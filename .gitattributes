@@ -14,7 +14,6 @@ Bonmin/doc/BOUM_use.tex -text
 Bonmin/doc/Head.tex -text
 Bonmin/doc/bonmin.css -text
 Bonmin/doc/bonmin.sty -text
-Bonmin/doc/index.html -text
 Bonmin/doc/options.tex -text
 Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
