@@ -1,6 +1,6 @@
 Below are the generic COIN-OR installation instruction.
 
-For Bonmin-specific information look at Bonmon/INSTALL
+For Bonmin-specific information look at Bonmin/INSTALL
 
 
 These instructions are for UNIX-like systems (including Linux, Cygwin
@@ -13,7 +13,7 @@ maintained for this package, you can find instructions at
 ***                         DOWNLOAD                               ***
 **********************************************************************
 
-You can obtain the source code for the Cbc package in two ways:
+You can obtain the source code for the Bonmin package in two ways:
 
 1. Obtain the source directly from the COIN-OR subversion repository
    (recommended).  For this you needs the program 'svn' installed on
@@ -21,15 +21,15 @@ You can obtain the source code for the Cbc package in two ways:
    "handles 'https' scheme".
 
    Assuming that you want to download the code into a subdirectory
-   "COIN-Cbc", you type
+   "Bonmin", you type
 
-   svn co https://projects.coin-or.org/svn/Cbc/trunk Coin-Cbc
+   svn co https://projects.coin-or.org/svn/Bonmin/trunk Bonmin
 
-2. Download the tarball from http://www.coin-or.org/Tarballs/Cbc and
+2. Download the tarball from http://www.coin-or.org/Tarballs/ and
    extract it, for example, with
 
-   gunzip Cbc_2006Jun07.tgz
-   tar xvf Cbc_2006Jun07.tar
+   gunzip Bonmin_2006Jun07.tgz
+   tar xvf Bonmin_2006Jun07.tar
 
    (Here "2006Jun07" is of course replaced by the string in the
    tarball you downloaded.)
@@ -53,9 +53,9 @@ compilers).  Please visit
 
    https://projects.coin-or.org/BuildTools/wiki/user-configure
 
-and the Cbc Trac page
+and the Bonmin Trac page
 
-   https://projects.coin-or.org/Cbc
+   https://projects.coin-or.org/Bonmin
 
 for more information.
 
@@ -95,7 +95,7 @@ More information on the compilation and installation can be found at
 Now you can link your own code with the installed libraries.  You can
 find examples in the
 
-   Cbc/examples/
+   Bonmin/examples/
 
 subdirectory, see also the information at
 
