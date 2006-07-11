@@ -1,0 +1,325 @@
+// (C) Copyright Carnegie Mellon University 2005
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// P. Bonami, Carnegie Mellon University
+//
+// Date :  07/01/2005
+
+#include "BonminAmplInterface.hpp"
+#include "OsiClpSolverInterface.hpp"
+#include "TMINLP.hpp"
+#include "AmplTMINLP.hpp"
+#include "IpIpoptApplication.hpp"
+/** Test function for the Osi interface to Ipopt (or any nlp solver). <br>
+    If Solver passes all the test then it should have everything needed to be integrated into bonmin. */
+
+void testGetMethods(IpoptInterface &si)
+{
+    CoinRelFltEq eq;// to test equality of doubles    
+    std::cout<<"Checking get functions"<<std::endl;
+      // Problem size
+      assert(si.getNumCols()==4);
+      assert(si.getNumRows()==3);
+      
+      //Check bounds on columns
+      const double * colLow = si.getColLower();
+      assert(eq(colLow[0],0.));
+      assert(eq(colLow[1],0.));
+      assert(eq(colLow[2],0.));
+      assert(eq(colLow[3],0.));
+      
+      const double * colUp = si.getColUpper();
+      assert(colUp[0]>si.getInfinity());
+      assert(colUp[1]>si.getInfinity());
+      assert(eq(colUp[2],1.));
+      assert(eq(colUp[3],5.));      
+      //Check bounds on rows
+      const double * rowLow = si.getRowLower();
+      assert(rowLow[0]<= -si.getInfinity());
+      assert(rowLow[1]<= -si.getInfinity());
+      assert(rowLow[2]<= -si.getInfinity());
+                  
+      const double * rowUp = si.getRowUpper();
+      assert(eq(rowUp[0], 1./4.));
+      assert(eq(rowUp[1], 0.));
+      assert(eq(rowUp[2], 2.));
+
+      //check objective sense
+      assert(si.getObjSense()==1);
+      
+      // check variables types
+      assert(si.isInteger(0)==0);
+      assert(si.isInteger(1)==0);
+      assert(si.isInteger(2)==1);
+      assert(si.isInteger(3)==1);
+      
+      assert(si.isContinuous(0)==1);
+      assert(si.isContinuous(1)==1);
+      assert(si.isContinuous(2)==0);
+      assert(si.isContinuous(3)==0);
+      
+      assert(si.isBinary(0)==0);
+      assert(si.isBinary(1)==0);
+      assert(si.isBinary(2)==1);
+      assert(si.isBinary(3)==0);
+      
+      assert(si.isIntegerNonBinary(0)==0);
+      assert(si.isIntegerNonBinary(1)==0);
+      assert(si.isIntegerNonBinary(2)==0);
+      assert(si.isIntegerNonBinary(3)==1);
+      
+      assert(si.isFreeBinary(2)==1);
+      si.setColLower(2,1.);
+      assert(si.isFreeBinary(2)==0);
+      si.setColLower(2,0.);
+      
+      assert(si.getInfinity()>1e50);
+      std::cout<<"Test passed"<<std::endl;                  
+}
+void testOptimAndSolutionQuery(IpoptInterface &si)
+{
+    CoinRelFltEq eq(1e-07);// to test equality of doubles    
+    std::cout<<"Testing optimization methods and solution query"<<std::endl;
+    si.initialSolve();
+    
+    assert(si.isProvenOptimal());
+    assert(si.nCallOptimizeTNLP()==1);
+    assert(si.getIterationCount()>0);
+    // Optimum of the problem is -( 3/2 + sqrt(5)/2)
+    // with x = (1/2 + sqrt(5) y[1]=x and y[2] = 1/2 + sqrt(5)/2
+    // (can easily be computed since constraint x-y[1]<=0 imply x = y[1] and the resulting problem has dimension 2
+    if(!eq(si.getObjValue(),-( (3./2.) + sqrt(5.)/2.)))
+        std::cout<<"Error in objective : "<<fabs(si.getObjValue()+( (3./2.) + sqrt(5.)/2.))<<std::endl;
+    
+    //Test validity of primal solution
+    const double * colsol = si.getColSolution();
+    if(!eq(colsol[0],( (1./2.) + 1/sqrt(5.))))
+        std::cout<<"Error for y[1]  : "<<fabs(colsol[0]-( (1./2.) + 1/sqrt(5.)))<<std::endl;
+    if(!eq(colsol[1],( (1./2.) + 1/(2.*sqrt(5.)))))
+        std::cout<<"Error for y[2]  : "<<fabs(colsol[1]-( (1./2.) + 1/(2*sqrt(5.))))<<std::endl;
+    if(!eq(colsol[2],( (1./2.) + 1/sqrt(5.))))
+        std::cout<<"Error for x  : "<<fabs(colsol[2]-( (1./2.) + 1/sqrt(5.)))<<std::endl;
+    //value of z is not tested
+
+    //Test for row activity
+    const double * rowAct = si.getRowActivity();
+    if(!eq(rowAct[0],1./4.))
+        std::cout<<"Error for row activity of c1 : "<<fabs(rowAct[0]-1./4.)<<std::endl;
+    if(!eq(rowAct[1],0.))
+        std::cout<<"Error for row activity of c2 : "<<fabs(rowAct[1])<<std::endl;
+        
+     //Check dual values dual for c1 = sqrt(5) c2=1 c3 not tested
+     const double * duals = si.getRowPrice();
+     if(!eq(duals[0],sqrt(5)))
+             std::cout<<"Error dual of c1 : "<<fabs(duals[0]-sqrt(5.))<<std::endl;
+     if(!eq(duals[1],1.))
+             std::cout<<"Error dual of c2 : "<<fabs(duals[0]-1.)<<std::endl;
+             
+     std::cout<<"Test passed successfully"<<std::endl;
+}
+
+///Test set methods
+void testSetMethods(IpoptInterface &si)
+{
+    CoinRelFltEq eq(1e-07);// to test equality of doubles    
+    si.setColLower(2,1.);
+    assert(si.getColLower()[2]==1.);
+    si.initialSolve();    
+    assert(si.isProvenOptimal());
+    assert(eq(si.getColSolution()[2],1));
+
+    CoinWarmStart * ws = si.getWarmStart();
+    
+    
+    si.setColLower(2,0.);
+    
+    si.setColUpper(2,0.);
+    assert(si.getColUpper()[2]==0.);
+    si.setWarmStart(ws);
+
+    si.resolve();    
+    assert(si.isProvenOptimal());
+    assert(eq(si.getColSolution()[2],0.));
+    
+    si.setColUpper(2,1.);
+    delete ws;
+}
+
+void testOa(BonminAmplInterface &si)
+{
+        CoinRelFltEq eq(1e-07);// to test equality of doubles    
+    OsiClpSolverInterface lp;
+    si.extractLinearRelaxation(lp);
+    lp.writeMps("toy");
+     assert(lp.getNumCols()==5);
+      assert(lp.getNumRows()==4);
+      //Check bounds on columns
+      const double * colLow = lp.getColLower();
+      assert(eq(colLow[0],0.));
+      assert(eq(colLow[1],0.));
+      assert(eq(colLow[2],0.));
+      assert(eq(colLow[3],0.));
+      
+      const double * colUp = lp.getColUpper();
+      assert(colUp[0]>=lp.getInfinity());
+      assert(colUp[1]>=lp.getInfinity());
+      assert(eq(colUp[2],1.));
+      assert(eq(colUp[3],5.));      
+      //Check bounds on rows
+      const double * rowLow = lp.getRowLower();
+      assert(rowLow[0]<= -lp.getInfinity());
+      assert(rowLow[1]<= -lp.getInfinity());
+      assert(rowLow[2]<= -lp.getInfinity());
+                  
+      const double * rowUp = lp.getRowUpper();
+      assert(eq(rowUp[0], 1./2. + 3./(2 * sqrt(5))));
+      assert(eq(rowUp[1], 0.));
+      assert(eq(rowUp[2], 2.));
+      assert(eq(rowUp[3], 0.));
+      
+
+      //check objective sense
+      assert(si.getObjSense()==1);
+      
+      // check variables types
+      assert(si.isInteger(0)==0);
+      assert(si.isInteger(1)==0);
+      assert(si.isInteger(2)==1);
+      assert(si.isInteger(3)==1);
+    
+       //Now check the full matrix
+       const CoinPackedMatrix * mat = lp.getMatrixByCol();
+       int  inds[11] = {0, 1, 3, 0, 2, 3, 1, 2, 3, 2, 3};
+       double vals[11] = {2. / sqrt(5) , -1., -1., 1./sqrt(5), 1. , -1. , 1. , 1., -1.,1.,-1.};
+       assert(mat->getNumElements()==11);
+       int k=0;
+       for(int i = 0 ; i < si.getNumCols() ; i++)
+       {
+        for(int j = mat->getVectorStarts()[i] ; j < mat->getVectorStarts()[i] + mat->getVectorLengths()[i] ; j++)
+        {
+        assert(inds[k]==mat->getIndices()[j]);
+        assert(eq(vals[k],mat->getElements()[j]));
+          k++;
+        }
+       }
+}
+
+void testFp(BonminAmplInterface &si)
+{
+        CoinRelFltEq eq(1e-07);// to test equality of doubles
+        OsiCuts cuts;
+        double x[1] = {0.};
+        int ind[1]={1};
+        si.getFeasibilityOuterApproximation(1,x,ind,cuts);
+        std::cout<<si.getColSolution()[0]<<std::endl;
+         std::cout<<si.getColSolution()[1]<<std::endl;
+       assert(eq(si.getColSolution()[1],(1./2.)));
+}
+void interfaceTest()
+{
+  /**********************************************************************************/
+  /*   Test constructors                                                                                                              */
+  /**********************************************************************************/
+  std::cout<<"Test IpoptInterface"<<std::endl;
+  // Test usefull constructor
+  {
+        //read a toy problem and do various tests
+//        var x binary;
+//        var z integer >= 0 <= 5;
+//        var y{1..2} >=0;
+//        
+//        
+//        minimize cost:
+//            - x - y[1] - y[2] ;
+//            
+//        subject to
+//            c1: ( y[1] - 1/2 )^2 + (y[2] - 1/2)^2 <= 1/4 ;
+//            c2: x - y[1] <= 0 ;
+//            c3: x + y[2] + z <= 2;
+        
+        //Setup Ipopt should be replaced if solver is changed
+        using namespace Ipopt;
+      SmartPtr<Ipopt::IpoptApplication> app = new Ipopt::IpoptApplication();
+       const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
+       const char ** argv = args;
+      SmartPtr<Ipopt::TMINLP> ampl_tminlp = new Ipopt::AmplTMINLP(ConstPtr(app->Jnlst()), app->Options(), const_cast<char**&>(argv));
+      IpoptInterface si(ampl_tminlp);
+    std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
+    <<std::endl<<"Testing usefull constructor"<<std::endl
+    <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
+      //Start of real tests
+      testGetMethods(si);
+      testOptimAndSolutionQuery(si);
+      testSetMethods(si);
+  }
+  // Test copy constructor
+  {
+        //read a toy problem and do various tests
+//        var x binary;
+//        var z integer >= 0 <= 5;
+//        var y{1..2} >=0;
+//        
+//        
+//        minimize cost:
+//            - x - y[1] - y[2] ;
+//            
+//        subject to
+//            c1: ( y[1] - 1/2 )^2 + (y[2] - 1/2)^2 <= 1/4 ;
+//            c2: x - y[1] <= 0 ;
+//            c3: x + y[2] + z <= 2;
+        
+        //Setup Ipopt should be replaced if solver is changed
+        using namespace Ipopt;
+      SmartPtr<Ipopt::IpoptApplication> app = new Ipopt::IpoptApplication();
+      const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
+      const char ** argv = args;
+      SmartPtr<Ipopt::TMINLP> ampl_tminlp = new Ipopt::AmplTMINLP(ConstPtr(app->Jnlst()),  app->Options(), const_cast<char**&>(argv));
+      IpoptInterface si1(ampl_tminlp);
+      
+      IpoptInterface si(si1);
+    std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
+    <<std::endl<<"Testing copy constructor"<<std::endl
+    <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
+      //Start of real tests
+      testGetMethods(si);
+      testOptimAndSolutionQuery(si);
+      testSetMethods(si);
+  }
+  
+    // Test outer approximation methods
+  {
+        //Setup Ipopt should be replaced if solver is changed
+        using namespace Ipopt;
+        const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
+        const char ** argv = args;
+      BonminAmplInterface si(const_cast<char**&>(argv));
+      std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
+	       <<std::endl<<"Testing outer approximations related methods"<<std::endl
+	       <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
+      testOa(si);
+  }
+  
+  // Test Feasibility Pump methods
+//  {
+//    //Setup Ipopt should be replaced if solver is changed
+//    using namespace Ipopt;
+//    SmartPtr<Ipopt::IpoptApplication> app = new Ipopt::IpoptApplication();
+//    char * args[3] ={"name","toy3",NULL}; //Ugly, but I don't know how to do differently
+//    char ** argv = args;
+//    SmartPtr<Ipopt::TMINLP> ampl_tminlp = new Ipopt::AmplTMINLP(ConstPtr(app->Jnlst()),  app->Options(), argv);
+//    BonminAmplInterface si(ampl_tminlp);
+//    std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
+//	     <<std::endl<<"Testing optimization of some distance over feasible set"<<std::endl
+//	     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
+ //   testFp(si);
+//  }
+  std::cout<<"All test passed successfully"<<std::endl;
+} 
+
+int main()
+{
+    interfaceTest();
+    return 0;
+}

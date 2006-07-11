@@ -1,0 +1,35 @@
+* text=auto !eol
+Bonmin/AUTHORS -text
+Bonmin/INSTALL -text
+Bonmin/LICENSE -text
+Bonmin/README -text
+Bonmin/configure -text
+Bonmin/doc/BONMIN_UsersManual.pdf -text
+Bonmin/doc/BONMIN_UsersManual.tex -text
+Bonmin/doc/BOUM_Install.tex -text
+Bonmin/doc/BOUM_Intro.tex -text
+Bonmin/doc/BOUM_Obtain.tex -text
+Bonmin/doc/BOUM_options.tex -text
+Bonmin/doc/BOUM_use.tex -text
+Bonmin/doc/Head.tex -text
+Bonmin/doc/bonmin.css -text
+Bonmin/doc/bonmin.sty -text
+Bonmin/doc/options.tex -text
+Bonmin/examples/amplExamples/toy.mod -text
+Bonmin/experimental/Bcp/BM.par -text
+Bonmin/inc/config_bonmin.h.in -text
+Bonmin/src/IpoptInterface/README -text
+Bonmin/test/.cvsignore -text
+Bonmin/test/bonmin.opt -text
+Bonmin/test/mytoy.nl -text
+Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
+/INSTALL -text
+/LICENSE -text
+/README -text
+/config.guess -text
+/config.sub -text
+/configure -text
+/depcomp -text
+doxydoc/doxygen.conf -text
+/install-sh -text
+/missing -text

@@ -1,0 +1,559 @@
+\PageHead{Setting Options}
+\StartPageSummary
+\PageSection{Passing options to \Bonmin }{sec:opt_opt}
+\PageSection{Getting good solutions to nonconvex problems}{sec:opt_nonconv}
+\PageSection{Notes on \Ipopt\ options}{sec:opt_ipopt}
+\EndPageSummary
+\NavigationPanel
+
+\PageTitle{Options}{sec:opt}
+\subsectionH{Passing options to \Bonmin}{sec:opt_opt}
+Options in \Bonmin\ can be set in several different ways.
+
+First, you can set options by putting them in a file called {\tt
+bonmin.opt} in the directory where {\tt bonmin} is executing. If you
+are familiar with the file
+\href{http://www.coin-or.org/Ipopt/documentation/node38.html}{\tt
+ipopt.opt} (formerly named {\tt PARAMS.DAT}) in {\tt Ipopt}, the
+syntax of the {\tt bonmin.opt} is similar. For those not familiar
+with {\tt ipopt.opt}, the syntax is simply to put the name of the
+option followed by its value, with no more than two options on a
+single line. Anything on a line after a \# symbol is ignored (i.e.,
+treated as a comment).
+
+Note that \Bonmin\ sets options for {\tt
+Ipopt}. If you want to set options for {\tt Ipopt} (when used inside \Bonmin) you have to set them
+in the file {\tt bonmin.opt} (the standard {\tt Ipopt} option file {\tt ipopt.opt}
+is not read by \Bonmin.)
+For a list and a description of all the {\tt Ipopt} options, the
+reader may refer to the
+\footlink{http://www.coin-or.org/Ipopt/documentation/node43.html}{documentation
+of {\tt
+Ipopt}}.
+
+Since {\tt bonmin.opt} contains both {\tt Ipopt} and \Bonmin\ options, for clarity
+all \Bonmin\ options should be preceded with the prefix ``{\tt bonmin.}'' in {\tt bonmin.opt}~.
+Note that some options can also be passed to the MILP subsolver used by \Bonmin\
+in the outer approximation decomposition
+and the hybrid (see Subsection \ref{sec:milp_opt}).\\
+
+The most important option in \Bonmin\ is the choice of the solution
+algorithm. This can be set by using the option named {\tt
+bonmin.algorithm} which can be set to {\tt B-BB}, {\tt B-OA}, {\tt
+B-QG} or {\tt B-Hyb} (it's default value is {\tt B-Hyb}). Depending
+on the value of this option, certain other options may be available
+or not. Table \ref{tab:options} gives the list of options together
+with their types, default values and availability in each of the
+four algorithms. The column labeled `type' indicates the type of the
+parameter (`F' stands for float, `I' for integer, and `S' for
+string). The column labeled default indicates the global default
+value. Then for each of the four algorithm {\tt B-BB}, {\tt B-OA},
+{\tt B-QG} and {\tt B-Hyb}, `$+$' indicates that the option is
+available for that particular algorithm
+while `$-$' indicates that it is not.\\
+
+An example of a {\tt bonmin.opt} file including all the options
+with their default values is located in the {\tt Test}
+sub-directory.
+
+A small example is as follows:
+\begin{verbatim}
+   bonmin.bb_log_level 4
+   bonmin.algorithm B-BB
+   print_level 6
+\end{verbatim}
+This sets the level of output of the branch-and-bound in \Bonmin\ to $4$, the algorithm to branch-and-bound
+and the output level for {\tt Ipopt} to $6$.\\
+
+When \Bonmin\ is run from within {\tt Ampl}, another way to set
+an option is through the
+internal {\tt Ampl} command {\tt options}.
+For example
+\begin{verbatim}
+options bonmin_options "bonmin.bb_log-level 4 \
+                  bonmin.algorithm B-BB print_level 6";
+\end{verbatim}
+has the same affect as the {\tt bonmin.dat} example above.
+Note that any \Bonmin\ option specified in the file {\tt bonmin.opt}
+overrides any setting of that option from within {\t Ampl}.\\
+
+A third way is to set options directly in the C/C++ code when
+running \Bonmin\ from inside a C/C++ program as is explained in the reference manual.
+
+A detailed description of all of the \Bonmin\ options is given in Appendix \ref{sec:optList}.
+In the following, we give some more details on options for the MILP subsolver and
+on the options specifically designed
+for nonconvex problems.\\
+
+\mylatexhtml{
+\begin{latexonly}
+%\begin{table}[htb]
+%\centering
+\begin{threeparttable}%[tb]
+\caption{\label{tab:options} %\parbox{\linewidth}{
+    List of options and compatibility with the different algorithms.
+    }
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+Option & type &  default & {\tt B-BB} & {\tt B-OA} & {\tt B-QG} & {\tt B-Hyb} \\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{output options}\\
+\hline
+bb\_log\_level & I & 1 & + & $-$  & + & +\\
+bb\_log\_interval & I & 100 & + & $-$ & + & +\\
+lp\_log\_level & I & 0 & $-$ & $-$ & + & +\\
+milp\_log\_level & I &  0 & $-$ &  + & $-$ & +\\
+oa\_log\_level & I & 1 & $-$ &  + & $-$ & +\\
+nlp\_log\_level & I & 0 & +&  + & + & +\\
+print\_user\_options & S & no & + & + & + & +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{branch-and-bound options}\\
+\hline
+allowable\_gap  & F & 0 & + & + & + & +\\
+allowable\_fraction\_gap & F & 0& +& + & +& +\\
+cutoff & F& 1e+100 &  + & +& +& +\\
+cutoff\_decr & F & 1e$-$05 & + & + & + & +\\
+integer\_tolerance & F & + &  + & + & + & +\\
+node\_limit & I & INT\_MAX &  + & +& + & + \\
+nodeselect\_stra$^*$ & S & best-bound & + & + & +& +\\
+number\_before\_trust$^*$ & I & 8 & $-$ & + & + & +\\
+number\_strong\_branch$^*$ & I & 20 & $-$ & + & + &+ \\
+time\_limit & F & 1e+10 & + & + & + & +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{options for robustness}\\
+\hline
+max\_random\_point\_radius & F &+  &+ &+ &+ &+\\
+num\_consecutive\_failures & I & 1 & + & $-$ & $-$ & $-$\\
+nlp\_failure\_behavior & S & stop   & + & + & + & + \\
+num\_iterations\_suspect & I & $-$1 & + & + & + & + \\
+num\_retry\_unsolved\_random\_point & I & 0 & + & + & + & + \\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{options for nonconve+ problems}\\
+\hline
+num\_consecutive\_infeasible & I & 1 & + & $-$ & $-$ & $-$\\
+num\_resolve\_at\_node & I & 0 & + & +  & + & + \\
+num\_resolve\_at\_root & I & 0& + & + & + & +  \\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{{\tt B-Hyb }specific options}\\
+\hline
+nlp\_solve\_frequency & I & 10 & $-$ & $-$ & $-$ & +\\
+oa\_dec\_time\_limit & F& 120 & $-$ & $-$ & $-$ & +\\
+tiny\_element & F & 1e$-$08 & $-$ & + & + & + \\
+very\_tiny\_element & F & 1e$-$17 & $-$ & + & + & + \\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{MILP options}\\
+\hline
+cover\_cuts$^*$  & I & $-$5 & $-$ & + & $-$ & +\\
+Gomory\_cuts$^*$ & I & $-$5 & $-$ &  + & $-$ & + \\
+milp\_subsolver &S & {\tt Cbc\_D} & $-$ & + & $-$ & + \\
+mir\_cuts$^*$  & I & $-$5 & $-$  & + & $-$ &+\\
+probing\_cuts$^1$$^*$  & I & 0 & $-$ & + & $-$ & +\\
+\hline
+\end{tabular}
+\begin{tablenotes}
+\item $\strut^*$ option is available
+         for MILP subsolver (it is only passed if the {\tt milp\_subsolver} option is set to {\tt Cbc\_Par},
+         see Subsection \ref{sec:milp_opt}).
+\item $\strut^1$ disabled for stability reasons.
+\end{tablenotes}
+\end{threeparttable}
+\end{latexonly}
+}{
+\begin{rawhtml}
+<table border="1">
+  <tr>
+    <td>Option </td>
+    <td> type </td>
+    <td> default </td>
+    <td> B-BB</td>
+    <td> B-OA</td>
+    <td> B-QG</td>
+    <td> B-Hyb</td>
+  </tr>
+  <tr>
+    <td>bb_log_level </td>
+    <td> I </td>
+    <td> 1 </td>
+    <td> + </td>
+    <td> - </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>bb_log_interval </td>
+    <td> I </td>
+    <td> 100</td>
+    <td> + </td>
+    <td> - </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>lp_log_level </td>
+    <td> I </td>
+    <td> 0 </td>
+    <td> - </td>
+    <td> - </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>milp_log_level </td>
+    <td> I </td>
+    <td> - </td>
+    <td> + </td>
+    <td> - </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>oa_log_level </td>
+    <td> I </td>
+    <td> 1 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> - </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>nlp_log_level </td>
+    <td> I </td>
+    <td> 0 </td>
+    <td> +</td>
+    <td> + </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>allowable_gap </td>
+    <td> F </td>
+    <td> 0 </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>allowable_fraction_gap </td>
+    <td> F </td>
+    <td> 0</td>
+    <td> +</td>
+    <td> + </td>
+    <td> +</td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>cutoff </td>
+    <td> F</td>
+    <td> 1e100 </td>
+    <td> + </td>
+    <td> +</td>
+    <td> +</td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>cutoff_decr </td>
+    <td> F </td>
+    <td> 1e-05 </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>integer_tolerance </td>
+    <td> F </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>node_limit </td>
+    <td> I </td>
+    <td> INT_MAX </td>
+    <td> + </td>
+    <td> +</td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>nodeselect_stra<a href="#MILP_options">(1)</a></td>
+    <td> S </td>
+    <td> best-bound </td>
+    <td> + </td>
+    <td> + </td>
+    <td> +</td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>number_before_trust<a href="#MILP_options">(1)</a></td>
+    <td> I </td>
+    <td> 8 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>number_strong_branch<a href="#MILP_options">(1)</a></td>
+    <td> I </td>
+    <td> 20 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> + </td>
+    <td>+ </td>
+  </tr>
+  <tr>
+    <td>time_limit </td>
+    <td> F </td>
+    <td> 1e10 </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>ma+_random_point_radius </td>
+    <td> F </td>
+    <td>1e08</td>
+    <td>+ </td>
+    <td>+ </td>
+    <td>+ </td>
+    <td>+</td>
+  </tr>
+  <tr>
+    <td>ma+_consecutive_failures </td>
+    <td> I </td>
+    <td> 1</td>
+    <td> + </td>
+    <td> - </td>
+    <td> - </td>
+    <td> -</td>
+  </tr>
+  <tr>
+    <td>nlp_failure_behavior </td>
+    <td> S </td>
+    <td> stop </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>num_iterations_suspect </td>
+    <td> I </td>
+    <td> -1 </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>num_retry_unsolved_random_point </td>
+    <td> I </td>
+    <td> 0 </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>ma+_consecutive_infeasible </td>
+    <td> I </td>
+    <td> 0 </td>
+    <td> 0 </td>
+    <td> 0 </td>
+    <td> 0 </td>
+    <td> 0 </td>
+  </tr>
+  <tr>
+    <td>num_resolve_at_node </td>
+    <td> I </td>
+    <td> 0 </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>num_resolve_at_root </td>
+    <td> I </td>
+    <td> 0</td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>nlp_solve_frequency </td>
+    <td> I </td>
+    <td> 10 </td>
+    <td> - </td>
+    <td> - </td>
+    <td> - </td>
+    <td> 10</td>
+  </tr>
+  <tr>
+    <td>oa_dec_time_limit </td>
+    <td> F</td>
+    <td> 120. </td>
+    <td> - </td>
+    <td> - </td>
+    <td> - </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>tiny_element </td>
+    <td> F</td>
+    <td> 1e-08 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>very_tiny_element </td>
+    <td> F</td>
+    <td> 1e-17 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> + </td>
+    <td> + </td>
+  </tr>
+    <tr>
+    <td>cover_cuts<a href="#MILP_options">(1)</a></td>
+    <td> I </td>
+    <td> -5 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> - </td>
+    <td> +</td>
+  </tr>
+  <tr>
+    <td>Gomory_cuts<a href="#MILP_options">(1)</a></td>
+    <td> I </td>
+    <td> -5 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> - </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>milp_subsolver </td>
+    <td>S </td>
+    <td> Cbc_D </td>
+    <td> - </td>
+    <td> + </td>
+    <td> - </td>
+    <td> + </td>
+  </tr>
+  <tr>
+    <td>mir_cuts<a href="#MILP_options">(1)</a></td>
+    <td> I </td>
+    <td> -5 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> - </td>
+    <td>+</td>
+  </tr>
+  <tr>
+    <td>probing_cuts<a href="#MILP_options">(1)</a><a href="#disabled">(2)</a></td>
+    <td> I </td>
+    <td> 0 </td>
+    <td> - </td>
+    <td> + </td>
+    <td> - </td>
+    <td> +</td>
+  </tr>
+</table>
+\end{rawhtml}
+}
+
+
+\subsection{Passing options to the MILP subsolver}
+\label{sec:milp_opt}
+In the context of outer approximation decomposition, a standard MILP solver is used.
+Several option are available for configuring this MILP solver.
+\Bonmin\ allows a choice of different MILP solvers through the option
+{\tt bonmin.milp\_subsolver}. Values for this option are: {\tt Cbc\_D} which uses {\tt Cbc} with its
+default settings, {\tt Cplex} which uses {\tt Cplex} with its default settings, and
+{\tt Cbc\_Par} which uses a version of {\tt Cbc} that can be parameterized by the user.
+
+The options that can be set are the node-selection strategy, the number of strong-branching candidates,
+the number of branches before pseudo costs are to be trusted, and the frequency of the various cut generators
+(options marked with $^*$ in Table \ref{tab:options}). To pass those options to the MILP subsolver, you have
+to replace the prefix ``{\tt bonmin.}'' with ``{\tt milp\_sub.}''.
+
+
+\subsectionH{Getting good solutions to nonconvex problems}{sec:opt_nonconv}
+\label{sec:non_convex}
+A few options have been designed in \Bonmin\ specifically to treat
+problems that do not have a convex continuous relaxation.
+In such problems, the solutions obtained from {\tt Ipopt} are
+not necessarily globally optimal, but are only locally optimal. Also the outer-approximation
+constraints are not necessarily valid inequalities for the problem.
+
+No specific heuristic method for treating nonconvex problems is implemented
+yet within the OA framework.
+But for the pure branch-and-bound {\tt B-BB}, we implemented a few options having
+in mind that lower bounds provided by {\tt Ipopt} should not be trusted, and with the goal of
+trying to get good solutions. Such options are at a very experimental stage.
+
+First, in the context of nonconvex problems, {\tt Ipopt} may find different local optima when started
+from different starting points. The two options {\tt num\_solve\_at\_root} and {\tt num\_solve\_at\_node}
+allow for solving the root node or each node of the tree, respectively, with a user-specified
+number of different randomly-chosen
+starting points, saving the best solution found. Note that the function to generate a random starting point
+is very na\"{\i}ve: it chooses a random point (uniformly) between the bounds provided for the variable.
+In particular if there are some functions
+that can not be evaluated at some points of the domain, it may pick such points,
+ and so it is not robust in that respect.
+
+Secondly, since the solution given by {\tt Ipopt} does not truly give a lower bound, we allow for
+changing the fathoming rule
+to continue branching even if the solution value to the current node is worse
+than the best-known
+solution. This is achieved by setting {\tt allowable\_gap}
+and {\tt allowable\_fraction\_gap} and {\tt cutoff\_decr} to negative values.
+
+\subsectionH{Notes on \Ipopt\ options}{sec:opt_ipopt}
+\Ipopt\ has a very large number of options, to get a complete description of them, you
+should refer to the \Ipopt\ manual.
+Here we only mention and explain some of the options that have been more important to us, so far,
+in developing and using \Bonmin.
+\subsubsection{Default options changed by \Bonmin}
+\Ipopt\ has been tailored to be more efficient when used in the context of the
+solution of a MINLP problem. In particular, we have tried to
+improve \Ipopt's warm-starting capabilities and its ability to prove quickly that a subproblem
+is infeasible. For ordinary NLP problems, \Ipopt\ does not use these options
+by default, but \Bonmin\ automatically changes these options from their default values.
+
+Note that options set by the user in {\tt bonmin.opt} will override these
+settings.
+
+\paragraph{{\tt mu\_strategy} and {\tt mu\_oracle}} are set, respectively, to
+{\tt adaptive} and {\tt probing} by default (these are newly implemented strategies in \Ipopt\
+for updating the barrier parameter \cite{NocedalAdaptive} which we have found to be
+more efficient in the context of MINLP).
+\paragraph{{\tt gamma\_phi} and {\tt gamma\_theta}} are set to $10^{-8}$ and $10^{-4}$
+respectively. This has the effect of reducing the size of the filter in the line search performed by Ipopt.
+
+\paragraph{required\_infeasibility\_reduction} is set to $0.1$.
+This increases the required infeasibility reduction when \Ipopt\ enters the
+restoration phase and should thus help
+detect infeasible problems faster.
+
+\paragraph{expect\_infeasible\_problem} is set to {\tt yes} which enables some heuristics
+to detect infeasible problems faster.
+
+\paragraph{\tt warm\_start\_init\_point} is set to {\tt yes} when a full primal/dual starting
+point is available (generally all the optimizations after the continuous relaxation has been solved).
+
+\paragraph{\tt print\_level} is set to $0$ by default to turn off Ipopt output.
+\subsubsection{Some useful \Ipopt\ options}
+\paragraph{bound\_relax\_factor} is by default set to $10^{-8}$ in \Ipopt. All of the bounds
+of the problem are relaxed by this factor. This may cause some trouble
+when constraint functions can only be evaluated within their bounds.
+In such cases, this
+option should be set to 0.

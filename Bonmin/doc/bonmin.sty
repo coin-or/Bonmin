@@ -1,0 +1,154 @@
+%
+%
+\newcommand{\mylatexhtml}[2]{#1}
+\newcommand{\myrawhtml}[1]{}
+
+\newcommand{\Bonmin}{{\tt BONMIN}}
+\newcommand{\BonminBB}{{\tt BonminBB}}
+
+\newcommand{\linkCoin}{https://projects.coin-or.org/}
+\newcommand{\link}[2]{\mylatexhtml{\href{#1}{#2}}{\htmladdnormallink{#2}{#1}}}
+
+\newcommand{\footlink}[2]{\link{#1}{#2}\latex{\footnote{#1}}}
+
+\newcommand{\Ipopt}{\link{\linkCoin Ipopt}{\tt Ipopt}}
+\newcommand{\CoinUtils}{\link{\linkCoin CoinUtils}{\tt CoinUtils}}
+\newcommand{\BuildTools}{\link{\linkCoin BuildTools}{\tt BuildTools}}
+\newcommand{\Cbc}{\link{\linkCoin Cbc}{\tt Cbc}} 
+\newcommand{\Cgl}{\link{\linkCoin Cgl}{\tt Cgl}}
+\newcommand{\Clp}{\link{\linkCoin Clp}{\tt Clp}}
+\newcommand{\Osi}{\link{\linkCoin Osi}{\tt Osi}}
+\newcommand{\COINOR}{\link{http://www.coin-or.org}{COIN-OR}}
+
+
+\newcommand{\PageTitle}[2]{
+\mylatexhtml{
+\section{#1}
+\label{#2}
+}
+{
+\begin{rawhtml}
+</div>
+<div id="content">
+  <div class="feature">
+  <h3>
+  \end{rawhtml} #1 \begin{rawhtml}</h3>
+  \end{rawhtml}
+}
+}
+
+\newcommand{\myHTMLsections}[3]{
+\mylatexhtml{
+#3{#1}
+\label{#2}
+}
+{
+\begin{rawhtml}
+ </div>
+  <div class="story">
+    <h3><a name=
+\end{rawhtml} "#2" \begin{rawhtml}></a>\end{rawhtml} #1 \begin{rawhtml} </h3>
+\end{rawhtml}
+}
+}
+
+\newcommand{\subsectionH}[2]{
+\myHTMLsections{#1}{#2}{\subsection}}
+
+\newcommand{\subsectionHs}[2]{
+\myHTMLsections{#1}{#2}{\subsection*}}
+
+\newcommand{\citeH}[3]{\mylatexhtml{ \cite{#1} }{
+\begin{rawhtml}
+<A
+ HREF=\end{rawhtml} "#2" \begin{rawhtml} >\end{rawhtml}[#3]\begin{rawhtml}</A>
+\end{rawhtml}
+}
+}
+
+\newcommand{\PageHead}[1]{
+\mylatexhtml{}{
+\begin{rawhtml}
+<div id="masthead"> 
+  <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1> 
+  <div id="globalNav"> 
+	<a href="../BOUM_Intro/index.html">Introduction</a> | <a href="../BOUM_Obtain/index.html">Download</a> |
+	<a href="../BOUM_Install/index.html">Install</a> | <a href="../BOUM_use/index.html">Use</a> | <a href="Biblio.html">Bibliography</a> | <a href="../BOUM_options/index.html">Options</a> | 
+  </div> 
+  <h2 id="pageName"> \end{rawhtml} #1 \begin{rawhtml} </h2> 
+  \end{rawhtml}}
+  }
+  
+  \newcommand{\StartPageSummary}{
+  \mylatexhtml{}{
+  \begin{rawhtml}
+  <div id="breadCrumb"> 
+  \end{rawhtml}}
+  }
+  
+  \newcommand{\PageSection}[2]{\mylatexhtml{}{\begin{rawhtml} <a href="\end{rawhtml}\##2 \begin{rawhtml}" > \end{rawhtml} #1 \begin{rawhtml} </a>  / \end{rawhtml}}}
+ 
+ \newcommand{\EndPageSummary}{
+ \mylatexhtml{}{\begin{rawhtml}
+</div> 
+</div>
+\end{rawhtml}
+}
+}
+
+
+\newcommand{\NavigationPanel}{
+\mylatexhtml{}{
+\begin{rawhtml}
+<div id="leftPanel">
+<div id="navBar"> 
+  <div id="sectionLinks"> 
+   <h3>BONMIN links </h3> 
+	<ul> 
+	  <li><a href= \end{rawhtml} "\#" \begin{rawhtml} >Project page</a></li> 
+	  <li><a href= \end{rawhtml} "\#" \begin{rawhtml} >Browse source</a></li> 
+	  <li><a href= \end{rawhtml} "\#" \begin{rawhtml} >User's Manual</a></li> 
+	  <li><a href= \end{rawhtml} "\#" \begin{rawhtml} >Reference Manual</a></li> 
+		 <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU page </a></li>
+	  <li><a href="http://www.coin-or.org">Coin-or</a></li>
+	</ul> 
+   </div>
+</div>
+  <!--
+	<div class="relatedLinks"> 
+	<h3>COIN-OR links </h3> 
+	<ul> 
+	  <li><a href="http://www.coin-or.org">Main Page</a></li>
+	  <li><a href="http://www.coin-or.org/Cbc/index.html">Cbc</a></li> 
+	  <li><a href="http://www.coin-or.org/Clp/index.html">Clp</a></li> 
+	  <li><a href="http://projects.coin-or.org/Ipopt">Ipopt</a></li> 
+	</ul> 
+  </div> 
+  <div class="relatedLinks"> 
+	<h3>Problems libraries</h3> 
+	<ul> 
+	  <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU MINLP library </a></li>
+	  <li><a href="http://www.gamsworld.org/minlp/index.htm">GAMS MINLPLib </a></li> 
+	  <li><a href="http://www-unix.mcs.anl.gov/%7Eleyffer/macminlp/index.html">MacMinlp</a></li> 
+	</ul> 
+  </div> 
+  <div class="relatedLinks"> 
+	<h3>Other MINLP software</h3> 
+	<ul> 
+	  <li><a href="http://www.abo.fi/~Tapio.Westerlund/">alpha-CP</a></li>
+	  <li><a href="http://archimedes.scs.uiuc.edu/baron/baron.html">Baron</a></li>
+	  <li><a href="http://www.gamsworld.org/">GAMS</a></li> 
+	  <li><a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html">MINLPBB</a></li> 
+	  <li><a href="http://titan.princeton.edu/MINOPT/">MINOPT</a></li>
+	  <li><a href="http://www-neos.mcs.anl.gov/neos/solvers/index.html">NEOS</a></li>
+	  <li></li> 
+	</ul> 
+  </div> 
+</div>
+--> 
+<!--end navBar div --> 
+<br>
+\end{rawhtml}
+}
+}
+

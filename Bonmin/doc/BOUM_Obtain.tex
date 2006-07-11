@@ -1,0 +1,67 @@
+\PageHead{Downloading \Bonmin}
+\StartPageSummary
+\PageSection{Obtaining \Bonmin}{sec:obtain}
+\PageSection{Obtaining required third party code}{sec:obtain_3rd}
+\EndPageSummary
+\NavigationPanel
+
+
+
+\PageTitle{Obtaining \Bonmin}{sec:obtain}
+
+
+You can obtain the \Bonmin\ package by using
+\link{http://subversion.tigris.org/}{subversion}.
+
+The \Bonmin\ package consists of the source code for the \Bonmin\
+project but also source code from other \COINOR\ projects:
+\begin{itemize}
+\item \BuildTools
+\item \Cbc
+\item \Cgl
+\item \Clp
+\item \CoinUtils
+\item \Ipopt
+\item \Osi
+\end{itemize}
+
+When downloading the \Bonmin\ package you will download the source code for all these and
+libraries of problems to test the codes.\\
+
+In Unix\footnote{UNIX is a registered trademark of The Open
+Group.}-like environments, make a directory, say {\tt Bonmin-dist} where you want to
+download the code. Change to {\tt Bonmin-dist}, and issue the following
+command:
+%\begin{verbatim}
+\break
+
+ \noindent {\tt  svn co
+svn+ssh://pbonami-lx.tepper.cmu.edu/home/cvs/svn/BONMIN/trunk~. }
+
+%\end{verbatim}
+\noindent and when asked for a login and password type the ones you
+were provided with (of course this will change with the release).
+This copies all the necessary COIN-OR files to compile \Bonmin\ to
+{\tt Bonmin-dist}. To download \Bonmin\ using svn on Windows,
+follow the instructions provided at
+\link{http://www.coin-or.org/faqs.html\#q4}{COIN-OR}.
+
+\subsectionH{Obtaining required third party code}{sec:obtain_3rd}
+\Bonmin\ needs a few external packages which are not included in the \Bonmin\ package:
+\begin{itemize}
+\item Lapack (Linear Algebra PACKage)
+\item Blas (Basic Linear Algebra Subroutines)
+\item the sparse linear solver MA27 from the Harwell Subroutine Library and optionally (but strongly recommended) MC19 to enable automatic scaling in \Ipopt.
+\item optionally ASL (the Ampl Solver Library), to be able to use \Bonmin\ from Ampl.
+\end{itemize}
+
+Since these third-party software modules are released under licenses
+that are incompatible with the CPL, they cannot be included for
+distribution with \Bonmin\ from COIN-OR, but you will find scripts
+to help you download them in the subdirectory {\tt ThirdParty} of
+the \Bonmin\ distribution\footnote{In most Linux distribution and
+CYGWIN, Lapack and Blas are available as prebuilt binary packages in
+the distribution (and are probably already installed on your
+machine).}. For details on how to obtain these package, refer to the
+instructions in
+\link{http://www.coin-or.org/Ipopt/documentation/node13.html}{Section 2.2} of the Ipopt manual.\\
