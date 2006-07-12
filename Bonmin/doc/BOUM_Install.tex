@@ -53,7 +53,7 @@ make install
 
 \end{verbatim}
 
-This installs the executable {\tt bonmin} in {\tt Bonmin-dist/bin}. In what follows, we assume
+This installs the executable {\tt bonmin} in {\tt coin-Bonmin/bin}. In what follows, we assume
 that you have put the executable {\tt bonmin} on your path.
 
 The {\tt configure} script attempts to find all of the machine specific settings (compiler, libraries,...)
@@ -98,22 +98,22 @@ following lines in the {\tt config.site} file:
  with_cplex_lib="/usr/ilog/cplex/lib/libcplex.a -lpthread"
  with_cplex_incdir="/usr/ilog/cplex/include/ilcplex"
  \end{verbatim}
- (You will find a {\tt config.site} example in the subdirectory {\tt BuildTools} of {\tt Bonmin-dist}.)
+ (You will find a {\tt config.site} example in the subdirectory {\tt BuildTools} of {\tt coin-Bonmin}.)
 
 \subsectionH{Compiling \Bonmin\ in a external directory}{sec:vpath}
-It is possible to compile \Bonmin\ in a directory different from {\tt Bonmin-dist}.
+It is possible to compile \Bonmin\ in a directory different from {\tt coin-Bonmin}.
 This is convenient if you want to have several executables compiled for different a
 rchitectures or have several executables compiled with different options
 (debugging and production, shared and static libraries).\\
 
 To do this just create a new directory, for example {\tt Bonmin-build} in the parent directory of
-{\tt Bonmin-dist} and run the configure command from {\tt Bonmin-build}:
+{\tt coin-Bonmin} and run the configure command from {\tt Bonmin-build}:
 \begin{verbatim}
 
-../Bonmin-dist/configure -C
+../coin-Bonmin/configure -C
 
 \end{verbatim}
-This will create the makefiles in {\tt Bonmin-dist}, and
+This will create the makefiles in {\tt coin-Bonmin}, and
 you can then compile with the usual {\tt make} and {\tt make install}
 (in {\tt Bonmin-build}).
 
@@ -121,7 +121,7 @@ you can then compile with the usual {\tt make} and {\tt make install}
 The documentation for \Bonmin\ consists of a users' manual (this document) and a reference manual.
 You can build a local copy of the reference manual provided that you have Latex
 and Doxygen installed on your machine. Issue the command {\tt make
-doxydoc} in {\tt Bonmin-dist}. It calls Doxygen to build a copy of the
+doxydoc} in {\tt coin-Bonmin}. It calls Doxygen to build a copy of the
 reference manual. An html version of the reference manual can then
 be accessed in {\tt doc/html/index.html}.
 
