@@ -19,7 +19,6 @@ Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
 Bonmin/inc/config_bonmin.h.in -text
 Bonmin/src/IpoptInterface/README -text
-Bonmin/test/.cvsignore -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
