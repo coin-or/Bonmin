@@ -2205,12 +2205,14 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   }
 
   //Then convert everything to a CoinPackedMatrix (col ordered)
-  CoinBigIndex * inds = new CoinBigIndex[nnz_jac_g];
-  double * vals = new double [nnz_jac_g];
+  CoinBigIndex * inds = new CoinBigIndex[nnz_jac_g + 1];
+  double * vals = new double [nnz_jac_g + 1];
   int * start = new int[n+1];
   int * length = new int[n];
   bool needOrder = false;
   int nnz = 0;
+  if(nnz_jac_g > 0)
+  {
   for(int k = 0; k < jCol_[0]; k++) {
     start[k] = nnz;
     length[k] = 0;
@@ -2256,18 +2258,28 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
       length[i] = 0;
     }
     start[n]=nnz;
-    mat.assignMatrix(false, m, n, nnz, vals, inds, start, length);
   }
   else {
     std::cerr<<"jacobian matrix is not ordered properly"<<std::endl;
     throw -1;
   }
   delete [] g;
+  }
+  else {
+   for (int i = 0 ; i < n ; i++)
+   {
+     length[i] = 0;
+     start[i] = 0;
+   }
+   start[n]=0;
+ }
+ mat.assignMatrix(false, m, n, nnz, vals, inds, start, length);
   int numcols=getNumCols();
   double *obj = new double[numcols];
   for(int i = 0 ; i < numcols ; i++)
     obj[i] = 0;
   mat.transpose();
+  
 #if 0
   std::cout<<"Mat is ordered by "<<
   <<mat.isColOrdered?"columns.":"rows."
@@ -2297,6 +2309,8 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     CoinPackedVector * v = &objCut;
     v->reserve(n);
     for(int i = 0; i<n ; i++) {
+     if(nnz_jac_g)
+     {
       if(cleanNnz(obj[i],colLower[i], colUpper[i],
           -getInfinity(), 0,
           getColSolution()[i],
@@ -2306,6 +2320,19 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
         lb += obj[i] * getColSolution()[i];
         ub += obj[i] * getColSolution()[i];
       }
+     }
+     else //Unconstrained problem can not put clean coefficient
+     {
+         if(cleanNnz(obj[i],colLower[i], colUpper[i],
+          -getInfinity(), 0,
+          getColSolution()[i],
+          lb,
+          ub, 1e-03, 1e-08)) {
+        v->insert(i,obj[i]);
+        lb += obj[i] * getColSolution()[i];
+        ub += obj[i] * getColSolution()[i];
+         }
+     }
     }
     v->insert(n,-1);
     si.addRow(objCut, lb, ub);

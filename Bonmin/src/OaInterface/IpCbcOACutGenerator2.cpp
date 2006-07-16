@@ -521,6 +521,10 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
       value = floor(value+0.5);
         value = max(saveColLb[i],value);
         value = min(value, saveColUb[i]);
+        if(fabs(value) > 1e10) { std::cerr<<"FATAL ERROR: Variable taking a big value ("<<value
+                                 <<") at optimium of LP relaxation, can not construct outer approximation. You should try running the problem with B-BB"<<std::endl;
+         throw -1;
+        }
 #ifdef OA_DEBUG
         //         printf("xx %d at %g (bounds %g, %g)",i,value,nlp_->getColLower()[i],
         //                nlp_->getColUpper()[i]);
@@ -660,12 +664,12 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
       feasible = (si_->isProvenOptimal() &&
           !si_->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
       //if value of integers are unchanged then we have to get out
-      bool changed = !nlp_->isProvenOptimal()//if nlp_ is infeasible solution has necessarily changed
-          && feasible;//if lp is infeasible we don't have to check anything
+      bool changed = //!nlp_->isProvenOptimal()//if nlp_ is infeasible solution has necessarily changed
+          !feasible;//if lp is infeasible we don't have to check anything
       const double * nlpSol = nlp_->getColSolution();
       const double * lpSol = si_->getColSolution();
       for(int i = 0; i < numcols && !changed; i++) {
-        if(nlp_->isInteger(i) && fabs(nlpSol[i] - lpSol[i])>cbcIntegerTolerance_)
+        if(nlp_->isInteger(i) && fabs(nlpSol[i] - lpSol[i])>0.001)
           changed = 1;
       }
       if(changed) {
