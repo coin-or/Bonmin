@@ -6,7 +6,7 @@
 // P. Bonami, Carnegie Mellon University
 //
 // Date : 05/26/2005
-#define OA_DEBUG
+//#define OA_DEBUG
 
 #include "BonminConfig.h"
 

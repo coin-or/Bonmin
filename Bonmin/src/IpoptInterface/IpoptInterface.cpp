@@ -41,9 +41,9 @@ register_general_options
 
   roptions->AddBoundedIntegerOption("bb_log_level",
       "specify main branch-and-bound log level.",
-      0,5,1,
+      0,3,1,
       "Set the level of output of the branch-and-bound : "
-      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
+      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                    );
 
   roptions->AddLowerBoundedIntegerOption("bb_log_interval",
@@ -54,16 +54,16 @@ register_general_options
 
   roptions->AddBoundedIntegerOption("lp_log_level",
       "specify LP log level.",
-      0,5,0,
+      0,4,0,
       "Set the level of output of the linear programming sub-solver in B-Hyb or B-QG : "
       "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
                                    );
 
   roptions->AddBoundedIntegerOption("milp_log_level",
       "specify MILP subsolver log level.",
-      0,5,0,
+      0,3,0,
       "Set the level of output of the MILP subsolver in OA : "
-      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
+      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                    );
 
   roptions->AddBoundedIntegerOption("oa_log_level",

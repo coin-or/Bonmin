@@ -43,9 +43,13 @@ You can obtain the source code for the Bonmin package in two ways:
 **********************************************************************
 
 Go into the directory that you just downloaded or extracted (e.g.,
-Coin-Cbc or Cbc_2006Jun07).  Then you type
+Coin-Cbc or Cbc_2006Jun07).  Then create a subdirectory buildi and go into it:
+    mkdir build
+    cd build
 
-   ./configure
+then type
+
+   ../configure
 
 Note that you might have to specify additional options, in case you
 don't want to use the default choices that configure makes (e.g.,

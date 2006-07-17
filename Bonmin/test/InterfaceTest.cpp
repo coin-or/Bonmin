@@ -153,6 +153,7 @@ void testOa(BonminAmplInterface &si)
     OsiClpSolverInterface lp;
     si.extractLinearRelaxation(lp);
     lp.writeMps("toy");
+
      assert(lp.getNumCols()==5);
       assert(lp.getNumRows()==4);
       //Check bounds on columns
@@ -200,6 +201,7 @@ void testOa(BonminAmplInterface &si)
         for(int j = mat->getVectorStarts()[i] ; j < mat->getVectorStarts()[i] + mat->getVectorLengths()[i] ; j++)
         {
         assert(inds[k]==mat->getIndices()[j]);
+//        std::cout<<vals[k]<<"    "<<mat->getElements()[j]<<"    "<<vals[k]-mat->getElements()[j]<<std::endl;
         assert(eq(vals[k],mat->getElements()[j]));
           k++;
         }
