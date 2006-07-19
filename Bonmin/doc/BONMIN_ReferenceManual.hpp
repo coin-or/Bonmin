@@ -11,7 +11,10 @@ License) </A>. bonmin is a C++ code</p>
 
 <p>
 You can use the link at the top of this page to access the documentation
-of the different elements of the code. In addition you will find here:
+of the different elements of the code.
+*/
+
+ In addition you will find here:
 <ul>
 <li> <A HREF='../Bonmin_UserManual/'> A link </A> to the html version of
 bonmin Users manual,
