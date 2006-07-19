@@ -82,9 +82,14 @@ AM_CPPFLAGS = \
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
-test: unitTest$(EXEEXT) CppExample$(EXEEXT)
+test: unitTest$(EXEEXT) CppExample$(EXEEXT) bonmin.opt mytoy.nl
 	./unitTest$(EXEEXT)
 	./CppExample$(EXEEXT)
+
+if VPATH_CONFIG
+bonmin.opt mytoy.nl: $(srcdir)/$@
+	cp $(srcdir)/$@ .
+endif
 
 .PHONY: test
 
