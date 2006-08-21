@@ -60,12 +60,12 @@ amplsolver.a:
 	patch -p1 < $(abs_source_dir)/experimental/Bcp/ampl_bcp.patch ; \
 	for f in `grep -l 'strtod' *.c *.h`; do \
 		mv $$f $$f.orig ; \
-		sed -e 's/strtod/ASLstrtod/g' $$f.orig > $$f ; \
+		sed -e 's/strtod/ASLstrtod/g' -e 's/ASLASLstrtod/ASLstrtod/g' $$f.orig > $$f ; \
 		rm $$f.orig ; \
 	done ; \
 	for f in `grep -l 'atof(' *.c`; do \
 		mv $$f $$f.orig ; \
-		sed -e 's/atof(/ASLatof(/g' $$f.orig > $$f ; \
+		sed -e 's/atof/ASLatof/g' -e 's/ASLASLatof/ASLatof/g' $$f.orig > $$f ; \
 		rm $$f.orig ; \
 	done ; \
 	sed -e 's/CFLAGS =/CFLAGS = -DNO_FUNCADD/g' $(AMPL_SRC)/makefile.u > makefile.u ; \
