@@ -243,6 +243,7 @@ namespace Ipopt
      *  the respective bool to false.
      */
     virtual bool get_starting_point(Index n, bool init_x, Number* x,
+                                    bool init_z, Number* z_L, Number* z_U,
         Index m, bool init_lambda,
         Number* lambda)=0;
 
