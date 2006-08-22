@@ -699,6 +699,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
           numberPasses < maxLocalSearchPerNode_ &&
           localSearchNodeLimit_ > 0 &&
           CoinCpuTime() - timeBegin_ < maxLocalSearchTime_) {
+         std::cout<<"Perform new local search"<<std::endl;
         if(clp==NULL) {
           nLocalSearch_++;
 
@@ -715,6 +716,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
           }
           if(changed) {
             feasible = (milpBound < cutoff);
+            std::cout<<"milp bound "<<milpBound<<" cutoff "<<cutoff<<std::endl;
           }
           else
            {
@@ -748,13 +750,9 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
           nLocalSearch_++;
           milpBound = siBestObj(model);
           handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<model->getNodeCount()<<model->getIterationCount()<<CoinMessageEol;
-
           feasible =  (milpBound < cutoff);
-          milpFeasible = feasible;
           isInteger = model->getSolutionCount();
           if(model->isProvenOptimal() || model->isProvenInfeasible()) {
-            bool feasible = model->isProvenOptimal();
-
             bool changed = 0;		  //If integer solution is the same as nlp solution problem is solved
             for(int i = 0; feasible && isInteger && i < numcols && !changed; i++) {
               if(nlp_->isInteger(i) && fabs(nlp_->getColSolution()[i] - model->bestSolution()[i])>cbcIntegerTolerance_)
@@ -774,13 +772,18 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
           }
 
         }/** endif solved by clp/cbc*/
+
         if(milpBound < cutoff)
           handler_->message(UPDATE_LB, messages_)
           <<milpBound<<CoinCpuTime() - timeBegin_
           <<CoinMessageEol;
         else
+        {
+          milpBound = 1e50;
+          feasible = 0;
           handler_->message(OASUCCESS, messages_)
           <<CoinCpuTime() - timeBegin_ <<CoinMessageEol;
+        }
       }/** endif localSearch*/
       else if(model!=NULL)/** have to delete model for next iteration*/
       { 
