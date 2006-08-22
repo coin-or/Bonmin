@@ -48,10 +48,13 @@ AMPL_PATHED_FILES = \
 AMPL_SRC = $(abs_source_dir)/../ThirdParty/ASL/solvers
 
 amplsolver.a:
-	mkdir -p solvers ; \
+	rm -rf solvers ; \
+	mkdir solvers ; \
 	cd solvers ; \
-	for f in $(AMPL_SRC)/*.c* $(AMPL_SRC)/*.h*; do \
-		$(LN_S) $$f ; \
+	aslmakeflags=`grep '^ASLMAKEFLAGS' ../../../../ThirdParty/ASL/Makefile | sed -e 's/ASLMAKEFLAGS = //' -e 's/CFLAGS="/CFLAGS="-DNO_FUNCADD /'` ; \
+	files=`cd $(AMPL_SRC); ls *.[chs]* makefile* `; \
+	for f in $$files ; do \
+		$(LN_S) $(AMPL_SRC)/$$f $$f; \
 	done ; \
 	for f in $(AMPL_PATHED_FILES); do \
 		rm $$f ; \
@@ -68,8 +71,7 @@ amplsolver.a:
 		sed -e 's/atof/ASLatof/g' -e 's/ASLASLatof/ASLatof/g' $$f.orig > $$f ; \
 		rm $$f.orig ; \
 	done ; \
-	sed -e 's/CFLAGS =/CFLAGS = -DNO_FUNCADD/g' $(AMPL_SRC)/makefile.u > makefile.u ; \
-	$(MAKE) -f makefile.u ; \
+	$(MAKE) CC=$(CC) -j 1 CFLAGS="-DNO_FUNCADD `grep '^ASLMAKEFLAGS' ../../../../ThirdParty/ASL/Makefile | sed -e 's/^.*CFLAGS=\"//' -e 's/\"$//'`" -f makefile.u ; \
 	cp amplsolver.a ..
 
 bonminbcp_LDADD = \
