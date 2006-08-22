@@ -76,7 +76,7 @@ namespace Ipopt
 
     // Allocate space for the initial point
     x_init_ = new Number[3*n_ + m_];
-    tminlp_->get_starting_point(n_, true, x_init_,
+    tminlp_->get_starting_point(n_, true, x_init_, false, NULL, NULL,
         m_, false, NULL);
     x_init_user_ = new Number[n_];
     IpBlasDcopy(n_, x_init_, 1, x_init_user_, 1);

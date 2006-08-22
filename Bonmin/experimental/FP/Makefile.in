@@ -42,7 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COIN_HAS_CPX_TRUE@bin_PROGRAMS = oa_fp$(EXEEXT)
+bin_PROGRAMS = oa_fp$(EXEEXT)
 @COIN_HAS_CPX_TRUE@am__append_1 = \
 @COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 @COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \

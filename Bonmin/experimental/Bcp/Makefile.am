@@ -24,7 +24,6 @@ COINLIBS = \
 if COIN_HAS_CPX
   COINLIBS += \
 	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
 	$(CPXLIB)
 endif
 
@@ -39,14 +38,48 @@ LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
 
 bonminbcp_SOURCES = BB_cut.hpp BB_cut.cpp BM.hpp BM.cpp BM_pack.cpp bm_var.hpp
 
+bonminbcp_DEPENDENCIES = amplsolver.a
+
+AMPL_PATHED_FILES = \
+	asl.h \
+	jac0dim.c \
+	misc.c \
+	pfg_read.c
+AMPL_SRC = $(abs_source_dir)/../ThirdParty/ASL/solvers
+
+amplsolver.a:
+	mkdir -p solvers ; \
+	cd solvers ; \
+	for f in $(AMPL_SRC)/*.c* $(AMPL_SRC)/*.h*; do \
+		$(LN_S) $$f ; \
+	done ; \
+	for f in $(AMPL_PATHED_FILES); do \
+		rm $$f ; \
+		cp $(AMPL_SRC)/$$f . ; \
+	done ; \
+	patch -p1 < $(abs_source_dir)/experimental/Bcp/ampl_bcp.patch ; \
+	for f in `grep -l 'strtod' *.c *.h`; do \
+		mv $$f $$f.orig ; \
+		sed -e 's/strtod/ASLstrtod/g' -e 's/ASLASLstrtod/ASLstrtod/g' $$f.orig > $$f ; \
+		rm $$f.orig ; \
+	done ; \
+	for f in `grep -l 'atof(' *.c`; do \
+		mv $$f $$f.orig ; \
+		sed -e 's/atof/ASLatof/g' -e 's/ASLASLatof/ASLatof/g' $$f.orig > $$f ; \
+		rm $$f.orig ; \
+	done ; \
+	sed -e 's/CFLAGS =/CFLAGS = -DNO_FUNCADD/g' $(AMPL_SRC)/makefile.u > makefile.u ; \
+	$(MAKE) -f makefile.u ; \
+	cp amplsolver.a ..
+
 bonminbcp_LDADD = \
 	../../src/Apps/libbonmin.la \
 	../../src/BonminAmplInterface/libamplinterface.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	amplsolver.a \
 	$(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared

@@ -51,7 +51,6 @@ AmplFP(const SmartPtr<const Journalist>& jnlst,
            const std::string& appName,
            std::string* nl_file_content /* = NULL */):AmplTMINLP()
            {
-               std::cout<<"Toto"<<std::endl;
                Initialize2(jnlst, options, argv, suffix_handler,
                appName, nl_file_content);
           }

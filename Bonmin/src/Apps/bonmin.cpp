@@ -142,23 +142,26 @@ int main (int argc, char *argv[])
 
     std::cout<<pbName<<" \t";
     std::string message;
+    std::string status;
     if(bb.mipStatus()==BonminBB::FeasibleOptimal) {
-      std::cout<<"\t\"Finished\"\t";
+      status = "\t\"Finished\"";
       message = "\nbonmin: Optimal";
     }
     else if(bb.mipStatus()==BonminBB::ProvenInfeasible) {
-      std::cout<<"\t\"Finished\"\t";
+      status = "\t\"Finished\"";
       message = "\nbonmin: Infeasible problem";
     }
     else if(bb.mipStatus()==BonminBB::Feasible) {
-      std::cout<<"\t\"Not finished\""<<"\t";
+      status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
     else if(bb.mipStatus()==BonminBB::NoSolutionKnown) {
-      std::cout<<"\t\"Not finished\""<<"\t";
+      status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
-    std::cout<<CoinCpuTime()-time1<<"\t"
+
+  if(0)// To output a line for building tables
+    std::cout<<status<<"\t"<<CoinCpuTime()-time1<<"\t"
 	     <<bb.bestObj()<<"\t"
 	     <<bb.numNodes()<<"\t"
 	     <<bb.iterationCount()<<"\t"

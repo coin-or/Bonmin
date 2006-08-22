@@ -271,13 +271,9 @@ double FP(BonminAmplInterface &nlp,
     //        mip.writeMps("oa");
     CbcStrategyDefault defaultStrategy;
     mip.setStrategy(defaultStrategy);
+    mip.solver()->messageHandler()->setLogLevel(0);
 
     //Add some heuristics to get feasible solutions
-    //       CbcGreedyCover greed(mip);
-    CbcHeuristicFPump fp(mip);
-    //       mip.addHeuristic(&greed);
-    //        mip.addHeuristic(&fp);
-    //      mip.setMaximumNodes(nMaxNodes - nTotalNodes);
     mip.setMaximumSeconds(maxTime - CoinCpuTime() - info.time);
     mip.setMaximumSolutions(1);
 #endif
@@ -534,12 +530,6 @@ int main3 (int argc, char *argv[])
     CbcStrategyDefault defaultStrategy(1,8,4);
     mip.setStrategy(defaultStrategy);
 
-    //Add some heuristics to get feasible solutions
-    //       CbcGreedyCover greed(mip);
-    CbcHeuristicFPump fp(mip);
-    //       mip.addHeuristic(&greed);
-    mip.addHeuristic(&fp);
-    //      mip.setMaximumNodes(nMaxNodes - nTotalNodes);
     mip.setMaximumSeconds(params.maxTime_ - CoinCpuTime() + BeginTimeGLOB);
     mip.setMaximumSolutions(3);
     mip.setCutoff(ub);
@@ -790,7 +780,7 @@ int enhancedOA(BonminAmplInterface & solver1, bool doFp,
   double precision = 1e-04;
   bool solved = 0;
   double firstIterationTime;
-  solver.messageHandler()->setLogLevel(1);
+  solver.messageHandler()->setLogLevel(0);
   int numNotFound = 0;
 
   bool feasible = 1;
@@ -820,16 +810,13 @@ int enhancedOA(BonminAmplInterface & solver1, bool doFp,
       }
 #ifndef COIN_HAS_CPX
       solver.initialSolve();
+      solver.messageHandler()->setLogLevel(0);
+
       CbcStrategyDefault defaultStrategy;
       CbcModel mip(solver);
       mip.setStrategy(defaultStrategy);
       mip.solver()->messageHandler()->setLogLevel(0);
-      mip.setLogLevel(1);
-      CbcHeuristicFPump fp(mip);
-      //       mip.addHeuristic(&greed);
-      //mip.addHeuristic(&fp);
-
-      //		mip.setMaximumNodes(nMaxNodes - nTotalNodes);
+      mip.setLogLevel(0);
       mip.setMaximumSeconds(params.maxTime_ - CoinCpuTime() - BeginTimeGLOB);
       mip.setMaximumSolutions(1);
 #else
@@ -1026,18 +1013,12 @@ int enhancedOA(BonminAmplInterface & solver1, bool doFp,
     solver.resolve();
 #ifndef COIN_HAS_CPX
 
+    solver.messageHandler()->setLogLevel(0);
     CbcModel mip(solver);
     //  solver.writeMps("oa");
-    mip.solver()->messageHandler()->setLogLevel(0);
     CbcStrategyDefault defaultStrategy(1,8,4);
     mip.setStrategy(defaultStrategy);
 
-    //Add some heuristics to get feasible solutions
-    //       CbcGreedyCover greed(mip);
-    CbcHeuristicFPump fp(mip);
-    //       mip.addHeuristic(&greed);
-    mip.addHeuristic(&fp);
-    //      mip.setMaximumNodes(nMaxNodes - nTotalNodes);
     mip.setMaximumSeconds(params.maxTime_ - CoinCpuTime() + BeginTimeGLOB);
     mip.setMaximumSolutions(3);
     mip.setCutoff(ub);
@@ -1241,7 +1222,7 @@ int iteratedFP (BonminAmplInterface& solver1, bool standAlone,
   OsiClpSolverInterface solver;
 #endif
 
-  solver.messageHandler()->setLogLevel(3);
+  solver.messageHandler()->setLogLevel(0);
 
   //Setup timers since an nlp is solved to extract the linear relaxation
   double beginTime= CoinCpuTime();
@@ -1293,19 +1274,14 @@ int iteratedFP (BonminAmplInterface& solver1, bool standAlone,
         solver.setColUpper(solver.getNumCols()-1,ub);
 
 #ifndef COIN_HAS_CPX
-
+  
         solver.initialSolve();
         CbcModel mip(solver);
         CbcStrategyDefault defaultStrategy;
         mip.setStrategy(defaultStrategy);
+        mip.solver()->messageHandler()->setLogLevel(0);
 
         //Add some heuristics to get feasible solutions
-        //       CbcGreedyCover greed(mip);
-        CbcHeuristicFPump fp(mip);
-        fp.setMaximumPasses(1000);
-        //       mip.addHeuristic(&greed);
-        mip.addHeuristic(&fp);
-        //		mip.setMaximumNodes(nMaxNodes - nTotalNodes);
         mip.setMaximumSeconds(params.maxTime_ - CoinCpuTime() +beginTime);
         mip.setMaximumSolutions(1);
 #else
@@ -1576,13 +1552,8 @@ double FPGeneralIntegers(BonminAmplInterface &nlp, OsiSolverInterface &linearMod
     //        mip.writeMps("oa");
     CbcStrategyDefault defaultStrategy;
     mip.setStrategy(defaultStrategy);
+    mip.solver()->messageHandler()->setLogLevel(0);
 
-    //Add some heuristics to get feasible solutions
-    //       CbcGreedyCover greed(mip);
-    CbcHeuristicFPump fp(mip);
-    //       mip.addHeuristic(&greed);
-    mip.addHeuristic(&fp);
-    //      mip.setMaximumNodes(nMaxNodes - nTotalNodes);
     mip.setMaximumSeconds(maxTime - CoinCpuTime() + time);
     mip.setMaximumSolutions(1);
 #endif

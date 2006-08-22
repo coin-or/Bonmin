@@ -956,10 +956,10 @@ protected:
 
   ///Store the types of the constraints (linear and nonlinear).
   Ipopt::TMINLP::ConstraintType * constTypes_;
-  /** Numerotation of linear/nonlinear constraints
+  /* Numerotation of linear/nonlinear constraints
    * Perform independent numerotation of linear (resp. nonlinear constraints)
    * so that constraints of each type are numeroted consecutively */
-  int * constTypesNum_;
+ // int * constTypesNum_;
   /** Number of linear constraints */
   int nLinear_;
   /** Number of nonlinear constraint
@@ -969,7 +969,8 @@ protected:
   double tiny_;
   /** Value for small non-zero element which we will take the risk to ignore in OA cuts.*/
   double veryTiny_;
-
+  /** Value for infinity. */
+  double infty_;
 
 };
 

@@ -41,9 +41,9 @@ register_general_options
 
   roptions->AddBoundedIntegerOption("bb_log_level",
       "specify main branch-and-bound log level.",
-      0,5,1,
+      0,3,1,
       "Set the level of output of the branch-and-bound : "
-      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
+      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                    );
 
   roptions->AddLowerBoundedIntegerOption("bb_log_interval",
@@ -54,16 +54,16 @@ register_general_options
 
   roptions->AddBoundedIntegerOption("lp_log_level",
       "specify LP log level.",
-      0,5,0,
+      0,4,0,
       "Set the level of output of the linear programming sub-solver in B-Hyb or B-QG : "
       "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
                                    );
 
   roptions->AddBoundedIntegerOption("milp_log_level",
       "specify MILP subsolver log level.",
-      0,5,0,
+      0,3,0,
       "Set the level of output of the MILP subsolver in OA : "
-      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
+      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                    );
 
   roptions->AddBoundedIntegerOption("oa_log_level",
@@ -424,11 +424,12 @@ IpoptInterface::IpoptInterface():
     jValues_(NULL),
     nnz_jac(0),
     constTypes_(NULL),
-    constTypesNum_(NULL),
+//    constTypesNum_(NULL),
     nLinear_(0),
     nNonLinear_(0),
     tiny_(1e-8),
-    veryTiny_(1e-20)
+    veryTiny_(1e-20),
+    infty_(1e100)
 {}
 
 
@@ -467,11 +468,12 @@ IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp):
     jValues_(NULL),
     nnz_jac(0),
     constTypes_(NULL),
-    constTypesNum_(NULL),
+//    constTypesNum_(NULL),
     nLinear_(0),
     nNonLinear_(0),
     tiny_(1e-08),
-    veryTiny_(1e-17)
+    veryTiny_(1e-17),
+    infty_(1e100)
 {
   assert(IsValid(tminlp));
   app_ = new Ipopt::IpoptApplication();
@@ -511,6 +513,10 @@ IpoptInterface::extractInterfaceParams()
     ("warm_start_bound_frac" ,pushValue_,"bonmin.");
     app_->Options()->GetNumericValue("tiny_element",tiny_,"bonmin.");
     app_->Options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
+    double lower_infty, upper_infty;
+    app_->Options()->GetNumericValue("nlp_lower_bound_inf",lower_infty,"");
+    app_->Options()->GetNumericValue("nlp_upper_bound_inf",upper_infty,"");
+    infty_ = min(fabs(lower_infty), fabs(upper_infty));
   }
 }
 
@@ -559,11 +565,12 @@ IpoptInterface::IpoptInterface (const IpoptInterface &source):
     jValues_(NULL),
     nnz_jac(source.nnz_jac),
     constTypes_(NULL),
-    constTypesNum_(NULL),
+//    constTypesNum_(NULL),
     nLinear_(0),
     nNonLinear_(0),
     tiny_(source.tiny_),
-    veryTiny_(source.veryTiny_)
+    veryTiny_(source.veryTiny_),
+    infty_(source.infty_)
 {
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
@@ -609,10 +616,10 @@ IpoptInterface::IpoptInterface (const IpoptInterface &source):
       constTypes_ = new Ipopt::TMINLP::ConstraintType[getNumRows()];
       CoinCopyN(source.constTypes_, getNumRows(), constTypes_);
     }
-    if(source.constTypesNum_ != NULL) {
-      constTypesNum_ = new int[getNumRows()];
-      CoinCopyN(source.constTypesNum_, getNumRows(), constTypesNum_);
-    }
+//    if(source.constTypesNum_ != NULL) {
+//      constTypesNum_ = new int[getNumRows()];
+//      CoinCopyN(source.constTypesNum_, getNumRows(), constTypesNum_);
+//    }
   }
   else if(nnz_jac > 0) {
     throw CoinError("Arrays for storing jacobian are inconsistant.",
@@ -665,7 +672,7 @@ IpoptInterface & IpoptInterface::operator=(const IpoptInterface& rhs)
         constTypes_ = new Ipopt::TMINLP::ConstraintType[getNumRows()];
         CoinCopyN(rhs.constTypes_, getNumRows(), constTypes_);
       }
-
+/*
       if(constTypesNum_ != NULL) {
         delete [] constTypesNum_;
         constTypesNum_ = NULL;
@@ -674,7 +681,7 @@ IpoptInterface & IpoptInterface::operator=(const IpoptInterface& rhs)
         constTypesNum_ = new int[getNumRows()];
         CoinCopyN(rhs.constTypesNum_, getNumRows(), constTypesNum_);
       }
-
+*/
       if(rhs.jValues_!=NULL && rhs.jRow_ != NULL && rhs.jCol_ != NULL && nnz_jac>0) {
         jValues_ = new double [nnz_jac];
         jCol_    = new Ipopt::Index [nnz_jac];
@@ -690,6 +697,7 @@ IpoptInterface & IpoptInterface::operator=(const IpoptInterface& rhs)
       }
       tiny_ = rhs.tiny_;
       veryTiny_ = rhs.veryTiny_;
+      infty_ = rhs.infty_;
 
 
     }
@@ -746,7 +754,7 @@ IpoptInterface::~IpoptInterface ()
   delete [] jCol_;
   delete [] jValues_;
   delete [] constTypes_;
-  delete [] constTypesNum_;
+//  delete [] constTypesNum_;
 }
 
 void
@@ -1486,7 +1494,7 @@ IpoptInterface::isFreeBinary(int colNumber) const
 double
 IpoptInterface::getInfinity() const
 {
-  return 1e100;
+  return infty_;
 }
 
 /// Get pointer to array[getNumCols()] of primal solution vector
@@ -1936,17 +1944,19 @@ int IpoptInterface::initializeJacobianArrays()
 
 
   if(constTypes_ != NULL) delete [] constTypes_;
-  if(constTypesNum_ != NULL) delete [] constTypesNum_;
+//  if(constTypesNum_ != NULL) delete [] constTypesNum_;
 
   constTypes_ = new Ipopt::TMINLP::ConstraintType[getNumRows()];
   tminlp_->get_constraints_types(getNumRows(), constTypes_);
-  constTypesNum_ = new int[getNumRows()];
+//  constTypesNum_ = new int[getNumRows()];
   for(int i = 0; i < getNumRows() ; i++) {
     if(constTypes_[i]==Ipopt::TMINLP::LINEAR) {
-      constTypesNum_[i] = nLinear_++;
+      //constTypesNum_[i] =
+      nLinear_++;
     }
     else if(constTypes_[i]==Ipopt::TMINLP::NON_LINEAR) {
-      constTypesNum_[i] = nNonLinear_++;
+      //constTypesNum_[i] = 
+      nNonLinear_++;
     }
   }
   return nnz_jac;
@@ -2048,34 +2058,63 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
   CoinPackedVector * cuts = new CoinPackedVector[nNonLinear_ + 1];
   double * lb = new double[nNonLinear_ + 1];
   double * ub = new double[nNonLinear_ + 1];
+  int * binding = new int[nNonLinear_ + 1];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
+  int numBindings = 0;
+    
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
-
+  const double * duals = getRowPrice();
+  double infty = 1e100 *getInfinity();
+  
   for(int i = 0; i< m ; i++) {
     if(constTypes_[i] == Ipopt::TMINLP::NON_LINEAR) {
-      lb[constTypesNum_[i]] = rowLower[i] - g[i];
-      ub[constTypesNum_[i]] = rowUpper[i] - g[i];
+      if(rowLower[i] > -infty && rowUpper[i] < infty && fabs(duals[i]) == 0.)
+      {
+        binding[i] = -1;
+        std::cerr<<"non binding constraint"<<std::endl;
+        continue;
+      }
+      binding[i] = numBindings;
+      if(rowLower[i] > - infty_)
+        lb[numBindings] = rowLower[i] - g[i];
+      else
+        lb[numBindings] = - infty;
+      if(rowUpper[i] < infty_)
+        ub[numBindings] = rowUpper[i] - g[i];
+      else
+        ub[numBindings] = infty_;
+      if(rowLower[i] > -infty && rowUpper[i] < infty)
+      {
+        if(duals[i] >= 0)// <= inequality
+          lb[numBindings] = - infty;
+        if(duals[i] <= 0)// >= inequality
+          ub[numBindings] = infty;
+      }
+      
+      numBindings++;
     }
   }
-//double infty = getInfinity();
+
   for(int i = 0 ; i < nnz_jac_g ; i++) {
     if(constTypes_[jRow_[i] - 1] == Ipopt::TMINLP::NON_LINEAR) {
       //"clean" coefficient
       if(cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
           rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
           getColSolution()[jCol_[i] - 1],
-          lb[constTypesNum_[jRow_[i] - 1]],
-          ub[constTypesNum_[jRow_[i] - 1]], tiny_, veryTiny_)) {
-        cuts[constTypesNum_[jRow_[i] - 1]].insert(jCol_[i]-1,jValues_[i]);
-        lb[constTypesNum_[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
-        ub[constTypesNum_[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
+          lb[binding[jRow_[i] - 1]],
+          ub[binding[jRow_[i] - 1]], tiny_, veryTiny_)) {
+        cuts[binding[jRow_[i] - 1]].insert(jCol_[i]-1,jValues_[i]);
+        if(lb[binding[jRow_[i] - 1]] > - infty_)
+          lb[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
+        if(ub[binding[jRow_[i] - 1]] < infty_)
+        ub[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
       }
     }
   }
 
-  for(int i = 0; i< nNonLinear_ ; i++) {
+  for(int i = 0; i< numBindings ; i++) {
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
@@ -2128,8 +2167,6 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
     delete [] obj;
   }
 
-  // setColSolution(problem()->x_sol());
-  //  setRowPrice(problem()->duals_sol());
   delete []lb;
   delete[]ub;
 }
@@ -2186,31 +2223,63 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
 
   rowLow = new double[m];
   rowUp = new double[m];
+  int * binding = new int[m];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
+  int numBindings = 0;
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
+  const double * duals = getRowPrice();
   assert(m==getNumRows());
+  double infty = getInfinity() * 1e100;
   for(int i = 0 ; i < m ; i++) {
     {
       if(constTypes_[i] == Ipopt::TMINLP::NON_LINEAR) {
-        rowLow[i] = (rowLower[i] - g[i]) - 1e-07;
-        rowUp[i] =  (rowUpper[i] - g[i]) + 1e-07;
+        //If constraint is equality not binding do not add
+        if(rowLower[i] > -infty && rowUpper[i] < infty && fabs(duals[i]) == 0.)
+        {
+            binding[i] = -1;
+            continue;
+        }
+        else
+          binding[i] = numBindings;
+        if(rowLower[i] > - infty_)
+          rowLow[numBindings] = (rowLower[i] - g[i]) - 1e-07;
+        else
+          rowLow[numBindings] = - infty_;
+        if(rowUpper[i] < infty_)
+          rowUp[numBindings] =  (rowUpper[i] - g[i]) + 1e-07;
+        else
+          rowUp[numBindings] = infty_;
+        
+        //If equality or ranged constraint only add one side by looking at sign of dual multiplier
+        if(rowLower[i] > -infty && rowUpper[i] < infty)
+        {
+          if(duals[i] >= 0)// <= inequality
+            rowLow[numBindings] = - infty;
+          if(duals[i] <= 0)// >= inequality
+            rowUp[numBindings] = infty;
+        }
+        numBindings++;
       }
       else {
-        rowLow[i] = (rowLower[i] - g[i]);
-        rowUp[i] =  (rowUpper[i] - g[i]);
+        binding[i] = numBindings;//All are considered as bindings
+        rowLow[numBindings] = (rowLower[i] - g[i]);
+        rowUp[numBindings] =  (rowUpper[i] - g[i]);
+        numBindings++;
       }
     }
   }
 
   //Then convert everything to a CoinPackedMatrix (col ordered)
-  CoinBigIndex * inds = new CoinBigIndex[nnz_jac_g];
-  double * vals = new double [nnz_jac_g];
+  CoinBigIndex * inds = new CoinBigIndex[nnz_jac_g + 1];
+  double * vals = new double [nnz_jac_g + 1];
   int * start = new int[n+1];
   int * length = new int[n];
   bool needOrder = false;
   int nnz = 0;
+  if(nnz_jac_g > 0)
+  {
   for(int k = 0; k < jCol_[0]; k++) {
     start[k] = nnz;
     length[k] = 0;
@@ -2226,12 +2295,15 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
           cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
               rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
               getColSolution()[jCol_[i] - 1],
-              rowLow[jRow_[i] - 1],
-              rowUp[jRow_[i] -1], tiny_, veryTiny_)) {
+              rowLow[binding[jRow_[i] - 1]],
+              rowUp[binding[jRow_[i] -1]], tiny_, veryTiny_)) {
+        if(binding[jRow_[i] - 1] == -1) continue;
         vals[nnz] = jValues_[i];
-        rowLow[jRow_[i] - 1] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
-        rowUp[jRow_[i] -1] += jValues_[i] *getColSolution()[jCol_[i] -1];
-        inds[nnz] = jRow_[i ] - 1;
+        if(rowLow[binding[jRow_[i] - 1]] > - infty_)
+          rowLow[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
+        if(rowUp[binding[jRow_[i] - 1]] < infty_)
+          rowUp[binding[jRow_[i] -1]] += jValues_[i] *getColSolution()[jCol_[i] -1];
+        inds[nnz] = binding[jRow_[i] - 1];//jRow_[i ] - 1;
         length[jCol_[i] - 1]++;
         nnz++;
       }
@@ -2247,35 +2319,47 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     {
       length[jCol_[nnz_jac_g -1] - 1]++;
       vals[nnz] = jValues_[nnz_jac_g - 1];
-      rowLow[jRow_[nnz_jac_g - 1] - 1] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - 1];
-      rowUp[jRow_[nnz_jac_g - 1] -1] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] -1];
-      inds[nnz++] = jRow_[nnz_jac_g - 1] - 1;
+      rowLow[binding[jRow_[nnz_jac_g - 1] - 1]] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - 1];
+      rowUp[binding[jRow_[nnz_jac_g - 1] -1]] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] -1];
+      inds[nnz++] = binding[jRow_[nnz_jac_g - 1] - 1];
     }
     for(int i = jCol_[nnz_jac_g -1] ; i < n ; i++) {
       start[i] = nnz;
       length[i] = 0;
     }
     start[n]=nnz;
-    mat.assignMatrix(false, m, n, nnz, vals, inds, start, length);
   }
   else {
     std::cerr<<"jacobian matrix is not ordered properly"<<std::endl;
     throw -1;
   }
   delete [] g;
+  }
+  else {
+   for (int i = 0 ; i < n ; i++)
+   {
+     length[i] = 0;
+     start[i] = 0;
+   }
+   start[n]=0;
+ }
+ mat.assignMatrix(false, m, n, nnz, vals, inds, start, length);
   int numcols=getNumCols();
   double *obj = new double[numcols];
   for(int i = 0 ; i < numcols ; i++)
     obj[i] = 0;
   mat.transpose();
+  
 #if 0
   std::cout<<"Mat is ordered by "<<
   <<mat.isColOrdered?"columns.":"rows."
   <<std::endl;
 #endif
+  
   si.loadProblem(mat, getColLower(), getColUpper(), obj, rowLow, rowUp);
   delete [] rowLow;
   delete [] rowUp;
+  delete [] binding;
   for(int i = 0 ; i < getNumCols() ; i++) {
     if(isInteger(i))
       si.setInteger(i);
@@ -2297,6 +2381,8 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     CoinPackedVector * v = &objCut;
     v->reserve(n);
     for(int i = 0; i<n ; i++) {
+     if(nnz_jac_g)
+     {
       if(cleanNnz(obj[i],colLower[i], colUpper[i],
           -getInfinity(), 0,
           getColSolution()[i],
@@ -2306,13 +2392,26 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
         lb += obj[i] * getColSolution()[i];
         ub += obj[i] * getColSolution()[i];
       }
+     }
+     else //Unconstrained problem can not put clean coefficient
+     {
+         if(cleanNnz(obj[i],colLower[i], colUpper[i],
+          -getInfinity(), 0,
+          getColSolution()[i],
+          lb,
+          ub, 1e-03, 1e-08)) {
+        v->insert(i,obj[i]);
+        lb += obj[i] * getColSolution()[i];
+        ub += obj[i] * getColSolution()[i];
+         }
+     }
     }
     v->insert(n,-1);
     si.addRow(objCut, lb, ub);
     delete [] obj;
   }
 
-// si.writeMps("init");
+si.writeMps("init");
 
   setWarmStartOptions();
   setColSolution(problem()->x_sol());

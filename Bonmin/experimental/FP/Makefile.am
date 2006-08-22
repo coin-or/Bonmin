@@ -11,9 +11,7 @@ AUTOMAKE_OPTIONS = foreign
 # What is done in this directory:
 
 
-if COIN_HAS_CPX
   bin_PROGRAMS = oa_fp
-endif
 
 
 COINLIBS = \
