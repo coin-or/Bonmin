@@ -71,7 +71,7 @@ amplsolver.a:
 		sed -e 's/atof/ASLatof/g' -e 's/ASLASLatof/ASLatof/g' $$f.orig > $$f ; \
 		rm $$f.orig ; \
 	done ; \
-	$(MAKE) CC=$(CC) -j 1 CFLAGS="-DNO_FUNCADD `grep '^ASLMAKEFLAGS' ../../../../ThirdParty/ASL/Makefile | sed -e 's/^.*CFLAGS=\"//' -e 's/\"$//'`" -f makefile.u ; \
+	$(MAKE) CC=$(CC) -j 1 CFLAGS="-DNO_FUNCADD `grep '^ASLMAKEFLAGS' ../../../../ThirdParty/ASL/Makefile | sed -e 's/^.*CFLAGS=\"//' -e 's/\"\$//'`" -f makefile.u ; \
 	cp amplsolver.a ..
 
 bonminbcp_LDADD = \
