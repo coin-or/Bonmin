@@ -301,10 +301,11 @@ namespace Ipopt
   }
 
   bool AmplTMINLP::get_starting_point(Index n, bool init_x, Number* x,
+                                    bool init_z, Number* z_L, Number* z_U,
       Index m, bool init_lambda, Number* lambda)
   {
     return ampl_tnlp_->get_starting_point(n, init_x, x,
-        false, NULL, NULL,
+        init_z, z_L, z_U,
         m, init_lambda, lambda);
   }
 
