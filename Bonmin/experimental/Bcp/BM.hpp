@@ -158,7 +158,7 @@ class BM_lp : public BCP_lp_user
 	int num;
 	int *priority_order;
 	int *lengths;
-	char * types;
+	int *types; // 0: type 1  ---- 1: type 2
 	int *priorities;
 	int **indices;
 	double **weights;
