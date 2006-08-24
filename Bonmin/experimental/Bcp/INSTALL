@@ -1,0 +1,2 @@
+To install on BlueGene us the following flags to configure Bonmin:
+--disable-shared --enable-bg --with-mpi-incdir=/bgl/BlueLight/ppcfloor/bglsys/include --with-mpi-lib="-L/bgl/BlueLight/ppcfloor/bglsys/lib -lmpich.rts -lmsglayer.rts -ldevices.rts -lrts.rts"
