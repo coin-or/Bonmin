@@ -51,9 +51,14 @@ void BCP_parameter_set<BM_par>::create_keyword_list() {
     keys.push_back(make_pair(BCP_string("PrintBranchingInfo"),
 			     BCP_parameter(BCP_CharPar, PrintBranchingInfo)));
     keys.push_back(make_pair(BCP_string("CombinedDistanceAndPriority"),
-			     BCP_parameter(BCP_CharPar, CombinedDistanceAndPriority)));
-    keys.push_back(make_pair(BCP_string("LowPriorityImportant"),
-			     BCP_parameter(BCP_CharPar, LowPriorityImportant)));
+			     BCP_parameter(BCP_CharPar,
+					   CombinedDistanceAndPriority)));
+    keys.push_back(make_pair(BCP_string("SosWithLowPriorityMoreImportant"),
+			     BCP_parameter(BCP_CharPar,
+					   SosWithLowPriorityMoreImportant)));
+    keys.push_back(make_pair(BCP_string("VarWithLowPriorityMoreImportant"),
+			     BCP_parameter(BCP_CharPar,
+					   VarWithLowPriorityMoreImportant)));
     keys.push_back(make_pair(BCP_string("NumNlpFailureMax"),
 			     BCP_parameter(BCP_IntPar, NumNlpFailureMax)));
     keys.push_back(make_pair(BCP_string("NL_filename"),
@@ -68,7 +73,9 @@ void BCP_parameter_set<BM_par>::set_default_entries() {
     set_entry(PureBranchAndBound, false);
     set_entry(PrintBranchingInfo, true);
     set_entry(CombinedDistanceAndPriority, true);
-    set_entry(LowPriorityImportant, true);
+    set_entry(SosWithLowPriorityMoreImportant, true);
+    set_entry(SosWithLowPriorityMoreImportant, true);
+    set_entry(VarWithLowPriorityMoreImportant, true);
     set_entry(NumNlpFailureMax, 5);
     set_entry(NL_filename, "");
     set_entry(IpoptParamfile, "");
@@ -284,9 +291,9 @@ BM_tm::display_feasible_solution(const BCP_solution* sol)
 
 BM_lp::BM_lp() :
     BCP_lp_user(),
+    sos(),
     babSolver_(3),
     nlp(),
-    sos(),
     feasChecker_(NULL),
     in_strong(0)
 {
@@ -301,6 +308,9 @@ BM_lp::~BM_lp()
     delete feasChecker_;
     delete[] primal_solution_;
     delete[] branching_priority_;
+    for (int i = sos.size() - 1; i >= 0; --i) {
+	delete sos[i];
+    }
 }
 
 /****************************************************************************/
@@ -329,13 +339,18 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
 				       BCP_vec<int>& cut_changed_pos,
 				       BCP_vec<double>& cut_new_bd)
 {
+    int i;
     // First copy the bounds into nlp. That way all the branching decisions
     // will be transferred over.
+    for (i = sos.size() - 1; i >= 0; --i) {
+	sos[i]->first = 0;
+	sos[i]->last = sos[i]->length;
+    }
     OsiSolverInterface * osi = getLpProblemPointer()->lp_solver;
-    const int numCols = nlp.getNumCols();
+    const int numCols = osi->getNumCols();
     const double* clb = osi->getColLower();
     const double* cub = osi->getColUpper();
-    for (int i = 0; i < numCols; ++i) {
+    for (i = 0; i < numCols; ++i) {
 	const BCP_var_core* v =
 	    dynamic_cast<const BCP_var_core*>(vars[i]);
 	if (v) {
@@ -348,19 +363,22 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
 	if (bv) {
 	    const int ind = bv->sos_index;
 	    const int split = bv->split;
-	    const int len = sos.lengths[ind];
-	    const char type = sos.types[ind];
-	    const int *indices = sos.indices[ind];
+	    const char type = sos[ind]->type;
+	    const int *indices = sos[ind]->indices;
 	    if (bv->ub() == 0.0) {
-		for (int j = split + type; j < len; ++j) {
+		const int last = sos[ind]->last;
+		for (int j = split + type; j < last; ++j) {
 		    nlp.setColLower(indices[j], 0.0);
 		    nlp.setColUpper(indices[j], 0.0);
 		}
+		sos[ind]->last = split + type;
 	    } else {
-		for (int j = 0; j < split; ++j) {
+		const int first = sos[ind]->first;
+		for (int j = first; j < split; ++j) {
 		    nlp.setColLower(indices[j], 0.0);
 		    nlp.setColUpper(indices[j], 0.0);
 		}
+		sos[ind]->first = split;
 	    }
 	    continue;
 	}
@@ -403,15 +421,14 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	*/
 	nlp.initialSolve();
 	if (nlp.isProvenOptimal()) {
+	    const int numCols = nlp.getNumCols();
 	    lower_bound_ = nlp.getObjValue();
-	    CoinDisjointCopyN(nlp.getColSolution(), vars.size(),
-			      primal_solution_);
+	    CoinDisjointCopyN(nlp.getColSolution(), numCols, primal_solution_);
 	    numNlpFailed_ = 0;
 	    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp.retrieve_options();
 	    double intTol;
 	    options->GetNumericValue("integer_tolerance",intTol,"bonmin.");
 
-	    const int numCols = nlp.getNumCols();
 	    int i;
 	    for (i = 0; i < numCols; ++i) {
 		if (vars[i]->var_type() == BCP_ContinuousVar)
@@ -439,6 +456,9 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	    // prune it!
 	    lower_bound_ = 1e200;
 	    numNlpFailed_ = 0;
+	    printf("\
+BM_lp: At node %i : will fathom because of infeasibility\n",
+		   current_index());
 	}
 	else if (nlp.isAbandoned()) {
 	    // nlp failed
@@ -464,7 +484,8 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	double cutOffIncrement;
 	nlp.retrieve_options()->GetNumericValue("integer_tolerance",
 						integerTolerance,"bonmin.");
-	nlp.retrieve_options()->GetNumericValue("cutoff_incr",
+	/* FIXME: cutoff_decr was called cutoff_incr??? */
+	nlp.retrieve_options()->GetNumericValue("cutoff_decr",
 						cutOffIncrement,"bonmin.");
 	OsiSolverInterface * osi = getLpProblemPointer()->lp_solver;
     
@@ -606,7 +627,7 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
     double intTol;
     double cutoffIncr;
     options->GetNumericValue("integer_tolerance", intTol, "bonmin.");
-    options->GetNumericValue("cutoff_incr", cutoffIncr, "bonmin.");
+    options->GetNumericValue("cutoff_decr", cutoffIncr, "bonmin.");
 
     if (lower_bound_ >= upper_bound() + cutoffIncr) {
 	return BCP_DoNotBranch_Fathomed;
@@ -618,21 +639,26 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 	return BCP_DoNotBranch_Fathomed;
     }
 
-    if (par.entry(BM_par::BranchOnSos) && sos.num > 0) {
+    if (par.entry(BM_par::BranchOnSos) && sos.size() > 0) {
 	double bestval = 2.0;
 	int bestsos = -1;
 	int bestsplit = -1;
 	int bestprio = 0;
-	for (int i = 0; i < sos.num; ++i) {
-	    const int ind = sos.priority_order[i];
-	    const int prio = sos.priorities[ind];
+	for (size_t ind = 0; ind < sos.size(); ++ind) {
+	    const BmSosInfo& sosi = *sos[ind];
+	    const int prio = sosi.priority;
+	    const int type = sosi.type;
+	    if ((type == 0 && par.entry(BM_par::BranchOnSos) == 2) ||
+		(type == 1 && par.entry(BM_par::BranchOnSos) == 1))
+		continue;
 	    if (bestsos >= 0 && prio != bestprio)
 		break;
-	    const int len = sos.lengths[ind];
-	    const int *indices = sos.indices[ind];
+	    const int first = sosi.first;
+	    const int last = sosi.last;
+	    const int *indices = sosi.indices;
 	    // First count how many nonzeros are there
 	    int cnt = 0;
-	    for (int j = 0; j < len; ++j) {
+	    for (int j = first; j < last; ++j) {
 		const double prim_i = primal_solution_[indices[j]];
 		if (prim_i > intTol && prim_i < 1-intTol) {
 		    ++cnt;
@@ -640,7 +666,6 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 	    }
 	    // For type1 there can be at most 1, for type2 at most 2 nonzeros
 	    // Find the next sos if this is satisfied.
-	    const int type = sos.types[ind];
 	    if (cnt <= 1+type)
 		continue;
 
@@ -648,7 +673,7 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 	    int half = -10;
 	    double val = 0.0;
 	    double primal = 0.0;
-	    for (half = 0; half < len; ++half) {
+	    for (half = first; half < last; ++half) {
 		val = primal_solution_[indices[half]];
 		primal += val;
 		if (primal > 0.5) {
@@ -663,14 +688,14 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 		continue;
 
 	    /* The branches will be as follows:
-	       type1 : [0,half) and [half,len)
-	       type2 : [0,half) and (half,len)
-	       So if half==0 then it must be incremented,
-	       and also for type 2 if half==len-1 then it must be decremented.
+	       type1 : [first,half) and [half,last)
+	       type2 : [first,half) and (half,last)
+	       So if half==first then it must be incremented,
+	       and also for type 2 if half==last-1 then it must be decremented.
 	    */
-	    if (half == 0)
+	    if (half == first)
 		++half;
-	    if (type == 1 && half == len-1)
+	    if (type == 1 && half == last-1)
 		--half;
 
 	    bestval = val;
@@ -699,8 +724,10 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 							&fvp,NULL,&fvb,NULL,
 							NULL,NULL,NULL,NULL));
 	    if (par.entry(BM_par::PrintBranchingInfo)) {
-		printf("BM_lp: branching on SOS #%i (type %i)  split at: %i\n",
-		       bestsos, sos.types[bestsos]+1, bestsplit);
+		printf("\
+BM_lp: At node %i branching on SOS%i set %i  split at: %i with val: %f\n",
+		       current_index(), sos[bestsos]->type+1,
+		       bestsos, bestsplit, bestval);
 	    }
 	    return BCP_DoBranch;;
 	}
@@ -772,59 +799,51 @@ BM_lp::set_user_data_for_children(BCP_presolved_lp_brobj* best,
 
 //#############################################################################
 
-BM_lp::BmSosInfo::~BmSosInfo()
+BM_lp::BmSosInfo::BmSosInfo(const TMINLP::SosInfo * sosinfo, int i)
 {
-    if (num > 0) {
-	for (int i = 0; i < num; ++i) {
-	    delete[] indices[i];
-	    delete[] weights[i];
-	}
-	delete[] indices;
-	delete[] weights;
-	delete[] types;
-	delete[] lengths;
-	delete[] priority_order;
-    }
+    priority = sosinfo->priorities ? sosinfo->priorities[i] : 0;
+    length   = sosinfo->starts[i+1] - sosinfo->starts[i];
+    type     = sosinfo->types[i] == 1 ? 0 : 1;
+    indices  = new int[length];
+    weights  = new double[length];
+    first    = 0;
+    last     = length;
+    CoinDisjointCopyN(sosinfo->indices+sosinfo->starts[i], length, indices);
+    CoinDisjointCopyN(sosinfo->weights+sosinfo->starts[i], length, weights);
+    CoinSort_2(weights, weights+length, indices);
 }
-
+    
 /*---------------------------------------------------------------------------*/
 
-void BM_lp::BmSosInfo::setFrom(const TMINLP::SosInfo * sos)
+void BM_lp::setSosFrom(const TMINLP::SosInfo * sosinfo)
 {
-    if (!sos || sos->num == 0)
+    if (!sosinfo || sosinfo->num == 0)
 	return;
 
     //we have some sos constraints
-    num = sos->num;
-    priority_order = new int[num];
-    CoinIotaN(priority_order, num, 0);
-    priorities = new int[num];
-    if (sos->priorities) {
-	CoinDisjointCopyN(sos->priorities, num, priorities);
-	/* FIXME: we may need to go down in order! */
-	CoinSort_2(priorities, priorities+num, priority_order);
-    } else {
-	CoinFillN(priorities, num, 0);
+    sos.reserve(sosinfo->num);
+    for (int i = 0; i < sosinfo->num; ++i) {
+	sos.push_back(new BmSosInfo(sosinfo, i));
     }
 
-    lengths = new int[num];
-    types   = new int[num];
-    indices = new int*[num];
-    weights = new double*[num];
-
-    for (int i = 0; i < num; ++i) {
-	lengths[i] = sos->starts[i+1] - sos->starts[i];
-	types[i] = sos->types[i] == 1 ? 0 : 1;;
-	indices[i] = new int[lengths[i]];
-	weights[i] = new double[lengths[i]];
-	CoinDisjointCopyN(sos->indices+sos->starts[i], lengths[i], indices[i]);
-	CoinDisjointCopyN(sos->weights+sos->starts[i], lengths[i], weights[i]);
-	CoinSort_2(weights[i], weights[i]+lengths[i], indices[i]);
+    if (sosinfo->priorities) {
+	int * priorities = new int[sosinfo->num];
+	CoinDisjointCopyN(sosinfo->priorities, sosinfo->num, priorities);
+	/* FIXME: we may need to go down in order! */
+	if (par.entry(BM_par::SosWithLowPriorityMoreImportant)) {
+	    CoinSort_2(priorities, priorities+sosinfo->num, &sos[0],
+		       std::less<int>());
+	} else {
+	    CoinSort_2(priorities, priorities+sosinfo->num, &sos[0],
+		       std::greater<int>());
+	}
+	delete[] priorities;
     }
 }
 
 /*---------------------------------------------------------------------------*/
 
+#if 0
 void BM_lp::BmSosInfo::shuffle()
 {
     if (num == 0)
@@ -840,6 +859,7 @@ void BM_lp::BmSosInfo::shuffle()
 	pos += cnt;
     }
 }
+#endif
 
 //#############################################################################
 

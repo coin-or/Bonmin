@@ -77,7 +77,7 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     double bm_intTol;
     double bm_cutoffIncr; // could be negative
     options->GetNumericValue("integer_tolerance",bm_intTol,"bonmin.");
-    options->GetNumericValue("cutoff_incr",bm_cutoffIncr,"bonmin.");
+    options->GetNumericValue("cutoff_decr",bm_cutoffIncr,"bonmin.");
 
     BCP_lp_prob* bcp_lp = getLpProblemPointer();
     const double bcp_intTol = bcp_lp->par.entry(BCP_lp_par::IntegerTolerance);
@@ -120,7 +120,7 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 
     /* SOS constraints */
     if (par.entry(BM_par::BranchOnSos)) {
-	sos.setFrom(nlp.model()->sosConstraints());
+	setSosFrom(nlp.model()->sosConstraints());
     }
 
     /* just to be on the safe side... always allocate */
@@ -133,21 +133,19 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     int i;
     if (prio == NULL) {
 	// No. Just sett all of them uniformly to 1.0
-	for (i = 0; i < numCols; ++i)
-	    {
-		branching_priority_[i] = 1.0;
-	    }
-    }
-    else {
+	for (i = 0; i < numCols; ++i) {
+	    branching_priority_[i] = 1.0;
+	}
+    } else {
 	/* Yes! the lower the number the earlier we want to branch on it.
 	   Let's see how many different numbers there are */
 	std::set<int> numbers;
-	for (i = 0; i < numCols; ++i)
-	    {
-		numbers.insert(prio[i]);
-	    }
+	for (i = 0; i < numCols; ++i) {
+	    numbers.insert(prio[i]);
+	}
 	if (numbers.size() > 15) {
-	    /* Sigh... too many... We just have to trust the user's knowledge */
+	    /* Sigh... too many... We just have to trust the user's
+	       knowledge */
 	    if (par.entry(BM_par::CombinedDistanceAndPriority) == true) {
 		printf("WARNING!\n");
 		printf("   There are too many (>15) different branching priorities\n");
@@ -165,27 +163,22 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 	    const double powerdo[15] = {1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7,
 					1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14};
 	    const double* powers =
-		par.entry(BM_par::LowPriorityImportant) ? powerup : powerdo;
-	    for (i = 0; i < numCols; ++i)
-		{
-		    const int pos = coinDistance(numbers.begin(), numbers.find(prio[i]));
-		    assert (pos >= 0 && pos < 15);
-		    branching_priority_[i] = powers[pos];
-		}
-	}
-	else {
-	    if (par.entry(BM_par::LowPriorityImportant)) {
-		const double maxprio = *numbers.rbegin();
-		for (i = 0; i < numCols; ++i)
-		    {
-			branching_priority_[i] = maxprio - prio[i];
-		    }
+		par.entry(BM_par::VarWithLowPriorityMoreImportant) ? powerup : powerdo;
+	    for (i = 0; i < numCols; ++i) {
+		const int pos = coinDistance(numbers.begin(), numbers.find(prio[i]));
+		assert (pos >= 0 && pos < 15);
+		branching_priority_[i] = powers[pos];
 	    }
-	    else {
-		for (i = 0; i < numCols; ++i)
-		    {
-			branching_priority_[i] = prio[i];
-		    }
+	} else {
+	    if (par.entry(BM_par::VarWithLowPriorityMoreImportant)) {
+		const double maxprio = *numbers.rbegin();
+		for (i = 0; i < numCols; ++i) {
+		    branching_priority_[i] = maxprio - prio[i];
+		}
+	    } else {
+		for (i = 0; i < numCols; ++i) {
+		    branching_priority_[i] = prio[i];
+		}
 	    }
 	}
     }

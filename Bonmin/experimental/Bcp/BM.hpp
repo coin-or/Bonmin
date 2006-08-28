@@ -48,7 +48,8 @@ public:
         CombinedDistanceAndPriority,
         PureBranchAndBound,
 	PrintBranchingInfo,
-        LowPriorityImportant,
+	SosWithLowPriorityMoreImportant,
+        VarWithLowPriorityMoreImportant,
         end_of_chr_params
     };
     enum int_params {
@@ -155,18 +156,21 @@ public:
 class BM_lp : public BCP_lp_user
 {
     struct BmSosInfo {
-	int num;
-	int *priority_order;
-	int *lengths;
-	int *types; // 0: type 1  ---- 1: type 2
-	int *priorities;
-	int **indices;
-	double **weights;
-	BmSosInfo() : num(0) {}
-	~BmSosInfo();
-	void setFrom(const TMINLP::SosInfo * sos);
-	void shuffle();
+	int length;
+	int type; // 0: type 1  ---- 1: type 2
+	int priority;
+	int *indices;
+	double *weights;
+	int first;
+	int last;
+	BmSosInfo(const TMINLP::SosInfo * sosinfo, int i);
+	~BmSosInfo() {
+	    delete[] indices;
+	    delete[] weights;
+	}
     };
+    std::vector<BmSosInfo*> sos;
+    void setSosFrom(const TMINLP::SosInfo * sosinfo);
 		
     BCP_string ipopt_file_content;
     BCP_string nl_file_content;
@@ -174,7 +178,6 @@ class BM_lp : public BCP_lp_user
 
     OsiBabSolver babSolver_;
     BonminAmplInterface nlp;
-    BmSosInfo sos;
 
     double lower_bound_;
     double* primal_solution_;
