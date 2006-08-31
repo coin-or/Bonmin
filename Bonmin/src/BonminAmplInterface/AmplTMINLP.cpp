@@ -170,11 +170,11 @@ namespace Ipopt
       ampl_utils::sos_kludge(sos_.num, sos_.starts, sos_.weights);
       for (int ii=0;ii<sos_.num;ii++) {
         int ichar = sos_.types[ii];
-        if(ichar != '1') {
+        if(ichar != '1' && ichar!='2') {
           std::cerr<<"Unsuported type of sos constraint: "<<sos_.types[ii]<<std::endl;
           throw;
         }
-        sos_.types[ii]= 1;
+        sos_.types[ii]= ichar - '0';
       }
     }
   }
@@ -273,7 +273,6 @@ namespace Ipopt
       var_types[i] = INTEGER;
       totalNumberOfNonContinuous++;
     }
-    //    std::cout<<"Number of integer and binaries : "<<totalNumberOfNonContinuous<<std::endl;
     return true;
   }
 
