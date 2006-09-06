@@ -71,7 +71,9 @@ MyTMINLP::get_bounds_info(Index n, Number* x_l, Number* x_u,
 
 bool 
 MyTMINLP::get_starting_point(Index n, bool init_x, Number* x,
-                       Index m, bool init_lambda, Number* lambda)
+                             bool init_z, Number* z_L, Number* z_U,
+                             Index m, bool init_lambda,
+                             Number* lambda)
 {
   assert(n==4);
   assert(m==3);

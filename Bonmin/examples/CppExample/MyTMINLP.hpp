@@ -88,7 +88,8 @@ public:
     \param init_lambda do we initialize duals of constraints? 
     \param lambda lower bounds of the constraints (function should fill it).
     \return true in case of success.*/
-  virtual bool get_starting_point(Index n, bool init_x, Number* x,                                  
+  virtual bool get_starting_point(Index n, bool init_x, Number* x,
+                                  bool init_z, Number* z_L, Number* z_U,
                                   Index m, bool init_lambda,
                                   Number* lambda);
   
