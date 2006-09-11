@@ -104,6 +104,7 @@ bb\_log\_interval & I & 100 & + & $-$ & + & +\\
 lp\_log\_level & I & 0 & $-$ & $-$ & + & +\\
 milp\_log\_level & I &  0 & $-$ &  + & $-$ & +\\
 oa\_log\_level & I & 1 & $-$ &  + & $-$ & +\\
+oa\_log\_frequency & I & 100 & $ - $ & $+$ & $-$ & $+$\\
 nlp\_log\_level & I & 0 & +&  + & + & +\\
 print\_user\_options & S & no & + & + & + & +\\
 \hline
@@ -123,14 +124,14 @@ time\_limit & F & 1e+10 & + & + & + & +\\
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{options for robustness}\\
 \hline
 max\_random\_point\_radius & F &+  &+ &+ &+ &+\\
-num\_consecutive\_failures & I & 1 & + & $-$ & $-$ & $-$\\
+max\_consecutive\_failures & I & 1 & + & $-$ & $-$ & $-$\\
 nlp\_failure\_behavior & S & stop   & + & + & + & + \\
 num\_iterations\_suspect & I & $-$1 & + & + & + & + \\
 num\_retry\_unsolved\_random\_point & I & 0 & + & + & + & + \\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{options for nonconvex problems}\\
 \hline
-num\_consecutive\_infeasible & I & 1 & + & $-$ & $-$ & $-$\\
+max\_consecutive\_infeasible & I & 1 & + & $-$ & $-$ & $-$\\
 num\_resolve\_at\_node & I & 0 & + & +  & + & + \\
 num\_resolve\_at\_root & I & 0& + & + & + & +  \\
 \hline
