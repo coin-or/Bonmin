@@ -46,7 +46,7 @@ bool IpCbcColReader::readFile()
     if(name.size()==0)
       continue;
     varNames_.push_back(name);
-    varIndices_[varNames_[nVar].c_str()]=nVar;
+    varIndices_[varNames_[nVar].c_str()] = nVar;
     nVar++;
   }
   while(!inFile.eof());

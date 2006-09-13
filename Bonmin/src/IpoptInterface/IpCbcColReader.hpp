@@ -10,12 +10,13 @@
 #ifndef IpCbcColReader_HPP
 #define IpCbcColReader_HPP
 #include <string>
+#include <vector>
 #include <list>
 #include <fstream>
 #include <iostream>
 #include <CoinHelperFunctions.hpp>
-#include <ext/hash_map>
-
+//#include <tr1/unordered_map>
+#include <map>
 /** A class for reading a .col file containing name for variable (ampl generated file).
    */
 class IpCbcColReader
@@ -41,17 +42,18 @@ private:
   std::string fileName_;
 
   /// String comparison strucutre.
-  struct eqstr
+  struct ltstr
   {
     bool operator()(const char* s1, const char* s2) const
     {
-      return strcmp(s1, s2) == 0;
+      return strcmp(s1, s2) < 0;
     }
   };
 
   /// Hash type.
-  typedef __gnu_cxx::hash_map<const char *, int> namesHash;//, __gnu_cxx::hash <const char *>, eqstr > namesHash;
-
+ // typedef __gnu_cxx::hash_map<const char *, int> namesHash;//, __gnu_cxx::hash <const char *>, eqstr > namesHash;
+ // typedef std::tr1::unordered_map<std::string, int, std::tr1::hash<std::string> > namesHash;
+  typedef std::map<const char *, int, ltstr> namesHash;
   ///Hash map used to store the indices.
   namesHash varIndices_;
   ///Variable names.
