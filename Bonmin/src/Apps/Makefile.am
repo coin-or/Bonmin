@@ -103,11 +103,11 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # is made)
 CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
 	rm -f $@
-	$(LN_S) $< $@
+	$(LN_S) $? $@
 
 CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
 	rm -f $@
-	$(LN_S) $< $@
+	$(LN_S) $? $@
 
 ########################################################################
 #                              nodeSolver                              #

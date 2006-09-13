@@ -738,11 +738,11 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
 # is made)
 CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
 	rm -f $@
-	$(LN_S) $< $@
+	$(LN_S) $? $@
 
 CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
 	rm -f $@
-	$(LN_S) $< $@
+	$(LN_S) $? $@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
