@@ -50,7 +50,7 @@ bin_PROGRAMS = bonminbcp$(EXEEXT)
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
 subdir = experimental/Bcp
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in INSTALL
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -62,7 +62,8 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_bonminbcp_OBJECTS = BB_cut.$(OBJEXT) BM.$(OBJEXT) BM_pack.$(OBJEXT)
+am_bonminbcp_OBJECTS = BB_cut.$(OBJEXT) BM.$(OBJEXT) BM_tm.$(OBJEXT) \
+	BM_lp.$(OBJEXT) BM_lp_branch.$(OBJEXT) BM_pack.$(OBJEXT)
 bonminbcp_OBJECTS = $(am_bonminbcp_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
@@ -320,7 +321,17 @@ IPOPTLIBS = \
 ########################################################################
 #                                bonmin                                #
 ########################################################################
-bonminbcp_SOURCES = BB_cut.hpp BB_cut.cpp BM.hpp BM.cpp BM_pack.cpp bm_var.hpp
+bonminbcp_SOURCES = \
+	BB_cut.hpp \
+	BB_cut.cpp \
+	BM.hpp \
+	BM.cpp \
+	BM_tm.cpp \
+	BM_lp.cpp \
+	BM_lp_branch.cpp \
+	BM_pack.cpp \
+	BM_var.hpp
+
 bonminbcp_DEPENDENCIES = amplsolver.a
 AMPL_PATHED_FILES = \
 	asl.h \
@@ -444,7 +455,10 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BB_cut.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_lp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_lp_branch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_pack.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_tm.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

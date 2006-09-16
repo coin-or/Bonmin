@@ -229,6 +229,9 @@ public:
     virtual BCP_user_data*
     unpack_user_data(BCP_buffer& buf);
 
+    virtual void
+    process_message(BCP_buffer& buf);
+
     virtual OsiSolverInterface *
     initialize_solver_interface();
 

@@ -74,6 +74,11 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 
     /* synchronize bonmin & BCP parameters */
     Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp.retrieve_options();
+
+    int nlpLogLevel;
+    options->GetIntegerValue("nlp_log_level", nlpLogLevel, "bonmin.");
+    nlp.messageHandler()->setLogLevel(nlpLogLevel);
+
     double bm_intTol;
     double bm_cutoffIncr; // could be negative
     options->GetNumericValue("integer_tolerance",bm_intTol,"bonmin.");
