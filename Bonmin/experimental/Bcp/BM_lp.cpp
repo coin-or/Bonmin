@@ -165,24 +165,27 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 		}
 		sol->setObjective(lower_bound_);
 	    }
-	    if (lower_bound_>upper_bound()-get_param(BCP_lp_par::Granularity)){
-		printf("\
+	    if (lower_bound_>upper_bound()-get_param(BCP_lp_par::Granularity) &&
+			par.entry(BM_par::PrintBranchingInfo)) {
+			printf("\
 BM_lp: At node %i : will fathom because of high lower bound\n",
-		       current_index());
+				   current_index());
 	    }
 	}
 	else if (nlp.isProvenPrimalInfeasible()) {
 	    // prune it!
 	    lower_bound_ = 1e200;
 	    numNlpFailed_ = 0;
-	    printf("\
+		if (par.entry(BM_par::PrintBranchingInfo)) {
+			printf("\
 BM_lp: At node %i : will fathom because of infeasibility\n",
-		   current_index());
+				   current_index());
+		}
 	}
 	else if (nlp.isAbandoned()) {
-	    printf("\
+		printf("\
 BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
-		   current_index());
+			   current_index());
 	    // nlp failed
 	    nlp.forceBranchable();
 	    lower_bound_ = nlp.getObjValue();
