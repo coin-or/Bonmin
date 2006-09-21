@@ -54,17 +54,7 @@ namespace Ipopt
   class TMINLP : public ReferencedObject
   {
   public:
-    /**@name Constructors/Destructors */
-    //@{
-    TMINLP()
-    {}
-    ;
-
-    /** Default destructor */
-    virtual ~TMINLP()
-    {}
-    ;
-    //@}
+    friend class TMINLP2TNLP;
 
     /** Class to store sos constraints for model */
     struct SosInfo
@@ -88,45 +78,10 @@ namespace Ipopt
       double * weights;
       /** @} */
       /** default constructor. */
-      SosInfo():num(0), types(NULL), priorities(NULL), numNz(0), starts(NULL),
-             indices(NULL), weights(NULL)
-      {}
+      SosInfo();
       /** Copy constructor.*/
-      SosInfo(const SosInfo & source):num(source.num), types(NULL), priorities(NULL), 
-          numNz(source.numNz), starts(NULL),indices(NULL),
-           weights(NULL)
-      {
-
-        if(num > 0) {
-          assert(source.types!=NULL);
-          assert(source.priorities!=NULL);
-          assert(source.starts!=NULL);
-          assert(source.indices!=NULL);
-          assert(source.weights!=NULL);
-          types = new char[num];
-          priorities = new int[num];
-          starts = new int[num + 1];
-          indices = new int[numNz];
-          weights = new double[numNz];
-          for(int i = 0 ; i < num ; i++) {
-            source.types[i] = types[i];
-            source.priorities[i] = priorities[i];
-            source.starts[i] = starts[i];
-          }
-          for(int i = 0 ; i < numNz ; i++) {
-            source.indices[i] = indices[i];
-            source.weights[i] = weights[i];
-          }
-        }
-        else {
-          assert(source.types==NULL);
-          assert(source.priorities==NULL);
-          assert(source.starts==NULL);
-          assert(source.indices==NULL);
-          assert(source.weights==NULL);
-        }
-
-      }
+      SosInfo(const SosInfo & source);
+      
 
       /** destructor*/
       ~SosInfo()
@@ -136,21 +91,8 @@ namespace Ipopt
 
 
       /** Reset information */
-      void gutsOfDestructor()
-      {
-        num = 0;
-        numNz = 0;
-        if(types) delete [] types;
-        types = NULL;
-        if(starts) delete [] starts;
-        starts = NULL;
-        if(indices) delete [] indices;
-        indices = NULL;
-        if(priorities) delete [] priorities;
-        priorities = NULL;
-        if(weights) delete [] weights;
-        weights = NULL;
-      }
+      void gutsOfDestructor();
+
     };
 
     /** Stores branching priorities information. */
@@ -208,6 +150,16 @@ namespace Ipopt
       LINEAR/** Constraint contains only linear terms.*/,
       NON_LINEAR/**Constraint contains some non-linear terms.*/
     };
+
+    /**@name Constructors/Destructors */
+    //@{
+    TMINLP();
+
+    /** Default destructor */
+    virtual ~TMINLP()
+    {}
+    //@}
+;
 
     /**@name methods to gather information about the MINLP */
     //@{
@@ -293,7 +245,16 @@ namespace Ipopt
     
     virtual const BranchingInfo * branchingInfo() const = 0;
 
-    virtual const SosInfo * sosConstraints() const = 0;
+    /** Add some linear cuts to the problem formulation */
+   void addCuts(int numberCuts, const OsiRowCut ** cuts);
+  
+   /** Remove some cuts to the formulation */
+   void removeCuts(int number ,const int * toRemove);
+
+   /** remove the last number cuts.*/
+   void removeLastCuts(int number);
+
+   virtual const SosInfo * sosConstraints() const = 0;
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -313,7 +274,27 @@ namespace Ipopt
     void operator=(const TMINLP&);
     //@}
 
-
+      private:
+  /** resize arrays for linear cuts */
+  void resizeLinearCuts(int newNumberCuts, int newNnz);
+  /** columnindices of linear cuts. */
+   int * jCol_;
+  /** rows indices of linear cuts. */
+   int * iRow_;
+  /** elements of linear cuts.*/
+  double * elems_;
+  /** lower bounds for linear cuts. */
+  double * lower_;
+  /** upper bounds for linear cuts. */
+  double * upper_;
+  /** number of linear cuts.*/
+  int nLinearCuts_;
+  /** number of non-zeroes in linear cuts*/
+  int linearCutsNnz_;
+  /** storage size for linear cuts number of cuts.*/
+  int linearCutsCapacity_;
+  /** storage size for linear cuts number of nnz.*/
+  int linearCutsNnzCapacity_;
   };
 
 } // namespace Ipopt

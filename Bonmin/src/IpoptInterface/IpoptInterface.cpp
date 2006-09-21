@@ -1494,7 +1494,7 @@ IpoptInterface::isFreeBinary(int colNumber) const
 double
 IpoptInterface::getInfinity() const
 {
-  return infty_;
+  return DBL_MAX;
 }
 
 /// Get pointer to array[getNumCols()] of primal solution vector
@@ -2066,25 +2066,26 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
   const double * duals = getRowPrice();
-  double infty = 1e100 *getInfinity();
+  double infty = getInfinity();
+  double nlp_infty = infty_;
   
   for(int i = 0; i< m ; i++) {
     if(constTypes_[i] == Ipopt::TMINLP::NON_LINEAR) {
-      if(rowLower[i] > -infty && rowUpper[i] < infty && fabs(duals[i]) == 0.)
+      if(rowLower[i] > - nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
       {
         binding[i] = -1;
         std::cerr<<"non binding constraint"<<std::endl;
         continue;
       }
       binding[i] = numBindings;
-      if(rowLower[i] > - infty_)
+      if(rowLower[i] > - nlp_infty)
         lb[numBindings] = rowLower[i] - g[i];
       else
         lb[numBindings] = - infty;
-      if(rowUpper[i] < infty_)
+      if(rowUpper[i] < nlp_infty)
         ub[numBindings] = rowUpper[i] - g[i];
       else
-        ub[numBindings] = infty_;
+        ub[numBindings] = infty;
       if(rowLower[i] > -infty && rowUpper[i] < infty)
       {
         if(duals[i] >= 0)// <= inequality
@@ -2106,9 +2107,9 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
           lb[binding[jRow_[i] - 1]],
           ub[binding[jRow_[i] - 1]], tiny_, veryTiny_)) {
         cuts[binding[jRow_[i] - 1]].insert(jCol_[i]-1,jValues_[i]);
-        if(lb[binding[jRow_[i] - 1]] > - infty_)
+        if(lb[binding[jRow_[i] - 1]] > - infty)
           lb[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
-        if(ub[binding[jRow_[i] - 1]] < infty_)
+        if(ub[binding[jRow_[i] - 1]] < infty)
         ub[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
       }
     }
@@ -2119,6 +2120,7 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
     newCut.setGloballyValid();
+    newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
     newCut.setUb(ub[i]);
     newCut.setRow(cuts[i]);
@@ -2158,6 +2160,7 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
     v.insert(n,-1);
     OsiRowCut newCut;
     newCut.setGloballyValid();
+    newCut.setEffectiveness(99.99e99);
     newCut.setRow(v);
     newCut.setLb(-DBL_MAX/*Infinity*/);
     newCut.setUb(ub[nNonLinear_]);
@@ -2231,29 +2234,30 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   const double * colUpper = getColUpper();
   const double * duals = getRowPrice();
   assert(m==getNumRows());
-  double infty = getInfinity() * 1e100;
+  double infty = getInfinity();
+  double nlp_infty = infty_;
   for(int i = 0 ; i < m ; i++) {
     {
       if(constTypes_[i] == Ipopt::TMINLP::NON_LINEAR) {
         //If constraint is equality not binding do not add
-        if(rowLower[i] > -infty && rowUpper[i] < infty && fabs(duals[i]) == 0.)
+        if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
         {
             binding[i] = -1;
             continue;
         }
         else
           binding[i] = numBindings;
-        if(rowLower[i] > - infty_)
+        if(rowLower[i] > - nlp_infty)
           rowLow[numBindings] = (rowLower[i] - g[i]) - 1e-07;
         else
-          rowLow[numBindings] = - infty_;
-        if(rowUpper[i] < infty_)
+          rowLow[numBindings] = - infty;
+        if(rowUpper[i] < nlp_infty)
           rowUp[numBindings] =  (rowUpper[i] - g[i]) + 1e-07;
         else
-          rowUp[numBindings] = infty_;
+          rowUp[numBindings] = infty;
         
         //If equality or ranged constraint only add one side by looking at sign of dual multiplier
-        if(rowLower[i] > -infty && rowUpper[i] < infty)
+        if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty)
         {
           if(duals[i] >= 0)// <= inequality
             rowLow[numBindings] = - infty;
@@ -2411,7 +2415,6 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     delete [] obj;
   }
 
-si.writeMps("init");
 
   setWarmStartOptions();
   setColSolution(problem()->x_sol());
@@ -2419,4 +2422,16 @@ si.writeMps("init");
 
 }
 
+/** Add a collection of linear cuts to problem formulation.*/
+void 
+IpoptInterface::applyRowCuts(int numberCuts, const OsiRowCut * cuts)
+{
+  const OsiRowCut ** cutsPtrs = new const OsiRowCut*[numberCuts];
+  for(int i = 0 ; i < numberCuts ; i++)
+  {
+    cutsPtrs[i] = &cuts[i];
+  }
+  tminlp_->addCuts(numberCuts, cutsPtrs);
+  delete [] cutsPtrs;
+}
 

@@ -35,7 +35,6 @@ bool IpCbcColReader::readFile()
   colFileName+=".col";
   std::ifstream inFile(colFileName.c_str());
   if(!inFile.is_open()) {
-    std::cerr<<"Error in opening Names file (probably does not exists)";
     return false;
   }
   std::string name;

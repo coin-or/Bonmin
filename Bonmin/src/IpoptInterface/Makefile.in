@@ -59,7 +59,7 @@ libipoptinterface_la_LIBADD =
 am_libipoptinterface_la_OBJECTS = IpCbcBoundsReader.lo \
 	IpCbcColReader.lo IpCbcStartPointReader.lo IpoptInterface.lo \
 	IpoptInteriorWarmStarter.lo IpoptWarmStart.lo TMINLP2TNLP.lo \
-	TNLP2FPNLP.lo
+	TMINLP.lo TNLP2FPNLP.lo
 libipoptinterface_la_OBJECTS = $(am_libipoptinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -316,7 +316,7 @@ libipoptinterface_la_SOURCES = \
 	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
 	IpoptWarmStart.cpp IpoptWarmStart.hpp \
 	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
-	TMINLP.hpp \
+	TMINLP.cpp TMINLP.hpp \
 	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
 
 
@@ -376,7 +376,7 @@ ASTYLE_FILES = \
 	IpoptInteriorWarmStarter.cppbak IpoptInteriorWarmStarter.hppbak \
 	IpoptWarmStart.cppbak IpoptWarmStart.hppbak \
 	TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
-	TMINLP.hppbak \
+	TMINLP.hppbak TMINLP.hppbak \
 	TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
@@ -438,6 +438,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptInteriorWarmStarter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptWarmStart.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TMINLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TMINLP2TNLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TNLP2FPNLP.Plo@am__quote@
 

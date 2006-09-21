@@ -59,6 +59,49 @@ IpCbcOACutGenerator::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
     }
   }
 
+#ifdef 0
+ //Add tight cuts at LP optimum
+ int numberCuts = si.getNumRows() - nlp_->getNumRows();
+ const OsiRowCut ** cuts = new const OsiRowCut*[numberCuts];
+ int begin = nlp_->getNumRows();
+ numberCuts = 0;
+ int end = si.getNumRows();
+ const double * rowLower = si.getRowLower();
+ const double * rowUpper = si.getRowUpper();
+ const CoinPackedMatrix * mat = si.getMatrixByRow();      
+ const CoinBigIndex * starts = mat->getVectorStarts();
+ const int * lengths = mat->getVectorLengths();
+ const double * elements = mat->getElements();
+ const int * indices = mat->getIndices();
+ 
+ for(int i = begin ; i < end ; i++, numberCuts++)
+ {
+   bool nnzExists=false;
+   for(int k = starts[i] ; k < starts[i]+lengths[i] ; k++)
+   {
+     if(indices[k] == nlp_->getNumCols())
+     {
+       nnzExists = true;
+       char sign = (elements[k]>0.)?'+':'-';
+       char type='<';
+       if(rowLower[i]>-1e20) type='>'; 
+       std::cout<<"Non zero with sign: "<<sign<<", type: "<<type<<std::endl;
+     }
+   }
+   if(nnzExists)
+   {
+      numberCuts--;
+      continue;
+   }
+   else
+      std::cout<<"No nonzero element"<<std::endl;
+   int * indsCopy = CoinCopyOfArray(&indices[starts[i]], lengths[i]);
+   double * elemsCopy = CoinCopyOfArray(&elements[starts[i]], lengths[i]);
+   cuts[numberCuts] = new OsiRowCut(rowLower[i], rowUpper[i], lengths[i], lengths[i],
+                           indsCopy, elemsCopy);
+ }
+ nlp_->applyRowCuts(numberCuts,cuts);
+#endif
   //Now solve the NLP get the cuts, reset bounds and get out
 
   //  nlp_->turnOnIpoptOutput();
@@ -127,6 +170,7 @@ IpCbcOACutGenerator::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
       nlp_->setColBounds(i,saveColLb[i],saveColUb[i]);
     }
   }
+  nlp_->deleteLastRows(numberCuts);
   delete [] saveColLb;
   delete [] saveColUb;
 }

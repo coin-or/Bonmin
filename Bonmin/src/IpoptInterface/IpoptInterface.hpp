@@ -645,9 +645,11 @@ class Messages : public CoinMessages
   */
   virtual void deleteRows(const int num, const int * rowIndices)
   {
-    if(num>0)
-      throw CoinError("Ipopt model does not implement this function.",
-          "deleteRows","IpoptInterface");
+     tminlp_->removeCuts(num, rowIndices);
+  }
+
+  void deleteLastRows(int number){
+  tminlp_->removeLastCuts(number);
   }
 
   /** We have to keep this but it will throw an error
@@ -810,7 +812,20 @@ class Messages : public CoinMessages
   double getFeasibilityOuterApproximation(int n, const double * x_bar,const int *ind, OsiCuts &cs);
   //@}
   /** get NLP constraint violation of current point */
-  double getConstraintViolation();
+
+
+   /** Add a collection of linear cuts to problem formulation.*/
+  virtual void applyRowCuts(int numberCuts, const OsiRowCut * cuts);
+
+
+  /** Add a collection of linear cuts to the problem formulation */
+  virtual void applyRowCuts(int numberCuts, const OsiRowCut ** cuts)
+  {
+    tminlp_->addCuts(numberCuts, cuts);
+  }
+
+
+ double getConstraintViolation();
 
 //---------------------------------------------------------------------------
 protected:
@@ -833,12 +848,12 @@ protected:
       const char * whereFrom);
 
 
-  /** We have to keep this but it will throw an error.
+  /** Add a linear cut to the problem formulation.
   */
   virtual void applyRowCut( const OsiRowCut & rc )
   {
-    throw SimpleError("Ipopt model does not implement this function.",
-        "applyRowCut");
+    const OsiRowCut * cut = &rc;
+    tminlp_->addCuts(1, &cut);
   }
   /** We have to keep this but it will throw an error.
   */

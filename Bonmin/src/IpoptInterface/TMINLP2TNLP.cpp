@@ -226,7 +226,7 @@ namespace Ipopt
 
   void TMINLP2TNLP::setDualsInit(Index n, const Number* duals_init)
   {
-    DBG_ASSERT(n == m_ + 2 * n_);
+    DBG_ASSERT(n == m_ );
 
     if(!duals_init_)
       duals_init_ = &x_init_[n_];
@@ -255,7 +255,10 @@ namespace Ipopt
   bool TMINLP2TNLP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
       Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
   {
-    return tminlp_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+    bool return_code = tminlp_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+    m += tminlp_->nLinearCuts_;
+    nnz_jac_g += tminlp_->linearCutsNnz_;
+    return return_code;
   }
 
   bool TMINLP2TNLP::get_bounds_info(Index n, Number* x_l, Number* x_u,
@@ -263,9 +266,10 @@ namespace Ipopt
   {
     IpBlasDcopy(n, x_l_, 1, x_l, 1);
     IpBlasDcopy(n, x_u_, 1, x_u, 1);
-    IpBlasDcopy(m, g_l_, 1, g_l, 1);
-    IpBlasDcopy(m, g_u_, 1, g_u, 1);
-
+    IpBlasDcopy(m_, g_l_, 1, g_l, 1);
+    IpBlasDcopy(m_, g_u_, 1, g_u, 1);
+    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->lower_, 1, &g_l[m_],1); 
+    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->upper_, 1, &g_u[m_],1); 
     return true;
   }
 
@@ -274,7 +278,7 @@ namespace Ipopt
       Index m, bool init_lambda,
       Number* lambda)
   {
-    assert(m==m_);
+    assert(m==m_ + tminlp_->nLinearCuts_);
     assert(n==n_);
     if (init_x == true) {
       if(x_init_==NULL)
@@ -291,7 +295,11 @@ namespace Ipopt
     if(init_lambda == true) {
       if(duals_init_ == NULL)
         return false;
-      IpBlasDcopy(m, duals_init_, 1, lambda, 1);
+      IpBlasDcopy(m_, duals_init_, 1, lambda, 1);
+      for(int i = 0 ; i < tminlp_->nLinearCuts_; i++)
+      {
+        lambda [i + m_ ] = 0.;
+      }
     }
 
     need_new_warm_starter_ = true;
@@ -326,14 +334,44 @@ namespace Ipopt
   bool TMINLP2TNLP::eval_g(Index n, const Number* x, bool new_x,
       Index m, Number* g)
   {
-    return tminlp_->eval_g(n, x, new_x, m, g);
+    int return_code = tminlp_->eval_g(n, x, new_x, m_, g);
+    // Add the linear cuts
+    int nnz = 0;
+    for(int i = 0 ; i < tminlp_->nLinearCuts_ ; i++)
+    {
+      int iplusm = m_ + i;
+      g[iplusm] = 0;
+      while(tminlp_->iRow_[nnz]==i) { g[iplusm] += tminlp_->elems_[nnz] * x[tminlp_->jCol_[nnz]]; nnz++;}
+    }
+    return return_code;
   }
 
   bool TMINLP2TNLP::eval_jac_g(Index n, const Number* x, bool new_x,
       Index m, Index nele_jac, Index* iRow,
       Index *jCol, Number* values)
   {
-    return tminlp_->eval_jac_g(n, x, new_x, m, nele_jac, iRow, jCol, values);
+    int return_code = tminlp_->eval_jac_g(n, x, new_x, m_ , nele_jac - tminlp_->nLinearCuts_, 
+                                          iRow, jCol, values);
+    bool isFortran = index_style_ == TNLP::FORTRAN_STYLE;
+    if(iRow != NULL)
+    {
+      DBG_ASSERT(iCol != NULL);
+      DBG_ASSERT(values == NULL)
+      
+      int nnz = nele_jac - tminlp_->linearCutsNnz_ ;
+      for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++)
+      {
+         iRow[nnz] = tminlp_->iRow_[i] + m_ + isFortran; 
+         jCol[nnz] = tminlp_->jCol_[i] + isFortran;
+      }
+    }
+    else
+    {
+      DBG_ASSERT(iCol == NULL);
+      DBG_ASSERT(values != NULL);
+      IpBlasDcopy(tminlp_->linearCutsNnz_ , tminlp_->elems_, 1, &values[nele_jac - tminlp_->linearCutsNnz_],1);
+    }
+  return return_code;
   }
 
   bool TMINLP2TNLP::eval_h(Index n, const Number* x, bool new_x,
@@ -352,7 +390,7 @@ namespace Ipopt
       Number obj_value)
   {
     assert(n==n_);
-    assert(m==m_);
+    assert(m==m_ + tminlp_->nLinearCuts_);
     if (!x_sol_) {
       x_sol_ = new Number[n];
     }
@@ -548,9 +586,4 @@ namespace Ipopt
 
 }
 // namespace Ipopt
-
-
-
-
-
 

@@ -57,8 +57,8 @@ LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
 bonmin_SOURCES = bonmin.cpp
 
 bonmin_LDADD = \
-	libbonmin.la \
 	../BonminAmplInterface/libamplinterface.la\
+	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \
@@ -116,8 +116,8 @@ CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
 nodeSolver_SOURCES = nodeSolver.cpp
 
 nodeSolver_LDADD = \
-	libbonmin.la \
 	../BonminAmplInterface/libamplinterface.la \
+	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \

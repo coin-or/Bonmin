@@ -24,7 +24,7 @@ libipoptinterface_la_SOURCES = \
 	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
 	IpoptWarmStart.cpp IpoptWarmStart.hpp \
 	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
-	TMINLP.hpp \
+	TMINLP.cpp TMINLP.hpp \
 	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
 
 # This is for libtool (on Windows)
@@ -93,7 +93,7 @@ ASTYLE_FILES = \
 	IpoptInteriorWarmStarter.cppbak IpoptInteriorWarmStarter.hppbak \
 	IpoptWarmStart.cppbak IpoptWarmStart.hppbak \
 	TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
-	TMINLP.hppbak \
+	TMINLP.hppbak TMINLP.hppbak \
 	TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak
 
 ASTYLE = @ASTYLE@
