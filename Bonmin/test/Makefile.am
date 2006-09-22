@@ -18,8 +18,9 @@ unitTest_SOURCES = \
 	InterfaceTest.cpp 
 
 # List libraries of COIN projects
-unitTest_LDADD = ../src/Apps/libbonmin.la \
+unitTest_LDADD = \
         ../src/BonminAmplInterface/libamplinterface.la \
+        ../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \

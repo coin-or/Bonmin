@@ -77,8 +77,9 @@ CppExample_DEPENDENCIES = ../src/Apps/libbonmin.la \
 	$(am__DEPENDENCIES_2)
 am_unitTest_OBJECTS = InterfaceTest.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
-unitTest_DEPENDENCIES = ../src/Apps/libbonmin.la \
+unitTest_DEPENDENCIES =  \
 	../src/BonminAmplInterface/libamplinterface.la \
+	../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_2)
@@ -319,8 +320,9 @@ unitTest_SOURCES = \
 
 
 # List libraries of COIN projects
-unitTest_LDADD = ../src/Apps/libbonmin.la \
+unitTest_LDADD = \
         ../src/BonminAmplInterface/libamplinterface.la \
+        ../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \
