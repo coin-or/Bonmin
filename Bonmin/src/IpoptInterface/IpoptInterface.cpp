@@ -747,6 +747,7 @@ IpoptInterface::~IpoptInterface ()
   delete [] jValues_;
   delete [] constTypes_;
   delete [] constTypesNum_;
+  delete [] obj_;
 }
 
 void
