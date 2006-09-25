@@ -100,7 +100,9 @@ namespace Ipopt
   }
 
   AmplTMINLP::~AmplTMINLP()
-  {}
+  {
+    delete ampl_tnlp_;
+  }
 
   void
   AmplTMINLP::read_priorities()
