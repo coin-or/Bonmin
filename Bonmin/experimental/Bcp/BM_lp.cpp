@@ -8,6 +8,7 @@ BM_lp::BM_lp() :
     sos(),
     babSolver_(3),
     nlp(),
+    ws(NULL),
     feasChecker_(NULL),
     in_strong(0)
 {
@@ -19,6 +20,7 @@ BM_lp::BM_lp() :
 
 BM_lp::~BM_lp()
 {
+    delete ws;
     delete feasChecker_;
     delete[] primal_solution_;
     delete[] branching_priority_;
@@ -133,7 +135,33 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	   feasible (or along the NLP optimization we have blundered into
 	   a feas sol) then create "sol"
 	*/
-	nlp.initialSolve();
+	if (current_index() == 0) {
+	    nlp.initialSolve();
+	    switch (par.entry(BM_par::WarmStartStrategy)) {
+	    case WarmStartNone:
+		break;
+	    case WarmStartFromRoot:
+		ws = nlp.getWarmStart();
+		break;
+	    case WarmStartFromParent:
+		// FIXME: not yet implemented
+		break;
+	    }
+	} else {
+	    switch (par.entry(BM_par::WarmStartStrategy)) {
+	    case WarmStartNone:
+		nlp.initialSolve();
+		break;
+	    case WarmStartFromRoot:
+		nlp.setWarmStart(ws);
+		nlp.resolve();
+		break;
+	    case WarmStartFromParent:
+		// FIXME: not yet implemented
+		nlp.initialSolve();
+		break;
+	    }
+	}
 	if (nlp.isProvenOptimal()) {
 	    const int numCols = nlp.getNumCols();
 	    lower_bound_ = nlp.getObjValue();
@@ -166,26 +194,32 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 		sol->setObjective(lower_bound_);
 	    }
 	    if (lower_bound_>upper_bound()-get_param(BCP_lp_par::Granularity) &&
-			par.entry(BM_par::PrintBranchingInfo)) {
-			printf("\
+		par.entry(BM_par::PrintBranchingInfo)) {
+		printf("\
 BM_lp: At node %i : will fathom because of high lower bound\n",
-				   current_index());
+		       current_index());
 	    }
 	}
 	else if (nlp.isProvenPrimalInfeasible()) {
 	    // prune it!
 	    lower_bound_ = 1e200;
 	    numNlpFailed_ = 0;
-		if (par.entry(BM_par::PrintBranchingInfo)) {
-			printf("\
+	    if (par.entry(BM_par::PrintBranchingInfo)) {
+		printf("\
 BM_lp: At node %i : will fathom because of infeasibility\n",
-				   current_index());
-		}
+		       current_index());
+	    }
 	}
 	else if (nlp.isAbandoned()) {
+	    if (nlp.isIterationLimitReached()) {
+		printf("\
+BM_lp: At node %i : WARNING: nlp reached iter limit. Will force branching\n",
+		       current_index());
+	    } else {
 		printf("\
 BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
-			   current_index());
+		       current_index());
+	    }
 	    // nlp failed
 	    nlp.forceBranchable();
 	    lower_bound_ = nlp.getObjValue();

@@ -61,6 +61,8 @@ void BCP_parameter_set<BM_par>::create_keyword_list() {
 					   VarWithLowPriorityMoreImportant)));
     keys.push_back(make_pair(BCP_string("NumNlpFailureMax"),
 			     BCP_parameter(BCP_IntPar, NumNlpFailureMax)));
+    keys.push_back(make_pair(BCP_string("WarmStartStrategy"),
+			     BCP_parameter(BCP_IntPar, WarmStartStrategy)));
     keys.push_back(make_pair(BCP_string("NL_filename"),
 			     BCP_parameter(BCP_StringPar, NL_filename)));
     keys.push_back(make_pair(BCP_string("IpoptParamfile"),
@@ -79,6 +81,7 @@ void BCP_parameter_set<BM_par>::set_default_entries() {
     set_entry(SosWithLowPriorityMoreImportant, true);
     set_entry(VarWithLowPriorityMoreImportant, true);
     set_entry(NumNlpFailureMax, 5);
+    set_entry(WarmStartStrategy, WarmStartFromRoot);
     set_entry(NL_filename, "");
     set_entry(IpoptParamfile, "");
 }

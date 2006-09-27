@@ -39,7 +39,13 @@ public:
 };
 
 //#############################################################################
-    
+
+enum BM_WarmStartStrategy {
+    WarmStartNone,
+    WarmStartFromRoot,
+    WarmStartFromParent
+};
+
 class BM_par {
 public:
     enum chr_params {
@@ -55,6 +61,7 @@ public:
     enum int_params {
         //
         NumNlpFailureMax,
+	WarmStartStrategy,
         end_of_int_params
     };
     enum dbl_params {
@@ -178,6 +185,7 @@ class BM_lp : public BCP_lp_user
 
     OsiBabSolver babSolver_;
     BonminAmplInterface nlp;
+    CoinWarmStart* ws;
 
     double lower_bound_;
     double* primal_solution_;
