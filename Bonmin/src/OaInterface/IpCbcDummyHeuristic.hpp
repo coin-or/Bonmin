@@ -12,7 +12,7 @@
 #include "IpoptInterface.hpp"
 
 #include "CbcHeuristic.hpp"
-
+namespace Bonmin{
 class  IpCbcDummyHeuristic : public CbcHeuristic
 {
 public:
@@ -46,4 +46,5 @@ private:
   /// Do I have a solution?
   bool knowsSolution;
 };
+}
 #endif

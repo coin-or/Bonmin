@@ -10,6 +10,7 @@
 #define MyTNLP_HPP
 #include "TMINLP.hpp"
 using namespace  Ipopt;
+using namespace Bonmin;
 /** A C++ example for interfacing an MINLP with bonmin.
    * This class implements the following NLP :
   * \f[ 

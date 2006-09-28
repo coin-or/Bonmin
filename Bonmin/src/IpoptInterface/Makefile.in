@@ -56,10 +56,11 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libipoptinterface_la_LIBADD =
-am_libipoptinterface_la_OBJECTS = IpCbcBoundsReader.lo \
-	IpCbcColReader.lo IpCbcStartPointReader.lo IpoptInterface.lo \
-	IpoptInteriorWarmStarter.lo IpoptWarmStart.lo TMINLP2TNLP.lo \
-	TMINLP.lo TNLP2FPNLP.lo
+am_libipoptinterface_la_OBJECTS = BoundsReader.lo IpCbcColReader.lo \
+	IpCbcStartPointReader.lo IpoptInterface.lo \
+	OsiTMINLPInterface.lo IpoptInteriorWarmStarter.lo \
+	IpoptWarmStart.lo TMINLP2TNLP.lo TMINLP.lo IpoptSolver.lo \
+	TNLPSolver.lo TNLP2FPNLP.lo
 libipoptinterface_la_OBJECTS = $(am_libipoptinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -308,15 +309,18 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LTLIBRARIES = libipoptinterface.la 
 # List all source files, including headers
 libipoptinterface_la_SOURCES = \
-	IpCbcBoundsReader.cpp IpCbcBoundsReader.hpp \
+	BoundsReader.cpp BoundsReader.hpp \
 	IpCbcColReader.cpp IpCbcColReader.hpp \
 	IpCbcStartPointReader.cpp IpCbcStartPointReader.hpp \
 	IpoptIntegerBias.hpp \
 	IpoptInterface.cpp IpoptInterface.hpp \
+	OsiTMINLPInterface.cpp OsiTMINLPInterface.hpp \
 	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
 	IpoptWarmStart.cpp IpoptWarmStart.hpp \
 	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
 	TMINLP.cpp TMINLP.hpp \
+        IpoptSolver.hpp IpoptSolver.cpp \
+	TNLPSolver.hpp TNLPSolver.cpp \
 	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
 
 
@@ -349,10 +353,13 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 include_HEADERS = \
 	IpoptInterface.hpp \
+	OsiTMINLPInterface.hpp \
 	IpoptInteriorWarmStarter.hpp \
 	TMINLP2TNLP.hpp \
 	TMINLP.hpp \
-	TNLP2FPNLP.hpp
+	TNLP2FPNLP.hpp \
+        TNLPSolver.hpp \
+        IpoptSolver.hpp
 
 
 #############################################################################
@@ -368,15 +375,18 @@ ConfigHeader = BonminConfig.h
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	IpCbcBoundsReader.cppbak IpCbcBoundsReader.hppbak \
+	BoundsReader.cppbak BoundsReader.hppbak \
 	IpCbcColReader.cppbak IpCbcColReader.hppbak \
 	IpCbcStartPointReader.cppbak IpCbcStartPointReader.hppbak \
 	IpoptIntegerBias.hppbak \
 	IpoptInterface.cppbak IpoptInterface.hppbak \
+	OsiTMINLPInterface.cppbak OsiTMINLPInterface.hppbak \
 	IpoptInteriorWarmStarter.cppbak IpoptInteriorWarmStarter.hppbak \
 	IpoptWarmStart.cppbak IpoptWarmStart.hppbak \
 	TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
 	TMINLP.hppbak TMINLP.hppbak \
+        TNLPSolver.hppbak TNLPSolver.hppbak \
+	IpoptSolver.hppbak  IpoptSolver.cpp \
 	TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
@@ -432,15 +442,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcBoundsReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BoundsReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcColReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcStartPointReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptInteriorWarmStarter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptWarmStart.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OsiTMINLPInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TMINLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TMINLP2TNLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TNLP2FPNLP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TNLPSolver.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

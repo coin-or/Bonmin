@@ -1,10 +1,19 @@
+// (C) Copyright International Business Machines (IBM) 2005
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Pierre Bonami, IBM
+//
+// Date : 26/09/2006
+
 #include "TMINLP.hpp"
 #include "IpBlas.hpp"
 
-
+namespace Bonmin{
 
 /** default constructor for Sos constraints */
-Ipopt::TMINLP::SosInfo::SosInfo():
+TMINLP::SosInfo::SosInfo():
         num(0), 
         types(NULL), 
         priorities(NULL), 
@@ -15,7 +24,7 @@ Ipopt::TMINLP::SosInfo::SosInfo():
 {}
 
 /** Copy constructor.*/
-Ipopt::TMINLP::SosInfo::SosInfo(const SosInfo & source):
+TMINLP::SosInfo::SosInfo(const SosInfo & source):
         num(source.num), 
         types(NULL), 
         priorities(NULL), 
@@ -59,7 +68,7 @@ Ipopt::TMINLP::SosInfo::SosInfo(const SosInfo & source):
 
 /** Reset information */
 void 
-Ipopt::TMINLP::SosInfo::gutsOfDestructor()
+TMINLP::SosInfo::gutsOfDestructor()
 {
   num = 0;
   numNz = 0;
@@ -76,7 +85,7 @@ Ipopt::TMINLP::SosInfo::gutsOfDestructor()
 }
 
 
-Ipopt::TMINLP::TMINLP():
+TMINLP::TMINLP():
     jCol_(NULL),
     iRow_(NULL),
     elems_(NULL),
@@ -90,7 +99,7 @@ Ipopt::TMINLP::TMINLP():
 
 
 void
-Ipopt::TMINLP::addCuts(int numberCuts, const OsiRowCut ** cuts){
+TMINLP::addCuts(int numberCuts, const OsiRowCut ** cuts){
 
  int n,m,nnz_lag,nnz_hess;
  Ipopt::TNLP::IndexStyleEnum fort;
@@ -132,7 +141,7 @@ Ipopt::TMINLP::addCuts(int numberCuts, const OsiRowCut ** cuts){
 }
 
 void
-Ipopt::TMINLP::resizeLinearCuts(int newNumberCuts, int newNnz)
+TMINLP::resizeLinearCuts(int newNumberCuts, int newNnz)
 {
   if(newNumberCuts > linearCutsCapacity_)
   {
@@ -173,7 +182,7 @@ Ipopt::TMINLP::resizeLinearCuts(int newNumberCuts, int newNnz)
   }
 }
 void
-Ipopt::TMINLP::removeCuts(int number, const int * toRemove){
+TMINLP::removeCuts(int number, const int * toRemove){
  if(! CoinIsSorted(toRemove, number))
  {
    int * sorted = new int[number];
@@ -195,7 +204,7 @@ Ipopt::TMINLP::removeCuts(int number, const int * toRemove){
  }
 }
 void
-Ipopt::TMINLP::removeLastCuts(int number){
+TMINLP::removeLastCuts(int number){
  number = nLinearCuts_ - number;
  int iNew = 0;
    for(int i = 0 ; i < linearCutsNnz_ ; i++)
@@ -210,3 +219,4 @@ Ipopt::TMINLP::removeLastCuts(int number){
  nLinearCuts_ = number;
  std::cout<<"Number of cuts remaining "<<nLinearCuts_<<std::endl;
  }
+}

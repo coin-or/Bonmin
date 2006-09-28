@@ -50,7 +50,7 @@
 
 
 static CbcModel * currentBranchModel = NULL;
-static IpCbcOACutGenerator2 * currentOA = NULL;
+static Bonmin::IpCbcOACutGenerator2 * currentOA = NULL;
 CbcModel * OAModel = NULL;
 
 #include "CoinSignal.hpp"
@@ -68,7 +68,7 @@ extern "C" {
    }
 }
 
-
+namespace Bonmin {
 /** Constructor.*/
 BonminBB::BonminBB():
     bestSolution_(NULL),
@@ -469,4 +469,5 @@ BonminBB::bestBound()
   if(mipStatus_ == FeasibleOptimal) return bestObj_;
   else if(mipStatus_ == ProvenInfeasible) return 1e200;
   else return bestBound_;
+}
 }

@@ -17,6 +17,8 @@ class CbcNodeInfo;
 class CbcNode;
 class CoinWarmStartDiff;
 
+
+namespace Bonmin{
 class BonminCbcNlpStrategy : public CbcStrategy
 {
 public:
@@ -90,6 +92,6 @@ private:
   BonminCbcNlpStrategy & operator=(const BonminCbcNlpStrategy& rhs);
 
 };
-
+}
 
 #endif

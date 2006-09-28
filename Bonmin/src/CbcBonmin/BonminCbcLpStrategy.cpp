@@ -22,6 +22,8 @@
 #include "CbcCompareUser.hpp"
 #include "CbcCompareActual.hpp"
 
+
+namespace Bonmin{
 CbcOaStrategy::CbcOaStrategy(int migFreq,
     int probFreq,
     int mirFreq,
@@ -124,3 +126,4 @@ CbcOaStrategy::setupOther(CbcModel & model)
 
 }
 
+}

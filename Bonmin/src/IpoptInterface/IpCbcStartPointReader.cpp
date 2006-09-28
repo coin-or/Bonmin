@@ -9,45 +9,46 @@
 #include "IpCbcStartPointReader.hpp"
 
 
+namespace Bonmin {
 
+  bool IpCbcStartPointReader::readFile()
+  {
+    std::ifstream inFile(fileName_.c_str());
+    if(!inFile.is_open()) {
+      std::cerr<<"Error in opening initial point file";
+      return false;
+    }
+    int numPrimals;
+    int numDuals;
+    inFile>>numPrimals>>numDuals;
+    gutsOfDestructor();
+    primals_ = new double [numPrimals];
+    duals_ = new double[numDuals];
+    for(int i = 0; i < numPrimals ; i++) {
+      inFile>>primals_[i];
+    }
+    for(int i = 0; i < numDuals ; i++) {
+      inFile>>duals_[i];
+    }
+    return true;
+  }
 
-bool IpCbcStartPointReader::readFile()
-{
-  std::ifstream inFile(fileName_.c_str());
-  if(!inFile.is_open()) {
-    std::cerr<<"Error in opening initial point file";
-    return false;
+  bool IpCbcStartPointReader::readAndApply(IpoptInterface& solver)
+  {
+    readFile();
+    solver.setWarmStartOptions();
+    if(primals_)
+      solver.setColSolution(primals_);
+    else {
+      std::cerr<<"No warm start info ???"<<std::endl;
+      return 0;
+    }
+    if(duals_)
+      solver.setRowPrice(duals_);
+    else {
+      std::cerr<<"No warm start info ???"<<std::endl;
+      return 0;
+    }
+    return 1;
   }
-  int numPrimals;
-  int numDuals;
-  inFile>>numPrimals>>numDuals;
-  gutsOfDestructor();
-  primals_ = new double [numPrimals];
-  duals_ = new double[numDuals];
-  for(int i = 0; i < numPrimals ; i++) {
-    inFile>>primals_[i];
-  }
-  for(int i = 0; i < numDuals ; i++) {
-    inFile>>duals_[i];
-  }
-  return true;
-}
-
-bool IpCbcStartPointReader::readAndApply(IpoptInterface& solver)
-{
-  readFile();
-  solver.setWarmStartOptions();
-  if(primals_)
-    solver.setColSolution(primals_);
-  else {
-    std::cerr<<"No warm start info ???"<<std::endl;
-    return 0;
-  }
-  if(duals_)
-    solver.setRowPrice(duals_);
-  else {
-    std::cerr<<"No warm start info ???"<<std::endl;
-    return 0;
-  }
-  return 1;
 }

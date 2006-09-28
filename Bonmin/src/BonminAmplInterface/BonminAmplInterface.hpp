@@ -3,21 +3,22 @@
 #include "IpoptInterface.hpp"
 #include "AmplTMINLP.hpp"
 
+namespace Bonmin {
 /** Class for providing an Osi interface to Ipopt with an ampl nl file as input. */
-class BonminAmplInterface: public IpoptInterface
+class AmplInterface: public IpoptInterface
 {
   public:
   /** Default constructor */
-  BonminAmplInterface();
+  AmplInterface();
   /** Constructor with inputed ampl command line (reads model from nl file)*/ 
-  BonminAmplInterface(char **& amplArgs);
+  AmplInterface(char **& amplArgs);
   /** Copy constructor */
-  BonminAmplInterface(const BonminAmplInterface &other);
+  AmplInterface(const AmplInterface &other);
   /// Clone
-  virtual BonminAmplInterface * clone(bool CopyData = true);
+  virtual AmplInterface * clone(bool CopyData = true);
 
   ///Destructor
-  virtual ~BonminAmplInterface();
+  virtual ~AmplInterface();
 
    /**@name Methods to input a problem */
   //@{
@@ -30,14 +31,14 @@ class BonminAmplInterface: public IpoptInterface
   //@}
 
   /** Fast access to AmplTMINLP */
-   const Ipopt::AmplTMINLP * amplModel() const
+   const AmplTMINLP * amplModel() const
   {
     return GetRawPtr(amplTminlp_);
   }
  
   protected:
    /** TMINLP problem (the original problem usually an AmplTMINLP).*/
-  Ipopt::SmartPtr<Ipopt::AmplTMINLP> amplTminlp_;
+  Ipopt::SmartPtr<Bonmin::AmplTMINLP> amplTminlp_;
 };
-
+}
 #endif

@@ -16,15 +16,17 @@
 #include "IpSmartPtr.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "OsiCuts.hpp"
-
-namespace Ipopt
-{
-
-
-  // Declarations, so that we don't have to include the Ipopt AMPL headers
+// Declarations, so that we don't have to include the Ipopt AMPL headers
+namespace Ipopt{
   class AmplTNLP;
   class AmplSuffixHandler;
   class AmplOptionsList;
+}
+
+namespace Bonmin
+{
+
+
 
   /** Ampl MINLP Interface.
    *  Ampl MINLP Interface, implemented as a TMINLP.

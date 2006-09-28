@@ -15,6 +15,8 @@
 #include "CoinPackedVector.hpp"
 #include "IpoptInteriorWarmStarter.hpp"
 
+
+namespace Bonmin {
 class IpoptInterface;
 
 /** \brief Class for storing warm start informations for Ipopt.<br>
@@ -144,4 +146,6 @@ private:
   /** warm start information object */
   SmartPtr<IpoptInteriorWarmStarter> warm_starter_;
 };
+
+}
 #endif

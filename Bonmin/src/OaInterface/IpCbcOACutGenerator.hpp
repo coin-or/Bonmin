@@ -12,7 +12,7 @@
 #include "CglCutGenerator.hpp"
 #include "IpoptInterface.hpp"
 #include "OaMessages.hpp"
-
+namespace Bonmin{
 class IpCbcOACutGenerator : public CglCutGenerator
 {
 public:
@@ -77,4 +77,5 @@ private:
   /** handler */
   CoinMessages messages_;
 };
+}
 #endif

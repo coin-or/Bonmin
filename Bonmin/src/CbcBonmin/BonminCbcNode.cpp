@@ -25,6 +25,8 @@
 
 using namespace std;
 
+
+namespace Bonmin{
 //Default constructor
 BonminCbcFullNodeInfo::BonminCbcFullNodeInfo()
     :
@@ -145,3 +147,4 @@ BonminCbcPartialNodeInfo::allBranchesGone()
 
 BonminCbcPartialNodeInfo::~BonminCbcPartialNodeInfo ()
 {}
+}

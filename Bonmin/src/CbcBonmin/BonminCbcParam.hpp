@@ -12,6 +12,7 @@
 #define BonminCbcParam_H
 
 #include "IpoptInterface.hpp"
+namespace Bonmin {
 class BonminCbcParam
 {
 public:
@@ -140,6 +141,6 @@ public:
     return extractParams(solver);
   }
 };
-
+}
 #endif
 

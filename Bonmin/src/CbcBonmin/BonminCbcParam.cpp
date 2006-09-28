@@ -11,6 +11,7 @@
 #include "IpoptInterface.hpp"
 #include "BonminCbcParam.hpp"
 
+namespace Bonmin {
 bool
 BonminCbcParam::extractParams(IpoptInterface &solver)
 {
@@ -95,4 +96,5 @@ BonminCbcParam::extractParams(IpoptInterface &solver)
   }
 
   return success;
+}
 }

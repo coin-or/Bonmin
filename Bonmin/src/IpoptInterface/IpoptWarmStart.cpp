@@ -18,6 +18,7 @@
 #include "IpoptInteriorWarmStarter.hpp"
 
 
+namespace Bonmin {
 /// Default constructor
 IpoptWarmStart::IpoptWarmStart
 (bool empty, int numvars, int numcont):
@@ -156,4 +157,5 @@ IpoptWarmStartDiff::flushPoint()
     delete diffValues_;
     diffValues_ = NULL;
   }
+}
 }

@@ -16,15 +16,18 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LTLIBRARIES = libipoptinterface.la 
 # List all source files, including headers
 libipoptinterface_la_SOURCES = \
-	IpCbcBoundsReader.cpp IpCbcBoundsReader.hpp \
+	BoundsReader.cpp BoundsReader.hpp \
 	IpCbcColReader.cpp IpCbcColReader.hpp \
 	IpCbcStartPointReader.cpp IpCbcStartPointReader.hpp \
 	IpoptIntegerBias.hpp \
 	IpoptInterface.cpp IpoptInterface.hpp \
+	OsiTMINLPInterface.cpp OsiTMINLPInterface.hpp \
 	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
 	IpoptWarmStart.cpp IpoptWarmStart.hpp \
 	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
 	TMINLP.cpp TMINLP.hpp \
+        IpoptSolver.hpp IpoptSolver.cpp \
+	TNLPSolver.hpp TNLPSolver.cpp \
 	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
 
 # This is for libtool (on Windows)
@@ -56,10 +59,13 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 include_HEADERS = \
 	IpoptInterface.hpp \
+	OsiTMINLPInterface.hpp \
 	IpoptInteriorWarmStarter.hpp \
 	TMINLP2TNLP.hpp \
 	TMINLP.hpp \
-	TNLP2FPNLP.hpp
+	TNLP2FPNLP.hpp \
+        TNLPSolver.hpp \
+        IpoptSolver.hpp
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
@@ -85,15 +91,18 @@ uninstall-local:
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	IpCbcBoundsReader.cppbak IpCbcBoundsReader.hppbak \
+	BoundsReader.cppbak BoundsReader.hppbak \
 	IpCbcColReader.cppbak IpCbcColReader.hppbak \
 	IpCbcStartPointReader.cppbak IpCbcStartPointReader.hppbak \
 	IpoptIntegerBias.hppbak \
 	IpoptInterface.cppbak IpoptInterface.hppbak \
+	OsiTMINLPInterface.cppbak OsiTMINLPInterface.hppbak \
 	IpoptInteriorWarmStarter.cppbak IpoptInteriorWarmStarter.hppbak \
 	IpoptWarmStart.cppbak IpoptWarmStart.hppbak \
 	TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
 	TMINLP.hppbak TMINLP.hppbak \
+        TNLPSolver.hppbak TNLPSolver.hppbak \
+	IpoptSolver.hppbak  IpoptSolver.cpp \
 	TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak
 
 ASTYLE = @ASTYLE@

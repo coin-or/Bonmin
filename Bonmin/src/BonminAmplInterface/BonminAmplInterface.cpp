@@ -2,12 +2,14 @@
 #include <string>
 #include <sstream>
 
+
+namespace Bonmin {
 /** Default constructor */
-BonminAmplInterface::BonminAmplInterface(): IpoptInterface(), amplTminlp_(NULL)
+AmplInterface::AmplInterface(): IpoptInterface(), amplTminlp_(NULL)
 {}
   
 /** Constructor with inputed ampl command line (reads model from nl file)*/ 
-BonminAmplInterface::BonminAmplInterface(char **& amplArgs)
+AmplInterface::AmplInterface(char **& amplArgs)
 :
 IpoptInterface(),
 amplTminlp_(NULL)
@@ -16,32 +18,32 @@ amplTminlp_(NULL)
 }
 
 /** Copy constructor */
-BonminAmplInterface::BonminAmplInterface(const BonminAmplInterface &other):
+AmplInterface::AmplInterface(const AmplInterface &other):
           IpoptInterface(other), amplTminlp_(NULL)
 {
-  amplTminlp_ = dynamic_cast<Ipopt::AmplTMINLP *> (GetRawPtr(tminlp_));
+  amplTminlp_ = dynamic_cast<Bonmin::AmplTMINLP *> (GetRawPtr(tminlp_));
 }
 /// Clone
-BonminAmplInterface * 
-BonminAmplInterface::clone(bool CopyData )
+AmplInterface * 
+AmplInterface::clone(bool CopyData )
 {
-  return new BonminAmplInterface(*this); 
+  return new AmplInterface(*this); 
 }
 
 ///Destructor
-BonminAmplInterface::~BonminAmplInterface()
+AmplInterface::~AmplInterface()
 {amplTminlp_ = NULL;}
 
 /** Read an ampl . nl file from the given filename */
 void
-BonminAmplInterface::readAmplNlFile(char**& filename,
+AmplInterface::readAmplNlFile(char**& filename,
     std::string* ipopt_file_content,
     std::string* nl_file_content)
 {
 
 
 
-  app_ = new Ipopt::IpoptApplication();
+  app_ = new IpoptSolver;
 
   SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
   register_ALL_options(roptions);
@@ -59,10 +61,9 @@ BonminAmplInterface::readAmplNlFile(char**& filename,
 
 
   // set the default options... expect_infeasible, etc...
-  set_ipopt_minlp_default(app_->Options());
-
+  IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
   if(!IsValid(tminlp_)) {
-        amplTminlp_ = new AmplTMINLP(ConstPtr(app_->Jnlst()), app_->Options(), filename,
+        amplTminlp_ = new AmplTMINLP(ConstPtr(ipopt->getIpoptApp().Jnlst()), app_->Options(), filename,
         NULL, appName() , nl_file_content);
         tminlp_ = GetRawPtr(amplTminlp_);
   }
@@ -70,18 +71,18 @@ BonminAmplInterface::readAmplNlFile(char**& filename,
     AmplTMINLP * amplTMINLP = dynamic_cast<AmplTMINLP *> (GetRawPtr(tminlp_));
     if(amplTMINLP) {
       AmplTMINLP * newAmpl = amplTMINLP->createEmpty();
-      newAmpl->Initialize(ConstPtr(app_->Jnlst()), app_->Options(), filename,
+      newAmpl->Initialize(ConstPtr(ipopt->getIpoptApp().Jnlst()), app_->Options(), filename,
           NULL, appName() , nl_file_content);
       amplTminlp_ = newAmpl;
       tminlp_ = GetRawPtr(amplTminlp_);
     }
     else {
-      amplTminlp_ = new AmplTMINLP(ConstPtr(app_->Jnlst()), app_->Options(), filename,
+      amplTminlp_ = new AmplTMINLP(ConstPtr(ipopt->getIpoptApp().Jnlst()), app_->Options(), filename,
           NULL, appName() , nl_file_content);
       tminlp_ = GetRawPtr(amplTminlp_);
     }
   }
-  problem_ = new Ipopt::TMINLP2TNLP(tminlp_, *app_->Options());
+  problem_ = new TMINLP2TNLP(tminlp_);//, *app_->Options());
 
   bool print_options_documentation;
   app_->Options()->GetBoolValue("print_options_documentation",
@@ -93,7 +94,7 @@ BonminAmplInterface::readAmplNlFile(char**& filename,
     categories.push_back("bonmin options for non-convex problems");
     categories.push_back("bonmin options : B-Hyb specific options");
 //    roptions->OutputLatexOptionDocumentation2(*app_->Jnlst(),categories);
-    roptions->OutputOptionDocumentation(*app_->Jnlst(),categories);
+    roptions->OutputOptionDocumentation(*(ipopt->getIpoptApp().Jnlst()),categories);
   }
 
   int numcols = getNumCols();
@@ -104,13 +105,13 @@ BonminAmplInterface::readAmplNlFile(char**& filename,
   setStrParam(OsiProbName, std::string(filename[1]));
   extractInterfaceParams();
   hasBeenOptimized_ = false;
-  feasibilityProblem_ = new Ipopt::TNLP2FPNLP
-      (Ipopt::SmartPtr<Ipopt::TNLP>(Ipopt::GetRawPtr(problem_)));
+  feasibilityProblem_ = new TNLP2FPNLP
+      (Ipopt::SmartPtr<TNLP>(Ipopt::GetRawPtr(problem_)));
 }
 
 /** write ampl solution file */
 void
-BonminAmplInterface::writeAmplSolFile(std::string message,const double * primalSol,const double * dualSol)
+AmplInterface::writeAmplSolFile(std::string message,const double * primalSol,const double * dualSol)
 {
   TMINLP * tminlp = GetRawPtr(tminlp_);
   AmplTMINLP * ampl_tminlp = dynamic_cast<AmplTMINLP *> (tminlp);
@@ -120,4 +121,4 @@ BonminAmplInterface::writeAmplSolFile(std::string message,const double * primalS
     std::cerr<<"Errot can not write .sol file for non ampl problem"<<std::endl;
 }
 
-
+}

@@ -23,7 +23,7 @@ namespace ampl_utils
 {
   void sos_kludge(int nsos, int *sosbeg, double *sosref);
 }
-namespace Ipopt
+namespace Bonmin
 {
 
   AmplTMINLP::AmplTMINLP()
@@ -62,7 +62,7 @@ namespace Ipopt
 
 
     if(suffix_handler==NULL)
-      suffix_handler_ = suffix_handler = new AmplSuffixHandler();
+      suffix_handler_ = suffix_handler = new Ipopt::AmplSuffixHandler();
 
     // Add the suffix handler for scaling
     suffix_handler->AddAvailableSuffix("scaling_factor", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
@@ -100,7 +100,7 @@ namespace Ipopt
   }
 
   AmplTMINLP::~AmplTMINLP()
-  {}
+  {delete ampl_tnlp_;}
 
   void
   AmplTMINLP::read_priorities()

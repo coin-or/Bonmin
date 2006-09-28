@@ -9,6 +9,8 @@
 
 #include "IpCbcOACutGenerator.hpp"
 #include "OsiAuxInfo.hpp"
+
+namespace Bonmin{
 /// Default constructor
 IpCbcOACutGenerator::IpCbcOACutGenerator(IpoptInterface * si,
     int maxDepth)
@@ -59,7 +61,7 @@ IpCbcOACutGenerator::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
     }
   }
 
-#ifdef 0
+#if 0
  //Add tight cuts at LP optimum
  int numberCuts = si.getNumRows() - nlp_->getNumRows();
  const OsiRowCut ** cuts = new const OsiRowCut*[numberCuts];
@@ -170,7 +172,10 @@ IpCbcOACutGenerator::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
       nlp_->setColBounds(i,saveColLb[i],saveColUb[i]);
     }
   }
+#if 0
   nlp_->deleteLastRows(numberCuts);
+#endif
   delete [] saveColLb;
   delete [] saveColUb;
+}
 }

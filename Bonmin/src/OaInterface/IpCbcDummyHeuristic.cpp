@@ -12,6 +12,7 @@
 #include "CbcModel.hpp"
 
 #include "OsiAuxInfo.hpp"
+namespace Bonmin{
 /// Default constructor
 IpCbcDummyHeuristic::IpCbcDummyHeuristic(CbcModel &model,
     IpoptInterface * si)
@@ -45,3 +46,4 @@ IpCbcDummyHeuristic::solution(double &solutionValue, double *betterSolution)
   return 0;
 }
 
+}

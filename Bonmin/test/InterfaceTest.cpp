@@ -12,6 +12,8 @@
 #include "TMINLP.hpp"
 #include "AmplTMINLP.hpp"
 #include "IpIpoptApplication.hpp"
+
+using namespace Bonmin;
 /** Test function for the Osi interface to Ipopt (or any nlp solver). <br>
     If Solver passes all the test then it should have everything needed to be integrated into bonmin. */
 
@@ -147,7 +149,7 @@ void testSetMethods(IpoptInterface &si)
     delete ws;
 }
 
-void testOa(BonminAmplInterface &si)
+void testOa(Bonmin::AmplInterface &si)
 {
         CoinRelFltEq eq(1e-07);// to test equality of doubles    
     OsiClpSolverInterface lp;
@@ -207,7 +209,7 @@ void testOa(BonminAmplInterface &si)
        }
 }
 
-void testFp(BonminAmplInterface &si)
+void testFp(Bonmin::AmplInterface &si)
 {
         CoinRelFltEq eq(1e-07);// to test equality of doubles
         OsiCuts cuts;
@@ -242,10 +244,10 @@ void interfaceTest()
         
         //Setup Ipopt should be replaced if solver is changed
         using namespace Ipopt;
-      SmartPtr<Ipopt::IpoptApplication> app = new Ipopt::IpoptApplication();
+      SmartPtr<Bonmin::IpoptSolver> app = new Bonmin::IpoptSolver();
        const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
        const char ** argv = args;
-      SmartPtr<Ipopt::TMINLP> ampl_tminlp = new Ipopt::AmplTMINLP(ConstPtr(app->Jnlst()), app->Options(), const_cast<char**&>(argv));
+      SmartPtr<TMINLP> ampl_tminlp = new AmplTMINLP(ConstPtr(app->getIpoptApp().Jnlst()), app->Options(), const_cast<char**&>(argv));
       IpoptInterface si(ampl_tminlp);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
     <<std::endl<<"Testing usefull constructor"<<std::endl
@@ -276,7 +278,7 @@ void interfaceTest()
       SmartPtr<Ipopt::IpoptApplication> app = new Ipopt::IpoptApplication();
       const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
       const char ** argv = args;
-      SmartPtr<Ipopt::TMINLP> ampl_tminlp = new Ipopt::AmplTMINLP(ConstPtr(app->Jnlst()),  app->Options(), const_cast<char**&>(argv));
+      SmartPtr<TMINLP> ampl_tminlp = new AmplTMINLP(ConstPtr(app->Jnlst()),  app->Options(), const_cast<char**&>(argv));
       IpoptInterface si1(ampl_tminlp);
       
       IpoptInterface si(si1);
@@ -295,7 +297,7 @@ void interfaceTest()
         using namespace Ipopt;
         const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
         const char ** argv = args;
-      BonminAmplInterface si(const_cast<char**&>(argv));
+      Bonmin::AmplInterface si(const_cast<char**&>(argv));
       std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
 	       <<std::endl<<"Testing outer approximations related methods"<<std::endl
 	       <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
@@ -309,8 +311,8 @@ void interfaceTest()
 //    SmartPtr<Ipopt::IpoptApplication> app = new Ipopt::IpoptApplication();
 //    char * args[3] ={"name","toy3",NULL}; //Ugly, but I don't know how to do differently
 //    char ** argv = args;
-//    SmartPtr<Ipopt::TMINLP> ampl_tminlp = new Ipopt::AmplTMINLP(ConstPtr(app->Jnlst()),  app->Options(), argv);
-//    BonminAmplInterface si(ampl_tminlp);
+//    SmartPtr<TMINLP> ampl_tminlp = new AmplTMINLP(ConstPtr(app->Jnlst()),  app->Options(), argv);
+//    Bonmin::AmplInterface si(ampl_tminlp);
 //    std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
 //	     <<std::endl<<"Testing optimization of some distance over feasible set"<<std::endl
 //	     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;

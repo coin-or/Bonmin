@@ -22,7 +22,7 @@
 #include "BonminCbcNode.hpp"
 
 #include "IpoptInterface.hpp"
-
+namespace Bonmin{
 // Default Constructor
 BonminCbcNlpStrategy::BonminCbcNlpStrategy(int maxFailures,
     int maxInfeasibles,
@@ -146,7 +146,7 @@ BonminCbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFro
       returnStatus = 2;
     }
     else
-      throw IpoptInterface::UnsolvedError(ipopt->getOptStatus());
+      throw ipopt->newUnsolvedError(ipopt->getOptStatus());
   }
   return returnStatus;
 }
@@ -166,3 +166,4 @@ BonminCbcNlpStrategy::setupPrinting(CbcModel &model, int toto)
 void
 BonminCbcNlpStrategy::setupOther(CbcModel &model)
 {}
+}

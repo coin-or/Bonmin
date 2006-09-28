@@ -12,13 +12,13 @@
 #include "TMINLP.hpp"
 #include "IpSmartPtr.hpp"
 
-namespace Ipopt
+namespace Bonmin
 {
   /** This is an adapter class to convert an NLP to a Feasibility Pump NLP
    *  by changing the objective function to the (2-norm) distance to a point.
    * The extra function is set_dist2point_obj(int n, const double *, const int *)
    */
-  class TNLP2FPNLP : public TNLP
+  class TNLP2FPNLP : public Ipopt::TNLP
   {
   public:
     /**@name Constructors/Destructors */

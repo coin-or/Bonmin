@@ -12,7 +12,7 @@
 #define CbcOaStrategy_HPP
 
 #include "CbcStrategy.hpp"
-
+namespace Bonmin{
 /** A class to pass on a CbcStrategy to OA sub-milp solver.
  This class allows to setup GMI, MIR, probing and cover cuts frequency.
 Number of variables to strong branch on and minimum number of branches on a variable before its
@@ -59,4 +59,5 @@ private:
   double intTol_;
   int logLevel_;
 };
+}
 #endif

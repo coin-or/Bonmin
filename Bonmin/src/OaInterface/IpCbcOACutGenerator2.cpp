@@ -22,7 +22,7 @@
 
 
 extern CbcModel * OAModel;
-
+namespace Bonmin{
 /// Default constructor
 IpCbcOACutGenerator2::IpCbcOACutGenerator2():
     CglCutGenerator(),
@@ -865,4 +865,5 @@ delete [] saveColLb;
 delete [] saveColUb;
 if(strategy && ! strategy_)
   delete strategy;
+}
 }

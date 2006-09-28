@@ -19,7 +19,7 @@
 #include "IpOptionsList.hpp"
 #include "IpoptInteriorWarmStarter.hpp"
 
-namespace Ipopt
+namespace Bonmin
 {
   /** This is an adapter class that converts a TMINLP to
    *  a TNLP to be solved by Ipopt. It allows an external
@@ -27,13 +27,17 @@ namespace Ipopt
    *  the treatment of binary and integer variables as
    *  relaxed, or fixed
    */
-  class TMINLP2TNLP : public TNLP
+  class TMINLP2TNLP : public Ipopt::TNLP
   {
   public:
     /**@name Constructors/Destructors */
     //@{
-    TMINLP2TNLP(const SmartPtr<TMINLP> tminlp,
-        const OptionsList& options);
+    TMINLP2TNLP(const SmartPtr<TMINLP> tminlp
+#ifdef WARM_STARTER
+        ,
+        const OptionsList& options
+#endif
+        );
 
     /** Default destructor */
     virtual ~TMINLP2TNLP();
@@ -295,7 +299,6 @@ namespace Ipopt
 
     /** Method called to check wether a problem has still some variable not fixed. If there are no more
         unfixed vars, checks wether the solution given by the bounds is feasible.*/
-    bool checkZeroDimension(ApplicationReturnStatus& optimization_status);
 
     /** @name Methods for setting and getting the warm starter */
     //@{

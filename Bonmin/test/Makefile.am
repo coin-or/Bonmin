@@ -74,6 +74,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \

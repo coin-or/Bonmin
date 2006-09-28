@@ -14,7 +14,7 @@
 #include "CbcNode.hpp"
 
 
-
+namespace Bonmin{
 /** \brief Holds information for recreating a subproblem by incremental change
 	   from the parent for Bonmin
 
@@ -124,4 +124,5 @@ private:
   /// Illegal Assignment operator
   BonminCbcPartialNodeInfo & operator=(const BonminCbcPartialNodeInfo& rhs);
 };
+}
 #endif

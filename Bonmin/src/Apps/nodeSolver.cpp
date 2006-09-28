@@ -20,7 +20,7 @@
 
 #include "BonminAmplInterface.hpp"
 
-#include "IpCbcBoundsReader.hpp"
+#include "BoundsReader.hpp"
 #include "IpCbcStartPointReader.hpp"
 
 #include "CoinTime.hpp"
@@ -55,7 +55,7 @@ int main (int argc, char *argv[])
   myArgv[2]= NULL;//new char[1];
 
 
-  BonminAmplInterface nlpSolver(myArgv);
+  Bonmin::AmplInterface nlpSolver(myArgv);
 
   Ipopt::SmartPtr<Ipopt::OptionsList> Options =
     nlpSolver.retrieve_options();
@@ -67,11 +67,11 @@ int main (int argc, char *argv[])
       std::cout<<nodeFileName<<std::endl;
       // Read the bounds and change them in Ipopt
       if(argc>2) {
-	IpCbcBoundsReader bounds(nodeFileName);
-	bounds.readAndApply(nlpSolver);
+	Bonmin::BoundsReader bounds(nodeFileName);
+	bounds.readAndApply(&nlpSolver);
       }
       if(argc>3) {
-	IpCbcStartPointReader init(startingPointFile);
+	Bonmin::IpCbcStartPointReader init(startingPointFile);
 	init.readAndApply(nlpSolver);
       }
       
@@ -85,7 +85,7 @@ int main (int argc, char *argv[])
 	}
       }
     }
-  catch(IpoptInterface::SimpleError &E) {
+  catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
 	     <<std::endl
 	     <<E.message()<<std::endl;

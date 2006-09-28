@@ -16,10 +16,14 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-namespace Ipopt
+namespace Bonmin
 {
-  TMINLP2TNLP::TMINLP2TNLP(const SmartPtr<TMINLP> tminlp,
-      const OptionsList& options)
+  TMINLP2TNLP::TMINLP2TNLP(const SmartPtr<TMINLP> tminlp
+#ifdef WARM_STARTER
+       ,
+      const OptionsList& options
+#endif
+       )
       :
       tminlp_(tminlp),
       n_(0),
@@ -82,11 +86,14 @@ namespace Ipopt
     IpBlasDcopy(n_, x_init_, 1, x_init_user_, 1);
     duals_sol_ = NULL;
     duals_init_ = NULL;
+
+#ifdef WARM_STARTER
     // Get values for parameters
     options.GetNumericValue("nlp_lower_bound_inf", nlp_lower_bound_inf_, "");
     options.GetNumericValue("nlp_upper_bound_inf", nlp_upper_bound_inf_, "");
     options.GetBoolValue("warm_start_entire_iterate",
         warm_start_entire_iterate_, "");
+#endif
   }
 
   TMINLP2TNLP::~TMINLP2TNLP()
@@ -439,35 +446,7 @@ namespace Ipopt
       }
     }
   }
-  bool TMINLP2TNLP::checkZeroDimension(ApplicationReturnStatus
-      &optimization_status)
-  {
-    for(int i = 0 ; i < n_ ; i++) {
-      if(x_u_[i] - x_l_[i] > 1e-5)
-        return 0;
-    }
 
-    //Problem has no variables just check if the unique solution given by the bounds is
-    // feasible or not.
-    eval_f(n_, x_l_, true, obj_value_);
-    if (!x_sol_) {
-      x_sol_ = new Number[n_];
-    }
-    IpBlasDcopy(n_, x_l_, 1, x_sol_, 1);
-
-    if(!g_sol_) {
-      g_sol_ = new Number [m_];
-    }
-    eval_g(n_, x_l_, true, m_, g_sol_);
-    optimization_status = Solve_Succeeded;
-    for(int i = 0 ; i < m_ ; i++) {
-      if(g_sol_[i] - g_l_[i] <  - 1e-07 || g_sol_[i] - g_u_[i] > 1e-07) {
-        optimization_status = Infeasible_Problem_Detected;
-        return 1;
-      }
-    }
-    return 1;
-  }
 
   bool TMINLP2TNLP::intermediate_callback(AlgorithmMode mode,
       Index iter, Number obj_value,
@@ -479,13 +458,13 @@ namespace Ipopt
       const IpoptData* ip_data,
       IpoptCalculatedQuantities* ip_cq)
   {
+#if WARM_STARTER
     // If we don't have this swtiched on, we assume that also the
     // "warm_start" option for bonmin is set not to refer to the
     // interior warm start object
     if (!warm_start_entire_iterate_) {
       return true;
     }
-
     if (need_new_warm_starter_) {
       // Create a new object for later warm start information
       curr_warm_starter_ = new IpoptInteriorWarmStarter(n_, x_l_, x_u_,
@@ -496,6 +475,9 @@ namespace Ipopt
     }
 
     return curr_warm_starter_->UpdateStoredIterates(mode, *ip_data, *ip_cq);
+#else 
+    return true;
+#endif
   }
 
 

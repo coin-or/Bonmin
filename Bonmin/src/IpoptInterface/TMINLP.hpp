@@ -21,7 +21,8 @@
 #include "IpTNLP.hpp"
 
 #include "CoinHelperFunctions.hpp"
-namespace Ipopt
+using namespace Ipopt;
+namespace Bonmin
 {
 
   /** Base class for all MINLPs that use a standard triplet matrix form
@@ -51,7 +52,7 @@ namespace Ipopt
    *  variable has no upper or lower bound, set the bound to
    *  -ipopt_inf or +ipopt_inf respectively
    */
-  class TMINLP : public ReferencedObject
+  class TMINLP : public Ipopt::ReferencedObject
   {
   public:
     friend class TMINLP2TNLP;

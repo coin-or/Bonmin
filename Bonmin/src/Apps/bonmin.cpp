@@ -21,7 +21,7 @@
 #include "BonminAmplInterface.hpp"
 #include "CbcBonmin.hpp"
 
-
+using namespace Bonmin;
 
 /** Procedure to ouptut relevant informations in the case of a failure.
     si1 should be the problem solved at a node of the b&b tree, and si2 the original problem.
@@ -117,7 +117,7 @@ int main (int argc, char *argv[])
 {
   using namespace Ipopt;
   
-  BonminAmplInterface * nlpSolver; 
+  AmplInterface * nlpSolver; 
   char * pbName = NULL;
   if(argc > 1)
   {
@@ -126,13 +126,13 @@ int main (int argc, char *argv[])
   }
   else //will just output usage
   {
-    nlpSolver = new BonminAmplInterface(argv);
+    nlpSolver = new AmplInterface(argv);
     delete nlpSolver;
     return 0;
   }
   double time1 = CoinCpuTime();
   try {
-  nlpSolver = new BonminAmplInterface(argv);
+  nlpSolver = new AmplInterface(argv);
     BonminCbcParam par;
     BonminBB bb;
     par(*nlpSolver);

@@ -3,8 +3,11 @@
 
 #include "BonminCbcParam.hpp"
 
-class IpoptInterface;
+
 class CbcObject;
+
+namespace Bonmin{
+class IpoptInterface;
 /** Class which performs optimization of an MINLP stored in an IpoptInterface. */
 class BonminBB
 {
@@ -82,4 +85,5 @@ private:
   /** get total number of iterations in last mip solved.*/
   int mipIterationCount_;
 };
+}
 #endif

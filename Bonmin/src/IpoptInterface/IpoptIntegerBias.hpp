@@ -8,4 +8,3 @@
 //
 // Date : 12/01/2004
 
-#define INT_BIAS 0e-8

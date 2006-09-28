@@ -19,7 +19,7 @@
 
 #include "CoinTime.hpp"
 
-
+namespace Bonmin{
 class IpCbcOACutGenerator2 : public CglCutGenerator
 {
 public:
@@ -182,4 +182,5 @@ private:
   /** Frequency of log. */
   double logFrequency_;
 };
+}
 #endif
