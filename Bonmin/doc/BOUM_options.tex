@@ -105,33 +105,33 @@ lp\_log\_level & I & 0 & $-$ & $-$ & + & +\\
 milp\_log\_level & I &  0 & $-$ &  + & $-$ & +\\
 oa\_log\_level & I & 1 & $-$ &  + & $-$ & +\\
 oa\_log\_frequency & I & 100 & $ - $ & $+$ & $-$ & $+$\\
-nlp\_log\_level & I & 0 & +&  + & + & +\\
+nlp\_log\_level & I & 1 & +&  + & + & +\\
 print\_user\_options & S & no & + & + & + & +\\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{branch-and-bound options}\\
 \hline
 allowable\_gap  & F & 0 & + & + & + & +\\
 allowable\_fraction\_gap & F & 0& +& + & +& +\\
-cutoff & F& 1e+100 &  + & +& +& +\\
-cutoff\_decr & F & 1e$-$05 & + & + & + & +\\
-integer\_tolerance & F & + &  + & + & + & +\\
+cutoff & F& $10^{100}$ &  + & +& +& +\\
+cutoff\_decr & F & $10^{-5}$ & + & + & + & +\\
+integer\_tolerance & F & $10^{-6}$ &  + & + & + & +\\
 node\_limit & I & INT\_MAX &  + & +& + & + \\
 nodeselect\_stra$^*$ & S & best-bound & + & + & +& +\\
 number\_before\_trust$^*$ & I & 8 & $-$ & + & + & +\\
 number\_strong\_branch$^*$ & I & 20 & $-$ & + & + &+ \\
-time\_limit & F & 1e+10 & + & + & + & +\\
+time\_limit & F & $10^{10}$ & + & + & + & +\\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{options for robustness}\\
 \hline
-max\_random\_point\_radius & F &+  &+ &+ &+ &+\\
-max\_consecutive\_failures & I & 1 & + & $-$ & $-$ & $-$\\
+max\_random\_point\_radius & F & $10^5$  &+ &+ &+ &+\\
+max\_consecutive\_failures & I & 10 & + & $-$ & $-$ & $-$\\
 nlp\_failure\_behavior & S & stop   & + & + & + & + \\
 num\_iterations\_suspect & I & $-$1 & + & + & + & + \\
 num\_retry\_unsolved\_random\_point & I & 0 & + & + & + & + \\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{options for nonconvex problems}\\
 \hline
-max\_consecutive\_infeasible & I & 1 & + & $-$ & $-$ & $-$\\
+max\_consecutive\_infeasible & I & 0 & + & $-$ & $-$ & $-$\\
 num\_resolve\_at\_node & I & 0 & + & +  & + & + \\
 num\_resolve\_at\_root & I & 0& + & + & + & +  \\
 \hline
@@ -139,8 +139,8 @@ num\_resolve\_at\_root & I & 0& + & + & + & +  \\
 \hline
 nlp\_solve\_frequency & I & 10 & $-$ & $-$ & $-$ & +\\
 oa\_dec\_time\_limit & F& 120 & $-$ & $-$ & $-$ & +\\
-tiny\_element & F & 1e$-$08 & $-$ & + & + & + \\
-very\_tiny\_element & F & 1e$-$17 & $-$ & + & + & + \\
+tiny\_element & F & $10^{-8}$ & $-$ & + & + & + \\
+very\_tiny\_element & F & $10e^{-17}$ & $-$ & + & + & + \\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{MILP options}\\
 \hline
@@ -148,7 +148,7 @@ cover\_cuts$^*$  & I & $-$5 & $-$ & + & $-$ & +\\
 Gomory\_cuts$^*$ & I & $-$5 & $-$ &  + & $-$ & + \\
 milp\_subsolver &S & {\tt Cbc\_D} & $-$ & + & $-$ & + \\
 mir\_cuts$^*$  & I & $-$5 & $-$  & + & $-$ &+\\
-probing\_cuts$^1$$^*$  & I & 0 & $-$ & + & $-$ & +\\
+probing\_cuts$^1$$^*$  & I & -5 & $-$ & + & $-$ & +\\
 \hline
 \end{tabular}
 \begin{tablenotes}
