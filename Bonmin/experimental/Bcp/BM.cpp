@@ -17,8 +17,8 @@
 */
 
 #include "CoinHelperFunctions.hpp"
-#include "BonminAmplInterface.hpp"
-#include "TMINLP.hpp"
+#include "BonAmplInterface.hpp"
+#include "BonTMINLP.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "BCP_parameters.hpp"
 #include "BCP_lp.hpp"
@@ -141,7 +141,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
                        BCP_vec<BCP_cut_core*>& cuts,
                        BCP_lp_relax*& matrix)
 {
-    BonminAmplInterface nlpSolver; 
+    Bonmin::AmplInterface nlpSolver; 
     char* argv_[3];
     char** argv = argv_;
     argv[0] = NULL;
@@ -231,7 +231,7 @@ BM_tm::display_feasible_solution(const BCP_solution* sol)
     }
 
     /* Parse again the input file so that we have a nice and clean ampl setup */
-    BonminAmplInterface nlpSolver;  
+    Bonmin::AmplInterface nlpSolver;  
     char* argv_[3];
     char** argv = argv_;
     argv[0] = NULL;
@@ -469,7 +469,7 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	}
 
 	if (!feasChecker_) {
-	    feasChecker_ = new IpCbcOACutGenerator2(&nlp, NULL, NULL, 
+	    feasChecker_ = new Bonmin::OACutGenerator2(&nlp, NULL, NULL, 
 						    cutOffIncrement,
 						    integerTolerance, 0, 1);
 	    feasChecker_->setLocalSearchNodeLimit(0);
@@ -760,7 +760,7 @@ BM_lp::BmSosInfo::~BmSosInfo()
 
 /*---------------------------------------------------------------------------*/
 
-void BM_lp::BmSosInfo::setFrom(const TMINLP::SosInfo * sos)
+void BM_lp::BmSosInfo::setFrom(const Bonmin::TMINLP::SosInfo * sos)
 {
     if (!sos || sos->num == 0)
 	return;

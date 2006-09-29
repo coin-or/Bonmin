@@ -146,12 +146,11 @@ public:
 };
 
 //#############################################################################
-
 #include <OsiAuxInfo.hpp>
 #include <OsiCuts.hpp>
 #include "BCP_lp_user.hpp"
-#include "IpCbcOACutGenerator2.hpp"
-#include "BonminAmplInterface.hpp"
+#include "BonOACutGenerator2.hpp"
+#include "BonAmplInterface.hpp"
 class BM_lp : public BCP_lp_user
 {
     struct BmSosInfo {
@@ -164,7 +163,7 @@ class BM_lp : public BCP_lp_user
 	double **weights;
 	BmSosInfo() : num(0) {}
 	~BmSosInfo();
-	void setFrom(const TMINLP::SosInfo * sos);
+	void setFrom(const Bonmin::TMINLP::SosInfo * sos);
 	void shuffle();
     };
 		
@@ -173,7 +172,7 @@ class BM_lp : public BCP_lp_user
     BCP_parameter_set<BM_par> par;
 
     OsiBabSolver babSolver_;
-    BonminAmplInterface nlp;
+    Bonmin::AmplInterface nlp;
     BmSosInfo sos;
 
     double lower_bound_;
@@ -190,7 +189,7 @@ class BM_lp : public BCP_lp_user
 	with it's priority and choose the var with the highest value */
     double* branching_priority_;
 
-    IpCbcOACutGenerator2* feasChecker_;
+    Bonmin::OACutGenerator2* feasChecker_;
     OsiCuts cuts_;
 
 public:
