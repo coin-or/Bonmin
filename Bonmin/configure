@@ -433,7 +433,7 @@ PACKAGE_VERSION='0.9'
 PACKAGE_STRING='Bonmin 0.9'
 PACKAGE_BUGREPORT='coin-bonmin@list.coin-or.org'
 
-ac_unique_file="src/CbcBonmin/CbcBonmin.hpp"
+ac_unique_file="src/CbcBonmin/BonCbc.hpp"
 ac_default_prefix=`pwd`
 # Factoring default headers for most tests.
 ac_includes_default="\
