@@ -14,13 +14,13 @@
 #include "BonTMINLP.hpp"
 #include "BonColReader.hpp"
 #include "CoinTime.hpp"
-#include "BonminIpoptWarmStart.hpp"
+#include "BonIpoptWarmStart.hpp"
 #include "BonIpoptInteriorWarmStarter.hpp"
 #include <string>
 #include <sstream>
 
 #include "IpSolveStatistics.hpp"
-#include "IpoptSolver.hpp"
+#include "BonIpoptSolver.hpp"
 
 using namespace Ipopt;
 

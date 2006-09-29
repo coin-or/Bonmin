@@ -8,7 +8,7 @@
 // Date : 26/09/2006
 
 
-#include "IpoptSolver.hpp"
+#include "BonIpoptSolver.hpp"
 #include "IpSolveStatistics.hpp"
 #include "CoinError.hpp"
 

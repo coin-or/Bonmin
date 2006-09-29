@@ -9,7 +9,7 @@
 // Date : 02/15/2006
 
 
-#include "BonminIpoptWarmStart.hpp"
+#include "BonIpoptWarmStart.hpp"
 #include "CoinHelperFunctions.hpp"
 
 

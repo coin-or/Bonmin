@@ -20,7 +20,7 @@ liboainterface_la_SOURCES = \
 	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
 	BonOACutGenerator.cpp BonOACutGenerator.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
-	OAMessages.cpp OAMessages.hpp
+	BonOAMessages.cpp BonOAMessages.hpp
 
 # This is for libtool (on Windows)
 liboainterface_la_LDFLAGS = $(LT_LDFLAGS)

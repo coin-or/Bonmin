@@ -11,7 +11,7 @@
 #ifndef BonminCbcParam_H
 #define BonminCbcParam_H
 
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 namespace Bonmin {
 class BonminCbcParam
 {

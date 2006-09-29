@@ -60,8 +60,8 @@ include_HEADERS =
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	AmplTMINLP.cppbak AmplTMINLP.hppbak \
-	BonminAmplInterface.cppbak BonminAmplInterface.hppbak 
+	BonAmplTMINLP.cppbak BonAmplTMINLP.hppbak \
+	BonAmplInterface.cppbak BonAmplInterface.hppbak 
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

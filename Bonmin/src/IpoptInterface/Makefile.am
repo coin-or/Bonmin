@@ -20,13 +20,13 @@ libipoptinterface_la_SOURCES = \
 	BonColReader.cpp BonColReader.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonIpoptInterface.cpp BonIpoptInterface.hpp \
-	OsiTMINLPInterface.cpp OsiTMINLPInterface.hpp \
+	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
-	BonminIpoptWarmStart.cpp BonminIpoptWarmStart.hpp \
+	BonIpoptWarmStart.cpp BonIpoptWarmStart.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
-        IpoptSolver.hpp IpoptSolver.cpp \
-	TNLPSolver.hpp TNLPSolver.cpp \
+        BonIpoptSolver.hpp BonIpoptSolver.cpp \
+	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
 
 # This is for libtool (on Windows)
@@ -58,13 +58,13 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 include_HEADERS = \
 	BonIpoptInterface.hpp \
-	OsiTMINLPInterface.hpp \
+	BonOsiTMINLPInterface.hpp \
 	BonIpoptInteriorWarmStarter.hpp \
 	BonTMINLP2TNLP.hpp \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
-        TNLPSolver.hpp \
-        IpoptSolver.hpp
+        BonTNLPSolver.hpp \
+        BonIpoptSolver.hpp
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
@@ -90,19 +90,19 @@ uninstall-local:
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BoundsReader.cppbak BoundsReader.hppbak \
-	IpCbcColReader.cppbak IpCbcColReader.hppbak \
-	IpCbcStartPointReader.cppbak IpCbcStartPointReader.hppbak \
-	IpoptIntegerBias.hppbak \
-	IpoptInterface.cppbak IpoptInterface.hppbak \
-	OsiTMINLPInterface.cppbak OsiTMINLPInterface.hppbak \
-	IpoptInteriorWarmStarter.cppbak IpoptInteriorWarmStarter.hppbak \
-	IpoptWarmStart.cppbak IpoptWarmStart.hppbak \
-	TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
-	TMINLP.hppbak TMINLP.hppbak \
-        TNLPSolver.hppbak TNLPSolver.hppbak \
-	IpoptSolver.hppbak  IpoptSolver.cpp \
-	TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak
+	BonBoundsReader.cpp BonBoundsReader.hpp \
+	BonColReader.cpp BonColReader.hpp \
+	BonStartPointReader.cpp BonStartPointReader.hpp \
+	BonIpoptInterface.cpp BonIpoptInterface.hpp \
+	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
+	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
+	BonIpoptWarmStart.cpp BonIpoptWarmStart.hpp \
+	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLP.cpp BonTMINLP.hpp \
+        BonIpoptSolver.hpp BonIpoptSolver.cpp \
+	BonTNLPSolver.hpp BonTNLPSolver.cpp \
+	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
+
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

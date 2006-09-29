@@ -13,7 +13,7 @@
 #include <list>
 #include <fstream>
 #include <iostream>
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 
 
 

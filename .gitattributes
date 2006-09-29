@@ -18,14 +18,14 @@ Bonmin/doc/options.tex -text
 Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
 Bonmin/inc/config_bonmin.h.in -text
+Bonmin/src/IpoptInterface/BonIpoptSolver.cpp -text
+Bonmin/src/IpoptInterface/BonIpoptSolver.hpp -text
+Bonmin/src/IpoptInterface/BonOsiTMINLPInterface.cpp -text
+Bonmin/src/IpoptInterface/BonOsiTMINLPInterface.hpp -text
 Bonmin/src/IpoptInterface/BonTMINLP.cpp -text
-Bonmin/src/IpoptInterface/IpoptSolver.cpp -text
-Bonmin/src/IpoptInterface/IpoptSolver.hpp -text
-Bonmin/src/IpoptInterface/OsiTMINLPInterface.cpp -text
-Bonmin/src/IpoptInterface/OsiTMINLPInterface.hpp -text
+Bonmin/src/IpoptInterface/BonTNLPSolver.cpp -text
+Bonmin/src/IpoptInterface/BonTNLPSolver.hpp -text
 Bonmin/src/IpoptInterface/README -text
-Bonmin/src/IpoptInterface/TNLPSolver.cpp -text
-Bonmin/src/IpoptInterface/TNLPSolver.hpp -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip

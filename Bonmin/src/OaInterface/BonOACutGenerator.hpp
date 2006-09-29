@@ -10,8 +10,8 @@
 #ifndef BonOACutGenerator_HPP
 #define BonOACutGenerator_HPP
 #include "CglCutGenerator.hpp"
-#include "OsiTMINLPInterface.hpp"
-#include "OAMessages.hpp"
+#include "BonOsiTMINLPInterface.hpp"
+#include "BonOAMessages.hpp"
 namespace Bonmin{
 class OACutGenerator : public CglCutGenerator
 {

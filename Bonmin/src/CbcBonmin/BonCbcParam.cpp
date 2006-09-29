@@ -8,7 +8,7 @@
 //
 // Date : 03/15/2006
 
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 #include "BonCbcParam.hpp"
 
 namespace Bonmin {

@@ -21,7 +21,7 @@
 #include "BonCbcNlpStrategy.hpp"
 #include "BonCbcNode.hpp"
 
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 namespace Bonmin{
 // Default Constructor
 CbcNlpStrategy::CbcNlpStrategy(int maxFailures,

@@ -59,7 +59,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liboainterface_la_LIBADD =
 am_liboainterface_la_OBJECTS = BonDummyHeuristic.lo \
-	BonOACutGenerator.lo BonOACutGenerator2.lo OAMessages.lo
+	BonOACutGenerator.lo BonOACutGenerator2.lo BonOAMessages.lo
 liboainterface_la_OBJECTS = $(am_liboainterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -303,7 +303,7 @@ liboainterface_la_SOURCES = \
 	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
 	BonOACutGenerator.cpp BonOACutGenerator.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
-	OAMessages.cpp OAMessages.hpp
+	BonOAMessages.cpp BonOAMessages.hpp
 
 
 # This is for libtool (on Windows)
@@ -394,7 +394,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDummyHeuristic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OAMessages.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOAMessages.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

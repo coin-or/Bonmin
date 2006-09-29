@@ -9,7 +9,7 @@
 
 #ifndef BonDummyHeuristic_HPP
 #define BonDummyHeuristic_HPP
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 
 #include "CbcHeuristic.hpp"
 namespace Bonmin{

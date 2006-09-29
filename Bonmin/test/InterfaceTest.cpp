@@ -7,10 +7,10 @@
 //
 // Date :  07/01/2005
 
-#include "BonminAmplInterface.hpp"
+#include "BonAmplInterface.hpp"
 #include "OsiClpSolverInterface.hpp"
-#include "TMINLP.hpp"
-#include "AmplTMINLP.hpp"
+#include "BonTMINLP.hpp"
+#include "BonAmplTMINLP.hpp"
 #include "IpIpoptApplication.hpp"
 
 using namespace Bonmin;

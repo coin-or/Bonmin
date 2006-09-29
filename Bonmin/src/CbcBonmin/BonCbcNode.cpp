@@ -20,8 +20,8 @@
 #include "CoinWarmStartBasis.hpp"
 #include "CbcModel.hpp"
 #include "BonCbcNode.hpp"
-#include "OsiTMINLPInterface.hpp"
-#include "BonminIpoptWarmStart.hpp"
+#include "BonOsiTMINLPInterface.hpp"
+#include "BonIpoptWarmStart.hpp"
 #include "BonIpoptInterface.hpp"
 
 using namespace std;

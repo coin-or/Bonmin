@@ -10,7 +10,7 @@
 // Date : 12/01/2004
 
 
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 #include "BonColReader.hpp"
 #include "CoinTime.hpp"
 #include <string>

@@ -1,4 +1,4 @@
-#include "TNLPSolver.hpp"
+#include "BonTNLPSolver.hpp"
 #include "IpBlas.hpp"
 namespace Bonmin{
   using namespace Ipopt;

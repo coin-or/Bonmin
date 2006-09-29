@@ -11,7 +11,7 @@
 #define BoundsReader_HPP
 
 #include <string>
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 
 
 namespace Bonmin {

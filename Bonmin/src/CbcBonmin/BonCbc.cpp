@@ -13,7 +13,7 @@
 #include "BonCbc.hpp"
 #include "BonCbcLpStrategy.hpp"
 #include "BonCbcNlpStrategy.hpp"
-#include "OsiTMINLPInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 
 #include "BonCbcParam.hpp"
 

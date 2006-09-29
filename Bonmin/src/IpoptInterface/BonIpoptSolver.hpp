@@ -9,7 +9,7 @@
 
 #ifndef IpoptSolver_HPP
 #define IpoptSolver_HPP
-#include "TNLPSolver.hpp"
+#include "BonTNLPSolver.hpp"
 #include "IpIpoptApplication.hpp"
 
 namespace Bonmin{

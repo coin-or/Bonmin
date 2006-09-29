@@ -8,7 +8,7 @@
 // Date :  05/26/2005
 
 
-#include "OAMessages.hpp"
+#include "BonOAMessages.hpp"
 
 namespace Bonmin{
 

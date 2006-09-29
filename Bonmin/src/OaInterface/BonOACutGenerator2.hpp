@@ -11,8 +11,8 @@
 #ifndef BonOACutGenerator2_HPP
 #define BonOACutGenerator2_HPP
 #include "CglCutGenerator.hpp"
-#include "OsiTMINLPInterface.hpp"
-#include "OAMessages.hpp"
+#include "BonOsiTMINLPInterface.hpp"
+#include "BonOAMessages.hpp"
 #include "CbcModel.hpp"
 
 #include "CbcStrategy.hpp"

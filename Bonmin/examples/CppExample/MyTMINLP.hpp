@@ -8,7 +8,7 @@
 // Date :  03/17/2006
 #ifndef MyTNLP_HPP
 #define MyTNLP_HPP
-#include "TMINLP.hpp"
+#include "BonTMINLP.hpp"
 using namespace  Ipopt;
 using namespace Bonmin;
 /** A C++ example for interfacing an MINLP with bonmin.

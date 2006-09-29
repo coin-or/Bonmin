@@ -24,7 +24,7 @@
 #include "BonTMINLP.hpp"
 #include "BonTMINLP2TNLP.hpp"
 #include "BonTNLP2FPNLP.hpp"
-#include "TNLPSolver.hpp"
+#include "BonTNLPSolver.hpp"
 
 
 namespace Bonmin {

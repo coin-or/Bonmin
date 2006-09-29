@@ -14,8 +14,8 @@
 #define IpoptInterface_H
 
 
-#include "OsiTMINLPInterface.hpp"
-#include "IpoptSolver.hpp"
+#include "BonOsiTMINLPInterface.hpp"
+#include "BonIpoptSolver.hpp"
 
 namespace Bonmin{
 /**
