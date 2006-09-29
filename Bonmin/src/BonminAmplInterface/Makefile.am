@@ -17,8 +17,8 @@ noinst_LTLIBRARIES = libamplinterface.la
 
 # List all source files, including headers
 libamplinterface_la_SOURCES = \
-	BonminAmplInterface.cpp BonminAmplInterface.hpp \
-	AmplTMINLP.cpp AmplTMINLP.hpp \
+	BonAmplInterface.cpp BonAmplInterface.hpp \
+	BonAmplTMINLP.cpp BonAmplTMINLP.hpp \
         sos_kludge.cpp
 
 # This is for libtool (on Windows)

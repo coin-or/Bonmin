@@ -1,7 +1,7 @@
 #ifndef BonminAmplInterface_H
 #define BonminAmplInterface_H
-#include "IpoptInterface.hpp"
-#include "AmplTMINLP.hpp"
+#include "BonIpoptInterface.hpp"
+#include "BonAmplTMINLP.hpp"
 
 namespace Bonmin {
 /** Class for providing an Osi interface to Ipopt with an ampl nl file as input. */

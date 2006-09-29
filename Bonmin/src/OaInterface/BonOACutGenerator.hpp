@@ -7,20 +7,20 @@
 //
 // Date :  05/26/2005
 
-#ifndef IpCbcOACutGenerator_HPP
-#define IpCbcOACutGenerator_HPP
+#ifndef BonOACutGenerator_HPP
+#define BonOACutGenerator_HPP
 #include "CglCutGenerator.hpp"
-#include "IpoptInterface.hpp"
-#include "OaMessages.hpp"
+#include "OsiTMINLPInterface.hpp"
+#include "OAMessages.hpp"
 namespace Bonmin{
-class IpCbcOACutGenerator : public CglCutGenerator
+class OACutGenerator : public CglCutGenerator
 {
 public:
   /// Default constructor
-  IpCbcOACutGenerator(IpoptInterface * si = NULL,
+  OACutGenerator(OsiTMINLPInterface * si = NULL,
       int maxDepth = 10);
   /// Copy constructor
-  IpCbcOACutGenerator(const IpCbcOACutGenerator &copy)
+  OACutGenerator(const OACutGenerator &copy)
       :
       nlp_(copy.nlp_),
       maxDepth_(copy.maxDepth_)
@@ -33,17 +33,17 @@ public:
   ///Abstract constructor
   virtual CglCutGenerator * clone() const
   {
-    return new IpCbcOACutGenerator(*this);
+    return new OACutGenerator(*this);
   }
 
   /** Desctructor */
-  virtual ~IpCbcOACutGenerator()
+  virtual ~OACutGenerator()
   {
     delete handler_;
   }
 
-  /// Assign an IpoptInterface
-  void assignInterface(IpoptInterface * si);
+  /// Assign an OsiTMINLPInterface
+  void assignInterface(OsiTMINLPInterface * si);
   /// cut generation method
   virtual void generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
       const CglTreeInfo info) const;
@@ -65,7 +65,7 @@ public:
   }
 private:
   /// Pointer to the Ipopt interface
-  IpoptInterface * nlp_;
+  OsiTMINLPInterface * nlp_;
 
   /** maximum depth at which generate cuts*/
   int maxDepth_;

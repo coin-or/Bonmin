@@ -23,22 +23,22 @@ namespace Bonmin{
   augmenting the parent subproblem.
 */
 
-class BonminCbcFullNodeInfo : public CbcFullNodeInfo
+class BonCbcFullNodeInfo : public CbcFullNodeInfo
 {
 
 public:
-  friend class BonminCbcPartialNodeInfo;
+  friend class BonCbcPartialNodeInfo;
   // Default Constructor
-  BonminCbcFullNodeInfo ();
+  BonCbcFullNodeInfo ();
 
   // Constructor from current state
-  BonminCbcFullNodeInfo (CbcModel * model, int numberRowsAtContinuous);
+  BonCbcFullNodeInfo (CbcModel * model, int numberRowsAtContinuous);
 
   // Copy constructor
-  BonminCbcFullNodeInfo ( const BonminCbcFullNodeInfo &);
+  BonCbcFullNodeInfo ( const BonCbcFullNodeInfo &);
 
   // Destructor
-  ~BonminCbcFullNodeInfo ();
+  ~BonCbcFullNodeInfo ();
 
   /// Clone
   virtual CbcNodeInfo * clone() const;
@@ -66,35 +66,35 @@ private:
 private:
 
   /// Illegal Assignment operator
-  BonminCbcFullNodeInfo & operator=(const BonminCbcFullNodeInfo& rhs);
+  BonCbcFullNodeInfo & operator=(const BonCbcFullNodeInfo& rhs);
 };
 
 /** \brief Holds information for recreating a subproblem by incremental change
-	   from the parent for Bonmin
+	   from the parent for 
 
-  A BonminBonminCbcPartialNodeInfo object contains changes to the bounds and basis, and
+  A BonminCbcPartialNodeInfo object contains changes to the bounds and basis, and
   additional cuts, required to recreate a subproblem by modifying and
   augmenting the parent subproblem.
 */
 
-class BonminCbcPartialNodeInfo : public CbcPartialNodeInfo
+class BonCbcPartialNodeInfo : public CbcPartialNodeInfo
 {
 
 public:
   // Default Constructor
-  BonminCbcPartialNodeInfo ();
+  BonCbcPartialNodeInfo ();
 
   // Constructor from current state
-  BonminCbcPartialNodeInfo (CbcModel * model, CbcNodeInfo * parent, CbcNode * owner,
+  BonCbcPartialNodeInfo (CbcModel * model, CbcNodeInfo * parent, CbcNode * owner,
       int numberChangedBounds,const int * variables,
       const double * boundChanges,
       const CoinWarmStartDiff *basisDiff) ;
 
   // Copy constructor
-  BonminCbcPartialNodeInfo ( const BonminCbcPartialNodeInfo &);
+  BonCbcPartialNodeInfo ( const BonCbcPartialNodeInfo &);
 
   // Destructor
-  ~BonminCbcPartialNodeInfo ();
+  ~BonCbcPartialNodeInfo ();
 
   /// Clone
   virtual CbcNodeInfo * clone() const;
@@ -122,7 +122,7 @@ private:
 private:
 
   /// Illegal Assignment operator
-  BonminCbcPartialNodeInfo & operator=(const BonminCbcPartialNodeInfo& rhs);
+  BonCbcPartialNodeInfo & operator=(const Bonmin::BonCbcPartialNodeInfo& rhs);
 };
 }
 #endif

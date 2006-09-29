@@ -56,7 +56,7 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libamplinterface_la_LIBADD =
-am_libamplinterface_la_OBJECTS = BonminAmplInterface.lo AmplTMINLP.lo \
+am_libamplinterface_la_OBJECTS = BonAmplInterface.lo BonAmplTMINLP.lo \
 	sos_kludge.lo
 libamplinterface_la_OBJECTS = $(am_libamplinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -307,8 +307,8 @@ noinst_LTLIBRARIES = libamplinterface.la
 
 # List all source files, including headers
 libamplinterface_la_SOURCES = \
-	BonminAmplInterface.cpp BonminAmplInterface.hpp \
-	AmplTMINLP.cpp AmplTMINLP.hpp \
+	BonAmplInterface.cpp BonAmplInterface.hpp \
+	BonAmplTMINLP.cpp BonAmplTMINLP.hpp \
         sos_kludge.cpp
 
 
@@ -400,8 +400,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AmplTMINLP.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonminAmplInterface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonAmplInterface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonAmplTMINLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sos_kludge.Plo@am__quote@
 
 .cpp.o:

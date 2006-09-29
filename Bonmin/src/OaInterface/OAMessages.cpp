@@ -8,7 +8,9 @@
 // Date :  05/26/2005
 
 
-#include "OaMessages.hpp"
+#include "OAMessages.hpp"
+
+namespace Bonmin{
 
 OaMessages::OaMessages():
     CoinMessages(DUMMY_END)
@@ -25,3 +27,5 @@ OaMessages::OaMessages():
   addMessage(LP_ERROR,CoinOneMessage(9,2,"Error of LP approximation %g"));
   addMessage(PERIODIC_MSG, CoinOneMessage(10,1,"After %7.1f seconds, upper bound %10g, lower bound %10g"));
 }
+
+}//end namespace Bonmin

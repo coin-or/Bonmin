@@ -18,10 +18,10 @@
 #include <iomanip>
 
 
-#include "BonminAmplInterface.hpp"
+#include "BonAmplInterface.hpp"
 
-#include "BoundsReader.hpp"
-#include "IpCbcStartPointReader.hpp"
+#include "BonBoundsReader.hpp"
+#include "BonStartPointReader.hpp"
 
 #include "CoinTime.hpp"
 
@@ -71,8 +71,8 @@ int main (int argc, char *argv[])
 	bounds.readAndApply(&nlpSolver);
       }
       if(argc>3) {
-	Bonmin::IpCbcStartPointReader init(startingPointFile);
-	init.readAndApply(nlpSolver);
+	Bonmin::StartPointReader init(startingPointFile);
+	init.readAndApply(&nlpSolver);
       }
       
       nlpSolver.turnOnIpoptOutput();

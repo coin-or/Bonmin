@@ -60,8 +60,8 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonminbb_la_LIBADD =
-am_libbonminbb_la_OBJECTS = CbcBonmin.lo BonminCbcLpStrategy.lo \
-	BonminCbcNlpStrategy.lo BonminCbcNode.lo BonminCbcParam.lo
+am_libbonminbb_la_OBJECTS = BonCbc.lo BonCbcLpStrategy.lo \
+	BonCbcNlpStrategy.lo BonCbcNode.lo BonCbcParam.lo
 libbonminbb_la_OBJECTS = $(am_libbonminbb_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -311,11 +311,11 @@ noinst_LTLIBRARIES = libbonminbb.la
 
 # List all source files, including headers
 libbonminbb_la_SOURCES = \
-	CbcBonmin.cpp CbcBonmin.hpp \
-	BonminCbcLpStrategy.cpp BonminCbcLpStrategy.hpp \
-	BonminCbcNlpStrategy.cpp BonminCbcNlpStrategy.hpp \
-	BonminCbcNode.cpp BonminCbcNode.hpp \
-	BonminCbcParam.cpp BonminCbcParam.hpp
+	BonCbc.cpp BonCbc.hpp \
+	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
+	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
+	BonCbcNode.cpp BonCbcNode.hpp \
+	BonCbcParam.cpp BonCbcParam.hpp
 
 
 # This is for libtool (on Windows)
@@ -353,8 +353,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 include_HEADERS = \
-	CbcBonmin.hpp \
-	BonminCbcParam.hpp
+	BonCbc.hpp \
+	BonCbcParam.hpp
 
 
 ########################################################################
@@ -363,11 +363,11 @@ include_HEADERS = \
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonminCbcParam.cppbak BonminCbcParam.hppbak \
-	CbcBonmin.cppbak CbcBonmin.hppbak \
-	BonminCbcLpStrategy.cppbak BonminCbcLpStrategy.hppbak \
-	BonminCbcNlpStrategy.cppbak BonminCbcNlpStrategy.hppbak \
-	BonminCbcNode.cppbak BonminCbcNode.hppbak
+	BonCbcParam.cppbak BonCbcParam.hppbak \
+	BonCbc.cppbak BonCbc.hppbak \
+	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
+	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
+	BonCbcNode.cppbak BonCbcNode.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -422,11 +422,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonminCbcLpStrategy.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonminCbcNlpStrategy.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonminCbcNode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonminCbcParam.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcBonmin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcLpStrategy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNlpStrategy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcParam.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

@@ -17,10 +17,10 @@ noinst_LTLIBRARIES = liboainterface.la
 
 # List all source files, including headers
 liboainterface_la_SOURCES = \
-	IpCbcDummyHeuristic.cpp IpCbcDummyHeuristic.hpp \
-	IpCbcOACutGenerator.cpp IpCbcOACutGenerator.hpp \
-	IpCbcOACutGenerator2.cpp IpCbcOACutGenerator2.hpp \
-	OaMessages.cpp OaMessages.hpp
+	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
+	BonOACutGenerator.cpp BonOACutGenerator.hpp \
+	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
+	OAMessages.cpp OAMessages.hpp
 
 # This is for libtool (on Windows)
 liboainterface_la_LDFLAGS = $(LT_LDFLAGS)
@@ -58,10 +58,10 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	IpCbcDummyHeuristic.cppbak IpCbcDummyHeuristic.hppbak \
-	IpCbcOACutGenerator.cppbak IpCbcOACutGenerator.hppbak \
-	IpCbcOACutGenerator2.cppbak IpCbcOACutGenerator2.hppbak \
-	OaMessages.cppbak OaMessages.hppbak
+	BonDummyHeuristic.cppbak BonDummyHeuristic.hppbak \
+	BonOACutGenerator.cppbak BonOACutGenerator.hppbak \
+	BonOACutGenerator2.cppbak BonOACutGenerator2.hppbak \
+	BonOaMessages.cppbak BonOaMessages.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

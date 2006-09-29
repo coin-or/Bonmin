@@ -7,27 +7,27 @@
 //
 // Date :  05/26/2005
 
-#ifndef IpCbcDummyHeuristic_HPP
-#define IpCbcDummyHeuristic_HPP
-#include "IpoptInterface.hpp"
+#ifndef BonDummyHeuristic_HPP
+#define BonDummyHeuristic_HPP
+#include "OsiTMINLPInterface.hpp"
 
 #include "CbcHeuristic.hpp"
 namespace Bonmin{
-class  IpCbcDummyHeuristic : public CbcHeuristic
+class  DummyHeuristic : public CbcHeuristic
 {
 public:
   /// Default constructor
-  IpCbcDummyHeuristic(IpoptInterface * si = NULL);
+  DummyHeuristic(OsiTMINLPInterface * si = NULL);
   /// Usefull constructor
-  IpCbcDummyHeuristic(CbcModel &model, IpoptInterface * si = NULL);
+  DummyHeuristic(CbcModel &model, OsiTMINLPInterface * si = NULL);
   ///Copy constructor
-  IpCbcDummyHeuristic( const IpCbcDummyHeuristic &copy):
+  DummyHeuristic( const DummyHeuristic &copy):
       CbcHeuristic(copy),
       nlp_(copy.nlp_),
       knowsSolution(copy.knowsSolution)
   {}
-  /// Assign an IpoptInterface
-  void assignInterface(IpoptInterface * si);
+  /// Assign an OsiTMINLPInterface
+  void assignInterface(OsiTMINLPInterface * si);
   /// heuristic method
   virtual int solution(double &solutionValue, double *betterSolution);
   virtual int solution(double &solutionValue, double *betterSolution, OsiCuts & cs)
@@ -36,13 +36,13 @@ public:
   }
   virtual CbcHeuristic * clone()const
   {
-    return new IpCbcDummyHeuristic(*this);
+    return new DummyHeuristic(*this);
   }
   virtual void resetModel(CbcModel*)
   {}
 private:
   /// Pointer to the Ipopt interface
-  IpoptInterface * nlp_;
+  OsiTMINLPInterface * nlp_;
   /// Do I have a solution?
   bool knowsSolution;
 };

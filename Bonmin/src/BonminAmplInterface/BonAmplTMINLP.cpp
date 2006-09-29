@@ -11,7 +11,7 @@
 #include "IpBlas.hpp"
 
 #include "AmplTNLP.hpp"
-#include "AmplTMINLP.hpp"
+#include "BonAmplTMINLP.hpp"
 #include <iostream>
 
 #include "asl.h"

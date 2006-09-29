@@ -8,19 +8,19 @@
 //
 // Date : 03/15/2006
 
-#include "IpoptInterface.hpp"
-#include "BonminCbcParam.hpp"
+#include "OsiTMINLPInterface.hpp"
+#include "BonCbcParam.hpp"
 
 namespace Bonmin {
 bool
-BonminCbcParam::extractParams(IpoptInterface &solver)
+BonminCbcParam::extractParams(OsiTMINLPInterface * solver)
 {
   bool success = true;
 
-  Ipopt::SmartPtr<Ipopt::OptionsList> Options = solver.retrieve_options();
+  Ipopt::SmartPtr<Ipopt::OptionsList> Options = solver->retrieve_options();
 
   //extract IpoptInterface special params
-  solver.extractInterfaceParams();
+  solver->extractInterfaceParams();
 
   //log levels
   success &= Options->GetIntegerValue("bb_log_level",bbLogLevel,"bonmin.");

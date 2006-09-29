@@ -10,7 +10,7 @@
 
 #include "BonminConfig.h"
 
-#include "IpCbcOACutGenerator2.hpp"
+#include "BonOACutGenerator2.hpp"
 #include "OsiClpSolverInterface.hpp"
 
 #include "CbcModel.hpp"
@@ -24,7 +24,7 @@
 extern CbcModel * OAModel;
 namespace Bonmin{
 /// Default constructor
-IpCbcOACutGenerator2::IpCbcOACutGenerator2():
+OACutGenerator2::OACutGenerator2():
     CglCutGenerator(),
     nlp_(NULL),
     nSolve_(0),
@@ -52,8 +52,8 @@ IpCbcOACutGenerator2::IpCbcOACutGenerator2():
 
 
 
-IpCbcOACutGenerator2::IpCbcOACutGenerator2
-(IpoptInterface * nlp,
+OACutGenerator2::OACutGenerator2
+(OsiTMINLPInterface * nlp,
  OsiSolverInterface * si,
  CbcStrategy * strategy,
  double cbcCutoffIncrement,
@@ -89,22 +89,22 @@ IpCbcOACutGenerator2::IpCbcOACutGenerator2
   timeBegin_ = CoinCpuTime();
 }
 
-IpCbcOACutGenerator2::~IpCbcOACutGenerator2()
+OACutGenerator2::~OACutGenerator2()
 {
   delete handler_;
   if(strategy_)
     delete strategy_;
 }
-/// Assign an IpoptInterface
+/// Assign an OsiTMINLPInterface
 void
-IpCbcOACutGenerator2::assignNlpInterface(IpoptInterface * nlp)
+OACutGenerator2::assignNlpInterface(OsiTMINLPInterface * nlp)
 {
   nlp_ = nlp;
 }
 
-/// Assign an IpoptInterface
+/// Assign an OsiTMINLPInterface
 void
-IpCbcOACutGenerator2::assignLpInterface(OsiSolverInterface * si)
+OACutGenerator2::assignLpInterface(OsiSolverInterface * si)
 {
   si_ = si;
   if(maxLocalSearch_>0) {
@@ -112,7 +112,7 @@ IpCbcOACutGenerator2::assignLpInterface(OsiSolverInterface * si)
   }
 }
 
-double IpCbcOACutGenerator2::siBestObj(CbcModel * model) const
+double OACutGenerator2::siBestObj(CbcModel * model) const
 {
   if(model == NULL) {
     //Check solver name to see if local searches can be performed
@@ -122,7 +122,7 @@ double IpCbcOACutGenerator2::siBestObj(CbcModel * model) const
     std::string shortSolverName(solverName,0,3);
     if(shortSolverName == "cbc") {
       throw CoinError("OsiCbc is not supported for doing local searches use OsiClpSolverInterface instead",
-          "IpCbcOACutGenerator2","setTheNodeLimit");
+          "OACutGenerator2","setTheNodeLimit");
     }
     else if(solverName == "cplex") {
 #ifdef COIN_HAS_CPX
@@ -130,12 +130,12 @@ double IpCbcOACutGenerator2::siBestObj(CbcModel * model) const
       double value;
       int status = CPXgetbestobjval(cpx->getEnvironmentPtr(),cpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL), &value);
       if(status)
-        throw CoinError("Error in getting CPLEX best bound","IpCbcOACutGenerator2","siBestObj");
+        throw CoinError("Error in getting CPLEX best bound","OACutGenerator2","siBestObj");
       return value;
 #else
 
       throw CoinError("You have to define COIN_HAS_CPX at compilation to be able to use cplex for local searches",
-          "IpCbcOACutGenerator2","siBestObj");
+          "OACutGenerator2","siBestObj");
 #endif
 
     }
@@ -144,13 +144,13 @@ double IpCbcOACutGenerator2::siBestObj(CbcModel * model) const
       mesg += solverName;
       mesg +=" for local searches, you should use Cbc or Cplex";
       throw CoinError(mesg,
-          "IpCbcOACutGenerator2","assignLpInterface");
+          "OACutGenerator2","assignLpInterface");
     }
   }
   else
     return model->getBestPossibleObjValue();
 }
-void IpCbcOACutGenerator2::setTheNodeLimit()
+void OACutGenerator2::setTheNodeLimit()
 {
   //Check solver name to see if local searches can be performed
   std::string solverName;
@@ -160,7 +160,7 @@ void IpCbcOACutGenerator2::setTheNodeLimit()
   std::string shortSolverName(solverName,0,3);
   if(shortSolverName == "cbc") {
     throw CoinError("OsiCbc is not supported for doing local searches use OsiClpSolverInterface instead",
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
   }
   else if(solverName == "cplex") {
 #ifdef COIN_HAS_CPX
@@ -169,7 +169,7 @@ void IpCbcOACutGenerator2::setTheNodeLimit()
 #else
 
     throw CoinError("You have to define COIN_HAS_CPX at compilation to be able to use cplex for local searches",
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
 #endif
 
   }
@@ -181,12 +181,12 @@ void IpCbcOACutGenerator2::setTheNodeLimit()
     mesg += solverName;
     mesg +=" for local searches, you should use Cbc or Cplex";
     throw CoinError(mesg,
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
   }
 }
 
 
-void IpCbcOACutGenerator2::setTimeLimit(double time) const
+void OACutGenerator2::setTimeLimit(double time) const
 {
   //Check solver name to see if local searches can be performed
   std::string solverName;
@@ -195,7 +195,7 @@ void IpCbcOACutGenerator2::setTimeLimit(double time) const
   std::string shortSolverName(solverName,0,3);
   if(shortSolverName == "cbc") {
     throw CoinError("OsiCbc is not supported for doing local searches use OsiClpSolverInterface instead",
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
   }
   else if(solverName == "cplex") {
 #ifdef COIN_HAS_CPX
@@ -204,7 +204,7 @@ void IpCbcOACutGenerator2::setTimeLimit(double time) const
 #else
 
     throw CoinError("You have to define COIN_HAS_CPX at compilation to be able to use cplex for local searches",
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
 #endif
 
   }
@@ -216,11 +216,11 @@ void IpCbcOACutGenerator2::setTimeLimit(double time) const
     mesg += solverName;
     mesg +=" for local searches, you should use Cbc or Cplex";
     throw CoinError(mesg,
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
   }
 }
 
-void IpCbcOACutGenerator2::setCutoff(double bestKnown) const
+void OACutGenerator2::setCutoff(double bestKnown) const
 {
   //Check solver name to see if local searches can be performed
   std::string solverName;
@@ -230,7 +230,7 @@ void IpCbcOACutGenerator2::setCutoff(double bestKnown) const
   std::string shortSolverName(solverName,0,3);
   if(shortSolverName == "cbc") {
     throw CoinError("OsiCbc is not supported for doing local searches use OsiClpSolverInterface instead",
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
   }
   else if(solverName == "cplex") {
 #ifdef COIN_HAS_CPX
@@ -239,7 +239,7 @@ void IpCbcOACutGenerator2::setCutoff(double bestKnown) const
 #else
 
     throw CoinError("You have to define COIN_HAS_CPX at compilation to be able to use cplex for local searches",
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
 #endif
 
   }
@@ -251,11 +251,11 @@ void IpCbcOACutGenerator2::setCutoff(double bestKnown) const
     mesg += solverName;
     mesg +=" for local searches, you should use Cbc or Cplex";
     throw CoinError(mesg,
-        "IpCbcOACutGenerator2","setTheNodeLimit");
+        "OACutGenerator2","setTheNodeLimit");
   }
 }/// cut generation method
 void
-IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
+OACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
     const CglTreeInfo info) const
 {
   CbcStrategy * strategy = strategy_;
@@ -378,7 +378,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
     }
     else if (numberCutsToAdd < 0)//Oups some error
     {
-      std::cerr<<"Internal error in IpCbcOACutGenerator2 : number of cuts wrong"<<std::endl;
+      std::cerr<<"Internal error in OACutGenerator2 : number of cuts wrong"<<std::endl;
     }
 
     //Set the bounds on columns
@@ -392,7 +392,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
     {
       delete warm;
       throw CoinError("Fail installing the warm start in the subproblem",
-          "generateCuts","IpCbcOACutGenerator2") ;
+          "generateCuts","OACutGenerator2") ;
     }
     delete warm;
     //put the cutoff
@@ -416,7 +416,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
   else {
 #ifdef NO_NULL_SI
     throw CoinError("Not allowed to modify si in a cutGenerator",
-        "IpCbcOACutGenerator2","generateCuts");
+        "OACutGenerator2","generateCuts");
 #else //Seems that nobody wants to allow me to do this
     if(leaveSiUnchanged_)
       saveWarmStart = si.getWarmStart();
@@ -655,7 +655,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
       if (si_->setWarmStart(basis) == false) {
         delete basis;
         throw CoinError("Fail setWarmStart() after cut installation.",
-            "generateCuts","IpCbcOACutGenerator2") ;
+            "generateCuts","OACutGenerator2") ;
       }
       delete basis;
       si_->resolve();
@@ -854,7 +854,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
         si_->setDblParam(OsiDualObjectiveLimit, saveCutoff);
         if(si_->setWarmStart(saveWarmStart)==false) {
           throw CoinError("Fail restoring the warm start at the end of procedure",
-              "generateCuts","IpCbcOACutGenerator2") ;
+              "generateCuts","OACutGenerator2") ;
         }
         delete saveWarmStart;
       }

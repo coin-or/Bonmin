@@ -18,13 +18,13 @@
 
 #include "OsiSolverInterface.hpp"
 #include "CbcModel.hpp"
-#include "BonminCbcNlpStrategy.hpp"
-#include "BonminCbcNode.hpp"
+#include "BonCbcNlpStrategy.hpp"
+#include "BonCbcNode.hpp"
 
-#include "IpoptInterface.hpp"
+#include "OsiTMINLPInterface.hpp"
 namespace Bonmin{
 // Default Constructor
-BonminCbcNlpStrategy::BonminCbcNlpStrategy(int maxFailures,
+CbcNlpStrategy::CbcNlpStrategy(int maxFailures,
     int maxInfeasibles,
     int pretendFailIsInfeasible)
     :
@@ -38,18 +38,18 @@ BonminCbcNlpStrategy::BonminCbcNlpStrategy(int maxFailures,
 
 
 // Destructor
-BonminCbcNlpStrategy::~BonminCbcNlpStrategy ()
+CbcNlpStrategy::~CbcNlpStrategy ()
 {}
 
 // Clone
 CbcStrategy *
-BonminCbcNlpStrategy::clone() const
+CbcNlpStrategy::clone() const
 {
-  return new BonminCbcNlpStrategy(*this);
+  return new CbcNlpStrategy(*this);
 }
 
 // Copy constructor
-BonminCbcNlpStrategy::BonminCbcNlpStrategy(const BonminCbcNlpStrategy & rhs)
+CbcNlpStrategy::CbcNlpStrategy(const CbcNlpStrategy & rhs)
     :
     hasFailed_(false),
     maxFailure_(rhs.maxFailure_),
@@ -58,18 +58,18 @@ BonminCbcNlpStrategy::BonminCbcNlpStrategy(const BonminCbcNlpStrategy & rhs)
 {}
 // Return a new Full node information pointer (descendant of CbcFullNodeInfo)
 CbcNodeInfo *
-BonminCbcNlpStrategy::fullNodeInfo(CbcModel * model,int numberRowsAtContinuous) const
+CbcNlpStrategy::fullNodeInfo(CbcModel * model,int numberRowsAtContinuous) const
 {
   return new CbcFullNodeInfo(model,numberRowsAtContinuous);
 }
 // Return a new Partial node information pointer (descendant of CbcPartialNodeInfo)
 CbcNodeInfo *
-BonminCbcNlpStrategy::partialNodeInfo(CbcModel * model, CbcNodeInfo * parent, CbcNode * owner,
+CbcNlpStrategy::partialNodeInfo(CbcModel * model, CbcNodeInfo * parent, CbcNode * owner,
     int numberChangedBounds,const int * variables,
     const double * boundChanges,
     const CoinWarmStartDiff *basisDiff) const
 {
-  return new BonminCbcPartialNodeInfo(model,parent, owner, numberChangedBounds, variables,
+  return new BonCbcPartialNodeInfo(model,parent, owner, numberChangedBounds, variables,
       boundChanges,basisDiff);
 }
 /* After a CbcModel::resolve this can return a status
@@ -79,13 +79,13 @@ BonminCbcNlpStrategy::partialNodeInfo(CbcModel * model, CbcNodeInfo * parent, Cb
    2 treat as infeasible
 */
 int
-BonminCbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFrom)
+CbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFrom)
 {
   OsiSolverInterface * solver = model->solver();//get solver
   int feasible = 1;
   bool solved = true;
   int returnStatus = -1;
-  BonminCbcPartialNodeInfo * bmNodeInfo = dynamic_cast<BonminCbcPartialNodeInfo *>(parent);
+  BonCbcPartialNodeInfo * bmNodeInfo = dynamic_cast<BonCbcPartialNodeInfo *>(parent);
   if(!bmNodeInfo) return -1;
 
   int seqOfInfeasiblesSize = bmNodeInfo->getSequenceOfInfeasiblesSize();
@@ -120,7 +120,7 @@ BonminCbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFro
     std::cerr<<"Branching on infeasible node, sequence of infeasibles size "
     <<seqOfInfeasiblesSize<<std::endl;
     // Have to make sure that we will branch
-    IpoptInterface * ipopt = dynamic_cast<IpoptInterface *>(solver);
+    OsiTMINLPInterface * ipopt = dynamic_cast<OsiTMINLPInterface *>(solver);
     ipopt->forceBranchable();
     //change objective value
     returnStatus = 0;
@@ -131,7 +131,7 @@ BonminCbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFro
       seqOfUnsolvedSize <= maxFailure_) {
     std::cout<<"Branching on unsolved node, sequence of unsolved size "<<seqOfUnsolvedSize<<std::endl;
     // Have to make sure that we will branch
-    IpoptInterface * ipopt = dynamic_cast<IpoptInterface *>(solver);
+    OsiTMINLPInterface * ipopt = dynamic_cast<OsiTMINLPInterface *>(solver);
     ipopt->forceBranchable();     //      feasible=1;
     returnStatus = 0;
   }
@@ -139,31 +139,32 @@ BonminCbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFro
   if(solver->isAbandoned() && parent != NULL &&
       seqOfUnsolvedSize > maxFailure_) {
     hasFailed_ = true;
-    IpoptInterface * ipopt = dynamic_cast<IpoptInterface *>(solver);
+    OsiTMINLPInterface * ipopt = 
+      dynamic_cast<OsiTMINLPInterface *>(solver);
     if(pretendFailIsInfeasible_) {
       //force infeasible
       ipopt->forceInfeasible();
       returnStatus = 2;
     }
     else
-      throw ipopt->newUnsolvedError(ipopt->getOptStatus());
+      throw ipopt->newUnsolvedError(0);
   }
   return returnStatus;
 }
 
 void
-BonminCbcNlpStrategy::setupCutGenerators(CbcModel &model)
+CbcNlpStrategy::setupCutGenerators(CbcModel &model)
 {}
 
 void
-BonminCbcNlpStrategy::setupHeuristics(CbcModel &model)
+CbcNlpStrategy::setupHeuristics(CbcModel &model)
 {}
 
 void
-BonminCbcNlpStrategy::setupPrinting(CbcModel &model, int toto)
+CbcNlpStrategy::setupPrinting(CbcModel &model, int toto)
 {}
 
 void
-BonminCbcNlpStrategy::setupOther(CbcModel &model)
+CbcNlpStrategy::setupOther(CbcModel &model)
 {}
 }

@@ -8,11 +8,11 @@
 // Date :  05/26/2005
 
 
-#ifndef IpCbcOACutGenerator2_HPP
-#define IpCbcOACutGenerator2_HPP
+#ifndef BonOACutGenerator2_HPP
+#define BonOACutGenerator2_HPP
 #include "CglCutGenerator.hpp"
-#include "IpoptInterface.hpp"
-#include "OaMessages.hpp"
+#include "OsiTMINLPInterface.hpp"
+#include "OAMessages.hpp"
 #include "CbcModel.hpp"
 
 #include "CbcStrategy.hpp"
@@ -20,14 +20,14 @@
 #include "CoinTime.hpp"
 
 namespace Bonmin{
-class IpCbcOACutGenerator2 : public CglCutGenerator
+class OACutGenerator2 : public CglCutGenerator
 {
 public:
   typedef enum subSolver {Clp, Cbc, Cplex, Other};
   /// Default constructor
-  IpCbcOACutGenerator2();
+  OACutGenerator2();
   /// Usefull constructor
-  IpCbcOACutGenerator2(IpoptInterface * nlp = NULL,
+  OACutGenerator2(OsiTMINLPInterface * nlp = NULL,
       OsiSolverInterface * si = NULL,
       CbcStrategy * strategy = NULL,
       double cbcCutoffIncrement_=1e-07,
@@ -37,7 +37,7 @@ public:
                       );
 
   /// Copy constructor
-  IpCbcOACutGenerator2(const IpCbcOACutGenerator2 &copy)
+  OACutGenerator2(const OACutGenerator2 &copy)
       :nlp_(copy.nlp_),
       si_(copy.si_),
       cbcCutoffIncrement_(copy.cbcCutoffIncrement_),
@@ -62,12 +62,12 @@ public:
     timeBegin_ = CoinCpuTime();
   }
   /// Destructor
-  ~IpCbcOACutGenerator2();
+  ~OACutGenerator2();
 
-  /// Assign an IpoptInterface
-  void assignNlpInterface(IpoptInterface * nlp);
+  /// Assign an OsiTMINLPInterface
+  void assignNlpInterface(OsiTMINLPInterface * nlp);
 
-  /// Assign an IpoptInterface
+  /// Assign an OsiTMINLPInterface
   void assignLpInterface(OsiSolverInterface * si);
 
   void setStrategy(const CbcStrategy & strategy)
@@ -82,7 +82,7 @@ public:
 
   virtual CglCutGenerator * clone() const
   {
-    return new IpCbcOACutGenerator2(*this);
+    return new OACutGenerator2(*this);
   }
 
   inline int getNSolve()
@@ -146,7 +146,7 @@ private:
   /// Get bound on the solution value after doing partial local search
   double siBestObj(CbcModel * model=NULL) const;
   /// Pointer to the Ipopt interface
-  IpoptInterface * nlp_;
+  OsiTMINLPInterface * nlp_;
   ///Number of NLP resolution done
   mutable int nSolve_;
   /// A linear solver

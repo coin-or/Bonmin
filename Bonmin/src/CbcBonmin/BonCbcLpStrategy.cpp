@@ -7,8 +7,10 @@
 //
 // Date : 03/15/2006
 
-#include "BonminCbcLpStrategy.hpp"
+#include "BonCbcLpStrategy.hpp"
 
+
+// Cut generators
 #include "CglGomory.hpp"
 #include "CglProbing.hpp"
 #include "CglKnapsackCover.hpp"
@@ -19,8 +21,12 @@
 #include "CglTwomir.hpp"
 #include "CglPreProcess.hpp"
 
+
+// Node selection
 #include "CbcCompareUser.hpp"
 #include "CbcCompareActual.hpp"
+
+#include "CbcBranchUser.hpp"
 
 
 namespace Bonmin{

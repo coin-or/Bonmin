@@ -54,7 +54,7 @@ LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
 #                                bonmin                                #
 ########################################################################
 
-bonmin_SOURCES = bonmin.cpp
+bonmin_SOURCES = BonMin.cpp
 
 bonmin_LDADD = \
 	../BonminAmplInterface/libamplinterface.la\

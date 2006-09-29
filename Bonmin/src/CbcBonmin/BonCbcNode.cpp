@@ -19,23 +19,24 @@
 #include "OsiSolverInterface.hpp"
 #include "CoinWarmStartBasis.hpp"
 #include "CbcModel.hpp"
-#include "BonminCbcNode.hpp"
-#include "IpoptInterface.hpp"
-#include "IpoptWarmStart.hpp"
+#include "BonCbcNode.hpp"
+#include "OsiTMINLPInterface.hpp"
+#include "BonminIpoptWarmStart.hpp"
+#include "BonIpoptInterface.hpp"
 
 using namespace std;
 
 
 namespace Bonmin{
 //Default constructor
-BonminCbcFullNodeInfo::BonminCbcFullNodeInfo()
+BonCbcFullNodeInfo::BonCbcFullNodeInfo()
     :
     CbcFullNodeInfo(),
     sequenceOfInfeasiblesSize_(0),
     sequenceOfUnsolvedSize_(0)
 {}
 
-BonminCbcFullNodeInfo::BonminCbcFullNodeInfo(CbcModel * model,
+BonCbcFullNodeInfo::BonCbcFullNodeInfo(CbcModel * model,
     int numberRowsAtContinuous) :
     CbcFullNodeInfo(model, numberRowsAtContinuous),
     sequenceOfInfeasiblesSize_(0),
@@ -44,7 +45,7 @@ BonminCbcFullNodeInfo::BonminCbcFullNodeInfo(CbcModel * model,
 }
 
 // Copy constructor
-BonminCbcFullNodeInfo::BonminCbcFullNodeInfo ( const BonminCbcFullNodeInfo &other):
+BonCbcFullNodeInfo::BonCbcFullNodeInfo ( const BonCbcFullNodeInfo &other):
     CbcFullNodeInfo(other),
     sequenceOfInfeasiblesSize_(other.sequenceOfInfeasiblesSize_),
     sequenceOfUnsolvedSize_(other.sequenceOfUnsolvedSize_)
@@ -53,32 +54,32 @@ BonminCbcFullNodeInfo::BonminCbcFullNodeInfo ( const BonminCbcFullNodeInfo &othe
 
 
 void
-BonminCbcFullNodeInfo::allBranchesGone()
+BonCbcFullNodeInfo::allBranchesGone()
 {
   IpoptWarmStart * ipws = dynamic_cast<IpoptWarmStart *>(basis_);
   if(ipws)
     ipws->flushPoint();
 }
 
-BonminCbcFullNodeInfo::~BonminCbcFullNodeInfo()
+BonCbcFullNodeInfo::~BonCbcFullNodeInfo()
 {}
 
 CbcNodeInfo *
-BonminCbcFullNodeInfo::clone() const
+BonCbcFullNodeInfo::clone() const
 {
-  return new BonminCbcFullNodeInfo(*this);
+  return new BonCbcFullNodeInfo(*this);
 }
 /****************************************************************************************************/
 
 // Default constructor
-BonminCbcPartialNodeInfo::BonminCbcPartialNodeInfo ()
+BonCbcPartialNodeInfo::BonCbcPartialNodeInfo ()
     : CbcPartialNodeInfo(),
     sequenceOfInfeasiblesSize_(0),
     sequenceOfUnsolvedSize_(0)
 {
 }
 // Constructor from current state
-BonminCbcPartialNodeInfo::BonminCbcPartialNodeInfo (CbcModel * model,CbcNodeInfo *parent, CbcNode *owner,
+BonCbcPartialNodeInfo::BonCbcPartialNodeInfo (CbcModel * model,CbcNodeInfo *parent, CbcNode *owner,
     int numberChangedBounds,
     const int *variables,
     const double *boundChanges,
@@ -92,7 +93,7 @@ BonminCbcPartialNodeInfo::BonminCbcPartialNodeInfo (CbcModel * model,CbcNodeInfo
   assert (ipopt);
   Ipopt::ApplicationReturnStatus optimization_status
   = ipopt->getOptStatus();
-  BonminCbcPartialNodeInfo * nlpParent = dynamic_cast<BonminCbcPartialNodeInfo *> (parent);
+  BonCbcPartialNodeInfo * nlpParent = dynamic_cast<BonCbcPartialNodeInfo *> (parent);
   int numberInfeasible = 0;
   int numberUnsolved = 0;
   if(nlpParent)//father is not root
@@ -105,7 +106,7 @@ BonminCbcPartialNodeInfo::BonminCbcPartialNodeInfo (CbcModel * model,CbcNodeInfo
 //       }
   }
   else {
-    BonminCbcFullNodeInfo * nlpRoot = dynamic_cast<BonminCbcFullNodeInfo *> (parent);
+    BonCbcFullNodeInfo * nlpRoot = dynamic_cast<BonCbcFullNodeInfo *> (parent);
     if(nlpRoot) {
       numberInfeasible = nlpRoot->getSequenceOfInfeasiblesSize();
       numberUnsolved =  nlpRoot->getSequenceOfUnsolvedSize();
@@ -123,7 +124,7 @@ BonminCbcPartialNodeInfo::BonminCbcPartialNodeInfo (CbcModel * model,CbcNodeInfo
     sequenceOfInfeasiblesSize_ = numberInfeasible + 1;
 }
 
-BonminCbcPartialNodeInfo::BonminCbcPartialNodeInfo (const BonminCbcPartialNodeInfo & rhs)
+BonCbcPartialNodeInfo::BonCbcPartialNodeInfo (const BonCbcPartialNodeInfo & rhs)
 
     : CbcPartialNodeInfo(rhs),
     sequenceOfInfeasiblesSize_(rhs.sequenceOfInfeasiblesSize_),
@@ -132,19 +133,19 @@ BonminCbcPartialNodeInfo::BonminCbcPartialNodeInfo (const BonminCbcPartialNodeIn
 {}
 
 CbcNodeInfo *
-BonminCbcPartialNodeInfo::clone() const
+BonCbcPartialNodeInfo::clone() const
 {
-  return (new BonminCbcPartialNodeInfo(*this));
+  return (new BonCbcPartialNodeInfo(*this));
 }
 
 void
-BonminCbcPartialNodeInfo::allBranchesGone()
+BonCbcPartialNodeInfo::allBranchesGone()
 {
   IpoptWarmStartDiff * ipws = dynamic_cast<IpoptWarmStartDiff *>(basisDiff_);
   if(ipws)
     ipws->flushPoint();
 }
 
-BonminCbcPartialNodeInfo::~BonminCbcPartialNodeInfo ()
+BonCbcPartialNodeInfo::~BonCbcPartialNodeInfo ()
 {}
 }

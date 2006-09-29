@@ -12,7 +12,7 @@
 #ifndef __IPAMPLTMINLP_HPP__
 #define __IPAMPLTMINLP_HPP__
 
-#include "TMINLP.hpp"
+#include "BonTMINLP.hpp"
 #include "IpSmartPtr.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "OsiCuts.hpp"

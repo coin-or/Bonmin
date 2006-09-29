@@ -1,4 +1,4 @@
-#include "BonminAmplInterface.hpp"
+#include "BonAmplInterface.hpp"
 #include <string>
 #include <sstream>
 

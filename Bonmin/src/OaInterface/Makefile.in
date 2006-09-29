@@ -58,8 +58,8 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liboainterface_la_LIBADD =
-am_liboainterface_la_OBJECTS = IpCbcDummyHeuristic.lo \
-	IpCbcOACutGenerator.lo IpCbcOACutGenerator2.lo OaMessages.lo
+am_liboainterface_la_OBJECTS = BonDummyHeuristic.lo \
+	BonOACutGenerator.lo BonOACutGenerator2.lo OAMessages.lo
 liboainterface_la_OBJECTS = $(am_liboainterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -300,10 +300,10 @@ noinst_LTLIBRARIES = liboainterface.la
 
 # List all source files, including headers
 liboainterface_la_SOURCES = \
-	IpCbcDummyHeuristic.cpp IpCbcDummyHeuristic.hpp \
-	IpCbcOACutGenerator.cpp IpCbcOACutGenerator.hpp \
-	IpCbcOACutGenerator2.cpp IpCbcOACutGenerator2.hpp \
-	OaMessages.cpp OaMessages.hpp
+	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
+	BonOACutGenerator.cpp BonOACutGenerator.hpp \
+	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
+	OAMessages.cpp OAMessages.hpp
 
 
 # This is for libtool (on Windows)
@@ -333,10 +333,10 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	IpCbcDummyHeuristic.cppbak IpCbcDummyHeuristic.hppbak \
-	IpCbcOACutGenerator.cppbak IpCbcOACutGenerator.hppbak \
-	IpCbcOACutGenerator2.cppbak IpCbcOACutGenerator2.hppbak \
-	OaMessages.cppbak OaMessages.hppbak
+	BonDummyHeuristic.cppbak BonDummyHeuristic.hppbak \
+	BonOACutGenerator.cppbak BonOACutGenerator.hppbak \
+	BonOACutGenerator2.cppbak BonOACutGenerator2.hppbak \
+	BonOaMessages.cppbak BonOaMessages.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -391,10 +391,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcDummyHeuristic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcOACutGenerator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcOACutGenerator2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OaMessages.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDummyHeuristic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OAMessages.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

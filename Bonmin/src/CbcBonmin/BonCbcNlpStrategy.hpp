@@ -8,8 +8,8 @@
 //
 // Date : 03/15/2006
 
-#ifndef BonminCbcNlpStrategy_H
-#define BonminCbcNlpStrategy_H
+#ifndef BonCbcNlpStrategy_H
+#define BonCbcNlpStrategy_H
 
 #include "CbcStrategy.hpp"
 class CglPreProcess;
@@ -19,20 +19,20 @@ class CoinWarmStartDiff;
 
 
 namespace Bonmin{
-class BonminCbcNlpStrategy : public CbcStrategy
+class CbcNlpStrategy : public CbcStrategy
 {
 public:
 
   // Default Constructor
-  BonminCbcNlpStrategy (int maxFailures,
+  CbcNlpStrategy (int maxFailures,
       int maxInfeasibles,
       int pretendFailIsInfeasible);
 
   // Copy constructor
-  BonminCbcNlpStrategy ( const BonminCbcNlpStrategy &);
+  CbcNlpStrategy ( const CbcNlpStrategy &);
 
   // Destructor
-  virtual ~BonminCbcNlpStrategy ();
+  virtual ~CbcNlpStrategy ();
 
   /// Clone
   virtual CbcStrategy * clone() const;
@@ -89,7 +89,7 @@ protected:
 
 private:
   /// Illegal Assignment operator
-  BonminCbcNlpStrategy & operator=(const BonminCbcNlpStrategy& rhs);
+  CbcNlpStrategy & operator=(const CbcNlpStrategy& rhs);
 
 };
 }

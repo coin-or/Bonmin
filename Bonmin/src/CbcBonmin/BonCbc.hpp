@@ -1,15 +1,15 @@
 #ifndef BonminBB_hpp
 #define BonminBB_hpp
 
-#include "BonminCbcParam.hpp"
+#include "BonCbcParam.hpp"
 
 
 class CbcObject;
 
 namespace Bonmin{
-class IpoptInterface;
+class OsiTMINLPInterface;
 /** Class which performs optimization of an MINLP stored in an IpoptInterface. */
-class BonminBB
+class Bab
 {
 public:
   /** Integer optimization return codes.*/
@@ -18,17 +18,17 @@ public:
       Feasible /** An integer solution to the problem has been found.*/,
       NoSolutionKnown/** No feasible solution to the problem is known*/};
   /** Constructor.*/
-  BonminBB();
+  Bab();
   /** destructor.*/
-  virtual ~BonminBB();
+  virtual ~Bab();
   /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
-  void branchAndBound(IpoptInterface &ip,
+  void branchAndBound(OsiTMINLPInterface * nlp,
       const BonminCbcParam&par);
 
   /**operator() performs the branchAndBound*/
-  void operator()(IpoptInterface &ip, const BonminCbcParam& par)
+  void operator()(OsiTMINLPInterface * nlp, const BonminCbcParam& par)
   {
-    branchAndBound(ip,par);
+    branchAndBound(nlp,par);
   }
 
   /** get the best solution known to the problem (is optimal if MipStatus is FeasibleOptimal).

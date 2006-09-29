@@ -18,8 +18,8 @@
 
 #include "CoinTime.hpp"
 
-#include "BonminAmplInterface.hpp"
-#include "CbcBonmin.hpp"
+#include "BonAmplInterface.hpp"
+#include "BonCbc.hpp"
 
 using namespace Bonmin;
 
@@ -134,28 +134,28 @@ int main (int argc, char *argv[])
   try {
   nlpSolver = new AmplInterface(argv);
     BonminCbcParam par;
-    BonminBB bb;
-    par(*nlpSolver);
-    bb(*nlpSolver, par);//do branch and bound
+    Bab bb;
+    par(nlpSolver);
+    bb(nlpSolver, par);//do branch and bound
 
     std::cout.precision(10);
 
     std::cout<<pbName<<" \t";
     std::string message;
     std::string status;
-    if(bb.mipStatus()==BonminBB::FeasibleOptimal) {
+    if(bb.mipStatus()==Bab::FeasibleOptimal) {
       status = "\t\"Finished\"";
       message = "\nbonmin: Optimal";
     }
-    else if(bb.mipStatus()==BonminBB::ProvenInfeasible) {
+    else if(bb.mipStatus()==Bab::ProvenInfeasible) {
       status = "\t\"Finished\"";
       message = "\nbonmin: Infeasible problem";
     }
-    else if(bb.mipStatus()==BonminBB::Feasible) {
+    else if(bb.mipStatus()==Bab::Feasible) {
       status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
-    else if(bb.mipStatus()==BonminBB::NoSolutionKnown) {
+    else if(bb.mipStatus()==Bab::NoSolutionKnown) {
       status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
@@ -171,8 +171,8 @@ int main (int argc, char *argv[])
     nlpSolver->writeAmplSolFile(message,bb.bestSolution(),NULL);
 
   }
-  catch(IpoptInterface::UnsolvedError &E) {
-     E.printError(std::cerr);
+  catch(IpoptInterface::UnsolvedError *E) {
+     E->printError(std::cerr);
     //There has been a failure to solve a problem with Ipopt.
     //And we will output file with information on what has been changed in the problem to make it fail.
     //Now depending on what algorithm has been called (B-BB or other) the failed problem may be at different place.

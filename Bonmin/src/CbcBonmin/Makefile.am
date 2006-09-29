@@ -17,11 +17,11 @@ noinst_LTLIBRARIES = libbonminbb.la
 
 # List all source files, including headers
 libbonminbb_la_SOURCES = \
-	CbcBonmin.cpp CbcBonmin.hpp \
-	BonminCbcLpStrategy.cpp BonminCbcLpStrategy.hpp \
-	BonminCbcNlpStrategy.cpp BonminCbcNlpStrategy.hpp \
-	BonminCbcNode.cpp BonminCbcNode.hpp \
-	BonminCbcParam.cpp BonminCbcParam.hpp
+	BonCbc.cpp BonCbc.hpp \
+	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
+	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
+	BonCbcNode.cpp BonCbcNode.hpp \
+	BonCbcParam.cpp BonCbcParam.hpp
 
 # This is for libtool (on Windows)
 libbonminbb_la_LDFLAGS = $(LT_LDFLAGS)
@@ -70,8 +70,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 include_HEADERS = \
-	CbcBonmin.hpp \
-	BonminCbcParam.hpp
+	BonCbc.hpp \
+	BonCbcParam.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -79,11 +79,11 @@ include_HEADERS = \
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonminCbcParam.cppbak BonminCbcParam.hppbak \
-	CbcBonmin.cppbak CbcBonmin.hppbak \
-	BonminCbcLpStrategy.cppbak BonminCbcLpStrategy.hppbak \
-	BonminCbcNlpStrategy.cppbak BonminCbcNlpStrategy.hppbak \
-	BonminCbcNode.cppbak BonminCbcNode.hppbak
+	BonCbcParam.cppbak BonCbcParam.hppbak \
+	BonCbc.cppbak BonCbc.hppbak \
+	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
+	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
+	BonCbcNode.cppbak BonCbcNode.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

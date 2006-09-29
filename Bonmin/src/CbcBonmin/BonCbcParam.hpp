@@ -11,7 +11,7 @@
 #ifndef BonminCbcParam_H
 #define BonminCbcParam_H
 
-#include "IpoptInterface.hpp"
+#include "OsiTMINLPInterface.hpp"
 namespace Bonmin {
 class BonminCbcParam
 {
@@ -134,13 +134,13 @@ public:
   ~BonminCbcParam()
   {}
   ///Process parameter file and extract MIP options.
-  bool extractParams(IpoptInterface &solver);
+  bool extractParams(OsiTMINLPInterface * solver);
   ///operator() will extractParameters from IpoptInterface.
-  bool operator()(IpoptInterface &solver)
+  bool operator()(OsiTMINLPInterface * solver)
   {
     return extractParams(solver);
   }
 };
-}
+} //end namespace Bonmin
 #endif
 

@@ -11,6 +11,7 @@
 #define OaMessages_H
 #include "CoinMessage.hpp"
 
+namespace Bonmin {
 enum OA_Message{
   FEASIBLE_NLP,
   INFEASIBLE_NLP,
@@ -31,4 +32,6 @@ class OaMessages : public CoinMessages
 public:
   OaMessages();
 };
+
+} //end namespace Bonmin
 #endif

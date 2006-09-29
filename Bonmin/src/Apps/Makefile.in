@@ -81,7 +81,7 @@ libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS) \
 	$(nodist_libbonmin_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_bonmin_OBJECTS = bonmin.$(OBJEXT)
+am_bonmin_OBJECTS = BonMin.$(OBJEXT)
 bonmin_OBJECTS = $(am_bonmin_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
@@ -354,7 +354,7 @@ IPOPTLIBS = \
 ########################################################################
 #                                bonmin                                #
 ########################################################################
-bonmin_SOURCES = bonmin.cpp
+bonmin_SOURCES = BonMin.cpp
 bonmin_LDADD = \
 	../BonminAmplInterface/libamplinterface.la\
 	libbonmin.la \
@@ -518,9 +518,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonMin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcBranchUser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcCompareUser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bonmin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nodeSolver.Po@am__quote@
 
 .cpp.o:

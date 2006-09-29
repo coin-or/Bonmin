@@ -7,24 +7,38 @@
 //
 // Date : 03/15/2006
 
-#include "BonminConfig.h"
 
-#include "CbcBonmin.hpp"
+//Bonmin heaader files
+#include "BonminConfig.h"
+#include "BonCbc.hpp"
+#include "BonCbcLpStrategy.hpp"
+#include "BonCbcNlpStrategy.hpp"
+#include "OsiTMINLPInterface.hpp"
+
+#include "BonCbcParam.hpp"
+
+//OA machinery
+#include "BonDummyHeuristic.hpp"
+#include "BonOACutGenerator2.hpp"
+#include "BonOACutGenerator.hpp"
+
+
+// Cbc Header file
 #include "CbcModel.hpp"
 #include "CbcBranchActual.hpp"
 #include "CbcCutGenerator.hpp"
-#include "IpoptInterface.hpp"
-#include "OsiClpSolverInterface.hpp"
 
-#include "BonminCbcLpStrategy.hpp"
-#include "BonminCbcNlpStrategy.hpp"
+//Osi Header files
+#include "OsiClpSolverInterface.hpp"
+#include "OsiAuxInfo.hpp"
 
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
 #endif
 
 
-//MILP machinery
+
+// Cut generators
 #include "CglGomory.hpp"
 #include "CglProbing.hpp"
 #include "CglKnapsackCover.hpp"
@@ -34,23 +48,17 @@
 #include "CglMixedIntegerRounding.hpp"
 #include "CglTwomir.hpp"
 #include "CglPreProcess.hpp"
+
+// Node selection
 #include "CbcCompareUser.hpp"
 #include "CbcCompareActual.hpp"
+
 #include "CbcBranchUser.hpp"
 
 
-//OA machinery
-#include "IpCbcDummyHeuristic.hpp"
-#include "IpCbcOACutGenerator2.hpp"
-#include "IpCbcOACutGenerator.hpp"
-
-#include "BonminCbcParam.hpp"
-
-#include "OsiAuxInfo.hpp"
-
-
+// Code to enable user interuption
 static CbcModel * currentBranchModel = NULL;
-static Bonmin::IpCbcOACutGenerator2 * currentOA = NULL;
+static Bonmin::OACutGenerator2 * currentOA = NULL;
 CbcModel * OAModel = NULL;
 
 #include "CoinSignal.hpp"
@@ -70,7 +78,7 @@ extern "C" {
 
 namespace Bonmin {
 /** Constructor.*/
-BonminBB::BonminBB():
+Bab::Bab():
     bestSolution_(NULL),
     mipStatus_(),
     bestObj_(1e200),
@@ -81,14 +89,14 @@ BonminBB::BonminBB():
 {}
 
 /** Destructor.*/
-BonminBB::~BonminBB()
+Bab::~Bab()
 {
   if(bestSolution_) delete [] bestSolution_;
   bestSolution_ = NULL;
 }
 /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
 void
-BonminBB::branchAndBound(IpoptInterface &nlpSolver,
+Bab::branchAndBound(OsiTMINLPInterface *nlpSolver,
     const BonminCbcParam &par)
 {
 
@@ -96,20 +104,20 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   OsiSolverInterface * si;
 
 
-  nlpSolver.messageHandler()->setLogLevel(par.nlpLogLevel);
+  nlpSolver->messageHandler()->setLogLevel(par.nlpLogLevel);
 
   if (par.algo > 0) //OA based
   {
     si = new OsiClpSolverInterface;
-    nlpSolver.extractLinearRelaxation(*si);
+    nlpSolver->extractLinearRelaxation(*si);
     // say bound dubious, does cuts at solution
     OsiBabSolver * extraStuff = new OsiBabSolver(3);
     si->setAuxiliaryInfo(extraStuff);
     delete extraStuff;
   }
   else {
-    si = &nlpSolver;
-    nlpSolver.ignoreFailures();
+    si = nlpSolver;
+    nlpSolver->ignoreFailures();
     OsiBabSolver * extraStuff = new OsiBabSolver(2);
     si->setAuxiliaryInfo(extraStuff);
     delete extraStuff;
@@ -123,7 +131,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     int specOpt = model.specialOptions();
     specOpt = 16;
     model.setSpecialOptions(specOpt);
-    BonminCbcNlpStrategy strat(par.maxFailures, par.maxInfeasible, par.failureBehavior);
+    CbcNlpStrategy strat(par.maxFailures, par.maxInfeasible, par.failureBehavior);
     model.setStrategy(strat);
   }
 
@@ -142,7 +150,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   //Setup OA generators
 
   //Resolution of nlp relaxations
-  IpCbcOACutGenerator oaGen(&nlpSolver);
+  OACutGenerator oaGen(nlpSolver);
   oaGen.setMaxDepth(100000);
   oaGen.setLogLevel(par.oaLogLevel);
 
@@ -159,7 +167,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
 #ifdef COIN_HAS_CPX
     OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
     localSearchSolver = cpxSolver;
-    nlpSolver.extractLinearRelaxation(*localSearchSolver);
+    nlpSolver->extractLinearRelaxation(*localSearchSolver);
 #else
 
     std::cerr<<"You have set an option to use CPLEX as the milp subsolver in oa decomposition."<<std::endl
@@ -181,7 +189,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
         par.milpLogLevel
                                 );
   }
-  IpCbcOACutGenerator2 oaDec(&nlpSolver, localSearchSolver, strategy, par.cutoffDecr, par.intTol, 0,1);
+  OACutGenerator2 oaDec(nlpSolver, localSearchSolver, strategy, par.cutoffDecr, par.intTol, 0,1);
   if(par.algo>0) {
     oaDec.setLocalSearchNodeLimit(1000000);
     oaDec.setMaxLocalSearch(100000);
@@ -192,7 +200,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     oaDec.setSubMilpLogLevel(par.milpLogLevel);
   }
   //Setup solver for checking validity of integral solutions
-  IpCbcOACutGenerator2 feasCheck(&nlpSolver, model.solver(),
+  OACutGenerator2 feasCheck(nlpSolver, model.solver(),
       NULL,
       par.cutoffDecr, par.intTol,
       0, 0);
@@ -201,7 +209,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     feasCheck.setMaxLocalSearch(0);
     feasCheck.setMaxLocalSearchPerNode(100000);
   }
-  IpCbcDummyHeuristic oaHeu(model, &nlpSolver);
+  DummyHeuristic oaHeu(model, nlpSolver);
 
   if(par.algo>0) {
     int numGen = 0;
@@ -233,7 +241,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     if(par.oaDecMaxTime>0.)
       {
 	model.addCutGenerator(&oaDec,1,"Outer Approximation local enumerator");      
-	IpCbcOACutGenerator2 * oaDecCopy = dynamic_cast<IpCbcOACutGenerator2 *>
+	OACutGenerator2 * oaDecCopy = dynamic_cast<OACutGenerator2 *>
 	  (model.cutGenerators()[numGen]->generator());
 	assert(oaDecCopy);
 	currentOA = oaDecCopy;
@@ -257,10 +265,10 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   //Pass over user set branching priorities to Cbc
   {
     //set priorities, prefered directions...
-    const int * priorities = nlpSolver.getPriorities();
-    const double * upPsCosts = nlpSolver.getUpPsCosts();
-    const double * downPsCosts = nlpSolver.getDownPsCosts();
-    const int * directions = nlpSolver.getBranchingDirections();
+    const int * priorities = nlpSolver->getPriorities();
+    const double * upPsCosts = nlpSolver->getUpPsCosts();
+    const double * downPsCosts = nlpSolver->getDownPsCosts();
+    const int * directions = nlpSolver->getBranchingDirections();
     bool hasPseudo = (upPsCosts!=NULL);
     model.findIntegers(true,hasPseudo);
     CbcObject ** simpleIntegerObjects = model.objects();
@@ -283,7 +291,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   }
 
   // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
-  const TMINLP::SosInfo * sos = nlpSolver.model()->sosConstraints();
+  const TMINLP::SosInfo * sos = nlpSolver->model()->sosConstraints();
   if(!par.disableSos && sos && sos->num > 0) //we have some sos constraints
   {
     const int & numSos = sos->num;
@@ -294,7 +302,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     const double * weights = sos->weights;
     //verify if model has user set priorities
     bool hasPriorities = false;
-    const int * varPriorities = nlpSolver.getPriorities();
+    const int * varPriorities = nlpSolver->getPriorities();
     int numberObjects = model.numberObjects();
     if(varPriorities)
     {
@@ -408,14 +416,14 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   bool hasFailed = false;
   if(par.algo==0)//Did we continue branching on a failure
   {
-    BonminCbcNlpStrategy * nlpStrategy = dynamic_cast<BonminCbcNlpStrategy *>(model.strategy());
+    CbcNlpStrategy * nlpStrategy = dynamic_cast<CbcNlpStrategy *>(model.strategy());
     if(nlpStrategy)
       hasFailed = nlpStrategy->hasFailed();
     else
       throw -1;
   }
   else
-    hasFailed = nlpSolver.hasContinuedOnAFailure();
+    hasFailed = nlpSolver->hasContinuedOnAFailure();
 
 
   if(hasFailed) {
@@ -431,8 +439,8 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   if(model.bestSolution()) {
     if(bestSolution_)
       delete [] bestSolution_;
-    bestSolution_ = new double[nlpSolver.getNumCols()];
-    CoinCopyN(model.bestSolution(), nlpSolver.getNumCols(), bestSolution_);
+    bestSolution_ = new double[nlpSolver->getNumCols()];
+    CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
   }
   if(!model.status()) {
     if(bestSolution_)
@@ -464,7 +472,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
 
 /** return the best known lower bound on the objective value*/
 double
-BonminBB::bestBound()
+Bab::bestBound()
 {
   if(mipStatus_ == FeasibleOptimal) return bestObj_;
   else if(mipStatus_ == ProvenInfeasible) return 1e200;

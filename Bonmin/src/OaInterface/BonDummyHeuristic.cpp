@@ -7,34 +7,34 @@
 //
 // Date : 05/26/2005
 
-#include "IpCbcDummyHeuristic.hpp"
+#include "BonDummyHeuristic.hpp"
 #include "CoinHelperFunctions.hpp"
 #include "CbcModel.hpp"
 
 #include "OsiAuxInfo.hpp"
 namespace Bonmin{
 /// Default constructor
-IpCbcDummyHeuristic::IpCbcDummyHeuristic(CbcModel &model,
-    IpoptInterface * si)
+DummyHeuristic::DummyHeuristic(CbcModel &model,
+    OsiTMINLPInterface * si)
     :
     CbcHeuristic(model),
     nlp_(si)
 {}
 
-IpCbcDummyHeuristic::IpCbcDummyHeuristic(IpoptInterface * si)
+DummyHeuristic::DummyHeuristic(OsiTMINLPInterface * si)
     :
     CbcHeuristic(),
     nlp_(si)
 {}
-/// Assign an IpoptInterface
+/// Assign an OsiTMINLPInterface
 void
-IpCbcDummyHeuristic::assignInterface(IpoptInterface * si)
+DummyHeuristic::assignInterface(OsiTMINLPInterface * si)
 {
   nlp_ = si;
 }
 /// heuristic method
 int
-IpCbcDummyHeuristic::solution(double &solutionValue, double *betterSolution)
+DummyHeuristic::solution(double &solutionValue, double *betterSolution)
 {
   OsiBabSolver * babSolver = dynamic_cast<OsiBabSolver *>
       (model_->solver()->getAuxiliaryInfo());

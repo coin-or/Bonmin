@@ -7,12 +7,12 @@
 //
 // Date :  05/26/2005
 
-#include "IpCbcOACutGenerator.hpp"
+#include "BonOACutGenerator.hpp"
 #include "OsiAuxInfo.hpp"
 
 namespace Bonmin{
 /// Default constructor
-IpCbcOACutGenerator::IpCbcOACutGenerator(IpoptInterface * si,
+OACutGenerator::OACutGenerator(OsiTMINLPInterface * si,
     int maxDepth)
     :
     CglCutGenerator(),
@@ -24,9 +24,9 @@ IpCbcOACutGenerator::IpCbcOACutGenerator(IpoptInterface * si,
   handler_ -> setLogLevel(1);
   messages_ = OaMessages();
 }
-/// Assign an IpoptInterface
+/// Assign an OsiTMINLPInterface
 void
-IpCbcOACutGenerator::assignInterface(IpoptInterface * si)
+OACutGenerator::assignInterface(OsiTMINLPInterface * si)
 
 {
   nlp_ = si;
@@ -34,7 +34,7 @@ IpCbcOACutGenerator::assignInterface(IpoptInterface * si)
 static int nCalls = 0;
 /// cut generation method
 void
-IpCbcOACutGenerator::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
+OACutGenerator::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
     const CglTreeInfo info) const
 {
   if(nlp_ == NULL) {
@@ -141,7 +141,7 @@ IpCbcOACutGenerator::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
   }
   else if(nlp_->isAbandoned() || nlp_->isIterationLimitReached()) {
     std::cerr<<"Unsolved NLP ... exit"<<std::endl;
-    nlp_->turnOnIpoptOutput();
+    //    nlp_->turnOnIpoptOutput();
     nlp_->resolve();
     throw -1;
   }
