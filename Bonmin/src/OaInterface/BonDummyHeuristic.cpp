@@ -12,38 +12,39 @@
 #include "CbcModel.hpp"
 
 #include "OsiAuxInfo.hpp"
-namespace Bonmin{
+namespace Bonmin
+{
 /// Default constructor
-DummyHeuristic::DummyHeuristic(CbcModel &model,
-    OsiTMINLPInterface * si)
-    :
-    CbcHeuristic(model),
-    nlp_(si)
-{}
+  DummyHeuristic::DummyHeuristic(CbcModel &model,
+      OsiTMINLPInterface * si)
+      :
+      CbcHeuristic(model),
+      nlp_(si)
+  {}
 
-DummyHeuristic::DummyHeuristic(OsiTMINLPInterface * si)
-    :
-    CbcHeuristic(),
-    nlp_(si)
-{}
+  DummyHeuristic::DummyHeuristic(OsiTMINLPInterface * si)
+      :
+      CbcHeuristic(),
+      nlp_(si)
+  {}
 /// Assign an OsiTMINLPInterface
-void
-DummyHeuristic::assignInterface(OsiTMINLPInterface * si)
-{
-  nlp_ = si;
-}
-/// heuristic method
-int
-DummyHeuristic::solution(double &solutionValue, double *betterSolution)
-{
-  OsiBabSolver * babSolver = dynamic_cast<OsiBabSolver *>
-      (model_->solver()->getAuxiliaryInfo());
-  //  double bestKnown = getObjValue();
-  if(babSolver) {
-    return babSolver->solution(solutionValue, betterSolution,
-        model_->getNumCols());
+  void
+  DummyHeuristic::assignInterface(OsiTMINLPInterface * si)
+  {
+    nlp_ = si;
   }
-  return 0;
-}
+/// heuristic method
+  int
+  DummyHeuristic::solution(double &solutionValue, double *betterSolution)
+  {
+    OsiBabSolver * babSolver = dynamic_cast<OsiBabSolver *>
+        (model_->solver()->getAuxiliaryInfo());
+    //  double bestKnown = getObjValue();
+    if (babSolver) {
+      return babSolver->solution(solutionValue, betterSolution,
+          model_->getNumCols());
+    }
+    return 0;
+  }
 
 }

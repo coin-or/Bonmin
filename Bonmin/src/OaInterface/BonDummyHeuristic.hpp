@@ -12,39 +12,40 @@
 #include "BonOsiTMINLPInterface.hpp"
 
 #include "CbcHeuristic.hpp"
-namespace Bonmin{
-class  DummyHeuristic : public CbcHeuristic
+namespace Bonmin
 {
-public:
-  /// Default constructor
-  DummyHeuristic(OsiTMINLPInterface * si = NULL);
-  /// Usefull constructor
-  DummyHeuristic(CbcModel &model, OsiTMINLPInterface * si = NULL);
-  ///Copy constructor
-  DummyHeuristic( const DummyHeuristic &copy):
-      CbcHeuristic(copy),
-      nlp_(copy.nlp_),
-      knowsSolution(copy.knowsSolution)
-  {}
-  /// Assign an OsiTMINLPInterface
-  void assignInterface(OsiTMINLPInterface * si);
-  /// heuristic method
-  virtual int solution(double &solutionValue, double *betterSolution);
-  virtual int solution(double &solutionValue, double *betterSolution, OsiCuts & cs)
+  class  DummyHeuristic : public CbcHeuristic
   {
-    return solution(solutionValue, betterSolution);
-  }
-  virtual CbcHeuristic * clone()const
-  {
-    return new DummyHeuristic(*this);
-  }
-  virtual void resetModel(CbcModel*)
-  {}
-private:
-  /// Pointer to the Ipopt interface
-  OsiTMINLPInterface * nlp_;
-  /// Do I have a solution?
-  bool knowsSolution;
-};
+  public:
+    /// Default constructor
+    DummyHeuristic(OsiTMINLPInterface * si = NULL);
+    /// Usefull constructor
+    DummyHeuristic(CbcModel &model, OsiTMINLPInterface * si = NULL);
+    ///Copy constructor
+    DummyHeuristic( const DummyHeuristic &copy):
+        CbcHeuristic(copy),
+        nlp_(copy.nlp_),
+        knowsSolution(copy.knowsSolution)
+    {}
+    /// Assign an OsiTMINLPInterface
+    void assignInterface(OsiTMINLPInterface * si);
+    /// heuristic method
+    virtual int solution(double &solutionValue, double *betterSolution);
+    virtual int solution(double &solutionValue, double *betterSolution, OsiCuts & cs)
+    {
+      return solution(solutionValue, betterSolution);
+    }
+    virtual CbcHeuristic * clone()const
+    {
+      return new DummyHeuristic(*this);
+    }
+    virtual void resetModel(CbcModel*)
+    {}
+  private:
+    /// Pointer to the Ipopt interface
+    OsiTMINLPInterface * nlp_;
+    /// Do I have a solution?
+    bool knowsSolution;
+  };
 }
 #endif

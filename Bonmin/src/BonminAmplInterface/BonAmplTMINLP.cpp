@@ -61,14 +61,14 @@ namespace Bonmin
   {
 
 
-    if(suffix_handler==NULL)
+    if (suffix_handler==NULL)
       suffix_handler_ = suffix_handler = new AmplSuffixHandler();
 
     // Add the suffix handler for scaling
     suffix_handler->AddAvailableSuffix("scaling_factor", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
     suffix_handler->AddAvailableSuffix("scaling_factor", AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Number_Type);
     suffix_handler->AddAvailableSuffix("scaling_factor", AmplSuffixHandler::Objective_Source, AmplSuffixHandler::Number_Type);
-  
+
     // priority suffix
     suffix_handler->AddAvailableSuffix("priority", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
     suffix_handler->AddAvailableSuffix("direction", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
@@ -85,14 +85,14 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("sosref",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
-    
+
 
     SmartPtr<AmplOptionsList> ampl_options_list = new AmplOptionsList();
     fillAmplOptionList(GetRawPtr(ampl_options_list));
     fillApplicationOptions(GetRawPtr(ampl_options_list) );
     std::string options_id = appName + "_options";
     ampl_tnlp_ = new AmplTNLP(jnlst, options, argv, suffix_handler, true,
-         ampl_options_list, options_id.c_str(),
+        ampl_options_list, options_id.c_str(),
         appName.c_str(), appName.c_str(), nl_file_content);
     /* Read suffixes */
     read_priorities();
@@ -100,7 +100,9 @@ namespace Bonmin
   }
 
   AmplTMINLP::~AmplTMINLP()
-  {delete ampl_tnlp_;}
+  {
+    delete ampl_tnlp_;
+  }
 
   void
   AmplTMINLP::read_priorities()
@@ -119,25 +121,25 @@ namespace Bonmin
 
     branch_.gutsOfDestructor();
     branch_.size = numcols;
-    if(pri) {
+    if (pri) {
       branch_.priorities = new int[numcols];
-      for(int i = 0 ; i < numcols ; i++) {
+      for (int i = 0 ; i < numcols ; i++) {
         branch_.priorities [i] = -pri[i] + 9999;
       }
     }
-    if(brac) {
+    if (brac) {
       branch_.branchingDirections = CoinCopyOfArray(brac,numcols);
     }
-    if(upPs && !dwPs) dwPs = upPs;
-    else if(dwPs && !upPs) upPs = dwPs;
-  
-    if(upPs) {
+    if (upPs && !dwPs) dwPs = upPs;
+    else if (dwPs && !upPs) upPs = dwPs;
+
+    if (upPs) {
       branch_.upPsCosts = CoinCopyOfArray(upPs,numcols);
     }
-    if(dwPs) {
+    if (dwPs) {
       branch_.downPsCosts = CoinCopyOfArray(dwPs,numcols);
     }
-  } 
+  }
 
   void
   AmplTMINLP::read_sos()
@@ -170,7 +172,7 @@ namespace Bonmin
       ampl_utils::sos_kludge(sos_.num, sos_.starts, sos_.weights);
       for (int ii=0;ii<sos_.num;ii++) {
         int ichar = sos_.types[ii];
-        if(ichar != '1') {
+        if (ichar != '1') {
           std::cerr<<"Unsuported type of sos constraint: "<<sos_.types[ii]<<std::endl;
           throw;
         }
@@ -286,10 +288,10 @@ namespace Bonmin
     DBG_ASSERT(nlnc == 0 && lnc == 0);
     //the first nlc constraints are non linear the rest is linear
     int i;
-    for(i = 0 ; i < nlc ; i++)
+    for (i = 0 ; i < nlc ; i++)
       const_types[i]=NON_LINEAR;
     // the rest is linear
-    for(; i < n_con ; i++)
+    for (; i < n_con ; i++)
       const_types[i]=LINEAR;
     return true;
   }
@@ -301,7 +303,7 @@ namespace Bonmin
   }
 
   bool AmplTMINLP::get_starting_point(Index n, bool init_x, Number* x,
-                                    bool init_z, Number* z_L, Number* z_U,
+      bool init_z, Number* z_L, Number* z_U,
       Index m, bool init_lambda, Number* lambda)
   {
     return ampl_tnlp_->get_starting_point(n, init_x, x,

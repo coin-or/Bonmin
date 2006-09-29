@@ -17,7 +17,8 @@
 #include "CoinPackedMatrix.hpp"
 #include "OsiCuts.hpp"
 // Declarations, so that we don't have to include the Ipopt AMPL headers
-namespace Ipopt{
+namespace Ipopt
+{
   class AmplTNLP;
   class AmplSuffixHandler;
   class AmplOptionsList;
@@ -91,7 +92,7 @@ namespace Bonmin
     /** provides a starting point for the nlp variables. Overloaded
     from TMINLP */
     virtual bool get_starting_point(Index n, bool init_x, Number* x,
-                                    bool init_z, Number* z_L, Number* z_U,
+        bool init_z, Number* z_L, Number* z_U,
         Index m, bool init_lambda, Number* lambda);
 
     /** evaluates the objective value for the nlp. Overloaded from TMINLP */
@@ -139,11 +140,11 @@ namespace Bonmin
     void write_solution_file(const std::string& message) const;
     //@}
 
-   
+
     virtual const BranchingInfo * branchingInfo() const
     {
       return &branch_;
-    } 
+    }
 
     virtual const SosInfo * sosConstraints() const
     {

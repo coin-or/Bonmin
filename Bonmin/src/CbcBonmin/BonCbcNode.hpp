@@ -14,115 +14,116 @@
 #include "CbcNode.hpp"
 
 
-namespace Bonmin{
-/** \brief Holds information for recreating a subproblem by incremental change
-	   from the parent for Bonmin
-
-  A BonminBonminCbcPartialNodeInfo object contains changes to the bounds and basis, and
-  additional cuts, required to recreate a subproblem by modifying and
-  augmenting the parent subproblem.
-*/
-
-class BonCbcFullNodeInfo : public CbcFullNodeInfo
+namespace Bonmin
 {
+  /** \brief Holds information for recreating a subproblem by incremental change
+  	   from the parent for Bonmin
 
-public:
-  friend class BonCbcPartialNodeInfo;
-  // Default Constructor
-  BonCbcFullNodeInfo ();
+    A BonminBonminCbcPartialNodeInfo object contains changes to the bounds and basis, and
+    additional cuts, required to recreate a subproblem by modifying and
+    augmenting the parent subproblem.
+  */
 
-  // Constructor from current state
-  BonCbcFullNodeInfo (CbcModel * model, int numberRowsAtContinuous);
-
-  // Copy constructor
-  BonCbcFullNodeInfo ( const BonCbcFullNodeInfo &);
-
-  // Destructor
-  ~BonCbcFullNodeInfo ();
-
-  /// Clone
-  virtual CbcNodeInfo * clone() const;
-
-  /**Method called when all direct sons have been explored to flush
-     useless warm start information.*/
-  virtual void allBranchesGone();
-
-  /** Number of consecutive infeasible parents only recorded if node is infeasible*/
-  inline int getSequenceOfInfeasiblesSize()
+  class BonCbcFullNodeInfo : public CbcFullNodeInfo
   {
-    return sequenceOfInfeasiblesSize_;
-  }
-  /** Number of consecutive unsolved parents only recorded if node is infeasible*/
-  inline int getSequenceOfUnsolvedSize()
+
+  public:
+    friend class BonCbcPartialNodeInfo;
+    // Default Constructor
+    BonCbcFullNodeInfo ();
+
+    // Constructor from current state
+    BonCbcFullNodeInfo (CbcModel * model, int numberRowsAtContinuous);
+
+    // Copy constructor
+    BonCbcFullNodeInfo ( const BonCbcFullNodeInfo &);
+
+    // Destructor
+    ~BonCbcFullNodeInfo ();
+
+    /// Clone
+    virtual CbcNodeInfo * clone() const;
+
+    /**Method called when all direct sons have been explored to flush
+       useless warm start information.*/
+    virtual void allBranchesGone();
+
+    /** Number of consecutive infeasible parents only recorded if node is infeasible*/
+    inline int getSequenceOfInfeasiblesSize()
+    {
+      return sequenceOfInfeasiblesSize_;
+    }
+    /** Number of consecutive unsolved parents only recorded if node is infeasible*/
+    inline int getSequenceOfUnsolvedSize()
+    {
+      return sequenceOfUnsolvedSize_;
+    }
+  private:
+    /* Data values */
+    /** Number of consecutive infeasible parents only recorded if node is infeasible*/
+    int sequenceOfInfeasiblesSize_;
+    /** Number of consecutive unsolved parents only recorded if node is infeasible*/
+    int sequenceOfUnsolvedSize_;
+  private:
+
+    /// Illegal Assignment operator
+    BonCbcFullNodeInfo & operator=(const BonCbcFullNodeInfo& rhs);
+  };
+
+  /** \brief Holds information for recreating a subproblem by incremental change
+  	   from the parent for
+
+    A BonminCbcPartialNodeInfo object contains changes to the bounds and basis, and
+    additional cuts, required to recreate a subproblem by modifying and
+    augmenting the parent subproblem.
+  */
+
+  class BonCbcPartialNodeInfo : public CbcPartialNodeInfo
   {
-    return sequenceOfUnsolvedSize_;
-  }
-private:
-  /* Data values */
-  /** Number of consecutive infeasible parents only recorded if node is infeasible*/
-  int sequenceOfInfeasiblesSize_;
-  /** Number of consecutive unsolved parents only recorded if node is infeasible*/
-  int sequenceOfUnsolvedSize_;
-private:
 
-  /// Illegal Assignment operator
-  BonCbcFullNodeInfo & operator=(const BonCbcFullNodeInfo& rhs);
-};
+  public:
+    // Default Constructor
+    BonCbcPartialNodeInfo ();
 
-/** \brief Holds information for recreating a subproblem by incremental change
-	   from the parent for 
+    // Constructor from current state
+    BonCbcPartialNodeInfo (CbcModel * model, CbcNodeInfo * parent, CbcNode * owner,
+        int numberChangedBounds,const int * variables,
+        const double * boundChanges,
+        const CoinWarmStartDiff *basisDiff) ;
 
-  A BonminCbcPartialNodeInfo object contains changes to the bounds and basis, and
-  additional cuts, required to recreate a subproblem by modifying and
-  augmenting the parent subproblem.
-*/
+    // Copy constructor
+    BonCbcPartialNodeInfo ( const BonCbcPartialNodeInfo &);
 
-class BonCbcPartialNodeInfo : public CbcPartialNodeInfo
-{
+    // Destructor
+    ~BonCbcPartialNodeInfo ();
 
-public:
-  // Default Constructor
-  BonCbcPartialNodeInfo ();
+    /// Clone
+    virtual CbcNodeInfo * clone() const;
 
-  // Constructor from current state
-  BonCbcPartialNodeInfo (CbcModel * model, CbcNodeInfo * parent, CbcNode * owner,
-      int numberChangedBounds,const int * variables,
-      const double * boundChanges,
-      const CoinWarmStartDiff *basisDiff) ;
+    /**Method called when all direct sons have been explored to flush
+       useless warm start information.*/
+    virtual void allBranchesGone();
 
-  // Copy constructor
-  BonCbcPartialNodeInfo ( const BonCbcPartialNodeInfo &);
+    /** Number of consecutive infeasible parents only recorded if node is infeasible*/
+    inline int getSequenceOfInfeasiblesSize()
+    {
+      return sequenceOfInfeasiblesSize_;
+    }
+    /** Number of consecutive unsolved parents only recorded if node is infeasible*/
+    inline int getSequenceOfUnsolvedSize()
+    {
+      return sequenceOfUnsolvedSize_;
+    }
+  private:
+    /* Data values */
+    /** Number of consecutive infeasible parents only recorded if node is infeasible*/
+    int sequenceOfInfeasiblesSize_;
+    /** Number of consecutive unsolved parents only recorded if node is infeasible*/
+    int sequenceOfUnsolvedSize_;
+  private:
 
-  // Destructor
-  ~BonCbcPartialNodeInfo ();
-
-  /// Clone
-  virtual CbcNodeInfo * clone() const;
-
-  /**Method called when all direct sons have been explored to flush
-     useless warm start information.*/
-  virtual void allBranchesGone();
-
-  /** Number of consecutive infeasible parents only recorded if node is infeasible*/
-  inline int getSequenceOfInfeasiblesSize()
-  {
-    return sequenceOfInfeasiblesSize_;
-  }
-  /** Number of consecutive unsolved parents only recorded if node is infeasible*/
-  inline int getSequenceOfUnsolvedSize()
-  {
-    return sequenceOfUnsolvedSize_;
-  }
-private:
-  /* Data values */
-  /** Number of consecutive infeasible parents only recorded if node is infeasible*/
-  int sequenceOfInfeasiblesSize_;
-  /** Number of consecutive unsolved parents only recorded if node is infeasible*/
-  int sequenceOfUnsolvedSize_;
-private:
-
-  /// Illegal Assignment operator
-  BonCbcPartialNodeInfo & operator=(const Bonmin::BonCbcPartialNodeInfo& rhs);
-};
+    /// Illegal Assignment operator
+    BonCbcPartialNodeInfo & operator=(const Bonmin::BonCbcPartialNodeInfo& rhs);
+  };
 }
 #endif
