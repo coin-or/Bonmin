@@ -9,13 +9,13 @@
 // Date : 02/15/2006
 
 
-#include "IpoptWarmStart.hpp"
+#include "BonminIpoptWarmStart.hpp"
 #include "CoinHelperFunctions.hpp"
 
 
 
-#include "IpoptInterface.hpp"
-#include "IpoptInteriorWarmStarter.hpp"
+#include "BonIpoptInterface.hpp"
+#include "BonIpoptInteriorWarmStarter.hpp"
 
 
 namespace Bonmin {

@@ -56,11 +56,11 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libipoptinterface_la_LIBADD =
-am_libipoptinterface_la_OBJECTS = BoundsReader.lo IpCbcColReader.lo \
-	IpCbcStartPointReader.lo IpoptInterface.lo \
-	OsiTMINLPInterface.lo IpoptInteriorWarmStarter.lo \
-	IpoptWarmStart.lo TMINLP2TNLP.lo TMINLP.lo IpoptSolver.lo \
-	TNLPSolver.lo TNLP2FPNLP.lo
+am_libipoptinterface_la_OBJECTS = BonBoundsReader.lo BonColReader.lo \
+	BonStartPointReader.lo BonIpoptInterface.lo \
+	OsiTMINLPInterface.lo BonIpoptInteriorWarmStarter.lo \
+	BonminIpoptWarmStart.lo BonTMINLP2TNLP.lo BonTMINLP.lo \
+	IpoptSolver.lo TNLPSolver.lo BonTNLP2FPNLP.lo
 libipoptinterface_la_OBJECTS = $(am_libipoptinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -309,19 +309,18 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LTLIBRARIES = libipoptinterface.la 
 # List all source files, including headers
 libipoptinterface_la_SOURCES = \
-	BoundsReader.cpp BoundsReader.hpp \
-	IpCbcColReader.cpp IpCbcColReader.hpp \
-	IpCbcStartPointReader.cpp IpCbcStartPointReader.hpp \
-	IpoptIntegerBias.hpp \
-	IpoptInterface.cpp IpoptInterface.hpp \
+	BonBoundsReader.cpp BonBoundsReader.hpp \
+	BonColReader.cpp BonColReader.hpp \
+	BonStartPointReader.cpp BonStartPointReader.hpp \
+	BonIpoptInterface.cpp BonIpoptInterface.hpp \
 	OsiTMINLPInterface.cpp OsiTMINLPInterface.hpp \
-	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
-	IpoptWarmStart.cpp IpoptWarmStart.hpp \
-	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
-	TMINLP.cpp TMINLP.hpp \
+	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
+	BonminIpoptWarmStart.cpp BonminIpoptWarmStart.hpp \
+	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLP.cpp BonTMINLP.hpp \
         IpoptSolver.hpp IpoptSolver.cpp \
 	TNLPSolver.hpp TNLPSolver.cpp \
-	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
+	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
 
 
 # This is for libtool (on Windows)
@@ -352,12 +351,12 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 include_HEADERS = \
-	IpoptInterface.hpp \
+	BonIpoptInterface.hpp \
 	OsiTMINLPInterface.hpp \
-	IpoptInteriorWarmStarter.hpp \
-	TMINLP2TNLP.hpp \
-	TMINLP.hpp \
-	TNLP2FPNLP.hpp \
+	BonIpoptInteriorWarmStarter.hpp \
+	BonTMINLP2TNLP.hpp \
+	BonTMINLP.hpp \
+	BonTNLP2FPNLP.hpp \
         TNLPSolver.hpp \
         IpoptSolver.hpp
 
@@ -442,17 +441,17 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BoundsReader.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcColReader.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcStartPointReader.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptInterface.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptInteriorWarmStarter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBoundsReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonColReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptInterface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptInteriorWarmStarter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStartPointReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP2TNLP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTNLP2FPNLP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonminIpoptWarmStart.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptSolver.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpoptWarmStart.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OsiTMINLPInterface.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TMINLP.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TMINLP2TNLP.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TNLP2FPNLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TNLPSolver.Plo@am__quote@
 
 .cpp.o:

@@ -7,30 +7,30 @@
 //
 // Date : 26/05/2005
 
-#ifndef _IPCBCSTARTPOINTREADER_H_
-#define _IPCBCSTARTPOINTREADER_H_
+#ifndef _BONSTARTPOINTREADER_H_
+#define _BONSTARTPOINTREADER_H_
 #include <string>
 #include <list>
 #include <fstream>
 #include <iostream>
-#include "IpoptInterface.hpp"
+#include "OsiTMINLPInterface.hpp"
 
 
 
 namespace Bonmin {
 /** This class reads a file with a starting point for Ipopt initalization. File format is number of primals number of duals then values one after another
  * Numbering of variables is first variables, then duals on lower bounds duals on upper bounds and to finish duals on constraints */
-class IpCbcStartPointReader
+class StartPointReader
 {
 public:
   /** Constructor with fileName_ given by a string (and default) */
-  IpCbcStartPointReader(std::string fileName = ""):
+  StartPointReader(std::string fileName = ""):
       fileName_(fileName),
       primals_(NULL),
       duals_(NULL)
   {}
   /** Constructor with fileName_ given by a const char * */
-  IpCbcStartPointReader(const char * fileName):
+  StartPointReader(const char * fileName):
       fileName_(fileName),
       primals_(NULL),
       duals_(NULL)
@@ -45,8 +45,8 @@ public:
     return readFile();
   }
   /** Read warmstart info and apply to an IpoptInterface */
-  bool readAndApply(IpoptInterface& solver);
-  ~IpCbcStartPointReader()
+  bool readAndApply(OsiTMINLPInterface * solver);
+  ~StartPointReader()
   {
     gutsOfDestructor();
   }

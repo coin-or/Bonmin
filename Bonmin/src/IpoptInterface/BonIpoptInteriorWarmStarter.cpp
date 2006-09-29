@@ -6,7 +6,7 @@
 //
 // Authors:  Andreas Waechter          IBM    2006-03-09
 
-#include "IpoptInteriorWarmStarter.hpp"
+#include "BonIpoptInteriorWarmStarter.hpp"
 #include "IpDenseVector.hpp"
 
 #include "IpIpoptData.hpp"

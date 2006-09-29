@@ -13,11 +13,11 @@
 #define __TMINLP2TNLP_HPP__
 
 #include "IpTNLP.hpp"
-#include "TMINLP.hpp"
+#include "BonTMINLP.hpp"
 #include "IpSmartPtr.hpp"
 #include "IpIpoptApplication.hpp"
 #include "IpOptionsList.hpp"
-#include "IpoptInteriorWarmStarter.hpp"
+#include "BonIpoptInteriorWarmStarter.hpp"
 
 namespace Bonmin
 {

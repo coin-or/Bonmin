@@ -13,7 +13,7 @@
 #define IpoptWarmStart_HPP
 #include "CoinWarmStartBasis.hpp"
 #include "CoinPackedVector.hpp"
-#include "IpoptInteriorWarmStarter.hpp"
+#include "BonIpoptInteriorWarmStarter.hpp"
 
 
 namespace Bonmin {

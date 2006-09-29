@@ -7,7 +7,7 @@
 //
 // Date : 26/09/2006
 
-#include "TMINLP.hpp"
+#include "BonTMINLP.hpp"
 #include "IpBlas.hpp"
 
 namespace Bonmin{

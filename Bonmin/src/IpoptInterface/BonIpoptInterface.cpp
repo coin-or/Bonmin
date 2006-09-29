@@ -10,13 +10,12 @@
 // Date : 12/01/2004
 
 
-#include "IpoptInterface.hpp"
-#include "TMINLP.hpp"
-#include "IpCbcColReader.hpp"
+#include "BonIpoptInterface.hpp"
+#include "BonTMINLP.hpp"
+#include "BonColReader.hpp"
 #include "CoinTime.hpp"
-#include "IpoptWarmStart.hpp"
-#include "IpoptIntegerBias.hpp"
-#include "IpoptInteriorWarmStarter.hpp"
+#include "BonminIpoptWarmStart.hpp"
+#include "BonIpoptInteriorWarmStarter.hpp"
 #include <string>
 #include <sstream>
 

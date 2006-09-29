@@ -6,26 +6,28 @@
 // Pierre Bonami, Carnegie Mellon University,
 //
 // Date : 26/05/2005
-#include "IpCbcColReader.hpp"
+#include "BonColReader.hpp"
 #include <fstream>
 #include <iostream>
+
+namespace Bonmin{
 /** Keywords of the .int file */
 static std::string keywords[]= { "priorities", "PRIORITIES",
     "special_ordered_set_1",
     "SPECIAL_ORDERED_SET_1"};
-IpCbcColReader::IpCbcColReader(const char * fileName)
+ColReader::ColReader(const char * fileName)
     :
     fileName_(), varIndices_(), varNames_()
 {
   assert(fileName != NULL);
   fileName_=fileName;
 }
-IpCbcColReader::IpCbcColReader(const std::string & fileName)
+ColReader::ColReader(const std::string & fileName)
     :
     fileName_(fileName), varIndices_(), varNames_()
 {}
 
-bool IpCbcColReader::readFile()
+bool ColReader::readFile()
 {
   std::string colFileName = fileName_;
   int size = colFileName.size();
@@ -58,10 +60,11 @@ bool IpCbcColReader::readFile()
 }
 
 void
-IpCbcColReader::copyNames(std::string *varNames, int n_var)
+ColReader::copyNames(std::string *varNames, int n_var)
 {
   assert(n_var >= 0 && (unsigned int) n_var==varNames_.size());
   for(int i = 0 ; i < n_var ; i++) {
     varNames[i] = varNames_[i];
   }
+}
 }

@@ -9,7 +9,7 @@
 #define _TNLP2FPNLP_HPP_
 
 #include "IpTNLP.hpp"
-#include "TMINLP.hpp"
+#include "BonTMINLP.hpp"
 #include "IpSmartPtr.hpp"
 
 namespace Bonmin

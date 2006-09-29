@@ -8,7 +8,7 @@
 // Date : 05/25/2005
 
 
-#include "TNLP2FPNLP.hpp"
+#include "BonTNLP2FPNLP.hpp"
 #include "IpBlas.hpp"
 namespace Bonmin
 {

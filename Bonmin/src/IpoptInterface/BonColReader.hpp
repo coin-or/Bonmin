@@ -17,6 +17,8 @@
 #include <CoinHelperFunctions.hpp>
 //#include <tr1/unordered_map>
 #include <map>
+
+namespace Bonmin{
 /** A class for reading a .col file containing name for variable (ampl generated file).
    */
 class ColReader
@@ -59,5 +61,5 @@ private:
   ///Variable names.
   std::vector<std::string> varNames_;
 };
-
+}
 #endif

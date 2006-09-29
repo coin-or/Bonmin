@@ -7,7 +7,7 @@
 //
 // Date : 26/05/2005
 
-#include "BoundsReader.hpp"
+#include "BonBoundsReader.hpp"
 
 #include <fstream>
 

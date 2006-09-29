@@ -10,7 +10,7 @@
 // Date : 12/01/2004
 
 
-#include "TMINLP2TNLP.hpp"
+#include "BonTMINLP2TNLP.hpp"
 #include "IpBlas.hpp"
 #include "IpAlgTypes.hpp"
 #include <string>

@@ -16,19 +16,18 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LTLIBRARIES = libipoptinterface.la 
 # List all source files, including headers
 libipoptinterface_la_SOURCES = \
-	BoundsReader.cpp BoundsReader.hpp \
-	IpCbcColReader.cpp IpCbcColReader.hpp \
-	IpCbcStartPointReader.cpp IpCbcStartPointReader.hpp \
-	IpoptIntegerBias.hpp \
-	IpoptInterface.cpp IpoptInterface.hpp \
+	BonBoundsReader.cpp BonBoundsReader.hpp \
+	BonColReader.cpp BonColReader.hpp \
+	BonStartPointReader.cpp BonStartPointReader.hpp \
+	BonIpoptInterface.cpp BonIpoptInterface.hpp \
 	OsiTMINLPInterface.cpp OsiTMINLPInterface.hpp \
-	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
-	IpoptWarmStart.cpp IpoptWarmStart.hpp \
-	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
-	TMINLP.cpp TMINLP.hpp \
+	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
+	BonminIpoptWarmStart.cpp BonminIpoptWarmStart.hpp \
+	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLP.cpp BonTMINLP.hpp \
         IpoptSolver.hpp IpoptSolver.cpp \
 	TNLPSolver.hpp TNLPSolver.cpp \
-	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
+	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
 
 # This is for libtool (on Windows)
 libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
@@ -58,12 +57,12 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 include_HEADERS = \
-	IpoptInterface.hpp \
+	BonIpoptInterface.hpp \
 	OsiTMINLPInterface.hpp \
-	IpoptInteriorWarmStarter.hpp \
-	TMINLP2TNLP.hpp \
-	TMINLP.hpp \
-	TNLP2FPNLP.hpp \
+	BonIpoptInteriorWarmStarter.hpp \
+	BonTMINLP2TNLP.hpp \
+	BonTMINLP.hpp \
+	BonTNLP2FPNLP.hpp \
         TNLPSolver.hpp \
         IpoptSolver.hpp
 

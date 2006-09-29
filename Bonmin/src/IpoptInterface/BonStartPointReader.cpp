@@ -6,12 +6,12 @@
 // Pierre Bonami, Carnegie Mellon University,
 //
 // Date : 26/05/2005
-#include "IpCbcStartPointReader.hpp"
+#include "BonStartPointReader.hpp"
 
 
 namespace Bonmin {
 
-  bool IpCbcStartPointReader::readFile()
+  bool StartPointReader::readFile()
   {
     std::ifstream inFile(fileName_.c_str());
     if(!inFile.is_open()) {
@@ -33,18 +33,18 @@ namespace Bonmin {
     return true;
   }
 
-  bool IpCbcStartPointReader::readAndApply(IpoptInterface& solver)
+  bool StartPointReader::readAndApply(OsiTMINLPInterface * solver)
   {
     readFile();
-    solver.setWarmStartOptions();
+    solver->setWarmStartOptions();
     if(primals_)
-      solver.setColSolution(primals_);
+      solver->setColSolution(primals_);
     else {
       std::cerr<<"No warm start info ???"<<std::endl;
       return 0;
     }
     if(duals_)
-      solver.setRowPrice(duals_);
+      solver->setRowPrice(duals_);
     else {
       std::cerr<<"No warm start info ???"<<std::endl;
       return 0;
