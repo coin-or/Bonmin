@@ -145,12 +145,6 @@ namespace Bonmin
       INTEGER
     };
 
-    /** Type of the constraints*/
-    enum ConstraintType
-    {
-      LINEAR/** Constraint contains only linear terms.*/,
-      NON_LINEAR/**Constraint contains some non-linear terms.*/
-    };
 
     /**@name Constructors/Destructors */
     //@{
@@ -172,10 +166,12 @@ namespace Bonmin
 
     /** overload this method to set the variable type. The var_types
      *  array will be allocated with length n. */
-    virtual bool get_var_types(Index n, VariableType* var_types)=0;
+    virtual bool get_variables_types(Index n, VariableType* var_types)=0;
 
-    /** overload this method to set the constraint types (linear or not)*/
-    virtual bool get_constraints_types(Index m, ConstraintType* const_types)=0;
+    /** overload this method to return the constraint linearity.
+     * array should be alocated with length at least n.*/
+    virtual bool get_constraints_linearity(Index m, 
+					   Ipopt::TNLP::LinearityType* const_types) = 0;
 
     /** overload this method to return the information about the bound
      *  on the variables and constraints. The value that indicates

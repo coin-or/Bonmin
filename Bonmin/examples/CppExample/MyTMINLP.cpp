@@ -10,7 +10,7 @@
 
 
 bool 
-MyTMINLP::get_var_types(Index n, VariableType* var_types)
+MyTMINLP::get_variables_types(Index n, VariableType* var_types)
 {
   var_types[0] = BINARY;
   var_types[1] = CONTINUOUS;
@@ -20,12 +20,12 @@ MyTMINLP::get_var_types(Index n, VariableType* var_types)
 }
 
 bool 
-MyTMINLP::get_constraints_types(Index m, ConstraintType* const_types)
+MyTMINLP::get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types)
 {
   assert (m==3);
-  const_types[0] = NON_LINEAR;
-  const_types[1] = LINEAR;
-  const_types[2] = LINEAR;
+  const_types[0] = Ipopt::TNLP::NON_LINEAR;
+  const_types[1] = Ipopt::TNLP::LINEAR;
+  const_types[2] = Ipopt::TNLP::LINEAR;
   return true;
 }
 bool 

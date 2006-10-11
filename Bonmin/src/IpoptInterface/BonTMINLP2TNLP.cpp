@@ -57,7 +57,7 @@ namespace Bonmin
     var_types_ = new TMINLP::VariableType[n_];
 
     // retrieve the variable types
-    tminlp_->get_var_types(n_, var_types_);
+    tminlp_->get_variables_types(n_, var_types_);
 
     // Allocate space for the internal copy of the variable bounds
     x_l_ = new Number[n_];

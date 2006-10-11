@@ -43,6 +43,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@COIN_HAS_FSQP_TRUE@am__append_1 = \
+@COIN_HAS_FSQP_TRUE@	BonFilterSolver.cpp BonFilterSolver.hpp
+
 subdir = src/IpoptInterface
 DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -56,11 +59,25 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libipoptinterface_la_LIBADD =
+am__libipoptinterface_la_SOURCES_DIST = BonBoundsReader.cpp \
+	BonBoundsReader.hpp BonColReader.cpp BonColReader.hpp \
+	BonStartPointReader.cpp BonStartPointReader.hpp \
+	BonIpoptInterface.cpp BonIpoptInterface.hpp \
+	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
+	BonIpoptInteriorWarmStarter.cpp \
+	BonIpoptInteriorWarmStarter.hpp BonIpoptWarmStart.cpp \
+	BonIpoptWarmStart.hpp BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLP.cpp BonTMINLP.hpp BonIpoptSolver.hpp \
+	BonIpoptSolver.cpp BonTNLPSolver.hpp BonTNLPSolver.cpp \
+	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp BonFilterSolver.cpp \
+	BonFilterSolver.hpp
+@COIN_HAS_FSQP_TRUE@am__objects_1 = BonFilterSolver.lo
 am_libipoptinterface_la_OBJECTS = BonBoundsReader.lo BonColReader.lo \
 	BonStartPointReader.lo BonIpoptInterface.lo \
 	BonOsiTMINLPInterface.lo BonIpoptInteriorWarmStarter.lo \
 	BonIpoptWarmStart.lo BonTMINLP2TNLP.lo BonTMINLP.lo \
-	BonIpoptSolver.lo BonTNLPSolver.lo BonTNLP2FPNLP.lo
+	BonIpoptSolver.lo BonTNLPSolver.lo BonTNLP2FPNLP.lo \
+	$(am__objects_1)
 libipoptinterface_la_OBJECTS = $(am_libipoptinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -81,7 +98,7 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libipoptinterface_la_SOURCES)
-DIST_SOURCES = $(libipoptinterface_la_SOURCES)
+DIST_SOURCES = $(am__libipoptinterface_la_SOURCES_DIST)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -148,6 +165,8 @@ COIN_HAS_DYLP_FALSE = @COIN_HAS_DYLP_FALSE@
 COIN_HAS_DYLP_TRUE = @COIN_HAS_DYLP_TRUE@
 COIN_HAS_FMP_FALSE = @COIN_HAS_FMP_FALSE@
 COIN_HAS_FMP_TRUE = @COIN_HAS_FMP_TRUE@
+COIN_HAS_FSQP_FALSE = @COIN_HAS_FSQP_FALSE@
+COIN_HAS_FSQP_TRUE = @COIN_HAS_FSQP_TRUE@
 COIN_HAS_GLPK_FALSE = @COIN_HAS_GLPK_FALSE@
 COIN_HAS_GLPK_TRUE = @COIN_HAS_GLPK_TRUE@
 COIN_HAS_IPOPT_FALSE = @COIN_HAS_IPOPT_FALSE@
@@ -193,6 +212,8 @@ FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
 FMPINCDIR = @FMPINCDIR@
 FMPLIB = @FMPLIB@
+FSQPINCDIR = @FSQPINCDIR@
+FSQPLIB = @FSQPLIB@
 GLPKINCDIR = @GLPKINCDIR@
 GLPKLIB = @GLPKLIB@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
@@ -308,21 +329,16 @@ AUTOMAKE_OPTIONS = foreign
 # Name of the library in this directory
 noinst_LTLIBRARIES = libipoptinterface.la 
 # List all source files, including headers
-libipoptinterface_la_SOURCES = \
-	BonBoundsReader.cpp BonBoundsReader.hpp \
-	BonColReader.cpp BonColReader.hpp \
-	BonStartPointReader.cpp BonStartPointReader.hpp \
-	BonIpoptInterface.cpp BonIpoptInterface.hpp \
-	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
-	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
-	BonIpoptWarmStart.cpp BonIpoptWarmStart.hpp \
-	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonTMINLP.cpp BonTMINLP.hpp \
-        BonIpoptSolver.hpp BonIpoptSolver.cpp \
-	BonTNLPSolver.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
-
-
+libipoptinterface_la_SOURCES = BonBoundsReader.cpp BonBoundsReader.hpp \
+	BonColReader.cpp BonColReader.hpp BonStartPointReader.cpp \
+	BonStartPointReader.hpp BonIpoptInterface.cpp \
+	BonIpoptInterface.hpp BonOsiTMINLPInterface.cpp \
+	BonOsiTMINLPInterface.hpp BonIpoptInteriorWarmStarter.cpp \
+	BonIpoptInteriorWarmStarter.hpp BonIpoptWarmStart.cpp \
+	BonIpoptWarmStart.hpp BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLP.cpp BonTMINLP.hpp BonIpoptSolver.hpp \
+	BonIpoptSolver.cpp BonTNLPSolver.hpp BonTNLPSolver.cpp \
+	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp $(am__append_1)
 # This is for libtool (on Windows)
 libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
@@ -358,7 +374,8 @@ include_HEADERS = \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
         BonTNLPSolver.hpp \
-        BonIpoptSolver.hpp
+        BonIpoptSolver.hpp \
+	BonFilterSolver.cpp
 
 
 #############################################################################
@@ -442,6 +459,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBoundsReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonColReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFilterSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptInteriorWarmStarter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptSolver.Plo@am__quote@

@@ -29,6 +29,10 @@ libipoptinterface_la_SOURCES = \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
 
+if COIN_HAS_FSQP
+libipoptinterface_la_SOURCES += \
+	BonFilterSolver.cpp BonFilterSolver.hpp
+endif
 # This is for libtool (on Windows)
 libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
@@ -64,7 +68,8 @@ include_HEADERS = \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
         BonTNLPSolver.hpp \
-        BonIpoptSolver.hpp
+        BonIpoptSolver.hpp \
+	BonFilterSolver.cpp
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #

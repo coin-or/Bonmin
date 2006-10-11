@@ -564,7 +564,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     CoinCopyN(source.jRow_    , nnz_jac,jRow_    );
 
     if(source.constTypes_ != NULL) {
-      constTypes_ = new Bonmin::TMINLP::ConstraintType[getNumRows()];
+      constTypes_ = new Ipopt::TNLP::LinearityType [getNumRows()];
       CoinCopyN(source.constTypes_, getNumRows(), constTypes_);
     }
   }
@@ -603,7 +603,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
         constTypes_ = NULL;
       }
       if(rhs.constTypes_ != NULL) {
-        constTypes_ = new Bonmin::TMINLP::ConstraintType[getNumRows()];
+        constTypes_ = new Ipopt::TNLP::LinearityType[getNumRows()];
         CoinCopyN(rhs.constTypes_, getNumRows(), constTypes_);
       }
 /*
@@ -1476,15 +1476,15 @@ int OsiTMINLPInterface::initializeJacobianArrays()
   if(constTypes_ != NULL) delete [] constTypes_;
 //  if(constTypesNum_ != NULL) delete [] constTypesNum_;
 
-  constTypes_ = new Bonmin::TMINLP::ConstraintType[getNumRows()];
-  tminlp_->get_constraints_types(getNumRows(), constTypes_);
+  constTypes_ = new Ipopt::TNLP::LinearityType[getNumRows()];
+  tminlp_->get_constraints_linearity(getNumRows(), constTypes_);
 //  constTypesNum_ = new int[getNumRows()];
   for(int i = 0; i < getNumRows() ; i++) {
-    if(constTypes_[i]==Bonmin::TMINLP::LINEAR) {
+    if(constTypes_[i]==Ipopt::TNLP::LINEAR) {
       //constTypesNum_[i] =
       nLinear_++;
     }
-    else if(constTypes_[i]==Bonmin::TMINLP::NON_LINEAR) {
+    else if(constTypes_[i]==Ipopt::TNLP::NON_LINEAR) {
       //constTypesNum_[i] = 
       nNonLinear_++;
     }
@@ -1507,7 +1507,7 @@ OsiTMINLPInterface::getConstraintViolation()
 
   double norm = 0;
   for(int i = 0; i< numrows ; i++) {
-    if(constTypes_[i] == Bonmin::TMINLP::NON_LINEAR) {
+    if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
       double rowViolation = max(0.,rowLower[i] - g[i]);
       if(rowViolation  > 0.) rowViolation  /= fabs(rowLower[i]);
       double rowViolation2 = max(0.,g[i] - rowUpper[i]);
@@ -1600,7 +1600,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
   double nlp_infty = infty_;
   
   for(int i = 0; i< m ; i++) {
-    if(constTypes_[i] == Bonmin::TMINLP::NON_LINEAR) {
+    if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
       if(rowLower[i] > - nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
       {
         binding[i] = -1;
@@ -1629,7 +1629,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
   }
 
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i] - 1] == Bonmin::TMINLP::NON_LINEAR) {
+    if(constTypes_[jRow_[i] - 1] == Ipopt::TNLP::NON_LINEAR) {
       //"clean" coefficient
       if(cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
           rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
@@ -1769,7 +1769,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   double nlp_infty = infty_;
   for(int i = 0 ; i < m ; i++) {
     {
-      if(constTypes_[i] == Bonmin::TMINLP::NON_LINEAR) {
+      if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
         //If constraint is equality not binding do not add
         if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
         {
@@ -1825,7 +1825,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
         needOrder = 1;
         break;
       }
-      if(Bonmin::TMINLP::LINEAR //Always accept coefficients from linear constraints
+      if(Ipopt::TNLP::LINEAR //Always accept coefficients from linear constraints
           || //For other clean tinys
           cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
               rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],

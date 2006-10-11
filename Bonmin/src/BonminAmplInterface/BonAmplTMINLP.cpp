@@ -186,7 +186,7 @@ namespace Bonmin
     return ampl_tnlp_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
   }
 
-  bool AmplTMINLP::get_var_types(Index n, VariableType* var_types)
+  bool AmplTMINLP::get_variables_types(Index n, VariableType* var_types)
   {
     // The variables are sorted by type in AMPL, so all we need to
     // know are the counts of each type.
@@ -279,21 +279,14 @@ namespace Bonmin
     return true;
   }
 
-  bool AmplTMINLP::get_constraints_types(Index n, ConstraintType* const_types)
+
+  /** Returns the constraint linearity.
+    * array should be alocated with length at least n.*/
+  bool 
+  AmplTMINLP::get_constraints_linearity(Index m, 
+                                        Ipopt::TNLP::LinearityType* const_types)
   {
-    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
-    //check that n is good
-    DBG_ASSERT(n == n_con);
-    // check that there are no network constraints
-    DBG_ASSERT(nlnc == 0 && lnc == 0);
-    //the first nlc constraints are non linear the rest is linear
-    int i;
-    for (i = 0 ; i < nlc ; i++)
-      const_types[i]=NON_LINEAR;
-    // the rest is linear
-    for (; i < n_con ; i++)
-      const_types[i]=LINEAR;
-    return true;
+    return ampl_tnlp_->get_constraints_linearity(m, const_types);
   }
 
   bool AmplTMINLP::get_bounds_info(Index n, Number* x_l, Number* x_u,

@@ -47,13 +47,13 @@ public:
      \param n size of var_types (has to be equal to the number of variables in the problem)
   \param var_types types of the variables (has to be filled by function).
   */
-  virtual bool get_var_types(Index n, VariableType* var_types);
+  virtual bool get_variables_types(Index n, VariableType* var_types);
  
   /** Pass the type of the constraints (LINEAR, NON_LINEAR) to the optimizer.
   \param m size of const_types (has to be equal to the number of constraints in the problem)
   \param const_types types of the constraints (has to be filled by function).
   */
-  virtual bool get_constraints_types(Index m, ConstraintType* const_types);
+  virtual bool get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types);
 //@}  
     
   /** \name Overloaded functions defining a TNLP.

@@ -32,6 +32,7 @@ namespace Bonmin{
   IpoptSolver::Initialize(std::istream &is)
   {
     app_.Initialize(is);
+    setMinlpDefaults(app_.Options());
   }
 
   TNLPSolver::ReturnStatus
