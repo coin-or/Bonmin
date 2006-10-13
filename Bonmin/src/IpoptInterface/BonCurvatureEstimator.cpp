@@ -151,19 +151,21 @@ namespace Bonmin
 
   CurvatureEstimator::~CurvatureEstimator()
   {
-    delete [] irows_jac_;
-    delete [] jcols_jac_;
-    delete [] jac_vals_;
-    delete [] irows_hess_;
-    delete [] jcols_hess_;
-    delete [] hess_vals_;
-    delete [] x_l_;
-    delete [] x_u_;
-    delete [] g_l_;
-    delete [] g_u_;
-    delete [] x_free_map_;
-    delete [] g_fixed_map_;
-    delete [] lambda_;
+    if (initialized_) {
+      delete [] irows_jac_;
+      delete [] jcols_jac_;
+      delete [] jac_vals_;
+      delete [] irows_hess_;
+      delete [] jcols_hess_;
+      delete [] hess_vals_;
+      delete [] x_l_;
+      delete [] x_u_;
+      delete [] g_l_;
+      delete [] g_u_;
+      delete [] x_free_map_;
+      delete [] g_fixed_map_;
+      delete [] lambda_;
+    }
   }
 
   bool CurvatureEstimator::Initialize()
@@ -240,6 +242,10 @@ namespace Bonmin
     Number& dTHd)
   {
     DBG_ASSERT(n == n_);
+
+    if (!initialized_) {
+      Initialize();
+    }
 
     if (new_bounds) new_activities = true;
 
