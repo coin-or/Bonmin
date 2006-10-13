@@ -362,8 +362,8 @@ namespace Bonmin
     bool isFortran = index_style_ == TNLP::FORTRAN_STYLE;
     if(iRow != NULL)
     {
-      DBG_ASSERT(iCol != NULL);
-      DBG_ASSERT(values == NULL)
+      DBG_ASSERT(jCol != NULL);
+      DBG_ASSERT(values == NULL);
       
       int nnz = nele_jac - tminlp_->linearCutsNnz_ ;
       for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++)
@@ -374,7 +374,7 @@ namespace Bonmin
     }
     else
     {
-      DBG_ASSERT(iCol == NULL);
+      DBG_ASSERT(jCol == NULL);
       DBG_ASSERT(values != NULL);
       IpBlasDcopy(tminlp_->linearCutsNnz_ , tminlp_->elems_, 1, &values[nele_jac - tminlp_->linearCutsNnz_],1);
     }

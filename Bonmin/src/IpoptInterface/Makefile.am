@@ -18,6 +18,7 @@ noinst_LTLIBRARIES = libipoptinterface.la
 libipoptinterface_la_SOURCES = \
 	BonBoundsReader.cpp BonBoundsReader.hpp \
 	BonColReader.cpp BonColReader.hpp \
+	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonIpoptInterface.cpp BonIpoptInterface.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
@@ -42,7 +43,9 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg/TMatrices` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Algorithm` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Algorithm/LinearSolvers` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Apps/AmplSolver` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
