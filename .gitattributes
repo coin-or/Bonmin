@@ -19,6 +19,7 @@ Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
 Bonmin/inc/config_bonmin.h.in -text
 Bonmin/src/IpoptInterface/BonFilterSolver.cpp -text
+Bonmin/src/IpoptInterface/BonFilterSolver.hpp -text
 Bonmin/src/IpoptInterface/BonIpoptSolver.cpp -text
 Bonmin/src/IpoptInterface/BonIpoptSolver.hpp -text
 Bonmin/src/IpoptInterface/BonOsiTMINLPInterface.cpp -text
