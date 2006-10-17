@@ -11,7 +11,7 @@
 
 #include "IpIpoptData.hpp"
 #include "IpIpoptCalculatedQuantities.hpp"
-
+namespace Bonmin {
 IpoptInteriorWarmStarter::
 IpoptInteriorWarmStarter(Index n,
     const Number* x_l, const Number* x_u,
@@ -212,3 +212,5 @@ WarmStartIterate(Index n, const Number* x_l_new,
 
   return true;
 }
+}
+

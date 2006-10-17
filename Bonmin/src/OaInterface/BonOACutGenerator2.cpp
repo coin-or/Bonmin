@@ -343,7 +343,7 @@ namespace Bonmin
 
     bool deleteSi = false;
     if (si_ == NULL) {
-      si_ = si.clone();
+      si_ = si.clone(1);
       deleteSi = true;
     }
     else

@@ -17,7 +17,8 @@
 
 #include "CoinTime.hpp"
 
-#include "BonIpoptInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
+#include "BonIpoptSolver.hpp"
 #include "MyTMINLP.hpp"
 #include "BonCbc.hpp"
 
@@ -26,8 +27,9 @@
 int main (int argc, char *argv[])
 {
   using namespace Ipopt;
+  using namespace Bonmin;
   SmartPtr<TMINLP> tminlp = new MyTMINLP;
-  IpoptInterface nlpSolver(tminlp);
+  OsiTMINLPInterface nlpSolver(tminlp, new IpoptSolver);
   
   //Option can be set here directly either to bonmin or ipopt
   nlpSolver.retrieve_options()->SetNumericValue("bonmin.time_limit", 1); //changes bonmin's time limit
@@ -71,11 +73,11 @@ int main (int argc, char *argv[])
     <<std::endl;
 
   }
-  catch(IpoptInterface::UnsolvedError *E) {
+  catch(TNLPSolver::UnsolvedError *E) {
     //There has been a failure to solve a problem with Ipopt.
     std::cerr<<"Ipopt has failed to solve a problem"<<std::endl;
   }
-  catch(IpoptInterface::SimpleError &E) {
+  catch(OsiTMINLPInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
 	     <<std::endl
 	     <<E.message()<<std::endl;

@@ -20,7 +20,6 @@ libipoptinterface_la_SOURCES = \
 	BonColReader.cpp BonColReader.hpp \
 	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
-	BonIpoptInterface.cpp BonIpoptInterface.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
 	BonIpoptWarmStart.cpp BonIpoptWarmStart.hpp \
@@ -64,7 +63,6 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 include_HEADERS = \
-	BonIpoptInterface.hpp \
 	BonOsiTMINLPInterface.hpp \
 	BonIpoptInteriorWarmStarter.hpp \
 	BonTMINLP2TNLP.hpp \
@@ -98,18 +96,17 @@ uninstall-local:
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonBoundsReader.cpp BonBoundsReader.hpp \
-	BonColReader.cpp BonColReader.hpp \
-	BonStartPointReader.cpp BonStartPointReader.hpp \
-	BonIpoptInterface.cpp BonIpoptInterface.hpp \
-	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
-	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
-	BonIpoptWarmStart.cpp BonIpoptWarmStart.hpp \
-	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonTMINLP.cpp BonTMINLP.hpp \
-        BonIpoptSolver.hpp BonIpoptSolver.cpp \
-	BonTNLPSolver.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
+	BonBoundsReaderbak.cpp BonBoundsReaderbak.hpp \
+	BonColReaderbak.cpp BonColReaderbak.hpp \
+	BonStartPointReaderbak.cpp BonStartPointReader.hpp \
+	BonOsiTMINLPInterfacebak.cpp BonOsiTMINLPInterface.hpp \
+	BonIpoptInteriorWarmStarterbak.cpp BonIpoptInteriorWarmStarter.hpp \
+	BonIpoptWarmStartbak.cpp BonIpoptWarmStart.hpp \
+	BonTMINLP2TNLPbak.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLPbak.cpp BonTMINLP.hpp \
+        BonIpoptSolverbak.hpp BonIpoptSolver.cpp \
+	BonTNLPSolverbak.hpp BonTNLPSolver.cpp \
+	BonTNLP2FPNLPbak.cpp BonTNLP2FPNLP.hpp
 
 
 ASTYLE = @ASTYLE@

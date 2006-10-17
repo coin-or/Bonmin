@@ -6,21 +6,21 @@
 namespace Bonmin
 {
   /** Default constructor */
-  AmplInterface::AmplInterface(): IpoptInterface(), amplTminlp_(NULL)
+  AmplInterface::AmplInterface(): OsiTMINLPInterface(), amplTminlp_(NULL)
   {}
 
   /** Constructor with inputed ampl command line (reads model from nl file)*/
-  AmplInterface::AmplInterface(char **& amplArgs)
+  AmplInterface::AmplInterface(char **& amplArgs, SmartPtr<TNLPSolver> app)
       :
-      IpoptInterface(),
+      OsiTMINLPInterface(),
       amplTminlp_(NULL)
   {
-    readAmplNlFile(amplArgs, NULL, NULL);
+    readAmplNlFile(amplArgs, NULL, NULL, app);
   }
 
   /** Copy constructor */
   AmplInterface::AmplInterface(const AmplInterface &other):
-      IpoptInterface(other), amplTminlp_(NULL)
+      OsiTMINLPInterface(other), amplTminlp_(NULL)
   {
     amplTminlp_ = dynamic_cast<Bonmin::AmplTMINLP *> (GetRawPtr(tminlp_));
   }
@@ -41,12 +41,13 @@ namespace Bonmin
   void
   AmplInterface::readAmplNlFile(char**& filename,
       std::string* ipopt_file_content,
-      std::string* nl_file_content)
+      std::string* nl_file_content,
+      Ipopt::SmartPtr<TNLPSolver> app)
   {
 
 
 
-    app_ = new IpoptSolver;
+    app_ = app->createNew();
 
     SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
     register_ALL_options(roptions);

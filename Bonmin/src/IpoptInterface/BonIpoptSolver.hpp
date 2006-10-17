@@ -12,11 +12,35 @@
 #include "BonTNLPSolver.hpp"
 #include "IpIpoptApplication.hpp"
 
+
 namespace Bonmin{
 class IpoptSolver: public TNLPSolver {
 public:
+class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
+{
+ public:
+  UnsolvedIpoptError(int errorNum = 10000):
+  TNLPSolver::UnsolvedError(errorNum)
+  {}
+  virtual const std::string& errorName() const;
+ 
+  virtual const std::string& solverName() const; 
+  virtual ~UnsolvedIpoptError(){}
+  private:
+  static std::string errorNames [17];
+  static std::string solverName_;
+};
+
+  virtual UnsolvedError * newUnsolvedError(int num){
+    return new UnsolvedIpoptError(num);}
+
+
+
   /// Constructor
-  IpoptSolver():app_(){}
+  IpoptSolver():
+    app_(),
+    warmStartStrategy_(1)
+  {}
 
   ///virtual constructor
   virtual TNLPSolver * createNew();
@@ -40,6 +64,22 @@ public:
 
   /// Resolves a problem expresses as a TNLP 
   virtual TNLPSolver::ReturnStatus ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp);
+
+  /// Set the warm start in the solver
+  virtual bool setWarmStart(const CoinWarmStart * warm,
+                           Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
+
+  /// Get the warm start form the solver
+  virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<Bonmin::TMINLP2TNLP> tnlp) const;
+
+  virtual CoinWarmStart * getEmptyWarmStart() const;
+
+  /// Enable the warm start options in the solver
+  virtual void enableWarmStart();
+
+  /// Disable the warm start options in the solver
+  virtual void disableWarmStart();
+
   //@}
 
   ///Get a pointer to RegisteredOptions (generally used to add new ones)
@@ -56,6 +96,11 @@ public:
 
    /// Get the iteration count of the last optimization.
    virtual int IterationCount();
+
+  /// turn off all output from the solver 
+  virtual void turnOffOutput();
+  /// turn on all output from the solver
+  virtual void turnOnOutput();
 
   /// Return status of last optimization
   Ipopt::ApplicationReturnStatus getOptStatus() const
@@ -76,7 +121,16 @@ public:
   Ipopt::IpoptApplication app_;
   /** return status of last optimization.*/
   Ipopt::ApplicationReturnStatus optimizationStatus_;
- 
+    //@}
+
+  /** Warm start strategy :
+  <ol>
+  <li> no warm start,</li>
+  <li> simple warm start (optimal point),</li>
+  <li> more elaborate strategies (interior point...).</li>
+  </ol>
+  */
+  int warmStartStrategy_;
 };
 }
 #endif

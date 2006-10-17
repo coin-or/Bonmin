@@ -63,7 +63,6 @@ am__libipoptinterface_la_SOURCES_DIST = BonBoundsReader.cpp \
 	BonBoundsReader.hpp BonColReader.cpp BonColReader.hpp \
 	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
-	BonIpoptInterface.cpp BonIpoptInterface.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonIpoptInteriorWarmStarter.cpp \
 	BonIpoptInteriorWarmStarter.hpp BonIpoptWarmStart.cpp \
@@ -75,10 +74,10 @@ am__libipoptinterface_la_SOURCES_DIST = BonBoundsReader.cpp \
 @COIN_HAS_FSQP_TRUE@am__objects_1 = BonFilterSolver.lo
 am_libipoptinterface_la_OBJECTS = BonBoundsReader.lo BonColReader.lo \
 	BonCurvatureEstimator.lo BonStartPointReader.lo \
-	BonIpoptInterface.lo BonOsiTMINLPInterface.lo \
-	BonIpoptInteriorWarmStarter.lo BonIpoptWarmStart.lo \
-	BonTMINLP2TNLP.lo BonTMINLP.lo BonIpoptSolver.lo \
-	BonTNLPSolver.lo BonTNLP2FPNLP.lo $(am__objects_1)
+	BonOsiTMINLPInterface.lo BonIpoptInteriorWarmStarter.lo \
+	BonIpoptWarmStart.lo BonTMINLP2TNLP.lo BonTMINLP.lo \
+	BonIpoptSolver.lo BonTNLPSolver.lo BonTNLP2FPNLP.lo \
+	$(am__objects_1)
 libipoptinterface_la_OBJECTS = $(am_libipoptinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -333,8 +332,7 @@ noinst_LTLIBRARIES = libipoptinterface.la
 libipoptinterface_la_SOURCES = BonBoundsReader.cpp BonBoundsReader.hpp \
 	BonColReader.cpp BonColReader.hpp BonCurvatureEstimator.cpp \
 	BonCurvatureEstimator.hpp BonStartPointReader.cpp \
-	BonStartPointReader.hpp BonIpoptInterface.cpp \
-	BonIpoptInterface.hpp BonOsiTMINLPInterface.cpp \
+	BonStartPointReader.hpp BonOsiTMINLPInterface.cpp \
 	BonOsiTMINLPInterface.hpp BonIpoptInteriorWarmStarter.cpp \
 	BonIpoptInteriorWarmStarter.hpp BonIpoptWarmStart.cpp \
 	BonIpoptWarmStart.hpp BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
@@ -371,7 +369,6 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 include_HEADERS = \
-	BonIpoptInterface.hpp \
 	BonOsiTMINLPInterface.hpp \
 	BonIpoptInteriorWarmStarter.hpp \
 	BonTMINLP2TNLP.hpp \
@@ -395,18 +392,17 @@ ConfigHeader = BonminConfig.h
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonBoundsReader.cpp BonBoundsReader.hpp \
-	BonColReader.cpp BonColReader.hpp \
-	BonStartPointReader.cpp BonStartPointReader.hpp \
-	BonIpoptInterface.cpp BonIpoptInterface.hpp \
-	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
-	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
-	BonIpoptWarmStart.cpp BonIpoptWarmStart.hpp \
-	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonTMINLP.cpp BonTMINLP.hpp \
-        BonIpoptSolver.hpp BonIpoptSolver.cpp \
-	BonTNLPSolver.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
+	BonBoundsReaderbak.cpp BonBoundsReaderbak.hpp \
+	BonColReaderbak.cpp BonColReaderbak.hpp \
+	BonStartPointReaderbak.cpp BonStartPointReader.hpp \
+	BonOsiTMINLPInterfacebak.cpp BonOsiTMINLPInterface.hpp \
+	BonIpoptInteriorWarmStarterbak.cpp BonIpoptInteriorWarmStarter.hpp \
+	BonIpoptWarmStartbak.cpp BonIpoptWarmStart.hpp \
+	BonTMINLP2TNLPbak.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLPbak.cpp BonTMINLP.hpp \
+        BonIpoptSolverbak.hpp BonIpoptSolver.cpp \
+	BonTNLPSolverbak.hpp BonTNLPSolver.cpp \
+	BonTNLP2FPNLPbak.cpp BonTNLP2FPNLP.hpp
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -465,7 +461,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonColReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvatureEstimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFilterSolver.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptInteriorWarmStarter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonIpoptWarmStart.Plo@am__quote@

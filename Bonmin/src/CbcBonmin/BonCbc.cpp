@@ -266,18 +266,20 @@ namespace Bonmin
       const int * directions = nlpSolver->getBranchingDirections();
       bool hasPseudo = (upPsCosts!=NULL);
       model.findIntegers(true,hasPseudo);
-      CbcObject ** simpleIntegerObjects = model.objects();
+      OsiObject ** simpleIntegerObjects = model.objects();
       int numberObjects = model.numberObjects();
       for (int i = 0 ; i < numberObjects ; i++)
       {
-        int iCol = simpleIntegerObjects[i]->columnNumber();
+	CbcObject * object = dynamic_cast<CbcObject *>
+	  (simpleIntegerObjects[i]);
+        int iCol = object->columnNumber();
         if (priorities)
-          simpleIntegerObjects[i]->setPriority(priorities[iCol]);
+          object->setPriority(priorities[iCol]);
         if (directions)
-          simpleIntegerObjects[i]->setPreferredWay(directions[iCol]);
+          object->setPreferredWay(directions[iCol]);
         if (upPsCosts) {
           CbcSimpleIntegerPseudoCost * pscObject =
-            dynamic_cast<CbcSimpleIntegerPseudoCost*> (simpleIntegerObjects[i]);
+            dynamic_cast<CbcSimpleIntegerPseudoCost*> (object);
           pscObject->setUpPseudoCost(upPsCosts[iCol]);
           pscObject->setDownPseudoCost(downPsCosts[iCol]);
         }

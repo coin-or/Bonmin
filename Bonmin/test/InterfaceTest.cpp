@@ -17,7 +17,7 @@ using namespace Bonmin;
 /** Test function for the Osi interface to Ipopt (or any nlp solver). <br>
     If Solver passes all the test then it should have everything needed to be integrated into bonmin. */
 
-void testGetMethods(IpoptInterface &si)
+void testGetMethods(OsiTMINLPInterface &si)
 {
     CoinRelFltEq eq;// to test equality of doubles    
     std::cout<<"Checking get functions"<<std::endl;
@@ -80,7 +80,7 @@ void testGetMethods(IpoptInterface &si)
       //assert(si.getInfinity()>1e50);
       std::cout<<"Test passed"<<std::endl;                  
 }
-void testOptimAndSolutionQuery(IpoptInterface &si)
+void testOptimAndSolutionQuery(OsiTMINLPInterface & si)
 {
     CoinRelFltEq eq(1e-07);// to test equality of doubles    
     std::cout<<"Testing optimization methods and solution query"<<std::endl;
@@ -123,7 +123,7 @@ void testOptimAndSolutionQuery(IpoptInterface &si)
 }
 
 ///Test set methods
-void testSetMethods(IpoptInterface &si)
+void testSetMethods(OsiTMINLPInterface &si)
 {
     CoinRelFltEq eq(1e-07);// to test equality of doubles    
     si.setColLower(2,1.);
@@ -225,7 +225,7 @@ void interfaceTest()
   /**********************************************************************************/
   /*   Test constructors                                                                                                              */
   /**********************************************************************************/
-  std::cout<<"Test IpoptInterface"<<std::endl;
+  std::cout<<"Test OsiTMINLPInterface with Ipopt solver"<<std::endl;
   // Test usefull constructor
   {
         //read a toy problem and do various tests
@@ -248,7 +248,7 @@ void interfaceTest()
        const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
        const char ** argv = args;
       SmartPtr<TMINLP> ampl_tminlp = new AmplTMINLP(ConstPtr(app->getIpoptApp().Jnlst()), app->Options(), const_cast<char**&>(argv));
-      IpoptInterface si(ampl_tminlp);
+      OsiTMINLPInterface si(ampl_tminlp, new IpoptSolver);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
     <<std::endl<<"Testing usefull constructor"<<std::endl
     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
@@ -279,9 +279,9 @@ void interfaceTest()
       const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
       const char ** argv = args;
       SmartPtr<TMINLP> ampl_tminlp = new AmplTMINLP(ConstPtr(app->Jnlst()),  app->Options(), const_cast<char**&>(argv));
-      IpoptInterface si1(ampl_tminlp);
+      OsiTMINLPInterface si1(ampl_tminlp, new IpoptSolver);
       
-      IpoptInterface si(si1);
+      OsiTMINLPInterface si(si1);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
     <<std::endl<<"Testing copy constructor"<<std::endl
     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;

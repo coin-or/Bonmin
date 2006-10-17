@@ -17,7 +17,7 @@
 
 
 namespace Bonmin {
-class IpoptInterface;
+class TMINLP2TNLP;
 
 /** \brief Class for storing warm start informations for Ipopt.<br>
  * For practical reason (integration in Cbc) this class inherits from
@@ -31,7 +31,7 @@ public:
   /// Default constructor
   IpoptWarmStart(bool empty = 1, int numvars = 0, int numcont = 0);
   /// Usefull constructor, stores the current optimum of ipopt
-  IpoptWarmStart(const IpoptInterface &ipopt,
+  IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
       SmartPtr<IpoptInteriorWarmStarter> warm_starter);
   /// Copy constructor
   IpoptWarmStart( const IpoptWarmStart &other, bool ownValues = 1);

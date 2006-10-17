@@ -574,6 +574,13 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
   }
 }
 
+OsiSolverInterface * 
+OsiTMINLPInterface::clone(bool copyData ) const
+{
+  if(copyData)
+    return new OsiTMINLPInterface(*this);
+  else return new OsiTMINLPInterface;
+}
 
 /// Assignment operator
 OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs)
@@ -838,7 +845,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
 {
   //std::cerr<<"Resolving the problem for robustness"<<std::endl;
   //First remove warm start point and resolve
-  unsetWarmStartOptions();
+  app_->disableWarmStart();
   messageHandler()->message(WARNING_RESOLVING,
       messages_)
   <<1<< CoinMessageEol ;
@@ -1240,6 +1247,28 @@ OsiTMINLPInterface::setRowPrice(const double * rowprice)
   hasBeenOptimized_ = false;
 }
 
+  /*! \brief Get an empty warm start object
+
+  This routine returns an empty CoinWarmStartBasis object. Its purpose is
+  to provide a way to give a client a warm start basis object of the
+  appropriate type, which can resized and modified as desired.
+  */
+CoinWarmStart *
+OsiTMINLPInterface::getEmptyWarmStart () const
+{return app_->getEmptyWarmStart();}
+
+  /** Get warmstarting information */
+CoinWarmStart* 
+OsiTMINLPInterface::getWarmStart() const
+{return app_->getWarmStart(problem_);}
+  /** Set warmstarting information. Return true/false depending on whether
+      the warmstart information was accepted or not. */
+bool 
+OsiTMINLPInterface::setWarmStart(const CoinWarmStart* warmstart)
+{
+  hasBeenOptimized_ = false;
+  return app_->setWarmStart(warmstart, problem_);
+}
 
 /** Set the index-th variable to be a continuous variable */
 void
@@ -1443,17 +1472,11 @@ OsiTMINLPInterface::randomStartingPoint()
     //  std::cout<<interval<<"\t";
   }
   //std::cout<<std::endl;
-  unsetWarmStartOptions();
+  app_->disableWarmStart();
   setColSolution(sol);
   delete [] sol;
 }
 
-
-void
-OsiTMINLPInterface::UnsolvedError::printError(std::ostream &os)
-{
-  os<<solverName()<<" exited with error code "<<errorNum_<<" "<<errorName()<<std::endl;
-}
 
 
 /** This methods initialiaze arrays for storing the jacobian */
@@ -1947,7 +1970,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   }
 
 
-  setWarmStartOptions();
+  app_->enableWarmStart();
   setColSolution(problem()->x_sol());
   setRowPrice(problem()->duals_sol());
 
@@ -2139,7 +2162,7 @@ OsiTMINLPInterface::resolve()
     app_->Options()->SetStringValue("warm_start_same_structure", "no");
   }
 
-  setWarmStartOptions();
+  app_->enableWarmStart();
 
   solveAndCheckErrors(1,1,"resolve");
   

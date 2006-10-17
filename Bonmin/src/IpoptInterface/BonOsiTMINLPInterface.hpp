@@ -69,33 +69,10 @@ class SimpleError : public CoinError
   }
   ;
 
-  //#############################################################################
-
-  /** We will throw this error when a problem is not solved.
-      Eventually store the error code from Ipopt*/
-  class UnsolvedError
-  {
-  public:
-    /** Constructor */
-    UnsolvedError(int errorNum):errorNum_(errorNum)
-    {}
-    /** Print error message.*/
-    void printError(std::ostream & os);
-    /** Get the string corresponding to error.*/
-    virtual const std::string& errorName() const = 0;
-    /** Return the name of the solver. */
-    virtual const std::string& solverName() const = 0;
-    /** Return error number. */
-    int errorNum() const{
-    return errorNum_;}
-    /** destructor. */
-    virtual ~UnsolvedError(){}
-  private:
-    int errorNum_;
+  // Error when problem is not solved
+  TNLPSolver::UnsolvedError * newUnsolvedError(int num){
+    return app_->newUnsolvedError(num);
   }
-  ;
-
-  virtual UnsolvedError * newUnsolvedError(int num) = 0;
   //#############################################################################
 
 
@@ -153,6 +130,9 @@ class Messages : public CoinMessages
   /** Copy constructor
   */
   OsiTMINLPInterface (const OsiTMINLPInterface &);
+
+  /** Virtual copy constructor */
+  OsiSolverInterface * clone(bool copyData = true) const;
 
   /// Assignment operator
   OsiTMINLPInterface & operator=(const OsiTMINLPInterface& rhs);
@@ -513,17 +493,15 @@ class Messages : public CoinMessages
   to provide a way to give a client a warm start basis object of the
   appropriate type, which can resized and modified as desired.
   */
-  virtual CoinWarmStart *getEmptyWarmStart () const = 0;
+  virtual CoinWarmStart *getEmptyWarmStart () const;
 
   /** Get warmstarting information */
-  virtual CoinWarmStart* getWarmStart() const = 0;
+  virtual CoinWarmStart* getWarmStart() const;
 
   /** Set warmstarting information. Return true/false depending on whether
       the warmstart information was accepted or not. */
-  virtual bool setWarmStart(const CoinWarmStart* warmstart) = 0;
+  virtual bool setWarmStart(const CoinWarmStart* warmstart);
 
-  virtual void setWarmStartOptions() = 0;
-  virtual void unsetWarmStartOptions() = 0;
 
 
   void randomStartingPoint();
@@ -784,7 +762,15 @@ class Messages : public CoinMessages
   {
     return GetRawPtr(tminlp_);
   }
-  
+   const Bonmin::TNLPSolver * solver() const
+  {
+    return GetRawPtr(app_);
+  } 
+ 
+  Bonmin::TNLPSolver * solver()
+  {
+    return GetRawPtr(app_);
+  } 
   /** Methods to build outer approximations */
   //@{
   /** \brief Extract a linear relaxation of the MINLP.

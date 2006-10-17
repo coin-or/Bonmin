@@ -80,4 +80,13 @@ namespace Bonmin{
     delete [] x_sol;
     return 1;
   }
+
+void
+TNLPSolver::UnsolvedError::printError(std::ostream &os)
+{
+  os<<solverName()<<" exited with error code "<<errorNum_<<" "<<errorName()<<std::endl;
 }
+
+
+}//end namespace Bonmin
+

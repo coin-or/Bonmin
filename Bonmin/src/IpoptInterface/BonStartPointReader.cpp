@@ -36,7 +36,7 @@ namespace Bonmin {
   bool StartPointReader::readAndApply(OsiTMINLPInterface * solver)
   {
     readFile();
-    solver->setWarmStartOptions();
+    solver->solver()->enableWarmStart();
     if(primals_)
       solver->setColSolution(primals_);
     else {

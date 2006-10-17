@@ -14,7 +14,7 @@
 #include <vector>
 
 using namespace Ipopt;
-
+namespace Ipopt {
 class IpoptInteriorWarmStarter : public ReferencedObject
 {
 public:
@@ -99,5 +99,5 @@ private:
   std::vector<Number> stored_compl_;
   //@}
 };
-
+}
 #endif

@@ -1,18 +1,19 @@
 #ifndef BonminAmplInterface_H
 #define BonminAmplInterface_H
-#include "BonIpoptInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 #include "BonAmplTMINLP.hpp"
+#include "BonIpoptSolver.hpp"
 
 namespace Bonmin
 {
   /** Class for providing an Osi interface to Ipopt with an ampl nl file as input. */
-  class AmplInterface: public IpoptInterface
+  class AmplInterface: public OsiTMINLPInterface
   {
   public:
     /** Default constructor */
     AmplInterface();
     /** Constructor with inputed ampl command line (reads model from nl file)*/
-    AmplInterface(char **& amplArgs);
+    AmplInterface(char **& amplArgs, Ipopt::SmartPtr<TNLPSolver> app = new IpoptSolver);
     /** Copy constructor */
     AmplInterface(const AmplInterface &other);
     /// Clone
@@ -26,7 +27,8 @@ namespace Bonmin
     /** Read an ampl . nl file from the given filename */
     virtual void readAmplNlFile(char**& filename,
         std::string* ipopt_file_content =NULL,
-        std::string* nl_file_content = NULL);
+        std::string* nl_file_content = NULL,
+        Ipopt::SmartPtr<TNLPSolver> app = IpoptSolver() );
     /** write ampl solution file */
     void writeAmplSolFile(std::string message,const double * primalSol = NULL,const double * dualSol = NULL);
     //@}

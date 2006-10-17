@@ -22,7 +22,7 @@
 #include "BonCbcNode.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonIpoptWarmStart.hpp"
-#include "BonIpoptInterface.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 
 using namespace std;
 
@@ -88,10 +88,6 @@ namespace Bonmin
       sequenceOfInfeasiblesSize_(0),
       sequenceOfUnsolvedSize_(0)
   {
-    IpoptInterface * ipopt = dynamic_cast<IpoptInterface *>(model->solver());
-    assert (ipopt);
-    Ipopt::ApplicationReturnStatus optimization_status
-    = ipopt->getOptStatus();
     BonCbcPartialNodeInfo * nlpParent = dynamic_cast<BonCbcPartialNodeInfo *> (parent);
     int numberInfeasible = 0;
     int numberUnsolved = 0;
@@ -111,15 +107,11 @@ namespace Bonmin
         numberUnsolved =  nlpRoot->getSequenceOfUnsolvedSize();
       }
     }
-    if ((optimization_status==Ipopt::Unrecoverable_Exception)||
-        (optimization_status==Ipopt::NonIpopt_Exception_Thrown)||
-        (optimization_status==Ipopt::Insufficient_Memory)||
-        (optimization_status==Ipopt::Restoration_Failed)||
-        (optimization_status==Ipopt::Internal_Error)||
-        (optimization_status==Ipopt::Maximum_Iterations_Exceeded))
+    if (model->solver()->isAbandoned() ||
+        model->solver()->isIterationLimitReached())
       sequenceOfUnsolvedSize_ = numberUnsolved + 1;
 
-    if (optimization_status==Ipopt::Infeasible_Problem_Detected)
+    if (model->solver()->isProvenPrimalInfeasible())
       sequenceOfInfeasiblesSize_ = numberInfeasible + 1;
   }
 

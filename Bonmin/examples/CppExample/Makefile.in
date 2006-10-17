@@ -59,13 +59,11 @@ LIBS = -L$(COINLIBDIR) \
 	`cat $(COINLIBDIR)/cgl_addlibs.txt` \
 	`cat $(COINLIBDIR)/osi_addlibs.txt` \
 	`cat $(COINLIBDIR)/clp_addlibs.txt` \
-	`cat $(COINLIBDIR)/coinutils_addlibs.txt` \
-	@ASLLIB@
+	`cat $(COINLIBDIR)/coinutils_addlibs.txt` 
 
 # Necessary Include dirs
 INCL = -I`$(CYGPATH_W) $(COININCDIR)` \
 	-I`$(CYGPATH_W) $(COININCDIR)/ipopt` \
-        -I`$(CYGPATH_W) $(SRCDIR)/BonminAmplInterface/` \
         $(ADDINCFLAGS)
 
 # The following is necessary under cygwin, if native compilers are used

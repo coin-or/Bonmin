@@ -30,7 +30,7 @@ using namespace Bonmin;
     Also outputs a file with the starting point of si1.
 
 */
-void writeNodeFiles(const OsiSolverInterface& si1,const IpoptInterface& si2)
+void writeNodeFiles(const OsiSolverInterface& si1,const OsiTMINLPInterface& si2)
 {
   const int numcols = si1.getNumCols();
   const int numrows = si1.getNumRows();
@@ -87,11 +87,11 @@ void writeNodeFiles(const OsiSolverInterface& si1,const IpoptInterface& si2)
 
 
 
-    const IpoptInterface * ipopt = dynamic_cast<const IpoptInterface *>(&si1);
-    assert(ipopt);
+    const OsiTMINLPInterface* nlpSolver = dynamic_cast<const OsiTMINLPInterface *>(&si1);
+    assert(nlpSolver);
 
-    const double * primals = ipopt->problem()->x_init();
-    const double * duals = ipopt->problem()->duals_init();
+    const double * primals = nlpSolver->problem()->x_init();
+    const double * duals = nlpSolver->problem()->duals_init();
 
     if(!primals)//No starting point no output
       {
@@ -171,7 +171,7 @@ int main (int argc, char *argv[])
     nlpSolver->writeAmplSolFile(message,bb.bestSolution(),NULL);
 
   }
-  catch(IpoptInterface::UnsolvedError *E) {
+  catch(TNLPSolver::UnsolvedError *E) {
      E->printError(std::cerr);
     //There has been a failure to solve a problem with Ipopt.
     //And we will output file with information on what has been changed in the problem to make it fail.
@@ -179,7 +179,7 @@ int main (int argc, char *argv[])
     //    const OsiSolverInterface &si1 = (algo > 0) ? nlpSolver : *model.solver();
     writeNodeFiles(*nlpSolver, *nlpSolver);
   }
-  catch(IpoptInterface::SimpleError &E) {
+  catch(OsiTMINLPInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
 	     <<std::endl
 	     <<E.message()<<std::endl;

@@ -11,10 +11,12 @@
 #ifndef TNLPSolver_H
 #define TNLPSolver_H
 #include "IpTNLP.hpp"
+#include "BonTMINLP2TNLP.hpp"
 
 //Some declarations
 #include "IpOptionsList.hpp"
 #include "IpRegOptions.hpp"
+#include "CoinWarmStart.hpp"
 
 namespace Bonmin  {
 /** This is a generic class for calling an NLP solver to solve a TNLP.
@@ -36,6 +38,39 @@ class TNLPSolver: public Ipopt::ReferencedObject{
     provenInfeasible /** Infeasibility Proven. */,
     unbounded /** Problem is unbounded.*/
   };
+
+
+
+//#############################################################################
+
+  /** We will throw this error when a problem is not solved.
+      Eventually store the error code from solver*/
+  class UnsolvedError
+  {
+  public:
+    /** Constructor */
+    UnsolvedError(int errorNum):errorNum_(errorNum)
+    {}
+    /** Print error message.*/
+    void printError(std::ostream & os);
+    /** Get the string corresponding to error.*/
+    virtual const std::string& errorName() const = 0;
+    /** Return the name of the solver. */
+    virtual const std::string& solverName() const = 0;
+    /** Return error number. */
+    int errorNum() const{
+    return errorNum_;}
+    /** destructor. */
+    virtual ~UnsolvedError(){}
+  private:
+    int errorNum_;
+  }
+  ;
+
+  virtual UnsolvedError * newUnsolvedError(int num) = 0;
+ 
+
+
   /// Constructor
    TNLPSolver();
 
@@ -61,6 +96,21 @@ class TNLPSolver: public Ipopt::ReferencedObject{
 
    /// Resolves a problem expresses as a TNLP 
    virtual ReturnStatus ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp) = 0;
+
+  /// Set the warm start in the solver
+  virtual bool setWarmStart(const CoinWarmStart * warm, 
+                            Ipopt::SmartPtr<TMINLP2TNLP> tnlp) = 0;
+
+  /// Get the warm start form the solver
+  virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const = 0;
+
+  virtual CoinWarmStart * getEmptyWarmStart() const = 0;
+
+  /// Enable the warm start options in the solver
+  virtual void enableWarmStart() = 0;
+
+  /// Disable the warm start options in the solver
+  virtual void disableWarmStart() = 0;
    //@}
 
    ///Get a pointer to RegisteredOptions (generally used to add new ones)
@@ -77,6 +127,12 @@ class TNLPSolver: public Ipopt::ReferencedObject{
 
    /// Get the iteration count of the last optimization.
    virtual int IterationCount() = 0;
+
+
+  /// turn off all output from the solver 
+  virtual void turnOffOutput() = 0 ;
+  /// turn on all output from the solver
+  virtual void turnOnOutput() = 0;
 
 protected:
   bool zeroDimension(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp, 

@@ -14,7 +14,7 @@
 
 
 
-#include "BonIpoptInterface.hpp"
+#include "BonTMINLP2TNLP.hpp"
 #include "BonIpoptInteriorWarmStarter.hpp"
 
 
@@ -31,7 +31,7 @@ IpoptWarmStart::IpoptWarmStart
   setSize(numvars,numcont);
 }
 /// Usefull constructor
-IpoptWarmStart::IpoptWarmStart(const IpoptInterface &ipopt,
+IpoptWarmStart::IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
     SmartPtr<IpoptInteriorWarmStarter> warm_starter):
     values_(),
     tempValues_(NULL),
@@ -39,17 +39,17 @@ IpoptWarmStart::IpoptWarmStart(const IpoptInterface &ipopt,
     empty_(false)
 {
 
-  int numcols = ipopt.getNumCols();
-  int numrows = ipopt.getNumRows();
+  int numcols = tnlp->num_variables();
+  int numrows = tnlp->num_constraints();
   setSize(numcols,numrows);
   values_.reserve(numcols+numrows);
   // For now, we keep all this in here, but we probably want to remove
   // it when we are happy with the new warmstarter (AW)
   double epsilon = 1e-05;//ipopt.getPushFact();
-  const double * primals = ipopt.problem()->x_sol();
-  const double * duals = ipopt.problem()->duals_sol();
-  const double * colLo = ipopt.getColLower();
-  const double * colUp = ipopt.getColUpper();
+  const double * primals = tnlp->x_sol();
+  const double * duals = tnlp->duals_sol();
+  const double * colLo = tnlp->x_l();
+  const double * colUp = tnlp->x_u();
   for(int i = 0 ; i < numcols ; i++) {
     if(primals[i] - colLo[i] < epsilon) {
       setStructStatus(i, atLowerBound);
