@@ -67,7 +67,8 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     argv[2] = NULL;
     std::string ipopt_content(ipopt_file_content.c_str());
     std::string nl_content(nl_file_content.c_str());
-    nlp.readAmplNlFile(argv, &ipopt_content, &nl_content);
+    nlp.readAmplNlFile(argv, &ipopt_content, &nl_content, 
+                       new Bonmin::IpoptSolver);
     free(argv[1]);
 
     nlp.extractInterfaceParams();

@@ -28,7 +28,7 @@ namespace Bonmin
     virtual void readAmplNlFile(char**& filename,
         std::string* ipopt_file_content =NULL,
         std::string* nl_file_content = NULL,
-        Ipopt::SmartPtr<TNLPSolver> app = IpoptSolver() );
+        Ipopt::SmartPtr<TNLPSolver> app = new Bonmin::IpoptSolver());
     /** write ampl solution file */
     void writeAmplSolFile(std::string message,const double * primalSol = NULL,const double * dualSol = NULL);
     //@}

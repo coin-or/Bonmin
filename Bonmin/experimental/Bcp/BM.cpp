@@ -19,6 +19,7 @@
 #include "CoinHelperFunctions.hpp"
 #include "BonAmplInterface.hpp"
 #include "BonTMINLP.hpp"
+#include "BonIpoptSolver.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "BCP_parameters.hpp"
 #include "BCP_lp.hpp"
@@ -147,7 +148,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     argv[0] = NULL;
     argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
     argv[2] = NULL;
-    nlpSolver.readAmplNlFile(argv, 0, 0);
+    nlpSolver.readAmplNlFile(argv, 0, 0, new Bonmin::IpoptSolver);
     free(argv[1]);
   
     nlpSolver.extractInterfaceParams();
@@ -237,7 +238,7 @@ BM_tm::display_feasible_solution(const BCP_solution* sol)
     argv[0] = NULL;
     argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
     argv[2] = NULL;
-    nlpSolver.readAmplNlFile(argv, 0, 0);
+    nlpSolver.readAmplNlFile(argv, 0, 0, new Bonmin::IpoptSolver);
     free(argv[1]);
     OsiClpSolverInterface clp;
     int addObjVar = par.entry(BM_par::PureBranchAndBound) ? 0 : 1;
