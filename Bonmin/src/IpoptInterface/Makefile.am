@@ -70,7 +70,7 @@ include_HEADERS = \
 	BonTNLP2FPNLP.hpp \
         BonTNLPSolver.hpp \
         BonIpoptSolver.hpp \
-	BonFilterSolver.cpp
+	BonFilterSolver.hpp
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #

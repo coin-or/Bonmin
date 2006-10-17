@@ -376,7 +376,7 @@ include_HEADERS = \
 	BonTNLP2FPNLP.hpp \
         BonTNLPSolver.hpp \
         BonIpoptSolver.hpp \
-	BonFilterSolver.cpp
+	BonFilterSolver.hpp
 
 
 #############################################################################
