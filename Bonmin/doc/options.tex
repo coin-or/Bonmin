@@ -17,7 +17,7 @@
   \end{itemize}
  The valid range for this integer option is
  $${\tt 0} \le \hbox{\tt bb\_log\_level } \le {\tt 3}$$
-and its default value is {\tt 3}.
+and its default value is {\tt 1}.
 
 
 \paragraph{bb\_log\_interval} Interval at which node level output is printed.
@@ -182,7 +182,7 @@ Choose the maximum number of variables considered for strong branching.
  Set the number of variables on which to do strong
 branching. The valid range for this integer option is
 $${\tt 0} \le \hbox{\tt number\_strong\_branch } <  \infty$$
-and its default value is ${\tt 0}$.
+and its default value is ${\tt 20}$.
 
 
 \paragraph{number\_before\_trust}
@@ -191,7 +191,7 @@ be believed in dynamic strong branching.
 
  A value of 0 disables dynamic strong branching. The valid range for this integer option is
 $${\tt 0} \le \hbox{\tt number\_before\_trust } <  \infty$$
-and its default value is ${\tt 0}$.
+and its default value is ${\tt 8}$.
 
 
 \paragraph{time\_limit}
@@ -217,7 +217,7 @@ Set integer tolerance.
 considered integer.
 The valid range for this real option is
 $${\tt 0} <  \hbox{\tt integer\_tolerance } <  {\tt 0.5}$$
-and its default value is ${\tt 10^{-06}}$.
+and its default value is ${\tt 10^{-6}}$.
 
 
 \paragraph{warm\_start}
@@ -252,7 +252,7 @@ at such a randomly generated point (if \Bonmin\  finds that this is the case,
 it will give up random point generation).
 The valid range for this real option is
 $${\tt 0} <  \hbox{\tt max\_random\_point\_radius } <  \infty$$
-and its default value is ${\tt 10^{+08}}$.
+and its default value is ${\tt 10^{5}}$.
 
 
 \paragraph{max\_consecutive\_failures}
@@ -414,5 +414,4 @@ enough are generated at the root node,
 \end{itemize}
  The valid range for this integer option is
 $${\tt -100} \le k <  \infty$$
-and its default value is ${\tt -5}$ (excepted for probing
-cuts for which default is 0).
+and its default value is ${\tt -5}$.
