@@ -110,16 +110,17 @@ print\_user\_options & S & no & + & + & + & +\\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{branch-and-bound options}\\
 \hline
+time\_limit & F & $10^{10}$ & + & + & + & +\\
 allowable\_gap  & F & 0 & + & + & + & +\\
 allowable\_fraction\_gap & F & 0& +& + & +& +\\
-cutoff & F& 1e+100 &  + & +& +& +\\
-cutoff\_decr & F & 1e$-$05 & + & + & + & +\\
+cutoff & F& $10^{100}$ &  + & +& +& +\\
+cutoff\_decr & F & $10^{-05}$ & + & + & + & +\\
 integer\_tolerance & F & + &  + & + & + & +\\
 node\_limit & I & INT\_MAX &  + & +& + & + \\
 nodeselect\_stra$^*$ & S & best-bound & + & + & +& +\\
 number\_before\_trust$^*$ & I & 8 & $-$ & + & + & +\\
 number\_strong\_branch$^*$ & I & 20 & $-$ & + & + &+ \\
-time\_limit & F & 1e+10 & + & + & + & +\\
+sos\_constraints & S & enable & + & - & - & - \\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{options for robustness}\\
 \hline
@@ -139,8 +140,8 @@ num\_resolve\_at\_root & I & 0& + & + & + & +  \\
 \hline
 nlp\_solve\_frequency & I & 10 & $-$ & $-$ & $-$ & +\\
 oa\_dec\_time\_limit & F& 120 & $-$ & $-$ & $-$ & +\\
-tiny\_element & F & 1e$-$08 & $-$ & + & + & + \\
-very\_tiny\_element & F & 1e$-$17 & $-$ & + & + & + \\
+tiny\_element & F & $10^{-08}$ & $-$ & + & + & + \\
+very\_tiny\_element & F & $10^{-17}$ & $-$ & + & + & + \\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{6}{l|}{MILP options}\\
 \hline
