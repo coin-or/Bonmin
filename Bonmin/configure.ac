@@ -125,8 +125,10 @@ AC_CONFIG_FILES([Makefile
                  src/Apps/Makefile
                  experimental/Bcp/Makefile
                  src/CbcBonmin/Makefile
-                 src/IpoptInterface/Makefile
-                 src/BonminAmplInterface/Makefile
+                 src/Interfaces/Makefile
+                 src/Interfaces/Ipopt/Makefile
+                 src/Interfaces/Filter/Makefile
+                 src/Interfaces/Ampl/Makefile
                  src/OaInterface/Makefile
                  experimental/FP/Makefile
                  test/Makefile

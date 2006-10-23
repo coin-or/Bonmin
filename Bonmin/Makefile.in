@@ -92,9 +92,8 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = src/IpoptInterface src/BonminAmplInterface \
-	src/OaInterface src/CbcBonmin src/Apps experimental/FP \
-	experimental/Bcp test
+DIST_SUBDIRS = src/Interfaces src/OaInterface src/CbcBonmin src/Apps \
+	experimental/FP experimental/Bcp test
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -322,9 +321,8 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Here list all subdirectories into which to recurse
-SUBDIRS = src/IpoptInterface src/BonminAmplInterface src/OaInterface \
-	src/CbcBonmin src/Apps $(am__append_1) $(am__append_2) \
-	$(am__append_3)
+SUBDIRS = src/Interfaces src/OaInterface src/CbcBonmin src/Apps \
+	$(am__append_1) $(am__append_2) $(am__append_3)
 
 ########################################################################
 #             Additional files to be included in tarball               #
@@ -788,12 +786,15 @@ uninstall-info: uninstall-info-recursive
 #                           Extra Targets                              #
 ########################################################################
 
-.PHONY: doc test unitTest userman astyle
+.PHONY: doc test unitTest userman astyle nodeSolver
 
 test: unitTest
 
 unitTest: all
 	cd test; make test
+
+nodeSolver: all
+	cd src/Apps; make nodeSolver
 
 doc:	userman
 
@@ -802,7 +803,6 @@ userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
 
 astyle:
 	cd src/IpoptInterface; $(MAKE) astyle
-	cd src/BonminAmplInterface; $(MAKE) astyle
 	cd src/CbcBonmin; $(MAKE) astyle
 	cd src/OaInterface; $(MAKE) astyle
 	cd src/Apps; $(MAKE) astyle

@@ -13,8 +13,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Here list all subdirectories into which to recurse
-SUBDIRS = src/IpoptInterface \
-	src/BonminAmplInterface \
+SUBDIRS = src/Interfaces \
 	src/OaInterface \
 	src/CbcBonmin \
 	src/Apps 
@@ -56,12 +55,15 @@ EXTRA_DIST = \
 #                           Extra Targets                              #
 ########################################################################
 
-.PHONY: doc test unitTest userman astyle
+.PHONY: doc test unitTest userman astyle nodeSolver
 
 test: unitTest
 
 unitTest: all
 	cd test; make test
+
+nodeSolver: all
+	cd src/Apps; make nodeSolver
 
 doc:	userman
 
@@ -70,7 +72,6 @@ userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
 
 astyle:
 	cd src/IpoptInterface; $(MAKE) astyle
-	cd src/BonminAmplInterface; $(MAKE) astyle
 	cd src/CbcBonmin; $(MAKE) astyle
 	cd src/OaInterface; $(MAKE) astyle
 	cd src/Apps; $(MAKE) astyle
