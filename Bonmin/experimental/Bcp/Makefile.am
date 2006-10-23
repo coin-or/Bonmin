@@ -91,7 +91,7 @@ bonminbcp_LDFLAGS = -rpath $(libdir)
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/OaInterface` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/IpoptInterface` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/BonminAmplInterface` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
