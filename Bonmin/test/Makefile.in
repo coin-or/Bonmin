@@ -77,8 +77,7 @@ CppExample_DEPENDENCIES = ../src/Apps/libbonmin.la \
 	$(am__DEPENDENCIES_2)
 am_unitTest_OBJECTS = InterfaceTest.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
-unitTest_DEPENDENCIES =  \
-	../src/BonminAmplInterface/libamplinterface.la \
+unitTest_DEPENDENCIES = ../src/Interfaces/Ampl/libamplinterface.la \
 	../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
@@ -325,7 +324,7 @@ unitTest_SOURCES = \
 
 # List libraries of COIN projects
 unitTest_LDADD = \
-        ../src/BonminAmplInterface/libamplinterface.la \
+        ../src/Interfaces/Ampl/libamplinterface.la \
         ../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
@@ -358,8 +357,10 @@ IPOPTLIBS = \
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
 AM_CPPFLAGS = \
         -I`$(CYGPATH_W) $(srcdir)/../src/Apps` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/IpoptInterface` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/BonminAmplInterface` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ipopt` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Filter` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/CbcBonmin` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
