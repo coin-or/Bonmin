@@ -30,7 +30,7 @@ libbonminbb_la_LDFLAGS = $(LT_LDFLAGS)
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../OaInterface` \
-	-I`$(CYGPATH_W) $(srcdir)/../IpoptInterface` \
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \

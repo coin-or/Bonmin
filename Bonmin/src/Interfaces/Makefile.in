@@ -46,7 +46,7 @@ host_triplet = @host@
 @COIN_HAS_FSQP_TRUE@am__append_1 = \
 @COIN_HAS_FSQP_TRUE@	BonFilterSolver.cpp BonFilterSolver.hpp
 
-subdir = src/IpoptInterface
+subdir = src/Interfaces
 DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -419,9 +419,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/IpoptInterface/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/Interfaces/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/IpoptInterface/Makefile
+	  $(AUTOMAKE) --foreign  src/Interfaces/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
