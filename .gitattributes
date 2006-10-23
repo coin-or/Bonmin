@@ -25,8 +25,12 @@ Bonmin/src/Interfaces/BonTNLPSolver.cpp -text
 Bonmin/src/Interfaces/BonTNLPSolver.hpp -text
 Bonmin/src/Interfaces/Filter/BonFilterSolver.cpp -text
 Bonmin/src/Interfaces/Filter/BonFilterSolver.hpp -text
+Bonmin/src/Interfaces/Filter/Makefile.am -text
+Bonmin/src/Interfaces/Filter/Makefile.in -text
 Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.cpp -text
 Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.hpp -text
+Bonmin/src/Interfaces/Ipopt/Makefile.am -text
+Bonmin/src/Interfaces/Ipopt/Makefile.in -text
 Bonmin/src/Interfaces/README -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
