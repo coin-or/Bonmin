@@ -33,7 +33,7 @@ IPOPTLIBS = \
 LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
 
 ########################################################################
-#                                bonmin                                #
+#                                bonminbcp                                #
 ########################################################################
 
 bonminbcp_SOURCES = BB_cut.hpp BB_cut.cpp BM.hpp BM.cpp BM_pack.cpp bm_var.hpp
@@ -74,7 +74,7 @@ amplsolver.a:
 
 bonminbcp_LDADD = \
 	../../src/Apps/libbonmin.la \
-	../../src/BonminAmplInterface/libamplinterface.la \
+	../../src/Interfaces/Ampl/libamplinterface.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(LIBCBCCOPY) \
@@ -92,7 +92,8 @@ bonminbcp_LDFLAGS = -rpath $(libdir)
 AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/OaInterface` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/BonminAmplInterface` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
