@@ -17,7 +17,7 @@
 #include "IpSmartPtr.hpp"
 #include "IpIpoptApplication.hpp"
 #include "IpOptionsList.hpp"
-#include "BonIpoptInteriorWarmStarter.hpp"
+#include "Ipopt/BonIpoptInteriorWarmStarter.hpp"
 
 namespace Bonmin
 {

@@ -31,6 +31,9 @@ libbonminbb_la_LDFLAGS = $(LT_LDFLAGS)
 AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../OaInterface` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \

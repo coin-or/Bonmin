@@ -39,7 +39,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-        -I`$(CYGPATH_W) $(srcdir)/../Interfaces`
+        -I`$(CYGPATH_W) $(srcdir)/..`
 
 AM_CPPFLAGS += $(ASL_CPPFLAGS)
 

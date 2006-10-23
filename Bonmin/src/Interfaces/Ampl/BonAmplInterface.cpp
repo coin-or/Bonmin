@@ -15,7 +15,7 @@ namespace Bonmin
       OsiTMINLPInterface(),
       amplTminlp_(NULL)
   {
-    readAmplNlFile(amplArgs, NULL, NULL, app);
+    readAmplNlFile(amplArgs, app, NULL, NULL);
   }
 
   /** Copy constructor */
@@ -40,9 +40,9 @@ namespace Bonmin
   /** Read an ampl . nl file from the given filename */
   void
   AmplInterface::readAmplNlFile(char**& filename,
+      Ipopt::SmartPtr<TNLPSolver> app,
       std::string* ipopt_file_content,
-      std::string* nl_file_content,
-      Ipopt::SmartPtr<TNLPSolver> app)
+      std::string* nl_file_content)
   {
 
 

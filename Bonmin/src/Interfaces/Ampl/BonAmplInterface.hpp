@@ -2,7 +2,6 @@
 #define BonminAmplInterface_H
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonAmplTMINLP.hpp"
-#include "BonIpoptSolver.hpp"
 
 namespace Bonmin
 {
@@ -26,9 +25,10 @@ namespace Bonmin
     //@{
     /** Read an ampl . nl file from the given filename */
     virtual void readAmplNlFile(char**& filename,
+        Ipopt::SmartPtr<TNLPSolver> app,
         std::string* ipopt_file_content =NULL,
-        std::string* nl_file_content = NULL,
-        Ipopt::SmartPtr<TNLPSolver> app = new Bonmin::IpoptSolver());
+        std::string* nl_file_content = NULL
+        );
     /** write ampl solution file */
     void writeAmplSolFile(std::string message,const double * primalSol = NULL,const double * dualSol = NULL);
     //@}

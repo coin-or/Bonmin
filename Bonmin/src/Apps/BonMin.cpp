@@ -19,7 +19,7 @@
 #include "CoinTime.hpp"
 
 #include "BonAmplInterface.hpp"
-#include "BonFilterSolver.hpp"
+#include "BonIpoptSolver.hpp"
 #include "BonCbc.hpp"
 
 using namespace Bonmin;
@@ -134,7 +134,7 @@ int main (int argc, char *argv[])
   }
   double time1 = CoinCpuTime();
   try {
-  Ipopt::SmartPtr<TNLPSolver> filterSolver = new FilterSolver;
+  Ipopt::SmartPtr<TNLPSolver> filterSolver = new IpoptSolver;
   nlpSolver = new AmplInterface(argv, filterSolver);
     BonminCbcParam par;
     Bab bb;

@@ -8,33 +8,42 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+#We need to do autothings in the subdirectories for the different interfaces
+SUBDIRS = Ipopt Ampl
+
+if COIN_HAS_FSQP
+SUBDIRS += Filter
+endif
+
 ########################################################################
 #                          libipoptinterface                           #
 ########################################################################
 
 # Name of the library in this directory
-noinst_LTLIBRARIES = libipoptinterface.la 
+noinst_LTLIBRARIES = libbonmininterfaces.la 
 # List all source files, including headers
-libipoptinterface_la_SOURCES = \
+libbonmininterfaces_la_SOURCES = \
 	BonBoundsReader.cpp BonBoundsReader.hpp \
 	BonColReader.cpp BonColReader.hpp \
 	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
-	BonIpoptInteriorWarmStarter.cpp BonIpoptInteriorWarmStarter.hpp \
-	BonIpoptWarmStart.cpp BonIpoptWarmStart.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
-        BonIpoptSolver.hpp BonIpoptSolver.cpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
 
+#sublibraries for various installed solvers
+libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
+                              Ampl/libamplinterface.la
 if COIN_HAS_FSQP
-libipoptinterface_la_SOURCES += \
-	BonFilterSolver.cpp BonFilterSolver.hpp
+libbonmininterfaces_la_LIBADD += Filter/libfilterinterface.la
 endif
+
+libbonmininterfaces_la_DEPENDENCIES = $(libipoptinterface_la_LIBADD)
+
 # This is for libtool (on Windows)
-libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
+libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
@@ -64,13 +73,10 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 include_HEADERS = \
 	BonOsiTMINLPInterface.hpp \
-	BonIpoptInteriorWarmStarter.hpp \
 	BonTMINLP2TNLP.hpp \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
-        BonTNLPSolver.hpp \
-        BonIpoptSolver.hpp \
-	BonFilterSolver.hpp
+        BonTNLPSolver.hpp 
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
@@ -100,11 +106,8 @@ ASTYLE_FILES = \
 	BonColReaderbak.cpp BonColReaderbak.hpp \
 	BonStartPointReaderbak.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterfacebak.cpp BonOsiTMINLPInterface.hpp \
-	BonIpoptInteriorWarmStarterbak.cpp BonIpoptInteriorWarmStarter.hpp \
-	BonIpoptWarmStartbak.cpp BonIpoptWarmStart.hpp \
 	BonTMINLP2TNLPbak.cpp BonTMINLP2TNLP.hpp \
 	BonTMINLPbak.cpp BonTMINLP.hpp \
-        BonIpoptSolverbak.hpp BonIpoptSolver.cpp \
 	BonTNLPSolverbak.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLPbak.cpp BonTNLP2FPNLP.hpp
 
