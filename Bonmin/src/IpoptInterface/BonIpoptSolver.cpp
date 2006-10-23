@@ -16,6 +16,10 @@
 #include "BonIpoptWarmStart.hpp"
 
 namespace Bonmin{
+
+  std::string IpoptSolver::solverName_ = "Ipopt";
+
+
   IpoptSolver::~IpoptSolver(){}
 
   ///virtual constructor
@@ -79,6 +83,10 @@ namespace Bonmin{
       }
       return solverReturnStatus(optimizationStatus_);
   }
+
+  Ipopt::SmartPtr<Ipopt::Journalist>
+  IpoptSolver::Jnlst()
+  {return app_.Jnlst();}
 
   Ipopt::SmartPtr<Ipopt::RegisteredOptions>
   IpoptSolver::RegOptions()

@@ -566,6 +566,21 @@ namespace Bonmin
     }
   }
 
+  bool 
+  TMINLP2TNLP::get_scaling_parameters(Number& obj_scaling,
+                                        bool& use_x_scaling, Index n,
+                                        Number* x_scaling,
+                                        bool& use_g_scaling, Index m,
+                                        Number* g_scaling)
+  {
+    return tminlp_->get_scaling_parameters(obj_scaling, use_x_scaling, n,
+				  x_scaling,
+				  use_g_scaling, m, g_scaling);
+  }
+				  
+
+
+
 }
 // namespace Ipopt
 

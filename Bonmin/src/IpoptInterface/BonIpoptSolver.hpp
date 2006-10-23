@@ -82,6 +82,9 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
 
   //@}
 
+  ///Get a pointer to a journalist
+  virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst();
+
   ///Get a pointer to RegisteredOptions (generally used to add new ones)
   virtual Ipopt::SmartPtr<Ipopt::RegisteredOptions> RegOptions();
 
@@ -101,6 +104,11 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   virtual void turnOffOutput();
   /// turn on all output from the solver
   virtual void turnOnOutput();
+
+  /// Get the solver name
+  virtual std::string & solverName(){
+    return solverName_;}
+
 
   /// Return status of last optimization
   Ipopt::ApplicationReturnStatus getOptStatus() const
@@ -131,6 +139,9 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   </ol>
   */
   int warmStartStrategy_;
+
+  //name of solver (Ipopt)
+  static std::string  solverName_;
 };
 }
 #endif

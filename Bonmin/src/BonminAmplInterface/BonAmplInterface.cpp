@@ -65,9 +65,8 @@ namespace Bonmin
 
 
     // set the default options... expect_infeasible, etc...
-    IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
     if (!IsValid(tminlp_)) {
-      amplTminlp_ = new AmplTMINLP(ConstPtr(ipopt->getIpoptApp().Jnlst()), app_->Options(), filename,
+      amplTminlp_ = new AmplTMINLP(Ipopt::ConstPtr(app_->Jnlst()), app_->Options(), filename,
           NULL, appName() , nl_file_content);
       tminlp_ = GetRawPtr(amplTminlp_);
     }
@@ -75,13 +74,13 @@ namespace Bonmin
       AmplTMINLP * amplTMINLP = dynamic_cast<AmplTMINLP *> (GetRawPtr(tminlp_));
       if (amplTMINLP) {
         AmplTMINLP * newAmpl = amplTMINLP->createEmpty();
-        newAmpl->Initialize(ConstPtr(ipopt->getIpoptApp().Jnlst()), app_->Options(), filename,
+        newAmpl->Initialize(ConstPtr(app_->Jnlst()), app_->Options(), filename,
             NULL, appName() , nl_file_content);
         amplTminlp_ = newAmpl;
         tminlp_ = GetRawPtr(amplTminlp_);
       }
       else {
-        amplTminlp_ = new AmplTMINLP(ConstPtr(ipopt->getIpoptApp().Jnlst()), app_->Options(), filename,
+        amplTminlp_ = new AmplTMINLP(ConstPtr(app_->Jnlst()), app_->Options(), filename,
             NULL, appName() , nl_file_content);
         tminlp_ = GetRawPtr(amplTminlp_);
       }
@@ -98,7 +97,7 @@ namespace Bonmin
       categories.push_back("bonmin options for non-convex problems");
       categories.push_back("bonmin options : B-Hyb specific options");
 //    roptions->OutputLatexOptionDocumentation2(*app_->Jnlst(),categories);
-      roptions->OutputOptionDocumentation(*(ipopt->getIpoptApp().Jnlst()),categories);
+      roptions->OutputOptionDocumentation(*(Ipopt::ConstPtr(app_->Jnlst())),categories);
     }
 
     int numcols = getNumCols();

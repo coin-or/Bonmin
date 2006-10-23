@@ -19,7 +19,7 @@
 
 
 #include "BonAmplInterface.hpp"
-
+#include "BonIpoptSolver.hpp"
 #include "BonBoundsReader.hpp"
 #include "BonStartPointReader.hpp"
 
@@ -35,6 +35,7 @@ int main (int argc, char *argv[])
 {
 
   using namespace Ipopt;
+  using namespace Bonmin;
 
   // Read in model using argv[1]
   char * pbName = new char[strlen(argv[1])+1];
@@ -55,7 +56,7 @@ int main (int argc, char *argv[])
   myArgv[2]= NULL;//new char[1];
 
 
-  Bonmin::AmplInterface nlpSolver(myArgv);
+  Bonmin::AmplInterface nlpSolver(myArgv, new IpoptSolver);
 
   Ipopt::SmartPtr<Ipopt::OptionsList> Options =
     nlpSolver.retrieve_options();

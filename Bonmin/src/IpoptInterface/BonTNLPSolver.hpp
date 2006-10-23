@@ -113,6 +113,9 @@ class TNLPSolver: public Ipopt::ReferencedObject{
   virtual void disableWarmStart() = 0;
    //@}
 
+  ///Get a pointer to a journalist
+  virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst() = 0;
+
    ///Get a pointer to RegisteredOptions (generally used to add new ones)
    virtual Ipopt::SmartPtr<Ipopt::RegisteredOptions> RegOptions() = 0;
 
@@ -133,7 +136,8 @@ class TNLPSolver: public Ipopt::ReferencedObject{
   virtual void turnOffOutput() = 0 ;
   /// turn on all output from the solver
   virtual void turnOnOutput() = 0;
-
+  /// Get the solver name
+  virtual std::string & solverName() = 0;
 protected:
   bool zeroDimension(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp, 
 		     ReturnStatus &optimization_status);

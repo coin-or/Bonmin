@@ -164,6 +164,23 @@ namespace Bonmin
     virtual bool get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
         Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)=0;
 
+    /** overload this method to return scaling parameters. This is
+     *  only called if the options are set to retrieve user scaling.
+     *  There, use_x_scaling (or use_g_scaling) should get set to true
+     *  only if the variables (or constraints) are to be scaled.  This
+     *  method should return true only if the scaling parameters could
+     *  be provided.
+     */
+    virtual bool get_scaling_parameters(Number& obj_scaling,
+                                        bool& use_x_scaling, Index n,
+                                        Number* x_scaling,
+                                        bool& use_g_scaling, Index m,
+                                        Number* g_scaling)
+    {
+      return false;
+    }
+
+
     /** overload this method to set the variable type. The var_types
      *  array will be allocated with length n. */
     virtual bool get_variables_types(Index n, VariableType* var_types)=0;

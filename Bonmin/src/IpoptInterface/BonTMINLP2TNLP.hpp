@@ -237,6 +237,15 @@ namespace Bonmin
         Index m, bool init_lambda,
         Number* lambda);
 
+    /** Method that returns scaling parameters. 
+     */
+    virtual bool get_scaling_parameters(Number& obj_scaling,
+                                        bool& use_x_scaling, Index n,
+                                        Number* x_scaling,
+                                        bool& use_g_scaling, Index m,
+                                        Number* g_scaling);
+
+
     /** Methat that returns an Ipopt IteratesVector that has the
      *  starting point for all internal varibles. */
     virtual bool get_warm_start_iterate(IteratesVector& warm_start_iterate);

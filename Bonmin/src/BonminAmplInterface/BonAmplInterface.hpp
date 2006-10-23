@@ -13,7 +13,7 @@ namespace Bonmin
     /** Default constructor */
     AmplInterface();
     /** Constructor with inputed ampl command line (reads model from nl file)*/
-    AmplInterface(char **& amplArgs, Ipopt::SmartPtr<TNLPSolver> app = new IpoptSolver);
+    AmplInterface(char **& amplArgs, Ipopt::SmartPtr<TNLPSolver> app);
     /** Copy constructor */
     AmplInterface(const AmplInterface &other);
     /// Clone
