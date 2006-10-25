@@ -36,11 +36,12 @@ libbonmininterfaces_la_SOURCES = \
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
                               Ampl/libamplinterface.la
+
 if COIN_HAS_FSQP
 libbonmininterfaces_la_LIBADD += Filter/libfilterinterface.la
 endif
 
-libbonmininterfaces_la_DEPENDENCIES = $(libipoptinterface_la_LIBADD)
+libbonmininterfaces_la_DEPENDENCIES = $(libbonmininterfaces_la_LIBADD)
 
 # This is for libtool (on Windows)
 libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)

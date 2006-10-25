@@ -117,11 +117,14 @@ class Messages : public CoinMessages
   //@{
   /// Default Constructor
   OsiTMINLPInterface();
-  /** Constructor with given (user) TMINLP.
+   /** Constructor with given (user) TMINLP.
     \warning In this constructor option file is not read, use readOptionFile to read one.
   */
   OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
 		      Ipopt::SmartPtr<Bonmin::TNLPSolver> app);
+
+ /** Constructor with specified application and empty problem just usefull to get the options and nothing else */
+  OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app);
 
   /** Facilitator to allocate a tminlp and an application. */
   void allocateTMINLP(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,

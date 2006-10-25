@@ -16,6 +16,8 @@
 #include <string>
 #include <sstream>
 
+#include "Ipopt/BonIpoptSolver.hpp"
+#include "Filter/BonFilterSolver.hpp"
 
 using namespace Ipopt;
 
@@ -75,6 +77,13 @@ register_general_options
                                    );
 
   roptions->SetRegisteringCategory("bonmin branch-and-bound options");
+
+  roptions->AddStringOption2("nlp_solver",
+      "Choice of the solver for continuous nlp's",
+      "Ipopt",
+      "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
+      "filterSQP", "Sequential quadratic programming trust region algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
+       "");
 
   roptions->AddStringOption4("algorithm",
       "Choice of the algorithm.",
@@ -304,13 +313,32 @@ OsiTMINLPInterface::register_ALL_options
   register_general_options(roptions);
   register_OA_options(roptions);
   register_milp_sub_solver_options(roptions);
+  //Register options for all possible solvers (besides the one used
+  IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
+  FilterSolver * filter = dynamic_cast<FilterSolver *> (GetRawPtr(app_));
+
+  if(!ipopt)
+    {
+      ipopt = new IpoptSolver;
+      ipopt->RegisterOptions(app_->RegOptions());
+      delete ipopt;
+      ipopt = NULL;
+    }
+  if(!filter)
+    {
+      filter = new FilterSolver;
+      filter->RegisterOptions(app_->RegOptions());
+      delete filter;
+      filter = NULL;
+    }
+					       
 }
 
 
 OsiTMINLPInterface::Messages::Messages
 ():CoinMessages((int)OSITMINLPINTERFACE_DUMMY_END)
 {
-  strcpy(source_ ,"IpOp");
+  strcpy(source_ ,"NLP");
   addMessage(SOLUTION_FOUND, CoinOneMessage
       (1,2,"After %d tries found a solution of %g "
        "(previous best %g)."));
@@ -408,6 +436,54 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     infty_(1e100)
 {}
 
+/** Constructor with given IpSolver and TMINLP */
+OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app):
+    OsiSolverInterface(),
+    tminlp_(NULL),
+    problem_(NULL),
+    rowsense_(NULL),
+    rhs_(NULL),
+    rowrange_(NULL),
+    reducedCosts_(NULL),
+    OsiDualObjectiveLimit_(1e200),
+//    optimization_status_(HasNotBeenOptimized),
+    varNames_(NULL),
+    hasVarNamesFile_(true),
+    nCallOptimizeTNLP_(0),
+    totalNlpSolveTime_(0),
+    totalIterations_(0),
+    maxRandomRadius_(1e08),
+    pushValue_(1e-02),
+    numRetryInitial_(-1),
+    numRetryResolve_(-1),
+    numRetryUnsolved_(1),
+    messages_(),
+    pretendFailIsInfeasible_(false),
+    hasContinuedAfterNlpFailure_(false),
+    numIterationSuspect_(-1),
+    hasBeenOptimized_(false),
+    obj_(NULL),
+    feasibilityProblem_(NULL),
+    jRow_(NULL),
+    jCol_(NULL),
+    jValues_(NULL),
+    nnz_jac(0),
+    constTypes_(NULL),
+//    constTypesNum_(NULL),
+    nLinear_(0),
+    nNonLinear_(0),
+    tiny_(1e-08),
+    veryTiny_(1e-17),
+    infty_(1e100)
+{
+  app_ = app->createNew();
+
+  Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = app_->RegOptions();
+  register_ALL_options(roptions);
+  app_->Initialize("bonmin.opt");
+  extractInterfaceParams();
+
+}
 
 /** Constructor with given IpSolver and TMINLP */
 OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,

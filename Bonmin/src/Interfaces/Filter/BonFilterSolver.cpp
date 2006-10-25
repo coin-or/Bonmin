@@ -31,7 +31,8 @@ static fint * hStruct = NULL;
 
 static real * g;
 //Permutation to apply to jacobian in order to get it row ordered
-static int * permutation = NULL;
+static int * permutationJac = NULL;
+static int * permutationHess = NULL;
 //static int * cache = NULL;
 
 
@@ -94,11 +95,11 @@ gradient_(fint *n, fint *m, fint * mxa, real * x, real *a, fint * la,
   a+= *n;
   for(int i = 0 ; i < nnz ; i++)
     {
-      int indice = permutation[i];
+      int indice = permutationJac[i];
       if(indice > nnz)
 	{
 	  std::cout<<"Error in gradient computation, i: "<<i
-                   <<" in row order "<<permutation[i]<<std::endl;
+                   <<" in row order "<<permutationJac[i]<<std::endl;
          }
       *a++ = values[indice];
     }
@@ -121,9 +122,16 @@ hessian_(real *x, fint *n, fint *m, fint *phase, real *lam,
   *l_hess = nnz_h;
   *li_hess = nnz_h + *n + 3;
   end = *n + *m;
-  for(int i = *n ; i < end ; i++)
+  //std::cout<<"lambda"<<std::endl;
+  for(int i = *n ; i < end ; i++){
     g[i] = - lam[i];
-  tnlpSolved->eval_h(*n, x, 1, obj_factor, *m, g + *n ,1, hStruct[0] - 1, NULL, NULL, ws);
+   // std::cout<<lam[i]<<"\t";
+   }
+  //std::cout<<std::endl;
+  real * values = new real [nnz_h];
+  tnlpSolved->eval_h(*n, x, 1, obj_factor, *m, g + *n ,1, hStruct[0] - 1, NULL, NULL, values);
+   for(int i = 0 ; i < nnz_h ; i++) ws[i] = values[permutationHess[i]];
+   delete [] values;
 }
 
 }
@@ -182,12 +190,18 @@ namespace Bonmin{
     long int * inds = lws + 1;
     long int * start = inds + nnz + offset;
     
-    for(fint i = 0 ; i < nnz ; i++)
+    Transposer lt;
+    lt.rowIndices = iCol;
+    lt.colIndices = iRow;
+
+    std::sort(permutationHess, permutationHess + nnz, lt);
+
+   for(fint i = 0 ; i < nnz ; i++)
       {
-	inds[offset + i] = iRow[i];
-	DBG_ASSERT(iCol[i] >= col);
-	if(iCol[i] >= col) {
-	  for(;col <= iCol[i] ; col++)
+	inds[offset + i] = iRow[permutationHess[i]];
+	DBG_ASSERT(iCol[permutationHess[i]] >= col);
+	if(iCol[permutationHess[i]] >= col) {
+	  for(;col <= iCol[permutationHess[i]] ; col++)
 	    *start++ = i + offset + 1;
 	}
       }
@@ -199,56 +213,26 @@ namespace Bonmin{
   std::string FilterSolver::solverName_ = "filter SQP";
 
 void
-FilterSolver::registerAllOptions(){
-  roptions_->SetRegisteringCategory("FilterSQP options");
-  roptions_->AddLowerBoundedNumberOption("eps", "Tolerance for SQP solver",
+FilterSolver::RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+  roptions->SetRegisteringCategory("FilterSQP options");
+  roptions->AddLowerBoundedNumberOption("eps", "Tolerance for SQP solver",
 					0., 1, 1e-06, "");
-  roptions_->AddLowerBoundedNumberOption("infty","A large number (1E20)",0.,1, 1e20, "");
-  roptions_->AddBoundedIntegerOption("iprint", "Print level (0=silent, 3=verbose)", 0,6,0);
-  roptions_->AddLowerBoundedIntegerOption("kmax", "Dimension of null-space",
-					 0,500, "");
-  roptions_->AddLowerBoundedIntegerOption("maxf","Maximum filter length",0,100);
-  roptions_->AddLowerBoundedIntegerOption("maxiter", "Maximum number of iterations",0,1000);
-  roptions_->AddLowerBoundedIntegerOption("mlp","Maximum level for degeneracy (bqpd)",0, 1000);
-  roptions_->AddLowerBoundedIntegerOption("mxlws", "FINTEGER workspace increment", 0, 50000);
-  roptions_->AddLowerBoundedIntegerOption("mxws", "REAL workspace increment",
-					0,20000);
-  roptions_->AddLowerBoundedNumberOption("rho", "Initial trust region size",0,1,10.);
+  roptions->AddLowerBoundedNumberOption("infty","A large number (1E20)",0.,1, 1e20, "");
+  roptions->AddBoundedIntegerOption("iprint", "Print level (0=silent, 3=verbose)", 0,6,0);
+  roptions->AddLowerBoundedIntegerOption("kmax", "Dimension of null-space",
+				 0, 500, "");
+  roptions->AddLowerBoundedIntegerOption("maxf","Maximum filter length",0,100);
+  roptions->AddLowerBoundedIntegerOption("maxiter", "Maximum number of iterations",0,1000);
+  roptions->AddLowerBoundedIntegerOption("mlp","Maximum level for degeneracy (bqpd)",0, 1000);
+  roptions->AddLowerBoundedIntegerOption("mxlws", "FINTEGER workspace increment", 0, 500000);
+  roptions->AddLowerBoundedIntegerOption("mxws", "REAL workspace increment",
+					0,2000000);
+  roptions->AddLowerBoundedNumberOption("rho", "Initial trust region size",0,1,10.);
   //  roption->AddLowerBoundedIntegerOption("timing", "whether to time evaluations (1 = yes)");
-  roptions_->AddLowerBoundedNumberOption("tt", "Parameter for upper bound on filter",0,1, 125e-2);
-  roptions_->AddLowerBoundedNumberOption("ubd", "Parameter for upper bound on filter", 0 , 1,1e2);
+  roptions->AddLowerBoundedNumberOption("tt", "Parameter for upper bound on filter",0,1, 125e-2);
+  roptions->AddLowerBoundedNumberOption("ubd", "Parameter for upper bound on filter", 0 , 1,1e2);
 
-  /** Options taken from Ipopt code Algorithm/IpWarmStartInitializaer. */
-  roptions_->AddLowerBoundedNumberOption(
-					"warm_start_bound_push",
-					"same as bound_push for the regular initializer.",
-					0.0, true, 1e-3);
-  roptions_->AddBoundedNumberOption(
-				   "warm_start_bound_frac",
-				   "same as bound_frac for the regular initializer.",
-				   0.0, true, 0.5, false, 1e-3);
-
-  /** Options taken from Ipopt: Interfaces/IpIpoptApplication.cpp */
-      roptions_->AddStringOption2(
-      "print_user_options",
-      "Print all options set by the user.",
-      "no",
-      "no", "don't print options",
-      "yes", "print options",
-      "If selected, the algorithm will print the list of all options set by "
-      "the user including their values and whether they have been used.");
-
-    roptions_->AddStringOption2(
-      "print_options_documentation",
-      "Switch to print all algorithmic options.",
-      "no",
-      "no", "don't print list",
-      "yes", "print list",
-      "If selected, the algorithm will print the list of all available "
-      "algorithmic options with some documentation before solving the "
-      "optimization problem.");
-
-}
+ }
 
 
 FilterSolver::FilterSolver():
@@ -261,7 +245,7 @@ FilterSolver::FilterSolver():
   Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
     journalist_->AddFileJournal("console", "stdout", Ipopt::J_ITERSUMMARY);
   
-  registerAllOptions();
+  RegisterOptions();
 
   options_->SetJournalist(journalist_);
   options_->SetRegisteredOptions(roptions_);
@@ -344,7 +328,7 @@ FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 
   g = cached_->g_;
 //Permutation to apply to jacobian in order to get it row ordered
-  permutation = cached_->transposed;
+  permutationJac = cached_->transposed;
 
 
   return callOptimizer();
@@ -370,7 +354,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
 
   // 1.b) then from options
   options->GetIntegerValue("kmax", (Ipopt::Index&) kmax, "filter.");
-
+  kmax = min(kmax,n);
   options->GetIntegerValue("mlp", (Ipopt::Index&) mlp,"filter.");
 
   options->GetIntegerValue("maxf",(Ipopt::Index&) maxf,"filter.");
@@ -382,19 +366,28 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   options->GetIntegerValue("mxlws", (Ipopt::Index&) mxiwk0, "filter.");
 
   // Setup storage for Filter
-
+  double infty = nlp_eps_inf__.infty;
+  int nplusm = n + m;
   //Starting point
   x = new real [n];
 
   tnlp->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
-  
+  //for(int i = 0 ; i < n ; i++) x[i] = 0;
   lam = new real [n+m];
   g = g_ = new real[n+m];
   for(int i = 0 ; i < n+m ; i++) lam[i] = g_[i] = 0.; 
   //bounds
   bounds = new real [2*n + 2*m];
   
-  tnlp->get_bounds_info(n, bounds, &bounds[n+m], m, &bounds[n], &bounds[2*n + m]);
+  tnlp->get_bounds_info(n, bounds, bounds + nplusm, m, bounds + n, bounds + n + nplusm);
+
+  for(int i = 0 ; i < nplusm ; i++){
+  if(bounds[i] < -infty) bounds[i] = - infty;}
+
+  real * ubounds = bounds + nplusm;
+  for(int i = 0 ; i < nplusm ; i++){
+  if(ubounds[i] > infty) ubounds[i] = infty;}
+
   maxa = n + nnz_jac_g;
   fint maxia = n + nnz_jac_g + m + 3;
   a = new real[maxa];
@@ -409,24 +402,21 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
     la[i] = i;// - (index_style == Ipopt::TNLP::C_STYLE);
   tnlp->eval_jac_g( (int) n, NULL, 0,(int) m , (int) nnz_jac_g,  RowJac,  ColJac, NULL);
 
-  permutation = transposed = new int [nnz_jac_g];
+  permutationJac = transposed = new int [nnz_jac_g];
   TMat2RowPMat(n, m, nnz_jac_g,  RowJac, ColJac, transposed,
 	       la, n);
-
-
-  for(int i = 0 ; i < nnz_jac_g ; i++){
-    std::cout<<RowJac[transposed[i]];}
 
 
   delete [] RowJac;
   delete [] ColJac;
 
   // Now setup hessian
-  
-  hStruct_ = new fint[nnz_h + m + 3];
+  permutationHess = new int[nnz_h];
+  for(int i = 0 ; i < nnz_h ; i++) permutationHess[i] = i;
+  hStruct_ = new fint[nnz_h + n + 3];
   int * cache = new int[2*nnz_h + 1];
   hessc_.phl = 1;
-  tnlp->eval_h((Ipopt::Index&) n, NULL, 0, 1., (Ipopt::Index&) m, NULL, 0, (Ipopt::Index&) nnz_h, cache , cache + nnz_h , NULL);
+  tnlp->eval_h((Ipopt::Index&) n, NULL, 0, 1., (Ipopt::Index&) m, NULL, 0, (Ipopt::Index&) nnz_h, cache + nnz_h, cache  , NULL);
 
   TMat2ColPMat(n, m, nnz_h, cache, cache + nnz_h,
 	       hStruct_, 0);
@@ -438,7 +428,9 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   maxiWk = 13*n + 4*m + mlp + lh1 + kmax + 113 + mxiwk0;
 
   ws = new real[maxWk];
+  for(int i = 0 ; i < maxWk ; i++) ws[i] = 0;
   lws = new fint[maxiWk];
+  for(int i = 0 ; i < maxiWk ; i++) lws[i] = 0;
 
   // Setup global variables and static variables
   hStruct = hStruct_;
@@ -467,8 +459,17 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   iprint = bufy;
   nout = 6;
   cstype = new char[m];
+  Ipopt::TNLP::LinearityType * const_types =
+        new Ipopt::TNLP::LinearityType[m];
+  tnlp->get_constraints_linearity(m, const_types);
   for(int i = 0 ; i < m ; i++)
-     cstype[i] = 'N'; 
+  {
+    if(const_types[i] == Ipopt::TNLP::LINEAR){
+     cstype[i] = 'L';}
+    else 
+     cstype[i] = 'N';
+  } 
+  delete [] const_types;
   c = new double[m];
   tnlp_ = Ipopt::GetRawPtr(tnlp);
 }

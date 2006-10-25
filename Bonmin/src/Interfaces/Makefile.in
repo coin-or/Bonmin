@@ -338,7 +338,7 @@ libbonmininterfaces_la_SOURCES = \
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
 	Ampl/libamplinterface.la $(am__append_2)
-libbonmininterfaces_la_DEPENDENCIES = $(libipoptinterface_la_LIBADD)
+libbonmininterfaces_la_DEPENDENCIES = $(libbonmininterfaces_la_LIBADD)
 
 # This is for libtool (on Windows)
 libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)

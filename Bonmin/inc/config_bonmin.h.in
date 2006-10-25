@@ -27,6 +27,9 @@
 /* Define to 1 if the FortMP package is used */
 #undef COIN_HAS_FMP
 
+/* Define to 1 if the filterSqp package is used */
+#undef COIN_HAS_FSQP
+
 /* Define to 1 if the Glpk package is used */
 #undef COIN_HAS_GLPK
 

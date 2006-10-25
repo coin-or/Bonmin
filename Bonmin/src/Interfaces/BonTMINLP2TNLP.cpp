@@ -271,8 +271,10 @@ namespace Bonmin
   bool TMINLP2TNLP::get_bounds_info(Index n, Number* x_l, Number* x_u,
       Index m, Number* g_l, Number* g_u)
   {
-    IpBlasDcopy(n, x_l_, 1, x_l, 1);
-    IpBlasDcopy(n, x_u_, 1, x_u, 1);
+    DBG_ASSERT(n==n_);
+    DBG_ASSERT(m==m_);
+    IpBlasDcopy(n_, x_l_, 1, x_l, 1);
+    IpBlasDcopy(n_, x_u_, 1, x_u, 1);
     IpBlasDcopy(m_, g_l_, 1, g_l, 1);
     IpBlasDcopy(m_, g_u_, 1, g_u, 1);
     IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->lower_, 1, &g_l[m_],1); 

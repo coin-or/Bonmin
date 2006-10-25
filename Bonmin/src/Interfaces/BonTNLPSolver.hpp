@@ -125,6 +125,9 @@ class TNLPSolver: public Ipopt::ReferencedObject{
    /// Get the options (for getting and setting their values).
    virtual Ipopt::SmartPtr<Ipopt::OptionsList> Options() = 0;
 
+   /// Register this solver options into passed roptions
+   virtual void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions) = 0;
+
    /// Get the CpuTime of the last optimization.
    virtual double CPUTime() = 0;
 

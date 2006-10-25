@@ -17,10 +17,14 @@
 #include <fstream>
 
 #include "CoinTime.hpp"
-
+#include "BonminConfig.h"
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "BonCbc.hpp"
+
+#ifdef COIN_HAS_FSQP
+#include "BonFilterSolver.hpp"
+#endif
 
 using namespace Bonmin;
 
@@ -118,7 +122,16 @@ int main (int argc, char *argv[])
 {
   using namespace Ipopt;
   
-  AmplInterface * nlpSolver; 
+  AmplInterface * nlp_and_solver; 
+
+  //We need to build dummy solver objects to get the options, determine which is the solver to use and register all the options
+  Ipopt::SmartPtr<IpoptSolver> dummy_ipopt = new IpoptSolver;
+  OsiTMINLPInterface forOption(GetRawPtr(dummy_ipopt));
+
+
+  int solverUsed = 0; // 0 is Ipopt, 1 is Filter
+  forOption.solver()->Options()->GetEnumValue("nlp_solver", solverUsed,"bonmin.");
+
   char * pbName = NULL;
   if(argc > 1)
   {
@@ -127,19 +140,37 @@ int main (int argc, char *argv[])
   }
   else //will just output usage
   {
-    Ipopt::SmartPtr<TNLPSolver> ipoptSolver = new IpoptSolver;
-    nlpSolver = new AmplInterface(argv, ipoptSolver);
-    delete nlpSolver;
+    Ipopt::SmartPtr<IpoptSolver> ipoptSolver = new IpoptSolver;
+    nlp_and_solver = new AmplInterface(argv, GetRawPtr(ipoptSolver));
+    delete nlp_and_solver;
     return 0;
   }
   double time1 = CoinCpuTime();
   try {
-  Ipopt::SmartPtr<TNLPSolver> filterSolver = new IpoptSolver;
-  nlpSolver = new AmplInterface(argv, filterSolver);
+  Ipopt::SmartPtr<TNLPSolver> solver;
+  if(solverUsed == 0)
+    solver = new IpoptSolver;
+  else if(solverUsed == 1)
+#ifdef COIN_HAS_FSQP
+    solver = new FilterSolver;
+#else
+    {
+      std::cerr<<"filterSQP is not propoerly configured for using into Bonmin"<<std::endl
+               <<"be sure to run the configure script with options:"<<std::endl
+               <<"--with-filtersqp_lib=\"<path_to_filter_library>\""<<std::endl
+               <<"--with-filtersqp_incdir=\"\""<<std::endl;
+               throw -1;
+      }
+#endif
+  else
+    {
+      std::cerr<<"Trying to use unknown solver."<<std::endl;
+    }
+   nlp_and_solver = new AmplInterface(argv, solver);
     BonminCbcParam par;
     Bab bb;
-    par(nlpSolver);
-    bb(nlpSolver, par);//do branch and bound
+    par(nlp_and_solver);
+    bb(nlp_and_solver, par);//do branch and bound
 
     std::cout.precision(10);
 
@@ -168,10 +199,10 @@ int main (int argc, char *argv[])
 	     <<bb.bestObj()<<"\t"
 	     <<bb.numNodes()<<"\t"
 	     <<bb.iterationCount()<<"\t"
-	     <<nlpSolver->totalNlpSolveTime()<<"\t"
-	     <<nlpSolver->nCallOptimizeTNLP()<<"\t"
+	     <<nlp_and_solver->totalNlpSolveTime()<<"\t"
+	     <<nlp_and_solver->nCallOptimizeTNLP()<<"\t"
 	     <<std::endl;
-    nlpSolver->writeAmplSolFile(message,bb.bestSolution(),NULL);
+    nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
 
   }
   catch(TNLPSolver::UnsolvedError *E) {
@@ -180,7 +211,7 @@ int main (int argc, char *argv[])
     //And we will output file with information on what has been changed in the problem to make it fail.
     //Now depending on what algorithm has been called (B-BB or other) the failed problem may be at different place.
     //    const OsiSolverInterface &si1 = (algo > 0) ? nlpSolver : *model.solver();
-    writeNodeFiles(*nlpSolver, *nlpSolver);
+    writeNodeFiles(*nlp_and_solver, *nlp_and_solver);
   }
   catch(OsiTMINLPInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
@@ -203,7 +234,7 @@ int main (int argc, char *argv[])
   }
 
   delete [] pbName;
-  delete nlpSolver;
+  delete nlp_and_solver;
   return 0;
 }
 

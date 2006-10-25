@@ -225,6 +225,13 @@ namespace Bonmin
     virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
         Index m, Number* g_l, Number* g_u);
 
+    /** Returns the constraint linearity.
+     * array should be alocated with length at least n. (default implementation
+     *  just return false and does not fill the array).*/
+    virtual bool get_constraints_linearity(Index m, LinearityType* const_types)
+    {
+      return tminlp_->get_constraints_linearity(m, const_types);
+    }
     /** Method called by Ipopt to get the starting point. The bools
      *  init_x and init_lambda are both inputs and outputs. As inputs,
      *  they indicate whether or not the algorithm wants you to

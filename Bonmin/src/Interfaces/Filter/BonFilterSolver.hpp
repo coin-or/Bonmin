@@ -119,14 +119,17 @@ public:
   virtual std::string & solverName(){
     return solverName_;}
 
+   /// Register this solver options into passed roptions
+   void RegisterOptions(){
+   RegisterOptions(roptions_);}
+
+   /// Register this solver options into passed roptions
+   virtual void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
 private:
   /** @name Private function members. */
   /** @{ */
   /** Perform optimization using data structure in cache. */
   TNLPSolver::ReturnStatus callOptimizer();
-
-  void registerAllOptions();
-  
   /** @} */
   /** Register all the options for filter. */
   
@@ -218,8 +221,40 @@ private:
     {}
 
     cachedInfo(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp,
-	       Ipopt::SmartPtr<Ipopt::OptionsList>& options)
-    {
+	       Ipopt::SmartPtr<Ipopt::OptionsList>& options):
+     n(-1),
+     m(-1),
+     nnz_h_(-1),
+     kmax(-1),
+     maxa(-1),
+     maxf(-1),
+     mlp(-1),
+     maxWk(-1),
+     maxiWk(-1),
+     iprint(-1),
+     nout(6),
+     ifail(0),
+     rho(0),
+      x(NULL),
+      c(NULL),
+     f(1e100),
+     fmin(-1e100),
+      bounds(NULL),
+     s(NULL),
+      a(NULL),
+      la(NULL),
+      ws(NULL),
+      lws(NULL),
+      lam(NULL),
+     g_(NULL),
+     cstype(NULL),
+     maxiter(1000),
+     istat(NULL),
+     rstat(NULL),
+     tnlp_(NULL),
+     hStruct_(NULL),
+     transposed(NULL),
+     cpuTime_(0)   {
       initialize(tnlp, options);
     }
 

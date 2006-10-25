@@ -109,6 +109,13 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   virtual std::string & solverName(){
     return solverName_;}
 
+   /// Register this solver options into passed roptions
+   virtual void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+   app_.RegisterAllIpoptOptions(roptions);
+  // app_.RegisterOptions(roptions);
+   }
+
+
 
   /// Return status of last optimization
   Ipopt::ApplicationReturnStatus getOptStatus() const

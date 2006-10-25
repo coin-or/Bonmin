@@ -77,7 +77,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libbonmin_la_DEPENDENCIES = ../CbcBonmin/libbonminbb.la \
 	../OaInterface/liboainterface.la \
-	../IpoptInterface/libipoptinterface.la
+	../Interfaces/libbonmininterfaces.la
 am_libbonmin_la_OBJECTS =
 nodist_libbonmin_la_OBJECTS = CbcCompareUser.lo CbcBranchUser.lo
 libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS) \
@@ -349,7 +349,7 @@ nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 libbonmin_la_LIBADD = \
 	../CbcBonmin/libbonminbb.la \
 	../OaInterface/liboainterface.la \
-	../IpoptInterface/libipoptinterface.la 
+	../Interfaces/libbonmininterfaces.la 
 
 libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
 COINLIBS = $(CBCOBJDIR)/src/libCbc.la $(CGLOBJDIR)/src/libCgl.la \
