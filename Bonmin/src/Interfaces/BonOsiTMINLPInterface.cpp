@@ -17,7 +17,9 @@
 #include <sstream>
 
 #include "Ipopt/BonIpoptSolver.hpp"
+#ifdef COIN_HAS_FSQP
 #include "Filter/BonFilterSolver.hpp"
+#endif
 
 using namespace Ipopt;
 
@@ -315,8 +317,9 @@ OsiTMINLPInterface::register_ALL_options
   register_milp_sub_solver_options(roptions);
   //Register options for all possible solvers (besides the one used
   IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
+#ifdef COIN_HAS_FSQP
   FilterSolver * filter = dynamic_cast<FilterSolver *> (GetRawPtr(app_));
-
+#endif
   if(!ipopt)
     {
       ipopt = new IpoptSolver;
@@ -324,6 +327,8 @@ OsiTMINLPInterface::register_ALL_options
       delete ipopt;
       ipopt = NULL;
     }
+
+#ifdef COIN_HAS_FSQP
   if(!filter)
     {
       filter = new FilterSolver;
@@ -331,7 +336,8 @@ OsiTMINLPInterface::register_ALL_options
       delete filter;
       filter = NULL;
     }
-					       
+#endif		
+			       
 }
 
 
