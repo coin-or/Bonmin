@@ -14,7 +14,7 @@
 #include <vector>
 
 using namespace Ipopt;
-namespace Ipopt {
+namespace Bonmin {
 class IpoptInteriorWarmStarter : public ReferencedObject
 {
 public:
