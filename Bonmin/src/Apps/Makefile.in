@@ -99,14 +99,14 @@ am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4)
-bonmin_DEPENDENCIES = ../BonminAmplInterface/libamplinterface.la \
+bonmin_DEPENDENCIES = ../Interfaces/Ampl/libamplinterface.la \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_2)
 am_nodeSolver_OBJECTS = nodeSolver.$(OBJEXT)
 nodeSolver_OBJECTS = $(am_nodeSolver_OBJECTS)
-nodeSolver_DEPENDENCIES = ../BonminAmplInterface/libamplinterface.la \
+nodeSolver_DEPENDENCIES = ../Interfaces/Ampl/libamplinterface.la \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
@@ -366,7 +366,7 @@ IPOPTLIBS = \
 ########################################################################
 bonmin_SOURCES = BonMin.cpp
 bonmin_LDADD = \
-	../BonminAmplInterface/libamplinterface.la\
+	../Interfaces/Ampl/libamplinterface.la\
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
@@ -406,7 +406,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 nodeSolver_SOURCES = nodeSolver.cpp
 nodeSolver_LDADD = \
-	../BonminAmplInterface/libamplinterface.la \
+	../Interfaces/Ampl/libamplinterface.la \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \

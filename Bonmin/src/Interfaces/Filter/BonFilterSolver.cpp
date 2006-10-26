@@ -313,7 +313,7 @@ TNLPSolver::ReturnStatus
 FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 {
   assert(tnlp == cached_->tnlp_);
-  cached_->ifail = -1;
+  cached_->ifail = 0;//-1;
   //rescan bounds which may have changed
   assert(cached_->bounds);
   int n = cached_->n;
@@ -532,6 +532,7 @@ FilterSolver::cachedInfo::optimize()
 {
   cpuTime_ = - CoinCpuTime();
   fint cstype_len = 1;
+  rho = 10; 
   filtersqp_(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk, 
 	     &maxiWk, &iprint, &nout, &ifail, &rho, x, 
 	     c, &f, &fmin, bounds, 
