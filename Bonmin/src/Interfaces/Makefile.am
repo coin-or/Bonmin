@@ -34,8 +34,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
 
 #sublibraries for various installed solvers
-libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
-                              Ampl/libamplinterface.la
+libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
+#                              Ampl/libamplinterface.la
 
 if COIN_HAS_FSQP
 libbonmininterfaces_la_LIBADD += Filter/libfilterinterface.la

@@ -44,6 +44,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @COIN_HAS_FSQP_TRUE@am__append_1 = Filter
+#                              Ampl/libamplinterface.la
 @COIN_HAS_FSQP_TRUE@am__append_2 = Filter/libfilterinterface.la
 subdir = src/Interfaces
 DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.am \
@@ -337,7 +338,7 @@ libbonmininterfaces_la_SOURCES = \
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
-	Ampl/libamplinterface.la $(am__append_2)
+	$(am__append_2)
 libbonmininterfaces_la_DEPENDENCIES = $(libbonmininterfaces_la_LIBADD)
 
 # This is for libtool (on Windows)
