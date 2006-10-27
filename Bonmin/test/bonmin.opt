@@ -31,7 +31,7 @@ bonmin.oa_log_level                1          #specify OA log level
 bonmin.oa_log_frequency            100        #specify OA log frequency
 bonmin.probing_cuts                0          #Frequency for Generating probing cuts in branch-and-cut
 bonmin.time_limit                  7200       #Set maximum computation time for Algorithm
-bonmin.warm_start                  none       #Set warm start method
+bonmin.warm_start                  optimum    #Set warm start method
 
 
 #ipopt default changed by bonmin
