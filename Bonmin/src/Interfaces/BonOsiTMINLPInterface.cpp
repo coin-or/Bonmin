@@ -337,7 +337,7 @@ OsiTMINLPInterface::register_ALL_options
       filter = NULL;
     }
 #endif		
-			       
+      
 }
 
 

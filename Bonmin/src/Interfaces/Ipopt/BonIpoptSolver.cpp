@@ -211,7 +211,7 @@ bool
 IpoptSolver::setWarmStart(const CoinWarmStart* warmstart,
                           Ipopt::SmartPtr<TMINLP2TNLP> tnlp)
 {
-  if(!warmstart || !warmStartStrategy_)
+  if(!warmstart && warmStartStrategy_)
     return 0;
   const IpoptWarmStart * ws = dynamic_cast<const IpoptWarmStart*> (warmstart);
   if(ws->empty())//reset initial point and leave

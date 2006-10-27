@@ -23,7 +23,7 @@ namespace Bonmin{
     double * g_l = new double[m];
     double * g_u = new double[m];
     
-    tnlp->get_bounds_info(m, x_l, x_u, m, g_l , g_u);
+    tnlp->get_bounds_info(n, x_l, x_u, m, g_l , g_u);
     
 
     for(int i = 0 ; i < n ; i++) {

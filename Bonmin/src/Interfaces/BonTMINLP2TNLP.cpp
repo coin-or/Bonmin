@@ -231,14 +231,14 @@ namespace Bonmin
     duals_init_[ind] = val;
   }
 
-  void TMINLP2TNLP::setDualsInit(Index n, const Number* duals_init)
+  void TMINLP2TNLP::setDualsInit(Index m, const Number* duals_init)
   {
-    DBG_ASSERT(n == m_ );
+    DBG_ASSERT(m == m_ + 2*n_ );
 
     if(!duals_init_)
-      duals_init_ = &x_init_[n_];
+      duals_init_ = x_init_ + n_;
 
-    IpBlasDcopy(n, duals_init, 1, duals_init_, 1);
+    IpBlasDcopy(m, duals_init, 1, duals_init_, 1);
 
   }
 
