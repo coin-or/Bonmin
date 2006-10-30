@@ -761,6 +761,11 @@ class Messages : public CoinMessages
     return GetRawPtr(problem_);
   }
 
+  Bonmin::TMINLP2TNLP * problem()
+  {
+    return GetRawPtr(problem_);
+  }
+
   const Bonmin::TMINLP * model() const
   {
     return GetRawPtr(tminlp_);

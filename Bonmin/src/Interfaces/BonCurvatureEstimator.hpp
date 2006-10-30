@@ -49,15 +49,18 @@ namespace Bonmin
 
     bool ComputeNullSpaceCurvature(
       bool new_bounds,
-      std::vector<int>& active_x,
-      std::vector<int>& active_g,
-      bool new_activities,
       int n,
       const Number* x,
       bool new_x,
+      const Number* z_L,
+      const Number* z_U,
+      int m,
+      const Number* lam,
+      bool new_mults,
       const Number* orig_d,
       Number* projected_d,
-      Number& dTHd);
+      Number& gradLagTd,
+      Number& dTHLagd);
 
   private:
     /**@name Default Compiler Generated Methods
@@ -93,6 +96,7 @@ namespace Bonmin
     //@{
     SmartPtr<TNLP> tnlp_;
     Index n_;
+    Number* grad_f_;
     Index m_;
     Index nnz_jac_;
     Index* irows_jac_;
@@ -137,15 +141,17 @@ namespace Bonmin
     SmartPtr<CompoundVectorSpace> comp_vec_space_;
     //@}
 
+    /** Storing the activities */
+    //@{
+    std::vector<int> active_x_;
+    std::vector<int> active_g_;
+    //@}
+
     bool initialized_;
 
     bool Initialize();
 
-    bool PrepareNewMatrixStructure(
-      bool new_bounds,
-      std::vector<int>& active_x,
-      std::vector<int>& active_g,
-      bool new_activities);
+    bool PrepareNewMatrixStructure(bool new_activities);
 
     bool PrepareNewMatrixValues(
       bool new_activities,
@@ -155,9 +161,9 @@ namespace Bonmin
     bool SolveSystem(const Number* rhs_x, const Number* rhs_g,
 		     Number* sol_x, Number* sol_g);
 
-    bool Compute_dTHd(
+    bool Compute_dTHLagd(
       const Number* d, const Number* x, bool new_x, const Number* lambda,
-      bool new_lambda,  Number& dTHd);
+      bool new_lambda,  Number& dTHLagd);
   };
 
 } // namespace Ipopt

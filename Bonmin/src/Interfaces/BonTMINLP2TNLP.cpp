@@ -137,8 +137,8 @@ namespace Bonmin
     DBG_ASSERT(x_u_);
     DBG_ASSERT(other.x_l_);
     DBG_ASSERT(other.x_u_);
-    DBG_ASSERT(n_ = other.n_);
-    DBG_ASSERT(m_ = other.m_);
+    DBG_ASSERT(n_ == other.n_);
+    DBG_ASSERT(m_ == other.m_);
 
     IpBlasDcopy(n_, other.x_l_, 1, x_l_, 1);
     IpBlasDcopy(n_, other.x_u_, 1, x_u_, 1);

@@ -49,7 +49,22 @@ namespace Bonmin
       jnlst_(jnlst),
       options_(options),
       prefix_(""),
-      tnlp_(tnlp)
+      tnlp_(tnlp),
+      grad_f_(NULL),
+      irows_jac_(NULL),
+      jcols_jac_(NULL),
+      jac_vals_(NULL),
+      irows_hess_(NULL),
+      jcols_hess_(NULL),
+      hess_vals_(NULL),
+      x_l_(NULL),
+      x_u_(NULL),
+      g_l_(NULL),
+      g_u_(NULL),
+      x_free_map_(NULL),
+      g_fixed_map_(NULL),
+      lambda_(NULL),
+      initialized_(false)
   {
     DBG_ASSERT(IsValid(jnlst));
     DBG_ASSERT(IsValid(options));
@@ -152,6 +167,7 @@ namespace Bonmin
   CurvatureEstimator::~CurvatureEstimator()
   {
     if (initialized_) {
+      delete [] grad_f_;
       delete [] irows_jac_;
       delete [] jcols_jac_;
       delete [] jac_vals_;
@@ -171,6 +187,7 @@ namespace Bonmin
   bool CurvatureEstimator::Initialize()
   {
     DBG_ASSERT(!initialized_);
+
     //////////////////////////////////////
     // Prepare internal data structures //
     //////////////////////////////////////
@@ -180,6 +197,9 @@ namespace Bonmin
     if (!tnlp_->get_nlp_info(n_, m_, nnz_jac_, nnz_hess_, index_style)) {
       return false;
     }
+
+    // Space for gradient
+    grad_f_ = new Number[n_];
 
     // Get nonzero entries in the matrices
     irows_jac_ = new Index[nnz_jac_];
@@ -231,28 +251,89 @@ namespace Bonmin
   bool
   CurvatureEstimator::ComputeNullSpaceCurvature(
     bool new_bounds,
-    std::vector<int>& active_x,
-    std::vector<int>& active_g,
-    bool new_activities,
     int n,
     const Number* x,
     bool new_x,
+    const Number* z_L,
+    const Number* z_U,
+    int m,
+    const Number* lam,
+    bool new_mults,
     const Number* orig_d,
     Number* projected_d,
-    Number& dTHd)
+    Number& gradLagTd,
+    Number& dTHLagd)
   {
-    DBG_ASSERT(n == n_);
-
     if (!initialized_) {
       Initialize();
+      new_bounds = true;
+      new_mults = true;
     }
 
-    if (new_bounds) new_activities = true;
+    DBG_ASSERT(n == n_);
+    DBG_ASSERT(m == m_);
+
+    // If necessary, get new Jacobian values (for the original matrix)
+    if (new_x) {
+      if (!tnlp_->eval_jac_g(n_, x, new_x, m_, nnz_jac_,
+			     NULL, NULL, jac_vals_)) {
+	return false;
+      }
+    }
+
+    if (new_bounds) {
+      // Get bounds
+      if (!tnlp_->get_bounds_info(n_, x_l_, x_u_, m_, g_l_, g_u_)) {
+	return false;
+      }
+    }
+
+    // If necessary, determine new activities
+    bool new_activities = false;
+    if (new_bounds || new_mults) {
+      new_activities = true;
+      active_x_.clear();
+      const Number zTol = 1e-4; // ToDo: make this more elaborate
+      jnlst_->Printf(J_MOREDETAILED, J_NLP,
+		     "List of variables considered fixed (with z_L and z_U)\n");
+      for (Index i=0; i<n; i++) {
+	if(z_L[i] > zTol || z_U[i] > zTol) {
+	  active_x_.push_back(i+1);
+	  jnlst_->Printf(J_MOREDETAILED, J_NLP,
+			 "x[%5d] (%e,%e)\n", i, z_L[i], z_U[i]);
+	}
+      }
+
+      active_g_.clear();
+      // Compute the product of the direction with the constraint Jacobian
+      // This could be done more efficient if we have d in sparse format
+      Number* jacTd = new Number[m];
+      const Number zero = 0.;
+      IpBlasDcopy(m, &zero, 0, jacTd, 1);
+      for (Index i=0; i<nnz_jac_; i++) {
+	const Index &irow = irows_jac_[i];
+	const Index &jcol = jcols_jac_[i];
+	jacTd[irow] += jac_vals_[i]*orig_d[jcol];
+      }
+
+      const Number lamTol = 1e-4;
+      jnlst_->Printf(J_MOREDETAILED, J_NLP,
+		     "List of constraints considered fixed (with lam and jacTd)\n");
+      for (Index j=0; j<m; j++) {
+	if (g_l_[j] < g_u_[j] && fabs(lam[j]) > lamTol) {
+	  if (lam[j]*jacTd[j] > 0) {
+	    active_g_.push_back(j+1);
+	    jnlst_->Printf(J_MOREDETAILED, J_NLP,
+			   "g[%5d] (%e,%e)\n", j, lam[j], jacTd[j]);
+	  }
+	}
+      }
+      delete [] jacTd;
+    }
 
     // Check if the structure of the matrix has changed
     if (new_activities) {
-      if (!PrepareNewMatrixStructure(new_bounds, active_x, active_g,
-				     new_activities)) {
+      if (!PrepareNewMatrixStructure(new_activities)) {
 	return false;
       }
     }
@@ -264,15 +345,13 @@ namespace Bonmin
       }
 
       // Compute least square multipliers for the given activities
-      Number* grad_f = new Number[n_];
-      if (!tnlp_->eval_grad_f(n_, x, new_x, grad_f)) {
+      if (!tnlp_->eval_grad_f(n_, x, new_x, grad_f_)) {
 	return false;
       }
-      if (!SolveSystem(grad_f, NULL, NULL, lambda_)) {
+      if (!SolveSystem(grad_f_, NULL, NULL, lambda_)) {
 	return false;
       }
-      delete [] grad_f;
-      IpBlasDscal(n_, -1., lambda_, 1);
+      IpBlasDscal(m_, -1., lambda_, 1);
       new_lambda = true;
     }
 
@@ -280,7 +359,17 @@ namespace Bonmin
     if (!SolveSystem(orig_d, NULL, projected_d, NULL)) {
       return false;
     }
-    if (!Compute_dTHd(projected_d, x, new_x, lambda_, new_lambda, dTHd)) {
+
+    // Compute the product with the gradient of the Lagrangian
+    gradLagTd = IpBlasDdot(n, projected_d, 1, grad_f_, 1);
+    for (Index i=0; i<nnz_jac_; i++) {
+      const Index &irow = irows_jac_[i];
+      const Index &jcol = jcols_jac_[i];
+      gradLagTd += lambda_[irow]*jac_vals_[i]*projected_d[jcol];
+    }
+
+    // Compute the product with the Hessian of the Lagrangian
+    if (!Compute_dTHLagd(projected_d, x, new_x, lambda_, new_lambda, dTHLagd)) {
       return false;
     }
 
@@ -288,26 +377,16 @@ namespace Bonmin
   }
 
   bool CurvatureEstimator::PrepareNewMatrixStructure(
-    bool new_bounds,
-    std::vector<int>& active_x,
-    std::vector<int>& active_g,
     bool new_activities)
   {
-    if (new_bounds) {
-      // Get bounds
-      if (!tnlp_->get_bounds_info(n_, x_l_, x_u_, m_, g_l_, g_u_)) {
-	return false;
-      }
-    }
-
     if (new_activities) {
       // Deterimine which variables are free
       for (Index i=0; i<n_; i++) {
 	x_free_map_[i] = 0;
       }
       // fixed by activities
-      for (std::vector<int>::iterator i=active_x.begin();
-	   i != active_x.end(); i++) {
+      for (std::vector<int>::iterator i=active_x_.begin();
+	   i != active_x_.end(); i++) {
 	DBG_ASSERT(*i != 0 && *i<=n_ && *i>=-n_);
 	if (*i<0) {
 	  x_free_map_[(-*i)-1] = -1;
@@ -339,8 +418,8 @@ namespace Bonmin
 	g_fixed_map_[j] = -1;
       }
       // fixed by activities
-      for (std::vector<int>::iterator i=active_g.begin();
-	   i != active_g.end(); i++) {
+      for (std::vector<int>::iterator i=active_g_.begin();
+	   i != active_g_.end(); i++) {
 	DBG_ASSERT(*i != 0 && *i<=m_ && *i>=-m_);
 	if (*i<0) {
 	  g_fixed_map_[(-*i)-1] = 0;
@@ -348,7 +427,7 @@ namespace Bonmin
 	}
 	else {
 	  g_fixed_map_[(*i)-1] = 0;
-	  DBG_ASSERT(g_u_[(-*i)-1] < 1e19);
+	  DBG_ASSERT(g_u_[(*i)-1] < 1e19);
 	}
       }
       // fixed by bounds
@@ -360,7 +439,7 @@ namespace Bonmin
       // Correct the numbering in the g map and determine number of
       // fixed constraints
       Index ng_fixed_ = 0;
-      for (Index j=0; j<n_; j++) {
+      for (Index j=0; j<m_; j++) {
 	if (g_fixed_map_[j] == 0) {
 	  g_fixed_map_[j] = ng_fixed_;
 	  ng_fixed_++;
@@ -373,11 +452,11 @@ namespace Bonmin
       Index* jCols = new Index[nnz_jac_];
       Index nnz_proj_jac = 0;
       for (Index i=0; i<nnz_jac_; i++) {
-	Index irow = irows_jac_[i];
-	Index jcol = jcols_jac_[i];
+	const Index &irow = irows_jac_[i];
+	const Index &jcol = jcols_jac_[i];
 	if (x_free_map_[jcol] >= 0 && g_fixed_map_[irow] >= 0) {
-	  iRows[nnz_proj_jac] = g_fixed_map_[irow];
-	  jCols[nnz_proj_jac] = x_free_map_[jcol];
+	  iRows[nnz_proj_jac] = g_fixed_map_[irow] + 1;
+	  jCols[nnz_proj_jac] = x_free_map_[jcol] + 1;
 	  nnz_proj_jac++;
 	}
       }
@@ -391,13 +470,15 @@ namespace Bonmin
       // Create Matrix space for the projection matrix
       comp_proj_matrix_space_ =
 	new CompoundSymMatrixSpace(2, nx_free_+ng_fixed_);
+      comp_proj_matrix_space_->SetBlockDim(0, nx_free_);
+      comp_proj_matrix_space_->SetBlockDim(1, ng_fixed_);
       SmartPtr<SymMatrixSpace> identity_space =
 	new IdentityMatrixSpace(nx_free_);
       comp_proj_matrix_space_->SetCompSpace(0, 0, *identity_space, true);
       comp_proj_matrix_space_->SetCompSpace(1, 0, *proj_jac_space, true);
-      SmartPtr<MatrixSpace> zero_space =
-	new ZeroMatrixSpace(ng_fixed_, ng_fixed_);
-      comp_proj_matrix_space_->SetCompSpace(1, 1, *zero_space, true);
+      //      SmartPtr<MatrixSpace> zero_space =
+      //	new ZeroMatrixSpace(ng_fixed_, ng_fixed_);
+      //      comp_proj_matrix_space_->SetCompSpace(1, 1, *zero_space, true);
 
       // Create a Vector space for the rhs and sol
       comp_vec_space_ = new CompoundVectorSpace(2, nx_free_+ng_fixed_);
@@ -415,14 +496,6 @@ namespace Bonmin
     const Number* x,
     bool new_x)
   {
-    // If necessary, get new Jacobian values (for the original matrix)
-    if (new_x) {
-      if (!tnlp_->eval_jac_g(n_, x, new_x, m_, nnz_jac_,
-			     NULL, NULL, jac_vals_)) {
-	return false;
-      }
-    }
-
     if (new_x || new_activities) {
       comp_proj_matrix_ = comp_proj_matrix_space_->MakeNewCompoundSymMatrix();
       SmartPtr<Matrix> jac = comp_proj_matrix_->GetCompNonConst(1, 0);
@@ -436,6 +509,7 @@ namespace Bonmin
 	  vals[inz++] = jac_vals_[i];
 	}
       }
+      comp_proj_matrix_->Print(*jnlst_,J_WARNING,J_MAIN,"compmat");
       DBG_ASSERT(inz == tjac->Nonzeros());
 
       // We need to reset the linear solver object, so that it knows
@@ -523,9 +597,9 @@ namespace Bonmin
     return true;
   }
 
-  bool CurvatureEstimator::Compute_dTHd(
+  bool CurvatureEstimator::Compute_dTHLagd(
     const Number* d, const Number* x, bool new_x, const Number* lambda,
-    bool new_lambda,  Number& dTHd)
+    bool new_lambda,  Number& dTHLagd)
   {
     if (new_x || new_lambda || !hess_vals_) {
       hess_vals_ = new Number[nnz_hess_];
@@ -534,15 +608,15 @@ namespace Bonmin
 	return false;
       }
     }
-    dTHd = 0.;
+    dTHLagd = 0.;
     for (Index i=0; i<nnz_hess_; i++) {
       Index irow = irows_hess_[i];
       Index jcol = jcols_hess_[i];
       if (irow == jcol) {
-	dTHd += d[irow]*d[irow]*hess_vals_[i];
+	dTHLagd += d[irow]*d[irow]*hess_vals_[i];
       }
       else {
-	dTHd += 2.*d[irow]*d[jcol]*hess_vals_[i];
+	dTHLagd += 2.*d[irow]*d[jcol]*hess_vals_[i];
       }
     }
     return true;

@@ -21,7 +21,8 @@ libbonminbb_la_SOURCES = \
 	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
-	BonCbcParam.cpp BonCbcParam.hpp
+	BonCbcParam.cpp BonCbcParam.hpp \
+	BonChooseVariable.cpp BonChooseVariable.hpp
 
 # This is for libtool (on Windows)
 libbonminbb_la_LDFLAGS = $(LT_LDFLAGS)
@@ -38,6 +39,8 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Algorithm` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Algorithm/LinearSolvers` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
@@ -86,7 +89,8 @@ ASTYLE_FILES = \
 	BonCbc.cppbak BonCbc.hppbak \
 	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
-	BonCbcNode.cppbak BonCbcNode.hppbak
+	BonCbcNode.cppbak BonCbcNode.hppbak \
+	BonChooseVariable.cppbak BonChooseVariable.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

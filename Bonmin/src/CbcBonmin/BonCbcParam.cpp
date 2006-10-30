@@ -75,8 +75,9 @@ namespace Bonmin
     //Preset default for algorithm
     if (algo==0)//B-BB
     {
-      minReliability=0;
-      numberStrong=0;
+      // AW minReliability=0;
+      minReliability=10000;
+      //AW numberStrong=0;
     }
     else if (algo==1)//B-OA
     {

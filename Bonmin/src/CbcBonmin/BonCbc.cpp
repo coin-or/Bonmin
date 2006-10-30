@@ -17,6 +17,9 @@
 
 #include "BonCbcParam.hpp"
 
+// AW
+#include "BonChooseVariable.hpp"
+
 //OA machinery
 #include "BonDummyHeuristic.hpp"
 #include "BonOACutGenerator2.hpp"
@@ -383,6 +386,12 @@ namespace Bonmin
 
     // Redundant definition of default branching (as Default == User)
     CbcBranchUserDecision branch;
+
+    // AW: Try to set new chooseVariable object
+    BonChooseVariable chooseVariable(nlpSolver);
+    chooseVariable.setNumberStrong(model.numberStrong());
+    branch.setChooseMethod(chooseVariable);
+
     model.setBranchingMethod(&branch);
 
     //Get the time and start.
