@@ -148,6 +148,14 @@ register_general_options
       "integer feasible solutions have been found).",
       "Choose the strategy for selecting the next node to be processed.");
 
+  roptions->AddStringOption4("varselect_stra",
+      "Chooses variable selection strategy",
+      "strong_branching",
+      "most_fractional", "Choose most fractional variable",
+      "strong_branching", "Perform strong branching",
+      "reliability_branching", "Use reliability branching",
+      "curvature_estimator", "Use curvature estimation to select branching variable","");
+
   roptions->AddLowerBoundedIntegerOption("number_strong_branch",
       "Choose the maximum number of variables considered for strong branching.",
       0,20,

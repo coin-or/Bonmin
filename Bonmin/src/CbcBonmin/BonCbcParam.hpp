@@ -58,7 +58,7 @@ namespace Bonmin
     double allowableFractionGap;
     /** Node selection strategy :
         <ul>
-        <li> 0: best boud,
+        <li> 0: best bound,
         <li> 1: DFS,
         <li> 2: BFS,
         <li> 3: dynamic (see
@@ -67,6 +67,15 @@ namespace Bonmin
         </ul>
     */
     int nodeSelection;
+    /** Variable selection strategy :
+        <ul>
+        <li> 0: most fractional,
+        <li> 1: strong branching,
+        <li> 2: reliability branching,
+        <li> 3: Curvature estimation.
+        </ul>
+    */
+    int varSelection;
     /** Number of candidates for strong branching.*/
     int numberStrong;
     /** Minimum reliability before trust pseudo-costs.*/

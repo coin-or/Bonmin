@@ -43,6 +43,7 @@ namespace Bonmin
 
     // Branch & bound setting
     success &= Options->GetEnumValue("nodeselect_stra",nodeSelection,"bonmin.");
+    success &= Options->GetEnumValue("varseselect_stra",varSelection,"bonmin.");
     success &= Options->GetIntegerValue("number_strong_branch",numberStrong,"bonmin.");
     success &= Options->GetIntegerValue("number_before_trust", minReliability,"bonmin.");
 
@@ -75,9 +76,10 @@ namespace Bonmin
     //Preset default for algorithm
     if (algo==0)//B-BB
     {
-      // AW minReliability=0;
-      minReliability=10000;
-      //AW numberStrong=0;
+      if(varSelection == 1 || varSelection == 2){
+        std::cout<<"Variable selection strategy not available with B-BB.\nSetting to most fractional."<<std::endl;
+        varSelection = 0;
+      }
     }
     else if (algo==1)//B-OA
     {
@@ -96,7 +98,18 @@ namespace Bonmin
     else if (algo==3)//Nothing to do
     {
     }
-
+    
+    // Set branching strategy
+    if(varSelection == 0){
+      minReliability = 0;
+      numberStrong = 0;
+    }
+    else if(varSelection == 1){
+      minReliability = 0;
+    }
+    else if(varSelection == 3){
+      minReliability = 10000;
+    } 
     return success;
   }
 }

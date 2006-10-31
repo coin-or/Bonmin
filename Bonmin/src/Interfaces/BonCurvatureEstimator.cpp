@@ -12,7 +12,7 @@
 #include "IpZeroMatrix.hpp"
 #include "IpDenseVector.hpp"
 #include "IpBlas.hpp"
-
+#include <cmath>
 #ifdef HAVE_MA27
 # include "IpMa27TSolverInterface.hpp"
 #endif
