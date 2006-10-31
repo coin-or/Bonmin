@@ -43,7 +43,7 @@ namespace Bonmin
 
     // Branch & bound setting
     success &= Options->GetEnumValue("nodeselect_stra",nodeSelection,"bonmin.");
-    success &= Options->GetEnumValue("varseselect_stra",varSelection,"bonmin.");
+    success &= Options->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     success &= Options->GetIntegerValue("number_strong_branch",numberStrong,"bonmin.");
     success &= Options->GetIntegerValue("number_before_trust", minReliability,"bonmin.");
 

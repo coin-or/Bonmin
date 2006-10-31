@@ -387,10 +387,12 @@ namespace Bonmin
     // Redundant definition of default branching (as Default == User)
     CbcBranchUserDecision branch;
 
+
+    if(par.varSelection == 3){
     // AW: Try to set new chooseVariable object
-    BonChooseVariable chooseVariable(nlpSolver);
-    chooseVariable.setNumberStrong(model.numberStrong());
-    branch.setChooseMethod(chooseVariable);
+      BonChooseVariable chooseVariable(nlpSolver);
+      chooseVariable.setNumberStrong(model.numberStrong());
+      branch.setChooseMethod(chooseVariable);}
 
     model.setBranchingMethod(&branch);
 
