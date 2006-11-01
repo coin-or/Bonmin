@@ -9,6 +9,7 @@
 //
 // Date : 12/01/2004
 
+#include "BonminConfig.h"
 
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonColReader.hpp"
@@ -2328,7 +2329,17 @@ void
 OsiTMINLPInterface::extractInterfaceParams()
 {
   if (IsValid(app_)) {
+#ifdef COIN_HAS_FSQP
+    FilterSolver * filter = dynamic_cast<FilterSolver *>(Ipopt::GetRawPtr(app_));
+#endif
     app_->Options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
+
+#ifdef COIN_HAS_FSQP
+    if(filter && maxRandomRadius_ > 10.){
+      std::cerr<<"filterSqp picking a random point with a big value seems not to work well setting max_random_point_radius to 10"<<std::endl;
+      maxRandomRadius_ = 10.;
+    }
+#endif
     app_->Options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,"bonmin.");
     app_->Options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,"bonmin.");
     app_->Options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,"bonmin.");

@@ -178,7 +178,8 @@ private:
     real * rstat;
     Ipopt::TNLP * tnlp_;
     fint * hStruct_;
-    int * transposed;
+    int * permutationJac_;
+    int * permutationHess_;
     /** Elapsed CPU time in last optimization. */
     double cpuTime_;
 
@@ -216,7 +217,8 @@ private:
      rstat(NULL),
      tnlp_(NULL),
      hStruct_(NULL),
-     transposed(NULL),
+     permutationJac_(NULL),
+     permutationHess_(NULL),
      cpuTime_(0)
     {}
 
@@ -253,7 +255,8 @@ private:
      rstat(NULL),
      tnlp_(NULL),
      hStruct_(NULL),
-     transposed(NULL),
+     permutationJac_(NULL),
+     permutationHess_(NULL),
      cpuTime_(0)   {
       initialize(tnlp, options);
     }
@@ -280,7 +283,8 @@ private:
       delete [] cstype;      
       delete [] istat;
       delete [] rstat;
-      delete [] transposed;
+      delete [] permutationJac_;
+      delete [] permutationHess_;
       delete [] hStruct_;
       tnlp_ = NULL;
     }

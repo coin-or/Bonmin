@@ -304,6 +304,7 @@ FilterSolver::Initialize(std::istream &is){
 TNLPSolver::ReturnStatus 
 FilterSolver::OptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 {
+  cached_ = NULL;
   cached_ = new cachedInfo(tnlp, options_);
   return callOptimizer();
 }
@@ -328,7 +329,8 @@ FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 
   g = cached_->g_;
 //Permutation to apply to jacobian in order to get it row ordered
-  permutationJac = cached_->transposed;
+  permutationJac = cached_->permutationJac_;
+  permutationHess = cached_->permutationHess_;
 
 
   return callOptimizer();
@@ -402,8 +404,8 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
     la[i] = i;// - (index_style == Ipopt::TNLP::C_STYLE);
   tnlp->eval_jac_g( (int) n, NULL, 0,(int) m , (int) nnz_jac_g,  RowJac,  ColJac, NULL);
 
-  permutationJac = transposed = new int [nnz_jac_g];
-  TMat2RowPMat(n, m, nnz_jac_g,  RowJac, ColJac, transposed,
+  permutationJac = permutationJac_ = new int [nnz_jac_g];
+  TMat2RowPMat(n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
 	       la, n);
 
 
@@ -411,7 +413,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   delete [] ColJac;
 
   // Now setup hessian
-  permutationHess = new int[nnz_h];
+  permutationHess = permutationHess_ = new int[nnz_h];
   for(int i = 0 ; i < nnz_h ; i++) permutationHess[i] = i;
   hStruct_ = new fint[nnz_h + n + 3];
   int * cache = new int[2*nnz_h + 1];
