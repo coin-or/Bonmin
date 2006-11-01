@@ -150,7 +150,7 @@ namespace Bonmin{
 
   // Convert a sparse matrix from triplet format to row ordered packed matrix
   void TMat2RowPMat(int n, int m, int nnz, int * iRow, int* iCol, int * permutation2,
-		    long int * lws, int offset)
+		    fint * lws, int offset)
   {
     for(int i = 0 ; i < nnz ; i++)
       permutation2[i] = i;
@@ -164,8 +164,8 @@ namespace Bonmin{
 
     fint row = 1;
     lws[0] = nnz + offset + 1;
-    long int * inds = lws + 1;
-    long int * start = inds + nnz + offset + 1;
+    fint * inds = lws + 1;
+    fint * start = inds + nnz + offset + 1;
     
     for(fint i = 0 ; i < nnz ; i++)
       {
@@ -183,12 +183,12 @@ namespace Bonmin{
 
   // Convert a sparse matrix from triplet format to row ordered packed matrix
   void TMat2ColPMat(int n, int m, int nnz, int * iRow, int* iCol,
-		    long int * lws, int offset)
+		    fint * lws, int offset)
   {
     fint col = 1;
     lws[0] = nnz + offset + 1;
-    long int * inds = lws + 1;
-    long int * start = inds + nnz + offset;
+    fint * inds = lws + 1;
+    fint * start = inds + nnz + offset;
     
     Transposer lt;
     lt.rowIndices = iCol;
@@ -347,26 +347,40 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   int  nnz_jac_g;
 
   Ipopt::TNLP::IndexStyleEnum index_style;
-  tnlp->get_nlp_info((Ipopt::Index&) n,(Ipopt::Index&) m, 
-                     (Ipopt::Index&) nnz_jac_g, (Ipopt::Index&) nnz_h_, 
+  Ipopt::Index nv, nc, nnz_j, nnz_hess;
+  tnlp->get_nlp_info( nv, nc, 
+                     nnz_j, (Ipopt::Index&) nnz_hess, 
                      index_style);
+  n = nv;
+  m = nc;
+  nnz_jac_g = nnz_j;
+  nnz_h_ = nnz_hess;
 
   nnz_h = nnz_h_;
   
 
   // 1.b) then from options
-  options->GetIntegerValue("kmax", (Ipopt::Index&) kmax, "filter.");
+  Ipopt::Index kmax_ipt;
+  options->GetIntegerValue("kmax", kmax_ipt, "filter.");
+  kmax = kmax_ipt;
   kmax = min(kmax,n);
-  options->GetIntegerValue("mlp", (Ipopt::Index&) mlp,"filter.");
+  Ipopt::Index mlp_ipt;
+  options->GetIntegerValue("mlp", mlp_ipt,"filter.");
+  mlp = mlp_ipt;
 
-  options->GetIntegerValue("maxf",(Ipopt::Index&) maxf,"filter.");
+  Ipopt::Index  maxf_ipt;
+  options->GetIntegerValue("maxf", maxf_ipt,"filter.");
+  maxf = maxf_ipt;
 
   fint mxwk0;
-  options->GetIntegerValue("mxws", (Ipopt::Index&) mxwk0, "filter.");
+  Ipopt::Index mxwk0_ipt;
+  options->GetIntegerValue("mxws", mxwk0_ipt, "filter.");
+  mxwk0 = mxwk0_ipt;
 
   fint mxiwk0;
-  options->GetIntegerValue("mxlws", (Ipopt::Index&) mxiwk0, "filter.");
-
+  Ipopt::Index mxiwk0_ipt;
+  options->GetIntegerValue("mxlws",  mxiwk0_ipt, "filter.");
+  mxiwk0 = mxiwk0_ipt;
   // Setup storage for Filter
   double infty = nlp_eps_inf__.infty;
   int nplusm = n + m;
@@ -402,7 +416,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
 
   for(fint i = 1; i <= n ; i++)
     la[i] = i;// - (index_style == Ipopt::TNLP::C_STYLE);
-  tnlp->eval_jac_g( (int) n, NULL, 0,(int) m , (int) nnz_jac_g,  RowJac,  ColJac, NULL);
+  tnlp->eval_jac_g(  nv, NULL, 0, nc , nnz_j,  RowJac,  ColJac, NULL);
 
   permutationJac = permutationJac_ = new int [nnz_jac_g];
   TMat2RowPMat(n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,

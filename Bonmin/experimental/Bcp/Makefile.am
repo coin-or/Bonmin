@@ -48,6 +48,7 @@ AMPL_PATHED_FILES = \
 AMPL_SRC = $(abs_source_dir)/../ThirdParty/ASL/solvers
 
 amplsolver.a:
+	rm -rf solvers
 	mkdir -p solvers ; \
 	cd solvers ; \
 	for f in $(AMPL_SRC)/*.c* $(AMPL_SRC)/*.h*; do \
@@ -69,7 +70,8 @@ amplsolver.a:
 		rm $$f.orig ; \
 	done ; \
 	sed -e 's/CFLAGS =/CFLAGS = -DNO_FUNCADD/g' $(AMPL_SRC)/makefile.u > makefile.u ; \
-	$(MAKE) -f makefile.u ; \
+	eval `grep ASLMAKEFLAGS ../../../../ThirdParty/ASL/config.log | tail -1`; \
+	$(MAKE) $$ASLMAKEFLAGS -f makefile.u ; \
 	cp amplsolver.a ..
 
 bonminbcp_LDADD = \
@@ -123,6 +125,6 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                         make distclean stuff                         #
 ########################################################################
 
-CLEANFILES = $(LIBCBCCOPY)
+CLEANFILES = $(LIBCBCCOPY) amplsolver.a
 
 DISTCLEANFILES = 

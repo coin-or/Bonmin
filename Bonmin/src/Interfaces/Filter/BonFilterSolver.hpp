@@ -36,7 +36,7 @@ public:
 
 
 
-    typedef long fint;
+    typedef ipfint fint;
     typedef double real;
 
   ///Default constructor

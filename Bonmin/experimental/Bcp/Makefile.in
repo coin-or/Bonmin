@@ -372,7 +372,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 #                         make distclean stuff                         #
 ########################################################################
-CLEANFILES = $(LIBCBCCOPY)
+CLEANFILES = $(LIBCBCCOPY) amplsolver.a
 DISTCLEANFILES = 
 all: all-am
 
@@ -652,6 +652,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 
 
 amplsolver.a:
+	rm -rf solvers
 	mkdir -p solvers ; \
 	cd solvers ; \
 	for f in $(AMPL_SRC)/*.c* $(AMPL_SRC)/*.h*; do \
@@ -673,8 +674,10 @@ amplsolver.a:
 		rm $$f.orig ; \
 	done ; \
 	sed -e 's/CFLAGS =/CFLAGS = -DNO_FUNCADD/g' $(AMPL_SRC)/makefile.u > makefile.u ; \
-	$(MAKE) -f makefile.u ; \
+	eval `grep ASLMAKEFLAGS ../../../../ThirdParty/ASL/config.log | tail -1`; \
+	$(MAKE) $ASLMAKEFLAGS -f makefile.u ; \
 	cp amplsolver.a ..
+	rm -rf solvers
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
