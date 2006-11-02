@@ -165,6 +165,7 @@ namespace Bonmin{
     case Ipopt::Unrecoverable_Exception:
       return computationError;
     case Ipopt::Not_Enough_Degrees_Of_Freedom:
+      return notEnoughFreedom;
     case Ipopt::Invalid_Problem_Definition:
       return illDefinedProblem;
     case Ipopt::Invalid_Option:

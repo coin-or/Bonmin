@@ -27,16 +27,17 @@ class TNLPSolver: public Ipopt::ReferencedObject{
  public:
 
   enum ReturnStatus /** Standard return statuses for a solver*/{
-    iterationLimit/** Solver reached iteration limit. */,
-    computationError /** Some error was made in the computations. */,
-    illDefinedProblem /** The solver finds that the problem is not well defined. */,
-    illegalOption /** An option is not valid. */,
-    externalException /** Some unrecovered exception occured in an external tool used by the solver. */,
-    exception /** Some unrocevered exception */,
-    solvedOptimal /** Problem solved to an optimal solution.*/,
-    solvedOptimalTol /** Problem solved to "acceptable level of tolerance. */,
-    provenInfeasible /** Infeasibility Proven. */,
-    unbounded /** Problem is unbounded.*/
+    iterationLimit = -3/** Solver reached iteration limit. */,
+    computationError = -2/** Some error was made in the computations. */,
+    notEnoughFreedom = -1/** not enough degrees of freedom.*/,
+    illDefinedProblem = -4/** The solver finds that the problem is not well defined. */,
+    illegalOption =-5/** An option is not valid. */,
+    externalException =-6/** Some unrecovered exception occured in an external tool used by the solver. */,
+    exception =-7/** Some unrocevered exception */,
+    solvedOptimal = 1/** Problem solved to an optimal solution.*/,
+    solvedOptimalTol =2/** Problem solved to "acceptable level of tolerance. */,
+    provenInfeasible =3/** Infeasibility Proven. */,
+    unbounded = 4/** Problem is unbounded.*/
   };
 
 

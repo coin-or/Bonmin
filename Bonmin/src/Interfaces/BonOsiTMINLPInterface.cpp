@@ -2102,7 +2102,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 
 
 #if 1
-  if(optimization_status_ == -10)//Too few degrees of freedom
+  if(optimization_status_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
     {
       std::cout<<"Too few degrees of freedom...."<<std::endl;
       int numrows = getNumRows();
@@ -2160,7 +2160,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     }
   else 
 #endif
-    if(optimization_status_ < -9)//Ipopt failed and the error can not be recovered, throw it
+    if(optimization_status_ < -1)//Ipopt failed and the error can not be recovered, throw it
   {
     throw newUnsolvedError(optimization_status_);
   }
