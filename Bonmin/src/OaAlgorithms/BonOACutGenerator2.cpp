@@ -415,7 +415,7 @@ namespace Bonmin
 #endif
     }
     else {
-#if 1
+#if 0
       throw CoinError("Not allowed to modify si in a cutGenerator",
           "OACutGenerator2","generateCuts");
 #else //Seems that nobody wants to allow me to do this
