@@ -744,8 +744,10 @@ class Messages : public CoinMessages
   /**@name Control of Ipopt output
    */
   //@{
-  void turnOffIpoptOutput();
-  void turnOnIpoptOutput();
+  void turnOffSolverOutput(){
+  app_->turnOffOutput();}
+  void turnOnSolverOutput(){
+  app_->turnOnOutput();}
   //@}
 
   /**@name Sets and Getss */

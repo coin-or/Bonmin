@@ -19,6 +19,8 @@
 
 #include "CoinTime.hpp"
 
+class OsiClpSolverInterface;
+
 namespace Bonmin
 {
   class OACutGenerator2 : public CglCutGenerator
@@ -90,6 +92,7 @@ namespace Bonmin
     {
       return nSolve_;
     }
+
     /// Set value for cutoff increment
     void setcbcCutoffIncrement (double value)
     {
@@ -137,6 +140,13 @@ namespace Bonmin
     {
       subMilpLogLevel_ = value;
     }
+
+  protected:
+    ///Setup a new instance of Cbc with correct parameters
+    CbcModel * setupNewCbc(OsiClpSolverInterface *clp,
+                           CbcStrategy * strategy,
+                           double cutoff);
+
   private:
     /// Set the node limit to the interface
     void setTheNodeLimit();

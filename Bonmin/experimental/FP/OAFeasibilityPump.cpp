@@ -36,16 +36,16 @@
 #include "CbcCompareActual.hpp"
 #include "CbcCutGenerator.hpp"
 //#include "CbcHeuristicUser.hpp"
-#include "BonminAmplInterface.hpp"
-#include "IpCbcDummyHeuristic.hpp"
-#include "IpCbcOACutGenerator.hpp"
-#include "IpCbcOACutGenerator2.hpp"
+#include "BonAmplInterface.hpp"
+#include "BonDummyHeuristic.hpp"
+#include "BonOACutGenerator.hpp"
+#include "BonOACutGenerator2.hpp"
 
 //Use heuristics
 #include "CbcHeuristicFPump.hpp"
 #include "CbcHeuristicGreedy.hpp"
 
-#include "AmplTMINLP.hpp"
+#include "BonAmplTMINLP.hpp"
 
 #include "CglGomory.hpp"
 //#include "CglProbing.hpp"
@@ -65,6 +65,9 @@
 // Time
 #include "CoinTime.hpp"
 #include "FP.hpp"
+
+using namespace Bonmin;
+
 OptParam params;
 static double BeginTimeGLOB;
 
@@ -137,7 +140,7 @@ struct ResolutionInformation
 };
 
 void
-writeBoundFiles(BonminAmplInterface& nlp, const double * originalLower, const double * originalUpper)
+writeBoundFiles(AmplInterface& nlp, const double * originalLower, const double * originalUpper)
 {
   const double * currentLower = nlp.getColLower();
   const double * currentUpper = nlp.getColUpper();
@@ -176,7 +179,7 @@ writeBoundFiles(BonminAmplInterface& nlp, const double * originalLower, const do
 }
 
 
-double FP(BonminAmplInterface &nlp,
+double FP(AmplInterface &nlp,
           OsiSolverInterface &linearModel,
           int numIntCols, int * inds, double * vals,
           double maxTime, int maxIter, ResolutionInformation& info,
@@ -392,13 +395,13 @@ double FP(BonminAmplInterface &nlp,
       //Set warm start point to the last point found (which is feasible for this relaxation)
       nlp.setColSolution(nlp.getColSolution());
       nlp.setRowPrice(nlp.getRowPrice());
-      nlp.setWarmStartOptions();
+      nlp.solver()->enableWarmStart();
       //Resolve the NLP with fixed variables and original objective function
       for(int i = 0; i < numIntCols; i++) {
         nlp.setColLower(inds[i], vals[i]);
         nlp.setColUpper(inds[i], vals[i]);
       }
-      //nlp.turnOnIpoptOutput();
+      //nlp.turnOnSolverOutput();
       nlp.initialSolve();
       if(nlp.isProvenOptimal()) {
         OsiCuts cs;
@@ -463,7 +466,7 @@ int main3 (int argc, char *argv[])
   char * pbName = new char[strlen(argv[1])+1];
   strcpy(pbName, argv[1]);
   BonminAmplInterface solver1(argv);
-  solver1.turnOnIpoptOutput();
+  solver1.turnOnSolverOutput();
   bool doFp=true;
 
 #ifdef COIN_HAS_CPX
@@ -603,7 +606,7 @@ int main3 (int argc, char *argv[])
       solver1.setColLower(inds[i], x[i]);
       solver1.setColUpper(inds[i], x[i]);
     }
-    solver1.turnOnIpoptOutput();
+    solver1.turnOnSolverOutput();
     solver1.initialSolve();
     if(solver1.isProvenOptimal()) {
       std::cout<<pbName<<" OA found easible solution of value "
@@ -638,7 +641,7 @@ int main3 (int argc, char *argv[])
     }
     else if(solver1.isAbandoned() || solver1.isIterationLimitReached()) {
       writeBoundFiles(solver1, solver.getColLower(), solver.getColUpper());
-      solver1.turnOnIpoptOutput();
+      solver1.turnOnSolverOutput();
       solver1.initialSolve();
 
       std::cerr<<"Error"<<std::endl;
@@ -713,7 +716,7 @@ int main3 (int argc, char *argv[])
 
 
 /** Enhanced OA code */
-int enhancedOA(BonminAmplInterface & solver1, bool doFp,
+int enhancedOA(AmplInterface & solver1, bool doFp,
                double *& solution)
 {
   bool nonConvex = 0;
@@ -909,7 +912,7 @@ int enhancedOA(BonminAmplInterface & solver1, bool doFp,
         solver1.setColLower(inds[i], x[i]);
         solver1.setColUpper(inds[i], x[i]);
       }
-      solver1.turnOnIpoptOutput();
+      solver1.turnOnSolverOutput();
       solver1.initialSolve();
       if(solver1.isProvenOptimal()) {
         ub = min(solver1.getObjValue(), ub);
@@ -1096,7 +1099,7 @@ int enhancedOA(BonminAmplInterface & solver1, bool doFp,
       lb += 1e10;
       break;
     }
-    solver1.turnOnIpoptOutput();
+    solver1.turnOnSolverOutput();
     solver1.initialSolve();
     if(solver1.isProvenOptimal()) {
       if (solution==NULL) solution = new double[numcols];
@@ -1125,7 +1128,7 @@ int enhancedOA(BonminAmplInterface & solver1, bool doFp,
     }
     else if(solver1.isAbandoned() || solver1.isIterationLimitReached()) {
       writeBoundFiles(solver1, solver.getColLower(), solver.getColUpper());
-      solver1.turnOnIpoptOutput();
+      solver1.turnOnSolverOutput();
       solver1.initialSolve();
 
       std::cerr<<"Error"<<std::endl;
@@ -1204,7 +1207,7 @@ int enhancedOA(BonminAmplInterface & solver1, bool doFp,
 
 
 /** Iterated feasibility pump.*/
-int iteratedFP (BonminAmplInterface& solver1, bool standAlone, 
+int iteratedFP (AmplInterface& solver1, bool standAlone, 
                 double * &solution)
 {
   // Define a Solver which inherits from OsiClpsolverInterface -> OsiSolverInterface
@@ -1366,7 +1369,7 @@ int iteratedFP (BonminAmplInterface& solver1, bool standAlone,
           solver1.setColLower(inds[i], x[i]);
           solver1.setColUpper(inds[i], x[i]);
         }
-        solver1.turnOnIpoptOutput();
+        solver1.turnOnSolverOutput();
         solver1.initialSolve();
         if(solver1.isProvenOptimal()) {
           ub = min(solver1.getObjValue() * (1-1e-4), ub);
@@ -1430,7 +1433,10 @@ int iteratedFP (BonminAmplInterface& solver1, bool standAlone,
 
 
 
-double FPGeneralIntegers(BonminAmplInterface &nlp, OsiSolverInterface &linearModel,int numIntCols, int * inds, double * vals, double maxTime, ResolutionInformation& info, double ub, bool &provenInfeas)
+double FPGeneralIntegers(AmplInterface &nlp, OsiSolverInterface &linearModel,
+                         int numIntCols, int * inds, double * vals, double maxTime,
+                         ResolutionInformation& info, double ub, bool &provenInfeas)
+
 {
   provenInfeas=0;
 #ifdef COIN_HAS_CPX
@@ -1655,13 +1661,13 @@ double FPGeneralIntegers(BonminAmplInterface &nlp, OsiSolverInterface &linearMod
       //Set warm start point to the last point found (which is feasible for this relaxation)
       nlp.setColSolution(nlp.getColSolution());
       nlp.setRowPrice(nlp.getRowPrice());
-      nlp.setWarmStartOptions();
+      nlp.solver()->enableWarmStart();
       //Resolve the NLP with fixed variables and original objective function
       for(int i = 0; i < numIntCols; i++) {
         nlp.setColLower(inds[i], vals[i]);
         nlp.setColUpper(inds[i], vals[i]);
       }
-      //nlp.turnOnIpoptOutput();
+      //nlp.turnOnSolverOutput();
       nlp.initialSolve();
       if(nlp.isProvenOptimal()) {
         OsiCuts cs;

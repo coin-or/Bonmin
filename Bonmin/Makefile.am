@@ -14,7 +14,7 @@ AUTOMAKE_OPTIONS = foreign
 
 # Here list all subdirectories into which to recurse
 SUBDIRS = src/Interfaces \
-	src/OaInterface \
+	src/OaAlgorithms \
 	src/CbcBonmin \
 	src/Apps 
 

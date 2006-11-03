@@ -349,7 +349,7 @@ bonminbcp_LDFLAGS = -rpath $(libdir)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/OaInterface` \
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/OaAlgorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
@@ -675,9 +675,8 @@ amplsolver.a:
 	done ; \
 	sed -e 's/CFLAGS =/CFLAGS = -DNO_FUNCADD/g' $(AMPL_SRC)/makefile.u > makefile.u ; \
 	eval `grep ASLMAKEFLAGS ../../../../ThirdParty/ASL/config.log | tail -1`; \
-	$(MAKE) $ASLMAKEFLAGS -f makefile.u ; \
+	$(MAKE) $$ASLMAKEFLAGS -f makefile.u ; \
 	cp amplsolver.a ..
-	rm -rf solvers
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

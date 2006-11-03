@@ -30,7 +30,7 @@ libbonminbb_la_LDFLAGS = $(LT_LDFLAGS)
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../OaInterface` \
+	-I`$(CYGPATH_W) $(srcdir)/../OaAlgorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \

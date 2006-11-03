@@ -270,7 +270,7 @@ namespace Bonmin
     //This node may already be fathomed by a previous call to this
     // this information is stored in babInfo
     OsiBabSolver * babInfo = dynamic_cast<OsiBabSolver *> (si.getAuxiliaryInfo());
-#if 1
+#if 0
     //if algorithms would converge this should never happen and it seems very dangerous if somebody forgot to reset the bound
     if (babInfo)
       if (!babInfo->mipFeasible())
@@ -334,7 +334,7 @@ namespace Bonmin
     CoinWarmStart * saveWarmStart = NULL;
     bool milpOptimal = 1;
 
-#ifdef NO_NULL_SI
+#if 0
     if (si_ == NULL) {
       std::cerr<<"Error in cut generator for outer approximation no lp solver interface assigned"<<std::endl;
       throw -1;
@@ -415,7 +415,7 @@ namespace Bonmin
 #endif
     }
     else {
-#ifdef NO_NULL_SI
+#if 1
       throw CoinError("Not allowed to modify si in a cutGenerator",
           "OACutGenerator2","generateCuts");
 #else //Seems that nobody wants to allow me to do this
@@ -865,4 +865,29 @@ namespace Bonmin
   if (strategy && ! strategy_)
     delete strategy;
 }
+
+CbcModel * 
+OACutGenerator2::setupNewCbc(OsiClpSolverInterface *clp,
+                             CbcStrategy * strategy,
+                             double cutoff){
+          OsiBabSolver empty;
+        CbcModel * model = new CbcModel(*clp); // which clones
+        OAModel = model;
+        model->solver()->setAuxiliaryInfo(&empty);
+
+        //Change Cbc messages prefixes
+        strcpy(model->messagesPointer()->source_,"OaCbc");
+
+        if (!strategy)
+          strategy = new CbcStrategyDefault(1,0,0,subMilpLogLevel_);
+
+        clp->resolve();
+        model->setLogLevel(subMilpLogLevel_);
+        model->solver()->messageHandler()->setLogLevel(0);
+        model->setStrategy(*strategy);
+        model->setMaximumNodes(localSearchNodeLimit_);
+        model->setMaximumSeconds(maxLocalSearchTime_ + timeBegin_ - CoinCpuTime());
+        model->setCutoff(cutoff);
+        return model;
 }
+}/* End namespace Bonmin. */

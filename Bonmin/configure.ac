@@ -129,7 +129,7 @@ AC_CONFIG_FILES([Makefile
                  src/Interfaces/Ipopt/Makefile
                  src/Interfaces/Filter/Makefile
                  src/Interfaces/Ampl/Makefile
-                 src/OaInterface/Makefile
+                 src/OaAlgorithms/Makefile
                  experimental/FP/Makefile
                  test/Makefile
                  examples/CppExample/Makefile])

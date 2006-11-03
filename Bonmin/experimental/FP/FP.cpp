@@ -19,18 +19,20 @@
 
 #include "CoinTime.hpp"
 
-#include "BonminAmplInterface.hpp"
-#include "BonminCbcParam.hpp"
-#include "CbcBonmin.hpp"
-#include "AmplTMINLP.hpp"
+#include "BonAmplInterface.hpp"
+#include "BonCbcParam.hpp"
+#include "BonCbc.hpp"
+#include "BonAmplTMINLP.hpp"
 #include "AmplTNLP.hpp"
 #include "FP.hpp"
+#include "BonIpoptSolver.hpp"
+
 void register_ALL_options( SmartPtr<RegisteredOptions> roptions );
 void set_ipopt_minlp_default(SmartPtr<OptionsList> Option);
 
 
 
-class AmplFP : public Ipopt::AmplTMINLP
+class AmplFP : public Bonmin::AmplTMINLP
 {
   public:
   virtual void fillApplicationOptions2(Ipopt::AmplOptionsList* amplOptList)
@@ -75,16 +77,16 @@ Initialize2(const SmartPtr<const Journalist>& jnlst,
            virtual AmplTMINLP * createEmpty(){return new AmplFP;}
 };
 
-class FPInterface : public BonminAmplInterface
+class FPInterface : public Bonmin::AmplInterface
 {
 public:
-  FPInterface(char **& argv):BonminAmplInterface()
+  FPInterface(char **& argv):Bonmin::AmplInterface()
   {
     readAmplNlFile2(argv);
   }
   FPInterface(const FPInterface &other):
-  BonminAmplInterface(other)
-  {std::cout<<"Holla soy aqui"<<std::endl;}
+  Bonmin::AmplInterface(other)
+  {}
   virtual OsiSolverInterface * clone()
   { return new FPInterface(*this);} 
 protected:
@@ -104,7 +106,7 @@ protected:
   readAmplNlFile2(char**& filename
                   )
   {
-    app_ = new Ipopt::IpoptApplication();
+    app_ = new Bonmin::IpoptSolver();
     SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
     register_ALL_options(roptions);
     registerApplicationOptions(roptions);
@@ -120,8 +122,6 @@ protected:
     setStrParam(OsiProbName,std::string(pbName));
     delete [] pbName;
     
-    // set the default options... expect_infeasible, etc...
-    set_ipopt_minlp_default(app_->Options());
     
     if(!IsValid(tminlp_)) {
       amplTminlp_ = new AmplFP(ConstPtr(app_->Jnlst()), app_->Options(), filename,
@@ -129,9 +129,9 @@ protected:
       tminlp_ = GetRawPtr(amplTminlp_);
     }
     else {
-      AmplTMINLP * amplTMINLP = dynamic_cast<AmplTMINLP *> (GetRawPtr(tminlp_));
+      Bonmin::AmplTMINLP * amplTMINLP = dynamic_cast<Bonmin::AmplTMINLP *> (GetRawPtr(tminlp_));
       if(amplTMINLP) {
-        AmplTMINLP * newAmpl = amplTMINLP->createEmpty();
+        Bonmin::AmplTMINLP * newAmpl = amplTMINLP->createEmpty();
         newAmpl->Initialize(ConstPtr(app_->Jnlst()), app_->Options(), filename,
                             NULL, appName() , NULL);
         amplTminlp_ = newAmpl;
@@ -143,7 +143,7 @@ protected:
         tminlp_ = GetRawPtr(amplTminlp_);
       }
     }
-    problem_ = new Ipopt::TMINLP2TNLP(tminlp_, *app_->Options());
+    problem_ = new Bonmin::TMINLP2TNLP(tminlp_);
     
     bool print_options_documentation;
     app_->Options()->GetBoolValue("print_options_documentation",
@@ -163,16 +163,16 @@ protected:
     setStrParam(OsiProbName, std::string(filename[1]));
     extractInterfaceParams();
     hasBeenOptimized_ = false;
-    feasibilityProblem_ = new Ipopt::TNLP2FPNLP
+    feasibilityProblem_ = new Bonmin::TNLP2FPNLP
       (Ipopt::SmartPtr<Ipopt::TNLP>(Ipopt::GetRawPtr(problem_)));
   }
 };
 
-int iteratedFP(BonminAmplInterface &nlpSolver, 
+int iteratedFP(Bonmin::AmplInterface &nlpSolver, 
                bool standAlone, 
                double *&solution);
 
-int enhancedOA(BonminAmplInterface &nlpSolver, 
+int enhancedOA(Bonmin::AmplInterface &nlpSolver, 
                bool doFP, 
                double *&solution);
 
@@ -208,14 +208,15 @@ int main (int argc, char *argv[])
     nlpSolver.writeAmplSolFile(message,solution,NULL);
     
   }
-  catch(IpoptInterface::UnsolvedError &E) {
+  catch(Bonmin::TNLPSolver::UnsolvedError *E) {
+     E->printError(std::cerr);
     //There has been a failure to solve a problem with Ipopt.
     //And we will output file with information on what has been changed in the problem to make it fail.
     //Now depending on what algorithm has been called (B-BB or other) the failed problem may be at different place.
     //    const OsiSolverInterface &si1 = (algo > 0) ? nlpSolver : *model.solver();
 
   }
-  catch(IpoptInterface::SimpleError &E) {
+  catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
     <<std::endl
     <<E.message()<<std::endl;

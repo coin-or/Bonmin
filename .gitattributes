@@ -33,6 +33,8 @@ Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.hpp -text
 Bonmin/src/Interfaces/Ipopt/Makefile.am -text
 Bonmin/src/Interfaces/Ipopt/Makefile.in -text
 Bonmin/src/Interfaces/README -text
+Bonmin/src/OaAlgorithms/BonFpForMinlp.cpp -text
+Bonmin/src/OaAlgorithms/BonFpForMinlp.hpp -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip

@@ -92,7 +92,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = src/Interfaces src/OaInterface src/CbcBonmin src/Apps \
+DIST_SUBDIRS = src/Interfaces src/OaAlgorithms src/CbcBonmin src/Apps \
 	experimental/FP experimental/Bcp test
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -321,7 +321,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Here list all subdirectories into which to recurse
-SUBDIRS = src/Interfaces src/OaInterface src/CbcBonmin src/Apps \
+SUBDIRS = src/Interfaces src/OaAlgorithms src/CbcBonmin src/Apps \
 	$(am__append_1) $(am__append_2) $(am__append_3)
 
 ########################################################################

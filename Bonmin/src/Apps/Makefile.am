@@ -25,7 +25,7 @@ nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 
 libbonmin_la_LIBADD = \
 	../CbcBonmin/libbonminbb.la \
-	../OaInterface/liboainterface.la \
+	../OaAlgorithms/liboainterface.la \
 	../Interfaces/libbonmininterfaces.la 
 
 libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
