@@ -213,8 +213,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
 void
 BM_tm::create_root(BCP_vec<BCP_var*>& added_vars,
                    BCP_vec<BCP_cut*>& added_cuts,
-                   BCP_user_data*& user_data,
-                   BCP_pricing_status& pricing_status)
+                   BCP_user_data*& user_data)
 {
     BM_node* data = new BM_node;
     data->numNlpFailed_ = 0;
