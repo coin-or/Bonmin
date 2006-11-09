@@ -8,6 +8,7 @@
 
 #include "BM.hpp"
 #include "BonIpoptSolver.hpp"
+
 //#############################################################################
 
 void
@@ -67,17 +68,23 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     argv[2] = NULL;
     std::string ipopt_content(ipopt_file_content.c_str());
     std::string nl_content(nl_file_content.c_str());
-    nlp.readAmplNlFile(argv, new Bonmin::IpoptSolver, &ipopt_content, &nl_content);
+    nlp.readAmplNlFile(argv, new Bonmin::IpoptSolver,
+		       &ipopt_content, &nl_content);
     free(argv[1]);
 
     nlp.extractInterfaceParams();
 
     /* synchronize bonmin & BCP parameters */
     Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp.retrieve_options();
+
+    int nlpLogLevel;
+    options->GetIntegerValue("nlp_log_level", nlpLogLevel, "bonmin.");
+    nlp.messageHandler()->setLogLevel(nlpLogLevel);
+
     double bm_intTol;
     double bm_cutoffIncr; // could be negative
     options->GetNumericValue("integer_tolerance",bm_intTol,"bonmin.");
-    options->GetNumericValue("cutoff_incr",bm_cutoffIncr,"bonmin.");
+    options->GetNumericValue("cutoff_decr",bm_cutoffIncr,"bonmin.");
 
     BCP_lp_prob* bcp_lp = getLpProblemPointer();
     const double bcp_intTol = bcp_lp->par.entry(BCP_lp_par::IntegerTolerance);
@@ -118,77 +125,38 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 	//  bcp_lp->par.set_entry(BCP_lp_par::LpVerb_FathomInfo, false);
     }
 
-    /* SOS constraints */
-    if (par.entry(BM_par::BranchOnSos)) {
-	sos.setFrom(nlp.model()->sosConstraints());
+    /* extract the sos constraints */
+    const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
+    
+    int i;
+    const int numCols = nlp.getNumCols();
+    const double* clb = nlp.getColLower();
+    const double* cub = nlp.getColUpper();
+
+    /* Find first the integer variables and then the SOS constraints */
+    int nObj = 0;
+    OsiObject** osiObj = new OsiObject*[numCols + sos->num];
+    for (i = 0; i < numCols; ++i) {
+	if (nlp.isInteger(i)) {
+	    osiObj[nObj++] = new OsiSimpleInteger(i, clb[i], cub[i]);
+	}
     }
+    const int* starts = sos->starts;
+    for (i = 0; i < sos->num; ++i) {
+	osiObj[nObj++] = new OsiSOS(NULL, /* FIXME: why does the constr need */
+				    starts[i+1] - starts[i],
+				    sos->indices + starts[i],
+				    sos->weights + starts[i],
+				    sos->types[i]);
+    }
+    nlp.addObjects(nObj, osiObj);
+    for (i = 0; i < nObj; ++i) {
+	delete osiObj[i];
+    }
+    delete[] osiObj;
 
     /* just to be on the safe side... always allocate */
     primal_solution_ = new double[nlp.getNumCols()];
-    branching_priority_ = new double[nlp.getNumCols()];
-
-    /* Priorities... Let's see whether the user has set them up. */
-    const int* prio = nlp.getPriorities();
-    const int numCols = nlp.getNumCols();
-    int i;
-    if (prio == NULL) {
-	// No. Just sett all of them uniformly to 1.0
-	for (i = 0; i < numCols; ++i)
-	    {
-		branching_priority_[i] = 1.0;
-	    }
-    }
-    else {
-	/* Yes! the lower the number the earlier we want to branch on it.
-	   Let's see how many different numbers there are */
-	std::set<int> numbers;
-	for (i = 0; i < numCols; ++i)
-	    {
-		numbers.insert(prio[i]);
-	    }
-	if (numbers.size() > 15) {
-	    /* Sigh... too many... We just have to trust the user's knowledge */
-	    if (par.entry(BM_par::CombinedDistanceAndPriority) == true) {
-		printf("WARNING!\n");
-		printf("   There are too many (>15) different branching priorities\n");
-		printf("   defined. Switching off CombinedDistanceAndPriority and\n");
-		printf("   will branch on considering only the specified priority\n");
-		printf("   order.\n");
-		par.set_entry(BM_par::CombinedDistanceAndPriority, false);
-	    }
-	}
-	if (par.entry(BM_par::CombinedDistanceAndPriority) == true) {
-	    /* vars with the lowest prio will have their branching_priority_
-	       set to 1.0, the next set to 10.0, etc. */
-	    const double powerup[15] = {1e14, 1e13, 1e12, 1e11, 1e10, 1e9, 1e8, 1e7,
-					1e6, 1e5, 1e4, 1e3, 1e2, 1e1, 1e0};
-	    const double powerdo[15] = {1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7,
-					1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14};
-	    const double* powers =
-		par.entry(BM_par::LowPriorityImportant) ? powerup : powerdo;
-	    for (i = 0; i < numCols; ++i)
-		{
-		    const int pos = coinDistance(numbers.begin(), numbers.find(prio[i]));
-		    assert (pos >= 0 && pos < 15);
-		    branching_priority_[i] = powers[pos];
-		}
-	}
-	else {
-	    if (par.entry(BM_par::LowPriorityImportant)) {
-		const double maxprio = *numbers.rbegin();
-		for (i = 0; i < numCols; ++i)
-		    {
-			branching_priority_[i] = maxprio - prio[i];
-		    }
-	    }
-	    else {
-		for (i = 0; i < numCols; ++i)
-		    {
-			branching_priority_[i] = prio[i];
-		    }
-	    }
-	}
-    }
 }
 
 //#############################################################################

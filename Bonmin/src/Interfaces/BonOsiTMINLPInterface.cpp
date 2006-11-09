@@ -1263,6 +1263,30 @@ OsiTMINLPInterface::setColUpper( int elementIndex, double elementValue )
   hasBeenOptimized_ = false;
 }
 
+/** Set the lower bounds for all columns
+    Use -getInfinity() for -infinity. */
+void
+OsiTMINLPInterface::setColLower( const double* array )
+{
+    for (int i = getNumCols() - 1; i >= 0; --i) {
+	//  if(fabs(problem_->x_l()[i]-array[i])>1e-06)
+	problem_->SetVariableLowerBound(i, array[i]);
+    }
+    hasBeenOptimized_ = false;
+}
+
+/** Set Set the upper bounds for all columns
+    Use getInfinity() for infinity. */
+void
+OsiTMINLPInterface::setColUpper( const double* array )
+{
+    for (int i = getNumCols() - 1; i >= 0; --i) {
+	//  if(fabs(problem_->x_u()[i]-elementValue)>1e-06)
+	problem_->SetVariableUpperBound(i, array[i]);
+    }
+    hasBeenOptimized_ = false;
+}
+
 /** Set a single row lower bound.
     Use -getInfinity() for -infinity. */
 void

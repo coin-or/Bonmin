@@ -17,6 +17,9 @@ Bonmin/doc/bonmin.sty -text
 Bonmin/doc/options.tex -text
 Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
+Bonmin/experimental/Bcp/BM_lp.cpp -text
+Bonmin/experimental/Bcp/BM_lp_branch.cpp -text
+Bonmin/experimental/Bcp/BM_tm.cpp -text
 Bonmin/experimental/Bcp/ampl_bcp.patch -text
 Bonmin/inc/config_bonmin.h.in -text
 Bonmin/src/Interfaces/Ampl/Makefile.in -text

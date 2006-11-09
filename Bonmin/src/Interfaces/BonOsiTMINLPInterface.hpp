@@ -450,6 +450,15 @@ class Messages : public CoinMessages
       Use getInfinity() for infinity. */
   virtual void setColUpper( int elementIndex, double elementValue );
 
+  /** Set the lower bounds for all columns
+      array [getNumCols()] is an array of values for the objective.
+  */
+  virtual void setColLower(const double * array);
+
+  /** Set the upper bounds for all columns
+      array [getNumCols()] is an array of values for the objective.
+  */
+  virtual void setColUpper(const double * array);
 
 
   /** Set a single row lower bound.
@@ -548,31 +557,26 @@ class Messages : public CoinMessages
   }
 
 
-  /** We have to keep this but it will throw an error.
+  /** We have to keep this but it will return NULL.
   */
   virtual const double * getObjCoefficients() const
   {
-    if(!obj_)
-      throw SimpleError("OsiTMINLP does not implement this function (function irelevant in an minlp).",
-          "getObjCoefficients");
-    return obj_;
+      return obj_;
   }
 
-  /** We have to keep this but it will throw an error.
+  /** We have to keep this but it will return NULL.
    */
   virtual const CoinPackedMatrix * getMatrixByRow() const
   {
-    throw SimpleError("OsiTMINLPInterface  does not implement this function.",
-        "getMatrixByRow()");
+      return NULL;
   }
 
 
-  /** We have to keep this but it will throw an error.
+  /** We have to keep this but it will return NULL.
    */
   virtual const CoinPackedMatrix * getMatrixByCol() const
   {
-    throw SimpleError("OsiTMINLPInterface model does not implement this function.",
-        "getMatrixByCol()");
+      return NULL;
   }
 
   /** We have to keep this but it will throw an error.

@@ -36,7 +36,8 @@ LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
 #                                bonminbcp                                #
 ########################################################################
 
-bonminbcp_SOURCES = BB_cut.hpp BB_cut.cpp BM.hpp BM.cpp BM_pack.cpp bm_var.hpp
+bonminbcp_SOURCES = BB_cut.hpp BM.hpp \
+	BB_cut.cpp BM.cpp BM_tm.cpp BM_lp.cpp BM_lp_branch.cpp BM_pack.cpp
 
 bonminbcp_DEPENDENCIES = amplsolver.a
 

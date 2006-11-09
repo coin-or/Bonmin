@@ -14,7 +14,6 @@
 #include "BCP_tm_user.hpp"
 #include "BCP_lp_user.hpp"
 
-#include "BM_var.hpp"
 #include "BB_cut.hpp"
 
 //#############################################################################
@@ -40,6 +39,12 @@ public:
 
 //#############################################################################
     
+enum BM_WarmStartStrategy {
+    WarmStartNone,
+    WarmStartFromRoot,
+    WarmStartFromParent
+};
+
 class BM_par {
 public:
     enum chr_params {
@@ -48,12 +53,14 @@ public:
         CombinedDistanceAndPriority,
         PureBranchAndBound,
 	PrintBranchingInfo,
-        LowPriorityImportant,
+	SosWithLowPriorityMoreImportant,
+        VarWithLowPriorityMoreImportant,
         end_of_chr_params
     };
     enum int_params {
         //
         NumNlpFailureMax,
+	WarmStartStrategy,
         end_of_int_params
     };
     enum dbl_params {
@@ -98,13 +105,6 @@ public:
     //@{
     virtual void pack_module_data(BCP_buffer& buf, BCP_process_t ptype);
 
-    virtual void pack_var_algo(const BCP_var_algo* var, BCP_buffer& buf) {
-	BM_pack_var(var, buf);
-    }
-    virtual BCP_var_algo* unpack_var_algo(BCP_buffer& buf) {
-	return BM_unpack_var(buf);
-    }
-
     virtual void pack_cut_algo(const BCP_cut_algo* cut, BCP_buffer& buf) {
 	BB_pack_cut(cut, buf);
     }
@@ -145,34 +145,23 @@ public:
 };
 
 //#############################################################################
+
 #include <OsiAuxInfo.hpp>
 #include <OsiCuts.hpp>
 #include "BCP_lp_user.hpp"
 #include "BonOACutGenerator2.hpp"
 #include "BonAmplInterface.hpp"
+#include "BonTMINLP.hpp"
+
 class BM_lp : public BCP_lp_user
 {
-    struct BmSosInfo {
-	int num;
-	int *priority_order;
-	int *lengths;
-	char * types;
-	int *priorities;
-	int **indices;
-	double **weights;
-	BmSosInfo() : num(0) {}
-	~BmSosInfo();
-	void setFrom(const Bonmin::TMINLP::SosInfo * sos);
-	void shuffle();
-    };
-		
     BCP_string ipopt_file_content;
     BCP_string nl_file_content;
     BCP_parameter_set<BM_par> par;
 
     OsiBabSolver babSolver_;
     Bonmin::AmplInterface nlp;
-    BmSosInfo sos;
+    CoinWarmStart* ws;
 
     double lower_bound_;
     double* primal_solution_;
@@ -182,11 +171,6 @@ class BM_lp : public BCP_lp_user
 	fails too many times in a row then we fathom the node: it's hopelessly
 	difficult. */
     int numNlpFailed_;
-
-    /** If pure branch and bound is done then for each fractional variable
-	that ought to be integer we multiply it's distance from integrality
-	with it's priority and choose the var with the highest value */
-    double* branching_priority_;
 
     Bonmin::OACutGenerator2* feasChecker_;
     OsiCuts cuts_;
@@ -202,13 +186,6 @@ public:
     virtual void
     unpack_module_data(BCP_buffer& buf);
 
-    virtual void pack_var_algo(const BCP_var_algo* var, BCP_buffer& buf) {
-	BM_pack_var(var, buf);
-    }
-    virtual BCP_var_algo* unpack_var_algo(BCP_buffer& buf) {
-	return BM_unpack_var(buf);
-    }
-
     virtual void pack_cut_algo(const BCP_cut_algo* cut, BCP_buffer& buf) {
 	BB_pack_cut(cut, buf);
     }
@@ -223,6 +200,9 @@ public:
     pack_user_data(const BCP_user_data* ud, BCP_buffer& buf);
     virtual BCP_user_data*
     unpack_user_data(BCP_buffer& buf);
+
+    virtual void
+    process_message(BCP_buffer& buf);
 
     virtual OsiSolverInterface *
     initialize_solver_interface();
@@ -242,12 +222,6 @@ public:
 		 BCP_vec<BCP_cut*>& cuts,       // what to expand
 		 BCP_vec<BCP_row*>& rows,       // the expanded rows
 		 // things that the user can use for lifting cuts if allowed
-		 const BCP_lp_result& lpres,
-		 BCP_object_origin origin, bool allow_multiple);
-    virtual void
-    vars_to_cols(const BCP_vec<BCP_cut*>& cuts,
-		 BCP_vec<BCP_var*>& vars,
-		 BCP_vec<BCP_col*>& cols,
 		 const BCP_lp_result& lpres,
 		 BCP_object_origin origin, bool allow_multiple);
     virtual double

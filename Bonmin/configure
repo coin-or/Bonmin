@@ -23830,7 +23830,18 @@ echo "$as_me: Creating VPATH links for data files" >&6;}
     lnkcmd="$LN_S"
   fi
   for file in $coin_vpath_link_files; do
-    dir=`echo ./$file | sed -e 's|^/*$||'`
+    dir=`(dirname "./$file") 2>/dev/null ||
+$as_expr X"./$file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"./$file" : 'X\(//\)[^/]' \| \
+	 X"./$file" : 'X\(//\)$' \| \
+	 X"./$file" : 'X\(/\)' \| \
+	 .     : '\(.\)' 2>/dev/null ||
+echo X"./$file" |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
+  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
+  	  /^X\(\/\/\)$/{ s//\1/; q; }
+  	  /^X\(\/\).*/{ s//\1/; q; }
+  	  s/.*/./; q'`
     if test -d $dir; then : ; else
       { if $as_mkdir_p; then
     mkdir -p $dir
