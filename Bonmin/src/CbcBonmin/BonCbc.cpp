@@ -60,9 +60,12 @@
 
 
 // Code to enable user interuption
-static CbcModel * currentBranchModel = NULL;
-static Bonmin::OACutGenerator2 * currentOA = NULL;
-CbcModel * OAModel = NULL;
+static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
+static Bonmin::OACutGenerator2 * currentOA = NULL; //pointer to the OA generator
+CbcModel * OAModel = NULL; // pointer to the submip if using Cbc
+//#ifdef COIN_HAS_CPX
+//OsiCpxSolverInterface * CpxModel = NULL;//pointer to the submip if using cplex
+//#endif
 
 #include "CoinSignal.hpp"
 
@@ -74,7 +77,7 @@ extern "C"
     if (OAModel!=NULL)
       OAModel->setMaximumNodes(0); // stop at next node
     if (currentOA!=NULL)
-      currentOA->setMaxLocalSearchTime(0.); // stop at next node
+      currentOA->setMaxLocalSearchTime(0.); // stop OA
     return;
   }
 }
@@ -393,7 +396,16 @@ namespace Bonmin
       BonChooseVariable chooseVariable(nlpSolver);
       chooseVariable.setNumberStrong(model.numberStrong());
       branch.setChooseMethod(chooseVariable);}
-
+     else if(par.varSelection == 4){
+      OsiChooseVariable choose(model.solver());
+      branch.setChooseMethod(choose);
+    }
+    else if(par.varSelection == 5){
+      OsiChooseStrong choose(model.solver());
+      choose.setNumberBeforeTrusted(par.minReliability);
+      choose.setNumberStrong(par.numberStrong);
+      branch.setChooseMethod(choose);
+    }
     model.setBranchingMethod(&branch);
 
     //Get the time and start.
