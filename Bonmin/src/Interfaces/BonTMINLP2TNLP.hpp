@@ -172,6 +172,19 @@ namespace Bonmin
     /** force solution to be fractionnal.*/
     void force_fractionnal_sol();
 
+    /** Change the bounds on the variables */
+    void SetVariablesBounds(Index n,
+                            const Number * x_l,
+                            const Number * x_u);
+
+    /** Change the lower bound on the variables */
+    void SetVariablesLowerBounds(Index n,
+                               const Number * x_l);
+
+    /** Change the upper bound on the variable */
+    void SetVariablesUpperBounds(Index n,
+                                const Number * x_u);
+
     /** Change the bounds on the variable */
     void SetVariableBounds(Index var_no, Number x_l, Number x_u);
 

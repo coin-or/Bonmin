@@ -179,6 +179,29 @@ namespace Bonmin
     need_new_warm_starter_ = other.need_new_warm_starter_;
   }
 
+  void TMINLP2TNLP::SetVariablesBounds(Index n,
+                                       const Number * x_l,
+                                       const Number * x_u)
+  {
+    DBG_ASSERT(n==n_);
+    IpBlasDcopy(n_, x_l, 1, x_l_, 1);
+    IpBlasDcopy(n_, x_u, 1, x_u_, 1);
+  }
+
+   void TMINLP2TNLP::SetVariablesLowerBounds(Index n,
+                                       const Number * x_l)
+  {
+    DBG_ASSERT(n==n_);
+    IpBlasDcopy(n_, x_l, 1, x_l_, 1);
+  }
+
+   void TMINLP2TNLP::SetVariablesUpperBounds(Index n,
+                                       const Number * x_u)
+  {
+    DBG_ASSERT(n==n_);
+    IpBlasDcopy(n_, x_u, 1, x_u_, 1);
+  }
+
   void TMINLP2TNLP::SetVariableBounds(Index var_no, Number x_l, Number x_u)
   {
     DBG_ASSERT(var_no >= 0 && var_no < n_);

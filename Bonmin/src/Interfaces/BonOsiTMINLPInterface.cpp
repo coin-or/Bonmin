@@ -35,7 +35,7 @@ register_general_options
 
   roptions->AddBoundedIntegerOption("bb_log_level",
       "specify main branch-and-bound log level.",
-      0,3,1,
+      0,5,1,
       "Set the level of output of the branch-and-bound : "
       "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                    );
@@ -149,13 +149,15 @@ register_general_options
       "integer feasible solutions have been found).",
       "Choose the strategy for selecting the next node to be processed.");
 
-  roptions->AddStringOption4("varselect_stra",
+  roptions->AddStringOption6("varselect_stra",
       "Chooses variable selection strategy",
       "strong_branching",
       "most_fractional", "Choose most fractional variable",
       "strong_branching", "Perform strong branching",
-      "reliability_branching", "Use reliability branching",
-      "curvature_estimator", "Use curvature estimation to select branching variable","");
+      "reliability-branching", "Use reliability branching",
+      "curvature-estimator", "Use curvature estimation to select branching variable",
+      "osi-simple", "Osi method to do simple branching",
+      "osi-strong", "Osi method to do strong branching","");
 
   roptions->AddLowerBoundedIntegerOption("number_strong_branch",
       "Choose the maximum number of variables considered for strong branching.",
@@ -1268,11 +1270,9 @@ OsiTMINLPInterface::setColUpper( int elementIndex, double elementValue )
 void
 OsiTMINLPInterface::setColLower( const double* array )
 {
-    for (int i = getNumCols() - 1; i >= 0; --i) {
-	//  if(fabs(problem_->x_l()[i]-array[i])>1e-06)
-	problem_->SetVariableLowerBound(i, array[i]);
-    }
-    hasBeenOptimized_ = false;
+  problem_->SetVariablesLowerBounds(problem_->num_variables(),
+                                  array);
+  hasBeenOptimized_ = false;
 }
 
 /** Set Set the upper bounds for all columns
@@ -1280,11 +1280,9 @@ OsiTMINLPInterface::setColLower( const double* array )
 void
 OsiTMINLPInterface::setColUpper( const double* array )
 {
-    for (int i = getNumCols() - 1; i >= 0; --i) {
-	//  if(fabs(problem_->x_u()[i]-elementValue)>1e-06)
-	problem_->SetVariableUpperBound(i, array[i]);
-    }
-    hasBeenOptimized_ = false;
+  problem_->SetVariablesUpperBounds(problem_->num_variables(), 
+                                  array);
+  hasBeenOptimized_ = false;
 }
 
 /** Set a single row lower bound.
