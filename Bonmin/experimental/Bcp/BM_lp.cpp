@@ -36,9 +36,6 @@ BM_lp::initialize_solver_interface()
     clp->messageHandler()->setLogLevel(0);
     setOsiBabSolver(dynamic_cast<OsiBabSolver *>(clp->getAuxiliaryInfo()));
 
-    // copy over the OsiObjects from the nlp solver
-    clp->addObjects(nlp.numberObjects(), nlp.objects());
-
     return clp;
 }
 
@@ -61,20 +58,23 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
     nlp.setColLower(osi->getColLower());
     nlp.setColUpper(osi->getColUpper());
 
-    // Carry the changes over to the object lists in osi and in nlp
-    const int numObj = osi->numberObjects();
-    OsiObject** osiObj = osi->objects();
+    // Carry the changes over to the object lists in nlp
+    const int numObj = nlp.numberObjects();
     OsiObject** nlpObj = nlp.objects();
     for (i = 0; i < numObj; ++i) {
-	OsiSimpleInteger* io = dynamic_cast<OsiSimpleInteger*>(osiObj[i]);
+	OsiSimpleInteger* io = dynamic_cast<OsiSimpleInteger*>(nlpObj[i]);
 	if (io) {
-	    io->resetBounds(osi);
-	    io = dynamic_cast<OsiSimpleInteger*>(nlpObj[i]);
 	    io->resetBounds(&nlp);
-	    continue;
+	} else {
+	    // The rest is OsiSOS where we don't need to do anything
+	    break;
 	}
-	// The rest is OsiSOS where we don't need to do anything
-	break;
+    }
+
+    // copy over the OsiObjects from the nlp solver if the lp solver is to be
+    // used at all (i.e., not pure B&B)
+    if (! par.entry(BM_par::PureBranchAndBound)) {
+	osi->addObjects(nlp.numberObjects(), nlp.objects());
     }
 
     in_strong = 0;

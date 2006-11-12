@@ -33,8 +33,8 @@ int main(int argc, char* argv[])
 template <>
 void BCP_parameter_set<BM_par>::create_keyword_list() {
     // Create the list of keywords for parameter file reading
-    keys.push_back(make_pair(BCP_string("BranchOnSos"),
-			     BCP_parameter(BCP_CharPar, BranchOnSos)));
+    keys.push_back(make_pair(BCP_string("BranchingStrategy"),
+			     BCP_parameter(BCP_IntPar, BranchingStrategy)));
     keys.push_back(make_pair(BCP_string("PureBranchAndBound"),
 			     BCP_parameter(BCP_CharPar, PureBranchAndBound)));
     keys.push_back(make_pair(BCP_string("PrintBranchingInfo"),
@@ -62,7 +62,7 @@ void BCP_parameter_set<BM_par>::create_keyword_list() {
 
 template <>
 void BCP_parameter_set<BM_par>::set_default_entries() {
-    set_entry(BranchOnSos, true);
+    set_entry(BranchingStrategy, BM_OsiChooseStrong);
     set_entry(PureBranchAndBound, false);
     set_entry(PrintBranchingInfo, true);
     set_entry(CombinedDistanceAndPriority, true);

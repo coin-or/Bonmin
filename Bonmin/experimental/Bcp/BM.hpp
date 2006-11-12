@@ -45,11 +45,15 @@ enum BM_WarmStartStrategy {
     WarmStartFromParent
 };
 
+enum BM_BranchingStrategy {
+    BM_OsiChooseVariable,
+    BM_OsiChooseStrong
+};
+
 class BM_par {
 public:
     enum chr_params {
         //
-	BranchOnSos,
         CombinedDistanceAndPriority,
         PureBranchAndBound,
 	PrintBranchingInfo,
@@ -59,6 +63,7 @@ public:
     };
     enum int_params {
         //
+	BranchingStrategy,
         NumNlpFailureMax,
 	WarmStartStrategy,
         end_of_int_params
