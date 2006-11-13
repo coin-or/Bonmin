@@ -107,6 +107,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
 	matrix = new BCP_lp_relax(true /*column major ordered*/);
 	matrix->copyOf(*clp.getMatrixByCol(), obj, clb, cub, rlb, rub);
     }
+    delete[] obj;
 }
 
 /****************************************************************************/

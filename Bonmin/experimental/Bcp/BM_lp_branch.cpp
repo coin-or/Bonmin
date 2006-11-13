@@ -171,6 +171,7 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
 	    }
 	}
 
+	delete brObj;
 	delete[] clb_old;
 	delete[] cub_old;
 	delete choose;
