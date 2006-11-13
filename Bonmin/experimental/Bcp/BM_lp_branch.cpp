@@ -74,8 +74,9 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 
 	const int brResult = try_to_branch(brInfo, &nlp, choose, brObj, true);
 
+#if 0
 	if (choose->goodSolution()) {
-	    /* yipee! a feasible solution! */
+	    /* yipee! a feasible solution! Check that it's really */
 	    const double* sol = choose->goodSolution();
 	    BM_solution* bmsol = new BM_solution;
 	    //Just copy the solution stored in solver to sol
@@ -90,7 +91,7 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 	    send_feasible_solution(bmsol);
 	    delete bmsol;
 	}
-
+#endif
 	switch (brResult) {
 	case -2:
 	    // when doing strong branching a candidate has proved that the
