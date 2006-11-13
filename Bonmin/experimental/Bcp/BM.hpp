@@ -168,6 +168,11 @@ class BM_lp : public BCP_lp_user
     Bonmin::AmplInterface nlp;
     CoinWarmStart* ws;
 
+    /* FIXME: gross cheating. works only for serial mode. Store the warmstart
+       informations in the lp process, do not send them over in user data or
+       anywhere. MUST be fixed. The map is indexed by the node index. */
+    std::map<int, CoinWarmStart*> warmStart;
+
     double lower_bound_;
     double* primal_solution_;
 

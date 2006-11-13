@@ -56,7 +56,7 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 	switch (par.entry(BM_par::BranchingStrategy)) {
 	case BM_OsiChooseVariable:
 	    choose = new OsiChooseVariable(&nlp);
-	    choose->setNumberStrong(1);
+	    // choose->setNumberStrong(1);
 	    break;
 	case BM_OsiChooseStrong:
 	    OsiChooseStrong* strong = new OsiChooseStrong(&nlp);
@@ -142,14 +142,14 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
 	if (retCode == BCP_DoBranch) {
 	    // all possibilities are 2-way branches
 	    int order[2] = {0, 1};
-	    if (choose->bestWhichWay() == 1) {
-		order[0] = 1;
-		order[1] = 0;
-	    }
 	    // Now interpret the result (at this point we must have a brObj
 	    OsiIntegerBranchingObject* intBrObj =
 		dynamic_cast<OsiIntegerBranchingObject*>(brObj);
 	    if (intBrObj) {
+		if (intBrObj->firstBranch() == 1) {
+		    order[0] = 1;
+		    order[1] = 0;
+		}
 		BCP_lp_integer_branching_object o(intBrObj);
 		cands.push_back(new BCP_lp_branching_object(o, order));
 		if (par.entry(BM_par::PrintBranchingInfo)) {
@@ -161,6 +161,10 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
 	    OsiSOSBranchingObject* sosBrObj =
 		dynamic_cast<OsiSOSBranchingObject*>(brObj);
 	    if (sosBrObj) {
+		if (sosBrObj->firstBranch() == 1) {
+		    order[0] = 1;
+		    order[1] = 0;
+		}
 		BCP_lp_sos_branching_object o(sosBrObj);
 		cands.push_back(new BCP_lp_branching_object(&nlp, o, order));
 		if (par.entry(BM_par::PrintBranchingInfo)) {

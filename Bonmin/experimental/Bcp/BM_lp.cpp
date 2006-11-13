@@ -1,5 +1,6 @@
 #include "OsiClpSolverInterface.hpp"
 #include "BM.hpp"
+#include "BCP_lp_node.hpp"
 
 //#############################################################################
 
@@ -22,6 +23,11 @@ BM_lp::~BM_lp()
     delete ws;
     delete feasChecker_;
     delete[] primal_solution_;
+    /* FIXME: CHEATING */
+    for (std::map<int, CoinWarmStart*>::iterator it = warmStart.begin();
+	 it != warmStart.end(); ++it) {
+	delete it->second;
+    }
 }
 
 /****************************************************************************/
@@ -120,7 +126,8 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 		ws = nlp.getWarmStart();
 		break;
 	    case WarmStartFromParent:
-		// FIXME: not yet implemented
+		/* FIXME: CHEAT */
+		warmStart[0] = nlp.getWarmStart();
 		break;
 	    }
 	} else {
@@ -133,8 +140,24 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 		nlp.resolve();
 		break;
 	    case WarmStartFromParent:
-		// FIXME: not yet implemented
-		nlp.initialSolve();
+		{
+		    const int ind = current_index();
+		    const int parentind =
+			getLpProblemPointer()->parent->index;
+		    /* FIXME: CHEAT */
+		    std::map<int, CoinWarmStart*>::iterator it =
+			warmStart.find(parentind);
+		    nlp.setWarmStart(it->second);
+		    nlp.resolve();
+		    warmStart[ind] = nlp.getWarmStart();
+		    bool sibling_seen =  ((ind & 1) == 0) ?
+			warmStart.find(ind-1) != warmStart.end() :
+			warmStart.find(ind+1) != warmStart.end() ;
+		    if (sibling_seen) {
+			delete it->second;
+			warmStart.erase(it);
+		    }
+		}
 		break;
 	    }
 	}
