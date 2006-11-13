@@ -2079,9 +2079,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     }
     v->insert(n,-1);
     si.addRow(objCut, lb, ub);
-    delete [] obj;
   }
-
+  delete [] obj;
 
   app_->enableWarmStart();
   setColSolution(problem()->x_sol());
