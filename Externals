@@ -8,7 +8,7 @@ Data/Sample   https://projects.coin-or.org/svn/Data/trunk/Sample
 Data/miplib3  https://projects.coin-or.org/svn/Data/trunk/miplib3
 CoinUtils     https://projects.coin-or.org/svn/CoinUtils/branches/devel/CoinUtils
 Cbc           https://projects.coin-or.org/svn/Cbc/branches/devel/Cbc
-Cgl           https://projects.coin-or.org/svn/Cgl/branches/devel/Cgl
+Cgl           https://projects.coin-or.org/svn/Cgl/trunk/Cgl
 Clp           https://projects.coin-or.org/svn/Clp/branches/devel/Clp
 Ipopt         https://projects.coin-or.org/svn/Ipopt/branches/devel/Ipopt
 Osi           https://projects.coin-or.org/svn/Osi/branches/devel/Osi
