@@ -98,6 +98,16 @@ BM_init::tm_init(BCP_tm_prob& p,
 	tm->par.read_from_arglist(argnum, arglist);
     }
 
+    if (! p.param(BCP_tm_par::MessagePassingIsSerial) &&
+	tm->par.entry(BM_par::PureBranchAndBound) &&
+	tm->par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
+	printf("\
+BM: WarmStartFromParent is not supported for pure B&B in parallel env.\n");
+	printf("\
+BM: Switching to WarmStartFromRoot.\n");
+	tm->par.set_entry(BM_par::WarmStartStrategy, WarmStartFromRoot);
+    }
+
     tm->readIpopt();
 
     return tm;

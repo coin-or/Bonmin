@@ -117,49 +117,34 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	   feasible (or along the NLP optimization we have blundered into
 	   a feas sol) then create "sol"
 	*/
-	if (current_index() == 0) {
+	switch (par.entry(BM_par::WarmStartStrategy)) {
+	case WarmStartNone:
 	    nlp.initialSolve();
-	    switch (par.entry(BM_par::WarmStartStrategy)) {
-	    case WarmStartNone:
-		break;
-	    case WarmStartFromRoot:
-		ws = nlp.getWarmStart();
-		break;
-	    case WarmStartFromParent:
-		/* FIXME: CHEAT */
-		warmStart[0] = nlp.getWarmStart();
-		break;
-	    }
-	} else {
-	    switch (par.entry(BM_par::WarmStartStrategy)) {
-	    case WarmStartNone:
-		nlp.initialSolve();
-		break;
-	    case WarmStartFromRoot:
-		nlp.setWarmStart(ws);
+	    break;
+	case WarmStartFromRoot:
+	    nlp.setWarmStart(ws);
+	    nlp.resolve();
+	    break;
+	case WarmStartFromParent:
+	    /* FIXME: CHEAT! this works only in serial mode! */
+	    {
+		const int ind = current_index();
+		const int parentind =
+		    getLpProblemPointer()->parent->index;
+		std::map<int, CoinWarmStart*>::iterator it =
+		    warmStart.find(parentind);
+		nlp.setWarmStart(it->second);
 		nlp.resolve();
-		break;
-	    case WarmStartFromParent:
-		{
-		    const int ind = current_index();
-		    const int parentind =
-			getLpProblemPointer()->parent->index;
-		    /* FIXME: CHEAT */
-		    std::map<int, CoinWarmStart*>::iterator it =
-			warmStart.find(parentind);
-		    nlp.setWarmStart(it->second);
-		    nlp.resolve();
-		    warmStart[ind] = nlp.getWarmStart();
-		    bool sibling_seen =  ((ind & 1) == 0) ?
-			warmStart.find(ind-1) != warmStart.end() :
-			warmStart.find(ind+1) != warmStart.end() ;
-		    if (sibling_seen) {
-			delete it->second;
-			warmStart.erase(it);
-		    }
+		warmStart[ind] = nlp.getWarmStart();
+		bool sibling_seen =  ((ind & 1) == 0) ?
+		    warmStart.find(ind-1) != warmStart.end() :
+		    warmStart.find(ind+1) != warmStart.end() ;
+		if (sibling_seen) {
+		    delete it->second;
+		    warmStart.erase(it);
 		}
-		break;
 	    }
+	    break;
 	}
 
 	const int numCols = nlp.getNumCols();

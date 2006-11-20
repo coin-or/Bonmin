@@ -157,6 +157,15 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 
     /* just to be on the safe side... always allocate */
     primal_solution_ = new double[nlp.getNumCols()];
+
+    /* solve the initial nlp to get warmstart info in the root */
+    nlp.initialSolve();
+    ws = nlp.getWarmStart();
+    if (param(BCP_lp_par::MessagePassingIsSerial) &&
+	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
+	warmStart[0] = ws;
+	ws = NULL;
+    }
 }
 
 //#############################################################################
