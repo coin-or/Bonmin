@@ -161,7 +161,7 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     /* solve the initial nlp to get warmstart info in the root */
     nlp.initialSolve();
     ws = nlp.getWarmStart();
-    if (param(BCP_lp_par::MessagePassingIsSerial) &&
+    if (get_param(BCP_lp_par::MessagePassingIsSerial) &&
 	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
 	warmStart[0] = ws;
 	ws = NULL;

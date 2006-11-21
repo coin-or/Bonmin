@@ -46,11 +46,6 @@ AC_COIN_PROJECTDIR_INIT
 # Check if user wants to produce debugging code
 AC_COIN_DEBUG_COMPILE
 
-# on blue gene, we need to define -DBLUE_GENE_XLC for the COIN headers
-if test x"$enable_bg" = xyes; then
-  ADD_CXXFLAGS="$ADD_CXXFLAGS -DBLUE_GENE_XLC"
-fi
-
 # Get the name of the C++ compiler and appropriate compiler options
 AC_COIN_PROG_CXX
 
