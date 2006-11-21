@@ -8,6 +8,8 @@
 // Date : 10/02/2006
 
 #include "BonFilterSolver.hpp"
+#include "BonFilterWarmStart.hpp"
+
 #include <fstream>
 
 #include "CoinTime.hpp"
@@ -320,7 +322,7 @@ TNLPSolver::ReturnStatus
 FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 {
   assert(tnlp == cached_->tnlp_);
-  cached_->ifail = 0;//-1;
+  cached_->ifail = -1;
   //rescan bounds which may have changed
   assert(cached_->bounds);
   int n = cached_->n;
@@ -582,6 +584,27 @@ FilterSolver::UnsolvedFilterError::errorName() const
 const std::string& 
 FilterSolver::UnsolvedFilterError::solverName() const
 { return solverName_;}
+
+bool
+FilterSolver::setWarmStart(const CoinWarmStart * warm, 
+			   Ipopt::SmartPtr<TMINLP2TNLP> tnlp){
+  const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
+  CoinCopyN(warmF->array(), warmF->size(), cached_->lws);
+  for(int i = 0 ; i < 14 ; i ++)
+    {
+      cached_->istat[i] = warmF->istat()[i];
+    }
+  return 1;
+}
+
+CoinWarmStart *
+FilterSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
+  return new FilterWarmStart(cached_->maxiWk, cached_->lws, cached_->istat);
+}
+
+CoinWarmStart * 
+FilterSolver::getEmptyWarmStart() const {
+  return new FilterWarmStart;}
 
 
 

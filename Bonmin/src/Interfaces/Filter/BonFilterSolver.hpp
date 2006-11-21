@@ -12,7 +12,6 @@
 
 #include "BonTNLPSolver.hpp"
 
-#include "CoinWarmStartBasis.hpp"
 namespace Bonmin{
 class FilterSolver : public TNLPSolver{
 public:
@@ -36,15 +35,17 @@ public:
     static std::string solverName_;
 };
 
+  /** Fortran type for integer used in filter. */
+    typedef ipfint fint;
+  /** Fortran type for double.used in filter */
+    typedef double real;
+
+
   virtual UnsolvedError * newUnsolvedError(int num,
 					   Ipopt::SmartPtr<TMINLP2TNLP> problem,
 					   std::string name){
     return new UnsolvedFilterError(num, problem, name);}
 
-
-
-    typedef ipfint fint;
-    typedef double real;
 
   ///Default constructor
   FilterSolver();
@@ -70,15 +71,12 @@ public:
 
   /// Set the warm start in the solver
   virtual bool setWarmStart(const CoinWarmStart * warm, 
-                            Ipopt::SmartPtr<TMINLP2TNLP> tnlp){
-   return 1;}
+                            Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
 
   /// Get the warm start form the solver
-  virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
-   return new CoinWarmStartBasis;}
+  virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const;
 
-  virtual CoinWarmStart * getEmptyWarmStart() const {
-  return new CoinWarmStartBasis;}
+  virtual CoinWarmStart * getEmptyWarmStart() const;
 
 
   virtual void enableWarmStart()
