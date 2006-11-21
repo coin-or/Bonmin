@@ -6,6 +6,11 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
+
+# Source: Bonmin/src/IpoptInterface/Makefile.am
+# Modified for filterInterface
+#          P. Bonami                  IBM    2006-10-02
+
 AUTOMAKE_OPTIONS = foreign
 
 ########################################################################
@@ -18,7 +23,9 @@ noinst_LTLIBRARIES = libfilterinterface.la
 # List all source files, including headers
 libfilterinterface_la_SOURCES = \
         BonFilterSolver.cpp \
-        BonFilterSolver.hpp 
+        BonFilterSolver.hpp \
+        BonFilterWarmStart.cpp \
+        BonFilterWarmStart.hpp
 
 # This is for libtool (on Windows)
 libfilterinterface_la_LDFLAGS = $(LT_LDFLAGS)
@@ -52,7 +59,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 include_HEADERS =  \
-                  BonFilterSolver.hpp 
+                  BonFilterSolver.hpp \
+                  BonFilterWarmStart.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -61,7 +69,9 @@ include_HEADERS =  \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
          BonFilterSolver.cppbak \
-         BonFilterSolver.hppbak 
+         BonFilterSolver.hppbak \
+         BonFilterWarmStart.cppbak \
+         BonFilterWarmStart.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

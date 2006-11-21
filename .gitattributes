@@ -30,6 +30,8 @@ Bonmin/src/Interfaces/BonTNLPSolver.cpp -text
 Bonmin/src/Interfaces/BonTNLPSolver.hpp -text
 Bonmin/src/Interfaces/Filter/BonFilterSolver.cpp -text
 Bonmin/src/Interfaces/Filter/BonFilterSolver.hpp -text
+Bonmin/src/Interfaces/Filter/BonFilterWarmStart.cpp -text
+Bonmin/src/Interfaces/Filter/BonFilterWarmStart.hpp -text
 Bonmin/src/Interfaces/Filter/Makefile.am -text
 Bonmin/src/Interfaces/Filter/Makefile.in -text
 Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.cpp -text
