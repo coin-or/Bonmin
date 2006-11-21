@@ -104,7 +104,7 @@ bonmin_DEPENDENCIES = ../Interfaces/Ampl/libamplinterface.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_2)
-am_nodeSolver_OBJECTS = nodeSolver.$(OBJEXT)
+am_nodeSolver_OBJECTS = BonNodeSolver.$(OBJEXT)
 nodeSolver_OBJECTS = $(am_nodeSolver_OBJECTS)
 nodeSolver_DEPENDENCIES = ../Interfaces/Ampl/libamplinterface.la \
 	libbonmin.la \
@@ -404,7 +404,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 #                              nodeSolver                              #
 ########################################################################
-nodeSolver_SOURCES = nodeSolver.cpp
+nodeSolver_SOURCES = BonNodeSolver.cpp
 nodeSolver_LDADD = \
 	../Interfaces/Ampl/libamplinterface.la \
 	libbonmin.la \
@@ -531,9 +531,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonMin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonNodeSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcBranchUser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcCompareUser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nodeSolver.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

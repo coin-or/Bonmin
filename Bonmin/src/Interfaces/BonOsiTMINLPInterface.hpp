@@ -70,8 +70,8 @@ class SimpleError : public CoinError
   ;
 
   // Error when problem is not solved
-  TNLPSolver::UnsolvedError * newUnsolvedError(int num){
-    return app_->newUnsolvedError(num);
+  TNLPSolver::UnsolvedError * newUnsolvedError(int num, Ipopt::SmartPtr<TMINLP2TNLP> problem, std::string name){
+    return app_->newUnsolvedError(num, problem, name);
   }
   //#############################################################################
 
@@ -858,8 +858,8 @@ protected:
         "applyColCut");
   }
 
-  /** Read the name of the variables in an ampl .col file. */
-  void readVarNames() const;
+//  /** Read the name of the variables in an ampl .col file. */
+//  void readVarNames() const;
 
   //@}
 

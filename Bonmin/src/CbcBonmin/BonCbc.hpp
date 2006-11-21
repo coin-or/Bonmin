@@ -70,6 +70,7 @@ namespace Bonmin
         (replace with user set). This is called after CbcModel::findIntegers */
     virtual void replaceIntegers(OsiObject ** objects, int numberObjects)
     {};
+
   private:
     /** Stores the solution of MIP. */
     double * bestSolution_;

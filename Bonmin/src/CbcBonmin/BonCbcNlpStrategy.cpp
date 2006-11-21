@@ -132,23 +132,26 @@ namespace Bonmin
         seqOfUnsolvedSize <= maxFailure_) {
       std::cout<<"Branching on unsolved node, sequence of unsolved size "<<seqOfUnsolvedSize<<std::endl;
       // Have to make sure that we will branch
-      OsiTMINLPInterface * ipopt = dynamic_cast<OsiTMINLPInterface *>(solver);
-      ipopt->forceBranchable();     //      feasible=1;
+      OsiTMINLPInterface * osiMinlp = dynamic_cast<OsiTMINLPInterface *>(solver);
+      osiMinlp->forceBranchable();     //      feasible=1;
       returnStatus = 0;
     }
 
     if (solver->isAbandoned() && parent != NULL &&
         seqOfUnsolvedSize > maxFailure_) {
       hasFailed_ = true;
-      OsiTMINLPInterface * ipopt =
+      OsiTMINLPInterface * osiMinlp =
         dynamic_cast<OsiTMINLPInterface *>(solver);
       if (pretendFailIsInfeasible_) {
         //force infeasible
-        ipopt->forceInfeasible();
+        osiMinlp->forceInfeasible();
         returnStatus = 2;
       }
-      else
-        throw ipopt->newUnsolvedError(0);
+      else {
+	std::string probName;
+	osiMinlp->getStrParam(OsiProbName,probName);
+        throw osiMinlp->newUnsolvedError(0, osiMinlp->problem(), probName);
+      }
     }
     return returnStatus;
   }

@@ -19,7 +19,7 @@
 #include <map>
 
 namespace Bonmin{
-/** A class for reading a .col file containing name for variable (ampl generated file).
+/** A class for reading a .col file containing name for variables (usually ampl generated file).
    */
 class ColReader
 {
@@ -37,8 +37,18 @@ public:
     return readFile();
   }
 
-  /** Copy the names to varNames */
+  /** Copy the names to varNames. */
   void copyNames(std::string *varNames, int n_var);
+
+  /** Access Names of variable i. */
+  const std::string& varName(int i){
+   return varNames_[i];
+  }
+
+  /** Access index of variable str */
+  int varIndex(const char * str){
+    return varIndices_[str];
+  }
 private:
   /// Name of the file to read.
   std::string fileName_;

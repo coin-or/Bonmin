@@ -1009,7 +1009,10 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     return;
   }
   else {
-    throw newUnsolvedError(optimization_status_);
+    std::string probName;
+    getStrParam(OsiProbName,probName);
+    throw newUnsolvedError(optimization_status_, problem_,
+                           probName);
   }
 }
 
@@ -1043,6 +1046,7 @@ OsiTMINLPInterface::getColUpper() const
   return problem_->x_u();
 }
 
+#if 0
 void
 OsiTMINLPInterface::readVarNames() const
 {
@@ -1069,6 +1073,8 @@ OsiTMINLPInterface::getVarNames() const
   }
   return varNames_;
 }
+#endif
+
 
 void OsiTMINLPInterface::extractSenseRhsAndRange() const
 {
@@ -2154,7 +2160,9 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 	}
       if(numcols - numberFixed > numberEqualities)
 	{
-	  throw newUnsolvedError(optimization_status_);
+	  std::string probName;
+	  getStrParam(OsiProbName, probName);
+	  throw newUnsolvedError(optimization_status_, problem_, probName);
 	}
       double * saveColLow = CoinCopyOfArray(getColLower(), getNumCols());
       double * saveColUp = CoinCopyOfArray(getColUpper(), getNumCols());
@@ -2181,9 +2189,11 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     }
   else 
 #endif
-    if(optimization_status_ < -1)//Ipopt failed and the error can not be recovered, throw it
+    if(optimization_status_ < -1)//Solver failed and the error can not be recovered, throw it
   {
-    throw newUnsolvedError(optimization_status_);
+    std::string probName;
+    getStrParam(OsiProbName, probName);
+    throw newUnsolvedError(optimization_status_, problem_, probName);
   }
   try{
   totalIterations_ += app_->IterationCount();

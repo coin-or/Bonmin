@@ -120,7 +120,7 @@ CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
 #                              nodeSolver                              #
 ########################################################################
 
-nodeSolver_SOURCES = nodeSolver.cpp
+nodeSolver_SOURCES = BonNodeSolver.cpp
 
 nodeSolver_LDADD = \
 	../Interfaces/Ampl/libamplinterface.la \

@@ -17,12 +17,15 @@
 #include <cassert>
 #include <iomanip>
 
+#include "BonminConfig.h"
 
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "BonBoundsReader.hpp"
 #include "BonStartPointReader.hpp"
-
+#ifdef COIN_HAS_FSQP
+#include "BonFilterSolver.cpp"
+#endif
 #include "CoinTime.hpp"
 
 /************************************************************************
@@ -55,8 +58,36 @@ int main (int argc, char *argv[])
   strcpy(myArgv[1],argv[1]);
   myArgv[2]= NULL;//new char[1];
 
+  //We need to build dummy solver objects to get the options, determine which is the solver to use and register all the options
+  Ipopt::SmartPtr<IpoptSolver> dummy_ipopt = new IpoptSolver;
+  OsiTMINLPInterface forOption(GetRawPtr(dummy_ipopt));
 
-  Bonmin::AmplInterface nlpSolver(myArgv, new IpoptSolver);
+
+  int solverUsed = 0; // 0 is Ipopt, 1 is Filter
+  forOption.solver()->Options()->GetEnumValue("nlp_solver", solverUsed,"bonmin.");
+
+
+  Ipopt::SmartPtr<TNLPSolver> solver;
+  if(solverUsed == 0)
+    solver = new IpoptSolver;
+  else if(solverUsed == 1)
+#ifdef COIN_HAS_FSQP
+    solver = new FilterSolver;
+#else
+    {
+      std::cerr<<"filterSQP is not propoerly configured for using into Bonmin"<<std::endl
+               <<"be sure to run the configure script with options:"<<std::endl
+               <<"--with-filtersqp_lib=\"<path_to_filter_library>\""<<std::endl
+               <<"--with-filtersqp_incdir=\"\""<<std::endl;
+               throw -1;
+      }
+#endif
+  else
+    {
+      std::cerr<<"Trying to use unknown solver."<<std::endl;
+    }
+
+  Bonmin::AmplInterface nlpSolver(myArgv, solver);
 
   Ipopt::SmartPtr<Ipopt::OptionsList> Options =
     nlpSolver.retrieve_options();

@@ -19,8 +19,10 @@ public:
 class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
 {
  public:
-  UnsolvedIpoptError(int errorNum = 10000):
-  TNLPSolver::UnsolvedError(errorNum)
+  UnsolvedIpoptError(int errorNum,
+		     Ipopt::SmartPtr<TMINLP2TNLP> problem,
+		     std::string name):
+  TNLPSolver::UnsolvedError(errorNum, problem, name)
   {}
   virtual const std::string& errorName() const;
  
@@ -31,8 +33,10 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   static std::string solverName_;
 };
 
-  virtual UnsolvedError * newUnsolvedError(int num){
-    return new UnsolvedIpoptError(num);}
+  virtual UnsolvedError * newUnsolvedError(int num,
+					   Ipopt::SmartPtr<TMINLP2TNLP> problem,
+					   std::string name){
+    return new UnsolvedIpoptError(num, problem, name);}
 
 
 

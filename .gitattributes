@@ -36,7 +36,6 @@ Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.cpp -text
 Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.hpp -text
 Bonmin/src/Interfaces/Ipopt/Makefile.am -text
 Bonmin/src/Interfaces/Ipopt/Makefile.in -text
-Bonmin/src/Interfaces/README -text
 Bonmin/src/OaAlgorithms/BonFpForMinlp.cpp -text
 Bonmin/src/OaAlgorithms/BonFpForMinlp.hpp -text
 Bonmin/test/bonmin.opt -text

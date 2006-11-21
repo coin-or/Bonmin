@@ -11,10 +11,7 @@
 #include <iostream>
 
 namespace Bonmin{
-/** Keywords of the .int file */
-static std::string keywords[]= { "priorities", "PRIORITIES",
-    "special_ordered_set_1",
-    "SPECIAL_ORDERED_SET_1"};
+
 ColReader::ColReader(const char * fileName)
     :
     fileName_(), varIndices_(), varNames_()

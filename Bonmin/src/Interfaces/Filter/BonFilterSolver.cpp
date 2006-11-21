@@ -1,3 +1,12 @@
+// (C) Copyright International Business Machines Corporation, Carnegie Mellon University 2006
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Pierre Bonami, International Business Machines Corporation
+//
+// Date : 10/02/2006
+
 #include "BonFilterSolver.hpp"
 #include <fstream>
 
@@ -74,24 +83,24 @@ extern "C" {
 /// Objective function evaluation
 void objfun_(real *x, fint *n, real * f, real *user, fint * iuser, fint * errflag)
 {
-  tnlpSolved->eval_f(*n, x, 1, *f);
+  (*errflag) = !tnlpSolved->eval_f(*n, x, 1, *f);
 }
 
 /** Constraint functions evaluation. */
 void 
 confun_(real * x, fint * n , fint *m, real *c, real *a, fint * la, real * user, fint * iuser,
-	fint * errflags){
-  tnlpSolved->eval_g(*n, x, 1, *m, c);
+	fint * errflag){
+  (*errflag) = !tnlpSolved->eval_g(*n, x, 1, *m, c);
 }
 
 void
 gradient_(fint *n, fint *m, fint * mxa, real * x, real *a, fint * la,
 	  fint * maxa, real * user, fint * iuser, fint * errflag){
-  tnlpSolved->eval_grad_f(*n, x, 1, a);
+  (*errflag) = !tnlpSolved->eval_grad_f(*n, x, 1, a);
   /// ATTENTION: Filter expect the jacobian to be ordered by row 
   int nnz = la[0] - *n - 1;
   double * values = new double [nnz];
-  tnlpSolved->eval_jac_g(*n, x, 1, *m, nnz, NULL, NULL, values);
+  (*errflag) = !tnlpSolved->eval_jac_g(*n, x, 1, *m, nnz, NULL, NULL, values) || (*errflag);
   a+= *n;
   for(int i = 0 ; i < nnz ; i++)
     {
@@ -112,7 +121,7 @@ hessian_(real *x, fint *n, fint *m, fint *phase, real *lam,
 	     real *ws, fint *lws, real *user, fint *iuser,
 	     fint *l_hess, fint *li_hess, fint *errflag)
 {
-  real obj_factor = (*phase == 1)? 0. : 1.;
+  Number obj_factor = (*phase == 1)? 0. : 1.;
   fint  end = nnz_h + (*n)  + 2;
 
   for(int i = 0 ; i < end ; i++)
@@ -122,14 +131,11 @@ hessian_(real *x, fint *n, fint *m, fint *phase, real *lam,
   *l_hess = nnz_h;
   *li_hess = nnz_h + *n + 3;
   end = *n + *m;
-  //std::cout<<"lambda"<<std::endl;
   for(int i = *n ; i < end ; i++){
     g[i] = - lam[i];
-   // std::cout<<lam[i]<<"\t";
    }
-  //std::cout<<std::endl;
-  real * values = new real [nnz_h];
-  tnlpSolved->eval_h(*n, x, 1, obj_factor, *m, g + *n ,1, hStruct[0] - 1, NULL, NULL, values);
+  Number * values = new Number [nnz_h];
+  (*errflag) = !tnlpSolved->eval_h(*n, x, 1, obj_factor, *m, g + *n ,1, hStruct[0] - 1, NULL, NULL, values);
    for(int i = 0 ; i < nnz_h ; i++) ws[i] = values[permutationHess[i]];
    delete [] values;
 }

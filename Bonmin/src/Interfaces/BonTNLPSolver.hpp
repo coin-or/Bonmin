@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines (IBM) 2005
+// (C) Copyright International Business Machines (IBM) 2006
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -50,8 +50,17 @@ class TNLPSolver: public Ipopt::ReferencedObject{
   {
   public:
     /** Constructor */
-    UnsolvedError(int errorNum):errorNum_(errorNum)
-    {}
+    UnsolvedError(int errorNum = -10000, 
+                  Ipopt::SmartPtr<TMINLP2TNLP> model = NULL,
+                  std::string name="")
+    :
+     errorNum_(errorNum),
+     model_(model),
+     name_(name)
+    {if(name_=="") 
+{
+	std::cout<<"FIXME"<<std::endl;
+}}
     /** Print error message.*/
     void printError(std::ostream & os);
     /** Get the string corresponding to error.*/
@@ -63,12 +72,24 @@ class TNLPSolver: public Ipopt::ReferencedObject{
     return errorNum_;}
     /** destructor. */
     virtual ~UnsolvedError(){}
+    /** write files with differences between input model and
+        this one */
+    void writeDiffFiles() const;
   private:
+    /** Error code (solver dependent). */
     int errorNum_;
+
+    /** model_ on which error occured*/
+    Ipopt::SmartPtr< TMINLP2TNLP > model_;
+
+    /** name of the model on which error occured. */
+    std::string name_;
   }
   ;
 
-  virtual UnsolvedError * newUnsolvedError(int num) = 0;
+  virtual UnsolvedError * newUnsolvedError(int num,
+					   Ipopt::SmartPtr<TMINLP2TNLP> problem,
+					   std::string name) = 0;
  
 
 

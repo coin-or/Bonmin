@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation, Carnegie Mellon University 2006
+// (C) Copyright International Business Machines Corporation, 2006
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -16,23 +16,30 @@
 namespace Bonmin{
 class FilterSolver : public TNLPSolver{
 public:
+
+
   class UnsolvedFilterError: public TNLPSolver::UnsolvedError
-{
- public:
-  UnsolvedFilterError(int errorNum = 10000):
-  TNLPSolver::UnsolvedError(errorNum)
-  {}
-  virtual const std::string& errorName() const;
- 
-  virtual const std::string& solverName() const; 
-  virtual ~UnsolvedFilterError(){}
+  {
+  public:
+    UnsolvedFilterError(int errorNum, 
+			Ipopt::SmartPtr<TMINLP2TNLP> model,
+			const std::string &name):
+      TNLPSolver::UnsolvedError(errorNum, model, name)
+    {}
+    virtual const std::string& errorName() const;
+    
+    virtual const std::string& solverName() const; 
+    virtual ~UnsolvedFilterError(){}
+
   private:
-  static std::string errorNames_[1];
-  static std::string solverName_;
+    static std::string errorNames_[1];
+    static std::string solverName_;
 };
 
-  virtual UnsolvedError * newUnsolvedError(int num){
-    return new UnsolvedFilterError(num);}
+  virtual UnsolvedError * newUnsolvedError(int num,
+					   Ipopt::SmartPtr<TMINLP2TNLP> problem,
+					   std::string name){
+    return new UnsolvedFilterError(num, problem, name);}
 
 
 

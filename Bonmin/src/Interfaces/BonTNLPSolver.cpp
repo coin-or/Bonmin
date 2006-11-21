@@ -1,5 +1,22 @@
+// (C) Copyright International Business Machines Corporation, 2006
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Pierre Bonami, International Business Machines Corporation
+//
+// Date : 10/02/2006
+
+//Bonmin includes
 #include "BonTNLPSolver.hpp"
+#include "BonColReader.hpp"
+
+//Ipopt includes
 #include "IpBlas.hpp"
+
+//Standard includes
+#include <fstream>
+
 namespace Bonmin{
   using namespace Ipopt;
 
@@ -100,6 +117,85 @@ TNLPSolver::UnsolvedError::printError(std::ostream &os)
   os<<solverName()<<" exited with error code "<<errorNum_<<" "<<errorName()<<std::endl;
 }
 
+void
+TNLPSolver::UnsolvedError::writeDiffFiles() const{
+  const int numcols = model_->num_variables();
+  const int numrows = model_->num_constraints();
+  
+  const double * currentLower = model_->x_l();
+  const double * currentUpper = model_->x_u();
 
+  const double * originalLower = model_->orig_x_l();
+  const double * originalUpper = model_->orig_x_u();
+  CoinRelFltEq eq;
+  std::string fBoundsName = name_;
+  fBoundsName+="_bounds";
+  
+  std::string fModName = fBoundsName + ".mod";
+  std::ofstream fBounds;
+  std::ofstream fMod;
+
+  /** Reader variables names.*/
+  bool hasVarNames = 0;
+  ColReader reader(name_);
+  
+  if(reader.readFile())
+      hasVarNames=1;
+  if(hasVarNames)
+    fMod.open(fModName.c_str());
+  fBounds.open(fBoundsName.c_str());
+    
+  for(int i = 0 ; i < numcols ; i++)
+    {    
+    if(!eq(currentLower[i],originalLower[i]))
+      {
+        if(hasVarNames)
+          fMod<<"bounds"<<i<<": "
+	      <<reader.varName(i)<<" >= "
+	      <<currentLower[i]<<";\n";
+
+
+	fBounds<<"LO"<<"\t"<<i<<"\t"<<currentLower[i]<<std::endl;
+    }
+    if(!eq(currentUpper[i],originalUpper[i]))
+      {
+	if(hasVarNames)
+	  fMod<<"bounds"<<i<<": "
+	      <<reader.varName(i)<<" <= "
+	      <<currentUpper[i]<<";\n";
+	
+        fBounds<<"UP"<<"\t"<<i<<"\t"<<currentUpper[i]<<std::endl;
+      }
+    }
+  
+    //write a file with starting point
+    std::string fStartPointName = name_;
+    fStartPointName+="_start";
+
+
+
+    const double * primals = model_->x_init();
+    const double * duals = model_->duals_init();
+
+    if(!primals)//No starting point no output
+      {
+	std::cerr<<"A failure has occured but no starting point exists"<<std::endl;
+	return;
+      }
+
+    std::ofstream fStartPoint(fStartPointName.c_str());
+    fStartPoint.precision(17);
+    fStartPoint<<numcols<<"\t"<<2*numcols+numrows<<std::endl;
+    for(int i = 0 ; i < numcols ; i++)
+    fStartPoint<<primals[i]<<std::endl;
+    int end = 2*numcols + numrows;
+    if(duals)
+      {
+	for(int i = 0 ; i < end; i++)
+	  fStartPoint<<duals[i]<<std::endl;
+      }
+
+ 
+}
 }//end namespace Bonmin
 
