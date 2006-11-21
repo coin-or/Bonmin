@@ -31,6 +31,7 @@ IPOPTLIBS = \
 	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
 LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
+LIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 
 ########################################################################
 #                                bonminbcp                                #

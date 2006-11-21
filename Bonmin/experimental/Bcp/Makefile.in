@@ -215,7 +215,8 @@ LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@ `cat \
-	$(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
+	$(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt` `cat \
+	$(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 LIBTOOL = @LIBTOOL@
 LIBTOOLM4 = @LIBTOOLM4@
 LN_S = @LN_S@
