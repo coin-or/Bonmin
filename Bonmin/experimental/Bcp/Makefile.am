@@ -75,7 +75,10 @@ amplsolver.a:
 	cat aslflags.txt ; \
 	eval `sed -e "s/ CFLAGS=\".*\"//" aslflags.txt`; \
 	eval `sed -e "s/.*CFLAGS=\"\(.*\)\".*/CFLAGS=\"-DNO_FUNCADD \1\"/" aslflags.txt` ; \
-	$(MAKE) $$ASLMAKEFLAGS CFLAGS="$$CFLAGS" -f makefile.u ; \
+	if test x"$$CC" = x; then \
+		CC=cc ; \
+	fi; \
+	$(MAKE) CC="$$CC" $$ASLMAKEFLAGS CFLAGS="$$CFLAGS" -f makefile.u ; \
 	cp amplsolver.a ..
 
 bonminbcp_LDADD = \
