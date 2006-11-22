@@ -589,7 +589,8 @@ bool
 FilterSolver::setWarmStart(const CoinWarmStart * warm, 
 			   Ipopt::SmartPtr<TMINLP2TNLP> tnlp){
   const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
-  CoinCopyN(warmF->array(), warmF->size(), cached_->lws);
+  fint size_hessian = nnz_h + tnlp->num_variables() + 2;
+  CoinCopyN(warmF->array(), warmF->size(), cached_->lws + size_hessian);
   for(int i = 0 ; i < 14 ; i ++)
     {
       cached_->istat[i] = warmF->istat()[i];
@@ -600,7 +601,7 @@ FilterSolver::setWarmStart(const CoinWarmStart * warm,
 CoinWarmStart *
 FilterSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
   //Skip the first element which store the structure of the hessian (never change)
-  fint size_hessian = nnz_h + tnlp->num_variables() + 2;
+   fint size_hessian = nnz_h + tnlp->num_variables() + 2;
   //  std::cout<<"Size of hessian :"<<size_hessian<<std::endl;
   fint * first = cached_->lws + size_hessian;
   
