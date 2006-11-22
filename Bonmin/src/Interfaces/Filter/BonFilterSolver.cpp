@@ -599,7 +599,12 @@ FilterSolver::setWarmStart(const CoinWarmStart * warm,
 
 CoinWarmStart *
 FilterSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
-  return new FilterWarmStart(cached_->maxiWk, cached_->lws, cached_->istat);
+  //Skip the first element which store the structure of the hessian (never change)
+  fint size_hessian = nnz_h + tnlp->num_variables() + 2;
+  //  std::cout<<"Size of hessian :"<<size_hessian<<std::endl;
+  fint * first = cached_->lws + size_hessian;
+  
+  return new FilterWarmStart(cached_->maxiWk - size_hessian, first, cached_->istat);
 }
 
 CoinWarmStart * 

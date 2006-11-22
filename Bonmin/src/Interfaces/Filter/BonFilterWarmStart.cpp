@@ -32,7 +32,7 @@ namespace Bonmin{
       }
     }
     
-    std::cout<<"Index of last difference "<<lastDiff<<", size "<<size_<<std::endl;
+    //    std::cout<<"Index of last difference "<<lastDiff<<", size "<<size_<<std::endl;
     diff->differences.resize(diff->differences.size());
     
     for(int i = 0 ; i < 14 ; i++){
