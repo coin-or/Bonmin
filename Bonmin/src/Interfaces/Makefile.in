@@ -47,7 +47,7 @@ host_triplet = @host@
 #                              Ampl/libamplinterface.la
 @COIN_HAS_FSQP_TRUE@am__append_2 = Filter/libfilterinterface.la
 subdir = src/Interfaces
-DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \

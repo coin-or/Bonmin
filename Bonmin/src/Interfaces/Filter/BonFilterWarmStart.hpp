@@ -63,6 +63,8 @@ namespace Bonmin{
       else if(other.warmArray_ != NULL) {
 	throw CoinError("Array passed but size is 0","FilterWarmStart(const fint, const fint *)","FilterWarmStart");
 	}      
+      for(int i = 0 ; i < 14 ; i ++)
+	istat_[i] = other.istat_[i];
     }
 
     /** virtual copy */
