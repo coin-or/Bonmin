@@ -30,8 +30,13 @@ endif
 IPOPTLIBS = \
 	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
-LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
-LIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
+LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt` \
+	`cat $(BCPOBJDIR)/bcp_addlibs.txt` \
+	`cat $(CBCOBJDIR)/cbc_addlibs.txt` \
+	`cat $(CGLOBJDIR)/cgl_addlibs.txt` \
+	`cat $(OSIOBJDIR)/osi_addlibs.txt` \
+	`cat $(CLPOBJDIR)/clp_addlibs.txt` \
+	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 
 ########################################################################
 #                                bonminbcp                                #

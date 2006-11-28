@@ -64,6 +64,7 @@ public:
     enum int_params {
         //
 	BranchingStrategy,
+	FullStrongBranch,
         NumNlpFailureMax,
 	WarmStartStrategy,
         end_of_int_params
@@ -257,6 +258,10 @@ public:
 				const BCP_lp_var_pool& local_var_pool,
 				const BCP_lp_cut_pool& local_cut_pool,
 				BCP_vec<BCP_lp_branching_object*>& cans);
+
+    BCP_branching_decision bbBranch(OsiBranchingInformation& brInfo,
+				    BCP_vec<BCP_lp_branching_object*>& cands);
+    BCP_branching_decision hybridBranch();
 
     virtual void
     set_user_data_for_children(BCP_presolved_lp_brobj* best, 
