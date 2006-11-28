@@ -10,8 +10,6 @@
 \PageTitle{Obtaining \Bonmin}{sec:obtain}
 
 
-You can obtain the \Bonmin\ package by using
-\link{http://subversion.tigris.org/}{subversion}.
 
 The \Bonmin\ package consists of the source code for the \Bonmin\
 project but also source code from other \COINOR\ projects:
@@ -28,18 +26,36 @@ project but also source code from other \COINOR\ projects:
 When downloading the \Bonmin\ package you will download the source code for all these and
 libraries of problems to test the codes.\\
 
+
+Before downloading \Bonmin\ you need to know which branch of Bonmin you want to download. 
+In particular you need to know if you want to download the latest version from:
+\begin{itemize}
+    \item the Stable branch, or from
+    \item the Released branch. 
+\end{itemize}
+These different version are made according to the guidelines of COIN-OR. The interpretation of these guidelines for the Bonmin project is explained on the wiki pages of Bonmin.
+
+The main distinction between the Stable and Release branch is that a stable version that we propose to download may evolve over time to include bug fixes while a released version will never change. The released versions present an advantage in particular if you want to make experiments which you want to be able to reproduce the stable version presents the advantage that it is less work for you to update in the event where we fix a bug.
+
+The easiest way to obtain the released version is by downloading a compressed archive. The latest release is Bonmin-0.1.0.
+
+The only way to obain one of the stable versions is through subversion.
+
 In Unix\footnote{UNIX is a registered trademark of The Open
-Group.}-like environments, to download the code in a sub-directory, say {\tt coin-Bonmin} issue the following
-command:
+Group.}-like environments, to download the latest stable version of Bonmin (0.1) in a sub-directory, say {\tt Bonmin-0.1} 
+issue the following command
 %\begin{verbatim}
 \break
 
- \noindent {\tt  svn co
-https://projects.coin-or.org/svn/Bonmin/trunk~coin-Bonmin }
+ \noindent {\ttsvn co 
+https://projects.coin-or.org/svn/Bonmin/stable/0.1 Bonmin-0.1 }
 
-%\end{verbatim}
+This copies all the necessary COIN-OR files to compile Bonmin to Bonmin-0.1. 
+You can obtain the \Bonmin\ package by using
+\link{http://subversion.tigris.org/}{subversion}.
+
 \noindent This copies all the necessary COIN-OR files to compile \Bonmin\ to
-{\tt coin-Bonmin}. To download \Bonmin\ using svn on Windows,
+{\tt Bonmin-0.1}. To download \Bonmin\ using svn on Windows,
 follow the instructions provided at
 \link{http://www.coin-or.org/faqs.html\#q4}{COIN-OR}.
 

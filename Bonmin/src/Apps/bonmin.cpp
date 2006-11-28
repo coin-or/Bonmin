@@ -13,6 +13,7 @@
 // Turn off compiler warning about long names
 #  pragma warning(disable:4786)
 #endif
+
 #include <iomanip>
 #include <fstream>
 
@@ -21,6 +22,13 @@
 #include "BonminAmplInterface.hpp"
 #include "CbcBonmin.hpp"
 
+#ifndef COIN_HAS_ASL 
+#error "Ampl Solver Library (ASL) is not properly configured."
+#error "Can not compile bonmin executable."
+#error "Please check that you have the file asl.h in ThirdPary/ASL subdirectory"
+#error "See documentation for instuctions on installing ASL."
+#error "And rerun the configure script."
+#endif
 
 
 /** Procedure to ouptut relevant informations in the case of a failure.

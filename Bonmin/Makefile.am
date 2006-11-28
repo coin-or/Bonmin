@@ -13,9 +13,13 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Here list all subdirectories into which to recurse
-SUBDIRS = src/IpoptInterface \
-	src/BonminAmplInterface \
-	src/OaInterface \
+SUBDIRS = src/IpoptInterface
+
+if COIN_HAS_ASL
+SUBDIRS += src/BonminAmplInterface
+endif
+
+SUBDIRS += 	src/OaInterface \
 	src/CbcBonmin \
 	src/Apps 
 
