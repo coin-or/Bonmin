@@ -44,9 +44,11 @@ public:
   /// Destructor
   virtual ~BonChooseVariable ();
 
+  //#ifdef UseOurOwn
   /** Sets up strong list and clears all if initialize is true.
       Returns number of infeasibilities. */
   virtual int setupList ( OsiBranchingInformation *info, bool initialize);
+  //#endif
   /** Choose a variable
       Returns - 
      -1 Node is infeasible

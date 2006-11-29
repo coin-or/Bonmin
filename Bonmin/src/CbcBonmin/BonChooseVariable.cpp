@@ -49,6 +49,8 @@ BonChooseVariable::clone() const
   return new BonChooseVariable(*this);
 }
 
+// For now there is no difference to what John has, so let's just use his
+//#ifdef UseOurOwn
 // Initialize
 // PB: ToDo Check
 int 
@@ -72,7 +74,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   int checkIndex=0;
   int bestPriority=INT_MAX;
   // pretend one strong even if none
-  int maximumStrong= Min(numberStrong_ ? numberStrong_ : 1, numberObjects);
+  int maximumStrong= numberStrong_ ? CoinMin(numberStrong_,numberObjects) : 1;
   int putOther = numberObjects;
   int i;
   for (i=0;i<maximumStrong;i++) {
@@ -146,9 +148,13 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
     assert (i==numberUnsatisfied_);
     if (!numberStrong_)
       numberOnList_=0;
-  } 
+  }
+  //  DELETEME
+  for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
+    printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
   return numberUnsatisfied_;
 }
+//#endif
 
 /* Choose a variable
    Returns - 
@@ -180,8 +186,7 @@ BonChooseVariable::chooseVariable(
     const double * b_L = solver->getColLower();
     const double * b_U = solver->getColUpper();
 
-    int numberObjects = solver_->numberObjects();
-    int numStrong = Min(numberObjects, numberStrong_);
+    int numStrong = Min(numberUnsatisfied_, numberStrong_);
     // space for storing the predicted changes in the objective
     double * change_up = new double[numStrong];
     double * change_down = new double[numStrong];
@@ -211,20 +216,22 @@ BonChooseVariable::chooseVariable(
           new_bounds, numCols, solution, new_x, z_L, z_U,
 	  numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
       // ToDo
-      assert(retval);
+      if (!retval) {
+	printf("Problem with curvature estimator for down up.\n");
+      }
       new_bounds = false;
       new_x = false;
       new_mults = false;
 
       // Determine step size and predicted change
       const double &curr_val = solution[col_number];
-      if (retval) {
+      if (retval && projected_d[col_number] != 0.) {
 	const double up_val = Min(b_U[col_number],ceil(curr_val));
 	double alpha = (up_val-curr_val)/projected_d[col_number];
 	change_up[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
       }
       else {
-	change_up[i] = large_number;
+	change_up[i] = -large_number;
       }
 
       // down
@@ -232,6 +239,10 @@ BonChooseVariable::chooseVariable(
       retval = cur_estimator_->ComputeNullSpaceCurvature(
           new_bounds, numCols, solution, new_x, z_L, z_U,
 	  numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
+      // ToDo
+      if (!retval) {
+	printf("Problem with curvature estimator for down down.\n");
+      }
 
       // Determine step size and predicted change
       if (retval) {
@@ -240,7 +251,7 @@ BonChooseVariable::chooseVariable(
 	change_down[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
       }
       else {
-	change_down[i] = large_number;
+	change_down[i] = -large_number;
       }
 
       orig_d[col_number] = 0.;
@@ -250,13 +261,15 @@ BonChooseVariable::chooseVariable(
 
     // Determine most promising branching variable
     int best_i = -1;
-    double best_change = large_number;
+    double best_change = -large_number;
     for (int i=0; i<numStrong; i++) {
+      //DELETEME
+      printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
       // for now, we look for the best combined change
       double change_min = Min(change_down[i], change_up[i]);
       double change_max = Max(change_down[i], change_up[i]);
       double change_comp = 2.*change_max + change_min;
-      if (best_change > change_comp) {
+      if (best_change < change_comp) {
 	best_change = change_comp;
 	best_i = i;
       }
@@ -266,6 +279,9 @@ BonChooseVariable::chooseVariable(
     delete [] change_down;
 
     assert(best_i != -1);
+
+    //DELETEME
+    printf("best_i = %d  best_change = %e\n", best_i, best_change);
 
     bestObjectIndex_=list_[best_i];
     bestWhichWay_ = solver->object(bestObjectIndex_)->whichWay();

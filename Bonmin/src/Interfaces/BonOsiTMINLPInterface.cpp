@@ -635,11 +635,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     obj_ = new double[source.getNumCols()];
     CoinCopyN(source.obj_, source.getNumCols(), obj_);
   }
-
-  if(source.obj_) {
-    obj_ = new double[source.getNumCols()];
-    CoinCopyN(source.obj_, source.getNumCols(), obj_);
-  }
   if(IsValid(source.tminlp_))
     feasibilityProblem_ = new Bonmin::TNLP2FPNLP
         (Ipopt::SmartPtr<Ipopt::TNLP>(Ipopt::GetRawPtr(problem_)));

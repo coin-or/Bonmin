@@ -269,6 +269,8 @@ namespace Bonmin
       new_bounds = true;
       new_mults = true;
     }
+    //DELETEME
+    new_bounds = true;
 
     DBG_ASSERT(n == n_);
     DBG_ASSERT(m == m_);
@@ -293,14 +295,22 @@ namespace Bonmin
     if (new_bounds || new_mults) {
       new_activities = true;
       active_x_.clear();
-      const Number zTol = 1e-4; // ToDo: make this more elaborate
+      const Number zTol = 1e300; //1e-2; // ToDo: make this more elaborate
       jnlst_->Printf(J_MOREDETAILED, J_NLP,
 		     "List of variables considered fixed (with z_L and z_U)\n");
       for (Index i=0; i<n; i++) {
 	if(z_L[i] > zTol || z_U[i] > zTol) {
-	  active_x_.push_back(i+1);
+	  if (z_L[i] > z_U[i]) {
+	    active_x_.push_back(-(i+1));
+	    DBG_ASSERT(x_l_[i] > -1e19);
+	  }
+	  else {
+	    active_x_.push_back(i+1);
+	    DBG_ASSERT(x_u_[i] < 1e19);
+	  }
 	  jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			 "x[%5d] (%e,%e)\n", i, z_L[i], z_U[i]);
+	  DBG_ASSERT(orig_d[i] == 0.);
 	}
       }
 
@@ -311,8 +321,8 @@ namespace Bonmin
       const Number zero = 0.;
       IpBlasDcopy(m, &zero, 0, jacTd, 1);
       for (Index i=0; i<nnz_jac_; i++) {
-	const Index &irow = irows_jac_[i];
-	const Index &jcol = jcols_jac_[i];
+	const Index& irow = irows_jac_[i];
+	const Index& jcol = jcols_jac_[i];
 	jacTd[irow] += jac_vals_[i]*orig_d[jcol];
       }
 
@@ -322,7 +332,15 @@ namespace Bonmin
       for (Index j=0; j<m; j++) {
 	if (g_l_[j] < g_u_[j] && fabs(lam[j]) > lamTol) {
 	  if (lam[j]*jacTd[j] > 0) {
-	    active_g_.push_back(j+1);
+	    if (lam[j] < 0.) {
+	      active_g_.push_back(-(j+1));
+	      DBG_ASSERT(g_l_[j] > -1e19);
+	    }
+	    else {
+	      active_g_.push_back(j+1);
+	      DBG_ASSERT(g_u_[j] < 1e19);
+	    }
+	    //	    active_g_.push_back(j+1);
 	    jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			   "g[%5d] (%e,%e)\n", j, lam[j], jacTd[j]);
 	  }
@@ -348,11 +366,21 @@ namespace Bonmin
       if (!tnlp_->eval_grad_f(n_, x, new_x, grad_f_)) {
 	return false;
       }
+#ifdef lambdas
       if (!SolveSystem(grad_f_, NULL, NULL, lambda_)) {
 	return false;
       }
       IpBlasDscal(m_, -1., lambda_, 1);
+      if (jnlst_->ProduceOutput(J_MOREVECTOR, J_NLP)) {
+	jnlst_->Printf(J_MOREVECTOR, J_NLP,
+		       "Curvature Estimator: least square multiplier:\n");
+	for (Index i=0; i<m_; i++) {
+	  jnlst_->Printf(J_MOREVECTOR, J_NLP, "lambda[%5d] = %23.16e\n",
+			 i, lambda_[i]);
+	}
+      }
       new_lambda = true;
+#endif
     }
 
     // Compute the projection of the direction
@@ -360,16 +388,60 @@ namespace Bonmin
       return false;
     }
 
-    // Compute the product with the gradient of the Lagrangian
-    gradLagTd = IpBlasDdot(n, projected_d, 1, grad_f_, 1);
+    // Sanity check to see if the thing is indeed in the null space
+    // (if the constraint gradients are rank-deficient, the solver
+    // might not have done a good job)
+    Number* trash = new Number[m_];
+    for (Index j=0; j<m_; j++) {
+      trash[j] = 0.;
+    }
     for (Index i=0; i<nnz_jac_; i++) {
       const Index &irow = irows_jac_[i];
       const Index &jcol = jcols_jac_[i];
-      gradLagTd += lambda_[irow]*jac_vals_[i]*projected_d[jcol];
+      if (x_free_map_[jcol] >= 0 && g_fixed_map_[irow] >= 0) {
+	trash[irow] += jac_vals_[i]*projected_d[jcol];
+      }
+    }
+    if (jnlst_->ProduceOutput(J_MOREVECTOR, J_NLP)) {    
+      for (Index j=0; j<m_; j++) {
+	jnlst_->Printf(J_MOREVECTOR, J_NLP,
+		       "nullspacevector[%5d] = %e\n", j, trash[j]);
+      }
+    }
+    Index imax = IpBlasIdamax(m_, trash, 1);
+    Number max_trash = trash[imax];
+    delete [] trash;
+    const Number max_trash_tol = 1e-6;
+    if (max_trash > max_trash_tol) {
+      return false;
+    }
+
+    if (jnlst_->ProduceOutput(J_MOREVECTOR, J_NLP)) {
+      jnlst_->Printf(J_MOREVECTOR, J_NLP,
+		     "Curvature Estimator: original and projected directions are:\n");
+      for (Index i=0; i<n_; i++) {
+	jnlst_->Printf(J_MOREVECTOR, J_NLP,
+		       "orig_d[%5d] = %23.16e proj_d[%5d] = %23.16e\n",
+		       i, orig_d[i], i, projected_d[i]);
+      }
+    }
+
+    // Compute the product with the gradient of the Lagrangian
+    if (true) {
+      gradLagTd = 0.;
+    }
+    else {
+      gradLagTd = IpBlasDdot(n, projected_d, 1, grad_f_, 1);
+      for (Index i=0; i<nnz_jac_; i++) {
+	const Index &irow = irows_jac_[i];
+	const Index &jcol = jcols_jac_[i];
+	gradLagTd += lambda_[irow]*jac_vals_[i]*projected_d[jcol];
+      }
     }
 
     // Compute the product with the Hessian of the Lagrangian
-    if (!Compute_dTHLagd(projected_d, x, new_x, lambda_, new_lambda, dTHLagd)) {
+    //    if (!Compute_dTHLagd(projected_d, x, new_x, lambda_, new_lambda, dTHLagd)) {
+    if (!Compute_dTHLagd(projected_d, x, new_x, lam, new_lambda, dTHLagd)) {
       return false;
     }
 
@@ -394,7 +466,7 @@ namespace Bonmin
 	}
 	else {
 	  x_free_map_[(*i)-1] = -1;
-	  DBG_ASSERT(x_u_[(-*i)-1] < 1e19);
+	  DBG_ASSERT(x_u_[(*i)-1] < 1e19);
 	}
       }
       // fixed by bounds
@@ -509,7 +581,8 @@ namespace Bonmin
 	  vals[inz++] = jac_vals_[i];
 	}
       }
-      comp_proj_matrix_->Print(*jnlst_,J_WARNING,J_MAIN,"compmat");
+      //DELETEME
+      // comp_proj_matrix_->Print(*jnlst_,J_WARNING,J_MAIN,"compmat");
       DBG_ASSERT(inz == tjac->Nonzeros());
 
       // We need to reset the linear solver object, so that it knows
@@ -560,7 +633,18 @@ namespace Bonmin
     SmartPtr<CompoundVector> sol = comp_vec_space_->MakeNewCompoundVector();
     ESymSolverStatus solver_retval =
       tsymlinearsolver_->Solve(*comp_proj_matrix_, *rhs, *sol, false, 0);
+    // For now we try, if the system is reported to be singular, to
+    // still get a solution; ToDo
+    if (solver_retval == SYMSOLVER_SINGULAR) {
+      jnlst_->Printf(J_DETAILED, J_NLP,
+		     "Projection matrix reported to be singular, but we try to obtain a solution anyway.\n");
+      solver_retval =
+	tsymlinearsolver_->Solve(*comp_proj_matrix_, *rhs, *sol, false, 0);
+    }
+
     if (solver_retval != SYMSOLVER_SUCCESS) {
+      // DELETEME
+      printf("Return code from Solver is %d\n", solver_retval);
       return false;
     }
 
@@ -602,7 +686,9 @@ namespace Bonmin
     bool new_lambda,  Number& dTHLagd)
   {
     if (new_x || new_lambda || !hess_vals_) {
-      hess_vals_ = new Number[nnz_hess_];
+      if (!hess_vals_) {
+	hess_vals_ = new Number[nnz_hess_];
+      }
       if (!tnlp_->eval_h(n_, x, new_x, 1., m_, lambda, new_lambda, nnz_hess_,
 			 NULL, NULL, hess_vals_)) {
 	return false;
