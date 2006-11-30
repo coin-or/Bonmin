@@ -110,11 +110,8 @@ AC_SUBST(ASTYLEFLAGS)
 #                            Stuff for Examples                             #
 #############################################################################
 
-#AC_COIN_VPATH_LINK(test/bonmin.opt)
-#AC_COIN_VPATH_LINK(test/mytoy.nl)
-# FIXME
-AC_COIN_VPATH_LINK
-AM_CONDITIONAL(VPATH_CONFIG, test $coin_vpath_config = yes)
+AC_COIN_VPATH_LINK(test/bonmin.opt)
+AC_COIN_VPATH_LINK(test/mytoy.nl)
 AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
                  test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp
                  test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp])

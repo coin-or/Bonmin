@@ -260,8 +260,6 @@ SYMSRCDIR = @SYMSRCDIR@
 VERSION = @VERSION@
 VOLOBJDIR = @VOLOBJDIR@
 VOLSRCDIR = @VOLSRCDIR@
-VPATH_CONFIG_FALSE = @VPATH_CONFIG_FALSE@
-VPATH_CONFIG_TRUE = @VPATH_CONFIG_TRUE@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
 XPRINCDIR = @XPRINCDIR@
 XPRLIB = @XPRLIB@
@@ -636,12 +634,9 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
-test: unitTest$(EXEEXT) CppExample$(EXEEXT) bonmin.opt mytoy.nl
+test: unitTest$(EXEEXT) CppExample$(EXEEXT)
 	./unitTest$(EXEEXT)
 	./CppExample$(EXEEXT)
-
-@VPATH_CONFIG_TRUE@bonmin.opt mytoy.nl: $(srcdir)/$@
-@VPATH_CONFIG_TRUE@	cp $(srcdir)/$@ .
 
 .PHONY: test
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
