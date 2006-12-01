@@ -1707,12 +1707,12 @@ build_os=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 # externals.  The following macro ensures that those externals are
 # retrieved by svn if they are not there yet.
 # Initialize the ADDLIBS variable
-ADDLIBS='-lm'
+ADDLIBS="-lm $LIBS"
 
 
 # Initialize the FADDLIBS variable (which is to be used with a fortran
 # compiler and will not include FLIBS)
-FADDLIBS=
+FADDLIBS="$LIBS"
 
 
 # A useful makefile conditional that is always false
@@ -1807,7 +1807,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # compiler, if the C++ is set, but the C compiler isn't (only for CXX=cl)
 if test x"$CXX" != x; then
   case "$CXX" in
-    cl*)
+    cl* | */cl*)
       if test x"$CC" = x; then
         CC="$CXX"
         { echo "$as_me:$LINENO: WARNING: C++ compiler name provided as $CXX, but CC is unset. Setting CC to $CXX" >&5
@@ -1833,7 +1833,7 @@ case $build in
 esac
 
 # We delete the cached value, since the test might not have been
-# performed with out choise of compilers earlier
+# performed with our choice of compilers earlier
 $as_unset ac_cv_prog_CC || test "${ac_cv_prog_CC+set}" != set || { ac_cv_prog_CC=; export ac_cv_prog_CC; }
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -2548,6 +2548,20 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+if test -z "$CC" ; then
+  { { echo "$as_me:$LINENO: error: Failed to find a C compiler!" >&5
+echo "$as_me: error: Failed to find a C compiler!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+# Autoconf incorrectly concludes that cl recognises -g. It doesn't.
+case "$CC" in
+  cl* | */cl*)
+    if test "$ac_cv_prog_cc_g" = yes ; then
+      ac_cv_prog_cc_g=no
+      { echo "$as_me:$LINENO: Overruling autoconf; cl does not recognise -g." >&5
+echo "$as_me: Overruling autoconf; cl does not recognise -g." >&6;}
+    fi ;;
+esac
 CFLAGS="$save_cflags"
 
 # Check if a project specific CFLAGS variable has been set
@@ -2933,7 +2947,7 @@ fi
 
 # Correct ADDLIBS initialization if we are using the MS compiler
 case "$CC" in
-  cl*)
+  cl* | */cl*)
     ADDLIBS=
     case $build in
   *-mingw*)
@@ -2979,7 +2993,7 @@ case $build in
 esac
 
 # We delete the cached value, since the test might not have been
-# performed with out choise of compilers earlier
+# performed with our choice of compilers earlier
 $as_unset ac_cv_prog_CXX || test "${ac_cv_prog_CXX+set}" != set || { ac_cv_prog_CXX=; export ac_cv_prog_CXX; }
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -3336,6 +3350,21 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+if test -z "$CXX" ; then
+  { { echo "$as_me:$LINENO: error: Failed to find a C++ compiler!" >&5
+echo "$as_me: error: Failed to find a C++ compiler!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+# Autoconf incorrectly concludes that cl recognises -g. It doesn't.
+case "$CXX" in
+  cl* | */cl*)
+    if test "$ac_cv_prog_cxx_g" = yes ; then
+      ac_cv_prog_cxx_g=no
+      { echo "$as_me:$LINENO: Overruling autoconf; cl does not recognise -g." >&5
+echo "$as_me: Overruling autoconf; cl does not recognise -g." >&6;}
+    fi ;;
+esac
 CXXFLAGS="$save_cxxflags"
 
 # Check if a project specific CXXFLAGS variable has been set
@@ -3419,6 +3448,7 @@ rm -f conftest.err conftest.$ac_objext \
         fi
     esac
   fi
+
   if test -z "$coin_opt_cxxflags"; then
     case $build in
       *-cygwin* | *-mingw*)
@@ -3716,7 +3746,7 @@ echo "$as_me: Will use MPI C++ compiler $MPICXX" >&6;}
 fi
 
 case "$CXX" in
-  cl*)
+  cl* | */cl*)
     case $build in
   *-mingw*)
     if test "${LD+set}" = set; then :; else
@@ -4759,7 +4789,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4762 "configure"' > conftest.$ac_ext
+  echo '#line 4792 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5893,7 +5923,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5896:" \
+echo "$as_me:5926:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6960,11 +6990,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6963: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6993: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6967: \$? = $ac_status" >&5
+   echo "$as_me:6997: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7228,11 +7258,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7231: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7261: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7235: \$? = $ac_status" >&5
+   echo "$as_me:7265: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7332,11 +7362,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7335: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7365: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7339: \$? = $ac_status" >&5
+   echo "$as_me:7369: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9677,7 +9707,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9680 "configure"
+#line 9710 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9777,7 +9807,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9780 "configure"
+#line 9810 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12121,11 +12151,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12124: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12154: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12128: \$? = $ac_status" >&5
+   echo "$as_me:12158: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12225,11 +12255,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12228: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12258: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12232: \$? = $ac_status" >&5
+   echo "$as_me:12262: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13795,11 +13825,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13798: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13828: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13802: \$? = $ac_status" >&5
+   echo "$as_me:13832: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13899,11 +13929,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13902: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13932: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13906: \$? = $ac_status" >&5
+   echo "$as_me:13936: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16106,11 +16136,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16109: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16139: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16113: \$? = $ac_status" >&5
+   echo "$as_me:16143: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16374,11 +16404,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16377: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16407: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16381: \$? = $ac_status" >&5
+   echo "$as_me:16411: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16478,11 +16508,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16481: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16511: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16485: \$? = $ac_status" >&5
+   echo "$as_me:16515: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19541,11 +19571,13 @@ coin_have_externals=no
 if test "$enable_maintainer_mode" = yes; then
 
   # If maintainer mode is chosen, we make sure that the correct versions
-  # of the tools are used, and that we know where libtoo.m4 is (to
+  # of the tools are used, and that we know where libtool.m4 is (to
   # recreate acinclude.m4)
 
 
   LIBTOOLM4=
+  # Normally, $HOME
+  AUTOTOOLS_DFLT=$HOME
 
   # Check if we have autoconf
   # Extract the first word of "autoconf", so it can be a program name with args.
@@ -19615,7 +19647,7 @@ echo $ECHO_N "checking whether autoconf is coming from the correct location... $
   autoconf_dir=`which autoconf | sed -e 's=/autoconf=='`
   autoconf_dir=`cd $autoconf_dir; pwd`
   if test x$AUTOTOOLS_DIR = x; then
-    want_dir=$HOME/bin
+    want_dir=$AUTOTOOLS_DFLT/bin
   else
     want_dir=$AUTOTOOLS_DIR/bin
   fi
@@ -19626,8 +19658,8 @@ echo "${ECHO_T}yes" >&6
     rm -f confauto.out
     echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-    { { echo "$as_me:$LINENO: error: The autoconf executable should be picked up from \$HOME/bin or \$AUTOTOOLS_DIR/bin." >&5
-echo "$as_me: error: The autoconf executable should be picked up from \$HOME/bin or \$AUTOTOOLS_DIR/bin." >&2;}
+    { { echo "$as_me:$LINENO: error: The autoconf executable should be picked up from \$AUTOTOOLS_DFLT/bin or \$AUTOTOOLS_DIR/bin." >&5
+echo "$as_me: error: The autoconf executable should be picked up from \$AUTOTOOLS_DFLT/bin or \$AUTOTOOLS_DIR/bin." >&2;}
    { (exit 1); exit 1; }; }
   fi
 
@@ -19699,7 +19731,7 @@ echo $ECHO_N "checking whether automake is coming from the correct location... $
   automake_dir=`which automake | sed -e 's=/automake=='`
   automake_dir=`cd $automake_dir; pwd`
   if test x$AUTOTOOLS_DIR = x; then
-    want_dir=$HOME/bin
+    want_dir=$AUTOTOOLS_DFLT/bin
   else
     want_dir=$AUTOTOOLS_DIR/bin
   fi
@@ -19710,14 +19742,14 @@ echo "${ECHO_T}yes" >&6
     rm -f confauto.out
     echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-    { { echo "$as_me:$LINENO: error: The automake executable should be picked up from \$HOME/bin or \$AUTOTOOLS_DIR/bin." >&5
-echo "$as_me: error: The automake executable should be picked up from \$HOME/bin or \$AUTOTOOLS_DIR/bin." >&2;}
+    { { echo "$as_me:$LINENO: error: The automake executable should be picked up from \$AUTOTOOLS_DFLT/bin or \$AUTOTOOLS_DIR/bin." >&5
+echo "$as_me: error: The automake executable should be picked up from \$AUTOTOOLS_DFLT/bin or \$AUTOTOOLS_DIR/bin." >&2;}
    { (exit 1); exit 1; }; }
   fi
 
   # Check if we can find the libtool file
   if test x$AUTOTOOLS_DIR = x; then
-    want_dir=$HOME/share
+    want_dir=$AUTOTOOLS_DFLT/share
   else
     want_dir=$AUTOTOOLS_DIR/share
   fi
@@ -21940,7 +21972,8 @@ fi
 # library extension
 
 case "$CC" in
-  cl*) LIBEXT=lib ;;
+  cl* | */cl*)
+       LIBEXT=lib ;;
     *) LIBEXT=a ;;
 esac
 
