@@ -477,7 +477,7 @@ namespace Bonmin
 		       "nullspacevector[%5d] = %e\n", j, trash[j]);
       }
     }
-    Index imax = IpBlasIdamax(m_, trash, 1);
+    Index imax = IpBlasIdamax(m_, trash, 1)-1;
     Number max_trash = trash[imax];
     delete [] trash;
     const Number max_trash_tol = 1e-6;
