@@ -43,6 +43,7 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   /// Constructor
   IpoptSolver():
     app_(),
+    problemHadZeroDimension_(false),
     warmStartStrategy_(1)
   {}
 
@@ -142,6 +143,10 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   Ipopt::ApplicationReturnStatus optimizationStatus_;
     //@}
 
+
+  /** Flag to indicate if last problem solved had 0 dimension. (in this case Ipopt was not called).*/
+  bool problemHadZeroDimension_;
+  
   /** Warm start strategy :
   <ol>
   <li> no warm start,</li>

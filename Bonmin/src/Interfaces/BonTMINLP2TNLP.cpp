@@ -435,10 +435,12 @@ namespace Bonmin
     if (!duals_sol_) {
       duals_sol_ = new Number[m + 2*n];
     }
-    IpBlasDcopy(m, lambda, 1, duals_sol_, 1);
-
-    IpBlasDcopy(n, z_L, 1 , duals_sol_ + m, 1);
-    IpBlasDcopy(n, z_U, 1 , duals_sol_ + m + n, 1);
+    if(lambda){
+      IpBlasDcopy(m, lambda, 1, duals_sol_, 1);
+      
+      IpBlasDcopy(n, z_L, 1 , duals_sol_ + m, 1);
+      IpBlasDcopy(n, z_U, 1 , duals_sol_ + m + n, 1);
+    }
 
     return_status_ = status;
     obj_value_ = obj_value;

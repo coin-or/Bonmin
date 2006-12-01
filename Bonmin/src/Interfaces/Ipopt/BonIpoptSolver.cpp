@@ -51,9 +51,11 @@ namespace Bonmin{
     if(!zeroDimension(tnlp, ret_status))
       {
 	optimizationStatus_ = app_.OptimizeTNLP(tnlp);
+	problemHadZeroDimension_ = false;
       }
     else
       {
+	problemHadZeroDimension_ = true;
 	if(ret_status == solvedOptimal)
 	  optimizationStatus_ = Ipopt::Solve_Succeeded;
 	else if(ret_status == provenInfeasible)
@@ -73,9 +75,11 @@ namespace Bonmin{
     if(!zeroDimension(tnlp, ret_status))
       {
 	optimizationStatus_ = app_.ReOptimizeTNLP(tnlp);
+	problemHadZeroDimension_ = false;
       }
     else
       {
+	problemHadZeroDimension_ = true;
 	if(ret_status == solvedOptimal)
 	  optimizationStatus_ = Ipopt::Solve_Succeeded;
 	else if(ret_status == provenInfeasible)
@@ -110,14 +114,20 @@ namespace Bonmin{
   double 
   IpoptSolver::CPUTime()
   {
-    const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_.Statistics();
-    if(IsValid(stats))
+    if(problemHadZeroDimension_)
       {
-	return stats->TotalCPUTime();
-      }
+	return 0.;}
     else
       {
-	throw CoinError("No statistics available from Ipopt","CPUTime","Bonmin::IpoptSolver");
+	const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_.Statistics();
+	if(IsValid(stats))
+	  {
+	    return stats->TotalCPUTime();
+	  }
+	else
+	  {
+	    throw CoinError("No statistics available from Ipopt","CPUTime","Bonmin::IpoptSolver");
+	  }
       }
   }
 
@@ -125,14 +135,22 @@ namespace Bonmin{
   int
   IpoptSolver::IterationCount()
   {
-    const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_.Statistics();
-    if(IsValid(stats))
+    if(problemHadZeroDimension_)
       {
-	return stats->IterationCount();
+	return 0;
       }
     else
       {
-	throw CoinError("No statistics available from Ipopt","IterationCount","Bonmin::IpoptSolver");
+	const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_.Statistics();
+	if(IsValid(stats))
+	  {
+	    return stats->IterationCount();
+	  }
+	else
+	  {
+	    throw CoinError("No statistics available from Ipopt","IterationCount","Bonmin::IpoptSolver");
+	  }
+	
       }
   }
 
