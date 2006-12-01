@@ -61,9 +61,12 @@ namespace Bonmin
       x_u_(NULL),
       g_l_(NULL),
       g_u_(NULL),
-      x_free_map_(NULL),
-      g_fixed_map_(NULL),
+      eq_x_free_map_(NULL),
+      eq_g_fixed_map_(NULL),
+      all_x_free_map_(NULL),
+      all_g_fixed_map_(NULL),
       lambda_(NULL),
+      eq_projected_d_(NULL),
       initialized_(false)
   {
     DBG_ASSERT(IsValid(jnlst));
@@ -76,12 +79,14 @@ namespace Bonmin
     ////////////////////////////////////////////////////////////////////
 
     // The following linear are taken from AlgBuilder in Ipopt
-    SmartPtr<SparseSymLinearSolverInterface> SolverInterface;
+    SmartPtr<SparseSymLinearSolverInterface> SolverInterface1;
+    SmartPtr<SparseSymLinearSolverInterface> SolverInterface2;
     std::string linear_solver;
     options->GetStringValue("linear_solver", linear_solver, prefix_);
     if (linear_solver=="ma27") {
 #ifdef HAVE_MA27
-      SolverInterface = new Ma27TSolverInterface();
+      SolverInterface1 = new Ma27TSolverInterface();
+      SolverInterface2 = new Ma27TSolverInterface();
 #else
 
       THROW_EXCEPTION(OPTION_INVALID,
@@ -91,7 +96,8 @@ namespace Bonmin
     }
     else if (linear_solver=="ma57") {
 #ifdef HAVE_MA57
-      SolverInterface = new Ma57TSolverInterface();
+      SolverInterface1 = new Ma57TSolverInterface();
+      SolverInterface2 = new Ma57TSolverInterface();
 #else
 
       THROW_EXCEPTION(OPTION_INVALID,
@@ -101,7 +107,8 @@ namespace Bonmin
     }
     else if (linear_solver=="pardiso") {
 #ifdef HAVE_PARDISO
-      SolverInterface = new PardisoSolverInterface();
+      SolverInterface1 = new PardisoSolverInterface();
+      SolverInterface2 = new PardisoSolverInterface();
 #else
 
       THROW_EXCEPTION(OPTION_INVALID,
@@ -111,7 +118,8 @@ namespace Bonmin
     }
     else if (linear_solver=="taucs") {
 #ifdef HAVE_TAUCS
-      SolverInterface = new TAUCSSolverInterface();
+      SolverInterface1 = new TAUCSSolverInterface();
+      SolverInterface2 = new TAUCSSolverInterface();
 #else
 
       THROW_EXCEPTION(OPTION_INVALID,
@@ -121,7 +129,8 @@ namespace Bonmin
     }
     else if (linear_solver=="wsmp") {
 #ifdef HAVE_WSMP
-      SolverInterface = new WsmpSolverInterface();
+      SolverInterface1 = new WsmpSolverInterface();
+      SolverInterface2 = new WsmpSolverInterface();
 #else
 
       THROW_EXCEPTION(OPTION_INVALID,
@@ -131,7 +140,8 @@ namespace Bonmin
     }
     else if (linear_solver=="mumps") {
 #ifdef HAVE_MUMPS
-      SolverInterface = new MumpsSolverInterface();
+      SolverInterface1 = new MumpsSolverInterface();
+      SolverInterface2 = new MumpsSolverInterface();
 #else
 
       THROW_EXCEPTION(OPTION_INVALID,
@@ -140,7 +150,8 @@ namespace Bonmin
 
     }
 
-    SmartPtr<TSymScalingMethod> ScalingMethod;
+    SmartPtr<TSymScalingMethod> ScalingMethod1;
+    SmartPtr<TSymScalingMethod> ScalingMethod2;
     std::string linear_system_scaling;
     if (!options->GetStringValue("linear_system_scaling",
 				 linear_system_scaling, prefix_)) {
@@ -151,7 +162,8 @@ namespace Bonmin
     }
     if (linear_system_scaling=="mc19") {
 #ifdef HAVE_MC19
-      ScalingMethod = new Mc19TSymScalingMethod();
+      ScalingMethod1 = new Mc19TSymScalingMethod();
+      ScalingMethod2 = new Mc19TSymScalingMethod();
 #else
 
       THROW_EXCEPTION(OPTION_INVALID,
@@ -160,7 +172,10 @@ namespace Bonmin
 
     }
 
-    tsymlinearsolver_ = new TSymLinearSolver(SolverInterface, ScalingMethod);
+    eq_tsymlinearsolver_ =
+      new TSymLinearSolver(SolverInterface1, ScalingMethod1);
+    all_tsymlinearsolver_ =
+      new TSymLinearSolver(SolverInterface2, ScalingMethod2);
     // End of lines from AlgBuilder
   }
 
@@ -178,8 +193,11 @@ namespace Bonmin
       delete [] x_u_;
       delete [] g_l_;
       delete [] g_u_;
-      delete [] x_free_map_;
-      delete [] g_fixed_map_;
+      delete [] eq_x_free_map_;
+      delete [] eq_g_fixed_map_;
+      delete [] all_x_free_map_;
+      delete [] all_g_fixed_map_;
+      delete [] eq_projected_d_;
       delete [] lambda_;
     }
   }
@@ -238,11 +256,16 @@ namespace Bonmin
     g_u_ = new Number[m_];
 
     // Get space for the activities maps
-    x_free_map_ = new Index[n_];
-    g_fixed_map_ = new Index[m_];
+    eq_x_free_map_ = new Index[n_];
+    eq_g_fixed_map_ = new Index[m_];
+    all_x_free_map_ = new Index[n_];
+    all_g_fixed_map_ = new Index[m_];
 
     // Get space for the multipliers
     lambda_ = new Number[m_];
+
+    // Get space for projected d
+    eq_projected_d_ = new Number[n_];
 
     initialized_ = true;
     return true;
@@ -290,27 +313,63 @@ namespace Bonmin
       }
     }
 
+    // First we compute the direction projected into the space of only
+    // the equality constraints
+    if (new_x) {
+      std::vector<int> dummy_active_x;
+      std::vector<int> dummy_active_g;
+      if (!PrepareNewMatrixStructure(dummy_active_x, dummy_active_g,
+				     eq_nx_free_, eq_x_free_map_,
+				     eq_ng_fixed_, eq_g_fixed_map_,
+				     eq_comp_proj_matrix_space_,
+				     eq_comp_vec_space_)) {
+	return false;
+      }
+
+      if (!PrepareNewMatrixValues(eq_x_free_map_, eq_g_fixed_map_,
+				  eq_comp_proj_matrix_space_,
+				  eq_comp_proj_matrix_,
+				  eq_tsymlinearsolver_)) {
+	return false;
+      }
+    }
+
+    if (eq_ng_fixed_>0) {
+      // Compute the projection of the direction
+      if (!SolveSystem(orig_d, NULL, eq_projected_d_, NULL,
+		       eq_x_free_map_, eq_g_fixed_map_,
+		       eq_comp_vec_space_, eq_comp_proj_matrix_,
+		       eq_tsymlinearsolver_)) {
+	return false;
+      }
+      orig_d = eq_projected_d_; // This way we don't need to rememeber
+				// how the dorection was projected;
+    }
+
     // If necessary, determine new activities
     bool new_activities = false;
     if (new_bounds || new_mults) {
       new_activities = true;
       active_x_.clear();
-      const Number zTol = 1e300; //1e-2; // ToDo: make this more elaborate
-      jnlst_->Printf(J_MOREDETAILED, J_NLP,
-		     "List of variables considered fixed (with z_L and z_U)\n");
-      for (Index i=0; i<n; i++) {
-	if(z_L[i] > zTol || z_U[i] > zTol) {
-	  if (z_L[i] > z_U[i]) {
-	    active_x_.push_back(-(i+1));
-	    DBG_ASSERT(x_l_[i] > -1e19);
+      if (eq_ng_fixed_>0) {
+	const Number zTol = 1e-4;
+	jnlst_->Printf(J_MOREDETAILED, J_NLP,
+		       "List of variables considered fixed (with orig_d and z)\n");
+	for (Index i=0; i<n; i++) {
+	  if (x_l_[i] < x_u_[i]) {
+	    if (orig_d[i]>0. && z_U[i]*orig_d[i]>zTol) {
+	      active_x_.push_back(i+1);
+	      DBG_ASSERT(x_u_[i] < 1e19);
+	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
+			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_U[i]);
+	    }
+	    else if (orig_d[i]<0. && -z_L[i]*orig_d[i]>zTol) {
+	      active_x_.push_back(-(i+1));
+	      DBG_ASSERT(x_l_[i] > -1e19);
+	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
+			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_L[i]);
+	    }
 	  }
-	  else {
-	    active_x_.push_back(i+1);
-	    DBG_ASSERT(x_u_[i] < 1e19);
-	  }
-	  jnlst_->Printf(J_MOREDETAILED, J_NLP,
-			 "x[%5d] (%e,%e)\n", i, z_L[i], z_U[i]);
-	  DBG_ASSERT(orig_d[i] == 0.);
 	}
       }
 
@@ -351,22 +410,29 @@ namespace Bonmin
 
     // Check if the structure of the matrix has changed
     if (new_activities) {
-      if (!PrepareNewMatrixStructure(new_activities)) {
+      if (!PrepareNewMatrixStructure(active_x_, active_g_,
+				     all_nx_free_, all_x_free_map_,
+				     all_ng_fixed_, all_g_fixed_map_,
+				     all_comp_proj_matrix_space_,
+				     all_comp_vec_space_)) {
 	return false;
       }
     }
 
     bool new_lambda = false;
     if (new_x || new_activities) {
-      if (!PrepareNewMatrixValues(new_activities, x, new_x)) {
+      if (!PrepareNewMatrixValues(all_x_free_map_, all_g_fixed_map_,
+				  all_comp_proj_matrix_space_,
+				  all_comp_proj_matrix_,
+				  all_tsymlinearsolver_)) {
 	return false;
       }
 
+#ifdef lambdas
       // Compute least square multipliers for the given activities
       if (!tnlp_->eval_grad_f(n_, x, new_x, grad_f_)) {
 	return false;
       }
-#ifdef lambdas
       if (!SolveSystem(grad_f_, NULL, NULL, lambda_)) {
 	return false;
       }
@@ -384,7 +450,10 @@ namespace Bonmin
     }
 
     // Compute the projection of the direction
-    if (!SolveSystem(orig_d, NULL, projected_d, NULL)) {
+    if (!SolveSystem(orig_d, NULL, projected_d, NULL,
+		     all_x_free_map_, all_g_fixed_map_,
+		     all_comp_vec_space_, all_comp_proj_matrix_,
+		     all_tsymlinearsolver_)) {
       return false;
     }
 
@@ -398,7 +467,7 @@ namespace Bonmin
     for (Index i=0; i<nnz_jac_; i++) {
       const Index &irow = irows_jac_[i];
       const Index &jcol = jcols_jac_[i];
-      if (x_free_map_[jcol] >= 0 && g_fixed_map_[irow] >= 0) {
+      if (all_x_free_map_[jcol] >= 0 && all_g_fixed_map_[irow] >= 0) {
 	trash[irow] += jac_vals_[i]*projected_d[jcol];
       }
     }
@@ -413,6 +482,8 @@ namespace Bonmin
     delete [] trash;
     const Number max_trash_tol = 1e-6;
     if (max_trash > max_trash_tol) {
+      jnlst_->Printf(J_WARNING, J_NLP,
+		     "Curvature Estimator: Bad solution from linear solver with max_red = %e:\n", max_trash);
       return false;
     }
 
@@ -426,18 +497,16 @@ namespace Bonmin
       }
     }
 
+    gradLagTd = 0.;
+#ifdef lambdas
     // Compute the product with the gradient of the Lagrangian
-    if (true) {
-      gradLagTd = 0.;
+    gradLagTd = IpBlasDdot(n, projected_d, 1, grad_f_, 1);
+    for (Index i=0; i<nnz_jac_; i++) {
+      const Index &irow = irows_jac_[i];
+      const Index &jcol = jcols_jac_[i];
+      gradLagTd += lambda_[irow]*jac_vals_[i]*projected_d[jcol];
     }
-    else {
-      gradLagTd = IpBlasDdot(n, projected_d, 1, grad_f_, 1);
-      for (Index i=0; i<nnz_jac_; i++) {
-	const Index &irow = irows_jac_[i];
-	const Index &jcol = jcols_jac_[i];
-	gradLagTd += lambda_[irow]*jac_vals_[i]*projected_d[jcol];
-      }
-    }
+#endif
 
     // Compute the product with the Hessian of the Lagrangian
     //    if (!Compute_dTHLagd(projected_d, x, new_x, lambda_, new_lambda, dTHLagd)) {
@@ -449,156 +518,160 @@ namespace Bonmin
   }
 
   bool CurvatureEstimator::PrepareNewMatrixStructure(
-    bool new_activities)
+    std::vector<int>& active_x,
+    std::vector<int>& active_g,
+    Index& nx_free,
+    Index* x_free_map,
+    Index& ng_fixed,
+    Index* g_fixed_map,
+    SmartPtr<CompoundSymMatrixSpace>& comp_proj_matrix_space,
+    SmartPtr<CompoundVectorSpace>& comp_vec_space)
   {
-    if (new_activities) {
-      // Deterimine which variables are free
-      for (Index i=0; i<n_; i++) {
-	x_free_map_[i] = 0;
+    // Deterimine which variables are free
+    for (Index i=0; i<n_; i++) {
+      x_free_map[i] = 0;
+    }
+    // fixed by activities
+    for (std::vector<int>::iterator i=active_x.begin();
+	 i != active_x.end(); i++) {
+      DBG_ASSERT(*i != 0 && *i<=n_ && *i>=-n_);
+      if (*i<0) {
+	x_free_map[(-*i)-1] = -1;
+	DBG_ASSERT(x_l_[(-*i)-1] > -1e19);
       }
-      // fixed by activities
-      for (std::vector<int>::iterator i=active_x_.begin();
-	   i != active_x_.end(); i++) {
-	DBG_ASSERT(*i != 0 && *i<=n_ && *i>=-n_);
-	if (*i<0) {
-	  x_free_map_[(-*i)-1] = -1;
-	  DBG_ASSERT(x_l_[(-*i)-1] > -1e19);
-	}
-	else {
-	  x_free_map_[(*i)-1] = -1;
-	  DBG_ASSERT(x_u_[(*i)-1] < 1e19);
-	}
+      else {
+	x_free_map[(*i)-1] = -1;
+	DBG_ASSERT(x_u_[(*i)-1] < 1e19);
       }
-      // fixed by bounds
-      for (Index i=0; i<n_; i++) {
-	if (x_l_[i] == x_u_[i]) {
-	  x_free_map_[i] = -1;
-	}
+    }
+    // fixed by bounds
+    for (Index i=0; i<n_; i++) {
+      if (x_l_[i] == x_u_[i]) {
+	x_free_map[i] = -1;
       }
-      // Correct the numbering in the x map and determine number of
-      // free variables
-      Index nx_free_ = 0;
-      for (Index i=0; i<n_; i++) {
-	if (x_free_map_[i] == 0) {
-	  x_free_map_[i] = nx_free_;
-	  nx_free_++;
-	}
+    }
+    // Correct the numbering in the x map and determine number of
+    // free variables
+    nx_free = 0;
+    for (Index i=0; i<n_; i++) {
+      if (x_free_map[i] == 0) {
+	x_free_map[i] = nx_free++;
       }
+    }
 
-      // Determine which constraints are fixed
-      for (Index j=0; j<m_; j++) {
-	g_fixed_map_[j] = -1;
+    // Determine which constraints are fixed
+    for (Index j=0; j<m_; j++) {
+      g_fixed_map[j] = -1;
+    }
+    // fixed by activities
+    for (std::vector<int>::iterator i=active_g.begin();
+	 i != active_g.end(); i++) {
+      DBG_ASSERT(*i != 0 && *i<=m_ && *i>=-m_);
+      if (*i<0) {
+	g_fixed_map[(-*i)-1] = 0;
+	DBG_ASSERT(g_l_[(-*i)-1] > -1e19); //ToDo look at option?
       }
-      // fixed by activities
-      for (std::vector<int>::iterator i=active_g_.begin();
-	   i != active_g_.end(); i++) {
-	DBG_ASSERT(*i != 0 && *i<=m_ && *i>=-m_);
-	if (*i<0) {
-	  g_fixed_map_[(-*i)-1] = 0;
-	  DBG_ASSERT(g_l_[(-*i)-1] > -1e19); //ToDo look at option?
-	}
-	else {
-	  g_fixed_map_[(*i)-1] = 0;
-	  DBG_ASSERT(g_u_[(*i)-1] < 1e19);
-	}
+      else {
+	g_fixed_map[(*i)-1] = 0;
+	DBG_ASSERT(g_u_[(*i)-1] < 1e19);
       }
-      // fixed by bounds
-      for (Index j=0; j<m_; j++) {
-	if (g_l_[j] == g_u_[j]) {
-	  g_fixed_map_[j] = 0;
-	}
+    }
+    // fixed by bounds
+    for (Index j=0; j<m_; j++) {
+      if (g_l_[j] == g_u_[j]) {
+	g_fixed_map[j] = 0;
       }
-      // Correct the numbering in the g map and determine number of
-      // fixed constraints
-      Index ng_fixed_ = 0;
-      for (Index j=0; j<m_; j++) {
-	if (g_fixed_map_[j] == 0) {
-	  g_fixed_map_[j] = ng_fixed_;
-	  ng_fixed_++;
-	}
+    }
+    // Correct the numbering in the g map and determine number of
+    // fixed constraints
+    ng_fixed = 0;
+    for (Index j=0; j<m_; j++) {
+      if (g_fixed_map[j] == 0) {
+	g_fixed_map[j] = ng_fixed++;
       }
+    }
 
-      // Determine the row and column indices for the Jacobian of the fixed
-      // constraints in the space of the free variables
-      Index* iRows = new Index[nnz_jac_];
-      Index* jCols = new Index[nnz_jac_];
-      Index nnz_proj_jac = 0;
-      for (Index i=0; i<nnz_jac_; i++) {
-	const Index &irow = irows_jac_[i];
-	const Index &jcol = jcols_jac_[i];
-	if (x_free_map_[jcol] >= 0 && g_fixed_map_[irow] >= 0) {
-	  iRows[nnz_proj_jac] = g_fixed_map_[irow] + 1;
-	  jCols[nnz_proj_jac] = x_free_map_[jcol] + 1;
-	  nnz_proj_jac++;
-	}
+    // Determine the row and column indices for the Jacobian of the fixed
+    // constraints in the space of the free variables
+    Index* iRows = new Index[nnz_jac_];
+    Index* jCols = new Index[nnz_jac_];
+    Index nnz_proj_jac = 0;
+    for (Index i=0; i<nnz_jac_; i++) {
+      const Index &irow = irows_jac_[i];
+      const Index &jcol = jcols_jac_[i];
+      if (x_free_map[jcol] >= 0 && g_fixed_map[irow] >= 0) {
+	iRows[nnz_proj_jac] = g_fixed_map[irow] + 1;
+	jCols[nnz_proj_jac] = x_free_map[jcol] + 1;
+	nnz_proj_jac++;
       }
+    }
 
-      // Create the matrix space for the Jacobian matrices
-      SmartPtr<GenTMatrixSpace> proj_jac_space =
-	new GenTMatrixSpace(ng_fixed_, nx_free_, nnz_proj_jac, iRows, jCols);
-      delete [] iRows;
-      delete [] jCols;
+    // Create the matrix space for the Jacobian matrices
+    SmartPtr<GenTMatrixSpace> proj_jac_space =
+      new GenTMatrixSpace(ng_fixed, nx_free, nnz_proj_jac, iRows, jCols);
+    delete [] iRows;
+    delete [] jCols;
 
-      // Create Matrix space for the projection matrix
-      comp_proj_matrix_space_ =
-	new CompoundSymMatrixSpace(2, nx_free_+ng_fixed_);
-      comp_proj_matrix_space_->SetBlockDim(0, nx_free_);
-      comp_proj_matrix_space_->SetBlockDim(1, ng_fixed_);
-      SmartPtr<SymMatrixSpace> identity_space =
-	new IdentityMatrixSpace(nx_free_);
-      comp_proj_matrix_space_->SetCompSpace(0, 0, *identity_space, true);
-      comp_proj_matrix_space_->SetCompSpace(1, 0, *proj_jac_space, true);
-      //      SmartPtr<MatrixSpace> zero_space =
-      //	new ZeroMatrixSpace(ng_fixed_, ng_fixed_);
-      //      comp_proj_matrix_space_->SetCompSpace(1, 1, *zero_space, true);
+    // Create Matrix space for the projection matrix
+    comp_proj_matrix_space =
+      new CompoundSymMatrixSpace(2, nx_free+ng_fixed);
+    comp_proj_matrix_space->SetBlockDim(0, nx_free);
+    comp_proj_matrix_space->SetBlockDim(1, ng_fixed);
+    SmartPtr<SymMatrixSpace> identity_space =
+      new IdentityMatrixSpace(nx_free);
+    comp_proj_matrix_space->SetCompSpace(0, 0, *identity_space, true);
+    comp_proj_matrix_space->SetCompSpace(1, 0, *proj_jac_space, true);
 
-      // Create a Vector space for the rhs and sol
-      comp_vec_space_ = new CompoundVectorSpace(2, nx_free_+ng_fixed_);
-      SmartPtr<DenseVectorSpace> x_space = new DenseVectorSpace(nx_free_);
-      comp_vec_space_->SetCompSpace(0, *x_space);
-      SmartPtr<DenseVectorSpace> g_space = new DenseVectorSpace(ng_fixed_);
-      comp_vec_space_->SetCompSpace(1, *g_space);
-    } 
+    // Create a Vector space for the rhs and sol
+    comp_vec_space = new CompoundVectorSpace(2, nx_free+ng_fixed);
+    SmartPtr<DenseVectorSpace> x_space = new DenseVectorSpace(nx_free);
+    comp_vec_space->SetCompSpace(0, *x_space);
+    SmartPtr<DenseVectorSpace> g_space = new DenseVectorSpace(ng_fixed);
+    comp_vec_space->SetCompSpace(1, *g_space);
 
     return true;
   }
 
   bool CurvatureEstimator::PrepareNewMatrixValues(
-    bool new_activities,
-    const Number* x,
-    bool new_x)
+    const Index* x_free_map,
+    const Index* g_fixed_map,
+    SmartPtr<CompoundSymMatrixSpace>& comp_proj_matrix_space,
+    SmartPtr<CompoundSymMatrix>& comp_proj_matrix,
+    SmartPtr<TSymLinearSolver>& tsymlinearsolver)
   {
-    if (new_x || new_activities) {
-      comp_proj_matrix_ = comp_proj_matrix_space_->MakeNewCompoundSymMatrix();
-      SmartPtr<Matrix> jac = comp_proj_matrix_->GetCompNonConst(1, 0);
-      SmartPtr<GenTMatrix> tjac = dynamic_cast<GenTMatrix*> (GetRawPtr(jac));
-      Number* vals = tjac->Values();
-      Index inz=0;
-      for (Index i=0; i<nnz_jac_; i++) {
-	Index irow = irows_jac_[i];
-	Index jcol = jcols_jac_[i];
-	if (x_free_map_[jcol] >= 0 && g_fixed_map_[irow] >= 0) {
-	  vals[inz++] = jac_vals_[i];
-	}
+    comp_proj_matrix = comp_proj_matrix_space->MakeNewCompoundSymMatrix();
+    SmartPtr<Matrix> jac = comp_proj_matrix->GetCompNonConst(1, 0);
+    SmartPtr<GenTMatrix> tjac = dynamic_cast<GenTMatrix*> (GetRawPtr(jac));
+    Number* vals = tjac->Values();
+    Index inz=0;
+    for (Index i=0; i<nnz_jac_; i++) {
+      Index irow = irows_jac_[i];
+      Index jcol = jcols_jac_[i];
+      if (x_free_map[jcol] >= 0 && g_fixed_map[irow] >= 0) {
+	vals[inz++] = jac_vals_[i];
       }
-      //DELETEME
-      // comp_proj_matrix_->Print(*jnlst_,J_WARNING,J_MAIN,"compmat");
-      DBG_ASSERT(inz == tjac->Nonzeros());
-
-      // We need to reset the linear solver object, so that it knows
-      // that the structure of the linear system has changed
-      tsymlinearsolver_->ReducedInitialize(*jnlst_, *options_, prefix_);
     }
+    DBG_ASSERT(inz == tjac->Nonzeros());
+
+    // We need to reset the linear solver object, so that it knows
+    // that the structure of the linear system has changed
+    tsymlinearsolver->ReducedInitialize(*jnlst_, *options_, prefix_);
 
     return true;
   }
 
-  bool CurvatureEstimator::SolveSystem(const Number* rhs_x,
-				       const Number* rhs_g,
-				       Number* sol_x, Number* sol_g)
+  bool CurvatureEstimator::SolveSystem(
+    const Number* rhs_x,
+    const Number* rhs_g,
+    Number* sol_x, Number* sol_g,
+    const Index* x_free_map,
+    const Index* g_fixed_map,
+    SmartPtr<CompoundVectorSpace>& comp_vec_space,
+    SmartPtr<CompoundSymMatrix>& comp_proj_matrix,
+    SmartPtr<TSymLinearSolver>& tsymlinearsolver)
   {
     // Create a vector for the RHS
-    SmartPtr<CompoundVector> rhs = comp_vec_space_->MakeNewCompoundVector();
+    SmartPtr<CompoundVector> rhs = comp_vec_space->MakeNewCompoundVector();
     SmartPtr<Vector> vrhs_x = rhs->GetCompNonConst(0);
     SmartPtr<Vector> vrhs_g = rhs->GetCompNonConst(1);
     // Now fill this vector with the values, extracting the relevant entries
@@ -607,8 +680,9 @@ namespace Bonmin
 	dynamic_cast<DenseVector*> (GetRawPtr(vrhs_x));
       Number* xvals = drhs_x->Values();
       for (Index i=0; i<n_; i++) {
-	if (x_free_map_[i]>=0) {
-	  xvals[x_free_map_[i]] = rhs_x[i];
+	const Index& ix = x_free_map[i];
+	if (ix>=0) {
+	  xvals[ix] = rhs_x[i];
 	}
       }
     }
@@ -620,8 +694,9 @@ namespace Bonmin
 	dynamic_cast<DenseVector*> (GetRawPtr(vrhs_g));
       Number* gvals = drhs_g->Values();
       for (Index j=0; j<m_; j++) {
-	if (g_fixed_map_[j]>=0) {
-	  gvals[g_fixed_map_[j]] = rhs_g[j];
+	const Index& jg = g_fixed_map[j];
+	if (jg>=0) {
+	  gvals[jg] = rhs_g[j];
 	}
       }
     }
@@ -630,16 +705,16 @@ namespace Bonmin
     }
 
     // Solve the linear system
-    SmartPtr<CompoundVector> sol = comp_vec_space_->MakeNewCompoundVector();
+    SmartPtr<CompoundVector> sol = comp_vec_space->MakeNewCompoundVector();
     ESymSolverStatus solver_retval =
-      tsymlinearsolver_->Solve(*comp_proj_matrix_, *rhs, *sol, false, 0);
+      tsymlinearsolver->Solve(*comp_proj_matrix, *rhs, *sol, false, 0);
     // For now we try, if the system is reported to be singular, to
     // still get a solution; ToDo
     if (solver_retval == SYMSOLVER_SINGULAR) {
       jnlst_->Printf(J_DETAILED, J_NLP,
 		     "Projection matrix reported to be singular, but we try to obtain a solution anyway.\n");
       solver_retval =
-	tsymlinearsolver_->Solve(*comp_proj_matrix_, *rhs, *sol, false, 0);
+	tsymlinearsolver->Solve(*comp_proj_matrix, *rhs, *sol, false, 0);
     }
 
     if (solver_retval != SYMSOLVER_SUCCESS) {
@@ -655,8 +730,9 @@ namespace Bonmin
 	dynamic_cast<const DenseVector*> (GetRawPtr(vsol_x));
       const Number* xvals = dsol_x->Values();
       for (Index i=0; i<n_; i++) {
-	if (x_free_map_[i]>=0) {
-	  sol_x[i] = xvals[x_free_map_[i]];
+	const Index& ix = x_free_map[i];
+	if (ix >=0) {
+	  sol_x[i] = xvals[ix];
 	}
 	else {
 	  sol_x[i] = 0.;
@@ -669,8 +745,9 @@ namespace Bonmin
 	dynamic_cast<const DenseVector*> (GetRawPtr(vsol_g));
       const Number* gvals = dsol_g->Values();
       for (Index j=0; j<m_; j++) {
-	if (g_fixed_map_[j]>=0) {
-	  sol_g[j] = gvals[g_fixed_map_[j]];
+	const Index& ig = g_fixed_map[j];
+	if (ig>=0) {
+	  sol_g[j] = gvals[ig];
 	}
 	else {
 	  sol_g[j] = 0.;

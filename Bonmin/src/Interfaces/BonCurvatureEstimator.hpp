@@ -88,8 +88,12 @@ namespace Bonmin
     /** prefix to be used when parsion the options for the linear
      *  solver */
     std::string prefix_;
-    /** Strategy object for solving the projection matrix */
-    SmartPtr<TSymLinearSolver> tsymlinearsolver_;
+    /** Strategy object for solving the projection matrix for
+	equality constraints only */
+    SmartPtr<TSymLinearSolver> eq_tsymlinearsolver_;
+    /** Strategy object for solving the projection matrix for
+	all active constraints */
+    SmartPtr<TSymLinearSolver> all_tsymlinearsolver_;
     //@}
 
     /** @name Information about the tnlp */
@@ -112,33 +116,68 @@ namespace Bonmin
     Number* g_u_;
     //@}
 
-    /** @name Information about activities */
+    /** @name Information about activities for equality projection
+	only */
     //@{
     /** Number of free x variables */
-    Index nx_free_;
+    Index eq_nx_free_;
     /** Map for pointing from the original x space to the one without
      *  fixed variables.  */
-    Index* x_free_map_;
+    Index* eq_x_free_map_;
     /** Number of active constraints */
-    Index ng_fixed_;
+    Index eq_ng_fixed_;
     /** Map for pointing from the original constraint space to the one
      *  with only active constraints */
-    Index* g_fixed_map_;
+    Index* eq_g_fixed_map_;
+    //@}
+
+    /** @name Information about activities for projection
+	with respect to all active constraints */
+    //@{
+    /** Number of free x variables */
+    Index all_nx_free_;
+    /** Map for pointing from the original x space to the one without
+     *  fixed variables.  */
+    Index* all_x_free_map_;
+    /** Number of active constraints */
+    Index all_ng_fixed_;
+    /** Map for pointing from the original constraint space to the one
+     *  with only active constraints */
+    Index* all_g_fixed_map_;
     //@}
 
     /** Space for most recent computed least-square multipliers */
     Number* lambda_;
 
-    /** @name Items for handling the projection system */
+    /** Space for storing the direction projected into the equality
+     *  constraints only.  Having this array around all the time means
+     *  that we don't have to be so careful about memory leaks. */
+    Number* eq_projected_d_;
+
+    /** @name Items for handling the projection system for equality
+     *  constraints only */
     //@{
     /** Compound Matrix space for storing the linear system for the
      *  projection */
-    SmartPtr<CompoundSymMatrixSpace> comp_proj_matrix_space_;
+    SmartPtr<CompoundSymMatrixSpace> eq_comp_proj_matrix_space_;
     /** Compound Matrix storing the current projection matrix */
-    SmartPtr<CompoundSymMatrix> comp_proj_matrix_;
+    SmartPtr<CompoundSymMatrix> eq_comp_proj_matrix_;
     /** Compound Vector space for storing right hand side and solution
      *  for the projection system */
-    SmartPtr<CompoundVectorSpace> comp_vec_space_;
+    SmartPtr<CompoundVectorSpace> eq_comp_vec_space_;
+    //@}
+
+    /** @name Items for handling the projection system for all
+     *  constraints */
+    //@{
+    /** Compound Matrix space for storing the linear system for the
+     *  projection */
+    SmartPtr<CompoundSymMatrixSpace> all_comp_proj_matrix_space_;
+    /** Compound Matrix storing the current projection matrix */
+    SmartPtr<CompoundSymMatrix> all_comp_proj_matrix_;
+    /** Compound Vector space for storing right hand side and solution
+     *  for the projection system */
+    SmartPtr<CompoundVectorSpace> all_comp_vec_space_;
     //@}
 
     /** Storing the activities */
@@ -151,15 +190,32 @@ namespace Bonmin
 
     bool Initialize();
 
-    bool PrepareNewMatrixStructure(bool new_activities);
+    bool PrepareNewMatrixStructure(
+      std::vector<int>& active_x,
+      std::vector<int>& active_g,
+      Index& nx_free,
+      Index* x_free_map,
+      Index& ng_fixed,
+      Index* g_fixed_map,
+      SmartPtr<CompoundSymMatrixSpace>& comp_proj_matrix_space,
+      SmartPtr<CompoundVectorSpace>& comp_vec_space);
 
     bool PrepareNewMatrixValues(
-      bool new_activities,
-      const Number* x,
-      bool new_x);
+      const Index* x_free_map,
+      const Index* g_fixed_map,
+      SmartPtr<CompoundSymMatrixSpace>& comp_proj_matrix_space,
+      SmartPtr<CompoundSymMatrix>& comp_proj_matrix,
+      SmartPtr<TSymLinearSolver>& tsymlinearsolver);
 
-    bool SolveSystem(const Number* rhs_x, const Number* rhs_g,
-		     Number* sol_x, Number* sol_g);
+    bool SolveSystem(
+      const Number* rhs_x,
+      const Number* rhs_g,
+      Number* sol_x, Number* sol_g,
+      const Index* x_free_map,
+      const Index* g_fixed_map,
+      SmartPtr<CompoundVectorSpace>& comp_vec_space,
+      SmartPtr<CompoundSymMatrix>& comp_proj_matrix,
+      SmartPtr<TSymLinearSolver>& tsymlinearsolver);
 
     bool Compute_dTHLagd(
       const Number* d, const Number* x, bool new_x, const Number* lambda,

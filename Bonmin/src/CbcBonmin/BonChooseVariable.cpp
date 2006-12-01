@@ -202,83 +202,87 @@ BonChooseVariable::chooseVariable(
 
     const Number large_number = COIN_DBL_MAX;
  
-    for (int i=0; i<numStrong; i++) {
-      int index = list_[i];
-      const OsiObject * object = solver->object(index);
-      int col_number = object->columnNumber();
-      DBG_ASSERT(col_number != -1);
-      // up
-      orig_d[col_number] = 1.;
-      double gradLagTd;
-      double dTHLagd;
-      bool retval =
-	cur_estimator_->ComputeNullSpaceCurvature(
-          new_bounds, numCols, solution, new_x, z_L, z_U,
-	  numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
-      // ToDo
-      if (!retval) {
-	printf("Problem with curvature estimator for down up.\n");
-      }
-      new_bounds = false;
-      new_x = false;
-      new_mults = false;
+    int best_i = 0;
+    double best_change = large_number;
+    if (numStrong > 1) {
+      for (int i=0; i<numStrong; i++) {
+	int index = list_[i];
+	const OsiObject * object = solver->object(index);
+	int col_number = object->columnNumber();
+	DBG_ASSERT(col_number != -1);
+	// up
+	orig_d[col_number] = 1.;
+	double gradLagTd;
+	double dTHLagd;
+	bool retval =
+	  cur_estimator_->ComputeNullSpaceCurvature(
+            new_bounds, numCols, solution, new_x, z_L, z_U,
+	    numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
+	// ToDo
+	if (!retval) {
+	  printf("Problem with curvature estimator for down up.\n");
+	}
+	new_bounds = false;
+	new_x = false;
+	new_mults = false;
 
-      // Determine step size and predicted change
-      const double &curr_val = solution[col_number];
-      if (retval && projected_d[col_number] != 0.) {
-	const double up_val = Min(b_U[col_number],ceil(curr_val));
-	double alpha = (up_val-curr_val)/projected_d[col_number];
-	change_up[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
+	// Determine step size and predicted change
+	const double &curr_val = solution[col_number];
+	if (retval && projected_d[col_number] != 0.) {
+	  const double up_val = Min(b_U[col_number],ceil(curr_val));
+	  double alpha = (up_val-curr_val)/projected_d[col_number];
+	  change_up[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
+	}
+	else {
+	  change_up[i] = -large_number;
+	}
+
+	// down
+	orig_d[col_number] = -1.;
+	retval = cur_estimator_->ComputeNullSpaceCurvature(
+            new_bounds, numCols, solution, new_x, z_L, z_U,
+	    numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
+	// ToDo
+	if (!retval) {
+	  printf("Problem with curvature estimator for down down.\n");
+	}
+
+	// Determine step size and predicted change
+	if (retval) {
+	  const double down_val = Max(b_L[col_number],floor(curr_val));
+	  double alpha = (down_val-curr_val)/projected_d[col_number];
+	  change_down[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
+	}
+	else {
+	  change_down[i] = -large_number;
+	}
+
+	orig_d[col_number] = 0.;
       }
-      else {
-	change_up[i] = -large_number;
+      delete [] orig_d;
+      delete [] projected_d;
+
+      // Determine most promising branching variable
+      best_i = -1;
+      best_change = -large_number;
+      for (int i=0; i<numStrong; i++) {
+	//DELETEME
+	printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
+	// for now, we look for the best combined change
+	double change_min = Min(change_down[i], change_up[i]);
+	double change_max = Max(change_down[i], change_up[i]);
+	double change_comp = 2.*change_max + change_min;
+	if (best_change < change_comp) {
+	  best_change = change_comp;
+	  best_i = i;
+	}
       }
 
-      // down
-      orig_d[col_number] = -1.;
-      retval = cur_estimator_->ComputeNullSpaceCurvature(
-          new_bounds, numCols, solution, new_x, z_L, z_U,
-	  numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
-      // ToDo
-      if (!retval) {
-	printf("Problem with curvature estimator for down down.\n");
-      }
+      delete [] change_up;
+      delete [] change_down;
 
-      // Determine step size and predicted change
-      if (retval) {
-	const double down_val = Max(b_L[col_number],floor(curr_val));
-	double alpha = (down_val-curr_val)/projected_d[col_number];
-	change_down[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
-      }
-      else {
-	change_down[i] = -large_number;
-      }
-
-      orig_d[col_number] = 0.;
+      assert(best_i != -1);
     }
-    delete [] orig_d;
-    delete [] projected_d;
-
-    // Determine most promising branching variable
-    int best_i = -1;
-    double best_change = -large_number;
-    for (int i=0; i<numStrong; i++) {
-      //DELETEME
-      printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
-      // for now, we look for the best combined change
-      double change_min = Min(change_down[i], change_up[i]);
-      double change_max = Max(change_down[i], change_up[i]);
-      double change_comp = 2.*change_max + change_min;
-      if (best_change < change_comp) {
-	best_change = change_comp;
-	best_i = i;
-      }
-    }
-
-    delete [] change_up;
-    delete [] change_down;
-
-    assert(best_i != -1);
 
     //DELETEME
     printf("best_i = %d  best_change = %e\n", best_i, best_change);
