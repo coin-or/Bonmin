@@ -76,11 +76,9 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   // pretend one strong even if none
   int maximumStrong= numberStrong_ ? CoinMin(numberStrong_,numberObjects) : 1;
   int putOther = numberObjects;
+  int numViolatedAtBestPriority = 0;
   int i;
-  for (i=0;i<maximumStrong;i++) {
-    list_[i]=-1;
-    useful_[i]=0.0;
-  }
+
   OsiObject ** object = info->solver_->objects();
   for ( i=0;i<numberObjects;i++) {
     int way;
@@ -90,66 +88,62 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
       int priorityLevel = object[i]->priority();
       // Better priority? Flush choices.
       if (priorityLevel<bestPriority) {
-	for (int j=0;j<maximumStrong;j++) {
-	  if (list_[j]>=0) {
-	    int iObject = list_[j];
-	    list_[j]=-1;
-	    useful_[j]=0.0;
-	    list_[--putOther]=iObject;
+	  for (int j = numViolatedAtBestPriority - 1; j >= 0; --j) {
+	      list_[--putOther] = list_[j];
+	      useful_[putOther] = useful_[j]; 
 	  }
-	}
-	bestPriority = priorityLevel;
-	check=0.0;
+	  bestPriority = priorityLevel;
+	  numViolatedAtBestPriority = 0;
+	  check=0.0;
       } 
-      if (priorityLevel==bestPriority) {
-	if (value>check) {
+      if (priorityLevel==bestPriority && value>check) {
 	  //add to list
-	  int iObject = list_[checkIndex];
-	  if (iObject>=0)
-	    list_[--putOther]=iObject;  // to end
-	  list_[checkIndex]=i;
-	  useful_[checkIndex]=value;
-	  // find worst
-	  check=COIN_DBL_MAX;
-	  for (int j=0;j<maximumStrong;j++) {
-	    if (list_[j]>=0) {
-	      if (useful_[j]<check) {
-		check=useful_[j];
-		checkIndex=j;
-	      }
-	    } else {
-	      check=0.0;
-	      checkIndex = j;
-	      break;
-	    }
+	  if (numViolatedAtBestPriority < maximumStrong) {
+	      list_[numViolatedAtBestPriority] = i;
+	      useful_[numViolatedAtBestPriority] = value;
+	      ++numViolatedAtBestPriority;
+	  } else {
+	      assert (useful_[checkIndex] == check);
+	      list_[--putOther] = list_[checkIndex];
+	      useful_[putOther] = check; 
+	      list_[checkIndex] = i;
+	      useful_[checkIndex] = value;
 	  }
-	} else {
+	  if (numViolatedAtBestPriority == maximumStrong) {
+	      // find worst
+	      check=useful_[0];
+	      for (int j = 1; j < maximumStrong; ++j) {
+		  if (useful_[j] < check) {
+		      check = useful_[j];
+		      checkIndex = j;
+		  }
+	      }
+	  }
+      } else {
 	  // to end
-	  list_[--putOther]=i;
-	}
+	  list_[--putOther] = i;
+	  useful_[putOther] = value;
       }
     }
   }
   // Get list
-  numberOnList_=0;
-  for (i=0;i<maximumStrong;i++) {
-    if (list_[i]>=0) {
-      list_[numberOnList_]=list_[i];
-      useful_[numberOnList_++]=-useful_[i];
-    }
-  }
+  numberOnList_ = numViolatedAtBestPriority;
   if (numberOnList_) {
     // Sort 
     CoinSort_2(useful_,useful_+numberOnList_,list_);
     // move others
     i = numberOnList_;
-    for (;putOther<numberObjects;putOther++) 
-      list_[i++]=list_[putOther];
+    for (;putOther<numberObjects;putOther++, i++) {
+      list_[i]=list_[putOther];
+      useful_[i] = useful_[putOther];
+    }
     assert (i==numberUnsatisfied_);
     if (!numberStrong_)
       numberOnList_=0;
   }
   //  DELETEME
+  printf("numberOnList_: %i, numberUnsatisfied_: %i, numberStrong_: %i \n",
+	 numberOnList_, numberUnsatisfied_, numberStrong_);
   for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
     printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
   return numberUnsatisfied_;
