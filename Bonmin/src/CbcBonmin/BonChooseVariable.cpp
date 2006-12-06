@@ -129,17 +129,20 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   // Get list
   numberOnList_ = numViolatedAtBestPriority;
   if (numberOnList_) {
-    // Sort 
-    CoinSort_2(useful_,useful_+numberOnList_,list_);
-    // move others
-    i = numberOnList_;
-    for (;putOther<numberObjects;putOther++, i++) {
-      list_[i]=list_[putOther];
-      useful_[i] = useful_[putOther];
-    }
-    assert (i==numberUnsatisfied_);
-    if (!numberStrong_)
-      numberOnList_=0;
+      for (i = 0; i < numberOnList_; ++i) {
+	  useful_[i] = - useful_[i];
+      }
+      // Sort 
+      CoinSort_2(useful_,useful_+numberOnList_,list_);
+      // move others
+      i = numberOnList_;
+      for (;putOther<numberObjects;putOther++, i++) {
+	  list_[i]=list_[putOther];
+	  useful_[i] = - useful_[putOther];
+      }
+      assert (i==numberUnsatisfied_);
+      if (!numberStrong_)
+	  numberOnList_=0;
   }
   //  DELETEME
   printf("numberOnList_: %i, numberUnsatisfied_: %i, numberStrong_: %i \n",
