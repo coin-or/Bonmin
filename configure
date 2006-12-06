@@ -296,6 +296,7 @@ ac_subdirs_all="$ac_subdirs_all Cgl"
 ac_subdirs_all="$ac_subdirs_all Cbc"
 ac_subdirs_all="$ac_subdirs_all Bcp"
 ac_subdirs_all="$ac_subdirs_all Ipopt"
+ac_subdirs_all="$ac_subdirs_all Feline"
 ac_subdirs_all="$ac_subdirs_all Bonmin"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE subdirs COIN_SKIP_PROJECTS LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS LN_S'
 ac_subst_files=''
@@ -2630,6 +2631,44 @@ echo "${ECHO_T}yes" >&6
 
 
 subdirs="$subdirs Ipopt"
+
+                else
+                  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+                fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+echo "$as_me:$LINENO: checking whether directory Feline is available" >&5
+echo $ECHO_N "checking whether directory Feline is available... $ECHO_C" >&6
+                coin_skip=no
+                if test x"$COIN_SKIP_PROJECTS" != x; then
+                  for dir in $COIN_SKIP_PROJECTS; do
+                    if test $dir = Feline; then
+                      coin_skip=yes
+                    fi
+                  done
+                fi
+                if test $coin_skip = yes; then
+                  echo "$as_me:$LINENO: result: skipping" >&5
+echo "${ECHO_T}skipping" >&6
+                elif test -r $srcdir/Feline/configure; then
+                  coin_subdirs="$coin_subdirs Feline"
+                  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+
+subdirs="$subdirs Feline"
 
                 else
                   echo "$as_me:$LINENO: result: no" >&5
