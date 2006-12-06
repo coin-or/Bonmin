@@ -112,6 +112,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 	  if (numViolatedAtBestPriority == maximumStrong) {
 	      // find worst
 	      check=useful_[0];
+	      checkIndex = 0;
 	      for (int j = 1; j < maximumStrong; ++j) {
 		  if (useful_[j] < check) {
 		      check = useful_[j];
