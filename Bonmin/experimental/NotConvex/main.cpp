@@ -3,9 +3,7 @@
 // This code is published under the Common Public License.
 //
 // Authors :
-// Andreas Waechter, International Business Machines Corporation
 // Pierre Bonami, International Business Machines Corporation
-// Pietro Belotti, Carnegie Mellon University
 //
 // Date : 02/15/2006
 
