@@ -10,7 +10,7 @@
 // Date : 02/15/2006
 
 
-#include "problem.h"
+#include "CouenneProblem.h"
 #include <iomanip>
 #include <fstream>
 #include <iostream>
@@ -32,6 +32,10 @@
 
 #include <math.h>
 
+/* AMPL includes */
+#include "asl.h"
+#include "asl_pfgh.h"
+#include "getstub.h"
 
 
 int main (int argc, char **argv) {
@@ -44,7 +48,7 @@ int main (int argc, char **argv) {
   dummy_ipopt->Initialize("bonmin.opt");
   int solverUsed = 0; //O if it is ipopt 1 if it is filterSqp
 
-  dummy_ipopt()->Options()->GetEnumValue("nlp_solver", solverUsed , "bonmin.");
+  dummy_ipopt->Options()->GetEnumValue("nlp_solver", solverUsed , "bonmin.");
 
     char * pbName = NULL;
   if(argc > 1)
@@ -54,19 +58,19 @@ int main (int argc, char **argv) {
   }
   else //will just output usage
   {
-    Ipopt::SmartPtr<IpoptSolver> ipoptSolver = new IpoptSolver;
-    nlp_and_solver = new AmplInterface(argv, GetRawPtr(ipoptSolver));
+    Ipopt::SmartPtr<Bonmin::IpoptSolver> ipoptSolver = new Bonmin::IpoptSolver;
+    Bonmin::AmplInterface * nlp_and_solver = new Bonmin::AmplInterface(argv, GetRawPtr(ipoptSolver));
     delete nlp_and_solver;
     return 0;
   }
 
   try{
-      Ipopt::SmartPtr<TNLPSolver> solver;
+      Ipopt::SmartPtr<Bonmin::TNLPSolver> solver;
   if(solverUsed == 0)
-    solver = new IpoptSolver;
+    solver = new Bonmin::IpoptSolver;
   else if(solverUsed == 1)
 #ifdef COIN_HAS_FSQP
-    solver = new FilterSolver;
+    solver = new Bonmin::FilterSolver;
 #else
     {
       std::cerr<<"filterSQP is not propoerly configured for using into Bonmin"<<std::endl
@@ -80,25 +84,27 @@ int main (int argc, char **argv) {
     {
       std::cerr<<"Trying to use unknown solver."<<std::endl;
     }
-   Bonmin::AmplInterface * nlp_and_solver = new AmplInterface(argv, solver);
+   Bonmin::AmplInterface * nlp_and_solver = new Bonmin::AmplInterface(argv, solver);
 
 
 //Now we come to the real meat
+
+  // Declare some Couenne problem. 
   Problem p;
   //Get the ASL pointer and pass it to Pietro
-  ASL_pfgh* nlp_and_solver->amplModel()->AmplSolverObject();
-//  p.init(ASLPointer);
+  const ASL_pfgh* asl = nlp_and_solver->amplModel()->AmplSolverObject();
+//  p.readNl(ASLPointer);
 
 
 
-
+    delete nlp_and_solver;
   }
-  catch(Bonmin::UnsolvedError *E)
+  catch(Bonmin::TNLPSolver::UnsolvedError *E)
   {
     E->writeDiffFiles();
     E->printError(std::cerr);
   }
-  catch(OsiTMINLPInterface::SimpleError &E) {
+  catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
 	     <<std::endl
 	     <<E.message()<<std::endl;
@@ -119,7 +125,6 @@ int main (int argc, char **argv) {
   }
 
   delete [] pbName;
-  delete nlp_and_solver;
   return 0;
 
 

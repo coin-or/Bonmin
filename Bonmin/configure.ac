@@ -66,6 +66,7 @@ AC_COIN_HAS_PROJECT(Osi)
 AC_COIN_HAS_PROJECT(Sym)
 AC_COIN_HAS_PROJECT(Vol)
 AC_COIN_HAS_PROJECT(Bcp)
+AC_COIN_HAS_PROJECT(Feline)
 
 #############################################################################
 #                            Third party solvers                            #
@@ -88,11 +89,14 @@ AC_COIN_HAS_USER_LIBRARY([filterSqp],[FSQP]) #ToDo
 # Ampl Solver library
 AC_COIN_HAS_ASL
 
+
 # Some internal variables
 if test x"$BUILD_FP" != x; then
   build_fp=yes
 fi
 AM_CONDITIONAL(BUILD_FP, test x$build_fp = xyes)
+
+
 
 ##########
 # ASTYLE #
@@ -126,6 +130,7 @@ AC_CONFIG_FILES([Makefile
                  src/Interfaces/Ampl/Makefile
                  src/OaAlgorithms/Makefile
                  experimental/FP/Makefile
+                 experimental/NotConvex/Makefile
                  test/Makefile
                  examples/CppExample/Makefile])
 

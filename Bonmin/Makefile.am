@@ -25,6 +25,10 @@ if COIN_HAS_BCP
 SUBDIRS += experimental/Bcp
 endif
 
+if COIN_HAS_FELINE
+SUBDIRS += experimental/NotConvex
+endif
+
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball

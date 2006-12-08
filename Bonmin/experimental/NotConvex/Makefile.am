@@ -30,7 +30,7 @@ COINLIBS += $(FSQPLIB)
 endif
 
 if COIN_HAS_FELINE
-COINLIBS += $(FELINEOBJDIR)/src/libfeline.la
+COINLIBS += $(FELINEOBJDIR)/src/libFeline.la
 endif
 
 IPOPTLIBS = \
@@ -78,6 +78,8 @@ if COIN_HAS_CPX
 	-I`$(CYGPATH_W) $(CPXINCDIR)`
 endif
 
+AM_CPPFLAGS += $(ASL_CPPFLAGS)
+
 if COIN_HAS_FSQP
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Filter` 
 endif
@@ -90,8 +92,8 @@ endif
 fun_SOURCES = main.cpp
 
 fun_LDADD = \
-        ../../src/Apps/libbonmin.la \
 	../../src/Interfaces/Ampl/libamplinterface.la \
+        ../../src/Apps/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \

@@ -24,6 +24,9 @@
 /* Define to 1 if the DyLP package is used */
 #undef COIN_HAS_DYLP
 
+/* Define to 1 if the Feline package is used */
+#undef COIN_HAS_FELINE
+
 /* Define to 1 if the FortMP package is used */
 #undef COIN_HAS_FMP
 

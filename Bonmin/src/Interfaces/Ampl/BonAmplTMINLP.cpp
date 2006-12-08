@@ -598,4 +598,13 @@ namespace Bonmin
         "Frequency for Generating MIR cuts in branch-and-cut");
 
   }
-} // namespace Ipopt
+
+  /** Return the ampl solver object (ASL*) */
+  const ASL_pfgh* 
+  AmplTMINLP::AmplSolverObject() const
+  {
+    return ampl_tnlp_->AmplSolverObject();
+  }
+
+
+} // namespace Bonmin 

@@ -16,12 +16,19 @@
 #include "IpSmartPtr.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "OsiCuts.hpp"
+
+/* non Ipopt forward declaration */
+struct ASL_pfgh;
+struct SufDecl;
+struct SufDesc;
+
+
 // Declarations, so that we don't have to include the Ipopt AMPL headers
 namespace Ipopt
 {
-  class AmplTNLP;
   class AmplSuffixHandler;
   class AmplOptionsList;
+  class AmplTNLP;
 }
 
 namespace Bonmin
@@ -71,6 +78,10 @@ namespace Bonmin
     /** Default destructor */
     virtual ~AmplTMINLP();
     //@}
+
+    /** Return the ampl solver object (ASL*) */
+    const ASL_pfgh* AmplSolverObject() const;
+
 
     /**@name methods to gather information about the NLP. These
     * methods are overloaded from TMINLP. See TMINLP for their more
