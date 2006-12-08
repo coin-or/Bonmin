@@ -29,8 +29,8 @@ if COIN_HAS_FSQP
 COINLIBS += $(FSQPLIB)
 endif
 
-if COIN_HAS_FELINE
-COINLIBS += $(FELINEOBJDIR)/src/libFeline.la
+if COIN_HAS_COUENNE
+COINLIBS += $(COUENNEOBJDIR)/src/libCouenne.la
 endif
 
 IPOPTLIBS = \
@@ -84,9 +84,9 @@ if COIN_HAS_FSQP
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Filter` 
 endif
 
-if COIN_HAS_FELINE
+if COIN_HAS_COUENNE
   AM_CPPFLAGS += \
-	-I`$(CYGPATH_W) $(FELINESRCDIR)/src/include`
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include`
 endif
 
 fun_SOURCES = main.cpp

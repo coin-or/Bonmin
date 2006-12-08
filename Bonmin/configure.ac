@@ -66,7 +66,7 @@ AC_COIN_HAS_PROJECT(Osi)
 AC_COIN_HAS_PROJECT(Sym)
 AC_COIN_HAS_PROJECT(Vol)
 AC_COIN_HAS_PROJECT(Bcp)
-AC_COIN_HAS_PROJECT(Feline)
+AC_COIN_HAS_PROJECT(Couenne)
 
 #############################################################################
 #                            Third party solvers                            #
