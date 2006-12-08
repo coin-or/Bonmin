@@ -139,6 +139,7 @@ struct ResolutionInformation
   }
 };
 
+#if 0
 void
 writeBoundFiles(AmplInterface& nlp, const double * originalLower, const double * originalUpper)
 {
@@ -177,7 +178,7 @@ writeBoundFiles(AmplInterface& nlp, const double * originalLower, const double *
     }
   }
 }
-
+#endif
 
 double FP(AmplInterface &nlp,
           OsiSolverInterface &linearModel,
@@ -640,7 +641,8 @@ int main3 (int argc, char *argv[])
 
     }
     else if(solver1.isAbandoned() || solver1.isIterationLimitReached()) {
-      writeBoundFiles(solver1, solver.getColLower(), solver.getColUpper());
+      TNLPSolver::UnsolvedError * E=solver1.newUnsolvedError(0,argv[1],"not solved");
+      E->writeDiffFiles();
       solver1.turnOnSolverOutput();
       solver1.initialSolve();
 
@@ -1126,14 +1128,7 @@ int enhancedOA(AmplInterface & solver1, bool doFp,
       std::cout << std::endl << std::endl;
 
     }
-    else if(solver1.isAbandoned() || solver1.isIterationLimitReached()) {
-      writeBoundFiles(solver1, solver.getColLower(), solver.getColUpper());
-      solver1.turnOnSolverOutput();
-      solver1.initialSolve();
 
-      std::cerr<<"Error"<<std::endl;
-      throw -1;
-    }
 
     else {
       if (doFp)//Launch FP

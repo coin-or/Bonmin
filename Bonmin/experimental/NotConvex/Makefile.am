@@ -2,42 +2,41 @@
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
-## $Id$
+## $Id: Makefile.am 105 2006-11-03 19:31:19Z pbonami $
 
-# Author:  Andreas Waechter           IBM    2006-04-13
+# Author: Pierre Bonami, International Business Machines 12/04/2006
 
 AUTOMAKE_OPTIONS = foreign
 
-# What is done in this directory:
-
-
-  bin_PROGRAMS = oa_fp
+  bin_PROGRAMS = fun
 
 
 COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \
 	$(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/libOsi.la \
-	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
+        $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+        $(OSIOBJDIR)/src/libOsi.la \
+        $(CLPOBJDIR)/src/libClp.la \
+        $(COINUTILSOBJDIR)/src/libCoinUtils.la
 
 if COIN_HAS_CPX
-  COINLIBS += \
-	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(CPXLIB)
+COINLIBS += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
+        $(COINUTILSOBJDIR)/src/libCoinUtils.la \
+        $(CPXLIB)
 endif
 
 if COIN_HAS_FSQP
 COINLIBS += $(FSQPLIB)
 endif
 
+if COIN_HAS_FELINE
+COINLIBS += $(FELINEOBJDIR)/src/libfeline.la
+endif
+
 IPOPTLIBS = \
-	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
+        $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
 LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
-
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
@@ -79,24 +78,18 @@ if COIN_HAS_CPX
 	-I`$(CYGPATH_W) $(CPXINCDIR)`
 endif
 
-# The following is a trick to get the source code of Cbc/Samples correctly in
-# here, and also to get a link to libCbc into this directory (so that it
-# is made)
-CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
-	rm -f $@
-	$(LN_S) $< $@
+if COIN_HAS_FSQP
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Filter` 
+endif
 
-CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
-	rm -f $@
-	$(LN_S) $< $@
+if COIN_HAS_FELINE
+  AM_CPPFLAGS += \
+	-I`$(CYGPATH_W) $(FELINESRCDIR)/src/include`
+endif
 
-########################################################################
-#                                 oa_fp                                #
-########################################################################
+fun_SOURCES = main.cpp
 
-oa_fp_SOURCES = OAFeasibilityPump.cpp FP.cpp FP.hpp
-
-oa_fp_LDADD = \
+fun_LDADD = \
         ../../src/Apps/libbonmin.la \
 	../../src/Interfaces/Ampl/libamplinterface.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
@@ -105,18 +98,9 @@ oa_fp_LDADD = \
 	$(LIBCBCCOPY) \
 	$(COINLIBS)
 
-
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
 # libraries.
-oa_fp_LDFLAGS = -rpath $(libdir)
+fun_LDFLAGS = -rpath $(libdir)
 
-########################################################################
-#                         make distclean stuff                         #
-########################################################################
-
-CLEANFILES = $(LIBCBCCOPY)
-
-DISTCLEANFILES = \
-	CbcCompareUser.cpp CbcBranchUser.cpp
 

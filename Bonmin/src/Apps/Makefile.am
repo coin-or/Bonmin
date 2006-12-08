@@ -83,7 +83,6 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../OaInterface` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
@@ -101,6 +100,11 @@ if COIN_HAS_CPX
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 	-I`$(CYGPATH_W) $(CPXINCDIR)`
 endif
+
+if COIN_HAS_FSQP
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` 
+endif
+
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
