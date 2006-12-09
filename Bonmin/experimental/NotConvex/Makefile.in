@@ -47,14 +47,13 @@ bin_PROGRAMS = fun$(EXEEXT)
 @COIN_HAS_CPX_TRUE@        $(COINUTILSOBJDIR)/src/libCoinUtils.la \
 @COIN_HAS_CPX_TRUE@        $(CPXLIB)
 
-@COIN_HAS_FSQP_TRUE@am__append_2 = $(FSQPLIB)
-@COIN_HAS_COUENNE_TRUE@am__append_3 = $(COUENNEOBJDIR)/src/libCouenne.la
-@COIN_HAS_CPX_TRUE@am__append_4 = \
+@COIN_HAS_COUENNE_TRUE@am__append_2 = $(COUENNEOBJDIR)/src/libCouenne.la
+@COIN_HAS_CPX_TRUE@am__append_3 = \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
-@COIN_HAS_FSQP_TRUE@am__append_5 = -I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Filter` 
-@COIN_HAS_COUENNE_TRUE@am__append_6 = \
+@COIN_HAS_FILTERSQP_TRUE@am__append_4 = -I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces/Filter` 
+@COIN_HAS_COUENNE_TRUE@am__append_5 = \
 @COIN_HAS_COUENNE_TRUE@	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include`
 
 subdir = experimental/NotConvex
@@ -78,20 +77,19 @@ am__DEPENDENCIES_2 =
 @COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 @COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
 @COIN_HAS_CPX_TRUE@	$(am__DEPENDENCIES_2)
-@COIN_HAS_FSQP_TRUE@am__DEPENDENCIES_4 = $(am__DEPENDENCIES_2)
-@COIN_HAS_COUENNE_TRUE@am__DEPENDENCIES_5 =  \
+@COIN_HAS_COUENNE_TRUE@am__DEPENDENCIES_4 =  \
 @COIN_HAS_COUENNE_TRUE@	$(COUENNEOBJDIR)/src/libCouenne.la
-am__DEPENDENCIES_6 = $(CBCOBJDIR)/src/libCbc.la \
+am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
 	$(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3) \
-	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_5)
+	$(am__DEPENDENCIES_4)
 fun_DEPENDENCIES = ../../src/Interfaces/Ampl/libamplinterface.la \
 	../../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_6)
+	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/inc
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -112,6 +110,7 @@ ACLOCAL = @ACLOCAL@
 ADDLIBS = @ADDLIBS@
 ADD_CFLAGS = @ADD_CFLAGS@
 ADD_CXXFLAGS = @ADD_CXXFLAGS@
+ADD_FFLAGS = @ADD_FFLAGS@
 ALWAYS_FALSE_FALSE = @ALWAYS_FALSE_FALSE@
 ALWAYS_FALSE_TRUE = @ALWAYS_FALSE_TRUE@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -162,10 +161,10 @@ COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
 COIN_HAS_DYLP_FALSE = @COIN_HAS_DYLP_FALSE@
 COIN_HAS_DYLP_TRUE = @COIN_HAS_DYLP_TRUE@
+COIN_HAS_FILTERSQP_FALSE = @COIN_HAS_FILTERSQP_FALSE@
+COIN_HAS_FILTERSQP_TRUE = @COIN_HAS_FILTERSQP_TRUE@
 COIN_HAS_FMP_FALSE = @COIN_HAS_FMP_FALSE@
 COIN_HAS_FMP_TRUE = @COIN_HAS_FMP_TRUE@
-COIN_HAS_FSQP_FALSE = @COIN_HAS_FSQP_FALSE@
-COIN_HAS_FSQP_TRUE = @COIN_HAS_FSQP_TRUE@
 COIN_HAS_GLPK_FALSE = @COIN_HAS_GLPK_FALSE@
 COIN_HAS_GLPK_TRUE = @COIN_HAS_GLPK_TRUE@
 COIN_HAS_IPOPT_FALSE = @COIN_HAS_IPOPT_FALSE@
@@ -198,6 +197,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
+DBG_FFLAGS = @DBG_FFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DYLPOBJDIR = @DYLPOBJDIR@
@@ -211,10 +211,10 @@ EXEEXT = @EXEEXT@
 F77 = @F77@
 FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
+FILTERSQPLIBADD = @FILTERSQPLIBADD@
+FLIBS = @FLIBS@
 FMPINCDIR = @FMPINCDIR@
 FMPLIB = @FMPLIB@
-FSQPINCDIR = @FSQPINCDIR@
-FSQPLIB = @FSQPLIB@
 GLPKINCDIR = @GLPKINCDIR@
 GLPKLIB = @GLPKLIB@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
@@ -241,11 +241,13 @@ MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 MPICC = @MPICC@
 MPICXX = @MPICXX@
+MPIF77 = @MPIF77@
 MSKINCDIR = @MSKINCDIR@
 MSKLIB = @MSKLIB@
 OBJEXT = @OBJEXT@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
+OPT_FFLAGS = @OPT_FFLAGS@
 OSIOBJDIR = @OSIOBJDIR@
 OSISRCDIR = @OSISRCDIR@
 OSLINCDIR = @OSLINCDIR@
@@ -327,7 +329,7 @@ COINLIBS = $(CBCOBJDIR)/src/libCbc.la $(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__append_1) \
-	$(am__append_2) $(am__append_3)
+	$(am__append_2)
 IPOPTLIBS = \
         $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
@@ -359,8 +361,8 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/OaAlgorithms` \
 	$(CGLSRCDIR)/src/CglTwomir` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src` $(am__append_4) $(ASL_CPPFLAGS) \
-	$(am__append_5) $(am__append_6)
+	$(CGLSRCDIR)/src` $(am__append_3) $(ASL_CPPFLAGS) \
+	$(am__append_4) $(am__append_5)
 fun_SOURCES = main.cpp
 fun_LDADD = \
 	../../src/Interfaces/Ampl/libamplinterface.la \
@@ -369,7 +371,8 @@ fun_LDADD = \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \
 	$(LIBCBCCOPY) \
-	$(COINLIBS)
+	$(COINLIBS) \
+	$(ADDLIBS)
 
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared

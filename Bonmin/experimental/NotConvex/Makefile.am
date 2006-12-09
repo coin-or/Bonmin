@@ -8,8 +8,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-  bin_PROGRAMS = fun
-
+bin_PROGRAMS = fun
 
 COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \
@@ -23,10 +22,6 @@ if COIN_HAS_CPX
 COINLIBS += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
         $(COINUTILSOBJDIR)/src/libCoinUtils.la \
         $(CPXLIB)
-endif
-
-if COIN_HAS_FSQP
-COINLIBS += $(FSQPLIB)
 endif
 
 if COIN_HAS_COUENNE
@@ -80,8 +75,8 @@ endif
 
 AM_CPPFLAGS += $(ASL_CPPFLAGS)
 
-if COIN_HAS_FSQP
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Filter` 
+if COIN_HAS_FILTERSQP
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces/Filter` 
 endif
 
 if COIN_HAS_COUENNE
@@ -98,7 +93,8 @@ fun_LDADD = \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \
 	$(LIBCBCCOPY) \
-	$(COINLIBS)
+	$(COINLIBS) \
+	$(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic

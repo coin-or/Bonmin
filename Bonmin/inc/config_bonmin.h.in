@@ -18,20 +18,20 @@
 /* Define to 1 if the CoinUtils package is used */
 #undef COIN_HAS_COINUTILS
 
+/* Define to 1 if the Couenne package is used */
+#undef COIN_HAS_COUENNE
+
 /* Define to 1 if the Cplex package is used */
 #undef COIN_HAS_CPX
 
 /* Define to 1 if the DyLP package is used */
 #undef COIN_HAS_DYLP
 
-/* Define to 1 if the Feline package is used */
-#undef COIN_HAS_FELINE
+/* Define to 1 if FilterSQP is available */
+#undef COIN_HAS_FILTERSQP
 
 /* Define to 1 if the FortMP package is used */
 #undef COIN_HAS_FMP
-
-/* Define to 1 if the filterSqp package is used */
-#undef COIN_HAS_FSQP
 
 /* Define to 1 if the Glpk package is used */
 #undef COIN_HAS_GLPK
@@ -59,6 +59,20 @@
 
 /* Define to 1 if the Xpress package is used */
 #undef COIN_HAS_XPR
+
+/* Define to dummy `main' function (if any) required to link to the Fortran
+   libraries. */
+#undef F77_DUMMY_MAIN
+
+/* Define to a macro mangling the given C identifier (in lower and upper
+   case), which must not contain underscores, for linking with Fortran. */
+#undef F77_FUNC
+
+/* As F77_FUNC, but for C identifiers containing underscores. */
+#undef F77_FUNC_
+
+/* Define if F77 and FC dummy `main' functions are identical. */
+#undef FC_DUMMY_MAIN_EQ_F77
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H

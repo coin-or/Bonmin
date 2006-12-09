@@ -7,6 +7,8 @@
 //
 // Date : 10/02/2006
 
+#include "BonminConfig.h"
+
 #include "BonFilterSolver.hpp"
 #include "BonFilterWarmStart.hpp"
 
@@ -21,7 +23,7 @@ typedef Bonmin::FilterSolver::real real;
 
 typedef long ftnlen;
 extern "C" {
-void filtersqp_(
+void F77_FUNC(filtersqp,FILTERSQP)(
 	fint *n, fint *m, fint *kmax, fint *maxa,
 	fint *maxf, fint *mlp, fint *mxwk, fint *mxiwk,
 	fint *iprint, fint *nout, fint *ifail, real *rho,
@@ -31,7 +33,7 @@ void filtersqp_(
 	fint *iuser, fint *maxiter, fint *istat,
 	real *rstat, ftnlen cstype_len);
 
- void fopen_ (fint*, char*, ftnlen);
+ void F77_FUNC(fopen,FOPEN) (fint*, char*, ftnlen);
 }
 
 //Static variables
@@ -52,51 +54,51 @@ static int * permutationHess = NULL;
 extern struct {
   fint  char_l;
   char pname[10];
-} cpname_;
+} F77_FUNC(cpname,CPNAME);
 
 /* common block for Hessian storage set to 0, i.e. NO Hessian */
 extern struct {
   fint phl, phr, phc;
-} hessc_;
+} F77_FUNC(hessc,HESSC);
 
 /* common block for upper bound on filter */
 extern struct {
   real ubd, tt;
-} ubdc_;
+} F77_FUNC(ubdc,UBDC);
 
 /* common block for infinity & epslon */
 extern struct {
   real infty, eps;
-} nlp_eps_inf__;
+} F77_FUNC_(nlp_eps_inf,NLP_EPS_INF);
 
 /* common block for prfinting from QP solver */
 extern struct {
   fint n_bqpd_calls, n_bqpd_prfint;
-} bqpd_count__;
+} F77_FUNC_(bqpd_count,BQPD_COUNT);
 
 /* common for scaling: scale_mode = 0 (none), 1 (variables), 2 (vars+cons) */
 extern struct {
   fint scale_mode, phe;
-} scalec_;
+} F77_FUNC(scalec,SCALEC);
 
 
 extern "C" {
 
 /// Objective function evaluation
-void objfun_(real *x, fint *n, real * f, real *user, fint * iuser, fint * errflag)
+void F77_FUNC(objfun,OBJFUN)(real *x, fint *n, real * f, real *user, fint * iuser, fint * errflag)
 {
   (*errflag) = !tnlpSolved->eval_f(*n, x, 1, *f);
 }
 
 /** Constraint functions evaluation. */
 void 
-confun_(real * x, fint * n , fint *m, real *c, real *a, fint * la, real * user, fint * iuser,
+F77_FUNC(confun,CONFUN)(real * x, fint * n , fint *m, real *c, real *a, fint * la, real * user, fint * iuser,
 	fint * errflag){
   (*errflag) = !tnlpSolved->eval_g(*n, x, 1, *m, c);
 }
 
 void
-gradient_(fint *n, fint *m, fint * mxa, real * x, real *a, fint * la,
+F77_FUNC(gradient,GRADIENT)(fint *n, fint *m, fint * mxa, real * x, real *a, fint * la,
 	  fint * maxa, real * user, fint * iuser, fint * errflag){
   (*errflag) = !tnlpSolved->eval_grad_f(*n, x, 1, a);
   /// ATTENTION: Filter expect the jacobian to be ordered by row 
@@ -119,7 +121,7 @@ gradient_(fint *n, fint *m, fint * mxa, real * x, real *a, fint * la,
 
 /* evaluation of the Hessian of the Lagrangian */
  void
-hessian_(real *x, fint *n, fint *m, fint *phase, real *lam,
+F77_FUNC(hessian,HESSIAN)(real *x, fint *n, fint *m, fint *phase, real *lam,
 	     real *ws, fint *lws, real *user, fint *iuser,
 	     fint *l_hess, fint *li_hess, fint *errflag)
 {
@@ -178,7 +180,7 @@ namespace Bonmin{
     for(fint i = 0 ; i < nnz ; i++)
       {
 	inds[offset + i] = iCol[permutation2[i]];
-	DBG_ASSERT(RowJac[permutation2[i]] >= row);
+	//DBG_ASSERT(RowJac[permutation2[i]] >= row);
 	if(iRow[permutation2[i]] >= row) {
 	  for(;row <= iRow[permutation2[i]] ; row++)
 	    *start++ = i + offset + 1;
@@ -207,7 +209,7 @@ namespace Bonmin{
    for(fint i = 0 ; i < nnz ; i++)
       {
 	inds[offset + i] = iRow[permutationHess[i]];
-	DBG_ASSERT(iCol[permutationHess[i]] >= col);
+	//DBG_ASSERT(iCol[permutationHess[i]] >= col); PIERRE, I took this out
 	if(iCol[permutationHess[i]] >= col) {
 	  for(;col <= iCol[permutationHess[i]] ; col++)
 	    *start++ = i + offset + 1;

@@ -26,7 +26,10 @@ nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 libbonmin_la_LIBADD = \
 	../CbcBonmin/libbonminbb.la \
 	../OaAlgorithms/liboainterface.la \
-	../Interfaces/libbonmininterfaces.la 
+	../Interfaces/libbonmininterfaces.la \
+	$(FILTERSQPLIBADD)
+
+libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
 
 libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
 
@@ -43,11 +46,6 @@ if COIN_HAS_CPX
 	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
 	$(CPXLIB)
-endif
-
-if COIN_HAS_FSQP
-  COINLIBS += \
-	$(FSQPLIB)
 endif
 
 IPOPTLIBS = \
@@ -101,7 +99,7 @@ if COIN_HAS_CPX
 	-I`$(CYGPATH_W) $(CPXINCDIR)`
 endif
 
-if COIN_HAS_FSQP
+if COIN_HAS_FILTERSQP
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` 
 endif
 

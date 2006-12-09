@@ -22,7 +22,7 @@
 #include "BonIpoptSolver.hpp"
 #include "BonCbc.hpp"
 
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
 
@@ -61,11 +61,11 @@ int main (int argc, char *argv[])
   if(solverUsed == 0)
     solver = new IpoptSolver;
   else if(solverUsed == 1)
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
     solver = new FilterSolver;
 #else
     {
-      std::cerr<<"filterSQP is not propoerly configured for using into Bonmin"<<std::endl
+      std::cerr<<"filterSQP is not properly configured for using into Bonmin"<<std::endl
                <<"be sure to run the configure script with options:"<<std::endl
                <<"--with-filtersqp_lib=\"<path_to_filter_library>\""<<std::endl
                <<"--with-filtersqp_incdir=\"\""<<std::endl;

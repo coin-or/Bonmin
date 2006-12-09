@@ -16,9 +16,10 @@
 #include "BonIpoptSolver.hpp"
 #include "BonminConfig.h"
 
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
+
 #include <cmath>
 
 using namespace Bonmin;

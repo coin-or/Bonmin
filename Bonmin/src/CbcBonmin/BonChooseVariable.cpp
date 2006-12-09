@@ -279,6 +279,9 @@ BonChooseVariable::chooseVariable(
       delete [] change_up;
       delete [] change_down;
 
+      if (best_i == -1) {
+	best_i = 0;
+      }
       assert(best_i != -1);
     }
 

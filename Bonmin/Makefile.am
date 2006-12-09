@@ -21,11 +21,12 @@ SUBDIRS = src/Interfaces \
 if BUILD_FP 
 SUBDIRS += experimental/FP
 endif
+
 if COIN_HAS_BCP
 SUBDIRS += experimental/Bcp
 endif
 
-if COIN_HAS_FELINE
+if COIN_HAS_COUENNE
 SUBDIRS += experimental/NotConvex
 endif
 

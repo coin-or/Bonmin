@@ -11,7 +11,7 @@ AUTOMAKE_OPTIONS = foreign
 #We need to do autothings in the subdirectories for the different interfaces
 SUBDIRS = Ipopt Ampl
 
-if COIN_HAS_FSQP
+if COIN_HAS_FILTERSQP
 SUBDIRS += Filter
 endif
 
@@ -37,7 +37,7 @@ libbonmininterfaces_la_SOURCES = \
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
 #                              Ampl/libamplinterface.la
 
-if COIN_HAS_FSQP
+if COIN_HAS_FILTERSQP
 libbonmininterfaces_la_LIBADD += Filter/libfilterinterface.la
 endif
 

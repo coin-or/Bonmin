@@ -19,7 +19,7 @@
 #include "BonIpoptSolver.hpp"
 #include "BonCbc.hpp"
 
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
 

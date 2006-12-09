@@ -29,10 +29,6 @@ if COIN_HAS_CPX
 	$(CPXLIB)
 endif
 
-if COIN_HAS_FSQP
-COINLIBS += $(FSQPLIB)
-endif
-
 IPOPTLIBS = \
 	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
@@ -103,7 +99,8 @@ oa_fp_LDADD = \
 	$(IPOPTLIBS) \
 	$(ASLLIB) \
 	$(LIBCBCCOPY) \
-	$(COINLIBS)
+	$(COINLIBS) \
+	$(ADDLIBS)
 
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared

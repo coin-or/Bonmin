@@ -49,6 +49,15 @@ AC_COIN_DEBUG_COMPILE
 # Get the name of the C++ compiler and appropriate compiler options
 AC_COIN_PROG_CXX
 
+# AW: I'm adding the Fortran compiler now for FilterSQP - we should
+# make this optional
+
+# Get the name of the Fortran compiler and appropriate compiler options
+AC_COIN_PROG_F77
+
+# Find out how to call Fortran from C and determine Fortran runtime libraries
+AC_COIN_F77_WRAPPERS
+
 # Initialize automake and libtool
 AC_COIN_INIT_AUTO_TOOLS
 
@@ -80,7 +89,6 @@ AC_COIN_HAS_USER_LIBRARY([Mosek],[MSK],[mosekdl.h],[MSK_openmosek])
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
-AC_COIN_HAS_USER_LIBRARY([filterSqp],[FSQP]) #ToDo
 
 #############################################################################
 #                       Other third party software                          #
@@ -96,7 +104,62 @@ if test x"$BUILD_FP" != x; then
 fi
 AM_CONDITIONAL(BUILD_FP, test x$build_fp = xyes)
 
+#####################
+# FILTER SQP SOLVER #
+#####################
 
+filtersqpobjdir=../ThirdParty/FilterSQP
+filtersqpsrcdir=$srcdir/$filtersqpobjdir
+
+AC_MSG_NOTICE([Checking for Filter SQP library])
+
+AC_ARG_WITH([filtersqp],
+            AC_HELP_STRING([--with-filtersqp],
+                           [specify library for FilterSQP (or BUILD for compilation)]),
+            [use_filtersqp=$withval], [use_filtersqp=detect])
+
+if test "$use_filtersqp" = BUILD || test "$use_filtersqp" = detect; then
+# Check which files are available
+  AC_CHECK_FILE([$filtersqpsrcdir/source/src/filter.f],
+                [AC_DEFINE(COIN_HAS_FILTERSQP,1,
+                           [Define to 1 if FilterSQP is available])
+                 use_filtersqp=BUILD],
+                [if test "$use_filtersqp" = BUILD; then
+                   AC_MSG_ERROR([Filter SQP files are not available])
+                 fi])
+fi
+if test "$use_filtersqp" = detect; then
+  use_filtersqp=no
+fi
+
+if test "$use_filtersqp" = BUILD; then
+  FILTERSQPLIBADD=`cd $filtersqpobjdir; pwd`/libfiltersqp.la
+  coin_need_flibs=yes
+elif test "$use_filtersqp" != no; then
+  AC_MSG_CHECKING([whether user supplied FILTERSQPLIB=\"$use_filtersqp\" works])
+  SAVE_LIBS="$LIBS"
+  LIBS="$use_filtersqp $LIBS $FLIBS"
+  ADDLIBS="$use_filtersqp $ADDLIBS"
+  AC_LANG_PUSH([Fortran 77])
+  AC_TRY_LINK([],
+[      call filterSQP
+      end
+      subroutine confun
+      end
+      subroutine objfun
+      end
+      subroutine gradient
+      end
+      subroutine hessian],
+              [AC_MSG_RESULT([yes])],
+              [AC_MSG_RESULT([no])
+               AC_MSG_ERROR([user supplied FilterSQP library \"$use_filtersqp\" does not work])])
+  AC_LANG_POP([Fortran 77])
+  LIBS="$SAVE_LIBS"
+fi
+
+AM_CONDITIONAL([COIN_HAS_FILTERSQP], [test "$use_filtersqp" != no])
+AC_SUBST(FILTERSQPLIBADD)
 
 ##########
 # ASTYLE #

@@ -33,11 +33,10 @@ AC_CONFIG_SRCDIR(configure.ac)
 AC_PREFIX_DEFAULT([`pwd`])
 
 #############################################################################
-#     We only need automake to generate Makefiles for the distribution      #
+#              Create the libtool script for the subdirectories             #
 #############################################################################
 
-# Initialize automake
-AC_COIN_INIT_AUTOMAKE
+AC_COIN_CREATE_LIBTOOL
 
 #############################################################################
 #             Check which ThirdParty sources are available                  #
@@ -47,6 +46,7 @@ AC_COIN_THIRDPARTY_SUBDIRS([Blas],[ThirdParty/Blas],[daxpy.f])
 AC_COIN_THIRDPARTY_SUBDIRS([Lapack],[ThirdParty/Lapack],[LAPACK/SRC/dlarf.f])
 AC_COIN_THIRDPARTY_SUBDIRS([HSL],[ThirdParty/HSL],[configure.ac])
 AC_COIN_THIRDPARTY_SUBDIRS([ASL],[ThirdParty/ASL],[solvers/asl.h])
+AC_COIN_THIRDPARTY_SUBDIRS([FilterSQP],[ThirdParty/FilterSQP],[source/src/filter.f])
 
 #############################################################################
 #                  Check which subprojects are there                        #

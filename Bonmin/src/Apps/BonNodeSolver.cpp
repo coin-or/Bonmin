@@ -23,7 +23,7 @@
 #include "BonIpoptSolver.hpp"
 #include "BonBoundsReader.hpp"
 #include "BonStartPointReader.hpp"
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.cpp"
 #endif
 #include "CoinTime.hpp"
@@ -71,7 +71,7 @@ int main (int argc, char *argv[])
   if(solverUsed == 0)
     solver = new IpoptSolver;
   else if(solverUsed == 1)
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
     solver = new FilterSolver;
 #else
     {

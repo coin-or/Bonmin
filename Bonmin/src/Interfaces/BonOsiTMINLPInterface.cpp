@@ -18,7 +18,7 @@
 #include <sstream>
 
 #include "Ipopt/BonIpoptSolver.hpp"
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
 #include "Filter/BonFilterSolver.hpp"
 #endif
 
@@ -328,7 +328,7 @@ OsiTMINLPInterface::register_ALL_options
   register_milp_sub_solver_options(roptions);
   //Register options for all possible solvers (besides the one used
   IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
   FilterSolver * filter = dynamic_cast<FilterSolver *> (GetRawPtr(app_));
 #endif
   if(!ipopt)
@@ -339,7 +339,7 @@ OsiTMINLPInterface::register_ALL_options
       ipopt = NULL;
     }
 
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
   if(!filter)
     {
       filter = new FilterSolver;
@@ -2355,12 +2355,12 @@ void
 OsiTMINLPInterface::extractInterfaceParams()
 {
   if (IsValid(app_)) {
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
     FilterSolver * filter = dynamic_cast<FilterSolver *>(Ipopt::GetRawPtr(app_));
 #endif
     app_->Options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
 
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
     if(filter && maxRandomRadius_ > 10.){
       std::cerr<<"filterSqp picking a random point with a big value seems not to work well setting max_random_point_radius to 10"<<std::endl;
       maxRandomRadius_ = 10.;
