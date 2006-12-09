@@ -95,15 +95,15 @@ am__DEPENDENCIES_4 = $(CBCOBJDIR)/src/libCbc.la \
 bonmin_DEPENDENCIES = ../Interfaces/Ampl/libamplinterface.la \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_4) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_nodeSolver_OBJECTS = BonNodeSolver.$(OBJEXT)
 nodeSolver_OBJECTS = $(am_nodeSolver_OBJECTS)
 nodeSolver_DEPENDENCIES = ../Interfaces/Ampl/libamplinterface.la \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_4)
+	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_4) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -373,9 +373,9 @@ bonmin_LDADD = \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	$(ASLLIB) \
         $(ADDLIBS)
 
 
@@ -412,9 +412,10 @@ nodeSolver_LDADD = \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
-	$(COINLIBS)
+	$(COINLIBS) \
+	$(ASLLIB) \
+	$(ADDLIBS)
 
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared

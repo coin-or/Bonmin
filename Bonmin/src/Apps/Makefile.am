@@ -65,9 +65,9 @@ bonmin_LDADD = \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	$(ASLLIB) \
         $(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
@@ -130,9 +130,10 @@ nodeSolver_LDADD = \
 	libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
-	$(COINLIBS)
+	$(COINLIBS) \
+	$(ASLLIB) \
+	$(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
