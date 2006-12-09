@@ -23,9 +23,9 @@ unitTest_LDADD = \
         ../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	$(ASLLIB) \
 	$(ADDLIBS)
 
 #########################################################################
@@ -39,6 +39,7 @@ CppExample_LDADD = ../src/Apps/libbonmin.la \
         $(IPOPTLIBS) \
         $(LIBCBCCOPY) \
         $(COINLIBS) \
+	$(ASLLIB) \
         $(ADDLIBS)
 
 COINLIBS = \
