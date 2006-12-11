@@ -392,7 +392,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   options->GetIntegerValue("mxlws",  mxiwk0_ipt, "filter.");
   mxiwk0 = mxiwk0_ipt;
   // Setup storage for Filter
-  double infty = nlp_eps_inf__.infty;
+  double infty = F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty;
   int nplusm = n + m;
   //Starting point
   x = new real [n];
@@ -441,7 +441,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   for(int i = 0 ; i < nnz_h ; i++) permutationHess[i] = i;
   hStruct_ = new fint[nnz_h + n + 3];
   int * cache = new int[2*nnz_h + 1];
-  hessc_.phl = 1;
+  F77_FUNC(hessc,HESSC).phl = 1;
   tnlp->eval_h((Ipopt::Index&) n, NULL, 0, 1., (Ipopt::Index&) m, NULL, 0, (Ipopt::Index&) nnz_h, cache + nnz_h, cache  , NULL);
 
   TMat2ColPMat(n, m, nnz_h, cache, cache + nnz_h,
@@ -462,10 +462,10 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   hStruct = hStruct_;
   tnlpSolved = static_cast<Ipopt::TNLP *>(Ipopt::GetRawPtr(tnlp));
 
-  options->GetNumericValue("ubd",ubdc_.ubd, "filter.");
-  options->GetNumericValue("tt", ubdc_.tt, "filter.");
-  options->GetNumericValue("eps", nlp_eps_inf__.eps, "filter.");
-  options->GetNumericValue("infty", nlp_eps_inf__.infty, "filter.");
+  options->GetNumericValue("ubd",F77_FUNC(ubdc,UBDC).ubd, "filter.");
+  options->GetNumericValue("tt", F77_FUNC(ubdc,UBDC).tt, "filter.");
+  options->GetNumericValue("eps", F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).eps, "filter.");
+  options->GetNumericValue("infty", F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty, "filter.");
   rho = 10.;
   maxiter = 1000;
   options->GetIntegerValue("maxiter", (Ipopt::Index &) maxiter, "filter.");
@@ -473,7 +473,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
 
 
   // Set up scaling
-  scalec_.scale_mode = 0;
+  F77_FUNC(scalec,SCALEC).scale_mode = 0;
   s = new real [n+m];
   
   istat = new fint[14];
@@ -559,7 +559,7 @@ FilterSolver::cachedInfo::optimize()
   cpuTime_ = - CoinCpuTime();
   fint cstype_len = 1;
   rho = 10; 
-  filtersqp_(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk, 
+  F77_FUNC(filtersqp,FILTERSQP)(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk, 
 	     &maxiWk, &iprint, &nout, &ifail, &rho, x, 
 	     c, &f, &fmin, bounds, 
 	     bounds + n + m, 

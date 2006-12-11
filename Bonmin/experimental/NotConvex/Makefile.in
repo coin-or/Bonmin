@@ -52,7 +52,7 @@ bin_PROGRAMS = fun$(EXEEXT)
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
-@COIN_HAS_FILTERSQP_TRUE@am__append_4 = -I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces/Filter` 
+@COIN_HAS_FILTERSQP_TRUE@am__append_4 = -I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Filter` 
 @COIN_HAS_COUENNE_TRUE@am__append_5 = \
 @COIN_HAS_COUENNE_TRUE@	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include`
 

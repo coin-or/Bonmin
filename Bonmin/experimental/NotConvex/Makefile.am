@@ -76,7 +76,7 @@ endif
 AM_CPPFLAGS += $(ASL_CPPFLAGS)
 
 if COIN_HAS_FILTERSQP
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces/Filter` 
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Filter` 
 endif
 
 if COIN_HAS_COUENNE
