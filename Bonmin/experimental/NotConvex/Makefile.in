@@ -88,8 +88,8 @@ am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
 fun_DEPENDENCIES = ../../src/Interfaces/Ampl/libamplinterface.la \
 	../../src/Apps/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
+	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/inc
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -229,7 +229,8 @@ LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@ `cat \
-	$(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
+	$(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt` `cat \
+	$(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 LIBTOOL = @LIBTOOL@
 LIBTOOLM4 = @LIBTOOLM4@
 LN_S = @LN_S@
@@ -369,9 +370,9 @@ fun_LDADD = \
         ../../src/Apps/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	$(ASLLIB) \
 	$(ADDLIBS)
 
 

@@ -81,8 +81,8 @@ am__DEPENDENCIES_4 = $(CBCOBJDIR)/src/libCbc.la \
 oa_fp_DEPENDENCIES = ../../src/Apps/libbonmin.la \
 	../../src/Interfaces/Ampl/libamplinterface.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) \
+	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/inc
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -372,9 +372,9 @@ oa_fp_LDADD = \
 	../../src/Interfaces/Ampl/libamplinterface.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	$(ASLLIB) \
 	$(ADDLIBS)
 
 

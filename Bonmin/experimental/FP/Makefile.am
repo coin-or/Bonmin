@@ -97,9 +97,9 @@ oa_fp_LDADD = \
 	../../src/Interfaces/Ampl/libamplinterface.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	$(ASLLIB) \
 	$(ADDLIBS)
 
 

@@ -32,6 +32,7 @@ IPOPTLIBS = \
         $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
 LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
+LIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
@@ -91,9 +92,9 @@ fun_LDADD = \
         ../../src/Apps/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(ASLLIB) \
 	$(LIBCBCCOPY) \
 	$(COINLIBS) \
+	$(ASLLIB) \
 	$(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
