@@ -117,7 +117,7 @@ WARN_FORMAT            = "$file:$line: $text"
 
 WARN_LOGFILE           = 
 
-INPUT                  = @abs_source_dir@/Bonmin/src @abs_source_dir@/Bonmin/test/MyBonmin.cpp
+INPUT                  = @abs_source_dir@/Bonmin/src @abs_source_dir@/Bonmin/examples/CppExample/MyBonmin.cpp
 
 FILE_PATTERNS          = *.hpp *.h
 
