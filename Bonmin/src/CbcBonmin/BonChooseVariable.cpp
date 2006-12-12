@@ -246,7 +246,7 @@ BonChooseVariable::chooseVariable(
 	}
 
 	// Determine step size and predicted change
-	if (retval) {
+	if (retval && projected_d[col_number] != 0.) {
 	  const double down_val = Max(b_L[col_number],floor(curr_val));
 	  double alpha = (down_val-curr_val)/projected_d[col_number];
 	  change_down[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;

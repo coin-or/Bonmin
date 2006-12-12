@@ -71,7 +71,7 @@ AC_COIN_MAIN_SUBDIRS(Bonmin)
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile doxydoc/doxygen.conf])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE

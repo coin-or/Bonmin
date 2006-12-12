@@ -37,7 +37,7 @@ tests: all
 unitTests: tests
 
 doxydoc:
-	cd $(srcdir); doxygen doxydoc/doxygen.conf
+	doxygen doxydoc/doxygen.conf
 
 .PHONY: test unitTest tests unitTests doxydoc
 

@@ -53,8 +53,9 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure INSTALL \
-	config.guess config.sub depcomp install-sh ltmain.sh missing
+	$(srcdir)/Makefile.in $(top_srcdir)/configure \
+	$(top_srcdir)/doxydoc/doxygen.conf.in INSTALL config.guess \
+	config.sub depcomp install-sh ltmain.sh missing
 @HAVE_EXTERNALS_TRUE@am__append_1 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_2 = .Externals-stamp
 subdir = .
@@ -66,7 +67,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = doxydoc/doxygen.conf
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -273,6 +274,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+doxydoc/doxygen.conf: $(top_builddir)/config.status $(top_srcdir)/doxydoc/doxygen.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -675,7 +678,7 @@ tests: all
 unitTests: tests
 
 doxydoc:
-	cd $(srcdir); doxygen doxydoc/doxygen.conf
+	doxygen doxydoc/doxygen.conf
 
 .PHONY: test unitTest tests unitTests doxydoc
 
