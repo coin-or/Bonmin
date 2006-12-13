@@ -88,7 +88,7 @@ int main (int argc, char **argv) {
 //Now we come to the real meat
 
   // Declare some Couenne problem. 
-  Problem p;
+  CouenneProblem p;
   //Get the ASL pointer and pass it to Pietro
   const ASL_pfgh* asl = nlp_and_solver->amplModel()->AmplSolverObject();
 //  p.readNl(ASLPointer);

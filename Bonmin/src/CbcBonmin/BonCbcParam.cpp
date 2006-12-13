@@ -76,10 +76,7 @@ namespace Bonmin
     //Preset default for algorithm
     if (algo==0)//B-BB
     {
-      if(varSelection == 1 || varSelection == 2){
-        std::cout<<"Variable selection strategy not available with B-BB.\nSetting to most fractional."<<std::endl;
-        varSelection = 0;
-      }
+    
     }
     else if (algo==1)//B-OA
     {

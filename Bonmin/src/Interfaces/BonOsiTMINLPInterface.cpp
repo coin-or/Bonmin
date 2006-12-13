@@ -151,9 +151,9 @@ register_general_options
 
   roptions->AddStringOption6("varselect_stra",
       "Chooses variable selection strategy",
-      "strong_branching",
-      "most_fractional", "Choose most fractional variable",
-      "strong_branching", "Perform strong branching",
+      "strong-branching",
+      "most-fractional", "Choose most fractional variable",
+      "strong-branching", "Perform strong branching",
       "reliability-branching", "Use reliability branching",
       "curvature-estimator", "Use curvature estimation to select branching variable",
       "osi-simple", "Osi method to do simple branching",
