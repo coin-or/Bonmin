@@ -85,7 +85,9 @@ if COIN_HAS_COUENNE
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include`
 endif
 
-fun_SOURCES = main.cpp
+fun_SOURCES = BonCouenne.cpp \
+              BonCouenneInterface.hpp \
+              BonCouenneInterface.cpp
 
 fun_LDADD = \
 	../../src/Interfaces/Ampl/libamplinterface.la \
