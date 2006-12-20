@@ -70,8 +70,6 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
    int numcols = getNumCols();
    int numcolsconv = couenneCg_->getnvars();
 
-   printf("%d original, %d total\n", numcols, numcolsconv);
-
    CouNumber * x0 = new CouNumber[numcolsconv];
    CouNumber * colLower = new CouNumber[numcolsconv];
    CouNumber * colUpper = new CouNumber[numcolsconv];
@@ -87,8 +85,6 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
 
    int numrowsconv = couenneCg_->getncuts();
 
-   printf("%d cuts obtained\n", numrowsconv);
-
    /* Now, create matrix and other stuff. */
    CoinBigIndex * start = new CoinBigIndex[numrowsconv + 1];
    int * length = new int[numrowsconv];
@@ -100,8 +96,6 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
    for(int i = 0 ; i < numrowsconv ; i++)
    {
      OsiRowCut * cut = couenneCg_->getCut(i);
-
-     cut -> print ();
 
      const CoinPackedVector &v = cut->row();
      start[i+1] = start[i] + v.getNumElements();
