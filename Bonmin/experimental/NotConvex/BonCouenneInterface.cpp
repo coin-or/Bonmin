@@ -43,7 +43,7 @@ CouenneInterface::CouenneInterface(const CouenneInterface &other):
   }
 
 /** virutal copy constructor. */
-OsiSolverInterface * CouenneInterface::clone(bool CopyData){
+CouenneInterface * CouenneInterface::clone(bool CopyData){
   return new CouenneInterface(*this);
 }
 
@@ -69,7 +69,9 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
    }
    int numcols = getNumCols();
    int numcolsconv = couenneCg_->getnvars();
-   int numrowsconv = couenneCg_->getncuts();
+
+   printf("%d original, %d total\n", numcols, numcolsconv);
+
    CouNumber * x0 = new CouNumber[numcolsconv];
    CouNumber * colLower = new CouNumber[numcolsconv];
    CouNumber * colUpper = new CouNumber[numcolsconv];
@@ -83,7 +85,11 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
    CoinCopyN(getColSolution(), numcols, x0);
    couenneCg_->updateConv(x0, colLower, colUpper);
 
-   /* Now, create matrix and other sutff. */
+   int numrowsconv = couenneCg_->getncuts();
+
+   printf("%d cuts obtained\n", numrowsconv);
+
+   /* Now, create matrix and other stuff. */
    CoinBigIndex * start = new CoinBigIndex[numrowsconv + 1];
    int * length = new int[numrowsconv];
    double * rowLower = new double[numrowsconv];
@@ -94,6 +100,9 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
    for(int i = 0 ; i < numrowsconv ; i++)
    {
      OsiRowCut * cut = couenneCg_->getCut(i);
+
+     cut -> print ();
+
      const CoinPackedVector &v = cut->row();
      start[i+1] = start[i] + v.getNumElements();
      length[i] = v.getNumElements();

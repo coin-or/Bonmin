@@ -26,7 +26,7 @@ class CouenneInterface : public AmplInterface
   CouenneInterface(const CouenneInterface &other);
 
   /** virutal copy constructor. */
-  virtual OsiSolverInterface * clone(bool CopyData);
+  virtual CouenneInterface * clone(bool CopyData);
 
   /** Destructor. */
   virtual ~CouenneInterface();
@@ -34,7 +34,8 @@ class CouenneInterface : public AmplInterface
   /** \name Overloaded methods to build outer approximations */
   //@{
   /** \brief Extract a linear relaxation of the MINLP.
-   * Solve the continuous relaxation and takes first-order outer-approximation constraints at the optimum.
+   * Solve the continuous relaxation and takes first-order 
+   * outer-approximation constraints at the optimum.
    * The put everything in an OsiSolverInterface.
    */
   virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1);
