@@ -185,7 +185,9 @@ int main (int argc, char *argv[])
     //And we will output file with information on what has been changed in the problem to make it fail.
     //Now depending on what algorithm has been called (B-BB or other) the failed problem may be at different place.
     //    const OsiSolverInterface &si1 = (algo > 0) ? nlpSolver : *model.solver();
+#ifdef BONMIN_DEBUG
     writeNodeFiles(*nlpSolver, *nlpSolver);
+#endif
   }
   catch(IpoptInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
