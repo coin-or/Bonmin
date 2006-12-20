@@ -25,7 +25,7 @@ namespace Bonmin
     amplTminlp_ = dynamic_cast<Bonmin::AmplTMINLP *> (GetRawPtr(tminlp_));
   }
 /// Clone
-  AmplInterface *
+  OsiSolverInterface *
   AmplInterface::clone(bool CopyData )
   {
     return new AmplInterface(*this);

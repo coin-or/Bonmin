@@ -16,7 +16,7 @@ namespace Bonmin
     /** Copy constructor */
     AmplInterface(const AmplInterface &other);
     /// Clone
-    virtual AmplInterface * clone(bool CopyData = true);
+    virtual OsiSolverInterface * clone(bool CopyData = true);
 
     ///Destructor
     virtual ~AmplInterface();

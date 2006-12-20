@@ -791,11 +791,11 @@ class Messages : public CoinMessages
    * Solve the continuous relaxation and takes first-order outer-approximation constraints at the optimum.
    * The put everything in an OsiSolverInterface.
    */
-  void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1);
+  virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1);
 
   /** Get the outer approximation constraints at the currently stored optimal point.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  void getOuterApproximation(OsiCuts &cs, bool getObj = 1);
+  virtual void getOuterApproximation(OsiCuts &cs, bool getObj = 1);
 
   /** solve the problem of finding the closest point to x_bar in the subspace of coordinates given by ind
    * (i.e., \f$ min \sum\limits_{i=1}^n (x_{ind[i]} -\overline{x}_i)^2 \f$ ,
