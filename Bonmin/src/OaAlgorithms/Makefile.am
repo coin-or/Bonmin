@@ -20,6 +20,8 @@ liboainterface_la_SOURCES = \
 	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
 	BonOACutGenerator.cpp BonOACutGenerator.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
+	BonOaDecBase.cpp BonOaDecBase.hpp \
+        BonEcpCuts.cpp BonEcpCuts.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 
 # This is for libtool (on Windows)
@@ -61,7 +63,8 @@ ASTYLE_FILES = \
 	BonDummyHeuristic.cppbak BonDummyHeuristic.hppbak \
 	BonOACutGenerator.cppbak BonOACutGenerator.hppbak \
 	BonOACutGenerator2.cppbak BonOACutGenerator2.hppbak \
-	BonOaMessages.cppbak BonOaMessages.hppbak
+	BonOaMessages.cppbak BonOaMessages.hppbak BonEcpCuts.hppbak \
+        BonEcpCuts.cppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

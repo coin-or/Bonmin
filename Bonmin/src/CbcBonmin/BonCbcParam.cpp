@@ -57,6 +57,7 @@ namespace Bonmin
 
     // Hybrid options
     success &= Options->GetIntegerValue("nlp_solve_frequency",nlpSolveFrequency,"bonmin.");
+success &= Options->GetIntegerValue("filmint_ecp_cuts",filmintCutsFrequency, "bonmin.");
     success &= Options->GetNumericValue("oa_dec_time_limit",oaDecMaxTime,"bonmin.");
     success &= Options->GetIntegerValue("Gomory_cuts", migFreq,"bonmin.");
     success &= Options->GetIntegerValue("probing_cuts",probFreq,"bonmin.");

@@ -43,8 +43,12 @@ Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.cpp -text
 Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.hpp -text
 Bonmin/src/Interfaces/Ipopt/Makefile.am -text
 Bonmin/src/Interfaces/Ipopt/Makefile.in -text
+Bonmin/src/OaAlgorithms/BonEcpCuts.cpp -text
+Bonmin/src/OaAlgorithms/BonEcpCuts.hpp -text
 Bonmin/src/OaAlgorithms/BonFpForMinlp.cpp -text
 Bonmin/src/OaAlgorithms/BonFpForMinlp.hpp -text
+Bonmin/src/OaAlgorithms/BonOaDecBase.cpp -text
+Bonmin/src/OaAlgorithms/BonOaDecBase.hpp -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip

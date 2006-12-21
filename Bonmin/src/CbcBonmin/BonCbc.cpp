@@ -8,7 +8,7 @@
 // Date : 03/15/2006
 
 
-//Bonmin heaader files
+//Bonmin header files
 #include "BonminConfig.h"
 #include "BonCbc.hpp"
 #include "BonCbcLpStrategy.hpp"
@@ -24,7 +24,7 @@
 #include "BonDummyHeuristic.hpp"
 #include "BonOACutGenerator2.hpp"
 #include "BonOACutGenerator.hpp"
-
+#include "BonEcpCuts.hpp"
 
 // Cbc Header file
 #include "CbcModel.hpp"
@@ -77,7 +77,7 @@ extern "C"
     if (OAModel!=NULL)
       OAModel->setMaximumNodes(0); // stop at next node
     if (currentOA!=NULL)
-      currentOA->setMaxLocalSearchTime(0.); // stop OA
+      currentOA->parameter().maxLocalSearchTime_ = 0.; // stop OA
     return;
   }
 }
@@ -161,6 +161,7 @@ namespace Bonmin
     oaGen.setMaxDepth(100000);
     oaGen.setLogLevel(par.oaLogLevel);
 
+    EcpCuts ecpGen(nlpSolver);
 
     //Outer approximation iterations
     OsiSolverInterface * localSearchSolver=NULL;
@@ -198,13 +199,13 @@ namespace Bonmin
     }
     OACutGenerator2 oaDec(nlpSolver, localSearchSolver, strategy, par.cutoffDecr, par.intTol, 0,1);
     if (par.algo>0) {
-      oaDec.setLocalSearchNodeLimit(1000000);
-      oaDec.setMaxLocalSearch(100000);
-      oaDec.setMaxLocalSearchPerNode(10000);
-      oaDec. setMaxLocalSearchTime(min(par.maxTime,par.oaDecMaxTime));
+      oaDec.parameter().localSearchNodeLimit_ = 1000000;
+      oaDec.parameter().maxLocalSearch_ = 100000;
+      oaDec.parameter().maxLocalSearchPerNode_ = 10000;
+      oaDec.parameter().maxLocalSearchTime_ = min(par.maxTime,par.oaDecMaxTime);
       oaDec.setLogLevel(par.oaLogLevel);
-      oaDec.setLogFrequency(par.oaLogFrequency);
-      oaDec.setSubMilpLogLevel(par.milpLogLevel);
+      oaDec.parameter().logFrequency_ = par.oaLogFrequency;
+      oaDec.parameter().subMilpLogLevel_ = par.milpLogLevel;
     }
     //Setup solver for checking validity of integral solutions
     OACutGenerator2 feasCheck(nlpSolver, model.solver(),
@@ -212,9 +213,9 @@ namespace Bonmin
         par.cutoffDecr, par.intTol,
         0, 0);
     if (par.algo>0) {
-      feasCheck.setLocalSearchNodeLimit(0);
-      feasCheck.setMaxLocalSearch(0);
-      feasCheck.setMaxLocalSearchPerNode(100000);
+      feasCheck.parameter().localSearchNodeLimit_ = 0;
+      feasCheck.parameter().maxLocalSearch_ = 0;
+      feasCheck.parameter().maxLocalSearchPerNode_ = 100000;
     }
     DummyHeuristic oaHeu(model, nlpSolver);
 
@@ -224,6 +225,12 @@ namespace Bonmin
         model.addCutGenerator(&oaGen,par.nlpSolveFrequency,"Outer Approximation Supporting Hyperplanes for NLP optimum");
         numGen++;
       }
+
+      if(par.filmintCutsFrequency != 0){
+      model.addCutGenerator(&ecpGen,par.filmintCutsFrequency,"Filmint cutting planes");
+      numGen++;
+      }
+
       if (par.migFreq != 0) {
         model.addCutGenerator(&miGGen,par.migFreq,"GMI");
         numGen++;

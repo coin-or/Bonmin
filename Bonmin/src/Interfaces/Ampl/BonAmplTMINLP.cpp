@@ -565,6 +565,10 @@ namespace Bonmin
         AmplOptionsList::Integer_Option,
         "Specify the frequency at which nlp relaxations are solved in hybrid.");
 
+    amplOptList->AddAmplOption("bonmin.filmint_ecp_cuts","bonmin.filmint_ecp_cuts",
+        AmplOptionsList::Integer_Option,
+        "Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.");
+
     amplOptList->AddAmplOption("bonmin.oa_dec_time_limit", "bonmin.oa_dec_time_limit",
         AmplOptionsList::Number_Option,
         "Specify the maximum amount of time spent in OA decomposition iteratrions.");

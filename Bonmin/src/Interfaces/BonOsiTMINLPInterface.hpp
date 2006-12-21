@@ -793,9 +793,13 @@ class Messages : public CoinMessages
    */
   virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1);
 
-  /** Get the outer approximation constraints at the currently stored optimal point.
+  /** Get the outer approximation constraints at the current optimal point.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
   virtual void getOuterApproximation(OsiCuts &cs, bool getObj = 1);
+
+  /** Get the outer approximation constraints at provided point
+   (Only get outer-approximations of nonlinear constraints of the problem.)*/
+  void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj = 1);
 
   /** solve the problem of finding the closest point to x_bar in the subspace of coordinates given by ind
    * (i.e., \f$ min \sum\limits_{i=1}^n (x_{ind[i]} -\overline{x}_i)^2 \f$ ,
@@ -819,8 +823,9 @@ class Messages : public CoinMessages
     tminlp_->addCuts(numberCuts, cuts);
   }
 
-
- double getConstraintViolation();
+ /** Get constraint violation and objective error for some
+     user provided point.*/
+ double getConstraintViolation(const double * x, double obj);
 
 //---------------------------------------------------------------------------
 protected:

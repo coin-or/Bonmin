@@ -262,6 +262,11 @@ static void register_OA_options
       0,10,
       "A frequency of 0 amounts to to never solve the NLP relaxation.");
 
+  roptions->AddLowerBoundedIntegerOption("filmint_ecp_cuts",
+      "Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.",
+      0,0,
+      "A frequency of 0 amounts to to never solve the NLP relaxation.");
+
   roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
       "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
       0.,0,30.,
@@ -1630,14 +1635,14 @@ int OsiTMINLPInterface::initializeJacobianArrays()
 }
 
 
-/** get NLP constraint violation of current point */
+/** get NLP constraint violation of point */
 double
-OsiTMINLPInterface::getConstraintViolation()
+OsiTMINLPInterface::getConstraintViolation(const double *x, const double obj)
 {
   int numcols = getNumCols();
   int numrows = getNumRows();
   double * g = new double[numrows];
-  tminlp_->eval_g(numcols,getColSolution(),1,numrows,g);
+  tminlp_->eval_g(numcols, x, 1, numrows, g);
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
 
@@ -1645,13 +1650,22 @@ OsiTMINLPInterface::getConstraintViolation()
   double norm = 0;
   for(int i = 0; i< numrows ; i++) {
     if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
-      double rowViolation = max(0.,rowLower[i] - g[i]);
-      if(rowViolation  > 0.) rowViolation  /= fabs(rowLower[i]);
-      double rowViolation2 = max(0.,g[i] - rowUpper[i]);
-      if(rowViolation2 > 0.) rowViolation2 /= fabs(rowUpper[i]);
+      double rowViolation;
+      if(rowLower[i] > -1e10)
+         rowViolation = max(0.,- rowLower[i] + g[i]);
+//      if(rowViolation  > 0.) rowViolation  /= fabs(rowLower[i]);
+      if(rowUpper[i] < 1e10);
+        rowViolation = max(rowViolation,- g[i] + rowUpper[i]);
+//      if(rowViolation2 > 0.) rowViolation2 /= fabs(rowUpper[i]);
       norm = max(rowViolation, norm);
     }
   }
+
+  double f;
+  tminlp_->eval_f(numcols, x, 0, f);
+  norm = max(norm, fabs(f - obj));
+
+  delete [] g;
   return norm;
 }
 
@@ -1711,6 +1725,14 @@ bool cleanNnz(double &value, double colLower, double colUpper,
 void
 OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
 {
+  getOuterApproximation(cs, getColSolution(), getObj);
+}
+
+/** Get the outer approximation constraints at the current optimum of the
+  current ipopt problem */
+void
+OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj)
+{
   int n,m, nnz_jac_g, nnz_h_lag;
   Ipopt::TNLP::IndexStyleEnum index_style;
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
@@ -1719,8 +1741,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
   assert(jRow_ != NULL);
   assert(jCol_ != NULL);
   double * g = new double[m];
-  tminlp_->eval_jac_g(n, getColSolution(), 1, m, nnz_jac_g, NULL, NULL, jValues_);
-  tminlp_->eval_g(n,getColSolution(),1,m,g);
+  tminlp_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
+  tminlp_->eval_g(n,x,1,m,g);
   //As jacobian is stored by cols fill OsiCuts with cuts
   CoinPackedVector * cuts = new CoinPackedVector[nNonLinear_ + 1];
   double * lb = new double[nNonLinear_ + 1];
@@ -1770,14 +1792,14 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
       //"clean" coefficient
       if(cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
           rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
-          getColSolution()[jCol_[i] - 1],
+          x[jCol_[i] - 1],
           lb[binding[jRow_[i] - 1]],
           ub[binding[jRow_[i] - 1]], tiny_, veryTiny_)) {
         cuts[binding[jRow_[i] - 1]].insert(jCol_[i]-1,jValues_[i]);
         if(lb[binding[jRow_[i] - 1]] > - infty)
-          lb[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
+          lb[binding[jRow_[i] - 1]] += jValues_[i] * x[jCol_ [i] - 1];
         if(ub[binding[jRow_[i] - 1]] < infty)
-        ub[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
+        ub[binding[jRow_[i] - 1]] += jValues_[i] * x[jCol_ [i] - 1];
       }
     }
   }
@@ -1802,9 +1824,9 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
   if(getObj)  // Get the objective cuts
   {
     double * obj = new double [n];
-    tminlp_->eval_grad_f(n, getColSolution(), 1,obj);
+    tminlp_->eval_grad_f(n, x, 1,obj);
     double f;
-    tminlp_->eval_f(n, getColSolution(), 1, f);
+    tminlp_->eval_f(n, x, 1, f);
 
     CoinPackedVector v;
     v.reserve(n);
@@ -1815,13 +1837,13 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
     {
       if(cleanNnz(obj[i],colLower[i], colUpper[i],
           -getInfinity(), 0,
-          getColSolution()[i],
+          x[i],
           lb[nNonLinear_],
           ub[nNonLinear_],tiny_, 1e-15)) {
         //	      minCoeff = min(fabs(obj[i]), minCoeff);
         v.insert(i,obj[i]);
-        lb[nNonLinear_] += obj[i] * getColSolution()[i];
-        ub[nNonLinear_] += obj[i] * getColSolution()[i];
+        lb[nNonLinear_] += obj[i] * x[i];
+        ub[nNonLinear_] += obj[i] * x[i];
       }
     }
     v.insert(n,-1);
@@ -1854,7 +1876,7 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
   app2->Options()->SetIntegerValue("print_level", (Ipopt::Index) 0);
   optimization_status_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
-  getOuterApproximation(cs, 0);
+  getOuterApproximation(cs, getColSolution(), 0);
   hasBeenOptimized_=true;
   delete app2;
   return getObjValue();
@@ -2022,7 +2044,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     obj[i] = 0;
   mat.transpose();
   
-#if 0
+#if 0 
   std::cout<<"Mat is ordered by "<<
   <<mat.isColOrdered?"columns.":"rows."
   <<std::endl;

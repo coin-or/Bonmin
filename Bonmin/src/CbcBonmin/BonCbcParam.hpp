@@ -90,6 +90,8 @@ namespace Bonmin
     int disableSos;
     /** frequency to solve nlp's in B-Hyb.*/
     int nlpSolveFrequency;
+    /** frequency for generating filmint's type ecp cuts.*/
+    int filmintCutsFrequency;
     /** Max OA decomposition time in B-Hyb.*/
     double oaDecMaxTime;
     /** milp subsolver:
