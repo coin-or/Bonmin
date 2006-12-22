@@ -249,9 +249,9 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 	    feasChecker_ = new Bonmin::OACutGenerator2(&nlp, NULL, NULL,
 						       cutOffIncrement,
 						       integerTolerance, 0, 1);
-	    feasChecker_->setLocalSearchNodeLimit(0);
-	    feasChecker_->setMaxLocalSearch(0);
-	    feasChecker_->setMaxLocalSearchPerNode(0);
+	    feasChecker_->parameter().localSearchNodeLimit_ = 0;
+	    feasChecker_->parameter().maxLocalSearch_ = 0;
+	    feasChecker_->parameter().maxLocalSearchPerNode_ = 0;
 	}
 
 	// The babSolver info used is the one containted in osi
