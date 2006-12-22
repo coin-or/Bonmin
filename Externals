@@ -1,0 +1,4 @@
+BuildTools    https://projects.coin-or.org/svn/BuildTools/trunk
+ThirdParty/ASL https://projects.coin-or.org/svn/BuildTools/ThirdParty/ASL/trunk
+CoinUtils     https://projects.coin-or.org/svn/CoinUtils/branches/devel/CoinUtils
+Osi           https://projects.coin-or.org/svn/Osi/branches/devel/Osi
