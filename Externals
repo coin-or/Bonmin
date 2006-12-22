@@ -14,4 +14,4 @@ Clp           https://projects.coin-or.org/svn/Clp/branches/devel/Clp
 Ipopt         https://projects.coin-or.org/svn/Ipopt/branches/devel/Ipopt
 Osi           https://projects.coin-or.org/svn/Osi/branches/devel/Osi
 Bcp           https://projects.coin-or.org/svn/Bcp/trunk/Bcp
-Couenne svn+ssh://pbonami-lx.tepper.cmu.edu/usr/local/code/convex/Couenne
+Couenne       https://projects.coin-or.org/svn/Bonmin/branches/Couenne/Couenne 
