@@ -1,0 +1,360 @@
+/*
+ * Name:    conv-exprMul.C
+ * Author:  Pietro Belotti
+ * Purpose: methods to convexify multiplications
+ *
+ * This file is licensed under the Common Public License (CPL)
+ */
+
+#include <CouenneTypes.h>
+#include <exprMul.h>
+#include <exprBMul.h>
+#include <exprConst.h>
+#include <exprPow.h>
+#include <exprClone.h>
+#include <CouenneProblem.h>
+#include <CouenneCutGenerator.h>
+
+
+// check if two arguments point to the same variable
+
+inline bool areSameVariables (expression *v1, expression *v2) {
+  return ((((v1 -> Type () == VAR) || (v1 -> Type () == AUX)) &&
+	   ((v2 -> Type () == VAR) || (v2 -> Type () == AUX))) 
+	  && (v1 -> Index () == v2 -> Index ()));
+}
+
+// Create standard formulation of this expression
+
+exprAux *exprMul::standardize (CouenneProblem *p) {
+
+  exprOp::standardize (p);
+
+  expression *aux = new exprClone (arglist_ [0]);
+
+  for (int i=1; i < nargs_ - 1; i++)
+    if (areSameVariables (aux, arglist_ [i]))
+         aux = p -> addAuxiliary (new exprPow (aux, new exprConst (2)));
+    else aux = p -> addAuxiliary (new exprMul (aux, new exprClone (arglist_ [i])));
+
+  if (areSameVariables (aux, arglist_ [nargs_ - 1]))
+       return  p -> addAuxiliary (new exprPow (aux, new exprConst (2)));
+  else return  p -> addAuxiliary (new exprMul (aux, new exprClone (arglist_ [nargs_ - 1])));
+}
+
+
+// get lower/upper bounds of product f(x) g(x) in expression form
+
+void exprMul::getBounds (expression *&lb, expression *&ub) {
+
+  int i;
+
+  if ((arglist_ [i=0] -> Type () == CONST) ||
+      (arglist_ [i=1] -> Type () == CONST)) {
+
+    CouNumber c = arglist_ [i] -> Value ();
+
+    expression *lbi, *ubi;
+    arglist_ [1-i] -> getBounds (lbi, ubi);
+
+    if (c >= 0) {
+      lb = new exprMul (new exprConst (c), lbi);
+      ub = new exprMul (new exprConst (c), ubi);
+    } else {
+      lb = new exprMul (new exprConst (c), ubi);
+      ub = new exprMul (new exprConst (c), lbi);
+    }
+  }
+  else {
+
+    expression **almin = new expression * [4];
+    expression **almax = new expression * [4];
+
+    arglist_ [0] -> getBounds (almin [0], almin [1]);
+    arglist_ [1] -> getBounds (almin [2], almin [3]);
+
+    almax [0] = new exprClone (almin [0]);
+    almax [1] = new exprClone (almin [1]);
+    almax [2] = new exprClone (almin [2]);
+    almax [3] = new exprClone (almin [3]);
+
+    lb = new exprLBMul (almin, 4);
+    ub = new exprUBMul (almax, 4);
+  }
+}
+
+
+// construct linear under-estimator for expression within problem *p
+// (p is used to add convexification constraints)
+
+int exprMul::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
+			      int **&indices, expression **&rhs, enum con_sign *&sign) {
+
+  // expression w = xy is convexified from below with two linear
+  // constraints (lx and ly are lower bounds of x and y, ux and uy are
+  // upper bounds
+  //
+  // w >= ly x + lx y - ly lx
+  // w >= uy x + ux y - uy ux
+
+  if ((arglist_ [0] -> Type () == CONST) ||
+      (arglist_ [1] -> Type () == CONST))
+    return 0;
+
+  expression *lx, *ux, *ly, *uy;
+
+  arglist_ [0] -> getBounds (lx, ux);
+  arglist_ [1] -> getBounds (ly, uy);
+
+  nterms = new int [2];
+  nterms [0] = nterms [1] = 3;
+
+  allocateCon (2, nterms, coeff, indices, rhs, sign);
+
+  coeff [0] [0] = new exprConst (-1); indices [0] [0] = w            -> Index ();
+  coeff [0] [1] = new exprClone (ly); indices [0] [1] = arglist_ [0] -> Index ();
+  coeff [0] [2] = new exprClone (lx); indices [0] [2] = arglist_ [1] -> Index ();
+  rhs   [0] = new exprMul (lx, ly);
+  sign  [0] = COUENNE_LE;
+
+  coeff [1] [0] = new exprConst (-1); indices [1] [0] = w            -> Index ();
+  coeff [1] [1] = new exprClone (uy); indices [1] [1] = arglist_ [0] -> Index ();
+  coeff [1] [2] = new exprClone (ux); indices [1] [2] = arglist_ [1] -> Index ();
+  rhs   [1] = new exprMul (ux, uy);
+  sign  [1] = COUENNE_LE;
+
+  return 2;
+}
+
+
+// similarly, construct linear over-estimator for expression within
+// problem *p (p is used to add convexification constraints). It is
+// also used when this function appears with a minus sign in the
+// expression
+
+int exprMul::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
+			      int **&indices, expression **&rhs, enum con_sign *&sign) {
+
+  // expression w = xy is convexified from below with two linear
+  // constraints (lx and ly are lower bounds of x and y, ux and uy are
+  // upper bounds
+  //
+  // w <= ly x + ux y - ly ux
+  // w <= uy x + lx y - uy lx
+
+  if ((arglist_ [0] -> Type () == CONST) ||
+      (arglist_ [1] -> Type () == CONST))
+    return 0;
+
+  expression *lx, *ux, *ly, *uy;
+
+  arglist_ [0] -> getBounds (lx, ux);
+  arglist_ [1] -> getBounds (ly, uy);
+
+  nterms = new int [2];
+  nterms [0] = nterms [1] = 3;
+
+  allocateCon (2, nterms, coeff, indices, rhs, sign);
+
+  coeff [0] [0] = new exprConst (-1); indices [0] [0] = w            -> Index ();
+  coeff [0] [1] = new exprClone (ly); indices [0] [1] = arglist_ [0] -> Index ();
+  coeff [0] [2] = new exprClone (ux); indices [0] [2] = arglist_ [1] -> Index ();
+  rhs   [0] = new exprMul (ly, ux);
+  sign  [0] = COUENNE_GE;
+
+  coeff [1] [0] = new exprConst (-1); indices [1] [0] = w            -> Index ();
+  coeff [1] [1] = new exprClone (uy); indices [1] [1] = arglist_ [0] -> Index ();
+  coeff [1] [2] = new exprClone (lx); indices [1] [2] = arglist_ [1] -> Index ();
+  rhs   [1] = new exprMul (uy, lx);
+  sign  [1] = COUENNE_GE;
+
+  return 2;
+}
+
+
+// generate convexification cut for constraint w = this
+
+void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+
+  // get bounds of numerator and denominator
+
+  expression *xle, *xue, 
+             *yle, *yue, 
+             *wle, *wue;
+
+  expression *xe = arglist_ [0];
+  expression *ye = arglist_ [1];
+
+  CouNumber *coeff;
+  int       *index;
+  OsiRowCut *cut;
+
+  bool check = cg -> isFirst () || !(cg -> addViolated ());
+
+  // if expression is c*x, where c is constant, everything gets
+  // easier...
+
+  if ((xe -> Type () == CONST) || 
+      (ye -> Type () == CONST)) {
+
+    if (cg -> isFirst ()) {
+
+      if ((xe -> Type () == CONST) && 
+	  (ye -> Type () == CONST)) {
+
+	// strange case: w = c1*c2, should have been dealt with in
+	// simplify, but who knows...
+
+	coeff = new CouNumber [1];
+	index = new int       [1];
+	cut   = new OsiRowCut;
+
+	coeff [0] = 1;  
+	index [0] = w -> Index ();
+
+	CouNumber rhs = xe -> Value () * ye -> Value ();
+
+	cut -> setUb (rhs);
+	cut -> setLb (rhs);
+	cut -> setRow (1, index, coeff);
+      }
+      else {
+
+	CouNumber coe;
+	int ind;
+
+	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = xe -> Index ();}
+	else                        {coe = xe -> Value (); ind = ye -> Index ();}
+
+	coeff = new CouNumber [2];
+	index = new int       [2];
+	cut   = new OsiRowCut;
+
+	coeff [0] = -1;  index [0] = w  -> Index ();
+	coeff [1] = coe; index [1] = ind;
+
+	cut -> setUb (0);
+	cut -> setLb (0);
+	cut -> setRow (2, index, coeff);
+      }
+
+      printf ("Mul cx: "); cut -> print ();
+
+      cs.insert (cut);
+    }
+
+    return;
+  }
+
+  xe -> getBounds (xle, xue);
+  ye -> getBounds (yle, yue);
+  w  -> getBounds (wle, wue);
+
+  CouNumber x  = (*xe) (), xl = (*xle) (), xu = (*xue) (),
+            y  = (*ye) (), yl = (*yle) (), yu = (*yue) (),
+            w0 = (*w) ();
+
+  printf ("Mult: x = ");
+  xe  -> print (std::cout); printf (" [");
+  xle -> print (std::cout); printf (",");
+  xue -> print (std::cout); printf ("]    y = ");
+
+  ye  -> print (std::cout); printf (" [");
+  yle -> print (std::cout); printf (",");
+  yue -> print (std::cout); printf ("];   w = ");
+
+  w   -> print (std::cout); printf ("\n");
+
+  // Add McCormick convexification cuts:
+  //
+  // 1) w >= yl x + xl y - yl xl
+  // 2) w >= yu x + xu y - yu xu
+  //
+  // 3) w <= yl x + xu y - yl xu
+  // 4) w <= yu x + xl y - yu xl
+
+  // 1) 
+
+  if ((yl > - COUENNE_INFINITY + 1) && (xl > - COUENNE_INFINITY + 1) &&
+      (check || (w0 < yl*x + xl*y - yl*xl - COUENNE_EPS))) {
+
+    coeff = new CouNumber [3];
+    index = new int       [3];
+    cut   = new OsiRowCut;
+
+    coeff [0] = -1; index [0] = w  -> Index ();
+    coeff [1] = yl; index [1] = xe -> Index ();
+    coeff [2] = xl; index [2] = ye -> Index ();
+
+    cut -> setUb (yl * xl);
+    cut -> setRow (3, index, coeff);
+
+    printf ("Multiply1: "); cut -> print ();
+
+    cs.insert (cut);
+  }
+
+  // 2) 
+
+  if ((yu < COUENNE_INFINITY - 1) && (xu < COUENNE_INFINITY - 1) &&
+      (check || (w0 < yu*x + xu*y - yu*xu - COUENNE_EPS))) {
+
+    coeff = new CouNumber [3];
+    index = new int       [3];
+    cut   = new OsiRowCut;
+
+    coeff [0] = -1; index [0] = w  -> Index ();
+    coeff [1] = yu; index [1] = xe -> Index ();
+    coeff [2] = xu; index [2] = ye -> Index ();
+
+    cut -> setUb (yu * xu);
+    cut -> setRow (3, index, coeff);
+
+    printf ("Multiply2: "); cut -> print ();
+
+    cs.insert (cut);
+  }
+
+  // 3) 
+
+  if ((yl > - COUENNE_INFINITY + 1) && (xu < COUENNE_INFINITY - 1) &&
+      (check || (w0 > yl*x + xu*y - yl*xu + COUENNE_EPS))) {
+
+    coeff = new CouNumber [3];
+    index = new int       [3];
+    cut   = new OsiRowCut;
+
+    coeff [0] = -1; index [0] = w  -> Index ();
+    coeff [1] = yl; index [1] = xe -> Index ();
+    coeff [2] = xu; index [2] = ye -> Index ();
+
+    cut -> setLb (yl * xu);
+    cut -> setRow (3, index, coeff);
+
+    printf ("Multiply3: "); cut -> print ();
+
+    cs.insert (cut);
+  }
+
+  // 4) 
+
+  if ((yu < COUENNE_INFINITY - 1) && (xl > - COUENNE_INFINITY + 1) &&
+      (check || (w0 > yu*x + xl*y - yu*xl + COUENNE_EPS))) {
+
+    coeff = new CouNumber [3];
+    index = new int       [3];
+    cut   = new OsiRowCut;
+
+    coeff [0] = -1; index [0] = w  -> Index ();
+    coeff [1] = yu; index [1] = xe -> Index ();
+    coeff [2] = xl; index [2] = ye -> Index ();
+
+    cut -> setLb (yu * xl);
+    cut -> setRow (3, index, coeff);
+
+    printf ("Multiply4: "); cut -> print ();
+
+    cs.insert (cut);
+  }
+}
