@@ -20,7 +20,7 @@ EcpCuts::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
   std::cout<<"Constraint violation: "<<violation<<std::endl;
   if(violation <= 1e-01)
     return;
-  int numIt = 20; 
+  int numIt = 1; 
   solverManip * lpManip = NULL;
   for(int i = 0 ; i < numIt ; i++)
   {

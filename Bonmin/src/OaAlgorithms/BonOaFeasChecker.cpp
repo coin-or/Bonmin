@@ -22,7 +22,7 @@ namespace Bonmin
 /// Default constructor
   OaFeasibilityChecker ::OaFeasibilityChecker ():
       CglCutGenerator(),
-      OaDecompositionBase()
+      OaDecompositionHelper()
    {
    }
 
@@ -33,12 +33,11 @@ namespace Bonmin
    OsiSolverInterface * si,
    double cbcCutoffIncrement,
    double cbcIntegerTolerance,
-   bool solveAuxiliaryProblem,
    bool leaveSiUnchanged
    )
       :
       CglCutGenerator(),
-      OaDecompositionBase(nlp,si,
+      OaDecompositionHelper(nlp,si,
                           NULL, cbcCutoffIncrement,
                           cbcIntegerTolerance, leaveSiUnchanged)
   {
@@ -114,7 +113,6 @@ namespace Bonmin
     
     double milpBound = cutoff;
     int numberPasses = 0;
-    bool foundSolution = 0;
     while (isInteger && feasible ) {
       numberPasses++;
 
@@ -127,56 +125,16 @@ namespace Bonmin
 
 
       //Now solve the NLP get the cuts, and intall them in the local LP
-      nSolve_++;
-      nlp_->resolve();
-      if (nlp_->isProvenOptimal()) {
-        handler_->message(FEASIBLE_NLP, messages_)
-        <<nlp_->getIterationCount()
-        <<nlp_->getObjValue()<<CoinMessageEol;
 
-#ifdef OA_DEBUG
-        const double * colsol2 = nlp_->getColSolution();
-        debug_.checkInteger(colsol2,numcols,std::cerr);
-#endif
-
-        if ((nlp_->getObjValue() < cutoff) ) {
-          handler_->message(UPDATE_UB, messages_)
-          <<nlp_->getObjValue()
-          <<CoinCpuTime()-timeBegin_
-          <<CoinMessageEol;
-
-          foundSolution = 1;
-          // Also pass it to solver
-          if (babInfo) {
-            double * lpSolution = new double[numcols + 1];
-            CoinCopyN(nlp_->getColSolution(), numcols, lpSolution);
-            lpSolution[numcols] = nlp_->getObjValue();
-            babInfo->setSolution(lpSolution,
-                numcols + 1, lpSolution[numcols]);
-            delete [] lpSolution;
-          }
-          else {
-            printf("No auxiliary info in nlp solve!\n");
-            throw -1;
-          }
-          // Update the cutoff
-          cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
-          // Update the lp solver cutoff
-          lp->setDblParam(OsiDualObjectiveLimit, cutoff);
-        }
-      }
-      else if (nlp_->isAbandoned() || nlp_->isIterationLimitReached()) {
-        std::cerr<<"Unsolved NLP... exit"<<std::endl;
-      }
-      else {
-        handler_->message(INFEASIBLE_NLP, messages_)
-        <<nlp_->getIterationCount()
-        <<CoinMessageEol;
-      }
-      
+    if(solveNlp(babInfo, cutoff)){
+      //nlp solved and feasible
+      // Update the cutoff
+      cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
+      // Update the lp solver cutoff
+      lp->setDblParam(OsiDualObjectiveLimit, cutoff);
+    }
       // Get the cuts outer approximation at the current point
       nlp_->getOuterApproximation(cs);
-
 
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)

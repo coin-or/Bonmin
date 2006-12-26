@@ -10,19 +10,20 @@
 #ifndef BonECPCuts_HPP
 #define BonECPCuts_HPP
 
-#include "BonOaDecBase.hpp"
+#include "BonOaDecHelper.hpp"
 #include "CglCutGenerator.hpp"
 namespace Bonmin {
-  class EcpCuts: public OaDecompositionBase, public CglCutGenerator {
+  class EcpCuts: public OaDecompositionHelper, public CglCutGenerator {
     public:
     EcpCuts(OsiTMINLPInterface *nlp = NULL
 	    ):
-      OaDecompositionBase(nlp,NULL, NULL,0,0,0){
+      OaDecompositionHelper(nlp,NULL, NULL,0,0,0){
     }
     
     /// Copy constructor
-    EcpCuts(const OaDecompositionBase & copy):
-      OaDecompositionBase(copy){
+    EcpCuts(const EcpCuts & copy):
+      OaDecompositionHelper(copy),
+      CglCutGenerator(copy){
     }
     
     /// clone

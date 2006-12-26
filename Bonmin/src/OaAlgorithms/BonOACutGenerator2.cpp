@@ -29,7 +29,7 @@ namespace Bonmin
 /// Default constructor
   OACutGenerator2::OACutGenerator2():
       CglCutGenerator(),
-      OaDecompositionBase()
+      OaDecompositionHelper()
    {
    }
 
@@ -46,7 +46,7 @@ namespace Bonmin
    )
       :
       CglCutGenerator(),
-      OaDecompositionBase(nlp,si,
+      OaDecompositionHelper(nlp,si,
                           strategy, cbcCutoffIncrement,
                           cbcIntegerTolerance, leaveSiUnchanged)
   {
@@ -179,82 +179,43 @@ namespace Bonmin
     nlpManip.fixIntegers(colsol);
 
 
-      //Now solve the NLP get the cuts, and intall them in the local LP
-      nSolve_++;
-      nlp_->resolve();
-      if (nlp_->isProvenOptimal()) {
-        handler_->message(FEASIBLE_NLP, messages_)
-        <<nlp_->getIterationCount()
-        <<nlp_->getObjValue()<<CoinMessageEol;
+    if(solveNlp(babInfo, cutoff)){
+      //nlp solved and feasible
+      // Update the cutoff
+      cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
+      // Update the lp solver cutoff
+      lp->setDblParam(OsiDualObjectiveLimit, cutoff);
+    }
 
-#ifdef OA_DEBUG
-        const double * colsol2 = nlp_->getColSolution();
-        debug_.checkInteger(colsol2,numcols,std::cerr);
-#endif
-
-        if ((nlp_->getObjValue() < cutoff) ) {
-          handler_->message(UPDATE_UB, messages_)
-          <<nlp_->getObjValue()
-          <<CoinCpuTime()-timeBegin_
-          <<CoinMessageEol;
-
-          foundSolution = 1;
-          // Also pass it to solver
-          if (babInfo) {
-            double * lpSolution = new double[numcols + 1];
-            CoinCopyN(nlp_->getColSolution(), numcols, lpSolution);
-            lpSolution[numcols] = nlp_->getObjValue();
-            babInfo->setSolution(lpSolution,
-                numcols + 1, lpSolution[numcols]);
-            delete [] lpSolution;
-          }
-          else {
-            printf("No auxiliary info in nlp solve!\n");
-            throw -1;
-          }
-          // Update the cutoff
-          cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
-          // Update the lp solver cutoff
-          lp->setDblParam(OsiDualObjectiveLimit, cutoff);
-        }
-      }
-      else if (nlp_->isAbandoned() || nlp_->isIterationLimitReached()) {
-        std::cerr<<"Unsolved NLP... exit"<<std::endl;
-      }
-      else {
-        handler_->message(INFEASIBLE_NLP, messages_)
-        <<nlp_->getIterationCount()
-        <<CoinMessageEol;
-      }
       
-      // Get the cuts outer approximation at the current point
-      nlp_->getOuterApproximation(cs);
+    // Get the cuts outer approximation at the current point
+    nlp_->getOuterApproximation(cs);
 
 
-      int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
-      if (numberCuts > 0)
-        lpManip->installCuts(cs, numberCuts);
+    int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
+    if (numberCuts > 0)
+      lpManip->installCuts(cs, numberCuts);
 
-        lp->resolve();
-        double objvalue = lp->getObjValue();
-        //milpBound = max(milpBound, lp->getObjValue());
-        feasible = (lp->isProvenOptimal() &&
-            !lp->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
-        //if value of integers are unchanged then we have to get out
-        bool changed = !feasible;//if lp is infeasible we don't have to check anything
-	if(!changed)
-	  changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
-        if (changed) {
-          isInteger = integerFeasible(lp->getColSolution(), numcols);
-        }
-        else {
-          isInteger = 0;
-          //	  if(!fixed)//fathom on bounds
-          milpBound = 1e200;
-        }
+    lp->resolve();
+    double objvalue = lp->getObjValue();
+    //milpBound = max(milpBound, lp->getObjValue());
+    feasible = (lp->isProvenOptimal() &&
+		!lp->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
+    //if value of integers are unchanged then we have to get out
+    bool changed = !feasible;//if lp is infeasible we don't have to check anything
+    if(!changed)
+      changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+    if (changed) {
+      isInteger = integerFeasible(lp->getColSolution(), numcols);
+    }
+    else {
+      isInteger = 0;
+      //	  if(!fixed)//fathom on bounds
+      milpBound = 1e200;
+    }
 #ifdef OA_DEBUG
-        printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
-            numberCuts) ;
+    printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
+	   numberCuts) ;
 #endif
         //do we perform a new local search ?
         if (milpOptimal && feasible && !isInteger &&

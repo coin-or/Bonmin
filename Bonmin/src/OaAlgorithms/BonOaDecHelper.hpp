@@ -7,8 +7,8 @@
 //
 // Date :  12/07/2006
 
-#ifndef BonOaBase_HPP
-#define BonOaBase_HPP
+#ifndef BonOaDecHelper_HPP
+#define BonOaDecHelper_HPP
 #include "CglCutGenerator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonOAMessages.hpp"
@@ -25,7 +25,7 @@ class OsiCpxSolverInterface;
 namespace Bonmin
 {
   /** Base class for OA algorithms.*/
-  class OaDecompositionBase 
+  class OaDecompositionHelper 
   {
     public:
         /** Small class to perform the solution of sub-mips.*/
@@ -170,7 +170,7 @@ namespace Bonmin
 
    };
     /// Usefull constructor
-    OaDecompositionBase(OsiTMINLPInterface * nlp = NULL,
+    OaDecompositionHelper(OsiTMINLPInterface * nlp = NULL,
         OsiSolverInterface * si = NULL,
         CbcStrategy * strategy = NULL,
         double cbcCutoffIncrement_=1e-07,
@@ -179,11 +179,11 @@ namespace Bonmin
         );
 
     /// Copy constructor
-    OaDecompositionBase(const OaDecompositionBase & copy);
+    OaDecompositionHelper(const OaDecompositionHelper & copy);
 
 
     /// Destructor
-    ~OaDecompositionBase();
+    ~OaDecompositionHelper();
 
 
     /// Assign an OsiTMINLPInterface
@@ -247,7 +247,12 @@ namespace Bonmin
    /** Check for integer feasibility of a solution return true if it is feasible.
       \todo Handle SOS Type 2 constraints. */
       bool integerFeasible(const double * sol, int numcols) const;
+
+    /** Solve the nlp and do output. 
+	\return true if feasible*/
+    bool solveNlp(OsiBabSolver * babInfo, double cutoff) const;
    /** @} */
+
 
     /// \name Protected members
     /** @{ */

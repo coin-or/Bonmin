@@ -18,10 +18,10 @@ noinst_LTLIBRARIES = liboainterface.la
 # List all source files, including headers
 liboainterface_la_SOURCES = \
 	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
-	BonOACutGenerator.cpp BonOACutGenerator.hpp \
+	BonOaNlpOptim.cpp BonOaNlpOptim.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
         BonOaFeasChecker.cpp BonOaFeasChecker.hpp \
-	BonOaDecBase.cpp BonOaDecBase.hpp \
+	BonOaDecHelper.cpp BonOaDecHelper.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 

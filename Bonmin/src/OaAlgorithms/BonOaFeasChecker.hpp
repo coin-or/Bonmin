@@ -10,12 +10,12 @@
 
 #ifndef BonOaFeasibilityChecker_HPP
 #define BonOaFeasibilityChecker_HPP
-#include "BonOaDecBase.hpp"
+#include "BonOaDecHelper.hpp"
 
 namespace Bonmin
 {
   /** Class to perform OA in its classical form.*/
-  class OaFeasibilityChecker : public CglCutGenerator, public OaDecompositionBase
+  class OaFeasibilityChecker : public CglCutGenerator, public OaDecompositionHelper
   {
   public:
     /// Default constructor
@@ -31,7 +31,7 @@ namespace Bonmin
     /// Copy constructor
     OaFeasibilityChecker(const OaFeasibilityChecker &copy)
         :
-        OaDecompositionBase(copy)
+        OaDecompositionHelper(copy)
     {
     }
     /// Destructor

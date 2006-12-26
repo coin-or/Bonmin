@@ -58,9 +58,9 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liboainterface_la_LIBADD =
-am_liboainterface_la_OBJECTS = BonDummyHeuristic.lo \
-	BonOACutGenerator.lo BonOACutGenerator2.lo BonOaFeasChecker.lo \
-	BonOaDecBase.lo BonEcpCuts.lo BonOAMessages.lo
+am_liboainterface_la_OBJECTS = BonDummyHeuristic.lo BonOaNlpOptim.lo \
+	BonOACutGenerator2.lo BonOaFeasChecker.lo BonOaDecHelper.lo \
+	BonEcpCuts.lo BonOAMessages.lo
 liboainterface_la_OBJECTS = $(am_liboainterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -314,10 +314,10 @@ noinst_LTLIBRARIES = liboainterface.la
 # List all source files, including headers
 liboainterface_la_SOURCES = \
 	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
-	BonOACutGenerator.cpp BonOACutGenerator.hpp \
+	BonOaNlpOptim.cpp BonOaNlpOptim.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
         BonOaFeasChecker.cpp BonOaFeasChecker.hpp \
-	BonOaDecBase.cpp BonOaDecBase.hpp \
+	BonOaDecHelper.cpp BonOaDecHelper.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 
@@ -408,11 +408,11 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDummyHeuristic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonEcpCuts.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOAMessages.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaDecBase.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaDecHelper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaFeasChecker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaNlpOptim.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

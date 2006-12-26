@@ -24,7 +24,7 @@
 #include "BonDummyHeuristic.hpp"
 #include "BonOACutGenerator2.hpp"
 #include "BonOaFeasChecker.hpp"
-#include "BonOACutGenerator.hpp"
+#include "BonOaNlpOptim.hpp"
 #include "BonEcpCuts.hpp"
 
 // Cbc Header file
@@ -158,7 +158,7 @@ namespace Bonmin
     //Setup OA generators
 
     //Resolution of nlp relaxations
-    OACutGenerator oaGen(nlpSolver);
+    OaNlpOptim oaGen(nlpSolver);
     oaGen.setMaxDepth(100000);
     oaGen.setLogLevel(par.oaLogLevel);
 
@@ -210,9 +210,8 @@ namespace Bonmin
     }
     //Setup solver for checking validity of integral solutions
     OaFeasibilityChecker feasCheck(nlpSolver, model.solver(),
-        NULL,
-        par.cutoffDecr, par.intTol,
-        0, 0);
+				   par.cutoffDecr, par.intTol,
+				   0);
     if (par.algo>0) {
       feasCheck.parameter().localSearchNodeLimit_ = 0;
       feasCheck.parameter().maxLocalSearch_ = 0;

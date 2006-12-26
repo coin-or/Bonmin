@@ -10,12 +10,12 @@
 
 #ifndef BonOACutGenerator2_HPP
 #define BonOACutGenerator2_HPP
-#include "BonOaDecBase.hpp"
+#include "BonOaDecHelper.hpp"
 
 namespace Bonmin
 {
   /** Class to perform OA in its classical form.*/
-  class OACutGenerator2 : public CglCutGenerator, public OaDecompositionBase
+  class OACutGenerator2 : public CglCutGenerator, public OaDecompositionHelper
   {
   public:
     /// Default constructor
@@ -33,7 +33,7 @@ namespace Bonmin
     /// Copy constructor
     OACutGenerator2(const OACutGenerator2 &copy)
         :
-        OaDecompositionBase(copy)
+        OaDecompositionHelper(copy)
     {
     }
     /// Destructor
