@@ -51,6 +51,8 @@ Bonmin/src/OaAlgorithms/BonOaDecHelper.cpp -text
 Bonmin/src/OaAlgorithms/BonOaDecHelper.hpp -text
 Bonmin/src/OaAlgorithms/BonOaFeasChecker.cpp -text
 Bonmin/src/OaAlgorithms/BonOaFeasChecker.hpp -text
+Bonmin/src/OaAlgorithms/BonOaNlpOptim.cpp -text
+Bonmin/src/OaAlgorithms/BonOaNlpOptim.hpp -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
