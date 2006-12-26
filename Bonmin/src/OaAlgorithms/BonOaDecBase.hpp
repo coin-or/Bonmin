@@ -251,9 +251,9 @@ namespace Bonmin
 
     /// \name Protected members
     /** @{ */
-    /// Pointer to the Ipopt interface
+    /// Pointer to nlp interface
     mutable OsiTMINLPInterface * nlp_;
-    ///Number of NLP resolution done
+    ///Number of nlp solved done
     mutable int nSolve_;
     /// A linear solver
     mutable OsiSolverInterface * lp_;

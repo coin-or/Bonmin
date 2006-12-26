@@ -23,6 +23,7 @@
 //OA machinery
 #include "BonDummyHeuristic.hpp"
 #include "BonOACutGenerator2.hpp"
+#include "BonOaFeasChecker.hpp"
 #include "BonOACutGenerator.hpp"
 #include "BonEcpCuts.hpp"
 
@@ -208,7 +209,7 @@ namespace Bonmin
       oaDec.parameter().subMilpLogLevel_ = par.milpLogLevel;
     }
     //Setup solver for checking validity of integral solutions
-    OACutGenerator2 feasCheck(nlpSolver, model.solver(),
+    OaFeasibilityChecker feasCheck(nlpSolver, model.solver(),
         NULL,
         par.cutoffDecr, par.intTol,
         0, 0);
