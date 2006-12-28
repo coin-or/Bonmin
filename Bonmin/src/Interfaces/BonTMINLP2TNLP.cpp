@@ -16,8 +16,13 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+
+
+extern bool BonminAbortAll;
+
 namespace Bonmin
 {
+
   TMINLP2TNLP::TMINLP2TNLP(const SmartPtr<TMINLP> tminlp
 #ifdef WARM_STARTER
        ,
@@ -485,6 +490,7 @@ namespace Bonmin
       const IpoptData* ip_data,
       IpoptCalculatedQuantities* ip_cq)
   {
+    if (BonminAbortAll) return false;
 #if WARM_STARTER
     // If we don't have this swtiched on, we assume that also the
     // "warm_start" option for bonmin is set not to refer to the

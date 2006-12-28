@@ -15,6 +15,8 @@
 #include "BonIpoptInteriorWarmStarter.hpp"
 #include "BonIpoptWarmStart.hpp"
 
+extern bool BonminAbortAll;
+
 namespace Bonmin{
 
   std::string IpoptSolver::solverName_ = "Ipopt";
@@ -62,7 +64,8 @@ namespace Bonmin{
 	  optimizationStatus_ = Ipopt::Infeasible_Problem_Detected;
       }
 
-
+     if(BonminAbortAll)
+       optimizationStatus_ = Ipopt::Infeasible_Problem_Detected;
 
     return solverReturnStatus(optimizationStatus_);
   }
@@ -85,6 +88,8 @@ namespace Bonmin{
 	else if(ret_status == provenInfeasible)
 	  optimizationStatus_ = Ipopt::Infeasible_Problem_Detected;
       }
+     if(BonminAbortAll)
+       optimizationStatus_ = Ipopt::Infeasible_Problem_Detected;
       return solverReturnStatus(optimizationStatus_);
   }
 
