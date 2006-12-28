@@ -10,12 +10,12 @@
 
 #ifndef BonOaFeasibilityChecker_HPP
 #define BonOaFeasibilityChecker_HPP
-#include "BonOaDecHelper.hpp"
+#include "BonOaDecBase.hpp"
 
 namespace Bonmin
 {
   /** Class to perform OA in its classical form.*/
-  class OaFeasibilityChecker : public CglCutGenerator, public OaDecompositionHelper
+  class OaFeasibilityChecker : public OaDecompositionBase
   {
   public:
     /// Default constructor
@@ -31,7 +31,7 @@ namespace Bonmin
     /// Copy constructor
     OaFeasibilityChecker(const OaFeasibilityChecker &copy)
         :
-        OaDecompositionHelper(copy)
+        OaDecompositionBase(copy)
     {
     }
     /// Destructor
@@ -47,15 +47,18 @@ namespace Bonmin
     {
       parameters_.setStrategy(strategy);
     }
-    /// cut generation method
-    virtual void generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
-        const CglTreeInfo info = CglTreeInfo()) const;
 
     virtual CglCutGenerator * clone() const
     {
       return new OaFeasibilityChecker(*this);
     }
-
+  protected:
+    /// virtual method which performs the OA algorithm by modifying lp and nlp.
+    virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
+                           SubMipSolver * subMip, OsiBabSolver * babInfo, double &cutoff) const;
+    /// virutal method to decide if local search is performed
+    virtual bool doLocalSearch() const{
+      return 0;} 
   };
 }
 #endif

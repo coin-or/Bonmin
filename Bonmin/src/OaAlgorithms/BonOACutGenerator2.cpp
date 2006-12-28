@@ -1,4 +1,4 @@
-// (C) Copyright Carnegie Mellon University 2005
+// (C) Copyright Carnegie Mellon University 2005, 2006
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -28,8 +28,7 @@ namespace Bonmin
 
 /// Default constructor
   OACutGenerator2::OACutGenerator2():
-      CglCutGenerator(),
-      OaDecompositionHelper()
+      OaDecompositionBase()
    {
    }
 
@@ -41,12 +40,10 @@ namespace Bonmin
    CbcStrategy * strategy,
    double cbcCutoffIncrement,
    double cbcIntegerTolerance,
-   bool solveAuxiliaryProblem,
    bool leaveSiUnchanged
    )
       :
-      CglCutGenerator(),
-      OaDecompositionHelper(nlp,si,
+      OaDecompositionBase(nlp,si,
                           strategy, cbcCutoffIncrement,
                           cbcIntegerTolerance, leaveSiUnchanged)
   {
@@ -56,77 +53,30 @@ namespace Bonmin
   {
   }
 
-  /// cut generation method
-  void
-  OACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
-      const CglTreeInfo info) const
+  /// virutal method to decide if local search is performed
+  bool
+  OACutGenerator2::doLocalSearch() const{
+    return (nLocalSearch_<parameters_.maxLocalSearch_ &&
+          parameters_.localSearchNodeLimit_ > 0 &&
+          CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_);
+  }
+  /// virtual method which performs the OA algorithm by modifying lp and nlp.
+  double
+  OACutGenerator2::performOa(OsiCuts &cs,
+                             solverManip &nlpManip, 
+                             solverManip &lpManip, 
+                             SubMipSolver * subMip,
+                             OsiBabSolver * babInfo,
+                             double & cutoff) const
   {
     double lastPeriodicLog= CoinCpuTime();
 
-    if (nlp_ == NULL) {
-      std::cerr<<"Error in cut generator for outer approximation no NLP ipopt assigned"<<std::endl;
-      throw -1;
-    }
-
-    // babInfo is used to communicate with the b-and-b solver (Cbc or Bcp).
-    OsiBabSolver * babInfo = dynamic_cast<OsiBabSolver *> (si.getAuxiliaryInfo());
-
     const int numcols = nlp_->getNumCols();
 
-    //Get the continuous solution
-    const double *colsol = si.getColSolution();
 
+    bool isInteger = false;
 
-    //Check integer infeasibility
-    bool isInteger = integerFeasible(colsol, numcols);
-
-    SubMipSolver * subMip = NULL;
-
-    if (!isInteger) {
-      if (nLocalSearch_<parameters_.maxLocalSearch_ &&
-          parameters_.localSearchNodeLimit_ > 0 &&
-          CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_)//do a local search
-      {
-        subMip = new SubMipSolver(lp_, parameters_.strategy());
-      }
-      else {
-        return;
-      }
-    }
-
-
-    //If we are going to modify things copy current information to restore it in the end
-
-
-    //get the current cutoff
-    double cutoff;
-    si.getDblParam(OsiDualObjectiveLimit, cutoff);
-
-    // Save solvers state if needed
-    solverManip nlpManip(nlp_, false, false, true, false);
-
-    solverManip * lpManip = NULL; 
-    OsiSolverInterface *lp;
-    if(lp_ != NULL){
-      if(lp_!=&si){
-        lpManip = new solverManip(lp_, true, false, false, true);
-        lpManip->cloneOther(si);
-      }
-      else{
-#if 0
-        throw CoinError("Not allowed to modify si in a cutGenerator",
-          "OACutGenerator2","generateCuts");
-#else
-         lpManip = new solverManip(lp_, true, leaveSiUnchanged_, true, true);
-#endif
-      }
-      lp = lp_;
-    }
-    else{
-      lpManip = new solverManip(si);
-      lp = lpManip->si();
-    }
-
+    OsiSolverInterface * lp = lpManip.si();
     bool milpOptimal = 1;
 
 
@@ -155,7 +105,11 @@ namespace Bonmin
         }
     }
     int numberPasses = 0;
+
+#ifdef OA_DEBUG
     bool foundSolution = 0;
+#endif
+
     while (isInteger && feasible ) {
       numberPasses++;
 
@@ -175,7 +129,7 @@ namespace Bonmin
       int numberCutsBefore = cs.sizeRowCuts();
 
     //Fix the variable which have to be fixed, after having saved the bounds
-    colsol = (subMip == NULL) ? lp->getColSolution() : subMip->getLastSolution();
+    const double * colsol = (subMip == NULL) ? lp->getColSolution() : subMip->getLastSolution();
     nlpManip.fixIntegers(colsol);
 
 
@@ -194,7 +148,7 @@ namespace Bonmin
 
     int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
     if (numberCuts > 0)
-      lpManip->installCuts(cs, numberCuts);
+      lpManip.installCuts(cs, numberCuts);
 
     lp->resolve();
     double objvalue = lp->getObjValue();
@@ -274,29 +228,7 @@ namespace Bonmin
 #ifdef OA_DEBUG
   debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
 #endif
-
-    //Transmit the bound found by the milp
-    {
-      if (milpBound>-1e100)
-      {
-        // Also store into solver
-        if (babInfo)
-          babInfo->setMipBound(milpBound);
-      }
-    }  //Clean everything :
-
-    //free subMip
-    if (subMip!= NULL) {
-      delete subMip;
-      subMip = NULL;
-    }
-
-    //  Reset the two solvers
-    if(leaveSiUnchanged_)
-      lpManip->restore();
-    delete lpManip;
-    nlpManip.restore();
-  return;
+  return milpBound;
 }
 
 

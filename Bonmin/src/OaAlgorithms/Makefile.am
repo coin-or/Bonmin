@@ -21,7 +21,7 @@ liboainterface_la_SOURCES = \
 	BonOaNlpOptim.cpp BonOaNlpOptim.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
         BonOaFeasChecker.cpp BonOaFeasChecker.hpp \
-	BonOaDecHelper.cpp BonOaDecHelper.hpp \
+	BonOaDecBase.cpp BonOaDecBase.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 

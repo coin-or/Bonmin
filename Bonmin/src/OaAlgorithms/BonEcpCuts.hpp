@@ -10,20 +10,19 @@
 #ifndef BonECPCuts_HPP
 #define BonECPCuts_HPP
 
-#include "BonOaDecHelper.hpp"
+#include "BonOaDecBase.hpp"
 #include "CglCutGenerator.hpp"
 namespace Bonmin {
-  class EcpCuts: public OaDecompositionHelper, public CglCutGenerator {
+  class EcpCuts: public OaDecompositionBase {
     public:
     EcpCuts(OsiTMINLPInterface *nlp = NULL
 	    ):
-      OaDecompositionHelper(nlp,NULL, NULL,0,0,0){
+      OaDecompositionBase(nlp,NULL, NULL,0,0,0){
     }
     
     /// Copy constructor
     EcpCuts(const EcpCuts & copy):
-      OaDecompositionHelper(copy),
-      CglCutGenerator(copy){
+      OaDecompositionBase(copy){
     }
     
     /// clone
@@ -34,10 +33,19 @@ namespace Bonmin {
     /// Destructor
     virtual ~EcpCuts(){
     }
+    /** Standard cut generation methods. */
+    virtual void generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
+                              const CglTreeInfo info = CglTreeInfo()) const;
     
-    virtual void generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
-			       const CglTreeInfo info = CglTreeInfo()) const;
-    
+   protected: 
+    /// virtual method which performs the OA algorithm by modifying lp and nlp.
+    virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
+                           SubMipSolver * subMip, OsiBabSolver * babInfo, double &cutoff) const{
+    throw -1;
+    }
+    /// virutal method to decide if local search is performed
+    virtual bool doLocalSearch() const{
+      return 0;}
   };
 } /* end namespace Bonmin.*/
 #endif

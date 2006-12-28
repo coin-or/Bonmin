@@ -7,8 +7,8 @@
 //
 // Date :  12/07/2006
 
-#ifndef BonOaDecHelper_HPP
-#define BonOaDecHelper_HPP
+#ifndef BonOaDecBase_HPP
+#define BonOaDecBase_HPP
 #include "CglCutGenerator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonOAMessages.hpp"
@@ -17,6 +17,7 @@
 #include "CbcStrategy.hpp"
 
 #include "CoinTime.hpp"
+#include "OsiAuxInfo.hpp"
 
 /* forward declarations.*/
 class OsiClpSolverInterface;
@@ -25,7 +26,7 @@ class OsiCpxSolverInterface;
 namespace Bonmin
 {
   /** Base class for OA algorithms.*/
-  class OaDecompositionHelper 
+  class OaDecompositionBase : public CglCutGenerator
   {
     public:
         /** Small class to perform the solution of sub-mips.*/
@@ -170,7 +171,7 @@ namespace Bonmin
 
    };
     /// Usefull constructor
-    OaDecompositionHelper(OsiTMINLPInterface * nlp = NULL,
+    OaDecompositionBase(OsiTMINLPInterface * nlp = NULL,
         OsiSolverInterface * si = NULL,
         CbcStrategy * strategy = NULL,
         double cbcCutoffIncrement_=1e-07,
@@ -179,12 +180,15 @@ namespace Bonmin
         );
 
     /// Copy constructor
-    OaDecompositionHelper(const OaDecompositionHelper & copy);
+    OaDecompositionBase(const OaDecompositionBase & copy);
 
 
     /// Destructor
-    ~OaDecompositionHelper();
-
+    virtual ~OaDecompositionBase();
+    
+    /** Standard cut generation methods. */
+    virtual void generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
+                              const CglTreeInfo info = CglTreeInfo()) const;
 
     /// Assign an OsiTMINLPInterface
     void assignNlpInterface(OsiTMINLPInterface * nlp);
@@ -253,6 +257,11 @@ namespace Bonmin
     bool solveNlp(OsiBabSolver * babInfo, double cutoff) const;
    /** @} */
 
+    /// virtual method which performs the OA algorithm by modifying lp and nlp.
+    virtual double performOa(OsiCuts &cs, solverManip &nlpManip, solverManip &lpManip,
+                           SubMipSolver * subMip, OsiBabSolver * babInfo, double &) const = 0;
+    /// virutal method to decide if local search is performed
+    virtual bool doLocalSearch() const = 0;
 
     /// \name Protected members
     /** @{ */

@@ -64,6 +64,7 @@
 static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
 static Bonmin::OACutGenerator2 * currentOA = NULL; //pointer to the OA generator
 CbcModel * OAModel = NULL; // pointer to the submip if using Cbc
+bool BonminAbortAll = false;
 //#ifdef COIN_HAS_CPX
 //OsiCpxSolverInterface * CpxModel = NULL;//pointer to the submip if using cplex
 //#endif
@@ -79,6 +80,7 @@ extern "C"
       OAModel->setMaximumNodes(0); // stop at next node
     if (currentOA!=NULL)
       currentOA->parameter().maxLocalSearchTime_ = 0.; // stop OA
+    BonminAbortAll = true;
     return;
   }
 }
@@ -198,7 +200,7 @@ namespace Bonmin
           par.milpLogLevel
                                   );
     }
-    OACutGenerator2 oaDec(nlpSolver, localSearchSolver, strategy, par.cutoffDecr, par.intTol, 0,1);
+    OACutGenerator2 oaDec(nlpSolver, localSearchSolver, strategy, par.cutoffDecr, par.intTol, 1);
     if (par.algo>0) {
       oaDec.parameter().localSearchNodeLimit_ = 1000000;
       oaDec.parameter().maxLocalSearch_ = 100000;

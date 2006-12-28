@@ -59,7 +59,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liboainterface_la_LIBADD =
 am_liboainterface_la_OBJECTS = BonDummyHeuristic.lo BonOaNlpOptim.lo \
-	BonOACutGenerator2.lo BonOaFeasChecker.lo BonOaDecHelper.lo \
+	BonOACutGenerator2.lo BonOaFeasChecker.lo BonOaDecBase.lo \
 	BonEcpCuts.lo BonOAMessages.lo
 liboainterface_la_OBJECTS = $(am_liboainterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -317,7 +317,7 @@ liboainterface_la_SOURCES = \
 	BonOaNlpOptim.cpp BonOaNlpOptim.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
         BonOaFeasChecker.cpp BonOaFeasChecker.hpp \
-	BonOaDecHelper.cpp BonOaDecHelper.hpp \
+	BonOaDecBase.cpp BonOaDecBase.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 
@@ -410,7 +410,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonEcpCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOAMessages.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaDecHelper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaDecBase.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaFeasChecker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaNlpOptim.Plo@am__quote@
 

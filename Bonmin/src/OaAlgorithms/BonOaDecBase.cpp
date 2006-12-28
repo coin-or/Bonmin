@@ -7,7 +7,7 @@
 //
 // Date :  12/07/2006
 
-#include "BonOaDecHelper.hpp"
+#include "BonOaDecBase.hpp"
 
 
 #include "BonminConfig.h"
@@ -26,7 +26,7 @@ extern CbcModel * OAModel;
 
 namespace Bonmin {
 
-   OaDecompositionHelper::OaDecompositionHelper
+   OaDecompositionBase::OaDecompositionBase
    (OsiTMINLPInterface * nlp,
    OsiSolverInterface * si,
    CbcStrategy * strategy,
@@ -35,11 +35,13 @@ namespace Bonmin {
    bool leaveSiUnchanged
    )
       :
+      CglCutGenerator(),
       nlp_(nlp),
       nSolve_(0),
       lp_(si),
       nLocalSearch_(0),
       handler_(NULL),
+      leaveSiUnchanged_(leaveSiUnchanged),
       timeBegin_(0),
       parameters_()
   {
@@ -53,14 +55,16 @@ namespace Bonmin {
     parameters_.cbcIntegerTolerance_ = cbcIntegerTolerance;
   }
 
-  OaDecompositionHelper::OaDecompositionHelper
-  (const OaDecompositionHelper & other)
+  OaDecompositionBase::OaDecompositionBase
+  (const OaDecompositionBase & other)
       :
+      CglCutGenerator(other),
       nlp_(other.nlp_),
       lp_(other.lp_),
       nLocalSearch_(0),
       handler_(NULL), 
       messages_(other.messages_),
+      leaveSiUnchanged_(other.leaveSiUnchanged_),
       timeBegin_(0),
       parameters_(other.parameters_)
     {
@@ -69,7 +73,7 @@ namespace Bonmin {
       timeBegin_ = CoinCpuTime();
     }
 /// Constructor with default values for parameters
-OaDecompositionHelper::Parameters::Parameters():
+OaDecompositionBase::Parameters::Parameters():
   cbcCutoffIncrement_(1e-06),
   cbcIntegerTolerance_(1e-05),
   localSearchNodeLimit_(0),
@@ -82,19 +86,19 @@ OaDecompositionHelper::Parameters::Parameters():
   {}
 
 /** Destructor.*/ 
-OaDecompositionHelper::~OaDecompositionHelper(){
+OaDecompositionBase::~OaDecompositionBase(){
   delete handler_;}
 
   /// Assign an OsiTMINLPInterface (interface to non-linear problem).
   void
-  OaDecompositionHelper::assignNlpInterface(OsiTMINLPInterface * nlp)
+  OaDecompositionBase::assignNlpInterface(OsiTMINLPInterface * nlp)
   {
     nlp_ = nlp;
   }
 
   /// Assign an OsiSolverInterface (interface to LP solver).
   void
-  OaDecompositionHelper::assignLpInterface(OsiSolverInterface * si)
+  OaDecompositionBase::assignLpInterface(OsiSolverInterface * si)
   {
     lp_ = si;
   }
@@ -102,7 +106,7 @@ OaDecompositionHelper::~OaDecompositionHelper(){
 
 
 /// Constructor with default values for parameters
-OaDecompositionHelper::Parameters::Parameters(const Parameters & other):
+OaDecompositionBase::Parameters::Parameters(const Parameters & other):
   cbcCutoffIncrement_(other.cbcCutoffIncrement_),
   cbcIntegerTolerance_(other.cbcIntegerTolerance_),
   localSearchNodeLimit_(other.localSearchNodeLimit_),
@@ -119,7 +123,7 @@ OaDecompositionHelper::Parameters::Parameters(const Parameters & other):
  
 
 /** Constructor */
-OaDecompositionHelper::SubMipSolver::SubMipSolver(OsiSolverInterface * lp,
+OaDecompositionBase::SubMipSolver::SubMipSolver(OsiSolverInterface * lp,
              const CbcStrategy * strategy):
  lp_(lp),
  clp_(NULL),
@@ -138,7 +142,7 @@ OaDecompositionHelper::SubMipSolver::SubMipSolver(OsiSolverInterface * lp,
 #endif
    if(strategy) strategy_ = strategy->clone();
  }
- OaDecompositionHelper::SubMipSolver::~SubMipSolver(){
+ OaDecompositionBase::SubMipSolver::~SubMipSolver(){
    if(strategy_) delete strategy_;
    if(integerSolution_) delete [] integerSolution_;
    if(cbc_) delete cbc_;
@@ -146,7 +150,7 @@ OaDecompositionHelper::SubMipSolver::SubMipSolver(OsiSolverInterface * lp,
 
 /** Assign lp solver. */
 void 
-OaDecompositionHelper::SubMipSolver::setLpSolver(OsiSolverInterface * lp)
+OaDecompositionBase::SubMipSolver::setLpSolver(OsiSolverInterface * lp)
 {
   lp_ = lp;
   clp_ = (lp_ == NULL) ? NULL :
@@ -166,7 +170,7 @@ OaDecompositionHelper::SubMipSolver::setLpSolver(OsiSolverInterface * lp)
 
 
 void
-OaDecompositionHelper::SubMipSolver::performLocalSearch(double cutoff, int loglevel, double maxTime,
+OaDecompositionBase::SubMipSolver::performLocalSearch(double cutoff, int loglevel, double maxTime,
                                                   int maxNodes)
 {
   if(clp_)
@@ -225,7 +229,7 @@ OaDecompositionHelper::SubMipSolver::performLocalSearch(double cutoff, int logle
     {
      throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
                      "performLocalSearch",
-                     "OaDecompositionHelper::SubMipSolver");
+                     "OaDecompositionBase::SubMipSolver");
     } 
 
     lp_->branchAndBound();
@@ -241,7 +245,7 @@ OaDecompositionHelper::SubMipSolver::performLocalSearch(double cutoff, int logle
       status |= CPXgetnodecnt(env , cpxlp, nodeCount_); 
       status |= CPXgetmipitcnt(env , cpxlp, iterationCount_); 
       if (status)
-        throw CoinError("Error in getting some CPLEX information","OaDecompositionHelper::SubMipSolver","performLocalSearch");
+        throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
     }
 #endif
 
@@ -257,7 +261,7 @@ OaDecompositionHelper::SubMipSolver::performLocalSearch(double cutoff, int logle
   }
 }
 
-OaDecompositionHelper::solverManip::solverManip
+OaDecompositionBase::solverManip::solverManip
          (OsiSolverInterface * si,
           bool saveNumRows,
           bool saveBasis,
@@ -287,7 +291,7 @@ OaDecompositionHelper::solverManip::solverManip
 }
 
 
-OaDecompositionHelper::solverManip::solverManip
+OaDecompositionBase::solverManip::solverManip
          (const OsiSolverInterface & si):
   si_(NULL),
   initialNumberRows_(-1),
@@ -301,7 +305,7 @@ OaDecompositionHelper::solverManip::solverManip
   getCached();
 }
 
-OaDecompositionHelper::solverManip::~solverManip(){
+OaDecompositionBase::solverManip::~solverManip(){
   if(warm_) delete warm_;
   if(colLower_) delete [] colLower_;
   if(colUpper_) delete [] colUpper_;
@@ -309,7 +313,7 @@ OaDecompositionHelper::solverManip::~solverManip(){
 }
 
 void
-OaDecompositionHelper::solverManip::restore(){
+OaDecompositionBase::solverManip::restore(){
   if(initialNumberRows_ >= 0){
     int nRowsToDelete = numrows_ - initialNumberRows_;
     int * rowsToDelete = new int[nRowsToDelete];
@@ -336,7 +340,7 @@ OaDecompositionHelper::solverManip::restore(){
   if(warm_){
      if(si_->setWarmStart(warm_)==false){
        throw CoinError("Fail restoring the warm start at the end of procedure",
-                "restore","OaDecompositionHelper::SaveSolverState") ;
+                "restore","OaDecompositionBase::SaveSolverState") ;
      }
   }
   getCached();
@@ -345,7 +349,7 @@ OaDecompositionHelper::solverManip::restore(){
 
 /// Check for integer feasibility of a solution return 1 if it is
 bool 
-OaDecompositionHelper::integerFeasible(const double * sol, int numcols) const{
+OaDecompositionBase::integerFeasible(const double * sol, int numcols) const{
   for(int i = 0 ; i < numcols ; i++)
   {
     if(nlp_->isInteger(i)) {
@@ -361,7 +365,7 @@ OaDecompositionHelper::integerFeasible(const double * sol, int numcols) const{
 /** Fix integer variables in si to their values in colsol
 \todo Handle SOS type 2.*/
 void 
-OaDecompositionHelper::solverManip::fixIntegers(const double * colsol) {
+OaDecompositionBase::solverManip::fixIntegers(const double * colsol) {
   for (int i = 0; i < numcols_ - 1; i++) {
     if (si_->isInteger(i)) {
       double  value =  colsol[i];
@@ -393,7 +397,7 @@ OaDecompositionHelper::solverManip::fixIntegers(const double * colsol) {
 
 /** Check if solution in solver is the same as colsol on integer variables. */
 bool 
-OaDecompositionHelper::solverManip::isDifferentOnIntegers(const double * colsol){
+OaDecompositionBase::solverManip::isDifferentOnIntegers(const double * colsol){
   const double * siSol= si_->getColSolution();
   for (int i = 0; i < numcols_ ; i++) {
      if (si_->isInteger(i) && fabs(siSol[i] - colsol[i])>0.001)
@@ -404,7 +408,7 @@ OaDecompositionHelper::solverManip::isDifferentOnIntegers(const double * colsol)
 
 /** Clone the state of another solver (bounds, cutoff, basis).*/
 void
-OaDecompositionHelper::solverManip::cloneOther(const OsiSolverInterface &si){
+OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si){
   //Install current active cuts into local solver
   int numberCutsToAdd = si.getNumRows();
   numberCutsToAdd -= numrows_;
@@ -473,7 +477,7 @@ OaDecompositionHelper::solverManip::cloneOther(const OsiSolverInterface &si){
 
 /** Install cuts in solver. */
 void 
-OaDecompositionHelper::solverManip::installCuts(const OsiCuts& cs, int numberCuts){
+OaDecompositionBase::solverManip::installCuts(const OsiCuts& cs, int numberCuts){
   int numberCutsBefore = cs.sizeRowCuts() - numberCuts;
 
   CoinWarmStartBasis * basis
@@ -500,8 +504,96 @@ OaDecompositionHelper::solverManip::installCuts(const OsiCuts& cs, int numberCut
   delete basis;
 }
 
+/** Standard cut generation methods. */
+void 
+OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
+                          const CglTreeInfo info) const{
+    if (nlp_ == NULL) {
+      std::cerr<<"Error in cut generator for outer approximation no NLP ipopt assigned"<<std::endl;
+      throw -1;
+    }
+
+    // babInfo is used to communicate with the b-and-b solver (Cbc or Bcp).
+    OsiBabSolver * babInfo = dynamic_cast<OsiBabSolver *> (si.getAuxiliaryInfo());
+
+    const int numcols = nlp_->getNumCols();
+
+    //Get the continuous solution
+    const double *colsol = si.getColSolution();
+
+
+    //Check integer infeasibility
+    bool isInteger = integerFeasible(colsol, numcols);
+
+    SubMipSolver * subMip = NULL;
+
+    if (!isInteger) {
+      if (doLocalSearch())//create sub mip solver.
+      {
+        subMip = new SubMipSolver(lp_, parameters_.strategy());
+      }
+      else {
+        return;
+      }
+    }
+
+
+    //If we are going to modify things copy current information to restore it in the end
+
+
+    //get the current cutoff
+    double cutoff;
+    si.getDblParam(OsiDualObjectiveLimit, cutoff);
+
+    // Save solvers state if needed
+    solverManip nlpManip(nlp_, false, false, true, false);
+
+    solverManip * lpManip = NULL; 
+    if(lp_ != NULL){
+      if(lp_!=&si){
+        lpManip = new solverManip(lp_, true, false, false, true);
+        lpManip->cloneOther(si);
+      }
+      else{
+#if 0
+        throw CoinError("Not allowed to modify si in a cutGenerator",
+          "OACutGenerator2","generateCuts");
+#else
+         lpManip = new solverManip(lp_, true, leaveSiUnchanged_, true, true);
+#endif
+      }
+    }
+    else{
+      lpManip = new solverManip(si);
+    }
+    double milpBound = performOa(cs, nlpManip, *lpManip, subMip, babInfo, cutoff);
+
+    //Transmit the bound found by the milp
+    {
+      if (milpBound>-1e100)
+      {
+        // Also store into solver
+        if (babInfo)
+          babInfo->setMipBound(milpBound);
+      }
+    }  //Clean everything :
+
+    //free subMip
+    if (subMip!= NULL) {
+      delete subMip;
+      subMip = NULL;
+    }
+
+    //  Reset the two solvers
+    if(leaveSiUnchanged_)
+      lpManip->restore();
+    delete lpManip;
+    nlpManip.restore();
+    return;
+}
+
 void
-OaDecompositionHelper::solverManip::getCached(){
+OaDecompositionBase::solverManip::getCached(){
   numrows_ = si_->getNumRows();
   numcols_ = si_->getNumCols();
   siColLower_ = si_->getColLower();
@@ -511,7 +603,7 @@ OaDecompositionHelper::solverManip::getCached(){
 
 /** Solve the nlp and do output return true if feasible*/
 bool 
-OaDecompositionHelper::solveNlp(OsiBabSolver * babInfo, double cutoff) const{
+OaDecompositionBase::solveNlp(OsiBabSolver * babInfo, double cutoff) const{
       nSolve_++;
       nlp_->resolve();
       bool return_value = false;
@@ -563,7 +655,7 @@ OaDecompositionHelper::solveNlp(OsiBabSolver * babInfo, double cutoff) const{
 
 #ifdef OA_DEBUG
 bool 
-OaDecompositionHelper::OaDebug::checkInteger(const double * colsol, int numcols, ostream & os) const{
+OaDecompositionBase::OaDebug::checkInteger(const double * colsol, int numcols, ostream & os) const{
   for(int i = 0 ; i < numcols ; i++)
   {
     if(nlp_->isInteger(i)) {
@@ -579,7 +671,7 @@ OaDecompositionHelper::OaDebug::checkInteger(const double * colsol, int numcols,
 }
 
 void 
-OaDecompositionHelper::OaDebug::printEndOfProcedureDebugMessage(const OsiCuts &cs, 
+OaDecompositionBase::OaDebug::printEndOfProcedureDebugMessage(const OsiCuts &cs, 
                                      bool foundSolution, 
                                      double milpBound, 
                                      bool isInteger, 

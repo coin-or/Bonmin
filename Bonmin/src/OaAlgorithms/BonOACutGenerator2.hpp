@@ -10,12 +10,12 @@
 
 #ifndef BonOACutGenerator2_HPP
 #define BonOACutGenerator2_HPP
-#include "BonOaDecHelper.hpp"
+#include "BonOaDecBase.hpp"
 
 namespace Bonmin
 {
   /** Class to perform OA in its classical form.*/
-  class OACutGenerator2 : public CglCutGenerator, public OaDecompositionHelper
+  class OACutGenerator2 : public OaDecompositionBase
   {
   public:
     /// Default constructor
@@ -26,14 +26,13 @@ namespace Bonmin
         CbcStrategy * strategy = NULL,
         double cbcCutoffIncrement_=1e-07,
         double cbcIntegerTolerance = 1e-05,
-        bool solveAuxiliaryProblem = 1,
         bool leaveSiUnchanged = 0
                    );
 
     /// Copy constructor
     OACutGenerator2(const OACutGenerator2 &copy)
         :
-        OaDecompositionHelper(copy)
+        OaDecompositionBase(copy)
     {
     }
     /// Destructor
@@ -49,15 +48,18 @@ namespace Bonmin
     {
       parameters_.setStrategy(strategy);
     }
-    /// cut generation method
-    virtual void generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
-        const CglTreeInfo info = CglTreeInfo()) const;
 
     virtual CglCutGenerator * clone() const
     {
       return new OACutGenerator2(*this);
     }
-
+  protected:
+    /// virtual method which performs the OA algorithm by modifying lp and nlp.
+    virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
+                           SubMipSolver * subMip, OsiBabSolver * babInfo, double &cutoff) const;
+    /// virutal method to decide if local search is performed
+    virtual bool doLocalSearch() const;
+  
   };
 }
 #endif

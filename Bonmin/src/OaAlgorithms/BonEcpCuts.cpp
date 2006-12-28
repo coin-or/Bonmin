@@ -11,8 +11,8 @@
 namespace Bonmin{
 
 void
-EcpCuts::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
-		       const CglTreeInfo info) const
+EcpCuts::generateCuts(const OsiSolverInterface &si, OsiCuts & cs,
+                      const CglTreeInfo info) const
 {
   std::cout<<"Start ecp cut generation"<<std::endl;
   double violation = nlp_->getConstraintViolation(
