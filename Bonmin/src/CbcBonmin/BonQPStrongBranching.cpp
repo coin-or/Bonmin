@@ -167,7 +167,6 @@ BonQPStrongBranching::chooseVariable(
     // Create a QP problem based on the current solution
     OsiTMINLPInterface* tminlp_interface =
       dynamic_cast<OsiTMINLPInterface*> (solver);
-    const double * solution2 = solver->getColSolution();// Current solution
     const TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
     SmartPtr<BranchingTQP> branching_tqp = new BranchingTQP(*tminlp2tnlp);
     const Number curr_obj = tminlp2tnlp->obj_value();

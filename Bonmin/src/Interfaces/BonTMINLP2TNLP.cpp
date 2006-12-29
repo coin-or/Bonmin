@@ -137,7 +137,7 @@ namespace Bonmin
 
     x_init_ = new Number[3*n_ + m_];
     x_init_user_ = new Number[n_];
-    IpBlasDcopy(n_, x_init_, 1, other.x_init_, 1);
+    IpBlasDcopy(n_, other.x_init_, 1, x_init_, 1);
 
     copyUserModification(other);
   }
