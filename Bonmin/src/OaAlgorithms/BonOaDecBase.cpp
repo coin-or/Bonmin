@@ -366,7 +366,7 @@ OaDecompositionBase::integerFeasible(const double * sol, int numcols) const{
 \todo Handle SOS type 2.*/
 void 
 OaDecompositionBase::solverManip::fixIntegers(const double * colsol) {
-  for (int i = 0; i < numcols_ - 1; i++) {
+  for (int i = 0; i < numcols_ ; i++) {
     if (si_->isInteger(i)) {
       double  value =  colsol[i];
       if(value - floor(value+0.5) > 1e-04){

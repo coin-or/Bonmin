@@ -65,7 +65,8 @@ namespace Bonmin
    int numberCutsBefore = cs.sizeRowCuts();
 
    //Fix the variable which have to be fixed, after having saved the bounds
-   const double * colsol = (subMip == NULL) ? lp->getColSolution() : subMip->getLastSolution();
+   const double * colsol = lp->getColSolution();
+
    nlpManip.fixIntegers(colsol);
 
 
@@ -110,7 +111,7 @@ namespace Bonmin
 #ifdef OA_DEBUG
     debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
 #endif
-
+   std::cout<<"milpBound found: "<<milpBound<<std::endl;
     return milpBound;
   }
 
