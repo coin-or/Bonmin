@@ -68,12 +68,20 @@ bool BonminAbortAll = false;
 //#ifdef COIN_HAS_CPX
 //OsiCpxSolverInterface * CpxModel = NULL;//pointer to the submip if using cplex
 //#endif
-
+#define SIGNAL
+#ifdef SIGNAL
 #include "CoinSignal.hpp"
 
 extern "C"
 {
+  
+  static bool BonminInteruptedOnce =false;
   static void signal_handler(int whichSignal) {
+    if(BonminInteruptedOnce)
+    {
+      std::cerr<<"User forced interuption"<<std::endl;
+      exit(0);
+    }
     if (currentBranchModel!=NULL)
       currentBranchModel->setMaximumNodes(0); // stop at next node
     if (OAModel!=NULL)
@@ -81,10 +89,11 @@ extern "C"
     if (currentOA!=NULL)
       currentOA->parameter().maxLocalSearchTime_ = 0.; // stop OA
     BonminAbortAll = true;
+    BonminInteruptedOnce = true;
     return;
   }
 }
-
+#endif
 namespace Bonmin
 {
   /** Constructor.*/
@@ -429,10 +438,11 @@ namespace Bonmin
       model.solver()->setRowPrice(duals);
     }
 
+#ifdef SIGNAL
     CoinSighandler_t saveSignal=SIG_DFL;
     // register signal handler
     saveSignal = signal(SIGINT,signal_handler);
-
+#endif
 
     currentBranchModel = &model;
 
