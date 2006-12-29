@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004, 2006
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -24,6 +24,8 @@
 using namespace Ipopt;
 namespace Bonmin
 {
+  DECLARE_STD_EXCEPTION(TMINLP_INVALID);
+  DECLARE_STD_EXCEPTION(TMINLP_INVALID_VARIABLE_BOUNDS);
 
   /** Base class for all MINLPs that use a standard triplet matrix form
    *  and dense vectors.

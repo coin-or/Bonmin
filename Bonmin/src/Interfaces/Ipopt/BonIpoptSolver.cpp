@@ -21,29 +21,47 @@ namespace Bonmin{
 
   std::string IpoptSolver::solverName_ = "Ipopt";
 
+  /// Constructor
+  IpoptSolver::IpoptSolver(bool createEmpty /*= false*/):
+    problemHadZeroDimension_(false),
+    warmStartStrategy_(1)
+  {
+    if(createEmpty) return;
+    app_ = new Ipopt::IpoptApplication();
+  }
 
   IpoptSolver::~IpoptSolver(){}
 
   ///virtual constructor
-  TNLPSolver * 
-  IpoptSolver::createNew()
-  { return new IpoptSolver();}
+  Ipopt::SmartPtr<TNLPSolver> 
+  IpoptSolver::clone()
+  {
+    SmartPtr<IpoptSolver> retval = new IpoptSolver(true);
+
+    retval->warmStartStrategy_ = warmStartStrategy_;
+    retval->problemHadZeroDimension_ = problemHadZeroDimension_;
+    retval->optimizationStatus_ = optimizationStatus_;
+
+    retval->app_ = app_->clone();
+
+    return GetRawPtr(retval);
+  }
 
 
   void
   IpoptSolver::Initialize(std::string params_file)
   {
-    app_.Initialize(params_file);
-    app_.Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
-    setMinlpDefaults(app_.Options());
+    app_->Initialize(params_file);
+    app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
+    setMinlpDefaults(app_->Options());
   }
 
   void
   IpoptSolver::Initialize(std::istream &is)
   {
-    app_.Initialize(is);
-    app_.Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
-    setMinlpDefaults(app_.Options());
+    app_->Initialize(is);
+    app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
+    setMinlpDefaults(app_->Options());
   }
 
   TNLPSolver::ReturnStatus
@@ -52,7 +70,7 @@ namespace Bonmin{
     TNLPSolver::ReturnStatus ret_status;
     if(!zeroDimension(tnlp, ret_status))
       {
-	optimizationStatus_ = app_.OptimizeTNLP(tnlp);
+	optimizationStatus_ = app_->OptimizeTNLP(tnlp);
 	problemHadZeroDimension_ = false;
       }
     else
@@ -77,7 +95,7 @@ namespace Bonmin{
     TNLPSolver::ReturnStatus ret_status;
     if(!zeroDimension(tnlp, ret_status))
       {
-	optimizationStatus_ = app_.ReOptimizeTNLP(tnlp);
+	optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
 	problemHadZeroDimension_ = false;
       }
     else
@@ -95,24 +113,24 @@ namespace Bonmin{
 
   Ipopt::SmartPtr<Ipopt::Journalist>
   IpoptSolver::Jnlst()
-  {return app_.Jnlst();}
+  {return app_->Jnlst();}
 
   Ipopt::SmartPtr<Ipopt::RegisteredOptions>
   IpoptSolver::RegOptions()
   {
-    return app_.RegOptions();
+    return app_->RegOptions();
   }
 
   Ipopt::SmartPtr<const Ipopt::OptionsList>
   IpoptSolver::Options() const
   {
-    return app_.Options();
+    return ConstPtr(app_)->Options();
   }
 
   Ipopt::SmartPtr<Ipopt::OptionsList>
   IpoptSolver::Options()
   {
-    return app_.Options();
+    return app_->Options();
   }
 
   /// Get the CpuTime of the last optimization.
@@ -124,7 +142,7 @@ namespace Bonmin{
 	return 0.;}
     else
       {
-	const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_.Statistics();
+	const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_->Statistics();
 	if(IsValid(stats))
 	  {
 	    return stats->TotalCPUTime();
@@ -146,7 +164,7 @@ namespace Bonmin{
       }
     else
       {
-	const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_.Statistics();
+	const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_->Statistics();
 	if(IsValid(stats))
 	  {
 	    return stats->IterationCount();

@@ -44,10 +44,7 @@ namespace Bonmin
       std::string* ipopt_file_content,
       std::string* nl_file_content)
   {
-
-
-
-    app_ = app->createNew();
+    app_ = app->clone();
 
     SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
     register_ALL_options(roptions);

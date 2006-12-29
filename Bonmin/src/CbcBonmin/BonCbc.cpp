@@ -19,6 +19,7 @@
 
 // AW
 #include "BonChooseVariable.hpp"
+#include "BonQPStrongBranching.hpp"
 
 //OA machinery
 #include "BonDummyHeuristic.hpp"
@@ -409,16 +410,22 @@ namespace Bonmin
     CbcBranchUserDecision branch;
 
 
-    if(par.varSelection == 3){
+    if(par.varSelection == OsiTMINLPInterface::CURVATURE_ESTIMATOR){
     // AW: Try to set new chooseVariable object
       BonChooseVariable chooseVariable(nlpSolver);
       chooseVariable.setNumberStrong(model.numberStrong());
-      branch.setChooseMethod(chooseVariable);}
-     else if(par.varSelection == 4){
+      branch.setChooseMethod(chooseVariable);
+    }
+    else if(par.varSelection == OsiTMINLPInterface::QP_STRONG_BRANCHING){
+      BonQPStrongBranching chooseVariable(nlpSolver);
+      chooseVariable.setNumberStrong(model.numberStrong());
+      branch.setChooseMethod(chooseVariable);
+    }
+    else if(par.varSelection == OsiTMINLPInterface::OSI_SIMPLE){
       OsiChooseVariable choose(model.solver());
       branch.setChooseMethod(choose);
     }
-    else if(par.varSelection == 5){
+    else if(par.varSelection == OsiTMINLPInterface::OSI_STRONG){
       OsiChooseStrong choose(model.solver());
       choose.setNumberBeforeTrusted(par.minReliability);
       choose.setNumberStrong(par.numberStrong);

@@ -31,7 +31,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
+	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
+	BonBranchingTQP.cpp BonBranchingTQP.hpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
@@ -103,14 +104,15 @@ uninstall-local:
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonBoundsReaderbak.cpp BonBoundsReaderbak.hpp \
-	BonColReaderbak.cpp BonColReaderbak.hpp \
-	BonStartPointReaderbak.cpp BonStartPointReader.hpp \
-	BonOsiTMINLPInterfacebak.cpp BonOsiTMINLPInterface.hpp \
-	BonTMINLP2TNLPbak.cpp BonTMINLP2TNLP.hpp \
-	BonTMINLPbak.cpp BonTMINLP.hpp \
-	BonTNLPSolverbak.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLPbak.cpp BonTNLP2FPNLP.hpp
+	BonBoundsReader.cppbak BonBoundsReader.hppbak \
+	BonColReader.cppbak BonColReader.hppbak \
+	BonStartPointReader.cppbak BonStartPointReader.hppbak \
+	BonOsiTMINLPInterface.cppbak BonOsiTMINLPInterface.hppbak \
+	BonTMINLP2TNLP.cppbak BonTMINLP2TNLP.hppbak \
+	BonTMINLP.cppbak BonTMINLP.hppbak \
+	BonTNLPSolver.hppbak BonTNLPSolver.cppbak \
+	BonTNLP2FPNLP.cppbak BonTNLP2FPNLP.hppbak \
+	BonBranchingTQP.cppbak BonBranchingTQP.hppbak
 
 
 ASTYLE = @ASTYLE@

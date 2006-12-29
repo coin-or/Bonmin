@@ -48,7 +48,7 @@ public:
 
 
   ///Default constructor
-  FilterSolver();
+  FilterSolver(bool createEmpty = false);
 
   ///destructor
   virtual ~FilterSolver();
@@ -85,9 +85,8 @@ public:
   {if(Ipopt::IsValid(cached_)) cached_->ifail= 0;}
    //@}
 
-  /// Virtual constructor
-  virtual TNLPSolver * createNew(){
-    return new FilterSolver;}
+  /// Virtual copy constructor
+  virtual SmartPtr<TNLPSolver> clone();
 
   ///Get a pointer to a journalist
   virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst(){

@@ -245,20 +245,24 @@ FilterSolver::RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
  }
 
 
-FilterSolver::FilterSolver():
-  journalist_(new Ipopt::Journalist()),
-  options_(new Ipopt::OptionsList()),
-  roptions_(new Ipopt::RegisteredOptions()),
-  cached_(NULL)
+  FilterSolver::FilterSolver(bool createEmpty /* = false */)
+    :
+    cached_(NULL)
 {
-  try{
-  Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
-    journalist_->AddFileJournal("console", "stdout", Ipopt::J_ITERSUMMARY);
-  
-  RegisterOptions();
+  options_ = new Ipopt::OptionsList();
+  if (createEmpty) return;
 
-  options_->SetJournalist(journalist_);
-  options_->SetRegisteredOptions(roptions_);
+  journalist_= new Ipopt::Journalist();
+  roptions_ = new Ipopt::RegisteredOptions();
+  
+  try{
+    Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
+      journalist_->AddFileJournal("console", "stdout", Ipopt::J_ITERSUMMARY);
+  
+    RegisterOptions();
+
+    options_->SetJournalist(journalist_);
+    options_->SetRegisteredOptions(roptions_);
   }
   catch (Ipopt::IpoptException &E){
     E.ReportException(*journalist_);
@@ -275,8 +279,16 @@ FilterSolver::FilterSolver():
   }
 }
 
+Ipopt::SmartPtr <TNLPSolver>
+FilterSolver::clone(){
+  Ipopt::SmartPtr<FilterSolver> retval = new FilterSolver(true);
+  *retval->options_ = *options_;
+  retval->roptions_ = roptions_;
+  retval->journalist_ = journalist_;
+  return GetRawPtr(retval);
+}
+
 FilterSolver::~FilterSolver(){
-  cached_ = NULL;
 }
 
 void 

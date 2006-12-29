@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004, 2006
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -39,6 +39,9 @@ namespace Bonmin
 #endif
         );
 
+    /** Copy Constructor */
+    TMINLP2TNLP(const TMINLP2TNLP&);
+
     /** Default destructor */
     virtual ~TMINLP2TNLP();
     //@}
@@ -49,10 +52,8 @@ namespace Bonmin
     I am trying to mimic a copy construction for Cbc
     use with great care not safe.
     */
-    void copyUserModification(TMINLP2TNLP& other);
+    void copyUserModification(const TMINLP2TNLP& other);
 
-
-    DECLARE_STD_EXCEPTION(TMINLP_INVALID_VARIABLE_BOUNDS);
 
     /**@name Methods to modify the MINLP and form the NLP */
     //@{
@@ -152,13 +153,13 @@ namespace Bonmin
     }
 
     /** Get Optimization status */
-    SolverReturn optimization_status()
+    SolverReturn optimization_status() const
     {
       return return_status_;
     }
 
     /** Get the objective value */
-    Number obj_value()
+    Number obj_value() const
     {
       return obj_value_;
     }
@@ -352,9 +353,6 @@ namespace Bonmin
     /** Default Constructor */
     TMINLP2TNLP();
 
-    /** Copy Constructor */
-    TMINLP2TNLP(const TMINLP2TNLP&);
-
     /** Overloaded Equals Operator */
     void operator=(const TMINLP2TNLP&);
     //@}
@@ -368,7 +366,9 @@ namespace Bonmin
     Index n_;
     /// Number of constraints
     Index m_;
-    /// Number of non-zeroes in the lagrangian.
+    /// Number of non-zeroes in the constraints jacobian.
+    Index nnz_jac_g_;
+    /// Number of non-zeroes in the lagrangian hessian
     Index nnz_h_lag_;
     /**index style (fortran or C)*/
     TNLP::IndexStyleEnum index_style_;
@@ -425,6 +425,13 @@ namespace Bonmin
     /** Private method that throws an exception if the variable bounds
      * are not consistent with the variable type */
     void throw_exception_on_bad_variable_bound(Index i);
+
+    /** @name Methods for adding the linear cut information */
+    //@{
+    void eval_g_add_linear_cuts(Number* g, const Number* x);
+    void eval_jac_g_add_linear_cuts(Index nele_jac, Index* iRow,
+				    Index *jCol, Number* values);
+    //@}
 
   };
 

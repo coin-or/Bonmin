@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004, 2006
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -55,8 +55,11 @@ namespace Bonmin
     // caller can modify the bounds that are sent to Ipopt;
     DBG_ASSERT(IsValid(tminlp_));
 
-    Index nnz_jac_g;
-    tminlp_->get_nlp_info(n_, m_, nnz_jac_g, nnz_h_lag_, index_style_);
+    bool retval =
+      tminlp_->get_nlp_info(n_, m_, nnz_jac_g_, nnz_h_lag_, index_style_);
+
+    ASSERT_EXCEPTION(retval, TMINLP_INVALID,
+		     "get_nlp_info of TMINLP returns false.");
 
     // Allocate space for the variable types vector
     var_types_ = new TMINLP::VariableType[n_];
@@ -101,6 +104,44 @@ namespace Bonmin
 #endif
   }
 
+  TMINLP2TNLP::TMINLP2TNLP(const TMINLP2TNLP& other)
+    :
+    tminlp_(other.tminlp_),
+    n_(other.n_),
+    m_(other.m_),
+    nnz_jac_g_(other.nnz_jac_g_),
+    nnz_h_lag_(other.nnz_h_lag_),
+    index_style_(other.index_style_),
+    duals_init_(NULL),
+    x_sol_(NULL),
+    g_sol_(NULL),
+    duals_sol_(NULL)
+  {
+    var_types_ = new TMINLP::VariableType[n_];
+    for (Index i=0; i<n_; i++) {
+      var_types_[i] = other.var_types_[i];
+    }
+
+    x_l_ = new Number[n_];
+    x_u_ = new Number[n_]; // Those are copied in copyUserModification
+
+    orig_x_l_ = new Number[n_];
+    orig_x_u_ = new Number[n_];
+    IpBlasDcopy(n_, other.orig_x_l_, 1, orig_x_l_, 1);
+    IpBlasDcopy(n_, other.orig_x_u_, 1, orig_x_u_, 1);
+
+    g_l_ = new Number[m_];
+    g_u_ = new Number[m_];
+    IpBlasDcopy(m_, other.g_l_, 1, g_l_, 1);
+    IpBlasDcopy(m_, other.g_u_, 1, g_u_, 1);
+
+    x_init_ = new Number[3*n_ + m_];
+    x_init_user_ = new Number[n_];
+    IpBlasDcopy(n_, x_init_, 1, other.x_init_, 1);
+
+    copyUserModification(other);
+  }
+
   TMINLP2TNLP::~TMINLP2TNLP()
   {
     delete [] var_types_;
@@ -136,7 +177,7 @@ namespace Bonmin
       use with great care not safe.
   */
   void
-  TMINLP2TNLP::copyUserModification(TMINLP2TNLP& other)
+  TMINLP2TNLP::copyUserModification(const TMINLP2TNLP& other)
   {
     DBG_ASSERT(x_l_);
     DBG_ASSERT(x_u_);
@@ -290,10 +331,12 @@ namespace Bonmin
   bool TMINLP2TNLP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
       Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
   {
-    bool return_code = tminlp_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
-    m += tminlp_->nLinearCuts_;
-    nnz_jac_g += tminlp_->linearCutsNnz_;
-    return return_code;
+    n = n_;
+    m = m_ + tminlp_->nLinearCuts_;
+    nnz_jac_g = nnz_jac_g_ + tminlp_->linearCutsNnz_;
+    nnz_h_lag = nnz_h_lag_;
+    index_style = index_style_;
+    return true;
   }
 
   bool TMINLP2TNLP::get_bounds_info(Index n, Number* x_l, Number* x_u,
@@ -335,7 +378,7 @@ namespace Bonmin
       IpBlasDcopy(m_, duals_init_, 1, lambda, 1);
       for(int i = 0 ; i < tminlp_->nLinearCuts_; i++)
       {
-        lambda [i + m_ ] = 0.;
+        lambda [i + m_] = 0.;
       }
     }
 
@@ -368,47 +411,71 @@ namespace Bonmin
     return tminlp_->eval_grad_f(n, x, new_x, grad_f);
   }
 
-  bool TMINLP2TNLP::eval_g(Index n, const Number* x, bool new_x,
-      Index m, Number* g)
+  void TMINLP2TNLP::eval_g_add_linear_cuts(Number* g, const Number* x)
   {
-    int return_code = tminlp_->eval_g(n, x, new_x, m_, g);
     // Add the linear cuts
     int nnz = 0;
     for(int i = 0 ; i < tminlp_->nLinearCuts_ ; i++)
     {
       int iplusm = m_ + i;
-      g[iplusm] = 0;
-      while(tminlp_->iRow_[nnz]==i) { g[iplusm] += tminlp_->elems_[nnz] * x[tminlp_->jCol_[nnz]]; nnz++;}
+      g[iplusm] = 0.;
+      while(tminlp_->iRow_[nnz]==i) {
+	g[iplusm] += tminlp_->elems_[nnz] * x[tminlp_->jCol_[nnz]];
+	nnz++;
+      }
+    }
+  }
+
+  bool TMINLP2TNLP::eval_g(Index n, const Number* x, bool new_x,
+      Index m, Number* g)
+  {
+    int return_code = tminlp_->eval_g(n, x, new_x, m_, g);
+    if (return_code) {
+      eval_g_add_linear_cuts(g, x);
     }
     return return_code;
+  }
+
+  void TMINLP2TNLP::eval_jac_g_add_linear_cuts(Index nele_jac, Index* iRow,
+					       Index* jCol, Number* values)
+  {
+    if(iRow != NULL) {
+      DBG_ASSERT(jCol != NULL);
+      DBG_ASSERT(values == NULL);
+
+      int nnz = nele_jac - tminlp_->linearCutsNnz_ ;
+      if (index_style_ == TNLP::FORTRAN_STYLE) {
+	for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++) {
+	  iRow[nnz] = tminlp_->iRow_[i] + m_ + 1; 
+	  jCol[nnz] = tminlp_->jCol_[i] + 1;
+	}
+      }
+      else {
+	for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++) {
+	  iRow[nnz] = tminlp_->iRow_[i] + m_; 
+	  jCol[nnz] = tminlp_->jCol_[i];
+	}
+      }
+    }
+    else {
+      DBG_ASSERT(jCol == NULL);
+      DBG_ASSERT(values != NULL);
+      IpBlasDcopy(tminlp_->linearCutsNnz_ , tminlp_->elems_, 1,
+		  &values[nele_jac - tminlp_->linearCutsNnz_],1);
+    }
   }
 
   bool TMINLP2TNLP::eval_jac_g(Index n, const Number* x, bool new_x,
       Index m, Index nele_jac, Index* iRow,
       Index *jCol, Number* values)
   {
-    int return_code = tminlp_->eval_jac_g(n, x, new_x, m_ , nele_jac - tminlp_->nLinearCuts_, 
-                                          iRow, jCol, values);
-    bool isFortran = index_style_ == TNLP::FORTRAN_STYLE;
-    if(iRow != NULL)
-    {
-      DBG_ASSERT(jCol != NULL);
-      DBG_ASSERT(values == NULL);
-      
-      int nnz = nele_jac - tminlp_->linearCutsNnz_ ;
-      for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++)
-      {
-         iRow[nnz] = tminlp_->iRow_[i] + m_ + isFortran; 
-         jCol[nnz] = tminlp_->jCol_[i] + isFortran;
-      }
+    bool return_code =
+      tminlp_->eval_jac_g(n, x, new_x, m_, nele_jac - tminlp_->linearCutsNnz_,
+			  iRow, jCol, values);
+    if (return_code) {
+      eval_jac_g_add_linear_cuts(nele_jac, iRow, jCol, values);
     }
-    else
-    {
-      DBG_ASSERT(jCol == NULL);
-      DBG_ASSERT(values != NULL);
-      IpBlasDcopy(tminlp_->linearCutsNnz_ , tminlp_->elems_, 1, &values[nele_jac - tminlp_->linearCutsNnz_],1);
-    }
-  return return_code;
+    return return_code;
   }
 
   bool TMINLP2TNLP::eval_h(Index n, const Number* x, bool new_x,

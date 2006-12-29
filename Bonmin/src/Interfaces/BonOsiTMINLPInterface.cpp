@@ -149,13 +149,14 @@ register_general_options
       "integer feasible solutions have been found).",
       "Choose the strategy for selecting the next node to be processed.");
 
-  roptions->AddStringOption6("varselect_stra",
+  roptions->AddStringOption7("varselect_stra",
       "Chooses variable selection strategy",
       "strong-branching",
       "most-fractional", "Choose most fractional variable",
       "strong-branching", "Perform strong branching",
       "reliability-branching", "Use reliability branching",
       "curvature-estimator", "Use curvature estimation to select branching variable",
+      "qp-strong-branching", "Perform strong branching with QP approximation",
       "osi-simple", "Osi method to do simple branching",
       "osi-strong", "Osi method to do strong branching","");
 
@@ -328,16 +329,18 @@ void
 OsiTMINLPInterface::register_ALL_options
 (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
 {
-  register_general_options(roptions);
-  register_OA_options(roptions);
-  register_milp_sub_solver_options(roptions);
-  //Register options for all possible solvers (besides the one used
-  IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
+  // We try to register the options - if those have been registered
+  // already, we catch the exception and don't need to do it again
+  try {
+    register_general_options(roptions);
+    register_OA_options(roptions);
+    register_milp_sub_solver_options(roptions);
+    //Register options for all possible solvers (besides the one used
+    IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
 #ifdef COIN_HAS_FILTERSQP
-  FilterSolver * filter = dynamic_cast<FilterSolver *> (GetRawPtr(app_));
+    FilterSolver * filter = dynamic_cast<FilterSolver *> (GetRawPtr(app_));
 #endif
-  if(!ipopt)
-    {
+    if(!ipopt) {
       ipopt = new IpoptSolver;
       ipopt->RegisterOptions(app_->RegOptions());
       delete ipopt;
@@ -345,15 +348,17 @@ OsiTMINLPInterface::register_ALL_options
     }
 
 #ifdef COIN_HAS_FILTERSQP
-  if(!filter)
-    {
+    if(!filter) {
       filter = new FilterSolver;
       filter->RegisterOptions(app_->RegOptions());
       delete filter;
       filter = NULL;
     }
 #endif		
-      
+  }   
+  catch(RegisteredOptions::OPTION_ALREADY_REGISTERED) {
+    // skipping
+  }
 }
 
 
@@ -498,7 +503,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app)
     veryTiny_(1e-17),
     infty_(1e100)
 {
-  app_ = app->createNew();
+  app_ = app->clone();
 
   Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = app_->RegOptions();
   register_ALL_options(roptions);
@@ -559,7 +564,7 @@ OsiTMINLPInterface::allocateTMINLP(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
 
   tminlp_ = tminlp;
   problem_ = new TMINLP2TNLP(tminlp_);
-  app_ = app->createNew();
+  app_ = app->clone();
 
   Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = app_->RegOptions();
   register_ALL_options(roptions);
@@ -622,14 +627,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
 
     // Copy options from old application
-    app_ = source.app_->createNew();
-
-    
-    SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
-    register_ALL_options(roptions);
-    
-    // Copy the options
-    *app_->Options() = *source.app_->Options();
+    app_ = source.app_->clone();
   }
   else {
     throw SimpleError("Don't know how to copy an empty IpoptInterface.",
@@ -692,7 +690,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
 
       tminlp_ = rhs.tminlp_;
       problem_ = new Bonmin::TMINLP2TNLP(tminlp_);
-      app_ = rhs.app_->createNew();
+      app_ = rhs.app_->clone();
 
       feasibilityProblem_ = new Bonmin::TNLP2FPNLP
           (Ipopt::SmartPtr<Ipopt::TNLP>(Ipopt::GetRawPtr(problem_)));
@@ -1872,13 +1870,12 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
   feasibilityProblem_->set_dist2point_obj(n,(const Ipopt::Number *) x_bar,(const Ipopt::Index *) inds);
   nCallOptimizeTNLP_++;
   totalNlpSolveTime_-=CoinCpuTime();
-  Bonmin::TNLPSolver * app2 = app_->createNew();
+  Ipopt::SmartPtr<TNLPSolver> app2 = app_->clone();
   app2->Options()->SetIntegerValue("print_level", (Ipopt::Index) 0);
   optimization_status_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
   getOuterApproximation(cs, getColSolution(), 0);
   hasBeenOptimized_=true;
-  delete app2;
   return getObjValue();
 }
 

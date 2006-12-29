@@ -96,9 +96,8 @@ class TNLPSolver: public Ipopt::ReferencedObject{
   /// Constructor
    TNLPSolver();
 
-  ///virtual constructor
-  virtual TNLPSolver * createNew() = 0;
-  
+  ///virtual copy constructor
+  virtual Ipopt::SmartPtr<TNLPSolver> clone() = 0;
 
    /// Virtual destructor
    virtual ~TNLPSolver();

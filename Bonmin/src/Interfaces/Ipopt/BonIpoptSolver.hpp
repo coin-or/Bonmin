@@ -41,14 +41,10 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
 
 
   /// Constructor
-  IpoptSolver():
-    app_(),
-    problemHadZeroDimension_(false),
-    warmStartStrategy_(1)
-  {}
+  IpoptSolver(bool createEmpty = false);
 
   ///virtual constructor
-  virtual TNLPSolver * createNew();
+  virtual Ipopt::SmartPtr<TNLPSolver> clone();
 
 
   /// Virtual destructor
@@ -116,8 +112,7 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
 
    /// Register this solver options into passed roptions
    virtual void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-   app_.RegisterAllIpoptOptions(roptions);
-  // app_.RegisterOptions(roptions);
+   app_->RegisterAllIpoptOptions(roptions);
    }
 
 
@@ -129,7 +124,7 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   }
 
   Ipopt::IpoptApplication& getIpoptApp(){
-    return app_;
+    return *app_;
   }
   private:
   /** Set default Ipopt parameters for use in a MINLP */
@@ -137,8 +132,9 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
 
   /** get Bonmin return status from Ipopt one. */
   TNLPSolver::ReturnStatus solverReturnStatus(Ipopt::ApplicationReturnStatus optimization_status) const;
+
   /** Ipopt application */
-  Ipopt::IpoptApplication app_;
+  Ipopt::SmartPtr<Ipopt::IpoptApplication> app_;
   /** return status of last optimization.*/
   Ipopt::ApplicationReturnStatus optimizationStatus_;
     //@}

@@ -98,14 +98,14 @@ success &= Options->GetIntegerValue("filmint_ecp_cuts",filmintCutsFrequency, "bo
     }
     
     // Set branching strategy
-    if(varSelection == 0){
+    if(varSelection == OsiTMINLPInterface::MOST_FRACTIONAL){
       minReliability = 0;
       numberStrong = 0;
     }
-    else if(varSelection == 1){
+    else if(varSelection == OsiTMINLPInterface::STRONG_BRANCHING){
       minReliability = 0;
     }
-    else if(varSelection == 3){
+    else if(varSelection == OsiTMINLPInterface::RELIABILITY_BRANCHING){
       minReliability = 10000;
     } 
     return success;

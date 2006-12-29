@@ -63,7 +63,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonColReader.lo \
 	BonCurvatureEstimator.lo BonStartPointReader.lo \
 	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo BonTMINLP.lo \
-	BonTNLPSolver.lo BonTNLP2FPNLP.lo
+	BonTNLPSolver.lo BonTNLP2FPNLP.lo BonBranchingTQP.lo
 libbonmininterfaces_la_OBJECTS = $(am_libbonmininterfaces_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -342,7 +342,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp
+	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
+	BonBranchingTQP.cpp BonBranchingTQP.hpp
 
 
 #sublibraries for various installed solvers
@@ -400,14 +401,15 @@ ConfigHeader = BonminConfig.h
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonBoundsReaderbak.cpp BonBoundsReaderbak.hpp \
-	BonColReaderbak.cpp BonColReaderbak.hpp \
-	BonStartPointReaderbak.cpp BonStartPointReader.hpp \
-	BonOsiTMINLPInterfacebak.cpp BonOsiTMINLPInterface.hpp \
-	BonTMINLP2TNLPbak.cpp BonTMINLP2TNLP.hpp \
-	BonTMINLPbak.cpp BonTMINLP.hpp \
-	BonTNLPSolverbak.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLPbak.cpp BonTNLP2FPNLP.hpp
+	BonBoundsReader.cppbak BonBoundsReader.hppbak \
+	BonColReader.cppbak BonColReader.hppbak \
+	BonStartPointReader.cppbak BonStartPointReader.hppbak \
+	BonOsiTMINLPInterface.cppbak BonOsiTMINLPInterface.hppbak \
+	BonTMINLP2TNLP.cppbak BonTMINLP2TNLP.hppbak \
+	BonTMINLP.cppbak BonTMINLP.hppbak \
+	BonTNLPSolver.hppbak BonTNLPSolver.cppbak \
+	BonTNLP2FPNLP.cppbak BonTNLP2FPNLP.hppbak \
+	BonBranchingTQP.cppbak BonBranchingTQP.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -463,6 +465,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBoundsReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBranchingTQP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonColReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvatureEstimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOsiTMINLPInterface.Plo@am__quote@

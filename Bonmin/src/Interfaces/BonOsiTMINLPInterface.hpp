@@ -269,6 +269,19 @@ class Messages : public CoinMessages
 
   //@}
 
+  /** @name Enums for optionslist parameters */
+  //@{
+  enum VarSelectStra_Enum {
+    MOST_FRACTIONAL=0,
+    STRONG_BRANCHING,
+    RELIABILITY_BRANCHING,
+    CURVATURE_ESTIMATOR,
+    QP_STRONG_BRANCHING,
+    OSI_SIMPLE,
+    OSI_STRONG
+  };
+  //@}
+
   //---------------------------------------------------------------------------
   /**@name Problem information methods
 
@@ -776,7 +789,7 @@ class Messages : public CoinMessages
   {
     return GetRawPtr(tminlp_);
   }
-   const Bonmin::TNLPSolver * solver() const
+  const Bonmin::TNLPSolver * solver() const
   {
     return GetRawPtr(app_);
   } 
