@@ -248,7 +248,7 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 	if (!feasChecker_) {
 	    feasChecker_ = new Bonmin::OACutGenerator2(&nlp, NULL, NULL,
 						       cutOffIncrement,
-						       integerTolerance, 0, 1);
+						       integerTolerance, 1);
 	    feasChecker_->parameter().localSearchNodeLimit_ = 0;
 	    feasChecker_->parameter().maxLocalSearch_ = 0;
 	    feasChecker_->parameter().maxLocalSearchPerNode_ = 0;
