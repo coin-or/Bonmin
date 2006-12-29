@@ -136,10 +136,12 @@ BonQPStrongBranching::setupList ( OsiBranchingInformation *info, bool initialize
 	  numberOnList_=0;
   }
   //  DELETEME
+#ifdef Verbose
   printf("numberOnList_: %i, numberUnsatisfied_: %i, numberStrong_: %i \n",
 	 numberOnList_, numberUnsatisfied_, numberStrong_);
   for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
     printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
+#endif
   return numberUnsatisfied_;
 }
 #endif
@@ -204,7 +206,9 @@ BonQPStrongBranching::chooseVariable(
 	// up
 	Number curr_bnd = branching_tqp->x_l()[col_number];
 	const Number up_bnd = Min(b_U[col_number],ceil(solution[col_number]));
+#ifdef Verbose
 	printf("up bounds: %d sol %e cur %e new %e\n", col_number, solution[col_number], curr_bnd, up_bnd);
+#endif
 	branching_tqp->SetVariableLowerBound(col_number, up_bnd);
 
 	// Solve Problem
@@ -215,8 +219,10 @@ BonQPStrongBranching::chooseVariable(
 	else {
 	  retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
 	}
+#ifdef Verbose
 	// DELETEME
 	printf("up: retstatus = %d obj = %e\n", retstatus, branching_tqp->obj_value());
+#endif
 	
 	if (retstatus == TNLPSolver::solvedOptimal ||
 	    retstatus == TNLPSolver::solvedOptimalTol) {
@@ -247,8 +253,10 @@ BonQPStrongBranching::chooseVariable(
 	else {
 	  retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
 	}
+#ifdef Verbose
 	// DELETEME
 	printf("down: retstatus = %d obj = %e\n", retstatus, branching_tqp->obj_value());
+#endif
 
 	if (retstatus == TNLPSolver::solvedOptimal ||
 	    retstatus == TNLPSolver::solvedOptimalTol) {
@@ -272,8 +280,10 @@ BonQPStrongBranching::chooseVariable(
       best_i = -1;
       best_change = -large_number;
       for (int i=0; i<numStrong; i++) {
+#ifdef Verbose
 	//DELETEME
 	printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
+#endif
 	// for now, we look for the best combined change
 	double change_min = Min(change_down[i], change_up[i]);
 	double change_max = Max(change_down[i], change_up[i]);
@@ -293,8 +303,10 @@ BonQPStrongBranching::chooseVariable(
       assert(best_i != -1);
     }
 
+#ifdef Verbose
     //DELETEME
     printf("best_i = %d  best_change = %e\n", best_i, best_change);
+#endif
 
     bestObjectIndex_=list_[best_i];
     bestWhichWay_ = solver->object(bestObjectIndex_)->whichWay();
