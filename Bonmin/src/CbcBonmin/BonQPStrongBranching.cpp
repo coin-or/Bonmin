@@ -39,6 +39,7 @@ BonQPStrongBranching::clone() const
   return new BonQPStrongBranching(*this);
 }
 
+//#define Verbose
 // For now there is no difference to what John has, so let's just use his
 #ifdef UseOurOwn
 // Initialize
@@ -192,6 +193,8 @@ BonQPStrongBranching::chooseVariable(
  
     int best_i = 0;
     double best_change = large_number;
+    int found_infeasible = -1;
+    int best_way;
     if (numStrong > 1) {
       bool first_solve = true;
       SmartPtr<TNLPSolver> tqp_solver =
@@ -232,6 +235,9 @@ BonQPStrongBranching::chooseVariable(
 	else if (retstatus == TNLPSolver::provenInfeasible) {
 	  // We try this for now - we should probably skip the rest of
 	  // the tests
+	  found_infeasible = i;
+	  best_way = 1;
+	  break;
 	  change_up[i] = large_number;
 	  first_solve = false;
 	}
@@ -264,6 +270,9 @@ BonQPStrongBranching::chooseVariable(
 	  first_solve = false;
 	}
 	else if (retstatus == TNLPSolver::provenInfeasible) {
+	  found_infeasible = i;
+	  best_way = 0;
+	  break;
 	  // We try this for now - we should probably skip the rest of
 	  // the tests
 	  change_down[i] = large_number;
@@ -279,18 +288,32 @@ BonQPStrongBranching::chooseVariable(
       // Determine most promising branching variable
       best_i = -1;
       best_change = -large_number;
-      for (int i=0; i<numStrong; i++) {
+      if (found_infeasible>-1) {
+	best_i = found_infeasible;
+	best_change = large_number;
+      }
+      else {
+	for (int i=0; i<numStrong; i++) {
 #ifdef Verbose
 	//DELETEME
-	printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
+	  printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
 #endif
-	// for now, we look for the best combined change
-	double change_min = Min(change_down[i], change_up[i]);
-	double change_max = Max(change_down[i], change_up[i]);
-	double change_comp = 2.*change_max + change_min;
-	if (best_change < change_comp) {
-	  best_change = change_comp;
-	  best_i = i;
+	  // for now, we look for the best combined change
+	  double change_min = Min(change_down[i], change_up[i]);
+	  double change_max = Max(change_down[i], change_up[i]);
+	  double change_comp = 2.*change_max + change_min;
+	  // only use new value if significantly larger (rel_fact)
+	  const Number rel_fact = 1e-6;
+	  if (best_change*(1.+rel_fact) < change_comp) {
+	    best_change = change_comp;
+	    best_i = i;
+	    if (change_down[i] < change_up[i]) {
+	      best_way = 1;
+	    }
+	    else {
+	      best_way = 0;
+	    }
+	  }
 	}
       }
 
@@ -305,11 +328,11 @@ BonQPStrongBranching::chooseVariable(
 
 #ifdef Verbose
     //DELETEME
-    printf("best_i = %d  best_change = %e\n", best_i, best_change);
+    printf("best_i = %d  best_change = %e best_way = %d\n", best_i, best_change, best_way);
 #endif
 
     bestObjectIndex_=list_[best_i];
-    bestWhichWay_ = solver->object(bestObjectIndex_)->whichWay();
+    bestWhichWay_ = best_way; // AW: check! solver->object(bestObjectIndex_)->whichWay();
     firstForcedObjectIndex_ = -1;
     firstForcedWhichWay_ =-1;
     return 0;

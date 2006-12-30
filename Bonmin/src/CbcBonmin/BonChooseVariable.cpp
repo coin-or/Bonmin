@@ -270,7 +270,9 @@ BonChooseVariable::chooseVariable(
 	double change_min = Min(change_down[i], change_up[i]);
 	double change_max = Max(change_down[i], change_up[i]);
 	double change_comp = 2.*change_max + change_min;
-	if (best_change < change_comp) {
+	// only use new value if significantly larger (rel_fact)
+	const Number rel_fact = 1e-6;
+	if (best_change*(1.+rel_fact) < change_comp) {
 	  best_change = change_comp;
 	  best_i = i;
 	}
