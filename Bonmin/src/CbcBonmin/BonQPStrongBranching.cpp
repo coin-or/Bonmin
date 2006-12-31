@@ -39,7 +39,7 @@ BonQPStrongBranching::clone() const
   return new BonQPStrongBranching(*this);
 }
 
-//#define Verbose
+#define Verbose
 // For now there is no difference to what John has, so let's just use his
 #ifdef UseOurOwn
 // Initialize
@@ -209,6 +209,7 @@ BonQPStrongBranching::chooseVariable(
 	// up
 	Number curr_bnd = branching_tqp->x_l()[col_number];
 	const Number up_bnd = Min(b_U[col_number],ceil(solution[col_number]));
+
 #ifdef Verbose
 	printf("up bounds: %d sol %e cur %e new %e\n", col_number, solution[col_number], curr_bnd, up_bnd);
 #endif
@@ -221,6 +222,7 @@ BonQPStrongBranching::chooseVariable(
 	}
 	else {
 	  retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
+	  //retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
 	}
 #ifdef Verbose
 	// DELETEME
@@ -238,7 +240,7 @@ BonQPStrongBranching::chooseVariable(
 	  found_infeasible = i;
 	  best_way = 1;
 	  break;
-	  change_up[i] = large_number;
+	  change_up[i] = 0.;//large_number;
 	  first_solve = false;
 	}
 	else {
@@ -275,7 +277,7 @@ BonQPStrongBranching::chooseVariable(
 	  break;
 	  // We try this for now - we should probably skip the rest of
 	  // the tests
-	  change_down[i] = large_number;
+	  change_down[i] = 0.;//large_number;
 	  first_solve = false;
 	}
 	else {
@@ -325,7 +327,6 @@ BonQPStrongBranching::chooseVariable(
       }
       assert(best_i != -1);
     }
-
 #ifdef Verbose
     //DELETEME
     printf("best_i = %d  best_change = %e best_way = %d\n", best_i, best_change, best_way);
