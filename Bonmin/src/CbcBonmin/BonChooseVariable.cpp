@@ -50,7 +50,7 @@ BonChooseVariable::clone() const
 }
 
 // For now there is no difference to what John has, so let's just use his
-//#ifdef UseOurOwn
+#ifdef UseOurOwn
 // Initialize
 // PB: ToDo Check
 int 
@@ -74,7 +74,8 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   int checkIndex=0;
   int bestPriority=INT_MAX;
   // pretend one strong even if none
-  int maximumStrong = numberStrong_ ? CoinMin(numberStrong_,numberObjects) : 1;
+  //int maximumStrong = numberStrong_ ? CoinMin(numberStrong_,numberObjects) : 1;
+  int maximumStrong = numberObjects;
   int putOther = numberObjects;
   int numViolatedAtBestPriority = 0;
   int i;
@@ -152,7 +153,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
     printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
   return numberUnsatisfied_;
 }
-//#endif
+#endif
 
 /* Choose a variable
    Returns - 
