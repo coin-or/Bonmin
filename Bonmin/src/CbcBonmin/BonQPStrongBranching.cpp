@@ -319,14 +319,14 @@ BonQPStrongBranching::chooseVariable(
 	}
       }
 
-      delete [] change_up;
-      delete [] change_down;
-
       if (best_i == -1) {
 	best_i = 0;
       }
       assert(best_i != -1);
     }
+    delete [] change_up;
+    delete [] change_down;
+
 #ifdef Verbose
     //DELETEME
     printf("best_i = %d  best_change = %e best_way = %d\n", best_i, best_change, best_way);

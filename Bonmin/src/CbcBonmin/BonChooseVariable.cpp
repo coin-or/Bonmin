@@ -258,8 +258,6 @@ BonChooseVariable::chooseVariable(
 
 	orig_d[col_number] = 0.;
       }
-      delete [] orig_d;
-      delete [] projected_d;
 
       // Determine most promising branching variable
       best_i = -1;
@@ -279,14 +277,16 @@ BonChooseVariable::chooseVariable(
 	}
       }
 
-      delete [] change_up;
-      delete [] change_down;
-
       if (best_i == -1) {
 	best_i = 0;
       }
       assert(best_i != -1);
     }
+
+    delete [] change_up;
+    delete [] change_down;
+    delete [] orig_d;
+    delete [] projected_d;
 
     //DELETEME
     printf("best_i = %d  best_change = %e\n", best_i, best_change);
