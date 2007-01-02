@@ -171,7 +171,8 @@ BonQPStrongBranching::chooseVariable(
     OsiTMINLPInterface* tminlp_interface =
       dynamic_cast<OsiTMINLPInterface*> (solver);
     const TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
-    SmartPtr<BranchingTQP> branching_tqp = new BranchingTQP(*tminlp2tnlp);
+    //    SmartPtr<BranchingTQP> branching_tqp = new BranchingTQP(*tminlp2tnlp);
+    SmartPtr<TMINLP2TNLP> branching_tqp = new TMINLP2TNLP(*tminlp2tnlp);
     const Number curr_obj = tminlp2tnlp->obj_value();
 
     // Get info about the current solution
@@ -199,6 +200,7 @@ BonQPStrongBranching::chooseVariable(
       bool first_solve = true;
       SmartPtr<TNLPSolver> tqp_solver =
 	tminlp_interface->solver()->clone();
+      tqp_solver->enableWarmStart();
 
       for (int i=0; i<numStrong; i++) {
 	int& index = list_[i];

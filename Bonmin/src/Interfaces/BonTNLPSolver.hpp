@@ -140,7 +140,7 @@ class TNLPSolver: public Ipopt::ReferencedObject{
    ///Get a pointer to RegisteredOptions (generally used to add new ones)
    virtual Ipopt::SmartPtr<Ipopt::RegisteredOptions> RegOptions() = 0;
 
-   /// Get the options (for getting theur values).
+   /// Get the options (for getting their values).
    virtual Ipopt::SmartPtr<const Ipopt::OptionsList> Options() const = 0;
 
    /// Get the options (for getting and setting their values).
