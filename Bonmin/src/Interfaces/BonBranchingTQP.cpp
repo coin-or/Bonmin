@@ -35,7 +35,7 @@ namespace Bonmin
     // Compute all nonlinear values at the starting point so that we
     // have all the information for the QP
     bool new_x = true;   // ToDo: maybe NOT new?
-    bool retval = tminlp_->eval_f(n_, x_sol_, new_x, obj_value_);
+    bool retval = tminlp_->eval_f(n_, x_sol_, new_x, obj_val_);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate objective function in BranchingTQP");
     new_x = false;
@@ -76,8 +76,14 @@ namespace Bonmin
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate constraint Jacobian values in BranchingTQP");
 
-    // Get room for "displacement"
+    // Get room for "displacement" and copy of x_sol_
     d_ = new Number[n_];
+
+    // Keep copy of original x_sol_ and duals_sol_ values
+    x_sol_copy_ = new Number[n_];
+    IpBlasDcopy(n_, x_sol_, 1, x_sol_copy_, 1);
+    duals_sol_copy_ = new Number[m_ + 2*n_];
+    IpBlasDcopy(m_+2*n_, duals_sol_, 1, duals_sol_copy_, 1);
   }
 
   BranchingTQP::~BranchingTQP()
@@ -91,6 +97,8 @@ namespace Bonmin
     delete [] g_jac_irow_;
     delete [] g_jac_jcol_;
     delete [] d_;
+    delete [] x_sol_copy_;
+    delete [] duals_sol_copy_;
   }
 
   bool BranchingTQP::get_starting_point(Index n, bool init_x, Number* x,
@@ -102,19 +110,17 @@ namespace Bonmin
     if (init_x == true) {
       if(x_init_==NULL)
         return false;
-      IpBlasDcopy(n, x_sol_, 1, x, 1);
+      IpBlasDcopy(n, x_sol_copy_, 1, x, 1);
     }
     if (init_z == true) {
-      if(duals_sol_ == NULL)
-        return false;
-      IpBlasDcopy(n, &duals_sol_[m], 1, z_L, 1);
-      IpBlasDcopy(n, &duals_sol_[m + n], 1, z_U, 1);
+      DBG_ASSERT(duals_sol_copy_);
+      IpBlasDcopy(n, &duals_sol_copy_[m], 1, z_L, 1);
+      IpBlasDcopy(n, &duals_sol_copy_[m + n], 1, z_U, 1);
 
     }
     if(init_lambda == true) {
-      if(duals_sol_ == NULL)
-        return false;
-      IpBlasDcopy(m_, duals_sol_, 1, lambda, 1);
+      DBG_ASSERT(duals_sol_copy_);
+      IpBlasDcopy(m_, duals_sol_copy_, 1, lambda, 1);
       for(int i = m_ ; i < m; i++)
       {
         lambda[i] = 0.;
@@ -133,7 +139,7 @@ namespace Bonmin
       update_displacement(x);
     }
 
-    obj_value = obj_value_ + IpBlasDdot(n, d_, 1, obj_grad_, 1);
+    obj_value = obj_val_ + IpBlasDdot(n, d_, 1, obj_grad_, 1);
     for (int i=0; i<nnz_h_lag_; i++) {
       Index& irow = obj_hess_irow_[i];
       Index& jcol = obj_hess_jcol_[i];
@@ -266,7 +272,7 @@ namespace Bonmin
   void BranchingTQP::update_displacement(const Number* x)
   {
     for (Index i=0; i<n_; i++) {
-      d_[i] = x[i] - x_sol_[i];
+      d_[i] = x[i] - x_sol_copy_[i];
     }
   }
 

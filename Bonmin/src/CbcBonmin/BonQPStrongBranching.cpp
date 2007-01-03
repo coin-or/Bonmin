@@ -10,12 +10,12 @@
 namespace Bonmin {
 
 BonQPStrongBranching::BonQPStrongBranching(OsiTMINLPInterface * solver) :
-  OsiChooseVariable(solver)
+  BonChooseVariable(solver)
 {
 }
 
 BonQPStrongBranching::BonQPStrongBranching(const BonQPStrongBranching & rhs) :
-  OsiChooseVariable(rhs)
+  BonChooseVariable(rhs)
 {
 }
 
@@ -23,7 +23,7 @@ BonQPStrongBranching &
 BonQPStrongBranching::operator=(const BonQPStrongBranching & rhs)
 {
   if (this != &rhs) {
-    OsiChooseVariable::operator=(rhs);
+    BonChooseVariable::operator=(rhs);
   }
   return *this;
 }
@@ -40,112 +40,6 @@ BonQPStrongBranching::clone() const
 }
 
 #define Verbose
-// For now there is no difference to what John has, so let's just use his
-#ifdef UseOurOwn
-// Initialize
-// PB: ToDo Check
-int 
-BonQPStrongBranching::setupList ( OsiBranchingInformation *info, bool initialize)
-{
-  if (initialize) {
-    status_=-2;
-    delete [] goodSolution_;
-    bestObjectIndex_=-1;
-    numberStrongDone_=0;
-    numberStrongIterations_ = 0;
-    numberStrongFixed_ = 0;
-    goodSolution_ = NULL;
-    goodObjectiveValue_ = COIN_DBL_MAX;
-  }
-  numberOnList_=0;
-  numberUnsatisfied_=0;
-  int numberObjects = solver_->numberObjects();
-  assert (numberObjects);
-  double check = 0.0;
-  int checkIndex=0;
-  int bestPriority=INT_MAX;
-  // pretend one strong even if none
-  int maximumStrong = numberStrong_ ? CoinMin(numberStrong_,numberObjects) : 1;
-  int putOther = numberObjects;
-  int numViolatedAtBestPriority = 0;
-  int i;
-
-  OsiObject ** object = info->solver_->objects();
-  for ( i=0;i<numberObjects;i++) {
-    int way;
-    double value = object[i]->infeasibility(info,way);
-    if (value>0.0) {
-      numberUnsatisfied_++;
-      int priorityLevel = object[i]->priority();
-      // Better priority? Flush choices.
-      if (priorityLevel<bestPriority) {
-	  for (int j = numViolatedAtBestPriority - 1; j >= 0; --j) {
-	      list_[--putOther] = list_[j];
-	      useful_[putOther] = useful_[j]; 
-	  }
-	  bestPriority = priorityLevel;
-	  numViolatedAtBestPriority = 0;
-	  check=0.0;
-      } 
-      if (priorityLevel==bestPriority && value>check) {
-	  //add to list
-	  if (numViolatedAtBestPriority < maximumStrong) {
-	      list_[numViolatedAtBestPriority] = i;
-	      useful_[numViolatedAtBestPriority] = value;
-	      ++numViolatedAtBestPriority;
-	  } else {
-	      assert (useful_[checkIndex] == check);
-	      list_[--putOther] = list_[checkIndex];
-	      useful_[putOther] = check; 
-	      list_[checkIndex] = i;
-	      useful_[checkIndex] = value;
-	  }
-	  if (numViolatedAtBestPriority == maximumStrong) {
-	      // find worst
-	      check=useful_[0];
-	      checkIndex = 0;
-	      for (int j = 1; j < maximumStrong; ++j) {
-		  if (useful_[j] < check) {
-		      check = useful_[j];
-		      checkIndex = j;
-		  }
-	      }
-	  }
-      } else {
-	  // to end
-	  list_[--putOther] = i;
-	  useful_[putOther] = value;
-      }
-    }
-  }
-  // Get list
-  numberOnList_ = numViolatedAtBestPriority;
-  if (numberOnList_) {
-      for (i = 0; i < numberOnList_; ++i) {
-	  useful_[i] = - useful_[i];
-      }
-      // Sort 
-      CoinSort_2(useful_,useful_+numberOnList_,list_);
-      // move others
-      i = numberOnList_;
-      for (;putOther<numberObjects;putOther++, i++) {
-	  list_[i]=list_[putOther];
-	  useful_[i] = - useful_[putOther];
-      }
-      assert (i==numberUnsatisfied_);
-      if (!numberStrong_)
-	  numberOnList_=0;
-  }
-  //  DELETEME
-#ifdef Verbose
-  printf("numberOnList_: %i, numberUnsatisfied_: %i, numberStrong_: %i \n",
-	 numberOnList_, numberUnsatisfied_, numberStrong_);
-  for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
-    printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
-#endif
-  return numberUnsatisfied_;
-}
-#endif
 
 /* Choose a variable
    Returns - 
@@ -159,20 +53,46 @@ BonQPStrongBranching::setupList ( OsiBranchingInformation *info, bool initialize
    We can pick up a forced branch (can change bound) from whichForcedObject() and whichForcedWay()
    If we have a solution then we can pick up from goodObjectiveValue() and goodSolution()
 */
+#define RunAllProblems
 int 
 BonQPStrongBranching::chooseVariable(
   OsiSolverInterface * solver,
   OsiBranchingInformation *info,
   bool fixVariables)
 {
+#ifdef RunAllProblems
+  if (fixVariables) {
+    chooseVariable(solver,info, false);
+
+    printf("== Beginning: Strong branching with curvature estimator:\n");
+    BonChooseVariable::chooseVariable(solver,info, fixVariables);
+
+    printf("== Beginning: Strong branching with QP:\n");
+  }
+  else {
+    printf("== Beginning: Strong branching with NLP:\n");
+  }
+#endif
+
   if (numberUnsatisfied_) {
 
     // Create a QP problem based on the current solution
     OsiTMINLPInterface* tminlp_interface =
       dynamic_cast<OsiTMINLPInterface*> (solver);
     const TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
-    //    SmartPtr<BranchingTQP> branching_tqp = new BranchingTQP(*tminlp2tnlp);
+
+#ifdef RunAllProblems
+    SmartPtr<TMINLP2TNLP> branching_tqp;
+    if (fixVariables) {
+      branching_tqp = new BranchingTQP(*tminlp2tnlp);
+    }
+    else {
+      branching_tqp = new TMINLP2TNLP(*tminlp2tnlp);
+    }
+#else
+    //SmartPtr<BranchingTQP> branching_tqp = new BranchingTQP(*tminlp2tnlp);
     SmartPtr<TMINLP2TNLP> branching_tqp = new TMINLP2TNLP(*tminlp2tnlp);
+#endif
     const Number curr_obj = tminlp2tnlp->obj_value();
 
     // Get info about the current solution
@@ -195,12 +115,12 @@ BonQPStrongBranching::chooseVariable(
     int best_i = 0;
     double best_change = large_number;
     int found_infeasible = -1;
-    int best_way;
+    int best_way = -1;
     if (numStrong > 1) {
       bool first_solve = true;
       SmartPtr<TNLPSolver> tqp_solver =
 	tminlp_interface->solver()->clone();
-      tqp_solver->enableWarmStart();
+      //TODO: activate this: tqp_solver->enableWarmStart();
 
       for (int i=0; i<numStrong; i++) {
 	int& index = list_[i];
@@ -212,7 +132,7 @@ BonQPStrongBranching::chooseVariable(
 	Number curr_bnd = branching_tqp->x_l()[col_number];
 	const Number up_bnd = Min(b_U[col_number],ceil(solution[col_number]));
 
-#ifdef Verbose
+#ifdef VeryVerbose
 	printf("up bounds: %d sol %e cur %e new %e\n", col_number, solution[col_number], curr_bnd, up_bnd);
 #endif
 	branching_tqp->SetVariableLowerBound(col_number, up_bnd);
@@ -223,10 +143,10 @@ BonQPStrongBranching::chooseVariable(
 	  retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
 	}
 	else {
-	  retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
+	  retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
 	  //retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
 	}
-#ifdef Verbose
+#ifdef VeryVerbose
 	// DELETEME
 	printf("up: retstatus = %d obj = %e\n", retstatus, branching_tqp->obj_value());
 #endif
@@ -263,7 +183,7 @@ BonQPStrongBranching::chooseVariable(
 	else {
 	  retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
 	}
-#ifdef Verbose
+#ifdef VeryVerbose
 	// DELETEME
 	printf("down: retstatus = %d obj = %e\n", retstatus, branching_tqp->obj_value());
 #endif
@@ -300,7 +220,7 @@ BonQPStrongBranching::chooseVariable(
 	for (int i=0; i<numStrong; i++) {
 #ifdef Verbose
 	//DELETEME
-	  printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
+	  printf("i = %d down = %15.6e up = %15.6e\n", i,change_down[i], change_up[i]);
 #endif
 	  // for now, we look for the best combined change
 	  double change_min = Min(change_down[i], change_up[i]);
@@ -331,7 +251,7 @@ BonQPStrongBranching::chooseVariable(
 
 #ifdef Verbose
     //DELETEME
-    printf("best_i = %d  best_change = %e best_way = %d\n", best_i, best_change, best_way);
+    printf("best_i = %d  best_change = %15.6e best_way = %d\n", best_i, best_change, best_way);
 #endif
 
     bestObjectIndex_=list_[best_i];

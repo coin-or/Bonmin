@@ -115,8 +115,16 @@ namespace Bonmin
     Index* g_jac_jcol_;
     //@}
 
-    /** Displacement with respect to x_sol_ */
+    /** Displacement with respect to x_sol_copy_ */
     Number* d_;
+
+    /** Copy of original x_sol_.  x_sol_ is changed after the first QP
+     *  has been solved once. */
+    Number* x_sol_copy_;
+
+    /** Copy of original duals_sol_.  duals_sol_ is changed after the
+     *  first QP has been solved once. */
+    Number* duals_sol_copy_;
 
     /** Method for updating the displacement */
     void update_displacement(const Number* x);

@@ -49,6 +49,7 @@ BonChooseVariable::clone() const
   return new BonChooseVariable(*this);
 }
 
+#define Verbose
 // For now there is no difference to what John has, so let's just use his
 #ifdef UseOurOwn
 // Initialize
@@ -146,11 +147,13 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
       if (!numberStrong_)
 	  numberOnList_=0;
   }
+#ifdef Verbose
   //  DELETEME
   printf("numberOnList_: %i, numberUnsatisfied_: %i, numberStrong_: %i \n",
 	 numberOnList_, numberUnsatisfied_, numberStrong_);
   for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
     printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
+#endif
   return numberUnsatisfied_;
 }
 #endif
@@ -264,7 +267,7 @@ BonChooseVariable::chooseVariable(
       best_change = -large_number;
       for (int i=0; i<numStrong; i++) {
 	//DELETEME
-	printf("i = %d down = %e up = %e\n", i,change_down[i], change_up[i]);
+	printf("i = %d down = %15.6e up = %15.6e\n", i,change_down[i], change_up[i]);
 	// for now, we look for the best combined change
 	double change_min = Min(change_down[i], change_up[i]);
 	double change_max = Max(change_down[i], change_up[i]);
@@ -289,7 +292,7 @@ BonChooseVariable::chooseVariable(
     delete [] projected_d;
 
     //DELETEME
-    printf("best_i = %d  best_change = %e\n", best_i, best_change);
+    printf("best_i = %d  best_change = %15.6e\n", best_i, best_change);
 
     bestObjectIndex_=list_[best_i];
     bestWhichWay_ = solver->object(bestObjectIndex_)->whichWay();
