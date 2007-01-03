@@ -413,7 +413,9 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   //for(int i = 0 ; i < n ; i++) x[i] = 0;
   lam = new real [n+m];
   g = g_ = new real[n+m];
+#ifdef InitializeAll
   for(int i = 0 ; i < n+m ; i++) lam[i] = g_[i] = 0.; 
+#endif
   //bounds
   bounds = new real [2*n + 2*m];
   
@@ -466,9 +468,11 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   maxiWk = 13*n + 4*m + mlp + lh1 + kmax + 113 + mxiwk0;
 
   ws = new real[maxWk];
-  for(int i = 0 ; i < maxWk ; i++) ws[i] = 0;
   lws = new fint[maxiWk];
+#ifdef InitializeAll
+  for(int i = 0 ; i < maxWk ; i++) ws[i] = 0;
   for(int i = 0 ; i < maxiWk ; i++) lws[i] = 0;
+#endif
 
   // Setup global variables and static variables
   hStruct = hStruct_;

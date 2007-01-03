@@ -421,6 +421,12 @@ namespace Bonmin
       chooseVariable.setNumberStrong(model.numberStrong());
       branch.setChooseMethod(chooseVariable);
     }
+    else if(par.varSelection == OsiTMINLPInterface::NLP_STRONG_BRANCHING){
+      const bool solve_nlp = true;
+      BonQPStrongBranching chooseVariable(nlpSolver, solve_nlp);
+      chooseVariable.setNumberStrong(model.numberStrong());
+      branch.setChooseMethod(chooseVariable);
+    }
     else if(par.varSelection == OsiTMINLPInterface::OSI_SIMPLE){
       OsiChooseVariable choose(model.solver());
       branch.setChooseMethod(choose);

@@ -91,9 +91,6 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
     Number curr_bnd = branching_tqp->x_l()[col_number];
     const Number up_bnd = Min(b_U[col_number],ceil(solution[col_number]));
 
-#ifdef MostVerboseCV
-    printf("up bounds: %d sol %e cur %e new %e\n", col_number, solution[col_number], curr_bnd, up_bnd);
-#endif
     branching_tqp->SetVariableLowerBound(col_number, up_bnd);
 
     //TODO: activate this: tqp_solver->enableWarmStart();
@@ -104,13 +101,8 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
       retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
     }
     else {
-      retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
-      //retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
+      retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
     }
-#ifdef MostVerboseCV
-    // DELETEME
-    printf("up: retstatus = %d obj = %e\n", retstatus, branching_tqp->obj_value());
-#endif
 	
     if (retstatus == TNLPSolver::solvedOptimal ||
 	retstatus == TNLPSolver::solvedOptimalTol) {
@@ -141,10 +133,6 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
     else {
       retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
     }
-#ifdef MostVerboseCV
-    // DELETEME
-    printf("down: retstatus = %d obj = %e\n", retstatus, branching_tqp->obj_value());
-#endif
 
     if (retstatus == TNLPSolver::solvedOptimal ||
 	retstatus == TNLPSolver::solvedOptimalTol) {

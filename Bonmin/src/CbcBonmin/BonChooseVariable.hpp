@@ -50,7 +50,6 @@ public:
      If we have a solution then we can pick up from goodObjectiveValue() and goodSolution()
      If fixVariables is true then 2,3,4 are all really same as problem changed
   */
-#define VerboseCV
   virtual int chooseVariable( OsiSolverInterface * solver, OsiBranchingInformation *info, bool fixVariables);
   /**  This is a utility function which does strong branching on
        a list of objects and stores the results in OsiHotInfo.objects.
@@ -80,6 +79,12 @@ protected:
 			   bool fixVariables,
 			   int numStrong, double* change_down,
 			   double* change_up, int& best_way) = 0;
+
+  /// Holding on the a pointer to the journalist
+  SmartPtr<Journalist> jnlst_;
+
+  /// verbosity level
+  int bb_log_level_;
 
 private:
   /// Default Constructor 

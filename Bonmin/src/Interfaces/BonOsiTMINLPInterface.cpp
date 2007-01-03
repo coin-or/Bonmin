@@ -149,7 +149,7 @@ register_general_options
       "integer feasible solutions have been found).",
       "Choose the strategy for selecting the next node to be processed.");
 
-  roptions->AddStringOption7("varselect_stra",
+  roptions->AddStringOption9("varselect_stra",
       "Chooses variable selection strategy",
       "strong-branching",
       "most-fractional", "Choose most fractional variable",
@@ -157,6 +157,8 @@ register_general_options
       "reliability-branching", "Use reliability branching",
       "curvature-estimator", "Use curvature estimation to select branching variable",
       "qp-strong-branching", "Perform strong branching with QP approximation",
+      "lp-strong-branching", "Perform strong branching with LP approximation",
+      "nlp-strong-branching", "Perform strong branching with NLP approximation",
       "osi-simple", "Osi method to do simple branching",
       "osi-strong", "Osi method to do strong branching","");
 

@@ -12,17 +12,30 @@ namespace Bonmin {
 
 BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   OsiChooseVariable(solver)
-{}
+{
+  SmartPtr<TNLPSolver> tnlp_solver =
+    dynamic_cast<TNLPSolver *> (solver->solver());
+  DBG_ASSERT(IsValid(tnlp_solver));
+  SmartPtr<Journalist> jnlst_ = tnlp_solver->Jnlst();
+  SmartPtr<OptionsList> options = tnlp_solver->Options();
+
+  options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
+}
 
 BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
   OsiChooseVariable(rhs)
-{}
+{
+  jnlst_ = rhs.jnlst_;
+  bb_log_level_ = rhs.bb_log_level_;
+}
 
 BonChooseVariable &
 BonChooseVariable::operator=(const BonChooseVariable & rhs)
 {
   if (this != &rhs) {
     OsiChooseVariable::operator=(rhs);
+    jnlst_ = rhs.jnlst_;
+    bb_log_level_ = rhs.bb_log_level_;
   }
   return *this;
 }
@@ -30,8 +43,6 @@ BonChooseVariable::operator=(const BonChooseVariable & rhs)
 BonChooseVariable::~BonChooseVariable ()
 {}
 
-#define Verbose
-// For now there is no difference to what John has, so let's just use his
 #ifdef UseOurOwn
 // Initialize
 // PB: ToDo Check
@@ -128,13 +139,11 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
       if (!numberStrong_)
 	  numberOnList_=0;
   }
-#ifdef Verbose
-  //  DELETEME
-  printf("numberOnList_: %i, numberUnsatisfied_: %i, numberStrong_: %i \n",
-	 numberOnList_, numberUnsatisfied_, numberStrong_);
-  for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
-    printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
-#endif
+
+  if (bb_log_level_>4) {
+    for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
+      printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e\n", i,list_[i],i,useful_[i]);
+  }
   return numberUnsatisfied_;
 }
 #endif
@@ -179,10 +188,11 @@ BonChooseVariable::chooseVariable(
 	best_i = -1;
 	best_change = -large_number;
 	for (int i=0; i<numStrong; i++) {
-#ifdef VerboseCV
-	  printf("i = %d down = %15.6e up = %15.6e\n",
-		 i, change_down[i], change_up[i]);
-#endif
+	  if (bb_log_level_>4) {
+	    printf("i = %d down = %15.6e up = %15.6e\n",
+		   i, change_down[i], change_up[i]);
+	  }
+
 	  // for now, we look for the best combined change
 	  double change_min = Min(change_down[i], change_up[i]);
 	  double change_max = Max(change_down[i], change_up[i]);
@@ -204,10 +214,9 @@ BonChooseVariable::chooseVariable(
       delete [] change_down;
     }
 
-#ifdef VerboseCV
-    //DELETEME
-    printf("best_i = %d  best_change = %15.6e\n", best_i, best_change);
-#endif
+    if (bb_log_level_>3) {
+      printf("best_i = %d  best_change = %15.6e\n", best_i, best_change);
+    }
 
     bestObjectIndex_=list_[best_i];
     bestWhichWay_ = solver->object(bestObjectIndex_)->whichWay();

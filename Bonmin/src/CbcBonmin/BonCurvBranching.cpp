@@ -15,11 +15,10 @@ BonCurvBranching::BonCurvBranching(OsiTMINLPInterface * solver) :
 {
   SmartPtr<TNLPSolver> tnlp_solver =
     dynamic_cast<TNLPSolver *> (solver->solver());
-  SmartPtr<Journalist> jnlst = tnlp_solver->Jnlst();
   SmartPtr<OptionsList> options = tnlp_solver->Options();
   SmartPtr<TNLP> tnlp = solver->problem();
 
-  cur_estimator_ = new CurvatureEstimator(jnlst, options, tnlp);
+  cur_estimator_ = new CurvatureEstimator(jnlst_, options, tnlp);
 }
 
 BonCurvBranching::BonCurvBranching(const BonCurvBranching & rhs) :
