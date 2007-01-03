@@ -18,7 +18,7 @@
 #include "BonCbcParam.hpp"
 
 // AW
-#include "BonChooseVariable.hpp"
+#include "BonCurvBranching.hpp"
 #include "BonQPStrongBranching.hpp"
 
 //OA machinery
@@ -412,7 +412,7 @@ namespace Bonmin
 
     if(par.varSelection == OsiTMINLPInterface::CURVATURE_ESTIMATOR){
     // AW: Try to set new chooseVariable object
-      BonChooseVariable chooseVariable(nlpSolver);
+      BonCurvBranching chooseVariable(nlpSolver);
       chooseVariable.setNumberStrong(model.numberStrong());
       branch.setChooseMethod(chooseVariable);
     }

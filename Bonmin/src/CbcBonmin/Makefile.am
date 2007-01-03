@@ -23,7 +23,8 @@ libbonminbb_la_SOURCES = \
 	BonCbcNode.cpp BonCbcNode.hpp \
 	BonCbcParam.cpp BonCbcParam.hpp \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
-	BonQPStrongBranching.cpp BonQPStrongBranching.hpp
+	BonQPStrongBranching.cpp BonQPStrongBranching.hpp \
+	BonCurvBranching.cpp BonCurvBranching.hpp
 
 # This is for libtool (on Windows)
 libbonminbb_la_LDFLAGS = $(LT_LDFLAGS)
@@ -92,7 +93,8 @@ ASTYLE_FILES = \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
 	BonCbcNode.cppbak BonCbcNode.hppbak \
 	BonChooseVariable.cppbak BonChooseVariable.hppbak \
-	BonQPStrongBranching.cppbak BonQPStrongBranching.hppbak
+	BonQPStrongBranching.cppbak BonQPStrongBranching.hppbak \
+	BonCurvBranching.cppbak BonCurvBranching.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

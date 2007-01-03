@@ -12,42 +12,23 @@ namespace Bonmin {
 
 BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   OsiChooseVariable(solver)
-{
-  SmartPtr<TNLPSolver> tnlp_solver =
-    dynamic_cast<TNLPSolver *> (solver->solver());
-  SmartPtr<Journalist> jnlst = tnlp_solver->Jnlst();
-  SmartPtr<OptionsList> options = tnlp_solver->Options();
-  SmartPtr<TNLP> tnlp = solver->problem();
-
-  cur_estimator_ = new CurvatureEstimator(jnlst, options, tnlp);
-}
+{}
 
 BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
   OsiChooseVariable(rhs)
-{
-  cur_estimator_ = rhs.cur_estimator_;
-}
+{}
 
 BonChooseVariable &
 BonChooseVariable::operator=(const BonChooseVariable & rhs)
 {
   if (this != &rhs) {
     OsiChooseVariable::operator=(rhs);
-    cur_estimator_ = rhs.cur_estimator_;
   }
   return *this;
 }
 
 BonChooseVariable::~BonChooseVariable ()
-{
-}
-
-// Clone
-OsiChooseVariable *
-BonChooseVariable::clone() const
-{
-  return new BonChooseVariable(*this);
-}
+{}
 
 #define Verbose
 // For now there is no difference to what John has, so let's just use his
@@ -178,121 +159,55 @@ BonChooseVariable::chooseVariable(
 {
   if (numberUnsatisfied_) {
 
-    // Get info about the current solution
-    const double * solution = solver->getColSolution();// Current solution
-    int numCols = solver->getNumCols();
-    int numRows = solver->getNumRows();
-    const double * lam = solver->getRowPrice();
-    const double * z_L = lam + numRows;
-    const double * z_U = z_L + numCols;
-    const double * b_L = solver->getColLower();
-    const double * b_U = solver->getColUpper();
-
     int numStrong = Min(numberUnsatisfied_, numberStrong_);
-    // space for storing the predicted changes in the objective
-    double * change_up = new double[numStrong];
-    double * change_down = new double[numStrong];
-
-    // Set up stuff for the curvature estimator
-    bool new_bounds = true;
-    bool new_x = true;
-    bool new_mults = true;
-    double * orig_d = new double[numCols];
-    double * projected_d = new double[numCols];
-    const Number zero = 0.;
-    IpBlasDcopy(numCols, &zero, 0, orig_d, 1);
 
     const Number large_number = COIN_DBL_MAX;
  
     int best_i = 0;
+    int best_way;
     double best_change = large_number;
     if (numStrong > 1) {
-      for (int i=0; i<numStrong; i++) {
-	int index = list_[i];
-	const OsiObject * object = solver->object(index);
-	int col_number = object->columnNumber();
-	DBG_ASSERT(col_number != -1);
-	// up
-	orig_d[col_number] = 1.;
-	double gradLagTd;
-	double dTHLagd;
-	bool retval =
-	  cur_estimator_->ComputeNullSpaceCurvature(
-            new_bounds, numCols, solution, new_x, z_L, z_U,
-	    numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
-	// ToDo
-	if (!retval) {
-	  printf("Problem with curvature estimator for down up.\n");
-	}
-	new_bounds = false;
-	new_x = false;
-	new_mults = false;
+      // space for storing the predicted changes in the objective
+      double* change_up = new double[numStrong];
+      double* change_down = new double[numStrong];
 
-	// Determine step size and predicted change
-	const double &curr_val = solution[col_number];
-	if (retval && projected_d[col_number] != 0.) {
-	  const double up_val = Min(b_U[col_number],ceil(curr_val));
-	  double alpha = (up_val-curr_val)/projected_d[col_number];
-	  change_up[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
-	}
-	else {
-	  change_up[i] = -large_number;
-	}
-
-	// down
-	orig_d[col_number] = -1.;
-	retval = cur_estimator_->ComputeNullSpaceCurvature(
-            new_bounds, numCols, solution, new_x, z_L, z_U,
-	    numRows, lam, new_mults, orig_d, projected_d, gradLagTd, dTHLagd);
-	// ToDo
-	if (!retval) {
-	  printf("Problem with curvature estimator for down down.\n");
-	}
-
-	// Determine step size and predicted change
-	if (retval && projected_d[col_number] != 0.) {
-	  const double down_val = Max(b_L[col_number],floor(curr_val));
-	  double alpha = (down_val-curr_val)/projected_d[col_number];
-	  change_down[i] = alpha*gradLagTd + 0.5*alpha*alpha*dTHLagd;
-	}
-	else {
-	  change_down[i] = -large_number;
-	}
-
-	orig_d[col_number] = 0.;
-      }
-
-      // Determine most promising branching variable
-      best_i = -1;
-      best_change = -large_number;
-      for (int i=0; i<numStrong; i++) {
-	//DELETEME
-	printf("i = %d down = %15.6e up = %15.6e\n", i,change_down[i], change_up[i]);
-	// for now, we look for the best combined change
-	double change_min = Min(change_down[i], change_up[i]);
-	double change_max = Max(change_down[i], change_up[i]);
-	double change_comp = 2.*change_max + change_min;
-	// only use new value if significantly larger (rel_fact)
-	const Number rel_fact = 1e-6;
-	if (best_change*(1.+rel_fact) < change_comp) {
-	  best_change = change_comp;
-	  best_i = i;
-	}
-      }
-
+      // This will return -1 if an infeasible node was detected
+      best_i = fill_changes(solver, info, fixVariables,
+			    numStrong, change_down, change_up, best_way);
       if (best_i == -1) {
-	best_i = 0;
+	// Determine most promising branching variable
+	best_i = -1;
+	best_change = -large_number;
+	for (int i=0; i<numStrong; i++) {
+#ifdef VerboseCV
+	  printf("i = %d down = %15.6e up = %15.6e\n",
+		 i, change_down[i], change_up[i]);
+#endif
+	  // for now, we look for the best combined change
+	  double change_min = Min(change_down[i], change_up[i]);
+	  double change_max = Max(change_down[i], change_up[i]);
+	  double change_comp = 2.*change_max + change_min;
+	  // only use new value if significantly larger (rel_fact)
+	  const Number rel_fact = 1e-6;
+	  if (best_change*(1.+rel_fact) < change_comp) {
+	    best_change = change_comp;
+	    best_i = i;
+	  }
+	}
+
+	if (best_i == -1) {
+	  best_i = 0;
+	}
+	assert(best_i != -1);
       }
-      assert(best_i != -1);
+      delete [] change_up;
+      delete [] change_down;
     }
 
-    delete [] change_up;
-    delete [] change_down;
-    delete [] orig_d;
-    delete [] projected_d;
-
+#ifdef VerboseCV
     //DELETEME
     printf("best_i = %d  best_change = %15.6e\n", best_i, best_change);
+#endif
 
     bestObjectIndex_=list_[best_i];
     bestWhichWay_ = solver->object(bestObjectIndex_)->whichWay();

@@ -1,38 +1,35 @@
 // Copyright (C) 2006, International Business Machines
 // Corporation and others.  All Rights Reserved.
-#ifndef BonQPStrongBranching_H
-#define BonQPStrongBranching_H
+#ifndef BonCurvBranching_H
+#define BonCurvBranching_H
 
 #include "BonChooseVariable.hpp"
-#include "BonBranchingTQP.hpp"
+#include "BonCurvatureEstimator.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 
 namespace Bonmin {
 
-/** This class chooses a variable to branch on
-
-    This implementation solves the QP model for different branches
-    (strong branching).
+/** Implementation of BonChooseVariable for curvature-based braching.
 */
 
-class BonQPStrongBranching : public BonChooseVariable  {
+class BonCurvBranching : public BonChooseVariable  {
  
 public:
 
   /// Constructor from solver (so we can set up arrays etc)
-  BonQPStrongBranching (OsiTMINLPInterface * solver,
-			bool solve_nlp = false);
+  BonCurvBranching (OsiTMINLPInterface * solver);
 
   /// Copy constructor 
-  BonQPStrongBranching (const BonQPStrongBranching &);
+  BonCurvBranching (const BonCurvBranching &);
    
   /// Assignment operator 
-  BonQPStrongBranching & operator= (const BonQPStrongBranching& rhs);
+  BonCurvBranching & operator= (const BonCurvBranching& rhs);
 
   /// Clone
   virtual OsiChooseVariable * clone() const;
 
   /// Destructor
-  virtual ~BonQPStrongBranching ();
+  virtual ~BonCurvBranching ();
 
 protected:
   virtual int fill_changes(OsiSolverInterface * solver,
@@ -41,11 +38,11 @@ protected:
 			   int numStrong, double* change_down,
 			   double* change_up, int& best_way);  
 
-  bool solve_nlp_;
+  SmartPtr<CurvatureEstimator> cur_estimator_;
 
 private:
   /// Default Constructor 
-  BonQPStrongBranching ();
+  BonCurvBranching ();
 
 };
 

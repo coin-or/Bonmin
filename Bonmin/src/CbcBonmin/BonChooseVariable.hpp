@@ -11,18 +11,8 @@ namespace Bonmin {
 
 /** This class chooses a variable to branch on
 
-    The base class just chooses the variable and direction without strong branching but it 
-    has information which would normally be used by strong branching e.g. to re-enter
-    having fixed a variable but using same candidates for strong branching.
-
-    The flow is :
-    a) initialize the process.  This decides on strong branching list
-       and stores indices of all infeasible objects  
-    b) do strong branching on list.  If list is empty then just
-       choose one candidate and return without strong branching.  If not empty then
-       go through list and return best.  However we may find that the node is infeasible
-       or that we can fix a variable.  If so we return and it is up to user to call
-       again (after fixing a variable).
+    This is the base class for the branching rules in Bonmin (inherits
+    from OsiChooseVariable).
 */
 
 class BonChooseVariable : public OsiChooseVariable  {
@@ -37,9 +27,6 @@ public:
    
   /// Assignment operator 
   BonChooseVariable & operator= (const BonChooseVariable& rhs);
-
-  /// Clone
-  virtual OsiChooseVariable * clone() const;
 
   /// Destructor
   virtual ~BonChooseVariable ();
@@ -63,6 +50,7 @@ public:
      If we have a solution then we can pick up from goodObjectiveValue() and goodSolution()
      If fixVariables is true then 2,3,4 are all really same as problem changed
   */
+#define VerboseCV
   virtual int chooseVariable( OsiSolverInterface * solver, OsiBranchingInformation *info, bool fixVariables);
   /**  This is a utility function which does strong branching on
        a list of objects and stores the results in OsiHotInfo.objects.
@@ -79,12 +67,19 @@ public:
 
 #ifdef AWAWAWAW
   /// Given a candidate fill in useful information e.g. estimates
-  virtual void updateInformation( const OsiBranchingInformation *info,
-				  int branch, OsiHotInfo * hotInfo);
+  virtual void updateInformation(const OsiBranchingInformation *info,
+				 int branch, OsiHotInfo * hotInfo);
 #endif
 
 protected:
-  SmartPtr<CurvatureEstimator> cur_estimator_;
+  /// This method determines the predicted changes in the objective
+  /// function. It has to be implemented by any class that inherits
+  /// off of this class.
+  virtual int fill_changes(OsiSolverInterface * solver,
+			   OsiBranchingInformation *info,
+			   bool fixVariables,
+			   int numStrong, double* change_down,
+			   double* change_up, int& best_way) = 0;
 
 private:
   /// Default Constructor 
