@@ -53,7 +53,7 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
   // Create a QP (or NLP) problem based on the current solution
   OsiTMINLPInterface* tminlp_interface =
     dynamic_cast<OsiTMINLPInterface*> (solver);
-  const TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
+  TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
 
   SmartPtr<TMINLP2TNLP> branching_tqp;
   if (solve_nlp_) {
@@ -77,9 +77,11 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
 
   const Number large_number = COIN_DBL_MAX;
  
-  bool first_solve = true;
+  bool first_solve = true; // always use warm start...(?)
   SmartPtr<TNLPSolver> tqp_solver =
     tminlp_interface->solver()->clone();
+  CoinWarmStart* warmStart =
+    tminlp_interface->getWarmStart();
 
   for (int i=0; i<numStrong; i++) {
     int& index = list_[i];
@@ -96,6 +98,7 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
     //TODO: activate this: tqp_solver->enableWarmStart();
 
     // Solve Problem
+    tqp_solver->setWarmStart(warmStart, branching_tqp);
     TNLPSolver::ReturnStatus retstatus;
     if (first_solve) {
       retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
@@ -110,6 +113,7 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
       first_solve = false;
     }
     else if (retstatus == TNLPSolver::provenInfeasible) {
+      delete warmStart;
       best_way = 1;
       return i;
       change_up[i] = 0.;//large_number;
@@ -127,6 +131,7 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
     branching_tqp->SetVariableUpperBound(col_number, down_bnd);
 
     // Solve Problem
+    tqp_solver->setWarmStart(warmStart, branching_tqp);
     if (first_solve) {
       retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
     }
@@ -140,6 +145,7 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
       first_solve = false;
     }
     else if (retstatus == TNLPSolver::provenInfeasible) {
+      delete warmStart;
       best_way = 0;
       return i;
       // We try this for now - we should probably skip the rest of
@@ -153,6 +159,8 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
 
     branching_tqp->SetVariableUpperBound(col_number, curr_bnd);
   }
+
+  delete warmStart;
 
   return -1; // nothing infeasible detected
 }

@@ -42,9 +42,8 @@ IpoptWarmStart::IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
   int numcols = tnlp->num_variables();
   int numrows = tnlp->num_constraints();
   setSize(numcols,numrows);
-  values_.reserve(numcols+numrows);
-  // For now, we keep all this in here, but we probably want to remove
-  // it when we are happy with the new warmstarter (AW)
+  values_.reserve(numcols+numrows); //AW: Factor 2 is missing?
+
   double epsilon = 1e-05;//ipopt.getPushFact();
   const double * primals = tnlp->x_sol();
   const double * duals = tnlp->duals_sol();
@@ -149,8 +148,8 @@ IpoptWarmStart::flushPoint()
   if(values_.getNumElements() > 0)
     values_.clear();
 }
-void
 
+void
 IpoptWarmStartDiff::flushPoint()
 {
   if(diffValues_) {

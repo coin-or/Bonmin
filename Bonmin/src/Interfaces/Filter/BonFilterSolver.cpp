@@ -413,6 +413,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   //for(int i = 0 ; i < n ; i++) x[i] = 0;
   lam = new real [n+m];
   g = g_ = new real[n+m];
+#define InitializeAll
 #ifdef InitializeAll
   for(int i = 0 ; i < n+m ; i++) lam[i] = g_[i] = 0.; 
 #endif
@@ -605,34 +606,34 @@ FilterSolver::UnsolvedFilterError::solverName() const
 
 bool
 FilterSolver::setWarmStart(const CoinWarmStart * warm, 
-			   Ipopt::SmartPtr<TMINLP2TNLP> tnlp){
-  const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
-  fint size_hessian = nnz_h + tnlp->num_variables() + 2;
-  CoinCopyN(warmF->array(), warmF->size(), cached_->lws + size_hessian);
-  //DELETEME
-  for (int i=0; i<size_hessian; i++) {
-    printf("set[%3d] = %8d %8d\n",i,cached_->lws[i], cached_->hStruct_[i]);
+			   Ipopt::SmartPtr<TMINLP2TNLP> tnlp)
+{
+  if (IsNull(cached_)) {
+    cached_ = new cachedInfo(GetRawPtr(tnlp), options_);
   }
-  for(int i = 0 ; i < 14 ; i ++)
-    {
-      cached_->istat[i] = warmF->istat()[i];
-    }
-  return 1;
+
+  const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
+  //CoinCopyN(warmF->xArray(), warmF->xSize(), cached_->x);
+  const fint xsize = warmF->xSize();
+  real* x = cached_->x;
+  const real* xarray = warmF->xArray();
+  for (int i = 0; i<xsize; i++) {
+    x[i] = xarray[i];
+  }
+  CoinCopyN(warmF->lamArray(), warmF->lamSize(), cached_->lam);
+  CoinCopyN(warmF->lwsArray(), warmF->lwsSize(), cached_->lws);
+  for(int i = 0 ; i < 14 ; i ++) {
+    cached_->istat[i] = warmF->istat()[i];
+  }
+  return true;
 }
 
 CoinWarmStart *
-FilterSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
-  //Skip the first element which store the structure of the hessian (never change)
-   fint size_hessian = nnz_h + tnlp->num_variables() + 2;
-  //  std::cout<<"Size of hessian :"<<size_hessian<<std::endl;
-  fint * first = cached_->lws + size_hessian;
-
-  //DELETEME
-  for (int i=0; i<size_hessian; i++) {
-    printf("get[%3d] = %8d %8d\n",i,cached_->lws[i], cached_->hStruct_[i]);
-  }
-  
-  return new FilterWarmStart(cached_->maxiWk - size_hessian, first, cached_->istat);
+FilterSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
+{
+  return new FilterWarmStart(cached_->n, cached_->x,
+			     cached_->n+cached_->m, cached_->lam,
+			     cached_->maxiWk, cached_->lws, cached_->istat);
 }
 
 CoinWarmStart * 
