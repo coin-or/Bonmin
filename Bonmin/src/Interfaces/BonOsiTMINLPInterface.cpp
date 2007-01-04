@@ -1656,7 +1656,7 @@ OsiTMINLPInterface::getConstraintViolation(const double *x, const double obj)
   double norm = 0;
   for(int i = 0; i< numrows ; i++) {
     if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
-      double rowViolation;
+      double rowViolation = 0;
       if(rowLower[i] > -1e10)
          rowViolation = max(0.,rowLower[i] - g[i]);
 //      if(rowViolation  > 0.) rowViolation  /= fabs(rowLower[i]);
@@ -1826,6 +1826,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 
   delete[] g;
   delete [] cuts;
+  delete [] bindings;
 
   if(getObj)  // Get the objective cuts
   {
