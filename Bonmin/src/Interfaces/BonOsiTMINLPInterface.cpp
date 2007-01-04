@@ -1652,18 +1652,18 @@ OsiTMINLPInterface::getConstraintViolation(const double *x, const double obj)
     if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
       double rowViolation;
       if(rowLower[i] > -1e10)
-         rowViolation = max(0.,- rowLower[i] + g[i]);
+         rowViolation = max(0.,rowLower[i] - g[i]);
 //      if(rowViolation  > 0.) rowViolation  /= fabs(rowLower[i]);
       if(rowUpper[i] < 1e10);
-        rowViolation = max(rowViolation,- g[i] + rowUpper[i]);
+        rowViolation = max(rowViolation, g[i] - rowUpper[i]);
 //      if(rowViolation2 > 0.) rowViolation2 /= fabs(rowUpper[i]);
-      norm = max(rowViolation, norm);
+      norm = rowViolation > norm ? rowViolation : norm;
     }
   }
 
   double f;
-  tminlp_->eval_f(numcols, x, 0, f);
-  norm = max(norm, fabs(f - obj));
+  tminlp_->eval_f(numcols, x, 1, f);
+  norm =  fabs(f - obj) > norm ? fabs(f - obj) : norm;
 
   delete [] g;
   return norm;
@@ -1886,9 +1886,11 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
 
 
 void
-OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
+OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
+                                            bool solveNlp)
 {
-  initialSolve();
+  if(solveNlp)
+    initialSolve();
 
   CoinPackedMatrix mat;
   double * rowLow = NULL;

@@ -41,6 +41,7 @@ namespace Bonmin{
 			       double* change_down,
 			       double* change_up, int& best_way)
    {
+     std::cout<<"Start strong branching"<<std::endl;
      // get info about nlp solution and others
      const double * colsol = solver->getColSolution();
      const double * colLow = solver->getColLower();
@@ -50,7 +51,7 @@ namespace Bonmin{
      OsiTMINLPInterface * tminlpSi = dynamic_cast<OsiTMINLPInterface *>(solver);
 
      OsiClpSolverInterface lin;
-     tminlpSi->extractLinearRelaxation(lin, 1);
+     tminlpSi->extractLinearRelaxation(lin, 1, 0);
      lin.setDblParam(OsiDualObjectiveLimit, info->cutoff_);
      lin.resolve();
      CoinWarmStart * warm = lin.getWarmStart();
@@ -86,6 +87,7 @@ namespace Bonmin{
        }
        lin.setColUpper(colnum, saveBound);
      } 
+     std::cout<<"End strong branching"<<std::endl;
      delete warm;
      return return_value;
    }

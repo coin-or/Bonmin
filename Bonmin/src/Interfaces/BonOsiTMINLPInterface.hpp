@@ -806,7 +806,8 @@ class Messages : public CoinMessages
    * Solve the continuous relaxation and takes first-order outer-approximation constraints at the optimum.
    * The put everything in an OsiSolverInterface.
    */
-  virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1);
+  virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1,
+                                       bool solveNlp = 0);
 
   /** Get the outer approximation constraints at the current optimal point.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/

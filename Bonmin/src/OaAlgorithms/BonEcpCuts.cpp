@@ -33,13 +33,13 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
   double violation = nlp_->getConstraintViolation(
                      si.getColSolution(), si.getObjValue());
   std::cout<<"Constraint violation: "<<violation<<std::endl;
-  if(violation <= 1e-01)
+  if(violation <= 1e-02)
     return;
   solverManip * lpManip = NULL;
   bool infeasible = false;
   for(int i = 0 ; i < numRounds_ ; i++)
   {
-    if( violation > 1e-01)
+    if( violation > 1e-02)
     {
       int numberCuts =  - cs.sizeRowCuts();
       nlp_->getOuterApproximation(cs, si.getColSolution(), 1);
@@ -57,6 +57,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
         if(lpManip->si()->isProvenPrimalInfeasible())
         {
           infeasible = true;
+          std::cout<<"Stopping Ecp generation because problem became infeasible"<<std::endl;
           break;
         }
         violation =  nlp_->getConstraintViolation(

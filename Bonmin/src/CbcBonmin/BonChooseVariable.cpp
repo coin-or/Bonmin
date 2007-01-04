@@ -188,7 +188,7 @@ BonChooseVariable::chooseVariable(
 	best_i = -1;
 	best_change = -large_number;
 	for (int i=0; i<numStrong; i++) {
-	  if (bb_log_level_>4) {
+	  if (1 || bb_log_level_>4) {
 	    printf("i = %d down = %15.6e up = %15.6e\n",
 		   i, change_down[i], change_up[i]);
 	  }
@@ -214,7 +214,7 @@ BonChooseVariable::chooseVariable(
       delete [] change_down;
     }
 
-    if (bb_log_level_>3) {
+    if (1 || bb_log_level_>3) {
       printf("best_i = %d  best_change = %15.6e\n", best_i, best_change);
     }
 
