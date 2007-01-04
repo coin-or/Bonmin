@@ -43,7 +43,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
       int numberCuts =  - cs.sizeRowCuts();
       nlp_->getOuterApproximation(cs, si.getColSolution(), 1);
       numberCuts += cs.sizeRowCuts();
-      if(numberCuts > 0 && i + 1 < numRounds_){
+      if(numberCuts > 0 && (lp_ || i + 1 < numRounds_ )){
         if(lpManip==NULL) {
           if(lp_ == NULL)
             lpManip = new solverManip(si);
@@ -69,20 +69,24 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
     else break;
   }
   if(!infeasible){
-    lpManip->si()->resolve();
-    if(lpManip->si()->isProvenPrimalInfeasible())
-      objValue_ = 2e50;
-    else
-      objValue_ = lpManip->si()->getObjValue();}
-   else objValue_ = 2e50;
-  if(lpManip)
-  {
-    if(lp_ != NULL && lpManip != NULL)
-    {
-      lpManip->restore();
-    }
-    delete lpManip;
+    if(lpManip != NULL)
+      {
+	lpManip->si()->resolve();
+	if(lpManip->si()->isProvenPrimalInfeasible())
+	  objValue_ = 2e50;
+	else
+	  objValue_ = lpManip->si()->getObjValue();}
   }
+  else objValue_ = 2e50;
+  if(lpManip)
+    {
+      if(lp_ != NULL && lpManip != NULL)
+	{
+	  lpManip->restore();
+	}
+      
+      delete lpManip;
+    }
   //  std::cout<<"End ecp cut generation"<<std::endl;
   return;
 }

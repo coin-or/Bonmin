@@ -69,7 +69,16 @@ namespace Bonmin{
        lin.setColLower(colnum, newBound);
        lin.setWarmStart(warm);
        lin.resolve();
-       change_up[i] = ecp.doEcpRounds(lin, true) - curObj;
+       if(lin.isProvenPrimalInfeasible())
+	 {
+	   best_way = 1;
+	   return_value = i;
+	   break;
+	 }
+       if(maxCuttingPlaneIterations_ > 0)
+	 change_up[i] = ecp.doEcpRounds(lin, true) - curObj;
+       else
+	 change_up[i] = lin.getObjValue() - curObj;
        if(change_up[i] >= 1e50){//Problem is infeasible force branch
          best_way = 1;
          return_value = i;
@@ -82,7 +91,16 @@ namespace Bonmin{
        lin.setColUpper(colnum, newBound);
        lin.setWarmStart(warm);
        lin.resolve();
-       change_down[i] = ecp.doEcpRounds(lin, true) - curObj;
+       if(lin.isProvenPrimalInfeasible())
+	 {
+	   best_way = 0;
+	   return_value = i;
+	   break;
+	 }
+       else if(maxCuttingPlaneIterations_ > 0)
+	 change_down[i] = ecp.doEcpRounds(lin, true) - curObj;
+       else
+	 change_down[i] = lin.getObjValue() - curObj;
        if(change_down[i] >= 1e50){//Problem is infeasible force branch
          best_way = 0;
          return_value = i;
