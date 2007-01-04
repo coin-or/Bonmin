@@ -63,7 +63,7 @@ libbonminbb_la_LIBADD =
 am_libbonminbb_la_OBJECTS = BonCbc.lo BonCbcLpStrategy.lo \
 	BonCbcNlpStrategy.lo BonCbcNode.lo BonCbcParam.lo \
 	BonChooseVariable.lo BonQPStrongBranching.lo \
-	BonCurvBranching.lo
+	BonCurvBranching.lo BonLpStrongBranching.lo
 libbonminbb_la_OBJECTS = $(am_libbonminbb_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -332,7 +332,8 @@ libbonminbb_la_SOURCES = \
 	BonCbcParam.cpp BonCbcParam.hpp \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
 	BonQPStrongBranching.cpp BonQPStrongBranching.hpp \
-	BonCurvBranching.cpp BonCurvBranching.hpp
+	BonCurvBranching.cpp BonCurvBranching.hpp \
+        BonLpStrongBranching.cpp BonLpStrongBranching.hpp
 
 
 # This is for libtool (on Windows)
@@ -392,7 +393,8 @@ ASTYLE_FILES = \
 	BonCbcNode.cppbak BonCbcNode.hppbak \
 	BonChooseVariable.cppbak BonChooseVariable.hppbak \
 	BonQPStrongBranching.cppbak BonQPStrongBranching.hppbak \
-	BonCurvBranching.cppbak BonCurvBranching.hppbak
+	BonCurvBranching.cppbak BonCurvBranching.hppbak \
+        BonLpStrongBranching.hppbak BonLpStrongBranching.cppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -454,6 +456,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcParam.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonChooseVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvBranching.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLpStrongBranching.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQPStrongBranching.Plo@am__quote@
 
 .cpp.o:

@@ -10,8 +10,23 @@
 #include "BonEcpCuts.hpp"
 namespace Bonmin{
 
+double 
+EcpCuts::doEcpRounds(OsiSolverInterface &si, 
+                     bool leaveSiUnchanged){
+  OsiSolverInterface * saveLp = lp_;
+  lp_ = &si;
+  OsiCuts cs;
+  bool saveLeaveSi = leaveSiUnchanged_;
+  leaveSiUnchanged_ = leaveSiUnchanged;
+  generateCuts(si, cs);
+  lp_ = saveLp;
+  leaveSiUnchanged_ = saveLeaveSi;
+  return objValue_;
+}
+
 void
-EcpCuts::generateCuts(const OsiSolverInterface &si, OsiCuts & cs,
+EcpCuts::generateCuts(const OsiSolverInterface &si, 
+                      OsiCuts & cs,
                       const CglTreeInfo info) const
 {
   std::cout<<"Start ecp cut generation"<<std::endl;
@@ -20,19 +35,30 @@ EcpCuts::generateCuts(const OsiSolverInterface &si, OsiCuts & cs,
   std::cout<<"Constraint violation: "<<violation<<std::endl;
   if(violation <= 1e-01)
     return;
-  int numIt = 1; 
   solverManip * lpManip = NULL;
-  for(int i = 0 ; i < numIt ; i++)
+  bool infeasible = false;
+  for(int i = 0 ; i < numRounds_ ; i++)
   {
     if( violation > 1e-01)
     {
       int numberCuts =  - cs.sizeRowCuts();
       nlp_->getOuterApproximation(cs, si.getColSolution(), 1);
       numberCuts += cs.sizeRowCuts();
-      if(numberCuts > 0 && i + 1 < numIt){
-        if(lpManip==NULL) lpManip = new solverManip(si);
+      if(numberCuts > 0 && i + 1 < numRounds_){
+        if(lpManip==NULL) {
+          if(lp_ == NULL)
+            lpManip = new solverManip(si);
+          else
+            lpManip = new solverManip(lp_, true,true, 
+                                      false,false);
+        }
         lpManip->installCuts(cs,numberCuts);
         lpManip->si()->resolve();
+        if(lpManip->si()->isProvenPrimalInfeasible())
+        {
+          infeasible = true;
+          break;
+        }
         violation =  nlp_->getConstraintViolation(
                      lpManip->si()->getColSolution(), 
                      lpManip->si()->getObjValue());
@@ -43,7 +69,21 @@ EcpCuts::generateCuts(const OsiSolverInterface &si, OsiCuts & cs,
     }
     break;
   }
-  delete lpManip;
+  if(!infeasible){
+    lpManip->si()->resolve();
+    if(lpManip->si()->isProvenPrimalInfeasible())
+      objValue_ = 2e50;
+    else
+      objValue_ = lpManip->si()->getObjValue();}
+   else objValue_ = 2e50;
+  if(lpManip)
+  {
+    if(lp_ != NULL && lpManip != NULL)
+    {
+      lpManip->restore();
+    }
+    delete lpManip;
+  }
   std::cout<<"End ecp cut generation"<<std::endl;
   return;
 }

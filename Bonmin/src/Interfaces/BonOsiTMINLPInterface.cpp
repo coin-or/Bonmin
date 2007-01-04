@@ -465,7 +465,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     infty_(1e100)
 {}
 
-/** Constructor with given IpSolver and TMINLP */
+/** Constructor with given TNLPSolver and TMINLP */
 OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app):
     OsiSolverInterface(),
     tminlp_(NULL),
@@ -2322,9 +2322,9 @@ OsiTMINLPInterface::resolve()
 }
 
 
-////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 // Methods returning info on how the solution process terminated  //
-////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 /// Are there a numerical difficulties?
 bool OsiTMINLPInterface::isAbandoned() const
 {

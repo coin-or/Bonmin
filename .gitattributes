@@ -27,6 +27,8 @@ Bonmin/experimental/NotConvex/BonCouenneInterface.hpp -text
 Bonmin/experimental/NotConvex/Makefile.am -text
 Bonmin/experimental/NotConvex/Makefile.in -text
 Bonmin/inc/config_bonmin.h.in -text
+Bonmin/src/CbcBonmin/BonLpStrongBranching.cpp -text
+Bonmin/src/CbcBonmin/BonLpStrongBranching.hpp -text
 Bonmin/src/Interfaces/Ampl/Makefile.in -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.cpp -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.hpp -text

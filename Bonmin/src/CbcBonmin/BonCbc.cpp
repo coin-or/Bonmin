@@ -20,6 +20,7 @@
 // AW
 #include "BonCurvBranching.hpp"
 #include "BonQPStrongBranching.hpp"
+#include "BonLpStrongBranching.hpp"
 
 //OA machinery
 #include "BonDummyHeuristic.hpp"
@@ -417,21 +418,31 @@ namespace Bonmin
       branch.setChooseMethod(chooseVariable);
     }
     else if(par.varSelection == OsiTMINLPInterface::QP_STRONG_BRANCHING){
+      model.solver()->findIntegersAndSOS(false);
       BonQPStrongBranching chooseVariable(nlpSolver);
+      chooseVariable.setNumberStrong(model.numberStrong());
+      branch.setChooseMethod(chooseVariable);
+    }
+    else if(par.varSelection == OsiTMINLPInterface::LP_STRONG_BRANCHING){
+      model.solver()->findIntegersAndSOS(false);
+      LpStrongBranching chooseVariable(nlpSolver);
       chooseVariable.setNumberStrong(model.numberStrong());
       branch.setChooseMethod(chooseVariable);
     }
     else if(par.varSelection == OsiTMINLPInterface::NLP_STRONG_BRANCHING){
       const bool solve_nlp = true;
+      model.solver()->findIntegersAndSOS(false);
       BonQPStrongBranching chooseVariable(nlpSolver, solve_nlp);
       chooseVariable.setNumberStrong(model.numberStrong());
       branch.setChooseMethod(chooseVariable);
     }
     else if(par.varSelection == OsiTMINLPInterface::OSI_SIMPLE){
+      model.solver()->findIntegersAndSOS(false);
       OsiChooseVariable choose(model.solver());
       branch.setChooseMethod(choose);
     }
     else if(par.varSelection == OsiTMINLPInterface::OSI_STRONG){
+      model.solver()->findIntegersAndSOS(false);
       OsiChooseStrong choose(model.solver());
       choose.setNumberBeforeTrusted(par.minReliability);
       choose.setNumberStrong(par.numberStrong);
