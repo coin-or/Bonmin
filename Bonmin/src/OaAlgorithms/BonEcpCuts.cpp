@@ -29,10 +29,9 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
                       OsiCuts & cs,
                       const CglTreeInfo info) const
 {
-  std::cout<<"Start ecp cut generation"<<std::endl;
   double violation = nlp_->getConstraintViolation(
                      si.getColSolution(), si.getObjValue());
-  std::cout<<"Constraint violation: "<<violation<<std::endl;
+  //  std::cout<<"Constraint violation: "<<violation<<std::endl;
   if(violation <= 1e-02)
     return;
   solverManip * lpManip = NULL;
@@ -57,18 +56,17 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
         if(lpManip->si()->isProvenPrimalInfeasible())
         {
           infeasible = true;
-          std::cout<<"Stopping Ecp generation because problem became infeasible"<<std::endl;
+	  //      std::cout<<"Stopping Ecp generation because problem became infeasible"<<std::endl;
           break;
         }
         violation =  nlp_->getConstraintViolation(
                      lpManip->si()->getColSolution(), 
                      lpManip->si()->getObjValue());
-        std::cout<<"Constraint violation: "<<violation<<std::endl;
+	//        std::cout<<"Constraint violation: "<<violation<<std::endl;
          }
-      else
-        break;
+      else break;
     }
-    break;
+    else break;
   }
   if(!infeasible){
     lpManip->si()->resolve();
@@ -85,7 +83,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
     }
     delete lpManip;
   }
-  std::cout<<"End ecp cut generation"<<std::endl;
+  //  std::cout<<"End ecp cut generation"<<std::endl;
   return;
 }
 

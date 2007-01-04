@@ -9,12 +9,11 @@ namespace Bonmin {
   class LpStrongBranching : public BonChooseVariable {
 
  public:
-  
+    /** Default constructor. */
+ LpStrongBranching(OsiTMINLPInterface *si);
 
- /// Constructor from a solver
- LpStrongBranching(OsiTMINLPInterface * solver);
 
- /// Copy constructor
+    //Copy constructor
  LpStrongBranching(const LpStrongBranching &other);
 
  ///Assignment operator
@@ -26,8 +25,8 @@ namespace Bonmin {
  /// Destructor
  virtual ~LpStrongBranching();
 
- void setMaxCuttingPlaneIter_(int num){
-   maxCuttingPlaneIteration_ = num;
+ void setMaxCuttingPlaneIter(int num){
+   maxCuttingPlaneIterations_ = num;
  }
 
   /// This method determines the predicted changes in the objective
@@ -39,7 +38,7 @@ namespace Bonmin {
 			   int numStrong, double* change_down,
 			   double* change_up, int& best_way);
  private:
- int maxCuttingPlaneIteration_;
+ int maxCuttingPlaneIterations_;
 };
 
 }

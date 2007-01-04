@@ -80,6 +80,8 @@ namespace Bonmin
     int numberStrong;
     /** Minimum reliability before trust pseudo-costs.*/
     int minReliability;
+    /** Number of cutting plane iterations in lp strong branching.*/
+    int numEcpRounds;
     /** Global time limit. */
     double maxTime;
     /** Global node limit.*/

@@ -174,6 +174,12 @@ register_general_options
    0,8,
    "A value of 0 disables dynamic strong branching.");
 
+  roptions->AddLowerBoundedIntegerOption
+  ("number_ecp_rounds",
+   "Set the number of rounds of ecp in strong branching.",
+   0,5,
+   "");
+
   roptions->AddStringOption3("warm_start",
       "Select the warm start method",
       "optimum",

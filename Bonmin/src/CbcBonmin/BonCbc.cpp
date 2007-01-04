@@ -426,6 +426,7 @@ namespace Bonmin
     else if(par.varSelection == OsiTMINLPInterface::LP_STRONG_BRANCHING){
       model.solver()->findIntegersAndSOS(false);
       LpStrongBranching chooseVariable(nlpSolver);
+      chooseVariable.setMaxCuttingPlaneIter(par.numEcpRounds);
       chooseVariable.setNumberStrong(model.numberStrong());
       branch.setChooseMethod(chooseVariable);
     }

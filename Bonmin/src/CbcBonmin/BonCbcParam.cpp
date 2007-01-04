@@ -46,6 +46,7 @@ namespace Bonmin
     success &= Options->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     success &= Options->GetIntegerValue("number_strong_branch",numberStrong,"bonmin.");
     success &= Options->GetIntegerValue("number_before_trust", minReliability,"bonmin.");
+    success &= Options->GetIntegerValue("number_ecp_rounds", numEcpRounds,"bonmin.");
 
     success &=  Options->GetEnumValue("sos_constraints",disableSos,"bonmin.");
     // Robustness and non convex minlps
