@@ -609,6 +609,10 @@ FilterSolver::setWarmStart(const CoinWarmStart * warm,
   const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
   fint size_hessian = nnz_h + tnlp->num_variables() + 2;
   CoinCopyN(warmF->array(), warmF->size(), cached_->lws + size_hessian);
+  //DELETEME
+  for (int i=0; i<size_hessian; i++) {
+    printf("set[%3d] = %8d %8d\n",i,cached_->lws[i], cached_->hStruct_[i]);
+  }
   for(int i = 0 ; i < 14 ; i ++)
     {
       cached_->istat[i] = warmF->istat()[i];
@@ -622,6 +626,11 @@ FilterSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
    fint size_hessian = nnz_h + tnlp->num_variables() + 2;
   //  std::cout<<"Size of hessian :"<<size_hessian<<std::endl;
   fint * first = cached_->lws + size_hessian;
+
+  //DELETEME
+  for (int i=0; i<size_hessian; i++) {
+    printf("get[%3d] = %8d %8d\n",i,cached_->lws[i], cached_->hStruct_[i]);
+  }
   
   return new FilterWarmStart(cached_->maxiWk - size_hessian, first, cached_->istat);
 }
