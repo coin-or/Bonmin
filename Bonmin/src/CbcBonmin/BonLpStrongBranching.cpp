@@ -62,7 +62,7 @@ namespace Bonmin{
        int & index = list_[i];
        const OsiObject * object = solver->object(index);
        int colnum = object->columnNumber();
-       DBG_ASSERT(col_number != -1);
+       DBG_ASSERT(colnum != -1);
 
        double saveBound = colLow[colnum];
        double newBound = Min(ceil(colsol[colnum]), colUp[colnum]);
