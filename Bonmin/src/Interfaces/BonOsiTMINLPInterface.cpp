@@ -1826,7 +1826,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 
   delete[] g;
   delete [] cuts;
-  delete [] bindings;
+  delete [] binding;
 
   if(getObj)  // Get the objective cuts
   {
