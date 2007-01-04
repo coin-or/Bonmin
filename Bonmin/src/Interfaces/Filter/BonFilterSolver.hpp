@@ -80,9 +80,11 @@ public:
 
 
   virtual void enableWarmStart()
-  {if(Ipopt::IsValid(cached_)) cached_->ifail= -1;}
+  {//No options to be set
+  }
   virtual void disableWarmStart()
-  {if(Ipopt::IsValid(cached_)) cached_->ifail= 0;}
+  {//No options to be set
+  }
    //@}
 
   /// Virtual copy constructor
@@ -146,7 +148,7 @@ private:
 
   /** Registered Options */
   Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions_;
-  
+
 
 
   /** Cached information for reoptimizing. */
@@ -186,6 +188,9 @@ private:
     int * permutationHess_;
     /** Elapsed CPU time in last optimization. */
     double cpuTime_;
+    /** flag remembering if warm start information has been put into
+	cache */
+    bool use_warm_start_in_cache_;
 
 
     /** Constructor.*/
@@ -223,7 +228,8 @@ private:
      hStruct_(NULL),
      permutationJac_(NULL),
      permutationHess_(NULL),
-     cpuTime_(0)
+     cpuTime_(0),
+     use_warm_start_in_cache_(false)
     {}
 
     cachedInfo(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp,
@@ -261,7 +267,8 @@ private:
      hStruct_(NULL),
      permutationJac_(NULL),
      permutationHess_(NULL),
-     cpuTime_(0)   {
+     cpuTime_(0),
+     use_warm_start_in_cache_(false)   {
       initialize(tnlp, options);
     }
 
@@ -292,7 +299,7 @@ private:
       delete [] hStruct_;
       tnlp_ = NULL;
     }
-  };
+    };
 
   /** Cached information on last problem optimized for reoptimization. */
   Ipopt::SmartPtr<cachedInfo> cached_;

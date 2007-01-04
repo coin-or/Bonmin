@@ -282,9 +282,9 @@ FilterSolver::RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
 Ipopt::SmartPtr <TNLPSolver>
 FilterSolver::clone(){
   Ipopt::SmartPtr<FilterSolver> retval = new FilterSolver(true);
-  *retval->options_ = *options_;
-  retval->roptions_ = roptions_;
-  retval->journalist_ = journalist_;
+  *retval->options_ = *options_; // Copy the options
+  retval->roptions_ = roptions_; // only copy pointers of registered options
+  retval->journalist_ = journalist_; // and journalist
   return GetRawPtr(retval);
 }
 
@@ -326,8 +326,9 @@ FilterSolver::Initialize(std::istream &is){
 TNLPSolver::ReturnStatus 
 FilterSolver::OptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 {
-  cached_ = NULL;
-  cached_ = new cachedInfo(tnlp, options_);
+  if (IsNull(cached_) || !cached_->use_warm_start_in_cache_) {
+    cached_ = new cachedInfo(tnlp, options_);
+  }
   return callOptimizer();
 }
 
@@ -336,7 +337,6 @@ TNLPSolver::ReturnStatus
 FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 {
   assert(tnlp == cached_->tnlp_);
-  cached_->ifail = -1;
   //rescan bounds which may have changed
   assert(cached_->bounds);
   int n = cached_->n;
@@ -409,11 +409,12 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   //Starting point
   x = new real [n];
 
-  tnlp->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
+  //tnlp->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
+  use_warm_start_in_cache_ = false;
   //for(int i = 0 ; i < n ; i++) x[i] = 0;
   lam = new real [n+m];
   g = g_ = new real[n+m];
-#define InitializeAll
+  //#define InitializeAll
 #ifdef InitializeAll
   for(int i = 0 ; i < n+m ; i++) lam[i] = g_[i] = 0.; 
 #endif
@@ -522,6 +523,7 @@ TNLPSolver::ReturnStatus
 FilterSolver::callOptimizer()
 {
   cached_->optimize();
+
   TNLPSolver::ReturnStatus optimizationStatus;
   Ipopt::SolverReturn status;
   fint ifail = cached_->ifail;
@@ -573,9 +575,18 @@ FilterSolver::callOptimizer()
 void 
 FilterSolver::cachedInfo::optimize()
 {
+  if (use_warm_start_in_cache_) {
+    ifail = -1;
+    use_warm_start_in_cache_ = false;
+  }
+  else {
+    tnlp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
+    ifail = 0;
+  }
+
   cpuTime_ = - CoinCpuTime();
   fint cstype_len = 1;
-  rho = 10; 
+  rho = 10;
   F77_FUNC(filtersqp,FILTERSQP)(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk, 
 	     &maxiWk, &iprint, &nout, &ifail, &rho, x, 
 	     c, &f, &fmin, bounds, 
@@ -625,6 +636,7 @@ FilterSolver::setWarmStart(const CoinWarmStart * warm,
   for(int i = 0 ; i < 14 ; i ++) {
     cached_->istat[i] = warmF->istat()[i];
   }
+  cached_->use_warm_start_in_cache_ = true;
   return true;
 }
 

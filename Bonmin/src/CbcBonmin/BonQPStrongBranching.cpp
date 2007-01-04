@@ -6,6 +6,7 @@
 #endif
 
 #include "BonQPStrongBranching.hpp"
+#include "BonFilterSolver.hpp"
 
 namespace Bonmin {
 
@@ -77,17 +78,26 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
 
   const Number large_number = COIN_DBL_MAX;
  
-  bool first_solve = true; // always use warm start...(?)
+  bool first_solve = true;
   SmartPtr<TNLPSolver> tqp_solver =
     tminlp_interface->solver()->clone();
-  CoinWarmStart* warmStart =
-    tminlp_interface->getWarmStart();
+  // Get a warm start object from the node just solved
+  CoinWarmStart* warmStart;
+  FilterSolver* filter_solver =
+    dynamic_cast<FilterSolver*> (tminlp_interface->solver());
+  if (filter_solver) {
+    warmStart = filter_solver->getWarmStart(tminlp2tnlp);
+  }
+  else {
+    warmStart = NULL;
+  }
 
   for (int i=0; i<numStrong; i++) {
     int& index = list_[i];
     const OsiObject * object = solver->object(index);
     int col_number = object->columnNumber();
     DBG_ASSERT(col_number != -1);
+    const double& cutoff = info->cutoff_;
 
     // up
     Number curr_bnd = branching_tqp->x_l()[col_number];
@@ -95,10 +105,11 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
 
     branching_tqp->SetVariableLowerBound(col_number, up_bnd);
 
-    //TODO: activate this: tqp_solver->enableWarmStart();
-
     // Solve Problem
-    tqp_solver->setWarmStart(warmStart, branching_tqp);
+    tqp_solver->enableWarmStart();
+    if (warmStart) {
+      tqp_solver->setWarmStart(warmStart, branching_tqp);
+    }
     TNLPSolver::ReturnStatus retstatus;
     if (first_solve) {
       retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
@@ -106,18 +117,25 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
     else {
       retstatus = tqp_solver->ReOptimizeTNLP(GetRawPtr(branching_tqp));
     }
-	
+
     if (retstatus == TNLPSolver::solvedOptimal ||
 	retstatus == TNLPSolver::solvedOptimalTol) {
-      change_up[i] = branching_tqp->obj_value() - curr_obj;
+      const Number& new_obj = branching_tqp->obj_value();
+      if (new_obj > cutoff) {
+	if (bb_log_level_>3) {
+	  printf("Declaring branch infeasible because new_obj = %e and cutoff = %e\n",new_obj, cutoff);
+	}
+	delete warmStart;
+	best_way = 1;
+	return i;
+      }
+      change_up[i] = new_obj - curr_obj;
       first_solve = false;
     }
     else if (retstatus == TNLPSolver::provenInfeasible) {
       delete warmStart;
       best_way = 1;
       return i;
-      change_up[i] = 0.;//large_number;
-      first_solve = false;
     }
     else {
       change_up[i] = -large_number;
@@ -131,7 +149,9 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
     branching_tqp->SetVariableUpperBound(col_number, down_bnd);
 
     // Solve Problem
-    tqp_solver->setWarmStart(warmStart, branching_tqp);
+    if (warmStart) {
+      tqp_solver->setWarmStart(warmStart, branching_tqp);
+    }
     if (first_solve) {
       retstatus = tqp_solver->OptimizeTNLP(GetRawPtr(branching_tqp));
     }
@@ -141,17 +161,22 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
 
     if (retstatus == TNLPSolver::solvedOptimal ||
 	retstatus == TNLPSolver::solvedOptimalTol) {
-      change_down[i] = branching_tqp->obj_value() - curr_obj;
+      const Number& new_obj = branching_tqp->obj_value();
+      if (new_obj > cutoff) {
+	if (bb_log_level_>3) {
+	  printf("Declaring branch infeasible because new_obj = %e and cutoff = %e\n",new_obj, cutoff);
+	}
+	delete warmStart;
+	best_way = 0;
+	return i;
+      }
+      change_down[i] = new_obj - curr_obj;
       first_solve = false;
     }
     else if (retstatus == TNLPSolver::provenInfeasible) {
       delete warmStart;
       best_way = 0;
       return i;
-      // We try this for now - we should probably skip the rest of
-      // the tests
-      change_down[i] = 0.;//large_number;
-      first_solve = false;
     }
     else {
       change_down[i] = -large_number;

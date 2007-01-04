@@ -16,7 +16,8 @@ BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   SmartPtr<TNLPSolver> tnlp_solver =
     dynamic_cast<TNLPSolver *> (solver->solver());
   DBG_ASSERT(IsValid(tnlp_solver));
-  SmartPtr<Journalist> jnlst_ = tnlp_solver->Jnlst();
+  jnlst_ = tnlp_solver->Jnlst();
+  DBG_ASSERT(IsValid(jnlst_));
   SmartPtr<OptionsList> options = tnlp_solver->Options();
 
   options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
@@ -27,6 +28,7 @@ BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
 {
   jnlst_ = rhs.jnlst_;
   bb_log_level_ = rhs.bb_log_level_;
+  DBG_ASSERT(IsValid(jnlst_));
 }
 
 BonChooseVariable &

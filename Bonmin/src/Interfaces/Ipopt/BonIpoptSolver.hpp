@@ -152,6 +152,9 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   */
   int warmStartStrategy_;
 
+  /** flag remembering if we want to use warm start option */
+  bool enable_warm_start_;
+
   //name of solver (Ipopt)
   static std::string  solverName_;
 };

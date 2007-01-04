@@ -994,6 +994,8 @@ protected:
   double infty_;
   /** status of last optimization. */
   TNLPSolver::ReturnStatus optimization_status_;
+  /** Flag indicating if the warm start methods actually do something. \TODO: FIX TO OPTION */
+  bool expose_warm_start_;
 };
 }
 #endif

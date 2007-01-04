@@ -468,7 +468,8 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     nNonLinear_(0),
     tiny_(1e-8),
     veryTiny_(1e-20),
-    infty_(1e100)
+    infty_(1e100),
+    expose_warm_start_(false)
 {}
 
 /** Constructor with given TNLPSolver and TMINLP */
@@ -509,7 +510,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app)
     nNonLinear_(0),
     tiny_(1e-08),
     veryTiny_(1e-17),
-    infty_(1e100)
+    infty_(1e100),
+    expose_warm_start_(false)
 {
   app_ = app->clone();
 
@@ -559,7 +561,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
     nNonLinear_(0),
     tiny_(1e-08),
     veryTiny_(1e-17),
-    infty_(1e100)
+    infty_(1e100),
+    expose_warm_start_(false)
 {
   allocateTMINLP(tminlp,app);
 }
@@ -626,7 +629,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     nNonLinear_(0),
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_),
-    infty_(source.infty_)
+    infty_(source.infty_),
+    expose_warm_start_(source.expose_warm_start_)
 {
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
@@ -738,7 +742,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
       tiny_ = rhs.tiny_;
       veryTiny_ = rhs.veryTiny_;
       infty_ = rhs.infty_;
-
+      expose_warm_start_ = rhs.expose_warm_start_;
 
     }
     else {
@@ -1385,14 +1389,26 @@ OsiTMINLPInterface::getEmptyWarmStart () const
   /** Get warmstarting information */
 CoinWarmStart* 
 OsiTMINLPInterface::getWarmStart() const
-{return app_->getWarmStart(problem_);}
+{
+  if (expose_warm_start_) {
+    return app_->getWarmStart(problem_);
+  }
+  else {
+    return getEmptyWarmStart();
+  }
+}
   /** Set warmstarting information. Return true/false depending on whether
       the warmstart information was accepted or not. */
 bool 
 OsiTMINLPInterface::setWarmStart(const CoinWarmStart* warmstart)
 {
   hasBeenOptimized_ = false;
-  return app_->setWarmStart(warmstart, problem_);
+  if (expose_warm_start_) {
+    return app_->setWarmStart(warmstart, problem_);
+  }
+  else {
+    return true;
+  }
 }
 
 /** Set the index-th variable to be a continuous variable */
