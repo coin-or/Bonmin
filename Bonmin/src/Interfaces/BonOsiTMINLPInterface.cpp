@@ -2128,10 +2128,11 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
     si.addRow(objCut, lb, ub);
   }
   delete [] obj;
-
-  app_->enableWarmStart();
-  setColSolution(problem()->x_sol());
-  setRowPrice(problem()->duals_sol());
+  
+  if(solveNlp){
+   app_->enableWarmStart();
+   setColSolution(problem()->x_sol());
+   setRowPrice(problem()->duals_sol());}
 
 }
 

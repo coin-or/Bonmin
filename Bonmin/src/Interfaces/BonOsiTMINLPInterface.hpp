@@ -807,7 +807,7 @@ class Messages : public CoinMessages
    * The put everything in an OsiSolverInterface.
    */
   virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1,
-                                       bool solveNlp = 0);
+                                       bool solveNlp = 1);
 
   /** Get the outer approximation constraints at the current optimal point.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
