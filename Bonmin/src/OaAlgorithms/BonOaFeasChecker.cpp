@@ -56,7 +56,7 @@ namespace Bonmin
    OsiSolverInterface * lp = lpManip.si();
    int numcols = lp->getNumCols();
     
-   double milpBound = cutoff;
+   double milpBound = -DBL_MAX;
    int numberPasses = 0;
    while (isInteger && feasible ) {
      numberPasses++;
