@@ -19,7 +19,7 @@
 
 // reallocates space for buffer buf if n is a multiple of SIZE_MALLOC
 // (needs to be called each time a new element is introduced in buf)
-
+/*
 extern "C" {
   void Reallocate (void **buf, int n, int size) {
 
@@ -27,10 +27,10 @@ extern "C" {
       *buf = realloc (*buf, (n + SIZE_MALLOC) * size);
   }
 }
-
+*/
 
 // updates problem_'s internal bounds based on user bounds
-
+/*
 void CouenneCutGenerator::updateBounds (CouNumber *curlb, 
 					CouNumber *curub) {
 
@@ -55,7 +55,7 @@ void CouenneCutGenerator::updateBounds (CouNumber *curlb,
     problem_ -> Ub (ind) = (*(v -> Ub ())) ();
   }
 }
-
+*/
 
 // Return a set of cuts that tighten convexification.
 //
@@ -67,9 +67,51 @@ void CouenneCutGenerator::updateBounds (CouNumber *curlb,
 int CouenneCutGenerator::updateConv (CouNumber *curx, 
 				     CouNumber *curlb, 
 				     CouNumber *curub) {
+
+  if (!bonCs_) {
+
+    // This cut generator has been called through updateConv (really?
+    // :-) and not through generateCuts, therefore we need to store a
+    // OsiSolverInterface somewhere in order to call generateCuts. But
+    // first of all, allocate space for bonCs_
+
+    bonCs_ = new OsiCuts;
+
+    // now, create a fake OsiSolverInterface that only needs to
+    // contain the value of variables and bounds
+
+    bonOs_ = new OsiClpSolverInterface;
+  }
+  else {
+
+    // Bonmin is calling this for the second time at least, hence we
+    // have to get rid of all cuts contained in the OsiCuts bonCs_
+    // before filling it with the new ones.
+
+    for (int i = bonCs_ -> sizeRowCuts (); i--;)
+      bonCs_ -> eraseRowCut (i);
+  }
+
+  // ok, now let's just call generateCuts and fill the cuts vector
+  // with what we are returned
+
+  generateCuts (*bonOs_, *bonCs_);
+
   // delete all cuts in the pool
   cleanup ();
 
+  int ncuts = bonCs_ -> sizeRowCuts ();
+
+  if (ncuts) {
+
+    pool_ = (OsiRowCut **) realloc (pool_, ncuts * sizeof (OsiRowCut *));
+      for (int i = 0; i<ncuts; i++)
+	pool_ [i] = bonCs_ -> rowCutPtr (i);
+  }
+
+  return ncuts;
+
+  /*
   // update value of bounds and variables
   expression::update (curx, curlb, curub);
 
@@ -160,4 +202,5 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     firstcall_ = false;
 
   return ncuts_;
+  */
 }

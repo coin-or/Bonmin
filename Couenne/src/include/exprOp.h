@@ -101,6 +101,6 @@ inline CouNumber exprOp::operator () () {
 
 //
 
-void convert_monomial (expression *, expression *&, int &);
+//void convert_monomial (expression *, expression *&, int &);
 
 #endif

@@ -7,17 +7,12 @@
  */
 
 #include <CouenneTypes.h>
-
 #include <exprCos.h>
-#include <exprClone.h>
 #include <exprAux.h>
-#include <exprSum.h>
-#include <exprSub.h>
-
 #include <CouenneCutGenerator.h>
 
 // construct under-estimator for cosine expression w = cos x
-
+/*
 int exprCos::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -117,9 +112,9 @@ int exprCos::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 3;
 }
+*/
 
-
-// generate convexification cut for constraint w = this
+// generate convexification cut for constraint w = cos (this)
 
 void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {

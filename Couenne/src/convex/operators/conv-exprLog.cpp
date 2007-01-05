@@ -17,7 +17,7 @@
 // Lower convexification of exponential consists in (the north part
 // of) the half-space defined by the segment from the point
 // (lb,log(lb)) to the point (ub,log(ub))
-
+/*
 int exprLog::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 		     int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -74,7 +74,7 @@ int exprLog::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return ns;
 }
-
+*/
 
 #define LOG_STEP 10
 #define LOG_SCALE 1e-20
@@ -94,8 +94,8 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   bool check = cg -> isFirst () || !(cg -> addViolated ());
 
-  CouNumber *coeff;
-  int       *index;
+  //  CouNumbers *coeff;
+  //  int       *index;
   OsiRowCut *cut;
 
   int w_ind = aux       -> Index ();
@@ -110,26 +110,28 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     if ((u < COUENNE_INFINITY - 1) && 
 	(check || ((w-log(l) * (u-l) < (x-l) * log(u)*log(l) - COUENNE_EPS)))) {
 
-      cut   = new OsiRowCut;
-      coeff = new CouNumber [2];
-      index = new int       [2];
+      //      cut   = new OsiRowCut;
+      //      coeff = new CouNumber [2];
+      //      index = new int       [2];
 
       CouNumber dx   = u-l;
       CouNumber logu = log (u);
       CouNumber dw   = logu - log (l);
 
+      if ((cut = cg -> createCut (dx*logu - u*dw, +1, w_ind, dx, x_ind, -dw)))
+	cs.insert (cut);
+      /*
       coeff [0] =  dx; index [0] = w_ind;
       coeff [1] = -dw; index [1] = x_ind;
 
-      cut -> setLb (dx*logu - u*dw);
+      cut -> setLb ();
       cut -> setRow (2, index, coeff);
 
       printf ("Log lower: "); cut -> print ();
-
-      cs.insert (cut);
+      */
     }
 
-  // add tangent points: first choose sampling points
+  // fix bound interval (unless you like infinite coefficients)
 
   int ns = cg -> nSamples ();
 
@@ -142,6 +144,11 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   if (x <= COUENNE_EPS)
     l = LOG_SCALE;
 
+  // add upper envelope
+
+  cg -> addEnvelope (cs, -1, log, inv, w_ind, x_ind, x, l, u);
+
+  /*
   if ((cg -> ConvType () == UNIFORM_GRID) || cg -> isFirst ()) {
 
     // choose sampling points. If unbounded, re-bound using a rule of
@@ -179,4 +186,5 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       addTangent (cs, w_ind, x_ind, sample, log (sample), 1./sample, -1);
     }
   }
+  */
 }

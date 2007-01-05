@@ -35,6 +35,8 @@ libCouenne_la_SOURCES = \
 	expression/expression.cpp \
 	simplify/simplifiers.cpp \
 	simplify/simplify.cpp \
+	convex/addEnvelope.cpp \
+	convex/createCuts.cpp \
 	convex/conv-exprOp.cpp \
 	convex/conv-exprUnary.cpp \
 	convex/operators/conv-exprDiv.cpp \
@@ -84,9 +86,12 @@ endif
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include/operators` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc`
 

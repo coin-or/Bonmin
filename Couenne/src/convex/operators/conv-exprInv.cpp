@@ -46,7 +46,7 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 
 
 // construct estimator for convex part of the inverse of an expression
-
+/*
 int exprInv::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
   int ns = nSamples ();
@@ -174,8 +174,15 @@ int exprInv::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 1;
 }
+*/
 
 #define MIN_DENOMINATOR 1e-10
+
+inline CouNumber oppInvSqr (CouNumber x) {
+  CouNumber invx = inv (x); 
+  return (- invx * invx);
+}
+//unary_function oppInvSqr;
 
 // generate convexification cut for constraint w = this
 
@@ -207,6 +214,9 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   CouNumber x = (*xe)  (), xl = (*xle) (), xu = (*xue) (),
             w = (*aux) (), wl = (*wle) (), wu = (*wue) ();
 
+  int w_ind = aux       -> Index (), 
+      x_ind = argument_ -> Index ();
+
   // choose sampling
   // points. If unbounded, re-bound using a rule of thumb where
 
@@ -229,10 +239,13 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       u = (u<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
   }
 
-  int sign = (l > 0) ? -1 : +1;
+  int sign = (l > 0) ? +1 : -1;
 
   // bound
 
+  cg -> addEnvelope (cs, sign, inv, oppInvSqr, w_ind, x_ind, x, l, u);
+
+  /*
   if ((cg -> ConvType () == UNIFORM_GRID) || cg -> isFirst ()) {
 
     // add tangent at each sampling point
@@ -271,4 +284,5 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 		  sample, inv (sample), - inv (sample*sample), sign);
     }
   }
+  */
 }

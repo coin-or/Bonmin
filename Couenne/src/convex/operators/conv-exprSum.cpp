@@ -11,6 +11,7 @@
 #include <exprConst.h>
 
 #include <CouenneProblem.h>
+#include <CouenneCutGenerator.h>
 
 
 // Create standard formulation of sums of expressions
@@ -29,7 +30,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 // If this is a sum, no need to approximate from below or above but we
 // rather add this as a linear constraints (all elements of arglist_
 // are of the type c*x or x*c or x)
-
+/*
 int exprSum::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -60,12 +61,15 @@ int exprSum::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 1;
 }
-
+*/
 
 // generate convexification cut for constraint w = this
 
 void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+
+  if (!(cg -> isFirst ()))
+    return;
 
   CouNumber *coeff = new CouNumber [nargs_ + 1];
   int       *index = new int       [nargs_ + 1];

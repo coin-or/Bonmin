@@ -24,6 +24,7 @@ inline bool areSameVariables (expression *v1, expression *v2) {
 	  && (v1 -> Index () == v2 -> Index ()));
 }
 
+
 // Create standard formulation of this expression
 
 exprAux *exprMul::standardize (CouenneProblem *p) {
@@ -86,7 +87,7 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
 
 // construct linear under-estimator for expression within problem *p
 // (p is used to add convexification constraints)
-
+/*
 int exprMul::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -170,7 +171,7 @@ int exprMul::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 2;
 }
-
+*/
 
 // generate convexification cut for constraint w = this
 
@@ -186,11 +187,11 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   expression *xe = arglist_ [0];
   expression *ye = arglist_ [1];
 
-  CouNumber *coeff;
-  int       *index;
   OsiRowCut *cut;
 
-  bool check = cg -> isFirst () || !(cg -> addViolated ());
+  int w_ind = w  -> Index (), 
+      x_ind = xe -> Index (), 
+      y_ind = ye -> Index ();
 
   // if expression is c*x, where c is constant, everything gets
   // easier...
@@ -206,42 +207,21 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	// strange case: w = c1*c2, should have been dealt with in
 	// simplify, but who knows...
 
-	coeff = new CouNumber [1];
-	index = new int       [1];
-	cut   = new OsiRowCut;
-
-	coeff [0] = 1;  
-	index [0] = w -> Index ();
-
-	CouNumber rhs = xe -> Value () * ye -> Value ();
-
-	cut -> setUb (rhs);
-	cut -> setLb (rhs);
-	cut -> setRow (1, index, coeff);
+	if ((cut = cg -> createCut (xe -> Value () * ye -> Value (), 
+				    0, w_ind, CouNumber (1.))))
+	  cs.insert (cut);
       }
       else {
 
 	CouNumber coe;
 	int ind;
 
-	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = xe -> Index ();}
-	else                        {coe = xe -> Value (); ind = ye -> Index ();}
+	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = x_ind;}
+	else                        {coe = xe -> Value (); ind = y_ind;}
 
-	coeff = new CouNumber [2];
-	index = new int       [2];
-	cut   = new OsiRowCut;
-
-	coeff [0] = -1;  index [0] = w  -> Index ();
-	coeff [1] = coe; index [1] = ind;
-
-	cut -> setUb (0);
-	cut -> setLb (0);
-	cut -> setRow (2, index, coeff);
+	if ((cut = cg -> createCut (CouNumber (0), +1, w_ind, CouNumber (-1.), ind, coe)))
+	  cs.insert (cut);
       }
-
-      printf ("Mul cx: "); cut -> print ();
-
-      cs.insert (cut);
     }
 
     return;
@@ -251,10 +231,10 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   ye -> getBounds (yle, yue);
   w  -> getBounds (wle, wue);
 
-  CouNumber x  = (*xe) (), xl = (*xle) (), xu = (*xue) (),
-            y  = (*ye) (), yl = (*yle) (), yu = (*yue) (),
-            w0 = (*w) ();
+  CouNumber xl = (*xle) (), xu = (*xue) (), 
+            yl = (*yle) (), yu = (*yue) ();
 
+  /*  
   printf ("Mult: x = ");
   xe  -> print (std::cout); printf (" [");
   xle -> print (std::cout); printf (",");
@@ -265,6 +245,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   yue -> print (std::cout); printf ("];   w = ");
 
   w   -> print (std::cout); printf ("\n");
+  */
 
   // Add McCormick convexification cuts:
   //
@@ -274,87 +255,39 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 3) w <= yl x + xu y - yl xu
   // 4) w <= yu x + xl y - yu xl
 
+
   // 1) 
 
   if ((yl > - COUENNE_INFINITY + 1) && (xl > - COUENNE_INFINITY + 1) &&
-      (check || (w0 < yl*x + xl*y - yl*xl - COUENNE_EPS))) {
+      (cut = cg -> createCut (yl*xl, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl))) {
 
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = w  -> Index ();
-    coeff [1] = yl; index [1] = xe -> Index ();
-    coeff [2] = xl; index [2] = ye -> Index ();
-
-    cut -> setUb (yl * xl);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Multiply1: "); cut -> print ();
-
+    printf ("--- cut 1: "); cut -> print ();
     cs.insert (cut);
   }
 
   // 2) 
 
   if ((yu < COUENNE_INFINITY - 1) && (xu < COUENNE_INFINITY - 1) &&
-      (check || (w0 < yu*x + xu*y - yu*xu - COUENNE_EPS))) {
+      (cut = cg -> createCut (yu*xu, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu))) {
 
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = w  -> Index ();
-    coeff [1] = yu; index [1] = xe -> Index ();
-    coeff [2] = xu; index [2] = ye -> Index ();
-
-    cut -> setUb (yu * xu);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Multiply2: "); cut -> print ();
-
+    printf ("--- cut 2: "); cut -> print ();
     cs.insert (cut);
   }
 
   // 3) 
 
   if ((yl > - COUENNE_INFINITY + 1) && (xu < COUENNE_INFINITY - 1) &&
-      (check || (w0 > yl*x + xu*y - yl*xu + COUENNE_EPS))) {
+      (cut = cg -> createCut (yl*xu, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu))) {
 
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = w  -> Index ();
-    coeff [1] = yl; index [1] = xe -> Index ();
-    coeff [2] = xu; index [2] = ye -> Index ();
-
-    cut -> setLb (yl * xu);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Multiply3: "); cut -> print ();
-
+    printf ("--- cut 3: "); cut -> print ();
     cs.insert (cut);
   }
 
   // 4) 
 
   if ((yu < COUENNE_INFINITY - 1) && (xl > - COUENNE_INFINITY + 1) &&
-      (check || (w0 > yu*x + xl*y - yu*xl + COUENNE_EPS))) {
-
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = w  -> Index ();
-    coeff [1] = yu; index [1] = xe -> Index ();
-    coeff [2] = xl; index [2] = ye -> Index ();
-
-    cut -> setLb (yu * xl);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Multiply4: "); cut -> print ();
-
+      (cut = cg -> createCut (yu*xl, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl))) {
+    printf ("--- cut 4: "); cut -> print ();
     cs.insert (cut);
   }
 }

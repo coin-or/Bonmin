@@ -37,7 +37,7 @@ exprAux *exprUnary::standardize (CouenneProblem *p) {
 
 // Method to create a linear, convex (concave) hull of a given
 // function that is convex (concave)
-
+/*
 void exprUnary::hull (expression **& coeff, expression **& rhs) {
 
   expression *lba, *uba;
@@ -98,3 +98,5 @@ void exprUnary::segment (expression*& coeff, expression*& rhs) {
 				  new exprMul (mirror (uba), new exprClone (lba))),
 		     new exprSub (new exprClone (uba), new exprClone (lba)));
 }
+*/
+

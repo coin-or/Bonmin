@@ -87,7 +87,8 @@ am__libCouenne_la_SOURCES_DIST = expression/operators/exprCos.cpp \
 	expression/operators/exprMax.cpp \
 	expression/operators/exprMin.cpp expression/exprVar.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/conv-exprOp.cpp \
+	simplify/simplify.cpp convex/addEnvelope.cpp \
+	convex/createCuts.cpp convex/conv-exprOp.cpp \
 	convex/conv-exprUnary.cpp convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -110,14 +111,15 @@ am__libCouenne_la_SOURCES_DIST = expression/operators/exprCos.cpp \
 am_libCouenne_la_OBJECTS = exprCos.lo exprDiv.lo exprExp.lo exprInv.lo \
 	exprLog.lo exprMul.lo exprOpp.lo exprPow.lo exprSin.lo \
 	exprSub.lo exprSum.lo exprMax.lo exprMin.lo exprVar.lo \
-	expression.lo simplifiers.lo simplify.lo conv-exprOp.lo \
-	conv-exprUnary.lo conv-exprDiv.lo conv-exprMul.lo \
-	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
-	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
-	conv-exprInv.lo conv-exprSin.lo conv-exprCos.lo trigGenCuts.lo \
-	conv-exprExp.lo conv-exprLog.lo add_tangent.lo \
-	CouenneCutGenerator.lo problem.lo constraint.lo update_conv.lo \
-	rootQ.lo $(am__objects_1)
+	expression.lo simplifiers.lo simplify.lo addEnvelope.lo \
+	createCuts.lo conv-exprOp.lo conv-exprUnary.lo conv-exprDiv.lo \
+	conv-exprMul.lo conv-exprOpp.lo conv-exprPow.lo \
+	conv-exprPow-getBounds.lo conv-exprPow-envelope.lo \
+	conv-exprSub.lo conv-exprSum.lo conv-exprInv.lo \
+	conv-exprSin.lo conv-exprCos.lo trigGenCuts.lo conv-exprExp.lo \
+	conv-exprLog.lo add_tangent.lo CouenneCutGenerator.lo \
+	problem.lo constraint.lo update_conv.lo rootQ.lo \
+	$(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -322,7 +324,8 @@ libCouenne_la_SOURCES = expression/operators/exprCos.cpp \
 	expression/operators/exprMax.cpp \
 	expression/operators/exprMin.cpp expression/exprVar.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/conv-exprOp.cpp \
+	simplify/simplify.cpp convex/addEnvelope.cpp \
+	convex/createCuts.cpp convex/conv-exprOp.cpp \
 	convex/conv-exprUnary.cpp convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -361,8 +364,10 @@ libCouenne_la_LDFLAGS = $(LT_LDFLAGS)
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include/operators` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` -I`$(CYGPATH_W) \
-	$(OSIOBJDIR)/inc` -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
+	$(CGLOBJDIR)/inc` -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` -I`$(CYGPATH_W) \
 	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(COINUTILSOBJDIR)/inc` $(am__append_2)
 
@@ -487,6 +492,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addEnvelope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/add_tangent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprCos.Plo@am__quote@
@@ -504,6 +510,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprUnary.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprCos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprExp.Plo@am__quote@
@@ -703,6 +710,20 @@ simplify.lo: simplify/simplify.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='simplify/simplify.cpp' object='simplify.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o simplify.lo `test -f 'simplify/simplify.cpp' || echo '$(srcdir)/'`simplify/simplify.cpp
+
+addEnvelope.lo: convex/addEnvelope.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT addEnvelope.lo -MD -MP -MF "$(DEPDIR)/addEnvelope.Tpo" -c -o addEnvelope.lo `test -f 'convex/addEnvelope.cpp' || echo '$(srcdir)/'`convex/addEnvelope.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/addEnvelope.Tpo" "$(DEPDIR)/addEnvelope.Plo"; else rm -f "$(DEPDIR)/addEnvelope.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/addEnvelope.cpp' object='addEnvelope.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o addEnvelope.lo `test -f 'convex/addEnvelope.cpp' || echo '$(srcdir)/'`convex/addEnvelope.cpp
+
+createCuts.lo: convex/createCuts.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT createCuts.lo -MD -MP -MF "$(DEPDIR)/createCuts.Tpo" -c -o createCuts.lo `test -f 'convex/createCuts.cpp' || echo '$(srcdir)/'`convex/createCuts.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/createCuts.Tpo" "$(DEPDIR)/createCuts.Plo"; else rm -f "$(DEPDIR)/createCuts.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/createCuts.cpp' object='createCuts.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o createCuts.lo `test -f 'convex/createCuts.cpp' || echo '$(srcdir)/'`convex/createCuts.cpp
 
 conv-exprOp.lo: convex/conv-exprOp.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprOp.lo -MD -MP -MF "$(DEPDIR)/conv-exprOp.Tpo" -c -o conv-exprOp.lo `test -f 'convex/conv-exprOp.cpp' || echo '$(srcdir)/'`convex/conv-exprOp.cpp; \

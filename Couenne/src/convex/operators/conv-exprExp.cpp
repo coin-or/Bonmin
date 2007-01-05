@@ -23,7 +23,7 @@
 // variable x which is the argument of exponential, whose coefficient
 // is contained in coeffs [k] and whose rhs is contained in rhs [k], 0
 // <= k < nSamples().
-
+/*
 int exprExp::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -77,12 +77,12 @@ int exprExp::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 1;
 }
-
+*/
 
 // generate convexification cut for constraint w = this
 
 void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs,  const CouenneCutGenerator *cg) {
 
   expression *le, *ue;
 
@@ -95,31 +95,24 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   bool check = cg -> isFirst () || !(cg -> addViolated ());
 
-  CouNumber *coeff;
-  int       *index;
+  int w_ind = aux       -> Index (),
+      x_ind = argument_ -> Index ();
+
   OsiRowCut *cut;
 
   // upper segment
 
+  CouNumber expl = exp (l);
+  CouNumber oppslope = (expl - exp (u)) / (u - l);
+
   if ((u < COUENNE_INFINITY - 1) 
-      && (check || ((w-exp(l) * (u-l) > (x-l) * exp(u)*exp(l) + COUENNE_EPS)))) {
+      && (check || 
+	  (w + oppslope*x > expl + oppslope*l)) &&
+      ((cut = cg -> createCut (expl + oppslope*l, -1, 
+			       w_ind, CouNumber (1.), 
+			       x_ind, oppslope)))) {
 
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [2];
-    index = new int       [2];
-
-    CouNumber dx   = u-l;
-    CouNumber expu = exp (u);
-    CouNumber dw   = expu - exp (l);
-
-    coeff [0] =  dx; index [0] = aux       -> Index ();
-    coeff [1] = -dw; index [1] = argument_ -> Index ();
-
-    cut -> setUb (dx*expu - u*dw);
-    cut -> setRow (2, index, coeff);
-
-    printf ("Exp upper: "); cut -> print ();
-
+    printf ("Exp upper: ", CouNumber (1.)); cut -> print ();
     cs.insert (cut);
   }
 
@@ -127,41 +120,39 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   if (check || (w < - COUENNE_EPS)) {
 
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [1];
-    index = new int       [1];
+    if ((cut = cg -> createCut (CouNumber (0.), +1, w_ind, CouNumber (1.)))) {
 
-    coeff [0] = 1; 
-    index [0] = aux -> Index ();
-
-    cut -> setLb (0);
-    cut -> setRow (1, index, coeff);
-
-    printf ("Exp trivial: "); cut -> print ();
-
-    cs.insert (cut);
+      printf ("Exp trivial: "); cut -> print ();
+      cs.insert (cut);
+    }
   }
 
   // add tangent points: first choose sampling points
 
   int ns = cg -> nSamples ();
 
+  // fix bounds to get finite coefficients
+
+  if (l < - COUENNE_INFINITY + 1) {
+    if (u > COUENNE_INFINITY - 1) {
+      
+      l = - log (MULT_FACTOR) * ns/2;
+      u =   log (MULT_FACTOR) * ns/2;
+    } else 
+      l = u - log (2) * ns;
+
+  } else if (u > COUENNE_INFINITY - 1) 
+    u = l + log (2) * ns;
+
+  // approximate the exponential function from below
+  cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u);
+
+  /*
   if ((cg -> ConvType () == UNIFORM_GRID) || cg -> isFirst ()) {
 
     // choose sampling points. If unbounded, re-bound using a rule of
     // thumb where each point is taken every log 2 from the finite bound
  
-    if (l < - COUENNE_INFINITY + 1) {
-      if (u > COUENNE_INFINITY - 1) {
-
-	l = - log (MULT_FACTOR) * ns/2;
-	u =   log (MULT_FACTOR) * ns/2;
-      } else 
-	l = u - log (2) * ns;
-
-    } else if (u > COUENNE_INFINITY - 1) 
-	u = l + log (2) * ns;
-
     // now add tangent at each sampling point
 
     CouNumber sample = l, step = (u-l) / ns;
@@ -198,4 +189,5 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 		  sample, exp (sample), exp (sample), +1);
     }
   }
+  */
 }

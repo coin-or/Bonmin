@@ -26,7 +26,7 @@ exprAux *exprDiv::standardize (CouenneProblem *p) {
 // the lower/upper bounds for q (which are infinite if the bounds of d
 // are different in sign), we translate the equation into n = qd and
 // apply the convexification for products.
-
+/*
 int exprDiv::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -94,7 +94,7 @@ int exprDiv::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 2;
 }
-
+*/
 
 // generate convexification cut for constraint w = x/y
 
@@ -124,9 +124,7 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   expression *xe = arglist_ [0];
   expression *ye = arglist_ [1];
 
-  CouNumber x = (*xe) (), xl = (*xle) (), xu = (*xue) (),
-            y = (*ye) (),
-            w0 = (*w) (), wl = (*wle) (), wu = (*wue) ();
+  CouNumber wl = (*wle) (), wu = (*wue) ();
 
   // Add McCormick convexification cuts. Reduce w = x/y to the case
   // x = wy and apply the same rule as for multiplications:
@@ -137,88 +135,26 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 3) x <= yl w + wu y - yl wu
   // 4) x <= yu w + wl y - yu wl
 
-  CouNumber *coeff;
-  int       *index;
+
+  int xi = xe -> Index (),
+      wi = w  -> Index (),
+      yi = ye -> Index ();
+
   OsiRowCut *cut;
 
-  bool check = cg -> isFirst () || !(cg -> addViolated ());
-
   // 1) 
-
-  if (check || (x < yl*w0 + wl*y - yl*wl - COUENNE_EPS)) {
-
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = xe -> Index ();
-    coeff [1] = yl; index [1] = w  -> Index ();
-    coeff [2] = wl; index [2] = ye -> Index ();
-
-    cut -> setUb (yl * wl);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Division1: "); cut -> print ();
-  
+  if ((cut = cg -> createCut (yl*wl, +1, xi, CouNumber (-1.), wi, yl, yi, wl)))
     cs.insert (cut);
-  }
 
   // 2) 
-
-  if (check || (x < yu*w0 + wu*y - yu*wu - COUENNE_EPS)) {
-
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = xe -> Index ();
-    coeff [1] = yu; index [1] = w  -> Index ();
-    coeff [2] = wu; index [2] = ye -> Index ();
-
-    cut -> setUb (yu * wu);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Division2: "); cut -> print ();
+  if ((cut = cg -> createCut (yu*wu, +1, xi, CouNumber (-1.), wi, yu, yi, wu)))
     cs.insert (cut);
-  }
 
   // 3) 
-
-  if (check || (x > yl*w0 + wu*y - yl*wu + COUENNE_EPS)) {
-
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = xe -> Index ();
-    coeff [1] = yl; index [1] = w  -> Index ();
-    coeff [2] = wu; index [2] = ye -> Index ();
-
-    cut -> setLb (yl * wu);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Division3: "); cut -> print ();
-
+  if ((cut = cg -> createCut (yl*wu, -1, xi, CouNumber (-1.), wi, yl, yi, wu)))
     cs.insert (cut);
-  }
 
   // 4) 
-
-  if (check || (x < yu*w0 + wl*y - yu*wl - COUENNE_EPS)) {
-
-    coeff = new CouNumber [3];
-    index = new int       [3];
-    cut   = new OsiRowCut;
-
-    coeff [0] = -1; index [0] = xe -> Index ();
-    coeff [1] = yu; index [1] = w  -> Index ();
-    coeff [2] = wl; index [2] = ye -> Index ();
-
-    cut -> setLb (yu * wl);
-    cut -> setRow (3, index, coeff);
-
-    printf ("Division4: "); cut -> print ();
-
+  if ((cut = cg -> createCut (yu*wl, -1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
-  }
 }

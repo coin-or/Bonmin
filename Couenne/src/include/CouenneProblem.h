@@ -106,7 +106,7 @@ class CouenneProblem {
   void standardize ();
 
   // convexify standardized problem
-  void convexify ();
+  //  void convexify ();
 
   // output objective, linear and nonlinear constraints, and auxiliary
   // variables

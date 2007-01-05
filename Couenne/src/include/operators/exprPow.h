@@ -59,10 +59,10 @@ class exprPow: public exprOp {
   //  int upperLinearHull (exprAux *, int *&, expression ***&, 
   //		       int **&, expression **&, enum con_sign *&);
 
-  void segment (expression *&,  expression *&);
+  //  void segment (expression *&,  expression *&);
 
-  void hull    (expression **, expression **);
-
+  //  void hull    (expression **, expression **);
+  /*
   inline expression *mirror (expression *arg) 
     {return new exprPow (arg, new exprClone (arglist_ [1]));}
 
@@ -72,7 +72,7 @@ class exprPow: public exprOp {
     return new exprMul (new exprConst (expon),
 			new exprPow (arg, new exprConst (expon -1)));
   }
-
+  */
   // reduce expression in standard form, creating additional aux
   // variables (and constraints)
   exprAux *standardize (CouenneProblem *p);

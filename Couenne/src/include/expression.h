@@ -21,9 +21,6 @@ class exprAux;
 class OsiSolverInterface;
 class OsiCuts;
 
-// How many planes should be added per each linear hull?
-
-const int N_SAMPLES = 5;
 
 // expression base class
 
@@ -66,12 +63,6 @@ class expression {
   static CouNumber *lbounds_;
   static CouNumber *ubounds_;
 
-  // Gives number of linear lower (upper) approximations of a convex
-  // (concave) function
-
-  virtual int nSamples () 
-    {return N_SAMPLES;}
-
   // current value of the expression, used when accessing a copy of
   // the expression created for a node that is evaluated after the
   // original (saves some time).
@@ -108,7 +99,7 @@ class expression {
     {return NULL;}
 
   // node type
-  virtual inline enum nodeType Type () 
+  virtual inline enum nodeType Type ()
     {return EMPTY;}
 
   // value (empty)
@@ -166,7 +157,7 @@ class expression {
 
   // construct linear under-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  virtual inline int lowerLinearHull (exprAux *, int *&, expression ***&, 
+  /*  virtual inline int lowerLinearHull (exprAux *, int *&, expression ***&, 
 			       int **&, expression **&, enum con_sign *&)
     {return 0;}
 
@@ -177,7 +168,7 @@ class expression {
   virtual inline int upperLinearHull (exprAux *, int *&, expression ***&, 
 			       int **&, expression **&, enum con_sign *&)
     {return 0;}
-
+  */
   // Create standard formulation of this expression, by:
   //
   // - creating auxiliary w variables and corresponding expressions
@@ -191,8 +182,8 @@ class expression {
     {return NULL;}
 
   // generate convexification cut for constraint w = this
-  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			     OsiCuts &cs, const CouenneCutGenerator *cg) {}
+  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+			     OsiCuts &, const CouenneCutGenerator *) {}
 };
 
 #endif

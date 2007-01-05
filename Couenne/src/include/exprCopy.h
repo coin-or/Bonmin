@@ -85,18 +85,19 @@ class exprCopy: public expression {
 
   // construct linear under-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  inline int lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
+  /*  inline int lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 		       int **&indices, expression **&rhs, enum con_sign *&sign)
     {return copy_ -> lowerLinearHull (w, nterms, coeff, indices, rhs, sign);}
+  */
 
   // similarly, construct linear over-estimator for expression within
   // problem *p (p is used to add convexification constraints). It is
   // also used when this function appears with a minus sign in the
   // expression
-  inline int upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
+  /*  inline int upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign)
     {return copy_ -> upperLinearHull (w, nterms, coeff, indices, rhs, sign);}
-
+  */
   // Create standard formulation of this expression
   inline exprAux *standardize (CouenneProblem *p)
     {return copy_ -> standardize (p);}

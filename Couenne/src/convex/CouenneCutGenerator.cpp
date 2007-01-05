@@ -18,7 +18,7 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   CglCutGenerator (),
   ncuts_          (0),
   pool_           (NULL),
-  //  bonCs_          (NULL),
+  bonCs_          (NULL),
   firstcall_      (true),
   addviolated_    (addviolated),
   convtype_       (convtype),
@@ -27,20 +27,22 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
 
   if (!asl) return;
 
-  problem_ -> readnl      (asl);  //printf ("-- Original\n");     problem_ -> print (std::cout); 
+  problem_ -> readnl      (asl);  printf ("-- Original\n");     problem_ -> print (std::cout); 
   problem_ -> standardize ();     //printf ("-- Standardized\n"); problem_ -> print (std::cout);
-  problem_ -> convexify   ();     //printf ("-- Convexified\n");  problem_ -> print (std::cout);
+  //  problem_ -> convexify   ();     //printf ("-- Convexified\n");  problem_ -> print (std::cout);
 }
 
 
 // destructor
-/*
+
 CouenneCutGenerator::~CouenneCutGenerator () {
 
-  if (bonCs_) 
+  if (bonCs_) {
     delete bonCs_;
+    delete bonOs_;
+  }
 }
-*/
+
 
 // (re-)initializes cut pool
 
@@ -57,8 +59,7 @@ void CouenneCutGenerator::cleanup () {
 
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si, 
 					OsiCuts &cs, 
-					const CglTreeInfo info = CglTreeInfo ()) const {
-
+					const CglTreeInfo info) const {
   int ncols = si.getNumCols ();
 
   CouNumber *x, *l, *u;
@@ -108,7 +109,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       // for constraint lb <= w <= ub, compute actual values of lb, w,
       // and ub
 
-      CouNumber body = con -> Body () -> Value ();
+      //      CouNumber body = con -> Body () -> Value ();
       CouNumber lb   = con -> Lb   () -> Value ();
       CouNumber ub   = con -> Ub   () -> Value ();
 
@@ -126,12 +127,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       if (lb > - COUENNE_INFINITY + 1) orc -> setLb  (lb);
       if (ub <   COUENNE_INFINITY - 1) orc -> setUb  (ub);
 
+      /*
       printf ("con %d: ", i);
       if (lb > - COUENNE_INFINITY) 
 	printf ("%.4f <= ", lb);
       printf ("w_%d", index [0]);
       if (ub <   COUENNE_INFINITY) 
 	printf (" <= %.4f\n", ub);
+
+      printf ("1st... cut: "); orc -> print ();
+      */
 
       cs.insert (orc);
     }
@@ -140,8 +145,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
 
-  for (int i = 0; i<problem_ -> nAuxs (); i++)
+
+  for (int i = 0; i<problem_ -> nAuxs (); i++) {
     problem_ -> Aux (i) -> generateCuts (si, cs, this);
+
+    printf ("...added so far %d cuts\n", cs . sizeRowCuts ());
+
+  }
+
+
+  // end of generateCuts
 
   if (firstcall_) 
     firstcall_ = false;
@@ -183,3 +196,26 @@ int CouenneCutGenerator::generateCuts (const OsiSolverInterface &si, OsiRowCut *
   return ncuts;
 }
 */
+
+void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi, 
+		 CouNumber x1, CouNumber y1, 
+		 CouNumber x2, CouNumber y2, int sign) const { 
+
+  CouNumber oppslope = (y1-y2)/(x2-x1);
+
+  OsiRowCut *cut = createCut (y1 + oppslope * x1, sign, 
+			      wi, CouNumber (1.), 
+			      xi, oppslope);
+
+  if (cut) {printf ("Segment: "); cut -> print ();}
+
+  if (cut) 
+    cs.insert (cut);
+
+  /*
+  if (x2-x1 > COUENNE_EPS) {
+    printf ("Segment --> ");
+    addTangent (cs, wi, xi, x1, y1, (y2-y1) / (x2-x1), sign);
+  }
+  */
+}

@@ -99,7 +99,7 @@ inline void expression::getBounds (expression *&lb, expression *&ub) {
 
 // (trivial) convexification of an expression w = k, where k is
 // constant. Generate linear constraint w = k
-
+/*
 int exprConst::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 				int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -115,7 +115,7 @@ int exprConst::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 1;
 }
-
+*/
 
 void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			      OsiCuts &cs, const CouenneCutGenerator *cg) {

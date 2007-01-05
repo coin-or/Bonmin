@@ -13,7 +13,11 @@
 #include <iostream>
 
 #include <CglCutGenerator.hpp>
+#include <OsiRowCut.hpp>
 #include <CouenneProblem.h>
+
+#include <OsiSolverInterface.hpp>
+#include <OsiClpSolverInterface.hpp>
 
 
 struct ASL_pfgh;
@@ -31,8 +35,11 @@ class CouenneCutGenerator: public CglCutGenerator {
   // array of pointers to linearization cuts
   OsiRowCut **pool_;
 
-  // for compatibility with Bonmin. It is NULL when used normally
-  //  OsiCuts *bonCs_;
+  // for use with Bonmin. It is NULL when used normally
+  OsiCuts *bonCs_;
+
+  // similarly, a fictitious object to make calls to generateCuts 
+  OsiClpSolverInterface *bonOs_;
 
   // has generateCuts been called yet?
   mutable bool firstcall_;
@@ -58,7 +65,7 @@ class CouenneCutGenerator: public CglCutGenerator {
 			enum conv_type = UNIFORM_GRID, 
 			int = 2);
   // destructor
-  ~CouenneCutGenerator () {}
+  ~CouenneCutGenerator ();
 
   // clone method (necessary for the abstract CglCutGenerator class)
   CouenneCutGenerator *clone () const 
@@ -72,7 +79,8 @@ class CouenneCutGenerator: public CglCutGenerator {
   int         getncuts ()      const {return ncuts_;}
   OsiRowCut  *getCut   (int i) const {return pool_ [i];}
 
-  const CouNumber   &X       (int i)  {return problem_ -> X  (i);}
+  const CouNumber   X        (int i) const  {return problem_ -> X  (i);}
+
   const CouNumber   &Lb      (int i)  {return problem_ -> Lb (i);}
   const CouNumber   &Ub      (int i)  {return problem_ -> Ub (i);}
 
@@ -102,11 +110,7 @@ class CouenneCutGenerator: public CglCutGenerator {
   // the main CglCutGenerator
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, 
-		     const CglTreeInfo) const;
-
-  // for compatibility with Bonmin
-  //  int generateCuts (const OsiSolverInterface &, 
-  //		    OsiRowCut **&);
+		     const CglTreeInfo = CglTreeInfo ()) const;
 
   // (re-)initializes the pool  
   void cleanup ();
@@ -116,11 +120,35 @@ class CouenneCutGenerator: public CglCutGenerator {
   int updateConv (CouNumber *, CouNumber *, CouNumber *);
 
   // updates auxiliary variables' bounds
-  void updateBounds (CouNumber *, CouNumber *);
+  //  void updateBounds (CouNumber *, CouNumber *);
+
+  // create cut and check violation
+  OsiRowCut *createCut (CouNumber, // rhs
+			int,       // sign: -1: <=, 0: =, +1: >=
+			int,    CouNumber,    // index, coeff of first term
+			int=-1, CouNumber=0., //              of second term 
+			                      // (-1 means don't consider)
+			int=-1, CouNumber=0.) const; //       of third term
+
+  // add general linear envelope to convex function, given its
+  // variables' indices, the (univariate) function and its first
+  // derivative
+  void addEnvelope (OsiCuts &,
+		    int,
+		    unary_function, unary_function, 
+		    int, int, 
+		    CouNumber, CouNumber, CouNumber) const;
+
+  // add half-plane through (x1,y1) and (x2,y2) -- resp. 4th, 5th,
+  // 6th, and 7th argument
+  void addSegment (OsiCuts &, int, int,
+		   CouNumber, CouNumber, 
+		   CouNumber, CouNumber, int) const;
 };
 
 
 // add half-plane corresponding to tangent in given point
+
 
 void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int);
 
@@ -128,14 +156,12 @@ void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int);
 // add half-plane defined by two points (x1,y1) and (x2, y2), and
 // sign. Sign is only valid if x1 < x2
 
-inline void addSegment (OsiCuts &cs, int wi, int xi, 
-			CouNumber x1, CouNumber y1, 
-			CouNumber x2, CouNumber y2, int sign) { 
-
-  if (x2-x1 > COUENNE_EPS) {
-    printf ("Segment --> ");
-    addTangent (cs, wi, xi, x1, y1, (y2-y1) / (x2-x1), sign);
-  }
-}
+/*
+void addSegment (OsiCuts &, // cut set, 
+		 int, int,  // index of x and y
+		 CouNumber, CouNumber, // x1, y1
+		 CouNumber, CouNumber, // x2, y2
+		 int); // sign (see createCut () above for meaning)
+*/
 
 #endif

@@ -171,7 +171,7 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
 
 // generate linear convexification of all nonlinear expressions
 // associated with auxiliary variables
-
+/*
 void CouenneProblem::convexify () {
 
   expression ***coeff; // array of arrays of coefficients
@@ -213,7 +213,7 @@ void CouenneProblem::convexify () {
   }
 
   // convexify those constraints that are originally linear 
-  /*
+  ********************** /*
   for (std::vector <CouenneConstraint *>::iterator con = constraints_.begin ();
        con != constraints_.end (); con++)
 
@@ -275,9 +275,9 @@ void CouenneProblem::convexify () {
       }
     }
   }
-  */
+  ******************************************************************* /
 }
-
+*/
 
 // Allocate space in coeff, indices, rhs, and sign, for n constraint
 // with number of coefficients given in nterms. Used in upper- and lowerLinearHull

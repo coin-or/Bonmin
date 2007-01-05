@@ -57,13 +57,13 @@ class exprDiv: public exprOp {
 
   // construct linear under-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-		       int **&, expression **&, enum con_sign *&);
+  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
+  //		       int **&, expression **&, enum con_sign *&);
 
   // construct linear over-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  int upperLinearHull (exprAux *, int *&, expression ***&, 
-		       int **&, expression **&, enum con_sign *&);
+  //  int upperLinearHull (exprAux *, int *&, expression ***&, 
+  //		       int **&, expression **&, enum con_sign *&);
 
   // reduce expression in standard form, creating additional aux
   // variables (and constraints)

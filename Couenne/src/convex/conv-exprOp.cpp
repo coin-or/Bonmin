@@ -37,7 +37,7 @@ exprAux *exprOp::standardize (CouenneProblem *p) {
 // convert an expression, which is either a multiplication of a
 // constant and a variable or a variable, into a list of coefficient
 // and indices to be fed into a LinearConstraint
-
+/*
 void convert_monomial (expression *arg, expression *&coeff, int &index) {
 
   // for each argument, three cases:
@@ -71,3 +71,4 @@ void convert_monomial (expression *arg, expression *&coeff, int &index) {
     exit (-1);
   }
 }
+*/

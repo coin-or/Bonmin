@@ -26,8 +26,8 @@ void trigGenCuts (exprAux *w, OsiCuts &cs,
     // convexification cuts for sine/cosine functions
 
     OsiRowCut *cut;
-    CouNumber *coeff;
-    int       *index;
+
+    int w_ind = w -> Index ();
 
     // A sine and cosine (loose) convex envelope is a hexagon, where
     // the two horizontal edges are the constraints -1 <= w <= 1,
@@ -35,40 +35,22 @@ void trigGenCuts (exprAux *w, OsiCuts &cs,
 
     // Draw the two horizontal edges first: upper, w <= 1
 
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [1];
-    index = new int [1];
-
-    cut -> setUb (1.);
-    coeff [0] = 1;
-    index [0] = w -> Index ();
-
-    cut -> setRow (1, index, coeff);
-
+    cut = cg -> createCut (-1, +1, w_ind, CouNumber (1.));
     cs.insert (cut);
 
     // and lower, w >= -1
 
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [1];
-    index = new int [1];
-
-    cut -> setLb (-1.);
-    coeff [0] = 1;
-    index [0] = w -> Index ();
-
-    cut -> setRow (1, index, coeff);
-
+    cut = cg -> createCut (+1, -1, w_ind, CouNumber (1.));
     cs.insert (cut);
 
     // Now add the lower/upper envelope
 
-    addHexagon (cs, f, false, w, w -> Image () -> Argument ());
+    addHexagon (cg, cs, f, false, w, w -> Image () -> Argument ());
   }
   else { // yes, auxiliary variables' value can be considered
 
     // for now just add more hexagon constraints
-    addHexagon (cs, f, true, w, w -> Image () -> Argument ());
+    addHexagon (cg, cs, f, true, w, w -> Image () -> Argument ());
 
     /*
     switch (cg -> ConvType ()) {
@@ -83,15 +65,14 @@ void trigGenCuts (exprAux *w, OsiCuts &cs,
 
 // add lateral edges of the hexagon providing 
 
-void addHexagon (OsiCuts &cs,       // cut set to be enriched
+void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called us
+		 OsiCuts &cs,       // cut set to be enriched
 		 unary_function f,  // sine or cosine
 		 bool check,        // should violation be checked before adding cut?
 		 exprAux *aux,      // auxiliary variable
 		 expression *arg) { // argument of cos/sin (should be a variable)
 
   OsiRowCut *cut;
-  CouNumber *coeff;
-  int       *index;
 
   expression *lbe, *ube;
   arg -> getBounds (lbe, ube);
@@ -99,80 +80,32 @@ void addHexagon (OsiCuts &cs,       // cut set to be enriched
   CouNumber lb = (*lbe) (), 
             ub = (*ube) ();
 
-  CouNumber w, x;
-
-  if (check) {
-    w = (*aux) ();
-    x = (*arg) ();
-  }
-
   printf ("Trig slopes: "); cut -> print ();
 
   // add the lower envelope, left: w - x <= f lb - lb 
 
-  if (!check || (w - x > f (lb) - lb + COUENNE_EPS)) {
+  int x_ind = arg -> Index ();
+  int w_ind = aux -> Index ();
 
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [2];
-    index = new int [2];
-
-    coeff [0] =  1.; index [0] = aux -> Index ();
-    coeff [1] = -1.; index [1] = arg -> Index ();
-
-    cut -> setUb (f (lb) - lb);
-    cut -> setRow (2, index, coeff);
-
+  if ((cut = cg -> createCut (f (lb) - lb, -1, w_ind, CouNumber (1.),
+			      x_ind, CouNumber (-1.))))
     cs.insert (cut);
-  }
 
   // and right: w + x <= f ub + ub 
 
-  if (!check || (w + x > f (ub) + ub + COUENNE_EPS)) {
-
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [2];
-    index = new int [2];
-
-    coeff [0] = 1.; index [0] = aux -> Index ();
-    coeff [1] = 1.; index [1] = arg -> Index ();
-
-    cut -> setUb (f (ub) + ub);
-    cut -> setRow (2, index, coeff);
-
+  if ((cut = cg -> createCut (f (ub) + ub, -1, w_ind, CouNumber (1.),
+			      x_ind, CouNumber (-1.))))
     cs.insert (cut);
-  }
 
   // add the lower envelope, right: w - x >= cos ub - ub 
 
-  if (!check || (w - x < f (ub) - ub - COUENNE_EPS)) {
-
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [2];
-    index = new int [2];
-
-    coeff [0] =  1.; index [0] = aux -> Index ();
-    coeff [1] = -1.; index [1] = arg -> Index ();
-
-    cut -> setUb (f (ub) - ub);
-    cut -> setRow (2, index, coeff);
-
+  if ((cut = cg -> createCut (f (ub) - ub, +1, w_ind, CouNumber (1.),
+			      x_ind, CouNumber (-1.))))
     cs.insert (cut);
-  }
 
   // and left: w + x >= cos lb + lb 
 
-  if (!check || (w + x < f (lb) + lb - COUENNE_EPS)) {
-
-    cut   = new OsiRowCut;
-    coeff = new CouNumber [2];
-    index = new int [2];
-
-    coeff [0] =  1.; index [0] = aux -> Index ();
-    coeff [1] = -1.; index [1] = arg -> Index ();
-
-    cut -> setUb (f (lb) + lb);
-    cut -> setRow (2, index, coeff);
-
+  if ((cut = cg -> createCut (f (lb) + lb, +1, w_ind, CouNumber (1.),
+			      x_ind, CouNumber (-1.))))
     cs.insert (cut);
-  }
 }

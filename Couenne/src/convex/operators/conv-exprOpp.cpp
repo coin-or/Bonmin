@@ -16,11 +16,11 @@
 
 // construct linear under-estimator for expression within problem *p
 // (p is used to add convexification constraints)
-
+/*
 int exprOpp::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
-  // we have an expression w = -x. We need to invert the linear hulls
+  // we have an expression w = - x. We need to invert the linear hulls
   // and the sign of all appearances of
 
   nterms = new int [1];
@@ -35,13 +35,12 @@ int exprOpp::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 1;
 }
+*/
 
-
-// generate convexification cut for constraint w = -x
+// generate convexification cut for constraint w = - x
 
 void exprOpp::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
-
   // easy... 
 
   if (cg -> isFirst ())

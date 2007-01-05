@@ -60,7 +60,7 @@ exprAux *exprPow::standardize (CouenneProblem *p) {
 
 
 // Find lower convex envelope for power x^k
-
+/*
 int exprPow::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -221,15 +221,15 @@ void exprPow::segment (expression*& coeff, expression*& rhs) {
 				  new exprMul (mirror (uba), new exprClone (lba))),
 		     new exprSub (new exprClone (uba), new exprClone (lba)));
 }
-
+*/
 
 // generate convexification cut for constraint w = x^k
 
 void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
-  // not as easy... after standardization, all such expressions are of
-  // the form x^k, with k constant
+  // after standardization, all such expressions are of the form x^k,
+  // with k constant
 
   CouNumber k = arglist_ [1] -> Value ();
 
@@ -250,8 +250,6 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
             w = (*aux) ();
 
   OsiRowCut *cut;
-  CouNumber *coeff;
-  int       *index;
 
   // classify power
 
@@ -267,38 +265,36 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       && (l < - COUENNE_EPS) 
       && (u >   COUENNE_EPS)) {
 
-    Qroot qmap;
-
     // 1) k (or its inverse) is positive, integer, and odd, and 0 is
     //    an internal point of the interval [l,u].
+
+    Qroot qmap;
 
     // this case is somewhat simpler than the second, although we have
     // to resort to numerical procedures to find the (unique) root of
     // a polynomial Q(x) (see Liberti and Pantelides, 2003).
 
-    CouNumber q = qmap (k);
+    CouNumber q = qmap (intk);
 
     // check if lower part needs a convex envelope
 
     if (u > q * l) {
       addPowEnvelope (cg, cs, w_ind, x_ind, x, k, q*l, u, +1);
-      addSegment (cs, w_ind, x_ind, l, pow (l,k), q, pow (q,k), +1);
+      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), q, pow (q,k), +1);
     }
     else
-      addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), +1);
+      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), +1);
 
     // check if upper part needs a concave envelope
 
     if (l < q * u) {
       addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -1);
-      addSegment (cs, w_ind, x_ind, q, pow (q,k), q, pow (q,k), -1);
+      cg -> addSegment (cs, w_ind, x_ind, q, pow (q,k), q, pow (q,k), -1);
     }
     else
-      addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), -1);
+      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), -1);
   }
   else {
-
-    printf ("no flexes...\n");
 
     // 2) all other cases.
 
@@ -307,7 +303,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     if (!isInt 
 	&& !isInvInt
 	&& (l < - COUENNE_EPS) 
-	&& (u < (l=0)))        // *** l is updated here. Be careful.
+	&& (u < (l=0)))        // CAUTION! l is updated here, if negative
       return;
 
     // if k is negative and 0 is an internal point of [l,u], no
@@ -316,10 +312,9 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     if ((k < COUENNE_EPS) && (l < - COUENNE_EPS) && (u > COUENNE_EPS)) {
 
-      printf ("Seg!\n ");
       if (!(intk % 2))
-	addSegment (cs, w_ind, arglist_ [0] -> Index (), 
-		    l, u, pow (l,k), pow (u,k), +1);
+	cg -> addSegment (cs, w_ind, arglist_ [0] -> Index (), 
+		    l, pow (l,k), u, pow (u,k), +1);
       return;
     }
 
@@ -331,18 +326,12 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     if (!(intk % 2) && (cg -> isFirst () || !(cg -> addViolated ()) || w < - COUENNE_EPS)) {
 
-      cut   = new OsiRowCut;
-      coeff = new CouNumber [1];
-      index = new int       [1];
+      cut = cg -> createCut (0, +1, w_ind, CouNumber (1.));
 
-      coeff [0] = 1.; index [0] = w_ind;
+      if (cut) {printf ("Trivial cut: "); cut -> print ();}
 
-      cut -> setLb (0);
-      cut -> setRow (1, index, coeff);
-
-      printf ("Trivial cut: "); cut -> print ();
-
-      cs.insert (cut);
+      if (cut) 
+	cs.insert (cut);
     }
 
     // create envelope. Choose sign based on k
@@ -359,14 +348,12 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     // concave envelope -- when k negative, add only if bounds are far from 0
 
-    if (((k > COUENNE_EPS)
+    if ((  (k > COUENNE_EPS)
 	|| (l > COUENNE_EPS)
 	|| (u < - COUENNE_EPS)) &&
 	(l > - COUENNE_INFINITY + 1) &&
 	(u <   COUENNE_INFINITY - 1)) {
-      printf ("Here?\n");
-      addSegment (cs, w_ind, x_ind, l, u, pow (l,k), pow (u,k), - sign);
-      printf ("or somewhere else?\n");
+      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), - sign);
     }
 
     // similarly, pay attention not to add infinite slopes

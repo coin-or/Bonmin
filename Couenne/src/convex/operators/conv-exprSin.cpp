@@ -6,18 +6,20 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <OsiSolverInterface.hpp>
 #include <CouenneTypes.h>
+#include <CouenneCutGenerator.h>
 #include <exprSin.h>
 #include <exprCos.h>
-#include <exprConst.h>
+//#include <exprConst.h>
 #include <exprAux.h>
-#include <exprSub.h>
-#include <exprSum.h>
-#include <exprClone.h>
+//#include <exprSub.h>
+//#include <exprSum.h>
+//#include <exprClone.h>
 
 
 // construct under-estimator for cosine expression w = cos x
-
+/*
 int exprSin::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -115,12 +117,11 @@ int exprSin::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 3;
 }
-
+*/
 
 // generate convexification cut for constraint w = this
 
 void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-				   OsiCuts &cs, const CouenneCutGenerator *cg) {
-
+			    OsiCuts &cs, const CouenneCutGenerator *cg) {
   trigGenCuts (w, cs, cg, sin);
 }

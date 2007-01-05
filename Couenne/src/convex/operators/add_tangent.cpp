@@ -33,6 +33,11 @@ void addTangent (OsiCuts &cs, int wi, int xi,
   cut -> setRow (2, index, coeff);
 
   printf ("Tangent: "); cut -> print ();
-  
+
   cs.insert (cut);
 }
+
+
+// add half-plane defined by two points (x1,y1) and (x2, y2), and
+// sign. Sign is only valid if x1 < x2
+

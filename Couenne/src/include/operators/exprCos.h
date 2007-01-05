@@ -40,13 +40,13 @@ class exprCos: public exprUnary {
 
   // construct linear under-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-		       int **&, expression **&, enum con_sign *&);
+  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
+  //		       int **&, expression **&, enum con_sign *&);
 
   // construct linear over-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  int upperLinearHull (exprAux *, int *&, expression ***&, 
-		       int **&, expression **&, enum con_sign *&);
+  //  int upperLinearHull (exprAux *, int *&, expression ***&, 
+  //		       int **&, expression **&, enum con_sign *&);
 
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
@@ -61,7 +61,8 @@ void trigGenCuts (exprAux *, OsiCuts &, const CouenneCutGenerator *, unary_funct
 
 // convex envelope for sine/cosine 
 
-void addHexagon (OsiCuts &,      // cut set to be enriched
+void addHexagon (const CouenneCutGenerator *, // pointer to the caller cut generator 
+		 OsiCuts &,      // cut set to be enriched
 		 unary_function, // sine or cosine
 		 bool,           // should violation be checked before adding cut?
 		 exprAux *,      // auxiliary variable

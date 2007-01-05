@@ -41,7 +41,7 @@ inline void exprVar::getBounds (expression *&lb, expression *&ub) {
 
 // (possibly auxiliary) variable. Generate linear constraint w
 // = x
-
+/*
 int exprVar::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
   nterms = new int;
@@ -59,7 +59,7 @@ int exprVar::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 1;
 }
-
+*/
 
 // generate convexification cut for constraint w = this
 

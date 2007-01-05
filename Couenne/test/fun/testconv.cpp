@@ -114,9 +114,12 @@ int main (int argc, char **argv) {
   //
   // The bounds (value) of each auxiliary variable is computed
   // as a function of the bounds (values) of the original variables 
+
+
   printf ("           x           lb             ub\n");
   for (int i=0; i < cg -> getnvars (); i++)
     printf ("%3d %12.3f %12.3f %12.3f\n", i, x [i], l [i], u [i]);
+
 
   // do whatever preprocessing on x, l, u within Bonmin 
 
@@ -194,8 +197,6 @@ int main (int argc, char **argv) {
 
     OsiRowCut *cut = cs. rowCutPtr (i);
 
-    cut -> print (); 
-
     const int    *ind   = cut -> row (). getIndices     ();
     const double *coe   = cut -> row (). getElements    ();
     int           nelem = cut -> row (). getNumElements (); 
@@ -220,14 +221,16 @@ int main (int argc, char **argv) {
 
   objcoe [cg -> Problem () -> Obj (0) -> Body () -> Index ()] = 1;
 
+
   printf ("START: "); for (int i=0; i<=nvar0; i++) printf ("%2d ", start [i]); printf ("\n");
-  printf ("Index: "); for (int i=0; i<=start [nvar0]; i++) printf ("%2d ",index [i]); printf ("\n");
-  printf ("coeff: "); for (int i=0; i<=start [nvar0]; i++) printf ("%.3g ",coeff[i]); printf ("\n");
-  printf ("objco: "); for (int i=0; i<=nvar0; i++) printf ("%.3g ",  objcoe [i]); printf ("\n");
-  printf ("lb:    "); for (int i=0; i<=nvar0; i++)if(l[i]>-1e15) printf("%.3g ",l[i]);printf("\n");
-  printf ("ub:    "); for (int i=0; i<=nvar0; i++)if(u[i]< 1e15) printf("%.3g ",u [i]);printf ("\n");
-  printf ("rlb:   "); for (int i=0; i<=ncon0; i++)if(rlb[i]>-1e15)printf("%.3g ",rlb[i]);printf("\n");
-  printf ("rub:   "); for (int i=0; i<=ncon0; i++)if(rub[i]<1e15)printf("%.3g ",rub[i]);printf ("\n");
+  printf ("Index: "); for (int i=0; i<start [nvar0]; i++) printf ("%2d ",index [i]); printf ("\n");
+  printf ("coeff: "); for (int i=0; i<start [nvar0]; i++) printf ("%.3g ",coeff[i]); printf ("\n");
+  printf ("objco: "); for (int i=0; i<nvar0; i++) printf ("%.3g ",  objcoe [i]); printf ("\n");
+  printf ("lb:    "); for (int i=0; i<nvar0; i++)if(l[i]>-1e15) printf("%.3g ",l[i]);printf("\n");
+  printf ("ub:    "); for (int i=0; i<nvar0; i++)if(u[i]< 1e15) printf("%.3g ",u [i]);printf ("\n");
+  printf ("rlb:   "); for (int i=0; i<ncon0; i++)if(rlb[i]>-1e15)printf("%.3g ",rlb[i]);printf("\n");
+  printf ("rub:   "); for (int i=0; i<ncon0; i++)if(rub[i]<1e15)printf("%.3g ",rub[i]);printf ("\n");
+
 
   clp -> loadProblem (nvar0, ncon0, start, index, coeff, 
 		      l, u, objcoe, rlb, rub);  
@@ -238,8 +241,14 @@ int main (int argc, char **argv) {
 
   // ...and then call again the cut generation for a number of times:
 
+  clp -> initialSolve ();
+  printf ("-----------------------\n");
+
   // 10 iterations of cut generation
   for (int round = 0; round < 10; round++) {
+
+    for (int i = cs . sizeRowCuts (); i--;)
+      cs. eraseRowCut (i);
 
     // x,l,u should be relative to the original variables for the
     // first iteration only, and should be relative to all variables
@@ -247,10 +256,10 @@ int main (int argc, char **argv) {
     //    cg -> updateConv (x, l, u);
 
     char fname [20];
-
+    
     sprintf (fname, "round%d", round);
 
-    clp -> writeMps (fname);
+    clp -> writeLp (fname);
 
     cg -> generateCuts (*clp, cs, tree);
 
@@ -259,16 +268,19 @@ int main (int argc, char **argv) {
     /********************** some other code of yours here ***************************/
  
     // print generated cuts
+    /*
     for (int i = 0; i < ncuts; i++)
       cs.rowCutPtr (i) -> print ();
+    */
 
     // pseudo random sequence of bounds
+    /*    
     for (int i=0; i < cg -> getnvars (); i++) {
       l [i] += 0.02;
       u [i] -= 0.4;
       x [i]  = 0.5 * (l [i] + u [i]);
     }
-    printf ("-----------------------\n");
+    */
 
     const OsiRowCut **newRowCuts = new const OsiRowCut * [ncuts];
 
@@ -277,13 +289,15 @@ int main (int argc, char **argv) {
 
     clp -> applyRowCuts (ncuts, newRowCuts);
 
-    printf ("round %4d: %4d generated cuts. New objective value: %12.2f\n", 
+    printf (">>> it. %4d: %4d new cuts. New obj.: %12.2f\n-----------------------\n", 
 	    round, ncuts, clp->getObjValue());
 
-    clp->resolve();  
+    clp -> resolve();  
 
-    if (clp -> isAbandoned ())              {printf ("### ERROR: Numerical difficulties\n");exit (1);}
-    if (clp -> isProvenPrimalInfeasible ()) {printf ("### WARNING: Problem infeasible\n");  exit (1);}
+    if (clp -> isAbandoned ())              {printf ("### ERROR: Numerical difficulties\n");break;}
+    if (clp -> isProvenPrimalInfeasible ()) {printf ("### WARNING: Problem infeasible\n");  break;}
+
+    delete newRowCuts;
   }
 
   delete clp;

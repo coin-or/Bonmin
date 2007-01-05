@@ -41,7 +41,7 @@ class exprUnary: public expression {
 
   ~exprUnary () 
     {if (argument_) delete argument_;}
-
+  /*
   // return a pointer to an object with the same type of operator f_
   // as this class, and with arg as argument_
   virtual inline expression *mirror (expression *arg)
@@ -51,7 +51,7 @@ class exprUnary: public expression {
   // derivative of operator f_ as this class, and with arg as argument_
   virtual inline expression *mirror_d (expression *arg)
     {return new exprUnary (arg, f_);}
-
+  */
   // return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
     {return argument_;}

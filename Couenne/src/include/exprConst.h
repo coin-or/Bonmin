@@ -72,8 +72,8 @@ class exprConst: public expression {
 
   // construct linear under-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-		       int **&, expression **&, enum con_sign *&);
+  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
+  //		       int **&, expression **&, enum con_sign *&);
 
   // Create standard formulation of this expression
   inline exprAux *standardize (CouenneProblem *)

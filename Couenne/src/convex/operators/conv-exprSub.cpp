@@ -28,7 +28,7 @@ exprAux *exprSub::standardize (CouenneProblem *p) {
 // if this is a subtraction, no need to approximate from below or
 // above but we rather add this as a linear constraints (all elements
 // of arglist_ are of the type c*x or x*c or x)
-
+/*
 int exprSub::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
 			      int **&indices, expression **&rhs, enum con_sign *&sign) {
 
@@ -56,7 +56,7 @@ int exprSub::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
   return 1;
 }
-
+*/
 
 // generate convexification cut for constraint w = this
 

@@ -80,16 +80,16 @@ class exprVar: public expression {
 
   // construct linear under-estimator for expression within problem *p
   // (p is used to add convexification constraints)
-  int lowerLinearHull (exprAux *w, int *&, expression ***&, int **&, 
-		       expression **&, enum con_sign *&);
+  //  int lowerLinearHull (exprAux *w, int *&, expression ***&, int **&, 
+  //		       expression **&, enum con_sign *&);
 
   // similarly, construct linear over-estimator for expression within
   // problem *p (p is used to add convexification constraints). It is
   // also used when this function appears with a minus sign in the
   // expression
-  inline int upperLinearHull (exprAux *, int *&, expression ***&, int **&, 
-		       expression **&, enum con_sign *&)
-    {return 0;}
+  //  inline int upperLinearHull (exprAux *, int *&, expression ***&, int **&, 
+  //		       expression **&, enum con_sign *&)
+  //    {return 0;}
 
   // generate convexification cut for constraint w = this
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
