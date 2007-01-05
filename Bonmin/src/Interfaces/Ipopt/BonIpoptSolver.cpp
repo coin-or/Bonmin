@@ -72,12 +72,12 @@ namespace Bonmin{
     TNLPSolver::ReturnStatus ret_status;
     if(!zeroDimension(tnlp, ret_status))
       {
-	if (enable_warm_start_) {
-	  optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
-	}
-	else {
+	//if (enable_warm_start_) {
+	//optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
+	//}
+	//else {
 	  optimizationStatus_ = app_->OptimizeTNLP(tnlp);
-	}
+	//}
 	problemHadZeroDimension_ = false;
       }
     else
