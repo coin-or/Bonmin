@@ -145,14 +145,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
 
+  if (!firstcall_) {
 
-  for (int i = 0; i<problem_ -> nAuxs (); i++) {
-    problem_ -> Aux (i) -> generateCuts (si, cs, this);
-
-    printf ("...added so far %d cuts\n", cs . sizeRowCuts ());
-
+    printf ("-----------x\n");
+    for (int i=0; i < getnvars (); i++)
+      printf ("%3d %12.3f\n", i, x [i]);
   }
 
+  for (int i = 0; i<problem_ -> nAuxs (); i++)
+    problem_ -> Aux (i) -> generateCuts (si, cs, this);
 
   // end of generateCuts
 
@@ -211,11 +212,4 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 
   if (cut) 
     cs.insert (cut);
-
-  /*
-  if (x2-x1 > COUENNE_EPS) {
-    printf ("Segment --> ");
-    addTangent (cs, wi, xi, x1, y1, (y2-y1) / (x2-x1), sign);
-  }
-  */
 }

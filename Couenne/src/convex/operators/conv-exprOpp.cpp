@@ -44,5 +44,5 @@ void exprOpp::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // easy... 
 
   if (cg -> isFirst ())
-    addTangent (cs, w -> Index (), argument_ -> Index (), 0, 0, -1., 0);
+    cg -> addTangent (cs, w -> Index (), argument_ -> Index (), 0, 0, CouNumber (-1.), 0);
 }

@@ -26,18 +26,15 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   if (!check) { // need to check violation 
 
     CouNumber violation = - rhs + c1 * X (i1);
+    if (i2 >= 0) violation     += c2 * X (i2);
+    if (i3 >= 0) violation     += c3 * X (i3);
 
-    if (i2 >= 0) violation += c2 * X (i2);
-    if (i3 >= 0) violation += c3 * X (i3);
-
-    if ((violation > COUENNE_EPS) && (sign >= 0)) check = true;
+    if ((violation > COUENNE_EPS) && (sign <= 0)) check = true;
     else
-      if ((violation < - COUENNE_EPS) && (sign <= 0)) check = true;
+      if ((violation < - COUENNE_EPS) && (sign >= 0)) check = true;
   }
 
   if (check) {
-
-    //    printf ("%d %d %d\n", i1, i2, nterms);
 
     CouNumber *coeff = new CouNumber [nterms]; 
     int       *index = new int       [nterms];

@@ -143,18 +143,18 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   OsiRowCut *cut;
 
   // 1) 
-  if ((cut = cg -> createCut (yl*wl, +1, xi, CouNumber (-1.), wi, yl, yi, wl)))
+  if ((cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl)))
     cs.insert (cut);
 
   // 2) 
-  if ((cut = cg -> createCut (yu*wu, +1, xi, CouNumber (-1.), wi, yu, yi, wu)))
+  if ((cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu)))
     cs.insert (cut);
 
   // 3) 
-  if ((cut = cg -> createCut (yl*wu, -1, xi, CouNumber (-1.), wi, yl, yi, wu)))
+  if ((cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu)))
     cs.insert (cut);
 
   // 4) 
-  if ((cut = cg -> createCut (yu*wl, -1, xi, CouNumber (-1.), wi, yu, yi, wl)))
+  if ((cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
 }

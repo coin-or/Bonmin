@@ -259,7 +259,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 1) 
 
   if ((yl > - COUENNE_INFINITY + 1) && (xl > - COUENNE_INFINITY + 1) &&
-      (cut = cg -> createCut (yl*xl, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl))) {
+      (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl))) {
 
     printf ("--- cut 1: "); cut -> print ();
     cs.insert (cut);
@@ -268,7 +268,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 2) 
 
   if ((yu < COUENNE_INFINITY - 1) && (xu < COUENNE_INFINITY - 1) &&
-      (cut = cg -> createCut (yu*xu, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu))) {
+      (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu))) {
 
     printf ("--- cut 2: "); cut -> print ();
     cs.insert (cut);
@@ -277,7 +277,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 3) 
 
   if ((yl > - COUENNE_INFINITY + 1) && (xu < COUENNE_INFINITY - 1) &&
-      (cut = cg -> createCut (yl*xu, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu))) {
+      (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu))) {
 
     printf ("--- cut 3: "); cut -> print ();
     cs.insert (cut);
@@ -286,7 +286,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 4) 
 
   if ((yu < COUENNE_INFINITY - 1) && (xl > - COUENNE_INFINITY + 1) &&
-      (cut = cg -> createCut (yu*xl, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl))) {
+      (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl))) {
     printf ("--- cut 4: "); cut -> print ();
     cs.insert (cut);
   }

@@ -64,6 +64,9 @@ class CouenneCutGenerator: public CglCutGenerator {
 			bool = false, 
 			enum conv_type = UNIFORM_GRID, 
 			int = 2);
+  // copy constructor
+  CouenneCutGenerator  (const CouenneCutGenerator &) {}
+
   // destructor
   ~CouenneCutGenerator ();
 
@@ -144,13 +147,10 @@ class CouenneCutGenerator: public CglCutGenerator {
   void addSegment (OsiCuts &, int, int,
 		   CouNumber, CouNumber, 
 		   CouNumber, CouNumber, int) const;
-};
-
 
 // add half-plane corresponding to tangent in given point
-
-
-void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int);
+  void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int) const;
+};
 
 
 // add half-plane defined by two points (x1,y1) and (x2, y2), and
