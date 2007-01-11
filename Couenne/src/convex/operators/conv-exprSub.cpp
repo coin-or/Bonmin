@@ -70,13 +70,35 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int       *index = new int       [3];
   OsiRowCut *cut   = new OsiRowCut;    
 
-  coeff [0] = -1; index [0] = w            -> Index ();
-  coeff [1] =  1; index [1] = arglist_ [0] -> Index ();
-  coeff [2] = -1; index [2] = arglist_ [1] -> Index ();
+  CouNumber rhs = 0;
+  int nvars = 1;
 
-  cut -> setUb (0);
-  cut -> setLb (0);
-  cut -> setRow (3, index, coeff);
+  coeff [0] = -1; 
+  index [0] = w -> Index ();
+
+  // first term
+
+  if (arglist_ [0] -> Type () == CONST)
+    rhs = - arglist_ [0] -> Value ();
+  else {
+    coeff [nvars] =  1; 
+    index [nvars] = arglist_ [0] -> Index ();
+    ++nvars;
+  }
+
+  // second term
+
+  if (arglist_ [1] -> Type () == CONST)
+    rhs += arglist_ [1] -> Value ();
+  else {
+    coeff [nvars] =  -1; 
+    index [nvars] = arglist_ [1] -> Index ();
+    ++nvars;
+  }
+
+  cut -> setUb (rhs);
+  cut -> setLb (rhs);
+  cut -> setRow (nvars, index, coeff);
 
   printf ("Sub: "); cut -> print ();
 

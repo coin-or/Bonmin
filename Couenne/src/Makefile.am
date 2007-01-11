@@ -18,6 +18,7 @@ lib_LTLIBRARIES = libCouenne.la
 
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = \
+	expression/operators/exprAbs.cpp \
 	expression/operators/exprCos.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -39,6 +40,7 @@ libCouenne_la_SOURCES = \
 	convex/createCuts.cpp \
 	convex/conv-exprOp.cpp \
 	convex/conv-exprUnary.cpp \
+	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -112,6 +114,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # and that therefore should be installed in 'install'
 include_HEADERS = \
 	../inc/config_couenne.h \
+	include/operators/exprAbs.h \
 	include/operators/exprExp.h \
 	include/operators/exprInv.h \
 	include/operators/exprMul.h \

@@ -324,7 +324,10 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     // first of all, add trivial cut w >= 0 if violated
 
-    if (!(intk % 2) && (cg -> isFirst () || !(cg -> addViolated ()) || w < - COUENNE_EPS)) {
+    if (!(intk % 2) && 
+	(cg -> isFirst () || 
+	 !(cg -> addViolated ()) || 
+	 (w < - COUENNE_EPS))) {
 
       cut = cg -> createCut (0, +1, w_ind, CouNumber (1.));
 

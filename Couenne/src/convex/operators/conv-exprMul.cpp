@@ -219,8 +219,12 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = x_ind;}
 	else                        {coe = xe -> Value (); ind = y_ind;}
 
-	if ((cut = cg -> createCut (CouNumber (0), +1, w_ind, CouNumber (-1.), ind, coe)))
+	printf ("========> w=cx: c=%.4f, x_%d, w_%d\n", coe, ind, w_ind);
+
+	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, CouNumber (-1.), ind, coe))){
+	  cut -> print ();
 	  cs.insert (cut);
+	}
       }
     }
 

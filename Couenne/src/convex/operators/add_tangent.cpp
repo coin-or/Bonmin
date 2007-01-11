@@ -6,6 +6,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <math.h>
+
 #include <CouenneTypes.h>
 #include <exprExp.h>
 #include <exprConst.h>
@@ -18,13 +20,16 @@
 // add half-plane defined by x, w, and slope, and <= or >= according to sign
 
 void CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi, 
-		 CouNumber x, CouNumber w, CouNumber slope, int sign) const { 
+				      CouNumber x, CouNumber w, 
+				      CouNumber slope, int sign) const {
 
-
-  CouNumber violation = X (wi) - w - slope * (X (xi) - x);
+  CouNumber violation = (X (wi) - w - slope * (X (xi) - x)) / sqrt (slope*slope + 1);
   bool violated = 
     ((violation >   COUENNE_EPS) && sign <= 0) ||
     ((violation < - COUENNE_EPS) && sign >= 0);
+
+  printf ("######## P=(%.8f,%.8f) w=%.8f slope=%8.f sign=%d violation=%.8f\n", 
+	  x, w, X (wi), slope, sign, violation);
 
   // add tangent only if first call or if violated
 
@@ -34,11 +39,13 @@ void CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi,
     int       *index = new int       [2];
     OsiRowCut *cut   = new OsiRowCut;
 
+    CouNumber rhs = w - slope * x;
+
     coeff [0] = 1.;      index [0] = wi;
     coeff [1] = - slope; index [1] = xi;
 
-    if (sign >= 0) cut -> setLb (w - slope * x);
-    if (sign <= 0) cut -> setUb (w - slope * x);
+    if (sign >= 0) cut -> setLb (rhs);
+    if (sign <= 0) cut -> setUb (rhs);
 
     cut -> setRow (2, index, coeff);
 
@@ -47,8 +54,3 @@ void CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi,
     cs.insert (cut);
   }
 }
-
-
-// add half-plane defined by two points (x1,y1) and (x2, y2), and
-// sign. Sign is only valid if x1 < x2
-

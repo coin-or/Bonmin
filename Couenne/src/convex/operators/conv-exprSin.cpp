@@ -11,11 +11,7 @@
 #include <CouenneCutGenerator.h>
 #include <exprSin.h>
 #include <exprCos.h>
-//#include <exprConst.h>
 #include <exprAux.h>
-//#include <exprSub.h>
-//#include <exprSum.h>
-//#include <exprClone.h>
 
 
 // construct under-estimator for cosine expression w = cos x
@@ -123,5 +119,6 @@ int exprSin::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 
 void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+
   trigGenCuts (w, cs, cg, sin);
 }

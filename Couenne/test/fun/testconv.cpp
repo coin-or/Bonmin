@@ -170,6 +170,9 @@ int main (int argc, char **argv) {
   for (int i=nvar0; i--;)
     *start++ = 0;
 
+  // empty the (nvar0+1)-th
+  *start = 0;
+
   start -= nvar0;
 
   start++;
@@ -202,6 +205,7 @@ int main (int argc, char **argv) {
     int           nelem = cut -> row (). getNumElements (); 
 
     for (int j=0; j<nelem; j++) {
+
       int pos = start [ind [j]] ++;
       coeff [pos] = coe [j];
       index [pos] = i;
@@ -244,8 +248,8 @@ int main (int argc, char **argv) {
   clp -> initialSolve ();
   printf ("-----------------------\n");
 
-  // 10 iterations of cut generation
-  for (int round = 0; round < 10; round++) {
+  // not more than 10 iterations of cut generation
+  for (int round = 0; round < 30; round++) {
 
     for (int i = cs . sizeRowCuts (); i--;)
       cs. eraseRowCut (i);
@@ -259,7 +263,8 @@ int main (int argc, char **argv) {
     
     sprintf (fname, "round%d", round);
 
-    clp -> writeLp (fname);
+    clp -> writeMps (fname);
+    clp -> writeLp  (fname);
 
     cg -> generateCuts (*clp, cs, tree);
 
@@ -287,17 +292,26 @@ int main (int argc, char **argv) {
     for (int i = 0; i < ncuts; i++)
       newRowCuts [i] = cs.rowCutPtr (i);
 
+    for (int i = 0; i < ncuts; i++) {
+      printf (" >> Adding cut ");
+      newRowCuts [i] -> print ();
+    }
+
     clp -> applyRowCuts (ncuts, newRowCuts);
+
+    delete [] newRowCuts;
 
     printf (">>> it. %4d: %4d new cuts. New obj.: %12.2f\n-----------------------\n", 
 	    round, ncuts, clp->getObjValue());
 
     clp -> resolve();  
 
-    if (clp -> isAbandoned ())              {printf ("### ERROR: Numerical difficulties\n");break;}
-    if (clp -> isProvenPrimalInfeasible ()) {printf ("### WARNING: Problem infeasible\n");  break;}
+    if (clp -> isAbandoned ())              
+      {printf ("### ERROR: Numerical difficulties\n");break;}
+    if (clp -> isProvenPrimalInfeasible ()) 
+      {printf ("### WARNING: Problem infeasible\n");  break;}
 
-    delete newRowCuts;
+    if (!ncuts) break;
   }
 
   delete clp;

@@ -47,7 +47,8 @@ exprOp::~exprOp () {
 
 // print expression
 
-void exprOp::print (std::ostream &out = std::cout, char *op = "unknown", enum pos pos = PRE) {
+void exprOp::print (std::ostream &out = std::cout, const std::string &op = "unknown", 
+		    enum pos pos = PRE) {
 
   if (pos == PRE)
     out << op;
@@ -68,7 +69,8 @@ void exprOp::print (std::ostream &out = std::cout, char *op = "unknown", enum po
 
 // print unary expression
 
-void exprUnary::print (std::ostream &out, char *op = "unknown", enum pos pos = PRE) {
+void exprUnary::print (std::ostream &out, const std::string &op = "unknown", 
+		       enum pos pos = PRE) {
 
   if (pos == PRE)  out << op << " "; fflush (stdout);
   argument_ -> print (out);

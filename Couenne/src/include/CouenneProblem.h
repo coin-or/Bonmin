@@ -46,6 +46,10 @@ class CouenneProblem {
   CouenneProblem  () {}
   ~CouenneProblem ();
 
+  // update value of variables and bounds
+  void update (CouNumber *x, CouNumber *l, CouNumber *u) 
+  {x_ = x; lb_ = l; ub_ = u;}
+
   // get size of vectors
   int nObjs   () const {return objectives_.        size ();}
   int nNLCons () const {return constraints_.       size ();}
@@ -73,7 +77,7 @@ class CouenneProblem {
   CouNumber         *Ub    () {return ub_;}
 
   // add (non linear) objective function
-  void addObjective     (expression *, char *);
+  void addObjective     (expression *, const std::string &);
 
   // add (non linear) "=", ">=", "<=", and range constraints
   void addEQConstraint  (expression *, expression *);

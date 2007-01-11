@@ -33,7 +33,7 @@ class exprMax: public exprOp {
 
   // I/O
   void print (std::ostream &out)
-    {exprOp:: print (out, (char *) "max", PRE);}
+    {exprOp:: print (out, "max", PRE);}
 
   // function for the evaluation of the expression
   inline CouNumber operator () ();

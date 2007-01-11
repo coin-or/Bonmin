@@ -211,8 +211,7 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   expression *xe = argument_;
 
-  CouNumber x = (*xe)  (), xl = (*xle) (), xu = (*xue) (),
-            w = (*aux) (), wl = (*wle) (), wu = (*wue) ();
+  CouNumber x = (*xe)  ();
 
   int w_ind = aux       -> Index (), 
       x_ind = argument_ -> Index ();

@@ -112,7 +112,7 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 			       w_ind, CouNumber (1.), 
 			       x_ind, oppslope)))) {
 
-    printf ("Exp upper: ", CouNumber (1.)); cut -> print ();
+    printf ("Exp upper: "); cut -> print ();
     cs.insert (cut);
   }
 

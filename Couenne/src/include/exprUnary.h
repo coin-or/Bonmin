@@ -57,7 +57,7 @@ class exprUnary: public expression {
     {return argument_;}
 
   // I/O
-  virtual void print (std::ostream &, char *, enum pos);
+  virtual void print (std::ostream &, const std::string &, enum pos);
 
   // compute value of unary operator
   virtual inline CouNumber operator () ()

@@ -39,9 +39,9 @@ class expression {
   // POP operations are the *++sp and *sp-- instructions,
   // respectively, on the Stack Pointer variable sp.
   // 
-  // STACK_SIZE should be enough for expression where for each node of
+  // STACK_SIZE should be enough for expressions where at each node of
   // the evaluation tree, DEPTH + #ARGUMENTS is at most STACK_SIZE,
-  // where DEPTH is the depth of the evalation node and #ARGUMENTS is
+  // where DEPTH is the depth of the evaluation node and #ARGUMENTS is
   // the number of arguments of the function in the node.
 
   static CouNumber stack [STACK_SIZE];

@@ -22,9 +22,9 @@
 
 // methods to add objective function
 
-void CouenneProblem::addObjective    (expression *newobj, char *sense = NULL) {
+void CouenneProblem::addObjective (expression *newobj, const std::string &sense = "min") {
   objectives_ . push_back 
-    (new Objective (newobj, ((!sense) || strncasecmp (sense, "max", 3)) ? MINIMIZE : MAXIMIZE));
+    (new Objective (newobj, (sense == "min") ? MINIMIZE : MAXIMIZE));
 }
 
 
@@ -213,7 +213,7 @@ void CouenneProblem::convexify () {
   }
 
   // convexify those constraints that are originally linear 
-  ********************** /*
+  ********************** 
   for (std::vector <CouenneConstraint *>::iterator con = constraints_.begin ();
        con != constraints_.end (); con++)
 

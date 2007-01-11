@@ -32,7 +32,7 @@ class exprMin: public exprOp {
 
   // I/O
   void print (std::ostream &out)
-    {exprOp:: print (out, (char *) "min", PRE);}
+    {exprOp:: print (out, "min", PRE);}
 
   // function for the evaluation of the expression
   CouNumber operator () ();

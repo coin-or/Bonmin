@@ -27,9 +27,17 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
 
   if (!asl) return;
 
-  problem_ -> readnl      (asl);  printf ("-- Original\n");     problem_ -> print (std::cout); 
-  problem_ -> standardize ();     //printf ("-- Standardized\n"); problem_ -> print (std::cout);
-  //  problem_ -> convexify   ();     //printf ("-- Convexified\n");  problem_ -> print (std::cout);
+  problem_ -> readnl      (asl);  
+
+  printf ("-- Original\n");     
+  problem_ -> print (std::cout); 
+
+  problem_ -> standardize ();     
+
+  printf ("--------------------------\n");
+  //  printf ("-- Standardized\n"); problem_ -> print (std::cout);
+  //  problem_ -> convexify   ();     
+  //  printf ("-- Convexified\n");  problem_ -> print (std::cout);
 }
 
 
@@ -92,7 +100,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       u [i] = uc [i];
     }
 
-    expression::update (x,l,u);
+    printf ("!!!!-------x\n");
+    for (int i=0; i < getnvars (); i++)
+      printf ("%3d %12.9f\n", i, x [i]);
+
+    problem_ ->  update (x,l,u);
+    expression:: update (x,l,u);
   }
 
   // For each auxiliary variable replacing the original constraints,
@@ -127,7 +140,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       if (lb > - COUENNE_INFINITY + 1) orc -> setLb  (lb);
       if (ub <   COUENNE_INFINITY - 1) orc -> setUb  (ub);
 
-      /*
+
       printf ("con %d: ", i);
       if (lb > - COUENNE_INFINITY) 
 	printf ("%.4f <= ", lb);
@@ -136,7 +149,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	printf (" <= %.4f\n", ub);
 
       printf ("1st... cut: "); orc -> print ();
-      */
 
       cs.insert (orc);
     }
@@ -144,13 +156,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
-
-  if (!firstcall_) {
-
-    printf ("-----------x\n");
-    for (int i=0; i < getnvars (); i++)
-      printf ("%3d %12.3f\n", i, x [i]);
-  }
 
   for (int i = 0; i<problem_ -> nAuxs (); i++)
     problem_ -> Aux (i) -> generateCuts (si, cs, this);

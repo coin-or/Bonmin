@@ -21,6 +21,7 @@
 
 #define OBJ_DE ((const ASL_pfgh *) asl) -> I.obj2_de_
 #define CON_DE ((const ASL_pfgh *) asl) -> I.con2_de_
+#define OBJ_sense ((const ASL_pfgh *) asl) -> i.objtype_
 
 
 // check if an expression is a null pointer or equals zero
@@ -105,8 +106,8 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     expression *subst = body -> simplify ();
     if (subst) body = subst;
 
-    char *sense = "max";
-    addObjective (body, sense);
+    // asl.h, line 336: 0 is minimization, 1 is maximization
+    addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
   }
 
 

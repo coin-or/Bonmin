@@ -55,7 +55,7 @@ class exprOp: public expression {
     {return nargs_;}
 
   // I/O
-  virtual void print (std::ostream &, char *, enum pos);
+  virtual void print (std::ostream &, const std::string &, enum pos);
 
   // function for the evaluation of the expression
   virtual inline CouNumber operator () ();

@@ -94,8 +94,6 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   bool check = cg -> isFirst () || !(cg -> addViolated ());
 
-  //  CouNumbers *coeff;
-  //  int       *index;
   OsiRowCut *cut;
 
   int w_ind = aux       -> Index ();
@@ -110,25 +108,12 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     if ((u < COUENNE_INFINITY - 1) && 
 	(check || ((w-log(l) * (u-l) < (x-l) * log(u)*log(l) - COUENNE_EPS)))) {
 
-      //      cut   = new OsiRowCut;
-      //      coeff = new CouNumber [2];
-      //      index = new int       [2];
-
       CouNumber dx   = u-l;
       CouNumber logu = log (u);
       CouNumber dw   = logu - log (l);
 
       if ((cut = cg -> createCut (dx*logu - u*dw, +1, w_ind, dx, x_ind, -dw)))
 	cs.insert (cut);
-      /*
-      coeff [0] =  dx; index [0] = w_ind;
-      coeff [1] = -dw; index [1] = x_ind;
-
-      cut -> setLb ();
-      cut -> setRow (2, index, coeff);
-
-      printf ("Log lower: "); cut -> print ();
-      */
     }
 
   // fix bound interval (unless you like infinite coefficients)
@@ -147,44 +132,4 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // add upper envelope
 
   cg -> addEnvelope (cs, -1, log, inv, w_ind, x_ind, x, l, u);
-
-  /*
-  if ((cg -> ConvType () == UNIFORM_GRID) || cg -> isFirst ()) {
-
-    // choose sampling points. If unbounded, re-bound using a rule of
-    // thumb where each point is taken every log 2 from the finite bound
- 
-    // now add tangent at each sampling point
-
-    CouNumber sample = l, 
-              step   = pow (u/l, 1/ns);
-
-    for (int i = 0; i <= ns; i++) {
-
-      addTangent (cs, w_ind, x_ind, sample, log (sample), 1./sample, -1);
-      sample *= step;
-    }
-  } else if (cg -> ConvType () == CURRENT_ONLY)
-    addTangent (cs, w_ind, x_ind, x, log (x), 1./x, -1);
-  else {
-
-    CouNumber sample = x;
-
-    addTangent (cs, w_ind, x_ind, x, log (x), 1./x, -1);
-
-    for (int i = 0; i <= ns/2; i++) {
-
-      sample -= (x-l) / ns;
-      addTangent (cs, w_ind, x_ind, sample, log (sample), 1./sample, -1);
-    }
-
-    sample = x;
-
-    for (int i = 0; i <= ns/2; i++) {
-
-      sample += (u-x) / ns;
-      addTangent (cs, w_ind, x_ind, sample, log (sample), 1./sample, -1);
-    }
-  }
-  */
 }
