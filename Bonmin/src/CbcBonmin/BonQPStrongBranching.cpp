@@ -4,9 +4,12 @@
 // Turn off compiler warning about long names
 #  pragma warning(disable:4786)
 #endif
-
+#define Verbose
 #include "BonQPStrongBranching.hpp"
+
+#ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
+#endif
 
 namespace Bonmin {
 
@@ -82,16 +85,15 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
   SmartPtr<TNLPSolver> tqp_solver =
     tminlp_interface->solver()->clone();
   // Get a warm start object from the node just solved
-  CoinWarmStart* warmStart;
+  CoinWarmStart* warmStart = NULL;
+#ifdef COIN_HAS_FILTERSQP
   FilterSolver* filter_solver =
     dynamic_cast<FilterSolver*> (tminlp_interface->solver());
   if (filter_solver) {
     warmStart = filter_solver->getWarmStart(tminlp2tnlp);
   }
-  else {
-    warmStart = NULL;
-  }
-
+#endif
+  
   for (int i=0; i<numStrong; i++) {
     int& index = list_[i];
     const OsiObject * object = solver->object(index);
