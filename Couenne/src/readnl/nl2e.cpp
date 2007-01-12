@@ -69,7 +69,7 @@ expression *nl2e (expr2 *e) {
 
   switch (getOperator (e -> op)) {
 
-  case OPPLUS:  /* printf ("[+]");*/ return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPPLUS:   /*printf ("[+]");*/ return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPMINUS:  /*printf ("[-]");*/ return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPMULT:   /*printf ("[*]");*/ return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPDIV:    /*printf ("[/]");*/ return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
@@ -91,7 +91,7 @@ expression *nl2e (expr2 *e) {
 						   new exprExp (new exprOpp (nl2e (e -> L.e)))));
   case OP_sin:    /*printf ("[S]");*/ return new exprSin (nl2e (e -> L.e));
   case OP_log10:  /*printf ("[L]");*/ return new exprMul (new exprConst (1.0 / log (10.0)), 
-				      new exprLog (nl2e (e -> L.e)));
+							  new exprLog (nl2e (e -> L.e)));
   case OP_log:    /*printf ("[l]");*/ return new exprLog (nl2e (e -> L.e));
   case OP_exp:    /*printf ("[e]");*/ return new exprExp (nl2e (e -> L.e));
   case OP_cosh:   /*printf ("[c]");*/ return new exprMul (new exprConst (0.5),
@@ -119,14 +119,13 @@ expression *nl2e (expr2 *e) {
     //  case OPtrunc:
 
   case OP1POW: /*printf ("[p]");*/ return new exprPow (nl2e (e -> L.e), 
-						   new exprConst (((expr_n *)e->R.e)->v));
-  case OP2POW: /*printf ("[P]");*/ return new exprPow (nl2e (/*(expr*)0x807fc24 */e -> L.e), 
+						       new exprConst (((expr_n *)e->R.e)->v));
+  case OP2POW: /*printf ("[P]");*/ return new exprPow (nl2e (e -> L.e), 
 						       new exprConst (2));
   case OPCPOW: /*printf ("[E]");*/ return new exprPow (new exprConst (((expr_n *)e->L.e)->v),
-						   nl2e (e -> R.e));
+						       nl2e (e -> R.e));
     //  case OPFUNCALL:
-  case OPNUM: /*printf ("[#]");*/
-    //    if ((unsigned int)e->op < N_OPS)
+  case OPNUM: //printf ("[#] %d %d %d\n", sizeof (*(expr_n *) e), sizeof (expr_n), sizeof (expr));
       return new exprConst (((expr_n *)e)->v);
     //  case OPPLTERM:
     //  case OPIFSYM:

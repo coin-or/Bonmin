@@ -45,12 +45,38 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     addVariable ();
 
   // read lower and upper bounds of variables
-  expression::update (NULL, LUv, Uvx);
+  //  expression::update (NULL, LUv, Uvx);
 
   // create room for problem's variables and bounds
   x_  = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   lb_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   ub_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
+
+  // check groups ////////////////////////////////////////////////////////////////////
+
+  if (asl -> P. cps) 
+    printf (">>>>>> ps struct, con, %d basic, %d group\n", 
+	    asl -> P. cps -> nb, 
+	    asl -> P. cps -> ng);
+
+  if (asl -> P. cps -> ng) 
+    printf ("%f, %d lin, %d nlin\n",
+	    asl -> P. cps -> g -> g0, 
+	    asl -> P. cps -> g -> nlin, 
+	    asl -> P. cps -> g -> ns);
+
+  if (asl -> P. ops) 
+    printf (">>>>>> ps struct, obj, %d basic, %d group\n",
+	    asl -> P. ops -> nb, 
+	    asl -> P. ops -> ng);
+
+  if (asl -> P. ops -> ng) 
+    printf ("%f, %d lin, %d nlin\n",
+	    asl -> P. ops -> g -> g0, 
+	    asl -> P. ops -> g -> nlin, 
+	    asl -> P. ops -> g -> ns);
+
+
 
   // objective functions /////////////////////////////////////////////////////////////
 
@@ -106,7 +132,7 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     expression *subst = body -> simplify ();
     if (subst) body = subst;
 
-    // asl.h, line 336: 0 is minimization, 1 is maximization
+    // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
   }
 
@@ -265,6 +291,9 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
       lb_ [i] = - COUENNE_INFINITY;
       ub_ [i] =   COUENNE_INFINITY;
     }
+
+  // read lower and upper bounds of variables
+  expression::update (NULL, lb_, ub_);
 
   if (X0) for (int i=n_var; i--;) x_ [i] = (havex0 [i]) ? X0 [i] : 0; 
   else    for (int i=n_var; i--;) x_ [i] = 0.5 * (lb_ [i] + ub_ [i]);

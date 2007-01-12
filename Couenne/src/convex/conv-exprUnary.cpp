@@ -99,4 +99,3 @@ void exprUnary::segment (expression*& coeff, expression*& rhs) {
 		     new exprSub (new exprClone (uba), new exprClone (lba)));
 }
 */
-

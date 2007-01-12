@@ -20,8 +20,9 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   // a maximum of three terms are allowed here. Index -1 means the
   // term is not considered
 
-  int nterms = 1;
+  int nterms = 0;
 
+  if (i1 >= 0) nterms++; // useless, but you never know...
   if (i2 >= 0) nterms++;
   if (i3 >= 0) nterms++;
 
