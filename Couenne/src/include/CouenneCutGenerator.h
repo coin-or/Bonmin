@@ -39,7 +39,7 @@ class CouenneCutGenerator: public CglCutGenerator {
   OsiCuts *bonCs_;
 
   // similarly, a fictitious object to make calls to generateCuts 
-  OsiClpSolverInterface *bonOs_;
+  OsiSolverInterface *bonOs_;
 
   // has generateCuts been called yet?
   mutable bool firstcall_;
@@ -65,18 +65,38 @@ class CouenneCutGenerator: public CglCutGenerator {
 			enum conv_type = UNIFORM_GRID, 
 			int = 2);
   // copy constructor
-  CouenneCutGenerator  (const CouenneCutGenerator &) {}
+  CouenneCutGenerator  (const CouenneCutGenerator &);
 
   // destructor
   ~CouenneCutGenerator ();
 
   // clone method (necessary for the abstract CglCutGenerator class)
-  CouenneCutGenerator *clone () const 
-    {return NULL;}
+  CouenneCutGenerator *clone () const;
 
   // return pointer to symbolic problem
-  CouenneProblem *Problem ()  
+  CouenneProblem *Problem () const
     {return problem_;}
+
+  // set problem pointer
+  void setProblem (CouenneProblem *p)
+    {problem_ = p;}
+
+  // set solver interface
+  void setBonOs (OsiSolverInterface *b)
+    {bonOs_ = b;}
+
+  // set cut set
+  void setBonCs (OsiCuts *c)
+    {bonCs_ = c;}
+
+  // copy pool
+  void copyPool (int n, OsiRowCut **p) {
+
+    pool_ = new OsiRowCut * [n];
+    for (int i=0; i<n; i++)
+      pool_ [i] = new OsiRowCut (*(p [i]));
+    ncuts_ = n;
+  }
 
   // get methods
   int         getncuts ()      const {return ncuts_;}
@@ -87,6 +107,7 @@ class CouenneCutGenerator: public CglCutGenerator {
   const CouNumber   &Lb      (int i)  {return problem_ -> Lb (i);}
   const CouNumber   &Ub      (int i)  {return problem_ -> Ub (i);}
 
+  // get arrays
   const CouNumber   *X       ()       {return problem_ -> X  ();}
   const CouNumber   *Lb      ()       {return problem_ -> Lb ();}
   const CouNumber   *Ub      ()       {return problem_ -> Ub ();}
@@ -97,6 +118,10 @@ class CouenneCutGenerator: public CglCutGenerator {
   // has generateCuts been called yet?
   bool isFirst () const 
     {return firstcall_;}
+
+  // set firstcall_ (used by clone)
+  void setIsFirst (bool s) 
+    {firstcall_ = s;}
 
   // should we add the violated cuts only (true), or all of them (false)?
   bool addViolated () const
@@ -121,9 +146,6 @@ class CouenneCutGenerator: public CglCutGenerator {
   // update linearization cut pool (parameters are current point,
   // current lower-, and current upper bound)
   int updateConv (CouNumber *, CouNumber *, CouNumber *);
-
-  // updates auxiliary variables' bounds
-  //  void updateBounds (CouNumber *, CouNumber *);
 
   // create cut and check violation
   OsiRowCut *createCut (CouNumber, // rhs
@@ -151,17 +173,5 @@ class CouenneCutGenerator: public CglCutGenerator {
 // add half-plane corresponding to tangent in given point
   void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int) const;
 };
-
-
-// add half-plane defined by two points (x1,y1) and (x2, y2), and
-// sign. Sign is only valid if x1 < x2
-
-/*
-void addSegment (OsiCuts &, // cut set, 
-		 int, int,  // index of x and y
-		 CouNumber, CouNumber, // x1, y1
-		 CouNumber, CouNumber, // x2, y2
-		 int); // sign (see createCut () above for meaning)
-*/
 
 #endif

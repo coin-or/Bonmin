@@ -46,6 +46,9 @@ class CouenneProblem {
   CouenneProblem  () {}
   ~CouenneProblem ();
 
+  // clone method (for use within CouenneCutGenerator::clone)
+  CouenneProblem *clone () const;
+
   // update value of variables and bounds
   void update (CouNumber *x, CouNumber *l, CouNumber *u) 
   {x_ = x; lb_ = l; ub_ = u;}

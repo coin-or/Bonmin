@@ -57,6 +57,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/add_tangent.cpp \
 	convex/CouenneCutGenerator.cpp \
+	convex/generateCuts.cpp \
 	problem/problem.cpp \
 	problem/constraint.cpp \
 	convex/update_conv.cpp \

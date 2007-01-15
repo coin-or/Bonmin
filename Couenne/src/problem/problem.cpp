@@ -19,6 +19,12 @@
 #include <CouenneProblem.h>
 #include <CouenneProblemElem.h>
 
+// clone problem
+
+CouenneProblem *CouenneProblem::clone () const {
+
+  return NULL;
+}
 
 // methods to add objective function
 
