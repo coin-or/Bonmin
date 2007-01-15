@@ -331,7 +331,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
       cut = cg -> createCut (0, +1, w_ind, CouNumber (1.));
 
-      if (cut) {printf ("Trivial cut: "); cut -> print ();}
+      //      if (cut) {printf ("Trivial cut: "); cut -> print ();}
 
       if (cut) 
 	cs.insert (cut);

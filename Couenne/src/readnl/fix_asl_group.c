@@ -109,7 +109,6 @@ void fix_asl_group (psg_elem *g) {
     arglist [--nterms] = lin;
   }
 
-  /*  free (g -> ge -> L.e); */
   sum -> op = (efunc2 *)(long) OPSUMLIST;
   g -> ge -> L.e = sum;
 }

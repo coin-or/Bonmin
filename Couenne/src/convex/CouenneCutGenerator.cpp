@@ -26,18 +26,8 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   problem_        (new CouenneProblem) {
 
   if (!asl) return;
-
   problem_ -> readnl      (asl);  
-
-  printf ("-- Original\n");     
-  problem_ -> print (std::cout); 
-
   problem_ -> standardize ();     
-
-  printf ("--------------------------\n");
-  //  printf ("-- Standardized\n"); problem_ -> print (std::cout);
-  //  problem_ -> convexify   ();     
-  //  printf ("-- Convexified\n");  problem_ -> print (std::cout);
 }
 
 
@@ -99,11 +89,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       l [i] = lc [i];
       u [i] = uc [i];
     }
-
+    /*
     printf ("!!!!-------x\n");
     for (int i=0; i < getnvars (); i++)
       printf ("%3d %12.9f\n", i, x [i]);
-
+    */
     problem_ ->  update (x,l,u);
     expression:: update (x,l,u);
   }
@@ -140,7 +130,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       if (lb > - COUENNE_INFINITY + 1) orc -> setLb  (lb);
       if (ub <   COUENNE_INFINITY - 1) orc -> setUb  (ub);
 
-
+      /*
       printf ("con %d: ", i);
       if (lb > - COUENNE_INFINITY) 
 	printf ("%.4f <= ", lb);
@@ -149,7 +139,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	printf (" <= %.4f\n", ub);
 
       printf ("1st... cut: "); orc -> print ();
-
+      */
       cs.insert (orc);
     }
   }
@@ -213,7 +203,7 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 			      wi, CouNumber (1.), 
 			      xi, oppslope);
 
-  if (cut) {printf ("Segment: "); cut -> print ();}
+  //  if (cut) {printf ("Segment: "); cut -> print ();}
 
   if (cut) 
     cs.insert (cut);

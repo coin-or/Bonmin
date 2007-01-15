@@ -33,7 +33,7 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
       if ((cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
 			    x_ind, opp_slope))) {
-	printf ("  Uniform %d: ", i); cut -> print ();
+	//	printf ("  Uniform %d: ", i); cut -> print ();
 	cs.insert (cut);
       }
 
@@ -48,7 +48,7 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
     if ((cut = createCut (f (x) + opp_slope * x, sign, 
 			  w_ind, CouNumber (1.),
 			  x_ind, opp_slope))) {
-      printf ("  Current tangent: "); cut -> print ();
+      //      printf ("  Current tangent: "); cut -> print ();
       cs.insert (cut);
     }
 
@@ -60,7 +60,7 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
       if ((cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
 			    x_ind, opp_slope))) {
-	printf ("  neighbour -%d: ", i); cut -> print ();
+	//	printf ("  neighbour -%d: ", i); cut -> print ();
 	cs.insert (cut);
       }
     }
@@ -75,7 +75,7 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
       if ((cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
 			    x_ind, opp_slope))) {
-	printf ("  neighbour  %d: ", i); cut -> print ();
+	//	printf ("  neighbour  %d: ", i); cut -> print ();
 	cs.insert (cut);
       }
     }

@@ -98,9 +98,9 @@ class exprAux: public exprVar {
   // generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg)
-    {printf ("Generating cut for "); 
+    {/*printf ("Generating cut for "); 
     print (std::cout);  printf (" := ");
-    image_ -> print (std::cout); printf("\n"); 
+    image_ -> print (std::cout); printf("\n"); */
     image_ -> generateCuts (this, si, cs, cg);}
 
   // generate equality between *this and *w

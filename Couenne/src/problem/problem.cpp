@@ -113,29 +113,14 @@ void CouenneProblem::standardize () {
 
   expression::update (x_, lb_, ub_);
 
-  for (int i=0; i < nVars (); i++) {
+  for (int i=0; i < nVars (); i++)
     (*(variables_ [i])) ();
-    /*
-    printf ("VAR %d:", i); fflush (stdout);
-    printf (" %7.3f [%7.3f %7.3f]\n", x_ [i], lb_ [i], ub_ [i]); 
-    */
-  }
 
   for (int i=nVars (), j=0; j < nAuxs (); i++, j++) {
 
     lb_ [i] = (*(auxiliaries_ [j] -> Lb    ())) ();
     ub_ [i] = (*(auxiliaries_ [j] -> Ub    ())) ();
     x_  [i] = (*(auxiliaries_ [j] -> Image ())) ();
-    /*
-    printf ("AUX %d:", i); 
-    printf (" %7.3f",   x_  [i]);
-    printf (" [%7.3f ", lb_ [i]);
-    printf (" %7.3f]\n", ub_ [i]);
-    auxiliaries_ [j] ->             print (std::cout); printf (" = ");
-    auxiliaries_ [j] -> Image () -> print (std::cout); printf (" in [");
-    auxiliaries_ [j] -> Lb    () -> print (std::cout); printf (" ||| ");
-    auxiliaries_ [j] -> Ub    () -> print (std::cout); printf ("]\n");
-    */
   }
 }
 
@@ -154,10 +139,12 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
        i != constraints_.end (); i++)
     (*i) -> print (out);
 
+  /*
   printf ("linear constraints:\n");
   for (std::vector <LinearConstraint *>::iterator i = linearconstraints_.begin ();
        i != linearconstraints_.end (); i++)
     (*i) -> print (out);
+  */
 
   printf ("auxiliaries:\n");
   for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
@@ -281,7 +268,7 @@ void CouenneProblem::convexify () {
 
 // Allocate space in coeff, indices, rhs, and sign, for n constraint
 // with number of coefficients given in nterms. Used in upper- and lowerLinearHull
-
+/*
 void allocateCon (int n, int *nterms,                     // input data
  		  expression ***& coeff, int **& indices, // allocated data
 		  expression **& rhs, enum con_sign *& sign) {
@@ -298,7 +285,7 @@ void allocateCon (int n, int *nterms,                     // input data
     indices [n] = new int          [nt];
   }
 }
-
+*/
 
 // destroy problem components
 
@@ -312,9 +299,11 @@ CouenneProblem::~CouenneProblem () {
        i != objectives_ . end (); i++)
     delete (*i);
 
+  /*
   for (std::vector <LinearConstraint *>::iterator i = linearconstraints_ . begin ();
        i != linearconstraints_ . end (); i++)
     delete (*i);
+  */
 
   for (std::vector <exprAux *>::iterator i = auxiliaries_ . begin ();
        i != auxiliaries_ . end (); i++)

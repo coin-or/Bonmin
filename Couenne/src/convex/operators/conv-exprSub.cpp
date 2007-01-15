@@ -100,7 +100,7 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   cut -> setLb (rhs);
   cut -> setRow (nvars, index, coeff);
 
-  printf ("Sub: "); cut -> print ();
+  //  printf ("Sub: "); cut -> print ();
 
   cs.insert (cut);
 }

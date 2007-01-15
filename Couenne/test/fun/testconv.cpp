@@ -60,7 +60,7 @@ int main (int argc, char **argv) {
   // Although very intuitive, we shall explain why the second argument
   // is passed with a minus sign: it is to tell the ASL to retrieve
   // the nonlinear information too.
-  nl   = jac0dim   (stub, - (fint) strlen (stub));
+  nl = jac0dim (stub, - (fint) strlen (stub));
 
   // Set options in the asl structure
   want_xpi0 = 1 | 2;  // allocate initial values for primal and dual if available
@@ -225,7 +225,7 @@ int main (int argc, char **argv) {
 
   objcoe [cg -> Problem () -> Obj (0) -> Body () -> Index ()] = 1;
 
-
+  /*
   printf ("START: "); for (int i=0; i<=nvar0; i++) printf ("%2d ", start [i]); printf ("\n");
   printf ("Index: "); for (int i=0; i<start [nvar0]; i++) printf ("%2d ",index [i]); printf ("\n");
   printf ("coeff: "); for (int i=0; i<start [nvar0]; i++) printf ("%.3g ",coeff[i]); printf ("\n");
@@ -234,7 +234,7 @@ int main (int argc, char **argv) {
   printf ("ub:    "); for (int i=0; i<nvar0; i++)if(u[i]< 1e15) printf("%.3g ",u [i]);printf ("\n");
   printf ("rlb:   "); for (int i=0; i<ncon0; i++)if(rlb[i]>-1e15)printf("%.3g ",rlb[i]);printf("\n");
   printf ("rub:   "); for (int i=0; i<ncon0; i++)if(rub[i]<1e15)printf("%.3g ",rub[i]);printf ("\n");
-
+  */
 
   clp -> loadProblem (nvar0, ncon0, start, index, coeff, 
 		      l, u, objcoe, rlb, rub);  
@@ -249,7 +249,7 @@ int main (int argc, char **argv) {
   printf ("-----------------------\n");
 
   // not more than 10 iterations of cut generation
-  for (int round = 0; round < 30; round++) {
+  for (int round = 0; round < 5; round++) {
 
     for (int i = cs . sizeRowCuts (); i--;)
       cs. eraseRowCut (i);
@@ -263,7 +263,7 @@ int main (int argc, char **argv) {
     
     sprintf (fname, "round%d", round);
 
-    clp -> writeMps (fname);
+    //    clp -> writeMps (fname);
     clp -> writeLp  (fname);
 
     cg -> generateCuts (*clp, cs, tree);
@@ -291,17 +291,17 @@ int main (int argc, char **argv) {
 
     for (int i = 0; i < ncuts; i++)
       newRowCuts [i] = cs.rowCutPtr (i);
-
+    /*
     for (int i = 0; i < ncuts; i++) {
       printf (" >> Adding cut ");
       newRowCuts [i] -> print ();
     }
-
+    */
     clp -> applyRowCuts (ncuts, newRowCuts);
 
     delete [] newRowCuts;
 
-    printf (">>> it. %4d: %4d new cuts. New obj.: %12.2f\n-----------------------\n", 
+    printf (">>> it. %4d: %4d new cuts. New obj.: %12.2f\n", 
 	    round, ncuts, clp->getObjValue());
 
     clp -> resolve();  

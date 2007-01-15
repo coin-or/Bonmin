@@ -96,7 +96,7 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   cut -> setLb (-rhs);
   cut -> setUb (-rhs);
 
-  printf ("Sum: "); cut -> print ();
+  //  printf ("Sum: "); cut -> print ();
 
   cs.insert (cut);
 }

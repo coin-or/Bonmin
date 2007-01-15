@@ -219,10 +219,10 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = x_ind;}
 	else                        {coe = xe -> Value (); ind = y_ind;}
 
-	printf ("========> w=cx: c=%.4f, x_%d, w_%d\n", coe, ind, w_ind);
+	//	printf ("========> w=cx: c=%.4f, x_%d, w_%d\n", coe, ind, w_ind);
 
 	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, CouNumber (-1.), ind, coe))){
-	  cut -> print ();
+	  //	  cut -> print ();
 	  cs.insert (cut);
 	}
       }
@@ -265,7 +265,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((yl > - COUENNE_INFINITY + 1) && (xl > - COUENNE_INFINITY + 1) &&
       (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl))) {
 
-    printf ("--- cut 1: "); cut -> print ();
+    //    printf ("--- cut 1: "); cut -> print ();
     cs.insert (cut);
   }
 
@@ -274,7 +274,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((yu < COUENNE_INFINITY - 1) && (xu < COUENNE_INFINITY - 1) &&
       (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu))) {
 
-    printf ("--- cut 2: "); cut -> print ();
+    //    printf ("--- cut 2: "); cut -> print ();
     cs.insert (cut);
   }
 
@@ -283,7 +283,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((yl > - COUENNE_INFINITY + 1) && (xu < COUENNE_INFINITY - 1) &&
       (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu))) {
 
-    printf ("--- cut 3: "); cut -> print ();
+    //    printf ("--- cut 3: "); cut -> print ();
     cs.insert (cut);
   }
 
@@ -291,7 +291,8 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   if ((yu < COUENNE_INFINITY - 1) && (xl > - COUENNE_INFINITY + 1) &&
       (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl))) {
-    printf ("--- cut 4: "); cut -> print ();
+
+    //    printf ("--- cut 4: "); cut -> print ();
     cs.insert (cut);
   }
 }
