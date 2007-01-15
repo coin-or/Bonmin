@@ -1,7 +1,7 @@
 /*
  * Name:    readnl.C
  * Author:  Pietro Belotti
- * Purpose: define a reader for .nl files. Adapted from ampl2ev3 by Leo Liberti and Stefano Galli 
+ * Purpose: define a reader for .nl files. Adapted from ampl2ev3 by L. Liberti and S. Galli 
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -32,9 +32,14 @@ inline bool is_expr_zero (expr* e)
 
 
 // translates an ASL expression into an expression
-
 expression *nl2e (expr *);
 
+
+// replaces group in original position within expression tree
+
+extern "C" {
+  void fix_asl_group (psg_elem *);
+}
 
 // Reads a MINLP from an AMPL .nl file through the ASL methods
 
@@ -44,38 +49,37 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   for (int i=0; i<n_var; i++)
     addVariable ();
 
-  // read lower and upper bounds of variables
-  //  expression::update (NULL, LUv, Uvx);
-
   // create room for problem's variables and bounds
   x_  = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   lb_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   ub_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
 
-  // check groups ////////////////////////////////////////////////////////////////////
+  // fix groups //////////////////////////////////////////////////////////////////////
 
-  if (asl -> P. cps) 
-    printf (">>>>>> ps struct, con, %d basic, %d group\n", 
+  if (asl -> P. cps) {
+    /*
+    printf (">>> ps struct, con, %d basic, %d group\n", 
 	    asl -> P. cps -> nb, 
 	    asl -> P. cps -> ng);
+    */
 
-  if (asl -> P. cps -> ng) 
-    printf ("%f, %d lin, %d nlin\n",
-	    asl -> P. cps -> g -> g0, 
-	    asl -> P. cps -> g -> nlin, 
-	    asl -> P. cps -> g -> ns);
+    int ngroups = asl -> P. cps -> ng;
+    for (int i=0; i<ngroups; i++) 
+      fix_asl_group (asl -> P. cps -> g + i);
+  }
 
-  if (asl -> P. ops) 
-    printf (">>>>>> ps struct, obj, %d basic, %d group\n",
-	    asl -> P. ops -> nb, 
+  if (asl -> P. ops) {
+    /*
+    printf (">>> ps struct, obj, %d basic, %d group\n",
+            asl -> P. ops -> nb, 
 	    asl -> P. ops -> ng);
+    */
 
-  if (asl -> P. ops -> ng) 
-    printf ("%f, %d lin, %d nlin\n",
-	    asl -> P. ops -> g -> g0, 
-	    asl -> P. ops -> g -> nlin, 
-	    asl -> P. ops -> g -> ns);
+    int ngroups = asl -> P. ops -> ng;
 
+    for (int i=0; i<ngroups; i++)
+      fix_asl_group (&(asl -> P. ops -> g [i]));
+  }
 
 
   // objective functions /////////////////////////////////////////////////////////////

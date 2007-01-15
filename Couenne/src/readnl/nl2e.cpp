@@ -40,32 +40,6 @@ expression *nl2e (expr2 *e) {
 
   expression **al;
   expr **ep;
-  /*
-  printf ("\n> %10x: {op=%10x, a=%4d, L=%10x, R=%10x} sz %3d:", 
-	  e, e->op, e->a, e->L, e->R, sizeof (*e)); fflush (stdout);
-  */
-  /*
-  if (e==(void *) 0x807fc88)
-    for (int i=0; i<2000; i++) {
-      if (!(i%22)) printf ("\n");
-      printf (" %8x", 
-	      (void *)(*((int **)e-1000+i))); 
-      //     if ((void *)(*((int **)e-1000+i)) == (void *) 0x807fc24)
-      //       printf ("Found at %x\n", e-1000+i);
-    }
-  */
-
-  //  unsigned char *Li = (unsigned char *) e;
-  //  char *Ri = (char *) e -> R);
-  /*
-  printf ("\n[");
-  for (int i=0; i< sizeof (*e); i++)
-    printf ("%d ", (unsigned char) (Li [i]));
-  //  printf ("] [");
-  //  for (int i=0; i< sizeof (union ei2); i++)
-  //   printf ("%2x|", Ri [i]);
-  printf ("]");
-  */
 
   switch (getOperator (e -> op)) {
 
@@ -81,7 +55,7 @@ expression *nl2e (expr2 *e) {
     //  case FLOOR:     
     //  case CEIL:      
   case ABS:       /*printf ("[|]");*/ return new exprAbs (nl2e (e -> L.e));
-  case OPUMINUS:  /*printf ("[~]");*/ return new exprOpp (nl2e (e -> L.e ->L.e));
+  case OPUMINUS:  /*printf ("[~]");*/ return new exprOpp (nl2e (e -> L.e));
     //  case OPIFnl:
     //  case OP_tanh:
     //  case OP_tan:
@@ -106,7 +80,7 @@ expression *nl2e (expr2 *e) {
     //  case OP_asin:
     //  case OP_acosh:
     //  case OP_acos:
-  case OPSUMLIST: /*printf ("[++]");*/ {
+  case OPSUMLIST: {
     register int i=0;
     al = new expression * [(e->R.ep - e->L.ep)];
     for (ep = e->L.ep; ep < e->R.ep; ep++)
@@ -125,12 +99,11 @@ expression *nl2e (expr2 *e) {
   case OPCPOW: /*printf ("[E]");*/ return new exprPow (new exprConst (((expr_n *)e->L.e)->v),
 						       nl2e (e -> R.e));
     //  case OPFUNCALL:
-  case OPNUM: //printf ("[#] %d %d %d\n", sizeof (*(expr_n *) e), sizeof (expr_n), sizeof (expr));
-      return new exprConst (((expr_n *)e)->v);
+  case OPNUM:   return new exprConst (((expr_n *)e)->v);
     //  case OPPLTERM:
     //  case OPIFSYM:
     //  case OPHOL:
-  case OPVARVAL: /*printf ("[x]");*/ return new exprVar (e->a);
+  case OPVARVAL: return new exprVar (e->a);
 
   case -1:
   default: printf ("WARNING: operator %d in expression not implemented\n", (int) e -> op); 

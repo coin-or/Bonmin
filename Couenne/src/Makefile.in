@@ -47,7 +47,8 @@ host_triplet = @host@
 # If we have the Ampl solver library, we need to add additional things
 @COIN_HAS_ASL_TRUE@am__append_1 = readnl/readnl.cpp \
 @COIN_HAS_ASL_TRUE@			 readnl/nl2e.cpp \
-@COIN_HAS_ASL_TRUE@			 readnl/invmap.c
+@COIN_HAS_ASL_TRUE@			 readnl/invmap.c \
+@COIN_HAS_ASL_TRUE@			 readnl/fix_asl_group.c
 
 
 # If we have the Ampl solver library, we need to add additional things
@@ -108,8 +109,10 @@ am__libCouenne_la_SOURCES_DIST = expression/operators/exprAbs.cpp \
 	convex/operators/add_tangent.cpp \
 	convex/CouenneCutGenerator.cpp problem/problem.cpp \
 	problem/constraint.cpp convex/update_conv.cpp util/rootQ.c \
-	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
-@COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
+	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c \
+	readnl/fix_asl_group.c
+@COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
+@COIN_HAS_ASL_TRUE@	fix_asl_group.lo
 am_libCouenne_la_OBJECTS = exprAbs.lo exprCos.lo exprDiv.lo exprExp.lo \
 	exprInv.lo exprLog.lo exprMul.lo exprOpp.lo exprPow.lo \
 	exprSin.lo exprSub.lo exprSum.lo exprMax.lo exprMin.lo \
@@ -533,6 +536,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix_asl_group.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nl2e.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
@@ -577,6 +581,13 @@ invmap.lo: readnl/invmap.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readnl/invmap.c' object='invmap.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o invmap.lo `test -f 'readnl/invmap.c' || echo '$(srcdir)/'`readnl/invmap.c
+
+fix_asl_group.lo: readnl/fix_asl_group.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fix_asl_group.lo -MD -MP -MF "$(DEPDIR)/fix_asl_group.Tpo" -c -o fix_asl_group.lo `test -f 'readnl/fix_asl_group.c' || echo '$(srcdir)/'`readnl/fix_asl_group.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/fix_asl_group.Tpo" "$(DEPDIR)/fix_asl_group.Plo"; else rm -f "$(DEPDIR)/fix_asl_group.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readnl/fix_asl_group.c' object='fix_asl_group.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fix_asl_group.lo `test -f 'readnl/fix_asl_group.c' || echo '$(srcdir)/'`readnl/fix_asl_group.c
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

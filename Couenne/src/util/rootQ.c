@@ -12,6 +12,12 @@
 #include <CouennePrecisions.h>
 #include <stdio.h>
 
+/*
+inline int round (double x) {
+  return (int) (ceil (x - 0.5));
+}
+*/
+
 /* compute Q(x)*/
 
 CouNumber Q (int k, CouNumber x) {
@@ -33,6 +39,7 @@ CouNumber Q (int k, CouNumber x) {
 
   return Q;
 }
+
 
 /*
  * Find roots of polynomial $Q^k(x) = \sum_{i=1}^{2k} i x^{i-1}$. Used

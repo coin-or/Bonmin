@@ -76,7 +76,8 @@ libCouenne_la_LDFLAGS = $(LT_LDFLAGS)
 if COIN_HAS_ASL
 libCouenne_la_SOURCES += readnl/readnl.cpp \
 			 readnl/nl2e.cpp \
-			 readnl/invmap.c
+			 readnl/invmap.c \
+			 readnl/fix_asl_group.c
 endif
 
 ########################################################################

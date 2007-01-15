@@ -12,12 +12,10 @@
 #include <CouenneTypes.h>
 #include <math.h>
 
-const CouNumber COUENNE_EPS       = 1e-100;
-const CouNumber COUENNE_EPS_SIMPL = 1e-200;
-const CouNumber COUENNE_INFINITY  = 1e+300;
+#define COUENNE_EPS       1e-100
+#define COUENNE_EPS_SIMPL 1e-200
+#define COUENNE_INFINITY  1e+300
 
-inline int FELINE_round (double x) {
-  return (int) (ceil (x - 0.5));
-}
+#define FELINE_round(x) ((int) (floor ((x)+0.5)))
 
 #endif
