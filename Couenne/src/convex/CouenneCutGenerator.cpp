@@ -7,6 +7,8 @@
  * This file is licensed under the Common Public License.
  */
 
+#include <OsiRowCut.hpp>
+
 #include <CglCutGenerator.hpp>
 #include <CouenneCutGenerator.h>
 
@@ -48,8 +50,10 @@ CouenneCutGenerator::~CouenneCutGenerator () {
 
 // clone method
 
-CouenneCutGenerator *CouenneCutGenerator::clone () const{
+CouenneCutGenerator *CouenneCutGenerator::clone () const
+  {return new CouenneCutGenerator (*this);}
 
+/*
   CouenneCutGenerator *dolly = new CouenneCutGenerator 
     (NULL, addviolated_, convtype_, nSamples_);
 
@@ -62,12 +66,24 @@ CouenneCutGenerator *CouenneCutGenerator::clone () const{
 
   return dolly;
 }
-
+*/
 
 // copy constructor
 
-CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src) {
+CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
+  CglCutGenerator (),
+  ncuts_       (src.getncuts ()),
+  pool_        (new OsiRowCut * [ncuts_]),
+  bonCs_       (new OsiCuts (*(src.getBonCs ()))),
+  bonOs_       (src.getBonOs () -> clone ()),
+  firstcall_   (src.isFirst ()),
+  addviolated_ (src. addViolated ()), 
+  convtype_    (src. ConvType ()), 
+  nSamples_    (src. nSamples ()),
+  problem_     (src.Problem() -> clone ()) {
 
+  for (int i=0; i<ncuts_; i++)
+    pool_ [i] = src. getCut (i) -> clone ();
 }
 
 

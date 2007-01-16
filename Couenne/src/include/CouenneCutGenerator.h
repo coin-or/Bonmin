@@ -78,25 +78,20 @@ class CouenneCutGenerator: public CglCutGenerator {
     {return problem_;}
 
   // set problem pointer
-  void setProblem (CouenneProblem *p)
-    {problem_ = p;}
+  //  void setProblem (CouenneProblem *p)
+  //    {problem_ = p;}
 
   // set solver interface
-  void setBonOs (OsiSolverInterface *b)
-    {bonOs_ = b;}
+  //  void setBonOs (OsiSolverInterface *b)
+  //    {bonOs_ = b;}
 
   // set cut set
-  void setBonCs (OsiCuts *c)
-    {bonCs_ = c;}
+  //  void setBonCs (OsiCuts *c)
+  //    {bonCs_ = c;}
 
   // copy pool
-  void copyPool (int n, OsiRowCut **p) {
-
-    pool_ = new OsiRowCut * [n];
-    for (int i=0; i<n; i++)
-      pool_ [i] = new OsiRowCut (*(p [i]));
-    ncuts_ = n;
-  }
+  //  void copyPool (int n, OsiRowCut **p) {
+  //  }
 
   // get methods
   int         getncuts ()      const {return ncuts_;}
@@ -115,13 +110,21 @@ class CouenneCutGenerator: public CglCutGenerator {
   int getnvars () const {return problem_ -> nVars () + 
 			        problem_ -> nAuxs ();} 
 
+  // Solver interface (used in copy constructor)
+  OsiSolverInterface *getBonOs () const
+    {return bonOs_;}
+
+  // Cutset (used in copy constructor)
+  OsiCuts *getBonCs () const
+    {return bonCs_;}
+
   // has generateCuts been called yet?
   bool isFirst () const 
     {return firstcall_;}
 
   // set firstcall_ (used by clone)
-  void setIsFirst (bool s) 
-    {firstcall_ = s;}
+  //  void setIsFirst (bool s) 
+  //    {firstcall_ = s;}
 
   // should we add the violated cuts only (true), or all of them (false)?
   bool addViolated () const
