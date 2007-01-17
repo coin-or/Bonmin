@@ -38,7 +38,8 @@ expression *nl2e (expr *);
 // replaces group in original position within expression tree
 
 extern "C" {
-  void fix_asl_group (psg_elem *);
+  void fix_asl_group  (psg_elem *);
+  void free_asl_group (psg_elem *);
 }
 
 // Reads a MINLP from an AMPL .nl file through the ASL methods
@@ -138,6 +139,8 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
     // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
+
+    delete [] al;
   }
 
 
@@ -303,6 +306,13 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   else    for (int i=n_var; i--;) x_ [i] = 0.5 * (lb_ [i] + ub_ [i]);
 
   delete [] nterms;
+  delete [] alists;
+
+  for (int i=asl -> P. ops -> ng; i--;)
+    free_asl_group (asl -> P. ops -> g + i);
+
+  for (int i=asl -> P. cps -> ng; i--;)
+    free_asl_group (asl -> P. cps -> g + i);
 
   return 0;
 }

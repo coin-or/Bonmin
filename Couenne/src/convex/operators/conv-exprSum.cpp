@@ -96,6 +96,9 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   cut -> setLb (-rhs);
   cut -> setUb (-rhs);
 
+  delete [] index;
+  delete [] coeff;
+
   //  printf ("Sum: "); cut -> print ();
 
   cs.insert (cut);

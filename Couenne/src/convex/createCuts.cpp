@@ -56,6 +56,9 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
 
     cut -> setRow (nterms, index, coeff);
 
+    delete [] coeff;
+    delete [] index;
+
     return cut;
   }
   else return NULL;

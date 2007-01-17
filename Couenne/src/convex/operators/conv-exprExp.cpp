@@ -147,6 +147,9 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // approximate the exponential function from below
   cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u);
 
+  delete le;
+  delete ue;
+
   /*
   if ((cg -> ConvType () == UNIFORM_GRID) || cg -> isFirst ()) {
 

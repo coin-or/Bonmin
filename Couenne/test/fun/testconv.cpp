@@ -315,6 +315,18 @@ int main (int argc, char **argv) {
   }
 
   delete clp;
+  delete cg;
+
+  delete [] x;  
+  delete [] l;  
+  delete [] u;
+
+  delete [] X0;
+  delete [] havex0;
+  delete [] pi0;
+  delete [] havepi0;
+
+  ASL_free ((ASL **) &asl);
 
   return 0;
 }

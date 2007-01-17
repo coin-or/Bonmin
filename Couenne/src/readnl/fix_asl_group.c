@@ -101,7 +101,7 @@ void fix_asl_group (psg_elem *g) {
 
       /* expression is x */
 
-      lin = (expr *) malloc (sizeof (expr));
+      /*      lin = (expr *) malloc (sizeof (expr));*/
       lin -> op = (efunc2 *)(long) OPVARVAL;
       lin -> a = g -> L[j]. v.i;
     }
@@ -111,4 +111,30 @@ void fix_asl_group (psg_elem *g) {
 
   sum -> op = (efunc2 *)(long) OPSUMLIST;
   g -> ge -> L.e = sum;
+}
+
+
+/* free restored group (since not taken care of within ASL_free) */
+
+void free_asl_group (psg_elem *g) {
+
+  int j;
+
+  /* free constant expr_n part */
+  if (fabs (g -> g0) > COUENNE_EPS)
+    free (g -> ge -> L.e -> L.ep [g->ns + g->nlin]);
+
+  /* free linear parts */
+  for (j = 0; j < g->nlin; j++) {
+    if (fabs (g -> L[j]. fac - 1.0) > COUENNE_EPS) {
+      free (g -> ge -> L.e -> L.ep [j] -> L.e);
+      free (g -> ge -> L.e -> L.ep [j] -> R.e);
+    }
+    free (g -> ge -> L.e -> L.ep [j]);
+  }
+
+  /* free the whole OPSUMLIST */
+
+  free (g -> ge -> L.e -> L.ep);
+  free (g -> ge -> L.e);
 }

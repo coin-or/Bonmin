@@ -47,6 +47,10 @@ CouenneCutGenerator::~CouenneCutGenerator () {
     delete bonCs_;
     delete bonOs_;
   }
+
+  cleanup ();
+
+  delete problem_;
 }
 
 

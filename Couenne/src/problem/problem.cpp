@@ -31,8 +31,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p) {
 
   register int i;
 
-  //  for (i=0; i < p.nObjs   (); i++) objectives_  . push_back (p.Obj   (i) -> clone ());
-  //  for (i=0; i < p.nNLCons (); i++) constraints_ . push_back (p.NLCon (i) -> clone ());
+  for (i=0; i < p.nObjs   (); i++) objectives_  . push_back (p.Obj   (i) -> clone ());
+  for (i=0; i < p.nNLCons (); i++) constraints_ . push_back (p.NLCon (i) -> clone ());
   for (i=0; i < p.nVars   (); i++) variables_   . push_back (p.Var   (i) -> clone ());
   for (i=0; i < p.nAuxs   (); i++) auxiliaries_ . push_back (p.Aux   (i) -> clone ());
 
@@ -312,7 +312,11 @@ void allocateCon (int n, int *nterms,                     // input data
 // destroy problem components
 
 CouenneProblem::~CouenneProblem () {
-
+  /*
+  delete x_;
+  delete lb_;
+  delete ub_;
+  */
   for (std::vector <CouenneConstraint *>::iterator i = constraints_ . begin ();
        i != constraints_ . end (); i++)
     delete (*i);
@@ -326,8 +330,9 @@ CouenneProblem::~CouenneProblem () {
        i != linearconstraints_ . end (); i++)
     delete (*i);
   */
-
+  /*
   for (std::vector <exprAux *>::iterator i = auxiliaries_ . begin ();
        i != auxiliaries_ . end (); i++)
     delete (*i);
+  */
 }

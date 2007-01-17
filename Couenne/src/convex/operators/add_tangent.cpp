@@ -49,6 +49,9 @@ void CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi,
 
     cut -> setRow (2, index, coeff);
 
+    delete [] index;
+    delete [] coeff;
+
     //    printf ("Tangent: "); cut -> print ();
 
     cs.insert (cut);
