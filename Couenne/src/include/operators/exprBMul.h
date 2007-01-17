@@ -25,6 +25,10 @@ class exprLBMul: public exprOp {
 
   ~exprLBMul () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprLBMul (clonearglist (), nargs_);}
+
   // function for the evaluation of the expression
   CouNumber operator () ();
 
@@ -80,6 +84,10 @@ class exprUBMul: public exprOp {
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   ~exprUBMul () {}
+
+  // cloning method
+  expression *clone () const
+    {return new exprUBMul (clonearglist (), nargs_);}
 
   // function for the evaluation of the expression
   CouNumber operator () ();

@@ -25,7 +25,7 @@ class exprVar: public expression {
 
  protected:
 
-  int varIndex_; //< the address of the variable's current value
+  int varIndex_; //< the index of the variable's current value
 
  public:
 
@@ -33,14 +33,23 @@ class exprVar: public expression {
   virtual inline enum nodeType Type () 
     {return VAR;}
 
-  // Constructor, destructor
-  exprVar  (int varIndex):
+  // Constructor
+  exprVar (int varIndex):
     varIndex_ (varIndex) {}
 
+  // destructor
   ~exprVar () {}
 
+  // copy constructor
+  exprVar (const exprVar &e):
+    varIndex_ (e.Index ()) {}
+
+  // cloning method
+  virtual exprVar *clone ()
+    {return new exprVar (*this);}
+
   // get variable index in problem
-  inline int Index () 
+  inline int Index () const
     {return varIndex_;}
 
   // print

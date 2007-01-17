@@ -16,7 +16,7 @@
 #include <exprCopy.h>
 
 
-// expression copy (points to VALUE of another expression) 
+// expression clone (points to VALUE and EXPRESSION of another expression) 
 
 class exprClone: public exprCopy {
 
@@ -27,10 +27,18 @@ class exprClone: public exprCopy {
     exprCopy (copy -> Original ()) {}
   ~exprClone () {}
 
+  // copy constructor
+  exprClone (const exprClone &e):
+    exprCopy (e.Original ()) {}
+
+  // cloning method
+  virtual exprClone *clone ()
+  {return new exprClone (this);}
+
   // If this is an exprClone of a exprClone of an expr???, point to
   // the original expr??? instead of an exprClone -- improves computing
   // efficiency
-  virtual inline expression *Original () {return copy_ -> Original ();}
+  virtual inline expression *Original () const {return copy_ -> Original ();}
 
   // I/O
   void print (std::ostream &out) 

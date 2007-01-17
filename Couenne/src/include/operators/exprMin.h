@@ -30,6 +30,10 @@ class exprMin: public exprOp {
 
   ~exprMin () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprMin (clonearglist (), nargs_);}
+
   // I/O
   void print (std::ostream &out)
     {exprOp:: print (out, "min", PRE);}

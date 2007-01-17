@@ -32,6 +32,10 @@ class exprPow: public exprOp {
 
   ~exprPow () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprPow (clonearglist (), nargs_);}
+
   void print (std::ostream&);
 
   // function for the evaluation of the expression

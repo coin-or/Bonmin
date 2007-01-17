@@ -50,6 +50,17 @@ class exprAux: public exprVar {
     delete ub_;
   }
 
+  // copy constructor
+  exprAux (const exprAux &e):
+    exprVar (e.Index ()),
+    image_  (e.Image () -> clone ())
+
+    {image_ -> getBounds (lb_, ub_);}
+
+  // cloning method
+  virtual exprAux *clone ()
+    {return new exprAux (*this);}
+
   // set lower bound
   void setLB (expression *lb) 
     {if (lb_) delete lb_; lb_ = lb;}

@@ -25,6 +25,10 @@ class exprLBDiv: public exprOp {
 
   ~exprLBDiv () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprLBDiv (clonearglist (), nargs_);}
+
   // function for the evaluation of the expression
   CouNumber operator () ();
 
@@ -77,6 +81,10 @@ class exprUBDiv: public exprOp {
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   ~exprUBDiv () {}
+
+  // cloning method
+  expression *clone () const
+    {return new exprUBDiv (clonearglist (), nargs_);}
 
   // function for the evaluation of the expression
   CouNumber operator () ();

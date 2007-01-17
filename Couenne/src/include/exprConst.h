@@ -30,10 +30,20 @@ class exprConst: public expression {
   inline CouNumber Value () const 
     {return currValue_;}
 
-  // Constructors, destructor
-  exprConst  (CouNumber value) 
+  // Constructor
+  exprConst (CouNumber value)
     {currValue_ = value;}
+
+  // Destructor
   ~exprConst () {}
+
+  // Copy constructor
+  exprConst (const exprConst &e)
+    {currValue_ = e.Value ();}
+
+  // Cloning method
+  virtual exprConst *clone ()
+    {return new exprConst (currValue_);}
 
   // I/O
   inline void print (std::ostream &out) 

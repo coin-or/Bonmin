@@ -26,6 +26,10 @@ class exprLog: public exprUnary {
 
   ~exprLog () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprLog (argument_ -> clone ());}
+
   void print (std::ostream&);
 
   // differentiation

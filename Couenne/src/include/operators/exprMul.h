@@ -28,6 +28,10 @@ class exprMul: public exprOp {
 
   ~exprMul () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprMul (clonearglist (), nargs_);}
+
   // print expression
   void print (std::ostream&);
 

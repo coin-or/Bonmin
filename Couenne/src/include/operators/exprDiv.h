@@ -28,6 +28,11 @@ class exprDiv: public exprOp {
 
   ~exprDiv () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprDiv (clonearglist (), nargs_);}
+
+  // I/O
   void print (std::ostream&);
 
   // function for the evaluation of the expression

@@ -28,6 +28,10 @@ class exprCos: public exprUnary {
 
   ~exprCos () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprCos (argument_ -> clone ());}
+
   // print "cos" and argument
   void print (std::ostream&);
 

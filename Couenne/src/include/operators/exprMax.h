@@ -31,6 +31,10 @@ class exprMax: public exprOp {
 
   ~exprMax () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprMax (clonearglist (), nargs_);}
+
   // I/O
   void print (std::ostream &out)
     {exprOp:: print (out, "max", PRE);}

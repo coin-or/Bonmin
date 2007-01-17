@@ -21,10 +21,26 @@
 
 // clone problem
 
-CouenneProblem *CouenneProblem::clone () const {
+CouenneProblem *CouenneProblem::clone () const
+  {return new CouenneProblem (*this);}
 
-  return NULL;
+
+// copy constructor
+
+CouenneProblem::CouenneProblem (const CouenneProblem &p) {
+
+  register int i;
+
+  //  for (i=0; i < p.nObjs   (); i++) objectives_  . push_back (p.Obj   (i) -> clone ());
+  //  for (i=0; i < p.nNLCons (); i++) constraints_ . push_back (p.NLCon (i) -> clone ());
+  for (i=0; i < p.nVars   (); i++) variables_   . push_back (p.Var   (i) -> clone ());
+  for (i=0; i < p.nAuxs   (); i++) auxiliaries_ . push_back (p.Aux   (i) -> clone ());
+
+  x_  = p.X();
+  lb_ = p.Lb();
+  ub_ = p.Ub();
 }
+
 
 // methods to add objective function
 
@@ -78,9 +94,9 @@ expression *CouenneProblem::addVariable () {
 // add auxiliary variable and associate it with pointer to expression
 // given as argument
 
-exprAux *CouenneProblem::addAuxiliary (expression *added) {
+exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
-  exprAux *var = new exprAux (added, variables_ . size () + auxiliaries_ . size ());
+  exprAux *var = new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
   auxiliaries_ . push_back (var);
 
   return var;

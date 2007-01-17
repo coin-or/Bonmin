@@ -31,7 +31,7 @@ class CouenneProblem {
   std::vector <CouenneConstraint *> constraints_;
 
   // data of the linearized problem
-  std::vector <LinearConstraint *> linearconstraints_;
+  //  std::vector <LinearConstraint *> linearconstraints_;
   std::vector <exprAux          *> auxiliaries_;
   std::vector <exprVar          *> variables_;
 
@@ -42,8 +42,9 @@ class CouenneProblem {
 
  public:
 
-  // constructor, destructor
+  // constructors, destructor
   CouenneProblem  () {}
+  CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 
   // clone method (for use within CouenneCutGenerator::clone)
@@ -57,27 +58,27 @@ class CouenneProblem {
   int nObjs   () const {return objectives_.        size ();}
   int nNLCons () const {return constraints_.       size ();}
 
-  int nCons   () const {return linearconstraints_. size ();}
+  //  int nCons   () const {return linearconstraints_. size ();}
   int nAuxs   () const {return auxiliaries_.       size ();}
   int nVars   () const {return variables_.         size ();}
 
   // get elements from vectors
-  CouenneConstraint *NLCon (int i) const {return constraints_       [i];}
-  Objective         *Obj   (int i) const {return objectives_        [i];}
+  CouenneConstraint *NLCon (int i) const {return constraints_  [i];}
+  Objective         *Obj   (int i) const {return objectives_   [i];}
 
-  LinearConstraint  *Con   (int i) const {return linearconstraints_ [i];}
-  exprAux           *Aux   (int i) const {return auxiliaries_       [i];}
-  exprVar           *Var   (int i) const {return variables_         [i];}
-
-  // get and set current variable and bounds
-  CouNumber         &X     (int i) {return x_                 [i];}
-  CouNumber         &Lb    (int i) {return lb_                [i];}
-  CouNumber         &Ub    (int i) {return ub_                [i];}
+  //  LinearConstraint  *Con   (int i) const {return linearconstraints_ [i];}
+  exprAux     *Aux   (int i) const {return auxiliaries_  [i];}
+  exprVar     *Var   (int i) const {return variables_    [i];}
 
   // get and set current variable and bounds
-  CouNumber         *X     () {return x_;}
-  CouNumber         *Lb    () {return lb_;}
-  CouNumber         *Ub    () {return ub_;}
+  CouNumber   &X     (int i) {return x_   [i];}
+  CouNumber   &Lb    (int i) {return lb_  [i];}
+  CouNumber   &Ub    (int i) {return ub_  [i];}
+
+  // get and set current variable and bounds
+  CouNumber  *X     () const {return x_;}
+  CouNumber  *Lb    () const {return lb_;}
+  CouNumber  *Ub    () const {return ub_;}
 
   // add (non linear) objective function
   void addObjective     (expression *, const std::string &);
@@ -91,16 +92,17 @@ class CouenneProblem {
   // add linear constraints defined as - w + a * x >=< b, where a is
   // an expression (function of variable bounds) pointed to by coeff,
   // where b is the expression rhs
-  void inline addLinearConstraint (exprAux *w, exprVar *x, expression *coeff, 
+  /*  void inline addLinearConstraint (exprAux *w, exprVar *x, expression *coeff, 
 				   expression *rhs, enum con_sign sign)
     {linearconstraints_ . push_back (new LinearConstraint  (w, x, coeff, rhs, sign));}
+  */
 
   // add linear constraint defined by array of n coefficients and
   // array of n indices, with lower- and upper bounds and sign
-  void inline addLinearConstraint (int n, expression **coeffs, int *indices,
+  /*  void inline addLinearConstraint (int n, expression **coeffs, int *indices,
 				   expression *rhs, enum con_sign sign)
     {linearconstraints_ . push_back (new LinearConstraint (n, coeffs, indices, rhs, sign));}
-
+  */
   // add variable
   expression *addVariable ();
 

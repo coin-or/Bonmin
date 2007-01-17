@@ -84,10 +84,14 @@ class expression {
 
   // Constructor, destructor
   expression () {}
+  expression (const expression &e) {}
   virtual ~expression () {}
 
+  // cloning method
+  virtual expression *clone () {return NULL;}
+
   // return index of variable (only valid for exprVar and exprAux)
-  virtual inline int Index () 
+  virtual inline int Index () const
     {return -1;}
 
   // return arglist (when applicable, that is, with N-ary functions)

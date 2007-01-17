@@ -28,6 +28,10 @@ class exprSub: public exprOp {
 
   ~exprSub () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprSub (clonearglist (), nargs_);}
+
   void print (std::ostream&);
 
   // function for the evaluation of the expression

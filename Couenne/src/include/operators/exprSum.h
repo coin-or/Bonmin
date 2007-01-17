@@ -27,6 +27,10 @@ class exprSum: public exprOp {
 
   ~exprSum () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprSum (clonearglist (), nargs_);}
+
   // I/O
   virtual void print (std::ostream &);
 

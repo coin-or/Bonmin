@@ -29,6 +29,10 @@ class exprOpp: public exprUnary {
     exprUnary (al, opp) {} //< non-leaf expression, with argument list
   ~exprOpp () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprOpp (argument_ -> clone ());}
+
   void print (std::ostream&);
 
   // differentiation

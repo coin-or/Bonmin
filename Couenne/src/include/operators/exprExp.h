@@ -23,6 +23,10 @@ class exprExp: public exprUnary {
     exprUnary (al, exp) {} //< non-leaf expression, with argument list
   ~exprExp () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprExp (argument_ -> clone ());}
+
   // output
   void print (std::ostream&);
 

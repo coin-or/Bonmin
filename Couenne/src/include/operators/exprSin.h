@@ -26,6 +26,10 @@ class exprSin: public exprUnary {
     exprUnary (al, sin) {} //< non-leaf expression, with argument list
   ~exprSin () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprSin (argument_ -> clone ());}
+
   void print (std::ostream&);
 
   // differentiation

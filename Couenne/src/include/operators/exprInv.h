@@ -29,6 +29,10 @@ class exprInv: public exprUnary {
     exprUnary (al, inv) {} //< non-leaf expression, with argument list
   ~exprInv () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprInv (argument_ -> clone ());}
+
   // output "1/argument"
   void print (std::ostream&);
 

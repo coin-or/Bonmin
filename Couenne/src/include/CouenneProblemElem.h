@@ -53,10 +53,20 @@ class CouenneConstraint {
     delete ub_;
   }
 
+  // copy constructor
+  CouenneConstraint  (const CouenneConstraint &c):
+    body_  (c.Body () -> clone ()), 
+    lb_    (c.Lb   () -> clone ()),
+    ub_    (c.Ub   () -> clone ()) {}
+
+  // cloning method
+  inline CouenneConstraint *clone () const
+    {return new CouenneConstraint (*this);}
+
   // get constraint's elements
-  inline expression *Lb   () {return lb_;}
-  inline expression *Ub   () {return ub_;}
-  inline expression *Body () {return body_;}
+  inline expression *Lb   () const {return lb_;}
+  inline expression *Ub   () const {return ub_;}
+  inline expression *Body () const {return body_;}
 
   // set body of constraint
   inline expression *Body (expression *newBody) 
@@ -74,7 +84,7 @@ class CouenneConstraint {
 // Linear constraint class, with an array of expression for the
 // coefficients, an array of indices (int) for the variables, a lower
 // bound and an upper bound (both of class expression). 
-
+/*
 class LinearConstraint {
 
  protected:
@@ -156,7 +166,7 @@ class LinearConstraint {
 
   void print (std::ostream &);
 };
-
+*/
 
 // Objective function class, with an expression and an optimization
 // direction
@@ -173,21 +183,40 @@ class Objective {
 
  public:
 
+  // constructor
   Objective  (expression *body, enum opt_sense sense):
     body_ (body), sense_ (sense) {}
 
+  // destructor
   ~Objective () 
     {delete body_;}
 
-  //  inline expression     *body  () {return body_;}
-  //  inline enum opt_sense  sense () {return sense_;}
+  // copy constructor
+  Objective  (const Objective &o):
+    body_  (o.Body  () -> clone ()), 
+    sense_ (o.Sense ()) {}
 
-  inline expression *Body (expression *newBody = NULL) 
-    {if (newBody) body_ = newBody; return body_;}
+  // cloning method
+  inline Objective *clone () const
+    {return new Objective (*this);}
 
+  // optimization sense
+  inline enum opt_sense Sense () const
+    {return sense_;}
+
+  // get body
+  inline expression *Body () const
+    {return body_;}
+
+  // set body
+  expression *Body (expression *newBody) 
+    {body_ = newBody; return body_;}
+
+  // get standard form of this objective function
   inline exprAux *standardize (CouenneProblem *p) 
     {return body_ -> standardize (p);}
 
+  // I/O
   void print (std::ostream &out = std::cout) {
     out << (sense_ == MAXIMIZE ? "max " : "min ");
     body_ -> print (out);

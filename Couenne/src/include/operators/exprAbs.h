@@ -26,6 +26,10 @@ class exprAbs: public exprUnary {
     exprUnary (al, fabs) {} //< non-leaf expression, with argument list
   ~exprAbs () {}
 
+  // cloning method
+  expression *clone () const
+    {return new exprAbs (argument_ -> clone ());}
+
   void print (std::ostream&);
 
   // differentiation

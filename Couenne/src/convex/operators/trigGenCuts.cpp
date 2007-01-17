@@ -80,40 +80,30 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
   CouNumber lb = (*lbe) (), 
             ub = (*ube) ();
 
-  printf ("Trig slopes: "); 
-
   // add the lower envelope, left: w - x <= f lb - lb 
 
   int x_ind = arg -> Index ();
   int w_ind = aux -> Index ();
 
   if ((cut = cg -> createCut (f (lb) - lb, -1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (-1.)))) {
-    cut -> print ();
+			      x_ind, CouNumber (-1.))))
     cs.insert (cut);
-  }
 
   // and right: w + x <= f ub + ub 
 
   if ((cut = cg -> createCut (f (ub) + ub, -1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (1.)))) {
-    cut -> print ();
+			      x_ind, CouNumber (1.))))
     cs.insert (cut);
-  }
 
   // add the lower envelope, right: w - x >= cos ub - ub 
 
   if ((cut = cg -> createCut (f (ub) - ub, +1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (-1.)))) {
-    cut -> print ();
+			      x_ind, CouNumber (-1.))))
     cs.insert (cut);
-  }
 
   // and left: w + x >= cos lb + lb 
 
   if ((cut = cg -> createCut (f (lb) + lb, +1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (1.)))) {
-    cut -> print ();
+			      x_ind, CouNumber (1.))))
     cs.insert (cut);
-  }
 }

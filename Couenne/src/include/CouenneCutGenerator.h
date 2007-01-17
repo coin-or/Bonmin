@@ -77,35 +77,19 @@ class CouenneCutGenerator: public CglCutGenerator {
   CouenneProblem *Problem () const
     {return problem_;}
 
-  // set problem pointer
-  //  void setProblem (CouenneProblem *p)
-  //    {problem_ = p;}
-
-  // set solver interface
-  //  void setBonOs (OsiSolverInterface *b)
-  //    {bonOs_ = b;}
-
-  // set cut set
-  //  void setBonCs (OsiCuts *c)
-  //    {bonCs_ = c;}
-
-  // copy pool
-  //  void copyPool (int n, OsiRowCut **p) {
-  //  }
-
   // get methods
-  int         getncuts ()      const {return ncuts_;}
-  OsiRowCut  *getCut   (int i) const {return pool_ [i];}
+  int         getncuts   ()      const {return ncuts_;}
+  OsiRowCut  *getCut     (int i) const {return pool_ [i];}
 
-  const CouNumber   X        (int i) const  {return problem_ -> X  (i);}
+  const CouNumber   X    (int i) const {return problem_ -> X  (i);}
 
-  const CouNumber   &Lb      (int i)  {return problem_ -> Lb (i);}
-  const CouNumber   &Ub      (int i)  {return problem_ -> Ub (i);}
+  const CouNumber   &Lb  (int i) {return problem_ -> Lb (i);}
+  const CouNumber   &Ub  (int i) {return problem_ -> Ub (i);}
 
   // get arrays
-  const CouNumber   *X       ()       {return problem_ -> X  ();}
-  const CouNumber   *Lb      ()       {return problem_ -> Lb ();}
-  const CouNumber   *Ub      ()       {return problem_ -> Ub ();}
+  const CouNumber   *X   ()      {return problem_ -> X  ();}
+  const CouNumber   *Lb  ()      {return problem_ -> Lb ();}
+  const CouNumber   *Ub  ()      {return problem_ -> Ub ();}
 
   int getnvars () const {return problem_ -> nVars () + 
 			        problem_ -> nAuxs ();} 
@@ -122,19 +106,15 @@ class CouenneCutGenerator: public CglCutGenerator {
   bool isFirst () const 
     {return firstcall_;}
 
-  // set firstcall_ (used by clone)
-  //  void setIsFirst (bool s) 
-  //    {firstcall_ = s;}
-
   // should we add the violated cuts only (true), or all of them (false)?
   bool addViolated () const
     {return addviolated_;}
 
-  // get or set convexification type (see CouenneTypes.h)
+  // get convexification type (see CouenneTypes.h)
   enum conv_type ConvType () const
     {return convtype_;}
 
-  // get or set convexification type (see CouenneTypes.h)
+  // get number of convexification samples
   int nSamples () const
     {return nSamples_;}
 
@@ -173,7 +153,7 @@ class CouenneCutGenerator: public CglCutGenerator {
 		   CouNumber, CouNumber, 
 		   CouNumber, CouNumber, int) const;
 
-// add half-plane corresponding to tangent in given point
+  // add half-plane corresponding to tangent in given point
   void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int) const;
 };
 

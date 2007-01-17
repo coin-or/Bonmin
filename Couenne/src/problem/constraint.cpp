@@ -39,9 +39,8 @@ void CouenneConstraint::print (std::ostream &out = std::cout) {
 
 
 // output linear constraint
-
+/*
 void LinearConstraint::print (std::ostream &out = std::cout) {
-  /*
   if (ub_ && lb_ &&
       ((lb_ -> Type  () != CONST) ||
        (lb_ -> Value () > - COUENNE_INFINITY))) {
@@ -49,7 +48,7 @@ void LinearConstraint::print (std::ostream &out = std::cout) {
     lb_ -> print (out); 
     out << " <= ";
   }
-  */
+
 
   for (int i = 0; i<nterms_; i++) {
 
@@ -64,7 +63,7 @@ void LinearConstraint::print (std::ostream &out = std::cout) {
 
   rhs_ -> print (out);
 
-  /*
+
   if (ub_ && ((1) || (ub_ -> Type  () != CONST) || 
 	      (ub_ -> Value () <  COUENNE_INFINITY)))
     ub_ -> print (out);
@@ -81,7 +80,8 @@ void LinearConstraint::print (std::ostream &out = std::cout) {
       else printf ("(null!)");
       printf (" >> ");
     }
-  */
+  
 
   out << std::endl;
 }
+*/

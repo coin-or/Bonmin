@@ -47,6 +47,18 @@ class exprOp: public expression {
 
  ~exprOp ();
 
+  // copy constructor
+  exprOp (const exprOp &e):
+    arglist_ (new expression * [e.nArgs ()]),
+    nargs_   (e.nArgs ()) {
+
+  }
+
+  // cloning method
+  virtual exprOp *clone ()
+    {return new exprOp (*this);}
+
+
   // return class members
   inline expression **ArgList () const 
     {return arglist_;}
@@ -65,6 +77,14 @@ class exprOp: public expression {
 
   // simplification
   virtual expression *simplify ();
+
+  // clone argument list (for use with clone method
+  expression **clonearglist () const {
+    expression **al = new expression * [nargs_];
+    for (int i=0; i<nargs_; i++)
+      al [i] = arglist_ [i] -> clone ();
+    return al;
+  }
 
   // compress argument list
   int shrink_arglist (CouNumber, CouNumber);

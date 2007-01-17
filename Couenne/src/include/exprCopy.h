@@ -31,14 +31,22 @@ class exprCopy: public expression {
     {return copy_ -> Type ();}
 
   // Constructor, destructor
-  exprCopy  (expression *copy): 
-    copy_ (copy -> Original ()) {}
+  exprCopy  (expression *copy)
+    {copy_ = copy -> Original ();}
   ~exprCopy () {}
+
+  // copy constructor
+  exprCopy (const exprCopy &e):
+    copy_ (e.Original () -> clone ()) {}
+
+  // cloning method
+  virtual exprCopy *clone ()
+    {return new exprCopy (*this);}
 
   // If this is an exprClone of a exprClone of an expr???, point to
   // the original expr??? instead of an exprClone -- improves computing
   // efficiency
-  virtual inline expression *Original () 
+  virtual inline expression *Original () const
     {return copy_ -> Original ();}
 
   // get variable index in problem
