@@ -16,9 +16,6 @@
 #include <exprClone.h>
 #include <exprMul.h>
 #include <exprSum.h>
-#include <exprDiv.h>
-#include <exprOpp.h>
-#include <exprSub.h>
 #include <exprLog.h>
 #include <CouennePrecisions.h>
 #include <CouenneProblem.h>
@@ -276,23 +273,29 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     CouNumber q = qmap (intk);
 
-    // check if lower part needs a convex envelope
+    int sign;
+
+    if (isInvInt) {
+      q = safe_pow (q, k);
+      sign = -1;
+    }
+    else sign = 1;
 
     if (u > q * l) {
-      addPowEnvelope (cg, cs, w_ind, x_ind, x, k, q*l, u, +1);
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q, safe_pow (q,k), +1);
+      addPowEnvelope (cg, cs, w_ind, x_ind, x, k, q*l, u, sign);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
     }
     else
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), +1);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), sign);
 
     // check if upper part needs a concave envelope
 
     if (l < q * u) {
-      addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -1);
-      cg -> addSegment (cs, w_ind, x_ind, q, safe_pow (q,k), q, safe_pow (q,k), -1);
+      addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -sign);
+      cg -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
     }
     else
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -1);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -sign);
   }
   else {
 

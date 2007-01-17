@@ -34,7 +34,6 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
     // Should already be dealt with by simplify () / standardize ()
     //
 
-
     /*
     // x is constant, the expression is of the form base^y 
 
@@ -123,7 +122,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	  if (rndexp % 2) 
 	       all [3] = new exprConst (-COUENNE_INFINITY);
 	  else all [3] = new exprMin (new exprClone (all [1]),
-				      new exprPow (new exprCopy (lbbase), new exprConst (expon)));
+				      new exprPow (new exprCopy (lbbase), 
+						   new exprConst (expon)));
 	}
 	else all [3] = new exprCopy (all [1]);
 

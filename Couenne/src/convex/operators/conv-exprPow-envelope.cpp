@@ -15,7 +15,6 @@
 #include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>
 
-
 #define COUENNE_POW_CONST 1
 #define POW_FACTOR 2
 
@@ -66,48 +65,4 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
   exponent = k;
 
   cg -> addEnvelope (cs, sign, power_k, power_k_prime, wi, xi, x, l, u);
-				    
-  /*
-  if ((cg -> ConvType () == UNIFORM_GRID) || cg -> isFirst ()) {
-
-    // choose sampling points. 
-
-    // If unbounded, re-bound using a rule of thumb where each point
-    // is taken every z from the finite bound, z dependent on operator
- 
-    // now add tangent at each sampling point
-
-    CouNumber sample = l, step = (u-l) / ns;
-
-    for (int i = 0; i <= ns; i++) {
-
-      addTangent (cs, wi, xi, sample, pow (sample, k), k * pow (sample, k-1), sign);
-
-      sample += step;
-    }
-  } else 
-    if (cg -> ConvType () == CURRENT_ONLY)
-      addTangent (cs, wi, xi, x, pow (x, k), k * pow (x, k-1), sign);
-
-  else {
-
-    CouNumber sample = x;
-
-    addTangent (cs, wi, xi, x, exp (x), exp (x), +1);
-
-    for (int i = 0; i <= ns/2; i++) {
-
-      sample -= (x-l) / ns;
-      addTangent (cs, wi, xi, sample, pow (sample, k), k * pow (sample, k-1), sign);
-    }
-
-    sample = x;
-
-    for (int i = 0; i <= ns/2; i++) {
-
-      sample += (u-x) / ns;
-      addTangent (cs, wi, xi, sample, pow (sample, k), k * pow (sample, k-1), +1);
-    }
-  }
-  */
 }
