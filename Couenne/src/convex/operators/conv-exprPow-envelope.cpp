@@ -29,13 +29,13 @@ static CouNumber exponent;
 // function x^k
 
 inline static CouNumber power_k (CouNumber x) 
-{return pow (x, exponent);}
+{return safe_pow (x, exponent);}
 
 
 // function k*x^(k-1)
 
 inline static CouNumber power_k_prime (CouNumber x) 
-{return exponent * pow (x, exponent-1);}
+{return exponent * safe_pow (x, exponent-1);}
 
 
 // adds convex (upper/lower) envelope to a power function

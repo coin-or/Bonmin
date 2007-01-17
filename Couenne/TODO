@@ -2,3 +2,4 @@ add integrality to bound check
 use it for disj prog
 order in convexifying x*y*z*...*(1/w)*(1/t)*...
 linear convxfctn has an acyclic structure where x are leaves. Fourier-Motzkin? Acyclic graph computations?
+check duplicated auxiliary variables

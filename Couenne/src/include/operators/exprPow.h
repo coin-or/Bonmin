@@ -87,13 +87,33 @@ class exprPow: public exprOp {
 };
 
 
+// compute power and check for integer-and-odd inverse exponent
+
+inline CouNumber safe_pow (register CouNumber base, 
+			   register CouNumber exponent) {
+
+  register int rndexp;
+
+  if ((base < 0) && ((fabs (exponent - (rndexp = FELINE_round (exponent))) < COUENNE_EPS) ||
+       ((fabs (exponent) > COUENNE_EPS) && 
+	(fabs (1. / exponent - (rndexp = FELINE_round (1. / exponent))) < COUENNE_EPS)))
+      && (rndexp % 2))
+    return (- pow (- base, exponent));
+
+  return (pow (base, exponent));
+}
+
+
 // compute power
 
 inline CouNumber exprPow::operator () () {
 
   exprOp:: operator () ();
-  register CouNumber power = *sp--;
-  return (currValue_ = pow (*sp--, power));
+
+  register CouNumber exponent = *sp--;
+  register CouNumber base     = *sp--;
+
+  return (currValue_ = safe_pow (base,exponent));
 }
 
 

@@ -30,7 +30,8 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
       opp_slope = - fprime (sample);
 
-      if ((cut = createCut (f (sample) + opp_slope * sample, sign, 
+      if ((fabs (opp_slope) < COUENNE_INFINITY) && 
+	  (cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
 			    x_ind, opp_slope))) {
 	//	printf ("  Uniform %d: ", i); cut -> print ();
@@ -39,13 +40,14 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
       sample += step;
     }
-  } else if (convtype_ == CURRENT_ONLY)
+  } else if ((convtype_ == CURRENT_ONLY) && (fabs (opp_slope) < COUENNE_INFINITY))
     addTangent (cs, w_ind, x_ind, x, f (x), fprime (x), sign);
   else {
 
     CouNumber sample = x;
 
-    if ((cut = createCut (f (x) + opp_slope * x, sign, 
+    if ((fabs (opp_slope) < COUENNE_INFINITY) && 
+	(cut = createCut (f (x) + opp_slope * x, sign, 
 			  w_ind, CouNumber (1.),
 			  x_ind, opp_slope))) {
       //      printf ("  Current tangent: "); cut -> print ();
@@ -57,7 +59,8 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
       sample += (x-l) / nSamples_;
       opp_slope = - fprime (sample);
 
-      if ((cut = createCut (f (sample) + opp_slope * sample, sign, 
+      if ((fabs (opp_slope) < COUENNE_INFINITY) &&
+	  (cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
 			    x_ind, opp_slope))) {
 	//	printf ("  neighbour -%d: ", i); cut -> print ();

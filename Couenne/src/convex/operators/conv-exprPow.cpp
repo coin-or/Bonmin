@@ -280,28 +280,30 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     if (u > q * l) {
       addPowEnvelope (cg, cs, w_ind, x_ind, x, k, q*l, u, +1);
-      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), q, pow (q,k), +1);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q, safe_pow (q,k), +1);
     }
     else
-      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), +1);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), +1);
 
     // check if upper part needs a concave envelope
 
     if (l < q * u) {
       addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -1);
-      cg -> addSegment (cs, w_ind, x_ind, q, pow (q,k), q, pow (q,k), -1);
+      cg -> addSegment (cs, w_ind, x_ind, q, safe_pow (q,k), q, safe_pow (q,k), -1);
     }
     else
-      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), -1);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -1);
   }
   else {
 
     // 2) all other cases.
 
-    // if k is real or inv(k) is even, then lift l to max (0,l)
+    // if k is real or inv(k) is even, then lift l to max (0,l) but if
+    // also u is negative, there is no convexification -- this
+    // function is only defined on non-negative numbers
 
     if (!isInt 
-	&& !isInvInt
+	&& (!isInvInt || !(intk % 2))
 	&& (l < - COUENNE_EPS) 
 	&& (u < (l=0)))        // CAUTION! l is updated here, if negative
       return;
@@ -314,7 +316,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
       if (!(intk % 2))
 	cg -> addSegment (cs, w_ind, arglist_ [0] -> Index (), 
-		    l, pow (l,k), u, pow (u,k), +1);
+		    l, safe_pow (l,k), u, safe_pow (u,k), +1);
       return;
     }
 
@@ -356,7 +358,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	|| (u < - COUENNE_EPS)) &&
 	(l > - COUENNE_INFINITY + 1) &&
 	(u <   COUENNE_INFINITY - 1)) {
-      cg -> addSegment (cs, w_ind, x_ind, l, pow (l,k), u, pow (u,k), - sign);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), - sign);
     }
 
     // similarly, pay attention not to add infinite slopes
