@@ -40,9 +40,10 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
       sample += step;
     }
-  } else if ((convtype_ == CURRENT_ONLY) && 
-	     (fabs (opp_slope) < COUENNE_INFINITY))
+  } else if (convtype_ == CURRENT_ONLY) {
+    if (fabs (opp_slope) < COUENNE_INFINITY)
     addTangent (cs, w_ind, x_ind, x, f (x), fprime (x), sign);
+  }
   else {
 
     CouNumber sample = x;

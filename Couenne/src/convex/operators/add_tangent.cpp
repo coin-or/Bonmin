@@ -28,7 +28,7 @@ void CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi,
     ((violation >   COUENNE_EPS) && sign <= 0) ||
     ((violation < - COUENNE_EPS) && sign >= 0);
 
-  /*  printf ("######## P=(%.8f,%.8f) w=%.8f slope=%8.f sign=%d violation=%.8f\n", 
+  /*  printf ("######## P=(%.8f,%.8f) w=%.8f slope=%8.f sign=%d violation=%.8f\n",
       x, w, X (wi), slope, sign, violation);*/
 
   // add tangent only if first call or if violated
