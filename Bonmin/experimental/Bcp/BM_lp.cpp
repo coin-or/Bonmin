@@ -12,6 +12,7 @@ BM_lp::BM_lp() :
     feasChecker_(NULL),
     in_strong(0)
 {
+    nlp.Set_expose_warm_start(true);
     babSolver_.setSolver(&nlp);
     setOsiBabSolver(&babSolver_);
 }

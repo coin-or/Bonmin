@@ -25,7 +25,8 @@ namespace Bonmin{
   IpoptSolver::IpoptSolver(bool createEmpty /*= false*/):
     problemHadZeroDimension_(false),
     warmStartStrategy_(1),
-    enable_warm_start_(false)
+    enable_warm_start_(false),
+    optimized_before_(false)
   {
     if(createEmpty) return;
     app_ = new Ipopt::IpoptApplication();
@@ -45,6 +46,7 @@ namespace Bonmin{
 
     retval->app_ = app_->clone();
     enable_warm_start_ = false;
+    optimized_before_ = false;
 
     return GetRawPtr(retval);
   }
@@ -56,6 +58,7 @@ namespace Bonmin{
     app_->Initialize(params_file);
     app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
     setMinlpDefaults(app_->Options());
+    optimized_before_ = false;
   }
 
   void
@@ -64,6 +67,7 @@ namespace Bonmin{
     app_->Initialize(is);
     app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
     setMinlpDefaults(app_->Options());
+    optimized_before_ = false;
   }
 
   TNLPSolver::ReturnStatus
@@ -72,12 +76,13 @@ namespace Bonmin{
     TNLPSolver::ReturnStatus ret_status;
     if(!zeroDimension(tnlp, ret_status))
       {
-	//if (enable_warm_start_) {
-	//optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
-	//}
-	//else {
+	if (enable_warm_start_ && optimized_before_) {
+	  optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
+	}
+	else {
 	  optimizationStatus_ = app_->OptimizeTNLP(tnlp);
-	//}
+	}
+	optimized_before_ = true;
 	problemHadZeroDimension_ = false;
       }
     else
@@ -102,8 +107,14 @@ namespace Bonmin{
     TNLPSolver::ReturnStatus ret_status;
     if(!zeroDimension(tnlp, ret_status))
       {
-	optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
+	if (optimized_before_) {	
+	  optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
+	}
+	else {
+	  optimizationStatus_ = app_->OptimizeTNLP(tnlp);
+	}
 	problemHadZeroDimension_ = false;
+	optimized_before_ = true;
       }
     else
       {
