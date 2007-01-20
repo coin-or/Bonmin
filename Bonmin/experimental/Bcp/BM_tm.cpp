@@ -1,5 +1,8 @@
 #include "OsiClpSolverInterface.hpp"
 #include "BonIpoptSolver.hpp"
+#ifdef COIN_HAS_FILTERSQP
+# include "BonFilterSolver.hpp"
+#endif
 #include "BCP_problem_core.hpp"
 #include "BM.hpp"
 
@@ -42,15 +45,14 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
                        BCP_vec<BCP_cut_core*>& cuts,
                        BCP_lp_relax*& matrix)
 {
-    Bonmin::AmplInterface nlpSolver; 
     char* argv_[3];
     char** argv = argv_;
     argv[0] = NULL;
     argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
     argv[2] = NULL;
-    nlpSolver.readAmplNlFile(argv, new Bonmin::IpoptSolver,  NULL, NULL);
+    
+    Bonmin::AmplInterface nlpSolver(argv);
     free(argv[1]);
-  
     nlpSolver.extractInterfaceParams();
   
     OsiClpSolverInterface clp;

@@ -1,4 +1,4 @@
-// Copyright (C) 2006 International Business Machines and others.
+// Copyright (C) 2006, 2007 International Business Machines and others.
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -7,6 +7,7 @@
 // Author:   Andreas Waechter                 IBM    2006-10-11
 
 #include "BonCurvatureEstimator.hpp"
+#include "IpTSymLinearSolver.hpp"
 #include "IpGenTMatrix.hpp"
 #include "IpIdentityMatrix.hpp"
 #include "IpZeroMatrix.hpp"

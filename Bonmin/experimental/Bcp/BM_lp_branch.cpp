@@ -1,6 +1,10 @@
 #include "CoinHelperFunctions.hpp"
 #include "BCP_lp_node.hpp"
 #include "BM.hpp"
+#include "BonCurvBranching.hpp"
+#include "BonQPStrongBranching.hpp"
+#include "BonLpStrongBranching.hpp"
+#include "BonOsiTMINLPInterface.hpp"
 
 //#############################################################################
 
@@ -12,7 +16,7 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
                                    const BCP_lp_cut_pool& local_cut_pool,
                                    BCP_vec<BCP_lp_branching_object*>& cands)
 {
-    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp.retrieve_options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.retrieve_options();
     double intTol;
     double cutoffIncr;
     options->GetNumericValue("integer_tolerance", intTol, "bonmin.");
@@ -30,7 +34,7 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 	return BCP_DoNotBranch_Fathomed;
     }
 
-    OsiBranchingInformation brInfo(&nlp, false);
+    OsiBranchingInformation brInfo(&nlp_, false);
     brInfo.cutoff_ = objLimit;
     brInfo.integerTolerance_ = intTol;
     brInfo.timeRemaining_ = get_param(BCP_lp_par::MaxRunTime) - CoinCpuTime();
@@ -66,33 +70,66 @@ BM_lp::bbBranch(OsiBranchingInformation& brInfo,
     BCP_branching_decision retCode;
     OsiBranchingObject* brObj = NULL;
 
-    const int numCols = nlp.getNumCols();
+    const int numCols = nlp_.getNumCols();
     double* clb_old = new double[numCols];
     double* cub_old = new double[numCols];
-    CoinDisjointCopyN(nlp.getColLower(), numCols, clb_old);
-    CoinDisjointCopyN(nlp.getColUpper(), numCols, cub_old);
+    CoinDisjointCopyN(nlp_.getColLower(), numCols, clb_old);
+    CoinDisjointCopyN(nlp_.getColUpper(), numCols, cub_old);
 
-    OsiChooseVariable* choose = NULL;
-    switch (par.entry(BM_par::BranchingStrategy)) {
-    case BM_OsiChooseVariable:
-	choose = new OsiChooseVariable(&nlp);
-	// choose->setNumberStrong(1);
+    // if we don't have a ChooseVariable object yet, create it now
+    if (!chooseVar_) {
+      switch (varselect_) {
+      case Bonmin::OsiTMINLPInterface::MOST_FRACTIONAL: {
+	// AW: Try to set new chooseVariable object
+	Bonmin::BonCurvBranching* chooseVariable =
+	  new Bonmin::BonCurvBranching(&nlp_);
+	chooseVariable->setNumberStrong(0);
+	chooseVar_ = chooseVariable;
 	break;
-    case BM_OsiChooseStrong:
-	OsiChooseStrong* strong = new OsiChooseStrong(&nlp);
-	strong->setNumberBeforeTrusted(5); // the default in Cbc
-	choose->setNumberStrong(5); // the default in Cbc
-	/** Pseudo Shadow Price mode
-	    0 - off
-	    1 - use and multiply by strong info
-	    2 - use 
-	*/
-	strong->setShadowPriceMode(0);
-	choose = strong;
+      }
+      case Bonmin::OsiTMINLPInterface::CURVATURE_ESTIMATOR: {
+	// AW: Try to set new chooseVariable object
+	Bonmin::BonCurvBranching* chooseVariable =
+	  new Bonmin::BonCurvBranching(&nlp_);
+	chooseVariable->setNumberStrong(numberStrong_);
+	chooseVar_ = chooseVariable;
 	break;
+      }
+      case Bonmin::OsiTMINLPInterface::QP_STRONG_BRANCHING: {
+	Bonmin::BonQPStrongBranching* chooseVariable =
+	  new Bonmin::BonQPStrongBranching(&nlp_);
+	chooseVariable->setNumberStrong(numberStrong_);
+	chooseVar_ = chooseVariable;
+	break;
+      }
+      case Bonmin::OsiTMINLPInterface::LP_STRONG_BRANCHING: {
+	Bonmin::LpStrongBranching* chooseVariable =
+	  new Bonmin::LpStrongBranching(&nlp_);
+	chooseVariable->setMaxCuttingPlaneIter(numEcpRounds_);
+	chooseVariable->setNumberStrong(numberStrong_);
+	chooseVar_ = chooseVariable;
+	break;
+      }
+      case Bonmin::OsiTMINLPInterface::NLP_STRONG_BRANCHING: {
+	const bool solve_nlp = true;
+	Bonmin::BonQPStrongBranching* chooseVariable = 
+	  new Bonmin::BonQPStrongBranching(&nlp_, solve_nlp);
+	chooseVariable->setNumberStrong(numberStrong_);
+	chooseVar_ = chooseVariable;
+	break;
+      }
+      case Bonmin::OsiTMINLPInterface::OSI_SIMPLE: {
+	OsiChooseVariable* chooseVariable = new OsiChooseVariable(&nlp_);
+	chooseVar_ = chooseVariable;
+	break;
+      }
+      default:
+	printf("Invalid choice for variable selection!\n");
+	throw -3;
+      }
     }
 
-    const int brResult = try_to_branch(brInfo, &nlp, choose, brObj, true);
+    const int brResult = try_to_branch(brInfo, &nlp_, chooseVar_, brObj, true);
 
 #if 0
     if (choose->goodSolution()) {
@@ -101,7 +138,7 @@ BM_lp::bbBranch(OsiBranchingInformation& brInfo,
 	BM_solution* bmsol = new BM_solution;
 	//Just copy the solution stored in solver to sol
 	double ptol;
-	nlp.getDblParam(OsiPrimalTolerance, ptol);
+	nlp_.getDblParam(OsiPrimalTolerance, ptol);
 	for (int i = 0 ; i < numCols ; i++) {
 	    if (fabs(sol[i]) > ptol)
 		bmsol->add_entry(i, sol[i]); 
@@ -148,8 +185,8 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
     if (brResult < 0) {
 	// If there were some fixings (brResult < 0) then propagate them
 	// where needed
-	const double* clb = nlp.getColLower();
-	const double* cub = nlp.getColUpper();
+	const double* clb = nlp_.getColLower();
+	const double* cub = nlp_.getColUpper();
 	BCP_lp_prob* p = getLpProblemPointer();
 	BCP_vec<BCP_var*>& vars = p->node->vars;
 	OsiSolverInterface* lp = p->lp_solver;
@@ -191,7 +228,7 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
 		order[1] = 0;
 	    }
 	    BCP_lp_sos_branching_object o(sosBrObj);
-	    cands.push_back(new BCP_lp_branching_object(&nlp, o, order));
+	    cands.push_back(new BCP_lp_branching_object(&nlp_, o, order));
 	    if (par.entry(BM_par::PrintBranchingInfo)) {
 		printf("BM_lp: branching on SOS %i   value: %f\n",
 		       sosBrObj->originalObject()->columnNumber(),
@@ -203,7 +240,6 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
     delete brObj;
     delete[] clb_old;
     delete[] cub_old;
-    delete choose;
     return retCode;
 }
 

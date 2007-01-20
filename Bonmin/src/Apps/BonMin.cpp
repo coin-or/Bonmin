@@ -17,14 +17,9 @@
 #include <fstream>
 
 #include "CoinTime.hpp"
-#include "BonminConfig.h"
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "BonCbc.hpp"
-
-#ifdef COIN_HAS_FILTERSQP
-#include "BonFilterSolver.hpp"
-#endif
 
 using namespace Bonmin;
 
@@ -33,50 +28,22 @@ int main (int argc, char *argv[])
   using namespace Ipopt;
   
   AmplInterface * nlp_and_solver; 
-  int solverUsed = 0; // 0 is Ipopt, 1 is Filter
   char * pbName = NULL;
 
-  { //AW: The following is not a nice solution, since we read everything twice
-
-    //We need to build dummy solver objects to get the options, determine which is the solver to use and register all the options
-    Ipopt::SmartPtr<IpoptSolver> dummy_ipopt = new IpoptSolver;
-    OsiTMINLPInterface forOption(GetRawPtr(dummy_ipopt));
-    forOption.solver()->Options()->GetEnumValue("nlp_solver", solverUsed,"bonmin.");
-
-    if(argc > 1) {
-      pbName = new char[strlen(argv[1])+1];
-      strcpy(pbName, argv[1]);
-    }
-    else { //will just output usage
-      nlp_and_solver = new AmplInterface(argv, GetRawPtr(dummy_ipopt));
-      delete nlp_and_solver;
-      return 0;
-    }
+  if(argc > 1) {
+    pbName = new char[strlen(argv[1])+1];
+    strcpy(pbName, argv[1]);
   }
-
+  else { //will just output usage
+    Ipopt::SmartPtr<IpoptSolver> dummy_ipopt = new IpoptSolver;      
+    nlp_and_solver = new AmplInterface(argv, GetRawPtr(dummy_ipopt));
+    delete nlp_and_solver;
+    return 0;
+  }
 
   double time1 = CoinCpuTime();
   try {
-    Ipopt::SmartPtr<TNLPSolver> solver;
-    if(solverUsed == 0)
-      solver = new IpoptSolver();
-    else if(solverUsed == 1)
-#ifdef COIN_HAS_FILTERSQP
-      solver = new FilterSolver();
-#else
-    {
-      std::cerr<<"filterSQP is not properly configured for using into Bonmin"<<std::endl
-               <<"be sure to run the configure script with options:"<<std::endl
-               <<"--with-filtersqp_lib=\"<path_to_filter_library>\""<<std::endl
-               <<"--with-filtersqp_incdir=\"\""<<std::endl;
-               throw -1;
-    }
-#endif
-    else
-      {
-	std::cerr<<"Trying to use unknown solver."<<std::endl;
-      }
-    nlp_and_solver = new AmplInterface(argv, solver);
+    nlp_and_solver = new AmplInterface(argv);
     BonminCbcParam par;
     Bab bb;
     par(nlp_and_solver);

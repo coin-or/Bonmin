@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006 
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -7,7 +7,6 @@
 //
 
 #include "BM.hpp"
-#include "BonIpoptSolver.hpp"
 
 //#############################################################################
 
@@ -57,6 +56,8 @@ BM_tm::pack_module_data(BCP_buffer& buf, BCP_process_t ptype)
 void
 BM_lp::unpack_module_data(BCP_buffer& buf)
 {
+    using namespace Bonmin;
+
     par.unpack(buf);
     buf.unpack(nl_file_content);
     buf.unpack(ipopt_file_content);
@@ -68,18 +69,17 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     argv[2] = NULL;
     std::string ipopt_content(ipopt_file_content.c_str());
     std::string nl_content(nl_file_content.c_str());
-    nlp.readAmplNlFile(argv, new Bonmin::IpoptSolver,
-		       &ipopt_content, &nl_content);
+    nlp_.readAmplNlFile(argv, NULL, &ipopt_content, &nl_content);
     free(argv[1]);
 
-    nlp.extractInterfaceParams();
+    nlp_.extractInterfaceParams();
 
     /* synchronize bonmin & BCP parameters */
-    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp.retrieve_options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.retrieve_options();
 
     int nlpLogLevel;
     options->GetIntegerValue("nlp_log_level", nlpLogLevel, "bonmin.");
-    nlp.messageHandler()->setLogLevel(nlpLogLevel);
+    nlp_.messageHandler()->setLogLevel(nlpLogLevel);
 
     double bm_intTol;
     double bm_cutoffIncr; // could be negative
@@ -107,6 +107,17 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     bcp_lp->par.set_entry(BCP_lp_par::IntegerTolerance, bm_intTol);
     bcp_lp->par.set_entry(BCP_lp_par::Granularity, bm_cutoffIncr);
 
+    // Getting the options for the choose variable object
+    if (!options->GetEnumValue("varselect_stra",varselect_,"bonmin.")) {
+      // For Bcp, we change the default to most-fractional for now
+      varselect_ = Bonmin::OsiTMINLPInterface::MOST_FRACTIONAL;
+    }
+    options->GetIntegerValue("number_ecp_rounds", numEcpRounds_,"bonmin.");
+    options->GetIntegerValue("number_strong_branch",numberStrong_,"bonmin.");
+    options->GetIntegerValue("number_before_trust", minReliability_,"bonmin.");
+    delete chooseVar_;
+    chooseVar_ = NULL;
+
     /* If pure BB is selected then a number of BCP parameters are changed */
     if (par.entry(BM_par::PureBranchAndBound)) {
 	/* disable strong branching */
@@ -126,18 +137,18 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     }
 
     /* extract the sos constraints */
-    const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
+    const Bonmin::TMINLP::SosInfo * sos = nlp_.model()->sosConstraints();
     
     int i;
-    const int numCols = nlp.getNumCols();
-    const double* clb = nlp.getColLower();
-    const double* cub = nlp.getColUpper();
+    const int numCols = nlp_.getNumCols();
+    const double* clb = nlp_.getColLower();
+    const double* cub = nlp_.getColUpper();
 
     /* Find first the integer variables and then the SOS constraints */
     int nObj = 0;
     OsiObject** osiObj = new OsiObject*[numCols + sos->num];
     for (i = 0; i < numCols; ++i) {
-	if (nlp.isInteger(i)) {
+	if (nlp_.isInteger(i)) {
 	    osiObj[nObj++] = new OsiSimpleInteger(i, clb[i], cub[i]);
 	}
     }
@@ -149,22 +160,22 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 				    sos->weights + starts[i],
 				    sos->types[i]);
     }
-    nlp.addObjects(nObj, osiObj);
+    nlp_.addObjects(nObj, osiObj);
     for (i = 0; i < nObj; ++i) {
 	delete osiObj[i];
     }
     delete[] osiObj;
 
     /* just to be on the safe side... always allocate */
-    primal_solution_ = new double[nlp.getNumCols()];
+    primal_solution_ = new double[nlp_.getNumCols()];
 
     /* solve the initial nlp to get warmstart info in the root */
-    nlp.initialSolve();
-    ws = nlp.getWarmStart();
+    nlp_.initialSolve();
+    ws_ = nlp_.getWarmStart();
     if (get_param(BCP_lp_par::MessagePassingIsSerial) &&
 	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
-	warmStart[0] = ws;
-	ws = NULL;
+	warmStart[0] = ws_;
+	ws_ = NULL;
     }
 }
 

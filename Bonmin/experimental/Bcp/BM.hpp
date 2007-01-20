@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006 
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -45,7 +45,16 @@ enum BM_WarmStartStrategy {
     WarmStartFromParent
 };
 
+// This needs to be the same as enum VarSelectStra_Enum in
+// BonOsiTMINLPInterface.hpp
 enum BM_BranchingStrategy {
+    BM_MostFractional=0,
+    BM_StrongBranching,
+    BM_ReliabilityBranching,
+    BM_CurvatureEstimator,
+    BM_QpStrongBranching,
+    BM_LpStrongBranching,
+    BM_NlpStrongBranching,
     BM_OsiChooseVariable,
     BM_OsiChooseStrong
 };
@@ -166,8 +175,13 @@ class BM_lp : public BCP_lp_user
     BCP_parameter_set<BM_par> par;
 
     OsiBabSolver babSolver_;
-    Bonmin::AmplInterface nlp;
-    CoinWarmStart* ws;
+    Bonmin::AmplInterface nlp_;
+    CoinWarmStart* ws_;
+    OsiChooseVariable* chooseVar_;
+    int numEcpRounds_;
+    int numberStrong_;
+    int minReliability_;
+    int varselect_;
 
     /* FIXME: gross cheating. works only for serial mode. Store the warmstart
        informations in the lp process, do not send them over in user data or

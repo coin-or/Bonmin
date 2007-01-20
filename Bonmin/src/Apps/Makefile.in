@@ -53,7 +53,6 @@ bin_PROGRAMS = bonmin$(EXEEXT) nodeSolver$(EXEEXT)
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
-@COIN_HAS_FILTERSQP_TRUE@am__append_3 = -I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` 
 subdir = src/Apps
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -397,7 +396,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../OaInterface` \
 	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(CBCSRCDIR)/examples` $(am__append_2) $(am__append_3)
+	$(CBCSRCDIR)/examples` $(am__append_2)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin

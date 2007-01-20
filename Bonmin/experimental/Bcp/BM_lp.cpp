@@ -7,13 +7,14 @@
 BM_lp::BM_lp() :
     BCP_lp_user(),
     babSolver_(3),
-    nlp(),
-    ws(NULL),
+    nlp_(),
+    ws_(NULL),
+    chooseVar_(NULL),
     feasChecker_(NULL),
     in_strong(0)
 {
-    nlp.Set_expose_warm_start(true);
-    babSolver_.setSolver(&nlp);
+    nlp_.Set_expose_warm_start(true);
+    babSolver_.setSolver(&nlp_);
     setOsiBabSolver(&babSolver_);
 }
 
@@ -21,7 +22,8 @@ BM_lp::BM_lp() :
 
 BM_lp::~BM_lp()
 {
-    delete ws;
+    delete chooseVar_;
+    delete ws_;
     delete feasChecker_;
     delete[] primal_solution_;
     /* FIXME: CHEATING */
@@ -62,16 +64,16 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
     // First copy the bounds into nlp. That way all the branching decisions
     // will be transferred over.
     OsiSolverInterface * osi = getLpProblemPointer()->lp_solver;
-    nlp.setColLower(osi->getColLower());
-    nlp.setColUpper(osi->getColUpper());
+    nlp_.setColLower(osi->getColLower());
+    nlp_.setColUpper(osi->getColUpper());
 
     // Carry the changes over to the object lists in nlp
-    const int numObj = nlp.numberObjects();
-    OsiObject** nlpObj = nlp.objects();
+    const int numObj = nlp_.numberObjects();
+    OsiObject** nlpObj = nlp_.objects();
     for (i = 0; i < numObj; ++i) {
 	OsiSimpleInteger* io = dynamic_cast<OsiSimpleInteger*>(nlpObj[i]);
 	if (io) {
-	    io->resetBounds(&nlp);
+	    io->resetBounds(&nlp_);
 	} else {
 	    // The rest is OsiSOS where we don't need to do anything
 	    break;
@@ -81,7 +83,7 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
     // copy over the OsiObjects from the nlp solver if the lp solver is to be
     // used at all (i.e., not pure B&B)
     if (! par.entry(BM_par::PureBranchAndBound)) {
-	osi->addObjects(nlp.numberObjects(), nlp.objects());
+	osi->addObjects(nlp_.numberObjects(), nlp_.objects());
     }
 
     in_strong = 0;
@@ -120,11 +122,11 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	*/
 	switch (par.entry(BM_par::WarmStartStrategy)) {
 	case WarmStartNone:
-	    nlp.initialSolve();
+	    nlp_.initialSolve();
 	    break;
 	case WarmStartFromRoot:
-	    nlp.setWarmStart(ws);
-	    nlp.resolve();
+	    nlp_.setWarmStart(ws_);
+	    nlp_.resolve();
 	    break;
 	case WarmStartFromParent:
 	    /* FIXME: CHEAT! this works only in serial mode! */
@@ -134,9 +136,9 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 		    getLpProblemPointer()->parent->index;
 		std::map<int, CoinWarmStart*>::iterator it =
 		    warmStart.find(parentind);
-		nlp.setWarmStart(it->second);
-		nlp.resolve();
-		warmStart[ind] = nlp.getWarmStart();
+		nlp_.setWarmStart(it->second);
+		nlp_.resolve();
+		warmStart[ind] = nlp_.getWarmStart();
 		bool sibling_seen =  ((ind & 1) == 0) ?
 		    warmStart.find(ind-1) != warmStart.end() :
 		    warmStart.find(ind+1) != warmStart.end() ;
@@ -148,21 +150,21 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 	    break;
 	}
 
-	const int numCols = nlp.getNumCols();
-	const double* colsol = nlp.getColSolution();
-	if (nlp.isProvenOptimal()) {
+	const int numCols = nlp_.getNumCols();
+	const double* colsol = nlp_.getColSolution();
+	if (nlp_.isProvenOptimal()) {
 	    int i;
-	    const double* clb = nlp.getColLower();
-	    const double* cub = nlp.getColUpper();
+	    const double* clb = nlp_.getColLower();
+	    const double* cub = nlp_.getColUpper();
 	    // Make sure we are within bounds (get rid of rounding problems)
 	    for (i = 0; i < numCols; ++i) {
 		primal_solution_[i] =
 		    CoinMin(CoinMax(clb[i], colsol[i]), cub[i]);
 	    }
 	    
-	    lower_bound_ = nlp.getObjValue();
+	    lower_bound_ = nlp_.getObjValue();
 	    numNlpFailed_ = 0;
-	    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp.retrieve_options();
+	    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.retrieve_options();
 	    double intTol;
 	    options->GetNumericValue("integer_tolerance",intTol,"bonmin.");
 
@@ -193,7 +195,7 @@ BM_lp: At node %i : will fathom because of high lower bound\n",
 		       current_index());
 	    }
 	}
-	else if (nlp.isProvenPrimalInfeasible()) {
+	else if (nlp_.isProvenPrimalInfeasible()) {
 	    // prune it!
 	    // FIXME: if nonconvex, restart from a different place...
 	    lower_bound_ = 1e200;
@@ -204,8 +206,8 @@ BM_lp: At node %i : will fathom because of infeasibility\n",
 		       current_index());
 	    }
 	}
-	else if (nlp.isAbandoned()) {
-	    if (nlp.isIterationLimitReached()) {
+	else if (nlp_.isAbandoned()) {
+	    if (nlp_.isIterationLimitReached()) {
 		printf("\
 BM_lp: At node %i : WARNING: nlp reached iter limit. Will force branching\n",
 		       current_index());
@@ -215,8 +217,8 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 		       current_index());
 	    }
 	    // nlp failed
-	    nlp.forceBranchable();
-	    lower_bound_ = nlp.getObjValue();
+	    nlp_.forceBranchable();
+	    lower_bound_ = nlp_.getObjValue();
 	    CoinDisjointCopyN(colsol, numCols, primal_solution_);
 	    numNlpFailed_ += 1;
 	    // will branch, but save in the user data how many times we have
@@ -234,10 +236,10 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 	*/
 	double integerTolerance;
 	double cutOffIncrement;
-	nlp.retrieve_options()->GetNumericValue("integer_tolerance",
+	nlp_.retrieve_options()->GetNumericValue("integer_tolerance",
 						integerTolerance,"bonmin.");
 	/* FIXME: cutoff_decr was called cutoff_incr??? */
-	nlp.retrieve_options()->GetNumericValue("cutoff_decr",
+	nlp_.retrieve_options()->GetNumericValue("cutoff_decr",
 						cutOffIncrement,"bonmin.");
 	OsiSolverInterface * osi = getLpProblemPointer()->lp_solver;
     
@@ -247,7 +249,7 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 	}
 
 	if (!feasChecker_) {
-	    feasChecker_ = new Bonmin::OACutGenerator2(&nlp, NULL, NULL,
+	    feasChecker_ = new Bonmin::OACutGenerator2(&nlp_, NULL, NULL,
 						       cutOffIncrement,
 						       integerTolerance, 1);
 	    feasChecker_->parameter().localSearchNodeLimit_ = 0;
@@ -259,7 +261,7 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 	OsiBabSolver * babSolver =
 	    dynamic_cast<OsiBabSolver *> (osi->getAuxiliaryInfo());
 	//assert(babSolver == &babSolver_);
-	babSolver->setSolver(nlp); 
+	babSolver->setSolver(nlp_); 
 	feasChecker_->generateCuts(*osi, cuts_);
 	const int numvar = vars.size();
 	double* solverSol = new double[numvar];

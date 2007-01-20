@@ -1,4 +1,10 @@
+#include "BonminConfig.h"
+
 #include "BonAmplInterface.hpp"
+#include "BonIpoptSolver.hpp"
+#ifdef COIN_HAS_FILTERSQP
+# include "BonFilterSolver.cpp"
+#endif
 #include <string>
 #include <sstream>
 
@@ -10,7 +16,8 @@ namespace Bonmin
   {}
 
   /** Constructor with inputed ampl command line (reads model from nl file)*/
-  AmplInterface::AmplInterface(char **& amplArgs, SmartPtr<TNLPSolver> app)
+  AmplInterface::AmplInterface(char **& amplArgs,
+			       SmartPtr<TNLPSolver> app /* =  NULL */)
       :
       OsiTMINLPInterface(),
       amplTminlp_(NULL)
@@ -40,11 +47,41 @@ namespace Bonmin
   /** Read an ampl . nl file from the given filename */
   void
   AmplInterface::readAmplNlFile(char**& filename,
-      Ipopt::SmartPtr<TNLPSolver> app,
-      std::string* ipopt_file_content,
-      std::string* nl_file_content)
+      Ipopt::SmartPtr<TNLPSolver> app /* = NULL */,
+      std::string* ipopt_file_content /* = NULL */,
+      std::string* nl_file_content /* = NULL */)
   {
-    app_ = app->clone();
+    // If nothing is given in 'app', we determine from the options
+    // which solver is to be used
+    if (IsNull(app)) {
+      // AW: The following is not a nice solution, since we read
+      // everything twice, if FilterSQP was chosen
+
+      //We need to build dummy solver objects to get the options,
+      //determine which is the solver to use and register all the
+      //options
+      app_ = new IpoptSolver();
+      OsiTMINLPInterface forOption(GetRawPtr(app_));
+      int ival;
+      forOption.solver()->Options()->GetEnumValue("nlp_solver", ival,"bonmin.");
+      NLPSolverChoice NLPchoice = NLPSolverChoice(ival);
+
+      if(NLPchoice == Bonmin::AmplInterface::FilterSQP) {
+#ifdef COIN_HAS_FILTERSQP
+	app_ = new Bonmin::FilterSolver();
+#else
+	std::cerr<<"Bonmin not configured to run with FilterSQP"<<std::endl;
+	throw -1;
+#endif
+      }
+      else if (NLPchoice != Bonmin::AmplInterface::Ipopt) {
+	std::cerr<<"Trying to use unknown solver."<<std::endl;
+	throw -1;
+      }
+    }
+    else {
+      app_ = app->clone();
+    }
 
     SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
     register_ALL_options(roptions);

@@ -10,14 +10,20 @@
 #define __BONCURVATUREESTIMATOR_HPP__
 
 #include "IpTNLP.hpp"
+#include "IpOptionsList.hpp"
 #include "IpCompoundSymMatrix.hpp"
 #include "IpCompoundVector.hpp"
-#include "IpTSymLinearSolver.hpp"
 #include <vector>
+
+namespace Ipopt {
+  //forward declarations
+  class TSymLinearSolver;
+}
 
 namespace Bonmin
 {
   using namespace Ipopt;
+
   /** 
    */
   class CurvatureEstimator: public ReferencedObject

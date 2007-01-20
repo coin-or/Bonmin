@@ -45,7 +45,14 @@ LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt` \
 bonminbcp_SOURCES = BB_cut.hpp BM.hpp \
 	BB_cut.cpp BM.cpp BM_tm.cpp BM_lp.cpp BM_lp_branch.cpp BM_pack.cpp
 
-bonminbcp_DEPENDENCIES = amplsolver.a $(COINLIBS) $(IPOPTLIBS)
+bonminbcp_DEPENDENCIES = \
+	../../src/Interfaces/Ampl/libamplinterface.la \
+	../../src/Apps/libbonmin.la \
+	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
+	$(IPOPTLIBS) \
+	$(LIBCBCCOPY) \
+	$(COINLIBS) \
+	amplsolver.a
 
 AMPL_PATHED_FILES = \
 	asl.h \
@@ -87,14 +94,7 @@ amplsolver.a:
 	$(MAKE) CC="$$CC" $$ASLMAKEFLAGS CFLAGS="$$CFLAGS" -f makefile.u ; \
 	cp amplsolver.a ..
 
-bonminbcp_LDADD = \
-	../../src/Apps/libbonmin.la \
-	../../src/Interfaces/Ampl/libamplinterface.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(IPOPTLIBS) \
-	$(LIBCBCCOPY) \
-	$(COINLIBS) \
-	amplsolver.a \
+bonminbcp_LDADD = $(bonminbcp_DEPENDENCIES) \
 	$(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared

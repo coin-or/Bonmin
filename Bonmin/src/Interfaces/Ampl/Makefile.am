@@ -39,7 +39,12 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-        -I`$(CYGPATH_W) $(srcdir)/..`
+        -I`$(CYGPATH_W) $(srcdir)/..` \
+        -I`$(CYGPATH_W) $(srcdir)/../Ipopt`
+
+if COIN_HAS_FILTERSQP
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Filter` 
+endif
 
 AM_CPPFLAGS += $(ASL_CPPFLAGS)
 

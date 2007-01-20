@@ -99,11 +99,6 @@ if COIN_HAS_CPX
 	-I`$(CYGPATH_W) $(CPXINCDIR)`
 endif
 
-if COIN_HAS_FILTERSQP
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` 
-endif
-
-
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
