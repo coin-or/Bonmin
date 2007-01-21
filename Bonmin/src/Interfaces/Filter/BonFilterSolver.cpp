@@ -32,8 +32,6 @@ void F77_FUNC(filtersqp,FILTERSQP)(
 	fint *lws, real *lam, char *cstype, real *user,
 	fint *iuser, fint *maxiter, fint *istat,
 	real *rstat, ftnlen cstype_len);
-
- void F77_FUNC(fopen,FOPEN) (fint*, char*, ftnlen);
 }
 
 //Static variables
