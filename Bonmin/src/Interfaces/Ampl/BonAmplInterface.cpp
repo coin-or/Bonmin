@@ -3,7 +3,7 @@
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #ifdef COIN_HAS_FILTERSQP
-# include "BonFilterSolver.cpp"
+# include "BonFilterSolver.hpp"
 #endif
 #include <string>
 #include <sstream>
