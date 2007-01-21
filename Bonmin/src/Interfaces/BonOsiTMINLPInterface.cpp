@@ -177,7 +177,7 @@ register_general_options
   roptions->AddLowerBoundedIntegerOption
   ("number_ecp_rounds",
    "Set the number of rounds of ecp in strong branching.",
-   0,5,
+   0,0,
    "");
 
   roptions->AddStringOption3("warm_start",
