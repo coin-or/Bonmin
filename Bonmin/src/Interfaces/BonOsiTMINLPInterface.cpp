@@ -2231,14 +2231,12 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     }
   else 
 #endif
-#ifdef AskPierreIfThisGoesOut
-    if(optimization_status_ < -1)//Solver failed and the error can not be recovered, throw it
+    if(!app_->isRecoverable(optimization_status_))//Solver failed and the error can not be recovered, throw it
   {
     std::string probName;
     getStrParam(OsiProbName, probName);
     throw newUnsolvedError(optimization_status_, problem_, probName);
   }
-#endif
   try{
   totalIterations_ += app_->IterationCount();
   }

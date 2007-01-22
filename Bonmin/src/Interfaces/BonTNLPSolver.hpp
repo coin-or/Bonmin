@@ -162,6 +162,11 @@ class TNLPSolver: public Ipopt::ReferencedObject{
   virtual void turnOnOutput() = 0;
   /// Get the solver name
   virtual std::string & solverName() = 0;
+
+    /** Say if an optimization status for a problem which failed is recoverable
+        (problem may be solvable).*/
+  bool isRecoverable(ReturnStatus &r);
+
 protected:
   bool zeroDimension(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp, 
 		     ReturnStatus &optimization_status);

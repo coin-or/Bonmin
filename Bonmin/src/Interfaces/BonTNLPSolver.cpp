@@ -197,5 +197,14 @@ TNLPSolver::UnsolvedError::writeDiffFiles() const{
 
  
 }
+
+  /** Say if an optimization status for a problem which failed is recoverable
+      (problem may be solvable).*/
+  bool 
+  TNLPSolver::isRecoverable(ReturnStatus &r){
+    return (r >=0 || (r != -4 && r != -5) );
+  }
+
+
 }//end namespace Bonmin
 
