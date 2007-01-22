@@ -2405,11 +2405,12 @@ OsiTMINLPInterface::extractInterfaceParams()
 #ifdef COIN_HAS_FILTERSQP
     FilterSolver * filter = dynamic_cast<FilterSolver *>(Ipopt::GetRawPtr(app_));
 #endif
-    app_->Options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
+    bool is_given =
+      app_->Options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
 
 #ifdef COIN_HAS_FILTERSQP
-    if(filter && maxRandomRadius_ > 10.){
-      std::cerr<<"filterSqp picking a random point with a big value seems not to work well setting max_random_point_radius to 10"<<std::endl;
+    if(filter && !is_given){
+      // overwriting default for filter
       maxRandomRadius_ = 10.;
     }
 #endif
