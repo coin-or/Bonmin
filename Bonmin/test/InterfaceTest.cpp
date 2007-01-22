@@ -150,7 +150,7 @@ void testSetMethods(OsiTMINLPInterface &si)
     assert(si.getColUpper()[2]==0.);
     si.setWarmStart(ws);
 
-    si.resolve();    
+    si.resolve();
     assert(si.isProvenOptimal());
     assert(eq(si.getColSolution()[2],0.));
     
@@ -266,6 +266,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
        const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
        const char ** argv = args;
       AmplInterface si(const_cast<char **&> (argv), solver);
+      si.Set_expose_warm_start(1);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
     <<std::endl<<"Testing usefull constructor"<<std::endl
     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
@@ -294,6 +295,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
       const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
       const char ** argv = args;
       AmplInterface si1(const_cast<char **&> (argv), solver);
+      si1.Set_expose_warm_start(1);
       
       OsiTMINLPInterface si(si1);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
@@ -311,6 +313,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
         const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
         const char ** argv = args;
       Bonmin::AmplInterface si(const_cast<char**&>(argv), solver);
+      si.Set_expose_warm_start(1);
       std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
 	       <<std::endl<<"Testing outer approximations related methods"<<std::endl
 	       <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;

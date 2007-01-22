@@ -35,4 +35,4 @@ bonmin.warm_start                  optimum    #Set warm start method
 
 
 #ipopt default changed by bonmin
-print_level 0
+print_level 4

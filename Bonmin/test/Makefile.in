@@ -74,7 +74,7 @@ am__DEPENDENCIES_4 = $(CBCOBJDIR)/src/libCbc.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3)
 CppExample_DEPENDENCIES = ../src/Apps/libbonmin.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) \
-	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_2)
 am_unitTest_OBJECTS = InterfaceTest.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 unitTest_DEPENDENCIES = ../src/Interfaces/Ampl/libamplinterface.la \
@@ -351,7 +351,6 @@ CppExample_LDADD = ../src/Apps/libbonmin.la \
         $(IPOPTLIBS) \
         $(LIBCBCCOPY) \
         $(COINLIBS) \
-	$(ASLLIB) \
         $(ADDLIBS)
 
 COINLIBS = $(CBCOBJDIR)/src/libCbc.la $(CGLOBJDIR)/src/libCgl.la \
@@ -380,7 +379,8 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src`
+	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+          $(ASL_CPPFLAGS)
 
 
 # This line is necessary to allow VPATH compilation with MS compilers
