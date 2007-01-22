@@ -137,7 +137,11 @@ namespace Bonmin
       upPsCosts = NULL;
       if (downPsCosts != NULL) delete [] downPsCosts;
       downPsCosts = NULL;
-      } 
+      }
+      ~BranchingInfo()
+      {
+	gutsOfDestructor();
+      }
     };
     /** Type of the variables.*/
     enum VariableType
