@@ -68,6 +68,8 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 				     CouNumber *curlb, 
 				     CouNumber *curub) {
 
+  std::cerr << "Update Convexification" << std::endl;
+
   if (!bonCs_) {
 
     // This cut generator has been called through updateConv (really?

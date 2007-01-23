@@ -131,8 +131,12 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     expression *body;
 
     // if sum only has one term, this objective is rather that term than a sum...
-    if (term==1) body = al [0]; 
-    else         body = new exprSum (al, term); 
+    if (term==1) {
+      body = al [0]; 
+      delete [] al;
+    }
+    else 
+      body = new exprSum (al, term); 
 
     expression *subst = body -> simplify ();
     if (subst) body = subst;
@@ -140,7 +144,7 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
 
-    delete [] al;
+    //    delete [] al;
   }
 
 

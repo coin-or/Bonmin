@@ -136,5 +136,7 @@ void free_asl_group (psg_elem *g) {
   /* free the whole OPSUMLIST */
 
   free (g -> ge -> L.e -> L.ep);
-  free (g -> ge -> L.e);
+  /*  free (g -> ge -> L.e); */
+  g -> ge -> L.e = (expr*)&g -> esum;
+  /*  g -> ge -> L.e = g -> ge.esum; */
 }
