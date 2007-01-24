@@ -31,7 +31,6 @@ class CouenneProblem {
   std::vector <CouenneConstraint *> constraints_;
 
   // data of the linearized problem
-  //  std::vector <LinearConstraint *> linearconstraints_;
   std::vector <exprAux          *> auxiliaries_;
   std::vector <exprVar          *> variables_;
 
@@ -89,20 +88,6 @@ class CouenneProblem {
   void addLEConstraint  (expression *, expression *);
   void addRNGConstraint (expression *, expression *, expression *);
 
-  // add linear constraints defined as - w + a * x >=< b, where a is
-  // an expression (function of variable bounds) pointed to by coeff,
-  // where b is the expression rhs
-  /*  void inline addLinearConstraint (exprAux *w, exprVar *x, expression *coeff, 
-				   expression *rhs, enum con_sign sign)
-    {linearconstraints_ . push_back (new LinearConstraint  (w, x, coeff, rhs, sign));}
-  */
-
-  // add linear constraint defined by array of n coefficients and
-  // array of n indices, with lower- and upper bounds and sign
-  /*  void inline addLinearConstraint (int n, expression **coeffs, int *indices,
-				   expression *rhs, enum con_sign sign)
-    {linearconstraints_ . push_back (new LinearConstraint (n, coeffs, indices, rhs, sign));}
-  */
   // add variable
   expression *addVariable ();
 
@@ -113,9 +98,6 @@ class CouenneProblem {
   // break problem's nonlinear constraints in simple expressions to be
   // convexified later
   void standardize ();
-
-  // convexify standardized problem
-  //  void convexify ();
 
   // output objective, linear and nonlinear constraints, and auxiliary
   // variables

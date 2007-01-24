@@ -68,9 +68,7 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 				     CouNumber *curlb, 
 				     CouNumber *curub) {
 
-  std::cerr << "Update Convexification" << std::endl;
-
-  expression::update (curx, curlb, curub);
+  std::cerr << "--------Update Convexification" << std::endl;
 
   if (!bonCs_) {
 
@@ -85,6 +83,9 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     // contain the value of variables and bounds
 
     bonOs_ = new OsiClpSolverInterface;
+
+    for (int i=0; i < problem_ -> nVars (); i++)
+      bonOs_ -> addCol (0, NULL, NULL, curlb [i], curub [i], 0);
   }
   else {
 
@@ -95,6 +96,8 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     for (int i = bonCs_ -> sizeRowCuts (); i--;)
       bonCs_ -> eraseRowCut (i);
   }
+
+  bonOs_ -> setColSolution (curx);
 
   // ok, now let's just call generateCuts and fill the cuts vector
   // with what we are returned
@@ -112,6 +115,8 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
       for (int i = 0; i<ncuts; i++)
 	pool_ [i] = bonCs_ -> rowCutPtr (i);
   }
+
+  printf ("Couenne: %d cuts\n", ncuts);
 
   return ncuts;
 
