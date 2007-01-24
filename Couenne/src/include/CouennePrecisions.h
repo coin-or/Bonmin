@@ -12,8 +12,8 @@
 #include <CouenneTypes.h>
 #include <math.h>
 
-#define COUENNE_EPS       1e-100
-#define COUENNE_EPS_SIMPL 1e-200
+#define COUENNE_EPS       1e-7
+#define COUENNE_EPS_SIMPL 1e-20
 #define COUENNE_INFINITY  1e+300
 
 #define FELINE_round(x) ((int) (floor ((x)+0.5)))

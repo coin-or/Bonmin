@@ -81,7 +81,7 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
       pool_ [i] = bonCs_ -> rowCutPtr (i);
   }
 
-  //  printf ("Couenne: %d cuts\n", ncuts);
+  printf ("Couenne: %d cuts\n", ncuts);
 
   return ncuts;
 }
