@@ -96,8 +96,13 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
 
 void CouenneCutGenerator::cleanup () {
 
+  if (!pool_) return;
+
   while (ncuts_--)
-    delete pool_ [ncuts_];
+    if (pool_ [ncuts_]) {
+      delete pool_ [ncuts_];
+      pool_ [ncuts_] = NULL;
+    }
   free (pool_);
   pool_ = NULL;
 }

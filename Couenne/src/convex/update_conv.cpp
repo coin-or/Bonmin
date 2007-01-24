@@ -70,10 +70,12 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
   std::cerr << "Update Convexification" << std::endl;
 
+  expression::update (curx, curlb, curub);
+
   if (!bonCs_) {
 
-    // This cut generator has been called through updateConv (really?
-    // :-) and not through generateCuts, therefore we need to store a
+    // This cut generator has been called through updateConv, not
+    // through generateCuts, therefore we need to store a
     // OsiSolverInterface somewhere in order to call generateCuts. But
     // first of all, allocate space for bonCs_
 
@@ -115,7 +117,6 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
   /*
   // update value of bounds and variables
-  expression::update (curx, curlb, curub);
 
   // At first call, set value of auxiliaries (in subsequent calls,
   // auxiliaries do have their own value)

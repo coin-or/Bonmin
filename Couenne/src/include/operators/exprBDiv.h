@@ -112,7 +112,7 @@ inline CouNumber exprUBDiv::operator () () {
   } else { // d <= 0
     if      (D >   COUENNE_EPS) return + COUENNE_INFINITY; // (?,?,-,+) --> unbounded
     else if (n < - COUENNE_EPS) return n/D;              // (-,?,-,-) --> n/D
-    else                      return n/d;              // (+,+,-,-) --> n/d
+    else                        return n/d;              // (+,+,-,-) --> n/d
   }
 }
 
