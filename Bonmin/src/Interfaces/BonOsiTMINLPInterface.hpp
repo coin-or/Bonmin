@@ -812,12 +812,17 @@ class Messages : public CoinMessages
                                        bool solveNlp = 1);
 
   /** Get the outer approximation constraints at the current optimal point.
+      If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  virtual void getOuterApproximation(OsiCuts &cs, bool getObj = 1);
+  virtual void getOuterApproximation(OsiCuts &cs, bool getObj = 1, const double * x2= NULL, bool global = true);
 
-  /** Get the outer approximation constraints at provided point
+  /** Get the outer approximation constraints at provided point.
+      If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj = 1);
+  void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj = 1, const double * x2 = NULL, bool global = true);
+
+  /** Get the Benders cut at provided point with provided multipliers.*/
+  void getBendersCut(OsiCuts &cs, const double * x, const double *lambda, bool getObj = 1);
 
   /** solve the problem of finding the closest point to x_bar in the subspace of coordinates given by ind
    * (i.e., \f$ min \sum\limits_{i=1}^n (x_{ind[i]} -\overline{x}_i)^2 \f$ ,
@@ -841,9 +846,13 @@ class Messages : public CoinMessages
     tminlp_->addCuts(numberCuts, cuts);
   }
 
- /** Get constraint violation and objective error for some
-     user provided point.*/
- double getConstraintViolation(const double * x, double obj);
+ /** Get infinity norm of constraint violation for x. Put into
+     obj the objective value of x.*/
+ double getConstraintsViolation(const double * x, double & obj);
+
+  /** Get infinity norm of constraint violation for x and error in objective
+      value where obj is the estimated objective value of x.*/
+  double getNonLinearitiesViolation(const double *x, const double obj);
 
 //---------------------------------------------------------------------------
 protected:

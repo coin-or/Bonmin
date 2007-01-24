@@ -14,12 +14,14 @@ namespace Bonmin
 {
 /// Default constructor
   OaNlpOptim::OaNlpOptim(OsiTMINLPInterface * si,
-      int maxDepth)
+      int maxDepth, bool addOnlyViolated, bool global)
       :
       CglCutGenerator(),
       nlp_(si),
       maxDepth_(maxDepth),
-      nSolve_(0)
+      nSolve_(0),
+      addOnlyViolated_(addOnlyViolated),
+      global_(global)
   {
     handler_ = new CoinMessageHandler();
     handler_ -> setLogLevel(1);
@@ -106,7 +108,9 @@ namespace Bonmin
     //  nlp_->turnOnIpoptOutput();
     nSolve_++;
     nlp_->resolve();
-    nlp_->getOuterApproximation(cs);
+    const double * violatedPoint = (addOnlyViolated_)? si.getColSolution():
+      NULL;
+    nlp_->getOuterApproximation(cs, 1, violatedPoint,global_);
     if (nlp_->isProvenOptimal()) {
       handler_->message(LP_ERROR,messages_)
       <<nlp_->getObjValue()-si.getObjValue()<<CoinMessageEol;

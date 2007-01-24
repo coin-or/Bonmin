@@ -266,6 +266,16 @@ static void register_OA_options
 {
   roptions->SetRegisteringCategory("bonmin options : B-Hyb specific options");
 
+  roptions->AddStringOption2("oa_cuts_scope","Specify if OA cuts added are to be set globally or locally valid",
+                             "global",
+			     "global","Cuts are treated as globally valid",
+			     "local", "Cuts are treated as locally valid",
+			     "");
+
+  roptions->AddStringOption2("add_only_violated_oa","Do we add all OA cuts or only the ones violated by current point?",
+			     "no",
+			     "yes","",
+			     "no","","");
   roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
       "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
       0,10,
@@ -1657,9 +1667,8 @@ int OsiTMINLPInterface::initializeJacobianArrays()
 }
 
 
-/** get NLP constraint violation of point */
-double
-OsiTMINLPInterface::getConstraintViolation(const double *x, const double obj)
+double 
+OsiTMINLPInterface::getConstraintsViolation(const double *x, double &obj)
 {
   int numcols = getNumCols();
   int numrows = getNumRows();
@@ -1675,21 +1684,28 @@ OsiTMINLPInterface::getConstraintViolation(const double *x, const double obj)
       double rowViolation = 0;
       if(rowLower[i] > -1e10)
          rowViolation = max(0.,rowLower[i] - g[i]);
-//      if(rowViolation  > 0.) rowViolation  /= fabs(rowLower[i]);
+
       if(rowUpper[i] < 1e10);
         rowViolation = max(rowViolation, g[i] - rowUpper[i]);
-//      if(rowViolation2 > 0.) rowViolation2 /= fabs(rowUpper[i]);
+
       norm = rowViolation > norm ? rowViolation : norm;
     }
   }
-
-  double f;
-  tminlp_->eval_f(numcols, x, 1, f);
-  norm =  fabs(f - obj) > norm ? fabs(f - obj) : norm;
-
+  tminlp_->eval_f(numcols, x, 1, obj);
   delete [] g;
   return norm;
 }
+
+/** get infinity norm of constraint violation of a point and objective error*/
+double
+OsiTMINLPInterface::getNonLinearitiesViolation(const double *x, const double obj)
+{
+  double f;
+  double norm = getConstraintsViolation(x, f);
+  norm =  fabs(f - obj) > norm ? fabs(f - obj) : norm;
+  return norm;
+}
+
 
 
 //A procedure to try to remove small coefficients in OA cuts (or make it non small
@@ -1745,15 +1761,175 @@ bool cleanNnz(double &value, double colLower, double colUpper,
 /** Get the outer approximation constraints at the current optimum of the
   current ipopt problem */
 void
-OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
+OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj, const double *x2, bool global)
 {
-  getOuterApproximation(cs, getColSolution(), getObj);
+  getOuterApproximation(cs, getColSolution(), getObj, x2, global);
 }
 
 /** Get the outer approximation constraints at the current optimum of the
   current ipopt problem */
 void
-OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj)
+OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global)
+{
+  int n,m, nnz_jac_g, nnz_h_lag;
+  Ipopt::TNLP::IndexStyleEnum index_style;
+  tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
+  if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
+    initializeJacobianArrays();
+  assert(jRow_ != NULL);
+  assert(jCol_ != NULL);
+  double * g = new double[m];
+  tminlp_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
+  tminlp_->eval_g(n,x,1,m,g);
+  //As jacobian is stored by cols fill OsiCuts with cuts
+  CoinPackedVector * cuts = new CoinPackedVector[nNonLinear_ + 1];
+  double * lb = new double[nNonLinear_ + 1];
+  double * ub = new double[nNonLinear_ + 1];
+  int * binding = new int[nNonLinear_ + 1];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
+  int numBindings = 0;
+    
+  const double * rowLower = getRowLower();
+  const double * rowUpper = getRowUpper();
+  const double * colLower = getColLower();
+  const double * colUpper = getColUpper();
+  const double * duals = getRowPrice();
+  double infty = getInfinity();
+  double nlp_infty = infty_;
+  
+  for(int i = 0; i< m ; i++) {
+    if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
+      if(rowLower[i] > - nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
+      {
+        binding[i] = -1;
+        std::cerr<<"non binding constraint"<<std::endl;
+        continue;
+      }
+      binding[i] = numBindings;
+      if(rowLower[i] > - nlp_infty)
+        lb[numBindings] = rowLower[i] - g[i];
+      else
+        lb[numBindings] = - infty;
+      if(rowUpper[i] < nlp_infty)
+        ub[numBindings] = rowUpper[i] - g[i];
+      else
+        ub[numBindings] = infty;
+      if(rowLower[i] > -infty && rowUpper[i] < infty)
+      {
+        if(duals[i] >= 0)// <= inequality
+          lb[numBindings] = - infty;
+        if(duals[i] <= 0)// >= inequality
+          ub[numBindings] = infty;
+      }
+      
+      numBindings++;
+    }
+  }
+
+  for(int i = 0 ; i < nnz_jac_g ; i++) {
+    if(constTypes_[jRow_[i] - 1] == Ipopt::TNLP::NON_LINEAR) {
+      //"clean" coefficient
+      if(cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
+		  rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
+		  x[jCol_[i] - 1],
+		  lb[binding[jRow_[i] - 1]],
+		  ub[binding[jRow_[i] - 1]], tiny_, veryTiny_)) {
+        cuts[binding[jRow_[i] - 1]].insert(jCol_[i]-1,jValues_[i]);
+        if(lb[binding[jRow_[i] - 1]] > - infty)
+          lb[binding[jRow_[i] - 1]] += jValues_[i] * x[jCol_ [i] - 1];
+        if(ub[binding[jRow_[i] - 1]] < infty)
+	  ub[binding[jRow_[i] - 1]] += jValues_[i] * x[jCol_ [i] - 1];
+      }
+    }
+  }
+
+  for(int i = 0; i< numBindings ; i++) {
+    //Compute cut violation
+    if(x2 != NULL)
+      {
+	double rhs = cuts[i].dotProduct(x2);
+	double violation = 0.;
+	violation = max(violation, rhs - ub[i]);
+	violation = max(violation, lb[i] - rhs);
+	if(violation == 0.) continue;
+      }
+    OsiRowCut newCut;
+    //    if(lb[i]>-1e20) assert (ub[i]>1e20);
+    
+    if(global)
+      {
+	newCut.setGloballyValid();
+      }
+    newCut.setEffectiveness(99.99e99);
+    newCut.setLb(lb[i]);
+    newCut.setUb(ub[i]);
+    newCut.setRow(cuts[i]);
+    //    CftValidator validator;
+    //    validator(newCut);
+    cs.insert(newCut);
+  }
+
+  delete[] g;
+  delete [] cuts;
+  delete [] binding;
+
+  if(getObj)  // Get the objective cuts
+  {
+    double * obj = new double [n];
+    tminlp_->eval_grad_f(n, x, 1,obj);
+    double f;
+    tminlp_->eval_f(n, x, 1, f);
+
+    CoinPackedVector v;
+    v.reserve(n);
+    lb[nNonLinear_] = -f;
+    ub[nNonLinear_] = -f;
+    //double minCoeff = 1e50;
+    for(int i = 0; i<n ; i++)
+    {
+      if(cleanNnz(obj[i],colLower[i], colUpper[i],
+          -getInfinity(), 0,
+          x[i],
+          lb[nNonLinear_],
+          ub[nNonLinear_],tiny_, 1e-15)) {
+        //	      minCoeff = min(fabs(obj[i]), minCoeff);
+        v.insert(i,obj[i]);
+        lb[nNonLinear_] += obj[i] * x[i];
+        ub[nNonLinear_] += obj[i] * x[i];
+      }
+    }
+    v.insert(n,-1);
+    //Compute cut violation
+    bool genCut = true;
+    if(x2 != NULL)
+      {
+	double rhs = v.dotProduct(x2);
+	double violation = max(0., rhs - ub[nNonLinear_]);
+	if(violation == 0.) genCut = false;
+      }
+    if(genCut)
+      {
+	OsiRowCut newCut;
+	if(global)
+	  newCut.setGloballyValid();
+	newCut.setEffectiveness(99.99e99);
+	newCut.setRow(v);
+	newCut.setLb(-DBL_MAX/*Infinity*/);
+	newCut.setUb(ub[nNonLinear_]);
+	//     CftValidator validator;
+	//     validator(newCut);
+	cs.insert(newCut);
+	delete [] obj;
+      }
+  }
+
+  delete []lb;
+  delete[]ub;
+}
+
+#if 0
+/** Get the Benders cut at the point x with multipliers l */
+void
+OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * l, bool getObj)
 {
   int n,m, nnz_jac_g, nnz_h_lag;
   Ipopt::TNLP::IndexStyleEnum index_style;
@@ -1830,7 +2006,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
-    newCut.setGloballyValid();
+//    newCut.setGloballyValid();
     newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
     newCut.setUb(ub[i]);
@@ -1871,7 +2047,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     }
     v.insert(n,-1);
     OsiRowCut newCut;
-    newCut.setGloballyValid();
+//    newCut.setGloballyValid();
     newCut.setEffectiveness(99.99e99);
     newCut.setRow(v);
     newCut.setLb(-DBL_MAX/*Infinity*/);
@@ -1885,6 +2061,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   delete []lb;
   delete[]ub;
 }
+#endif
 
 double
 OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs)

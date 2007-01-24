@@ -90,6 +90,10 @@ namespace Bonmin
     double intTol;
     /** Conssider or not SOS constraints.*/
     int disableSos;
+    /** Add oa cuts as global or local cuts. */
+    int oaCutsGlobal;
+    /** Add all cuts or only violated ones. */
+    int addOnlyViolatedOa;
     /** frequency to solve nlp's in B-Hyb.*/
     int nlpSolveFrequency;
     /** frequency for generating filmint's type ecp cuts.*/

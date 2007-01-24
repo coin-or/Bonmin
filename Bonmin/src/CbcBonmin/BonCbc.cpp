@@ -171,8 +171,7 @@ namespace Bonmin
     //Setup OA generators
 
     //Resolution of nlp relaxations
-    OaNlpOptim oaGen(nlpSolver);
-    oaGen.setMaxDepth(100000);
+    OaNlpOptim oaGen(nlpSolver, 10000, par.addOnlyViolatedOa, par.oaCutsGlobal);
     oaGen.setLogLevel(par.oaLogLevel);
 
     EcpCuts ecpGen(nlpSolver);

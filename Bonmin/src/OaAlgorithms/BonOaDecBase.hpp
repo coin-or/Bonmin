@@ -198,6 +198,10 @@ namespace Bonmin
 
    /** Parameters for algorithm. */
     struct Parameters {
+      /// Add cuts as global
+      bool global_;
+      /// Add only violated OA inequalities
+      bool addOnlyViolated_;
       /// cutoff min increase (has to be intialized trhough Cbc)
       double cbcCutoffIncrement_;
       /// integer tolerance (has to be the same as Cbc's)

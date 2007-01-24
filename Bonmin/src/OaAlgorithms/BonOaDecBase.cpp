@@ -74,6 +74,8 @@ namespace Bonmin {
     }
 /// Constructor with default values for parameters
 OaDecompositionBase::Parameters::Parameters():
+  global_(true),
+  addOnlyViolated_(false),
   cbcCutoffIncrement_(1e-06),
   cbcIntegerTolerance_(1e-05),
   localSearchNodeLimit_(0),
@@ -107,6 +109,8 @@ OaDecompositionBase::~OaDecompositionBase(){
 
 /// Constructor with default values for parameters
 OaDecompositionBase::Parameters::Parameters(const Parameters & other):
+  global_(other.global_),
+  addOnlyViolated_(other.addOnlyViolated_),
   cbcCutoffIncrement_(other.cbcCutoffIncrement_),
   cbcIntegerTolerance_(other.cbcIntegerTolerance_),
   localSearchNodeLimit_(other.localSearchNodeLimit_),

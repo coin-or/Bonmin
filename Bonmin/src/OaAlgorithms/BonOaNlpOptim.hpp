@@ -20,12 +20,17 @@ namespace Bonmin
   public:
     /// Default constructor
     OaNlpOptim(OsiTMINLPInterface * si = NULL,
-        int maxDepth = 10);
+        int maxDepth = 10, bool addOnlyViolated = false,
+	       bool globalCuts = true);
     /// Copy constructor
     OaNlpOptim(const OaNlpOptim &copy)
         :
+      CglCutGenerator(copy),
         nlp_(copy.nlp_),
-        maxDepth_(copy.maxDepth_)
+        maxDepth_(copy.maxDepth_),
+	nSolve_(0),
+	addOnlyViolated_(copy.addOnlyViolated_),
+      global_(copy.global_)
     {
       handler_ = new CoinMessageHandler();
       handler_ -> setLogLevel(copy.handler_->logLevel());
@@ -78,6 +83,10 @@ namespace Bonmin
     CoinMessageHandler * handler_;
     /** handler */
     CoinMessages messages_;
+    /** Add only violated cuts?*/
+    bool addOnlyViolated_;
+    /** Add cuts as global?*/
+    bool global_;
   };
 }
 #endif

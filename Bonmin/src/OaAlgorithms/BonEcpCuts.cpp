@@ -29,7 +29,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
                       OsiCuts & cs,
                       const CglTreeInfo info) const
 {
-  double violation = nlp_->getConstraintViolation(
+  double violation = nlp_->getNonLinearitiesViolation(
                      si.getColSolution(), si.getObjValue());
   //  std::cout<<"Constraint violation: "<<violation<<std::endl;
   if(violation <= 1e-02)
@@ -59,7 +59,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
 	  //      std::cout<<"Stopping Ecp generation because problem became infeasible"<<std::endl;
           break;
         }
-        violation =  nlp_->getConstraintViolation(
+        violation =  nlp_->getNonLinearitiesViolation(
                      lpManip->si()->getColSolution(), 
                      lpManip->si()->getObjValue());
 	//        std::cout<<"Constraint violation: "<<violation<<std::endl;

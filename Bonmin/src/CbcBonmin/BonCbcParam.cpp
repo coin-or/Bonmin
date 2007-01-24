@@ -54,9 +54,11 @@ namespace Bonmin
         maxFailures,"bonmin.");
     Options->GetIntegerValue("max_consecutive_infeasible",
         maxInfeasible,"bonmin.");
-    Options->GetEnumValue("nlp_failure_behavior",failureBehavior,".bonmin");
+    Options->GetEnumValue("nlp_failure_behavior",failureBehavior,"bonmin.");
 
     // Hybrid options
+    Options->GetEnumValue("oa_cuts_scope", oaCutsGlobal,"bonmin.");
+    Options->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     Options->GetIntegerValue("nlp_solve_frequency",nlpSolveFrequency,"bonmin.");
 Options->GetIntegerValue("filmint_ecp_cuts",filmintCutsFrequency, "bonmin.");
     Options->GetNumericValue("oa_dec_time_limit",oaDecMaxTime,"bonmin.");

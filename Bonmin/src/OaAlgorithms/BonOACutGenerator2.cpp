@@ -171,24 +171,26 @@ namespace Bonmin
     printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
 	   numberCuts) ;
 #endif
+    //check time
+    if(CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_)
+      break;
         //do we perform a new local search ?
-        if (milpOptimal && feasible && !isInteger &&
-            nLocalSearch_ < parameters_.maxLocalSearch_ &&
-            numberPasses < parameters_.maxLocalSearchPerNode_ &&
-            parameters_.localSearchNodeLimit_ > 0 &&
-            CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_) {
-
-            /** do we have a subMip? if not create a new one. */
-            if(subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy()); 
-
-            nLocalSearch_++;
-
-            subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_,
-                                       parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
-                                       parameters_.localSearchNodeLimit_);
-
-            milpBound = subMip->lowBound();
-
+    if (milpOptimal && feasible && !isInteger &&
+	nLocalSearch_ < parameters_.maxLocalSearch_ &&
+	numberPasses < parameters_.maxLocalSearchPerNode_ &&
+	parameters_.localSearchNodeLimit_ > 0) {
+      
+      /** do we have a subMip? if not create a new one. */
+      if(subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy()); 
+      
+      nLocalSearch_++;
+      
+      subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_,
+				 parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
+				 parameters_.localSearchNodeLimit_);
+      
+      milpBound = subMip->lowBound();
+      
             if(subMip->optimal())
             handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
             else
@@ -224,6 +226,10 @@ namespace Bonmin
             handler_->message(OASUCCESS, messages_)<<CoinCpuTime() - timeBegin_ <<CoinMessageEol;
           }
         }/** endif localSearch*/
+    else if(subMip!=NULL) {
+      delete subMip; 
+      subMip = NULL;
+    }
     }
 #ifdef OA_DEBUG
   debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
