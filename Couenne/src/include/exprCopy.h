@@ -31,8 +31,8 @@ class exprCopy: public expression {
     {return copy_ -> Type ();}
 
   // Constructor, destructor
-  exprCopy  (expression *copy)
-    {copy_ = copy -> Original ();}
+  exprCopy  (expression *copy):
+    copy_ (copy) {}
   ~exprCopy () {}
 
   // copy constructor
@@ -46,16 +46,16 @@ class exprCopy: public expression {
   // If this is an exprClone of a exprClone of an expr???, point to
   // the original expr??? instead of an exprClone -- improves computing
   // efficiency
-  virtual inline expression *Original () const
+  inline expression *Original () const
     {return copy_ -> Original ();}
 
   // get variable index in problem
-  inline int Index () 
+  inline int Index () const
     {return copy_ -> Index ();}
 
   // I/O
   virtual void print (std::ostream &out) 
-    {out << "["; copy_ -> print (out); out << "]";}
+  {out << "["; copy_ -> print (out); out << "]";}
 
   // value (empty)
   virtual inline CouNumber Value () const 

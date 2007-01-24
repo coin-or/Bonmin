@@ -24,7 +24,7 @@ class exprClone: public exprCopy {
 
   // Constructor, destructor
   exprClone  (expression *copy): 
-    exprCopy (copy -> Original ()) {}
+    exprCopy (copy) {}
   ~exprClone () {}
 
   // copy constructor
@@ -32,17 +32,12 @@ class exprClone: public exprCopy {
     exprCopy (e.Original ()) {}
 
   // cloning method
-  virtual exprClone *clone ()
-  {return new exprClone (this);}
-
-  // If this is an exprClone of a exprClone of an expr???, point to
-  // the original expr??? instead of an exprClone -- improves computing
-  // efficiency
-  virtual inline expression *Original () const {return copy_ -> Original ();}
+  exprClone *clone ()
+  {return new exprClone (*this);}
 
   // I/O
   void print (std::ostream &out) 
-    {out << "{"; copy_ -> print (out); out << "}";}
+  {out << "{"; copy_ -> print (out); out << "}";}
 
   // value (empty)
   inline CouNumber Value () const 

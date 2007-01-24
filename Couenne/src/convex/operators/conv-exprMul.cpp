@@ -193,8 +193,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
       x_ind = xe -> Index (), 
       y_ind = ye -> Index ();
 
-  // if expression is c*x, where c is constant, everything gets
-  // easier...
+  // if expression is c*x, with c constant, everything gets easier...
 
   if ((xe -> Type () == CONST) || 
       (ye -> Type () == CONST)) {
@@ -218,9 +217,11 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
 	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = x_ind;}
 	else                        {coe = xe -> Value (); ind = y_ind;}
-
-	//	printf ("========> w=cx: c=%.4f, x_%d, w_%d\n", coe, ind, w_ind);
-
+	/*
+	  printf ("========> w=cx: c=%.4f, x_%d, w_%d... ", coe, ind, w_ind);
+	  xe -> print (std::cout); printf (" * ");
+	  ye -> print (std::cout); printf ("\n");
+	*/
 	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, CouNumber (-1.), ind, coe))){
 	  //	  cut -> print ();
 	  cs.insert (cut);
@@ -238,7 +239,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   CouNumber xl = (*xle) (), xu = (*xue) (), 
             yl = (*yle) (), yu = (*yue) ();
 
-  /*  
+  /*
   printf ("Mult: x = ");
   xe  -> print (std::cout); printf (" [");
   xle -> print (std::cout); printf (",");

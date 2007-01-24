@@ -8,8 +8,9 @@
  */
 
 #include <OsiRowCut.hpp>
-
 #include <CglCutGenerator.hpp>
+#include <CoinHelperFunctions.hpp>
+
 #include <CouenneCutGenerator.h>
 
 
@@ -58,20 +59,6 @@ CouenneCutGenerator::~CouenneCutGenerator () {
 CouenneCutGenerator *CouenneCutGenerator::clone () const
   {return new CouenneCutGenerator (*this);}
 
-/*
-  CouenneCutGenerator *dolly = new CouenneCutGenerator 
-    (NULL, addviolated_, convtype_, nSamples_);
-
-  dolly -> setIsFirst (firstcall_);
-  dolly -> setBonCs   (bonCs_);
-  dolly -> setBonOs   (bonOs_);
-
-  dolly -> setProblem (problem_ -> clone ());
-  dolly -> copyPool   (ncuts_, pool_);
-
-  return dolly;
-}
-*/
 
 // copy constructor
 
@@ -98,45 +85,18 @@ void CouenneCutGenerator::cleanup () {
 
   if (!pool_) return;
 
-  while (ncuts_--)
-    if (pool_ [ncuts_]) {
-      delete pool_ [ncuts_];
-      pool_ [ncuts_] = NULL;
-    }
+  if (ncuts_)
+    while (ncuts_--)
+      if (pool_ [ncuts_]) {
+	delete pool_ [ncuts_];
+	pool_ [ncuts_] = NULL;
+      }
   free (pool_);
   pool_ = NULL;
 }
 
 
-// Another version, to be called from Bonmin
-/*
-int CouenneCutGenerator::generateCuts (const OsiSolverInterface &si, OsiRowCut **&cuts) {
-
-  int ncuts = 0;
-
-  if (bonCs_ == NULL)
-    bonCs_ = new OsiCuts;
-  else {
-    ncuts = bonCs_ -> sizeRowCuts ();
-    for (int i=0; i<ncuts; i++)
-      bonCs_ -> eraseRowCut (i);
-  }
-
-  generateCuts (si, *bonCs_);
-
-  ncuts = bonCs_ -> sizeRowCuts ();
-
-  cuts = new OsiRowCut * [ncuts];
-
-  for (int i=0; i<ncuts; i++)
-    cuts [i]= bonCs_ -> rowCutPtr (i);
-
-  if (firstcall_)
-    firstcall_ = false;
-
-  return ncuts;
-}
-*/
+// add half-space through two points (x1,y1) and (x2,y2)
 
 void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi, 
 		 CouNumber x1, CouNumber y1, 

@@ -42,7 +42,7 @@ class CouenneProblem {
  public:
 
   // constructors, destructor
-  CouenneProblem  () {}
+  CouenneProblem  () {x_ = lb_ = ub_ = NULL;}
   CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 
@@ -50,8 +50,7 @@ class CouenneProblem {
   CouenneProblem *clone () const;
 
   // update value of variables and bounds
-  void update (CouNumber *x, CouNumber *l, CouNumber *u) 
-  {x_ = x; lb_ = l; ub_ = u;}
+  void update (CouNumber *, CouNumber *, CouNumber *);
 
   // get size of vectors
   int nObjs   () const {return objectives_.        size ();}

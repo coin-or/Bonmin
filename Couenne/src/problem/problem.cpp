@@ -36,9 +36,7 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p) {
   for (i=0; i < p.nVars   (); i++) variables_   . push_back (p.Var   (i) -> clone ());
   for (i=0; i < p.nAuxs   (); i++) auxiliaries_ . push_back (p.Aux   (i) -> clone ());
 
-  x_  = p.X();
-  lb_ = p.Lb();
-  ub_ = p.Ub();
+  update (p.X(), p.Lb(), p.Ub());
 }
 
 
@@ -161,13 +159,6 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
        i != constraints_.end (); i++)
     (*i) -> print (out);
 
-  /*
-  printf ("linear constraints:\n");
-  for (std::vector <LinearConstraint *>::iterator i = linearconstraints_.begin ();
-       i != linearconstraints_.end (); i++)
-    (*i) -> print (out);
-  */
-
   printf ("auxiliaries:\n");
   for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
        i != auxiliaries_.end (); i++) {
@@ -288,26 +279,6 @@ void CouenneProblem::convexify () {
 }
 */
 
-// Allocate space in coeff, indices, rhs, and sign, for n constraint
-// with number of coefficients given in nterms. Used in upper- and lowerLinearHull
-/*
-void allocateCon (int n, int *nterms,                     // input data
- 		  expression ***& coeff, int **& indices, // allocated data
-		  expression **& rhs, enum con_sign *& sign) {
-
-  coeff   = new expression ** [n];
-  indices = new int        *  [n];
-  rhs     = new expression *  [n];
-  sign    = new enum con_sign [n];
-
-  while (n--) {
-    register int nt = nterms [n];
-
-    coeff   [n] = new expression * [nt];
-    indices [n] = new int          [nt];
-  }
-}
-*/
 
 // destroy problem components
 
@@ -335,4 +306,23 @@ CouenneProblem::~CouenneProblem () {
        i != auxiliaries_ . end (); i++)
     delete (*i);
   */
+}
+
+void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
+
+  int nvars = nVars () + nAuxs ();
+
+  x_   = (CouNumber *) realloc (x_,  nvars * sizeof (CouNumber));
+  lb_  = (CouNumber *) realloc (lb_, nvars * sizeof (CouNumber));
+  ub_  = (CouNumber *) realloc (ub_, nvars * sizeof (CouNumber));
+
+  register int i;
+
+  for (i=nvars; i--;) {
+    x_  [i] = x [i];
+    lb_ [i] = l [i];
+    ub_ [i] = u [i];
+  }
+
+  expression::update (x_, lb_, ub_);
 }

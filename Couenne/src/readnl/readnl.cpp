@@ -28,7 +28,9 @@
 
 inline bool is_expr_zero (expr* e)
   {return ((e==NULL) || (((((int) e->op) == OPNUM) && 
-			  (fabs (e -> dL) < COUENNE_EPS))));} // *** CHECK THIS! dL is the derivative
+			  (fabs (((expr_n *)e) -> v)  < COUENNE_EPS) 
+			  //  && (fabs (e -> dL) < COUENNE_EPS)
+			  )));} // *** CHECK THIS! dL is the derivative
 
 
 // translates an ASL expression into an expression
