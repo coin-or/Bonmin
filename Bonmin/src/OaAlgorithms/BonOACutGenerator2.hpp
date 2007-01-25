@@ -56,7 +56,7 @@ namespace Bonmin
   protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
-                           SubMipSolver * subMip, OsiBabSolver * babInfo, double &cutoff) const;
+                           SubMipSolver * &subMip, OsiBabSolver * babInfo, double &cutoff) const;
     /// virutal method to decide if local search is performed
     virtual bool doLocalSearch() const;
   

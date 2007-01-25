@@ -65,7 +65,7 @@ namespace Bonmin
   OACutGenerator2::performOa(OsiCuts &cs,
                              solverManip &nlpManip, 
                              solverManip &lpManip, 
-                             SubMipSolver * subMip,
+                             SubMipSolver * &subMip,
                              OsiBabSolver * babInfo,
                              double & cutoff) const
   {
