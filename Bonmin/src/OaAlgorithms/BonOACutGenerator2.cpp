@@ -172,7 +172,7 @@ namespace Bonmin
 	   numberCuts) ;
 #endif
     //check time
-    if(CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_)
+    if(CoinCpuTime() - timeBegin_ > parameters_.maxLocalSearchTime_)
       break;
         //do we perform a new local search ?
     if (milpOptimal && feasible && !isInteger &&
