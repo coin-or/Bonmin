@@ -18,8 +18,8 @@
 namespace Bonmin
 {
 
-
-/// Default constructor
+extern int usingCouenne;
+// Default constructor
   OaFeasibilityChecker ::OaFeasibilityChecker ():
       OaDecompositionBase()
    {
@@ -65,8 +65,10 @@ namespace Bonmin
    int numberCutsBefore = cs.sizeRowCuts();
 
    //Fix the variable which have to be fixed, after having saved the bounds
-   const double * colsol = lp->getColSolution();
-
+   double * colsol = const_cast<double *>(lp->getColSolution());
+   if(usingCouenne){
+     colsol = new double [numcols];
+     CoinCopyN(lp->getColSolution(), numcols, colsol);}
    nlpManip.fixIntegers(colsol);
 
 
@@ -80,8 +82,9 @@ namespace Bonmin
       lp->setDblParam(OsiDualObjectiveLimit, cutoff);
     }
       // Get the cuts outer approximation at the current point
+      if(usingCouenne)
+        nlpManip.restore();
       nlp_->getOuterApproximation(cs);
-
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)
         lpManip.installCuts(cs, numberCuts);
@@ -93,8 +96,12 @@ namespace Bonmin
             !lp->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
         //if value of integers are unchanged then we have to get out
         bool changed = !feasible;//if lp is infeasible we don't have to check anything
-         if(!changed)
+	if(!changed){
+	  if(usingCouenne)
+	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution(),colsol);
+	  else
            changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+	}
           if (changed) {
             isInteger = integerFeasible(lp->getColSolution(), numcols);
           }
@@ -103,6 +110,7 @@ namespace Bonmin
             //	  if(!fixed)//fathom on bounds
             milpBound = 1e200;
           }
+	  delete [] colsol;
 #ifdef OA_DEBUG
           printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
               numberCuts) ;

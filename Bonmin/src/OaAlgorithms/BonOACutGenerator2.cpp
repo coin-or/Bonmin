@@ -24,7 +24,7 @@
 
 namespace Bonmin
 {
-
+extern int usingCouenne;
 
 /// Default constructor
   OACutGenerator2::OACutGenerator2():
@@ -129,8 +129,11 @@ namespace Bonmin
       int numberCutsBefore = cs.sizeRowCuts();
 
     //Fix the variable which have to be fixed, after having saved the bounds
-    const double * colsol = (subMip == NULL) ? lp->getColSolution() : subMip->getLastSolution();
-    nlpManip.fixIntegers(colsol);
+   double * colsol = const_cast<double *>(lp->getColSolution());
+   if(usingCouenne){
+     colsol = new double [numcols];
+     CoinCopyN(lp->getColSolution(), numcols, colsol);}
+   nlpManip.fixIntegers(colsol);
 
 
     if(solveNlp(babInfo, cutoff)){
@@ -143,6 +146,8 @@ namespace Bonmin
 
       
     // Get the cuts outer approximation at the current point
+      if(usingCouenne)
+        nlpManip.restore();
     nlp_->getOuterApproximation(cs);
 
 
@@ -158,7 +163,10 @@ namespace Bonmin
     //if value of integers are unchanged then we have to get out
     bool changed = !feasible;//if lp is infeasible we don't have to check anything
     if(!changed)
-      changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+	  if(usingCouenne)
+	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution(),colsol);
+	  else
+           changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
     if (changed) {
       isInteger = integerFeasible(lp->getColSolution(), numcols);
     }
@@ -197,7 +205,7 @@ namespace Bonmin
             handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
 
 
-            colsol = subMip->getLastSolution();
+            colsol =const_cast<double *> (subMip->getLastSolution());
             isInteger = colsol != 0;
 
             feasible =  (milpBound < cutoff);
@@ -230,6 +238,8 @@ namespace Bonmin
       delete subMip; 
       subMip = NULL;
     }
+    if(usingCouenne)
+      delete [] colsol;
     }
 #ifdef OA_DEBUG
   debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);

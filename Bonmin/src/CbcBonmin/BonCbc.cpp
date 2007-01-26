@@ -98,6 +98,8 @@ extern "C"
 #endif
 namespace Bonmin
 {
+  int usingCouenne = 0;
+
   /** Constructor.*/
   Bab::Bab():
       bestSolution_(NULL),

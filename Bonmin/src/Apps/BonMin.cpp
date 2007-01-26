@@ -20,13 +20,12 @@
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "BonCbc.hpp"
-
+namespace Bonmin{
+extern int usingCouenne;}
 using namespace Bonmin;
-
 int main (int argc, char *argv[])
 {
   using namespace Ipopt;
-  
   AmplInterface * nlp_and_solver; 
   char * pbName = NULL;
 

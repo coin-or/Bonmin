@@ -25,13 +25,14 @@
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
-
+namespace Bonmin{
+extern int usingCouenne;}
 using namespace Bonmin;
 
 int main (int argc, char *argv[])
 {
   using namespace Ipopt;
-  
+  Bonmin::usingCouenne = 1;  
   CouenneInterface * nlp_and_solver; 
 
   //We need to build dummy solver objects to get the options, determine which is the solver to use and register all the options

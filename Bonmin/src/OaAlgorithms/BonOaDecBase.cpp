@@ -410,6 +410,16 @@ OaDecompositionBase::solverManip::isDifferentOnIntegers(const double * colsol){
   return false;
 }
 
+/** Check if two solutions are the same on integer variables. */
+bool 
+OaDecompositionBase::solverManip::isDifferentOnIntegers(const double * colsol, const double *otherSol){
+  for (int i = 0; i < numcols_ ; i++) {
+     if (si_->isInteger(i) && fabs(otherSol[i] - colsol[i])>0.001)
+       return true;
+  }
+  return false;
+}
+
 /** Clone the state of another solver (bounds, cutoff, basis).*/
 void
 OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si){

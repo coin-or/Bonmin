@@ -125,6 +125,10 @@ namespace Bonmin
 
      /** Check if solution in solver is the same as colsol on integer variables. */
      bool isDifferentOnIntegers(const double * colsol);
+
+     /** Check if two solutions are the same on integer variables. */
+     bool isDifferentOnIntegers(const double * colsol, const double * other);
+
      /** Install cuts in solver. */
      void installCuts(const OsiCuts& cs, int numberCuts);
 
