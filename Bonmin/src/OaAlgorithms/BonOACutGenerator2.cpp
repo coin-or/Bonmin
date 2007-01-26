@@ -129,7 +129,8 @@ extern int usingCouenne;
       int numberCutsBefore = cs.sizeRowCuts();
 
     //Fix the variable which have to be fixed, after having saved the bounds
-   double * colsol = const_cast<double *>(lp->getColSolution());
+   double * colsol = const_cast<double *>(subMip == NULL ? lp->getColSolution():
+					  subMip->getLastSolution());
    if(usingCouenne){
      colsol = new double [numcols];
      CoinCopyN(lp->getColSolution(), numcols, colsol);}

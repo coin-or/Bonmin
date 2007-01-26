@@ -177,7 +177,7 @@ register_general_options
   roptions->AddLowerBoundedIntegerOption
   ("number_ecp_rounds",
    "Set the number of rounds of ecp in strong branching.",
-   0,0,
+   0,1,
    "");
 
   roptions->AddStringOption3("warm_start",
@@ -2581,8 +2581,9 @@ OsiTMINLPInterface::extractInterfaceParams()
   if (IsValid(app_)) {
 #ifdef COIN_HAS_FILTERSQP
     FilterSolver * filter = dynamic_cast<FilterSolver *>(Ipopt::GetRawPtr(app_));
-#endif
+
     bool is_given =
+#endif
       app_->Options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
 
 #ifdef COIN_HAS_FILTERSQP

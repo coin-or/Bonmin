@@ -29,11 +29,20 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
                       OsiCuts & cs,
                       const CglTreeInfo info) const
 {
+  double num=CoinDrand48();
+  const int & depth = info.level;
+  double beta=(1 + sqrt(5))/2.;
+  if(depth == 0) return;
+  if(num> beta*pow(2,-depth))
+    return;
   double violation = nlp_->getNonLinearitiesViolation(
                      si.getColSolution(), si.getObjValue());
   //  std::cout<<"Constraint violation: "<<violation<<std::endl;
+
+  //Get a random number
   if(violation <= 1e-02)
     return;
+  std::cout<<"Generating ECP cuts"<<std::endl;
   solverManip * lpManip = NULL;
   bool infeasible = false;
   for(int i = 0 ; i < numRounds_ ; i++)
@@ -41,7 +50,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
     if( violation > 1e-02)
     {
       int numberCuts =  - cs.sizeRowCuts();
-      nlp_->getOuterApproximation(cs, si.getColSolution(), 1);
+      nlp_->getOuterApproximation(cs, 1, si.getColSolution(), 1);
       numberCuts += cs.sizeRowCuts();
       if(numberCuts > 0 && (lp_ || i + 1 < numRounds_ )){
         if(lpManip==NULL) {
