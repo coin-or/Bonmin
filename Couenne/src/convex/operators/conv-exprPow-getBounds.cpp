@@ -143,11 +143,11 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	  else all [5] = new exprConst (0);
 	}
 
-	// And now for the upper bound
+	// And now for the upper bound ///////////////////////////////////
 
 	expression **alu = new expression * [6];
 
-	alu [0] = new exprClone   (all [0]);
+	alu [0] = new exprClone (all [0]);
 	alu [2] = new exprConst (0);
 	alu [4] = new exprClone (ubbase);
 
@@ -155,25 +155,26 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	     alu [1] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
 	else alu [1] = new exprPow (new exprCopy (lbbase), new exprConst (expon));
 
-	// alu [3] is lower bound when lbbase <= 0 <= ubbase
+	// alu [3] is upper bound when lbbase <= 0 <= ubbase
 
-	if (expon < - COUENNE_EPS) alu [3] = new exprConst (COUENNE_INFINITY);
-	else
-	  if (isInt && !(rndexp % 2))
-	       alu [3] = new exprMax (new exprPow (new exprCopy (lbbase), new exprConst (expon)),
-		  	 	      new exprPow (new exprCopy (ubbase), new exprConst (expon)));
-	  else alu [3] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
+	if (expon < - COUENNE_EPS) 
+	     alu [3] = new exprConst (COUENNE_INFINITY);
+	else if (isInt && !(rndexp % 2))
+	     alu [3] = new exprPow (new exprMax (new exprCopy (lbbase), new exprCopy (ubbase)),
+				      new exprConst (expon));
+	else alu [3] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
 
-	// alu [5] is the lower bound value when lbbase <= ubbase <= 0
+	// alu [5] is the upper bound value when lbbase <= ubbase <= 0
 
 	if (expon > COUENNE_EPS) {
+
 	  if (isInt && !(rndexp % 2)) 
-	       alu [5] = new exprPow (new exprClone(lbbase), new exprConst(expon));
+	       alu [5] = new exprPow (new exprClone(ubbase), new exprConst(expon));
 	  else alu [5] = new exprConst (0);
 	}
 	else {
 	  if (isInt || isInvInt) 
-	       alu [5] = new exprPow (new exprClone(lbbase), new exprConst(expon));
+	       alu [5] = new exprPow (new exprClone(ubbase), new exprConst(expon));
 	  else alu [5] = new exprConst (COUENNE_INFINITY);
 	}
 

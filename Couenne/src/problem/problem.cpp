@@ -110,22 +110,22 @@ void CouenneProblem::standardize () {
   for (std::vector <Objective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); i++) {
 
-      exprAux *aux = (*i) -> standardize (this);
+    exprAux *aux = (*i) -> standardize (this);
 
-      if (aux)
-	(*i) -> Body (aux);
-    }
+    if (aux)
+      (*i) -> Body (aux);
+  }
 
-  // same for constraints
+  // standardize constraints
 
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
        i != constraints_.end (); i++) {
 
-      exprAux *aux = (*i) -> standardize (this);
+    exprAux *aux = (*i) -> standardize (this);
 
-      if (aux)
-	(*i) -> Body (aux);
-    }
+    if (aux)
+      (*i) -> Body (aux);
+  }
 
   x_  = (CouNumber *) realloc (x_,  (nVars() + nAuxs ()) * sizeof (CouNumber));
   lb_ = (CouNumber *) realloc (lb_, (nVars() + nAuxs ()) * sizeof (CouNumber));
@@ -307,6 +307,9 @@ CouenneProblem::~CouenneProblem () {
     delete (*i);
   */
 }
+
+
+// update value of variables, bounds
 
 void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
 

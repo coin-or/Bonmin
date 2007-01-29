@@ -26,40 +26,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // on variables or bounds -- and none is needed since our
     // constructor populated *problem_ with variables and bounds. We
     // only need to 
-  }
-  else {
 
-    // Retrieve, from si, variable and bounds of all variables, if not
-    // firstcall, otherwise only those of the original ones Update
-    // expression structure with x, l, u
-
-    const CouNumber *xc = si.getColSolution (), 
-      *lc = si.getColLower (),
-      *uc = si.getColUpper ();
-
-    x = new CouNumber [ncols];
-    l = new CouNumber [ncols];
-    u = new CouNumber [ncols];
-
-    for (int i=ncols; i--;) {
-
-      x [i] = xc [i];
-      l [i] = lc [i];
-      u [i] = uc [i];
-    }
-    /*
-    printf ("!!!!-------x\n");
-    for (int i=0; i < getnvars (); i++)
-      printf ("%3d %12.9f\n", i, x [i]);
-    */
-    problem_ ->  update (x,l,u);
-    expression:: update (x,l,u);
-  }
-
-  // For each auxiliary variable replacing the original constraints,
-  // check if corresponding bounds are violated, and add cut to cs
-
-  if (firstcall_) {
+    // For each auxiliary variable replacing the original constraints,
+    // check if corresponding bounds are violated, and add cut to cs
 
     int nnlc = problem_ -> nNLCons ();
 
@@ -70,7 +39,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       // for constraint lb <= w <= ub, compute actual values of lb, w,
       // and ub
 
-      //      CouNumber body = con -> Body () -> Value ();
       CouNumber lb   = con -> Lb   () -> Value ();
       CouNumber ub   = con -> Ub   () -> Value ();
 
@@ -101,6 +69,34 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       cs.insert (orc);
     }
   }
+  else {
+
+    // Retrieve, from si, variable and bounds of all variables, if not
+    // firstcall, otherwise only those of the original ones Update
+    // expression structure with x, l, u
+
+    const CouNumber *xc = si.getColSolution (), 
+      *lc = si.getColLower (),
+      *uc = si.getColUpper ();
+
+    x = new CouNumber [ncols];
+    l = new CouNumber [ncols];
+    u = new CouNumber [ncols];
+
+    for (int i=ncols; i--;) {
+
+      x [i] = xc [i];
+      l [i] = lc [i];
+      u [i] = uc [i];
+    }
+    /*
+    printf ("!!!!-------x\n");
+    for (int i=0; i < getnvars (); i++)
+      printf ("%3d %12.9f\n", i, x [i]);
+    */
+    problem_ ->  update (x,l,u);
+    expression:: update (x,l,u);
+  }
 
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
@@ -118,4 +114,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     delete [] l;
     delete [] u;
   }
+
+  printf ("Couenne: %d cuts\n", bonCs_ -> sizeRowCuts ());
 }

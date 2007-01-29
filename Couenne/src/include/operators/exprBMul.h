@@ -63,13 +63,8 @@ inline CouNumber exprLBMul::operator () () {
 
 
 // output
-inline void exprLBMul::print (std::ostream &out = std::cout) {
-  out << "LB_mul("; 
-  arglist_ [0] -> print (out); out << ",";
-  arglist_ [1] -> print (out); out << ",";
-  arglist_ [2] -> print (out); out << ",";
-  arglist_ [3] -> print (out); out << ")";
-}
+inline void exprLBMul::print (std::ostream &out = std::cout)
+{exprOp::print (out, "LB_mul", PRE);}
 
 
 //  class to compute lower bound of a fraction based on the bounds of
@@ -125,12 +120,7 @@ inline CouNumber exprUBMul::operator () () {
 
 // output
 
-inline void exprUBMul::print (std::ostream &out = std::cout) {
-  out << "UB_mul(";
-  arglist_ [0] -> print (out); out << ",";
-  arglist_ [1] -> print (out); out << ",";
-  arglist_ [2] -> print (out); out << ",";
-  arglist_ [3] -> print (out); out << ")";
-}
+inline void exprUBMul::print (std::ostream &out = std::cout)
+{exprOp::print (out, "UB_mul", PRE);}
 
 #endif

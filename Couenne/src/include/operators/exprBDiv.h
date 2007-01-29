@@ -38,13 +38,8 @@ class exprLBDiv: public exprOp {
 
 
 // output
-inline void exprLBDiv::print (std::ostream &out = std::cout) {
-  out << "LB_div(";
-  arglist_ [0] -> print (out); out << ",";
-  arglist_ [1] -> print (out); out << ",";
-  arglist_ [2] -> print (out); out << ",";
-  arglist_ [3] -> print (out); out << ")";
-}
+inline void exprLBDiv::print (std::ostream &out = std::cout)
+{exprOp::print (out, "LB_div(", PRE);}
 
 
 // compute sum
@@ -53,10 +48,17 @@ inline CouNumber exprLBDiv::operator () () {
 
   exprOp:: operator () ();
 
+  register CouNumber D = *sp--;
+  register CouNumber d = *sp--;
+  register CouNumber N = *sp--;
+  register CouNumber n = *sp--;
+
+  /*
   register CouNumber d = *sp--;
   register CouNumber n = *sp--;
   CouNumber D = *sp--;
   CouNumber N = *sp--;
+  */
                                                      // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                             // (?,?,+,+)
     if   (n > 0) return n/D;                         // (+,+,+,+) --> n/D
@@ -100,11 +102,17 @@ inline CouNumber exprUBDiv::operator () () {
 
   exprOp:: operator () ();
 
+  register CouNumber D = *sp--;
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
+  register CouNumber n = *sp--;
 
+  /*
+  register CouNumber d = *sp--;
+  register CouNumber N = *sp--;
   CouNumber D = *sp--;
   CouNumber n = *sp--;
+  */
                                                        // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                                                     
     if   (N < 0) return N/D;                           // (-,-,+,+) --> N/D
@@ -117,12 +125,7 @@ inline CouNumber exprUBDiv::operator () () {
 }
 
 // output
-inline void exprUBDiv::print (std::ostream &out = std::cout) {
-  out << "UB_div(";
-  arglist_ [0] -> print (out); out << ",";
-  arglist_ [1] -> print (out); out << ",";
-  arglist_ [2] -> print (out); out << ",";
-  arglist_ [3] -> print (out); out << ")";
-}
+inline void exprUBDiv::print (std::ostream &out = std::cout)
+{exprOp::print (out, "UB_div(", PRE);}
 
 #endif

@@ -14,8 +14,6 @@
 #include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>
 
-#define SIZE_MALLOC 32768
-
 
 // Return a set of cuts that tighten convexification.
 //
@@ -27,13 +25,12 @@
 int CouenneCutGenerator::updateConv (CouNumber *curx, 
 				     CouNumber *curlb, 
 				     CouNumber *curub) {
-
   if (!bonCs_) {
 
     // This cut generator has been called through updateConv, not
-    // through generateCuts, therefore we need to store a
-    // OsiSolverInterface somewhere in order to call generateCuts. But
-    // first of all, allocate space for bonCs_
+    // through generateCuts, therefore we need to store an
+    // OsiSolverInterface and an OsiCuts somewhere in order to call
+    // generateCuts. Allocate space for bonCs_
 
     bonCs_ = new OsiCuts;
 
@@ -68,6 +65,8 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
   generateCuts (*bonOs_, *bonCs_);
 
+  // Update pool (used by Bonmin)
+
   // delete all cuts in the pool
   cleanup ();
 
@@ -80,8 +79,34 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     for (int i = 0; i<ncuts_; i++)
       pool_ [i] = bonCs_ -> rowCutPtr (i);
   }
+  /*
+  for (int i=0; i<problem_ -> nVars (); i++) {
+    printf ("%4d:  %12.3f [ %12.3f %12.3f ] -- ", 
+	    i, problem_ -> X(i), problem_ -> Lb(i), problem_ -> Ub(i));
 
-  printf ("Couenne: %d cuts\n", ncuts_);
+    problem_ -> Var (i) -> print (std::cout);
+    printf ("\n");
+  }
 
+  for (int i=0; i<problem_ -> nAuxs (); i++) {
+
+    int j = i+problem_ -> nVars ();
+    printf ("%4d:  %12.3f < %12.3f %12.3f > -- ", 
+	    j, problem_ -> X (j), problem_ -> Lb (j), problem_ -> Ub (j));
+
+    problem_ -> Aux (i) -> print (std::cout);  printf (" = ");
+    problem_ -> Aux (i) -> Image () -> print (std::cout);
+
+    expression *lb, *ub;
+
+    problem_ -> Aux (i) -> getBounds (lb, ub);
+
+    printf ("  [ ");
+    lb -> print (std::cout);
+    printf (" , ");
+    ub -> print (std::cout);
+    printf (" ]\n");
+  }
+  */
   return ncuts_;
 }
