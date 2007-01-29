@@ -82,9 +82,7 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
 
    // Feed in the initial relaxation point
    CoinCopyN(getColSolution(), numcols, x0);
-   couenneCg_->updateConv(x0, colLower, colUpper);
-
-   int numrowsconv = couenneCg_->getncuts();
+   int numrowsconv = couenneCg_->updateConv(x0, colLower, colUpper);
 
    /* Now, create matrix and other stuff. */
    CoinBigIndex * start = new CoinBigIndex[numrowsconv + 1];
@@ -143,6 +141,8 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
        si.setInteger(i);
      }
    }
+ 
+  si.writeMps("toto");
   app_->enableWarmStart();
   setColSolution(problem()->x_sol());
   setRowPrice(problem()->duals_sol());
