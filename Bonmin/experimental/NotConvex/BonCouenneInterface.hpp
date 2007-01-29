@@ -38,7 +38,7 @@ class CouenneInterface : public AmplInterface
    * outer-approximation constraints at the optimum.
    * The put everything in an OsiSolverInterface.
    */
-  virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1);
+  virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1, bool solveNlp = 1);
 
   /** Get the outer approximation constraints at the currently stored optimal point.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/

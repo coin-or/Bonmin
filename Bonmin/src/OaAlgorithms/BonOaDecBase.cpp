@@ -199,6 +199,7 @@ OaDecompositionBase::SubMipSolver::performLocalSearch(double cutoff, int logleve
     cbc_->setCutoff(cutoff);
 
     cbc_->branchAndBound();
+    cbc_->solver()->writeMps("toto");
     OAModel = NULL;
     lowBound_ = cbc_->getBestPossibleObjValue();
 

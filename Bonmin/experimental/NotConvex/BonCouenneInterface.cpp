@@ -59,9 +59,10 @@ CouenneInterface::~CouenneInterface(){
    * The put everything in an OsiSolverInterface.
    */
 void 
-CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
+CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, bool solveNlp)
 {
-   initialSolve();
+  if(solveNlp)
+    initialSolve();
 
    // Check that couenneCg_ has been built. 
    if(couenneCg_ == NULL){
@@ -128,6 +129,7 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   
    si.loadProblem(A, colLower, colUpper, obj, rowLower, rowUpper);
   
+
    delete [] rowLower; 
    delete [] rowUpper;
    delete [] colLower;
@@ -137,6 +139,7 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
    for(int i = 0 ; i < numcols ; i++)
    {
      if(isInteger(i)){
+	 std::cout<<"Adding integer variable :"<<i<<std::endl;
        si.setInteger(i);
      }
    }

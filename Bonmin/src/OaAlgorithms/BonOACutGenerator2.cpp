@@ -88,8 +88,8 @@ extern int usingCouenne;
     {
         subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_, 
                                    (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
-                                   parameters_.localSearchNodeLimit_);   
-        milpBound = subMip->lowBound();
+                                   parameters_.localSearchNodeLimit_);
+	milpBound = subMip->lowBound();
         milpOptimal = subMip->optimal();
 
         feasible = milpBound < cutoff;
