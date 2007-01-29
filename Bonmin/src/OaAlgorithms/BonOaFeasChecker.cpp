@@ -103,14 +103,15 @@ extern int usingCouenne;
            changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
 	}
           if (changed) {
-            isInteger = integerFeasible(lp->getColSolution(), numcols);
+            isInteger = integerFeasible(lp->getColSolution(), numcols - 1);
           }
           else {
             isInteger = 0;
             //	  if(!fixed)//fathom on bounds
             milpBound = 1e200;
           }
-	  delete [] colsol;
+	  if(usingCouenne)
+	    delete [] colsol;
 #ifdef OA_DEBUG
           printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
               numberCuts) ;
