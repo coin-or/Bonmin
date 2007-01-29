@@ -1918,8 +1918,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 	//     CftValidator validator;
 	//     validator(newCut);
 	cs.insert(newCut);
-	delete [] obj;
       }
+    delete [] obj;
   }
 
   delete []lb;
