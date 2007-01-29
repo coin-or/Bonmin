@@ -71,17 +71,17 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
   // delete all cuts in the pool
   cleanup ();
 
-  int ncuts = bonCs_ -> sizeRowCuts ();
+  ncuts_ = bonCs_ -> sizeRowCuts ();
 
   // copy cuts into (OsiRowCut ** ) vector for Bonmin's convenience
-  if (ncuts) {
+  if (ncuts_) {
 
-    pool_ = (OsiRowCut **) realloc (pool_, ncuts * sizeof (OsiRowCut *));
-    for (int i = 0; i<ncuts; i++)
+    pool_ = (OsiRowCut **) realloc (pool_, ncuts_ * sizeof (OsiRowCut *));
+    for (int i = 0; i<ncuts_; i++)
       pool_ [i] = bonCs_ -> rowCutPtr (i);
   }
 
-  printf ("Couenne: %d cuts\n", ncuts);
+  printf ("Couenne: %d cuts\n", ncuts_);
 
-  return ncuts;
+  return ncuts_;
 }
