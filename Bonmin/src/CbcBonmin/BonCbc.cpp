@@ -177,6 +177,8 @@ namespace Bonmin
     oaGen.setLogLevel(par.oaLogLevel);
 
     EcpCuts ecpGen(nlpSolver);
+    ecpGen.parameter().global_ = par.oaCutsGlobal;
+    ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
 
     //Outer approximation iterations
     OsiSolverInterface * localSearchSolver=NULL;
@@ -221,6 +223,9 @@ namespace Bonmin
       oaDec.setLogLevel(par.oaLogLevel);
       oaDec.parameter().logFrequency_ = par.oaLogFrequency;
       oaDec.parameter().subMilpLogLevel_ = par.milpLogLevel;
+      oaDec.parameter().global_ = par.oaCutsGlobal;
+      oaDec.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
+
     }
     //Setup solver for checking validity of integral solutions
     OaFeasibilityChecker feasCheck(nlpSolver, model.solver(),
@@ -230,6 +235,8 @@ namespace Bonmin
       feasCheck.parameter().localSearchNodeLimit_ = 0;
       feasCheck.parameter().maxLocalSearch_ = 0;
       feasCheck.parameter().maxLocalSearchPerNode_ = 100000;
+      feasCheck.parameter().global_ = par.oaCutsGlobal;
+      feasCheck.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
     }
     DummyHeuristic oaHeu(model, nlpSolver);
 

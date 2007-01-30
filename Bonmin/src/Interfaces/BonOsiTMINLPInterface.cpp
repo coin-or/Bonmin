@@ -268,14 +268,14 @@ static void register_OA_options
 
   roptions->AddStringOption2("oa_cuts_scope","Specify if OA cuts added are to be set globally or locally valid",
                              "global",
-			     "global","Cuts are treated as globally valid",
-			     "local", "Cuts are treated as locally valid",
+			     "local","Cuts are treated as globally valid",
+			     "global", "Cuts are treated as locally valid",
 			     "");
 
   roptions->AddStringOption2("add_only_violated_oa","Do we add all OA cuts or only the ones violated by current point?",
 			     "no",
-			     "yes","",
-			     "no","","");
+			     "no","",
+			     "yes","","");
   roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
       "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
       0,10,
@@ -2006,7 +2006,6 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * 
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
-//    newCut.setGloballyValid();
     newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
     newCut.setUb(ub[i]);
@@ -2064,7 +2063,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * 
 #endif
 
 double
-OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs)
+OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs, bool addOnlyViolated, bool global)
 {
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
@@ -2076,7 +2075,8 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
   app2->Options()->SetIntegerValue("print_level", (Ipopt::Index) 0);
   optimization_status_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
-  getOuterApproximation(cs, getColSolution(), 0);
+  getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
+			, global);
   hasBeenOptimized_=true;
   return getObjValue();
 }

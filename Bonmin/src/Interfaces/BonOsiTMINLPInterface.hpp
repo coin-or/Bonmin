@@ -814,12 +814,12 @@ class Messages : public CoinMessages
   /** Get the outer approximation constraints at the current optimal point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  virtual void getOuterApproximation(OsiCuts &cs, bool getObj = 1, const double * x2= NULL, bool global = true);
+  virtual void getOuterApproximation(OsiCuts &cs, bool getObj, const double * x2, bool global);
 
   /** Get the outer approximation constraints at provided point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj = 1, const double * x2 = NULL, bool global = true);
+  void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
 
   /** Get the Benders cut at provided point with provided multipliers.*/
   void getBendersCut(OsiCuts &cs, const double * x, const double *lambda, bool getObj = 1);
@@ -831,7 +831,7 @@ class Messages : public CoinMessages
    * \return Distance between feasibility set and x
    * \param n number of element in arrays x and ind
    * \param ind indices of the coordinate*/
-  double getFeasibilityOuterApproximation(int n, const double * x_bar,const int *ind, OsiCuts &cs);
+  double getFeasibilityOuterApproximation(int n, const double * x_bar,const int *ind, OsiCuts &cs, bool addOnlyViolated, bool global);
   //@}
   /** get NLP constraint violation of current point */
 

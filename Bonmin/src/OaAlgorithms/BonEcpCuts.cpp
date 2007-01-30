@@ -31,7 +31,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
 {
   double num=CoinDrand48();
   const int & depth = info.level;
-  double beta=(1 + sqrt(5))/2.;
+  double beta=16;
   if(depth == 0) return;
   if(num> beta*pow(2,-depth))
     return;
@@ -50,7 +50,9 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
     if( violation > 1e-02)
     {
       int numberCuts =  - cs.sizeRowCuts();
-      nlp_->getOuterApproximation(cs, 1, si.getColSolution(), 1);
+      const double * toCut = parameter().addOnlyViolated_?
+	si.getColSolution():NULL;
+      nlp_->getOuterApproximation(cs, 1, toCut, parameter().global_);
       numberCuts += cs.sizeRowCuts();
       if(numberCuts > 0 && (lp_ || i + 1 < numRounds_ )){
         if(lpManip==NULL) {

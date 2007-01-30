@@ -149,8 +149,10 @@ extern int usingCouenne;
     // Get the cuts outer approximation at the current point
       if(usingCouenne)
         nlpManip.restore();
-    nlp_->getOuterApproximation(cs);
-
+      const double * toCut = (parameter().addOnlyViolated_)?
+			      colsol:NULL;
+    nlp_->getOuterApproximation(cs, 1, toCut,
+				  parameter().global_);
 
     int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
     if (numberCuts > 0)

@@ -250,6 +250,10 @@ namespace Bonmin
     Parameters& parameter(){
       return parameters_;
     }
+
+    const Parameters& parameter()const {
+      return parameters_;
+    }
    
     void setLogLevel(int level){
       handler_->setLogLevel(level);} 
