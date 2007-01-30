@@ -102,8 +102,10 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 
 	lb = new exprPow (lbbase, new exprConst (expon));
 	ub = new exprPow (ubbase, new exprConst (expon));
-      }
+      } 
       else {
+
+	// the exponent is either negative, integer even, or fractional
 
 	expression **all = new expression * [6];
 
@@ -143,43 +145,53 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	  else all [5] = new exprConst (0);
 	}
 
+	lb = new exprMin (all, 6);
+
 	// And now for the upper bound ///////////////////////////////////
 
-	expression **alu = new expression * [6];
+	if (expon > 0) {
 
-	alu [0] = new exprClone (all [0]);
-	alu [2] = new exprConst (0);
-	alu [4] = new exprClone (ubbase);
+	  // special case: bounds are referred to bounds only
 
-	if ((expon > COUENNE_EPS) || ((isInt || isInvInt) && !(rndexp % 2)))
-	     alu [1] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
-	else alu [1] = new exprPow (new exprCopy (lbbase), new exprConst (expon));
+	  ub = new exprMax (new exprPow (new exprClone (lbbase), new exprConst (expon)),
+			    new exprPow (new exprClone (ubbase), new exprConst (expon)));
+	} else {
 
-	// alu [3] is upper bound when lbbase <= 0 <= ubbase
+	  expression **alu = new expression * [6];
 
-	if (expon < - COUENNE_EPS) 
-	     alu [3] = new exprConst (COUENNE_INFINITY);
-	else if (isInt && !(rndexp % 2))
-	     alu [3] = new exprPow (new exprMax (new exprCopy (lbbase), new exprCopy (ubbase)),
-				      new exprConst (expon));
-	else alu [3] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
+	  alu [0] = new exprClone (all [0]);
+	  alu [2] = new exprConst (0);
+	  alu [4] = new exprClone (ubbase);
 
-	// alu [5] is the upper bound value when lbbase <= ubbase <= 0
+	  if ((expon > COUENNE_EPS) || ((isInt || isInvInt) && !(rndexp % 2)))
+	    alu [1] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
+	  else alu [1] = new exprPow (new exprCopy (lbbase), new exprConst (expon));
 
-	if (expon > COUENNE_EPS) {
+	  // alu [3] is upper bound when lbbase <= 0 <= ubbase
 
-	  if (isInt && !(rndexp % 2)) 
-	       alu [5] = new exprPow (new exprClone(ubbase), new exprConst(expon));
-	  else alu [5] = new exprConst (0);
+	  if (expon < - COUENNE_EPS) 
+	    alu [3] = new exprConst (COUENNE_INFINITY);
+	  else if (isInt && !(rndexp % 2))
+	    alu [3] = new exprPow (new exprMax (new exprCopy (lbbase), new exprCopy (ubbase)),
+				   new exprConst (expon));
+	  else alu [3] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
+
+	  // alu [5] is the upper bound value when lbbase <= ubbase <= 0
+
+	  if (expon > COUENNE_EPS) {
+
+	    if (isInt && !(rndexp % 2)) 
+	      alu [5] = new exprPow (new exprClone(ubbase), new exprConst(expon));
+	    else alu [5] = new exprConst (0);
+	  }
+	  else {
+	    if (isInt || isInvInt) 
+	      alu [5] = new exprPow (new exprClone(ubbase), new exprConst(expon));
+	    else alu [5] = new exprConst (COUENNE_INFINITY);
+	  }
+
+	  ub = new exprMin (alu, 6);
 	}
-	else {
-	  if (isInt || isInvInt) 
-	       alu [5] = new exprPow (new exprClone(ubbase), new exprConst(expon));
-	  else alu [5] = new exprConst (COUENNE_INFINITY);
-	}
-
-	lb = new exprMin (all, 6);
-	ub = new exprMin (alu, 6);
       }
     }
     else {

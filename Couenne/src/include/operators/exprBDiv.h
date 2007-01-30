@@ -39,7 +39,7 @@ class exprLBDiv: public exprOp {
 
 // output
 inline void exprLBDiv::print (std::ostream &out = std::cout)
-{exprOp::print (out, "LB_div(", PRE);}
+{exprOp::print (out, "LB_div", PRE);}
 
 
 // compute sum
@@ -52,22 +52,14 @@ inline CouNumber exprLBDiv::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
-
-  /*
-  register CouNumber d = *sp--;
-  register CouNumber n = *sp--;
-  CouNumber D = *sp--;
-  CouNumber N = *sp--;
-  */
                                                      // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                             // (?,?,+,+)
     if   (n > 0) return n/D;                         // (+,+,+,+) --> n/D
     else         return n/d;                         // (-,?,+,+) --> n/d
-  } else { // d <= 0
+  } else  // d <= 0
     if      (D > COUENNE_EPS) return - COUENNE_INFINITY; // (?,?,-,+) --> unbounded
     else if (N > COUENNE_EPS) return N/D;                // (?,+,-,-) --> N/D
     else                      return N/d;                // (-,-,-,-) --> N/d
-  }
 }
 
 
@@ -106,13 +98,6 @@ inline CouNumber exprUBDiv::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
-
-  /*
-  register CouNumber d = *sp--;
-  register CouNumber N = *sp--;
-  CouNumber D = *sp--;
-  CouNumber n = *sp--;
-  */
                                                        // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                                                     
     if   (N < 0) return N/D;                           // (-,-,+,+) --> N/D
@@ -126,6 +111,6 @@ inline CouNumber exprUBDiv::operator () () {
 
 // output
 inline void exprUBDiv::print (std::ostream &out = std::cout)
-{exprOp::print (out, "UB_div(", PRE);}
+{exprOp::print (out, "UB_div", PRE);}
 
 #endif

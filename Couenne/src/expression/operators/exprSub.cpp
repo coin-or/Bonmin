@@ -80,8 +80,8 @@ void exprSub::getBounds (expression *&lb, expression *&ub) {
   expression **alsl = new expression * [2];
   expression **alsu = new expression * [2];
 
-  arglist_ [0] -> getBounds (alsl [0], alsu [1]);
-  arglist_ [1] -> getBounds (alsu [0], alsl [1]);
+  arglist_ [0] -> getBounds (alsl [0], alsu [0]);
+  arglist_ [1] -> getBounds (alsu [1], alsl [1]);
 
   lb = new exprSub (alsl, 2);
   ub = new exprSub (alsu, 2);

@@ -79,19 +79,21 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     for (int i = 0; i<ncuts_; i++)
       pool_ [i] = bonCs_ -> rowCutPtr (i);
   }
+
   /*
+
   for (int i=0; i<problem_ -> nVars (); i++) {
-    printf ("%4d:  %12.3f [ %12.3f %12.3f ] -- ", 
+    printf ("%4d:  %12.3f [%12.3f %12.3f]\n", 
 	    i, problem_ -> X(i), problem_ -> Lb(i), problem_ -> Ub(i));
 
-    problem_ -> Var (i) -> print (std::cout);
-    printf ("\n");
+    //    problem_ -> Var (i) -> print (std::cout);
+    //    printf ("\n");
   }
 
   for (int i=0; i<problem_ -> nAuxs (); i++) {
 
     int j = i+problem_ -> nVars ();
-    printf ("%4d:  %12.3f < %12.3f %12.3f > -- ", 
+    printf ("%4d:  %12.3f [%12.3f %12.3f] ", 
 	    j, problem_ -> X (j), problem_ -> Lb (j), problem_ -> Ub (j));
 
     problem_ -> Aux (i) -> print (std::cout);  printf (" = ");
@@ -101,11 +103,11 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
     problem_ -> Aux (i) -> getBounds (lb, ub);
 
-    printf ("  [ ");
+    printf ("\n L ");
     lb -> print (std::cout);
-    printf (" , ");
+    printf ("\n U ");
     ub -> print (std::cout);
-    printf (" ]\n");
+    printf ("\n");
   }
   */
   return ncuts_;

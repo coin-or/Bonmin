@@ -62,9 +62,14 @@ class exprCopy: public expression {
     //    {return currValue_;}
     {return copy_ -> Value ();} // *** Check this! Should be the commented one 
 
+  // FIX ME! a copy should just return an already evaluated number,
+  // that's why it is very important that exprCopy should only be used
+  // in successive evaluations. 
+
   // null function for evaluating the expression
   virtual inline CouNumber operator () () 
-    {return (currValue_ = copy_ -> Value ());}
+    {return (currValue_ = (*copy_) ());}
+  //    {return (currValue_ = copy_ -> Value ());}
 
   // differentiation
   inline expression *differentiate (int index) 
