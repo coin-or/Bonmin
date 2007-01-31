@@ -27,10 +27,11 @@
 // check if an expression is a null pointer or equals zero
 
 inline bool is_expr_zero (expr* e)
-  {return ((e==NULL) || (((((int) e->op) == OPNUM) && 
+  {return ((e==NULL) || (((((long int) e->op) == OPNUM) && 
 			  (fabs (((expr_n *)e) -> v)  < COUENNE_EPS) 
 			  //  && (fabs (e -> dL) < COUENNE_EPS)
-			  )));} // *** CHECK THIS! dL is the derivative
+			  // *** CHECK THIS! dL is the derivative
+			  )));} 
 
 
 // translates an ASL expression into an expression

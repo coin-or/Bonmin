@@ -96,6 +96,9 @@ int exprDiv::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 }
 */
 
+inline bool is_finite (CouNumber x)
+{return (fabs (x) < COUENNE_INFINITY);}
+
 // generate convexification cut for constraint w = x/y
 
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
@@ -143,18 +146,22 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   OsiRowCut *cut;
 
   // 1) 
-  if ((cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl)))
+  if (is_finite (yl) && is_finite (wl) 
+      && (cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl)))
     cs.insert (cut);
 
   // 2) 
-  if ((cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu)))
+  if (is_finite (yu) && is_finite (wu) 
+      && (cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu)))
     cs.insert (cut);
 
   // 3) 
-  if ((cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu)))
+  if (is_finite (yl) && is_finite (wu) 
+      && (cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu)))
     cs.insert (cut);
 
   // 4) 
-  if ((cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
+  if (is_finite (yu) && is_finite (wl) 
+      && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
 }
