@@ -151,7 +151,13 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
 /** Get the outer approximation constraints at the currently stored optimal point.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
 void 
-CouenneInterface::getOuterApproximation(OsiCuts &cs, bool getObj){
+CouenneInterface::getOuterApproximation(OsiCuts &cs, bool getObj, 
+					const double * x2, bool global){
+  getOuterApproximation(cs, getColSolution(), getObj, x2, global);
+}
+
+void 
+CouenneInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global){
    // Check that couenneCg_ has been built. 
    if(couenneCg_ == NULL){
      throw CoinError("No couenne generator has been built,"
@@ -163,21 +169,21 @@ CouenneInterface::getOuterApproximation(OsiCuts &cs, bool getObj){
    int numcols = getNumCols();
    int numcolsconv = couenneCg_->getnvars();
   
-   CouNumber * x = new CouNumber[numcolsconv];
+   CouNumber * x0 = new CouNumber[numcolsconv];
    CouNumber * colLower = new CouNumber[numcolsconv];
    CouNumber * colUpper = new CouNumber[numcolsconv];
    assert(numcolsconv >= numcols);
    
-   CoinCopyN(couenneCg_->X(), numcolsconv, x);
+   CoinCopyN(couenneCg_->X(), numcolsconv, x0);
    CoinCopyN(couenneCg_->Lb(), numcolsconv, colLower);
    CoinCopyN(couenneCg_->Ub(), numcolsconv, colUpper);
 
    // Feed in the current state
-   CoinCopyN(getColSolution(), numcols, x);
+   CoinCopyN(getColSolution(), numcols, x0);
    CoinCopyN(getColLower(), numcols, colLower);
    CoinCopyN(getColUpper(), numcols, colUpper);
 
-   couenneCg_->updateConv(x, colLower, colUpper);
+   couenneCg_->updateConv(x0, colLower, colUpper);
 
 
    int ncuts = couenneCg_->getncuts();

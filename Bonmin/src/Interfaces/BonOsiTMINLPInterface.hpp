@@ -819,7 +819,7 @@ class Messages : public CoinMessages
   /** Get the outer approximation constraints at provided point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
+  virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
 
   /** Get the Benders cut at provided point with provided multipliers.*/
   void getBendersCut(OsiCuts &cs, const double * x, const double *lambda, bool getObj = 1);
