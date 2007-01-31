@@ -61,6 +61,7 @@ Couenne/src/include/exprBound.h -text
 Couenne/src/include/exprClone.h -text
 Couenne/src/include/exprConst.h -text
 Couenne/src/include/exprCopy.h -text
+Couenne/src/include/exprIVar.h -text
 Couenne/src/include/exprOp.h -text
 Couenne/src/include/exprUnary.h -text
 Couenne/src/include/exprVar.h -text

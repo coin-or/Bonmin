@@ -28,6 +28,8 @@ typedef struct {
 
 inline int pair_compare (const void *p1, const void *p2) {
 
+  /* FIX THIS! weak cast for 64 bit machines */
+
   register int f1 = (int) (((AslCouPair *) p1) -> fp); 
   register int f2 = (int) (((AslCouPair *) p2) -> fp); 
 
@@ -48,6 +50,8 @@ int getOperator (efunc2 *f) {
 
   static char first_call = 1;
   AslCouPair key, *res;
+
+  /* FIX cast fo 64 bit machines */
 
   if (((int) f <  N_OPS) && 
       ((int) f > -N_OPS))

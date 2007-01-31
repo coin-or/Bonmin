@@ -132,21 +132,22 @@ include_HEADERS = \
 	include/operators/exprPow.h \
 	include/operators/exprSin.h \
 	include/operators/exprSub.h \
-	include/CouenneProblemElem.h \
+	include/expressions.h \
+	include/exprConst.h \
+	include/exprIVar.h \
+	include/exprVar.h \
 	include/exprAux.h \
 	include/exprUnary.h \
 	include/expression.h \
 	include/exprClone.h \
-	include/CouenneProblem.h \
 	include/exprBound.h \
-	include/rootQ.h \
-	include/CouenneTypes.h \
 	include/exprCopy.h \
 	include/exprOp.h \
 	include/CouennePrecisions.h \
-	include/expressions.h \
-	include/exprConst.h \
-	include/exprVar.h \
+	include/CouenneProblemElem.h \
+	include/CouenneProblem.h \
+	include/CouenneTypes.h \
+	include/rootQ.h \
 	include/CouenneCutGenerator.h
 
 #############################################################################

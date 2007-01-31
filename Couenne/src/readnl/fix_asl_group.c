@@ -81,7 +81,7 @@ void fix_asl_group (psg_elem *g) {
     real coef = g -> L[j]. fac;
     expr *lin = (expr *) malloc (sizeof (expr));
 
-    if (fabs (coef - 1.0) > COUENNE_EPS) { 
+    if (fabs (coef - 1.0) > COUENNE_EPS) {
 
       /* expression is ax, a!=1 */
 
@@ -101,7 +101,6 @@ void fix_asl_group (psg_elem *g) {
 
       /* expression is x */
 
-      /*      lin = (expr *) malloc (sizeof (expr));*/
       lin -> op = (efunc2 *)(long) OPVARVAL;
       lin -> a = g -> L[j]. v.i;
     }

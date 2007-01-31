@@ -106,7 +106,7 @@ expression *nl2e (expr2 *e) {
   case OPVARVAL: return new exprVar (e->a);
 
   case -1:
-  default: printf ("WARNING: operator %d in expression not implemented\n", (int) e -> op); 
+  default: printf ("WARNING: operator %d in expression not implemented\n", (long int) e -> op); 
     return new exprConst (0);
   }
 }
