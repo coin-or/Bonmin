@@ -101,7 +101,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
 
-  for (int i = 0, j = 0; i<problem_ -> nAuxs (); i++)
+  for (int i=0; i<problem_ -> nAuxs (); i++)
     problem_ -> Aux (i) -> generateCuts (si, cs, this);
 
   // end of generateCuts
