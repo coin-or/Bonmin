@@ -96,7 +96,7 @@ int exprDiv::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 }
 */
 
-inline bool is_finite (CouNumber x)
+bool is_finite (CouNumber x)
 {return (fabs (x) < COUENNE_INFINITY);}
 
 // generate convexification cut for constraint w = x/y

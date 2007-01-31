@@ -174,7 +174,7 @@ int exprMul::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 */
 
 // is x finite?
-inline bool is_finite (CouNumber x);
+bool is_finite (CouNumber x);
 
 // generate convexification cut for constraint w = this
 
