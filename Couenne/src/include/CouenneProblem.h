@@ -88,7 +88,7 @@ class CouenneProblem {
   void addRNGConstraint (expression *, expression *, expression *);
 
   // add variable
-  expression *addVariable ();
+  expression *addVariable (bool);
 
   // add auxiliary variable and associate it with expression given as
   // argument (used in standardization)

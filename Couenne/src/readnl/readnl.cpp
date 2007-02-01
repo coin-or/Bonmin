@@ -49,10 +49,22 @@ extern "C" {
 
 int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
-  // initialize the problem's macro parameters 
-  for (int i=0; i<n_var; i++)
-    addVariable ();
+  int i;
 
+  // create discrete variables
+  for (i=0; i<niv+nbv+nlvbi; i++)
+    addVariable (true);
+
+  // create continuous variables
+  for (; i<n_var; i++)
+    addVariable (false);
+  /*
+  printf ("%d linear integer\n", niv);
+  printf ("%d linear binary\n",  nbv);
+  printf ("%d int nonlin in both\n", nlvbi);
+  printf ("%d int nonlin in con\n", nlvci);
+  printf ("%d int nonlin in obj\n", nlvoi);
+  */
   // create room for problem's variables and bounds
   x_  = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   lb_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));

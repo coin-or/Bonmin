@@ -32,7 +32,7 @@ class exprIVar: public exprVar {
 
   // Constructor
   exprIVar (int varIndex):
-    varIndex_ (varIndex) {}
+    exprVar (varIndex) {}
 
   // destructor
   ~exprIVar () {}

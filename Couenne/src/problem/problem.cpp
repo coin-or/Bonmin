@@ -12,6 +12,7 @@
 #include <expression.h>
 #include <exprConst.h>
 #include <exprClone.h>
+#include <exprIVar.h>
 #include <exprAux.h>
 #include <exprMax.h>
 #include <exprMin.h>
@@ -80,9 +81,11 @@ void CouenneProblem::addRNGConstraint (expression *body, expression *lb=NULL, ex
 
 // add variable to the problem
 
-expression *CouenneProblem::addVariable () {
+expression *CouenneProblem::addVariable (bool isDiscrete) {
 
-  exprVar *var = new exprVar (variables_ . size () + auxiliaries_ . size ());
+  exprVar *var = (isDiscrete) ? 
+    (new exprIVar (variables_ . size () + auxiliaries_ . size ())) :
+    (new exprVar  (variables_ . size () + auxiliaries_ . size ()));
   variables_ . push_back (var);
 
   return var;
