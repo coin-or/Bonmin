@@ -33,9 +33,9 @@ testeval_LDADD = \
 	$(ADDLIBS)
 
 COINLIBS = \
-	$(OSIOBJDIR)/src/libOsi.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 	$(CGLOBJDIR)/src/libCgl.la \
+	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
