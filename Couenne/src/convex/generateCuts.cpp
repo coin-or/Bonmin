@@ -115,5 +115,5 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     delete [] u;
   }
 
-  printf ("Couenne: %d cuts\n", bonCs_ -> sizeRowCuts ());
+  printf ("Couenne: %d cuts\n", cs.sizeRowCuts ());
 }

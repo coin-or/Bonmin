@@ -68,7 +68,7 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
   // Update pool (used by Bonmin)
 
   // delete all cuts in the pool
-  cleanup ();
+  //  cleanup ();
 
   ncuts_ = bonCs_ -> sizeRowCuts ();
 
