@@ -16,7 +16,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-
+#include "Ipopt/BonIpoptInteriorWarmStarter.hpp"
 
 extern bool BonminAbortAll;
 
@@ -679,6 +679,21 @@ namespace Bonmin
   }
 				  
 
+    /** Method called to check wether a problem has still some variable not fixed. If there are no more
+        unfixed vars, checks wether the solution given by the bounds is feasible.*/
+
+    /** @name Methods for setting and getting the warm starter */
+    //@{
+  void 
+  TMINLP2TNLP::SetWarmStarter(SmartPtr<IpoptInteriorWarmStarter> warm_starter)
+    {
+      curr_warm_starter_ = warm_starter;
+    }
+  SmartPtr<IpoptInteriorWarmStarter> 
+  TMINLP2TNLP::GetWarmStarter()
+    {
+      return curr_warm_starter_;
+    }
 
 
 }

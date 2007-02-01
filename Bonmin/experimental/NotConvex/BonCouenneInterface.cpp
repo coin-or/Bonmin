@@ -166,7 +166,7 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
      }
    }
  
-  si.writeLp("toto");
+  si.writeMpsNative("toto",NULL,NULL,1);
   app_->enableWarmStart();
   setColSolution(problem()->x_sol());
   setRowPrice(problem()->duals_sol());

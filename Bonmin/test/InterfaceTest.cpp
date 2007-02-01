@@ -234,7 +234,7 @@ void testFp(Bonmin::AmplInterface &si)
         OsiCuts cuts;
         double x[1] = {0.};
         int ind[1]={1};
-        si.getFeasibilityOuterApproximation(1,x,ind,cuts);
+        si.getFeasibilityOuterApproximation(1,x,ind,cuts, 0, 1);
         std::cout<<si.getColSolution()[0]<<std::endl;
          std::cout<<si.getColSolution()[1]<<std::endl;
        assert(eq(si.getColSolution()[1],(1./2.)));

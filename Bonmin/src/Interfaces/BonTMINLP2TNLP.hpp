@@ -17,10 +17,11 @@
 #include "IpSmartPtr.hpp"
 #include "IpIpoptApplication.hpp"
 #include "IpOptionsList.hpp"
-#include "Ipopt/BonIpoptInteriorWarmStarter.hpp"
+
 
 namespace Bonmin
 {
+  class IpoptInteriorWarmStarter;
   /** This is an adapter class that converts a TMINLP to
    *  a TNLP to be solved by Ipopt. It allows an external
    *  caller to modify the bounds of variables, allowing
@@ -332,14 +333,10 @@ namespace Bonmin
 
     /** @name Methods for setting and getting the warm starter */
     //@{
-    void SetWarmStarter(SmartPtr<IpoptInteriorWarmStarter> warm_starter)
-    {
-      curr_warm_starter_ = warm_starter;
-    }
-    SmartPtr<IpoptInteriorWarmStarter> GetWarmStarter()
-    {
-      return curr_warm_starter_;
-    }
+    void SetWarmStarter(SmartPtr<IpoptInteriorWarmStarter> warm_starter);
+
+      SmartPtr<IpoptInteriorWarmStarter> GetWarmStarter();
+
     //@}
   protected:
     /**@name Default Compiler Generated Methods
