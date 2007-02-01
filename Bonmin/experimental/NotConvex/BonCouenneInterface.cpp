@@ -99,6 +99,27 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
      const CoinPackedVector &v = cut->row();
      start[i+1] = start[i] + v.getNumElements();
      length[i] = v.getNumElements();
+     int nnz = v.getNumElements();
+     for(int j = 0 ; j < v.getNumElements() ; j++)
+       {
+	 double elem = v.getElements()[j];
+	 if (elem == 0. || elem == -0.)
+	   {
+	     nnz --;
+	   }
+	 if(fabs(elem) > 1e5 || i==751){
+	   std::cout<<"element with a big value. Cut # "<<i<<" variable: "<<
+	     v.getIndices()[j]<<", value "<<elem<<std::endl;
+	 }
+       }
+#if 1 //For deep debug
+     if(i>740 && i < 756){
+       cut->print();
+     }
+#endif
+     if(!nnz){
+       std::cout<<"Empty row: "<<i<<std::endl;
+     }
      rowLower[i] = cut->lb();
      rowUpper[i] = cut->ub();
    }
@@ -110,13 +131,16 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
    {
      OsiRowCut * cut = couenneCg_->getCut(i);
      const CoinPackedVector &v = cut->row();
+     if(v.getNumElements() != length[i]){
+       std::cout<<"Empty row"<<std::endl;
+     }
      CoinCopyN(v.getIndices(), length[i], ind + start[i]);
      CoinCopyN(v.getElements(), length[i], elem + start[i]);
    }
 
    // Ok everything done now create interface
    CoinPackedMatrix A;
-   A.assignMatrix(true, numrowsconv, numcolsconv,
+   A.assignMatrix(false, numcolsconv, numrowsconv,
                   start[numrowsconv], elem, ind,
                   start, length);
 
@@ -142,7 +166,7 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
      }
    }
  
-  si.writeMps("toto");
+  si.writeLp("toto");
   app_->enableWarmStart();
   setColSolution(problem()->x_sol());
   setRowPrice(problem()->duals_sol());
