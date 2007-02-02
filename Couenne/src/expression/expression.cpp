@@ -99,25 +99,26 @@ inline void expression::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// (trivial) convexification of an expression w = k, where k is
-// constant. Generate linear constraint w = k
-/*
-int exprConst::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-				int **&indices, expression **&rhs, enum con_sign *&sign) {
+// generate cuts for expression associated with this auxiliary
 
-  nterms = new int [1];
-  nterms [0] = 1;
-
-  allocateCon (1, nterms, coeff, indices, rhs, sign);
-
-  (*coeff)   [0] = new exprConst (1); 
-  (*indices) [0] = w -> Index ();
-  *rhs = new exprConst (currValue_);
-  *sign = COUENNE_EQ;
-
-  return 1;
+void exprAux::generateCuts (const OsiSolverInterface &si, 
+			    OsiCuts &cs, const CouenneCutGenerator *cg)
+{
+#ifdef MYOWNDEBUG
+  printf ("----------------Generating cut for "); 
+  print (std::cout);  printf (" := ");
+  image_ -> print (std::cout); printf("\n");
+  int j = cs.sizeRowCuts ();
+  image_ -> generateCuts (this, si, cs, cg);
+  for (;j < cs.sizeRowCuts ();j++)
+    cs.rowCutPtr (j) -> print ();
+#else
+  image_ -> generateCuts (this, si, cs, cg);
+#endif
 }
-*/
+
+
+// generate one cut for a constant
 
 void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			      OsiCuts &cs, const CouenneCutGenerator *cg) {
@@ -134,3 +135,4 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   cs.insert (cut);
 }
+

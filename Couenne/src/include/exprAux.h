@@ -107,15 +107,8 @@ class exprAux: public exprVar {
     {image_ -> getBounds (lb, ub);}
 
   // generate cuts for expression associated with this auxiliary
-  void generateCuts (const OsiSolverInterface &si, 
-		     OsiCuts &cs, const CouenneCutGenerator *cg)
-    {/*printf ("----------------Generating cut for "); 
-    print (std::cout);  printf (" := ");
-    image_ -> print (std::cout); printf("\n");
-    int j = cs.sizeRowCuts ();*/
-    image_ -> generateCuts (this, si, cs, cg);
-    /*for (;j < cs.sizeRowCuts ();j++)
-      cs.rowCutPtr (j) -> print ();*/}
+  void generateCuts (const OsiSolverInterface &, 
+		     OsiCuts &, const CouenneCutGenerator *);
 
   // generate equality between *this and *w
   //  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
