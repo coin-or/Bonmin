@@ -101,6 +101,8 @@ void fix_asl_group (psg_elem *g) {
 
       /* expression is x */
 
+      lin -> L.e = lin -> R.e = NULL;
+
       lin -> op = (efunc2 *)(long) OPVARVAL;
       lin -> a = g -> L[j]. v.i;
     }
@@ -125,7 +127,8 @@ void free_asl_group (psg_elem *g) {
 
   /* free linear parts */
   for (j = 0; j < g->nlin; j++) {
-    if (fabs (g -> L[j]. fac - 1.0) > COUENNE_EPS) {
+    if ((fabs (g -> L[j]. fac - 1.0) > COUENNE_EPS) && 
+	(g -> ge -> L.e -> L.ep [j] -> L.e)){
       free (g -> ge -> L.e -> L.ep [j] -> L.e);
       free (g -> ge -> L.e -> L.ep [j] -> R.e);
     }
