@@ -55,7 +55,7 @@ extern int usingCouenne;
 
    OsiSolverInterface * lp = lpManip.si();
    int numcols = lp->getNumCols();
-    
+   int origNumcols = nlp_->getNumCols();
    double milpBound = -DBL_MAX;
    int numberPasses = 0;
    while (isInteger && feasible ) {
@@ -66,6 +66,11 @@ extern int usingCouenne;
 
    //Fix the variable which have to be fixed, after having saved the bounds
    double * colsol = const_cast<double *>(lp->getColSolution());
+   for(int i = 0 ; i < numcols ; i++)
+     {
+       std::cout<<"x["<<i<<"] = "<<colsol[i]<<"\t";
+     }
+   lp->writeLp("toto");
    if(usingCouenne){
      colsol = new double [numcols];
      CoinCopyN(lp->getColSolution(), numcols, colsol);}
@@ -106,7 +111,7 @@ extern int usingCouenne;
            changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
 	}
           if (changed) {
-            isInteger = integerFeasible(lp->getColSolution(), numcols - 1);
+            isInteger = integerFeasible(lp->getColSolution(), origNumcols);
           }
           else {
             isInteger = 0;

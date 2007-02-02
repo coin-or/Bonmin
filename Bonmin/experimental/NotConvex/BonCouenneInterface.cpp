@@ -218,7 +218,7 @@ CouenneInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getO
    
    delete [] colLower;
    delete [] colUpper;
-   delete [] x;
+   delete [] x0;
 }
 
 } /** End Bonmin namespace. */
