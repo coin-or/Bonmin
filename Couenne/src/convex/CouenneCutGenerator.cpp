@@ -34,10 +34,9 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   problem_ = new CouenneProblem;
 
   problem_ -> readnl      (asl);
-  problem_ -> standardize ();
-#ifdef MYOWNDEBUG
   problem_ -> print (std::cout);
-#endif
+  problem_ -> standardize ();
+  problem_ -> print (std::cout);
 }
 
 

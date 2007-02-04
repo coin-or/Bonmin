@@ -173,8 +173,9 @@ int exprMul::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 }
 */
 
-// is x finite?
-bool is_finite (CouNumber x);
+// check if bounding box is suitable for a multiplication convexification constraint
+bool is_boundbox_regular (CouNumber, CouNumber);
+
 
 // generate convexification cut for constraint w = this
 
@@ -266,7 +267,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // 1) 
 
-  if (is_finite (yl) && is_finite (xl) 
+  if (is_boundbox_regular (yl,xl) 
       && (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl))) {
 
     //    printf ("--- cut 1: "); cut -> print ();
@@ -275,7 +276,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // 2) 
 
-  if (is_finite (yu) && is_finite (xu) 
+  if (is_boundbox_regular (yu,xu) 
       && (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu))) {
 
     //    printf ("--- cut 2: "); cut -> print ();
@@ -284,7 +285,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // 3) 
 
-  if (is_finite (yl) && is_finite (xu) 
+  if (is_boundbox_regular (yl,xu) 
       && (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu))) {
 
     //    printf ("--- cut 3: "); cut -> print ();
@@ -293,7 +294,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // 4) 
 
-  if (is_finite (yu) && is_finite (xl) 
+  if (is_boundbox_regular (yu,xl) 
       && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl))) {
 
     //    printf ("--- cut 4: "); cut -> print ();

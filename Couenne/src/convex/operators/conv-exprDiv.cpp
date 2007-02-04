@@ -96,8 +96,15 @@ int exprDiv::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 }
 */
 
-bool is_finite (CouNumber x)
-{return (fabs (x) < COUENNE_INFINITY);}
+// check if bounding box is suitable for a multiplication
+// convexification constraint
+
+bool is_boundbox_regular (CouNumber b1, CouNumber b2) { // is_finite (yl) && is_finite (wl) 
+  return 
+    (fabs (b1) < COUENNE_INFINITY) && (fabs (b2) < COUENNE_INFINITY);
+    //    && ((fabs (b1) > COUENNE_EPS) || (fabs (b2) > COUENNE_EPS));
+}
+
 
 // generate convexification cut for constraint w = x/y
 
@@ -146,22 +153,22 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   OsiRowCut *cut;
 
   // 1) 
-  if (is_finite (yl) && is_finite (wl) 
+  if (is_boundbox_regular (yl, wl) // is_finite (yl) && is_finite (wl) 
       && (cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl)))
     cs.insert (cut);
 
   // 2) 
-  if (is_finite (yu) && is_finite (wu) 
+  if (is_boundbox_regular (yu, wu) //is_finite (yu) && is_finite (wu) 
       && (cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu)))
     cs.insert (cut);
 
   // 3) 
-  if (is_finite (yl) && is_finite (wu) 
+  if (is_boundbox_regular (yl, wu) //is_finite (yl) && is_finite (wu) 
       && (cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu)))
     cs.insert (cut);
 
   // 4) 
-  if (is_finite (yu) && is_finite (wl) 
+  if (is_boundbox_regular (yu, wl) //is_finite (yu) && is_finite (wl) 
       && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
 }
