@@ -111,6 +111,8 @@ bool is_boundbox_regular (CouNumber b1, CouNumber b2) { // is_finite (yl) && is_
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  //  return;
+
   // get bounds of numerator and denominator
 
   expression *yle, *yue;

@@ -63,6 +63,8 @@ int exprSub::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  //  return;
+
   if (!(cg -> isFirst ()))
     return;
 

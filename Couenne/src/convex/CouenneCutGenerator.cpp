@@ -34,9 +34,9 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   problem_ = new CouenneProblem;
 
   problem_ -> readnl      (asl);
-  problem_ -> print (std::cout);
+  //  problem_ -> print (std::cout);
   problem_ -> standardize ();
-  problem_ -> print (std::cout);
+  //  problem_ -> print (std::cout);
 }
 
 
@@ -48,6 +48,9 @@ CouenneCutGenerator::~CouenneCutGenerator () {
     delete bonCs_;
     delete bonOs_;
   }
+
+  if (!pool_) 
+    free (pool_);
 
   //  cleanup ();
 
@@ -100,8 +103,8 @@ void CouenneCutGenerator::cleanup () {
 // add half-space through two points (x1,y1) and (x2,y2)
 
 void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi, 
-		 CouNumber x1, CouNumber y1, 
-		 CouNumber x2, CouNumber y2, int sign) const { 
+				      CouNumber x1, CouNumber y1, 
+				      CouNumber x2, CouNumber y2, int sign) const { 
 
   CouNumber oppslope = (y1-y2)/(x2-x1);
 

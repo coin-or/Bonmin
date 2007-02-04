@@ -61,6 +61,8 @@ exprAux *exprPow::standardize (CouenneProblem *p) {
 void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  //  return;
+
   // after standardization, all such expressions are of the form x^k,
   // with k constant
 

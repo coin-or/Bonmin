@@ -41,7 +41,11 @@ class exprAux: public exprVar {
     exprVar (index),
     image_  (image)
 
-    {image_ -> getBounds (lb_, ub_);}
+    {
+      image_ -> getBounds (lb_, ub_);
+      //    lb_ = new exprConst (- COUENNE_INFINITY);
+      //    ub_ = new exprConst (  COUENNE_INFINITY);
+    }
 
   // Destructor
   ~exprAux () {
