@@ -102,16 +102,25 @@ inline void expression::getBounds (expression *&lb, expression *&ub) {
 // generate cuts for expression associated with this auxiliary
 
 void exprAux::generateCuts (const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg)
-{
-  /*  printf ("----------------Generating cut for "); 
-  print (std::cout);  printf (" := ");
-  image_ -> print (std::cout); printf("\n");
-  int j = cs.sizeRowCuts ();*/
+			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  int j = cs.sizeRowCuts ();
   image_ -> generateCuts (this, si, cs, cg);
-  /*  for (;j < cs.sizeRowCuts ();j++)
-      cs.rowCutPtr (j) -> print ();*/
+
+  /*
+  bool first=true;
+
+  for (;j < cs.sizeRowCuts ();j++) {
+
+    if (0 && first) {
+      printf ("----------------Generated cut for "); 
+      print (std::cout);  printf (" := ");
+      image_ -> print (std::cout); printf("\n");
+      first=false;
+    }
+    cs.rowCutPtr (j) -> print ();
+  }
+  */
 }
 
 

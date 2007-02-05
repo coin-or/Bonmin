@@ -70,7 +70,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
   else {
 
     // x is not constant, so it has (possibly different) lower and
-    // upper bounds. The expression can be x^y or x^b
+    // upper bounds. The expression is x^b, b constant (the case x^y
+    // has been decomposed by simplify() into exp(y log x).
 
     expression *lbbase, *ubbase;
     arglist_ [0] -> getBounds (lbbase, ubbase);
@@ -147,7 +148,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 
 	lb = new exprMin (all, 6);
 
-	// And now for the upper bound ///////////////////////////////////
+	// And now the upper bound ///////////////////////////////////
 
 	if (expon > 0) {
 
@@ -193,15 +194,6 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	  ub = new exprMin (alu, 6);
 	}
       }
-    }
-    else {
-
-      // should not happen, as powers x^y have already been reduced
-      // within simplify () or standardize ()
-
-      // expression is of the kind x^y, we have a similar case with
-      // exp (y * log (x)). Compute bounds accordingly (x must be
-      // nonnegative)
     }
   }
 }

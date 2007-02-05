@@ -43,8 +43,8 @@ class exprAux: public exprVar {
 
     {
       image_ -> getBounds (lb_, ub_);
-      //    lb_ = new exprConst (- COUENNE_INFINITY);
-      //    ub_ = new exprConst (  COUENNE_INFINITY);
+      //lb_ = new exprConst (- COUENNE_INFINITY);
+      //ub_ = new exprConst (  COUENNE_INFINITY);
     }
 
   // Destructor

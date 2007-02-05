@@ -39,8 +39,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       // for constraint lb <= w <= ub, compute actual values of lb, w,
       // and ub
 
-      CouNumber lb   = con -> Lb   () -> Value ();
-      CouNumber ub   = con -> Ub   () -> Value ();
+      CouNumber lb = con -> Lb   () -> Value ();
+      CouNumber ub = con -> Ub   () -> Value ();
 
       // if there exists violation, add constraint
 
@@ -56,16 +56,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       if (lb > - COUENNE_INFINITY + 1) orc -> setLb  (lb);
       if (ub <   COUENNE_INFINITY - 1) orc -> setUb  (ub);
 
-      /*
-      printf ("con %d: ", i);
-      if (lb > - COUENNE_INFINITY) 
-	printf ("%.4f <= ", lb);
-      printf ("w_%d", index [0]);
-      if (ub <   COUENNE_INFINITY) 
-	printf (" <= %.4f\n", ub);
-
-      printf ("1st... cut: "); orc -> print ();
-      */
       cs.insert (orc);
     }
   }
@@ -109,11 +99,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (firstcall_) 
     firstcall_ = false;
   else {
-
     delete [] x;
     delete [] l;
     delete [] u;
   }
 
-  printf ("Couenne: %d cuts\n", cs.sizeRowCuts ());
+  printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
 }

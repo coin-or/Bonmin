@@ -37,7 +37,7 @@ class exprClone: public exprCopy {
 
   // I/O
   void print (std::ostream &out) 
-  {out << "{"; copy_ -> print (out); out << "}";}
+  {out << "{"; copy_ -> Original () -> print (out); out << "}";}
 
   // value (empty)
   inline CouNumber Value () const 

@@ -99,7 +99,7 @@ int exprDiv::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff,
 // check if bounding box is suitable for a multiplication
 // convexification constraint
 
-bool is_boundbox_regular (CouNumber b1, CouNumber b2) { // is_finite (yl) && is_finite (wl) 
+bool is_boundbox_regular (CouNumber b1, CouNumber b2) {
   return 
     (fabs (b1) < COUENNE_INFINITY) && (fabs (b2) < COUENNE_INFINITY);
     //    && ((fabs (b1) > COUENNE_EPS) || (fabs (b2) > COUENNE_EPS));
@@ -110,8 +110,6 @@ bool is_boundbox_regular (CouNumber b1, CouNumber b2) { // is_finite (yl) && is_
 
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
-
-  //  return;
 
   // get bounds of numerator and denominator
 
@@ -125,7 +123,8 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // if the denominator's bound interval has 0 as internal point,
   // there is no convexification
 
-  if ((yl < - COUENNE_EPS) && (yu > COUENNE_EPS)) 
+  if ((yl < - COUENNE_EPS) && 
+      (yu >   COUENNE_EPS)) 
     return;
 
   expression *xle, *xue, *wle, *wue;
@@ -155,22 +154,22 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   OsiRowCut *cut;
 
   // 1) 
-  if (is_boundbox_regular (yl, wl) // is_finite (yl) && is_finite (wl) 
+  if (is_boundbox_regular (yl, wl)
       && (cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl)))
     cs.insert (cut);
 
   // 2) 
-  if (is_boundbox_regular (yu, wu) //is_finite (yu) && is_finite (wu) 
+  if (is_boundbox_regular (yu, wu)
       && (cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu)))
     cs.insert (cut);
 
   // 3) 
-  if (is_boundbox_regular (yl, wu) //is_finite (yl) && is_finite (wu) 
+  if (is_boundbox_regular (yl, wu)
       && (cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu)))
     cs.insert (cut);
 
   // 4) 
-  if (is_boundbox_regular (yu, wl) //is_finite (yu) && is_finite (wl) 
+  if (is_boundbox_regular (yu, wl)
       && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
 }

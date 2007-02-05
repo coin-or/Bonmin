@@ -55,7 +55,7 @@ class exprCopy: public expression {
 
   // I/O
   virtual void print (std::ostream &out) 
-  {out << "["; copy_ -> print (out); out << "]";}
+  {out << "["; copy_ -> Original () -> print (out); out << "]";}
 
   // value (empty)
   virtual inline CouNumber Value () const 

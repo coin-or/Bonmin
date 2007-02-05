@@ -221,15 +221,9 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
 	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = x_ind;}
 	else                        {coe = xe -> Value (); ind = y_ind;}
-	/*
-	  printf ("========> w=cx: c=%.4f, x_%d, w_%d... ", coe, ind, w_ind);
-	  xe -> print (std::cout); printf (" * ");
-	  ye -> print (std::cout); printf ("\n");
-	*/
-	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, CouNumber (-1.), ind, coe))){
-	  //	  cut -> print ();
+
+	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, CouNumber (-1.), ind, coe)))
 	  cs.insert (cut);
-	}
       }
     }
 
@@ -243,19 +237,6 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   CouNumber xl = (*xle) (), xu = (*xue) (), 
             yl = (*yle) (), yu = (*yue) ();
 
-  /*
-  printf ("Mult: x = ");
-  xe  -> print (std::cout); printf (" [");
-  xle -> print (std::cout); printf (",");
-  xue -> print (std::cout); printf ("]    y = ");
-
-  ye  -> print (std::cout); printf (" [");
-  yle -> print (std::cout); printf (",");
-  yue -> print (std::cout); printf ("];   w = ");
-
-  w   -> print (std::cout); printf ("\n");
-  */
-
   // Add McCormick convexification cuts:
   //
   // 1) w >= yl x + xl y - yl xl
@@ -265,39 +246,23 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 4) w <= yu x + xl y - yu xl
 
 
-  // 1) 
-
+  // 1)
   if (is_boundbox_regular (yl,xl) 
-      && (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl))) {
-
-    //    printf ("--- cut 1: "); cut -> print ();
+      && (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl)))
     cs.insert (cut);
-  }
 
-  // 2) 
-
+  // 2)
   if (is_boundbox_regular (yu,xu) 
-      && (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu))) {
-
-    //    printf ("--- cut 2: "); cut -> print ();
+      && (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu)))
     cs.insert (cut);
-  }
 
-  // 3) 
-
+  // 3)
   if (is_boundbox_regular (yl,xu) 
-      && (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu))) {
-
-    //    printf ("--- cut 3: "); cut -> print ();
+      && (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu)))
     cs.insert (cut);
-  }
 
-  // 4) 
-
+  // 4)
   if (is_boundbox_regular (yu,xl) 
-      && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl))) {
-
-    //    printf ("--- cut 4: "); cut -> print ();
+      && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl)))
     cs.insert (cut);
-  }
 }
