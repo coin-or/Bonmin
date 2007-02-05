@@ -36,8 +36,9 @@ class exprCopy: public expression {
   ~exprCopy () {}
 
   // copy constructor
-  exprCopy (const exprCopy &e):
-    copy_ (e.Original () -> clone ()) {}
+  exprCopy (const exprCopy &e) {
+    copy_ = e.Original () -> clone ();
+  }
 
   // cloning method
   virtual exprCopy *clone ()

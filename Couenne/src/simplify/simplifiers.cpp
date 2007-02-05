@@ -56,23 +56,31 @@ int exprOp::shrink_arglist (CouNumber c, CouNumber null_element) {
 
   bool one_fun = false;
 
+  // find first NULL spot (left by some constant)
   while ((i < nargs_) && (arglist_ [i])) 
     i++; 
 
+  // no spots, leave
   if (i==nargs_) 
     return 0;
 
-  for (register int k=nargs_; --k>=0;) 
+  // check if there is at least one non-constant expression
+  for (register int k=nargs_; k--;) 
     if (arglist_ [k]) {
       one_fun = true;
       break;
     }
 
-  if ((fabs (c - null_element) > COUENNE_EPS_SIMPL) || (!one_fun))
+  // add constant term if c is not null w.r.t the operation or if it
+  // would be an empty operand list otherwise
+  if ((fabs (c - null_element) > COUENNE_EPS) || !one_fun)
     arglist_ [i++] = new exprConst (c);
 
   j = i;
 
+  //  printf ("////////////////////////////// j=%d\n", j);
+
+  // now shift back all operands to compress argument list
   while (i < nargs_) {
 
     while ((i < nargs_) && !(arglist_ [i])) 
@@ -86,6 +94,25 @@ int exprOp::shrink_arglist (CouNumber c, CouNumber null_element) {
   }
 
   nargs_ = j;
+  /*
+  printf ("////////////////////////////// nargs=%d, %d, %d\n", nargs_,
 
-  return ((nargs_ == 1) && (!one_fun));
+	  ((fabs (c - null_element) < COUENNE_EPS) || !one_fun),
+	  ((nargs_ == 1) && ((fabs (c - null_element) > COUENNE_EPS) || !one_fun)));
+  */
+  // since C++ has no corresponding to realloc(), copy arglist_ to a
+  // smaller array and delete it
+  /*
+  expression ** new_arglist = new expression * [nargs_];
+
+  for (i=nargs_; i--;)
+    new_arglist [i] = arglist_ [i];
+
+  delete [] arglist_;
+
+  arglist_ = new_arglist;
+  */
+  // only say shrinking simplified arg list if there is just the
+  // constant
+  return (nargs_ == 1);// && ((fabs (c - null_element) > COUENNE_EPS) || !one_fun));
 }

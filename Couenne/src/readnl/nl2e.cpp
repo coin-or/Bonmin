@@ -55,7 +55,7 @@ expression *nl2e (expr2 *e) {
     //  case FLOOR:     
     //  case CEIL:      
   case ABS:       /*printf ("[|]");*/ return new exprAbs (nl2e (e -> L.e));
-  case OPUMINUS:  /*printf ("[~]");*/ return new exprOpp (nl2e (e -> L.e));
+  case OPUMINUS:  /*printf ("[~]");*/ return new exprOpp (nl2e (e -> L.e -> L.e));
     //  case OPIFnl:
     //  case OP_tanh:
     //  case OP_tan:

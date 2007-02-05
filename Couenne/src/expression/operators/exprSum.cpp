@@ -17,6 +17,13 @@ expression *exprSum::simplify () {
 
   exprOp:: simplify ();
 
+  if (nargs_ == 1) {
+
+    expression *ret = arglist_ [0];
+    arglist_ [0] = NULL;
+    return ret;
+  }
+
   CouNumber total     = 0;
   bool   found_one = false;
 
@@ -33,8 +40,17 @@ expression *exprSum::simplify () {
     }
   }
 
+  /*
   if (found_one && shrink_arglist (total, 0))
     return new exprConst (arglist_ [0] -> Value ());
+  else return NULL;
+  */
+
+  if (found_one && shrink_arglist (total, 0)) {
+    expression *ret = arglist_ [0];
+    arglist_ [0] = NULL;
+    return ret;
+  }
   else return NULL;
 }
 

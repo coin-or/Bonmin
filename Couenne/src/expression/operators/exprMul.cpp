@@ -18,6 +18,13 @@ expression *exprMul::simplify () {
 
   exprOp:: simplify ();
 
+  if (nargs_ == 1) {
+
+    expression *ret = arglist_ [0];
+    arglist_ [0] = NULL;
+    return ret;
+  }
+
   CouNumber prod = 1;
 
   bool found_one = false;
@@ -50,9 +57,15 @@ expression *exprMul::simplify () {
       arglist_ [i] = NULL;
     }
   }
-
+  /*
   if (found_one && shrink_arglist (prod, 1))
     return new exprConst (arglist_ [0] -> Value ());
+  */
+  if (found_one && shrink_arglist (prod, 1)) {
+    expression *ret = arglist_ [0];
+    arglist_ [0] = NULL;
+    return ret;
+  }
   else return NULL;
 }
 

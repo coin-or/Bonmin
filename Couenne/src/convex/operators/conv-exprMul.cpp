@@ -33,6 +33,15 @@ exprAux *exprMul::standardize (CouenneProblem *p) {
 
   expression *aux = new exprClone (arglist_ [0]);
 
+  if (nargs_==1) return NULL;
+  /*
+  for (int i=0; i<nargs_; i++) {
+    printf ("operand %d: ", i);
+    arglist_ [i] -> print (std::cout);
+    printf ("_");
+  }
+  printf ("\n");
+  */
   for (int i=1; i < nargs_ - 1; i++)
     if (areSameVariables (aux, arglist_ [i]))
          aux = p -> addAuxiliary (new exprPow (aux, new exprConst (2)));

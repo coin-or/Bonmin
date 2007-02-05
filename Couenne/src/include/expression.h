@@ -113,7 +113,7 @@ class expression {
   // If this is an exprClone of a exprClone of an expr???, point to
   // the original expr??? instead of an exprClone -- improve computing
   // efficiency. Only overloaded for exprClones/exprCopy, of course.
-  virtual inline expression *Original () {return this;}
+  virtual inline expression *Original ()  {return this;}
 
   // String equivalent (for comparisons)
   virtual std::string name() {return "";}
