@@ -52,6 +52,9 @@ class exprVar: public expression {
   inline int Index () const
     {return varIndex_;}
 
+  // string equivalent
+  virtual std::string name ();
+
   // print
   virtual void print (std::ostream &out) 
     {out << "x_" << varIndex_;}

@@ -37,15 +37,7 @@ class exprAux: public exprVar {
     {return AUX;}
 
   // Constructor
-  exprAux (expression *image, int index): 
-    exprVar (index),
-    image_  (image)
-
-    {
-      image_ -> getBounds (lb_, ub_);
-      //lb_ = new exprConst (- COUENNE_INFINITY);
-      //ub_ = new exprConst (  COUENNE_INFINITY);
-    }
+  exprAux (expression *, int);
 
   // Destructor
   ~exprAux () {
@@ -76,6 +68,9 @@ class exprAux: public exprVar {
   // Bound get
   expression *Lb () {return lb_;}
   expression *Ub () {return ub_;}
+
+  // string equivalent
+  std::string name ();
 
   // I/O
   void print (std::ostream &out)

@@ -66,6 +66,9 @@ class exprOp: public expression {
   inline int          nArgs   () const 
     {return nargs_;}
 
+  // string equivalent
+  virtual std::string name ();
+
   // I/O
   virtual void print (std::ostream &, const std::string &, enum pos);
 

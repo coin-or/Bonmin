@@ -32,7 +32,10 @@ class exprLBDiv: public exprOp {
   // function for the evaluation of the expression
   CouNumber operator () ();
 
-  // output
+  // String equivalent (for comparisons)
+  std::string name() {return "LB_div" + exprOp::name();}
+
+  // I/O
   void print (std::ostream &);
 };
 
@@ -82,6 +85,9 @@ class exprUBDiv: public exprOp {
 
   // function for the evaluation of the expression
   CouNumber operator () ();
+
+  // String equivalent (for comparisons)
+  std::string name() {return "UB_div" + exprOp::name();}
 
   // output
   void print (std::ostream &);

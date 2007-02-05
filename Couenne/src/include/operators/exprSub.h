@@ -32,6 +32,10 @@ class exprSub: public exprOp {
   expression *clone () const
     {return new exprSub (clonearglist (), nargs_);}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "-" + exprOp::name();}
+
+  // I/O
   void print (std::ostream&);
 
   // function for the evaluation of the expression

@@ -32,6 +32,9 @@ class exprLBMul: public exprOp {
   // function for the evaluation of the expression
   CouNumber operator () ();
 
+  // String equivalent (for comparisons)
+  std::string name() {return "LB_mul" + exprOp::name();}
+
   // output
   void print (std::ostream &);
 };
@@ -86,6 +89,9 @@ class exprUBMul: public exprOp {
 
   // function for the evaluation of the expression
   CouNumber operator () ();
+
+  // String equivalent (for comparisons)
+  std::string name() {return "UB_mul" + exprOp::name();}
 
   // output
   void print (std::ostream &);

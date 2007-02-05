@@ -56,6 +56,9 @@ class exprUnary: public expression {
   virtual inline expression *Argument () const
     {return argument_;}
 
+  // string equivalent
+  virtual std::string name ();
+
   // I/O
   virtual void print (std::ostream &, const std::string &, enum pos);
 

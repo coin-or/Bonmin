@@ -31,6 +31,9 @@ class exprSum: public exprOp {
   expression *clone () const
     {return new exprSum (clonearglist (), nargs_);}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "+" + exprOp::name();}
+
   // I/O
   virtual void print (std::ostream &);
 

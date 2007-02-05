@@ -12,19 +12,13 @@
 #include <CouennePrecisions.h>
 #include <stdio.h>
 
-/*
-inline int round (double x) {
-  return (int) (ceil (x - 0.5));
-}
-*/
 
 /* compute Q(x)*/
 
-CouNumber Q (int k, CouNumber x) {
+CouNumber Q (register int k, CouNumber x) {
 
-  register CouNumber xp;
+  register CouNumber xp, Q;
   register int i;
-  register CouNumber Q;
 
   k *= 2;
 
@@ -62,10 +56,10 @@ CouNumber rootQ (int k) {
 
       /*      printf ("[%.4f, %.4f] --> %.4f: %.24f\n", l, u, midpoint, Qm); */
 
-      if (Qm<0) {l = midpoint; Ql = Qm;}
+      if (Qm<0) {l = midpoint; Ql = Qm; Qm = - Qm;}
       else      {u = midpoint; Qu = Qm;}
 
-    } while (fabs (Qm) > 1e-15);
+    } while (Qm > 1e-15);
 
     return midpoint;
   }

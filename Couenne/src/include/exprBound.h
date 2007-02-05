@@ -42,6 +42,10 @@ class exprLowerBound: public exprVar {
   exprLowerBound  (int varIndex): exprVar (varIndex) {}
   ~exprLowerBound () {}
 
+  // string equivalent
+  std::string name ();
+
+  // I/O
   void print (std::ostream &out) 
     {out << "l_" << varIndex_;}
 
@@ -78,6 +82,10 @@ class exprUpperBound: public exprVar {
     exprVar (varIndex) {}
   ~exprUpperBound () {}
 
+  // string equivalent
+  std::string name ();
+
+  // I/O
   void print (std::ostream &out) 
     {out << "u_" << varIndex_;}
 

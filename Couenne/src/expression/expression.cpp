@@ -6,16 +6,18 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <sstream>
+
 #include <CouenneTypes.h>
 #include <expression.h>
 #include <exprAux.h>
 #include <exprOp.h>
 #include <exprUnary.h>
 #include <exprVar.h>
+#include <exprIVar.h>
 #include <exprBound.h>
 
 #include <CouenneProblem.h>
-
 
 // static vectors for evaluation, see their description in
 // expression.h
@@ -142,3 +144,38 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
   cs.insert (cut);
 }
 
+// name () -- a string value for each expression
+
+std::string Coutoa (CouNumber x) {
+  std::ostringstream o;
+  if (!(o << x)) return "_NaN_";
+  return o.str();
+}
+
+std::string Indtoa (int i) {
+  std::ostringstream o;
+  if (!(o << i)) return "-1";
+  return o.str();
+}
+
+std::string exprVar::name   () {return "x_"+Indtoa(varIndex_);}
+std::string exprIVar::name  () {return "y_"+Indtoa(varIndex_);}
+std::string exprAux::name   () {return "w_"+Indtoa(varIndex_);}
+
+std::string exprLowerBound::name () {return "l_"+Indtoa(varIndex_);}
+std::string exprUpperBound::name () {return "u_"+Indtoa(varIndex_);}
+
+std::string exprConst::name () {return Coutoa (currValue_);}
+std::string exprCopy::name  () {return copy_ -> Original () -> name();}
+
+std::string exprUnary::name () {return "(" + argument_ -> name() + ")";}
+
+std::string exprOp::name    () {
+
+  std::string args = "(" + arglist_ [0] -> name();
+
+  for (int i=1; i<nargs_; i++)
+    args += "," + arglist_ [i] -> name();
+
+  return args + ")";
+}

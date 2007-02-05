@@ -30,6 +30,10 @@ class exprLog: public exprUnary {
   expression *clone () const
     {return new exprLog (argument_ -> clone ());}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "log" + exprUnary::name();}
+
+  // I/O
   void print (std::ostream&);
 
   // differentiation

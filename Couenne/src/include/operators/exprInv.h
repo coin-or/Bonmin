@@ -33,6 +33,9 @@ class exprInv: public exprUnary {
   expression *clone () const
     {return new exprInv (argument_ -> clone ());}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "inv" + exprUnary::name();}
+
   // output "1/argument"
   void print (std::ostream&);
 

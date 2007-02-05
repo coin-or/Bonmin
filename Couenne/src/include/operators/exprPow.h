@@ -36,6 +36,10 @@ class exprPow: public exprOp {
   expression *clone () const
     {return new exprPow (clonearglist (), nargs_);}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "^" + exprOp::name();}
+
+  // I/O
   void print (std::ostream&);
 
   // function for the evaluation of the expression

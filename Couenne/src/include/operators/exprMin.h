@@ -34,6 +34,9 @@ class exprMin: public exprOp {
   expression *clone () const
     {return new exprMin (clonearglist (), nargs_);}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "min" + exprOp::name();}
+
   // I/O
   void print (std::ostream &out)
     {exprOp:: print (out, "min", PRE);}

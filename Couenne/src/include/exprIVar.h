@@ -49,6 +49,9 @@ class exprIVar: public exprVar {
   //  inline int Index () const
   //    {return varIndex_;}
 
+  // string equivalent
+  std::string name ();
+
   // print
   virtual void print (std::ostream &out) 
     {out << "y_" << varIndex_;}

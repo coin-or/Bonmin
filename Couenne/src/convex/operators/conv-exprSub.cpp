@@ -19,8 +19,6 @@ exprAux *exprSub::standardize (CouenneProblem *p) {
   // first of all, standardize all operands
   exprOp::standardize (p);
 
-  // now simply return NULL, (the caller will assume there is nothing
-  // to change), as subtraction is already standard
   return p -> addAuxiliary (this);
 }
 

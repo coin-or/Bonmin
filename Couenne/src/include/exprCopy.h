@@ -53,6 +53,9 @@ class exprCopy: public expression {
   inline int Index () const
     {return copy_ -> Index ();}
 
+  // string equivalent
+  std::string name ();
+
   // I/O
   virtual void print (std::ostream &out) 
   {out << "["; copy_ -> Original () -> print (out); out << "]";}

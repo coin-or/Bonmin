@@ -30,6 +30,10 @@ class exprSin: public exprUnary {
   expression *clone () const
     {return new exprSin (argument_ -> clone ());}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "sin" + exprUnary::name();}
+
+  // I/O
   void print (std::ostream&);
 
   // differentiation

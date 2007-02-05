@@ -16,6 +16,7 @@
 
 #include <CouenneProblem.h>
 
+
 // is the variable one of those in varlist?
 
 bool exprVar::dependsOn (int *varlist = NULL, int n = 1) {
@@ -33,33 +34,12 @@ bool exprVar::dependsOn (int *varlist = NULL, int n = 1) {
 
 // Get lower and upper bound of a variable expression (if any)
 
-inline void exprVar::getBounds (expression *&lb, expression *&ub) {
+void exprVar::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprLowerBound (varIndex_); 
   ub = new exprUpperBound (varIndex_);
 }
 
-// (possibly auxiliary) variable. Generate linear constraint w
-// = x
-/*
-int exprVar::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-			      int **&indices, expression **&rhs, enum con_sign *&sign) {
-  nterms = new int;
-  nterms [0] = 2;
-
-  allocateCon (1, nterms, coeff, indices, rhs, sign);
-
-  (*coeff) [0] = new exprConst (-1); 
-  (*coeff) [1] = new exprConst (1);
-  (*indices) [0] = w -> Index ();
-  (*indices) [1] = varIndex_;
-  *rhs = new exprConst (0);
-
-  *sign = COUENNE_EQ;
-
-  return 1;
-}
-*/
 
 // generate convexification cut for constraint w = this
 
@@ -78,4 +58,16 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
   coeff [1] = -1; index [1] = varIndex_;
 
   cs.insert (cut);
+}
+
+
+// auxiliary expression Constructor
+
+exprAux::exprAux (expression *image, int index): 
+  exprVar (index),
+  image_  (image) {
+
+  image_ -> getBounds (lb_, ub_);
+  //lb_ = new exprConst (- COUENNE_INFINITY);
+  //ub_ = new exprConst (  COUENNE_INFINITY);
 }

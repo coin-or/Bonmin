@@ -15,7 +15,7 @@
 #include <exprConst.h>
 
 
-// class for sin f(x)
+// class for abs f(x)
 
 class exprAbs: public exprUnary {
 
@@ -30,6 +30,10 @@ class exprAbs: public exprUnary {
   expression *clone () const
     {return new exprAbs (argument_ -> clone ());}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "abs" + exprUnary::name();}
+
+  // I/O
   void print (std::ostream&);
 
   // differentiation

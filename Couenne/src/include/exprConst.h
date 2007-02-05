@@ -45,6 +45,9 @@ class exprConst: public expression {
   virtual exprConst *clone ()
     {return new exprConst (currValue_);}
 
+  // string equivalent
+  std::string name ();
+
   // I/O
   inline void print (std::ostream &out) 
     {out << currValue_;}

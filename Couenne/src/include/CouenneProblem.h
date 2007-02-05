@@ -39,10 +39,13 @@ class CouenneProblem {
   CouNumber *lb_;
   CouNumber *ub_;
 
+  // expression map for comparison in standardization
+  std::map <std::string, exprAux *> *auxMap_;
+
  public:
 
   // constructors, destructor
-  CouenneProblem  () {x_ = lb_ = ub_ = NULL;}
+  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap_ = NULL;}
   CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 

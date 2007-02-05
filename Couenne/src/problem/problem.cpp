@@ -97,8 +97,33 @@ expression *CouenneProblem::addVariable (bool isDiscrete) {
 
 exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
-  exprAux *var = new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
-  auxiliaries_ . push_back (var);
+  // check if image is already in the expression database auxMap_
+
+  exprAux *var;
+  std::string key = symbolic -> name ();
+  std::map <std::string, exprAux *>::iterator i;
+
+  if ((i = auxMap_ -> find (key)) == auxMap_ -> end ()) {
+
+    //    printf ("....... New exprAux!!! "); 
+    //    symbolic -> print (std::cout);
+    std::pair <std::string, exprAux *> newpair;
+    newpair.first  = key;
+    newpair.second = var = 
+      new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
+    auxiliaries_ . push_back (var);
+    auxMap_ -> insert (newpair);
+    //    printf (" assigned to "); 
+    //    var -> print (std::cout);
+    //    printf ("\n");
+  }
+  else {
+    //    symbolic -> print (std::cout);
+    //    printf (" already assigned to "); 
+    var = (*i).second;
+    //    var -> print (std::cout);
+    //    std::cout << "  (" << (*i).first << ")\n";
+  }
 
   return var;
 }
@@ -107,6 +132,10 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 // standardize all nonlinear objectives and constraints
 
 void CouenneProblem::standardize () {
+
+  // create expression map for binary search
+
+  auxMap_ = new std::map <std::string, exprAux *>;
 
   // standardize objectives
 
@@ -145,6 +174,8 @@ void CouenneProblem::standardize () {
     ub_ [i] = (*(auxiliaries_ [j] -> Ub    ())) ();
     x_  [i] = (*(auxiliaries_ [j] -> Image ())) ();
   }
+
+  delete auxMap_;
 }
 
 

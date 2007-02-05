@@ -27,6 +27,9 @@ class exprExp: public exprUnary {
   expression *clone () const
     {return new exprExp (argument_ -> clone ());}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "exp" + exprUnary::name();}
+
   // output
   void print (std::ostream&);
 

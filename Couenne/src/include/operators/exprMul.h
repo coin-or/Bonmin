@@ -32,6 +32,9 @@ class exprMul: public exprOp {
   expression *clone () const
     {return new exprMul (clonearglist (), nargs_);}
 
+  // String equivalent (for comparisons)
+  std::string name() {return "*" + exprOp::name();}
+
   // print expression
   void print (std::ostream&);
 
