@@ -147,23 +147,23 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 // name () -- a string value for each expression
 
 std::string Coutoa (CouNumber x) {
-  std::ostringstream o;
-  if (!(o << x)) return "_NaN_";
-  return o.str();
+  char s [50];
+  sprintf (s, "%f", x);
+  return std::string (s);
 }
 
 std::string Indtoa (int i) {
-  std::ostringstream o;
-  if (!(o << i)) return "-1";
-  return o.str();
+  char s [50];
+  sprintf (s, "%d", i);
+  return std::string (s);
 }
 
-std::string exprVar::name   () {return "x_"+Indtoa(varIndex_);}
-std::string exprIVar::name  () {return "y_"+Indtoa(varIndex_);}
-std::string exprAux::name   () {return "w_"+Indtoa(varIndex_);}
+std::string exprVar::name   () {return "x_" + Indtoa(varIndex_);}
+std::string exprIVar::name  () {return "y_" + Indtoa(varIndex_);}
+std::string exprAux::name   () {return "w_" + Indtoa(varIndex_);}
 
-std::string exprLowerBound::name () {return "l_"+Indtoa(varIndex_);}
-std::string exprUpperBound::name () {return "u_"+Indtoa(varIndex_);}
+std::string exprLowerBound::name () {return "l_" + Indtoa(varIndex_);}
+std::string exprUpperBound::name () {return "u_" + Indtoa(varIndex_);}
 
 std::string exprConst::name () {return Coutoa (currValue_);}
 std::string exprCopy::name  () {return copy_ -> Original () -> name();}
@@ -172,10 +172,10 @@ std::string exprUnary::name () {return "(" + argument_ -> name() + ")";}
 
 std::string exprOp::name    () {
 
-  std::string args = "(" + arglist_ [0] -> name();
+  std::string args = "(" + arglist_ [0] -> name ();
 
   for (int i=1; i<nargs_; i++)
-    args += "," + arglist_ [i] -> name();
+    args += "," + arglist_ [i] -> name ();
 
   return args + ")";
 }
