@@ -124,7 +124,7 @@ class CouenneCutGenerator: public CglCutGenerator {
 		     const CglTreeInfo = CglTreeInfo ()) const;
 
   // (re-)initializes the pool  
-  void cleanup ();
+  //  void cleanup ();
 
   // update linearization cut pool (parameters are current point,
   // current lower-, and current upper bound)

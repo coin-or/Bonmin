@@ -34,39 +34,10 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
     // Should already be dealt with by simplify () / standardize ()
     //
 
-    /*
-    // x is constant, the expression is of the form base^y 
+    fprintf (stderr, "exprPow::getBounds(): warning, expression is of the type k^x\n");
+    return;
 
-    CouNumber base = arglist_ [0] -> Value ();
-
-    if (arglist_ [1] -> Type () == CONST) { 
-
-      // lb = ub = base^exponent (should not happen due to a previous
-      // simplification)
-
-      CouNumber k = pow (base, arglist_ [1] -> Value ());
-
-      lb = new exprConst (k);
-      ub = new exprConst (k);
-    } 
-    else { // expression = base^y. Bounds differ depending on whether
-	   // "base" is above or below one
-
-      expression *lbexp, *ubexp;
-      arglist_ [1] -> getBounds (lbexp, ubexp);
-
-      if (base > 1) {
-	lb = new exprPow (new exprConst (base), lbexp);
-	ub = new exprPow (new exprConst (base), ubexp);
-      } else {
-	lb = new exprPow (new exprConst (base), ubexp);
-	ub = new exprPow (new exprConst (base), lbexp);
-      }
-    }
-
-    */
   }       /********** end [if (x is constant)] ************/
-
   else {
 
     // x is not constant, so it has (possibly different) lower and

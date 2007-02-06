@@ -19,7 +19,6 @@ Couenne/src/convex/createCuts.cpp -text
 Couenne/src/convex/generateCuts.cpp -text
 Couenne/src/convex/operators/add_tangent.cpp -text
 Couenne/src/convex/operators/conv-exprAbs.cpp -text
-Couenne/src/convex/operators/conv-exprCos.cpp -text
 Couenne/src/convex/operators/conv-exprDiv.cpp -text
 Couenne/src/convex/operators/conv-exprExp.cpp -text
 Couenne/src/convex/operators/conv-exprInv.cpp -text
@@ -29,7 +28,7 @@ Couenne/src/convex/operators/conv-exprOpp.cpp -text
 Couenne/src/convex/operators/conv-exprPow-envelope.cpp -text
 Couenne/src/convex/operators/conv-exprPow-getBounds.cpp -text
 Couenne/src/convex/operators/conv-exprPow.cpp -text
-Couenne/src/convex/operators/conv-exprSin.cpp -text
+Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
 Couenne/src/convex/operators/trigGenCuts.cpp -text

@@ -23,39 +23,6 @@ exprAux *exprSub::standardize (CouenneProblem *p) {
 }
 
 
-// if this is a subtraction, no need to approximate from below or
-// above but we rather add this as a linear constraints (all elements
-// of arglist_ are of the type c*x or x*c or x)
-/*
-int exprSub::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-			      int **&indices, expression **&rhs, enum con_sign *&sign) {
-
-  nterms  = new int [1];
-  *nterms = 3;
-
-  allocateCon (1, nterms, coeff, indices, rhs, sign);
-
-    // for each argument, two cases:
-    //
-    // 1) it is a multiplication c*x or x*c, hence we have to spot c
-    //    and x and set c as coefficient and x as variable
-    // 2) x is a variable, coefficient is one
-
-  convert_monomial (arglist_ [0], coeff [0] [0], indices [0] [0]);
-  convert_monomial (arglist_ [1], coeff [0] [1], indices [0] [1]);
-
-  coeff [0] [1] = new exprOpp (coeff [0] [1]);
-
-  coeff   [0] [2] = new exprConst (-1);
-  indices [0] [2] = w -> Index ();
-
-  *rhs  = new exprConst (0);
-  *sign = COUENNE_EQ;
-
-  return 1;
-}
-*/
-
 // generate convexification cut for constraint w = this
 
 void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si, 

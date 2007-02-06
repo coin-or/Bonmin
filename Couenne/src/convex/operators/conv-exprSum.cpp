@@ -27,42 +27,6 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 }
 
 
-// If this is a sum, no need to approximate from below or above but we
-// rather add this as a linear constraints (all elements of arglist_
-// are of the type c*x or x*c or x)
-/*
-int exprSum::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-			      int **&indices, expression **&rhs, enum con_sign *&sign) {
-
-  CouNumber sumconst = 0;
-
-  nterms  = new int [1];
-  *nterms = nargs_ + 1; // preliminary estimate of how many coefficient
-
-  allocateCon (1, nterms, coeff, indices, rhs, sign);
-
-  *nterms = 0;
-
-  for (register int i=0; i<nargs_; i++)
-    if (arglist_ [i] -> Type () == CONST)
-      sumconst += arglist_ [i] -> Value ();
-    else {
-      convert_monomial (arglist_ [i], coeff [0] [*nterms], indices [0] [*nterms]);
-      ++*nterms;
-    }
-
-  coeff   [0] [*nterms] = new exprConst (-1);
-  indices [0] [*nterms] = w -> Index ();
-
-  ++*nterms;
-
-  *rhs  = new exprConst (- sumconst);
-  *sign = COUENNE_EQ;
-
-  return 1;
-}
-*/
-
 // generate convexification cut for constraint w = this
 
 void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si, 

@@ -145,7 +145,7 @@ void CouenneProblem::standardize () {
     exprAux *aux = (*i) -> standardize (this);
 
     if (aux)
-      (*i) -> Body (aux);
+      (*i) -> Body (new exprClone (aux));
   }
 
   // standardize constraints
@@ -156,7 +156,7 @@ void CouenneProblem::standardize () {
     exprAux *aux = (*i) -> standardize (this);
 
     if (aux)
-      (*i) -> Body (aux);
+      (*i) -> Body (new exprClone (aux));
   }
 
   x_  = (CouNumber *) realloc (x_,  (nVars() + nAuxs ()) * sizeof (CouNumber));
@@ -203,143 +203,33 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
 } 
 
 
-// generate linear convexification of all nonlinear expressions
-// associated with auxiliary variables
-/*
-void CouenneProblem::convexify () {
-
-  expression ***coeff; // array of arrays of coefficients
-  expression **rhs;    // array of arrays of right-hand sides
-  int **indices;       // array of arrays of indices
-  int *nterms;         // array with number of terms in each constraint
-  enum con_sign *sign; // sign of all constraints added
-  
-  int n;               // number of tangents generated
-
-  for (std::vector <exprAux *>::iterator aux = auxiliaries_.begin ();
-       aux != auxiliaries_.end (); aux++) {
-
-    // generate (set of) constraint to approximate function associated
-    // with auxiliary variable (*i) from below, using linear ">="
-    // constraints
-
-    if ((n = (*aux) -> Image () -> lowerLinearHull (*aux, nterms, coeff, indices, rhs, sign))) {
-
-      for (register int i=0; i<n; i++)
-	addLinearConstraint (nterms [i], coeff [i], indices [i], rhs [i], sign [i]);
-
-      delete [] coeff;     delete [] rhs;
-      delete [] indices;   delete [] nterms;
-      delete [] sign;
-    }
-
-    // same, but from above, using linear "<=" constraints
-
-    if ((n = (*aux) -> Image () -> upperLinearHull (*aux, nterms, coeff, indices, rhs, sign))) {
-
-      for (register int i=0; i<n; i++)
-	addLinearConstraint (nterms [i], coeff [i], indices [i], rhs [i], sign [i]);
-
-      delete [] coeff;     delete [] rhs;
-      delete [] indices;   delete [] nterms;
-      delete [] sign;
-    }
-  }
-
-  // convexify those constraints that are originally linear 
-  ********************** 
-  for (std::vector <CouenneConstraint *>::iterator con = constraints_.begin ();
-       con != constraints_.end (); con++)
-
-    if ((*con) -> Body () -> Linearity () < QUADRATIC) {
-
-      bool *var_dep = NULL;
-
-      // this is a linear constraint: a sum, a difference, or a
-      // multiple nesting of both, and as such has constant
-      // derivatives. To avoid checking for dependency of all
-      // variables, we build first a list of variables on which the
-      // expression depends on.
-
-      int n = (*con) -> Body () -> dependency (var_dep);
-
-      expression **coeff   = new expression * [n];
-      int         *indices = new int [n];
-
-      int j=0;
-
-      for (int i = nVar () + nAux (); i--;)
-
-	if (var_dep [i]) {
-
-	  coeff [j] = (*con) -> Body () -> differentiate (i);
-	  coeff [j] -> simplify (); 
-	  indices [j] = i;
-	}
-
-      addLinearConstraint (n, coeff, indices, 
-			   (*con) -> Lb (), (*con) -> Ub (), (*con) -> sign ());
-
-    }
-
-      // generate (set of) constraint to approximate function associated
-      // with auxiliary variable (*i) from below, using linear ">="
-      // constraints
-
-      if ((n = (*con) -> Body () -> lowerLinearHull (NULL, nterms, coeff, indices, rhs, sign))) {
-
-	for (register int i=0; i<n; i++)
-	  addLinearConstraint (nterms [i], coeff [i], indices [i], rhs [i], NULL, sign [i]);
-
-	delete [] coeff;     delete [] rhs;
-	delete [] indices;   delete [] nterms;
-	delete [] sign;
-      }
-
-      // same, but from above, using linear "<=" constraints
-
-      if ((n = (*con) -> Body () -> upperLinearHull (NULL, nterms, coeff, indices, rhs, sign))) {
-
-	for (register int i=0; i<n; i++)
-	  addLinearConstraint (nterms [i], coeff [i], indices [i], rhs [i], NULL, sign [i]);
-
-	delete [] coeff;     delete [] rhs;
-	delete [] indices;   delete [] nterms;
-	delete [] sign;
-      }
-    }
-  }
-  ******************************************************************* /
-}
-*/
-
-
 // destroy problem components
 
 CouenneProblem::~CouenneProblem () {
-  /*
-  delete x_;
-  delete lb_;
-  delete ub_;
-  */
-  for (std::vector <CouenneConstraint *>::iterator i = constraints_ . begin ();
-       i != constraints_ . end (); i++)
-    delete (*i);
 
+  free (x_);
+  free (lb_);
+  free (ub_);
+
+  // delete objectives
   for (std::vector <Objective *>::iterator i  = objectives_ . begin ();
        i != objectives_ . end (); i++)
     delete (*i);
 
-  /*
-  for (std::vector <LinearConstraint *>::iterator i = linearconstraints_ . begin ();
-       i != linearconstraints_ . end (); i++)
+  // delete constraints
+  for (std::vector <CouenneConstraint *>::iterator i = constraints_ . begin ();
+       i != constraints_ . end (); i++)
     delete (*i);
-  */
-  /*
+
+  // delete variables
+  for (std::vector <exprVar *>::iterator i = variables_ . begin ();
+       i != variables_ . end (); i++)
+    delete (*i);
+
+  // delete auxiliary variables
   for (std::vector <exprAux *>::iterator i = auxiliaries_ . begin ();
        i != auxiliaries_ . end (); i++)
     delete (*i);
-  */
 }
 
 

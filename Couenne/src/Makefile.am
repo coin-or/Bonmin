@@ -19,7 +19,6 @@ lib_LTLIBRARIES = libCouenne.la
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = \
 	expression/operators/exprAbs.cpp \
-	expression/operators/exprCos.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
 	expression/operators/exprInv.cpp \
@@ -28,6 +27,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprOpp.cpp \
 	expression/operators/exprPow.cpp \
 	expression/operators/exprSin.cpp \
+	expression/operators/exprCos.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMax.cpp \
@@ -50,8 +50,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
 	convex/operators/conv-exprInv.cpp \
-	convex/operators/conv-exprSin.cpp \
-	convex/operators/conv-exprCos.cpp \
+	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/trigGenCuts.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \

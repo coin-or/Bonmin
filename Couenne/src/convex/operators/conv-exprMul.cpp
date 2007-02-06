@@ -31,17 +31,15 @@ exprAux *exprMul::standardize (CouenneProblem *p) {
 
   exprOp::standardize (p);
 
+  if (nargs_==1) return NULL;
+  /* {
+     exprAux *aux = arglist_ [0];
+     arglist_ [0] = NULL;
+     return aux;
+     } */
+
   expression *aux = new exprClone (arglist_ [0]);
 
-  if (nargs_==1) return NULL;
-  /*
-  for (int i=0; i<nargs_; i++) {
-    printf ("operand %d: ", i);
-    arglist_ [i] -> print (std::cout);
-    printf ("_");
-  }
-  printf ("\n");
-  */
   for (int i=1; i < nargs_ - 1; i++)
     if (areSameVariables (aux, arglist_ [i]))
          aux = p -> addAuxiliary (new exprPow (aux, new exprConst (2)));
@@ -62,6 +60,8 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
   if ((arglist_ [i=0] -> Type () == CONST) ||
       (arglist_ [i=1] -> Type () == CONST)) {
 
+    // expression is of the type c*x
+
     CouNumber c = arglist_ [i] -> Value ();
 
     expression *lbi, *ubi;
@@ -76,6 +76,8 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
     }
   }
   else {
+
+    // expression is of the type x*y
 
     expression **almin = new expression * [4];
     expression **almax = new expression * [4];
@@ -94,95 +96,7 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// construct linear under-estimator for expression within problem *p
-// (p is used to add convexification constraints)
-/*
-int exprMul::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-			      int **&indices, expression **&rhs, enum con_sign *&sign) {
-
-  // expression w = xy is convexified from below with two linear
-  // constraints (lx and ly are lower bounds of x and y, ux and uy are
-  // upper bounds
-  //
-  // w >= ly x + lx y - ly lx
-  // w >= uy x + ux y - uy ux
-
-  if ((arglist_ [0] -> Type () == CONST) ||
-      (arglist_ [1] -> Type () == CONST))
-    return 0;
-
-  expression *lx, *ux, *ly, *uy;
-
-  arglist_ [0] -> getBounds (lx, ux);
-  arglist_ [1] -> getBounds (ly, uy);
-
-  nterms = new int [2];
-  nterms [0] = nterms [1] = 3;
-
-  allocateCon (2, nterms, coeff, indices, rhs, sign);
-
-  coeff [0] [0] = new exprConst (-1); indices [0] [0] = w            -> Index ();
-  coeff [0] [1] = new exprClone (ly); indices [0] [1] = arglist_ [0] -> Index ();
-  coeff [0] [2] = new exprClone (lx); indices [0] [2] = arglist_ [1] -> Index ();
-  rhs   [0] = new exprMul (lx, ly);
-  sign  [0] = COUENNE_LE;
-
-  coeff [1] [0] = new exprConst (-1); indices [1] [0] = w            -> Index ();
-  coeff [1] [1] = new exprClone (uy); indices [1] [1] = arglist_ [0] -> Index ();
-  coeff [1] [2] = new exprClone (ux); indices [1] [2] = arglist_ [1] -> Index ();
-  rhs   [1] = new exprMul (ux, uy);
-  sign  [1] = COUENNE_LE;
-
-  return 2;
-}
-
-
-// similarly, construct linear over-estimator for expression within
-// problem *p (p is used to add convexification constraints). It is
-// also used when this function appears with a minus sign in the
-// expression
-
-int exprMul::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-			      int **&indices, expression **&rhs, enum con_sign *&sign) {
-
-  // expression w = xy is convexified from below with two linear
-  // constraints (lx and ly are lower bounds of x and y, ux and uy are
-  // upper bounds
-  //
-  // w <= ly x + ux y - ly ux
-  // w <= uy x + lx y - uy lx
-
-  if ((arglist_ [0] -> Type () == CONST) ||
-      (arglist_ [1] -> Type () == CONST))
-    return 0;
-
-  expression *lx, *ux, *ly, *uy;
-
-  arglist_ [0] -> getBounds (lx, ux);
-  arglist_ [1] -> getBounds (ly, uy);
-
-  nterms = new int [2];
-  nterms [0] = nterms [1] = 3;
-
-  allocateCon (2, nterms, coeff, indices, rhs, sign);
-
-  coeff [0] [0] = new exprConst (-1); indices [0] [0] = w            -> Index ();
-  coeff [0] [1] = new exprClone (ly); indices [0] [1] = arglist_ [0] -> Index ();
-  coeff [0] [2] = new exprClone (ux); indices [0] [2] = arglist_ [1] -> Index ();
-  rhs   [0] = new exprMul (ly, ux);
-  sign  [0] = COUENNE_GE;
-
-  coeff [1] [0] = new exprConst (-1); indices [1] [0] = w            -> Index ();
-  coeff [1] [1] = new exprClone (uy); indices [1] [1] = arglist_ [0] -> Index ();
-  coeff [1] [2] = new exprClone (lx); indices [1] [2] = arglist_ [1] -> Index ();
-  rhs   [1] = new exprMul (uy, lx);
-  sign  [1] = COUENNE_GE;
-
-  return 2;
-}
-*/
-
-// check if bounding box is suitable for a multiplication convexification constraint
+// defined in conv-exprDiv.cpp
 bool is_boundbox_regular (CouNumber, CouNumber);
 
 
@@ -253,7 +167,8 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   //
   // 3) w <= yl x + xu y - yl xu
   // 4) w <= yu x + xl y - yu xl
-
+  //
+  // if the corresponding bounds are finite
 
   // 1)
   if (is_boundbox_regular (yl,xl) 

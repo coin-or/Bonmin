@@ -34,10 +34,10 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   problem_ = new CouenneProblem;
 
   problem_ -> readnl      (asl);
-  //problem_ -> print (std::cout);
-  //printf ("======================================\n");
+  //  problem_ -> print (std::cout);
+  //  printf ("======================================\n");
   problem_ -> standardize ();
-  //problem_ -> print (std::cout);
+  //  problem_ -> print (std::cout);
 }
 
 
@@ -55,7 +55,7 @@ CouenneCutGenerator::~CouenneCutGenerator () {
 
   //  cleanup ();
 
-  delete problem_;
+  //  delete problem_;
 }
 
 
@@ -85,7 +85,7 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
 
 
 // (re-)initializes cut pool
-
+/*
 void CouenneCutGenerator::cleanup () {
 
   if (!pool_) return;
@@ -99,7 +99,7 @@ void CouenneCutGenerator::cleanup () {
   free (pool_);
   pool_ = NULL;
 }
-
+*/
 
 // add half-space through two points (x1,y1) and (x2,y2)
 
@@ -107,7 +107,12 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 				      CouNumber x1, CouNumber y1, 
 				      CouNumber x2, CouNumber y2, int sign) const { 
 
-  CouNumber oppslope = (y1-y2)/(x2-x1);
+  if (fabs (x2-x1) < COUENNE_EPS) {
+    fprintf (stderr, "CouenneCutGenerator::addSegment(): warning, x1=x2\n");
+    return;
+  }
+
+  CouNumber oppslope = (y1-y2) / (x2-x1);
 
   OsiRowCut *cut = createCut (y1 + oppslope * x1, sign, 
 			      wi, CouNumber (1.), 

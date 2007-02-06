@@ -14,68 +14,6 @@
 #include <CouenneCutGenerator.h>
 
 
-// Lower convexification of exponential consists in (the north part
-// of) the half-space defined by the segment from the point
-// (lb,log(lb)) to the point (ub,log(ub))
-/*
-int exprLog::lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-		     int **&indices, expression **&rhs, enum con_sign *&sign) {
-
-  coeff    = new expression ** [1];
-  *coeff   = new expression * [2];
-  indices  = new int * [1];
-  *indices = new int [2];
-  rhs      = new expression * [1];
-  sign     = new enum con_sign [1];
-  nterms   = new int [1];
-
-  segment (coeff [0] [1], *rhs);
-
-  *nterms = 2;
-  coeff   [0] [0] = new exprConst (1);
-  indices [0] [0] = w         -> Index ();
-  indices [0] [1] = argument_ -> Index ();
-  *sign           = COUENNE_GE;
-
-  return 1;
-}
-
-
-// Upper convexification of logarithm is done by a set {1..nSamples()}
-// of tangents to the log curve, computed by exprUnary::hull, each
-// having three terms: auxiliary variable w, variable x which is the
-// argument of exponential and whose coefficient is contained in
-// coeffs [k] and whose rhs is contained in rhs [k], 0 <= k <
-// nSamples().
-
-int exprLog::upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-		     int **&indices, expression **&rhs, enum con_sign *&sign) {
-
-  int ns = nSamples ();
-
-  expression **x_coeff = new expression * [ns];
-
-  nterms = new int [ns];
-
-  for (int i=0; i<ns; i++) 
-    nterms [i] = 2;
-
-  allocateCon (ns, nterms, coeff, indices, rhs, sign);
-
-  hull (x_coeff, rhs);
-
-  for (int i=0; i<ns; i++) {
-    coeff [i] [0] = new exprConst (1); indices [i] [0] = w         -> Index ();
-    coeff [i] [1] = x_coeff [i];       indices [i] [1] = argument_ -> Index ();
-    sign  [i] = COUENNE_LE;
-  }
-
-  delete [] x_coeff;
-
-  return ns;
-}
-*/
-
 #define LOG_STEP 10
 #define LOG_SCALE 1e-20
 

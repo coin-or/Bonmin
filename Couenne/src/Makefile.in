@@ -75,7 +75,6 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libCouenne_la_LIBADD =
 am__libCouenne_la_SOURCES_DIST = expression/operators/exprAbs.cpp \
-	expression/operators/exprCos.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
 	expression/operators/exprInv.cpp \
@@ -84,6 +83,7 @@ am__libCouenne_la_SOURCES_DIST = expression/operators/exprAbs.cpp \
 	expression/operators/exprOpp.cpp \
 	expression/operators/exprPow.cpp \
 	expression/operators/exprSin.cpp \
+	expression/operators/exprCos.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMax.cpp \
@@ -101,8 +101,7 @@ am__libCouenne_la_SOURCES_DIST = expression/operators/exprAbs.cpp \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
 	convex/operators/conv-exprInv.cpp \
-	convex/operators/conv-exprSin.cpp \
-	convex/operators/conv-exprCos.cpp \
+	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/trigGenCuts.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
@@ -113,15 +112,15 @@ am__libCouenne_la_SOURCES_DIST = expression/operators/exprAbs.cpp \
 	readnl/nl2e.cpp readnl/invmap.c readnl/fix_asl_group.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
 @COIN_HAS_ASL_TRUE@	fix_asl_group.lo
-am_libCouenne_la_OBJECTS = exprAbs.lo exprCos.lo exprDiv.lo exprExp.lo \
-	exprInv.lo exprLog.lo exprMul.lo exprOpp.lo exprPow.lo \
-	exprSin.lo exprSub.lo exprSum.lo exprMax.lo exprMin.lo \
+am_libCouenne_la_OBJECTS = exprAbs.lo exprDiv.lo exprExp.lo exprInv.lo \
+	exprLog.lo exprMul.lo exprOpp.lo exprPow.lo exprSin.lo \
+	exprCos.lo exprSub.lo exprSum.lo exprMax.lo exprMin.lo \
 	exprVar.lo expression.lo simplifiers.lo simplify.lo \
 	addEnvelope.lo createCuts.lo conv-exprOp.lo conv-exprUnary.lo \
 	conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
 	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
-	conv-exprInv.lo conv-exprSin.lo conv-exprCos.lo trigGenCuts.lo \
+	conv-exprInv.lo conv-exprSinCos.lo trigGenCuts.lo \
 	conv-exprExp.lo conv-exprLog.lo add_tangent.lo \
 	CouenneCutGenerator.lo generateCuts.lo problem.lo \
 	constraint.lo update_conv.lo rootQ.lo $(am__objects_1)
@@ -318,7 +317,6 @@ lib_LTLIBRARIES = libCouenne.la
 
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = expression/operators/exprAbs.cpp \
-	expression/operators/exprCos.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
 	expression/operators/exprInv.cpp \
@@ -327,6 +325,7 @@ libCouenne_la_SOURCES = expression/operators/exprAbs.cpp \
 	expression/operators/exprOpp.cpp \
 	expression/operators/exprPow.cpp \
 	expression/operators/exprSin.cpp \
+	expression/operators/exprCos.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMax.cpp \
@@ -344,8 +343,7 @@ libCouenne_la_SOURCES = expression/operators/exprAbs.cpp \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
 	convex/operators/conv-exprInv.cpp \
-	convex/operators/conv-exprSin.cpp \
-	convex/operators/conv-exprCos.cpp \
+	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/trigGenCuts.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
@@ -507,7 +505,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/add_tangent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprAbs.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprCos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprExp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprInv.Plo@am__quote@
@@ -518,7 +515,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprPow-envelope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprPow-getBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprPow.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSinCos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprUnary.Plo@am__quote@
@@ -621,13 +618,6 @@ exprAbs.lo: expression/operators/exprAbs.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprAbs.lo `test -f 'expression/operators/exprAbs.cpp' || echo '$(srcdir)/'`expression/operators/exprAbs.cpp
 
-exprCos.lo: expression/operators/exprCos.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprCos.lo -MD -MP -MF "$(DEPDIR)/exprCos.Tpo" -c -o exprCos.lo `test -f 'expression/operators/exprCos.cpp' || echo '$(srcdir)/'`expression/operators/exprCos.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprCos.Tpo" "$(DEPDIR)/exprCos.Plo"; else rm -f "$(DEPDIR)/exprCos.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/exprCos.cpp' object='exprCos.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprCos.lo `test -f 'expression/operators/exprCos.cpp' || echo '$(srcdir)/'`expression/operators/exprCos.cpp
-
 exprDiv.lo: expression/operators/exprDiv.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprDiv.lo -MD -MP -MF "$(DEPDIR)/exprDiv.Tpo" -c -o exprDiv.lo `test -f 'expression/operators/exprDiv.cpp' || echo '$(srcdir)/'`expression/operators/exprDiv.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprDiv.Tpo" "$(DEPDIR)/exprDiv.Plo"; else rm -f "$(DEPDIR)/exprDiv.Tpo"; exit 1; fi
@@ -683,6 +673,13 @@ exprSin.lo: expression/operators/exprSin.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/exprSin.cpp' object='exprSin.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprSin.lo `test -f 'expression/operators/exprSin.cpp' || echo '$(srcdir)/'`expression/operators/exprSin.cpp
+
+exprCos.lo: expression/operators/exprCos.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprCos.lo -MD -MP -MF "$(DEPDIR)/exprCos.Tpo" -c -o exprCos.lo `test -f 'expression/operators/exprCos.cpp' || echo '$(srcdir)/'`expression/operators/exprCos.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprCos.Tpo" "$(DEPDIR)/exprCos.Plo"; else rm -f "$(DEPDIR)/exprCos.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/exprCos.cpp' object='exprCos.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprCos.lo `test -f 'expression/operators/exprCos.cpp' || echo '$(srcdir)/'`expression/operators/exprCos.cpp
 
 exprSub.lo: expression/operators/exprSub.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprSub.lo -MD -MP -MF "$(DEPDIR)/exprSub.Tpo" -c -o exprSub.lo `test -f 'expression/operators/exprSub.cpp' || echo '$(srcdir)/'`expression/operators/exprSub.cpp; \
@@ -838,19 +835,12 @@ conv-exprInv.lo: convex/operators/conv-exprInv.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprInv.lo `test -f 'convex/operators/conv-exprInv.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprInv.cpp
 
-conv-exprSin.lo: convex/operators/conv-exprSin.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprSin.lo -MD -MP -MF "$(DEPDIR)/conv-exprSin.Tpo" -c -o conv-exprSin.lo `test -f 'convex/operators/conv-exprSin.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprSin.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/conv-exprSin.Tpo" "$(DEPDIR)/conv-exprSin.Plo"; else rm -f "$(DEPDIR)/conv-exprSin.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprSin.cpp' object='conv-exprSin.lo' libtool=yes @AMDEPBACKSLASH@
+conv-exprSinCos.lo: convex/operators/conv-exprSinCos.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprSinCos.lo -MD -MP -MF "$(DEPDIR)/conv-exprSinCos.Tpo" -c -o conv-exprSinCos.lo `test -f 'convex/operators/conv-exprSinCos.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprSinCos.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/conv-exprSinCos.Tpo" "$(DEPDIR)/conv-exprSinCos.Plo"; else rm -f "$(DEPDIR)/conv-exprSinCos.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprSinCos.cpp' object='conv-exprSinCos.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprSin.lo `test -f 'convex/operators/conv-exprSin.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprSin.cpp
-
-conv-exprCos.lo: convex/operators/conv-exprCos.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprCos.lo -MD -MP -MF "$(DEPDIR)/conv-exprCos.Tpo" -c -o conv-exprCos.lo `test -f 'convex/operators/conv-exprCos.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprCos.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/conv-exprCos.Tpo" "$(DEPDIR)/conv-exprCos.Plo"; else rm -f "$(DEPDIR)/conv-exprCos.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprCos.cpp' object='conv-exprCos.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprCos.lo `test -f 'convex/operators/conv-exprCos.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprCos.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprSinCos.lo `test -f 'convex/operators/conv-exprSinCos.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprSinCos.cpp
 
 trigGenCuts.lo: convex/operators/trigGenCuts.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT trigGenCuts.lo -MD -MP -MF "$(DEPDIR)/trigGenCuts.Tpo" -c -o trigGenCuts.lo `test -f 'convex/operators/trigGenCuts.cpp' || echo '$(srcdir)/'`convex/operators/trigGenCuts.cpp; \

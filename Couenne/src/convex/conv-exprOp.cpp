@@ -8,6 +8,7 @@
 
 #include <CouenneTypes.h>
 #include <exprOp.h>
+#include <exprClone.h>
 #include <CouenneProblem.h>
 
 
@@ -28,7 +29,7 @@ exprAux *exprOp::standardize (CouenneProblem *p) {
   for (register int i = nargs_; i--;)
 
     if ((subst = arglist_ [i] -> standardize (p)))
-      arglist_ [i] = subst;
+      arglist_ [i] = new exprClone (subst);
 
   return NULL;
 }
