@@ -68,7 +68,7 @@ ASTYLE_FILES = \
          BonIpoptWarmStart.cppbak \
          BonIpoptInteriorWarmStarter.hppbak \
          BonIpoptSolver.hppbak \
-         BonIpoptWarmStart.hpp
+         BonIpoptWarmStart.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
