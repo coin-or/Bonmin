@@ -34,7 +34,7 @@ class exprLog: public exprUnary {
   const std::string name() const {return "log" + exprUnary::name();}
 
   // I/O
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 

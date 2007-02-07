@@ -73,7 +73,7 @@ class exprAux: public exprVar {
   const std::string name () const;
 
   // I/O
-  void print (std::ostream &out)
+  void print (std::ostream &out) const
     {out << "w_" << varIndex_;}
 
   // The expression associated with this auxiliary variable

@@ -37,10 +37,11 @@ class exprPow: public exprOp {
     {return new exprPow (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "^" + exprOp::name();}
+  const std::string name() const 
+    {return "^" + exprOp::name();}
 
   // I/O
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // function for the evaluation of the expression
   CouNumber operator () ();

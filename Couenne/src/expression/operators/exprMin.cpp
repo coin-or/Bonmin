@@ -11,6 +11,5 @@
 #include <exprMin.h>
 
 void exprMin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
-
-}
+			    OsiCuts &cs, const CouenneCutGenerator *cg) 
+{}

@@ -37,7 +37,7 @@ class exprOpp: public exprUnary {
   const std::string name() const {return "opp" + exprUnary::name();}
 
   // I/O
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 

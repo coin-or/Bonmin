@@ -79,7 +79,7 @@ expression *exprSum:: differentiate (int index) {
 
 // print
 
-void exprSum::print (std::ostream& out)
+void exprSum::print (std::ostream& out) const
   {exprOp::print (out, "+", INSIDE);}
 
 

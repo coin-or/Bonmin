@@ -60,7 +60,7 @@ class exprUnary: public expression {
   virtual const std::string name () const;
 
   // I/O
-  virtual void print (std::ostream &, const std::string &, enum pos);
+  virtual void print (std::ostream &, const std::string &, enum pos) const;
 
   // compute value of unary operator
   virtual inline CouNumber operator () ()

@@ -49,7 +49,7 @@ class exprConst: public expression {
   const std::string name () const;
 
   // I/O
-  inline void print (std::ostream &out) 
+  inline void print (std::ostream &out) const
     {out << currValue_;}
 
   // return constant's value

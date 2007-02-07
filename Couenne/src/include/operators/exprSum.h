@@ -35,7 +35,7 @@ class exprSum: public exprOp {
   const std::string name() const {return "+" + exprOp::name();}
 
   // I/O
-  virtual void print (std::ostream &);
+  virtual void print (std::ostream &) const;
 
   // function for the evaluation of the expression
   CouNumber operator () ();

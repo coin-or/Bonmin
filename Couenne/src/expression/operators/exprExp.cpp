@@ -26,7 +26,7 @@ expression *exprExp::differentiate (int index) {
 
 // printing
 
-void exprExp::print (std::ostream& out)
+void exprExp::print (std::ostream& out) const
   {exprUnary::print (out, "exp", PRE);}
 
 

@@ -37,7 +37,7 @@ class exprInv: public exprUnary {
   const std::string name() const {return "inv" + exprUnary::name();}
 
   // output "1/argument"
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 

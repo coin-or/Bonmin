@@ -36,7 +36,7 @@ class exprCos: public exprUnary {
   const std::string name() const {return "cos" + exprUnary::name();}
 
   // print "cos" and argument
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // obtain derivative of expression
   expression *differentiate (int index); 

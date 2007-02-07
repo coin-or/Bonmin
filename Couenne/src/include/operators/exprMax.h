@@ -39,7 +39,7 @@ class exprMax: public exprOp {
   const std::string name() const {return "max" + exprOp::name();}
 
   // I/O
-  void print (std::ostream &out)
+  void print (std::ostream &out) const
     {exprOp:: print (out, "max", PRE);}
 
   // function for the evaluation of the expression

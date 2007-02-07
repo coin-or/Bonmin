@@ -34,8 +34,8 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   problem_ = new CouenneProblem;
 
   problem_ -> readnl      (asl);
-  //  problem_ -> print (std::cout);
-  //  printf ("======================================\n");
+  /*  problem_ -> print (std::cout);
+      printf ("======================================\n");*/
   problem_ -> standardize ();
   //  problem_ -> print (std::cout);
 }
@@ -53,9 +53,8 @@ CouenneCutGenerator::~CouenneCutGenerator () {
   if (!pool_) 
     free (pool_);
 
-  //  cleanup ();
-
-  //  delete problem_;
+  printf ("deleting symbolic problem\n");
+  delete problem_;
 }
 
 
@@ -83,23 +82,6 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
     pool_ [i] = src. getCut (i) -> clone ();
 }
 
-
-// (re-)initializes cut pool
-/*
-void CouenneCutGenerator::cleanup () {
-
-  if (!pool_) return;
-
-  if (ncuts_)
-    while (ncuts_--)
-      if (pool_ [ncuts_]) {
-	delete pool_ [ncuts_];
-	pool_ [ncuts_] = NULL;
-      }
-  free (pool_);
-  pool_ = NULL;
-}
-*/
 
 // add half-space through two points (x1,y1) and (x2,y2)
 

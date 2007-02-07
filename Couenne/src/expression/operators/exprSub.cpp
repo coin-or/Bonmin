@@ -70,7 +70,7 @@ expression *exprSub::differentiate (int index) {
 
 
 // print
-void exprSub::print (std::ostream& out)
+void exprSub::print (std::ostream& out) const
   {exprOp::print (out, "-", INSIDE);}
 
 

@@ -44,38 +44,38 @@ expression *nl2e (expr2 *e) {
 
   switch (getOperator (e -> op)) {
 
-  case OPPLUS:   /*printf ("[+]");*/ return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPMINUS:  /*printf ("[-]");*/ return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPMULT:   /*printf ("[*]");*/ return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPDIV:    /*printf ("[/]");*/ return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPPLUS:   return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPMINUS:  return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPMULT:   return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPDIV:    return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPREM:   printf ("remainder not implemented\n"); return new exprConst (0);
-  case OPPOW:    /*printf ("[^]");*/ return new exprPow (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPPOW:    return new exprPow (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPLESS:  printf ("less not implemented\n"); return new exprConst (0);
   case MINLIST: printf ("min not implemented\n"); return new exprConst (0);
   case MAXLIST: printf ("max not implemented\n"); return new exprConst (0);
   case FLOOR:   printf ("floor not implemented\n"); return new exprConst (0);
   case CEIL:    printf ("ceil not implemented\n"); return new exprConst (0);
-  case ABS:       /*printf ("[|]");*/ return new exprAbs (nl2e (e -> L.e));
-  case OPUMINUS:  /*printf ("[~]");*/ return new exprOpp (nl2e (e -> L.e -> L.e));
+  case ABS:     return new exprAbs (nl2e (e -> L.e));
+  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
   case OPIFnl:  printf ("ifnl not implemented\n"); return new exprConst (0);
   case OP_tanh: printf ("tanh not implemented\n"); return new exprConst (0);
   case OP_tan:  
     arg = nl2e (e -> L.e);
     return new exprDiv (new exprSin (arg), new exprCos (new exprClone (arg)));
-  case OP_sqrt:   /*printf ("[v]");*/ return new exprPow (nl2e (e -> L.e), new exprConst (0.5));
-  case OP_sinh:   /*printf ("[s]");*/ return new exprMul (new exprConst (0.5),
-				      new exprSub (new exprExp (nl2e (e -> L.e)),
-						   new exprExp (new exprOpp (nl2e (e -> L.e)))));
-  case OP_sin:    /*printf ("[S]");*/ return new exprSin (nl2e (e -> L.e));
-  case OP_log10:  /*printf ("[L]");*/ return new exprMul (new exprConst (1.0 / log (10.0)), 
-							  new exprLog (nl2e (e -> L.e)));
-  case OP_log:    /*printf ("[l]");*/ return new exprLog (nl2e (e -> L.e));
-  case OP_exp:    /*printf ("[e]");*/ return new exprExp (nl2e (e -> L.e));
-  case OP_cosh:   /*printf ("[c]");*/ return new exprMul (new exprConst (0.5),
-				      new exprSum (new exprExp (nl2e (e -> L.e)),
-						   new exprExp (new exprOpp (nl2e (e -> L.e)))));
+  case OP_sqrt:    return new exprPow (nl2e (e -> L.e), new exprConst (0.5));
+  case OP_sinh:    return new exprMul (new exprConst (0.5),
+		   new exprSub (new exprExp (nl2e (e -> L.e)),
+				new exprExp (new exprOpp (nl2e (e -> L.e)))));
+  case OP_sin:     return new exprSin (nl2e (e -> L.e));
+  case OP_log10:   return new exprMul (new exprConst (1.0 / log (10.0)), 
+				       new exprLog (nl2e (e -> L.e)));
+  case OP_log:     return new exprLog (nl2e (e -> L.e));
+  case OP_exp:     return new exprExp (nl2e (e -> L.e));
+  case OP_cosh:    return new exprMul (new exprConst (0.5),
+		   new exprSum (new exprExp (nl2e (e -> L.e)),
+				new exprExp (new exprOpp (nl2e (e -> L.e)))));
 
-  case OP_cos:    /*printf ("[C]");*/ return new exprCos (nl2e (e -> L.e));
+  case OP_cos:     return new exprCos (nl2e (e -> L.e));
   case OP_atanh: printf ("atanh not implemented\n"); return new exprConst (0);
   case OP_atan2: printf ("atan2 not implemented\n"); return new exprConst (0);
   case OP_atan:  printf ("atan not implemented\n"); return new exprConst (0);
@@ -95,12 +95,12 @@ expression *nl2e (expr2 *e) {
   case OPround:  printf ("round not implemented\n"); return new exprConst (0);
   case OPtrunc:  printf ("trunc not implemented\n"); return new exprConst (0);
 
-  case OP1POW: /*printf ("[p]");*/ return new exprPow (nl2e (e -> L.e), 
-						       new exprConst (((expr_n *)e->R.e)->v));
-  case OP2POW: /*printf ("[P]");*/ return new exprPow (nl2e (e -> L.e), 
-						       new exprConst (2));
-  case OPCPOW: /*printf ("[E]");*/ return new exprPow (new exprConst (((expr_n *)e->L.e)->v),
-						       nl2e (e -> R.e));
+  case OP1POW: return new exprPow (nl2e (e -> L.e), 
+				   new exprConst (((expr_n *)e->R.e)->v));
+  case OP2POW: return new exprPow (nl2e (e -> L.e), 
+				   new exprConst (2));
+  case OPCPOW: return new exprPow (new exprConst (((expr_n *)e->L.e)->v),
+				   nl2e (e -> R.e));
   case OPFUNCALL: printf ("function call not implemented\n"); return new exprConst (0);
   case OPNUM:   return new exprConst (((expr_n *)e)->v);
   case OPPLTERM:  printf ("plterm not implemented\n"); return new exprConst (0);

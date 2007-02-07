@@ -58,7 +58,7 @@ class exprCopy: public expression {
   const std::string name () const;
 
   // I/O
-  virtual void print (std::ostream &out) 
+  virtual void print (std::ostream &out) const
   {out << "["; copy_ -> Original () -> print (out); out << "]";}
 
   // value (empty)

@@ -25,6 +25,5 @@ expression *exprCos::differentiate (int index) {
 }
 
 
-void exprCos::print (std::ostream& out) {
-  exprUnary::print (out, "cos", PRE);
-}
+void exprCos::print (std::ostream& out) const
+  {exprUnary::print (out, "cos", PRE);}

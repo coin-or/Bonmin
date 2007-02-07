@@ -38,7 +38,7 @@ class exprMin: public exprOp {
   const std::string name() const {return "min" + exprOp::name();}
 
   // I/O
-  void print (std::ostream &out)
+  void print (std::ostream &out) const
     {exprOp:: print (out, "min", PRE);}
 
   // function for the evaluation of the expression

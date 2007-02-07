@@ -70,7 +70,7 @@ class exprOp: public expression {
   virtual const std::string name () const;
 
   // I/O
-  virtual void print (std::ostream &, const std::string &, enum pos);
+  virtual void print (std::ostream &, const std::string &, enum pos) const;
 
   // function for the evaluation of the expression
   virtual inline CouNumber operator () ();

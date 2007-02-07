@@ -36,7 +36,7 @@ class exprClone: public exprCopy {
   {return new exprClone (*this);}
 
   // I/O
-  void print (std::ostream &out) 
+  void print (std::ostream &out) const
   {out << "{"; copy_ -> Original () -> print (out); out << "}";}
 
   // value (empty)

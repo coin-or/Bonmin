@@ -36,7 +36,7 @@ class exprLBMul: public exprOp {
   const std::string name() const {return "LB_mul" + exprOp::name();}
 
   // output
-  void print (std::ostream &);
+  void print (std::ostream &) const;
 };
 
 
@@ -66,7 +66,7 @@ inline CouNumber exprLBMul::operator () () {
 
 
 // output
-inline void exprLBMul::print (std::ostream &out = std::cout)
+inline void exprLBMul::print (std::ostream &out = std::cout) const
 {exprOp::print (out, "LB_mul", PRE);}
 
 
@@ -94,7 +94,7 @@ class exprUBMul: public exprOp {
   std::string name() {return "UB_mul" + exprOp::name();}
 
   // output
-  void print (std::ostream &);
+  void print (std::ostream &) const;
 };
 
 
@@ -126,7 +126,7 @@ inline CouNumber exprUBMul::operator () () {
 
 // output
 
-inline void exprUBMul::print (std::ostream &out = std::cout)
+inline void exprUBMul::print (std::ostream &out = std::cout) const
 {exprOp::print (out, "UB_mul", PRE);}
 
 #endif

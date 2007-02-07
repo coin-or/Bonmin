@@ -36,12 +36,12 @@ class exprLBDiv: public exprOp {
   const std::string name() const {return "LB_div" + exprOp::name();}
 
   // I/O
-  void print (std::ostream &);
+  void print (std::ostream &) const;
 };
 
 
 // output
-inline void exprLBDiv::print (std::ostream &out = std::cout)
+inline void exprLBDiv::print (std::ostream &out = std::cout) const
 {exprOp::print (out, "LB_div", PRE);}
 
 
@@ -90,7 +90,7 @@ class exprUBDiv: public exprOp {
   std::string name() {return "UB_div" + exprOp::name();}
 
   // output
-  void print (std::ostream &);
+  void print (std::ostream &) const;
 };
 
 
@@ -116,7 +116,7 @@ inline CouNumber exprUBDiv::operator () () {
 }
 
 // output
-inline void exprUBDiv::print (std::ostream &out = std::cout)
+inline void exprUBDiv::print (std::ostream &out = std::cout) const
 {exprOp::print (out, "UB_div", PRE);}
 
 #endif

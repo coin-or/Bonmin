@@ -100,7 +100,7 @@ expression *exprPow::differentiate (int index) {
 
 // output
 
-void exprPow::print (std::ostream& out)
+void exprPow::print (std::ostream& out) const
   {exprOp::print (out, "^", INSIDE);}
 
 

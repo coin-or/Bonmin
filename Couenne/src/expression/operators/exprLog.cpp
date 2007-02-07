@@ -48,7 +48,6 @@ expression *exprLog::differentiate (int index) {
 
 // printing
 
-void exprLog::print (std::ostream& out) {
-  exprUnary::print (out, "log", PRE);
-}
+void exprLog::print (std::ostream& out) const 
+{exprUnary::print (out, "log", PRE);}
 

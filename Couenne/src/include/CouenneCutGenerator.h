@@ -123,9 +123,6 @@ class CouenneCutGenerator: public CglCutGenerator {
 		     OsiCuts &, 
 		     const CglTreeInfo = CglTreeInfo ()) const;
 
-  // (re-)initializes the pool  
-  //  void cleanup ();
-
   // update linearization cut pool (parameters are current point,
   // current lower-, and current upper bound)
   int updateConv (CouNumber *, CouNumber *, CouNumber *);

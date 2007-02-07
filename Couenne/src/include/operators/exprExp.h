@@ -31,7 +31,7 @@ class exprExp: public exprUnary {
   const std::string name() const {return "exp" + exprUnary::name();}
 
   // output
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 

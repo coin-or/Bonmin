@@ -103,7 +103,7 @@ expression *exprMul::differentiate (int index) {
 
 // print
 
-void exprMul::print (std::ostream& out)
+void exprMul::print (std::ostream& out) const
   {exprOp::print (out, "*", INSIDE);}
 
 

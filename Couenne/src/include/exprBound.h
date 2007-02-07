@@ -46,7 +46,7 @@ class exprLowerBound: public exprVar {
   const std::string name () const;
 
   // I/O
-  void print (std::ostream &out) 
+  void print (std::ostream &out) const
     {out << "l_" << varIndex_;}
 
   // return the value of the variable

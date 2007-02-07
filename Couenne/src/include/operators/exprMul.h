@@ -36,7 +36,7 @@ class exprMul: public exprOp {
   const std::string name() const {return "*" + exprOp::name();}
 
   // print expression
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // function for the evaluation of the expression
   inline CouNumber operator () ();

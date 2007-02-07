@@ -93,7 +93,7 @@ expression *exprDiv::differentiate (int index) {
 
 // output
 
-void exprDiv::print (std::ostream& out)
+void exprDiv::print (std::ostream& out) const
   {exprOp::print (out, "/", INSIDE);}
 
 

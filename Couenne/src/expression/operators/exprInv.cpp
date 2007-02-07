@@ -28,6 +28,5 @@ expression *exprInv::differentiate (int index) {
 
 // printing
 
-void exprInv::print (std::ostream& out) {
-  exprUnary::print (out, "1/", PRE);
-}
+void exprInv::print (std::ostream& out) const 
+{exprUnary::print (out, "1/", PRE);}

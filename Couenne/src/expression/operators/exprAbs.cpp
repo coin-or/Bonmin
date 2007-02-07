@@ -58,7 +58,7 @@ expression *exprAbs::differentiate (int index) {
 
 // printing
 
-void exprAbs::print (std::ostream& out) {
+void exprAbs::print (std::ostream& out) const {
   out << "|";
   argument_ -> print (out);
   out << "|";

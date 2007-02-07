@@ -27,6 +27,6 @@ expression *exprSin::differentiate (int index) {
 
 // printing
 
-void exprSin::print (std::ostream& out) {
+void exprSin::print (std::ostream& out) const {
   exprUnary::print (out, "sin", PRE);
 }

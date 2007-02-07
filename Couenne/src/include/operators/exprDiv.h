@@ -33,10 +33,11 @@ class exprDiv: public exprOp {
     {return new exprDiv (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "/" + exprOp::name();}
+  const std::string name() const 
+    {return "/" + exprOp::name();}
 
   // I/O
-  void print (std::ostream&);
+  void print (std::ostream&) const;
 
   // function for the evaluation of the expression
   inline CouNumber operator () ();

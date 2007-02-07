@@ -53,7 +53,7 @@ class exprIVar: public exprVar {
   const std::string name () const;
 
   // print
-  virtual void print (std::ostream &out) 
+  virtual void print (std::ostream &out) const
     {out << "y_" << varIndex_;}
 
   // return the value of the variable
