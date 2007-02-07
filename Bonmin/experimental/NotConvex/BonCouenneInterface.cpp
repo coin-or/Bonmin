@@ -100,6 +100,7 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
      start[i+1] = start[i] + v.getNumElements();
      length[i] = v.getNumElements();
      int nnz = v.getNumElements();
+#if 0//Remove zero elements
      for(int j = 0 ; j < v.getNumElements() ; j++)
        {
 	 double elem = v.getElements()[j];
@@ -112,14 +113,17 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
 	     v.getIndices()[j]<<", value "<<elem<<std::endl;
 	 }
        }
-#if 1 //For deep debug
+#endif
+#if 0 //For deep debug
      if(i>740 && i < 756){
        cut->print();
      }
 #endif
+#if 0
      if(!nnz){
        std::cout<<"Empty row: "<<i<<std::endl;
      }
+#endif
      rowLower[i] = cut->lb();
      rowUpper[i] = cut->ub();
    }
@@ -203,7 +207,7 @@ CouenneInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getO
    CoinCopyN(couenneCg_->Ub(), numcolsconv, colUpper);
 
    // Feed in the current state
-   CoinCopyN(getColSolution(), numcols, x0);
+   CoinCopyN(x, numcols, x0);
    CoinCopyN(getColLower(), numcols, colLower);
    CoinCopyN(getColUpper(), numcols, colUpper);
 

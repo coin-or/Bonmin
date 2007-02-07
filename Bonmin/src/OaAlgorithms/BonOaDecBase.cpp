@@ -375,6 +375,7 @@ OaDecompositionBase::solverManip::fixIntegers(const double * colsol) {
       double  value =  colsol[i];
       if(value - floor(value+0.5) > 1e-04){
 	std::cerr<<"Error not integer valued solution"<<std::endl;
+	std::cerr<<"---------------- x["<<i<<"] = "<<value<<std::endl;
       }
       value = floor(value+0.5);
       value = max(colLower_[i],value);

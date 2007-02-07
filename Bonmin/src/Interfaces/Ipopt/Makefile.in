@@ -367,7 +367,7 @@ ASTYLE_FILES = \
          BonIpoptWarmStart.cppbak \
          BonIpoptInteriorWarmStarter.hppbak \
          BonIpoptSolver.hppbak \
-         BonIpoptWarmStart.hpp
+         BonIpoptWarmStart.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak

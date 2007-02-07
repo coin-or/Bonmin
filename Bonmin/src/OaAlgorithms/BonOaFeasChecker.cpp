@@ -58,6 +58,7 @@ extern int usingCouenne;
    int origNumcols = nlp_->getNumCols();
    double milpBound = -DBL_MAX;
    int numberPasses = 0;
+   double * nlpSol = usingCouenne ? new double[numcols] : NULL;
    while (isInteger && feasible ) {
      numberPasses++;
 
@@ -66,32 +67,36 @@ extern int usingCouenne;
 
    //Fix the variable which have to be fixed, after having saved the bounds
    double * colsol = const_cast<double *>(lp->getColSolution());
+#if 0
    for(int i = 0 ; i < numcols ; i++)
      {
        std::cout<<"x["<<i<<"] = "<<colsol[i]<<"\t";
      }
    lp->writeLp("toto");
-   if(usingCouenne){
-     colsol = new double [numcols];
-     CoinCopyN(lp->getColSolution(), numcols, colsol);}
+#endif
    nlpManip.fixIntegers(colsol);
 
 
-      //Now solve the NLP get the cuts, and intall them in the local LP
+   //Now solve the NLP get the cuts, and intall them in the local LP
 
-    if(solveNlp(babInfo, cutoff)){
-      //nlp solved and feasible
-      // Update the cutoff
-      cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
-      // Update the lp solver cutoff
-      lp->setDblParam(OsiDualObjectiveLimit, cutoff);
-    }
-      // Get the cuts outer approximation at the current point
-      if(usingCouenne)
-        nlpManip.restore();
-      const double * toCut = (parameter().addOnlyViolated_)?
+   if(solveNlp(babInfo, cutoff)){
+     //nlp solved and feasible
+     // Update the cutoff
+     cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
+     // Update the lp solver cutoff
+     lp->setDblParam(OsiDualObjectiveLimit, cutoff);
+   }
+   // Get the cuts outer approximation at the current point
+
+   if(usingCouenne){//Store solution and restore bounds because Couenne gives local cuts
+     CoinCopyN(nlp_->getColSolution(), numcols, nlpSol);
+     nlpManip.restore();}
+   else{
+     nlpSol = const_cast<double *>(nlp_->getColSolution());}
+   
+   const double * toCut = (parameter().addOnlyViolated_)?
 			      colsol:NULL;
-      nlp_->getOuterApproximation(cs, 1, toCut,
+      nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
 				  parameter().global_);
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)
@@ -105,10 +110,8 @@ extern int usingCouenne;
         //if value of integers are unchanged then we have to get out
         bool changed = !feasible;//if lp is infeasible we don't have to check anything
 	if(!changed){
-	  if(usingCouenne)
-	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution(),colsol);
-	  else
-           changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+	  if(!usingCouenne)
+	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
 	}
           if (changed) {
             isInteger = integerFeasible(lp->getColSolution(), origNumcols);
@@ -118,8 +121,6 @@ extern int usingCouenne;
             //	  if(!fixed)//fathom on bounds
             milpBound = 1e200;
           }
-	  if(usingCouenne)
-	    delete [] colsol;
 #ifdef OA_DEBUG
           printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
               numberCuts) ;
@@ -129,6 +130,8 @@ extern int usingCouenne;
     debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
 #endif
    std::cout<<"milpBound found: "<<milpBound<<std::endl;
+   if(usingCouenne)
+     delete [] nlpSol;
     return milpBound;
   }
 

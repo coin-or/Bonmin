@@ -83,7 +83,6 @@ extern int usingCouenne;
     double milpBound = -DBL_MAX;
     bool milpFeasible = 1;
     bool feasible = 1;
-
     if (subMip)//Perform a local search
     {
         subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_, 
@@ -109,6 +108,10 @@ extern int usingCouenne;
 #ifdef OA_DEBUG
     bool foundSolution = 0;
 #endif
+    double * nlpSol = NULL;
+    if(usingCouenne){
+      nlpSol = new double [numcols];
+    }
 
     while (isInteger && feasible ) {
       numberPasses++;
@@ -129,11 +132,8 @@ extern int usingCouenne;
       int numberCutsBefore = cs.sizeRowCuts();
 
     //Fix the variable which have to be fixed, after having saved the bounds
-   double * colsol = const_cast<double *>(subMip == NULL ? lp->getColSolution():
-					  subMip->getLastSolution());
-   if(usingCouenne){
-     colsol = new double [numcols];
-     CoinCopyN(lp->getColSolution(), numcols, colsol);}
+      const double * colsol = subMip == NULL ? lp->getColSolution():
+					  subMip->getLastSolution();
    nlpManip.fixIntegers(colsol);
 
 
@@ -145,13 +145,20 @@ extern int usingCouenne;
       lp->setDblParam(OsiDualObjectiveLimit, cutoff);
     }
 
+    if(usingCouenne)//Need to backup solution and restore bounds
+      {
+	CoinCopyN(nlp_->getColSolution(), numcols, nlpSol);
+	nlpManip.restore();
+      }
+    else
+      {
+	nlpSol = const_cast<double *>(nlp_->getColSolution());
+      }
       
     // Get the cuts outer approximation at the current point
-      if(usingCouenne)
-        nlpManip.restore();
-      const double * toCut = (parameter().addOnlyViolated_)?
-			      colsol:NULL;
-    nlp_->getOuterApproximation(cs, 1, toCut,
+    const double * toCut = (parameter().addOnlyViolated_)?
+      colsol:NULL;
+    nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
 				  parameter().global_);
 
     int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
@@ -166,10 +173,8 @@ extern int usingCouenne;
     //if value of integers are unchanged then we have to get out
     bool changed = !feasible;//if lp is infeasible we don't have to check anything
     if(!changed)
-	  if(usingCouenne)
-	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution(),colsol);
-	  else
-           changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+	  if(!usingCouenne)
+	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
     if (changed) {
       isInteger = integerFeasible(lp->getColSolution(), numcols);
     }
@@ -201,6 +206,7 @@ extern int usingCouenne;
 				 parameters_.localSearchNodeLimit_);
       
       milpBound = subMip->lowBound();
+      std::cout<<"MILP bound "<<milpBound<<std::endl;
       
             if(subMip->optimal())
             handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
@@ -208,14 +214,16 @@ extern int usingCouenne;
             handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
 
 
-            colsol =const_cast<double *> (subMip->getLastSolution());
+            colsol = const_cast<double *> (subMip->getLastSolution());
             isInteger = colsol != 0;
 
             feasible =  (milpBound < cutoff);
 
             if(feasible && isInteger)
              {
-              bool changed = nlpManip.isDifferentOnIntegers(colsol);//If integer solution is the same as nlp
+	       bool changed;
+	       if(!usingCouenne)
+		 changed = nlpManip.isDifferentOnIntegers(colsol);//If integer solution is the same as nlp
                                                                    //solution problem is solved
               if (!changed) {
                 feasible = 0;
@@ -241,9 +249,10 @@ extern int usingCouenne;
       delete subMip; 
       subMip = NULL;
     }
-    if(usingCouenne)
-      delete [] colsol;
     }
+    if(usingCouenne)
+      delete [] nlpSol;
+
 #ifdef OA_DEBUG
   debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
 #endif
