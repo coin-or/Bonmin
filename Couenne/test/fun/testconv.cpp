@@ -16,7 +16,7 @@
 
 #include <math.h>
 
-#include <expressions.h>
+//#include <expressions.h>
 #include <CouenneTypes.h>
 #include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>

@@ -31,7 +31,7 @@ class exprAbs: public exprUnary {
     {return new exprAbs (argument_ -> clone ());}
 
   // String equivalent (for comparisons)
-  std::string name() {return "abs" + exprUnary::name();}
+  const std::string name() const {return "abs" + exprUnary::name();}
 
   // I/O
   void print (std::ostream&);

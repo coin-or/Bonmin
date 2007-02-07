@@ -70,7 +70,7 @@ class exprAux: public exprVar {
   expression *Ub () {return ub_;}
 
   // string equivalent
-  std::string name ();
+  const std::string name () const;
 
   // I/O
   void print (std::ostream &out)

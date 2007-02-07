@@ -16,7 +16,15 @@
 
 #include <math.h>
 
-#include <expressions.h>
+//#include <expressions.h>
+#include <expression.h>
+#include <exprMul.h>
+#include <exprSin.h>
+#include <exprSum.h>
+#include <exprSub.h>
+#include <exprExp.h>
+#include <exprPow.h>
+#include <exprLog.h>
 #include <CouenneTypes.h>
 #include <CouenneProblem.h>
 #include <rootQ.h>

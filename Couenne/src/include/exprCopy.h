@@ -41,13 +41,13 @@ class exprCopy: public expression {
   }
 
   // cloning method
-  virtual exprCopy *clone ()
+  virtual exprCopy *clone () const
     {return new exprCopy (*this);}
 
   // If this is an exprClone of a exprClone of an expr???, point to
   // the original expr??? instead of an exprClone -- improves computing
   // efficiency
-  inline expression *Original () const
+  inline const expression *Original () const
     {return copy_ -> Original ();}
 
   // get variable index in problem
@@ -55,7 +55,7 @@ class exprCopy: public expression {
     {return copy_ -> Index ();}
 
   // string equivalent
-  std::string name ();
+  const std::string name () const;
 
   // I/O
   virtual void print (std::ostream &out) 

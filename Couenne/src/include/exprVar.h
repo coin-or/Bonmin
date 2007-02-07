@@ -53,7 +53,7 @@ class exprVar: public expression {
     {return varIndex_;}
 
   // string equivalent
-  virtual std::string name ();
+  virtual const std::string name () const;
 
   // print
   virtual void print (std::ostream &out) 

@@ -158,19 +158,20 @@ std::string Indtoa (int i) {
   return std::string (s);
 }
 
-std::string exprVar::name   () {return "x_" + Indtoa(varIndex_);}
-std::string exprIVar::name  () {return "y_" + Indtoa(varIndex_);}
-std::string exprAux::name   () {return "w_" + Indtoa(varIndex_);}
+const std::string exprVar::name   () const {return "x_" + Indtoa (varIndex_);}
+const std::string exprIVar::name  () const {return "y_" + Indtoa (varIndex_);}
+const std::string exprAux::name   () const {return "w_" + Indtoa (varIndex_);}
 
-std::string exprLowerBound::name () {return "l_" + Indtoa(varIndex_);}
-std::string exprUpperBound::name () {return "u_" + Indtoa(varIndex_);}
+const std::string exprLowerBound::name () const {return "l_" + Indtoa (varIndex_);}
+const std::string exprUpperBound::name () const {return "u_" + Indtoa (varIndex_);}
 
-std::string exprConst::name () {return Coutoa (currValue_);}
-std::string exprCopy::name  () {return copy_ -> Original () -> name();}
+const std::string exprConst::name () const {return Coutoa (currValue_);}
 
-std::string exprUnary::name () {return "(" + argument_ -> name() + ")";}
+const std::string exprCopy::name  () const {return copy_ -> Original () -> name ();}
 
-std::string exprOp::name    () {
+const std::string exprUnary::name () const {return "(" + argument_ -> name() + ")";}
+
+const std::string exprOp::name    () const {
 
   std::string args = "(" + arglist_ [0] -> name ();
 

@@ -32,7 +32,7 @@ class exprSum: public exprOp {
     {return new exprSum (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
-  std::string name() {return "+" + exprOp::name();}
+  const std::string name() const {return "+" + exprOp::name();}
 
   // I/O
   virtual void print (std::ostream &);

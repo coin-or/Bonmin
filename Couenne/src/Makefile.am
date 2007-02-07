@@ -131,7 +131,6 @@ include_HEADERS = \
 	include/operators/exprPow.h \
 	include/operators/exprSin.h \
 	include/operators/exprSub.h \
-	include/expressions.h \
 	include/exprConst.h \
 	include/exprIVar.h \
 	include/exprVar.h \

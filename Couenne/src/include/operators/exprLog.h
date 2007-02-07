@@ -31,7 +31,7 @@ class exprLog: public exprUnary {
     {return new exprLog (argument_ -> clone ());}
 
   // String equivalent (for comparisons)
-  std::string name() {return "log" + exprUnary::name();}
+  const std::string name() const {return "log" + exprUnary::name();}
 
   // I/O
   void print (std::ostream&);

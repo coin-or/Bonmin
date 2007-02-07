@@ -33,7 +33,7 @@ class exprLBDiv: public exprOp {
   CouNumber operator () ();
 
   // String equivalent (for comparisons)
-  std::string name() {return "LB_div" + exprOp::name();}
+  const std::string name() const {return "LB_div" + exprOp::name();}
 
   // I/O
   void print (std::ostream &);

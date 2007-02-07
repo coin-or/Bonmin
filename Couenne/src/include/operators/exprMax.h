@@ -36,7 +36,7 @@ class exprMax: public exprOp {
     {return new exprMax (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
-  std::string name() {return "max" + exprOp::name();}
+  const std::string name() const {return "max" + exprOp::name();}
 
   // I/O
   void print (std::ostream &out)

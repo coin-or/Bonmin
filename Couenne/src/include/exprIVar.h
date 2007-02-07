@@ -50,7 +50,7 @@ class exprIVar: public exprVar {
   //    {return varIndex_;}
 
   // string equivalent
-  std::string name ();
+  const std::string name () const;
 
   // print
   virtual void print (std::ostream &out) 

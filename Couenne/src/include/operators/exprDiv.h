@@ -33,7 +33,7 @@ class exprDiv: public exprOp {
     {return new exprDiv (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
-  std::string name() {return "/" + exprOp::name();}
+  const std::string name() const {return "/" + exprOp::name();}
 
   // I/O
   void print (std::ostream&);

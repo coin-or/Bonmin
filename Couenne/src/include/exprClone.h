@@ -29,10 +29,10 @@ class exprClone: public exprCopy {
 
   // copy constructor
   exprClone (const exprClone &e):
-    exprCopy (e.Original ()) {}
+    exprCopy (e) {}
 
   // cloning method
-  exprClone *clone ()
+  exprClone *clone () const
   {return new exprClone (*this);}
 
   // I/O

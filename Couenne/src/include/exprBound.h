@@ -43,7 +43,7 @@ class exprLowerBound: public exprVar {
   ~exprLowerBound () {}
 
   // string equivalent
-  std::string name ();
+  const std::string name () const;
 
   // I/O
   void print (std::ostream &out) 
@@ -83,7 +83,7 @@ class exprUpperBound: public exprVar {
   ~exprUpperBound () {}
 
   // string equivalent
-  std::string name ();
+  const std::string name () const;
 
   // I/O
   void print (std::ostream &out) 

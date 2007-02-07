@@ -35,7 +35,7 @@ class exprMin: public exprOp {
     {return new exprMin (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
-  std::string name() {return "min" + exprOp::name();}
+  const std::string name() const {return "min" + exprOp::name();}
 
   // I/O
   void print (std::ostream &out)

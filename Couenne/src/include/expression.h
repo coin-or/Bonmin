@@ -88,11 +88,12 @@ class expression {
   virtual ~expression () {}
 
   // cloning method
-  virtual expression *clone () {return NULL;}
+  virtual expression *clone () const 
+    {return new expression;}
 
   // return index of variable (only valid for exprVar and exprAux)
   virtual inline int Index () const
-  {return -1;}
+    {return -1;}
 
   // return arglist (when applicable, that is, with N-ary functions)
   virtual inline expression **ArgList () const
@@ -113,13 +114,15 @@ class expression {
   // If this is an exprClone of a exprClone of an expr???, point to
   // the original expr??? instead of an exprClone -- improve computing
   // efficiency. Only overloaded for exprClones/exprCopy, of course.
-  virtual inline expression *Original ()  {return this;}
+  virtual inline const expression *Original () const 
+    {return this;}
 
   // String equivalent (for comparisons)
-  virtual std::string name() {return "";}
+  virtual const std::string name() const 
+    {return "null_expr";}
 
   // I/O
-  virtual void print (std::ostream &) {}
+  virtual void print (std::ostream &) const {}
 
   // null function for evaluating the expression
   virtual inline CouNumber operator () () 
@@ -149,34 +152,7 @@ class expression {
   // Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //
-  // For convex functions $w = f(x)$, add linear inequality
-  //
-  // $w - f'(x_k) x   \ge   f(x_k) - f' (x_k) x_k$, or
-  // $lhs$            \ge   $rhs$
-  //
-  // where $w$ is the aux variable, $x$ is the unique variable of the
-  // term, $f'$ is the derivative with respect to $x$, and all $x_k$ are
-  // all the nPWApprox() sample points (at least two: lower- and upper
-  // bound of $x$
-
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  /*  virtual inline int lowerLinearHull (exprAux *, int *&, expression ***&, 
-			       int **&, expression **&, enum con_sign *&)
-    {return 0;}
-
-  // similarly, construct linear over-estimator for expression within
-  // problem *p (p is used to add convexification constraints). It is
-  // also used when this function appears with a minus sign in the
-  // expression
-  virtual inline int upperLinearHull (exprAux *, int *&, expression ***&, 
-			       int **&, expression **&, enum con_sign *&)
-    {return 0;}
-  */
-  // Create standard formulation of this expression, by:
+  // Create standard form of this expression, by:
   //
   // - creating auxiliary w variables and corresponding expressions
   // - returning linear counterpart as new constraint (to replace 

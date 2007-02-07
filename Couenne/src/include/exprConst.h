@@ -46,7 +46,7 @@ class exprConst: public expression {
     {return new exprConst (currValue_);}
 
   // string equivalent
-  std::string name ();
+  const std::string name () const;
 
   // I/O
   inline void print (std::ostream &out) 

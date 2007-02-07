@@ -33,7 +33,7 @@ class exprCos: public exprUnary {
     {return new exprCos (argument_ -> clone ());}
 
   // String equivalent (for comparisons)
-  std::string name() {return "cos" + exprUnary::name();}
+  const std::string name() const {return "cos" + exprUnary::name();}
 
   // print "cos" and argument
   void print (std::ostream&);
