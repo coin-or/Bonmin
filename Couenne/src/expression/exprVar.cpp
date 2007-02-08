@@ -64,10 +64,11 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
 // auxiliary expression Constructor
 
 exprAux::exprAux (expression *image, int index): 
+
   exprVar (index),
   image_  (image) {
 
   image_ -> getBounds (lb_, ub_);
-  //lb_ = new exprConst (- COUENNE_INFINITY);
-  //ub_ = new exprConst (  COUENNE_INFINITY);
+  //  lb_ = new exprConst (- COUENNE_INFINITY);
+  //  ub_ = new exprConst (  COUENNE_INFINITY);
 }

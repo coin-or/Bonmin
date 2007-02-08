@@ -45,7 +45,7 @@ expression *nl2e (expr2 *e) {
   switch (getOperator (e -> op)) {
 
   case OPPLUS:   return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPMINUS:  return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPMINUS:  return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e -> L.e));
   case OPMULT:   return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPDIV:    return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPREM:   printf ("remainder not implemented\n"); return new exprConst (0);
@@ -56,8 +56,8 @@ expression *nl2e (expr2 *e) {
   case FLOOR:   printf ("floor not implemented\n"); return new exprConst (0);
   case CEIL:    printf ("ceil not implemented\n"); return new exprConst (0);
   case ABS:     return new exprAbs (nl2e (e -> L.e));
-    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
-  case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
+  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
+    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
   case OPIFnl:  printf ("ifnl not implemented\n"); return new exprConst (0);
   case OP_tanh: printf ("tanh not implemented\n"); return new exprConst (0);
   case OP_tan:  

@@ -64,11 +64,12 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
   // with what we are returned
 
   generateCuts (*bonOs_, *bonCs_);
-
+  /*
+  printf ("           x           lb             ub\n");
+  for (int i=0; i < getnvars (); i++)
+    printf ("%3d %12.3f %12.3f %12.3f\n", i, X (i), Lb (i), Ub (i));
+  */
   // Update pool (used by Bonmin)
-
-  // delete all cuts in the pool
-  //  cleanup ();
 
   ncuts_ = bonCs_ -> sizeRowCuts ();
 

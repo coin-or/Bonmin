@@ -39,8 +39,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       // for constraint lb <= w <= ub, compute actual values of lb, w,
       // and ub
 
-      CouNumber lb = con -> Lb   () -> Value ();
-      CouNumber ub = con -> Ub   () -> Value ();
+      CouNumber lb = con -> Lb () -> Value ();
+      CouNumber ub = con -> Ub () -> Value ();
 
       // if there exists violation, add constraint
 

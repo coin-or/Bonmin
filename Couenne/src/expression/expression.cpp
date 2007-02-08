@@ -152,6 +152,7 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
   cs.insert (cut);
 }
 
+
 // name () -- a string value for each expression
 
 std::string Coutoa (CouNumber x) {

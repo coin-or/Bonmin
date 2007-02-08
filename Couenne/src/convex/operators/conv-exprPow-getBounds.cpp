@@ -166,5 +166,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	}
       }
     }
+    else // should NOT happen, exponent is not constant...
+      printf ("exprPow::getBounds(): Warning, exponent not constant\n");
   }
 }
