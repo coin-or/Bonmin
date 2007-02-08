@@ -50,7 +50,8 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       CouNumber logu = log (u);
       CouNumber dw   = logu - log (l);
 
-      if ((cut = cg -> createCut (dx*logu - u*dw, +1, w_ind, dx, x_ind, -dw)))
+      if ((cut = cg -> createCut (dx*logu - u*dw, +1, w_ind, dx, 
+				  x_ind, -dw, -1, 0., cg -> isFirst ())))
 	cs.insert (cut);
     }
 
@@ -69,5 +70,5 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   // add upper envelope
 
-  cg -> addEnvelope (cs, -1, log, inv, w_ind, x_ind, x, l, u);
+  cg -> addEnvelope (cs, -1, log, inv, w_ind, x_ind, x, l, u, true);
 }

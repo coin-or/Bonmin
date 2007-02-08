@@ -133,7 +133,8 @@ class CouenneCutGenerator: public CglCutGenerator {
 			int,    CouNumber,    // index, coeff of first term
 			int=-1, CouNumber=0., //              of second term 
 			                      // (-1 means don't consider)
-			int=-1, CouNumber=0.) const; //       of third term
+			int=-1, CouNumber=0., //              of third term
+			bool=false) const;    // is it a global cut?
 
   // add general linear envelope to convex function, given its
   // variables' indices, the (univariate) function and its first
@@ -142,7 +143,8 @@ class CouenneCutGenerator: public CglCutGenerator {
 		    int,
 		    unary_function, unary_function, 
 		    int, int, 
-		    CouNumber, CouNumber, CouNumber) const;
+		    CouNumber, CouNumber, CouNumber,
+		    bool = false) const;
 
   // add half-plane through (x1,y1) and (x2,y2) -- resp. 4th, 5th,
   // 6th, and 7th argument

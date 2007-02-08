@@ -15,7 +15,8 @@
 void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 				       unary_function f, unary_function fprime, 
 				       int w_ind, int x_ind, 
-				       CouNumber x, CouNumber l, CouNumber u) const {
+				       CouNumber x, CouNumber l, CouNumber u,
+				       bool is_global) const {
   OsiRowCut *cut;
   CouNumber opp_slope = - fprime (x);
 
@@ -33,7 +34,9 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
       if ((fabs (opp_slope) < COUENNE_INFINITY) && 
 	  (cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
-			    x_ind, opp_slope))) {
+			    x_ind, opp_slope, 
+			    -1, 0.,
+			    is_global))) {
 	//	printf ("  Uniform %d: ", i); cut -> print ();
 	cs.insert (cut);
       }
@@ -51,7 +54,9 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
     if ((fabs (opp_slope) < COUENNE_INFINITY) && 
 	(cut = createCut (f (x) + opp_slope * x, sign, 
 			  w_ind, CouNumber (1.),
-			  x_ind, opp_slope))) {
+			  x_ind, opp_slope, 
+			  -1, 0.,
+			  is_global))) {
       //      printf ("  Current tangent: "); cut -> print ();
       cs.insert (cut);
     }
@@ -64,7 +69,9 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
       if ((fabs (opp_slope) < COUENNE_INFINITY) &&
 	  (cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
-			    x_ind, opp_slope))) {
+			    x_ind, opp_slope, 
+			    -1, 0.,
+			    is_global))) {
 	//	printf ("  neighbour -%d: ", i); cut -> print ();
 	cs.insert (cut);
       }
@@ -79,7 +86,9 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
       if ((cut = createCut (f (sample) + opp_slope * sample, sign, 
 			    w_ind, CouNumber (1.),
-			    x_ind, opp_slope))) {
+			    x_ind, opp_slope, 
+			    -1, 0.,
+			    is_global))) {
 	//	printf ("  neighbour  %d: ", i); cut -> print ();
 	cs.insert (cut);
       }

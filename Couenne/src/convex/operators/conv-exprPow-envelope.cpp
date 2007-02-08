@@ -64,5 +64,6 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   exponent = k;
 
-  cg -> addEnvelope (cs, sign, power_k, power_k_prime, wi, xi, x, l, u);
+  cg -> addEnvelope (cs, sign, power_k, power_k_prime, 
+		     wi, xi, x, l, u, cg -> isFirst ());
 }

@@ -134,7 +134,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	// simplify, but who knows...
 
 	if ((cut = cg -> createCut (xe -> Value () * ye -> Value (), 
-				    0, w_ind, CouNumber (1.))))
+				    0, w_ind, CouNumber (1.), -1, 0., -1, 0., true)))
 	  cs.insert (cut);
       }
       else {
@@ -145,7 +145,8 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = x_ind;}
 	else                        {coe = xe -> Value (); ind = y_ind;}
 
-	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, CouNumber (-1.), ind, coe)))
+	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, 
+				    CouNumber (-1.), ind, coe, -1, 0., true)))
 	  cs.insert (cut);
       }
     }
@@ -170,23 +171,29 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   //
   // if the corresponding bounds are finite
 
+  bool is_glob = cg -> isFirst ();
+
   // 1)
   if (is_boundbox_regular (yl,xl) 
-      && (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xl)))
+      && (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), 
+				 x_ind, yl, y_ind, xl, is_glob)))
     cs.insert (cut);
 
   // 2)
   if (is_boundbox_regular (yu,xu) 
-      && (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xu)))
+      && (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), 
+				 x_ind, yu, y_ind, xu, is_glob)))
     cs.insert (cut);
 
   // 3)
   if (is_boundbox_regular (yl,xu) 
-      && (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), x_ind, yl, y_ind, xu)))
+      && (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), 
+				 x_ind, yl, y_ind, xu, is_glob)))
     cs.insert (cut);
 
   // 4)
   if (is_boundbox_regular (yu,xl) 
-      && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), x_ind, yu, y_ind, xl)))
+      && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), 
+				 x_ind, yu, y_ind, xl, is_glob)))
     cs.insert (cut);
 }

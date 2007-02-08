@@ -17,6 +17,7 @@
 #include <exprIVar.h>
 #include <exprBound.h>
 
+#include <CouenneCutGenerator.h>
 #include <CouenneProblem.h>
 
 // static vectors for evaluation, see their description in
@@ -108,23 +109,26 @@ inline void expression::getBounds (expression *&lb, expression *&ub) {
 void exprAux::generateCuts (const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  //  printf ("Generate cut for "); 
+  //  print (std::cout);  printf (" := ");
+  //  image_ -> print (std::cout); printf("\n");
+
   int j = cs.sizeRowCuts ();
   image_ -> generateCuts (this, si, cs, cg);
 
-  /*
   bool first=true;
 
-  for (;j < cs.sizeRowCuts ();j++) {
+  if (!(cg -> isFirst ()))
+    for (;j < cs.sizeRowCuts ();j++) {
 
-    if (0 && first) {
-      printf ("----------------Generated cut for "); 
-      print (std::cout);  printf (" := ");
-      image_ -> print (std::cout); printf("\n");
-      first=false;
+      if (first) {
+	printf ("----------------Generated cut for "); 
+	print (std::cout);  printf (" := ");
+	image_ -> print (std::cout); printf("\n");
+	first=false;
+      }
+      cs.rowCutPtr (j) -> print ();
     }
-    cs.rowCutPtr (j) -> print ();
-  }
-  */
 }
 
 

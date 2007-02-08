@@ -166,17 +166,9 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     // first of all, add trivial cut w >= 0 if violated
 
     if (!(intk % 2) && 
-	(cg -> isFirst () || 
-	 !(cg -> addViolated ()) || 
-	 (w < - COUENNE_EPS))) {
-
-      cut = cg -> createCut (0, +1, w_ind, CouNumber (1.));
-
-      //      if (cut) {printf ("Trivial cut: "); cut -> print ();}
-
-      if (cut) 
-	cs.insert (cut);
-    }
+	(cg -> isFirst () || (w < - COUENNE_EPS)) &&
+	(cut = cg -> createCut (0, +1, w_ind, CouNumber (1.), -1, 0., -1, 0., true)))
+      cs.insert (cut);
 
     // create envelope. Choose sign based on k
 

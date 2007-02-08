@@ -19,8 +19,7 @@
 
 void fix_asl_group (psg_elem *g) {
 
-  /*
-   *  All psg_elem represent a sum of elements, and pfg*_read() reads
+  /*  All psg_elem represent a sum of elements, and pfg*_read() reads
    *  the arguments of each unary operation as a group. That is,
    *  suppose we have the expression sin (exp (x0 + 3x1 + 3 +
    *  log(x1))) in a constraint or in an objective. The innermost
@@ -33,17 +32,16 @@ void fix_asl_group (psg_elem *g) {
    *  log(x1)" where it was before.
    *
    *  Well, now that it is isolated, "x0 + 3x1 + 3 + log(x1)" is
-   *  stored as a constant (g->g0 = 3), a set of g->nlin linear terms
-   *  (here we have two, g->nlin=2) and a set of g->ns nonlinear terms
-   *  (here g->ns=1). g->L is an array of g->nlin linpart's,
-   *  containing an information on the coefficient (g->L[i].fac) and
-   *  index (g -> L[j]. v.i) of the term. Finally, g->E is an array of
-   *  expression, here containing only one cell with the expression
-   *  tree for log(x1). 
+   *  stored as a structure with: a constant (g->g0 = 3), a set of
+   *  g->nlin linear terms (here we have two, g->nlin=2) and a set of
+   *  g->ns nonlinear terms (here g->ns=1). g->L is an array of
+   *  g->nlin linpart's, containing an information on the coefficient
+   *  (g->L[i].fac) and index (g -> L[j]. v.i) of the term. Finally,
+   *  g->E is an array of expression, here containing only one cell
+   *  with the expression tree for log(x1).
    *
    *  We need to create an OPSUMLIST expression whose terms are all
    *  the isolated terms in "x0 + 3x1 + 3 + log(x1)".
-   *
    */
 
   int j, nterms = g->ns + g->nlin;
@@ -53,6 +51,8 @@ void fix_asl_group (psg_elem *g) {
 
   if (fabs (g -> g0) > COUENNE_EPS) 
     nterms++;
+
+  printf ("%d terms, g0=%f, %d linear terms\n", nterms, g->g0, g->nlin);
 
   /* argument list and expression of OPSUMLIST */
   arglist = (expr **) malloc (nterms * sizeof (expr *));
@@ -119,7 +119,7 @@ void fix_asl_group (psg_elem *g) {
 
 void free_asl_group (psg_elem *g) {
 
-  int j;
+  register int j;
 
   /* free constant expr_n part */
   if (fabs (g -> g0) > COUENNE_EPS)

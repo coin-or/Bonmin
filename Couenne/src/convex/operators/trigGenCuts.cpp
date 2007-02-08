@@ -35,12 +35,12 @@ void trigGenCuts (exprAux *w, OsiCuts &cs,
 
     // Draw the two horizontal edges first: upper, w <= 1
 
-    cut = cg -> createCut (-1, +1, w_ind, CouNumber (1.));
+    cut = cg -> createCut (-1, +1, w_ind, CouNumber (1.), true);
     cs.insert (cut);
 
     // and lower, w >= -1
 
-    cut = cg -> createCut (+1, -1, w_ind, CouNumber (1.));
+    cut = cg -> createCut (+1, -1, w_ind, CouNumber (1.), true);
     cs.insert (cut);
 
     // Now add the lower/upper envelope
@@ -86,24 +86,24 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
   int w_ind = aux -> Index ();
 
   if ((cut = cg -> createCut (f (lb) - lb, -1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (-1.))))
+			      x_ind, CouNumber (-1.), cg -> isFirst ())))
     cs.insert (cut);
 
   // and right: w + x <= f ub + ub 
 
   if ((cut = cg -> createCut (f (ub) + ub, -1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (1.))))
+			      x_ind, CouNumber (1.), cg -> isFirst ())))
     cs.insert (cut);
 
   // add the lower envelope, right: w - x >= cos ub - ub 
 
   if ((cut = cg -> createCut (f (ub) - ub, +1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (-1.))))
+			      x_ind, CouNumber (-1.), cg -> isFirst ())))
     cs.insert (cut);
 
   // and left: w + x >= cos lb + lb 
 
   if ((cut = cg -> createCut (f (lb) + lb, +1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (1.))))
+			      x_ind, CouNumber (1.), cg -> isFirst ())))
     cs.insert (cut);
 }

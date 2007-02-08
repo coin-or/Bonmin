@@ -70,31 +70,30 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   lb_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   ub_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
 
+
   // fix groups //////////////////////////////////////////////////////////////////////
 
-  if (asl -> P. cps) {
-    /*
-    printf (">>> ps struct, con, %d basic, %d group\n", 
-	    asl -> P. cps -> nb, 
-	    asl -> P. cps -> ng);
-    */
-
-    int ngroups = asl -> P. cps -> ng;
-    for (int i=0; i<ngroups; i++) 
-      fix_asl_group (asl -> P. cps -> g + i);
-  }
-
   if (asl -> P. ops) {
-    /*
+
     printf (">>> ps struct, obj, %d basic, %d group\n",
             asl -> P. ops -> nb, 
 	    asl -> P. ops -> ng);
-    */
 
     int ngroups = asl -> P. ops -> ng;
 
     for (int i=0; i<ngroups; i++)
       fix_asl_group (&(asl -> P. ops -> g [i]));
+  }
+
+  if (asl -> P. cps) {
+
+    printf (">>> ps struct, con, %d basic, %d group\n", 
+	    asl -> P. cps -> nb, 
+	    asl -> P. cps -> ng);
+
+    int ngroups = asl -> P. cps -> ng;
+    for (int i=0; i<ngroups; i++) 
+      fix_asl_group (asl -> P. cps -> g + i);
   }
 
 

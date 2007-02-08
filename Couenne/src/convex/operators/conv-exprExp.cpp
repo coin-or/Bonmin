@@ -48,22 +48,19 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	  (w + oppslope*x > expl + oppslope*l)) &&
       ((cut = cg -> createCut (expl + oppslope*l, -1, 
 			       w_ind, CouNumber (1.), 
-			       x_ind, oppslope)))) {
-
-    //    printf ("Exp upper: "); cut -> print ();
+			       x_ind, oppslope, 
+			       -1, 0., 
+			       cg -> isFirst ())))) // set global only
+						    // at first call
     cs.insert (cut);
-  }
+
 
   // lower convexification: start with trivial envelope w >= 0
 
-  if (check || (w < - COUENNE_EPS)) {
-
-    if ((cut = cg -> createCut (CouNumber (0.), +1, w_ind, CouNumber (1.)))) {
-
-      //      printf ("Exp trivial: "); cut -> print ();
+  if (cg -> isFirst () &&
+      (cut = cg -> createCut (CouNumber (0.), +1, w_ind, CouNumber (1.), 
+			      -1, 0., -1, 0., true)))
       cs.insert (cut);
-    }
-  }
 
   // add tangent points: first choose sampling points
 

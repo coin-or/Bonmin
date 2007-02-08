@@ -23,7 +23,7 @@ exprAux *exprSub::standardize (CouenneProblem *p) {
 }
 
 
-// generate convexification cut for constraint w = this
+// generate convexification cut for constraint w = x - y
 
 void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
@@ -31,41 +31,28 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if (!(cg -> isFirst ()))
     return;
 
-  CouNumber *coeff = new CouNumber [3];
-  int       *index = new int       [3];
-  OsiRowCut *cut   = new OsiRowCut;    
+  OsiRowCut *cut;
 
-  CouNumber rhs = 0;
-  int nvars = 1;
+  expression *x = arglist_ [0];
+  expression *y = arglist_ [1];
 
-  coeff [0] = -1; 
-  index [0] = w -> Index ();
+  int wind = w -> Index ();
+  int xind = x -> Index ();
+  int yind = y -> Index ();
 
-  // first term
+  if (x->Type() == CONST) {
 
-  if (arglist_ [0] -> Type () == CONST)
-    rhs = - arglist_ [0] -> Value ();
-  else {
-    coeff [nvars] =  1; 
-    index [nvars] = arglist_ [0] -> Index ();
-    ++nvars;
+    CouNumber c = x -> Value ();
+
+    if (y->Type() == CONST) cut = cg -> createCut (c - y->Value(), 0, wind, 1.);
+    else                    cut = cg -> createCut (c,              0, wind, 1., yind, 1.);
   }
+  else
+    if (y->Type() == CONST) cut = cg -> createCut (y->Value(),     0, wind, -1., xind, 1.);
+    else                    cut = cg -> createCut (0.,             0, wind, -1., xind, 1., yind, -1.);
 
-  // second term
-
-  if (arglist_ [1] -> Type () == CONST)
-    rhs += arglist_ [1] -> Value ();
-  else {
-    coeff [nvars] =  -1; 
-    index [nvars] = arglist_ [1] -> Index ();
-    ++nvars;
+  if (cut) {
+    cut -> setGloballyValid ();
+    cs.insert (cut);
   }
-
-  cut -> setUb (rhs);
-  cut -> setLb (rhs);
-  cut -> setRow (nvars, index, coeff);
-
-  //  printf ("Sub: "); cut -> print ();
-
-  cs.insert (cut);
 }

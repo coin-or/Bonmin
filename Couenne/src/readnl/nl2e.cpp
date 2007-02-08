@@ -56,7 +56,8 @@ expression *nl2e (expr2 *e) {
   case FLOOR:   printf ("floor not implemented\n"); return new exprConst (0);
   case CEIL:    printf ("ceil not implemented\n"); return new exprConst (0);
   case ABS:     return new exprAbs (nl2e (e -> L.e));
-  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
+    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
+  case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
   case OPIFnl:  printf ("ifnl not implemented\n"); return new exprConst (0);
   case OP_tanh: printf ("tanh not implemented\n"); return new exprConst (0);
   case OP_tan:  

@@ -12,10 +12,15 @@
 #include <CouenneTypes.h>
 #include <CouenneCutGenerator.h>
 
+
+// general procedure for inserting a linear cut with up to three
+// variables
+
 OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign, 
 					   int i1, CouNumber c1,
 					   int i2, CouNumber c2,
-					   int i3, CouNumber c3) const {
+					   int i3, CouNumber c3,
+					   bool is_global) const {
 
   // a maximum of three terms are allowed here. Index -1 means the
   // term is not considered
@@ -36,13 +41,28 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
     if (i2 >= 0) violation     += c2 * X (i2);
     if (i3 >= 0) violation     += c3 * X (i3);
 
-    if      ((violation >   COUENNE_EPS) && (sign <= 0)) check = true;
-    else if ((violation < - COUENNE_EPS) && (sign >= 0)) check = true;
+    if      ((violation >   1e-2) && (sign <= 0)) check = true;
+    else if ((violation < - 1e-2) && (sign >= 0)) check = true;
   }
 
   if (check) { // that is, if this is the first call, if we also want
 	       // unviolated cuts, or if it is violated
+    /*
+    printf ("violated: ");
 
+    if (i1>=0) printf (" %+.2f x%d", c1, i1);
+    if (i2>=0) printf (" %+.2f x%d", c2, i2);
+    if (i3>=0) printf (" %+.2f x%d", c3, i3);
+
+    printf (" %c %+.2f ", ((sign < 0) ? '<' : ((sign > 0) ? '>': '=')), rhs);
+
+    printf ("------- ");
+    if (i1>=0) printf (" x%d = %+.2f", i1, X (i1));
+    if (i2>=0) printf (" x%d = %+.2f", i2, X (i2));
+    if (i3>=0) printf (" x%d = %+.2f", i3, X (i3));
+
+    printf ("\n");
+    */
     CouNumber *coeff = new CouNumber [nterms]; 
     int       *index = new int       [nterms];
     OsiRowCut *cut   = new OsiRowCut;
@@ -58,6 +78,8 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
 
     delete [] coeff;
     delete [] index;
+
+    cut -> setGloballyValid (is_global);
 
     return cut;
   }
