@@ -12,15 +12,15 @@ AUTOMAKE_OPTIONS = foreign
 #                          Subdirectories                              #
 ########################################################################
 
-SUBDIRS = src test
+SUBDIRS = src
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball
 
-#if ALWAYS_FALSE
-#  SUBDIRS += test
-#endif
+if ALWAYS_FALSE
+  SUBDIRS += test
+endif
 
 ########################################################################
 #             Additional files to be included in tarball               #

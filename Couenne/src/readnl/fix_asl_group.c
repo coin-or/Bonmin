@@ -52,7 +52,7 @@ void fix_asl_group (psg_elem *g) {
   if (fabs (g -> g0) > COUENNE_EPS) 
     nterms++;
 
-  printf ("%d terms, g0=%f, %d linear terms\n", nterms, g->g0, g->nlin);
+  /*  printf ("%d terms, g0=%f, %d linear terms\n", nterms, g->g0, g->nlin); */
 
   /* argument list and expression of OPSUMLIST */
   arglist = (expr **) malloc (nterms * sizeof (expr *));
