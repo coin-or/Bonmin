@@ -130,11 +130,11 @@ class CouenneCutGenerator: public CglCutGenerator {
   // create cut and check violation
   OsiRowCut *createCut (CouNumber, // rhs
 			int,       // sign: -1: <=, 0: =, +1: >=
-			int,    CouNumber,    // index, coeff of first term
-			int=-1, CouNumber=0., //              of second term 
-			                      // (-1 means don't consider)
-			int=-1, CouNumber=0., //              of third term
-			bool=false) const;    // is it a global cut?
+        	 		   // index, coeff  (index = -1 means "don't consider") 
+			int,    CouNumber,    // of first  term
+			int=-1, CouNumber=0., // of second term 
+			int=-1, CouNumber=0., // of third  term
+			bool = false) const;  // is it a global cut? No, by default
 
   // add general linear envelope to convex function, given its
   // variables' indices, the (univariate) function and its first
@@ -153,7 +153,7 @@ class CouenneCutGenerator: public CglCutGenerator {
 		   CouNumber, CouNumber, int) const;
 
   // add half-plane corresponding to tangent in given point
-  void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int) const;
+  //  void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int) const;
 };
 
 #endif

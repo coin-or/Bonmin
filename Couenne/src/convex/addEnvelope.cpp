@@ -44,8 +44,11 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
       sample += step;
     }
   } else if (convtype_ == CURRENT_ONLY) {
-    if (fabs (opp_slope) < COUENNE_INFINITY)
-    addTangent (cs, w_ind, x_ind, x, f (x), fprime (x), sign);
+    if ((fabs (opp_slope) < COUENNE_INFINITY) &&
+	((cut = createCut (f (x) + opp_slope * x, sign, w_ind, 1., 
+			  x_ind, opp_slope, -1, 0., is_global))))
+      cs.insert (cut);
+      //      addTangent (cs, w_ind, x_ind, x, f (x), fprime (x), sign);
   }
   else {
 

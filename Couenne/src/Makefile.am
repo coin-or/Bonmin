@@ -54,7 +54,6 @@ libCouenne_la_SOURCES = \
 	convex/operators/trigGenCuts.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
-	convex/operators/add_tangent.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
 	problem/problem.cpp \
