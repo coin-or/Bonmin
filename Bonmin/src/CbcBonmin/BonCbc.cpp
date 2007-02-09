@@ -269,7 +269,7 @@ namespace Bonmin
         numGen++;
       }
       if (par.oaDecMaxTime>0.) {
-        model.addCutGenerator(&oaDec,1,"Outer Approximation local enumerator");
+        model.addCutGenerator(&oaDec,-99,"Outer Approximation local enumerator");
         OACutGenerator2 * oaDecCopy = dynamic_cast<OACutGenerator2 *>
             (model.cutGenerators()[numGen]->generator());
         assert(oaDecCopy);

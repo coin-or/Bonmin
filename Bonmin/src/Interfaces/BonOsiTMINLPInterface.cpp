@@ -141,7 +141,7 @@ register_general_options
 
   roptions->AddStringOption4("nodeselect_stra",
       "Choose the node selection strategy.",
-      "best-bound",
+      "dynamic",
       "best-bound", "choose node whith the smallest bound,",
       "depth-first", "Perform depth first search,",
       "breadth-first", "Perform breadth first search,",

@@ -31,7 +31,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
 {
   double num=CoinDrand48();
   const int & depth = info.level;
-  double beta=16;
+  double beta=10000;
   if(depth == 0) return;
   if(num> beta*pow(2,-depth))
     return;
@@ -40,14 +40,14 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
   //  std::cout<<"Constraint violation: "<<violation<<std::endl;
 
   //Get a random number
-  if(violation <= 1e-02)
+  if(violation <= 1e-12)
     return;
   std::cout<<"Generating ECP cuts"<<std::endl;
   solverManip * lpManip = NULL;
   bool infeasible = false;
   for(int i = 0 ; i < numRounds_ ; i++)
   {
-    if( violation > 1e-02)
+    if( violation > 1e-06)
     {
       int numberCuts =  - cs.sizeRowCuts();
       const double * toCut = parameter().addOnlyViolated_?
