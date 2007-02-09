@@ -1,5 +1,5 @@
 /*
- * Name:    exprDiv.C
+ * Name:    exprDiv.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of divisions
  *

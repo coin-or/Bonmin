@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprDiv.C
+ * Name:    conv-exprDiv.cpp
  * Author:  Pietro Belotti
  * Purpose: standardization and convexification methods for divisions
  *
@@ -22,7 +22,7 @@ exprAux *exprDiv::standardize (CouenneProblem *p) {
 }
 
 
-// check if bounding box is suitable for a multiplication
+// check if bounding box is suitable for a multiplication/division
 // convexification constraint
 
 bool is_boundbox_regular (CouNumber b1, CouNumber b2) {
@@ -80,7 +80,7 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // set convexifier cuts global only if this is the broadest
   // convexification (that is, we are at the initial variable bounds).
-  bool is_glob = cg -> isFirst();
+  bool is_glob = cg -> isFirst ();
 
   // 1) 
   if (is_boundbox_regular (yl, wl)

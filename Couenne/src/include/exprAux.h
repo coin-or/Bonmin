@@ -108,10 +108,6 @@ class exprAux: public exprVar {
   // generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *);
-
-  // generate equality between *this and *w
-  //  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-  //		     OsiCuts &cs, const CouenneCutGenerator *cg);
 };
 
 #endif

@@ -182,7 +182,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	|| ((u < - COUENNE_EPS) && (intk % 2) && (k > COUENNE_EPS)))
       sign = -1;
 
-    // concave envelope -- when k negative, add only if bounds are far from 0
+    // upper envelope -- when k negative, add only if bounds are far from 0
 
     if ((  (k > COUENNE_EPS)
 	|| (l > COUENNE_EPS)

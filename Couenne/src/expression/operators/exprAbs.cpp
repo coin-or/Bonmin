@@ -21,22 +21,32 @@ void exprAbs::getBounds (expression *&lb, expression *&ub) {
 
   argument_ -> getBounds (lba, uba);
 
+  /*
   expression **all = new expression * [6];
-  expression **alu = new expression * [6];
+  //  expression **alu = new expression * [6];
 
-  all [0] = new exprConst (0);  alu [0] = new exprConst (0);
-  all [2] = new exprOpp (lba);  alu [2] = new exprOpp (new exprClone (lba));
-  all [4] = uba;                alu [4] = new exprClone (uba);
+  all [0] = new exprConst (0);  //alu [0] = new exprConst (0);
+  all [2] = new exprOpp (lba);  //alu [2] = new exprOpp (new exprClone (lba));
+  all [4] = uba;                //alu [4] = new exprClone (uba);
 
   all [1] = new exprConst (0);  
-  alu [1] = new exprMax (new exprOpp (new exprClone (lba)), new exprClone (uba));
+  //  alu [1] = new exprMax (new exprOpp (new exprClone (lba)), new exprClone (uba));
 
-  all [3] = new exprClone (lba); alu [3] = new exprClone (uba);
+  all [3] = new exprClone (lba); 
+  //  alu [3] = new exprClone (uba);
+
   all [5] = new exprOpp (new exprClone (uba));
-  alu [5] = new exprOpp (new exprClone (lba));
+  //  alu [5] = new exprOpp (new exprClone (lba));
 
   lb = new exprMin (all, 6);
-  ub = new exprMin (alu, 6);
+  //  ub = new exprMin (alu, 6);
+  */
+
+  lb = new exprMax (new exprConst (0),
+		    new exprMax (new exprOpp (uba), lba));
+
+  ub = new exprMax (new exprAbs (new exprClone (lba)), 
+		    new exprAbs (new exprClone (uba)));
 }
 
 

@@ -15,6 +15,7 @@
 #include <exprBound.h>
 
 #include <CouenneProblem.h>
+#include <CouenneCutGenerator.h>
 
 
 // is the variable one of those in varlist?
@@ -45,8 +46,13 @@ void exprVar::getBounds (expression *&lb, expression *&ub) {
 
 void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+  OsiRowCut *cut;
 
-  OsiRowCut *cut = new OsiRowCut;
+  if ((cut = cg -> createCut (0., 0, w -> Index (), 1., 
+			      varIndex_, -1., -1, 0., true)))
+    cs.insert (cut);
+  /*
+ = new OsiRowCut;
 
   CouNumber *coeff = new CouNumber [2];  
   int       *index = new int       [2];  
@@ -58,6 +64,7 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
   coeff [1] = -1; index [1] = varIndex_;
 
   cs.insert (cut);
+  */
 }
 
 

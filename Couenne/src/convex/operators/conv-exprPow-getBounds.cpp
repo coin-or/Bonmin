@@ -24,7 +24,12 @@
 // based on the lower/upper bounds of x and y
 
 void exprPow::getBounds (expression *&lb, expression *&ub) {
+  /*
+  lb = new exprConst (-COUENNE_INFINITY);
+  ub = new exprConst (COUENNE_INFINITY);
 
+  return;
+  */
   // We have a standardized expression of the form w = x^y, where x or
   // y could be constant. Let us study each case separately.
 
@@ -46,6 +51,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 
     expression *lbbase, *ubbase;
     arglist_ [0] -> getBounds (lbbase, ubbase);
+
+    //    printf ("ubbase = "); ubbase -> print (std::cout); printf ("\n"); 
 
     if (arglist_ [1] -> Type () == CONST) { 
 

@@ -32,7 +32,7 @@ class CouenneCutGenerator: public CglCutGenerator {
   // number of cuts currently in pool
   int ncuts_;
 
-  // array of pointers to linearization cuts
+  // array of pointers to linearization cuts. Only used within Bonmin
   OsiRowCut **pool_;
 
   // for use with Bonmin. It is NULL when used normally
@@ -53,8 +53,7 @@ class CouenneCutGenerator: public CglCutGenerator {
   // how many cuts should be added for each function?
   int nSamples_;
 
-  // pointer to symbolic representation of constraint, variables, and
-  // bounds
+  // pointer to symbolic repr. of constraint, variables, and bounds
   CouenneProblem *problem_;
 
  public:
@@ -151,9 +150,6 @@ class CouenneCutGenerator: public CglCutGenerator {
   void addSegment (OsiCuts &, int, int,
 		   CouNumber, CouNumber, 
 		   CouNumber, CouNumber, int) const;
-
-  // add half-plane corresponding to tangent in given point
-  //  void addTangent (OsiCuts &, int, int, CouNumber, CouNumber, CouNumber, int) const;
 };
 
 #endif

@@ -117,9 +117,12 @@ int main (int argc, char **argv) {
 
 
   printf ("           x           lb             ub\n");
-  for (int i=0; i < cg -> getnvars (); i++)
-    printf ("%3d %12.3f %12.3f %12.3f\n", i, x [i], l [i], u [i]);
-
+  for (int i=0; i < cg -> getnvars (); i++) {
+    printf ("%3d %12.3f %12.3f %12.3f", i, x [i], l [i], u [i]);
+    if (i >= cg -> Problem () -> nVars ())
+      cg -> Problem () -> Aux (i - cg -> Problem () -> nVars ()) -> Lb () -> print (std::cout);
+    printf ("\n");
+  }
 
   // do whatever preprocessing on x, l, u within Bonmin 
 

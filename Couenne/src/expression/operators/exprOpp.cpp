@@ -1,5 +1,5 @@
 /*
- * Name:    exprOpp.C
+ * Name:    exprOpp.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of the opposite -f(x) of a function
  *
@@ -13,12 +13,12 @@
 
 void exprOpp::getBounds (expression *&lb, expression *&ub) {
 
-    expression *lba, *uba;
-    argument_ -> getBounds (lba, uba);
+  expression *lba, *uba;
+  argument_ -> getBounds (lba, uba);
 
-    lb = new exprOpp (uba);
-    ub = new exprOpp (lba);
-  }
+  lb = new exprOpp (uba);
+  ub = new exprOpp (lba);
+}
 
 
 // differentiation

@@ -63,7 +63,7 @@ class exprMax: public exprOp {
     {return NONLINEAR;}
 
   // Get lower and upper bound of an expression (if any)
-  void getBounds (expression *&, expression *&);
+  //  void getBounds (expression *&, expression *&);
 
   // reduce expression in standard form, creating additional aux
   // variables (and constraints)

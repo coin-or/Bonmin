@@ -1,7 +1,7 @@
 /*
- * Name:    exprLog.C
+ * Name:    exprLog.cpp
  * Author:  Pietro Belotti
- * Purpose: definition of logarithm
+ * Purpose: methods for class logarithm
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
@@ -20,17 +20,20 @@
 
 void exprLog::getBounds (expression *&lb, expression *&ub) {
 
-    expression *lba, *uba;
-    argument_ -> getBounds (lba, uba);
+  expression *lba, *uba;
+  argument_ -> getBounds (lba, uba);
 
-    expression **all = new expression * [4];
+  expression **all = new expression * [4];
 
-    all [0] = new exprConst (COUENNE_EPS); all [1] = new exprConst (- COUENNE_INFINITY);
-    all [2] = new exprClone (argument_);   all [3] = new exprLog (lba);
+  all [0] = new exprConst (COUENNE_EPS); 
+  all [1] = new exprConst (- COUENNE_INFINITY);
 
-    lb = new exprMax (all, 4);
-    ub = new exprLog (uba);
-  }
+  all [2] = new exprClone (argument_);   
+  all [3] = new exprLog (lba);
+
+  lb = new exprMax (all, 4);
+  ub = new exprLog (uba);
+}
 
 
 // differentiation
@@ -50,4 +53,3 @@ expression *exprLog::differentiate (int index) {
 
 void exprLog::print (std::ostream& out) const 
 {exprUnary::print (out, "log", PRE);}
-

@@ -86,7 +86,7 @@ class exprUpperBound: public exprVar {
   const std::string name () const;
 
   // I/O
-  void print (std::ostream &out) 
+  void print (std::ostream &out) const
     {out << "u_" << varIndex_;}
 
   // return the value of the variable

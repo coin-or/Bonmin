@@ -30,16 +30,16 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
   argument_ -> getBounds (lba, uba);
 
   expression **all = new expression * [6];
-  all [0] = new exprConst (0);                   all [1] = new exprConst (- COUENNE_INFINITY); 
-  all [2] = new exprOpp   (new exprClone (lba)); all [3] = new exprInv   (new exprClone (uba)); 
-  all [4] = new exprClone (uba);                 all [5] = new exprInv   (new exprClone (lba)); 
+  all [0] = new exprConst (0);       all [1] = new exprConst (- COUENNE_INFINITY);  // l<0<u
+  all [2] = new exprOpp   (lba);     all [3] = new exprInv   (uba);                 // 0<l<u
+  all [4] = new exprClone (uba);     all [5] = new exprInv   (new exprClone (uba)); // l<u<0
 
   lb = new exprMin (all, 6);
 
   expression **alu = new expression * [6];
-  alu [0] = new exprConst (0);       alu [1] = new exprConst (COUENNE_INFINITY); 
-  alu [2] = new exprClone (all [2]); alu [3] = new exprClone (all [5]); 
-  alu [4] = new exprClone (uba);     alu [5] = new exprClone (all [3]); 
+  alu [0] = new exprConst (0);       alu [1] = new exprConst (COUENNE_INFINITY);   // l<0<u
+  alu [2] = new exprClone (all [2]); alu [3] = new exprInv (new exprClone (lba));  // 0<l<u
+  alu [4] = new exprClone (uba);     alu [5] = new exprInv (new exprClone (lba));  // l<u<0
 
   ub = new exprMin (alu, 6);
 }
@@ -47,10 +47,8 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 
 #define MIN_DENOMINATOR 1e-10
 
-inline CouNumber oppInvSqr (CouNumber x) {
-  CouNumber invx = inv (x); 
-  return (- invx * invx);
-}
+inline CouNumber oppInvSqr (register CouNumber x) 
+{return (- inv (x*x));}
 
 
 // generate convexification cut for constraint w = this

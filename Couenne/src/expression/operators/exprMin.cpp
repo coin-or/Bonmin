@@ -1,5 +1,5 @@
 /*
- * Name:    exprMin.C
+ * Name:    exprMin.cpp
  * Author:  Pietro Belotti
  * Purpose: convexification methods for min operator 
  *

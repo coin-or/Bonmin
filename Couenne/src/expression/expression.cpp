@@ -97,7 +97,7 @@ bool exprOp::dependsOn (int *varlist = NULL, int n = 1) {
 
 // Get lower and upper bound of a generic expression
 
-inline void expression::getBounds (expression *&lb, expression *&ub) {
+void expression::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprConst (- COUENNE_INFINITY);
   ub = new exprConst (  COUENNE_INFINITY);
@@ -162,7 +162,7 @@ std::string Coutoa (CouNumber x) {
 }
 
 std::string Indtoa (int i) {
-  char s [50];
+  char s [20];
   sprintf (s, "%d", i);
   return std::string (s);
 }

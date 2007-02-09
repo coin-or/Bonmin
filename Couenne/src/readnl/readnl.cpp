@@ -1,5 +1,5 @@
 /*
- * Name:    readnl.C
+ * Name:    readnl.cpp
  * Author:  Pietro Belotti
  * Purpose: define a reader for .nl files. Adapted from ampl2ev3 by L. Liberti and S. Galli 
  *
@@ -45,19 +45,21 @@ extern "C" {
   void free_asl_group (psg_elem *);
 }
 
+
 // Reads a MINLP from an AMPL .nl file through the ASL methods
 
 int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
-  int i;
+  int n_intvar = niv + nbv + nlvbi;
 
   // create discrete variables
-  for (i=0; i<niv+nbv+nlvbi; i++)
-    addVariable (true);
+  for (int i = n_var-n_intvar; i--;)
+    addVariable (false);
 
   // create continuous variables
-  for (; i<n_var; i++)
-    addVariable (false);
+  for (int i = n_intvar; i--;)
+    addVariable (true);
+
   /*
   printf ("%d linear integer\n", niv);
   printf ("%d linear binary\n",  nbv);

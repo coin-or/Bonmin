@@ -52,13 +52,13 @@ inline CouNumber exprLBMul::operator () () {
   register CouNumber n = *sp--;
   CouNumber nD;
 
-  if (d>0)
-    if   (n>0) return n*d;
-    else       return n*D;
+  if (d>=0)
+    if   (n>=0) return n*d;
+    else        return n*D;
   else // d <= 0
     if (N>0)
-      if (n<0 && D>0 && N*d > (nD = n*D)) return nD;
-      else                                return N*d;
+      if (n<0 && D>0 && (N*d > (nD = n*D))) return nD;
+      else                                  return N*d;
     else 
       if (D>0) return n*D;
       else     return N*D;
