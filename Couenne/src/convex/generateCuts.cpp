@@ -36,8 +36,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       CouenneConstraint *con = problem_ -> NLCon (i);
 
-      // for constraint lb <= w <= ub, compute actual values of lb, w,
-      // and ub
+      // for constraint lb <= w <= ub, compute actual values of lb, ub
 
       CouNumber lb = con -> Lb () -> Value ();
       CouNumber ub = con -> Ub () -> Value ();
@@ -53,15 +52,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       orc -> setRow (1, index, coeff);
 
-      if (lb > - COUENNE_INFINITY + 1) orc -> setLb  (lb);
-      if (ub <   COUENNE_INFINITY - 1) orc -> setUb  (ub);
+      if (lb > - COUENNE_INFINITY + 1) orc -> setLb (lb);
+      if (ub <   COUENNE_INFINITY - 1) orc -> setUb (ub);
 
       cs.insert (orc);
     }
   }
   else {
 
-    // Retrieve, from si, variable and bounds of all variables, if not
+    // Retrieve, from si, value and bounds of all variables, if not
     // firstcall, otherwise only those of the original ones Update
     // expression structure with x, l, u
 

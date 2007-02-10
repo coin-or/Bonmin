@@ -1,7 +1,7 @@
 /*
- * Name:    conv-exprAbs.C
+ * Name:    conv-exprAbs.cpp
  * Author:  Pietro Belotti
- * Purpose: convexification methods for absolute value 
+ * Purpose: convexification methods for |f(x)|
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -28,10 +28,8 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   if (cg -> isFirst ()) {
 
-    if ((cut = cg -> createCut (0., +1, w_ind, 1., x_ind, -1., -1, 0., true)))
-      cs.insert (cut);
-    if ((cut = cg -> createCut (0., +1, w_ind, 1., x_ind,  1., -1, 0., true)))
-      cs.insert (cut);
+    if ((cut = cg -> createCut (0., +1, w_ind, 1., x_ind, -1.))) cs.insert (cut);
+    if ((cut = cg -> createCut (0., +1, w_ind, 1., x_ind,  1.))) cs.insert (cut);
   }
 
   // add an upper segment, which depends on the lower/upper bounds

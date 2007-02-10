@@ -18,10 +18,10 @@
 
 exprAux *exprSum::standardize (CouenneProblem *p) {
 
-  // try a different approach: FLATTEN sum and reduce it to something
-  // similar to a psg_elem: a sum of linear terms plus a constant plus
-  // some nonlinear terms. (It only makes sense when there is at least
-  // one monomial
+  // TODO: Try a different approach. FLATTEN sum and reduce it to
+  // something similar to a psg_elem: a sum of linear terms plus a
+  // constant plus some nonlinear terms. (It only makes sense when
+  // there is at least one monomial
 
   //  exprGroup *sum = new exprGroup (arglist_, nargs_);
 
@@ -65,8 +65,8 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   }
 
   cut -> setRow (nv, index, coeff);
-  cut -> setLb (-rhs);
   cut -> setUb (-rhs);
+  cut -> setLb (-rhs);
 
   delete [] index;
   delete [] coeff;

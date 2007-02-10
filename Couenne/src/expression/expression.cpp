@@ -1,5 +1,5 @@
 /*
- * Name:    expression.C
+ * Name:    expression.cpp
  * Author:  Pietro Belotti
  * Purpose: methods of the expression class
  *
@@ -140,17 +140,10 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			      OsiCuts &cs, const CouenneCutGenerator *cg) {
 
-  OsiRowCut *cut = new OsiRowCut;
+  OsiRowCut *cut;
 
-  CouNumber *coeff = new CouNumber [1];  
-  int       *index = new int       [1];  
-
-  cut -> setLb (currValue_);
-  cut -> setUb (currValue_);
-
-  coeff [0] = 1; index [0] = w -> Index ();
-
-  cs.insert (cut);
+  if ((cut = cg -> createCut (currValue_, 0, w -> Index (), 1.)))
+    cs.insert (cut);
 }
 
 
