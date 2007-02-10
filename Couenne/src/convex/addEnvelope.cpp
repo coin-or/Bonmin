@@ -13,7 +13,8 @@
 #include <CouenneCutGenerator.h>
 
 void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
-				       unary_function f, unary_function fprime, 
+				       unary_function f,      // function to approximate
+				       unary_function fprime, // derivative of the function 
 				       int w_ind, int x_ind, 
 				       CouNumber x, CouNumber l, CouNumber u,
 				       bool is_global) const {

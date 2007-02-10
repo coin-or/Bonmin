@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprLog.C
+ * Name:    conv-exprLog.cpp
  * Author:  Pietro Belotti
  * Purpose: convexification and bounding methods for the logarithm operator
  *
@@ -25,12 +25,10 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   argument_ -> getBounds (le, ue);
 
-  CouNumber w = (*aux) (),
+  CouNumber// w = (*aux) (),
             x = (*argument_) (),
             l = (*le) (),
             u = (*ue) ();
-
-  bool check = cg -> isFirst () || !(cg -> addViolated ());
 
   OsiRowCut *cut;
 
@@ -43,15 +41,14 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     l = COUENNE_EPS;
   else   // lower segment (only put if lower bound is far enough from
 	 // zero and upper is finite
-    if ((u < COUENNE_INFINITY - 1) && 
-	(check || ((w-log(l) * (u-l) < (x-l) * log(u)*log(l) - COUENNE_EPS)))) {
+    if (u < COUENNE_INFINITY - 1) { 
 
       CouNumber dx   = u-l;
       CouNumber logu = log (u);
       CouNumber dw   = logu - log (l);
 
       if ((cut = cg -> createCut (dx*logu - u*dw, +1, w_ind, dx, 
-				  x_ind, -dw, -1, 0., cg -> isFirst ())))
+				  x_ind, -dw)))
 	cs.insert (cut);
     }
 

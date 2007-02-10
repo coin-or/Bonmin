@@ -45,11 +45,13 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-#define MIN_DENOMINATOR 1e-10
+// derivative of inv (x)
 
 inline CouNumber oppInvSqr (register CouNumber x) 
 {return (- inv (x*x));}
 
+
+#define MIN_DENOMINATOR 1e-10
 
 // generate convexification cut for constraint w = this
 
@@ -83,8 +85,7 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux       -> Index (), 
       x_ind = argument_ -> Index ();
 
-  // choose sampling points. If unbounded, re-bound using a rule of
-  // thumb
+  // choose sampling points. If unbounded, bound using a rule of thumb
 
   int ns = cg -> nSamples ();
 

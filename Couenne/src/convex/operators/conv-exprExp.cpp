@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprExp.C
+ * Name:    conv-exprExp.cpp
  * Author:  Pietro Belotti
  * Purpose: convexification and bounding methods for the exponential operator
  *
@@ -14,8 +14,6 @@
 #include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>
 
-#define MULT_FACTOR 10
-
 
 // generate convexification cut for constraint w = this
 
@@ -26,41 +24,35 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   argument_ -> getBounds (le, ue);
 
-  CouNumber w = (*aux) (),
-            x = (*argument_) (),
+  CouNumber x = (*argument_) (),
             l = (*le) (),
             u = (*ue) ();
-
-  bool check = cg -> isFirst () || !(cg -> addViolated ());
 
   int w_ind = aux       -> Index (),
       x_ind = argument_ -> Index ();
 
   OsiRowCut *cut;
 
+  int j = cs.sizeRowCuts ();
+
   // upper segment
 
-  CouNumber expl = exp (l);
-  CouNumber oppslope = (expl - exp (u)) / (u - l);
+  if ((   u < log (COUENNE_INFINITY) - 1) 
+      && (l > -    COUENNE_INFINITY  + 1)) {
 
-  if ((u < COUENNE_INFINITY - 1) 
-      && (check || 
-	  (w + oppslope*x > expl + oppslope*l)) &&
-      ((cut = cg -> createCut (expl + oppslope*l, -1, 
-			       w_ind, CouNumber (1.), 
-			       x_ind, oppslope, 
-			       -1, 0., 
-			       cg -> isFirst ())))) // set global only
-						    // at first call
-    cs.insert (cut);
+    CouNumber expl     = exp (l),
+              oppslope = (expl - exp (u)) / (u - l);
 
+    if ((cut = cg -> createCut (expl + oppslope*l, -1, 
+				w_ind, CouNumber (1.), 
+				x_ind, oppslope)))
+      cs.insert (cut);
+  }
 
   // lower convexification: start with trivial envelope w >= 0
 
-  if (cg -> isFirst () &&
-      (cut = cg -> createCut (CouNumber (0.), +1, w_ind, CouNumber (1.), 
-			      -1, 0., -1, 0., true)))
-      cs.insert (cut);
+  if ((cut = cg -> createCut (CouNumber (0.), +1, w_ind, CouNumber (1.))))
+    cs.insert (cut);
 
   // add tangent points: first choose sampling points
 
@@ -68,19 +60,23 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   // fix bounds to get finite coefficients
 
-  if (l < - COUENNE_INFINITY + 1) {
-    if (u > COUENNE_INFINITY - 1) {
-      
-      l = - log (MULT_FACTOR) * ns/2;
-      u =   log (MULT_FACTOR) * ns/2;
-    } else 
-      l = u - log (2) * ns;
+  CouNumber fact = 2 * ns;
 
-  } else if (u > COUENNE_INFINITY - 1) 
-    u = l + log (2) * ns;
-
+  if (x > COUENNE_EPS) {
+    l = x / fact;
+    u = x * fact;
+  }
+  else if (x < -COUENNE_EPS) {
+    l = x * fact;
+    u = x / fact;
+  }
+  else {
+    l = - ns;
+    u = ns;
+  }
+    
   // approximate the exponential function from below
-  cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u);
+  cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u, true);
 
   delete le;
   delete ue;

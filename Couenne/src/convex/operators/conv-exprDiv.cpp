@@ -78,27 +78,23 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   OsiRowCut *cut;
 
-  // set convexifier cuts global only if this is the broadest
-  // convexification (that is, we are at the initial variable bounds).
-  bool is_glob = cg -> isFirst ();
-
   // 1) 
   if (is_boundbox_regular (yl, wl)
-      && (cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl, is_glob)))
+      && (cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl)))
     cs.insert (cut);
 
   // 2) 
   if (is_boundbox_regular (yu, wu)
-      && (cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu, is_glob)))
+      && (cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu)))
     cs.insert (cut);
 
   // 3) 
   if (is_boundbox_regular (yl, wu)
-      && (cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu, is_glob)))
+      && (cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu)))
     cs.insert (cut);
 
   // 4) 
   if (is_boundbox_regular (yu, wl)
-      && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl, is_glob)))
+      && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
 }

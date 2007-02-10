@@ -41,13 +41,19 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
     if (i2 >= 0) violation     += c2 * X (i2);
     if (i3 >= 0) violation     += c3 * X (i3);
 
-    if      ((violation >   1e-2) && (sign <= 0)) check = true;
-    else if ((violation < - 1e-2) && (sign >= 0)) check = true;
+    if      ((violation >   COUENNE_EPS) && (sign <= 0)) check = true;
+    else if ((violation < - COUENNE_EPS) && (sign >= 0)) check = true;
   }
 
-  if (check) { // that is, if this is the first call, if we also want
-	       // unviolated cuts, or if it is violated
-    /*
+  if (!check) return NULL;
+
+  // You are here if:
+  //
+  // 1) this is the first call
+  // 2) we also want unviolated cuts, 
+  // 3) the cut is violated
+
+  /*
     printf ("violated: ");
 
     if (i1>=0) printf (" %+.2f x%d", c1, i1);
@@ -62,26 +68,29 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
     if (i3>=0) printf (" x%d = %+.2f", i3, X (i3));
 
     printf ("\n");
-    */
-    CouNumber *coeff = new CouNumber [nterms]; 
-    int       *index = new int       [nterms];
-    OsiRowCut *cut   = new OsiRowCut;
+  */
 
-    coeff [0] = c1; index [0] = i1;
-    if (i2 >= 0) {coeff [1] = c2; index [1] = i2;}
-    if (i3 >= 0) {coeff [2] = c3; index [2] = i3;}
+  CouNumber *coeff = new CouNumber [nterms]; 
+  int       *index = new int       [nterms];
+  OsiRowCut *cut   = new OsiRowCut;
 
-    if (sign <= 0) cut -> setUb (rhs);
-    if (sign >= 0) cut -> setLb (rhs);
+  coeff [0] = c1; index [0] = i1;
+  if (i2 >= 0) {coeff [1] = c2; index [1] = i2;}
+  if (i3 >= 0) {coeff [2] = c3; index [2] = i3;}
 
-    cut -> setRow (nterms, index, coeff);
+  if (sign <= 0) cut -> setUb (rhs);
+  if (sign >= 0) cut -> setLb (rhs);
 
-    delete [] coeff;
-    delete [] index;
+  cut -> setRow (nterms, index, coeff);
 
-    cut -> setGloballyValid (is_global);
+  delete [] coeff;
+  delete [] index;
 
-    return cut;
-  }
-  else return NULL;
+  // some convexification cuts (as the lower envelopes of convex
+  // functions) are global, hence here is a tool to make them valid
+  // throughout the code
+
+  cut -> setGloballyValid (is_global);
+
+  return cut;
 }

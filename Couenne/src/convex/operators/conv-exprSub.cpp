@@ -1,5 +1,5 @@
 /*
- * Name:    exprSub.C
+ * Name:    exprSub.cpp
  * Author:  Pietro Belotti
  * Purpose: convexification methods for the Subtraction class
  *
@@ -31,6 +31,8 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if (!(cg -> isFirst ()))
     return;
 
+  // only add one cut at the beginning
+
   OsiRowCut *cut;
 
   expression *x = arglist_ [0];
@@ -40,14 +42,14 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int xind = x -> Index ();
   int yind = y -> Index ();
 
-  if (x->Type() == CONST) {
+  if (x->Type() == CONST) { // (c - y) or (c - d)
 
     CouNumber c = x -> Value ();
 
     if (y->Type() == CONST) cut = cg -> createCut (c - y->Value(), 0, wind, 1.);
     else                    cut = cg -> createCut (c,              0, wind, 1., yind, 1.);
   }
-  else
+  else // (x - y) or (x - d)
     if (y->Type() == CONST) cut = cg -> createCut (y->Value(),     0, wind, -1., xind, 1.);
     else                    cut = cg -> createCut (0.,             0, wind, -1., xind, 1., yind, -1.);
 

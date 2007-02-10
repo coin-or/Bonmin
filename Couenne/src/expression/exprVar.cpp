@@ -1,7 +1,7 @@
 /*
- * Name:    expression.C
+ * Name:    exprVar.cpp
  * Author:  Pietro Belotti
- * Purpose: methods of the expression class
+ * Purpose: methods of the class for defining variables
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -51,20 +51,6 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((cut = cg -> createCut (0., 0, w -> Index (), 1., 
 			      varIndex_, -1., -1, 0., true)))
     cs.insert (cut);
-  /*
- = new OsiRowCut;
-
-  CouNumber *coeff = new CouNumber [2];  
-  int       *index = new int       [2];  
-
-  cut -> setLb (0);
-  cut -> setUb (0);
-
-  coeff [0] =  1; index [0] = w -> Index ();
-  coeff [1] = -1; index [1] = varIndex_;
-
-  cs.insert (cut);
-  */
 }
 
 

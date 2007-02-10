@@ -43,15 +43,6 @@ class exprSin: public exprUnary {
   virtual inline void getBounds (expression *&lb, expression *&ub)
     {lb = new exprConst (-1); ub = new exprConst (1);}
 
-  // (p is used to add convexification constraints)
-  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
-  // construct linear over-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int upperLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);

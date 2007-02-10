@@ -47,8 +47,6 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   int ns = cg -> nSamples ();
 
-  //  printf ("Power: \n"); 
-
   if (l < - COUENNE_INFINITY + 1) {
     if (u > COUENNE_INFINITY - 1) {
 

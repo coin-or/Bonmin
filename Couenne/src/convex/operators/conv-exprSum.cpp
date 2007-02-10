@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprSum.C
+ * Name:    conv-exprSum.cpp
  * Author:  Pietro Belotti
  * Purpose: methods to standardize/convexify sum expressions
  *
@@ -17,6 +17,13 @@
 // Create standard formulation of sums of expressions
 
 exprAux *exprSum::standardize (CouenneProblem *p) {
+
+  // try a different approach: FLATTEN sum and reduce it to something
+  // similar to a psg_elem: a sum of linear terms plus a constant plus
+  // some nonlinear terms. (It only makes sense when there is at least
+  // one monomial
+
+  //  exprGroup *sum = new exprGroup (arglist_, nargs_);
 
   // first of all, standardize all operands
   exprOp::standardize (p);
@@ -41,18 +48,19 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   CouNumber rhs = 0;
 
+  // first, make room for aux variable
   coeff [0] = -1.; index [0] = w -> Index ();
 
   int nv = 1;
 
+  // scan arglist for (aux) variables and constants
   for (int i=0; i<nargs_; i++) {
 
     if (arglist_ [i] -> Type () == CONST)
       rhs += arglist_ [i] -> Value ();
     else {
-      coeff [nv] = 1.; 
-      index [nv] = arglist_ [i] -> Index ();
-      nv++;
+      coeff [nv]   = 1.; 
+      index [nv++] = arglist_ [i] -> Index ();
     }
   }
 
@@ -63,9 +71,8 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   delete [] index;
   delete [] coeff;
 
+  // added only once, it is global
   cut -> setGloballyValid ();
-
-  //  printf ("Sum: "); cut -> print ();
 
   cs.insert (cut);
 }

@@ -1,5 +1,5 @@
 /*
- * Name:    exprSum.C
+ * Name:    exprSum.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of sum expressions
  *

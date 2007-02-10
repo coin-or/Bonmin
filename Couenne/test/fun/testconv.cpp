@@ -115,12 +115,14 @@ int main (int argc, char **argv) {
   // The bounds (value) of each auxiliary variable is computed
   // as a function of the bounds (values) of the original variables 
 
-
   printf ("           x           lb             ub\n");
   for (int i=0; i < cg -> getnvars (); i++) {
-    printf ("%3d %12.3f %12.3f %12.3f", i, x [i], l [i], u [i]);
-    if (i >= cg -> Problem () -> nVars ())
+    printf ("%3d %12.3f %12.3f %12.3f ", i, x [i], l [i], u [i]);
+    if (i >= cg -> Problem () -> nVars ()) {
       cg -> Problem () -> Aux (i - cg -> Problem () -> nVars ()) -> Lb () -> print (std::cout);
+      printf (" ");
+      cg -> Problem () -> Aux (i - cg -> Problem () -> nVars ()) -> Ub () -> print (std::cout);
+    }
     printf ("\n");
   }
 

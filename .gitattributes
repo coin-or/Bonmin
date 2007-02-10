@@ -30,7 +30,6 @@ Couenne/src/convex/operators/conv-exprPow.cpp -text
 Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
-Couenne/src/convex/operators/trigGenCuts.cpp -text
 Couenne/src/convex/update_conv.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/exprVar.cpp -text

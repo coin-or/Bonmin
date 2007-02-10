@@ -71,7 +71,6 @@ void trigGenCuts (exprAux *, OsiCuts &, const CouenneCutGenerator *, unary_funct
 void addHexagon (const CouenneCutGenerator *, // pointer to the caller cut generator 
 		 OsiCuts &,      // cut set to be enriched
 		 unary_function, // sine or cosine
-		 bool,           // should violation be checked before adding cut?
 		 exprAux *,      // auxiliary variable
 		 expression *);  // argument of cos/sin (should be a variable)
 

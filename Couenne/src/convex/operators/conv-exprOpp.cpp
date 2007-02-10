@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprOpp.C
+ * Name:    conv-exprOpp.cpp
  * Author:  Pietro Belotti
  * Purpose: methods to convexify opposite of expressions
  *
@@ -22,7 +22,7 @@ void exprOpp::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   OsiRowCut *cut;
 
-  if ((cut = cg -> createCut (0., 0, w -> Index (), 1., 
-			      argument_ -> Index (), +1., -1, 0., true)))
+  if (cg -> isFirst () && 
+      (cut = cg -> createCut (0., 0, w->Index (), 1., argument_->Index (), 1.)))
     cs.insert (cut);
 }

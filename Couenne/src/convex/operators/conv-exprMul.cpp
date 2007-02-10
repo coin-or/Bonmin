@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprMul.C
+ * Name:    conv-exprMul.cpp
  * Author:  Pietro Belotti
  * Purpose: methods to convexify multiplications
  *
@@ -19,9 +19,9 @@
 // check if two arguments point to the same variable
 
 inline bool areSameVariables (expression *v1, expression *v2) {
-  return ((((v1 -> Type () == VAR) || (v1 -> Type () == AUX)) &&
-	   ((v2 -> Type () == VAR) || (v2 -> Type () == AUX))) 
-	  && (v1 -> Index () == v2 -> Index ()));
+  return (((v1 -> Type () == VAR) || (v1 -> Type () == AUX)) &&
+	  ((v2 -> Type () == VAR) || (v2 -> Type () == AUX)) && 
+	  (v1 -> Index () == v2 -> Index ()));
 }
 
 
@@ -55,24 +55,39 @@ exprAux *exprMul::standardize (CouenneProblem *p) {
 
 void exprMul::getBounds (expression *&lb, expression *&ub) {
 
-  int i;
+  int i=2;
 
   if ((arglist_ [i=0] -> Type () == CONST) ||
       (arglist_ [i=1] -> Type () == CONST)) {
 
-    // expression is of the type c*x
-
     CouNumber c = arglist_ [i] -> Value ();
 
-    expression *lbi, *ubi;
-    arglist_ [1-i] -> getBounds (lbi, ubi);
+    if (!i && (arglist_ [1] -> Type () == CONST)) { 
 
-    if (c >= 0) {
-      lb = new exprMul (new exprConst (c), lbi);
-      ub = new exprMul (new exprConst (c), ubi);
-    } else {
-      lb = new exprMul (new exprConst (c), ubi);
-      ub = new exprMul (new exprConst (c), lbi);
+      // !i means i==0, or the first is constant. If you are here,
+      // both are constant, which should not happen. Anyway...
+
+      CouNumber prod = c * arglist_ [1] -> Value ();
+
+      lb = new exprConst (prod);
+      ub = new exprConst (prod);
+
+      return;
+    }
+    else {
+
+      // expression is of the type c*x
+
+      expression *lbi, *ubi;
+      arglist_ [1-i] -> getBounds (lbi, ubi);
+
+      if (c >= 0) {
+	lb = new exprMul (new exprConst (c), lbi);
+	ub = new exprMul (new exprConst (c), ubi);
+      } else {
+	lb = new exprMul (new exprConst (c), ubi);
+	ub = new exprMul (new exprConst (c), lbi);
+      }
     }
   }
   else {
@@ -100,10 +115,11 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
 bool is_boundbox_regular (CouNumber, CouNumber);
 
 
-// generate convexification cut for constraint w = this
+// generate convexification cut for constraint w = x*y
 
 void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+
 
   // get bounds of numerator and denominator
 
@@ -120,7 +136,8 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
       x_ind = xe -> Index (), 
       y_ind = ye -> Index ();
 
-  // if expression is c*x, with c constant, everything gets easier...
+  // if expression is c*x, with c constant, the expression is
+  // linear. Add one convexification equality constraint, once.
 
   if ((xe -> Type () == CONST) || 
       (ye -> Type () == CONST)) {
@@ -171,29 +188,27 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   //
   // if the corresponding bounds are finite
 
-  bool is_glob = cg -> isFirst ();
-
   // 1)
-  if (is_boundbox_regular (yl,xl) 
+  if (is_boundbox_regular (yl, xl)
       && (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), 
-				 x_ind, yl, y_ind, xl, is_glob)))
+				 x_ind, yl, y_ind, xl)))
     cs.insert (cut);
 
   // 2)
-  if (is_boundbox_regular (yu,xu) 
+  if (is_boundbox_regular (yu, xu)
       && (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), 
-				 x_ind, yu, y_ind, xu, is_glob)))
+				 x_ind, yu, y_ind, xu)))
     cs.insert (cut);
 
   // 3)
-  if (is_boundbox_regular (yl,xu) 
+  if (is_boundbox_regular (yl, xu)
       && (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), 
-				 x_ind, yl, y_ind, xu, is_glob)))
+				 x_ind, yl, y_ind, xu)))
     cs.insert (cut);
 
   // 4)
-  if (is_boundbox_regular (yu,xl) 
+  if (is_boundbox_regular (yu, xl)
       && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), 
-				 x_ind, yu, y_ind, xl, is_glob)))
+				 x_ind, yu, y_ind, xl)))
     cs.insert (cut);
 }
