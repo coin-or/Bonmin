@@ -59,7 +59,7 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   if (i2 >= 0) {coeff [1] = c2; index [1] = i2;}
   if (i3 >= 0) {coeff [2] = c3; index [2] = i3;}
 
-  if (sign <= 0) cut -> setUb (rhs+100);
+  if (sign <= 0) cut -> setUb (rhs);
   if (sign >= 0) cut -> setLb (rhs);
 
   cut -> setRow (nterms, index, coeff);
