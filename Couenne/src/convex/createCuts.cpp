@@ -31,9 +31,7 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   if (i2 >= 0) nterms++;
   if (i3 >= 0) nterms++;
 
-  bool check = isFirst () || !(addViolated ());
-
-  if (!check) { // need to check violation 
+  if (!firstcall_ && addviolated_) { // need to check violation 
 
     // compute violation
 
@@ -41,34 +39,17 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
     if (i2 >= 0) violation     += c2 * X (i2);
     if (i3 >= 0) violation     += c3 * X (i3);
 
-    if      ((violation >   COUENNE_EPS) && (sign <= 0)) check = true;
-    else if ((violation < - COUENNE_EPS) && (sign >= 0)) check = true;
+    // return NULL if not violated
+    if (((violation <   COUENNE_EPS) || (sign > 0)) &&
+	((violation > - COUENNE_EPS) || (sign < 0)))
+      return NULL;
   }
-
-  if (!check) return NULL;
 
   // You are here if:
   //
-  // 1) this is the first call
-  // 2) we also want unviolated cuts, 
+  // 1) this is the first call to CouenneCutGenerator::generateCuts()
+  // 2) we also want unviolated cuts
   // 3) the cut is violated
-
-  /*
-    printf ("violated: ");
-
-    if (i1>=0) printf (" %+.2f x%d", c1, i1);
-    if (i2>=0) printf (" %+.2f x%d", c2, i2);
-    if (i3>=0) printf (" %+.2f x%d", c3, i3);
-
-    printf (" %c %+.2f ", ((sign < 0) ? '<' : ((sign > 0) ? '>': '=')), rhs);
-
-    printf ("------- ");
-    if (i1>=0) printf (" x%d = %+.2f", i1, X (i1));
-    if (i2>=0) printf (" x%d = %+.2f", i2, X (i2));
-    if (i3>=0) printf (" x%d = %+.2f", i3, X (i3));
-
-    printf ("\n");
-  */
 
   CouNumber *coeff = new CouNumber [nterms]; 
   int       *index = new int       [nterms];
@@ -78,7 +59,7 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   if (i2 >= 0) {coeff [1] = c2; index [1] = i2;}
   if (i3 >= 0) {coeff [2] = c3; index [2] = i3;}
 
-  if (sign <= 0) cut -> setUb (rhs);
+  if (sign <= 0) cut -> setUb (rhs+100);
   if (sign >= 0) cut -> setLb (rhs);
 
   cut -> setRow (nterms, index, coeff);

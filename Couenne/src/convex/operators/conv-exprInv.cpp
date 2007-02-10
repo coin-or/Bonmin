@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprInv.C
+ * Name:    conv-exprInv.cpp
  * Author:  Pietro Belotti
  * Purpose: convexification and bounding methods for the inverse operator
  *
@@ -53,7 +53,7 @@ inline CouNumber oppInvSqr (register CouNumber x)
 
 #define MIN_DENOMINATOR 1e-10
 
-// generate convexification cut for constraint w = this
+// generate convexification cut for constraint w = 1/x
 
 void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {

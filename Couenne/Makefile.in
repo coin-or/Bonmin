@@ -258,7 +258,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 #                          Subdirectories                              #
 ########################################################################
-SUBDIRS = src test $(am__append_1)
+SUBDIRS = src $(am__append_1)
 
 ########################################################################
 #             Additional files to be included in tarball               #

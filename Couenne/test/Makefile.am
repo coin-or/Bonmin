@@ -12,16 +12,10 @@ AUTOMAKE_OPTIONS = foreign
 #                        testfun for Feline                            #
 ########################################################################
 
-noinst_PROGRAMS = testconv testeval clp_solver
+noinst_PROGRAMS = testconv testeval
 
-clp_solver_SOURCES = fun/clp_solver.cpp
 testconv_SOURCES = fun/testconv.cpp
 testeval_SOURCES = fun/testeval.cpp
-
-# List libraries of COIN projects
-clp_solver_LDADD = \
-	$(COINLIBS) \
-	$(ADDLIBS)
 
 # List libraries of COIN projects
 testconv_LDADD = \
