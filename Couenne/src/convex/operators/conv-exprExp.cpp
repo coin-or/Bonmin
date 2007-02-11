@@ -33,8 +33,6 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   OsiRowCut *cut;
 
-  int j = cs.sizeRowCuts ();
-
   // upper segment
 
   if ((   u < log (COUENNE_INFINITY) - 1) 

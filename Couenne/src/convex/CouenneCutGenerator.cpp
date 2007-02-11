@@ -38,6 +38,8 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   //  printf ("======================================\n");
   problem_ -> standardize ();
   //  problem_ -> print (std::cout);
+
+  problem_ -> writeMod ("extended.mod");
 }
 
 

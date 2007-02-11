@@ -82,9 +82,9 @@ int main (int argc, char **argv) {
   // that only violated cuts should be generated)
   CouenneCutGenerator *cg = new CouenneCutGenerator 
     ((ASL_pfgh *) asl,  // ASL interface to the problem
-     true,              // Do we want to get the violated cuts only?
+     false,             // Do we want to get the violated cuts only?
      CURRENT_ONLY,      // how should convexification pick their sampling point 
-     2);                // how many samples?
+     4);                // how many samples?
 
   // The constructor also sets all variable's bounds and initializes
   // them according to the information retrieved from the ASL_pfgh

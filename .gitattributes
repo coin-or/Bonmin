@@ -82,6 +82,7 @@ Couenne/src/include/operators/exprSum.h -text
 Couenne/src/include/rootQ.h -text
 Couenne/src/problem/constraint.cpp -text
 Couenne/src/problem/problem.cpp -text
+Couenne/src/problem/problemIO.cpp -text
 Couenne/src/readnl/fix_asl_group.c -text
 Couenne/src/readnl/invmap.c -text
 Couenne/src/readnl/nl2e.cpp -text

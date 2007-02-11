@@ -42,8 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = testconv$(EXEEXT) testeval$(EXEEXT) \
-	clp_solver$(EXEEXT)
+noinst_PROGRAMS = testconv$(EXEEXT) testeval$(EXEEXT)
 
 # If we have the Ampl solver library, we need to add additional things
 @COIN_HAS_ASL_TRUE@am__append_1 = $(ASL_CPPFLAGS)
@@ -58,22 +57,19 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_couenne.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_clp_solver_OBJECTS = clp_solver.$(OBJEXT)
-clp_solver_OBJECTS = $(am_clp_solver_OBJECTS)
-am__DEPENDENCIES_1 = $(CGLOBJDIR)/src/libCgl.la \
+am_testconv_OBJECTS = testconv.$(OBJEXT)
+testconv_OBJECTS = $(am_testconv_OBJECTS)
+am__DEPENDENCIES_1 =
+am__DEPENDENCIES_2 = $(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-am__DEPENDENCIES_2 =
-clp_solver_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
-am_testconv_OBJECTS = testconv.$(OBJEXT)
-testconv_OBJECTS = $(am_testconv_OBJECTS)
-testconv_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+testconv_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
 am_testeval_OBJECTS = testeval.$(OBJEXT)
 testeval_OBJECTS = $(am_testeval_OBJECTS)
-testeval_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+testeval_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -84,10 +80,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(clp_solver_SOURCES) $(testconv_SOURCES) \
-	$(testeval_SOURCES)
-DIST_SOURCES = $(clp_solver_SOURCES) $(testconv_SOURCES) \
-	$(testeval_SOURCES)
+SOURCES = $(testconv_SOURCES) $(testeval_SOURCES)
+DIST_SOURCES = $(testconv_SOURCES) $(testeval_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -247,15 +241,8 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-clp_solver_SOURCES = fun/clp_solver.cpp
 testconv_SOURCES = fun/testconv.cpp
 testeval_SOURCES = fun/testeval.cpp
-
-# List libraries of COIN projects
-clp_solver_LDADD = \
-	$(COINLIBS) \
-	$(ADDLIBS)
-
 
 # List libraries of COIN projects
 testconv_LDADD = \
@@ -343,9 +330,6 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-clp_solver$(EXEEXT): $(clp_solver_OBJECTS) $(clp_solver_DEPENDENCIES) 
-	@rm -f clp_solver$(EXEEXT)
-	$(CXXLINK) $(clp_solver_LDFLAGS) $(clp_solver_OBJECTS) $(clp_solver_LDADD) $(LIBS)
 testconv$(EXEEXT): $(testconv_OBJECTS) $(testconv_DEPENDENCIES) 
 	@rm -f testconv$(EXEEXT)
 	$(CXXLINK) $(testconv_LDFLAGS) $(testconv_OBJECTS) $(testconv_LDADD) $(LIBS)
@@ -359,7 +343,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clp_solver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testconv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testeval.Po@am__quote@
 
@@ -383,20 +366,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
-
-clp_solver.o: fun/clp_solver.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT clp_solver.o -MD -MP -MF "$(DEPDIR)/clp_solver.Tpo" -c -o clp_solver.o `test -f 'fun/clp_solver.cpp' || echo '$(srcdir)/'`fun/clp_solver.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/clp_solver.Tpo" "$(DEPDIR)/clp_solver.Po"; else rm -f "$(DEPDIR)/clp_solver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/clp_solver.cpp' object='clp_solver.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o clp_solver.o `test -f 'fun/clp_solver.cpp' || echo '$(srcdir)/'`fun/clp_solver.cpp
-
-clp_solver.obj: fun/clp_solver.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT clp_solver.obj -MD -MP -MF "$(DEPDIR)/clp_solver.Tpo" -c -o clp_solver.obj `if test -f 'fun/clp_solver.cpp'; then $(CYGPATH_W) 'fun/clp_solver.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/clp_solver.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/clp_solver.Tpo" "$(DEPDIR)/clp_solver.Po"; else rm -f "$(DEPDIR)/clp_solver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/clp_solver.cpp' object='clp_solver.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o clp_solver.obj `if test -f 'fun/clp_solver.cpp'; then $(CYGPATH_W) 'fun/clp_solver.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/clp_solver.cpp'; fi`
 
 testconv.o: fun/testconv.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT testconv.o -MD -MP -MF "$(DEPDIR)/testconv.Tpo" -c -o testconv.o `test -f 'fun/testconv.cpp' || echo '$(srcdir)/'`fun/testconv.cpp; \

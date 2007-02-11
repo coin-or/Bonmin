@@ -174,9 +174,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     int sign = +1;
 
     // invert sign if (k is odd negative and l<0) or (k is in [0,1])
-    if ((   l < - COUENNE_EPS) 
-	&& (k < - COUENNE_EPS) 
-	&& (intk % 2)
+    if ((l < - COUENNE_EPS) && (k < - COUENNE_EPS) && (intk % 2)
 	|| (fabs (k-0.5) < 0.5 - COUENNE_EPS)
 	|| ((u < - COUENNE_EPS) && (intk % 2) && (k > COUENNE_EPS)))
       sign = -1;

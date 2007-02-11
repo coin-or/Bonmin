@@ -19,6 +19,7 @@
 #include <CouenneProblemElem.h>
 
 struct ASL_pfgh;
+struct expr2;
 
 // The CouenneProblem class
 
@@ -107,6 +108,13 @@ class CouenneProblem {
 
   // read problem from .nl file using the Ampl Solver Library (ASL)
   int readnl (const struct ASL_pfgh *);
+
+  // read problem from .nl file using the Ampl Solver Library (ASL)
+  expression *nl2e (struct expr2 *);
+
+  // store nonlinear problem into a .mod file (with lots of defined
+  // variables)
+  void writeMod (char *);
 };
 
 

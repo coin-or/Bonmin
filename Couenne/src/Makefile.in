@@ -105,9 +105,10 @@ am__libCouenne_la_SOURCES_DIST = expression/operators/exprAbs.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
-	problem/problem.cpp problem/constraint.cpp \
-	convex/update_conv.cpp util/rootQ.c readnl/readnl.cpp \
-	readnl/nl2e.cpp readnl/invmap.c readnl/fix_asl_group.c
+	problem/problem.cpp problem/problemIO.cpp \
+	problem/constraint.cpp convex/update_conv.cpp util/rootQ.c \
+	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c \
+	readnl/fix_asl_group.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
 @COIN_HAS_ASL_TRUE@	fix_asl_group.lo
 am_libCouenne_la_OBJECTS = exprAbs.lo exprDiv.lo exprExp.lo exprInv.lo \
@@ -120,7 +121,7 @@ am_libCouenne_la_OBJECTS = exprAbs.lo exprDiv.lo exprExp.lo exprInv.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo CouenneCutGenerator.lo generateCuts.lo \
-	problem.lo constraint.lo update_conv.lo rootQ.lo \
+	problem.lo problemIO.lo constraint.lo update_conv.lo rootQ.lo \
 	$(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -345,8 +346,9 @@ libCouenne_la_SOURCES = expression/operators/exprAbs.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
-	problem/problem.cpp problem/constraint.cpp \
-	convex/update_conv.cpp util/rootQ.c $(am__append_1)
+	problem/problem.cpp problem/problemIO.cpp \
+	problem/constraint.cpp convex/update_conv.cpp util/rootQ.c \
+	$(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -535,6 +537,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nl2e.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problemIO.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readnl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rootQ.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplifiers.Plo@am__quote@
@@ -869,6 +872,13 @@ problem.lo: problem/problem.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/problem.cpp' object='problem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o problem.lo `test -f 'problem/problem.cpp' || echo '$(srcdir)/'`problem/problem.cpp
+
+problemIO.lo: problem/problemIO.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT problemIO.lo -MD -MP -MF "$(DEPDIR)/problemIO.Tpo" -c -o problemIO.lo `test -f 'problem/problemIO.cpp' || echo '$(srcdir)/'`problem/problemIO.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/problemIO.Tpo" "$(DEPDIR)/problemIO.Plo"; else rm -f "$(DEPDIR)/problemIO.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/problemIO.cpp' object='problemIO.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o problemIO.lo `test -f 'problem/problemIO.cpp' || echo '$(srcdir)/'`problem/problemIO.cpp
 
 constraint.lo: problem/constraint.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT constraint.lo -MD -MP -MF "$(DEPDIR)/constraint.Tpo" -c -o constraint.lo `test -f 'problem/constraint.cpp' || echo '$(srcdir)/'`problem/constraint.cpp; \

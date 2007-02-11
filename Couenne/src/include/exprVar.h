@@ -87,21 +87,12 @@ class exprVar: public expression {
   virtual inline int Linearity ()
     {return LINEAR;}
 
+  // is this expression integer?
+  virtual bool isInteger ()
+    {return false;}
+
   // Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
-
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int lowerLinearHull (exprAux *w, int *&, expression ***&, int **&, 
-  //		       expression **&, enum con_sign *&);
-
-  // similarly, construct linear over-estimator for expression within
-  // problem *p (p is used to add convexification constraints). It is
-  // also used when this function appears with a minus sign in the
-  // expression
-  //  inline int upperLinearHull (exprAux *, int *&, expression ***&, int **&, 
-  //		       expression **&, enum con_sign *&)
-  //    {return 0;}
 
   // generate convexification cut for constraint w = this
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 

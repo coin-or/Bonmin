@@ -23,12 +23,12 @@ class CouenneConstraint {
  protected:
 
   // a general constraint is defined as lb_ <= body_ <= ub_, where all
-  // three components are general expressions, depending on variables,
+  // three components are expressions, depending on variables,
   // auxiliaries and bounds. If the constraint is 2 <= exp (x1+x2) <=
   // 4, then:
 
-  // body_ = exp (x1+x2), that is, new exprExp (new exprSum (new
-  // exprVar (1), new exprVar (2)),
+  // body_ = exp (x1+x2), that is, 
+  // new exprExp (new exprSum (new exprVar (1), new exprVar (2)),
   expression *body_;
 
   // while lb_ = new exprConst (2) and ub_ = new exprConst (4).
@@ -80,93 +80,6 @@ class CouenneConstraint {
   void print (std::ostream &);
 };
 
-
-// Linear constraint class, with an array of expression for the
-// coefficients, an array of indices (int) for the variables, a lower
-// bound and an upper bound (both of class expression). 
-/*
-class LinearConstraint {
-
- protected:
-
-  // number of coefficients
-  int nterms_;
-
-  // array of coefficients (all of them are expressions)
-  expression **coeff_;
-
-  // array of indices of variables/auxiliaries associated with coeff
-  int *indices_;
-
-  // right-hand side
-  expression *rhs_;
-
-  // can be COUENNE_EQ, COUENNE_RNG, COUENNE_GE, COUENNE_LE
-  enum con_sign sign_;
-
- public:
-
-  int            nTerms  () {return nterms_;}
-  expression   **Coeff   () {return coeff_;}
-  expression    *Rhs     () {return rhs_;}
-  int           *Indices () {return indices_;}
-  enum con_sign  Sign    () {return sign_;}
-
-  // general constructor: specify array of coefficients and indices,
-  // lower- and upper bound, and sign
-  LinearConstraint  (int nterms         = 0,
-		     expression **coeff = NULL, 
-		     int *indices       = NULL,
-		     expression *rhs    = NULL,
-		     enum con_sign sign = COUENNE_EQ):
-
-    nterms_  (nterms),
-    coeff_   (coeff), 
-    indices_ (indices),
-    rhs_     (rhs),
-    sign_    (sign) 
-    {
-      if (!rhs_) 
-	rhs_ = new exprConst (0);
-    }
-
-  // constructor specific for auxiliary variables: specify auxiliary
-  // variable w, argument of unary function x, its coefficients and
-  // right hand side in the constraint -w + ax >=< b
-  LinearConstraint  (exprAux *w,
-		     exprVar *x,
-		     expression *coeff,
-		     expression *rhs = NULL,
-		     enum con_sign sign = COUENNE_EQ):
-
-    nterms_  (2),
-    coeff_   (new expression * [2]), 
-    indices_ (new int [2]),
-    rhs_     (rhs), 
-    sign_    (sign) 
-    {
-      if (!rhs_) 
-	rhs_ = new exprConst (0);
-
-      coeff_ [0] = new exprConst (-1);    indices_ [0] = w -> Index ();
-      coeff_ [1] = coeff;                 indices_ [1] = x -> Index ();
-
-      coeff_ [0] -> print (std::cout); printf ("  ");
-      coeff_ [1] -> print (std::cout); printf ("\n");
-    }
-
-  // destructor
-  ~LinearConstraint () {
-    while (nterms_--) 
-      delete coeff_ [nterms_];
-    delete [] coeff_;
-    delete [] indices_;
-    if (rhs_) delete rhs_;
-  }
-
-  void print (std::ostream &);
-};
-*/
 
 // Objective function class, with an expression and an optimization
 // direction

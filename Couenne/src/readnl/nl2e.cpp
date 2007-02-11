@@ -36,7 +36,7 @@ extern "C" {
 
 // converts an AMPL expression (sub)tree into an expression* (sub)tree
 
-expression *nl2e (expr2 *e) {
+expression *CouenneProblem::nl2e (expr2 *e) {
 
   expression **al;
   expr **ep;
@@ -107,7 +107,7 @@ expression *nl2e (expr2 *e) {
   case OPPLTERM:  printf ("plterm not implemented\n"); return new exprConst (0);
   case OPIFSYM:   printf ("ifsym not implemented\n"); return new exprConst (0);
   case OPHOL:     printf ("hol not implemented\n"); return new exprConst (0);
-  case OPVARVAL: return new exprVar (e->a);
+  case OPVARVAL: return new exprClone (variables_ [e->a]);
 
   case -1:
   default: printf ("WARNING: unknown operator (address %x)\n", (long int) e -> op); 

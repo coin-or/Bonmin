@@ -113,24 +113,18 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   //  print (std::cout);  printf (" := ");
   //  image_ -> print (std::cout); printf("\n");
 
-  int j = cs.sizeRowCuts ();
   image_ -> generateCuts (this, si, cs, cg);
 
-  bool first=true;
-
-
-  //  if (!(cg -> isFirst ()))
   /*
-    for (;j < cs.sizeRowCuts ();j++) {
-
-      if (first) {
-	printf ("----------------Generated cut for "); 
-	print (std::cout);  printf (" := ");
-	image_ -> print (std::cout); printf("\n");
-	first=false;
-      }
+  static int j=0;
+  //  if (!(cg -> isFirst ())) 
+  {
+    printf ("----------------Generated cut for "); 
+    print (std::cout);  printf (" := ");
+    image_ -> print (std::cout); printf("\n");
+    for (;j < cs.sizeRowCuts ();j++)
       cs.rowCutPtr (j) -> print ();
-    }
+  }
   */
 }
 

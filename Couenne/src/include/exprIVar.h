@@ -26,10 +26,6 @@ class exprIVar: public exprVar {
 
  public:
 
-  // node type
-  //  virtual inline enum nodeType Type () 
-  //    {return VAR;}
-
   // Constructor
   exprIVar (int varIndex):
     exprVar (varIndex) {}
@@ -45,10 +41,6 @@ class exprIVar: public exprVar {
   virtual exprIVar *clone ()
     {return new exprIVar (*this);}
 
-  // get variable index in problem
-  //  inline int Index () const
-  //    {return varIndex_;}
-
   // string equivalent
   const std::string name () const;
 
@@ -56,53 +48,9 @@ class exprIVar: public exprVar {
   virtual void print (std::ostream &out) const
     {out << "y_" << varIndex_;}
 
-  // return the value of the variable
-  //  virtual inline CouNumber operator () () 
-  //    {return (currValue_ = expression::variables_ [varIndex_]);}
-
-  // return the value of the variable
-  //  inline CouNumber Value ()
-  //    {return currValue_;}
-
-  // differentiation
-  //  virtual inline expression *differentiate (int index) 
-  //    {return new exprConst ((index == varIndex_) ? 1 : 0);}
-
-  // dependence on variable set
-  //  virtual bool dependsOn (int *, int);
-
-  // simplify
-  //  inline expression *simplify () 
-  //    {return NULL;}
-
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
-  //  virtual inline int Linearity ()
-  //    {return LINEAR;}
-
-  // Get lower and upper bound of an expression (if any)
-  //  virtual void getBounds (expression *&, expression *&);
-
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int lowerLinearHull (exprAux *w, int *&, expression ***&, int **&, 
-  //		       expression **&, enum con_sign *&);
-
-  // similarly, construct linear over-estimator for expression within
-  // problem *p (p is used to add convexification constraints). It is
-  // also used when this function appears with a minus sign in the
-  // expression
-  //  inline int upperLinearHull (exprAux *, int *&, expression ***&, int **&, 
-  //		       expression **&, enum con_sign *&)
-  //    {return 0;}
-
-  // generate convexification cut for constraint w = this
-  //  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-  //		     OsiCuts &cs, const CouenneCutGenerator *cg);
+  // is this expression integer?
+  virtual bool isInteger ()
+    {return true;}
 };
 
 #endif

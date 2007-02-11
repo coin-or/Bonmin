@@ -1,5 +1,5 @@
 /*
- * Name:    problem.C
+ * Name:    problem.cpp
  * Author:  Pietro Belotti
  * Purpose: methods of the class CouenneProblem
  *
@@ -105,25 +105,14 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
   if ((i = auxMap_ -> find (key)) == auxMap_ -> end ()) {
 
-    //    printf ("....... New exprAux!!! "); 
-    //    symbolic -> print (std::cout);
     std::pair <std::string, exprAux *> newpair;
     newpair.first  = key;
     newpair.second = var = 
       new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
     auxiliaries_ . push_back (var);
     auxMap_ -> insert (newpair);
-    //    printf (" assigned to "); 
-    //    var -> print (std::cout);
-    //    printf ("\n");
   }
-  else {
-    //    symbolic -> print (std::cout);
-    //    printf (" already assigned to "); 
-    var = (*i).second;
-    //    var -> print (std::cout);
-    //    std::cout << "  (" << (*i).first << ")\n";
-  }
+  else var = (*i).second;
 
   return var;
 }
@@ -177,30 +166,6 @@ void CouenneProblem::standardize () {
 
   delete auxMap_;
 }
-
-
-// output content of the problem
-
-void CouenneProblem::print (std::ostream &out = std::cout) {
-
-  printf ("objectives:\n");
-  for (std::vector <Objective *>::iterator i = objectives_.begin ();
-       i != objectives_.end (); i++)
-    (*i) -> print (out);
-
-  printf ("constraints:\n");
-  for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
-       i != constraints_.end (); i++)
-    (*i) -> print (out);
-
-  printf ("auxiliaries:\n");
-  for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
-       i != auxiliaries_.end (); i++) {
-    (*i) -> print (out);             out << " := ";
-    (*i) -> Image () -> print (out); out << std::endl;
-  }
-  printf ("end\n");
-} 
 
 
 // destroy problem components

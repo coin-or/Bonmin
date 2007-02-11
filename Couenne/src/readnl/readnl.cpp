@@ -35,7 +35,7 @@ inline bool is_expr_zero (expr* e)
 
 
 // translates an ASL expression into an expression
-expression *nl2e (expr *);
+//expression *nl2e (expr *);
 
 
 // replaces group in original position within expression tree
@@ -50,7 +50,7 @@ extern "C" {
 
 int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
-  int n_intvar = niv + nbv + nlvbi;
+  int n_intvar = niv + nbv + nlvbi + nlvci + nlvoi;
 
   // create discrete variables
   for (int i = n_var-n_intvar; i--;)
@@ -60,13 +60,6 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   for (int i = n_intvar; i--;)
     addVariable (true);
 
-  /*
-  printf ("%d linear integer\n", niv);
-  printf ("%d linear binary\n",  nbv);
-  printf ("%d int nonlin in both\n", nlvbi);
-  printf ("%d int nonlin in con\n", nlvci);
-  printf ("%d int nonlin in obj\n", nlvoi);
-  */
   // create room for problem's variables and bounds
   x_  = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   lb_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));

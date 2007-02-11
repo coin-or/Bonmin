@@ -56,6 +56,7 @@ libCouenne_la_SOURCES = \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
 	problem/problem.cpp \
+	problem/problemIO.cpp \
 	problem/constraint.cpp \
 	convex/update_conv.cpp \
 	util/rootQ.c

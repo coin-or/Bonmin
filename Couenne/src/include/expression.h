@@ -149,6 +149,10 @@ class expression {
   virtual inline int Linearity ()
     {return NONLINEAR;}
 
+  // is this expression integer?
+  virtual bool isInteger ()
+    {return false;}
+
   // Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
