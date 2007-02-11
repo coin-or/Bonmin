@@ -67,7 +67,7 @@ void CouenneProblem::writeMod (char *fname) {
   }
 
 
-  // defined (aux) variables, with formula ///////////////////////////////////////////
+  // defined (aux) variables, declaration ///////////////////////////////////////////
 
   f << std::endl << "# auxiliary variables" << std::endl << std::endl;
 
@@ -76,7 +76,7 @@ void CouenneProblem::writeMod (char *fname) {
        i++) {
 
     f << "var "; (*i) -> print (f);
-    f << " = ";  (*i) -> Image () -> print (f);
+    //    f << " = ";  (*i) -> Image () -> print (f);
     f << ';' << std::endl;
   }
 
@@ -89,6 +89,18 @@ void CouenneProblem::writeMod (char *fname) {
   else                                         f << "maximize";
 
   f << " obj: ";  objectives_ [0] -> Body () -> print (f); f << ';' << std::endl; 
+
+
+  // defined (aux) variables, with formula ///////////////////////////////////////////
+
+  f << std::endl << "# aux. variables defined" << std::endl << std::endl;
+
+  for (int i=0; i < nAuxs (); i++) {
+
+    f << "aux" << i << ": "; auxiliaries_ [i] -> print (f);
+    f << " = ";  auxiliaries_ [i] -> Image () -> print (f);
+    f << ';' << std::endl;
+  }
 
 
   // write constraints //////////////////////////////////////////////////////////////

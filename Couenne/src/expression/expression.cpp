@@ -77,9 +77,11 @@ void exprUnary::print (std::ostream      &out = std::cout,
 		       const std::string &op = "unknown", 
 		       enum pos           pos = PRE)       const 
 {
-  if (pos == PRE)  out << op << " "; fflush (stdout);
+  if (pos == PRE)  out << op;
+  out << "(";
   argument_ -> print (out);
-  if (pos == POST) out << op; fflush (stdout);
+  out << ")";
+  if (pos == POST) out << op;
 }
 
 
