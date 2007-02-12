@@ -27,8 +27,11 @@ CouenneInterface::CouenneInterface(char **& amplArgs, SmartPtr<TNLPSolver> app):
   {
     const ASL_pfgh* asl = amplModel()->AmplSolverObject();
     ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
+    //Get value of add_only violated option
+    int addOnlyViolatedOa = true;
+    app_->Options()->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     couenneCg_ = new CouenneCutGenerator 
-                       (nc_asl, false, CURRENT_ONLY,1);
+                       (nc_asl, addOnlyViolatedOa, CURRENT_ONLY,1);
   }
 
 /** Copy constructor. */
