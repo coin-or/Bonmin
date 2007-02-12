@@ -108,22 +108,33 @@ extern int usingCouenne;
         feasible = (lp->isProvenOptimal() &&
             !lp->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
         //if value of integers are unchanged then we have to get out
-        bool changed = !feasible;//if lp is infeasible we don't have to check anything
-	if(!changed){
-	  if(!usingCouenne)
-	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+        bool changed = true;//if lp is infeasible we don't have to check anything
+	if(usingCouenne){
+	  if(feasible){	    
+	  isInteger = integerFeasible(lp->getColSolution(), origNumcols);
+	  }
+	  else{
+	    isInteger = 0;
+	    //	  if(!fixed)//fathom on bounds
+	    milpBound = 1e200;
+	  }
 	}
-          if (changed) {
-            isInteger = integerFeasible(lp->getColSolution(), origNumcols);
-          }
-          else {
-            isInteger = 0;
-            //	  if(!fixed)//fathom on bounds
-            milpBound = 1e200;
-          }
+	else{
+	  if(feasible){
+	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+	  }
+	  if (changed) {
+	    isInteger = integerFeasible(lp->getColSolution(), origNumcols);
+	  }
+	  else {
+	    isInteger = 0;
+	    //	  if(!fixed)//fathom on bounds
+	    milpBound = 1e200;
+	  }
+	}
 #ifdef OA_DEBUG
-          printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
-              numberCuts) ;
+	printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
+	       numberCuts) ;
 #endif
       }
 #ifdef OA_DEBUG

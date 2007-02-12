@@ -165,7 +165,6 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
    for(int i = 0 ; i < numcols ; i++)
    {
      if(isInteger(i)){
-	 std::cout<<"Adding integer variable :"<<i<<std::endl;
        si.setInteger(i);
      }
    }
