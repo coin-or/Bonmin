@@ -19,7 +19,6 @@
 
 void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs,  const CouenneCutGenerator *cg) {
-
   expression *le, *ue;
 
   argument_ -> getBounds (le, ue);
@@ -61,12 +60,12 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   CouNumber fact = 2 * ns;
 
   if (x > COUENNE_EPS) {
-    l = x / fact;
-    u = x * fact;
+    l = x / fact - 1;
+    u = x * fact + 1;
   }
   else if (x < -COUENNE_EPS) {
-    l = x * fact;
-    u = x / fact;
+    l = x * fact - 1;
+    u = x / fact + 1;
   }
   else {
     l = - ns;

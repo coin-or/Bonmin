@@ -17,33 +17,21 @@
 
 void exprAbs::getBounds (expression *&lb, expression *&ub) {
 
+  // get bounds of the argument
   expression *lba, *uba;
 
   argument_ -> getBounds (lba, uba);
 
-  /*
+  // lower bound = max (0, lb, -ub)
+
   expression **all = new expression * [6];
-  //  expression **alu = new expression * [6];
+  all [0] = new exprConst (0);   all [1] = new exprConst (0);
+  all [2] = new exprOpp (uba);   all [3] = new exprOpp (new exprClone (uba));
+  all [4] = lba;                 all [5] = new exprClone (lba);
 
-  all [0] = new exprConst (0);  //alu [0] = new exprConst (0);
-  all [2] = new exprOpp (lba);  //alu [2] = new exprOpp (new exprClone (lba));
-  all [4] = uba;                //alu [4] = new exprClone (uba);
+  lb = new exprMax (all, 6);
 
-  all [1] = new exprConst (0);  
-  //  alu [1] = new exprMax (new exprOpp (new exprClone (lba)), new exprClone (uba));
-
-  all [3] = new exprClone (lba); 
-  //  alu [3] = new exprClone (uba);
-
-  all [5] = new exprOpp (new exprClone (uba));
-  //  alu [5] = new exprOpp (new exprClone (lba));
-
-  lb = new exprMin (all, 6);
-  //  ub = new exprMin (alu, 6);
-  */
-
-  lb = new exprMax (new exprConst (0),
-		    new exprMax (new exprOpp (uba), lba));
+  // upper bound = max (|lb|, |ub|)
 
   ub = new exprMax (new exprAbs (new exprClone (lba)), 
 		    new exprAbs (new exprClone (uba)));
@@ -69,7 +57,10 @@ expression *exprAbs::differentiate (int index) {
 // printing
 
 void exprAbs::print (std::ostream& out) const {
+  exprUnary::print (out, "abs", PRE);
+  /*
   out << "|";
   argument_ -> print (out);
   out << "|";
+  */
 }

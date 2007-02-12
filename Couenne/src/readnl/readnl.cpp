@@ -75,7 +75,6 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 	    asl -> P. ops -> ng);
     */
     int ngroups = asl -> P. ops -> ng;
-
     for (int i=0; i<ngroups; i++)
       fix_asl_group (&(asl -> P. ops -> g [i]));
   }
@@ -286,7 +285,7 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     }
   }
 
-  // lower, upper bounds, and initial variables ////////////////////////////////////////
+  // lower and upper bounds ///////////////////////////////////////////////////////////////
 
   if (LUv) {
 
@@ -312,11 +311,28 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
       ub_ [i] =   COUENNE_INFINITY;
     }
 
-  // read lower and upper bounds of variables
-  expression::update (NULL, lb_, ub_);
+  // initial x ////////////////////////////////////////////////////////////////////
 
-  if (X0) for (int i=n_var; i--;) x_ [i] = (havex0 [i]) ? X0 [i] : 0; 
-  else    for (int i=n_var; i--;) x_ [i] = 0.5 * (lb_ [i] + ub_ [i]);
+  if (X0) 
+    for (int i=n_var; i--;) 
+      x_ [i] = (havex0 [i]) ? X0 [i] : 0; 
+  else
+    for (int i=n_var; i--;) {
+
+      CouNumber x, l = lb_ [i], u = ub_ [i];
+
+      if      (l < - COUENNE_INFINITY + 1)
+	if    (u >   COUENNE_INFINITY - 1)  x = 0;
+	else                                x = u;
+      else if (u >   COUENNE_INFINITY - 1)  x = l;
+      else                                  x = 0.5 * (l+u);
+
+      x_ [i] = x;
+    }
+
+  // update expression internal data
+
+  expression::update (x_, lb_, ub_);
 
   delete [] nterms;
   delete [] alists;

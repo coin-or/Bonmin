@@ -78,13 +78,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       l [i] = lc [i];
       u [i] = uc [i];
     }
-    /*
-    printf ("!!!!-------x\n");
-    for (int i=0; i < getnvars (); i++)
-      printf ("%3d %12.9f\n", i, x [i]);
-    */
+
     problem_ ->  update (x,l,u);
-    expression:: update (x,l,u);
+    //    expression:: update (x,l,u);
   }
 
   // For each auxiliary variable, create cut (or set of cuts) violated

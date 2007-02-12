@@ -1,4 +1,4 @@
-add integrality to bound check
-order in convexifying x*y*z*...*(1/w)*(1/t)*...
-linear convexification has an acyclic structure where x are leaves
-check duplicated auxiliary variables
+a) add integrality to bound check
+b) order in convexifying x*y*z*...*(1/w)*(1/t)*...
+c) linear convexification has an acyclic structure where x are leaves
+d) linear combination plus aux. vars into one single aux

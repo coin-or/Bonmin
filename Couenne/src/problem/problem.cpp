@@ -202,11 +202,17 @@ CouenneProblem::~CouenneProblem () {
 
 void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
 
+  static int curr_size = -1;
+
   int nvars = nVars () + nAuxs ();
 
-  x_   = (CouNumber *) realloc (x_,  nvars * sizeof (CouNumber));
-  lb_  = (CouNumber *) realloc (lb_, nvars * sizeof (CouNumber));
-  ub_  = (CouNumber *) realloc (ub_, nvars * sizeof (CouNumber));
+  if (curr_size < nvars) {
+    x_   = (CouNumber *) realloc (x_,  nvars * sizeof (CouNumber));
+    lb_  = (CouNumber *) realloc (lb_, nvars * sizeof (CouNumber));
+    ub_  = (CouNumber *) realloc (ub_, nvars * sizeof (CouNumber));
+
+    curr_size = nvars;
+  }
 
   register int i;
 

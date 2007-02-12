@@ -37,6 +37,10 @@ bool is_boundbox_regular (CouNumber b1, CouNumber b2) {
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+
+  // TODO: Use method on Tawarmalani-Sahinidis //////////////////////////////
+
+
   // get bounds of numerator and denominator
 
   expression *yle, *yue;
