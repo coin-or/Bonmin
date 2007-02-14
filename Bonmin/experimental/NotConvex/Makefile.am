@@ -82,7 +82,8 @@ endif
 
 if COIN_HAS_COUENNE
   AM_CPPFLAGS += \
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include`
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include`\
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch`
 endif
 
 fun_SOURCES = BonCouenne.cpp \

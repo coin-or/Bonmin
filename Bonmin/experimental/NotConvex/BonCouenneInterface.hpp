@@ -49,6 +49,9 @@ class CouenneInterface : public AmplInterface
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
   virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
 
+  const CouenneProblem * couenneProb() const{
+    return couenneCg_->Problem();
+  }
   protected:
   /** The cut generator from couenne. */
   CouenneCutGenerator *couenneCg_;

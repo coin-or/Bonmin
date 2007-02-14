@@ -8,10 +8,16 @@
 // Date : 03/15/2006
 
 
-//Bonmin header files
-#include "BonminConfig.h"
+//Couenne Bonmin interface
 #include "BonCouenneCbc.hpp"
 #include "BonCouenneInterface.hpp"
+
+//Couenne
+#include "CouenneObject.hpp"
+#include "CouenneChooseVariable.hpp"
+
+//Bonmin header files
+#include "BonminConfig.h"
 #include "BonCbcLpStrategy.hpp"
 #include "BonCbcNlpStrategy.hpp"
 #include "BonOsiTMINLPInterface.hpp"
@@ -38,7 +44,7 @@
 //Osi Header files
 #include "OsiClpSolverInterface.hpp"
 #include "OsiAuxInfo.hpp"
-
+#include "OsiBranchingObject.hpp"
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
 #endif
@@ -108,7 +114,7 @@ namespace Bonmin
 
     //Now set-up b&b
     OsiSolverInterface * si;
-
+    CouenneInterface* ci = dynamic_cast<CouenneInterface *>(nlpSolver);
 
     nlpSolver->messageHandler()->setLogLevel(par.nlpLogLevel);
 
@@ -117,7 +123,7 @@ namespace Bonmin
       Bab::branchAndBound(nlpSolver, par);
       return;
     }
-    CouenneInterface * ci = dynamic_cast<CouenneInterface *>(nlpSolver);
+
     if(ci == NULL)
       {
 	std::cerr<<"Can not do Couenne algorithm without a Couenne interface."
@@ -187,9 +193,20 @@ namespace Bonmin
     //   model.setMaxFailure(par.maxFailures);
     //   model.setMaxInfeasible(par.maxInfeasible);
 
-    //TODO add the couenne objects to model
 
-
+    //TODO : Switch to OsiObejcts
+    si->findIntegersAndSOS(false);
+    {
+      const CouenneProblem * couenneProb = ci->couenneProb();
+      int numAuxs = couenneProb->nAuxs();
+      OsiObject ** objects = new OsiObject*[numAuxs];
+      for(int i = 0 ; i < numAuxs; i++)
+	{
+	objects[i] = new CouenneObject (couenneProb->Aux(i));
+	objects[i]->setPriority(9999);
+      }
+    si->addObjects(numAuxs, objects);
+    }
     //Pass over user set branching priorities to Cbc
     {
       //set priorities, prefered directions...
@@ -220,56 +237,7 @@ namespace Bonmin
 
     }
 
-    // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
-    const TMINLP::SosInfo * sos = nlpSolver->model()->sosConstraints();
-    if (!par.disableSos && sos && sos->num > 0) //we have some sos constraints
-    {
-      const int & numSos = sos->num;
-      CbcObject ** objects = new CbcObject*[numSos];
-      const int * starts = sos->starts;
-      const int * indices = sos->indices;
-      const char * types = sos->types;
-      const double * weights = sos->weights;
-      //verify if model has user set priorities
-      bool hasPriorities = false;
-      const int * varPriorities = nlpSolver->getPriorities();
-      int numberObjects = model.numberObjects();
-      if (varPriorities)
-      {
-        for (int i = 0 ; i < numberObjects ; i++) {
-          if (varPriorities[i]) {
-            hasPriorities = true;
-            break;
-          }
-        }
-      }
-      const int * sosPriorities = sos->priorities;
-      if (sosPriorities)
-      {
-        for (int i = 0 ; i < numSos ; i++) {
-          if (sosPriorities[i]) {
-            hasPriorities = true;
-            break;
-          }
-        }
-      }
-      for (int i = 0 ; i < numSos ; i++)
-      {
-        int start = starts[i];
-        int length = starts[i + 1] - start;
-        objects[i] = new CbcSOS(&model, length, &indices[start],
-            &weights[start], i, types[i]);
 
-        objects[i]->setPriority(10);
-        if (hasPriorities && sosPriorities && sosPriorities[i]) {
-          objects[i]->setPriority(sosPriorities[i]);
-        }
-      }
-      model.addObjects(numSos, objects);
-      for (int i = 0 ; i < numSos ; i++)
-        delete objects[i];
-      delete [] objects;
-    }
 
 
     replaceIntegers(model.objects(), model.numberObjects());
