@@ -25,7 +25,34 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     BM_init user_init;
-    return bcp_main(argc, argv, &user_init);
+    int retcode = -1;
+    try {
+      retcode = bcp_main(argc, argv, &user_init);
+    }
+    catch(Bonmin::TNLPSolver::UnsolvedError *E) {
+      E->writeDiffFiles();
+      E->printError(std::cerr);
+   }
+   catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
+     std::cerr<<E.className()<<"::"<<E.methodName()
+              <<std::endl
+              <<E.message()<<std::endl;
+   }
+   catch(CoinError &E) {
+     std::cerr<<E.className()<<"::"<<E.methodName()
+              <<std::endl
+              <<E.message()<<std::endl;
+   }
+   catch (Ipopt::OPTION_INVALID &E)
+   {
+    std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
+   }
+   catch(...) {
+     std::cerr<<" unrecognized exception"<<std::endl;
+     throw;
+   }
+
+    return retcode;
 }
 
 //#############################################################################
