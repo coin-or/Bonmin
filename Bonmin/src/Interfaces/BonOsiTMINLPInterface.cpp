@@ -274,8 +274,8 @@ static void register_OA_options
 
   roptions->AddStringOption2("add_only_violated_oa","Do we add all OA cuts or only the ones violated by current point?",
 			     "no",
-			     "no","",
-			     "yes","","");
+			     "no","Add all cuts",
+			     "yes","Add only violated Cuts","");
   roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
       "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
       0,10,
@@ -2553,8 +2553,7 @@ bool OsiTMINLPInterface::isProvenPrimalInfeasible() const
 /// Is dual infeasiblity proven?
 bool OsiTMINLPInterface::isProvenDualInfeasible() const
 {
-  throw SimpleError("Don't have this optimization status yet.",
-      "isProvenDualInfeasible");
+  return (optimization_status_ == TNLPSolver::unbounded);
 }
 /// Is the given primal objective limit reached?
 bool OsiTMINLPInterface::isPrimalObjectiveLimitReached() const
