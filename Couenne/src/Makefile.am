@@ -19,6 +19,7 @@ lib_LTLIBRARIES = libCouenne.la
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = \
 	branch/CouenneBranchingObject.cpp \
+	branch/CouenneObject.cpp \
 	branch/CouenneChooseVariable.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
@@ -117,6 +118,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # and that therefore should be installed in 'install'
 include_HEADERS = \
 	../inc/config_couenne.h \
+	branch/CouenneObject.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
 	include/operators/exprAbs.h \

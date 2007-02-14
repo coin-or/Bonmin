@@ -53,16 +53,6 @@ class exprMul: public exprOp {
   // Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
-  // construct linear over-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int upperLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
   // reduce expression in standard form, creating additional aux
   // variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);
@@ -70,6 +60,10 @@ class exprMul: public exprOp {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  // return an index to the variable's argument that is better fixed
+  // in a branching rule for solving a nonconvexity gap
+  int getFixIndex () {return arglist_ [0] -> Index ();}
 };
 
 

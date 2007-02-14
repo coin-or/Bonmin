@@ -34,10 +34,6 @@ inline bool is_expr_zero (expr* e)
 			  )));} 
 
 
-// translates an ASL expression into an expression
-//expression *nl2e (expr *);
-
-
 // replaces group in original position within expression tree
 
 extern "C" {
@@ -72,11 +68,7 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
   for (int k=0; k<n_obj; k++)
     if ((asl -> P. ops [k]. nb) || (asl -> P. ops [k]. ng)) {
-      /*
-      printf (">>> obj %d: %d basic, %d group\n", k,
-	      asl -> P. ops [k]. nb, 
-	      asl -> P. ops [k]. ng);
-      */
+
       int ngroups = asl -> P. ops [k]. ng;
       for (int i=0; i<ngroups; i++)
 	fix_asl_group (&(asl -> P. ops [k]. g [i]));
@@ -86,40 +78,11 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
   for (int k=0; k<n_con; k++)
     if ((asl -> P. cps [k]. nb) || (asl -> P. cps [k]. ng)) {
-      /*
-      printf (">>> con %d: %d basic, %d group\n", k,
-	      asl -> P. cps [k]. nb, 
-	      asl -> P. cps [k]. ng);
-      */
+
       int ngroups = asl -> P. cps [k]. ng;
       for (int i=0; i<ngroups; i++)
 	fix_asl_group (&(asl -> P. cps [k]. g [i]));
     }
-
-  /*
-  if (asl -> P. cps) {
-
-    printf (">>> ps struct, con, %d basic, %d group\n", 
-	    asl -> P. cps -> nb, 
-	    asl -> P. cps -> ng);
-
-    int ngroups = asl -> P. cps -> ng;
-    for (int i=0; i<ngroups; i++) 
-      fix_asl_group (asl -> P. cps -> g + i);
-  }
-
-  if (asl -> P. cps) {
-
-    printf (">>> ps struct, con, %d basic, %d group\n", 
-	    asl -> P. cps [2]. nb, 
-	    asl -> P. cps [2]. ng);
-
-    int ngroups = asl -> P. cps [2]. ng;
-    for (int i=0; i<ngroups; i++) 
-      fix_asl_group (asl -> P. cps [2]. g + i);
-  }
-  */
-
 
   // objective functions /////////////////////////////////////////////////////////////
 

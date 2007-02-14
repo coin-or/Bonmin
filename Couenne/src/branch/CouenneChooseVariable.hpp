@@ -10,6 +10,7 @@
 #define COUENNECHOOSEVARIABLE_HPP
 
 #include <OsiChooseVariable.hpp>
+#include <CouenneProblem.h>
 
 
 /** \brief Choose a variable for branching
@@ -68,6 +69,10 @@ public:
   /// Given a candidate fill in useful information e.g. estimates
   virtual void updateInformation( const OsiBranchingInformation *info,
 				  int branch, OsiHotInfo * hotInfo);
+
+protected:
+
+  CouenneProblem *problem_;
 };
 
 #endif

@@ -30,29 +30,20 @@ class exprUnary: public expression {
 
  public:
 
-  // node type
+  /// node type
   virtual inline enum nodeType Type () 
     {return UNARY;}
 
-  // Constructors, destructor
+  /// Constructor
   exprUnary  (expression *argument, unary_function f): 
     argument_ (argument),        //< non-leaf expression, with argument list
     f_        (f)         {}
 
+  /// Destructor
   ~exprUnary () 
     {if (argument_) delete argument_;}
-  /*
-  // return a pointer to an object with the same type of operator f_
-  // as this class, and with arg as argument_
-  virtual inline expression *mirror (expression *arg)
-    {return new exprUnary (arg, f_);}
 
-  // return a pointer to an object with the same type as the
-  // derivative of operator f_ as this class, and with arg as argument_
-  virtual inline expression *mirror_d (expression *arg)
-    {return new exprUnary (arg, f_);}
-  */
-  // return argument (when applicable, i.e., with univariate functions)
+  /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
     {return argument_;}
 
@@ -88,28 +79,9 @@ class exprUnary: public expression {
   // variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);
 
-  // for auxiliary variable w = f(x), returns coefficient of x and
-  // right hand side of the expression 
-  //
-  // w - (f(ub)-f(lb))/(ub-lb) * x  >=< f(lb) - (f(ub)-f(lb))/(ub-lb) * lb
-  //
-  // used as a convexification (lower bound) of a concave function
-  // (and vice versa, as a concavification -- upper bound -- of a
-  // convex function). The sign depends on the convexity of the
-  // operator.
-  void segment (expression *&, expression *&);
-
-  // for auxiliary variable w = f(x), returns coefficients of x and
-  // right hand sides of the expressions
-  //
-  // w - f'(x_k) * x  >=< f(x_k) - f'(x_k) * x_k
-  //
-  // where k is the set of sample points used to create convex
-  // (concave) hull. Used as a convexification (lower bound) of a
-  // concave function (and vice versa, as a concavification -- upper
-  // bound -- of a convex function). The sign depends on the convexity
-  // of the operator.
-  void hull (expression **&, expression **&);
+  // return an index to the variable's argument that is better fixed
+  // in a branching rule for solving a nonconvexity gap
+  virtual int getFixIndex () {return argument_ -> Index ();}
 };
 
 #endif

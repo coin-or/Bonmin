@@ -171,6 +171,10 @@ class expression {
   // generate convexification cut for constraint w = this
   virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *) {}
+
+  // return an index to the variable's argument that is better fixed
+  // in a branching rule for solving a nonconvexity gap
+  virtual int getFixIndex () {return -1;}
 };
 
 #endif

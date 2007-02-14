@@ -63,7 +63,7 @@ class exprOp: public expression {
   inline expression **ArgList () const 
     {return arglist_;}
 
-  inline int          nArgs   () const 
+  inline int nArgs () const 
     {return nargs_;}
 
   // string equivalent
@@ -102,6 +102,10 @@ class exprOp: public expression {
     {return NONLINEAR;}
 
   exprAux *standardize (CouenneProblem *);
+
+  // return an index to the variable's argument that is better fixed
+  // in a branching rule for solving a nonconvexity gap
+  virtual int getFixIndex () {return arglist_ [0] -> Index ();}
 };
 
 
@@ -120,10 +124,5 @@ inline CouNumber exprOp::operator () () {
 
   return 0;
 }
-
-
-//
-
-//void convert_monomial (expression *, expression *&, int &);
 
 #endif

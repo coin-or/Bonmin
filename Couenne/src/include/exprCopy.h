@@ -100,21 +100,6 @@ class exprCopy: public expression {
   inline void getBounds (expression *&lower, expression *&upper) 
     {copy_ -> getBounds (lower, upper);}
 
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  /*  inline int lowerLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-		       int **&indices, expression **&rhs, enum con_sign *&sign)
-    {return copy_ -> lowerLinearHull (w, nterms, coeff, indices, rhs, sign);}
-  */
-
-  // similarly, construct linear over-estimator for expression within
-  // problem *p (p is used to add convexification constraints). It is
-  // also used when this function appears with a minus sign in the
-  // expression
-  /*  inline int upperLinearHull (exprAux *w, int *&nterms, expression ***&coeff, 
-			      int **&indices, expression **&rhs, enum con_sign *&sign)
-    {return copy_ -> upperLinearHull (w, nterms, coeff, indices, rhs, sign);}
-  */
   // Create standard formulation of this expression
   inline exprAux *standardize (CouenneProblem *p)
     {return copy_ -> standardize (p);}
@@ -123,6 +108,10 @@ class exprCopy: public expression {
   inline void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) 
     {copy_ -> generateCuts (w, si, cs, cg);}
+
+  // return an index to the variable's argument that is better fixed
+  // in a branching rule for solving a nonconvexity gap
+  virtual int getFixIndex () {return copy_ -> getFixIndex ();}
 };
 
 #endif

@@ -97,6 +97,10 @@ class exprVar: public expression {
   // generate convexification cut for constraint w = this
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  // return an index to the variable's argument that is better fixed
+  // in a branching rule for solving a nonconvexity gap
+  virtual int getFixIndex () {return varIndex_;}
 };
 
 #endif

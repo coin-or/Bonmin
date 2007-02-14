@@ -15,6 +15,8 @@ Couenne/src/branch/CouenneBranchingObject.cpp -text
 Couenne/src/branch/CouenneBranchingObject.hpp -text
 Couenne/src/branch/CouenneChooseVariable.cpp -text
 Couenne/src/branch/CouenneChooseVariable.hpp -text
+Couenne/src/branch/CouenneObject.cpp -text
+Couenne/src/branch/CouenneObject.hpp -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
 Couenne/src/convex/addEnvelope.cpp -text
 Couenne/src/convex/conv-exprOp.cpp -text

@@ -37,7 +37,7 @@ class exprPow: public exprOp {
     {return new exprPow (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
-  const std::string name() const 
+  const std::string name () const 
     {return "^" + exprOp::name();}
 
   // I/O
@@ -58,30 +58,6 @@ class exprPow: public exprOp {
   // Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-		       int **&, expression **&, enum con_sign *&);
-
-  // construct linear over-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int upperLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
-  //  void segment (expression *&,  expression *&);
-
-  //  void hull    (expression **, expression **);
-  /*
-  inline expression *mirror (expression *arg) 
-    {return new exprPow (arg, new exprClone (arglist_ [1]));}
-
-  expression *mirror_d (expression *arg) {
-    CouNumber expon = arglist_ [1] -> Value ();
-
-    return new exprMul (new exprConst (expon),
-			new exprPow (arg, new exprConst (expon -1)));
-  }
-  */
   // reduce expression in standard form, creating additional aux
   // variables (and constraints)
   exprAux *standardize (CouenneProblem *p);
@@ -89,6 +65,10 @@ class exprPow: public exprOp {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  // return an index to the variable's argument that is better fixed
+  // in a branching rule for solving a nonconvexity gap
+  int getFixIndex () {return arglist_ [0] -> Index ();}
 };
 
 

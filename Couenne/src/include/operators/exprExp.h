@@ -47,16 +47,6 @@ class exprExp: public exprUnary {
   // Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
-  // construct linear over-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int upperLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);

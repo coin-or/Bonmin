@@ -19,11 +19,11 @@ class CouenneBranchingObject: public OsiTwoWayBranchingObject {
 public:
 
   /// Constructor
-  CouenneBranchingObject (exprAux *aux);
+  CouenneBranchingObject (exprVar *);
 
   /// Cloning method
-  virtual CouenneBranchingObject * clone() const
-  {return new CouenneBranchingObject (aux_);}
+  virtual OsiBranchingObject * clone() const
+  {return new CouenneBranchingObject (var_);}
 
   /** \brief Execute the actions required to branch, as specified by the
 	     current state of the branching object, and advance the object's
@@ -34,8 +34,8 @@ public:
 
 protected:
 
-  /// the aux variable which this branching object refers to
-  exprAux *aux_;
+  /// the variable which this branching object refers to
+  exprVar *var_;
 };
 
 #endif

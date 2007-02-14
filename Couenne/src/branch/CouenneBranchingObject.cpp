@@ -9,15 +9,13 @@
 #include <CouenneBranchingObject.hpp>
 
 
-/** \brief Constructor. Get an auxiliary variable as an argument and
-           set value_ through a call to operator () of that exprAux.
+/** \brief Constructor. Get a variable as an argument and set value_
+           through a call to operator () of that exprAux.
 */
 
-CouenneBranchingObject::CouenneBranchingObject (exprAux *aux):
-  aux_ (aux) {
-  // set the branching value at the current point 
-  value_ = (*aux_) ();
-}
+CouenneBranchingObject::CouenneBranchingObject (exprVar *var): 
+  var_ (var)
+  {value_ = (*var_) ();} // set the branching value at the current point 
 
 
 /** \brief Execute the actions required to branch, as specified by the
@@ -34,16 +32,13 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   int way = (!branchIndex_) ? firstBranch_ : !firstBranch_;
 
   if (way) // ">=" node, set lower bound (round if this variable is integer)
-       solver -> setColLower (aux_ -> Index(), 
-			      aux_ -> isInteger() ? 
-			        ceil  (value_) : 
-			        value_);
+    solver -> setColLower (var_ -> Index(), 
+			   var_ -> isInteger() ? ceil  (value_) : value_);
 
-           // "<=" node, set upper bound (ditto)
-  else solver -> setColUpper (aux_ -> Index(), 
-			      aux_ -> isInteger() ? 
-			        floor (value_) : 
-			        value_);
+
+  else     // "<=" node, set upper bound (ditto)
+    solver -> setColUpper (var_ -> Index(), 
+			   var_ -> isInteger() ? floor (value_) : value_);
 
   return 0.; // estimated gain in objective function
 }
