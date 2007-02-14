@@ -2564,7 +2564,7 @@ OsiTMINLPInterface::resolve()
   }
   else if(numRetryResolve_ ||
 	  (numRetryInfeasibles_ && isProvenPrimalInfeasible() ))
-	  resolveForCost(numRetryResolve_);
+	  resolveForCost(max(numRetryResolve_, numRetryInfeasibles_));
   
 }
 
