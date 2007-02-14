@@ -22,6 +22,8 @@ Bonmin/experimental/Bcp/BM_lp_branch.cpp -text
 Bonmin/experimental/Bcp/BM_tm.cpp -text
 Bonmin/experimental/Bcp/ampl_bcp.patch -text
 Bonmin/experimental/NotConvex/BonCouenne.cpp -text
+Bonmin/experimental/NotConvex/BonCouenneCbc.cpp -text
+Bonmin/experimental/NotConvex/BonCouenneCbc.hpp -text
 Bonmin/experimental/NotConvex/BonCouenneInterface.cpp -text
 Bonmin/experimental/NotConvex/BonCouenneInterface.hpp -text
 Bonmin/experimental/NotConvex/Makefile.am -text
