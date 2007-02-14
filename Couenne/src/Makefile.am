@@ -18,6 +18,8 @@ lib_LTLIBRARIES = libCouenne.la
 
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = \
+	branch/CouenneBranchingObject.cpp \
+	branch/CouenneChooseVariable.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -87,6 +89,7 @@ endif
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include/operators` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
@@ -114,6 +117,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # and that therefore should be installed in 'install'
 include_HEADERS = \
 	../inc/config_couenne.h \
+	branch/CouenneBranchingObject.hpp \
+	branch/CouenneChooseVariable.hpp \
 	include/operators/exprAbs.h \
 	include/operators/exprExp.h \
 	include/operators/exprInv.h \
