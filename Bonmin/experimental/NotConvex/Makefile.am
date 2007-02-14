@@ -86,6 +86,8 @@ if COIN_HAS_COUENNE
 endif
 
 fun_SOURCES = BonCouenne.cpp \
+              BonCouenneCbc.hpp \
+              BonCouenneCbc.cpp \
               BonCouenneInterface.hpp \
               BonCouenneInterface.cpp
 

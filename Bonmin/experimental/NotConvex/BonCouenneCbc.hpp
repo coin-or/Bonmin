@@ -1,14 +1,13 @@
-#ifndef BonminBB_hpp
-#define BonminBB_hpp
+#ifndef BonCouenneCbc_hpp
+#define BonCouenneCbc_hpp
 
 #include "BonCbcParam.hpp"
+#include "BonCbc.hpp"
 
 
-class CbcObject;
 
 namespace Bonmin
 {
-  class OsiTMINLPInterface;
   /** Class which performs optimization of an MINLP stored in an IpoptInterface. */
   class CouenneBab : public Bab
   {
@@ -24,7 +23,7 @@ namespace Bonmin
     /**operator() performs the branchAndBound*/
     virtual void operator()(OsiTMINLPInterface * nlp, const BonminCbcParam& par)
     {
-      BonCouenneBab::branchAndBound(nlp,par);
+      CouenneBab::branchAndBound(nlp,par);
     }
 
   };

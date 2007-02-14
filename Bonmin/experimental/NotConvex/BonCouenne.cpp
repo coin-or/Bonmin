@@ -20,7 +20,7 @@
 #include "BonminConfig.h"
 #include "BonCouenneInterface.hpp"
 #include "BonIpoptSolver.hpp"
-#include "BonCbc.hpp"
+#include "BonCouenneCbc.hpp"
 
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
@@ -79,7 +79,7 @@ int main (int argc, char *argv[])
     }
    nlp_and_solver = new CouenneInterface(argv, solver);
     BonminCbcParam par;
-    Bab bb;
+    CouenneBab bb;
     par(nlp_and_solver);
     bb(nlp_and_solver, par);//do branch and bound
 

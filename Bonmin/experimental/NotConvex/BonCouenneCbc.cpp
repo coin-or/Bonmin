@@ -10,7 +10,8 @@
 
 //Bonmin header files
 #include "BonminConfig.h"
-#include "BonCbc.hpp"
+#include "BonCouenneCbc.hpp"
+#include "BonCouenneInterface.hpp"
 #include "BonCbcLpStrategy.hpp"
 #include "BonCbcNlpStrategy.hpp"
 #include "BonOsiTMINLPInterface.hpp"
@@ -64,9 +65,6 @@
 
 // Code to enable user interuption
 static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
-static Bonmin::OACutGenerator2 * currentOA = NULL; //pointer to the OA generator
-CbcModel * OAModel = NULL; // pointer to the submip if using Cbc
-bool BonminAbortAll = false;
 //#ifdef COIN_HAS_CPX
 //OsiCpxSolverInterface * CpxModel = NULL;//pointer to the submip if using cplex
 //#endif
@@ -86,11 +84,6 @@ extern "C"
     }
     if (currentBranchModel!=NULL)
       currentBranchModel->setMaximumNodes(0); // stop at next node
-    if (OAModel!=NULL)
-      OAModel->setMaximumNodes(0); // stop at next node
-    if (currentOA!=NULL)
-      currentOA->parameter().maxLocalSearchTime_ = 0.; // stop OA
-    BonminAbortAll = true;
     BonminInteruptedOnce = true;
     return;
   }
@@ -124,8 +117,8 @@ namespace Bonmin
       Bab::branchAndBound(nlpSolver, par);
       return;
     }
-
-    if(!dynamic_cast<BonCouenneInterface *>(nlpSolver))
+    CouenneInterface * ci = dynamic_cast<CouenneInterface *>(nlpSolver);
+    if(ci == NULL)
       {
 	std::cerr<<"Can not do Couenne algorithm without a Couenne interface."
 		 <<std::endl;
@@ -435,9 +428,6 @@ namespace Bonmin
     }
     delete si;
     std::cout<<"Finished"<<std::endl;
-    if (strategy)
-      delete strategy;
-
   }
 
 }
