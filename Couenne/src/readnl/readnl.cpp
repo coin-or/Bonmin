@@ -68,27 +68,57 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
   // fix groups //////////////////////////////////////////////////////////////////////
 
-  if (asl -> P. ops) {
-    /*
-    printf (">>> ps struct, obj, %d basic, %d group\n",
-            asl -> P. ops -> nb, 
-	    asl -> P. ops -> ng);
-    */
-    int ngroups = asl -> P. ops -> ng;
-    for (int i=0; i<ngroups; i++)
-      fix_asl_group (&(asl -> P. ops -> g [i]));
-  }
+  // objective functions' groups
 
+  for (int k=0; k<n_obj; k++)
+    if ((asl -> P. ops [k]. nb) || (asl -> P. ops [k]. ng)) {
+      /*
+      printf (">>> obj %d: %d basic, %d group\n", k,
+	      asl -> P. ops [k]. nb, 
+	      asl -> P. ops [k]. ng);
+      */
+      int ngroups = asl -> P. ops [k]. ng;
+      for (int i=0; i<ngroups; i++)
+	fix_asl_group (&(asl -> P. ops [k]. g [i]));
+    }
+
+  // constraints' groups
+
+  for (int k=0; k<n_con; k++)
+    if ((asl -> P. cps [k]. nb) || (asl -> P. cps [k]. ng)) {
+      /*
+      printf (">>> con %d: %d basic, %d group\n", k,
+	      asl -> P. cps [k]. nb, 
+	      asl -> P. cps [k]. ng);
+      */
+      int ngroups = asl -> P. cps [k]. ng;
+      for (int i=0; i<ngroups; i++)
+	fix_asl_group (&(asl -> P. cps [k]. g [i]));
+    }
+
+  /*
   if (asl -> P. cps) {
-    /*
+
     printf (">>> ps struct, con, %d basic, %d group\n", 
 	    asl -> P. cps -> nb, 
 	    asl -> P. cps -> ng);
-    */
+
     int ngroups = asl -> P. cps -> ng;
     for (int i=0; i<ngroups; i++) 
       fix_asl_group (asl -> P. cps -> g + i);
   }
+
+  if (asl -> P. cps) {
+
+    printf (">>> ps struct, con, %d basic, %d group\n", 
+	    asl -> P. cps [2]. nb, 
+	    asl -> P. cps [2]. ng);
+
+    int ngroups = asl -> P. cps [2]. ng;
+    for (int i=0; i<ngroups; i++) 
+      fix_asl_group (asl -> P. cps [2]. g + i);
+  }
+  */
 
 
   // objective functions /////////////////////////////////////////////////////////////
