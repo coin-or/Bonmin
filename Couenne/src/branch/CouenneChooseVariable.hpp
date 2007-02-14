@@ -24,7 +24,7 @@ public:
   CouenneChooseVariable ();
 
   /// Constructor from solver (so we can set up arrays etc)
-  CouenneChooseVariable (const OsiSolverInterface *solver);
+  CouenneChooseVariable (const OsiSolverInterface *, CouenneProblem *);
 
   /// Copy constructor 
   CouenneChooseVariable (const CouenneChooseVariable &);
@@ -67,8 +67,12 @@ public:
 
 
   /// Given a candidate fill in useful information e.g. estimates
-  virtual void updateInformation( const OsiBranchingInformation *info,
+  /*  virtual void updateInformation( const OsiBranchingInformation *info,
 				  int branch, OsiHotInfo * hotInfo);
+  */
+
+  CouenneProblem *Problem () const 
+  {return problem_;}
 
 protected:
 

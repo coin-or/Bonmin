@@ -33,8 +33,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprCos.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
-	expression/operators/exprMax.cpp \
-	expression/operators/exprMin.cpp \
+	expression/operators/exprMinMax.cpp \
 	expression/exprVar.cpp \
 	expression/expression.cpp \
 	simplify/simplifiers.cpp \

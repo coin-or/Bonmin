@@ -46,8 +46,7 @@ Couenne/src/expression/operators/exprDiv.cpp -text
 Couenne/src/expression/operators/exprExp.cpp -text
 Couenne/src/expression/operators/exprInv.cpp -text
 Couenne/src/expression/operators/exprLog.cpp -text
-Couenne/src/expression/operators/exprMax.cpp -text
-Couenne/src/expression/operators/exprMin.cpp -text
+Couenne/src/expression/operators/exprMinMax.cpp -text
 Couenne/src/expression/operators/exprMul.cpp -text
 Couenne/src/expression/operators/exprOpp.cpp -text
 Couenne/src/expression/operators/exprPow.cpp -text

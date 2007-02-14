@@ -13,9 +13,9 @@
            through a call to operator () of that exprAux.
 */
 
-CouenneBranchingObject::CouenneBranchingObject (exprVar *var): 
-  var_ (var)
-  {value_ = (*var_) ();} // set the branching value at the current point 
+CouenneBranchingObject::CouenneBranchingObject (exprAux *aux): 
+  reference_ (aux)
+  {value_ = (*reference_) ();} // set the branching value at the current point 
 
 
 /** \brief Execute the actions required to branch, as specified by the
@@ -32,13 +32,11 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   int way = (!branchIndex_) ? firstBranch_ : !firstBranch_;
 
   if (way) // ">=" node, set lower bound (round if this variable is integer)
-    solver -> setColLower (var_ -> Index(), 
-			   var_ -> isInteger() ? ceil  (value_) : value_);
-
-
+    solver -> setColLower (reference_ -> Index(), 
+			   reference_ -> isInteger() ? ceil  (value_) : value_);
   else     // "<=" node, set upper bound (ditto)
-    solver -> setColUpper (var_ -> Index(), 
-			   var_ -> isInteger() ? floor (value_) : value_);
+    solver -> setColUpper (reference_ -> Index(), 
+			   reference_ -> isInteger() ? floor (value_) : value_);
 
   return 0.; // estimated gain in objective function
 }
