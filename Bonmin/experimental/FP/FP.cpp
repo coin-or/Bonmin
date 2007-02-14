@@ -184,7 +184,7 @@ int main (int argc, char *argv[])
   
                            
   //Set up done, now let's branch and bound
-  double time1 = CoinCpuTime();
+  //double time1 = CoinCpuTime();
   try {
     Ipopt::SmartPtr<Ipopt::OptionsList> Options = nlpSolver.retrieve_options();
     

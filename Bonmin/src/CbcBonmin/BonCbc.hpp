@@ -23,11 +23,11 @@ namespace Bonmin
     /** destructor.*/
     virtual ~Bab();
     /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
-    void branchAndBound(OsiTMINLPInterface * nlp,
+    virtual void branchAndBound(OsiTMINLPInterface * nlp,
         const BonminCbcParam&par);
 
     /**operator() performs the branchAndBound*/
-    void operator()(OsiTMINLPInterface * nlp, const BonminCbcParam& par)
+    virtual void operator()(OsiTMINLPInterface * nlp, const BonminCbcParam& par)
     {
       branchAndBound(nlp,par);
     }
@@ -71,7 +71,7 @@ namespace Bonmin
     virtual void replaceIntegers(OsiObject ** objects, int numberObjects)
     {};
 
-  private:
+  protected:
     /** Stores the solution of MIP. */
     double * bestSolution_;
     /** Status of the mixed integer program. */

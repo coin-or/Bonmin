@@ -103,9 +103,14 @@ register_general_options
       "");
 
   roptions->AddLowerBoundedIntegerOption("node_limit",
-      "Set the maximum number of nodes explored in the branch-and-bound search.",
-      0,INT_MAX,
-      "");
+					 "Set the maximum number of nodes explored in the branch-and-bound search.",
+					 0,INT_MAX,
+					 "");
+
+  roptions->AddLowerBoundedIntegerOption("solution_limit",
+					 "Abort after that much integer feasible solution have been found by algorithm",
+					 0,INT_MAX,
+					 "");
 
   roptions->AddBoundedNumberOption("integer_tolerance",
       "Set integer tolerance.",
@@ -203,6 +208,15 @@ register_general_options
       "When picking a random point coordinate i will be in the interval [min(max(l,-r),u-r), max(min(u,r),l+r)] "
       "(where l is the lower bound for the variable and u is its upper bound)");
 
+  roptions->AddStringOption2("random_point_type","method to choose a random starting point",
+			     "uniform",
+			     "Jon", "Choose random point uniformly between the bounds",
+			     "Andreas", "perturb the starting point of the problem within a prescriped interval","");
+    roptions->AddLowerBoundedNumberOption("random_point_perturbation_interval",
+					   "Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point",
+					   0.,1, DBL_MAX,
+					   "");
+					   
   roptions->AddLowerBoundedIntegerOption
   ("max_consecutive_failures",
    "(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.",
@@ -256,6 +270,12 @@ register_general_options
       "Number $k$ of tries to resolve a node (other than the root) of the tree with different starting point.",
       0,0,
       "The algorithm will solve all the nodes with $k$ different random starting points "
+      "and will keep the best local optimum found.");
+
+  roptions->AddLowerBoundedIntegerOption("num_resolve_at_infeasibles",
+      "Number $k$ of tries to resolve an infeasible node (other than the root) of the tree with different starting point.",
+      0,0,
+      "The algorithm will solve all the infeasible nodes with $k$ different random starting points "
       "and will keep the best local optimum found.");
 
 
@@ -457,9 +477,12 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     totalNlpSolveTime_(0),
     totalIterations_(0),
     maxRandomRadius_(1e08),
+    randomGenerationType_(0),
+    max_perturbation_(DBL_MAX),
     pushValue_(1e-02),
     numRetryInitial_(-1),
     numRetryResolve_(-1),
+    numRetryInfeasibles_(-1),
     numRetryUnsolved_(1),
     messages_(),
     pretendFailIsInfeasible_(0),
@@ -499,9 +522,12 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app)
     totalNlpSolveTime_(0),
     totalIterations_(0),
     maxRandomRadius_(1e08),
+    randomGenerationType_(0),
+    max_perturbation_(DBL_MAX),
     pushValue_(1e-02),
     numRetryInitial_(-1),
     numRetryResolve_(-1),
+    numRetryInfeasibles_(-1),
     numRetryUnsolved_(1),
     messages_(),
     pretendFailIsInfeasible_(false),
@@ -550,9 +576,12 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
     totalNlpSolveTime_(0),
     totalIterations_(0),
     maxRandomRadius_(1e08),
+    randomGenerationType_(0),
+    max_perturbation_(DBL_MAX),
     pushValue_(1e-02),
     numRetryInitial_(-1),
     numRetryResolve_(-1),
+    numRetryInfeasibles_(-1),
     numRetryUnsolved_(1),
     messages_(),
     pretendFailIsInfeasible_(false),
@@ -618,9 +647,12 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     totalNlpSolveTime_(0),
     totalIterations_(0),
     maxRandomRadius_(source.maxRandomRadius_),
+    randomGenerationType_(source.randomGenerationType_),
+    max_perturbation_(source.max_perturbation_),
     pushValue_(source.pushValue_),
     numRetryInitial_(source.numRetryInitial_),
     numRetryResolve_(source.numRetryResolve_),
+    numRetryInfeasibles_(source.numRetryInfeasibles_),
     numRetryUnsolved_(source.numRetryUnsolved_),
     messages_(),
     pretendFailIsInfeasible_(source.pretendFailIsInfeasible_),
@@ -789,6 +821,7 @@ app_ = NULL;
     pushValue_ = rhs.pushValue_;
     numRetryInitial_ = rhs.numRetryInitial_;
     numRetryResolve_ = rhs.numRetryResolve_;
+    numRetryInfeasibles_ = rhs.numRetryInfeasibles_;
     numRetryUnsolved_ = rhs.numRetryUnsolved_;
     pretendFailIsInfeasible_ = rhs.pretendFailIsInfeasible_;
     numIterationSuspect_ = rhs.numIterationSuspect_;
@@ -1610,15 +1643,26 @@ OsiTMINLPInterface::randomStartingPoint()
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
   double * sol = new double[numcols];
+  const Number * x_init = problem_->x_init_user();  
   for(int i = 0 ; i < numcols ; i++) {
-    double lower = min(-maxRandomRadius_,colUpper[i] - maxRandomRadius_);
-    lower = max(colLower[i], lower);
-    double upper = max(maxRandomRadius_,colLower[i] + maxRandomRadius_);
-    upper = min(colUpper[i],upper);
-    lower = min(upper,lower);
-    upper = max(upper, lower);
-    double interval = upper - lower;
-    sol[i] = CoinDrand48()*(interval) + lower;
+    int randomGenerationType = randomGenerationType_;
+    if(x_init[i] < colLower[i] || x_init[i] > colUpper[i])
+      randomGenerationType = uniform;
+    if(randomGenerationType_ == uniform){
+      double lower = min(-maxRandomRadius_,colUpper[i] - maxRandomRadius_);
+      lower = max(colLower[i], lower);
+      double upper = max(maxRandomRadius_,colLower[i] + maxRandomRadius_);
+      upper = min(colUpper[i],upper);
+      lower = min(upper,lower);
+      upper = max(upper, lower);
+      double interval = upper - lower;
+      sol[i] = CoinDrand48()*(interval) + lower;}
+    else if (randomGenerationType_ == perturb){
+      double lower = max(x_init[i] - max_perturbation_, colLower[i]);
+      double upper = min(x_init[i] + max_perturbation_, colUpper[i]);
+      double interval = upper - lower;
+      sol[i]  = lower + CoinDrand48()*(interval);
+    }
 //    printf("%f in [%f,%f]\n",sol[i],lower,upper);
     //  std::cout<<interval<<"\t";
   }
@@ -1766,8 +1810,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, bool getObj, const double
   getOuterApproximation(cs, getColSolution(), getObj, x2, global);
 }
 
-/** Get the outer approximation constraints at the current optimum of the
-  current ipopt problem */
+/** Get the outer approximation constraints at the point x.
+*/
 void
 OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global)
 {
@@ -2006,6 +2050,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * 
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
+    newCut.setGloballyValid();
     newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
     newCut.setUb(ub[i]);
@@ -2517,8 +2562,9 @@ OsiTMINLPInterface::resolve()
   if(isAbandoned()) {
     resolveForRobustness(numRetryUnsolved_);
   }
-  else if(numRetryResolve_)
-    resolveForCost(numRetryResolve_);
+  else if(numRetryResolve_ ||
+	  (numRetryInfeasibles_ && isProvenPrimalInfeasible() ))
+	  resolveForCost(numRetryResolve_);
   
 }
 
@@ -2594,12 +2640,15 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->Options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,"bonmin.");
     app_->Options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,"bonmin.");
     app_->Options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,"bonmin.");
+    app_->Options()->GetIntegerValue("num_resolve_at_infeasibles", numRetryInfeasibles_,"bonmin.");
     app_->Options()->GetIntegerValue("num_iterations_suspect", numIterationSuspect_,"bonmin.");
     app_->Options()->GetEnumValue("nlp_failure_behavior",pretendFailIsInfeasible_,"bonmin.");
     app_->Options()->GetNumericValue
     ("warm_start_bound_frac" ,pushValue_,"bonmin.");
     app_->Options()->GetNumericValue("tiny_element",tiny_,"bonmin.");
     app_->Options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
+    app_->Options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,"bonmin.");
+      app_->Options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
   }
 }
 

@@ -169,12 +169,12 @@ class Messages : public CoinMessages
 
   /** Resolve the problem with different random starting points
       to try to find a better solution (only makes sense for a non-convex problem.*/
-  void resolveForCost(int numretry);
+  virtual void resolveForCost(int numretry);
 
   /** Method to be called when a problem has failed to be solved. Will try
       to resolve it with different settings.
   */
-  void resolveForRobustness(int numretry);
+  virtual void resolveForRobustness(int numretry);
 
   /// Nescessary for compatibility with OsiSolverInterface but does nothing.
   virtual void branchAndBound()
@@ -856,7 +856,8 @@ class Messages : public CoinMessages
 
 //---------------------------------------------------------------------------
 protected:
-
+  enum RandomGenerationType{
+    uniform =0, perturb=1};
   /// Initialize data structures for storing the jacobian
   int initializeJacobianArrays();
 
@@ -942,12 +943,18 @@ protected:
   int totalIterations_;
   /// max radius for random point
   double maxRandomRadius_;
+  /// Method to pick a random starting point.
+  int randomGenerationType_;
+  /// Maximum perturbation value
+  double max_perturbation_;
   /// Ipopt value for pushing initial point inside the bounds
   double pushValue_;
   /// Number of times problem will be resolved in initialSolve (root node)
   int numRetryInitial_;
   /// Number of times problem will be resolved in resolve
   int numRetryResolve_;
+  /// Number of times infeasible problem will be resolved.
+  int numRetryInfeasibles_;
   /// Number of times problem will be resolved in case of a failure
   int numRetryUnsolved_;
   /** Messages specific to an OsiTMINLPInterface. */

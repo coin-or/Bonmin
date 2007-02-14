@@ -86,6 +86,8 @@ namespace Bonmin
     double maxTime;
     /** Global node limit.*/
     int maxNodes;
+    /** limit on number of integer feasible solution.*/
+    int maxSolutions;
     /** Integer tolerance.*/
     double intTol;
     /** Conssider or not SOS constraints.*/

@@ -38,7 +38,6 @@
 //#include "CbcHeuristicUser.hpp"
 #include "BonAmplInterface.hpp"
 #include "BonDummyHeuristic.hpp"
-#include "BonOACutGenerator.hpp"
 #include "BonOACutGenerator2.hpp"
 
 //Use heuristics
@@ -205,7 +204,7 @@ double FP(AmplInterface &nlp,
     OsiCuts cs;
     //First get the closest point to the current integer (NLP-infeasible) optimum
     nlpTime -= CoinCpuTime();
-    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs);
+    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs, false, true);
     nlpTime += CoinCpuTime();
     if(dist < 1e-06)//do integer infeasibility check on variables
     {
@@ -334,7 +333,7 @@ double FP(AmplInterface &nlp,
       vals[i] = min(mip.getColUpper()[inds[i]],vals[i]);
     }
     nlpTime -= CoinCpuTime();
-    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs);
+    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs, false, true);
     nlpTime += CoinCpuTime();
     nNlpIterations += nlp.getIterationCount();
     if(!nlp.isProvenOptimal()) {
@@ -406,7 +405,7 @@ double FP(AmplInterface &nlp,
       nlp.initialSolve();
       if(nlp.isProvenOptimal()) {
         OsiCuts cs;
-        nlp.getOuterApproximation(cs,1);
+        nlp.getOuterApproximation(cs,1, NULL, true);
         linearModel.applyCuts(cs);
         nAddedCuts += cs.sizeRowCuts();
         std::cout<<" FP found easible solution of value "<<nlp.getObjValue()<<" in "<< CoinCpuTime() - BeginTimeGLOB<<" seconds, "<<nMajorIt<<" major iterations, took"
@@ -876,7 +875,7 @@ int enhancedOA(AmplInterface & solver1, bool doFp,
         //				std::cout<<"Var "<<ind[i]<<" value "<<x[i]<<std::endl;
       }
       nlpTime -= CoinCpuTime();
-      double dist = solver1.getFeasibilityOuterApproximation( numIntCols, x, inds, cs);
+      double dist = solver1.getFeasibilityOuterApproximation( numIntCols, x, inds, cs, false, true);
       nlpTime += CoinCpuTime();
       std::cout<<"Dist : "<<dist<<std::endl;
       if(dist < 1e-04)//do integer infeasibility check on variables
@@ -931,7 +930,7 @@ int enhancedOA(AmplInterface & solver1, bool doFp,
 
         solved = 1;
         OsiCuts cs;
-        solver1.getOuterApproximation(cs,1);
+        solver1.getOuterApproximation(cs,1, NULL, true);
         OsiSolverInterface::ApplyCutsReturnCode acRc;
         acRc = solver.applyCuts(cs);
         for(int i = 0 ; i < numIntCols ; i++) {
@@ -1113,7 +1112,7 @@ int enhancedOA(AmplInterface & solver1, bool doFp,
       <<nTotalNodes<<" nodes."<<std::endl;
 
       OsiCuts cs;
-      solver1.getOuterApproximation(cs,1);
+      solver1.getOuterApproximation(cs,1, false, true);
       OsiSolverInterface::ApplyCutsReturnCode acRc;
       ub = min (solver1.getObjValue(), ub);
       acRc = solver.applyCuts(cs);
@@ -1164,7 +1163,7 @@ int enhancedOA(AmplInterface & solver1, bool doFp,
         std::cout<<"Adding feasibility cuts based on 1-norm of"
         <<"constraint satisfaction"<<std::endl;
         //	      solver1.getOuterApproximation(cs,1);
-        solver1.getFeasibilityOuterApproximation( numIntCols, x, inds, cs);
+        solver1.getFeasibilityOuterApproximation( numIntCols, x, inds, cs, false, true);
         OsiSolverInterface::ApplyCutsReturnCode acRc;
         acRc = solver.applyCuts(cs);
         // Print applyCuts return code
@@ -1326,7 +1325,7 @@ int iteratedFP (AmplInterface& solver1, bool standAlone,
           //				std::cout<<"Var "<<ind[i]<<" value "<<x[i]<<std::endl;
         }
         nlpTime -= CoinCpuTime();
-        double dist = solver1.getFeasibilityOuterApproximation( numIntCols, x, inds, cs);
+        double dist = solver1.getFeasibilityOuterApproximation( numIntCols, x, inds, cs, false, true);
         nlpTime += CoinCpuTime();
         std::cout<<"Dist : "<<dist<<std::endl;
         if(dist < 1e-05)//do integer infeasibility check on variables
@@ -1377,7 +1376,7 @@ int iteratedFP (AmplInterface& solver1, bool standAlone,
           <<nTotalNodes<<" nodes."<<std::endl;
           solved = 1;
           OsiCuts cs;
-          solver1.getOuterApproximation(cs,1);
+          solver1.getOuterApproximation(cs,1, NULL, true);
           OsiSolverInterface::ApplyCutsReturnCode acRc;
           acRc = solver.applyCuts(cs);
           for(int i = 0 ; i < numIntCols ; i++) {
@@ -1452,7 +1451,7 @@ double FPGeneralIntegers(AmplInterface &nlp, OsiSolverInterface &linearModel,
     OsiCuts cs;
     //First get the closest point to the current integer (NLP-infeasible) optimum
     nlpTime -= CoinCpuTime();
-    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs);
+    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs, false, true);
     nlpTime += CoinCpuTime();
     if(dist < 1e-06)//do integer infeasibility check on variables
     {
@@ -1594,7 +1593,7 @@ double FPGeneralIntegers(AmplInterface &nlp, OsiSolverInterface &linearModel,
       vals[i] = min(mip.getColUpper()[inds[i]],vals[i]);
     }
     nlpTime -= CoinCpuTime();
-    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs);
+    double dist = nlp.getFeasibilityOuterApproximation( numIntCols, vals, inds, cs, false, true);
     nlpTime += CoinCpuTime();
     nNlpIterations += nlp.getIterationCount();
     if(!nlp.isProvenOptimal()) {
@@ -1666,7 +1665,7 @@ double FPGeneralIntegers(AmplInterface &nlp, OsiSolverInterface &linearModel,
       nlp.initialSolve();
       if(nlp.isProvenOptimal()) {
         OsiCuts cs;
-        nlp.getOuterApproximation(cs,1);
+        nlp.getOuterApproximation(cs,1, NULL, true);
         linearModel.applyCuts(cs);
         nAddedCuts += cs.sizeRowCuts();
         std::cout<<" FP found easible solution of value "<<nlp.getObjValue()<<" in "<<time + CoinCpuTime()<<" seconds, "<<nMajorIt<<" major iterations, took"

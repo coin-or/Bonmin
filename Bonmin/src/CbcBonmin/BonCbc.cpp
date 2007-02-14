@@ -412,6 +412,8 @@ namespace Bonmin
 
     model.setMaximumNodes(par.maxNodes);
 
+    model.setMaximumSolutions(par.maxSolutions);
+
     model.setIntegerTolerance(par.intTol);
 
 

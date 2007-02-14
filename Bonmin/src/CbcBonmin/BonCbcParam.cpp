@@ -35,6 +35,7 @@ namespace Bonmin
     Options->GetEnumValue("algorithm",algo,"bonmin.");
     Options->GetNumericValue("time_limit", maxTime, "bonmin.");
     Options->GetIntegerValue("node_limit",maxNodes,"bonmin.");
+    Options->GetIntegerValue("solution_limit",maxSolutions,"bonmin.");
     Options->GetNumericValue("integer_tolerance",intTol,"bonmin.");
     Options->GetNumericValue("allowable_gap",allowableGap,"bonmin.");
     Options->GetNumericValue("allowable_fraction_gap",allowableFractionGap,"bonmin.");

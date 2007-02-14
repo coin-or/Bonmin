@@ -129,6 +129,12 @@ namespace Bonmin
       return x_init_;
     }
 
+    /** get the user provided starting primal point */
+    const Number * x_init_user() const
+    {
+      return x_init_user_;
+    }
+
     /** get the starting dual point */
     const Number * duals_init() const
     {
