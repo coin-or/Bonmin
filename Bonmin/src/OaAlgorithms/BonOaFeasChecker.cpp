@@ -50,7 +50,6 @@ extern int usingCouenne;
   OaFeasibilityChecker::performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
                   SubMipSolver * &subMip, OsiBabSolver * babInfo, double &cutoff) const
   {
-    int repeatedPoint = 0;
    bool isInteger = true;
    bool feasible = 1;
 
@@ -95,12 +94,12 @@ extern int usingCouenne;
    else{
      nlpSol = const_cast<double *>(nlp_->getColSolution());}
    
-   const double * toCut = colsol;//(parameter().addOnlyViolated_)?
-   //colsol:NULL;
-   nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
-			       parameter().global_);
-   int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
-   if (numberCuts > 0)
+   const double * toCut = (parameter().addOnlyViolated_)?
+			      colsol:NULL;
+      nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
+				  parameter().global_);
+      int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
+      if (numberCuts > 0)
         lpManip.installCuts(cs, numberCuts);
 
         lp->resolve();
@@ -111,19 +110,13 @@ extern int usingCouenne;
         //if value of integers are unchanged then we have to get out
         bool changed = true;//if lp is infeasible we don't have to check anything
 	if(usingCouenne){
-	  if(feasible){
-	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution(), colsol);
-	    if(!changed) repeatedPoint++;
-	    else repeatedPoint = 0;
+	  if(feasible){	    
 	  isInteger = integerFeasible(lp->getColSolution(), origNumcols);
 	  }
 	  else{
 	    isInteger = 0;
 	    //	  if(!fixed)//fathom on bounds
 	    milpBound = 1e200;
-	  }
-	  if(repeatedPoint >= 2){
-	    isInteger = 0;
 	  }
 	}
 	else{
