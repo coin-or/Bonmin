@@ -228,7 +228,7 @@ FilterSolver::RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
   roptions->AddLowerBoundedNumberOption("infty","A large number (1E20)",0.,1, 1e20, "");
   roptions->AddBoundedIntegerOption("iprint", "Print level (0=silent, 3=verbose)", 0,6,0);
   roptions->AddLowerBoundedIntegerOption("kmax", "Dimension of null-space",
-				 0, 500, "");
+				 -1, -1, "");
   roptions->AddLowerBoundedIntegerOption("maxf","Maximum filter length",0,100);
   roptions->AddLowerBoundedIntegerOption("maxiter", "Maximum number of iterations",0,1000);
   roptions->AddLowerBoundedIntegerOption("mlp","Maximum level for degeneracy (bqpd)",0, 1000);
@@ -382,8 +382,13 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   // 1.b) then from options
   Ipopt::Index kmax_ipt;
   options->GetIntegerValue("kmax", kmax_ipt, "filter.");
-  kmax = kmax_ipt;
-  kmax = min(kmax,n);
+  if (kmax_ipt == -1) {
+    kmax = n;
+  }
+  else {
+    kmax = kmax_ipt;
+    kmax = min(kmax,n);
+  }
   Ipopt::Index mlp_ipt;
   options->GetIntegerValue("mlp", mlp_ipt,"filter.");
   mlp = mlp_ipt;
@@ -522,8 +527,8 @@ FilterSolver::callOptimizer()
 {
   cached_->optimize();
 
-  TNLPSolver::ReturnStatus optimizationStatus;
-  Ipopt::SolverReturn status;
+  TNLPSolver::ReturnStatus optimizationStatus = TNLPSolver::exception;
+  Ipopt::SolverReturn status = Ipopt::INTERNAL_ERROR;
   fint ifail = cached_->ifail;
   switch(ifail){
   case 0:

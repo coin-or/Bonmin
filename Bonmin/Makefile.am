@@ -65,10 +65,10 @@ EXTRA_DIST = \
 test: unitTest
 
 unitTest: all
-	cd test; make test
+	cd test; $(MAKE) test
 
 nodeSolver: all
-	cd src/Apps; make nodeSolver
+	cd src/Apps; $(MAKE) nodeSolver
 
 doc:	userman
 
