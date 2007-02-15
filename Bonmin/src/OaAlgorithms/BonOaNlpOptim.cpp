@@ -108,8 +108,9 @@ namespace Bonmin
     //  nlp_->turnOnIpoptOutput();
     nSolve_++;
     nlp_->resolve();
-    const double * violatedPoint = (addOnlyViolated_)? si.getColSolution():
-      NULL;
+    const double * violatedPoint = si.getColSolution();
+    //(addOnlyViolated_)? si.getColSolution():
+    //      NULL;
     nlp_->getOuterApproximation(cs, 1, violatedPoint,global_);
     if (nlp_->isProvenOptimal()) {
       handler_->message(LP_ERROR,messages_)
