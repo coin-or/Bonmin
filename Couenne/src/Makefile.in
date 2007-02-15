@@ -76,7 +76,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libCouenne_la_LIBADD =
 am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	branch/CouenneObject.cpp branch/CouenneChooseVariable.cpp \
-	expression/operators/exprAbs.cpp \
+	branch/getFixVarBinFun.cpp expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
 	expression/operators/exprInv.cpp \
@@ -113,13 +113,14 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
 @COIN_HAS_ASL_TRUE@	fix_asl_group.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
-	CouenneChooseVariable.lo exprAbs.lo exprDiv.lo exprExp.lo \
-	exprInv.lo exprLog.lo exprMul.lo exprOpp.lo exprPow.lo \
-	exprSin.lo exprCos.lo exprSub.lo exprSum.lo exprMinMax.lo \
-	exprVar.lo expression.lo simplifiers.lo simplify.lo \
-	addEnvelope.lo createCuts.lo conv-exprOp.lo conv-exprUnary.lo \
-	conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
-	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
+	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
+	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
+	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
+	exprSum.lo exprMinMax.lo exprVar.lo expression.lo \
+	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
+	conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
+	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
+	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo CouenneCutGenerator.lo generateCuts.lo \
@@ -319,7 +320,7 @@ lib_LTLIBRARIES = libCouenne.la
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	branch/CouenneObject.cpp branch/CouenneChooseVariable.cpp \
-	expression/operators/exprAbs.cpp \
+	branch/getFixVarBinFun.cpp expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
 	expression/operators/exprInv.cpp \
@@ -542,6 +543,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix_asl_group.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getFixVarBinFun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nl2e.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
@@ -635,6 +637,13 @@ CouenneChooseVariable.lo: branch/CouenneChooseVariable.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/CouenneChooseVariable.cpp' object='CouenneChooseVariable.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneChooseVariable.lo `test -f 'branch/CouenneChooseVariable.cpp' || echo '$(srcdir)/'`branch/CouenneChooseVariable.cpp
+
+getFixVarBinFun.lo: branch/getFixVarBinFun.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT getFixVarBinFun.lo -MD -MP -MF "$(DEPDIR)/getFixVarBinFun.Tpo" -c -o getFixVarBinFun.lo `test -f 'branch/getFixVarBinFun.cpp' || echo '$(srcdir)/'`branch/getFixVarBinFun.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/getFixVarBinFun.Tpo" "$(DEPDIR)/getFixVarBinFun.Plo"; else rm -f "$(DEPDIR)/getFixVarBinFun.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/getFixVarBinFun.cpp' object='getFixVarBinFun.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o getFixVarBinFun.lo `test -f 'branch/getFixVarBinFun.cpp' || echo '$(srcdir)/'`branch/getFixVarBinFun.cpp
 
 exprAbs.lo: expression/operators/exprAbs.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprAbs.lo -MD -MP -MF "$(DEPDIR)/exprAbs.Tpo" -c -o exprAbs.lo `test -f 'expression/operators/exprAbs.cpp' || echo '$(srcdir)/'`expression/operators/exprAbs.cpp; \

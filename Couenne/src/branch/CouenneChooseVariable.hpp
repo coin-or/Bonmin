@@ -76,6 +76,7 @@ public:
 
 protected:
 
+  /// pointer to the CouenneProblem 
   CouenneProblem *problem_;
 };
 

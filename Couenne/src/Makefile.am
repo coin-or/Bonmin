@@ -21,6 +21,7 @@ libCouenne_la_SOURCES = \
 	branch/CouenneBranchingObject.cpp \
 	branch/CouenneObject.cpp \
 	branch/CouenneChooseVariable.cpp \
+	branch/getFixVarBinFun.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \

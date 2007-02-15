@@ -52,11 +52,6 @@ class exprSum: public exprOp {
   // Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
-
   // reduce expression in standard form, creating additional aux
   // variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);

@@ -111,7 +111,7 @@ class exprCopy: public expression {
 
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
-  virtual int getFixIndex () {return copy_ -> getFixIndex ();}
+  virtual expression *getFixVar () {return copy_ -> getFixVar ();}
 };
 
 #endif

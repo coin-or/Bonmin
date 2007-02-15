@@ -13,8 +13,8 @@
            through a call to operator () of that exprAux.
 */
 
-CouenneBranchingObject::CouenneBranchingObject (exprAux *aux): 
-  reference_ (aux)
+CouenneBranchingObject::CouenneBranchingObject (expression *var): 
+  reference_ (var)
   {value_ = (*reference_) ();} // set the branching value at the current point 
 
 

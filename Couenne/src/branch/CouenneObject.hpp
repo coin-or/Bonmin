@@ -36,6 +36,7 @@ public:
   /// create CouenneBranchingObject based on this object
   virtual OsiBranchingObject* createBranch (OsiSolverInterface*, 
 					    const OsiBranchingInformation*, int) const;
+
 protected:
 
   /// the (auxiliary) variable which this branching object refers to

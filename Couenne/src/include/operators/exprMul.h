@@ -63,7 +63,7 @@ class exprMul: public exprOp {
 
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
-  int getFixIndex () {return arglist_ [0] -> Index ();}
+  expression *getFixVar ();
 };
 
 

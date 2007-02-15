@@ -13,7 +13,7 @@ CouenneChooseVariable::CouenneChooseVariable ():
   problem_ (NULL) {}
 
 /// Constructor from solver (so we can set up arrays etc)
-CouenneChooseVariable::CouenneChooseVariable (const OsiSolverInterface *solver,
+CouenneChooseVariable::CouenneChooseVariable (const OsiSolverInterface *,
 					      CouenneProblem *p):
   problem_ (p) {}
 
