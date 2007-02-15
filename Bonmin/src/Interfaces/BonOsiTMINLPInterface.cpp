@@ -209,7 +209,7 @@ register_general_options
       "(where l is the lower bound for the variable and u is its upper bound)");
 
   roptions->AddStringOption2("random_point_type","method to choose a random starting point",
-			     "uniform",
+			     "Jon",
 			     "Jon", "Choose random point uniformly between the bounds",
 			     "Andreas", "perturb the starting point of the problem within a prescriped interval","");
     roptions->AddLowerBoundedNumberOption("random_point_perturbation_interval",
@@ -2648,7 +2648,7 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->Options()->GetNumericValue("tiny_element",tiny_,"bonmin.");
     app_->Options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
     app_->Options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,"bonmin.");
-      app_->Options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
+    app_->Options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
   }
 }
 
