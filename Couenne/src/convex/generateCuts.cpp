@@ -94,6 +94,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (cs.sizeRowCuts ())
     printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
 
+  for (int i = cs.sizeRowCuts (); i--;)
+    cs.rowCutPtr (i) -> print ();
+
+  printf ("==============================================\n");
   if (firstcall_) 
     firstcall_ = false;
   else {

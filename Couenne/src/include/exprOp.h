@@ -105,7 +105,7 @@ class exprOp: public expression {
 
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar () {return arglist_ [0];}
+  virtual expression *getFixVar () {printf ("////////////////////////\n\n");return arglist_ [0];}
 };
 
 

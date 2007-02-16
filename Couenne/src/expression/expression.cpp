@@ -117,10 +117,11 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   //  print (std::cout);  printf (" := ");
   //  image_ -> print (std::cout); printf("\n");
 
+  int j=cs.sizeRowCuts ();
+
   image_ -> generateCuts (this, si, cs, cg);
 
-  /*
-  static int j=0;
+  
   //  if (!(cg -> isFirst ())) 
   {
     printf ("----------------Generated cut for "); 
@@ -129,7 +130,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
     for (;j < cs.sizeRowCuts ();j++)
       cs.rowCutPtr (j) -> print ();
   }
-  */
+  
 }
 
 

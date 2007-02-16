@@ -15,7 +15,9 @@
 
 CouenneBranchingObject::CouenneBranchingObject (expression *var): 
   reference_ (var)
-  {value_ = (*reference_) ();} // set the branching value at the current point 
+  {
+    value_ = expression::Variable (reference_->Index());
+  } // set the branching value at the current point 
 
 
 /** \brief Execute the actions required to branch, as specified by the
@@ -37,6 +39,9 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   else     // "<=" node, set upper bound (ditto)
     solver -> setColUpper (reference_ -> Index(), 
 			   reference_ -> isInteger() ? floor (value_) : value_);
+  printf("Branching on %d, way %d, changing %s bound to %f.",
+	 reference_ -> Index(), way, (way)?"lower":"upper", value_);
 
+  branchIndex_++;
   return 0.; // estimated gain in objective function
 }

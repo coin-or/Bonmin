@@ -12,7 +12,18 @@
 
 /// return difference between current value
 double CouenneObject::infeasibility (const OsiBranchingInformation*, int &) const
-  {return fabs ((*reference_) () - (*(reference_ -> Image ())) ());}
+  {
+    const double & expr = (*(reference_ -> Image ())) ();
+    const double & var = expression::Variable (reference_ -> Index ());
+    bool verbose = 1;
+    if(verbose){
+      reference_->print(std::cout);
+      std::cout<<" = ";
+      reference_->Image()->print(std::cout);
+      std::cout<<std::endl;
+      std::cout<<expr<<" =(?) "<<var<<std::endl;
+    }
+    return fabs (var - expr);}
 
 
 /// fix integer coordinates of current integer feasible solution
@@ -34,6 +45,5 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *, 
 						 const OsiBranchingInformation *, 
 						 int) const {
-
-  return new CouenneBranchingObject (reference_ -> getFixVar ());
+  return new CouenneBranchingObject (reference_ -> Image () -> getFixVar ());
 }

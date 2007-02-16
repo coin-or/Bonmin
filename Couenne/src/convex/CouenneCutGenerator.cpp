@@ -106,3 +106,14 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
   if (cut) 
     cs.insert (cut);
 }
+
+void CouenneCutGenerator::updateAuxs (CouNumber *x, CouNumber *l, CouNumber *u) {
+
+  problem_ -> update (x,l,u);
+
+  for (int i=0, j=problem_->nVars(); i<problem_ -> nAuxs (); i++, j++) {
+    x [j] = (*(problem_ -> Aux (i))) ();
+    l [j] = (*(problem_ -> Aux (i) -> Lb ())) ();
+    u [j] = (*(problem_ -> Aux (i) -> Ub ())) ();
+  }
+}

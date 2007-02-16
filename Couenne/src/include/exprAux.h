@@ -99,7 +99,8 @@ class exprAux: public exprVar {
   // 2: quadratic
   // 3: nonlinear non-quadratic
   inline int Linearity ()
-    {return image_ -> Linearity ();}
+    {return LINEAR;
+    /*return image_ -> Linearity ();*/}
 
   // Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lb, expression *&ub) 

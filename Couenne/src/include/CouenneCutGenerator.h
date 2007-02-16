@@ -126,6 +126,9 @@ class CouenneCutGenerator: public CglCutGenerator {
   // current lower-, and current upper bound)
   int updateConv (CouNumber *, CouNumber *, CouNumber *);
 
+  // update auxiliary variables and their bounds
+  void updateAuxs (CouNumber *, CouNumber *, CouNumber *);
+
   // create cut and check violation
   OsiRowCut *createCut (CouNumber, // rhs
 			int,       // sign: -1: <=, 0: =, +1: >=
