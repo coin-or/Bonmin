@@ -9,6 +9,7 @@
 #include <exprMul.h>
 #include <exprSum.h>
 #include <exprConst.h>
+#include <exprClone.h>
 #include <CouennePrecisions.h>
 
 
@@ -87,7 +88,7 @@ expression *exprMul::differentiate (int index) {
 
       for (int j = 0; j < nargs_; j++) 
 	if (i!=j)
-	  alm [j] = new exprCopy (arglist_ [j]);
+	  alm [j] = new exprClone (arglist_ [j]);
 
       als [nonconst++] = new exprMul (alm, nargs_);
     }

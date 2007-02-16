@@ -74,18 +74,18 @@ expression *exprPow::differentiate (int index) {
   expression **alm2 = new expression * [2];
   expression **ald  = new expression * [2];
 
-  alp [0] = new exprCopy (arglist_ [0]);
-  alp [1] = new exprCopy (arglist_ [1]);
+  alp [0] = new exprClone (arglist_ [0]);
+  alp [1] = new exprClone (arglist_ [1]);
 
   alm [0] = new exprPow (alp, 2);
 
   alm1 [0] = arglist_ [1] -> differentiate (index);
-  alm1 [1] = new exprLog (new exprCopy (arglist_ [0]));
+  alm1 [1] = new exprLog (new exprClone (arglist_ [0]));
 
   als [0] = new exprMul (alm1, 2);
 
-  ald [0] = new exprCopy (arglist_ [1]);
-  ald [1] = new exprCopy (arglist_ [0]);
+  ald [0] = new exprClone (arglist_ [1]);
+  ald [1] = new exprClone (arglist_ [0]);
 
   alm2 [0] = new exprDiv (ald, 2);
   alm2 [1] = arglist_ [0] -> differentiate (index);

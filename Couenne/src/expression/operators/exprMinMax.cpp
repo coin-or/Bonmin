@@ -9,7 +9,6 @@
 #include <OsiSolverInterface.hpp>
 #include <CouenneCutGenerator.h>
 #include <exprMax.h>
-#include <exprCopy.h>
 #include <exprMin.h>
 
 void exprMin::generateCuts (exprAux *w, const OsiSolverInterface &si, 

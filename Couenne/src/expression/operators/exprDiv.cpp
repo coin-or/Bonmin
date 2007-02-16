@@ -8,6 +8,7 @@
 
 #include <exprDiv.h>
 #include <exprConst.h>
+#include <exprClone.h>
 #include <exprMul.h>
 #include <exprInv.h>
 #include <exprSub.h>
@@ -74,13 +75,13 @@ expression *exprDiv::differentiate (int index) {
   expression **als  = new expression * [2];
   expression **alm2 = new expression * [3];
 
-  exprInv *invg = new exprInv (new exprCopy (arglist_ [1]));
+  exprInv *invg = new exprInv (new exprClone (arglist_ [1]));
 
   alm [0] = invg; // evaluated before alm2 [2]
 
-  alm2 [0] = new exprCopy (arglist_ [0]);
+  alm2 [0] = new exprClone (arglist_ [0]);
   alm2 [1] = arglist_ [1] -> differentiate (index);
-  alm2 [2] = new exprCopy (invg);
+  alm2 [2] = new exprClone (invg);
 
   als [0] = arglist_ [0] -> differentiate (index);
   als [1] = new exprMul (alm2, 3);
@@ -108,10 +109,10 @@ void exprDiv::getBounds (expression *&lb, expression *&ub) {
   arglist_ [0] -> getBounds (almin [0], almin [1]);
   arglist_ [1] -> getBounds (almin [2], almin [3]);
 
-  almax [0] = new exprCopy (almin [0]);
-  almax [1] = new exprCopy (almin [1]);
-  almax [2] = new exprCopy (almin [2]);
-  almax [3] = new exprCopy (almin [3]);
+  almax [0] = new exprClone (almin [0]);
+  almax [1] = new exprClone (almin [1]);
+  almax [2] = new exprClone (almin [2]);
+  almax [3] = new exprClone (almin [3]);
 
   lb = new exprLBDiv (almin, 4);
   ub = new exprUBDiv (almax, 4);

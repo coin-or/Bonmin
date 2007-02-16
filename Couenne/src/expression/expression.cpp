@@ -57,17 +57,19 @@ void exprOp::print (std::ostream      &out = std::cout,
   if (pos == PRE)
     out << op;
 
-  out << "("; 
+  out << "("; fflush (stdout);
   for (int i=0; i<nargs_; i++) {
     if (arglist_ [i])
       arglist_ [i] -> print (out); 
-
+    fflush (stdout);
     if (i < nargs_ - 1) {
       if (pos == INSIDE) out << op;
       else               out << ",";
     }
+    fflush (stdout);
   }
   out << ")";
+  fflush (stdout);
 }
 
 

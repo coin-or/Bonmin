@@ -1,5 +1,5 @@
 /*
- * Name:    exprInv.C
+ * Name:    exprInv.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of inverse of a function (1/f(x))
  *
@@ -8,7 +8,7 @@
 
 
 #include <exprInv.h>
-#include <exprCopy.h>
+#include <exprClone.h>
 #include <exprMul.h>
 
 
@@ -18,8 +18,8 @@ expression *exprInv::differentiate (int index) {
 
   expression **alm = new expression * [3];
   
-  alm [0] = new exprInv (new exprCopy (argument_));
-  alm [1] = new exprCopy (alm [0]);
+  alm [0] = new exprInv (new exprClone (argument_));
+  alm [1] = new exprClone (alm [0]);
   alm [2] = argument_ -> differentiate (index);
 
   return new exprMul (alm, 3);

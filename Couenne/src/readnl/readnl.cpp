@@ -263,6 +263,7 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
       else                 body = new exprSum (alists [i], nterms [i]);	
 
       expression *subst = body -> simplify ();
+
       if (subst) body = subst;
 
       // add them (and set lower-upper bound)

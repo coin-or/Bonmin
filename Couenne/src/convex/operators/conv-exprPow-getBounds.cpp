@@ -85,8 +85,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	all [4] = ubbase;
 
 	if (expon > COUENNE_EPS) 
-	     all [1] = new exprPow (new exprCopy (lbbase), new exprConst (expon));
-	else all [1] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
+	     all [1] = new exprPow (new exprClone (lbbase), new exprConst (expon));
+	else all [1] = new exprPow (new exprClone (ubbase), new exprConst (expon));
 
 	// all [3] is lower bound when lbbase <= 0 <= ubbase
 
@@ -95,10 +95,10 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	  if (rndexp % 2) 
 	       all [3] = new exprConst (-COUENNE_INFINITY);
 	  else all [3] = new exprMin (new exprClone (all [1]),
-				      new exprPow (new exprCopy (lbbase), 
+				      new exprPow (new exprClone (lbbase), 
 						   new exprConst (expon)));
 	}
-	else all [3] = new exprCopy (all [1]);
+	else all [3] = new exprClone (all [1]);
 
 	// all [5] is the lower bound value when lbbase <= ubbase <= 0
 
@@ -135,17 +135,17 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	  alu [4] = new exprClone (ubbase);
 
 	  if ((expon > COUENNE_EPS) || ((isInt || isInvInt) && !(rndexp % 2)))
-	    alu [1] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
-	  else alu [1] = new exprPow (new exprCopy (lbbase), new exprConst (expon));
+	    alu [1] = new exprPow (new exprClone (ubbase), new exprConst (expon));
+	  else alu [1] = new exprPow (new exprClone (lbbase), new exprConst (expon));
 
 	  // alu [3] is upper bound when lbbase <= 0 <= ubbase
 
 	  if (expon < - COUENNE_EPS) 
 	    alu [3] = new exprConst (COUENNE_INFINITY);
 	  else if (isInt && !(rndexp % 2))
-	    alu [3] = new exprPow (new exprMax (new exprCopy (lbbase), new exprCopy (ubbase)),
+	    alu [3] = new exprPow (new exprMax (new exprClone (lbbase), new exprClone (ubbase)),
 				   new exprConst (expon));
-	  else alu [3] = new exprPow (new exprCopy (ubbase), new exprConst (expon));
+	  else alu [3] = new exprPow (new exprClone (ubbase), new exprConst (expon));
 
 	  // alu [5] is the upper bound value when lbbase <= ubbase <= 0
 
