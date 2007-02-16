@@ -81,7 +81,7 @@ namespace Bonmin
     /** Minimum reliability before trust pseudo-costs.*/
     int minReliability;
     /** Number of cutting plane iterations in lp strong branching.*/
-    int numEcpRounds;
+    int numEcpRoundsStrong;
     /** Global time limit. */
     double maxTime;
     /** Global node limit.*/
@@ -100,6 +100,8 @@ namespace Bonmin
     int nlpSolveFrequency;
     /** frequency for generating filmint's type ecp cuts.*/
     int filmintCutsFrequency;
+    /** Number of cutting plane iterations in lp strong branching.*/
+    int numEcpRounds;
     /** Max OA decomposition time in B-Hyb.*/
     double oaDecMaxTime;
     /** milp subsolver:

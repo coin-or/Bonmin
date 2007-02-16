@@ -179,6 +179,7 @@ namespace Bonmin
     EcpCuts ecpGen(nlpSolver);
     ecpGen.parameter().global_ = par.oaCutsGlobal;
     ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
+    ecpGen.setNumRounds(par.numEcpRounds);
 
     //Outer approximation iterations
     OsiSolverInterface * localSearchSolver=NULL;
@@ -436,7 +437,7 @@ namespace Bonmin
     else if(par.varSelection == OsiTMINLPInterface::LP_STRONG_BRANCHING){
       model.solver()->findIntegersAndSOS(false);
       LpStrongBranching chooseVariable(nlpSolver);
-      chooseVariable.setMaxCuttingPlaneIter(par.numEcpRounds);
+      chooseVariable.setMaxCuttingPlaneIter(par.numEcpRoundsStrong);
       chooseVariable.setNumberStrong(model.numberStrong());
       branch.setChooseMethod(chooseVariable);
     }

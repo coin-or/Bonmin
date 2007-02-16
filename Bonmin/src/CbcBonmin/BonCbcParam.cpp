@@ -47,7 +47,7 @@ namespace Bonmin
     Options->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     Options->GetIntegerValue("number_strong_branch",numberStrong,"bonmin.");
     Options->GetIntegerValue("number_before_trust", minReliability,"bonmin.");
-    Options->GetIntegerValue("number_ecp_rounds", numEcpRounds,"bonmin.");
+    Options->GetIntegerValue("number_ecp_rounds_strong", numEcpRoundsStrong,"bonmin.");
 
     Options->GetEnumValue("sos_constraints",disableSos,"bonmin.");
     // Robustness and non convex minlps
@@ -61,7 +61,8 @@ namespace Bonmin
     Options->GetEnumValue("oa_cuts_scope", oaCutsGlobal,"bonmin.");
     Options->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     Options->GetIntegerValue("nlp_solve_frequency",nlpSolveFrequency,"bonmin.");
-Options->GetIntegerValue("filmint_ecp_cuts",filmintCutsFrequency, "bonmin.");
+    Options->GetIntegerValue("filmint_ecp_cuts",filmintCutsFrequency, "bonmin.");
+    Options->GetIntegerValue("number_ecp_rounds", numEcpRounds,"bonmin.");
     Options->GetNumericValue("oa_dec_time_limit",oaDecMaxTime,"bonmin.");
     Options->GetIntegerValue("Gomory_cuts", migFreq,"bonmin.");
     Options->GetIntegerValue("probing_cuts",probFreq,"bonmin.");
