@@ -147,15 +147,6 @@ class Messages : public CoinMessages
   /// Retrieve OsiTMINLPApplication option list
   Ipopt::SmartPtr<Ipopt::OptionsList> retrieve_options();
 
-  /** Register all possible options to Bonmin */
-  void register_ALL_options (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
-
-  /// Read parameter file
-  void readOptionFile(const char * fileName);
-  //@}
-
-  void extractInterfaceParams();
-
   //---------------------------------------------------------------------------
   /**@name Solve methods */
   //@{
@@ -855,7 +846,26 @@ class Messages : public CoinMessages
   double getNonLinearitiesViolation(const double *x, const double obj);
 
 //---------------------------------------------------------------------------
+
+  void extractInterfaceParams();
+
+  enum AlgorithmType{
+    B_BB=0/** Bonmin's Branch-and-bound.*/,
+    B_OA=1/** Bonmin's Outer Approximation Decomposition.*/,
+    B_QG=2/** Bonmin's Quesada & Grossmann branch-and-cut.*/,
+    B_Hyb=3/** Bonmin's hybrid outer approximation.*/,
+    B_Couenne=4/** Bonmin's and Couenne spatial branch-and-bound.*/};
+  /** To set some application specific defaults. */
+  virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
+
 protected:
+  /** Register all possible options to Bonmin */
+  void register_ALL_options (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+  
+  /// Read parameter file
+  void readOptionFile(const char * fileName);
+  //@}
+
   enum RandomGenerationType{
     uniform =0, perturb=1};
   /// Initialize data structures for storing the jacobian

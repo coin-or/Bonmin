@@ -44,8 +44,11 @@ namespace Bonmin
     {
       return GetRawPtr(amplTminlp_);
     }
+    /** To set some application specific defaults. */
+    virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
   protected:
+
     /** TMINLP problem (the original problem usually an AmplTMINLP).*/
     Ipopt::SmartPtr<Bonmin::AmplTMINLP> amplTminlp_;
   };

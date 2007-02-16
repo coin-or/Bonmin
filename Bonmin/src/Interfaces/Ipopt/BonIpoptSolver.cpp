@@ -157,7 +157,8 @@ namespace Bonmin{
   {
     if(problemHadZeroDimension_)
       {
-	return 0.;}
+	return 0.;
+      }
     else
       {
 	const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_->Statistics();

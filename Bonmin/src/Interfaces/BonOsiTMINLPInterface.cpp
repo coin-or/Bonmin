@@ -88,13 +88,14 @@ register_general_options
       "filterSQP", "Sequential quadratic programming trust region algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
        "");
 
-  roptions->AddStringOption4("algorithm",
+  roptions->AddStringOption5("algorithm",
       "Choice of the algorithm.",
       "B-Hyb",
       "B-BB","simple branch-and-bound algorithm,",
       "B-OA","OA Decomposition algorithm,",
       "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
       "B-Hyb","hybrid outer approximation based branch-and-cut.",
+			     "B-Couenne","Branch-and-bound using Couenne convexifier (not available through Bonmin excutable)",
       "This will preset default values for most options of bonmin but depending on which algorithm "
       "some of these can be changed.");
   roptions->AddLowerBoundedNumberOption("time_limit",
@@ -180,7 +181,7 @@ register_general_options
    "A value of 0 disables dynamic strong branching.");
 
   roptions->AddLowerBoundedIntegerOption
-  ("number_ecp_rounds",
+  ("number_ecp_rounds_strong",
    "Set the number of rounds of ecp in strong branching.",
    0,1,
    "");
@@ -306,6 +307,13 @@ static void register_OA_options
       0,0,
       "A frequency of 0 amounts to to never solve the NLP relaxation.");
 
+  roptions->AddLowerBoundedIntegerOption
+    ("number_ecp_rounds",
+     "Set the number of rounds of ecp cuts.",
+     0,5,
+     "");
+
+
   roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
       "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
       0.,0,30.,
@@ -397,8 +405,14 @@ OsiTMINLPInterface::register_ALL_options
   catch(RegisteredOptions::OPTION_ALREADY_REGISTERED) {
     // skipping
   }
+
+
 }
 
+/** To set some application specific defaults. */
+void 
+OsiTMINLPInterface::setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options)
+{}
 
 OsiTMINLPInterface::Messages::Messages
 ():CoinMessages((int)OSITMINLPINTERFACE_DUMMY_END)

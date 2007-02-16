@@ -158,4 +158,9 @@ namespace Bonmin
       std::cerr<<"Errot can not write .sol file for non ampl problem"<<std::endl;
   }
 
-}
+void 
+AmplInterface::setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options)
+{}
+
+
+} /* end namespace Bonmin. */
