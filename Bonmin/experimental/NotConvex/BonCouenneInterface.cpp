@@ -31,7 +31,7 @@ CouenneInterface::CouenneInterface(char **& amplArgs, SmartPtr<TNLPSolver> app):
     int addOnlyViolatedOa = true;
     app_->Options()->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     couenneCg_ = new CouenneCutGenerator 
-                       (nc_asl, addOnlyViolatedOa, CURRENT_ONLY,1);
+                       (nc_asl, false, CURRENT_ONLY,1);
   }
 
 /** Copy constructor. */
@@ -54,6 +54,8 @@ CouenneInterface * CouenneInterface::clone(bool CopyData){
 CouenneInterface::~CouenneInterface(){
   if(couenneCg_) delete couenneCg_;
 }
+
+
 
 /** \name Overloaded methods to build outer approximations */
   //@{
@@ -85,6 +87,9 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
 
    // Feed in the initial relaxation point
    CoinCopyN(getColSolution(), numcols, x0);
+   //   updateCouenneAuxiliryVar(x0,colLower, colUpper);
+
+   couenneCg_ -> updateAuxs (x0, colLower, colUpper);
    int numrowsconv = couenneCg_->updateConv(x0, colLower, colUpper);
 
    /* Now, create matrix and other stuff. */
@@ -172,7 +177,8 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
      }
    }
  
-  si.writeMpsNative("toto",NULL,NULL,1);
+   //si.writeMpsNative("toto",NULL,NULL,1);
+   si.writeLp("toto");
   app_->enableWarmStart();
   setColSolution(problem()->x_sol());
   setRowPrice(problem()->duals_sol());
@@ -183,7 +189,28 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
 void 
 CouenneInterface::getOuterApproximation(OsiCuts &cs, bool getObj, 
 					const double * x2, bool global){
-  getOuterApproximation(cs, getColSolution(), getObj, x2, global);
+  
+   int numcols = getNumCols();
+   int numcolsconv = couenneCg_->getnvars();
+
+   CouNumber * x0 = new CouNumber[numcolsconv];
+   CouNumber * colLower = new CouNumber[numcolsconv];
+   CouNumber * colUpper = new CouNumber[numcolsconv];
+   assert(numcolsconv >= numcols);
+   
+   CoinCopyN(couenneCg_->X(), numcolsconv, x0);
+   CoinCopyN(couenneCg_->Lb(), numcolsconv, colLower);
+   CoinCopyN(couenneCg_->Ub(), numcolsconv, colUpper);
+
+   // Feed in the initial relaxation point
+   CoinCopyN(getColSolution(), numcols, x0);
+   couenneCg_ -> updateAuxs (x0,colLower, colUpper);
+   getOuterApproximation(cs, x0, getObj, x2, global);
+
+   delete [] colLower;
+   delete [] colUpper;
+   delete [] x0;
+
 }
 
 void 
@@ -204,14 +231,10 @@ CouenneInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getO
    CouNumber * colUpper = new CouNumber[numcolsconv];
    assert(numcolsconv >= numcols);
    
-   CoinCopyN(couenneCg_->X(), numcolsconv, x0);
-   CoinCopyN(couenneCg_->Lb(), numcolsconv, colLower);
-   CoinCopyN(couenneCg_->Ub(), numcolsconv, colUpper);
-
    // Feed in the current state
-   CoinCopyN(x, numcols, x0);
-   CoinCopyN(getColLower(), numcols, colLower);
-   CoinCopyN(getColUpper(), numcols, colUpper);
+   CoinCopyN(x, numcolsconv, x0);
+   CoinCopyN(getColLower(), numcolsconv, colLower);
+   CoinCopyN(getColUpper(), numcolsconv, colUpper);
 
    couenneCg_->updateConv(x0, colLower, colUpper);
 
@@ -226,5 +249,14 @@ CouenneInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getO
    delete [] colUpper;
    delete [] x0;
 }
+
+  /** To set some application specific defaults. */
+  void CouenneInterface::setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options){
+    Options->SetStringValue("bonmin.algorithm", "B-Couenne", true, true);
+    Options->SetIntegerValue("bonmin.filmint_ecp_cuts", 1, true, true);
+  }
+
+
+
 
 } /** End Bonmin namespace. */

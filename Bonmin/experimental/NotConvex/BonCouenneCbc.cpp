@@ -11,6 +11,7 @@
 //Couenne Bonmin interface
 #include "BonCouenneCbc.hpp"
 #include "BonCouenneInterface.hpp"
+#include "BonCouenneConvexCuts.hpp"
 
 //Couenne
 #include "CouenneObject.hpp"
@@ -34,7 +35,7 @@
 #include "BonOACutGenerator2.hpp"
 #include "BonOaFeasChecker.hpp"
 #include "BonOaNlpOptim.hpp"
-#include "BonEcpCuts.hpp"
+
 
 // Cbc Header file
 #include "CbcModel.hpp"
@@ -118,7 +119,8 @@ namespace Bonmin
 
     nlpSolver->messageHandler()->setLogLevel(par.nlpLogLevel);
 
-    if (par.algo >= 0 && par.algo <= 3) //Do something classic
+    if (par.algo >= OsiTMINLPInterface::B_BB && 
+	par.algo <= OsiTMINLPInterface::B_Hyb) //Do something classic
     {
       Bab::branchAndBound(nlpSolver, par);
       return;
@@ -137,6 +139,27 @@ namespace Bonmin
     si->setAuxiliaryInfo(extraStuff);
     delete extraStuff;
 
+    //TODO : Switch to OsiObejcts
+    si->findIntegersAndSOS(false);
+    {
+      const CouenneProblem * couenneProb = ci->couenneProb();
+      int numAuxs = couenneProb->nAuxs();
+      OsiObject ** objects = new OsiObject*[numAuxs];
+      int nobj = 0;
+      for(int i = 0 ; i < numAuxs; i++)
+	{
+	  if(couenneProb->Aux(i)->Image()->Linearity() > LINEAR){
+	    objects[nobj] = new CouenneObject (couenneProb->Aux(i));
+	    objects[nobj++]->setPriority(1);
+	  }
+      }
+      si->addObjects(nobj, objects);
+//       for(int i = 0 ; i < nobj ; i++){
+// 	delete objects[i];
+//       }
+//       delete objects;
+    }
+    
 
     CbcModel model(*si);
 
@@ -155,10 +178,10 @@ namespace Bonmin
 
     //Setup OA generators
 
-    EcpCuts ecpGen(nlpSolver);
+    CouenneConvCuts ecpGen(nlpSolver);
     ecpGen.parameter().global_ = par.oaCutsGlobal;
     ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
-
+    ecpGen.setNumRounds(par.numEcpRounds);
 
     int numGen = 0;
 
@@ -167,22 +190,22 @@ namespace Bonmin
       numGen++;
     }
 
-    if (par.migFreq != 0) {
-      model.addCutGenerator(&miGGen,par.migFreq,"GMI");
-      numGen++;
-    }
-      if (par.probFreq != 0) {
-        model.addCutGenerator(&probGen,par.probFreq,"Probing");
-        numGen++;
-      }
-      if (par.coverFreq != 0) {
-        model.addCutGenerator(&knapsackGen,par.coverFreq,"covers");
-        numGen++;
-      }
-      if (par.mirFreq != 0) {
-        model.addCutGenerator(&mixedGen,par.mirFreq,"MIR");
-        numGen++;
-      }
+//     if (par.migFreq != 0) {
+//       model.addCutGenerator(&miGGen,par.migFreq,"GMI");
+//       numGen++;
+//     }
+//       if (par.probFreq != 0) {
+//         model.addCutGenerator(&probGen,par.probFreq,"Probing");
+//         numGen++;
+//       }
+//       if (par.coverFreq != 0) {
+//         model.addCutGenerator(&knapsackGen,par.coverFreq,"covers");
+//         numGen++;
+//       }
+//       if (par.mirFreq != 0) {
+//         model.addCutGenerator(&mixedGen,par.mirFreq,"MIR");
+//         numGen++;
+//       }
 
     //Set true branch-and-bound parameters
     model.messageHandler()->setLogLevel(par.bbLogLevel);
@@ -194,21 +217,9 @@ namespace Bonmin
     //   model.setMaxInfeasible(par.maxInfeasible);
 
 
-    //TODO : Switch to OsiObejcts
-    si->findIntegersAndSOS(false);
-    {
-      const CouenneProblem * couenneProb = ci->couenneProb();
-      int numAuxs = couenneProb->nAuxs();
-      OsiObject ** objects = new OsiObject*[numAuxs];
-      for(int i = 0 ; i < numAuxs; i++)
-	{
-	objects[i] = new CouenneObject (couenneProb->Aux(i));
-	objects[i]->setPriority(9999);
-      }
-    si->addObjects(numAuxs, objects);
-    }
     //Pass over user set branching priorities to Cbc
-    {
+    if(0)
+      {
       //set priorities, prefered directions...
       const int * priorities = nlpSolver->getPriorities();
       const double * upPsCosts = nlpSolver->getUpPsCosts();
@@ -287,44 +298,10 @@ namespace Bonmin
     CbcBranchUserDecision branch;
 
 
-    if(par.varSelection == OsiTMINLPInterface::CURVATURE_ESTIMATOR){
-    // AW: Try to set new chooseVariable object
-      BonCurvBranching chooseVariable(nlpSolver);
-      chooseVariable.setNumberStrong(model.numberStrong());
-      branch.setChooseMethod(chooseVariable);
-    }
-    else if(par.varSelection == OsiTMINLPInterface::QP_STRONG_BRANCHING){
-      model.solver()->findIntegersAndSOS(false);
-      BonQPStrongBranching chooseVariable(nlpSolver);
-      chooseVariable.setNumberStrong(model.numberStrong());
-      branch.setChooseMethod(chooseVariable);
-    }
-    else if(par.varSelection == OsiTMINLPInterface::LP_STRONG_BRANCHING){
-      model.solver()->findIntegersAndSOS(false);
-      LpStrongBranching chooseVariable(nlpSolver);
-      chooseVariable.setMaxCuttingPlaneIter(par.numEcpRounds);
-      chooseVariable.setNumberStrong(model.numberStrong());
-      branch.setChooseMethod(chooseVariable);
-    }
-    else if(par.varSelection == OsiTMINLPInterface::NLP_STRONG_BRANCHING){
-      const bool solve_nlp = true;
-      model.solver()->findIntegersAndSOS(false);
-      BonQPStrongBranching chooseVariable(nlpSolver, solve_nlp);
-      chooseVariable.setNumberStrong(model.numberStrong());
-      branch.setChooseMethod(chooseVariable);
-    }
-    else if(par.varSelection == OsiTMINLPInterface::OSI_SIMPLE){
-      model.solver()->findIntegersAndSOS(false);
-      OsiChooseVariable choose(model.solver());
-      branch.setChooseMethod(choose);
-    }
-    else if(par.varSelection == OsiTMINLPInterface::OSI_STRONG){
-      model.solver()->findIntegersAndSOS(false);
-      OsiChooseStrong choose(model.solver());
-      choose.setNumberBeforeTrusted(par.minReliability);
-      choose.setNumberStrong(par.numberStrong);
-      branch.setChooseMethod(choose);
-    }
+
+    CouenneChooseVariable choose(model.solver(), const_cast<CouenneProblem *>(ci->couenneProb()));
+    branch.setChooseMethod(choose);
+
     model.setBranchingMethod(&branch);
 
     //Get the time and start.
@@ -397,5 +374,8 @@ namespace Bonmin
     delete si;
     std::cout<<"Finished"<<std::endl;
   }
+
+
+
 
 }

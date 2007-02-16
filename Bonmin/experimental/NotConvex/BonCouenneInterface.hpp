@@ -49,10 +49,19 @@ class CouenneInterface : public AmplInterface
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
   virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
 
+  void updateCouenneAuxiliryVar(double *x, double * lb, double * ub);
+
   const CouenneProblem * couenneProb() const{
     return couenneCg_->Problem();
   }
-  protected:
+
+  CouenneCutGenerator * couenneCg()  {
+    return couenneCg_;}
+  /** To set some application specific defaults. */
+  virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
+
+protected:
+ 
   /** The cut generator from couenne. */
   CouenneCutGenerator *couenneCg_;
 

@@ -25,7 +25,6 @@ namespace Bonmin
     {
       CouenneBab::branchAndBound(nlp,par);
     }
-
   };
 }
 #endif

@@ -80,6 +80,9 @@ int main (int argc, char *argv[])
    nlp_and_solver = new CouenneInterface(argv, solver);
     BonminCbcParam par;
     CouenneBab bb;
+    // Eventually change some default in a custom application
+    nlp_and_solver->setAppDefaultOptions(nlp_and_solver->solver()->Options());
+
     par(nlp_and_solver);
     bb(nlp_and_solver, par);//do branch and bound
 
