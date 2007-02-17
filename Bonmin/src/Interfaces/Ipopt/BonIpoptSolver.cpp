@@ -190,7 +190,9 @@ namespace Bonmin{
 	  }
 	else
 	  {
-	    throw CoinError("No statistics available from Ipopt","IterationCount","Bonmin::IpoptSolver");
+            printf("TODO: No statistics available from Ipopt in Bonmin::IpoptSolver::IterationCount\n");
+            return 0;
+	    //throw CoinError("No statistics available from Ipopt","IterationCount","Bonmin::IpoptSolver");
 	  }
 	
       }
