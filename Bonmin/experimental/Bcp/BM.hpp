@@ -155,7 +155,16 @@ public:
     /// Print a feasible solution
     virtual void display_feasible_solution(const BCP_solution* sol);
 
+    /// Output the final solution
+    virtual void display_final_information(const BCP_lp_statistics& lp_stat);
+
     void readIpopt();
+
+  private:
+
+  /// auxilliary method for handling output for AMPL
+  void write_AMPL_solution(const BCP_solution* sol,
+			   bool write_file, bool write_screen);
 
 };
 

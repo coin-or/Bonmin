@@ -123,63 +123,104 @@ BM_tm::create_root(BCP_vec<BCP_var*>& added_vars,
     user_data = data;
 }
 
+void
+BM_tm::write_AMPL_solution(const BCP_solution* sol,
+			   bool write_file, bool write_screen)
+{
+  const BM_solution* bs = dynamic_cast<const BM_solution*>(sol);
+  if (!bs) {
+    throw BCP_fatal_error("Trying to pack non-BM_solution.\n");
+  }
+  /* Parse again the input file so that we have a nice and clean ampl
+     setup */
+  Bonmin::AmplInterface nlpSolver;  
+
+  char* argv_[3];
+  char** argv = argv_;
+  argv[0] = NULL;
+  argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
+  argv[2] = NULL;
+  nlpSolver.readAmplNlFile(argv, 0, 0);
+  free(argv[1]);
+  OsiClpSolverInterface clp;
+  int addObjVar = par.entry(BM_par::PureBranchAndBound) ? 0 : 1;
+  nlpSolver.extractLinearRelaxation(clp, addObjVar);
+  const int numCols = clp.getNumCols();
+
+  int i;
+  
+  /* This will give the vector of core variables we have created in
+     BM_tm::initialize_core */
+  const BCP_vec<BCP_var_core*>& vars = getTmProblemPointer()->core->vars;
+
+  /* Create a dense vector with the value of each variable. Round the
+     integer vars (they were tested to be near enough to integrality) so
+     in the printouts we won't have 9.99999991234, etc.) */
+  double* dsol = new double[numCols];
+  for (i = 0; i < numCols; ++i) {
+    dsol[i] = 0.0;
+  }
+  const int size = bs->_ind.size();
+  for (i = 0; i < size; ++i) {
+    const int ind = bs->_ind[i];
+    const double v = bs->_values[i];
+    const BCP_var_t type = vars[ind]->var_type();
+    dsol[ind] = (type == BCP_ContinuousVar) ? v : floor(v+0.5);
+  }
+
+  if (write_screen) {
+    /* Display the solution on the screen */
+    printf("bonmin: feasible solution found.  Objective value: %f\n",
+	   bs->_objective);
+    for (i = 0; i < size; ++i) {
+      printf("    index: %5i   value: %f\n", bs->_ind[i], dsol[bs->_ind[i]]);
+    }
+    printf("\n");
+  }
+
+  if (write_file) {
+    /* create the AMPL solfile */
+    nlpSolver.writeAmplSolFile("\nbon-min: Optimal solution", dsol, NULL);
+  }
+  delete[] dsol;
+}
+
+/****************************************************************************/
+
+void
+BM_tm::display_final_information(const BCP_lp_statistics& lp_stat)
+{
+  bool write_screen = false;
+  BCP_tm_prob *p = getTmProblemPointer();
+  if (p->param(BCP_tm_par::TmVerb_FinalStatistics)) {
+    printf("TM: Running time: %.3f\n", CoinCpuTime() - p->start_time);
+    printf("TM: search tree size: %i   ( processed %i )   max depth: %i\n",
+	   int(p->search_tree.size()), int(p->search_tree.processed()),
+	   p->search_tree.maxdepth());
+    lp_stat.display();
+
+    if (! p->feas_sol) {
+      printf("TM: No feasible solution is found\n");
+    } else {
+      printf("TM: The best solution found has value %f\n",
+	     p->feas_sol->objective_value());
+      if (p->param(BCP_tm_par::TmVerb_BestFeasibleSolution)) {
+	write_screen = true;
+      }
+    }
+  }
+  if (p->feas_sol) {
+    write_AMPL_solution(p->feas_sol, true, write_screen);
+  }
+}
+
 /****************************************************************************/
 
 void
 BM_tm::display_feasible_solution(const BCP_solution* sol)
 {
-    const BM_solution* bs = dynamic_cast<const BM_solution*>(sol);
-    if (!bs) {
-	throw BCP_fatal_error("Trying to pack non-BM_solution.\n");
-    }
-
-    /* Parse again the input file so that we have a nice and clean ampl
-       setup */
-    Bonmin::AmplInterface nlpSolver;  
-
-    char* argv_[3];
-    char** argv = argv_;
-    argv[0] = NULL;
-    argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
-    argv[2] = NULL;
-    nlpSolver.readAmplNlFile(argv, 0, 0);
-    free(argv[1]);
-    OsiClpSolverInterface clp;
-    int addObjVar = par.entry(BM_par::PureBranchAndBound) ? 0 : 1;
-    nlpSolver.extractLinearRelaxation(clp, addObjVar);
-    const int numCols = clp.getNumCols();
-
-    int i;
-  
-    /* This will give the vector of core variables we have created in
-       BM_tm::initialize_core */
-    const BCP_vec<BCP_var_core*>& vars = getTmProblemPointer()->core->vars;
-
-    /* Create a dense vector with the value of each variable. Round the
-       integer vars (they were tested to be near enough to integrality) so
-       in the printouts we won't have 9.99999991234, etc.) */
-    double* dsol = new double[numCols];
-    for (i = 0; i < numCols; ++i) {
-	dsol[i] = 0.0;
-    }
-    const int size = bs->_ind.size();
-    for (i = 0; i < size; ++i) {
-	const int ind = bs->_ind[i];
-	const double v = bs->_values[i];
-	const BCP_var_t type = vars[ind]->var_type();
-	dsol[ind] = (type == BCP_ContinuousVar) ? v : floor(v+0.5);
-    }
-
-    /* Display the solution on the screen */
-    printf("bonmin: feasible solution found.  Objective value: %f\n",
-	   bs->_objective);
-    for (i = 0; i < size; ++i) {
-	printf("    index: %5i   value: %f\n", bs->_ind[i], dsol[bs->_ind[i]]);
-    }
-    printf("\n");
-
-    /* create the AMPL solfile */
-    nlpSolver.writeAmplSolFile("\nbon-min: Optimal solution", dsol, NULL);
-    delete[] dsol;
+  // For now, we want to write also the AMPL solution file...(?)
+  // This needs to be changed though
+  write_AMPL_solution(sol, true, true);
 }
 
