@@ -42,7 +42,7 @@ expression *exprLog::differentiate (int index) {
 
   expression **arglist = new expression * [2];
 
-  arglist [0] = new exprInv (new exprCopy (argument_));
+  arglist [0] = new exprInv (new exprClone (argument_));
   arglist [1] = argument_ -> differentiate (index);
 
   return new exprMul (arglist, 2);

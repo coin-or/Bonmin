@@ -7,7 +7,7 @@
  */
 
 #include <exprExp.h>
-#include <exprCopy.h>
+#include <exprClone.h>
 #include <exprMul.h>
 
 
@@ -17,7 +17,7 @@ expression *exprExp::differentiate (int index) {
 
   expression **arglist = new expression * [2];
 
-  arglist [0] = new exprExp (new exprCopy (argument_));
+  arglist [0] = new exprExp (new exprClone (argument_));
   arglist [1] = argument_ -> differentiate (index);
 
   return new exprMul (arglist, 2);

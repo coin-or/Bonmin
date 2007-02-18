@@ -1,6 +1,7 @@
 /*
  * Name:    CouenneBranchingObject.cpp
- * Author:  Pietro Belotti
+ * Authors: Pierre Bonami, IBM Corp.
+ *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for auxiliary variables
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
@@ -9,15 +10,48 @@
 #include <CouenneBranchingObject.hpp>
 
 
+/// make branching point $\alpha$ away from current point:
+/// bp = alpha * current + (1-alpha) * midpoint
+
+CouNumber CouenneBranchingObject::alpha_ = 0.9;
+
+
 /** \brief Constructor. Get a variable as an argument and set value_
            through a call to operator () of that exprAux.
 */
 
 CouenneBranchingObject::CouenneBranchingObject (expression *var): 
-  reference_ (var)
-  {
-    value_ = expression::Variable (reference_->Index());
-  } // set the branching value at the current point 
+  reference_ (var) {
+
+  // set the branching value at the current point 
+  //  value_ = expression::Variable (reference_ -> Index ());
+
+  int index = reference_ -> Index ();
+
+  CouNumber 
+    x = expression::Variable (index),   // current solution
+    l = expression::Lbound   (index),   //         lower bound
+    u = expression::Ubound   (index),   //         upper
+
+    alpha = CouenneBranchingObject::Alpha ();
+
+  if ((l > - COUENNE_INFINITY + 1) &&
+      (u <   COUENNE_INFINITY - 1)) 
+    // finite bounds, apply midpoint rule
+    value_ = alpha * x + (1-alpha) * (l+u) / 2.;
+  else 
+    if ((fabs (x-l) > COUENNE_EPS) && 
+	(fabs (x-u) > COUENNE_EPS))
+      // infinite (at least on one side) bound interval, but x is not
+      // at the boundary
+      value_ = x;
+    else
+      // infinite bound interval, x is at the boundary
+      // push it inwards
+      // TODO: look for a proper value for the displacement 
+      if (fabs (x-l) < COUENNE_EPS) value_ += fabs (l) / 2.; 
+      else                          value_ -= fabs (u) / 2.; 
+}
 
 
 /** \brief Execute the actions required to branch, as specified by the
@@ -39,8 +73,8 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   else     // "<=" node, set upper bound (ditto)
     solver -> setColUpper (reference_ -> Index(), 
 			   reference_ -> isInteger() ? floor (value_) : value_);
-  printf("Branching on %d, way %d, changing %s bound to %f.",
-	 reference_ -> Index(), way, (way)?"lower":"upper", value_);
+
+  printf ("Branch: x%d %c= %.12f\n", reference_ -> Index(), way ? '>' : '<', value_);
 
   branchIndex_++;
   return 0.; // estimated gain in objective function

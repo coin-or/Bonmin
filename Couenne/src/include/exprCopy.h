@@ -85,7 +85,7 @@ class exprCopy: public expression {
 
   // simplify expression (useful for derivatives)
   inline expression *simplify () 
-    {return NULL;}
+    {return copy_ -> simplify ();}
 
   // get a measure of "how linear" the expression is:
   //

@@ -103,9 +103,11 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
       if (fabs (objgrad -> coef) > COUENNE_EPS) 
 	nterms++;
 
-    if (   (OBJ_DE [i] . e) 
-	   && (!is_expr_zero (OBJ_DE [i] . e)))
+    if ((OBJ_DE [i] . e) && (!is_expr_zero (OBJ_DE [i] . e)))
       nterms++;
+
+    if (!nterms) // strange, but no (linear or nonlinear) terms in here 
+      continue;
 
     // now we can fill in the objective function terms
 
@@ -144,8 +146,6 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
     // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
-
-    //    delete [] al;
   }
 
 
@@ -263,7 +263,6 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
       else                 body = new exprSum (alists [i], nterms [i]);	
 
       expression *subst = body -> simplify ();
-
       if (subst) body = subst;
 
       // add them (and set lower-upper bound)

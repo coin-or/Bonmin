@@ -1,6 +1,7 @@
 /*
  * Name:    CouenneChooseVariable.hpp
- * Author:  Pietro Belotti
+ * Authors: Pierre Bonami, IBM Corp.
+ *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for choosing branching auxiliary variable
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)

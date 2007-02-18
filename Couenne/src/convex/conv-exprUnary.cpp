@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprUnary.C
+ * Name:    conv-exprUnary.cpp
  * Author:  Pietro Belotti
  * Purpose: methods to convexify n-ary operators
  *
@@ -8,12 +8,7 @@
 
 #include <CouenneTypes.h>
 #include <exprUnary.h>
-#include <exprSum.h>
-#include <exprSub.h>
 #include <exprClone.h>
-#include <exprOpp.h>
-#include <exprDiv.h>
-#include <exprMul.h>
 
 #include <CouenneProblem.h>
 

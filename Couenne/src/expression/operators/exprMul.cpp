@@ -13,7 +13,7 @@
 #include <CouennePrecisions.h>
 
 
-// simplify multiplications
+/// simplify multiplications
 
 expression *exprMul::simplify () {
 
@@ -102,7 +102,7 @@ expression *exprMul::differentiate (int index) {
 }
 
 
-// print
+/// print
 
 void exprMul::print (std::ostream& out) const
   {exprOp::print (out, "*", INSIDE);}
@@ -139,9 +139,4 @@ expression *getFixVarBinFun (expression *, expression *);
 // return an index to the variable's argument that is better fixed
 // in a branching rule for solving a nonconvexity gap
 expression *exprMul::getFixVar () 
-{printf ("...................using correct getFixVar for" );
- print(std::cout); std::cout << " ---> ";
- expression *ret =  getFixVarBinFun (arglist_ [0], arglist_ [1]);
- ret -> print (std::cout);
- return ret;
-}
+{return getFixVarBinFun (arglist_ [0], arglist_ [1]);}

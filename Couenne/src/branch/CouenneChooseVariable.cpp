@@ -1,6 +1,7 @@
 /*
  * Name:    CouenneChooseVariable.cpp
- * Author:  Pietro Belotti
+ * Authors: Pierre Bonami, IBM Corp.
+ *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for choosing branching auxiliary variable
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
@@ -42,12 +43,13 @@ CouenneChooseVariable::~CouenneChooseVariable () {
 
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
-  std::cout<<"Branching on :"<<std::endl;
+  /*  std::cout<<"Branching on :"<<std::endl;
   for(int kk = 0 ; kk < info -> numberColumns_ ; kk++)
     {
             std::cout<<"x["<<kk<<"] = "<<info->solution_[kk]<<"\t";  
     }
   std::cout<<std::endl;
+  */
   problem_ -> update ((CouNumber *) (info -> solution_), 
 		      (CouNumber *) (info -> lower_), 
 		      (CouNumber *) (info -> upper_));

@@ -1,6 +1,7 @@
 /*
  * Name:    CouenneObject.cpp
- * Author:  Pietro Belotti
+ * Authors: Pierre Bonami, IBM Corp.
+ *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Base object for variables (to be used in branching)
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
@@ -15,7 +16,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation*, int &) cons
   {
     const double & expr = (*(reference_ -> Image ())) ();
     const double & var = expression::Variable (reference_ -> Index ());
-    bool verbose = 1;
+    bool verbose = 0;
     if(verbose){
       reference_->print(std::cout);
       std::cout<<" = ";
@@ -31,11 +32,12 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 				      const OsiBranchingInformation *info) const {
 
   // 
-  int index = reference_ -> getFixVar () -> Index ();
+  int    index = reference_ -> getFixVar () -> Index ();
+  double val   = info -> solution_ [index];
 
   // 
-  solver -> setColLower (index, info -> solution_ [index]);
-  solver -> setColUpper (index, info -> solution_ [index]);
+  solver -> setColLower (index, val);
+  solver -> setColUpper (index, val);
 
   return 0.;
 }
@@ -45,5 +47,9 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *, 
 						 const OsiBranchingInformation *, 
 						 int) const {
+  /*  printf ("create branch for aux x%d (branch on x%d)\n", 
+	  reference_ -> Index(), 
+	  reference_ -> Image() -> getFixVar () ->Index());
+  */
   return new CouenneBranchingObject (reference_ -> Image () -> getFixVar ());
 }

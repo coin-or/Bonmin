@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprOp.C
+ * Name:    conv-exprOp.cpp
  * Author:  Pietro Belotti
  * Purpose: methods to convexify n-ary operators
  *

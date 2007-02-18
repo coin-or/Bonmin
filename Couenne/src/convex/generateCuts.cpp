@@ -80,7 +80,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
 
     problem_ ->  update (x,l,u);
-    //    expression:: update (x,l,u);
   }
 
   // For each auxiliary variable, create cut (or set of cuts) violated
@@ -91,13 +90,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   // end of generateCuts
 
-  if (cs.sizeRowCuts ())
-    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
+  //  if (cs.sizeRowCuts ())
+  //    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
 
-  for (int i = cs.sizeRowCuts (); i--;)
-    cs.rowCutPtr (i) -> print ();
-
-  printf ("==============================================\n");
   if (firstcall_) 
     firstcall_ = false;
   else {

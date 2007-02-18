@@ -24,8 +24,8 @@ class exprMin: public exprOp {
  
   exprMin  (expression *el0, expression *el1):
     exprOp (new expression * [4], 4) {
-    arglist_ [0] = el0; arglist_ [1] = new exprCopy (el0);
-    arglist_ [2] = el1; arglist_ [3] = new exprCopy (el1);
+    arglist_ [0] = el0; arglist_ [1] = new exprClone (el0);
+    arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
   }
 
   ~exprMin () {}

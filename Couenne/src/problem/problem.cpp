@@ -54,7 +54,7 @@ void CouenneProblem::addObjective (expression *newobj, const std::string &sense 
 // equality constraint
 void CouenneProblem::addEQConstraint (expression *body, expression *rhs = NULL) {
   if (!rhs) rhs = new exprConst (0);
-  constraints_ . push_back (new CouenneConstraint (body, rhs, new exprCopy (rhs)));
+  constraints_ . push_back (new CouenneConstraint (body, rhs, new exprClone (rhs)));
 }
 
 // "greater than" constraint
@@ -207,6 +207,7 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
   int nvars = nVars () + nAuxs ();
 
   if (curr_size < nvars) {
+
     x_   = (CouNumber *) realloc (x_,  nvars * sizeof (CouNumber));
     lb_  = (CouNumber *) realloc (lb_, nvars * sizeof (CouNumber));
     ub_  = (CouNumber *) realloc (ub_, nvars * sizeof (CouNumber));
@@ -214,9 +215,7 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
     curr_size = nvars;
   }
 
-  register int i;
-
-  for (i=nvars; i--;) {
+  for (register int i=nvars; i--;) {
     x_  [i] = x [i];
     lb_ [i] = l [i];
     ub_ [i] = u [i];

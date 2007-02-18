@@ -1,6 +1,7 @@
 /*
  * Name:    CouenneObject.hpp
- * Author:  Pietro Belotti
+ * Authors: Pierre Bonami, IBM Corp.
+ *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Object for auxiliary variables
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)

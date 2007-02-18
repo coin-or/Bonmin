@@ -1,6 +1,7 @@
 /*
  * Name:    CouenneBranchingObject.hpp
- * Author:  Pietro Belotti
+ * Authors: Pierre Bonami, IBM Corp.
+ *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for auxiliary variables
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
@@ -17,6 +18,10 @@
 class CouenneBranchingObject: public OsiTwoWayBranchingObject {
 
 public:
+
+  /// return global value for convex combination between current point
+  /// and midpoint
+  static CouNumber Alpha () {return alpha_;}
 
   /// Constructor
   CouenneBranchingObject (expression *);
@@ -36,6 +41,10 @@ protected:
 
   /// the variable which this branching object refers to
   expression *reference_;
+
+  /// global value for convex combination between current point and
+  /// midpoint
+  static CouNumber alpha_;
 };
 
 #endif

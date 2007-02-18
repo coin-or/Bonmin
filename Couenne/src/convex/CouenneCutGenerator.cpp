@@ -14,7 +14,7 @@
 #include <CouenneCutGenerator.h>
 
 
-// constructor
+/// constructor
 
 CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
 					  enum conv_type convtype, int nSamples):
@@ -43,7 +43,7 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
 }
 
 
-// destructor
+/// destructor
 
 CouenneCutGenerator::~CouenneCutGenerator () {
 
@@ -59,61 +59,70 @@ CouenneCutGenerator::~CouenneCutGenerator () {
 }
 
 
-// clone method
+/// clone method
 
 CouenneCutGenerator *CouenneCutGenerator::clone () const
   {return new CouenneCutGenerator (*this);}
 
 
-// copy constructor
+/// copy constructor
 
 CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   CglCutGenerator (),
-  ncuts_       (src.getncuts ()),
+  ncuts_       (src. getncuts ()),
   pool_        (new OsiRowCut * [ncuts_]),
   bonCs_       (new OsiCuts (*(src.getBonCs ()))),
-  bonOs_       (src.getBonOs () -> clone ()),
-  firstcall_   (src.isFirst ()),
+  bonOs_       (src. getBonOs () -> clone ()),
+  firstcall_   (src. isFirst ()),
   addviolated_ (src. addViolated ()), 
   convtype_    (src. ConvType ()), 
   nSamples_    (src. nSamples ()),
-  problem_     (src.Problem() -> clone ()) {
+  problem_     (src. Problem() -> clone ()) {
 
   for (int i=0; i<ncuts_; i++)
     pool_ [i] = src. getCut (i) -> clone ();
 }
 
 
-// add half-space through two points (x1,y1) and (x2,y2)
+/// add half-space through two points (x1,y1) and (x2,y2)
 
 void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi, 
 				      CouNumber x1, CouNumber y1, 
 				      CouNumber x2, CouNumber y2, int sign) const { 
 
-  if (fabs (x2-x1) < COUENNE_EPS) {
-    fprintf (stderr, "CouenneCutGenerator::addSegment(): warning, x1=x2\n");
-    return;
+  OsiRowCut *cut = NULL;
+
+  if (fabs (x2-x1) < COUENNE_EPS)
+    // well, we suppose that y1=y2...
+    cut = createCut (y2, 0, wi, CouNumber (1.));
+  else {
+
+    CouNumber oppslope = (y1-y2) / (x2-x1);
+
+    cut = createCut (y1 + oppslope * x1, sign, 
+		     wi, CouNumber (1.), 
+		     xi, oppslope);
   }
-
-  CouNumber oppslope = (y1-y2) / (x2-x1);
-
-  OsiRowCut *cut = createCut (y1 + oppslope * x1, sign, 
-			      wi, CouNumber (1.), 
-			      xi, oppslope);
-
-  //  if (cut) {printf ("Segment: "); cut -> print ();}
 
   if (cut) 
     cs.insert (cut);
 }
 
+
+/// update auxiliary variables from original
+
 void CouenneCutGenerator::updateAuxs (CouNumber *x, CouNumber *l, CouNumber *u) {
 
-  problem_ -> update (x,l,u);
+  problem_ -> update (x, l, u);
 
-  for (int i=0, j=problem_->nVars(); i<problem_ -> nAuxs (); i++, j++) {
-    x [j] = (*(problem_ -> Aux (i))) ();
-    l [j] = (*(problem_ -> Aux (i) -> Lb ())) ();
-    u [j] = (*(problem_ -> Aux (i) -> Ub ())) ();
+  int nAux = problem_ -> nAuxs ();
+
+  for (int i = 0, j = problem_ -> nVars (); i < nAux; i++, j++) {
+
+    exprAux *aux = problem_ -> Aux (i);
+
+    x [j] = (*aux)            ();
+    l [j] = (*(aux -> Lb ())) ();
+    u [j] = (*(aux -> Ub ())) ();
   }
 }

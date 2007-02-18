@@ -1,5 +1,5 @@
 /*
- * Name:    simplify.C
+ * Name:    simplify.cpp
  * Author:  Pietro Belotti
  * Purpose: symbolic expression simplifier
  *

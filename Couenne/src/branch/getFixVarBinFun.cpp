@@ -14,11 +14,11 @@
 // in a branching rule for solving a nonconvexity gap
 expression *getFixVarBinFun (expression *arg0, expression *arg1) {
 
-  if      (arg0 -> Type () == CONST) return arg1; // Case c*y
-  else if (arg1 -> Type () == CONST) return arg0; // Case x*d
+  if      (arg0 -> Type () == CONST) return arg1; // Case c*y or c/y
+  else if (arg1 -> Type () == CONST) return arg0; // Case x*d or x/d
   else {
 
-    // Case x*y: return variable closest to midpoint in bound interval
+    // Case x*y, x/y: return variable closest to midpoint in bound interval
 
     // get variables' indices
 

@@ -13,7 +13,7 @@
 
 #include <CouenneTypes.h>
 #include <expression.h>
-#include <exprCopy.h>
+#include <exprClone.h>
 
 
 // constant-type operator
@@ -79,14 +79,9 @@ class exprConst: public expression {
 
   // Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lower, expression *&upper) {
-    lower = new exprCopy (this);
-    upper = new exprCopy (this);
+    lower = new exprClone (this);
+    upper = new exprClone (this);
   }
-
-  // construct linear under-estimator for expression within problem *p
-  // (p is used to add convexification constraints)
-  //  int lowerLinearHull (exprAux *, int *&, expression ***&, 
-  //		       int **&, expression **&, enum con_sign *&);
 
   // Create standard formulation of this expression
   inline exprAux *standardize (CouenneProblem *)

@@ -16,35 +16,39 @@
 #include <exprCopy.h>
 
 
-// expression clone (points to VALUE and EXPRESSION of another expression) 
+/// expression clone (points to VALUE and EXPRESSION of another expression) 
 
 class exprClone: public exprCopy {
 
  public:
 
-  // Constructor, destructor
+  /// Constructor
   exprClone  (expression *copy): 
     exprCopy (copy) {}
+
+  /// destructor
   ~exprClone () {}
 
-  // copy constructor
+  /// copy constructor
   exprClone (const exprClone &e):
     exprCopy (e) {}
 
-  // cloning method
+  /// cloning method
   exprClone *clone () const
   {return new exprClone (*this);}
 
-  // I/O
+  /// I/O
   void print (std::ostream &out) const
-    //  {out << "{"; copy_ -> Original () -> print (out); out << "}";}
-  {copy_ -> Original () -> print (out);}
+    //{out << "{"; copy_ -> Original () -> print (out); out << "}";}
+    {copy_ -> Original () -> print (out);}
+    //{copy_ -> print (out);}
+    //{out << ",";}
 
-  // value (empty)
+  /// value
   inline CouNumber Value () const 
     {return copy_ -> Value ();}
 
-  // null function for evaluating the expression
+  /// null function for evaluating the expression
   inline CouNumber operator () () 
     {return (currValue_ = (*copy_) ());}
 };
