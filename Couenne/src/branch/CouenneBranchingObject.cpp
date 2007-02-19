@@ -13,7 +13,7 @@
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
 
-CouNumber CouenneBranchingObject::alpha_ = 0.9;
+CouNumber CouenneBranchingObject::alpha_ = 0.8;
 
 
 /** \brief Constructor. Get a variable as an argument and set value_
@@ -32,20 +32,19 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
     x = expression::Variable (index),   // current solution
     l = expression::Lbound   (index),   //         lower bound
     u = expression::Ubound   (index),   //         upper
-
     alpha = CouenneBranchingObject::Alpha ();
 
-  if ((l > - COUENNE_INFINITY + 1) &&
-      (u <   COUENNE_INFINITY - 1)) 
-    // finite bounds, apply midpoint rule
-    value_ = alpha * x + (1-alpha) * (l+u) / 2.;
-  else 
-    if ((fabs (x-l) > COUENNE_EPS) && 
-	(fabs (x-u) > COUENNE_EPS))
-      // infinite (at least on one side) bound interval, but x is not
-      // at the boundary
-      value_ = x;
-    else
+  if ((fabs (x-l) > COUENNE_EPS) && 
+      (fabs (x-u) > COUENNE_EPS))
+    // infinite (at least on one side) bound interval, but x is not
+    // at the boundary
+    value_ = x;
+  else
+    if ((l > - COUENNE_INFINITY + 1) &&
+	(u <   COUENNE_INFINITY - 1)) 
+      // finite bounds, apply midpoint rule
+      value_ = alpha * x + (1-alpha) * (l+u) / 2.;
+    else 
       // infinite bound interval, x is at the boundary
       // push it inwards
       // TODO: look for a proper value for the displacement 

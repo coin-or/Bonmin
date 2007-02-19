@@ -114,10 +114,6 @@ void expression::getBounds (expression *&lb, expression *&ub) {
 void exprAux::generateCuts (const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
-  //  printf ("Generate cut for "); 
-  //  print (std::cout);  printf (" := ");
-  //  image_ -> print (std::cout); printf("\n");
-
   int j = cs.sizeRowCuts ();
 
   image_ -> generateCuts (this, si, cs, cg);
@@ -152,13 +148,13 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 #define MAX_NAME 10000
 
 std::string Coutoa (CouNumber x) {
-  char s [50];
+  char s [MAX_NAME];
   sprintf (s, "%f", x);
   return std::string (s);
 }
 
 std::string Indtoa (char prefix, int i) {
-  char s [20];
+  char s [MAX_NAME];
   sprintf (s, "%c%d", prefix, i);
   return std::string (s);
 }
@@ -175,29 +171,46 @@ const std::string exprConst::name () const {return Coutoa (currValue_);}
 const std::string exprCopy::name  () const {return copy_ -> Original () -> name ();}
 
 const std::string exprUnary::name () const {return name ("?");}
+const std::string exprOp::name    () const {return name ("?");}
+
+
+/* The functions below could have been implemented much more easily as follows:
+
+const std::string exprUnary::name () const {return "(" + argument_ -> name() + ")";}
+
+const std::string exprOp::name    () const {
+
+  std::string args = "(" + arglist_ [0] -> name ();
+
+  for (int i=1; i<nargs_; i++)
+    args += "," + arglist_ [i] -> name ();
+
+  return args + ")";
+}
+
+But, because of a segfault occurred in some x86_64 machines, we have
+decided to do it more plainly (and probably less efficiently).
+*/
 
 const std::string exprUnary::name (const std::string &op) const {
 
-  char *s = (char *) malloc (MAX_NAME * sizeof (char));
-  sprintf (s, "%s(%s)", op.c_str(), argument_ -> name (). c_str ());
+  register char *s = (char *) malloc (MAX_NAME * sizeof (char));
+  sprintf (s, "%s(%s)", op.c_str (), argument_ -> name (). c_str ());
 
   s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
   std::string ret (1 + strlen (s), ' ');
-  for (int i=strlen (s); i>=0; i--)
+  for (int register i=strlen (s); i>=0; i--)
     ret [i] = s [i]; 
   free (s);
-
   return ret;
 }
 
-const std::string exprOp::name () const {return name ("?");}
-
 const std::string exprOp::name (const std::string &op) const {
 
-  char *s = (char *) malloc (MAX_NAME * sizeof (char));
+  register char *s = (char *) malloc (MAX_NAME * sizeof (char));
   sprintf (s, "%s(%s", op.c_str (), arglist_ [0] -> name (). c_str ());
 
-  for (int i=1; i<nargs_; i++) {
+  for (register int i=1; i<nargs_; i++) {
     strcat (s, ",");
     strcat (s, arglist_ [i] -> name (). c_str ());
   }
@@ -206,7 +219,7 @@ const std::string exprOp::name (const std::string &op) const {
 
   s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
   std::string ret (1 + strlen (s), ' ');
-  for (int i=strlen (s); i>=0; i--)
+  for (register int i=strlen (s); i>=0; i--)
     ret [i] = s [i]; 
   free (s);
   return ret;

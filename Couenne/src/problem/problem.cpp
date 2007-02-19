@@ -148,6 +148,8 @@ void CouenneProblem::standardize () {
       (*i) -> Body (new exprClone (aux));
   }
 
+  delete auxMap_;
+
   x_  = (CouNumber *) realloc (x_,  (nVars() + nAuxs ()) * sizeof (CouNumber));
   lb_ = (CouNumber *) realloc (lb_, (nVars() + nAuxs ()) * sizeof (CouNumber));
   ub_ = (CouNumber *) realloc (ub_, (nVars() + nAuxs ()) * sizeof (CouNumber));
@@ -163,8 +165,6 @@ void CouenneProblem::standardize () {
     ub_ [i] = (*(auxiliaries_ [j] -> Ub    ())) ();
     x_  [i] = (*(auxiliaries_ [j] -> Image ())) ();
   }
-
-  delete auxMap_;
 }
 
 

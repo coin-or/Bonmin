@@ -43,8 +43,16 @@ class CouenneConstraint {
 		      expression *ub   = NULL):
     body_ (body), 
     lb_   (lb), 
-    ub_   (ub) 
-    {}
+    ub_   (ub) {
+
+    if (!lb_) 
+      if (!ub_) {
+	lb_ = new exprConst (0);
+	ub_ = new exprConst (0);
+      } 
+      else         lb_ = new exprConst (- COUENNE_INFINITY);
+    else if (!ub_) ub_ = new exprConst   (COUENNE_INFINITY);
+  }
 
   // destructor
   ~CouenneConstraint () {
