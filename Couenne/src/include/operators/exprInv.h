@@ -37,7 +37,7 @@ class exprInv: public exprUnary {
   inline unary_function F () {return inv;}
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "inv" + exprUnary::name();}
+  const std::string name () const {return exprUnary::name ("inv");}
 
   // output "1/argument"
   void print (std::ostream&) const;

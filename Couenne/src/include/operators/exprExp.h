@@ -28,7 +28,7 @@ class exprExp: public exprUnary {
     {return new exprExp (argument_ -> clone ());}
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "exp" + exprUnary::name();}
+  const std::string name() const {return exprUnary::name ("exp");}
 
   /// the operator's function
   inline unary_function F () {return exp;}

@@ -34,7 +34,7 @@ class exprOpp: public exprUnary {
     {return new exprOpp (argument_ -> clone ());}
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "opp" + exprUnary::name();}
+  const std::string name () const {return exprUnary::name ("opp");}
 
   /// the operator's function
   inline unary_function F () {return opp;}

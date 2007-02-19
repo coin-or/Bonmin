@@ -68,6 +68,7 @@ class exprOp: public expression {
 
   // string equivalent
   virtual const std::string name () const;
+  virtual const std::string name (const std::string &) const;
 
   // I/O
   virtual void print (std::ostream &, const std::string &, enum pos) const;

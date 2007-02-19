@@ -31,7 +31,7 @@ class exprSin: public exprUnary {
     {return new exprSin (argument_ -> clone ());}
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "sin" + exprUnary::name();}
+  const std::string name () const {return exprUnary::name ("sin");}
 
   /// the operator's function
   inline unary_function F () {return sin;}

@@ -33,7 +33,7 @@ class exprLBMul: public exprOp {
   CouNumber operator () ();
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "LB_mul" + exprOp::name();}
+  const std::string name() const {return exprOp::name ("LB_mul");}
 
   // output
   void print (std::ostream &) const;
@@ -91,7 +91,7 @@ class exprUBMul: public exprOp {
   CouNumber operator () ();
 
   // String equivalent (for comparisons)
-  std::string name() {return "UB_mul" + exprOp::name();}
+  std::string name () {return exprOp::name ("UB_mul");}
 
   // output
   void print (std::ostream &) const;

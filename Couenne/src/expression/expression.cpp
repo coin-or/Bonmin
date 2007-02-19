@@ -148,6 +148,8 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
 // name () -- a string value for each expression
 
+#define MAX_NAME 10000
+
 std::string Coutoa (CouNumber x) {
   char s [50];
   sprintf (s, "%f", x);
@@ -171,14 +173,38 @@ const std::string exprConst::name () const {return Coutoa (currValue_);}
 
 const std::string exprCopy::name  () const {return copy_ -> Original () -> name ();}
 
-const std::string exprUnary::name () const {return "(" + argument_ -> name() + ")";}
+const std::string exprUnary::name () const {return name ("?");}
 
-const std::string exprOp::name    () const {
+const std::string exprUnary::name (const std::string &op) const {
 
-  std::string args = "(" + arglist_ [0] -> name ();
+  char *s = (char *) malloc (MAX_NAME * sizeof (char));
+  sprintf (s, "%s(%s)", op.c_str(), argument_ -> name (). c_str ());
 
-  for (int i=1; i<nargs_; i++)
-    args += "," + arglist_ [i] -> name ();
+  s = (char *) realloc (s, strlen (s) * sizeof (char));
+  std::string ret (s);
+  free (s);
 
-  return args + ")";
+  return ret;
+}
+
+const std::string exprOp::name () const {return name ("?");}
+
+const std::string exprOp::name (const std::string &op) const {
+
+  char *s = new char [MAX_NAME];
+  sprintf (s, "%s(%s", op.c_str (), arglist_ [0] -> name (). c_str ());
+
+  for (int i=1; i<nargs_; i++) {
+    int j=strlen (s);
+    s [j++] = ',';
+    s [j] = 0;
+    strcat (s, arglist_ [i] -> name (). c_str ());
+  }
+
+  strcat (s, ")");
+
+  s = (char *) realloc (s, strlen (s) * sizeof (char));
+  std::string ret (s);
+  free (s);
+  return ret;
 }

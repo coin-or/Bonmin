@@ -35,7 +35,7 @@ class exprAbs: public exprUnary {
 
   // String equivalent (for comparisons)
   const std::string name() const 
-    {return "abs" + exprUnary::name();}
+    {return exprUnary::name ("abs");}
 
   // I/O
   void print (std::ostream&) const;

@@ -36,7 +36,7 @@ class exprCos: public exprUnary {
   inline unary_function F () {return cos;}
 
   // String equivalent (for comparisons)
-  const std::string name() const {return "cos" + exprUnary::name();}
+  const std::string name() const {return exprUnary::name ("cos");}
 
   // print "cos" and argument
   void print (std::ostream&) const;
