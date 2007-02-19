@@ -6,7 +6,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <sstream>
+#include <string>
+#include <string.h>
 
 #include <CouenneTypes.h>
 #include <expression.h>
@@ -180,8 +181,10 @@ const std::string exprUnary::name (const std::string &op) const {
   char *s = (char *) malloc (MAX_NAME * sizeof (char));
   sprintf (s, "%s(%s)", op.c_str(), argument_ -> name (). c_str ());
 
-  s = (char *) realloc (s, strlen (s) * sizeof (char));
-  std::string ret (s);
+  s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
+  std::string ret (1 + strlen (s), ' ');
+  for (int i=strlen (s); i>=0; i--)
+    ret [i] = s [i]; 
   free (s);
 
   return ret;
@@ -191,20 +194,20 @@ const std::string exprOp::name () const {return name ("?");}
 
 const std::string exprOp::name (const std::string &op) const {
 
-  char *s = new char [MAX_NAME];
+  char *s = (char *) malloc (MAX_NAME * sizeof (char));
   sprintf (s, "%s(%s", op.c_str (), arglist_ [0] -> name (). c_str ());
 
   for (int i=1; i<nargs_; i++) {
-    int j=strlen (s);
-    s [j++] = ',';
-    s [j] = 0;
+    strcat (s, ",");
     strcat (s, arglist_ [i] -> name (). c_str ());
   }
 
   strcat (s, ")");
 
-  s = (char *) realloc (s, strlen (s) * sizeof (char));
-  std::string ret (s);
+  s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
+  std::string ret (1 + strlen (s), ' ');
+  for (int i=strlen (s); i>=0; i--)
+    ret [i] = s [i]; 
   free (s);
   return ret;
 }
