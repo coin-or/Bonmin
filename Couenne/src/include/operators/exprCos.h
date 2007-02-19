@@ -24,13 +24,16 @@ class exprCos: public exprUnary {
 
   // constructor, destructor
   exprCos  (expression *al): 
-    exprUnary (al, cos) {}
+    exprUnary (al) {}
 
   ~exprCos () {}
 
   // cloning method
   expression *clone () const
     {return new exprCos (argument_ -> clone ());}
+
+  /// the operator's function
+  inline unary_function F () {return cos;}
 
   // String equivalent (for comparisons)
   const std::string name() const {return "cos" + exprUnary::name();}

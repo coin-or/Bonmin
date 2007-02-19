@@ -20,7 +20,7 @@ class exprExp: public exprUnary {
 
   // Constructors, destructor
   exprExp  (expression *al): 
-    exprUnary (al, exp) {} //< non-leaf expression, with argument list
+    exprUnary (al) {} //< non-leaf expression, with argument list
   ~exprExp () {}
 
   // cloning method
@@ -29,6 +29,9 @@ class exprExp: public exprUnary {
 
   // String equivalent (for comparisons)
   const std::string name() const {return "exp" + exprUnary::name();}
+
+  /// the operator's function
+  inline unary_function F () {return exp;}
 
   // output
   void print (std::ostream&) const;

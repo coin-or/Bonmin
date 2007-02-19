@@ -14,6 +14,11 @@
 #include <expression.h>
 #include <CouenneTypes.h>
 
+
+/// zero function (used by default by exprUnary)
+inline CouNumber zero_fun (CouNumber x) {return 0;}
+
+
 //
 // univariate operator-type expression: requires single argument. All
 // unary functions are derived from this base class, which has a lot
@@ -26,7 +31,6 @@ class exprUnary: public expression {
  protected:
 
   expression     *argument_; //< single argument taken by this expression
-  unary_function  f_;        //< single variable function (e.g. sin, log...)
 
  public:
 
@@ -35,9 +39,12 @@ class exprUnary: public expression {
     {return UNARY;}
 
   /// Constructor
-  exprUnary  (expression *argument, unary_function f): 
-    argument_ (argument),        //< non-leaf expression, with argument list
-    f_        (f)         {}
+  exprUnary  (expression *argument): 
+    argument_ (argument)        //< non-leaf expression, with argument list
+   {}
+
+  /// the operator itself (e.g. sin, log...)
+  virtual inline unary_function F () {return zero_fun;}
 
   /// Destructor
   ~exprUnary () 
@@ -55,7 +62,7 @@ class exprUnary: public expression {
 
   // compute value of unary operator
   virtual inline CouNumber operator () ()
-    {return (currValue_ = f_ ((*argument_) ()));}
+    {return (currValue_ = (F ()) ((*argument_) ()));}
 
   // dependence on variable set
   bool inline dependsOn (int *list, int n) 

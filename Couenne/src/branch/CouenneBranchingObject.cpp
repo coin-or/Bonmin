@@ -69,10 +69,10 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   if (way) // ">=" node, set lower bound (round if this variable is integer)
     solver -> setColLower (reference_ -> Index(), 
-			   reference_ -> isInteger() ? ceil  (value_) : value_);
+			   reference_ -> isInteger () ? ceil  (value_) : value_);
   else     // "<=" node, set upper bound (ditto)
     solver -> setColUpper (reference_ -> Index(), 
-			   reference_ -> isInteger() ? floor (value_) : value_);
+			   reference_ -> isInteger () ? floor (value_) : value_);
 
   printf ("Branch: x%d %c= %.12f\n", reference_ -> Index(), way ? '>' : '<', value_);
 

@@ -26,7 +26,7 @@ class exprOpp: public exprUnary {
 
   // Constructors, destructor
   exprOpp  (expression *al): 
-    exprUnary (al, opp) {} //< non-leaf expression, with argument list
+    exprUnary (al) {} //< non-leaf expression, with argument list
   ~exprOpp () {}
 
   // cloning method
@@ -35,6 +35,9 @@ class exprOpp: public exprUnary {
 
   // String equivalent (for comparisons)
   const std::string name() const {return "opp" + exprUnary::name();}
+
+  /// the operator's function
+  inline unary_function F () {return opp;}
 
   // I/O
   void print (std::ostream&) const;

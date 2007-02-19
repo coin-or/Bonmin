@@ -22,7 +22,7 @@ class exprLog: public exprUnary {
 
   // Constructors, destructor
   exprLog  (expression *al): 
-    exprUnary (al, log) {} //< non-leaf expression, with argument list
+    exprUnary (al) {} //< non-leaf expression, with argument list
 
   ~exprLog () {}
 
@@ -32,6 +32,9 @@ class exprLog: public exprUnary {
 
   // String equivalent (for comparisons)
   const std::string name() const {return "log" + exprUnary::name();}
+
+  /// the operator's function
+  inline unary_function F () {return log;}
 
   // I/O
   void print (std::ostream&) const;

@@ -23,7 +23,7 @@ class exprSin: public exprUnary {
 
   // Constructors, destructor
   exprSin  (expression *al): 
-    exprUnary (al, sin) {} //< non-leaf expression, with argument list
+    exprUnary (al) {} //< non-leaf expression, with argument list
   ~exprSin () {}
 
   // cloning method
@@ -32,6 +32,9 @@ class exprSin: public exprUnary {
 
   // String equivalent (for comparisons)
   const std::string name() const {return "sin" + exprUnary::name();}
+
+  /// the operator's function
+  inline unary_function F () {return sin;}
 
   // I/O
   void print (std::ostream&) const;

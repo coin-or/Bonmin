@@ -26,12 +26,15 @@ class exprInv: public exprUnary {
 
   // Constructors, destructor
   exprInv  (expression *al): 
-    exprUnary (al, inv) {} //< non-leaf expression, with argument list
+    exprUnary (al) {} //< non-leaf expression, with argument list
   ~exprInv () {}
 
   // cloning method
   expression *clone () const
     {return new exprInv (argument_ -> clone ());}
+
+  /// the operator's function
+  inline unary_function F () {return inv;}
 
   // String equivalent (for comparisons)
   const std::string name() const {return "inv" + exprUnary::name();}

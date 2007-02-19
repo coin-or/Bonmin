@@ -154,18 +154,18 @@ std::string Coutoa (CouNumber x) {
   return std::string (s);
 }
 
-std::string Indtoa (int i) {
+std::string Indtoa (char prefix, int i) {
   char s [20];
-  sprintf (s, "%d", i);
+  sprintf (s, "%c%d", prefix, i);
   return std::string (s);
 }
 
-const std::string exprVar::name   () const {return "x_" + Indtoa (varIndex_);}
-const std::string exprIVar::name  () const {return "y_" + Indtoa (varIndex_);}
-const std::string exprAux::name   () const {return "w_" + Indtoa (varIndex_);}
+const std::string exprVar::name   () const {return Indtoa ('x', varIndex_);}
+const std::string exprIVar::name  () const {return Indtoa ('y', varIndex_);}
+const std::string exprAux::name   () const {return Indtoa ('w', varIndex_);}
 
-const std::string exprLowerBound::name () const {return "l_" + Indtoa (varIndex_);}
-const std::string exprUpperBound::name () const {return "u_" + Indtoa (varIndex_);}
+const std::string exprLowerBound::name () const {return Indtoa ('l', varIndex_);}
+const std::string exprUpperBound::name () const {return Indtoa ('u', varIndex_);}
 
 const std::string exprConst::name () const {return Coutoa (currValue_);}
 

@@ -23,8 +23,11 @@ class exprAbs: public exprUnary {
 
   // Constructors, destructor
   exprAbs  (expression *al): 
-    exprUnary (al, fabs) {} //< non-leaf expression, with argument list
+    exprUnary (al) {} //< non-leaf expression, with argument list
   ~exprAbs () {}
+
+  /// the operator's function
+  inline unary_function F () {return fabs;}
 
   // cloning method
   expression *clone () const

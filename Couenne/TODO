@@ -1,4 +1,5 @@
 - improve convexification of x/y
+- change expr*::name() for compatibility with x86_64
 - linear combination plus aux. vars into one single aux
 - add integrality to bound check
 - order in convexifying x*y*z*...*(1/w)*(1/t)*...
