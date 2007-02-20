@@ -116,11 +116,17 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   int j = cs.sizeRowCuts ();
 
-  image_ -> generateCuts (this, si, cs, cg);
+  CouNumber l = expression::Lbound (varIndex_),
+            u = expression::Ubound (varIndex_);
+
+  if (fabs (u-l) < COUENNE_EPS) {
+    OsiRowCut *cut = cg -> createCut (l, 0, varIndex_, 1.);
+    if (cut) cs.insert (cut);
+  } else image_ -> generateCuts (this, si, cs, cg);
 
   //  if (!(cg -> isFirst ())) 
   //  if (j < cs.sizeRowCuts ())
-  if (0)
+   if (0)
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");
@@ -174,23 +180,23 @@ const std::string exprUnary::name () const {return name ("?");}
 const std::string exprOp::name    () const {return name ("?");}
 
 
-/* The functions below could have been implemented much more easily as follows:
-
-const std::string exprUnary::name () const {return "(" + argument_ -> name() + ")";}
-
-const std::string exprOp::name    () const {
-
-  std::string args = "(" + arglist_ [0] -> name ();
-
-  for (int i=1; i<nargs_; i++)
-    args += "," + arglist_ [i] -> name ();
-
-  return args + ")";
-}
-
-But, because of a segfault occurred in some x86_64 machines, we have
-decided to do it more plainly (and probably less efficiently).
-*/
+/**
+ *
+ * The functions below could have been implemented much more easily as follows:
+ *
+ * const std::string exprUnary::name () const 
+ *   {return "(" + argument_ -> name () + ")";}
+ *
+ * const std::string exprOp::   name () const {
+ *  std::string args = "(" + arglist_ [0] -> name ();
+ *  for (int i=1; i<nargs_; i++)
+ *    args += "," + arglist_ [i] -> name ();
+ *  return args + ")";
+ * }
+ *
+ * But, because of a segfault occurred in some x86_64 machines, we have
+ * decided to do it more plainly (and probably less efficiently).
+ */
 
 const std::string exprUnary::name (const std::string &op) const {
 

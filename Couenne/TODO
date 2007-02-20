@@ -8,3 +8,5 @@
 - linear convexification has an acyclic structure where x are leaves
 - recognition of quadratic forms
 - q.f. partitioning into PD + nonconvex
+
+- Write documentation...

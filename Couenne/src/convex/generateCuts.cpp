@@ -16,9 +16,9 @@
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si, 
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-  int ncols = si.getNumCols ();
+  //  int ncols = si.getNumCols ();
 
-  CouNumber *x, *l, *u;
+  //  CouNumber *x, *l, *u;
 
   if (firstcall_) {
 
@@ -64,39 +64,57 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // firstcall, otherwise only those of the original ones Update
     // expression structure with x, l, u
 
-    const CouNumber *xc = si.getColSolution (), 
-      *lc = si.getColLower (),
-      *uc = si.getColUpper ();
+    CouNumber 
+      *xc = const_cast <CouNumber *> (si.getColSolution ()), 
+      *lc = const_cast <CouNumber *> (si.getColLower    ()),
+      *uc = const_cast <CouNumber *> (si.getColUpper    ());
 
-    x = new CouNumber [ncols];
-    l = new CouNumber [ncols];
-    u = new CouNumber [ncols];
+    // update now all variables and bounds
 
-    for (int i=ncols; i--;) {
+    problem_ -> update (xc, lc, uc);
 
-      x [i] = xc [i];
-      l [i] = lc [i];
-      u [i] = uc [i];
-    }
+    // update bounding box (which may depend on the original
+    // variables' box) for the variables whose bound is looser. Here,
+    // newly enforced branching rules may change dependent auxiliary
+    // variables' bounds, in a recursive way. Hence we need to repeat
+    // the propagation step as long as at least one bound is modified.
 
-    problem_ -> update (x,l,u);
+    bool found_one;
 
-    // TODO: fix all this. The way variables and bounds are updated is,
-    // kindly speaking, messy.
+    do {
 
-    // update bounding box (which may depend on the original variables'
-    // box) for the variables whose bound is looser
+      found_one = false;
 
-    for (register int 
-	   i = problem_ -> nVars (), 
-	   j = problem_ -> nAuxs (); j--;) {
-      
-      CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
-      CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
-      
-      if (ll > l [i+j]) l [i+j] = ll;
-      if (uu < u [i+j]) u [i+j] = uu;
-    }
+      for (register int 
+	     i = problem_ -> nVars (), 
+	     j = problem_ -> nAuxs (); j--;) {
+    
+	CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
+	CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
+    
+	if (ll > lc [i+j]) {
+	  const_cast <OsiSolverInterface *> (&si) -> setColLower (i+j, ll);
+	  //	  si.setColLower (i+j, ll);
+	  lc [i+j] = ll;
+	  found_one = true;
+	}
+
+	if (uu < uc [i+j]) {
+	  const_cast <OsiSolverInterface *> (&si) -> setColUpper (i+j, uu);
+	  //	  const_cast<ClassName*>(this)->nonConstFunction();
+	  //	  si.setColUpper (i+j, uu);
+	  uc [i+j] = uu;
+	  found_one = true;
+	}
+      }
+
+      expression::update (xc, lc, uc);
+
+    } while (found_one);
+
+    // update again 
+    problem_ -> update (xc, lc, uc);
+
   }
 
   // For each auxiliary variable, create cut (or set of cuts) violated
@@ -107,14 +125,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   // end of generateCuts
 
-  //  if (cs.sizeRowCuts ())
-  //    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
+  if (cs.sizeRowCuts ())
+    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
 
   if (firstcall_) 
     firstcall_ = false;
-  else {
+  /*  else {
     delete [] x;
     delete [] l;
     delete [] u;
   }
+  */
 }

@@ -25,7 +25,7 @@ CouenneChooseVariable::CouenneChooseVariable (const CouenneChooseVariable &sourc
 
 /// Assignment operator 
 CouenneChooseVariable & CouenneChooseVariable::operator= (const CouenneChooseVariable& rhs)
-{}
+{problem_ = rhs.Problem(); return *this;}
 
 /// Clone
 OsiChooseVariable *CouenneChooseVariable::clone() const

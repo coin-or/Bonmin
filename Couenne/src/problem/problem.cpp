@@ -100,19 +100,25 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
   // check if image is already in the expression database auxMap_
 
   exprAux *var;
-  std::string key = symbolic -> name ();
+  std::string key = symbolic -> name (); // string serving as a key to the map
   std::map <std::string, exprAux *>::iterator i;
 
   if ((i = auxMap_ -> find (key)) == auxMap_ -> end ()) {
 
+    // no such expression has been found in the map, 
+
+    // create entry in the map
+
     std::pair <std::string, exprAux *> newpair;
     newpair.first  = key;
     newpair.second = var = 
+      // and corresponding auxiliary variable
       new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
     auxiliaries_ . push_back (var);
     auxMap_ -> insert (newpair);
   }
-  else var = (*i).second;
+  else var = (*i).second; // otherwise, just return the entry's
+			  // auxiliary var. pointer
 
   return var;
 }
@@ -171,11 +177,11 @@ void CouenneProblem::standardize () {
 // destroy problem components
 
 CouenneProblem::~CouenneProblem () {
-
+  /*
   free (x_);
   free (lb_);
   free (ub_);
-
+  */
   // delete objectives
   for (std::vector <Objective *>::iterator i  = objectives_ . begin ();
        i != objectives_ . end (); i++)
@@ -202,6 +208,11 @@ CouenneProblem::~CouenneProblem () {
 
 void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
 
+  x_  = x;
+  lb_ = l;
+  ub_ = u;
+
+  /*
   static int curr_size = -1;
 
   int nvars = nVars () + nAuxs ();
@@ -220,6 +231,6 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
     lb_ [i] = l [i];
     ub_ [i] = u [i];
   }
-
+  */
   expression::update (x_, lb_, ub_);
 }
