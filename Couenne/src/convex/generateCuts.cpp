@@ -79,7 +79,24 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       u [i] = uc [i];
     }
 
-    problem_ ->  update (x,l,u);
+    problem_ -> update (x,l,u);
+
+    // TODO: fix all this. The way variables and bounds are updated is,
+    // kindly speaking, messy.
+
+    // update bounding box (which may depend on the original variables'
+    // box) for the variables whose bound is looser
+
+    for (register int 
+	   i = problem_ -> nVars (), 
+	   j = problem_ -> nAuxs (); j--;) {
+      
+      CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
+      CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
+      
+      if (ll > l [i+j]) l [i+j] = ll;
+      if (uu < u [i+j]) u [i+j] = uu;
+    }
   }
 
   // For each auxiliary variable, create cut (or set of cuts) violated

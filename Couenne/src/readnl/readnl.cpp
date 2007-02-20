@@ -330,11 +330,21 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   delete [] nterms;
   delete [] alists;
 
-  for (int i=asl -> P. ops -> ng; i--;)
-    free_asl_group (asl -> P. ops -> g + i);
+  for (int k=0; k<n_con; k++)
+    if ((asl -> P. cps [k]. nb) || (asl -> P. cps [k]. ng)) {
 
-  for (int i=asl -> P. cps -> ng; i--;)
-    free_asl_group (asl -> P. cps -> g + i);
+      int ngroups = asl -> P. cps [k]. ng;
+      for (int i=0; i<ngroups; i++)
+	free_asl_group (asl -> P. cps [k]. g + i);
+    }
+
+  for (int k=0; k<n_obj; k++)
+    if ((asl -> P. ops [k]. nb) || (asl -> P. ops [k]. ng)) {
+
+      int ngroups = asl -> P. ops [k]. ng;
+      for (int i=0; i<ngroups; i++)
+	free_asl_group (asl -> P. ops [k]. g + i);
+    }
 
   return 0;
 }
