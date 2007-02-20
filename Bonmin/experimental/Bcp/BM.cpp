@@ -29,9 +29,9 @@ int main(int argc, char* argv[])
     try {
       retcode = bcp_main(argc, argv, &user_init);
     }
-    catch(Bonmin::TNLPSolver::UnsolvedError *E) {
-      E->writeDiffFiles();
-      E->printError(std::cerr);
+    catch(Bonmin::TNLPSolver::UnsolvedError &E) {
+      E.writeDiffFiles();
+      E.printError(std::cerr);
    }
    catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
      std::cerr<<E.className()<<"::"<<E.methodName()
