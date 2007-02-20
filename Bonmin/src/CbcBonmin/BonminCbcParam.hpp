@@ -73,6 +73,10 @@ public:
   double maxTime;
   /** Global node limit.*/
   int maxNodes;
+  /** Integer solution limit. */
+  int maxSolutions;
+  /** Global iteration limit. */
+  int maxIterations;
   /** Integer tolerance.*/
   double intTol;
   /** Conssider or not SOS constraints.*/
@@ -124,10 +128,11 @@ public:
   int milpSubSolver_mirFreq;
   /** (only set if milpSubSolver is 1) milpsubsolver Cover cuts generation frequency.*/
   int milpSubSolver_coverFreq;
-
+  /** pointer to a FILE * for output. */
+  FILE * fout;
 public:
   /** Empty constructor. */
-  BonminCbcParam()
+  BonminCbcParam():fout(NULL)
   {}
   /** Destructor.*/
   ~BonminCbcParam()

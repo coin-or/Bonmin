@@ -7,12 +7,12 @@ BonminAmplInterface::BonminAmplInterface(): IpoptInterface(), amplTminlp_(NULL)
 {}
   
 /** Constructor with inputed ampl command line (reads model from nl file)*/ 
-BonminAmplInterface::BonminAmplInterface(char **& amplArgs)
+BonminAmplInterface::BonminAmplInterface(char **& amplArgs, bool create_stdout)
 :
 IpoptInterface(),
 amplTminlp_(NULL)
 {
-  readAmplNlFile(amplArgs, NULL, NULL);
+  readAmplNlFile(amplArgs, NULL, NULL, create_stdout);
 }
 
 /** Copy constructor */
@@ -36,12 +36,13 @@ BonminAmplInterface::~BonminAmplInterface()
 void
 BonminAmplInterface::readAmplNlFile(char**& filename,
     std::string* ipopt_file_content,
-    std::string* nl_file_content)
+    std::string* nl_file_content,
+    bool create_stdout)
 {
 
 
 
-  app_ = new Ipopt::IpoptApplication();
+  app_ = new Ipopt::IpoptApplication( create_stdout);
 
   SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
   register_ALL_options(roptions);

@@ -106,7 +106,17 @@ register_general_options
       0,INT_MAX,
       "");
 
-  roptions->AddBoundedNumberOption("integer_tolerance",
+   roptions->AddLowerBoundedIntegerOption("iteration_limit",
+      "Set the cummulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
+      0,INT_MAX,
+      "value 0 deactivates option.");
+
+  roptions->AddLowerBoundedIntegerOption("solution_limit",
+					 "Abort after that much integer feasible solution have been found by algorithm",
+					 0,INT_MAX,
+					 "value 0 deactivates option");
+
+   roptions->AddBoundedNumberOption("integer_tolerance",
       "Set integer tolerance.",
       0.,1,.5,1,1e-06,
       "Any number within that value of an integer is considered integer.");
@@ -2061,17 +2071,18 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
     }
   }
 //double infty = getInfinity();
+  int offset = (index_style == Ipopt::TNLP::FORTRAN_STYLE);
   for(int i = 0 ; i < nnz_jac_g ; i++) {
     if(constTypes_[jRow_[i] - 1] == Ipopt::TMINLP::NON_LINEAR) {
       //"clean" coefficient
-      if(cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
-          rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
-          getColSolution()[jCol_[i] - 1],
-          lb[constTypesNum_[jRow_[i] - 1]],
-          ub[constTypesNum_[jRow_[i] - 1]], tiny_, veryTiny_)) {
-        cuts[constTypesNum_[jRow_[i] - 1]].insert(jCol_[i]-1,jValues_[i]);
-        lb[constTypesNum_[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
-        ub[constTypesNum_[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
+      if(cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
+          rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
+          getColSolution()[jCol_[i] - offset],
+          lb[constTypesNum_[jRow_[i] - offset]],
+          ub[constTypesNum_[jRow_[i] - offset]], tiny_, veryTiny_)) {
+        cuts[constTypesNum_[jRow_[i] - offset]].insert(jCol_[i]-offset,jValues_[i]);
+        lb[constTypesNum_[jRow_[i] - offset]] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
+        ub[constTypesNum_[jRow_[i] - offset]] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
       }
     }
   }
@@ -2218,7 +2229,9 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     start[k] = nnz;
     length[k] = 0;
   }
-  for(int i = 0 ; i < nnz_jac_g - 1 ; i++) {
+  int end = nnz_jac_g - 1;
+  int offset = (index_style == Ipopt::TNLP::FORTRAN_STYLE);
+  for(int i = 0 ; i < end ; i++) {
     {
       if(jCol_[i + 1] < jCol_ [i] || ( jCol_ [i+1] == jCol_[i] && jRow_[i + 1] <= jRow_[i]) ) {
         needOrder = 1;
@@ -2226,16 +2239,16 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
       }
       if(Ipopt::TMINLP::LINEAR //Always accept coefficients from linear constraints
           || //For other clean tinys
-          cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
-              rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
-              getColSolution()[jCol_[i] - 1],
-              rowLow[jRow_[i] - 1],
-              rowUp[jRow_[i] -1], tiny_, veryTiny_)) {
+          cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]- offset],
+              rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
+              getColSolution()[jCol_[i] - offset],
+              rowLow[jRow_[i] - offset],
+              rowUp[jRow_[i] -offset], tiny_, veryTiny_)) {
         vals[nnz] = jValues_[i];
-        rowLow[jRow_[i] - 1] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
-        rowUp[jRow_[i] -1] += jValues_[i] *getColSolution()[jCol_[i] -1];
-        inds[nnz] = jRow_[i ] - 1;
-        length[jCol_[i] - 1]++;
+        rowLow[jRow_[i] - offset] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
+        rowUp[jRow_[i] -offset] += jValues_[i] *getColSolution()[jCol_[i] -offset];
+        inds[nnz] = jRow_[i ] - offset;
+        length[jCol_[i] - offset]++;
         nnz++;
       }
     }
@@ -2248,11 +2261,11 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   }
   if(!needOrder) {
     {
-      length[jCol_[nnz_jac_g -1] - 1]++;
+      length[jCol_[nnz_jac_g -1] - offset]++;
       vals[nnz] = jValues_[nnz_jac_g - 1];
-      rowLow[jRow_[nnz_jac_g - 1] - 1] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - 1];
-      rowUp[jRow_[nnz_jac_g - 1] -1] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] -1];
-      inds[nnz++] = jRow_[nnz_jac_g - 1] - 1;
+      rowLow[jRow_[nnz_jac_g - 1] - offset] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - offset];
+      rowUp[jRow_[nnz_jac_g - 1] -offset] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] - offset ];
+      inds[nnz++] = jRow_[nnz_jac_g - 1] - offset;
     }
     for(int i = jCol_[nnz_jac_g -1] ; i < n ; i++) {
       start[i] = nnz;

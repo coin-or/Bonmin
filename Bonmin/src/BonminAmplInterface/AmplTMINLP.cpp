@@ -514,6 +514,14 @@ namespace Ipopt
         AmplOptionsList::Integer_Option,
         "Set maximum number of nodes explored");
 
+    amplOptList->AddAmplOption("bonmin.solution_limit","bonmin.solution_limit",
+        AmplOptionsList::Integer_Option,
+        "Set maximum of new best integer before aborting.");
+
+    amplOptList->AddAmplOption("bonmin.iteration_limit","bonmin.iteration_limit",
+        AmplOptionsList::Integer_Option,
+        "Set cummulated maximum number of iterations in sub-algorithm used for nodes relaxations");
+
     amplOptList->AddAmplOption("bonmin.integer_tolerance", "bonmin.integer_tolerance",
         AmplOptionsList::Number_Option,
         "Set integer tolerance");

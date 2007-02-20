@@ -97,7 +97,9 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
 
 
   nlpSolver.messageHandler()->setLogLevel(par.nlpLogLevel);
-
+  if(par.fout != NULL){
+    nlpSolver.messageHandler()->setFilePointer(par.fout);
+   }
   if (par.algo > 0) //OA based
   {
     si = new OsiClpSolverInterface;
@@ -145,7 +147,9 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   IpCbcOACutGenerator oaGen(&nlpSolver);
   oaGen.setMaxDepth(100000);
   oaGen.setLogLevel(par.oaLogLevel);
-
+  if(par.fout != NULL){
+    oaGen.messageHandler()->setFilePointer(par.fout);
+   }
 
   //Outer approximation iterations
   OsiSolverInterface * localSearchSolver=NULL;
@@ -179,7 +183,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
         par.milpSubSolver_nodeSelection,
         par.intTol,
         par.milpLogLevel
-                                );
+        );
   }
   IpCbcOACutGenerator2 oaDec(&nlpSolver, localSearchSolver, strategy, par.cutoffDecr, par.intTol, 0,1);
   if(par.algo>0) {
@@ -188,6 +192,10 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     oaDec.setMaxLocalSearchPerNode(10000);
     oaDec. setMaxLocalSearchTime(min(par.maxTime,par.oaDecMaxTime));
     oaDec.setLogLevel(par.oaLogLevel);
+    if(par.fout != NULL)
+    {
+      oaDec.messageHandler()->setFilePointer(par.fout);
+    }
     oaDec.setLogFrequency(par.oaLogFrequency);
     oaDec.setSubMilpLogLevel(par.milpLogLevel);
   }
@@ -200,6 +208,10 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     feasCheck.setLocalSearchNodeLimit(0);
     feasCheck.setMaxLocalSearch(0);
     feasCheck.setMaxLocalSearchPerNode(100000);
+    if(par.fout != NULL)
+    {
+      feasCheck.messageHandler()->setFilePointer(par.fout);
+    }
   }
   IpCbcDummyHeuristic oaHeu(model, &nlpSolver);
 
@@ -247,10 +259,17 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
 
   //Set true branch-and-bound parameters
   model.messageHandler()->setLogLevel(par.bbLogLevel);
+  if(par.fout!= NULL)
+  {
+    model.messageHandler()->setFilePointer(par.fout);
+  }
   if(par.algo > 0)
+  {
     model.solver()->messageHandler()->setLogLevel(par.lpLogLevel);
-
-
+    if(par.fout != NULL){
+      model.solver()->messageHandler()->setFilePointer(par.fout);
+     }
+  }
   //   model.setMaxFailure(par.maxFailures);
   //   model.setMaxInfeasible(par.maxInfeasible);
 
@@ -372,6 +391,8 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   model.setDblParam(CbcModel::CbcMaximumSeconds, par.maxTime);
 
   model.setMaximumNodes(par.maxNodes);
+  //model.setMaximumIterations(par.maxIterations);
+  model.setMaximumSolutions(par.maxSolutions);
 
   model.setIntegerTolerance(par.intTol);
 

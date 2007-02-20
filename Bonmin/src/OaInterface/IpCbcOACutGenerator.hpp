@@ -63,6 +63,10 @@ public:
   {
     handler_->setLogLevel(value);
   }
+
+ CoinMessageHandler * messageHandler(){
+   return handler_;
+ }
 private:
   /// Pointer to the Ipopt interface
   IpoptInterface * nlp_;

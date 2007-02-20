@@ -55,8 +55,7 @@ public:
       timeBegin_(0.),
       logFrequency_(copy.logFrequency_)
   {
-    handler_ = new CoinMessageHandler();
-    handler_->setLogLevel(copy.handler_->logLevel());
+    handler_ = copy.handler_->clone();
     if(copy.strategy_)
       strategy_ = copy.strategy_->clone();
     timeBegin_ = CoinCpuTime();
@@ -125,6 +124,11 @@ public:
   void setLogLevel(int value)
   {
     handler_->setLogLevel(value);
+  }
+
+
+  CoinMessageHandler * messageHandler(){
+    return handler_;
   }
   /** Set log frequency.*/
   void setLogFrequency(double value)

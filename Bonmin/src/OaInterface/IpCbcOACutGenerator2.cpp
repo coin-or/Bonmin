@@ -447,6 +447,7 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
 
       clp->resolve();
       model->setLogLevel(subMilpLogLevel_);
+      model->messageHandler()->setFilePointer(handler_->filePointer());
       model->solver()->messageHandler()->setLogLevel(0);
       model->setStrategy(*strategy);
       model->setMaximumNodes(localSearchNodeLimit_);
@@ -470,8 +471,6 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
       else
       {
         handler_->message(LOCAL_SEARCH_ABORT, messages_)<<model->getNodeCount()<<model->getIterationCount()<<CoinMessageEol;
-        if(isInteger)
-          std::cout<<"Integer feasible solution found"<<std::endl;
       }
     }
     else//use OsiSolverInterface::branchAndBound
@@ -617,11 +616,9 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
         if(nlp_->isProvenOptimal())
         {
           assert((nlp_->getObjValue() > cbcIntegerTolerance_) );
-          std::cout<<"Solved auxiliary infeasibility problem"<<std::endl;
         }
         else
         {
-          std::cout<<"Failed to solve auxiliary infeasibility problem"<<std::endl;
           bool * s = const_cast<bool *> (&solveAuxiliaryProblem_);
           *s =0;
         }
@@ -699,7 +696,6 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
           numberPasses < maxLocalSearchPerNode_ &&
           localSearchNodeLimit_ > 0 &&
           CoinCpuTime() - timeBegin_ < maxLocalSearchTime_) {
-         std::cout<<"Perform new local search"<<std::endl;
         if(clp==NULL) {
           nLocalSearch_++;
 
@@ -716,7 +712,6 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
           }
           if(changed) {
             feasible = (milpBound < cutoff);
-            std::cout<<"milp bound "<<milpBound<<" cutoff "<<cutoff<<std::endl;
           }
           else
            {
@@ -765,7 +760,6 @@ IpCbcOACutGenerator2::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
             milpFeasible = feasible;
           }
           else {
-            std::cout<<"Exiting on time limit"<<std::endl;
             milpOptimal = 0;
             //feasible = 1;
             break;

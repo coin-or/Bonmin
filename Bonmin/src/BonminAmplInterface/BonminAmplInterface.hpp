@@ -10,7 +10,7 @@ class BonminAmplInterface: public IpoptInterface
   /** Default constructor */
   BonminAmplInterface();
   /** Constructor with inputed ampl command line (reads model from nl file)*/ 
-  BonminAmplInterface(char **& amplArgs);
+  BonminAmplInterface(char **& amplArgs, bool = true);
   /** Copy constructor */
   BonminAmplInterface(const BonminAmplInterface &other);
   /// Clone
@@ -24,7 +24,8 @@ class BonminAmplInterface: public IpoptInterface
   /** Read an ampl . nl file from the given filename */
   virtual void readAmplNlFile(char**& filename,
       std::string* ipopt_file_content =NULL,
-      std::string* nl_file_content = NULL);
+      std::string* nl_file_content = NULL,
+      bool = true);
   /** write ampl solution file */
   void writeAmplSolFile(std::string message,const double * primalSol = NULL,const double * dualSol = NULL);
   //@}

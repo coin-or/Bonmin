@@ -33,6 +33,8 @@ BonminCbcParam::extractParams(IpoptInterface &solver)
   success &= Options->GetEnumValue("algorithm",algo,"bonmin.");
   success &= Options->GetNumericValue("time_limit", maxTime, "bonmin.");
   success &= Options->GetIntegerValue("node_limit",maxNodes,"bonmin.");
+  success &= Options->GetIntegerValue("solution_limit",maxSolutions,"bonmin.");
+  success &= Options->GetIntegerValue("iteration_limit",maxIterations,"bonmin.");
   success &= Options->GetNumericValue("integer_tolerance",intTol,"bonmin.");
   success &= Options->GetNumericValue("allowable_gap",allowableGap,"bonmin.");
   success &= Options->GetNumericValue("allowable_fraction_gap",allowableFractionGap,"bonmin.");
