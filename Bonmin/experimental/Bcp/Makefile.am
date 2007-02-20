@@ -54,7 +54,7 @@ bonminbcp_DEPENDENCIES = \
 	$(COINLIBS) \
 	amplsolver.a
 
-AMPL_PATHED_FILES = \
+AMPL_PATCHED_FILES = \
 	asl.h \
 	jac0dim.c \
 	misc.c \
@@ -68,7 +68,7 @@ amplsolver.a:
 	for f in $(AMPL_SRC)/*.c* $(AMPL_SRC)/*.h* $(AMPL_SRC)/makefile.u; do \
 		$(LN_S) $$f ; \
 	done ; \
-	for f in $(AMPL_PATHED_FILES); do \
+	for f in $(AMPL_PATCHED_FILES); do \
 		rm $$f ; \
 		cp $(AMPL_SRC)/$$f . ; \
 	done ; \
@@ -93,6 +93,7 @@ amplsolver.a:
 	fi; \
 	$(MAKE) CC="$$CC" $$ASLMAKEFLAGS CFLAGS="$$CFLAGS" -f makefile.u ; \
 	cp amplsolver.a ..
+	rm -rf solvers
 
 bonminbcp_LDADD = $(bonminbcp_DEPENDENCIES) \
 	$(ADDLIBS)
