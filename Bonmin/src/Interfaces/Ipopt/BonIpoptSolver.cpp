@@ -168,7 +168,9 @@ namespace Bonmin{
 	  }
 	else
 	  {
-	    throw CoinError("No statistics available from Ipopt","CPUTime","Bonmin::IpoptSolver");
+            printf("TODO: No statistics available from Ipopt in Bonmin::IpoptSolver::CPUTime\n");
+            return 0.;
+	    //throw CoinError("No statistics available from Ipopt","CPUTime","Bonmin::IpoptSolver");
 	  }
       }
   }
@@ -225,6 +227,7 @@ namespace Bonmin{
     case Ipopt::Restoration_Failed:
     case Ipopt::Error_In_Step_Computation:
     case Ipopt::Unrecoverable_Exception:
+    case Ipopt::Insufficient_Memory:
       return computationError;
     case Ipopt::Not_Enough_Degrees_Of_Freedom:
       return notEnoughFreedom;
@@ -235,7 +238,6 @@ namespace Bonmin{
       return illegalOption;
     case Ipopt::NonIpopt_Exception_Thrown:
       return externalException;
-    case Ipopt::Insufficient_Memory:
     case Ipopt::Internal_Error:
       return exception;
     case Ipopt::Solve_Succeeded:

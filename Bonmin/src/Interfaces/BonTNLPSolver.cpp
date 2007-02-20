@@ -202,7 +202,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles() const{
       (problem may be solvable).*/
   bool 
   TNLPSolver::isRecoverable(ReturnStatus &r){
-    return (r >=0 || (r != -4 && r != -5) );
+    return (r >=0 || (r != illDefinedProblem && r != illegalOption) );
   }
 
 

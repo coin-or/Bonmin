@@ -215,7 +215,7 @@ register_general_options
 			     "Andreas", "perturb the starting point of the problem within a prescriped interval","");
     roptions->AddLowerBoundedNumberOption("random_point_perturbation_interval",
 					   "Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point",
-					   0.,1, DBL_MAX,
+					   0.,true, 100.,
 					   "");
 					   
   roptions->AddLowerBoundedIntegerOption
