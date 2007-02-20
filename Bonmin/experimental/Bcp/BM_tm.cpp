@@ -224,3 +224,33 @@ BM_tm::display_feasible_solution(const BCP_solution* sol)
   write_AMPL_solution(sol, true, true);
 }
 
+struct BMSearchTreeCompareBest {
+  inline bool operator()(const CoinTreeSiblings* x,
+			 const CoinTreeSiblings* y) const {
+    double allowable_gap = 1e-8;
+    return ((x->currentNode()->quality_ <
+	     y->currentNode()->quality_-allowable_gap) ||
+	    ((x->currentNode()->quality_ <= y->currentNode()->quality_+allowable_gap) &&
+	     x->currentNode()->depth_ > y->currentNode()->depth_));
+    }
+};
+
+void
+BM_tm::init_new_phase(int phase,
+		      BCP_column_generation& colgen,
+		      CoinSearchTreeBase*& candidates)
+{
+  BCP_tm_prob* p = getTmProblemPointer();
+  colgen = BCP_DoNotGenerateColumns_Fathom;
+  switch (p->param(BCP_tm_par::TreeSearchStrategy)) {
+  case BCP_BestFirstSearch:
+    candidates = new CoinSearchTree<BMSearchTreeCompareBest>;
+    break;
+  case BCP_BreadthFirstSearch:
+    candidates = new CoinSearchTree<CoinSearchTreeCompareBreadth>;
+    break;
+  case BCP_DepthFirstSearch:
+    candidates = new CoinSearchTree<CoinSearchTreeCompareDepth>;
+    break;
+  }
+}

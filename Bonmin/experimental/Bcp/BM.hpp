@@ -158,6 +158,10 @@ public:
     /// Output the final solution
     virtual void display_final_information(const BCP_lp_statistics& lp_stat);
 
+    virtual void init_new_phase(int phase,
+				BCP_column_generation& colgen,
+				CoinSearchTreeBase*& candidates);
+
     void readIpopt();
 
   private:
