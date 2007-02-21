@@ -45,7 +45,7 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
   CouenneInterface* ci = dynamic_cast<CouenneInterface *>(nlp_);
   if(violation <= 1e-12)
     return;
-  std::cout<<"Generating ECP cuts"<<std::endl;
+  //  std::cout<<"Generating ECP cuts"<<std::endl;
   solverManip * lpManip = NULL;
   bool infeasible = false;
   const int memory = 5;
@@ -55,21 +55,29 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
   {
     const double * colsol = si.getColSolution();
     int numcols = si.getNumCols();
-    std::cout<<"Cutting :"<<std::endl;
+    /*    std::cout<<"Cutting :"<<std::endl;
     for(int kk = 0 ; kk < numcols; kk++){
       std::cout<<"x["<<kk<<"] = "<<colsol[kk]<<"\t";      
     }
     std::cout<<std::endl;
+    */
     if( violation > 1e-06)
     {
       int numberCuts =  - cs.sizeRowCuts();
       {
 
-	ci->couenneCg()->updateConv(
-				    const_cast<double *>(si.getColSolution()), 
-				    const_cast<double *>(si.getColLower()), 
-				    const_cast<double *>(si.getColUpper()));
-	
+	// Provide Couenne with initial relaxation or, if one round
+	// has been performed already, with the updated (tighter)
+	// relaxation
+	if (!lpManip)
+	  ci->couenneCg()->updateConv(const_cast<double *>(si.getColSolution()), 
+				      const_cast<double *>(si.getColLower()), 
+				      const_cast<double *>(si.getColUpper()));
+	else 
+	  ci->couenneCg()->updateConv(const_cast<double *>(lpManip -> si () -> getColSolution()), 
+				      const_cast<double *>(lpManip -> si () -> getColLower()), 
+				      const_cast<double *>(lpManip -> si () -> getColUpper()));
+
 
 	int ncuts = ci->couenneCg()->getncuts();
 	for(int i = 0 ; i < ncuts ; i++)
@@ -88,7 +96,7 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
         }
         lpManip->installCuts(cs,numberCuts);
         lpManip->si()->resolve();
-	std::cout<<"Cut generation: round "<<i<<", objective "<<lpManip->si()->getObjValue()<<std::endl;
+	//	std::cout<<"Cut generation: round "<<i<<", objective "<<lpManip->si()->getObjValue()<<std::endl;
         if(lpManip->si()->isProvenPrimalInfeasible())
         {
           infeasible = true;
