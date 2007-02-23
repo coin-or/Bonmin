@@ -65,8 +65,8 @@ expression *CouenneProblem::nl2e (expr2 *e) {
   case FLOOR:   return notimpl ("floor");
   case CEIL:    return notimpl ("ceil");
   case ABS:     return new exprAbs (nl2e (e -> L.e));
-    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
-  case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
+  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
+    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
   case OPIFnl:  return notimpl ("ifnl");
   case OP_tanh: return notimpl ("tanh");
   case OP_tan:  

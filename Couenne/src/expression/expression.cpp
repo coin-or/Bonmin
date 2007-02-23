@@ -126,7 +126,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   //  if (!(cg -> isFirst ())) 
   //  if (j < cs.sizeRowCuts ())
-   if (0)
+  if (0)
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");

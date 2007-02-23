@@ -39,7 +39,7 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
     // infinite (at least on one side) bound interval, but x is not
     // at the boundary
     value_ = x;
-  else
+  else // current point is at one of the bounds
     if ((l > - COUENNE_INFINITY + 1) &&
 	(u <   COUENNE_INFINITY - 1)) 
       // finite bounds, apply midpoint rule
@@ -48,8 +48,8 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
       // infinite bound interval, x is at the boundary
       // push it inwards
       // TODO: look for a proper value for the displacement 
-      if (fabs (x-l) < COUENNE_EPS) value_ += fabs (l) / 2.; 
-      else                          value_ -= fabs (u) / 2.; 
+      if (fabs (x-l) < COUENNE_EPS) value_ += (1+fabs (l)) / 2.; 
+      else                          value_ -= (1+fabs (u)) / 2.; 
 }
 
 
@@ -76,5 +76,5 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   printf ("Branch: x%d %c= %.12f\n", reference_ -> Index(), way ? '>' : '<', value_);
 
   branchIndex_++;
-  return 0.; // estimated gain in objective function
+  return 0.; // estimated change in objective function
 }

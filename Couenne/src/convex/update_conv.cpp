@@ -107,15 +107,15 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
   generateCuts (*bonOs_, *bonCs_);
 
-  /*
-  CouNumber *lb = bonOs_ -> getColLower (),
-            *ub = bonOs_ -> getColUpper ();
+
+  CouNumber *lb = const_cast <CouNumber *>(bonOs_ -> getColLower ()),
+            *ub = const_cast <CouNumber *>(bonOs_ -> getColUpper ());
 
   for (register int i = bonOs_ -> getNumCols (); i--;) {
     curlb [i] = lb [i];
     curub [i] = ub [i];
   }
-  */
+
 
   /*
   printf ("           x           lb             ub\n");

@@ -37,8 +37,9 @@ void CouenneConstraint::print (std::ostream &out = std::cout) {
   if (ub_ && ((ub_ -> Type  () != CONST) || 
 	      (ub_ -> Value () <  COUENNE_INFINITY))) {
 
+    out << ' ';
     if (!samebounds) out << "<";
-    out << " = "; fflush (stdout);
+    out << "= "; fflush (stdout);
     ub_ -> print (out); fflush (stdout);
   } 
 

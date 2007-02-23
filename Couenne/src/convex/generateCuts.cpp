@@ -1,6 +1,6 @@
 /*
- * Name: generateCuts.cpp
- * Author: Pietro Belotti
+ * Name:    generateCuts.cpp
+ * Author:  Pietro Belotti
  * Purpose: the generateCuts() method of the convexification class CouenneCutGenerator
  *
  * (C) Pietro Belotti, all rights reserved. 
@@ -16,9 +16,6 @@
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si, 
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-  //  int ncols = si.getNumCols ();
-
-  //  CouNumber *x, *l, *u;
 
   if (firstcall_) {
 
@@ -85,36 +82,39 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       found_one = false;
 
-      for (register int 
-	     i = problem_ -> nVars (), 
-	     j = problem_ -> nAuxs (); j--;) {
+      int naux = problem_ -> nAuxs ();
+
+      // check all auxiliary variables for changes in their upper,
+      // lower bound, depending on the bound changes of the variables
+      // they depend on
+
+      for (register int i = problem_ -> nVars (), j=0; 
+	   j < naux; j++) {
     
 	CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
 	CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
-    
+
+	// check if lower bound got higher    
 	if (ll > lc [i+j]) {
 	  const_cast <OsiSolverInterface *> (&si) -> setColLower (i+j, ll);
-	  //	  si.setColLower (i+j, ll);
 	  lc [i+j] = ll;
 	  found_one = true;
 	}
 
+	// check if upper bound got lower
 	if (uu < uc [i+j]) {
 	  const_cast <OsiSolverInterface *> (&si) -> setColUpper (i+j, uu);
-	  //	  const_cast<ClassName*>(this)->nonConstFunction();
-	  //	  si.setColUpper (i+j, uu);
 	  uc [i+j] = uu;
 	  found_one = true;
 	}
+
+	expression::update (xc, lc, uc);
       }
 
-      expression::update (xc, lc, uc);
-
-    } while (found_one);
+    } while (found_one); // repeat as long as at least one bound changed
 
     // update again 
     problem_ -> update (xc, lc, uc);
-
   }
 
   // For each auxiliary variable, create cut (or set of cuts) violated
@@ -130,10 +130,4 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   if (firstcall_) 
     firstcall_ = false;
-  /*  else {
-    delete [] x;
-    delete [] l;
-    delete [] u;
-  }
-  */
 }

@@ -23,6 +23,13 @@ public:
   CouenneObject (exprAux *ref):
     reference_ (ref) {}
 
+  /// Destructor
+  ~CouenneObject () {}
+
+  /// Copy constructor
+  CouenneObject (CouenneObject &src):
+    reference_ (src.Reference ()) {}
+
   /// Cloning method
   virtual OsiObject * clone() const
   {return new CouenneObject (reference_);}
@@ -37,6 +44,9 @@ public:
   /// create CouenneBranchingObject based on this object
   virtual OsiBranchingObject* createBranch (OsiSolverInterface*, 
 					    const OsiBranchingInformation*, int) const;
+
+  /// return reference auxiliary variable
+  exprAux *Reference () {return reference_;}
 
 protected:
 

@@ -12,19 +12,34 @@
 
 
 /// return difference between current value
-double CouenneObject::infeasibility (const OsiBranchingInformation*, int &) const
-  {
-    const double & expr = (*(reference_ -> Image ())) ();
-    const double & var = expression::Variable (reference_ -> Index ());
-    bool verbose = 0;
-    if(verbose){
-      reference_->print(std::cout);
-      std::cout<<" = ";
-      reference_->Image()->print(std::cout);
-      std::cout<<std::endl;
-      std::cout<<expr<<" =(?) "<<var<<std::endl;
-    }
-    return fabs (var - expr);}
+double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &) const
+{
+
+  int index = reference_ -> Image () -> getFixVar () -> Index ();
+
+  // if branched-upon variable has a narrow interval, it is not worthy
+  // to branch on it
+
+  if (fabs (info -> lower_ [index] - info -> upper_ [index]) < COUENNE_EPS)
+    return 0.;
+
+  const double & expr = (*(reference_ -> Image ())) ();
+  const double & var = expression::Variable (reference_ -> Index ());
+
+  bool verbose = 0;
+
+  if (verbose) {
+
+    reference_ -> print(std::cout);
+    std::cout<<" = ";
+    reference_->Image()->print(std::cout);
+    std::cout<<std::endl;
+    std::cout<<expr<<" =(?) "<<var<<std::endl;
+  }
+
+  // otherwise, return real value of difference w - f(x)
+  return fabs (var - expr);
+}
 
 
 /// fix integer coordinates of current integer feasible solution
@@ -47,9 +62,6 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *, 
 						 const OsiBranchingInformation *, 
 						 int) const {
-  /*  printf ("create branch for aux x%d (branch on x%d)\n", 
-	  reference_ -> Index(), 
-	  reference_ -> Image() -> getFixVar () ->Index());
-  */
+
   return new CouenneBranchingObject (reference_ -> Image () -> getFixVar ());
 }
