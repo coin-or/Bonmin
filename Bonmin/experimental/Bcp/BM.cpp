@@ -64,8 +64,6 @@ void BCP_parameter_set<BM_par>::create_keyword_list() {
 			     BCP_parameter(BCP_IntPar, BranchingStrategy)));
     keys.push_back(make_pair(BCP_string("FullStrongBranch"),
 			     BCP_parameter(BCP_IntPar, FullStrongBranch)));
-    keys.push_back(make_pair(BCP_string("PureBranchAndBound"),
-			     BCP_parameter(BCP_CharPar, PureBranchAndBound)));
     keys.push_back(make_pair(BCP_string("PrintBranchingInfo"),
 			     BCP_parameter(BCP_CharPar, PrintBranchingInfo)));
     keys.push_back(make_pair(BCP_string("CombinedDistanceAndPriority"),
@@ -93,7 +91,6 @@ template <>
 void BCP_parameter_set<BM_par>::set_default_entries() {
     set_entry(BranchingStrategy, BM_OsiChooseStrong);
     set_entry(FullStrongBranch, 0);
-    set_entry(PureBranchAndBound, false);
     set_entry(PrintBranchingInfo, true);
     set_entry(CombinedDistanceAndPriority, true);
     set_entry(SosWithLowPriorityMoreImportant, true);
@@ -126,16 +123,6 @@ BM_init::tm_init(BCP_tm_prob& p,
 	// work with defaults
     } else {
 	tm->par.read_from_arglist(argnum, arglist);
-    }
-
-    if (! p.param(BCP_tm_par::MessagePassingIsSerial) &&
-	tm->par.entry(BM_par::PureBranchAndBound) &&
-	tm->par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
-	printf("\
-BM: WarmStartFromParent is not supported for pure B&B in parallel env.\n");
-	printf("\
-BM: Switching to WarmStartFromRoot.\n");
-	tm->par.set_entry(BM_par::WarmStartStrategy, WarmStartFromRoot);
     }
 
     tm->readIpopt();

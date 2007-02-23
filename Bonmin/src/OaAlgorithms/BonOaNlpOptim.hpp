@@ -57,9 +57,17 @@ namespace Bonmin
 
 
 
-    void setMaxDepth(int value)
+    inline void setMaxDepth(int value)
     {
       maxDepth_ = value;
+    }
+    inline void setAddOnlyViolated(bool yesno)
+    {
+      addOnlyViolated_ = yesno;
+    }
+    inline void setGlobalCuts(bool yesno)
+    {
+      global_ = yesno;
     }
     inline int getNSolve()
     {

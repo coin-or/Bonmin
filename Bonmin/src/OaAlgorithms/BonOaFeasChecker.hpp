@@ -18,8 +18,6 @@ namespace Bonmin
   class OaFeasibilityChecker : public OaDecompositionBase
   {
   public:
-    /// Default constructor
-    OaFeasibilityChecker();
     /// Usefull constructor
     OaFeasibilityChecker(OsiTMINLPInterface * nlp = NULL,
         OsiSolverInterface * si = NULL,
@@ -36,12 +34,6 @@ namespace Bonmin
     }
     /// Destructor
     ~OaFeasibilityChecker();
-
-    /// Assign an OsiTMINLPInterface
-    void assignNlpInterface(OsiTMINLPInterface * nlp);
-
-    /// Assign an OsiTMINLPInterface
-    void assignLpInterface(OsiSolverInterface * si);
 
     void setStrategy(const CbcStrategy & strategy)
     {

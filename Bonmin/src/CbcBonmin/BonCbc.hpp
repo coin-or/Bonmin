@@ -6,8 +6,31 @@
 
 class CbcObject;
 
+class CglGomory;
+class CglProbing;
+class CglKnapsackCover;
+class CglMixedIntegerRounding;
+
 namespace Bonmin
 {
+  class OaNlpOptim;
+  class EcpCuts;
+  class OACutGenerator2;
+  class OaFeasibilityChecker;
+  void initializeCutGenerators(const BonminCbcParam &par,
+			       OsiTMINLPInterface * nlpSolver,
+			       CglGomory& miGGen,
+			       CglProbing& probGen,
+			       CglKnapsackCover& knapsackGen,
+			       CglMixedIntegerRounding& mixedGen,
+			       OaNlpOptim& oaGen,
+			       EcpCuts& ecpGen,
+			       OACutGenerator2& oaDec,
+			       OsiSolverInterface* localSearchSolver,
+			       OaFeasibilityChecker& feasCheck,
+			       OsiSolverInterface* feasLpSolver
+			       );
+
   class OsiTMINLPInterface;
   /** Class which performs optimization of an MINLP stored in an IpoptInterface. */
   class Bab

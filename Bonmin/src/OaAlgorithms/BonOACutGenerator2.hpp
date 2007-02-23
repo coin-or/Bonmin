@@ -18,8 +18,6 @@ namespace Bonmin
   class OACutGenerator2 : public OaDecompositionBase
   {
   public:
-    /// Default constructor
-    OACutGenerator2();
     /// Usefull constructor
     OACutGenerator2(OsiTMINLPInterface * nlp = NULL,
         OsiSolverInterface * si = NULL,
@@ -37,12 +35,6 @@ namespace Bonmin
     }
     /// Destructor
     ~OACutGenerator2();
-
-    /// Assign an OsiTMINLPInterface
-    void assignNlpInterface(OsiTMINLPInterface * nlp);
-
-    /// Assign an OsiTMINLPInterface
-    void assignLpInterface(OsiSolverInterface * si);
 
     void setStrategy(const CbcStrategy & strategy)
     {

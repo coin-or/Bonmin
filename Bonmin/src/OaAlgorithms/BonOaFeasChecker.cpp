@@ -20,13 +20,6 @@ namespace Bonmin
 
 extern int usingCouenne;
 // Default constructor
-  OaFeasibilityChecker ::OaFeasibilityChecker ():
-      OaDecompositionBase()
-   {
-   }
-
-
-
   OaFeasibilityChecker ::OaFeasibilityChecker 
   (OsiTMINLPInterface * nlp,
    OsiSolverInterface * si,

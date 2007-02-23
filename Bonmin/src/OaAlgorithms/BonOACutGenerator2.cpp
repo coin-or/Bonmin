@@ -27,13 +27,6 @@ namespace Bonmin
 extern int usingCouenne;
 
 /// Default constructor
-  OACutGenerator2::OACutGenerator2():
-      OaDecompositionBase()
-   {
-   }
-
-
-
   OACutGenerator2::OACutGenerator2
   (OsiTMINLPInterface * nlp,
    OsiSolverInterface * si,

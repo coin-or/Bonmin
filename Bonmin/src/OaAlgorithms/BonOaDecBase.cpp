@@ -91,21 +91,6 @@ OaDecompositionBase::Parameters::Parameters():
 OaDecompositionBase::~OaDecompositionBase(){
   delete handler_;}
 
-  /// Assign an OsiTMINLPInterface (interface to non-linear problem).
-  void
-  OaDecompositionBase::assignNlpInterface(OsiTMINLPInterface * nlp)
-  {
-    nlp_ = nlp;
-  }
-
-  /// Assign an OsiSolverInterface (interface to LP solver).
-  void
-  OaDecompositionBase::assignLpInterface(OsiSolverInterface * si)
-  {
-    lp_ = si;
-  }
-
-
 
 /// Constructor with default values for parameters
 OaDecompositionBase::Parameters::Parameters(const Parameters & other):

@@ -16,13 +16,7 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
                                    const BCP_lp_cut_pool& local_cut_pool,
                                    BCP_vec<BCP_lp_branching_object*>& cands)
 {
-    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.retrieve_options();
-    double intTol;
-    double cutoffIncr;
-    options->GetNumericValue("integer_tolerance", intTol, "bonmin.");
-    options->GetNumericValue("cutoff_decr", cutoffIncr, "bonmin.");
-
-    const double objLimit = upper_bound() + cutoffIncr;
+    const double objLimit = upper_bound() + cutOffDecrement_;
 
     if (lower_bound_ >= objLimit) {
 	return BCP_DoNotBranch_Fathomed;
@@ -36,14 +30,15 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
 
     OsiBranchingInformation brInfo(&nlp_, false);
     brInfo.cutoff_ = objLimit;
-    brInfo.integerTolerance_ = intTol;
+    brInfo.integerTolerance_ = integerTolerance_;
     brInfo.timeRemaining_ = get_param(BCP_lp_par::MaxRunTime) - CoinCpuTime();
     brInfo.numberSolutions_ = 0; /*FIXME*/
     brInfo.numberBranchingSolutions_ = 0; /*FIXME numBranchingSolutions_;*/
     brInfo.depth_ = current_level();
 
     BCP_branching_decision brDecision;
-    if (par.entry(BM_par::PureBranchAndBound)) {
+    if (minlpParams_.algo == 0) {
+	/* if pure B&B */
 	brDecision = bbBranch(brInfo, cands);
     } else {
 	brDecision = hybridBranch();
@@ -185,8 +180,13 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
     if (brResult < 0) {
 	// If there were some fixings (brResult < 0) then propagate them
 	// where needed
+
+	// FIXME: This is not nice. Meddling w/ BCP internal data. The BCP
+	// user interface should provide a way to change bounds regardless
+	// whether branching is asked for or not.
 	const double* clb = nlp_.getColLower();
 	const double* cub = nlp_.getColUpper();
+
 	BCP_lp_prob* p = getLpProblemPointer();
 	BCP_vec<BCP_var*>& vars = p->node->vars;
 	OsiSolverInterface* lp = p->lp_solver;
@@ -259,6 +259,26 @@ BM_lp::set_user_data_for_children(BCP_presolved_lp_brobj* best,
 }
 
 //#############################################################################
+
+const BCP_proc_id*
+BM_lp::process_id() const
+{
+}
+
+void
+BM_lp::send_message(const BCP_proc_id* const target, const BCP_buffer& buf)
+{
+}
+
+void
+BM_lp::broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf)
+{
+}
+
+void
+BM_lp::process_message(BCP_buffer& buf)
+{
+}
 
 /*
  Ipopt::TMINLP* model = nlp.model();

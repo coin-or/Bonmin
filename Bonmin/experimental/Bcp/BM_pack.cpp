@@ -6,6 +6,7 @@
 // Laszlo Ladanyi, International Business Machines Corporation
 //
 
+#include "BonCbc.hpp"
 #include "BM.hpp"
 
 //#############################################################################
@@ -73,6 +74,17 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     free(argv[1]);
 
     nlp_.extractInterfaceParams();
+    minlpParams_.extractParams(&nlp_);
+
+    if (! get_param(BCP_lp_par::MessagePassingIsSerial) &&
+	minlpParams_.algo == 0 /* pure B&B */ &&
+	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
+	printf("\
+BM: WarmStartFromParent is not supported for pure B&B in parallel env.\n");
+	printf("\
+BM: Switching to WarmStartFromRoot.\n");
+	par.set_entry(BM_par::WarmStartStrategy, WarmStartFromRoot);
+    }
 
     /* synchronize bonmin & BCP parameters */
     Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.retrieve_options();
@@ -107,6 +119,11 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     bcp_lp->par.set_entry(BCP_lp_par::IntegerTolerance, bm_intTol);
     bcp_lp->par.set_entry(BCP_lp_par::Granularity, bm_cutoffIncr);
 
+    /* Store a few options in local variables */
+
+    options->GetNumericValue("integer_tolerance", integerTolerance_,"bonmin.");
+    options->GetNumericValue("cutoff_decr", cutOffDecrement_,"bonmin.");
+
     // Getting the options for the choose variable object
     if (!options->GetEnumValue("varselect_stra",varselect_,"bonmin.")) {
       // For Bcp, we change the default to most-fractional for now
@@ -118,8 +135,9 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     delete chooseVar_;
     chooseVar_ = NULL;
 
+
     /* If pure BB is selected then a number of BCP parameters are changed */
-    if (par.entry(BM_par::PureBranchAndBound)) {
+    if (minlpParams_.algo == 0 /* pure B&B */) {
 	/* disable strong branching */
 	bcp_lp->par.set_entry(BCP_lp_par::MaxPresolveIter, -1);
 	/* disable a bunch of printing, all of which are meaningless, since the
@@ -134,6 +152,44 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_IterationCount, false);
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_RowEffectivenessCount, false);
 	//  bcp_lp->par.set_entry(BCP_lp_par::LpVerb_FathomInfo, false);
+    } else {
+	/* for hybrid: initialize the cut generators */
+
+	/* NOTE:
+	   
+	   if the localSerchSolver for oaDec_ is NULL, that will force the cut
+	   generator to create a clone of the solverinterface in bcp and use
+	   that to solve the milp subproblem.
+
+	   If localSearchSolver is set then if it is *not* the same as bcp's
+	   solverinterface then bcp's si's data gets copied into
+	   localsearchsolver when the milp is solvede.
+
+	   Finally, if localSearchSolver is set and it is the same as bcp's
+	   si, then bcp's si will be modified by the oaDec_. A big NO-NO!
+	   Fortunately, this will never happen as in each search tree node bcp
+	   creates a clone of the master lp.
+	*/
+	OsiSolverInterface * localSearchSolver = NULL;
+	if (minlpParams_.milpSubSolver == 2) {/* try to use cplex */
+#ifdef COIN_HAS_CPX
+	    localSearchSolver = new OsiCpxSolverInterface;
+	    nlpSolver->extractLinearRelaxation(*localSearchSolver);
+#else
+	    std::cerr << "You have set an option to use CPLEX as the milp\n"
+		      << "subsolver in oa decomposition. However, apparently\n"
+		      << "CPLEX is not configured to be used in bonmin.\n"
+		      << "See the manual for configuring CPLEX\n";
+	    throw -1;
+#endif
+	}
+	Bonmin::initializeCutGenerators(minlpParams_, &nlp_,
+					miGGen_, probGen_,
+					knapsackGen_, mixedGen_,
+					oaGen_, ecpGen_,
+					oaDec_, localSearchSolver,
+					feasCheck_, NULL
+					);
     }
 
     /* extract the sos constraints */

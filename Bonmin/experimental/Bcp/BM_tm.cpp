@@ -56,14 +56,14 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     nlpSolver.extractInterfaceParams();
   
     OsiClpSolverInterface clp;
-    int addObjVar = par.entry(BM_par::PureBranchAndBound) ? 0 : 1;
+    int addObjVar = minlpParams_.algo == 0 /* pure B&B */ ? 0 : 1;
     nlpSolver.extractLinearRelaxation(clp, addObjVar);
   
     const int numCols = clp.getNumCols();
     const int numRows = clp.getNumRows();
 
     double* obj = new double[numCols];
-    if (par.entry(BM_par::PureBranchAndBound)) {
+    if (minlpParams_.algo == 0 /* pure B&B */) {
 	CoinFillN(obj, numCols, 0.0);
     }
     else {
@@ -81,7 +81,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
 	    vars.push_back(new BCP_var_core(type, obj[i], clb[i], cub[i]));
 	}
 
-    if (par.entry(BM_par::PureBranchAndBound)) {
+    if (minlpParams_.algo == 0 /* pure B&B */) {
 	// Just fake something into the core matrix. In this case: 0 <= 1
 	BCP_vec<double> OBJ(obj, numCols);
 	BCP_vec<double> CLB(clb, numCols);
@@ -141,9 +141,10 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
   argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
   argv[2] = NULL;
   nlpSolver.readAmplNlFile(argv, 0, 0);
+  minlpParams_.extractParams(&nlpSolver);
   free(argv[1]);
   OsiClpSolverInterface clp;
-  int addObjVar = par.entry(BM_par::PureBranchAndBound) ? 0 : 1;
+  int addObjVar = minlpParams_.algo == 0 /* pure B&B */ ? 0 : 1;
   nlpSolver.extractLinearRelaxation(clp, addObjVar);
   const int numCols = clp.getNumCols();
 
@@ -183,6 +184,28 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
     nlpSolver.writeAmplSolFile("\nbon-min: Optimal solution", dsol, NULL);
   }
   delete[] dsol;
+}
+
+//#############################################################################
+
+const BCP_proc_id*
+BM_tm::process_id() const
+{
+}
+
+void
+BM_tm::send_message(const BCP_proc_id* const target, const BCP_buffer& buf)
+{
+}
+
+void
+BM_tm::broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf)
+{
+}
+
+void
+BM_tm::process_message(BCP_buffer& buf)
+{
 }
 
 /****************************************************************************/
@@ -254,3 +277,4 @@ BM_tm::init_new_phase(int phase,
     break;
   }
 }
+

@@ -98,6 +98,85 @@ extern "C"
 #endif
 namespace Bonmin
 {
+  void initializeCutGenerators(const BonminCbcParam &par,
+			       OsiTMINLPInterface * nlpSolver,
+			       CglGomory& miGGen,
+			       CglProbing& probGen,
+			       CglKnapsackCover& knapsackGen,
+			       CglMixedIntegerRounding& mixedGen,
+			       OaNlpOptim& oaGen,
+			       EcpCuts& ecpGen,
+			       OACutGenerator2& oaDec,
+			       OsiSolverInterface* localSearchSolver,
+			       OaFeasibilityChecker& feasCheck,
+			       OsiSolverInterface* feasLpSolver
+			       )
+  {
+    probGen.setUsingObjective(true);
+    probGen.setMaxPass(3);
+    probGen.setMaxProbe(100);
+    probGen.setMaxLook(50);
+
+    oaGen.assignInterface(nlpSolver);
+    oaGen.setMaxDepth(10000);
+    oaGen.setAddOnlyViolated(par.addOnlyViolatedOa);
+    oaGen.setGlobalCuts(par.oaCutsGlobal);
+    oaGen.setLogLevel(par.oaLogLevel);
+
+    ecpGen.assignNlpInterface(nlpSolver);
+    ecpGen.parameter().global_ = par.oaCutsGlobal;
+    ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
+    ecpGen.setNumRounds(par.numEcpRounds);
+
+    //Outer approximation iterations
+    oaDec.assignNlpInterface(nlpSolver);
+    if (localSearchSolver)
+      oaDec.assignLpInterface(localSearchSolver);
+    if (par.milpSubSolver == 1) {
+	CbcStrategy * strategy =
+	    new CbcOaStrategy(par.milpSubSolver_migFreq,
+			      par.milpSubSolver_probFreq,
+			      par.milpSubSolver_mirFreq,
+			      par.milpSubSolver_coverFreq,
+			      par.milpSubSolver_minReliability,
+			      par.milpSubSolver_numberStrong,
+			      par.milpSubSolver_nodeSelection,
+			      par.intTol,
+			      par.milpLogLevel);
+	oaDec.setStrategy(*strategy);
+	delete strategy;
+    }
+    oaDec.parameter().cbcCutoffIncrement_ = par.cutoffDecr;
+    oaDec.parameter().cbcIntegerTolerance_ = par.intTol;
+    oaDec.setLeaveSiUnchanged(true);
+    if (par.algo>0) {
+      oaDec.parameter().localSearchNodeLimit_ = 1000000;
+      oaDec.parameter().maxLocalSearch_ = 100000;
+      oaDec.parameter().maxLocalSearchPerNode_ = 10000;
+      oaDec.parameter().maxLocalSearchTime_ =
+	  std::min(par.maxTime, par.oaDecMaxTime);
+      oaDec.setLogLevel(par.oaLogLevel);
+      oaDec.parameter().logFrequency_ = par.oaLogFrequency;
+      oaDec.parameter().subMilpLogLevel_ = par.milpLogLevel;
+      oaDec.parameter().global_ = par.oaCutsGlobal;
+      oaDec.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
+    }
+
+    //Setup solver for checking validity of integral solutions
+    feasCheck.assignNlpInterface(nlpSolver);
+    feasCheck.assignLpInterface(feasLpSolver);
+    /* FIXME: last 3 args to constructor of OaFeasibilityChecker. Must copy
+       them to the right place. */
+    /********* par.cutoffDecr, par.intTol, 0); */
+    if (par.algo>0) {
+      feasCheck.parameter().localSearchNodeLimit_ = 0;
+      feasCheck.parameter().maxLocalSearch_ = 0;
+      feasCheck.parameter().maxLocalSearchPerNode_ = 100000;
+      feasCheck.parameter().global_ = par.oaCutsGlobal;
+      feasCheck.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
+    }
+  }
+    
   int usingCouenne = 0;
 
   /** Constructor.*/
@@ -117,6 +196,7 @@ namespace Bonmin
     if (bestSolution_) delete [] bestSolution_;
     bestSolution_ = NULL;
   }
+
   /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
   void
   Bab::branchAndBound(OsiTMINLPInterface *nlpSolver,
@@ -160,29 +240,21 @@ namespace Bonmin
 
     //Setup likely milp cut generator
     CglGomory miGGen;
-
     CglProbing probGen;
-    probGen.setUsingObjective(true);
-    probGen.setMaxPass(3);
-    probGen.setMaxProbe(100);
-    probGen.setMaxLook(50);
-
     CglKnapsackCover knapsackGen;
     CglMixedIntegerRounding mixedGen;
 
     //Setup OA generators
 
     //Resolution of nlp relaxations
-    OaNlpOptim oaGen(nlpSolver, 10000, par.addOnlyViolatedOa, par.oaCutsGlobal);
-    oaGen.setLogLevel(par.oaLogLevel);
+    OaNlpOptim oaGen;
+    EcpCuts ecpGen;
+    OACutGenerator2 oaDec;
+    OaFeasibilityChecker feasCheck;
 
-    EcpCuts ecpGen(nlpSolver);
-    ecpGen.parameter().global_ = par.oaCutsGlobal;
-    ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
-    ecpGen.setNumRounds(par.numEcpRounds);
+    // Create localSearchSolver that'll be used in oaDec
+    OsiSolverInterface * localSearchSolver = NULL;
 
-    //Outer approximation iterations
-    OsiSolverInterface * localSearchSolver=NULL;
     if (par.milpSubSolver <= 1)/* use cbc */
     {
       localSearchSolver = model.solver();
@@ -195,50 +267,20 @@ namespace Bonmin
       localSearchSolver = cpxSolver;
       nlpSolver->extractLinearRelaxation(*localSearchSolver);
 #else
-
-      std::cerr<<"You have set an option to use CPLEX as the milp subsolver in oa decomposition."<<std::endl
-      <<"but apparently CPLEX is not configured to be used in bonmin, see the manual for configuring CPLEX"<<std::endl;
+      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
+		<< "subsolver in oa decomposition. However, apparently\n"
+		<< "CPLEX is not configured to be used in bonmin.\n"
+		<< "See the manual for configuring CPLEX\n";
       throw -1;
 #endif
+    }
 
-    }
-    CbcStrategy * strategy = NULL;
-    if (par.milpSubSolver == 1) {
-      strategy = new CbcOaStrategy(par.milpSubSolver_migFreq,
-          par.milpSubSolver_probFreq,
-          par.milpSubSolver_mirFreq,
-          par.milpSubSolver_coverFreq,
-          par.milpSubSolver_minReliability,
-          par.milpSubSolver_numberStrong,
-          par.milpSubSolver_nodeSelection,
-          par.intTol,
-          par.milpLogLevel
-                                  );
-    }
-    OACutGenerator2 oaDec(nlpSolver, localSearchSolver, strategy, par.cutoffDecr, par.intTol, 1);
-    if (par.algo>0) {
-      oaDec.parameter().localSearchNodeLimit_ = 1000000;
-      oaDec.parameter().maxLocalSearch_ = 100000;
-      oaDec.parameter().maxLocalSearchPerNode_ = 10000;
-      oaDec.parameter().maxLocalSearchTime_ = min(par.maxTime,par.oaDecMaxTime);
-      oaDec.setLogLevel(par.oaLogLevel);
-      oaDec.parameter().logFrequency_ = par.oaLogFrequency;
-      oaDec.parameter().subMilpLogLevel_ = par.milpLogLevel;
-      oaDec.parameter().global_ = par.oaCutsGlobal;
-      oaDec.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
+    initializeCutGenerators(par, nlpSolver,
+			    miGGen, probGen, knapsackGen, mixedGen,
+			    oaGen, ecpGen, oaDec, localSearchSolver,
+			    feasCheck, model.solver());
 
-    }
-    //Setup solver for checking validity of integral solutions
-    OaFeasibilityChecker feasCheck(nlpSolver, model.solver(),
-				   par.cutoffDecr, par.intTol,
-				   0);
-    if (par.algo>0) {
-      feasCheck.parameter().localSearchNodeLimit_ = 0;
-      feasCheck.parameter().maxLocalSearch_ = 0;
-      feasCheck.parameter().maxLocalSearchPerNode_ = 100000;
-      feasCheck.parameter().global_ = par.oaCutsGlobal;
-      feasCheck.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
-    }
+
     DummyHeuristic oaHeu(model, nlpSolver);
 
     if (par.algo>0) {
@@ -539,9 +581,6 @@ namespace Bonmin
       delete localSearchSolver;
 #endif
     std::cout<<"Finished"<<std::endl;
-    if (strategy)
-      delete strategy;
-
   }
 
 

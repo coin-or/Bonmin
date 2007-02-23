@@ -195,10 +195,20 @@ namespace Bonmin
                               const CglTreeInfo info = CglTreeInfo()) const;
 
     /// Assign an OsiTMINLPInterface
-    void assignNlpInterface(OsiTMINLPInterface * nlp);
+    void assignNlpInterface(OsiTMINLPInterface * nlp) {
+      nlp_ = nlp;
+    }
 
     /// Assign an OsiTMINLPInterface
-    void assignLpInterface(OsiSolverInterface * si);
+    void assignLpInterface(OsiSolverInterface * si) {
+	lp_ = si;
+    }
+
+    /// Set whether to leave the solverinterface unchanged
+    inline void setLeaveSiUnchanged(bool yesno)
+    {
+      leaveSiUnchanged_ = yesno;
+    }
 
    /** Parameters for algorithm. */
     struct Parameters {
@@ -232,7 +242,7 @@ namespace Bonmin
       /** Destructor */
       ~Parameters(){
         if(!strategy_) delete strategy_;}
-      
+
       /** Strategy to apply when using Cbc as MILP sub-solver.*/
       void setStrategy(const CbcStrategy & strategy){
         if(strategy_) delete strategy_;
@@ -257,15 +267,16 @@ namespace Bonmin
    
     void setLogLevel(int level){
       handler_->setLogLevel(level);} 
+
   protected:
    /// \name Protected helper functions
    /**@{ */
    /** Check for integer feasibility of a solution return true if it is feasible.
-      \todo Handle SOS Type 2 constraints. */
-      bool integerFeasible(const double * sol, int numcols) const;
+   \todo Handle SOS Type 2 constraints. */
+   bool integerFeasible(const double * sol, int numcols) const;
 
-    /** Solve the nlp and do output. 
-	\return true if feasible*/
+   /** Solve the nlp and do output. 
+       \return true if feasible*/
     bool solveNlp(OsiBabSolver * babInfo, double cutoff) const;
    /** @} */
 

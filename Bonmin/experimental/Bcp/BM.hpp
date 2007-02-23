@@ -10,6 +10,8 @@
 #ifndef _BM_H
 #define _BM_H
 
+#include "BonCbcParam.hpp"
+
 #include "BCP_USER.hpp"
 #include "BCP_tm_user.hpp"
 #include "BCP_lp_user.hpp"
@@ -59,12 +61,19 @@ enum BM_BranchingStrategy {
     BM_OsiChooseStrong
 };
 
+enum BM_message {
+    StrongBranchRequest,
+    StrongBranchResult,
+    FreeToBusyRatio
+};
+
+//#############################################################################
+    
 class BM_par {
 public:
     enum chr_params {
         //
         CombinedDistanceAndPriority,
-        PureBranchAndBound,
 	PrintBranchingInfo,
 	SosWithLowPriorityMoreImportant,
         VarWithLowPriorityMoreImportant,
@@ -104,6 +113,7 @@ public:
     BCP_string ipopt_file_content;
     BCP_string nl_file_content;
     BCP_parameter_set<BM_par> par;
+    Bonmin::BonminCbcParam minlpParams_;
 
 public:
 
@@ -155,6 +165,20 @@ public:
     /// Print a feasible solution
     virtual void display_feasible_solution(const BCP_solution* sol);
 
+    /** What is the process id of the current process */
+    const BCP_proc_id*
+    process_id() const;
+    /** Send a message to a particular process */
+    void
+    send_message(const BCP_proc_id* const target, const BCP_buffer& buf);
+    /** Broadcast the message to all processes of the given type */
+    void
+    broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf);
+    /** Process a message that has been sent by another process' user part to
+	this process' user part. */
+    virtual void
+    process_message(BCP_buffer& buf);
+
     /// Output the final solution
     virtual void display_final_information(const BCP_lp_statistics& lp_stat);
 
@@ -176,8 +200,16 @@ public:
 
 #include <OsiAuxInfo.hpp>
 #include <OsiCuts.hpp>
-#include "BCP_lp_user.hpp"
+#include "CglGomory.hpp"
+#include "CglProbing.hpp"
+#include "CglKnapsackCover.hpp"
+#include "CglMixedIntegerRounding.hpp"
+#include "BonOaFeasChecker.hpp"
+#include "BonOaNlpOptim.hpp"
+#include "BonEcpCuts.hpp"
 #include "BonOACutGenerator2.hpp"
+
+#include "BCP_lp_user.hpp"
 #include "BonAmplInterface.hpp"
 #include "BonTMINLP.hpp"
 
@@ -189,12 +221,26 @@ class BM_lp : public BCP_lp_user
 
     OsiBabSolver babSolver_;
     Bonmin::AmplInterface nlp_;
+    Bonmin::BonminCbcParam minlpParams_;
+
     CoinWarmStart* ws_;
     OsiChooseVariable* chooseVar_;
     int numEcpRounds_;
     int numberStrong_;
     int minReliability_;
     int varselect_;
+    double integerTolerance_;
+    double cutOffDecrement_;
+
+    /* A couple of cut generators to be used in the hybrid method */
+    CglGomory miGGen_;
+    CglProbing probGen_;
+    CglKnapsackCover knapsackGen_;
+    CglMixedIntegerRounding mixedGen_;
+    Bonmin::OaNlpOptim oaGen_;
+    Bonmin::EcpCuts ecpGen_;
+    Bonmin::OACutGenerator2 oaDec_;
+    Bonmin::OaFeasibilityChecker feasCheck_;
 
     /* FIXME: gross cheating. works only for serial mode. Store the warmstart
        informations in the lp process, do not send them over in user data or
@@ -210,8 +256,12 @@ class BM_lp : public BCP_lp_user
 	difficult. */
     int numNlpFailed_;
 
-    Bonmin::OACutGenerator2* feasChecker_;
     OsiCuts cuts_;
+
+    /** The last free-to-busy ratio (among the LP processes) that the TM has
+	sent over. It is used to decide whether we want distributed strong
+	branching */
+    double freeToBusyRatio_;
 
 public:
     BM_lp();
@@ -239,6 +289,17 @@ public:
     virtual BCP_user_data*
     unpack_user_data(BCP_buffer& buf);
 
+    /** What is the process id of the current process */
+    const BCP_proc_id*
+    process_id() const;
+    /** Send a message to a particular process */
+    void
+    send_message(const BCP_proc_id* const target, const BCP_buffer& buf);
+    /** Broadcast the message to all processes of the given type */
+    void
+    broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf);
+    /** Process a message that has been sent by another process' user part to
+	this process' user part. */
     virtual void
     process_message(BCP_buffer& buf);
 
@@ -249,6 +310,11 @@ public:
     test_feasibility(const BCP_lp_result& lp_result,
 		     const BCP_vec<BCP_var*>& vars,
 		     const BCP_vec<BCP_cut*>& cuts);
+    BCP_solution* test_feasibility_BB(const BCP_vec<BCP_var*>& vars);
+    BCP_solution* test_feasibility_hybrid(const BCP_lp_result& lp_result,
+					  const BCP_vec<BCP_var*>& vars,
+					  const BCP_vec<BCP_cut*>& cuts);
+
     virtual void
     generate_cuts_in_lp(const BCP_lp_result& lpres,
 			const BCP_vec<BCP_var*>& vars,
