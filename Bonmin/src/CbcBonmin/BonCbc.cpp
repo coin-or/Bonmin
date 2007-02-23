@@ -165,9 +165,12 @@ namespace Bonmin
     //Setup solver for checking validity of integral solutions
     feasCheck.assignNlpInterface(nlpSolver);
     feasCheck.assignLpInterface(feasLpSolver);
-    /* FIXME: last 3 args to constructor of OaFeasibilityChecker. Must copy
-       them to the right place. */
-    /********* par.cutoffDecr, par.intTol, 0); */
+    feasCheck.parameter().cbcCutoffIncrement_ = par.cutoffDecr;
+    feasCheck.parameter().cbcIntegerTolerance_ = par.intTol;
+    /* If feasLpSolver is set to NULL (like in bonminbcp) then this won't
+       affect anything. From bonmincbc we must allow changing the underlying
+       LP solver */
+    feasCheck.setLeaveSiUnchanged(false);
     if (par.algo>0) {
       feasCheck.parameter().localSearchNodeLimit_ = 0;
       feasCheck.parameter().maxLocalSearch_ = 0;

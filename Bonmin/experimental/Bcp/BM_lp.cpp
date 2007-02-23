@@ -269,7 +269,7 @@ BM_lp::test_feasibility_hybrid(const BCP_lp_result& lp_result,
 	dynamic_cast<OsiBabSolver *> (osi->getAuxiliaryInfo());
     //assert(babSolver == &babSolver_);
     babSolver->setSolver(nlp_); 
-    feasCheck_->generateCuts(*osi, cuts_);
+    feasCheck_.generateCuts(*osi, cuts_);
     const int numvar = vars.size();
     double* solverSol = new double[numvar];
     double objValue = 1e200;
@@ -303,15 +303,17 @@ BM_lp::generate_cuts_in_lp(const BCP_lp_result& lpres,
 	   some measurement of how good a generator is.
 	*/
 	
-	OsiSolverInterface* si = getLpProblemPointer()->lp_solver;
+	OsiSolverInterface& si = *getLpProblemPointer()->lp_solver;
 	double rand;
 	rand = 1 - CoinDrand48();
 	if (minlpParams_.nlpSolveFrequency > rand) {
-	    oaGen_.generateCuts(si, cuts_);
+	    /* FIXME: fill out the tree info! */
+	    CglTreeInfo info;
+	    oaGen_.generateCuts(si, cuts_, info);
 	}
 	rand = 1 - CoinDrand48();
 	if (minlpParams_.filmintCutsFrequency > rand) {
-	    ecpGen.generateCuts(si, cuts_);
+	    ecpGen_.generateCuts(si, cuts_);
 	}
 	rand = 1 - CoinDrand48();
 	if (minlpParams_.migFreq > rand) {
