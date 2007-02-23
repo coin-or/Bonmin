@@ -26,7 +26,7 @@ class exprCos: public exprUnary {
   exprCos  (expression *al): 
     exprUnary (al) {}
 
-  ~exprCos () {}
+  //  ~exprCos () {}
 
   // cloning method
   expression *clone () const

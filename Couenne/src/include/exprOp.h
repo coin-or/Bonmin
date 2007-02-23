@@ -45,7 +45,7 @@ class exprOp: public expression {
     nargs_   (2)
     {arglist_ [0] = arg0; arglist_ [1] = arg1;}
 
- ~exprOp ();
+  ~exprOp ();
 
   // copy constructor
   exprOp (const exprOp &e):

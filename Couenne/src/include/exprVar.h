@@ -38,7 +38,7 @@ class exprVar: public expression {
     varIndex_ (varIndex) {}
 
   // destructor
-  ~exprVar () {}
+  virtual  ~exprVar () {}
 
   // copy constructor
   exprVar (const exprVar &e):

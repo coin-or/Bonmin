@@ -211,4 +211,8 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
       && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), 
 				 x_ind, yu, y_ind, xl)))
     cs.insert (cut);
+
+  delete xle; delete xue;
+  delete yle; delete yue;
+  delete wle; delete wue;
 }

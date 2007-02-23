@@ -28,7 +28,7 @@ class exprMin: public exprOp {
     arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
   }
 
-  ~exprMin () {}
+  //  ~exprMin () {}
 
   // cloning method
   expression *clone () const

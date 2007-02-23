@@ -24,7 +24,7 @@ class exprLog: public exprUnary {
   exprLog  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
-  ~exprLog () {}
+  //  ~exprLog () {}
 
   // cloning method
   expression *clone () const

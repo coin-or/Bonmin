@@ -52,7 +52,7 @@ CouenneCutGenerator::~CouenneCutGenerator () {
     delete bonOs_;
   }
 
-  if (!pool_) 
+  if (pool_) 
     free (pool_);
 
   delete problem_;

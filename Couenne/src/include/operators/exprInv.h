@@ -27,7 +27,7 @@ class exprInv: public exprUnary {
   // Constructors, destructor
   exprInv  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
-  ~exprInv () {}
+  //  ~exprInv () {}
 
   // cloning method
   expression *clone () const

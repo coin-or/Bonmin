@@ -28,7 +28,7 @@ class exprMax: public exprOp {
     arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
   }
 
-  ~exprMax () {}
+  //  ~exprMax () {}
 
   // cloning method
   expression *clone () const

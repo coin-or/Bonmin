@@ -35,7 +35,7 @@ class exprConst: public expression {
     {currValue_ = value;}
 
   // Destructor
-  ~exprConst () {}
+  //  ~exprConst () {}
 
   // Copy constructor
   exprConst (const exprConst &e)

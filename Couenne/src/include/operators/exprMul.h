@@ -26,7 +26,7 @@ class exprMul: public exprOp {
   exprMul (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  ~exprMul () {}
+  //  ~exprMul () {}
 
   // cloning method
   expression *clone () const

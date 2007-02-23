@@ -27,7 +27,7 @@ class exprClone: public exprCopy {
     exprCopy (copy) {}
 
   /// destructor
-  ~exprClone () {}
+  //  ~exprClone () {}
 
   /// copy constructor
   exprClone (const exprClone &e):

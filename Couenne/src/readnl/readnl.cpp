@@ -306,11 +306,11 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
   // initial x ////////////////////////////////////////////////////////////////////
 
-  if (X0) 
-    for (int i=n_var; i--;) 
-      x_ [i] = (havex0 [i]) ? X0 [i] : 0; 
-  else
-    for (int i=n_var; i--;) {
+  for (int i=n_var; i--;) 
+    if (X0 && havex0 [i])
+      x_ [i] = X0 [i]; 
+    else {
+      //    for (int i=n_var; i--;) {
 
       CouNumber x, l = lb_ [i], u = ub_ [i];
 
@@ -330,6 +330,8 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   delete [] nterms;
   delete [] alists;
 
+  // restore groups for use by Ipopt: constraints
+
   for (int k=0; k<n_con; k++)
     if ((asl -> P. cps [k]. nb) || (asl -> P. cps [k]. ng)) {
 
@@ -337,6 +339,8 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
       for (int i=0; i<ngroups; i++)
 	free_asl_group (asl -> P. cps [k]. g + i);
     }
+
+  // and objectives
 
   for (int k=0; k<n_obj; k++)
     if ((asl -> P. ops [k]. nb) || (asl -> P. ops [k]. ng)) {

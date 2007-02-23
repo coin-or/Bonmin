@@ -24,7 +24,7 @@ class exprAbs: public exprUnary {
   // Constructors, destructor
   exprAbs  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
-  ~exprAbs () {}
+  //  ~exprAbs () {}
 
   /// the operator's function
   inline unary_function F () {return fabs;}

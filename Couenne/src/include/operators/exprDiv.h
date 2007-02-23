@@ -26,7 +26,7 @@ class exprDiv: public exprOp {
   exprDiv (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  ~exprDiv () {}
+  //  ~exprDiv () {}
 
   // cloning method
   expression *clone () const

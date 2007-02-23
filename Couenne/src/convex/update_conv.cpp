@@ -67,6 +67,7 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     }
   }
   */
+
   if (!bonCs_) {
 
     // This cut generator has been called through updateConv, not
@@ -81,7 +82,8 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
     bonOs_ = new OsiClpSolverInterface;
 
-    int nvars = problem_ -> nVars () + problem_ -> nAuxs ();
+    int nvars = problem_ -> nVars () + 
+                problem_ -> nAuxs ();
 
     for (int i=0; i < nvars; i++)
       bonOs_ -> addCol (0, NULL, NULL, curlb [i], curub [i], 0);
@@ -107,6 +109,7 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
   generateCuts (*bonOs_, *bonCs_);
 
+  // give the possibly shrunken variable bounds to the caller problem
 
   CouNumber *lb = const_cast <CouNumber *>(bonOs_ -> getColLower ()),
             *ub = const_cast <CouNumber *>(bonOs_ -> getColUpper ());
@@ -115,7 +118,6 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     curlb [i] = lb [i];
     curub [i] = ub [i];
   }
-
 
   /*
   printf ("           x           lb             ub\n");
@@ -135,7 +137,6 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
   }
 
   /*
-
   for (int i=0; i<problem_ -> nVars (); i++) {
     printf ("%4d:  %12.3f [%12.3f %12.3f]\n", 
 	    i, problem_ -> X(i), problem_ -> Lb(i), problem_ -> Ub(i));
@@ -164,5 +165,6 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     printf ("\n");
   }
   */
+
   return ncuts_;
 }

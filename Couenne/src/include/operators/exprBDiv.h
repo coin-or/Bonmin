@@ -23,7 +23,7 @@ class exprLBDiv: public exprOp {
   exprLBDiv  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  ~exprLBDiv () {}
+  //  ~exprLBDiv () {}
 
   // cloning method
   expression *clone () const
@@ -77,7 +77,7 @@ class exprUBDiv: public exprOp {
   exprUBDiv  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  ~exprUBDiv () {}
+  //  ~exprUBDiv () {}
 
   // cloning method
   expression *clone () const

@@ -1,5 +1,5 @@
 /*
- * Name:    simplifiers.C
+ * Name:    simplifiers.cpp
  * Author:  Pietro Belotti
  * Purpose: simplifiers for main operators (+,*,-)
  *
@@ -94,24 +94,7 @@ int exprOp::shrink_arglist (CouNumber c, CouNumber null_element) {
   }
 
   nargs_ = j;
-  /*
-  printf ("////////////////////////////// nargs=%d, %d, %d\n", nargs_,
 
-	  ((fabs (c - null_element) < COUENNE_EPS) || !one_fun),
-	  ((nargs_ == 1) && ((fabs (c - null_element) > COUENNE_EPS) || !one_fun)));
-  */
-  // since C++ has no corresponding to realloc(), copy arglist_ to a
-  // smaller array and delete it
-  /*
-  expression ** new_arglist = new expression * [nargs_];
-
-  for (i=nargs_; i--;)
-    new_arglist [i] = arglist_ [i];
-
-  delete [] arglist_;
-
-  arglist_ = new_arglist;
-  */
   // only say shrinking simplified arg list if there is just the
   // constant
   return (nargs_ == 1);// && ((fabs (c - null_element) > COUENNE_EPS) || !one_fun));

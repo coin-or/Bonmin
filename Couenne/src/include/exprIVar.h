@@ -31,7 +31,7 @@ class exprIVar: public exprVar {
     exprVar (varIndex) {}
 
   // destructor
-  ~exprIVar () {}
+  //  ~exprIVar () {}
 
   // copy constructor
   exprIVar (const exprIVar &e):

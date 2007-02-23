@@ -33,7 +33,7 @@ class exprCopy: public expression {
   // Constructor, destructor
   exprCopy  (expression *copy):
     copy_ (copy) {}
-  ~exprCopy () {}
+  //  ~exprCopy () {}
 
   // copy constructor
   exprCopy (const exprCopy &e) {

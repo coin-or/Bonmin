@@ -68,4 +68,7 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // add upper envelope
 
   cg -> addEnvelope (cs, -1, log, inv, w_ind, x_ind, x, l, u, true);
+
+  delete le;
+  delete ue;
 }

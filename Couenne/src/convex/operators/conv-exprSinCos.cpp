@@ -108,4 +108,7 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
   if ((cut = cg -> createCut (f (lb) + lb, +1, w_ind, CouNumber (1.),
 			      x_ind, CouNumber (1.))))
     cs.insert (cut);
+
+  delete lbe;
+  delete ube;
 }

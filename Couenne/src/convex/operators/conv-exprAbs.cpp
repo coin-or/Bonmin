@@ -76,4 +76,7 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	  cs.insert (cut);
       }
     }
+
+  delete lbe;
+  delete ube;
 }

@@ -101,4 +101,8 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if (is_boundbox_regular (yu, wl)
       && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
+
+  delete yle; delete yue;
+  delete wle; delete wue;
+  delete xle; delete xue;
 }

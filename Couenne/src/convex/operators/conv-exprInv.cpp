@@ -111,4 +111,7 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // bound
 
   cg -> addEnvelope (cs, sign, inv, oppInvSqr, w_ind, x_ind, x, l, u);
+
+  delete xle; 
+  delete xue;
 }

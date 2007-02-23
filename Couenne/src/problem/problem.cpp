@@ -177,11 +177,13 @@ void CouenneProblem::standardize () {
 // destroy problem components
 
 CouenneProblem::~CouenneProblem () {
-  /*
-  free (x_);
-  free (lb_);
-  free (ub_);
-  */
+
+  if (x_) {
+    free (x_);
+    free (lb_);
+    free (ub_);
+  }
+
   // delete objectives
   for (std::vector <Objective *>::iterator i  = objectives_ . begin ();
        i != objectives_ . end (); i++)
@@ -207,12 +209,12 @@ CouenneProblem::~CouenneProblem () {
 // update value of variables, bounds
 
 void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
-
+  /*
   x_  = x;
   lb_ = l;
   ub_ = u;
+  */
 
-  /*
   static int curr_size = -1;
 
   int nvars = nVars () + nAuxs ();
@@ -231,6 +233,6 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
     lb_ [i] = l [i];
     ub_ [i] = u [i];
   }
-  */
+
   expression::update (x_, lb_, ub_);
 }

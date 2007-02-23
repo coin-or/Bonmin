@@ -23,7 +23,7 @@ class exprLBMul: public exprOp {
   exprLBMul  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  ~exprLBMul () {}
+  //  ~exprLBMul () {}
 
   // cloning method
   expression *clone () const
@@ -81,7 +81,7 @@ class exprUBMul: public exprOp {
   exprUBMul  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  ~exprUBMul () {}
+  //  ~exprUBMul () {}
 
   // cloning method
   expression *clone () const

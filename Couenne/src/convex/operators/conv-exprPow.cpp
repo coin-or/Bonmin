@@ -206,4 +206,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, u, sign);
   }
+
+  delete xle; delete xue;
+  delete wle; delete wue;
 }

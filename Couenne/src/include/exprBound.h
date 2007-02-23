@@ -40,7 +40,7 @@ class exprLowerBound: public exprVar {
 
   // Constructors, destructor
   exprLowerBound  (int varIndex): exprVar (varIndex) {}
-  ~exprLowerBound () {}
+  //  ~exprLowerBound () {}
 
   // string equivalent
   const std::string name () const;
@@ -80,7 +80,7 @@ class exprUpperBound: public exprVar {
   // Constructors, destructor
   exprUpperBound  (int varIndex): 
     exprVar (varIndex) {}
-  ~exprUpperBound () {}
+  //  ~exprUpperBound () {}
 
   // string equivalent
   const std::string name () const;

@@ -21,7 +21,7 @@ class exprExp: public exprUnary {
   // Constructors, destructor
   exprExp  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
-  ~exprExp () {}
+  //  ~exprExp () {}
 
   // cloning method
   expression *clone () const
