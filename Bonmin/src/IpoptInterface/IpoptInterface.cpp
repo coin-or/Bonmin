@@ -1944,8 +1944,13 @@ int IpoptInterface::initializeJacobianArrays()
   jCol_ = new Ipopt::Index[nnz_jac];
   jValues_ = new Ipopt::Number[nnz_jac];
   tminlp_->eval_jac_g(n, NULL, 0, m, nnz_jac, jRow_, jCol_, NULL);
-
-
+  if(index_style == Ipopt::TNLP::FORTRAN_STYLE)//put C-style
+  {
+     for(int i = 0 ; i < nnz_jac ; i++){
+        jRow_[i]--;
+        jCol_[i]--;
+     }
+  }
   if(constTypes_ != NULL) delete [] constTypes_;
   if(constTypesNum_ != NULL) delete [] constTypesNum_;
 
@@ -2016,21 +2021,25 @@ bool cleanNnz(double &value, double colLower, double colUpper,
 
   if(colLoBounded && pos && rowNotUpBounded) {
     lb += value * (colsol - colLower);
+    value = 0;
     return 0;
   }
   else
     if(colLoBounded && !pos && rowNotLoBounded) {
       ub += value * (colsol - colLower);
+      value = 0;
       return 0;
     }
     else
       if(colUpBounded && !pos && rowNotUpBounded) {
         lb += value * (colsol - colUpper);
+        value = 0;
         return 0;
       }
       else
         if(colUpBounded && pos && rowNotLoBounded) {
           ub += value * (colsol - colUpper);
+          value = 0;
           return 0;
         }
   //can not remove coefficient increase it to smallest non zero
@@ -2071,18 +2080,17 @@ IpoptInterface::getOuterApproximation(OsiCuts &cs, bool getObj)
     }
   }
 //double infty = getInfinity();
-  int offset = (index_style == Ipopt::TNLP::FORTRAN_STYLE);
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i] - 1] == Ipopt::TMINLP::NON_LINEAR) {
+    if(constTypes_[jRow_[i]] == Ipopt::TMINLP::NON_LINEAR) {
       //"clean" coefficient
-      if(cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
-          rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
-          getColSolution()[jCol_[i] - offset],
-          lb[constTypesNum_[jRow_[i] - offset]],
-          ub[constTypesNum_[jRow_[i] - offset]], tiny_, veryTiny_)) {
-        cuts[constTypesNum_[jRow_[i] - offset]].insert(jCol_[i]-offset,jValues_[i]);
-        lb[constTypesNum_[jRow_[i] - offset]] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
-        ub[constTypesNum_[jRow_[i] - offset]] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
+      if(cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
+          rowLower[jRow_[i]], rowUpper[jRow_[i]],
+          getColSolution()[jCol_[i]],
+          lb[constTypesNum_[jRow_[i]]],
+          ub[constTypesNum_[jRow_[i]]], tiny_, veryTiny_)) {
+        cuts[constTypesNum_[jRow_[i]]].insert(jCol_[i],jValues_[i]);
+        lb[constTypesNum_[jRow_[i]]] += jValues_[i] * getColSolution()[jCol_ [i]];
+        ub[constTypesNum_[jRow_[i]]] += jValues_[i] * getColSolution()[jCol_ [i]];
       }
     }
   }
@@ -2173,7 +2181,7 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
 {
   initialSolve();
 
-  CoinPackedMatrix mat;
+
   double * rowLow = NULL;
   double * rowUp = NULL;
 
@@ -2216,7 +2224,9 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     }
   }
 
-  //Then convert everything to a CoinPackedMatrix (col ordered)
+#ifdef OLD_CONSTRUCTION
+   CoinPackedMatrix mat;
+ //Then convert everything to a CoinPackedMatrix (col ordered)
   CoinBigIndex * inds = new CoinBigIndex[nnz_jac_g + 1];
   double * vals = new double [nnz_jac_g + 1];
   int * start = new int[n+1];
@@ -2230,25 +2240,24 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     length[k] = 0;
   }
   int end = nnz_jac_g - 1;
-  int offset = (index_style == Ipopt::TNLP::FORTRAN_STYLE);
   for(int i = 0 ; i < end ; i++) {
     {
       if(jCol_[i + 1] < jCol_ [i] || ( jCol_ [i+1] == jCol_[i] && jRow_[i + 1] <= jRow_[i]) ) {
         needOrder = 1;
         break;
       }
-      if(Ipopt::TMINLP::LINEAR //Always accept coefficients from linear constraints
+      if(constTypes_[jRow_[i]] == Ipopt::TMINLP::LINEAR //Always accept coefficients from linear constraints
           || //For other clean tinys
-          cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]- offset],
-              rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
-              getColSolution()[jCol_[i] - offset],
-              rowLow[jRow_[i] - offset],
-              rowUp[jRow_[i] -offset], tiny_, veryTiny_)) {
+          cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
+              rowLower[jRow_[i]], rowUpper[jRow_[i]],
+              getColSolution()[jCol_[i]],
+              rowLow[jRow_[i]],
+              rowUp[jRow_[i]], tiny_, veryTiny_)) {
         vals[nnz] = jValues_[i];
-        rowLow[jRow_[i] - offset] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
-        rowUp[jRow_[i] -offset] += jValues_[i] *getColSolution()[jCol_[i] -offset];
-        inds[nnz] = jRow_[i ] - offset;
-        length[jCol_[i] - offset]++;
+        rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
+        rowUp[jRow_[i]] += jValues_[i] *getColSolution()[jCol_[i]];
+        inds[nnz] = jRow_[i ];
+        length[jCol_[i]]++;
         nnz++;
       }
     }
@@ -2261,11 +2270,11 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   }
   if(!needOrder) {
     {
-      length[jCol_[nnz_jac_g -1] - offset]++;
+      length[jCol_[nnz_jac_g -1]]++;
       vals[nnz] = jValues_[nnz_jac_g - 1];
-      rowLow[jRow_[nnz_jac_g - 1] - offset] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - offset];
-      rowUp[jRow_[nnz_jac_g - 1] -offset] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] - offset ];
-      inds[nnz++] = jRow_[nnz_jac_g - 1] - offset;
+      rowLow[jRow_[nnz_jac_g - 1]] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1]];
+      rowUp[jRow_[nnz_jac_g - 1]] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] ];
+      inds[nnz++] = jRow_[nnz_jac_g - 1];
     }
     for(int i = jCol_[nnz_jac_g -1] ; i < n ; i++) {
       start[i] = nnz;
@@ -2288,11 +2297,27 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
    start[n]=0;
  }
  mat.assignMatrix(false, m, n, nnz, vals, inds, start, length);
+  mat.transpose();
+#else
+//Go through values, clean coefficients and fix bounds
+  for(int i = 0 ; i < nnz_jac_g ; i++) {
+      if(constTypes_[jRow_[i]] == Ipopt::TMINLP::LINEAR //Always accept coefficients from linear constraints
+          || //For other clean tinys
+          cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
+              rowLower[jRow_[i]], rowUpper[jRow_[i]],
+              getColSolution()[jCol_[i]],
+              rowLow[jRow_[i]],
+              rowUp[jRow_[i]], tiny_, veryTiny_)) {
+        rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
+        rowUp[jRow_[i]] += jValues_[i] *getColSolution()[jCol_[i]];
+      }
+    }
+   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
+#endif
   int numcols=getNumCols();
   double *obj = new double[numcols];
   for(int i = 0 ; i < numcols ; i++)
     obj[i] = 0;
-  mat.transpose();
   
 #if 0
   std::cout<<"Mat is ordered by "<<
