@@ -111,12 +111,12 @@ BonminAmplInterface::readAmplNlFile(char**& filename,
 
 /** write ampl solution file */
 void
-BonminAmplInterface::writeAmplSolFile(std::string message,const double * primalSol,const double * dualSol)
+BonminAmplInterface::writeAmplSolFile(std::string message,const double * primalSol)
 {
   TMINLP * tminlp = GetRawPtr(tminlp_);
   AmplTMINLP * ampl_tminlp = dynamic_cast<AmplTMINLP *> (tminlp);
   if(ampl_tminlp)
-    ampl_tminlp->write_solution(message,primalSol,dualSol);
+    ampl_tminlp->write_solution(message,primalSol);
   else
     std::cerr<<"Errot can not write .sol file for non ampl problem"<<std::endl;
 }

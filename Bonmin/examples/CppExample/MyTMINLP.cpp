@@ -191,8 +191,7 @@ MyTMINLP::eval_h(Index n, const Number* x, bool new_x,
 
 void
 MyTMINLP::finalize_solution(SolverReturn status,
-                            Index n, const Number* x, const Number* z_L, const Number* z_U,
-                            Index m, const Number* g, const Number* lambda,
-                            Number obj_value)
+                            Index n, const Number* x,
+                            Number obj_value) const
 {//don't need anything
 }

@@ -26,6 +26,10 @@ libipoptinterface_la_SOURCES = \
 	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
 	TMINLP.hpp \
 	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
+if COIN_HAS_GAMSLINKS
+libipoptinterface_la_SOURCES += CoinMessageHandler2Journal.cpp CoinMessageHandler2Journal.hpp
+endif
+
 
 # This is for libtool (on Windows)
 libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
@@ -61,6 +65,9 @@ include_HEADERS = \
 	TMINLP.hpp \
 	TNLP2FPNLP.hpp
 
+if COIN_HAS_GAMSLINKS
+include_HEADERS += CoinMessageHandler2Journal.hpp
+endif
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
 #############################################################################
@@ -95,7 +102,9 @@ ASTYLE_FILES = \
 	TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
 	TMINLP.hppbak \
 	TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak
-
+if COIN_HAS_GAMSLINKS
+ASTYLE_FILES += CoinMessageHandler2Journal.cppbak CoinMessageHandler2Journal.hppbak     
+endif
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
 

@@ -344,24 +344,32 @@ namespace Ipopt
         jCol, values);
   }
 
-  void AmplTMINLP::finalize_solution(SolverReturn status,
-      Index n, const Number* x, const Number* z_L, const Number* z_U,
-      Index m, const Number* g, const Number* lambda,
-      Number obj_value)
+  void AmplTMINLP::finalize_solution(TMINLP::SolverReturn status,
+      Index n, const Number* x, Number obj_value) const
   {
-    // Not sure if ampl require a different form of solution file
-    // for MINLPs - we may have to write a different solution file here instead of
-    // passing this back to ampl.
-    ampl_tnlp_->finalize_solution(status,
-        n, x, z_L, z_U,
-        m, g, lambda,
-        obj_value);
-
-    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
-    solve_result_num = 0;
+    std::string message;
+    std::string status_str;
+    if(status == TMINLP::SUCCESS) {
+      status_str = "\t\"Finished\"";
+      message = "\nbonmin: Optimal";
+    }
+    else if(status == TMINLP::INFEASIBLE) {
+      status_str = "\t\"Finished\"";
+      message = "\nbonmin: Infeasible problem";
+    }
+    else if(status == TMINLP::LIMIT_EXCEEDED) {
+      status_str = "\t\"Not finished\"";
+      message = "\n Optimization interupted on limit.";
+    }
+    else if(status == TMINLP::ERROR) {
+      status_str = "\t\"Aborted\"";
+      message = "\n Error encountered in optimization.";
+    }
+   write_solution(message, x);
+   std::cout<<"\n "<<status_str<<std::endl;
   }
 
-  void AmplTMINLP::write_solution(const std::string & message, const Number *x_sol, const Number * lambda_sol)
+  void AmplTMINLP::write_solution(const std::string & message, const Number *x_sol) const
   {
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
     ;
@@ -381,17 +389,9 @@ namespace Ipopt
         x_sol_copy[i] = x_sol[i];
       }
     }
-    double* lambda_sol_copy = NULL;
-    if (lambda_sol_copy) {
-      lambda_sol_copy = new double[n_con];
-      for (int i=0; i<n_con; i++) {
-        lambda_sol_copy[i] = lambda_sol[i];
-      }
-    }
-    write_sol(cmessage, x_sol_copy, lambda_sol_copy, NULL);
+    write_sol(cmessage, x_sol_copy, NULL, NULL);
 
     delete [] x_sol_copy;
-    delete [] lambda_sol_copy;
     delete [] cmessage;
 
   }

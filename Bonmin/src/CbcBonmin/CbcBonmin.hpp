@@ -30,7 +30,7 @@ public:
 
   /** get the best solution known to the problem (is optimal if MipStatus is FeasibleOptimal).
       if no solution is known returns NULL.*/
-  const double * bestSolution() const
+  const Number * bestSolution() const
   {
     return bestSolution_;
   }

@@ -43,8 +43,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@COIN_HAS_GAMSLINKS_TRUE@am__append_1 = CoinMessageHandler2Journal.cpp CoinMessageHandler2Journal.hpp
+@COIN_HAS_GAMSLINKS_TRUE@am__append_2 = CoinMessageHandler2Journal.hpp
+@COIN_HAS_GAMSLINKS_TRUE@am__append_3 = CoinMessageHandler2Journal.cppbak CoinMessageHandler2Journal.hppbak     
 subdir = src/IpoptInterface
-DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = README $(am__include_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -56,10 +59,20 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libipoptinterface_la_LIBADD =
+am__libipoptinterface_la_SOURCES_DIST = IpCbcBoundsReader.cpp \
+	IpCbcBoundsReader.hpp IpCbcColReader.cpp IpCbcColReader.hpp \
+	IpCbcStartPointReader.cpp IpCbcStartPointReader.hpp \
+	IpoptIntegerBias.hpp IpoptInterface.cpp IpoptInterface.hpp \
+	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
+	IpoptWarmStart.cpp IpoptWarmStart.hpp TMINLP2TNLP.cpp \
+	TMINLP2TNLP.hpp TMINLP.hpp TNLP2FPNLP.cpp TNLP2FPNLP.hpp \
+	CoinMessageHandler2Journal.cpp CoinMessageHandler2Journal.hpp
+@COIN_HAS_GAMSLINKS_TRUE@am__objects_1 =  \
+@COIN_HAS_GAMSLINKS_TRUE@	CoinMessageHandler2Journal.lo
 am_libipoptinterface_la_OBJECTS = IpCbcBoundsReader.lo \
 	IpCbcColReader.lo IpCbcStartPointReader.lo IpoptInterface.lo \
 	IpoptInteriorWarmStarter.lo IpoptWarmStart.lo TMINLP2TNLP.lo \
-	TNLP2FPNLP.lo
+	TNLP2FPNLP.lo $(am__objects_1)
 libipoptinterface_la_OBJECTS = $(am_libipoptinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -80,7 +93,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libipoptinterface_la_SOURCES)
-DIST_SOURCES = $(libipoptinterface_la_SOURCES)
+DIST_SOURCES = $(am__libipoptinterface_la_SOURCES_DIST)
+am__include_HEADERS_DIST = IpoptInterface.hpp \
+	IpoptInteriorWarmStarter.hpp TMINLP2TNLP.hpp TMINLP.hpp \
+	TNLP2FPNLP.hpp CoinMessageHandler2Journal.hpp
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -147,6 +163,8 @@ COIN_HAS_DYLP_FALSE = @COIN_HAS_DYLP_FALSE@
 COIN_HAS_DYLP_TRUE = @COIN_HAS_DYLP_TRUE@
 COIN_HAS_FMP_FALSE = @COIN_HAS_FMP_FALSE@
 COIN_HAS_FMP_TRUE = @COIN_HAS_FMP_TRUE@
+COIN_HAS_GAMSLINKS_FALSE = @COIN_HAS_GAMSLINKS_FALSE@
+COIN_HAS_GAMSLINKS_TRUE = @COIN_HAS_GAMSLINKS_TRUE@
 COIN_HAS_GLPK_FALSE = @COIN_HAS_GLPK_FALSE@
 COIN_HAS_GLPK_TRUE = @COIN_HAS_GLPK_TRUE@
 COIN_HAS_IPOPT_FALSE = @COIN_HAS_IPOPT_FALSE@
@@ -192,6 +210,8 @@ FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
 FMPINCDIR = @FMPINCDIR@
 FMPLIB = @FMPLIB@
+GAMSLINKSOBJDIR = @GAMSLINKSOBJDIR@
+GAMSLINKSSRCDIR = @GAMSLINKSSRCDIR@
 GLPKINCDIR = @GLPKINCDIR@
 GLPKLIB = @GLPKLIB@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
@@ -309,18 +329,14 @@ AUTOMAKE_OPTIONS = foreign
 # Name of the library in this directory
 noinst_LTLIBRARIES = libipoptinterface.la 
 # List all source files, including headers
-libipoptinterface_la_SOURCES = \
-	IpCbcBoundsReader.cpp IpCbcBoundsReader.hpp \
-	IpCbcColReader.cpp IpCbcColReader.hpp \
+libipoptinterface_la_SOURCES = IpCbcBoundsReader.cpp \
+	IpCbcBoundsReader.hpp IpCbcColReader.cpp IpCbcColReader.hpp \
 	IpCbcStartPointReader.cpp IpCbcStartPointReader.hpp \
-	IpoptIntegerBias.hpp \
-	IpoptInterface.cpp IpoptInterface.hpp \
+	IpoptIntegerBias.hpp IpoptInterface.cpp IpoptInterface.hpp \
 	IpoptInteriorWarmStarter.cpp IpoptInteriorWarmStarter.hpp \
-	IpoptWarmStart.cpp IpoptWarmStart.hpp \
-	TMINLP2TNLP.cpp TMINLP2TNLP.hpp \
-	TMINLP.hpp \
-	TNLP2FPNLP.cpp TNLP2FPNLP.hpp
-
+	IpoptWarmStart.cpp IpoptWarmStart.hpp TMINLP2TNLP.cpp \
+	TMINLP2TNLP.hpp TMINLP.hpp TNLP2FPNLP.cpp TNLP2FPNLP.hpp \
+	$(am__append_1)
 
 # This is for libtool (on Windows)
 libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
@@ -349,14 +365,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
-include_HEADERS = \
-	IpoptInterface.hpp \
-	IpoptInteriorWarmStarter.hpp \
-	TMINLP2TNLP.hpp \
-	TMINLP.hpp \
-	TNLP2FPNLP.hpp
-
-
+include_HEADERS = IpoptInterface.hpp IpoptInteriorWarmStarter.hpp \
+	TMINLP2TNLP.hpp TMINLP.hpp TNLP2FPNLP.hpp $(am__append_2)
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
 #############################################################################
@@ -369,18 +379,15 @@ ConfigHeader = BonminConfig.h
 ########################################################################
 
 # Here repeat all source files, with "bak" appended
-ASTYLE_FILES = \
-	IpCbcBoundsReader.cppbak IpCbcBoundsReader.hppbak \
+ASTYLE_FILES = IpCbcBoundsReader.cppbak IpCbcBoundsReader.hppbak \
 	IpCbcColReader.cppbak IpCbcColReader.hppbak \
 	IpCbcStartPointReader.cppbak IpCbcStartPointReader.hppbak \
-	IpoptIntegerBias.hppbak \
-	IpoptInterface.cppbak IpoptInterface.hppbak \
-	IpoptInteriorWarmStarter.cppbak IpoptInteriorWarmStarter.hppbak \
-	IpoptWarmStart.cppbak IpoptWarmStart.hppbak \
-	TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
-	TMINLP.hppbak \
-	TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak
-
+	IpoptIntegerBias.hppbak IpoptInterface.cppbak \
+	IpoptInterface.hppbak IpoptInteriorWarmStarter.cppbak \
+	IpoptInteriorWarmStarter.hppbak IpoptWarmStart.cppbak \
+	IpoptWarmStart.hppbak TMINLP2TNLP.cppbak TMINLP2TNLP.hppbak \
+	TMINLP.hppbak TNLP2FPNLP.cppbak TNLP2FPNLP.hppbak \
+	$(am__append_3)
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
 all: all-am
@@ -434,6 +441,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CoinMessageHandler2Journal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcBoundsReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcColReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IpCbcStartPointReader.Plo@am__quote@

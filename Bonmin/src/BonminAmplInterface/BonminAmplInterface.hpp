@@ -27,7 +27,7 @@ class BonminAmplInterface: public IpoptInterface
       std::string* nl_file_content = NULL,
       bool = true);
   /** write ampl solution file */
-  void writeAmplSolFile(std::string message,const double * primalSol = NULL,const double * dualSol = NULL);
+  void writeAmplSolFile(std::string message,const double * primalSol = NULL);
   //@}
 
   /** Fast access to AmplTMINLP */

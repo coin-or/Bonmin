@@ -27,6 +27,9 @@
 /* Define to 1 if the FortMP package is used */
 #undef COIN_HAS_FMP
 
+/* Define to 1 if the GAMSlinks package is used */
+#undef COIN_HAS_GAMSLINKS
+
 /* Define to 1 if the Glpk package is used */
 #undef COIN_HAS_GLPK
 
@@ -83,6 +86,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Define to 1 if va_copy is avaliable */
+#undef HAVE_VA_COPY
 
 /* Name of package */
 #undef PACKAGE

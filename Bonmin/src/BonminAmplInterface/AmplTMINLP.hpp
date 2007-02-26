@@ -124,17 +124,15 @@ namespace Ipopt
     /** @name Solution Methods */
     //@{
     virtual void finalize_solution(SolverReturn status,
-        Index n, const Number* x, const Number* z_L, const Number* z_U,
-        Index m, const Number* g, const Number* lambda,
-        Number obj_value);
+        Index n, const Number* x, Number obj_value) const ;
 
-    void write_solution(const std::string & message, const Number *x_sol, const Number * lambda_sol);
+    void write_solution(const std::string & message, const Number *x_sol) const;
     //@}
 
     /** Write the solution file.  This is a wrapper for AMPL's
      *  write_sol.  TODO Maybe this should be at a different place, or
      *  collect the numbers itself? */
-    void write_solution_file(const std::string& message) const;
+    void write_solution_file(const std::string& message, const Number * x) const;
     //@}
 
    

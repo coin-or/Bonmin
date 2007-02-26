@@ -22,7 +22,9 @@
 #include "TMINLP.hpp"
 #include "TMINLP2TNLP.hpp"
 #include "TNLP2FPNLP.hpp"
-
+#ifdef COIN_HAS_GAMSLINK
+#include "CoinMessageHandler2Journal.hpp"
+#endif
 #include "IpIpoptApplication.hpp"
 
 
@@ -133,8 +135,11 @@ class Messages : public CoinMessages
   /** Constructor with given (user) TMINLP.
     \warning In this constructor option file is not read, use readOptionFile to read one.
   */
-  IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp);
-
+  IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
+#ifdef COIN_HAS_GAMSLINK
+, CoinMessageHandler* messagehandler=NULL
+#endif
+ );
   /// Clone
   virtual OsiSolverInterface * clone(bool CopyData=true) const;
 
@@ -415,10 +420,15 @@ class Messages : public CoinMessages
   /// Get pointer to array[getNumCols()] of primal solution vector
   virtual const double * getColSolution() const;
 
-  /// Get pointer to array[getNumRows()] of dual prices
+  /** Get pointer to array[getNumRows() + 2* getNumCols()] of dual prices.
+  Array is ordererd as follow <ul>
+  <li> getNumRows() first elements are constraints duals. </li>
+  <li> getNumCols() following elements are duals of variable lower bounds.</li>
+  <li> getNumCols() last elements are duals of variable upper bounds.</li>
+  */
   virtual const double * getRowPrice() const;
 
-  /// Get a pointer to array[getNumCols()] of reduced costs
+  /// Reduced costs are not available in Ipopt, returns NULL
   virtual const double * getReducedCost() const;
 
   /** Get pointer to array[getNumRows()] of row activity levels (constraint
@@ -426,9 +436,7 @@ class Messages : public CoinMessages
   virtual const double * getRowActivity() const;
 
 
-  /** Get how many iterations it took to solve the problem (whatever
-      "iteration" mean to the solver.
-      * \todo Figure out what it could mean for Ipopt.
+  /** Get how many iterations it took to solve the problem.
       */
   virtual int getIterationCount() const;
 
@@ -490,9 +498,12 @@ class Messages : public CoinMessages
   */
   virtual void setColSolution(const double *colsol);
 
-  /** Set dual solution variable values.
-      set the values for the starting point.
-      \warning getRowPrice will never return this vector (unless it is optimal).
+  /** Pass an array[getNumRows() + 2* getNumCols()] of dual prices for starting point.
+  Array is ordererd as follow <ul>
+  <li> getNumRows() first elements are constraints duals. </li>
+  <li> getNumCols() following elements are duals of variable lower bounds.</li>
+  <li> getNumCols() last elements are duals of variable upper bounds.</li>
+ \warning getRowPrice() will never return this vector.
   */
   virtual void setRowPrice(const double * rowprice);
 
@@ -768,6 +779,9 @@ class Messages : public CoinMessages
   //@{
   void turnOffIpoptOutput();
   void turnOnIpoptOutput();
+#ifdef COIN_HAS_GAMSLINK
+  void passInMessageHandler(CoinMessageHandler* messagehandler);
+#endif
   //@}
 
   /**@name Sets and Getss */
@@ -969,8 +983,10 @@ protected:
   double tiny_;
   /** Value for small non-zero element which we will take the risk to ignore in OA cuts.*/
   double veryTiny_;
-
-
+#ifdef COIN_HAS_GAMS_LINK
+  /** To redirect Ipopt output to a message handler. */
+  Ipopt::SmartPtr<CoinMessageHandler2Journal> journal_;
+#endif
 };
 
 #endif

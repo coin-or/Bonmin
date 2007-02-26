@@ -440,35 +440,48 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
 
 
   if(hasFailed) {
-    std::cout<<"************************************************************"<<std::endl
-    <<"WARNING : Optimization failed on an NLP during optimization"
-    <<"\n (no optimal value found within tolerances)."<<std::endl
-    <<"Optimization was not stopped because option \n"
-    <<"\"nlp_failure_behavior\" has been set to fathom but"
-    <<" beware that reported solution may not be optimal"<<std::endl
-    <<"************************************************************"<<std::endl;
+  std::string msg="************************************************************\n"
+              "WARNING : Optimization failed on an NLP during optimization\n"
+              "\n (no optimal value found within tolerances).\n"
+              "Optimization was not stopped because option \n"
+              "\"nlp_failure_behavior\" has been set to fathom but"
+              " be carefull that reported solution is not proven optimal"
+              "************************************************************\n";
+    if(par.fout)
+      fprintf(par.fout,"%s", msg.c_str());
+    else printf("%s",msg.c_str());
   }
 
   if(model.bestSolution()) {
     if(bestSolution_)
       delete [] bestSolution_;
-    bestSolution_ = new double[nlpSolver.getNumCols()];
+    bestSolution_ = new Number[nlpSolver.getNumCols()];
     CoinCopyN(model.bestSolution(), nlpSolver.getNumCols(), bestSolution_);
   }
-  if(!model.status()) {
-    if(bestSolution_)
+  TMINLP::SolverReturn status;
+  if(model.status()==0) {
+    if(bestSolution_){
+      status = TMINLP::SUCCESS;
       mipStatus_ = FeasibleOptimal;
-    else
+    }
+    else{
+      status = TMINLP::INFEASIBLE;
       mipStatus_ = ProvenInfeasible;
+    }
   }
-  else {
+  else if(model.status()==1){
+     status = TMINLP::LIMIT_EXCEEDED;
     if(bestSolution_)
       mipStatus_ = Feasible;
     else
       mipStatus_ = NoSolutionKnown;
   }
+  else if (model.status()==2){
+    status = TMINLP::ERROR;
+  }
 
-
+  nlpSolver.model()->finalize_solution(status, nlpSolver.getNumCols(), bestSolution_,
+                                       nlpSolver.getObjValue());
   if(par.algo > 0)
     delete si;
 #ifdef COIN_HAS_CPX
@@ -476,7 +489,10 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   if (par.milpSubSolver ==1)
     delete localSearchSolver;
 #endif
-  std::cout<<"Finished"<<std::endl;
+  if(par.fout)
+  fprintf(par.fout,"Finished\n");
+  else
+   printf("Finished\n");
   if(strategy)
     delete strategy;
 

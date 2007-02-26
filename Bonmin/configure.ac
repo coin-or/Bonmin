@@ -71,6 +71,7 @@ AC_COIN_HAS_PROJECT(Osi)
 AC_COIN_HAS_PROJECT(Sym)
 AC_COIN_HAS_PROJECT(Vol)
 AC_COIN_HAS_PROJECT(Bcp)
+AC_COIN_HAS_PROJECT(GAMSlinks)
 
 #############################################################################
 #                            Third party solvers                            #
@@ -105,6 +106,20 @@ ASTYLE=astyle
 AC_SUBST(ASTYLE)
 ASTYLEFLAGS="--mode=c --indent=spaces=2 --indent-cases --indent-namespaces --min-conditional-indent=1 --brackets=linux --brackets=break-closing-headers --max-instatement-indent=2"
 AC_SUBST(ASTYLEFLAGS)    
+
+###########
+# va_copy #
+###########
+
+AC_CHECK_DECL([va_copy],[AC_DEFINE([HAVE_VA_COPY],[1],
+                                   [Define to 1 if va_copy is avaliable])],,[
+#ifdef HAVE_CSTDARG
+# include <cstdarg>
+#else
+# ifdef HAVE_STDARG_H
+#  include <stdarg.h>
+# endif
+#endif])
 
 #############################################################################
 #                            Stuff for Examples                             #

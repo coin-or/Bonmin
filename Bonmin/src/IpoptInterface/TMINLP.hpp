@@ -54,6 +54,11 @@ namespace Ipopt
   class TMINLP : public ReferencedObject
   {
   public:
+    enum SolverReturn{
+      SUCCESS,
+      INFEASIBLE,
+      LIMIT_EXCEEDED,
+      ERROR};
     /**@name Constructors/Destructors */
     //@{
     TMINLP()
@@ -71,7 +76,7 @@ namespace Ipopt
     {
       /** Number of SOS constraints.*/
       int num;
-      /** Type of sos. At present Only type '1' SOS are supported by Cbc*/
+      /** Type of sos. At present Only type '1' SOS are supported.*/
       char * types;
       /** priorities of sos constraints.*/
       int * priorities;
@@ -284,11 +289,9 @@ namespace Ipopt
 
     /** @name Solution Methods */
     //@{
-    /** This method is called when the algorithm is complete so the TNLP can store/write the solution */
+    /** This method is called when the algorithm is complete so the TMINLP can store/write the solution */
     virtual void finalize_solution(SolverReturn status,
-        Index n, const Number* x, const Number* z_L, const Number* z_U,
-        Index m, const Number* g, const Number* lambda,
-        Number obj_value)=0;
+        Index n, const Number* x, Number obj_value)const =0;
     //@}
     
     virtual const BranchingInfo * branchingInfo() const = 0;

@@ -140,44 +140,14 @@ int main (int argc, char *argv[])
   }
   double time1 = CoinCpuTime();
   try {
-  nlpSolver = new BonminAmplInterface(argv);
+  nlpSolver = new BonminAmplInterface(argv, false);
     BonminCbcParam par;
     BonminBB bb;
     par(*nlpSolver);
+    //par.fout = fopen("out.txt","w");
     bb(*nlpSolver, par);//do branch and bound
 
     std::cout.precision(10);
-
-    std::cout<<pbName<<" \t";
-    std::string message;
-    std::string status;
-    if(bb.mipStatus()==BonminBB::FeasibleOptimal) {
-      status = "\t\"Finished\"";
-      message = "\nbonmin: Optimal";
-    }
-    else if(bb.mipStatus()==BonminBB::ProvenInfeasible) {
-      status = "\t\"Finished\"";
-      message = "\nbonmin: Infeasible problem";
-    }
-    else if(bb.mipStatus()==BonminBB::Feasible) {
-      status = "\t\"Not finished\"";
-      message = "\n Optimization not finished.";
-    }
-    else if(bb.mipStatus()==BonminBB::NoSolutionKnown) {
-      status = "\t\"Not finished\"";
-      message = "\n Optimization not finished.";
-    }
-
-  if(0)// To output a line for building tables
-    std::cout<<status<<"\t"<<CoinCpuTime()-time1<<"\t"
-	     <<bb.bestObj()<<"\t"
-	     <<bb.numNodes()<<"\t"
-	     <<bb.iterationCount()<<"\t"
-	     <<nlpSolver->totalNlpSolveTime()<<"\t"
-	     <<nlpSolver->nCallOptimizeTNLP()<<"\t"
-	     <<std::endl;
-    nlpSolver->writeAmplSolFile(message,bb.bestSolution(),NULL);
-
   }
   catch(IpoptInterface::UnsolvedError &E) {
      E.printError(std::cerr);

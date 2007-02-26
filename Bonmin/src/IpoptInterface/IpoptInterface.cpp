@@ -439,11 +439,20 @@ IpoptInterface::IpoptInterface():
     nNonLinear_(0),
     tiny_(1e-8),
     veryTiny_(1e-20)
-{}
+{
+#ifdef COIN_HAS_GAMSLINK
+ 		 journal_=new CoinMessageHandler2Journal(messageHandler(), "console", J_ITERSUMMARY);
+ 		 journal_->SetPrintLevel(J_DBG, J_NONE);
+#endif
+}
 
 
 /** Constructor with given IpSolver and TMINLP */
-IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp):
+IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
+#ifdef COIN_HAS_GAMSLINK
+, CoinMessageHandler* messagehandler
+#endif
+    ):
     OsiSolverInterface(),
     tminlp_(tminlp),
     problem_(NULL),
@@ -484,7 +493,17 @@ IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp):
     veryTiny_(1e-17)
 {
   assert(IsValid(tminlp));
-  app_ = new Ipopt::IpoptApplication();
+#ifdef COIN_HAS_GAMSLINK 
+  if (messagehandler)
+  		 passInMessageHandler(messagehandler);
+#endif
+  app_ = new Ipopt::IpoptApplication(false);
+#ifdef COIN_HAS_GAMSLINK
+ 		 journal_=new CoinMessageHandler2Journal(messageHandler(), "console", J_ITERSUMMARY);
+ 		 journal_->SetPrintLevel(J_DBG, J_NONE);
+		 if (!app_->Jnlst()->AddJournal(GetRawPtr(journal)))
+		 		 std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
+#endif
 
   SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
   register_ALL_options(roptions);
@@ -574,11 +593,17 @@ IpoptInterface::IpoptInterface (const IpoptInterface &source):
     nNonLinear_(0),
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_)
+#ifdef COIN_HAS_GAMSLINK
+    , journal_(source.journal_)
+#endif
 {
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
-    app_ = new Ipopt::IpoptApplication();
-
+    app_ = new Ipopt::IpoptApplication(false);
+#ifdef COIN_HAS_GAMSLINK
+    if (!app_->Jnlst()->AddJournal(GetRawPtr(journal_)))
+        std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
+#endif
     SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
     register_ALL_options(roptions);
     // Copy the options
@@ -656,11 +681,17 @@ IpoptInterface & IpoptInterface::operator=(const IpoptInterface& rhs)
     hasVarNamesFile_ = rhs.hasVarNamesFile_;
     pushValue_ = rhs.pushValue_;
     optimization_status_ = rhs.optimization_status_;
-
+#ifdef COIN_HAS_GAMSLINK
+    journal_ = rhs.journal_;
+#endif
     if(IsValid(rhs.tminlp_)) {
 
       tminlp_ = rhs.tminlp_;
-      app_ = new Ipopt::IpoptApplication();
+      app_ = new Ipopt::IpoptApplication(false);
+#ifdef COIN_HAS_GAMSLINK
+      if (!app_->Jnlst()->AddJournal(GetRawPtr(journal_)))
+         std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
+#endif
       problem_ = new Ipopt::TMINLP2TNLP(tminlp_, *app_->Options());
 
       feasibilityProblem_ = new Ipopt::TNLP2FPNLP
@@ -1849,6 +1880,14 @@ IpoptInterface::turnOnIpoptOutput()
   std::string opt="print_level";
   app_->Options()->SetIntegerValue(opt, (Index)J_SUMMARY,true);
 }
+
+#ifdef COIN_HAS_GAMSLINK
+void
+IpoptInterface::passInMessageHandler(CoinMessageHandler* messagehandler) {
+		 OsiSolverInterface::passInMessageHandler(messagehandler);
+		 journal->setMessageHandler(messageHandler());
+}
+#endif
 
 void
 IpoptInterface::randomStartingPoint()
