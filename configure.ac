@@ -63,6 +63,7 @@ AC_COIN_MAIN_SUBDIRS(Cbc)
 AC_COIN_MAIN_SUBDIRS(Bcp)
 AC_COIN_MAIN_SUBDIRS(Ipopt)
 AC_COIN_MAIN_SUBDIRS(Bonmin)
+AC_COIN_MAIN_SUBDIRS(GAMSlinks)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
