@@ -42,27 +42,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       OsiRowCut *orc = createCut (0., 0, con -> Body () -> Index (), 1.);
 
-      /*
-      OsiRowCut *orc   = new OsiRowCut;
-      CouNumber *coeff = new CouNumber [1];
-      int       *index = new int       [1];
-
-      coeff [0] = 1;
-      index [0] = con -> Body () -> Index ();
-
-      orc -> setRow (1, index, coeff);
-      */
-
       if (orc) {
-	if (lb > - COUENNE_INFINITY + 1) orc -> setLb (lb);
-	if (ub <   COUENNE_INFINITY - 1) orc -> setUb (ub);
-	
+
+	orc -> setLb (lb);
+	orc -> setUb (ub);
+
 	cs.insert (orc);
 
 	delete orc;
       }
-      //      delete [] coeff;
-      //      delete [] index;
     }
   }
   else {
