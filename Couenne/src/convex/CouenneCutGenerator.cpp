@@ -27,7 +27,9 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   addviolated_    (addviolated),
   convtype_       (convtype),
   nSamples_       (nSamples),
-  problem_        (NULL) {
+  problem_        (NULL),
+  nrootcuts_      (0),
+  ntotalcuts_     (0) {
 
   if (!asl) return;
 
@@ -56,6 +58,9 @@ CouenneCutGenerator::~CouenneCutGenerator () {
     free (pool_);
 
   delete problem_;
+
+  printf ("Couenne: %d root cuts, %d total\n", 
+	  nrootcuts_, ntotalcuts_);
 }
 
 

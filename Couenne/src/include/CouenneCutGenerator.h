@@ -56,6 +56,12 @@ class CouenneCutGenerator: public CglCutGenerator {
   // pointer to symbolic repr. of constraint, variables, and bounds
   CouenneProblem *problem_;
 
+  // number of cuts generated at the first call
+  mutable int nrootcuts_;
+
+  // total number of cuts generated 
+  mutable int ntotalcuts_;
+
  public:
 
   // constructor

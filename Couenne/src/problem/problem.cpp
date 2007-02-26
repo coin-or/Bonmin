@@ -209,15 +209,12 @@ CouenneProblem::~CouenneProblem () {
 // update value of variables, bounds
 
 void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
-  /*
-  x_  = x;
-  lb_ = l;
-  ub_ = u;
-  */
 
   static int curr_size = -1;
 
   int nvars = nVars () + nAuxs ();
+
+  // expand arrays if needed
 
   if (curr_size < nvars) {
 
@@ -228,10 +225,26 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
     curr_size = nvars;
   }
 
+  // copy arrays (do not simply make x_ point to x)
+
   for (register int i=nvars; i--;) {
     x_  [i] = x [i];
     lb_ [i] = l [i];
     ub_ [i] = u [i];
+
+    if ((x_ [i] < lb_ [i] - COUENNE_EPS) ||
+	(x_ [i] > ub_ [i] + COUENNE_EPS)) 
+      printf ("x%d =  %f < %f < %f\n", 
+	      i, lb_ [i], x_ [i], ub_ [i]);
+
+#define BIGNU 1e57;
+    /*
+    if (lb_ [i] < - COUENNE_INFINITY + 1) lb_ [i] = - BIGNU; 
+    if (ub_ [i] >   COUENNE_INFINITY - 1) ub_ [i] =   BIGNU; 
+
+    if (x_ [i] < lb_ [i]) x_ [i] = lb_ [i];
+    if (x_ [i] > ub_ [i]) x_ [i] = ub_ [i];
+    */
   }
 
   expression::update (x_, lb_, ub_);

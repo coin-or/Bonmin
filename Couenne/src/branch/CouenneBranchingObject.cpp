@@ -13,7 +13,7 @@
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
 
-CouNumber CouenneBranchingObject::alpha_ = 0.8;
+CouNumber CouenneBranchingObject::alpha_ = 0.99;
 
 
 /** \brief Constructor. Get a variable as an argument and set value_
@@ -73,7 +73,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     solver -> setColUpper (reference_ -> Index(), 
 			   reference_ -> isInteger () ? floor (value_) : value_);
 
-  printf ("Branch: x%d %c= %.12f\n", reference_ -> Index(), way ? '>' : '<', value_);
+  //  printf ("Branch: x%d %c= %.12f\n", reference_ -> Index(), way ? '>' : '<', value_);
 
   branchIndex_++;
   return 0.; // estimated change in objective function

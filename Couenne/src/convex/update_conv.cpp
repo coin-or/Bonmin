@@ -111,8 +111,8 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
 
   // give the possibly shrunken variable bounds to the caller problem
 
-  CouNumber *lb = const_cast <CouNumber *>(bonOs_ -> getColLower ()),
-            *ub = const_cast <CouNumber *>(bonOs_ -> getColUpper ());
+  CouNumber *lb = const_cast <CouNumber *> (bonOs_ -> getColLower ()),
+            *ub = const_cast <CouNumber *> (bonOs_ -> getColUpper ());
 
   for (register int i = bonOs_ -> getNumCols (); i--;) {
     curlb [i] = lb [i];

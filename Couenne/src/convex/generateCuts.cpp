@@ -71,10 +71,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // firstcall, otherwise only those of the original ones Update
     // expression structure with x, l, u
 
+    OsiSolverInterface *psi = const_cast <OsiSolverInterface *> (&si);
+
     CouNumber 
-      *xc = const_cast <CouNumber *> (si.getColSolution ()), 
-      *lc = const_cast <CouNumber *> (si.getColLower    ()),
-      *uc = const_cast <CouNumber *> (si.getColUpper    ());
+      *xc = const_cast <CouNumber *> (psi -> getColSolution ()),
+      *lc = const_cast <CouNumber *> (psi -> getColLower    ()),
+      *uc = const_cast <CouNumber *> (psi -> getColUpper    ());
 
     // update now all variables and bounds
 
@@ -106,14 +108,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	// check if lower bound got higher    
 	if (ll > lc [i+j]) {
-	  const_cast <OsiSolverInterface *> (&si) -> setColLower (i+j, ll);
+	  psi -> setColLower (i+j, ll);
 	  lc [i+j] = ll;
 	  found_one = true;
 	}
 
 	// check if upper bound got lower
 	if (uu < uc [i+j]) {
-	  const_cast <OsiSolverInterface *> (&si) -> setColUpper (i+j, uu);
+	  psi -> setColUpper (i+j, uu);
 	  uc [i+j] = uu;
 	  found_one = true;
 	}
@@ -125,6 +127,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // update again 
     problem_ -> update (xc, lc, uc);
+
   }
 
   // For each auxiliary variable, create cut (or set of cuts) violated
@@ -135,9 +138,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   // end of generateCuts
 
-  if (cs.sizeRowCuts ())
-    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
+  //  if (cs.sizeRowCuts ())
+  //    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
 
-  if (firstcall_) 
+  if (firstcall_) {
     firstcall_ = false;
+    ntotalcuts_  = nrootcuts_ = cs.sizeRowCuts ();
+  }
+  else ntotalcuts_ += cs.sizeRowCuts ();
 }

@@ -12,6 +12,7 @@
 
 // return an index to the variable's argument that is better fixed
 // in a branching rule for solving a nonconvexity gap
+
 expression *getFixVarBinFun (expression *arg0, expression *arg1) {
 
   if      (arg0 -> Type () == CONST) return arg1; // Case c*y or c/y
@@ -40,11 +41,28 @@ expression *getFixVarBinFun (expression *arg0, expression *arg1) {
 
     // We have a full-dimensional (possibly unlimited) bounding box
 
+    {
+      // First of all, do not branch on variable close to bound
+
+      bool 
+	xl0 = (fabs (x0-l0) < COUENNE_EPS), 
+	xu0 = (fabs (x0-u0) < COUENNE_EPS),
+	xl1 = (fabs (x1-l1) < COUENNE_EPS), 
+	xu1 = (fabs (x1-u1) < COUENNE_EPS);
+
+      if      ((xl0 || xu0) && !(xl1 || xu1)) return arg1;
+      else if ((xl1 || xu1) && !(xl0 || xu0)) return arg0;
+    }
+
+    // The bounding box may be unlimited but at least no variable is
+    // close to the bound
+
     if ((l0 > - COUENNE_INFINITY + 1) && (u0 < COUENNE_INFINITY - 1)) {
 
       if ((l1 > - COUENNE_INFINITY + 1) && (u1 < COUENNE_INFINITY - 1)) {
 
-	// ideal situation, bounding box is finite
+	// Ideal situation, bounding box is finite.  Branch on the one
+	// closest to the midpoint
 
 	CouNumber 
 	  normdist0 = fabs (0.5 * (u0+l0) - x0) / delta0,
@@ -70,9 +88,9 @@ expression *getFixVarBinFun (expression *arg0, expression *arg1) {
 
 	if      (l0 > - COUENNE_INFINITY + 1) distance0 = x0 - l0;
 	else if (u0 <   COUENNE_INFINITY - 1) distance0 = u0 - x0;
-
+	
 	if      (l1 > - COUENNE_INFINITY + 1) distance1 = x1 - l1;
-	else if (u1 <   COUENNE_INFINITY - 1) distance0 = u1 - x1;
+	else if (u1 <   COUENNE_INFINITY - 1) distance1 = u1 - x1;
 
 	if (distance0 > distance1) 
 	     return arg0;
