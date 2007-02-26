@@ -24,6 +24,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    CoinError::printErrors_ = true;
     BM_init user_init;
     int retcode = -1;
     try {

@@ -48,26 +48,24 @@ public:
   */
 class SimpleError : public CoinError
   {
-  public:
-    /// Default constructor
-    SimpleError() : CoinError()
-    {}
+  private:
+    SimpleError();
 
+  public:
     ///Alternate constructor using strings
     SimpleError(std::string message,
-        std::string methodName)
+        std::string methodName,
+	std::string f = std::string(),
+	int l = -1)
         :
-        CoinError(message,methodName,std::string("OsiTMINLPInterface"))
+        CoinError(message,methodName,std::string("OsiTMINLPInterface"), f, l)
     {}
-    ///Alternate constructor using const char *
-    SimpleError (const char * message,
-        const char * methodName)
-        :
-        CoinError(message,methodName,"OsiTMINLPInterface")
-    {}
-
   }
   ;
+
+#ifdef __LINE__
+#define SimpleError(x, y) SimpleError((x), (y), __FILE__, __LINE__)
+#endif
 
   // Error when problem is not solved
   TNLPSolver::UnsolvedError * newUnsolvedError(int num, Ipopt::SmartPtr<TMINLP2TNLP> problem, std::string name){
