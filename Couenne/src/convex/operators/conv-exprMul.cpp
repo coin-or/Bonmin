@@ -136,22 +136,64 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
       x_ind = xe -> Index (), 
       y_ind = ye -> Index ();
 
-  // if expression is c*x, with c constant, the expression is
-  // linear. Add one convexification equality constraint, once.
+  // if expression is x*c or c*y, with c constant from the problem
+  // definition or from the branching rules, the expression is
+  // linear. Add one convexification equality constraint.
 
-  if ((xe -> Type () == CONST) || 
-      (ye -> Type () == CONST)) {
+  // check that either operand is constant
 
-    if (cg -> isFirst ()) {
+  bool is0const = (xe -> Type () == CONST),
+       is1const = (ye -> Type () == CONST);
 
-      if ((xe -> Type () == CONST) && 
-	  (ye -> Type () == CONST)) {
+  CouNumber c0, c1;
 
-	// strange case: w = c1*c2, should have been dealt with in
+  // check if either operator got constant because of the branching
+  // rules: x
+
+  if (is0const) c0 = xe -> Value ();  
+  else {
+
+    expression *xle, *xue;
+    xe -> getBounds (xle, xue);
+
+    c0 = (*xle) ();
+
+    is0const = (fabs (c0 - (*xue) ()) < COUENNE_EPS);
+
+    delete xle; delete xue;
+  }
+
+  // and y
+
+  if (is1const) c1 = ye -> Value ();  
+  else {
+
+    expression *yle, *yue;
+    ye -> getBounds (yle, yue);
+
+    c1 = (*yle) ();
+
+    is1const = (fabs (c1 - (*yue) ()) < COUENNE_EPS);
+
+    delete yle; delete yue;
+  }
+
+  // right now c0 and c1 only have a value if the corresponding
+  // expression is constant
+
+  if (is0const || is1const) {
+
+    if (cg -> isFirst () ||            // if first call or
+	((xe -> Type () != CONST) &&   // neither term is a defined constant
+	 (ye -> Type () != CONST))) {  // (and hence this follows from
+				       // branching rule)
+
+      if (is0const && is1const) {
+
+	// strange case: w = c0*c1, should have been dealt with in
 	// simplify, but who knows...
 
-	if ((cut = cg -> createCut (xe -> Value () * ye -> Value (), 
-				    0, w_ind, CouNumber (1.), -1, 0., -1, 0., true)))
+	if ((cut = cg -> createCut (c0 * c1, 0, w_ind, CouNumber (1.))))
 	  cs.insert (cut);
       }
       else {
@@ -159,11 +201,11 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	CouNumber coe;
 	int ind;
 
-	if (xe -> Type () != CONST) {coe = ye -> Value (); ind = x_ind;}
-	else                        {coe = xe -> Value (); ind = y_ind;}
+	if (is0const) {coe = c0; ind = y_ind;} // c*y
+	else          {coe = c1; ind = x_ind;} // x*c
 
 	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, 
-				    CouNumber (-1.), ind, coe, -1, 0., true)))
+				    CouNumber (-1.), ind, coe)))
 	  cs.insert (cut);
       }
     }

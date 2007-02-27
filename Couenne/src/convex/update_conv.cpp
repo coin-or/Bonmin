@@ -85,6 +85,7 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     int nvars = problem_ -> nVars () + 
                 problem_ -> nAuxs ();
 
+    // add nvars empty columns to fictitious problem
     for (int i=0; i < nvars; i++)
       bonOs_ -> addCol (0, NULL, NULL, curlb [i], curub [i], 0);
   }
@@ -98,11 +99,17 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
       bonCs_ -> eraseRowCut (i);
 
     // update lower and upper bounds
-    bonOs_ -> setColLower (curlb);
-    bonOs_ -> setColUpper (curub);
   }
 
+  /*
+  printf ("           x           lb             ub\n");
+  for (int i=0; i < getnvars (); i++)
+    printf ("%3d %12.3f %12.3f %12.3f\n", i, X (i), Lb (i), Ub (i));
+  */
+
   bonOs_ -> setColSolution (curx);
+  bonOs_ -> setColLower (curlb);
+  bonOs_ -> setColUpper (curub);
 
   // ok, now let's just call generateCuts and fill the cuts vector
   // with what we are returned
@@ -119,11 +126,6 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     curub [i] = ub [i];
   }
 
-  /*
-  printf ("           x           lb             ub\n");
-  for (int i=0; i < getnvars (); i++)
-    printf ("%3d %12.3f %12.3f %12.3f\n", i, X (i), Lb (i), Ub (i));
-  */
   // Update pool (used by Bonmin)
 
   ncuts_ = bonCs_ -> sizeRowCuts ();

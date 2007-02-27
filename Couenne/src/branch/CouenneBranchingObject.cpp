@@ -66,11 +66,27 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   int way = (!branchIndex_) ? firstBranch_ : !firstBranch_;
 
+  /*
+  if (way) {
+
+    if (value_ < solver -> getColLower () [reference_ -> Index ()])
+      printf ("Wrong down-branch: [%f,%f] -> %f\n", 
+	      solver -> getColLower () [reference_ -> Index()], 
+	      solver -> getColUpper () [reference_ -> Index()], value_);
+  } else {
+
+    if (value_ > solver -> getColUpper () [reference_ -> Index()])
+      printf ("Wrong   up-branch: [%f,%f] -> %f\n", 
+	      solver -> getColLower () [reference_ -> Index()], 
+	      solver -> getColUpper () [reference_ -> Index()], value_);
+  }
+  */
+
   if (way) // ">=" node, set lower bound (round if this variable is integer)
-    solver -> setColLower (reference_ -> Index(), 
+    solver -> setColLower (reference_ -> Index (), 
 			   reference_ -> isInteger () ? ceil  (value_) : value_);
   else     // "<=" node, set upper bound (ditto)
-    solver -> setColUpper (reference_ -> Index(), 
+    solver -> setColUpper (reference_ -> Index (), 
 			   reference_ -> isInteger () ? floor (value_) : value_);
 
   //  printf ("Branch: x%d %c= %.12f\n", reference_ -> Index (), way ? '>' : '<', value_);

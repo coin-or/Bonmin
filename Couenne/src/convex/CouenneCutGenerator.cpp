@@ -118,10 +118,14 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 
 void CouenneCutGenerator::updateAuxs (CouNumber *x, CouNumber *l, CouNumber *u) {
 
+  // update current point and bounds 
   problem_ -> update (x, l, u);
 
   int nAux = problem_ -> nAuxs ();
 
+  // only one loop is sufficient here, since auxiliary variable are
+  // defined in such a way that w_i does NOT depend on w_j if i<j.
+ 
   for (int i = 0, j = problem_ -> nVars (); i < nAux; i++, j++) {
 
     exprAux *aux = problem_ -> Aux (i);
@@ -130,4 +134,7 @@ void CouenneCutGenerator::updateAuxs (CouNumber *x, CouNumber *l, CouNumber *u) 
     l [j] = (*(aux -> Lb ())) ();
     u [j] = (*(aux -> Ub ())) ();
   }
+
+  // propagate value back to problem_'s and expression::'s arrays
+  problem_ -> update (x, l, u);
 }

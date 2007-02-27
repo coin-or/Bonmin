@@ -33,98 +33,86 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       CouenneConstraint *con = problem_ -> NLCon (i);
 
-      // for constraint lb <= w <= ub, compute actual values of lb, ub
-
-      CouNumber lb = con -> Lb () -> Value ();
-      CouNumber ub = con -> Ub () -> Value ();
-
       // if there exists violation, add constraint
 
       OsiRowCut *orc = createCut (0., 0, con -> Body () -> Index (), 1.);
 
       if (orc) {
 
-	orc -> setLb (lb);
-	orc -> setUb (ub);
-
+	orc -> setLb (con -> Lb () -> Value ());
+	orc -> setUb (con -> Ub () -> Value ());
 	cs.insert (orc);
-
 	delete orc;
       }
     }
   }
-  else {
 
-    // Retrieve, from si, value and bounds of all variables, if not
-    // firstcall, otherwise only those of the original ones Update
-    // expression structure with x, l, u
+  // Retrieve, from si, value and bounds of all variables, if not
+  // firstcall, otherwise only those of the original ones Update
+  // expression structure with x, l, u
 
-    OsiSolverInterface *psi = const_cast <OsiSolverInterface *> (&si);
+  OsiSolverInterface *psi = const_cast <OsiSolverInterface *> (&si);
 
-    CouNumber 
-      *xc = const_cast <CouNumber *> (psi -> getColSolution ()),
-      *lc = const_cast <CouNumber *> (psi -> getColLower    ()),
-      *uc = const_cast <CouNumber *> (psi -> getColUpper    ());
+  CouNumber 
+    *xc = const_cast <CouNumber *> (psi -> getColSolution ()),
+    *lc = const_cast <CouNumber *> (psi -> getColLower    ()),
+    *uc = const_cast <CouNumber *> (psi -> getColUpper    ());
 
-    // update now all variables and bounds
+  // update now all variables and bounds
 
-    problem_ -> update (xc, lc, uc);
+  problem_ -> update (xc, lc, uc);
 
-    // update bounding box (which may depend on the original
-    // variables' box) for the variables whose bound is looser. Here,
-    // newly enforced branching rules may change dependent auxiliary
-    // variables' bounds, in a recursive way. Hence we need to repeat
-    // the propagation step as long as at least one bound is modified.
+  // update bounding box (which may depend on the original
+  // variables' box) for the variables whose bound is looser. Here,
+  // newly enforced branching rules may change dependent auxiliary
+  // variables' bounds, in a recursive way. Hence we need to repeat
+  // the propagation step as long as at least one bound is modified.
 
-    bool found_one;
+  bool found_one;
 
-    do {
+  do {
 
-      found_one = false;
+    found_one = false;
 
-      int naux = problem_ -> nAuxs ();
+    int naux = problem_ -> nAuxs ();
 
-      // check all auxiliary variables for changes in their upper,
-      // lower bound, depending on the bound changes of the variables
-      // they depend on
+    // check all auxiliary variables for changes in their upper,
+    // lower bound, depending on the bound changes of the variables
+    // they depend on
 
-      for (register int i = problem_ -> nVars (), j=0; 
-	   j < naux; j++) {
+    for (register int i = problem_ -> nVars (), j=0; 
+	 j < naux; j++) {
     
-	CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
-	CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
+      CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
+      CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
 
-	// check if lower bound got higher    
-	if (ll > lc [i+j]) {
-	  psi -> setColLower (i+j, ll);
-	  lc [i+j] = ll;
-	  found_one = true;
-	}
-
-	// check if upper bound got lower
-	if (uu < uc [i+j]) {
-	  psi -> setColUpper (i+j, uu);
-	  uc [i+j] = uu;
-	  found_one = true;
-	}
-
-	expression::update (xc, lc, uc);
+      // check if lower bound got higher    
+      if (ll > lc [i+j]) {
+	psi -> setColLower (i+j, ll);
+	lc [i+j] = ll;
+	found_one = true;
       }
 
-    } while (found_one); // repeat as long as at least one bound changed
+      // check if upper bound got lower
+      if (uu < uc [i+j]) {
+	psi -> setColUpper (i+j, uu);
+	uc [i+j] = uu;
+	found_one = true;
+      }
 
-    // update again 
-    problem_ -> update (xc, lc, uc);
+      expression::update (xc, lc, uc);
+    }
 
-  }
+  } while (found_one); // repeat as long as at least one bound changed
+
+  // update again 
+  problem_ -> update (xc, lc, uc);
 
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
 
   for (int i=0; i<problem_ -> nAuxs (); i++)
     problem_ -> Aux (i) -> generateCuts (si, cs, this);
-
-  // end of generateCuts
 
   //  if (cs.sizeRowCuts ())
   //    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
