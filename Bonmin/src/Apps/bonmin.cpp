@@ -140,7 +140,7 @@ int main (int argc, char *argv[])
   }
   double time1 = CoinCpuTime();
   try {
-  nlpSolver = new BonminAmplInterface(argv, false);
+  nlpSolver = new BonminAmplInterface(argv, true);
     BonminCbcParam par;
     BonminBB bb;
     par(*nlpSolver);
