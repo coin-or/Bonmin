@@ -205,7 +205,7 @@ int main (int argc, char *argv[])
     std::string message;
     if(solution==NULL) message="No solution";
       else message="Solution found";
-    nlpSolver.writeAmplSolFile(message,solution,NULL);
+    nlpSolver.writeAmplSolFile(message,solution);
     
   }
   catch(IpoptInterface::UnsolvedError &E) {

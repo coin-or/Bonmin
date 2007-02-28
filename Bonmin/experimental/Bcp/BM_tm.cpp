@@ -175,7 +175,7 @@ BM_tm::display_feasible_solution(const BCP_solution* sol)
     printf("\n");
 
     /* create the AMPL solfile */
-    nlpSolver.writeAmplSolFile("\nbon-min: Optimal solution", dsol, NULL);
+    nlpSolver.writeAmplSolFile("\nbon-min: Optimal solution", dsol);
     delete[] dsol;
 }
 
