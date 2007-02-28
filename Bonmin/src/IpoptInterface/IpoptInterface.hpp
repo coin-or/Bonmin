@@ -13,6 +13,8 @@
 #ifndef IpoptInterface_H
 #define IpoptInterface_H
 
+#include "BonminConfig.h"
+
 #include <string>
 #include <iostream>
 
@@ -22,7 +24,7 @@
 #include "TMINLP.hpp"
 #include "TMINLP2TNLP.hpp"
 #include "TNLP2FPNLP.hpp"
-#ifdef COIN_HAS_GAMSLINK
+#ifdef COIN_HAS_GAMSLINKS
 #include "CoinMessageHandler2Journal.hpp"
 #endif
 #include "IpIpoptApplication.hpp"
@@ -136,8 +138,8 @@ class Messages : public CoinMessages
     \warning In this constructor option file is not read, use readOptionFile to read one.
   */
   IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
-#ifdef COIN_HAS_GAMSLINK
-, CoinMessageHandler* messagehandler=NULL
+#ifdef COIN_HAS_GAMSLINKS
+, CoinMessageHandler* messageHandler=NULL
 #endif
  );
   /// Clone
@@ -779,8 +781,8 @@ class Messages : public CoinMessages
   //@{
   void turnOffIpoptOutput();
   void turnOnIpoptOutput();
-#ifdef COIN_HAS_GAMSLINK
-  void passInMessageHandler(CoinMessageHandler* messagehandler);
+#ifdef COIN_HAS_GAMSLINKS
+  void passInMessageHandler(CoinMessageHandler* messageHandler);
 #endif
   //@}
 
@@ -983,7 +985,7 @@ protected:
   double tiny_;
   /** Value for small non-zero element which we will take the risk to ignore in OA cuts.*/
   double veryTiny_;
-#ifdef COIN_HAS_GAMS_LINK
+#ifdef COIN_HAS_GAMSLINKS
   /** To redirect Ipopt output to a message handler. */
   Ipopt::SmartPtr<CoinMessageHandler2Journal> journal_;
 #endif

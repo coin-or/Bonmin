@@ -440,7 +440,7 @@ IpoptInterface::IpoptInterface():
     tiny_(1e-8),
     veryTiny_(1e-20)
 {
-#ifdef COIN_HAS_GAMSLINK
+#ifdef COIN_HAS_GAMSLINKS
  		 journal_=new CoinMessageHandler2Journal(messageHandler(), "console", J_ITERSUMMARY);
  		 journal_->SetPrintLevel(J_DBG, J_NONE);
 #endif
@@ -449,7 +449,7 @@ IpoptInterface::IpoptInterface():
 
 /** Constructor with given IpSolver and TMINLP */
 IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
-#ifdef COIN_HAS_GAMSLINK
+#ifdef COIN_HAS_GAMSLINKS
 , CoinMessageHandler* messagehandler
 #endif
     ):
@@ -494,16 +494,15 @@ IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
 {
   assert(IsValid(tminlp));
 #ifdef COIN_HAS_GAMSLINK 
-  if (messagehandler)
-  		 passInMessageHandler(messagehandler);
-#endif
   app_ = new Ipopt::IpoptApplication(false);
-#ifdef COIN_HAS_GAMSLINK
- 		 journal_=new CoinMessageHandler2Journal(messageHandler(), "console", J_ITERSUMMARY);
- 		 journal_->SetPrintLevel(J_DBG, J_NONE);
-		 if (!app_->Jnlst()->AddJournal(GetRawPtr(journal)))
-		 		 std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
+  journal_=new CoinMessageHandler2Journal(messageHandler(), "console", J_ITERSUMMARY);
+  journal_->SetPrintLevel(J_DBG, J_NONE);
+  if (messagehandler)
+    passInMessageHandler(messagehandler);
+  if (!app_->Jnlst()->AddJournal(GetRawPtr(journal_)))
+    std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
 #endif
+  app_ = new Ipopt::IpoptApplication();
 
   SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
   register_ALL_options(roptions);
@@ -593,16 +592,18 @@ IpoptInterface::IpoptInterface (const IpoptInterface &source):
     nNonLinear_(0),
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_)
-#ifdef COIN_HAS_GAMSLINK
+#ifdef COIN_HAS_GAMSLINKS
     , journal_(source.journal_)
 #endif
 {
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
+#ifdef COIN_HAS_GAMSLINKS
     app_ = new Ipopt::IpoptApplication(false);
-#ifdef COIN_HAS_GAMSLINK
     if (!app_->Jnlst()->AddJournal(GetRawPtr(journal_)))
-        std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
+        std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl;
+#else 
+    app_ = new Ipopt::IpoptApplication();
 #endif
     SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
     register_ALL_options(roptions);
@@ -681,16 +682,18 @@ IpoptInterface & IpoptInterface::operator=(const IpoptInterface& rhs)
     hasVarNamesFile_ = rhs.hasVarNamesFile_;
     pushValue_ = rhs.pushValue_;
     optimization_status_ = rhs.optimization_status_;
-#ifdef COIN_HAS_GAMSLINK
+#ifdef COIN_HAS_GAMSLINKS
     journal_ = rhs.journal_;
 #endif
     if(IsValid(rhs.tminlp_)) {
 
       tminlp_ = rhs.tminlp_;
+#ifdef COIN_HAS_GAMSLINKS
       app_ = new Ipopt::IpoptApplication(false);
-#ifdef COIN_HAS_GAMSLINK
       if (!app_->Jnlst()->AddJournal(GetRawPtr(journal_)))
-         std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
+         std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl;
+#else 
+      app_ = new Ipopt::IpoptApplication(true);
 #endif
       problem_ = new Ipopt::TMINLP2TNLP(tminlp_, *app_->Options());
 
@@ -1881,11 +1884,11 @@ IpoptInterface::turnOnIpoptOutput()
   app_->Options()->SetIntegerValue(opt, (Index)J_SUMMARY,true);
 }
 
-#ifdef COIN_HAS_GAMSLINK
+#ifdef COIN_HAS_GAMSLINKS
 void
 IpoptInterface::passInMessageHandler(CoinMessageHandler* messagehandler) {
-		 OsiSolverInterface::passInMessageHandler(messagehandler);
-		 journal->setMessageHandler(messageHandler());
+ OsiSolverInterface::passInMessageHandler(messagehandler);
+ journal_->setMessageHandler(messageHandler());
 }
 #endif
 
@@ -2325,7 +2328,6 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     std::cerr<<"jacobian matrix is not ordered properly"<<std::endl;
     throw -1;
   }
-  delete [] g;
   }
   else {
    for (int i = 0 ; i < n ; i++)
@@ -2353,6 +2355,7 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     }
    CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
 #endif
+  delete [] g;
   int numcols=getNumCols();
   double *obj = new double[numcols];
   for(int i = 0 ; i < numcols ; i++)

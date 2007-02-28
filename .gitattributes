@@ -23,6 +23,8 @@ Bonmin/experimental/Bcp/BM_tm.cpp -text
 Bonmin/experimental/Bcp/INSTALL -text
 Bonmin/experimental/Bcp/ampl_bcp.patch -text
 Bonmin/inc/config_bonmin.h.in -text
+Bonmin/src/IpoptInterface/CoinMessageHandler2Journal.cpp -text
+Bonmin/src/IpoptInterface/CoinMessageHandler2Journal.hpp -text
 Bonmin/src/IpoptInterface/README -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
