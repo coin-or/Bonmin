@@ -112,6 +112,7 @@ class SimpleError : public CoinError
     WARN_RESOLVE_BEFORE_INITIAL_SOLVE /** resolve() has been called but there
                                               was no previous call to initialSolve().
                                          */,
+    WARN_NONCONVEX_OA/** An OA is taken for an equality constraint warm that it is dangerous*/,
     IPOTPINTERFACE_DUMMY_END
   };
 
@@ -824,6 +825,10 @@ class Messages : public CoinMessages
    * \param n number of element in arrays x and ind
    * \param ind indices of the coordinate*/
   double getFeasibilityOuterApproximation(int n, const double * x_bar,const int *ind, OsiCuts &cs);
+  ///A procedure to try to remove small coefficients in OA cuts (or make it non small
+  inline bool cleanNnz(double &value, double colLower, double colUpper,
+    double rowLower, double rowUpper, double colsol,
+    double & lb, double &ub, double tiny, double veryTiny);
   //@}
   /** get NLP constraint violation of current point */
   double getConstraintViolation();
@@ -990,5 +995,57 @@ protected:
   Ipopt::SmartPtr<CoinMessageHandler2Journal> journal_;
 #endif
 };
+//A procedure to try to remove small coefficients in OA cuts (or make it non small
+inline
+bool IpoptInterface::cleanNnz(double &value, double colLower, double colUpper,
+    double rowLower, double rowUpper, double colsol,
+    double & lb, double &ub, double tiny, double veryTiny)
+{
+  if(fabs(value)>= tiny) return 1;
+
+  if(fabs(value)<veryTiny) return 0;//Take the risk?
+
+  //try and remove
+  double infty = 1e20;
+  bool colUpBounded = colUpper < 10000;
+  bool colLoBounded = colLower > -10000;
+  bool rowNotLoBounded =  rowLower <= - infty;
+  bool rowNotUpBounded = rowUpper >= infty;
+  bool pos =  value > 0;
+
+  if(!rowNotLoBounded && ! rowNotUpBounded)//would have to either choose side or duplicate cut
+  {
+    messageHandler()->message(WARN_NONCONVEX_OA, ipoptIMessages_)<<CoinMessageEol;
+  }
+
+  if(colLoBounded && pos && rowNotUpBounded) {
+    lb += value * (colsol - colLower);
+    value = 0;
+    return 0;
+  }
+  else
+    if(colLoBounded && !pos && rowNotLoBounded) {
+      ub += value * (colsol - colLower);
+      value = 0;
+      return 0;
+    }
+    else
+      if(colUpBounded && !pos && rowNotUpBounded) {
+        lb += value * (colsol - colUpper);
+        value = 0;
+        return 0;
+      }
+      else
+        if(colUpBounded && pos && rowNotLoBounded) {
+          ub += value * (colsol - colUpper);
+          value = 0;
+          return 0;
+        }
+  //can not remove coefficient increase it to smallest non zero
+  if(pos) value = tiny;
+  else
+    value = - tiny;
+  return 1;
+}
 
 #endif

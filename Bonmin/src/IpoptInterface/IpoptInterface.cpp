@@ -392,7 +392,8 @@ IpoptInterface::Messages::Messages
   addMessage(WARN_RESOLVE_BEFORE_INITIAL_SOLVE, CoinOneMessage
       (3012,1,"resolve called before any call to initialSolve"
        " can not use warm starts."));
-
+  addMessage(WARN_NONCONVEX_OA, CoinOneMessage
+      (3013,1,"OA on non-convex constraint is very experimental, don't know how to remove"));
 }
 bool IpoptInterface::hasPrintedOptions=0;
 
@@ -493,7 +494,7 @@ IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
     veryTiny_(1e-17)
 {
   assert(IsValid(tminlp));
-#ifdef COIN_HAS_GAMSLINK 
+#ifdef COIN_HAS_GAMSLINKS 
   app_ = new Ipopt::IpoptApplication(false);
   journal_=new CoinMessageHandler2Journal(messageHandler(), "console", J_ITERSUMMARY);
   journal_->SetPrintLevel(J_DBG, J_NONE);
@@ -501,8 +502,9 @@ IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
     passInMessageHandler(messagehandler);
   if (!app_->Jnlst()->AddJournal(GetRawPtr(journal_)))
     std::cerr << "Error adding CoinMessageHandler2Journal." << std::endl; 
-#endif
+#else
   app_ = new Ipopt::IpoptApplication();
+#endif
 
   SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
   register_ALL_options(roptions);
@@ -2037,59 +2039,6 @@ IpoptInterface::getConstraintViolation()
 }
 
 
-//A procedure to try to remove small coefficients in OA cuts (or make it non small
-static inline
-bool cleanNnz(double &value, double colLower, double colUpper,
-    double rowLower, double rowUpper, double colsol,
-    double & lb, double &ub, double tiny, double veryTiny)
-{
-  if(fabs(value)>= tiny) return 1;
-
-  if(fabs(value)<veryTiny) return 0;//Take the risk?
-
-  //try and remove
-  double infty = 1e20;
-  bool colUpBounded = colUpper < 10000;
-  bool colLoBounded = colLower > -10000;
-  bool rowNotLoBounded =  rowLower <= - infty;
-  bool rowNotUpBounded = rowUpper >= infty;
-  bool pos =  value > 0;
-
-  if(!rowNotLoBounded && ! rowNotUpBounded)//would have to either choose side or duplicate cut
-  {
-    std::cerr<<"OA on non-convex constraint is very experimental, don't know how to remove"
-    <<std::endl;
-  }
-
-  if(colLoBounded && pos && rowNotUpBounded) {
-    lb += value * (colsol - colLower);
-    value = 0;
-    return 0;
-  }
-  else
-    if(colLoBounded && !pos && rowNotLoBounded) {
-      ub += value * (colsol - colLower);
-      value = 0;
-      return 0;
-    }
-    else
-      if(colUpBounded && !pos && rowNotUpBounded) {
-        lb += value * (colsol - colUpper);
-        value = 0;
-        return 0;
-      }
-      else
-        if(colUpBounded && pos && rowNotLoBounded) {
-          ub += value * (colsol - colUpper);
-          value = 0;
-          return 0;
-        }
-  //can not remove coefficient increase it to smallest non zero
-  if(pos) value = tiny;
-  else
-    value = - tiny;
-  return 1;
-}
 
 /** Get the outer approximation constraints at the current optimum of the
   current ipopt problem */
