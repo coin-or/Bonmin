@@ -142,6 +142,9 @@ class Messages : public CoinMessages
   virtual ~OsiTMINLPInterface ();
 
 
+  /// Read parameter file
+  void readOptionFile(const char * fileName);
+
   /// Retrieve OsiTMINLPApplication option list
   Ipopt::SmartPtr<Ipopt::OptionsList> retrieve_options();
 
@@ -860,8 +863,6 @@ protected:
   /** Register all possible options to Bonmin */
   void register_ALL_options (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
   
-  /// Read parameter file
-  void readOptionFile(const char * fileName);
   //@}
 
   enum RandomGenerationType{
