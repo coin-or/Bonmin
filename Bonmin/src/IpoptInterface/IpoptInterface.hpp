@@ -113,6 +113,7 @@ class SimpleError : public CoinError
                                               was no previous call to initialSolve().
                                          */,
     WARN_NONCONVEX_OA/** An OA is taken for an equality constraint warm that it is dangerous*/,
+    WARN_FREEDOM/** Too many equalities and not enough variables in the problems.*/,
     IPOTPINTERFACE_DUMMY_END
   };
 

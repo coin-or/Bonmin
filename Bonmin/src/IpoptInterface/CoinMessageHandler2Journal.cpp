@@ -32,28 +32,39 @@ CoinMessageHandler2Journal::~CoinMessageHandler2Journal() { }
 
 /** Print to the designated output location */
 void CoinMessageHandler2Journal::PrintImpl(const char* str) {
-		 //TODO one should set the detail level of the message according to the journalist print level
-		  
-		 if (messagehandler) {
-		 		 int length=strlen(str);
-		 		 if (!length) return;
-		 		 if (str[length-1]=='\n') {
-		 		 		 // if this message ends with a newline, we remove the newline and let the messagehandler finish it
-		 		 		 // the messagehandler will then add the newline again (wonderful complicated, isn't it?)
-		 		 		 const_cast<char*>(str)[length-1]=0;
-		 		 		 *messagehandler << str;
-		 		 		 messagehandler->finish();
-		 		 } else if (strlen(messagehandler->messageBuffer())+length<990) {
-		 		 		 // try to cache the message, so we can wait until a newline
-		 		 		 *messagehandler << str;		 		 		 
-		 		 } else {
-		 		 		 // message buffer is (almost) full; so we have to print here
-		 		 		 messagehandler->finish();
-		 		 		 *messagehandler << str;
-		 		 }
-		 } else {
-		 		 printf("%s", str);
-		 }
+  //TODO one should set the detail level of the message according to the journalist print level
+ 
+  if (messagehandler) {
+    int length=strlen(str);
+    if (!length) return;
+      if (length>=1000) {
+        // longer then messagehandler buffer size, so we print directly to a file pointer or stdout
+        messagehandler->finish();
+        if (messagehandler->filePointer())
+          fprintf(messagehandler->filePointer(), "%s", str);
+        else 
+        printf("%s", str);
+      }
+      else if (str[length-1]=='\n') {
+      // if this message ends with a newline, we remove the newline and let the messagehandler finish it
+      // the messagehandler will then add the newline again (wonderful complicated, isn't it?)
+      const_cast<char*>(str)[length-1]=0;
+      *messagehandler << str;
+       messagehandler->finish();
+       } else if (strlen(messagehandler->messageBuffer())+length<990) {
+      // try to cache the message, so we can wait until a newline
+      *messagehandler << str;		 		 		 
+    } 
+    else 
+    {
+     // message buffer is (almost) full; so we have to print here
+     messagehandler->finish();
+     *messagehandler << str;
+    }
+  } 
+  else {
+     printf("%s", str);
+  }
 }
 
 /** Printf to the designated output location */

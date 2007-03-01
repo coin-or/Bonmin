@@ -368,7 +368,7 @@ IpoptInterface::Messages::Messages
        "Problem initially not solved but solved with "
        "a random starting point (success on %d attempt)"));
   addMessage(WARN_CONTINUING_ON_FAILURE, CoinOneMessage
-      (3017,1,
+      (3012,1,
        "Warning : continuing branching, while there are "
        "unrecovered failures at nodes"));
 
@@ -390,10 +390,12 @@ IpoptInterface::Messages::Messages
        " %c  r%-7d %-11s %-14g %-8d %-3g"));
 
   addMessage(WARN_RESOLVE_BEFORE_INITIAL_SOLVE, CoinOneMessage
-      (3012,1,"resolve called before any call to initialSolve"
+      (3013,1,"resolve called before any call to initialSolve"
        " can not use warm starts."));
   addMessage(WARN_NONCONVEX_OA, CoinOneMessage
-      (3013,1,"OA on non-convex constraint is very experimental, don't know how to remove"));
+             (3014,1,"OA on non-convex constraint is very experimental, don't know how to remove"));
+  addMessage(WARN_FREEDOM, CoinOneMessage
+             (3015,1,"Too few degrees of freedom, relaxing slightly some bounds...."));
 }
 bool IpoptInterface::hasPrintedOptions=0;
 
@@ -939,7 +941,8 @@ IpoptInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 #if 1
   if(optimization_status_ == -10)//Too few degrees of freedom
     {
-      std::cout<<"Too few degrees of freedom...."<<std::endl;
+      messageHandler()->message(WARN_FREEDOM, ipoptIMessages_)
+      <<CoinMessageEol;
       int numrows = getNumRows();
       int numcols = getNumCols();
 
