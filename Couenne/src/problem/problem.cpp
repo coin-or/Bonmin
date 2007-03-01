@@ -231,7 +231,6 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
     x_  [i] = x [i];
     lb_ [i] = l [i];
     ub_ [i] = u [i];
-
     /*
     if ((x_ [i] < lb_ [i] - COUENNE_EPS) ||
 	(x_ [i] > ub_ [i] + COUENNE_EPS)) 

@@ -50,6 +50,14 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
       // TODO: look for a proper value for the displacement 
       if (fabs (x-l) < COUENNE_EPS) value_ += (1+fabs (l)) / 2.; 
       else                          value_ -= (1+fabs (u)) / 2.; 
+  /*
+  printf ("Branch::constructor: ");
+  reference_ -> print (std::cout);
+  printf (" on %f [%f,%f]\n", 
+	  value_, 
+	  expression::Lbound (reference_ -> Index ()),
+	  expression::Ubound (reference_ -> Index ()));
+  */
 }
 
 
