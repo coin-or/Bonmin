@@ -239,6 +239,7 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 	// complain loudly about a bug
 	throw BCP_fatal_error("Impossible outcome by nlp.initialSolve()\n");
     }
+    return sol;
 }
 
 /****************************************************************************/
