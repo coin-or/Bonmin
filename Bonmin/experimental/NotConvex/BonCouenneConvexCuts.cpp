@@ -31,6 +31,9 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
                       OsiCuts & cs,
                       const CglTreeInfo info) const
 {
+
+  // si is the current LP problem
+
   double num=CoinDrand48();
   const int & depth = info.level;
   double beta=10000;
@@ -66,41 +69,56 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
       int numberCuts =  - cs.sizeRowCuts();
       {
 
+	OsiSolverInterface *psi = 
+	  const_cast <OsiSolverInterface *> 
+	  (lpManip ? lpManip -> si () : &si);
+
 	// Provide Couenne with initial relaxation or, if one round
 	// has been performed already, with the updated (tighter)
 	// relaxation
-	if (!lpManip)
-	  ci->couenneCg()->updateConv(const_cast<double *>(si.getColSolution()), 
-				      const_cast<double *>(si.getColLower()), 
-				      const_cast<double *>(si.getColUpper()));
-	else 
-	  ci->couenneCg()->updateConv(const_cast<double *>(lpManip -> si () -> getColSolution()), 
-				      const_cast<double *>(lpManip -> si () -> getColLower()), 
-				      const_cast<double *>(lpManip -> si () -> getColUpper()));
 
+	double 
+	  *x = const_cast <double *> (psi -> getColSolution ()),
+	  *l = const_cast <double *> (psi -> getColLower ()),
+	  *u = const_cast <double *> (psi -> getColUpper ());
+
+	ci -> couenneCg () -> updateConv (x, l, u);
+
+	// update bounds as some of them (namely, some auxiliary
+	// variable bounds) may have gotten tighter
+	/*
+	for (i=0; i<psi -> getNumCols (); i++) {
+	  if (fabs (psi -> getColLower () [i] - l [i]) > COUENNE_EPS)
+	    printf ("################## LOW %d : %f, %f\n", i, psi -> getColLower () [i], l [i]);
+	  if (fabs (psi -> getColUpper () [i] - u [i]) > COUENNE_EPS)
+	    printf ("################## UPP %d : %f, %f\n", i, psi -> getColUpper () [i], u [i]);
+	}
+	*/
+	psi -> setColLower (l);
+	psi -> setColUpper (u);
 
 	int ncuts = ci->couenneCg()->getncuts();
 	for(int i = 0 ; i < ncuts ; i++)
 	  {
-	    cs.insert(*ci->couenneCg()->getCut(i)); 
+	    cs.insert (*ci->couenneCg()->getCut(i)); 
 	  }
       }
       numberCuts += cs.sizeRowCuts();
       if(numberCuts > 0 && (lp_ || i + 1 < numRounds_ )){
         if(lpManip==NULL) {
-          if(lp_ == NULL)
-            lpManip = new solverManip(si);
-          else
-            lpManip = new solverManip(lp_, true,true, 
+          if(lp_ == NULL) lpManip = new solverManip (si);
+          else            lpManip = new solverManip (lp_, true,true, 
                                       false,false);
         }
         lpManip->installCuts(cs,numberCuts);
         lpManip->si()->resolve();
-	//	std::cout<<"Cut generation: round "<<i<<", objective "<<lpManip->si()->getObjValue()<<std::endl;
+	//	std::cout<<"Cut generation: round "<<i<<", objective "
+	//               <<lpManip->si()->getObjValue()<<std::endl;
         if(lpManip->si()->isProvenPrimalInfeasible())
         {
           infeasible = true;
-	  //      std::cout<<"Stopping CouenneConv generation because problem became infeasible"<<std::endl;
+	  //      std::cout<<"Stopping CouenneConv generation because problem became infeasible"
+	  //               <<std::endl;
           break;
         }
 	if(i >= memory)

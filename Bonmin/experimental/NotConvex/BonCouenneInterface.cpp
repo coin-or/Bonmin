@@ -31,7 +31,7 @@ CouenneInterface::CouenneInterface(char **& amplArgs, SmartPtr<TNLPSolver> app):
     int addOnlyViolatedOa = true;
     app_->Options()->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     couenneCg_ = new CouenneCutGenerator 
-                       (nc_asl, false, CURRENT_ONLY,1);
+                       (nc_asl, true, CURRENT_ONLY,1);
   }
 
 /** Copy constructor. */
@@ -42,7 +42,7 @@ CouenneInterface::CouenneInterface(const CouenneInterface &other):
     const ASL_pfgh* asl = amplModel()->AmplSolverObject();
     ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
     couenneCg_ = new CouenneCutGenerator 
-                       (nc_asl, false, CURRENT_ONLY,1);
+                       (nc_asl, true, CURRENT_ONLY,1);
   }
 
 /** virutal copy constructor. */
@@ -66,37 +66,54 @@ CouenneInterface::~CouenneInterface(){
 void 
 CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, bool solveNlp)
 {
-  if(solveNlp)
-    initialSolve();
+
+  if (solveNlp)
+    initialSolve ();
 
    // Check that couenneCg_ has been built. 
-   if(couenneCg_ == NULL){
-     throw CoinError("No couenne generator has been built, probably ampl .nl file was not properly read","extractLinearRelaxation", "Bonmin::CouenneInterface");
-   }
-   int numcols = getNumCols();
-   int numcolsconv = couenneCg_->getnvars();
+   if (couenneCg_ == NULL)
+     throw CoinError 
+       ("No couenne generator has been built, probably ampl .nl file was not properly read",
+	"extractLinearRelaxation", "Bonmin::CouenneInterface");
 
-   CouNumber * x0 = new CouNumber[numcolsconv];
-   CouNumber * colLower = new CouNumber[numcolsconv];
-   CouNumber * colUpper = new CouNumber[numcolsconv];
-   assert(numcolsconv >= numcols);
-   
-   CoinCopyN(couenneCg_->X(), numcolsconv, x0);
-   CoinCopyN(couenneCg_->Lb(), numcolsconv, colLower);
-   CoinCopyN(couenneCg_->Ub(), numcolsconv, colUpper);
+   int numcols     = getNumCols ();             // number of original variables
+   int numcolsconv = couenneCg_ -> getnvars (); // number of original+auxiliary variables
+
+   CouNumber * x0       = new CouNumber [numcolsconv];
+   CouNumber * colLower = new CouNumber [numcolsconv];
+   CouNumber * colUpper = new CouNumber [numcolsconv];
+
+   assert (numcolsconv >= numcols);
+
+   // Initialize original variable bounds. This might be useless since
+   // the same data has been read from the asl_pfgh structure, but we
+   // do it since there might have been some preprocessing, within
+   // Bonmin, that has tightened the bounds. No preprocessing is done,
+   // instead, from CouenneCutGenerator::readnl() to the call to
+   // CouenneCutGenerator::updateConv() below.
+
+   CoinCopyN (getColLower (), numcols, colLower);
+   CoinCopyN (getColUpper (), numcols, colUpper);
 
    // Feed in the initial relaxation point
-   CoinCopyN(getColSolution(), numcols, x0);
-   //   updateCouenneAuxiliryVar(x0,colLower, colUpper);
+   CoinCopyN (getColSolution (), numcols, x0);
 
+   // update auxiliary variables (w = f(x)) and bounds (l_w = f(l_x))
    couenneCg_ -> updateAuxs (x0, colLower, colUpper);
-   int numrowsconv = couenneCg_->updateConv(x0, colLower, colUpper);
+
+   // add new variables to the new problem
+   //   for (register int i=numcols; i<numcolsconv; i++)
+   //     si.addCol (0, NULL, NULL, colLower [i], colUpper [i], 0);
+
+   // now create the linear relaxation
+   int numrowsconv = couenneCg_ -> updateConv (x0, colLower, colUpper);
 
    /* Now, create matrix and other stuff. */
-   CoinBigIndex * start = new CoinBigIndex[numrowsconv + 1];
-   int * length = new int[numrowsconv];
-   double * rowLower = new double[numrowsconv];
-   double * rowUpper = new double[numrowsconv];
+   CoinBigIndex * start = new CoinBigIndex [numrowsconv + 1];
+
+   int    * length   = new int    [numrowsconv];
+   double * rowLower = new double [numrowsconv];
+   double * rowUpper = new double [numrowsconv];
 
    start[0] = 0;
    /* fill the four arrays. */
@@ -159,16 +176,19 @@ CouenneInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj, b
    // Objective function
    double * obj = new double[numcolsconv];
    CoinFillN(obj,numcolsconv,0.);
-   obj[couenneCg_->Problem()->Obj(0)->Body()->Index()] = 1;
-  
-   si.loadProblem(A, colLower, colUpper, obj, rowLower, rowUpper);
-  
 
+   // some instances have no (or null) objective function, check it here
+   if (couenneCg_ -> Problem () -> nObjs () > 0)
+     obj [couenneCg_ -> Problem () -> Obj (0) -> Body () -> Index ()] = 1;
+
+   si.loadProblem (A, colLower, colUpper, obj, rowLower, rowUpper);
+  
    delete [] rowLower; 
    delete [] rowUpper;
    delete [] colLower;
    delete [] colUpper;
    delete [] obj;
+   delete [] x0;
 
    for(int i = 0 ; i < numcols ; i++)
    {
@@ -216,6 +236,9 @@ CouenneInterface::getOuterApproximation(OsiCuts &cs, bool getObj,
 void 
 CouenneInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global){
    // Check that couenneCg_ has been built. 
+
+  printf ("::::::::::::::::::::::::::::::::::::: getOA ()\n");
+
    if(couenneCg_ == NULL){
      throw CoinError("No couenne generator has been built,"
                      " probably ampl .nl file was not properly"
