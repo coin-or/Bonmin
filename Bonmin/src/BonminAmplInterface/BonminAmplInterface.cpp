@@ -23,7 +23,7 @@ BonminAmplInterface::BonminAmplInterface(const BonminAmplInterface &other):
 }
 /// Clone
 BonminAmplInterface * 
-BonminAmplInterface::clone(bool CopyData )
+BonminAmplInterface::clone(bool CopyData ) const
 {
   return new BonminAmplInterface(*this); 
 }

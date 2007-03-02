@@ -14,7 +14,7 @@ class BonminAmplInterface: public IpoptInterface
   /** Copy constructor */
   BonminAmplInterface(const BonminAmplInterface &other);
   /// Clone
-  virtual BonminAmplInterface * clone(bool CopyData = true);
+  virtual BonminAmplInterface * clone(bool CopyData = true) const;
 
   ///Destructor
   virtual ~BonminAmplInterface();
