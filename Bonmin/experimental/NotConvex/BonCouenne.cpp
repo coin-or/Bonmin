@@ -52,7 +52,7 @@ int main (int argc, char *argv[])
   else //will just output usage
   {
     Ipopt::SmartPtr<IpoptSolver> ipoptSolver = new IpoptSolver;
-    nlp_and_solver = new CouenneInterface(argv, GetRawPtr(ipoptSolver));
+    nlp_and_solver = new CouenneInterface (argv, GetRawPtr (ipoptSolver));
     delete nlp_and_solver;
     return 0;
   }
@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
     {
       std::cerr<<"Trying to use unknown solver."<<std::endl;
     }
-   nlp_and_solver = new CouenneInterface(argv, solver);
+  nlp_and_solver = new CouenneInterface(argv, solver);
     BonminCbcParam par;
     CouenneBab bb;
     // Eventually change some default in a custom application
@@ -116,7 +116,8 @@ int main (int argc, char *argv[])
 	     <<nlp_and_solver->totalNlpSolveTime()<<"\t"
 	     <<nlp_and_solver->nCallOptimizeTNLP()<<"\t"
 	     <<std::endl;
-    nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
+
+  nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
 
   }
   catch(TNLPSolver::UnsolvedError *E) {

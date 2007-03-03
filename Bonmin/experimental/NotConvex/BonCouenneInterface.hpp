@@ -42,14 +42,15 @@ class CouenneInterface : public AmplInterface
 
   /** Get the outer approximation constraints at the currently stored optimal point.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  virtual void getOuterApproximation(OsiCuts &cs, bool getObj, const double * x2, bool global);
+  //  virtual void getOuterApproximation(OsiCuts &cs, bool getObj, const double * x2, bool global);
 
   /** Get the outer approximation constraints at provided point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
+  //  virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
 
-  void updateCouenneAuxiliryVar(double *x, double * lb, double * ub);
+  // This is never called, eliminated
+  //  void updateCouenneAuxiliryVar(double *x, double * lb, double * ub);
 
   const CouenneProblem * couenneProb() const{
     return couenneCg_->Problem();

@@ -100,6 +100,8 @@ namespace Bonmin
     int nlpSolveFrequency;
     /** frequency for generating filmint's type ecp cuts.*/
     int filmintCutsFrequency;
+    /** frequency for generating Couenne ecp cuts.*/
+    int couenneCutsFrequency;
     /** Number of cutting plane iterations in lp strong branching.*/
     int numEcpRounds;
     /** Max OA decomposition time in B-Hyb.*/

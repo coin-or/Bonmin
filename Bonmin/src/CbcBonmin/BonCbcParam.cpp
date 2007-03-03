@@ -62,6 +62,7 @@ namespace Bonmin
     Options->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     Options->GetIntegerValue("nlp_solve_frequency",nlpSolveFrequency,"bonmin.");
     Options->GetIntegerValue("filmint_ecp_cuts",filmintCutsFrequency, "bonmin.");
+    Options->GetIntegerValue("couenne_ecp_cuts",couenneCutsFrequency, "bonmin.");
     Options->GetIntegerValue("number_ecp_rounds", numEcpRounds,"bonmin.");
     Options->GetNumericValue("oa_dec_time_limit",oaDecMaxTime,"bonmin.");
     Options->GetIntegerValue("Gomory_cuts", migFreq,"bonmin.");

@@ -307,6 +307,11 @@ static void register_OA_options
       0,0,
       "A frequency of 0 amounts to to never solve the NLP relaxation.");
 
+  roptions->AddLowerBoundedIntegerOption("couenne_ecp_cuts",
+      "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
+      0,1,
+      "A frequency of 0 amounts to to never solve the NLP relaxation.");
+
   roptions->AddLowerBoundedIntegerOption
     ("number_ecp_rounds",
      "Set the number of rounds of ecp cuts.",

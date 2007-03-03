@@ -89,8 +89,6 @@ endif
 fun_SOURCES = BonCouenne.cpp \
               BonCouenneCbc.hpp \
               BonCouenneCbc.cpp \
-	      BonCouenneConvexCuts.hpp \
-              BonCouenneConvexCuts.cpp \
               BonCouenneInterface.hpp \
               BonCouenneInterface.cpp
 

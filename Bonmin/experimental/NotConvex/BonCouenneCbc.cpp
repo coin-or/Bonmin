@@ -11,7 +11,7 @@
 //Couenne Bonmin interface
 #include "BonCouenneCbc.hpp"
 #include "BonCouenneInterface.hpp"
-#include "BonCouenneConvexCuts.hpp"
+//#include "BonCouenneConvexCuts.hpp"
 
 //Couenne
 #include "CouenneObject.hpp"
@@ -86,7 +86,7 @@ extern "C"
   static void signal_handler(int whichSignal) {
     if(BonminInteruptedOnce)
     {
-      std::cerr<<"User forced interuption"<<std::endl;
+      std::cerr<<"User forced interruption"<<std::endl;
       exit(0);
     }
     if (currentBranchModel!=NULL)
@@ -122,18 +122,18 @@ namespace Bonmin
     if (par.algo >= OsiTMINLPInterface::B_BB && 
 	par.algo <= OsiTMINLPInterface::B_Hyb) //Do something classic
     {
-      Bab::branchAndBound(nlpSolver, par);
+      Bab::branchAndBound (nlpSolver, par);
       return;
     }
 
     if(ci == NULL)
-      {
-	std::cerr<<"Can not do Couenne algorithm without a Couenne interface."
-		 <<std::endl;
-      }
+	std::cerr << "Can not run Couenne without a Couenne interface."
+		  << std::endl;
 
     si = new OsiClpSolverInterface;
-    nlpSolver->extractLinearRelaxation(*si);
+
+    nlpSolver -> extractLinearRelaxation (*si);
+
     // say bound dubious, does cuts at solution
     OsiBabSolver * extraStuff = new OsiBabSolver(0);
     si->setAuxiliaryInfo(extraStuff);
@@ -146,14 +146,18 @@ namespace Bonmin
       int numAuxs = couenneProb->nAuxs();
       OsiObject ** objects = new OsiObject*[numAuxs];
       int nobj = 0;
-      for(int i = 0 ; i < numAuxs; i++)
-	{
-	  if(couenneProb->Aux(i)->Image()->Linearity() > LINEAR){
-	    objects[nobj] = new CouenneObject (couenneProb->Aux(i));
-	    objects[nobj++]->setPriority(1);
-	  }
-      }
-      si->addObjects(nobj, objects);
+
+      for (int i = 0 ; i < numAuxs; i++) // for each aux variable
+
+	// if this variable is associated with a nonlinear function
+	if (couenneProb -> Aux (i) -> Image () -> Linearity () > LINEAR) {
+
+	  // then we may have to branch on it
+	  objects [nobj] = new CouenneObject (couenneProb -> Aux (i));
+	  objects [nobj++] -> setPriority(1);
+	}
+
+      si -> addObjects (nobj, objects);
 //       for(int i = 0 ; i < nobj ; i++){
 // 	delete objects[i];
 //       }
@@ -161,8 +165,9 @@ namespace Bonmin
     }
     
 
-    CbcModel model(*si);
+    // create linear model based on the initial linear convexification
 
+    CbcModel model(*si);
 
     //Setup likely milp cut generator
     CglGomory miGGen;
@@ -178,15 +183,20 @@ namespace Bonmin
 
     //Setup OA generators
 
-    CouenneConvCuts ecpGen(nlpSolver);
+    CouenneCutGenerator *ecpGen = ci -> couenneCg ();
+
+    /*
     ecpGen.parameter().global_ = par.oaCutsGlobal;
     ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
     ecpGen.setNumRounds(par.numEcpRounds);
+    */
 
     int numGen = 0;
 
-    if(par.filmintCutsFrequency != 0){
-      model.addCutGenerator(&ecpGen,par.filmintCutsFrequency,"Filmint cutting planes");
+    // TODO: replace with couenneCutsFrequency
+
+    if (par.couenneCutsFrequency != 0) {
+      model.addCutGenerator (ecpGen, par.couenneCutsFrequency, "Couenne cutting planes");
       numGen++;
     }
 
@@ -248,9 +258,6 @@ namespace Bonmin
 
     }
 
-
-
-
     replaceIntegers(model.objects(), model.numberObjects());
 
     model.setPrintFrequency(par.logInterval);
@@ -297,9 +304,8 @@ namespace Bonmin
     // Redundant definition of default branching (as Default == User)
     CbcBranchUserDecision branch;
 
-
-
-    CouenneChooseVariable choose(model.solver(), const_cast<CouenneProblem *>(ci->couenneProb()));
+    CouenneChooseVariable choose (model.solver(), 
+				  const_cast<CouenneProblem *> (ci -> couenneProb ()));
     branch.setChooseMethod(choose);
 
     model.setBranchingMethod(&branch);
@@ -307,7 +313,8 @@ namespace Bonmin
     //Get the time and start.
     model.initialSolve();
 
-    continuousRelaxation_ =model.solver()->getObjValue();
+    continuousRelaxation_ = model.solver() -> getObjValue ();
+
     if (par.algo == 0)//Set warm start point for Ipopt
     {
       const double * colsol = model.solver()->getColSolution();
@@ -324,7 +331,12 @@ namespace Bonmin
 
     currentBranchModel = &model;
 
-    model.branchAndBound();
+    //////////////////////////////////////////////////////////
+
+    model.branchAndBound ();
+
+    //////////////////////////////////////////////////////////
+
     numNodes_ = model.getNodeCount();
     bestObj_ = model.getObjValue();
     bestBound_ = model.getBestPossibleObjValue();
@@ -374,8 +386,4 @@ namespace Bonmin
     delete si;
     std::cout<<"Finished"<<std::endl;
   }
-
-
-
-
 }

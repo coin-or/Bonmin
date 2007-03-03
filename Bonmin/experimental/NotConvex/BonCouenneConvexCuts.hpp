@@ -42,8 +42,8 @@ namespace Bonmin {
     /** Standard cut generation methods. */
     virtual void generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
                               const CglTreeInfo info = CglTreeInfo()) const;
-    double doCouenneConvRounds(OsiSolverInterface &si,
-                     bool leaveSiUnchanged);
+    //    double doCouenneConvRounds(OsiSolverInterface &si,
+    //                     bool leaveSiUnchanged);
 
    void setNumRounds(int value){
    numRounds_ = value;}

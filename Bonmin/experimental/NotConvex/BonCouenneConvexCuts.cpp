@@ -12,6 +12,7 @@
 #include "CouenneCutGenerator.h"
 namespace Bonmin{
 
+  /*
 double 
 CouenneConvCuts::doCouenneConvRounds(OsiSolverInterface &si, 
                      bool leaveSiUnchanged){
@@ -25,6 +26,7 @@ CouenneConvCuts::doCouenneConvRounds(OsiSolverInterface &si,
   leaveSiUnchanged_ = saveLeaveSi;
   return objValue_;
 }
+  */
 
 void
 CouenneConvCuts::generateCuts(const OsiSolverInterface &si, 
@@ -54,6 +56,9 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
   const int memory = 5;
   double lastObjs[memory];
   double minImprove = 0.05;
+
+  // TODO: leave #rounds to Cbc
+
   for(int i = 0 ; i < numRounds_ ; i++)
   {
     const double * colsol = si.getColSolution();
@@ -76,6 +81,9 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
 	// Provide Couenne with initial relaxation or, if one round
 	// has been performed already, with the updated (tighter)
 	// relaxation
+
+
+	// TODO: useOsiColCuts
 
 	double 
 	  *x = const_cast <double *> (psi -> getColSolution ()),
@@ -152,6 +160,9 @@ CouenneConvCuts::generateCuts(const OsiSolverInterface &si,
 	  objValue_ = lpManip->si()->getObjValue();}
   }
   else objValue_ = 2e50;
+
+  // TODO: propagate back
+
   if(lpManip)
     {
       if(lp_ != NULL && lpManip != NULL)
