@@ -20,15 +20,19 @@
 #include <CouenneProblem.h>
 #include <CouenneProblemElem.h>
 
-// clone problem
+/// clone problem
 
 CouenneProblem *CouenneProblem::clone () const
   {return new CouenneProblem (*this);}
 
 
-// copy constructor
+/// copy constructor
 
-CouenneProblem::CouenneProblem (const CouenneProblem &p) {
+CouenneProblem::CouenneProblem (const CouenneProblem &p):
+  x_        (NULL),
+  lb_       (NULL),
+  ub_       (NULL),
+  curnvars_ (-1) {
 
   register int i;
 
@@ -41,7 +45,7 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p) {
 }
 
 
-// methods to add objective function
+/// methods to add objective function
 
 void CouenneProblem::addObjective (expression *newobj, const std::string &sense = "min") {
   objectives_ . push_back 
@@ -49,29 +53,29 @@ void CouenneProblem::addObjective (expression *newobj, const std::string &sense 
 }
 
 
-// methods to add nonlinear constraints:
+/// methods to add nonlinear constraints:
 
-// equality constraint
+/// equality constraint
 void CouenneProblem::addEQConstraint (expression *body, expression *rhs = NULL) {
   if (!rhs) rhs = new exprConst (0);
   constraints_ . push_back (new CouenneConstraint (body, rhs, new exprClone (rhs)));
 }
 
-// "greater than" constraint
+/// "greater than" constraint
 void CouenneProblem::addGEConstraint (expression *body, expression *rhs = NULL) {
   if (!rhs) rhs = new exprConst (0);
   constraints_ . push_back (new CouenneConstraint 
 			    (body, rhs, new exprConst (1 + COUENNE_INFINITY)));
 }
 
-// "smaller than" constraint
+/// "smaller than" constraint
 void CouenneProblem::addLEConstraint (expression *body, expression *rhs = NULL) {
   if (!rhs) rhs = new exprConst (0);
   constraints_ . push_back (new CouenneConstraint 
 			    (body, new exprConst (- (1 + COUENNE_INFINITY)), rhs));
 }
 
-// range constraint
+/// range constraint
 void CouenneProblem::addRNGConstraint (expression *body, expression *lb=NULL, expression *ub=NULL) {
   if (!lb) lb = new exprConst (0);
   if (!ub) ub = new exprConst (0);
@@ -79,7 +83,7 @@ void CouenneProblem::addRNGConstraint (expression *body, expression *lb=NULL, ex
 }
 
 
-// add variable to the problem
+/// add variable to the problem
 
 expression *CouenneProblem::addVariable (bool isDiscrete) {
 
@@ -92,8 +96,8 @@ expression *CouenneProblem::addVariable (bool isDiscrete) {
 }
 
 
-// add auxiliary variable and associate it with pointer to expression
-// given as argument
+/// add auxiliary variable and associate it with pointer to expression
+/// given as argument
 
 exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
@@ -106,7 +110,6 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
   if ((i = auxMap_ -> find (key)) == auxMap_ -> end ()) {
 
     // no such expression has been found in the map, 
-
     // create entry in the map
 
     std::pair <std::string, exprAux *> newpair;
@@ -124,7 +127,7 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 }
 
 
-// standardize all nonlinear objectives and constraints
+/// standardize all nonlinear objectives and constraints
 
 void CouenneProblem::standardize () {
 
@@ -174,7 +177,7 @@ void CouenneProblem::standardize () {
 }
 
 
-// destroy problem components
+/// destroy problem components
 
 CouenneProblem::~CouenneProblem () {
 
@@ -206,47 +209,57 @@ CouenneProblem::~CouenneProblem () {
 }
 
 
-// update value of variables, bounds
+/// update value of variables, bounds
 
-void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u) {
-
-  static int curr_size = -1;
+void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u, int n) {
 
   int nvars = nVars () + nAuxs ();
 
   // expand arrays if needed
 
-  if (curr_size < nvars) {
+  if (curnvars_ < nvars) {
 
     x_   = (CouNumber *) realloc (x_,  nvars * sizeof (CouNumber));
     lb_  = (CouNumber *) realloc (lb_, nvars * sizeof (CouNumber));
     ub_  = (CouNumber *) realloc (ub_, nvars * sizeof (CouNumber));
 
-    curr_size = nvars;
+    curnvars_ = nvars;
   }
 
   // copy arrays (do not simply make x_ point to x)
 
-  for (register int i=nvars; i--;) {
+  for (register int i = (n==-1) ? nvars : n; i--;) {
+
     x_  [i] = x [i];
     lb_ [i] = l [i];
     ub_ [i] = u [i];
-    /*
-    if ((x_ [i] < lb_ [i] - COUENNE_EPS) ||
-	(x_ [i] > ub_ [i] + COUENNE_EPS)) 
-      printf ("x%d =  %f < %f < %f\n", 
-	      i, lb_ [i], x_ [i], ub_ [i]);
-    */
-
-#define BIGNU 1e57;
-    /*
-    if (lb_ [i] < - COUENNE_INFINITY + 1) lb_ [i] = - BIGNU; 
-    if (ub_ [i] >   COUENNE_INFINITY - 1) ub_ [i] =   BIGNU; 
-
-    if (x_ [i] < lb_ [i]) x_ [i] = lb_ [i];
-    if (x_ [i] > ub_ [i]) x_ [i] = ub_ [i];
-    */
   }
 
   expression::update (x_, lb_, ub_);
+}
+
+
+/// initialize auxiliary variables from original variables in the
+/// nonlinear problem
+
+void CouenneProblem::initAuxs (CouNumber *x, 
+			       CouNumber *l, 
+			       CouNumber *u) {
+
+  // update current point and bounds 
+  update (x, l, u, nVars ());
+
+  int nAux = nAuxs ();
+
+  // only one loop is sufficient here, since auxiliary variable are
+  // defined in such a way that w_i does NOT depend on w_j if i<j.
+
+  for (register int i = 0, j = nVars (); i < nAux; i++, j++) {
+
+    exprAux *aux = Aux (i);
+
+    x_  [j] = (*aux)            ();
+    lb_ [j] = (*(aux -> Lb ())) ();
+    ub_ [j] = (*(aux -> Ub ())) ();
+  }
 }

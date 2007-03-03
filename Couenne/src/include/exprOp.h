@@ -55,14 +55,14 @@ class exprOp: public expression {
   }
 
   // cloning method
-  virtual exprOp *clone ()
+  virtual expression *clone () const
     {return new exprOp (*this);}
 
-
-  // return class members
+  // return argument list
   inline expression **ArgList () const 
     {return arglist_;}
 
+  // return number of arguments
   inline int nArgs () const 
     {return nargs_;}
 

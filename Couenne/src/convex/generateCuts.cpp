@@ -9,23 +9,35 @@
 
 #include <CglCutGenerator.hpp>
 #include <CouenneCutGenerator.h>
+#include <CouenneProblem.h>
 
 
-// a convexifier cut generator
+/// a convexifier cut generator
 
-void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si, 
+void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-
   if (firstcall_) {
+
+    // initialize auxiliary variables and bounds according to originals
+    problem_ -> initAuxs (const_cast <CouNumber *> (nlp_ -> getColSolution ()), 
+			  const_cast <CouNumber *> (nlp_ -> getColLower    ()),
+			  const_cast <CouNumber *> (nlp_ -> getColUpper    ()));
 
     // OsiSolverInterface is empty yet, no information can be obtained
     // on variables or bounds -- and none is needed since our
     // constructor populated *problem_ with variables and bounds. We
-    // only need to 
+    // only need to update the auxiliary variable and bounds with
+    // their current value.
 
-    // For each auxiliary variable replacing the original constraints,
-    // check if corresponding bounds are violated, and add cut to cs
+    // add auxiliary variables, unbounded for now
+    for (register int i=problem_ -> nAuxs (); i--;)
+      const_cast <OsiSolverInterface *> (&si) -> addCol 
+	(0, NULL, NULL, - COUENNE_INFINITY, COUENNE_INFINITY, 0);
+
+    // For each auxiliary variable replacing the original (nonlinear)
+    // constraints, check if corresponding bounds are violated, and
+    // add cut to cs
 
     int nnlc = problem_ -> nNLCons ();
 
@@ -47,66 +59,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  // Retrieve, from si, value and bounds of all variables, if not
-  // firstcall, otherwise only those of the original ones Update
-  // expression structure with x, l, u
+  // first of all, try to tighten the current relaxation by tightening
+  // the variables' bounds
 
-  OsiSolverInterface *psi = const_cast <OsiSolverInterface *> (&si);
-
-  CouNumber 
-    *xc = const_cast <CouNumber *> (psi -> getColSolution ()),
-    *lc = const_cast <CouNumber *> (psi -> getColLower    ()),
-    *uc = const_cast <CouNumber *> (psi -> getColUpper    ());
-
-  // update now all variables and bounds
-
-  problem_ -> update (xc, lc, uc);
-
-  // update bounding box (which may depend on the original
-  // variables' box) for the variables whose bound is looser. Here,
-  // newly enforced branching rules may change dependent auxiliary
-  // variables' bounds, in a recursive way. Hence we need to repeat
-  // the propagation step as long as at least one bound is modified.
-
-  bool found_one;
-
-  do {
-
-    found_one = false;
-
-    int naux = problem_ -> nAuxs ();
-
-    // check all auxiliary variables for changes in their upper,
-    // lower bound, depending on the bound changes of the variables
-    // they depend on
-
-    for (register int i = problem_ -> nVars (), j=0; 
-	 j < naux; j++) {
-    
-      CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
-      CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
-
-      // check if lower bound got higher    
-      if (ll > lc [i+j]) {
-	psi -> setColLower (i+j, ll);
-	lc [i+j] = ll;
-	found_one = true;
-      }
-
-      // check if upper bound got lower
-      if (uu < uc [i+j]) {
-	psi -> setColUpper (i+j, uu);
-	uc [i+j] = uu;
-	found_one = true;
-      }
-
-      expression::update (xc, lc, uc);
-    }
-
-  } while (found_one); // repeat as long as at least one bound changed
-
-  // update again 
-  problem_ -> update (xc, lc, uc);
+  tightenBounds (si);
 
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
@@ -118,8 +74,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   //    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
 
   if (firstcall_) {
-    firstcall_ = false;
-    ntotalcuts_  = nrootcuts_ = cs.sizeRowCuts ();
+    firstcall_  = false;
+    ntotalcuts_ = nrootcuts_ = cs.sizeRowCuts ();
   }
   else ntotalcuts_ += cs.sizeRowCuts ();
 }

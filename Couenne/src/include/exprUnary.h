@@ -30,7 +30,7 @@ class exprUnary: public expression {
 
  protected:
 
-  expression     *argument_; //< single argument taken by this expression
+  expression *argument_; //< single argument taken by this expression
 
  public:
 

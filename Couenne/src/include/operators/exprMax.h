@@ -10,6 +10,7 @@
 #define COUENNE_EXPRMAX_H
 
 #include <exprOp.h>
+#include <exprClone.h>
 
 
 //  class max
@@ -31,7 +32,7 @@ class exprMax: public exprOp {
   //  ~exprMax () {}
 
   // cloning method
-  expression *clone () const
+  exprMax *clone () const
     {return new exprMax (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)

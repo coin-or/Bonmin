@@ -38,14 +38,14 @@ class exprVar: public expression {
     varIndex_ (varIndex) {}
 
   // destructor
-  virtual  ~exprVar () {}
+  virtual ~exprVar () {}
 
   // copy constructor
   exprVar (const exprVar &e):
     varIndex_ (e.Index ()) {}
 
   // cloning method
-  virtual exprVar *clone ()
+  virtual exprVar *clone () const
     {return new exprVar (*this);}
 
   // get variable index in problem

@@ -94,7 +94,7 @@ class expression {
 
   /// cloning method
   virtual expression *clone () const 
-    {return new expression;}
+    {return new expression (*this);}
 
   /// return index of variable (only valid for exprVar and exprAux)
   virtual inline int Index () const
@@ -127,7 +127,7 @@ class expression {
     {return "null_expr";}
 
   /// I/O
-  virtual void print (std::ostream &) const {}
+  virtual void print (std::ostream &s) const {s << '?';}
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 

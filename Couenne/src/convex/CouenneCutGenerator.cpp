@@ -8,28 +8,32 @@
  */
 
 #include <OsiRowCut.hpp>
+#include <BonOaDecBase.hpp>
 #include <CglCutGenerator.hpp>
 #include <CoinHelperFunctions.hpp>
 
+#include <CouennePrecisions.h>
+#include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>
 
 
 /// constructor
 
-CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
+CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
+					  const struct ASL_pfgh *asl, 
+					  bool addviolated,
 					  enum conv_type convtype, int nSamples):
-  CglCutGenerator (),
-  ncuts_          (0),
-  pool_           (NULL),
-  bonCs_          (NULL),
-  bonOs_          (NULL),
+
+  OaDecompositionBase (nlp, NULL, NULL, 0,0,0),
   firstcall_      (true),
   addviolated_    (addviolated),
   convtype_       (convtype),
   nSamples_       (nSamples),
   problem_        (NULL),
   nrootcuts_      (0),
-  ntotalcuts_     (0) {
+  ntotalcuts_     (0),
+  objValue_       (- DBL_MAX),
+  nlp_            (nlp) {
 
   if (!asl) return;
 
@@ -40,6 +44,7 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
   //  printf ("======================================\n");
   problem_ -> standardize ();
   //  problem_ -> print (std::cout);
+  //  printf ("======================================\n");
 
   //  problem_ -> writeMod ("extended.mod");
 }
@@ -47,46 +52,26 @@ CouenneCutGenerator::CouenneCutGenerator (const ASL_pfgh *asl, bool addviolated,
 
 /// destructor
 
-CouenneCutGenerator::~CouenneCutGenerator () {
-
-  if (bonCs_) {
-    delete bonCs_;
-    delete bonOs_;
-  }
-
-  if (pool_) 
-    free (pool_);
-
-  delete problem_;
-
-  printf ("Couenne: %d root cuts, %d total\n", 
-	  nrootcuts_, ntotalcuts_);
-}
-
-
-/// clone method
-
-CouenneCutGenerator *CouenneCutGenerator::clone () const
-  {return new CouenneCutGenerator (*this);}
+CouenneCutGenerator::~CouenneCutGenerator ()
+{delete problem_;}
 
 
 /// copy constructor
 
 CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
-  CglCutGenerator (),
-  ncuts_       (src. getncuts ()),
-  pool_        (new OsiRowCut * [ncuts_]),
-  bonCs_       (new OsiCuts (*(src.getBonCs ()))),
-  bonOs_       (src. getBonOs () -> clone ()),
-  firstcall_   (src. isFirst ()),
-  addviolated_ (src. addViolated ()), 
-  convtype_    (src. ConvType ()), 
-  nSamples_    (src. nSamples ()),
-  problem_     (src. Problem() -> clone ()) {
 
-  for (int i=0; i<ncuts_; i++)
-    pool_ [i] = src. getCut (i) -> clone ();
-}
+  OaDecompositionBase (src),
+
+  firstcall_   (src. firstcall_),
+  addviolated_ (src. addviolated_), 
+  convtype_    (src. convtype_), 
+  nSamples_    (src. nSamples_),
+  problem_     (src. problem_ -> clone ()),
+  nrootcuts_   (src. nrootcuts_),
+  ntotalcuts_  (src. ntotalcuts_),
+  objValue_    (src. objValue_),
+  nlp_         (src. nlp_)
+{}
 
 
 /// add half-space through two points (x1,y1) and (x2,y2)
@@ -113,28 +98,14 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
     cs.insert (cut);
 }
 
+const CouNumber    CouenneCutGenerator::X   (int i) {return problem_ -> X  (i);}
+const CouNumber   &CouenneCutGenerator::Lb  (int i) {return problem_ -> Lb (i);}
+const CouNumber   &CouenneCutGenerator::Ub  (int i) {return problem_ -> Ub (i);}
 
-/// update auxiliary variables from original
+/// get arrays
+const CouNumber   *CouenneCutGenerator::X   ()      {return problem_ -> X  ();}
+const CouNumber   *CouenneCutGenerator::Lb  ()      {return problem_ -> Lb ();}
+const CouNumber   *CouenneCutGenerator::Ub  ()      {return problem_ -> Ub ();}
 
-void CouenneCutGenerator::updateAuxs (CouNumber *x, CouNumber *l, CouNumber *u) {
-
-  // update current point and bounds 
-  expression::update (x,l,u);
-
-  int nAux = problem_ -> nAuxs ();
-
-  // only one loop is sufficient here, since auxiliary variable are
-  // defined in such a way that w_i does NOT depend on w_j if i<j.
-
-  for (int i = 0, j = problem_ -> nVars (); i < nAux; i++, j++) {
-
-    exprAux *aux = problem_ -> Aux (i);
-
-    x [j] = (*aux)            ();
-    l [j] = (*(aux -> Lb ())) ();
-    u [j] = (*(aux -> Ub ())) ();
-  }
-
-  // propagate value back to problem_'s and expression::'s arrays
-  problem_ -> update (x, l, u);
-}
+int                CouenneCutGenerator::getnvars () const {return problem_ -> nVars () + 
+					                          problem_ -> nAuxs ();} 

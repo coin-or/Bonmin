@@ -6,6 +6,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <CouenneCutGenerator.h>
 #include <CouenneTypes.h>
 #include <expression.h>
 #include <exprAux.h>
@@ -15,7 +16,6 @@
 #include <exprBound.h>
 
 #include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
 
 
 // is the variable one of those in varlist?
@@ -48,8 +48,7 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
   OsiRowCut *cut;
 
-  if ((cut = cg -> createCut (0., 0, w -> Index (), 1., 
-			      varIndex_, -1., -1, 0., true)))
+  if ((cut = cg -> createCut (0., 0, w -> Index (), 1., varIndex_)))
     cs.insert (cut);
 }
 

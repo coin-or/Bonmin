@@ -56,11 +56,11 @@ int CouenneCutGenerator::updateConv (CouNumber *curx,
     for (int i = bonCs_ -> sizeRowCuts (); i--;)
       bonCs_ -> eraseRowCut (i);
 
-  /*
-  printf ("           x           lb             ub\n");
-  for (int i=0; i < getnvars (); i++)
-    printf ("%3d %12.3f %12.3f %12.3f\n", i, X (i), Lb (i), Ub (i));
-  */
+
+  //  printf ("           x           lb             ub\n");
+  //  for (int i=0; i < getnvars (); i++)
+  //    printf ("%3d %12.3f %12.3f %12.3f\n", i, X (i), Lb (i), Ub (i));
+
 
   bonOs_ -> setColSolution (curx);
   bonOs_ -> setColLower (curlb);

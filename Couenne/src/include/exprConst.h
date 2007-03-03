@@ -42,7 +42,7 @@ class exprConst: public expression {
     {currValue_ = e.Value ();}
 
   // Cloning method
-  virtual exprConst *clone ()
+  virtual exprConst *clone () const
     {return new exprConst (currValue_);}
 
   // string equivalent

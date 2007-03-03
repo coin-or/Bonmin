@@ -472,7 +472,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE CLPSRCDIR CLPOBJDIR COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE COUENNESRCDIR COUENNEOBJDIR COIN_HAS_COUENNE_TRUE COIN_HAS_COUENNE_FALSE ASLLIB ASL_CPPFLAGS COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE CLPSRCDIR CLPOBJDIR COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE BONMINSRCDIR BONMINOBJDIR COIN_HAS_BONMIN_TRUE COIN_HAS_BONMIN_FALSE IPOPTSRCDIR IPOPTOBJDIR COIN_HAS_IPOPT_TRUE COIN_HAS_IPOPT_FALSE CBCSRCDIR CBCOBJDIR COIN_HAS_CBC_TRUE COIN_HAS_CBC_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE COUENNESRCDIR COUENNEOBJDIR COIN_HAS_COUENNE_TRUE COIN_HAS_COUENNE_FALSE ASLLIB ASL_CPPFLAGS COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -21304,6 +21304,174 @@ fi
 echo "$as_me:$LINENO: result: $coin_has_clp" >&5
 echo "${ECHO_T}$coin_has_clp" >&6
 
+echo "$as_me:$LINENO: checking for COIN project Bonmin" >&5
+echo $ECHO_N "checking for COIN project Bonmin... $ECHO_C" >&6
+
+# First check, if the sub-project is actually available (ToDo: allow
+# other locations)
+
+coin_has_bonmin=unavailable
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = Bonmin; then
+      coin_has_bonmin=skipping
+    fi
+  done
+fi
+
+if test $coin_has_bonmin != skipping; then
+  if test $PACKAGE_TARNAME = bonmin; then
+    coin_has_bonmin=.
+  else
+    if test -d $srcdir/../Bonmin; then
+      coin_has_bonmin=../Bonmin
+    fi
+  fi
+fi
+
+if test $coin_has_bonmin != unavailable &&
+   test $coin_has_bonmin != skipping; then
+  # Set the #define if the component is available
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_BONMIN 1
+_ACEOF
+
+
+  # Set the variables for source and object code location
+
+  BONMINSRCDIR=`cd $srcdir/$coin_has_bonmin; pwd`
+
+  BONMINOBJDIR=`pwd`/$coin_has_bonmin
+fi
+
+  # Define the Makefile conditional
+
+
+if test $coin_has_bonmin != unavailable &&
+                test $coin_has_bonmin != skipping; then
+  COIN_HAS_BONMIN_TRUE=
+  COIN_HAS_BONMIN_FALSE='#'
+else
+  COIN_HAS_BONMIN_TRUE='#'
+  COIN_HAS_BONMIN_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_bonmin" >&5
+echo "${ECHO_T}$coin_has_bonmin" >&6
+
+echo "$as_me:$LINENO: checking for COIN project Ipopt" >&5
+echo $ECHO_N "checking for COIN project Ipopt... $ECHO_C" >&6
+
+# First check, if the sub-project is actually available (ToDo: allow
+# other locations)
+
+coin_has_ipopt=unavailable
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = Ipopt; then
+      coin_has_ipopt=skipping
+    fi
+  done
+fi
+
+if test $coin_has_ipopt != skipping; then
+  if test $PACKAGE_TARNAME = ipopt; then
+    coin_has_ipopt=.
+  else
+    if test -d $srcdir/../Ipopt; then
+      coin_has_ipopt=../Ipopt
+    fi
+  fi
+fi
+
+if test $coin_has_ipopt != unavailable &&
+   test $coin_has_ipopt != skipping; then
+  # Set the #define if the component is available
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_IPOPT 1
+_ACEOF
+
+
+  # Set the variables for source and object code location
+
+  IPOPTSRCDIR=`cd $srcdir/$coin_has_ipopt; pwd`
+
+  IPOPTOBJDIR=`pwd`/$coin_has_ipopt
+fi
+
+  # Define the Makefile conditional
+
+
+if test $coin_has_ipopt != unavailable &&
+                test $coin_has_ipopt != skipping; then
+  COIN_HAS_IPOPT_TRUE=
+  COIN_HAS_IPOPT_FALSE='#'
+else
+  COIN_HAS_IPOPT_TRUE='#'
+  COIN_HAS_IPOPT_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_ipopt" >&5
+echo "${ECHO_T}$coin_has_ipopt" >&6
+
+echo "$as_me:$LINENO: checking for COIN project Cbc" >&5
+echo $ECHO_N "checking for COIN project Cbc... $ECHO_C" >&6
+
+# First check, if the sub-project is actually available (ToDo: allow
+# other locations)
+
+coin_has_cbc=unavailable
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = Cbc; then
+      coin_has_cbc=skipping
+    fi
+  done
+fi
+
+if test $coin_has_cbc != skipping; then
+  if test $PACKAGE_TARNAME = cbc; then
+    coin_has_cbc=.
+  else
+    if test -d $srcdir/../Cbc; then
+      coin_has_cbc=../Cbc
+    fi
+  fi
+fi
+
+if test $coin_has_cbc != unavailable &&
+   test $coin_has_cbc != skipping; then
+  # Set the #define if the component is available
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_CBC 1
+_ACEOF
+
+
+  # Set the variables for source and object code location
+
+  CBCSRCDIR=`cd $srcdir/$coin_has_cbc; pwd`
+
+  CBCOBJDIR=`pwd`/$coin_has_cbc
+fi
+
+  # Define the Makefile conditional
+
+
+if test $coin_has_cbc != unavailable &&
+                test $coin_has_cbc != skipping; then
+  COIN_HAS_CBC_TRUE=
+  COIN_HAS_CBC_FALSE='#'
+else
+  COIN_HAS_CBC_TRUE='#'
+  COIN_HAS_CBC_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_cbc" >&5
+echo "${ECHO_T}$coin_has_cbc" >&6
+
 echo "$as_me:$LINENO: checking for COIN project Osi" >&5
 echo $ECHO_N "checking for COIN project Osi... $ECHO_C" >&6
 
@@ -21941,6 +22109,27 @@ if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CLP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COIN_HAS_CLP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_BONMIN_TRUE}" && test -z "${COIN_HAS_BONMIN_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_BONMIN\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_BONMIN\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_IPOPT_TRUE}" && test -z "${COIN_HAS_IPOPT_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_IPOPT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_IPOPT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_CBC_TRUE}" && test -z "${COIN_HAS_CBC_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CBC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_CBC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -22613,6 +22802,18 @@ s,@CLPSRCDIR@,$CLPSRCDIR,;t t
 s,@CLPOBJDIR@,$CLPOBJDIR,;t t
 s,@COIN_HAS_CLP_TRUE@,$COIN_HAS_CLP_TRUE,;t t
 s,@COIN_HAS_CLP_FALSE@,$COIN_HAS_CLP_FALSE,;t t
+s,@BONMINSRCDIR@,$BONMINSRCDIR,;t t
+s,@BONMINOBJDIR@,$BONMINOBJDIR,;t t
+s,@COIN_HAS_BONMIN_TRUE@,$COIN_HAS_BONMIN_TRUE,;t t
+s,@COIN_HAS_BONMIN_FALSE@,$COIN_HAS_BONMIN_FALSE,;t t
+s,@IPOPTSRCDIR@,$IPOPTSRCDIR,;t t
+s,@IPOPTOBJDIR@,$IPOPTOBJDIR,;t t
+s,@COIN_HAS_IPOPT_TRUE@,$COIN_HAS_IPOPT_TRUE,;t t
+s,@COIN_HAS_IPOPT_FALSE@,$COIN_HAS_IPOPT_FALSE,;t t
+s,@CBCSRCDIR@,$CBCSRCDIR,;t t
+s,@CBCOBJDIR@,$CBCOBJDIR,;t t
+s,@COIN_HAS_CBC_TRUE@,$COIN_HAS_CBC_TRUE,;t t
+s,@COIN_HAS_CBC_FALSE@,$COIN_HAS_CBC_FALSE,;t t
 s,@OSISRCDIR@,$OSISRCDIR,;t t
 s,@OSIOBJDIR@,$OSIOBJDIR,;t t
 s,@COIN_HAS_OSI_TRUE@,$COIN_HAS_OSI_TRUE,;t t

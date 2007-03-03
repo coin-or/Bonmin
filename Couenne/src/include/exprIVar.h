@@ -38,7 +38,7 @@ class exprIVar: public exprVar {
     exprVar (e.Index ()) {}
 
   // cloning method
-  virtual exprIVar *clone ()
+  virtual exprIVar *clone () const
     {return new exprIVar (*this);}
 
   // string equivalent

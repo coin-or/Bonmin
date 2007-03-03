@@ -9,6 +9,7 @@
 
 
 #include <OsiRowCut.hpp>
+#include <CouennePrecisions.h>
 #include <CouenneTypes.h>
 #include <CouenneCutGenerator.h>
 

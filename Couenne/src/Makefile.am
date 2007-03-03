@@ -39,6 +39,7 @@ libCouenne_la_SOURCES = \
 	expression/expression.cpp \
 	simplify/simplifiers.cpp \
 	simplify/simplify.cpp \
+	convex/tightenBounds.cpp \
 	convex/addEnvelope.cpp \
 	convex/createCuts.cpp \
 	convex/conv-exprOp.cpp \
@@ -61,7 +62,6 @@ libCouenne_la_SOURCES = \
 	problem/problem.cpp \
 	problem/problemIO.cpp \
 	problem/constraint.cpp \
-	convex/update_conv.cpp \
 	util/rootQ.c
 
 COINLIBS = \
@@ -94,10 +94,20 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/inc` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
+	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/OaAlgorithms` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/CbcBonmin` \
+	-I`$(CYGPATH_W) $(objdir)/inc` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc`
 

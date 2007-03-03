@@ -9,8 +9,11 @@
  */
 
 #include <OsiRowCut.hpp>
+
 #include <CouenneTypes.h>
+#include <CouennePrecisions.h>
 #include <CouenneCutGenerator.h>
+#include <CouenneProblem.h>
 
 
 // general procedure for inserting a linear cut with up to three
@@ -42,10 +45,12 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
 
   if (!firstcall_ && addviolated_) { // need to check violation 
 
+    CouNumber *x = const_cast <CouNumber *> (problem_ -> X ());
+
     // compute violation
-    CouNumber violation = - rhs + c1 * X (i1);
-    if (i2 >= 0) violation     += c2 * X (i2);
-    if (i3 >= 0) violation     += c3 * X (i3);
+    CouNumber violation = - rhs + c1 * x [i1];
+    if (i2 >= 0) violation     += c2 * x [i2];
+    if (i3 >= 0) violation     += c3 * x [i3];
 
     // return NULL if not violated
 

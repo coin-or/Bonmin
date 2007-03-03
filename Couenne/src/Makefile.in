@@ -90,9 +90,10 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp expression/exprVar.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/addEnvelope.cpp \
-	convex/createCuts.cpp convex/conv-exprOp.cpp \
-	convex/conv-exprUnary.cpp convex/operators/conv-exprAbs.cpp \
+	simplify/simplify.cpp convex/tightenBounds.cpp \
+	convex/addEnvelope.cpp convex/createCuts.cpp \
+	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
+	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -107,9 +108,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp convex/update_conv.cpp util/rootQ.c \
-	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c \
-	readnl/fix_asl_group.c
+	problem/constraint.cpp util/rootQ.c readnl/readnl.cpp \
+	readnl/nl2e.cpp readnl/invmap.c readnl/fix_asl_group.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
 @COIN_HAS_ASL_TRUE@	fix_asl_group.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
@@ -117,14 +117,14 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
 	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
 	exprSum.lo exprMinMax.lo exprVar.lo expression.lo \
-	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
-	conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
+	simplifiers.lo simplify.lo tightenBounds.lo addEnvelope.lo \
+	createCuts.lo conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
 	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
 	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo CouenneCutGenerator.lo generateCuts.lo \
-	problem.lo problemIO.lo constraint.lo update_conv.lo rootQ.lo \
+	problem.lo problemIO.lo constraint.lo rootQ.lo \
 	$(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -169,7 +169,11 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AUX_DIR = @AUX_DIR@
 AWK = @AWK@
+BONMINOBJDIR = @BONMINOBJDIR@
+BONMINSRCDIR = @BONMINSRCDIR@
 BUILDTOOLSDIR = @BUILDTOOLSDIR@
+CBCOBJDIR = @CBCOBJDIR@
+CBCSRCDIR = @CBCSRCDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
@@ -182,6 +186,10 @@ COINUTILSOBJDIR = @COINUTILSOBJDIR@
 COINUTILSSRCDIR = @COINUTILSSRCDIR@
 COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
 COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
+COIN_HAS_BONMIN_FALSE = @COIN_HAS_BONMIN_FALSE@
+COIN_HAS_BONMIN_TRUE = @COIN_HAS_BONMIN_TRUE@
+COIN_HAS_CBC_FALSE = @COIN_HAS_CBC_FALSE@
+COIN_HAS_CBC_TRUE = @COIN_HAS_CBC_TRUE@
 COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
 COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
 COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
@@ -190,6 +198,8 @@ COIN_HAS_COINUTILS_FALSE = @COIN_HAS_COINUTILS_FALSE@
 COIN_HAS_COINUTILS_TRUE = @COIN_HAS_COINUTILS_TRUE@
 COIN_HAS_COUENNE_FALSE = @COIN_HAS_COUENNE_FALSE@
 COIN_HAS_COUENNE_TRUE = @COIN_HAS_COUENNE_TRUE@
+COIN_HAS_IPOPT_FALSE = @COIN_HAS_IPOPT_FALSE@
+COIN_HAS_IPOPT_TRUE = @COIN_HAS_IPOPT_TRUE@
 COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
 COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
 COUENNEOBJDIR = @COUENNEOBJDIR@
@@ -221,6 +231,8 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+IPOPTOBJDIR = @IPOPTOBJDIR@
+IPOPTSRCDIR = @IPOPTSRCDIR@
 LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
@@ -334,9 +346,10 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp expression/exprVar.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/addEnvelope.cpp \
-	convex/createCuts.cpp convex/conv-exprOp.cpp \
-	convex/conv-exprUnary.cpp convex/operators/conv-exprAbs.cpp \
+	simplify/simplify.cpp convex/tightenBounds.cpp \
+	convex/addEnvelope.cpp convex/createCuts.cpp \
+	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
+	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -351,8 +364,7 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp convex/update_conv.cpp util/rootQ.c \
-	$(am__append_1)
+	problem/constraint.cpp util/rootQ.c $(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -375,9 +387,17 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` -I`$(CYGPATH_W) \
 	$(OSISRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CGLOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(CLPOBJDIR)/inc` -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+	$(CBCSRCDIR)/src` -I`$(CYGPATH_W) $(CBCSRCDIR)/inc` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` -I`$(CYGPATH_W) \
+	$(IPOPTSRCDIR)/src/LinAlg` -I`$(CYGPATH_W) \
+	$(IPOPTSRCDIR)/src/Interfaces` -I`$(CYGPATH_W) \
+	$(IPOPTOBJDIR)/inc` -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(CLPSRCDIR)/src` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/OaAlgorithms` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/CbcBonmin` -I`$(CYGPATH_W) \
+	$(objdir)/inc` -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` $(am__append_2)
 
 # This line is necessary to allow VPATH compilation with MS compilers
@@ -552,7 +572,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rootQ.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplifiers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplify.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/update_conv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tightenBounds.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -764,6 +784,13 @@ simplify.lo: simplify/simplify.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o simplify.lo `test -f 'simplify/simplify.cpp' || echo '$(srcdir)/'`simplify/simplify.cpp
 
+tightenBounds.lo: convex/tightenBounds.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tightenBounds.lo -MD -MP -MF "$(DEPDIR)/tightenBounds.Tpo" -c -o tightenBounds.lo `test -f 'convex/tightenBounds.cpp' || echo '$(srcdir)/'`convex/tightenBounds.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/tightenBounds.Tpo" "$(DEPDIR)/tightenBounds.Plo"; else rm -f "$(DEPDIR)/tightenBounds.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/tightenBounds.cpp' object='tightenBounds.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tightenBounds.lo `test -f 'convex/tightenBounds.cpp' || echo '$(srcdir)/'`convex/tightenBounds.cpp
+
 addEnvelope.lo: convex/addEnvelope.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT addEnvelope.lo -MD -MP -MF "$(DEPDIR)/addEnvelope.Tpo" -c -o addEnvelope.lo `test -f 'convex/addEnvelope.cpp' || echo '$(srcdir)/'`convex/addEnvelope.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/addEnvelope.Tpo" "$(DEPDIR)/addEnvelope.Plo"; else rm -f "$(DEPDIR)/addEnvelope.Tpo"; exit 1; fi
@@ -917,13 +944,6 @@ constraint.lo: problem/constraint.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/constraint.cpp' object='constraint.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o constraint.lo `test -f 'problem/constraint.cpp' || echo '$(srcdir)/'`problem/constraint.cpp
-
-update_conv.lo: convex/update_conv.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT update_conv.lo -MD -MP -MF "$(DEPDIR)/update_conv.Tpo" -c -o update_conv.lo `test -f 'convex/update_conv.cpp' || echo '$(srcdir)/'`convex/update_conv.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/update_conv.Tpo" "$(DEPDIR)/update_conv.Plo"; else rm -f "$(DEPDIR)/update_conv.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/update_conv.cpp' object='update_conv.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o update_conv.lo `test -f 'convex/update_conv.cpp' || echo '$(srcdir)/'`convex/update_conv.cpp
 
 readnl.lo: readnl/readnl.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readnl.lo -MD -MP -MF "$(DEPDIR)/readnl.Tpo" -c -o readnl.lo `test -f 'readnl/readnl.cpp' || echo '$(srcdir)/'`readnl/readnl.cpp; \

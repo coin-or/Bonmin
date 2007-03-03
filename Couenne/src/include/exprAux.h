@@ -54,7 +54,7 @@ class exprAux: public exprVar {
     {image_ -> getBounds (lb_, ub_);}
 
   // cloning method
-  virtual exprAux *clone ()
+  virtual exprAux *clone () const
     {return new exprAux (*this);}
 
   // set lower bound

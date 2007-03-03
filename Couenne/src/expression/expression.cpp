@@ -9,6 +9,9 @@
 #include <string>
 #include <string.h>
 
+#include <CouenneCutGenerator.h>
+#include <CouenneProblem.h>
+
 #include <CouenneTypes.h>
 #include <expression.h>
 #include <exprAux.h>
@@ -17,9 +20,6 @@
 #include <exprVar.h>
 #include <exprIVar.h>
 #include <exprBound.h>
-
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
 
 // static vectors for evaluation, see their description in
 // expression.h

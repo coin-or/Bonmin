@@ -31,7 +31,7 @@ class exprMin: public exprOp {
   //  ~exprMin () {}
 
   // cloning method
-  expression *clone () const
+  exprMin *clone () const
     {return new exprMin (clonearglist (), nargs_);}
 
   // String equivalent (for comparisons)
