@@ -58,7 +58,7 @@ namespace Ipopt
       SUCCESS,
       INFEASIBLE,
       LIMIT_EXCEEDED,
-      ERROR};
+      MINLP_ERROR};
     /**@name Constructors/Destructors */
     //@{
     TMINLP()

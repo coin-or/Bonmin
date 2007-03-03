@@ -361,7 +361,7 @@ namespace Ipopt
       status_str = "\t\"Not finished\"";
       message = "\n Optimization interupted on limit.";
     }
-    else if(status == TMINLP::ERROR) {
+    else if(status == TMINLP::MINLP_ERROR) {
       status_str = "\t\"Aborted\"";
       message = "\n Error encountered in optimization.";
     }

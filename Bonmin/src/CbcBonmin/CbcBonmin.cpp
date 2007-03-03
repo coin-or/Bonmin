@@ -477,7 +477,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
       mipStatus_ = NoSolutionKnown;
   }
   else if (model.status()==2){
-    status = TMINLP::ERROR;
+    status = TMINLP::MINLP_ERROR;
   }
 
   nlpSolver.model()->finalize_solution(status, nlpSolver.getNumCols(), bestSolution_,
