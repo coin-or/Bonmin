@@ -88,7 +88,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprCos.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
-	expression/operators/exprMinMax.cpp expression/exprVar.cpp \
+	expression/operators/exprMinMax.cpp \
+	expression/operators/exprGroup.cpp expression/exprVar.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
 	simplify/simplify.cpp convex/tightenBounds.cpp \
 	convex/addEnvelope.cpp convex/createCuts.cpp \
@@ -106,6 +107,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
+	convex/operators/conv-exprGroup.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp util/rootQ.c readnl/readnl.cpp \
@@ -116,15 +118,15 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
 	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
 	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
-	exprSum.lo exprMinMax.lo exprVar.lo expression.lo \
+	exprSum.lo exprMinMax.lo exprGroup.lo exprVar.lo expression.lo \
 	simplifiers.lo simplify.lo tightenBounds.lo addEnvelope.lo \
 	createCuts.lo conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
 	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
 	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
-	conv-exprLog.lo CouenneCutGenerator.lo generateCuts.lo \
-	problem.lo problemIO.lo constraint.lo rootQ.lo \
+	conv-exprLog.lo conv-exprGroup.lo CouenneCutGenerator.lo \
+	generateCuts.lo problem.lo problemIO.lo constraint.lo rootQ.lo \
 	$(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -344,7 +346,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprCos.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
-	expression/operators/exprMinMax.cpp expression/exprVar.cpp \
+	expression/operators/exprMinMax.cpp \
+	expression/operators/exprGroup.cpp expression/exprVar.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
 	simplify/simplify.cpp convex/tightenBounds.cpp \
 	convex/addEnvelope.cpp convex/createCuts.cpp \
@@ -362,6 +365,7 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
+	convex/operators/conv-exprGroup.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp util/rootQ.c $(am__append_1)
@@ -431,6 +435,7 @@ include_HEADERS = \
 	include/operators/exprPow.h \
 	include/operators/exprSin.h \
 	include/operators/exprSub.h \
+	include/operators/exprGroup.h \
 	include/exprConst.h \
 	include/exprIVar.h \
 	include/exprVar.h \
@@ -533,6 +538,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprAbs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprExp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprGroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprInv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprLog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprMul.Plo@am__quote@
@@ -550,6 +556,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprCos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprExp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprGroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprInv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprLog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprMinMax.Plo@am__quote@
@@ -756,6 +763,13 @@ exprMinMax.lo: expression/operators/exprMinMax.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprMinMax.lo `test -f 'expression/operators/exprMinMax.cpp' || echo '$(srcdir)/'`expression/operators/exprMinMax.cpp
 
+exprGroup.lo: expression/operators/exprGroup.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprGroup.lo -MD -MP -MF "$(DEPDIR)/exprGroup.Tpo" -c -o exprGroup.lo `test -f 'expression/operators/exprGroup.cpp' || echo '$(srcdir)/'`expression/operators/exprGroup.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprGroup.Tpo" "$(DEPDIR)/exprGroup.Plo"; else rm -f "$(DEPDIR)/exprGroup.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/exprGroup.cpp' object='exprGroup.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprGroup.lo `test -f 'expression/operators/exprGroup.cpp' || echo '$(srcdir)/'`expression/operators/exprGroup.cpp
+
 exprVar.lo: expression/exprVar.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprVar.lo -MD -MP -MF "$(DEPDIR)/exprVar.Tpo" -c -o exprVar.lo `test -f 'expression/exprVar.cpp' || echo '$(srcdir)/'`expression/exprVar.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprVar.Tpo" "$(DEPDIR)/exprVar.Plo"; else rm -f "$(DEPDIR)/exprVar.Tpo"; exit 1; fi
@@ -909,6 +923,13 @@ conv-exprLog.lo: convex/operators/conv-exprLog.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprLog.cpp' object='conv-exprLog.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprLog.lo `test -f 'convex/operators/conv-exprLog.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprLog.cpp
+
+conv-exprGroup.lo: convex/operators/conv-exprGroup.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprGroup.lo -MD -MP -MF "$(DEPDIR)/conv-exprGroup.Tpo" -c -o conv-exprGroup.lo `test -f 'convex/operators/conv-exprGroup.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprGroup.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/conv-exprGroup.Tpo" "$(DEPDIR)/conv-exprGroup.Plo"; else rm -f "$(DEPDIR)/conv-exprGroup.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprGroup.cpp' object='conv-exprGroup.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprGroup.lo `test -f 'convex/operators/conv-exprGroup.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprGroup.cpp
 
 CouenneCutGenerator.lo: convex/CouenneCutGenerator.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneCutGenerator.lo -MD -MP -MF "$(DEPDIR)/CouenneCutGenerator.Tpo" -c -o CouenneCutGenerator.lo `test -f 'convex/CouenneCutGenerator.cpp' || echo '$(srcdir)/'`convex/CouenneCutGenerator.cpp; \

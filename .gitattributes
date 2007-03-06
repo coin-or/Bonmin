@@ -27,6 +27,7 @@ Couenne/src/convex/generateCuts.cpp -text
 Couenne/src/convex/operators/conv-exprAbs.cpp -text
 Couenne/src/convex/operators/conv-exprDiv.cpp -text
 Couenne/src/convex/operators/conv-exprExp.cpp -text
+Couenne/src/convex/operators/conv-exprGroup.cpp -text
 Couenne/src/convex/operators/conv-exprInv.cpp -text
 Couenne/src/convex/operators/conv-exprLog.cpp -text
 Couenne/src/convex/operators/conv-exprMul.cpp -text
@@ -38,7 +39,6 @@ Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
 Couenne/src/convex/tightenBounds.cpp -text
-Couenne/src/convex/update_conv.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/exprVar.cpp -text
 Couenne/src/expression/expression.cpp -text
@@ -46,6 +46,7 @@ Couenne/src/expression/operators/exprAbs.cpp -text
 Couenne/src/expression/operators/exprCos.cpp -text
 Couenne/src/expression/operators/exprDiv.cpp -text
 Couenne/src/expression/operators/exprExp.cpp -text
+Couenne/src/expression/operators/exprGroup.cpp -text
 Couenne/src/expression/operators/exprInv.cpp -text
 Couenne/src/expression/operators/exprLog.cpp -text
 Couenne/src/expression/operators/exprMinMax.cpp -text
@@ -76,6 +77,7 @@ Couenne/src/include/operators/exprBMul.h -text
 Couenne/src/include/operators/exprCos.h -text
 Couenne/src/include/operators/exprDiv.h -text
 Couenne/src/include/operators/exprExp.h -text
+Couenne/src/include/operators/exprGroup.h -text
 Couenne/src/include/operators/exprInv.h -text
 Couenne/src/include/operators/exprLog.h -text
 Couenne/src/include/operators/exprMax.h -text

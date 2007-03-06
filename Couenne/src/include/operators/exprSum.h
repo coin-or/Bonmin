@@ -12,57 +12,57 @@
 #include <exprOp.h>
 
 
-//  class sum 
+///  class sum 
 
 class exprSum: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprSum  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   exprSum (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  ~exprSum () {}
+  ///  virtual ~exprSum () {}
 
-  // cloning method
-  expression *clone () const
+  /// cloning method
+  virtual expression *clone () const
     {return new exprSum (clonearglist (), nargs_);}
 
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprOp::name ("+");}
+  /// String equivalent (for comparisons)
+  virtual const std::string name () const {return exprOp::name ("+");}
 
-  // I/O
+  /// I/O
   virtual void print (std::ostream &) const;
 
-  // function for the evaluation of the expression
-  CouNumber operator () ();
+  /// function for the evaluation of the expression
+  virtual CouNumber operator () ();
 
-  // differentiation
-  expression *differentiate (int index); 
+  /// differentiation
+  virtual expression *differentiate (int index); 
 
-  // simplification
-  expression *simplify ();
+  /// simplification
+  virtual expression *simplify ();
 
-  // get a measure of "how linear" the expression is:
-  int Linearity ();
+  /// get a measure of "how linear" the expression is:
+  virtual int Linearity ();
 
-  // Get lower and upper bound of an expression (if any)
-  void getBounds (expression *&, expression *&);
+  /// Get lower and upper bound of an expression (if any)
+  virtual void getBounds (expression *&, expression *&);
 
-  // reduce expression in standard form, creating additional aux
-  // variables (and constraints)
+  /// reduce expression in standard form, creating additional aux
+  /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);
 
-  // generate equality between *this and *w
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-		     OsiCuts &cs, const CouenneCutGenerator *cg);
+  /// generate equality between *this and *w
+  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+			     OsiCuts &cs, const CouenneCutGenerator *cg);
 };
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprSum::operator () () {
 

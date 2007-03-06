@@ -35,6 +35,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
+	expression/operators/exprGroup.cpp \
 	expression/exprVar.cpp \
 	expression/expression.cpp \
 	simplify/simplifiers.cpp \
@@ -57,6 +58,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
+	convex/operators/conv-exprGroup.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
 	problem/problem.cpp \
@@ -147,6 +149,7 @@ include_HEADERS = \
 	include/operators/exprPow.h \
 	include/operators/exprSin.h \
 	include/operators/exprSub.h \
+	include/operators/exprGroup.h \
 	include/exprConst.h \
 	include/exprIVar.h \
 	include/exprVar.h \
