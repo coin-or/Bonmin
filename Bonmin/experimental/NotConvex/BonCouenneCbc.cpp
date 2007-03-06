@@ -126,7 +126,7 @@ namespace Bonmin
       return;
     }
 
-    if(ci == NULL)
+    if (ci == NULL)
 	std::cerr << "Can not run Couenne without a Couenne interface."
 		  << std::endl;
 
@@ -136,7 +136,11 @@ namespace Bonmin
 
     // say bound dubious, does cuts at solution
     OsiBabSolver * extraStuff = new OsiBabSolver(0);
-    si->setAuxiliaryInfo(extraStuff);
+
+    // as per instructions by John Forrest, to get changed bounds
+    extraStuff -> setExtraCharacteristics (extraStuff -> extraCharacteristics () | 2);
+
+    si -> setAuxiliaryInfo (extraStuff);
     delete extraStuff;
 
     //TODO : Switch to OsiObejcts
