@@ -13,6 +13,7 @@
 #include <exprSum.h>
 #include <exprMul.h>
 #include <exprClone.h>
+#include <exprGroup.h>
 
 #include "asl_pfgh.h"
 #include "nlp2.h"
@@ -87,7 +88,7 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   // objective functions /////////////////////////////////////////////////////////////
 
   for (int i = 0; i < n_obj; i++) {
-
+    /*
     int nterms = 0;
 
     real z0 = objconst (i);
@@ -140,9 +141,45 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     }
     else 
       body = new exprSum (al, term); 
+    */
 
-    expression *subst = body -> simplify ();
-    if (subst) body = subst;
+    ////////////////////////////////////////////////
+    int nterms = 0;
+
+    // count nonzero terms in linear part
+ 
+    for (ograd *objgrad = Ograd [i]; 
+	 objgrad; 
+	 objgrad = objgrad -> next) 
+	nterms++;
+
+    int       *index = new int       [nterms+1];
+    CouNumber *coeff = new CouNumber [nterms];
+
+    for (ograd *objgrad = Ograd [i]; objgrad; objgrad = objgrad -> next) {
+
+      *index++ = objgrad -> varno;
+      *coeff++ = objgrad -> coef;
+    }
+
+    *index = -1;
+
+    index -= nterms;
+    coeff -= nterms;
+
+    expression **nl = new expression * [1];
+
+    *nl = nl2e (OBJ_DE [i] . e);
+
+    expression *body = new exprGroup (objconst (i), index, coeff, nl, 1);
+
+    delete [] index;
+    delete [] coeff;
+
+    ///////////////////////////////////////////////////
+
+    //    expression *subst = body -> simplify ();
+    //    if (subst) body = subst;
 
     // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
@@ -219,7 +256,7 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   }
 
 
-  // set constraints' bound, sign and store nonlinear part ///////////////////////////////
+  // set constraints' bound and sign and store nonlinear part ///////////////////////////////
 
   for (int i = 0; i < n_con; i++) {
 
@@ -310,7 +347,6 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
     if (X0 && havex0 [i])
       x_ [i] = X0 [i]; 
     else {
-      //    for (int i=n_var; i--;) {
 
       CouNumber x, l = lb_ [i], u = ub_ [i];
 

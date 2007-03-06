@@ -149,7 +149,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   virtual bool doLocalSearch () const {return 0;}
 
   /// bound tightening
-  virtual void tightenBounds (const OsiSolverInterface &) const;
+  virtual int tightenBounds (const OsiSolverInterface &, char *) const;
 };
 
 #endif

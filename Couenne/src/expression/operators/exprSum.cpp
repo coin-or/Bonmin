@@ -24,8 +24,10 @@ expression *exprSum::simplify () {
     return ret;
   }
 
+  // from here on we assume the operands have been simplified
+
   CouNumber total     = 0;
-  bool   found_one = false;
+  bool      found_one = false;
 
   for (register int i=0; i<nargs_; i++) {
 
@@ -59,7 +61,7 @@ expression *exprSum::simplify () {
 
 expression *exprSum:: differentiate (int index) {
 
-  exprOp::differentiate (index);
+  //  exprOp::differentiate (index); // FIX IT: why is it called?
 
   expression **arglist = new expression * [nargs_];
 

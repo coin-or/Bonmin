@@ -117,17 +117,26 @@ void exprMul::print (std::ostream& out) const
 
 int exprMul::Linearity () {
 
-  int lin = arglist_ [0] -> Linearity ();
+  int lin0 = arglist_ [0] -> Linearity ();
+
+  if (lin0 >= NONLINEAR) return NONLINEAR;
+  if (lin0 == ZERO)      return ZERO;
 
   for (register int i=1; i<nargs_; i++) {
 
-    lin += arglist_ [i] -> Linearity ();
-    if (lin >= NONLINEAR) {
-      lin = NONLINEAR;
-      break;
+    int lin = arglist_ [i] -> Linearity ();
+
+    switch (lin) {
+    case NONLINEAR: return NONLINEAR;
+    case ZERO:      return ZERO;
+    case LINEAR:    lin0++; break;
+    case QUADRATIC: lin0 += 2; break;
+    default: break;
     }
+
+    if (lin0 >= NONLINEAR) return NONLINEAR;
   }
-  return lin;
+  return lin0;
 }
 
 

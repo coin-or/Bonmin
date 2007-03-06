@@ -24,62 +24,56 @@ class exprGroup: public exprSum {
 
  public:
 
-  // Constructor
-  exprGroup  (CouNumber c0, 
-		      int *index, CouNumber *coeff, 
-		      expression **al = NULL, int n = 0): 
-    exprSum (al, n),
-    c0_     (c0),
-    index_  (index),
-    coeff_  (coeff)  {} 
+  /// Constructor
+  exprGroup  (CouNumber, int *, CouNumber *, expression ** = NULL, int = 0);
 
-  // copy constructor
+  /// copy constructor
   exprGroup (const exprGroup &src);
 
-  // destructor
+  /// destructor
   virtual ~exprGroup () {
-    //    exprSum::~exprSum ();
+
     delete index_;
     delete coeff_;
   }
 
-  // cloning method
+  /// cloning method
   virtual expression *clone () const
     {return new exprGroup (*this);}
 
-  // String equivalent (for comparisons)
+  /// String equivalent (for comparisons)
   virtual const std::string name () const;
 
-  // I/O
+  /// I/O
   virtual void print (std::ostream &) const;
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   virtual CouNumber operator () ();
 
-  // differentiation
+  /// differentiation
   virtual expression *differentiate (int index); 
 
-  // simplification
+  /// simplification
   virtual expression *simplify ()
-    {return exprSum::simplify ();}
+    {exprOp::simplify (); return NULL;}
 
-  // get a measure of "how linear" the expression is:
+  /// get a measure of "how linear" the expression is:
   virtual int Linearity ();
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  // reduce expression in standard form, creating additional aux
-  // variables (and constraints)
+  /// reduce expression in standard form, creating additional aux
+  /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 };
 
 
-// compute sum
+/// compute sum of linear and nonlinear terms
 
 inline CouNumber exprGroup::operator () () {
 

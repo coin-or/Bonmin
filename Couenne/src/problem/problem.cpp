@@ -117,12 +117,12 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
     newpair.second = var = 
       // and corresponding auxiliary variable
       new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
+
     auxiliaries_ . push_back (var);
     auxMap_ -> insert (newpair);
   }
   else var = (*i).second; // otherwise, just return the entry's
 			  // auxiliary var. pointer
-
   return var;
 }
 

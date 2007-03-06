@@ -17,6 +17,18 @@
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
+
+  // contains variables whose bounds have changed due to branching,
+  // reduced cost fixing, or bound tightening below. To be used with
+  // malloc/realloc/free
+
+  int ncols = problem_ -> nVars () + 
+              problem_ -> nAuxs ();
+
+  char *chg_bds = NULL;
+
+  int nchanged = 0; // number of bounds changed;
+
   if (firstcall_) {
 
     // initialize auxiliary variables and bounds according to originals
@@ -57,25 +69,124 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	delete orc;
       }
     }
+  } else {
+
+    chg_bds = new char [ncols];
+
+    // fill it with zeros
+    for (register int i = ncols; i--;) *chg_bds++ = 0;
+    chg_bds -= ncols;
+
+    // not the first call to this procedure, meaning we can be
+    // anywhere in the B&B tree. Check, through the auxiliary
+    // information, which bounds have changed from the parent node.
+
+    OsiBabSolver *auxinfo = dynamic_cast <OsiBabSolver *> (si.getAuxiliaryInfo ());
+
+    if (auxinfo &&
+	(auxinfo -> extraCharacteristics () & 2)) {
+
+      // get previous bounds
+      const double * beforeLower = auxinfo -> beforeLower ();
+      const double * beforeUpper = auxinfo -> beforeUpper ();
+
+      if (beforeLower && beforeUpper) {
+
+	// get currentbounds
+	const double * nowLower = si.getColLower();
+	const double * nowUpper = si.getColUpper();
+
+	for (register int i=0; i < ncols; i++)
+
+	  if ((   nowLower [i] >= beforeLower[i] + COUENNE_EPS)
+	      || (nowUpper [i] <= beforeUpper[i] - COUENNE_EPS)) {
+	    chg_bds [i] = 1;
+	    nchanged++;
+	  }
+
+	//	if (nchanged)
+	//	  printf("%d bounds have changed\n", nchanged);
+
+      } else printf ("WARNING: could not access parent's bounds\n");
+    }
   }
 
-  // first of all, try to tighten the current relaxation by tightening
-  // the variables' bounds
+  // tighten the current relaxation by tightening the variables'
+  // bounds
 
-  tightenBounds (si);
+  nchanged = tightenBounds (si, chg_bds);
+
+  //  if (nchanged)
+  //    printf("%d bounds tightened\n", nchanged);
 
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
 
-  for (int i=0; i<problem_ -> nAuxs (); i++)
-    problem_ -> Aux (i) -> generateCuts (si, cs, this);
+  if (!chg_bds) // this is the first call to generateCuts, we have to
+		// generate cuts for all auxiliary variable
+    for (int i=0; i < problem_ -> nAuxs (); i++)
+      problem_ -> Aux (i) -> generateCuts (si, cs, this);
 
-  //  if (cs.sizeRowCuts ())
-  //    printf ("Couenne: %d convexifier cuts\n", cs.sizeRowCuts ());
+  else          // chg_bds contains the indices of the variables whose
+		// bounds have changes (a -1 follows the last element)
+    for (int i=0, j = problem_ -> nVars (); j < ncols; i++)
+      if ((chg_bds [j++]) && 
+	  (problem_ -> Aux (i) -> Image () -> Linearity () > LINEAR))
+	problem_ -> Aux (i) -> generateCuts (si, cs, this);
+
+  // change tightened bounds through OsiCuts
+
+  if (nchanged) {
+
+    int *indLow = new int [ncols], 
+        *indUpp = new int [ncols],
+         nLow, nUpp = nLow = 0;
+
+    CouNumber *bndLow = new CouNumber [nchanged],
+              *bndUpp = new CouNumber [nchanged];
+
+    const CouNumber 
+      *oldLow = si.getColLower (),
+      *oldUpp = si.getColUpper (),
+      *newLow = problem_ -> Lb (),
+      *newUpp = problem_ -> Ub ();
+
+    for (register int i=0; i<ncols; i++)
+
+      if (chg_bds [i]) {
+
+	CouNumber bd;
+
+	if ((bd = newLow [i]) > oldLow [i] + COUENNE_EPS) {
+	  indLow [nLow]   = i;
+	  bndLow [nLow++] = bd;
+	}
+
+	if ((bd = newUpp [i]) < oldUpp [i] - COUENNE_EPS) {
+	  indUpp [nUpp]   = i;
+	  bndUpp [nUpp++] = bd;
+	}
+      }
+
+    OsiColCut *cut = new OsiColCut;
+
+    if (cut) {
+      cut -> setLbs (nLow, indLow, bndLow);
+      cut -> setUbs (nUpp, indUpp, bndUpp);
+      cs.insert (cut);
+    }
+
+    delete cut;
+
+    delete [] bndLow; delete indLow;
+    delete [] bndUpp; delete indUpp;
+  }
 
   if (firstcall_) {
     firstcall_  = false;
     ntotalcuts_ = nrootcuts_ = cs.sizeRowCuts ();
   }
   else ntotalcuts_ += cs.sizeRowCuts ();
+
+  delete [] chg_bds;
 }

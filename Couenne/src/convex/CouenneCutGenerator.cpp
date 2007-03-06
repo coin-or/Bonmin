@@ -98,6 +98,7 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
     cs.insert (cut);
 }
 
+/// methods to get values of variables and bounds
 const CouNumber    CouenneCutGenerator::X   (int i) {return problem_ -> X  (i);}
 const CouNumber   &CouenneCutGenerator::Lb  (int i) {return problem_ -> Lb (i);}
 const CouNumber   &CouenneCutGenerator::Ub  (int i) {return problem_ -> Ub (i);}

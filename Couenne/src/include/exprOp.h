@@ -15,11 +15,11 @@
 #include <CouenneTypes.h>
 
 
-// general n-ary operator-type expression: requires argument list. All
-// non-unary and non-leaf operators, i.e., sum, subtraction,
-// multiplication, power, division, max, min, etc. are derived from
-// this class.
-//
+/// general n-ary operator-type expression: requires argument list. All
+/// non-unary and non-leaf operators, i.e., sum, subtraction,
+/// multiplication, power, division, max, min, etc. are derived from
+/// this class.
+///
 
 class exprOp: public expression {
 
@@ -30,11 +30,11 @@ class exprOp: public expression {
 
  public:
 
-  // node type
+  /// node type
   virtual inline enum nodeType Type () 
     {return N_ARY;}
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprOp (expression **arglist, int nargs):  //< non-leaf expression, with argument list 
     arglist_ (arglist),
     nargs_   (nargs)
@@ -47,76 +47,76 @@ class exprOp: public expression {
 
   ~exprOp ();
 
-  // copy constructor
+  /// copy constructor
   exprOp (const exprOp &e):
     arglist_ (new expression * [e.nArgs ()]),
     nargs_   (e.nArgs ()) {
 
   }
 
-  // cloning method
+  /// cloning method
   virtual expression *clone () const
     {return new exprOp (*this);}
 
-  // return argument list
+  /// return argument list
   inline expression **ArgList () const 
     {return arglist_;}
 
-  // return number of arguments
+  /// return number of arguments
   inline int nArgs () const 
     {return nargs_;}
 
-  // string equivalent
+  /// string equivalent
   virtual const std::string name () const;
   virtual const std::string name (const std::string &) const;
 
-  // I/O
+  /// I/O
   virtual void print (std::ostream &, const std::string &, enum pos) const;
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   virtual inline CouNumber operator () ();
 
-  // dependence on variable set
+  /// dependence on variable set
   virtual bool dependsOn (int *, int);
 
-  // simplification
+  /// simplification
   virtual expression *simplify ();
 
-  // clone argument list (for use with clone method
+  /// clone argument list (for use with clone method
   expression **clonearglist () const {
     expression **al = new expression * [nargs_];
-    for (int i=0; i<nargs_; i++)
+    for (register int i=0; i<nargs_; i++)
       al [i] = arglist_ [i] -> clone ();
     return al;
   }
 
-  // compress argument list
+  /// compress argument list
   int shrink_arglist (CouNumber, CouNumber);
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  /// get a measure of "how linear" the expression is:
+  ///
+  /// CONSTANT  = 0: a constant
+  /// LINEAR    = 1: linear
+  /// QUADRATIC = 2: quadratic
+  /// NONLINER  = 3: nonlinear non-quadratic
   virtual inline int Linearity ()
     {return NONLINEAR;}
 
   exprAux *standardize (CouenneProblem *);
 
-  // return an index to the variable's argument that is better fixed
-  // in a branching rule for solving a nonconvexity gap
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar () {return arglist_ [0];}
 };
 
 
-// expression evaluation -- n-ary operator (non-variable, non-constant)
+/// expression evaluation -- n-ary operator (non-variable, non-constant)
 
 inline CouNumber exprOp::operator () () {
 
-  // Fetch argument list and compute it "recursively" (the operator()
-  // of the elements in the list is called) to fill in the vector
-  // containing the numerical value of the argument list.
+  /// Fetch argument list and compute it "recursively" (the operator()
+  /// of the elements in the list is called) to fill in the vector
+  /// containing the numerical value of the argument list.
 
   register expression **al = arglist_;
 

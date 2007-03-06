@@ -11,7 +11,7 @@
 #define COUENNE_TYPES_H
 
 enum nodeType       {CONST=0, VAR, UNARY, N_ARY, COPY, AUX, EMPTY};
-enum linearity_type {CONSTANT = 0, LINEAR, QUADRATIC, NONLINEAR};
+enum linearity_type {ZERO=0, CONSTANT, LINEAR, QUADRATIC, NONLINEAR};
 enum pos            {PRE=0, POST, INSIDE, NONE};
 enum con_sign       {COUENNE_EQ, COUENNE_LE, COUENNE_GE, COUENNE_RNG};
 enum opt_sense      {MAXIMIZE, MINIMIZE};

@@ -1,3 +1,4 @@
+- rank in expressions for branching
 - documentation
 - improve convexification of x/y
 - linear combination plus aux. vars into one single aux

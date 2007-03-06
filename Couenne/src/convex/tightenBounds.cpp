@@ -14,7 +14,10 @@
 
 /// Bound tightening
 
-void CouenneCutGenerator::tightenBounds (const OsiSolverInterface &si) const {
+int CouenneCutGenerator::tightenBounds (const OsiSolverInterface &si, 
+					char *chg_bds) const {
+
+  int nchg = 0; //< number of bounds changed for propagation
 
   // Retrieve, from si, value and bounds of all variables, if not
   // firstcall, otherwise only those of the original ones Update
@@ -51,7 +54,7 @@ void CouenneCutGenerator::tightenBounds (const OsiSolverInterface &si) const {
 
     for (register int i = problem_ -> nVars (), j=0; 
 	 j < naux; j++) {
-    
+
       CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
       CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
 
@@ -69,6 +72,11 @@ void CouenneCutGenerator::tightenBounds (const OsiSolverInterface &si) const {
 	found_one = true;
       }
 
+      if (found_one && chg_bds && !(chg_bds [i+j])) {
+	nchg++;
+	chg_bds [i+j] = 1;
+      }
+
       expression::update (xc, lc, uc);
     }
 
@@ -76,4 +84,6 @@ void CouenneCutGenerator::tightenBounds (const OsiSolverInterface &si) const {
 
   // update again 
   problem_ -> update (xc, lc, uc);
+
+  return nchg;
 }
