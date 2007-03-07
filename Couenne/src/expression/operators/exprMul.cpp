@@ -110,10 +110,11 @@ void exprMul::print (std::ostream& out) const
 
 // get a measure of "how linear" the expression is:
 //
-// CONSTANT  = 0: a constant
-// LINEAR    = 1: linear
-// QUADRATIC = 2: quadratic
-// NONLINER  = 3: nonlinear non-quadratic
+// ZERO      = 0: constant 0
+// CONSTANT  = 1: a constant
+// LINEAR    = 2: linear
+// QUADRATIC = 3: quadratic
+// NONLINER  = 4: nonlinear non-quadratic
 
 int exprMul::Linearity () {
 

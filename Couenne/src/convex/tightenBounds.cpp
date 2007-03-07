@@ -11,8 +11,13 @@
 #include <CouenneCutGenerator.h>
 #include <CouenneProblem.h>
 
+inline CouNumber mymin (CouNumber a, CouNumber b) 
+{return (a<b) ? a : b;} 
 
-/// Bound tightening
+inline CouNumber mymax (CouNumber a, CouNumber b) 
+{return (a>b) ? a : b;} 
+
+/// Bound tightening for auxiliary variables
 
 int CouenneCutGenerator::tightenBounds (const OsiSolverInterface &si, 
 					char *chg_bds) const {
@@ -58,24 +63,36 @@ int CouenneCutGenerator::tightenBounds (const OsiSolverInterface &si,
       CouNumber ll = (*(problem_ -> Aux (j) -> Lb ())) ();
       CouNumber uu = (*(problem_ -> Aux (j) -> Ub ())) ();
 
+      //      printf ("x%3d: [%12.4f,%12.4f] -> [%12.4f,%12.4f] ", 
+      //	      i+j, lc [i+j], uc [i+j], ll, uu);
+
+      bool chg = false;
+
       // check if lower bound got higher    
-      if (ll > lc [i+j]) {
-	psi -> setColLower (i+j, ll);
+      if (ll >= lc [i+j] + COUENNE_EPS) {
+	//	psi -> setColLower (i+j, ll);
+	//	printf ("l");
 	lc [i+j] = ll;
-	found_one = true;
+	chg = true;
       }
 
       // check if upper bound got lower
-      if (uu < uc [i+j]) {
-	psi -> setColUpper (i+j, uu);
+      if (uu <= uc [i+j] - COUENNE_EPS) {
+	//	psi -> setColUpper (i+j, uu);
+	//	printf ("u");
 	uc [i+j] = uu;
-	found_one = true;
+	chg = true;
       }
 
-      if (found_one && chg_bds && !(chg_bds [i+j])) {
+      if (chg && chg_bds && !(chg_bds [i+j])) {
 	nchg++;
-	chg_bds [i+j] = 1;
+	found_one = true;
+	chg_bds [i+j] = 1; 
+	//	printf (" ");
+	//	problem_ -> Aux (j) -> Image () -> print (std::cout);
       }
+
+      //      printf ("\n");
 
       expression::update (xc, lc, uc);
     }

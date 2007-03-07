@@ -12,6 +12,9 @@
 
 #include <iostream>
 #include <exprVar.h>
+#include <exprBound.h>
+#include <exprMax.h>
+#include <exprMin.h>
 #include <CouenneTypes.h>
 #include <CglCutGenerator.hpp>
 
@@ -103,8 +106,12 @@ class exprAux: public exprVar {
     /*return image_ -> Linearity ();*/}
 
   // Get lower and upper bound of an expression (if any)
-  inline void getBounds (expression *&lb, expression *&ub) 
-    {image_ -> getBounds (lb, ub);}
+  inline void getBounds (expression *&lb, expression *&ub) {
+    expression *lb0, *ub0;
+    image_ -> getBounds (lb0, ub0);
+    lb = new exprMax (lb0, new exprLowerBound (varIndex_)); 
+    ub = new exprMin (ub0, new exprUpperBound (varIndex_));
+  }
 
   // generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &, 
