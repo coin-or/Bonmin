@@ -141,9 +141,7 @@ void CouenneProblem::standardize () {
        i != objectives_.end (); i++) {
 
     exprAux *aux = (*i) -> standardize (this);
-
-    if (aux)
-      (*i) -> Body (new exprClone (aux));
+    if (aux) (*i) -> Body (new exprClone (aux));
   }
 
   // standardize constraints
@@ -152,9 +150,7 @@ void CouenneProblem::standardize () {
        i != constraints_.end (); i++) {
 
     exprAux *aux = (*i) -> standardize (this);
-
-    if (aux)
-      (*i) -> Body (new exprClone (aux));
+    if (aux) (*i) -> Body (new exprClone (aux));
   }
 
   delete auxMap_;
@@ -250,6 +246,14 @@ void CouenneProblem::initAuxs (CouNumber *x,
   update (x, l, u, nVars ());
 
   int nAux = nAuxs ();
+
+  // initially, auxiliary variables are unbounded, their bounds only
+  // depending on their function
+
+  for (register int i=nVars (), j=nAux; j--; i++)
+    lb_ [i] = - (ub_ [i] = COUENNE_INFINITY);
+
+  expression::update (x_, lb_, ub_);
 
   // only one loop is sufficient here, since auxiliary variable are
   // defined in such a way that w_i does NOT depend on w_j if i<j.

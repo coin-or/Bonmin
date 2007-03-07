@@ -1,7 +1,7 @@
 - rank in expressions for branching
 - documentation
 - improve convexification of x/y
-- linear combination plus aux. vars into one single aux
+- linear combination plus aux. vars into one single aux - extend to constraints
 - improve bounding box with upper bound
 - add integrality to bound check
 - order in convexifying x*y*z*...*(1/w)*(1/t)*...

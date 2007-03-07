@@ -37,10 +37,10 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp \
 	expression/exprVar.cpp \
+	expression/exprAux.cpp \
 	expression/expression.cpp \
 	simplify/simplifiers.cpp \
 	simplify/simplify.cpp \
-	convex/tightenBounds.cpp \
 	convex/addEnvelope.cpp \
 	convex/createCuts.cpp \
 	convex/conv-exprOp.cpp \
@@ -64,6 +64,7 @@ libCouenne_la_SOURCES = \
 	problem/problem.cpp \
 	problem/problemIO.cpp \
 	problem/constraint.cpp \
+	problem/tightenBounds.cpp \
 	util/rootQ.c
 
 COINLIBS = \

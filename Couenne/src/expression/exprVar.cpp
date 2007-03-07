@@ -51,16 +51,3 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((cut = cg -> createCut (0., 0, w -> Index (), 1., varIndex_)))
     cs.insert (cut);
 }
-
-
-// auxiliary expression Constructor
-
-exprAux::exprAux (expression *image, int index): 
-
-  exprVar (index),
-  image_  (image) {
-
-  image_ -> getBounds (lb_, ub_);
-  //  lb_ = new exprConst (- COUENNE_INFINITY);
-  //  ub_ = new exprConst (  COUENNE_INFINITY);
-}

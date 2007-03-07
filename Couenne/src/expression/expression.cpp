@@ -109,34 +109,6 @@ void expression::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// generate cuts for expression associated with this auxiliary
-
-void exprAux::generateCuts (const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
-
-  int j = cs.sizeRowCuts ();
-
-  CouNumber l = expression::Lbound (varIndex_),
-            u = expression::Ubound (varIndex_);
-
-  if (fabs (u-l) < COUENNE_EPS) {
-    OsiRowCut *cut = cg -> createCut (l, 0, varIndex_, 1.);
-    if (cut) cs.insert (cut);
-  } else image_ -> generateCuts (this, si, cs, cg);
-
-  //  if (!(cg -> isFirst ())) 
-  //  if (j < cs.sizeRowCuts ())
-  if (0)
-    {
-      printf ("----------------Generated cut for "); 
-      print (std::cout);  printf (" := ");
-      image_ -> print (std::cout); printf("\n");
-      for (;j < cs.sizeRowCuts ();j++)
-	cs.rowCutPtr (j) -> print ();
-    }
-}
-
-
 // generate one cut for a constant
 
 void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si, 
@@ -205,7 +177,7 @@ const std::string exprUnary::name (const std::string &op) const {
 
   s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
   std::string ret (1 + strlen (s), ' ');
-  for (int register i=strlen (s); i>=0; i--)
+  for (int register i=strlen (s); i--;) // no need to set eos
     ret [i] = s [i]; 
   free (s);
   return ret;
@@ -225,7 +197,7 @@ const std::string exprOp::name (const std::string &op) const {
 
   s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
   std::string ret (1 + strlen (s), ' ');
-  for (register int i=strlen (s); i>=0; i--)
+  for (register int i=strlen (s); i--;) // no need to set eos
     ret [i] = s [i]; 
   free (s);
   return ret;

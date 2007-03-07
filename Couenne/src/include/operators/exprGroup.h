@@ -69,7 +69,7 @@ class exprGroup: public exprSum {
 
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-		     OsiCuts &cs, const CouenneCutGenerator *cg);
+			     OsiCuts &cs, const CouenneCutGenerator *cg);
 };
 
 

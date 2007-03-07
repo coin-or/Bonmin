@@ -18,6 +18,8 @@
 
 exprAux *exprSum::standardize (CouenneProblem *p) {
 
+  //  printf ("exprSum::standardize\n");
+
   // TODO: Try a different approach. FLATTEN sum and reduce it to
   // something similar to a psg_elem: a sum of linear terms plus a
   // constant plus some nonlinear terms. (It only makes sense when
@@ -41,6 +43,8 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   if (!(cg -> isFirst ()))
     return;
+
+  //  printf ("exprSum::genCuts()\n");
 
   CouNumber *coeff = new CouNumber [nargs_ + 1];
   int       *index = new int       [nargs_ + 1];

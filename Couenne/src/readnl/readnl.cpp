@@ -148,38 +148,50 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
     // count nonzero terms in linear part
  
-    for (ograd *objgrad = Ograd [i]; 
-	 objgrad; 
-	 objgrad = objgrad -> next) 
+    for (ograd *objgrad = Ograd [i];
+	 objgrad;
+	 objgrad = objgrad -> next)
+      if (fabs (objgrad -> coef) > COUENNE_EPS)
 	nterms++;
 
-    int       *index = new int       [nterms+1];
-    CouNumber *coeff = new CouNumber [nterms];
+    expression *body;
 
-    for (ograd *objgrad = Ograd [i]; objgrad; objgrad = objgrad -> next) {
+    expression *nl = nl2e (OBJ_DE [i] . e);
 
-      *index++ = objgrad -> varno;
-      *coeff++ = objgrad -> coef;
-    }
+    if (nterms) {
 
-    *index = -1;
+      int       *index = new int       [nterms+1];
+      CouNumber *coeff = new CouNumber [nterms];
 
-    index -= nterms;
-    coeff -= nterms;
+      for (ograd *objgrad = Ograd [i]; objgrad; objgrad = objgrad -> next)
+	if (fabs (objgrad -> coef) > COUENNE_EPS) {
 
-    expression **nl = new expression * [1];
+	  *index++ = objgrad -> varno;
+	  *coeff++ = objgrad -> coef;
+	}
 
-    *nl = nl2e (OBJ_DE [i] . e);
+      *index = -1;
 
-    expression *body = new exprGroup (objconst (i), index, coeff, nl, 1);
+      index -= nterms;
+      coeff -= nterms;
 
-    delete [] index;
-    delete [] coeff;
+      expression **nll = new expression * [1];
+
+      *nll = nl;
+
+      body = new exprGroup (objconst (i), index, coeff, nll, 1);
+
+      delete [] index;
+      delete [] coeff;
+    } else 
+      if (fabs (objconst (i) > COUENNE_EPS))
+	body = new exprSum (nl, new exprConst (objconst (i)));
+      else body = nl;
 
     ///////////////////////////////////////////////////
 
-    //    expression *subst = body -> simplify ();
-    //    if (subst) body = subst;
+    expression *subst = body -> simplify ();
+    if (subst) body = subst;
 
     // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");

@@ -122,6 +122,9 @@ class CouenneProblem {
   /// initialize auxiliary variables and their bounds from original
   /// variables
   void initAuxs (CouNumber *, CouNumber *, CouNumber *);
+
+  /// bound tightening
+  int tightenBounds (const OsiSolverInterface &, char *) const;
 };
 
 

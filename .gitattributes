@@ -38,8 +38,8 @@ Couenne/src/convex/operators/conv-exprPow.cpp -text
 Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
-Couenne/src/convex/tightenBounds.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
+Couenne/src/expression/exprAux.cpp -text
 Couenne/src/expression/exprVar.cpp -text
 Couenne/src/expression/expression.cpp -text
 Couenne/src/expression/operators/exprAbs.cpp -text
@@ -92,6 +92,7 @@ Couenne/src/include/rootQ.h -text
 Couenne/src/problem/constraint.cpp -text
 Couenne/src/problem/problem.cpp -text
 Couenne/src/problem/problemIO.cpp -text
+Couenne/src/problem/tightenBounds.cpp -text
 Couenne/src/readnl/fix_asl_group.c -text
 Couenne/src/readnl/invmap.c -text
 Couenne/src/readnl/nl2e.cpp -text

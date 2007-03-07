@@ -90,8 +90,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp expression/exprVar.cpp \
-	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/tightenBounds.cpp \
+	expression/exprAux.cpp expression/expression.cpp \
+	simplify/simplifiers.cpp simplify/simplify.cpp \
 	convex/addEnvelope.cpp convex/createCuts.cpp \
 	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
 	convex/operators/conv-exprAbs.cpp \
@@ -110,24 +110,25 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp util/rootQ.c readnl/readnl.cpp \
-	readnl/nl2e.cpp readnl/invmap.c readnl/fix_asl_group.c
+	problem/constraint.cpp problem/tightenBounds.cpp util/rootQ.c \
+	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c \
+	readnl/fix_asl_group.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
 @COIN_HAS_ASL_TRUE@	fix_asl_group.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
 	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
 	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
-	exprSum.lo exprMinMax.lo exprGroup.lo exprVar.lo expression.lo \
-	simplifiers.lo simplify.lo tightenBounds.lo addEnvelope.lo \
+	exprSum.lo exprMinMax.lo exprGroup.lo exprVar.lo exprAux.lo \
+	expression.lo simplifiers.lo simplify.lo addEnvelope.lo \
 	createCuts.lo conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
 	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
 	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo conv-exprGroup.lo CouenneCutGenerator.lo \
-	generateCuts.lo problem.lo problemIO.lo constraint.lo rootQ.lo \
-	$(am__objects_1)
+	generateCuts.lo problem.lo problemIO.lo constraint.lo \
+	tightenBounds.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -348,8 +349,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp expression/exprVar.cpp \
-	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/tightenBounds.cpp \
+	expression/exprAux.cpp expression/expression.cpp \
+	simplify/simplifiers.cpp simplify/simplify.cpp \
 	convex/addEnvelope.cpp convex/createCuts.cpp \
 	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
 	convex/operators/conv-exprAbs.cpp \
@@ -368,7 +369,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp util/rootQ.c $(am__append_1)
+	problem/constraint.cpp problem/tightenBounds.cpp util/rootQ.c \
+	$(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -553,6 +555,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprUnary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprAbs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprAux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprCos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprExp.Plo@am__quote@
@@ -777,6 +780,13 @@ exprVar.lo: expression/exprVar.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprVar.lo `test -f 'expression/exprVar.cpp' || echo '$(srcdir)/'`expression/exprVar.cpp
 
+exprAux.lo: expression/exprAux.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprAux.lo -MD -MP -MF "$(DEPDIR)/exprAux.Tpo" -c -o exprAux.lo `test -f 'expression/exprAux.cpp' || echo '$(srcdir)/'`expression/exprAux.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprAux.Tpo" "$(DEPDIR)/exprAux.Plo"; else rm -f "$(DEPDIR)/exprAux.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/exprAux.cpp' object='exprAux.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprAux.lo `test -f 'expression/exprAux.cpp' || echo '$(srcdir)/'`expression/exprAux.cpp
+
 expression.lo: expression/expression.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT expression.lo -MD -MP -MF "$(DEPDIR)/expression.Tpo" -c -o expression.lo `test -f 'expression/expression.cpp' || echo '$(srcdir)/'`expression/expression.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/expression.Tpo" "$(DEPDIR)/expression.Plo"; else rm -f "$(DEPDIR)/expression.Tpo"; exit 1; fi
@@ -797,13 +807,6 @@ simplify.lo: simplify/simplify.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='simplify/simplify.cpp' object='simplify.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o simplify.lo `test -f 'simplify/simplify.cpp' || echo '$(srcdir)/'`simplify/simplify.cpp
-
-tightenBounds.lo: convex/tightenBounds.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tightenBounds.lo -MD -MP -MF "$(DEPDIR)/tightenBounds.Tpo" -c -o tightenBounds.lo `test -f 'convex/tightenBounds.cpp' || echo '$(srcdir)/'`convex/tightenBounds.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/tightenBounds.Tpo" "$(DEPDIR)/tightenBounds.Plo"; else rm -f "$(DEPDIR)/tightenBounds.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/tightenBounds.cpp' object='tightenBounds.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tightenBounds.lo `test -f 'convex/tightenBounds.cpp' || echo '$(srcdir)/'`convex/tightenBounds.cpp
 
 addEnvelope.lo: convex/addEnvelope.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT addEnvelope.lo -MD -MP -MF "$(DEPDIR)/addEnvelope.Tpo" -c -o addEnvelope.lo `test -f 'convex/addEnvelope.cpp' || echo '$(srcdir)/'`convex/addEnvelope.cpp; \
@@ -965,6 +968,13 @@ constraint.lo: problem/constraint.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/constraint.cpp' object='constraint.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o constraint.lo `test -f 'problem/constraint.cpp' || echo '$(srcdir)/'`problem/constraint.cpp
+
+tightenBounds.lo: problem/tightenBounds.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tightenBounds.lo -MD -MP -MF "$(DEPDIR)/tightenBounds.Tpo" -c -o tightenBounds.lo `test -f 'problem/tightenBounds.cpp' || echo '$(srcdir)/'`problem/tightenBounds.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/tightenBounds.Tpo" "$(DEPDIR)/tightenBounds.Plo"; else rm -f "$(DEPDIR)/tightenBounds.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/tightenBounds.cpp' object='tightenBounds.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tightenBounds.lo `test -f 'problem/tightenBounds.cpp' || echo '$(srcdir)/'`problem/tightenBounds.cpp
 
 readnl.lo: readnl/readnl.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readnl.lo -MD -MP -MF "$(DEPDIR)/readnl.Tpo" -c -o readnl.lo `test -f 'readnl/readnl.cpp' || echo '$(srcdir)/'`readnl/readnl.cpp; \

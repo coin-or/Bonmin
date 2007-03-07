@@ -45,9 +45,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // their current value.
 
     // add auxiliary variables, unbounded for now
-    for (register int i=problem_ -> nAuxs (); i--;)
+    for (register int i = problem_ -> nVars (), 
+	              j = problem_ -> nAuxs (); j--; i++)
       const_cast <OsiSolverInterface *> (&si) -> addCol 
-	(0, NULL, NULL, - COUENNE_INFINITY, COUENNE_INFINITY, 0);
+	(0, NULL, NULL, problem_ -> Lb (i), problem_ -> Ub (i), 0);
 
     // For each auxiliary variable replacing the original (nonlinear)
     // constraints, check if corresponding bounds are violated, and
@@ -72,6 +73,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
   } else { // equivalent to info.depth > 0
+
+    if (info.pass == 0) // this is the first call in this b&b node
+      problem_ -> update (const_cast <CouNumber *> (si. getColSolution ()), 
+			  const_cast <CouNumber *> (si. getColLower    ()),
+			  const_cast <CouNumber *> (si. getColUpper    ()));
 
     chg_bds = new char [ncols];
 
@@ -104,14 +110,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	    if ((   nowLower [i] >= beforeLower [i] + COUENNE_EPS)
 		|| (nowUpper [i] <= beforeUpper [i] - COUENNE_EPS)) {
-	      //	    printf ("x%d bound changed: [%12.4f,%12.4f] -> [%12.4f,%12.4f] ", i,
-	      //		    beforeLower [i], beforeUpper [i], 
-	      //		    nowLower    [i], nowUpper    [i]);
+	      //	      printf ("x%d bound changed: [%12.4f,%12.4f] -> [%12.4f,%12.4f] ", i,
+	      //		      beforeLower [i], beforeUpper [i], 
+	      //		      nowLower    [i], nowUpper    [i]);
 
-	      //	    if (i >= problem_ -> nVars())
-	      //	      problem_ -> Aux (i - problem_ -> nVars ()) 
-	      //                       -> Image () -> print (std::cout);
-	      //	    printf ("\n");
+	      //	      if (i >= problem_ -> nVars ())
+	      //		problem_ -> Aux (i - problem_ -> nVars ()) 
+	      //		         -> Image () -> print (std::cout);
+	      //	      printf ("\n");
 
 	      chg_bds [i] = 1;
 	      nchanged++;
@@ -125,10 +131,21 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
+  //  for (register int i=0; i < ncols; i++)
+  //    printf ("x%3d: [%12.4f,%12.4f]\n", i,
+  //	    expression::Lbound (i), 
+  //	    expression::Ubound (i));
+
   // tighten the current relaxation by tightening the variables'
   // bounds
 
-  nchanged = tightenBounds (si, chg_bds);
+  nchanged = problem_ -> tightenBounds (si, chg_bds);
+
+  //  printf ("::::::::::::::::::::::::::::::::::::::::::::::\n");
+  //  for (register int i=0; i < ncols; i++)
+  //    printf ("x%3d: [%12.4f,%12.4f]\n", i,
+  //	    expression::Lbound (i), 
+  //	    expression::Ubound (i));
 
   //  if (nchanged)
   //    printf("%d bounds tightened\n", nchanged);

@@ -112,6 +112,10 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // now add linear terms
   for (register int i=0; i<nlin; i++) {
 
+    //    printf ("(%d,%f) <= (%d,%f)\n", 
+    //	    index  [i+1], coeff  [i+1],
+    //	    index_ [i],   coeff_ [i]);
+
     coeff [i+1] = coeff_ [i]; 
     index [i+1] = index_ [i];
   }
