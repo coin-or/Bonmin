@@ -13,7 +13,9 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library in this directory
-noinst_LTLIBRARIES = libamplinterface.la
+if COIN_HAS_ASL
+  noinst_LTLIBRARIES = libamplinterface.la
+endif
 
 # List all source files, including headers
 libamplinterface_la_SOURCES = \

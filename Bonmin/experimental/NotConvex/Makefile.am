@@ -8,7 +8,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-bin_PROGRAMS = fun
+if COIN_HAS_ASL
+  bin_PROGRAMS = fun
+endif
 
 COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \

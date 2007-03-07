@@ -60,6 +60,7 @@ libamplinterface_la_LIBADD =
 am_libamplinterface_la_OBJECTS = BonAmplInterface.lo BonAmplTMINLP.lo \
 	sos_kludge.lo
 libamplinterface_la_OBJECTS = $(am_libamplinterface_la_OBJECTS)
+@COIN_HAS_ASL_TRUE@am_libamplinterface_la_rpath =
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -318,7 +319,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library in this directory
-noinst_LTLIBRARIES = libamplinterface.la
+@COIN_HAS_ASL_TRUE@noinst_LTLIBRARIES = libamplinterface.la
 
 # List all source files, including headers
 libamplinterface_la_SOURCES = \
@@ -408,7 +409,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libamplinterface.la: $(libamplinterface_la_OBJECTS) $(libamplinterface_la_DEPENDENCIES) 
-	$(CXXLINK)  $(libamplinterface_la_LDFLAGS) $(libamplinterface_la_OBJECTS) $(libamplinterface_la_LIBADD) $(LIBS)
+	$(CXXLINK) $(am_libamplinterface_la_rpath) $(libamplinterface_la_LDFLAGS) $(libamplinterface_la_OBJECTS) $(libamplinterface_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
