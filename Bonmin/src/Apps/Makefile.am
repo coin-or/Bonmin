@@ -10,8 +10,9 @@ AUTOMAKE_OPTIONS = foreign
 
 # What is done in this directory:
 
-bin_PROGRAMS = bonmin nodeSolver 
-
+if COIN_HAS_ASL
+  bin_PROGRAMS = bonmin nodeSolver 
+endif
 
 lib_LTLIBRARIES = libbonmin.la
 
