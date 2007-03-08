@@ -82,7 +82,7 @@ const std::string exprGroup::name () const {
 
   s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
   std::string ret (1 + strlen (s), ' ');
-  for (register int i=strlen (s); i>=0; i--)
+  for (register int i=strlen (s); i--;)
     ret [i] = s [i]; 
 
   free (s);

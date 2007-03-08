@@ -7,6 +7,9 @@
  * This file is licensed under the Common Public License.
  */
 
+// for profiling
+#include <sys/time.h>
+
 #include <OsiRowCut.hpp>
 #include <BonOaDecBase.hpp>
 #include <CglCutGenerator.hpp>
@@ -39,10 +42,20 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 
   problem_ = new CouenneProblem;
 
+  //  double now = CoinCpuTime ();
+
   problem_ -> readnl      (asl);
+
+  //  printf ("reading time: %.3fs\n", CoinCpuTime () - now);
+
+  //  now = CoinCpuTime ();
+
   //  problem_ -> print (std::cout);
   //  printf ("======================================\n");
   problem_ -> standardize ();
+
+  //  printf ("standardization time: %.3fs\n", CoinCpuTime () - now);
+
   //  problem_ -> print (std::cout);
   //  printf ("======================================\n");
 

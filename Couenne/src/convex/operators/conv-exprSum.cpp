@@ -44,8 +44,6 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if (!(cg -> isFirst ()))
     return;
 
-  //  printf ("exprSum::genCuts()\n");
-
   CouNumber *coeff = new CouNumber [nargs_ + 1];
   int       *index = new int       [nargs_ + 1];
   OsiRowCut *cut   = new OsiRowCut;

@@ -57,6 +57,8 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   for (int i = n_intvar; i--;)
     addVariable (true);
 
+  //  printf ("readln: added %d (%d + %d) variables\n", n_var, n_var - n_intvar, n_intvar);
+
   // create room for problem's variables and bounds
   x_  = (CouNumber *) malloc (n_var * sizeof (CouNumber));
   lb_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
@@ -69,7 +71,18 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
   for (int k=0; k<n_obj; k++)
     if ((asl -> P. ops [k]. nb) || (asl -> P. ops [k]. ng)) {
+      /*
+      printf ("obj %d: %d nb, %d ng\n", k, 
+	      asl -> P. ops [k]. nb, 
+	      asl -> P. ops [k]. ng);
 
+      for (int i=0; i<asl -> P. ops [k]. nb; i++) {
+
+	printf ("Group %d, obj %d: %x  ", i, k, asl -> P. ops [k]. b[i].D.e);
+	nl2e(asl -> P. ops [k]. b[i].D.e) -> print (std::cout);
+	printf ("\n");
+      }
+      */
       int ngroups = asl -> P. ops [k]. ng;
       for (int i=0; i<ngroups; i++)
 	fix_asl_group (&(asl -> P. ops [k]. g [i]));
@@ -79,7 +92,18 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
   for (int k=0; k<n_con; k++)
     if ((asl -> P. cps [k]. nb) || (asl -> P. cps [k]. ng)) {
+      /*
+      printf ("con %d: %d nb, %d ng\n", k, 
+	      asl -> P. cps [k]. nb, 
+	      asl -> P. cps [k]. ng);
 
+      for (int i=0; i<asl -> P. cps [k]. nb; i++) {
+
+	printf ("Group %d, obj %d: %x  ", i, k, asl -> P. cps [k]. b[i].D.e);
+	nl2e(asl -> P. cps [k]. b[i].D.ee) -> print (std::cout);
+	printf ("\n");
+      }
+      */
       int ngroups = asl -> P. cps [k]. ng;
       for (int i=0; i<ngroups; i++)
 	fix_asl_group (&(asl -> P. cps [k]. g [i]));

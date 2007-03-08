@@ -59,8 +59,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");
-      image_ -> print (std::cout); printf (" -- \n");
-      std::cout << image_ -> name ();
+      image_ -> print (std::cout); 
       printf("\n");
       for (;j < cs.sizeRowCuts ();j++)
 	cs.rowCutPtr (j) -> print ();

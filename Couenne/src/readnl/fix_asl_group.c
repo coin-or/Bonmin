@@ -59,6 +59,8 @@ void fix_asl_group (psg_elem *g) {
   sum     = (expr  *) malloc (sizeof (expr));
 
   arglist [nterms] = malloc (sizeof (expr));
+
+  /* save current operand hidden after the last position */
   arglist [nterms] -> op = g -> ge -> L.e -> op;
 
   sum -> L.ep = arglist;

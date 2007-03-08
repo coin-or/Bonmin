@@ -117,15 +117,20 @@ expression *CouenneProblem::nl2e (expr2 *e) {
   case OPIFSYM:   return notimpl ("ifsym");
   case OPHOL:     return notimpl ("hol");
   case OPVARVAL:  
-    // check if index is above number of variables
-    // (should never happen, but it depends on some map [] in pfg_read.c)
-    if ((j = ((expr2_v *) e) -> a) >= nVars ()) 
-      for (int i=nVars(); i<=j; i++)
-	addVariable (false);
+    // check if index is above number of variables (depending on
+    // psb_elem groups in asl)
+    if ((j = ((expr2_v *) e) -> a) >= nVars ()) {
+
+      printf ("ERROR: added %d fake variables\nAborting...", j-nVars()+1);
+      exit (-1);
+      //      for (int i=nVars(); i<=j; i++)
+      //	addVariable (false);
+    }
     return new exprClone (variables_ [j]);
 
   case -1:
-  default: printf ("WARNING: unknown operator (address %x)\n", (long int) e -> op); 
+  default: printf ("ERROR: unknown operator (address %x)\nAborting...", (long int) e -> op); 
+    exit (-1);
     return new exprConst (0);
   }
 }

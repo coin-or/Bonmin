@@ -81,7 +81,8 @@ int main (int argc, char **argv) {
   // create cut generator (the second parameter equal to true means
   // that only violated cuts should be generated)
   CouenneCutGenerator *cg = new CouenneCutGenerator 
-    ((ASL_pfgh *) asl,  // ASL interface to the problem
+    (NULL,
+     (ASL_pfgh *) asl,  // ASL interface to the problem
      false,             // Do we want to get the violated cuts only?
      CURRENT_ONLY,      // how should convexification pick their sampling point 
      4);                // how many samples?
