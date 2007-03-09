@@ -72,9 +72,6 @@ class exprAux: public exprVar {
   expression *Lb () {return lb_;}
   expression *Ub () {return ub_;}
 
-  // string equivalent
-  const std::string name () const;
-
   // I/O
   void print (std::ostream &out) const
     {out << "w_" << varIndex_;}
@@ -95,12 +92,7 @@ class exprAux: public exprVar {
   inline bool dependsOn (int *indices, int num) 
     {return image_ -> dependsOn (indices, num);}
 
-  // Get a measure of "how linear" the expression is:
-  //
-  // 0: a constant
-  // 1: linear
-  // 2: quadratic
-  // 3: nonlinear non-quadratic
+  // Get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
     {return LINEAR;
     /*return image_ -> Linearity ();*/}

@@ -26,14 +26,9 @@ class exprDiv: public exprOp {
   exprDiv (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  //  ~exprDiv () {}
-
   // cloning method
   expression *clone () const
     {return new exprDiv (clonearglist (), nargs_);}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprOp::name ("/");}
 
   // I/O
   void print (std::ostream&) const;
@@ -47,12 +42,7 @@ class exprDiv: public exprOp {
   // simplification
   expression *simplify ();
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity () {
 
     if (arglist_ [1] -> Type () == CONST)
@@ -74,6 +64,9 @@ class exprDiv: public exprOp {
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
   expression *getFixVar ();
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRDIV;}
 };
 
 

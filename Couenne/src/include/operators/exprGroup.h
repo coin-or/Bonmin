@@ -33,16 +33,15 @@ class exprGroup: public exprSum {
   /// destructor
   virtual ~exprGroup () {
 
-    delete index_;
-    delete coeff_;
+    if (index_) {
+      delete [] index_;
+      delete [] coeff_;
+    }
   }
 
   /// cloning method
   virtual expression *clone () const
     {return new exprGroup (*this);}
-
-  /// String equivalent (for comparisons)
-  virtual const std::string name () const;
 
   /// I/O
   virtual void print (std::ostream &) const;
@@ -70,6 +69,12 @@ class exprGroup: public exprSum {
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  /// only compare with people of the same kind
+  virtual int compare (exprGroup &);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRGROUP;}
 };
 
 
@@ -77,10 +82,11 @@ class exprGroup: public exprSum {
 
 inline CouNumber exprGroup::operator () () {
 
-  register CouNumber ret = c0_ + exprSum::operator () ();
+  register CouNumber  ret = c0_ + exprSum::operator () (),
+                     *coe = coeff_;
 
   for (register int *ind = index_, i=0; *ind >= 0;)
-    ret += coeff_ [i++] * expression::Variable (*ind++);
+    ret += *coe++ * expression::Variable (*ind++);
 
   return (currValue_ = ret);
 }

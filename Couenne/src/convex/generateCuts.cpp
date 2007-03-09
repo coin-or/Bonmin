@@ -27,7 +27,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   int ncols = problem_ -> nVars () + 
               problem_ -> nAuxs ();
 
-  char *chg_bds = NULL;
+  char *chg_bds = new char [ncols];
+
+  // fill it with zeros
+  for (register int i = ncols; i--;) *chg_bds++ = 0;
+  chg_bds -= ncols;
 
   int nchanged = 0; // number of bounds changed;
 
@@ -79,15 +83,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 			  const_cast <CouNumber *> (si. getColLower    ()),
 			  const_cast <CouNumber *> (si. getColUpper    ()));
 
-    chg_bds = new char [ncols];
-
-    // fill it with zeros
-    for (register int i = ncols; i--;) *chg_bds++ = 0;
-    chg_bds -= ncols;
-
     // not the first call to this procedure, meaning we can be
-    // anywhere in the B&B tree. Check, through the auxiliary
-    // information, which bounds have changed from the parent node.
+    // anywhere in the B&B tree but the root node. Check, through the
+    // auxiliary information, which bounds have changed from the
+    // parent node.
 
     if (info.inTree) {
 
@@ -141,7 +140,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // tighten the current relaxation by tightening the variables'
   // bounds
 
-  nchanged = problem_ -> tightenBounds (si, chg_bds);
+  int ntightened = problem_ -> tightenBounds (si, chg_bds);
 
   //  printf ("::::::::::::::::::::::::::::::::::::::::::::::\n");
   //  for (register int i=0; i < ncols; i++)
@@ -149,8 +148,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   //	    expression::Lbound (i), 
   //	    expression::Ubound (i));
 
-  //  if (nchanged)
-  //    printf("%d bounds tightened\n", nchanged);
+  //  if (ntightened)
+  //    printf("%d bounds tightened\n", ntightened);
 
   // For each auxiliary variable, create cut (or set of cuts) violated
   // by current point and add it to cs
@@ -160,8 +159,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   //  if (!chg_bds) // this is the first call to generateCuts, we have to
 		// generate cuts for all auxiliary variable
-    for (int i=0; i < problem_ -> nAuxs (); i++)
-      problem_ -> Aux (i) -> generateCuts (si, cs, this);
+
+  for (int i=0; i < problem_ -> nAuxs (); i++)
+    problem_ -> Aux (i) -> generateCuts (si, cs, this);
+
     /*
   else          // chg_bds contains the indices of the variables whose
 		// bounds have changes (a -1 follows the last element)
@@ -172,14 +173,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     */
   // change tightened bounds through OsiCuts
 
-  if (nchanged) {
+  if (nchanged || ntightened) {
 
     int *indLow = new int [ncols], 
         *indUpp = new int [ncols],
          nLow, nUpp = nLow = 0;
 
-    CouNumber *bndLow = new CouNumber [nchanged],
-              *bndUpp = new CouNumber [nchanged];
+    CouNumber *bndLow = new CouNumber [ncols],
+              *bndUpp = new CouNumber [ncols];
 
     const CouNumber 
       *oldLow = si.getColLower (),
@@ -187,9 +188,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       *newLow = problem_ -> Lb (),
       *newUpp = problem_ -> Ub ();
 
-    for (register int i=0; i<ncols; i++)
+    for (register int i=0; i<ncols; i++) {
 
-      if (chg_bds [i]) {
+      //      if (chg_bds [i]) {
 
 	CouNumber bd;
 
@@ -202,7 +203,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  indUpp [nUpp]   = i;
 	  bndUpp [nUpp++] = bd;
 	}
-      }
+	//      }
+    }
 
     OsiColCut *cut = new OsiColCut;
 
@@ -210,12 +212,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       cut -> setLbs (nLow, indLow, bndLow);
       cut -> setUbs (nUpp, indUpp, bndUpp);
       cs.insert (cut);
+      delete cut;
     }
 
-    delete cut;
-
-    delete [] bndLow; delete indLow;
-    delete [] bndUpp; delete indUpp;
+    delete [] bndLow; delete [] indLow;
+    delete [] bndUpp; delete [] indUpp;
   }
 
   if (firstcall_) {

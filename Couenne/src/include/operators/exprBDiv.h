@@ -23,17 +23,12 @@ class exprLBDiv: public exprOp {
   exprLBDiv  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  //  ~exprLBDiv () {}
-
   // cloning method
   expression *clone () const
     {return new exprLBDiv (clonearglist (), nargs_);}
 
   // function for the evaluation of the expression
   CouNumber operator () ();
-
-  // String equivalent (for comparisons)
-  const std::string name() const {return exprOp::name ("LB_div");}
 
   // I/O
   void print (std::ostream &) const;
@@ -77,17 +72,12 @@ class exprUBDiv: public exprOp {
   exprUBDiv  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  //  ~exprUBDiv () {}
-
   // cloning method
   expression *clone () const
     {return new exprUBDiv (clonearglist (), nargs_);}
 
   // function for the evaluation of the expression
   CouNumber operator () ();
-
-  // String equivalent (for comparisons)
-  std::string name () {return exprOp::name ("UB_div");}
 
   // output
   void print (std::ostream &) const;

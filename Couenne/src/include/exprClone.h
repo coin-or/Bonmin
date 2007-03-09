@@ -26,9 +26,6 @@ class exprClone: public exprCopy {
   exprClone  (expression *copy): 
     exprCopy (copy) {}
 
-  /// destructor
-  //  ~exprClone () {}
-
   /// copy constructor
   exprClone (const exprClone &e):
     exprCopy (e) {}
@@ -39,10 +36,7 @@ class exprClone: public exprCopy {
 
   /// I/O
   void print (std::ostream &out) const
-    //{out << "{"; copy_ -> Original () -> print (out); out << "}";}
     {copy_ -> Original () -> print (out);}
-    //{copy_ -> print (out);}
-    //{out << ",";}
 
   /// value
   inline CouNumber Value () const 

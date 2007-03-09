@@ -47,8 +47,7 @@ host_triplet = @host@
 # If we have the Ampl solver library, we need to add additional things
 @COIN_HAS_ASL_TRUE@am__append_1 = readnl/readnl.cpp \
 @COIN_HAS_ASL_TRUE@			 readnl/nl2e.cpp \
-@COIN_HAS_ASL_TRUE@			 readnl/invmap.c \
-@COIN_HAS_ASL_TRUE@			 readnl/fix_asl_group.c
+@COIN_HAS_ASL_TRUE@			 readnl/invmap.c
 
 
 # If we have the Ampl solver library, we need to add additional things
@@ -89,7 +88,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
-	expression/operators/exprGroup.cpp expression/exprVar.cpp \
+	expression/operators/exprGroup.cpp expression/exprOp.cpp \
+	expression/exprUnary.cpp expression/exprVar.cpp \
 	expression/exprAux.cpp expression/expression.cpp \
 	simplify/simplifiers.cpp simplify/simplify.cpp \
 	convex/addEnvelope.cpp convex/createCuts.cpp \
@@ -110,25 +110,24 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp util/rootQ.c \
-	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c \
-	readnl/fix_asl_group.c
-@COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
-@COIN_HAS_ASL_TRUE@	fix_asl_group.lo
+	problem/constraint.cpp problem/tightenBounds.cpp \
+	problem/readASLfg.cpp util/rootQ.c readnl/readnl.cpp \
+	readnl/nl2e.cpp readnl/invmap.c
+@COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
 	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
 	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
-	exprSum.lo exprMinMax.lo exprGroup.lo exprVar.lo exprAux.lo \
-	expression.lo simplifiers.lo simplify.lo addEnvelope.lo \
-	createCuts.lo conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
-	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
-	conv-exprPow.lo conv-exprPow-getBounds.lo \
+	exprSum.lo exprMinMax.lo exprGroup.lo exprOp.lo exprUnary.lo \
+	exprVar.lo exprAux.lo expression.lo simplifiers.lo simplify.lo \
+	addEnvelope.lo createCuts.lo conv-exprOp.lo conv-exprUnary.lo \
+	conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
+	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo conv-exprGroup.lo CouenneCutGenerator.lo \
 	generateCuts.lo problem.lo problemIO.lo constraint.lo \
-	tightenBounds.lo rootQ.lo $(am__objects_1)
+	tightenBounds.lo readASLfg.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -348,7 +347,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
-	expression/operators/exprGroup.cpp expression/exprVar.cpp \
+	expression/operators/exprGroup.cpp expression/exprOp.cpp \
+	expression/exprUnary.cpp expression/exprVar.cpp \
 	expression/exprAux.cpp expression/expression.cpp \
 	simplify/simplifiers.cpp simplify/simplify.cpp \
 	convex/addEnvelope.cpp convex/createCuts.cpp \
@@ -369,8 +369,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp util/rootQ.c \
-	$(am__append_1)
+	problem/constraint.cpp problem/tightenBounds.cpp \
+	problem/readASLfg.cpp util/rootQ.c $(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -564,20 +564,22 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprLog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprMinMax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprMul.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprOp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprOpp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprPow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprSin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprSub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprSum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprUnary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix_asl_group.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getFixVarBinFun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nl2e.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problemIO.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readASLfg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readnl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rootQ.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplifiers.Plo@am__quote@
@@ -618,13 +620,6 @@ invmap.lo: readnl/invmap.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readnl/invmap.c' object='invmap.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o invmap.lo `test -f 'readnl/invmap.c' || echo '$(srcdir)/'`readnl/invmap.c
-
-fix_asl_group.lo: readnl/fix_asl_group.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fix_asl_group.lo -MD -MP -MF "$(DEPDIR)/fix_asl_group.Tpo" -c -o fix_asl_group.lo `test -f 'readnl/fix_asl_group.c' || echo '$(srcdir)/'`readnl/fix_asl_group.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/fix_asl_group.Tpo" "$(DEPDIR)/fix_asl_group.Plo"; else rm -f "$(DEPDIR)/fix_asl_group.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readnl/fix_asl_group.c' object='fix_asl_group.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fix_asl_group.lo `test -f 'readnl/fix_asl_group.c' || echo '$(srcdir)/'`readnl/fix_asl_group.c
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -772,6 +767,20 @@ exprGroup.lo: expression/operators/exprGroup.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/exprGroup.cpp' object='exprGroup.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprGroup.lo `test -f 'expression/operators/exprGroup.cpp' || echo '$(srcdir)/'`expression/operators/exprGroup.cpp
+
+exprOp.lo: expression/exprOp.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprOp.lo -MD -MP -MF "$(DEPDIR)/exprOp.Tpo" -c -o exprOp.lo `test -f 'expression/exprOp.cpp' || echo '$(srcdir)/'`expression/exprOp.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprOp.Tpo" "$(DEPDIR)/exprOp.Plo"; else rm -f "$(DEPDIR)/exprOp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/exprOp.cpp' object='exprOp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprOp.lo `test -f 'expression/exprOp.cpp' || echo '$(srcdir)/'`expression/exprOp.cpp
+
+exprUnary.lo: expression/exprUnary.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprUnary.lo -MD -MP -MF "$(DEPDIR)/exprUnary.Tpo" -c -o exprUnary.lo `test -f 'expression/exprUnary.cpp' || echo '$(srcdir)/'`expression/exprUnary.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/exprUnary.Tpo" "$(DEPDIR)/exprUnary.Plo"; else rm -f "$(DEPDIR)/exprUnary.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/exprUnary.cpp' object='exprUnary.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprUnary.lo `test -f 'expression/exprUnary.cpp' || echo '$(srcdir)/'`expression/exprUnary.cpp
 
 exprVar.lo: expression/exprVar.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprVar.lo -MD -MP -MF "$(DEPDIR)/exprVar.Tpo" -c -o exprVar.lo `test -f 'expression/exprVar.cpp' || echo '$(srcdir)/'`expression/exprVar.cpp; \
@@ -975,6 +984,13 @@ tightenBounds.lo: problem/tightenBounds.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/tightenBounds.cpp' object='tightenBounds.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tightenBounds.lo `test -f 'problem/tightenBounds.cpp' || echo '$(srcdir)/'`problem/tightenBounds.cpp
+
+readASLfg.lo: problem/readASLfg.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readASLfg.lo -MD -MP -MF "$(DEPDIR)/readASLfg.Tpo" -c -o readASLfg.lo `test -f 'problem/readASLfg.cpp' || echo '$(srcdir)/'`problem/readASLfg.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/readASLfg.Tpo" "$(DEPDIR)/readASLfg.Plo"; else rm -f "$(DEPDIR)/readASLfg.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/readASLfg.cpp' object='readASLfg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o readASLfg.lo `test -f 'problem/readASLfg.cpp' || echo '$(srcdir)/'`problem/readASLfg.cpp
 
 readnl.lo: readnl/readnl.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readnl.lo -MD -MP -MF "$(DEPDIR)/readnl.Tpo" -c -o readnl.lo `test -f 'readnl/readnl.cpp' || echo '$(srcdir)/'`readnl/readnl.cpp; \

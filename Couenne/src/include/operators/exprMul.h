@@ -26,14 +26,9 @@ class exprMul: public exprOp {
   exprMul (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  //  ~exprMul () {}
-
   // cloning method
   expression *clone () const
     {return new exprMul (clonearglist (), nargs_);}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprOp::name ("*");}
 
   // print expression
   void print (std::ostream&) const;
@@ -64,6 +59,9 @@ class exprMul: public exprOp {
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
   expression *getFixVar ();
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRMUL;}
 };
 
 

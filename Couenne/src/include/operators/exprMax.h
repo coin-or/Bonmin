@@ -29,14 +29,9 @@ class exprMax: public exprOp {
     arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
   }
 
-  //  ~exprMax () {}
-
   // cloning method
   exprMax *clone () const
     {return new exprMax (clonearglist (), nargs_);}
-
-  // String equivalent (for comparisons)
-  const std::string name() const {return exprOp::name ("max");}
 
   // I/O
   void print (std::ostream &out) const
@@ -53,12 +48,7 @@ class exprMax: public exprOp {
   inline expression *simplify () 
     {return NULL;}
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () 
     {return NONLINEAR;}
 
@@ -73,6 +63,9 @@ class exprMax: public exprOp {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRMAX;}
 };
 
 

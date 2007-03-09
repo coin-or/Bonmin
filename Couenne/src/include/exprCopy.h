@@ -33,7 +33,6 @@ class exprCopy: public expression {
   // Constructor, destructor
   exprCopy  (expression *copy):
     copy_ (copy) {}
-  //  ~exprCopy () {}
 
   // copy constructor
   exprCopy (const exprCopy &e) {
@@ -53,9 +52,6 @@ class exprCopy: public expression {
   // get variable index in problem
   inline int Index () const
     {return copy_ -> Index ();}
-
-  // string equivalent
-  const std::string name () const;
 
   // I/O
   virtual void print (std::ostream &out) const
@@ -87,12 +83,7 @@ class exprCopy: public expression {
   inline expression *simplify () 
     {return copy_ -> simplify ();}
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
     {return copy_ -> Linearity ();}
 
@@ -111,7 +102,16 @@ class exprCopy: public expression {
 
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar () {return copy_ -> getFixVar ();}
+  virtual expression *getFixVar () 
+    {return copy_ -> getFixVar ();}
+
+  ///
+  virtual enum expr_type code () 
+    {return copy_ -> code ();}
+
+  ///
+  int compare (expression &e) 
+    {return copy_ -> compare (e);}
 };
 
 #endif

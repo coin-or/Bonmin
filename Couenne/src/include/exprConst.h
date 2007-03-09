@@ -34,9 +34,6 @@ class exprConst: public expression {
   exprConst (CouNumber value)
     {currValue_ = value;}
 
-  // Destructor
-  //  ~exprConst () {}
-
   // Copy constructor
   exprConst (const exprConst &e)
     {currValue_ = e.Value ();}
@@ -44,9 +41,6 @@ class exprConst: public expression {
   // Cloning method
   virtual exprConst *clone () const
     {return new exprConst (currValue_);}
-
-  // string equivalent
-  const std::string name () const;
 
   // I/O
   inline void print (std::ostream &out) const
@@ -68,14 +62,9 @@ class exprConst: public expression {
   inline expression *simplify () 
     {return NULL;}
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
-    {return CONSTANT;}
+    {return ((fabs (currValue_) < COUENNE_EPS) ? ZERO: CONSTANT);}
 
   // Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lower, expression *&upper) {
@@ -88,8 +77,11 @@ class exprConst: public expression {
     {return NULL;}
 
   // generate convexification cut for constraint w = this
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-		     OsiCuts &cs, const CouenneCutGenerator *cg);
+  void generateCuts (exprAux *, const OsiSolverInterface &, 
+		     OsiCuts &, const CouenneCutGenerator *);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRCONST;}
 };
 
 #endif

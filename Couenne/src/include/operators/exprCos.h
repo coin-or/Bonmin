@@ -26,17 +26,12 @@ class exprCos: public exprUnary {
   exprCos  (expression *al): 
     exprUnary (al) {}
 
-  //  ~exprCos () {}
-
   // cloning method
   expression *clone () const
     {return new exprCos (argument_ -> clone ());}
 
   /// the operator's function
   inline unary_function F () {return cos;}
-
-  // String equivalent (for comparisons)
-  const std::string name() const {return exprUnary::name ("cos");}
 
   // print "cos" and argument
   void print (std::ostream&) const;
@@ -51,6 +46,9 @@ class exprCos: public exprUnary {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRCOS;}
 };
 
 

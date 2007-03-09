@@ -32,74 +32,6 @@ CouNumber *expression::lbounds_   = NULL;
 CouNumber *expression::ubounds_   = NULL;
 
 
-// General N-ary function destructor
-
-exprOp::~exprOp () {
-
-  register expression *elem;
-
-  if (arglist_) {
-    for (register int i = nargs_; i--;)
-      if ((elem = arglist_ [i]))
-	delete elem;
-
-    delete [] arglist_;
-    arglist_ = NULL;
-  }
-}
-
-
-// print expression
-
-void exprOp::print (std::ostream      &out = std::cout, 
-		    const std::string &op  = "unknown", 
-		    enum pos           pos = PRE)        const 
-{
-  if (pos == PRE)
-    out << op;
-
-  out << "("; fflush (stdout);
-  for (int i=0; i<nargs_; i++) {
-    if (arglist_ [i])
-      arglist_ [i] -> print (out); 
-    fflush (stdout);
-    if (i < nargs_ - 1) {
-      if (pos == INSIDE) out << op;
-      else               out << ",";
-    }
-    fflush (stdout);
-  }
-  out << ")";
-  fflush (stdout);
-}
-
-
-// print unary expression
-
-void exprUnary::print (std::ostream      &out = std::cout, 
-		       const std::string &op = "unknown", 
-		       enum pos           pos = PRE)       const 
-{
-  if (pos == PRE)  out << op;
-  out << "(";
-  argument_ -> print (out);
-  out << ")";
-  if (pos == POST) out << op;
-}
-
-
-// does this expression depend on variables in varlist?
-
-bool exprOp::dependsOn (int *varlist = NULL, int n = 1) {
-
-  for (register int i = nargs_; i--;)
-    if (arglist_ [i] -> dependsOn (varlist, n))
-      return true;
-
-  return false;
-}
-
-
 // Get lower and upper bound of a generic expression
 
 void expression::getBounds (expression *&lb, expression *&ub) {
@@ -121,84 +53,54 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 }
 
 
-// name () -- a string value for each expression
+/// compare generic expression with other expression
+int expression::compare (expression &e1) {
 
-#define MAX_NAME 10000
+  if      (code () >= COU_EXPRUNARY) 
+    if (e1.code () >= COU_EXPRUNARY) {
 
-std::string Coutoa (CouNumber x) {
-  char s [MAX_NAME];
-  sprintf (s, "%f", x);
-  return std::string (s);
-}
+      exprUnary *ne0 = dynamic_cast <exprUnary *> (this);
+      exprUnary *ne1 = dynamic_cast <exprUnary *> (&e1);
+      return ne0 -> compare (*ne1);
+    }
+    else return 1;
+  else if   (code () >= COU_EXPROP)
+    if   (e1.code () >= COU_EXPROP)
+      if (e1.code () >= COU_EXPRUNARY) return -1;
+      else {
 
-std::string Indtoa (char prefix, int i) {
-  char s [MAX_NAME];
-  sprintf (s, "%c%d", prefix, i);
-  return std::string (s);
-}
+      exprOp *ne0 = dynamic_cast <exprOp *> (this);
+      exprOp *ne1 = dynamic_cast <exprOp *> (&e1);
+      return ne0 -> compare (*ne1);
+      }
+    else if (e1.code () >= COU_EXPROP) return -1;
+    else ;
+  else ;
 
-const std::string exprVar::name   () const {return Indtoa ('x', varIndex_);}
-const std::string exprIVar::name  () const {return Indtoa ('y', varIndex_);}
-const std::string exprAux::name   () const {return Indtoa ('w', varIndex_);}
+  int c0 = code (),
+      c1 = e1. code ();
 
-const std::string exprLowerBound::name () const {return Indtoa ('l', varIndex_);}
-const std::string exprUpperBound::name () const {return Indtoa ('u', varIndex_);}
+  if      (c0 < c1) return -1;
+  else if (c0 > c1) return  1;
+  else { // it is either a constant or a variable
 
-const std::string exprConst::name () const {return Coutoa (currValue_);}
+    int i1 = e1. Index ();
 
-const std::string exprCopy::name  () const {return copy_ -> Original () -> name ();}
+    if      (Index () < i1) return -1;
+    else if (Index () > i1) return  1;
+    else if (i1 != -1)      return  0; // same variables
+    else { // both are constants
 
-const std::string exprUnary::name () const {return name ("?");}
-const std::string exprOp::name    () const {return name ("?");}
+      CouNumber v1 = e1. Value ();
 
-
-/**
- *
- * The functions below could have been implemented much more easily as follows:
- *
- * const std::string exprUnary::name () const 
- *   {return "(" + argument_ -> name () + ")";}
- *
- * const std::string exprOp::   name () const {
- *  std::string args = "(" + arglist_ [0] -> name ();
- *  for (int i=1; i<nargs_; i++)
- *    args += "," + arglist_ [i] -> name ();
- *  return args + ")";
- * }
- *
- * But, because of a segfault occurred in some x86_64 machines, we have
- * decided to do it more plainly (and probably less efficiently).
- */
-
-const std::string exprUnary::name (const std::string &op) const {
-
-  register char *s = (char *) malloc (MAX_NAME * sizeof (char));
-  sprintf (s, "%s(%s)", op.c_str (), argument_ -> name (). c_str ());
-
-  s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
-  std::string ret (1 + strlen (s), ' ');
-  for (int register i=strlen (s); i--;) // no need to set eos
-    ret [i] = s [i]; 
-  free (s);
-  return ret;
-}
-
-const std::string exprOp::name (const std::string &op) const {
-
-  register char *s = (char *) malloc (MAX_NAME * sizeof (char));
-  sprintf (s, "%s(%s", op.c_str (), arglist_ [0] -> name (). c_str ());
-
-  for (register int i=1; i<nargs_; i++) {
-    strcat (s, ",");
-    strcat (s, arglist_ [i] -> name (). c_str ());
+      if      (currValue_ < v1) return -1;
+      else if (currValue_ > v1) return  1;
+      else                      return  0;
+    }
   }
-
-  strcat (s, ")");
-
-  s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
-  std::string ret (1 + strlen (s), ' ');
-  for (register int i=strlen (s); i--;) // no need to set eos
-    ret [i] = s [i]; 
-  free (s);
-  return ret;
 }
+
+
+///
+int expression::compare (exprCopy &c)
+{return compare (const_cast <expression &> (*(c. Original ())));}

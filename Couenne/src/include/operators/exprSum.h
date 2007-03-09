@@ -25,14 +25,9 @@ class exprSum: public exprOp {
   exprSum (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  ///  virtual ~exprSum () {}
-
   /// cloning method
   virtual expression *clone () const
     {return new exprSum (clonearglist (), nargs_);}
-
-  /// String equivalent (for comparisons)
-  virtual const std::string name () const {return exprOp::name ("+");}
 
   /// I/O
   virtual void print (std::ostream &) const;
@@ -59,6 +54,9 @@ class exprSum: public exprOp {
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRSUM;}
 };
 
 

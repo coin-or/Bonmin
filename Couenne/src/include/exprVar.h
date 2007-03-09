@@ -52,9 +52,6 @@ class exprVar: public expression {
   inline int Index () const
     {return varIndex_;}
 
-  // string equivalent
-  virtual const std::string name () const;
-
   // print
   virtual void print (std::ostream &out) const
     {out << "x_" << varIndex_;}
@@ -78,12 +75,7 @@ class exprVar: public expression {
   inline expression *simplify () 
     {return NULL;}
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity ()
     {return LINEAR;}
 
@@ -101,6 +93,9 @@ class exprVar: public expression {
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar () {return this;}
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRVAR;}
 };
 
 #endif

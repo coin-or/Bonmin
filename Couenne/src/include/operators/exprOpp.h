@@ -27,14 +27,10 @@ class exprOpp: public exprUnary {
   // Constructors, destructor
   exprOpp  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
-  ~exprOpp () {}
 
   // cloning method
   expression *clone () const
     {return new exprOpp (argument_ -> clone ());}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprUnary::name ("opp");}
 
   /// the operator's function
   inline unary_function F () {return opp;}
@@ -45,12 +41,7 @@ class exprOpp: public exprUnary {
   // differentiation
   expression *differentiate (int index); 
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
     {return argument_ -> Linearity ();}
 
@@ -60,6 +51,9 @@ class exprOpp: public exprUnary {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPROPP;}
 };
 
 #endif

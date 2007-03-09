@@ -57,14 +57,6 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
     if (((violation <   COUENNE_EPS) || (sign > 0)) &&
 	((violation > - COUENNE_EPS) || (sign < 0)))
       return NULL;
-
-
-    // return NULL if not violated
-    /*
-    if (((violation <   1e-5) || (sign > 0)) &&
-	((violation > - 1e-5) || (sign < 0)))
-      return NULL;
-    */
   }
 
   // You are here if:

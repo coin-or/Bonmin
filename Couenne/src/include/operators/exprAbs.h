@@ -24,7 +24,6 @@ class exprAbs: public exprUnary {
   // Constructors, destructor
   exprAbs  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
-  //  ~exprAbs () {}
 
   /// the operator's function
   inline unary_function F () {return fabs;}
@@ -32,10 +31,6 @@ class exprAbs: public exprUnary {
   // cloning method
   expression *clone () const
     {return new exprAbs (argument_ -> clone ());}
-
-  // String equivalent (for comparisons)
-  const std::string name() const 
-    {return exprUnary::name ("abs");}
 
   // I/O
   void print (std::ostream&) const;
@@ -49,6 +44,9 @@ class exprAbs: public exprUnary {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRABS;}
 };
 
 #endif

@@ -20,7 +20,9 @@ class CouenneCutGenerator;
 class exprAux;
 class OsiSolverInterface;
 class OsiCuts;
-
+class exprUnary;
+class exprOp;
+class exprCopy;
 
 // expression base class
 
@@ -122,10 +124,6 @@ class expression {
   virtual inline const expression *Original () const 
     {return this;}
 
-  /// String equivalent (for comparisons)
-  virtual const std::string name() const 
-    {return "null_expr";}
-
   /// I/O
   virtual void print (std::ostream &s) const {s << '?';}
 
@@ -145,12 +143,7 @@ class expression {
   virtual inline expression *simplify () 
     {return NULL;}
 
-  /// get a measure of "how linear" the expression is:
-  ///
-  /// 0: a constant
-  /// 1: linear
-  /// 2: quadratic
-  /// 3: nonlinear non-quadratic
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity ()
     {return NONLINEAR;}
 
@@ -181,6 +174,19 @@ class expression {
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar ()
     {printf ("Warning: expression::getFixIndex()\n"); return NULL;}
+
+  /// return integer for comparing expressions (used to recognize
+  /// common expression)
+  virtual enum expr_type code () 
+    {return COU_EXPRESSION;}
+
+  /// either CONVEX, CONCAVE, AFFINE, or NONE
+  virtual enum convexity convexity () 
+    {return NONCONVEX;}
+
+  /// compare expressions
+  virtual int compare (expression &);
+  virtual int compare (exprCopy   &);
 };
 
 #endif

@@ -22,7 +22,7 @@
 
 class CouenneProblem;
 
-struct ASL_pfgh;
+struct ASL;
 
 
 /// Cut Generator for linear convexifications
@@ -63,7 +63,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// constructor
   CouenneCutGenerator  (Bonmin::OsiTMINLPInterface * = NULL,
-			const struct ASL_pfgh * = NULL, 
+			const struct ASL * = NULL, 
 			bool = false, 
 			enum conv_type = UNIFORM_GRID, 
 			int = 2);

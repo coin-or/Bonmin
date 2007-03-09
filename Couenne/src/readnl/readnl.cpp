@@ -15,14 +15,14 @@
 #include <exprClone.h>
 #include <exprGroup.h>
 
-#include "asl_pfgh.h"
-#include "nlp2.h"
+#include "asl.h"
+#include "nlp.h"
 #include "getstub.h"
 #include "opcode.hd"
 
-#define OBJ_DE ((const ASL_pfgh *) asl) -> I.obj2_de_
-#define CON_DE ((const ASL_pfgh *) asl) -> I.con2_de_
-#define OBJ_sense ((const ASL_pfgh *) asl) -> i.objtype_
+#define OBJ_DE    ((const ASL_fg *) asl) -> I.obj_de_
+#define CON_DE    ((const ASL_fg *) asl) -> I.con_de_
+#define OBJ_sense ((const ASL_fg *) asl) -> i.objtype_
 
 
 // check if an expression is a null pointer or equals zero
@@ -34,18 +34,9 @@ inline bool is_expr_zero (expr* e)
 			  // *** CHECK THIS! dL is the derivative
 			  )));} 
 
-
-// replaces group in original position within expression tree
-
-extern "C" {
-  void fix_asl_group  (psg_elem *);
-  void free_asl_group (psg_elem *);
-}
-
-
 // Reads a MINLP from an AMPL .nl file through the ASL methods
 
-int CouenneProblem::readnl (const ASL_pfgh *asl) {
+int CouenneProblem::readnl (const ASL *asl) {
 
   int n_intvar = niv + nbv + nlvbi + nlvci + nlvoi;
 
@@ -65,107 +56,9 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
   ub_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
 
 
-  // fix groups //////////////////////////////////////////////////////////////////////
-
-  // objective functions' groups
-
-  for (int k=0; k<n_obj; k++)
-    if ((asl -> P. ops [k]. nb) || (asl -> P. ops [k]. ng)) {
-      /*
-      printf ("obj %d: %d nb, %d ng\n", k, 
-	      asl -> P. ops [k]. nb, 
-	      asl -> P. ops [k]. ng);
-
-      for (int i=0; i<asl -> P. ops [k]. nb; i++) {
-
-	printf ("Group %d, obj %d: %x  ", i, k, asl -> P. ops [k]. b[i].D.e);
-	nl2e(asl -> P. ops [k]. b[i].D.e) -> print (std::cout);
-	printf ("\n");
-      }
-      */
-      int ngroups = asl -> P. ops [k]. ng;
-      for (int i=0; i<ngroups; i++)
-	fix_asl_group (&(asl -> P. ops [k]. g [i]));
-    }
-
-  // constraints' groups
-
-  for (int k=0; k<n_con; k++)
-    if ((asl -> P. cps [k]. nb) || (asl -> P. cps [k]. ng)) {
-      /*
-      printf ("con %d: %d nb, %d ng\n", k, 
-	      asl -> P. cps [k]. nb, 
-	      asl -> P. cps [k]. ng);
-
-      for (int i=0; i<asl -> P. cps [k]. nb; i++) {
-
-	printf ("Group %d, obj %d: %x  ", i, k, asl -> P. cps [k]. b[i].D.e);
-	nl2e(asl -> P. cps [k]. b[i].D.ee) -> print (std::cout);
-	printf ("\n");
-      }
-      */
-      int ngroups = asl -> P. cps [k]. ng;
-      for (int i=0; i<ngroups; i++)
-	fix_asl_group (&(asl -> P. cps [k]. g [i]));
-    }
-
   // objective functions /////////////////////////////////////////////////////////////
 
   for (int i = 0; i < n_obj; i++) {
-    /*
-    int nterms = 0;
-
-    real z0 = objconst (i);
-
-    // count nonzero terms in objective function (constant, linear
-    // and nonlinear part)
- 
-    if (fabs (z0) > COUENNE_EPS) nterms++;
-
-    for (ograd *objgrad = Ograd [i]; 
-	 objgrad; 
-	 objgrad = objgrad -> next) 
-      if (fabs (objgrad -> coef) > COUENNE_EPS) 
-	nterms++;
-
-    if ((OBJ_DE [i] . e) && (!is_expr_zero (OBJ_DE [i] . e)))
-      nterms++;
-
-    if (!nterms) // strange, but no (linear or nonlinear) terms in here 
-      continue;
-
-    // now we can fill in the objective function terms
-
-    expression **al = new expression * [nterms];
-
-    int term = 0;
-
-    if (fabs (z0) > COUENNE_EPS) 
-      al [term++] = new exprConst (z0);
-
-    ograd *objgrad;
-
-    for (objgrad = Ograd [i]; 
-	 objgrad; 
-	 objgrad = objgrad -> next) 
-      if (fabs (objgrad -> coef) > COUENNE_EPS) 
-	al [term++] = new exprMul (new exprConst (objgrad -> coef),
-				   new exprClone (variables_ [objgrad -> varno]));
-
-    if (   (OBJ_DE [i] . e)
-	   && (!is_expr_zero (OBJ_DE [i] . e)))
-      al [term++] = nl2e (OBJ_DE [i] . e);
-
-    expression *body;
-
-    // if sum only has one term, this objective is rather that term than a sum...
-    if (term==1) {
-      body = al [0]; 
-      delete [] al;
-    }
-    else 
-      body = new exprSum (al, term); 
-    */
 
     ////////////////////////////////////////////////
     int nterms = 0;
@@ -401,26 +294,6 @@ int CouenneProblem::readnl (const ASL_pfgh *asl) {
 
   delete [] nterms;
   delete [] alists;
-
-  // restore groups for use by Ipopt: constraints
-
-  for (int k=0; k<n_con; k++)
-    if ((asl -> P. cps [k]. nb) || (asl -> P. cps [k]. ng)) {
-
-      int ngroups = asl -> P. cps [k]. ng;
-      for (int i=0; i<ngroups; i++)
-	free_asl_group (asl -> P. cps [k]. g + i);
-    }
-
-  // and objectives
-
-  for (int k=0; k<n_obj; k++)
-    if ((asl -> P. ops [k]. nb) || (asl -> P. ops [k]. ng)) {
-
-      int ngroups = asl -> P. ops [k]. ng;
-      for (int i=0; i<ngroups; i++)
-	free_asl_group (asl -> P. ops [k]. g + i);
-    }
 
   return 0;
 }

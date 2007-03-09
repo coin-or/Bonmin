@@ -34,36 +34,36 @@ class exprLowerBound: public exprVar {
 
  public:
 
-  // node type
+  /// node type
   inline enum nodeType Type () 
     {return CONST;}
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprLowerBound  (int varIndex): exprVar (varIndex) {}
-  //  ~exprLowerBound () {}
 
-  // string equivalent
-  const std::string name () const;
-
-  // I/O
+  /// I/O
   void print (std::ostream &out) const
     {out << "l_" << varIndex_;}
 
-  // return the value of the variable
+  /// return the value of the variable
   inline CouNumber operator () () 
     {return (currValue_ = expression::lbounds_ [varIndex_]);}
 
-  // differentiation
+  /// differentiation
   inline expression *differentiate (int) 
     {return new exprConst (0);}
 
-  // dependence on variable set
+  /// dependence on variable set
   bool dependsOn (int *, int) 
     {return false;}
 
-  // get a measure of "how linear" the expression is:
+  /// get a measure of "how linear" the expression is:
   virtual inline int Linearity () 
     {return CONST;}
+
+  ///
+  virtual enum expr_type code ()
+    {return COU_EXPRLBOUND;}
 };
 
 
@@ -80,10 +80,6 @@ class exprUpperBound: public exprVar {
   // Constructors, destructor
   exprUpperBound  (int varIndex): 
     exprVar (varIndex) {}
-  //  ~exprUpperBound () {}
-
-  // string equivalent
-  const std::string name () const;
 
   // I/O
   void print (std::ostream &out) const
@@ -104,6 +100,10 @@ class exprUpperBound: public exprVar {
   // get a measure of "how linear" the expression is:
   virtual inline int Linearity () 
     {return CONST;}
+
+  ///
+  virtual enum expr_type code ()
+    {return COU_EXPRUBOUND;}
 };
 
 #endif

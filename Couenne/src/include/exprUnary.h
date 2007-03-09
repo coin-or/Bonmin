@@ -13,10 +13,11 @@
 
 #include <expression.h>
 #include <CouenneTypes.h>
-
+#include <exprOp.h>
 
 /// zero function (used by default by exprUnary)
-inline CouNumber zero_fun (CouNumber x) {return 0;}
+inline CouNumber zero_fun (CouNumber x) 
+{return 0;}
 
 
 //
@@ -44,7 +45,8 @@ class exprUnary: public expression {
    {}
 
   /// the operator itself (e.g. sin, log...)
-  virtual inline unary_function F () {return zero_fun;}
+  virtual inline unary_function F () 
+    {return zero_fun;}
 
   /// Destructor
   ~exprUnary () 
@@ -53,10 +55,6 @@ class exprUnary: public expression {
   /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
     {return argument_;}
-
-  // string equivalent
-  virtual const std::string name () const;
-  virtual const std::string name (const std::string &) const;
 
   // I/O
   virtual void print (std::ostream &, const std::string &, enum pos) const;
@@ -72,24 +70,26 @@ class exprUnary: public expression {
   // simplification
   expression *simplify ();
 
-  // get a measure of "how linear" the expression is:
-  //
-  // 0: a constant
-  // 1: linear
-  // 2: quadratic
-  // 3: nonlinear non-quadratic
-  //
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   // for general univariate functions, return nonlinear.
   virtual inline int Linearity ()
     {return NONLINEAR;}
 
   // reduce expression in standard form, creating additional aux
   // variables (and constraints)
-  virtual exprAux *standardize (CouenneProblem *p);
+  virtual exprAux *standardize (CouenneProblem *);
 
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar () {return argument_;}
+  virtual expression *getFixVar () 
+    {return argument_;}
+
+  /// type of operator
+  virtual enum expr_type code () 
+    {return COU_EXPRUNARY;}
+
+  /// compare two unary functions
+  virtual int compare (exprUnary &); 
 };
 
 #endif

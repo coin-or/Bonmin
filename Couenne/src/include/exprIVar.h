@@ -30,9 +30,6 @@ class exprIVar: public exprVar {
   exprIVar (int varIndex):
     exprVar (varIndex) {}
 
-  // destructor
-  //  ~exprIVar () {}
-
   // copy constructor
   exprIVar (const exprIVar &e):
     exprVar (e.Index ()) {}
@@ -40,9 +37,6 @@ class exprIVar: public exprVar {
   // cloning method
   virtual exprIVar *clone () const
     {return new exprIVar (*this);}
-
-  // string equivalent
-  const std::string name () const;
 
   // print
   virtual void print (std::ostream &out) const

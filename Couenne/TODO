@@ -1,8 +1,7 @@
-- change expression comparison
-- fix fake variable generation in readnl.cpp
 - rank in expressions for branching
 - documentation
 - improve convexification of x/y
+- improve power convexification (find closest point in convex hull)
 - linear combination plus aux. vars into one single aux - extend to constraints
 - improve bounding box with upper bound
 - add integrality to bound check

@@ -26,14 +26,9 @@ class exprSub: public exprOp {
   exprSub (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  ~exprSub () {}
-
   // cloning method
   expression *clone () const
     {return new exprSub (clonearglist (), nargs_);}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprOp::name ("-");}
 
   // I/O
   void print (std::ostream&) const;
@@ -47,12 +42,7 @@ class exprSub: public exprOp {
   // simplification
   expression *simplify ();
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () {
 
     int lin1 = arglist_ [0] -> Linearity ();
@@ -72,6 +62,9 @@ class exprSub: public exprOp {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRSUB;}
 };
 
 

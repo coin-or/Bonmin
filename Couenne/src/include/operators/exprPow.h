@@ -30,14 +30,9 @@ class exprPow: public exprOp {
   exprPow (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  ~exprPow () {}
-
   // cloning method
   expression *clone () const
     {return new exprPow (clonearglist (), nargs_);}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprOp::name ("^");}
 
   // I/O
   void print (std::ostream&) const;
@@ -68,6 +63,9 @@ class exprPow: public exprOp {
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
   //   getFixVar () {return arglist_ [0];}
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRPOW;}
 };
 
 

@@ -27,7 +27,6 @@ class exprInv: public exprUnary {
   // Constructors, destructor
   exprInv  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
-  //  ~exprInv () {}
 
   // cloning method
   expression *clone () const
@@ -36,21 +35,13 @@ class exprInv: public exprUnary {
   /// the operator's function
   inline unary_function F () {return inv;}
 
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprUnary::name ("inv");}
-
   // output "1/argument"
   void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () {
     if (argument_ -> Type () == CONST) return CONSTANT;
     else                               return NONLINEAR;
@@ -62,6 +53,9 @@ class exprInv: public exprUnary {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRINV;}
 };
 
 #endif

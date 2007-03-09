@@ -18,8 +18,14 @@
 #include <exprAux.h>
 #include <CouenneProblemElem.h>
 
-struct ASL_pfgh;
-struct expr2;
+struct ASL;
+struct expr;
+
+struct compExpr {
+  bool operator () (exprAux* e0, exprAux* e1) const
+  {return (e0 -> Image () -> compare (*(e1 -> Image ())) < 0);}
+};
+
 
 /// The CouenneProblem class
 
@@ -42,6 +48,7 @@ class CouenneProblem {
 
   /// expression map for comparison in standardization
   std::map <std::string, exprAux *> *auxMap_;
+  std::map <exprAux *, int, compExpr> *auxMap2_; // int to count occurrences
 
   /// number of elements in the x_, lb_, ub_ arrays
   int curnvars_;
@@ -49,7 +56,7 @@ class CouenneProblem {
  public:
 
   /// constructors, destructor
-  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap_ = NULL; curnvars_ = -1;}
+  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap2_ = NULL; curnvars_ = -1;}
   CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 
@@ -110,10 +117,10 @@ class CouenneProblem {
   void print (std::ostream &);
 
   /// read problem from .nl file using the Ampl Solver Library (ASL)
-  int readnl (const struct ASL_pfgh *);
+  int readnl (const struct ASL *);
 
   /// read problem from .nl file using the Ampl Solver Library (ASL)
-  expression *nl2e (struct expr2 *);
+  expression *nl2e (struct expr *);
 
   /// store nonlinear problem into a .mod file (with lots of defined
   /// variables)
@@ -127,11 +134,4 @@ class CouenneProblem {
   int tightenBounds (const OsiSolverInterface &, char *) const;
 };
 
-
-/// utility to allocate space for coeff, indices, rhs and sign based on
-/// the data in n and nterms
-
-void allocateCon (int n, int *nterms,                     // input data
- 		  expression ***& coeff, int **& indices, // allocated data
-		  expression **& rhs, enum con_sign *& sign);
 #endif

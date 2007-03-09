@@ -10,17 +10,17 @@
 
 #include <stdlib.h>
 
-#include <asl_pfgh.h>
+#include <asl.h>
 #include <opcode.hd>
-#include <nlp2.h>
+#include <nlp.h>
 #include <r_opn.hd>
 
 
 /* couples an ASL function pointer with the relative operator constant */
 
 typedef struct {
-  efunc2 *fp;
-  int     op;
+  efunc *fp;
+  int    op;
 } AslCouPair;
 
 
@@ -46,7 +46,7 @@ AslCouPair opmap [N_OPS];
 
 /* binary search to get operator number from its efunc2* (the type of e->op) */
 
-int getOperator (efunc2 *f) {
+int getOperator (efunc *f) {
 
   static char first_call = 1;
   AslCouPair key, *res;

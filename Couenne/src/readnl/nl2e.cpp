@@ -1,7 +1,7 @@
 /*
  * Name:    nl2e.cpp
  * Author:  Pietro Belotti
- * Purpose: converts a nl expression into a Feline expression
+ * Purpose: converts a nl expression into a Couenne expression
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -22,15 +22,15 @@
 #include <exprCos.h>
 #include <exprExp.h>
 
-#include <asl_pfgh.h>
-#include <nlp2.h>
+#include <asl.h>
+#include <nlp.h>
 #include <opcode.hd>
 
 
 // get ASL op. code relative to function pointer passed as parameter 
 
 extern "C" {
-  int getOperator (efunc2 *);
+  int getOperator (efunc *);
 }
 
 
@@ -44,17 +44,12 @@ expression *notimpl (const std::string &fname) {
 
 // converts an AMPL expression (sub)tree into an expression* (sub)tree
 
-expression *CouenneProblem::nl2e (expr2 *e) {
-
-  expression **al;
-  expr **ep;
-  expression *arg;
-  int j;
+expression *CouenneProblem::nl2e (expr *e) {
 
   switch (getOperator (e -> op)) {
 
   case OPPLUS:   return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPMINUS:  return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e -> L.e));
+  case OPMINUS:  return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPMULT:   return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPDIV:    return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPREM:   return notimpl ("remainder");
@@ -65,13 +60,15 @@ expression *CouenneProblem::nl2e (expr2 *e) {
   case FLOOR:   return notimpl ("floor");
   case CEIL:    return notimpl ("ceil");
   case ABS:     return new exprAbs (nl2e (e -> L.e));
-  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
-    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
+    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
+  case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
   case OPIFnl:  return notimpl ("ifnl");
   case OP_tanh: return notimpl ("tanh");
-  case OP_tan:  
+  case OP_tan: {
+    expression *arg;
     arg = nl2e (e -> L.e);
     return new exprDiv (new exprSin (arg), new exprCos (new exprClone (arg)));
+  }
   case OP_sqrt:    return new exprPow (nl2e (e -> L.e), new exprConst (0.5));
   case OP_sinh:    return new exprMul (new exprConst (0.5),
 		   new exprSub (new exprExp (nl2e (e -> L.e)),
@@ -95,8 +92,8 @@ expression *CouenneProblem::nl2e (expr2 *e) {
   case OP_acos:  return notimpl ("acos");
   case OPSUMLIST: {
     register int i=0;
-    al = new expression * [(e->R.ep - e->L.ep)];
-    for (ep = e->L.ep; ep < e->R.ep; ep++)
+    expression **al = new expression * [(e->R.ep - e->L.ep)];
+    for (expr **ep = e->L.ep; ep < e->R.ep; ep++)
       al [i++] = nl2e (*ep);
     return new exprSum (al, i);
   }
@@ -117,17 +114,16 @@ expression *CouenneProblem::nl2e (expr2 *e) {
   case OPIFSYM:   return notimpl ("ifsym");
   case OPHOL:     return notimpl ("hol");
   case OPVARVAL:  
-    // check if index is above number of variables (depending on
-    // psb_elem groups in asl)
-    if ((j = ((expr2_v *) e) -> a) >= nVars ()) {
-
-      printf ("ERROR: added %d fake variables\nAborting...", j-nVars()+1);
-      exit (-1);
-      //      for (int i=nVars(); i<=j; i++)
-      //	addVariable (false);
+    {
+      int j;
+      // check if index is above number of variables (depending on
+      // psb_elem groups in asl)
+      if ((j = ((expr_v *) e) -> a) >= nVars ()) {
+	printf ("ERROR: unknown variable x%d\nAborting...", j);
+	exit (-1);
+      }
+      return new exprClone (variables_ [j]);
     }
-    return new exprClone (variables_ [j]);
-
   case -1:
   default: printf ("ERROR: unknown operator (address %x)\nAborting...", (long int) e -> op); 
     exit (-1);

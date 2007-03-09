@@ -36,6 +36,8 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp \
+	expression/exprOp.cpp \
+	expression/exprUnary.cpp \
 	expression/exprVar.cpp \
 	expression/exprAux.cpp \
 	expression/expression.cpp \
@@ -65,6 +67,7 @@ libCouenne_la_SOURCES = \
 	problem/problemIO.cpp \
 	problem/constraint.cpp \
 	problem/tightenBounds.cpp \
+	problem/readASLfg.cpp \
 	util/rootQ.c
 
 COINLIBS = \
@@ -81,8 +84,7 @@ libCouenne_la_LDFLAGS = $(LT_LDFLAGS)
 if COIN_HAS_ASL
 libCouenne_la_SOURCES += readnl/readnl.cpp \
 			 readnl/nl2e.cpp \
-			 readnl/invmap.c \
-			 readnl/fix_asl_group.c
+			 readnl/invmap.c
 endif
 
 ########################################################################

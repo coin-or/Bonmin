@@ -98,7 +98,7 @@ expression *CouenneProblem::addVariable (bool isDiscrete) {
 
 /// add auxiliary variable and associate it with pointer to expression
 /// given as argument
-
+/*
 exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
   // check if image is already in the expression database auxMap_
@@ -125,6 +125,60 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 			  // auxiliary var. pointer
   return var;
 }
+*/
+
+
+/// add auxiliary variable and associate it with pointer to expression
+/// given as argument
+
+exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
+
+  // check if image is already in the expression database auxMap_
+
+  //  exprAux *var;
+  //  std::string key = symbolic -> name (); // string serving as a key to the map
+
+  std::map <exprAux *, int, compExpr>::iterator i;
+
+  exprAux *w = new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
+
+  if ((i = auxMap2_ -> find (w)) == auxMap2_ -> end ()) {
+
+    // no such expression has been found in the map, 
+    // create entry in the map
+
+    std::pair <exprAux *, int> newpair;
+
+    newpair.first = w;//new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
+      // and corresponding auxiliary variable
+    newpair.second = 1;
+
+    auxiliaries_ . push_back (w);
+    auxMap2_ -> insert (newpair);
+    /*
+    printf ("new expression: "); 
+    w -> print (std::cout);
+    printf (" := ");
+    w -> Image () -> print (std::cout);
+    printf ("\n");
+    */
+  }
+  else {
+    delete w;
+    w = i -> first; // otherwise, just return the entry's
+                    // auxiliary var. pointer
+    i -> second ++;
+    /*
+    printf ("found (%d times now): ", i -> second); 
+    i -> first -> print (std::cout);
+    printf (" := ");
+    i -> first -> Image () -> print (std::cout);
+    printf ("\n");
+    */
+  }
+
+  return w;
+}
 
 
 /// standardize all nonlinear objectives and constraints
@@ -133,7 +187,8 @@ void CouenneProblem::standardize () {
 
   // create expression map for binary search
 
-  auxMap_ = new std::map <std::string, exprAux *>;
+  auxMap_  = new std::map <std::string, exprAux *>;
+  auxMap2_ = new std::map <exprAux *, int, compExpr>;
 
   // standardize objectives
 

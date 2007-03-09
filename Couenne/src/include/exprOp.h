@@ -13,6 +13,7 @@
 
 #include <expression.h>
 #include <CouenneTypes.h>
+#include <exprUnary.h>
 
 
 /// general n-ary operator-type expression: requires argument list. All
@@ -66,10 +67,6 @@ class exprOp: public expression {
   inline int nArgs () const 
     {return nargs_;}
 
-  /// string equivalent
-  virtual const std::string name () const;
-  virtual const std::string name (const std::string &) const;
-
   /// I/O
   virtual void print (std::ostream &, const std::string &, enum pos) const;
 
@@ -93,20 +90,22 @@ class exprOp: public expression {
   /// compress argument list
   int shrink_arglist (CouNumber, CouNumber);
 
-  /// get a measure of "how linear" the expression is:
-  ///
-  /// CONSTANT  = 0: a constant
-  /// LINEAR    = 1: linear
-  /// QUADRATIC = 2: quadratic
-  /// NONLINER  = 3: nonlinear non-quadratic
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity ()
     {return NONLINEAR;}
 
+  /// generate auxiliary variable
   exprAux *standardize (CouenneProblem *);
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar () {return arglist_ [0];}
+
+  ///
+  virtual enum expr_type code () {return COU_EXPROP;}
+
+  ///
+  virtual int compare (exprOp &);
 };
 
 

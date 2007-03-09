@@ -24,14 +24,10 @@ class exprSin: public exprUnary {
   // Constructors, destructor
   exprSin  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
-  ~exprSin () {}
 
   // cloning method
   expression *clone () const
     {return new exprSin (argument_ -> clone ());}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprUnary::name ("sin");}
 
   /// the operator's function
   inline unary_function F () {return sin;}
@@ -49,6 +45,9 @@ class exprSin: public exprUnary {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRSIN;}
 };
 
 #endif

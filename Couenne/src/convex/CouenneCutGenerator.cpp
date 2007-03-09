@@ -23,11 +23,12 @@
 /// constructor
 
 CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
-					  const struct ASL_pfgh *asl, 
+					  const struct ASL *asl, 
 					  bool addviolated,
 					  enum conv_type convtype, int nSamples):
 
   OaDecompositionBase (nlp, NULL, NULL, 0,0,0),
+
   firstcall_      (true),
   addviolated_    (addviolated),
   convtype_       (convtype),
@@ -39,7 +40,6 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   nlp_            (nlp) {
 
   if (!asl) return;
-
   problem_ = new CouenneProblem;
 
   //  double now = CoinCpuTime ();
@@ -47,18 +47,14 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   problem_ -> readnl      (asl);
 
   //  printf ("reading time: %.3fs\n", CoinCpuTime () - now);
-
   //  now = CoinCpuTime ();
-
   //  problem_ -> print (std::cout);
   //  printf ("======================================\n");
   problem_ -> standardize ();
 
   //  printf ("standardization time: %.3fs\n", CoinCpuTime () - now);
-
   //  problem_ -> print (std::cout);
   //  printf ("======================================\n");
-
   //  problem_ -> writeMod ("extended.mod");
 }
 
@@ -111,10 +107,12 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
     cs.insert (cut);
 }
 
+
 /// methods to get values of variables and bounds
 const CouNumber    CouenneCutGenerator::X   (int i) {return problem_ -> X  (i);}
 const CouNumber   &CouenneCutGenerator::Lb  (int i) {return problem_ -> Lb (i);}
 const CouNumber   &CouenneCutGenerator::Ub  (int i) {return problem_ -> Ub (i);}
+
 
 /// get arrays
 const CouNumber   *CouenneCutGenerator::X   ()      {return problem_ -> X  ();}

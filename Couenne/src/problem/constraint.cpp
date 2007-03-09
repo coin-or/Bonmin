@@ -20,8 +20,7 @@ void CouenneConstraint::print (std::ostream &out = std::cout) {
 
   bool samebounds = ((lb_ -> Type () == CONST) &&
 		     (ub_ -> Type () == CONST) && 
-		     (lb_ -> Value () == ub_ -> Value ()))
-		     || (lb_ -> name () == ub_ -> name ());
+		     (fabs (lb_ -> Value () - ub_ -> Value ()) < COUENNE_EPS));
 
   if (lb_ && 
       !samebounds &&

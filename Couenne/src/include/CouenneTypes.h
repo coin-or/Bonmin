@@ -17,7 +17,23 @@ enum con_sign       {COUENNE_EQ, COUENNE_LE, COUENNE_GE, COUENNE_RNG};
 enum opt_sense      {MAXIMIZE, MINIMIZE};
 enum conv_type      {CURRENT_ONLY, UNIFORM_GRID, AROUND_CURPOINT};
 
+enum expr_type {/*COU_EXPRAUX,  COU_EXPRCLONE, COU_EXPRCOPY, */
+                COU_EXPRESSION, /***** variables, constants **************/
+		COU_EXPRCONST, COU_EXPRVAR, COU_EXPRLBOUND, COU_EXPRUBOUND, 
+		/*COU_EXPRIVAR, */ 
+		COU_EXPROP,     /***** n-ary operators *******************/
+		COU_EXPRSUB,  COU_EXPRSUM, COU_EXPRGROUP, 
+		COU_EXPRMIN,  COU_EXPRMUL, COU_EXPRPOW, COU_EXPRMAX, COU_EXPRDIV, 
+		/*COU_EXPRBDIV,  COU_EXPRBMUL,*/ 
+		COU_EXPRUNARY,  /***** unary operators *******************/
+		COU_EXPRCOS,  COU_EXPRABS,
+		COU_EXPREXP,  COU_EXPRINV,   COU_EXPRLOG,    
+		COU_EXPROPP,   COU_EXPRSIN
+		};
+
+enum convexity {NONCONVEX, CONVEX, CONCAVE, AFFINE};
+
 typedef double CouNumber;
-typedef CouNumber       (*unary_function)   (CouNumber);
+typedef CouNumber (*unary_function) (CouNumber);
 
 #endif

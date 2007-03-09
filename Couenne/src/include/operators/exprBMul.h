@@ -23,17 +23,12 @@ class exprLBMul: public exprOp {
   exprLBMul  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  //  ~exprLBMul () {}
-
   // cloning method
   expression *clone () const
     {return new exprLBMul (clonearglist (), nargs_);}
 
   // function for the evaluation of the expression
   CouNumber operator () ();
-
-  // String equivalent (for comparisons)
-  const std::string name() const {return exprOp::name ("LB_mul");}
 
   // output
   void print (std::ostream &) const;
@@ -81,17 +76,12 @@ class exprUBMul: public exprOp {
   exprUBMul  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  //  ~exprUBMul () {}
-
   // cloning method
   expression *clone () const
     {return new exprUBMul (clonearglist (), nargs_);}
 
   // function for the evaluation of the expression
   CouNumber operator () ();
-
-  // String equivalent (for comparisons)
-  std::string name () {return exprOp::name ("UB_mul");}
 
   // output
   void print (std::ostream &) const;

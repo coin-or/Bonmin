@@ -58,39 +58,6 @@ exprGroup::exprGroup  (const exprGroup &src):
   }
 } 
 
-#define MAX_NAME 10000
-
-/// String equivalent (for comparisons)
-const std::string exprGroup::name () const {
-
-  std::string nl = exprSum::name ();
-
-  register char *s   = (char *) malloc (MAX_NAME * sizeof (char));
-  char          *sub = (char *) malloc (MAX_NAME * sizeof (char));
-
-  sprintf (s, "%s", nl. c_str ());
-
-  if (fabs (c0_) > COUENNE_EPS) {
-    sprintf (sub, "+%f", c0_);
-    strcat (s, sub);
-  }
-
-  for (register int *ind=index_, i=0; *ind>=0;) {
-    sprintf (sub, "%+fx_%d", coeff_ [i++], *ind++);
-    strcat (s, sub);
-  }
-
-  s = (char *) realloc (s, (1 + strlen (s)) * sizeof (char));
-  std::string ret (1 + strlen (s), ' ');
-  for (register int i=strlen (s); i--;)
-    ret [i] = s [i]; 
-
-  free (s);
-  free (sub);
-
-  return ret;
-}
-
 
 /// I/O
 void exprGroup::print (std::ostream &out) const {
@@ -159,4 +126,32 @@ int exprGroup::Linearity () {
       if (*index_ == -1)            return CONSTANT; 
       else                          return LINEAR;
     else                            return nllin;
+}
+
+///
+int exprGroup::compare (exprGroup &e) {
+
+  printf ("exprGroup::compare "); 
+  print (std::cout); 
+  e. print (std::cout);
+  printf ("\n");
+
+  int ret = exprOp::compare (e);
+
+  if (!ret) {
+
+    CouNumber *coe0 = coeff_,
+              *coe1 = e.coeff_;
+
+    for (register int *ind0 = index_, *ind1 = e.index_; 
+	 *ind0 >= 0 || *ind1 >= 0; 
+	 ind0++, ind1++, coe0++, coe1++)
+ 
+      if      (*ind0 < *ind1) return -1;
+      else if (*ind0 > *ind1) return  1;
+      else if (*coe0 < *coe1 - COUENNE_EPS) return -1;
+      else if (*coe0 > *coe1 + COUENNE_EPS) return  1;
+
+    return 0;
+  } else return ret;
 }

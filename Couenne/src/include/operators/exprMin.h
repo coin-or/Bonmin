@@ -28,14 +28,9 @@ class exprMin: public exprOp {
     arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
   }
 
-  //  ~exprMin () {}
-
   // cloning method
   exprMin *clone () const
     {return new exprMin (clonearglist (), nargs_);}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprOp::name ("min");}
 
   // I/O
   void print (std::ostream &out) const
@@ -52,12 +47,7 @@ class exprMin: public exprOp {
   inline expression *simplify () 
     {return NULL;}
 
-  // get a measure of "how linear" the expression is:
-  //
-  // CONSTANT  = 0: a constant
-  // LINEAR    = 1: linear
-  // QUADRATIC = 2: quadratic
-  // NONLINER  = 3: nonlinear non-quadratic
+  // get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () 
     {return NONLINEAR;}
 
@@ -72,6 +62,9 @@ class exprMin: public exprOp {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRMIN;}
 };
 
 

@@ -24,14 +24,9 @@ class exprLog: public exprUnary {
   exprLog  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
-  //  ~exprLog () {}
-
   // cloning method
   expression *clone () const
     {return new exprLog (argument_ -> clone ());}
-
-  // String equivalent (for comparisons)
-  const std::string name () const {return exprUnary::name ("log");}
 
   /// the operator's function
   inline unary_function F () {return log;}
@@ -56,6 +51,9 @@ class exprLog: public exprUnary {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
+
+  ///
+  virtual enum expr_type code () {return COU_EXPRINV;}
 };
 
 #endif
