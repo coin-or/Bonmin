@@ -12,7 +12,6 @@
 #include "CoinHelperFunctions.hpp"
 #include <CouenneProblem.h>
 
-
 namespace Bonmin {
 
 /** Default constructor. */
@@ -26,13 +25,16 @@ CouenneInterface::CouenneInterface(char **& amplArgs, SmartPtr<TNLPSolver> app):
   AmplInterface(amplArgs, app),
   couenneCg_(NULL)
   {
-    const ASL_pfgh* asl = amplModel()->AmplSolverObject();
-    ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
+    //    const ASL_pfgh* asl = amplModel()->AmplSolverObject();
+    //    ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
+
+    aslfg_ = readASLfg (amplArgs);
+
     //Get value of add_only violated option
     int addOnlyViolatedOa = true;
     app_->Options()->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     couenneCg_ = new CouenneCutGenerator 
-                       (this, nc_asl, true, CURRENT_ONLY,1);
+                       (this, aslfg_, true, CURRENT_ONLY,1);
   }
 
 /** Copy constructor. */
@@ -40,10 +42,10 @@ CouenneInterface::CouenneInterface(const CouenneInterface &other):
   AmplInterface(other),
   couenneCg_(NULL)
   {
-    const ASL_pfgh* asl = amplModel()->AmplSolverObject();
-    ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
+    //    const ASL_pfgh* asl = amplModel()->AmplSolverObject();
+    //    ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
     couenneCg_ = new CouenneCutGenerator 
-                       (this, nc_asl, true, CURRENT_ONLY,1);
+                       (this, aslfg_, true, CURRENT_ONLY,1);
   }
 
 /** virutal copy constructor. */
@@ -102,6 +104,7 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
    CouNumber *ll = couenneCg_ -> Problem () -> Lb ();
    CouNumber *uu = couenneCg_ -> Problem () -> Ub ();
 
+   // overwrite original bounds, could be improved within generateCuts
    for (register int i=numcolsconv; i--;) {
      colLower [i] = ll [i];
      colUpper [i] = uu [i];

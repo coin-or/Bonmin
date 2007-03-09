@@ -12,6 +12,11 @@
 #include "CouenneCutGenerator.h"
 
 
+struct ASL;
+
+struct ASL *readASLfg (char **);
+
+
 namespace Bonmin {
 class CouenneInterface : public AmplInterface
 {
@@ -56,8 +61,12 @@ class CouenneInterface : public AmplInterface
     return couenneCg_->Problem();
   }
 
+  /** return ASL interface */
+  ASL *getASL() {return aslfg_;}
+
   CouenneCutGenerator * couenneCg()  {
     return couenneCg_;}
+
   /** To set some application specific defaults. */
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
@@ -66,9 +75,10 @@ protected:
   /** The cut generator from couenne. */
   CouenneCutGenerator *couenneCg_;
 
+  /** The simpler ASL interface (no partially separable information,
+      no groups, no hassle) */
+  ASL *aslfg_;
 };
-
 
 } /** end Bonmin namespace. */
 #endif
-
