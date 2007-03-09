@@ -105,9 +105,11 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
   std::map <exprAux *, int, compExpr>::iterator i;
 
-  exprAux *w = new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
+  exprAux *w = new exprAux (symbolic, 
+			    variables_ . size () + auxiliaries_ . size (), 
+			    symbolic -> rank (this));
 
-  if ((i = auxMap2_ -> find (w)) == auxMap2_ -> end ()) {
+  if ((i = auxMap_ -> find (w)) == auxMap_ -> end ()) {
 
     // no such expression has been found in the map, 
     // create entry in the map
@@ -118,7 +120,7 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
     newpair.second = 1;
 
     auxiliaries_ . push_back (w);
-    auxMap2_ -> insert (newpair);
+    auxMap_ -> insert (newpair);
 
   }
   else {
@@ -138,8 +140,7 @@ void CouenneProblem::standardize () {
 
   // create expression map for binary search
 
-  auxMap_  = new std::map <std::string, exprAux *>;
-  auxMap2_ = new std::map <exprAux *, int, compExpr>;
+  auxMap_ = new std::map <exprAux *, int, compExpr>;
 
   // standardize objectives
 

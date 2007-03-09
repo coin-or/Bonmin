@@ -25,13 +25,18 @@ class exprAux: public exprVar {
 
  protected:
 
-  // The expression associated with this auxiliary variable
+  /// The expression associated with this auxiliary variable
   expression *image_;
 
-  // bounds determined by the associated expression's bounds and the
-  // relative constraint's bound
+  /// bounds determined by the associated expression's bounds and the
+  /// relative constraint's bound
   expression *lb_;
   expression *ub_;
+
+  /// used in rank-based branching variable choice: original variables
+  /// have rank 1; auxiliary w=f(x) has rank r(w) = r(x)+1; finally,
+  /// auxiliary w=f(x1,x2...,xk) has rank r(w) = 1+max{r(xi):i=1..k}.
+  int rank_;
 
  public:
 
@@ -40,7 +45,7 @@ class exprAux: public exprVar {
     {return AUX;}
 
   // Constructor
-  exprAux (expression *, int);
+  exprAux (expression *, int, int);
 
   // Destructor
   ~exprAux () {
@@ -51,8 +56,9 @@ class exprAux: public exprVar {
 
   // copy constructor
   exprAux (const exprAux &e):
-    exprVar (e.Index ()),
-    image_  (e.Image () -> clone ())
+    exprVar (e.varIndex_),
+    image_  (e.Image () -> clone ()),
+    rank_   (e.rank_)
 
     {image_ -> getBounds (lb_, ub_);}
 
@@ -108,6 +114,10 @@ class exprAux: public exprVar {
   // generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *);
+
+  /// used in rank-based branching variable choice
+  virtual int rank (CouenneProblem *p)
+    {return rank_;} 
 };
 
 #endif

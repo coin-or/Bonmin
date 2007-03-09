@@ -90,6 +90,10 @@ class exprUnary: public expression {
 
   /// compare two unary functions
   virtual int compare (exprUnary &); 
+
+  /// used in rank-based branching variable choice
+  virtual int rank (CouenneProblem *p)
+    {return (1 + argument_ -> rank (p));} 
 };
 
 #endif

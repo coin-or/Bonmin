@@ -20,10 +20,11 @@
 
 // auxiliary expression Constructor
 
-exprAux::exprAux (expression *image, int index): 
+exprAux::exprAux (expression *image, int index, int rank): 
 
   exprVar (index),
-  image_  (image) {
+  image_  (image),
+  rank_   (rank) {
 
   image_ -> getBounds (lb_, ub_);
   //  lb_ = new exprConst (- COUENNE_INFINITY);

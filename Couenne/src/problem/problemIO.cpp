@@ -36,7 +36,7 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
   printf ("auxiliaries:\n");
   for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
        i != auxiliaries_.end (); i++) {
-    (*i) -> print (out);             out << " := ";
+    (*i) -> print (out);             out << " [" << (*i) -> rank (NULL) << "] := ";
     (*i) -> Image () -> print (out); out << std::endl;
   }
   printf ("end\n");

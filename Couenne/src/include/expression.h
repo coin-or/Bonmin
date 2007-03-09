@@ -187,6 +187,12 @@ class expression {
   /// compare expressions
   virtual int compare (expression &);
   virtual int compare (exprCopy   &);
+
+  /// used in rank-based branching variable choice: original variables
+  /// have rank 1; auxiliary w=f(x) has rank r(w) = r(x)+1; finally,
+  /// auxiliary w=f(x1,x2...,xk) has rank r(w) = 1+max{r(xi):i=1..k}.
+  virtual int rank (CouenneProblem *p)
+    {return -1;} // return null rank
 };
 
 #endif

@@ -109,3 +109,17 @@ int exprOp::compare (exprOp  &e1) {
 
   return 0;
 }
+
+/// used in rank-based branching variable choice
+int exprOp::rank (CouenneProblem *p) {
+
+  int maxrank = -1;
+
+  for (register expression **al = arglist_ + nargs_; 
+       al-- > arglist_;) {
+    register int r = (*al) -> rank (p);
+    if (r > maxrank) maxrank = r;
+  }
+
+  return (1 + maxrank);
+}

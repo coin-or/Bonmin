@@ -96,6 +96,10 @@ class exprVar: public expression {
 
   ///
   virtual enum expr_type code () {return COU_EXPRVAR;}
+
+  /// used in rank-based branching variable choice
+  virtual int rank (CouenneProblem *p)
+    {return 1;} 
 };
 
 #endif

@@ -75,6 +75,9 @@ class exprGroup: public exprSum {
 
   ///
   virtual enum expr_type code () {return COU_EXPRGROUP;}
+
+  /// used in rank-based branching variable choice
+  virtual int rank (CouenneProblem *);
 };
 
 

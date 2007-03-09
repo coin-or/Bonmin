@@ -82,6 +82,10 @@ class exprConst: public expression {
 
   ///
   virtual enum expr_type code () {return COU_EXPRCONST;}
+
+  /// used in rank-based branching variable choice
+  virtual int rank (CouenneProblem *p)
+    {return 0;} 
 };
 
 #endif

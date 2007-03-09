@@ -6,6 +6,7 @@
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
  */
 
+#include <CouenneProblem.h>
 #include <exprConst.h>
 #include <exprGroup.h>
 
@@ -131,13 +132,13 @@ int exprGroup::Linearity () {
 ///
 int exprGroup::compare (exprGroup &e) {
 
-  CouNumber *coe0 = coeff_,
-    *coe1 = e.coeff_;
+  CouNumber *coe0 =   coeff_,
+            *coe1 = e.coeff_;
 
   for (register int *ind0 = index_, *ind1 = e.index_; 
        *ind0 >= 0 || *ind1 >= 0; 
        ind0++, ind1++, 
-	 coe0++, coe1++) {
+       coe0++, coe1++) {
  
     if (*ind0 < *ind1) return -1;
     if (*ind0 > *ind1) return  1;
@@ -146,4 +147,27 @@ int exprGroup::compare (exprGroup &e) {
   }
 
   return 0;
+}
+
+/// used in rank-based branching variable choice
+int exprGroup::rank (CouenneProblem *p) {
+
+  int maxrank = exprOp::rank (p);
+
+  if (maxrank < 0) 
+    maxrank = 0;
+
+  int norig = p -> nVars ();
+
+  for (register int *ind = index_; *ind>=0; ind++) {
+
+    int r = (*ind >= norig) ? 
+      (p -> Aux (*ind - norig) -> rank (p)) :
+      (p -> Var (*ind)         -> rank (p));
+    if (++r > maxrank) // increment because above exprOp::rank returns
+		       // something already incremented
+      maxrank = r;
+  }
+
+  return maxrank;
 }

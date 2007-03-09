@@ -106,6 +106,9 @@ class exprOp: public expression {
 
   ///
   virtual int compare (exprOp &);
+
+  /// used in rank-based branching variable choice
+  virtual int rank (CouenneProblem *);
 };
 
 

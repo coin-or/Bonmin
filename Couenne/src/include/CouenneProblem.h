@@ -47,8 +47,7 @@ class CouenneProblem {
   CouNumber *ub_;
 
   /// expression map for comparison in standardization
-  std::map <std::string, exprAux *> *auxMap_;
-  std::map <exprAux *, int, compExpr> *auxMap2_; // int to count occurrences
+  std::map <exprAux *, int, compExpr> *auxMap_; // int to count occurrences
 
   /// number of elements in the x_, lb_, ub_ arrays
   int curnvars_;
@@ -56,7 +55,7 @@ class CouenneProblem {
  public:
 
   /// constructors, destructor
-  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap2_ = NULL; curnvars_ = -1;}
+  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap_ = NULL; curnvars_ = -1;}
   CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 

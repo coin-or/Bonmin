@@ -112,6 +112,10 @@ class exprCopy: public expression {
   ///
   int compare (expression &e) 
     {return copy_ -> compare (e);}
+
+  /// used in rank-based branching variable choice
+  virtual int rank (CouenneProblem *p)
+    {return copy_ -> rank (p);} 
 };
 
 #endif
