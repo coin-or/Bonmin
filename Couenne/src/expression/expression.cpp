@@ -56,48 +56,46 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 /// compare generic expression with other expression
 int expression::compare (expression &e1) {
 
-  if      (code () >= COU_EXPRUNARY) 
-    if (e1.code () >= COU_EXPRUNARY) {
-
-      exprUnary *ne0 = dynamic_cast <exprUnary *> (this);
-      exprUnary *ne1 = dynamic_cast <exprUnary *> (&e1);
-      return ne0 -> compare (*ne1);
-    }
-    else return 1;
-  else if   (code () >= COU_EXPROP)
-    if   (e1.code () >= COU_EXPROP)
-      if (e1.code () >= COU_EXPRUNARY) return -1;
-      else {
-
-      exprOp *ne0 = dynamic_cast <exprOp *> (this);
-      exprOp *ne1 = dynamic_cast <exprOp *> (&e1);
-      return ne0 -> compare (*ne1);
-      }
-    else if (e1.code () >= COU_EXPROP) return -1;
-    else ;
-  else ;
-
   int c0 = code (),
       c1 = e1. code ();
 
   if      (c0 < c1) return -1;
   else if (c0 > c1) return  1;
-  else { // it is either a constant or a variable
 
-    int i1 = e1. Index ();
+  // same code, check arguments
 
-    if      (Index () < i1) return -1;
-    else if (Index () > i1) return  1;
-    else if (i1 != -1)      return  0; // same variables
-    else { // both are constants
+  if (c0 >= COU_EXPRUNARY) { // both are exprUnary's
 
-      CouNumber v1 = e1. Value ();
+    exprUnary *ne0 = dynamic_cast <exprUnary *> (this);
+    exprUnary *ne1 = dynamic_cast <exprUnary *> (&e1);
 
-      if      (currValue_ < v1) return -1;
-      else if (currValue_ > v1) return  1;
-      else                      return  0;
-    }
+    return ne0 -> compare (*ne1);
   }
+
+  if (c0 >= COU_EXPROP) { // both are exprOp's
+
+    exprOp *ne0 = dynamic_cast <exprOp *> (this);
+    exprOp *ne1 = dynamic_cast <exprOp *> (&e1);
+
+    return ne0 -> compare (*ne1);
+  }
+
+  // expressions are both variables or constants
+
+  int i0 =     Index (),
+      i1 = e1. Index ();
+
+  if (i0 < i1) return -1;
+  if (i0 > i1) return  1;
+  if (i0 >= 0) return  0; // same variables
+
+  // both are numbers
+  CouNumber v1 = e1. Value ();
+
+  if (currValue_ < v1) return -1;
+  if (currValue_ > v1) return  1;
+
+  return  0;
 }
 
 

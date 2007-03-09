@@ -85,7 +85,7 @@ inline CouNumber exprGroup::operator () () {
   register CouNumber  ret = c0_ + exprSum::operator () (),
                      *coe = coeff_;
 
-  for (register int *ind = index_, i=0; *ind >= 0;)
+  for (register int *ind = index_; *ind >= 0;)
     ret += *coe++ * expression::Variable (*ind++);
 
   return (currValue_ = ret);

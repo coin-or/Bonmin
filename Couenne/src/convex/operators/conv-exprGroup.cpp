@@ -138,11 +138,13 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   cut -> setUb (rhs);
   cut -> setLb (rhs);
 
-  delete [] index;
-  delete [] coeff;
-
   // added only once, it is global
   cut -> setGloballyValid ();
 
   cs.insert (cut);
+
+  delete [] index;
+  delete [] coeff;
+
+  delete cut;
 }

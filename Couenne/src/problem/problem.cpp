@@ -98,45 +98,10 @@ expression *CouenneProblem::addVariable (bool isDiscrete) {
 
 /// add auxiliary variable and associate it with pointer to expression
 /// given as argument
-/*
-exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
-
-  // check if image is already in the expression database auxMap_
-
-  exprAux *var;
-  std::string key = symbolic -> name (); // string serving as a key to the map
-  std::map <std::string, exprAux *>::iterator i;
-
-  if ((i = auxMap_ -> find (key)) == auxMap_ -> end ()) {
-
-    // no such expression has been found in the map, 
-    // create entry in the map
-
-    std::pair <std::string, exprAux *> newpair;
-    newpair.first  = key;
-    newpair.second = var = 
-      // and corresponding auxiliary variable
-      new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
-
-    auxiliaries_ . push_back (var);
-    auxMap_ -> insert (newpair);
-  }
-  else var = (*i).second; // otherwise, just return the entry's
-			  // auxiliary var. pointer
-  return var;
-}
-*/
-
-
-/// add auxiliary variable and associate it with pointer to expression
-/// given as argument
 
 exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
   // check if image is already in the expression database auxMap_
-
-  //  exprAux *var;
-  //  std::string key = symbolic -> name (); // string serving as a key to the map
 
   std::map <exprAux *, int, compExpr>::iterator i;
 
@@ -149,32 +114,18 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
     std::pair <exprAux *, int> newpair;
 
-    newpair.first = w;//new exprAux (symbolic, variables_ . size () + auxiliaries_ . size ());
-      // and corresponding auxiliary variable
+    newpair.first  = w; // and corresponding auxiliary variable
     newpair.second = 1;
 
     auxiliaries_ . push_back (w);
     auxMap2_ -> insert (newpair);
-    /*
-    printf ("new expression: "); 
-    w -> print (std::cout);
-    printf (" := ");
-    w -> Image () -> print (std::cout);
-    printf ("\n");
-    */
+
   }
   else {
     delete w;
     w = i -> first; // otherwise, just return the entry's
                     // auxiliary var. pointer
     i -> second ++;
-    /*
-    printf ("found (%d times now): ", i -> second); 
-    i -> first -> print (std::cout);
-    printf (" := ");
-    i -> first -> Image () -> print (std::cout);
-    printf ("\n");
-    */
   }
 
   return w;

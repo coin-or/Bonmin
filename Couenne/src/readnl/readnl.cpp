@@ -34,17 +34,18 @@ inline bool is_expr_zero (expr* e)
 			  // *** CHECK THIS! dL is the derivative
 			  )));} 
 
+
 // Reads a MINLP from an AMPL .nl file through the ASL methods
 
 int CouenneProblem::readnl (const ASL *asl) {
 
   int n_intvar = niv + nbv + nlvbi + nlvci + nlvoi;
 
-  // create discrete variables
+  // create continuous variables
   for (int i = n_var-n_intvar; i--;)
     addVariable (false);
 
-  // create continuous variables
+  // create integer variables
   for (int i = n_intvar; i--;)
     addVariable (true);
 
@@ -117,7 +118,6 @@ int CouenneProblem::readnl (const ASL *asl) {
 
   // constraints ///////////////////////////////////////////////////////////////////
 
-  expression ***alists = new expression ** [n_con];
   int          *nterms = new int           [n_con];
 
   // allocate space for argument list of all constraints' summations
@@ -132,7 +132,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 
   // count all linear terms
   if (A_colstarts && A_vals)
-    for (int j = A_colstarts [n_var]; j--;) {
+    for (register int j = A_colstarts [n_var]; j--;) {
 
       real coeff = A_vals [j];
 
@@ -140,7 +140,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 	nterms [A_rownos [j]] ++;
     }
   else {                             // Constraints' linear info is stored in Cgrad
-    for (int i = 0; i < n_con; i++)
+    for (register int i = 0; i < n_con; i++)
       for (congrad = Cgrad [i]; 
 	   congrad; 
 	   congrad = congrad -> next) 
@@ -149,41 +149,57 @@ int CouenneProblem::readnl (const ASL *asl) {
   }
 
 
-  // add possible nonlinear term (at most one)
-  for (int i = 0; i < n_con; i++) 
-    if (!is_expr_zero (CON_DE [i] . e))
-      nterms [i] ++;
+  // vectors of the linear part
+  CouNumber **coeff = new CouNumber * [n_con];
+  int       **index = new int       * [n_con];
 
-  // reserve space for argument lists of sums
-  for (int i = 0; i < n_con; i++)
-    alists [i] = new expression * [nterms [i]];
+  for (register int i = n_con; i--;) 
+    *index++ = NULL;
+
+  index -= n_con;
+
 
   // set linear terms
 
   if (A_colstarts && A_vals)         // Constraints' linear info is stored in A_vals
     for (int j = 0; j < n_var; j++)
-      for (int i = A_colstarts [j]; i < A_colstarts [j + 1]; i++) {
+      for (register int i = A_colstarts [j], k = A_colstarts [j+1] - i; k--; i++) {
 
-	real coeff = A_vals[i];
+	int rowno = A_rownos [i],
+	    nt    = nterms [rowno] --;
 
-	if (fabs (coeff) > COUENNE_EPS)
-	  if (fabs (coeff - 1.0) > COUENNE_EPS)
-	    *(alists [A_rownos [i]])++ = 
-	      new exprMul (new exprConst (coeff), new exprClone (variables_ [j]));
-	  else
-	    *(alists [A_rownos [i]])++ = 
-	      new exprClone (variables_ [j]);
+	CouNumber **cline = coeff + rowno;
+	int       **iline = index + rowno;
+
+	if (*iline==NULL) {
+	  *cline = new CouNumber [nt];
+	  *iline = new int       [nt+1];
+	  (*iline) [nt] = -1;
+	}
+
+	(*cline) [--nt] = A_vals [i];
+	(*iline)   [nt] = j;
+
       }
   else {                             // Constraints' linear info is stored in Cgrad
-    for (int i = 0; i < n_con; i++)
-      for (congrad = Cgrad [i]; 
-	   congrad; 
-	   congrad = congrad -> next) 
-	if (fabs (congrad -> coef) > COUENNE_EPS) 
-	  *(alists [i])++ = new exprMul (new exprConst (congrad -> coef),
-					 new exprClone (variables_ [congrad -> varno]));
-  }
+    for (int i=0; i < n_con; i++) {
 
+      int nt = nterms [i];
+
+      CouNumber **cline = coeff + i;
+      int       **iline = index + i;
+
+      *cline = new CouNumber [nt];
+      *iline = new int       [nt+1];
+      (*iline) [nt] = -1;
+
+      for (congrad = Cgrad [i]; congrad; congrad = congrad -> next) 
+	if (fabs (congrad -> coef) > COUENNE_EPS) {
+	  (*cline) [--nt] = congrad -> coef;
+	  (*iline)   [nt] = congrad -> varno;
+	}
+    }
+  }
 
   // set constraints' bound and sign and store nonlinear part ///////////////////////////////
 
@@ -207,42 +223,43 @@ int CouenneProblem::readnl (const ASL *asl) {
 	sign = COUENNE_RNG;
       else sign = COUENNE_GE;
     else sign = COUENNE_LE;
-  
+
+    // this is an equality constraint  
     if (fabs (lb - ub) < COUENNE_EPS)
       sign = COUENNE_EQ;
 
-    // set nonlinear part
-    if (!is_expr_zero (CON_DE [i] . e))
-      *(alists [i])++ = nl2e (CON_DE [i] . e);
+    expression *body;
 
-    // re-align alists [i] to original value
-    alists [i] -= nterms [i];
+    expression **nll = new expression * [1];
+    *nll = nl2e (CON_DE [i] . e);
 
-    if (!(nterms [i])) 
-      delete [] alists [i];
+    if (index [i]) 
+      body = new exprGroup (0, index [i], coeff [i], nll, 1);
     else {
-
-      expression *body;
-
-      // create sum with alists [i] as argument list
-      if (nterms [i] == 1) body = alists [i] [0];
-      else                 body = new exprSum (alists [i], nterms [i]);	
-
-      expression *subst = body -> simplify ();
-      if (subst) body = subst;
-
-      // add them (and set lower-upper bound)
-      switch (sign) {
-	
-      case COUENNE_EQ:  addEQConstraint  (body, new exprConst (ub)); break;
-      case COUENNE_LE:  addLEConstraint  (body, new exprConst (ub)); break;
-      case COUENNE_GE:  addGEConstraint  (body, new exprConst (lb)); break;
-      case COUENNE_RNG: addRNGConstraint (body, new exprConst (lb), 
-					        new exprConst (ub)); break;
-      default: printf ("could not recognize constraint\n"); return -1;
-      }
+      body = *nll;
+      delete [] nll;
     }
+
+    expression *subst = body -> simplify ();
+    if (subst) body = subst;
+
+    // add them (and set lower-upper bound)
+    switch (sign) {
+	
+    case COUENNE_EQ:  addEQConstraint  (body, new exprConst (ub)); break;
+    case COUENNE_LE:  addLEConstraint  (body, new exprConst (ub)); break;
+    case COUENNE_GE:  addGEConstraint  (body, new exprConst (lb)); break;
+    case COUENNE_RNG: addRNGConstraint (body, new exprConst (lb), 
+					      new exprConst (ub)); break;
+    default: printf ("could not recognize constraint\n"); return -1;
+    }
+
+    delete [] index [i];
+    delete [] coeff [i];
   }
+
+  delete [] index;
+  delete [] coeff;
 
   // lower and upper bounds ///////////////////////////////////////////////////////////////
 
@@ -251,28 +268,28 @@ int CouenneProblem::readnl (const ASL *asl) {
     real *Uvx_copy = Uvx;
 
     if (!Uvx_copy)
-      for (int i=0; i<n_var; i++) {
+      for (register int i=0; i<n_var; i++) {
 
-	int j = 2*i;
+	register int j = 2*i;
 
 	lb_ [i] = LUv [j];
 	ub_ [i] = LUv [j+1];
       }
     else
-      for (int i=n_var; i--;) {
+      for (register int i=n_var; i--;) {
 	lb_ [i] = LUv [i];
 	ub_ [i] = Uvx_copy [i];
       }
 
   } else
-    for (int i=n_var; i--;) {
+    for (register int i=n_var; i--;) {
       lb_ [i] = - COUENNE_INFINITY;
       ub_ [i] =   COUENNE_INFINITY;
     }
 
   // initial x ////////////////////////////////////////////////////////////////////
 
-  for (int i=n_var; i--;) 
+  for (register int i=n_var; i--;) 
     if (X0 && havex0 [i])
       x_ [i] = X0 [i]; 
     else {
@@ -293,7 +310,6 @@ int CouenneProblem::readnl (const ASL *asl) {
   expression::update (x_, lb_, ub_);
 
   delete [] nterms;
-  delete [] alists;
 
   return 0;
 }

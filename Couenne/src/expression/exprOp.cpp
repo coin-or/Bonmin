@@ -20,6 +20,7 @@
 #include <exprVar.h>
 #include <exprIVar.h>
 #include <exprBound.h>
+#include <exprGroup.h>
 
 // General N-ary function destructor
 
@@ -74,24 +75,37 @@ bool exprOp::dependsOn (int *varlist = NULL, int n = 1) {
   return false;
 }
 
+
 ///
 int exprOp::compare (exprOp  &e1) {
 
   int c0 = code (),
       c1 = e1. code ();
 
-  if      (c0 < c1) return -1;
-  else if (c0 > c1) return  1;
-  else { // have to compare arguments one by one
+  if (c0 < c1) return -1;
+  if (c0 > c1) return  1;
 
-    if      (nargs_ < e1.nargs_) return -1;
-    else if (nargs_ > e1.nargs_) return 1;
+  // have to compare arguments one by one
 
-    for (register int i = nargs_; i--;) {
+  if (nargs_ < e1.nargs_) return -1;
+  if (nargs_ > e1.nargs_) return  1;
 
-      int res = arglist_ [i] -> compare (*(e1. ArgList () [i]));
-      if (res) return res;
-    }
-    return 0;
+
+  // not an exprGroup, compare arguments
+  for (register int i = nargs_; i--;) {
+
+    int res = arglist_ [i] -> compare (*(e1. ArgList () [i]));
+    if (res) return res;
   }
+
+  // last chance, this might be an exprGrouip
+  if (c0==COU_EXPRGROUP) {
+
+    exprGroup *ne0 = dynamic_cast <exprGroup *> (this),
+              *ne1 = dynamic_cast <exprGroup *> (&e1);
+
+    return ne0 -> compare (*ne1);
+  }
+
+  return 0;
 }

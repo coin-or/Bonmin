@@ -131,27 +131,19 @@ int exprGroup::Linearity () {
 ///
 int exprGroup::compare (exprGroup &e) {
 
-  printf ("exprGroup::compare "); 
-  print (std::cout); 
-  e. print (std::cout);
-  printf ("\n");
+  CouNumber *coe0 = coeff_,
+    *coe1 = e.coeff_;
 
-  int ret = exprOp::compare (e);
-
-  if (!ret) {
-
-    CouNumber *coe0 = coeff_,
-              *coe1 = e.coeff_;
-
-    for (register int *ind0 = index_, *ind1 = e.index_; 
-	 *ind0 >= 0 || *ind1 >= 0; 
-	 ind0++, ind1++, coe0++, coe1++)
+  for (register int *ind0 = index_, *ind1 = e.index_; 
+       *ind0 >= 0 || *ind1 >= 0; 
+       ind0++, ind1++, 
+	 coe0++, coe1++) {
  
-      if      (*ind0 < *ind1) return -1;
-      else if (*ind0 > *ind1) return  1;
-      else if (*coe0 < *coe1 - COUENNE_EPS) return -1;
-      else if (*coe0 > *coe1 + COUENNE_EPS) return  1;
+    if (*ind0 < *ind1) return -1;
+    if (*ind0 > *ind1) return  1;
+    if (*coe0 < *coe1 - COUENNE_EPS) return -1;
+    if (*coe0 > *coe1 + COUENNE_EPS) return  1;
+  }
 
-    return 0;
-  } else return ret;
+  return 0;
 }
