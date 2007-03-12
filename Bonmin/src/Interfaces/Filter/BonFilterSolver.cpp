@@ -570,7 +570,7 @@ FilterSolver::callOptimizer()
   cached_->tnlp_->finalize_solution(status, cached_->n, 
 			  cached_->x, cached_->lam, cached_->lam, 
 			  cached_->m, cached_->c, cached_->g_ + cached_->n, 
-			  cached_->f);
+			  cached_->f, NULL, NULL);
   return optimizationStatus;
 }
 

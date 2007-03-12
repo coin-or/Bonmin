@@ -85,7 +85,7 @@ namespace Bonmin{
 	CoinFillN(z,n,0.);
 	tnlp->finalize_solution(Ipopt::LOCAL_INFEASIBILITY,
 			       n, x_sol, NULL, NULL, 
-			       m, g_sol, NULL, obj_value);
+			       m, g_sol, NULL, obj_value, NULL, NULL);
 	delete [] lam;
 	delete [] z;
 	delete [] g_sol;
@@ -103,7 +103,7 @@ namespace Bonmin{
     CoinFillN(z,n,0.);
     tnlp->finalize_solution(Ipopt::SUCCESS,
 			   n, x_sol, z, z,
-			   m, g_sol, lam, obj_value);
+			   m, g_sol, lam, obj_value, NULL, NULL);
     delete [] lam;
     delete [] z;
     delete [] g_sol;

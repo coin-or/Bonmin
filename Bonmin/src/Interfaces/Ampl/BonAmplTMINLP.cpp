@@ -342,7 +342,9 @@ namespace Bonmin
   void AmplTMINLP::finalize_solution(SolverReturn status,
       Index n, const Number* x, const Number* z_L, const Number* z_U,
       Index m, const Number* g, const Number* lambda,
-      Number obj_value)
+      Number obj_value,
+      const IpoptData* ip_data,
+      IpoptCalculatedQuantities* ip_cq)
   {
     // Not sure if ampl require a different form of solution file
     // for MINLPs - we may have to write a different solution file here instead of
@@ -350,7 +352,7 @@ namespace Bonmin
     ampl_tnlp_->finalize_solution(status,
         n, x, z_L, z_U,
         m, g, lambda,
-        obj_value);
+        obj_value, ip_data, ip_cq);
 
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
     solve_result_num = 0;

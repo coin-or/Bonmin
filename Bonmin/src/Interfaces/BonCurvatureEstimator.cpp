@@ -344,7 +344,7 @@ namespace Bonmin
 	return false;
       }
       orig_d = eq_projected_d_; // This way we don't need to rememeber
-				// how the dorection was projected;
+				// how the direction was projected;
     }
 
     // If necessary, determine new activities
