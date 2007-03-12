@@ -526,7 +526,6 @@ namespace Bonmin
 #endif
 
     currentBranchModel = &model;
-
     model.branchAndBound();
     numNodes_ = model.getNodeCount();
     bestObj_ = model.getObjValue();
@@ -555,7 +554,13 @@ namespace Bonmin
       <<" beware that reported solution may not be optimal"<<std::endl
       <<"************************************************************"<<std::endl;
     }
-
+    if(model.numberObjects()==0){
+      if(bestSolution_)
+        delete [] bestSolution_;
+      bestSolution_ = new double[nlpSolver->getNumCols()];
+      CoinCopyN(nlpSolver->getColSolution(), nlpSolver->getNumCols(),
+                bestSolution_);
+    }
     if (model.bestSolution()) {
       if (bestSolution_)
         delete [] bestSolution_;
