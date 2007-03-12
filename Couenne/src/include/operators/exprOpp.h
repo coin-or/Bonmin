@@ -54,6 +54,9 @@ class exprOpp: public exprUnary {
 
   ///
   virtual enum expr_type code () {return COU_EXPROPP;}
+
+  /// implied bound processing
+  bool impliedBound (int, CouNumber *, CouNumber *, char *);
 };
 
 #endif

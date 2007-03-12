@@ -64,3 +64,39 @@ void exprAbs::print (std::ostream& out) const {
   out << "|";
   */
 }
+
+
+/// implied bound processing for expression w = |x|, upon change in
+/// lower- and/or upper bound of w, whose index is wind
+
+bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  int index = argument_ -> Index ();
+
+  CouNumber *xl = l + index, *xu = u + index,
+            *wl = l + wind,  *wu = u + wind;
+
+  // for w >= b, we can only improve xlb if it is at least -b
+  //                                 xub             most   b
+
+  bool tighter = false;
+
+  if (*wl >= 0) {
+
+    if (*xl > -*wl) tighter = updateBound (-1, xl,  *wl);
+    if (*xu <  *wl) tighter = updateBound ( 1, xu, -*wl) || tighter;
+  }
+
+  // now w <= b
+
+  if (*wu >= 0) {
+
+    tighter = updateBound (-1, xl, -*wu) || tighter;
+    tighter = updateBound ( 1, xu,  *wu) || tighter;
+  }
+
+  if (tighter)
+    chg [index] = 1;
+
+  return tighter;
+}

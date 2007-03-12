@@ -27,8 +27,6 @@ exprAux::exprAux (expression *image, int index, int rank):
   rank_   (rank) {
 
   image_ -> getBounds (lb_, ub_);
-  //  lb_ = new exprConst (- COUENNE_INFINITY);
-  //  ub_ = new exprConst (  COUENNE_INFINITY);
 }
 
 
@@ -43,15 +41,12 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
             u = expression::Ubound (varIndex_);
 
   if (fabs (u-l) < COUENNE_EPS) {
-    //    printf ("fixed aux: %d, %f, %f\n", varIndex_,
-    //	    expression::Lbound (varIndex_),
-    //            expression::Ubound (varIndex_));
+
     OsiRowCut *cut = cg -> createCut (l, 0, varIndex_, 1.);
     if (cut) cs.insert (cut);
   } else {
 
     image_ -> generateCuts (this, si, cs, cg);
-    //    printf ("generated cuts\n");
   }
 
   //  if (!(cg -> isFirst ())) 

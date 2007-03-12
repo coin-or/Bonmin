@@ -1,5 +1,5 @@
 /*
- * Name:    exprSub.C
+ * Name:    exprSub.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of subtractions
  *
@@ -85,4 +85,57 @@ void exprSub::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprSub (alsl, 2);
   ub = new exprSub (alsu, 2);
+}
+
+
+/// implied bound processing for expression w = x-y, upon change in
+/// lower- and/or upper bound of w, whose index is wind
+
+bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  // caution, xi or yi might be -1
+  int xi = arglist_ [0] -> Index (),
+      yi = arglist_ [1] -> Index ();
+
+  if ((xi==-1) && (yi==-1))
+    return false;
+
+  CouNumber xl, xu, yl, yu;
+
+  if (xi==-1) xl =         xu = arglist_ [0] -> Value ();
+  else       {xl = l [xi]; xu = u [xi];}
+
+  if (yi==-1) yl =         yu = arglist_ [1] -> Value ();
+  else       {yl = l [yi]; yu = u [yi];}
+
+  CouNumber wl = l [wind],
+            wu = u [wind];
+
+  bool res = false;
+
+  // w >= b
+
+  if ((xi >= 0) && updateBound (-1, l + xi, yl + wl)) {
+    chg [xi] = 1;
+    res = true;
+  }
+
+  if ((yi >= 0) && updateBound (+1, u + yi, xu - wl)) {
+    chg [yi] = 1;
+    res = true;
+  }
+
+  // w <= b
+
+  if ((xi >= 0) && updateBound (+1, u + xi, yu + wu)) {
+    chg [xi] = 1;
+    res = true;
+  }
+
+  if ((yi >= 0) && updateBound (-1, l + yi, xl - wu)) {
+    chg [yi] = 1;
+    res = true;
+  }
+
+  return res;
 }

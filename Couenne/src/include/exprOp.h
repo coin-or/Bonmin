@@ -101,10 +101,10 @@ class exprOp: public expression {
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar () {return arglist_ [0];}
 
-  ///
+  /// return code to classify type of expression
   virtual enum expr_type code () {return COU_EXPROP;}
 
-  ///
+  /// compare with other generic exprOp
   virtual int compare (exprOp &);
 
   /// used in rank-based branching variable choice

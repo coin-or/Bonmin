@@ -180,7 +180,7 @@ class expression {
   virtual enum expr_type code () 
     {return COU_EXPRESSION;}
 
-  /// either CONVEX, CONCAVE, AFFINE, or NONE
+  /// either CONVEX, CONCAVE, AFFINE, or NONCONVEX
   virtual enum convexity convexity () 
     {return NONCONVEX;}
 
@@ -193,6 +193,43 @@ class expression {
   /// auxiliary w=f(x1,x2...,xk) has rank r(w) = 1+max{r(xi):i=1..k}.
   virtual int rank (CouenneProblem *p)
     {return -1;} // return null rank
+
+  /// does a backward implied bound processing on every expression,
+  /// including exprSums although already done by Clp (useful when
+  /// repeated within Couenne). Parameters are the index of the
+  /// (auxiliary) variable in question and the current lower/upper
+  /// bound. The method returns the best bound improvement obtained on
+  /// all variables of the expression.
+  virtual bool impliedBound (int, CouNumber *, CouNumber *, char *)
+    {return false;}
 };
+
+
+/// updates maximum violation. Used with all impliedBound. Returns 1
+/// if a bound has been modified, 0 otherwise
+
+inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
+
+  register CouNumber delta = src - *dst;
+
+  if (sign > 0) 
+    delta = - delta;
+
+  // meaning: 
+  //
+  // if (*dst > src) && (sign > 0) --> dst down to src
+  // if (*dst < src) && (sign < 0) --> dst up   to src
+  //
+  // that is, sign > 0 means we are tightening an UPPER bound
+  //          sign < 0                            LOWER
+
+  if (delta > COUENNE_EPS) {
+
+    *dst = src; // tighten
+    return true;
+  }
+
+  return false;
+}
 
 #endif

@@ -1,4 +1,7 @@
-- rank in expressions for branching
+- cut currValue_ from expressions
+- extra forward bound tightening for products (can do in exprMul::generateCuts())
+- forward bound tightening for product, power, division
+- marginals bound tightening
 - documentation
 - improve convexification of x/y
 - improve power convexification (find closest point in convex envelope)

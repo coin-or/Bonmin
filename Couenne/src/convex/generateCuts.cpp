@@ -129,8 +129,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
   }
-
   /*
+  printf ("================= before-----------\n");
   for (register int i=0; i < ncols; i++)
     printf ("x%3d: [%12.4f,%12.4f]\n", i,
 	    expression::Lbound (i), 
@@ -140,7 +140,29 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // tighten the current relaxation by tightening the variables'
   // bounds
 
-  int ntightened = problem_ -> tightenBounds (si, chg_bds);
+  int ntightened = 0, nbwtightened = 0;
+
+  //  printf ("-----------\n");
+
+  do {
+
+    ntightened   = problem_ -> tightenBounds (si, chg_bds);
+    nbwtightened = problem_ -> impliedBounds     (chg_bds);
+
+    /*
+    if (ntightened || nbwtightened) 
+      printf ("(%d,%d) bounds improvement\n",
+	      ntightened, nbwtightened);
+    */
+  } while (ntightened || nbwtightened);
+
+  /*
+  for (register int i=0; i < ncols; i++)
+    printf ("x%3d: [%12.4f,%12.4f]\n", i,
+	    expression::Lbound (i), 
+	    expression::Ubound (i));
+  printf ("================= after\n");
+  */
 
   //  printf ("::::::::::::::::::::::::::::::::::::::::::::::\n");
   //  for (register int i=0; i < ncols; i++)

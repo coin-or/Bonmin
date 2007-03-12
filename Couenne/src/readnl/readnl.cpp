@@ -101,6 +101,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 
       delete [] index;
       delete [] coeff;
+
     } else 
       if (fabs (objconst (i) > COUENNE_EPS))
 	body = new exprSum (nl, new exprConst (objconst (i)));
@@ -118,7 +119,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 
   // constraints ///////////////////////////////////////////////////////////////////
 
-  int          *nterms = new int           [n_con];
+  int *nterms = new int [n_con];
 
   // allocate space for argument list of all constraints' summations
   // of linear and nonlinear terms
@@ -131,7 +132,7 @@ int CouenneProblem::readnl (const ASL *asl) {
   cgrad *congrad;
 
   // count all linear terms
-  if (A_colstarts && A_vals)
+  if (A_colstarts && A_vals)         // Constraints' linear info is stored in A_vals
     for (register int j = A_colstarts [n_var]; j--;) {
 
       real coeff = A_vals [j];
@@ -234,7 +235,7 @@ int CouenneProblem::readnl (const ASL *asl) {
     *nll = nl2e (CON_DE [i] . e);
 
     if (index [i]) 
-      body = new exprGroup (0, index [i], coeff [i], nll, 1);
+      body = new exprGroup (0., index [i], coeff [i], nll, 1);
     else {
       body = *nll;
       delete [] nll;

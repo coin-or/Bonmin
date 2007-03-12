@@ -99,6 +99,6 @@ int expression::compare (expression &e1) {
 }
 
 
-///
+/// compare expressions (used in bsearch within CouenneProblem::standardize)
 int expression::compare (exprCopy &c)
 {return compare (const_cast <expression &> (*(c. Original ())));}

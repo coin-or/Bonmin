@@ -36,6 +36,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp \
+	expression/operators/impliedBounds-exprSum.cpp \
 	expression/exprOp.cpp \
 	expression/exprUnary.cpp \
 	expression/exprVar.cpp \
@@ -67,6 +68,7 @@ libCouenne_la_SOURCES = \
 	problem/problemIO.cpp \
 	problem/constraint.cpp \
 	problem/tightenBounds.cpp \
+	problem/impliedBounds.cpp \
 	problem/readASLfg.cpp \
 	util/rootQ.c
 

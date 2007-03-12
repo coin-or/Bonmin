@@ -39,6 +39,11 @@ class exprGroup: public exprSum {
     }
   }
 
+  /// get constant, indices and coefficients vectors
+  CouNumber  getc0      () {return c0_;}
+  CouNumber *getCoeffs  () {return coeff_;}
+  int       *getIndices () {return index_;}
+
   /// cloning method
   virtual expression *clone () const
     {return new exprGroup (*this);}

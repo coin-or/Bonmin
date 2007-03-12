@@ -100,6 +100,9 @@ class exprVar: public expression {
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *p)
     {return 1;} 
+
+  /// implied bound processing
+  virtual bool impliedBound (int, CouNumber *, CouNumber *, char *);
 };
 
 #endif

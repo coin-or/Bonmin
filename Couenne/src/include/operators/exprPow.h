@@ -66,6 +66,9 @@ class exprPow: public exprOp {
 
   ///
   virtual enum expr_type code () {return COU_EXPRPOW;}
+
+  /// implied bound processing
+  bool impliedBound (int, CouNumber *, CouNumber *, char *);
 };
 
 

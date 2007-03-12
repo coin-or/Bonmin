@@ -128,3 +128,11 @@ expression *getFixVarBinFun (expression *, expression *);
 // in a branching rule for solving a nonconvexity gap
 expression *exprDiv::getFixVar () 
 {return getFixVarBinFun (arglist_ [0], arglist_ [1]);}
+
+
+/// implied bound processing for expression w = x/y, upon change in
+/// lower- and/or upper bound of w, whose index is wind
+bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  return false;
+}

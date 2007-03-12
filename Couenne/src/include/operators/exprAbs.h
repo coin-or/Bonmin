@@ -46,7 +46,10 @@ class exprAbs: public exprUnary {
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
   ///
-  virtual enum expr_type code () {return COU_EXPRABS;}
+  enum expr_type code () {return COU_EXPRABS;}
+
+  /// implied bound processing
+  bool impliedBound (int, CouNumber *, CouNumber *, char *);
 };
 
 #endif

@@ -88,13 +88,14 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
-	expression/operators/exprGroup.cpp expression/exprOp.cpp \
-	expression/exprUnary.cpp expression/exprVar.cpp \
-	expression/exprAux.cpp expression/expression.cpp \
-	simplify/simplifiers.cpp simplify/simplify.cpp \
-	convex/addEnvelope.cpp convex/createCuts.cpp \
-	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
-	convex/operators/conv-exprAbs.cpp \
+	expression/operators/exprGroup.cpp \
+	expression/operators/impliedBounds-exprSum.cpp \
+	expression/exprOp.cpp expression/exprUnary.cpp \
+	expression/exprVar.cpp expression/exprAux.cpp \
+	expression/expression.cpp simplify/simplifiers.cpp \
+	simplify/simplify.cpp convex/addEnvelope.cpp \
+	convex/createCuts.cpp convex/conv-exprOp.cpp \
+	convex/conv-exprUnary.cpp convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -111,23 +112,25 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/readASLfg.cpp util/rootQ.c readnl/readnl.cpp \
-	readnl/nl2e.cpp readnl/invmap.c
+	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
+	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
 	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
 	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
-	exprSum.lo exprMinMax.lo exprGroup.lo exprOp.lo exprUnary.lo \
-	exprVar.lo exprAux.lo expression.lo simplifiers.lo simplify.lo \
-	addEnvelope.lo createCuts.lo conv-exprOp.lo conv-exprUnary.lo \
-	conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
-	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
+	exprSum.lo exprMinMax.lo exprGroup.lo impliedBounds-exprSum.lo \
+	exprOp.lo exprUnary.lo exprVar.lo exprAux.lo expression.lo \
+	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
+	conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
+	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
+	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo conv-exprGroup.lo CouenneCutGenerator.lo \
 	generateCuts.lo problem.lo problemIO.lo constraint.lo \
-	tightenBounds.lo readASLfg.lo rootQ.lo $(am__objects_1)
+	tightenBounds.lo impliedBounds.lo readASLfg.lo rootQ.lo \
+	$(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -347,13 +350,14 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprSub.cpp \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
-	expression/operators/exprGroup.cpp expression/exprOp.cpp \
-	expression/exprUnary.cpp expression/exprVar.cpp \
-	expression/exprAux.cpp expression/expression.cpp \
-	simplify/simplifiers.cpp simplify/simplify.cpp \
-	convex/addEnvelope.cpp convex/createCuts.cpp \
-	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
-	convex/operators/conv-exprAbs.cpp \
+	expression/operators/exprGroup.cpp \
+	expression/operators/impliedBounds-exprSum.cpp \
+	expression/exprOp.cpp expression/exprUnary.cpp \
+	expression/exprVar.cpp expression/exprAux.cpp \
+	expression/expression.cpp simplify/simplifiers.cpp \
+	simplify/simplify.cpp convex/addEnvelope.cpp \
+	convex/createCuts.cpp convex/conv-exprOp.cpp \
+	convex/conv-exprUnary.cpp convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -370,7 +374,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/readASLfg.cpp util/rootQ.c $(am__append_1)
+	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
+	$(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -575,6 +580,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getFixVarBinFun.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprSum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nl2e.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
@@ -767,6 +774,13 @@ exprGroup.lo: expression/operators/exprGroup.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/exprGroup.cpp' object='exprGroup.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o exprGroup.lo `test -f 'expression/operators/exprGroup.cpp' || echo '$(srcdir)/'`expression/operators/exprGroup.cpp
+
+impliedBounds-exprSum.lo: expression/operators/impliedBounds-exprSum.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-exprSum.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-exprSum.Tpo" -c -o impliedBounds-exprSum.lo `test -f 'expression/operators/impliedBounds-exprSum.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprSum.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-exprSum.Tpo" "$(DEPDIR)/impliedBounds-exprSum.Plo"; else rm -f "$(DEPDIR)/impliedBounds-exprSum.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/impliedBounds-exprSum.cpp' object='impliedBounds-exprSum.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprSum.lo `test -f 'expression/operators/impliedBounds-exprSum.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprSum.cpp
 
 exprOp.lo: expression/exprOp.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprOp.lo -MD -MP -MF "$(DEPDIR)/exprOp.Tpo" -c -o exprOp.lo `test -f 'expression/exprOp.cpp' || echo '$(srcdir)/'`expression/exprOp.cpp; \
@@ -984,6 +998,13 @@ tightenBounds.lo: problem/tightenBounds.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/tightenBounds.cpp' object='tightenBounds.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tightenBounds.lo `test -f 'problem/tightenBounds.cpp' || echo '$(srcdir)/'`problem/tightenBounds.cpp
+
+impliedBounds.lo: problem/impliedBounds.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds.lo -MD -MP -MF "$(DEPDIR)/impliedBounds.Tpo" -c -o impliedBounds.lo `test -f 'problem/impliedBounds.cpp' || echo '$(srcdir)/'`problem/impliedBounds.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds.Tpo" "$(DEPDIR)/impliedBounds.Plo"; else rm -f "$(DEPDIR)/impliedBounds.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/impliedBounds.cpp' object='impliedBounds.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds.lo `test -f 'problem/impliedBounds.cpp' || echo '$(srcdir)/'`problem/impliedBounds.cpp
 
 readASLfg.lo: problem/readASLfg.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readASLfg.lo -MD -MP -MF "$(DEPDIR)/readASLfg.Tpo" -c -o readASLfg.lo `test -f 'problem/readASLfg.cpp' || echo '$(srcdir)/'`problem/readASLfg.cpp; \

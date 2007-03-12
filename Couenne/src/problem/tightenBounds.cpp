@@ -26,23 +26,6 @@ int CouenneProblem::tightenBounds (const OsiSolverInterface &si,
 
   int nchg = 0; //< number of bounds changed for propagation
 
-  // Retrieve, from si, value and bounds of all variables, if not
-  // firstcall, otherwise only those of the original ones Update
-  // expression structure with x, l, u
-
-  /*
-  OsiSolverInterface *psi = const_cast <OsiSolverInterface *> (&si);
-
-  CouNumber 
-    *xc = const_cast <CouNumber *> (psi -> getColSolution ()),
-    *lc = const_cast <CouNumber *> (psi -> getColLower    ()),
-    *uc = const_cast <CouNumber *> (psi -> getColUpper    ());
-
-  // update now all variables and bounds
-
-  problem_ -> update (xc, lc, uc);
-  */
-
   // update bounding box (which may depend on the original
   // variables' box) for the variables whose bound is looser. Here,
   // newly enforced branching rules may change dependent auxiliary

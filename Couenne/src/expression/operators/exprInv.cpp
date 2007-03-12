@@ -30,3 +30,12 @@ expression *exprInv::differentiate (int index) {
 
 void exprInv::print (std::ostream& out) const 
 {exprUnary::print (out, "1/", PRE);}
+
+
+/// implied bound processing for expression w = 1/x, upon change in
+/// lower- and/or upper bound of w, whose index is wind
+bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  bool res = false;
+  return res;
+}

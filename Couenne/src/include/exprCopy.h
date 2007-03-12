@@ -116,6 +116,10 @@ class exprCopy: public expression {
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *p)
     {return copy_ -> rank (p);} 
+
+  /// implied bound processing
+  bool impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg)
+    {return copy_ -> impliedBound (wind, l, u, chg);}
 };
 
 #endif

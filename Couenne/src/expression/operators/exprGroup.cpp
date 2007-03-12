@@ -19,9 +19,9 @@ exprGroup::exprGroup  (CouNumber c0,
   
   int nlin = 0;
 
-  for (register int *ind = index; *ind++>=0; nlin++);
+  for (register int *ind = index; *ind++ >= 0; nlin++);
 
-  index_ = new int       [nlin+1];
+  index_ = new int       [nlin + 1];
   coeff_ = new CouNumber [nlin];
 
   index_ [nlin] = index [nlin];

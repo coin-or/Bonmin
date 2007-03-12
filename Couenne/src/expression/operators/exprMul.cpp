@@ -150,3 +150,64 @@ expression *getFixVarBinFun (expression *, expression *);
 // in a branching rule for solving a nonconvexity gap
 expression *exprMul::getFixVar () 
 {return getFixVarBinFun (arglist_ [0], arglist_ [1]);}
+
+
+/// implied bound processing for expression w = x*y, upon change in
+/// lower- and/or upper bound of w, whose index is wind
+
+bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  bool res = false;
+  int ind;
+
+  if ((arglist_ [ind=0] -> Type () == CONST) || 
+      (arglist_ [ind=1] -> Type () == CONST)) {
+
+    CouNumber c = arglist_ [ind] -> Value ();
+
+    ind = arglist_ [1-ind] -> Index ();
+
+    if (c > COUENNE_EPS) {
+
+      res = updateBound (-1, l + ind, l [wind] / c);
+      res = updateBound ( 1, u + ind, u [wind] / c) || res;
+
+    } 
+    else if (c < - COUENNE_EPS) {
+
+      res = updateBound (-1, l + ind, u [wind] / c);
+      res = updateBound ( 1, u + ind, l [wind] / c) || res;
+    } 
+    else res = false;
+
+    if (res) 
+      chg [ind] = 1;
+
+    return res;
+  } else {
+
+
+    return false; ///////////////////////////////////////////////////////////////
+
+    int xi = arglist_ [0] -> Index (),
+        yi = arglist_ [1] -> Index ();
+
+    CouNumber *xl = l + xi,
+              *xu = u + xi,
+              *yl = l + yi,
+              *yu = u + yi,
+               wl = l [wind],
+               wu = u [wind];
+
+    // w's lower bound 
+
+    if (wl < 0) {
+
+    } else if (wl > 0) {
+
+    }
+
+    // w's upper bound 
+
+  }
+}

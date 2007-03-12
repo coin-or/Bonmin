@@ -154,3 +154,11 @@ int exprPow::Linearity () {
     else return NONLINEAR;
   }
 }
+
+
+/// implied bound processing for expression w = x^k, upon change in
+/// lower- and/or upper bound of w, whose index is wind
+
+bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+  return false;
+}

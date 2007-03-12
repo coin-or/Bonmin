@@ -51,3 +51,17 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((cut = cg -> createCut (0., 0, w -> Index (), 1., varIndex_)))
     cs.insert (cut);
 }
+
+
+/// implied bound processing. Expression w = x, upon change in lower
+/// or upper bound of w, whose index is wind
+bool exprVar::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  bool res = updateBound (-1, l + varIndex_, l [wind]);
+  res      = updateBound (+1, u + varIndex_, u [wind]) || res;
+
+  if (res) 
+    chg [varIndex_] = 1;
+
+  return res;
+}

@@ -57,6 +57,9 @@ class exprSum: public exprOp {
 
   ///
   virtual enum expr_type code () {return COU_EXPRSUM;}
+
+  /// implied bound processing
+  virtual bool impliedBound (int, CouNumber *, CouNumber *, char *);
 };
 
 

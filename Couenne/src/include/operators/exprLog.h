@@ -54,6 +54,9 @@ class exprLog: public exprUnary {
 
   ///
   virtual enum expr_type code () {return COU_EXPRINV;}
+
+  /// implied bound processing
+  bool impliedBound (int, CouNumber *, CouNumber *, char *);
 };
 
 #endif

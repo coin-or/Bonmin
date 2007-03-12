@@ -100,12 +100,7 @@ void exprSum::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// get a measure of "how linear" the expression is:
-//
-// CONSTANT  = 0: a constant
-// LINEAR    = 1: linear
-// QUADRATIC = 2: quadratic
-// NONLINER  = 3: nonlinear non-quadratic
+// get a measure of "how linear" the expression is (see CouenneTypes.h)
 
 int exprSum::Linearity () {
 

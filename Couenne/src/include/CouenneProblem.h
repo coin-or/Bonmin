@@ -131,6 +131,9 @@ class CouenneProblem {
 
   /// bound tightening
   int tightenBounds (const OsiSolverInterface &, char *) const;
+
+  /// search for implied bounds 
+  int impliedBounds (char *) const;
 };
 
 #endif

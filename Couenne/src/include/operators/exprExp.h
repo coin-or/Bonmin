@@ -52,6 +52,9 @@ class exprExp: public exprUnary {
 
   ///
   virtual enum expr_type code () {return COU_EXPREXP;}
+
+  /// implied bound processing
+  bool impliedBound (int, CouNumber *, CouNumber *, char *);
 };
 
 #endif

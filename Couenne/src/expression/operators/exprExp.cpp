@@ -39,3 +39,25 @@ void exprExp::getBounds (expression *&lb, expression *&ub) {
   lb = new exprExp (lba);
   ub = new exprExp (uba);
 }
+
+
+/// implied bound processing for expression w = exp(x), upon change in
+/// lower- and/or upper bound of w, whose index is wind
+bool exprExp::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  bool res = false;
+  int ind = argument_ -> Index ();
+
+  CouNumber b;
+
+  if ((b = l [wind]) >= COUENNE_EPS)
+    res = updateBound (-1, l + ind, log (b));
+
+  if ((b = u [wind]) >= COUENNE_EPS)
+    res = updateBound ( 1, u + ind, log (b)) || res;
+
+  if (res) 
+    chg [ind] = 1;
+
+  return res;
+}
