@@ -48,10 +48,10 @@ public:
 
 protected:
   /** Print to the designated output location */
-  virtual void PrintImpl(const char* str);
+  virtual void PrintImpl(EJournalCategory category, EJournalLevel level, const char* str);
 
   /** Printf to the designated output location */
-  virtual void PrintfImpl(const char* pformat, va_list ap);
+  virtual void PrintfImpl(EJournalCategory category, EJournalLevel level, const char* pformat, va_list ap);
 
   /** Flush output buffer.*/
   virtual void FlushBufferImpl();

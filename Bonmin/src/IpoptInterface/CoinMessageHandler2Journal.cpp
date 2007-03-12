@@ -31,7 +31,7 @@ CoinMessageHandler2Journal::CoinMessageHandler2Journal(CoinMessageHandler* messa
 CoinMessageHandler2Journal::~CoinMessageHandler2Journal() { }
 
 /** Print to the designated output location */
-void CoinMessageHandler2Journal::PrintImpl(const char* str) {
+void CoinMessageHandler2Journal::PrintImpl(EJournalCategory category, EJournalLevel level, const char* str) {
   //TODO one should set the detail level of the message according to the journalist print level
  
   if (messagehandler) {
@@ -68,7 +68,7 @@ void CoinMessageHandler2Journal::PrintImpl(const char* str) {
 }
 
 /** Printf to the designated output location */
-void CoinMessageHandler2Journal::PrintfImpl(const char* pformat, va_list ap) {
+void CoinMessageHandler2Journal::PrintfImpl(EJournalCategory category, EJournalLevel level, const char* pformat, va_list ap) {
   char outBuf[1024];
 
 #ifdef HAVE_VA_COPY
@@ -80,7 +80,7 @@ void CoinMessageHandler2Journal::PrintfImpl(const char* pformat, va_list ap) {
   vsnprintf(outBuf, sizeof(outBuf), pformat, ap);
 #endif
 
-		 PrintImpl(outBuf);
+		 PrintImpl(category, level, outBuf);
 }
 
 /** Flush output buffer.*/
