@@ -118,7 +118,7 @@ TNLPSolver::UnsolvedError::printError(std::ostream &os)
 }
 
 void
-TNLPSolver::UnsolvedError::writeDiffFiles() const{
+TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
   const int numcols = model_->num_variables();
   const int numrows = model_->num_constraints();
   
@@ -128,7 +128,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles() const{
   const double * originalLower = model_->orig_x_l();
   const double * originalUpper = model_->orig_x_u();
   CoinRelFltEq eq;
-  std::string fBoundsName = name_;
+  std::string fBoundsName = prefix + name_;
   fBoundsName+="_bounds";
   
   std::string fModName = fBoundsName + ".mod";

@@ -74,7 +74,7 @@ class TNLPSolver: public Ipopt::ReferencedObject{
     virtual ~UnsolvedError(){}
     /** write files with differences between input model and
         this one */
-    void writeDiffFiles() const;
+    void writeDiffFiles(const std::string prefix=std::string()) const;
   private:
     /** Error code (solver dependent). */
     int errorNum_;
