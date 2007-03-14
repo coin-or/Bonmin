@@ -224,12 +224,21 @@ inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
   //          sign < 0                            LOWER
 
   if (delta > COUENNE_EPS) {
-
+    //    printf ("%.9f --> %.9f\n", *dst, src);
     *dst = src; // tighten
     return true;
   }
 
   return false;
 }
+
+
+/// maximum
+inline CouNumber mymin (CouNumber a, CouNumber b) 
+{return (a<b) ? a : b;} 
+
+/// minimum
+inline CouNumber mymax (CouNumber a, CouNumber b) 
+{return (a>b) ? a : b;} 
 
 #endif

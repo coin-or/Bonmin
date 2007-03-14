@@ -1,3 +1,4 @@
+
 /*
  * Name: CouenneCglCutGenerator.cpp
  * Author: Pietro Belotti
@@ -40,19 +41,24 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   nlp_            (nlp) {
 
   if (!asl) return;
+
   problem_ = new CouenneProblem;
 
-  //  double now = CoinCpuTime ();
+  double now = CoinCpuTime ();
 
   problem_ -> readnl      (asl);
 
-  //  printf ("reading time: %.3fs\n", CoinCpuTime () - now);
-  //  now = CoinCpuTime ();
+  if ((now = (CoinCpuTime () - now)) > 10.)
+    printf ("reading time: %.3fs\n", now);
+
+  now = CoinCpuTime ();
   //  problem_ -> print (std::cout);
   //  printf ("======================================\n");
   problem_ -> standardize ();
 
-  //  printf ("standardization time: %.3fs\n", CoinCpuTime () - now);
+  if ((now = (CoinCpuTime () - now)) > 10.)
+  printf ("standardization time: %.3fs\n", now);
+
   //  problem_ -> print (std::cout);
   //  printf ("======================================\n");
   //  problem_ -> writeMod ("extended.mod");

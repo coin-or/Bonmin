@@ -56,7 +56,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     a0 +=      dynamic_cast <exprGroup *> (this) -> getc0      ();
     int *ind = dynamic_cast <exprGroup *> (this) -> getIndices ();
 
-    while (*ind++>=0) // count linear terms 
+    while (*ind++ >= 0) // count linear terms 
       nlin++;
   }
 
@@ -116,9 +116,9 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   C2 = (CouNumber *) realloc (C2, ineg * sizeof (CouNumber));
 
   // now we have correct  I1, I2, C1, C2, ipos, ineg, and a0
-
   /*
-  printf ("::::::::::::::::::::: now we have: a0 = %.3f\n", a0);
+  printf ("::::::::::::::::::::: now we have: w%d [%f,%f] a0 = %.3f\n", 
+	  wind, l [wind], u [wind], a0);
 
   printf ("I1 (%d): ", ipos);
   for (int i=0; i<ipos; i++)
@@ -130,7 +130,6 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   printf ("\n");
   */
-
   // indices of the variable in I1 or I2 with infinite lower or upper
   // bound. If more than one is found, it is set to -2
 
@@ -138,7 +137,13 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       infUp1 = -1, infUp2 = -1;
 
   // upper bound of the sum, considering lower/upper bounds of the
-  // variables but negliging the infinite ones
+  // variables but negliging the infinite ones:
+  //
+  // lower = $a0 + \sum_{i in I_1: a_i <  \infinity} a_i l_i
+  //             + \sum_{i in I_2: a_i > -\infinity} a_i u_i$
+  //
+  // upper = $a0 + \sum_{i in I_1: a_i <  \infinity} a_i u_i
+  //             + \sum_{i in I_2: a_i > -\infinity} a_i l_i$
 
   CouNumber
 
@@ -149,10 +154,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
                + scanBounds (ineg, -1, I2, C2, l, &infLo2);
   /*
   printf ("lower = %.3f\nupper = %.3f. (%d,%d,%d,%d)\n", 
-	  lower, upper, 
-	  infLo1, infUp1, infLo2, infUp2);
+	  lower, upper, infLo1, infUp1, infLo2, infUp2);
   */
-
   // Now compute lower bound for all or for some of the variables:
   // There is a bound for all variables only if both infUp1 and infLo2
   // are -1, otherwise there is a bound only for one variable if one
@@ -163,88 +166,72 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   CouNumber wl = l [wind],
             wu = u [wind];
 
+  // check if there is room for improvement
+
+  /*if ((lower < wl + COUENNE_EPS) && 
+      (upper > wu - COUENNE_EPS))
+      return false;*/
+
   // Update lowers in I1 and uppers in I2
+
 
   if ((infLo1 == -1) && (infUp2 == -1)) { // All finite bounds. All var. bounds can be tightened.
 
     // tighten upper bound of variables in I1
 
-    if (wu < COUENNE_INFINITY - 1)
-      for (register int i=ipos; i--;) {
-	int ind = I1 [i];
-	if (updateBound (+1, u + ind, (wu - lower) / C1 [i] + l [ind])) {
-	  chg [ind] = 1;
-	  tighter = true;
-	}
-      }
+    for (register int i=ipos; i--;) {
+      int ind = I1 [i];
+      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [i] + l [ind]) || tighter)
+	chg [ind] = 1;
+    }
 
     // tighten lower bound of variables in I2
-    if (wl > - COUENNE_INFINITY + 1)
-      for (register int i=ineg; i--;) {
-	int ind = I2 [i];
-	if (updateBound (+1, u + ind, (wl - lower) / C2 [i] + u [ind])) {
-	  chg [ind] = 1;
-	  tighter = true;
-	}
-      }
-  } else 
+    for (register int i=ineg; i--;) {
+      int ind = I2 [i];
+      if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [i] + u [ind]) || tighter)
+	chg [ind] = 1;
+    }
+  } else
+
     if ((infLo1 >= 0) && (infUp2 == -1)) {    // There is one infinite lower bound in I1
       int ind = I1 [infLo1];
-      if ((wu < COUENNE_INFINITY - 1) &&
-	  (updateBound (+1, u + ind, (wu - lower) / C1 [infLo1]))) {
-	  chg [ind] = 1;
-	  tighter = true;
-	}
+      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [infLo1]) || tighter)
+	chg [ind] = 1;
     }
     else 
       if ((infLo1 == -1) && (infUp2 >= 0)) {  // There is one infinite upper bound in I2
 	int ind = I2 [infUp2];
-	if ((wl > - COUENNE_INFINITY + 1) &&
-	    (updateBound (+1, u + ind, (wl - lower) / C2 [infUp2]))) {
+	if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [infUp2]) || tighter)
 	  chg [ind] = 1;
-	  tighter = true;
-	}
       }
-
 
   // Update uppers in I1 and lowers in I2
 
   if ((infUp1 == -1) && (infLo2 == -1)) { // All finite bounds. All var. bounds can be tightened.
 
-    if (wl > - COUENNE_INFINITY + 1)
-      for (register int i=ipos; i--;) {
-	int ind = I1 [i];
-	if (updateBound (-1, l + ind, (wl - upper) / C1 [i] + u [ind])) {
-	  chg [ind] = 1;
-	  tighter = true;
-	}
-      }
+    for (register int i=ipos; i--;) {
+      int ind = I1 [i];
+      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + u [ind]) || tighter)
+	chg [ind] = 1;
+    }
 
-    if (wu < COUENNE_INFINITY - 1)
-      for (register int i=ineg; i--;) {
-	int ind = I2 [i];
-	if (updateBound (-1, l + ind, (wu - upper) / C2 [i] + l [ind])) {
-	  chg [ind] = 1;
-	  tighter = true;
-	}
-      }
+    for (register int i=ineg; i--;) {
+      int ind = I2 [i];
+      if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + l [ind]) || tighter)
+	chg [ind] = 1;
+    }
   } else 
+
     if ((infUp1 >= 0) && (infLo2 == -1)) { // There is one infinite lower bound in I2
       int ind = I1 [infUp1];
-      if ((wl > - COUENNE_INFINITY + 1) &&
-	  (updateBound (-1, l + ind, (wl - upper) / C1 [infUp1]))) {
+      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [infUp1]) || tighter)
 	chg [ind] = 1;
-	tighter = true;
-      }
     }
     else 
       if ((infUp1 == -1) && (infLo2 >= 0)) {  // There is one infinite upper bound in I1
 	int ind = I2 [infLo2];
-	if ((wu < COUENNE_INFINITY - 1) &&
-	    (updateBound (-1, l + ind, (wu - upper) / C2 [infLo2]))) {
+	if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [infLo2]) || tighter)
 	  chg [ind] = 1;
-	  tighter = true;
-	}
       }
 
   // ...phew!

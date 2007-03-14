@@ -48,11 +48,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // only need to update the auxiliary variable and bounds with
     // their current value.
 
+    OsiSolverInterface *psi = const_cast <OsiSolverInterface *> (&si);
+
     // add auxiliary variables, unbounded for now
     for (register int i = problem_ -> nVars (), 
 	              j = problem_ -> nAuxs (); j--; i++)
-      const_cast <OsiSolverInterface *> (&si) -> addCol 
-	(0, NULL, NULL, problem_ -> Lb (i), problem_ -> Ub (i), 0);
+
+	psi -> addCol (0, NULL, NULL, problem_ -> Lb (i), problem_ -> Ub (i), 0);
 
     // For each auxiliary variable replacing the original (nonlinear)
     // constraints, check if corresponding bounds are violated, and
@@ -66,14 +68,20 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       // if there exists violation, add constraint
 
-      OsiRowCut *orc = createCut (0., 0, con -> Body () -> Index (), 1.);
+      int index = con -> Body () -> Index ();
 
-      if (orc) {
+      if (index >= 0) {
 
-	orc -> setLb (con -> Lb () -> Value ());
-	orc -> setUb (con -> Ub () -> Value ());
-	cs.insert (orc);
-	delete orc;
+	CouNumber l = con -> Lb () -> Value (),	
+	          u = con -> Ub () -> Value ();
+
+	// tighten bounds in Couenne's problem representation
+	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
+	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
+
+	// and in the OsiSolverInterface
+	psi -> setColLower (index, mymax (l, si.getColLower () [index]));
+	psi -> setColUpper (index, mymin (u, si.getColUpper () [index]));
       }
     }
   } else { // equivalent to info.depth > 0
@@ -83,8 +91,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 			  const_cast <CouNumber *> (si. getColLower    ()),
 			  const_cast <CouNumber *> (si. getColUpper    ()));
 
-    // not the first call to this procedure, meaning we can be
-    // anywhere in the B&B tree but the root node. Check, through the
+    // not the first call to this procedure, meaning we are anywhere
+    // in the B&B tree but at the root node. Check, through the
     // auxiliary information, which bounds have changed from the
     // parent node.
 
@@ -129,46 +137,38 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
   }
-  /*
-  printf ("================= before-----------\n");
-  for (register int i=0; i < ncols; i++)
-    printf ("x%3d: [%12.4f,%12.4f]\n", i,
-	    expression::Lbound (i), 
-	    expression::Ubound (i));
-  */
 
   // tighten the current relaxation by tightening the variables'
   // bounds
 
   int ntightened = 0, nbwtightened = 0;
 
-  //  printf ("-----------\n");
+  bool infeasible = false;
 
   do {
 
     ntightened   = problem_ -> tightenBounds (si, chg_bds);
     nbwtightened = problem_ -> impliedBounds     (chg_bds);
 
-    /*
-    if (ntightened || nbwtightened) 
+    //    printf ("::::::::::::::::::::::::::::::::::::::::::::::\n");
+    for (register int i=0; i < ncols; i++) {
+      //      printf ("x%3d [%12.4f,%12.4f] ", i, expression::Lbound (i), expression::Ubound (i));
+      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS)
+	infeasible = true;
+      //      if (!((1+i)%6)) printf ("\n");
+    }
+    //    printf ("\n");
+
+    if (infeasible) {
+      //      printf ("**** INFEASIBLE ****\n");
+      break;
+    }
+
+    /*if (ntightened || nbwtightened) 
       printf ("(%d,%d) bounds improvement\n",
-	      ntightened, nbwtightened);
-    */
+	      ntightened, nbwtightened); */
+
   } while (ntightened || nbwtightened);
-
-  /*
-  for (register int i=0; i < ncols; i++)
-    printf ("x%3d: [%12.4f,%12.4f]\n", i,
-	    expression::Lbound (i), 
-	    expression::Ubound (i));
-  printf ("================= after\n");
-  */
-
-  //  printf ("::::::::::::::::::::::::::::::::::::::::::::::\n");
-  //  for (register int i=0; i < ncols; i++)
-  //    printf ("x%3d: [%12.4f,%12.4f]\n", i,
-  //	    expression::Lbound (i), 
-  //	    expression::Ubound (i));
 
   //  if (ntightened)
   //    printf("%d bounds tightened\n", ntightened);
@@ -182,8 +182,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   //  if (!chg_bds) // this is the first call to generateCuts, we have to
 		// generate cuts for all auxiliary variable
 
-  for (int i=0; i < problem_ -> nAuxs (); i++)
-    problem_ -> Aux (i) -> generateCuts (si, cs, this);
+  if (!infeasible)
+    for (int i=0; i < problem_ -> nAuxs (); i++)
+      problem_ -> Aux (i) -> generateCuts (si, cs, this);
 
     /*
   else          // chg_bds contains the indices of the variables whose
@@ -234,11 +235,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       cut -> setLbs (nLow, indLow, bndLow);
       cut -> setUbs (nUpp, indUpp, bndUpp);
       cs.insert (cut);
-      delete cut;
     }
 
     delete [] bndLow; delete [] indLow;
     delete [] bndUpp; delete [] indUpp;
+    delete cut;
   }
 
   if (firstcall_) {

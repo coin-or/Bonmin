@@ -12,13 +12,6 @@
 #include <CouenneProblem.h>
 
 
-inline CouNumber mymin (CouNumber a, CouNumber b) 
-{return (a<b) ? a : b;} 
-
-inline CouNumber mymax (CouNumber a, CouNumber b) 
-{return (a>b) ? a : b;} 
-
-
 /// Bound tightening for auxiliary variables
 
 int CouenneProblem::tightenBounds (const OsiSolverInterface &si, 

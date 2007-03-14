@@ -7,6 +7,7 @@
 - improve power convexification (find closest point in convex envelope)
 - improve bounding box with upper bound
 - add integrality to bound check
+- decomposition approach
 - order in convexifying x*y*z*...*(1/w)*(1/t)*...
 - linear convexification has an acyclic structure where x are leaves
 - recognition of quadratic forms

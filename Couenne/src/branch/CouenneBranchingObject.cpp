@@ -97,7 +97,8 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     solver -> setColUpper (reference_ -> Index (), 
 			   reference_ -> isInteger () ? floor (value_) : value_);
 
-  //  printf ("Branch: x%d %c= %.12f\n", reference_ -> Index (), way ? '>' : '<', value_);
+  //  printf ("################################# Branch: x%d %c= %.12f\n", 
+  //	  reference_ -> Index (), way ? '>' : '<', value_);
 
   branchIndex_++;
   return 0.; // estimated change in objective function

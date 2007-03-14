@@ -1815,9 +1815,9 @@ case $build in
 	       comps="gcc cl"
 	     fi ;;
   sparc-sun-solaris*)
-  	     comps="cc xlc gcc pgcc icc" ;;
-  *-linux-*) comps="xlc gcc cc pgcc icc" ;;
-  *)         comps="xlc_r xlc cc gcc pgcc icc" ;;
+  	     comps="cc xlc icc gcc pgcc icc" ;;
+  *-linux-*) comps="xlc icc gcc cc pgcc icc" ;;
+  *)         comps="xlc_r xlc icc cc gcc pgcc icc" ;;
 esac
 
 # We delete the cached value, since the test might not have been
@@ -2999,9 +2999,9 @@ case $build in
 	       comps="g++ cl"
 	     fi ;;
   sparc-sun-solaris*)
-  	     comps="CC xlC aCC g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
+  	     comps="CC xlC aCC icpc g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
   *-darwin*) comps="g++ c++ CC" ;;
-          *) comps="xlC aCC CC g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
+          *) comps="xlC aCC CC icpc g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
 esac
 
 # We delete the cached value, since the test might not have been
@@ -3854,9 +3854,9 @@ case $build in
 	       comps="gcc cl"
 	     fi ;;
   sparc-sun-solaris*)
-  	     comps="cc xlc gcc pgcc icc" ;;
-  *-linux-*) comps="xlc gcc cc pgcc icc" ;;
-  *)         comps="xlc_r xlc cc gcc pgcc icc" ;;
+  	     comps="cc xlc icc gcc pgcc icc" ;;
+  *-linux-*) comps="xlc icc gcc cc pgcc icc" ;;
+  *)         comps="xlc_r xlc icc cc gcc pgcc icc" ;;
 esac
 
 # We delete the cached value, since the test might not have been
@@ -21634,60 +21634,20 @@ fi;
 if test "$use_asldir" = BUILD; then
   if test "$PACKAGE_NAME" != ThirdPartyASL; then
     # If we are configuring ThirdParty/ASL, don't check
-    as_ac_File=`echo "ac_cv_file_$coin_aslobjdir/.MakeOk" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $coin_aslobjdir/.MakeOk" >&5
-echo $ECHO_N "checking for $coin_aslobjdir/.MakeOk... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$coin_aslobjdir/.MakeOk"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  :
-else
-  { { echo "$as_me:$LINENO: error: option \"BUILD\" specified for asldir, but directory is not configure (sources missing?)" >&5
+    if test -r $coin_aslobjdir/.MakeOk; then :; else
+      { { echo "$as_me:$LINENO: error: option \"BUILD\" specified for asldir, but directory is not configure (sources missing?)" >&5
 echo "$as_me: error: option \"BUILD\" specified for asldir, but directory is not configure (sources missing?)" >&2;}
    { (exit 1); exit 1; }; }
-fi
-
+    fi
   fi
 elif test -z "$use_asldir"; then
  # try to find sources - if not given don't compile
   if test "$PACKAGE_NAME" != ThirdPartyASL; then
-    as_ac_File=`echo "ac_cv_file_$coin_aslobjdir/.MakeOk" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $coin_aslobjdir/.MakeOk" >&5
-echo $ECHO_N "checking for $coin_aslobjdir/.MakeOk... $ECHO_C" >&6
-if eval "test \"\${$as_ac_File+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "$coin_aslobjdir/.MakeOk"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
-if test `eval echo '${'$as_ac_File'}'` = yes; then
-  use_asldir=BUILD
-else
-  use_asldir=no
-fi
-
+    if test -r $coin_aslobjdir/.MakeOk; then
+      use_asldir=BUILD
+    else
+      use_asldir=no
+    fi
   else
     use_asldir=no
   fi
