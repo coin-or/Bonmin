@@ -36,6 +36,40 @@ void exprInv::print (std::ostream& out) const
 /// lower- and/or upper bound of w, whose index is wind
 bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
+  // Expression w = 1/x
+  //
+  // If 0 <= l <= w <= u or
+  //         l <= w <= u <= 0, 
+  //
+  // then then 1/u <= x <= 1/l (given l, u finite and nonzero)
+
+
+  CouNumber wl = l [wind],
+            wu = u [wind];
+
+  int index = argument_ -> Index ();
+
   bool res = false;
+
+  // 0 <= l <= w <= u
+
+  if (wl >= 0.) {
+    if (wu > COUENNE_EPS) {
+      if (wu < COUENNE_INFINITY - 1) res = updateBound (-1, l + index, 1/wu);
+      else                           res = updateBound (-1, l + index, 0.);
+    }
+    if (wl > COUENNE_EPS)            res = updateBound (+1, u + index, 1/wl) || res;
+  }
+
+  // l <= w <= u <= 0
+
+  if (wu <= -0.) {
+    if (wl < - COUENNE_EPS) {
+      if (wl > - COUENNE_INFINITY + 1) res = updateBound (+1, u + index, 1/wl) || res;
+      else                             res = updateBound (+1, u + index, 0.)   || res;
+    }
+    if (wu < - COUENNE_EPS)          res = updateBound (-1, l + index, 1/wu) || res;
+  }
+
   return res;
 }

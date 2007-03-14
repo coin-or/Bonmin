@@ -28,7 +28,7 @@ public:
 
   /// Copy constructor
   CouenneObject (CouenneObject &src):
-    reference_ (src.Reference ()) {}
+    reference_ (src.reference_) {}
 
   /// Cloning method
   virtual OsiObject * clone() const
@@ -46,11 +46,14 @@ public:
 					    const OsiBranchingInformation*, int) const;
 
   /// return reference auxiliary variable
-  exprAux *Reference () {return reference_;}
+  exprAux *Reference () 
+  {return reference_;}
 
 protected:
 
-  /// the (auxiliary) variable which this branching object refers to
+  /// The (auxiliary) variable which this branching object refers
+  /// to. If the expression is w=f(x,y), this is w, as opposed to
+  /// CouenneBranchingObject, where it would be either x or y.
   exprAux *reference_;
 };
 

@@ -15,6 +15,9 @@
 #include <exprAux.h>
 
 
+/// "Spatial" Branching object. Branching can also be performed on
+/// continuous variables.
+
 class CouenneBranchingObject: public OsiTwoWayBranchingObject {
 
 public:
@@ -39,10 +42,12 @@ public:
 
 protected:
 
-  /// the variable which this branching object refers to
+  /// The variable this branching object refers to. If the
+  /// corresponding CouenneObject was created on w=f(x,y), it is
+  /// either x or y.
   expression *reference_;
 
-  /// global value for convex combination between current point and
+  /// Global value for convex combination between current point and
   /// midpoint
   static CouNumber alpha_;
 };

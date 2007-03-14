@@ -165,7 +165,11 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     CouNumber c = arglist_ [ind] -> Value ();
 
+    // get the index of the nonconstant part
     ind = arglist_ [1-ind] -> Index ();
+
+    if (ind==-1) // should not happen, it is a product of constant
+      return false;
 
     if (c > COUENNE_EPS) {
 
@@ -180,7 +184,7 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     } 
     else res = false;
 
-    if (res) 
+    if (res)
       chg [ind] = 1;
 
     return res;

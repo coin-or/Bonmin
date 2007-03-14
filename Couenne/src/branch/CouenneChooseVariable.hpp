@@ -31,7 +31,7 @@ public:
   CouenneChooseVariable (const CouenneChooseVariable &);
 
   /// Assignment operator 
-  CouenneChooseVariable &operator= (const CouenneChooseVariable& rhs);
+  CouenneChooseVariable &operator= (const CouenneChooseVariable &);
 
   /// Clone
   virtual OsiChooseVariable *clone() const;
@@ -44,8 +44,7 @@ public:
       If returns -1 then has worked out node is infeasible!
   */
 
-  virtual int setupList (OsiBranchingInformation *info, bool initialize);
-
+  virtual int setupList (OsiBranchingInformation *, bool);
 
   /** Choose a variable
       Returns:
@@ -62,16 +61,11 @@ public:
      If fixVariables is true then 2,3,4 are all really same as problem changed
   */
 
-  virtual int chooseVariable (OsiSolverInterface * solver, 
-			      OsiBranchingInformation *info, 
-			      bool fixVariables);
+  virtual int chooseVariable (OsiSolverInterface *, 
+			      OsiBranchingInformation *, 
+			      bool);
 
-
-  /// Given a candidate fill in useful information e.g. estimates
-  /*  virtual void updateInformation( const OsiBranchingInformation *info,
-				  int branch, OsiHotInfo * hotInfo);
-  */
-
+  /// return pointer to MINLP symbolic representation
   CouenneProblem *Problem () const 
   {return problem_;}
 

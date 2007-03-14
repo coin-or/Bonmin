@@ -97,10 +97,11 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   int xi = arglist_ [0] -> Index (),
       yi = arglist_ [1] -> Index ();
 
-  if ((xi==-1) && (yi==-1))
+  if ((xi == -1) && (yi == -1)) // both x and y are constant
     return false;
 
-  CouNumber xl, xu, yl, yu;
+  CouNumber xl, xu, yl, yu, 
+            wl = l [wind], wu = u [wind];
 
   if (xi==-1) xl =         xu = arglist_ [0] -> Value ();
   else       {xl = l [xi]; xu = u [xi];}
@@ -108,34 +109,17 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   if (yi==-1) yl =         yu = arglist_ [1] -> Value ();
   else       {yl = l [yi]; yu = u [yi];}
 
-  CouNumber wl = l [wind],
-            wu = u [wind];
-
   bool res = false;
 
-  // w >= b
+  // w >= l
 
-  if ((xi >= 0) && updateBound (-1, l + xi, yl + wl)) {
-    chg [xi] = 1;
-    res = true;
-  }
+  if ((xi >= 0) && (res = updateBound (-1, l + xi, yl + wl)))        chg [xi] = 1;
+  if ((yi >= 0) && (res = updateBound (+1, u + yi, xu - wl) || res)) chg [yi] = 1;
 
-  if ((yi >= 0) && updateBound (+1, u + yi, xu - wl)) {
-    chg [yi] = 1;
-    res = true;
-  }
+  // w <= u
 
-  // w <= b
-
-  if ((xi >= 0) && updateBound (+1, u + xi, yu + wu)) {
-    chg [xi] = 1;
-    res = true;
-  }
-
-  if ((yi >= 0) && updateBound (-1, l + yi, xl - wu)) {
-    chg [yi] = 1;
-    res = true;
-  }
+  if ((xi >= 0) && (res = updateBound (+1, u + xi, yu + wu) || res)) chg [xi] = 1;
+  if ((yi >= 0) && (res = updateBound (-1, l + yi, xl - wu) || res)) chg [yi] = 1;
 
   return res;
 }

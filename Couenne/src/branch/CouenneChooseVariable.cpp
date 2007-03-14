@@ -43,18 +43,14 @@ CouenneChooseVariable::~CouenneChooseVariable () {
 
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
-  /*  std::cout<<"Branching on :"<<std::endl;
-  for(int kk = 0 ; kk < info -> numberColumns_ ; kk++)
-    {
-            std::cout<<"x["<<kk<<"] = "<<info->solution_[kk]<<"\t";  
-    }
-  std::cout<<std::endl;
-  */
+  /// LEAVE THIS HERE.
   problem_ -> update ((CouNumber *) (info -> solution_), 
 		      (CouNumber *) (info -> lower_), 
 		      (CouNumber *) (info -> upper_));
 
-  return OsiChooseVariable::setupList (info, initialize);
+  // Make it stable, in OsiChooseVariable::setupList() numberObjects must be 0.
+  return (solver_ -> numberObjects ()) ? 
+    OsiChooseVariable::setupList (info, initialize) : 0;
 }
 
 

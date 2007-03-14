@@ -16,37 +16,29 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 
   int index = reference_ -> Image () -> getFixVar () -> Index ();
 
-  // if branched-upon variable has a narrow interval, it is not worthy
+  // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
 
-  if ((fabs (info -> lower_    [index] - info -> upper_    [index]) < COUENNE_EPS)
+  if ((fabs (info -> lower_ [index] - info -> upper_ [index]) < COUENNE_EPS)
       //|| (fabs (info -> solution_ [index] - info -> upper_    [index]) < COUENNE_EPS)
       //|| (fabs (info -> solution_ [index] - info -> lower_    [index]) < COUENNE_EPS)
       )
     return 0.;
 
-  const double & expr = (*(reference_ -> Image ())) ();
-  const double & var  = expression::Variable (reference_ -> Index ());
+  const double & expr = (*(reference_ -> Image ())) (), 
+               & var  = expression::Variable (reference_ -> Index ());
 
-  bool verbose = 0;
+  if (0) {
 
-  if (verbose) {
+    reference_ -> print (std::cout); std::cout << " = ";
+    reference_ -> Image () -> print (std::cout);
 
-    reference_ -> print(std::cout);
-    std::cout<<" = ";
-    reference_->Image()->print(std::cout);
-    std::cout<<std::endl;
-    std::cout<<expr<<" =(?) "<<var<<std::endl;
+    printf (". Infeasibility = |%.15f - %.15f| = %.15f\n", var, expr, fabs (var - expr));
   }
-  /*
-  printf ("CO::infeasibility: ");
-  reference_ -> print (std::cout);
-  printf (" = ");
-  reference_ -> Image () -> print (std::cout);
-  printf ("=%.15f\n", fabs (var-expr));
-  */
+
   CouNumber delta = fabs (var - expr);
 
+  /// avoid branching on very small deltas
   if (delta < COUENNE_EPS) delta = 0.;
 
   // otherwise, return real value of difference w - f(x)
@@ -61,13 +53,14 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   // get current value of the branching variable
   int    index = reference_ -> getFixVar () -> Index ();
   double val   = info -> solution_ [index];
-  /*
-  printf ("CO::feasRegion: ");
-  reference_ -> print (std::cout);
-  printf (" = ");
-  reference_ -> Image () -> print (std::cout);
-  printf (" on x_%d (%.15f)\n", index, val);
-  */
+
+  if (0) {
+    printf ("CO::feasRegion: ");
+    reference_ -> print (std::cout);
+    printf (" = ");
+    reference_ -> Image () -> print (std::cout);
+    printf (" on x_%d (%.15f)\n", index, val);
+  }
 
   // fix that variable to its current value
   solver -> setColLower (index, val);
@@ -78,15 +71,18 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
 
 /// apply the branching rule
-OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *, 
+OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si, 
 						 const OsiBranchingInformation *, 
 						 int) const {
-  /*
-  printf ("CO::createBranch: ");
-  reference_ -> print (std::cout);
-  printf (" = ");
-  reference_ -> Image () -> print (std::cout);
-  printf ("\n");
-  */
+  if (0) {
+    printf ("CO::createBranch: ");
+    reference_ -> print (std::cout);
+    printf (" = ");
+    reference_ -> Image () -> print (std::cout);
+    printf (" --> branch on ");
+    reference_ -> Image () -> getFixVar () -> print (std::cout);
+    printf ("\n");
+  }
+
   return new CouenneBranchingObject (reference_ -> Image () -> getFixVar ());
 }

@@ -13,7 +13,7 @@
 #include <exprOpp.h>
 
 
-// find lower and upper bound of a given expression
+/// find lower and upper bound of a given expression
 
 void exprAbs::getBounds (expression *&lb, expression *&ub) {
 
@@ -38,7 +38,7 @@ void exprAbs::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// differentiation
+/// differentiation
 
 expression *exprAbs::differentiate (int index) {
 
@@ -54,7 +54,7 @@ expression *exprAbs::differentiate (int index) {
 }
 
 
-// printing
+/// printing
 
 void exprAbs::print (std::ostream& out) const {
   exprUnary::print (out, "abs", PRE);
@@ -74,26 +74,26 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   int index = argument_ -> Index ();
 
   CouNumber *xl = l + index, *xu = u + index,
-            *wl = l + wind,  *wu = u + wind;
+             wl = l [wind],   wu = u [wind];
 
   // for w >= b, we can only improve xlb if it is at least -b
   //                                 xub             most   b
 
   bool tighter = false;
 
-  if (*wl >= 0) {
+  if (wl >= 0) {
 
-    if (*xl > -*wl) tighter = updateBound (-1, xl,  *wl);
-    if (*xu <  *wl) tighter = updateBound ( 1, xu, -*wl) || tighter;
+    tighter = updateBound (-1, xl, -wl);
+    tighter = updateBound (+1, xu,  wl) || tighter;
   }
 
   // now w <= b
 
-  if (*wu >= 0) {
+  if (wu <= -0.) 
+    wu = 0.;
 
-    tighter = updateBound (-1, xl, -*wu) || tighter;
-    tighter = updateBound ( 1, xu,  *wu) || tighter;
-  }
+  tighter = updateBound (-1, xl, -wu) || tighter;
+  tighter = updateBound (+1, xu,  wu) || tighter;
 
   if (tighter)
     chg [index] = 1;
