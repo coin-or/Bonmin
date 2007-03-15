@@ -4,6 +4,7 @@ ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/
 ThirdParty/HSL https://projects.coin-or.org/svn/BuildTools/ThirdParty/HSL/trunk
 ThirdParty/ASL https://projects.coin-or.org/svn/BuildTools/ThirdParty/ASL/trunk
 ThirdParty/FilterSQP https://projects.coin-or.org/svn/BuildTools/ThirdParty/FilterSQP/trunk
+ThirdParty/Mumps https://projects.coin-or.org/svn/BuildTools/ThirdParty/Mumps/trunk
 Data/Netlib   https://projects.coin-or.org/svn/Data/trunk/Netlib
 Data/Sample   https://projects.coin-or.org/svn/Data/trunk/Sample
 Data/miplib3  https://projects.coin-or.org/svn/Data/trunk/miplib3
