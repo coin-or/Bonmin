@@ -1,4 +1,3 @@
-
 /*
  * Name: CouenneCglCutGenerator.cpp
  * Author: Pietro Belotti

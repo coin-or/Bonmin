@@ -32,22 +32,40 @@ void exprInv::print (std::ostream& out) const
 {exprUnary::print (out, "1/", PRE);}
 
 
+/// general function (see below)
+bool invPowImplBounds (int, int, CouNumber *, CouNumber *, CouNumber);
+
+
 /// implied bound processing for expression w = 1/x, upon change in
 /// lower- and/or upper bound of w, whose index is wind
+
 bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
-  // Expression w = 1/x
+  // Expression w = 1/x: we can only improve the bounds if 
   //
-  // If 0 <= l <= w <= u or
-  //         l <= w <= u <= 0, 
+  //    0 <= l <= w <= u         or
+  //         l <= w <= u <= 0. 
   //
-  // then then 1/u <= x <= 1/l (given l, u finite and nonzero)
-
-
-  CouNumber wl = l [wind],
-            wu = u [wind];
+  // Then 1/u <= x <= 1/l (given l, u finite and nonzero)
 
   int index = argument_ -> Index ();
+
+  bool res = invPowImplBounds (wind, index, l, u, -1.);
+
+  if (res)
+    chg [index] = 1;
+
+  return res;
+}
+
+
+/// general function to tighten implied bounds of a function w = x^k,
+/// k negative, integer or inverse integer, and odd
+
+bool invPowImplBounds (int wind, int index, CouNumber *l, CouNumber *u, CouNumber k) {
+
+  CouNumber wl = l [wind], 
+            wu = u [wind];
 
   bool res = false;
 
@@ -68,7 +86,7 @@ bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       if (wl > - COUENNE_INFINITY + 1) res = updateBound (+1, u + index, 1/wl) || res;
       else                             res = updateBound (+1, u + index, 0.)   || res;
     }
-    if (wu < - COUENNE_EPS)          res = updateBound (-1, l + index, 1/wu) || res;
+    if (wu < - COUENNE_EPS)            res = updateBound (-1, l + index, 1/wu) || res;
   }
 
   return res;

@@ -87,7 +87,8 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     tighter = updateBound (+1, xu,  wl) || tighter;
   }
 
-  // now w <= b
+  // w <= u. If u the problem is infeasible, but we only fix x to zero
+  // since we cannot return infeasibility here
 
   if (wu <= -0.) 
     wu = 0.;

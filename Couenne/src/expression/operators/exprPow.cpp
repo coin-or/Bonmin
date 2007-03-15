@@ -1,5 +1,5 @@
 /*
- * Name:    exprPow.C
+ * Name:    exprPow.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of powers
  *
@@ -106,10 +106,11 @@ void exprPow::print (std::ostream& out) const
 
 // get a measure of "how linear" the expression is:
 //
-// CONSTANT  = 0: a constant
-// LINEAR    = 1: linear
-// QUADRATIC = 2: quadratic
-// NONLINER  = 3: nonlinear non-quadratic
+// ZERO      = 0: a zero
+// CONSTANT  = 1: a constant
+// LINEAR    = 2: linear
+// QUADRATIC = 3: quadratic
+// NONLINER  = 4: nonlinear non-quadratic
 
 int exprPow::Linearity () {
 
@@ -156,9 +157,83 @@ int exprPow::Linearity () {
 }
 
 
+/// set implied bounds for function w = x^k, k negative, integer or
+/// inverse integer, and odd
+
+bool invPowImplBounds (int, int, CouNumber *, CouNumber *, CouNumber);
+
+
 /// implied bound processing for expression w = x^k, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
 bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
-  return false;
+
+  bool res = false;
+
+  return res;
+
+  if (arglist_ [0] -> Type () <= CONST)   // base is constant or zero, nothing to do
+    return false;
+
+  if (arglist_ [1] -> Type () >  CONST) { // exponent is nonconstant, no good
+
+    printf ("Couenne: Warning, power expression has nonconstant exponent: ");
+    print (std::cout);
+    printf ("\n");
+
+    return false;
+  }
+
+  int index = arglist_ [0] -> Index ();
+
+  CouNumber k = arglist_ [1] -> Value (); // exponent
+
+  if (fabs (k) < COUENNE_EPS) // k null is of little use
+    return false;
+
+  int intk; // integer (or integer inverse of) exponent
+
+  bool isint    =           (k    - (intk = floor (k))    < COUENNE_EPS), // k   is integer
+       isinvint = !isint && (1./k - (intk = floor (1./k)) < COUENNE_EPS); // 1/k is integer
+
+  CouNumber wl = l [wind], // lower w
+            wu = u [wind]; // upper w
+
+  if ((isint || isinvint) && (intk % 2)) { // k or 1/k integer and odd
+
+    if (k > 0.) { // simple, just flip bounds
+
+      res = updateBound (-1, l + index, pow (wl, 1./k));
+      res = updateBound (+1, u + index, pow (wu, 1./k)) || res;
+    } else // slightly more complicated, resort to same method as in exprInv
+      res = invPowImplBounds (wind, index, l, u, k);
+  } 
+  else 
+    if (isint) { // x^k, k integer and even
+
+      CouNumber bound = (k<0) ? wl : wu;
+
+      // |x| <= b^(1/k), where b is wl or wu depending on k negative
+      // or positive, respectively
+
+      if (bound > COUENNE_EPS) {
+
+	res = updateBound (-1, l + index, - pow (bound, 1./k));
+	res = updateBound (+1, u + index,   pow (bound, 1./k)) || res;
+      }
+
+    } else { // x^k, k=(1/h), h integer and even, or x^k, neither k nor 1/k integer
+
+      CouNumber lb = wl, ub = wu;
+
+      if (k < 0) { // swap bounds as they swap on the curve x^k when 
+	lb = wu;
+	ub = wl;
+      }
+
+      if (lb > COUENNE_EPS) res = updateBound (-1, l + index, pow (lb, 1./k));
+      if (ub > COUENNE_EPS) res = updateBound (+1, u + index, pow (ub, 1./k)) || res;
+    }
+
+  return res;
 }
