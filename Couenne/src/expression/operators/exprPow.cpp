@@ -170,8 +170,6 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   bool res = false;
 
-  return res;
-
   if (arglist_ [0] -> Type () <= CONST)   // base is constant or zero, nothing to do
     return false;
 

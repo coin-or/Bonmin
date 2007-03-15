@@ -148,7 +148,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	infeasible = true;
       //      if (!((1+i)%6)) printf ("\n");
     }
-    //    printf ("\n");
 
     if (infeasible)
       break;

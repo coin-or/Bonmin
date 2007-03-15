@@ -43,23 +43,16 @@ int CouenneProblem::tightenBounds (const OsiSolverInterface &si,
       CouNumber ll = (*(Aux (j) -> Lb ())) ();
       CouNumber uu = (*(Aux (j) -> Ub ())) ();
 
-      //      printf ("x%3d: [%12.4f,%12.4f] -> [%12.4f,%12.4f] ", 
-      //	      i+j, lc [i+j], uc [i+j], ll, uu);
-
       bool chg = false;
 
       // check if lower bound got higher    
       if (ll >= lb_ [i+j] + COUENNE_EPS) {
-	//	psi -> setColLower (i+j, ll);
-	//	printf ("l");
 	lb_ [i+j] = ll;
 	chg = true;
       }
 
       // check if upper bound got lower
       if (uu <= ub_ [i+j] - COUENNE_EPS) {
-	//	psi -> setColUpper (i+j, uu);
-	//	printf ("u");
 	ub_ [i+j] = uu;
 	chg = true;
       }
@@ -68,11 +61,7 @@ int CouenneProblem::tightenBounds (const OsiSolverInterface &si,
 	nchg++;
 	found_one = true;
 	chg_bds [i+j] = 1; 
-	//	printf (" ");
-	//	problem_ -> Aux (j) -> Image () -> print (std::cout);
       }
-
-      //      printf ("\n");
 
       // useless if assume expression::[lu]b etc already point to
       // problem::[lu]b
@@ -80,9 +69,6 @@ int CouenneProblem::tightenBounds (const OsiSolverInterface &si,
     }
 
   } while (found_one); // repeat as long as at least one bound changed
-
-  // update again 
-  //  update (NULL, lb_, ub_);
 
   return nchg;
 }
