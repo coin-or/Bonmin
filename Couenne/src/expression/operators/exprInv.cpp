@@ -73,20 +73,20 @@ bool invPowImplBounds (int wind, int index, CouNumber *l, CouNumber *u, CouNumbe
 
   if (wl >= 0.) {
     if (wu > COUENNE_EPS) {
-      if (wu < COUENNE_INFINITY - 1) res = updateBound (-1, l + index, 1/wu);
+      if (wu < COUENNE_INFINITY - 1) res = updateBound (-1, l + index, pow (wu, k));
       else                           res = updateBound (-1, l + index, 0.);
     }
-    if (wl > COUENNE_EPS)            res = updateBound (+1, u + index, 1/wl) || res;
+    if (wl > COUENNE_EPS)            res = updateBound (+1, u + index, pow (wl, k)) || res;
   }
 
   // l <= w <= u <= 0
 
   if (wu <= -0.) {
     if (wl < - COUENNE_EPS) {
-      if (wl > - COUENNE_INFINITY + 1) res = updateBound (+1, u + index, 1/wl) || res;
-      else                             res = updateBound (+1, u + index, 0.)   || res;
+      if (wl > - COUENNE_INFINITY + 1) res = updateBound (+1, u + index, pow (wl, k)) || res;
+      else                             res = updateBound (+1, u + index, 0.)          || res;
     }
-    if (wu < - COUENNE_EPS)            res = updateBound (-1, l + index, 1/wu) || res;
+    if (wu < - COUENNE_EPS)            res = updateBound (-1, l + index, pow (wu, k)) || res;
   }
 
   return res;

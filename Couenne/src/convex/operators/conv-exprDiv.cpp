@@ -40,6 +40,7 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // TODO: Use method on Tawarmalani-Sahinidis //////////////////////////////
 
+  // TODO: apply implied bounds
 
   // get bounds of numerator and denominator
 

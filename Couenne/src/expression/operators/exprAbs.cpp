@@ -73,8 +73,8 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   int index = argument_ -> Index ();
 
-  CouNumber *xl = l + index, *xu = u + index,
-             wl = l [wind],   wu = u [wind];
+  CouNumber *xl = l + index, wl = l [wind],
+            *xu = u + index, wu = u [wind];
 
   // for w >= b, we can only improve xlb if it is at least -b
   //                                 xub             most   b

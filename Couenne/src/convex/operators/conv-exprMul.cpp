@@ -121,6 +121,9 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
 
+  // TODO: add cuts considering w's lower and upper bounds (see
+  // implied bounds)
+
   // get bounds of numerator and denominator
 
   expression *xle, *xue, 

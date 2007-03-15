@@ -187,11 +187,11 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     if (res)
       chg [ind] = 1;
 
-    return res;
   } else {
 
-
-    return false; ///////////////////////////////////////////////////////////////
+    // these bounds would be implied by McCormick's convexification,
+    // however we write them explicitly for internal use within bound
+    // tightening, as they would only be known by Clp only.
 
     int xi = arglist_ [0] -> Index (),
         yi = arglist_ [1] -> Index ();
@@ -205,13 +205,70 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     // w's lower bound 
 
-    if (wl < 0) {
+    if (wl > 0) {
 
-    } else if (wl > 0) {
+      if ((*xl * *yl > wl) && 
+	  (*xu * *yu < wl)) {
 
+	if (updateBound (+1, xu, wl / *yl)) {res = true; chg [xi] = 1;}
+	if (updateBound (+1, yu, wl / *xl)) {res = true; chg [yi] = 1;}
+      } 
+      else if ((*xl * *yl < wl) && 
+	       (*xu * *yu > wl)) {
+
+	if (updateBound (-1, xl, wl / *yu)) {res = true; chg [xi] = 1;}
+	if (updateBound (-1, yl, wl / *xu)) {res = true; chg [yi] = 1;}
+      }
+
+    } else if (wl < 0) {
+
+      if ((*xu * *yl > wl) && 
+	  (*xl * *yu < wl)) {
+
+	if (updateBound (-1, xl, wl / *yl)) {res = true; chg [xi] = 1;}
+	if (updateBound (+1, yu, wl / *xu)) {res = true; chg [yi] = 1;}
+      } 
+      else if ((*xu * *yl < wl) && 
+	       (*xl * *yu > wl)) {
+
+	if (updateBound (+1, xu, wl / *yu)) {res = true; chg [xi] = 1;}
+	if (updateBound (-1, yl, wl / *xl)) {res = true; chg [xi] = 1;}
+      }
     }
 
     // w's upper bound 
 
+    if (wu > 0) {
+
+      if ((*xl * *yl > wu) && 
+	  (*xu * *yu < wu)) {
+
+	if (updateBound (-1, xl, wu / *yu)) {res = true; chg [xi] = 1;}
+	if (updateBound (-1, yl, wu / *xu)) {res = true; chg [yi] = 1;}
+      } 
+      else if ((*xl * *yl < wu) &&
+	       (*xu * *yu > wu)) {
+
+	if (updateBound (+1, xu, wu / *yl)) {res = true; chg [xi] = 1;}
+	if (updateBound (+1, yu, wu / *xl)) {res = true; chg [yi] = 1;}
+      }
+
+    } else if (wu < 0) {
+
+      if ((*xu * *yl > wu) && 
+	  (*xl * *yu < wu)) {
+
+	if (updateBound (+1, xu, wu / *yu)) {res = true; chg [xi] = 1;}
+	if (updateBound (+1, yl, wu / *xl)) {res = true; chg [yi] = 1;}
+      } 
+      else if ((*xu * *yl < wu) && 
+	       (*xl * *yu > wu)) {
+
+	if (updateBound (-1, xl, wu / *yl)) {res = true; chg [xi] = 1;}
+	if (updateBound (+1, yu, wu / *xu)) {res = true; chg [yi] = 1;}
+      }
+    }
   }
+
+  return res;
 }

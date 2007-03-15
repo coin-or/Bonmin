@@ -204,7 +204,7 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       res = updateBound (-1, l + index, pow (wl, 1./k));
       res = updateBound (+1, u + index, pow (wu, 1./k)) || res;
     } else // slightly more complicated, resort to same method as in exprInv
-      res = invPowImplBounds (wind, index, l, u, k);
+      res = invPowImplBounds (wind, index, l, u, 1./k);
   } 
   else 
     if (isint) { // x^k, k integer and even
