@@ -37,7 +37,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   nrootcuts_      (0),
   ntotalcuts_     (0),
   objValue_       (- DBL_MAX),
-  nlp_            (nlp) {
+  nlp_            (nlp),
+  BabPtr_         (NULL) {
 
   if (!asl) return;
 
@@ -84,7 +85,8 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   nrootcuts_   (src. nrootcuts_),
   ntotalcuts_  (src. ntotalcuts_),
   objValue_    (src. objValue_),
-  nlp_         (src. nlp_)
+  nlp_         (src. nlp_),
+  BabPtr_      (src. BabPtr_)
 {}
 
 

@@ -127,6 +127,36 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
+  // update primal bound with best feasible solution object
+
+  if (BabPtr_) {
+
+    int objInd = problem_ -> Obj (0) -> Body () -> Index ();
+
+    if (objInd >= 0) {
+
+      CouNumber bestObj = BabPtr_ -> bestObj();
+
+      if (problem_ -> Obj (0) -> Sense () == MAXIMIZE) { 
+	// maximization, bestObj() is a lower bound
+	if (problem_ -> Lb (objInd) < bestObj) {
+	  printf ("Lower: %.3f", problem_ -> Lb (objInd));
+	  problem_ -> Lb (objInd) = bestObj;
+	  chg_bds [objInd] = 1;
+	  printf (" =-> %.3f\n", problem_ -> Lb (objInd));
+	}
+      }
+      else
+	// minimization, bestObj() is an upper bound
+	if (problem_ -> Ub (objInd) > bestObj) {
+	  printf ("Upper: %.3f", problem_ -> Ub (objInd));
+	  problem_ -> Ub (objInd) = bestObj;
+	  chg_bds [objInd] = 1;
+	  printf (" =-> %.3f\n", problem_ -> Ub (objInd));
+	}
+    }
+  }
+
   //////////////////////// PROPAGATE CHANGED BOUNDS ///////////////////////////////////
 
   // tighten the current relaxation by tightening the variables'

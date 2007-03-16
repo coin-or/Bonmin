@@ -10,8 +10,6 @@
 #ifndef COUENNE_CUT_GENERATOR_H
 #define COUENNE_CUT_GENERATOR_H
 
-#include <iostream>
-
 #include <CglCutGenerator.hpp>
 #include <BonOaDecBase.hpp>
 #include <OsiRowCut.hpp>
@@ -19,6 +17,8 @@
 
 #include <OsiSolverInterface.hpp>
 #include <OsiClpSolverInterface.hpp>
+
+#include <BonCbc.hpp>
 
 class CouenneProblem;
 
@@ -58,6 +58,10 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// nonlinear solver interface as used within Bonmin (used at first
   /// Couenne pass of each b&b node
   Bonmin::OsiTMINLPInterface *nlp_;
+
+  /// pointer to the Bab object (used to retrieve the current primal
+  /// bound through bestObj())
+  Bonmin::Bab *BabPtr_;
 
  public:
 
@@ -147,6 +151,10 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// virtual method to decide if local search is performed
   virtual bool doLocalSearch () const {return 0;}
+
+  /// method to set the Bab pointer
+  void setBabPtr (Bonmin::Bab *p)
+    {BabPtr_ = p;}
 };
 
 #endif

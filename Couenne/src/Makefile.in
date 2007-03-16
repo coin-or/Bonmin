@@ -90,6 +90,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp \
 	expression/operators/impliedBounds-exprSum.cpp \
+	expression/operators/impliedBounds-exprDiv.cpp \
+	expression/operators/impliedBounds-exprMul.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
 	expression/exprVar.cpp expression/exprAux.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
@@ -120,7 +122,8 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
 	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
 	exprSum.lo exprMinMax.lo exprGroup.lo impliedBounds-exprSum.lo \
-	exprOp.lo exprUnary.lo exprVar.lo exprAux.lo expression.lo \
+	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo exprOp.lo \
+	exprUnary.lo exprVar.lo exprAux.lo expression.lo \
 	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
 	conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
 	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
@@ -352,6 +355,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp \
 	expression/operators/impliedBounds-exprSum.cpp \
+	expression/operators/impliedBounds-exprDiv.cpp \
+	expression/operators/impliedBounds-exprMul.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
 	expression/exprVar.cpp expression/exprAux.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
@@ -580,6 +585,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getFixVarBinFun.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprDiv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprMul.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
@@ -781,6 +788,20 @@ impliedBounds-exprSum.lo: expression/operators/impliedBounds-exprSum.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/impliedBounds-exprSum.cpp' object='impliedBounds-exprSum.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprSum.lo `test -f 'expression/operators/impliedBounds-exprSum.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprSum.cpp
+
+impliedBounds-exprDiv.lo: expression/operators/impliedBounds-exprDiv.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-exprDiv.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-exprDiv.Tpo" -c -o impliedBounds-exprDiv.lo `test -f 'expression/operators/impliedBounds-exprDiv.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprDiv.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-exprDiv.Tpo" "$(DEPDIR)/impliedBounds-exprDiv.Plo"; else rm -f "$(DEPDIR)/impliedBounds-exprDiv.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/impliedBounds-exprDiv.cpp' object='impliedBounds-exprDiv.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprDiv.lo `test -f 'expression/operators/impliedBounds-exprDiv.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprDiv.cpp
+
+impliedBounds-exprMul.lo: expression/operators/impliedBounds-exprMul.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-exprMul.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-exprMul.Tpo" -c -o impliedBounds-exprMul.lo `test -f 'expression/operators/impliedBounds-exprMul.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprMul.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-exprMul.Tpo" "$(DEPDIR)/impliedBounds-exprMul.Plo"; else rm -f "$(DEPDIR)/impliedBounds-exprMul.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/impliedBounds-exprMul.cpp' object='impliedBounds-exprMul.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprMul.lo `test -f 'expression/operators/impliedBounds-exprMul.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprMul.cpp
 
 exprOp.lo: expression/exprOp.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprOp.lo -MD -MP -MF "$(DEPDIR)/exprOp.Tpo" -c -o exprOp.lo `test -f 'expression/exprOp.cpp' || echo '$(srcdir)/'`expression/exprOp.cpp; \
