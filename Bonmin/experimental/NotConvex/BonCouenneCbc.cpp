@@ -134,6 +134,10 @@ namespace Bonmin
 
     nlpSolver -> extractLinearRelaxation (*si);
 
+    // [PBelotti] Change solver type to force NLP-feasibility check
+    // rather than simple integrality
+    //    OsiBabSolver * extraStuff = new OsiBabSolver(3);
+
     // say bound dubious, does cuts at solution
     OsiBabSolver * extraStuff = new OsiBabSolver(0);
 
@@ -189,6 +193,8 @@ namespace Bonmin
 
     CouenneCutGenerator *ecpGen = ci -> couenneCg ();
 
+    ecpGen -> setBabPtr (this);
+
     /*
     ecpGen.parameter().global_ = par.oaCutsGlobal;
     ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
@@ -197,29 +203,29 @@ namespace Bonmin
 
     int numGen = 0;
 
-    // TODO: replace with couenneCutsFrequency
-
     if (par.couenneCutsFrequency != 0) {
       model.addCutGenerator (ecpGen, par.couenneCutsFrequency, "Couenne cutting planes");
       numGen++;
     }
 
-//     if (par.migFreq != 0) {
-//       model.addCutGenerator(&miGGen,par.migFreq,"GMI");
-//       numGen++;
-//     }
-//       if (par.probFreq != 0) {
-//         model.addCutGenerator(&probGen,par.probFreq,"Probing");
-//         numGen++;
-//       }
-//       if (par.coverFreq != 0) {
-//         model.addCutGenerator(&knapsackGen,par.coverFreq,"covers");
-//         numGen++;
-//       }
-//       if (par.mirFreq != 0) {
-//         model.addCutGenerator(&mixedGen,par.mirFreq,"MIR");
-//         numGen++;
-//       }
+    /*
+    if (par.migFreq != 0) {
+      model.addCutGenerator(&miGGen,par.migFreq,"GMI");
+      numGen++;
+    }
+    if (par.probFreq != 0) {
+      model.addCutGenerator(&probGen,par.probFreq,"Probing");
+      numGen++;
+    }
+    if (par.coverFreq != 0) {
+      model.addCutGenerator(&knapsackGen,par.coverFreq,"covers");
+      numGen++;
+    }
+    if (par.mirFreq != 0) {
+      model.addCutGenerator(&mixedGen,par.mirFreq,"MIR");
+      numGen++;
+    }
+    */
 
     //Set true branch-and-bound parameters
     model.messageHandler()->setLogLevel(par.bbLogLevel);
@@ -374,6 +380,11 @@ namespace Bonmin
         delete [] bestSolution_;
       bestSolution_ = new double[nlpSolver->getNumCols()];
       CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
+
+      printf ("lp solution: {");
+      for (int i=0; i < ecpGen -> getnvars (); i++)
+	printf ("%.3f ", model.bestSolution () [i]);
+      printf ("}\n");
     }
     if (!model.status()) {
       if (bestSolution_)
