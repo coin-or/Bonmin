@@ -46,6 +46,7 @@ libCouenne_la_SOURCES = \
 	expression/expression.cpp \
 	simplify/simplifiers.cpp \
 	simplify/simplify.cpp \
+	convex/checkNLP.cpp \
 	convex/addEnvelope.cpp \
 	convex/createCuts.cpp \
 	convex/conv-exprOp.cpp \

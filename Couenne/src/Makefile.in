@@ -95,9 +95,10 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
 	expression/exprVar.cpp expression/exprAux.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/addEnvelope.cpp \
-	convex/createCuts.cpp convex/conv-exprOp.cpp \
-	convex/conv-exprUnary.cpp convex/operators/conv-exprAbs.cpp \
+	simplify/simplify.cpp convex/checkNLP.cpp \
+	convex/addEnvelope.cpp convex/createCuts.cpp \
+	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
+	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -124,8 +125,8 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	exprSum.lo exprMinMax.lo exprGroup.lo impliedBounds-exprSum.lo \
 	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo exprOp.lo \
 	exprUnary.lo exprVar.lo exprAux.lo expression.lo \
-	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
-	conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
+	simplifiers.lo simplify.lo checkNLP.lo addEnvelope.lo \
+	createCuts.lo conv-exprOp.lo conv-exprUnary.lo conv-exprAbs.lo \
 	conv-exprDiv.lo conv-exprMul.lo conv-exprOpp.lo \
 	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
@@ -360,9 +361,10 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
 	expression/exprVar.cpp expression/exprAux.cpp \
 	expression/expression.cpp simplify/simplifiers.cpp \
-	simplify/simplify.cpp convex/addEnvelope.cpp \
-	convex/createCuts.cpp convex/conv-exprOp.cpp \
-	convex/conv-exprUnary.cpp convex/operators/conv-exprAbs.cpp \
+	simplify/simplify.cpp convex/checkNLP.cpp \
+	convex/addEnvelope.cpp convex/createCuts.cpp \
+	convex/conv-exprOp.cpp convex/conv-exprUnary.cpp \
+	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprOpp.cpp \
@@ -546,6 +548,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addEnvelope.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checkNLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprAbs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprDiv.Plo@am__quote@
@@ -851,6 +854,13 @@ simplify.lo: simplify/simplify.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='simplify/simplify.cpp' object='simplify.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o simplify.lo `test -f 'simplify/simplify.cpp' || echo '$(srcdir)/'`simplify/simplify.cpp
+
+checkNLP.lo: convex/checkNLP.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT checkNLP.lo -MD -MP -MF "$(DEPDIR)/checkNLP.Tpo" -c -o checkNLP.lo `test -f 'convex/checkNLP.cpp' || echo '$(srcdir)/'`convex/checkNLP.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/checkNLP.Tpo" "$(DEPDIR)/checkNLP.Plo"; else rm -f "$(DEPDIR)/checkNLP.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/checkNLP.cpp' object='checkNLP.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o checkNLP.lo `test -f 'convex/checkNLP.cpp' || echo '$(srcdir)/'`convex/checkNLP.cpp
 
 addEnvelope.lo: convex/addEnvelope.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT addEnvelope.lo -MD -MP -MF "$(DEPDIR)/addEnvelope.Tpo" -c -o addEnvelope.lo `test -f 'convex/addEnvelope.cpp' || echo '$(srcdir)/'`convex/addEnvelope.cpp; \
