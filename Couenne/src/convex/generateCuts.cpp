@@ -18,6 +18,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
 
+  double now = CoinCpuTime ();
+
   //  printf ("-------------------- Couenne::GENERATE CUTS\n");
 
   int ncols = problem_ -> nVars () + 
@@ -287,5 +289,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
   else ntotalcuts_ += cs.sizeRowCuts ();
 
-  //  printf (":::::::::::::::::::::::::::::::::: generate cuts (%d)\n", cs.sizeRowCuts ());
+  septime_ += CoinCpuTime () - now;
+
+  //  printf (":::::::::::::::::::::::::::::::::: generate cuts (%d) %d %d\n", 
+  //	  cs.sizeRowCuts (), ntotalcuts_, nrootcuts_);
 }

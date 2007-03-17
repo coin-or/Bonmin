@@ -59,6 +59,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   if ((now = (CoinCpuTime () - now)) > 10.)
   printf ("standardization time: %.3fs\n", now);
 
+  septime_ = now;
+
   //  problem_ -> print (std::cout);
   //  printf ("======================================\n");
   //  problem_ -> writeMod ("extended.mod");

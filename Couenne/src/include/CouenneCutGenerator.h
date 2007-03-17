@@ -52,6 +52,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// total number of cuts generated 
   mutable int ntotalcuts_;
 
+  /// separation time (includes generation of problem)
+  mutable double septime_;
+
   /// Record obj value at final point of CouenneConv.
   mutable double objValue_;
 
@@ -155,6 +158,14 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// method to set the Bab pointer
   void setBabPtr (Bonmin::Bab *p)
     {BabPtr_ = p;}
+
+  /// methods to get statistics
+
+  void getStats (int &nrc, int &ntc, double &st) {
+    nrc = nrootcuts_;
+    ntc = ntotalcuts_;
+    st  = septime_;
+  }
 };
 
 #endif
