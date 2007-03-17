@@ -400,5 +400,15 @@ namespace Bonmin
     }
     delete si;
     std::cout<<"Finished"<<std::endl;
+
+
+    int nr, nt;
+    double st;
+
+    dynamic_cast <CouenneCutGenerator *> 
+      (model.cutGenerator (0) -> generator ()) 
+      -> getStats (nr, nt, st);
+
+    printf ("::: %6d & %6d & %8.3f ", nr, nt, st);
   }
 }

@@ -108,7 +108,8 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-  if(0)// To output a line for building tables
+    if (1) {// To output a line for building tables
+
     std::cout<<status<<"\t"<<CoinCpuTime()-time1<<"\t"
 	     <<bb.bestObj()<<"\t"
 	     <<bb.numNodes()<<"\t"
@@ -116,8 +117,9 @@ int main (int argc, char *argv[])
 	     <<nlp_and_solver->totalNlpSolveTime()<<"\t"
 	     <<nlp_and_solver->nCallOptimizeTNLP()<<"\t"
 	     <<std::endl;
+    }
 
-  nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
+    //  nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
 
   }
   catch(TNLPSolver::UnsolvedError *E) {
