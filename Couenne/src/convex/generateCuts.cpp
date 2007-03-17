@@ -140,19 +140,21 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       if (problem_ -> Obj (0) -> Sense () == MAXIMIZE) { 
 	// maximization, bestObj() is a lower bound
 	if (problem_ -> Lb (objInd) < bestObj) {
-	  printf ("Lower: %.3f", problem_ -> Lb (objInd));
+	  //	  printf ("Lower: %.3f", problem_ -> Lb (objInd));
 	  problem_ -> Lb (objInd) = bestObj;
-	  chg_bds [objInd] = 1;
-	  printf (" =-> %.3f\n", problem_ -> Lb (objInd));
+	  if (bestObj > - COUENNE_INFINITY + 1) 
+	    chg_bds [objInd] = 1;
+	  //	  printf (" =-> %.3f\n", problem_ -> Lb (objInd));
 	}
       }
       else
 	// minimization, bestObj() is an upper bound
 	if (problem_ -> Ub (objInd) > bestObj) {
-	  printf ("Upper: %.3f", problem_ -> Ub (objInd));
+	  //	  printf ("Upper: %.3f", problem_ -> Ub (objInd));
 	  problem_ -> Ub (objInd) = bestObj;
-	  chg_bds [objInd] = 1;
-	  printf (" =-> %.3f\n", problem_ -> Ub (objInd));
+	  if (bestObj < COUENNE_INFINITY - 1) 
+	    chg_bds [objInd] = 1;
+	  //	  printf (" =-> %.3f\n", problem_ -> Ub (objInd));
 	}
     }
   }
