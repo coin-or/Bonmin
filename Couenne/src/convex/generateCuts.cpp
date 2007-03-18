@@ -170,6 +170,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   bool infeasible = false;
 
+  int niter = 0;
+
   do {
 
     ntightened   = problem_ -> tightenBounds (si, chg_bds);
@@ -186,7 +188,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     if (infeasible)
       break;
 
-  } while (ntightened || nbwtightened);
+  } while ((ntightened || nbwtightened) && (niter++ < 10));
 
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
