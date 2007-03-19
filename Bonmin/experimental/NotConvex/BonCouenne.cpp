@@ -110,13 +110,25 @@ int main (int argc, char *argv[])
 
     if (1) {// To output a line for building tables
 
-    std::cout<<status<<"\t"<<CoinCpuTime()-time1<<"\t"
+      printf ("%8.2f %12.3f %12.3f %7d %7d %7.2f %7d ",
+	      CoinCpuTime()-time1,
+	      bb.bestBound(),
+	      bb.bestObj(),
+	      bb.numNodes(),
+	      bb.iterationCount(),
+	      nlp_and_solver->totalNlpSolveTime(),
+	      nlp_and_solver->nCallOptimizeTNLP());
+      
+      std::cout<<status<<"\n";//
+      /*<<CoinCpuTime()-time1<<"\t"
+	     <<bb.bestBound()<<"\t"
 	     <<bb.bestObj()<<"\t"
 	     <<bb.numNodes()<<"\t"
 	     <<bb.iterationCount()<<"\t"
 	     <<nlp_and_solver->totalNlpSolveTime()<<"\t"
 	     <<nlp_and_solver->nCallOptimizeTNLP()<<"\t"
 	     <<std::endl;
+      */
     }
 
     //  nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
