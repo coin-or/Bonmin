@@ -88,7 +88,8 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   ntotalcuts_  (src. ntotalcuts_),
   objValue_    (src. objValue_),
   nlp_         (src. nlp_),
-  BabPtr_      (src. BabPtr_)
+  BabPtr_      (src. BabPtr_),
+  septime_     (src. septime_)
 {}
 
 
