@@ -1743,7 +1743,7 @@ OsiTMINLPInterface::getConstraintsViolation(const double *x, double &obj)
 
   double norm = 0;
   for(int i = 0; i< numrows ; i++) {
-    if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
+    if(!constTypes_ || constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
       double rowViolation = 0;
       if(rowLower[i] > -1e10)
          rowViolation = max(0.,rowLower[i] - g[i]);
@@ -1920,7 +1920,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     
     if(global)
       {
-	newCut.setGloballyValid();
+	newCut.setGloballyValidAsInteger(2);
       }
     newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
@@ -1973,7 +1973,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       {
 	OsiRowCut newCut;
 	if(global)
-	  newCut.setGloballyValid();
+	  newCut.setGloballyValidAsInteger(2);
 	newCut.setEffectiveness(99.99e99);
 	newCut.setRow(v);
 	newCut.setLb(-DBL_MAX/*Infinity*/);
@@ -2069,7 +2069,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * 
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
-    newCut.setGloballyValid();
+    newCut.setGloballyValidAsInteger(2);
     newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
     newCut.setUb(ub[i]);
@@ -2110,7 +2110,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * 
     }
     v.insert(n,-1);
     OsiRowCut newCut;
-//    newCut.setGloballyValid();
+//    newCut.setGloballyValidAsInteger(2);
     newCut.setEffectiveness(99.99e99);
     newCut.setRow(v);
     newCut.setLb(-DBL_MAX/*Infinity*/);
