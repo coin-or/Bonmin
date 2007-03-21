@@ -183,7 +183,7 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
    }
  
    //si.writeMpsNative("toto",NULL,NULL,1);
-   si.writeLp("toto");
+//   si.writeLp("toto");
   app_->enableWarmStart();
   setColSolution(problem()->x_sol());
   setRowPrice(problem()->duals_sol());

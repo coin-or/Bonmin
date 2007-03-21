@@ -381,9 +381,16 @@ namespace Bonmin
       bestSolution_ = new double[nlpSolver->getNumCols()];
       CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
 
+      //Check solution validity
+      double obj = 0;
+      double violation = nlpSolver->getConstraintsViolation(bestSolution_, obj);
+      std::cout<<"Solution found violates non linear constraints by: "<<violation<<std::endl;
+      std::cout<<"Objective: "<<obj<<" (was "<<nlpSolver->getObjValue()<<" returned by Cbc)."<<std::endl;
+      
+      
       printf ("lp solution: {");
       for (int i=0; i < ecpGen -> getnvars (); i++)
-	printf ("%.3f ", model.bestSolution () [i]);
+	printf ("%.3f ", bestSolution_ [i]);
       printf ("}\n");
     }
     if (!model.status()) {
