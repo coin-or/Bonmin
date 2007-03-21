@@ -52,6 +52,10 @@ class exprUnary: public expression {
   ~exprUnary () 
     {if (argument_) delete argument_;}
 
+  /// return number of arguments
+  inline int nArgs () const
+    {return 1;}
+
   /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
     {return argument_;}

@@ -102,6 +102,10 @@ class expression {
   virtual inline int Index () const
     {return -1;}
 
+  /// return number of arguments (when applicable, that is, with N-ary functions)
+  virtual inline int nArgs () const
+    {return 0;}
+
   /// return arglist (when applicable, that is, with N-ary functions)
   virtual inline expression **ArgList () const
     {return NULL;}

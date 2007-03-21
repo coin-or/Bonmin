@@ -8,6 +8,7 @@
  */
 
 #include <CouenneObject.hpp>
+#include <exprGroup.h>
 #include <CouenneBranchingObject.hpp>
 
 
@@ -51,38 +52,60 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 				      const OsiBranchingInformation *info) const {
   int index = reference_ -> Index ();
   double val = info -> solution_ [index];
+
   // fix that variable to its current value
   solver -> setColLower (index, val);
   solver -> setColUpper (index, val);
 
-  const expression * expr = reference_ -> Image();
-  if(expr->Argument()){
-    index = expr->Argument()->Index();
-    if(index > -1){
-    val = info ->solution_ [index];
-    solver -> setColLower (index, val);
-    solver -> setColUpper (index, val);
+  expression * expr = reference_ -> Image();
+
+  if (expr -> Argument ()){ // unary function
+
+    index = expr -> Argument () -> Index ();
+
+    if (index > -1) {
+
+      val = info -> solution_ [index];
+
+      solver -> setColLower (index, val);
+      solver -> setColUpper (index, val);
     }
-    else throw -1;
   }
-  else {
-    const exprOp * op = dynamic_cast<const exprOp *> (expr);
-    if(op){
-      expression ** args = op->ArgList();
-      int nargs = op -> nArgs();
-      for(int i = 0 ; i < nargs ; i++){
-        index = args[i] -> Index();
-        if(index > -1){
-          val = info -> solution_ [index];
-          solver -> setColLower (index, val);
-          solver -> setColUpper (index, val);
-        }
+  else // n-ary function
+    if (expr -> ArgList ()) {
+
+      expression ** args = expr -> ArgList ();
+      int nargs = expr -> nArgs();
+
+      for (int i = 0 ; i < nargs ; i++) {
+
+	index = args [i] -> Index();
+
+	if (index > -1) {
+
+	  val = info -> solution_ [index];
+	  solver -> setColLower (index, val);
+	  solver -> setColUpper (index, val);
+	}
       }
     }
-    else{
-      throw -1;
+
+  // last case: exprGroup, the linear terms are not handled
+
+  if (expr -> code () == COU_EXPRGROUP) {
+
+    exprGroup *e = dynamic_cast <exprGroup *> (expr);
+    int *indices = e -> getIndices (), index;
+
+    for (int i=0; (index = indices [i]) >= 0; i++) {
+      
+      val = info -> solution_ [index];
+
+      solver -> setColLower (index, val);
+      solver -> setColUpper (index, val);
     }
   }
+
   return 0.;
 }
 
