@@ -49,23 +49,40 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 /// fix integer coordinates of current integer feasible solution
 double CouenneObject::feasibleRegion (OsiSolverInterface *solver, 
 				      const OsiBranchingInformation *info) const {
-
-  // get current value of the branching variable
-  int    index = reference_ -> getFixVar () -> Index ();
-  double val   = info -> solution_ [index];
-
-  if (0) {
-    printf ("CO::feasRegion: ");
-    reference_ -> print (std::cout);
-    printf (" = ");
-    reference_ -> Image () -> print (std::cout);
-    printf (" on x_%d (%.15f)\n", index, val);
-  }
-
+  int index = reference_ -> Index ();
+  double val = info -> solution_ [index];
   // fix that variable to its current value
   solver -> setColLower (index, val);
   solver -> setColUpper (index, val);
 
+  const expression * expr = reference_ -> Image();
+  if(expr->Argument()){
+    index = expr->Argument()->Index();
+    if(index > -1){
+    val = info ->solution_ [index];
+    solver -> setColLower (index, val);
+    solver -> setColUpper (index, val);
+    }
+    else throw -1;
+  }
+  else {
+    const exprOp * op = dynamic_cast<const exprOp *> (expr);
+    if(op){
+      expression ** args = op->ArgList();
+      int nargs = op -> nArgs();
+      for(int i = 0 ; i < nargs ; i++){
+        index = args[i] -> Index();
+        if(index > -1){
+          val = info -> solution_ [index];
+          solver -> setColLower (index, val);
+          solver -> setColUpper (index, val);
+        }
+      }
+    }
+    else{
+      throw -1;
+    }
+  }
   return 0.;
 }
 
