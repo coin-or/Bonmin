@@ -150,6 +150,7 @@ int exprGroup::compare (exprGroup &e) {
 }
 
 /// used in rank-based branching variable choice
+
 int exprGroup::rank (CouenneProblem *p) {
 
   int maxrank = exprOp::rank (p);
@@ -170,4 +171,14 @@ int exprGroup::rank (CouenneProblem *p) {
   }
 
   return maxrank;
+}
+
+
+/// return an index to the variable's argument that is better fixed
+/// in a branching rule for solving a nonconvexity gap
+
+expression *exprGroup::getFixVar () {
+  if (arglist_ [0] -> Type () == CONST) 
+    return this;
+  else return arglist_ [0];
 }

@@ -3,6 +3,12 @@
 /* If defined, the Ampl Solver Library is available. */
 #undef COIN_HAS_ASL
 
+/* Define to 1 if the Bonmin package is used */
+#undef COIN_HAS_BONMIN
+
+/* Define to 1 if the Cbc package is used */
+#undef COIN_HAS_CBC
+
 /* Define to 1 if the Cgl package is used */
 #undef COIN_HAS_CGL
 
@@ -14,6 +20,9 @@
 
 /* Define to 1 if the Couenne package is used */
 #undef COIN_HAS_COUENNE
+
+/* Define to 1 if the Ipopt package is used */
+#undef COIN_HAS_IPOPT
 
 /* Define to 1 if the Osi package is used */
 #undef COIN_HAS_OSI

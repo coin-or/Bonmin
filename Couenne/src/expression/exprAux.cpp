@@ -40,14 +40,12 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   CouNumber l = expression::Lbound (varIndex_),
             u = expression::Ubound (varIndex_);
 
-  if (fabs (u-l) < COUENNE_EPS) {
+  if ((!(cg -> isFirst ())) && (fabs (u-l) < COUENNE_EPS)) {
 
     OsiRowCut *cut = cg -> createCut (l, 0, varIndex_, 1.);
     if (cut) cs.insert (cut);
-  } else {
-
-    image_ -> generateCuts (this, si, cs, cg);
-  }
+  } 
+  else image_ -> generateCuts (this, si, cs, cg);
 
   //  if (!(cg -> isFirst ())) 
   //  if (j < cs.sizeRowCuts ())

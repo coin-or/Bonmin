@@ -95,13 +95,14 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if (!(cg -> isFirst ()))
     return;
 
-  // second, count the number of linear terms
-  int nlin = 0;
+  // there is one linear term so far: -w
+  int nterms = 0;
 
-  for (register int *ind = index_; *ind++>=0; nlin++);
+  // count terms in linear part
+  for (register int *ind = index_; *ind++ >= 0; nterms++);
 
-  CouNumber *coeff = new CouNumber [nargs_ + nlin + 1];
-  int       *index = new int       [nargs_ + nlin + 1];
+  CouNumber *coeff = new CouNumber [nargs_ + nterms + 1];
+  int       *index = new int       [nargs_ + nterms + 1];
   OsiRowCut *cut   = new OsiRowCut;
 
   CouNumber rhs = c0_;
@@ -110,28 +111,26 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   coeff [0] = -1.; index [0] = w -> Index ();
 
   // now add linear terms
-  for (register int i=0; i<nlin; i++) {
+  for (register int i=1; i<=nterms; i++) {
 
-    coeff [i+1] = coeff_ [i]; 
-    index [i+1] = index_ [i];
+    coeff [i] = coeff_ [i-1]; 
+    index [i] = index_ [i-1];
   }
-
-  int nv = nlin+1;
 
   // scan arglist for (aux) variables and constants
   for (register int i=0; i<nargs_; i++) {
 
     expression *curr = arglist_ [i];
 
-    if (curr -> Type () == CONST)
+    if (curr -> Type () == CONST) // constant term in sum
       rhs += curr -> Value ();
-    else {
-      coeff [nv]   = 1.; 
-      index [nv++] = curr -> Index ();
+    else {                        // variable
+      coeff [++nterms] = 1.; 
+      index   [nterms] = curr -> Index ();
     }
   }
 
-  cut -> setRow (nv, index, coeff);
+  cut -> setRow (nterms+1, index, coeff);
 
   rhs = - rhs;
 

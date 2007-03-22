@@ -60,6 +60,9 @@ class exprSum: public exprOp {
 
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, char *);
+
+  ///
+  virtual expression *getFixVar () {return *arglist_;}
 };
 
 

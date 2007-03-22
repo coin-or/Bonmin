@@ -88,7 +88,7 @@ class exprAux: public exprVar {
 
   // Null function for evaluating the expression
   inline CouNumber operator () () 
-    {return (currValue_ = (*image_) ());}
+    {return (currValue_ = expression::Variable (varIndex_));}
 
   // Differentiation
   inline expression *differentiate (int index) 

@@ -16,11 +16,10 @@
 #include <exprUnary.h>
 
 
-/// general n-ary operator-type expression: requires argument list. All
-/// non-unary and non-leaf operators, i.e., sum, subtraction,
-/// multiplication, power, division, max, min, etc. are derived from
-/// this class.
-///
+/// general n-ary operator-type expression: requires argument
+/// list. All non-unary and non-leaf operators, i.e., sum,
+/// subtraction, multiplication, power, division, max, min, etc. are
+/// derived from this class.
 
 class exprOp: public expression {
 
@@ -99,7 +98,8 @@ class exprOp: public expression {
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar () {return arglist_ [0];}
+  virtual expression *getFixVar ()
+    {return arglist_ [0];}
 
   /// return code to classify type of expression
   virtual enum expr_type code () {return COU_EXPROP;}

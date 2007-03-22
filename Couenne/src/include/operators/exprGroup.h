@@ -83,6 +83,10 @@ class exprGroup: public exprSum {
 
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *);
+
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
+  virtual expression *getFixVar ();
 };
 
 

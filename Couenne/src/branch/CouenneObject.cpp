@@ -17,24 +17,38 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 
   int index = reference_ -> Image () -> getFixVar () -> Index ();
 
+  //  if (index < 0) return 0;
+
+  //printf("vars: "); for (int i=0;i<18;i++) printf("%+7.1f ",expression::Variable(i)); printf ("\n");
+
+  expression::update (const_cast <CouNumber *> (info -> solution_),
+		      const_cast <CouNumber *> (info -> lower_),
+		      const_cast <CouNumber *> (info -> upper_));
+
+  //printf("info: "); for (int i=0;i<18;i++) printf("%+7.1f ",expression::Variable(i)); printf ("\n");
+
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
 
-  if ((fabs (info -> lower_ [index] - info -> upper_ [index]) < COUENNE_EPS)
+  /*
+  if ((fabs (info -> lower_ [index] - 
+	     info -> upper_ [index]) < COUENNE_EPS)
       //|| (fabs (info -> solution_ [index] - info -> upper_    [index]) < COUENNE_EPS)
       //|| (fabs (info -> solution_ [index] - info -> lower_    [index]) < COUENNE_EPS)
       )
     return 0.;
+  */
 
   const double & expr = (*(reference_ -> Image ())) (), 
                & var  = expression::Variable (reference_ -> Index ());
 
   if (0) {
 
-    reference_ -> print (std::cout); std::cout << " = ";
+    reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout);
 
-    printf (". Infeasibility = |%.15f - %.15f| = %.15f\n", var, expr, fabs (var - expr));
+    printf (". Infeasibility = |%.15f - %.15f| (%.15f)= %.15f\n", 
+	    var, expr, (*reference_) (), fabs (var - expr));
   }
 
   CouNumber delta = fabs (var - expr);
@@ -51,9 +65,14 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 double CouenneObject::feasibleRegion (OsiSolverInterface *solver, 
 				      const OsiBranchingInformation *info) const {
   int index = reference_ -> Index ();
+
+  // should never happen...
+  if (index < 0) return 0;
+
   double val = info -> solution_ [index];
 
   // fix that variable to its current value
+
   solver -> setColLower (index, val);
   solver -> setColUpper (index, val);
 

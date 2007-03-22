@@ -13,8 +13,6 @@
 
 bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
 
-  // PBelotti: check NLP feasibility
-
   // first cut generator (if the only one) is a CouenneCutGenerator,
   // which has NLP symbolic information. Use that to check NLP feasibility
     
@@ -33,7 +31,9 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
   printf (" (variable %d)\n", p -> Obj (0) -> Body () -> Index ());*/
 
   if (fabs (realobj - obj) > COUENNE_EPS) {
-    obj = realobj;
+    //    obj = realobj;
+
+    printf ("checkNLP: false objective function! %.3f != %.3f\n", realobj, obj);
   }
 
   for (int i=0; i<p->nNLCons (); i++) {
@@ -49,7 +49,7 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
     if ((body > rhs + COUENNE_EPS) || 
 	(body < lhs - COUENNE_EPS)) {
 
-      //      printf ("############### NO!\n");
+      printf ("############### NLCons NO!\n");
       return false;
     }
     //    else printf ("yes\n");
@@ -70,7 +70,7 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
 
     if (fabs (aux - img) > COUENNE_EPS) {
 
-      //      printf ("######### NO!\n");
+      printf ("######### Aux NO!\n");
       return false;
     } 
     //    else printf ("yes (%.15f)\n", aux-img);
@@ -78,4 +78,3 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
 
   return true;
 }
-  
