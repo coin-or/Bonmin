@@ -385,7 +385,7 @@ namespace Bonmin
       double obj = 0;
       double violation = nlpSolver->getConstraintsViolation(bestSolution_, obj);
       std::cout<<"Solution found violates non linear constraints by: "<<violation<<std::endl;
-      std::cout<<"Objective: "<<obj<<" (was "<<nlpSolver->getObjValue()<<" returned by Cbc)."<<std::endl;
+      std::cout<<"Objective: "<<obj<<" (was "<<model.getObjValue()<<" returned by Cbc)."<<std::endl;
       
       
       printf ("lp solution: {");
