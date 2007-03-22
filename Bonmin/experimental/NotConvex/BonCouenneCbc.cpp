@@ -69,6 +69,8 @@
 
 #include "CbcBranchUser.hpp"
 
+bool checkNLP (CglCutGenerator *, const double *, double &);
+
 
 // Code to enable user interuption
 static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
@@ -158,12 +160,18 @@ namespace Bonmin
       for (int i = 0 ; i < numAuxs; i++) // for each aux variable
 
 	// if this variable is associated with a nonlinear function
-	if (couenneProb -> Aux (i) -> Image () -> Linearity () > LINEAR) {
+	//	if (couenneProb -> Aux (i) -> Image () -> Linearity () > LINEAR) 
+	  {
+	    /*
+	    printf ("creating CouenneObject for ");
 
-	  // then we may have to branch on it
-	  objects [nobj] = new CouenneObject (couenneProb -> Aux (i));
-	  objects [nobj++] -> setPriority(1);
-	}
+	    couenneProb -> Aux (i) ->             print (std::cout); printf (" := ");
+	    couenneProb -> Aux (i) -> Image () -> print (std::cout); printf ("\n");
+	    */
+	    // then we may have to branch on it
+	    objects [nobj] = new CouenneObject (couenneProb -> Aux (i));
+	    objects [nobj++] -> setPriority (1);
+	  }
 
       si -> addObjects (nobj, objects);
 //       for(int i = 0 ; i < nobj ; i++){
@@ -378,20 +386,27 @@ namespace Bonmin
     if (model.bestSolution()) {
       if (bestSolution_)
         delete [] bestSolution_;
+
+      if (!checkNLP (model.cutGenerator (0) -> generator (), bestSolution_, obj))
+	printf ("### checkNLP: solution is wrong\n");
+
       bestSolution_ = new double[nlpSolver->getNumCols()];
       CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
 
       //Check solution validity
       double obj = 0;
       double violation = nlpSolver->getConstraintsViolation(bestSolution_, obj);
-      std::cout<<"Solution found violates non linear constraints by: "<<violation<<std::endl;
-      std::cout<<"Objective: "<<obj<<" (was "<<model.getObjValue()<<" returned by Cbc)."<<std::endl;
-      
-      
+
+      if (fabs (violation) > 1e-5)
+	std::cout << "Solution found violates non linear constraints by: "
+		  << violation << std::endl << "Objective: " << obj
+		  << " (was "<< model.getObjValue () << " returned by Cbc)." << std::endl;
+      /*      
       printf ("lp solution: {");
       for (int i=0; i < ecpGen -> getnvars (); i++)
 	printf ("%.3f ", bestSolution_ [i]);
       printf ("}\n");
+      */
     }
     if (!model.status()) {
       if (bestSolution_)
