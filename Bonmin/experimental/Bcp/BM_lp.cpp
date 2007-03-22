@@ -132,6 +132,9 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
     */
     BM_solution* sol = NULL;
 
+    char prefix[100];
+    sprintf(prefix, "%i", getLpProblemPointer()->get_process_id().pid());
+    try {
     switch (par.entry(BM_par::WarmStartStrategy)) {
     case WarmStartNone:
 	nlp_.initialSolve();
@@ -160,6 +163,35 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 	    }
 	}
 	break;
+    }
+    }
+    catch(Bonmin::TNLPSolver::UnsolvedError &E) {
+      E.writeDiffFiles(prefix);
+      E.printError(std::cerr);
+      //There has been a failure to solve a problem with Ipopt.  And
+      //we will output file with information on what has been changed
+      //in the problem to make it fail.
+      //Now depending on what algorithm has been called (B-BB or
+      //other) the failed problem may be at different place.
+      //    const OsiSolverInterface &si1 = (algo > 0) ? nlpSolver : *model.solver();
+    }
+    catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
+      std::cerr<<E.className()<<"::"<<E.methodName()
+	       <<std::endl
+	       <<E.message()<<std::endl;
+    }
+    catch(CoinError &E) {
+      std::cerr<<E.className()<<"::"<<E.methodName()
+	       <<std::endl
+	       <<E.message()<<std::endl;
+    }
+    catch (Ipopt::OPTION_INVALID &E) {
+      std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
+    }
+    catch(...) {
+      std::cerr<<pbName<<" unrecognized exception"<<std::endl;
+      std::cerr<<pbName<<"\t Finished \t exception"<<std::endl;
+      throw;
     }
 
     const int numCols = nlp_.getNumCols();
