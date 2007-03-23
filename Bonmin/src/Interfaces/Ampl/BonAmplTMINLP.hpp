@@ -1,4 +1,6 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004
+// (C) Copyright International Business Machines Corporation and
+// Carnegie Mellon University 2004, 2007
+//
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -33,8 +35,6 @@ namespace Ipopt
 
 namespace Bonmin
 {
-
-
 
   /** Ampl MINLP Interface.
    *  Ampl MINLP Interface, implemented as a TMINLP.
@@ -168,6 +168,11 @@ namespace Bonmin
       return &sos_;
     }
 
+    virtual const PerturbInfo* perturbInfo() const
+    {
+      return &perturb_info_;
+    }
+
     /** @name User callbacks */
     //@{
     /** Additional application specific options.*/
@@ -253,6 +258,8 @@ namespace Bonmin
     BranchingInfo branch_;
     /** Storage of sos constraints */
     SosInfo sos_;
+    /** Storage for perturbation radii */
+    PerturbInfo perturb_info_;
     /** Store a suffix handler (since Ipopt does not want to give access to his >:( ).*/
     SmartPtr<AmplSuffixHandler> suffix_handler_;
   };

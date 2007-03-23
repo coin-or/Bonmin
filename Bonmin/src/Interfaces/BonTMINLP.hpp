@@ -1,4 +1,6 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004, 2006
+// (C) Copyright International Business Machines Corporation and
+// Carnegie Mellon University 2004, 2007
+//
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -143,6 +145,42 @@ namespace Bonmin
 	gutsOfDestructor();
       }
     };
+
+    /** Class to store perturbation radii for variables in the model */
+    class PerturbInfo
+    {
+    public:
+      /** default constructor. */
+      PerturbInfo() :
+	perturb_radius_(NULL)
+      {}
+
+      /** destructor*/
+      ~PerturbInfo()
+      {
+        delete [] perturb_radius_;
+      }
+
+      /** Method for setting the perturbation radii. */
+      void SetPerturbationArray(Index numvars, const double* perturb_radius);
+
+      /** Method for getting the array for the perturbation radii in
+       *  order to use the values. */
+      const double* GetPerturbationArray() const {
+	return perturb_radius_;
+      }
+
+    private:
+      /** Copy constructor.*/
+      PerturbInfo(const PerturbInfo & source);
+
+      /** Perturbation radii for all variables.  A negative value
+       *  means that the radius has not been given. If the pointer is
+       *  NULL, then no variables have been assigned a perturbation
+       *  radius. */
+      double* perturb_radius_;
+    };
+
     /** Type of the variables.*/
     enum VariableType
     {
@@ -150,7 +188,6 @@ namespace Bonmin
       BINARY,
       INTEGER
     };
-
 
     /**@name Constructors/Destructors */
     //@{
@@ -160,7 +197,6 @@ namespace Bonmin
     virtual ~TMINLP()
     {}
     //@}
-;
 
     /**@name methods to gather information about the MINLP */
     //@{
@@ -268,15 +304,17 @@ namespace Bonmin
     virtual const BranchingInfo * branchingInfo() const = 0;
 
     /** Add some linear cuts to the problem formulation */
-   void addCuts(int numberCuts, const OsiRowCut ** cuts);
+    void addCuts(int numberCuts, const OsiRowCut ** cuts);
   
-   /** Remove some cuts to the formulation */
-   void removeCuts(int number ,const int * toRemove);
+    /** Remove some cuts to the formulation */
+    void removeCuts(int number ,const int * toRemove);
 
-   /** remove the last number cuts.*/
-   void removeLastCuts(int number);
+    /** remove the last number cuts.*/
+    void removeLastCuts(int number);
 
-   virtual const SosInfo * sosConstraints() const = 0;
+    virtual const SosInfo * sosConstraints() const = 0;
+
+    virtual const PerturbInfo* perturbInfo() const = 0;
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).

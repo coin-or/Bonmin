@@ -866,7 +866,7 @@ protected:
   //@}
 
   enum RandomGenerationType{
-    uniform =0, perturb=1};
+    uniform =0, perturb=1, perturb_suffix=2};
   /// Initialize data structures for storing the jacobian
   int initializeJacobianArrays();
 

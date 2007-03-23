@@ -70,12 +70,14 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
+    /*
     std::cout<<std::endl << "{";
     for (int i=0; i<37; i++)
       std::cout << bb.bestSolution() [i] << ",";
     std::cout << "}" <<std::endl;
+    */
 
-  if(1)// To output a line for building tables
+  if(0)// To output a line for building tables
     std::cout<<status<<"\t"<<CoinCpuTime()-time1<<"\t"
 	     <<bb.bestObj()<<"\t"
 	     <<bb.numNodes()<<"\t"

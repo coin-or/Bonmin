@@ -1,4 +1,6 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004
+// (C) Copyright International Business Machines Corporation and
+// Carnegie Mellon University 2004, 2007
+//
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -209,13 +211,15 @@ register_general_options
       "When picking a random point coordinate i will be in the interval [min(max(l,-r),u-r), max(min(u,r),l+r)] "
       "(where l is the lower bound for the variable and u is its upper bound)");
 
-  roptions->AddStringOption2("random_point_type","method to choose a random starting point",
+  roptions->AddStringOption3("random_point_type","method to choose a random starting point",
 			     "Jon",
 			     "Jon", "Choose random point uniformly between the bounds",
-			     "Andreas", "perturb the starting point of the problem within a prescriped interval","");
+			     "Andreas", "perturb the starting point of the problem within a prescriped interval",
+			     "Claudia", "perturn the starting point using the perturbation radius suffix information",
+			     "");
     roptions->AddLowerBoundedNumberOption("random_point_perturbation_interval",
 					   "Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point",
-					   0.,true, 100.,
+					   0.,true, 1.,
 					   "");
 					   
   roptions->AddLowerBoundedIntegerOption
@@ -1663,6 +1667,11 @@ OsiTMINLPInterface::randomStartingPoint()
   const double * colUpper = getColUpper();
   double * sol = new double[numcols];
   const Number * x_init = problem_->x_init_user();  
+  const double* perturb_radius = tminlp_->perturbInfo()->GetPerturbationArray();
+  if (randomGenerationType_ == perturb_suffix && !perturb_radius) {
+    throw SimpleError("Can't use perturb_radius if no radii are given.",
+		      "randomStartingPoint");
+  }
   for(int i = 0 ; i < numcols ; i++) {
     int randomGenerationType = randomGenerationType_;
     if(x_init[i] < colLower[i] || x_init[i] > colUpper[i])
@@ -1677,12 +1686,19 @@ OsiTMINLPInterface::randomStartingPoint()
       double interval = upper - lower;
       sol[i] = CoinDrand48()*(interval) + lower;}
     else if (randomGenerationType_ == perturb){
-      double lower = max(x_init[i] - max_perturbation_, colLower[i]);
-      double upper = min(x_init[i] + max_perturbation_, colUpper[i]);
-      double interval = upper - lower;
+      const double lower = max(x_init[i] - max_perturbation_, colLower[i]);
+      const double upper = min(x_init[i] + max_perturbation_, colUpper[i]);
+      const double interval = upper - lower;
       sol[i]  = lower + CoinDrand48()*(interval);
     }
-//    printf("%f in [%f,%f]\n",sol[i],lower,upper);
+    else if (randomGenerationType_ == perturb_suffix){
+      const double radius = perturb_radius[i];
+      const double lower = max(x_init[i] - radius*max_perturbation_, colLower[i]);
+      const double upper = min(x_init[i] + radius*max_perturbation_, colUpper[i]);
+      const double interval = upper - lower;
+      sol[i]  = lower + CoinDrand48()*(interval);
+    }
+    //printf("%f in [%f,%f]\n",sol[i],lower,upper);
     //  std::cout<<interval<<"\t";
   }
   //std::cout<<std::endl;

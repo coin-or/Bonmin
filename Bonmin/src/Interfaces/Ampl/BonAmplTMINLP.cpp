@@ -1,4 +1,6 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2004
+// (C) Copyright International Business Machines Corporation and
+// Carnegie Mellon University 2004, 2007
+//
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -87,6 +89,8 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
 
+    // Perturbation radius
+    suffix_handler->AddAvailableSuffix("perturb_radius",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
 
     SmartPtr<AmplOptionsList> ampl_options_list = new AmplOptionsList();
     fillAmplOptionList(GetRawPtr(ampl_options_list));
@@ -140,6 +144,10 @@ namespace Bonmin
     if (dwPs) {
       branch_.downPsCosts = CoinCopyOfArray(dwPs,numcols);
     }
+
+    const double* perturb_radius =
+      suffix_handler->GetNumberSuffixValues("perturb_radius", AmplSuffixHandler::Variable_Source);
+    perturb_info_.SetPerturbationArray(numcols, perturb_radius);
   }
 
   void
