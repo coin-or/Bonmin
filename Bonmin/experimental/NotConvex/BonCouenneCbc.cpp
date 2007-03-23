@@ -387,6 +387,8 @@ namespace Bonmin
       if (bestSolution_)
         delete [] bestSolution_;
 
+      double obj = 0;
+
       if (!checkNLP (model.cutGenerator (0) -> generator (), bestSolution_, obj))
 	printf ("### checkNLP: solution is wrong\n");
 
@@ -394,7 +396,6 @@ namespace Bonmin
       CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
 
       //Check solution validity
-      double obj = 0;
       double violation = nlpSolver->getConstraintsViolation(bestSolution_, obj);
 
       if (fabs (violation) > 1e-5)
