@@ -1,5 +1,6 @@
 #include "OsiClpSolverInterface.hpp"
 #include "BM.hpp"
+#include "BCP_message_mpi.hpp"
 #include "BCP_lp_node.hpp"
 
 //#############################################################################
@@ -133,7 +134,13 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
     BM_solution* sol = NULL;
 
     char prefix[100];
-    sprintf(prefix, "%i", getLpProblemPointer()->get_process_id().pid());
+#ifdef COIN_HAS_MPI
+    const BCP_proc_id* id = getLpProblemPointer()->get_process_id();
+    const BCP_mpi_id* mid = dynamic_cast<const BCP_mpi_id*>(id);
+    sprintf(prefix, "%i", mid->pid());
+#else
+    prefix[0] = 0;
+#endif
     try {
     switch (par.entry(BM_par::WarmStartStrategy)) {
     case WarmStartNone:
@@ -189,8 +196,7 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
       std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
     }
     catch(...) {
-      std::cerr<<pbName<<" unrecognized exception"<<std::endl;
-      std::cerr<<pbName<<"\t Finished \t exception"<<std::endl;
+      std::cerr<<" unrecognized exception"<<std::endl;
       throw;
     }
 

@@ -129,7 +129,8 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-	-I`$(CYGPATH_W) $(BCPSRCDIR)/src/include`
+	-I`$(CYGPATH_W) $(BCPSRCDIR)/src/include` \
+	-I`$(CYGPATH_W) $(BCPOBJDIR)/inc`
 
 if COIN_HAS_CPX
   AM_CPPFLAGS += \

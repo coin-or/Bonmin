@@ -65,6 +65,10 @@ BM_lp::bbBranch(OsiBranchingInformation& brInfo,
     BCP_branching_decision retCode;
     OsiBranchingObject* brObj = NULL;
 
+    static int cnt = 0;
+    printf("cnt = %i\n", cnt);
+    ++cnt;
+
     const int numCols = nlp_.getNumCols();
     double* clb_old = new double[numCols];
     double* cub_old = new double[numCols];
