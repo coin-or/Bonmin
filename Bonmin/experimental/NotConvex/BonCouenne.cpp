@@ -35,10 +35,10 @@ int main (int argc, char *argv[])
   Bonmin::usingCouenne = 1;  
   CouenneInterface * nlp_and_solver; 
 
-  //We need to build dummy solver objects to get the options, determine which is the solver to use and register all the options
+  // We need to build dummy solver objects to get the options,
+  // determine which is the solver to use and register all the options
   Ipopt::SmartPtr<IpoptSolver> dummy_ipopt = new IpoptSolver;
   OsiTMINLPInterface forOption(GetRawPtr(dummy_ipopt));
-
 
   int solverUsed = 0; // 0 is Ipopt, 1 is Filter
   forOption.solver()->Options()->GetEnumValue("nlp_solver", solverUsed,"bonmin.");
@@ -88,7 +88,6 @@ int main (int argc, char *argv[])
 
     std::cout.precision(10);
 
-    std::cout<<pbName<<" \t";
     std::string message;
     std::string status;
     if(bb.mipStatus()==Bab::FeasibleOptimal) {
@@ -108,27 +107,42 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (1) {// To output a line for building tables
+    if (0) {// print statistics in LaTeX format
 
-      printf ("%8.2f %12.3f %12.3f %7d %7d %7.2f %7d ",
-	      CoinCpuTime()-time1,
-	      bb.bestBound(),
-	      bb.bestObj(),
+      char *basename = strrchr (pbName, '/');
+      if (!basename) basename = pbName;
+      else basename++;
+
+      printf (" %-25s & %8.2f &", basename, CoinCpuTime () - time1);
+
+      if (fabs (bb.bestBound()) < 1e40) 
+	printf (" %12.3f &", bb.bestBound());
+      else printf (" %8s     &", "inf_dual");
+	  
+      if (fabs (bb.bestObj()) < 1e40) 
+	printf (" %12.3f &", bb.bestObj());
+      else printf (" %8s     &", "inf_prim");
+	  
+      printf ("%7d & %7d & %-20s\\\\\n ",
 	      bb.numNodes(),
 	      bb.iterationCount(),
-	      nlp_and_solver->totalNlpSolveTime(),
-	      nlp_and_solver->nCallOptimizeTNLP());
+	      //	      nlp_and_solver->totalNlpSolveTime(),
+	      //	      nlp_and_solver->nCallOptimizeTNLP(),
+	      status.c_str());
       
-      std::cout<<status<<"\n";//
-      /*<<CoinCpuTime()-time1<<"\t"
-	     <<bb.bestBound()<<"\t"
-	     <<bb.bestObj()<<"\t"
-	     <<bb.numNodes()<<"\t"
-	     <<bb.iterationCount()<<"\t"
-	     <<nlp_and_solver->totalNlpSolveTime()<<"\t"
-	     <<nlp_and_solver->nCallOptimizeTNLP()<<"\t"
-	     <<std::endl;
-      */
+    }
+
+    if (0) { // print statistics
+      std::cout<<pbName << status
+	       <<CoinCpuTime()-time1<<"\t"
+	       <<bb.bestBound()<<"\t"
+	       <<bb.bestObj()<<"\t"
+	       <<bb.numNodes()<<"\t"
+	       <<bb.iterationCount()<<"\t"
+	       <<nlp_and_solver->totalNlpSolveTime()<<"\t"
+	       <<nlp_and_solver->nCallOptimizeTNLP()<<"\t"
+	       <<status
+	       <<std::endl;
     }
 
     //  nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);

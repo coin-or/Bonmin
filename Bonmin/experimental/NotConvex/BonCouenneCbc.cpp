@@ -384,13 +384,15 @@ namespace Bonmin
     }
 
     if (model.bestSolution()) {
-      if (bestSolution_)
-        delete [] bestSolution_;
 
       double obj = 0;
 
-      if (!checkNLP (model.cutGenerator (0) -> generator (), bestSolution_, obj))
-	printf ("### checkNLP: solution is wrong\n");
+      if (bestSolution_)
+	if (!checkNLP (model.cutGenerator (0) -> generator (), bestSolution_, obj))
+	  printf ("### checkNLP: solution is wrong\n");
+
+      if (bestSolution_)
+        delete [] bestSolution_;
 
       bestSolution_ = new double[nlpSolver->getNumCols()];
       CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
@@ -425,16 +427,22 @@ namespace Bonmin
     std::cout<<"Finished"<<std::endl;
 
 
-    int nr, nt;
-    double st;
+    if (0) { // print some statistics in LaTeX format
 
-    dynamic_cast <CouenneCutGenerator *> 
-      (model.cutGenerator (0) -> generator ()) 
-      -> getStats (nr, nt, st);
+      int nr, nt;
+      double st;
 
-    printf ("::: %6d & %6d & %8.3f & %5d &", nr, nt, st, 
-	        dynamic_cast <CouenneCutGenerator *> 
-	    (model.cutGenerator (0) -> generator ()) 
-	    -> Problem () -> nAuxs ());
+      CouenneCutGenerator *cg = dynamic_cast <CouenneCutGenerator *> 
+	(model.cutGenerator (0) -> generator ());
+
+      cg -> getStats (nr, nt, st);
+
+      printf ("::: %6d & %6d & %6d & %6d & %6d & %6d & %8.3f & ", 
+	      cg -> Problem () -> nVars (), 
+	      cg -> Problem () -> nIntVars(), 
+	      cg -> Problem () -> nNLCons (),
+	      cg -> Problem () -> nAuxs (),
+	      nr, nt, st);
+    }
   }
 }
