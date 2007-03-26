@@ -33,14 +33,12 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
       res = updateBound (-1, l + ind, l [wind] / c);
       res = updateBound ( 1, u + ind, u [wind] / c) || res;
-
     } 
     else if (c < - COUENNE_EPS) {
 
       res = updateBound (-1, l + ind, u [wind] / c);
       res = updateBound ( 1, u + ind, l [wind] / c) || res;
     } 
-    else res = false;
 
     if (res)
       chg [ind] = 1;

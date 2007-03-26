@@ -18,6 +18,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
 
+  // lift bound on objective auxiliary to avoid overly strict implied
+  // bounds
+
+  //  printf ("pass = %d, level = %d, intree = %d, objval = %.12f\n", 
+  //	  info.pass, info.level, info.inTree, si.getObjValue());
+
   double now = CoinCpuTime ();
 
   //  printf ("-------------------- Couenne::GENERATE CUTS\n");
@@ -78,6 +84,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	CouNumber l = con -> Lb () -> Value (),	
 	          u = con -> Ub () -> Value ();
 
+	/*printf ("con %3d [w_%02d]: [%12.3f %12.3f] && [%12.3f %12.3f] --> [%12.3f %12.3f]\n", 
+		i, index, 
+		l, u, 
+		problem_ -> Lb (index), 
+		problem_ -> Ub (index),
+		mymax (l, problem_ -> Lb (index)),
+		mymin (u, problem_ -> Ub (index)));*/
+
 	// tighten bounds in Couenne's problem representation
 	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
 	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
@@ -130,7 +144,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 
   // update primal bound with best feasible solution object
-
+  /*
   if (BabPtr_) {
 
     int objInd = problem_ -> Obj (0) -> Body () -> Index ();
@@ -160,33 +174,58 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	}
     }
   }
-
+  */
   //////////////////////// PROPAGATE CHANGED BOUNDS ///////////////////////////////////
 
   // tighten the current relaxation by tightening the variables'
   // bounds
 
-  int ntightened = 0, nbwtightened = 0;
+  /*  printf ("before:");
+  for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++)
+    printf ("%.1f %.1f|",
+	    (problem_ -> Lb (i) > -COUENNE_INFINITY+1) ? (problem_ -> Lb (i)) : -1e9, 
+	    (problem_ -> Ub (i) <  COUENNE_INFINITY-1) ? (problem_ -> Ub (i)) : 1e9);
+	    printf ("\n");*/
 
-  bool infeasible = false;
+  int   ntightened = 0, 
+      nbwtightened = 0, 
+      niter = 0;
 
-  int niter = 0;
+  int *changed;
+  int  nchanged;
 
   do {
 
+    //    bool infeasible = false;
+
     ntightened   = problem_ -> tightenBounds (si, chg_bds);
-    nbwtightened = problem_ -> impliedBounds     (chg_bds);
+    //    nbwtightened = problem_ -> impliedBounds     (chg_bds);
 
-    //    printf ("::::::::::::::::::::::::::::::::::::::::::::::\n");
-    for (register int i=0; i < ncols; i++) {
-      //      printf ("x%3d [%12.4f,%12.4f] ", i, expression::Lbound (i), expression::Ubound (i));
-      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS)
-	infeasible = true;
-      //      if (!((1+i)%6)) printf ("\n");
-    }
+    /*if (ntightened || nbwtightened) printf ("%d, %d bounds tightened\n", 
+      ntightened, nbwtightened);*/
 
-    if (infeasible)
-      break;
+    for (register int i=0; i < ncols; i++) 
+      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS) {
+	//printf ("Couenne: infeasible bounds %d\n", i);
+	//	infeasible = true;
+
+	OsiColCut *infeascut = new OsiColCut;
+
+	if (infeascut) {
+
+	  double upper = -1, lower = +1; // want to make this node infeasible
+
+	  infeascut -> setLbs (1, &i, &lower);
+	  infeascut -> setUbs (1, &i, &upper);
+
+	  //	  infeascut -> print ();
+	  cs.insert (infeascut);
+	  goto back_end_genCuts;
+	}
+      }
+
+    //    if (infeasible)
+    //      break;
 
   } while ((ntightened || nbwtightened) && (niter++ < 10));
 
@@ -196,8 +235,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // first of all, convert sparse vector chg_bds in something more
   // handy
 
-  int *changed  = (int *) malloc (ncols * sizeof (int));
-  int  nchanged = 0;
+  changed  = (int *) malloc (ncols * sizeof (int));
+  nchanged = 0;
 
   for (register int i=ncols, j=0; i--; j++)
     if (*chg_bds++) {
@@ -272,27 +311,44 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // ok, now create cut
 
-    OsiColCut *cut = new OsiColCut;
+    if (nUpp || nLow) {
+      OsiColCut *cut = new OsiColCut;
 
-    if (cut) {
-      cut -> setLbs (nLow, indLow, bndLow);
-      cut -> setUbs (nUpp, indUpp, bndUpp);
-      cs.insert (cut);
+      if (cut) {
+	cut -> setLbs (nLow, indLow, bndLow);
+	cut -> setUbs (nUpp, indUpp, bndUpp);
+
+	//	cut -> print ();
+
+	cs.insert (cut);
+	delete cut;
+      }
     }
 
     delete [] bndLow; delete [] indLow;
     delete [] bndUpp; delete [] indUpp;
-    delete cut;
   }
+
+  free (changed);
 
   if (firstcall_) {
     firstcall_  = false;
     ntotalcuts_ = nrootcuts_ = cs.sizeRowCuts ();
   }
   else ntotalcuts_ += cs.sizeRowCuts ();
+					
+ back_end_genCuts:
+
+  /*printf ("after: ");
+  for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++)
+    printf ("%.1f %.1f|",
+	    (problem_ -> Lb (i) > -COUENNE_INFINITY+1) ? (problem_ -> Lb (i)) : -1e9, 
+	    (problem_ -> Ub (i) <  COUENNE_INFINITY-1) ? (problem_ -> Ub (i)) : 1e9);
+	    printf ("\n");*/
 
   septime_ += CoinCpuTime () - now;
 
-  //  printf (":::::::::::::::::::::::::::::::::: generate cuts (%d) %d %d\n", 
-  //	  cs.sizeRowCuts (), ntotalcuts_, nrootcuts_);
+  /*if (cs.sizeRowCuts ())
+    printf (":::::::::::::::::::::::::::::::::: generate cuts (%d) %d %d\n", 
+    cs.sizeRowCuts (), ntotalcuts_, nrootcuts_);*/
 }

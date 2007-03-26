@@ -11,13 +11,13 @@
 #include <CouennePrecisions.h>
 
 /// positive part of a number x, [x]^+
-inline CouNumber mypos (register CouNumber x)
-{return ((x > 0.) ? x : 0.);}
+//inline CouNumber mypos (register CouNumber x)
+//{return ((x > 0.) ? x : 0.);}
 
 
 /// negative part of a number x, [x]^-
-inline CouNumber myneg (register CouNumber x)
-{return ((x < 0.) ? x : 0.);}
+//inline CouNumber myneg (register CouNumber x)
+//{return ((x < 0.) ? x : 0.);}
 
 
 /// implied bound processing for expression w = x/y, upon change in
@@ -25,14 +25,14 @@ inline CouNumber myneg (register CouNumber x)
 
 bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
-  bool res = false;
+  bool resx, resy = resx = false;
 
   // deal with the "y is a constant"
   if (arglist_ [1] -> Type () == CONST) {
 
     int ind = arglist_ [0] -> Index ();
 
-    if (ind<0) {
+    if (ind < 0) {
       printf ("exprDiv::impliedBound: Warning, w=c/d constants\n");
       return false;
     }
@@ -44,23 +44,20 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       return false;
     }
 
-    c = 1. / c;
-
     // a copy of exprMul::impliedBound for the case where y is a constant
 
     if (c > COUENNE_EPS) {
 
-      res = updateBound (-1, l + ind, l [wind] / c);
-      res = updateBound ( 1, u + ind, u [wind] / c) || res;
+      resx = updateBound (-1, l + ind, l [wind] * c);
+      resx = updateBound ( 1, u + ind, u [wind] * c) || resx;
     } 
     else if (c < - COUENNE_EPS) {
 
-      res = updateBound (-1, l + ind, u [wind] / c);
-      res = updateBound ( 1, u + ind, l [wind] / c) || res;
+      resx = updateBound (-1, l + ind, u [wind] * c);
+      resx = updateBound ( 1, u + ind, l [wind] * c) || resx;
     } 
-    else res = false;
 
-    if (res)
+    if (resx)
       chg [ind] = 1;
 
   } else {
@@ -75,7 +72,7 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     // Each bound on w is represented on the xy plane with two cones,
     // such that joining the extreme rays of both one obtains two
     // lines, or in other words, the second cone is obtained through
-    // the transformation (x',y') = (-x,-y).
+    // the transformation (x',y') = (-x,-y) applied to the first cone.
     //
     // Bounds can be tightened according to four different cases,
     // depending on which corner of the bounding box belongs to which
@@ -113,6 +110,66 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     //////////// deal with lower bound of w=x/y /////////////////////////////////////////////
 
+    if        (wl < - COUENNE_EPS) {
+
+      resy = (*yl<0) && (*yl > *xl/wl) && updateBound (-1, yl, 0)      || resy;
+
+      resx = (*yl>0) && (*yl < *xl/wl) && updateBound (-1, xl, *yu/wl) || resx;
+      resy = (*yl>0) && (*yl < *xl/wl) && updateBound (-1, yl, *xu/wl) || resy;
+
+      //
+
+      resx = (*yu<0) && (*yu > *xu/wl) && updateBound (+1, xu, *yl*wl) || resx;
+      resy = (*yu<0) && (*yu < *xu/wl) && updateBound (+1, yu, *xl/wl) || resy;
+
+      resy = (*yu>0) && (*yu < *xu/wl) && updateBound (+1, yu, 0)      || resy;
+
+    } else if (wl >   COUENNE_EPS) {
+
+      resy = (*yl<0) && (*yl < *xl/wl) && updateBound (-1, yl, mymin (*xl/wl, 0)) || resy;
+      resx = (*yl>0) && (*yl > *xl/wl) && updateBound (-1, xl, *yl/wl)            || resx;
+
+      //
+
+      resx = (*yu<0) && (*yu < *xu/wl) && updateBound (+1, xu, *yu*wl)            || resx;
+      resy = (*yu>0) && (*yu > *xu/wl) && updateBound (+1, yu, mymax (*xu/wl, 0)) || resy;
+    }
+
+    //////////// deal with upper bound of w=x/y /////////////////////////////////////////////
+
+    if        (wu >   COUENNE_EPS) {
+
+      resy = (*yl<0) && (*yl > *xu/wu) && updateBound (-1, yl, 0)      || resy;
+
+      resx = (*yl>0) && (*yl < *xu/wu) && updateBound (+1, xu, *yu*wl) || resx;
+      resy = (*yl>0) && (*yl < *xu/wu) && updateBound (-1, yl, *xl/wl) || resy;
+
+      //
+
+      resx = (*yu<0) && (*yu > *xl/wu) && updateBound (-1, xl, *yl*wl) || resx;
+      resy = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, yu, *xu/wl) || resy;
+
+      resy = (*yu>0) && (*yu < *xl/wl) && updateBound (+1, yu, 0)      || resy;
+
+    } else if (wu < - COUENNE_EPS) {
+
+      resx = (*yl<0) && (*yl < *xu/wu) && updateBound (-1, xl, *yu*wl)            || resx;
+      resy = (*yl>0) && (*yl > *xu/wu) && updateBound (+1, yu, mymax (*xl/wl,0))  || resy;
+
+      //
+
+      resy = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, yl, mymin (*xu/wl, 0)) || resy;
+      resx = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, xu, *yl*wl)            || resx;
+    }
+
+    if (resx) chg [xi] = 1;
+    if (resy) chg [yi] = 1;
+  }
+
+  return (resx || resy);
+
+    /*
+
     if (wl < - COUENNE_EPS) { // columns 1 and 2 of 8 /////////////////////
 
       // (xl,yu) in upper and lower cone, or simply, yu > 0 and yu < 0. Row 2
@@ -126,6 +183,11 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       if ((*yl < - COUENNE_EPS) && (updateBound (-1, yl, myneg (*xu/wl)))) {res = true; chg [yi] = 1;}
 
     } else if (wl > COUENNE_EPS) { // columns 3 and 4 of 8 /////////////////
+
+      if ((*yl<-COUENNE_EPS) && (*yl < *xl/wl) && updateBound (-1, yl, *xl/wl)) {res=true; chg[yi]=1;}
+      else
+      if ((*yl> COUENNE_EPS) && (*yl > *xl/wl) && updateBound (-1, xl, *yl*wl)) {res=true; chg[xi]=1;}
+
 
       // (xl,yl), row 1
 
@@ -190,5 +252,5 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     }
   }
 
-  return res;
+  return res;*/
 }

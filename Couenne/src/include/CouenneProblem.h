@@ -52,10 +52,13 @@ class CouenneProblem {
   /// number of elements in the x_, lb_, ub_ arrays
   int curnvars_;
 
+  /// number of discrete variables
+  int nIntVars_;
+
  public:
 
   /// constructors, destructor
-  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap_ = NULL; curnvars_ = -1;}
+  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap_ = NULL; curnvars_ = -1; nIntVars_ = 0;}
   CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 
@@ -69,9 +72,9 @@ class CouenneProblem {
   int nObjs   () const {return objectives_.        size ();}
   int nNLCons () const {return constraints_.       size ();}
 
-  //  int nCons   () const {return linearconstraints_. size ();}
-  int nAuxs   () const {return auxiliaries_.       size ();}
-  int nVars   () const {return variables_.         size ();}
+  int nAuxs    () const {return auxiliaries_.       size ();}
+  int nVars    () const {return variables_.         size ();}
+  int nIntVars () const {return nIntVars_;}
 
   /// get elements from vectors
   CouenneConstraint *NLCon (int i) const {return constraints_  [i];}

@@ -11,6 +11,8 @@
 #include <CouenneCutGenerator.h>
 #include <CouenneProblem.h>
 
+// big enough we should stop due to no more bounds tightened
+#define MAX_FWTIGHTEN 100 
 
 /// Bound tightening for auxiliary variables
 
@@ -25,11 +27,12 @@ int CouenneProblem::tightenBounds (const OsiSolverInterface &si,
   // variables' bounds, in a recursive way. Hence we need to repeat
   // the propagation step as long as at least one bound is modified.
 
-  bool found_one;
+  // actually, no more than one iteration should be needed, as
+  // auxiliary variables only depend on variables with LOWER index
 
-  do {
+  for (int i=0; i < MAX_FWTIGHTEN; i++) {
 
-    found_one = false;
+    bool found_one = false;
 
     int naux = nAuxs ();
 
@@ -41,18 +44,24 @@ int CouenneProblem::tightenBounds (const OsiSolverInterface &si,
 	 j < naux; j++) {
 
       CouNumber ll = (*(Aux (j) -> Lb ())) ();
-      CouNumber uu = (*(Aux (j) -> Ub ())) ();
 
       bool chg = false;
 
       // check if lower bound got higher    
-      if (ll >= lb_ [i+j] + COUENNE_EPS) {
+      if ((ll > - COUENNE_INFINITY + 1) && (ll >= lb_ [i+j] + COUENNE_EPS)) {
+
+	//printf ("update lbound %d: %.10f >= %.10f + %.12f\n", i+j, ll, lb_ [i+j], COUENNE_EPS);
 	lb_ [i+j] = ll;
 	chg = true;
       }
 
+      CouNumber uu = (*(Aux (j) -> Ub ())) ();
+
       // check if upper bound got lower
-      if (uu <= ub_ [i+j] - COUENNE_EPS) {
+      if ((uu < COUENNE_INFINITY - 1) && (uu <= ub_ [i+j] - COUENNE_EPS)) {
+
+	//printf ("update ubound %d: %.10f <= %.10f - %.12f (%.12f)\n", 
+	//	i+j, uu, ub_ [i+j], COUENNE_EPS, uu - ub_ [i+j]);
 	ub_ [i+j] = uu;
 	chg = true;
       }
@@ -68,7 +77,8 @@ int CouenneProblem::tightenBounds (const OsiSolverInterface &si,
       expression::update (NULL, lb_, ub_);
     }
 
-  } while (found_one); // repeat as long as at least one bound changed
+    if (!found_one) break;
+  } 
 
   return nchg;
 }

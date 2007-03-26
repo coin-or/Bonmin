@@ -36,6 +36,7 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   problem_        (NULL),
   nrootcuts_      (0),
   ntotalcuts_     (0),
+  septime_        (0),
   objValue_       (- DBL_MAX),
   nlp_            (nlp),
   BabPtr_         (NULL) {

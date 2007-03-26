@@ -234,7 +234,7 @@ int CouenneProblem::readnl (const ASL *asl) {
     expression **nll = new expression * [1];
     *nll = nl2e (CON_DE [i] . e);
 
-    if (index [i]) 
+    if (index [i] && (*(index [i]) >= 0)) 
       body = new exprGroup (0., index [i], coeff [i], nll, 1);
     else {
       body = *nll;

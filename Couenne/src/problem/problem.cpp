@@ -32,7 +32,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   x_        (NULL),
   lb_       (NULL),
   ub_       (NULL),
-  curnvars_ (-1) {
+  curnvars_ (-1),
+  nIntVars_ (p.nIntVars_) {
 
   register int i;
 
@@ -91,6 +92,9 @@ expression *CouenneProblem::addVariable (bool isDiscrete) {
     (new exprIVar (variables_ . size () + auxiliaries_ . size ())) :
     (new exprVar  (variables_ . size () + auxiliaries_ . size ()));
   variables_ . push_back (var);
+
+  if (isDiscrete) 
+    nIntVars_++;
 
   return var;
 }
@@ -249,7 +253,8 @@ void CouenneProblem::initAuxs (CouNumber *x,
 			       CouNumber *l, 
 			       CouNumber *u) {
 
-  // update current point and bounds 
+  // update original variables only, that is, the first nVars ()
+  // variables, as no auxiliaries exist yet
   update (x, l, u, nVars ());
 
   int nAux = nAuxs ();
@@ -273,4 +278,9 @@ void CouenneProblem::initAuxs (CouNumber *x,
     lb_ [j] = (*(aux -> Lb ())) ();
     ub_ [j] = (*(aux -> Ub ())) ();
   }
+
+  /*for (register int i = 0, j = nVars (); i < nAux; i++, j++)
+    printf ("aux %3d [w_%03d]: [%12.3f %12.3f]\n",
+	    i, j, 
+	    lb_ [j], ub_ [j]);*/
 }
