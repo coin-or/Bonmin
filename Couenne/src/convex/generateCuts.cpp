@@ -12,6 +12,8 @@
 #include <CouenneProblem.h>
 
 
+#define LARGE_BOUND 1e12
+
 /// a convexifier cut generator
 
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
@@ -26,7 +28,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   double now = CoinCpuTime ();
 
-  //  printf ("-------------------- Couenne::GENERATE CUTS\n");
+  //  printf ("-------------------- Couenne::GENERATE CUTS"); fflush (stdout);
 
   int ncols = problem_ -> nVars () + 
               problem_ -> nAuxs ();
@@ -54,16 +56,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // OsiSolverInterface is empty yet, no information can be obtained
     // on variables or bounds -- and none is needed since our
     // constructor populated *problem_ with variables and bounds. We
-    // only need to update the auxiliary variable and bounds with
+    // only need to update the auxiliary variables and bounds with
     // their current value.
-
-    OsiSolverInterface *psi = const_cast <OsiSolverInterface *> (&si);
-
-    // add auxiliary variables, unbounded for now
-    for (register int i = problem_ -> nVars (), 
-	              j = problem_ -> nAuxs (); j--; i++)
-
-	psi -> addCol (0, NULL, NULL, problem_ -> Lb (i), problem_ -> Ub (i), 0);
 
     // For each auxiliary variable replacing the original (nonlinear)
     // constraints, check if corresponding bounds are violated, and
@@ -95,12 +89,17 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	// tighten bounds in Couenne's problem representation
 	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
 	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
-
-	// and in the OsiSolverInterface
-	psi -> setColLower (index, mymax (l, si.getColLower () [index]));
-	psi -> setColUpper (index, mymin (u, si.getColUpper () [index]));
       }
     }
+
+    int ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
+
+    if (ind_obj >= 0)
+      if (problem_ -> Obj (0) -> Sense () == MINIMIZE)
+	problem_ -> Lb (ind_obj) = - LARGE_BOUND;
+      else
+	problem_ -> Ub (ind_obj) =   LARGE_BOUND;
+
   } else { // equivalent to info.depth > 0
 
     //////////////////////// GET CHANGED BOUNDS DUE TO BRANCHING ////////////////////////
@@ -220,7 +219,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	  //	  infeascut -> print ();
 	  cs.insert (infeascut);
-	  goto back_end_genCuts;
+	  goto end_genCuts;
 	}
       }
 
@@ -252,7 +251,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // by current point and add it to cs
 
   if (firstcall_)
-    for (int i=0; i < problem_ -> nAuxs (); i++)
+    for (int i=0, j = problem_ -> nAuxs (); j--; i++)
       problem_ -> Aux (i) -> generateCuts (si, cs, this);
 
   else { // chg_bds contains the indices of the variables whose bounds
@@ -298,12 +297,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       CouNumber bd;
 
-      if ((bd = newLow [index]) > oldLow [index] + COUENNE_EPS) { // lower
+      if (firstcall_ || ((bd = newLow [index]) > oldLow [index] + COUENNE_EPS)) { // lower
 	indLow [nLow]   = index;
 	bndLow [nLow++] = bd;
       }
 
-      if ((bd = newUpp [index]) < oldUpp [index] - COUENNE_EPS) { // upper
+      if (firstcall_ || ((bd = newUpp [index]) < oldUpp [index] - COUENNE_EPS)) { // upper
 	indUpp [nUpp]   = index;
 	bndUpp [nUpp++] = bd;
       }
@@ -337,7 +336,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
   else ntotalcuts_ += cs.sizeRowCuts ();
 					
- back_end_genCuts:
+ end_genCuts:
 
   /*printf ("after: ");
   for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++)
@@ -349,6 +348,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   septime_ += CoinCpuTime () - now;
 
   /*if (cs.sizeRowCuts ())
-    printf (":::::::::::::::::::::::::::::::::: generate cuts (%d) %d %d\n", 
+    printf (":::::::::::::::::::::::::::::::::: generate cuts (%d) %d %d\n",
     cs.sizeRowCuts (), ntotalcuts_, nrootcuts_);*/
 }

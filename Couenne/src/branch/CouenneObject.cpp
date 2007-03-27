@@ -40,15 +40,19 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
   */
 
   const double & expr = (*(reference_ -> Image ())) (), 
-               & var  = expression::Variable (reference_ -> Index ());
+               & var  = (*reference_) ();
+    //expression::Variable (reference_ -> Index ());
 
   if (0) {
 
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout);
 
-    printf (". Infeasibility = |%.15f - %.15f| (%.15f)= %.15f\n", 
-	    var, expr, (*reference_) (), fabs (var - expr));
+    printf (". Inf: = |%.2f - %.2f| [%.2f,%.2f]= %.2f\n", 
+	    var, expr, 
+	    expression::Lbound (reference_ -> Index ()),
+	    expression::Ubound (reference_ -> Index ()),
+	    fabs (var - expr));
   }
 
   CouNumber delta = fabs (var - expr);

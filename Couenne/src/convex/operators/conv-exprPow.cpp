@@ -87,12 +87,13 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   int intk = 0;
 
-  bool isInt    =            fabs (k    - (intk = (int) (round (k))))    < COUENNE_EPS,
-       isInvInt = !isInt && (fabs (1./k - (intk = (int) (round (1./k)))) < COUENNE_EPS);
+  bool isInt    =            fabs (k    - (double) (intk = (int) (round (k))))    < COUENNE_EPS,
+       isInvInt = !isInt && (fabs (1./k - (double) (intk = (int) (round (1./k)))) < COUENNE_EPS);
    
   // two macro-cases: 
 
-  if (   (intk % 2) 
+  if (   (isInt || isInvInt)
+      && (intk % 2) 
       && (k >   COUENNE_EPS) 
       && (l < - COUENNE_EPS) 
       && (u >   COUENNE_EPS)) {
@@ -185,9 +186,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	|| (l > COUENNE_EPS)
 	|| (u < - COUENNE_EPS)) &&
 	(l > - COUENNE_INFINITY + 1) &&
-	(u <   COUENNE_INFINITY - 1)) {
+	(u <   COUENNE_INFINITY - 1))
       cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), - sign);
-    }
 
     // similarly, pay attention not to add infinite slopes
 

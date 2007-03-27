@@ -125,7 +125,6 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
     auxiliaries_ . push_back (w);
     auxMap_ -> insert (newpair);
-
   }
   else {
     delete w;
@@ -166,16 +165,22 @@ void CouenneProblem::standardize () {
 
   delete auxMap_;
 
-  x_  = (CouNumber *) realloc (x_,  (nVars() + nAuxs ()) * sizeof (CouNumber));
-  lb_ = (CouNumber *) realloc (lb_, (nVars() + nAuxs ()) * sizeof (CouNumber));
-  ub_ = (CouNumber *) realloc (ub_, (nVars() + nAuxs ()) * sizeof (CouNumber));
+  int nTotVar = nVars() + nAuxs ();
+
+  x_  = (CouNumber *) realloc (x_,  nTotVar * sizeof (CouNumber));
+  lb_ = (CouNumber *) realloc (lb_, nTotVar * sizeof (CouNumber));
+  ub_ = (CouNumber *) realloc (ub_, nTotVar * sizeof (CouNumber));
 
   expression::update (x_, lb_, ub_);
 
-  for (int i=0; i < nVars (); i++)
-    (*(variables_ [i])) ();
+  //  for (int i=0; i < nVars (); i++)
+  //    (*(variables_ [i])) ();
 
   for (int i=nVars (), j=0; j < nAuxs (); i++, j++) {
+
+    // re-create auxiliary bounds
+
+    auxiliaries_ [j] -> resetBounds ();
 
     lb_ [i] = (*(auxiliaries_ [j] -> Lb    ())) ();
     ub_ [i] = (*(auxiliaries_ [j] -> Ub    ())) ();

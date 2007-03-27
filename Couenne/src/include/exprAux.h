@@ -105,10 +105,23 @@ class exprAux: public exprVar {
 
   // Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lb, expression *&ub) {
-    expression *lb0, *ub0;
-    image_ -> getBounds (lb0, ub0);
-    lb = new exprMax (lb0, new exprLowerBound (varIndex_)); 
-    ub = new exprMin (ub0, new exprUpperBound (varIndex_));
+
+    // this replaces the previous 
+    //
+    //    image_ -> getBounds (lb0, ub0);
+    //
+    // which created large expression trees, now useless since all
+    // auxiliaries are standardized.
+
+    lb = new exprLowerBound (varIndex_);
+    ub = new exprUpperBound (varIndex_);
+  }
+
+  virtual void resetBounds () {
+
+    delete lb_;
+    delete ub_;
+    image_ -> getBounds (lb_, ub_);
   }
 
   // generate cuts for expression associated with this auxiliary

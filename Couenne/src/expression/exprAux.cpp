@@ -26,7 +26,9 @@ exprAux::exprAux (expression *image, int index, int rank):
   image_  (image),
   rank_   (rank) {
 
-  image_ -> getBounds (lb_, ub_);
+  // do this later, in standardize()
+  //  image_ -> getBounds (lb_, ub_);
+  getBounds (lb_, ub_);
 }
 
 
