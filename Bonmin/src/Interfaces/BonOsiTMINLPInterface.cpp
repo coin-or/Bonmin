@@ -215,7 +215,7 @@ register_general_options
 			     "Jon",
 			     "Jon", "Choose random point uniformly between the bounds",
 			     "Andreas", "perturb the starting point of the problem within a prescriped interval",
-			     "Claudia", "perturn the starting point using the perturbation radius suffix information",
+			     "Claudia", "perturb the starting point using the perturbation radius suffix information",
 			     "");
     roptions->AddLowerBoundedNumberOption("random_point_perturbation_interval",
 					   "Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point",
@@ -525,7 +525,8 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     tiny_(1e-8),
     veryTiny_(1e-20),
     infty_(1e100),
-    expose_warm_start_(false)
+    expose_warm_start_(false),
+    firstSolve_(true)
 {}
 
 /** Constructor with given TNLPSolver and TMINLP */
@@ -570,7 +571,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app)
     tiny_(1e-08),
     veryTiny_(1e-17),
     infty_(1e100),
-    expose_warm_start_(false)
+    expose_warm_start_(false),
+    firstSolve_(true)
 {
   app_ = app->clone();
 
@@ -624,7 +626,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
     tiny_(1e-08),
     veryTiny_(1e-17),
     infty_(1e100),
-    expose_warm_start_(false)
+    expose_warm_start_(false),
+    firstSolve_(true)
 {
   allocateTMINLP(tminlp,app);
 }
@@ -2557,16 +2560,17 @@ void OsiTMINLPInterface::initialSolve()
   messageHandler()->message(LOG_FIRST_LINE, messages_)<<nCallOptimizeTNLP_
 						      <<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
   
+  int numRetry = firstSolve_ ? numRetryInitial_ : numRetryResolve_;
   if(isAbandoned()) {
     resolveForRobustness(numRetryUnsolved_);
   }
-  else if(numRetryInitial_)
+  else if(numRetry)
     {
-      resolveForCost(numRetryInitial_);
+      resolveForCost(numRetry);
       /** Only do it once at the root.*/
       numRetryInitial_ = 0;
     }
-  
+  firstSolve_ = false;
 }
 
 /** Resolve the continuous relaxation after problem modification.
