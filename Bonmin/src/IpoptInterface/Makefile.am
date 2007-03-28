@@ -59,6 +59,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 include_HEADERS = \
+        ../../inc/config_bonmin.h \
 	IpoptInterface.hpp \
 	IpoptInteriorWarmStarter.hpp \
 	TMINLP2TNLP.hpp \

@@ -996,6 +996,10 @@ protected:
   double tiny_;
   /** Value for small non-zero element which we will take the risk to ignore in OA cuts.*/
   double veryTiny_;
+  /** Is it the first solve (for random starting point at root options).*/
+  bool firstSolve_;
+
+
 #ifdef COIN_HAS_GAMSLINKS
   /** To redirect Ipopt output to a message handler. */
   Ipopt::SmartPtr<CoinMessageHandler2Journal> journal_;

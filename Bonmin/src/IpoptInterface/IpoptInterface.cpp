@@ -441,7 +441,8 @@ IpoptInterface::IpoptInterface():
     nLinear_(0),
     nNonLinear_(0),
     tiny_(1e-8),
-    veryTiny_(1e-20)
+    veryTiny_(1e-20),
+    firstSolve_(true)
 {
 #ifdef COIN_HAS_GAMSLINKS
  		 journal_=new CoinMessageHandler2Journal(messageHandler(), "console", J_ITERSUMMARY);
@@ -493,7 +494,8 @@ IpoptInterface::IpoptInterface (Ipopt::SmartPtr<Ipopt::TMINLP> tminlp
     nLinear_(0),
     nNonLinear_(0),
     tiny_(1e-08),
-    veryTiny_(1e-17)
+    veryTiny_(1e-17),
+    firstSolve_(true)
 {
   assert(IsValid(tminlp));
 #ifdef COIN_HAS_GAMSLINKS 
@@ -595,7 +597,8 @@ IpoptInterface::IpoptInterface (const IpoptInterface &source):
     nLinear_(0),
     nNonLinear_(0),
     tiny_(source.tiny_),
-    veryTiny_(source.veryTiny_)
+    veryTiny_(source.veryTiny_),
+    firstSolve_(true)
 #ifdef COIN_HAS_GAMSLINKS
     , journal_(source.journal_)
 #endif
@@ -1064,6 +1067,7 @@ void IpoptInterface::initialSolve()
     messageHandler()->message(LOG_FIRST_LINE, ipoptIMessages_)<<nCallOptimizeTNLP_
     <<status<<getObjValue()<<app_->Statistics()->IterationCount()<<app_->Statistics()->TotalCPUTime()<<CoinMessageEol;
 
+    int numRetry = firstSolve_ ? numRetryInitial_ : numRetryResolve_;
     if(isAbandoned()) {
       resolveForRobustness(numRetryUnsolved_);
     }
@@ -1076,6 +1080,7 @@ void IpoptInterface::initialSolve()
   }
   else
     hasBeenOptimized_ = true;
+    firstSolve_ = false;
 }
 
 /** Resolve the continuous relaxation after problem modification.

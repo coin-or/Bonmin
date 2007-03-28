@@ -94,9 +94,10 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libipoptinterface_la_SOURCES)
 DIST_SOURCES = $(am__libipoptinterface_la_SOURCES_DIST)
-am__include_HEADERS_DIST = IpoptInterface.hpp \
-	IpoptInteriorWarmStarter.hpp TMINLP2TNLP.hpp TMINLP.hpp \
-	TNLP2FPNLP.hpp CoinMessageHandler2Journal.hpp
+am__include_HEADERS_DIST = ../../inc/config_bonmin.h \
+	IpoptInterface.hpp IpoptInteriorWarmStarter.hpp \
+	TMINLP2TNLP.hpp TMINLP.hpp TNLP2FPNLP.hpp \
+	CoinMessageHandler2Journal.hpp
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -365,8 +366,9 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
-include_HEADERS = IpoptInterface.hpp IpoptInteriorWarmStarter.hpp \
-	TMINLP2TNLP.hpp TMINLP.hpp TNLP2FPNLP.hpp $(am__append_2)
+include_HEADERS = ../../inc/config_bonmin.h IpoptInterface.hpp \
+	IpoptInteriorWarmStarter.hpp TMINLP2TNLP.hpp TMINLP.hpp \
+	TNLP2FPNLP.hpp $(am__append_2)
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
 #############################################################################
@@ -548,6 +550,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
+	$(mkdir_p) $(distdir)/../../inc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
