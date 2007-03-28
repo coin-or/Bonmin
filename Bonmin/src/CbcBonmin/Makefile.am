@@ -1,4 +1,4 @@
-# Copyright (C) 2006 International Business Machines and others.
+# Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
@@ -8,15 +8,15 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-########################################################################
-#                             libbonminbb                              #
-########################################################################
-
 # Name of the library in this directory
-noinst_LTLIBRARIES = libbonminbb.la
+lib_LTLIBRARIES = libbonmin.la
+
+########################################################################
+#                          bonmin library                              #
+########################################################################
 
 # List all source files, including headers
-libbonminbb_la_SOURCES = \
+libbonmin_la_SOURCES = \
 	BonCbc.cpp BonCbc.hpp \
 	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
@@ -27,8 +27,17 @@ libbonminbb_la_SOURCES = \
 	BonCurvBranching.cpp BonCurvBranching.hpp \
         BonLpStrongBranching.cpp BonLpStrongBranching.hpp
 
+nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
+
+libbonmin_la_LIBADD = \
+	../OaAlgorithms/liboainterface.la \
+	../Interfaces/libbonmininterfaces.la \
+	$(FILTERSQPLIBADD)
+
+libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
+
 # This is for libtool (on Windows)
-libbonminbb_la_LDFLAGS = $(LT_LDFLAGS)
+libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
@@ -74,6 +83,17 @@ endif
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
+# The following is a trick to get the source code of Cbc/Samples correctly in
+# here, and also to get a link to libCbc into this directory (so that it
+# is made)
+CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
+	rm -f $@
+	$(LN_S) $? $@
+
+CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
+	rm -f $@
+	$(LN_S) $? $@
+
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
@@ -102,6 +122,9 @@ ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
 
 CLEANFILES = $(ASTYLE_FILES)
+
+DISTCLEANFILES = \
+	CbcCompareUser.cpp CbcBranchUser.cpp
 
 SUFFIXES = .cppbak .hppbak
 

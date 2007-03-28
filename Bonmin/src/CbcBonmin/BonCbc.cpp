@@ -154,7 +154,7 @@ namespace Bonmin
       oaDec.parameter().maxLocalSearch_ = 100000;
       oaDec.parameter().maxLocalSearchPerNode_ = 10000;
       oaDec.parameter().maxLocalSearchTime_ =
-	  std::min(par.maxTime, par.oaDecMaxTime);
+	  Ipopt::Min(par.maxTime, par.oaDecMaxTime);
       oaDec.setLogLevel(par.oaLogLevel);
       oaDec.parameter().logFrequency_ = par.oaLogFrequency;
       oaDec.parameter().subMilpLogLevel_ = par.milpLogLevel;

@@ -47,6 +47,7 @@ static int * permutationHess = NULL;
 //static int * cache = NULL;
 
 
+extern "C" {
 //Access to filter common bloc
 /* common block for problemname */
 extern struct {
@@ -78,7 +79,7 @@ extern struct {
 extern struct {
   fint scale_mode, phe;
 } F77_FUNC(scalec,SCALEC);
-
+}
 
 extern "C" {
 

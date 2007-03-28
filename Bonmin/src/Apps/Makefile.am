@@ -1,4 +1,4 @@
-# Copyright (C) 2006 International Business Machines and others.
+# Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
@@ -13,26 +13,6 @@ AUTOMAKE_OPTIONS = foreign
 if COIN_HAS_ASL
   bin_PROGRAMS = bonmin nodeSolver 
 endif
-
-lib_LTLIBRARIES = libbonmin.la
-
-########################################################################
-#                          bonmin library                              #
-########################################################################
-
-libbonmin_la_SOURCES =
-
-nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
-
-libbonmin_la_LIBADD = \
-	../CbcBonmin/libbonminbb.la \
-	../OaAlgorithms/liboainterface.la \
-	../Interfaces/libbonmininterfaces.la \
-	$(FILTERSQPLIBADD)
-
-libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
-
-libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
 
 COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \
@@ -63,10 +43,9 @@ bonmin_SOURCES = BonMin.cpp
 
 bonmin_LDADD = \
 	../Interfaces/Ampl/libamplinterface.la\
-	libbonmin.la \
+	../CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(LIBCBCCOPY) \
 	$(COINLIBS) \
 	$(ASLLIB) \
         $(ADDLIBS)
@@ -104,17 +83,6 @@ endif
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
-# The following is a trick to get the source code of Cbc/Samples correctly in
-# here, and also to get a link to libCbc into this directory (so that it
-# is made)
-CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
-
-CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
-
 ########################################################################
 #                              nodeSolver                              #
 ########################################################################
@@ -123,10 +91,9 @@ nodeSolver_SOURCES = BonNodeSolver.cpp
 
 nodeSolver_LDADD = \
 	../Interfaces/Ampl/libamplinterface.la \
-	libbonmin.la \
+	../CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(LIBCBCCOPY) \
 	$(COINLIBS) \
 	$(ASLLIB) \
 	$(ADDLIBS)
@@ -141,8 +108,7 @@ nodeSolver_LDFLAGS = -rpath $(libdir)
 #                         make distclean stuff                         #
 ########################################################################
 
-CLEANFILES = $(LIBCBCCOPY)
+CLEANFILES =
 
-DISTCLEANFILES = \
-	CbcCompareUser.cpp CbcBranchUser.cpp
+DISTCLEANFILES =
 
