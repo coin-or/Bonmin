@@ -13,7 +13,7 @@
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
 
-CouNumber CouenneBranchingObject::alpha_ = 0.1;
+CouNumber CouenneBranchingObject::alpha_ = 0.9;
 
 
 /** \brief Constructor. Get a variable as an argument and set value_

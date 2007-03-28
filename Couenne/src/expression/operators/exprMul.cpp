@@ -13,6 +13,21 @@
 #include <CouennePrecisions.h>
 
 
+/// Constructors, destructor
+exprMul::exprMul  (expression **al, int n): 
+  exprOp (al, n) { //< non-leaf expression, with argument list
+
+  // commutative operator, sort elements
+
+  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
+}
+
+exprMul::exprMul (expression *arg0, expression *arg1):
+  exprOp (arg0, arg1) {
+
+  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
+}
+
 /// simplify multiplications
 
 expression *exprMul::simplify () {

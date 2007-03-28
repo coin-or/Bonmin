@@ -44,7 +44,7 @@ expression *getFixVarBinFun (expression *arg0, expression *arg1) {
     {
       // First of all, do not branch on variable close to bound
 
-      bool 
+      register bool 
 	xl0 = (fabs (x0-l0) < COUENNE_EPS), 
 	xu0 = (fabs (x0-u0) < COUENNE_EPS),
 	xl1 = (fabs (x1-l1) < COUENNE_EPS), 
@@ -57,8 +57,7 @@ expression *getFixVarBinFun (expression *arg0, expression *arg1) {
     // The bounding box may be unlimited but at least no variable is
     // close to the bound
 
-    if ((l0 > - COUENNE_INFINITY + 1) && (u0 < COUENNE_INFINITY - 1)) {
-
+    if ((  l0 > - COUENNE_INFINITY + 1) && (u0 < COUENNE_INFINITY - 1)) {
       if ((l1 > - COUENNE_INFINITY + 1) && (u1 < COUENNE_INFINITY - 1)) {
 
 	// Ideal situation, bounding box is finite.  Branch on the one
@@ -76,7 +75,8 @@ expression *getFixVarBinFun (expression *arg0, expression *arg1) {
     }
     else {
 
-      if ((l1 > - COUENNE_INFINITY + 1) && (u1 < COUENNE_INFINITY - 1))
+      if ((l1 > - COUENNE_INFINITY + 1) && 
+	  (u1 <   COUENNE_INFINITY - 1))
 	return arg1;
       else {
 

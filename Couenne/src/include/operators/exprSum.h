@@ -19,11 +19,10 @@ class exprSum: public exprOp {
  public:
 
   /// Constructors, destructor
-  exprSum  (expression **al, int n): 
-    exprOp (al, n) {} //< non-leaf expression, with argument list
+  exprSum  (expression **, int);
 
-  exprSum (expression *arg0, expression *arg1):
-    exprOp (arg0, arg1) {}
+  /// Constructor with two elements
+  exprSum (expression *, expression *);
 
   /// cloning method
   virtual expression *clone () const

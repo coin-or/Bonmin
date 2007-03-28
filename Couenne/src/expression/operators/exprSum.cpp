@@ -11,6 +11,22 @@
 #include <exprConst.h>
 
 
+/// Constructors, destructor
+exprSum::exprSum  (expression **al, int n): 
+  exprOp (al, n) { //< non-leaf expression, with argument list
+
+  // commutative operator, sort elements
+
+  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
+}
+
+exprSum::exprSum (expression *arg0, expression *arg1):
+  exprOp (arg0, arg1) {
+
+  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
+}
+
+
 // simplify sums
 
 expression *exprSum::simplify () {

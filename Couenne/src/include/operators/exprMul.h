@@ -20,11 +20,9 @@ class exprMul: public exprOp {
  public:
 
   // Constructors, destructor
-  exprMul  (expression **al, int n): 
-    exprOp (al, n) {} //< non-leaf expression, with argument list
+  exprMul (expression **, int);
 
-  exprMul (expression *arg0, expression *arg1):
-    exprOp (arg0, arg1) {}
+  exprMul (expression *, expression *);
 
   // cloning method
   expression *clone () const

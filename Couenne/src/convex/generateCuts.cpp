@@ -11,7 +11,7 @@
 #include <CouenneCutGenerator.h>
 #include <CouenneProblem.h>
 
-
+// fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 1e12
 
 /// a convexifier cut generator
@@ -143,7 +143,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 
   // update primal bound with best feasible solution object
-  /*
+
   if (BabPtr_) {
 
     int objInd = problem_ -> Obj (0) -> Body () -> Index ();
@@ -173,7 +173,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	}
     }
   }
-  */
+
   //////////////////////// PROPAGATE CHANGED BOUNDS ///////////////////////////////////
 
   // tighten the current relaxation by tightening the variables'

@@ -98,9 +98,9 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
     if (expr -> ArgList ()) {
 
       expression ** args = expr -> ArgList ();
-      int nargs = expr -> nArgs();
+      int nargs = expr -> nArgs ();
 
-      for (int i = 0 ; i < nargs ; i++) {
+      for (register int i = 0 ; i < nargs ; i++) {
 
 	index = args [i] -> Index();
 
@@ -120,7 +120,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
     exprGroup *e = dynamic_cast <exprGroup *> (expr);
     int *indices = e -> getIndices (), index;
 
-    for (int i=0; (index = indices [i]) >= 0; i++) {
+    for (register int i=0; (index = indices [i]) >= 0; i++) {
       
       val = info -> solution_ [index];
 
@@ -135,7 +135,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
 /// apply the branching rule
 OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si, 
-						 const OsiBranchingInformation *, 
+						 const OsiBranchingInformation *info, 
 						 int) const {
   if (0) {
     printf ("CO::createBranch: ");
@@ -147,5 +147,26 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     printf ("\n");
   }
 
-  return new CouenneBranchingObject (reference_ -> Image () -> getFixVar ());
+  expression::update (const_cast <CouNumber *> (info -> solution_),
+		      const_cast <CouNumber *> (info -> lower_),
+		      const_cast <CouNumber *> (info -> upper_));
+
+  expression *depvar = reference_ -> Image () -> getFixVar ();
+
+  int index = depvar -> Index ();
+
+  if (index >= 0) {
+
+    CouNumber l = info -> lower_    [index],
+              u = info -> upper_    [index],
+              x = info -> solution_ [index];
+
+    if ((fabs (x-l) > COUENNE_EPS) &&
+	(fabs (u-x) > COUENNE_EPS))
+      return new CouenneBranchingObject (depvar);
+    else 
+      return new CouenneBranchingObject (reference_);
+  }
+  else
+    return new CouenneBranchingObject (reference_);
 }

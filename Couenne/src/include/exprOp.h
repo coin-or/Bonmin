@@ -34,17 +34,19 @@ class exprOp: public expression {
   virtual inline enum nodeType Type () 
     {return N_ARY;}
 
-  /// Constructors, destructor
+  /// Constructor
   exprOp (expression **arglist, int nargs):  //< non-leaf expression, with argument list 
     arglist_ (arglist),
     nargs_   (nargs)
     {}
 
+  /// constructor with two arguments (for convenience)
   exprOp (expression *arg0, expression *arg1):  //< two arguments 
     arglist_ (new expression * [2]),
     nargs_   (2)
     {arglist_ [0] = arg0; arglist_ [1] = arg1;}
 
+  /// destructor
   ~exprOp ();
 
   /// copy constructor

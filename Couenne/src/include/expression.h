@@ -236,6 +236,10 @@ inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
   return false;
 }
 
+/// independent comparison
+inline int compareExpr (const void *e0, const void *e1) {
+  return ((*(expression **) e0) -> compare (**(expression **)e1));
+}
 
 /// maximum
 inline CouNumber mymin (CouNumber a, CouNumber b) 
