@@ -93,7 +93,7 @@ CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
 oa_fp_SOURCES = OAFeasibilityPump.cpp FP.cpp FP.hpp
 
 oa_fp_LDADD = \
-        ../../src/Apps/libbonmin.la \
+        ../../src/CbcBonmin/libbonmin.la \
 	../../src/Interfaces/Ampl/libamplinterface.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \

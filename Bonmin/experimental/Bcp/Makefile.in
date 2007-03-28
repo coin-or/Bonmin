@@ -76,7 +76,7 @@ am__DEPENDENCIES_4 = $(BCPOBJDIR)/src/libBcp.la \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3)
 am__DEPENDENCIES_5 = ../../src/Interfaces/Ampl/libamplinterface.la \
-	../../src/Apps/libbonmin.la \
+	../../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) amplsolver.a
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -348,7 +348,7 @@ bonminbcp_SOURCES = BB_cut.hpp BM.hpp \
 
 bonminbcp_DEPENDENCIES = \
 	../../src/Interfaces/Ampl/libamplinterface.la \
-	../../src/Apps/libbonmin.la \
+	../../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(LIBCBCCOPY) \

@@ -89,7 +89,7 @@ am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4)
 fun_DEPENDENCIES = ../../src/Interfaces/Ampl/libamplinterface.la \
-	../../src/Apps/libbonmin.la \
+	../../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
@@ -385,7 +385,7 @@ fun_SOURCES = BonCouenne.cpp \
 
 fun_LDADD = \
 	../../src/Interfaces/Ampl/libamplinterface.la \
-        ../../src/Apps/libbonmin.la \
+        ../../src/CbcBonmin/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(LIBCBCCOPY) \

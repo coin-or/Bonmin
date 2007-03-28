@@ -20,7 +20,7 @@ unitTest_SOURCES = \
 # List libraries of COIN projects
 unitTest_LDADD = \
         ../src/Interfaces/Ampl/libamplinterface.la \
-        ../src/Apps/libbonmin.la \
+        ../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(LIBCBCCOPY) \

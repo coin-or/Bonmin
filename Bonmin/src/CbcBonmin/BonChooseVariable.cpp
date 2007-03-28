@@ -201,8 +201,9 @@ BonChooseVariable::chooseVariable(
 	  double change_comp = 2.*change_max + change_min;
 	  // only use new value if significantly larger (rel_fact)
 	  const Number rel_fact = 1e-6;
+          const Number rel_max = 1e-4;
 	  if (best_change - change_comp <
-	      -rel_fact*Max(1.,fabs(best_change))) {
+	      -rel_fact*Max(rel_max,fabs(best_change))) {
 	    best_change = change_comp;
 	    best_i = i;
 	  }

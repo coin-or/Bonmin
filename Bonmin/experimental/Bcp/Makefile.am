@@ -49,7 +49,7 @@ bonminbcp_SOURCES = BB_cut.hpp BM.hpp \
 
 bonminbcp_DEPENDENCIES = \
 	../../src/Interfaces/Ampl/libamplinterface.la \
-	../../src/Apps/libbonmin.la \
+	../../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(LIBCBCCOPY) \
