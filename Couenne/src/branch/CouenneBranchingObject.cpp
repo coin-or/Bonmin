@@ -13,7 +13,7 @@
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
 
-CouNumber CouenneBranchingObject::alpha_ = 0.9;
+CouNumber CouenneBranchingObject::alpha_ = 0.5;
 
 
 /** \brief Constructor. Get a variable as an argument and set value_
@@ -21,6 +21,7 @@ CouNumber CouenneBranchingObject::alpha_ = 0.9;
 */
 
 CouenneBranchingObject::CouenneBranchingObject (expression *var): 
+
   reference_ (var) {
 
   // set the branching value at the current point 
@@ -28,36 +29,42 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
 
   int index = reference_ -> Index ();
 
-  CouNumber 
+  long double
     x = expression::Variable (index),   // current solution
     l = expression::Lbound   (index),   //         lower bound
     u = expression::Ubound   (index),   //         upper
     alpha = CouenneBranchingObject::Alpha ();
+
+  if      (x<l) x = l;
+  else if (x>u) x = u;
 
   if ((x > l + COUENNE_EPS) && 
       (x < u - COUENNE_EPS))
     // infinite (at least on one side) bound interval, but x is not
     // at the boundary
     value_ = x;
+
   else // current point is at one of the bounds
     if ((l > - COUENNE_INFINITY + 1) &&
-	(u <   COUENNE_INFINITY - 1)) 
+	(u <   COUENNE_INFINITY - 1))
       // finite bounds, apply midpoint rule
-      value_ = alpha * x + (1-alpha) * (l+u) / 2.;
-    else 
-      // infinite bound interval, x is at the boundary
+      value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
+
+    else
+      // infinite (one direction) bound interval, x is at the boundary
       // push it inwards
-      // TODO: look for a proper value for the displacement 
-      if (fabs (x-l) < COUENNE_EPS) value_ += (1+fabs (l)) / 2.; 
-      else                          value_ -= (1+fabs (u)) / 2.; 
+      // TODO: look for a proper displacement 
+      if (fabs (x-l) < COUENNE_EPS) value_ = l + (1+fabs (l)) / 2.; 
+      else                          value_ = u - (1+fabs (u)) / 2.; 
 
   if (0) {
     printf ("Branch::constructor: ");
     reference_ -> print (std::cout);
-    printf (" on %f [%f,%f]\n", 
+    printf (" on %f (%f) [%f,%f]\n", 
 	    value_, 
-	    expression::Lbound (reference_ -> Index ()),
-	    expression::Ubound (reference_ -> Index ()));
+	    expression::Variable (reference_ -> Index ()),
+	    expression::Lbound   (reference_ -> Index ()),
+	    expression::Ubound   (reference_ -> Index ()));
   }
 }
 
@@ -73,7 +80,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   //       1 if ">=" node
 
   int way = (!branchIndex_) ? firstBranch_ : !firstBranch_;
-  /*
+
   if (way) {
 
     if (value_ < solver -> getColLower () [reference_ -> Index ()])
@@ -97,7 +104,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 		solver -> getColLower () [reference_ -> Index()], 
 		solver -> getColUpper () [reference_ -> Index()], value_);
   }
-  */
+
   if (way) // ">=" node, set lower bound (round if this variable is integer)
     solver -> setColLower (reference_ -> Index (), 
 			   reference_ -> isInteger () ? ceil  (value_) : value_);

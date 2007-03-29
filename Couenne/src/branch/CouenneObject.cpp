@@ -48,10 +48,10 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout);
 
-    printf (". Inf: = |%.2f - %.2f| [%.2f,%.2f]= %.2f\n", 
+    printf (". Inf: = |%.2f - %.2f| = %.2f\n",  ////[%.2f,%.2f]
 	    var, expr, 
-	    expression::Lbound (reference_ -> Index ()),
-	    expression::Ubound (reference_ -> Index ()),
+	    //	    expression::Lbound (reference_ -> Index ()),
+	    //	    expression::Ubound (reference_ -> Index ()),
 	    fabs (var - expr));
   }
 
@@ -157,16 +157,25 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
   if (index >= 0) {
 
-    CouNumber l = info -> lower_    [index],
-              u = info -> upper_    [index],
-              x = info -> solution_ [index];
+    int ref_ind = reference_ -> Index ();
+
+    CouNumber x  = info -> solution_ [index],
+              l  = info -> lower_    [index],
+              u  = info -> upper_    [index],
+              xr = info -> solution_ [ref_ind],
+              lr = info -> lower_    [ref_ind],
+              ur = info -> upper_    [ref_ind];
 
     if ((fabs (x-l) > COUENNE_EPS) &&
-	(fabs (u-x) > COUENNE_EPS))
+	(fabs (u-x) > COUENNE_EPS) &&
+	(fabs (u-l) > COUENNE_EPS) 
+	||
+	(fabs (xr-lr) < COUENNE_EPS) ||
+	(fabs (ur-xr) < COUENNE_EPS) ||
+	(fabs (ur-lr) < COUENNE_EPS))
+
       return new CouenneBranchingObject (depvar);
-    else 
-      return new CouenneBranchingObject (reference_);
   }
-  else
-    return new CouenneBranchingObject (reference_);
+
+  return new CouenneBranchingObject (reference_);
 }

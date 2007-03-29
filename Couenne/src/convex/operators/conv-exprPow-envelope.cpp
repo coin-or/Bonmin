@@ -47,21 +47,36 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   int ns = cg -> nSamples ();
 
+  exponent = k;
+  /*
+  if (k <= 0) k = 1;
+
   if (l < - COUENNE_INFINITY + 1) {
     if (u > COUENNE_INFINITY - 1) {
 
-      l = - pow (POW_FACTOR, k) * ns/2;
-      u =   pow (POW_FACTOR, k) * ns/2;
+      l = - pow (POW_FACTOR, 1. / (1. + k)) * ns/2;
+      u =   pow (POW_FACTOR, 1. / (1. + k)) * ns/2;
     } else 
-      l = u - pow (POW_FACTOR, k) * ns;
+      l = u - pow (POW_FACTOR, 1. / (1. + k)) * ns;
 
   } else if (u > COUENNE_INFINITY - 1) 
-    u = l + pow (POW_FACTOR, k) * ns;
+    u = l + pow (POW_FACTOR,   1. / (1. + k)) * ns;
+  */
+
+  if (l < - COUENNE_INFINITY + 1) {
+    if (u > COUENNE_INFINITY - 1) {
+
+      l = x - 1;
+      u = x + 1;
+    } else 
+      l = x - 1;
+
+  } else if (u > COUENNE_INFINITY - 1) 
+    u = l + 1;
 
   // convex envelope
 
-  exponent = k;
-
+  //  printf (".............. now call addEnvelope %.4f %.4f\n", l, u);
   cg -> addEnvelope (cs, sign, power_k, power_k_prime, 
 		     wi, xi, x, l, u, cg -> isFirst ());
 }

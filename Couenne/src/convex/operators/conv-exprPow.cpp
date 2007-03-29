@@ -117,21 +117,29 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     }
     else sign = 1;
 
-    if (u > q * l) {
-      addPowEnvelope (cg, cs, w_ind, x_ind, x, k, q*l, u, sign);
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
-    }
+    //    printf ("%.4f [%.4f, %.4f] q=%.4f\n", x, l, u, q);
+
+    // lower envelope
+
+    if (l > -COUENNE_INFINITY) {
+      if (u > q * l) { // upper x is after "turning point", add also lower envelope
+	addPowEnvelope (cg, cs, w_ind, x_ind, x, k, q*l, u, sign);
+	cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
+      }
     else
       cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), sign);
+    }
 
     // check if upper part needs a concave envelope
 
-    if (l < q * u) {
-      addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -sign);
-      cg -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
+    if (u < COUENNE_INFINITY) {
+      if (l < q * u) {
+	addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -sign);
+	cg -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
+      }
+      else
+	cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -sign);
     }
-    else
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -sign);
   }
   else {
 

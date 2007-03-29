@@ -29,6 +29,8 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
     CouNumber sample = l, 
               step   = (u-l) / nSamples_;
 
+    //    printf ("[%.4f %.4f], step = %.4f, %d samples\n", 
+    //	    l, u, step, nSamples_);
     for (int i = 0; i <= nSamples_; i++) {
 
       opp_slope = - fprime (sample);
