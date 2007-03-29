@@ -314,7 +314,10 @@ namespace Bonmin
 
     virtual const SosInfo * sosConstraints() const = 0;
 
-    virtual const PerturbInfo* perturbInfo() const = 0;
+    virtual const PerturbInfo* perturbInfo() const
+    {
+      return NULL;
+    }
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).

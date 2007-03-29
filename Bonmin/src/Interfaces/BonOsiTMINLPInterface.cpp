@@ -1669,11 +1669,17 @@ OsiTMINLPInterface::randomStartingPoint()
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
   double * sol = new double[numcols];
-  const Number * x_init = problem_->x_init_user();  
-  const double* perturb_radius = tminlp_->perturbInfo()->GetPerturbationArray();
-  if (randomGenerationType_ == perturb_suffix && !perturb_radius) {
-    throw SimpleError("Can't use perturb_radius if no radii are given.",
-		      "randomStartingPoint");
+  const Number * x_init = problem_->x_init_user();
+  const double* perturb_radius = NULL;
+  if (randomGenerationType_ == perturb_suffix) {
+    const TMINLP::PerturbInfo* pertubinfo = tminlp_->perturbInfo();
+    if (pertubinfo) {
+      perturb_radius = pertubinfo->GetPerturbationArray();
+    }
+    if (!perturb_radius) {
+      throw SimpleError("Can't use perturb_radius if no radii are given.",
+			"randomStartingPoint");
+    }
   }
   for(int i = 0 ; i < numcols ; i++) {
     int randomGenerationType = randomGenerationType_;
