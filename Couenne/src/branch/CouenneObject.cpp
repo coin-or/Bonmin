@@ -17,6 +17,9 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 
   int index = reference_ -> Image () -> getFixVar () -> Index ();
 
+  if (index < 0)
+    return 0.;
+
   //  if (index < 0) return 0;
 
   //printf("vars: "); for (int i=0;i<18;i++) printf("%+7.1f ",expression::Variable(i)); printf ("\n");
@@ -57,8 +60,18 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 
   CouNumber delta = fabs (var - expr);
 
-  /// avoid branching on very small deltas
-  if (delta < COUENNE_EPS) delta = 0.;
+  CouNumber l  = info -> lower_ [index],
+            u  = info -> upper_ [index];
+
+  /// avoid branching on (relatively) very small deltas
+  if ((delta < COUENNE_EPS) ||
+      (fabs (u-l) < COUENNE_EPS) ||
+      ((mymin (fabs (l), fabs (u)) > COUENNE_EPS) && 
+       (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))
+    //      ((mymin (fabs (lr), fabs (ur)) > COUENNE_EPS) && 
+    //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
+
+    delta = 0.;
 
   // otherwise, return real value of difference w - f(x)
   return delta;

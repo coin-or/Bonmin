@@ -91,15 +91,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
       }
     }
-
-    int ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
-
-    if (ind_obj >= 0)
-      if (problem_ -> Obj (0) -> Sense () == MINIMIZE)
-	problem_ -> Lb (ind_obj) = - LARGE_BOUND;
-      else
-	problem_ -> Ub (ind_obj) =   LARGE_BOUND;
-
   } else { // equivalent to info.depth > 0
 
     //////////////////////// GET CHANGED BOUNDS DUE TO BRANCHING ////////////////////////
@@ -270,6 +261,19 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 
   //////////////////////// GENERATE OsiColCut FOR SHRUNKEN BOUNDS /////////////////////
+
+  if (firstcall_) {
+
+    // set trivial dual bound to objective function
+
+    int ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
+
+    if (ind_obj >= 0)
+      if (problem_ -> Obj (0) -> Sense () == MINIMIZE)
+	problem_ -> Lb (ind_obj) = - LARGE_BOUND;
+      else
+	problem_ -> Ub (ind_obj) =   LARGE_BOUND;
+  }
 
   // change tightened bounds through OsiCuts
 

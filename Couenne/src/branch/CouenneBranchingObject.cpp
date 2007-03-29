@@ -39,9 +39,7 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
   else if (x>u) x = u;
 
   if ((x > l + COUENNE_EPS) && 
-      (x < u - COUENNE_EPS))
-    // infinite (at least on one side) bound interval, but x is not
-    // at the boundary
+      (x < u - COUENNE_EPS))      // x is not at the boundary
     value_ = x;
 
   else // current point is at one of the bounds
