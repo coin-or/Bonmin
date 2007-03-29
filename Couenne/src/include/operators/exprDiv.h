@@ -83,4 +83,21 @@ inline CouNumber exprDiv::operator () () {
   return (currValue_ = (*sp-- / denominator));
 }
 
+
+// check if bounding box is suitable for a multiplication/division
+// convexification constraint
+
+inline bool is_boundbox_regular (register CouNumber b1, register CouNumber b2) {
+
+  // Why 1e20 and not COUENNE_INFINITY? Because OsiRowCut::set[LU]b do
+  // not work for values more than 1e20 and apparently makes the
+  // convexification infeasible.
+  return 
+    (fabs (b1)    < 1e20) && 
+    (fabs (b2)    < 1e20) && 
+    (fabs (b1*b2) < 1e20);
+    //    && ((fabs (b1) > COUENNE_EPS) || (fabs (b2) > COUENNE_EPS));
+}
+
+
 #endif

@@ -11,6 +11,7 @@
 #include <exprBMul.h>
 #include <exprConst.h>
 #include <exprPow.h>
+#include <exprDiv.h>
 #include <exprClone.h>
 #include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>
@@ -112,7 +113,7 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
 
 
 // defined in conv-exprDiv.cpp
-bool is_boundbox_regular (CouNumber, CouNumber);
+//bool is_boundbox_regular (CouNumber, CouNumber);
 
 
 // generate convexification cut for constraint w = x*y
