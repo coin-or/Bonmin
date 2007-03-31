@@ -26,7 +26,7 @@ libbonmininterfaces_la_SOURCES = \
 	BonBoundsReader.cpp BonBoundsReader.hpp \
 	BonColReader.cpp BonColReader.hpp \
 	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
-	BonCutStrengthener.cpp BonCutStrengthener.cpp \
+	BonCutStrengthener.cpp BonCutStrengthener.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \

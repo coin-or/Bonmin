@@ -288,8 +288,8 @@ register_general_options
       "none",
       "none", "No strengthening of cuts.",
       "sglobal", "Strengthen global cuts.",
-      "uglobal-slocal", "Unstrengthened glocal and strengthened local cuts",
-      "sglobal-slocal", "Strengthened glocal and strengthened local cuts",
+      "uglobal-slocal", "Unstrengthened global and strengthened local cuts",
+      "sglobal-slocal", "Strengthened global and strengthened local cuts",
       "");
 }
 
