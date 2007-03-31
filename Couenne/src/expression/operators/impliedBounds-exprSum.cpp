@@ -63,7 +63,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   nterms += nlin;
 
   // Coefficients and indices of the positive and the negative
-  // non-constant parts of the sum
+  // non-constant parts of the sum (at most nlin are negative, as all
+  // "nonlinear" terms have coefficient 1)
 
   CouNumber *C1 = (CouNumber *) malloc (nterms * sizeof (CouNumber)),
             *C2 = (CouNumber *) malloc (nlin   * sizeof (CouNumber));
@@ -93,18 +94,9 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     int       *ind = dynamic_cast <exprGroup *> (this) -> getIndices ();
     CouNumber *coe = dynamic_cast <exprGroup *> (this) -> getCoeffs  ();
 
-    for (;*ind >= 0; ind++, coe++) {
-
-      if (*coe > COUENNE_EPS) {
-	I1 [ipos]   = *ind;
-	C1 [ipos++] = *coe;
-      }
-
-      if (*coe < - COUENNE_EPS) {
-	I2 [ineg]   = *ind;
-	C2 [ineg++] = *coe;
-      }
-    }
+    for (;*ind >= 0; ind++, coe++)
+      if      (*coe >   COUENNE_EPS) {I1 [ipos] = *ind; C1 [ipos++] = *coe;}
+      else if (*coe < - COUENNE_EPS) {I2 [ineg] = *ind; C2 [ineg++] = *coe;}
   }
 
   // realloc to save some memory
@@ -116,20 +108,25 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   C2 = (CouNumber *) realloc (C2, ineg * sizeof (CouNumber));
 
   // now we have correct  I1, I2, C1, C2, ipos, ineg, and a0
-  /*
-  printf ("::::::::::::::::::::: now we have: w%d [%f,%f] a0 = %.3f\n", 
-	  wind, l [wind], u [wind], a0);
 
-  printf ("I1 (%d): ", ipos);
-  for (int i=0; i<ipos; i++)
-    printf ("%+.1f x%d [%.1f,%.1f] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]);
+  if (0) {
 
-  printf ("\nI2 (%d): ", ineg);
-  for (int i=0; i<ineg; i++)
-    printf ("%+.1f x%d [%.1f,%.1f] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
+    printf ("w_%d = ", wind); print (std::cout);
 
-  printf ("\n");
-  */
+    printf (" ::::::::::::::::::::: now we have: w%d [%.3f,%.3f] a0 = %.3f\n", 
+	    wind, l [wind], u [wind], a0);
+
+    printf ("I1 (%d): ", ipos);
+    for (int i=0; i<ipos; i++)
+      printf ("%+.3f x%d [%.3f,%.3f] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]);
+
+    printf ("\nI2 (%d): ", ineg);
+    for (int i=0; i<ineg; i++)
+      printf ("%+.3f x%d [%.3f,%.3f] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
+
+    printf ("\n");
+  }
+
   // indices of the variable in I1 or I2 with infinite lower or upper
   // bound. If more than one is found, it is set to -2
 
@@ -152,10 +149,11 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     upper = a0 + scanBounds (ipos, +1, I1, C1, u, &infUp1)
                + scanBounds (ineg, -1, I2, C2, l, &infLo2);
-  /*
-  printf ("lower = %.3f\nupper = %.3f. (%d,%d,%d,%d)\n", 
-	  lower, upper, infLo1, infUp1, infLo2, infUp2);
-  */
+
+  if (0)
+    printf ("lower = %.3f\nupper = %.3f. (%d,%d,%d,%d)\n", 
+	    lower, upper, infLo1, infUp1, infLo2, infUp2);
+  
   // Now compute lower bound for all or for some of the variables:
   // There is a bound for all variables only if both infUp1 and infLo2
   // are -1, otherwise there is a bound only for one variable if one
@@ -172,23 +170,42 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       (upper > wu - COUENNE_EPS))
       return false;*/
 
-  // Update lowers in I1 and uppers in I2
+  // Very subtle... make two copies of lower and upper to avoid
+  // updating bounds with some previously updated bounds
 
+  // first of all, find maximum index in I1 and I2
+
+  int maxind = -1;
+
+  for (register int i=ipos; i--; I1++) if (*I1 > maxind) maxind = *I1;
+  for (register int i=ineg; i--; I2++) if (*I2 > maxind) maxind = *I2;
+
+  I1 -= ipos;
+  I2 -= ineg;
+
+  CouNumber *lc = (CouNumber *) malloc (++maxind * sizeof (CouNumber));
+  CouNumber *uc = (CouNumber *) malloc (maxind   * sizeof (CouNumber));
+
+  for (register int i = maxind; i--;) {
+    lc [i] = l [i];
+    uc [i] = u [i];
+  }
+
+  // Update lowers in I1 and uppers in I2
 
   if ((infLo1 == -1) && (infUp2 == -1)) { // All finite bounds. All var. bounds can be tightened.
 
     // tighten upper bound of variables in I1
-
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
-      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [i] + l [ind]) || tighter)
+      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [i] + lc [ind]) || tighter)
 	chg [ind] = 1;
     }
 
     // tighten lower bound of variables in I2
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
-      if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [i] + u [ind]) || tighter)
+      if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [i] + uc [ind]) || tighter)
 	chg [ind] = 1;
     }
   } else
@@ -211,13 +228,13 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
-      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + u [ind]) || tighter)
+      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + uc [ind]) || tighter)
 	chg [ind] = 1;
     }
 
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
-      if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + l [ind]) || tighter)
+      if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + lc [ind]) || tighter)
 	chg [ind] = 1;
     }
   } else 
@@ -238,10 +255,13 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   free (I1); free (I2);
   free (C1); free (C2);
+  free (lc); free (uc);
 
   return tighter;
 }
 
+
+/// sum bounds depending on coefficients
 
 static CouNumber scanBounds (int        num,      /// cardinality of the set (I1 or I2)
 			     int        sign,     /// +1: check for +inf, -1: check for -inf
@@ -260,7 +280,7 @@ static CouNumber scanBounds (int        num,      /// cardinality of the set (I1
 
       // this variable has an infinite bound, mark it
       if      (*infnum == -1) *infnum =  i; // first variable with infinite bound, so far
-      else if (*infnum >=  0) *infnum = -2; // oops... more than one found, no bound
+      else if (*infnum >=  0) *infnum = -2; // oops... more than one found, no finite bound
     }
     else bound += coeff [i] * bd; // no infinity detected, sum a weighted, finite bound
   }

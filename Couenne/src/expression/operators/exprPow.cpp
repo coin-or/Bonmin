@@ -197,9 +197,10 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   CouNumber wl = l [wind], // lower w
             wu = u [wind]; // upper w
 
-  if ((isint || isinvint) && (intk % 2)) { // k or 1/k integer and odd
+  if ((isint || isinvint) && (intk % 2) ||
+      (!isint && !isinvint)) { // k or 1/k integer and odd, or non-integer
 
-    if (k > 0.) { // simple, just flip bounds
+    if (k > 0.) { // simple, just follow bounds
 
       res = updateBound (-1, l + index, pow (wl, 1./k));
       res = updateBound (+1, u + index, pow (wu, 1./k)) || res;
@@ -219,19 +220,18 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 	res = updateBound (-1, l + index, - pow (bound, 1./k));
 	res = updateBound (+1, u + index,   pow (bound, 1./k)) || res;
       }
-
     } else { // x^k, k=(1/h), h integer and even, or x^k, neither k nor 1/k integer
 
-      CouNumber lb = wl, ub = wu;
+	CouNumber lb = wl, ub = wu;
 
-      if (k < 0) { // swap bounds as they swap on the curve x^k when 
-	lb = wu;
-	ub = wl;
+	if (k < 0) { // swap bounds as they swap on the curve x^k when 
+	  lb = wu;
+	  ub = wl;
+	}
+	
+	if (lb > COUENNE_EPS) res = updateBound (-1, l + index, pow (lb, 1./k));
+	if (ub > COUENNE_EPS) res = updateBound (+1, u + index, pow (ub, 1./k)) || res;
       }
-
-      if (lb > COUENNE_EPS) res = updateBound (-1, l + index, pow (lb, 1./k));
-      if (ub > COUENNE_EPS) res = updateBound (+1, u + index, pow (ub, 1./k)) || res;
-    }
 
   return res;
 }

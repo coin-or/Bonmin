@@ -16,7 +16,7 @@
 #include <exprMul.h>
 
 
-// get bounds of log (x) based on bounds of x
+/// get bounds of log (x) based on bounds of x
 
 void exprLog::getBounds (expression *&lb, expression *&ub) {
 
@@ -36,7 +36,7 @@ void exprLog::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// differentiation
+/// differentiation
 
 expression *exprLog::differentiate (int index) {
 
@@ -49,7 +49,7 @@ expression *exprLog::differentiate (int index) {
 }
 
 
-// printing
+/// printing
 
 void exprLog::print (std::ostream& out) const 
 {exprUnary::print (out, "log", PRE);}

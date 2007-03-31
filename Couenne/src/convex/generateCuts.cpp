@@ -12,7 +12,7 @@
 #include <CouenneProblem.h>
 
 // fictitious bound for initial unbounded lp relaxations
-#define LARGE_BOUND 1e12
+#define LARGE_BOUND 9.999e12
 
 /// a convexifier cut generator
 
@@ -30,8 +30,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   //  printf ("-------------------- Couenne::GENERATE CUTS"); fflush (stdout);
 
-  int ncols = problem_ -> nVars () + 
-              problem_ -> nAuxs ();
+  int ncols = problem_ -> nVars () + problem_ -> nAuxs ();
 
   // This vector contains variables whose bounds have changed due to
   // branching, reduced cost fixing, or bound tightening below. To be
@@ -165,7 +164,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  //////////////////////// PROPAGATE CHANGED BOUNDS ///////////////////////////////////
+  //////////////////////// TIGHTEN BOUNDS ///////////////////////////////////
 
   // tighten the current relaxation by tightening the variables'
   // bounds
@@ -186,44 +185,54 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   do {
 
-    //    bool infeasible = false;
+    // propagate bounds to auxiliary variables
 
-    ntightened   = problem_ -> tightenBounds (si, chg_bds);
-    //    nbwtightened = problem_ -> impliedBounds     (chg_bds);
+    ntightened = problem_ -> tightenBounds (chg_bds);
 
-    /*if (ntightened || nbwtightened) printf ("%d, %d bounds tightened\n", 
-      ntightened, nbwtightened);*/
+    /*for (register int i=0; i < ncols; i++) 
+      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS)
+	printf ("Couenne: infeasible bounds on w_%d [%.12e,%.12e]\n", 
+	i, expression::Lbound (i), expression::Ubound (i));*/
 
-    for (register int i=0; i < ncols; i++) 
-      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS) {
-	//printf ("Couenne: infeasible bounds %d\n", i);
-	//	infeasible = true;
+    // implied bounds. Only do it after other bounds have changed,
+    // i.e. after branching
 
-	OsiColCut *infeascut = new OsiColCut;
+    if (!firstcall_) {
 
-	if (infeascut) {
+      nbwtightened = problem_ -> impliedBounds (chg_bds);
+      
+      /*if (ntightened || nbwtightened) printf ("%d, %d bounds tightened\n", 
+	ntightened, nbwtightened);*/
 
-	  double upper = -1, lower = +1; // want to make this node infeasible
+      for (register int i=0; i < ncols; i++) 
+	if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS) {
 
-	  infeascut -> setLbs (1, &i, &lower);
-	  infeascut -> setUbs (1, &i, &upper);
+	  /*printf ("Couenne: infeasible bounds on w_%d [%.12e,%.12e]\n", 
+	    i, expression::Lbound (i), expression::Ubound (i));*/
 
-	  //	  infeascut -> print ();
-	  cs.insert (infeascut);
-	  goto end_genCuts;
+	  OsiColCut *infeascut = new OsiColCut;
+
+	  if (infeascut) {
+
+	    double upper = -1, lower = +1; // want to make this node infeasible
+
+	    infeascut -> setLbs (1, &i, &lower);
+	    infeascut -> setUbs (1, &i, &upper);
+
+	    cs.insert (infeascut);
+	    delete infeascut;
+
+	    // avoid bookkeeping of infeasible flag
+	    goto end_genCuts;
+	  }
 	}
-      }
-
-    //    if (infeasible)
-    //      break;
-
+    }
   } while ((ntightened || nbwtightened) && (niter++ < 10));
 
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
-  // first of all, convert sparse vector chg_bds in something more
-  // handy
+  // first of all, convert sparse chg_bds in something handier
 
   changed  = (int *) malloc (ncols * sizeof (int));
   nchanged = 0;
@@ -315,6 +324,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // ok, now create cut
 
     if (nUpp || nLow) {
+
       OsiColCut *cut = new OsiColCut;
 
       if (cut) {

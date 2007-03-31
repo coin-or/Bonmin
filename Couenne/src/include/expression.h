@@ -228,7 +228,7 @@ inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
   //          sign < 0                            LOWER
 
   if (delta > COUENNE_EPS) {
-    //    printf ("%.9f --> %.9f\n", *dst, src);
+    //printf ("%.9f --> %.9f\n", *dst, src);
     *dst = src; // tighten
     return true;
   }
@@ -242,11 +242,11 @@ inline int compareExpr (const void *e0, const void *e1) {
 }
 
 /// maximum
-inline CouNumber mymin (CouNumber a, CouNumber b) 
-{return (a<b) ? a : b;} 
+inline CouNumber mymin (register CouNumber a, register CouNumber b) 
+{return ((a<b) ? a : b);} 
 
 /// minimum
-inline CouNumber mymax (CouNumber a, CouNumber b) 
-{return (a>b) ? a : b;} 
+inline CouNumber mymax (register CouNumber a, register CouNumber b) 
+{return ((a>b) ? a : b);} 
 
 #endif

@@ -38,6 +38,11 @@ class exprAux: public exprVar {
   /// auxiliary w=f(x1,x2...,xk) has rank r(w) = 1+max{r(xi):i=1..k}.
   int rank_;
 
+  /// number of appearances of this aux in the formulation. The more
+  /// times it occurs in the formulation, the more implication its
+  /// branching has on other variables
+  int nappear_;
+
  public:
 
   // Node type
@@ -56,9 +61,10 @@ class exprAux: public exprVar {
 
   // copy constructor
   exprAux (const exprAux &e):
-    exprVar (e.varIndex_),
-    image_  (e.Image () -> clone ()),
-    rank_   (e.rank_)
+    exprVar  (e.varIndex_),
+    image_   (e.Image () -> clone ()),
+    rank_    (e.rank_),
+    nappear_ (e.nappear_)
 
     {image_ -> getBounds (lb_, ub_);}
 
@@ -131,6 +137,9 @@ class exprAux: public exprVar {
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *p)
     {return rank_;} 
+
+  /// Tell this variable appears once more
+  int &nAppear () {return nappear_;}
 };
 
 #endif

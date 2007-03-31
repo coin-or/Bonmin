@@ -53,8 +53,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
     printf ("reading time: %.3fs\n", now);
 
   now = CoinCpuTime ();
-  //  problem_ -> print (std::cout);
-  //  printf ("======================================\n");
+  //problem_ -> print (std::cout);
+  //printf ("======================================\n");
   problem_ -> standardize ();
 
   if ((now = (CoinCpuTime () - now)) > 10.)
@@ -62,7 +62,7 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 
   septime_ = now;
 
-  //  problem_ -> print (std::cout);
+  //problem_ -> print (std::cout);
   //  printf ("======================================\n");
   //  problem_ -> writeMod ("extended.mod");
 }
@@ -87,10 +87,10 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   problem_     (src. problem_ -> clone ()),
   nrootcuts_   (src. nrootcuts_),
   ntotalcuts_  (src. ntotalcuts_),
+  septime_     (src. septime_),
   objValue_    (src. objValue_),
   nlp_         (src. nlp_),
-  BabPtr_      (src. BabPtr_),
-  septime_     (src. septime_)
+  BabPtr_      (src. BabPtr_)
 {}
 
 

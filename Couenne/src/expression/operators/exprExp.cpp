@@ -55,6 +55,11 @@ bool exprExp::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   if ((b = u [wind]) >= COUENNE_EPS) // upper bound
     res = updateBound ( 1, u + ind, log (b)) || res;
+  else if (b < - COUENNE_EPS) {
+    // make it infeasible
+    res = updateBound ( 1, u + ind, -1) || res;
+    res = updateBound (-1, l + ind,  1) || res;
+  }
 
   if (res) 
     chg [ind] = 1;

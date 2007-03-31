@@ -10,20 +10,13 @@
 
 #include <CouennePrecisions.h>
 
-/// positive part of a number x, [x]^+
-//inline CouNumber mypos (register CouNumber x)
-//{return ((x > 0.) ? x : 0.);}
-
-
-/// negative part of a number x, [x]^-
-//inline CouNumber myneg (register CouNumber x)
-//{return ((x < 0.) ? x : 0.);}
-
 
 /// implied bound processing for expression w = x/y, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
 bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+
+  //  return false;
 
   bool resx, resy = resx = false;
 
@@ -97,12 +90,15 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     // 4 xu,yu    |  -   | INF  |  yu  |  xu  |  yu  |xu,yu?|  -   |  yu  |
     //            |______|______|______|______|______|______|______|______|
     //
-    // Where "INF" stands for "subproblem infeasible", "-" for
+    // Where "INF" stands for "infeasible subproblem", "-" for
     // "nothing to improve", and the rest is improved (those with "?"
     // may improve).
  
     CouNumber *xl = l + xi, *yl = l + yi, wl = l [wind],
               *xu = u + xi, *yu = u + yi, wu = u [wind];
+
+    /*printf ("from              : w[%d] [%e %e], x%d [%e %e] / y%d [%e %e]",
+      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);*/
 
     // avoid changing bounds if x is constant
     if (xi == -1) 
@@ -110,24 +106,32 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     //////////// deal with lower bound of w=x/y /////////////////////////////////////////////
 
-    if        (wl < - COUENNE_EPS) {
+    if        (wl < - COUENNE_EPS) { // w >= wl, wl negative
 
-      resy = (*yl<0) && (*yl > *xl/wl) && updateBound (-1, yl, 0)      || resy;
+      // point C: (xl,yl)
 
-      resx = (*yl>0) && (*yl < *xl/wl) && updateBound (-1, xl, *yu/wl) || resx;
-      resy = (*yl>0) && (*yl < *xl/wl) && updateBound (-1, yl, *xu/wl) || resy;
+      resy = (*yl<0) && (*yl > *xl/wl) && updateBound (-1, yl, 0) || resy;//
+
+      if ((*yl>0) && (*yl < *xl/wl)) { // point C violates x/y >= wl, down
+	resx = updateBound (-1, xl, *yu*wl) || resx;//
+	resy = updateBound (-1, yl, *xu/wl) || resy;//
+      }
+
+      // point B: (xu,yu)
+
+      if ((*yu<0) && (*yu > *xu/wl)) { // point B violates x/y >= wl, down
+	resx = updateBound (+1, xu, *yl*wl) || resx;
+	resy = updateBound (+1, yu, *xl/wl) || resy;
+      }
+
+      resy = (*yu>0) && (*yu < *xu/wl) && updateBound (+1, yu, 0) || resy;
+
+    } else if (wl >   COUENNE_EPS) { // w >= wl, wl positive
 
       //
 
-      resx = (*yu<0) && (*yu > *xu/wl) && updateBound (+1, xu, *yl*wl) || resx;
-      resy = (*yu<0) && (*yu < *xu/wl) && updateBound (+1, yu, *xl/wl) || resy;
-
-      resy = (*yu>0) && (*yu < *xu/wl) && updateBound (+1, yu, 0)      || resy;
-
-    } else if (wl >   COUENNE_EPS) {
-
       resy = (*yl<0) && (*yl < *xl/wl) && updateBound (-1, yl, mymin (*xl/wl, 0)) || resy;
-      resx = (*yl>0) && (*yl > *xl/wl) && updateBound (-1, xl, *yl/wl)            || resx;
+      resx = (*yl>0) && (*yl > *xl/wl) && updateBound (-1, xl, *yl*wl)            || resx;
 
       //
 
@@ -137,120 +141,47 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     //////////// deal with upper bound of w=x/y /////////////////////////////////////////////
 
-    if        (wu >   COUENNE_EPS) {
+    if        (wu >   COUENNE_EPS) { // w <= wu, wu negative
+
+      //
 
       resy = (*yl<0) && (*yl > *xu/wu) && updateBound (-1, yl, 0)      || resy;
 
-      resx = (*yl>0) && (*yl < *xu/wu) && updateBound (+1, xu, *yu*wl) || resx;
-      resy = (*yl>0) && (*yl < *xu/wu) && updateBound (-1, yl, *xl/wl) || resy;
+      if ((*yl>0) && (*yl < *xu/wu)) {
+	resx = updateBound (+1, xu, *yu*wu) || resx;
+	resy = updateBound (-1, yl, *xl/wu) || resy;
+      }
 
       //
 
-      resx = (*yu<0) && (*yu > *xl/wu) && updateBound (-1, xl, *yl*wl) || resx;
-      resy = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, yu, *xu/wl) || resy;
+      if ((*yu<0) && (*yu > *xl/wu)) {
+	resx = updateBound (-1, xl, *yl*wu) || resx;
+	resy = updateBound (+1, yu, *xu/wu) || resy;
+      }
 
-      resy = (*yu>0) && (*yu < *xl/wl) && updateBound (+1, yu, 0)      || resy;
+      resy = (*yu>0) && (*yu < *xl/wu) && updateBound (+1, yu, 0)      || resy;
 
-    } else if (wu < - COUENNE_EPS) {
-
-      resx = (*yl<0) && (*yl < *xu/wu) && updateBound (-1, xl, *yu*wl)            || resx;
-      resy = (*yl>0) && (*yl > *xu/wu) && updateBound (+1, yu, mymax (*xl/wl,0))  || resy;
+    } else if (wu < - COUENNE_EPS) { // w <= wu, wu positive
 
       //
 
-      resy = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, yl, mymin (*xu/wl, 0)) || resy;
-      resx = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, xu, *yl*wl)            || resx;
+      resy = (*yl<0) && (*yl < *xu/wu) && updateBound (-1, yl, mymin (*xu/wu,0))  || resy;//
+      resx = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, xl, *yu*wu)            || resx;
+
+      //
+
+      resx = (*yl>0) && (*yl > *xu/wu) && updateBound (+1, xu, *yl*wu)            || resx;
+      resy = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, yu, mymax (*xl/wu,0))  || resy;
     }
 
     if (resx) chg [xi] = 1;
     if (resy) chg [yi] = 1;
+
+    /*if (resx || resy) 
+      printf ("                 \ntightened division: w[%d] [%e %e], x%d [%e %e] / y%d [%e %e]\n",
+	      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);
+	      else printf ("                                                 \r");*/
   }
 
   return (resx || resy);
-
-    /*
-
-    if (wl < - COUENNE_EPS) { // columns 1 and 2 of 8 /////////////////////
-
-      // (xl,yu) in upper and lower cone, or simply, yu > 0 and yu < 0. Row 2
-
-      if ((*yu >   COUENNE_EPS) && (updateBound (+1, yu, mypos (*xl/wl)))) {res = true; chg [yi] = 1;}
-      if ((*yu < - COUENNE_EPS) && (updateBound (-1, xl, *yu * wl))) {res = true; chg [xi] = 1;}
-
-      // (xu,yl), row 3
-
-      if ((*yl >   COUENNE_EPS) && (updateBound (+1, xu, *yl * wl))) {res = true; chg [xi] = 1;}
-      if ((*yl < - COUENNE_EPS) && (updateBound (-1, yl, myneg (*xu/wl)))) {res = true; chg [yi] = 1;}
-
-    } else if (wl > COUENNE_EPS) { // columns 3 and 4 of 8 /////////////////
-
-      if ((*yl<-COUENNE_EPS) && (*yl < *xl/wl) && updateBound (-1, yl, *xl/wl)) {res=true; chg[yi]=1;}
-      else
-      if ((*yl> COUENNE_EPS) && (*yl > *xl/wl) && updateBound (-1, xl, *yl*wl)) {res=true; chg[xi]=1;}
-
-
-      // (xl,yl), row 1
-
-      if ((*yl >   COUENNE_EPS) && (updateBound (-1, xl, *yl * wl))) {res = true; chg [xi] = 1;}
-      if ((*yl < - COUENNE_EPS) && (updateBound (-1, yl, myneg (*xl/wl)))) {res = true; chg [yi] = 1;}
-
-      // (xu,yu), row 4
-
-      if ((*yu >   COUENNE_EPS) && (updateBound (+1, yu, mypos (*xu/wl)))) {res = true; chg [yi] = 1;}
-      if ((*yu < - COUENNE_EPS) && (updateBound (+1, xu, *yu * wl))) {res = true; chg [xi] = 1;}
-    }
-
-    ///////////// deal with upper bound of w=x/y ///////////////////////////////////////////
-
-    if (wu < - COUENNE_EPS) { // columns 5 and 6 of 8 ///////////////////
-
-      // (xl,yl), row 1
-
-      if ((*yl >   COUENNE_EPS) && (updateBound (-1, xl, *yu * wu))) {res = true; chg [xi] = 1;}
-      if ((*yl >   COUENNE_EPS) && (updateBound (-1, yl, *xu / wu))) {res = true; chg [yi] = 1;}
-      if ((*yl < - COUENNE_EPS) && (*xl > *yl * wu) && 
-	                           (updateBound (-1, yl, 0)))        {res = true; chg [yi] = 1;}
-
-      // (xl,yu), row 2
-
-      //    if ((*yu < - COUENNE_EPS) && (updateBound (+1, yu, *xl / wu))) {res = true; chg [yi] = 1;}
-
-      // (xu,yl), row 3
-
-      //    if ((*yl >   COUENNE_EPS) && (updateBound (-1, yl, *xu / wu))) {res = true; chg [yi] = 1;}
-
-      // (xu,yu), row 4
-
-      if ((*yu >   COUENNE_EPS) && (*xu < *yu * wu) && 
-                                   (updateBound (+1, yu, 0)))        {res = true; chg [yi] = 1;}
-      if ((*yu < - COUENNE_EPS) && (updateBound (+1, xu, *yl * wu))) {res = true; chg [xi] = 1;}
-      if ((*yu < - COUENNE_EPS) && (updateBound (+1, yu, *xl / wu))) {res = true; chg [yi] = 1;}
-
-    } else if (wu > COUENNE_EPS) { // columns 7 and 8 of 8 /////////////////////
-
-      // (xl,yl), row 1
-
-      //    if ((*yl >   COUENNE_EPS) && (updateBound (-1, yl, *xl / wu))) {res = true; chg [yi] = 1;}
-
-      // (xl,yu), row 2
-
-      if ((*yu >   COUENNE_EPS) && (*xl > *yu * wu) && 
-                                   (updateBound (+1, yu, 0)))        {res = true; chg [yi] = 1;}
-      if ((*yu < - COUENNE_EPS) && (updateBound (+1, yu, *xu / wu))) {res = true; chg [yi] = 1;}
-      if ((*yu < - COUENNE_EPS) && (updateBound (-1, xl, *yl * wu))) {res = true; chg [xi] = 1;}
-
-      // (xu,yl), row 3
-
-      if ((*yl >   COUENNE_EPS) && (updateBound (-1, yl, *xl / wu))) {res = true; chg [yi] = 1;}
-      if ((*yl >   COUENNE_EPS) && (updateBound (+1, xu, *yu * wu))) {res = true; chg [xi] = 1;}
-      if ((*yl < - COUENNE_EPS) && (*xu < *yl * wu) && 
-                                   (updateBound (-1, yl, 0)))        {res = true; chg [yi] = 1;}
-
-      // (xu,yu), row 4
-
-      //    if ((*yu < - COUENNE_EPS) && (updateBound (?1, ??, *?? ? wu))) {res = true; chg [?i] = 1;}
-    }
-  }
-
-  return res;*/
 }

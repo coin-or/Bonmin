@@ -15,11 +15,13 @@
 
 bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
+  //  return false;
+
   bool res = false;
   int ind;
 
-  if ((arglist_ [ind=0] -> Type () == CONST) || 
-      (arglist_ [ind=1] -> Type () == CONST)) {
+  if ((arglist_ [ind=0] -> Type () <= CONST) || 
+      (arglist_ [ind=1] -> Type () <= CONST)) {
 
     CouNumber c = arglist_ [ind] -> Value ();
 
@@ -55,71 +57,81 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     CouNumber *xl = l + xi, *yl = l + yi, wl = l [wind],
               *xu = u + xi, *yu = u + yi, wu = u [wind];
 
+    /*printf ("from             : w[%d] [%e %e], x%d [%e %e] * y%d [%e %e]",
+      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);*/
+
     // w's lower bound 
 
-    if (wl > 0) {
+    bool resx = false, resy = false;
 
-      if ((*xl * *yl > wl) && 
-	  (*xu * *yu < wl)) {
+    if (wl >= 0.) {
 
-	if (updateBound (+1, xu, wl / *yl)) {res = true; chg [xi] = 1;}
-	if (updateBound (+1, yu, wl / *xl)) {res = true; chg [yi] = 1;}
-      } 
-      else if ((*xl * *yl < wl) && 
-	       (*xu * *yu > wl)) {
+      // point B in central infeasible area
 
-	if (updateBound (-1, xl, wl / *yu)) {res = true; chg [xi] = 1;}
-	if (updateBound (-1, yl, wl / *xu)) {res = true; chg [yi] = 1;}
+      if (*xu * *yu < wl) {
+	resx = (*xu * *yl < wl) && updateBound (+1, xu, wl / *yl) || resx;
+	resy = (*xl * *yu < wl) && updateBound (+1, yu, wl / *xl) || resy;
       }
 
-    } else if (wl < 0) {
+      // point C in central infeasible area
 
-      if ((*xu * *yl > wl) && 
-	  (*xl * *yu < wl)) {
-
-	if (updateBound (-1, xl, wl / *yl)) {res = true; chg [xi] = 1;}
-	if (updateBound (+1, yu, wl / *xu)) {res = true; chg [yi] = 1;}
-      } 
-      else if ((*xu * *yl < wl) && 
-	       (*xl * *yu > wl)) {
-
-	if (updateBound (+1, xu, wl / *yu)) {res = true; chg [xi] = 1;}
-	if (updateBound (-1, yl, wl / *xl)) {res = true; chg [xi] = 1;}
+      if (*xl * *yl < wl) {
+	resx = (*xl * *yu < wl) && updateBound (-1, xl, wl / *yu) || resx;
+	resy = (*xu * *yl < wl) && updateBound (-1, yl, wl / *xu) || resy;
       }
+    } else {
+
+      // the infeasible set is a hyperbola with two branches
+
+      // upper left
+      resx = (*xl * *yl < wl) && (*yl > 0.) && updateBound (-1, xl, wl / *yl) || resx; // point C
+      resy = (*xu * *yu < wl) && (*yu > 0.) && updateBound (+1, yu, wl / *xu) || resy; // point B
+
+      // lower right
+      resy = (*xl * *yl < wl) && (*yl < 0.) && updateBound (-1, yl, wl / *xl) || resy; // point C
+      resx = (*xu * *yu < wl) && (*yu < 0.) && updateBound (+1, xu, wl / *yu) || resx; // point B
     }
 
     // w's upper bound 
 
-    if (wu > 0) {
+    if (wu >= 0.) {
 
-      if ((*xl * *yl > wu) && 
-	  (*xu * *yu < wu)) {
+      // the infeasible set is a hyperbola with two branches
 
-	if (updateBound (-1, xl, wu / *yu)) {res = true; chg [xi] = 1;}
-	if (updateBound (-1, yl, wu / *xu)) {res = true; chg [yi] = 1;}
-      } 
-      else if ((*xl * *yl < wu) &&
-	       (*xu * *yu > wu)) {
+      // upper right
+      resx = (*xu * *yl > wu) && (*yl > 0.) && updateBound (+1, xu, wu / *yl) || resx; // point D
+      resy = (*xl * *yu > wu) && (*yu > 0.) && updateBound (+1, yu, wu / *xl) || resy; // point A
 
-	if (updateBound (+1, xu, wu / *yl)) {res = true; chg [xi] = 1;}
-	if (updateBound (+1, yu, wu / *xl)) {res = true; chg [yi] = 1;}
+      // lower left
+      resx = (*xl * *yu > wu) && (*yu < 0.) && updateBound (-1, xl, wu / *yu) || resx; // point A
+      resy = (*xu * *yl > wu) && (*yl < 0.) && updateBound (-1, yl, wu / *xu) || resy; // point D
+
+    } else {
+
+      // point D in central infeasible area
+
+      if (*xu * *yl > wu) {
+	resx = (*xu * *yu > wu) && updateBound (+1, xu, wu / *yu) || resx;
+	resy = (*xl * *yl > wu) && updateBound (-1, yl, wu / *xl) || resy;
       }
 
-    } else if (wu < 0) {
+      // point A in central infeasible area
 
-      if ((*xu * *yl > wu) && 
-	  (*xl * *yu < wu)) {
-
-	if (updateBound (+1, xu, wu / *yu)) {res = true; chg [xi] = 1;}
-	if (updateBound (+1, yl, wu / *xl)) {res = true; chg [yi] = 1;}
-      } 
-      else if ((*xu * *yl < wu) && 
-	       (*xl * *yu > wu)) {
-
-	if (updateBound (-1, xl, wu / *yl)) {res = true; chg [xi] = 1;}
-	if (updateBound (+1, yu, wu / *xu)) {res = true; chg [yi] = 1;}
+      if (*xl * *yu > wu) {
+	resx = (*xl * *yl > wu) && updateBound (-1, xl, wu / *yl) || resx;
+	resy = (*xu * *yu > wu) && updateBound (+1, yu, wu / *xu) || resy;
       }
     }
+
+    /*if (resx || resy) 
+      printf ("                 \ntightened product: w[%d] [%e %e], x%d [%e %e] * y%d [%e %e]\n",
+	      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);
+	      else printf ("                                                 \r");*/
+
+    if (resx) chg [xi] = 1;
+    if (resy) chg [yi] = 1;
+
+    res = resx || resy;
   }
 
   return res;

@@ -105,32 +105,29 @@ expression *CouenneProblem::addVariable (bool isDiscrete) {
 
 exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
-  // check if image is already in the expression database auxMap_
+  // check if image is already in the expression database auxSet_
 
-  std::map <exprAux *, int, compExpr>::iterator i;
+  std::set <exprAux *, compExpr>::iterator i;
 
   exprAux *w = new exprAux (symbolic, 
 			    variables_ . size () + auxiliaries_ . size (), 
 			    symbolic -> rank (this));
 
-  if ((i = auxMap_ -> find (w)) == auxMap_ -> end ()) {
+  if ((i = auxSet_ -> find (w)) == auxSet_ -> end ()) {
 
-    // no such expression has been found in the map, 
-    // create entry in the map
-
-    std::pair <exprAux *, int> newpair;
-
-    newpair.first  = w; // and corresponding auxiliary variable
-    newpair.second = 1;
+    // no such expression has been found in the set, 
+    // create entry in the set
 
     auxiliaries_ . push_back (w);
-    auxMap_ -> insert (newpair);
+    auxSet_ -> insert (w);
   }
   else {
+
+    // otherwise, just return the entry's pointer
+
     delete w;
-    w = i -> first; // otherwise, just return the entry's
-                    // auxiliary var. pointer
-    i -> second ++;
+    w = *i;
+    ++ (w -> nAppear ());
   }
 
   return w;
@@ -141,9 +138,9 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
 void CouenneProblem::standardize () {
 
-  // create expression map for binary search
+  // create expression set for binary search
 
-  auxMap_ = new std::map <exprAux *, int, compExpr>;
+  auxSet_ = new std::set <exprAux *, compExpr>;
 
   // standardize objectives
 
@@ -163,7 +160,7 @@ void CouenneProblem::standardize () {
     if (aux) (*i) -> Body (new exprClone (aux));
   }
 
-  delete auxMap_;
+  delete auxSet_;
 
   int nTotVar = nVars() + nAuxs ();
 

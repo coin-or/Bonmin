@@ -76,22 +76,18 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   CouNumber *xl = l + index, wl = l [wind],
             *xu = u + index, wu = u [wind];
 
-  // for w >= b, we can only improve xlb if it is at least -b
-  //                                 xub             most   b
+  // for w >= b > 0, we can only improve xlb if it is at least  b
+  //                                 xub             most  -b
 
   bool tighter = false;
 
-  if (wl >= 0) {
+  if (wl > 0) {
 
-    tighter = updateBound (-1, xl, -wl);
-    tighter = updateBound (+1, xu,  wl) || tighter;
+    if (*xl > 0) tighter = updateBound (-1, xl,  wl);
+    if (*xu < 0) tighter = updateBound (+1, xu, -wl) || tighter;
   }
 
-  // w <= u. If u the problem is infeasible, but we only fix x to zero
-  // since we cannot return infeasibility here
-
-  if (wu <= -0.) 
-    wu = 0.;
+  // w <= u (if u < 0 the problem is infeasible)
 
   tighter = updateBound (-1, xl, -wu) || tighter;
   tighter = updateBound (+1, xu,  wu) || tighter;

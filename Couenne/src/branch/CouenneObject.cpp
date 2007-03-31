@@ -51,7 +51,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout);
 
-    printf (". Inf: = |%.2f - %.2f| = %.2f\n",  ////[%.2f,%.2f]
+    printf (". Inf: = |%.2f - %.2f| = %.2f",  ////[%.2f,%.2f]
 	    var, expr, 
 	    //	    expression::Lbound (reference_ -> Index ()),
 	    //	    expression::Ubound (reference_ -> Index ()),

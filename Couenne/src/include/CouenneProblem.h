@@ -22,7 +22,7 @@ struct ASL;
 struct expr;
 
 struct compExpr {
-  bool operator () (exprAux* e0, exprAux* e1) const
+  inline bool operator () (exprAux* e0, exprAux* e1) const
   {return (e0 -> Image () -> compare (*(e1 -> Image ())) < 0);}
 };
 
@@ -47,7 +47,7 @@ class CouenneProblem {
   CouNumber *ub_;
 
   /// expression map for comparison in standardization
-  std::map <exprAux *, int, compExpr> *auxMap_; // int to count occurrences
+  std::set <exprAux *, compExpr> *auxSet_; // int to count occurrences
 
   /// number of elements in the x_, lb_, ub_ arrays
   int curnvars_;
@@ -58,7 +58,7 @@ class CouenneProblem {
  public:
 
   /// constructors, destructor
-  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxMap_ = NULL; curnvars_ = -1; nIntVars_ = 0;}
+  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxSet_ = NULL; curnvars_ = -1; nIntVars_ = 0;}
   CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 
@@ -133,7 +133,7 @@ class CouenneProblem {
   void initAuxs (CouNumber *, CouNumber *, CouNumber *);
 
   /// bound tightening
-  int tightenBounds (const OsiSolverInterface &, char *) const;
+  int tightenBounds (char *) const;
 
   /// search for implied bounds 
   int impliedBounds (char *) const;
