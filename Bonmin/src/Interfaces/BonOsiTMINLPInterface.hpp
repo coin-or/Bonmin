@@ -25,7 +25,7 @@
 #include "BonTMINLP2TNLP.hpp"
 #include "BonTNLP2FPNLP.hpp"
 #include "BonTNLPSolver.hpp"
-
+#include "BonCutStrengthener.hpp"
 
 namespace Bonmin {
 /**
@@ -856,6 +856,14 @@ class Messages : public CoinMessages
     B_QG=2/** Bonmin's Quesada & Grossmann branch-and-cut.*/,
     B_Hyb=3/** Bonmin's hybrid outer approximation.*/,
     B_Couenne=4/** Bonmin's and Couenne spatial branch-and-bound.*/};
+
+  enum CutStrengtheningType{
+    CS_None=0,
+    CS_StrengthenedGlobal=1,
+    CS_UnstrengthenedGlobal_StrengthenedLocal=2,
+    CS_StrengthenedGlobal_StrengthenedLocal=3
+  };
+
   /** To set some application specific defaults. */
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
@@ -966,6 +974,8 @@ protected:
   int numRetryInfeasibles_;
   /// Number of times problem will be resolved in case of a failure
   int numRetryUnsolved_;
+  /// Type of OA cut strengthener
+  int cut_strengthening_type_;
   /** Messages specific to an OsiTMINLPInterface. */
   Messages messages_;
   /** If not 0 when a problem is not solved (failed to be solved)
@@ -1025,6 +1035,8 @@ protected:
   bool expose_warm_start_;
   /** Is it the first solve (for random starting point at root options).*/
   bool firstSolve_;
+  /** Object for strengthening cuts */
+  SmartPtr<CutStrengthener> cut_strengthener_;
 };
 }
 #endif

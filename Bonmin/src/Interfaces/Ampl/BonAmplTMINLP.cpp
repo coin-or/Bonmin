@@ -347,6 +347,55 @@ namespace Bonmin
         jCol, values);
   }
 
+  bool AmplTMINLP::eval_gi(Index n, const Number* x, bool new_x,
+			   Index i, Number& gi)
+  {
+    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
+
+    // ignore new_x for now
+    xunknown();
+
+    fint nerror = 0;
+    gi = conival(i, const_cast<real*>(x), &nerror);
+    if (nerror!=0) {
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
+  bool AmplTMINLP::eval_grad_gi(Index n, const Number* x, bool new_x,
+				Index i, Index& nele_grad_gi, Index* jCol,
+				Number* values)
+  {
+    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
+
+    if (jCol) {
+      // Only compute the number of nonzeros and the indices
+      DBG_ASSERT(!values);
+      nele_grad_gi = 0;
+      for (cgrad* cg=Cgrad[i]; cg; cg = cg->next) {
+	jCol[nele_grad_gi++] = cg->varno;
+      }
+      return true;
+    }
+    DBG_ASSERT(values);
+
+    // ignore new_x for now
+    xunknown();
+
+    asl->i.congrd_mode = 1;
+    fint nerror = 0;
+    congrd(i, const_cast<real*>(x), values, &nerror);
+    if (nerror!=0) {
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
   void AmplTMINLP::finalize_solution(SolverReturn status,
       Index n, const Number* x, const Number* z_L, const Number* z_U,
       Index m, const Number* g, const Number* lambda,
@@ -369,7 +418,7 @@ namespace Bonmin
   void AmplTMINLP::write_solution(const std::string & message, const Number *x_sol, const Number * lambda_sol)
   {
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
-    ;
+
     DBG_ASSERT(asl);
     //    DBG_ASSERT(x_sol);
 

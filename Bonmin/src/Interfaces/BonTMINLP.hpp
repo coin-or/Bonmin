@@ -21,6 +21,7 @@
 #include "CoinPackedMatrix.hpp"
 #include "OsiCuts.hpp"
 #include "IpTNLP.hpp"
+#include "CoinError.hpp"
 
 #include "CoinHelperFunctions.hpp"
 using namespace Ipopt;
@@ -288,6 +289,24 @@ namespace Bonmin
         Number obj_factor, Index m, const Number* lambda,
         bool new_lambda, Index nele_hess,
         Index* iRow, Index* jCol, Number* values)=0;
+    /** Compute the value of a single constraint. The constraint
+     *  number is i (starting counting from 0. */
+    virtual bool eval_gi(Index n, const Number* x, bool new_x,
+			 Index i, Number& gi)
+    {
+      std::cerr << "Method eval_gi not overloaded from TMINLP\n";
+      return false;
+    }
+    /** Compute the structure or values of the gradient for one
+     *  constraint. The constraint * number is i (starting counting
+     *  from 0.  Other things are like with eval_jac_g. */
+    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
+			      Index i, Index& nele_grad_gi, Index* jCol,
+			      Number* values)
+    {
+      std::cerr << "Method eval_grad_gi not overloaded from TMINLP\n";
+      return false;
+    }
     //@}
 
     /** @name Solution Methods */

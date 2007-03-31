@@ -283,7 +283,14 @@ register_general_options
       "The algorithm will solve all the infeasible nodes with $k$ different random starting points "
       "and will keep the best local optimum found.");
 
-
+  roptions->AddStringOption4("cut_strengthening_type",
+      "Determines if and what kind of cut strengthening should be performed.",
+      "none",
+      "none", "No strengthening of cuts.",
+      "sglobal", "Strengthen global cuts.",
+      "uglobal-slocal", "Unstrengthened glocal and strengthened local cuts",
+      "sglobal-slocal", "Strengthened glocal and strengthened local cuts",
+      "");
 }
 
 static void register_OA_options
@@ -698,7 +705,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_),
     infty_(source.infty_),
-    expose_warm_start_(source.expose_warm_start_)
+    expose_warm_start_(source.expose_warm_start_),
+    cut_strengthener_(source.cut_strengthener_)
 {
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
@@ -853,6 +861,7 @@ app_ = NULL;
     numIterationSuspect_ = rhs.numIterationSuspect_;
 
     hasBeenOptimized_ = rhs.hasBeenOptimized_;
+    cut_strengthener_ = rhs.cut_strengthener_;
 
     freeCachedData();
   }
@@ -1526,6 +1535,10 @@ OsiTMINLPInterface::setIntParam(OsiIntParam key, int value)
   case OsiLastIntParam:
     retval = false;
     break;
+  default:
+    retval = false;
+    std::cerr << "Unhandled case in setIntParam\n";
+    break;
   }
   return retval;
 }
@@ -1559,6 +1572,10 @@ OsiTMINLPInterface::setDblParam(OsiDblParam key, double value)
     break;
   case OsiLastDblParam:
     retval = false;
+    break;
+  default:
+    retval = false;
+    std::cerr << "Unhandled case in setDblParam\n";
     break;
   }
   return retval;
@@ -1603,6 +1620,9 @@ OsiTMINLPInterface::getIntParam(OsiIntParam key, int& value) const
   case OsiLastIntParam:
     retval = false;
     break;
+  default:
+    retval = false;
+    std::cerr << "Unhandled case in setIntParam\n";
   }
   return retval;
 }
@@ -1875,7 +1895,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   double * ub = new double[nNonLinear_ + 1];
   int * binding = new int[nNonLinear_ + 1];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
   int numBindings = 0;
-    
+
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
   const double * colLower = getColLower();
@@ -1932,21 +1952,69 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 
   for(int i = 0; i< numBindings ; i++) {
     //Compute cut violation
-    if(x2 != NULL)
-      {
-	double rhs = cuts[i].dotProduct(x2);
-	double violation = 0.;
-	violation = max(violation, rhs - ub[i]);
-	violation = max(violation, lb[i] - rhs);
-	if(violation == 0.) continue;
-      }
+    if(x2 != NULL) {
+      double rhs = cuts[i].dotProduct(x2);
+      double violation = 0.;
+      violation = max(violation, rhs - ub[i]);
+      violation = max(violation, lb[i] - rhs);
+      if(violation == 0.) continue;
+    }
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
-    
-    if(global)
-      {
-	newCut.setGloballyValidAsInteger(2);
+
+    if (IsValid(cut_strengthener_)) {
+      const int& bindi = binding[i];
+      //printf("before: lb = %e ub = %e rl = %e ru = %e g = %e\n", lb[i], ub[i], rowLower[bindi], rowUpper[bindi], g[bindi]);
+      // First check if the cut is indeed away from the constraint
+      bool is_tight = false;
+      const Number tight_tol = 1e-8;
+      if (lb[i] <= -infty && rowUpper[bindi] - g[bindi] <= tight_tol) {
+	is_tight = true;
       }
+      else if (ub[i] >= infty && g[bindi]-rowLower[bindi] <= tight_tol) {
+	is_tight = true;
+      }
+      if (!is_tight) {
+	if (cut_strengthening_type_ == CS_StrengthenedGlobal ||
+	    cut_strengthening_type_ == CS_StrengthenedGlobal_StrengthenedLocal) {
+	  bool retval =
+	    cut_strengthener_->StrengthenCut(tminlp_, i, cuts[i], n, x,
+					     problem_->orig_x_l(),
+					     problem_->orig_x_u(), lb[i], ub[i]);
+	  //printf("after global: lb = %e ub = %e\n", lb[i], ub[i]);
+	  if (!retval) {
+	    std::cerr << "Error in StrengthenCut global\n";
+	  }
+	}
+	if (cut_strengthening_type_ == CS_UnstrengthenedGlobal_StrengthenedLocal ||
+	    cut_strengthening_type_ == CS_StrengthenedGlobal_StrengthenedLocal) {
+	  Number lb2 = lb[i];
+	  Number ub2 = ub[i];
+	  bool retval =
+	    cut_strengthener_->StrengthenCut(tminlp_, i, cuts[i], n, x,
+					     problem_->x_l(),
+					     problem_->x_u(), lb2, ub2);
+	  if (!retval) {
+	    std::cerr << "Error in StrengthenCut local\n";
+	  }
+	  const Number localCutTol = 1e-4;
+	  if (lb2-lb[i] >= localCutTol || ub[i]-ub2 >= localCutTol) {
+	    // ToDo write this output depending on some print level
+	    printf("Adding local cut for constraint %d.\n", bindi);
+	    // Now we generate a new cut
+	    OsiRowCut newCut2;
+	    newCut2.setEffectiveness(99.99e99);
+	    newCut2.setLb(lb2);
+	    newCut2.setUb(ub2);
+	    newCut2.setRow(cuts[i]);
+	    cs.insert(newCut2);
+	  }
+	}
+      }
+    }
+    if(global) {
+      newCut.setGloballyValidAsInteger(2);
+    }
     newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
     newCut.setUb(ub[i]);
@@ -1960,8 +2028,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   delete [] cuts;
   delete [] binding;
 
-  if(getObj)  // Get the objective cuts
-  {
+  if(getObj) { // Get the objective cuts
     double * obj = new double [n];
     tminlp_->eval_grad_f(n, x, 1,obj);
     double f;
@@ -1972,8 +2039,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     lb[nNonLinear_] = -f;
     ub[nNonLinear_] = -f;
     //double minCoeff = 1e50;
-    for(int i = 0; i<n ; i++)
-    {
+    for(int i = 0; i<n ; i++) {
       if(cleanNnz(obj[i],colLower[i], colUpper[i],
           -getInfinity(), 0,
           x[i],
@@ -1988,27 +2054,25 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     v.insert(n,-1);
     //Compute cut violation
     bool genCut = true;
-    if(x2 != NULL)
-      {
-	double rhs = v.dotProduct(x2);
-	double violation = max(0., rhs - ub[nNonLinear_]);
-	if(violation == 0.) genCut = false;
-      }
-    if(genCut)
-      {
-	OsiRowCut newCut;
-	if(global)
-	  newCut.setGloballyValidAsInteger(2);
-	newCut.setEffectiveness(99.99e99);
-	newCut.setRow(v);
-	newCut.setLb(-DBL_MAX/*Infinity*/);
-	newCut.setUb(ub[nNonLinear_]);
-	//     CftValidator validator;
-	//     validator(newCut);
-	cs.insert(newCut);
-      }
+    if(x2 != NULL) {
+      double rhs = v.dotProduct(x2);
+      double violation = max(0., rhs - ub[nNonLinear_]);
+      if(violation == 0.) genCut = false;
+    }
+    if(genCut) {
+      OsiRowCut newCut;
+      if(global)
+	newCut.setGloballyValidAsInteger(2);
+      newCut.setEffectiveness(99.99e99);
+      newCut.setRow(v);
+      newCut.setLb(-DBL_MAX/*Infinity*/);
+      newCut.setUb(ub[nNonLinear_]);
+      //     CftValidator validator;
+      //     validator(newCut);
+      cs.insert(newCut);
+    }
     delete [] obj;
-  }
+    }
 
   delete []lb;
   delete[]ub;
@@ -2694,6 +2758,13 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->Options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
     app_->Options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,"bonmin.");
     app_->Options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
+    app_->Options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type_,"bonmin.");
+
+    if (cut_strengthening_type_ != CS_None) {
+      // TNLP solver to be used in the cut strengthener
+      cut_strengthener_ = new CutStrengthener(app_->clone());
+    }
+
   }
 }
 

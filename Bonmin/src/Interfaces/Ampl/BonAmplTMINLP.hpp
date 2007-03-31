@@ -137,6 +137,15 @@ namespace Bonmin
         Number obj_factor, Index m, const Number* lambda,
         bool new_lambda, Index nele_hess, Index* iRow,
         Index* jCol, Number* values);
+
+    /** compute the value of a single constraint */
+    virtual bool eval_gi(Index n, const Number* x, bool new_x,
+			 Index i, Number& gi);
+    /** compute the structure or values of the gradient for one
+	constraint */
+    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
+			      Index i, Index& nele_grad_gi, Index* jCol,
+			      Number* values);
     //@}
 
     /** @name Solution Methods */
