@@ -1977,11 +1977,20 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       if (!is_tight) {
 	if (cut_strengthening_type_ == CS_StrengthenedGlobal ||
 	    cut_strengthening_type_ == CS_StrengthenedGlobal_StrengthenedLocal) {
+	  const double orig_lb = lb[i];
+	  const double orig_ub = ub[i];
 	  bool retval =
 	    cut_strengthener_->StrengthenCut(tminlp_, i, cuts[i], n, x,
 					     problem_->orig_x_l(),
 					     problem_->orig_x_u(), lb[i], ub[i]);
-	  //printf("after global: lb = %e ub = %e\n", lb[i], ub[i]);
+	  if (oa_log_level_ >=2 && (fabs(orig_lb-lb[i])>1e-4 || fabs(orig_ub-ub[i])>1e-4)) {
+	    if (orig_ub < infty) {
+	      printf(" Strengthening ub of global cut for constraint %d from %e to %e\n", i, orig_ub, ub[i]);
+	    }
+	    else {
+	      printf(" Strengthening lb of global cut for constraint %d from %e to %e\n", i, orig_lb, lb[i]);
+	    }
+	  }
 	  if (!retval) {
 	    std::cerr << "Error in StrengthenCut global\n";
 	  }
@@ -1999,8 +2008,12 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 	  }
 	  const Number localCutTol = 1e-4;
 	  if (lb2-lb[i] >= localCutTol || ub[i]-ub2 >= localCutTol) {
-	    // ToDo write this output depending on some print level
-	    printf("Adding local cut for constraint %d.\n", bindi);
+	    if (ub2 < infty) {
+	      printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", i, ub[i], ub2);
+	    }
+	    else {
+	      printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", i,lb[i], lb2);
+	    }
 	    // Now we generate a new cut
 	    OsiRowCut newCut2;
 	    newCut2.setEffectiveness(99.99e99);
@@ -2013,7 +2026,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       }
     }
     if(global) {
-      newCut.setGloballyValidAsInteger(2);
+      newCut.setGloballyValidAsInteger(1);
     }
     newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[i]);
@@ -2062,7 +2075,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     if(genCut) {
       OsiRowCut newCut;
       if(global)
-	newCut.setGloballyValidAsInteger(2);
+	newCut.setGloballyValidAsInteger(1);
       newCut.setEffectiveness(99.99e99);
       newCut.setRow(v);
       newCut.setLb(-DBL_MAX/*Infinity*/);
@@ -2765,6 +2778,7 @@ OsiTMINLPInterface::extractInterfaceParams()
       cut_strengthener_ = new CutStrengthener(app_->clone());
     }
 
+    app_->Options()->GetIntegerValue("oa_log_level", oa_log_level_,"bonmin.");
   }
 }
 

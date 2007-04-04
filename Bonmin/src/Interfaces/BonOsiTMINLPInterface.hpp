@@ -1037,6 +1037,8 @@ protected:
   bool firstSolve_;
   /** Object for strengthening cuts */
   SmartPtr<CutStrengthener> cut_strengthener_;
+  /** verbosity level for OA-related output */
+  int oa_log_level_;
 };
 }
 #endif
