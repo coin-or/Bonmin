@@ -97,15 +97,20 @@ int CouenneProblem::readnl (const ASL *asl) {
 
       *nll = nl;
 
-      body = new exprGroup (objconst (i), index, coeff, nll, 1);
+      //body = new exprGroup (objconst (i), index, coeff, nll, 1);
+
+      // apparently, objconst (i) is included in the obj expression
+      body = new exprGroup (0, index, coeff, nll, 1);
 
       delete [] index;
       delete [] coeff;
 
-    } else 
-      if (fabs (objconst (i) > COUENNE_EPS))
-	body = new exprSum (nl, new exprConst (objconst (i)));
-      else body = nl;
+    } else
+      // apparently, objconst (i) is included in the obj expression
+      body = nl;
+      //if (fabs (objconst (i) > COUENNE_EPS))
+      //body = new exprSum (nl, new exprConst (objconst (i)));
+      //else 
 
     ///////////////////////////////////////////////////
 

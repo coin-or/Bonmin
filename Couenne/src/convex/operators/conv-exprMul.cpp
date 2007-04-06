@@ -266,7 +266,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // intersection with the bounding box. These are in fact NOT implied
   // by the above cuts (as happens for division, for instance) and may
   // be of help.
-  /*
+
   if (wu < - COUENNE_EPS) {
     // check points A and B: second orthant intersections
     if ((xu*yl > wu) && (xl*yu <= wu)) {
@@ -276,51 +276,54 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
     else
       // check points C and D: fourth orthant intersections
       if ((xl*yu > wu) && (xu*yl <= wu)) {
-	addImplTangent (cg, cs, xl, yl, wu, xi, yi, +1, -1); // C
-	addImplTangent (cg, cs, xu, yu, wu, xi, yi, -1, -1); // D
+	addImplTangent (cg, cs, xl, yl, wu, xi, yi, -1, -1); // C
+	addImplTangent (cg, cs, xu, yu, wu, xi, yi, +1, -1); // D
       }
   }
-  else if (wl > COUENNE_EPS) {
-    // check points A and B: third orthant intersections
-    if ((xl*yl >= wl) && (xu*yu < wl)) {
-      addImplTangent (cg, cs, xl, yu, wl, xi, yi, +1, -1); // A
-      addImplTangent (cg, cs, xu, yl, wl, xi, yi, -1, -1); // B
+  else 
+    if (wl > COUENNE_EPS) {
+      // check points A and B: third orthant intersections
+      if ((xl*yl >= wl) && (xu*yu < wl)) {
+	addImplTangent (cg, cs, xl, yu, wl, xi, yi, -1, -1); // A
+	addImplTangent (cg, cs, xu, yl, wl, xi, yi, +1, -1); // B
+      }
+      else
+	// check points C and D: first orthant intersections
+	if ((xu*yu >= wl) && (xl*yl < wl)) {
+	  addImplTangent (cg, cs, xl, yu, wl, xi, yi, +1, +1); // C
+	  addImplTangent (cg, cs, xu, yl, wl, xi, yi, -1, +1); // D
+	}
     }
-    else
-      // check points C and D: first orthant intersections
-      if ((xu*yu >= wl) && (xl*yl < wl)) {
-	addImplTangent (cg, cs, xl, yu, wl, xi, yi, +1, +1); // C
-	addImplTangent (cg, cs, xu, yl, wl, xi, yi, -1, +1); // D
-      }
-  }
-  */
 }
 
 
 /// add tangent to feasibility region of w=x*y at intersection with bounding box
 
 void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
-		     CouNumber xb,
-		     CouNumber yb,
-		     CouNumber wb,
-		     int xi, int yi,
-		     int sign_check,
-		     int sign_ineq) {
+		     CouNumber xb,    // x bound
+		     CouNumber yb,    // y 
+		     CouNumber wb,    // w 
+		     int xi, int yi,  // indices of variables passed to createCut
+		     int sign_check,  // get maximum or minimum of abscissa
+		     int sign_ineq) { // lower or upper half-plane
 
   OsiRowCut *cut;
-
-  CouNumber xp, yp;
+  CouNumber xp, yp; // intersection point
 
   //  point is (xb, wb/xb) if xb*yb > wb, (wb/yb,yb) otherwise
 
-  CouNumber check = xb*yb - wb;
-  if (sign_check < 0) check = -check;
+  CouNumber check = xb*yb - wb; // violation (signed)
+
+  if (sign_check < 0) check = -check; // intersection point depends on
+				      // the violation check
 
   if (check > 0) {xp = xb;    yp = wb/xb;}
   else           {xp = wb/yb; yp = yb;}
 
   CouNumber w_xp = wb / xp;
 
-  if ((cut = cg -> createCut (yp-w_xp, sign_ineq, yi, 1., xi, w_xp/xp))) 
+  if ((cut = cg -> createCut (yp-w_xp, sign_ineq, yi, 1., xi, w_xp/xp))) {
+    printf ("\n### extra Mul cut inserted: "); cut -> print ();
     cs.insert (cut);
+  }
 }
