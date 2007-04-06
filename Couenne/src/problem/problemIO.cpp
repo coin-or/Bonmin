@@ -38,7 +38,7 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
        i != auxiliaries_.end (); i++) {
     (*i) -> print (out);
     out << " [" << (*i) -> rank (NULL) 
-	<< ","  << (*i) -> nAppear () << "] := ";
+	<< ","  << (*i) -> Multiplicity () << "] := ";
     (*i) -> Image () -> print (out); 
     out << " [ " << (*((*i) -> Lb ())) (); //-> print (out);
     out << " , " << (*((*i) -> Ub ())) (); //-> print (out);

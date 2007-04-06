@@ -11,16 +11,18 @@
 #include <exprGroup.h>
 #include <CouenneBranchingObject.hpp>
 
+#define WEI_INF   1.
+#define WEI_RANK  0.
+#define WEI_MULT  0.
 
 /// return difference between current value
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &) const {
 
-  int index = reference_ -> Image () -> getFixVar () -> Index ();
+  expression *fixvar = reference_ -> Image () -> getFixVar ();
+  int index = fixvar -> Index ();
 
   if (index < 0)
     return 0.;
-
-  //  if (index < 0) return 0;
 
   //printf("vars: "); for (int i=0;i<18;i++) printf("%+7.1f ",expression::Variable(i)); printf ("\n");
 
@@ -32,15 +34,6 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
-
-  /*
-  if ((fabs (info -> lower_ [index] - 
-	     info -> upper_ [index]) < COUENNE_EPS)
-      //|| (fabs (info -> solution_ [index] - info -> upper_    [index]) < COUENNE_EPS)
-      //|| (fabs (info -> solution_ [index] - info -> lower_    [index]) < COUENNE_EPS)
-      )
-    return 0.;
-  */
 
   const double & expr = (*(reference_ -> Image ())) (), 
                & var  = (*reference_) ();
@@ -72,6 +65,10 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
     //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
 
     delta = 0.;
+  else // make delta a function of the variable's rank and multiplicity
+    delta =   WEI_INF  * (1. - exp (-delta))
+            + WEI_RANK / (1. + fixvar -> rank ())
+            + WEI_MULT * (1. - 1. / fixvar -> Multiplicity ());
 
   // otherwise, return real value of difference w - f(x)
   return delta;
@@ -181,11 +178,10 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
     if ((fabs (x-l) > COUENNE_EPS) &&
 	(fabs (u-x) > COUENNE_EPS) &&
-	(fabs (u-l) > COUENNE_EPS) 
-	||
-	(fabs (xr-lr) < COUENNE_EPS) ||
-	(fabs (ur-xr) < COUENNE_EPS) ||
-	(fabs (ur-lr) < COUENNE_EPS))
+	(fabs (u-l) > COUENNE_EPS)
+	|| (fabs (xr-lr) < COUENNE_EPS)
+	|| (fabs (ur-xr) < COUENNE_EPS)
+	|| (fabs (ur-lr) < COUENNE_EPS))
 
       return new CouenneBranchingObject (depvar);
   }

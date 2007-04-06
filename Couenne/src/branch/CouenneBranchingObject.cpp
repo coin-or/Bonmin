@@ -58,7 +58,7 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
   if (0) {
     printf ("Branch::constructor: ");
     reference_ -> print (std::cout);
-    printf (" on %f (%f) [%f,%f]\n", 
+    printf (" on %.3e (%.3e) [%.3e,%.3e]\n", 
 	    value_, 
 	    expression::Variable (reference_ -> Index ()),
 	    expression::Lbound   (reference_ -> Index ()),
@@ -103,6 +103,10 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 		solver -> getColUpper () [reference_ -> Index()], value_);
   }
 
+  if (0)
+    printf (" [%.3e,%.3e]", solver -> getColLower () [reference_ -> Index ()],
+	    solver -> getColUpper () [reference_ -> Index ()]);
+
   if (way) // ">=" node, set lower bound (round if this variable is integer)
     solver -> setColLower (reference_ -> Index (), 
 			   reference_ -> isInteger () ? ceil  (value_) : value_);
@@ -110,8 +114,18 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     solver -> setColUpper (reference_ -> Index (), 
 			   reference_ -> isInteger () ? floor (value_) : value_);
 
-  //  printf ("################################# Branch: x%d %c= %.12f\n", 
-  //	  reference_ -> Index (), way ? '>' : '<', value_);
+  if (0) {
+
+    printf (" --> [%.3e,%.3e]", solver -> getColLower () [reference_ -> Index ()],
+	    solver -> getColUpper () [reference_ -> Index ()]);
+
+    printf ("### Branch: x%d %c= %.12f\n", 
+	    reference_ -> Index (), way ? '>' : '<', value_);
+
+    for (int i=0; i<15; i++)
+      printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
+  	                             solver -> getColUpper () [i]);
+  }
 
   branchIndex_++;
   return 0.; // estimated change in objective function

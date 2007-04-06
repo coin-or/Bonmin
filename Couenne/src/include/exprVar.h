@@ -18,8 +18,8 @@
 class CouenneProblem;
 
 
-// variable-type operator. All variables of the expression must be
-// objects of this class
+/// variable-type operator. All variables of the expression must be
+/// objects of this class
 
 class exprVar: public expression {
 
@@ -29,80 +29,80 @@ class exprVar: public expression {
 
  public:
 
-  // node type
+  /// node type
   virtual inline enum nodeType Type () 
     {return VAR;}
 
-  // Constructor
+  /// Constructor
   exprVar (int varIndex):
     varIndex_ (varIndex) {}
 
-  // destructor
+  /// destructor
   virtual ~exprVar () {}
 
-  // copy constructor
+  /// copy constructor
   exprVar (const exprVar &e):
     varIndex_ (e.Index ()) {}
 
-  // cloning method
+  /// cloning method
   virtual exprVar *clone () const
     {return new exprVar (*this);}
 
-  // get variable index in problem
+  /// get variable index in problem
   inline int Index () const
     {return varIndex_;}
 
-  // print
+  /// print
   virtual void print (std::ostream &out) const
     {out << "x_" << varIndex_;}
 
-  // return the value of the variable
+  /// return the value of the variable
   virtual inline CouNumber operator () () 
     {return (currValue_ = expression::variables_ [varIndex_]);}
 
-  // return the value of the variable
+  /// return the value of the variable
   inline CouNumber Value ()
     {return currValue_;}
 
-  // differentiation
+  /// differentiation
   virtual inline expression *differentiate (int index) 
     {return new exprConst ((index == varIndex_) ? 1 : 0);}
 
-  // dependence on variable set
+  /// dependence on variable set
   virtual bool dependsOn (int *, int);
 
-  // simplify
+  /// simplify
   inline expression *simplify () 
     {return NULL;}
 
-  // get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity ()
     {return LINEAR;}
 
-  // is this expression integer?
+  /// is this expression integer?
   virtual bool isInteger ()
     {return false;}
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  // generate convexification cut for constraint w = this
+  /// generate convexification cut for constraint w = this
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  // return an index to the variable's argument that is better fixed
-  // in a branching rule for solving a nonconvexity gap
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar () {return this;}
 
-  ///
+  /// code for comparison
   virtual enum expr_type code () {return COU_EXPRVAR;}
-
-  /// used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *p)
-    {return 1;} 
 
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, char *);
+
+  /// rank of an original variable is always one
+  virtual int rank (CouenneProblem *p) 
+    {return 1;}
 };
 
 #endif

@@ -41,7 +41,7 @@ class exprAux: public exprVar {
   /// number of appearances of this aux in the formulation. The more
   /// times it occurs in the formulation, the more implication its
   /// branching has on other variables
-  int nappear_;
+  int multiplicity_;
 
  public:
 
@@ -61,24 +61,22 @@ class exprAux: public exprVar {
 
   // copy constructor
   exprAux (const exprAux &e):
-    exprVar  (e.varIndex_),
-    image_   (e.Image () -> clone ()),
-    rank_    (e.rank_),
-    nappear_ (e.nappear_)
+    exprVar       (e.varIndex_),
+    image_        (e.image_ -> clone ()),
+    //    lb_           (e.lb_    -> clone ()),
+    //    ub_           (e.ub_    -> clone ()),
+    rank_         (e.rank_),
+    multiplicity_ (e.multiplicity_) {
 
-    {image_ -> getBounds (lb_, ub_);}
+    image_ -> getBounds (lb_, ub_);
+
+    lb_ = new exprMax (lb_, new exprLowerBound (varIndex_));
+    ub_ = new exprMin (ub_, new exprUpperBound (varIndex_));
+  }
 
   // cloning method
   virtual exprAux *clone () const
     {return new exprAux (*this);}
-
-  // set lower bound
-  void setLB (expression *lb) 
-    {if (lb_) delete lb_; lb_ = lb;}
-
-  // set upper bound
-  void setUB (expression *ub) 
-    {if (ub_) delete ub_; ub_ = ub;}
 
   // Bound get
   expression *Lb () {return lb_;}
@@ -123,11 +121,16 @@ class exprAux: public exprVar {
     ub = new exprUpperBound (varIndex_);
   }
 
-  virtual void resetBounds () {
+  /// set bounds depending on both branching rules and propagated
+  /// bounds. To be used after standardization
+  inline void crossBounds () {
 
-    delete lb_;
-    delete ub_;
-    image_ -> getBounds (lb_, ub_);
+    expression *l0, *u0;
+
+    image_ -> getBounds (l0, u0);
+
+    lb_ = new exprMax (lb_, l0);
+    ub_ = new exprMin (ub_, u0);
   }
 
   // generate cuts for expression associated with this auxiliary
@@ -135,11 +138,14 @@ class exprAux: public exprVar {
 		     OsiCuts &, const CouenneCutGenerator *);
 
   /// used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *p)
+  virtual inline int rank (CouenneProblem *p = NULL)
     {return rank_;} 
 
   /// Tell this variable appears once more
-  int &nAppear () {return nappear_;}
+  inline void increaseMult () {++multiplicity_;}
+
+  /// How many times this variable appears 
+  inline int Multiplicity () {return multiplicity_;}
 };
 
 #endif

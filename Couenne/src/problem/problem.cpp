@@ -127,7 +127,7 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
     delete w;
     w = *i;
-    ++ (w -> nAppear ());
+    w -> increaseMult ();
   }
 
   return w;
@@ -177,7 +177,10 @@ void CouenneProblem::standardize () {
 
     // re-create auxiliary bounds
 
-    auxiliaries_ [j] -> resetBounds ();
+    lb_ [i] = -COUENNE_INFINITY;
+    ub_ [i] =  COUENNE_INFINITY;
+
+    auxiliaries_ [j] -> crossBounds ();
 
     lb_ [i] = (*(auxiliaries_ [j] -> Lb    ())) ();
     ub_ [i] = (*(auxiliaries_ [j] -> Ub    ())) ();
@@ -276,9 +279,24 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
     exprAux *aux = Aux (i);
 
-    x_  [j] = (*aux)            ();
-    lb_ [j] = (*(aux -> Lb ())) ();
-    ub_ [j] = (*(aux -> Ub ())) ();
+    CouNumber lb, ub;
+
+    x_ [j] = (*aux)            ();
+
+    // set bounds in two stages
+    lb     = (*(aux -> Lb ())) ();
+    ub     = (*(aux -> Ub ())) ();
+
+    lb_ [j] = lb;
+    ub_ [j] = ub;
+
+    /*printf ("aux %d ub: %e ", j, ub_ [j]);
+    aux -> Ub () -> print (std::cout);
+    printf ("\n");
+
+    printf ("       lb: %e ", j, lb_ [j]);
+    aux -> Lb () -> print (std::cout);
+    printf ("\n");*/
   }
 
   /*for (register int i = 0, j = nVars (); i < nAux; i++, j++)

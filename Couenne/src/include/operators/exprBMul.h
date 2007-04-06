@@ -12,6 +12,14 @@
 #include <exprOp.h>
 
 
+// product that avoids NaN's 
+inline CouNumber safeProd (register CouNumber a, register CouNumber b) {
+
+  if ((fabs (a) < 1e-10) || (fabs (b) < 1e-10)) return 0;
+  return a*b;
+}
+
+
 //  class to compute lower bound of a fraction based on the bounds of
 //  both numerator and denominator
 
@@ -45,18 +53,20 @@ inline CouNumber exprLBMul::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
-  CouNumber nD;
+  CouNumber nD, Nd;
 
   if (d>=0)
-    if   (n>=0) return n*d;
-    else        return n*D;
+    if   (n>=0) return safeProd (n,d);
+    else        return safeProd (n,D);
   else // d <= 0
     if (N>0)
-      if (n<0 && D>0 && (N*d > (nD = n*D))) return nD;
-      else                                  return N*d;
+      if (n<0 && D>0 && 
+	  ((Nd = safeProd (N,d)) > 
+	   (nD = safeProd (n,D)))) return nD;
+      else                         return Nd;
     else 
-      if (D>0) return n*D;
-      else     return N*D;
+      if (D>0) return safeProd (n,D);
+      else     return safeProd (N,D);
 }
 
 
@@ -99,18 +109,19 @@ inline CouNumber exprUBMul::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
-  CouNumber ND;
+  CouNumber ND, nd;
 
   if (d>0)
-    if (N<0) return N*d;
-    else     return N*D;
+    if (N<0) return safeProd (N,d);
+    else     return safeProd (N,D);
   else // d <= 0
     if (n<0) 
-      if (N>0 && D>0 && ((ND=N*D) > n*d)) return ND;
-      else                                return n*d;
+      if (N>0 && D>0 && ((ND = safeProd (N,D)) > 
+			 (nd = safeProd (n,d)))) return ND;
+      else                                       return nd;
     else 
-      if (D>0) return N*D;
-      else     return n*D;
+      if (D>0) return safeProd (N,D);
+      else     return safeProd (n,D);
 }
 
 

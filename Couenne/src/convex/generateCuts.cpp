@@ -47,10 +47,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     //////////////////////// FIRST CONVEXIFICATION //////////////////////////////////////
 
+    //for (int i=0; i<15; i++)
+    //  printf (":: %3d [%.3e,%.3e]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
+
     // initialize auxiliary variables and bounds according to originals
     problem_ -> initAuxs (const_cast <CouNumber *> (nlp_ -> getColSolution ()), 
 			  const_cast <CouNumber *> (nlp_ -> getColLower    ()),
 			  const_cast <CouNumber *> (nlp_ -> getColUpper    ()));
+
+    //for (int i=0; i<15; i++)
+    //  printf ("// %3d [%.3e,%.3e]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
 
     // OsiSolverInterface is empty yet, no information can be obtained
     // on variables or bounds -- and none is needed since our
@@ -169,7 +175,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // tighten the current relaxation by tightening the variables'
   // bounds
 
-  /*  printf ("before:");
+  /*printf ("before:");
   for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++)
     printf ("%.1f %.1f|",
 	    (problem_ -> Lb (i) > -COUENNE_INFINITY+1) ? (problem_ -> Lb (i)) : -1e9, 

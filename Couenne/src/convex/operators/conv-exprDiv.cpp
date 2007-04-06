@@ -27,10 +27,7 @@ exprAux *exprDiv::standardize (CouenneProblem *p) {
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
-
   // TODO: Use method on Tawarmalani-Sahinidis //////////////////////////////
-
-  // TODO: apply implied bounds
 
   // get bounds of numerator and denominator
 
@@ -56,10 +53,15 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   expression *xe = arglist_ [0];
   expression *ye = arglist_ [1];
 
-  CouNumber wl = (*wle) (), wu = (*wue) ();
+  CouNumber wl = (*wle) (), wu = (*wue) (),
+            xl = (*xle) (), xu = (*xue) ();
 
-  // Add McCormick convexification cuts. Reduce w = x/y to the case
-  // x = wy and apply the same rule as for multiplications:
+  delete yle; delete yue;
+  delete wle; delete wue;
+  delete xle; delete xue;
+
+  // Add McCormick convexification cuts. Reduce w = x/y to x = wy and
+  // apply the same rule as for multiplications:
   //
   // 1) x >= yl w + wl y - yl wl
   // 2) x >= yu w + wu y - yu wu
@@ -92,8 +94,4 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if (is_boundbox_regular (yu, wl)
       && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
     cs.insert (cut);
-
-  delete yle; delete yue;
-  delete wle; delete wue;
-  delete xle; delete xue;
 }

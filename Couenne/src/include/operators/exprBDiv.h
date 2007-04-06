@@ -12,6 +12,14 @@
 #include <exprOp.h>
 
 
+// division that avoids NaN's 
+inline CouNumber safeDiv (register CouNumber a, register CouNumber b) {
+
+  if ((fabs (a) < 1e-10) && (fabs (b) < 1e-10)) return 0;
+  return a/b;
+}
+
+
 //  class to compute lower bound of a fraction based on the bounds of
 //  both numerator and denominator
 
@@ -52,12 +60,12 @@ inline CouNumber exprLBDiv::operator () () {
   register CouNumber n = *sp--;
                                                      // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                             // (?,?,+,+)
-    if   (n > 0) return n/D;                         // (+,+,+,+) --> n/D
-    else         return n/d;                         // (-,?,+,+) --> n/d
+    if   (n > 0) return safeDiv (n,D);               // (+,+,+,+) --> n/D
+    else         return safeDiv (n,d);               // (-,?,+,+) --> n/d
   } else  // d <= 0
     if      (D > COUENNE_EPS) return - COUENNE_INFINITY; // (?,?,-,+) --> unbounded
-    else if (N > COUENNE_EPS) return N/D;                // (?,+,-,-) --> N/D
-    else                      return N/d;                // (-,-,-,-) --> N/d
+    else if (N > COUENNE_EPS) return safeDiv (N,D);      // (?,+,-,-) --> N/D
+    else                      return safeDiv (N,d);      // (-,-,-,-) --> N/d
 }
 
 
@@ -96,12 +104,12 @@ inline CouNumber exprUBDiv::operator () () {
   register CouNumber n = *sp--;
                                                        // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                                                     
-    if   (N < 0) return N/D;                           // (-,-,+,+) --> N/D
-    else         return N/d;                           // (?,+,+,+) --> N/d
+    if   (N < 0) return safeDiv (N,D);                 // (-,-,+,+) --> N/D
+    else         return safeDiv (N,d);                 // (?,+,+,+) --> N/d
   } else { // d <= 0
     if      (D >   COUENNE_EPS) return + COUENNE_INFINITY; // (?,?,-,+) --> unbounded
-    else if (n < - COUENNE_EPS) return n/D;              // (-,?,-,-) --> n/D
-    else                        return n/d;              // (+,+,-,-) --> n/d
+    else if (n < - COUENNE_EPS) return safeDiv (n,D);  // (-,?,-,-) --> n/D
+    else                        return safeDiv (n,d);  // (+,+,-,-) --> n/d
   }
 }
 

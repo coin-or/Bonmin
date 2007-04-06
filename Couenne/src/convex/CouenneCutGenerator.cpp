@@ -50,7 +50,7 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   problem_ -> readnl      (asl);
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-    printf ("reading time: %.3fs\n", now);
+    printf ("Couenne: reading time %.3fs\n", now);
 
   now = CoinCpuTime ();
   //problem_ -> print (std::cout);
@@ -58,7 +58,7 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   problem_ -> standardize ();
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-  printf ("standardization time: %.3fs\n", now);
+    printf ("Couenne: standardization time %.3fs\n", now);
 
   septime_ = now;
 

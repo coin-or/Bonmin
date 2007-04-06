@@ -112,8 +112,9 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// defined in conv-exprDiv.cpp
-//bool is_boundbox_regular (CouNumber, CouNumber);
+/// add tangent at intersection with bounding box
+void addImplTangent (const CouenneCutGenerator *, OsiCuts &, 
+		     CouNumber, CouNumber, CouNumber, int, int, int, int);
 
 
 // generate convexification cut for constraint w = x*y
@@ -136,9 +137,9 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   OsiRowCut *cut;
 
-  int w_ind = w  -> Index (), 
-      x_ind = xe -> Index (), 
-      y_ind = ye -> Index ();
+  int wi = w  -> Index (), 
+      xi = xe -> Index (), 
+      yi = ye -> Index ();
 
   // if expression is x*c or c*y, with c constant from the problem
   // definition or from the branching rules, the expression is
@@ -197,7 +198,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	// strange case: w = c0*c1, should have been dealt with in
 	// simplify, but who knows...
 
-	if ((cut = cg -> createCut (c0 * c1, 0, w_ind, CouNumber (1.))))
+	if ((cut = cg -> createCut (c0 * c1, 0, wi, CouNumber (1.))))
 	  cs.insert (cut);
       }
       else {
@@ -205,10 +206,10 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	CouNumber coe;
 	int ind;
 
-	if (is0const) {coe = c0; ind = y_ind;} // c*y
-	else          {coe = c1; ind = x_ind;} // x*c
+	if (is0const) {coe = c0; ind = yi;} // c*y
+	else          {coe = c1; ind = xi;} // x*c
 
-	if ((cut = cg -> createCut (CouNumber (0.), 0, w_ind, 
+	if ((cut = cg -> createCut (CouNumber (0.), 0, wi, 
 				    CouNumber (-1.), ind, coe)))
 	  cs.insert (cut);
       }
@@ -222,7 +223,12 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   w  -> getBounds (wle, wue);
 
   CouNumber xl = (*xle) (), xu = (*xue) (), 
-            yl = (*yle) (), yu = (*yue) ();
+            yl = (*yle) (), yu = (*yue) (),
+            wl = (*wle) (), wu = (*wue) ();
+
+  delete xle; delete xue;
+  delete yle; delete yue;
+  delete wle; delete wue;
 
   // Add McCormick convexification cuts:
   //
@@ -236,29 +242,85 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // 1)
   if (is_boundbox_regular (yl, xl)
-      && (cut = cg -> createCut (yl*xl, -1, w_ind, CouNumber (-1.), 
-				 x_ind, yl, y_ind, xl)))
+      && (cut = cg -> createCut (yl*xl, -1, wi, -1., xi, yl, yi, xl)))
     cs.insert (cut);
 
   // 2)
   if (is_boundbox_regular (yu, xu)
-      && (cut = cg -> createCut (yu*xu, -1, w_ind, CouNumber (-1.), 
-				 x_ind, yu, y_ind, xu)))
+      && (cut = cg -> createCut (yu*xu, -1, wi, -1., xi, yu, yi, xu)))
     cs.insert (cut);
 
   // 3)
   if (is_boundbox_regular (yl, xu)
-      && (cut = cg -> createCut (yl*xu, +1, w_ind, CouNumber (-1.), 
-				 x_ind, yl, y_ind, xu)))
+      && (cut = cg -> createCut (yl*xu, +1, wi, -1., xi, yl, yi, xu)))
     cs.insert (cut);
 
   // 4)
   if (is_boundbox_regular (yu, xl)
-      && (cut = cg -> createCut (yu*xl, +1, w_ind, CouNumber (-1.), 
-				 x_ind, yu, y_ind, xl)))
+      && (cut = cg -> createCut (yu*xl, +1, wi, -1., xi, yu, yi, xl)))
     cs.insert (cut);
 
-  delete xle; delete xue;
-  delete yle; delete yue;
-  delete wle; delete wue;
+  // extra cuts for the two cases w = xy >= l > 0 and w = xy <= u < 0
+  //
+  // These cuts are added at the tangent of the curve xy=k, on the
+  // intersection with the bounding box. These are in fact NOT implied
+  // by the above cuts (as happens for division, for instance) and may
+  // be of help.
+  /*
+  if (wu < - COUENNE_EPS) {
+    // check points A and B: second orthant intersections
+    if ((xu*yl > wu) && (xl*yu <= wu)) {
+      addImplTangent (cg, cs, xl, yl, wu, xi, yi, +1, +1); // A
+      addImplTangent (cg, cs, xu, yu, wu, xi, yi, -1, +1); // B
+    }
+    else
+      // check points C and D: fourth orthant intersections
+      if ((xl*yu > wu) && (xu*yl <= wu)) {
+	addImplTangent (cg, cs, xl, yl, wu, xi, yi, +1, -1); // C
+	addImplTangent (cg, cs, xu, yu, wu, xi, yi, -1, -1); // D
+      }
+  }
+  else if (wl > COUENNE_EPS) {
+    // check points A and B: third orthant intersections
+    if ((xl*yl >= wl) && (xu*yu < wl)) {
+      addImplTangent (cg, cs, xl, yu, wl, xi, yi, +1, -1); // A
+      addImplTangent (cg, cs, xu, yl, wl, xi, yi, -1, -1); // B
+    }
+    else
+      // check points C and D: first orthant intersections
+      if ((xu*yu >= wl) && (xl*yl < wl)) {
+	addImplTangent (cg, cs, xl, yu, wl, xi, yi, +1, +1); // C
+	addImplTangent (cg, cs, xu, yl, wl, xi, yi, -1, +1); // D
+      }
+  }
+  */
+}
+
+
+/// add tangent to feasibility region of w=x*y at intersection with bounding box
+
+void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
+		     CouNumber xb,
+		     CouNumber yb,
+		     CouNumber wb,
+		     int xi, int yi,
+		     int sign_check,
+		     int sign_ineq) {
+
+  OsiRowCut *cut;
+
+  CouNumber xp, yp;
+
+  //  point is (xb, wb/xb) if xb*yb > wb, (wb/yb,yb) otherwise
+
+  CouNumber check = xb*yb - wb;
+  if (sign_check < 0) check = -check;
+
+  if (check > 0) {xp = xb;    yp = wb/xb;}
+  else           {xp = wb/yb; yp = yb;}
+
+  CouNumber w_xp = wb / xp;
+
+  if ((cut = cg -> createCut (yp-w_xp, sign_ineq, yi, 1., xi, w_xp/xp))) 
+    cs.insert (cut);
 }

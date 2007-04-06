@@ -25,7 +25,7 @@ exprAux::exprAux (expression *image, int index, int rank):
   exprVar  (index),
   image_   (image),
   rank_    (rank),
-  nappear_ (1) {
+  multiplicity_ (1) {
 
   // do this later, in standardize()
   //  image_ -> getBounds (lb_, ub_);
@@ -39,11 +39,11 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
   int j = cs.sizeRowCuts ();
+  CouNumber l; 
 
-  CouNumber l = expression::Lbound (varIndex_),
-            u = expression::Ubound (varIndex_);
-
-  if ((!(cg -> isFirst ())) && (fabs (u-l) < COUENNE_EPS)) {
+  if ((!(cg -> isFirst ())) && 
+      (fabs ((l = expression::Ubound (varIndex_)) - 
+	          expression::Lbound (varIndex_)) < COUENNE_EPS)) {
 
     OsiRowCut *cut = cg -> createCut (l, 0, varIndex_, 1.);
     if (cut) cs.insert (cut);
