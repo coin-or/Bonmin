@@ -82,10 +82,12 @@ class exprOp: public expression {
 
   /// clone argument list (for use with clone method
   expression **clonearglist () const {
-    expression **al = new expression * [nargs_];
-    for (register int i=0; i<nargs_; i++)
-      al [i] = arglist_ [i] -> clone ();
-    return al;
+    if (nargs_) {
+      expression **al = new expression * [nargs_];
+      for (register int i=0; i<nargs_; i++)
+	al [i] = arglist_ [i] -> clone ();
+      return al;
+    } else return NULL;
   }
 
   /// compress argument list
@@ -101,10 +103,11 @@ class exprOp: public expression {
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar ()
-    {return arglist_ [0];}
+    {printf ("### Warning: called empty exprOp::getFixVar()\n"); return arglist_ [0];}
 
   /// return code to classify type of expression
-  virtual enum expr_type code () {return COU_EXPROP;}
+  virtual enum expr_type code ()
+    {return COU_EXPROP;}
 
   /// compare with other generic exprOp
   virtual int compare (exprOp &);

@@ -28,7 +28,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   double now = CoinCpuTime ();
 
-  //  printf ("-------------------- Couenne::GENERATE CUTS"); fflush (stdout);
+  if (firstcall_) {
+    printf ("Couenne:"); 
+    fflush (stdout);
+  }
 
   int ncols = problem_ -> nVars () + problem_ -> nAuxs ();
 
@@ -176,11 +179,19 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // bounds
 
   /*printf ("before:");
-  for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++)
-    printf ("%.1f %.1f|",
-	    (problem_ -> Lb (i) > -COUENNE_INFINITY+1) ? (problem_ -> Lb (i)) : -1e9, 
-	    (problem_ -> Ub (i) <  COUENNE_INFINITY-1) ? (problem_ -> Ub (i)) : 1e9);
-	    printf ("\n");*/
+  for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++) {
+    printf ("%3d: %+e %+e ", i, problem_ -> Lb (i), problem_ -> Ub (i));
+    if (i >= problem_ -> nVars ()) {
+      problem_ -> Aux (i-problem_ -> nVars ()) -> print (std::cout);
+      printf (" := ");
+      problem_ -> Aux (i-problem_ -> nVars ()) -> Image () -> print (std::cout); printf (" [");
+      problem_ -> Aux (i-problem_ -> nVars ()) -> Lb () -> print (std::cout); printf (" , ");
+      problem_ -> Aux (i-problem_ -> nVars ()) -> Ub () -> print (std::cout); printf ("]");
+    }
+    printf ("\n");
+    }*/
+  //(problem_ -> Lb (i) > -COUENNE_INFINITY+1) ? (problem_ -> Lb (i)) : -1e9, 
+  //(problem_ -> Ub (i) <  COUENNE_INFINITY-1) ? (problem_ -> Ub (i)) : 1e9);
 
   int   ntightened = 0, 
       nbwtightened = 0, 
@@ -233,7 +244,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  }
 	}
     }
-  } while ((ntightened || nbwtightened) && (niter++ < 10));
+  } while (ntightened && nbwtightened && (niter++ < 10));
+  // as opposed to ((ntightened || nbwtightened) && (niter++ < 10));
 
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
@@ -351,13 +363,19 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   free (changed);
 
   if (firstcall_) {
+    if (cs.sizeRowCuts ())
+      printf (" %d initial cuts", cs.sizeRowCuts ());
+    printf ("\n");
+  }
+
+ end_genCuts:
+
+  if (firstcall_) {
     firstcall_  = false;
     ntotalcuts_ = nrootcuts_ = cs.sizeRowCuts ();
   }
   else ntotalcuts_ += cs.sizeRowCuts ();
 					
- end_genCuts:
-
   /*printf ("after: ");
   for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++)
     printf ("%.1f %.1f|",
@@ -366,8 +384,4 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	    printf ("\n");*/
 
   septime_ += CoinCpuTime () - now;
-
-  /*if (cs.sizeRowCuts ())
-    printf (":::::::::::::::::::::::::::::::::: generate cuts (%d) %d %d\n",
-    cs.sizeRowCuts (), ntotalcuts_, nrootcuts_);*/
 }

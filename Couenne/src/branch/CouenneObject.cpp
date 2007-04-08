@@ -18,6 +18,10 @@
 /// return difference between current value
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &) const {
 
+  // infeasibility is always null for linear expressions
+  if (reference_ -> Image () -> Linearity () <= LINEAR)
+    return 0.;
+
   expression *fixvar = reference_ -> Image () -> getFixVar ();
   int index = fixvar -> Index ();
 
@@ -81,7 +85,8 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   int index = reference_ -> Index ();
 
   // should never happen...
-  if (index < 0) return 0;
+  if (index < 0) 
+    return 0;
 
   double val = info -> solution_ [index];
 

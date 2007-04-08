@@ -12,43 +12,47 @@
 #include <exprOp.h>
 
 
-// division that avoids NaN's 
+/// division that avoids NaN's 
 inline CouNumber safeDiv (register CouNumber a, register CouNumber b) {
 
   if ((fabs (a) < 1e-10) && (fabs (b) < 1e-10)) return 0;
+  if (fabs (a) > 1e20) {
+    if (a > 1e20) return ((b < 0) ? -COUENNE_INFINITY :  COUENNE_INFINITY);
+    else          return ((b < 0) ?  COUENNE_INFINITY : -COUENNE_INFINITY);
+  }
   return a/b;
 }
 
 
-//  class to compute lower bound of a fraction based on the bounds of
-//  both numerator and denominator
+///  class to compute lower bound of a fraction based on the bounds of
+///  both numerator and denominator
 
 class exprLBDiv: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprLBDiv  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprLBDiv (clonearglist (), nargs_);}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
-  // I/O
+  /// I/O
   void print (std::ostream &) const;
 };
 
 
-// output
+/// output
 inline void exprLBDiv::print (std::ostream &out = std::cout) const
 {exprOp::print (out, "LB_div", PRE);}
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprLBDiv::operator () () {
 
@@ -58,6 +62,8 @@ inline CouNumber exprLBDiv::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
+
+  //  printf ("lbdiv: %e %e %e %e\n", n,N,d,D);
                                                      // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                             // (?,?,+,+)
     if   (n > 0) return safeDiv (n,D);               // (+,+,+,+) --> n/D
@@ -69,30 +75,30 @@ inline CouNumber exprLBDiv::operator () () {
 }
 
 
-//  class to compute lower bound of a fraction based on the bounds of
-//  both numerator and denominator
+///  class to compute lower bound of a fraction based on the bounds of
+///  both numerator and denominator
 
 class exprUBDiv: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprUBDiv  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprUBDiv (clonearglist (), nargs_);}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
-  // output
+  /// output
   void print (std::ostream &) const;
 };
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprUBDiv::operator () () {
 
@@ -102,6 +108,8 @@ inline CouNumber exprUBDiv::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
+
+  //  printf ("ubdiv: %e %e %e %e\n", n,N,d,D);
                                                        // (n,N,d,D)     lb 
   if (d > COUENNE_EPS) {                                                     
     if   (N < 0) return safeDiv (N,D);                 // (-,-,+,+) --> N/D
@@ -113,8 +121,8 @@ inline CouNumber exprUBDiv::operator () () {
   }
 }
 
-// output
-inline void exprUBDiv::print (std::ostream &out = std::cout) const
+/// output
+void exprUBDiv::print (std::ostream &out = std::cout) const
 {exprOp::print (out, "UB_div", PRE);}
 
 #endif

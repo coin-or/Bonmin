@@ -83,7 +83,7 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
 
   // some convexification cuts (as the lower envelopes of convex
   // functions) are global, hence here is a tool to make them valid
-  // throughout the code
+  // throughout the BB tree
 
   cut -> setGloballyValid (is_global);
 

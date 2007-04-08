@@ -62,10 +62,12 @@ class exprPow: public exprOp {
 
   // return an index to the variable's argument that is better fixed
   // in a branching rule for solving a nonconvexity gap
-  //   getFixVar () {return arglist_ [0];}
+  expression *getFixVar () 
+    {return arglist_ [0];}
 
-  ///
-  virtual enum expr_type code () {return COU_EXPRPOW;}
+  /// code for comparison
+  virtual enum expr_type code () 
+    {return COU_EXPRPOW;}
 
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, char *);

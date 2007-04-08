@@ -69,7 +69,7 @@ class exprGroup: public exprSum {
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)
-  virtual exprAux *standardize (CouenneProblem *p);
+  //  virtual exprAux *standardize (CouenneProblem *p);
 
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 

@@ -74,7 +74,7 @@ void exprGroup::getBounds (expression *&lb, expression *&ub) {
 
 /// reduce expression in standard form, creating additional aux
 /// variables (and constraints)
-exprAux *exprGroup::standardize (CouenneProblem *p) {
+/*exprAux *exprGroup::standardize (CouenneProblem *p) {
 
   // same as in exprSum... the only difference is that we also have to
   // arrange it with the linear and constant term later in generateCuts
@@ -83,7 +83,7 @@ exprAux *exprGroup::standardize (CouenneProblem *p) {
   // create auxiliary pointing to this expression
   return p -> addAuxiliary (this);
 }
-
+*/
 
 // generate equality between *this and *w
 void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si, 

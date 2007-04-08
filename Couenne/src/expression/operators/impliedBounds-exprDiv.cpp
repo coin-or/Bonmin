@@ -16,8 +16,6 @@
 
 bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
-  //  return false;
-
   bool resx, resy = resx = false;
 
   // deal with the "y is a constant"

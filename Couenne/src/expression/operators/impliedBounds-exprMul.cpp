@@ -15,8 +15,6 @@
 
 bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
-  //  return false;
-
   bool res = false;
   int ind;
 

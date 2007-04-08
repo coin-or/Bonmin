@@ -56,8 +56,8 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 /// compare generic expression with other expression
 int expression::compare (expression &e1) {
 
-  int c0 = code (),
-      c1 = e1. code ();
+  register int c0 = code (),
+               c1 = e1. code ();
 
   if      (c0 < c1) return -1;
   else if (c0 > c1) return  1;
@@ -82,15 +82,15 @@ int expression::compare (expression &e1) {
 
   // expressions are both variables or constants
 
-  int i0 =     Index (),
-      i1 = e1. Index ();
+  register int i0 =     Index (),
+               i1 = e1. Index ();
 
   if (i0 < i1) return -1;
   if (i0 > i1) return  1;
   if (i0 >= 0) return  0; // same variables
 
   // both are numbers
-  CouNumber v1 = e1. Value ();
+  register CouNumber v1 = e1. Value ();
 
   if (currValue_ < v1) return -1;
   if (currValue_ > v1) return  1;

@@ -60,6 +60,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprPow-envelope.cpp \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
+	convex/operators/linearize.cpp \
 	convex/operators/conv-exprInv.cpp \
 	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/conv-exprExp.cpp \

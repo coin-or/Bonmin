@@ -69,6 +69,7 @@ class exprAux: public exprVar {
     multiplicity_ (e.multiplicity_) {
 
     image_ -> getBounds (lb_, ub_);
+    //getBounds (lb_, ub_);
 
     lb_ = new exprMax (lb_, new exprLowerBound (varIndex_));
     ub_ = new exprMin (ub_, new exprUpperBound (varIndex_));
@@ -104,8 +105,8 @@ class exprAux: public exprVar {
 
   // Get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
-    {return LINEAR;
-    /*return image_ -> Linearity ();*/}
+    {return LINEAR;}
+    /*return image_ -> Linearity ();*/
 
   // Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lb, expression *&ub) {
@@ -128,6 +129,7 @@ class exprAux: public exprVar {
     expression *l0, *u0;
 
     image_ -> getBounds (l0, u0);
+    //image_ -> getBounds (lb_, ub_);
 
     lb_ = new exprMax (lb_, l0);
     ub_ = new exprMin (ub_, u0);

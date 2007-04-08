@@ -54,14 +54,17 @@ class exprSum: public exprOp {
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  ///
-  virtual enum expr_type code () {return COU_EXPRSUM;}
+  /// code for comparison
+  virtual enum expr_type code () 
+    {return COU_EXPRSUM;}
 
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, char *);
 
-  ///
-  virtual expression *getFixVar () {return *arglist_;}
+  /// compute best variable to branch on (nonsense here, as there is
+  /// no nonlinear infeasibility)
+  virtual expression *getFixVar () 
+    {printf ("### Warning: called empty exprSum::getFixVar\n"); return *arglist_;}
 };
 
 

@@ -13,52 +13,52 @@
 #include <exprAux.h>
 #include <CouenneProblem.h>
 
-// class for multiplications
+/// class for multiplications
 
 class exprMul: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprMul (expression **, int);
 
   exprMul (expression *, expression *);
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprMul (clonearglist (), nargs_);}
 
-  // print expression
+  /// print expression
   void print (std::ostream&) const;
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   inline CouNumber operator () ();
 
-  // differentiation
+  /// differentiation
   expression *differentiate (int index); 
 
-  // simplification
+  /// simplification
   expression *simplify ();
 
-  // get a measure of "how linear" the expression is:
+  /// get a measure of "how linear" the expression is:
   virtual int Linearity ();
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // reduce expression in standard form, creating additional aux
-  // variables (and constraints)
+  /// reduce expression in standard form, creating additional aux
+  /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  // return an index to the variable's argument that is better fixed
-  // in a branching rule for solving a nonconvexity gap
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
   expression *getFixVar ();
 
-  ///
+  /// code for comparison
   virtual enum expr_type code () {return COU_EXPRMUL;}
 
   /// implied bound processing
@@ -66,7 +66,7 @@ class exprMul: public exprOp {
 };
 
 
-// compute multiplication
+/// compute multiplication
 
 inline CouNumber exprMul:: operator () () {
 

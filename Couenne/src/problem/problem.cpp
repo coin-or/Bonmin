@@ -84,7 +84,7 @@ void CouenneProblem::addRNGConstraint (expression *body, expression *lb=NULL, ex
 }
 
 
-/// add variable to the problem
+/// add variable to the problem -- check whether it is integer (isDiscrete)
 
 expression *CouenneProblem::addVariable (bool isDiscrete) {
 
@@ -109,6 +109,7 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
   std::set <exprAux *, compExpr>::iterator i;
 
+  // create new aux associated with that expression
   exprAux *w = new exprAux (symbolic, 
 			    variables_ . size () + auxiliaries_ . size (), 
 			    symbolic -> rank (this));

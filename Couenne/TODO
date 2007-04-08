@@ -1,5 +1,4 @@
 - cut currValue_ from expressions
-- extra forward bound tightening for products (can do in exprMul::generateCuts())
 - marginals bound tightening
 - documentation
 - improve convexification of x/y

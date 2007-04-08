@@ -11,15 +11,16 @@
 #include <exprConst.h>
 
 
-/// Constructors, destructor
+/// Constructor
 exprSum::exprSum  (expression **al, int n): 
   exprOp (al, n) { //< non-leaf expression, with argument list
 
   // commutative operator, sort elements
-
   qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
 }
 
+
+/// Copy constructor
 exprSum::exprSum (expression *arg0, expression *arg1):
   exprOp (arg0, arg1) {
 
@@ -27,7 +28,7 @@ exprSum::exprSum (expression *arg0, expression *arg1):
 }
 
 
-// simplify sums
+/// simplify sums
 
 expression *exprSum::simplify () {
 
@@ -73,7 +74,7 @@ expression *exprSum::simplify () {
 }
 
 
-// differentiate sum of expressions
+/// differentiate sum of expressions
 
 expression *exprSum:: differentiate (int index) {
 
@@ -95,13 +96,13 @@ expression *exprSum:: differentiate (int index) {
 }
 
 
-// print
+/// print
 
 void exprSum::print (std::ostream& out) const
   {exprOp::print (out, "+", INSIDE);}
 
 
-// Get lower and upper bound of an expression (if any)
+/// Get lower and upper bound of an expression (if any)
 
 void exprSum::getBounds (expression *&lb, expression *&ub) {
 
@@ -116,7 +117,7 @@ void exprSum::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// get a measure of "how linear" the expression is (see CouenneTypes.h)
+/// get a measure of "how linear" the expression is (see CouenneTypes.h)
 
 int exprSum::Linearity () {
 

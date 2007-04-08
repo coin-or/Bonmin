@@ -15,7 +15,8 @@
 // product that avoids NaN's 
 inline CouNumber safeProd (register CouNumber a, register CouNumber b) {
 
-  if ((fabs (a) < 1e-10) || (fabs (b) < 1e-10)) return 0;
+  if ((fabs (a) < 1e-10) || (fabs (b) < 1e-10)) 
+    return 0.;
   return a*b;
 }
 
@@ -53,17 +54,17 @@ inline CouNumber exprLBMul::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
-  CouNumber nD, Nd;
 
   if (d>=0)
     if   (n>=0) return safeProd (n,d);
     else        return safeProd (n,D);
   else // d <= 0
-    if (N>0)
+    if (N>0) {
+      CouNumber Nd = safeProd (N,d), nD;
       if (n<0 && D>0 && 
-	  ((Nd = safeProd (N,d)) > 
-	   (nD = safeProd (n,D)))) return nD;
-      else                         return Nd;
+	  (Nd > (nD = safeProd (n,D)))) return nD;
+      else                              return Nd;
+    }
     else 
       if (D>0) return safeProd (n,D);
       else     return safeProd (N,D);
@@ -109,16 +110,17 @@ inline CouNumber exprUBMul::operator () () {
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
-  CouNumber ND, nd;
 
   if (d>0)
     if (N<0) return safeProd (N,d);
     else     return safeProd (N,D);
   else // d <= 0
-    if (n<0) 
-      if (N>0 && D>0 && ((ND = safeProd (N,D)) > 
-			 (nd = safeProd (n,d)))) return ND;
-      else                                       return nd;
+    if (n<0) {
+      CouNumber nd = safeProd (n,d), ND;
+      if (N>0 && D>0 && 
+	  ((ND = safeProd (N,D)) > nd)) return ND;
+      else                              return nd;
+    }
     else 
       if (D>0) return safeProd (N,D);
       else     return safeProd (n,D);
@@ -127,7 +129,7 @@ inline CouNumber exprUBMul::operator () () {
 
 // output
 
-inline void exprUBMul::print (std::ostream &out = std::cout) const
+void exprUBMul::print (std::ostream &out = std::cout) const
 {exprOp::print (out, "UB_mul", PRE);}
 
 #endif

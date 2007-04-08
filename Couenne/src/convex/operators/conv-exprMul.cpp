@@ -17,7 +17,7 @@
 #include <CouenneCutGenerator.h>
 
 
-// check if two arguments point to the same variable
+/// check if two arguments point to the same variable
 
 inline bool areSameVariables (expression *v1, expression *v2) {
   return (((v1 -> Type () == VAR) || (v1 -> Type () == AUX)) &&
@@ -26,7 +26,7 @@ inline bool areSameVariables (expression *v1, expression *v2) {
 }
 
 
-// Create standard formulation of this expression
+/// Create standard formulation of this expression
 
 exprAux *exprMul::standardize (CouenneProblem *p) {
 
@@ -52,7 +52,7 @@ exprAux *exprMul::standardize (CouenneProblem *p) {
 }
 
 
-// get lower/upper bounds of product f(x) g(x) in expression form
+/// get lower/upper bounds of product f(x) g(x) in expression form
 
 void exprMul::getBounds (expression *&lb, expression *&ub) {
 
@@ -117,14 +117,10 @@ void addImplTangent (const CouenneCutGenerator *, OsiCuts &,
 		     CouNumber, CouNumber, CouNumber, int, int, int, int);
 
 
-// generate convexification cut for constraint w = x*y
+/// generate convexification cut for constraint w = x*y
 
 void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
-
-
-  // TODO: add cuts considering w's lower and upper bounds (see
-  // implied bounds)
 
   // get bounds of numerator and denominator
 
@@ -267,6 +263,8 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // by the above cuts (as happens for division, for instance) and may
   // be of help.
 
+  //  return;
+
   if (wu < - COUENNE_EPS) {
     // check points A and B: second orthant intersections
     if ((xu*yl > wu) && (xl*yu <= wu)) {
@@ -319,6 +317,13 @@ void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   if (check > 0) {xp = xb;    yp = wb/xb;}
   else           {xp = wb/yb; yp = yb;}
+
+  // infinite or null bounds give vertical or horizontal cuts, useless
+  if ((fabs (xp) < COUENNE_EPS) ||
+      (fabs (yp) < COUENNE_EPS) ||
+      (fabs (xp) > COUENNE_INFINITY-1) ||
+      (fabs (yp) > COUENNE_INFINITY-1))
+    return;
 
   CouNumber w_xp = wb / xp;
 

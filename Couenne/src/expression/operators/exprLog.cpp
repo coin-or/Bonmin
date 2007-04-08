@@ -23,16 +23,9 @@ void exprLog::getBounds (expression *&lb, expression *&ub) {
   expression *lba, *uba;
   argument_ -> getBounds (lba, uba);
 
-  expression **all = new expression * [4];
-
-  all [0] = new exprConst (COUENNE_EPS); 
-  all [1] = new exprConst (- COUENNE_INFINITY);
-
-  all [2] = new exprClone (argument_);   
-  all [3] = new exprLog (lba);
-
-  lb = new exprMax (all, 4);
-  ub = new exprLog (uba);
+  // [low|upp]er bound of w=log(x) is log (max (0, [low|upp]er (x)))
+  lb = new exprLog (new exprMax (new exprConst (1e-100), lba));
+  ub = new exprLog (new exprMax (new exprConst (1e-100), uba));
 }
 
 

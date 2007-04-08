@@ -14,28 +14,6 @@
 #include <CouenneCutGenerator.h>
 
 
-// Create standard formulation of sums of expressions
-
-exprAux *exprSum::standardize (CouenneProblem *p) {
-
-  //  printf ("exprSum::standardize\n");
-
-  // TODO: Try a different approach. FLATTEN sum and reduce it to
-  // something similar to a psg_elem: a sum of linear terms plus a
-  // constant plus some nonlinear terms. (It only makes sense when
-  // there is at least one monomial
-
-  //  exprGroup *sum = new exprGroup (arglist_, nargs_);
-
-  // first of all, standardize all operands
-  exprOp::standardize (p);
-
-  // now simply return NULL, (the caller will assume there is nothing
-  // to change), as a sum is already standard
-  return p -> addAuxiliary (this);
-}
-
-
 // generate convexification cut for constraint w = this
 
 void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si, 

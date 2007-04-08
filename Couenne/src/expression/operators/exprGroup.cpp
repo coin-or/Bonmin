@@ -11,14 +11,17 @@
 #include <exprGroup.h>
 
 /// Constructor
-exprGroup::exprGroup  (CouNumber c0, 
-		       int *index, CouNumber *coeff, 
-		       expression **al, int n): 
+exprGroup::exprGroup  (CouNumber c0,     // constant term
+		       int *index,       // indices (array terminated by a -1)
+		       CouNumber *coeff, // coefficient vector
+		       expression **al,  // vector of nonlinear expressions to be added 
+		       int n):           // number of *nonlinear* expressions in al
   exprSum (al, n),
   c0_     (c0) {
   
   int nlin = 0;
 
+  // count linear terms
   for (register int *ind = index; *ind++ >= 0; nlin++);
 
   index_ = new int       [nlin + 1];
