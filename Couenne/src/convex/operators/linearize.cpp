@@ -198,5 +198,5 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
   expression **zero = new expression * [1];
   *zero = new exprConst (0.);
 
-  return (p -> addAuxiliary (new exprGroup (a0, indices, coeffs, zero, 1)))
+  return (p -> addAuxiliary (new exprGroup (a0, indices, coeffs, zero, 1)));
 }
