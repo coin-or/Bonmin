@@ -305,3 +305,27 @@ void CouenneProblem::initAuxs (CouNumber *x,
 	    i, j, 
 	    lb_ [j], ub_ [j]);*/
 }
+
+
+/// get auxiliary variables from original variables in the nonlinear
+/// problem
+
+void CouenneProblem::getAuxs (CouNumber *x) {
+
+  // temporarily make the expression arrays point to x (restore them
+  // at the end of this function)
+  expression::update (x, NULL, NULL);
+
+  int nAux = nAuxs ();
+
+  // set auxiliary w to f(x). This procedure is exact even though the
+  // auxiliary variables have an incomplete image, i.e. they have been
+  // decomposed previously, since they are updated with increasing
+  // index.
+
+  for (register int i = 0, j = nVars (); i < nAux; i++, j++)
+    x [j] = (*(Aux (i))) ();
+
+  // now get the x and the bound vectors back to their previous state
+  expression::update (x_, lb_, ub_);
+}

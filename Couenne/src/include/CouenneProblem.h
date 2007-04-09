@@ -132,6 +132,9 @@ class CouenneProblem {
   /// variables
   void initAuxs (CouNumber *, CouNumber *, CouNumber *);
 
+  /// get auxiliary variables from original variables
+  void getAuxs (CouNumber *);
+
   /// bound tightening
   int tightenBounds (char *) const;
 
