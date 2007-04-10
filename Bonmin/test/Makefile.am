@@ -35,7 +35,7 @@ unitTest_LDADD = \
 CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
 # List libraries of COIN projects
-CppExample_LDADD = ../src/Apps/libbonmin.la \
+CppExample_LDADD = ../src/CbcBonmin/libbonmin.la \
         $(IPOPTLIBS) \
         $(LIBCBCCOPY) \
         $(COINLIBS) \
