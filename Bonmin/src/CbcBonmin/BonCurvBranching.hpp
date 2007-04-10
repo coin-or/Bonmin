@@ -1,4 +1,4 @@
-// Copyright (C) 2006, International Business Machines
+// Copyright (C) 2006, 2007 International Business Machines
 // Corporation and others.  All Rights Reserved.
 #ifndef BonCurvBranching_H
 #define BonCurvBranching_H
@@ -43,9 +43,6 @@ protected:
 private:
   /// Default Constructor 
   BonCurvBranching ();
-  /// Store a pointer to the solver the object was created with
-  OsiTMINLPInterface * solver_;
-
 };
 
 }

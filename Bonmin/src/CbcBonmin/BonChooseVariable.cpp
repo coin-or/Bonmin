@@ -170,7 +170,7 @@ BonChooseVariable::chooseVariable(
 {
   if (numberUnsatisfied_) {
 
-    int numStrong = Min(numberUnsatisfied_, numberStrong_);
+    int numStrong = Min(numberOnList_, numberStrong_);
 
     const Number large_number = COIN_DBL_MAX;
  
@@ -182,7 +182,7 @@ BonChooseVariable::chooseVariable(
       double* change_up = new double[numStrong];
       double* change_down = new double[numStrong];
 
-      // This will return -1 if an infeasible node was detected
+      // This will return -1 if no infeasible node was detected
       best_i = fill_changes(solver, info, fixVariables,
 			    numStrong, change_down, change_up, best_way);
       if (best_i == -1) {
