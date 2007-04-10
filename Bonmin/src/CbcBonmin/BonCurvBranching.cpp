@@ -8,11 +8,18 @@
 #include "BonCurvBranching.hpp"
 #include "IpBlas.hpp"
 
+#ifdef BONMIN_CURVATURE_USE_QP_IF_SOS_FOUND
+#include "BonQPStrongBranching.hpp"
+#endif
+
 namespace Bonmin {
 
 BonCurvBranching::BonCurvBranching(OsiTMINLPInterface * solver) :
   BonChooseVariable(solver)
 {
+#ifdef BONMIN_CURVATURE_USE_QP_IF_SOS_FOUND
+  solver_ = solver;
+#endif
   SmartPtr<TNLPSolver> tnlp_solver =
     dynamic_cast<TNLPSolver *> (solver->solver());
   SmartPtr<OptionsList> options = tnlp_solver->Options();
@@ -24,6 +31,9 @@ BonCurvBranching::BonCurvBranching(OsiTMINLPInterface * solver) :
 BonCurvBranching::BonCurvBranching(const BonCurvBranching & rhs) :
   BonChooseVariable(rhs)
 {
+#ifdef BONMIN_CURVATURE_USE_QP_IF_SOS_FOUND
+  solver_ = rhs.solver_;
+#endif
   cur_estimator_ = rhs.cur_estimator_;
 }
 
@@ -32,6 +42,9 @@ BonCurvBranching::operator=(const BonCurvBranching & rhs)
 {
   if (this != &rhs) {
     BonChooseVariable::operator=(rhs);
+#ifdef BONMIN_CURVATURE_USE_QP_IF_SOS_FOUND
+    solver_ = rhs.solver_;
+#endif
     cur_estimator_ = rhs.cur_estimator_;
   }
   return *this;
@@ -54,6 +67,21 @@ BonCurvBranching::fill_changes(OsiSolverInterface * solver,
 			       double* change_down,
 			       double* change_up, int& best_way)
 {
+#ifdef BONMIN_CURVATURE_USE_QP_IF_SOS_FOUND
+  for (int i=0; i<numStrong; i++) {
+    const OsiObject * object = solver->object(list_[i]);
+    if (object->columnNumber() == -1) {
+      // At least one entry on the branching object candidate list is SOS.
+      // switch to QP based strong branching
+      // (Note: solver_ and solver may or may not be different...)
+      BonQPStrongBranching qpchoose(solver_);
+      qpchoose.setupList(info, true);
+      return qpchoose.fill_changes(solver, info, fixVariables, numStrong,
+				   change_down, change_up, best_way);
+    }
+  }
+#endif
+    
   // Get info about the current solution
   const double* solution = solver->getColSolution();// Current solution
   int numCols = solver->getNumCols();

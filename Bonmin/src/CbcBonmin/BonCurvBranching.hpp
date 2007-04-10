@@ -43,6 +43,8 @@ protected:
 private:
   /// Default Constructor 
   BonCurvBranching ();
+  /// Store a pointer to the solver the object was created with
+  OsiTMINLPInterface * solver_;
 
 };
 

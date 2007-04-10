@@ -210,11 +210,15 @@ BM: Switching to WarmStartFromRoot.\n");
     }
     const int* starts = sos->starts;
     for (i = 0; i < sos->num; ++i) {
-	osiObj[nObj++] = new OsiSOS(NULL, /* FIXME: why does the constr need */
-				    starts[i+1] - starts[i],
-				    sos->indices + starts[i],
-				    sos->weights + starts[i],
-				    sos->types[i]);
+	OsiSOS* so = new OsiSOS(NULL, /* FIXME: why does the constr need */
+				starts[i+1] - starts[i],
+				sos->indices + starts[i],
+				sos->weights + starts[i],
+				sos->types[i]);
+	// FIXME: this should go when SOS object can get a priority
+	so->setPriority(1);
+	osiObj[nObj++] = so;
+	
     }
     nlp_.addObjects(nObj, osiObj);
     for (i = 0; i < nObj; ++i) {

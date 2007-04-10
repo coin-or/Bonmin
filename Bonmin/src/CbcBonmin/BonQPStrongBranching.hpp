@@ -34,7 +34,11 @@ public:
   /// Destructor
   virtual ~BonQPStrongBranching ();
 
+#ifdef BONMIN_CURVATURE_USE_QP_IF_SOS_FOUND
+public:
+#else
 protected:
+#endif
   virtual int fill_changes(OsiSolverInterface * solver,
 			   OsiBranchingInformation *info,
 			   bool fixVariables,
