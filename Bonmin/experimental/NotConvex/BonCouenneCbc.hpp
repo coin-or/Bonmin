@@ -1,3 +1,11 @@
+// (C) Copyright International Business Machines Corporation (IBM) 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Pierre Bonami, International Business Machines Corporation
+//Date 02/14/2007
+
 #ifndef BonCouenneCbc_hpp
 #define BonCouenneCbc_hpp
 

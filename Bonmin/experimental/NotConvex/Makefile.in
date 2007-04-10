@@ -72,7 +72,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_fun_OBJECTS = BonCouenne.$(OBJEXT) BonCouenneCbc.$(OBJEXT) \
-	BonCouenneInterface.$(OBJEXT)
+	BonNlpHeuristic.$(OBJEXT) BonCouenneInterface.$(OBJEXT)
 fun_OBJECTS = $(am_fun_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
@@ -381,6 +381,8 @@ fun_SOURCES = BonCouenne.cpp \
               BonCouenneCbc.hpp \
               BonCouenneCbc.cpp \
               BonCouenneInterface.hpp \
+              BonNlpHeuristic.hpp \
+              BonNlpHeuristic.cpp \
               BonCouenneInterface.cpp
 
 fun_LDADD = \
@@ -472,6 +474,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenne.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneCbc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneInterface.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonNlpHeuristic.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

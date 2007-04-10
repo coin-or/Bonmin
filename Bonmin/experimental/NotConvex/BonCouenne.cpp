@@ -1,12 +1,12 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006 
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
 // Authors :
-// Andreas Waechter, International Business Machines Corporation
-// Pierre Bonami, Carnegie Mellon University,
+// Pietro Belloti, Carnegie Mellon University,
+// Pierre Bonami, International Business Machines Corporation
 //
-// Date : 02/15/2006
+// Date : 12/19/2006
 
 
 #if defined(_MSC_VER)

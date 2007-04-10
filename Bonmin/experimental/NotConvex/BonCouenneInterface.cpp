@@ -1,11 +1,12 @@
-// (C) Copyright International Business Machines Corporation (IBM and Carnegie Mellon University 2006 
+// (C) Copyright International Business Machines Corporation (IBM) 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
 // Authors :
+// Pietro Belloti, Carnegie Mellon University
 // Pierre Bonami, International Business Machines Corporation
 //
-// Date : 02/19/2006
+// Date : 12/19/2006
 
 
 #include "BonCouenneInterface.hpp"

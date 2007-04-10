@@ -1,16 +1,19 @@
-// (C) Copyright Carnegie Mellon University 2006
+// (C) Copyright International Business Machines Corporation (IBM) and Carnegie Mellon University 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
 // Authors :
-// Pierre Bonami, Carnegie Mellon University,
+// Pietro Belloti, Carnegie Mellon University
+// Pierre Bonami, International Business Machines Corporation
+
 //
-// Date : 03/15/2006
+// Date : 02/14/2007
 
 
 //Couenne Bonmin interface
 #include "BonCouenneCbc.hpp"
 #include "BonCouenneInterface.hpp"
+#include "BonNlpHeuristic.hpp"
 //#include "BonCouenneConvexCuts.hpp"
 
 //Couenne
@@ -30,11 +33,6 @@
 #include "BonQPStrongBranching.hpp"
 #include "BonLpStrongBranching.hpp"
 
-//OA machinery
-#include "BonDummyHeuristic.hpp"
-#include "BonOACutGenerator2.hpp"
-#include "BonOaFeasChecker.hpp"
-#include "BonOaNlpOptim.hpp"
 
 
 // Cbc Header file
@@ -197,17 +195,12 @@ namespace Bonmin
     CglKnapsackCover knapsackGen;
     CglMixedIntegerRounding mixedGen;
 
-    //Setup OA generators
+    //Setup Convexifier generators
 
     CouenneCutGenerator *ecpGen = ci -> couenneCg ();
 
     ecpGen -> setBabPtr (this);
 
-    /*
-    ecpGen.parameter().global_ = par.oaCutsGlobal;
-    ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
-    ecpGen.setNumRounds(par.numEcpRounds);
-    */
 
     int numGen = 0;
 
@@ -215,7 +208,6 @@ namespace Bonmin
       model.addCutGenerator (ecpGen, par.couenneCutsFrequency, "Couenne cutting planes");
       numGen++;
     }
-
     /*
     if (par.migFreq != 0) {
       model.addCutGenerator(&miGGen,par.migFreq,"GMI");
@@ -235,6 +227,9 @@ namespace Bonmin
     }
     */
 
+    /*Setup heuristic to solve nlp problems.*/
+    NlpSolveHeuristic nlpHeuristic(model, *nlpSolver, false);
+ //   model.addHeuristic(&nlpHeuristic);
     //Set true branch-and-bound parameters
     model.messageHandler()->setLogLevel(par.bbLogLevel);
     if (par.algo > 0)
