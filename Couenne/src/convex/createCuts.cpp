@@ -48,9 +48,11 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
     CouNumber *x = const_cast <CouNumber *> (problem_ -> X ());
 
     // compute violation
-    CouNumber violation = - rhs + c1 * x [i1];
-    if (i2 >= 0) violation     += c2 * x [i2];
-    if (i3 >= 0) violation     += c3 * x [i3];
+    CouNumber violation = - rhs;
+
+    if (i1 >= 0) violation += c1 * x [i1];
+    if (i2 >= 0) violation += c2 * x [i2];
+    if (i3 >= 0) violation += c3 * x [i3];
 
     // return NULL if not violated
 
