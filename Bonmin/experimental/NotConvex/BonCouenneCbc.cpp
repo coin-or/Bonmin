@@ -229,7 +229,8 @@ namespace Bonmin
 
     /*Setup heuristic to solve nlp problems.*/
     NlpSolveHeuristic nlpHeuristic(model, *nlpSolver, false);
- //   model.addHeuristic(&nlpHeuristic);
+    nlpHeuristic.setMaxNlpInf(1e10);
+    //model.addHeuristic(&nlpHeuristic);
     //Set true branch-and-bound parameters
     model.messageHandler()->setLogLevel(par.bbLogLevel);
     if (par.algo > 0)

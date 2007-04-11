@@ -22,13 +22,13 @@ namespace Bonmin{
   }
   
   NlpSolveHeuristic::NlpSolveHeuristic(CbcModel & model, OsiSolverInterface &nlp, bool cloneNlp):
-  CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp){
+  CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp),maxNlpInf_(1e-04){
     if(cloneNlp)
       nlp_ = nlp.clone();
   }
   
   NlpSolveHeuristic::NlpSolveHeuristic(const NlpSolveHeuristic & other):
-  CbcHeuristic(other), nlp_(other.nlp_), hasCloned_(other.hasCloned_){
+  CbcHeuristic(other), nlp_(other.nlp_), hasCloned_(other.hasCloned_),maxNlpInf_(other.maxNlpInf_){
     if(hasCloned_ && nlp_ != NULL)
       nlp_ = other.nlp_->clone();
   }
@@ -53,6 +53,7 @@ namespace Bonmin{
           nlp_ = rhs.nlp_;
       }
     }
+    maxNlpInf_ = rhs.maxNlpInf_;
     return *this;
   }
   
@@ -76,7 +77,7 @@ namespace Bonmin{
   int
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();
-
+    std::cout<<"Starting heuristic."<<std::endl;
     double * lower = CoinCopyOfArray(solver->getColLower(), nlp_->getNumCols());
     double * upper = CoinCopyOfArray(solver->getColUpper(), nlp_->getNumCols());
     const double * solution = solver->getColSolution();
@@ -90,7 +91,8 @@ namespace Bonmin{
       {
         int dummy;
         maxInfeasibility = max ( maxInfeasibility, couObj->infeasibility(&info, dummy));
-        if(maxInfeasibility > maxNlpInf_){
+         if(maxInfeasibility > maxNlpInf_){
+          std::cout<<"Node too infeasible:"<<maxInfeasibility<<std::endl;
           delete [] lower;
           delete [] upper;
           return 0;
@@ -124,16 +126,24 @@ namespace Bonmin{
     nlp_->setColSolution(solution);
     nlp_->initialSolve();
     double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
-    if(obj < objectiveValue)//Better solution found update
+    bool foundSolution = obj < objectiveValue;
+    if(foundSolution)//Better solution found update
     {
-      newSolution = new double [solver->getNumCols()];
+  //    newSolution = new double [solver->getNumCols()];
       CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), newSolution);
+
       //Get correct values for all auxiliary variables
       CouenneInterface * couenne = dynamic_cast<CouenneInterface *>
         (nlp_);
       if(couenne){
-        couenne->couenneProb()->getAuxs(newSolution);
+       couenne->couenneProb()->getAuxs(newSolution);
     }
+      objectiveValue = obj;
+      std::cout<<"Solution : ";
+      for(int i = - 0 ; i < solver->getNumCols() ; i++){
+        std::cout<<newSolution[i]<<", ";
+      }
+      std::cout<<std::endl;
   }
   nlp_->setColLower(saveColLower);
   nlp_->setColUpper(saveColUpper);
@@ -141,6 +151,6 @@ namespace Bonmin{
   delete [] upper;
   delete [] saveColLower;
   delete [] saveColUpper;
-  return obj < objectiveValue;
+  return foundSolution;
   }
 }/** Ends namespace Bonmin.*/
