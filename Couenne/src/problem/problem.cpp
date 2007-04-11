@@ -322,9 +322,25 @@ void CouenneProblem::getAuxs (CouNumber *x) {
   // auxiliary variables have an incomplete image, i.e. they have been
   // decomposed previously, since they are updated with increasing
   // index.
-
-  for (register int i = 0, j = nVars (); i < nAux; i++, j++)
-    x [j] = (*(Aux (i))) ();
+  /*
+  printf ("initial x: ");
+  for (int i=0; i<nVars(); i++)
+    printf ("%.2f ", x [i]);
+  printf ("\n");
+  */
+  for (register int i = 0, j = nVars (); i < nAux; i++, j++) {
+    //Aux (i) -> print (std::cout); 
+    x [j] = (*(Aux (i) -> Image ())) ();
+    //printf (" ( = %.2f)  ", x [j]);
+    //Aux (i) -> Image () -> print (std::cout); 
+    //printf ("\n");
+  }
+  /*
+  printf ("final x: ");
+  for (int i=0; i<nVars() + nAuxs(); i++)
+    printf ("%.2f ", x [i]);
+  printf ("\n");
+  */
 
   // now get the x and the bound vectors back to their previous state
   expression::update (x_, lb_, ub_);

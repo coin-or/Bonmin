@@ -263,7 +263,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // by the above cuts (as happens for division, for instance) and may
   // be of help.
 
-  //  return;
+  return;
 
   if (wu < - COUENNE_EPS) {
     // check points A and B: second orthant intersections
@@ -328,7 +328,7 @@ void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
   CouNumber w_xp = wb / xp;
 
   if ((cut = cg -> createCut (yp-w_xp, sign_ineq, yi, 1., xi, w_xp/xp))) {
-    printf ("\n### extra Mul cut inserted: "); cut -> print ();
+    //printf ("\n### extra Mul cut inserted: "); cut -> print ();
     cs.insert (cut);
   }
 }
