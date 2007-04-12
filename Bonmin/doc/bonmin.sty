@@ -9,6 +9,12 @@
 \newcommand{\linkCoin}{https://projects.coin-or.org/}
 \newcommand{\link}[2]{\mylatexhtml{\href{#1}{#2}}{\htmladdnormallink{#2}{#1}}}
 
+\newcommand{\mycite}[2]{\latexhtml{
+\cite{#1}}
+{
+\begin{rawhtml}<a href= \end{rawhtml}"../BOUM_bib/index.html\##1"
+\begin{rawhtml}> \end{rawhtml}[#2]\begin{rawhtml}</a>\end{rawhtml}}}
+
 \newcommand{\footlink}[2]{\link{#1}{#2}\latex{\footnote{#1}}}
 
 \newcommand{\Ipopt}{\link{\linkCoin Ipopt}{\tt Ipopt}}
@@ -19,6 +25,11 @@
 \newcommand{\Clp}{\link{\linkCoin Clp}{\tt Clp}}
 \newcommand{\Osi}{\link{\linkCoin Osi}{\tt Osi}}
 \newcommand{\COINOR}{\link{http://www.coin-or.org}{COIN-OR}}
+
+\newenvironment{myverbatim}{
+\html{\begin{rawhtml} <div id="verbatim">\end{rawhtml}}}
+{\html{\begin{rawhtml} </div> \end{rawhtml}}}
+
 
 
 \newcommand{\PageTitle}[2]{

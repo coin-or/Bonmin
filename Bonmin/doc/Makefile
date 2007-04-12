@@ -1,14 +1,14 @@
-FILES = BOUM_Intro/index.html \
-        BOUM_Obtain/index.html \
-        BOUM_Install/index.html \
-        BOUM_use/index.html \
-        BOUM_options/index.html
+OUTPUTS = BOUM_Install.done
+OUTPUTS += BOUM_Intro.done
+OUTPUTS += BOUM_Obtain.done
+OUTPUTS += BOUM_bib.done
+OUTPUTS += BOUM_options_list.done
+OUTPUTS += BOUM_options_set.done
+OUTPUTS += BOUM_use.done
 
-all: $(FILES)
-	@echo "html generated"
+all: $(OUTPUTS) Head.tex
 
-%/index.html: %.tex
+%.done : %.tex Head.tex
 	./genHtml.sh $<
+	touch $@
 
-clean: 
-	rm -rf $(FILES)

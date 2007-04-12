@@ -5,62 +5,30 @@
 
 
 \PageHead{Introduction}
-\StartPageSummary
+\begin{PageSummary}
 \PageSection{Types of problems solved}{MathBack}
 \PageSection{Algorithms}{Algos}
 \PageSection{Required third party code}{ThirdP}
 \PageSection{Supported platforms}{Support}
-\EndPageSummary
-\NavigationPanel
+\end{PageSummary}
 
 
-\mylatexhtml{}{
-\begin{rawhtml}
-<div id="headlines">
-  <h3>References </h3>
-  <div id="refer">
-  <p>
-   1&nbsp;-&nbsp;An algorithmic framework for convex MINLP. Bonami et.al.
-   <a href="http://domino.research.ibm.com/library/cyberdig.nsf/1e4115aea78b6e7c85256b360066f0d4/fdb4630e33bd2876852570b20062af37?OpenDocument">
-   full reference</a>
-  </p>
-  </div>
-  <div id="refer">
-  <p>
-  2&nbsp;-&nbsp;An outer-approximation algorithm for a class of MINLP. M.&nbsp;Duran and I.E.&nbsp;Grossmann. Mathematical Programming
-  <a href="BONMIN_UsersManual.html#DG">full reference</a>
-</p>
-</div>
-  <div id="refer">
-   <p>
-   3&nbsp;-&nbsp;Branch and bound experiments in convex nonlinear integer programming. O.K.&nbsp;Gupta and V.&nbsp;Ravindran.
-   <a href="BONMIN_UsersManual.html#Gupta80Nonlinear">full reference</a>
-  </p>
-  </div>
-  <div id="refer">
-  <p>
-  4&nbsp;-&nbsp;Solving MINLP by outer approximation.
-  R.&nbsp;Fletcher and S.&nbsp;Leyffer. Mathematical Programming.
-  <a href="http://dx.doi.org/10.1007/BF01581153">full reference</a>
-  </p>
-  </div>
-  <div id="refer">
-   An LP/NLP based branched and bound algorithm for convex MINLP optimization problems. I.&nbsp;Quesada and I.E.&nbsp;Grossmann.
-   Computers and Chemical Engineering
-   <a href="http://dx.doi.org/10.1016/0098-1354(92)80028-8">full reference</a>
-  </div>
-</div>
-<!--end headlines -->
-\end{rawhtml}
-}
+\begin{quickref}
+\quickcitation{An algorithmic framework for convex MINLP. Bonami et.al.}{\BetalLink}
+\quickcitation{An outer-approximation algorithm for a class of MINLP. M. Duran and I.E. Grossmann. Mathematical Programming}{\DGLink}
+\quickcitation{Branch and bound experiments in convex nonlinear integer programming. O.K. Gupta and V. Ravindran.}{\GuptaLink}
+\quickcitation{Solving MINLP by outer approximation.
+  R. Fletcher and S. Leyffer. Mathematical Programming.}{\FLLink}
+\quickcitation{An LP/NLP based branched and bound algorithm for convex MINLP optimization problems. I. Quesada and I.E. Grossmann.
+   Computers and Chemical Engineering.}{\QGLink}\end{quickref}
 
-\PageTitle{Introduction}{sec:Intro}
+\PageTitle{\latexhtml{Introduction}{\Bonmin}}{sec:Intro}
 \Bonmin\ (Basic Open-source Nonlinear Mixed INteger programming)
 is an open-source code for solving general MINLP (Mixed
 Integer NonLinear Programming) problems.
  It is distributed on
 \COINOR
-\mylatexhtml{\begin{latexonly} (\tt www.coin-or.org) \end{latexonly}}{}
+\latexhtml{\begin{latexonly} (\tt www.coin-or.org) \end{latexonly}}{}
 under the CPL (Common Public
 License). The CPL is a license approved by the
 \footlink{http://www.opensource.org}{OSI},
@@ -80,13 +48,12 @@ branch-and-cut algorithm.
 Some of the algorithmic choices require the ability to solve MILP
 (Mixed Integer Linear Programming) problems and NLP (NonLinear
 Programming) problems. The default solvers for these are,
-respectively, the COIN-OR codes {\tt Cbc} and {\tt Ipopt}. In turn,
-{\tt Cbc} uses further COIN-OR modules: {\tt Clp} (for LP (Linear
-Programming) problems), {\tt Cgl} (for generating MILP cutting
+respectively, the COIN-OR codes \Cbc\ and \Ipopt. In turn,
+{\tt Cbc} uses further COIN-OR modules: \Clp\ (for LP (Linear
+Programming) problems), \Cgl\ (for generating MILP cutting
 planes), as well as various other utilities. It is also possible to
 step outside the open-source realm and use
-\link{http://www.ilog.com/products/cplex/product/mip.cfm}{\tt Cplex}
-as the MILP solver. We expect to make an interface to other NLP solvers as well.
+\Cplex\ as the MILP solver. We expect to make an interface to other NLP solvers as well.
 
 \subsectionHs{Types of problems solved}{MathBack}
 \Bonmin\ solves MINLPs of the form
@@ -119,26 +86,22 @@ MINLPs:
 \begin{itemize}
 \item {\tt B-BB}: a simple branch-and-bound algorithm based on solving
 a continuous nonlinear program at each node of the search tree and
-branching on variables \html{\citeH{Gupta80Nonlinear}{}{Gupta80}};
+branching on variables \mycite{Gupta80Nonlinear}{Gupta80};
 we also allow the possibility of SOS (Type 1) branching
 \item {\tt B-OA}: an outer-approximation based decomposition algorithm
-\mylatexhtml{\begin{latexonly} \cite{DG,FL} \end{latexonly}}
-{\begin{rawhtml}
-[<A
- HREF="bonmin_UsersManual.html#DG">3</A>,<A
- HREF="http://dx.doi.org/10.1007/BF01581153">4</A>]
-\end{rawhtml}}
+\latexhtml{\begin{latexonly} \cite{DG,FL} \end{latexonly}}
+{[\link{\DGLink}{Duran1986},\link{\FLLink}{Leyffer1994}]}
 \item {\tt B-QG}: an outer-approximation based branch-and-bound
 algorithm
-\citeH{QG}{http://dx.doi.org/10.1016/0098-1354(92)80028-8}{5}
+\citeH{QG}{\QGLink}{Quesada1994}
 \item {\tt B-Hyb}: a hybrid outer-approximation/nonlinear programming
 based branch-and-cut algorithm \citeH{Betal}
-{http://domino.watson.ibm.com/library/cyberdig.nsf/papers?SearchView&Query=(RC23945)}{1}
+{\BetalLink}{Bonami2006}
 \end{itemize}
 
 In this manual,  we will not go into a further description of these algorithms.
 Mathematical details of these algorithms
-and some details of their implementations can be found in\citeH{Betal}{http://domino.research.ibm.com/library/cyberdig.nsf/1e4115aea78b6e7c85256b360066f0d4/fdb4630e33bd2876852570b20062af37?}{1}.
+and some details of their implementations can be found in\citeH{Betal}{\BetalLink}{Bonami2006}.
 
 Whether or not you are interested in the details of the algorithms, you certainly
 want to know which one of these four algorithms you should choose to solve
@@ -151,18 +114,18 @@ Nevertheless, there are cases where {\tt B-OA} is much faster than {\tt B-Hyb} a
 For nonconvex MINLPs, we strongly recommend using {\tt B-BB} (the outer-approximation algorithms
 have not been tailored to treat nonconvex problems at this point). Although even {\tt B-BB} is only a
 heuristic for such problems, we have added several
-options to try and improve the quality of the solutions it provides (see Section \ref{sec:non_convex}).
+options to try and improve the quality of the solutions it provides (see \latexhtml{Section \ref{sec:non_convex}}{\link{\OptSetPage #sec:non_convex}{non convex options}}).
 
 \subsectionHs{Required third party code}{ThirdP}
 In order to run {\Bonmin}, you have to download other external
 libraries (and pay attention to their licenses!):
 \begin{itemize}
-\item \link{http://www.netlib.org/lapack/}{Lapack} (Linear Algebra
+\item \link{\LapackAddr}{Lapack} (Linear Algebra
 PACKage)
-\item \link{http://www.netlib.org/blas/}{Blas} (Basic Linear Algebra
+\item \link{\BlasAddr}{Blas} (Basic Linear Algebra
 Subroutines)
 \item the sparse linear solver MA27 from the
-\link{http://www.cse.clrc.ac.uk/nag/hsl/contents.shtml}{HSL}
+\link{\AslAddr}{HSL}
 (Harwell Subroutine Library)
 \end{itemize}
 
@@ -180,7 +143,7 @@ need the {\tt ASL} (Ampl Solver Library) which is obtainable from the Netlib.
 
 Also, in the outer approximation decomposition method {\tt B-OA}, some MILP problems are
 solved. By default \Bonmin\ uses  \Cbc\ to solve them, but it can also be set up to use
-the commercial solver \footlink{http://www.ilog.com/products/cplex/product/mip.cfm}{\tt Cplex}.
+the commercial solver \footlink{http://www.ilog.com/products/cplex/product/mip.cfm}{\Cplex}.
 
 \subsectionHs{Tested platforms}{Support}
 \Bonmin\ has been installed on the following systems:
@@ -190,7 +153,7 @@ the commercial solver \footlink{http://www.ilog.com/products/cplex/product/mip.c
 \item Mac OS X using gcc 3.* and 4.*
 \end{itemize}
 
-\mylatexhtml{}{
+\latexhtml{}{
 \begin{rawhtml}
 </div>
 </div>

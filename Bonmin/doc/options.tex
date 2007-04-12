@@ -4,9 +4,10 @@
 %%% TeX-master: "BONMIN_UsersManual"
 %%% End:
 
-\subsection{\Bonmin\  output options}
+\subsectionH{\Bonmin\  output options}{}
 \label{app:opt_loglevel}
-\paragraph{bb\_log\_level} specify branch-and-bound's log level.
+\paragraph{bb\_log\_level}
+\label{bb_log_level} specify branch-and-bound's log level.
 
  Set the level of output of the branch-and-bound:
  \begin{itemize}
@@ -20,7 +21,9 @@
 and its default value is {\tt 3}.
 
 
-\paragraph{bb\_log\_interval} Interval at which node level output is printed.
+\paragraph{bb\_log\_interval} 
+\label{bb_log_interval}
+Interval at which node level output is printed.
 
  Set the interval (in terms of number of nodes) at
 which a log on node resolutions (consisting of
@@ -29,7 +32,9 @@ $${\tt 0} \le \hbox{\tt bb\_log\_interval } <  \infty$$
 and its default value is {\tt 100}.
 
 
-\paragraph{lp\_log\_level} specify LP log level.
+\paragraph{lp\_log\_level}
+\label{lp_log_level}
+ specify LP log level.
 
  Set the level of output of the linear programming
 subsolver in {\tt B-Hyb }or {\tt B-QG}:
@@ -45,7 +50,9 @@ $${\tt 0} \le \hbox{\tt lp\_log\_level } \le {\tt 4}$$
 and its default value is {\tt 0}.
 
 
-\paragraph{milp\_log\_level} specify MILP subsolver log level.
+\paragraph{milp\_log\_level} 
+\label{milp_log_level}
+specify MILP subsolver log level.
 
  Set the level of output of the MILP subsolver in
 OA :
@@ -60,7 +67,9 @@ $${\tt 0} \le \hbox{\tt milp\_log\_level } \le {\tt 3}$$
 and its default value is {\tt 0}.
 
 
-\paragraph{oa\_log\_level} specify OA iterations log level.
+\paragraph{oa\_log\_level}
+\label{oa_log_level}
+ specify OA iterations log level.
 
  Set the level of output of OA decomposition solver :
  \begin{itemize}
@@ -72,14 +81,17 @@ and its default value is {\tt 0}.
   $${\tt 0} \le \hbox{\tt oa\_log\_level } \le {\tt 2}$$
   and its default value is {\tt 1}.
 
-\paragraph{oa\_log\_frequency} specify OA log frequency.
+\paragraph{oa\_log\_frequency} 
+\label{oa_log_frequency}
+specify OA log frequency.
   The valid range for this real option is
   $$ 0 \le \hbox{\tt oa\_log\_frequency } \le \infty $$
   and its default value is $100$.
 
 
-
-  \paragraph{nlp\_log\_level} specify NLP solver interface log level (independent from ipopt print\_level).
+\paragraph{nlp\_log\_level}
+\label{nlp_log_level}
+ specify NLP solver interface log level (independent from ipopt print\_level).
 
   Set the level of output of the IpoptInterface :
   \begin{itemize}
@@ -91,7 +103,9 @@ and its default value is {\tt 0}.
 $${\tt 0} \le {\tt nlp\_log\_level } \le {\tt 2}$$
 and its default value is {\tt 1}.
 
-\paragraph{print\_user\_options} Prints the list of options set by the user.
+\paragraph{print\_user\_options}
+\label{print_user_options}
+Prints the list of options set by the user.
 The default value for this option is ``no".\\
 Possible values are:
 \begin{itemize}
@@ -99,9 +113,10 @@ Possible values are:
 \item no: don't.
 \end{itemize}
 
-\subsection{\Bonmin\ branch-and-bound options}
+\subsectionH{\Bonmin\ branch-and-bound options}
 
-\paragraph{algorithm} Choice of the algorithm.
+\paragraph{algorithm}
+\label{algorithm} Choice of the algorithm.
 
        This will preset default values for most options
     of \Bonmin\ but depending on which algorithm some
@@ -119,6 +134,7 @@ Possible values:
 
 
 \paragraph{allowable\_gap}
+\label{allowable_gap}
 Specify the value of absolute gap under which the algorithm stops.
 
  Stop the tree search when the gap between the
@@ -130,6 +146,7 @@ and its default value is $0$.
 
 
 \paragraph{allowable\_fraction\_gap}
+\label{allowable_fraction_gap}
 Specify the value of relative gap under which the algorithm stops.
 
  Stop the tree search when the gap between the
@@ -140,7 +157,9 @@ of the best known solution value. The valid range for this real option is
 $$-10^{20} \le \hbox{\tt allowable\_fraction\_gap } \le 10^{20}$$
 and its default value is $0$.
 
-\paragraph{cutoff}Specify a cutoff value
+\paragraph{cutoff}
+\label{cutoff}
+Specify a cutoff value
 
 cutoff should be the value of a feasible solution known by the user
 (if any). The algorithm will only look for solutions better (meaning with a lower objective value)
@@ -149,7 +168,9 @@ $$-10^{100} \le \hbox{\tt cutoff } \le 10^{100}$$
 and its default value is $10^{100}$.
 
 
-\paragraph{cutoff\_decr} Specify cutoff decrement.
+\paragraph{cutoff\_decr}
+\label{cutoff_decr}
+ Specify cutoff decrement.
 
  Specify the amount by which cutoff is decremented
 below a new best upper-bound (usually a small
@@ -159,7 +180,9 @@ $${\tt -10^{10}} \le \hbox{\tt cutoff\_decr } \le {\tt 10^{10}}$$
 and its default value is ${\tt 10^{-05}}$.
 
 
-\paragraph{nodeselect\_stra} Choose the node selection strategy.
+\paragraph{nodeselect\_stra}
+\label{nodeselect_stra}
+Choose the node selection strategy.
 
  Choose the strategy for selecting the next node
 to be processed.
@@ -177,6 +200,7 @@ feasible solutions have been found).
 
 
 \paragraph{number\_strong\_branch}
+\label{number_strong_branch}
 Choose the maximum number of variables considered for strong branching.
 
  Set the number of variables on which to do strong
@@ -186,6 +210,7 @@ and its default value is ${\tt 0}$.
 
 
 \paragraph{number\_before\_trust}
+\label{number_before_trust}
 Set the number of branches on a variable before its pseudo costs are to
 be believed in dynamic strong branching.
 
@@ -195,6 +220,7 @@ and its default value is ${\tt 0}$.
 
 
 \paragraph{time\_limit}
+\label{time_limit}
 Set the global maximum computation time (in seconds) for the algorithm.
 
  The valid range for this real option is
@@ -203,6 +229,7 @@ and its default value is ${\tt 10^{+10}}$.
 
 
 \paragraph{node\_limit}
+\label{node_limit}
 Set the maximum number of nodes explored in the branch-and-bound search.
 
 The valid range for this integer option is
@@ -211,6 +238,7 @@ and its default value is {\tt INT\_MAX} (as defined in system {\tt limits.h}).
 
 
 \paragraph{integer\_tolerance}
+\label{integer_tolerance}
 Set integer tolerance.
 
  Any number within that value of an integer is
@@ -220,10 +248,29 @@ $${\tt 0} <  \hbox{\tt integer\_tolerance } <  {\tt 0.5}$$
 and its default value is ${\tt 10^{-06}}$.
 
 
+\paragraph{warm\_start}
+\label{warm_start}
+Select the warm start method. Possible values:
+\begin{itemize}
+ \item {\tt none}: no warm start,
+\item {\tt optimum}: warm start with direct parent optimum",
+\item {\tt interior\_point}: Warm start with an interior point of direct parent".
+\end{itemize}
+The default value is {\tt optimum}.
+
+\paragraph{sos\_constraints}
+\label{sos_constraint}
+Wether or not to activate SOS constraints branching. Possible values are
+\begin{itemize}
+ \item {\tt enable},
+\item {\tt disable}.
+\end{itemize}
+The default value is {\tt enable}.
 
 \subsection{\Bonmin\ options for robustness}
 
 \paragraph{max\_random\_point\_radius}
+\label{max_random_point_radius}
 Set max value r for coordinate of a random point.
 
  When picking a random point, each coordinate is selected uniformly
@@ -240,6 +287,7 @@ and its default value is ${\tt 10^{+08}}$.
 
 
 \paragraph{max\_consecutive\_failures}
+\label{max_consecutive_failures}
 Number $n$ of consecutive unsolved problems before aborting
 a branch of the tree.
 
@@ -253,7 +301,7 @@ and its default value is ${\tt 10}$.
 
 
 \paragraph{num\_iterations\_suspect}
-(for debugging purposes only) number of iterations to consider a problem
+\label{num_iterations_suspect}(for debugging purposes only) number of iterations to consider a problem
 suspect.
 
 When the number of iterations taken by the continuous nonlinear solver
@@ -267,6 +315,7 @@ and its default value is $-1$.
 
 
 \paragraph{nlp\_failure\_behavior}
+\label{nlp_failure_behavior}
 Set the behavior when an NLP or a series of NLP are unsolved by {\tt Ipopt}
 (an NLP is unsolved if {\tt Ipopt} is not able to guarantee optimality within the specified tolerances).
 
@@ -283,6 +332,7 @@ Possible values:
 \end{itemize}
 
 \paragraph{num\_retry\_unsolved\_random\_point}
+\label{num_retry_unsolved_random_point}
 Number $k$ of times that the algorithm tries to resolve an unsolved NLP with a
 random starting point (unsolved NLP as defined above).
  When an NLP is unsolved, if $k > 0$, the algorithm tries
@@ -294,9 +344,10 @@ and its default value is {\tt 0}.
 
 
 
-\subsection{\Bonmin\ options for non-convex problems}
+\subsectionH{\Bonmin\ options for non-convex problems}{}
 
 \paragraph{max\_consecutive\_infeasible}
+\label{max_consecutive_infeasible}
 Number $k$ of consecutive infeasible subproblems before aborting a branch.
 
  Explores a branch of the tree
@@ -308,6 +359,7 @@ and its default value is {\tt 0}.
 
 
 \paragraph{num\_resolve\_at\_root}
+\label{num_resolve_at_root}
 Number $k$ of trials to solve the root node with different starting points.
 
  The algorithm solves the root node with $k$
@@ -318,6 +370,7 @@ and its default value is {\tt 0}.
 
 
 \paragraph{num\_resolve\_at\_node}
+\label{num_resolve_at_node}
 Number $k$ of tries to solve a node (other than the root) of the tree with different starting point.
 
  The algorithm solves all the nodes with $k$
@@ -328,9 +381,10 @@ and its default value is {\tt 0}.
 
 
 
-\subsection{\Bonmin\ options : {\tt B-Hyb} specific options}
+\subsectionH{\Bonmin\ options : {\tt B-Hyb} specific options}
 
 \paragraph{nlp\_solve\_frequency}
+\label{nlp_solve_frequency}
 Specify the frequency (in terms of nodes) at which NLP relaxations
 are solved in {\tt B-Hyb}.
 
@@ -341,6 +395,7 @@ and its default value is {\tt 10}.
 
 
 \paragraph{oa\_dec\_time\_limit}
+\label{oa_dec_time_limit}
 Specify the maximum number of seconds spent overall in OA decomposition iterations.
 
  The valid range for this real option is
@@ -348,6 +403,7 @@ $${\tt 0} \le \hbox{\tt oa\_dec\_time\_limit } <  \infty$$
 and its default value is {\tt 120}.
 
 \paragraph{tiny\_element}
+\label{tiny_element}
 Value for tiny element in OA cut.
 We will remove cleanly (by relaxing cut) an element lower
 than this.
@@ -357,6 +413,7 @@ $$0 \le \hbox{\tt tiny\_element } <  \infty$$
 and its default value is $10^{-8}$.
 
 \paragraph{very\_tiny\_element}
+\label{very_tiny_element}
 Value for very tiny element in OA cut.
 Algorithm will take the risk of neglecting an element lower
 than this.
@@ -366,6 +423,7 @@ $$0 \le \hbox{\tt very\_tiny\_element } <  \infty$$
 and its default value is $10^{-17}$.
 
 \paragraph{milp\_subsolver}
+\label{milp_subsolver}
 Choose the subsolver to solve MILPs sub-problems in OA decompositions.
 
   To use Cplex, a valid license is required and
@@ -383,9 +441,12 @@ Possible values:
 \subsubsection{Cut generators frequency}
 For each one of the cut generators
 \paragraph{Gomory\_cuts}
+\label{Gomory_cuts}
 \paragraph{probing\_cuts}(by default probing cuts are currently disabled for numerical stability reason)
 \paragraph{cover\_cuts}
+\label{cover_cuts}
 \paragraph{mir\_cuts}
+\label{mir_cuts}
 Sets the frequency (in terms of nodes) for generating cuts of
 the given type in the branch-and-cut.
 \begin{itemize}
