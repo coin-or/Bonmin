@@ -77,10 +77,11 @@ class exprDiv: public exprOp {
 
 inline CouNumber exprDiv::operator () () {
 
-  exprOp:: operator () ();
+  //  exprOp:: operator () ();
 
-  register CouNumber denominator = *sp--;
-  return (currValue_ = (*sp-- / denominator));
+  //  register CouNumber denominator = *sp--;
+  //  return (currValue_ = (*sp-- / denominator));
+  return (currValue_ = (*(arglist_ [0])) () / (*(arglist_ [1])) ());
 }
 
 

@@ -75,10 +75,10 @@ class exprSub: public exprOp {
 
 inline CouNumber exprSub::operator () () {
 
-  exprOp:: operator () ();
+  //  exprOp:: operator () ();
 
-  register CouNumber ret = - *sp--;
-  return (currValue_ = ret + *sp--);
+  //  register CouNumber ret = - *sp--;
+  return (currValue_ = (*(arglist_ [0])) () - (*(arglist_ [1])) ());
 }
 
 #endif

@@ -73,6 +73,24 @@ class exprMax: public exprOp {
 
 inline CouNumber exprMax::operator () () {
 
+  CouNumber best_val = (*(arglist_ [0])) ();
+  int best_ind = 0;
+
+  for (int ind = 2; ind < nargs_; ind += 2) {
+
+    register CouNumber val = (*(arglist_ [ind])) ();
+
+    if (val > best_val) {
+      best_ind = ind;
+      best_val = val;
+    }
+  }
+
+  best_val = (*(arglist_ [best_ind + 1])) ();
+
+  return (currValue_ = best_val);
+
+  /*
   exprOp:: operator () ();
 
   register CouNumber best_val = *sp--; 
@@ -81,6 +99,8 @@ inline CouNumber exprMax::operator () () {
   int n = nargs_ / 2;
 
   while (--n) {
+
+    printf ("::max: curr val = %.3f\n", *sp);
 
     register CouNumber val = *sp--;
     register CouNumber el  = *sp--;
@@ -92,6 +112,7 @@ inline CouNumber exprMax::operator () () {
   }
 
   return (currValue_ = best_val);
+  */
 }
 
 #endif

@@ -76,7 +76,8 @@ bool exprOp::dependsOn (int *varlist = NULL, int n = 1) {
 }
 
 
-///
+/// compare general n-ary expressions
+
 int exprOp::compare (exprOp  &e1) {
 
   int c0 = code (),
@@ -86,10 +87,8 @@ int exprOp::compare (exprOp  &e1) {
   if (c0 > c1) return  1;
 
   // have to compare arguments one by one
-
   if (nargs_ < e1.nargs_) return -1;
   if (nargs_ > e1.nargs_) return  1;
-
 
   // not an exprGroup, compare arguments
   for (register int i = nargs_; i--;) {
@@ -98,7 +97,7 @@ int exprOp::compare (exprOp  &e1) {
     if (res) return res;
   }
 
-  // last chance, this might be an exprGrouip
+  // last chance, this might be an exprGroup
   if (c0==COU_EXPRGROUP) {
 
     exprGroup *ne0 = dynamic_cast <exprGroup *> (this),
@@ -110,7 +109,9 @@ int exprOp::compare (exprOp  &e1) {
   return 0;
 }
 
+
 /// used in rank-based branching variable choice
+
 int exprOp::rank (CouenneProblem *p) {
 
   int maxrank = -1;

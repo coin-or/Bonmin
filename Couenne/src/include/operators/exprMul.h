@@ -70,6 +70,16 @@ class exprMul: public exprOp {
 
 inline CouNumber exprMul:: operator () () {
 
+  register CouNumber ret = 1;
+
+  expression **al = arglist_;
+
+  for (register int n = nargs_; n--;)
+    ret *= (**al++) ();
+
+  return (currValue_ = ret);
+
+  /*
   exprOp:: operator () ();
 
   register CouNumber ret = *sp--;
@@ -78,7 +88,8 @@ inline CouNumber exprMul:: operator () () {
   while (--n)
     ret *= *sp--;
 
-  return (currValue_ = ret);
+    return (currValue_ = ret);
+  */
 }
 
 #endif

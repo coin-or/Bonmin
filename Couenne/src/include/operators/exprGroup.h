@@ -78,7 +78,7 @@ class exprGroup: public exprSum {
   /// only compare with people of the same kind
   virtual int compare (exprGroup &);
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRGROUP;}
 
   /// used in rank-based branching variable choice

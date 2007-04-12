@@ -12,13 +12,13 @@
 #include <exprOp.h>
 
 
-//  class max
+///  class for minima
 
 class exprMin: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprMin  (expression **al, int n): 
     exprOp (al, n) {}
  
@@ -28,54 +28,67 @@ class exprMin: public exprOp {
     arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
   }
 
-  // cloning method
+  /// cloning method
   exprMin *clone () const
     {return new exprMin (clonearglist (), nargs_);}
 
-  // I/O
+  /// I/O
   void print (std::ostream &out) const
     {exprOp:: print (out, "min", PRE);}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
-  // differentiation
+  /// differentiation
   inline expression *differentiate (int) 
     {return NULL;} 
 
-  // simplification
+  /// simplification
   inline expression *simplify () 
     {return NULL;}
 
-  // get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () 
     {return NONLINEAR;}
 
-  // Get lower and upper bound of an expression (if any)
-  //  void getBounds (expression *&, expression *&);
+  /// Get lower and upper bound of an expression (if any)
+  ///  void getBounds (expression *&, expression *&);
 
-  // reduce expression in standard form, creating additional aux
-  // variables (and constraints)
+  /// reduce expression in standard form, creating additional aux
+  /// variables (and constraints)
   virtual inline exprAux *standardize (CouenneProblem *)
     {return NULL;}
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRMIN;}
 };
 
 
-// compute maximum
-
-// TODO: method that does not use the stack, computes elements only
-// and returns evaluation of best val pointer
-
+/// compute maximum
 
 inline CouNumber exprMin::operator () () {
 
+  CouNumber best_val = (*(arglist_ [0])) ();
+  int best_ind = 0;
+
+  for (int ind = 2; ind < nargs_; ind += 2) {
+
+    register CouNumber val = (*(arglist_ [ind])) ();
+
+    if (val < best_val) {
+      best_ind = ind;
+      best_val = val;
+    }
+  }
+
+  best_val = (*(arglist_ [best_ind + 1])) ();
+
+  return (currValue_ = best_val);
+  /*
   exprOp:: operator () ();
 
   register CouNumber best_val = *sp--; 
@@ -95,6 +108,7 @@ inline CouNumber exprMin::operator () () {
   }
 
   return (currValue_ = best_val);
+  */
 }
 
 #endif

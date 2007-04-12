@@ -56,12 +56,18 @@ inline void exprLBDiv::print (std::ostream &out = std::cout) const
 
 inline CouNumber exprLBDiv::operator () () {
 
-  exprOp:: operator () ();
+  //  exprOp:: operator () ();
 
+  register CouNumber n = (*(arglist_ [0])) ();
+  register CouNumber N = (*(arglist_ [1])) ();
+  register CouNumber d = (*(arglist_ [2])) ();
+  register CouNumber D = (*(arglist_ [3])) ();
+  /*
   register CouNumber D = *sp--;
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
+  */
 
   //  printf ("lbdiv: %e %e %e %e\n", n,N,d,D);
                                                      // (n,N,d,D)     lb 
@@ -102,12 +108,18 @@ class exprUBDiv: public exprOp {
 
 inline CouNumber exprUBDiv::operator () () {
 
-  exprOp:: operator () ();
+  //  exprOp:: operator () ();
 
+  register CouNumber n = (*(arglist_ [0])) ();
+  register CouNumber N = (*(arglist_ [1])) ();
+  register CouNumber d = (*(arglist_ [2])) ();
+  register CouNumber D = (*(arglist_ [3])) ();
+  /*
   register CouNumber D = *sp--;
   register CouNumber d = *sp--;
   register CouNumber N = *sp--;
   register CouNumber n = *sp--;
+  */
 
   //  printf ("ubdiv: %e %e %e %e\n", n,N,d,D);
                                                        // (n,N,d,D)     lb 

@@ -132,11 +132,14 @@ int exprGroup::Linearity () {
     else                            return nllin;
 }
 
-///
+/// compare affine terms
 int exprGroup::compare (exprGroup &e) {
 
   CouNumber *coe0 =   coeff_,
             *coe1 = e.coeff_;
+
+  if (c0_ < e.c0_ - COUENNE_EPS) return -1;
+  if (c0_ > e.c0_ + COUENNE_EPS) return  1;
 
   for (register int *ind0 = index_, *ind1 = e.index_; 
        *ind0 >= 0 || *ind1 >= 0; 

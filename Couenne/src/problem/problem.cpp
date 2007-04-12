@@ -171,17 +171,19 @@ void CouenneProblem::standardize () {
 
   expression::update (x_, lb_, ub_);
 
-  //  for (int i=0; i < nVars (); i++)
-  //    (*(variables_ [i])) ();
-
   for (int i=nVars (), j=0; j < nAuxs (); i++, j++) {
 
-    // re-create auxiliary bounds
+    // initial auxiliary bounds are infinite (they are later changed
+    // through branching)
 
     lb_ [i] = -COUENNE_INFINITY;
     ub_ [i] =  COUENNE_INFINITY;
 
+    // now tighten them with propagated bounds
+
     auxiliaries_ [j] -> crossBounds ();
+
+    // and evaluate them
 
     lb_ [i] = (*(auxiliaries_ [j] -> Lb    ())) ();
     ub_ [i] = (*(auxiliaries_ [j] -> Ub    ())) ();
@@ -282,7 +284,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
     x_ [j] = (*aux) ();
 
-    // set bounds in two stages
+    // set bounds 
     lb_ [j] = (*(aux -> Lb ())) ();
     ub_ [j] = (*(aux -> Ub ())) ();
   }

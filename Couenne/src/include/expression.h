@@ -9,7 +9,7 @@
 #ifndef COUENNE_EXPRESSION_H
 #define COUENNE_EXPRESSION_H
 
-#define STACK_SIZE 10000
+#define STACK_SIZE 100000
 
 #include <iostream>
 #include <CouennePrecisions.h>
@@ -45,6 +45,9 @@ class expression {
   /// the evaluation tree, DEPTH + #ARGUMENTS is at most STACK_SIZE,
   /// where DEPTH is the depth of the evaluation node and #ARGUMENTS is
   /// the number of arguments of the function in the node.
+  ///
+  /// UPDATE (04/12/07): no longer used, keep for possible new
+  /// operators
 
   static CouNumber stack [STACK_SIZE];
   static CouNumber *sp;

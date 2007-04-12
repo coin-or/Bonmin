@@ -88,17 +88,8 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   CouenneProblem *Problem () const
     {return problem_;}
 
-  const CouNumber   X    (int);
-
-  const CouNumber   &Lb  (int);
-  const CouNumber   &Ub  (int);
-
-  /// get arrays
-  const CouNumber   *X   ();
-  const CouNumber   *Lb  ();
-  const CouNumber   *Ub  ();
-
-  int getnvars () const;
+  /// total number of variables (original + auxiliary)
+  const int getnvars () const;
 
   /// has generateCuts been called yet?
   bool isFirst () const 
@@ -124,7 +115,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// create cut and check violation
   OsiRowCut *createCut (CouNumber, // rhs
 			int,       // sign: -1: <=, 0: =, +1: >=
-        	 		   // index, coeff  (index = -1 means "don't consider") 
+        	 		              // index, coeff  (index -1: "don't care") 
 			int,    CouNumber,    // of first  term
 			int=-1, CouNumber=0., // of second term 
 			int=-1, CouNumber=0., // of third  term
@@ -146,12 +137,14 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 		   CouNumber, CouNumber, 
 		   CouNumber, CouNumber, int) const;
 
+  /// (for compatibility with base class)
   /// virtual method which performs the OA algorithm by modifying lp and nlp.
   virtual double performOa (OsiCuts & cs,           solverManip &nlpManip, 
 			    solverManip &lpManip,   SubMipSolver *& subMip, 
 			    OsiBabSolver * babInfo, double &cutoff) const
     {throw -1;}
 
+  /// (for compatibility with base class)
   /// virtual method to decide if local search is performed
   virtual bool doLocalSearch () const {return 0;}
 
@@ -159,8 +152,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   void setBabPtr (Bonmin::Bab *p)
     {BabPtr_ = p;}
 
-  /// methods to get statistics
-
+  /// get statistics
   void getStats (int &nrc, int &ntc, double &st) {
     nrc = nrootcuts_;
     ntc = ntotalcuts_;

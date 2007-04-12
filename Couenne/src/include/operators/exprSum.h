@@ -72,13 +72,12 @@ class exprSum: public exprOp {
 
 inline CouNumber exprSum::operator () () {
 
-  exprOp:: operator () ();
+  register CouNumber ret = 0;
 
-  register CouNumber ret = *sp--; 
-  register int       n   = nargs_;
+  expression **al = arglist_;
 
-  while (--n)
-    ret += *sp--;
+  for (register int n = nargs_; n--;)
+    ret += (**al++) ();
 
   return (currValue_ = ret);
 }

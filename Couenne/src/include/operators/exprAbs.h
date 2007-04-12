@@ -15,7 +15,7 @@
 #include <exprConst.h>
 
 
-// class for abs f(x)
+/// class for abs f(x)
 
 class exprAbs: public exprUnary {
 
@@ -28,24 +28,24 @@ class exprAbs: public exprUnary {
   /// the operator's function
   inline unary_function F () {return fabs;}
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprAbs (argument_ -> clone ());}
 
-  // I/O
+  /// I/O
   void print (std::ostream&) const;
 
-  // differentiation
+  /// differentiation
   expression *differentiate (int index); 
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  ///
+  /// code for comparisons
   enum expr_type code () {return COU_EXPRABS;}
 
   /// implied bound processing

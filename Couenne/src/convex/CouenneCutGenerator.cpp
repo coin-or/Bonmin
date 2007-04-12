@@ -103,8 +103,9 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
   OsiRowCut *cut = NULL;
 
   if (fabs (x2-x1) < COUENNE_EPS)
-    // well, we suppose that y1=y2...
-    cut = createCut (y2, 0, wi, CouNumber (1.));
+    if (fabs (y2-y1) > COUENNE_EPS)
+      printf ("warning, discontinuity of %e over an interval of %e\n", y2-y1, x2-x1);
+    else cut = createCut (y2, 0, wi, CouNumber (1.));
   else {
 
     CouNumber oppslope = (y1-y2) / (x2-x1);
@@ -118,17 +119,6 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
     cs.insert (cut);
 }
 
-
-/// methods to get values of variables and bounds
-const CouNumber    CouenneCutGenerator::X   (int i) {return problem_ -> X  (i);}
-const CouNumber   &CouenneCutGenerator::Lb  (int i) {return problem_ -> Lb (i);}
-const CouNumber   &CouenneCutGenerator::Ub  (int i) {return problem_ -> Ub (i);}
-
-
-/// get arrays
-const CouNumber   *CouenneCutGenerator::X   ()      {return problem_ -> X  ();}
-const CouNumber   *CouenneCutGenerator::Lb  ()      {return problem_ -> Lb ();}
-const CouNumber   *CouenneCutGenerator::Ub  ()      {return problem_ -> Ub ();}
-
-int                CouenneCutGenerator::getnvars () const {return problem_ -> nVars () + 
-					                          problem_ -> nAuxs ();} 
+/// total number of variables (original + auxiliary) of the problem
+const int CouenneCutGenerator::getnvars () const
+{return problem_ -> nVars () + problem_ -> nAuxs ();} 
