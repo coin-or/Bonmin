@@ -32,7 +32,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 
     // Should already be dealt with by simplify() / standardize()
 
-    fprintf (stderr, "exprPow::getBounds(): warning, expression is of the type k^x\n");
+    fprintf (stderr, "exprPow::getBounds(): warning, expression is k^x\nno bounds...");
     return;
   }
   else {

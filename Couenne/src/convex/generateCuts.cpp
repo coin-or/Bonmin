@@ -278,11 +278,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     for (int i=0, j = problem_ -> nAuxs (); j--; i++) {
 
       expression * image = problem_ -> Aux (i) -> Image ();
-
-      if ((image -> Linearity () > LINEAR) &&       // if linear, no need to cut twice
-	  (image -> dependsOn (changed, nchanged))) // if expression does not depend on 
-	                                            // changed variables, do not cut
-
+      /*
+      if (   (image -> Linearity () > LINEAR)          // if linear, no need to cut twice
+	  && (image -> dependsOn (changed, nchanged))  // if expression does not depend on 
+	  )                                            // changed variables, do not cut
+      */
 	problem_ -> Aux (i) -> generateCuts (si, cs, this);
     }
   }
@@ -339,7 +339,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
 
-    // ok, now create cut
+    // ok, now create Column Cut
 
     if (nUpp || nLow) {
 
@@ -348,8 +348,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       if (cut) {
 	cut -> setLbs (nLow, indLow, bndLow);
 	cut -> setUbs (nUpp, indUpp, bndUpp);
-
-	//	cut -> print ();
 
 	cs.insert (cut);
 	delete cut;

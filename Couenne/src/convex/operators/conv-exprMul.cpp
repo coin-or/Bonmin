@@ -122,6 +122,8 @@ void addImplTangent (const CouenneCutGenerator *, OsiCuts &,
 void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  //  return;
+
   // get bounds of numerator and denominator
 
   expression *xle, *xue, 
@@ -148,36 +150,52 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   CouNumber c0, c1;
 
-  // check if either operator got constant because of the branching
-  // rules: x
+  // is one of the two constant?
 
   if (is0const) c0 = xe -> Value ();  
-  else {
+  if (is1const) c1 = ye -> Value ();  
 
-    expression *xle, *xue;
-    xe -> getBounds (xle, xue);
+  // compute bounds
 
-    c0 = (*xle) ();
+  xe -> getBounds (xle, xue);
+  ye -> getBounds (yle, yue);
+  w  -> getBounds (wle, wue);
 
-    is0const = (fabs (c0 - (*xue) ()) < COUENNE_EPS);
+  CouNumber xl = (*xle) (), xu = (*xue) (), 
+            yl = (*yle) (), yu = (*yue) (),
+            wl = (*wle) (), wu = (*wue) ();
 
-    delete xle; delete xue;
+  delete xle; delete xue;
+  delete yle; delete yue;
+  delete wle; delete wue;
+
+  // check if either operator got constant because of the branching
+  // rules: 
+
+  bool i0s, i1s = i0s = false;
+
+  if (!is0const) {
+
+    if (is1const) i0s = (fabs (c1) * (xu-xl) < COUENNE_EPS);
+    else          i0s = ((yu-yl)   * (xu-xl) < COUENNE_EPS);
+
+    if (i0s) 
+      c0 = 0.5 * (xl+xu);
   }
 
   // and y
 
-  if (is1const) c1 = ye -> Value ();  
-  else {
+  if (!is1const) {
 
-    expression *yle, *yue;
-    ye -> getBounds (yle, yue);
+    if (is0const) i1s = (fabs (c0) * (yu-yl) < COUENNE_EPS);
+    else          i1s = ((xu-xl)   * (yu-yl) < COUENNE_EPS);
 
-    c1 = (*yle) ();
-
-    is1const = (fabs (c1 - (*yue) ()) < COUENNE_EPS);
-
-    delete yle; delete yue;
+    if (i1s) 
+      c1 = 0.5 * (yl+yu);
   }
+
+  if (i0s) is0const = true;
+  if (i1s) is1const = true;
 
   // right now c0 and c1 only have a value if the corresponding
   // expression is constant
@@ -214,18 +232,6 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
     return;
   }
 
-  xe -> getBounds (xle, xue);
-  ye -> getBounds (yle, yue);
-  w  -> getBounds (wle, wue);
-
-  CouNumber xl = (*xle) (), xu = (*xue) (), 
-            yl = (*yle) (), yu = (*yue) (),
-            wl = (*wle) (), wu = (*wue) ();
-
-  delete xle; delete xue;
-  delete yle; delete yue;
-  delete wle; delete wue;
-
   // Add McCormick convexification cuts:
   //
   // 1) w >= yl x + xl y - yl xl
@@ -234,7 +240,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 3) w <= yl x + xu y - yl xu
   // 4) w <= yu x + xl y - yu xl
   //
-  // if the corresponding bounds are finite
+  // These cuts are added if the corresponding bounds are finite
 
   // 1)
   if (is_boundbox_regular (yl, xl)
@@ -262,6 +268,8 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // intersection with the bounding box. These are in fact NOT implied
   // by the above cuts (as happens for division, for instance) and may
   // be of help.
+
+  return;
 
   if (wu < - COUENNE_EPS) {
     // check points A and B: second orthant intersections
@@ -310,8 +318,8 @@ void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   CouNumber check = xb*yb - wb; // violation (signed)
 
-  if (sign_check < 0) check = -check; // intersection point depends on
-				      // the violation check
+  if (sign_check < 0) // intersection point depends on violation check
+    check = -check;
 
   if (check > 0) {xp = xb;    yp = wb/xb;}
   else           {xp = wb/yb; yp = yb;}

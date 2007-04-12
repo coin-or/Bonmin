@@ -18,21 +18,16 @@
 #define COUENNE_POW_CONST 1
 #define POW_FACTOR 2
 
-
 // A unary function to be given to addEnvelope with a local exponent,
 // given here as a static variable
-
 static CouNumber exponent;
 
-
 // function x^k
-
 inline static CouNumber power_k (CouNumber x) 
 {return safe_pow (x, exponent);}
 
 
 // function k*x^(k-1)
-
 inline static CouNumber power_k_prime (CouNumber x) 
 {return exponent * safe_pow (x, exponent-1);}
 
@@ -63,20 +58,20 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
     u = l + pow (POW_FACTOR,   1. / (1. + k)) * ns;
   */
 
+  // limit the bounds for the envelope
+
   if (l < - COUENNE_INFINITY + 1) {
     if (u > COUENNE_INFINITY - 1) {
-
       l = x - 1;
       u = x + 1;
     } else 
       l = x - 1;
-
-  } else if (u > COUENNE_INFINITY - 1) 
-    u = l + 1;
+  } else 
+    if (u > COUENNE_INFINITY - 1) 
+      u = x + 1;
 
   // convex envelope
 
-  //  printf (".............. now call addEnvelope %.4f %.4f\n", l, u);
   cg -> addEnvelope (cs, sign, power_k, power_k_prime, 
 		     wi, xi, x, l, u, cg -> isFirst ());
 }

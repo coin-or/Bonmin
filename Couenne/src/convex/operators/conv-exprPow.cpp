@@ -78,10 +78,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
 
-  CouNumber x = (*xe)  (), l = (*xle) (), u = (*xue) (),
-            w = (*aux) ();
-
-  OsiRowCut *cut;
+  CouNumber x = (*xe)  (), l = (*xle) (), u = (*xue) ();
 
   // classify power
 
@@ -116,8 +113,6 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       sign = -1;
     }
     else sign = 1;
-
-    //    printf ("%.4f [%.4f, %.4f] q=%.4f\n", x, l, u, q);
 
     // lower envelope
 
@@ -167,16 +162,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       return;
     }
 
-    // ok, now we are ready to play. Between l and u we have a
-    // convex/concave function that needs to be enveloped. Standard
-    // segment and tangent cuts can be applied.
-
-    // first of all, add trivial cut w >= 0 if violated
-
-    if (!(intk % 2) && 
-	(cg -> isFirst () || (w < - COUENNE_EPS)) &&
-	(cut = cg -> createCut (0, +1, w_ind, CouNumber (1.), -1, 0., -1, 0., true)))
-      cs.insert (cut);
+    // Between l and u we have a convex/concave function that needs to
+    // be enveloped. Standard segment and tangent cuts can be applied.
 
     // create envelope. Choose sign based on k
 

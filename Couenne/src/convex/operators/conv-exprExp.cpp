@@ -46,32 +46,23 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       cs.insert (cut);
   }
 
-  // lower convexification: start with trivial envelope w >= 0
-
-  if ((cut = cg -> createCut (CouNumber (0.), +1, w_ind, CouNumber (1.))))
-    cs.insert (cut);
-
   // add tangent points: first choose sampling points
 
   int ns = cg -> nSamples ();
 
-  // fix bounds to get finite coefficients
+  // change bounds to get finite coefficients
 
   CouNumber fact = 2 * ns;
 
-  if (x > COUENNE_EPS) {
-    l = x / fact - 1;
-    u = x * fact + 1;
-  }
-  else if (x < -COUENNE_EPS) {
-    l = x * fact - 1;
-    u = x / fact + 1;
+  if (x > 0) {
+    if (l < log (COUENNE_EPS))      l = x / fact - 1;
+    if (u > log (COUENNE_INFINITY)) u = x * fact + 1;
   }
   else {
-    l = - ns;
-    u = ns;
+    if (l < log (COUENNE_EPS))      l = x * fact - 1;
+    if (u > log (COUENNE_INFINITY)) u = x / fact + 1;
   }
-    
+
   // approximate the exponential function from below
   cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u, true);
 

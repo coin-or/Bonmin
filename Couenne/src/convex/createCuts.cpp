@@ -24,15 +24,6 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
 					   int i2, CouNumber c2,
 					   int i3, CouNumber c3,
 					   bool is_global)       const {
-  /*
-  CouNumber violation = - rhs + c1 * X (i1);
-  if (i2 >= 0) violation     += c2 * X (i2);
-  if (i3 >= 0) violation     += c3 * X (i3);
-  if (sign > 0) violation = - violation;
-  if (!sign) violation = fabs (violation);
-  if (violation > COUENNE_EPS)  
-    printf ("violation = %.12f\n", violation);
-  */
 
   // a maximum of three terms are allowed here. Index -1 means the
   // term is not considered
@@ -71,7 +62,7 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   int       *index = new int       [nterms];
   OsiRowCut *cut   = new OsiRowCut;
 
-  coeff [0] = c1; index [0] = i1;
+  if (i1 >= 0) {coeff [0] = c1; index [0] = i1;}
   if (i2 >= 0) {coeff [1] = c2; index [1] = i2;}
   if (i3 >= 0) {coeff [2] = c3; index [2] = i3;}
 

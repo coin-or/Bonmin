@@ -21,6 +21,7 @@
 
 void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+
   expression *le, *ue;
 
   argument_ -> getBounds (le, ue);
