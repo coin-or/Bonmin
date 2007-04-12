@@ -451,7 +451,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
       fprintf(par.fout,"%s", msg.c_str());
     else printf("%s",msg.c_str());
   }
-  if(model.numberObjects()){
+  if(!model.numberObjects()){
     if(bestSolution_)
       delete [] bestSolution_;
     bestSolution_ = new Number[nlpSolver.getNumCols()];
