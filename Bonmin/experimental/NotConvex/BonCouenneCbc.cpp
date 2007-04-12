@@ -231,7 +231,7 @@ namespace Bonmin
     /*Setup heuristic to solve nlp problems.*/
     Ipopt::SmartPtr<Ipopt::OptionsList> Options = nlpSolver->retrieve_options();
     int doNlpHeurisitic = 0;
-    Options->GetEnumValue("nlp_heuristic_solves", doNlpHeurisitic, "couenne.");
+    Options->GetEnumValue("nlp_local_solutions", doNlpHeurisitic, "couenne.");
     if(doNlpHeurisitic)
     {
       NlpSolveHeuristic nlpHeuristic(model, *nlpSolver, false);

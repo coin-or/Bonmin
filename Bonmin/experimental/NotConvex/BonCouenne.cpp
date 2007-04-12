@@ -98,7 +98,7 @@ int main (int argc, char *argv[])
                                            0,1,
                                            "A frequency of 0 amounts to to never solve the NLP relaxation.");
     
-    roptions->AddStringOption2("nlp_heuristic_solves",
+    roptions->AddStringOption2("nlp_local_solutions",
                                "Do we search for local solutions of NLP's",
                                "yes",
                                "no","",
