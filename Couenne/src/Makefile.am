@@ -115,7 +115,9 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
 	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/OaAlgorithms` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Algorithms` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Algorithms/OaGenerators` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/CbcBonmin` \
 	-I`$(CYGPATH_W) $(objdir)/inc` \
