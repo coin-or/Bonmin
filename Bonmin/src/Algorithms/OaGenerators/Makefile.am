@@ -2,7 +2,7 @@
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
-## $Id$
+## $Id: Makefile.am 204 2006-12-28 18:57:46Z pbonami $
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
@@ -13,10 +13,10 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library in this directory
-noinst_LTLIBRARIES = liboainterface.la
+noinst_LTLIBRARIES = libbonoagenerators.la
 
 # List all source files, including headers
-liboainterface_la_SOURCES = \
+libbonoagenerators_la_SOURCES = \
 	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
 	BonOaNlpOptim.cpp BonOaNlpOptim.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
@@ -26,12 +26,12 @@ liboainterface_la_SOURCES = \
 	BonOAMessages.cpp BonOAMessages.hpp
 
 # This is for libtool (on Windows)
-liboainterface_la_LDFLAGS = $(LT_LDFLAGS)
+libbonoagenerators_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \

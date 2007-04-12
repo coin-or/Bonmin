@@ -47,7 +47,10 @@ namespace Bonmin {
 
    void setNumRounds(int value){
    numRounds_ = value;}
-   protected: 
+     /** Register ecp cuts options.*/
+     static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+
+protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
                            SubMipSolver *& subMip, OsiBabSolver * babInfo, double &cutoff) const{

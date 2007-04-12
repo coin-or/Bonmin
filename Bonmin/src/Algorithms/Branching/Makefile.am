@@ -2,49 +2,36 @@
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
-## $Id$
+## $Id: Makefile.am 433 2007-03-28 05:01:22Z andreasw $
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
 AUTOMAKE_OPTIONS = foreign
 
 # Name of the library in this directory
-lib_LTLIBRARIES = libbonmin.la
+noinst_LTLIBRARIES = libbonbranching.la
 
 ########################################################################
 #                          bonmin library                              #
 ########################################################################
 
 # List all source files, including headers
-libbonmin_la_SOURCES = \
-	BonCbc.cpp BonCbc.hpp \
-	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
-	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
-	BonCbcNode.cpp BonCbcNode.hpp \
-	BonCbcParam.cpp BonCbcParam.hpp 
-
-nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
-
-libbonmin_la_LIBADD = \
-	../Algorithms/libbonalgorithms.la \
-	../Interfaces/libbonmininterfaces.la \
-	$(FILTERSQPLIBADD)
-
-libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
+libbonbranching_la_SOURCES = \
+	BonChooseVariable.cpp BonChooseVariable.hpp \
+	BonQPStrongBranching.cpp BonQPStrongBranching.hpp \
+	BonCurvBranching.cpp BonCurvBranching.hpp \
+        BonLpStrongBranching.cpp BonLpStrongBranching.hpp
 
 # This is for libtool (on Windows)
-libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
+libbonbranching_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
+	-I`$(CYGPATH_W) $(srcdir)/../OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
@@ -81,24 +68,16 @@ endif
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
-# The following is a trick to get the source code of Cbc/Samples correctly in
-# here, and also to get a link to libCbc into this directory (so that it
-# is made)
-CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
-
-CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 include_HEADERS = \
-	BonCbc.hpp \
-	BonCbcParam.hpp
+	BonChooseVariable.hpp \
+	BonCurvBranching.hpp \
+        BonLpStrongBranching.hpp \
+        BonQPStrongBranching.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -106,19 +85,15 @@ include_HEADERS = \
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonCbcParam.cppbak BonCbcParam.hppbak \
-	BonCbc.cppbak BonCbc.hppbak \
-	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
-	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
-	BonCbcNode.cppbak BonCbcNode.hppbak 
+	BonChooseVariable.cppbak BonChooseVariable.hppbak \
+	BonQPStrongBranching.cppbak BonQPStrongBranching.hppbak \
+	BonCurvBranching.cppbak BonCurvBranching.hppbak \
+        BonLpStrongBranching.hppbak BonLpStrongBranching.cppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
 
 CLEANFILES = $(ASTYLE_FILES)
-
-DISTCLEANFILES = \
-	CbcCompareUser.cpp CbcBranchUser.cpp
 
 SUFFIXES = .cppbak .hppbak
 

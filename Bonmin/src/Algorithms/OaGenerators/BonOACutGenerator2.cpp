@@ -252,5 +252,37 @@ extern int usingCouenne;
   return milpBound;
 }
 
+/** Register OA options.*/
+void 
+OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+{
+  
+  roptions->SetRegisteringCategory("bonmin options : Options for OA decomposition");
+  roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
+                                        "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
+                                        0.,0,30.,
+                                        "");
+
+  roptions->AddStringOption3("milp_subsolver",
+                             "Choose the subsolver to solve MILPs sub-problems in OA decompositions.",
+                             "Cbc_D",
+                             "Cbc_D","Coin Branch and Cut with its default",
+                             "Cbc_Par", "Coin Branch and Cut with passed parameters",
+                             "Cplex","Ilog Cplex",
+                             " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
+  
+  roptions->AddBoundedIntegerOption("oa_log_level",
+                                    "specify OA iterations log level.",
+                                    0,2,1,
+                                    "Set the level of output of OA decomposition solver : "
+                                    "0 - none, 1 - normal, 2 - verbose"
+                                    );
+  
+  roptions->AddLowerBoundedNumberOption("oa_log_frequency",
+                                        "display an update on lower and upper bounds in OA every n seconds",
+                                        0.,1.,100.,
+                                        "");
+}
+
 
 }/* End namespace Bonmin. */

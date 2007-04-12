@@ -867,9 +867,16 @@ class Messages : public CoinMessages
   /** To set some application specific defaults. */
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
-protected:
   /** Register all possible options to Bonmin */
-  void register_ALL_options (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+  void registerOptions (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+  
+  Ipopt::SmartPtr<Ipopt::RegisteredOptions> regOptions(){
+    if(IsValid(app_))
+      return app_->RegOptions();
+    else
+      return NULL;
+  }
+protected:
   
   //@}
 
@@ -1039,6 +1046,10 @@ protected:
   SmartPtr<CutStrengthener> cut_strengthener_;
   /** verbosity level for OA-related output */
   int oa_log_level_;
+private:
+    /** Facilitator to create an application. */
+    void
+    OsiTMINLPInterface::createApplication();
 };
 }
 #endif

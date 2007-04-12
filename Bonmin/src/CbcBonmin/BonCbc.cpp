@@ -1,4 +1,4 @@
-// (C) Copyright Carnegie Mellon University 2006
+// (C) Copyright Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -161,7 +161,6 @@ namespace Bonmin
       oaDec.parameter().global_ = par.oaCutsGlobal;
       oaDec.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
     }
-
     //Setup solver for checking validity of integral solutions
     feasCheck.assignNlpInterface(nlpSolver);
     feasCheck.assignLpInterface(feasLpSolver);
@@ -178,6 +177,7 @@ namespace Bonmin
       feasCheck.parameter().global_ = par.oaCutsGlobal;
       feasCheck.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
     }
+   // feasCheck.registerOptions(nlpSolver->regOptions());
   }
     
   int usingCouenne = 0;
@@ -199,7 +199,14 @@ namespace Bonmin
     if (bestSolution_) delete [] bestSolution_;
     bestSolution_ = NULL;
   }
-
+  
+  /**operator() performs the branchAndBound*/
+  void 
+  Bab::operator()(OsiTMINLPInterface * nlp, const BonminCbcParam& par)
+  {
+    branchAndBound(nlp,par);
+  }
+  
   /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
   void
   Bab::branchAndBound(OsiTMINLPInterface *nlpSolver,

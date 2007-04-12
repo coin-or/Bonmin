@@ -43,9 +43,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COIN_HAS_FILTERSQP_TRUE@am__append_1 = Filter
+@COIN_HAS_ASL_TRUE@am__append_1 = Ampl
+@COIN_HAS_FILTERSQP_TRUE@am__append_2 = Filter
 #                              Ampl/libamplinterface.la
-@COIN_HAS_FILTERSQP_TRUE@am__append_2 = Filter/libfilterinterface.la
+@COIN_HAS_FILTERSQP_TRUE@am__append_3 = Filter/libfilterinterface.la
 subdir = src/Interfaces
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -327,7 +328,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 
 #We need to do autothings in the subdirectories for the different interfaces
-SUBDIRS = Ipopt Ampl $(am__append_1)
+SUBDIRS = Ipopt $(am__append_1) $(am__append_2)
 
 ########################################################################
 #                          libipoptinterface                           #
@@ -352,7 +353,7 @@ libbonmininterfaces_la_SOURCES = \
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
-	$(am__append_2)
+	$(am__append_3)
 libbonmininterfaces_la_DEPENDENCIES = $(libbonmininterfaces_la_LIBADD)
 
 # This is for libtool (on Windows)

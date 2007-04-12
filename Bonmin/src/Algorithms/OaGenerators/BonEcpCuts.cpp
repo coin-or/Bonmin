@@ -102,4 +102,18 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
   return;
 }
 
+void
+EcpCuts::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+  roptions->SetRegisteringCategory("bonmin options : Options for ecp cuts generation");
+  roptions->AddLowerBoundedIntegerOption("filmint_ecp_cuts",
+                                         "Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.",
+                                         0,0,
+                                         "A frequency of 0 amounts to to never solve the NLP relaxation.");
+  
+  roptions->AddLowerBoundedIntegerOption
+    ("number_ecp_rounds",
+     "Set the number of rounds of ecp cuts.",
+     0,5,
+     "");
+}
 } // end namespace bonmin.

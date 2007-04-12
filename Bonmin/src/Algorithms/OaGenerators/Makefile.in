@@ -26,7 +26,7 @@ VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ../..
+top_builddir = ../../..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -46,7 +46,7 @@ host_triplet = @host@
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
-subdir = src/OaAlgorithms
+subdir = src/Algorithms/OaGenerators
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -57,11 +57,11 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-liboainterface_la_LIBADD =
-am_liboainterface_la_OBJECTS = BonDummyHeuristic.lo BonOaNlpOptim.lo \
-	BonOACutGenerator2.lo BonOaFeasChecker.lo BonOaDecBase.lo \
-	BonEcpCuts.lo BonOAMessages.lo
-liboainterface_la_OBJECTS = $(am_liboainterface_la_OBJECTS)
+libbonoagenerators_la_LIBADD =
+am_libbonoagenerators_la_OBJECTS = BonDummyHeuristic.lo \
+	BonOaNlpOptim.lo BonOACutGenerator2.lo BonOaFeasChecker.lo \
+	BonOaDecBase.lo BonEcpCuts.lo BonOAMessages.lo
+libbonoagenerators_la_OBJECTS = $(am_libbonoagenerators_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -80,8 +80,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(liboainterface_la_SOURCES)
-DIST_SOURCES = $(liboainterface_la_SOURCES)
+SOURCES = $(libbonoagenerators_la_SOURCES)
+DIST_SOURCES = $(libbonoagenerators_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -311,10 +311,10 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library in this directory
-noinst_LTLIBRARIES = liboainterface.la
+noinst_LTLIBRARIES = libbonoagenerators.la
 
 # List all source files, including headers
-liboainterface_la_SOURCES = \
+libbonoagenerators_la_SOURCES = \
 	BonDummyHeuristic.cpp BonDummyHeuristic.hpp \
 	BonOaNlpOptim.cpp BonOaNlpOptim.hpp \
 	BonOACutGenerator2.cpp BonOACutGenerator2.hpp \
@@ -325,13 +325,14 @@ liboainterface_la_SOURCES = \
 
 
 # This is for libtool (on Windows)
-liboainterface_la_LDFLAGS = $(LT_LDFLAGS)
+libbonoagenerators_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Interfaces` -I`$(CYGPATH_W) \
-	$(IPOPTOBJDIR)/inc` -I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` -I`$(CYGPATH_W) \
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
+	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(IPOPTSRCDIR)/src/Common` -I`$(CYGPATH_W) \
+	$(IPOPTSRCDIR)/src/Interfaces` -I`$(CYGPATH_W) \
 	$(IPOPTSRCDIR)/src/LinAlg` -I`$(CYGPATH_W) \
 	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
@@ -370,9 +371,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/OaAlgorithms/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/Algorithms/OaGenerators/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/OaAlgorithms/Makefile
+	  $(AUTOMAKE) --foreign  src/Algorithms/OaGenerators/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -399,8 +400,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-liboainterface.la: $(liboainterface_la_OBJECTS) $(liboainterface_la_DEPENDENCIES) 
-	$(CXXLINK)  $(liboainterface_la_LDFLAGS) $(liboainterface_la_OBJECTS) $(liboainterface_la_LIBADD) $(LIBS)
+libbonoagenerators.la: $(libbonoagenerators_la_OBJECTS) $(libbonoagenerators_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libbonoagenerators_la_LDFLAGS) $(libbonoagenerators_la_OBJECTS) $(libbonoagenerators_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

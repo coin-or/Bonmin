@@ -1,3 +1,11 @@
+// (C) Copyright International Business Machines Corporation, Carnegie Mellon University 2004, 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Pierre Bonami, Carnegie Mellon University,
+//
+// Date : 12/01/2004
 #ifndef BonminBB_hpp
 #define BonminBB_hpp
 
@@ -50,10 +58,7 @@ namespace Bonmin
         const BonminCbcParam&par);
 
     /**operator() performs the branchAndBound*/
-    virtual void operator()(OsiTMINLPInterface * nlp, const BonminCbcParam& par)
-    {
-      branchAndBound(nlp,par);
-    }
+    virtual void operator()(OsiTMINLPInterface * nlp, const BonminCbcParam& par);
 
     /** get the best solution known to the problem (is optimal if MipStatus is FeasibleOptimal).
         if no solution is known returns NULL.*/
@@ -110,5 +115,8 @@ namespace Bonmin
     /** get total number of iterations in last mip solved.*/
     int mipIterationCount_;
   };
+
+
+
 }
 #endif

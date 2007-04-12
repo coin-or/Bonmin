@@ -27,7 +27,7 @@ VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ../..
+top_builddir = ../../..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -47,7 +47,7 @@ host_triplet = @host@
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
-subdir = src/CbcBonmin
+subdir = src/Algorithms/Branching
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -58,21 +58,12 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
-libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
-am__DEPENDENCIES_1 =
-am_libbonmin_la_OBJECTS = BonCbc.lo BonCbcLpStrategy.lo \
-	BonCbcNlpStrategy.lo BonCbcNode.lo BonCbcParam.lo
-nodist_libbonmin_la_OBJECTS = CbcCompareUser.lo CbcBranchUser.lo
-libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS) \
-	$(nodist_libbonmin_la_OBJECTS)
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+libbonbranching_la_LIBADD =
+am_libbonbranching_la_OBJECTS = BonChooseVariable.lo \
+	BonQPStrongBranching.lo BonCurvBranching.lo \
+	BonLpStrongBranching.lo
+libbonbranching_la_OBJECTS = $(am_libbonbranching_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -91,8 +82,15 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libbonmin_la_SOURCES) $(nodist_libbonmin_la_SOURCES)
-DIST_SOURCES = $(libbonmin_la_SOURCES)
+SOURCES = $(libbonbranching_la_SOURCES)
+DIST_SOURCES = $(libbonbranching_la_SOURCES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(includedir)"
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
@@ -320,40 +318,29 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 
 # Name of the library in this directory
-lib_LTLIBRARIES = libbonmin.la
+noinst_LTLIBRARIES = libbonbranching.la
 
 ########################################################################
 #                          bonmin library                              #
 ########################################################################
 
 # List all source files, including headers
-libbonmin_la_SOURCES = \
-	BonCbc.cpp BonCbc.hpp \
-	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
-	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
-	BonCbcNode.cpp BonCbcNode.hpp \
-	BonCbcParam.cpp BonCbcParam.hpp 
+libbonbranching_la_SOURCES = \
+	BonChooseVariable.cpp BonChooseVariable.hpp \
+	BonQPStrongBranching.cpp BonQPStrongBranching.hpp \
+	BonCurvBranching.cpp BonCurvBranching.hpp \
+        BonLpStrongBranching.cpp BonLpStrongBranching.hpp
 
-nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
-libbonmin_la_LIBADD = \
-	../Algorithms/libbonalgorithms.la \
-	../Interfaces/libbonmininterfaces.la \
-	$(FILTERSQPLIBADD)
-
-libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
 
 # This is for libtool (on Windows)
-libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
+libbonbranching_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Algorithms` -I`$(CYGPATH_W) \
-	$(srcdir)/../Algorithms/OaGenerators` -I`$(CYGPATH_W) \
-	$(srcdir)/../Algorithms/Branching` -I`$(CYGPATH_W) \
-	$(srcdir)/../Interfaces` -I`$(CYGPATH_W) \
-	$(srcdir)/../Interfaces/Ipopt` -I`$(CYGPATH_W) \
-	$(srcdir)/../Interfaces/Ampl` -I`$(CYGPATH_W) \
-	$(srcdir)/../Interfaces/Filter` -I`$(CYGPATH_W) \
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` -I`$(CYGPATH_W) \
+	$(srcdir)/../../Interfaces/Ipopt` -I`$(CYGPATH_W) \
+	$(srcdir)/../../Interfaces/Filter` -I`$(CYGPATH_W) \
 	$(IPOPTOBJDIR)/inc` -I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` -I`$(CYGPATH_W) \
 	$(IPOPTSRCDIR)/src/LinAlg` -I`$(CYGPATH_W) \
@@ -384,8 +371,10 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 include_HEADERS = \
-	BonCbc.hpp \
-	BonCbcParam.hpp
+	BonChooseVariable.hpp \
+	BonCurvBranching.hpp \
+        BonLpStrongBranching.hpp \
+        BonQPStrongBranching.hpp
 
 
 ########################################################################
@@ -394,16 +383,12 @@ include_HEADERS = \
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonCbcParam.cppbak BonCbcParam.hppbak \
-	BonCbc.cppbak BonCbc.hppbak \
-	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
-	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
-	BonCbcNode.cppbak BonCbcNode.hppbak 
+	BonChooseVariable.cppbak BonChooseVariable.hppbak \
+	BonQPStrongBranching.cppbak BonQPStrongBranching.hppbak \
+	BonCurvBranching.cppbak BonCurvBranching.hppbak \
+        BonLpStrongBranching.hppbak BonLpStrongBranching.cppbak
 
 CLEANFILES = $(ASTYLE_FILES)
-DISTCLEANFILES = \
-	CbcCompareUser.cpp CbcBranchUser.cpp
-
 SUFFIXES = .cppbak .hppbak
 all: all-am
 
@@ -418,9 +403,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/CbcBonmin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/Algorithms/Branching/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/CbcBonmin/Makefile
+	  $(AUTOMAKE) --foreign  src/Algorithms/Branching/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -438,35 +423,17 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
-	@$(NORMAL_INSTALL)
-	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
-	  else :; fi; \
-	done
 
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
-	done
-
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libbonmin.la: $(libbonmin_la_OBJECTS) $(libbonmin_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libbonmin_la_LDFLAGS) $(libbonmin_la_OBJECTS) $(libbonmin_la_LIBADD) $(LIBS)
+libbonbranching.la: $(libbonbranching_la_OBJECTS) $(libbonbranching_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libbonbranching_la_LDFLAGS) $(libbonbranching_la_OBJECTS) $(libbonbranching_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -474,13 +441,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcLpStrategy.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNlpStrategy.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcParam.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcBranchUser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcCompareUser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonChooseVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvBranching.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLpStrongBranching.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQPStrongBranching.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -609,7 +573,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -633,14 +597,13 @@ clean-generic:
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
-	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -661,7 +624,7 @@ info-am:
 
 install-data-am: install-includeHEADERS
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am:
 
 install-info: install-info-am
 
@@ -687,34 +650,21 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+uninstall-am: uninstall-includeHEADERS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags distclean \
+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
 	install-exec-am install-includeHEADERS install-info \
-	install-info-am install-libLTLIBRARIES install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-includeHEADERS \
+	uninstall-info-am
 
-
-# The following is a trick to get the source code of Cbc/Samples correctly in
-# here, and also to get a link to libCbc into this directory (so that it
-# is made)
-CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
-
-CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
 
 astyle: $(ASTYLE_FILES)
 

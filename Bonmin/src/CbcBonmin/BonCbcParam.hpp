@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -88,6 +88,8 @@ namespace Bonmin
     int maxNodes;
     /** limit on number of integer feasible solution.*/
     int maxSolutions;
+    /** Global iteration limit. */
+    int maxIterations;
     /** Integer tolerance.*/
     double intTol;
     /** Conssider or not SOS constraints.*/

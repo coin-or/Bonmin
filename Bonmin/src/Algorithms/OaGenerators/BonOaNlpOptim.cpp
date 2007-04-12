@@ -179,4 +179,16 @@ namespace Bonmin
     delete [] saveColLb;
     delete [] saveColUb;
   }
-}
+  
+  void 
+    OaNlpOptim::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+  {
+      roptions->SetRegisteringCategory("bonmin options : Nlp solve options");
+      roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
+                                             "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
+                                             0,10,
+                                             "A frequency of 0 amounts to to never solve the NLP relaxation.");
+  }
+
+      
+}/* End namespace Bonmin. */

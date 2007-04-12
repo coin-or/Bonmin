@@ -58,7 +58,9 @@ bonmin_LDFLAGS = -rpath $(libdir)
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../OaInterface` \
+	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
+	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
+	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
@@ -70,6 +72,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples`
 

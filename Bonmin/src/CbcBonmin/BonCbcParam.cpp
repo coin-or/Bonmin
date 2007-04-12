@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -36,6 +36,7 @@ namespace Bonmin
     Options->GetNumericValue("time_limit", maxTime, "bonmin.");
     Options->GetIntegerValue("node_limit",maxNodes,"bonmin.");
     Options->GetIntegerValue("solution_limit",maxSolutions,"bonmin.");
+    Options->GetIntegerValue("iteration_limit",maxIterations,"bonmin.");
     Options->GetNumericValue("integer_tolerance",intTol,"bonmin.");
     Options->GetNumericValue("allowable_gap",allowableGap,"bonmin.");
     Options->GetNumericValue("allowable_fraction_gap",allowableFractionGap,"bonmin.");
@@ -62,7 +63,6 @@ namespace Bonmin
     Options->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     Options->GetIntegerValue("nlp_solve_frequency",nlpSolveFrequency,"bonmin.");
     Options->GetIntegerValue("filmint_ecp_cuts",filmintCutsFrequency, "bonmin.");
-    Options->GetIntegerValue("couenne_ecp_cuts",couenneCutsFrequency, "bonmin.");
     Options->GetIntegerValue("number_ecp_rounds", numEcpRounds,"bonmin.");
     Options->GetNumericValue("oa_dec_time_limit",oaDecMaxTime,"bonmin.");
     Options->GetIntegerValue("Gomory_cuts", migFreq,"bonmin.");

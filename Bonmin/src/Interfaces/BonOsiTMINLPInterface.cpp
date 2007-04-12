@@ -62,17 +62,7 @@ register_general_options
       "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                    );
 
-  roptions->AddBoundedIntegerOption("oa_log_level",
-      "specify OA iterations log level.",
-      0,2,1,
-      "Set the level of output of OA decomposition solver : "
-      "0 - none, 1 - normal, 2 - verbose"
-                                   );
 
-  roptions->AddLowerBoundedNumberOption("oa_log_frequency",
-      "display an update on lower and upper bounds in OA every n seconds",
-      0.,1.,100.,
-      "");
 
   roptions->AddBoundedIntegerOption("nlp_log_level",
       "specify NLP solver interface log level (independent from ipopt print_level).",
@@ -84,7 +74,7 @@ register_general_options
   roptions->SetRegisteringCategory("bonmin branch-and-bound options");
 
   roptions->AddStringOption2("nlp_solver",
-      "Choice of the solver for continuous nlp's",
+      "Choice of the solver for local optima of continuous nlp's",
       "Ipopt",
       "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
       "filterSQP", "Sequential quadratic programming trust region algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
@@ -97,7 +87,7 @@ register_general_options
       "B-OA","OA Decomposition algorithm,",
       "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
       "B-Hyb","hybrid outer approximation based branch-and-cut.",
-			     "B-Couenne","Branch-and-bound using Couenne convexifier (not available through Bonmin excutable)",
+      "B-Couenne","Branch-and-bound using Couenne convexifier (not available through Bonmin excutable)",
       "This will preset default values for most options of bonmin but depending on which algorithm "
       "some of these can be changed.");
   roptions->AddLowerBoundedNumberOption("time_limit",
@@ -110,10 +100,15 @@ register_general_options
 					 0,INT_MAX,
 					 "");
 
+   roptions->AddLowerBoundedIntegerOption("iteration_limit",
+      "Set the cummulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
+      0,INT_MAX,
+      "value 0 deactivates option.");
+
   roptions->AddLowerBoundedIntegerOption("solution_limit",
 					 "Abort after that much integer feasible solution have been found by algorithm",
 					 0,INT_MAX,
-					 "");
+					 "value 0 deactivates option");
 
   roptions->AddBoundedNumberOption("integer_tolerance",
       "Set integer tolerance.",
@@ -283,20 +278,13 @@ register_general_options
       "The algorithm will solve all the infeasible nodes with $k$ different random starting points "
       "and will keep the best local optimum found.");
 
-  roptions->AddStringOption4("cut_strengthening_type",
-      "Determines if and what kind of cut strengthening should be performed.",
-      "none",
-      "none", "No strengthening of cuts.",
-      "sglobal", "Strengthen global cuts.",
-      "uglobal-slocal", "Unstrengthened global and strengthened local cuts",
-      "sglobal-slocal", "Strengthened global and strengthened local cuts",
-      "");
+
 }
 
 static void register_OA_options
 (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("bonmin options : B-Hyb specific options");
+  roptions->SetRegisteringCategory("bonmin options : Outer Approximation cuts");
 
   roptions->AddStringOption2("oa_cuts_scope","Specify if OA cuts added are to be set globally or locally valid",
                              "global",
@@ -308,32 +296,16 @@ static void register_OA_options
 			     "no",
 			     "no","Add all cuts",
 			     "yes","Add only violated Cuts","");
-  roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
-      "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
-      0,10,
-      "A frequency of 0 amounts to to never solve the NLP relaxation.");
 
-  roptions->AddLowerBoundedIntegerOption("filmint_ecp_cuts",
-      "Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.",
-      0,0,
-      "A frequency of 0 amounts to to never solve the NLP relaxation.");
-
-  roptions->AddLowerBoundedIntegerOption("couenne_ecp_cuts",
-      "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
-      0,1,
-      "A frequency of 0 amounts to to never solve the NLP relaxation.");
-
-  roptions->AddLowerBoundedIntegerOption
-    ("number_ecp_rounds",
-     "Set the number of rounds of ecp cuts.",
-     0,5,
-     "");
-
-
-  roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
-      "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
-      0.,0,30.,
-      "");
+  roptions->AddStringOption4("cut_strengthening_type",
+                             "Determines if and what kind of cut strengthening should be performed.",
+                             "none",
+                             "none", "No strengthening of cuts.",
+                             "sglobal", "Strengthen global cuts.",
+                             "uglobal-slocal", "Unstrengthened global and strengthened local cuts",
+                             "sglobal-slocal", "Strengthened global and strengthened local cuts",
+                             "");
+  
   roptions->AddLowerBoundedNumberOption("tiny_element","Value for tiny element in OA cut",
       -0.,0,1e-08,
       "We will remove \"cleanly\" (by relaxing cut) an element lower"
@@ -373,22 +345,10 @@ static void register_OA_options
 
 }
 
-static void register_milp_sub_solver_options
-(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
-{
-  roptions->SetRegisteringCategory("bonmin options : Options for milp subsolver in OA decomposition");
-  roptions->AddStringOption3("milp_subsolver",
-      "Choose the subsolver to solve MILPs sub-problems in OA decompositions.",
-      "Cbc_D",
-      "Cbc_D","Coin Branch and Cut with its default",
-      "Cbc_Par", "Coin Branch and Cut with passed parameters",
-      "Cplex","Ilog Cplex",
-      " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
-}
 
 ///Register options
 void
-OsiTMINLPInterface::register_ALL_options
+OsiTMINLPInterface::registerOptions
 (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
 {
   // We try to register the options - if those have been registered
@@ -396,7 +356,6 @@ OsiTMINLPInterface::register_ALL_options
   try {
     register_general_options(roptions);
     register_OA_options(roptions);
-    register_milp_sub_solver_options(roptions);
     //Register options for all possible solvers (besides the one used
     IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
 #ifdef COIN_HAS_FILTERSQP
@@ -534,7 +493,9 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     infty_(1e100),
     expose_warm_start_(false),
     firstSolve_(true)
-{}
+{
+      createApplication();
+}
 
 /** Constructor with given TNLPSolver and TMINLP */
 OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app):
@@ -584,10 +545,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app)
   app_ = app->clone();
 
   Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = app_->RegOptions();
-  register_ALL_options(roptions);
-  app_->Initialize("bonmin.opt");
+  registerOptions(roptions);
   extractInterfaceParams();
-
 }
 
 /** Constructor with given IpSolver and TMINLP */
@@ -638,6 +597,44 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
 {
   allocateTMINLP(tminlp,app);
 }
+
+/// Enum for the NLP solver chosen
+enum NLPSolverChoice {
+  Ipopt = 0,
+  FilterSQP
+};
+
+
+/** Facilitator to create an application. */
+void
+OsiTMINLPInterface::createApplication(){
+  // AW: The following is not a nice solution, since we read
+  // everything twice, if FilterSQP was chosen
+  
+  //We need to build dummy solver objects to get the options,
+  //determine which is the solver to use and register all the
+  //options
+  assert(!IsValid(app_));
+  app_ = new IpoptSolver();
+  OsiTMINLPInterface forOption(GetRawPtr(app_));
+  int ival;
+  forOption.solver()->Options()->GetEnumValue("nlp_solver", ival,"bonmin.");
+  NLPSolverChoice NLPchoice = NLPSolverChoice(ival);
+  
+  if(NLPchoice == FilterSQP) {
+#ifdef COIN_HAS_FILTERSQP
+    app_ = new Bonmin::FilterSolver();
+#else
+    std::cerr<<"Bonmin not configured to run with FilterSQP"<<std::endl;
+    throw -1;
+#endif
+  }
+  else if (NLPchoice != Ipopt) {
+    std::cerr<<"Trying to use unknown solver."<<std::endl;
+    throw -1;
+  }
+}
+
 /** Facilitator to allocate a tminlp and an application. */
 void
 OsiTMINLPInterface::allocateTMINLP(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
@@ -650,7 +647,7 @@ OsiTMINLPInterface::allocateTMINLP(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
   app_ = app->clone();
 
   Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = app_->RegOptions();
-  register_ALL_options(roptions);
+  registerOptions(roptions);
   app_->Initialize("");
   extractInterfaceParams();
 }
@@ -1882,6 +1879,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   int n,m, nnz_jac_g, nnz_h_lag;
   Ipopt::TNLP::IndexStyleEnum index_style;
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
+  int offset = (index_style = Ipopt::TNLP::FORTRAN_STYLE);
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
   assert(jRow_ != NULL);
@@ -1936,16 +1934,16 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   for(int i = 0 ; i < nnz_jac_g ; i++) {
     if(constTypes_[jRow_[i] - 1] == Ipopt::TNLP::NON_LINEAR) {
       //"clean" coefficient
-      if(cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
-		  rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
-		  x[jCol_[i] - 1],
-		  lb[binding[jRow_[i] - 1]],
-		  ub[binding[jRow_[i] - 1]], tiny_, veryTiny_)) {
-        cuts[binding[jRow_[i] - 1]].insert(jCol_[i]-1,jValues_[i]);
-        if(lb[binding[jRow_[i] - 1]] > - infty)
-          lb[binding[jRow_[i] - 1]] += jValues_[i] * x[jCol_ [i] - 1];
-        if(ub[binding[jRow_[i] - 1]] < infty)
-	  ub[binding[jRow_[i] - 1]] += jValues_[i] * x[jCol_ [i] - 1];
+      if(cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
+		  rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
+		  x[jCol_[i] - offset],
+		  lb[binding[jRow_[i] - offset]],
+		  ub[binding[jRow_[i] - offset]], tiny_, veryTiny_)) {
+        cuts[binding[jRow_[i] - offset]].insert(jCol_[i]-offset,jValues_[i]);
+        if(lb[binding[jRow_[i] - offset]] > - infty)
+          lb[binding[jRow_[i] - offset]] += jValues_[i] * x[jCol_ [i] - offset];
+        if(ub[binding[jRow_[i] - offset]] < infty)
+	  ub[binding[jRow_[i] - offset]] += jValues_[i] * x[jCol_ [i] - offset];
       }
     }
   }
@@ -2269,7 +2267,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   Ipopt::TNLP::IndexStyleEnum index_style;
   //Get problem information
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
-
+  int offset = index_style == Ipopt::TNLP::FORTRAN_STYLE;
   //if not allocated allocate spaced for stroring jacobian
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
@@ -2353,19 +2351,19 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
       }
       if(Ipopt::TNLP::LINEAR //Always accept coefficients from linear constraints
           || //For other clean tinys
-          cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
-              rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
-              getColSolution()[jCol_[i] - 1],
-              rowLow[binding[jRow_[i] - 1]],
-              rowUp[binding[jRow_[i] -1]], tiny_, veryTiny_)) {
-        if(binding[jRow_[i] - 1] == -1) continue;
+          cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
+              rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
+              getColSolution()[jCol_[i] - offset],
+              rowLow[binding[jRow_[i] - offset]],
+              rowUp[binding[jRow_[i] -offset]], tiny_, veryTiny_)) {
+        if(binding[jRow_[i] - offset] == -1) continue;
         vals[nnz] = jValues_[i];
-        if(rowLow[binding[jRow_[i] - 1]] > - infty_)
-          rowLow[binding[jRow_[i] - 1]] += jValues_[i] * getColSolution()[jCol_ [i] - 1];
-        if(rowUp[binding[jRow_[i] - 1]] < infty_)
-          rowUp[binding[jRow_[i] -1]] += jValues_[i] *getColSolution()[jCol_[i] -1];
-        inds[nnz] = binding[jRow_[i] - 1];//jRow_[i ] - 1;
-        length[jCol_[i] - 1]++;
+        if(rowLow[binding[jRow_[i] - offset]] > - infty_)
+          rowLow[binding[jRow_[i] - offset]] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
+        if(rowUp[binding[jRow_[i] - offset]] < infty_)
+          rowUp[binding[jRow_[i] -offset]] += jValues_[i] *getColSolution()[jCol_[i] -offset];
+        inds[nnz] = binding[jRow_[i] - offset];//jRow_[i ] - 1;
+        length[jCol_[i] - offset]++;
         nnz++;
       }
     }
@@ -2378,11 +2376,11 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   }
   if(!needOrder) {
     {
-      length[jCol_[nnz_jac_g -1] - 1]++;
+      length[jCol_[nnz_jac_g -1] - offset]++;
       vals[nnz] = jValues_[nnz_jac_g - 1];
-      rowLow[binding[jRow_[nnz_jac_g - 1] - 1]] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - 1];
-      rowUp[binding[jRow_[nnz_jac_g - 1] -1]] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] -1];
-      inds[nnz++] = binding[jRow_[nnz_jac_g - 1] - 1];
+      rowLow[binding[jRow_[nnz_jac_g - 1] - 1]] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - offset];
+      rowUp[binding[jRow_[nnz_jac_g - 1] -offset]] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] -offset];
+      inds[nnz++] = binding[jRow_[nnz_jac_g - 1] - offset];
     }
     for(int i = jCol_[nnz_jac_g -1] ; i < n ; i++) {
       start[i] = nnz;
@@ -2778,7 +2776,7 @@ OsiTMINLPInterface::extractInterfaceParams()
       cut_strengthener_ = new CutStrengthener(app_->clone());
     }
 
-    app_->Options()->GetIntegerValue("oa_log_level", oa_log_level_,"bonmin.");
+ //   app_->Options()->GetIntegerValue("oa_log_level", oa_log_level_,"bonmin.");
   }
 }
 

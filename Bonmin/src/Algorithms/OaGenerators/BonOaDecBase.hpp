@@ -76,6 +76,10 @@ namespace Bonmin
         /** Returns number of simplex iterations in last solve.*/
         inline int iterationCount(){
           return iterationCount_;}
+        
+        /** Register options for that Oa based cut generation method. */
+        virtual void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){}
+protected:
       private:
        /** lp (potentially mip solver). */
        OsiSolverInterface * lp_;

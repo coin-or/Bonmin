@@ -1,3 +1,15 @@
+// (C) Copyright International Business Machines Corporation and
+// Carnegie Mellon University 2004, 2007
+//
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Pierre Bonami, Carnegie Mellon University,
+// Andreas Waechter, International Business Machines Corporation
+//
+// Date : 12/01/2004
+
 #include "BonminConfig.h"
 
 #include "BonAmplInterface.hpp"
@@ -15,22 +27,35 @@ namespace Bonmin
   AmplInterface::AmplInterface(): OsiTMINLPInterface(), amplTminlp_(NULL)
   {}
 
-  /** Constructor with inputed ampl command line (reads model from nl file)*/
+  /** Constructor with inputed ampl command line (reads model from nl file).*/
   AmplInterface::AmplInterface(char **& amplArgs,
-			       SmartPtr<TNLPSolver> app /* =  NULL */)
-      :
-      OsiTMINLPInterface(),
-      amplTminlp_(NULL)
-  {
-    readAmplNlFile(amplArgs, app, NULL, NULL);
-  }
+                               SmartPtr<TNLPSolver> app
+                               )
+  :
+  OsiTMINLPInterface(app),
+  amplTminlp_(NULL)
+{
+    std::cout<<"Usage of this constructor is deprecated"<<std::endl;
+    readAmplNlFile(amplArgs, NULL, NULL);
+}
 
-  /** Copy constructor */
-  AmplInterface::AmplInterface(const AmplInterface &other):
-      OsiTMINLPInterface(other), amplTminlp_(NULL)
-  {
-    amplTminlp_ = dynamic_cast<Bonmin::AmplTMINLP *> (GetRawPtr(tminlp_));
-  }
+/** Constructor with inputed ampl command line (reads model from nl file)*/
+AmplInterface::AmplInterface(char **& amplArgs
+                             )
+:
+OsiTMINLPInterface(),
+amplTminlp_(NULL)
+{
+  std::cout<<"Usage of this constructor is deprecated"<<std::endl;
+  readAmplNlFile(amplArgs, NULL, NULL);
+}
+
+/** Copy constructor */
+AmplInterface::AmplInterface(const AmplInterface &other):
+OsiTMINLPInterface(other), amplTminlp_(NULL)
+{
+  amplTminlp_ = dynamic_cast<Bonmin::AmplTMINLP *> (GetRawPtr(tminlp_));
+}
 /// Clone
   OsiSolverInterface *
   AmplInterface::clone(bool CopyData )
@@ -47,44 +72,11 @@ namespace Bonmin
   /** Read an ampl . nl file from the given filename */
   void
   AmplInterface::readAmplNlFile(char**& filename,
-      Ipopt::SmartPtr<TNLPSolver> app /* = NULL */,
       std::string* ipopt_file_content /* = NULL */,
       std::string* nl_file_content /* = NULL */)
   {
-    // If nothing is given in 'app', we determine from the options
-    // which solver is to be used
-    if (IsNull(app)) {
-      // AW: The following is not a nice solution, since we read
-      // everything twice, if FilterSQP was chosen
-
-      //We need to build dummy solver objects to get the options,
-      //determine which is the solver to use and register all the
-      //options
-      app_ = new IpoptSolver();
-      OsiTMINLPInterface forOption(GetRawPtr(app_));
-      int ival;
-      forOption.solver()->Options()->GetEnumValue("nlp_solver", ival,"bonmin.");
-      NLPSolverChoice NLPchoice = NLPSolverChoice(ival);
-
-      if(NLPchoice == Bonmin::AmplInterface::FilterSQP) {
-#ifdef COIN_HAS_FILTERSQP
-	app_ = new Bonmin::FilterSolver();
-#else
-	std::cerr<<"Bonmin not configured to run with FilterSQP"<<std::endl;
-	throw -1;
-#endif
-      }
-      else if (NLPchoice != Bonmin::AmplInterface::Ipopt) {
-	std::cerr<<"Trying to use unknown solver."<<std::endl;
-	throw -1;
-      }
-    }
-    else {
-      app_ = app->clone();
-    }
-
     SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
-    register_ALL_options(roptions);
+    registerOptions(roptions);
 
     // Call initalize to open output
     app_->Initialize("");

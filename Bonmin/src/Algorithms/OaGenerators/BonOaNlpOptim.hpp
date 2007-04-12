@@ -78,6 +78,10 @@ namespace Bonmin
     {
       handler_->setLogLevel(value);
     }
+
+    /** Register OaNlpOptim options.*/
+    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+
   private:
     /// Pointer to the Ipopt interface
     OsiTMINLPInterface * nlp_;

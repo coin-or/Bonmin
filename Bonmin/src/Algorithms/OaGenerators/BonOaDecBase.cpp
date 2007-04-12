@@ -277,6 +277,7 @@ OaDecompositionBase::solverManip::solverManip
   }
   if(saveCutoff)
    si->getDblParam(OsiDualObjectiveLimit, cutoff_);
+   si->resolve();
 }
 
 

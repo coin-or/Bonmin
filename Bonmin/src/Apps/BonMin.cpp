@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006 
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -20,6 +20,11 @@
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "BonCbc.hpp"
+
+#include "BonOACutGenerator2.hpp"
+#include "BonEcpCuts.hpp"
+#include "BonOaNlpOptim.hpp"
+
 namespace Bonmin{
 extern int usingCouenne;}
 using namespace Bonmin;
@@ -42,7 +47,12 @@ int main (int argc, char *argv[])
 
   double time1 = CoinCpuTime();
   try {
-    nlp_and_solver = new AmplInterface(argv);
+    nlp_and_solver = new AmplInterface();
+    
+    nlp_and_solver->readAmplNlFile(argv);
+    OACutGenerator2::registerOptions(nlp_and_solver->regOptions());
+    EcpCuts::registerOptions(nlp_and_solver->regOptions());
+    OaNlpOptim::registerOptions(nlp_and_solver->regOptions());
     BonminCbcParam par;
     Bab bb;
     par(nlp_and_solver);

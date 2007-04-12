@@ -551,6 +551,9 @@ namespace Bonmin
         AmplOptionsList::String_Option,
         "Choose the node selection strategy");
 
+    amplOptList->AddAmplOption("bonmin.varselect_stra","bonmin.varselect_stra",
+                               AmplOptionsList::String_Option,
+                               "Choose the variable selection strategy");
 
    amplOptList->AddAmplOption("bonmin.varselect_stra","bonmin.varselect_stra",
                                AmplOptionsList::String_Option,
@@ -571,6 +574,14 @@ namespace Bonmin
     amplOptList->AddAmplOption("bonmin.node_limit","bonmin.node_limit",
         AmplOptionsList::Integer_Option,
         "Set maximum number of nodes explored");
+
+    amplOptList->AddAmplOption("bonmin.solution_limit","bonmin.solution_limit",
+        AmplOptionsList::Integer_Option,
+        "Set maximum of new best integer before aborting.");
+
+    amplOptList->AddAmplOption("bonmin.iteration_limit","bonmin.iteration_limit",
+        AmplOptionsList::Integer_Option,
+        "Set cummulated maximum number of iterations in sub-algorithm used for nodes relaxations");
 
     amplOptList->AddAmplOption("bonmin.integer_tolerance", "bonmin.integer_tolerance",
         AmplOptionsList::Number_Option,
