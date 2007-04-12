@@ -149,6 +149,7 @@ namespace Bonmin
 
     //TODO : Switch to OsiObejcts
     si->findIntegersAndSOS(false);
+    int numberIntegerObjects = si->numberObjects() > 0;
     {
       const CouenneProblem * couenneProb = ci->couenneProb();
       int numAuxs = couenneProb->nAuxs();
@@ -228,11 +229,17 @@ namespace Bonmin
     */
 
     /*Setup heuristic to solve nlp problems.*/
-    NlpSolveHeuristic nlpHeuristic(model, *nlpSolver, false);
-    nlpHeuristic.setMaxNlpInf(1e10);
-    //model.addHeuristic(&nlpHeuristic);
-    //Set true branch-and-bound parameters
-    model.messageHandler()->setLogLevel(par.bbLogLevel);
+    Ipopt::SmartPtr<Ipopt::OptionsList> Options = nlpSolver->retrieve_options();
+    int doNlpHeurisitic = 0;
+    Options->GetEnumValue("nlp_heuristic_solves", doNlpHeurisitic, "couenne.");
+    if(doNlpHeurisitic)
+    {
+      NlpSolveHeuristic nlpHeuristic(model, *nlpSolver, false);
+      nlpHeuristic.setMaxNlpInf(1e10);
+      model.addHeuristic(&nlpHeuristic);
+      //Set true branch-and-bound parameters
+      model.messageHandler()->setLogLevel(par.bbLogLevel);
+    }
     if (par.algo > 0)
       model.solver()->messageHandler()->setLogLevel(par.lpLogLevel);
 
@@ -328,7 +335,39 @@ namespace Bonmin
     model.initialSolve();
 
     continuousRelaxation_ = model.solver() -> getObjValue ();
-
+    double * nlpSol = NULL;
+    if(nlpSolver->isProvenOptimal()){
+      //Look at the solution of nlp if it satisfies all integer branching object (if any) set it as best solution.
+      
+      nlpSol = new double[model.solver()->getNumCols()];
+      CoinCopyN(nlpSolver->getColSolution(), nlpSolver->getNumCols(), nlpSol);
+      CouenneInterface * couenne = dynamic_cast<CouenneInterface *>
+        (nlpSolver);
+      if(couenne){
+        couenne->couenneProb()->getAuxs(nlpSol);
+      }
+      
+      OsiObject ** objects = si->objects();
+      OsiBranchingInformation info(model.solver(), true, false);
+      info.solution_ = nlpSol;
+      bool feasible = true;
+      for(int i = 0 ; i < numberIntegerObjects ; i++){
+        int dummy;
+        if(objects[i]->infeasibility(&info,dummy) > par.intTol)
+        {
+          feasible = false;
+          break;
+        }
+      }
+      if(feasible){
+        double nlpObj = nlpSolver->getObjValue();
+        model.setSolutionCount(1);
+        model.setObjValue(nlpObj);
+        model.setCutoff(nlpObj);
+      }
+      else
+        delete [] nlpSol;
+    }
     if (par.algo == 0)//Set warm start point for Ipopt
     {
       const double * colsol = model.solver()->getColSolution();
@@ -406,6 +445,12 @@ namespace Bonmin
 	printf ("%.3f ", bestSolution_ [i]);
       printf ("}\n");
       */
+    }
+    else if(nlpSol)
+    {
+      if (bestSolution_)
+        delete [] bestSolution_;
+      bestSolution_ = nlpSol;
     }
     if (!model.status()) {
       if (bestSolution_)

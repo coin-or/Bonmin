@@ -77,7 +77,6 @@ namespace Bonmin{
   int
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();
-    std::cout<<"Starting heuristic."<<std::endl;
     double * lower = CoinCopyOfArray(solver->getColLower(), nlp_->getNumCols());
     double * upper = CoinCopyOfArray(solver->getColUpper(), nlp_->getNumCols());
     const double * solution = solver->getColSolution();
@@ -92,7 +91,6 @@ namespace Bonmin{
         int dummy;
         maxInfeasibility = max ( maxInfeasibility, couObj->infeasibility(&info, dummy));
          if(maxInfeasibility > maxNlpInf_){
-          std::cout<<"Node too infeasible:"<<maxInfeasibility<<std::endl;
           delete [] lower;
           delete [] upper;
           return 0;
@@ -139,11 +137,6 @@ namespace Bonmin{
        couenne->couenneProb()->getAuxs(newSolution);
     }
       objectiveValue = obj;
-      std::cout<<"Solution : ";
-      for(int i = - 0 ; i < solver->getNumCols() ; i++){
-        std::cout<<newSolution[i]<<", ";
-      }
-      std::cout<<std::endl;
   }
   nlp_->setColLower(saveColLower);
   nlp_->setColUpper(saveColUpper);

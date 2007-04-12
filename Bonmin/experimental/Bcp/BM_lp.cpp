@@ -1,7 +1,19 @@
+// (C) Copyright International Business Machines Corporation 2006, 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Laszlo Ladanyi, International Business Machines Corporation
+// Pierre Bonami, Carnegie Mellon University
+
 #include "OsiClpSolverInterface.hpp"
 #include "BM.hpp"
 #include "BCP_message_mpi.hpp"
 #include "BCP_lp_node.hpp"
+
+#include "BonOACutGenerator2.hpp"
+#include "BonEcpCuts.hpp"
+#include "BonOaNlpOptim.hpp"
 
 //#############################################################################
 
@@ -15,6 +27,10 @@ BM_lp::BM_lp() :
     in_strong(0)
 {
     nlp_.Set_expose_warm_start(true);
+      Bonmin::OACutGenerator2::registerOptions(nlp_.regOptions());
+      Bonmin::EcpCuts::registerOptions(nlp_.regOptions());
+      Bonmin::OaNlpOptim::registerOptions(nlp_.regOptions());
+      
     babSolver_.setSolver(&nlp_);
     setOsiBabSolver(&babSolver_);
 }

@@ -36,6 +36,7 @@ CouenneInterface::CouenneInterface(char **& amplArgs, SmartPtr<TNLPSolver> app):
     app_->Options()->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
     couenneCg_ = new CouenneCutGenerator 
                        (this, aslfg_, true, CURRENT_ONLY,1);
+    
   }
 
 /** Copy constructor. */

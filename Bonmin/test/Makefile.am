@@ -71,13 +71,18 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Filter` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/CbcBonmin` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Branching` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \

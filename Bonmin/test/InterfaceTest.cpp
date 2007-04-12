@@ -1,4 +1,4 @@
-// (C) Copyright Carnegie Mellon University 2005
+// (C) Copyright Carnegie Mellon University 2005, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -19,6 +19,10 @@
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
+
+#include "BonOACutGenerator2.hpp"
+#include "BonEcpCuts.hpp"
+#include "BonOaNlpOptim.hpp"
 
 #include <cmath>
 
@@ -102,16 +106,16 @@ void testOptimAndSolutionQuery(OsiTMINLPInterface & si)
     // with x = (1/2 + sqrt(5) y[1]=x and y[2] = 1/2 + sqrt(5)/2
     // (can easily be computed since constraint x-y[1]<=0 imply x = y[1] and the resulting problem has dimension 2
     if(!eq(si.getObjValue(),-( (3./2.) + sqrt(5.)/2.)))
-        std::cout<<"Error in objective : "<<fabs(si.getObjValue()+( (3./2.) + sqrt(5.)/2.))<<std::endl;
+        std::cout<<"Error in objective : "<<fabs(si.getObjValue()+( (3./2.) + sqrt(5.0)/2.))<<std::endl;
     
     //Test validity of primal solution
     const double * colsol = si.getColSolution();
-    if(!eq(colsol[0],( (1./2.) + 1/sqrt(5.))))
-        std::cout<<"Error for y[1]  : "<<fabs(colsol[0]-( (1./2.) + 1/sqrt(5.)))<<std::endl;
-    if(!eq(colsol[1],( (1./2.) + 1/(2.*sqrt(5.)))))
-        std::cout<<"Error for y[2]  : "<<fabs(colsol[1]-( (1./2.) + 1/(2*sqrt(5.))))<<std::endl;
+    if(!eq(colsol[0],( (1./2.) + 1/sqrt(5.0))))
+        std::cout<<"Error for y[1]  : "<<fabs(colsol[0]-( (1./2.) + 1/sqrt(5.0)))<<std::endl;
+    if(!eq(colsol[1],( (1./2.) + 1/(2.*sqrt(5.0)))))
+        std::cout<<"Error for y[2]  : "<<fabs(colsol[1]-( (1./2.) + 1/(2*sqrt(5.0))))<<std::endl;
     if(!eq(colsol[2],( (1./2.) + 1/sqrt(5.))))
-        std::cout<<"Error for x  : "<<fabs(colsol[2]-( (1./2.) + 1/sqrt(5.)))<<std::endl;
+        std::cout<<"Error for x  : "<<fabs(colsol[2]-( (1./2.) + 1/sqrt(5.0)))<<std::endl;
     //value of z is not tested
 
     //Test for row activity
@@ -123,7 +127,7 @@ void testOptimAndSolutionQuery(OsiTMINLPInterface & si)
         
      //Check dual values dual for c1 = sqrt(5) c2=1 c3 not tested
      const double * duals = si.getRowPrice();
-     if(!eq(duals[0],sqrt(5)))
+     if(!eq(duals[0],sqrt(5.0)))
              std::cout<<"Error dual of c1 : "<<fabs(duals[0]-sqrt(5.))<<std::endl;
      if(!eq(duals[1],1.))
              std::cout<<"Error dual of c2 : "<<fabs(duals[0]-1.)<<std::endl;
@@ -186,7 +190,7 @@ void testOa(Bonmin::AmplInterface &si)
       assert(rowLow[2]<= -lp.getInfinity());
                   
       const double * rowUp = lp.getRowUpper();
-      double sqrt5 = sqrt(5);
+      double sqrt5 = sqrt(5.);
       if(!eq(rowUp[0], 1./2. + 3./(2 * sqrt5))){
 	double error = fabs(rowUp[0] - 1./2. - 3./(2 * sqrt5));
 	std::cout<<"Error in OA for rowUp[0]: "
@@ -209,7 +213,7 @@ void testOa(Bonmin::AmplInterface &si)
        //Now check the full matrix
        const CoinPackedMatrix * mat = lp.getMatrixByCol();
        int  inds[11] = {0, 1, 3, 0, 2, 3, 1, 2, 3, 2, 3};
-       double vals[11] = {2. / sqrt(5) , -1., -1., 1./sqrt(5), 1. , -1. , 1. , 1., -1.,1.,-1.};
+       double vals[11] = {2. / sqrt(5.) , -1., -1., 1./sqrt(5.), 1. , -1. , 1. , 1., -1.,1.,-1.};
        assert(mat->getNumElements()==11);
        int k=0;
        for(int i = 0 ; i < si.getNumCols() ; i++)
@@ -340,10 +344,16 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 int main()
 {
   Ipopt::SmartPtr<IpoptSolver> ipopt_solver = new IpoptSolver;
+  OACutGenerator2::registerOptions(ipopt_solver->RegOptions());
+  EcpCuts::registerOptions(ipopt_solver->RegOptions());
+  OaNlpOptim::registerOptions(ipopt_solver->RegOptions());
   interfaceTest(GetRawPtr(ipopt_solver));
 
 #ifdef COIN_HAS_FSQP
   Ipopt::SmartPtr<FilterSolver> filter_solver = new FilterSolver;
+  OACutGenerator2::registerOptions(filter_solver->RegOptions());
+  EcpCuts::registerOptions(filter_solver->RegOptions());
+  OaNlpOptim::registerOptions(filter_solver->RegOptions());
   interfaceTest(GetRawPtr(filter_solver));
 #endif
   return 0;

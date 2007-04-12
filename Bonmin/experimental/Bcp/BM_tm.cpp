@@ -1,10 +1,23 @@
 #include "OsiClpSolverInterface.hpp"
+// (C) Copyright International Business Machines Corporation 2006, 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Laszlo Ladanyi, International Business Machines Corporation
+// Pierre Bonami, Carnegie Mellon University
+
 #include "BonIpoptSolver.hpp"
 #ifdef COIN_HAS_FILTERSQP
 # include "BonFilterSolver.hpp"
 #endif
 #include "BCP_problem_core.hpp"
 #include "BM.hpp"
+
+
+#include "BonOACutGenerator2.hpp"
+#include "BonEcpCuts.hpp"
+#include "BonOaNlpOptim.hpp"
 
 //#############################################################################
 
@@ -52,6 +65,10 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     argv[2] = NULL;
     
     Bonmin::AmplInterface nlpSolver(argv);
+    Bonmin::OACutGenerator2::registerOptions(nlpSolver.regOptions());
+    Bonmin::EcpCuts::registerOptions(nlpSolver.regOptions());
+    Bonmin::OaNlpOptim::registerOptions(nlpSolver.regOptions());
+    
     free(argv[1]);
     nlpSolver.extractInterfaceParams();
   
@@ -134,6 +151,9 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
   /* Parse again the input file so that we have a nice and clean ampl
      setup */
   Bonmin::AmplInterface nlpSolver;  
+  Bonmin::OACutGenerator2::registerOptions(nlpSolver.regOptions());
+  Bonmin::EcpCuts::registerOptions(nlpSolver.regOptions());
+  Bonmin::OaNlpOptim::registerOptions(nlpSolver.regOptions());
 
   char* argv_[3];
   char** argv = argv_;

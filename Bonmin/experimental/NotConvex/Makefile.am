@@ -39,7 +39,9 @@ LIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/OaAlgorithms` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \

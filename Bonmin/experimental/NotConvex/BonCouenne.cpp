@@ -22,6 +22,10 @@
 #include "BonIpoptSolver.hpp"
 #include "BonCouenneCbc.hpp"
 
+#include "BonOACutGenerator2.hpp"
+#include "BonEcpCuts.hpp"
+#include "BonOaNlpOptim.hpp"
+
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
@@ -77,9 +81,28 @@ int main (int argc, char *argv[])
     {
       std::cerr<<"Trying to use unknown solver."<<std::endl;
     }
-  nlp_and_solver = new CouenneInterface(argv, solver);
+    nlp_and_solver = new CouenneInterface(argv, solver);
     BonminCbcParam par;
     CouenneBab bb;
+    /** Register options */
+    Ipopt::SmartPtr<RegisteredOptions> roptions = nlp_and_solver->regOptions();
+    nlp_and_solver->registerOptions(roptions);
+    OACutGenerator2::registerOptions(roptions);
+    EcpCuts::registerOptions(roptions);
+    OaNlpOptim::registerOptions(roptions);
+    
+    roptions->SetRegisteringCategory("Couenne options");
+
+    roptions->AddLowerBoundedIntegerOption("ecp_cuts",
+                                           "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
+                                           0,1,
+                                           "A frequency of 0 amounts to to never solve the NLP relaxation.");
+    
+    roptions->AddStringOption2("nlp_heuristic_solves",
+                               "Do we search for local solutions of NLP's",
+                               "yes",
+                               "no","",
+                               "yes","");
     // Eventually change some default in a custom application
     nlp_and_solver->setAppDefaultOptions(nlp_and_solver->solver()->Options());
 

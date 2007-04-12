@@ -1,4 +1,4 @@
-// (C) Copyright Carnegie Mellon University 2006
+// (C) Copyright Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -22,6 +22,9 @@
 #include "MyTMINLP.hpp"
 #include "BonCbc.hpp"
 
+#include "BonOACutGenerator2.hpp"
+#include "BonEcpCuts.hpp"
+#include "BonOaNlpOptim.hpp"
 
 
 int main (int argc, char *argv[])
@@ -30,7 +33,9 @@ int main (int argc, char *argv[])
   using namespace Bonmin;
   SmartPtr<TMINLP> tminlp = new MyTMINLP;
   OsiTMINLPInterface nlpSolver(tminlp, new IpoptSolver);
-  
+  OACutGenerator2::registerOptions(nlpSolver.regOptions());
+  EcpCuts::registerOptions(nlpSolver.regOptions());
+  OaNlpOptim::registerOptions(nlpSolver.regOptions());
   //Option can be set here directly either to bonmin or ipopt
   nlpSolver.retrieve_options()->SetNumericValue("bonmin.time_limit", 1); //changes bonmin's time limit
   nlpSolver.retrieve_options()->SetStringValue("mu_oracle","loqo");

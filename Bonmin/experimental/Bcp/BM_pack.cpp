@@ -6,6 +6,14 @@
 // Laszlo Ladanyi, International Business Machines Corporation
 //
 
+// (C) Copyright International Business Machines Corporation 2006, 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Laszlo Ladanyi, International Business Machines Corporation
+// Pierre Bonami, Carnegie Mellon University
+
 #include "BonCbc.hpp"
 #include "BM.hpp"
 
@@ -70,7 +78,7 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     argv[2] = NULL;
     std::string ipopt_content(ipopt_file_content.c_str());
     std::string nl_content(nl_file_content.c_str());
-    nlp_.readAmplNlFile(argv, NULL, &ipopt_content, &nl_content);
+    nlp_.readAmplNlFile(argv, &ipopt_content, &nl_content);
     free(argv[1]);
 
     nlp_.extractInterfaceParams();

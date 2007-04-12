@@ -1,3 +1,11 @@
+// (C) Copyright International Business Machines Corporation 2006, 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Laszlo Ladanyi, International Business Machines Corporation
+// Pierre Bonami, Carnegie Mellon University
+
 #include "CoinHelperFunctions.hpp"
 #include "BCP_lp_node.hpp"
 #include "BM.hpp"
