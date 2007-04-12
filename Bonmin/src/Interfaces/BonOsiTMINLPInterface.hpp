@@ -1048,8 +1048,7 @@ protected:
   int oa_log_level_;
 private:
     /** Facilitator to create an application. */
-    void
-    OsiTMINLPInterface::createApplication();
+    void createApplication();
 };
 }
 #endif

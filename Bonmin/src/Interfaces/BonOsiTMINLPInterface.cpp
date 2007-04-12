@@ -703,7 +703,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     veryTiny_(source.veryTiny_),
     infty_(source.infty_),
     expose_warm_start_(source.expose_warm_start_),
-    cut_strengthener_(source.cut_strengthener_)
+    cut_strengthener_(source.cut_strengthener_),
+    firstSolve_(true)
 {
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
@@ -1606,6 +1607,7 @@ OsiTMINLPInterface::getIntParam(OsiIntParam key, int& value) const
 {
   //  debugMessage("OsiTMINLPInterface::getIntParam(%d)\n", key);
 
+  value = -INT_MAX; // Give a dummy value
   bool retval = false;
   switch (key) {
   case OsiMaxNumIteration:
