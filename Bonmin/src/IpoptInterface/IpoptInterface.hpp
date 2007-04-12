@@ -50,11 +50,6 @@ public:
 class SimpleError : public CoinError
   {
   public:
-#ifndef COIN_HAS_GAMSLINKS
-    /// Default constructor
-    SimpleError() : CoinError()
-    {}
-#endif
     ///Alternate constructor using strings
     SimpleError(std::string message,
         std::string methodName)
@@ -69,9 +64,7 @@ class SimpleError : public CoinError
     {}
 
   private:
-#ifdef COIN_HAS_GAMSLINKS
    SimpleError();
-#endif
   }
   ;
 
