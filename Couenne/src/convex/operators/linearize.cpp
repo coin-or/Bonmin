@@ -136,6 +136,10 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
       flatten (arglist_ [i] -> ArgList () [1], p, &terms, a0, -1.);
       break;
 
+    case COU_EXPROPP:   // decompose inner opposite
+      flatten (*(arglist_ [i] -> ArgPtr ()), p, &terms, a0, -1.);
+      break;
+
       //case COU_EXPRDIV:   // three cases: x/y, k/y, x/k
       //  if (arglist_ [0] -> Type () <= CONST)
 

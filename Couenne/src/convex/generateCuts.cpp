@@ -23,8 +23,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // lift bound on objective auxiliary to avoid overly strict implied
   // bounds
 
-  //  printf ("pass = %d, level = %d, intree = %d, objval = %.12f\n", 
-  //	  info.pass, info.level, info.inTree, si.getObjValue());
+  //printf ("pass = %d, level = %d, intree = %d, objval = %.12f\n", 
+  //        info.pass, info.level, info.inTree, si.getObjValue());
 
   double now = CoinCpuTime ();
 
@@ -149,27 +149,33 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if (objInd >= 0) {
 
-      CouNumber bestObj = BabPtr_ -> bestObj();
+      CouNumber bestObj = BabPtr_ -> bestObj ();
 
+      /*
       if (problem_ -> Obj (0) -> Sense () == MAXIMIZE) { 
 	// maximization, bestObj() is a lower bound
 	if (problem_ -> Lb (objInd) < bestObj) {
-	  //	  printf ("Lower: %.3f", problem_ -> Lb (objInd));
+	  	  printf ("Lower: %.3f", problem_ -> Lb (objInd));
 	  problem_ -> Lb (objInd) = bestObj;
 	  if (bestObj > - COUENNE_INFINITY + 1) 
 	    chg_bds [objInd] = 1;
-	  //	  printf (" =-> %.3f\n", problem_ -> Lb (objInd));
+	  	  printf (" =-> %.3f\n", problem_ -> Lb (objInd));
 	}
       }
       else
-	// minimization, bestObj() is an upper bound
-	if (problem_ -> Ub (objInd) > bestObj) {
-	  //	  printf ("Upper: %.3f", problem_ -> Ub (objInd));
-	  problem_ -> Ub (objInd) = bestObj;
-	  if (bestObj < COUENNE_INFINITY - 1) 
-	    chg_bds [objInd] = 1;
-	  //	  printf (" =-> %.3f\n", problem_ -> Ub (objInd));
-	}
+      */
+
+      // Bonmin ALWAYS assumes minimization. bestObj () is ALWAYS to
+      // be considered an UPPER bound.
+
+      // minimization, bestObj() is an upper bound
+      if (problem_ -> Ub (objInd) > bestObj) {
+	//printf ("Upper: %.3f", problem_ -> Ub (objInd));
+	problem_ -> Ub (objInd) = bestObj;
+	if (bestObj < COUENNE_INFINITY - 1) 
+	  chg_bds [objInd] = 1;
+	//printf (" =-> %.3f\n", problem_ -> Ub (objInd));
+      }
     }
   }
 
@@ -231,7 +237,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	  if (infeascut) {
 
-	    double upper = -1, lower = +1; // want to make this node infeasible
+	    double upper = -1., lower = +1.; // want to make this node infeasible
 
 	    infeascut -> setLbs (1, &i, &lower);
 	    infeascut -> setUbs (1, &i, &upper);

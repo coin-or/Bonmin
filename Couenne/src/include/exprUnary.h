@@ -60,6 +60,10 @@ class exprUnary: public expression {
   virtual inline expression *Argument () const
     {return argument_;}
 
+  /// return pointer to argument (when applicable, i.e., with univariate functions)
+  virtual inline expression **ArgPtr () 
+    {return &argument_;}
+
   // I/O
   virtual void print (std::ostream &, const std::string &, enum pos) const;
 

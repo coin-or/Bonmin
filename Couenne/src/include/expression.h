@@ -117,6 +117,10 @@ class expression {
   virtual inline expression *Argument () const
     {return NULL;}
 
+  /// return pointer to argument (when applicable, i.e., with univariate functions)
+  virtual inline expression **ArgPtr ()
+    {return NULL;}
+
   /// node type
   virtual inline enum nodeType Type ()
     {return EMPTY;}
