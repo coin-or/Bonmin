@@ -343,7 +343,7 @@ OaDecompositionBase::integerFeasible(const double * sol, int numcols) const{
   for(int i = 0 ; i < numcols ; i++)
   {
     if(nlp_->isInteger(i)) {
-      if(fabs(sol[i]) - floor(sol[i] + 0.5) >
+      if(fabs(sol[i] - floor(sol[i] + 0.5)) >
          parameters_.cbcIntegerTolerance_) {
          return false;
       }

@@ -37,7 +37,7 @@ namespace Bonmin
         SubMipSolver(OsiSolverInterface * lp = NULL,
                      const CbcStrategy * strategy = NULL);
 
-        ~SubMipSolver();
+        virtual ~SubMipSolver();
 
         /** Assign lp solver. */
         void setLpSolver(OsiSolverInterface * lp);
