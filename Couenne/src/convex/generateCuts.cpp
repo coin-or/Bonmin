@@ -99,7 +99,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
       }
     }
-  } else { // equivalent to info.depth > 0
+  } else { // equivalent to info.depth > 0 || info.pass > 0
 
     //////////////////////// GET CHANGED BOUNDS DUE TO BRANCHING ////////////////////////
 
@@ -165,7 +165,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       else
       */
 
-      // Bonmin ALWAYS assumes minimization. bestObj () is ALWAYS to
+      // Bonmin assumes minimization. Bonmin::Bab::bestObj () should
       // be considered an UPPER bound.
 
       // minimization, bestObj() is an upper bound
@@ -345,7 +345,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
 
-    // ok, now create Column Cut
+    // create Column Cut
 
     if (nUpp || nLow) {
 

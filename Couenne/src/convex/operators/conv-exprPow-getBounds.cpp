@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprPow-getBounds.C
+ * Name:    conv-exprPow-getBounds.cpp
  * Author:  Pietro Belotti
  * Purpose: method to get lower and upper bounds of a power x^y
  *

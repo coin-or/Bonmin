@@ -33,8 +33,6 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // only add one cut at the beginning
 
-  OsiRowCut *cut;
-
   expression *x = arglist_ [0];
   expression *y = arglist_ [1];
 
@@ -42,19 +40,14 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int xind = x -> Index ();
   int yind = y -> Index ();
 
-  if (x->Type() == CONST) { // (c - y) or (c - d)
+  if (x->Type () == CONST) { // (c - y) or (c - d)
 
     CouNumber c = x -> Value ();
 
-    if (y->Type() == CONST) cut = cg -> createCut (c - y->Value(), 0, wind, 1.);
-    else                    cut = cg -> createCut (c,              0, wind, 1., yind, 1.);
+    if (y->Type() == CONST) cg -> createCut (cs, c - y->Value(), 0, wind, 1.,   -1, 0., -1, 0., true);
+    else                    cg -> createCut (cs, c,              0, wind, 1., yind, 1., -1, 0., true);
   }
   else // (x - y) or (x - d)
-    if (y->Type() == CONST) cut = cg -> createCut (y->Value(),     0, wind, -1., xind, 1.);
-    else                    cut = cg -> createCut (0.,             0, wind, -1., xind, 1., yind, -1.);
-
-  if (cut) {
-    cut -> setGloballyValid ();
-    cs.insert (cut);
-  }
+    if (y->Type() == CONST) cg -> createCut (cs, y->Value(),     0, wind, -1., xind, 1., -1, 0.,true);
+    else                    cg -> createCut (cs, 0.,          0, wind, -1., xind, 1., yind, -1.,true);
 }

@@ -15,7 +15,8 @@
 
 
 #define LOG_STEP 10
-#define LOG_SCALE 1e-20
+//#define LOG_SCALE 1e-20
+#define LOG_MININF 1e-300
 
 // generate convexification cut for constraint w = this
 
@@ -26,20 +27,18 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   argument_ -> getBounds (le, ue);
 
-  CouNumber// w = (*aux) (),
-            x = (*argument_) (),
+  CouNumber x = (*argument_) (),
             l = (*le) (),
             u = (*ue) ();
-
-  OsiRowCut *cut;
 
   int w_ind = aux       -> Index ();
   int x_ind = argument_ -> Index ();
 
   // fix lower bound
 
-  if (l < COUENNE_EPS) 
-    l = COUENNE_EPS;
+  CouNumber logl = log (l);
+
+  if (l < LOG_MININF) l = LOG_MININF;
   else   // lower segment (only put if lower bound is far enough from
 	 // zero and upper is finite
     if (u < COUENNE_INFINITY - 1) { 
@@ -48,23 +47,16 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       CouNumber logu = log (u);
       CouNumber dw   = logu - log (l);
 
-      if ((cut = cg -> createCut (dx*logu - u*dw, +1, w_ind, dx, 
-				  x_ind, -dw)))
-	cs.insert (cut);
+      cg -> createCut (cs, dx*logu - u*dw, +1, w_ind, dx, x_ind, -dw);
     }
 
   // fix bound interval (unless you like infinite coefficients)
 
-  int ns = cg -> nSamples ();
+  if      (x < l) x = l;
+  else if (x > u) x = u;
 
   if (u > COUENNE_INFINITY - 1)
-    u = l + (LOG_STEP << ns);
-
-  if (l < 2 * COUENNE_EPS)
-    l = LOG_SCALE;
-
-  if (x <= COUENNE_EPS)
-    l = LOG_SCALE;
+    u = x + (LOG_STEP << cg -> nSamples ());
 
   // add upper envelope
 

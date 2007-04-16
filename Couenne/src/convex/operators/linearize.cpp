@@ -104,6 +104,8 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
       a0 += arg -> Value ();
       break;
 
+      // TODO:
+
       /*case COU_EXPRMUL:   // multiplication k*f1(x)*h*f2(x)*f3(x)*...
       extractIndCoe (arglist_ [i], term.index, term.coeff); // separate k*h from f1(x)*f2(x)*f3(x)*...
       terms. push_back (term);
@@ -139,6 +141,8 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
     case COU_EXPROPP:   // decompose inner opposite
       flatten (*(arglist_ [i] -> ArgPtr ()), p, &terms, a0, -1.);
       break;
+
+      // TODO:
 
       //case COU_EXPRDIV:   // three cases: x/y, k/y, x/k
       //  if (arglist_ [0] -> Type () <= CONST)

@@ -46,10 +46,8 @@ void exprVar::getBounds (expression *&lb, expression *&ub) {
 
 void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
-  OsiRowCut *cut;
 
-  if ((cut = cg -> createCut (0., 0, w -> Index (), 1., varIndex_)))
-    cs.insert (cut);
+  cg -> createCut (cs, 0., 0, w -> Index (), 1., varIndex_);
 }
 
 

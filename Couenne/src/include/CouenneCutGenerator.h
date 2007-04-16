@@ -112,14 +112,15 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 		     OsiCuts &, 
 		     const CglTreeInfo = CglTreeInfo ()) const;
 
-  /// create cut and check violation
-  OsiRowCut *createCut (CouNumber, // rhs
-			int,       // sign: -1: <=, 0: =, +1: >=
-        	 		              // index, coeff  (index -1: "don't care") 
-			int,    CouNumber,    // of first  term
-			int=-1, CouNumber=0., // of second term 
-			int=-1, CouNumber=0., // of third  term
-			bool = false) const;  // is it a global cut? No, by default
+  /// create cut and check violation. Insert and return status
+  int createCut (OsiCuts &, // cutset to insert
+		 CouNumber, // rhs
+		 int,       // sign: -1: <=, 0: =, +1: >=
+		                       // index, coeff  (index -1: "don't care") 
+		 int,    CouNumber,    // of first  term
+		 int=-1, CouNumber=0., // of second term 
+		 int=-1, CouNumber=0., // of third  term
+		 bool = false) const;  // is it a global cut? No, by default
 
   /// add general linear envelope to convex function, given its
   /// variables' indices, the (univariate) function and its first

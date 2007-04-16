@@ -60,18 +60,18 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   // limit the bounds for the envelope
 
+  int step = 1 + log (1. + (double) (cg -> nSamples ()));
+
   if (l < - COUENNE_INFINITY + 1) {
-    if (u > COUENNE_INFINITY - 1) {
-      l = x - 1;
-      u = x + 1;
-    } else 
-      l = x - 1;
+    l = x - step;
+    if (u > COUENNE_INFINITY - 1)
+      u = x + step;
   } else 
     if (u > COUENNE_INFINITY - 1) 
-      u = x + 1;
+      u = x + step;
 
   // convex envelope
 
   cg -> addEnvelope (cs, sign, power_k, power_k_prime, 
-		     wi, xi, x, l, u, cg -> isFirst ());
+		     wi, xi, x, l, u);
 }

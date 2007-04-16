@@ -20,9 +20,6 @@ void exprOpp::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
   // easy... 
 
-  OsiRowCut *cut;
-
-  if (cg -> isFirst () && 
-      (cut = cg -> createCut (0., 0, w->Index (), 1., argument_->Index (), 1.)))
-    cs.insert (cut);
+  if (cg -> isFirst ())
+    cg -> createCut (cs, 0., 0, w->Index (), 1., argument_->Index (), 1.);
 }

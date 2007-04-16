@@ -133,8 +133,6 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   expression *xe = arglist_ [0];
   expression *ye = arglist_ [1];
 
-  OsiRowCut *cut;
-
   int wi = w  -> Index (), 
       xi = xe -> Index (), 
       yi = ye -> Index ();
@@ -207,14 +205,13 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	 (ye -> Type () != CONST))) {  // (and hence this follows from
 				       // branching rule)
 
-      if (is0const && is1const) {
+      if (is0const && is1const)
 
 	// strange case: w = c0*c1, should have been dealt with in
 	// simplify, but who knows...
 
-	if ((cut = cg -> createCut (c0 * c1, 0, wi, CouNumber (1.))))
-	  cs.insert (cut);
-      }
+	cg -> createCut (cs, c0 * c1, 0, wi, 1.);
+
       else {
 
 	CouNumber coe;
@@ -223,9 +220,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	if (is0const) {coe = c0; ind = yi;} // c*y
 	else          {coe = c1; ind = xi;} // x*c
 
-	if ((cut = cg -> createCut (CouNumber (0.), 0, wi, 
-				    CouNumber (-1.), ind, coe)))
-	  cs.insert (cut);
+	cg -> createCut (cs, 0., 0, wi, -1., ind, coe);
       }
     }
 
@@ -242,25 +237,10 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   //
   // These cuts are added if the corresponding bounds are finite
 
-  // 1)
-  if (is_boundbox_regular (yl, xl)
-      && (cut = cg -> createCut (yl*xl, -1, wi, -1., xi, yl, yi, xl)))
-    cs.insert (cut);
-
-  // 2)
-  if (is_boundbox_regular (yu, xu)
-      && (cut = cg -> createCut (yu*xu, -1, wi, -1., xi, yu, yi, xu)))
-    cs.insert (cut);
-
-  // 3)
-  if (is_boundbox_regular (yl, xu)
-      && (cut = cg -> createCut (yl*xu, +1, wi, -1., xi, yl, yi, xu)))
-    cs.insert (cut);
-
-  // 4)
-  if (is_boundbox_regular (yu, xl)
-      && (cut = cg -> createCut (yu*xl, +1, wi, -1., xi, yu, yi, xl)))
-    cs.insert (cut);
+  if (is_boundbox_regular (yl, xl)) cg -> createCut (cs, yl*xl, -1, wi, -1., xi, yl, yi, xl);
+  if (is_boundbox_regular (yu, xu)) cg -> createCut (cs, yu*xu, -1, wi, -1., xi, yu, yi, xu);
+  if (is_boundbox_regular (yl, xu)) cg -> createCut (cs, yl*xu, +1, wi, -1., xi, yl, yi, xu);
+  if (is_boundbox_regular (yu, xl)) cg -> createCut (cs, yu*xl, +1, wi, -1., xi, yu, yi, xl);
 
   // extra cuts for the two cases w = xy >= l > 0 and w = xy <= u < 0
   //
@@ -269,6 +249,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // by the above cuts (as happens for division, for instance) and may
   // be of help.
 
+  // TODO: are these really useful? And are they correct?
   return;
 
   if (wu < - COUENNE_EPS) {
@@ -311,7 +292,6 @@ void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
 		     int sign_check,  // get maximum or minimum of abscissa
 		     int sign_ineq) { // lower or upper half-plane
 
-  OsiRowCut *cut;
   CouNumber xp, yp; // intersection point
 
   //  point is (xb, wb/xb) if xb*yb > wb, (wb/yb,yb) otherwise
@@ -333,6 +313,5 @@ void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   CouNumber w_xp = wb / xp;
 
-  if ((cut = cg -> createCut (yp+w_xp, sign_ineq, yi, 1., xi, w_xp/xp)))
-    cs.insert (cut);
+  cg -> createCut (cs, yp+w_xp, sign_ineq, yi, 1., xi, w_xp/xp);
 }

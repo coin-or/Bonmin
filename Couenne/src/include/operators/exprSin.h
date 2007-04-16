@@ -15,38 +15,39 @@
 #include <exprConst.h>
 
 
-// class for sin f(x)
+/// class for sin f(x)
 
 class exprSin: public exprUnary {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprSin  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprSin (argument_ -> clone ());}
 
-  /// the operator's function
+  //// the operator's function
   inline unary_function F () {return sin;}
 
-  // I/O
+  /// I/O
   void print (std::ostream&) const;
 
-  // differentiation
+  /// differentiation
   expression *differentiate (int index); 
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
+  /// TODO: improve with domain
   virtual inline void getBounds (expression *&lb, expression *&ub)
     {lb = new exprConst (-1); ub = new exprConst (1);}
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRSIN;}
 };
 

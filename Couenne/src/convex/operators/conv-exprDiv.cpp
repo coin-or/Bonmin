@@ -73,25 +73,8 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
       wi = w  -> Index (),
       yi = ye -> Index ();
 
-  OsiRowCut *cut;
-
-  // 1) 
-  if (is_boundbox_regular (yl, wl)
-      && (cut = cg -> createCut (yl*wl, -1, xi, CouNumber (-1.), wi, yl, yi, wl)))
-    cs.insert (cut);
-
-  // 2) 
-  if (is_boundbox_regular (yu, wu)
-      && (cut = cg -> createCut (yu*wu, -1, xi, CouNumber (-1.), wi, yu, yi, wu)))
-    cs.insert (cut);
-
-  // 3) 
-  if (is_boundbox_regular (yl, wu)
-      && (cut = cg -> createCut (yl*wu, +1, xi, CouNumber (-1.), wi, yl, yi, wu)))
-    cs.insert (cut);
-
-  // 4) 
-  if (is_boundbox_regular (yu, wl)
-      && (cut = cg -> createCut (yu*wl, +1, xi, CouNumber (-1.), wi, yu, yi, wl)))
-    cs.insert (cut);
+  if (is_boundbox_regular (yl, wl)) cg -> createCut (cs, yl*wl, -1, xi, -1., wi, yl, yi, wl);
+  if (is_boundbox_regular (yu, wu)) cg -> createCut (cs, yu*wu, -1, xi, -1., wi, yu, yi, wu);
+  if (is_boundbox_regular (yl, wu)) cg -> createCut (cs, yl*wu, +1, xi, -1., wi, yl, yi, wu);
+  if (is_boundbox_regular (yu, wl)) cg -> createCut (cs, yu*wl, +1, xi, -1., wi, yu, yi, wl);
 }

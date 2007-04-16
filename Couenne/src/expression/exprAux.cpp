@@ -45,8 +45,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       (fabs ((l = expression::Ubound (varIndex_)) - 
 	          expression::Lbound (varIndex_)) < COUENNE_EPS)) {
 
-    OsiRowCut *cut = cg -> createCut (l, 0, varIndex_, 1.);
-    if (cut) cs.insert (cut);
+    cg -> createCut (cs, l, 0, varIndex_, 1.);
   } 
   else image_ -> generateCuts (this, si, cs, cg);
 

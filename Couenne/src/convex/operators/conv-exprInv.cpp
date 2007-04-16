@@ -89,20 +89,20 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   int ns = cg -> nSamples ();
 
-  if      (l < - COUENNE_INFINITY + 1) l = ns * u; // (-infinity, u] where u < 0
-  else if (u >   COUENNE_INFINITY - 1) u = ns * l; // [l, +infinity) where l > 0
+  if      (l < - COUENNE_INFINITY + 1) l = ns * (u-1); // (-infinity, u] where u < 0
+  else if (u >   COUENNE_INFINITY - 1) u = ns * (l+1); // [l, +infinity) where l > 0
 
   // make bounds nonzero
 
   if (fabs (l) < COUENNE_EPS) {
-    l /= (COUENNE_EPS / MIN_DENOMINATOR);
-    if (fabs (l) < COUENNE_EPS) 
-      l = (l<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
+    /*l /= (COUENNE_EPS / MIN_DENOMINATOR);
+      if (fabs (l) < COUENNE_EPS) */
+    l = (l<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
   }
 
   if (fabs (u) < COUENNE_EPS) {
-    u /= (COUENNE_EPS / MIN_DENOMINATOR);
-    if (fabs (u) < COUENNE_EPS) 
+    /*u /= (COUENNE_EPS / MIN_DENOMINATOR);
+      if (fabs (u) < COUENNE_EPS) */
       u = (u<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
   }
 

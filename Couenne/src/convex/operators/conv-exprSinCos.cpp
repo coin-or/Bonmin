@@ -19,7 +19,8 @@
 void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
-  trigGenCuts (w, cs, cg, sin);
+  addHexagon (cg, cs, sin, w, w->Image()->Argument());
+  //  trigGenCuts (w, cs, cg, sin);
 }
 
 
@@ -28,14 +29,19 @@ void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si,
 void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
-  trigGenCuts (w, cs, cg, cos);
+  addHexagon (cg, cs, cos, w, w->Image()->Argument());
+  //  trigGenCuts (w, cs, cg, cos);
 }
 
 
 // unified function, works with cos and sin
-
+/*
 void trigGenCuts (exprAux *w, OsiCuts &cs, 
 		  const CouenneCutGenerator *cg, unary_function f) {
+
+  // Not needed as the same is done by getBounds and enforced by bound
+  // propagation
+
 
   if (cg -> isFirst ()) { // Do not consider values of auxiliary variables 
 
@@ -64,7 +70,7 @@ void trigGenCuts (exprAux *w, OsiCuts &cs,
   // Now add the lower/upper envelope
   addHexagon (cg, cs, f, w, w->Image()->Argument());
 }
-
+*/
 
 // add lateral edges of the hexagon providing 
 
@@ -74,40 +80,26 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
 		 exprAux *aux,      // auxiliary variable
 		 expression *arg) { // argument of cos/sin (should be a variable)
 
-  OsiRowCut *cut;
-
   expression *lbe, *ube;
   arg -> getBounds (lbe, ube);
 
   CouNumber lb = (*lbe) (), 
             ub = (*ube) ();
 
-  // add the lower envelope, left: w - x <= f lb - lb 
-
   int x_ind = arg -> Index ();
   int w_ind = aux -> Index ();
 
-  if ((cut = cg -> createCut (f (lb) - lb, -1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (-1.))))
-    cs.insert (cut);
+  // add the lower envelope, left: w - x <= f lb - lb 
+  cg -> createCut (cs, f (lb) - lb, -1, w_ind, 1., x_ind, -1.);
 
   // and right: w + x <= f ub + ub 
-
-  if ((cut = cg -> createCut (f (ub) + ub, -1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (1.))))
-    cs.insert (cut);
+  cg -> createCut (cs, f (ub) + ub, -1, w_ind, 1., x_ind,  1.);
 
   // add the lower envelope, right: w - x >= cos ub - ub 
-
-  if ((cut = cg -> createCut (f (ub) - ub, +1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (-1.))))
-    cs.insert (cut);
+  cg -> createCut (cs, f (ub) - ub, +1, w_ind, 1., x_ind, -1.);
 
   // and left: w + x >= cos lb + lb 
-
-  if ((cut = cg -> createCut (f (lb) + lb, +1, w_ind, CouNumber (1.),
-			      x_ind, CouNumber (1.))))
-    cs.insert (cut);
+  cg -> createCut (cs, f (lb) + lb, +1, w_ind, 1., x_ind,  1.);
 
   delete lbe;
   delete ube;

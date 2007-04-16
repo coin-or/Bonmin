@@ -100,23 +100,18 @@ void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 				      CouNumber x1, CouNumber y1, 
 				      CouNumber x2, CouNumber y2, int sign) const { 
 
-  OsiRowCut *cut = NULL;
-
   if (fabs (x2-x1) < COUENNE_EPS)
     if (fabs (y2-y1) > COUENNE_EPS)
       printf ("warning, discontinuity of %e over an interval of %e\n", y2-y1, x2-x1);
-    else cut = createCut (y2, 0, wi, CouNumber (1.));
+    else createCut (cs, y2, 0, wi, 1.);
   else {
 
     CouNumber oppslope = (y1-y2) / (x2-x1);
 
-    cut = createCut (y1 + oppslope * x1, sign, 
-		     wi, CouNumber (1.), 
-		     xi, oppslope);
+    createCut (cs, y1 + oppslope * x1, sign, 
+	       wi, 1., 
+	       xi, oppslope);
   }
-
-  if (cut) 
-    cs.insert (cut);
 }
 
 /// total number of variables (original + auxiliary) of the problem

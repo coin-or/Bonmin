@@ -21,15 +21,13 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int w_ind = w         -> Index (),
       x_ind = argument_ -> Index ();
 
-  OsiRowCut *cut;
-
   // convexifying an expression w = |x| consists in adding two
   // global cuts: w >= x and w >= -x
 
   if (cg -> isFirst ()) {
 
-    if ((cut = cg -> createCut (0., +1, w_ind, 1., x_ind, -1.))) cs.insert (cut);
-    if ((cut = cg -> createCut (0., +1, w_ind, 1., x_ind,  1.))) cs.insert (cut);
+    cg -> createCut (cs, 0., +1, w_ind, 1., x_ind, -1.);
+    cg -> createCut (cs, 0., +1, w_ind, 1., x_ind,  1.);
   }
 
   // add an upper segment, which depends on the lower/upper bounds
@@ -43,16 +41,9 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // if l, u have the same sign, then w = x (l > 0) or w = -x (u < 0)
 
-  if (l > 0) {
-    if ((cut = cg -> createCut (0., -1, w_ind, 1., x_ind, -1.)))
-      cs.insert (cut);
-  }
-  else 
-    if (u < 0) {
-      if ((cut = cg -> createCut (0., -1, w_ind, 1., x_ind, +1.)))
-	cs.insert (cut);
-    }
-    else {
+  if      (l >= 0) cg -> createCut (cs, 0., -1, w_ind, 1., x_ind, -1.);
+  else if (u <= 0) cg -> createCut (cs, 0., -1, w_ind, 1., x_ind, +1.);
+  else {
 
       // otherwise check if only one of the bounds is infinite: if so,
       // we can still add a plane, whose slope will be one (if x is
@@ -60,21 +51,16 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
       if (l > - COUENNE_INFINITY + 1) {
 
-	if (u < COUENNE_INFINITY - 1) {// the upper approximation has slope other than -1, 1
+	if (u < COUENNE_INFINITY - 1) { // the upper approximation has slope other than -1, 1
 
 	  CouNumber slope = (u+l) / (u-l);
-	  if ((cut = cg -> createCut (-l*(slope+1.), -1, w_ind, 1., x_ind, -slope)))
-	    cs.insert (cut);
+	  cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
 	}
-	else {// slope = 1
-	  if ((cut = cg -> createCut (-2*l, -1, w_ind, 1., x_ind, -1.)))
-	    cs.insert (cut);
-	}
+	else // slope = 1
+	  cg -> createCut (cs, -2*l, -1, w_ind, 1., x_ind, -1.);
       }
-      else if (u < COUENNE_INFINITY - 1) {// slope = -1
-	if ((cut = cg -> createCut (2*u, -1, w_ind, 1., x_ind, 1.)))
-	  cs.insert (cut);
-      }
+      else if (u < COUENNE_INFINITY - 1) // slope = -1
+	cg -> createCut (cs, 2*u, -1, w_ind, 1., x_ind, 1.);
     }
 
   delete lbe;

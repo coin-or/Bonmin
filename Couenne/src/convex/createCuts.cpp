@@ -17,13 +17,14 @@
 
 
 // general procedure for inserting a linear cut with up to three
-// variables
+// variables. Return 1 if cut inserted, 0 if none, <0 if error
 
-OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign, 
-					   int i1, CouNumber c1,
-					   int i2, CouNumber c2,
-					   int i3, CouNumber c3,
-					   bool is_global)       const {
+int CouenneCutGenerator::createCut (OsiCuts &cs,
+				    CouNumber rhs, int sign, 
+				    int i1, CouNumber c1,
+				    int i2, CouNumber c2,
+				    int i3, CouNumber c3,
+				    bool is_global)       const {
 
   // a maximum of three terms are allowed here. Index -1 means the
   // term is not considered
@@ -33,6 +34,9 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   if (i1 >= 0) nterms++; // useless, but you never know...
   if (i2 >= 0) nterms++;
   if (i3 >= 0) nterms++;
+
+  if (!nterms) // nonsense cut
+    return 0;
 
   if (!firstcall_ && addviolated_) { // need to check violation 
 
@@ -49,7 +53,7 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
 
     if (((violation <   COUENNE_EPS) || (sign > 0)) &&
 	((violation > - COUENNE_EPS) || (sign < 0)))
-      return NULL;
+      return 0;
   }
 
   // You are here if:
@@ -58,27 +62,47 @@ OsiRowCut *CouenneCutGenerator::createCut (CouNumber rhs, int sign,
   // 2) we also want unviolated cuts
   // 3) the cut is violated
 
-  CouNumber *coeff = new CouNumber [nterms]; 
-  int       *index = new int       [nterms];
-  OsiRowCut *cut   = new OsiRowCut;
+  // two cases: cut is of the form w1 [<|>]= alpha, hence a column
+  // cut, or it is of the form (a w1 + b w2 + c w3 [<|>]= alpha), a
+  // row cut
 
-  if (i1 >= 0) {coeff [0] = c1; index [0] = i1;}
-  if (i2 >= 0) {coeff [1] = c2; index [1] = i2;}
-  if (i3 >= 0) {coeff [2] = c3; index [2] = i3;}
+  if ((i2 < 0) && (i3 < 0)) { // column cut
 
-  if (sign <= 0) cut -> setUb (rhs);
-  if (sign >= 0) cut -> setLb (rhs);
+    OsiColCut *cut = new OsiColCut;
 
-  cut -> setRow (nterms, index, coeff);
+    if (sign <= 0) cut -> setUbs (1, &i1, &rhs);
+    if (sign >= 0) cut -> setLbs (1, &i1, &rhs);
 
-  delete [] coeff;
-  delete [] index;
+    cut -> setGloballyValid (is_global); // global?
 
-  // some convexification cuts (as the lower envelopes of convex
-  // functions) are global, hence here is a tool to make them valid
-  // throughout the BB tree
+    cs.insert (cut);
 
-  cut -> setGloballyValid (is_global);
+  } else { // row cut
 
-  return cut;
+    CouNumber *coeff = new CouNumber [nterms]; 
+    int       *index = new int       [nterms];
+    OsiRowCut *cut   = new OsiRowCut;
+
+    if (i1 >= 0) {coeff [0] = c1; index [0] = i1;}
+    if (i2 >= 0) {coeff [1] = c2; index [1] = i2;}
+    if (i3 >= 0) {coeff [2] = c3; index [2] = i3;}
+
+    if (sign <= 0) cut -> setUb (rhs);
+    if (sign >= 0) cut -> setLb (rhs);
+
+    cut -> setRow (nterms, index, coeff);
+
+    delete [] coeff;
+    delete [] index;
+
+    // some convexification cuts (as the lower envelopes of convex
+    // functions) are global, hence here is a tool to make them valid
+    // throughout the BB tree
+
+    cut -> setGloballyValid (is_global);
+
+    cs.insert (cut);
+  }
+
+  return 1;
 }
