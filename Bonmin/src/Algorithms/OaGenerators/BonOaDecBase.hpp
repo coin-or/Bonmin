@@ -77,8 +77,9 @@ namespace Bonmin
         inline int iterationCount(){
           return iterationCount_;}
         
-        /** Register options for that Oa based cut generation method. */
-        virtual void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){}
+      //AW: I think the following should not be here!  Otherwise we get warning messages about having not a virtual destructor
+      // /** Register options for that Oa based cut generation method. */
+        //virtual void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){}
 protected:
       private:
        /** lp (potentially mip solver). */

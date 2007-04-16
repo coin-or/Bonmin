@@ -49,10 +49,11 @@ int main (int argc, char *argv[])
   try {
     nlp_and_solver = new AmplInterface();
     
-    nlp_and_solver->readAmplNlFile(argv);
     OACutGenerator2::registerOptions(nlp_and_solver->regOptions());
     EcpCuts::registerOptions(nlp_and_solver->regOptions());
     OaNlpOptim::registerOptions(nlp_and_solver->regOptions());
+    nlp_and_solver->readAmplNlFile(argv);
+
     BonminCbcParam par;
     Bab bb;
     par(nlp_and_solver);

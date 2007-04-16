@@ -17,7 +17,19 @@ namespace Bonmin
 {
   using namespace Ipopt;
 
-  /** 
+  enum CutStrengtheningType{
+    CS_None=0,
+    CS_StrengthenedGlobal=1,
+    CS_UnstrengthenedGlobal_StrengthenedLocal=2,
+    CS_StrengthenedGlobal_StrengthenedLocal=3
+  };
+
+  enum DisjunctiveCutType{
+    DC_None=0,
+    DC_MostFractional=1
+  };
+
+  /** Class for strengthening OA cuts, and generating additional ones.
    */
   class CutStrengthener: public ReferencedObject
   {
@@ -149,6 +161,9 @@ namespace Bonmin
       /** Final strengthened bound */
       Number strengthened_bound_;
 
+      /** space for original gradient if objective function is handled */
+      Number* grad_f_;
+
       /** Auxilliary method for updating the full x variable */
       void update_x_full(const Number *x);
     };
@@ -158,22 +173,23 @@ namespace Bonmin
     //@{
     /** Constructor.  It is given a TNLP solver to solve the internal
      *  NLPs. */
-    CutStrengthener(SmartPtr<TNLPSolver> tnlp_solver);
+    CutStrengthener(SmartPtr<TNLPSolver> tnlp_solver,
+		    SmartPtr<OptionsList> options);
 
     /** Destructor */
     virtual ~CutStrengthener();
     //@}
 
-    /** Method for strengthening one cut. */
-    bool StrengthenCut(SmartPtr<TMINLP> tminlp /** current TMINLP */,
-		       int constr_index /** Index number of the constraint to be strengthened, -1 means objective function */,
-		       CoinPackedVector& row /** Cut to be strengthened */,
-		       int n /** Number of variables */,
-		       const double* x /** solution from node */,
-		       const double* x_l /** Lower bounds for x in which should be valid. */,
-		       const double* x_u /** Upper bounds for x in which should be valid. */,
-		       double& lb,
-		       double& ub);
+    /** Method for generating and strenghtening all desired cuts */
+    bool ComputeCuts(OsiCuts &cs,
+		     TMINLP* tminlp,
+		     TMINLP2TNLP* problem,
+		     const int gindex, CoinPackedVector& cut,
+		     double& cut_lb, double& cut_ub,
+		     const double g_val, const double g_lb,
+		     const double g_ub,
+		     int n, const double* x,
+		     double infty);
 
   private:
     /**@name Default Compiler Generated Methods
@@ -194,9 +210,36 @@ namespace Bonmin
     void operator=(const CutStrengthener&);
     //@}
 
+    /** Method for strengthening one cut. */
+    bool StrengthenCut(SmartPtr<TMINLP> tminlp /** current TMINLP */,
+		       int constr_index /** Index number of the constraint to be strengthened, -1 means objective function */,
+		       CoinPackedVector& row /** Cut to be strengthened */,
+		       int n /** Number of variables */,
+		       const double* x /** solution from node */,
+		       const double* x_l /** Lower bounds for x in which should be valid. */,
+		       const double* x_u /** Upper bounds for x in which should be valid. */,
+		       double& lb,
+		       double& ub);
+
+    /** Method for generating one type of cut (strengthened or disjunctive) */
+    bool HandleOneCut(bool is_tight, TMINLP* tminlp,
+		      TMINLP2TNLP* problem,
+		      const double* minlp_lb,
+		      const double* minlp_ub,
+		      const int gindex, CoinPackedVector& cut,
+		      double& cut_lb, double& cut_ub,
+		      int n, const double* x,
+		      double infty);
+
     /** Object for solving the TNLPs */
     SmartPtr<TNLPSolver> tnlp_solver_;
 
+    /** Type of OA cut strengthener */
+    int cut_strengthening_type_;
+    /** What kind of disjuntion should be done */
+    int disjunctive_cut_type_;
+    /** verbosity level for OA-related output */
+    int oa_log_level_;
   };
 
 } // namespace Ipopt

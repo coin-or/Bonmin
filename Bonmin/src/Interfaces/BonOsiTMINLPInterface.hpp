@@ -118,15 +118,15 @@ class Messages : public CoinMessages
    /** Constructor with given (user) TMINLP.
     \warning In this constructor option file is not read, use readOptionFile to read one.
   */
-  OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
-		      Ipopt::SmartPtr<Bonmin::TNLPSolver> app);
+  OsiTMINLPInterface (Ipopt::SmartPtr<TMINLP> tminlp,
+		      Ipopt::SmartPtr<TNLPSolver> app);
 
  /** Constructor with specified application and empty problem just usefull to get the options and nothing else */
-  OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app);
+  OsiTMINLPInterface (Ipopt::SmartPtr<TNLPSolver> app);
 
   /** Facilitator to allocate a tminlp and an application. */
-  void allocateTMINLP(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
-		 Ipopt::SmartPtr<Bonmin::TNLPSolver> app);
+  void allocateTMINLP(Ipopt::SmartPtr<TMINLP> tminlp,
+		      Ipopt::SmartPtr<TNLPSolver> app);
 
   /** Copy constructor
   */
@@ -373,7 +373,7 @@ class Messages : public CoinMessages
   ///Get priorities on integer variables.
   const int * getPriorities() const
   {
-    const Bonmin::TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
+    const TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
     if(branch)
       return branch->priorities;
     else return NULL;
@@ -381,21 +381,21 @@ class Messages : public CoinMessages
   ///get prefered branching directions
   const int * getBranchingDirections() const
   {
-    const Bonmin::TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
+    const TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
     if(branch)
       return branch->branchingDirections;
     else return NULL;
   }
   const double * getUpPsCosts() const
   {
-    const Bonmin::TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
+    const TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
     if(branch)
     return branch->upPsCosts;
     else return NULL;
   }
   const double * getDownPsCosts() const
   {
-    const Bonmin::TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
+    const TMINLP::BranchingInfo * branch = tminlp_->branchingInfo();
     if(branch)
     return branch->downPsCosts;
     else return NULL;
@@ -771,26 +771,26 @@ class Messages : public CoinMessages
   //@}
 
   /** get pointer to the TMINLP2TNLP adapter */
-  const Bonmin::TMINLP2TNLP * problem() const
+  const TMINLP2TNLP * problem() const
   {
     return GetRawPtr(problem_);
   }
 
-  Bonmin::TMINLP2TNLP * problem()
+  TMINLP2TNLP * problem()
   {
     return GetRawPtr(problem_);
   }
 
-  const Bonmin::TMINLP * model() const
+  const TMINLP * model() const
   {
     return GetRawPtr(tminlp_);
   }
-  const Bonmin::TNLPSolver * solver() const
+  const TNLPSolver * solver() const
   {
     return GetRawPtr(app_);
   } 
  
-  Bonmin::TNLPSolver * solver()
+  TNLPSolver * solver()
   {
     return GetRawPtr(app_);
   } 
@@ -857,13 +857,6 @@ class Messages : public CoinMessages
     B_Hyb=3/** Bonmin's hybrid outer approximation.*/,
     B_Couenne=4/** Bonmin's and Couenne spatial branch-and-bound.*/};
 
-  enum CutStrengtheningType{
-    CS_None=0,
-    CS_StrengthenedGlobal=1,
-    CS_UnstrengthenedGlobal_StrengthenedLocal=2,
-    CS_StrengthenedGlobal_StrengthenedLocal=3
-  };
-
   /** To set some application specific defaults. */
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
@@ -923,11 +916,11 @@ protected:
   /**@name Model and solver */
   //@{
   /** TMINLP model.*/
-  Ipopt::SmartPtr<Bonmin::TMINLP> tminlp_;
+  Ipopt::SmartPtr<TMINLP> tminlp_;
   /** Adapter for a MINLP to a NLP */
-  Ipopt::SmartPtr<Bonmin::TMINLP2TNLP> problem_;
+  Ipopt::SmartPtr<TMINLP2TNLP> problem_;
   /** Solver for a TMINLP. */
-  Ipopt::SmartPtr<Bonmin::TNLPSolver> app_;
+  Ipopt::SmartPtr<TNLPSolver> app_;
   //@}
 
   /**@name Cached information on the problem */
@@ -981,8 +974,6 @@ protected:
   int numRetryInfeasibles_;
   /// Number of times problem will be resolved in case of a failure
   int numRetryUnsolved_;
-  /// Type of OA cut strengthener
-  int cut_strengthening_type_;
   /** Messages specific to an OsiTMINLPInterface. */
   Messages messages_;
   /** If not 0 when a problem is not solved (failed to be solved)
@@ -1004,7 +995,7 @@ protected:
   static bool hasPrintedOptions;
 
   /** Adapter for TNLP to a feasibility problem */
-  Ipopt::SmartPtr<Bonmin::TNLP2FPNLP> feasibilityProblem_;
+  Ipopt::SmartPtr<TNLP2FPNLP> feasibilityProblem_;
 
 
   /** \name Arrays to store Jacobian matrix */
@@ -1044,8 +1035,6 @@ protected:
   bool firstSolve_;
   /** Object for strengthening cuts */
   SmartPtr<CutStrengthener> cut_strengthener_;
-  /** verbosity level for OA-related output */
-  int oa_log_level_;
 private:
     /** Facilitator to create an application. */
     void createApplication();

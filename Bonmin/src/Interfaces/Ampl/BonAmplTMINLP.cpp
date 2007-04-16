@@ -155,7 +155,7 @@ namespace Bonmin
   {
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
 
-    int i = ASL_suf_sos_explict_free;
+    int i = 0;//ASL_suf_sos_explict_free;
     int copri[2], **p_sospri;
     copri[0] = 0;
     copri[1] = 0;

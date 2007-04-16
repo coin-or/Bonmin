@@ -31,7 +31,7 @@ namespace Bonmin {
 ///Register options
 static void
 register_general_options
-(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+(SmartPtr<RegisteredOptions> roptions)
 {
   roptions->SetRegisteringCategory("bonmin output options");
 
@@ -279,10 +279,16 @@ register_general_options
       "and will keep the best local optimum found.");
 
 
+
+  roptions->AddStringOption2("disjunctive_cut_type",
+      "Determine if and what kind of disjunctive cuts should be computed.",
+      "none",
+      "none", "No disjunctive cuts.",
+      "most-fractional", "If discrete variables present, compute disjunction for most-fractional variable");
 }
 
 static void register_OA_options
-(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+(SmartPtr<RegisteredOptions> roptions)
 {
   roptions->SetRegisteringCategory("bonmin options : Outer Approximation cuts");
 
@@ -349,7 +355,7 @@ static void register_OA_options
 ///Register options
 void
 OsiTMINLPInterface::registerOptions
-(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+(SmartPtr<RegisteredOptions> roptions)
 {
   // We try to register the options - if those have been registered
   // already, we catch the exception and don't need to do it again
@@ -386,7 +392,7 @@ OsiTMINLPInterface::registerOptions
 
 /** To set some application specific defaults. */
 void 
-OsiTMINLPInterface::setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options)
+OsiTMINLPInterface::setAppDefaultOptions(SmartPtr<OptionsList> Options)
 {}
 
 OsiTMINLPInterface::Messages::Messages
@@ -498,7 +504,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
 }
 
 /** Constructor with given TNLPSolver and TMINLP */
-OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app):
+OsiTMINLPInterface::OsiTMINLPInterface (SmartPtr<TNLPSolver> app):
     OsiSolverInterface(),
     tminlp_(NULL),
     problem_(NULL),
@@ -544,14 +550,14 @@ OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TNLPSolver> app)
 {
   app_ = app->clone();
 
-  Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = app_->RegOptions();
+  SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
   registerOptions(roptions);
   extractInterfaceParams();
 }
 
 /** Constructor with given IpSolver and TMINLP */
-OsiTMINLPInterface::OsiTMINLPInterface (Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
-                                        Ipopt::SmartPtr<Bonmin::TNLPSolver> app):
+OsiTMINLPInterface::OsiTMINLPInterface (SmartPtr<TMINLP> tminlp,
+                                        SmartPtr<TNLPSolver> app):
     OsiSolverInterface(),
     tminlp_(tminlp),
     problem_(NULL),
@@ -623,7 +629,7 @@ OsiTMINLPInterface::createApplication(){
   
   if(NLPchoice == FilterSQP) {
 #ifdef COIN_HAS_FILTERSQP
-    app_ = new Bonmin::FilterSolver();
+    app_ = new FilterSolver();
 #else
     std::cerr<<"Bonmin not configured to run with FilterSQP"<<std::endl;
     throw -1;
@@ -637,8 +643,8 @@ OsiTMINLPInterface::createApplication(){
 
 /** Facilitator to allocate a tminlp and an application. */
 void
-OsiTMINLPInterface::allocateTMINLP(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
-				   Ipopt::SmartPtr<Bonmin::TNLPSolver> app)
+OsiTMINLPInterface::allocateTMINLP(SmartPtr<TMINLP> tminlp,
+				   SmartPtr<TNLPSolver> app)
 {
   assert(IsValid(tminlp));
 
@@ -646,12 +652,11 @@ OsiTMINLPInterface::allocateTMINLP(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp,
   problem_ = new TMINLP2TNLP(tminlp_);
   app_ = app->clone();
 
-  Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = app_->RegOptions();
+  SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
   registerOptions(roptions);
   app_->Initialize("");
   extractInterfaceParams();
 }
-
 
 
 
@@ -703,12 +708,12 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     veryTiny_(source.veryTiny_),
     infty_(source.infty_),
     expose_warm_start_(source.expose_warm_start_),
-    cut_strengthener_(source.cut_strengthener_),
-    firstSolve_(true)
+    firstSolve_(true),
+    cut_strengthener_(source.cut_strengthener_)
 {
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
-    problem_ = new Bonmin::TMINLP2TNLP(tminlp_);
+    problem_ = new TMINLP2TNLP(tminlp_);
     problem_->copyUserModification(*source.problem_);
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
 
@@ -725,8 +730,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     CoinCopyN(source.obj_, source.getNumCols(), obj_);
   }
   if(IsValid(source.tminlp_))
-    feasibilityProblem_ = new Bonmin::TNLP2FPNLP
-        (Ipopt::SmartPtr<Ipopt::TNLP>(Ipopt::GetRawPtr(problem_)));
+    feasibilityProblem_ = new TNLP2FPNLP
+        (SmartPtr<TNLP>(GetRawPtr(problem_)));
   else
     throw SimpleError("Don't know how to copy an empty IpoptOAInterface.",
         "copy constructor");
@@ -734,14 +739,14 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
 
   if(source.jValues_!=NULL && source.jRow_ != NULL && source.jCol_ != NULL && nnz_jac>0) {
     jValues_ = new double [nnz_jac];
-    jCol_    = new Ipopt::Index [nnz_jac];
-    jRow_    = new Ipopt::Index [nnz_jac];
+    jCol_    = new Index [nnz_jac];
+    jRow_    = new Index [nnz_jac];
     CoinCopyN(source.jValues_ , nnz_jac,jValues_ );
     CoinCopyN(source.jCol_    , nnz_jac,jCol_    );
     CoinCopyN(source.jRow_    , nnz_jac,jRow_    );
 
     if(source.constTypes_ != NULL) {
-      constTypes_ = new Ipopt::TNLP::LinearityType [getNumRows()];
+      constTypes_ = new TNLP::LinearityType [getNumRows()];
       CoinCopyN(source.constTypes_, getNumRows(), constTypes_);
     }
   }
@@ -775,11 +780,11 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
     if(IsValid(rhs.tminlp_)) {
 
       tminlp_ = rhs.tminlp_;
-      problem_ = new Bonmin::TMINLP2TNLP(tminlp_);
+      problem_ = new TMINLP2TNLP(tminlp_);
       app_ = rhs.app_->clone();
 
-      feasibilityProblem_ = new Bonmin::TNLP2FPNLP
-          (Ipopt::SmartPtr<Ipopt::TNLP>(Ipopt::GetRawPtr(problem_)));
+      feasibilityProblem_ = new TNLP2FPNLP
+          (SmartPtr<TNLP>(GetRawPtr(problem_)));
       nnz_jac = rhs.nnz_jac;
 
       if(constTypes_ != NULL) {
@@ -787,7 +792,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
         constTypes_ = NULL;
       }
       if(rhs.constTypes_ != NULL) {
-        constTypes_ = new Ipopt::TNLP::LinearityType[getNumRows()];
+        constTypes_ = new TNLP::LinearityType[getNumRows()];
         CoinCopyN(rhs.constTypes_, getNumRows(), constTypes_);
       }
 /*
@@ -802,8 +807,8 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
 */
       if(rhs.jValues_!=NULL && rhs.jRow_ != NULL && rhs.jCol_ != NULL && nnz_jac>0) {
         jValues_ = new double [nnz_jac];
-        jCol_    = new Ipopt::Index [nnz_jac];
-        jRow_    = new Ipopt::Index [nnz_jac];
+        jCol_    = new Index [nnz_jac];
+        jRow_    = new Index [nnz_jac];
         CoinCopyN(rhs.jValues_ , nnz_jac,jValues_ );
         CoinCopyN(rhs.jCol_    , nnz_jac,jCol_    );
         CoinCopyN(rhs.jRow_    , nnz_jac,jRow_    );
@@ -866,7 +871,7 @@ app_ = NULL;
   return *this;
 }
 
-Ipopt::SmartPtr<Ipopt::OptionsList> OsiTMINLPInterface::retrieve_options()
+SmartPtr<OptionsList> OsiTMINLPInterface::retrieve_options()
 {
   if(!IsValid(app_)) {
     std::cout<<"Can not parse options when no IpApplication has been created"<<std::endl;
@@ -1245,14 +1250,14 @@ OsiTMINLPInterface::getRowUpper() const
 bool
 OsiTMINLPInterface::isContinuous(int colNumber) const
 {
-  return (problem_->var_types()[colNumber]==Bonmin::TMINLP::CONTINUOUS);
+  return (problem_->var_types()[colNumber]==TMINLP::CONTINUOUS);
 }
 
 /// Return true if column is binary
 bool
 OsiTMINLPInterface::isBinary(int colNumber) const
 {
-  return (problem_->var_types()[colNumber]==Bonmin::TMINLP::BINARY);
+  return (problem_->var_types()[colNumber]==TMINLP::BINARY);
 }
 
 /** Return true if column is integer.
@@ -1262,21 +1267,21 @@ OsiTMINLPInterface::isBinary(int colNumber) const
 bool
 OsiTMINLPInterface::isInteger(int colNumber) const
 {
-  return ((problem_->var_types()[colNumber]==Bonmin::TMINLP::BINARY)||
-      (problem_->var_types()[colNumber]==Bonmin::TMINLP::INTEGER));
+  return ((problem_->var_types()[colNumber]==TMINLP::BINARY)||
+      (problem_->var_types()[colNumber]==TMINLP::INTEGER));
 }
 
 /// Return true if column is general integer
 bool
 OsiTMINLPInterface::isIntegerNonBinary(int colNumber) const
 {
-  return (problem_->var_types()[colNumber]==Bonmin::TMINLP::INTEGER);
+  return (problem_->var_types()[colNumber]==TMINLP::INTEGER);
 }
 /// Return true if column is binary and not fixed at either bound
 bool
 OsiTMINLPInterface::isFreeBinary(int colNumber) const
 {
-  return ((problem_->var_types()[colNumber]==Bonmin::TMINLP::BINARY)
+  return ((problem_->var_types()[colNumber]==TMINLP::BINARY)
       &&((getColUpper()[colNumber]-getColLower()[colNumber]) > 1 - 1e-09));
 }
 
@@ -1491,14 +1496,14 @@ OsiTMINLPInterface::setWarmStart(const CoinWarmStart* warmstart)
 void
 OsiTMINLPInterface::setContinuous(int index)
 {
-  problem_->SetVariableType(index, Bonmin::TMINLP::CONTINUOUS);
+  problem_->SetVariableType(index, TMINLP::CONTINUOUS);
   hasBeenOptimized_ = false;
 }
 /** Set the index-th variable to be an integer variable */
 void
 OsiTMINLPInterface::setInteger(int index)
 {
-  problem_->SetVariableType(index, Bonmin::TMINLP::INTEGER);
+  problem_->SetVariableType(index, TMINLP::INTEGER);
   hasBeenOptimized_ = false;
 }
 
@@ -1740,32 +1745,32 @@ OsiTMINLPInterface::randomStartingPoint()
 /** This methods initialiaze arrays for storing the jacobian */
 int OsiTMINLPInterface::initializeJacobianArrays()
 {
-  Ipopt::Index n, m, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
+  Index n, m, nnz_h_lag;
+  TNLP::IndexStyleEnum index_style;
   tminlp_->get_nlp_info( n, m, nnz_jac, nnz_h_lag, index_style);
 
   if(jRow_ != NULL) delete jRow_;
   if(jCol_ != NULL) delete jCol_;
   if(jValues_ != NULL) delete jValues_;
 
-  jRow_ = new Ipopt::Index[nnz_jac];
-  jCol_ = new Ipopt::Index[nnz_jac];
-  jValues_ = new Ipopt::Number[nnz_jac];
+  jRow_ = new Index[nnz_jac];
+  jCol_ = new Index[nnz_jac];
+  jValues_ = new Number[nnz_jac];
   tminlp_->eval_jac_g(n, NULL, 0, m, nnz_jac, jRow_, jCol_, NULL);
 
 
   if(constTypes_ != NULL) delete [] constTypes_;
 //  if(constTypesNum_ != NULL) delete [] constTypesNum_;
 
-  constTypes_ = new Ipopt::TNLP::LinearityType[getNumRows()];
+  constTypes_ = new TNLP::LinearityType[getNumRows()];
   tminlp_->get_constraints_linearity(getNumRows(), constTypes_);
 //  constTypesNum_ = new int[getNumRows()];
   for(int i = 0; i < getNumRows() ; i++) {
-    if(constTypes_[i]==Ipopt::TNLP::LINEAR) {
+    if(constTypes_[i]==TNLP::LINEAR) {
       //constTypesNum_[i] =
       nLinear_++;
     }
-    else if(constTypes_[i]==Ipopt::TNLP::NON_LINEAR) {
+    else if(constTypes_[i]==TNLP::NON_LINEAR) {
       //constTypesNum_[i] = 
       nNonLinear_++;
     }
@@ -1787,7 +1792,7 @@ OsiTMINLPInterface::getConstraintsViolation(const double *x, double &obj)
 
   double norm = 0;
   for(int i = 0; i< numrows ; i++) {
-    if(!constTypes_ || constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
+    if(!constTypes_ || constTypes_[i] == TNLP::NON_LINEAR) {
       double rowViolation = 0;
       if(rowLower[i] > -1e10)
          rowViolation = max(0.,rowLower[i] - g[i]);
@@ -1879,9 +1884,9 @@ void
 OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global)
 {
   int n,m, nnz_jac_g, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
+  TNLP::IndexStyleEnum index_style;
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
-  int offset = (index_style = Ipopt::TNLP::FORTRAN_STYLE);
+  int offset = (index_style = TNLP::FORTRAN_STYLE);
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
   assert(jRow_ != NULL);
@@ -1905,7 +1910,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   double nlp_infty = infty_;
   
   for(int i = 0; i< m ; i++) {
-    if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
+    if(constTypes_[i] == TNLP::NON_LINEAR) {
       if(rowLower[i] > - nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
       {
         binding[i] = -1;
@@ -1934,7 +1939,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   }
 
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i] - 1] == Ipopt::TNLP::NON_LINEAR) {
+    if(constTypes_[jRow_[i] - 1] == TNLP::NON_LINEAR) {
       //"clean" coefficient
       if(cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
 		  rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
@@ -1964,65 +1969,15 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 
     if (IsValid(cut_strengthener_)) {
       const int& bindi = binding[i];
-      //printf("before: lb = %e ub = %e rl = %e ru = %e g = %e\n", lb[i], ub[i], rowLower[bindi], rowUpper[bindi], g[bindi]);
-      // First check if the cut is indeed away from the constraint
-      bool is_tight = false;
-      const Number tight_tol = 1e-8;
-      if (lb[i] <= -infty && rowUpper[bindi] - g[bindi] <= tight_tol) {
-	is_tight = true;
-      }
-      else if (ub[i] >= infty && g[bindi]-rowLower[bindi] <= tight_tol) {
-	is_tight = true;
-      }
-      if (!is_tight) {
-	if (cut_strengthening_type_ == CS_StrengthenedGlobal ||
-	    cut_strengthening_type_ == CS_StrengthenedGlobal_StrengthenedLocal) {
-	  const double orig_lb = lb[i];
-	  const double orig_ub = ub[i];
-	  bool retval =
-	    cut_strengthener_->StrengthenCut(tminlp_, i, cuts[i], n, x,
-					     problem_->orig_x_l(),
-					     problem_->orig_x_u(), lb[i], ub[i]);
-	  if (oa_log_level_ >=2 && (fabs(orig_lb-lb[i])>1e-4 || fabs(orig_ub-ub[i])>1e-4)) {
-	    if (orig_ub < infty) {
-	      printf(" Strengthening ub of global cut for constraint %d from %e to %e\n", i, orig_ub, ub[i]);
-	    }
-	    else {
-	      printf(" Strengthening lb of global cut for constraint %d from %e to %e\n", i, orig_lb, lb[i]);
-	    }
-	  }
-	  if (!retval) {
-	    std::cerr << "Error in StrengthenCut global\n";
-	  }
-	}
-	if (cut_strengthening_type_ == CS_UnstrengthenedGlobal_StrengthenedLocal ||
-	    cut_strengthening_type_ == CS_StrengthenedGlobal_StrengthenedLocal) {
-	  Number lb2 = lb[i];
-	  Number ub2 = ub[i];
-	  bool retval =
-	    cut_strengthener_->StrengthenCut(tminlp_, i, cuts[i], n, x,
-					     problem_->x_l(),
-					     problem_->x_u(), lb2, ub2);
-	  if (!retval) {
-	    std::cerr << "Error in StrengthenCut local\n";
-	  }
-	  const Number localCutTol = 1e-4;
-	  if (lb2-lb[i] >= localCutTol || ub[i]-ub2 >= localCutTol) {
-	    if (ub2 < infty) {
-	      printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", i, ub[i], ub2);
-	    }
-	    else {
-	      printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", i,lb[i], lb2);
-	    }
-	    // Now we generate a new cut
-	    OsiRowCut newCut2;
-	    newCut2.setEffectiveness(99.99e99);
-	    newCut2.setLb(lb2);
-	    newCut2.setUb(ub2);
-	    newCut2.setRow(cuts[i]);
-	    cs.insert(newCut2);
-	  }
-	}
+      bool retval =
+	cut_strengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
+				       GetRawPtr(problem_), bindi,
+				       cuts[i], lb[i], ub[i], g[bindi],
+				       rowLower[bindi], rowUpper[bindi],
+				       n, x, infty);
+      if (!retval) {
+	std::cerr << "error in cut_strengthener_->ComputeCuts\n";
+	exit(-2);
       }
     }
     if(global) {
@@ -2073,6 +2028,19 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       if(violation == 0.) genCut = false;
     }
     if(genCut) {
+      if (IsValid(cut_strengthener_)) {
+	lb[nNonLinear_] = -infty;
+	bool retval =
+	  cut_strengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
+					 GetRawPtr(problem_), -1,
+					 v, lb[nNonLinear_], ub[nNonLinear_],
+					 ub[nNonLinear_], -infty, 0.,
+					 n, x, infty);
+	if (!retval) {
+	  std::cerr << "error in cut_strengthener_->ComputeCuts\n";
+	  exit(-2);
+	}
+      }
       OsiRowCut newCut;
       if(global)
 	newCut.setGloballyValidAsInteger(1);
@@ -2097,7 +2065,7 @@ void
 OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * l, bool getObj)
 {
   int n,m, nnz_jac_g, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
+  TNLP::IndexStyleEnum index_style;
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
@@ -2122,7 +2090,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * 
   double nlp_infty = infty_;
   
   for(int i = 0; i< m ; i++) {
-    if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
+    if(constTypes_[i] == TNLP::NON_LINEAR) {
       if(rowLower[i] > - nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
       {
         binding[i] = -1;
@@ -2151,7 +2119,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs, const double * x, const double * 
   }
 
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i] - 1] == Ipopt::TNLP::NON_LINEAR) {
+    if(constTypes_[jRow_[i] - 1] == TNLP::NON_LINEAR) {
       //"clean" coefficient
       if(cleanNnz(jValues_[i],colLower[jCol_[i] - 1], colUpper[jCol_[i]-1],
           rowLower[jRow_[i] - 1], rowUpper[jRow_[i] - 1],
@@ -2234,11 +2202,11 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
-  feasibilityProblem_->set_dist2point_obj(n,(const Ipopt::Number *) x_bar,(const Ipopt::Index *) inds);
+  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
   nCallOptimizeTNLP_++;
   totalNlpSolveTime_-=CoinCpuTime();
-  Ipopt::SmartPtr<TNLPSolver> app2 = app_->clone();
-  app2->Options()->SetIntegerValue("print_level", (Ipopt::Index) 0);
+  SmartPtr<TNLPSolver> app2 = app_->clone();
+  app2->Options()->SetIntegerValue("print_level", (Index) 0);
   optimization_status_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
   getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
@@ -2266,10 +2234,10 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   int m;
   int nnz_jac_g;
   int nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
+  TNLP::IndexStyleEnum index_style;
   //Get problem information
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
-  int offset = index_style == Ipopt::TNLP::FORTRAN_STYLE;
+  int offset = index_style == TNLP::FORTRAN_STYLE;
   //if not allocated allocate spaced for stroring jacobian
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
@@ -2295,7 +2263,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   double nlp_infty = infty_;
   for(int i = 0 ; i < m ; i++) {
     {
-      if(constTypes_[i] == Ipopt::TNLP::NON_LINEAR) {
+      if(constTypes_[i] == TNLP::NON_LINEAR) {
         //If constraint is equality not binding do not add
         if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
         {
@@ -2351,7 +2319,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
         needOrder = 1;
         break;
       }
-      if(Ipopt::TNLP::LINEAR //Always accept coefficients from linear constraints
+      if(TNLP::LINEAR //Always accept coefficients from linear constraints
           || //For other clean tinys
           cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
               rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
@@ -2747,7 +2715,7 @@ OsiTMINLPInterface::extractInterfaceParams()
 {
   if (IsValid(app_)) {
 #ifdef COIN_HAS_FILTERSQP
-    FilterSolver * filter = dynamic_cast<FilterSolver *>(Ipopt::GetRawPtr(app_));
+    FilterSolver * filter = dynamic_cast<FilterSolver *>(GetRawPtr(app_));
 
     bool is_given =
 #endif
@@ -2771,14 +2739,13 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->Options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
     app_->Options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,"bonmin.");
     app_->Options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
-    app_->Options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type_,"bonmin.");
+    int cut_strengthening_type;
+    app_->Options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type,"bonmin.");
 
-    if (cut_strengthening_type_ != CS_None) {
+    if (cut_strengthening_type != CS_None) {
       // TNLP solver to be used in the cut strengthener
-      cut_strengthener_ = new CutStrengthener(app_->clone());
+      cut_strengthener_ = new CutStrengthener(app_->clone(), app_->Options());
     }
-
- //   app_->Options()->GetIntegerValue("oa_log_level", oa_log_level_,"bonmin.");
   }
 }
 

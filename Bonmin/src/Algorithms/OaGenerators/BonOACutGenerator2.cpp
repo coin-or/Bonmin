@@ -256,7 +256,6 @@ extern int usingCouenne;
 void 
 OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
 {
-  
   roptions->SetRegisteringCategory("bonmin options : Options for OA decomposition");
   roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
                                         "Specify the maximum number of seconds spent overall in OA decomposition iterations.",

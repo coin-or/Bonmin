@@ -223,6 +223,12 @@ namespace Bonmin
     {
       si = new OsiClpSolverInterface;
       nlpSolver->extractLinearRelaxation(*si);
+#ifdef GREAT_STUFF_FOR_ANDREAS
+      printf("ToDo: Clean me up in Bab::branchAndBound\n");
+      OsiCuts cuts;
+      nlpSolver->getOuterApproximation(cuts, true, NULL, true);
+      si->applyCuts(cuts);
+#endif
       // say bound dubious, does cuts at solution
       OsiBabSolver * extraStuff = new OsiBabSolver(3);
       si->setAuxiliaryInfo(extraStuff);
