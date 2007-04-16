@@ -223,6 +223,7 @@ namespace Bonmin
     {
       si = new OsiClpSolverInterface;
       nlpSolver->extractLinearRelaxation(*si);
+      //#define GREAT_STUFF_FOR_ANDREAS
 #ifdef GREAT_STUFF_FOR_ANDREAS
       printf("ToDo: Clean me up in Bab::branchAndBound\n");
       OsiCuts cuts;
@@ -340,6 +341,8 @@ namespace Bonmin
 
       model.addHeuristic(&oaHeu);
     }
+
+    model.setMaximumCutPasses(1);
 
     //Set true branch-and-bound parameters
     model.messageHandler()->setLogLevel(par.bbLogLevel);

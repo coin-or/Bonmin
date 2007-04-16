@@ -52,7 +52,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
       int numberCuts =  - cs.sizeRowCuts();
       const double * toCut = parameter().addOnlyViolated_?
 	si.getColSolution():NULL;
-      nlp_->getOuterApproximation(cs, 1, toCut, parameter().global_);
+      nlp_->getOuterApproximation(cs, si.getColSolution(), 1, toCut, parameter().global_);
       numberCuts += cs.sizeRowCuts();
       if(numberCuts > 0 && (lp_ || i + 1 < numRounds_ )){
         if(lpManip==NULL) {

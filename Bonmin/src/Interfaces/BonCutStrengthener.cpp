@@ -110,12 +110,12 @@ namespace Bonmin
 	  if (cut_lb <= -infty) {
 	    // cut has upper bound
 	    coeff_xi += cut_ub_down - cut_ub_up;
-	    cut_ub += (down_xi+1.)*(cut_ub_down - cut_ub_up);
+	    cut_ub = cut_ub_up + (down_xi+1.)*(cut_ub_down - cut_ub_up);
 	  }
 	  else {
 	    // cut has lower bound
 	    coeff_xi += cut_lb_down - cut_lb_up;
-	    cut_lb += (down_xi+1.)*(cut_lb_down - cut_lb_up);
+	    cut_lb = cut_lb_up + (down_xi+1.)*(cut_lb_down - cut_lb_up);
 	  }
 	  cut.setElement(imostfra, coeff_xi);
 	  printf("old coeff = %e new = %e\n", old_coeff, coeff_xi);
@@ -342,7 +342,7 @@ namespace Bonmin
 	}
       }
       if (jidx < 0) {
-	std::cerr << "There is an index in the cut that does not appear in the constraint.\n";
+	printf("There is an index (%d) in the cut that does not appear in the constraint.\n",idx);
 	exit(-99);
       }
 
