@@ -20,6 +20,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
 
+  infeasNode () = false;
+
   // lift bound on objective auxiliary to avoid overly strict implied
   // bounds
 
@@ -232,7 +234,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	  /*printf ("Couenne: infeasible bounds on w_%d [%.12e,%.12e]\n", 
 	    i, expression::Lbound (i), expression::Ubound (i));*/
-
+	  /*
 	  OsiColCut *infeascut = new OsiColCut;
 
 	  if (infeascut) {
@@ -246,8 +248,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	    delete infeascut;
 
 	    // avoid bookkeeping of infeasible flag
-	    goto end_genCuts;
-	  }
+	    }*/
+
+	  infeasNode () = true;
+	  goto end_genCuts;
 	}
     }
   } while (ntightened && nbwtightened && (niter++ < 10));

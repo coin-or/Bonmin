@@ -66,6 +66,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// bound through bestObj())
   Bonmin::Bab *BabPtr_;
 
+  /// signal infeasibility of current node (found through 
+  mutable bool infeasNode_;
+
  public:
 
   /// constructor
@@ -159,6 +162,10 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
     ntc = ntotalcuts_;
     st  = septime_;
   }
+
+  /// allow to get and set the infeasNode_ flag (used only in generateCuts())
+  bool &infeasNode () const
+    {return infeasNode_;}
 };
 
 #endif

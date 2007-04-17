@@ -66,6 +66,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
+	convex/operators/trigNewton.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
 	problem/problem.cpp \

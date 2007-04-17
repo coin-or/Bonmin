@@ -57,6 +57,8 @@ class exprCos: public exprUnary {
 //void trigGenCuts (exprAux *, OsiCuts &, const CouenneCutGenerator *, unary_function);
 
 
+CouNumber trigNewton (CouNumber, int);
+
 /// convex envelope for sine/cosine 
 
 void addHexagon (const CouenneCutGenerator *, // pointer to the caller cut generator 

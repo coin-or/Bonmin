@@ -40,6 +40,7 @@ Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
 Couenne/src/convex/operators/linearize.cpp -text
+Couenne/src/convex/operators/trigNewton.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/exprAux.cpp -text
 Couenne/src/expression/exprOp.cpp -text

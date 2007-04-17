@@ -6,6 +6,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <math.h>
+
 #include <OsiSolverInterface.hpp>
 #include <CouenneTypes.h>
 #include <CouenneCutGenerator.h>
@@ -101,6 +103,61 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
   // and left: w + x >= cos lb + lb 
   cg -> createCut (cs, f (lb) + lb, +1, w_ind, 1., x_ind,  1.);
 
+  delete lbe;
+  delete ube;
+}
+
+
+///
+
+CouNumber modulo2Pi (register CouNumber &a) {
+
+  register CouNumber pi2 = 2 * M_PI;
+
+  return a - pi2 * floor (a/pi2);
+}
+
+/// real linearization of sine/cosine
+
+void trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has called us
+		   OsiCuts &cs,                   // cut set to be enriched
+		   exprAux *w,
+		   expression *arg,
+		   enum cou_trig which_trig) {
+
+  expression *lbe, *ube;
+  arg -> getBounds (lbe, ube);
+
+  CouNumber lb = (*lbe) (), 
+            ub = (*ube) ();
+
+  int x_ind = arg -> Index ();
+  int w_ind = w   -> Index ();
+
+  // if cosine, scale variables to pretend this is a sine problem
+
+  if (which_trig == COU_COSINE) {
+
+    lb += M_PI_2;
+    ub += M_PI_2;
+  }
+
+  CouNumber rlb   = modulo2Pi (lb),
+            rub   = modulo2Pi (ub),
+            delta = ub-lb;
+
+  // check four cases of lb: 
+
+  if        (rlb < M_PI_2)   { //    increasing, nonnegative
+
+
+  } else if (rlb < M_PI)     { // nonincreasing, nonnegative
+  } else if (rlb < 3*M_PI_2) { // nonincreasing,    negative
+  } else                     { //    increasing,    negative
+  }
+
+
+  // do the same for ub
   delete lbe;
   delete ube;
 }

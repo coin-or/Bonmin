@@ -113,11 +113,12 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
-	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
-	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
-	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
+	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
+	convex/generateCuts.cpp problem/problem.cpp \
+	problem/problemIO.cpp problem/constraint.cpp \
+	problem/tightenBounds.cpp problem/impliedBounds.cpp \
+	problem/readASLfg.cpp util/rootQ.c readnl/readnl.cpp \
+	readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
@@ -133,9 +134,9 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
 	linearize.lo conv-exprInv.lo conv-exprSinCos.lo \
 	conv-exprExp.lo conv-exprLog.lo conv-exprGroup.lo \
-	CouenneCutGenerator.lo generateCuts.lo problem.lo problemIO.lo \
-	constraint.lo tightenBounds.lo impliedBounds.lo readASLfg.lo \
-	rootQ.lo $(am__objects_1)
+	trigNewton.lo CouenneCutGenerator.lo generateCuts.lo \
+	problem.lo problemIO.lo constraint.lo tightenBounds.lo \
+	impliedBounds.lo readASLfg.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -380,11 +381,11 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
-	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
-	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
-	$(am__append_1)
+	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
+	convex/generateCuts.cpp problem/problem.cpp \
+	problem/problemIO.cpp problem/constraint.cpp \
+	problem/tightenBounds.cpp problem/impliedBounds.cpp \
+	problem/readASLfg.cpp util/rootQ.c $(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -607,6 +608,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplifiers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplify.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tightenBounds.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trigNewton.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -999,6 +1001,13 @@ conv-exprGroup.lo: convex/operators/conv-exprGroup.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprGroup.cpp' object='conv-exprGroup.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprGroup.lo `test -f 'convex/operators/conv-exprGroup.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprGroup.cpp
+
+trigNewton.lo: convex/operators/trigNewton.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT trigNewton.lo -MD -MP -MF "$(DEPDIR)/trigNewton.Tpo" -c -o trigNewton.lo `test -f 'convex/operators/trigNewton.cpp' || echo '$(srcdir)/'`convex/operators/trigNewton.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/trigNewton.Tpo" "$(DEPDIR)/trigNewton.Plo"; else rm -f "$(DEPDIR)/trigNewton.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/trigNewton.cpp' object='trigNewton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o trigNewton.lo `test -f 'convex/operators/trigNewton.cpp' || echo '$(srcdir)/'`convex/operators/trigNewton.cpp
 
 CouenneCutGenerator.lo: convex/CouenneCutGenerator.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneCutGenerator.lo -MD -MP -MF "$(DEPDIR)/CouenneCutGenerator.Tpo" -c -o CouenneCutGenerator.lo `test -f 'convex/CouenneCutGenerator.cpp' || echo '$(srcdir)/'`convex/CouenneCutGenerator.cpp; \

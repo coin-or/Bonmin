@@ -39,7 +39,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   septime_        (0),
   objValue_       (- DBL_MAX),
   nlp_            (nlp),
-  BabPtr_         (NULL) {
+  BabPtr_         (NULL),
+  infeasNode_     (false) {
 
   if (!asl) return;
 
@@ -90,7 +91,8 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   septime_     (src. septime_),
   objValue_    (src. objValue_),
   nlp_         (src. nlp_),
-  BabPtr_      (src. BabPtr_)
+  BabPtr_      (src. BabPtr_),
+  infeasNode_  (src. infeasNode_)
 {}
 
 

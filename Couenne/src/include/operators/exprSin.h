@@ -15,6 +15,10 @@
 #include <exprConst.h>
 
 
+/// specify which trigonometric function is dealt with in trigEnvelope
+
+enum cou_trig {COU_SINE, COU_COSINE};
+
 /// class for sin f(x)
 
 class exprSin: public exprUnary {
