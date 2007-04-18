@@ -5,7 +5,7 @@ bonmin.allowable_gap               0.         #Specify allowable absolute gap
 bonmin.bb_log_level                1         #specify BB log level
 bonmin.bb_log_interval             100        #Interval at which bound output is given
 bonmin.cover_cuts                  -5         #Frequency for Generating cover cuts in branch_and-cut
-bonmin.cutoff                      -1e100     #Specify cutoff
+bonmin.cutoff                      1e100     #Specify cutoff
 bonmin.cutoff_decr                 0.         #Specify cutoff increment
 bonmin.integer_tolerance           1e-08      #Set integer tolerance
 bonmin.lp_log_level                0          #specify sub-LP log level
@@ -22,7 +22,7 @@ bonmin.node_limit                  60000      #Set maximum number of nodes explo
 bonmin.nodeselect_stra             best-bound #Choose the node selection strategy
 bonmin.num_iterations_suspect      -1         #Number of iteration over which a node is considered suspect
 bonmin.num_retry_unsolved_random_point          0          #Number of time retry to solve a failed NLP with a random starting point
-bonmin.num_resolve_at_root           4          #Number of time retry to solve the root node with different starting point (only usefull in non_convex).
+bonmin.num_resolve_at_root           0          #Number of time retry to solve the root node with different starting point (only usefull in non_convex).
 bonmin.num_resolve_at_node           0          #Number of time retry to solve a non root node with different starting point (only usefull in non_convex).
 bonmin.number_before_trust         8          #Set number of branches on a variable before its pseudo_costs are to be believed
 bonmin.number_strong_branch        20         #Chooes number of variable for strong branching
@@ -35,4 +35,3 @@ bonmin.warm_start                  optimum    #Set warm start method
 
 
 #ipopt default changed by bonmin
-print_level 4
