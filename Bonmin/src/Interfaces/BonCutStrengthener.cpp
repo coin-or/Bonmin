@@ -166,17 +166,20 @@ namespace Bonmin
 				 problem->orig_x_u(), gindex, cut,
 				 cut_lb, cut_ub, n, x, infty);
       if (!retval) {
-	std::cerr << "Error in HandleOneCut global\n";
-	return false;
+        if (oa_log_level_ >= 1) {
+          printf(" Error during strengthening of global cut for constraint %d\n", gindex);
+        }
       }
-      if (oa_log_level_ >=2 && (fabs(orig_lb-cut_lb)>1e-4 ||
-				fabs(orig_ub-cut_ub)>1e-4)) {
-	if (orig_ub < infty) {
-	  printf(" Strengthening ub of global cut for constraint %d from %e to %e\n", gindex, orig_ub, cut_ub);
-	}
-	else {
-	  printf(" Strengthening lb of global cut for constraint %d from %e to %e\n", gindex, orig_lb, cut_lb);
-	}
+      else {
+        if (oa_log_level_ >=2 && (fabs(orig_lb-cut_lb)>1e-4 ||
+				  fabs(orig_ub-cut_ub)>1e-4)) {
+	  if (orig_ub < infty) {
+	    printf(" Strengthening ub of global cut for constraint %d from %e to %e\n", gindex, orig_ub, cut_ub);
+	  }
+	  else {
+	    printf(" Strengthening lb of global cut for constraint %d from %e to %e\n", gindex, orig_lb, cut_lb);
+	  }
+        }
       }
     }
     if (cut_strengthening_type_ == CS_UnstrengthenedGlobal_StrengthenedLocal ||
@@ -188,24 +191,27 @@ namespace Bonmin
 				 problem->x_u(), gindex, cut2,
 				 lb2, ub2, n, x, infty);
       if (!retval) {
-	std::cerr << "Error in HandleOneCut local\n";
-	return false;
+        if (oa_log_level_ >= 1) {
+          printf(" Error during strengthening of local cut for constraint %d\n", gindex);
+        }
       }
-      const Number localCutTol = 1e-4;
-      if (fabs(lb2-cut_lb) >= localCutTol || fabs(cut_ub-ub2) >= localCutTol) {
-	if (ub2 < infty) {
-	  printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", gindex, cut_ub, ub2);
-	}
-	else {
-	  printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", gindex, cut_lb, lb2);
-	}
-	// Now we generate a new cut
-	OsiRowCut newCut2;
-	newCut2.setEffectiveness(99.99e99);
-	newCut2.setLb(lb2);
-	newCut2.setUb(ub2);
-	newCut2.setRow(cut2);
-	cs.insert(newCut2);
+      else {
+        const Number localCutTol = 1e-4;
+        if (fabs(lb2-cut_lb) >= localCutTol || fabs(cut_ub-ub2) >= localCutTol) {
+	  if (ub2 < infty) {
+	    printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", gindex, cut_ub, ub2);
+	  }
+	  else {
+	    printf(" Strengthening ub of local cut for constraint %d from %e to %e\n", gindex, cut_lb, lb2);
+	  }
+	  // Now we generate a new cut
+	  OsiRowCut newCut2;
+	  newCut2.setEffectiveness(99.99e99);
+	  newCut2.setLb(lb2);
+	  newCut2.setUb(ub2);
+	  newCut2.setRow(cut2);
+	  cs.insert(newCut2);
+        }
       }
     }
     return true;
@@ -213,7 +219,7 @@ namespace Bonmin
 
   bool CutStrengthener::StrengthenCut(SmartPtr<TMINLP> tminlp,
 				      int constr_index,
-				      CoinPackedVector& row,
+				      const CoinPackedVector& row,
 				      int n,
 				      const double* x,
 				      const double* x_l,

@@ -213,7 +213,7 @@ namespace Bonmin
     /** Method for strengthening one cut. */
     bool StrengthenCut(SmartPtr<TMINLP> tminlp /** current TMINLP */,
 		       int constr_index /** Index number of the constraint to be strengthened, -1 means objective function */,
-		       CoinPackedVector& row /** Cut to be strengthened */,
+		       const CoinPackedVector& row /** Cut to be strengthened */,
 		       int n /** Number of variables */,
 		       const double* x /** solution from node */,
 		       const double* x_l /** Lower bounds for x in which should be valid. */,

@@ -1976,8 +1976,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 				       rowLower[bindi], rowUpper[bindi],
 				       n, x, infty);
       if (!retval) {
-	std::cerr << "error in cut_strengthener_->ComputeCuts\n";
-	exit(-2);
+	std::cout << "error in cut_strengthener_->ComputeCuts\n";
+	//exit(-2);
       }
     }
     if(global) {
@@ -2038,7 +2038,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 					 n, x, infty);
 	if (!retval) {
 	  std::cerr << "error in cut_strengthener_->ComputeCuts\n";
-	  exit(-2);
+	  //exit(-2);
 	}
       }
       OsiRowCut newCut;
