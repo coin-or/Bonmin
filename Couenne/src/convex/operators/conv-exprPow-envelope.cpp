@@ -40,7 +40,7 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 		     CouNumber l, CouNumber u,
 		     int sign) {
 
-  int ns = cg -> nSamples ();
+  //  int ns = cg -> nSamples ();
 
   exponent = k;
   /*
@@ -60,7 +60,7 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   // limit the bounds for the envelope
 
-  int step = 1 + log (1. + (double) (cg -> nSamples ()));
+  CouNumber step = 1 + log (1. + (double) (cg -> nSamples ()));
 
   if (l < - COUENNE_INFINITY + 1) {
     l = x - step;

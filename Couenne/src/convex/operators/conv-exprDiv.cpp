@@ -53,8 +53,7 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   expression *xe = arglist_ [0];
   expression *ye = arglist_ [1];
 
-  CouNumber wl = (*wle) (), wu = (*wue) (),
-            xl = (*xle) (), xu = (*xue) ();
+  CouNumber wl = (*wle) (), wu = (*wue) ();
 
   delete yle; delete yue;
   delete wle; delete wue;

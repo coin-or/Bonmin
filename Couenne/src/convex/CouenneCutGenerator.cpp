@@ -98,23 +98,32 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
 
 /// add half-space through two points (x1,y1) and (x2,y2)
 
-void CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi, 
-				      CouNumber x1, CouNumber y1, 
-				      CouNumber x2, CouNumber y2, int sign) const { 
+#define MAX_SLOPE 1e3
+
+int CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi, 
+				     CouNumber x1, CouNumber y1, 
+				     CouNumber x2, CouNumber y2, int sign) const { 
 
   if (fabs (x2-x1) < COUENNE_EPS)
-    if (fabs (y2-y1) > COUENNE_EPS)
+    if (fabs (y2-y1) > MAX_SLOPE * COUENNE_EPS)
       printf ("warning, discontinuity of %e over an interval of %e\n", y2-y1, x2-x1);
-    else createCut (cs, y2, 0, wi, 1.);
-  else {
+    else return createCut (cs, y2, 0, wi, 1.);
 
-    CouNumber oppslope = (y1-y2) / (x2-x1);
+  CouNumber oppslope = (y1-y2) / (x2-x1);
 
-    createCut (cs, y1 + oppslope * x1, sign, 
-	       wi, 1., 
-	       xi, oppslope);
-  }
+  return createCut (cs, y1 + oppslope * x1, sign, wi, 1., xi, oppslope);
 }
+
+
+/// add tangent at (x,w) with given slope
+
+int CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi, 
+				     CouNumber x, CouNumber w, 
+				     CouNumber slope, int sign) const { 
+
+  return createCut (cs, w - slope * x, sign, wi, 1., xi, - slope);
+}
+
 
 /// total number of variables (original + auxiliary) of the problem
 const int CouenneCutGenerator::getnvars () const

@@ -21,8 +21,6 @@ Couenne/src/branch/getFixVarBinFun.cpp -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
 Couenne/src/convex/addEnvelope.cpp -text
 Couenne/src/convex/checkNLP.cpp -text
-Couenne/src/convex/conv-exprOp.cpp -text
-Couenne/src/convex/conv-exprUnary.cpp -text
 Couenne/src/convex/createCuts.cpp -text
 Couenne/src/convex/generateCuts.cpp -text
 Couenne/src/convex/operators/conv-exprAbs.cpp -text

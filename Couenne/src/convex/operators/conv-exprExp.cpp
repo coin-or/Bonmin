@@ -49,7 +49,7 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   // change bounds to get finite coefficients
 
-  CouNumber fact = 2 * ns;
+  //  CouNumber fact = 2 * ns;
 
   /*if (x > 0) {
     if (l < log (COUENNE_EPS))      l = x / fact - 1;

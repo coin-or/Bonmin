@@ -137,9 +137,14 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// add half-plane through (x1,y1) and (x2,y2) -- resp. 4th, 5th,
   /// 6th, and 7th argument
-  void addSegment (OsiCuts &, int, int,
-		   CouNumber, CouNumber, 
-		   CouNumber, CouNumber, int) const;
+  int addSegment (OsiCuts &, int, int,
+		  CouNumber, CouNumber, 
+		  CouNumber, CouNumber, int) const;
+
+  /// add tangent at given poing (x,w) with given slope
+  int addTangent (OsiCuts &, int, int, 
+		  CouNumber, CouNumber, 
+		  CouNumber, int) const; 
 
   /// (for compatibility with base class)
   /// virtual method which performs the OA algorithm by modifying lp and nlp.

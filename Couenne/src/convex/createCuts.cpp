@@ -16,8 +16,8 @@
 #include <CouenneProblem.h>
 
 
-// general procedure for inserting a linear cut with up to three
-// variables. Return 1 if cut inserted, 0 if none, <0 if error
+/// general procedure for inserting a linear cut with up to three
+/// variables. Return 1 if cut inserted, 0 if none, <0 if error
 
 int CouenneCutGenerator::createCut (OsiCuts &cs,
 				    CouNumber rhs, int sign, 
@@ -68,14 +68,23 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
   if ((i2 < 0) && (i3 < 0)) { // column cut
 
+    if ((fabs (c1) < COUENNE_EPS) && (fabs (rhs) > 1e10*COUENNE_EPS)) {
+      printf ("nonsense column cut: %e w_%d <>= %e\n", c1, i1, rhs);
+      return 0;
+    }
+
     OsiColCut *cut = new OsiColCut;
 
-    if (sign <= 0) cut -> setUbs (1, &i1, &rhs);
-    if (sign >= 0) cut -> setLbs (1, &i1, &rhs);
+    CouNumber bound = rhs/c1;
+
+    if (c1 < 0) sign = -sign;
+
+    if (sign <= 0) cut -> setUbs (1, &i1, &bound);
+    if (sign >= 0) cut -> setLbs (1, &i1, &bound);
 
     cut -> setGloballyValid (is_global); // global?
-
     cs.insert (cut);
+    delete cut;
 
   } else { // row cut
 
@@ -100,8 +109,8 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
     // throughout the BB tree
 
     cut -> setGloballyValid (is_global);
-
     cs.insert (cut);
+    delete cut;
   }
 
   return 1;

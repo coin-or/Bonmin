@@ -48,7 +48,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout);
 
-    printf (". Inf: = |%.2f - %.2f| = %.2f",  ////[%.2f,%.2f]
+    printf (". Inf: = |%.2f - %.2f| = %.2f ",  ////[%.2f,%.2f]
 	    var, expr, 
 	    //	    expression::Lbound (reference_ -> Index ()),
 	    //	    expression::Ubound (reference_ -> Index ()),
@@ -60,6 +60,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
   CouNumber l  = info -> lower_ [index],
             u  = info -> upper_ [index];
 
+  //printf (" delta=%.9f,l=%.9f,u=%.9f ", delta, l, u);
+
   /// avoid branching on (relatively) very small deltas
   if ((delta < COUENNE_EPS) ||
       (fabs (u-l) < COUENNE_EPS) ||
@@ -67,8 +69,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
        (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))
     //      ((mymin (fabs (lr), fabs (ur)) > COUENNE_EPS) && 
     //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
-
     delta = 0.;
+
   else // make delta a function of the variable's rank and multiplicity
     delta =   WEI_INF  * (1. - exp (-delta))
             + WEI_RANK / (1. + fixvar -> rank ())

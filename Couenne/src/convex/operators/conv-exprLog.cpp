@@ -15,7 +15,6 @@
 
 
 #define LOG_STEP 10
-//#define LOG_SCALE 1e-20
 #define LOG_MININF 1e-300
 
 // generate convexification cut for constraint w = this
@@ -36,11 +35,9 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   // fix lower bound
 
-  CouNumber logl = log (l);
-
   if (l < LOG_MININF) l = LOG_MININF;
   else   // lower segment (only put if lower bound is far enough from
-	 // zero and upper is finite
+	 // zero and upper is finite)
     if (u < COUENNE_INFINITY - 1) { 
 
       CouNumber dx   = u-l;

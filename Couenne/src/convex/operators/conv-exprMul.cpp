@@ -250,7 +250,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // be of help.
 
   // TODO: are these really useful? And are they correct?
-  return;
+  //return;
 
   if (wu < - COUENNE_EPS) {
     // check points A and B: second orthant intersections

@@ -17,7 +17,6 @@
 #include <exprConst.h>
 
 
-
 // simplify power f(x) ^ g(x)
 
 expression *exprPow::simplify () {
@@ -186,13 +185,14 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   CouNumber k = arglist_ [1] -> Value (); // exponent
 
-  if (fabs (k) < COUENNE_EPS) // k null is of little use
+  if ((fabs (k) < COUENNE_EPS) || 
+      (fabs (k) > COUENNE_INFINITY)) // k null or infinite is of little use
     return false;
 
   int intk; // integer (or integer inverse of) exponent
 
-  bool isint    =           (k    - (intk = floor (k))    < COUENNE_EPS), // k   is integer
-       isinvint = !isint && (1./k - (intk = floor (1./k)) < COUENNE_EPS); // 1/k is integer
+  bool isint    =           (k    - (intk = FELINE_round (k))    < COUENNE_EPS), // k   is integer
+       isinvint = !isint && (1./k - (intk = FELINE_round (1./k)) < COUENNE_EPS); // 1/k is integer
 
   CouNumber wl = l [wind], // lower w
             wu = u [wind]; // upper w

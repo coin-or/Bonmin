@@ -38,18 +38,20 @@ exprAux *exprPow::standardize (CouenneProblem *p) {
       return p -> addAuxiliary (new exprExp (new exprClone (arglist_ [1])));
     else
       return p -> addAuxiliary 
-	(new exprExp (p -> addAuxiliary (new exprMul (new exprClone (arglist_ [1]), 
-						      new exprConst (log (base))))));
+	(new exprExp (new exprClone 
+		      (p -> addAuxiliary (new exprMul (new exprClone (arglist_ [1]), 
+						       new exprConst (log (base)))))));
   }
   else
 
     if (arglist_ [1] -> Type () != CONST) // expression is x^y, reduce
 					  // to exp (y*log(x));
       return p -> addAuxiliary 
-	(new exprExp (p -> addAuxiliary 
+	(new exprExp (new exprClone (p -> addAuxiliary 
 		      (new exprMul 
 		       (new exprClone (arglist_ [1]), 
-			p -> addAuxiliary (new exprLog (new exprClone (arglist_ [0])))))));
+			new exprClone (p -> addAuxiliary 
+				       (new exprLog (new exprClone (arglist_ [0])))))))));
     else                                  // expression is x^k, return
 					  // as it is
 	return p -> addAuxiliary (this);
@@ -84,8 +86,21 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   int intk = 0;
 
-  bool isInt    =            fabs (k    - (double) (intk = (int) (round (k))))    < COUENNE_EPS,
-       isInvInt = !isInt && (fabs (1./k - (double) (intk = (int) (round (1./k)))) < COUENNE_EPS);
+  if (k < - COUENNE_INFINITY) { // w=x^{-inf} means w=0
+    cg -> createCut (cs, 0., 0, w_ind, 1.);
+    return;
+  }
+
+  if (k > COUENNE_INFINITY) // w=x^{inf} means not much...
+    return;
+
+  if (fabs (k) < COUENNE_EPS) { // w = x^0 means w=1
+    cg -> createCut (cs, 1., 0, w_ind, 1.);
+    return;
+  }
+
+  bool isInt    =            fabs (k    - (double) (intk = FELINE_round (k)))    < COUENNE_EPS,
+       isInvInt = !isInt && (fabs (1./k - (double) (intk = FELINE_round (1./k))) < COUENNE_EPS);
    
   // two macro-cases: 
 
@@ -130,10 +145,9 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     if (u < COUENNE_INFINITY) {
       if (l < q * u) {
 	addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -sign);
-	cg -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
+	cg    -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
       }
-      else
-	cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -sign);
+      else cg -> addSegment (cs, w_ind, x_ind, l,   safe_pow (l,k),   u, safe_pow (u,k), -sign);
     }
   }
   else {

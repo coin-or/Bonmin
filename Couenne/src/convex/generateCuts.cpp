@@ -52,16 +52,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     //////////////////////// FIRST CONVEXIFICATION //////////////////////////////////////
 
-    //for (int i=0; i<15; i++)
-    //  printf (":: %3d [%.3e,%.3e]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
-
     // initialize auxiliary variables and bounds according to originals
     problem_ -> initAuxs (const_cast <CouNumber *> (nlp_ -> getColSolution ()), 
 			  const_cast <CouNumber *> (nlp_ -> getColLower    ()),
 			  const_cast <CouNumber *> (nlp_ -> getColUpper    ()));
-
-    //for (int i=0; i<15; i++)
-    //  printf ("// %3d [%.3e,%.3e]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
 
     // OsiSolverInterface is empty yet, no information can be obtained
     // on variables or bounds -- and none is needed since our
@@ -89,12 +83,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	          u = con -> Ub () -> Value ();
 
 	/*printf ("con %3d [w_%02d]: [%12.3f %12.3f] && [%12.3f %12.3f] --> [%12.3f %12.3f]\n", 
-		i, index, 
-		l, u, 
-		problem_ -> Lb (index), 
-		problem_ -> Ub (index),
-		mymax (l, problem_ -> Lb (index)),
-		mymin (u, problem_ -> Ub (index)));*/
+		i, index, l, u, 
+		problem_ -> Lb (index), problem_ -> Ub (index),
+		mymax (l, problem_ -> Lb (index)), mymin (u, problem_ -> Ub (index)));*/
 
 	// tighten bounds in Couenne's problem representation
 	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
@@ -153,30 +144,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       CouNumber bestObj = BabPtr_ -> bestObj ();
 
-      /*
-      if (problem_ -> Obj (0) -> Sense () == MAXIMIZE) { 
-	// maximization, bestObj() is a lower bound
-	if (problem_ -> Lb (objInd) < bestObj) {
-	  	  printf ("Lower: %.3f", problem_ -> Lb (objInd));
-	  problem_ -> Lb (objInd) = bestObj;
-	  if (bestObj > - COUENNE_INFINITY + 1) 
-	    chg_bds [objInd] = 1;
-	  	  printf (" =-> %.3f\n", problem_ -> Lb (objInd));
-	}
-      }
-      else
-      */
-
       // Bonmin assumes minimization. Bonmin::Bab::bestObj () should
       // be considered an UPPER bound.
 
-      // minimization, bestObj() is an upper bound
       if (problem_ -> Ub (objInd) > bestObj) {
-	//printf ("Upper: %.3f", problem_ -> Ub (objInd));
+
 	problem_ -> Ub (objInd) = bestObj;
 	if (bestObj < COUENNE_INFINITY - 1) 
 	  chg_bds [objInd] = 1;
-	//printf (" =-> %.3f\n", problem_ -> Ub (objInd));
       }
     }
   }
@@ -190,34 +165,23 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++) {
     printf ("%3d: %+e %+e ", i, problem_ -> Lb (i), problem_ -> Ub (i));
     if (i >= problem_ -> nVars ()) {
-      problem_ -> Aux (i-problem_ -> nVars ()) -> print (std::cout);
-      printf (" := ");
+      problem_ -> Aux (i-problem_ -> nVars ()) -> print (std::cout); printf (" := ");
       problem_ -> Aux (i-problem_ -> nVars ()) -> Image () -> print (std::cout); printf (" [");
       problem_ -> Aux (i-problem_ -> nVars ()) -> Lb () -> print (std::cout); printf (" , ");
       problem_ -> Aux (i-problem_ -> nVars ()) -> Ub () -> print (std::cout); printf ("]");
     }
     printf ("\n");
     }*/
-  //(problem_ -> Lb (i) > -COUENNE_INFINITY+1) ? (problem_ -> Lb (i)) : -1e9, 
-  //(problem_ -> Ub (i) <  COUENNE_INFINITY-1) ? (problem_ -> Ub (i)) : 1e9);
 
   int   ntightened = 0, 
       nbwtightened = 0, 
-      niter = 0;
-
-  int *changed;
-  int  nchanged;
+      niter = 0, *changed, nchanged;
 
   do {
 
     // propagate bounds to auxiliary variables
 
     ntightened = problem_ -> tightenBounds (chg_bds);
-
-    /*for (register int i=0; i < ncols; i++) 
-      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS)
-	printf ("Couenne: infeasible bounds on w_%d [%.12e,%.12e]\n", 
-	i, expression::Lbound (i), expression::Ubound (i));*/
 
     // implied bounds. Only do it after other bounds have changed,
     // i.e. after branching
@@ -226,36 +190,32 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       nbwtightened = problem_ -> impliedBounds (chg_bds);
       
-      /*if (ntightened || nbwtightened) printf ("%d, %d bounds tightened\n", 
-	ntightened, nbwtightened);*/
-
       for (register int i=0; i < ncols; i++) 
 	if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS) {
 
 	  /*printf ("Couenne: infeasible bounds on w_%d [%.12e,%.12e]\n", 
 	    i, expression::Lbound (i), expression::Ubound (i));*/
-	  /*
-	  OsiColCut *infeascut = new OsiColCut;
+	  
+	  /*OsiColCut *infeascut = new OsiColCut;
 
 	  if (infeascut) {
 
-	    double upper = -1., lower = +1.; // want to make this node infeasible
+	    double upper = -1., lower = +1.;
 
 	    infeascut -> setLbs (1, &i, &lower);
 	    infeascut -> setUbs (1, &i, &upper);
 
 	    cs.insert (infeascut);
 	    delete infeascut;
-
-	    // avoid bookkeeping of infeasible flag
 	    }*/
 
-	  infeasNode () = true;
+	  infeasNode () = true; // make this node infeasible
 	  goto end_genCuts;
 	}
     }
   } while (ntightened && nbwtightened && (niter++ < 10));
-  // as opposed to ((ntightened || nbwtightened) && (niter++ < 10));
+  // Not ((ntightened || nbwtightened) && (niter++ < 10)) since we
+  // need to repeat only if both bound tighteners had some result.
 
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
@@ -287,8 +247,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     for (int i=0, j = problem_ -> nAuxs (); j--; i++) {
 
-      expression * image = problem_ -> Aux (i) -> Image ();
       /*
+      expression * image = problem_ -> Aux (i) -> Image ();
       if (   (image -> Linearity () > LINEAR)          // if linear, no need to cut twice
 	  && (image -> dependsOn (changed, nchanged))  // if expression does not depend on 
 	  )                                            // changed variables, do not cut
@@ -307,9 +267,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if (ind_obj >= 0)
       if (problem_ -> Obj (0) -> Sense () == MINIMIZE)
-	problem_ -> Lb (ind_obj) = - LARGE_BOUND;
-      else
-	problem_ -> Ub (ind_obj) =   LARGE_BOUND;
+	   problem_ -> Lb (ind_obj) = - LARGE_BOUND;
+      else problem_ -> Ub (ind_obj) =   LARGE_BOUND;
   }
 
   // change tightened bounds through OsiCuts

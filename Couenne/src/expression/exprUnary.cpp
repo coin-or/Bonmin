@@ -25,7 +25,7 @@
 // print unary expression
 
 void exprUnary::print (std::ostream      &out = std::cout, 
-		       const std::string &op = "unknown", 
+		       const std::string &op  = "unknown", 
 		       enum pos           pos = PRE)       const 
 {
   if (pos == PRE)  out << op;
@@ -36,7 +36,7 @@ void exprUnary::print (std::ostream      &out = std::cout,
 }
 
 
-///
+/// comparison when looking for duplicates
 int exprUnary::compare (exprUnary  &e1) { 
 
   int c0 = code (),
@@ -46,4 +46,21 @@ int exprUnary::compare (exprUnary  &e1) {
   else if (c0 > c1) return  1;
   else // have to compare arguments 
     return argument_ -> compare (*(e1.argument_));
+}
+
+
+// Create standard formulation of this expression, by:
+//
+// - creating auxiliary w variables and corresponding expressions
+// - returning linear counterpart as new constraint (to replace 
+//   current one)
+
+exprAux *exprUnary::standardize (CouenneProblem *p) {
+
+  exprAux *subst;
+
+  if ((subst = argument_ -> standardize (p)))
+    argument_ = new exprClone (subst);
+
+  return p -> addAuxiliary (this);
 }

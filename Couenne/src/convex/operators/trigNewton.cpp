@@ -12,6 +12,7 @@
 #include <CouenneTypes.h>
 
 #define MAX_ITER 1000
+#define COU_TRIG_TOLERANCE 1e-12
 
 CouNumber trigNewton (CouNumber a, CouNumber l, CouNumber u) {
 
@@ -33,7 +34,8 @@ CouNumber trigNewton (CouNumber a, CouNumber l, CouNumber u) {
             dydx  = dy/dx,
             F     = cosxk - dydx;
 
-  for (register int k = MAX_ITER; (fabs (F) > 1e-12) && k--;) {
+  // Newton loop. Tolerance is set above
+  for (register int k = MAX_ITER; (fabs (F) > COU_TRIG_TOLERANCE) && k--;) {
 
     CouNumber Fp = sinxk + (cosxk - dydx) / dx;
 

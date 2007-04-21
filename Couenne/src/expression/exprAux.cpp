@@ -17,6 +17,7 @@
 
 #include <CouenneProblem.h>
 
+#include <unistd.h> // for the sleep() in generateCuts()
 
 // auxiliary expression Constructor
 
@@ -39,7 +40,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
   int j = cs.sizeRowCuts ();
-  CouNumber l; 
+  CouNumber l;
 
   if ((!(cg -> isFirst ())) && 
       (fabs ((l = expression::Ubound (varIndex_)) - 
@@ -50,14 +51,69 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   else image_ -> generateCuts (this, si, cs, cg);
 
   //  if (!(cg -> isFirst ())) 
-  //  if (j < cs.sizeRowCuts ())
+  if (j < cs.sizeRowCuts ())
   if (0)
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");
       image_ -> print (std::cout); 
       printf("\n");
-      for (;j < cs.sizeRowCuts ();j++)
-	cs.rowCutPtr (j) -> print ();
+      for (int jj=j; jj < cs.sizeRowCuts ();jj++)
+	cs.rowCutPtr (jj) -> print ();
+    }
+
+
+  if (0)  // [cool!] print graph-readable output for displaying
+          // inequalities on a Cartesian plane
+
+    if ((image_ -> code () == COU_EXPRSIN) || 
+	(image_ -> code () == COU_EXPRCOS)) {
+
+      printf (" ==> "); print (std::cout); printf ("\n");
+
+      expression *lbe, *ube;
+
+      int xi = image_ -> Argument () -> Index ();
+      printf ("looking into w_%d = f (x_%d)\n", varIndex_, xi);
+
+      image_ -> Argument () -> getBounds (lbe, ube);
+
+
+      CouNumber lb   = (*lbe) (),
+	        ub   = (*ube) ();
+
+      delete lbe;
+      delete ube;
+
+      if (xi >= 0) {
+
+	CouNumber curx = expression::Variable (xi);
+
+#define N_STEPS 100
+
+	// plot function
+	for (CouNumber x = lb; 
+	     x <= ub; 
+	     x += ((ub - lb) / N_STEPS)) {
+
+	  //	  expression::Variable (xi) = x;
+	  printf ("#=# %.3f %.3f\n", x, (*image_) ());
+	}
+
+	// plot lines defining constraint (only for cuts involving at
+	// most two variables (that is, w is a unary function)
+	for (int jj=j; jj < cs.sizeRowCuts ();jj++) {
+	  //	  const int    *ind = cs.rowCutPtr (jj) -> row (). getIndices  ();
+	  const double *el  = cs.rowCutPtr (jj) -> row (). getElements ();
+	  double  rhs = cs.rowCutPtr (jj) -> rhs ();
+
+	  printf ("#=# #m=1,S=%d\n", (cs.rowCutPtr (jj) -> sense () == 'L') ? 10:11);
+
+	  printf ("#=# %.3f %.3f\n", lb, (rhs - el [1] * lb) / el [0]);
+	  printf ("#=# %.3f %.3f\n", ub, (rhs - el [1] * ub) / el [0]);
+	}
+
+	//	expression::Variable (xi) = curx;
+      }
     }
 }

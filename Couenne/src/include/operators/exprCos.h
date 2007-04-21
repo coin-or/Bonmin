@@ -54,10 +54,7 @@ class exprCos: public exprUnary {
 
 /// common convexification method used by both cos and sin
 
-//void trigGenCuts (exprAux *, OsiCuts &, const CouenneCutGenerator *, unary_function);
-
-
-CouNumber trigNewton (CouNumber, int);
+CouNumber trigNewton (CouNumber, CouNumber, CouNumber);
 
 /// convex envelope for sine/cosine 
 

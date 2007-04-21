@@ -88,9 +88,9 @@ class expression {
   }
 
   /// return current values of variables and bounds
-  static CouNumber Lbound   (int i) {return lbounds_   [i];}
-  static CouNumber Ubound   (int i) {return ubounds_   [i];}
-  static CouNumber Variable (int i) {return variables_ [i];}
+  static CouNumber  Lbound   (int i) {return lbounds_   [i];}
+  static CouNumber  Ubound   (int i) {return ubounds_   [i];}
+  static CouNumber  Variable (int i) {return variables_ [i];} // allow to set it
 
   /// Constructor, destructor
   expression () {}

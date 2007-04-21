@@ -49,8 +49,6 @@ libCouenne_la_SOURCES = \
 	convex/checkNLP.cpp \
 	convex/addEnvelope.cpp \
 	convex/createCuts.cpp \
-	convex/conv-exprOp.cpp \
-	convex/conv-exprUnary.cpp \
 	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
