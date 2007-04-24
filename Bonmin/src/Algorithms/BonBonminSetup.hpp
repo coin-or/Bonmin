@@ -24,7 +24,7 @@ public:
     /** virtual copy constructor. */
     virtual BabSetupBase * clone() const {
       return new BonminSetup(*this);}
-
+    virtual ~BonminSetup(){}
     /** @name Methods to instantiate: Registering and retrieving options and initializing everything. */
     /** @{ */
     /** Register all the options for this algorithm instance.*/

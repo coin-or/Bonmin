@@ -406,6 +406,7 @@ namespace Bonmin{
       OaNlpOptim * nlpsol = new OaNlpOptim(*this);
       cg.cgl = nlpsol;
       cg.id="NLP solution based oa cuts";
+      cutGenerators_.push_back(cg);
     }
     
     options_->GetIntegerValue("filmint_ecp_cuts",ival, "bonmin.");

@@ -458,7 +458,7 @@ OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si){
     const int * length = mat->getVectorLengths();
     const double * elements = mat->getElements();
     const int * indices = mat->getIndices();
-    for (int i = 0 ; i <= numcols_ ; i++)
+    for (int i = 0 ; i < numcols_ ; i++)
       for (int k = start[i] ; k < start[i] + length[i] ; k++)
       {
         if (indices[k] >= numrows_) {
@@ -467,6 +467,10 @@ OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si){
       }
     si_->addRows(numberCutsToAdd, (const CoinPackedVectorBase * const *) addCuts, si.getRowLower() + numrows_,
         si.getRowUpper() + numrows_);
+    for(int i = 0 ; i < numberCutsToAdd ; i++){
+      delete addCuts[i];
+    }
+    delete [] addCuts;
   }
   else if (numberCutsToAdd < 0)//Oups some error
   {

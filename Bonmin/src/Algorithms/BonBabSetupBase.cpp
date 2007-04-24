@@ -157,9 +157,9 @@ roptions_(b.roptions())
 
 
 BabSetupBase::~BabSetupBase(){
-  delete linearSolver_;
   if(nonlinearSolver_ != linearSolver_)
     delete nonlinearSolver_;
+  delete linearSolver_;
   delete branchingMethod_;
   for(CuttingMethods::iterator i = cutGenerators_.begin() ; i != cutGenerators_.end() ; i++){
     delete i->cgl;
