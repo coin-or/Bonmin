@@ -360,9 +360,22 @@ OsiTMINLPInterface::setModel(SmartPtr<TMINLP> tminlp)
 
 
 void
-OsiTMINLPInterface::readOptionFile(const char * fileName)
+OsiTMINLPInterface::readOptionFile(const std::string & fileName)
 {
+  if(IsValid(app_)){
+  std::ifstream is;
+  if (fileName != "") {
+    try {
+      is.open(fileName.c_str());
+    }
+    catch(std::bad_alloc) {
+      std::cerr<<"Not enough memory to open option file.\n";
+      throw -1;
+    }
+  }
+  options()->ReadFromStream(*app_->Jnlst(), is);
   extractInterfaceParams();
+  }
 }
 
 /// Copy constructor
@@ -2210,12 +2223,12 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 	      numberEqualities++;
 	    }	  
 	}
-      if(numcols - numberFixed > numberEqualities)
-	{
-	  std::string probName;
-	  getStrParam(OsiProbName, probName);
-	  throw newUnsolvedError(app_->errorCode(), problem_, probName);
-	}
+      if(numcols - numberFixed > numberEqualities || numcols < numberEqualities)
+      {
+        std::string probName;
+        getStrParam(OsiProbName, probName);
+        throw newUnsolvedError(app_->errorCode(), problem_, probName);
+      }
       double * saveColLow = CoinCopyOfArray(getColLower(), getNumCols());
       double * saveColUp = CoinCopyOfArray(getColUpper(), getNumCols());
 

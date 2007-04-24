@@ -32,15 +32,42 @@ int main (int argc, char *argv[])
 {
   using namespace Ipopt;
   using namespace Bonmin;
-  SmartPtr<TMINLP> tminlp = new MyTMINLP;
+  SmartPtr<MyTMINLP> tminlp = new MyTMINLP;
+  
+  BasicSetup b;
+  
+  //Register an additional option
+  b.roptions()->AddStringOption2("print_solution","Do we print the solution or not?",
+                                 "yes",
+                                 "no", "No, we don't.",
+                                 "yes", "Yes, we do.",
+                                 "A longer comment can be put here");
+  
+  
+  // Register all the bonmin options.
+  BonminSetup::registerAllOptions(b.roptions());
+  
+  // Here we can change the default value of some Bonmin or Ipopt option
+  b.options()->SetNumericValue("bonmin.time_limit", 5); //changes bonmin's time limit
+  b.options()->SetStringValue("mu_oracle","loqo");
+  
+  //Here we can read one or several option files
+  b.Initialize("Mybonmin.opt");
+  b.Initialize("bonmin.opt");
+
+  
+  // Now we can obtain the value of the new option
+  int printSolution;
+  b.options()->GetEnumValue("print_solution", printSolution,"");
+  if(printSolution == 1){
+    tminlp->printSolutionAtEndOfAlgorithm();
+  }
+  
   BonminSetup bonmin;
-  bonmin.initializeBonmin(tminlp);
+  bonmin.setBasicOptions(b);
+  bonmin.initializeBonmin(GetRawPtr(tminlp));
 
-  bonmin.options()->SetNumericValue("bonmin.time_limit", 1); //changes bonmin's time limit
-  bonmin.options()->SetStringValue("mu_oracle","loqo");
 
-  // we can also try and read an option file (this can eventually change options set before, option file always have priority)
-//  bonmin.initialize("My_bonmin.opt");
 
   //Set up done, now let's branch and bound
   double time1 = CoinCpuTime();
@@ -48,7 +75,6 @@ int main (int argc, char *argv[])
     Bab2 bb;
     bb(bonmin);//process parameter file using Ipopt and do branch and bound
 
-    std::cout.precision(10);
 
   }
   catch(TNLPSolver::UnsolvedError *E) {

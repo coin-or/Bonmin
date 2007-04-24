@@ -195,7 +195,7 @@ MyTMINLP::finalize_solution(TMINLP::SolverReturn status,
 {
   std::cout<<"Problem status: "<<status<<std::endl;
   std::cout<<"Objective value: "<<obj_value<<std::endl;
-  if(x != NULL){
+  if(printSol_ && x != NULL){
     std::cout<<"Solution:"<<std::endl;
     for(int i = 0 ; i < n ; i++){
       std::cout<<"x["<<i<<"] = "<<x[i];

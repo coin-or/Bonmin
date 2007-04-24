@@ -15,6 +15,7 @@ Bonmin/doc/Head.tex -text
 Bonmin/doc/bonmin.css -text
 Bonmin/doc/bonmin.sty -text
 Bonmin/doc/options.tex -text
+Bonmin/examples/CppExample/Mybonmin.opt -text
 Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
 Bonmin/experimental/Bcp/BM_lp.cpp -text

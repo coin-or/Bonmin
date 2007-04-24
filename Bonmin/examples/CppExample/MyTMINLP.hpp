@@ -29,14 +29,16 @@ class MyTMINLP : public TMINLP
 {
 public:
   /// Default constructor.
-  MyTMINLP(){}
+  MyTMINLP():
+printSol_(false){}
   
   /// virtual destructor.
   virtual ~MyTMINLP(){}
 
   
-	/** Copy constructor. (no data = nothing to copy).*/   
-  MyTMINLP(const MyTMINLP &){}
+	/** Copy constructor.*/   
+  MyTMINLP(const MyTMINLP &other):
+printSol_(other.printSol_){}
   /** Assignment operator. no data = nothing to assign*/
   //MyTMINLP& operator=(const MyTMINLP&) {}
 
@@ -163,6 +165,13 @@ public:
 
   virtual const SosInfo * sosConstraints() const{return NULL;}
   virtual const BranchingInfo* branchingInfo() const{return NULL;}
+  
+  
+  void printSolutionAtEndOfAlgorithm(){
+    printSol_ = true;}
+  
+private:
+   bool printSol_;
 };
 
 #endif

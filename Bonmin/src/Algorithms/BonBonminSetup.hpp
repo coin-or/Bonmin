@@ -40,6 +40,12 @@ public:
     void initializeBonmin(const OsiTMINLPInterface& nlpSi);
     /** Get the basic options if don't already have them.*/
     virtual void defaultBasicOptions();
+    /** Set the basic options.*/
+    void setBasicOptions(BasicSetup &b){
+      options_ = b.options();
+      roptions_ = b.roptions();
+      journalist_ = b.journalist();
+    }
 protected:
       /** Register standard MILP cut generators. */
       static void registerMilpCutGenerators(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
