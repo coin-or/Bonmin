@@ -71,7 +71,7 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (0) {// print statistics in LaTeX format
+    if (1) {// print statistics in LaTeX format
 
       char *basename = strrchr (pbName, '/');
       if (!basename) basename = pbName;
@@ -79,7 +79,7 @@ int main (int argc, char *argv[])
 
       printf (" %-25s & %8.2f &", basename, CoinCpuTime () - time1);
 
-      if (fabs (bb.bestBound()) < 1e40) 
+      if (fabs (bb.bestBound()) < 1e12 - 1) 
 	printf (" %12.3f &", bb.bestBound());
       else printf (" %8s     &", "inf_dual");
 	  
@@ -93,10 +93,9 @@ int main (int argc, char *argv[])
 	      //	      nlp_and_solver->totalNlpSolveTime(),
 	      //	      nlp_and_solver->nCallOptimizeTNLP(),
 	      status.c_str());
-      
     }
 
-    //  nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
+//    nlp_and_solver -> writeAmplSolFile (message, bb.bestSolution (), NULL);
   }
   catch(TNLPSolver::UnsolvedError *E) {
      E->writeDiffFiles();
