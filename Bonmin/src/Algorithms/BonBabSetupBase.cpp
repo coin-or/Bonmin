@@ -343,3 +343,4 @@ BabSetupBase::initialize(OsiTMINLPInterface *){
 }
 
 }/* End namespace Bonmin.*/
+
