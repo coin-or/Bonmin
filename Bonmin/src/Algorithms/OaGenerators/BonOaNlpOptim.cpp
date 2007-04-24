@@ -39,6 +39,9 @@ namespace Bonmin
   addOnlyViolated_ = ivalue;
   b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
   global_ = ivalue;
+  handler_ = new CoinMessageHandler();
+  handler_ -> setLogLevel(1);
+  messages_ = OaMessages();
 }
 /// Assign an OsiTMINLPInterface
   void

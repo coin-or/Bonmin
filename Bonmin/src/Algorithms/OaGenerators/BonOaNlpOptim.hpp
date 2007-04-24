@@ -50,7 +50,8 @@ namespace Bonmin
     /** Desctructor */
     virtual ~OaNlpOptim()
     {
-      delete handler_;
+      if(handler_)
+        delete handler_;
     }
 
     /// Assign an OsiTMINLPInterface
