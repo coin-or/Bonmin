@@ -10,6 +10,7 @@
 #include <CglCutGenerator.hpp>
 #include <CouenneCutGenerator.h>
 #include <CouenneProblem.h>
+#include "BonAuxInfos.hpp"
 
 // fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 9.999e12
@@ -17,11 +18,13 @@
 /// a convexifier cut generator
 
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
-					OsiCuts &cs, 
-					const CglTreeInfo info) const {
-
+                                        OsiCuts &cs, 
+                                        const CglTreeInfo info) const 
+{
+  
   infeasNode () = false;
-
+  
+  Bonmin::BabInfo * babInfo = dynamic_cast<Bonmin::BabInfo *> (si.getAuxiliaryInfo());
   // lift bound on objective auxiliary to avoid overly strict implied
   // bounds
 
@@ -136,14 +139,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   // update primal bound with best feasible solution object
 
-  if (BabPtr_) {
-
+  if (babInfo) {
+    
     int objInd = problem_ -> Obj (0) -> Body () -> Index ();
 
     if (objInd >= 0) {
 
-      CouNumber bestObj = BabPtr_ -> bestObj ();
-
+      CouNumber bestObj = babInfo -> babPtr() -> model() -> getObjValue();
+      
       // Bonmin assumes minimization. Bonmin::Bab::bestObj () should
       // be considered an UPPER bound.
 
