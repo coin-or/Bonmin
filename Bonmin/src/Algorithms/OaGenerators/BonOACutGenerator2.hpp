@@ -28,7 +28,7 @@ namespace Bonmin
                    );
 
     /// Constructor with basic setup
-    OACutGenerator2::OACutGenerator2(BabSetupBase & b);
+    OACutGenerator2(BabSetupBase & b);
     
     /// Copy constructor
     OACutGenerator2(const OACutGenerator2 &copy)

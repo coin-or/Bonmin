@@ -22,3 +22,4 @@ public:
       void fillOsiInterface(AmplInterface &toFill, char **& argv, std::string & options, std::string & nl);
 };
 }
+

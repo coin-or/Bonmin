@@ -53,3 +53,4 @@ protected:
 }/** end namespace Bonmin*/
 
 #endif
+
