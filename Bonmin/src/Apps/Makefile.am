@@ -42,7 +42,7 @@ LIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 bonmin_SOURCES = BonMin.cpp
 
 bonmin_LDADD = \
-	../Interfaces/Ampl/libamplinterface.la\
+	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
@@ -61,6 +61,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
@@ -93,7 +94,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 nodeSolver_SOURCES = BonNodeSolver.cpp
 
 nodeSolver_LDADD = \
-	../Interfaces/Ampl/libamplinterface.la \
+	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \

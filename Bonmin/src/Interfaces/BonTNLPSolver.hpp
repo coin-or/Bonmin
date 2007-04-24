@@ -37,7 +37,8 @@ class TNLPSolver: public Ipopt::ReferencedObject{
     solvedOptimal = 1/** Problem solved to an optimal solution.*/,
     solvedOptimalTol =2/** Problem solved to "acceptable level of tolerance. */,
     provenInfeasible =3/** Infeasibility Proven. */,
-    unbounded = 4/** Problem is unbounded.*/
+    unbounded = 4/** Problem is unbounded.*/,
+    numReturnCodes/**Fake member to know size*/
   };
 
 
@@ -93,8 +94,13 @@ class TNLPSolver: public Ipopt::ReferencedObject{
  
 
 
-  /// Constructor
+  /// default Constructor
    TNLPSolver();
+
+  ///Constructor with options initialization
+TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+           Ipopt::SmartPtr<Ipopt::OptionsList> options,
+           Ipopt::SmartPtr<Ipopt::Journalist> journalist);
 
   ///virtual copy constructor
   virtual Ipopt::SmartPtr<TNLPSolver> clone() = 0;
@@ -147,7 +153,7 @@ class TNLPSolver: public Ipopt::ReferencedObject{
    virtual Ipopt::SmartPtr<Ipopt::OptionsList> Options() = 0;
 
    /// Register this solver options into passed roptions
-   virtual void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions) = 0;
+static void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){};
 
    /// Get the CpuTime of the last optimization.
    virtual double CPUTime() = 0;
@@ -167,6 +173,8 @@ class TNLPSolver: public Ipopt::ReferencedObject{
         (problem may be solvable).*/
   bool isRecoverable(ReturnStatus &r);
 
+  /** Error code (solver specific).*/
+virtual int errorCode() const = 0;
 protected:
   bool zeroDimension(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp, 
 		     ReturnStatus &optimization_status);

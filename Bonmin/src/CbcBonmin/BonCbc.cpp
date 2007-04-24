@@ -17,10 +17,7 @@
 
 #include "BonCbcParam.hpp"
 
-// AW
-#include "BonCurvBranching.hpp"
-#include "BonQPStrongBranching.hpp"
-#include "BonLpStrongBranching.hpp"
+
 
 //OA machinery
 #include "BonDummyHeuristic.hpp"
@@ -61,6 +58,10 @@
 
 #include "CbcBranchUser.hpp"
 
+// AW
+#include "BonCurvBranching.hpp"
+#include "BonQPStrongBranching.hpp"
+#include "BonLpStrongBranching.hpp"
 
 // Code to enable user interuption
 static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
@@ -124,8 +125,6 @@ namespace Bonmin
     oaGen.setLogLevel(par.oaLogLevel);
 
     ecpGen.assignNlpInterface(nlpSolver);
-    ecpGen.parameter().global_ = par.oaCutsGlobal;
-    ecpGen.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
     ecpGen.setNumRounds(par.numEcpRounds);
 
     //Outer approximation iterations
@@ -154,12 +153,7 @@ namespace Bonmin
       oaDec.parameter().maxLocalSearch_ = 100000;
       oaDec.parameter().maxLocalSearchPerNode_ = 10000;
       oaDec.parameter().maxLocalSearchTime_ =
-	  Ipopt::Min(par.maxTime, par.oaDecMaxTime);
-      oaDec.setLogLevel(par.oaLogLevel);
-      oaDec.parameter().logFrequency_ = par.oaLogFrequency;
-      oaDec.parameter().subMilpLogLevel_ = par.milpLogLevel;
-      oaDec.parameter().global_ = par.oaCutsGlobal;
-      oaDec.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
+        Ipopt::Min(par.maxTime, par.oaDecMaxTime);
     }
     //Setup solver for checking validity of integral solutions
     feasCheck.assignNlpInterface(nlpSolver);
@@ -174,8 +168,6 @@ namespace Bonmin
       feasCheck.parameter().localSearchNodeLimit_ = 0;
       feasCheck.parameter().maxLocalSearch_ = 0;
       feasCheck.parameter().maxLocalSearchPerNode_ = 100000;
-      feasCheck.parameter().global_ = par.oaCutsGlobal;
-      feasCheck.parameter().addOnlyViolated_ = par.addOnlyViolatedOa;
     }
    // feasCheck.registerOptions(nlpSolver->regOptions());
   }
@@ -223,6 +215,7 @@ namespace Bonmin
     {
       si = new OsiClpSolverInterface;
       nlpSolver->extractLinearRelaxation(*si);
+
       //#define GREAT_STUFF_FOR_ANDREAS
 #ifdef GREAT_STUFF_FOR_ANDREAS
       printf("ToDo: Clean me up in Bab::branchAndBound\n");
@@ -570,32 +563,49 @@ namespace Bonmin
       <<" beware that reported solution may not be optimal"<<std::endl
       <<"************************************************************"<<std::endl;
     }
+    TMINLP::SolverReturn status;
+
     if(model.numberObjects()==0){
       if(bestSolution_)
         delete [] bestSolution_;
       bestSolution_ = new double[nlpSolver->getNumCols()];
       CoinCopyN(nlpSolver->getColSolution(), nlpSolver->getNumCols(),
                 bestSolution_);
+      bestObj_ = bestBound_ = nlpSolver->getObjValue();
     }
+    
     if (model.bestSolution()) {
       if (bestSolution_)
         delete [] bestSolution_;
       bestSolution_ = new double[nlpSolver->getNumCols()];
       CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
     }
-    if (!model.status()) {
-      if (bestSolution_)
+    if (model.status() == 0) {
+      if (bestSolution_){
+        status = TMINLP::SUCCESS;
         mipStatus_ = FeasibleOptimal;
-      else
+      }
+      else {
+        status = TMINLP::INFEASIBLE;
         mipStatus_ = ProvenInfeasible;
+      }
     }
-    else {
-      if (bestSolution_)
+    else if(model.status() == 1){
+      status = TMINLP::LIMIT_EXCEEDED;
+      if (bestSolution_){
         mipStatus_ = Feasible;
-      else
+      }
+      else {
         mipStatus_ = NoSolutionKnown;
+      }
+    }
+    else if(model.status()==2){
+      status = TMINLP::MINLP_ERROR;
     }
 
+    nlpSolver->model()->finalize_solution(status, nlpSolver->getNumCols(), bestSolution_,
+                                         bestObj_);
+    
 
     if (par.algo > 0)
       delete si;

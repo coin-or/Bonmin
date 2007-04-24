@@ -27,6 +27,19 @@ namespace Bonmin
     handler_ -> setLogLevel(1);
     messages_ = OaMessages();
   }
+  
+  OaNlpOptim::OaNlpOptim(BabSetupBase &b):
+  CglCutGenerator(),
+  nlp_(b.nonlinearSolver()),
+  maxDepth_(10),
+  nSolve_(0)
+{
+  int ivalue;
+  b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
+  addOnlyViolated_ = ivalue;
+  b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
+  global_ = ivalue;
+}
 /// Assign an OsiTMINLPInterface
   void
   OaNlpOptim::assignInterface(OsiTMINLPInterface * si)

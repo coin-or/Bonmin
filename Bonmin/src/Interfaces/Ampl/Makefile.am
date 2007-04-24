@@ -14,17 +14,17 @@ AUTOMAKE_OPTIONS = foreign
 
 # Name of the library in this directory
 if COIN_HAS_ASL
-  noinst_LTLIBRARIES = libamplinterface.la
+  noinst_LTLIBRARIES = libbonamplinterface.la
 endif
 
 # List all source files, including headers
-libamplinterface_la_SOURCES = \
+libbonamplinterface_la_SOURCES = \
 	BonAmplInterface.cpp BonAmplInterface.hpp \
 	BonAmplTMINLP.cpp BonAmplTMINLP.hpp \
         sos_kludge.cpp
 
 # This is for libtool (on Windows)
-libamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
+libbonamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows

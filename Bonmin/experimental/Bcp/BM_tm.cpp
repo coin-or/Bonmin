@@ -19,6 +19,8 @@
 #include "BonEcpCuts.hpp"
 #include "BonOaNlpOptim.hpp"
 
+#include "BonAmplSetup.hpp"
+
 //#############################################################################
 
 void
@@ -64,10 +66,11 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
     argv[2] = NULL;
     
-    Bonmin::AmplInterface nlpSolver(argv);
-    Bonmin::OACutGenerator2::registerOptions(nlpSolver.regOptions());
-    Bonmin::EcpCuts::registerOptions(nlpSolver.regOptions());
-    Bonmin::OaNlpOptim::registerOptions(nlpSolver.regOptions());
+    /* Get the basic options. */
+    Bonmin::BonminAmplSetup bonmin;
+    bonmin.initializeBonmin(argv);    
+    
+    Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
     
     free(argv[1]);
     nlpSolver.extractInterfaceParams();
@@ -75,7 +78,6 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     OsiClpSolverInterface clp;
     int addObjVar = minlpParams_.algo == 0 /* pure B&B */ ? 0 : 1;
     nlpSolver.extractLinearRelaxation(clp, addObjVar);
-  
     const int numCols = clp.getNumCols();
     const int numRows = clp.getNumRows();
 
@@ -149,18 +151,17 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
     throw BCP_fatal_error("Trying to pack non-BM_solution.\n");
   }
   /* Parse again the input file so that we have a nice and clean ampl
-     setup */
-  Bonmin::AmplInterface nlpSolver;  
-  Bonmin::OACutGenerator2::registerOptions(nlpSolver.regOptions());
-  Bonmin::EcpCuts::registerOptions(nlpSolver.regOptions());
-  Bonmin::OaNlpOptim::registerOptions(nlpSolver.regOptions());
-
+     setup */  
+  
   char* argv_[3];
   char** argv = argv_;
   argv[0] = NULL;
   argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
   argv[2] = NULL;
-  nlpSolver.readAmplNlFile(argv, 0, 0);
+  Bonmin::BonminAmplSetup bonmin;
+  bonmin.initializeBonmin(argv);    
+  
+  Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
   minlpParams_.extractParams(&nlpSolver);
   free(argv[1]);
   OsiClpSolverInterface clp;
@@ -201,7 +202,8 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
 
   if (write_file) {
     /* create the AMPL solfile */
-    nlpSolver.writeAmplSolFile("\nbon-min: Optimal solution", dsol, NULL);
+    nlpSolver.model()->finalize_solution(Bonmin::TMINLP::SUCCESS, nlpSolver.getNumCols(), 
+                                         dsol, bs->_objective);
   }
   delete[] dsol;
 }

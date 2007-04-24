@@ -12,6 +12,7 @@
 #include "CglCutGenerator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonOAMessages.hpp"
+#include "BonBabSetupBase.hpp"
 namespace Bonmin
 {
   /** Generate cuts for the nlp corresponding to continuous relaxation at a node.*/
@@ -22,6 +23,9 @@ namespace Bonmin
     OaNlpOptim(OsiTMINLPInterface * si = NULL,
         int maxDepth = 10, bool addOnlyViolated = false,
 	       bool globalCuts = true);
+    
+    /// Constructor with basic setup
+    OaNlpOptim(BabSetupBase &b);
     /// Copy constructor
     OaNlpOptim(const OaNlpOptim &copy)
         :

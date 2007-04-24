@@ -21,33 +21,11 @@ CouenneInterface::CouenneInterface():
   couenneCg_(NULL)
 {}
 
-/** Constructor with inputed ampl command line.*/
-CouenneInterface::CouenneInterface(char **& amplArgs, SmartPtr<TNLPSolver> app):
-  AmplInterface(amplArgs, app),
-  couenneCg_(NULL)
-  {
-    //    const ASL_pfgh* asl = amplModel()->AmplSolverObject();
-    //    ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
-
-    aslfg_ = readASLfg (amplArgs);
-
-    //Get value of add_only violated option
-    int addOnlyViolatedOa = true;
-    app_->Options()->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
-    couenneCg_ = new CouenneCutGenerator 
-                       (this, aslfg_, true, CURRENT_ONLY,1);
-    
-  }
-
 /** Copy constructor. */
 CouenneInterface::CouenneInterface(const CouenneInterface &other):
   AmplInterface(other),
   couenneCg_(NULL)
   {
-    //    const ASL_pfgh* asl = amplModel()->AmplSolverObject();
-    //    ASL_pfgh * nc_asl = const_cast< ASL_pfgh *>(asl);
-    couenneCg_ = new CouenneCutGenerator 
-                       (this, aslfg_, true, CURRENT_ONLY,1);
   }
 
 /** virutal copy constructor. */
@@ -60,6 +38,23 @@ CouenneInterface::~CouenneInterface(){
   if(couenneCg_) delete couenneCg_;
 }
 
+void 
+CouenneInterface::readAmplNlFile(char **& amplArgs, Bonmin::BasicSetup & b){
+  readAmplNlFile(amplArgs, b.journalist(), b.options(), b.roptions());
+}
+
+
+void 
+CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                         Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                                 Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+  AmplInterface::readAmplNlFile(argv, journalist, options, roptions);
+  aslfg_ = readASLfg (argv);
+  int addOnlyViolatedOa;
+  options->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
+  couenneCg_ = new CouenneCutGenerator 
+    (this, aslfg_, true, CURRENT_ONLY,1);
+}
 
 /** \name Overloaded methods to build outer approximations */
   //@{

@@ -42,6 +42,7 @@ namespace Bonmin {
       nLocalSearch_(0),
       handler_(NULL),
       leaveSiUnchanged_(leaveSiUnchanged),
+    reassignLpsolver_(false),
       timeBegin_(0),
       parameters_()
   {
@@ -54,6 +55,35 @@ namespace Bonmin {
     parameters_.cbcCutoffIncrement_  = cbcCutoffIncrement;
     parameters_.cbcIntegerTolerance_ = cbcIntegerTolerance;
   }
+  OaDecompositionBase::OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
+                             bool reassignLpsolver):
+  CglCutGenerator(),
+  nlp_(b.nonlinearSolver()),
+  lp_(b.linearSolver()),
+  nLocalSearch_(0),
+  handler_(NULL),
+  leaveSiUnchanged_(leaveSiUnchanged),
+  reassignLpsolver_(reassignLpsolver),
+  timeBegin_(0),
+  parameters_()
+{
+    handler_ = new CoinMessageHandler();
+    int logLevel;
+    b.options()->GetIntegerValue("oa_log_level",logLevel,"bonmin.");
+    b.options()->GetNumericValue("oa_log_frequency",parameters_.logFrequency_,"bonmin.");
+
+    handler_ -> setLogLevel(logLevel);
+    
+    messages_ = OaMessages();
+    timeBegin_ = CoinCpuTime();
+    b.options()->GetNumericValue("cutoff_decr",parameters_.cbcCutoffIncrement_,"bonmin.");
+    b.options()->GetNumericValue("integer_tolerance",parameters_.cbcIntegerTolerance_,"bonmin.");
+    int ivalue;
+    b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
+    parameters_.addOnlyViolated_ = ivalue;
+    b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
+    parameters_.global_ = ivalue;
+}
 
   OaDecompositionBase::OaDecompositionBase
   (const OaDecompositionBase & other)
@@ -65,6 +95,7 @@ namespace Bonmin {
       handler_(NULL), 
       messages_(other.messages_),
       leaveSiUnchanged_(other.leaveSiUnchanged_),
+  reassignLpsolver_(other.reassignLpsolver_),
       timeBegin_(0),
       parameters_(other.parameters_)
     {
@@ -255,7 +286,8 @@ OaDecompositionBase::solverManip::solverManip
           bool saveNumRows,
           bool saveBasis,
           bool saveBounds,
-          bool saveCutoff):
+          bool saveCutoff,
+          bool resolve):
   si_(si),
   initialNumberRows_(-1),
   colLower_(NULL),
@@ -277,7 +309,7 @@ OaDecompositionBase::solverManip::solverManip
   }
   if(saveCutoff)
    si->getDblParam(OsiDualObjectiveLimit, cutoff_);
-   si->resolve();
+   if (resolve) si->resolve();
 }
 
 
@@ -359,7 +391,7 @@ OaDecompositionBase::solverManip::fixIntegers(const double * colsol) {
   for (int i = 0; i < numcols_; i++) {
     if (si_->isInteger(i)) {
       double  value =  colsol[i];
-      if(value - floor(value+0.5) > 1e-04){
+      if(fabs(value - floor(value+0.5)) > 1e-04){
 	std::cerr<<"Error not integer valued solution"<<std::endl;
 	std::cerr<<"---------------- x["<<i<<"] = "<<value<<std::endl;
       }
@@ -516,7 +548,10 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
 
     // babInfo is used to communicate with the b-and-b solver (Cbc or Bcp).
     OsiBabSolver * babInfo = dynamic_cast<OsiBabSolver *> (si.getAuxiliaryInfo());
-
+    if(babInfo)
+      if(!babInfo->mipFeasible())
+      return;
+  
     const int numcols = nlp_->getNumCols();
 
     //Get the continuous solution
@@ -547,12 +582,12 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
     si.getDblParam(OsiDualObjectiveLimit, cutoff);
 
     // Save solvers state if needed
-    solverManip nlpManip(nlp_, false, false, true, false);
+    solverManip nlpManip(nlp_, false, false, true, false, false);
 
     solverManip * lpManip = NULL; 
     if(lp_ != NULL){
       if(lp_!=&si){
-        lpManip = new solverManip(lp_, true, false, false, true);
+        lpManip = new solverManip(lp_, true, false, false, true, true);
         lpManip->cloneOther(si);
       }
       else{

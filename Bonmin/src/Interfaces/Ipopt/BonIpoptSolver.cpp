@@ -15,6 +15,7 @@
 #include "BonIpoptInteriorWarmStarter.hpp"
 #include "BonIpoptWarmStart.hpp"
 
+
 extern bool BonminAbortAll;
 
 namespace Bonmin{
@@ -32,6 +33,19 @@ namespace Bonmin{
     app_ = new Ipopt::IpoptApplication();
   }
 
+  /// Constructor with Passed in journalist, registered options, options
+  IpoptSolver::IpoptSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                           Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                           Ipopt::SmartPtr<Ipopt::Journalist> journalist):
+  TNLPSolver(roptions, options, journalist),
+  problemHadZeroDimension_(false),
+  warmStartStrategy_(1),
+  enable_warm_start_(false),
+  optimized_before_(false)
+{
+    app_ = new Ipopt::IpoptApplication(roptions, options, journalist);
+}
+  
   IpoptSolver::~IpoptSolver(){}
 
   ///virtual constructor

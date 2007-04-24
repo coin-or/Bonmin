@@ -72,7 +72,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_fun_OBJECTS = BonCouenne.$(OBJEXT) BonCouenneCbc.$(OBJEXT) \
-	BonNlpHeuristic.$(OBJEXT) BonCouenneInterface.$(OBJEXT)
+	BonCouenneSetup.$(OBJEXT) BonNlpHeuristic.$(OBJEXT) \
+	BonCouenneInterface.$(OBJEXT)
 fun_OBJECTS = $(am_fun_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
@@ -88,7 +89,7 @@ am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4)
-fun_DEPENDENCIES = ../../src/Interfaces/Ampl/libamplinterface.la \
+fun_DEPENDENCIES = ../../src/CbcBonmin/libbonminampl.la \
 	../../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
@@ -353,6 +354,7 @@ IPOPTLIBS = \
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
@@ -382,13 +384,15 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 fun_SOURCES = BonCouenne.cpp \
               BonCouenneCbc.hpp \
               BonCouenneCbc.cpp \
+              BonCouenneSetup.cpp \
+              BonCouenneSetup.hpp \
               BonCouenneInterface.hpp \
               BonNlpHeuristic.hpp \
               BonNlpHeuristic.cpp \
               BonCouenneInterface.cpp
 
 fun_LDADD = \
-	../../src/Interfaces/Ampl/libamplinterface.la \
+        ../../src/CbcBonmin/libbonminampl.la \
         ../../src/CbcBonmin/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
@@ -476,6 +480,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenne.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneCbc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneInterface.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneSetup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonNlpHeuristic.Po@am__quote@
 
 .cpp.o:

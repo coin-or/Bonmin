@@ -26,6 +26,7 @@
 #include "BonTNLP2FPNLP.hpp"
 #include "BonTNLPSolver.hpp"
 #include "BonCutStrengthener.hpp"
+#include "BonBasicSetup.hpp"
 
 namespace Bonmin {
 /**
@@ -115,18 +116,20 @@ class Messages : public CoinMessages
   //@{
   /// Default Constructor
   OsiTMINLPInterface();
-   /** Constructor with given (user) TMINLP.
-    \warning In this constructor option file is not read, use readOptionFile to read one.
-  */
-  OsiTMINLPInterface (Ipopt::SmartPtr<TMINLP> tminlp,
-		      Ipopt::SmartPtr<TNLPSolver> app);
 
- /** Constructor with specified application and empty problem just usefull to get the options and nothing else */
-  OsiTMINLPInterface (Ipopt::SmartPtr<TNLPSolver> app);
+  /** Facilitator to initialize interface. */
+  void initialize(BasicSetup &b,Ipopt::SmartPtr<TMINLP> tminlp);
 
-  /** Facilitator to allocate a tminlp and an application. */
-  void allocateTMINLP(Ipopt::SmartPtr<TMINLP> tminlp,
-		      Ipopt::SmartPtr<TNLPSolver> app);
+  /** Facilitator to initialize interface. */
+  void initialize(Ipopt::SmartPtr<Ipopt::Journalist> journalist_,
+                  Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                  Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                  Ipopt::SmartPtr<TMINLP> tminlp);
+
+  /** Set the model to be solved by interface.*/
+  void setModel(Ipopt::SmartPtr<TMINLP> tminlp);
+  /** Set the solver to be used by interface.*/
+  void setSolver(Ipopt::SmartPtr<TNLPSolver> app);
 
   /** Copy constructor
   */
@@ -146,7 +149,7 @@ class Messages : public CoinMessages
   void readOptionFile(const char * fileName);
 
   /// Retrieve OsiTMINLPApplication option list
-  Ipopt::SmartPtr<Ipopt::OptionsList> retrieve_options();
+  Ipopt::SmartPtr<Ipopt::OptionsList> options();
 
   //---------------------------------------------------------------------------
   /**@name Solve methods */
@@ -785,7 +788,13 @@ class Messages : public CoinMessages
   {
     return GetRawPtr(tminlp_);
   }
-  const TNLPSolver * solver() const
+  
+  Bonmin::TMINLP * model()
+  {
+    return GetRawPtr(tminlp_);
+  }
+  
+  const Bonmin::TNLPSolver * solver() const
   {
     return GetRawPtr(app_);
   } 
@@ -850,18 +859,12 @@ class Messages : public CoinMessages
 
   void extractInterfaceParams();
 
-  enum AlgorithmType{
-    B_BB=0/** Bonmin's Branch-and-bound.*/,
-    B_OA=1/** Bonmin's Outer Approximation Decomposition.*/,
-    B_QG=2/** Bonmin's Quesada & Grossmann branch-and-cut.*/,
-    B_Hyb=3/** Bonmin's hybrid outer approximation.*/,
-    B_Couenne=4/** Bonmin's and Couenne spatial branch-and-bound.*/};
 
   /** To set some application specific defaults. */
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
   /** Register all possible options to Bonmin */
-  void registerOptions (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+  static void registerOptions (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
   
   Ipopt::SmartPtr<Ipopt::RegisteredOptions> regOptions(){
     if(IsValid(app_))
@@ -1035,9 +1038,18 @@ protected:
   bool firstSolve_;
   /** Object for strengthening cuts */
   SmartPtr<CutStrengthener> cut_strengthener_;
-private:
+protected:
     /** Facilitator to create an application. */
-    void createApplication();
+    void createApplication(BasicSetup & b);
+  /** Facilitator to create an application. */
+  void createApplication(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                         Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                         Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+  ///Constructor without model only for derived classes
+  OsiTMINLPInterface(BasicSetup &b,
+                     Ipopt::SmartPtr<TNLPSolver> app);
+  
+
 };
 }
 #endif

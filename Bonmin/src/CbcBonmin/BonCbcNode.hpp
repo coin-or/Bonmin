@@ -12,6 +12,7 @@
 #define BonminCbcNode_H
 
 #include "CbcNode.hpp"
+#include "IpRegOptions.hpp"
 
 
 namespace Bonmin
@@ -58,6 +59,9 @@ namespace Bonmin
     {
       return sequenceOfUnsolvedSize_;
     }
+    /** Register all the options for class instance.*/
+    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+
   private:
     /* Data values */
     /** Number of consecutive infeasible parents only recorded if node is infeasible*/

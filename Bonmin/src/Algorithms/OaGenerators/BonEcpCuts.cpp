@@ -10,7 +10,13 @@
 #include "BonEcpCuts.hpp"
 namespace Bonmin{
 
-double 
+  
+  EcpCuts::EcpCuts(BabSetupBase & b):
+  OaDecompositionBase(b,false, false){
+  b.options()->GetIntegerValue("number_ecp_rounds", numRounds_,"bonmin.");
+  }
+  
+  double 
 EcpCuts::doEcpRounds(OsiSolverInterface &si, 
                      bool leaveSiUnchanged){
   OsiSolverInterface * saveLp = lp_;
@@ -50,7 +56,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
     if( violation > 1e-06)
     {
       int numberCuts =  - cs.sizeRowCuts();
-      const double * toCut = parameter().addOnlyViolated_?
+      const double * toCut = parameter().addOnlyViolated_ ?
 	si.getColSolution():NULL;
       nlp_->getOuterApproximation(cs, si.getColSolution(), 1, toCut, parameter().global_);
       numberCuts += cs.sizeRowCuts();

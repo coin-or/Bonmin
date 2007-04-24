@@ -43,7 +43,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COIN_HAS_CPX_TRUE@am__append_1 = \
+@COIN_HAS_ASL_TRUE@am__append_1 = libbonminampl.la
+@COIN_HAS_CPX_TRUE@am__append_2 = \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
@@ -68,11 +69,14 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am_libbonmin_la_OBJECTS = BonCbc.lo BonCbcLpStrategy.lo \
-	BonCbcNlpStrategy.lo BonCbcNode.lo BonCbcParam.lo
+am_libbonmin_la_OBJECTS = BonCbc.lo BonCbc2.lo BonCbcNlpStrategy.lo \
+	BonCbcNode.lo BonAuxInfos.lo BonCbcParam.lo
 nodist_libbonmin_la_OBJECTS = CbcCompareUser.lo CbcBranchUser.lo
 libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS) \
 	$(nodist_libbonmin_la_OBJECTS)
+am_libbonminampl_la_OBJECTS =
+libbonminampl_la_OBJECTS = $(am_libbonminampl_la_OBJECTS)
+@COIN_HAS_ASL_TRUE@am_libbonminampl_la_rpath = -rpath $(libdir)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -91,8 +95,9 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libbonmin_la_SOURCES) $(nodist_libbonmin_la_SOURCES)
-DIST_SOURCES = $(libbonmin_la_SOURCES)
+SOURCES = $(libbonmin_la_SOURCES) $(nodist_libbonmin_la_SOURCES) \
+	$(libbonminampl_la_SOURCES)
+DIST_SOURCES = $(libbonmin_la_SOURCES) $(libbonminampl_la_SOURCES)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
@@ -320,8 +325,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 
 # Name of the library in this directory
-lib_LTLIBRARIES = libbonmin.la
-
+lib_LTLIBRARIES = libbonmin.la $(am__append_1)
 ########################################################################
 #                          bonmin library                              #
 ########################################################################
@@ -329,9 +333,10 @@ lib_LTLIBRARIES = libbonmin.la
 # List all source files, including headers
 libbonmin_la_SOURCES = \
 	BonCbc.cpp BonCbc.hpp \
-	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
+	BonCbc2.cpp BonCbc2.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
+        BonAuxInfos.cpp BonAuxInfos.hpp \
 	BonCbcParam.cpp BonCbcParam.hpp 
 
 nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
@@ -344,6 +349,21 @@ libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
 
 # This is for libtool (on Windows)
 libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
+
+########################################################################
+#                         amplbonmin library                           #
+########################################################################
+
+# List all source files, including headers
+libbonminampl_la_SOURCES = 
+libbonminampl_la_LIBADD = \
+	../Algorithms/Ampl/libbonamplsetup.la \
+	../Interfaces/Ampl/libbonamplinterface.la 
+
+libbonminampl_la_DEPENDENCIES = $(libamplbonmin_la_LIBADD)
+
+# This is for libtool (on Windows)
+libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
@@ -374,7 +394,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Algorithms` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` $(am__append_1)
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` $(am__append_2)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
@@ -385,6 +405,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 include_HEADERS = \
 	BonCbc.hpp \
+        BonCbc2.hpp \
+        BonAuxInfos.hpp \
 	BonCbcParam.hpp
 
 
@@ -467,6 +489,8 @@ clean-libLTLIBRARIES:
 	done
 libbonmin.la: $(libbonmin_la_OBJECTS) $(libbonmin_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libbonmin_la_LDFLAGS) $(libbonmin_la_OBJECTS) $(libbonmin_la_LIBADD) $(LIBS)
+libbonminampl.la: $(libbonminampl_la_OBJECTS) $(libbonminampl_la_DEPENDENCIES) 
+	$(LINK) $(am_libbonminampl_la_rpath) $(libbonminampl_la_LDFLAGS) $(libbonminampl_la_OBJECTS) $(libbonminampl_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -474,8 +498,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonAuxInfos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcLpStrategy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNlpStrategy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcParam.Plo@am__quote@

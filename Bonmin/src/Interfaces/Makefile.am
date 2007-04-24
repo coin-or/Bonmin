@@ -35,6 +35,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
+        BonBaseOptions.cpp BonBaseOptions.hpp \
+        BonBasicSetup.cpp BonBasicSetup.hpp \
 	BonBranchingTQP.cpp BonBranchingTQP.hpp
 
 #sublibraries for various installed solvers
@@ -81,6 +83,9 @@ include_HEADERS = \
 	BonTMINLP2TNLP.hpp \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
+        BonCutStrengthener.hpp \
+        BonBasicSetup.hpp \
+        BonBaseOptions.hpp \
         BonTNLPSolver.hpp 
 
 #############################################################################

@@ -10,7 +10,9 @@ AUTOMAKE_OPTIONS = foreign
 
 # Name of the library in this directory
 lib_LTLIBRARIES = libbonmin.la
-
+if COIN_HAS_ASL
+lib_LTLIBRARIES += libbonminampl.la
+endif
 ########################################################################
 #                          bonmin library                              #
 ########################################################################
@@ -18,9 +20,10 @@ lib_LTLIBRARIES = libbonmin.la
 # List all source files, including headers
 libbonmin_la_SOURCES = \
 	BonCbc.cpp BonCbc.hpp \
-	BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
+	BonCbc2.cpp BonCbc2.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
+        BonAuxInfos.cpp BonAuxInfos.hpp \
 	BonCbcParam.cpp BonCbcParam.hpp 
 
 nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
@@ -34,6 +37,22 @@ libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
 
 # This is for libtool (on Windows)
 libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
+
+########################################################################
+#                         amplbonmin library                           #
+########################################################################
+
+# List all source files, including headers
+libbonminampl_la_SOURCES = 
+
+libbonminampl_la_LIBADD = \
+	../Algorithms/Ampl/libbonamplsetup.la \
+	../Interfaces/Ampl/libbonamplinterface.la 
+
+libbonminampl_la_DEPENDENCIES = $(libamplbonmin_la_LIBADD)
+
+# This is for libtool (on Windows)
+libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
@@ -98,6 +117,8 @@ CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
 
 include_HEADERS = \
 	BonCbc.hpp \
+        BonCbc2.hpp \
+        BonAuxInfos.hpp \
 	BonCbcParam.hpp
 
 ########################################################################

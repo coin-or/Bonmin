@@ -150,14 +150,10 @@ namespace Bonmin
 
     /** @name Solution Methods */
     //@{
-    virtual void finalize_solution(SolverReturn status,
-        Index n, const Number* x, const Number* z_L, const Number* z_U,
-        Index m, const Number* g, const Number* lambda,
-        Number obj_value,
-        const IpoptData* ip_data,
-        IpoptCalculatedQuantities* ip_cq);
+    virtual void finalize_solution(TMINLP::SolverReturn status,
+                                   Index n, const Number* x, Number obj_value);
 
-    void write_solution(const std::string & message, const Number *x_sol, const Number * lambda_sol);
+    void write_solution(const std::string & message, const Number *x_sol);
     //@}
 
     /** Write the solution file.  This is a wrapper for AMPL's

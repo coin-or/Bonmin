@@ -156,12 +156,8 @@ public:
 
   
   /** Method called by Ipopt at the end of optimization.*/  
-  virtual void finalize_solution(SolverReturn status,
-                                 Index n, const Number* x, const Number* z_L, const Number* z_U,
-                                 Index m, const Number* g, const Number* lambda,
-                                 Number obj_value,
-				 const IpoptData* ip_data,
-				 IpoptCalculatedQuantities* ip_cq);
+  virtual void finalize_solution(TMINLP::SolverReturn status,
+                                 Index n, const Number* x, Number obj_value);
   
   //@}
 

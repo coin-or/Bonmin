@@ -23,6 +23,7 @@ libbonoagenerators_la_SOURCES = \
         BonOaFeasChecker.cpp BonOaFeasChecker.hpp \
 	BonOaDecBase.cpp BonOaDecBase.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
+        BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 
 # This is for libtool (on Windows)
@@ -32,6 +33,7 @@ libbonoagenerators_la_LDFLAGS = $(LT_LDFLAGS)
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
+	-I`$(CYGPATH_W) $(srcdir)/..` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
@@ -43,7 +45,21 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/src`
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples`
 
 if COIN_HAS_CPX
   AM_CPPFLAGS += \
@@ -54,6 +70,18 @@ endif
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+
+
+include_HEADERS = \
+        BonDummyHeuristic.hpp \
+	BonOaNlpOptim.hpp \
+	BonOACutGenerator2.hpp \
+        BonOaFeasChecker.hpp \
+	BonOaDecBase.hpp \
+        BonEcpCuts.hpp \
+        BonCbcLpStrategy.hpp \
+	BonOAMessages.hpp
+ 
 
 ########################################################################
 #                            Astyle stuff                              #

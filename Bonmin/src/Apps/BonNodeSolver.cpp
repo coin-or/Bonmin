@@ -25,6 +25,9 @@
 #include "BonStartPointReader.hpp"
 #include "CoinTime.hpp"
 
+#include "BonAmplSetup.hpp"
+
+
 /************************************************************************
  
 This mains is used for resolving the problem with fixed bounds and eventually a starting point
@@ -55,12 +58,15 @@ int main (int argc, char *argv[])
   strcpy(myArgv[1],argv[1]);
   myArgv[2]= NULL;//new char[1];
 
-  Bonmin::AmplInterface nlpSolver(myArgv);
 
-  Ipopt::SmartPtr<Ipopt::OptionsList> Options =
-    nlpSolver.retrieve_options();
+    BonminAmplSetup bonmin;
+    bonmin.initializeBonmin(argv);
+    Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
+  
+    Ipopt::SmartPtr<Ipopt::OptionsList> Options =
+      nlpSolver.options();
 
-  nlpSolver.messageHandler()->setLogLevel(2);
+    nlpSolver.messageHandler()->setLogLevel(2);
 
   try
     {

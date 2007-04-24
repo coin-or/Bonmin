@@ -61,7 +61,12 @@ namespace Bonmin
   {
   public:
     friend class TMINLP2TNLP;
-
+    /** Return statuses of algorithm.*/
+    enum SolverReturn{
+      SUCCESS,
+      INFEASIBLE,
+      LIMIT_EXCEEDED,
+      MINLP_ERROR};
     /** Class to store sos constraints for model */
     struct SosInfo
     {
@@ -312,12 +317,8 @@ namespace Bonmin
     /** @name Solution Methods */
     //@{
     /** This method is called when the algorithm is complete so the TNLP can store/write the solution */
-    virtual void finalize_solution(SolverReturn status,
-        Index n, const Number* x, const Number* z_L, const Number* z_U,
-        Index m, const Number* g, const Number* lambda,
-        Number obj_value,
-        const IpoptData* ip_data,
-        IpoptCalculatedQuantities* ip_cq)=0;
+    virtual void finalize_solution(TMINLP::SolverReturn status,
+                                   Index n, const Number* x, Number obj_value) =0;
     //@}
     
     virtual const BranchingInfo * branchingInfo() const = 0;

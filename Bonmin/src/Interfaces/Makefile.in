@@ -65,7 +65,8 @@ am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonColReader.lo \
 	BonCurvatureEstimator.lo BonCutStrengthener.lo \
 	BonStartPointReader.lo BonOsiTMINLPInterface.lo \
 	BonTMINLP2TNLP.lo BonTMINLP.lo BonTNLPSolver.lo \
-	BonTNLP2FPNLP.lo BonBranchingTQP.lo
+	BonTNLP2FPNLP.lo BonBaseOptions.lo BonBasicSetup.lo \
+	BonBranchingTQP.lo
 libbonmininterfaces_la_OBJECTS = $(am_libbonmininterfaces_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -348,6 +349,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
+        BonBaseOptions.cpp BonBaseOptions.hpp \
+        BonBasicSetup.cpp BonBasicSetup.hpp \
 	BonBranchingTQP.cpp BonBranchingTQP.hpp
 
 
@@ -390,6 +393,9 @@ include_HEADERS = \
 	BonTMINLP2TNLP.hpp \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
+        BonCutStrengthener.hpp \
+        BonBasicSetup.hpp \
+        BonBaseOptions.hpp \
         BonTNLPSolver.hpp 
 
 
@@ -469,6 +475,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBaseOptions.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBasicSetup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBoundsReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBranchingTQP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonColReader.Plo@am__quote@

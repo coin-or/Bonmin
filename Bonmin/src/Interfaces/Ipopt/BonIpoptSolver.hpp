@@ -43,6 +43,12 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   /// Constructor
   IpoptSolver(bool createEmpty = false);
 
+/// Constructor with Passed in journalist, registered options, options
+IpoptSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+            Ipopt::SmartPtr<Ipopt::OptionsList> options,
+            Ipopt::SmartPtr<Ipopt::Journalist> journalist);
+
+
   ///virtual constructor
   virtual Ipopt::SmartPtr<TNLPSolver> clone();
 
@@ -111,8 +117,8 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
     return solverName_;}
 
    /// Register this solver options into passed roptions
-   virtual void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-   app_->RegisterAllIpoptOptions(roptions);
+   static void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+     Ipopt::IpoptApplication::RegisterAllIpoptOptions(roptions);
    }
 
 
@@ -126,6 +132,10 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   Ipopt::IpoptApplication& getIpoptApp(){
     return *app_;
   }
+
+virtual int errorCode() const{
+  return (int) optimizationStatus_;
+}
   private:
   /** Set default Ipopt parameters for use in a MINLP */
   void setMinlpDefaults(Ipopt::SmartPtr< Ipopt::OptionsList> Options);

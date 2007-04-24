@@ -20,7 +20,8 @@
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "MyTMINLP.hpp"
-#include "BonCbc.hpp"
+#include "BonCbc2.hpp"
+#include "BonBonminSetup.hpp"
 
 #include "BonOACutGenerator2.hpp"
 #include "BonEcpCuts.hpp"
@@ -32,50 +33,22 @@ int main (int argc, char *argv[])
   using namespace Ipopt;
   using namespace Bonmin;
   SmartPtr<TMINLP> tminlp = new MyTMINLP;
-  OsiTMINLPInterface nlpSolver(tminlp, new IpoptSolver);
-  OACutGenerator2::registerOptions(nlpSolver.regOptions());
-  EcpCuts::registerOptions(nlpSolver.regOptions());
-  OaNlpOptim::registerOptions(nlpSolver.regOptions());
-  //Option can be set here directly either to bonmin or ipopt
-  nlpSolver.retrieve_options()->SetNumericValue("bonmin.time_limit", 1); //changes bonmin's time limit
-  nlpSolver.retrieve_options()->SetStringValue("mu_oracle","loqo");
+  BonminSetup bonmin;
+  bonmin.initializeBonmin(tminlp);
 
-  // we can also try and read an option file (can eventually change options set before, option file always have priority)
-  nlpSolver.readOptionFile("My_bonmin.opt");
+  bonmin.options()->SetNumericValue("bonmin.time_limit", 1); //changes bonmin's time limit
+  bonmin.options()->SetStringValue("mu_oracle","loqo");
+
+  // we can also try and read an option file (this can eventually change options set before, option file always have priority)
+//  bonmin.initialize("My_bonmin.opt");
 
   //Set up done, now let's branch and bound
   double time1 = CoinCpuTime();
   try {
-    BonminCbcParam par;
-    Bab bb;
-    par(&nlpSolver);
-
-    bb(&nlpSolver, par);//process parameter file using Ipopt and do branch and bound
+    Bab2 bb;
+    bb(bonmin);//process parameter file using Ipopt and do branch and bound
 
     std::cout.precision(10);
-
-    std::string message;
-    if(bb.mipStatus()==Bab::FeasibleOptimal) {
-      std::cout<<"\t\"Finished\"\t";
-      message = "\nbonmin: Optimal";
-    }
-    else if(bb.mipStatus()==Bab::ProvenInfeasible) {
-      std::cout<<"\t\"Finished\"\t";
-      message = "\nbonmin: Infeasible problem";
-    }
-    else if(bb.mipStatus()==Bab::Feasible) {
-      std::cout<<"\t\"Not finished\""<<"\t";
-      message = "\n Optimization not finished.";
-    }
-    else if(bb.mipStatus()==Bab::NoSolutionKnown) {
-      std::cout<<"\t\"Not finished\""<<"\t";
-      message = "\n Optimization not finished.";
-    }
-    std::cout<<CoinCpuTime()-time1<<"\t"
-    <<bb.bestObj()<<"\t"
-    <<bb.numNodes()<<"\t"
-    <<bb.iterationCount()<<"\t"
-    <<std::endl;
 
   }
   catch(TNLPSolver::UnsolvedError *E) {

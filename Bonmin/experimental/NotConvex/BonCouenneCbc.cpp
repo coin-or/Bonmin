@@ -67,6 +67,7 @@
 
 #include "CbcBranchUser.hpp"
 
+
 bool checkNLP (CglCutGenerator *, const double *, double &);
 
 
@@ -78,7 +79,7 @@ static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
 #define SIGNAL
 #ifdef SIGNAL
 #include "CoinSignal.hpp"
-
+#include "BonBaseOptions.hpp"
 extern "C"
 {
   
@@ -119,8 +120,8 @@ namespace Bonmin
 
     nlpSolver->messageHandler()->setLogLevel(par.nlpLogLevel);
 
-    if (par.algo >= OsiTMINLPInterface::B_BB && 
-	par.algo <= OsiTMINLPInterface::B_Hyb) //Do something classic
+    if (par.algo >= Bonmin::BaseOptions::B_BB && 
+        par.algo <= Bonmin::BaseOptions::B_Hyb) //Do something classic
     {
       Bab::branchAndBound (nlpSolver, par);
       return;
@@ -229,7 +230,7 @@ namespace Bonmin
     */
 
     /*Setup heuristic to solve nlp problems.*/
-    Ipopt::SmartPtr<Ipopt::OptionsList> Options = nlpSolver->retrieve_options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> Options = nlpSolver->options();
     int doNlpHeurisitic = 0;
     Options->GetEnumValue("nlp_local_solutions", doNlpHeurisitic, "couenne.");
     if(doNlpHeurisitic)

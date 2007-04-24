@@ -10,7 +10,7 @@
 #ifndef BonOaDecBase_HPP
 #define BonOaDecBase_HPP
 #include "CglCutGenerator.hpp"
-#include "BonOsiTMINLPInterface.hpp"
+#include "BonBabSetupBase.hpp"
 #include "BonOAMessages.hpp"
 #include "CbcModel.hpp"
 
@@ -37,7 +37,7 @@ namespace Bonmin
         SubMipSolver(OsiSolverInterface * lp = NULL,
                      const CbcStrategy * strategy = NULL);
 
-        virtual ~SubMipSolver();
+        ~SubMipSolver();
 
         /** Assign lp solver. */
         void setLpSolver(OsiSolverInterface * lp);
@@ -77,10 +77,9 @@ namespace Bonmin
         inline int iterationCount(){
           return iterationCount_;}
         
-      //AW: I think the following should not be here!  Otherwise we get warning messages about having not a virtual destructor
-      // /** Register options for that Oa based cut generation method. */
-        //virtual void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){}
-protected:
+
+       /** Register options for that Oa based cut generation method. */
+      void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){}
       private:
        /** lp (potentially mip solver). */
        OsiSolverInterface * lp_;
@@ -111,7 +110,7 @@ protected:
       /** Constructor. */
       solverManip(OsiSolverInterface *si , bool saveNumRows=true,
                       bool saveBasis=true, bool saveBounds=false,
-                      bool saveCutoff = false);
+                      bool saveCutoff = false, bool resolve=true);
       
       /** Constructor which clone an other interface. */
       solverManip(const OsiSolverInterface & si);
@@ -179,7 +178,7 @@ protected:
      /** @} */
 
    };
-    /// Usefull constructor
+    /// Old usefull constructor
     OaDecompositionBase(OsiTMINLPInterface * nlp = NULL,
         OsiSolverInterface * si = NULL,
         CbcStrategy * strategy = NULL,
@@ -187,6 +186,9 @@ protected:
         double cbcIntegerTolerance = 1e-05,
         bool leaveSiUnchanged = 0
         );
+    /// New usefull constructor
+    OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
+                                             bool reassignLpsolver);
 
     /// Copy constructor
     OaDecompositionBase(const OaDecompositionBase & copy);
@@ -209,6 +211,9 @@ protected:
 	lp_ = si;
     }
 
+    bool reassignLpsolver(){
+      return reassignLpsolver_;
+    }
     /// Set whether to leave the solverinterface unchanged
     inline void setLeaveSiUnchanged(bool yesno)
     {
@@ -307,6 +312,8 @@ protected:
     CoinMessages messages_;
     /** Wether or not we should remove cuts at the end of the procedure */
     bool leaveSiUnchanged_;
+    /** Do we need to reassign the lp solver with Cbc.*/
+    bool reassignLpsolver_;
     /** time of construction*/
     double timeBegin_;
 

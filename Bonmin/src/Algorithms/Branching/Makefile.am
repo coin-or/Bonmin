@@ -29,6 +29,7 @@ libbonbranching_la_LDFLAGS = $(LT_LDFLAGS)
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/..` \
 	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \

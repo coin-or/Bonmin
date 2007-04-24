@@ -22,6 +22,7 @@ namespace Bonmin {
       objValue_(-DBL_MAX),
       numRounds_(numRounds){
     }
+    EcpCuts(BabSetupBase & b);
     
     /// Copy constructor
     EcpCuts(const EcpCuts & copy):

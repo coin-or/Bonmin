@@ -19,7 +19,7 @@ unitTest_SOURCES = \
 
 # List libraries of COIN projects
 unitTest_LDADD = \
-        ../src/Interfaces/Ampl/libamplinterface.la \
+        ../src/CbcBonmin/libbonminampl.la \
         ../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
@@ -74,6 +74,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \

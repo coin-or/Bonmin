@@ -42,6 +42,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
@@ -94,13 +95,15 @@ endif
 fun_SOURCES = BonCouenne.cpp \
               BonCouenneCbc.hpp \
               BonCouenneCbc.cpp \
+              BonCouenneSetup.cpp \
+              BonCouenneSetup.hpp \
               BonCouenneInterface.hpp \
               BonNlpHeuristic.hpp \
               BonNlpHeuristic.cpp \
               BonCouenneInterface.cpp
 
 fun_LDADD = \
-	../../src/Interfaces/Ampl/libamplinterface.la \
+        ../../src/CbcBonmin/libbonminampl.la \
         ../../src/CbcBonmin/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \

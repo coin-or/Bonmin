@@ -34,6 +34,10 @@ extern int usingCouenne;
   {
   }
 
+  /// New usefull constructor
+  OaFeasibilityChecker::OaFeasibilityChecker(BabSetupBase &b):
+  OaDecompositionBase(b, false, true){
+  }
   OaFeasibilityChecker ::~OaFeasibilityChecker ()
   {
   }
@@ -63,8 +67,9 @@ extern int usingCouenne;
 #if 0
    for(int i = 0 ; i < numcols ; i++)
      {
-       std::cout<<"x["<<i<<"] = "<<colsol[i]<<"\t";
+       std::cerr<<"x["<<i<<"] = "<<colsol[i]<<"\t";
      }
+   std::cerr<<std::endl;
    lp->writeLp("toto");
 #endif
    nlpManip.fixIntegers(colsol);

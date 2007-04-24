@@ -33,36 +33,7 @@ static void
 register_general_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("bonmin output options");
-
-  roptions->AddBoundedIntegerOption("bb_log_level",
-      "specify main branch-and-bound log level.",
-      0,5,1,
-      "Set the level of output of the branch-and-bound : "
-      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
-                                   );
-
-  roptions->AddLowerBoundedIntegerOption("bb_log_interval",
-      "Interval at which node level output is printed.",
-      0,100,
-      "Set the interval (in terms of number of nodes) at which "
-      "a log on node resolutions (consisting of lower and upper bounds) is given.");
-
-  roptions->AddBoundedIntegerOption("lp_log_level",
-      "specify LP log level.",
-      0,4,0,
-      "Set the level of output of the linear programming sub-solver in B-Hyb or B-QG : "
-      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
-                                   );
-
-  roptions->AddBoundedIntegerOption("milp_log_level",
-      "specify MILP subsolver log level.",
-      0,3,0,
-      "Set the level of output of the MILP subsolver in OA : "
-      "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
-                                   );
-
-
+  roptions->SetRegisteringCategory("bonmin nlp interface option");
 
   roptions->AddBoundedIntegerOption("nlp_log_level",
       "specify NLP solver interface log level (independent from ipopt print_level).",
@@ -71,118 +42,6 @@ register_general_options
       "0 - none, 1 - normal, 2 - verbose"
                                    );
 
-  roptions->SetRegisteringCategory("bonmin branch-and-bound options");
-
-  roptions->AddStringOption2("nlp_solver",
-      "Choice of the solver for local optima of continuous nlp's",
-      "Ipopt",
-      "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
-      "filterSQP", "Sequential quadratic programming trust region algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
-       "");
-
-  roptions->AddStringOption5("algorithm",
-      "Choice of the algorithm.",
-      "B-Hyb",
-      "B-BB","simple branch-and-bound algorithm,",
-      "B-OA","OA Decomposition algorithm,",
-      "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
-      "B-Hyb","hybrid outer approximation based branch-and-cut.",
-      "B-Couenne","Branch-and-bound using Couenne convexifier (not available through Bonmin excutable)",
-      "This will preset default values for most options of bonmin but depending on which algorithm "
-      "some of these can be changed.");
-  roptions->AddLowerBoundedNumberOption("time_limit",
-      "Set the global maximum computation time (in secs) for the algorithm.",
-      0.,1,1e10,
-      "");
-
-  roptions->AddLowerBoundedIntegerOption("node_limit",
-					 "Set the maximum number of nodes explored in the branch-and-bound search.",
-					 0,INT_MAX,
-					 "");
-
-   roptions->AddLowerBoundedIntegerOption("iteration_limit",
-      "Set the cummulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
-      0,INT_MAX,
-      "value 0 deactivates option.");
-
-  roptions->AddLowerBoundedIntegerOption("solution_limit",
-					 "Abort after that much integer feasible solution have been found by algorithm",
-					 0,INT_MAX,
-					 "value 0 deactivates option");
-
-  roptions->AddBoundedNumberOption("integer_tolerance",
-      "Set integer tolerance.",
-      0.,1,.5,1,1e-06,
-      "Any number within that value of an integer is considered integer.");
-
-  roptions->AddBoundedNumberOption("allowable_gap",
-      "Specify the value of absolute gap under which the algorithm stops.",
-      -1.e20,0,1.e20,0,0.,
-      "Stop the tree search when the gap between the objective value of the best known solution"
-      " and the best bound on the objective of any solution is less than this.");
-
-  roptions->AddBoundedNumberOption("allowable_fraction_gap",
-      "Specify the value of relative gap under which the algorithm stops.",
-      -1.e20,0,1.e20,0,0.0,
-      "Stop the tree search when the gap between the objective value of the best known solution "
-      "and the best bound on the objective of any solution is less than this "
-      "fraction of the absolute value of the best known solution value.");
-
-  roptions->AddBoundedNumberOption("cutoff",
-      "Specify cutoff value.",
-      -1e100,0,1e100,0,1e100,
-      "cutoff should be the value of a feasible solution known by the user "
-      "(if any). The algorithm will only look for solutions better than cutoof.");
-
-
-  roptions->AddBoundedNumberOption("cutoff_decr",
-      "Specify cutoff decrement.",
-      -1e10,0,1e10,0,1e-05,
-      "Specify the amount by which cutoff is decremented below "
-      "a new best upper-bound"
-      " (usually a small postive value but in non-convex problems it may be a negative value).");
-
-  roptions->AddStringOption4("nodeselect_stra",
-      "Choose the node selection strategy.",
-      "dynamic",
-      "best-bound", "choose node whith the smallest bound,",
-      "depth-first", "Perform depth first search,",
-      "breadth-first", "Perform breadth first search,",
-      "dynamic", "Cbc dynamic strategy (starts with a depth first search and turn to best bound after 3 "
-      "integer feasible solutions have been found).",
-      "Choose the strategy for selecting the next node to be processed.");
-
-  roptions->AddStringOption9("varselect_stra",
-      "Chooses variable selection strategy",
-      "strong-branching",
-      "most-fractional", "Choose most fractional variable",
-      "strong-branching", "Perform strong branching",
-      "reliability-branching", "Use reliability branching",
-      "curvature-estimator", "Use curvature estimation to select branching variable",
-      "qp-strong-branching", "Perform strong branching with QP approximation",
-      "lp-strong-branching", "Perform strong branching with LP approximation",
-      "nlp-strong-branching", "Perform strong branching with NLP approximation",
-      "osi-simple", "Osi method to do simple branching",
-      "osi-strong", "Osi method to do strong branching","");
-
-  roptions->AddLowerBoundedIntegerOption("number_strong_branch",
-      "Choose the maximum number of variables considered for strong branching.",
-      0,20,
-      "Set the number of variables on which to do strong branching.");
-
-  roptions->AddLowerBoundedIntegerOption
-  ("number_before_trust",
-   "Set the number of branches on a variable before its pseudo costs are to be believed "
-   "in dynamic strong branching.",
-   0,8,
-   "A value of 0 disables dynamic strong branching.");
-
-  roptions->AddLowerBoundedIntegerOption
-  ("number_ecp_rounds_strong",
-   "Set the number of rounds of ecp in strong branching.",
-   0,1,
-   "");
-
   roptions->AddStringOption3("warm_start",
       "Select the warm start method",
       "optimum",
@@ -190,13 +49,6 @@ register_general_options
       "optimum","Warm start with direct parent optimum",
       "interior_point","Warm start with an interior point of direct parent",
       "This will affect the function getWarmStart(), and as a consequence the wam starting in the various algorithms.");
-
-  roptions->AddStringOption2("sos_constraints",
-			     "Wether or not to activate SOS constraints.",
-			     "enable",
-			     "enable","",
-			     "disable","",
-			     "(only type 1 SOS are supported at the moment)");
 
   roptions->SetRegisteringCategory("bonmin options for robustness");
 
@@ -217,13 +69,6 @@ register_general_options
 					   0.,true, 1.,
 					   "");
 					   
-  roptions->AddLowerBoundedIntegerOption
-  ("max_consecutive_failures",
-   "(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.",
-   0,10,
-   "When $n > 0$, continue exploring a branch of the tree until $n$ "
-   "consecutive problems in the branch are unsolved (we call unsolved a problem for which Ipopt can not "
-   "guarantee optimality within the specified tolerances).");
 
   roptions->AddLowerBoundedIntegerOption
   ("num_iterations_suspect",
@@ -232,15 +77,7 @@ register_general_options
    "When the number of iterations to solve a node is above this number, the subproblem at this"
    " node is considered to be suspect and it will be outputed in a file (set to -1 to deactivate this).");
 
-  roptions->AddStringOption2("nlp_failure_behavior",
-      "Set the behavior when an NLP or a series of NLP are unsolved by Ipopt (we call unsolved an NLP for which Ipopt is not "
-      "able to guarantee optimality within the specified tolerances).",
-      "stop",
-      "stop", "Stop when failure happens.",
-      "fathom", "Continue when failure happens.",
-      "If set to \"fathom\", the algorithm will fathom the node when Ipopt fails to find a solution to the nlp "
-      "at that node whithin the specified tolerances. "
-      "The algorithm then becomes a heuristic, and the user will be warned that the solution might not be optimal.");
+  
 
   roptions->AddLowerBoundedIntegerOption("num_retry_unsolved_random_point",
       "Number $k$ of times that the algorithm will try to resolve an unsolved NLP with a random starting point "
@@ -253,12 +90,7 @@ register_general_options
 
 
   roptions->SetRegisteringCategory("bonmin options for non-convex problems");
-  roptions->AddLowerBoundedIntegerOption("max_consecutive_infeasible",
-      "Number of consecutive infeasible subproblems before aborting a"
-      " branch.",
-      0,0,
-      "Will continue exploring a branch of the tree until \"max_consecutive_infeasible\""
-      "consecutive problems are infeasibles by the NLP sub-solver.");
+
 
   roptions->AddLowerBoundedIntegerOption("num_resolve_at_root",
       "Number $k$ of tries to resolve the root node with different starting points.",
@@ -322,33 +154,6 @@ static void register_OA_options
       "Algorithm will take the risk of neglecting an element lower"
       " than this.");
 
-  roptions->AddLowerBoundedIntegerOption("Gomory_cuts",
-      "Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.",
-      -100,-5,
-      "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-      "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-      "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
-  roptions->AddLowerBoundedIntegerOption("probing_cuts",
-      "Frequency (in terms of nodes) for generating probing cuts in branch-and-cut",
-      -100,-5,
-      "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-      "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-      "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
-
-  roptions->AddLowerBoundedIntegerOption("cover_cuts",
-      "Frequency (in terms of nodes) for generating cover cuts in branch-and-cut",
-      -100,-5,
-      "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-      "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-      "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
-
-  roptions->AddLowerBoundedIntegerOption("mir_cuts",
-      "Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut",
-      -100,-5,
-      "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-      "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-      "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
-
 }
 
 
@@ -362,26 +167,12 @@ OsiTMINLPInterface::registerOptions
   try {
     register_general_options(roptions);
     register_OA_options(roptions);
-    //Register options for all possible solvers (besides the one used
-    IpoptSolver * ipopt = dynamic_cast<IpoptSolver *> (GetRawPtr(app_));
 #ifdef COIN_HAS_FILTERSQP
-    FilterSolver * filter = dynamic_cast<FilterSolver *> (GetRawPtr(app_));
+    FilterSolver::RegisterOptions(roptions);
 #endif
-    if(!ipopt) {
-      ipopt = new IpoptSolver;
-      ipopt->RegisterOptions(app_->RegOptions());
-      delete ipopt;
-      ipopt = NULL;
-    }
-
-#ifdef COIN_HAS_FILTERSQP
-    if(!filter) {
-      filter = new FilterSolver;
-      filter->RegisterOptions(app_->RegOptions());
-      delete filter;
-      filter = NULL;
-    }
-#endif		
+#ifdef COIN_HAS_IPOPT
+    IpoptSolver::RegisterOptions(roptions);
+#endif
   }   
   catch(RegisteredOptions::OPTION_ALREADY_REGISTERED) {
     // skipping
@@ -465,7 +256,6 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     rowrange_(NULL),
     reducedCosts_(NULL),
     OsiDualObjectiveLimit_(1e200),
-//   optimization_status_(HasNotBeenOptimized),
     varNames_(NULL),
     hasVarNamesFile_(true),
     nCallOptimizeTNLP_(0),
@@ -491,7 +281,6 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     jValues_(NULL),
     nnz_jac(0),
     constTypes_(NULL),
-//    constTypesNum_(NULL),
     nLinear_(0),
     nNonLinear_(0),
     tiny_(1e-8),
@@ -500,162 +289,72 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     expose_warm_start_(false),
     firstSolve_(true)
 {
-      createApplication();
 }
 
-/** Constructor with given TNLPSolver and TMINLP */
-OsiTMINLPInterface::OsiTMINLPInterface (SmartPtr<TNLPSolver> app):
-    OsiSolverInterface(),
-    tminlp_(NULL),
-    problem_(NULL),
-    rowsense_(NULL),
-    rhs_(NULL),
-    rowrange_(NULL),
-    reducedCosts_(NULL),
-    OsiDualObjectiveLimit_(1e200),
-//    optimization_status_(HasNotBeenOptimized),
-    varNames_(NULL),
-    hasVarNamesFile_(true),
-    nCallOptimizeTNLP_(0),
-    totalNlpSolveTime_(0),
-    totalIterations_(0),
-    maxRandomRadius_(1e08),
-    randomGenerationType_(0),
-    max_perturbation_(DBL_MAX),
-    pushValue_(1e-02),
-    numRetryInitial_(-1),
-    numRetryResolve_(-1),
-    numRetryInfeasibles_(-1),
-    numRetryUnsolved_(1),
-    messages_(),
-    pretendFailIsInfeasible_(false),
-    hasContinuedAfterNlpFailure_(false),
-    numIterationSuspect_(-1),
-    hasBeenOptimized_(false),
-    obj_(NULL),
-    feasibilityProblem_(NULL),
-    jRow_(NULL),
-    jCol_(NULL),
-    jValues_(NULL),
-    nnz_jac(0),
-    constTypes_(NULL),
-//    constTypesNum_(NULL),
-    nLinear_(0),
-    nNonLinear_(0),
-    tiny_(1e-08),
-    veryTiny_(1e-17),
-    infty_(1e100),
-    expose_warm_start_(false),
-    firstSolve_(true)
+
+
+void
+OsiTMINLPInterface::initialize(BasicSetup& b,
+                               Ipopt::SmartPtr<TMINLP> tminlp)
 {
-  app_ = app->clone();
-
-  SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
-  registerOptions(roptions);
-  extractInterfaceParams();
+  if(!IsValid(app_))
+    createApplication(b);
+  setModel(tminlp);
 }
 
-/** Constructor with given IpSolver and TMINLP */
-OsiTMINLPInterface::OsiTMINLPInterface (SmartPtr<TMINLP> tminlp,
-                                        SmartPtr<TNLPSolver> app):
-    OsiSolverInterface(),
-    tminlp_(tminlp),
-    problem_(NULL),
-    rowsense_(NULL),
-    rhs_(NULL),
-    rowrange_(NULL),
-    reducedCosts_(NULL),
-    OsiDualObjectiveLimit_(1e200),
-//    optimization_status_(HasNotBeenOptimized),
-    varNames_(NULL),
-    hasVarNamesFile_(true),
-    nCallOptimizeTNLP_(0),
-    totalNlpSolveTime_(0),
-    totalIterations_(0),
-    maxRandomRadius_(1e08),
-    randomGenerationType_(0),
-    max_perturbation_(DBL_MAX),
-    pushValue_(1e-02),
-    numRetryInitial_(-1),
-    numRetryResolve_(-1),
-    numRetryInfeasibles_(-1),
-    numRetryUnsolved_(1),
-    messages_(),
-    pretendFailIsInfeasible_(false),
-    hasContinuedAfterNlpFailure_(false),
-    numIterationSuspect_(-1),
-    hasBeenOptimized_(false),
-    obj_(NULL),
-    feasibilityProblem_(NULL),
-    jRow_(NULL),
-    jCol_(NULL),
-    jValues_(NULL),
-    nnz_jac(0),
-    constTypes_(NULL),
-//    constTypesNum_(NULL),
-    nLinear_(0),
-    nNonLinear_(0),
-    tiny_(1e-08),
-    veryTiny_(1e-17),
-    infty_(1e100),
-    expose_warm_start_(false),
-    firstSolve_(true)
-{
-  allocateTMINLP(tminlp,app);
+void 
+OsiTMINLPInterface::initialize(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                Ipopt::SmartPtr<TMINLP> tminlp){
+  createApplication(journalist, options, roptions);
+  setModel(tminlp); 
 }
 
-/// Enum for the NLP solver chosen
-enum NLPSolverChoice {
-  Ipopt = 0,
-  FilterSQP
-};
-
+void OsiTMINLPInterface::setSolver(Ipopt::SmartPtr<TNLPSolver> app){
+  app_ = app;}
 
 /** Facilitator to create an application. */
 void
-OsiTMINLPInterface::createApplication(){
-  // AW: The following is not a nice solution, since we read
-  // everything twice, if FilterSQP was chosen
-  
-  //We need to build dummy solver objects to get the options,
-  //determine which is the solver to use and register all the
-  //options
+OsiTMINLPInterface::createApplication(BasicSetup &b){
+  createApplication(b.journalist(),b.options(),b.roptions());
+}
+
+void
+OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                                      Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                                      Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+{
   assert(!IsValid(app_));
-  app_ = new IpoptSolver();
-  OsiTMINLPInterface forOption(GetRawPtr(app_));
   int ival;
-  forOption.solver()->Options()->GetEnumValue("nlp_solver", ival,"bonmin.");
-  NLPSolverChoice NLPchoice = NLPSolverChoice(ival);
-  
-  if(NLPchoice == FilterSQP) {
+  options->GetEnumValue("nlp_solver", ival, "bonmin.");
+  BaseOptions::Solver s = (BaseOptions::Solver) ival;
+  if(s == BaseOptions::FilterSQP){
 #ifdef COIN_HAS_FILTERSQP
-    app_ = new FilterSolver();
+    app_ = new Bonmin::FilterSolver(roptions, options, journalist);
 #else
-    std::cerr<<"Bonmin not configured to run with FilterSQP"<<std::endl;
+#endif    
+  }
+  else if(s == BaseOptions::Ipopt){
+#ifdef COIN_HAS_IPOPT
+    app_ = new IpoptSolver(roptions, options, journalist);
+#else
+    std::cerr<<"Bonmin not configured to run with Ipopt"<<std::endl;
     throw -1;
 #endif
   }
-  else if (NLPchoice != Ipopt) {
-    std::cerr<<"Trying to use unknown solver."<<std::endl;
-    throw -1;
-  }
+  app_->Initialize("");
+  extractInterfaceParams();
+  
 }
 
 /** Facilitator to allocate a tminlp and an application. */
 void
-OsiTMINLPInterface::allocateTMINLP(SmartPtr<TMINLP> tminlp,
-				   SmartPtr<TNLPSolver> app)
+OsiTMINLPInterface::setModel(SmartPtr<TMINLP> tminlp)
 {
   assert(IsValid(tminlp));
-
   tminlp_ = tminlp;
   problem_ = new TMINLP2TNLP(tminlp_);
-  app_ = app->clone();
-
-  SmartPtr<RegisteredOptions> roptions = app_->RegOptions();
-  registerOptions(roptions);
-  app_->Initialize("");
-  extractInterfaceParams();
 }
 
 
@@ -871,7 +570,7 @@ app_ = NULL;
   return *this;
 }
 
-SmartPtr<OptionsList> OsiTMINLPInterface::retrieve_options()
+SmartPtr<OptionsList> OsiTMINLPInterface::options()
 {
   if(!IsValid(app_)) {
     std::cout<<"Can not parse options when no IpApplication has been created"<<std::endl;
@@ -1102,7 +801,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   else {
     std::string probName;
     getStrParam(OsiProbName,probName);
-    throw newUnsolvedError(optimization_status_, problem_,
+    throw newUnsolvedError(app_->errorCode(), problem_,
                            probName);
   }
 }
@@ -2515,7 +2214,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 	{
 	  std::string probName;
 	  getStrParam(OsiProbName, probName);
-	  throw newUnsolvedError(optimization_status_, problem_, probName);
+	  throw newUnsolvedError(app_->errorCode(), problem_, probName);
 	}
       double * saveColLow = CoinCopyOfArray(getColLower(), getNumCols());
       double * saveColUp = CoinCopyOfArray(getColUpper(), getNumCols());
@@ -2546,7 +2245,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   {
     std::string probName;
     getStrParam(OsiProbName, probName);
-    throw newUnsolvedError(optimization_status_, problem_, probName);
+    throw newUnsolvedError(app_->errorCode(), problem_, probName);
   }
   try{
   totalIterations_ += app_->IterationCount();
@@ -2714,6 +2413,10 @@ void
 OsiTMINLPInterface::extractInterfaceParams()
 {
   if (IsValid(app_)) {
+    int logLevel;
+    app_->Options()->GetIntegerValue("nlp_log_level", logLevel,"bonmin.");
+    messageHandler()->setLogLevel(logLevel);
+
 #ifdef COIN_HAS_FILTERSQP
     FilterSolver * filter = dynamic_cast<FilterSolver *>(GetRawPtr(app_));
 

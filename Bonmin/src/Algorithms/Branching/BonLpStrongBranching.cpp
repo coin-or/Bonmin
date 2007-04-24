@@ -111,4 +111,13 @@ namespace Bonmin{
      delete warm;
      return return_value;
    }
+  
+  void
+  LpStrongBranching::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+  roptions->AddLowerBoundedIntegerOption
+  ("number_ecp_rounds_strong",
+   "Set the number of rounds of ecp in strong branching.",
+   0,1,
+   "");
+  }
 }/* End namespace Bonmin. */

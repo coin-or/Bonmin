@@ -12,6 +12,7 @@
 #include "BonTMINLP.hpp"
 #include "BonAmplTMINLP.hpp"
 #include "IpIpoptApplication.hpp"
+#include "BonAmplSetup.hpp"
 
 #include "BonIpoptSolver.hpp"
 #include "BonminConfig.h"
@@ -20,9 +21,6 @@
 #include "BonFilterSolver.hpp"
 #endif
 
-#include "BonOACutGenerator2.hpp"
-#include "BonEcpCuts.hpp"
-#include "BonOaNlpOptim.hpp"
 
 #include <cmath>
 
@@ -162,7 +160,7 @@ void testSetMethods(OsiTMINLPInterface &si)
     delete ws;
 }
 
-void testOa(Bonmin::AmplInterface &si)
+void testOa(Bonmin::OsiTMINLPInterface &si)
 {
         CoinRelFltEq eq(1e-07);// to test equality of doubles    
     OsiClpSolverInterface lp;
@@ -269,7 +267,11 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
         //Setup Ipopt should be replaced if solver is changed
        const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
        const char ** argv = args;
-      AmplInterface si(const_cast<char **&> (argv), solver);
+       AmplInterface amplSi;
+       amplSi.setSolver(solver);
+       BonminAmplSetup bonmin;
+       bonmin.initializeBonmin(amplSi,const_cast<char **&>(argv));
+       OsiTMINLPInterface& si = *bonmin.nonlinearSolver();
       si.Set_expose_warm_start(1);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
     <<std::endl<<"Testing usefull constructor"<<std::endl
@@ -278,6 +280,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
       testGetMethods(si);
       testOptimAndSolutionQuery(si);
       testSetMethods(si);
+
   }
   // Test copy constructor
   {
@@ -295,10 +298,14 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 //            c2: x - y[1] <= 0 ;
 //            c3: x + y[2] + z <= 2;
         
-        //Setup Ipopt should be replaced if solver is changed
+        //Setup should be replaced if solver is changed
       const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
       const char ** argv = args;
-      AmplInterface si1(const_cast<char **&> (argv), solver);
+      AmplInterface amplSi;
+      amplSi.setSolver(solver);
+      BonminAmplSetup bonmin;
+      bonmin.initializeBonmin(amplSi,const_cast<char **&>(argv));     
+      OsiTMINLPInterface& si1 = *bonmin.nonlinearSolver();
       si1.Set_expose_warm_start(1);
       
       OsiTMINLPInterface si(si1);
@@ -316,12 +323,16 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
         //Setup Ipopt should be replaced if solver is changed
         const char * args[3] ={"name","mytoy",NULL}; //Ugly, but I don't know how to do differently
         const char ** argv = args;
-      Bonmin::AmplInterface si(const_cast<char**&>(argv), solver);
-      si.Set_expose_warm_start(1);
-      std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
-	       <<std::endl<<"Testing outer approximations related methods"<<std::endl
-	       <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
-      testOa(si);
+        AmplInterface amplSi;
+        amplSi.setSolver(solver);
+        BonminAmplSetup bonmin;
+        bonmin.initializeBonmin(amplSi,const_cast<char **&>(argv));     
+        OsiTMINLPInterface& si = *bonmin.nonlinearSolver();
+        si.Set_expose_warm_start(1);
+        std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
+          <<std::endl<<"Testing outer approximations related methods"<<std::endl
+          <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
+        testOa(si);
   }
   
   // Test Feasibility Pump methods
@@ -344,16 +355,12 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 int main()
 {
   Ipopt::SmartPtr<IpoptSolver> ipopt_solver = new IpoptSolver;
-  OACutGenerator2::registerOptions(ipopt_solver->RegOptions());
-  EcpCuts::registerOptions(ipopt_solver->RegOptions());
-  OaNlpOptim::registerOptions(ipopt_solver->RegOptions());
+  BonminSetup::registerAllOptions(ipopt_solver->RegOptions());
   interfaceTest(GetRawPtr(ipopt_solver));
 
 #ifdef COIN_HAS_FSQP
   Ipopt::SmartPtr<FilterSolver> filter_solver = new FilterSolver;
-  OACutGenerator2::registerOptions(filter_solver->RegOptions());
-  EcpCuts::registerOptions(filter_solver->RegOptions());
-  OaNlpOptim::registerOptions(filter_solver->RegOptions());
+  BonminSetup::registerAllOptions(filter_solver->RegOptions());
   interfaceTest(GetRawPtr(filter_solver));
 #endif
   return 0;

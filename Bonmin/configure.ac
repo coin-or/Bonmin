@@ -192,6 +192,7 @@ AC_CONFIG_FILES([Makefile
                  src/Interfaces/Filter/Makefile
                  src/Interfaces/Ampl/Makefile
                  src/Algorithms/Makefile
+                 src/Algorithms/Ampl/Makefile
                  src/Algorithms/Branching/Makefile
                  src/Algorithms/OaGenerators/Makefile
                  experimental/FP/Makefile

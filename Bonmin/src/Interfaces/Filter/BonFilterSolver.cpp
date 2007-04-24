@@ -222,7 +222,7 @@ namespace Bonmin{
   std::string FilterSolver::solverName_ = "filter SQP";
 
 void
-FilterSolver::RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
   roptions->SetRegisteringCategory("FilterSQP options");
   roptions->AddLowerBoundedNumberOption("eps", "Tolerance for SQP solver",
 					0., 1, 1e-06, "");
@@ -278,6 +278,19 @@ FilterSolver::RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
   }
 }
 
+FilterSolver::FilterSolver(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                           Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                           Ipopt::SmartPtr<Ipopt::OptionsList> options):
+
+    cached_(NULL),
+    journalist_(journalist),
+    roptions_(roptions),
+    options_(options)
+{
+}
+
+                           
+FilterSolver::FilterSolver(
 Ipopt::SmartPtr <TNLPSolver>
 FilterSolver::clone(){
   Ipopt::SmartPtr<FilterSolver> retval = new FilterSolver(true);

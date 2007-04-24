@@ -22,10 +22,9 @@
 #include "BonIpoptSolver.hpp"
 #include "BonCouenneCbc.hpp"
 
-#include "BonOACutGenerator2.hpp"
-#include "BonEcpCuts.hpp"
-#include "BonOaNlpOptim.hpp"
+#include "BonCouenneSetup.hpp"
 
+#include "BonCbc2.hpp"
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
@@ -37,95 +36,37 @@ int main (int argc, char *argv[])
 {
   using namespace Ipopt;
   Bonmin::usingCouenne = 1;  
-  CouenneInterface * nlp_and_solver; 
-
-  // We need to build dummy solver objects to get the options,
-  // determine which is the solver to use and register all the options
-  Ipopt::SmartPtr<IpoptSolver> dummy_ipopt = new IpoptSolver;
-  OsiTMINLPInterface forOption(GetRawPtr(dummy_ipopt));
-
-  int solverUsed = 0; // 0 is Ipopt, 1 is Filter
-  forOption.solver()->Options()->GetEnumValue("nlp_solver", solverUsed,"bonmin.");
 
   char * pbName = NULL;
   if(argc > 1)
   {
     pbName = new char[strlen(argv[1])+1];
     strcpy(pbName, argv[1]);
-  }
-  else //will just output usage
-  {
-    Ipopt::SmartPtr<IpoptSolver> ipoptSolver = new IpoptSolver;
-    nlp_and_solver = new CouenneInterface (argv, GetRawPtr (ipoptSolver));
-    delete nlp_and_solver;
-    return 0;
-  }
-  double time1 = CoinCpuTime();
+  }  double time1 = CoinCpuTime();
   try {
-  Ipopt::SmartPtr<TNLPSolver> solver;
-  if(solverUsed == 0)
-    solver = new IpoptSolver;
-  else if(solverUsed == 1)
-#ifdef COIN_HAS_FILTERSQP
-    solver = new FilterSolver;
-#else
-    {
-      std::cerr<<"filterSQP is not properly configured for using into Bonmin"<<std::endl
-               <<"be sure to run the configure script with options:"<<std::endl
-               <<"--with-filtersqp_lib=\"<path_to_filter_library>\""<<std::endl
-               <<"--with-filtersqp_incdir=\"\""<<std::endl;
-               throw -1;
-      }
-#endif
-  else
-    {
-      std::cerr<<"Trying to use unknown solver."<<std::endl;
-    }
-    nlp_and_solver = new CouenneInterface(argv, solver);
-    BonminCbcParam par;
-    CouenneBab bb;
-    /** Register options */
-    Ipopt::SmartPtr<RegisteredOptions> roptions = nlp_and_solver->regOptions();
-    nlp_and_solver->registerOptions(roptions);
-    OACutGenerator2::registerOptions(roptions);
-    EcpCuts::registerOptions(roptions);
-    OaNlpOptim::registerOptions(roptions);
-    
-    roptions->SetRegisteringCategory("Couenne options");
 
-    roptions->AddLowerBoundedIntegerOption("ecp_cuts",
-                                           "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
-                                           0,1,
-                                           "A frequency of 0 amounts to to never solve the NLP relaxation.");
-    
-    roptions->AddStringOption2("nlp_local_solutions",
-                               "Do we search for local solutions of NLP's",
-                               "yes",
-                               "no","",
-                               "yes","");
-    // Eventually change some default in a custom application
-    nlp_and_solver->setAppDefaultOptions(nlp_and_solver->solver()->Options());
-
-    par(nlp_and_solver);
-    bb(nlp_and_solver, par);//do branch and bound
+    CouenneSetup bonmin;
+    bonmin.InitializeBonmin(argv);
+    Bab2 bb;
+    bb(bonmin);//do branch and bound
 
     std::cout.precision(10);
 
     std::string message;
     std::string status;
-    if(bb.mipStatus()==Bab::FeasibleOptimal) {
+    if(bb.mipStatus()==Bab2::FeasibleOptimal) {
       status = "\t\"Finished\"";
       message = "\nbonmin: Optimal";
     }
-    else if(bb.mipStatus()==Bab::ProvenInfeasible) {
+    else if(bb.mipStatus()==Bab2::ProvenInfeasible) {
       status = "\t\"Finished\"";
       message = "\nbonmin: Infeasible problem";
     }
-    else if(bb.mipStatus()==Bab::Feasible) {
+    else if(bb.mipStatus()==Bab2::Feasible) {
       status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
-    else if(bb.mipStatus()==Bab::NoSolutionKnown) {
+    else if(bb.mipStatus()==Bab2::NoSolutionKnown) {
       status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
@@ -155,21 +96,7 @@ int main (int argc, char *argv[])
       
     }
 
-    if (0) { // print statistics
-      std::cout<<pbName << status
-	       <<CoinCpuTime()-time1<<"\t"
-	       <<bb.bestBound()<<"\t"
-	       <<bb.bestObj()<<"\t"
-	       <<bb.numNodes()<<"\t"
-	       <<bb.iterationCount()<<"\t"
-	       <<nlp_and_solver->totalNlpSolveTime()<<"\t"
-	       <<nlp_and_solver->nCallOptimizeTNLP()<<"\t"
-	       <<status
-	       <<std::endl;
-    }
-
     //  nlp_and_solver->writeAmplSolFile(message,bb.bestSolution(),NULL);
-
   }
   catch(TNLPSolver::UnsolvedError *E) {
      E->writeDiffFiles();
@@ -200,7 +127,6 @@ int main (int argc, char *argv[])
 //  }
 
   delete [] pbName;
-  delete nlp_and_solver;
   return 0;
 }
 

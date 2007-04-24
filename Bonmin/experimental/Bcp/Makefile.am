@@ -48,7 +48,7 @@ bonminbcp_SOURCES = BB_cut.hpp BM.hpp \
 	BB_cut.cpp BM.cpp BM_tm.cpp BM_lp.cpp BM_lp_branch.cpp BM_pack.cpp
 
 bonminbcp_DEPENDENCIES = \
-	../../src/Interfaces/Ampl/libamplinterface.la \
+	../../src/CbcBonmin/libbonminampl.la \
 	../../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
@@ -111,6 +111,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \

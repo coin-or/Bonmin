@@ -190,11 +190,16 @@ MyTMINLP::eval_h(Index n, const Number* x, bool new_x,
 }
 
 void
-MyTMINLP::finalize_solution(SolverReturn status,
-                            Index n, const Number* x, const Number* z_L, const Number* z_U,
-                            Index m, const Number* g, const Number* lambda,
-                            Number obj_value,
-                            const IpoptData* ip_data,
-                            IpoptCalculatedQuantities* ip_cq)
-{//don't need anything
+MyTMINLP::finalize_solution(TMINLP::SolverReturn status,
+                            Index n, const Number* x, Number obj_value)
+{
+  std::cout<<"Problem status: "<<status<<std::endl;
+  std::cout<<"Objective value: "<<obj_value<<std::endl;
+  if(x != NULL){
+    std::cout<<"Solution:"<<std::endl;
+    for(int i = 0 ; i < n ; i++){
+      std::cout<<"x["<<i<<"] = "<<x[i];
+      if(i < n-1) std::cout<<", ";}
+    std::cout<<std::endl;
+  }
 }

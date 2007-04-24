@@ -20,10 +20,32 @@
 namespace Bonmin{
   using namespace Ipopt;
 
+  
+#if 0
+  string TNLPSolver::returnCodes[TNLPSolver::numReturnCodes] = {
+    "Hit iteration limit" /**iterationLimit*/,
+    "Some error was made in computations." /**computationError*/,
+    "Problem has more equations than free variables." /** notEnoughFreedom*/,
+    "Problem is not well defined."/**illDefinedProblem*/,
+    "Illegal option set."/**illegalOption*/,
+    "Exception in some the third-party code used by solver." /**externalException*/,
+    "Unrecognized exception."/**exception*/,
+    "Problem solved to optimality"/**solvedOptimal*/,
+    "Problem solvedd to acceptable level of tolerance"/**solvedOptimalTol*/,
+    "Problem is infeasible" /**provenInfeasible*/,
+    "Problem is unbounded", /**unbounded*/};
+#endif
+    
+    
   TNLPSolver::TNLPSolver()
   {
   }
 
+  TNLPSolver::TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+    Ipopt::SmartPtr<Ipopt::OptionsList> options,
+    Ipopt::SmartPtr<Ipopt::Journalist> journalist)
+  {}
+  
   TNLPSolver::~TNLPSolver()
   {}
 

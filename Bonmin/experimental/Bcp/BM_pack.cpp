@@ -17,6 +17,8 @@
 #include "BonCbc.hpp"
 #include "BM.hpp"
 
+#include "BonAmplSetup.hpp"
+
 //#############################################################################
 
 void
@@ -78,7 +80,9 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     argv[2] = NULL;
     std::string ipopt_content(ipopt_file_content.c_str());
     std::string nl_content(nl_file_content.c_str());
-    nlp_.readAmplNlFile(argv, &ipopt_content, &nl_content);
+
+    Bonmin::BonminAmplSetup::fillOsiInterface(nlp_, argv, ipopt_content, nl_content);
+    
     free(argv[1]);
 
     nlp_.extractInterfaceParams();
@@ -95,7 +99,7 @@ BM: Switching to WarmStartFromRoot.\n");
     }
 
     /* synchronize bonmin & BCP parameters */
-    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.retrieve_options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.options();
 
     int nlpLogLevel;
     options->GetIntegerValue("nlp_log_level", nlpLogLevel, "bonmin.");

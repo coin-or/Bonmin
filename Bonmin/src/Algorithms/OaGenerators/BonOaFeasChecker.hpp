@@ -26,6 +26,8 @@ namespace Bonmin
         bool leaveSiUnchanged = 0
                    );
 
+    /// New usefull constructor
+    OaFeasibilityChecker(BabSetupBase &b);
     /// Copy constructor
     OaFeasibilityChecker(const OaFeasibilityChecker &copy)
         :

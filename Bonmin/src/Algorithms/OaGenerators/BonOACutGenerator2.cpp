@@ -14,7 +14,7 @@
 #include "OsiClpSolverInterface.hpp"
 
 #include "CbcModel.hpp"
-#include "CbcStrategy.hpp"
+#include "BonCbcLpStrategy.hpp"
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
 #endif
@@ -41,7 +41,53 @@ extern int usingCouenne;
                           cbcIntegerTolerance, leaveSiUnchanged)
   {
   }
-
+/// Constructor with basic setup
+  OACutGenerator2::OACutGenerator2(BabSetupBase & b):
+  OaDecompositionBase(b, true, false){
+    int ivalue;
+    b.options()->GetEnumValue("milp_subsolver",ivalue,"bonmin.");
+    if(ivalue <= 0){//uses cbc 
+      //nothing to do?
+    }
+    else if (ivalue == 1){
+      int nodeS, nStrong, nTrust, mig, mir, probe, cover, logLevel;
+      b.options()->GetEnumValue("nodeselect_stra",nodeS,"milp_sub.");
+      b.options()->GetIntegerValue("number_strong_branch",nStrong,"milp_sub.");
+      b.options()->GetIntegerValue("number_before_trust", nTrust,"milp_sub.");
+      b.options()->GetIntegerValue("Gomory_cuts", mig,"milp_sub.");
+      b.options()->GetIntegerValue("probing_cuts",probe,"milp_sub.");
+      b.options()->GetIntegerValue("mir_cuts",mir,"milp_sub.");
+      b.options()->GetIntegerValue("cover_cuts",cover,"milp_sub.");
+      b.options()->GetIntegerValue("milp_log_level",logLevel,"bonmin.");
+      CbcStrategy * strategy =
+	    new CbcOaStrategy(mig, probe, mir, cover, nTrust,
+                        nStrong, nodeS, parameters_.cbcIntegerTolerance_, logLevel);
+      setStrategy(*strategy);
+      delete strategy;
+      
+    }
+    else if(ivalue == 2){
+#ifdef COIN_HAS_CPX
+      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
+      b.nonlinearRelaxation()->extractLinearRelaxation(*localSearchSolver);
+      assignLpSolver(cpxSolver);
+#else
+      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
+        << "subsolver in oa decomposition. However, apparently\n"
+        << "CPLEX is not configured to be used in bonmin.\n"
+        << "See the manual for configuring CPLEX\n";
+      throw -1;
+#endif      
+    }
+    
+    double oaTime;
+    b.options()->GetNumericValue("oa_dec_time_limit",oaTime,"bonmin.");
+    parameter().localSearchNodeLimit_ = 1000000;
+    parameter().maxLocalSearch_ = 100000;
+    parameter().maxLocalSearchPerNode_ = 10000;
+    parameter().maxLocalSearchTime_ =
+      Ipopt::Min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
+  }
   OACutGenerator2::~OACutGenerator2()
   {
   }
@@ -262,14 +308,6 @@ OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                         0.,0,30.,
                                         "");
 
-  roptions->AddStringOption3("milp_subsolver",
-                             "Choose the subsolver to solve MILPs sub-problems in OA decompositions.",
-                             "Cbc_D",
-                             "Cbc_D","Coin Branch and Cut with its default",
-                             "Cbc_Par", "Coin Branch and Cut with passed parameters",
-                             "Cplex","Ilog Cplex",
-                             " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
-  
   roptions->AddBoundedIntegerOption("oa_log_level",
                                     "specify OA iterations log level.",
                                     0,2,1,
@@ -281,6 +319,25 @@ OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                         "display an update on lower and upper bounds in OA every n seconds",
                                         0.,1.,100.,
                                         "");
+  
+  roptions->SetRegisteringCategory("bonmin options : Options for MILP subsolver in OA decomposition");
+  roptions->AddStringOption3("milp_subsolver",
+                             "Choose the subsolver to solve MILPs sub-problems in OA decompositions.",
+                             "Cbc_D",
+                             "Cbc_D","Coin Branch and Cut with its default",
+                             "Cbc_Par", "Coin Branch and Cut with passed parameters",
+                             "Cplex","Ilog Cplex",
+                             " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
+  
+  
+  roptions->AddBoundedIntegerOption("milp_log_level",
+                                    "specify MILP subsolver log level.",
+                                    0,3,0,
+                                    "Set the level of output of the MILP subsolver in OA : "
+                                    "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
+                                    );
+
+  
 }
 
 

@@ -50,6 +50,12 @@ public:
   ///Default constructor
   FilterSolver(bool createEmpty = false);
 
+
+  /// Constructor with passed journalist, roptions, options.
+FilterSolver::FilterSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                           Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                           Ipopt::SmartPtr<Ipopt::Journalist> journalist);
+
   ///destructor
   virtual ~FilterSolver();
 
@@ -129,8 +135,11 @@ public:
    void RegisterOptions(){
    RegisterOptions(roptions_);}
 
+/** Error code (solver specific).*/
+virtual int errorCode(){
+  return -1}
    /// Register this solver options into passed roptions
-   virtual void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+   static void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
 private:
   /** @name Private function members. */
   /** @{ */

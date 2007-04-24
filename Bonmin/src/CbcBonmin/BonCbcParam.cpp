@@ -18,11 +18,12 @@ namespace Bonmin
   {
     bool success = true;
 
-    Ipopt::SmartPtr<Ipopt::OptionsList> Options = solver->retrieve_options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> Options = solver->options();
 
     //extract IpoptInterface special params
     solver->extractInterfaceParams();
 
+    Options->GetEnumValue("algorithm",algo,"bonmin.");
     //log levels
     Options->GetIntegerValue("bb_log_level",bbLogLevel,"bonmin.");
     Options->GetIntegerValue("bb_log_interval",logInterval,"bonmin.");
@@ -32,7 +33,6 @@ namespace Bonmin
     Options->GetNumericValue("oa_log_frequency",oaLogFrequency,"bonmin.");
     Options->GetIntegerValue("nlp_log_level",nlpLogLevel,"bonmin.");
     //General options
-    Options->GetEnumValue("algorithm",algo,"bonmin.");
     Options->GetNumericValue("time_limit", maxTime, "bonmin.");
     Options->GetIntegerValue("node_limit",maxNodes,"bonmin.");
     Options->GetIntegerValue("solution_limit",maxSolutions,"bonmin.");

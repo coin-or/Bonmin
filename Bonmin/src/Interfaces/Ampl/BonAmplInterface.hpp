@@ -15,6 +15,7 @@
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonAmplTMINLP.hpp"
 
+class BM_lp;
 namespace Bonmin
 {
   /** Class for providing an Osi interface to Ipopt with an ampl nl file as input. */
@@ -22,11 +23,22 @@ namespace Bonmin
   {
   public:
     /** Default constructor */
+    /** Default constructor only available for Bonmin's friends and child classes.*/
     AmplInterface();
-    /** Constructor with inputed ampl command line (reads model from nl file). */
-    AmplInterface(char **& amplArgs);
-    /** Constructor with inputed ampl command line (reads model from nl file). */
-    AmplInterface(char **& amplArgs, Ipopt::SmartPtr<TNLPSolver> app);
+    /**@name Methods to input a problem */
+    //@{
+    /** Read an ampl . nl file from the given filename */
+    virtual void readAmplNlFile(char**& filename,
+                                BasicSetup &b,
+                                std::string* nl_file_content  = NULL
+                                );
+    
+    
+        virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                                    Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                                    Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                                    std::string* nl_file_content  = NULL);
+    //@}    
     /** Copy constructor */
     AmplInterface(const AmplInterface &other);
     /// Clone
@@ -35,16 +47,6 @@ namespace Bonmin
     /// Destructor
     virtual ~AmplInterface();
 
-    /**@name Methods to input a problem */
-    //@{
-    /** Read an ampl . nl file from the given filename */
-    virtual void readAmplNlFile(char**& filename,
-        std::string* ipopt_file_content = NULL,
-        std::string* nl_file_content = NULL
-        );
-    /** write ampl solution file */
-    void writeAmplSolFile(std::string message,const double * primalSol = NULL,const double * dualSol = NULL);
-    //@}
 
     /** Fast access to AmplTMINLP */
     const AmplTMINLP * amplModel() const
@@ -55,7 +57,7 @@ namespace Bonmin
     virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
   protected:
-
+    
     /** TMINLP problem (the original problem usually an AmplTMINLP).*/
     Ipopt::SmartPtr<Bonmin::AmplTMINLP> amplTminlp_;
   };

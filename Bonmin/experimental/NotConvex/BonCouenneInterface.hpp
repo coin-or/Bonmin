@@ -26,9 +26,6 @@ class CouenneInterface : public AmplInterface
   /** Default constructor. */
   CouenneInterface();
 
-  /** Constructor with inputed ampl command line.*/
-  CouenneInterface(char **& amplArgs, SmartPtr<TNLPSolver> app);
-
   /** Copy constructor. */
   CouenneInterface(const CouenneInterface &other);
 
@@ -38,6 +35,15 @@ class CouenneInterface : public AmplInterface
   /** Destructor. */
   virtual ~CouenneInterface();
 
+  
+  /** read ampl file*/
+  virtual void readAmplNlFile(char **& argv, Bonmin::BasicSetup & b);
+  
+  /** read ampl file using inputed options, journalist....*/
+  virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                              Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                              Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+  
   /** \name Overloaded methods to build outer approximations */
   //@{
   /** \brief Extract a linear relaxation of the MINLP.

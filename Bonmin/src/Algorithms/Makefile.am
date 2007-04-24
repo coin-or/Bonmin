@@ -13,6 +13,9 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = \
        OaGenerators \
        Branching
+if COIN_HAS_ASL
+SUBDIRS += Ampl
+endif
 
 noinst_LTLIBRARIES = libbonalgorithms.la
 
@@ -21,7 +24,9 @@ noinst_LTLIBRARIES = libbonalgorithms.la
 ########################################################################
 
 # List all source files, including headers
-libbonalgorithms_la_SOURCES = 
+libbonalgorithms_la_SOURCES = \
+         BonBabSetupBase.cpp BonBabSetupBase.hpp \
+         BonBonminSetup.cpp BonBonminSetup.hpp
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la
 libbonalgorithms_la_LIBADD += OaGenerators/libbonoagenerators.la 
@@ -34,9 +39,12 @@ libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
+	-I`$(CYGPATH_W) $(srcdir)/Branching` \
+	-I`$(CYGPATH_W) $(srcdir)/OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
@@ -56,6 +64,10 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
@@ -78,7 +90,10 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 
-include_HEADERS = 
+include_HEADERS = \
+          BonBabSetupBase.hpp \
+          BonBonminSetup.hpp 
+ 
 
 ########################################################################
 #                            Astyle stuff                              #

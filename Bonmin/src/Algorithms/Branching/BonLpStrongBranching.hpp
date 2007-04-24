@@ -37,6 +37,8 @@ namespace Bonmin {
 			   bool fixVariables,
 			   int numStrong, double* change_down,
 			   double* change_up, int& best_way);
+ 
+ static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
  private:
  int maxCuttingPlaneIterations_;
 };
