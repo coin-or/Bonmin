@@ -430,9 +430,6 @@ namespace Bonmin
       if (bestSolution_)
         delete [] bestSolution_;
 
-      bestSolution_ = new double[nlpSolver->getNumCols()];
-      CoinCopyN(model.bestSolution(), nlpSolver->getNumCols(), bestSolution_);
-
       //Check solution validity
       double violation = nlpSolver->getConstraintsViolation(bestSolution_, obj);
 

@@ -117,7 +117,7 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
    double * rowUpper = new double [numrowsconv];
 
    start[0] = 0;
-
+   int nnz = 0;
    /* fill the four arrays. */
    for(int i = 0 ; i < numrowsconv ; i++)
    {
@@ -125,13 +125,13 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
 
      const CoinPackedVector &v = cut->row();
      start[i+1] = start[i] + v.getNumElements();
-
+     nnz += v.getNumElements();
      length[i] = v.getNumElements();
 
      rowLower[i] = cut->lb();
      rowUpper[i] = cut->ub();
    }
-   
+   assert(nnz == start[numrowsconv]);
    /* Now fill the elements arrays. */
    int * ind = new int[start[numrowsconv]];
    double * elem = new double[start[numrowsconv]];
@@ -143,7 +143,7 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
 
      if(v.getNumElements() != length[i])
        std::cout<<"Empty row"<<std::endl;
-
+     cut->print();
      CoinCopyN(v.getIndices(), length[i], ind + start[i]);
      CoinCopyN(v.getElements(), length[i], elem + start[i]);
    }
@@ -153,7 +153,10 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
    A.assignMatrix(false, numcolsconv, numrowsconv,
                   start[numrowsconv], elem, ind,
                   start, length);
-
+   if(A.getNumCols() != numcolsconv || A.getNumRows() != numrowsconv){
+     std::cout<<"Error in row number"<<std::endl;
+   }
+   assert(A.getNumElements() == nnz);
    // Objective function
    double * obj = new double[numcolsconv];
    CoinFillN(obj,numcolsconv,0.);
