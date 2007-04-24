@@ -9,6 +9,7 @@
 
 #ifndef BonAuxInfos_H
 #define BonAuxInfos_H
+#include <stdlib.h>
 #include "OsiAuxInfo.hpp"
 #include "BonCbc2.hpp"
 
