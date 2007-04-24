@@ -15,6 +15,7 @@
 
 #include "CouenneObject.hpp"
 #include "CouenneChooseVariable.hpp"
+#include "BonAuxInfos.hpp"
 
 namespace Bonmin{
   void CouenneSetup::InitializeBonmin(char **& argv){
@@ -28,22 +29,26 @@ namespace Bonmin{
     nonlinearSolver_ = ci;
     ci->readAmplNlFile(argv,journalist(),options(),roptions());
     linearSolver_ = new OsiClpSolverInterface;
+   
+    Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
     
-    /* Setup log level*/
-    int lpLogLevel;
-    options()->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
-    linearSolver_->messageHandler()->setLogLevel(lpLogLevel);
-    ci->extractLinearRelaxation(*linearSolver_);
-  
-    
-    
-    OsiBabSolver * extraStuff = new OsiBabSolver(0);
-
     // as per instructions by John Forrest, to get changed bounds
     extraStuff -> setExtraCharacteristics (extraStuff -> extraCharacteristics () | 2);
     
     linearSolver_ -> setAuxiliaryInfo (extraStuff);
     delete extraStuff;
+    extraStuff = dynamic_cast<Bonmin::BabInfo *>(linearSolver_ -> getAuxiliaryInfo());
+    /* Setup log level*/
+    int lpLogLevel;
+    options()->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
+    linearSolver_->messageHandler()->setLogLevel(lpLogLevel);
+    ci->extractLinearRelaxation(*linearSolver_);
+    
+    if(extraStuff->infeasibleNode()){
+      std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
+      return;
+    }
+ 
     
     linearSolver_->findIntegersAndSOS(false);
     int numberIntegerObjects = linearSolver_->numberObjects() > 0;
