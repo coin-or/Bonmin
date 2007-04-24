@@ -22,6 +22,8 @@ namespace Bonmin{
     defaultBasicOptions();
     
     /* Read the model. */
+    options_->SetStringValue("nlp_failure_behavior","fathom","bonmin.");
+    gatherParametersValues(options_);
     CouenneInterface * ci = new CouenneInterface;
     nonlinearSolver_ = ci;
     ci->readAmplNlFile(argv,journalist(),options(),roptions());

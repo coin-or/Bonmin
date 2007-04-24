@@ -12,6 +12,7 @@
 #include "CouenneObject.hpp"
 #include "CouenneProblem.h"
 #include "CbcBranchActual.hpp"
+#include "BonAuxInfos.hpp"
 
 namespace Bonmin{
   NlpSolveHeuristic::NlpSolveHeuristic():
@@ -77,6 +78,11 @@ namespace Bonmin{
   int
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();
+    
+    Bonmin::BabInfo * babInfo = dynamic_cast<Bonmin::BabInfo *> (solver->getAuxiliaryInfo());
+    if(babInfo && babInfo->infeasibleNode()){
+      return 0;
+    }
     double * lower = CoinCopyOfArray(solver->getColLower(), nlp_->getNumCols());
     double * upper = CoinCopyOfArray(solver->getColUpper(), nlp_->getNumCols());
     const double * solution = solver->getColSolution();
