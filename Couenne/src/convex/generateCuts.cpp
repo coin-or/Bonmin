@@ -25,7 +25,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   infeasNode () = false;
   
   Bonmin::BabInfo * babInfo = dynamic_cast<Bonmin::BabInfo *> (si.getAuxiliaryInfo());
-  babInfo->setFeasibleNode();
+  if(babInfo)
+    babInfo->setFeasibleNode();
   // lift bound on objective auxiliary to avoid overly strict implied
   // bounds
 
@@ -214,7 +215,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	    }*/
 
 	  infeasNode () = true; // make this node infeasible
-    babInfo->setInfeasibleNode();
+    if(babInfo)
+      babInfo->setInfeasibleNode();
 	  goto end_genCuts;
 	}
     }
