@@ -12,8 +12,8 @@ namespace Bonmin{
   
   BasicSetup::BasicSetup():
   journalist_(NULL),
-  roptions_(NULL),
-  options_(NULL)
+  options_(NULL),
+  roptions_(NULL)
 {
   options_ = new Ipopt::OptionsList();
   
@@ -144,3 +144,4 @@ BasicSetup::mayPrintDoc(){
 }
 
 }/** End namespace Bonmin. */
+

@@ -258,7 +258,7 @@ FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
     Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
       journalist_->AddFileJournal("console", "stdout", Ipopt::J_ITERSUMMARY);
   
-    RegisterOptions();
+    registerOptions();
 
     options_->SetJournalist(journalist_);
     options_->SetRegisteredOptions(roptions_);
@@ -279,18 +279,17 @@ FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
 }
 
 FilterSolver::FilterSolver(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
-                           Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
-                           Ipopt::SmartPtr<Ipopt::OptionsList> options):
+                           Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                           Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions):
 
-    cached_(NULL),
     journalist_(journalist),
+    options_(options),
     roptions_(roptions),
-    options_(options)
+    cached_(NULL)
 {
 }
 
                            
-FilterSolver::FilterSolver(
 Ipopt::SmartPtr <TNLPSolver>
 FilterSolver::clone(){
   Ipopt::SmartPtr<FilterSolver> retval = new FilterSolver(true);

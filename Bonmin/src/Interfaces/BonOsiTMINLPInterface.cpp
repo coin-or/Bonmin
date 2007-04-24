@@ -331,7 +331,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Ipopt::Journalist> journal
   BaseOptions::Solver s = (BaseOptions::Solver) ival;
   if(s == BaseOptions::FilterSQP){
 #ifdef COIN_HAS_FILTERSQP
-    app_ = new Bonmin::FilterSolver(roptions, options, journalist);
+    app_ = new Bonmin::FilterSolver(journalist, options, roptions);
 #else
 #endif    
   }
