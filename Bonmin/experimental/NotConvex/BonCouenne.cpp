@@ -28,6 +28,11 @@
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
+
+#include <CbcCutGenerator.hpp>
+#include <CouenneProblem.h>
+#include <CouenneCutGenerator.h>
+
 namespace Bonmin{
 extern int usingCouenne;}
 using namespace Bonmin;
@@ -48,7 +53,8 @@ int main (int argc, char *argv[])
     CouenneSetup bonmin;
     bonmin.InitializeBonmin(argv);
     Bab2 bb;
-    bb(bonmin);//do branch and bound
+
+    bb (bonmin);//do branch and bound
 
     std::cout.precision(10);
 
@@ -71,8 +77,25 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (1) {// print statistics in LaTeX format
+    if (0) {// print statistics in LaTeX format
 
+      ////////////////////////////////
+      int nr, nt;
+      double st;
+
+      CouenneCutGenerator *cg = dynamic_cast <CouenneCutGenerator *> 
+	(bonmin.cutGenerators (). begin () -> cgl);
+
+      cg -> getStats (nr, nt, st);
+
+      printf ("::: %6d & %6d & %6d & %6d & %6d & %6d & %8.3f & ", 
+	      cg -> Problem () -> nVars (), 
+	      cg -> Problem () -> nIntVars(), 
+	      cg -> Problem () -> nNLCons (),
+	      cg -> Problem () -> nAuxs (),
+	      nr, nt, st);
+
+      /////////////////////////////////
       char *basename = strrchr (pbName, '/');
       if (!basename) basename = pbName;
       else basename++;
@@ -128,4 +151,3 @@ int main (int argc, char *argv[])
   delete [] pbName;
   return 0;
 }
-
