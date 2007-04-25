@@ -22,15 +22,15 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
   if (reference_ -> Image () -> Linearity () <= LINEAR)
     return 0.;
 
+  expression::update (const_cast <CouNumber *> (info -> solution_),
+		      const_cast <CouNumber *> (info -> lower_),
+		      const_cast <CouNumber *> (info -> upper_));
+
   expression *fixvar = reference_ -> Image () -> getFixVar ();
   int index = fixvar -> Index ();
 
   if (index < 0)
     return 0.;
-
-  expression::update (const_cast <CouNumber *> (info -> solution_),
-		      const_cast <CouNumber *> (info -> lower_),
-		      const_cast <CouNumber *> (info -> upper_));
 
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
