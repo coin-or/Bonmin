@@ -93,8 +93,6 @@ if COIN_HAS_COUENNE
 endif
 
 fun_SOURCES = BonCouenne.cpp \
-              BonCouenneCbc.hpp \
-              BonCouenneCbc.cpp \
               BonCouenneSetup.cpp \
               BonCouenneSetup.hpp \
               BonCouenneInterface.hpp \

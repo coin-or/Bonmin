@@ -17,14 +17,12 @@ namespace Bonmin {
 
 /** Default constructor. */
 CouenneInterface::CouenneInterface():
-  AmplInterface(),
-  couenneCg_(NULL)
+  AmplInterface()
 {}
 
 /** Copy constructor. */
 CouenneInterface::CouenneInterface(const CouenneInterface &other):
-  AmplInterface(other),
-  couenneCg_(NULL)
+  AmplInterface(other)
   {
   }
 
@@ -35,7 +33,6 @@ CouenneInterface * CouenneInterface::clone(bool CopyData){
 
 /** Destructor. */
 CouenneInterface::~CouenneInterface(){
-  if(couenneCg_) delete couenneCg_;
 }
 
 void 
@@ -49,11 +46,6 @@ CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalis
                          Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                  Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
   AmplInterface::readAmplNlFile(argv, journalist, options, roptions);
-  aslfg_ = readASLfg (argv);
-  int addOnlyViolatedOa;
-  options->GetEnumValue("add_only_violated_oa", addOnlyViolatedOa,"bonmin.");
-  couenneCg_ = new CouenneCutGenerator 
-    (this, aslfg_, true, CURRENT_ONLY,1);
 }
 
 /** \name Overloaded methods to build outer approximations */
@@ -69,19 +61,13 @@ CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalis
    */
 
 void 
-CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, bool solveNlp) {
+CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 
   if (solveNlp)
     initialSolve ();
 
-   // Check that couenneCg_ has been built. 
-   if (couenneCg_ == NULL)
-     throw CoinError 
-       ("No couenne generator has been built, probably ampl .nl file was not properly read",
-	"extractLinearRelaxation", "Bonmin::CouenneInterface");
-
    int numcols     = getNumCols ();             // number of original variables
-   int numcolsconv = couenneCg_ -> getnvars (); // number of original+auxiliary variables
+   int numcolsconv = couenneCg.getnvars (); // number of original+auxiliary variables
 
    const double *lb = getColLower ();
    const double *ub = getColUpper ();
@@ -92,14 +78,14 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
 
    // get initial relaxation
    OsiCuts cs;
-   couenneCg_ -> generateCuts (si, cs);
+   couenneCg.generateCuts (si, cs);
 
    // store all (original + auxiliary) bounds in the relaxation
    CouNumber * colLower = new CouNumber [numcolsconv];
    CouNumber * colUpper = new CouNumber [numcolsconv];
 
-   CouNumber *ll = couenneCg_ -> Problem () -> Lb ();
-   CouNumber *uu = couenneCg_ -> Problem () -> Ub ();
+   CouNumber *ll = couenneCg.Problem () -> Lb ();
+   CouNumber *uu = couenneCg.Problem () -> Ub ();
 
    // overwrite original bounds, could be improved within generateCuts
    for (register int i=numcolsconv; i--;) {
@@ -162,8 +148,8 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, bool getObj, 
    CoinFillN(obj,numcolsconv,0.);
 
    // some instances have no (or null) objective function, check it here
-   if (couenneCg_ -> Problem () -> nObjs () > 0)
-     obj [couenneCg_ -> Problem () -> Obj (0) -> Body () -> Index ()] = 1;
+   if (couenneCg.Problem () -> nObjs () > 0)
+     obj [couenneCg.Problem () -> Obj (0) -> Body () -> Index ()] = 1;
 
    // Finally, load interface si with the initial LP relaxation
    si.loadProblem (A, colLower, colUpper, obj, rowLower, rowUpper);

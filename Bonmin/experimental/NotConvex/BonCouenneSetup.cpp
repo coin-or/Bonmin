@@ -22,14 +22,24 @@ namespace Bonmin{
     /* Get the basic options. */
     defaultBasicOptions();
     
-    /* Read the model. */
+    
+    /** Change default value for failure behavior so that code doesn't crash when Ipopt does not solve a sub-problem.*/
     options_->SetStringValue("nlp_failure_behavior","fathom","bonmin.");
+
     gatherParametersValues(options_);
+    
+    linearSolver_ = new OsiClpSolverInterface;
     CouenneInterface * ci = new CouenneInterface;
     nonlinearSolver_ = ci;
+    /* Read the model in various places. */
     ci->readAmplNlFile(argv,journalist(),options(),roptions());
-    linearSolver_ = new OsiClpSolverInterface;
-   
+    ASL * aslfg = readASLfg (argv);
+    
+    
+    /* Initialize Couenne cut generator.*/
+    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg, true, CURRENT_ONLY,1);
+    const CouenneProblem * couenneProb = couenneCg -> Problem();
+
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
     
     // as per instructions by John Forrest, to get changed bounds
@@ -42,7 +52,7 @@ namespace Bonmin{
     int lpLogLevel;
     options()->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
     linearSolver_->messageHandler()->setLogLevel(lpLogLevel);
-    ci->extractLinearRelaxation(*linearSolver_);
+    ci->extractLinearRelaxation(*linearSolver_, *couenneCg);
     
     if(extraStuff->infeasibleNode()){
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
@@ -53,7 +63,6 @@ namespace Bonmin{
     linearSolver_->findIntegersAndSOS(false);
     int numberIntegerObjects = linearSolver_->numberObjects() > 0;
     {
-      const CouenneProblem * couenneProb = ci->couenneProb();
       int numAuxs = couenneProb->nAuxs();
       OsiObject ** objects = new OsiObject*[numAuxs];
       int nobj = 0;
@@ -92,8 +101,7 @@ namespace Bonmin{
     if (freq != 0) {
       CuttingMethod cg;
       cg.frequency = freq;
-      CouenneCutGenerator *couenneGen = ci -> couenneCg ();
-      cg.cgl = couenneGen;
+      cg.cgl = couenneCg;
       cg.id = "Couenne convexifier cuts";
       cutGenerators().push_back(cg);
     }
@@ -110,7 +118,7 @@ namespace Bonmin{
     }
     
     branchingMethod_ = new CouenneChooseVariable(linearSolver_, 
-                                  const_cast<CouenneProblem *> (ci -> couenneProb ()));
+                                  const_cast<CouenneProblem *> (couenneProb));
 
     
 }

@@ -199,7 +199,7 @@ namespace Bonmin
 
     //Setup Convexifier generators
 
-    CouenneCutGenerator *ecpGen = ci -> couenneCg ();
+    CouenneCutGenerator *ecpGen = NULL;//ci -> couenneCg ();
 
     ecpGen -> setBabPtr (this);
 

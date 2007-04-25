@@ -19,17 +19,20 @@ namespace Bonmin{
     CbcHeuristic(),
     nlp_(NULL),
     hasCloned_(false),
-    maxNlpInf_(1e-04){
+    maxNlpInf_(1e-04),
+    couenne_(NULL){
   }
   
-  NlpSolveHeuristic::NlpSolveHeuristic(CbcModel & model, OsiSolverInterface &nlp, bool cloneNlp):
-  CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp),maxNlpInf_(1e-04){
+  NlpSolveHeuristic::NlpSolveHeuristic(CbcModel & model, OsiSolverInterface &nlp, bool cloneNlp, CouenneProblem * couenne):
+  CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp),maxNlpInf_(1e-04),
+  couenne_(couenne){
     if(cloneNlp)
       nlp_ = nlp.clone();
   }
   
   NlpSolveHeuristic::NlpSolveHeuristic(const NlpSolveHeuristic & other):
-  CbcHeuristic(other), nlp_(other.nlp_), hasCloned_(other.hasCloned_),maxNlpInf_(other.maxNlpInf_){
+  CbcHeuristic(other), nlp_(other.nlp_), hasCloned_(other.hasCloned_),maxNlpInf_(other.maxNlpInf_),
+  couenne_(other.couenne_){
     if(hasCloned_ && nlp_ != NULL)
       nlp_ = other.nlp_->clone();
   }
@@ -55,6 +58,7 @@ namespace Bonmin{
       }
     }
     maxNlpInf_ = rhs.maxNlpInf_;
+    couenne_ = rhs.couenne_;
     return *this;
   }
   
@@ -75,6 +79,9 @@ namespace Bonmin{
       nlp_ = &nlp;
   }
   
+  void
+  NlpSolveHeuristic::setCouenneProblem(CouenneProblem & couenne){
+    couenne_ = &couenne;}
   int
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();
@@ -140,7 +147,7 @@ namespace Bonmin{
       CouenneInterface * couenne = dynamic_cast<CouenneInterface *>
         (nlp_);
       if(couenne){
-       couenne->couenneProb()->getAuxs(newSolution);
+       couenne_->getAuxs(newSolution);
     }
       objectiveValue = obj;
   }

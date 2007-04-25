@@ -11,6 +11,7 @@
 #define BonIpoptHeuristic_HPP
 #include "CbcHeuristic.hpp"
 #include "BonOsiTMINLPInterface.hpp"
+#include "CouenneProblem.h"
 namespace Bonmin{
   /** An heuristic to call an NlpSolver if all CouenneObjects are close to be satisfied (for other integer objects, rounding is performed, is SOS are not satisfied does not run).
   */
@@ -19,7 +20,7 @@ public:
     /** Default constructor.*/
     NlpSolveHeuristic();
   /** Constructor with model and Ipopt problems.*/
-    NlpSolveHeuristic(CbcModel & mip, OsiSolverInterface &nlp, bool cloneNlp = false);
+    NlpSolveHeuristic(CbcModel & mip, OsiSolverInterface &nlp, bool cloneNlp = false, CouenneProblem * couenne = NULL);
     /** Copy constructor.*/
     NlpSolveHeuristic(const NlpSolveHeuristic &other);
     
@@ -35,6 +36,8 @@ public:
     /** Set the nlp solver.*/
     void setNlp(OsiSolverInterface &nlp, bool cloneNlp = true);
     
+    /** set the couenne problem to use.*/
+    void setCouenneProblem(CouenneProblem &);
     /** Does nothing. */
     virtual void resetModel(CbcModel * model){}
     /** Run heuristic, return 1 if a better solution than the one passed is found and 0 otherwise.
@@ -53,6 +56,8 @@ private:
     bool hasCloned_;
     /** maximum nlp infeasibility under which try to solve problem with Ipopt.*/
     double maxNlpInf_;
+    /** Pointer to a couenne representation of the problem. */
+    CouenneProblem * couenne_;
   };
 }/* Ends namespace Bonmin. */
 

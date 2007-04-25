@@ -51,48 +51,13 @@ class CouenneInterface : public AmplInterface
    * outer-approximation constraints at the optimum.
    * The put everything in an OsiSolverInterface.
    */
-  virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1, bool solveNlp = 1);
+  virtual void extractLinearRelaxation(OsiSolverInterface &si,  CouenneCutGenerator & couenneCg, bool getObj = 1, bool solveNlp = 1);
 
-  /** Get the outer approximation constraints at the currently stored optimal point.
-   (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  //  virtual void getOuterApproximation(OsiCuts &cs, bool getObj, const double * x2, bool global);
-
-  /** Get the outer approximation constraints at provided point.
-      If x2 is different from NULL only add cuts violated by x2.
-   (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  //  virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
-
-  // This is never called, eliminated
-  //  void updateCouenneAuxiliryVar(double *x, double * lb, double * ub);
-
-  const CouenneProblem * couenneProb() const{
-    return couenneCg_->Problem();
-  }
-
-  CouenneProblem * couenneProb() {
-    return couenneCg_->Problem();
-  }
   
-  /** return ASL interface */
-  ASL *getASL() {return aslfg_;}
-
-  CouenneCutGenerator * couenneCg()  {
-    return couenneCg_;}
-
-  const CouenneCutGenerator * couenneCg()  const{
-    return couenneCg_;}
-
   /** To set some application specific defaults. */
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
 protected:
- 
-  /** The cut generator from couenne. */
-  CouenneCutGenerator *couenneCg_;
-
-  /** The simpler ASL interface (no partially separable information,
-      no groups, no hassle) */
-  ASL *aslfg_;
 };
 
 } /** end Bonmin namespace. */
