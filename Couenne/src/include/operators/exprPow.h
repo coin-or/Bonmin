@@ -93,7 +93,6 @@ inline CouNumber safe_pow (register CouNumber base,
 
 
 // compute power
-
 inline CouNumber exprPow::operator () () {
 
   exprOp:: operator () ();
@@ -106,7 +105,11 @@ inline CouNumber exprPow::operator () () {
 
 
 // add upper/lower envelope to power in convex/concave areas
-
 void addPowEnvelope (const CouenneCutGenerator *, OsiCuts &, int, int,
-		     CouNumber, CouNumber, CouNumber, CouNumber, int);
+		     CouNumber, CouNumber, CouNumber, CouNumber, CouNumber, int);
+
+
+// find proper tangent point to add deepest tangent cut
+CouNumber powNewton (CouNumber, CouNumber, unary_function, unary_function, unary_function);
+
 #endif

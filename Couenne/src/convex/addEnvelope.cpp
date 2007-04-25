@@ -24,6 +24,8 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
   // TODO: remove check of !firstcall_ if point is available already
 
+  // Add tangent in any case
+
   if (((!firstcall_) || ((x >= l) && (x <= u)))
       && (fabs (opp_slope) < COUENNE_INFINITY))
     createCut (cs, f (x) + opp_slope * x, sign, w_ind, 1., 
@@ -45,26 +47,19 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
       opp_slope = - fprime (sample);
 
-      if (fabs (opp_slope) < COUENNE_INFINITY)
+      if ((fabs (opp_slope) < COUENNE_INFINITY) && 
+	  (fabs (sample-x) > COUENNE_EPS)) // do not add twice cut at current point
 	  createCut (cs, f (sample) + opp_slope * sample, sign, 
 		     w_ind, 1.,
 		     x_ind, opp_slope, 
-		     -1, 0.,
-		     is_global);
+		     -1, 0., is_global);
 
 	//	printf ("  Uniform %d: ", i); cut -> print ();
 
       sample += step;
     }
   }
-  /* else if (convtype_ == CURRENT_ONLY) {
 
-    if (fabs (opp_slope) < COUENNE_INFINITY)
-      createCut (cs, f (x) + opp_slope * x, sign, w_ind, 1., 
-		 x_ind, opp_slope, -1, 0., is_global);
-
-      //      addTangent (cs, w_ind, x_ind, x, f (x), fprime (x), sign);
-  } */
   else if (convtype_ != CURRENT_ONLY) {
 
     CouNumber sample = x;

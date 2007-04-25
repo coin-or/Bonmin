@@ -46,15 +46,13 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   if ((!(cg -> isFirst ())) && 
       (fabs ((l = expression::Ubound (varIndex_)) - 
-	     expression::Lbound (varIndex_)) < COUENNE_EPS))
-
+                  expression::Lbound (varIndex_)) < COUENNE_EPS))
     cg -> createCut (cs, l, 0, varIndex_, 1.);
   else image_ -> generateCuts (this, si, cs, cg);
 
   //  if (!(cg -> isFirst ())) 
   //  if (j < cs.sizeRowCuts ())
   if (0)
-  //  if (varIndex_ == 60)
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");
@@ -66,11 +64,12 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   //////////////////////////////////////////////////////////////
 
-  if (0) {// [cool!] print graph-readable output for displaying
-          // inequalities on a Cartesian plane
+  if (0) { // [cool!] print graph-readable output for displaying
+           // inequalities on a Cartesian plane
 
-    if ((image_ -> code () == COU_EXPRSIN) || 
+    if (1 || (image_ -> code () == COU_EXPRSIN) || 
 	(image_ -> code () == COU_EXPRPOW) || 
+	(image_ -> code () == COU_EXPREXP) || 
 	(image_ -> code () == COU_EXPRLOG) || 
 	(image_ -> code () == COU_EXPRCOS)) {
 
@@ -117,12 +116,12 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 	    if (y > maxY) maxY = y;
 	    if (y < minY) minY = y;
 
-	    printf ("#=# %.3f %.3f\n", x, y);
+	    printf ("#=# %.12e %.12e\n", x, y);
 	  }
 	}
 	
-	lb -= 1;
-	ub += 1;
+	//lb -= 1;
+	//ub += 1;
 
 	// plot lines defining constraint (only for cuts involving at
 	// most two variables (that is, w is a unary function)
@@ -141,11 +140,10 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
 	  printf ("#=# #m=2,S=%d\n", (cs.rowCutPtr (jj) -> sense () == 'L') ? 10:11);
 
-	  printf ("#=# %.3f %.3f\n", lb0, (rhs - el [1] * lb0) / el [0]);
-	  printf ("#=# %.3f %.3f\n", ub0, (rhs - el [1] * ub0) / el [0]);
+	  printf ("#=# %.12e %.12e\n", lb0, (rhs - el [1] * lb0) / el [0]);
+	  printf ("#=# %.12e %.12e\n", ub0, (rhs - el [1] * ub0) / el [0]);
 	}
 
-	exit (0);
 	cg -> Problem () -> X () [xi] = curx;
       }
     }

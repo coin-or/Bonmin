@@ -71,8 +71,8 @@ int main (int argc, char **argv) {
 
   expon = atof (argv [1]);
 
-  //  for (register int i=10000; i--;)
-  r = powNewton (xc, yc, f, fp, fpp);
+  for (register int i=10000; i--;)
+    r = powNewton (xc, yc, f, fp, fpp);
 
   printf ("xc = %.14f: xk = %.15f, slope %.15f -- %.15f ==> %.15f\n", 
 	  xc, r, fp (r), (yc - f (r)) / (xc - r), fp (r) * (yc - f (r)) / (xc - r));

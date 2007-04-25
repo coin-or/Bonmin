@@ -34,27 +34,24 @@ exprAux *exprPow::standardize (CouenneProblem *p) {
 					  // to exp (x * log a)
     CouNumber base = arglist_ [0] -> Value ();
 
-    if (fabs (base - M_E) < COUENNE_EPS)
+    if (fabs (base - M_E) < COUENNE_EPS) // is base e = 2.7182818...
       return p -> addAuxiliary (new exprExp (new exprClone (arglist_ [1])));
-    else
+    else // no? convert k^x to e^(x log (k))
       return p -> addAuxiliary 
 	(new exprExp (new exprClone 
 		      (p -> addAuxiliary (new exprMul (new exprClone (arglist_ [1]), 
 						       new exprConst (log (base)))))));
   }
   else
-
-    if (arglist_ [1] -> Type () != CONST) // expression is x^y, reduce
-					  // to exp (y*log(x));
+    if (arglist_ [1] -> Type () != CONST) //  x^y, convert to exp (y*log(x));
       return p -> addAuxiliary 
 	(new exprExp (new exprClone (p -> addAuxiliary 
 		      (new exprMul 
 		       (new exprClone (arglist_ [1]), 
 			new exprClone (p -> addAuxiliary 
 				       (new exprLog (new exprClone (arglist_ [0])))))))));
-    else                                  // expression is x^k, return
-					  // as it is
-	return p -> addAuxiliary (this);
+
+    else return p -> addAuxiliary (this);  // expression is x^k, return as it is
 }
 
 
@@ -80,7 +77,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
 
-  CouNumber x = (*xe)  (), 
+  CouNumber w = (*aux) (),
+            x = (*xe)  (), 
             l = (*xle) (), 
             u = (*xue) ();
 
@@ -120,7 +118,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   bool isInt    =            fabs (k    - (double) (intk = FELINE_round (k)))    < COUENNE_EPS,
        isInvInt = !isInt && (fabs (1./k - (double) (intk = FELINE_round (1./k))) < COUENNE_EPS);
-   
+
   // two macro-cases: 
 
   if (   (isInt || isInvInt)
@@ -151,26 +149,25 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     // lower envelope
 
     if (l > -COUENNE_INFINITY) {
-      if (u > q * l) { // upper x is after "turning point", add also lower envelope
-	addPowEnvelope (cg, cs, w_ind, x_ind, x, k, q*l, u, sign);
-	cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
-      }
-    else
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), sign);
+      if (u > q * l) { // upper x is after "turning point", add lower envelope
+	addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, q*l, u, sign);
+	cg      -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
+      } else cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u,   safe_pow (u,k),   sign);
     }
 
-    // check if upper part needs a concave envelope
+    // upper envelope
 
     if (u < COUENNE_INFINITY) {
-      if (l < q * u) {
-	addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, q*u, -sign);
-	cg    -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
-      }
-      else cg -> addSegment (cs, w_ind, x_ind, l,   safe_pow (l,k),   u, safe_pow (u,k), -sign);
+      if (l < q * u) { // lower x is before "turning point", add upper envelope
+	addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, l, q*u, -sign);
+	cg      -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
+      } else cg -> addSegment (cs, w_ind, x_ind, l,   safe_pow (l,k),   u, safe_pow (u,k), -sign);
     }
   }
   else {
 
+    printf ("==== exprPow: x=%.5f  [%.5f %.5f]\n", x, l, u);
+   
     // 2) all other cases.
 
     // if k is real or inv(k) is even, then lift l to max (0,l) but if
@@ -187,36 +184,40 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     // convexification is possible -- just add a segment between two
     // tails of the asymptotes.
 
-    if ((k < COUENNE_EPS) && (l < - COUENNE_EPS) && (u > COUENNE_EPS)) {
+    if ((k < 0) && 
+	(l < - COUENNE_EPS) && 
+	(u >   COUENNE_EPS)) {
 
       if (!(intk % 2))
 	cg -> addSegment (cs, w_ind, arglist_ [0] -> Index (), 
-		    l, safe_pow (l,k), u, safe_pow (u,k), +1);
+			  l, safe_pow (l,k), u, safe_pow (u,k), +1);
       return;
     }
 
     // Between l and u we have a convex/concave function that needs to
     // be enveloped. Standard segment and tangent cuts can be applied.
 
-    // create envelope. Choose sign based on k
+    // create upper envelope (segment)
 
-    int sign = +1;
+    int sign = 1; // sign based on k
 
-    // invert sign if (k is odd negative and l<0) or (k is in [0,1])
-    if ((l < - COUENNE_EPS) && (k < 0) && (intk % 2)
-	|| (fabs (k-0.5) < 0.5 - COUENNE_EPS) // k in [0,1]
-	|| ((u < - COUENNE_EPS) && (intk % 2) && (k > COUENNE_EPS)))
+    // invert sign if 
+    if (   ((l < - COUENNE_EPS) && (intk % 2) && (k < -COUENNE_EPS)) // k<0 odd, l<0
+	|| ((u < - COUENNE_EPS) && (intk % 2) && (k >  COUENNE_EPS)) // k>0 odd, u<0
+	|| (fabs (k-0.5) < 0.5 - COUENNE_EPS))                       // k in [0,1]
       sign = -1;
 
-    // upper envelope -- when k negative, add only if bounds are far from 0
+    // upper envelope -- when k negative, add only if
+
+    CouNumber powThreshold = pow (1e20, 1./k);
 
     if ((  (k > COUENNE_EPS)
-	|| (l > COUENNE_EPS)
+	|| (l > COUENNE_EPS)             // bounds do not contain 0
 	|| (u < - COUENNE_EPS)) &&
-	(l > - COUENNE_INFINITY + 1) &&
-	(u <   COUENNE_INFINITY - 1))
+	(l > - powThreshold) &&  // and are finite
+	(u <   powThreshold))
 
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -sign);
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l, k), u, safe_pow (u, k), -sign);
 
     // similarly, pay attention not to add infinite slopes
 
@@ -224,8 +225,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     if (k > COUENNE_EPS) {
 
-      if (u >   COUENNE_INFINITY - 1) u = x + POWER_RANGE;
-      if (l < - COUENNE_INFINITY + 1) l = x - POWER_RANGE;
+      if (u >   powThreshold) u = x + POWER_RANGE;
+      if (l < - powThreshold) l = x - POWER_RANGE;
     }
     else {
 
@@ -233,7 +234,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       if (fabs (u) < COUENNE_EPS) u = -1. / POWER_RANGE; // u --> 0-
     }
 
-    addPowEnvelope (cg, cs, w_ind, x_ind, x, k, l, u, sign);
+    addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, l, u, sign);
   }
 
   delete xle; delete xue;

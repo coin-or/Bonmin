@@ -20,14 +20,11 @@
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-  
+
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
   if (babInfo)
     babInfo -> setFeasibleNode ();
-
-  // lift bound on objective auxiliary to avoid overly strict implied
-  // bounds
 
   double now = CoinCpuTime ();
 
@@ -133,47 +130,28 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   int objInd = problem_ -> Obj (0) -> Body () -> Index ();
   if (objInd < 0) objInd = 0; 
-  /*
-  if (babInfo) {
-    
-    CouNumber primal = babInfo -> mipBound (),
-              dual   = babInfo -> bestObjectiveValue ();
+
+  if (babInfo && (babInfo -> babPtr ())) {
+
+    CouNumber primal  = babInfo  -> babPtr () -> model (). getObjValue(),
+              dual    = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
+              primal0 = problem_ -> Ub (objInd), 
+              dual0   = problem_ -> Lb (objInd);
 
     // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
     // (LOWER) bound.
 
-    if (problem_ -> Ub (objInd) > primal) { // update primal bound (MIP)
+    if ((primal <   COUENNE_INFINITY - 1) && (primal < primal0)) { // update primal bound (MIP)
       problem_ -> Ub (objInd) = primal;
-      if (primal < COUENNE_INFINITY - 1) chg_bds [objInd] = 1;
+      chg_bds [objInd] = 1;
     }
 
-    if (problem_ -> Lb (objInd) < dual) { // update dual bound
+    if ((dual   > - COUENNE_INFINITY + 1) && (dual   > dual0)) { // update dual bound
       problem_ -> Lb (objInd) = dual;
-      if (dual < - COUENNE_INFINITY + 1) chg_bds [objInd] = 1;
+      chg_bds [objInd] = 1;
     }
   }
-  */
-
-  if (BabPtr_) { // update primal bound with best feasible solution object
-
-    int objInd = problem_ -> Obj (0) -> Body () -> Index ();
-
-    if (objInd >= 0) {
-
-      CouNumber bestObj = babInfo -> babPtr() -> model().getObjValue();
-      
-      // Bonmin assumes minimization. Bonmin::Bab::bestObj () should
-      // be considered an UPPER bound.
-
-      if (problem_ -> Ub (objInd) > bestObj) {
-
-	problem_ -> Ub (objInd) = bestObj;
-	if (bestObj < COUENNE_INFINITY - 1) 
-	  chg_bds [objInd] = 1;
-      }
-    }
-  }
-
+  
 
   //////////////////////// BOUND TIGHTENING ///////////////////////////////////
 
@@ -187,38 +165,19 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     ntightened = problem_ -> tightenBounds (chg_bds);
 
-    // implied bounds. Only do it after other bounds have changed,
-    // i.e. after branching or if upper bound found
+    // implied bounds. Call also at the beginning, as some common
+    // expression may have non-propagated bounds
 
-    if (!firstcall_ || chg_bds [objInd]) { 
-      //    if (!firstcall_) {
-
-      nbwtightened = problem_ -> impliedBounds (chg_bds);
+    nbwtightened = problem_ -> impliedBounds (chg_bds);
       
-      for (register int i=0; i < ncols; i++) 
-	if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS) {
+    for (register int i=0; i < ncols; i++) 
+      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS) {
 
-	  /*printf ("Couenne: infeasible bounds on w_%d [%.12e,%.12e]\n", 
-	    i, expression::Lbound (i), expression::Ubound (i));*/
+	if (babInfo)
+	  babInfo -> setInfeasibleNode ();
 
-	  /*OsiColCut *infeascut = new OsiColCut;
-	  if (infeascut) {
-	    double upper = -1., lower = +1.;
-	    infeascut -> setLbs (1, &i, &lower);
-	    infeascut -> setUbs (1, &i, &upper);
-	    cs.insert (infeascut);
-	    delete infeascut;
-	    }*/
-
-	  //	  infeasNode () = true; // make this node infeasible
-
-	  if (babInfo)
-	    babInfo -> setInfeasibleNode ();
-	  else printf ("warning, no babinfo\n");
-
-	  goto end_genCuts;
-	}
-    }
+	goto end_genCuts;
+      }
   } while (ntightened && nbwtightened && (niter++ < 10));
   // Not ((ntightened || nbwtightened) && (niter++ < 10)), as we need
   // to repeat only if both bound tighteners had some result.

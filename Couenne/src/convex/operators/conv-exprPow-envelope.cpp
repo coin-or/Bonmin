@@ -32,31 +32,29 @@ inline static CouNumber power_k_prime (CouNumber x)
 {return exponent * safe_pow (x, exponent-1);}
 
 
+// function k*(k-1)*x^(k-2)
+inline static CouNumber power_k_dblprime (CouNumber x) 
+{return exponent * (exponent-1) * pow (x, exponent-2);}
+
+
 // adds convex (upper/lower) envelope to a power function
 
 void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 		     int wi, int xi,
-		     CouNumber x, CouNumber k, 
+		     CouNumber x, CouNumber y,
+		     CouNumber k, 
 		     CouNumber l, CouNumber u,
 		     int sign) {
 
-  //  int ns = cg -> nSamples ();
-
   exponent = k;
-  /*
-  if (k <= 0) k = 1;
 
-  if (l < - COUENNE_INFINITY + 1) {
-    if (u > COUENNE_INFINITY - 1) {
+  // set x to get a deeper cut (so that we get a tangent which is
+  // orthogonal with line through current- and tangent point)
 
-      l = - pow (POW_FACTOR, 1. / (1. + k)) * ns/2;
-      u =   pow (POW_FACTOR, 1. / (1. + k)) * ns/2;
-    } else 
-      l = u - pow (POW_FACTOR, 1. / (1. + k)) * ns;
+  //  x = powNewton (x, y, power_k, power_k_prime, power_k_dblprime);
 
-  } else if (u > COUENNE_INFINITY - 1) 
-    u = l + pow (POW_FACTOR,   1. / (1. + k)) * ns;
-  */
+  if      (x<l) x=l;
+  else if (x>u) x=u;
 
   // limit the bounds for the envelope
 
