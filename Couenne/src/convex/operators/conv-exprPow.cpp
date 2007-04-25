@@ -80,7 +80,26 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
 
-  CouNumber x = (*xe)  (), l = (*xle) (), u = (*xue) ();
+  CouNumber x = (*xe)  (), 
+            l = (*xle) (), 
+            u = (*xue) ();
+
+  // if xl and xu are too close, approximate it as a line: sum the
+  // segment through the two extreme points (l,l^k) and (u,u^k), and
+  // the tangent at the midpoint ((l+u)/2, ((l+u)/2)^k)
+
+  if (fabs (u-l) < COUENNE_EPS) {
+
+    CouNumber avg     = 0.5 * (l+u),
+              avg_k_1 = safe_pow (avg, k-1),
+              lk      = safe_pow (l,   k),
+              uk      = safe_pow (u,   k);
+
+    cg -> createCut (cs, u*lk - l*uk + avg * avg_k_1 * (1-k), 0,
+		     w_ind, u - l + 1, 
+		     x_ind, lk-uk - k * avg_k_1);
+    return;
+  }
 
   // classify power
 
@@ -165,8 +184,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       return;
 
     // if k is negative and 0 is an internal point of [l,u], no
-    // convexification is possible -- add a segment
-    // between two tails of the asymptotes.
+    // convexification is possible -- just add a segment between two
+    // tails of the asymptotes.
 
     if ((k < COUENNE_EPS) && (l < - COUENNE_EPS) && (u > COUENNE_EPS)) {
 
@@ -184,8 +203,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     int sign = +1;
 
     // invert sign if (k is odd negative and l<0) or (k is in [0,1])
-    if ((l < - COUENNE_EPS) && (k < - COUENNE_EPS) && (intk % 2)
-	|| (fabs (k-0.5) < 0.5 - COUENNE_EPS)
+    if ((l < - COUENNE_EPS) && (k < 0) && (intk % 2)
+	|| (fabs (k-0.5) < 0.5 - COUENNE_EPS) // k in [0,1]
 	|| ((u < - COUENNE_EPS) && (intk % 2) && (k > COUENNE_EPS)))
       sign = -1;
 
@@ -196,7 +215,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	|| (u < - COUENNE_EPS)) &&
 	(l > - COUENNE_INFINITY + 1) &&
 	(u <   COUENNE_INFINITY - 1))
-      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), - sign);
+
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u, safe_pow (u,k), -sign);
 
     // similarly, pay attention not to add infinite slopes
 

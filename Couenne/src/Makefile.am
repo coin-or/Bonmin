@@ -52,10 +52,12 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
+	convex/operators/conv-exprMul-genCuts.cpp \
 	convex/operators/conv-exprOpp.cpp \
 	convex/operators/conv-exprPow.cpp \
 	convex/operators/conv-exprPow-getBounds.cpp \
 	convex/operators/conv-exprPow-envelope.cpp \
+	convex/operators/powNewton.cpp \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
 	convex/operators/linearize.cpp \
@@ -67,6 +69,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/trigNewton.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
+	convex/genColCuts.cpp \
 	problem/problem.cpp \
 	problem/problemIO.cpp \
 	problem/constraint.cpp \

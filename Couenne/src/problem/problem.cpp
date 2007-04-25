@@ -106,7 +106,6 @@ expression *CouenneProblem::addVariable (bool isDiscrete) {
 exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 
   // check if image is already in the expression database auxSet_
-
   std::set <exprAux *, compExpr>::iterator i;
 
   // create new aux associated with that expression
@@ -114,17 +113,14 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 			    variables_ . size () + auxiliaries_ . size (), 
 			    symbolic -> rank (this));
 
+  // seek expression in the set
   if ((i = auxSet_ -> find (w)) == auxSet_ -> end ()) {
 
-    // no such expression has been found in the set, 
-    // create entry in the set
-
+    // no such expression found in the set, create entry therein
     auxiliaries_ . push_back (w);
     auxSet_ -> insert (w);
   }
-  else {
-
-    // otherwise, just return the entry's pointer
+  else { // otherwise, just return the entry's pointer
 
     delete w;
     w = *i;
@@ -140,11 +136,9 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
 void CouenneProblem::standardize () {
 
   // create expression set for binary search
-
   auxSet_ = new std::set <exprAux *, compExpr>;
 
   // standardize objectives
-
   for (std::vector <Objective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); i++) {
 
@@ -153,7 +147,6 @@ void CouenneProblem::standardize () {
   }
 
   // standardize constraints
-
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
        i != constraints_.end (); i++) {
 
@@ -165,10 +158,12 @@ void CouenneProblem::standardize () {
 
   int nTotVar = nVars() + nAuxs ();
 
+  // reallocate space for enlarged set of variables
   x_  = (CouNumber *) realloc (x_,  nTotVar * sizeof (CouNumber));
   lb_ = (CouNumber *) realloc (lb_, nTotVar * sizeof (CouNumber));
   ub_ = (CouNumber *) realloc (ub_, nTotVar * sizeof (CouNumber));
 
+  // make expression library point to new vectors
   expression::update (x_, lb_, ub_);
 
   for (int i=nVars (), j=0; j < nAuxs (); i++, j++) {
@@ -179,12 +174,10 @@ void CouenneProblem::standardize () {
     lb_ [i] = -COUENNE_INFINITY;
     ub_ [i] =  COUENNE_INFINITY;
 
-    // now tighten them with propagated bounds
-
+    // tighten them with propagated bounds
     auxiliaries_ [j] -> crossBounds ();
 
     // and evaluate them
-
     lb_ [i] = (*(auxiliaries_ [j] -> Lb    ())) ();
     ub_ [i] = (*(auxiliaries_ [j] -> Ub    ())) ();
     x_  [i] = (*(auxiliaries_ [j] -> Image ())) ();
@@ -233,7 +226,6 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u, int n) {
   // expand arrays if needed
 
   if (curnvars_ < nvars) {
-
     x_   = (CouNumber *) realloc (x_,  nvars * sizeof (CouNumber));
     lb_  = (CouNumber *) realloc (lb_, nvars * sizeof (CouNumber));
     ub_  = (CouNumber *) realloc (ub_, nvars * sizeof (CouNumber));
@@ -242,7 +234,6 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u, int n) {
   }
 
   // copy arrays (do not simply make x_ point to x)
-
   for (register int i = (n==-1) ? nvars : n; i--;) {
 
     x_  [i] = x [i];

@@ -147,28 +147,28 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
 
   bool *s0, *s1;
 
-  if (left>0) {s0 = &skip_up; s1 = &skip_dn;}
-  else        {s0 = &skip_dn; s1 = &skip_up;}
+  if (up>0) {s0 = &skip_up; s1 = &skip_dn;}
+  else      {s0 = &skip_dn; s1 = &skip_up;}
 
   if (left * (modulo (rx0, M_PI) - M_PI_2) < 0) { 
 
-    // after flex (i.e., at \_ or /~ ) for left bound, before for
-    // right bound
+    // after  flex (i.e., at \_ or /~ ) for left  bound, 
+    // before flex (i.e., at _/ or ~\ ) for right bound
 
     // out of the "belly": tangent. If on upper bay we consider the
     // lower half-plane, and viceversa --> use -up
-    cg -> addTangent (cs, xi, wi, x0, sin (rx0), cos (rx0), -up);
+    cg -> addTangent (cs, wi, xi, x0, sin (rx0), cos (rx0), -up);
 
     // leftmost extreme to search for tangent point
     CouNumber extr0 = .75 * M_PI * (left+1) - M_PI_2 * up; 
 
     // in:
-    if ((left * (rx1 - M_PI * ((left - up) / 2 + 1)) < 0) ||   // if rx1 in same "belly", or
+    if ((left * (rx1 - M_PI * ((left - up) / 2 + 1)) <= 0) ||   // if rx1 in same "belly", or
 	(left * (rx1 - (tpt = trigNewton
-			(rx0, extr0, extr0 + M_PI_2))) < 0)) { // before closest leaning point 
-      if (!*s0) // -> chord, if not already added in previous call
-	*s0 = (cg -> addSegment (cs, xi, wi, x0, sin (rx0), x1,         sin (rx1), up) > 0);
-    } else     cg -> addSegment (cs, xi, wi, x0, sin (rx0), base + tpt, sin (tpt), up);
+			(rx0, extr0, extr0 + M_PI_2))) <= 0)) { // before closest leaning point 
+      if (!*s1) // -> chord, if not already added in previous call
+	*s1 = (cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,         sin (rx1), up) > 0);
+    } else     cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
   }
   else {
     // after stationary point (i.e., _/ or ~\ ) for left bound, before
@@ -182,17 +182,17 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
       else     // up: either chord or leaning plane
 	if (left * (rx1 - (tpt = trigNewton (rx0, left * zero, left * (zero + M_PI_2)))) < 0) {
 	  if (!*s0)
-	    *s0 = cg -> addSegment (cs, xi, wi, x0, sin (rx0), x1, sin (rx1), up) > 0;
+	    *s0 = cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1, sin (rx1), up) > 0;
 	}
-	else cg -> addSegment (cs, xi, wi, x0, sin (rx0), base + tpt, sin (tpt), up);
-    } else   cg -> addSegment (cs, xi, wi, x0, sin (rx0), base + tpt, sin (tpt), up);
+	else cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
+    } else   cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
 
     // down: other chord or leaning plane
     if ((left * (rx1 - (zero + M_PI)) < 0) || 
 	(left * (rx1 - (tpt = trigNewton (rx0, left * zero, left * (zero + M_PI_2)))) < 0)) {
-      if (!*s0) 
-	*s0 = (cg -> addSegment (cs, xi, wi, x0, sin (rx0), x1, sin (rx1), up) > 0);
-    } else     cg -> addSegment (cs, xi, wi, x0, sin (rx0), base + tpt, sin (tpt), up);
+      if (!*s1) 
+	*s1 = (cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,         sin (rx1), up) > 0);
+    } else     cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
   }
 
   return 0;

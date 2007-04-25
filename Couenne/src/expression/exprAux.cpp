@@ -17,8 +17,6 @@
 
 #include <CouenneProblem.h>
 
-#include <unistd.h> // for the sleep() in generateCuts()
-
 // auxiliary expression Constructor
 
 exprAux::exprAux (expression *image, int index, int rank): 
@@ -39,20 +37,24 @@ exprAux::exprAux (expression *image, int index, int rank):
 void exprAux::generateCuts (const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  static bool first_draw = true;
+  static CouNumber maxY = -COUENNE_INFINITY,
+                   minY =  COUENNE_INFINITY;
+
   int j = cs.sizeRowCuts ();
   CouNumber l;
 
   if ((!(cg -> isFirst ())) && 
       (fabs ((l = expression::Ubound (varIndex_)) - 
-	          expression::Lbound (varIndex_)) < COUENNE_EPS)) {
+	     expression::Lbound (varIndex_)) < COUENNE_EPS))
 
     cg -> createCut (cs, l, 0, varIndex_, 1.);
-  } 
   else image_ -> generateCuts (this, si, cs, cg);
 
   //  if (!(cg -> isFirst ())) 
-  if (j < cs.sizeRowCuts ())
+  //  if (j < cs.sizeRowCuts ())
   if (0)
+  //  if (varIndex_ == 60)
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");
@@ -62,25 +64,35 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 	cs.rowCutPtr (jj) -> print ();
     }
 
+  //////////////////////////////////////////////////////////////
 
-  if (0)  // [cool!] print graph-readable output for displaying
+  if (0) {// [cool!] print graph-readable output for displaying
           // inequalities on a Cartesian plane
 
     if ((image_ -> code () == COU_EXPRSIN) || 
+	(image_ -> code () == COU_EXPRPOW) || 
+	(image_ -> code () == COU_EXPRLOG) || 
 	(image_ -> code () == COU_EXPRCOS)) {
 
       printf (" ==> "); print (std::cout); printf ("\n");
 
       expression *lbe, *ube;
 
-      int xi = image_ -> Argument () -> Index ();
+      expression *indep = image_ -> Argument ();
+
+      if (!indep) 
+	indep = image_ -> getFixVar ();
+
+      int xi = indep -> Index ();
       printf ("looking into w_%d = f (x_%d)\n", varIndex_, xi);
 
-      image_ -> Argument () -> getBounds (lbe, ube);
+      indep -> getBounds (lbe, ube);
 
+      CouNumber lb = (*lbe) (),
+	        ub = (*ube) ();
 
-      CouNumber lb   = (*lbe) (),
-	        ub   = (*ube) ();
+      lb = 1e-10;
+      ub = 7;
 
       delete lbe;
       delete ube;
@@ -92,28 +104,53 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 #define N_STEPS 100
 
 	// plot function
-	for (CouNumber x = lb; 
-	     x <= ub; 
-	     x += ((ub - lb) / N_STEPS)) {
 
-	  //	  expression::Variable (xi) = x;
-	  printf ("#=# %.3f %.3f\n", x, (*image_) ());
+	if (first_draw) {
+
+	  first_draw = false;
+
+	  for (CouNumber x = lb; 
+	       x <= ub + COUENNE_EPS; 
+	       x += ((ub - lb) / N_STEPS)) {
+
+	    cg -> Problem () -> X () [xi] = x;
+	  
+	    CouNumber y = (*image_) ();
+
+	    if (y > maxY) maxY = y;
+	    if (y < minY) minY = y;
+
+	    printf ("#=# %.3f %.3f\n", x, y);
+	  }
 	}
+	
+	lb -= 1;
+	ub += 1;
 
 	// plot lines defining constraint (only for cuts involving at
 	// most two variables (that is, w is a unary function)
-	for (int jj=j; jj < cs.sizeRowCuts ();jj++) {
-	  //	  const int    *ind = cs.rowCutPtr (jj) -> row (). getIndices  ();
+	for (int jj=j; jj < cs.sizeRowCuts (); jj++) {
+
+	  CouNumber lb0 = lb, 
+	            ub0 = ub;
+
 	  const double *el  = cs.rowCutPtr (jj) -> row (). getElements ();
 	  double  rhs = cs.rowCutPtr (jj) -> rhs ();
 
-	  printf ("#=# #m=1,S=%d\n", (cs.rowCutPtr (jj) -> sense () == 'L') ? 10:11);
+	  if (fabs (el [1]) > COUENNE_EPS) {
+	    lb0 = mymax (lb, mymin ((rhs - el [0] * minY) / el [1], (rhs - el [0] * maxY) / el [1]));
+	    ub0 = mymin (ub, mymax ((rhs - el [0] * minY) / el [1], (rhs - el [0] * maxY) / el [1]));
+	  }
 
-	  printf ("#=# %.3f %.3f\n", lb, (rhs - el [1] * lb) / el [0]);
-	  printf ("#=# %.3f %.3f\n", ub, (rhs - el [1] * ub) / el [0]);
+	  printf ("#=# #m=2,S=%d\n", (cs.rowCutPtr (jj) -> sense () == 'L') ? 10:11);
+
+	  printf ("#=# %.3f %.3f\n", lb0, (rhs - el [1] * lb0) / el [0]);
+	  printf ("#=# %.3f %.3f\n", ub0, (rhs - el [1] * ub0) / el [0]);
 	}
 
-	//	expression::Variable (xi) = curx;
+	exit (0);
+	cg -> Problem () -> X () [xi] = curx;
       }
     }
+  }
 }

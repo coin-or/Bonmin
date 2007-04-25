@@ -104,14 +104,18 @@ int CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 				     CouNumber x1, CouNumber y1, 
 				     CouNumber x2, CouNumber y2, int sign) const { 
 
-  if (fabs (x2-x1) < COUENNE_EPS)
+  if (fabs (x2-x1) < COUENNE_EPS) {
     if (fabs (y2-y1) > MAX_SLOPE * COUENNE_EPS)
       printf ("warning, discontinuity of %e over an interval of %e\n", y2-y1, x2-x1);
     else return createCut (cs, y2, 0, wi, 1.);
+  }
 
-  CouNumber oppslope = (y1-y2) / (x2-x1);
+  //CouNumber oppslope = (y1-y2) / (x2-x1);
 
-  return createCut (cs, y1 + oppslope * x1, sign, wi, 1., xi, oppslope);
+  CouNumber dx = x2-x1, dy = y2-y1;
+
+  //  return createCut (cs, y1 + oppslope * x1, sign, wi, 1., xi, oppslope);
+  return createCut (cs, y1*dx - dy*x1, (dx>0) ? sign : -sign, wi, dx, xi, -dy);
 }
 
 

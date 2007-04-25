@@ -28,13 +28,9 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
   if (index < 0)
     return 0.;
 
-  //printf("vars: "); for (int i=0;i<18;i++) printf("%+7.1f ",expression::Variable(i)); printf ("\n");
-
   expression::update (const_cast <CouNumber *> (info -> solution_),
 		      const_cast <CouNumber *> (info -> lower_),
 		      const_cast <CouNumber *> (info -> upper_));
-
-  //printf("info: "); for (int i=0;i<18;i++) printf("%+7.1f ",expression::Variable(i)); printf ("\n");
 
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
@@ -60,13 +56,32 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
   CouNumber l  = info -> lower_ [index],
             u  = info -> upper_ [index];
 
+  if (0)
+    if ((delta > COUENNE_EPS) &&
+	((fabs (u-l) < COUENNE_EPS) ||
+	((mymin (fabs (l), fabs (u)) > COUENNE_EPS) && 
+	 (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))) {
+      //      ((mymin (fabs (lr), fabs (ur)) > COUENNE_EPS) && 
+      //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
+
+      printf (". Inf: = |%.4f - %.4f| = %.4e. w [%.3f,%.3f], x [%.3f,%.3f] = %.4e ",  ////[%.2f,%.2f]
+	      var, expr, fabs (var - expr), 
+	      info -> lower_ [reference_ -> Index ()],
+	      info -> upper_ [reference_ -> Index ()],
+	      l, u, u-l);
+      reference_             -> print (std::cout); std::cout << " = ";
+      reference_ -> Image () -> print (std::cout);
+      printf ("\n");
+    }
+
   //printf (" delta=%.9f,l=%.9f,u=%.9f ", delta, l, u);
 
-  /// avoid branching on (relatively) very small deltas
-  if ((delta < COUENNE_EPS) ||
+  /// avoid branching on (relatively) small deltas
+  if ((delta < COUENNE_EPS)
+    ||
       (fabs (u-l) < COUENNE_EPS) ||
       ((mymin (fabs (l), fabs (u)) > COUENNE_EPS) && 
-       (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))
+      (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))
     //      ((mymin (fabs (lr), fabs (ur)) > COUENNE_EPS) && 
     //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
     delta = 0.;
@@ -76,7 +91,6 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
             + WEI_RANK / (1. + fixvar -> rank ())
             + WEI_MULT * (1. - 1. / fixvar -> Multiplicity ());
 
-  // otherwise, return real value of difference w - f(x)
   return delta;
 }
 
@@ -97,7 +111,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   solver -> setColLower (index, val);
   solver -> setColUpper (index, val);
 
-  expression * expr = reference_ -> Image();
+  expression * expr = reference_ -> Image ();
 
   if (expr -> Argument ()){ // unary function
 

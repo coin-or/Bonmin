@@ -18,20 +18,16 @@
 /// a convexifier cut generator
 
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
-                                        OsiCuts &cs, 
-                                        const CglTreeInfo info) const 
-{
+					OsiCuts &cs, 
+					const CglTreeInfo info) const {
   
-  infeasNode () = false;
-  
-  Bonmin::BabInfo * babInfo = dynamic_cast<Bonmin::BabInfo *> (si.getAuxiliaryInfo());
-  if(babInfo)
-    babInfo->setFeasibleNode();
+  Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
+
+  if (babInfo)
+    babInfo -> setFeasibleNode ();
+
   // lift bound on objective auxiliary to avoid overly strict implied
   // bounds
-
-  //printf ("pass = %d, level = %d, intree = %d, objval = %.12f\n", 
-  //        info.pass, info.level, info.inTree, si.getObjValue());
 
   double now = CoinCpuTime ();
 
@@ -87,11 +83,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	CouNumber l = con -> Lb () -> Value (),	
 	          u = con -> Ub () -> Value ();
 
-	/*printf ("con %3d [w_%02d]: [%12.3f %12.3f] && [%12.3f %12.3f] --> [%12.3f %12.3f]\n", 
-		i, index, l, u, 
-		problem_ -> Lb (index), problem_ -> Ub (index),
-		mymax (l, problem_ -> Lb (index)), mymin (u, problem_ -> Ub (index)));*/
-
 	// tighten bounds in Couenne's problem representation
 	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
 	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
@@ -115,8 +106,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
       OsiBabSolver *auxinfo = dynamic_cast <OsiBabSolver *> (si.getAuxiliaryInfo ());
 
-      if (auxinfo &&
-	  (auxinfo -> extraCharacteristics () & 2)) {
+      if (auxinfo && (auxinfo -> extraCharacteristics () & 2)) {
 
 	// get previous bounds
 	const double * beforeLower = auxinfo -> beforeLower ();
@@ -139,10 +129,33 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  // update primal bound with best feasible solution object
+  //  OsiBabSolver *auxinfo = dynamic_cast <OsiBabSolver *> (si.getAuxiliaryInfo ());
 
+  int objInd = problem_ -> Obj (0) -> Body () -> Index ();
+  if (objInd < 0) objInd = 0; 
+  /*
   if (babInfo) {
     
+    CouNumber primal = babInfo -> mipBound (),
+              dual   = babInfo -> bestObjectiveValue ();
+
+    // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
+    // (LOWER) bound.
+
+    if (problem_ -> Ub (objInd) > primal) { // update primal bound (MIP)
+      problem_ -> Ub (objInd) = primal;
+      if (primal < COUENNE_INFINITY - 1) chg_bds [objInd] = 1;
+    }
+
+    if (problem_ -> Lb (objInd) < dual) { // update dual bound
+      problem_ -> Lb (objInd) = dual;
+      if (dual < - COUENNE_INFINITY + 1) chg_bds [objInd] = 1;
+    }
+  }
+  */
+
+  if (BabPtr_) { // update primal bound with best feasible solution object
+
     int objInd = problem_ -> Obj (0) -> Body () -> Index ();
 
     if (objInd >= 0) {
@@ -161,25 +174,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  //////////////////////// TIGHTEN BOUNDS ///////////////////////////////////
 
-  // tighten the current relaxation by tightening the variables'
-  // bounds
+  //////////////////////// BOUND TIGHTENING ///////////////////////////////////
 
-  /*printf ("before:");
-  for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++) {
-    printf ("%3d: %+e %+e ", i, problem_ -> Lb (i), problem_ -> Ub (i));
-    if (i >= problem_ -> nVars ()) {
-      problem_ -> Aux (i-problem_ -> nVars ()) -> print (std::cout); printf (" := ");
-      problem_ -> Aux (i-problem_ -> nVars ()) -> Image () -> print (std::cout); printf (" [");
-      problem_ -> Aux (i-problem_ -> nVars ()) -> Lb () -> print (std::cout); printf (" , ");
-      problem_ -> Aux (i-problem_ -> nVars ()) -> Ub () -> print (std::cout); printf ("]");
-    }
-    printf ("\n");
-    }*/
-
-  int   ntightened = 0, 
-      nbwtightened = 0, 
+  int   ntightened = 0,
+      nbwtightened = 0,
       niter = 0, *changed, nchanged;
 
   do {
@@ -189,9 +188,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     ntightened = problem_ -> tightenBounds (chg_bds);
 
     // implied bounds. Only do it after other bounds have changed,
-    // i.e. after branching
+    // i.e. after branching or if upper bound found
 
-    if (!firstcall_) {
+    if (!firstcall_ || chg_bds [objInd]) { 
+      //    if (!firstcall_) {
 
       nbwtightened = problem_ -> impliedBounds (chg_bds);
       
@@ -200,35 +200,33 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	  /*printf ("Couenne: infeasible bounds on w_%d [%.12e,%.12e]\n", 
 	    i, expression::Lbound (i), expression::Ubound (i));*/
-	  
+
 	  /*OsiColCut *infeascut = new OsiColCut;
-
 	  if (infeascut) {
-
 	    double upper = -1., lower = +1.;
-
 	    infeascut -> setLbs (1, &i, &lower);
 	    infeascut -> setUbs (1, &i, &upper);
-
 	    cs.insert (infeascut);
 	    delete infeascut;
 	    }*/
 
-	  infeasNode () = true; // make this node infeasible
-    if(babInfo)
-      babInfo->setInfeasibleNode();
+	  //	  infeasNode () = true; // make this node infeasible
+
+	  if (babInfo)
+	    babInfo -> setInfeasibleNode ();
+	  else printf ("warning, no babinfo\n");
+
 	  goto end_genCuts;
 	}
     }
   } while (ntightened && nbwtightened && (niter++ < 10));
-  // Not ((ntightened || nbwtightened) && (niter++ < 10)) since we
-  // need to repeat only if both bound tighteners had some result.
+  // Not ((ntightened || nbwtightened) && (niter++ < 10)), as we need
+  // to repeat only if both bound tighteners had some result.
 
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
-  // first of all, convert sparse chg_bds in something handier
-
+  // convert sparse chg_bds in something handier
   changed  = (int *) malloc (ncols * sizeof (int));
   nchanged = 0;
 
@@ -254,85 +252,36 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     for (int i=0, j = problem_ -> nAuxs (); j--; i++) {
 
-      /*
       expression * image = problem_ -> Aux (i) -> Image ();
       if (   (image -> Linearity () > LINEAR)          // if linear, no need to cut twice
 	  && (image -> dependsOn (changed, nchanged))  // if expression does not depend on 
 	  )                                            // changed variables, do not cut
-      */
 	problem_ -> Aux (i) -> generateCuts (si, cs, this);
     }
   }
 
-  //////////////////////// GENERATE OsiColCut FOR SHRUNKEN BOUNDS /////////////////////
-
   if (firstcall_) {
 
-    // set trivial dual bound to objective function
+    // set trivial dual bound to objective function, if there is none
 
     int ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
 
     if (ind_obj >= 0)
-      if (problem_ -> Obj (0) -> Sense () == MINIMIZE)
-	   problem_ -> Lb (ind_obj) = - LARGE_BOUND;
-      else problem_ -> Ub (ind_obj) =   LARGE_BOUND;
+      if (problem_ -> Obj (0) -> Sense () == MINIMIZE) {
+	if (problem_ -> Lb (ind_obj) < - LARGE_BOUND)
+	  problem_ -> Lb (ind_obj) = - LARGE_BOUND;
+      }
+      else
+	if (problem_ -> Ub (ind_obj) > LARGE_BOUND)
+	  problem_ -> Ub (ind_obj) = LARGE_BOUND;
   }
 
   // change tightened bounds through OsiCuts
 
-  if (nchanged) {
+  if (nchanged)
+    genColCuts (si, cs, nchanged, changed);
 
-    // indices for OsiColCut
-    int *indLow = new int [ncols], 
-        *indUpp = new int [ncols],
-         nLow, nUpp = nLow = 0;
-
-    // values fo OsiColCut
-    CouNumber *bndLow = new CouNumber [ncols],
-              *bndUpp = new CouNumber [ncols];
-
-    const CouNumber 
-      *oldLow = si.getColLower (), // old bounds
-      *oldUpp = si.getColUpper (),
-      *newLow = problem_ -> Lb (), // changed bounds
-      *newUpp = problem_ -> Ub ();
-
-    // check all changed bounds
-    for (int i=0; i<nchanged; i++) {
-
-      register int index = changed [i];
-
-      CouNumber bd;
-
-      if (firstcall_ || ((bd = newLow [index]) > oldLow [index] + COUENNE_EPS)) { // lower
-	indLow [nLow]   = index;
-	bndLow [nLow++] = bd;
-      }
-
-      if (firstcall_ || ((bd = newUpp [index]) < oldUpp [index] - COUENNE_EPS)) { // upper
-	indUpp [nUpp]   = index;
-	bndUpp [nUpp++] = bd;
-      }
-    }
-
-    // create Column Cut
-
-    if (nUpp || nLow) {
-
-      OsiColCut *cut = new OsiColCut;
-
-      if (cut) {
-	cut -> setLbs (nLow, indLow, bndLow);
-	cut -> setUbs (nUpp, indUpp, bndUpp);
-
-	cs.insert (cut);
-	delete cut;
-      }
-    }
-
-    delete [] bndLow; delete [] indLow;
-    delete [] bndUpp; delete [] indUpp;
-  }
+  // clean up
 
   free (changed);
 
@@ -350,12 +299,5 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
   else ntotalcuts_ += cs.sizeRowCuts ();
 					
-  /*printf ("after: ");
-  for (int i=0; i<problem_ -> nVars () + problem_ -> nAuxs(); i++)
-    printf ("%.1f %.1f|",
-	    (problem_ -> Lb (i) > -COUENNE_INFINITY+1) ? (problem_ -> Lb (i)) : -1e9, 
-	    (problem_ -> Ub (i) <  COUENNE_INFINITY-1) ? (problem_ -> Ub (i)) : 1e9);
-	    printf ("\n");*/
-
   septime_ += CoinCpuTime () - now;
 }

@@ -21,39 +21,37 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int w_ind = w         -> Index (),
       x_ind = argument_ -> Index ();
 
-  // convexifying an expression w = |x| consists in adding two
-  // global cuts: w >= x and w >= -x
-
-  if (cg -> isFirst ()) {
-
-    cg -> createCut (cs, 0., +1, w_ind, 1., x_ind, -1.);
-    cg -> createCut (cs, 0., +1, w_ind, 1., x_ind,  1.);
-  }
-
-  // add an upper segment, which depends on the lower/upper bounds
-
   expression *lbe, *ube;
-
   argument_ -> getBounds (lbe, ube);
 
   CouNumber l = (*lbe) (),
             u = (*ube) ();
 
+  delete lbe;
+  delete ube;
+
   // if l, u have the same sign, then w = x (l > 0) or w = -x (u < 0)
 
-  if      (l >= 0) cg -> createCut (cs, 0., -1, w_ind, 1., x_ind, -1.);
-  else if (u <= 0) cg -> createCut (cs, 0., -1, w_ind, 1., x_ind, +1.);
+  if      (l >= 0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, -1.);
+  else if (u <= 0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, +1.);
   else {
 
-      // otherwise check if only one of the bounds is infinite: if so,
-      // we can still add a plane, whose slope will be one (if x is
-      // unbounded from above) or -1 (from below)
+    // add two global cuts: w >= x and w >= -x
+    if (cg -> isFirst ()) {
+      cg -> createCut (cs, 0., +1, w_ind, 1., x_ind, -1.);
+      cg -> createCut (cs, 0., +1, w_ind, 1., x_ind,  1.);
+    }
 
-      if (l > - COUENNE_INFINITY + 1) {
+    // otherwise check if at most one of the bounds is infinite:
+    // even so so, we can still add a plane, whose slope will be 1
+    // (if x is unbounded from above) or -1 (from below)
 
-	if (u < COUENNE_INFINITY - 1) { // the upper approximation has slope other than -1, 1
+    if (l > - COUENNE_INFINITY + 1) {
+
+      if (u < COUENNE_INFINITY - 1) { // the upper approximation has slope other than -1, 1
 
 	  CouNumber slope = (u+l) / (u-l);
+	  // add an upper segment, which depends on the lower/upper bounds
 	  cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
 	}
 	else // slope = 1
@@ -62,7 +60,4 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
       else if (u < COUENNE_INFINITY - 1) // slope = -1
 	cg -> createCut (cs, 2*u, -1, w_ind, 1., x_ind, 1.);
     }
-
-  delete lbe;
-  delete ube;
 }

@@ -10,7 +10,6 @@
 #ifndef COUENNE_CUT_GENERATOR_H
 #define COUENNE_CUT_GENERATOR_H
 
-#include <CglCutGenerator.hpp>
 #include <BonOaDecBase.hpp>
 #include <OsiRowCut.hpp>
 #include <CouenneTypes.h>
@@ -171,6 +170,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// allow to get and set the infeasNode_ flag (used only in generateCuts())
   bool &infeasNode () const
     {return infeasNode_;}
+
+  /// generate OsiColCuts for improved (implied and propagated) bounds
+  void genColCuts (const OsiSolverInterface &, OsiCuts &, int, int *) const;
 };
 
 #endif

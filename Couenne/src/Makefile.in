@@ -100,10 +100,12 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
+	convex/operators/conv-exprMul-genCuts.cpp \
 	convex/operators/conv-exprOpp.cpp \
 	convex/operators/conv-exprPow.cpp \
 	convex/operators/conv-exprPow-getBounds.cpp \
 	convex/operators/conv-exprPow-envelope.cpp \
+	convex/operators/powNewton.cpp \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
 	convex/operators/linearize.cpp \
@@ -113,11 +115,11 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
-	convex/generateCuts.cpp problem/problem.cpp \
-	problem/problemIO.cpp problem/constraint.cpp \
-	problem/tightenBounds.cpp problem/impliedBounds.cpp \
-	problem/readASLfg.cpp util/rootQ.c readnl/readnl.cpp \
-	readnl/nl2e.cpp readnl/invmap.c
+	convex/generateCuts.cpp convex/genColCuts.cpp \
+	problem/problem.cpp problem/problemIO.cpp \
+	problem/constraint.cpp problem/tightenBounds.cpp \
+	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
+	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
@@ -128,11 +130,12 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	exprUnary.lo exprVar.lo exprAux.lo expression.lo \
 	simplifiers.lo simplify.lo checkNLP.lo addEnvelope.lo \
 	createCuts.lo conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
-	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
-	conv-exprPow-envelope.lo conv-exprSub.lo conv-exprSum.lo \
-	linearize.lo conv-exprInv.lo conv-exprSinCos.lo \
-	conv-exprExp.lo conv-exprLog.lo conv-exprGroup.lo \
-	trigNewton.lo CouenneCutGenerator.lo generateCuts.lo \
+	conv-exprMul-genCuts.lo conv-exprOpp.lo conv-exprPow.lo \
+	conv-exprPow-getBounds.lo conv-exprPow-envelope.lo \
+	powNewton.lo conv-exprSub.lo conv-exprSum.lo linearize.lo \
+	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
+	conv-exprLog.lo conv-exprGroup.lo trigNewton.lo \
+	CouenneCutGenerator.lo generateCuts.lo genColCuts.lo \
 	problem.lo problemIO.lo constraint.lo tightenBounds.lo \
 	impliedBounds.lo readASLfg.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
@@ -366,10 +369,12 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
+	convex/operators/conv-exprMul-genCuts.cpp \
 	convex/operators/conv-exprOpp.cpp \
 	convex/operators/conv-exprPow.cpp \
 	convex/operators/conv-exprPow-getBounds.cpp \
 	convex/operators/conv-exprPow-envelope.cpp \
+	convex/operators/powNewton.cpp \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
 	convex/operators/linearize.cpp \
@@ -379,10 +384,11 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
-	convex/generateCuts.cpp problem/problem.cpp \
-	problem/problemIO.cpp problem/constraint.cpp \
-	problem/tightenBounds.cpp problem/impliedBounds.cpp \
-	problem/readASLfg.cpp util/rootQ.c $(am__append_1)
+	convex/generateCuts.cpp convex/genColCuts.cpp \
+	problem/problem.cpp problem/problemIO.cpp \
+	problem/constraint.cpp problem/tightenBounds.cpp \
+	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
+	$(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -558,6 +564,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprGroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprInv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprLog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprMul-genCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprMul.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprOpp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprPow-envelope.Plo@am__quote@
@@ -586,6 +593,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprUnary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genColCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getFixVarBinFun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprDiv.Plo@am__quote@
@@ -595,6 +603,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linearize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nl2e.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/powNewton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problemIO.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readASLfg.Plo@am__quote@
@@ -899,6 +908,13 @@ conv-exprMul.lo: convex/operators/conv-exprMul.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprMul.lo `test -f 'convex/operators/conv-exprMul.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprMul.cpp
 
+conv-exprMul-genCuts.lo: convex/operators/conv-exprMul-genCuts.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprMul-genCuts.lo -MD -MP -MF "$(DEPDIR)/conv-exprMul-genCuts.Tpo" -c -o conv-exprMul-genCuts.lo `test -f 'convex/operators/conv-exprMul-genCuts.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprMul-genCuts.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/conv-exprMul-genCuts.Tpo" "$(DEPDIR)/conv-exprMul-genCuts.Plo"; else rm -f "$(DEPDIR)/conv-exprMul-genCuts.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprMul-genCuts.cpp' object='conv-exprMul-genCuts.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprMul-genCuts.lo `test -f 'convex/operators/conv-exprMul-genCuts.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprMul-genCuts.cpp
+
 conv-exprOpp.lo: convex/operators/conv-exprOpp.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprOpp.lo -MD -MP -MF "$(DEPDIR)/conv-exprOpp.Tpo" -c -o conv-exprOpp.lo `test -f 'convex/operators/conv-exprOpp.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprOpp.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/conv-exprOpp.Tpo" "$(DEPDIR)/conv-exprOpp.Plo"; else rm -f "$(DEPDIR)/conv-exprOpp.Tpo"; exit 1; fi
@@ -926,6 +942,13 @@ conv-exprPow-envelope.lo: convex/operators/conv-exprPow-envelope.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprPow-envelope.cpp' object='conv-exprPow-envelope.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprPow-envelope.lo `test -f 'convex/operators/conv-exprPow-envelope.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprPow-envelope.cpp
+
+powNewton.lo: convex/operators/powNewton.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT powNewton.lo -MD -MP -MF "$(DEPDIR)/powNewton.Tpo" -c -o powNewton.lo `test -f 'convex/operators/powNewton.cpp' || echo '$(srcdir)/'`convex/operators/powNewton.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/powNewton.Tpo" "$(DEPDIR)/powNewton.Plo"; else rm -f "$(DEPDIR)/powNewton.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/powNewton.cpp' object='powNewton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o powNewton.lo `test -f 'convex/operators/powNewton.cpp' || echo '$(srcdir)/'`convex/operators/powNewton.cpp
 
 conv-exprSub.lo: convex/operators/conv-exprSub.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprSub.lo -MD -MP -MF "$(DEPDIR)/conv-exprSub.Tpo" -c -o conv-exprSub.lo `test -f 'convex/operators/conv-exprSub.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprSub.cpp; \
@@ -1003,6 +1026,13 @@ generateCuts.lo: convex/generateCuts.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/generateCuts.cpp' object='generateCuts.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o generateCuts.lo `test -f 'convex/generateCuts.cpp' || echo '$(srcdir)/'`convex/generateCuts.cpp
+
+genColCuts.lo: convex/genColCuts.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT genColCuts.lo -MD -MP -MF "$(DEPDIR)/genColCuts.Tpo" -c -o genColCuts.lo `test -f 'convex/genColCuts.cpp' || echo '$(srcdir)/'`convex/genColCuts.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/genColCuts.Tpo" "$(DEPDIR)/genColCuts.Plo"; else rm -f "$(DEPDIR)/genColCuts.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/genColCuts.cpp' object='genColCuts.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o genColCuts.lo `test -f 'convex/genColCuts.cpp' || echo '$(srcdir)/'`convex/genColCuts.cpp
 
 problem.lo: problem/problem.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT problem.lo -MD -MP -MF "$(DEPDIR)/problem.Tpo" -c -o problem.lo `test -f 'problem/problem.cpp' || echo '$(srcdir)/'`problem/problem.cpp; \

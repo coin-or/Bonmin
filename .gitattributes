@@ -22,6 +22,7 @@ Couenne/src/convex/CouenneCutGenerator.cpp -text
 Couenne/src/convex/addEnvelope.cpp -text
 Couenne/src/convex/checkNLP.cpp -text
 Couenne/src/convex/createCuts.cpp -text
+Couenne/src/convex/genColCuts.cpp -text
 Couenne/src/convex/generateCuts.cpp -text
 Couenne/src/convex/operators/conv-exprAbs.cpp -text
 Couenne/src/convex/operators/conv-exprDiv.cpp -text
@@ -29,6 +30,7 @@ Couenne/src/convex/operators/conv-exprExp.cpp -text
 Couenne/src/convex/operators/conv-exprGroup.cpp -text
 Couenne/src/convex/operators/conv-exprInv.cpp -text
 Couenne/src/convex/operators/conv-exprLog.cpp -text
+Couenne/src/convex/operators/conv-exprMul-genCuts.cpp -text
 Couenne/src/convex/operators/conv-exprMul.cpp -text
 Couenne/src/convex/operators/conv-exprOpp.cpp -text
 Couenne/src/convex/operators/conv-exprPow-envelope.cpp -text
@@ -38,6 +40,7 @@ Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
 Couenne/src/convex/operators/linearize.cpp -text
+Couenne/src/convex/operators/powNewton.cpp -text
 Couenne/src/convex/operators/trigNewton.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/exprAux.cpp -text
