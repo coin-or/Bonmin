@@ -45,13 +45,13 @@ CouNumber rootQ (int k) {
   if (k==1) return - 0.5;
   else {
 
-    register CouNumber l = - 1.0 + 0.5 / k, 
-                    u = - 0.5,
-                    Ql = Q (k, l), Qu = Q (k, u), Qm,
-                    midpoint;
+    register CouNumber l  = - 1.0 + 0.5 / k, 
+                       u  = - 0.5,
+                       Ql = Q (k, l), Qu = Q (k, u), Qm,
+                       midpoint;
     do {
 
-      midpoint = 0.5 * (l+u);/* (- Ql * u + Qu * l) / (Qu - Ql); */
+      midpoint = 0.5 * (l+u); /* (- Ql * u + Qu * l) / (Qu - Ql); */
       Qm = Q (k, midpoint);
 
       /*      printf ("[%.4f, %.4f] --> %.4f: %.24f\n", l, u, midpoint, Qm); */
@@ -71,7 +71,7 @@ int main () {
   register int k;
   CouNumber x, q;
 
-  for (k=30; --k;) {
+  for (k=6; --k;) {
 
     printf ("root, %3d -> %.15f\n", 2*k+1, rootQ (k));
     /*

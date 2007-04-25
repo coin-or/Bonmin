@@ -91,9 +91,6 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       CouNumber lb = (*lbe) (),
 	        ub = (*ube) ();
 
-      lb = 1e-10;
-      ub = 7;
-
       delete lbe;
       delete ube;
 

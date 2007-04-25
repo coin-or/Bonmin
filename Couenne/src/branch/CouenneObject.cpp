@@ -77,11 +77,11 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
   //printf (" delta=%.9f,l=%.9f,u=%.9f ", delta, l, u);
 
   /// avoid branching on (relatively) small deltas
-  if ((delta < COUENNE_EPS)
-    ||
+  if (delta < COUENNE_EPS)
+    /*||
       (fabs (u-l) < COUENNE_EPS) ||
       ((mymin (fabs (l), fabs (u)) > COUENNE_EPS) && 
-      (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))
+      (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))*/
     //      ((mymin (fabs (lr), fabs (ur)) > COUENNE_EPS) && 
     //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
     delta = 0.;

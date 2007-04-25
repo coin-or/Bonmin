@@ -17,7 +17,7 @@
 #include <exprConst.h>
 
 
-// simplify power f(x) ^ g(x)
+/// simplify power f(x) ^ g(x)
 
 expression *exprPow::simplify () {
 
@@ -58,7 +58,7 @@ expression *exprPow::simplify () {
 }
 
 
-// differentiate power of expressions
+/// differentiate power of expressions
 
 expression *exprPow::differentiate (int index) {
 
@@ -97,19 +97,19 @@ expression *exprPow::differentiate (int index) {
 }
 
 
-// output
+/// output
 
 void exprPow::print (std::ostream& out) const
   {exprOp::print (out, "^", INSIDE);}
 
 
-// get a measure of "how linear" the expression is:
-//
-// ZERO      = 0: a zero
-// CONSTANT  = 1: a constant
-// LINEAR    = 2: linear
-// QUADRATIC = 3: quadratic
-// NONLINER  = 4: nonlinear non-quadratic
+/// get a measure of "how linear" the expression is:
+///
+/// ZERO      = 0: a zero
+/// CONSTANT  = 1: a constant
+/// LINEAR    = 2: linear
+/// QUADRATIC = 3: quadratic
+/// NONLINER  = 4: nonlinear non-quadratic
 
 int exprPow::Linearity () {
 

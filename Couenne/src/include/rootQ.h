@@ -43,6 +43,8 @@ class Qroot {
     std::map <int, CouNumber>:: iterator pos;
     CouNumber root;
 
+    k /= 2; // becomes true index
+
     if ((pos = Qmap.find (k)) == Qmap.end()) {
 
       std::pair <int, CouNumber> newpair;
