@@ -160,7 +160,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if (objInd >= 0) {
 
-      CouNumber bestObj = babInfo -> babPtr() -> model() -> getObjValue();
+      CouNumber bestObj = babInfo -> babPtr() -> model().getObjValue();
       
       // Bonmin assumes minimization. Bonmin::Bab::bestObj () should
       // be considered an UPPER bound.
