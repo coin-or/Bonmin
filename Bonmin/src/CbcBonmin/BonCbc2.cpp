@@ -20,6 +20,8 @@
 
 #include "CbcBranchUser.hpp"
 
+// sets cutoff a bit above real one, to avoid single-point feasible sets
+#define CUTOFF_TOL 1e-6
 
 // Code to enable user interuption
 static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
@@ -233,7 +235,7 @@ namespace Bonmin
     
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
     
-    model_.setCutoff(s.getDoubleParameter(BabSetupBase::Cutoff));
+    model_.setCutoff(s.getDoubleParameter(BabSetupBase::Cutoff) + CUTOFF_TOL);
     
     model_.setDblParam(CbcModel::CbcAllowableGap, s.getDoubleParameter(BabSetupBase::AllowableGap));
     model_.setDblParam(CbcModel::CbcAllowableFractionGap, s.getDoubleParameter(BabSetupBase::AllowableFractionGap));
