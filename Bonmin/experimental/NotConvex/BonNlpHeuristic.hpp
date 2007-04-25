@@ -37,7 +37,7 @@ public:
     void setNlp(OsiSolverInterface &nlp, bool cloneNlp = true);
     
     /** set the couenne problem to use.*/
-    void setCouenneProblem(CouenneProblem &);
+    void setCouenneProblem(CouenneProblem *);
     /** Does nothing. */
     virtual void resetModel(CbcModel * model){}
     /** Run heuristic, return 1 if a better solution than the one passed is found and 0 otherwise.

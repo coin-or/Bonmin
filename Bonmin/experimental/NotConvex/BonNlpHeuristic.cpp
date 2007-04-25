@@ -80,8 +80,8 @@ namespace Bonmin{
   }
   
   void
-  NlpSolveHeuristic::setCouenneProblem(CouenneProblem & couenne){
-    couenne_ = &couenne;}
+  NlpSolveHeuristic::setCouenneProblem(CouenneProblem * couenne){
+    couenne_ = couenne;}
   int
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();

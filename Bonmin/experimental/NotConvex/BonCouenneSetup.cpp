@@ -38,7 +38,7 @@ namespace Bonmin{
     
     /* Initialize Couenne cut generator.*/
     CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg, true, CURRENT_ONLY,1);
-    const CouenneProblem * couenneProb = couenneCg -> Problem();
+    CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
     
@@ -113,6 +113,7 @@ namespace Bonmin{
     {
       NlpSolveHeuristic * nlpHeuristic = new NlpSolveHeuristic;
       nlpHeuristic->setNlp(*ci,false);
+      nlpHeuristic->setCouenneProblem(couenneProb);
       nlpHeuristic->setMaxNlpInf(1e10);
       heuristics_.push_back(nlpHeuristic);
     }
