@@ -11,6 +11,7 @@
 #define BonCbc2_H
 
 #include "BonBabSetupBase.hpp"
+#include "CbcModel.hpp"
 
 namespace Bonmin{
   
@@ -70,10 +71,16 @@ public:
     (replace with user set). This is called after CbcModel::findIntegers */
   virtual void replaceIntegers(OsiObject ** objects, int numberObjects)
   {};
-  /** Get pointer to current model. */
-  CbcModel * model(){
+  /** Get cbc model used to solve. */
+  const CbcModel&  model() const{
     return model_;
   }
+
+  /** Get cbc model used to solve. */
+  const CbcModel&  model(){
+    return model_;
+  }
+  
 protected:
     /** Stores the solution of MIP. */
     double * bestSolution_;
@@ -89,8 +96,8 @@ protected:
   int numNodes_;
   /** get total number of iterations in last mip solved.*/
   int mipIterationCount_;
-  /** Pointer to model currently solved.*/
-  CbcModel * model_;
+  /** CbcModel used to solve problem.*/
+  CbcModel model_;
 };
 }
 #endif
