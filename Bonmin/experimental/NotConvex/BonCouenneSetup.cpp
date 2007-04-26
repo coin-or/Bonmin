@@ -100,7 +100,7 @@ namespace Bonmin{
       for(int i = 0 ; i < nobj ; i++){
        	delete objects[i];
       }
-      delete objects;
+      delete [] objects;
     }
     
     //Setup Convexifier generators
