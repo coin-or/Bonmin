@@ -70,30 +70,8 @@ algo_(other.algo_){
                                "B-Hyb","hybrid outer approximation based branch-and-cut.",
                                "This will preset some of the options of bonmin depending on the algorithm choice."
                                );
-    
-    roptions->SetRegisteringCategory("bonmin options: Branching strategies options");
-    roptions->AddStringOption2("sos_constraints",
-                               "Wether or not to activate SOS constraints.",
-                               "enable",
-                               "enable","",
-                               "disable","",
-                               "(only type 1 SOS are supported at the moment)");
-    
-    roptions->AddStringOption9("varselect_stra",
-                               "Chooses variable selection strategy",
-                               "strong-branching",
-                               "most-fractional", "Choose most fractional variable",
-                               "strong-branching", "Perform strong branching",
-                               "reliability-branching", "Use reliability branching",
-                               "curvature-estimator", "Use curvature estimation to select branching variable",
-                               "qp-strong-branching", "Perform strong branching with QP approximation",
-                               "lp-strong-branching", "Perform strong branching with LP approximation",
-                               "nlp-strong-branching", "Perform strong branching with NLP approximation",
-                               "osi-simple", "Osi method to do simple branching",
-                               "osi-strong", "Osi method to do strong branching","");
-    
-    
   }
+  
   /** Register all the Bonmin options.*/
   void 
   BonminSetup::registerOptions(){
@@ -321,8 +299,10 @@ algo_(other.algo_){
     }
     else if(varSelection == OsiTMINLPInterface::LP_STRONG_BRANCHING){
       continuousSolver_->findIntegersAndSOS(false);
+      int numEcpStrong;
+        options_->GetIntegerValue("number_ecp_rounds_strong",numEcpStrong,"bonmin.");
       LpStrongBranching * choose = new LpStrongBranching(nonlinearSolver_);
-      choose->setMaxCuttingPlaneIter(intParam_[BabSetupBase::NumEcpRoundsStrong]);
+      choose->setMaxCuttingPlaneIter(numEcpStrong);
       branchingMethod_ = choose;
     }
     else if(varSelection == OsiTMINLPInterface::NLP_STRONG_BRANCHING){

@@ -22,7 +22,6 @@ namespace Bonmin{
   0 /* MaxInfeasible*/,
   5 /*NumberStrong*/,
   2 /* MinReliability*/,
-  1 /*NumEcpRoundsStrong*/,
   INT_MAX /* MaxNodes*/,
   INT_MAX /* MaxSolutions*/,
   INT_MAX /* MaxIterations*/,
@@ -185,7 +184,6 @@ BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options){
   options->GetIntegerValue("max_consecutive_infeasible",intParam_[MaxInfeasible],"bonmin.");
   options->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin.");
   options->GetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.");
-  options->GetIntegerValue("number_ecp_rounds_strong",intParam_[NumEcpRoundsStrong],"bonmin.");
   options->GetIntegerValue("node_limit",intParam_[MaxNodes],"bonmin.");
   options->GetIntegerValue("solution_limit",intParam_[MaxSolutions],"bonmin.");
   options->GetIntegerValue("iteration_limit",intParam_[MaxIterations],"bonmin.");
@@ -214,7 +212,7 @@ BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options){
   }
   else if(varSelection == OsiTMINLPInterface::RELIABILITY_BRANCHING){
     intParam_[MinReliability] = 10;
-  } 
+  }
 }
 
 void 
@@ -334,6 +332,26 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "If set to \"fathom\", the algorithm will fathom the node when Ipopt fails to find a solution to the nlp "
                              "at that node whithin the specified tolerances. "
                              "The algorithm then becomes a heuristic, and the user will be warned that the solution might not be optimal.");
+  
+  roptions->AddStringOption2("sos_constraints",
+                             "Wether or not to activate SOS constraints.",
+                             "enable",
+                             "enable","",
+                             "disable","",
+                             "(only type 1 SOS are supported at the moment)");
+  
+  roptions->AddStringOption9("varselect_stra",
+                             "Chooses variable selection strategy",
+                             "strong-branching",
+                             "most-fractional", "Choose most fractional variable",
+                             "strong-branching", "Perform strong branching",
+                             "reliability-branching", "Use reliability branching",
+                             "curvature-estimator", "Use curvature estimation to select branching variable",
+                             "qp-strong-branching", "Perform strong branching with QP approximation",
+                             "lp-strong-branching", "Perform strong branching with LP approximation",
+                             "nlp-strong-branching", "Perform strong branching with NLP approximation",
+                             "osi-simple", "Osi method to do simple branching",
+                             "osi-strong", "Osi method to do strong branching","");
   
 }
 

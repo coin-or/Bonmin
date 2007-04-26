@@ -58,7 +58,6 @@ public:
       before fathoming.*/,
       NumberStrong /** Number of candidates for strong branching.*/,
       MinReliability /** Minimum reliability before trust pseudo-costs.*/,
-      NumEcpRoundsStrong /** Number of cutting plane iterations in lp strong branching.*/,
       MaxNodes /** Global node limit.*/,
       MaxSolutions /** limit on number of integer feasible solution.*/,
       MaxIterations /** Global iteration limit. */,

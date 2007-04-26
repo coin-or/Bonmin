@@ -14,6 +14,7 @@
 #include "CouenneObject.hpp"
 #include "CouenneChooseVariable.hpp"
 #include "BonAuxInfos.hpp"
+#include "BonCbcNode.hpp"
 
 
 #include "asl.h"
@@ -144,6 +145,8 @@ void CouenneSetup::registerOptions(){
 void
   CouenneSetup::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
     BabSetupBase::registerAllOptions(roptions);
+    BonCbcFullNodeInfo::registerOptions(roptions);
+
     roptions->SetRegisteringCategory("Couenne options");
     
     roptions->AddLowerBoundedIntegerOption("convexification_cuts",
