@@ -12,7 +12,20 @@
 
 struct ASL;
 
+
+
 namespace Bonmin{
+  
+  class SmartAsl : public Ipopt::ReferencedObject{
+public:
+    ASL * asl;
+    SmartAsl():
+      Ipopt::ReferencedObject(),
+      asl(NULL)
+    {}
+    virtual ~SmartAsl();
+  };
+  
   class CouenneSetup : public BabSetupBase{
 public:
     /** Default constructor*/
@@ -43,7 +56,7 @@ public:
       if(readOptions_) return;
       BabSetupBase::readOptionsFile("couenne.opt");}
 private:
-      ASL * aslfg_;
+      SmartPtr<SmartAsl> aslfg_;
   };
   
 }

@@ -21,11 +21,13 @@
 
 namespace Bonmin{
   
-  CouenneSetup::~CouenneSetup(){
-    if(aslfg_ != NULL)
-      ASL_free(&aslfg_);
+  SmartAsl::~SmartAsl(){
+    if(asl != NULL)
+      ASL_free(&asl);
   }
   
+  CouenneSetup::~CouenneSetup(){
+  }
   
   void CouenneSetup::InitializeBonmin(char **& argv){
     /* Get the basic options. */
@@ -42,11 +44,12 @@ namespace Bonmin{
     nonlinearSolver_ = ci;
     /* Read the model in various places. */
     ci->readAmplNlFile(argv,roptions(),options(),journalist());
-    aslfg_ = readASLfg (argv);
+    aslfg_ = new SmartAsl;
+    aslfg_->asl = readASLfg (argv);
     
     
     /* Initialize Couenne cut generator.*/
-    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg_, true, CURRENT_ONLY,1);
+    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg_->asl, true, CURRENT_ONLY,1);
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
