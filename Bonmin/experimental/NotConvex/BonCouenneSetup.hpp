@@ -10,22 +10,27 @@
 #define BonCouenneSetup_H
 #include "BonBabSetupBase.hpp"
 
+struct ASL;
+
 namespace Bonmin{
   class CouenneSetup : public BabSetupBase{
 public:
     /** Default constructor*/
     CouenneSetup():
-    BabSetupBase(){}
+    BabSetupBase(),
+    aslfg_(NULL){}
     
     /** Copy constructor.*/
     CouenneSetup(const CouenneSetup& other):
-      BabSetupBase(other){}
+      BabSetupBase(other),
+      aslfg_(NULL){}
     
     /** virtual copy constructor.*/
     virtual BabSetupBase * clone() const{
       return new CouenneSetup(*this);
     }
-
+    
+    virtual ~CouenneSetup();
     /** Initialize from command line arguments.*/
     void InitializeBonmin(char **& argv);
     /** register the options */
@@ -37,6 +42,8 @@ public:
     virtual void readOptionsFile(){
       if(readOptions_) return;
       BabSetupBase::readOptionsFile("couenne.opt");}
+private:
+      ASL * aslfg_;
   };
   
 }

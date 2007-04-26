@@ -8,7 +8,6 @@
 // Date : 04/18/2007
 
 #include "BonCouenneSetup.hpp"
-#include "BonBonminSetup.hpp"
 #include "BonNlpHeuristic.hpp"
 #include "BonCouenneInterface.hpp"
 
@@ -16,7 +15,18 @@
 #include "CouenneChooseVariable.hpp"
 #include "BonAuxInfos.hpp"
 
+
+#include "asl.h"
+#include "getstub.h"
+
 namespace Bonmin{
+  
+  CouenneSetup::~CouenneSetup(){
+    if(aslfg_ != NULL)
+      ASL_free(&aslfg_);
+  }
+  
+  
   void CouenneSetup::InitializeBonmin(char **& argv){
     /* Get the basic options. */
     readOptionsFile();
@@ -32,11 +42,11 @@ namespace Bonmin{
     nonlinearSolver_ = ci;
     /* Read the model in various places. */
     ci->readAmplNlFile(argv,roptions(),options(),journalist());
-    ASL * aslfg = readASLfg (argv);
+    aslfg_ = readASLfg (argv);
     
     
     /* Initialize Couenne cut generator.*/
-    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg, true, CURRENT_ONLY,1);
+    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg_, true, CURRENT_ONLY,1);
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
@@ -130,7 +140,7 @@ void CouenneSetup::registerOptions(){
 
 void
   CouenneSetup::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-    BonminSetup::registerAllOptions(roptions);
+    BabSetupBase::registerAllOptions(roptions);
     roptions->SetRegisteringCategory("Couenne options");
     
     roptions->AddLowerBoundedIntegerOption("convexification_cuts",
