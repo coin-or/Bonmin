@@ -90,16 +90,16 @@ namespace Bonmin
   Bab2::branchAndBound(BabSetupBase & s)
   {
     /* Put a link to this into solver.*/
-    OsiBabSolver *  babInfo = dynamic_cast<OsiBabSolver *>(s.linearSolver()->getAuxiliaryInfo());
+    OsiBabSolver *  babInfo = dynamic_cast<OsiBabSolver *>(s.continuousSolver()->getAuxiliaryInfo());
     Bonmin::BabInfo bonBabInfo(*babInfo);
     bonBabInfo.setBabPtr(this);
-    s.linearSolver()->setAuxiliaryInfo(&bonBabInfo);
-    OsiSolverInterface * solver = s.linearSolver()->clone();
+    s.continuousSolver()->setAuxiliaryInfo(&bonBabInfo);
+    OsiSolverInterface * solver = s.continuousSolver()->clone();
     model_.assignSolver(solver, true);
     
     
-    if(s.linearSolver()->objects()!=NULL){
-      model_.addObjects(s.linearSolver()->numberObjects(),s.linearSolver()->objects());
+    if(s.continuousSolver()->objects()!=NULL){
+      model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
     }
     
     
@@ -143,7 +143,7 @@ namespace Bonmin
         
     bool ChangedObject = false;
     //Pass over user set branching priorities to Cbc
-    if(s.linearSolver()->objects()==NULL)
+    if(s.continuousSolver()->objects()==NULL)
     {
       const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
       //set priorities, prefered directions...

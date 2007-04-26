@@ -48,14 +48,15 @@ OsiTMINLPInterface(other), amplTminlp_(NULL)
   }
 
 
-void AmplInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+void AmplInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
                                    Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                                   Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                                   Ipopt::SmartPtr<Ipopt::Journalist> journalist,
                                    std::string* nl_file_content /* = NULL*/
                                    )
 {
   if(!IsValid(app_)){
-    createApplication(journalist, options, roptions);}
+    createApplication(roptions, options, journalist);
+  }
   // set the default options... expect_infeasible, etc...
   if (!IsValid(tminlp_)) {
     amplTminlp_ = new AmplTMINLP(Ipopt::ConstPtr(app_->Jnlst()), app_->Options(), argv,
@@ -92,15 +93,6 @@ void AmplInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journal
     (Ipopt::SmartPtr<TNLP>(Ipopt::GetRawPtr(problem_)));
   
 }
-  /** Read an ampl . nl file from the given filename */
-  void
-  AmplInterface::readAmplNlFile(char**& argv,
-                                BasicSetup &b,
-      std::string* nl_file_content /* = NULL */)
-  {
-    readAmplNlFile(argv, b.journalist(), b.options(), b.roptions());
-  }
-
 
 void 
 AmplInterface::setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options)

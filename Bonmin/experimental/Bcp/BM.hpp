@@ -210,8 +210,7 @@ public:
 #include "BonOACutGenerator2.hpp"
 
 #include "BCP_lp_user.hpp"
-#include "BonAmplInterface.hpp"
-#include "BonTMINLP.hpp"
+#include "BonAmplSetup.hpp"
 
 class BM_lp : public BCP_lp_user
 {
@@ -220,8 +219,9 @@ class BM_lp : public BCP_lp_user
     BCP_parameter_set<BM_par> par;
 
     OsiBabSolver babSolver_;
-    Bonmin::AmplInterface nlp_;
-    Bonmin::BonminCbcParam minlpParams_;
+    /** PIERRE: This contains the setup for running Bonmin in particular nlp solver, continuous solver,
+      cut generators,...*/
+    Bonmin::BonminAmplSetup bonmin_;
 
     CoinWarmStart* ws_;
     OsiChooseVariable* chooseVar_;
@@ -232,6 +232,7 @@ class BM_lp : public BCP_lp_user
     double integerTolerance_;
     double cutOffDecrement_;
 
+#if 0
     /* A couple of cut generators to be used in the hybrid method */
     CglGomory miGGen_;
     CglProbing probGen_;
@@ -241,7 +242,7 @@ class BM_lp : public BCP_lp_user
     Bonmin::EcpCuts ecpGen_;
     Bonmin::OACutGenerator2 oaDec_;
     Bonmin::OaFeasibilityChecker feasCheck_;
-
+#endif
     /* FIXME: gross cheating. works only for serial mode. Store the warmstart
        informations in the lp process, do not send them over in user data or
        anywhere. MUST be fixed. The map is indexed by the node index. */

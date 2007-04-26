@@ -83,9 +83,9 @@ public:
     BabSetupBase();
     
     /** Construct from existing tminlp. */
-    BabSetupBase(BasicSetup& b, Ipopt::SmartPtr<TMINLP> tminlp);
+    BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp);
     /** Construct from existing application.*/
-    BabSetupBase(BasicSetup& b, Ipopt::SmartPtr<TNLPSolver> app);
+    BabSetupBase(Ipopt::SmartPtr<TNLPSolver> app);
     /** Construct from existing TMINLP interface.*/
     BabSetupBase(const OsiTMINLPInterface& nlp);
 
@@ -99,30 +99,54 @@ public:
     /** Virtual destructor. */
     virtual ~BabSetupBase();
     
-    /** Initialize from existing TMINLP interface (containing the options).*/
-    void initialize(const OsiTMINLPInterface& nlp);
-    /** Read options and initialize setup according to them using model in TMINLP.*/
-    void initialize(Ipopt::SmartPtr<TMINLP> tminlp );
-    
-    /** @name Methods to instantiate: Registering and retrieving options and initializing everything. */
+    /** @name Methods to initialize algorithm with various inputs. */
+    /** @{ */
+    /** use existing TMINLP interface (containing the options).*/
+    void use(const OsiTMINLPInterface& nlp);
+    /** Read options (if not done before) and create interface using tminlp.*/
+    void use(Ipopt::SmartPtr<TMINLP> tminlp );
+    /** Set the non-linear solver used */
+    void setNonlinearSolver(OsiTMINLPInterface * s){
+      nonlinearSolver_ = s;}
+    /** @} */
+
+    /** @name Methods to manipulate options. */
     /** @{ */
     /** Register all the options for this algorithm instance.*/
-    virtual void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    virtual void registerOptions();
     /** Setup the defaults options for this algorithm. */
     virtual void setBabDefaultOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions) {}
-    /** Read options and initialize algorithm according to them.*/
-    virtual void initialize(OsiTMINLPInterface *);
     /** Register all the options for this algorithm instance.*/
     static void registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
 
-    /** Get the basic options if don't already have them.*/
-    virtual void defaultBasicOptions() = 0;
+    /** Get the options from default text file (bonmin.opt) if don't already have them.*/
+    virtual void readOptionsFile(){
+      if(readOptions_) return;
+      readOptionsFile("bonmin.opt");}
     
+    /** Get the options from given fileName */
+      void readOptionsFile(std::string fileName);
+    
+    /** Get the options from long string containing all.*/
+    void readOptionsString(std::string opt_string);
+    
+    /** Get the options from stream.*/
+    void readOptionsStream(std::istream& is);
+    
+    /** May print documentation of options if options print_options_documentation is set to yes.*/
+    void mayPrintDoc();
+    
+
     /** Set the value for options, output...*/
-    void setBasicOptions(BasicSetup &b){
-      options_ = b.options();
-      roptions_ = b.roptions();
-      journalist_ = b.journalist();}
+    void setOptionsAndJournalist(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                                 Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                                 Ipopt::SmartPtr<Ipopt::Journalist> journalist){
+      options_ = options;
+      roptions_ = roptions;
+      journalist_ = journalist;}
+    
+    /** Initialize the options and the journalist.*/
+    void initializeOptionsAndJournalist();
     /** @} */
     
     /** @name Elements of the branch-and-bound setup.*/
@@ -131,8 +155,8 @@ public:
     OsiTMINLPInterface * nonlinearSolver()
     {return nonlinearSolver_;}
     /** Pointer to the continuous solver to use for relaxations. */
-    OsiSolverInterface * linearSolver()
-    { return linearSolver_;}
+    OsiSolverInterface * continuousSolver()
+    { return continuousSolver_;}
     /** list of cutting planes methods to apply with their frequencies. */
     CuttingMethods& cutGenerators()
     { return cutGenerators_;}
@@ -153,14 +177,10 @@ public:
     {return doubleParam_[p];}
     /** @} */
     
-    void setNonlinearSolver(OsiTMINLPInterface * s){
-      nonlinearSolver_ = s;}
-    
     /** Get the values of base parameters from the options stored.*/
     void gatherParametersValues(){
       gatherParametersValues(options_);
     }
-    
     /** Get the values of the base parameters from the passed options.*/
     void gatherParametersValues(Ipopt::SmartPtr<OptionsList> options);
     /** Acces storage of Journalist for output */
@@ -185,7 +205,7 @@ protected:
     /** Storage of the non-linear solver used.*/
     OsiTMINLPInterface * nonlinearSolver_;
     /** Storage of continuous solver.*/
-    OsiSolverInterface * linearSolver_;
+    OsiSolverInterface * continuousSolver_;
     /** Cut generation methods. */
     CuttingMethods cutGenerators_;
     /** Heuristic methods. */
@@ -203,6 +223,8 @@ protected:
     
     /** Registered Options */
     Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions_;
+    /** flag to say if option file was read.*/
+    bool readOptions_;
     
   };
 }/* End namespace Bonmin. */

@@ -68,25 +68,26 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     
     /* Get the basic options. */
     Bonmin::BonminAmplSetup bonmin;
+    bonmin.readOptionsFile(par.entry(BM_par::IpoptParamfile).c_str());
     bonmin.initializeBonmin(argv);    
     
     Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
     
     free(argv[1]);
-    nlpSolver.extractInterfaceParams();
-  
-    OsiClpSolverInterface clp;
-    int addObjVar = minlpParams_.algo == 0 /* pure B&B */ ? 0 : 1;
-    nlpSolver.extractLinearRelaxation(clp, addObjVar);
+    
+    OsiSolverInterface& clp  = *bonmin.continuousSolver();
+    
     const int numCols = clp.getNumCols();
     const int numRows = clp.getNumRows();
 
     double* obj = new double[numCols];
-    if (minlpParams_.algo == 0 /* pure B&B */) {
-	CoinFillN(obj, numCols, 0.0);
+    if (bonmin.getAlgorithm() == Bonmin::B_BB /* pure B&B */) {
+      std::cout<<"Doing branch and bound"<<std::endl;
+      CoinFillN(obj, numCols, 0.0);
     }
     else {
-	CoinDisjointCopyN(clp.getObjCoefficients(), numCols, obj);
+      std::cout<<"Doing hybrid"<<std::endl;
+      CoinDisjointCopyN(clp.getObjCoefficients(), numCols, obj);
     }
 
     vars.reserve(numCols);
@@ -100,7 +101,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
 	    vars.push_back(new BCP_var_core(type, obj[i], clb[i], cub[i]));
 	}
 
-    if (minlpParams_.algo == 0 /* pure B&B */) {
+    if (bonmin.getAlgorithm() == Bonmin::B_BB /* pure B&B */) {
 	// Just fake something into the core matrix. In this case: 0 <= 1
 	BCP_vec<double> OBJ(obj, numCols);
 	BCP_vec<double> CLB(clb, numCols);
@@ -164,9 +165,8 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
   Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
   minlpParams_.extractParams(&nlpSolver);
   free(argv[1]);
-  OsiClpSolverInterface clp;
-  int addObjVar = minlpParams_.algo == 0 /* pure B&B */ ? 0 : 1;
-  nlpSolver.extractLinearRelaxation(clp, addObjVar);
+  OsiSolverInterface& clp = *bonmin.continuousSolver();
+
   const int numCols = clp.getNumCols();
 
   int i;

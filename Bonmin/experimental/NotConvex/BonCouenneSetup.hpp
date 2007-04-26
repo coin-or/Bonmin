@@ -6,7 +6,9 @@
 // Pierre Bonami, International Business Machines Corporation
 //
 // Date : 04/18/2007
-#include "BonAmplSetup.hpp"
+#ifndef BonCouenneSetup_H
+#define BonCouenneSetup_H
+#include "BonBabSetupBase.hpp"
 
 namespace Bonmin{
   class CouenneSetup : public BabSetupBase{
@@ -26,21 +28,16 @@ public:
 
     /** Initialize from command line arguments.*/
     void InitializeBonmin(char **& argv);
-    
+    /** register the options */
+    virtual void registerOptions();
     /** Register all Couenne options.*/
     static void registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
     
     /** Get the basic options if don't already have them.*/
-    virtual void defaultBasicOptions(){
-      if(GetRawPtr(options_) != NULL && GetRawPtr(roptions_) != NULL &&  GetRawPtr(journalist_) != NULL) return;
-      BasicSetup b;
-      Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = b.roptions();
-      CouenneSetup::registerAllOptions(roptions);
-      b.Initialize("couenne.opt");
-      options_ = b.options();
-      roptions_ = b.roptions();
-      journalist_ = b.journalist();}
+    virtual void readOptionsFile(){
+      if(readOptions_) return;
+      BabSetupBase::readOptionsFile("couenne.opt");}
   };
   
 }
-
+#endif

@@ -4,17 +4,8 @@
 //
 // Authors :
 // Laszlo Ladanyi, International Business Machines Corporation
-//
 
-// (C) Copyright International Business Machines Corporation 2006, 2007
-// All Rights Reserved.
-// This code is published under the Common Public License.
-//
-// Authors :
-// Laszlo Ladanyi, International Business Machines Corporation
-// Pierre Bonami, Carnegie Mellon University
 
-#include "BonCbc.hpp"
 #include "BM.hpp"
 
 #include "BonAmplSetup.hpp"
@@ -81,15 +72,17 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     std::string ipopt_content(ipopt_file_content.c_str());
     std::string nl_content(nl_file_content.c_str());
 
-    Bonmin::BonminAmplSetup::fillOsiInterface(nlp_, argv, ipopt_content, nl_content);
+    /* PIERRE create the setup for algorithm, last argument indicates that continuous relaxation
+      should not be created.*/
+    bonmin_.initializeBonmin(argv, ipopt_content, nl_content, false);
+    bonmin_.nonlinearSolver()->Set_expose_warm_start(true);
+    babSolver_.setSolver(bonmin_.nonlinearSolver());
+
+
     
     free(argv[1]);
-
-    nlp_.extractInterfaceParams();
-    minlpParams_.extractParams(&nlp_);
-
     if (! get_param(BCP_lp_par::MessagePassingIsSerial) &&
-	minlpParams_.algo == 0 /* pure B&B */ &&
+	bonmin_.getAlgorithm() == 0 /* pure B&B */ &&
 	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
 	printf("\
 BM: WarmStartFromParent is not supported for pure B&B in parallel env.\n");
@@ -99,16 +92,18 @@ BM: Switching to WarmStartFromRoot.\n");
     }
 
     /* synchronize bonmin & BCP parameters */
-    Ipopt::SmartPtr<Ipopt::OptionsList> options = nlp_.options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> options = bonmin_.options();
 
+    /* PIERRE This should be already done with new code.
     int nlpLogLevel;
     options->GetIntegerValue("nlp_log_level", nlpLogLevel, "bonmin.");
     nlp_.messageHandler()->setLogLevel(nlpLogLevel);
-
-    double bm_intTol;
-    double bm_cutoffIncr; // could be negative
-    options->GetNumericValue("integer_tolerance",bm_intTol,"bonmin.");
-    options->GetNumericValue("cutoff_decr",bm_cutoffIncr,"bonmin.");
+*/
+    /** update getting options directly from setup*/
+    double bm_intTol = bonmin_.getDoubleParameter(BabSetupBase::IntTol);
+    double bm_cutoffIncr = bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr); // could be negative
+//PIERRE deprecated    options->GetNumericValue("integer_tolerance",bm_intTol,"bonmin.");
+//PIERRE deprecated    options->GetNumericValue("cutoff_decr",bm_cutoffIncr,"bonmin.");
 
     BCP_lp_prob* bcp_lp = getLpProblemPointer();
     const double bcp_intTol = bcp_lp->par.entry(BCP_lp_par::IntegerTolerance);
@@ -133,9 +128,13 @@ BM: Switching to WarmStartFromRoot.\n");
 
     /* Store a few options in local variables */
 
-    options->GetNumericValue("integer_tolerance", integerTolerance_,"bonmin.");
-    options->GetNumericValue("cutoff_decr", cutOffDecrement_,"bonmin.");
-
+    /** update getting options directly from setup*/
+    double integerTolerance_ = bonmin_.getDoubleParameter(BabSetupBase::IntTol);
+    double cutOffDecrement_ = bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr); 
+    
+    //PIERRE deprecated    options->GetNumericValue("integer_tolerance",integerTolerance_,"bonmin.");
+    //PIERRE deprecated    options->GetNumericValue("cutoff_decr",cutOffDecrement_,"bonmin.");
+    
     // Getting the options for the choose variable object
     if (!options->GetEnumValue("varselect_stra",varselect_,"bonmin.")) {
       // For Bcp, we change the default to most-fractional for now
@@ -149,7 +148,7 @@ BM: Switching to WarmStartFromRoot.\n");
 
 
     /* If pure BB is selected then a number of BCP parameters are changed */
-    if (minlpParams_.algo == 0 /* pure B&B */) {
+    if (bonmin_.getAlgorithm() == 0 /* pure B&B */) {
 	/* disable strong branching */
 	bcp_lp->par.set_entry(BCP_lp_par::MaxPresolveIter, -1);
 	/* disable a bunch of printing, all of which are meaningless, since the
@@ -165,6 +164,7 @@ BM: Switching to WarmStartFromRoot.\n");
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_RowEffectivenessCount, false);
 	//  bcp_lp->par.set_entry(BCP_lp_par::LpVerb_FathomInfo, false);
     } else {
+#if 0 // Pierre cut generators have already been initialized
 	/* for hybrid: initialize the cut generators */
 
 	/* NOTE:
@@ -202,21 +202,33 @@ BM: Switching to WarmStartFromRoot.\n");
 					oaDec_, localSearchSolver,
 					feasCheck_, NULL
 					);
+#else
+  //Check if OA decomposition is in cut generators and remove it
+    for(BabSetupBase::CuttingMethods::iterator i = bonmin_.cutGenerators().begin() ; 
+        i != bonmin_.cutGenerators().end() ; i++){
+      OACutGenerator2 * oaDec = dynamic_cast<OACutGenerator2 *> (i->cgl);
+      if(oaDec)//Disable it
+      {
+        i->frequency = 0;
+      }
+    }
+#endif
     }
 
     /* extract the sos constraints */
-    const Bonmin::TMINLP::SosInfo * sos = nlp_.model()->sosConstraints();
+Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
+const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
     
     int i;
-    const int numCols = nlp_.getNumCols();
-    const double* clb = nlp_.getColLower();
-    const double* cub = nlp_.getColUpper();
+    const int numCols = nlp.getNumCols();
+    const double* clb = nlp.getColLower();
+    const double* cub = nlp.getColUpper();
 
     /* Find first the integer variables and then the SOS constraints */
     int nObj = 0;
     OsiObject** osiObj = new OsiObject*[numCols + sos->num];
     for (i = 0; i < numCols; ++i) {
-	if (nlp_.isInteger(i)) {
+	if (nlp.isInteger(i)) {
 	    osiObj[nObj++] = new OsiSimpleInteger(i, clb[i], cub[i]);
 	}
     }
@@ -232,18 +244,18 @@ BM: Switching to WarmStartFromRoot.\n");
 	osiObj[nObj++] = so;
 	
     }
-    nlp_.addObjects(nObj, osiObj);
+    nlp.addObjects(nObj, osiObj);
     for (i = 0; i < nObj; ++i) {
 	delete osiObj[i];
     }
     delete[] osiObj;
 
     /* just to be on the safe side... always allocate */
-    primal_solution_ = new double[nlp_.getNumCols()];
+    primal_solution_ = new double[nlp.getNumCols()];
 
     /* solve the initial nlp to get warmstart info in the root */
-    nlp_.initialSolve();
-    ws_ = nlp_.getWarmStart();
+    nlp.initialSolve();
+    ws_ = nlp.getWarmStart();
     if (get_param(BCP_lp_par::MessagePassingIsSerial) &&
 	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
 	warmStart[0] = ws_;

@@ -35,14 +35,11 @@ class CouenneInterface : public AmplInterface
   /** Destructor. */
   virtual ~CouenneInterface();
 
-  
-  /** read ampl file*/
-  virtual void readAmplNlFile(char **& argv, Bonmin::BasicSetup & b);
-  
+    
   /** read ampl file using inputed options, journalist....*/
-  virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+  virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
                               Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                              Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+                              Ipopt::SmartPtr<Ipopt::Journalist> journalist);
   
   /** \name Overloaded methods to build outer approximations */
   //@{

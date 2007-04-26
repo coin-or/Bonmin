@@ -52,9 +52,9 @@ public:
 
 
   /// Constructor with passed journalist, roptions, options.
-  FilterSolver(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
-               Ipopt::SmartPtr<Ipopt::OptionsList> options,
-               Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
+FilterSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+             Ipopt::SmartPtr<Ipopt::OptionsList> options,
+             Ipopt::SmartPtr<Ipopt::Journalist> journalist
                );
 
   ///destructor

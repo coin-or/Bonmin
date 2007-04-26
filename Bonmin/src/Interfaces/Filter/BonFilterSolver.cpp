@@ -278,9 +278,9 @@ FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
   }
 }
 
-FilterSolver::FilterSolver(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+FilterSolver::FilterSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
                            Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                           Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions):
+                           Ipopt::SmartPtr<Ipopt::Journalist> journalist):
 
     journalist_(journalist),
     options_(options),

@@ -26,9 +26,15 @@
 #include "BonTNLP2FPNLP.hpp"
 #include "BonTNLPSolver.hpp"
 #include "BonCutStrengthener.hpp"
-#include "BonBasicSetup.hpp"
 
 namespace Bonmin {
+  
+  /** Solvers for solving nonlinear programs.*/
+  enum Solver{
+    Ipopt=0 /** <a href="http://projects.coin-or.org/Ipopt">
+    Ipopt </a> interior point algorithm.*/,
+    FilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/
+  };
 /**
    This is class provides an Osi interface for a Mixed Integer Linear Program
    expressed as a TMINLP
@@ -118,12 +124,9 @@ class Messages : public CoinMessages
   OsiTMINLPInterface();
 
   /** Facilitator to initialize interface. */
-  void initialize(BasicSetup &b,Ipopt::SmartPtr<TMINLP> tminlp);
-
-  /** Facilitator to initialize interface. */
-  void initialize(Ipopt::SmartPtr<Ipopt::Journalist> journalist_,
+  void initialize(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
                   Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                  Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                  Ipopt::SmartPtr<Ipopt::Journalist> journalist_,
                   Ipopt::SmartPtr<TMINLP> tminlp);
 
   /** Set the model to be solved by interface.*/
@@ -1039,15 +1042,12 @@ protected:
   /** Object for strengthening cuts */
   SmartPtr<CutStrengthener> cut_strengthener_;
 protected:
-    /** Facilitator to create an application. */
-    void createApplication(BasicSetup & b);
   /** Facilitator to create an application. */
-  void createApplication(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+  void createApplication(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
                          Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                         Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+                         Ipopt::SmartPtr<Ipopt::Journalist> journalist);
   ///Constructor without model only for derived classes
-  OsiTMINLPInterface(BasicSetup &b,
-                     Ipopt::SmartPtr<TNLPSolver> app);
+  OsiTMINLPInterface(Ipopt::SmartPtr<TNLPSolver> app);
   
 
 };

@@ -8,7 +8,6 @@
 // Date : 04/18/2007
 
 #include "BonCouenneSetup.hpp"
-#include "BonBasicSetup.hpp"
 #include "BonBonminSetup.hpp"
 #include "BonNlpHeuristic.hpp"
 #include "BonCouenneInterface.hpp"
@@ -20,7 +19,7 @@
 namespace Bonmin{
   void CouenneSetup::InitializeBonmin(char **& argv){
     /* Get the basic options. */
-    defaultBasicOptions();
+    readOptionsFile();
     
     
     /** Change default value for failure behavior so that code doesn't crash when Ipopt does not solve a sub-problem.*/
@@ -28,11 +27,11 @@ namespace Bonmin{
 
     gatherParametersValues(options_);
     
-    linearSolver_ = new OsiClpSolverInterface;
+    continuousSolver_ = new OsiClpSolverInterface;
     CouenneInterface * ci = new CouenneInterface;
     nonlinearSolver_ = ci;
     /* Read the model in various places. */
-    ci->readAmplNlFile(argv,journalist(),options(),roptions());
+    ci->readAmplNlFile(argv,roptions(),options(),journalist());
     ASL * aslfg = readASLfg (argv);
     
     
@@ -45,14 +44,14 @@ namespace Bonmin{
     // as per instructions by John Forrest, to get changed bounds
     extraStuff -> setExtraCharacteristics (extraStuff -> extraCharacteristics () | 2);
     
-    linearSolver_ -> setAuxiliaryInfo (extraStuff);
+    continuousSolver_ -> setAuxiliaryInfo (extraStuff);
     delete extraStuff;
-    extraStuff = dynamic_cast<Bonmin::BabInfo *>(linearSolver_ -> getAuxiliaryInfo());
+    extraStuff = dynamic_cast<Bonmin::BabInfo *>(continuousSolver_ -> getAuxiliaryInfo());
     /* Setup log level*/
     int lpLogLevel;
     options()->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
-    linearSolver_->messageHandler()->setLogLevel(lpLogLevel);
-    ci->extractLinearRelaxation(*linearSolver_, *couenneCg);
+    continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+    ci->extractLinearRelaxation(*continuousSolver_, *couenneCg);
     
     if(extraStuff->infeasibleNode()){
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
@@ -60,8 +59,8 @@ namespace Bonmin{
     }
  
     
-    linearSolver_->findIntegersAndSOS(false);
-    int numberIntegerObjects = linearSolver_->numberObjects() > 0;
+    continuousSolver_->findIntegersAndSOS(false);
+    int numberIntegerObjects = continuousSolver_->numberObjects() > 0;
     {
       int numAuxs = couenneProb->nAuxs();
       OsiObject ** objects = new OsiObject*[numAuxs];
@@ -83,11 +82,11 @@ namespace Bonmin{
         objects [nobj++] -> setPriority (1);
       }
       
-      linearSolver_ -> addObjects (nobj, objects);
-      //       for(int i = 0 ; i < nobj ; i++){
-      // 	delete objects[i];
-      //       }
-      //       delete objects;
+      continuousSolver_ -> addObjects (nobj, objects);
+      for(int i = 0 ; i < nobj ; i++){
+       	delete objects[i];
+      }
+      delete objects;
     }
     
     //Setup Convexifier generators
@@ -118,12 +117,17 @@ namespace Bonmin{
       heuristics_.push_back(nlpHeuristic);
     }
     
-    branchingMethod_ = new CouenneChooseVariable(linearSolver_, 
+    branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
                                   const_cast<CouenneProblem *> (couenneProb));
 
     
 }
-  
+ 
+void CouenneSetup::registerOptions(){
+  registerAllOptions(roptions());
+}
+
+
 void
   CouenneSetup::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
     BonminSetup::registerAllOptions(roptions);
@@ -144,3 +148,4 @@ void
   //}
   
 }
+ 

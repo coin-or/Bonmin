@@ -39,18 +39,11 @@
 #include "CglRedSplit.hpp"
 
 namespace Bonmin{
-  BonminSetup::BonminSetup():BabSetupBase(){
+  BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy){
   }
-  
-  BonminSetup::BonminSetup(BasicSetup& b, Ipopt::SmartPtr<TMINLP> tminlp):
-  BabSetupBase(b, tminlp){
-  }
-  
-  BonminSetup::BonminSetup(const OsiTMINLPInterface& nlp):
-  BabSetupBase(nlp){
-  }
-  
-  BonminSetup::BonminSetup(const BonminSetup &other):BabSetupBase(other){
+    
+  BonminSetup::BonminSetup(const BonminSetup &other):BabSetupBase(other),
+algo_(other.algo_){
   }
   
   void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
@@ -67,6 +60,16 @@ namespace Bonmin{
     
     registerMilpCutGenerators(roptions);
     
+    roptions->SetRegisteringCategory("Bonmin algotihm choice");
+    roptions->AddStringOption4("algorithm",
+                               "Choice of the algorithm.",
+                               "B-Hyb",
+                               "B-BB","simple branch-and-bound algorithm,",
+                               "B-OA","OA Decomposition algorithm,",
+                               "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
+                               "B-Hyb","hybrid outer approximation based branch-and-cut.",
+                               "This will preset some of the options of bonmin depending on the algorithm choice."
+                               );
     
     roptions->SetRegisteringCategory("bonmin options: Branching strategies options");
     roptions->AddStringOption2("sos_constraints",
@@ -93,51 +96,30 @@ namespace Bonmin{
   }
   /** Register all the Bonmin options.*/
   void 
-  BonminSetup::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-    registerAllOptions(roptions);
+  BonminSetup::registerOptions(){
+    registerAllOptions(roptions_);
   }
     
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
   void 
-  BonminSetup::initializeBonmin(Ipopt::SmartPtr<TMINLP> tminlp){
-     defaultBasicOptions();
+  BonminSetup::initializeBonmin(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/){
 
-    initialize(tminlp);
-    int ival;
-    options_->GetEnumValue("algorithm", ival,"bonmin.");
-    BaseOptions::Algorithm algo = (BaseOptions::Algorithm) ival;
-    if(algo == BaseOptions::B_BB)
+    use(tminlp);
+    Algorithm algo = getAlgorithm();
+    if(algo == B_BB)
       initializeBBB();
     else
-      initializeBHyb();}
-  
-
-    void
-    BonminSetup::defaultBasicOptions(){
-      if(GetRawPtr(options_) != NULL && GetRawPtr(roptions_) != NULL &&  GetRawPtr(journalist_) != NULL) return;
-      BasicSetup b;
-      Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions = b.roptions();
-      BonminSetup::registerAllOptions(roptions);
-      b.Initialize("bonmin.opt");
-      options_ = b.options();
-      roptions_ = b.roptions();
-      journalist_ = b.journalist();
-    }
-    
-    
+      initializeBHyb(createContinuousSolver);}
   
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
   void 
-  BonminSetup::initializeBonmin(const OsiTMINLPInterface &nlpSi){
-    defaultBasicOptions();
-    initialize(nlpSi);
-    int ival;
-    options_->GetEnumValue("algorithm", ival,"bonmin.");
-    BaseOptions::Algorithm algo = (BaseOptions::Algorithm) ival;
-    if(algo == BaseOptions::B_BB)
+  BonminSetup::initializeBonmin(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/){
+    use(nlpSi);
+    Algorithm algo = getAlgorithm();
+    if(algo == B_BB)
       initializeBBB();
     else
-      initializeBHyb();
+      initializeBHyb(createContinuousSolver);
   }
   
   /** Register standard MILP cut generators. */
@@ -314,10 +296,10 @@ namespace Bonmin{
   
   void 
   BonminSetup::initializeBBB(){
-    linearSolver_ = nonlinearSolver_;
+    continuousSolver_ = nonlinearSolver_;
     nonlinearSolver_->ignoreFailures();
     OsiBabSolver extraStuff(2);
-    linearSolver_->setAuxiliaryInfo(&extraStuff);
+    continuousSolver_->setAuxiliaryInfo(&extraStuff);
     
     intParam_[BabSetupBase::SpecialOption] = 16;
     intParam_[BabSetupBase::MinReliability] = 0;
@@ -328,56 +310,60 @@ namespace Bonmin{
     options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     
     if(varSelection == OsiTMINLPInterface::CURVATURE_ESTIMATOR){
-      linearSolver_->findIntegersAndSOS(false);
+      continuousSolver_->findIntegersAndSOS(false);
       BonCurvBranching * chooseVariable = new BonCurvBranching(nonlinearSolver_);
       branchingMethod_ = chooseVariable;      
     }
     else if(varSelection == OsiTMINLPInterface::QP_STRONG_BRANCHING){
-      linearSolver_->findIntegersAndSOS(false);
+      continuousSolver_->findIntegersAndSOS(false);
       BonQPStrongBranching*  chooseVariable = new BonQPStrongBranching(nonlinearSolver_);
       branchingMethod_ = chooseVariable;
     }
     else if(varSelection == OsiTMINLPInterface::LP_STRONG_BRANCHING){
-      linearSolver_->findIntegersAndSOS(false);
+      continuousSolver_->findIntegersAndSOS(false);
       LpStrongBranching * choose = new LpStrongBranching(nonlinearSolver_);
       choose->setMaxCuttingPlaneIter(intParam_[BabSetupBase::NumEcpRoundsStrong]);
       branchingMethod_ = choose;
     }
     else if(varSelection == OsiTMINLPInterface::NLP_STRONG_BRANCHING){
       const bool solve_nlp = true;
-      linearSolver_->findIntegersAndSOS(false);
+      continuousSolver_->findIntegersAndSOS(false);
       BonQPStrongBranching * choose =  new BonQPStrongBranching(nonlinearSolver_, solve_nlp);
       branchingMethod_ = choose;
     }
     else if(varSelection == OsiTMINLPInterface::OSI_SIMPLE){
-      linearSolver_->findIntegersAndSOS(false);
+      continuousSolver_->findIntegersAndSOS(false);
       branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
     }
     else if(varSelection == OsiTMINLPInterface::OSI_STRONG){
-      linearSolver_->findIntegersAndSOS(false);
+      continuousSolver_->findIntegersAndSOS(false);
       branchingMethod_ = new OsiChooseStrong(nonlinearSolver_);
     }
   }  
   
   void 
-  BonminSetup::initializeBHyb()
+  BonminSetup::initializeBHyb(bool createContinuousSolver /*= false*/)
 {
+    if(createContinuousSolver){
     /* Create linear solver */
-    linearSolver_ = new OsiClpSolverInterface;
+    continuousSolver_ = new OsiClpSolverInterface;
     int lpLogLevel;
     options_->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
-    linearSolver_->messageHandler()->setLogLevel(lpLogLevel);
-    nonlinearSolver_->extractLinearRelaxation(*linearSolver_);
+    continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+    nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
+    // say bound dubious, does cuts at solution
+    OsiBabSolver * extraStuff = new OsiBabSolver(3);
+    continuousSolver_->setAuxiliaryInfo(extraStuff);
+    delete extraStuff;
+    }
     
-    int ival;
-    options_->GetEnumValue("algorithm", ival,"bonmin.");
-    BaseOptions::Algorithm algo = (BaseOptions::Algorithm) ival;
-    if(algo == BaseOptions::B_OA){
+    Algorithm algo = getAlgorithm();
+    if(algo == B_OA){
       options_->SetNumericValue("oa_dec_time_limit",DBL_MAX, true, true);
       options_->SetNumericValue("nlp_solve_frequency", 0, true, true);
       intParam_[BabLogLevel] = 0;
     }
-    else if (algo==BaseOptions::B_QG) {
+    else if (algo==B_QG) {
       options_->SetNumericValue("oa_dec_time_limit",0, true, true);
       options_->SetNumericValue("nlp_solve_frequency", 0, true, true);
     }
@@ -388,10 +374,7 @@ namespace Bonmin{
     nonlinearSolver_->getOuterApproximation(cuts, true, NULL, true);
     si->applyCuts(cuts);
 #endif
-    // say bound dubious, does cuts at solution
-    OsiBabSolver * extraStuff = new OsiBabSolver(3);
-    linearSolver_->setAuxiliaryInfo(extraStuff);
-    delete extraStuff;
+
     
     int varSelection;
     options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
@@ -399,6 +382,7 @@ namespace Bonmin{
       std::cout<<"Variable selection stragey not available with oa branch-and-cut."<<std::endl;
     }
     /* Populate cut generation and heuristic procedures.*/
+    int ival;
     options_->GetIntegerValue("nlp_solve_frequency",ival,"bonmin.");
     if(ival != 0){
       CuttingMethod cg;
@@ -419,7 +403,7 @@ namespace Bonmin{
       cutGenerators_.push_back(cg);
     }
     
-    if (algo!=BaseOptions::B_QG)
+    if (algo!=B_QG)
       addMilpCutGenerators();
     
     double oaTime;
@@ -445,5 +429,17 @@ namespace Bonmin{
       cutGenerators_.push_back(cg);
     }
 }
+
+Algorithm BonminSetup::getAlgorithm(){
+  if(algo_ == Dummy)
+    return algo_;
+  if(IsValid(options_)){
+    int ival;
+    options_->GetEnumValue("algorithm", ival,"bonmin.");
+    return Algorithm(ival);
+  }
+  else return Algorithm(3);
+}
+
 }/* end namespace Bonmin*/
 

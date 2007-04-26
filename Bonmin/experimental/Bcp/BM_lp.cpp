@@ -20,19 +20,13 @@
 BM_lp::BM_lp() :
     BCP_lp_user(),
     babSolver_(3),
-    nlp_(),
+    bonmin_(),
     ws_(NULL),
     chooseVar_(NULL),
     freeToBusyRatio_(0.0),
     in_strong(0)
 {
-    nlp_.Set_expose_warm_start(true);
-      Bonmin::OACutGenerator2::registerOptions(nlp_.regOptions());
-      Bonmin::EcpCuts::registerOptions(nlp_.regOptions());
-      Bonmin::OaNlpOptim::registerOptions(nlp_.regOptions());
-      
-    babSolver_.setSolver(&nlp_);
-    setOsiBabSolver(&babSolver_);
+      setOsiBabSolver(&babSolver_);
 }
 
 /****************************************************************************/
@@ -80,16 +74,17 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
     // First copy the bounds into nlp. That way all the branching decisions
     // will be transferred over.
     OsiSolverInterface * osi = getLpProblemPointer()->lp_solver;
-    nlp_.setColLower(osi->getColLower());
-    nlp_.setColUpper(osi->getColUpper());
+    Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
+    nlp.setColLower(osi->getColLower());
+    nlp.setColUpper(osi->getColUpper());
 
     // Carry the changes over to the object lists in nlp
-    const int numObj = nlp_.numberObjects();
-    OsiObject** nlpObj = nlp_.objects();
+    const int numObj = nlp.numberObjects();
+    OsiObject** nlpObj = nlp.objects();
     for (i = 0; i < numObj; ++i) {
 	OsiSimpleInteger* io = dynamic_cast<OsiSimpleInteger*>(nlpObj[i]);
 	if (io) {
-	    io->resetBounds(&nlp_);
+	    io->resetBounds(&nlp);
 	} else {
 	    // The rest is OsiSOS where we don't need to do anything
 	    break;
@@ -98,8 +93,8 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
 
     // copy over the OsiObjects from the nlp solver if the lp solver is to be
     // used at all (i.e., not pure B&B)
-    if (minlpParams_.algo > 0) {
-	osi->addObjects(nlp_.numberObjects(), nlp_.objects());
+    if (bonmin_.getAlgorithm() > 0) {
+	osi->addObjects(nlp.numberObjects(), nlp.objects());
     }
 
     in_strong = 0;
@@ -125,7 +120,7 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
                         const BCP_vec<BCP_var*>& vars,
                         const BCP_vec<BCP_cut*>& cuts)
 {
-    if (minlpParams_.algo == 0) {
+    if (bonmin_.getAlgorithm() == 0) {
 	// if pure B&B
 	return test_feasibility_BB(vars);
     } else {
@@ -139,6 +134,7 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
 BCP_solution*
 BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 {
+  Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
     /* PURE_BB TODO:
        Do whatever must be done to:
        1) compute a lower bound using NLP and save it in "lower_bound_"
@@ -160,11 +156,11 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
     try {
     switch (par.entry(BM_par::WarmStartStrategy)) {
     case WarmStartNone:
-	nlp_.initialSolve();
+	nlp.initialSolve();
 	break;
     case WarmStartFromRoot:
-	nlp_.setWarmStart(ws_);
-	nlp_.resolve();
+	nlp.setWarmStart(ws_);
+	nlp.resolve();
 	break;
     case WarmStartFromParent:
 	/* FIXME: CHEAT! this works only in serial mode! */
@@ -174,9 +170,9 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 		getLpProblemPointer()->parent->index;
 	    std::map<int, CoinWarmStart*>::iterator it =
 		warmStart.find(parentind);
-	    nlp_.setWarmStart(it->second);
-	    nlp_.resolve();
-	    warmStart[ind] = nlp_.getWarmStart();
+	    nlp.setWarmStart(it->second);
+	    nlp.resolve();
+	    warmStart[ind] = nlp.getWarmStart();
 	    bool sibling_seen =  ((ind & 1) == 0) ?
 		warmStart.find(ind-1) != warmStart.end() :
 		warmStart.find(ind+1) != warmStart.end() ;
@@ -216,19 +212,19 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
       throw;
     }
 
-    const int numCols = nlp_.getNumCols();
-    const double* colsol = nlp_.getColSolution();
-    if (nlp_.isProvenOptimal()) {
+    const int numCols = nlp.getNumCols();
+    const double* colsol = nlp.getColSolution();
+    if (nlp.isProvenOptimal()) {
 	int i;
-	const double* clb = nlp_.getColLower();
-	const double* cub = nlp_.getColUpper();
+	const double* clb = nlp.getColLower();
+	const double* cub = nlp.getColUpper();
 	// Make sure we are within bounds (get rid of rounding problems)
 	for (i = 0; i < numCols; ++i) {
 	    primal_solution_[i] =
 		CoinMin(CoinMax(clb[i], colsol[i]), cub[i]);
 	}
 	
-	lower_bound_ = nlp_.getObjValue();
+	lower_bound_ = nlp.getObjValue();
 	numNlpFailed_ = 0;
 
 	for (i = 0; i < numCols; ++i) {
@@ -245,7 +241,7 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 	    sol = new BM_solution;
 	    //Just copy the solution stored in solver to sol
 	    double ptol;
-	    nlp_.getDblParam(OsiPrimalTolerance, ptol);
+	    nlp.getDblParam(OsiPrimalTolerance, ptol);
 	    for (i = 0 ; i < numCols ; i++) {
 		if (fabs(primal_solution_[i]) > ptol)
 		    sol->add_entry(i, primal_solution_[i]); 
@@ -259,7 +255,7 @@ BM_lp: At node %i : will fathom because of high lower bound\n",
 		   current_index());
 	}
     }
-    else if (nlp_.isProvenPrimalInfeasible()) {
+    else if (nlp.isProvenPrimalInfeasible()) {
 	// prune it!
 	// FIXME: if nonconvex, restart from a different place...
 	lower_bound_ = 1e200;
@@ -270,8 +266,8 @@ BM_lp: At node %i : will fathom because of infeasibility\n",
 		   current_index());
 	}
     }
-    else if (nlp_.isAbandoned()) {
-	if (nlp_.isIterationLimitReached()) {
+    else if (nlp.isAbandoned()) {
+	if (nlp.isIterationLimitReached()) {
 	    printf("\
 BM_lp: At node %i : WARNING: nlp reached iter limit. Will force branching\n",
 		   current_index());
@@ -281,8 +277,8 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 		   current_index());
 	}
 	// nlp failed
-	nlp_.forceBranchable();
-	lower_bound_ = nlp_.getObjValue();
+	nlp.forceBranchable();
+	lower_bound_ = nlp.getObjValue();
 	CoinDisjointCopyN(colsol, numCols, primal_solution_);
 	numNlpFailed_ += 1;
 	// will branch, but save in the user data how many times we have
@@ -323,8 +319,9 @@ BM_lp::test_feasibility_hybrid(const BCP_lp_result& lp_result,
     OsiBabSolver * babSolver =
 	dynamic_cast<OsiBabSolver *> (osi->getAuxiliaryInfo());
     //assert(babSolver == &babSolver_);
-    babSolver->setSolver(nlp_); 
-    feasCheck_.generateCuts(*osi, cuts_);
+    babSolver->setSolver(*bonmin_.nonlinearSolver()); 
+    //Last cut generator is used to check feasibility
+    bonmin_.cutGenerators().back().cgl->generateCuts(*osi, cuts_);
     const int numvar = vars.size();
     double* solverSol = new double[numvar];
     double objValue = 1e200;
@@ -352,7 +349,7 @@ BM_lp::generate_cuts_in_lp(const BCP_lp_result& lpres,
                            BCP_vec<BCP_cut*>& new_cuts,
                            BCP_vec<BCP_row*>& new_rows)
 {
-    if (minlpParams_.algo > 0) { /* if not pure B&B */
+    if (bonmin_.getAlgorithm() > 0) { /* if not pure B&B */
 	/* TODO:
 	   don't invoke all of them, only the *good* ones. figure out
 	   some measurement of how good a generator is.
@@ -360,47 +357,19 @@ BM_lp::generate_cuts_in_lp(const BCP_lp_result& lpres,
 	
 	OsiSolverInterface& si = *getLpProblemPointer()->lp_solver;
 	double rand;
-	rand = 1 - CoinDrand48();
-	if (minlpParams_.nlpSolveFrequency > rand) {
-	    /* FIXME: fill out the tree info! */
-	    CglTreeInfo info;
-	    oaGen_.generateCuts(si, cuts_, info);
-	}
-	rand = 1 - CoinDrand48();
-	if (minlpParams_.filmintCutsFrequency > rand) {
-	    ecpGen_.generateCuts(si, cuts_);
-	}
-	rand = 1 - CoinDrand48();
-	if (minlpParams_.migFreq > rand) {
-	    miGGen_.generateCuts(si, cuts_);
-	}
-	rand = 1 - CoinDrand48();
-	if (minlpParams_.probFreq > rand) {
-	    probGen_.generateCuts(si, cuts_);
-	}
-	rand = 1 - CoinDrand48();
-	if (minlpParams_.coverFreq > rand) {
-	    knapsackGen_.generateCuts(si, cuts_);
-	}
-	rand = 1 - CoinDrand48();
-	if (minlpParams_.mirFreq > rand) {
-	    mixedGen_.generateCuts(si, cuts_);
-	}
-#if 0
-	if (minlpParams_.oaDecMaxTime>0.) {
-	    model.addCutGenerator(&oaDec,-99,
-				  "Outer Approximation local enumerator");
-	    OACutGenerator2 * oaDecCopy = dynamic_cast<OACutGenerator2 *>
-		(model.cutGenerators()[numGen]->generator());
-	    assert(oaDecCopy);
-	    currentOA = oaDecCopy;
-	    numGen++;
-	}
-	model.addCutGenerator(&feasCheck,1,
-			      "Outer Approximation feasibility checker",
-			      false,true);
-#endif
-	
+  Bonmin::BabSetupBase::CuttingMethods::const_iterator end = bonmin_.cutGenerators().end();
+  end--;//have to go back one element because last cut generator checks feasibility
+    
+    /* FIXME: fill out the tree info! */
+    CglTreeInfo info;
+    for(Bonmin::BabSetupBase::CuttingMethods::const_iterator i = bonmin_.cutGenerators().begin() ;
+        i != end ; i++){
+    rand = 1 - CoinDrand48();
+    if(i->frequency > rand){
+      i->cgl->generateCuts(si, cuts_, info);
+    }
+  }
+  	
 	// fill cuts
 	// eventually fill rows if not in strong branching
 	int numCuts = cuts_.sizeRowCuts();
@@ -445,7 +414,7 @@ BM_lp::compute_lower_bound(const double old_lower_bound,
                            const BCP_vec<BCP_cut*>& cuts)
 {
     double bd;
-    if (minlpParams_.algo == 0) {
+    if (bonmin_.getAlgorithm() == 0) {
 	/* if pure B&B */
 	bd = lower_bound_;
     } else {

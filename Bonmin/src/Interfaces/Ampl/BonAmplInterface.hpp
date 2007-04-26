@@ -26,17 +26,10 @@ namespace Bonmin
     /** Default constructor only available for Bonmin's friends and child classes.*/
     AmplInterface();
     /**@name Methods to input a problem */
-    //@{
-    /** Read an ampl . nl file from the given filename */
-    virtual void readAmplNlFile(char**& filename,
-                                BasicSetup &b,
-                                std::string* nl_file_content  = NULL
-                                );
-    
-    
-        virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+    //@{    
+        virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
                                     Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                                    Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                                    Ipopt::SmartPtr<Ipopt::Journalist> journalist,
                                     std::string* nl_file_content  = NULL);
     //@}    
     /** Copy constructor */

@@ -34,7 +34,12 @@ register_general_options
 (SmartPtr<RegisteredOptions> roptions)
 {
   roptions->SetRegisteringCategory("bonmin nlp interface option");
-
+  roptions->AddStringOption2("nlp_solver",
+                             "Choice of the solver for local optima of continuous nlp's",
+                             "Ipopt",
+                             "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
+                             "filterSQP", "Sequential quadratic programming trust region algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
+                             "");
   roptions->AddBoundedIntegerOption("nlp_log_level",
       "specify NLP solver interface log level (independent from ipopt print_level).",
       0,2,1,
@@ -291,51 +296,37 @@ OsiTMINLPInterface::OsiTMINLPInterface():
 {
 }
 
-
-
-void
-OsiTMINLPInterface::initialize(BasicSetup& b,
-                               Ipopt::SmartPtr<TMINLP> tminlp)
-{
-  if(!IsValid(app_))
-    createApplication(b);
-  setModel(tminlp);
-}
-
 void 
-OsiTMINLPInterface::initialize(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
-                Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
-                Ipopt::SmartPtr<TMINLP> tminlp){
-  createApplication(journalist, options, roptions);
+OsiTMINLPInterface::initialize(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                               Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                               Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                               Ipopt::SmartPtr<TMINLP> tminlp){
+  if(!IsValid(app_))
+     createApplication(roptions, options, journalist);
   setModel(tminlp); 
 }
 
 void OsiTMINLPInterface::setSolver(Ipopt::SmartPtr<TNLPSolver> app){
   app_ = app;}
 
-/** Facilitator to create an application. */
-void
-OsiTMINLPInterface::createApplication(BasicSetup &b){
-  createApplication(b.journalist(),b.options(),b.roptions());
-}
 
 void
-OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
                                       Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                                      Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+                                      Ipopt::SmartPtr<Ipopt::Journalist> journalist
+                                      )
 {
   assert(!IsValid(app_));
   int ival;
   options->GetEnumValue("nlp_solver", ival, "bonmin.");
-  BaseOptions::Solver s = (BaseOptions::Solver) ival;
-  if(s == BaseOptions::FilterSQP){
+  Solver s = (Solver) ival;
+  if(s == FilterSQP){
 #ifdef COIN_HAS_FILTERSQP
-    app_ = new Bonmin::FilterSolver(journalist, options, roptions);
+    app_ = new Bonmin::FilterSolver(roptions, options, journalist);
 #else
 #endif    
   }
-  else if(s == BaseOptions::Ipopt){
+  else if(s == Ipopt){
 #ifdef COIN_HAS_IPOPT
     app_ = new IpoptSolver(roptions, options, journalist);
 #else

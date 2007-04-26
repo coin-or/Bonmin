@@ -34,37 +34,37 @@ int main (int argc, char *argv[])
   using namespace Bonmin;
   SmartPtr<MyTMINLP> tminlp = new MyTMINLP;
   
-  BasicSetup b;
-  
+
+  BonminSetup bonmin;
+  bonmin.initializeOptionsAndJournalist();
   //Register an additional option
-  b.roptions()->AddStringOption2("print_solution","Do we print the solution or not?",
+  bonmin.roptions()->AddStringOption2("print_solution","Do we print the solution or not?",
                                  "yes",
                                  "no", "No, we don't.",
                                  "yes", "Yes, we do.",
                                  "A longer comment can be put here");
   
   
-  // Register all the bonmin options.
-  BonminSetup::registerAllOptions(b.roptions());
   
   // Here we can change the default value of some Bonmin or Ipopt option
-  b.options()->SetNumericValue("bonmin.time_limit", 5); //changes bonmin's time limit
-  b.options()->SetStringValue("mu_oracle","loqo");
+  bonmin.options()->SetNumericValue("bonmin.time_limit", 5); //changes bonmin's time limit
+  bonmin.options()->SetStringValue("mu_oracle","loqo");
   
-  //Here we can read one or several option files
-  b.Initialize("Mybonmin.opt");
-  b.Initialize("bonmin.opt");
-
+  //Here we read several option files
+  bonmin.readOptionsFile("Mybonmin.opt");
+  bonmin.readOptionsFile();// This reads the default file "bonmin.opt"
+  
+    // Options can also be set by using a string with a format similar to the bonmin.opt file
+    bonmin.readOptionsString("bonmin.algorithm B-BB\n");
   
   // Now we can obtain the value of the new option
   int printSolution;
-  b.options()->GetEnumValue("print_solution", printSolution,"");
+  bonmin.options()->GetEnumValue("print_solution", printSolution,"");
   if(printSolution == 1){
     tminlp->printSolutionAtEndOfAlgorithm();
   }
-  
-  BonminSetup bonmin;
-  bonmin.setBasicOptions(b);
+
+  //Now initialize from tminlp
   bonmin.initializeBonmin(GetRawPtr(tminlp));
 
 
@@ -73,7 +73,7 @@ int main (int argc, char *argv[])
   double time1 = CoinCpuTime();
   try {
     Bab2 bb;
-    bb(bonmin);//process parameter file using Ipopt and do branch and bound
+    bb(bonmin);//process parameter file using Ipopt and do branch and bound using Cbc
 
 
   }

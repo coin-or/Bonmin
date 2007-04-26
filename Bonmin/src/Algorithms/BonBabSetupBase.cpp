@@ -9,8 +9,8 @@
 
 
 #include "BonBabSetupBase.hpp"
-#include "BonBasicSetup.hpp"
-
+#include <fstream>
+#include <sstream>
 
 
 namespace Bonmin{
@@ -42,16 +42,16 @@ double BabSetupBase::defaultDoubleParam_[BabSetupBase::NumberDoubleParam] = {
 
   BabSetupBase::BabSetupBase():
   nonlinearSolver_(NULL),
-  linearSolver_(NULL),
+  continuousSolver_(NULL),
   cutGenerators_(),
   heuristics_(),
   branchingMethod_(NULL),
   nodeSelectionMethod_(),
   journalist_(NULL),
   options_(NULL),
-roptions_(NULL)
+roptions_(NULL),
+readOptions_(false)
 {
-    
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
 }
@@ -59,19 +59,20 @@ roptions_(NULL)
 /** Copy constructor. */
 BabSetupBase::BabSetupBase(const BabSetupBase & other):
 nonlinearSolver_(NULL),
-linearSolver_(NULL),
+continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(),
 nodeSelectionMethod_(other.nodeSelectionMethod_),
 journalist_(other.journalist_),
 options_(NULL),
-roptions_(other.roptions_)
+roptions_(other.roptions_),
+readOptions_(other.readOptions_)
 {
   if(other.nonlinearSolver_){
     nonlinearSolver_ = (OsiTMINLPInterface *) other.nonlinearSolver_->clone();}
-  if(other.linearSolver_){
-    linearSolver_ = other.linearSolver_->clone();}
+  if(other.continuousSolver_){
+    continuousSolver_ = other.continuousSolver_->clone();}
  
   for(CuttingMethods::const_iterator i = other.cutGenerators_.begin() ; i != other.cutGenerators_.end() ; i++){
     cutGenerators_.push_back(*i);
@@ -82,84 +83,86 @@ roptions_(other.roptions_)
     heuristics_.push_back((*i)->clone());
   }
   branchingMethod_ = other.branchingMethod_->clone();
-  options_ = new OptionsList;
-  *options_ = *other.options_;
+  if(IsValid(other.options_)){
+    options_ = new OptionsList;
+    *options_ = *other.options_;
+  }
   CoinCopyN(other.intParam_, NumberIntParam, intParam_);
   CoinCopyN(other.doubleParam_, NumberDoubleParam, doubleParam_);
 }
 
-BabSetupBase::BabSetupBase(BasicSetup& b, Ipopt::SmartPtr<TMINLP> tminlp):
+BabSetupBase::BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp):
 nonlinearSolver_(NULL),
-linearSolver_(NULL),
+continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(NULL),
-nodeSelectionMethod_()
+nodeSelectionMethod_(),
+readOptions_(false)
 { 
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
-  setBasicOptions(b);
-  initialize(tminlp);
+  use(tminlp);
 }
 
 
 
 
 void 
-BabSetupBase::initialize(Ipopt::SmartPtr<TMINLP> tminlp){
-  defaultBasicOptions();
+BabSetupBase::use(Ipopt::SmartPtr<TMINLP> tminlp){
+  readOptionsFile();
   assert(IsValid(tminlp));
   nonlinearSolver_ = new OsiTMINLPInterface;
-  nonlinearSolver_->initialize(journalist_, options_, roptions_, tminlp);
-  gatherParametersValues(options_);
+  nonlinearSolver_->initialize(roptions_, options_, journalist_, tminlp);
 }
 
 BabSetupBase::BabSetupBase(const OsiTMINLPInterface& nlp):
 nonlinearSolver_(NULL),
-linearSolver_(NULL),
+continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(NULL),
 nodeSelectionMethod_(),
 journalist_(NULL),
 options_(NULL),
-roptions_(NULL)
+roptions_(NULL),
+readOptions_(false)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
-  initialize(nlp);
+  use(nlp);
 }
 
 void 
-BabSetupBase::initialize(const OsiTMINLPInterface& nlp){
+BabSetupBase::use(const OsiTMINLPInterface& nlp){
   nonlinearSolver_ = dynamic_cast<OsiTMINLPInterface *>(nlp.clone());
   options_ = nonlinearSolver_->options();
   roptions_ = nonlinearSolver_->regOptions();
   journalist_ = nonlinearSolver_->solver()->Jnlst();
-  gatherParametersValues(options_);  
+  readOptions_ = true;
 }
 
-BabSetupBase::BabSetupBase(BasicSetup& b, Ipopt::SmartPtr<TNLPSolver> app):
+BabSetupBase::BabSetupBase( Ipopt::SmartPtr<TNLPSolver> app):
 nonlinearSolver_(NULL),
-linearSolver_(NULL),
+continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(NULL),
 nodeSelectionMethod_(),
-journalist_(b.journalist()),
-options_(b.options()),
-roptions_(b.roptions())
+journalist_(app->Jnlst()),
+options_(app->Options()),
+roptions_(app->RegOptions()),
+readOptions_(true)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
-  gatherParametersValues(options_);
 }
 
 
 BabSetupBase::~BabSetupBase(){
-  if(nonlinearSolver_ != linearSolver_)
+  if(nonlinearSolver_ != continuousSolver_)
     delete nonlinearSolver_;
-  delete linearSolver_;
+  delete continuousSolver_;
   delete branchingMethod_;
   for(CuttingMethods::iterator i = cutGenerators_.begin() ; i != cutGenerators_.end() ; i++){
     delete i->cgl;
@@ -215,16 +218,13 @@ BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options){
 }
 
 void 
-BabSetupBase::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-  registerAllOptions(roptions);
+BabSetupBase::registerOptions(){
+  registerAllOptions(roptions_);
 }
 
 void 
 BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
   OsiTMINLPInterface::registerOptions(roptions);
-  BasicSetup::registerOptions(roptions);
-  
-  
   /* BabSetup options.*/
   roptions->SetRegisteringCategory("bonmin output options");
   
@@ -337,10 +337,105 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
   
 }
 
-/** Read options and initialize algorithm according to them.*/
+
+/** Initialize the options and the journalist.*/
 void 
-BabSetupBase::initialize(OsiTMINLPInterface *){
+BabSetupBase::initializeOptionsAndJournalist(){
+  options_ = new Ipopt::OptionsList();
+  
+  journalist_= new Ipopt::Journalist();
+  roptions_ = new Ipopt::RegisteredOptions();
+  
+  try{
+    Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
+    journalist_->AddFileJournal("console", "stdout", Ipopt::J_ITERSUMMARY);
+    
+    options_->SetJournalist(journalist_);
+    options_->SetRegisteredOptions(roptions_);
+  }
+  catch (Ipopt::IpoptException &E){
+    E.ReportException(*journalist_);
+    throw E;
+  }
+  catch(std::bad_alloc){
+    journalist_->Printf(Ipopt::J_ERROR, Ipopt::J_MAIN, "\n Not enough memory .... EXIT\n");
+    throw -1;
+  }
+  catch(...){
+    Ipopt::IpoptException E("Uncaught exception in FilterSolver::FilterSolver()",
+                            "BonFilterSolver.cpp",-1);
+    throw E;
+  }
+  
+  registerOptions();
 }
+
+/** Get the options from given fileName */
+void 
+BabSetupBase::readOptionsFile(std::string fileName){
+  if(GetRawPtr(options_) == NULL || GetRawPtr(roptions_) == NULL || GetRawPtr(journalist_) == NULL)
+    initializeOptionsAndJournalist();
+  std::ifstream is;
+  if (fileName != "") {
+    try {
+      is.open(fileName.c_str());
+    }
+    catch(std::bad_alloc) {
+      journalist_->Printf(Ipopt::J_SUMMARY, Ipopt::J_MAIN, "\nEXIT: Not enough memory.\n");
+      throw -1;
+    }
+    catch(...) {
+      Ipopt::IpoptException E("Unknown Exception caught in ipopt", "Unknown File", -1);
+      E.ReportException(*journalist_);
+      throw -1;
+    }
+  }
+  readOptionsStream(is);
+  if (is) {
+    is.close();
+  }
+}
+
+/** Get the options from long string containing all.*/
+void 
+BabSetupBase::readOptionsString(std::string opt_string){
+  if(GetRawPtr(options_) == NULL || GetRawPtr(roptions_) == NULL || GetRawPtr(journalist_) == NULL)
+    initializeOptionsAndJournalist();
+  std::stringstream is(opt_string.c_str());
+  readOptionsStream(is);
+}
+
+
+void 
+BabSetupBase::readOptionsStream(std::istream& is)
+{
+  if(GetRawPtr(options_) == NULL || GetRawPtr(roptions_) == NULL || GetRawPtr(journalist_) == NULL)
+    initializeOptionsAndJournalist();
+  std::cout<<"Reading options...."<<std::endl;
+  if(is.good()){
+    options_->ReadFromStream(*journalist_, is);
+  }
+  mayPrintDoc();
+  readOptions_=true;
+}
+
+/** May print documentation of options if options print_options_documentation is set to yes.*/
+void 
+BabSetupBase::mayPrintDoc(){
+  bool print_options_documentation;
+  options_->GetBoolValue("print_options_documentation",
+                         print_options_documentation, "");
+  if (print_options_documentation) {
+    std::list<std::string> categories;
+    categories.push_back("bonmin branch-and-bound options");
+    categories.push_back("bonmin options for robustness");
+    categories.push_back("bonmin options for non-convex problems");
+    categories.push_back("bonmin options : B-Hyb specific options");
+    //    roptions->OutputLatexOptionDocumentation2(*app_->Jnlst(),categories);
+    roptions_->OutputOptionDocumentation(*(journalist_),categories);
+  }
+}
+
 
 }/* End namespace Bonmin.*/
 

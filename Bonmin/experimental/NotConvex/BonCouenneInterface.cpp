@@ -35,17 +35,13 @@ CouenneInterface * CouenneInterface::clone(bool CopyData){
 CouenneInterface::~CouenneInterface(){
 }
 
-void 
-CouenneInterface::readAmplNlFile(char **& amplArgs, Bonmin::BasicSetup & b){
-  readAmplNlFile(amplArgs, b.journalist(), b.options(), b.roptions());
-}
 
 
 void 
-CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Journalist> journalist,
-                         Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                                 Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-  AmplInterface::readAmplNlFile(argv, journalist, options, roptions);
+CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+                                 Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                                 Ipopt::SmartPtr<Ipopt::Journalist> journalist){
+  AmplInterface::readAmplNlFile(argv, roptions, options, journalist);
 }
 
 /** \name Overloaded methods to build outer approximations */
