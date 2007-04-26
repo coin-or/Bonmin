@@ -166,8 +166,6 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   }
   else {
 
-    printf ("==== exprPow: x=%.5f  [%.5f %.5f]\n", x, l, u);
-   
     // 2) all other cases.
 
     // if k is real or inv(k) is even, then lift l to max (0,l) but if
