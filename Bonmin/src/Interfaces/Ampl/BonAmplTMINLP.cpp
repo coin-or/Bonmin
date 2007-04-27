@@ -32,6 +32,7 @@ namespace Bonmin
   AmplTMINLP::AmplTMINLP()
   :
   TMINLP(),
+  upperBoundingObj_(-1),
   ampl_tnlp_(NULL),
   branch_(),
   sos_()
@@ -47,6 +48,7 @@ namespace Bonmin
                          )
   :
   TMINLP(),
+  upperBoundingObj_(-1),
   ampl_tnlp_(NULL),
   branch_(),
   sos_(),
@@ -65,7 +67,8 @@ namespace Bonmin
                          )
   {
     
-    
+    jnlst_ = jnlst;
+
     if (suffix_handler==NULL)
       suffix_handler_ = suffix_handler = new AmplSuffixHandler();
     
@@ -90,6 +93,11 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("sosref",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
+    
+    
+    // For objectives
+    suffix_handler->AddAvailableSuffix("UBObj", AmplSuffixHandler::Objective_Source, AmplSuffixHandler::Index_Type);
+    
     
     // Perturbation radius
     suffix_handler->AddAvailableSuffix("perturb_radius",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
@@ -191,6 +199,40 @@ namespace Bonmin
       }
     }
   }
+  
+  void
+  AmplTMINLP::read_obj_suffixes(){
+    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
+    DBG_ASSERT(asl);
+    //Get the values
+    if(n_obj < 2) return;
+    
+    const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
+    
+    const Index* UBObj = suffix_handler->GetIntegerSuffixValues("UBObj", AmplSuffixHandler::Objective_Source);
+    if(UBObj){
+      //get index of lower bounding objective
+      int lowerBoundingObj = (UBObj[0] == 1)? 1:0;
+      // Pass information to Ipopt
+      ampl_tnlp_->set_active_objective(lowerBoundingObj);
+      
+      //get the index of upper bounding objective
+      for(int i = 0; i < n_obj; i++){
+        if(UBObj[i]==1){
+          if(upperBoundingObj_ != -1){
+            jnlst_->Printf(J_ERROR, J_MAIN,
+                                   "Too many objectives for upper-bounding");
+          }
+          upperBoundingObj_ = i;
+        }
+      }
+    }
+    else
+    {
+      ampl_tnlp_->set_active_objective(0);
+    }
+  }
+  
   
   bool AmplTMINLP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g, Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
   {
@@ -682,6 +724,22 @@ namespace Bonmin
     
   }
   
+  /** This method to returns the value of an alternative objective function for
+  upper bounding (if one has been declared by using the prefix UBObj).*/
+  bool 
+  AmplTMINLP::eval_upper_bound_f(Index n, const Number* x,
+                                  Number& obj_value){
+    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
+    //xknown(x);    // This tells ampl to use a new x
+    fint nerror = -1;
+    double retval = objval(upperBoundingObj_, const_cast<double *>(x), &nerror);
+    if(nerror > 0){
+      jnlst_->Printf(J_ERROR, J_MAIN,
+                     "Error in evaluating upper bounding objecting");
+      throw -1;}
+    return retval;
+
+  }
   /** Return the ampl solver object (ASL*) */
   const ASL_pfgh* 
   AmplTMINLP::AmplSolverObject() const

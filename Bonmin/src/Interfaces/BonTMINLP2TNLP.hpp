@@ -346,6 +346,13 @@ namespace Bonmin
       SmartPtr<IpoptInteriorWarmStarter> GetWarmStarter();
 
     //@}
+      
+      /** Say if has a specific function to compute upper bounds*/
+      virtual bool hasUpperBoundingObjective(){
+        return tminlp_->hasUpperBoundingObjective();}
+
+      /** Evaluate the upper bounding function at given point and store the result.*/
+      void evaluateUpperBoundingFunction(const double * x);
   protected:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).

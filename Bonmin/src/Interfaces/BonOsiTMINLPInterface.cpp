@@ -19,11 +19,14 @@
 #include <string>
 #include <sstream>
 
+
 #include "Ipopt/BonIpoptSolver.hpp"
 #ifdef COIN_HAS_FILTERSQP
 #include "Filter/BonFilterSolver.hpp"
 #endif
 
+
+#include "OsiBranchingObject.hpp"
 using namespace Ipopt;
 
 
@@ -2175,104 +2178,135 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   totalNlpSolveTime_+=CoinCpuTime();
   nCallOptimizeTNLP_++;
   hasBeenOptimized_ = true;
-
+  
   //Options should have been printed if not done already turn off Ipopt output
   if(!hasPrintedOptions) {
     hasPrintedOptions = 1;
     //app_->Options()->SetIntegerValue("print_level",0, true, true);
     app_->Options()->SetStringValue("print_user_options","no", false, true);
   }
-
-
+  
+  
 #if 1
   if(optimization_status_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
+  {
+    std::cout<<"Too few degrees of freedom...."<<std::endl;
+    int numrows = getNumRows();
+    int numcols = getNumCols();
+    
+    const double * colLower = getColLower();
+    const double * colUpper = getColUpper();
+    
+    
+    const double * rowLower = getRowLower();
+    const double * rowUpper = getRowUpper();
+    
+    int numberFixed = 0;
+    for(int i = 0 ; i < numcols ; i++)
     {
-      std::cout<<"Too few degrees of freedom...."<<std::endl;
-      int numrows = getNumRows();
-      int numcols = getNumCols();
-
-      const double * colLower = getColLower();
-      const double * colUpper = getColUpper();
-
-
-      const double * rowLower = getRowLower();
-      const double * rowUpper = getRowUpper();
-
-      int numberFixed = 0;
-      for(int i = 0 ; i < numcols ; i++)
-	{
-	  if(colUpper[i] - colLower[i] <= INT_BIAS)
+      if(colUpper[i] - colLower[i] <= INT_BIAS)
 	    {
 	      numberFixed++;
 	    }
-	}
-      int numberEqualities = 0;
-      for(int i = 0 ; i < numrows ; i++)
-	{
-	  if(rowUpper[i] - rowLower[i] <= INT_BIAS)
+    }
+    int numberEqualities = 0;
+    for(int i = 0 ; i < numrows ; i++)
+    {
+      if(rowUpper[i] - rowLower[i] <= INT_BIAS)
 	    {
 	      numberEqualities++;
 	    }	  
-	}
-      if(numcols - numberFixed > numberEqualities || numcols < numberEqualities)
-      {
-        std::string probName;
-        getStrParam(OsiProbName, probName);
-        throw newUnsolvedError(app_->errorCode(), problem_, probName);
-      }
-      double * saveColLow = CoinCopyOfArray(getColLower(), getNumCols());
-      double * saveColUp = CoinCopyOfArray(getColUpper(), getNumCols());
-
-      for(int i = 0; i < numcols && numcols - numberFixed <= numberEqualities ; i++)
-	{
-	  if(colUpper[i] - colLower[i] <= INT_BIAS)
+    }
+    if(numcols - numberFixed > numberEqualities || numcols < numberEqualities)
+    {
+      std::string probName;
+      getStrParam(OsiProbName, probName);
+      throw newUnsolvedError(app_->errorCode(), problem_, probName);
+    }
+    double * saveColLow = CoinCopyOfArray(getColLower(), getNumCols());
+    double * saveColUp = CoinCopyOfArray(getColUpper(), getNumCols());
+    
+    for(int i = 0; i < numcols && numcols - numberFixed <= numberEqualities ; i++)
+    {
+      if(colUpper[i] - colLower[i] <= INT_BIAS)
 	    {
 	      setColLower(i, saveColLow[i]-1e-06);
 	      setColUpper(i, saveColLow[i]+1e-06);
 	      numberFixed--;
 	    }
-	}
-      solveAndCheckErrors(warmStarted, throwOnFailure, whereFrom);
-      //restore
-      for(int i = 0; i < numcols && numcols - numberFixed < numrows ; i++)
-	{
-	  problem_->SetVariableLowerBound(i,saveColLow[i]);
-	  problem_->SetVariableUpperBound(i,saveColUp[i]);
-	}
-      delete [] saveColLow;
-      delete [] saveColUp;
-      return;
     }
+    solveAndCheckErrors(warmStarted, throwOnFailure, whereFrom);
+    //restore
+    for(int i = 0; i < numcols && numcols - numberFixed < numrows ; i++)
+    {
+      problem_->SetVariableLowerBound(i,saveColLow[i]);
+      problem_->SetVariableUpperBound(i,saveColUp[i]);
+    }
+    delete [] saveColLow;
+    delete [] saveColUp;
+    return;
+  }
   else 
 #endif
     if(!app_->isRecoverable(optimization_status_))//Solver failed and the error can not be recovered, throw it
-  {
-    std::string probName;
-    getStrParam(OsiProbName, probName);
-    throw newUnsolvedError(app_->errorCode(), problem_, probName);
-  }
+    {
+      std::string probName;
+      getStrParam(OsiProbName, probName);
+      throw newUnsolvedError(app_->errorCode(), problem_, probName);
+    }
   try{
-  totalIterations_ += app_->IterationCount();
+    totalIterations_ += app_->IterationCount();
   }
   catch(SimpleError &E)
+  {
+    if (throwOnFailure)//something failed throw
     {
-      if (throwOnFailure)//something failed throw
-	{
-	  throw SimpleError("No statistics available from Ipopt",whereFrom);
-	}
-      else return;
+      throw SimpleError("No statistics available from Ipopt",whereFrom);
     }
-
+    else {
+      return;
+    }
+  }
+  if(problem_->hasUpperBoundingObjective()){//Check if solution is integer and recompute objective value using alternative objective function
+    const double * sol = getColSolution();
+    bool integerSol = true;
+    double intTol = 1e-08;
+    if(objects()){
+      int nObjects = numberObjects();
+      OsiObject ** object = objects();
+      for(int i = 0 ; i< nObjects ; i++){
+        int dummy;
+        if(object[i]->infeasibility(this,dummy) > intTol)
+        {
+          integerSol=false;
+          break;
+        }
+      }
+    }
+    else{//Only works for integer constraints
+      int numcols = getNumCols();
+      for(int i = 0 ; i < numcols ; i++){
+        if(isInteger(i) || isBinary(i)){
+          if(fabs(sol[i] - floor(sol[i]+0.5)) > intTol){
+            integerSol = false;
+            break;
+          }
+        }
+      }
+    }
+    if(integerSol)
+      problem_->evaluateUpperBoundingFunction(sol);
+  }
   messageHandler()->message(IPOPT_SUMMARY, messages_)
-  <<whereFrom<<optimization_status_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
-
+    <<whereFrom<<optimization_status_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+  
   if((nCallOptimizeTNLP_ % 20) == 1)
     messageHandler()->message(LOG_HEAD, messages_)<<CoinMessageEol;
-
-
+  
+  
   if (numIterationSuspect_ >= 0 && (getIterationCount()>numIterationSuspect_ || isAbandoned())) {
     messageHandler()->message(SUSPECT_PROBLEM,
-        messages_)<<nCallOptimizeTNLP_<<CoinMessageEol;
+                              messages_)<<nCallOptimizeTNLP_<<CoinMessageEol;
     std::string subProbName;
     getStrParam(OsiProbName, subProbName);
     std::ostringstream os;
@@ -2280,7 +2314,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     subProbName+=os.str();
     problem_->outputDiffs(subProbName, NULL/*getVarNames()*/);
   }
-
+  
 }
 
 ////////////////////////////////////////////////////////////////////

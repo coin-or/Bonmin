@@ -698,6 +698,11 @@ namespace Bonmin
     }
 
 
+  /** Evaluate the upper bounding function at given point and store the result.*/
+  void 
+  TMINLP2TNLP::evaluateUpperBoundingFunction(const double * x){
+    tminlp_->eval_upper_bound_f(n_, x, obj_value_);
+  }
 }
 // namespace Ipopt
 

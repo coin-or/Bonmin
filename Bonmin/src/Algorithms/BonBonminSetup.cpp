@@ -340,7 +340,7 @@ algo_(other.algo_){
     Algorithm algo = getAlgorithm();
     if(algo == B_OA){
       options_->SetNumericValue("oa_dec_time_limit",DBL_MAX, true, true);
-      options_->SetNumericValue("nlp_solve_frequency", 0, true, true);
+      options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
       intParam_[BabLogLevel] = 0;
     }
     else if (algo==B_QG) {
@@ -408,10 +408,14 @@ algo_(other.algo_){
       cg.atSolution = 1;
       cutGenerators_.push_back(cg);
     }
+    
+    DummyHeuristic * oaHeu = new DummyHeuristic;
+    oaHeu->setNlp(nonlinearSolver_);
+    heuristics_.push_back(oaHeu);
 }
 
 Algorithm BonminSetup::getAlgorithm(){
-  if(algo_ == Dummy)
+  if(algo_ != Dummy)
     return algo_;
   if(IsValid(options_)){
     int ival;

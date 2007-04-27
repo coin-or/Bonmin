@@ -27,8 +27,8 @@ namespace Bonmin
         nlp_(copy.nlp_),
         knowsSolution(copy.knowsSolution)
     {}
-    /// Assign an OsiTMINLPInterface
-    void assignInterface(OsiTMINLPInterface * si);
+    /// Set nlp_
+    void setNlp(OsiTMINLPInterface * si);
     /// heuristic method
     virtual int solution(double &solutionValue, double *betterSolution);
     virtual int solution(double &solutionValue, double *betterSolution, OsiCuts & cs)

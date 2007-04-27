@@ -338,6 +338,15 @@ namespace Bonmin
     {
       return NULL;
     }
+
+    /** Say if has a specific function to compute upper bounds*/
+    virtual bool hasUpperBoundingObjective(){
+      return false;}
+    
+    /** overload this method to return the value of an alternative objective function for
+      upper bounding (to use it hasUpperBoundingObjective should return true).*/
+    virtual bool eval_upper_bound_f(Index n, const Number* x,
+                                    Number& obj_value){}
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -357,7 +366,6 @@ namespace Bonmin
     void operator=(const TMINLP&);
     //@}
 
-      private:
   /** resize arrays for linear cuts */
   void resizeLinearCuts(int newNumberCuts, int newNnz);
   /** columnindices of linear cuts. */

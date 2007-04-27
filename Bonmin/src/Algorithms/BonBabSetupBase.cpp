@@ -429,7 +429,6 @@ BabSetupBase::readOptionsStream(std::istream& is)
 {
   if(GetRawPtr(options_) == NULL || GetRawPtr(roptions_) == NULL || GetRawPtr(journalist_) == NULL)
     initializeOptionsAndJournalist();
-  std::cout<<"Reading options...."<<std::endl;
   if(is.good()){
     options_->ReadFromStream(*journalist_, is);
   }

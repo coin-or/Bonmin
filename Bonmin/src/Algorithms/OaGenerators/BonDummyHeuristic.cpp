@@ -29,7 +29,7 @@ namespace Bonmin
   {}
 /// Assign an OsiTMINLPInterface
   void
-  DummyHeuristic::assignInterface(OsiTMINLPInterface * si)
+  DummyHeuristic::setNlp(OsiTMINLPInterface * si)
   {
     nlp_ = si;
   }

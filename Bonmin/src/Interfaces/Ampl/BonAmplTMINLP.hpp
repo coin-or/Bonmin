@@ -67,6 +67,10 @@ namespace Bonmin
     /** read the sos constraints from ampl suffixes */
     void read_sos();
 
+    /** Read suffixes on objective functions for upper bounding*/
+    void read_obj_suffixes();
+    
+    /** Default constructor.*/
     AmplTMINLP();
 
     virtual AmplTMINLP * createEmpty()
@@ -75,7 +79,7 @@ namespace Bonmin
       return tminlp;
     }
 
-    /** Default destructor */
+    /** destructor */
     virtual ~AmplTMINLP();
     //@}
 
@@ -188,58 +192,20 @@ namespace Bonmin
 
     /** This methods gives the linear part of the objective function */
     virtual void getLinearPartOfObjective(double * obj);
-    /** Journlist */
-    SmartPtr<const Journalist> jnlst_;
 
-    /** Sign of the objective fn (1 for min, -1 for max) */
-    double obj_sign_;
-
-    /**@name Problem Size Data*/
-    //@{
-    Index nz_h_full_; // number of nonzeros in the full_x hessian
-    /* the rest of the problem size data is available easily through the ampl variables */
-    //@}
-
-    /**@name Internal copies of data */
-    //@{
-    /** A non-const copy of x - this is kept up-to-date in apply_new_x */
-    Number* non_const_x_;
-
-    /** Solution Vectors */
-    Number* x_sol_;
-    Number* z_L_sol_;
-    Number* z_U_sol_;
-    Number* g_sol_;
-    Number* lambda_sol_;
-    Number obj_sol_;
-    //@}
-
-    /**@name Flags to track internal state */
-    //@{
-    /** true when the objective value has been calculated with the
-     *  current x, set to false in apply_new_x, and set to true in
-     *  internal_objval */
-    bool objval_called_with_current_x_;
-    /** true when the constraint values have been calculated with the
-     *  current x, set to false in apply_new_x, and set to true in
-     *  internal_conval */
-    bool conval_called_with_current_x_;
-    //@}
-
-
-    /** Make the objective call to ampl */
-    bool internal_objval(Number& obj_val);
-
-    /** Make the constraint call to ampl*/
-    bool internal_conval(Index m, Number* g=NULL);
-
-    /** Internal function to update the internal and ampl state if the
-    x value changes */
-    void apply_new_x(bool new_x, Index n, const Number* x);
 
     /** Method to add the extra option for ampl */
     void fillAmplOptionList(AmplOptionsList* amplOptList);
 
+    /** Do we have an alternate objective for upper bounding?*/
+    virtual bool hasUpperBoundingObjective(){
+      return upperBoundingObj_ != -1;}
+    
+    /** This method to returns the value of an alternative objective function for
+      upper bounding (if one has been declared by using the prefix UBObj).*/
+    virtual bool eval_upper_bound_f(Index n, const Number* x,
+                                    Number& obj_value);
+private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
      * These methods are not implemented and
@@ -256,8 +222,12 @@ namespace Bonmin
     void operator=(const AmplTMINLP&);
     //@}
 
+    /** Index of the objective to use for upper bounding*/
+    int upperBoundingObj_;
     /** pointer to the internal AmplTNLP */
     AmplTNLP* ampl_tnlp_;
+    /** Journalist */
+    SmartPtr<const Journalist> jnlst_;
 
     /** Storage of branching priorities information.*/
     BranchingInfo branch_;
