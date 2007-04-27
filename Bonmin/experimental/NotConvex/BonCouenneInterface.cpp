@@ -125,7 +125,7 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
 
      if(v.getNumElements() != length[i])
        std::cout<<"Empty row"<<std::endl;
-     cut->print();
+     //     cut->print();
      CoinCopyN(v.getIndices(), length[i], ind + start[i]);
      CoinCopyN(v.getElements(), length[i], elem + start[i]);
    }
@@ -144,12 +144,23 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
    CoinFillN(obj,numcolsconv,0.);
 
    // some instances have no (or null) objective function, check it here
-   if (couenneCg.Problem () -> nObjs () > 0)
-     obj [couenneCg.Problem () -> Obj (0) -> Body () -> Index ()] = 1;
+   if (couenneCg. Problem () -> nObjs () > 0) {
+
+     // some problem may have zero or constant objective function, in
+     // that case just put the first variable
+
+     int index = couenneCg. Problem () -> Obj (0) -> Body () -> Index ();
+
+     obj [(index >= 0) ? index : 0] =
+       (couenneCg. Problem () -> Obj (0) -> Sense () == MINIMIZE) ? 1. : -1;
+
+     if (index < 0)
+       printf ("Warning, objective function has no associated aux variable\n");
+   }
 
    // Finally, load interface si with the initial LP relaxation
    si.loadProblem (A, colLower, colUpper, obj, rowLower, rowUpper);
-  
+
    delete [] rowLower; 
    delete [] rowUpper;
    delete [] colLower;
