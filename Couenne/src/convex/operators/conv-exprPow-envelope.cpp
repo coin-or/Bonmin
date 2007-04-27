@@ -51,21 +51,23 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
   // set x to get a deeper cut (so that we get a tangent which is
   // orthogonal with line through current- and tangent point)
 
-  //  x = powNewton (x, y, power_k, power_k_prime, power_k_dblprime);
+  if (!(cg -> isFirst ()))
+    x = powNewton (x, y, power_k, power_k_prime, power_k_dblprime);
 
   if      (x<l) x=l;
   else if (x>u) x=u;
 
   // limit the bounds for the envelope
 
-  CouNumber step = 1 + log (1. + (double) (cg -> nSamples ()));
+  CouNumber step     = 1 + log (1. + (double) (cg -> nSamples ())),
+            powThres = pow (COU_MAX_COEFF, 1./k);
 
-  if (l < - COUENNE_INFINITY + 1) {
+  if (l < - powThres + 1) {
     l = x - step;
-    if (u > COUENNE_INFINITY - 1)
+    if (u > powThres - 1)
       u = x + step;
   } else 
-    if (u > COUENNE_INFINITY - 1) 
+    if (u > powThres - 1) 
       u = x + step;
 
   // convex envelope

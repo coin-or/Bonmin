@@ -82,9 +82,9 @@ inline CouNumber safe_pow (register CouNumber base,
   register int rndexp;
 
   if ((base < 0) && 
-      ((fabs (exponent - (rndexp = FELINE_round (exponent))) < COUENNE_EPS) ||
+      ((fabs (exponent - (rndexp = COUENNE_round (exponent))) < COUENNE_EPS) ||
        ((fabs (exponent) > COUENNE_EPS) && 
-	(fabs (1. / exponent - (rndexp = FELINE_round (1. / exponent))) < COUENNE_EPS)))
+	(fabs (1. / exponent - (rndexp = COUENNE_round (1. / exponent))) < COUENNE_EPS)))
       && (rndexp % 2))
     return (- pow (- base, exponent));
 

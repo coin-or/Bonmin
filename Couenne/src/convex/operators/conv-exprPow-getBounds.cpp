@@ -61,10 +61,10 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
       CouNumber expon = arglist_ [1] -> Value ();
       int rndexp;
 
-      bool isInt    =  fabs (expon - (rndexp = FELINE_round (expon))) < COUENNE_EPS;
+      bool isInt    =  fabs (expon - (rndexp = COUENNE_round (expon))) < COUENNE_EPS;
       bool isInvInt = !isInt &&  
                       ((fabs (expon) > COUENNE_EPS) && 
-		       (fabs (1/expon - (rndexp = FELINE_round (1/expon))) < COUENNE_EPS));
+		       (fabs (1/expon - (rndexp = COUENNE_round (1/expon))) < COUENNE_EPS));
 
       if ((isInt || isInvInt) && (rndexp % 2) && (rndexp > 0)) { 
 

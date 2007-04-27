@@ -45,12 +45,6 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// derivative of inv (x)
-
-inline CouNumber oppInvSqr (register CouNumber x) 
-{return (- inv (x*x));}
-
-
 #define MIN_DENOMINATOR 1e-10
 
 // generate convexification cut for constraint w = 1/x
@@ -78,9 +72,7 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   aux -> getBounds (wle, wue);
 
-  expression *xe = argument_;
-
-  CouNumber x = (*xe)  ();
+  CouNumber x;
 
   int w_ind = aux       -> Index (), 
       x_ind = argument_ -> Index ();
@@ -106,11 +98,16 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       u = (u<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
   }
 
-  int sign = (l > 0) ? +1 : -1;
-
   // bound
-
-  cg -> addEnvelope (cs, sign, inv, oppInvSqr, w_ind, x_ind, x, l, u);
+  cg -> addEnvelope 
+    (cs, (l > 0) ? +1 : -1, 
+     inv, oppInvSqr, w_ind, x_ind, 
+     (cg -> isFirst ()) ?
+       // place it somewhere in the interval (we won't care)
+       ((l > COUENNE_EPS) ? l : u) :
+       // not first call, gotta replace it where it gives deepest cut
+       powNewton ((*argument_) (), (*aux) (), inv, oppInvSqr, inv_dblprime),
+     l, u);
 
   delete xle; 
   delete xue;

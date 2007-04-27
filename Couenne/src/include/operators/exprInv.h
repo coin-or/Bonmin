@@ -12,49 +12,57 @@
 #include <exprUnary.h>
 
 
-// the operator itself
-
+/// the operator itself
 inline CouNumber inv (register CouNumber arg) 
 {return 1.0 / arg;}
 
+/// derivative of inv (x)
+inline CouNumber oppInvSqr (register CouNumber x) 
+{return (- inv (x*x));}
 
-// class inverse (1/f(x))
+
+/// inv_dblprime, second derivative of inv (x)
+inline CouNumber inv_dblprime (register CouNumber x) 
+{return (2 * inv (x*x*x));}
+
+
+/// class inverse (1/f(x))
 
 class exprInv: public exprUnary {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprInv  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprInv (argument_ -> clone ());}
 
   /// the operator's function
   inline unary_function F () {return inv;}
 
-  // output "1/argument"
+  /// output "1/argument"
   void print (std::ostream&) const;
 
-  // differentiation
+  /// differentiation
   expression *differentiate (int index); 
 
-  // get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () {
     if (argument_ -> Type () == CONST) return CONSTANT;
     else                               return NONLINEAR;
   }
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRINV;}
 
   /// implied bound processing

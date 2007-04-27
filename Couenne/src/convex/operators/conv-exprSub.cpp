@@ -36,18 +36,14 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   expression *x = arglist_ [0];
   expression *y = arglist_ [1];
 
-  int wind = w -> Index ();
-  int xind = x -> Index ();
-  int yind = y -> Index ();
+  int wi = w -> Index ();
+  int xi = x -> Index ();
+  int yi = y -> Index ();
 
-  if (x->Type () == CONST) { // (c - y) or (c - d)
-
-    CouNumber c = x -> Value ();
-
-    if (y->Type() == CONST) cg -> createCut (cs, c - y->Value(), 0, wind, 1.,   -1, 0., -1, 0., true);
-    else                    cg -> createCut (cs, c,              0, wind, 1., yind, 1., -1, 0., true);
-  }
+  if (x->Type () == CONST) // (c - y) or (c - d)
+    if (y->Type() == CONST) cg -> createCut (cs, x->Value()-y->Value(), 0, wi, 1, -1, 0, -1, 0, true);
+    else                    cg -> createCut (cs, x->Value(),            0, wi, 1, yi, 1, -1, 0, true);
   else // (x - y) or (x - d)
-    if (y->Type() == CONST) cg -> createCut (cs, y->Value(),     0, wind, -1., xind, 1., -1, 0.,true);
-    else                    cg -> createCut (cs, 0.,          0, wind, -1., xind, 1., yind, -1.,true);
+    if (y->Type() == CONST) cg -> createCut (cs, y->Value(),     0, wi, -1., xi, 1., -1, 0.,true);
+    else                    cg -> createCut (cs, 0.,          0, wi, -1., xi, 1., yi, -1.,true);
 }

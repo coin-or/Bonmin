@@ -77,8 +77,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
 
-  CouNumber w = (*aux) (),
-            x = (*xe)  (), 
+  CouNumber w, x,
             l = (*xle) (), 
             u = (*xue) ();
 
@@ -116,8 +115,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     return;
   }
 
-  bool isInt    =            fabs (k    - (double) (intk = FELINE_round (k)))    < COUENNE_EPS,
-       isInvInt = !isInt && (fabs (1./k - (double) (intk = FELINE_round (1./k))) < COUENNE_EPS);
+  bool isInt    =            fabs (k    - (double) (intk = COUENNE_round (k)))    < COUENNE_EPS,
+       isInvInt = !isInt && (fabs (1./k - (double) (intk = COUENNE_round (1./k))) < COUENNE_EPS);
 
   // two macro-cases: 
 
@@ -141,14 +140,26 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     int sign;
 
     if (isInvInt) {
+      if (cg -> isFirst ()) {
+	w = (l>0) ? 1 : (u<0) ? -1 : 0;
+	x = 0;
+      }
       q = safe_pow (q, k);
       sign = -1;
     }
-    else sign = 1;
+    else {
+      if (cg -> isFirst ()) {
+	x = (l>0) ? l : (u<0) ? u : 0;
+	w = 0;
+      }
+      sign = 1;
+    }
+
+    CouNumber powThres = pow (COU_MAX_COEFF, 1./k); // don't want big coefficients
 
     // lower envelope
 
-    if (l > -COUENNE_INFINITY) {
+    if (l > -powThres) {
       if (u > q * l) { // upper x is after "turning point", add lower envelope
 	addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, q*l, u, sign);
 	cg      -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
@@ -157,7 +168,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     // upper envelope
 
-    if (u < COUENNE_INFINITY) {
+    if (u < powThres) {
       if (l < q * u) { // lower x is before "turning point", add upper envelope
 	addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, l, q*u, -sign);
 	cg      -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
@@ -175,7 +186,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     if (!isInt 
 	&& (!isInvInt || !(intk % 2))
 	&& (l < - COUENNE_EPS) 
-	&& (u < (l=0)))        // CAUTION! l is updated here, if negative
+	&& (u < (l=0)))        // CAUTION! l updated if negative (k real)
       return;
 
     // if k is negative and 0 is an internal point of [l,u], no
@@ -207,29 +218,33 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     // upper envelope -- when k negative, add only if
 
-    CouNumber powThreshold = pow (1e20, 1./k);
+    CouNumber powThres = pow (COU_MAX_COEFF, 1./k), // don't want big coefficients
+              powStep  = 1;
 
     if ((  (k > COUENNE_EPS)
-	|| (l > COUENNE_EPS)             // bounds do not contain 0
+	|| (l > COUENNE_EPS)       // bounds do not contain 0
 	|| (u < - COUENNE_EPS)) &&
-	(l > - powThreshold) &&  // and are finite
-	(u <   powThreshold))
+	(l > - powThres) &&    // and are finite
+	(u <   powThres))
 
       cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l, k), u, safe_pow (u, k), -sign);
 
     // similarly, pay attention not to add infinite slopes
 
-#define POWER_RANGE 1e2;
+    if (cg -> isFirst()) {
+      x = (k<0) ? ((u<0) ? u : (l>0) ? l : 0) : 0;
+      w = 0;
+    }
 
     if (k > COUENNE_EPS) {
 
-      if (u >   powThreshold) u = x + POWER_RANGE;
-      if (l < - powThreshold) l = x - POWER_RANGE;
+      if (u >   powThres) u = x + powStep;
+      if (l < - powThres) l = x - powStep;
     }
     else {
 
-      if (fabs (l) < COUENNE_EPS) l =  1. / POWER_RANGE; // l --> 0+
-      if (fabs (u) < COUENNE_EPS) u = -1. / POWER_RANGE; // u --> 0-
+      if (fabs (l) < COUENNE_EPS) l =  1. / powThres; // l --> 0+
+      if (fabs (u) < COUENNE_EPS) u = -1. / powThres; // u --> 0-
     }
 
     addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, l, u, sign);

@@ -92,7 +92,7 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int       *index = new int       [nargs_ + nterms + 1];
   OsiRowCut *cut   = new OsiRowCut;
 
-  CouNumber rhs = c0_;
+  CouNumber rhs = - c0_;
 
   // first, make room for aux variable
   coeff [0] = -1.; index [0] = w -> Index ();
@@ -110,7 +110,7 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
     expression *curr = arglist_ [i];
 
     if (curr -> Type () == CONST) // constant term in sum
-      rhs += curr -> Value ();
+      rhs -= curr -> Value ();
     else {                        // variable
       coeff [++nterms] = 1.; 
       index   [nterms] = curr -> Index ();
@@ -118,8 +118,6 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   }
 
   cut -> setRow (nterms+1, index, coeff);
-
-  rhs = - rhs;
 
   cut -> setUb (rhs);
   cut -> setLb (rhs);

@@ -8,6 +8,8 @@
 
 #include <CouenneTypes.h>
 #include <exprLog.h>
+#include <exprInv.h>
+#include <exprPow.h>
 #include <exprConst.h>
 
 #include <CouenneProblem.h>
@@ -26,7 +28,8 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   argument_ -> getBounds (le, ue);
 
-  CouNumber x = (*argument_) (),
+  CouNumber x = (cg -> isFirst ()) ? 
+                 1 : powNewton ((*argument_) (), (*aux) (), log, inv, oppInvSqr),
             l = (*le) (),
             u = (*ue) ();
 

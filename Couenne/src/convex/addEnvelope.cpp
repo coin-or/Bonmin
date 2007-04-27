@@ -19,7 +19,6 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 				       int w_ind, int x_ind, 
 				       CouNumber x, CouNumber l, CouNumber u,
 				       bool is_global) const {
-
   CouNumber opp_slope = - fprime (x);
 
   // TODO: remove check of !firstcall_ if point is available already

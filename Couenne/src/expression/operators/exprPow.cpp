@@ -122,12 +122,12 @@ int exprPow::Linearity () {
 
     double exponent = arglist_ [1] -> Value ();
 
-    if (fabs (exponent - FELINE_round (exponent)) > COUENNE_EPS)
+    if (fabs (exponent - COUENNE_round (exponent)) > COUENNE_EPS)
       return NONLINEAR;
 
     if (arglist_ [1] -> Type () == CONST) { 
 
-      int expInt = (int) FELINE_round (exponent);
+      int expInt = (int) COUENNE_round (exponent);
 
       if (arglist_ [0] -> Linearity () == LINEAR) {
 
@@ -191,8 +191,8 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   int intk; // integer (or integer inverse of) exponent
 
-  bool isint    =           (k    - (intk = FELINE_round (k))    < COUENNE_EPS), // k   is integer
-       isinvint = !isint && (1./k - (intk = FELINE_round (1./k)) < COUENNE_EPS); // 1/k is integer
+  bool isint    =           (k    - (intk = COUENNE_round (k))    < COUENNE_EPS), // k   is integer
+       isinvint = !isint && (1./k - (intk = COUENNE_round (1./k)) < COUENNE_EPS); // 1/k is integer
 
   CouNumber wl = l [wind], // lower w
             wu = u [wind]; // upper w

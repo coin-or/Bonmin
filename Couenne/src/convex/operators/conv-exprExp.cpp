@@ -10,6 +10,7 @@
 #include <exprExp.h>
 #include <exprConst.h>
 #include <exprAux.h>
+#include <exprPow.h>
 
 #include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>
@@ -23,7 +24,8 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   argument_ -> getBounds (le, ue);
 
-  CouNumber x = (*argument_) (),
+  CouNumber x = (cg -> isFirst ()) ? 
+                 0 : powNewton ((*argument_) (), (*aux) (), exp, exp, exp),
             l = (*le) (),
             u = (*ue) ();
 
@@ -46,19 +48,6 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // add tangent points: first choose sampling points
 
   int ns = cg -> nSamples ();
-
-  // change bounds to get finite coefficients
-
-  //  CouNumber fact = 2 * ns;
-
-  /*if (x > 0) {
-    if (l < log (COUENNE_EPS))      l = x / fact - 1;
-    if (u > log (COUENNE_INFINITY)) u = x * fact + 1;
-  }
-  else {
-    if (l < log (COUENNE_EPS))      l = x * fact - 1;
-    if (u > log (COUENNE_INFINITY)) u = x / fact + 1;
-    }*/
 
   // add tangents with finite coefficients
   if (l < log (COUENNE_EPS))      l = x - ns;

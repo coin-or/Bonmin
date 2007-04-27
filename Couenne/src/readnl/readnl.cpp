@@ -115,7 +115,10 @@ int CouenneProblem::readnl (const ASL *asl) {
     ///////////////////////////////////////////////////
 
     expression *subst = body -> simplify ();
-    if (subst) body = subst;
+    if (subst) {
+      delete body; // VALGRIND
+      body = subst;
+    }
 
     // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
@@ -247,7 +250,10 @@ int CouenneProblem::readnl (const ASL *asl) {
     }
 
     expression *subst = body -> simplify ();
-    if (subst) body = subst;
+    if (subst) {
+      delete body; // VALGRIND
+      body = subst;
+    }
 
     // add them (and set lower-upper bound)
     switch (sign) {

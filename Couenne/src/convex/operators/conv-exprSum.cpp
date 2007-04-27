@@ -14,7 +14,7 @@
 #include <CouenneCutGenerator.h>
 
 
-// generate convexification cut for constraint w = this
+/// generate convexification cut for constraint w = this
 
 void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
@@ -28,16 +28,16 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   CouNumber rhs = 0;
 
-  // first, make room for aux variable
+  /// first, make room for aux variable
   coeff [0] = -1.; index [0] = w -> Index ();
 
   int nv = 1;
 
-  // scan arglist for (aux) variables and constants
+  /// scan arglist for (aux) variables and constants
   for (int i=0; i<nargs_; i++) {
 
     if (arglist_ [i] -> Type () == CONST)
-      rhs += arglist_ [i] -> Value ();
+      rhs -= arglist_ [i] -> Value ();
     else {
       coeff [nv]   = 1.; 
       index [nv++] = arglist_ [i] -> Index ();
@@ -45,13 +45,13 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   }
 
   cut -> setRow (nv, index, coeff);
-  cut -> setUb (-rhs);
-  cut -> setLb (-rhs);
+  cut -> setUb (rhs);
+  cut -> setLb (rhs);
 
   delete [] index;
   delete [] coeff;
 
-  // added only once, it is global
+  /// added only once, it is global
   cut -> setGloballyValid ();
 
   cs.insert (cut);

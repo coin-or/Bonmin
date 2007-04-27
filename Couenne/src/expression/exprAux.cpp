@@ -53,6 +53,24 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");
       image_ -> print (std::cout); 
+
+      printf (" [%.3e,%.3e] ---> ", 
+	      expression::Lbound (varIndex_), 
+	      expression::Ubound (varIndex_));
+
+      int index;
+      if ((image_ -> Argument ()) && 
+	  ((index = image_ -> Argument () -> Index ()) >= 0))
+	printf ("[%.3e,%.3e] ", 
+		expression::Lbound (index), 
+		expression::Ubound (index));
+      else if (image_ -> ArgList ())
+	for (int i=0; i<image_ -> nArgs (); i++)
+	  if ((index = image_ -> ArgList () [i] -> Index ()) >= 0)
+	printf ("[%.3e,%.3e] ", 
+		expression::Lbound (index), 
+		expression::Ubound (index));
+	
       printf("\n");
       for (int jj=j; jj < cs.sizeRowCuts ();jj++)
 	cs.rowCutPtr (jj) -> print ();
