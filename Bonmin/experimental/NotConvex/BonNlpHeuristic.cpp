@@ -20,18 +20,23 @@ namespace Bonmin{
     nlp_(NULL),
     hasCloned_(false),
     maxNlpInf_(1e-04),
+  numberSolvePerLevel_(-1),
     couenne_(NULL){
   }
   
   NlpSolveHeuristic::NlpSolveHeuristic(CbcModel & model, OsiSolverInterface &nlp, bool cloneNlp, CouenneProblem * couenne):
   CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp),maxNlpInf_(1e-04),
+  numberSolvePerLevel_(-1),
   couenne_(couenne){
     if(cloneNlp)
       nlp_ = nlp.clone();
   }
   
   NlpSolveHeuristic::NlpSolveHeuristic(const NlpSolveHeuristic & other):
-  CbcHeuristic(other), nlp_(other.nlp_), hasCloned_(other.hasCloned_),maxNlpInf_(other.maxNlpInf_),
+  CbcHeuristic(other), nlp_(other.nlp_), 
+  hasCloned_(other.hasCloned_),
+  maxNlpInf_(other.maxNlpInf_),
+  numberSolvePerLevel_(other.numberSolvePerLevel_),
   couenne_(other.couenne_){
     if(hasCloned_ && nlp_ != NULL)
       nlp_ = other.nlp_->clone();
@@ -58,6 +63,7 @@ namespace Bonmin{
       }
     }
     maxNlpInf_ = rhs.maxNlpInf_;
+    numberSolvePerLevel_ = rhs.numberSolvePerLevel_;
     couenne_ = rhs.couenne_;
     return *this;
   }
@@ -90,6 +96,17 @@ namespace Bonmin{
     if(babInfo && babInfo->infeasibleNode()){
       return 0;
     }
+    
+    
+    if(numberSolvePerLevel_ > -1){
+      if(numberSolvePerLevel_ == 0) return 0 ;
+    double num=CoinDrand48();
+    const int depth = (model_->currentNode()) ? model_->currentNode()->depth() : 0;
+    double beta=pow(2,numberSolvePerLevel_);
+    if(num> beta*pow(2,-depth))
+      return 0 ;
+    }
+    
     double * lower = CoinCopyOfArray(solver->getColLower(), nlp_->getNumCols());
     double * upper = CoinCopyOfArray(solver->getColUpper(), nlp_->getNumCols());
     const double * solution = solver->getColSolution();

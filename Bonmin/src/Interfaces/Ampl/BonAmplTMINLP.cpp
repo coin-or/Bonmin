@@ -110,6 +110,7 @@ namespace Bonmin
                               ampl_options_list, options_id.c_str(),
                               appName.c_str(), appName.c_str(), nl_file_content);
     /* Read suffixes */
+    read_obj_suffixes();
     read_priorities();
     read_sos();
   }
@@ -732,12 +733,12 @@ namespace Bonmin
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
     //xknown(x);    // This tells ampl to use a new x
     fint nerror = -1;
-    double retval = objval(upperBoundingObj_, const_cast<double *>(x), &nerror);
+    obj_value = objval(upperBoundingObj_, const_cast<double *>(x), &nerror);
     if(nerror > 0){
       jnlst_->Printf(J_ERROR, J_MAIN,
                      "Error in evaluating upper bounding objecting");
       throw -1;}
-    return retval;
+    return nerror;
 
   }
   /** Return the ampl solver object (ASL*) */

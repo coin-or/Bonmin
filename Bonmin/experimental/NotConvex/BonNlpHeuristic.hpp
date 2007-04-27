@@ -49,6 +49,9 @@ public:
     /** set maxNlpInf. */
     void setMaxNlpInf(double value){
       maxNlpInf_ = value;}
+    /** set number of nlp's solved for each given level of the tree*/
+    void setNumberSolvePerLevel(int value){
+      numberSolvePerLevel_ = value;}
 private:
     /** Pointer to an nlp solver interface.*/
     OsiSolverInterface * nlp_;
@@ -56,6 +59,8 @@ private:
     bool hasCloned_;
     /** maximum nlp infeasibility under which try to solve problem with Ipopt.*/
     double maxNlpInf_;
+    /** Number of nlp's solved for each given level of the tree*/
+    int numberSolvePerLevel_;
     /** Pointer to a couenne representation of the problem. */
     CouenneProblem * couenne_;
   };

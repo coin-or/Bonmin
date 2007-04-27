@@ -71,7 +71,12 @@ namespace Bonmin{
     
     
     /* Initialize Couenne cut generator.*/
-    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg_->asl, true, CURRENT_ONLY,1);
+    int ivalue, num_points;
+    options()->GetEnumValue("convexification_type", ivalue,"bonmin.");
+    enum conv_type convtype((enum conv_type) ivalue);
+    options()->GetIntegerValue("convexification_points",num_points,"bonmin.");
+    
+    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg_->asl, true, convtype,num_points);
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
@@ -142,13 +147,16 @@ namespace Bonmin{
 
     /*Setup heuristic to solve nlp problems.*/
     int doNlpHeurisitic = 0;
-    options()->GetEnumValue("nlp_local_solutions", doNlpHeurisitic, "couenne.");
+    options()->GetEnumValue("local_optimization_heuristic", doNlpHeurisitic, "couenne.");
     if(doNlpHeurisitic)
     {
+      int numSolve;
+      options()->GetIntegerValue("log_num_local_optimization_per_level",numSolve,"couenne.");
       NlpSolveHeuristic * nlpHeuristic = new NlpSolveHeuristic;
       nlpHeuristic->setNlp(*ci,false);
       nlpHeuristic->setCouenneProblem(couenneProb);
       nlpHeuristic->setMaxNlpInf(1e10);
+      nlpHeuristic->setNumberSolvePerLevel(numSolve);
       heuristics_.push_back(nlpHeuristic);
     }
     
@@ -175,11 +183,35 @@ void
                                            0,1,
                                            "A frequency of 0 amounts to to never solve the NLP relaxation.");
     
-    roptions->AddStringOption2("nlp_local_solutions",
+    roptions->AddStringOption2("local_optimization_heuristic",
                                "Do we search for local solutions of NLP's",
                                "yes",
                                "no","",
                                "yes","");
+    
+    roptions->AddLowerBoundedIntegerOption("log_num_local_optimization_per_level",
+                               "Specify the logarithm of the number of local optimization to perform on average for each level of given depth of the tree.",
+                               -1,-1,"Solve as many nlp's at the nodes for each level of the tree. Nodes are randomly selected. If for a"
+                                           "given level there are less nodes than this number nlp are solved for every nodes."
+                                           "For example if parameter is 8, nlp's are solved for all node untill level 8, then for half the node at level 9, 1/4 at level 10...."
+                                           "Value -1 specify to perform at all nodes."
+                                           );
+    
+    
+    roptions->AddStringOption3("convexification_type",
+                               "Deterimnes in which point the linear over/under-estimator are generated",
+                               "current-point-only",
+                               "current-point-only","Only at current optimum of relaxation",
+                               "uniform-grid","Points chosen in a unform grid between the bounds of the problem",
+                               "around-current-point","At points around current optimum of relaxation");
+    
+    roptions->AddLowerBoundedIntegerOption("convexification_points",
+                                           "Specify the number of points at which to convexify when convexification type"
+                                           "is uniform-grid or arround-current-point.",
+                                           0,1,
+                                           "");
+    
+    
   }
   //  OsiTMINLPInterface * BonminAmplSetup::createOsiInterface{
   //}

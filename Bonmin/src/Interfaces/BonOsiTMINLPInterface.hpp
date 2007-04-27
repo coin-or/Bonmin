@@ -97,6 +97,7 @@ class SimpleError : public CoinError
     LOG_HEAD/** Head of "civilized" log.*/,
     LOG_FIRST_LINE/** First line (first solve) of log.*/,
     LOG_LINE/**standard line (retry solving) of log.*/,
+    ALTERNATE_OBJECTIVE/** Recomputed integer feasible with alternate objective function*/,
     WARN_RESOLVE_BEFORE_INITIAL_SOLVE /** resolve() has been called but there
                                               was no previous call to initialSolve().
                                          */,

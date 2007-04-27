@@ -201,6 +201,7 @@ OsiTMINLPInterface::Messages::Messages
   addMessage(SOLUTION_FOUND, CoinOneMessage
       (1,2,"After %d tries found a solution of %g "
        "(previous best %g)."));
+
   addMessage(INFEASIBLE_SOLUTION_FOUND, CoinOneMessage
       (2,2,"After %d tries found an solution of %g "
        "infeasible problem."));
@@ -243,6 +244,9 @@ OsiTMINLPInterface::Messages::Messages
       (10,1,
        " %c  r%-7d %-11s %-14g %-8d %-3g"));
 
+  addMessage(ALTERNATE_OBJECTIVE, CoinOneMessage
+             (18,1,"Objective value recomputed with alternate objective: %g."));
+  
   addMessage(WARN_RESOLVE_BEFORE_INITIAL_SOLVE, CoinOneMessage
       (3012,1,"resolve called before any call to initialSolve"
        " can not use warm starts."));
@@ -2294,8 +2298,11 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
         }
       }
     }
-    if(integerSol)
+    if(integerSol){
       problem_->evaluateUpperBoundingFunction(sol);
+      messageHandler()->message(ALTERNATE_OBJECTIVE, messages_)
+      <<getObjValue()<<CoinMessageEol;
+    }
   }
   messageHandler()->message(IPOPT_SUMMARY, messages_)
     <<whereFrom<<optimization_status_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
