@@ -36,13 +36,14 @@ expression *getFixVarBinFun (expression *arg0, expression *arg1) {
       delta0 = u0-l0, 
       delta1 = u1-l1;
 
-    if      (fabs (delta0) < COUENNE_EPS) return arg1;
-    else if (fabs (delta1) < COUENNE_EPS) return arg0;
+    if        (fabs (delta0) < COUENNE_EPS) {
+      if      (fabs (delta1) > COUENNE_EPS) return arg1;
+    } else if (fabs (delta1) < COUENNE_EPS) return arg0;
 
-    // We have a full-dimensional (possibly unlimited) bounding box
+    // We have a full-dimensional (possibly unlimited) bounding box,
+    // or a very tiny square
 
-    {
-      // First of all, do not branch on variable close to bound
+    { // branch on variable far from bounds if other is near bounds
 
       register bool 
 	xl0 = (fabs (x0-l0) < COUENNE_EPS), 

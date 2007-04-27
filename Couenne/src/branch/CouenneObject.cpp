@@ -41,14 +41,13 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &)
 
   if (0) {
 
-    reference_             -> print (std::cout); std::cout << " = ";
-    reference_ -> Image () -> print (std::cout);
-
-    printf (". Inf: = |%.2f - %.2f| = %.2f ",  ////[%.2f,%.2f]
+    printf ("Inf: = |%.6e - %.6e| = %.6e  ",  ////[%.2f,%.2f]
 	    var, expr, 
 	    //	    expression::Lbound (reference_ -> Index ()),
 	    //	    expression::Ubound (reference_ -> Index ()),
 	    fabs (var - expr));
+    reference_             -> print (std::cout); std::cout << " = ";
+    reference_ -> Image () -> print (std::cout); printf ("\n");
   }
 
   CouNumber delta = fabs (var - expr);
@@ -101,8 +100,10 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   int index = reference_ -> Index ();
 
   // should never happen...
-  if (index < 0) 
+  if (index < 0) {
+    printf ("Warning, CouenneObject::feasibleRegion: reference_'s index negative\n");
     return 0;
+  }
 
   double val = info -> solution_ [index];
 
@@ -112,6 +113,8 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   solver -> setColUpper (index, val);
 
   expression * expr = reference_ -> Image ();
+
+  // fix all variables upon which this auxiliary depends
 
   if (expr -> Argument ()){ // unary function
 
@@ -151,12 +154,12 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
     exprGroup *e = dynamic_cast <exprGroup *> (expr);
     int *indices = e -> getIndices (), index;
 
-    for (register int i=0; (index = indices [i]) >= 0; i++) {
+    for (; *indices >= 0; indices++) {
       
-      val = info -> solution_ [index];
+      val = info -> solution_ [*indices];
 
-      solver -> setColLower (index, val);
-      solver -> setColUpper (index, val);
+      solver -> setColLower (*indices, val);
+      solver -> setColUpper (*indices, val);
     }
   }
 
@@ -178,15 +181,15 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     printf ("\n");
   }
 
+  // constructor uses actual values of variables and bounds, update them
   expression::update (const_cast <CouNumber *> (info -> solution_),
 		      const_cast <CouNumber *> (info -> lower_),
 		      const_cast <CouNumber *> (info -> upper_));
 
   expression *depvar = reference_ -> Image () -> getFixVar ();
+  int index;
 
-  int index = depvar -> Index ();
-
-  if (index >= 0) {
+  if (depvar && (index = depvar -> Index ())>= 0) {
 
     int ref_ind = reference_ -> Index ();
 
@@ -203,7 +206,6 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-
       return new CouenneBranchingObject (depvar);
   }
 

@@ -118,8 +118,9 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
-	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
+	problem/impliedBounds.cpp problem/readASLfg.cpp \
+	util/drawCuts.cpp util/rootQ.c readnl/readnl.cpp \
+	readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
@@ -137,7 +138,8 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	conv-exprLog.lo conv-exprGroup.lo trigNewton.lo \
 	CouenneCutGenerator.lo generateCuts.lo genColCuts.lo \
 	problem.lo problemIO.lo constraint.lo tightenBounds.lo \
-	impliedBounds.lo readASLfg.lo rootQ.lo $(am__objects_1)
+	impliedBounds.lo readASLfg.lo drawCuts.lo rootQ.lo \
+	$(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -387,8 +389,8 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp util/rootQ.c \
-	$(am__append_1)
+	problem/impliedBounds.cpp problem/readASLfg.cpp \
+	util/drawCuts.cpp util/rootQ.c $(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -574,6 +576,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprAbs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprAux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprCos.Plo@am__quote@
@@ -1075,6 +1078,13 @@ readASLfg.lo: problem/readASLfg.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/readASLfg.cpp' object='readASLfg.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o readASLfg.lo `test -f 'problem/readASLfg.cpp' || echo '$(srcdir)/'`problem/readASLfg.cpp
+
+drawCuts.lo: util/drawCuts.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT drawCuts.lo -MD -MP -MF "$(DEPDIR)/drawCuts.Tpo" -c -o drawCuts.lo `test -f 'util/drawCuts.cpp' || echo '$(srcdir)/'`util/drawCuts.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/drawCuts.Tpo" "$(DEPDIR)/drawCuts.Plo"; else rm -f "$(DEPDIR)/drawCuts.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='util/drawCuts.cpp' object='drawCuts.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o drawCuts.lo `test -f 'util/drawCuts.cpp' || echo '$(srcdir)/'`util/drawCuts.cpp
 
 readnl.lo: readnl/readnl.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readnl.lo -MD -MP -MF "$(DEPDIR)/readnl.Tpo" -c -o readnl.lo `test -f 'readnl/readnl.cpp' || echo '$(srcdir)/'`readnl/readnl.cpp; \

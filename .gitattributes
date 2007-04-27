@@ -109,6 +109,7 @@ Couenne/src/readnl/nl2e.cpp -text
 Couenne/src/readnl/readnl.cpp -text
 Couenne/src/simplify/simplifiers.cpp -text
 Couenne/src/simplify/simplify.cpp -text
+Couenne/src/util/drawCuts.cpp -text
 Couenne/src/util/rootQ.c -text
 Couenne/test/Makefile.am -text
 Couenne/test/Makefile.in -text

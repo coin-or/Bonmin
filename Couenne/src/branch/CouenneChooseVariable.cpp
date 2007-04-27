@@ -43,7 +43,7 @@ CouenneChooseVariable::~CouenneChooseVariable () {
 
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
-  /// LEAVE THIS HERE.
+  /// LEAVE THIS HERE. 
   problem_ -> update ((CouNumber *) (info -> solution_), 
 		      (CouNumber *) (info -> lower_), 
 		      (CouNumber *) (info -> upper_));

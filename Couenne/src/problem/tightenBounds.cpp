@@ -30,9 +30,21 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
   for (register int i = nVars (), j=0; 
        j < naux; j++) {
 
-    CouNumber ll = (*(Aux (j) -> Lb ())) ();
+    CouNumber ll = (*(Aux (j) -> Lb ())) (),
+              uu = (*(Aux (j) -> Ub ())) ();
+
+    if (ll > uu + COUENNE_EPS)
+      return -1; // declare this node infeasible
 
     bool chg = false;
+
+    /*if (fabs (lb_ [i+j] - 883.37) < 0.01) {
+      printf ("orig = [%.9e,%.9e], implied = [%.9e,%.9e] ", 
+	      lb_ [i+j], ub_ [i+j], ll, uu);
+
+      Aux (j) -> Lb () -> print (std::cout); printf (", ");
+      Aux (j) -> Ub () -> print (std::cout); printf ("\n");
+      }*/
 
     // check if lower bound got higher    
     if ((ll > - COUENNE_INFINITY + 1) && (ll >= lb_ [i+j] + COUENNE_EPS)) {
@@ -42,8 +54,6 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
       lb_ [i+j] = ll;
       chg = true;
     }
-
-    CouNumber uu = (*(Aux (j) -> Ub ())) ();
 
     // check if upper bound got lower
     if ((uu < COUENNE_INFINITY - 1) && (uu <= ub_ [i+j] - COUENNE_EPS)) {

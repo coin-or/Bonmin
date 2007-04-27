@@ -150,4 +150,8 @@ class exprAux: public exprVar {
   inline int Multiplicity () {return multiplicity_;}
 };
 
+/// allow to draw function within intervals and cuts introduced
+void draw_cuts (OsiCuts &, const CouenneCutGenerator *, 
+		int, expression *, expression *);
+
 #endif

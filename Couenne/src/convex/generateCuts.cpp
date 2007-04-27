@@ -20,6 +20,13 @@
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
+  
+  /*printf (":::::::::::::::::::::::: level = %d, pass = %d, intree=%d\n Bounds:\n", 
+	  info.level, info.pass, info.inTree);
+
+  for (int i=0; i < si. getNumCols(); i++)
+      printf (" %3d [%.3e,%.3e]\n", i, si. getColLower () [i],
+      si. getColUpper () [i]);*/
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
@@ -94,12 +101,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 			  const_cast <CouNumber *> (si. getColLower    ()),
 			  const_cast <CouNumber *> (si. getColUpper    ()));
 
-    // not the first call to this procedure, meaning we are anywhere
-    // in the B&B tree but at the root node. Check, through the
-    // auxiliary information, which bounds have changed from the
-    // parent node.
-
     if (info.inTree) {
+
+      // we are anywhere in the B&B tree but at the root node. Check,
+      // through the auxiliary information, which bounds have changed
+      // from the parent node.
 
       OsiBabSolver *auxinfo = dynamic_cast <OsiBabSolver *> (si.getAuxiliaryInfo ());
 
@@ -168,19 +174,32 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // implied bounds. Call also at the beginning, as some common
     // expression may have non-propagated bounds
 
-    nbwtightened = problem_ -> impliedBounds (chg_bds);
-      
-    for (register int i=0; i < ncols; i++) 
-      if (expression::Lbound (i) >= expression::Ubound (i) + COUENNE_EPS) {
+    if (ntightened >= 0) // if last call didn't signal infeasibility
+      nbwtightened = problem_ -> impliedBounds (chg_bds);
 
-	if (babInfo)
-	  babInfo -> setInfeasibleNode ();
+    if ((ntightened < 0) || (nbwtightened < 0)) {
 
-	goto end_genCuts;
+      // set infeasibility for linear convexification
+
+      OsiColCut *infeascut = new OsiColCut;
+
+      if (infeascut) {
+	int i=0;
+	double upper = -1., lower = +1.;
+	infeascut -> setLbs (1, &i, &lower);
+	infeascut -> setUbs (1, &i, &upper);
+	cs.insert (infeascut);
+	delete infeascut;
       }
-  } while (ntightened && nbwtightened && (niter++ < 10));
-  // Not ((ntightened || nbwtightened) && (niter++ < 10)), as we need
-  // to repeat only if both bound tighteners had some result.
+
+      if (babInfo)
+	babInfo -> setInfeasibleNode (); // set infeasibility for NLP heuristic
+
+      goto end_genCuts;
+    }
+  } while (ntightened || nbwtightened && (niter++ < 10));
+  // need to check if EITHER procedures gave results, as expression
+  // structure is not a tree any longer.
 
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////

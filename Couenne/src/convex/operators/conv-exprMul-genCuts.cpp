@@ -99,13 +99,13 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
     if (cg -> isFirst () ||            // if first call or
 	((xe -> Type () != CONST) &&   // neither term is a defined constant
-	 (ye -> Type () != CONST))) {  // (and hence this follows from
-				       // branching rule)
+	 (ye -> Type () != CONST))) {  // (=> implied by branching rule)
 
       if (is0const && is1const)
 
-	// strange case: w = c0*c1, should have been dealt with in
-	// simplify(), but who knows...
+	// w = c0*c1, which is either because the intervals got very
+	// narrow, or because these are indeed constant (which should
+	// have been dealt with in simplify(), but who knows...)
 
 	cg -> createCut (cs, c0 * c1, 0, wi, 1.);
 

@@ -76,6 +76,7 @@ libCouenne_la_SOURCES = \
 	problem/tightenBounds.cpp \
 	problem/impliedBounds.cpp \
 	problem/readASLfg.cpp \
+	util/drawCuts.cpp \
 	util/rootQ.c
 
 COINLIBS = \
