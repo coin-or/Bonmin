@@ -88,7 +88,12 @@ int main (int argc, char *argv[])
 
       cg -> getStats (nr, nt, st);
 
-      printf ("::: %6d & %6d & %6d & %6d & %6d & %6d & %8.3f & ", 
+      char *basename = strrchr (pbName, '/');
+      if (!basename) basename = pbName;
+      else basename++;
+
+      printf ("::: %-25s & %6d & %6d & %6d & %6d & %6d & %6d & %8.3f & ", 
+	      basename,
 	      cg -> Problem () -> nVars (), 
 	      cg -> Problem () -> nIntVars(), 
 	      cg -> Problem () -> nNLCons (),
@@ -96,26 +101,37 @@ int main (int argc, char *argv[])
 	      nr, nt, st);
 
       /////////////////////////////////
-      char *basename = strrchr (pbName, '/');
-      if (!basename) basename = pbName;
-      else basename++;
 
-      printf (" %-25s & %8.2f &", basename, CoinCpuTime () - time1);
+      if (CoinCpuTime () - time1 > 3600) {
 
-      if (fabs (bb.bestBound()) < 1e12 - 1) 
-	printf (" %12.3f &", bb.bestBound());
-      else printf (" %8s     &", "inf_dual");
+	// time limit reached, print upper and (in brackets) lower
+
+	if (fabs (bb.bestBound()) < 1e12 - 1) 
+	  printf (" %12.3f &", bb.bestObj ());
+	else printf (" %8s     &", "inf_dual");
 	  
-      if (fabs (bb.bestObj()) < 1e40) 
-	printf (" %12.3f &", bb.bestObj());
-      else printf (" %8s     &", "inf_prim");
+	if (fabs (bb.bestObj()) < 1e40) 
+	  printf (" (%12.3f) &", bb.bestBound ());
+	else printf (" %8s     &", "inf_prim");
+      }
+      else {
+	// time limit not reached, print upper and time
+
+	if (fabs (bb.bestBound()) < 1e12 - 1) 
+	  printf (" %12.3f &", bb.bestObj ());
+	else printf (" %8s     &", "inf_dual");
 	  
-      printf ("%7d & %7d & %-20s\\\\\n ",
+	if (fabs (bb.bestObj()) < 1e40) 
+	  printf ("  %12.3f  &", CoinCpuTime () - time1);
+	else printf (" %8s     &", "inf_prim");
+      }
+
+      printf ("%7d & %7d \\\\\n ",
 	      bb.numNodes(),
-	      bb.iterationCount(),
+	      bb.iterationCount());
 	      //	      nlp_and_solver->totalNlpSolveTime(),
 	      //	      nlp_and_solver->nCallOptimizeTNLP(),
-	      status.c_str());
+      //	      status.c_str());
     }
 
 //    nlp_and_solver -> writeAmplSolFile (message, bb.bestSolution (), NULL);
