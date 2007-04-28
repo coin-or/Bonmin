@@ -1,7 +1,7 @@
 /*
  * Name:    trigNewton.cpp
  * Author:  Pietro Belotti
- * Purpose: numerically find tangents to sines
+ * Purpose: numerically find tangents to (co)sines
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -24,6 +24,12 @@ CouNumber trigNewton (CouNumber a, CouNumber l, CouNumber u) {
   //
   // F'(x) = - sin x - cos x / (x-a) + (sin x - sin a) / (x - a)^2
 
+  if (l>u) {
+    register CouNumber swap = l;
+    l = u;
+    u = swap;
+  }
+
   register CouNumber xk = 0.5 * (u+l);
 
   CouNumber sina  = sin (a),
@@ -40,6 +46,9 @@ CouNumber trigNewton (CouNumber a, CouNumber l, CouNumber u) {
     CouNumber Fp = sinxk + (cosxk - dydx) / dx;
 
     xk += F/Fp;
+
+    if      (xk < l) xk = l;
+    else if (xk > u) xk = u;
 
     sinxk = sin (xk);
     cosxk = cos (xk);

@@ -81,8 +81,10 @@ Couenne/src/include/exprUnary.h -text
 Couenne/src/include/exprVar.h -text
 Couenne/src/include/expression.h -text
 Couenne/src/include/operators/exprAbs.h -text
+Couenne/src/include/operators/exprBCos.h -text
 Couenne/src/include/operators/exprBDiv.h -text
 Couenne/src/include/operators/exprBMul.h -text
+Couenne/src/include/operators/exprBSin.h -text
 Couenne/src/include/operators/exprCos.h -text
 Couenne/src/include/operators/exprDiv.h -text
 Couenne/src/include/operators/exprExp.h -text

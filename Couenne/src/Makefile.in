@@ -458,6 +458,8 @@ include_HEADERS = \
 	include/operators/exprMax.h \
 	include/operators/exprPow.h \
 	include/operators/exprSin.h \
+	include/operators/exprBSin.h \
+	include/operators/exprBCos.h \
 	include/operators/exprSub.h \
 	include/operators/exprGroup.h \
 	include/exprConst.h \

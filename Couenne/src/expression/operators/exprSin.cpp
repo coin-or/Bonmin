@@ -1,5 +1,5 @@
 /*
- * Name:    exprSin.C
+ * Name:    exprSin.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of the sine of a function
  *
@@ -9,6 +9,7 @@
 #include <exprSin.h>
 #include <exprClone.h>
 #include <exprCos.h>
+#include <exprBSin.h>
 #include <exprMul.h>
 
 
@@ -29,4 +30,22 @@ expression *exprSin::differentiate (int index) {
 
 void exprSin::print (std::ostream& out) const {
   exprUnary::print (out, "sin", PRE);
+}
+
+
+// compute bounds of sin x given bounds of x 
+
+void exprSin::getBounds (expression *&lb, expression *&ub) {
+
+  lb = new exprConst (-1); 
+  ub = new exprConst (1);
+  return;
+
+  // TODO: 
+  expression *xl, *xu;
+
+  argument_ -> getBounds (xl, xu);
+
+  lb = new exprLBSin (xl, xu);
+  ub = new exprLBSin (new exprClone (xl), new exprClone (xu));
 }

@@ -43,9 +43,7 @@ class exprSin: public exprUnary {
   expression *differentiate (int index); 
 
   /// Get lower and upper bound of an expression (if any)
-  /// TODO: improve with domain
-  virtual inline void getBounds (expression *&lb, expression *&ub)
-    {lb = new exprConst (-1); ub = new exprConst (1);}
+  void getBounds (expression *&, expression *&);
 
   /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 

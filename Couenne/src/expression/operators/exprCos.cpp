@@ -8,14 +8,15 @@
 
 #include <exprCos.h>
 #include <exprSin.h>
+#include <exprBCos.h>
 #include <exprOpp.h>
 #include <exprMul.h>
 #include <exprClone.h>
+
 #include <math.h>
 
 
 // return an expression -sin (argument), the derivative of cos (argument)
-
 expression *exprCos::differentiate (int index) {
 
   expression **arglist = new expression * [2];
@@ -26,8 +27,20 @@ expression *exprCos::differentiate (int index) {
   return new exprMul (arglist, 2);
 }
 
-
 // I/O
-
 void exprCos::print (std::ostream& out) const
   {exprUnary::print (out, "cos", PRE);}
+
+// compute bounds of sin x given bounds of x 
+void exprCos::getBounds (expression *&lb, expression *&ub) {
+  lb = new exprConst (-1); 
+  ub = new exprConst (1);
+  return;
+
+  // TODO
+  expression *xl, *xu;
+  argument_ -> getBounds (xl, xu);
+
+  lb = new exprLBCos (xl, xu);
+  ub = new exprUBCos (new exprClone (xl), new exprClone (xu));
+}

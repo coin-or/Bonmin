@@ -171,25 +171,36 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
     } else     cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
   }
   else {
-    // after stationary point (i.e., _/ or ~\ ) for left bound, before
-    // for right bound
+
+    // after  stationary point (i.e., _/ or ~\ ) for left bound, 
+    // before stationary point (i.e., /~ or \_ ) for right bound
   
-    if (left * (rx1 - left * (zero + 5*M_PI_2)) < 0) {
+    //    if (left * (rx1 - left * (zero + 5*M_PI_2)) < 0) {
+    if (left * (rx1 - (4*left - up + 2) * M_PI_2) < 0) {
       CouNumber cosrx0 = cos (rx0);
       if (up * (sin (rx1) - sinrx0 - cosrx0 * (rx1-rx0)) < 0) 
 	// (b,sinb) below tangent --> tangent
-	cg -> addTangent (cs, wi, xi, x0, sinrx0, cosrx0, up);
-      else     // up: either chord or leaning plane
-	if (left * (rx1 - (tpt = trigNewton (rx0, left * zero, left * (zero + M_PI_2)))) < 0) {
+	cg -> addTangent (cs, wi, xi, x0, sinrx0, cosrx0, -up);
+      else {    // up: either chord or leaning plane
+	CouNumber searchpt = M_PI_2 * (2 + 3*left - up);
+	tpt = trigNewton (rx0, searchpt, searchpt + left * M_PI_2);
+	if (left * (rx1 - tpt) < 0) {
 	  if (!*s0)
-	    *s0 = cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1, sin (rx1), up) > 0;
+	    *s0 = cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1, sin (rx1), -up) > 0;
 	}
-	else cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
-    } else   cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
+	else cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
+      }
+    } else {
+      CouNumber searchpt = M_PI_2 * (2 + 3*left - up);
+      tpt = trigNewton (rx0, searchpt, searchpt + left * M_PI_2);
+      cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
+    }
 
     // down: other chord or leaning plane
     if ((left * (rx1 - (zero + M_PI)) < 0) || 
-	(left * (rx1 - (tpt = trigNewton (rx0, left * zero, left * (zero + M_PI_2)))) < 0)) {
+	(left * (rx1 - (tpt = trigNewton (rx0, 
+					  (2 +   left - up) * M_PI_2, 
+					  (2 + 2*left - up) * M_PI_2))) < 0)) {
       if (!*s1) 
 	*s1 = (cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,         sin (rx1), up) > 0);
     } else     cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);

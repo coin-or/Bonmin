@@ -21,13 +21,13 @@ void draw_cuts (OsiCuts &cs, const CouenneCutGenerator *cg, int j, expression *w
   static CouNumber maxY = -COUENNE_INFINITY,
                    minY =  COUENNE_INFINITY;
 
-  if (1 || (img -> code () == COU_EXPRSIN) || 
+  if ((img -> code () == COU_EXPRSIN) || 
       (img -> code () == COU_EXPRPOW) || 
       (img -> code () == COU_EXPREXP) || 
       (img -> code () == COU_EXPRLOG) || 
       (img -> code () == COU_EXPRCOS)) {
 
-    printf (" ==> "); w -> print (std::cout); printf ("\n");
+    //    fprintf (stderr, " ==> "); w -> print (std::cerr); fprintf (stderr, "\n");
 
     expression *lbe, *ube;
 
@@ -37,7 +37,9 @@ void draw_cuts (OsiCuts &cs, const CouenneCutGenerator *cg, int j, expression *w
       indep = img -> getFixVar ();
 
     int xi = indep -> Index ();
-    printf ("looking into w_%d = f (x_%d)\n", w -> Index (), xi);
+
+    //    fprintf (stderr, "looking into w_%d = f (x_%d)\n", 
+    //	     w -> Index (), xi);
 
     indep -> getBounds (lbe, ube);
 
@@ -70,12 +72,15 @@ void draw_cuts (OsiCuts &cs, const CouenneCutGenerator *cg, int j, expression *w
 	  if (y > maxY) maxY = y;
 	  if (y < minY) minY = y;
 
-	  printf ("#=# %.12e %.12e\n", x, y);
+	  fprintf (stderr, "%.12e %.12e\n", x, y);
 	}
+
+	maxY += (maxY-minY) / 20;
+	minY -= (maxY-minY) / 20;
       }
 	
-      //lb -= 1;
-      //ub += 1;
+      lb -= (ub-lb) / 20;
+      ub += (ub-lb) / 20;
 
       // plot lines defining constraint (only for cuts involving at
       // most two variables (that is, w is a unary function)
@@ -92,13 +97,14 @@ void draw_cuts (OsiCuts &cs, const CouenneCutGenerator *cg, int j, expression *w
 	  ub0 = mymin (ub, mymax ((rhs - el [0] * minY) / el [1], (rhs - el [0] * maxY) / el [1]));
 	}
 
-	printf ("#=# #m=2,S=%d\n", (cs.rowCutPtr (jj) -> sense () == 'L') ? 10:11);
+	fprintf (stderr, "#m=2,S=%d\n", (cs.rowCutPtr (jj) -> sense () == 'L') ? 10:11);
 
-	printf ("#=# %.12e %.12e\n", lb0, (rhs - el [1] * lb0) / el [0]);
-	printf ("#=# %.12e %.12e\n", ub0, (rhs - el [1] * ub0) / el [0]);
+	fprintf (stderr, "%.12e %.12e\n", lb0, (rhs - el [1] * lb0) / el [0]);
+	fprintf (stderr, "%.12e %.12e\n", ub0, (rhs - el [1] * ub0) / el [0]);
       }
 
       cg -> Problem () -> X () [xi] = curx;
+      exit(0);
     }
   }
 }
