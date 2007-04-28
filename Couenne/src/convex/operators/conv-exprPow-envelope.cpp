@@ -45,7 +45,6 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 		     CouNumber k, 
 		     CouNumber l, CouNumber u,
 		     int sign) {
-
   exponent = k;
 
   // set x to get a deeper cut (so that we get a tangent which is
@@ -59,8 +58,8 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 
   // limit the bounds for the envelope
 
-  CouNumber step     = 1 + log (1. + (double) (cg -> nSamples ())),
-            powThres = pow (COU_MAX_COEFF, 1./k);
+  CouNumber powThres = (k<=1) ? COU_MAX_COEFF: pow (COU_MAX_COEFF, 1./k),
+            step     = (1 + log (1. + (double) (cg -> nSamples ()))) * powThres / COU_MAX_COEFF;
 
   if (l < - powThres + 1) {
     l = x - step;

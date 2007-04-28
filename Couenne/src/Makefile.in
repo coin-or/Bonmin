@@ -453,11 +453,11 @@ include_HEADERS = \
 	include/operators/exprDiv.h \
 	include/operators/exprMin.h \
 	include/operators/exprBDiv.h \
-	include/operators/exprCos.h \
 	include/operators/exprSum.h \
 	include/operators/exprMax.h \
 	include/operators/exprPow.h \
 	include/operators/exprSin.h \
+	include/operators/exprCos.h \
 	include/operators/exprBSin.h \
 	include/operators/exprBCos.h \
 	include/operators/exprSub.h \

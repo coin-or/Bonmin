@@ -77,7 +77,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
 
-  CouNumber w, x,
+  CouNumber w = (*aux) (), 
+            x = (*xe)  (),
             l = (*xle) (), 
             u = (*xue) ();
 
@@ -129,13 +130,18 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     // 1) k (or its inverse) is positive, integer, and odd, and 0 is
     //    an internal point of the interval [l,u].
 
-    Qroot qmap;
+    // this case is somewhat simpler than the second, although if the
+    // bound interval includes the origin we have to resort to
+    // numerical procedures to find the (unique) root of a polynomial
+    // Q(x) (see Liberti and Pantelides, 2003).
 
-    // this case is somewhat simpler than the second, although we have
-    // to resort to numerical procedures to find the (unique) root of
-    // a polynomial Q(x) (see Liberti and Pantelides, 2003).
+    CouNumber q = 1;
 
-    CouNumber q = qmap (intk);
+    if ((l<0) && (u>0)) {
+
+      Qroot qmap;
+      q = qmap (intk);
+    }
 
     int sign;
 
@@ -155,24 +161,25 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
       sign = 1;
     }
 
-    CouNumber powThres = pow (COU_MAX_COEFF, 1./k); // don't want big coefficients
+    // don't want big coefficients -- check only when k>1
+    CouNumber powThres = (k<=1) ? COUENNE_INFINITY : pow (COU_MAX_COEFF, 1./k);
 
     // lower envelope
-
     if (l > -powThres) {
-      if (u > q * l) { // upper x is after "turning point", add lower envelope
-	addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, q*l, u, sign);
-	cg      -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
-      } else cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l,k), u,   safe_pow (u,k),   sign);
+      if (l>0) addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k,   l, u, sign); // 0<l<u, tangents only
+      else if (u > q * l) { // upper x is after "turning point", add lower envelope
+	addPowEnvelope        (cg, cs, w_ind, x_ind, x, w, k, q*l, u, sign);
+	cg      -> addSegment     (cs, w_ind, x_ind, l, safe_pow (l,k), q*l, safe_pow (q*l,k), sign);
+      } else cg -> addSegment     (cs, w_ind, x_ind, l, safe_pow (l,k), u,   safe_pow (u,  k), sign);
     }
 
     // upper envelope
-
     if (u < powThres) {
-      if (l < q * u) { // lower x is before "turning point", add upper envelope
-	addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, l, q*u, -sign);
-	cg      -> addSegment (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
-      } else cg -> addSegment (cs, w_ind, x_ind, l,   safe_pow (l,k),   u, safe_pow (u,k), -sign);
+      if (u<0) addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, l,   u, -sign);  // l<u<0, tangents only
+      else if (l < q * u) { // lower x is before "turning point", add upper envelope
+	addPowEnvelope        (cg, cs, w_ind, x_ind, x, w, k, l, q*u, -sign);
+	cg      -> addSegment     (cs, w_ind, x_ind, q*u, safe_pow (q*u,k), u, safe_pow (u,k), -sign);
+      } else cg -> addSegment     (cs, w_ind, x_ind, l,   safe_pow (l,k),   u, safe_pow (u,k), -sign);
     }
   }
   else {

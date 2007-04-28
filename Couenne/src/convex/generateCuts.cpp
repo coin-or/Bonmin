@@ -179,7 +179,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if ((ntightened < 0) || (nbwtightened < 0)) {
 
-      // set infeasibility for linear convexification
+      // set infeasibility through a cut 1 <= x0 <= -1
 
       OsiColCut *infeascut = new OsiColCut;
 
