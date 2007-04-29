@@ -113,16 +113,16 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     printf ("w_%d = ", wind); print (std::cout);
 
-    printf (" ::::::::::::::::::::: now we have: w%d [%.3f,%.3f] a0 = %.3f\n", 
+    printf (" --> w%d [%g,%g] a0 = %g\n", 
 	    wind, l [wind], u [wind], a0);
 
     printf ("I1 (%d): ", ipos);
     for (int i=0; i<ipos; i++)
-      printf ("%+.3f x%d [%.3f,%.3f] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]);
+      printf ("%+.3f x%d [%g,%g] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]);
 
     printf ("\nI2 (%d): ", ineg);
     for (int i=0; i<ineg; i++)
-      printf ("%+.3f x%d [%.3f,%.3f] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
+      printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
 
     printf ("\n");
   }
@@ -151,7 +151,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
                + scanBounds (ineg, -1, I2, C2, l, &infLo2);
 
   if (0)
-    printf ("lower = %.3f\nupper = %.3f. (%d,%d,%d,%d)\n", 
+    printf ("lower = %g\nupper = %g. (%d,%d,%d,%d)\n", 
 	    lower, upper, infLo1, infUp1, infLo2, infUp2);
   
   // Now compute lower bound for all or for some of the variables:
@@ -251,6 +251,19 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 	  chg [ind] = 1;
       }
 
+  if (0) {
+
+    printf ("I1 (%d): ", ipos);
+    for (int i=0; i<ipos; i++)
+      printf ("%+.3f x%d [%g,%g] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]);
+
+    printf ("\nI2 (%d): ", ineg);
+    for (int i=0; i<ineg; i++)
+      printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
+
+    printf ("\n---------------------------------------------------------------\n");
+  }
+
   // ...phew!
 
   free (I1); free (I2);
@@ -276,7 +289,11 @@ static CouNumber scanBounds (int        num,      /// cardinality of the set (I1
 
     CouNumber bd = bounds [indices [i]];
 
-    if (((sign > 0) ? bd : -bd) > COUENNE_INFINITY - 1) {
+    // be sensitive here, check for bounds a little within the finite realm
+
+    if (((sign > 0) ? bd : -bd) > COUENNE_INFINITY / 1e10 - 1) {
+
+      bounds [indices [i]] = (sign > 0) ? 1e300 : -1e300;
 
       // this variable has an infinite bound, mark it
       if      (*infnum == -1) *infnum =  i; // first variable with infinite bound, so far

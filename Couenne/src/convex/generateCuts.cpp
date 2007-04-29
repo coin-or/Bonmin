@@ -169,27 +169,35 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // propagate bounds to auxiliary variables
 
+    //    printf ("===== PROPAGATE\n");
+
     ntightened = problem_ -> tightenBounds (chg_bds);
 
     // implied bounds. Call also at the beginning, as some common
     // expression may have non-propagated bounds
 
+    //    printf ("===== IMPLIED\n");
+
     if (ntightened >= 0) // if last call didn't signal infeasibility
       nbwtightened = problem_ -> impliedBounds (chg_bds);
 
+    //    printf ("============\n");
     if ((ntightened < 0) || (nbwtightened < 0)) {
 
       // set infeasibility through a cut 1 <= x0 <= -1
 
-      OsiColCut *infeascut = new OsiColCut;
+      if (!firstcall_) {
 
-      if (infeascut) {
-	int i=0;
-	double upper = -1., lower = +1.;
-	infeascut -> setLbs (1, &i, &lower);
-	infeascut -> setUbs (1, &i, &upper);
-	cs.insert (infeascut);
-	delete infeascut;
+	OsiColCut *infeascut = new OsiColCut;
+
+	if (infeascut) {
+	  int i=0;
+	  double upper = -1., lower = +1.;
+	  infeascut -> setLbs (1, &i, &lower);
+	  infeascut -> setUbs (1, &i, &upper);
+	  cs.insert (infeascut);
+	  delete infeascut;
+	}
       }
 
       if (babInfo)

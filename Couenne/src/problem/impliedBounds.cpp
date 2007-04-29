@@ -28,15 +28,24 @@ int CouenneProblem::impliedBounds (char *chg_bds) const {
     //	(auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP))
     if (auxiliaries_ [i] -> Image () -> impliedBound (nvar+i, lb_, ub_, chg_bds) > COUENNE_EPS)
       nchg++;
-
   }
-      /*printf ("  tightened ");
-      auxiliaries_ [i] -> print (std::cout);
-      printf (" := ");
-      auxiliaries_ [i] -> Image () -> print (std::cout); fflush (stdout);
-      printf ("\n");*/
 
+  /*  for (int i=0; i<nvar; i++) 
+    printf (" [%g, %g]\n", 
+	    expression::Lbound (i),
+	    expression::Ubound (i));
 
+  for (int i=0; i < nAuxs (); i++) {
+
+    printf (" [%g, %g]", 
+	    expression::Lbound (i+nvar),
+	    expression::Ubound (i+nvar));
+
+    auxiliaries_ [i] -> print (std::cout);
+    printf (" := ");
+    auxiliaries_ [i] -> Image () -> print (std::cout); fflush (stdout);
+    printf ("\n");
+    }*/
 
   return nchg;
 }

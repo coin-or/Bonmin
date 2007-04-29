@@ -22,10 +22,91 @@ typedef struct {
 } monomial;
 
 
+/// get constant multiplicator and aux index from a multiplication
+void extractIndCoe (CouenneProblem *p, expression *&mul, int &index, CouNumber &coeff) {
+
+  // standardize expression
+  exprAux *w;
+
+  if ((w = mul -> standardize (p))) {
+    //    delete mul;
+    mul = new exprClone (w);
+  } else { // it is a constant or a variable itself, but it cannot happen
+
+    printf ("Couenne: strange, multiplication is actually a variable\n");
+    index = mul -> Index ();
+    coeff = 1;
+    return;
+  }
+
+  // Assume mul's image is a product of two elements: if both are 
+  // nonconstant, just return a pair with mul's index
+
+  /*printf ("standardized mul into: ");
+  w -> print (std::cout);  printf (" := ");
+  w -> Image () -> print (std::cout);  printf ("\n");*/
+
+  expression **alist = w -> Image () -> ArgList ();
+
+  if (alist) {
+
+    // first case: w = x*y. Just store w's index
+
+    if ((alist [0] -> Type () != CONST) &&
+	(alist [1] -> Type () != CONST)) {
+      index = w -> Index ();
+      coeff = 1;
+      return;
+    }
+
+    // remind auxset that this is actually not used, at least here
+    w -> decreaseMult (); 
+
+    // look for coefficient. Standardized expression has only two
+    // arguments, so it can be arglist_ [0] or arglist_ [1] -- or both
+
+    // three cases: c1*y, x*c2, or c1*c2
+
+    coeff = 1;
+    index = alist [0] -> Index ();
+
+    if (index < 0) { // first element is a constant
+      index  = alist [1] -> Index (); 
+      coeff *= alist [0] -> Value ();
+    } else 
+      coeff *= alist [1] -> Value ();
+
+    if (index < 0) // second element is a constant
+      coeff *= alist [1] -> Value ();
+  }
+  else if (mul -> Argument ()) {
+    index = mul -> Argument () -> Index ();
+    coeff = (index < 0) ? mul -> Argument () -> Value () : 1;
+  } else {
+    index = -1;
+    coeff = 0;
+  }
+}
+
+
 /// flatten single expression, pass its coefficient/index to vectors
 void flatten (expression *&arg, CouenneProblem *p, 
 	      std::vector <monomial> *terms, 
 	      CouNumber &a0, CouNumber sign) {
+
+  if (arg -> code () == COU_EXPRMUL) {
+
+    monomial term = {-1, 0.};
+    extractIndCoe (p, arg, term.index, term.coeff); 
+
+    // now we have a variable (constant) and a coefficient (its value).
+    if (sign<0) term.coeff = - term.coeff; // invert if it appears with a minus sign
+
+    if (term.index < 0) a0 += term.coeff;  // add to constant if it's a constant
+    else terms -> push_back (term);        // add monomial otherwise
+
+    return;
+  }
 
   // replace subexpression with its auxiliary
   register exprVar *subst;
@@ -41,12 +122,6 @@ void flatten (expression *&arg, CouenneProblem *p,
   } 
   else a0 += sign * arg -> Value (); // term is constant
 }
-
-
-/// get constant multiplicator and aux index from a multiplication
-/*void extractIndCoe (expression *, int &, CouNumber &) {
-
-}*/
 
 
 /// used to sort term vector
@@ -104,12 +179,14 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
       a0 += arg -> Value ();
       break;
 
-      // TODO:
-
-      /*case COU_EXPRMUL:   // multiplication k*f1(x)*h*f2(x)*f3(x)*...
-      extractIndCoe (arglist_ [i], term.index, term.coeff); // separate k*h from f1(x)*f2(x)*f3(x)*...
-      terms. push_back (term);
-      break;*/
+    case COU_EXPRMUL: // multiplication k*f1(x)*h*f2(x)*f3(x)*...
+      {
+	monomial term = {-1, 0.};
+	extractIndCoe (p, arglist_ [i], term.index, term.coeff); 
+	if (term.index < 0) a0 += term.coeff;
+	else terms. push_back (term);
+      }
+      break;
 
     case COU_EXPRGROUP: // just enqueue all linear term and wait for COU_EXPRSUM
       {

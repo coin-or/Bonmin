@@ -27,30 +27,44 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
   // lower bound, depending on the bound changes of the variables
   // they depend on
 
+  /*for (int i=0; i<nVars(); i++) 
+    printf (" [%g, %g]\n", 
+	    expression::Lbound (i),
+	    expression::Ubound (i));*/
+
   for (register int i = nVars (), j=0; 
        j < naux; j++) {
 
+    /*printf (" [%g, %g] ", 
+	    expression::Lbound (i+j),
+	    expression::Ubound (i+j));*/
+
     CouNumber ll = (*(Aux (j) -> Lb ())) (),
               uu = (*(Aux (j) -> Ub ())) ();
+
+    /*printf (" ---> [%g, %g] ", 
+	    expression::Lbound (i+j),
+	    expression::Ubound (i+j));*/
+
+    /*auxiliaries_ [j] -> print (std::cout);
+    printf (" := ");
+    auxiliaries_ [j] -> Image () -> print (std::cout); fflush (stdout);
+    printf ("\n");*/
 
     if (ll > uu + COUENNE_EPS)
       return -1; // declare this node infeasible
 
     bool chg = false;
 
-    /*if (fabs (lb_ [i+j] - 883.37) < 0.01) {
-      printf ("orig = [%.9e,%.9e], implied = [%.9e,%.9e] ", 
-	      lb_ [i+j], ub_ [i+j], ll, uu);
-
-      Aux (j) -> Lb () -> print (std::cout); printf (", ");
-      Aux (j) -> Ub () -> print (std::cout); printf ("\n");
-      }*/
-
     // check if lower bound got higher    
     if ((ll > - COUENNE_INFINITY + 1) && (ll >= lb_ [i+j] + COUENNE_EPS)) {
 
       /*printf ("update lbound %d: %.10e >= %.10e + %.12e\n", 
 	i+j, ll, lb_ [i+j], COUENNE_EPS);*/
+
+      /*printf ("update lbound %d: %g >= %g\n", 
+	i+j, ll, lb_ [i+j]);*/
+
       lb_ [i+j] = ll;
       chg = true;
     }
@@ -60,6 +74,9 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
 
       /*printf ("update ubound %d: %.10e <= %.10e - %.12e (%.12e)\n", 
 	i+j, uu, ub_ [i+j], COUENNE_EPS, uu - ub_ [i+j]);*/
+      /*printf ("update ubound %d: %g >= %g\n", 
+	i+j, uu, ub_ [i+j]);*/
+
       ub_ [i+j] = uu;
       chg = true;
     }

@@ -37,6 +37,8 @@ exprAux::exprAux (expression *image, int index, int rank):
 void exprAux::generateCuts (const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+  if (!multiplicity_) return; // variable is not used
+
   int j = cs.sizeRowCuts ();
   CouNumber l;
 

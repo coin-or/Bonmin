@@ -25,8 +25,17 @@ exprMul::exprMul  (expression **al, int n):
 exprMul::exprMul (expression *arg0, expression *arg1):
   exprOp (arg0, arg1) {
 
-  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
+  if (compareExpr (arglist_, arglist_ + 1) > 0) {
+
+    register expression
+           *swap = arglist_ [0];
+    arglist_ [0] = arglist_ [1];
+    arglist_ [1] = swap;
+  }
+
+  //  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
 }
+
 
 /// simplify multiplications
 
@@ -118,7 +127,6 @@ expression *exprMul::differentiate (int index) {
 
 
 /// print
-
 void exprMul::print (std::ostream& out) const
   {exprOp::print (out, "*", INSIDE);}
 

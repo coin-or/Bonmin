@@ -146,6 +146,10 @@ class exprAux: public exprVar {
   /// Tell this variable appears once more
   inline void increaseMult () {++multiplicity_;}
 
+  /// Tell this variable appears once less (standardized within
+  /// exprSum, for instance)
+  inline void decreaseMult () {--multiplicity_;}
+
   /// How many times this variable appears 
   inline int Multiplicity () {return multiplicity_;}
 };

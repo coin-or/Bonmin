@@ -104,6 +104,18 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     //////////// deal with lower bound of w=x/y /////////////////////////////////////////////
 
+    // simple case wl = wu = 0
+
+    if ((fabs (wl) < COUENNE_EPS) && 
+	(fabs (wu) < COUENNE_EPS)) {
+
+      resx = updateBound (-1, xl, 0.) || resx;
+      resx = updateBound (+1, xl, 0.) || resx;
+      return resx || resy;
+    }
+
+    // general case
+
     if        (wl < - COUENNE_EPS) { // w >= wl, wl negative
 
       // point C: (xl,yl)
@@ -139,7 +151,7 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     //////////// deal with upper bound of w=x/y /////////////////////////////////////////////
 
-    if        (wu >   COUENNE_EPS) { // w <= wu, wu negative
+    if        (wu >   COUENNE_EPS) { // w <= wu, wu positive
 
       //
 
@@ -159,7 +171,7 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
       resy = (*yu>0) && (*yu < *xl/wu) && updateBound (+1, yu, 0)      || resy;
 
-    } else if (wu < - COUENNE_EPS) { // w <= wu, wu positive
+    } else if (wu < - COUENNE_EPS) { // w <= wu, wu negative
 
       //
 
