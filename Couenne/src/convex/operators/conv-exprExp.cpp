@@ -35,7 +35,7 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // upper segment
 
   if ((   u < log (COUENNE_INFINITY) - 1) 
-      && (l > -    COUENNE_INFINITY  + 1)) {
+      && (l > -    COUENNE_INFINITY/1e4  + 1)) { // tame lower bound
 
     CouNumber expl     = exp (l),
               oppslope = (expl - exp (u)) / (u - l);

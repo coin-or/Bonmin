@@ -202,8 +202,14 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     if (k > 0.) { // simple, just follow bounds
 
-      res = updateBound (-1, l + index, pow (wl, 1./k));
-      res = updateBound (+1, u + index, pow (wu, 1./k)) || res;
+      if (wl > - COUENNE_INFINITY)
+	res    = updateBound (-1, l + index, pow (wl, 1./k));
+      else res = updateBound (-1, l + index, - COUENNE_INFINITY);
+
+      if (wu < COUENNE_INFINITY)
+	res    = updateBound (+1, u + index, pow (wu, 1./k)) || res;
+      else res = updateBound (+1, u + index, COUENNE_INFINITY);
+
     } else // slightly more complicated, resort to same method as in exprInv
       res = invPowImplBounds (wind, index, l, u, 1./k);
   } 
@@ -217,21 +223,29 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
       if (bound > COUENNE_EPS) {
 
-	res = updateBound (-1, l + index, - pow (bound, 1./k));
-	res = updateBound (+1, u + index,   pow (bound, 1./k)) || res;
+	if (fabs (bound) < COUENNE_INFINITY) {
+	  res = updateBound (-1, l + index, - pow (bound, 1./k));
+	  res = updateBound (+1, u + index,   pow (bound, 1./k)) || res;
+	} else {
+	  res = updateBound (-1, l + index, - COUENNE_INFINITY);
+	  res = updateBound (+1, u + index,   COUENNE_INFINITY) || res;
+	}
       }
     } else { // x^k, k=(1/h), h integer and even, or x^k, neither k nor 1/k integer
 
-	CouNumber lb = wl, ub = wu;
+      CouNumber lb = wl, ub = wu;
 
-	if (k < 0) { // swap bounds as they swap on the curve x^k when 
-	  lb = wu;
-	  ub = wl;
-	}
-	
-	if (lb > COUENNE_EPS) res = updateBound (-1, l + index, pow (lb, 1./k));
-	if (ub > COUENNE_EPS) res = updateBound (+1, u + index, pow (ub, 1./k)) || res;
+      if (k < 0) { // swap bounds as they swap on the curve x^k when 
+	lb = wu;
+	ub = wl;
       }
+	
+      if (lb > COUENNE_EPS) res = updateBound (-1, l + index, pow (lb, 1./k));
+
+      if (fabs (ub) < COUENNE_INFINITY) {
+	if (ub > COUENNE_EPS) res = updateBound (+1, u + index, pow (ub, 1./k)) || res;
+      } else                  res = updateBound (+1, u + index, COUENNE_INFINITY) || res;	
+    }
 
   return res;
 }

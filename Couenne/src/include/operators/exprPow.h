@@ -79,14 +79,28 @@ class exprPow: public exprOp {
 inline CouNumber safe_pow (register CouNumber base, 
 			   register CouNumber exponent) {
 
-  register int rndexp;
+  if (base < 0) {
 
-  if ((base < 0) && 
-      ((fabs (exponent - (rndexp = COUENNE_round (exponent))) < COUENNE_EPS) ||
-       ((fabs (exponent) > COUENNE_EPS) && 
-	(fabs (1. / exponent - (rndexp = COUENNE_round (1. / exponent))) < COUENNE_EPS)))
-      && (rndexp % 2))
-    return (- pow (- base, exponent));
+    register int rndexp;
+
+    if (((fabs (exponent - (rndexp = COUENNE_round (exponent))) < COUENNE_EPS) ||
+	 ((fabs (exponent) > COUENNE_EPS) && 
+	  (fabs (1. / exponent - (rndexp = COUENNE_round (1. / exponent))) < COUENNE_EPS)))
+	&& (rndexp % 2))
+      return (- pow (- base, exponent));
+  }
+
+  if (fabs (base) > COUENNE_INFINITY - 1) {
+
+    if (base < -COUENNE_INFINITY+1) {
+
+      register int intk = COUENNE_round (exponent);
+
+      if ((fabs (exponent - intk) < COUENNE_EPS) && (intk % 2))
+	return -COUENNE_INFINITY;
+    }
+    else return COUENNE_INFINITY;
+  }
 
   return (pow (base, exponent));
 }

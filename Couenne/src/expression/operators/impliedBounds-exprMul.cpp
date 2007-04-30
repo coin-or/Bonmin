@@ -21,6 +21,11 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   if ((arglist_ [ind=0] -> Type () <= CONST) || 
       (arglist_ [ind=1] -> Type () <= CONST)) {
 
+    // at least one constant in product w=cx:
+    //
+    // wl/c <= x <= wu/c, if c is positive
+    // wu/c <= x <= wl/c, if c is negative
+
     CouNumber c = arglist_ [ind] -> Value ();
 
     // get the index of the nonconstant part
@@ -31,17 +36,28 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     if (c > COUENNE_EPS) {
 
-      res = updateBound (-1, l + ind, l [wind] / c);
-      res = updateBound ( 1, u + ind, u [wind] / c) || res;
+      
+      res = (l [wind] > - COUENNE_INFINITY) && updateBound (-1, l + ind, l [wind] / c);
+      res = (u [wind] <   COUENNE_INFINITY) && updateBound ( 1, u + ind, u [wind] / c) || res;
     } 
     else if (c < - COUENNE_EPS) {
 
-      res = updateBound (-1, l + ind, u [wind] / c);
-      res = updateBound ( 1, u + ind, l [wind] / c) || res;
+      //      return false;
+
+      //      printf ("w_%d [%g,%g] = %g x_%d [%g,%g]\n", 
+      //	      wind, l [wind], u [wind], c, ind, l [ind], u [ind]);
+
+      res = (u [wind] <   COUENNE_INFINITY) && updateBound (-1, l + ind, u [wind] / c);
+      res = (l [wind] > - COUENNE_INFINITY) && updateBound ( 1, u + ind, l [wind] / c) || res;
     } 
 
-    if (res)
+    if (res) {
       chg [ind] = 1;
+
+      /*printf ("w_%d [%g,%g] -------> x_%d in [%g,%g] ", 
+	      wind, l [wind], u [wind], 
+	      ind,  l [ind],  u [ind]);*/
+    }
 
   } else {
 

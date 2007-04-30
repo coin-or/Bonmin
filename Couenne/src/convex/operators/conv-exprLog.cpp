@@ -17,7 +17,7 @@
 
 
 #define LOG_STEP 10
-#define LOG_MININF 1e-300
+#define LOG_MININF 1e-50
 
 // generate convexification cut for constraint w = this
 
@@ -55,7 +55,7 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   if      (x < l) x = l;
   else if (x > u) x = u;
 
-  if (u > COUENNE_INFINITY - 1)
+  if (u > 1e5 * log (COUENNE_INFINITY) - 1)
     u = x + (LOG_STEP << cg -> nSamples ());
 
   // add upper envelope

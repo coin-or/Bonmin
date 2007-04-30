@@ -109,7 +109,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   // now we have correct  I1, I2, C1, C2, ipos, ineg, and a0
 
-  if (0) {
+  /*if (0) {
 
     printf ("w_%d = ", wind); print (std::cout);
 
@@ -125,7 +125,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
 
     printf ("\n");
-  }
+    }*/
 
   // indices of the variable in I1 or I2 with infinite lower or upper
   // bound. If more than one is found, it is set to -2
@@ -251,7 +251,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 	  chg [ind] = 1;
       }
 
-  if (0) {
+  /*if (0) {
 
     printf ("I1 (%d): ", ipos);
     for (int i=0; i<ipos; i++)
@@ -262,7 +262,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
 
     printf ("\n---------------------------------------------------------------\n");
-  }
+    }*/
 
   // ...phew!
 

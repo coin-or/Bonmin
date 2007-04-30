@@ -111,6 +111,8 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   bool res = false;
 
+  return false;
+
   // w >= l
 
   if ((xi >= 0) && (res = updateBound (-1, l + xi, yl + wl)))        chg [xi] = 1;

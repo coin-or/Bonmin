@@ -24,8 +24,26 @@ void exprLog::getBounds (expression *&lb, expression *&ub) {
   argument_ -> getBounds (lba, uba);
 
   // [low|upp]er bound of w=log(x) is log (max (0, [low|upp]er (x)))
-  lb = new exprLog (new exprMax (new exprConst (1e-100), lba));
-  ub = new exprLog (new exprMax (new exprConst (1e-100), uba));
+  //  lb = new exprLog (new exprMax (new exprConst (1e-100), lba));
+  //  ub = new exprLog (new exprMax (new exprConst (1e-100), uba));
+
+  expression **all  = new expression * [4]; 
+
+  all [0] = new exprClone (lba); all [1] = new exprLog (lba);
+  all [2] = new exprConst (0);   all [3] = new exprConst (- COUENNE_INFINITY);
+  lb = new exprMax (all, 4);
+
+  expression **alu  = new expression * [4], 
+             **alum = new expression * [4];
+
+  alum [0] = new exprConst (COUENNE_INFINITY); 
+  alum [1] = new exprConst (COUENNE_INFINITY); 
+  alum [2] = new exprClone (uba); 
+  alum [3] = new exprLog (uba);
+
+  alu [0] = new exprClone (uba); alu [1] = new exprMin (alum, 4);
+  alu [2] = new exprConst (0);   alu [3] = new exprConst (- COUENNE_INFINITY);
+  ub = new exprMax (alu, 4);
 }
 
 
@@ -58,8 +76,13 @@ bool exprLog::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
   bool res = updateBound (-1, l + ind, exp (l [wind]));
   res      = updateBound ( 1, u + ind, exp (u [wind])) || res;
 
-  if (res)
+  if (res) {
+
+    /*printf ("w_%d [%g,%g] -------> x_%d in [%g,%g] ", 
+	    wind, l [wind], u [wind], 
+	    ind,  l [ind],  u [ind]);*/
     chg [ind] = 1;
+  }
 
   return res;
 }

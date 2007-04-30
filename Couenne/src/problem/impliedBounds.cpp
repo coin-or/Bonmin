@@ -16,18 +16,31 @@ int CouenneProblem::impliedBounds (char *chg_bds) const {
   int nchg = 0, //< number of bounds changed for propagation
       nvar = nVars ();
 
-  /*for (int i=0; i < nVars () + nAuxs (); i++)
-    printf ("x%3d: [%12.4f,%12.4f]\n", i, lb_ [i], ub_ [i]);*/
+  //printf ("implied========================\n");
+
+  /*  for (int i=0; i < nVars () + nAuxs (); i++)
+      printf ("x%d: [%g,%g]\n", i, lb_ [i], ub_ [i]);*/
 
   for (int i=nAuxs (); i--;) {
 
-    if (lb_ [nvar+i] > ub_ [nvar+i] + COUENNE_EPS) 
+    if (lb_ [nvar+i] > ub_ [nvar+i] + COUENNE_EPS) {
+      /*printf ("w_%d has infeasible bounds [%g,%g]\n", 
+	i+nvar, lb_ [nvar+i], ub_ [nvar+i]);*/
       return -1;
+    }
 
     //    if ((auxiliaries_ [i] -> Image () -> code () == COU_EXPRSUM) ||
     //	(auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP))
-    if (auxiliaries_ [i] -> Image () -> impliedBound (nvar+i, lb_, ub_, chg_bds) > COUENNE_EPS)
+
+    CouNumber l0 = lb_ [nvar+i], 
+              u0 = ub_ [nvar+i];
+
+    if (auxiliaries_ [i] -> Image () -> impliedBound (nvar+i, lb_, ub_, chg_bds) > COUENNE_EPS) {
+      /*printf ("implied: [%g,%g] -> [%g,%g] ", l0, u0, lb_ [nvar+i], ub_ [nvar+i]);
+      auxiliaries_ [i] -> print (std::cout); printf (" := ");
+      auxiliaries_ [i] -> Image () -> print (std::cout); printf ("\n");*/
       nchg++;
+    }
   }
 
   /*  for (int i=0; i<nvar; i++) 
