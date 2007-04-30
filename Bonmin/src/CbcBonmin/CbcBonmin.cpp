@@ -68,7 +68,7 @@ extern "C" {
    }
 }
 
-
+double GlobalTimeEnd;
 /** Constructor.*/
 BonminBB::BonminBB():
     bestSolution_(NULL),
@@ -95,6 +95,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   //Now set-up b&b
   OsiSolverInterface * si;
 
+  GlobalTimeEnd = CoinCpuTime() + par.maxTime;
 
   nlpSolver.messageHandler()->setLogLevel(par.nlpLogLevel);
   if(par.fout != NULL){
@@ -400,10 +401,16 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   // Redundant definition of default branching (as Default == User)
   CbcBranchUserDecision branch;
   model.setBranchingMethod(&branch);
+  TMINLP::SolverReturn status;
 
+  if(CoinCpuTime() > GlobalTimeEnd){
+    model.findIntegers(true);
+    status = TMINLP::LIMIT_EXCEEDED;
+    mipStatus_ = NoSolutionKnown;
+  }
+  else {
   //Get the time and start.
   model.initialSolve();
-
   continuousRelaxation_ =model.solver()->getObjValue();
   if(par.algo == 0)//Set warm start point for Ipopt
   {
@@ -464,7 +471,6 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     bestSolution_ = new Number[nlpSolver.getNumCols()];
     CoinCopyN(model.bestSolution(), nlpSolver.getNumCols(), bestSolution_);
   }
-  TMINLP::SolverReturn status;
   if(model.status()==0) {
     if(bestSolution_){
       status = TMINLP::SUCCESS;
@@ -484,6 +490,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   }
   else if (model.status()==2){
     status = TMINLP::MINLP_ERROR;
+  }
   }
 
   nlpSolver.model()->finalize_solution(status, nlpSolver.getNumCols(), bestSolution_,

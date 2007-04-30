@@ -16,6 +16,11 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+
+#include "CoinTime.hpp"
+
+extern double GlobalTimeEnd;
+
 namespace Ipopt
 {
   TMINLP2TNLP::TMINLP2TNLP(const SmartPtr<TMINLP> tminlp,
@@ -441,25 +446,27 @@ namespace Ipopt
       const IpoptData* ip_data,
       IpoptCalculatedQuantities* ip_cq)
   {
-    // If we don't have this swtiched on, we assume that also the
-    // "warm_start" option for bonmin is set not to refer to the
-    // interior warm start object
-    if (!warm_start_entire_iterate_) {
-      return true;
-    }
+    if(CoinCpuTime() > GlobalTimeEnd) return false;
+    else {
+      // If we don't have this swtiched on, we assume that also the
+      // "warm_start" option for bonmin is set not to refer to the
+      // interior warm start object
+      if (!warm_start_entire_iterate_) {
+        return true;
+      }
+  
+      if (need_new_warm_starter_) {
+        // Create a new object for later warm start information
+        curr_warm_starter_ = new IpoptInteriorWarmStarter(n_, x_l_, x_u_,
+            nlp_lower_bound_inf_,
+            nlp_upper_bound_inf_,
+            warm_start_entire_iterate_);
+        need_new_warm_starter_ = false;
+      }
 
-    if (need_new_warm_starter_) {
-      // Create a new object for later warm start information
-      curr_warm_starter_ = new IpoptInteriorWarmStarter(n_, x_l_, x_u_,
-          nlp_lower_bound_inf_,
-          nlp_upper_bound_inf_,
-          warm_start_entire_iterate_);
-      need_new_warm_starter_ = false;
+      return curr_warm_starter_->UpdateStoredIterates(mode, *ip_data, *ip_cq);
     }
-
-    return curr_warm_starter_->UpdateStoredIterates(mode, *ip_data, *ip_cq);
   }
-
 
   /** Procedure to ouptut relevant informations to reproduce a sub-problem.
   Compare the current problem to the problem to solve
