@@ -100,8 +100,8 @@ namespace Bonmin{
  
     
     continuousSolver_->findIntegersAndSOS(false);
-    int numberIntegerObjects = continuousSolver_->numberObjects() > 0;
     {
+    int numberIntegerObjects = continuousSolver_->numberObjects() > 0;
       int numAuxs = couenneProb->nAuxs();
       OsiObject ** objects = new OsiObject*[numAuxs];
       int nobj = 0;
@@ -213,8 +213,6 @@ void
     
     
   }
-  //  OsiTMINLPInterface * BonminAmplSetup::createOsiInterface{
-  //}
-  
+
 }
 
