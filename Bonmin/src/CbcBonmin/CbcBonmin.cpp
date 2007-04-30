@@ -401,16 +401,16 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   // Redundant definition of default branching (as Default == User)
   CbcBranchUserDecision branch;
   model.setBranchingMethod(&branch);
-  TMINLP::SolverReturn status;
+  TMINLP::SolverReturn status = TMINLP::LIMIT_EXCEEDED;
+  mipStatus_ = NoSolutionKnown;
 
   if(CoinCpuTime() > GlobalTimeEnd){
     model.findIntegers(true);
-    status = TMINLP::LIMIT_EXCEEDED;
-    mipStatus_ = NoSolutionKnown;
   }
   else {
   //Get the time and start.
   model.initialSolve();
+  if(CoinCpuTime() < GlobalTimeEnd){
   continuousRelaxation_ =model.solver()->getObjValue();
   if(par.algo == 0)//Set warm start point for Ipopt
   {
@@ -492,7 +492,7 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     status = TMINLP::MINLP_ERROR;
   }
   }
-
+  }
   nlpSolver.model()->finalize_solution(status, nlpSolver.getNumCols(), bestSolution_,
                                        nlpSolver.getObjValue());
   if(par.algo > 0)
