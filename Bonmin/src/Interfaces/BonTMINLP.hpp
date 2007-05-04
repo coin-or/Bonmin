@@ -346,7 +346,7 @@ namespace Bonmin
     /** overload this method to return the value of an alternative objective function for
       upper bounding (to use it hasUpperBoundingObjective should return true).*/
     virtual bool eval_upper_bound_f(Index n, const Number* x,
-                                    Number& obj_value){}
+                                    Number& obj_value){ return false; }
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
