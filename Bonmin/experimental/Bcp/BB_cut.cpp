@@ -1,10 +1,23 @@
-// Copyright (C) 2003, International Business Machines
-// Corporation and others.  All Rights Reserved.
-// File from COIN project Examples/Bac/BB_cut.cpp
+// (C) Copyright International Business Machines Corporation 2006, 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Laszlo Ladanyi, International Business Machines Corporation
+// Pierre Bonami, Carnegie Mellon University
+
 #include "BCP_buffer.hpp"
 #include "BB_cut.hpp"
 
 /****************************************************************************/
+
+BB_cut* BB_cut::clone() const
+{
+    return new BB_cut(dynamic_cast<const OsiRowCut&>(*this));
+}
+
+/****************************************************************************/
+
 void
 BB_cut::pack(BCP_buffer& buf) const
 {

@@ -130,3 +130,11 @@ BM_init::tm_init(BCP_tm_prob& p,
 
     return tm;
 }
+
+/****************************************************************************/
+
+BCP_user_pack *
+BM_init::packer_init(BCP_user_class* p)
+{
+    return new BM_pack;
+}

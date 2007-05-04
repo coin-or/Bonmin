@@ -8,6 +8,7 @@
 
 #include "CoinHelperFunctions.hpp"
 #include "BCP_lp_node.hpp"
+#include "BCP_lp.hpp"
 #include "BM.hpp"
 #include "BonCurvBranching.hpp"
 #include "BonQPStrongBranching.hpp"
@@ -273,21 +274,6 @@ BM_lp::set_user_data_for_children(BCP_presolved_lp_brobj* best,
 }
 
 //#############################################################################
-
-const BCP_proc_id*
-BM_lp::process_id() const
-{
-}
-
-void
-BM_lp::send_message(const BCP_proc_id* const target, const BCP_buffer& buf)
-{
-}
-
-void
-BM_lp::broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf)
-{
-}
 
 void
 BM_lp::process_message(BCP_buffer& buf)

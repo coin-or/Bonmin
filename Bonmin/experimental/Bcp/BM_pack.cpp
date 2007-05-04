@@ -5,8 +5,8 @@
 // Authors :
 // Laszlo Ladanyi, International Business Machines Corporation
 
-
 #include "BM.hpp"
+#include "BCP_lp.hpp"
 
 #include "BonAmplSetup.hpp"
 
@@ -72,14 +72,12 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     std::string ipopt_content(ipopt_file_content.c_str());
     std::string nl_content(nl_file_content.c_str());
 
-    /* PIERRE create the setup for algorithm, last argument indicates that continuous relaxation
-      should not be created.*/
+    /* PIERRE create the setup for algorithm, last argument indicates that
+      continuous relaxation should not be created.*/
     bonmin_.initializeBonmin(argv, ipopt_content, nl_content, false);
     bonmin_.nonlinearSolver()->Set_expose_warm_start(true);
     babSolver_.setSolver(bonmin_.nonlinearSolver());
 
-
-    
     free(argv[1]);
     if (! get_param(BCP_lp_par::MessagePassingIsSerial) &&
 	bonmin_.getAlgorithm() == 0 /* pure B&B */ &&
@@ -94,47 +92,35 @@ BM: Switching to WarmStartFromRoot.\n");
     /* synchronize bonmin & BCP parameters */
     Ipopt::SmartPtr<Ipopt::OptionsList> options = bonmin_.options();
 
-    /* PIERRE This should be already done with new code.
-    int nlpLogLevel;
-    options->GetIntegerValue("nlp_log_level", nlpLogLevel, "bonmin.");
-    nlp_.messageHandler()->setLogLevel(nlpLogLevel);
-*/
-    /** update getting options directly from setup*/
-    double bm_intTol = bonmin_.getDoubleParameter(BabSetupBase::IntTol);
-    double bm_cutoffIncr = bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr); // could be negative
-//PIERRE deprecated    options->GetNumericValue("integer_tolerance",bm_intTol,"bonmin.");
-//PIERRE deprecated    options->GetNumericValue("cutoff_decr",bm_cutoffIncr,"bonmin.");
+    /** update getting options directly from setup and store them in vars
+	local to the BM_lp object */
+    integerTolerance_ = bonmin_.getDoubleParameter(BabSetupBase::IntTol);
+    // cutOffDecrement_ could be negative
+    cutOffDecrement_ = bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr);
 
     BCP_lp_prob* bcp_lp = getLpProblemPointer();
     const double bcp_intTol = bcp_lp->par.entry(BCP_lp_par::IntegerTolerance);
     const double bcp_cutoffIncr = bcp_lp->par.entry(BCP_lp_par::Granularity);
 
-    if (fabs(bm_intTol - bcp_intTol) > 1e-10) {
+    if (fabs(integerTolerance_ - bcp_intTol) > 1e-10) {
 	printf("WARNING!\n");
 	printf("   The integrality tolerance parameters are different for\n");
 	printf("   BCP (%f) and bonmin (%f). They should be identical.\n",
-	       bcp_intTol, bm_intTol);
+	       bcp_intTol, integerTolerance_);
 	printf("   For now both will be set to that of bonmin.\n");
     }
-    if (fabs(bm_cutoffIncr - bcp_cutoffIncr) > 1e-10) {
+    if (fabs(cutOffDecrement_ - cutOffDecrement_) > 1e-10) {
 	printf("WARNING!\n");
 	printf("   The granularity (cutoff increment) parameters are different\n");
 	printf("   BCP (%f) and bonmin (%f). They should be identical.\n",
-	       bcp_cutoffIncr, bm_cutoffIncr);
+	       bcp_cutoffIncr, cutOffDecrement_);
 	printf("   For now both will be set to that of bonmin.\n");
     }
-    bcp_lp->par.set_entry(BCP_lp_par::IntegerTolerance, bm_intTol);
-    bcp_lp->par.set_entry(BCP_lp_par::Granularity, bm_cutoffIncr);
+    bcp_lp->par.set_entry(BCP_lp_par::IntegerTolerance, integerTolerance_);
+    bcp_lp->par.set_entry(BCP_lp_par::Granularity, cutOffDecrement_);
 
-    /* Store a few options in local variables */
+    /* Store a few more options in vars local to the BM_lp object */
 
-    /** update getting options directly from setup*/
-    double integerTolerance_ = bonmin_.getDoubleParameter(BabSetupBase::IntTol);
-    double cutOffDecrement_ = bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr); 
-    
-    //PIERRE deprecated    options->GetNumericValue("integer_tolerance",integerTolerance_,"bonmin.");
-    //PIERRE deprecated    options->GetNumericValue("cutoff_decr",cutOffDecrement_,"bonmin.");
-    
     // Getting the options for the choose variable object
     if (!options->GetEnumValue("varselect_stra",varselect_,"bonmin.")) {
       // For Bcp, we change the default to most-fractional for now
@@ -266,7 +252,7 @@ const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
 //#############################################################################
 
 void
-BM_tm::pack_user_data(const BCP_user_data* ud, BCP_buffer& buf)
+BM_pack::pack_user_data(const BCP_user_data* ud, BCP_buffer& buf)
 {
     const BM_node* data = dynamic_cast<const BM_node*>(ud);
     data->pack(buf);
@@ -275,28 +261,24 @@ BM_tm::pack_user_data(const BCP_user_data* ud, BCP_buffer& buf)
 /*---------------------------------------------------------------------------*/
 
 BCP_user_data*
-BM_tm::unpack_user_data(BCP_buffer& buf)
+BM_pack::unpack_user_data(BCP_buffer& buf)
 {
     return new BM_node(buf);
 }
 
-/*****************************************************************************/
+/*---------------------------------------------------------------------------*/
 
 void
-BM_lp::pack_user_data(const BCP_user_data* ud, BCP_buffer& buf)
+BM_pack::pack_cut_algo(const BCP_cut_algo* cut, BCP_buffer& buf)
 {
-    const BM_node* data = dynamic_cast<const BM_node*>(ud);
-    data->pack(buf);
+    const BB_cut* bb_cut = dynamic_cast<const BB_cut*>(cut);
+    if (!bb_cut)
+	throw BCP_fatal_error("pack_cut_algo() : unknown cut type!\n");
+    bb_cut->pack(buf);
 }
 
 /*---------------------------------------------------------------------------*/
-
-BCP_user_data*
-BM_lp::unpack_user_data(BCP_buffer& buf)
+BCP_cut_algo* BM_pack::unpack_cut_algo(BCP_buffer& buf)
 {
-    BM_node* data = new BM_node(buf);
-    numNlpFailed_ = data->numNlpFailed_;
-    return data;
+    return new BB_cut(buf);
 }
-
-//#############################################################################

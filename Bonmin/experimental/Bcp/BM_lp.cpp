@@ -10,6 +10,7 @@
 #include "BM.hpp"
 #include "BCP_message_mpi.hpp"
 #include "BCP_lp_node.hpp"
+#include "BCP_lp.hpp"
 
 #include "BonOACutGenerator2.hpp"
 #include "BonEcpCuts.hpp"
@@ -70,6 +71,11 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
 				       BCP_vec<int>& cut_changed_pos,
 				       BCP_vec<double>& cut_new_bd)
 {
+    BM_node* data = dynamic_cast<BM_node*>(get_user_data());
+    if (data) {
+	numNlpFailed_ = data->numNlpFailed_;
+    }
+
     int i;
     // First copy the bounds into nlp. That way all the branching decisions
     // will be transferred over.

@@ -1,6 +1,11 @@
-// Copyright (C) 2003, International Business Machines
-// Corporation and others.  All Rights Reserved.
-// File from COIN project Examples/Bac/BB_cut.hpp
+// (C) Copyright International Business Machines Corporation 2006, 2007
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Laszlo Ladanyi, International Business Machines Corporation
+// Pierre Bonami, Carnegie Mellon University
+
 #ifndef _BB_CUT_H
 #define _BB_CUT_H
 
@@ -42,25 +47,9 @@ public:
 
     /// Destructor
     ~BB_cut() {}
+
+    /// clone
+    virtual BB_cut* clone() const;
 };
-
-/****************************************************************************/
-
-static inline void
-BB_pack_cut(const BCP_cut_algo* cut, BCP_buffer& buf)
-{
-    const BB_cut* bb_cut = dynamic_cast<const BB_cut*>(cut);
-    if (!bb_cut)
-	throw BCP_fatal_error("pack_cut_algo() : unknown cut type!\n");
-    bb_cut->pack(buf);
-}
-
-static inline BCP_cut_algo*
-BB_unpack_cut(BCP_buffer& buf)
-{
-    return new BB_cut(buf);
-}
-
-/****************************************************************************/
 
 #endif

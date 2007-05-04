@@ -13,6 +13,7 @@
 #include "BonCbcParam.hpp"
 
 #include "BCP_USER.hpp"
+#include "BCP_parameters.hpp"
 #include "BCP_tm_user.hpp"
 #include "BCP_lp_user.hpp"
 
@@ -33,6 +34,10 @@ public:
 	buf.unpack(numNlpFailed_);
     }
     ~BM_node() {}
+
+    virtual BM_node* clone() const {
+	return new BM_node(*this);
+    }
 
     inline void pack(BCP_buffer& buf) const {
 	buf.pack(numNlpFailed_);
@@ -130,20 +135,7 @@ public:
     //@{
     virtual void pack_module_data(BCP_buffer& buf, BCP_process_t ptype);
 
-    virtual void pack_cut_algo(const BCP_cut_algo* cut, BCP_buffer& buf) {
-	BB_pack_cut(cut, buf);
-    }
-    virtual BCP_cut_algo* unpack_cut_algo(BCP_buffer& buf) {
-	return BB_unpack_cut(buf);
-    }
-
     virtual BCP_solution* unpack_feasible_solution(BCP_buffer& buf);
-
-    /// Packing of user data
-    virtual void pack_user_data(const BCP_user_data* ud, BCP_buffer& buf);
-
-    /// Unpacking of user_data
-    virtual BCP_user_data* unpack_user_data(BCP_buffer& buf);
     //@}
 
     /// Pass the core constraints and core variables to bcp
@@ -165,15 +157,6 @@ public:
     /// Print a feasible solution
     virtual void display_feasible_solution(const BCP_solution* sol);
 
-    /** What is the process id of the current process */
-    const BCP_proc_id*
-    process_id() const;
-    /** Send a message to a particular process */
-    void
-    send_message(const BCP_proc_id* const target, const BCP_buffer& buf);
-    /** Broadcast the message to all processes of the given type */
-    void
-    broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf);
     /** Process a message that has been sent by another process' user part to
 	this process' user part. */
     virtual void
@@ -232,17 +215,6 @@ class BM_lp : public BCP_lp_user
     double integerTolerance_;
     double cutOffDecrement_;
 
-#if 0
-    /* A couple of cut generators to be used in the hybrid method */
-    CglGomory miGGen_;
-    CglProbing probGen_;
-    CglKnapsackCover knapsackGen_;
-    CglMixedIntegerRounding mixedGen_;
-    Bonmin::OaNlpOptim oaGen_;
-    Bonmin::EcpCuts ecpGen_;
-    Bonmin::OACutGenerator2 oaDec_;
-    Bonmin::OaFeasibilityChecker feasCheck_;
-#endif
     /* FIXME: gross cheating. works only for serial mode. Store the warmstart
        informations in the lp process, do not send them over in user data or
        anywhere. MUST be fixed. The map is indexed by the node index. */
@@ -275,30 +247,9 @@ public:
     virtual void
     unpack_module_data(BCP_buffer& buf);
 
-    virtual void pack_cut_algo(const BCP_cut_algo* cut, BCP_buffer& buf) {
-	BB_pack_cut(cut, buf);
-    }
-    virtual BCP_cut_algo* unpack_cut_algo(BCP_buffer& buf) {
-	return BB_unpack_cut(buf);
-    }
-
     virtual void
     pack_feasible_solution(BCP_buffer& buf, const BCP_solution* sol);
 
-    virtual void
-    pack_user_data(const BCP_user_data* ud, BCP_buffer& buf);
-    virtual BCP_user_data*
-    unpack_user_data(BCP_buffer& buf);
-
-    /** What is the process id of the current process */
-    const BCP_proc_id*
-    process_id() const;
-    /** Send a message to a particular process */
-    void
-    send_message(const BCP_proc_id* const target, const BCP_buffer& buf);
-    /** Broadcast the message to all processes of the given type */
-    void
-    broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf);
     /** Process a message that has been sent by another process' user part to
 	this process' user part. */
     virtual void
@@ -376,6 +327,21 @@ private:
 
 #include "BCP_USER.hpp"
 
+class BM_pack : public BCP_user_pack {
+public:
+    virtual ~BM_pack() {}
+
+    virtual void pack_user_data(const BCP_user_data* ud, BCP_buffer& buf);
+    virtual BCP_user_data* unpack_user_data(BCP_buffer& buf);
+
+    virtual void pack_cut_algo(const BCP_cut_algo* cut, BCP_buffer& buf);
+    virtual BCP_cut_algo* unpack_cut_algo(BCP_buffer& buf);
+
+};
+
+
+//#############################################################################
+
 class BM_init : public USER_initialize {
 
 public:
@@ -385,6 +351,8 @@ public:
 				  const char * const * arglist);
 
     virtual BCP_lp_user * lp_init(BCP_lp_prob& p);
+
+    virtual BCP_user_pack * packer_init(BCP_user_class* p);
 };
 
 //#############################################################################

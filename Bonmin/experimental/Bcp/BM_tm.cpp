@@ -1,4 +1,3 @@
-#include "OsiClpSolverInterface.hpp"
 // (C) Copyright International Business Machines Corporation 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
@@ -7,19 +6,22 @@
 // Laszlo Ladanyi, International Business Machines Corporation
 // Pierre Bonami, Carnegie Mellon University
 
-#include "BonIpoptSolver.hpp"
-#ifdef COIN_HAS_FILTERSQP
-# include "BonFilterSolver.hpp"
-#endif
+#include "OsiClpSolverInterface.hpp"
+
 #include "BCP_problem_core.hpp"
-#include "BM.hpp"
+#include "BCP_tm.hpp"
+#include "BCP_lp.hpp"
 
-
-#include "BonOACutGenerator2.hpp"
-#include "BonEcpCuts.hpp"
-#include "BonOaNlpOptim.hpp"
-
+// #include "BonIpoptSolver.hpp"
+// #ifdef COIN_HAS_FILTERSQP
+// # include "BonFilterSolver.hpp"
+// #endif
+// #include "BonOACutGenerator2.hpp"
+// #include "BonEcpCuts.hpp"
+// #include "BonOaNlpOptim.hpp"
 #include "BonAmplSetup.hpp"
+
+#include "BM.hpp"
 
 //#############################################################################
 
@@ -70,8 +72,6 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     Bonmin::BonminAmplSetup bonmin;
     bonmin.readOptionsFile(par.entry(BM_par::IpoptParamfile).c_str());
     bonmin.initializeBonmin(argv);    
-    
-    Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
     
     free(argv[1]);
     
@@ -210,21 +210,6 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
 
 //#############################################################################
 
-const BCP_proc_id*
-BM_tm::process_id() const
-{
-}
-
-void
-BM_tm::send_message(const BCP_proc_id* const target, const BCP_buffer& buf)
-{
-}
-
-void
-BM_tm::broadcast_message(const BCP_process_t proc_type, const BCP_buffer& buf)
-{
-}
-
 void
 BM_tm::process_message(BCP_buffer& buf)
 {
@@ -273,10 +258,12 @@ struct BMSearchTreeCompareBest {
   inline bool operator()(const CoinTreeSiblings* x,
 			 const CoinTreeSiblings* y) const {
     double allowable_gap = 1e-8;
-    return ((x->currentNode()->quality_ <
-	     y->currentNode()->quality_-allowable_gap) ||
-	    ((x->currentNode()->quality_ <= y->currentNode()->quality_+allowable_gap) &&
-	     x->currentNode()->depth_ > y->currentNode()->depth_));
+    const double xq = x->currentNode()->getQuality();
+    const double yq = y->currentNode()->getQuality();
+    const int xd = x->currentNode()->getDepth();
+    const int yd = y->currentNode()->getDepth();
+    return ((xq < yq-allowable_gap) ||
+	    (xq <= yq+allowable_gap && xd > yd));
     }
 };
 
