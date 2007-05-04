@@ -18,6 +18,7 @@ lib_LTLIBRARIES = libCouenne.la
 
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = \
+	branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp \
 	branch/CouenneObject.cpp \
 	branch/CouenneChooseVariable.cpp \
@@ -69,6 +70,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/trigNewton.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
+	convex/boundTightening.cpp \
 	convex/genColCuts.cpp \
 	problem/problem.cpp \
 	problem/problemIO.cpp \
@@ -145,6 +147,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 include_HEADERS = \
 	../inc/config_couenne.h \
 	branch/CouenneObject.hpp \
+	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
 	include/operators/exprAbs.h \

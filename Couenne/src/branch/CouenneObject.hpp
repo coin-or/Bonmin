@@ -15,6 +15,10 @@
 #include <exprAux.h>
 
 
+/// OsiObject for auxiliary variables $w=f(x)$. Associated with a
+/// multi-variate function $f(x)$ and a related infeasibility
+/// $|w=f(x)|$, creates branches to help restoring feasibility
+
 class CouenneObject: public OsiObject {
 
 public:

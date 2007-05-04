@@ -17,9 +17,12 @@ Couenne/src/branch/CouenneChooseVariable.cpp -text
 Couenne/src/branch/CouenneChooseVariable.hpp -text
 Couenne/src/branch/CouenneObject.cpp -text
 Couenne/src/branch/CouenneObject.hpp -text
+Couenne/src/branch/CouenneThreeWayBranchObj.cpp -text
+Couenne/src/branch/CouenneThreeWayBranchObj.hpp -text
 Couenne/src/branch/getFixVarBinFun.cpp -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
 Couenne/src/convex/addEnvelope.cpp -text
+Couenne/src/convex/boundTightening.cpp -text
 Couenne/src/convex/checkNLP.cpp -text
 Couenne/src/convex/createCuts.cpp -text
 Couenne/src/convex/genColCuts.cpp -text

@@ -1,41 +1,40 @@
 /*
- * Name:    CouenneBranchingObject.hpp
+ * Name:    CouenneThreeWayBranchObj.hpp
  * Authors: Pierre Bonami, IBM Corp.
  *          Pietro Belotti, Carnegie Mellon University
- * Purpose: Branching object for auxiliary variables
+ * Purpose: Three way branching object for auxiliary variables
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNEBRANCHINGOBJECT_HPP
-#define COUENNEBRANCHINGOBJECT_HPP
+#ifndef COUENNETHREEWAYBRANCHOBJ_HPP
+#define COUENNETHREEWAYBRANCHOBJ_HPP
 
 #include <CoinFinite.hpp>
 #include <OsiBranchingObject.hpp>
 #include <exprAux.h>
 
 
-/// "Spatial" Branching object. Branching can also be performed on
-/// continuous variables.
+/// Spatial, Three-way Branching object. Branching is performed on
+/// continuous variables but a better convexification is sought around
+/// the current point by dividing the interval in three parts
 
-class CouenneBranchingObject: public OsiTwoWayBranchingObject {
+class CouenneThreeWayBranchObj: public OsiBranchingObject {
 
 public:
 
-  /// return global value for convex combination between current point
-  /// and midpoint
-  static CouNumber Alpha () {return alpha_;}
-
   /// Constructor
-  CouenneBranchingObject (expression * = NULL);
+  CouenneThreeWayBranchObj (expression * = NULL);
 
   /// Copy constructor
-  CouenneBranchingObject (const CouenneBranchingObject &src):
-    reference_ (src.reference_) {}
+  CouenneThreeWayBranchObj (const CouenneThreeWayBranchObj &src):
+    reference_ (src.reference_),
+    lcrop_     (src.lcrop_),
+    rcrop_     (src.rcrop_) {}
 
   /// Cloning method
   virtual OsiBranchingObject * clone() const
-  {return new CouenneBranchingObject (*this);}
+  {return new CouenneThreeWayBranchObj (*this);}
 
   /** \brief Execute the actions required to branch, as specified by the
 	     current state of the branching object, and advance the object's
@@ -51,9 +50,9 @@ protected:
   /// either x or y.
   expression *reference_;
 
-  /// Global value for convex combination between current point and
-  /// midpoint
-  static CouNumber alpha_;
+  /// Dividing points of interval
+  CouNumber lcrop_;
+  CouNumber rcrop_;
 };
 
 #endif

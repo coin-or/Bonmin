@@ -73,9 +73,10 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libCouenne_la_LIBADD =
-am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
-	branch/CouenneObject.cpp branch/CouenneChooseVariable.cpp \
-	branch/getFixVarBinFun.cpp expression/operators/exprAbs.cpp \
+am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
+	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
+	branch/CouenneChooseVariable.cpp branch/getFixVarBinFun.cpp \
+	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
 	expression/operators/exprInv.cpp \
@@ -115,14 +116,15 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
-	convex/generateCuts.cpp convex/genColCuts.cpp \
-	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	util/drawCuts.cpp util/rootQ.c readnl/readnl.cpp \
-	readnl/nl2e.cpp readnl/invmap.c
+	convex/generateCuts.cpp convex/boundTightening.cpp \
+	convex/genColCuts.cpp problem/problem.cpp \
+	problem/problemIO.cpp problem/constraint.cpp \
+	problem/tightenBounds.cpp problem/impliedBounds.cpp \
+	problem/readASLfg.cpp util/drawCuts.cpp util/rootQ.c \
+	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
-am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
+am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
+	CouenneBranchingObject.lo CouenneObject.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo exprAbs.lo \
 	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
 	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
@@ -136,10 +138,10 @@ am_libCouenne_la_OBJECTS = CouenneBranchingObject.lo CouenneObject.lo \
 	powNewton.lo conv-exprSub.lo conv-exprSum.lo linearize.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo conv-exprGroup.lo trigNewton.lo \
-	CouenneCutGenerator.lo generateCuts.lo genColCuts.lo \
-	problem.lo problemIO.lo constraint.lo tightenBounds.lo \
-	impliedBounds.lo readASLfg.lo drawCuts.lo rootQ.lo \
-	$(am__objects_1)
+	CouenneCutGenerator.lo generateCuts.lo boundTightening.lo \
+	genColCuts.lo problem.lo problemIO.lo constraint.lo \
+	tightenBounds.lo impliedBounds.lo readASLfg.lo drawCuts.lo \
+	rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -344,9 +346,10 @@ AUTOMAKE_OPTIONS = foreign
 lib_LTLIBRARIES = libCouenne.la
 
 # List all source files for this library, including headers
-libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
-	branch/CouenneObject.cpp branch/CouenneChooseVariable.cpp \
-	branch/getFixVarBinFun.cpp expression/operators/exprAbs.cpp \
+libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
+	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
+	branch/CouenneChooseVariable.cpp branch/getFixVarBinFun.cpp \
+	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
 	expression/operators/exprInv.cpp \
@@ -386,11 +389,12 @@ libCouenne_la_SOURCES = branch/CouenneBranchingObject.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
-	convex/generateCuts.cpp convex/genColCuts.cpp \
-	problem/problem.cpp problem/problemIO.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	util/drawCuts.cpp util/rootQ.c $(am__append_1)
+	convex/generateCuts.cpp convex/boundTightening.cpp \
+	convex/genColCuts.cpp problem/problem.cpp \
+	problem/problemIO.cpp problem/constraint.cpp \
+	problem/tightenBounds.cpp problem/impliedBounds.cpp \
+	problem/readASLfg.cpp util/drawCuts.cpp util/rootQ.c \
+	$(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -441,6 +445,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 include_HEADERS = \
 	../inc/config_couenne.h \
 	branch/CouenneObject.hpp \
+	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
 	include/operators/exprAbs.h \
@@ -559,7 +564,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneObject.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneThreeWayBranchObj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addEnvelope.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boundTightening.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checkNLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprAbs.Plo@am__quote@
@@ -674,6 +681,13 @@ invmap.lo: readnl/invmap.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+CouenneThreeWayBranchObj.lo: branch/CouenneThreeWayBranchObj.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneThreeWayBranchObj.lo -MD -MP -MF "$(DEPDIR)/CouenneThreeWayBranchObj.Tpo" -c -o CouenneThreeWayBranchObj.lo `test -f 'branch/CouenneThreeWayBranchObj.cpp' || echo '$(srcdir)/'`branch/CouenneThreeWayBranchObj.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CouenneThreeWayBranchObj.Tpo" "$(DEPDIR)/CouenneThreeWayBranchObj.Plo"; else rm -f "$(DEPDIR)/CouenneThreeWayBranchObj.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/CouenneThreeWayBranchObj.cpp' object='CouenneThreeWayBranchObj.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneThreeWayBranchObj.lo `test -f 'branch/CouenneThreeWayBranchObj.cpp' || echo '$(srcdir)/'`branch/CouenneThreeWayBranchObj.cpp
 
 CouenneBranchingObject.lo: branch/CouenneBranchingObject.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneBranchingObject.lo -MD -MP -MF "$(DEPDIR)/CouenneBranchingObject.Tpo" -c -o CouenneBranchingObject.lo `test -f 'branch/CouenneBranchingObject.cpp' || echo '$(srcdir)/'`branch/CouenneBranchingObject.cpp; \
@@ -1031,6 +1045,13 @@ generateCuts.lo: convex/generateCuts.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/generateCuts.cpp' object='generateCuts.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o generateCuts.lo `test -f 'convex/generateCuts.cpp' || echo '$(srcdir)/'`convex/generateCuts.cpp
+
+boundTightening.lo: convex/boundTightening.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT boundTightening.lo -MD -MP -MF "$(DEPDIR)/boundTightening.Tpo" -c -o boundTightening.lo `test -f 'convex/boundTightening.cpp' || echo '$(srcdir)/'`convex/boundTightening.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/boundTightening.Tpo" "$(DEPDIR)/boundTightening.Plo"; else rm -f "$(DEPDIR)/boundTightening.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/boundTightening.cpp' object='boundTightening.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o boundTightening.lo `test -f 'convex/boundTightening.cpp' || echo '$(srcdir)/'`convex/boundTightening.cpp
 
 genColCuts.lo: convex/genColCuts.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT genColCuts.lo -MD -MP -MF "$(DEPDIR)/genColCuts.Tpo" -c -o genColCuts.lo `test -f 'convex/genColCuts.cpp' || echo '$(srcdir)/'`convex/genColCuts.cpp; \

@@ -15,6 +15,7 @@
 #define WEI_RANK  0.
 #define WEI_MULT  0.
 
+
 /// return difference between current value
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &) const {
 

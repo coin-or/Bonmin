@@ -172,7 +172,7 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
   }
   else {
 
-    // after  stationary point (i.e., _/ or ~\ ) for left bound, 
+    // after  stationary point (i.e., _/ or ~\ ) for left  bound, 
     // before stationary point (i.e., /~ or \_ ) for right bound
   
     //    if (left * (rx1 - left * (zero + 5*M_PI_2)) < 0) {
@@ -186,9 +186,8 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
 	tpt = trigNewton (rx0, searchpt, searchpt + left * M_PI_2);
 	if (left * (rx1 - tpt) < 0) {
 	  if (!*s0)
-	    *s0 = cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1, sin (rx1), -up) > 0;
-	}
-	else cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
+	    *s0 = cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,         sin (rx1), -up) > 0;
+	} else    cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
       }
     } else {
       CouNumber searchpt = M_PI_2 * (2 + 3*left - up);

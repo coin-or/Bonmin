@@ -13,6 +13,7 @@
 #include <BonOaDecBase.hpp>
 #include <OsiRowCut.hpp>
 #include <CouenneTypes.h>
+#include "BonAuxInfos.hpp"
 
 #include <OsiSolverInterface.hpp>
 #include <OsiClpSolverInterface.hpp>
@@ -30,7 +31,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
  protected:
 
-  /// has generateCuts been called yet?
+  /// has generateCuts been called before?
   mutable bool firstcall_;
 
   /// should we add the violated cuts only (true), or all of them (false)?
@@ -173,6 +174,10 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// generate OsiColCuts for improved (implied and propagated) bounds
   void genColCuts (const OsiSolverInterface &, OsiCuts &, int, int *) const;
+
+  /// tighten bounds using propagation, implied bounds and reduced costs
+  bool boundTightening (const OsiSolverInterface &, OsiCuts &, 
+			char *, Bonmin::BabInfo * = NULL) const;
 };
 
 #endif

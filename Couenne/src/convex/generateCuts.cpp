@@ -132,78 +132,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  //  OsiBabSolver *auxinfo = dynamic_cast <OsiBabSolver *> (si.getAuxiliaryInfo ());
+  int *changed, nchanged;
 
-  int objInd = problem_ -> Obj (0) -> Body () -> Index ();
-  if (objInd < 0) objInd = 0; 
+  //////////////////////// Bound tightening ///////////////////////////////////////////
 
-  if (babInfo && (babInfo -> babPtr ())) {
-
-    CouNumber primal  = babInfo  -> babPtr () -> model (). getObjValue(),
-              dual    = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
-              primal0 = problem_ -> Ub (objInd), 
-              dual0   = problem_ -> Lb (objInd);
-
-    // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
-    // (LOWER) bound.
-
-    if ((primal <   COUENNE_INFINITY - 1) && (primal < primal0)) { // update primal bound (MIP)
-      problem_ -> Ub (objInd) = primal;
-      chg_bds [objInd] = 1;
-    }
-
-    if ((dual   > - COUENNE_INFINITY + 1) && (dual   > dual0)) { // update dual bound
-      problem_ -> Lb (objInd) = dual;
-      chg_bds [objInd] = 1;
-    }
-  }
-  
-
-  //////////////////////// BOUND TIGHTENING ///////////////////////////////////
-
-  int   ntightened = 0,
-      nbwtightened = 0,
-      niter = 0, *changed, nchanged;
-
-  do {
-
-    // propagate bounds to auxiliary variables
-
-    ntightened = problem_ -> tightenBounds (chg_bds);
-
-    // implied bounds. Call also at the beginning, as some common
-    // expression may have non-propagated bounds
-
-    if (ntightened >= 0) // if last call didn't signal infeasibility
-      nbwtightened = problem_ -> impliedBounds (chg_bds);
-
-    if ((ntightened < 0) || (nbwtightened < 0)) {
-
-      // set infeasibility through a cut 1 <= x0 <= -1
-
-      if (!firstcall_) {
-
-	OsiColCut *infeascut = new OsiColCut;
-
-	if (infeascut) {
-	  int i=0;
-	  double upper = -1., lower = +1.;
-	  infeascut -> setLbs (1, &i, &lower);
-	  infeascut -> setUbs (1, &i, &upper);
-	  cs.insert (infeascut);
-	  delete infeascut;
-	}
-      }
-
-      if (babInfo)
-	babInfo -> setInfeasibleNode (); // set infeasibility for NLP heuristic
-
-      goto end_genCuts;
-    }
-  } while (ntightened || nbwtightened && (niter++ < 10));
-  // need to check if EITHER procedures gave results, as expression
-  // structure is not a tree any longer.
-
+  if (! boundTightening (si, cs, chg_bds, babInfo)) 
+    goto end_genCuts;
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
@@ -248,7 +182,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     int ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
 
-    if (ind_obj >= 0)
+    if (ind_obj >= 0) {
       if (problem_ -> Obj (0) -> Sense () == MINIMIZE) {
 	if (problem_ -> Lb (ind_obj) < - LARGE_BOUND)
 	  problem_ -> Lb (ind_obj) = - LARGE_BOUND;
@@ -256,15 +190,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       else
 	if (problem_ -> Ub (ind_obj) > LARGE_BOUND)
 	  problem_ -> Ub (ind_obj) = LARGE_BOUND;
+    }
   }
 
   // change tightened bounds through OsiCuts
-
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
   // clean up
-
   free (changed);
 
   if (firstcall_) {
