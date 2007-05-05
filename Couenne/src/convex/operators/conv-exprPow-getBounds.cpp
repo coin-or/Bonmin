@@ -61,8 +61,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
       CouNumber expon = arglist_ [1] -> Value ();
       int rndexp;
 
-      bool isInt    =  fabs (expon - (rndexp = COUENNE_round (expon))) < COUENNE_EPS;
-      bool isInvInt = !isInt &&  
+      bool isInt    =  fabs (expon - (rndexp = COUENNE_round (expon))) < COUENNE_EPS,
+	   isInvInt = !isInt &&  
                       ((fabs (expon) > COUENNE_EPS) && 
 		       (fabs (1/expon - (rndexp = COUENNE_round (1/expon))) < COUENNE_EPS));
 
@@ -84,7 +84,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	all [2] = new exprConst (0);
 	all [4] = ubbase;
 
-	if (expon > COUENNE_EPS) 
+	if (expon > 0) 
 	     all [1] = new exprPow (new exprClone (lbbase), new exprConst (expon));
 	else all [1] = new exprPow (new exprClone (ubbase), new exprConst (expon));
 
@@ -122,7 +122,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 
 	if (expon > 0) {
 
-	  // special case: bounds are referred to bounds only
+	  // special case: upper bound depends to variable bounds only:
+	  // $max {lb^k, ub^k}$
 
 	  ub = new exprMax (new exprPow (new exprClone (lbbase), new exprConst (expon)),
 			    new exprPow (new exprClone (ubbase), new exprConst (expon)));
@@ -134,8 +135,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	  alu [2] = new exprConst (0);
 	  alu [4] = new exprClone (ubbase);
 
-	  if ((expon > COUENNE_EPS) || ((isInt || isInvInt) && !(rndexp % 2)))
-	    alu [1] = new exprPow (new exprClone (ubbase), new exprConst (expon));
+	  if ((expon > 0) || ((isInt || isInvInt) && !(rndexp % 2)))
+	    alu    [1] = new exprPow (new exprClone (ubbase), new exprConst (expon));
 	  else alu [1] = new exprPow (new exprClone (lbbase), new exprConst (expon));
 
 	  // alu [3] is upper bound when lbbase <= 0 <= ubbase

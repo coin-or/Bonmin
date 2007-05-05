@@ -13,12 +13,15 @@
 #include "BonAuxInfos.hpp"
 
 
-/// procedure to strengthen variable bounds
+/// procedure to strengthen variable bounds. Return false if problem
+/// turns out to be infeasible with given bounds, true otherwise.
 
 bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 					   OsiCuts &cs, 
 					   char *chg_bds, 
 					   Bonmin::BabInfo * babInfo) const {
+
+  return true;
 
   int objInd = problem_ -> Obj (0) -> Body () -> Index ();
 
@@ -26,7 +29,6 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 
   // do it only if a linear convexification is in place already
 
-  if (0)
   if ((objInd >= 0) && !firstcall_) {
 
     CouNumber 

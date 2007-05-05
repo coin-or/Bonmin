@@ -90,16 +90,16 @@ inline CouNumber safe_pow (register CouNumber base,
       return (- pow (- base, exponent));
   }
 
-  if (fabs (base) > COUENNE_INFINITY - 1) {
+  if (fabs (base) >= COUENNE_INFINITY) {
 
-    if (base < -COUENNE_INFINITY+1) {
+    if (base <= -COUENNE_INFINITY) {
 
       register int intk = COUENNE_round (exponent);
 
       if ((fabs (exponent - intk) < COUENNE_EPS) && (intk % 2))
-	return -COUENNE_INFINITY;
+	return (exponent < 0) ? 0 : -COUENNE_INFINITY;
     }
-    else return COUENNE_INFINITY;
+    else return (exponent < 0) ? 0 : COUENNE_INFINITY;
   }
 
   return (pow (base, exponent));
