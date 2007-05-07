@@ -87,8 +87,11 @@ endif
 
 if COIN_HAS_COUENNE
   AM_CPPFLAGS += \
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include`\
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include/operators`\
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression/operators` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/util` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch`
 endif
 
@@ -114,5 +117,3 @@ fun_LDADD = \
 # library is found (in the lib install directory) when we are using dynamic
 # libraries.
 fun_LDFLAGS = -rpath $(libdir)
-
-

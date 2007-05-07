@@ -3,7 +3,7 @@
 // This code is published under the Common Public License.
 //
 // Authors :
-// Pietro Belloti, Carnegie Mellon University,
+// Pietro Belotti, Carnegie Mellon University,
 // Pierre Bonami, International Business Machines Corporation
 //
 // Date : 12/19/2006
@@ -80,24 +80,25 @@ int main (int argc, char *argv[])
     if (0) {// print statistics in LaTeX format
 
       ////////////////////////////////
-      int nr, nt;
-      double st;
+      int nr=-1, nt=-1;
+      double st=-1;
 
       CouenneCutGenerator *cg = dynamic_cast <CouenneCutGenerator *> 
 	(bonmin.cutGenerators (). begin () -> cgl);
 
-      cg -> getStats (nr, nt, st);
+      if (cg)
+	cg -> getStats (nr, nt, st);
 
       char *basename = strrchr (pbName, '/');
       if (!basename) basename = pbName;
       else basename++;
 
-      printf ("::: %-25s & %6d & %6d & %6d & %6d & %6d & %6d & %8.3f & ", 
+      printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & ", 
 	      basename,
-	      cg -> Problem () -> nVars (), 
-	      cg -> Problem () -> nIntVars(), 
-	      cg -> Problem () -> nNLCons (),
-	      cg -> Problem () -> nAuxs (),
+	      (cg) ? cg -> Problem () -> nVars   () : -1, 
+	      (cg) ? cg -> Problem () -> nIntVars() : -1, 
+	      (cg) ? cg -> Problem () -> nNLCons () : -1,
+	      (cg) ? cg -> Problem () -> nAuxs   () : -1,
 	      nr, nt, st);
 
       /////////////////////////////////
@@ -107,23 +108,23 @@ int main (int argc, char *argv[])
 	// time limit reached, print upper and (in brackets) lower
 
 	if (fabs (bb.bestBound()) < 1e12 - 1) 
-	  printf (" %12.3f &", bb.bestObj ());
+	  printf    (" %12.3f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_dual");
-	  
+
 	if (fabs (bb.bestObj()) < 1e40) 
-	  printf (" (%12.3f) &", bb.bestBound ());
-	else printf (" %8s     &", "inf_prim");
+	  printf    (" (%12.3f) &", bb.bestBound ());
+	else printf (" %8s       &", "inf_prim");
       }
       else {
 	// time limit not reached, print upper and time
 
 	if (fabs (bb.bestBound()) < 1e12 - 1) 
-	  printf (" %12.3f &", bb.bestObj ());
+	  printf    (" %12.3f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_dual");
 	  
 	if (fabs (bb.bestObj()) < 1e40) 
-	  printf ("  %12.3f  &", CoinCpuTime () - time1);
-	else printf (" %8s     &", "inf_prim");
+	  printf    (" %12.3f   &", CoinCpuTime () - time1);
+	else printf (" %8s       &", "inf_prim");
       }
 
       printf ("%7d & %7d \\\\\n ",

@@ -437,7 +437,7 @@ namespace Bonmin
 	std::cout << "Solution found violates non linear constraints by: "
 		  << violation << std::endl << "Objective: " << obj
 		  << " (was "<< model.getObjValue () << " returned by Cbc)." << std::endl;
-      /*      
+      /*
       printf ("lp solution: {");
       for (int i=0; i < ecpGen -> getnvars (); i++)
 	printf ("%.3f ", bestSolution_ [i]);
@@ -463,10 +463,8 @@ namespace Bonmin
         mipStatus_ = NoSolutionKnown;
     }
     delete si;
-    std::cout<<"Finished"<<std::endl;
 
-
-    if (0) { // print some statistics in LaTeX format
+    if (1) { // print some statistics in LaTeX format
 
       int nr, nt;
       double st;
