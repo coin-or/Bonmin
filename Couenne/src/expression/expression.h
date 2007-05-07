@@ -12,9 +12,11 @@
 #define STACK_SIZE 100000
 
 #include <iostream>
+
 #include <CouennePrecisions.h>
 #include <CouenneTypes.h>
 
+class OsiBranchingObject;
 class CouenneProblem;
 class CouenneCutGenerator;
 class exprAux;
@@ -24,7 +26,7 @@ class exprUnary;
 class exprOp;
 class exprCopy;
 
-// expression base class
+/// expression base class
 
 class expression {
 
@@ -217,6 +219,10 @@ class expression {
   /// multiplicity of a variable
   virtual int Multiplicity () 
     {return 1;}
+
+  /// branching object best suited for this expression
+  virtual OsiBranchingObject *BranchObject ()
+    {return NULL;}
 };
 
 

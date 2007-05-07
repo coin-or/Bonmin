@@ -19,7 +19,7 @@
 #include <CglCutGenerator.hpp>
 
 
-// expression base class
+/// expression base class
 
 class exprAux: public exprVar {
 
@@ -45,21 +45,21 @@ class exprAux: public exprVar {
 
  public:
 
-  // Node type
+  /// Node type
   inline enum nodeType Type () 
     {return AUX;}
 
-  // Constructor
+  /// Constructor
   exprAux (expression *, int, int);
 
-  // Destructor
+  /// Destructor
   ~exprAux () {
     delete image_; 
     delete lb_; 
     delete ub_;
   }
 
-  // copy constructor
+  /// copy constructor
   exprAux (const exprAux &e):
     exprVar       (e.varIndex_),
     image_        (e.image_ -> clone ()),
@@ -69,54 +69,54 @@ class exprAux: public exprVar {
     multiplicity_ (e.multiplicity_) {
 
     image_ -> getBounds (lb_, ub_);
-    //getBounds (lb_, ub_);
+    // getBounds (lb_, ub_);
 
     lb_ = new exprMax (lb_, new exprLowerBound (varIndex_));
     ub_ = new exprMin (ub_, new exprUpperBound (varIndex_));
   }
 
-  // cloning method
+  /// cloning method
   virtual exprAux *clone () const
     {return new exprAux (*this);}
 
-  // Bound get
+  /// Bound get
   expression *Lb () {return lb_;}
   expression *Ub () {return ub_;}
 
-  // I/O
+  /// I/O
   void print (std::ostream &out) const
     {out << "w_" << varIndex_;}
 
-  // The expression associated with this auxiliary variable
+  /// The expression associated with this auxiliary variable
   inline expression *Image () const
     {return image_;}
 
-  // Null function for evaluating the expression
+  /// Null function for evaluating the expression
   inline CouNumber operator () () 
     {return (currValue_ = expression::Variable (varIndex_));}
 
-  // Differentiation
+  /// Differentiation
   inline expression *differentiate (int index) 
     {return image_ -> differentiate (index);}
 
-  // Dependence on variable set
+  /// Dependence on variable set
   inline bool dependsOn (int *indices, int num) 
     {return image_ -> dependsOn (indices, num);}
 
-  // Get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// Get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
     {return LINEAR;}
     /*return image_ -> Linearity ();*/
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lb, expression *&ub) {
 
-    // this replaces the previous 
-    //
-    //    image_ -> getBounds (lb0, ub0);
-    //
-    // which created large expression trees, now useless since all
-    // auxiliaries are standardized.
+    /// this replaces the previous 
+    ///
+    ///    image_ -> getBounds (lb0, ub0);
+    ///
+    /// which created large expression trees, now useless since all
+    /// auxiliaries are standardized.
 
     lb = new exprLowerBound (varIndex_);
     ub = new exprUpperBound (varIndex_);
@@ -135,7 +135,7 @@ class exprAux: public exprVar {
     ub_ = new exprMin (ub_, u0);
   }
 
-  // generate cuts for expression associated with this auxiliary
+  /// generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *);
 

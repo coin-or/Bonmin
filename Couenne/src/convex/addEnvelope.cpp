@@ -23,6 +23,15 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
   // TODO: remove check of !firstcall_ if point is available already
 
+  // if bounds are very close, convexify with a single line
+
+  if (fabs (u - l) < COUENNE_EPS) {
+
+    CouNumber x0 = 0.5 * (u+l), fp0 = fprime (x0);
+    createCut (cs, f(x0) - fp0 * x0, 0, w_ind, 1., x_ind, - fp0);
+    return;
+  }
+
   // Add tangent in any case
 
   if (((!firstcall_) || ((x >= l) && (x <= u)))

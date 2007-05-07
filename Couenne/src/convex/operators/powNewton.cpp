@@ -9,7 +9,7 @@
 #include <math.h>
 #include <CouenneTypes.h>
 
-#define MAX_ITER 1000
+#define MAX_ITER 100
 #define COU_POW_TOLERANCE 1e-12
 
 CouNumber powNewton (CouNumber xc, CouNumber yc, 

@@ -14,6 +14,12 @@
 #include <OsiBranchingObject.hpp>
 #include <exprAux.h>
 
+#define COUENNE_CROP 1
+#define COUENNE_LCROP (1e2*COUENNE_CROP)
+
+#define COUENNE_LARGE_INTERVAL 1e4
+#define COUENNE_NEAR_BOUND 1e-2
+
 
 /// "Spatial" Branching object. Branching can also be performed on
 /// continuous variables.
@@ -31,6 +37,7 @@ public:
 
   /// Copy constructor
   CouenneBranchingObject (const CouenneBranchingObject &src):
+    OsiTwoWayBranchingObject (src),
     reference_ (src.reference_) {}
 
   /// Cloning method
@@ -48,7 +55,7 @@ protected:
 
   /// The variable this branching object refers to. If the
   /// corresponding CouenneObject was created on w=f(x,y), it is
-  /// either x or y.
+  /// either x or y, chosen previously with a call to getFixVar()
   expression *reference_;
 
   /// Global value for convex combination between current point and

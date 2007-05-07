@@ -19,30 +19,30 @@
 class CouenneProblem;
 
 
-// variable-type operator. All variables of the expression must be
-// objects of this class
+/// variable-type operator. All variables of the expression must be
+/// objects of this class
 
 class exprIVar: public exprVar {
 
  public:
 
-  // Constructor
+  /// Constructor
   exprIVar (int varIndex):
     exprVar (varIndex) {}
 
-  // copy constructor
+  /// copy constructor
   exprIVar (const exprIVar &e):
     exprVar (e.Index ()) {}
 
-  // cloning method
+  /// cloning method
   virtual exprIVar *clone () const
     {return new exprIVar (*this);}
 
-  // print
+  /// print
   virtual void print (std::ostream &out) const
     {out << "y_" << varIndex_;}
 
-  // is this expression integer?
+  /// is this expression integer?
   virtual bool isInteger ()
     {return true;}
 };

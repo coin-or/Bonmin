@@ -27,37 +27,54 @@ exprAux *exprDiv::standardize (CouenneProblem *p) {
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
+
   // TODO: Use method on Tawarmalani-Sahinidis //////////////////////////////
 
-  // get bounds of numerator and denominator
+  // compute y bounds
 
-  expression *yle, *yue;
-
-  arglist_ [1] -> getBounds (yle, yue);
+  expression *yle, *yue, *ye = arglist_ [1];
+  ye -> getBounds (yle, yue);
 
   CouNumber yl = (*yle) (), 
-            yu = (*yue) ();
+            yu = (*yue) (), k;
+
+  delete yle; delete yue;
+
+  int xi = arglist_ [0] -> Index (),
+      wi = w  -> Index (),
+      yi = ye -> Index ();
 
   // if the denominator's bound interval has 0 as internal point,
   // there is no convexification
 
-  if ((yl < - COUENNE_EPS) && 
-      (yu >   COUENNE_EPS)) 
+  if ((yl < -0) && (yu >  0)) 
     return;
 
-  expression *xle, *xue, *wle, *wue;
+  // special case #1: y is almost constant (nonzero) --> y = k. We
+  // only need a single plane w = x/k.
 
-  arglist_ [0] -> getBounds (xle, xue);
-  w            -> getBounds (wle, wue);
+  if ((fabs (yl-yu) < COUENNE_EPS) && ((k = fabs (yl+yu) / 2) > COUENNE_EPS)) {
+    cg -> createCut (cs, 0., 0, wi, -1, xi, 1/k);
+    return;
+  }
 
-  expression *xe = arglist_ [0];
-  expression *ye = arglist_ [1];
+  // compute w bounds
 
-  CouNumber wl = (*wle) (), wu = (*wue) ();
+  expression *wle, *wue;
+  w -> getBounds (wle, wue);
 
-  delete yle; delete yue;
+  CouNumber wl = (*wle) (), 
+            wu = (*wue) ();
+
   delete wle; delete wue;
-  delete xle; delete xue;
+
+  // special case #2: w is almost constant (nonzero) --> w = x/y = k. We
+  // only need a single plane x = y*k.
+
+  if ((fabs (wl-wu) < COUENNE_EPS) && ((k = fabs (wl+wu) / 2) > COUENNE_EPS)) {
+    cg -> createCut (cs, 0., 0, yi, k, xi, -1.);
+    return;
+  }
 
   // Add McCormick convexification cuts. Reduce w = x/y to x = wy and
   // apply the same rule as for multiplications:
@@ -67,10 +84,6 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   //
   // 3) x <= yl w + wu y - yl wu
   // 4) x <= yu w + wl y - yu wl
-
-  int xi = xe -> Index (),
-      wi = w  -> Index (),
-      yi = ye -> Index ();
 
   if (is_boundbox_regular (yl, wl)) cg -> createCut (cs, yl*wl, -1, xi, -1., wi, yl, yi, wl);
   if (is_boundbox_regular (yu, wu)) cg -> createCut (cs, yu*wu, -1, xi, -1., wi, yu, yi, wu);

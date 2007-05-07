@@ -16,8 +16,8 @@ extern "C" {
   CouNumber rootQ (int k);
 }
 
-// class that stores result of previous calls to rootQ into a map for
-// faster access
+/// class that stores result of previous calls to rootQ into a map for
+/// faster access
 
 class Qroot {
 
@@ -29,14 +29,14 @@ class Qroot {
 
  public:
 
-  // empty constructors (we only need the method to work on the static
-  // structure)
+  /// empty constructors (we only need the method to work on the static
+  /// structure)
   
   Qroot  () {}
   ~Qroot () {}
 
-  // retrieve root of Q with order = k. If no such computation has
-  // been performed yet, do it here
+  /// retrieve root of Q with order = k. If no such computation has
+  /// been performed yet, do it here
 
   inline CouNumber operator () (int k) {
 

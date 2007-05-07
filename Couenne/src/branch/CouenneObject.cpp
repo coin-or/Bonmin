@@ -10,6 +10,7 @@
 #include <CouenneObject.hpp>
 #include <exprGroup.h>
 #include <CouenneBranchingObject.hpp>
+#include <CouenneThreeWayBranchObj.hpp>
 
 #define WEI_INF   1.
 #define WEI_RANK  0.
@@ -121,7 +122,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
     index = expr -> Argument () -> Index ();
 
-    if (index > -1) {
+    if (index >= 0) {
 
       val = info -> solution_ [index];
 
@@ -139,7 +140,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
 	index = args [i] -> Index();
 
-	if (index > -1) {
+	if (index >= 0) {
 
 	  val = info -> solution_ [index];
 	  solver -> setColLower (index, val);
@@ -153,7 +154,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   if (expr -> code () == COU_EXPRGROUP) {
 
     exprGroup *e = dynamic_cast <exprGroup *> (expr);
-    int *indices = e -> getIndices (), index;
+    int *indices = e -> getIndices ();
 
     for (; *indices >= 0; indices++) {
       
@@ -187,23 +188,48 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 		      const_cast <CouNumber *> (info -> lower_),
 		      const_cast <CouNumber *> (info -> upper_));
 
+  OsiBranchingObject *opobj = reference_ -> BranchObject ();
+
+  if (opobj)
+    return opobj;
+
   expression *depvar = reference_ -> Image () -> getFixVar ();
   int index;
 
-  if (depvar && (index = depvar -> Index ())>= 0) {
+  // Create a two- or three-way branching object according to
+  // finiteness of the intervals. For now only check if argument
+  // bounds are finite.
+
+  // TODO: check if function is finite within the interval (if so,
+  // two-way, if not, three-way). Could be operator-dependent, that
+  // is,
+  //
+  // return reference_ -> BranchObject ();
+
+  if (depvar && ((index = depvar -> Index ()) >= 0)) {
 
     int ref_ind = reference_ -> Index ();
 
     CouNumber x  = info -> solution_ [index],
               l  = info -> lower_    [index],
               u  = info -> upper_    [index],
+
               xr = info -> solution_ [ref_ind],
               lr = info -> lower_    [ref_ind],
               ur = info -> upper_    [ref_ind];
-
-    if ((fabs (x-l) > COUENNE_EPS) &&
-	(fabs (u-x) > COUENNE_EPS) &&
-	(fabs (u-l) > COUENNE_EPS)
+    /*
+    if (((x-l > COUENNE_LARGE_INTERVAL) &&
+	 (u-x > COUENNE_LARGE_INTERVAL)) 
+	|| 
+	(((x-l > COUENNE_LARGE_INTERVAL) ||
+	  (u-x > COUENNE_LARGE_INTERVAL)) && 
+	 ((x-l < COUENNE_NEAR_BOUND) ||
+	  (u-x < COUENNE_NEAR_BOUND))))
+      return new CouenneThreeWayBranchObj (depvar, x, l, u);
+    */
+    if (((fabs (x-l) > COUENNE_EPS) &&
+	 (fabs (u-x) > COUENNE_EPS) &&
+	 (fabs (u-l) > COUENNE_EPS))
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))

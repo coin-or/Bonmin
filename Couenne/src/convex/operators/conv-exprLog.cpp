@@ -28,13 +28,24 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   argument_ -> getBounds (le, ue);
 
-  CouNumber x = (cg -> isFirst ()) ? 
-                 1 : powNewton ((*argument_) (), (*aux) (), log, inv, oppInvSqr),
-            l = (*le) (),
+  CouNumber l = (*le) (),
             u = (*ue) ();
 
   int w_ind = aux       -> Index ();
   int x_ind = argument_ -> Index ();
+
+  // if bounds are very close, convexify with a single line
+
+  if ((fabs (u - l) < COUENNE_EPS) && (l > COUENNE_EPS)) {
+
+    CouNumber x0 = 0.5 * (u+l);
+    cg -> createCut (cs, log (x0) - 1, 0, 
+		     w_ind, 1., x_ind, - 1/x0);
+    return;
+  }
+
+  CouNumber x = (cg -> isFirst ()) ? 
+                 1 : powNewton ((*argument_) (), (*aux) (), log, inv, oppInvSqr);
 
   // fix lower bound
 

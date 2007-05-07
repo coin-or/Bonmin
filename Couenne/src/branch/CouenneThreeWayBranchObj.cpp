@@ -6,61 +6,48 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
+#include <CouenneBranchingObject.hpp>
 #include <CouenneThreeWayBranchObj.hpp>
-
-
-//CouNumber CouenneThreeWayBranchObj::lcrop_ = 0.8;
-//CouNumber CouenneThreeWayBranchObj::rcrop_ = 0.8;
 
 
 /** \brief Constructor. Get a variable as an argument and set value_
            through a call to operator () of that exprAux.
 */
 
-CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (expression *var): 
+CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (expression *var, 
+						    CouNumber x, 
+						    CouNumber l, 
+						    CouNumber u): 
+  reference_      (var) {
 
-  reference_ (var) {
+  value_          = x;
+  numberBranches_ = 3;
 
-  // set the branching value at the current point 
-  //  value_ = expression::Variable (reference_ -> Index ());
+  // Depending on where x, l, and u are, divide bound interval into
+  // three and set lcrop_ and rcrop_ accordingly.
 
-  int index = reference_ -> Index ();
+  // if l and u are unbounded, crop around x using COUENNE_CROP
 
-  long double
-    x = expression::Variable (index),   // current solution
-    l = expression::Lbound   (index),   //         lower bound
-    u = expression::Ubound   (index),   //         upper
-    alpha = 0;//CouenneBranchingObject::Alpha ();
-
-  if      (x<l) x = l;
-  else if (x>u) x = u;
-
-  if ((x > l + COUENNE_EPS) && 
-      (x < u - COUENNE_EPS))      // x is not at the boundary
-    value_ = x;
-
-  else // current point is at one of the bounds
-    if ((l > - COUENNE_INFINITY + 1) &&
-	(u <   COUENNE_INFINITY - 1))
-      // finite bounds, apply midpoint rule
-      value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
-
-    else
-      // infinite (one direction) bound interval, x is at the boundary
-      // push it inwards
-      // TODO: look for a proper displacement 
-      if (fabs (x-l) < COUENNE_EPS) value_ = l + (1+fabs (l)) / 2.; 
-      else                          value_ = u - (1+fabs (u)) / 2.; 
-
-  if (0) {
-    printf ("Branch::constructor: ");
-    reference_ -> print (std::cout);
-    printf (" on %.6e (%.6e) [%.6e,%.6e]\n", 
-	    value_, 
-	    expression::Variable (reference_ -> Index ()),
-	    expression::Lbound   (reference_ -> Index ()),
-	    expression::Ubound   (reference_ -> Index ()));
+  if ((x-l > COUENNE_LARGE_INTERVAL) && 
+      (u-x > COUENNE_LARGE_INTERVAL)) {
+    lcrop_ = x - COUENNE_CROP;
+    rcrop_ = x + COUENNE_CROP;
+    first_ = 1;
   }
+  else
+    if ((x-l > COUENNE_LARGE_INTERVAL) && 
+	(u-x < COUENNE_NEAR_BOUND)) {
+      lcrop_ = x - COUENNE_CROP;
+      rcrop_ = x - COUENNE_LCROP;
+      first_ = 2;
+    }
+    else
+      if ((x-l < COUENNE_NEAR_BOUND) && 
+	  (u-x > COUENNE_LARGE_INTERVAL)) {
+	lcrop_ = x + COUENNE_CROP;
+	rcrop_ = x + COUENNE_LCROP;
+	first_ = 0;
+      }
 }
 
 
@@ -76,20 +63,23 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
   // way =  0 if "[a,b]" node
   //        1 if ">= b"  node
 
-  int way = branchIndex_ - 1,
-      ind = reference_ -> Index ();
+  int way, ind = reference_ -> Index ();
 
-  /*CouNumber l = solver -> getColLower () [ind],
-            u = solver -> getColUpper () [ind];
-
-  if (way) {
-    if      (value_ < l)             printf ("Nonsense up-branch: [ %f ,(%f)] -> [%f\n", l,u,value_);
-    else if (value_ < l+COUENNE_EPS) printf ("## WEAK  up-branch: [ %f ,(%f)] -> [%f\n", l,u,value_);
-  } else {
-    if      (value_ > u)             printf ("Nonsense dn-branch: [(%f), %f ] -> %f]\n", l,u,value_);
-    else if (value_ > u+COUENNE_EPS) printf ("## WEAK  dn-branch: [(%f), %f ] -> %f]\n", l,u,value_);
+  switch (branchIndex_) {
+  case 0: 
+    way = first_;   // if first offspring, let first_ decide who's first
+    break;
+  case 1:
+    way = (first_ == 0) ? 1 : 0;
+    break;
+  case 2:
+    way = (first_ == 2) ? 1 : 2;
+    break;
+  default: 
+    printf ("Warning, branchIndex_ has a strange value (%d)\n", branchIndex_);
   }
-  */
+
+  way --; // from {0,1,2} to {-1,0,1}
 
   // set lower or upper bound (round if this variable is integer)
 
@@ -98,13 +88,16 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
   switch (way) {
 
   case -1: // left interval
+    //    printf ("Left branch: x%d <= %.3f\n", ind, lcrop_);
     solver -> setColUpper (ind, intvar ? floor (lcrop_) : lcrop_);
     break;
   case  0: // central interval
+    //    printf ("Central branch: %.3f <= x%d <= %.3f\n", lcrop_, ind, rcrop_);
     solver -> setColLower (ind, intvar ? ceil  (lcrop_) : lcrop_);
     solver -> setColUpper (ind, intvar ? floor (rcrop_) : rcrop_);
     break;
   case  1: // right interval
+    //    printf ("Right branch: x%d >= %.3f\n", ind, rcrop_);
     solver -> setColLower (ind, intvar ? ceil  (rcrop_) : rcrop_);
     break;
   default:

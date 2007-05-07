@@ -15,7 +15,7 @@
 #include <exprAux.h>
 
 
-/// Spatial, Three-way Branching object. Branching is performed on
+/// Spatial, three-way branching object. Branching is performed on
 /// continuous variables but a better convexification is sought around
 /// the current point by dividing the interval in three parts
 
@@ -24,22 +24,24 @@ class CouenneThreeWayBranchObj: public OsiBranchingObject {
 public:
 
   /// Constructor
-  CouenneThreeWayBranchObj (expression * = NULL);
+  CouenneThreeWayBranchObj (expression *, CouNumber, CouNumber, CouNumber);
 
   /// Copy constructor
   CouenneThreeWayBranchObj (const CouenneThreeWayBranchObj &src):
+    OsiBranchingObject (src),
     reference_ (src.reference_),
     lcrop_     (src.lcrop_),
     rcrop_     (src.rcrop_) {}
 
   /// Cloning method
-  virtual OsiBranchingObject * clone() const
+  virtual OsiBranchingObject * clone () const
   {return new CouenneThreeWayBranchObj (*this);}
 
   /** \brief Execute the actions required to branch, as specified by the
 	     current state of the branching object, and advance the object's
 	     state. 
-	     Returns change in guessed objective on next branch
+	     Returns change in guessed objective on next (what does
+	     "next" mean here?) branch
   */
   virtual double branch (OsiSolverInterface * solver = NULL);
 
@@ -53,6 +55,9 @@ protected:
   /// Dividing points of interval
   CouNumber lcrop_;
   CouNumber rcrop_;
+
+  /// first branch to be performed: 0 is left, 1 is central, 2 is right
+  int first_;
 };
 
 #endif

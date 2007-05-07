@@ -20,12 +20,10 @@ inline CouNumber zero_fun (CouNumber x)
 {return 0;}
 
 
-//
-// univariate operator-type expression: requires single argument. All
-// unary functions are derived from this base class, which has a lot
-// of common methods that need not be re-implemented by any univariate
-// class.
-//
+/// univariate operator-type expression: requires single argument. All
+/// unary functions are derived from this base class, which has a lot
+/// of common methods that need not be re-implemented by any univariate
+/// class.
 
 class exprUnary: public expression {
 
@@ -64,31 +62,31 @@ class exprUnary: public expression {
   virtual inline expression **ArgPtr () 
     {return &argument_;}
 
-  // I/O
+  /// I/O
   virtual void print (std::ostream &, const std::string &, enum pos) const;
 
-  // compute value of unary operator
+  /// compute value of unary operator
   virtual inline CouNumber operator () ()
     {return (currValue_ = (F ()) ((*argument_) ()));}
 
-  // dependence on variable set
+  /// dependence on variable set
   bool inline dependsOn (int *list, int n) 
     {return argument_ -> dependsOn (list, n);}
 
-  // simplification
+  /// simplification
   expression *simplify ();
 
-  // get a measure of "how linear" the expression is (see CouenneTypes.h)
-  // for general univariate functions, return nonlinear.
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// for general univariate functions, return nonlinear.
   virtual inline int Linearity ()
     {return NONLINEAR;}
 
-  // reduce expression in standard form, creating additional aux
-  // variables (and constraints)
+  /// reduce expression in standard form, creating additional aux
+  /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *);
 
-  // return an index to the variable's argument that is better fixed
-  // in a branching rule for solving a nonconvexity gap
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar () 
     {return argument_;}
 

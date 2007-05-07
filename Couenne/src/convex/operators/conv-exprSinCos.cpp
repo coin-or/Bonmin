@@ -64,7 +64,18 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
 
   int x_ind = arg -> Index ();
   int w_ind = aux -> Index ();
+  /*
+  if (fabs (ub - lb) < COUENNE_EPS) {
 
+    CouNumber x0 = 0.5 * (ub+lb), f, fp;
+
+    if (which_trig == COU_SINE) {f = sin (x0); fp =  cos (x0);}
+    else                        {f = cos (x0); fp = -sin (x0);}
+
+    cg -> createCut (cs, f - fp*x0, 0, w_ind, 1., x_ind, -fp);
+    return;
+  }
+  */
   // add the lower envelope
   cg -> createCut (cs, f (lb) - lb, -1, w_ind, 1., x_ind, -1.); // left:  w - x <= f lb - lb 
   cg -> createCut (cs, f (ub) + ub, -1, w_ind, 1., x_ind,  1.); // right: w + x <= f ub + ub 
@@ -110,6 +121,17 @@ void trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has call
 
   int xi = arg -> Index (),
       wi = w   -> Index ();
+
+  if (fabs (ub - lb) < COUENNE_EPS) {
+
+    CouNumber x0 = 0.5 * (ub+lb), f, fp;
+
+    if (which_trig == COU_SINE) {f = sin (x0); fp =  cos (x0);}
+    else                        {f = cos (x0); fp = -sin (x0);}
+
+    cg -> createCut (cs, f - fp*x0, 0, wi, 1., xi, -fp);
+    return;
+  }
 
   // true if, in the first call (lb), a lower/upper chord was added
   // --> no such chord must be generated in the second call (ub)

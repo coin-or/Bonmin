@@ -21,43 +21,43 @@ class exprCopy: public expression {
 
  protected:
 
-  // the expression this object is a (reference) copy of
+  /// the expression this object is a (reference) copy of
   expression *copy_;
 
  public:
 
-  // node type
+  /// node type
   inline enum nodeType Type () 
     {return copy_ -> Type ();}
 
-  // Constructor, destructor
+  /// Constructor, destructor
   exprCopy  (expression *copy):
     copy_ (copy) {}
 
-  // copy constructor
+  /// copy constructor
   exprCopy (const exprCopy &e) {
     copy_ = e.Original () -> clone ();
   }
 
-  // cloning method
+  /// cloning method
   virtual exprCopy *clone () const
     {return new exprCopy (*this);}
 
-  // If this is an exprClone of a exprClone of an expr???, point to
-  // the original expr??? instead of an exprClone -- improves computing
-  // efficiency
+  /// If this is an exprClone of a exprClone of an expr???, point to
+  /// the original expr??? instead of an exprClone -- improves computing
+  /// efficiency
   inline const expression *Original () const
     {return copy_ -> Original ();}
 
-  // get variable index in problem
+  /// get variable index in problem
   inline int Index () const
     {return copy_ -> Index ();}
 
-  // I/O
+  /// I/O
   virtual void print (std::ostream &out) const
   {out << "["; copy_ -> Original () -> print (out); out << "]";}
 
-  // value (empty)
+  /// value (empty)
   virtual inline CouNumber Value () const 
     //    {return currValue_;}
     {return copy_ -> Value ();} // *** Check this! Should be the commented one 
@@ -66,50 +66,50 @@ class exprCopy: public expression {
   // that's why it is very important that exprCopy should only be used
   // in successive evaluations. 
 
-  // null function for evaluating the expression
+  /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
     {return (currValue_ = (*copy_) ());}
   //    {return (currValue_ = copy_ -> Value ());}
 
-  // differentiation
+  /// differentiation
   inline expression *differentiate (int index) 
     {return copy_ -> differentiate (index);}
 
-  // dependence on variable set
+  /// dependence on variable set
   inline bool dependsOn (int *varlist, int n) 
     {return copy_ -> dependsOn (varlist, n);}
 
-  // simplify expression (useful for derivatives)
+  /// simplify expression (useful for derivatives)
   inline expression *simplify () 
     {return copy_ -> simplify ();}
 
-  // get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
     {return copy_ -> Linearity ();}
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lower, expression *&upper) 
     {copy_ -> getBounds (lower, upper);}
 
-  // Create standard formulation of this expression
+  /// Create standard formulation of this expression
   inline exprAux *standardize (CouenneProblem *p)
     {return copy_ -> standardize (p);}
 
-  // generate convexification cut for constraint w = this
+  /// generate convexification cut for constraint w = this
   inline void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) 
     {copy_ -> generateCuts (w, si, cs, cg);}
 
-  // return an index to the variable's argument that is better fixed
-  // in a branching rule for solving a nonconvexity gap
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar () 
     {return copy_ -> getFixVar ();}
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code () 
     {return copy_ -> code ();}
 
-  ///
+  /// compare this with other expression
   int compare (expression &e) 
     {return copy_ -> compare (e);}
 

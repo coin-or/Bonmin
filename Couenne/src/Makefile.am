@@ -104,9 +104,12 @@ endif
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include/operators` \
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression/operators` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/util` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
@@ -150,41 +153,41 @@ include_HEADERS = \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
-	include/operators/exprAbs.h \
-	include/operators/exprExp.h \
-	include/operators/exprInv.h \
-	include/operators/exprMul.h \
-	include/operators/exprOpp.h \
-	include/operators/exprBMul.h \
-	include/operators/exprLog.h \
-	include/operators/exprDiv.h \
-	include/operators/exprMin.h \
-	include/operators/exprBDiv.h \
-	include/operators/exprSum.h \
-	include/operators/exprMax.h \
-	include/operators/exprPow.h \
-	include/operators/exprSin.h \
-	include/operators/exprCos.h \
-	include/operators/exprBSin.h \
-	include/operators/exprBCos.h \
-	include/operators/exprSub.h \
-	include/operators/exprGroup.h \
-	include/exprConst.h \
-	include/exprIVar.h \
-	include/exprVar.h \
-	include/exprAux.h \
-	include/exprUnary.h \
-	include/expression.h \
-	include/exprClone.h \
-	include/exprBound.h \
-	include/exprCopy.h \
-	include/exprOp.h \
-	include/CouennePrecisions.h \
-	include/CouenneProblemElem.h \
-	include/CouenneProblem.h \
-	include/CouenneTypes.h \
-	include/rootQ.h \
-	include/CouenneCutGenerator.h
+	expression/operators/exprAbs.h \
+	expression/operators/exprExp.h \
+	expression/operators/exprInv.h \
+	expression/operators/exprMul.h \
+	expression/operators/exprOpp.h \
+	expression/operators/exprBMul.h \
+	expression/operators/exprLog.h \
+	expression/operators/exprDiv.h \
+	expression/operators/exprMin.h \
+	expression/operators/exprBDiv.h \
+	expression/operators/exprSum.h \
+	expression/operators/exprMax.h \
+	expression/operators/exprPow.h \
+	expression/operators/exprSin.h \
+	expression/operators/exprCos.h \
+	expression/operators/exprBSin.h \
+	expression/operators/exprBCos.h \
+	expression/operators/exprSub.h \
+	expression/operators/exprGroup.h \
+	expression/exprConst.h \
+	expression/exprIVar.h \
+	expression/exprVar.h \
+	expression/exprAux.h \
+	expression/exprUnary.h \
+	expression/expression.h \
+	expression/exprClone.h \
+	expression/exprBound.h \
+	expression/exprCopy.h \
+	expression/exprOp.h \
+	expression/CouennePrecisions.h \
+	problem/CouenneProblemElem.h \
+	problem/CouenneProblem.h \
+	expression/CouenneTypes.h \
+	util/rootQ.h \
+	convex/CouenneCutGenerator.h
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #

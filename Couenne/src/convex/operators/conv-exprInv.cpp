@@ -77,12 +77,22 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux       -> Index (), 
       x_ind = argument_ -> Index ();
 
+  // special case: l and u are very close, replace function with
+  // linear term
+
+  if (fabs (u - l) < COUENNE_EPS) {
+
+    CouNumber x0 = 0.5 * (u+l);
+    cg -> createCut (cs, 2/x0, 0, w_ind, 1., x_ind, 1/(x0*x0));
+    return;
+  }
+
   // choose sampling points. If unbounded, bound using a rule of thumb
 
   int ns = cg -> nSamples ();
 
-  if      (l < - COUENNE_INFINITY + 1) l = ns * (u-1); // (-infinity, u] where u < 0
-  else if (u >   COUENNE_INFINITY - 1) u = ns * (l+1); // [l, +infinity) where l > 0
+  if      (l < - COUENNE_INFINITY) l = ns * (u-1); // (-infinity, u] where u < 0
+  else if (u >   COUENNE_INFINITY) u = ns * (l+1); // [l, +infinity) where l > 0
 
   // make bounds nonzero
 

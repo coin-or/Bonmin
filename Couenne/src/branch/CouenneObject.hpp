@@ -42,15 +42,16 @@ public:
   /// the auxiliary variable defined as w = f(x)
   virtual double infeasibility (const OsiBranchingInformation*, int &) const;
 
-  /// fix (one of the) argument of reference auxiliary variable 
+  /// fix (one of the) arguments of reference auxiliary variable 
   virtual double feasibleRegion (OsiSolverInterface*, const OsiBranchingInformation*) const;
 
-  /// create CouenneBranchingObject based on this object
+  /// create CouenneBranchingObject or CouenneThreeWayBranchObj based
+  /// on this object
   virtual OsiBranchingObject* createBranch (OsiSolverInterface*, 
 					    const OsiBranchingInformation*, int) const;
 
   /// return reference auxiliary variable
-  exprAux *Reference () 
+  exprAux *Reference ()
   {return reference_;}
 
 protected:

@@ -42,13 +42,13 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
       cg -> createCut (cs, 0., +1, w_ind, 1., x_ind,  1.);
     }
 
-    // otherwise check if at most one of the bounds is infinite:
-    // even so so, we can still add a plane, whose slope will be 1
-    // (if x is unbounded from above) or -1 (from below)
+    // otherwise check if at most one of the bounds is infinite: even
+    // so, we can still add a plane, whose slope will be 1 (if x is
+    // unbounded from above) or -1 (from below)
 
-    if (l > - COUENNE_INFINITY + 1) {
+    if (l > - COUENNE_INFINITY) {
 
-      if (u < COUENNE_INFINITY - 1) { // the upper approximation has slope other than -1, 1
+      if (u < COUENNE_INFINITY) { // the upper approximation has slope other than -1, 1
 
 	  CouNumber slope = (u+l) / (u-l);
 	  // add an upper segment, which depends on the lower/upper bounds
@@ -57,7 +57,7 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	else // slope = 1
 	  cg -> createCut (cs, -2*l, -1, w_ind, 1., x_ind, -1.);
       }
-      else if (u < COUENNE_INFINITY - 1) // slope = -1
+      else if (u < COUENNE_INFINITY) // slope = -1
 	cg -> createCut (cs, 2*u, -1, w_ind, 1., x_ind, 1.);
     }
 }
