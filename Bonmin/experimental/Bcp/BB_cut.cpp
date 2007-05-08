@@ -11,13 +11,6 @@
 
 /****************************************************************************/
 
-BB_cut* BB_cut::clone() const
-{
-    return new BB_cut(dynamic_cast<const OsiRowCut&>(*this));
-}
-
-/****************************************************************************/
-
 void
 BB_cut::pack(BCP_buffer& buf) const
 {

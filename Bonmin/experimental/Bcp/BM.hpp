@@ -35,10 +35,6 @@ public:
     }
     ~BM_node() {}
 
-    virtual BM_node* clone() const {
-	return new BM_node(*this);
-    }
-
     inline void pack(BCP_buffer& buf) const {
 	buf.pack(numNlpFailed_);
     }

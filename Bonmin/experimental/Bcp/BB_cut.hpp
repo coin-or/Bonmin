@@ -47,9 +47,6 @@ public:
 
     /// Destructor
     ~BB_cut() {}
-
-    /// clone
-    virtual BB_cut* clone() const;
 };
 
 #endif

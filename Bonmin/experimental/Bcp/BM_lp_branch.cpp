@@ -72,6 +72,9 @@ BCP_branching_decision
 BM_lp::bbBranch(OsiBranchingInformation& brInfo,
 		BCP_vec<BCP_lp_branching_object*>& cands)
 {
+    bonmin_.nonlinearSolver()->getDblParam(OsiPrimalTolerance,
+					   brInfo.integerTolerance_);
+    
     BCP_branching_decision retCode;
     OsiBranchingObject* brObj = NULL;
 
