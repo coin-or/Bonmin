@@ -96,6 +96,8 @@ namespace Bonmin
     s.continuousSolver()->setAuxiliaryInfo(&bonBabInfo);
     OsiSolverInterface * solver = s.continuousSolver()->clone();
     model_.assignSolver(solver, true);
+
+  //  s.continuousSolver() = model_.solver();
     
     
     if(s.continuousSolver()->objects()!=NULL){
@@ -137,8 +139,16 @@ namespace Bonmin
       model_.addHeuristic(*i);
     }
     
+    
+    //need to record solver logLevel here
+    int logLevel = s.continuousSolver()->messageHandler()->logLevel();
+    
     //Set true branch-and-bound parameters
     model_.setLogLevel(s.getIntParameter(BabSetupBase::BabLogLevel));    
+    
+    // Put back solver logLevel
+    model_.solver()->messageHandler()->setLogLevel(logLevel);
+    
     model_.setPrintFrequency(s.getIntParameter(BabSetupBase::BabLogInterval));
         
     bool ChangedObject = false;

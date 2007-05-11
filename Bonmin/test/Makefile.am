@@ -12,7 +12,13 @@ AUTOMAKE_OPTIONS = foreign
 #                       unitTest for Bonmin                            #
 ########################################################################
 
-noinst_PROGRAMS = unitTest CppExample
+noinst_PROGRAMS = 
+
+if COIN_HAS_ASL
+noinst_PROGRAMS += unitTest 
+endif
+
+noinst_PROGRAMS += CppExample
 
 unitTest_SOURCES = \
 	InterfaceTest.cpp 
@@ -23,7 +29,6 @@ unitTest_LDADD = \
         ../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
-	$(LIBCBCCOPY) \
 	$(COINLIBS) \
 	$(ASLLIB) \
 	$(ADDLIBS)
@@ -35,11 +40,18 @@ unitTest_LDADD = \
 CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
 # List libraries of COIN projects
-CppExample_LDADD = ../src/CbcBonmin/libbonmin.la \
+CppExample_LDADD = \
+        ../src/CbcBonmin/libbonminampl.la \
+        ../src/CbcBonmin/libbonmin.la \
+	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
         $(IPOPTLIBS) \
-        $(LIBCBCCOPY) \
-        $(COINLIBS) \
-        $(ADDLIBS)
+        $(COINLIBS)
+
+if COIN_HAS_ASL
+CppExample_LDADD += $(ASLLIB)
+endif
+
+CppExample_LDADD += $(ADDLIBS)
 
 COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \

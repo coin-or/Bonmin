@@ -298,7 +298,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     tiny_(1e-8),
     veryTiny_(1e-20),
     infty_(1e100),
-    expose_warm_start_(false),
+    exposeWarmStart_(false),
     firstSolve_(true)
 {
 }
@@ -417,10 +417,11 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_),
     infty_(source.infty_),
-    expose_warm_start_(source.expose_warm_start_),
+    exposeWarmStart_(source.exposeWarmStart_),
     firstSolve_(true),
     cut_strengthener_(source.cut_strengthener_)
 {
+      messageHandler()->setLogLevel(source.messageHandler()->logLevel());
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
     problem_ = new TMINLP2TNLP(tminlp_);
@@ -531,7 +532,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
       tiny_ = rhs.tiny_;
       veryTiny_ = rhs.veryTiny_;
       infty_ = rhs.infty_;
-      expose_warm_start_ = rhs.expose_warm_start_;
+      exposeWarmStart_ = rhs.exposeWarmStart_;
 
     }
     else {
@@ -1181,7 +1182,7 @@ OsiTMINLPInterface::getEmptyWarmStart () const
 CoinWarmStart* 
 OsiTMINLPInterface::getWarmStart() const
 {
-  if (expose_warm_start_) {
+  if (exposeWarmStart_) {
     return app_->getWarmStart(problem_);
   }
   else {
@@ -1194,7 +1195,7 @@ bool
 OsiTMINLPInterface::setWarmStart(const CoinWarmStart* warmstart)
 {
   hasBeenOptimized_ = false;
-  if (expose_warm_start_) {
+  if (exposeWarmStart_) {
     return app_->setWarmStart(warmstart, problem_);
   }
   else {
@@ -2475,6 +2476,12 @@ OsiTMINLPInterface::extractInterfaceParams()
       maxRandomRadius_ = 10.;
     }
 #endif
+    
+    
+    int exposeWs = false;
+    app_->Options()->GetEnumValue("warm_start", exposeWs, "bonmin.");
+    setExposeWarmStart(exposeWs > 0);
+    
     app_->Options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,"bonmin.");
     app_->Options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,"bonmin.");
     app_->Options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,"bonmin.");

@@ -83,6 +83,7 @@ algo_(other.algo_){
   BonminSetup::initializeBonmin(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/){
 
     use(tminlp);
+    BabSetupBase::gatherParametersValues(options_);
     Algorithm algo = getAlgorithm();
     if(algo == B_BB)
       initializeBBB();
@@ -93,6 +94,7 @@ algo_(other.algo_){
   void 
   BonminSetup::initializeBonmin(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/){
     use(nlpSi);
+    BabSetupBase::gatherParametersValues(options_);
     Algorithm algo = getAlgorithm();
     if(algo == B_BB)
       initializeBBB();
@@ -336,7 +338,6 @@ algo_(other.algo_){
     continuousSolver_->setAuxiliaryInfo(extraStuff);
     delete extraStuff;
     }
-    
     Algorithm algo = getAlgorithm();
     if(algo == B_OA){
       options_->SetNumericValue("oa_dec_time_limit",DBL_MAX, true, true);

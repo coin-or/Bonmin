@@ -75,7 +75,7 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     /* PIERRE create the setup for algorithm, last argument indicates that
       continuous relaxation should not be created.*/
     bonmin_.initializeBonmin(argv, ipopt_content, nl_content, false);
-    bonmin_.nonlinearSolver()->Set_expose_warm_start(true);
+    bonmin_.nonlinearSolver()->setExposeWarmStart(true);
     babSolver_.setSolver(bonmin_.nonlinearSolver());
 
     free(argv[1]);

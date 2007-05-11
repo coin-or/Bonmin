@@ -7,7 +7,7 @@
 //
 // Date :  03/17/2006
 #include "MyTMINLP.hpp"
-
+#include "BonAmplInterface.hpp"
 
 bool 
 MyTMINLP::get_variables_types(Index n, VariableType* var_types)

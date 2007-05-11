@@ -528,8 +528,8 @@ class Messages : public CoinMessages
       the warmstart information was accepted or not. */
   virtual bool setWarmStart(const CoinWarmStart* warmstart);
 
-  void Set_expose_warm_start(bool expose_warm_start) {
-    expose_warm_start_ = expose_warm_start;
+  void setExposeWarmStart(bool value) {
+    exposeWarmStart_ = value;
   }
 
   void randomStartingPoint();
@@ -1036,8 +1036,8 @@ protected:
   double infty_;
   /** status of last optimization. */
   TNLPSolver::ReturnStatus optimization_status_;
-  /** Flag indicating if the warm start methods actually do something. \TODO: FIX TO OPTION */
-  bool expose_warm_start_;
+  /** Flag indicating if the warm start methods actually do something.*/
+  bool exposeWarmStart_;
   /** Is it the first solve (for random starting point at root options).*/
   bool firstSolve_;
   /** Object for strengthening cuts */

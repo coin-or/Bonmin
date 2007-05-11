@@ -51,10 +51,15 @@ COINLIBDIR = @abs_lib_dir@
 
 # Libraries necessary to link with Bonmin
 IPOPTLIBDIR = @IPOPTLIBDIR@
+
+#Librairies for ASL (needed by Cbc)
+ASLLIB = @ASLLIB@
+
+
 LIBS = -L$(COINLIBDIR) \
 	-lbonmin -lipopt \
-       -lCbc -lCgl -lOsiClp -lOsi -lClp -lCoinUtils\
-	@ADDLIBS@ \
+       -lCbc -lCgl -lOsiClp -lOsi -lClp -lCoinUtils \
+        $(ASLLIB) @ADDLIBS@ \
 	`cat $(COINLIBDIR)/ipopt_addlibs_cpp.txt` \
 	`cat $(COINLIBDIR)/cgl_addlibs.txt` \
 	`cat $(COINLIBDIR)/osi_addlibs.txt` \
