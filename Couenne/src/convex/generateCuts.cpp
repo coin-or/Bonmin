@@ -159,9 +159,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // by current point and add it to cs
 
   if (firstcall_)
-    for (int i=0, j = problem_ -> nAuxs (); j--; i++)
-      problem_ -> Aux (i) -> generateCuts (si, cs, this);
-
+    for (int i=0, j = problem_ -> nAuxs (); j--; i++) {
+      if (problem_ -> Aux (i) -> Multiplicity () > 0)
+	problem_ -> Aux (i) -> generateCuts (si, cs, this);
+    }
   else { // chg_bds contains the indices of the variables whose bounds
 	 // have changes (a -1 follows the last element)
 
@@ -172,6 +173,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       if (   (image -> Linearity () > LINEAR)          // if linear, no need to cut twice
 	  && (image -> dependsOn (changed, nchanged))  // if expression does not depend on 
 	  )*/                                            // changed variables, do not cut
+      if (problem_ -> Aux (i) -> Multiplicity () > 0)
 	problem_ -> Aux (i) -> generateCuts (si, cs, this);
     }
   }

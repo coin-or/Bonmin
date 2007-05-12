@@ -16,6 +16,7 @@
 #include <CouennePrecisions.h>
 #include <CouenneTypes.h>
 
+class OsiBranchingInformation;
 class OsiBranchingObject;
 class CouenneProblem;
 class CouenneCutGenerator;
@@ -220,9 +221,22 @@ class expression {
   virtual int Multiplicity () 
     {return 1;}
 
+  /// set up branching object by evaluating many branching points for
+  /// each expression's arguments
+  CouNumber selectBranch (expression *w, 
+			  const OsiBranchingInformation *info,
+			  int &ind, 
+			  double * &brpts, 
+			  int &way)
+    {ind = -1; return 0.;}
+
+  /// distance covered by current point if branching rule applied to this expression
+  /*virtual double BranchGain (expression *, const OsiBranchingInformation *)
+    {return 0.;}
+
   /// branching object best suited for this expression
-  virtual OsiBranchingObject *BranchObject ()
-    {return NULL;}
+  virtual OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *)
+  {return NULL;}*/
 };
 
 

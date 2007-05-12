@@ -16,6 +16,8 @@
 #include <CouenneProblem.h>
 
 
+#define MAX_COEFF 1e10
+
 /// general procedure for inserting a linear cut with up to three
 /// variables. Return 1 if cut inserted, 0 if none, <0 if error
 
@@ -25,18 +27,25 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 				    int i2, CouNumber c2,
 				    int i3, CouNumber c3,
 				    bool is_global)       const {
+  bool numerics = false;
 
   // a maximum of three terms are allowed here. Index -1 means the
   // term is not considered
 
   int nterms = 0;
 
-  if (i1 >= 0) nterms++; // useless, but you never know...
-  if (i2 >= 0) nterms++;
-  if (i3 >= 0) nterms++;
+  if (i1 >= 0) {if (fabs (c1) > MAX_COEFF) numerics = true; nterms++;} else c1 = 0;
+  if (i2 >= 0) {if (fabs (c2) > MAX_COEFF) numerics = true; nterms++;} else c2 = 0;
+  if (i3 >= 0) {if (fabs (c3) > MAX_COEFF) numerics = true; nterms++;} else c3 = 0;
 
   if (!nterms) // nonsense cut
     return 0;
+
+  // cut has large coefficients/rhs, bail out
+  if (numerics || (fabs (rhs) > MAX_COEFF)) {
+    printf ("Warning, too large coefficients/rhs: %g, %g, %g; %g\n", c1, c2, c3, rhs);
+    return 0;
+  }
 
   if (!firstcall_ && addviolated_) { // need to check violation 
 

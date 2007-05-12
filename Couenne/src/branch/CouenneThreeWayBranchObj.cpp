@@ -6,6 +6,8 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
+#include <CoinHelperFunctions.hpp>
+#include <CouenneObject.hpp>
 #include <CouenneBranchingObject.hpp>
 #include <CouenneThreeWayBranchObj.hpp>
 
@@ -14,20 +16,33 @@
            through a call to operator () of that exprAux.
 */
 
-CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (expression *var, 
-						    CouNumber x, 
-						    CouNumber l, 
-						    CouNumber u): 
-  reference_      (var) {
+CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index, 
+						    CouNumber lcrop, 
+						    CouNumber rcrop,
+						    int way,
+						    bool isint): 
+  index_   (index),
+  lcrop_   (lcrop),
+  rcrop_   (rcrop),
+  integer_ (isint) {
 
-  value_          = x;
   numberBranches_ = 3;
+
+  // if none of these three, set to 0 and do code below
+  firstBranch_ = (way == THREE_LEFT)   ? 0 : 
+                 (way == THREE_CENTER) ? 1 : 
+                 (way == THREE_RIGHT)  ? 2 : 0; 
+  
+  if (way == THREE_RAND) { // pick first branch randomly
+    CouNumber rnd = 3. * CoinDrand48 ();
+    firstBranch_ = (rnd < 1.) ? 0 : (rnd < 2.) ? 1: 2;
+  }
 
   // Depending on where x, l, and u are, divide bound interval into
   // three and set lcrop_ and rcrop_ accordingly.
 
   // if l and u are unbounded, crop around x using COUENNE_CROP
-
+  /*
   if ((x-l > COUENNE_LARGE_INTERVAL) && 
       (u-x > COUENNE_LARGE_INTERVAL)) {
     lcrop_ = x - COUENNE_CROP;
@@ -47,7 +62,7 @@ CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (expression *var,
 	lcrop_ = x + COUENNE_CROP;
 	rcrop_ = x + COUENNE_LCROP;
 	first_ = 0;
-      }
+	}*/
 }
 
 
@@ -63,56 +78,33 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
   // way =  0 if "[a,b]" node
   //        1 if ">= b"  node
 
-  int way, ind = reference_ -> Index ();
+  int way;//, ind = reference_ -> Index ();
 
   switch (branchIndex_) {
-  case 0: 
-    way = first_;   // if first offspring, let first_ decide who's first
-    break;
-  case 1:
-    way = (first_ == 0) ? 1 : 0;
-    break;
-  case 2:
-    way = (first_ == 2) ? 1 : 2;
-    break;
-  default: 
-    printf ("Warning, branchIndex_ has a strange value (%d)\n", branchIndex_);
+    // if first offspring, let firstBranch_ decide who's first
+  case 0: way = firstBranch_;                break;
+  case 1: way = (firstBranch_ == 0) ? 1 : 0; break;
+  case 2: way = (firstBranch_ == 2) ? 1 : 2; break;
+  default: printf ("Warning, branchIndex_ has a strange value (%d)\n", branchIndex_);
   }
-
-  way --; // from {0,1,2} to {-1,0,1}
 
   // set lower or upper bound (round if this variable is integer)
 
-  bool intvar = reference_ -> isInteger ();
+  switch (--way) { // from {0,1,2} to {-1,0,1}
 
-  switch (way) {
-
-  case -1: // left interval
-    //    printf ("Left branch: x%d <= %.3f\n", ind, lcrop_);
-    solver -> setColUpper (ind, intvar ? floor (lcrop_) : lcrop_);
-    break;
-  case  0: // central interval
-    //    printf ("Central branch: %.3f <= x%d <= %.3f\n", lcrop_, ind, rcrop_);
-    solver -> setColLower (ind, intvar ? ceil  (lcrop_) : lcrop_);
-    solver -> setColUpper (ind, intvar ? floor (rcrop_) : rcrop_);
-    break;
-  case  1: // right interval
-    //    printf ("Right branch: x%d >= %.3f\n", ind, rcrop_);
-    solver -> setColLower (ind, intvar ? ceil  (rcrop_) : rcrop_);
-    break;
-  default:
-    printf ("Couenne: branching on nonsense way %d\n", way);
+  case -1: solver -> setColUpper (index_, integer_ ? floor (lcrop_) : lcrop_); break; // left
+  case  0: solver -> setColLower (index_, integer_ ? ceil  (lcrop_) : lcrop_);
+           solver -> setColUpper (index_, integer_ ? floor (rcrop_) : rcrop_); break; // central
+  case  1: solver -> setColLower (index_, integer_ ? ceil  (rcrop_) : rcrop_); break; // right
+  default: printf ("Couenne: branching on nonsense way %d\n", way);
   }
 
   // TODO: apply bound tightening 
 
-  /*
-  if (0) {
-
+  /*if (0) {
   printf (" --> [%.6e,%.6e]\n", l, u);
   printf ("### Branch: x%d %c= %.12f\n", 
   reference_ -> Index (), way ? '>' : '<', value_);
-
   for (int i=0; i < solver -> getNumCols(); i++)
   printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
   solver -> getColUpper () [i]);

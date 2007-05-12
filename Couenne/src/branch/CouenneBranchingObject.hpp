@@ -33,12 +33,13 @@ public:
   static CouNumber Alpha () {return alpha_;}
 
   /// Constructor
-  CouenneBranchingObject (expression * = NULL);
+  CouenneBranchingObject (int, int, CouNumber = - COIN_DBL_MAX, bool = false);
 
   /// Copy constructor
   CouenneBranchingObject (const CouenneBranchingObject &src):
     OsiTwoWayBranchingObject (src),
-    reference_ (src.reference_) {}
+    index_   (src.index_),
+    integer_ (src.integer_) {}
 
   /// Cloning method
   virtual OsiBranchingObject * clone() const
@@ -56,7 +57,11 @@ protected:
   /// The variable this branching object refers to. If the
   /// corresponding CouenneObject was created on w=f(x,y), it is
   /// either x or y, chosen previously with a call to getFixVar()
-  expression *reference_;
+  //  expression *reference_;
+  int index_;
+
+  /// is the variable integer?
+  bool integer_;
 
   /// Global value for convex combination between current point and
   /// midpoint

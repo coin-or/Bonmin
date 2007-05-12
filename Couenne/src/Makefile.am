@@ -23,6 +23,14 @@ libCouenne_la_SOURCES = \
 	branch/CouenneObject.cpp \
 	branch/CouenneChooseVariable.cpp \
 	branch/getFixVarBinFun.cpp \
+	branch/projections.c \
+	branch/operators/branchExprAbs.cpp \
+	branch/operators/branchExprExp.cpp \
+	branch/operators/branchExprDiv.cpp \
+	branch/operators/branchExprInv.cpp \
+	branch/operators/branchExprLog.cpp \
+	branch/operators/branchExprMul.cpp \
+	branch/operators/branchExprPow.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -153,6 +161,7 @@ include_HEADERS = \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
+	branch/projections.h \
 	expression/operators/exprAbs.h \
 	expression/operators/exprExp.h \
 	expression/operators/exprInv.h \

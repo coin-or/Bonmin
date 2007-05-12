@@ -32,8 +32,8 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // if l, u have the same sign, then w = x (l > 0) or w = -x (u < 0)
 
-  if      (l >= 0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, -1.);
-  else if (u <= 0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, +1.);
+  if      (l >= -0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, -1.);
+  else if (u <=  0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, +1.);
   else {
 
     // add two global cuts: w >= x and w >= -x

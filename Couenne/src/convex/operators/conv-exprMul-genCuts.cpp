@@ -203,8 +203,8 @@ void addImplTangent (const CouenneCutGenerator *cg, OsiCuts &cs,
   // infinite or null bounds give vertical or horizontal cuts, useless
   if ((fabs (xp) < COUENNE_EPS) ||
       (fabs (yp) < COUENNE_EPS) ||
-      (fabs (xp) > COUENNE_INFINITY-1) ||
-      (fabs (yp) > COUENNE_INFINITY-1))
+      (fabs (xp) > COUENNE_INFINITY) ||
+      (fabs (yp) > COUENNE_INFINITY))
     return;
 
   CouNumber w_xp = wb / xp;

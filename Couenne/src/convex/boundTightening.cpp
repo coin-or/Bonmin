@@ -21,8 +21,6 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 					   char *chg_bds, 
 					   Bonmin::BabInfo * babInfo) const {
 
-  return true;
-
   int objInd = problem_ -> Obj (0) -> Body () -> Index ();
 
   //////////////////////// Reduced cost bound tightening //////////////////////

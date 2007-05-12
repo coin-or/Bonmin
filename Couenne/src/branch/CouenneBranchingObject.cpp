@@ -7,6 +7,9 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
+#include <CoinHelperFunctions.hpp>
+
+#include <CouenneObject.hpp>
 #include <CouenneBranchingObject.hpp>
 
 /// make branching point $\alpha$ away from current point:
@@ -19,23 +22,28 @@ CouNumber CouenneBranchingObject::alpha_ = 0.25;
            through a call to operator () of that exprAux.
 */
 
-CouenneBranchingObject::CouenneBranchingObject (expression *var): 
+CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber brpoint, bool isint): 
 
-  reference_ (var) {
+  index_   (index),
+  integer_ (isint) {
 
-  // set the branching value at the current point 
-  //  value_ = expression::Variable (reference_ -> Index ());
+  firstBranch_ = (way == TWO_LEFT)  ? 0 : 
+                 (way == TWO_RIGHT) ? 1 : 
+                 (CoinDrand48 () < 0.5) ? 0 : 1;
 
-  int index = reference_ -> Index ();
-
-  if (index < 0)
-    printf ("Couenne: Warning, CouenneBranchingObject has negative reference's index\n");
+  if (index_ < 0) {
+    printf ("Couenne: CouenneBranchingObject has negative reference's index\n");
+    exit (-1);
+  }
 
   long double
-    x = expression::Variable (index),   // current solution
-    l = expression::Lbound   (index),   //         lower bound
-    u = expression::Ubound   (index),   //         upper
+    x = expression::Variable (index_),   // current solution
+    l = expression::Lbound   (index_),   //         lower bound
+    u = expression::Ubound   (index_),   //         upper
     alpha = CouenneBranchingObject::Alpha ();
+
+  if (brpoint > - COIN_DBL_MAX) 
+    x = brpoint;
 
   if      (x<l) x = l;
   else if (x>u) x = u;
@@ -64,8 +72,7 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
     value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
   else value_ = x;
 
-  /*
-  if ((x > l + COUENNE_NEAR_BOUND) && 
+  /*  if ((x > l + COUENNE_NEAR_BOUND) && 
       (x < u - COUENNE_NEAR_BOUND))      // x is not at the boundary
     value_ = x;
   else // current point is at one of the bounds
@@ -79,10 +86,9 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
       // push it inwards
       // TODO: look for a proper displacement 
       if (fabs (x-l) < COUENNE_EPS) value_ = l + (1+fabs (l)) / 2.; 
-      else                          value_ = u - (1+fabs (u)) / 2.; 
-  */
+      else                          value_ = u - (1+fabs (u)) / 2.;   */
 
-  if (0) {
+  /*  if (0) {
     printf ("Branch::constructor: ");
     reference_ -> print (std::cout);
     printf (" on %.6e (%.6e) [%.6e,%.6e]\n", 
@@ -90,7 +96,7 @@ CouenneBranchingObject::CouenneBranchingObject (expression *var):
 	    expression::Variable (reference_ -> Index ()),
 	    expression::Lbound   (reference_ -> Index ()),
 	    expression::Ubound   (reference_ -> Index ()));
-  }
+	    }*/
 }
 
 
@@ -105,38 +111,38 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   // way = 0 if "<=" node, 
   //       1 if ">=" node
 
-  int way = (!branchIndex_) ? firstBranch_ : !firstBranch_,
-      ind = reference_ -> Index ();
+  int way = (!branchIndex_) ? firstBranch_ : !firstBranch_;
 
-  CouNumber l = solver -> getColLower () [ind],
-            u = solver -> getColUpper () [ind];
+  CouNumber l = solver -> getColLower () [index_],
+            u = solver -> getColUpper () [index_];
 
   if (way) {
-    if      (value_ < l)             printf ("Nonsense up-branch: [ %f ,(%f)] -> %f\n", l,u,value_);
-    else if (value_ < l+COUENNE_EPS) printf ("## WEAK  up-branch: [ %f ,(%f)] -> %f\n", l,u,value_);
+    if      (value_ < l)             printf ("Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
+    else if (value_ < l+COUENNE_EPS) printf ("## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
   } else {
-    if      (value_ > u)             printf ("Nonsense dn-branch: [(%f), %f ] -> %f\n", l,u,value_);
-    else if (value_ > u+COUENNE_EPS) printf ("## WEAK  dn-branch: [(%f), %f ] -> %f\n", l,u,value_);
+    if      (value_ > u)             printf ("Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
+    else if (value_ > u+COUENNE_EPS) printf ("## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
   }
 
-  if (0) printf (" [%.6e,%.6e]", l, u);
+  //if (0) printf (" [%.6e,%.6e]", l, u);
+  //  if (way) solver -> setColLower (index_, reference_ -> isInteger () ? ceil  (value_) : value_);
+  //  else     solver -> setColUpper (index_, reference_ -> isInteger () ? floor (value_) : value_);
 
-  // ">=" if way=1, "<=" if way=0 set lower or upper bound (round if this variable is integer)
-  if (way) solver -> setColLower (ind, reference_ -> isInteger () ? ceil  (value_) : value_);
-  else     solver -> setColUpper (ind, reference_ -> isInteger () ? floor (value_) : value_);
+  if (!way) solver -> setColUpper (index_, integer_ ? floor (value_) : value_); // down branch
+  else      solver -> setColLower (index_, integer_ ? ceil  (value_) : value_); // up   branch
 
   // TODO: apply bound tightening 
 
-  if (0) {
+  /*if (0) {
 
     printf (" --> [%.6e,%.6e]\n", l, u);
     printf ("### Branch: x%d %c= %.12f\n", 
-	    reference_ -> Index (), way ? '>' : '<', value_);
+	    index_, way ? '>' : '<', value_);
 
-    /*for (int i=0; i < solver -> getNumCols(); i++)
+    for (int i=0; i < solver -> getNumCols(); i++)
       printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
-      solver -> getColUpper () [i]);*/
-  }
+      solver -> getColUpper () [i]);
+      }*/
 
   branchIndex_++;
   return 0.; // estimated change in objective function

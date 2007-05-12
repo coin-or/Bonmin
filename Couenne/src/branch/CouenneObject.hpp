@@ -14,6 +14,14 @@
 #include <OsiBranchingObject.hpp>
 #include <exprAux.h>
 
+// Define what kind of branching (two- or three-way) and where to
+// start from: left, (center,) or right. The last is to help diversify
+// branching through randomization, which may help when the same
+// variable is branched upon in several points of the BB tree.
+
+enum {TWO_LEFT,                 TWO_RIGHT,   TWO_RAND,
+      THREE_LEFT, THREE_CENTER, THREE_RIGHT, THREE_RAND};
+
 
 /// OsiObject for auxiliary variables $w=f(x)$. Associated with a
 /// multi-variate function $f(x)$ and a related infeasibility
@@ -25,14 +33,31 @@ public:
 
   /// Constructor
   CouenneObject (exprAux *ref):
-    reference_ (ref) {}
+    reference_ (ref),
+    brVarInd_  (-1), 
+    brPts_     (NULL) {}
 
   /// Destructor
-  ~CouenneObject () {}
+  ~CouenneObject () 
+  {if (brPts_) free (brPts_);}
 
   /// Copy constructor
   CouenneObject (CouenneObject &src):
-    reference_ (src.reference_) {}
+    reference_ (src.reference_),
+    brVarInd_  (src.brVarInd_),
+    brPts_     (NULL) {
+
+    if (src.brPts_) {
+      register int i=0;
+      while (src.brPts_ [i] > -COIN_DBL_MAX) i++;
+
+      if (i) {
+	brPts_ = (CouNumber *) malloc (i * sizeof (CouNumber));
+	while (i--) 
+	  brPts_ [i] = src.brPts_ [i];
+      }
+    }
+  }
 
   /// Cloning method
   virtual OsiObject * clone() const
@@ -43,7 +68,8 @@ public:
   virtual double infeasibility (const OsiBranchingInformation*, int &) const;
 
   /// fix (one of the) arguments of reference auxiliary variable 
-  virtual double feasibleRegion (OsiSolverInterface*, const OsiBranchingInformation*) const;
+  virtual double feasibleRegion (OsiSolverInterface*, 
+				 const OsiBranchingInformation*) const;
 
   /// create CouenneBranchingObject or CouenneThreeWayBranchObj based
   /// on this object
@@ -60,6 +86,13 @@ protected:
   /// to. If the expression is w=f(x,y), this is w, as opposed to
   /// CouenneBranchingObject, where it would be either x or y.
   exprAux *reference_;
+
+  /// index on the branching variable
+  mutable int brVarInd_;
+
+  /// where to branch. It is a vector in the event we want to use a
+  /// ThreeWayBranching. Ends with a -COIN_DBL_MAX (not considered...)
+  mutable CouNumber *brPts_;
 };
 
 #endif

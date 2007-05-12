@@ -20,6 +20,15 @@ Couenne/src/branch/CouenneObject.hpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.cpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.hpp -text
 Couenne/src/branch/getFixVarBinFun.cpp -text
+Couenne/src/branch/operators/branchExprAbs.cpp -text
+Couenne/src/branch/operators/branchExprDiv.cpp -text
+Couenne/src/branch/operators/branchExprExp.cpp -text
+Couenne/src/branch/operators/branchExprInv.cpp -text
+Couenne/src/branch/operators/branchExprLog.cpp -text
+Couenne/src/branch/operators/branchExprMul.cpp -text
+Couenne/src/branch/operators/branchExprPow.cpp -text
+Couenne/src/branch/projections.c -text
+Couenne/src/branch/projections.h -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
 Couenne/src/convex/CouenneCutGenerator.h -text
 Couenne/src/convex/addEnvelope.cpp -text

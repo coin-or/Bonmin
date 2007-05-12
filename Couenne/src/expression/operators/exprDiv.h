@@ -70,6 +70,17 @@ class exprDiv: public exprOp {
 
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, char *);
+
+  /// set up branching object by evaluating many branching points for
+  /// each expression's arguments
+  CouNumber selectBranch (expression *, const OsiBranchingInformation *,
+			  int &, double * &, int &);
+
+  /*  /// distance covered by current point if branching rule applied to this expression
+  double BranchGain (expression *, const OsiBranchingInformation *);
+
+  /// branching object best suited for this expression
+  OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *);*/
 };
 
 
@@ -85,20 +96,21 @@ inline CouNumber exprDiv::operator () () {
 }
 
 
+#define SAFE_COEFFICIENT 1e9
+
 // check if bounding box is suitable for a multiplication/division
 // convexification constraint
 
 inline bool is_boundbox_regular (register CouNumber b1, register CouNumber b2) {
 
-  // Why 1e20 and not COUENNE_INFINITY? Because OsiRowCut::set[LU]b do
-  // not work for values more than 1e20 and apparently makes the
+  // Why SAFE_COEFFICIENT and not COUENNE_INFINITY? Because OsiRowCut::set[LU]b do
+  // not work for values more than SAFE_COEFFICIENT and apparently makes the
   // convexification infeasible.
   return 
-    (fabs (b1)    < 1e20) && 
-    (fabs (b2)    < 1e20) && 
-    (fabs (b1*b2) < 1e20);
+    (fabs (b1)    < SAFE_COEFFICIENT) && 
+    (fabs (b2)    < SAFE_COEFFICIENT) && 
+    (fabs (b1*b2) < SAFE_COEFFICIENT);
     //    && ((fabs (b1) > COUENNE_EPS) || (fabs (b2) > COUENNE_EPS));
 }
-
 
 #endif

@@ -48,19 +48,10 @@ class exprLBMul: public exprOp {
 
 inline CouNumber exprLBMul::operator () () {
 
-  //exprOp:: operator () ();
-
   register CouNumber n = (*(arglist_ [0])) ();
   register CouNumber N = (*(arglist_ [1])) ();
   register CouNumber d = (*(arglist_ [2])) ();
   register CouNumber D = (*(arglist_ [3])) ();
-
-  /*
-  register CouNumber D = *sp--;
-  register CouNumber d = *sp--;
-  register CouNumber N = *sp--;
-  register CouNumber n = *sp--;
-  */
 
   if (d>=0)
     if   (n>=0) return safeProd (n,d);

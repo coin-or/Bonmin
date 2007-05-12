@@ -55,6 +55,17 @@ class exprExp: public exprUnary {
 
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, char *);
+
+  /// set up branching object by evaluating many branching points for
+  /// each expression's arguments
+  CouNumber selectBranch (expression *, const OsiBranchingInformation *,
+			  int &, double * &, int &);
+
+  /*/// distance covered by current point if branching rule applied to this expression
+  double BranchGain (expression *, const OsiBranchingInformation *);
+
+  /// branching object best suited for this expression
+  OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *);*/
 };
 
 #endif
