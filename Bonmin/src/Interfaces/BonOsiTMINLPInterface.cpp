@@ -726,9 +726,9 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
       <<f+2
       <<CoinMessageEol;
   }
-  //  setColSolution(point);
-  //  setRowPrice(&point[getNumCols()]);
-  //  setWarmStartOptions();
+  setColSolution(point);
+  setRowPrice(&point[getNumCols()]);
+  app_->enableWarmStart();
   delete [] point;
 
   optimization_status_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
