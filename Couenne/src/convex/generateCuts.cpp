@@ -22,11 +22,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					const CglTreeInfo info) const {
   
   /*printf (":::::::::::::::::::::::: level = %d, pass = %d, intree=%d\n Bounds:\n", 
-	  info.level, info.pass, info.inTree);
+    info.level, info.pass, info.inTree);*/
 
   for (int i=0; i < si. getNumCols(); i++)
       printf (" %3d [%.3e,%.3e]\n", i, si. getColLower () [i],
-      si. getColUpper () [i]);*/
+      si. getColUpper () [i]);
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
@@ -136,8 +136,20 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   //////////////////////// Bound tightening ///////////////////////////////////////////
 
-  if (! boundTightening (si, cs, chg_bds, babInfo)) 
+  //  for (int i=0; i<problem_ -> nAuxs () + problem_ -> nVars (); i++ )
+  //    printf ("%d: [%.4f %.4f]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
+
+  if (! boundTightening (si, cs, chg_bds, babInfo)) {
+
+    printf ("INFEASIBLE\n");
+    //    for (int i=0; i<problem_ -> nAuxs () + problem_ -> nVars (); i++ )
+    //      printf ("%d: [%.4f %.4f]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
+
     goto end_genCuts;
+  }
+
+  //  for (int i=0; i<problem_ -> nAuxs () + problem_ -> nVars (); i++ )
+  //    printf ("%d: [%.4f %.4f]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 

@@ -133,16 +133,17 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   // TODO: apply bound tightening 
 
-  /*if (0) {
+  if (0) {
 
-    printf (" --> [%.6e,%.6e]\n", l, u);
+    //    printf (" --> [%.6e,%.6e]\n", l, u);
     printf ("### Branch: x%d %c= %.12f\n", 
 	    index_, way ? '>' : '<', value_);
-
-    for (int i=0; i < solver -> getNumCols(); i++)
+	   
+    /*for (int i=0; i < solver -> getNumCols(); i++)
       printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
       solver -> getColUpper () [i]);
       }*/
+  }
 
   branchIndex_++;
   return 0.; // estimated change in objective function

@@ -23,6 +23,31 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 
   int objInd = problem_ -> Obj (0) -> Body () -> Index ();
 
+  /////////////////////// MIP bound management /////////////////////////////////
+
+  if (objInd < 0) objInd = 0; 
+
+  if (babInfo && (babInfo -> babPtr ())) {
+
+    CouNumber primal  = babInfo  -> babPtr () -> model (). getObjValue(),
+              dual    = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
+              primal0 = problem_ -> Ub (objInd), 
+              dual0   = problem_ -> Lb (objInd);
+
+    // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
+    // (LOWER) bound.
+
+    if ((primal <   COUENNE_INFINITY - 1) && (primal < primal0)) { // update primal bound (MIP)
+      problem_ -> Ub (objInd) = primal;
+      chg_bds [objInd] = 1;
+    }
+
+    if ((dual   > - COUENNE_INFINITY + 1) && (dual   > dual0)) { // update dual bound
+      problem_ -> Lb (objInd) = dual;
+      chg_bds [objInd] = 1;
+    }
+  }
+
   //////////////////////// Reduced cost bound tightening //////////////////////
 
   // do it only if a linear convexification is in place already
@@ -51,31 +76,6 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 	  chg_bds [i] = 1;
 	}
       }
-    }
-  }
-
-  /////////////////////// MIP bound management /////////////////////////////////
-
-  if (objInd < 0) objInd = 0; 
-
-  if (babInfo && (babInfo -> babPtr ())) {
-
-    CouNumber primal  = babInfo  -> babPtr () -> model (). getObjValue(),
-              dual    = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
-              primal0 = problem_ -> Ub (objInd), 
-              dual0   = problem_ -> Lb (objInd);
-
-    // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
-    // (LOWER) bound.
-
-    if ((primal <   COUENNE_INFINITY - 1) && (primal < primal0)) { // update primal bound (MIP)
-      problem_ -> Ub (objInd) = primal;
-      chg_bds [objInd] = 1;
-    }
-
-    if ((dual   > - COUENNE_INFINITY + 1) && (dual   > dual0)) { // update dual bound
-      problem_ -> Lb (objInd) = dual;
-      chg_bds [objInd] = 1;
     }
   }
 
@@ -120,7 +120,10 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 
       return false;
     }
-  } while (ntightened || nbwtightened && (niter++ < 10));
+
+#define MAX_BT_ITER 10
+
+  } while (ntightened || nbwtightened && (niter++ < MAX_BT_ITER));
   // need to check if EITHER procedures gave results, as expression
   // structure is not a tree any longer.
 

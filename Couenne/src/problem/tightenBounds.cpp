@@ -37,6 +37,9 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
   for (register int i = nVars (), j=0; 
        j < naux; j++) {
 
+    //    for (int j=0; j<nAuxs () + nVars (); j++ )
+    //      printf ("+++ %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
+
     /*    printf ("w_%d [%g, %g] ", i+j,
 	    expression::Lbound (i+j),
 	    expression::Ubound (i+j));*/
@@ -52,9 +55,10 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
     printf ("\n");*/
 
     if (ll > uu + COUENNE_EPS) {
-      /*printf ("w_%d has infeasible bounds [%g,%g]: ", i+j, ll, uu);
-      Aux (j) -> Lb () -> print (std::cout); printf (" - ");
-      Aux (j) -> Ub () -> print (std::cout); printf ("\n");*/
+
+      //      printf ("w_%d has infeasible bounds [%g,%g]: ", i+j, ll, uu);
+      //      Aux (j) -> Lb () -> print (std::cout); printf (" - ");
+      //      Aux (j) -> Ub () -> print (std::cout); printf ("\n");
 
       return -1; // declare this node infeasible
     }
@@ -70,9 +74,9 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
       /*printf ("update lbound %d: %g >= %g\n", 
 	i+j, ll, lb_ [i+j]);*/
 
-      /*printf (" propaga: [%g,(%g)] -> [%g,(%g)] ", lb_ [i+j], ub_ [i+j], ll, uu);
-      Aux (j)             -> print (std::cout); printf (" := ");
-      Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+      //      printf (" propaga: [%g,(%g)] -> [%g,(%g)] ", lb_ [i+j], ub_ [i+j], ll, uu);
+      //      Aux (j)             -> print (std::cout); printf (" := ");
+      //      Aux (j) -> Image () -> print (std::cout); printf ("\n");
 
       lb_ [i+j] = ll;
       chg = true;
@@ -86,9 +90,9 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
       /*printf ("update ubound %d: %g >= %g\n", 
 	i+j, uu, ub_ [i+j]);*/
 
-      /*printf (" propaga: [(%g),%g] -> [(%g),%g] ", lb_ [i+j], ub_ [i+j], ll, uu);
-      Aux (j)             -> print (std::cout); printf (" := ");
-      Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+      //      printf (" propaga: [(%g),%g] -> [(%g),%g] ", lb_ [i+j], ub_ [i+j], ll, uu);
+      //      Aux (j)             -> print (std::cout); printf (" := ");
+      //      Aux (j) -> Image () -> print (std::cout); printf ("\n");
 
       ub_ [i+j] = uu;
       chg = true;

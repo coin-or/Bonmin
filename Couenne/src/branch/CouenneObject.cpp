@@ -46,7 +46,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
                & var  = (*reference_) ();
 
   //expression::Variable (reference_ -> Index ());
-  /* if (0) {
+ if (0) {
 
     printf ("Inf: = |%.6e - %.6e| = %.6e  ",  ////[%.2f,%.2f]
 	    var, expr, 
@@ -55,7 +55,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 	    fabs (var - expr));
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout); printf ("\n");
-  }  */
+  } 
 
   CouNumber delta = fabs (var - expr);
 
@@ -197,6 +197,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
   bool isint = reference_ -> isInteger ();
 
+  if (0)
   if (brVarInd_ >= 0)
     switch (way) {
     case TWO_LEFT:
@@ -213,7 +214,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
       exit (-1);
     }
 
-  /*if (0) {
+  if (0) {
     printf ("CO::createBranch: ");
     reference_ -> print (std::cout);
     printf (" = ");
@@ -221,7 +222,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     printf (" --> branch on ");
     reference_ -> Image () -> getFixVar () -> print (std::cout);
     printf ("\n");
-    }*/
+    }
 
   // constructor uses actual values of variables and bounds, update them
   expression::update (const_cast <CouNumber *> (info -> solution_),
@@ -286,8 +287,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-      return new CouenneBranchingObject (index, TWO_RAND, x, depvar -> isInteger ());
+      return new CouenneBranchingObject (index, TWO_LEFT, x, depvar -> isInteger ());
   }
 
-  return new CouenneBranchingObject (ref_ind, TWO_RAND, xr, reference_ -> isInteger ());
+  return new CouenneBranchingObject (ref_ind, TWO_LEFT, xr, reference_ -> isInteger ());
 }
