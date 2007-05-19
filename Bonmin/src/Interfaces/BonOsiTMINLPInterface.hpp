@@ -31,9 +31,9 @@ namespace Bonmin {
   
   /** Solvers for solving nonlinear programs.*/
   enum Solver{
-    Ipopt=0 /** <a href="http://projects.coin-or.org/Ipopt">
+    EIpopt=0 /** <a href="http://projects.coin-or.org/Ipopt">
     Ipopt </a> interior point algorithm.*/,
-    FilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/
+    EFilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/
   };
 /**
    This is class provides an Osi interface for a Mixed Integer Linear Program

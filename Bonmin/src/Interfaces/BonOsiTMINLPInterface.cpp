@@ -327,13 +327,13 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Ipopt::RegisteredOptions> 
   int ival;
   options->GetEnumValue("nlp_solver", ival, "bonmin.");
   Solver s = (Solver) ival;
-  if(s == FilterSQP){
+  if(s == EFilterSQP){
 #ifdef COIN_HAS_FILTERSQP
     app_ = new Bonmin::FilterSolver(roptions, options, journalist);
 #else
 #endif    
   }
-  else if(s == Ipopt){
+  else if(s == EIpopt){
 #ifdef COIN_HAS_IPOPT
     app_ = new IpoptSolver(roptions, options, journalist);
 #else
