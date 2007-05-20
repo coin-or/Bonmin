@@ -50,7 +50,8 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
 
 // store problem in a .mod file (AMPL)
 
-void CouenneProblem::writeMod (char *fname) {
+void CouenneProblem::writeMod (char *fname,  /// name of the mod file
+			       bool aux) {   /// 
 
   std::ofstream f (fname);
 
@@ -74,15 +75,23 @@ void CouenneProblem::writeMod (char *fname) {
 
   // defined (aux) variables, declaration ///////////////////////////////////////////
 
-  f << std::endl << "# auxiliary variables" << std::endl << std::endl;
+  if (aux) {
 
-  for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
-       i != auxiliaries_.end ();
-       i++) {
+    f << std::endl << "# auxiliary variables" << std::endl << std::endl;
 
-    f << "var "; (*i) -> print (f);
-    //    f << " = ";  (*i) -> Image () -> print (f);
-    f << ';' << std::endl;
+    for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
+	 i != auxiliaries_.end ();
+	 i++) {
+
+      f << "var "; (*i) -> print (f);
+      //    f << " = ";  (*i) -> Image () -> print (f);
+      CouNumber bound;
+
+      if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) f << " >= " << bound;
+      if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
+      if ((*i) -> isInteger ()) f << " integer";
+      f << ';' << std::endl;
+    }
   }
 
 
