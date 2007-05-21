@@ -42,7 +42,7 @@ class exprLowerBound: public exprVar {
   exprLowerBound  (int varIndex): exprVar (varIndex) {}
 
   /// I/O
-  void print (std::ostream &out) const
+  void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
     {out << "l_" << varIndex_;}
 
   /// return the value of the variable
@@ -82,7 +82,7 @@ class exprUpperBound: public exprVar {
     exprVar (varIndex) {}
 
   /// I/O
-  void print (std::ostream &out) const
+  void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
     {out << "u_" << varIndex_;}
 
   /// return the value of the variable

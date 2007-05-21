@@ -41,7 +41,29 @@ exprOp::~exprOp () {
 
 // print expression
 
-void exprOp::print (std::ostream      &out = std::cout, 
+void exprOp::print (std::ostream &out, 
+		    bool descend, 
+		    CouenneProblem *p) const {
+  
+  if (printPos () == PRE)
+    out << printOp ();
+
+  out << "("; fflush (stdout);
+  for (int i=0; i<nargs_; i++) {
+    if (arglist_ [i])
+      arglist_ [i] -> print (out, descend, p); 
+    fflush (stdout);
+    if (i < nargs_ - 1) {
+      if (printPos () == INSIDE) out << printOp ();
+      else                       out << ",";
+    }
+    fflush (stdout);
+  }
+  out << ")";
+  fflush (stdout);
+}
+
+/*void exprOp::print (std::ostream      &out = std::cout, 
 		    const std::string &op  = "unknown", 
 		    enum pos           pos = PRE)        const 
 {
@@ -62,7 +84,7 @@ void exprOp::print (std::ostream      &out = std::cout,
   out << ")";
   fflush (stdout);
 }
-
+*/
 
 // does this expression depend on variables in varlist?
 

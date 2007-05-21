@@ -35,8 +35,12 @@ class exprOpp: public exprUnary {
   /// the operator's function
   inline unary_function F () {return opp;}
 
+  /// print operator
+  std::string printOp () const
+    {return "-";}
+
   // I/O
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 

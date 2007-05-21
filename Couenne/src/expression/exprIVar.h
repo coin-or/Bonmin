@@ -39,7 +39,7 @@ class exprIVar: public exprVar {
     {return new exprIVar (*this);}
 
   /// print
-  virtual void print (std::ostream &out) const
+  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
     {out << "y_" << varIndex_;}
 
   /// is this expression integer?

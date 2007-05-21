@@ -43,7 +43,7 @@ class exprConst: public expression {
     {return new exprConst (currValue_);}
 
   /// I/O
-  inline void print (std::ostream &out) const
+  void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
     {out << currValue_;}
 
   /// return constant's value

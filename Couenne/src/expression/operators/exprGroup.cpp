@@ -64,23 +64,36 @@ exprGroup::exprGroup  (const exprGroup &src):
 
 
 /// I/O
-void exprGroup::print (std::ostream &out) const {
+void exprGroup::print (std::ostream &out, bool descend, CouenneProblem *p) const {
+//void exprGroup::print (std::ostream &out, CouenneProblem *p = NULL) const {
 
-  exprSum::print (out);
+  if (nargs_ && ((nargs_ > 1) ||
+		 ((*arglist_) -> Type () != CONST) ||
+		 (fabs ((*arglist_) -> Value ()) > COUENNE_EPS)))
+    exprSum::print (out, descend, p);
+
+  int nOrig = p ? (p -> nVars ()) : -1;
 
   if      (c0_ >   COUENNE_EPS) out << '+' << c0_;
   else if (c0_ < - COUENNE_EPS) out        << c0_;
 
-  for (register int *ind=index_, i=0; *ind>=0;) {
+  for (register int *ind=index_, i=0; *ind>=0; ind++) {
 
     CouNumber coeff = coeff_ [i++];
 
     out << ' ';
 
-    if      (coeff >   COUENNE_EPS) out << '+' << coeff;
-    else if (coeff < - COUENNE_EPS) out        << coeff;
+    if      (coeff >   COUENNE_EPS) out << '+' << coeff << "*";
+    else if (coeff < - COUENNE_EPS) out        << coeff << "*";
+    else continue;
 
-    out << " x_" << *ind++;
+    if (nOrig < 0) out << "x_" << *ind;
+    else {
+      //      out << "(";
+      if (*ind < nOrig) p -> Var (*ind)       -> print (out, descend, p);
+      else              p -> Aux (*ind-nOrig) -> print (out, descend, p);
+      //      out << ")";
+    }
   }
 }
 

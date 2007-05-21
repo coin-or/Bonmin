@@ -56,14 +56,14 @@ expression *exprAbs::differentiate (int index) {
 
 /// printing
 
-void exprAbs::print (std::ostream& out) const {
-  exprUnary::print (out, "abs", PRE);
+//void exprAbs::print (std::ostream& out) const {
+//  exprUnary::print (out, "abs", PRE);
   /*
   out << "|";
   argument_ -> print (out);
   out << "|";
   */
-}
+//}
 
 
 /// implied bound processing for expression w = |x|, upon change in

@@ -62,8 +62,8 @@ expression *exprLog::differentiate (int index) {
 
 /// printing
 
-void exprLog::print (std::ostream& out) const 
-{exprUnary::print (out, "log", PRE);}
+//void exprLog::print (std::ostream& out) const 
+//{exprUnary::print (out, "log", PRE);}
 
 
 /// implied bound processing for expression w = log(x), upon change in

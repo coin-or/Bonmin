@@ -139,7 +139,10 @@ class expression {
     {return this;}
 
   /// I/O
-  virtual void print (std::ostream &s) const {s << '?';}
+  virtual void print (std::ostream &s = std::cout,    /// output stream
+		      bool = false,                   /// descend into auxiliaries' image?
+		      CouenneProblem * = NULL) const  /// problem pointer (in exprGroup)
+    {s << '?';}
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 

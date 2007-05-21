@@ -34,8 +34,12 @@ class exprPow: public exprOp {
   expression *clone () const
     {return new exprPow (clonearglist (), nargs_);}
 
+  /// print operator
+  std::string printOp () const
+    {return "^";}
+
   // I/O
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   // function for the evaluation of the expression
   CouNumber operator () ();

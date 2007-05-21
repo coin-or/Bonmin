@@ -29,8 +29,8 @@ inline expression *exprOpp::differentiate (int index)
 
 // printing
 
-void exprOpp::print (std::ostream& out) const
-{exprUnary::print (out, "-", PRE);}
+//void exprOpp::print (std::ostream& out) const
+//{exprUnary::print (out, "-", PRE);}
 
 
 /// implied bound processing for expression w = -x, upon change in

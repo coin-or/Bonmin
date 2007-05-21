@@ -32,6 +32,15 @@ exprAux::exprAux (expression *image, int index, int rank):
 }
 
 
+/// I/O
+void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
+
+  if (descend) 
+    image_ -> print (out, descend, p);
+  else out << "w_" << varIndex_;
+}
+
+
 // generate cuts for expression associated with this auxiliary
 
 void exprAux::generateCuts (const OsiSolverInterface &si, 

@@ -32,8 +32,11 @@ class exprAbs: public exprUnary {
   expression *clone () const
     {return new exprAbs (argument_ -> clone ());}
 
+  std::string printOp () const
+    {return "abs";}
+
   /// I/O
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   /// differentiation
   expression *differentiate (int index); 

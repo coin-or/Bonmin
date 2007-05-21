@@ -46,14 +46,22 @@ class exprLBDiv: public exprOp {
   /// function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// print position (PRE, INSIDE, POST)
+  enum pos printPos () const
+    {return PRE;}
+
+  /// print operator
+  std::string printOp () const
+    {return "LB_Div";}
+
   /// I/O
-  void print (std::ostream &) const;
+  //  void print (std::ostream &) const;
 };
 
 
 /// output
-inline void exprLBDiv::print (std::ostream &out = std::cout) const
-{exprOp::print (out, "LB_div", PRE);}
+//inline void exprLBDiv::print (std::ostream &out = std::cout) const
+//{exprOp::print (out, "LB_div", PRE);}
 
 
 /// compute sum
@@ -93,8 +101,16 @@ class exprUBDiv: public exprOp {
   /// function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// print position (PRE, INSIDE, POST)
+  enum pos printPos () const
+    {return PRE;}
+
+  /// print operator
+  std::string printOp () const
+    {return "UB_Div";}
+
   /// output
-  void print (std::ostream &) const;
+  //  void print (std::ostream &) const;
 };
 
 
@@ -118,7 +134,7 @@ inline CouNumber exprUBDiv::operator () () {
 }
 
 /// output
-void exprUBDiv::print (std::ostream &out = std::cout) const
-{exprOp::print (out, "UB_div", PRE);}
+//void exprUBDiv::print (std::ostream &out = std::cout) const
+//{exprOp::print (out, "UB_div", PRE);}
 
 #endif

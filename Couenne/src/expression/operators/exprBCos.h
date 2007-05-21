@@ -35,9 +35,17 @@ class exprLBCos: public exprOp {
   // function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// print position (PRE, INSIDE, POST)
+  enum pos printPos () const
+    {return PRE;}
+
+  /// print operator
+  std::string printOp () 
+    {return "LB_Cos";}
+
   // output
-  void print (std::ostream &out = std::cout) 
-    {exprOp::print (out, "LB_Cos", PRE);}
+  //  void print (std::ostream &out = std::cout) 
+  //  {exprOp::print (out, "LB_Cos", PRE);}
 };
 
 
@@ -80,9 +88,17 @@ class exprUBCos: public exprOp {
   // function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// print position (PRE, INSIDE, POST)
+  virtual enum pos printPos () 
+    {return PRE;}
+
+  /// print operator
+  virtual const std::string printOp () 
+    {return "UB_Cos";}
+
   // output
-  void print (std::ostream &out = std::cout) 
-    {exprOp::print (out, "UB_Cos", PRE);}
+  //  void print (std::ostream &out = std::cout) 
+  //  {exprOp::print (out, "UB_Cos", PRE);}
 };
 
 

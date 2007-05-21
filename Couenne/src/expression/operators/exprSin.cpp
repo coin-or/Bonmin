@@ -28,9 +28,9 @@ expression *exprSin::differentiate (int index) {
 
 // printing
 
-void exprSin::print (std::ostream& out) const {
-  exprUnary::print (out, "sin", PRE);
-}
+//void exprSin::print (std::ostream& out) const {
+//  exprUnary::print (out, "sin", PRE);
+//}
 
 
 // compute bounds of sin x given bounds of x 

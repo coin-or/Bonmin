@@ -84,8 +84,7 @@ class exprAux: public exprVar {
   expression *Ub () {return ub_;}
 
   /// I/O
-  void print (std::ostream &out) const
-    {out << "w_" << varIndex_;}
+  virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
 
   /// The expression associated with this auxiliary variable
   inline expression *Image () const

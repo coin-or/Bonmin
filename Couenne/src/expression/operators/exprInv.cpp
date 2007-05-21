@@ -28,8 +28,15 @@ expression *exprInv::differentiate (int index) {
 
 // printing
 
-void exprInv::print (std::ostream& out) const 
-{exprUnary::print (out, "1/", PRE);}
+void exprInv::print (std::ostream &out, 
+		     bool descend, 
+		     CouenneProblem *p) const {
+//void exprInv::print (std::ostream& out) const 
+  out << "(1/(";
+  argument_ -> print (out, descend, p);
+  out << ")";
+}
+//  exprUnary::print (out, "1/", PRE);}
 
 
 /// general function (see below)

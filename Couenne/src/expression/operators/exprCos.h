@@ -33,8 +33,17 @@ class exprCos: public exprUnary {
   //// the operator's function
   inline unary_function F () {return cos;}
 
+  /// print operator
+  std::string printOp () const
+    {return "cos";}
+
+  /// print position
+  //  virtual const std::string printPos () 
+  //    {return PRE;}
+
+
   /// print "cos" and argument
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   /// obtain derivative of expression
   expression *differentiate (int index); 

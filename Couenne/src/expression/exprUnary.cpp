@@ -24,6 +24,19 @@
 
 // print unary expression
 
+
+void exprUnary::print (std::ostream &out, 
+		       bool descend, 
+		       CouenneProblem *p) const {
+
+  if (printPos () == PRE)  out << printOp ();
+  out << "("; 
+  argument_ -> print (out, descend, p); 
+  out << ")";
+  if (printPos () == POST) out << printOp ();
+}
+
+/*
 void exprUnary::print (std::ostream      &out = std::cout, 
 		       const std::string &op  = "unknown", 
 		       enum pos           pos = PRE)       const 
@@ -34,7 +47,7 @@ void exprUnary::print (std::ostream      &out = std::cout,
   out << ")";
   if (pos == POST) out << op;
 }
-
+*/
 
 /// comparison when looking for duplicates
 int exprUnary::compare (exprUnary  &e1) { 

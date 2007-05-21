@@ -54,8 +54,10 @@ class exprCopy: public expression {
     {return copy_ -> Index ();}
 
   /// I/O
-  virtual void print (std::ostream &out) const
-  {out << "["; copy_ -> Original () -> print (out); out << "]";}
+  virtual void print (std::ostream &out = std::cout, 
+		      bool descend      = false, 
+		      CouenneProblem *p = NULL) const
+    {copy_ -> Original () -> print (out, descend, p);}
 
   /// value (empty)
   virtual inline CouNumber Value () const 

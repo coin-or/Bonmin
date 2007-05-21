@@ -30,8 +30,16 @@ class exprDiv: public exprOp {
   expression *clone () const
     {return new exprDiv (clonearglist (), nargs_);}
 
+  /// print operator
+  std::string printOp () const
+    {return "/";}
+
+  /// print position
+  //  virtual enum pos printPos () 
+  //    {return INSIDE;}
+
   // I/O
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   // function for the evaluation of the expression
   inline CouNumber operator () ();

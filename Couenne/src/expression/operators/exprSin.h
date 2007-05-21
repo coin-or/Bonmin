@@ -36,8 +36,12 @@ class exprSin: public exprUnary {
   //// the operator's function
   inline unary_function F () {return sin;}
 
+  /// print operator
+  std::string printOp () const
+    {return "sin";}
+
   /// I/O
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   /// differentiation
   expression *differentiate (int index); 

@@ -26,8 +26,8 @@ expression *exprExp::differentiate (int index) {
 
 // printing
 
-void exprExp::print (std::ostream& out) const
-  {exprUnary::print (out, "exp", PRE);}
+//void exprExp::print (std::ostream& out) const
+//  {exprUnary::print (out, "exp", PRE);}
 
 
 // Get lower and upper bound of an expression (if any)

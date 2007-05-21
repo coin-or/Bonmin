@@ -35,9 +35,17 @@ class exprLBSin: public exprOp {
   // function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// print operator
+  std::string printOp () const
+    {return "LB_Sin";}
+
+  /// print position
+  enum pos printPos () const
+    {return PRE;}
+
   // output
-  void print (std::ostream &out = std::cout) 
-    {exprOp::print (out, "LB_Sin", PRE);}
+  //  void print (std::ostream &out = std::cout) 
+  //    {exprOp::print (out, "LB_Sin", PRE);}
 };
 
 
@@ -81,9 +89,17 @@ class exprUBSin: public exprOp {
   // function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// print operator
+  std::string printOp () const
+    {return "UB_Sin";}
+
+  /// print position
+  enum pos printPos () const
+    {return PRE;}
+
   // output
-  void print (std::ostream &out = std::cout) 
-    {exprOp::print (out, "UB_Sin", PRE);}
+  //  void print (std::ostream &out = std::cout) 
+  //    {exprOp::print (out, "UB_Sin", PRE);}
 };
 
 

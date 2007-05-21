@@ -28,8 +28,12 @@ class exprSum: public exprOp {
   virtual expression *clone () const
     {return new exprSum (clonearglist (), nargs_);}
 
+  /// print operator
+  std::string printOp () const
+    {return "+";}
+
   /// I/O
-  virtual void print (std::ostream &) const;
+  //  virtual void print (std::ostream &) const;
 
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();

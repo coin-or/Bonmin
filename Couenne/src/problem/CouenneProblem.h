@@ -126,7 +126,15 @@ class CouenneProblem {
 
   /// store nonlinear problem into a .mod file (with lots of defined
   /// variables)
-  void writeMod (char *);
+  ///
+  /// @aux controls the use of auxiliaries. If true, a problem is
+  /// written with auxiliary variables written with their associated
+  /// expression, i.e. w_i = h_i(x,y,w) and bounds l_i <= w_i <= u_i,
+  /// while if false these constraints are written in the form l_i <=
+  /// h_i (x,y) <= u_i
+  /// 
+  void writeMod (char *filename,  /// Name of the .mod file to be written
+		 bool  aux);      /// true: with aux, false: without.
 
   /// initialize auxiliary variables and their bounds from original
   /// variables

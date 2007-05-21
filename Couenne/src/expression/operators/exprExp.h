@@ -29,8 +29,17 @@ class exprExp: public exprUnary {
   /// the operator's function
   inline unary_function F () {return exp;}
 
+  /// print operator
+  std::string printOp () const
+    {return "exp";}
+
+  /// print position
+  //  virtual const std::string printPos () 
+  //    {return PRE;}
+
+
   // output
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 

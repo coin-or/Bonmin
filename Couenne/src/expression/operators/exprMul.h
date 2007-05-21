@@ -28,8 +28,12 @@ class exprMul: public exprOp {
   expression *clone () const
     {return new exprMul (clonearglist (), nargs_);}
 
+  /// print operator
+  std::string printOp () const
+    {return "*";}
+
   /// print expression
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   /// function for the evaluation of the expression
   inline CouNumber operator () ();

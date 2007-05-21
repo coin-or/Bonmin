@@ -44,7 +44,8 @@ class exprInv: public exprUnary {
   inline unary_function F () {return inv;}
 
   /// output "1/argument"
-  void print (std::ostream&) const;
+  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const;
+  //  void print (std::ostream&) const;
 
   /// differentiation
   expression *differentiate (int index); 

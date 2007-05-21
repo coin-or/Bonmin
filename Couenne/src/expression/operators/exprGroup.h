@@ -49,7 +49,8 @@ class exprGroup: public exprSum {
     {return new exprGroup (*this);}
 
   /// I/O
-  virtual void print (std::ostream &) const;
+  //  virtual void print (std::ostream &, CouenneProblem *) const;
+  virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
 
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();

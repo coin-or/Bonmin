@@ -69,7 +69,17 @@ class exprOp: public expression {
     {return nargs_;}
 
   /// I/O
-  virtual void print (std::ostream &, const std::string &, enum pos) const;
+  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const;
+  //  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
+  //  virtual void print (std::ostream &, const std::string &, enum pos) const;
+
+  /// print position (PRE, INSIDE, POST)
+  virtual enum pos printPos () const
+    {return INSIDE;}
+
+  /// print operator
+  virtual std::string printOp () const
+    {return "??";}
 
   /// function for the evaluation of the expression
   virtual inline CouNumber operator () ();

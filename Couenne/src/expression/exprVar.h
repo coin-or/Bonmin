@@ -53,7 +53,7 @@ class exprVar: public expression {
     {return varIndex_;}
 
   /// print
-  virtual void print (std::ostream &out) const
+  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
     {out << "x_" << varIndex_;}
 
   /// return the value of the variable

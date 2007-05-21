@@ -28,8 +28,8 @@ expression *exprCos::differentiate (int index) {
 }
 
 // I/O
-void exprCos::print (std::ostream& out) const
-  {exprUnary::print (out, "cos", PRE);}
+//void exprCos::print (std::ostream& out) const
+//  {exprUnary::print (out, "cos", PRE);}
 
 // compute bounds of sin x given bounds of x 
 void exprCos::getBounds (expression *&lb, expression *&ub) {

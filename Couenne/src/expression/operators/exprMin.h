@@ -32,9 +32,17 @@ class exprMin: public exprOp {
   exprMin *clone () const
     {return new exprMin (clonearglist (), nargs_);}
 
+  /// print operator
+  std::string printOp () const
+    {return "min";}
+
+  /// print operator
+  enum pos printPos () const
+    {return PRE;}
+
   /// I/O
-  void print (std::ostream &out) const
-    {exprOp:: print (out, "min", PRE);}
+  //  void print (std::ostream &out) const
+  //    {exprOp:: print (out, "min", PRE);}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();

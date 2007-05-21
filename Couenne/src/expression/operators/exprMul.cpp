@@ -127,8 +127,8 @@ expression *exprMul::differentiate (int index) {
 
 
 /// print
-void exprMul::print (std::ostream& out) const
-  {exprOp::print (out, "*", INSIDE);}
+//void exprMul::print (std::ostream& out) const
+//  {exprOp::print (out, "*", INSIDE);}
 
 
 // get a measure of "how linear" the expression is:

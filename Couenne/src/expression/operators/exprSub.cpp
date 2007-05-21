@@ -70,8 +70,8 @@ expression *exprSub::differentiate (int index) {
 
 
 // print
-void exprSub::print (std::ostream& out) const
-  {exprOp::print (out, "-", INSIDE);}
+//void exprSub::print (std::ostream& out) const
+//  {exprOp::print (out, "-", INSIDE);}
 
 
 // Get lower and upper bound of an expression (if any)

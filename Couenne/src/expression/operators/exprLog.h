@@ -31,8 +31,17 @@ class exprLog: public exprUnary {
   /// the operator's function
   inline unary_function F () {return log;}
 
+  /// print operator
+  std::string printOp () const
+    {return "log";}
+
+  /// print position
+  //virtual const std::string printPos () 
+  //{return PRE;}
+
+
   // I/O
-  void print (std::ostream&) const;
+  //  void print (std::ostream&) const;
 
   // differentiation
   expression *differentiate (int index); 

@@ -13,6 +13,7 @@
 #include <CouenneTypes.h>
 #include <expression.h>
 #include <exprConst.h>
+#include <exprGroup.h>
 #include <exprAux.h>
 
 #include <CouenneProblem.h>
@@ -39,7 +40,7 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
     (*i) -> print (out);
     out << " [" << (*i) -> rank (NULL) 
 	<< ","  << (*i) -> Multiplicity () << "] := ";
-    (*i) -> Image () -> print (out); 
+    (*i) -> Image () -> print (out, false, this); 
     out << " [ " << (*((*i) -> Lb ())) (); //-> print (out);
     out << " , " << (*((*i) -> Ub ())) (); //-> print (out);
     out << " ] " << std::endl;
@@ -51,7 +52,7 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
 // store problem in a .mod file (AMPL)
 
 void CouenneProblem::writeMod (char *fname,  /// name of the mod file
-			       bool aux) {   /// 
+			       bool aux) {   /// with or without auxiliaries?
 
   std::ofstream f (fname);
 
@@ -81,17 +82,19 @@ void CouenneProblem::writeMod (char *fname,  /// name of the mod file
 
     for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
 	 i != auxiliaries_.end ();
-	 i++) {
+	 i++) 
 
-      f << "var "; (*i) -> print (f);
-      //    f << " = ";  (*i) -> Image () -> print (f);
-      CouNumber bound;
+      if ((*i) -> Multiplicity () > 0) {
 
-      if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) f << " >= " << bound;
-      if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
-      if ((*i) -> isInteger ()) f << " integer";
-      f << ';' << std::endl;
-    }
+	f << "var "; (*i) -> print (f, false, this);
+	//    f << " = ";  (*i) -> Image () -> print (f);
+	CouNumber bound;
+
+	if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) f << " >= " << bound;
+	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
+	if ((*i) -> isInteger ()) f << " integer";
+	f << ';' << std::endl;
+      }
   }
 
 
@@ -102,24 +105,63 @@ void CouenneProblem::writeMod (char *fname,  /// name of the mod file
   if (objectives_ [0] -> Sense () == MINIMIZE) f << "minimize";
   else                                         f << "maximize";
 
-  f << " obj: ";  objectives_ [0] -> Body () -> print (f); f << ';' << std::endl; 
+  f << " obj: ";  
+  objectives_ [0] -> Body () -> print (f, !aux, this); 
+  f << ';' << std::endl; 
 
 
   // defined (aux) variables, with formula ///////////////////////////////////////////
 
-  f << std::endl << "# aux. variables defined" << std::endl << std::endl;
+  if (aux) {
+    f << std::endl << "# aux. variables defined" << std::endl << std::endl;
 
-  for (int i=0; i < nAuxs (); i++) {
+    for (int i=0; i < nAuxs (); i++) 
+      if (auxiliaries_ [i] -> Multiplicity () > 0) {
 
-    f << "aux" << i << ": "; auxiliaries_ [i] -> print (f);
-    f << " = ";  auxiliaries_ [i] -> Image () -> print (f);
-    f << ';' << std::endl;
+	f << "aux" << i << ": "; auxiliaries_ [i] -> print (f, false, this);
+	f << " = ";  
+
+	//	if (auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP)
+	  //	  dynamic_cast <exprGroup *> (auxiliaries_ [i] -> Image ()) -> print (f, this);
+	  //	else 
+	auxiliaries_ [i] -> Image () -> print (f, false, this);
+	f << ';' << std::endl;
+      }
   }
 
 
   // write constraints //////////////////////////////////////////////////////////////
 
   f << std::endl << "# constraints" << std::endl << std::endl;
+
+  if (!aux) // print h_i(x,y) <= ub, >= lb
+    for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
+	 i != auxiliaries_.end ();
+	 i++) 
+
+      if ((*i) -> Multiplicity () > 0) {
+	
+	//	f << "conAux"; (*i) -> print (f);
+	//    f << " = ";  (*i) -> Image () -> print (f);
+	CouNumber bound;
+
+	if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) {
+	  f << "conAuxLb" << (*i) -> Index () << ": ";
+	  (*i) -> print (f, true, this);
+	  f << ">= " << bound << ';' << std::endl;
+	}
+
+	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) {
+	  f << "conAuxUb" << (*i) -> Index () << ": ";
+	  (*i) -> print (f, true, this);
+	  f << "<= " << bound << ';' << std::endl;
+	}
+
+	//	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
+	//	if ((*i) -> isInteger ()) f << " integer";
+	//	f << ';' << std::endl;
+      }
+
 
   for (int i=0; i < nNLCons (); i++) {
 
@@ -128,7 +170,7 @@ void CouenneProblem::writeMod (char *fname,  /// name of the mod file
               ub = (constraints_ [i] -> Ub () -> Value ());
 
     f << "con" << i << ": ";
-    constraints_ [i] -> Body () -> print (f);
+    constraints_ [i] -> Body () -> print (f, !aux, this);
 
     if (lb > - COUENNE_INFINITY + 1) {
       f << ' ';
@@ -145,7 +187,7 @@ void CouenneProblem::writeMod (char *fname,  /// name of the mod file
 	&& (fabs (ub-lb) > COUENNE_EPS)) {
 
       f << "con" << i << "_rng: ";
-      constraints_ [i] -> Body () -> print (f);
+      constraints_ [i] -> Body () -> print (f, !aux, this);
       f << " <= " << ub << ';' << std::endl;
     }
   }

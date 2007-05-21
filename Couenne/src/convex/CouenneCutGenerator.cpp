@@ -65,7 +65,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 
   //problem_ -> print (std::cout);
   //  printf ("======================================\n");
-  //  problem_ -> writeMod ("extended.mod");
+  problem_ -> writeMod ("extended-aw.mod", true);
+  problem_ -> writeMod ("extended-pb.mod", false);
 }
 
 

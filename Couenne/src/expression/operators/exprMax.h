@@ -33,9 +33,17 @@ class exprMax: public exprOp {
   exprMax *clone () const
     {return new exprMax (clonearglist (), nargs_);}
 
+  /// print operator
+  std::string printOp () const
+    {return "max";}
+
+  /// print position
+  enum pos printPos () const
+    {return PRE;}
+
   // I/O
-  void print (std::ostream &out) const
-    {exprOp:: print (out, "max", PRE);}
+  //  void print (std::ostream &out) const
+  //    {exprOp:: print (out, "max", PRE);}
 
   // function for the evaluation of the expression
   inline CouNumber operator () ();

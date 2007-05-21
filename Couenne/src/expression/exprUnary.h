@@ -63,7 +63,16 @@ class exprUnary: public expression {
     {return &argument_;}
 
   /// I/O
-  virtual void print (std::ostream &, const std::string &, enum pos) const;
+  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const;
+  //  virtual void print (std::ostream &, const std::string &, enum pos) const;
+
+  /// print position (PRE, INSIDE, POST)
+  virtual enum pos printPos () const
+    {return PRE;}
+
+  /// print operator
+  virtual std::string printOp () const
+    {return "?";}
 
   /// compute value of unary operator
   virtual inline CouNumber operator () ()
