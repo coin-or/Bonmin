@@ -34,7 +34,7 @@ void exprInv::print (std::ostream &out,
 //void exprInv::print (std::ostream& out) const 
   out << "(1/(";
   argument_ -> print (out, descend, p);
-  out << ")";
+  out << "))";
 }
 //  exprUnary::print (out, "1/", PRE);}
 
