@@ -12,6 +12,26 @@
 #include <CouenneProblem.h>
 
 
+/// reoptimize and change bound of a variable if needed
+bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
+		  int sense,               /// 1: minimize, -1: maximize
+		  CouNumber &bound) {      /// bound to be updated
+
+  double opt;
+
+  csi -> setObjSense  (sense); // MINIMIZE
+  csi -> resolve ();
+
+  if (csi -> isProvenOptimal () && 
+      ((sense > 0) && ((opt = csi -> getObjValue ()) > bound + COUENNE_EPS)) ||
+      ((sense < 0) && ((opt = csi -> getObjValue ()) < bound - COUENNE_EPS))) {
+
+    bound = opt;
+    return true;
+  }
+  else return false;
+}
+
 /// Optimality based bound tightening
 int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
 			       OsiCuts &cs,
@@ -42,25 +62,9 @@ int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
     csi -> setObjective (objcoe);
 
     // minimize and then maximize x_i on si.
-    csi -> setObjSense  (1); // MINIMIZE
-    csi -> resolve ();
 
-    if (csi -> isProvenOptimal () && 
-	((opt = csi -> getObjValue ()) > problem_ -> Lb (i) + COUENNE_EPS)) {
-
-      problem_ -> Lb (i) = opt;
-      chg = true;
-    }
-
-    csi -> setObjSense (-1); // MAXIMIZE
-    csi -> resolve ();
-
-    if (csi -> isProvenOptimal () && 
-	((opt = csi -> getObjValue ()) < problem_ -> Ub (i) - COUENNE_EPS)) {
-
-      problem_ -> Ub (i) = opt;
-      chg = true;
-    }
+    chg = updateBound (csi,  1, problem_ -> Lb (i));
+    chg = updateBound (csi, -1, problem_ -> Ub (i)) || chg;
 
     if (chg) {
 

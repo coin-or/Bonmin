@@ -182,6 +182,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
+  //#define USE_OBBT
 #ifdef USE_OBBT
   if ((info.pass == 0) &&
       !firstcall_ && 

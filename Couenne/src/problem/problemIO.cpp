@@ -70,13 +70,15 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
     if (lb_ [i] > - COUENNE_INFINITY + 1) f << " >= " << lb_ [i];
     if (ub_ [i] < + COUENNE_INFINITY - 1) f << " <= " << ub_ [i];
     if (variables_ [i] -> isInteger ())   f << " integer";
-    f << ';' << std::endl;
+    f << " default " << x_ [i] << ';' << std::endl;
   }
 
 
   // defined (aux) variables, declaration ///////////////////////////////////////////
 
   if (aux) {
+
+    initAuxs (x_, lb_, ub_);
 
     f << std::endl << "# auxiliary variables" << std::endl << std::endl;
 
@@ -93,7 +95,7 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
 	if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) f << " >= " << bound;
 	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
 	if ((*i) -> isInteger ()) f << " integer";
-	f << ';' << std::endl;
+	f << " default " << (*((*i) -> Image ())) () << ';' << std::endl;
       }
   }
 
@@ -191,4 +193,34 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
       f << " <= " << ub << ';' << std::endl;
     }
   }
+  /*
+  // initial values, original variables /////////////////////////////////////////////
+
+  f << std::endl << "# initial values, original" << std::endl << std::endl;
+
+  for (int i=0; i < nVars (); i++) {
+
+    f << "let ";
+    variables_ [i] -> print (f);
+    f << ".init0 := " << x_ [i] << ';' << std::endl;
+  }
+
+  // initial values, auxiliary variables ////////////////////////////////////////////
+
+  if (aux) {
+
+    f << std::endl << "# initial values, auxiliary variables" << std::endl << std::endl;
+
+    for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
+	 i != auxiliaries_.end ();
+	 i++) 
+
+      if ((*i) -> Multiplicity () > 0) {
+
+	f << "let "; 
+	(*i) -> print (f, false, this);
+	f << ".init0 := " << (*((*i) -> Image ())) () << ';' << std::endl;
+      }
+  }
+  */
 }

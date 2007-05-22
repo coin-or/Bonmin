@@ -1,7 +1,6 @@
 - Bilinear cuts
 - trisection
 - variable lhs/rhs of bounds containing expression defining aux vars
-- OBBT
 - cut currValue_ from expressions
 - documentation
 - improve convexification of x/y
