@@ -83,7 +83,7 @@ class exprQuad: public exprGroup {
 	     }*/
 
   /// Get lower and upper bound of an expression (if any)
-  virtual void getBounds (expression *&, expression *&);
+  virtual void getBounds (expression *&, expression *&) {}
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)
@@ -91,7 +91,7 @@ class exprQuad: public exprGroup {
 
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			     OsiCuts &cs, const CouenneCutGenerator *cg);
+			       OsiCuts &cs, const CouenneCutGenerator *cg) {}
 
   /// only compare with people of the same kind
   virtual int compare (exprQuad &);
