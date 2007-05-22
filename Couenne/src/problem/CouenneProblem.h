@@ -133,8 +133,8 @@ class CouenneProblem {
   /// while if false these constraints are written in the form l_i <=
   /// h_i (x,y) <= u_i
   /// 
-  void writeMod (char *filename,  /// Name of the .mod file to be written
-		 bool  aux);      /// true: with aux, false: without.
+  void writeMod (const std::string &, /// Name of the .mod file to be written
+		 bool);               /// true: with aux, false: without.
 
   /// initialize auxiliary variables and their bounds from original
   /// variables

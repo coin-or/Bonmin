@@ -51,10 +51,10 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
 
 // store problem in a .mod file (AMPL)
 
-void CouenneProblem::writeMod (char *fname,  /// name of the mod file
-			       bool aux) {   /// with or without auxiliaries?
+void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod file
+			       bool aux) {                /// with or without auxiliaries?
 
-  std::ofstream f (fname);
+  std::ofstream f (fname.c_str ());
 
   f << std::setprecision (10);
 

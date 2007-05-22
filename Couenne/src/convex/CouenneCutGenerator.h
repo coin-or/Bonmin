@@ -125,7 +125,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 		 int=-1, CouNumber=0., /// of third  term
 		 bool = false) const;  /// is it a global cut? No, by default
 
-  /// add general linear envelope to convex function, given its
+  /// Add general linear envelope to convex function, given its
   /// variables' indices, the (univariate) function and its first
   /// derivative
   void addEnvelope (OsiCuts &,
@@ -135,7 +135,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 		    CouNumber, CouNumber, CouNumber,
 		    bool = false) const;
 
-  /// add half-plane through (x1,y1) and (x2,y2) -- resp. 4th, 5th,
+  /// Add half-plane through (x1,y1) and (x2,y2) -- resp. 4th, 5th,
   /// 6th, and 7th argument
   int addSegment (OsiCuts &, int, int,
 		  CouNumber, CouNumber, 
@@ -157,20 +157,23 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// virtual method to decide if local search is performed
   virtual bool doLocalSearch () const {return 0;}
 
-  /// method to set the Bab pointer
+  /// Method to set the Bab pointer
   void setBabPtr (Bonmin::Bab *p)
     {BabPtr_ = p;}
 
-  /// get statistics
+  /// Get statistics
   void getStats (int &nrc, int &ntc, double &st) {
     nrc = nrootcuts_;
     ntc = ntotalcuts_;
     st  = septime_;
   }
 
-  /// allow to get and set the infeasNode_ flag (used only in generateCuts())
+  /// Allow to get and set the infeasNode_ flag (used only in generateCuts())
   bool &infeasNode () const
     {return infeasNode_;}
+
+  /// generate OsiRowCuts for current convexification
+  void genRowCuts (const OsiSolverInterface &, OsiCuts &cs, int, int *) const;
 
   /// generate OsiColCuts for improved (implied and propagated) bounds
   void genColCuts (const OsiSolverInterface &, OsiCuts &, int, int *) const;
@@ -178,6 +181,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// tighten bounds using propagation, implied bounds and reduced costs
   bool boundTightening (const OsiSolverInterface &, OsiCuts &, 
 			char *, Bonmin::BabInfo * = NULL) const;
+
+  /// Optimality Based Bound Tightening
+  int obbt (const OsiSolverInterface &, OsiCuts &, char *, Bonmin::BabInfo *) const;
 };
 
 #endif

@@ -12,35 +12,46 @@
 #include <CouenneProblem.h>
 #include "BonAuxInfos.hpp"
 
+
 // fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 9.999e12
+
+
+// translate changed bound sparse array into a dense one
+void sparse2dense (int ncols, char *chg_bds, int *&changed, int &nchanged) {
+
+  // convert sparse chg_bds in something handier
+  changed  = (int *) malloc (ncols * sizeof (int));
+  nchanged = 0;
+
+  for (register int i=ncols, j=0; i--; j++)
+    if (*chg_bds++) {
+      *changed++ = j;
+      nchanged++;
+    }
+
+  changed = (int *) realloc (changed - nchanged, nchanged * sizeof (int));
+}
+
 
 /// a convexifier cut generator
 
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-  
+
+  //  int nInitCuts = cs.sizeRowCuts ();
+
   /*printf (":::::::::::::::::::::::: level = %d, pass = %d, intree=%d\n Bounds:\n", 
     info.level, info.pass, info.inTree);*/
-
-  //  for (int i=0; i < si. getNumCols(); i++)
-  //      printf (" %3d [%.3e,%.3e]\n", i, si. getColLower () [i],
-  //      si. getColUpper () [i]);
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
   if (babInfo)
     babInfo -> setFeasibleNode ();
 
-  double now = CoinCpuTime ();
-
-  if (firstcall_) {
-    printf ("Couenne:"); 
-    fflush (stdout);
-  }
-
-  int ncols = problem_ -> nVars () + problem_ -> nAuxs ();
+  double now   = CoinCpuTime ();
+  int    ncols = problem_ -> nVars () + problem_ -> nAuxs ();
 
   // This vector contains variables whose bounds have changed due to
   // branching, reduced cost fixing, or bound tightening below. To be
@@ -132,63 +143,21 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  int *changed, nchanged;
+  int *changed = NULL, nchanged;
 
   //////////////////////// Bound tightening ///////////////////////////////////////////
 
-  //  for (int i=0; i<problem_ -> nAuxs () + problem_ -> nVars (); i++ )
-  //    printf ("%d: [%.4f %.4f]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
-
-  if (! boundTightening (si, cs, chg_bds, babInfo)) {
-
-    //    printf ("INFEASIBLE\n");
-    //    for (int i=0; i<problem_ -> nAuxs () + problem_ -> nVars (); i++ )
-    //      printf ("%d: [%.4f %.4f]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
-
+  if ((info.pass == 0)  // do bound tightening only at first pass of cutting plane
+      && (! boundTightening (si, cs, chg_bds, babInfo))) 
     goto end_genCuts;
-  }
-
-  //  for (int i=0; i<problem_ -> nAuxs () + problem_ -> nVars (); i++ )
-  //    printf ("%d: [%.4f %.4f]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
-  // convert sparse chg_bds in something handier
-  changed  = (int *) malloc (ncols * sizeof (int));
-  nchanged = 0;
+  sparse2dense (ncols, chg_bds, changed, nchanged);
 
-  for (register int i=ncols, j=0; i--; j++)
-    if (*chg_bds++) {
-      *changed++ = j;
-      nchanged++;
-    }
-
-  delete [] (chg_bds -= ncols);
-
-  changed = (int *) realloc (changed - nchanged, nchanged * sizeof (int));
-
-  // For each auxiliary variable, create cut (or set of cuts) violated
-  // by current point and add it to cs
-
-  if (firstcall_)
-    for (int i=0, j = problem_ -> nAuxs (); j--; i++) {
-      if (problem_ -> Aux (i) -> Multiplicity () > 0)
-	problem_ -> Aux (i) -> generateCuts (si, cs, this);
-    }
-  else { // chg_bds contains the indices of the variables whose bounds
-	 // have changes (a -1 follows the last element)
-
-    for (int i=0, j = problem_ -> nAuxs (); j--; i++) {
-
-      // TODO: check if list contains all and only aux's to cut
-      /*expression * image = problem_ -> Aux (i) -> Image ();
-      if (   (image -> Linearity () > LINEAR)          // if linear, no need to cut twice
-	  && (image -> dependsOn (changed, nchanged))  // if expression does not depend on 
-	  )*/                                            // changed variables, do not cut
-      if (problem_ -> Aux (i) -> Multiplicity () > 0)
-	problem_ -> Aux (i) -> generateCuts (si, cs, this);
-    }
-  }
+  //////////////////////
+  genRowCuts (si, cs, nchanged, changed);
+  //////////////////////
 
   if (firstcall_) {
 
@@ -207,18 +176,49 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
+#define COU_OBBT_CUTOFF_LEVEL 3
+
   // change tightened bounds through OsiCuts
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
+#ifdef USE_OBBT
+  if ((info.pass == 0) &&
+      !firstcall_ && 
+      (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1))) {
+    // apply OBBT at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
+    // and then with probability inversely proportional to the level
+
+#define THRES_NBD_CHANGED 1
+
+    int nImprov = obbt (si, cs, chg_bds, babInfo);
+
+    if (nImprov < 0)
+      goto end_genCuts;
+
+    if (nImprov >= THRES_NBD_CHANGED) {
+
+      //      if (! (boundTightening (si, cs, chg_bds, babInfo)))
+      //	goto end_genCuts;
+
+      /// OBBT has given good results, add convexification with
+      /// improved bounds
+
+      sparse2dense (ncols, chg_bds, changed, nchanged);
+
+      genColCuts (si, cs, nchanged, changed);
+      genRowCuts (si, cs, nchanged, changed);
+    }
+  }
+#endif
+
+  delete [] chg_bds;
+
   // clean up
   free (changed);
 
-  if (firstcall_) {
-    if (cs.sizeRowCuts ())
-      printf (" %d initial cuts", cs.sizeRowCuts ());
-    printf ("\n");
-  }
+  if ((firstcall_) && cs.sizeRowCuts ())
+    printf ("Couenne: %d initial cuts\n", cs.sizeRowCuts ());
 
  end_genCuts:
 

@@ -36,7 +36,9 @@ Couenne/src/convex/boundTightening.cpp -text
 Couenne/src/convex/checkNLP.cpp -text
 Couenne/src/convex/createCuts.cpp -text
 Couenne/src/convex/genColCuts.cpp -text
+Couenne/src/convex/genRowCuts.cpp -text
 Couenne/src/convex/generateCuts.cpp -text
+Couenne/src/convex/obbt.cpp -text
 Couenne/src/convex/operators/conv-exprAbs.cpp -text
 Couenne/src/convex/operators/conv-exprDiv.cpp -text
 Couenne/src/convex/operators/conv-exprExp.cpp -text
@@ -100,6 +102,8 @@ Couenne/src/expression/operators/exprOpp.cpp -text
 Couenne/src/expression/operators/exprOpp.h -text
 Couenne/src/expression/operators/exprPow.cpp -text
 Couenne/src/expression/operators/exprPow.h -text
+Couenne/src/expression/operators/exprQuad.cpp -text
+Couenne/src/expression/operators/exprQuad.h -text
 Couenne/src/expression/operators/exprSin.cpp -text
 Couenne/src/expression/operators/exprSin.h -text
 Couenne/src/expression/operators/exprSub.cpp -text

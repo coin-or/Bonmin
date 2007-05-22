@@ -45,6 +45,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprSum.cpp \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp \
+	expression/operators/exprQuad.cpp \
 	expression/operators/impliedBounds-exprSum.cpp \
 	expression/operators/impliedBounds-exprDiv.cpp \
 	expression/operators/impliedBounds-exprMul.cpp \
@@ -80,6 +81,8 @@ libCouenne_la_SOURCES = \
 	convex/generateCuts.cpp \
 	convex/boundTightening.cpp \
 	convex/genColCuts.cpp \
+	convex/genRowCuts.cpp \
+	convex/obbt.cpp \
 	problem/problem.cpp \
 	problem/problemIO.cpp \
 	problem/constraint.cpp \
@@ -181,6 +184,7 @@ include_HEADERS = \
 	expression/operators/exprBCos.h \
 	expression/operators/exprSub.h \
 	expression/operators/exprGroup.h \
+	expression/operators/exprQuad.h \
 	expression/exprConst.h \
 	expression/exprIVar.h \
 	expression/exprVar.h \

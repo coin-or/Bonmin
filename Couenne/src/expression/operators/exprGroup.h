@@ -95,11 +95,13 @@ class exprGroup: public exprSum {
 
 inline CouNumber exprGroup::operator () () {
 
-  register CouNumber  ret = c0_ + exprSum::operator () (),
-                     *coe = coeff_;
+  register CouNumber
+     ret  = c0_ + exprSum::operator () (),
+    *coe  = coeff_,
+    *vars = expression::Variables ();
 
   for (register int *ind = index_; *ind >= 0;)
-    ret += *coe++ * expression::Variable (*ind++);
+    ret += *coe++ * vars [*ind++];
 
   return (currValue_ = ret);
 }
