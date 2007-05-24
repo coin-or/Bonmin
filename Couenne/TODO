@@ -1,3 +1,4 @@
+- avoid very large coefficients
 - Bilinear cuts
 - trisection
 - variable lhs/rhs of bounds containing expression defining aux vars
@@ -10,3 +11,4 @@
 - linear convexification has an acyclic structure where x are leaves
 - recognition of quadratic forms
 - q.f. partitioning into PD + nonconvex
+- (reverse Polish notation)-based evaluation for efficiency

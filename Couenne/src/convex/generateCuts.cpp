@@ -16,6 +16,15 @@
 // fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 9.999e12
 
+// minimum #bound changed in obbt to generate further cuts
+#define THRES_NBD_CHANGED 1
+
+// depth of the BB tree until which obbt is applied at all nodes
+#define COU_OBBT_CUTOFF_LEVEL 3
+
+// maximum number of obbt iterations
+#define MAX_OBBT_ITER 4
+
 
 // translate changed bound sparse array into a dense one
 void sparse2dense (int ncols, char *chg_bds, int *&changed, int &nchanged) {
@@ -39,11 +48,10 @@ void sparse2dense (int ncols, char *chg_bds, int *&changed, int &nchanged) {
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
+  int nInitCuts = cs.sizeRowCuts ();
 
-  //  int nInitCuts = cs.sizeRowCuts ();
-
-  /*printf (":::::::::::::::::::::::: level = %d, pass = %d, intree=%d\n Bounds:\n", 
-    info.level, info.pass, info.inTree);*/
+  //  printf (":::::::::::::::::::::::: level = %d, pass = %d, intree=%d\n Bounds:\n", 
+  //  info.level, info.pass, info.inTree);
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
@@ -176,40 +184,40 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-#define COU_OBBT_CUTOFF_LEVEL 3
-
   // change tightened bounds through OsiCuts
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
   //#define USE_OBBT
 #ifdef USE_OBBT
-  if ((info.pass == 0) &&
-      !firstcall_ && 
+  if ((!firstcall_ || (info.pass > 0)) && 
       (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1))) {
     // apply OBBT at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
     // and then with probability inversely proportional to the level
 
-#define THRES_NBD_CHANGED 1
+    int nImprov, nIter = 0;
+    bool repeat = true;
 
-    int nImprov = obbt (si, cs, chg_bds, babInfo);
+    while (repeat && 
+	   (nIter++ < MAX_OBBT_ITER) &&
+	   ((nImprov = obbt (si, cs, chg_bds, babInfo)) > 0)) 
+
+      if (nImprov >= THRES_NBD_CHANGED) {
+
+	/// OBBT has given good results, add convexification with
+	/// improved bounds
+
+	sparse2dense (ncols, chg_bds, changed, nchanged);
+	
+	genColCuts (si, cs, nchanged, changed);
+
+	int nCurCuts = cs.sizeRowCuts ();
+	//	genRowCuts (si, cs, nchanged, changed);
+	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
+      }
 
     if (nImprov < 0)
       goto end_genCuts;
-
-    if (nImprov >= THRES_NBD_CHANGED) {
-
-      //      if (! (boundTightening (si, cs, chg_bds, babInfo)))
-      //	goto end_genCuts;
-
-      /// OBBT has given good results, add convexification with
-      /// improved bounds
-
-      sparse2dense (ncols, chg_bds, changed, nchanged);
-
-      genColCuts (si, cs, nchanged, changed);
-      genRowCuts (si, cs, nchanged, changed);
-    }
   }
 #endif
 
@@ -227,7 +235,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     firstcall_  = false;
     ntotalcuts_ = nrootcuts_ = cs.sizeRowCuts ();
   }
-  else ntotalcuts_ += cs.sizeRowCuts ();
-					
+  else ntotalcuts_ += (cs.sizeRowCuts () - nInitCuts);
+
   septime_ += CoinCpuTime () - now;
 }

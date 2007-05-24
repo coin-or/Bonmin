@@ -37,9 +37,9 @@ expression *exprSin::differentiate (int index) {
 
 void exprSin::getBounds (expression *&lb, expression *&ub) {
 
-  lb = new exprConst (-1); 
-  ub = new exprConst (1);
-  return;
+  //  lb = new exprConst (-1); 
+  //  ub = new exprConst (1);
+  //  return;
 
   // TODO: 
   expression *xl, *xu;
@@ -47,5 +47,5 @@ void exprSin::getBounds (expression *&lb, expression *&ub) {
   argument_ -> getBounds (xl, xu);
 
   lb = new exprLBSin (xl, xu);
-  ub = new exprLBSin (new exprClone (xl), new exprClone (xu));
+  ub = new exprUBSin (new exprClone (xl), new exprClone (xu));
 }

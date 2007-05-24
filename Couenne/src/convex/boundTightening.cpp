@@ -12,6 +12,9 @@
 #include <CouenneProblem.h>
 #include "BonAuxInfos.hpp"
 
+// max # bound tightening iterations
+#define MAX_BT_ITER 10
+
 
 /// procedure to strengthen variable bounds. Return false if problem
 /// turns out to be infeasible with given bounds, true otherwise.
@@ -79,7 +82,7 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
     }
   }
 
-  //////////////////////// Bound tightening ///////////////////////////////////
+  //////////////////////// Bound propagation and implied bounds ////////////////////
 
   int   ntightened = 0,
       nbwtightened = 0,
@@ -121,11 +124,9 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
       return false;
     }
 
-#define MAX_BT_ITER 10
-
-  } while (ntightened || nbwtightened && (niter++ < MAX_BT_ITER));
-  // need to check if EITHER procedures gave results, as expression
-  // structure is not a tree any longer.
+  } while (((ntightened > 0) || (nbwtightened > 0)) && (niter++ < MAX_BT_ITER));
+  // continue if EITHER procedures gave (positive) results, as
+  // expression structure is not a tree.
 
   return true;
 }

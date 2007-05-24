@@ -232,7 +232,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	|| (l > COUENNE_EPS)       // bounds do not contain 0
 	|| (u < - COUENNE_EPS)) &&
 	(l > - powThres) &&    // and are finite
-	(u <   powThres))
+	(u <   powThres) &&
+	(fabs (l+u) > COUENNE_EPS)) // bounds are not opposite
 
       cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l, k), u, safe_pow (u, k), -sign);
 

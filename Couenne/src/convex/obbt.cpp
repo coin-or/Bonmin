@@ -11,34 +11,41 @@
 #include <CouenneCutGenerator.h>
 #include <CouenneProblem.h>
 
+#define OBBT_EPS 1e-3
 
 /// reoptimize and change bound of a variable if needed
 bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 		  int sense,               /// 1: minimize, -1: maximize
-		  CouNumber &bound) {      /// bound to be updated
+		  CouNumber &bound,        /// bound to be updated
+		  bool isint) {            /// is this variable integer
 
-  double opt;
-
-  csi -> setObjSense  (sense); // MINIMIZE
+  csi -> setObjSense (sense);
   csi -> resolve ();
 
-  if (csi -> isProvenOptimal () && 
-      ((sense > 0) && ((opt = csi -> getObjValue ()) > bound + COUENNE_EPS)) ||
-      ((sense < 0) && ((opt = csi -> getObjValue ()) < bound - COUENNE_EPS))) {
+  if (csi -> isProvenOptimal ()) {
 
-    bound = opt;
+    double opt = csi -> getObjValue ();
+
+    if      ((sense>0) && (opt > bound+OBBT_EPS)) bound = (isint ? ceil (opt) : (opt-OBBT_EPS));
+    else if ((sense<0) && (opt < bound-OBBT_EPS)) bound = (isint ? floor(opt) : (opt+OBBT_EPS));
+    else return false;
+
     return true;
   }
   else return false;
 }
+
 
 /// Optimality based bound tightening
 int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
 			       OsiCuts &cs,
 			       char *chg_bds,
 			       Bonmin::BabInfo * babInfo) const {
+  int 
+    nImprov = 0, 
+    ncols   = si.getNumCols (),
+    objind  = problem_ -> Obj (0) -> Body () -> Index ();
 
-  int nImprov = 0, ncols = si.getNumCols ();
   double *objcoe = (double *) malloc (ncols * sizeof (double));
 
   // set obj function coefficients to zero
@@ -53,31 +60,52 @@ int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
   csi -> applyCuts (cs);
 
   // for all (original+auxiliary) variables x_i,
-  for (int i=0; i<ncols; i++) {
+  for (int i=0; i<ncols; i++) 
 
-    CouNumber opt;
-    bool chg = false;
+    if (i != objind) { // do not improve objective's bounds
 
-    objcoe [i] = 1;
-    csi -> setObjective (objcoe);
+      CouNumber opt;
+      bool chg = false;
+      int nOrig = problem_ -> nVars ();
+      bool isInt = (i < nOrig) ? 
+	(problem_ -> Var (i)       -> isInteger ()) :
+	(problem_ -> Aux (i-nOrig) -> isInteger ());
 
-    // minimize and then maximize x_i on si.
+      objcoe [i] = 1;
+      csi -> setObjective (objcoe);
 
-    chg = updateBound (csi,  1, problem_ -> Lb (i));
-    chg = updateBound (csi, -1, problem_ -> Ub (i)) || chg;
+      // minimize and then maximize x_i on si.
 
-    if (chg) {
+      CouNumber l0 = problem_ -> Lb (i);
+      CouNumber u0 = problem_ -> Ub (i);
 
-      if (!(boundTightening (si, cs, chg_bds, babInfo)))
-	return -1; // return value to signal infeasibility
+      if (updateBound (csi,  1, problem_ -> Lb (i), isInt)) {
+	csi -> setColLower (i, problem_ -> Lb (i));
+	chg = true;
+      }
+      
+      if (updateBound (csi, -1, problem_ -> Ub (i), isInt)) {
+	csi -> setColUpper (i, problem_ -> Ub (i));
+	chg = true;
+      }
 
-      chg_bds [i] = 1;
-      nImprov++;
+      if (chg) {
+	/*
+	printf ("%d: [%g,%g] --> [%g,%g]\n", i,
+		l0, u0, 
+		problem_ -> Lb (i),
+		problem_ -> Ub (i));
+	*/
+	if (!(boundTightening (si, cs, chg_bds, babInfo)))
+	  return -1; // tell caller this is infeasible
+
+	chg_bds [i] = 1;
+	nImprov++;
+      }
+
+      // restore null obj fun
+      objcoe [i] = 0;
     }
-
-    // restore null obj fun
-    objcoe [i] = 0;
-  }
 
   delete csi;
   return nImprov;

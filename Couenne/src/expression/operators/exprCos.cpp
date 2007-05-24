@@ -33,9 +33,9 @@ expression *exprCos::differentiate (int index) {
 
 // compute bounds of sin x given bounds of x 
 void exprCos::getBounds (expression *&lb, expression *&ub) {
-  lb = new exprConst (-1); 
-  ub = new exprConst (1);
-  return;
+  //  lb = new exprConst (-1); 
+  //  ub = new exprConst (1);
+  //  return;
 
   // TODO
   expression *xl, *xu;

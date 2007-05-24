@@ -15,7 +15,7 @@
 #include <exprCos.h>
 #include <exprAux.h>
 
-//#define NEW_TRIG
+#define NEW_TRIG
 
 /// convex cuts for sine or cosine
 void trigEnvelope (const CouenneCutGenerator *, OsiCuts &,
@@ -158,13 +158,15 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
   CouNumber tpt,
     rx0  = modulo (x0 + displacement, 2*M_PI),
     rx1  = rx0 + x1 - x0,
-    base = x0 + displacement - rx0,
+    base = x0 - rx0,
     sinrx0 = sin (rx0), zero;
 
   int
-    up   = (modulo (rx0, 2*M_PI) < M_PI) ? +1 : -1,
-    left = (x0 < x1)                     ? +1 : -1;
+    //    up   = (modulo (rx0, 2*M_PI) < M_PI) ? +1 : -1,
+    up   = (rx0 < M_PI) ? +1 : -1,
+    left = (x0  < x1)   ? +1 : -1;
 
+  // starting point of the current bay
   zero = (up>0) ? 0. : M_PI;
 
   bool *s0, *s1;

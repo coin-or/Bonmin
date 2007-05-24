@@ -53,13 +53,16 @@ class exprLBSin: public exprOp {
 
 inline CouNumber exprLBSin::operator () () {
 
-  register CouNumber l = (*(arglist_ [0])) ();
-  register CouNumber u = (*(arglist_ [1])) ();
+  register CouNumber 
+    l = (*(arglist_ [0])) (),
+    u = (*(arglist_ [1])) ();
 
-  if ((u - l > 2 * M_PI) ||      // 1) interval spans whole cycle
-      (floor (l/2/M_PI - 0.75) < // 2) there is a 3/2 pi + 2k pi in between
-       floor (u/2/M_PI - 0.75))) 
-    return -1;
+  CouNumber pi2 = 2 * M_PI;
+ 
+  if ((u - l > pi2) ||        // 1) interval spans whole cycle
+      (floor (l/pi2 - 0.75) < // 2) there is a 3/2 pi + 2k pi in between
+       floor (u/pi2 - 0.75))) 
+    return -1.;
 
   return mymin (sin (l), sin (u));
 }
@@ -107,13 +110,16 @@ class exprUBSin: public exprOp {
 
 inline CouNumber exprUBSin::operator () () {
 
-  register CouNumber l = (*(arglist_ [0])) ();
-  register CouNumber u = (*(arglist_ [1])) ();
+  register CouNumber 
+    l = (*(arglist_ [0])) (),
+    u = (*(arglist_ [1])) ();
 
-  if ((u - l > 2 * M_PI) ||      // 1) interval spans whole cycle
-      (floor (l/2/M_PI - 0.25) < // 2) there is a 3/2 pi + 2k pi in between
-       floor (u/2/M_PI - 0.25))) 
-    return -1;
+  CouNumber pi2 = 2 * M_PI;
+
+  if ((u - l > pi2) ||        // 1) interval spans whole cycle
+      (floor (l/pi2 - 0.25) < // 2) there is a pi/2 + 2k pi in between
+       floor (u/pi2 - 0.25))) 
+    return 1.;
 
   return mymax (sin (l), sin (u));
 }
