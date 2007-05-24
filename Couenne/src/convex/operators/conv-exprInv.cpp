@@ -45,7 +45,7 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-#define MIN_DENOMINATOR 1e-10
+#define MIN_DENOMINATOR 1e-6
 
 // generate convexification cut for constraint w = 1/x
 
@@ -112,10 +112,10 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   cg -> addEnvelope 
     (cs, (l > 0) ? +1 : -1, 
      inv, oppInvSqr, w_ind, x_ind, 
-     (cg -> isFirst ()) ?
-       // place it somewhere in the interval (we won't care)
+     (cg -> isFirst ()) ? // is this first call?
+       // place it somewhere in the interval (we don't care)
        ((l > COUENNE_EPS) ? l : u) :
-       // not first call, gotta replace it where it gives deepest cut
+       // otherwise, replace it where it gives deepest cut
        powNewton ((*argument_) (), (*aux) (), inv, oppInvSqr, inv_dblprime),
      l, u);
 

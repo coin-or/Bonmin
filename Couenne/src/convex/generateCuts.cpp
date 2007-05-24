@@ -212,7 +212,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	genColCuts (si, cs, nchanged, changed);
 
 	int nCurCuts = cs.sizeRowCuts ();
-	//	genRowCuts (si, cs, nchanged, changed);
+	genRowCuts (si, cs, nchanged, changed);
 	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
       }
 

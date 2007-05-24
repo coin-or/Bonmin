@@ -12,3 +12,6 @@
 - recognition of quadratic forms
 - q.f. partitioning into PD + nonconvex
 - (reverse Polish notation)-based evaluation for efficiency
+- create CouenneTMINLP interface for Ipopt
+- separate function evaluation lib from convexification
+- QQP convexification

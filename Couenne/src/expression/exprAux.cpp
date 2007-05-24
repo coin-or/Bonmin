@@ -49,6 +49,10 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   int j = cs.sizeRowCuts ();
   CouNumber l, u;
 
+  /*printf ("### Generating cut for "); 
+  print (std::cout);  printf (" := ");
+  image_ -> print (std::cout); printf ("\n");*/
+
   if ((!(cg -> isFirst ())) && 
       (fabs ((l = expression::Lbound (varIndex_)) - 
              (u = expression::Ubound (varIndex_))) < COUENNE_EPS))
@@ -57,7 +61,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   // check if cuts have coefficients, rhs too large or too small
 
-  for (int jj=j; jj < cs.sizeRowCuts ();jj++) {
+  for (int jj=j; jj < cs.sizeRowCuts (); jj++) {
 
     int           n   = cs.rowCutPtr (jj) -> row (). getNumElements();
     const double *el  = cs.rowCutPtr (jj) -> row (). getElements ();
@@ -65,10 +69,14 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
     double        rhs = cs.rowCutPtr (jj) -> rhs ();
 
     while (n--)
-      if      (fabs (el [n]) > 1e9)  printf ("coefficient too large: %.12e x%d\n", el [n], ind [n]);
+      if      (fabs (el [n]) > COU_MAX_COEFF)  {
+	printf ("coefficient too large: %.12e x%d\n", el [n], ind [n]);
+      }
     //   else if (fabs (el[n]) < 1e-10) printf ("coefficient too small: %g x%d\n", el [n], ind [n]);
 
-    if      (fabs (rhs) > 1e9)  printf ("rhs too large: %.12e\n", rhs);
+    if      (fabs (rhs) > COU_MAX_COEFF) {
+      printf ("rhs too large: %.12e\n", rhs);
+    }
     //    else if (fabs (rhs) < 1e-10) printf ("rhs too small: %g\n", rhs);
   }
 

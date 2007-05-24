@@ -22,7 +22,15 @@ void trigEnvelope (const CouenneCutGenerator *, OsiCuts &,
 		   exprAux *, expression *, enum cou_trig);
 
 
-// generate convexification cut for constraint w = sin (this)
+/// 
+void addHexagon (const CouenneCutGenerator *, // cut generator that has called us
+		 OsiCuts &,      // cut set to be enriched
+		 enum cou_trig,  // sine or cosine
+		 exprAux *,      // auxiliary variable
+		 expression *);  // argument of cos/sin (should be a variable)
+
+
+/// generate convexification cut for constraint w = sin (this)
 
 void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
@@ -30,12 +38,12 @@ void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si,
 #ifdef NEW_TRIG
   trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_SINE);
 #else
-  addHexagon (cg, cs, sin, w, w -> Image () -> Argument());
+  addHexagon (cg, cs, COU_SINE, w, w -> Image () -> Argument());
 #endif
 }
 
 
-// generate convexification cut for constraint w = cos (this)
+/// generate convexification cut for constraint w = cos (this)
 
 void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
@@ -43,18 +51,20 @@ void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si,
 #ifdef NEW_TRIG
   trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_COSINE);
 #else
-  addHexagon (cg, cs, cos, w, w -> Image () -> Argument());
+  addHexagon (cg, cs, COU_COSINE, w, w -> Image () -> Argument());
 #endif
 }
 
 
-// add lateral edges of the hexagon providing 
+/// add lateral edges of the hexagon providing 
 
 void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called us
 		 OsiCuts &cs,       // cut set to be enriched
-		 unary_function f,  // sine or cosine
+		 enum cou_trig tt,  // sine or cosine
 		 exprAux *aux,      // auxiliary variable
 		 expression *arg) { // argument of cos/sin (should be a variable)
+
+  unary_function fn = (tt == COU_SINE) ? sin : cos;
 
   expression *lbe, *ube;
   arg -> getBounds (lbe, ube);
@@ -64,25 +74,32 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
 
   int x_ind = arg -> Index ();
   int w_ind = aux -> Index ();
-  /*
+
   if (fabs (ub - lb) < COUENNE_EPS) {
 
     CouNumber x0 = 0.5 * (ub+lb), f, fp;
 
-    if (which_trig == COU_SINE) {f = sin (x0); fp =  cos (x0);}
-    else                        {f = cos (x0); fp = -sin (x0);}
+    if (tt == COU_SINE) {f = sin (x0); fp =  cos (x0);}
+    else                {f = cos (x0); fp = -sin (x0);}
 
     cg -> createCut (cs, f - fp*x0, 0, w_ind, 1., x_ind, -fp);
     return;
   }
-  */
-  // add the lower envelope
-  cg -> createCut (cs, f (lb) - lb, -1, w_ind, 1., x_ind, -1.); // left:  w - x <= f lb - lb 
-  cg -> createCut (cs, f (ub) + ub, -1, w_ind, 1., x_ind,  1.); // right: w + x <= f ub + ub 
 
-  // add the upper envelope
-  cg -> createCut (cs, f (ub) - ub, +1, w_ind, 1., x_ind, -1.); // right: w - x >= cos ub - ub 
-  cg -> createCut (cs, f (lb) + lb, +1, w_ind, 1., x_ind,  1.); // left:  w + x >= cos lb + lb 
+  // add  /    \ envelope
+  //      \    /
+
+  // left
+  if (lb > -COUENNE_INFINITY) { // if not unbounded
+    cg -> createCut (cs, fn (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w - x <= f lb - lb 
+    cg -> createCut (cs, fn (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w + x >= f lb + lb 
+  }
+
+  // right
+  if (ub <  COUENNE_INFINITY) { // if not unbounded
+    cg -> createCut (cs, fn (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
+    cg -> createCut (cs, fn (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
+  }
 
   delete lbe;
   delete ube;
@@ -138,12 +155,14 @@ void trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has call
   bool skip_up = false, 
        skip_dn = false;
 
-  bayEnvelope (cg, cs, wi, xi, lb, ub, displacement, skip_up, skip_dn); // lb
-  bayEnvelope (cg, cs, wi, xi, ub, lb, displacement, skip_up, skip_dn); // ub
+  if (lb > -COUENNE_INFINITY) bayEnvelope (cg, cs, wi, xi, lb, ub, displacement, skip_up, skip_dn);
+  if (ub <  COUENNE_INFINITY) bayEnvelope (cg, cs, wi, xi, ub, lb, displacement, skip_up, skip_dn);
 }
 
 
-// study single bay ( \__/ or /~~\ ) of the trigonometric function
+//                             __
+// study single bay ( \__/ or /  \ ) of the trigonometric function
+//
 
 int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called us
 		 OsiCuts &cs,                   // cut set to be enriched

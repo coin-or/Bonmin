@@ -223,17 +223,18 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	|| (fabs (k-0.5) < 0.5 - COUENNE_EPS))                       // k in [0,1]
       sign = -1;
 
-    // upper envelope -- when k negative, add only if
-
-    CouNumber powThres = pow (COU_MAX_COEFF, 1./k), // don't want big coefficients
+    CouNumber powThres = mymin (COUENNE_INFINITY, 
+				pow (COU_MAX_COEFF, 1./k)), // don't want big coefficients
               powStep  = 1;
 
-    if ((  (k > COUENNE_EPS)
-	|| (l > COUENNE_EPS)       // bounds do not contain 0
+    // upper envelope
+
+    if ((  (k > COUENNE_EPS)        // when k negative, add only if
+	|| (l > COUENNE_EPS)        // bounds do not contain 0
 	|| (u < - COUENNE_EPS)) &&
-	(l > - powThres) &&    // and are finite
+	(l > - powThres) &&         // and are finite
 	(u <   powThres) &&
-	(fabs (l+u) > COUENNE_EPS)) // bounds are not opposite
+	(fabs (l+u) > COUENNE_EPS)) // bounds are not opposite (otherwise it's a variable bound)
 
       cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l, k), u, safe_pow (u, k), -sign);
 

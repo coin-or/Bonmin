@@ -66,10 +66,10 @@ CouNumber trigNewton (CouNumber, CouNumber, CouNumber);
 
 /// convex envelope for sine/cosine 
 
-void addHexagon (const CouenneCutGenerator *, // pointer to the caller cut generator 
-		 OsiCuts &,      // cut set to be enriched
-		 unary_function, // sine or cosine
-		 exprAux *,      // auxiliary variable
-		 expression *);  // argument of cos/sin (should be a variable)
+//void addHexagon (const CouenneCutGenerator *, // pointer to the caller cut generator 
+//		 OsiCuts &,      // cut set to be enriched
+//		 unary_function, // sine or cosine
+//		 exprAux *,      // auxiliary variable
+//		 expression *);  // argument of cos/sin (should be a variable)
 
 #endif

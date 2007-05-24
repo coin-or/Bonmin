@@ -37,7 +37,6 @@ void exprCos::getBounds (expression *&lb, expression *&ub) {
   //  ub = new exprConst (1);
   //  return;
 
-  // TODO
   expression *xl, *xu;
   argument_ -> getBounds (xl, xu);
 
