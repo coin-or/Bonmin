@@ -19,6 +19,9 @@ bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 		  CouNumber &bound,        /// bound to be updated
 		  bool isint) {            /// is this variable integer
 
+  csi -> setDblParam (OsiDualObjectiveLimit, 
+		      (sense == 1) ? COUENNE_INFINITY : -COUENNE_INFINITY); 
+
   csi -> setObjSense (sense);
   csi -> resolve ();
 
@@ -26,13 +29,11 @@ bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 
     double opt = csi -> getObjValue ();
 
-    if      ((sense>0) && (opt > bound+OBBT_EPS)) bound = (isint ? ceil (opt) : (opt-OBBT_EPS));
-    else if ((sense<0) && (opt < bound-OBBT_EPS)) bound = (isint ? floor(opt) : (opt+OBBT_EPS));
-    else return false;
-
-    return true;
+    if (sense > 0) {if (opt > bound + OBBT_EPS) {bound = (isint ? ceil  (opt) : opt); return true;}}
+    else           {if (opt < bound - OBBT_EPS) {bound = (isint ? floor (opt) : opt); return true;}}
   }
-  else return false;
+
+  return false;
 }
 
 
@@ -64,10 +65,9 @@ int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
 
     if (i != objind) { // do not improve objective's bounds
 
-      CouNumber opt;
-      bool chg = false;
       int nOrig = problem_ -> nVars ();
-      bool isInt = (i < nOrig) ? 
+      bool chg  = false, 
+	isInt   = (i < nOrig) ? 
 	(problem_ -> Var (i)       -> isInteger ()) :
 	(problem_ -> Aux (i-nOrig) -> isInteger ());
 
@@ -75,9 +75,6 @@ int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
       csi -> setObjective (objcoe);
 
       // minimize and then maximize x_i on si.
-
-      CouNumber l0 = problem_ -> Lb (i);
-      CouNumber u0 = problem_ -> Ub (i);
 
       if (updateBound (csi,  1, problem_ -> Lb (i), isInt)) {
 	csi -> setColLower (i, problem_ -> Lb (i));
@@ -90,14 +87,11 @@ int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
       }
 
       if (chg) {
-	/*
-	printf ("%d: [%g,%g] --> [%g,%g]\n", i,
-		l0, u0, 
-		problem_ -> Lb (i),
-		problem_ -> Ub (i));
-	*/
-	if (!(boundTightening (si, cs, chg_bds, babInfo)))
+
+	if (!(boundTightening (si, cs, chg_bds, babInfo))) {
+	  delete csi;
 	  return -1; // tell caller this is infeasible
+	}
 
 	chg_bds [i] = 1;
 	nImprov++;

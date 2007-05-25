@@ -115,10 +115,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     //////////////////////// GET CHANGED BOUNDS DUE TO BRANCHING ////////////////////////
 
-    if (info.pass == 0) // this is the first call in this b&b node
-      problem_ -> update (const_cast <CouNumber *> (si. getColSolution ()), 
-			  const_cast <CouNumber *> (si. getColLower    ()),
-			  const_cast <CouNumber *> (si. getColUpper    ()));
+    // transmit solution from OsiSolverInterface to problem
+    problem_ -> update (const_cast <CouNumber *> (si. getColSolution ()), 
+			const_cast <CouNumber *> (si. getColLower    ()),
+			const_cast <CouNumber *> (si. getColUpper    ()));
 
     if (info.inTree) {
 
@@ -188,7 +188,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
-  //#define USE_OBBT
+#define USE_OBBT
 #ifdef USE_OBBT
   if ((!firstcall_ || (info.pass > 0)) && 
       (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1))) {

@@ -15,3 +15,4 @@
 - create CouenneTMINLP interface for Ipopt
 - separate function evaluation lib from convexification
 - QQP convexification
+- MILP + MINLP for some operators
