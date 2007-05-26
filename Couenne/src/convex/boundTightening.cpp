@@ -28,55 +28,59 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 
   /////////////////////// MIP bound management /////////////////////////////////
 
-  if (objInd < 0) objInd = 0; 
+  if ((objInd >= 0) && babInfo && (babInfo -> babPtr ())) {
 
-  if (babInfo && (babInfo -> babPtr ())) {
-
-    CouNumber primal  = babInfo  -> babPtr () -> model (). getObjValue(),
-              dual    = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
+    CouNumber UB      = babInfo  -> babPtr () -> model (). getObjValue(),
+              LB      = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
               primal0 = problem_ -> Ub (objInd), 
               dual0   = problem_ -> Lb (objInd);
 
     // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
     // (LOWER) bound.
+    
+    if ((UB < COUENNE_INFINITY) && 
+	(UB < primal0 - COUENNE_EPS)) {
+      // update primal bound (MIP)
 
-    if ((primal <   COUENNE_INFINITY - 1) && (primal < primal0)) { // update primal bound (MIP)
-      problem_ -> Ub (objInd) = primal;
+      //      printf ("updating upper %g <-- %g\n", primal0, primal);
+      problem_ -> Ub (objInd) = UB;
+      chg_bds [objInd] = 1;
+    }
+    
+    if ((LB   > - COUENNE_INFINITY) && 
+	(LB   > dual0 + COUENNE_EPS)) { // update dual bound
+      problem_ -> Lb (objInd) = LB;
       chg_bds [objInd] = 1;
     }
 
-    if ((dual   > - COUENNE_INFINITY + 1) && (dual   > dual0)) { // update dual bound
-      problem_ -> Lb (objInd) = dual;
-      chg_bds [objInd] = 1;
-    }
-  }
+    //////////////////////// Reduced cost bound tightening //////////////////////
 
-  //////////////////////// Reduced cost bound tightening //////////////////////
+    // do it only if a linear convexification is in place already
 
-  // do it only if a linear convexification is in place already
-
-  if ((objInd >= 0) && !firstcall_) {
-
+    if (!firstcall_) {
+      /*
     CouNumber 
       LB = si.getObjValue (), 
       UB = (babInfo && (babInfo -> babPtr ())) ? 
               babInfo  -> babPtr () -> model (). getObjValue() : 
               problem_ -> Ub (objInd);
+      */
 
-    if ((LB > -COUENNE_INFINITY) && (UB < COUENNE_INFINITY)) {
-      int ncols = si.getNumCols ();
+      if ((LB > -COUENNE_INFINITY) && (UB < COUENNE_INFINITY)) {
+	int ncols = si.getNumCols ();
 
-      for (int i=0; i<ncols; i++) {
+	for (int i=0; i<ncols; i++) {
 
-	CouNumber 
-	  x  = si.getColSolution () [i],
-	  rc = si.getReducedCost () [i],
-	  dx = problem_ -> Ub (i) - x;
+	  CouNumber 
+	    x  = si.getColSolution () [i],
+	    rc = si.getReducedCost () [i],
+	    dx = problem_ -> Ub (i) - x;
 
-	if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
-	  // can improve bound on variable w_i
-	  problem_ -> Ub (i) = x + (UB-LB) / rc;
-	  chg_bds [i] = 1;
+	  if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
+	    // can improve bound on variable w_i
+	    problem_ -> Ub (i) = x + (UB-LB) / rc;
+	    chg_bds [i] = 1;
+	  }
 	}
       }
     }

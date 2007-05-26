@@ -18,12 +18,12 @@
 #define NEW_TRIG
 
 /// convex cuts for sine or cosine
-void trigEnvelope (const CouenneCutGenerator *, OsiCuts &,
+int trigEnvelope (const CouenneCutGenerator *, OsiCuts &,
 		   exprAux *, expression *, enum cou_trig);
 
 
 /// 
-void addHexagon (const CouenneCutGenerator *, // cut generator that has called us
+int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
 		 OsiCuts &,      // cut set to be enriched
 		 enum cou_trig,  // sine or cosine
 		 exprAux *,      // auxiliary variable
@@ -36,10 +36,13 @@ void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
 #ifdef NEW_TRIG
-  trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_SINE);
+  if (trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_SINE) == 0)
 #else
-  addHexagon (cg, cs, COU_SINE, w, w -> Image () -> Argument());
+  if (addHexagon (cg, cs, COU_SINE, w, w -> Image () -> Argument()) == 0)
 #endif
+    {
+
+    }
 }
 
 
@@ -49,16 +52,19 @@ void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg) {
 
 #ifdef NEW_TRIG
-  trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_COSINE);
+  if (trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_COSINE) == 0) 
 #else
-  addHexagon (cg, cs, COU_COSINE, w, w -> Image () -> Argument());
+  if (addHexagon (cg, cs, COU_COSINE, w, w -> Image () -> Argument()) == 0)
 #endif
+    {
+
+    }
 }
 
 
 /// add lateral edges of the hexagon providing 
 
-void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called us
+int addHexagon (const CouenneCutGenerator *cg, // cut generator that has called us
 		 OsiCuts &cs,       // cut set to be enriched
 		 enum cou_trig tt,  // sine or cosine
 		 exprAux *aux,      // auxiliary variable
@@ -66,14 +72,19 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
 
   unary_function fn = (tt == COU_SINE) ? sin : cos;
 
+  // retrieve argument bounds
   expression *lbe, *ube;
   arg -> getBounds (lbe, ube);
 
   CouNumber lb = (*lbe) (), 
             ub = (*ube) ();
 
-  int x_ind = arg -> Index ();
-  int w_ind = aux -> Index ();
+  delete lbe;
+  delete ube;
+
+  int ncuts = 0,
+    x_ind = arg -> Index (),
+    w_ind = aux -> Index ();
 
   if (fabs (ub - lb) < COUENNE_EPS) {
 
@@ -82,8 +93,7 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
     if (tt == COU_SINE) {f = sin (x0); fp =  cos (x0);}
     else                {f = cos (x0); fp = -sin (x0);}
 
-    cg -> createCut (cs, f - fp*x0, 0, w_ind, 1., x_ind, -fp);
-    return;
+    return cg -> createCut (cs, f - fp*x0, 0, w_ind, 1., x_ind, -fp);
   }
 
   // add  /    \ envelope
@@ -91,18 +101,17 @@ void addHexagon (const CouenneCutGenerator *cg, // cut generator that has called
 
   // left
   if (lb > -COUENNE_INFINITY) { // if not unbounded
-    cg -> createCut (cs, fn (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w - x <= f lb - lb 
-    cg -> createCut (cs, fn (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w + x >= f lb + lb 
+    ncuts += cg -> createCut (cs, fn (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w-x <= f lb - lb 
+    ncuts += cg -> createCut (cs, fn (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w+x >= f lb + lb 
   }
 
   // right
   if (ub <  COUENNE_INFINITY) { // if not unbounded
-    cg -> createCut (cs, fn (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
-    cg -> createCut (cs, fn (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
+    ncuts += cg -> createCut (cs, fn (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
+    ncuts += cg -> createCut (cs, fn (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
   }
 
-  delete lbe;
-  delete ube;
+  return ncuts;
 }
 
 
@@ -118,7 +127,7 @@ int bayEnvelope (const CouenneCutGenerator *, OsiCuts &, int, int,
 
 /// real linearization of sine/cosine
 
-void trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has called us
+int trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has called us
 		   OsiCuts &cs,                   // cut set to be enriched
 		   exprAux *w,
 		   expression *arg,
@@ -131,13 +140,14 @@ void trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has call
   CouNumber lb = (*lbe) (), 
             ub = (*ube) (),
             // if cosine, scale variables to pretend this is a sine problem
-            displacement = (which_trig == COU_COSINE) ? M_PI_2 : 0.;
+            displ = (which_trig == COU_COSINE) ? M_PI_2 : 0.;
 
   delete lbe;
   delete ube;
 
-  int xi = arg -> Index (),
-      wi = w   -> Index ();
+  int ncuts = 0,
+    xi = arg -> Index (),
+    wi = w   -> Index ();
 
   if (fabs (ub - lb) < COUENNE_EPS) {
 
@@ -146,8 +156,7 @@ void trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has call
     if (which_trig == COU_SINE) {f = sin (x0); fp =  cos (x0);}
     else                        {f = cos (x0); fp = -sin (x0);}
 
-    cg -> createCut (cs, f - fp*x0, 0, wi, 1., xi, -fp);
-    return;
+    return cg -> createCut (cs, f - fp*x0, 0, wi, 1., xi, -fp);
   }
 
   // true if, in the first call (lb), a lower/upper chord was added
@@ -155,8 +164,10 @@ void trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has call
   bool skip_up = false, 
        skip_dn = false;
 
-  if (lb > -COUENNE_INFINITY) bayEnvelope (cg, cs, wi, xi, lb, ub, displacement, skip_up, skip_dn);
-  if (ub <  COUENNE_INFINITY) bayEnvelope (cg, cs, wi, xi, ub, lb, displacement, skip_up, skip_dn);
+  if (lb > -COUENNE_INFINITY) ncuts += bayEnvelope (cg, cs, wi, xi, lb, ub, displ, skip_up, skip_dn);
+  if (ub <  COUENNE_INFINITY) ncuts += bayEnvelope (cg, cs, wi, xi, ub, lb, displ, skip_up, skip_dn);
+
+  return ncuts;
 }
 
 
@@ -180,8 +191,7 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
     base = x0 - rx0,
     sinrx0 = sin (rx0), zero;
 
-  int
-    //    up   = (modulo (rx0, 2*M_PI) < M_PI) ? +1 : -1,
+  int ncuts = 0,
     up   = (rx0 < M_PI) ? +1 : -1,
     left = (x0  < x1)   ? +1 : -1;
 
@@ -200,7 +210,7 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
 
     // out of the "belly": tangent. If on upper bay we consider the
     // lower half-plane, and viceversa --> use -up
-    cg -> addTangent (cs, wi, xi, x0, sin (rx0), cos (rx0), -up);
+    ncuts += cg -> addTangent (cs, wi, xi, x0, sin (rx0), cos (rx0), -up);
 
     // leftmost extreme to search for tangent point
     CouNumber extr0 = .75 * M_PI * (left+1) - M_PI_2 * up; 
@@ -210,8 +220,8 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
 	(left * (rx1 - (tpt = trigNewton
 			(rx0, extr0, extr0 + M_PI_2))) <= 0)) { // before closest leaning point 
       if (!*s1) // -> chord, if not already added in previous call
-	*s1 = (cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,         sin (rx1), up) > 0);
-    } else     cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
+	*s1 = ((ncuts += cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,  sin (rx1), up)) > 0);
+    } else      ncuts += cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
   }
   else {
 
@@ -223,30 +233,29 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
       CouNumber cosrx0 = cos (rx0);
       if (up * (sin (rx1) - sinrx0 - cosrx0 * (rx1-rx0)) < 0) 
 	// (b,sinb) below tangent --> tangent
-	cg -> addTangent (cs, wi, xi, x0, sinrx0, cosrx0, -up);
+	ncuts += cg -> addTangent (cs, wi, xi, x0, sinrx0, cosrx0, -up);
       else {    // up: either chord or leaning plane
 	CouNumber searchpt = M_PI_2 * (2 + 3*left - up);
 	tpt = trigNewton (rx0, searchpt, searchpt + left * M_PI_2);
 	if (left * (rx1 - tpt) < 0) {
 	  if (!*s0)
-	    *s0 = cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,         sin (rx1), -up) > 0;
-	} else    cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
+	    *s0 = ((ncuts += cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1, sin (rx1), -up)) > 0);
+	} else      ncuts += cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
       }
     } else {
       CouNumber searchpt = M_PI_2 * (2 + 3*left - up);
       tpt = trigNewton (rx0, searchpt, searchpt + left * M_PI_2);
-      cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
+      ncuts += cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), -up);
     }
 
     // down: other chord or leaning plane
     if ((left * (rx1 - (zero + M_PI)) < 0) || 
-	(left * (rx1 - (tpt = trigNewton (rx0, 
-					  (2 +   left - up) * M_PI_2, 
-					  (2 + 2*left - up) * M_PI_2))) < 0)) {
+	(left * (rx1 - (tpt = trigNewton (rx0, (2 +   left - up) * M_PI_2, 
+		  			       (2 + 2*left - up) * M_PI_2))) < 0)) {
       if (!*s1) 
-	*s1 = (cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1,         sin (rx1), up) > 0);
-    } else     cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
+	*s1 = ((ncuts += cg -> addSegment (cs, wi, xi, x0, sin (rx0), x1, sin (rx1), up)) > 0);
+    } else      ncuts += cg -> addSegment (cs, wi, xi, x0, sin (rx0), base + tpt, sin (tpt), up);
   }
 
-  return 0;
+  return ncuts;
 }

@@ -29,84 +29,89 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
 
   /*printf ("tighten========================\n");
 
-  for (int i=0; i<nVars(); i++) 
-    printf ("x_%d [%g, %g]\n", i, 
-	    expression::Lbound (i),
-	    expression::Ubound (i));*/
+  for (int i=0; i < nVars () + nAuxs (); i++) 
+    if ((i < nVars ()) || (Aux (i-nVars ()) -> Multiplicity () > 0))
+      printf ("x_%d [%g, %g]\n", i, 
+	      expression::Lbound (i),
+	      expression::Ubound (i));*/
 
   for (register int i = nVars (), j=0; 
-       j < naux; j++) {
+       j < naux; j++) 
 
-    //    for (int j=0; j<nAuxs () + nVars (); j++ )
-    //      printf ("+++ %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
+    if (Aux (j) -> Multiplicity () > 0) {
 
-    /*    printf ("w_%d [%g, %g] ", i+j,
+      //    for (int j=0; j<nAuxs () + nVars (); j++ )
+      //      printf ("+++ %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
+
+      /*    printf ("w_%d [%g, %g] ", i+j,
 	    expression::Lbound (i+j),
 	    expression::Ubound (i+j));*/
 
-    CouNumber ll = (*(Aux (j) -> Lb ())) (),
-              uu = (*(Aux (j) -> Ub ())) ();
+      CouNumber ll = (*(Aux (j) -> Lb ())) (),
+	uu = (*(Aux (j) -> Ub ())) ();
 
-    //    printf (" ---> [%g, %g]\n ", ll, uu);
+      //    printf (" ---> [%g, %g]\n ", ll, uu);
 
-    /*auxiliaries_ [j] -> print (std::cout);
-    printf (" := ");
-    auxiliaries_ [j] -> Image () -> print (std::cout); fflush (stdout);
-    printf ("\n");*/
+      /*auxiliaries_ [j] -> print (std::cout);
+	printf (" := ");
+	auxiliaries_ [j] -> Image () -> print (std::cout); fflush (stdout);
+	printf ("\n");*/
 
-    if (ll > uu + COUENNE_EPS) {
+      if (ll > uu + COUENNE_EPS) {
+	/*
+	printf ("w_%d has infeasible bounds [%g,%g]: ", i+j, ll, uu);
+	Aux (j) -> Lb () -> print (std::cout); printf (" --- ");
+	Aux (j) -> Ub () -> print (std::cout); printf ("\n");
+	*/
+	return -1; // declare this node infeasible
+      }
 
-      //      printf ("w_%d has infeasible bounds [%g,%g]: ", i+j, ll, uu);
-      //      Aux (j) -> Lb () -> print (std::cout); printf (" - ");
-      //      Aux (j) -> Ub () -> print (std::cout); printf ("\n");
+      bool chg = false;
 
-      return -1; // declare this node infeasible
+      // check if lower bound got higher    
+      if ((ll > - COUENNE_INFINITY) && (ll >= lb_ [i+j] + COUENNE_EPS)) {
+
+	/*printf ("update lbound %d: %.10e >= %.10e + %.12e\n", 
+	  i+j, ll, lb_ [i+j], COUENNE_EPS);*/
+
+	/*printf ("update lbound %d: %g >= %g\n", 
+	  i+j, ll, lb_ [i+j]);*/
+
+	/*printf ("propa %2d [%g,(%g)] -> [%g,(%g)] (%g)", 
+		i+j, lb_ [i+j], ub_ [i+j], ll, uu, lb_ [i+j] - ll);
+	Aux (j)             -> print (std::cout); printf (" := ");
+	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+
+	lb_ [i+j] = ll;
+	chg = true;
+      }
+
+      // check if upper bound got lower
+      if ((uu < COUENNE_INFINITY) && (uu <= ub_ [i+j] - COUENNE_EPS)) {
+
+	/*printf ("update ubound %d: %.10e <= %.10e - %.12e (%.12e)\n", 
+	  i+j, uu, ub_ [i+j], COUENNE_EPS, uu - ub_ [i+j]);*/
+	/*printf ("update ubound %d: %g >= %g\n", 
+	  i+j, uu, ub_ [i+j]);*/
+
+	/*printf ("propa %2d [(%g),%g] -> [(%g),%g] (%g)", 
+		i+j, lb_ [i+j], ub_ [i+j], ll, uu, ub_ [i+j] - uu);
+	Aux (j)             -> print (std::cout); printf (" := ");
+	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+
+	ub_ [i+j] = uu;
+	chg = true;
+      }
+
+      if (chg && chg_bds && !(chg_bds [i+j])) {
+	nchg++;
+	chg_bds [i+j] = 1; 
+      }
+
+      // useless if assume expression::[lu]b_ etc already point to
+      // problem::[lu]b_
+      expression::update (NULL, lb_, ub_);
     }
-
-    bool chg = false;
-
-    // check if lower bound got higher    
-    if ((ll > - COUENNE_INFINITY + 1) && (ll >= lb_ [i+j] + COUENNE_EPS)) {
-
-      /*printf ("update lbound %d: %.10e >= %.10e + %.12e\n", 
-	i+j, ll, lb_ [i+j], COUENNE_EPS);*/
-
-      /*printf ("update lbound %d: %g >= %g\n", 
-	i+j, ll, lb_ [i+j]);*/
-
-      //      printf (" propaga: [%g,(%g)] -> [%g,(%g)] ", lb_ [i+j], ub_ [i+j], ll, uu);
-      //      Aux (j)             -> print (std::cout); printf (" := ");
-      //      Aux (j) -> Image () -> print (std::cout); printf ("\n");
-
-      lb_ [i+j] = ll;
-      chg = true;
-    }
-
-    // check if upper bound got lower
-    if ((uu < COUENNE_INFINITY - 1) && (uu <= ub_ [i+j] - COUENNE_EPS)) {
-
-      /*printf ("update ubound %d: %.10e <= %.10e - %.12e (%.12e)\n", 
-	i+j, uu, ub_ [i+j], COUENNE_EPS, uu - ub_ [i+j]);*/
-      /*printf ("update ubound %d: %g >= %g\n", 
-	i+j, uu, ub_ [i+j]);*/
-
-      //      printf (" propaga: [(%g),%g] -> [(%g),%g] ", lb_ [i+j], ub_ [i+j], ll, uu);
-      //      Aux (j)             -> print (std::cout); printf (" := ");
-      //      Aux (j) -> Image () -> print (std::cout); printf ("\n");
-
-      ub_ [i+j] = uu;
-      chg = true;
-    }
-
-    if (chg && chg_bds && !(chg_bds [i+j])) {
-      nchg++;
-      chg_bds [i+j] = 1; 
-    }
-
-    // useless if assume expression::[lu]b_ etc already point to
-    // problem::[lu]b_
-    expression::update (NULL, lb_, ub_);
-  }
 
   return nchg;
 }

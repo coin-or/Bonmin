@@ -45,6 +45,16 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
     out << " , " << (*((*i) -> Ub ())) (); //-> print (out);
     out << " ] " << std::endl;
   }
+
+  printf ("bounds:\n");
+  for (std::vector <exprVar *>::iterator i = variables_.begin ();
+       i != variables_.end (); i++) {
+    (*i) -> print (out);
+    out << " in [" 
+	<< lb_ [(*i) -> Index ()] << ',' 
+	<< ub_ [(*i) -> Index ()] << "]\n";
+  }
+
   printf ("end\n");
 } 
 

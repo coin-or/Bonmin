@@ -20,7 +20,8 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
   int ncols = problem_ -> nVars () + problem_ -> nAuxs (),
     *indLow = new int [ncols], // indices for OsiColCut
     *indUpp = new int [ncols],
-    nLow, nUpp = nLow = 0;
+    nLow, nUpp = nLow = 0,
+    ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
 
   // values fo OsiColCut
   CouNumber *bndLow = new CouNumber [ncols],
@@ -36,6 +37,8 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
   for (int i=0; i<nchanged; i++) {
 
     register int index = changed [i];
+
+    if (index == ind_obj) continue;
 
     CouNumber bd;
 

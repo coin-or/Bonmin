@@ -16,8 +16,6 @@
 #include <CouenneProblem.h>
 
 
-//#define MAX_COEFF 1e12
-
 /// general procedure for inserting a linear cut with up to three
 /// variables. Return 1 if cut inserted, 0 if none, <0 if error
 
@@ -59,7 +57,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
     if (i2 >= 0) violation += c2 * x [i2];
     if (i3 >= 0) violation += c3 * x [i3];
 
-    // return NULL if not violated
+    // return 0 if not violated
 
     if (((violation <   COUENNE_EPS) || (sign > 0)) &&
 	((violation > - COUENNE_EPS) || (sign < 0)))
@@ -114,11 +112,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
     delete [] coeff;
     delete [] index;
 
-    // some convexification cuts (as the lower envelopes of convex
-    // functions) are global, hence here is a tool to make them valid
-    // throughout the BB tree
-
-    cut -> setGloballyValid (is_global);
+    cut -> setGloballyValid (is_global); // global?
     cs.insert (cut);
     delete cut;
   }

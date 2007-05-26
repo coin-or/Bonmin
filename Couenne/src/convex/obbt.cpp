@@ -74,15 +74,17 @@ int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
       objcoe [i] = 1;
       csi -> setObjective (objcoe);
 
-      // minimize and then maximize x_i on si.
+      // minimize...
 
-      if (updateBound (csi,  1, problem_ -> Lb (i), isInt)) {
+      if (updateBound (csi, 1, problem_ -> Lb (i), isInt)) {
 	csi -> setColLower (i, problem_ -> Lb (i));
 	chg = true;
       }
       
+      // ...and then maximize x_i on csi.
+
       if (updateBound (csi, -1, problem_ -> Ub (i), isInt)) {
-	csi -> setColUpper (i, problem_ -> Ub (i));
+	csi -> setColUpper  (i, problem_ -> Ub (i));
 	chg = true;
       }
 
