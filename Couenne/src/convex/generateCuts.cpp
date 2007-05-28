@@ -23,11 +23,12 @@
 #define COU_OBBT_CUTOFF_LEVEL 3
 
 // maximum number of obbt iterations
-#define MAX_OBBT_ITER 4
+#define MAX_OBBT_ITER 1
 
 #define LARGE_TOL (LARGE_BOUND/1e6)
 
-//
+// set and lift bound for auxiliary variable associated with objective
+// function
 void fictitiousBound (OsiCuts &cs,
 		      CouenneProblem *p, 
 		      bool action) { // true before convexifying, false afterwards
@@ -45,7 +46,7 @@ void fictitiousBound (OsiCuts &cs,
   }
   else
     if (sense>0) {if (fabs (p->Ub(ind_obj)-LARGE_BOUND)<LARGE_TOL) p->Ub(ind_obj) = COUENNE_INFINITY;}
-    else          if (fabs (p->Lb(ind_obj)+LARGE_BOUND)<LARGE_TOL) p->Lb(ind_obj) = -COUENNE_INFINITY;
+    else          if (fabs (p->Lb(ind_obj)+LARGE_BOUND)<LARGE_TOL) p->Lb(ind_obj) =-COUENNE_INFINITY;
 }
 
 
@@ -72,28 +73,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
 
-  //  if (firstcall_)
-  //    fictitiousBound (si, problem_, true);
-
   int nInitCuts = cs.sizeRowCuts ();
 
-  //  printf (":::::::::::::::::::::::: level = %d, pass = %d, intree=%d\n Bounds:\n", 
+  //  printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
   //  info.level, info.pass, info.inTree);
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
-  if (babInfo){
-    babInfo -> setFeasibleNode ();
-    
-    // PIERRE -> PIETRO
-    //HERE IS THE CODE TO OBTAIN SOLUTION JUST FOUND BY NLP SOLVER (AUXILIARIES SHOULD BE 
-    //CORRECT. SOLUTION SHOULD BE THE ONE FOUND AT THE NODE EVEN IF IT IS NOT AS GOOD AS THE
-    // BEST KNOWN.
-    // YOU CAN DELETE THE COMMENT
-    std::cout<<"Nlp solved: "<< (babInfo -> nlpSolution() != NULL) <<std::endl;
-    const double * nlpSol = babInfo -> nlpSolution();
-    babInfo -> setHasNlpSolution(false);//Have to reset it after use otherwise will stay true at next processed node.
-  }
+  if (babInfo)
+    babInfo -> setFeasibleNode ();    
+
   double now   = CoinCpuTime ();
   int    ncols = problem_ -> nVars () + problem_ -> nAuxs ();
 
@@ -201,28 +190,33 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   sparse2dense (ncols, chg_bds, changed, nchanged);
 
-  //////////////////////
-  genRowCuts (si, cs, nchanged, changed);
-  //////////////////////
+  double *nlpSol;
 
-  /*
-  if (firstcall_) {
+  //--------------------------------------------
 
-    // set trivial dual bound to objective function, if there is none
+  if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
 
-    int ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
+    // obtain solution just found by nlp solver
 
-    if (ind_obj >= 0) {
-      if (problem_ -> Obj (0) -> Sense () == MINIMIZE) {
-       if (problem_ -> Lb (ind_obj) < - LARGE_BOUND)
-         problem_ -> Lb (ind_obj) = - LARGE_BOUND;
-      }
-      else
-       if (problem_ -> Ub (ind_obj) > LARGE_BOUND)
-         problem_ -> Ub (ind_obj) = LARGE_BOUND;
-    }
+    // Auxiliaries should be correct. solution should be the one found
+    // at the node even if it is not as good as the best known.
+
+    // save violation flag and disregard it while adding cut at NLP
+    // point (which are not violated by the current, NLP, solution)
+    bool save_av = addviolated_;
+    addviolated_ = false;
+
+    // update problem current point with NLP solution
+    problem_ -> update (nlpSol, NULL, NULL);
+    genRowCuts (si, cs, nchanged, changed);  // add cuts
+
+    addviolated_ = save_av;     // restore previous value
+
+    babInfo -> setHasNlpSolution (false); // reset it after use 
   }
-  */
+  else genRowCuts (si, cs, nchanged, changed);
+
+  //---------------------------------------------
 
   // change tightened bounds through OsiCuts
   if (nchanged)
@@ -252,7 +246,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	genColCuts (si, cs, nchanged, changed);
 
 	int nCurCuts = cs.sizeRowCuts ();
-	genRowCuts (si, cs, nchanged, changed);
+	genRowCuts (si, cs, nchanged, changed);// !!!
 	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
       }
 

@@ -72,7 +72,7 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   aux -> getBounds (wle, wue);
 
-  CouNumber x;
+  //  CouNumber x;
 
   int w_ind = aux       -> Index (), 
       x_ind = argument_ -> Index ();

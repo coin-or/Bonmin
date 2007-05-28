@@ -234,12 +234,10 @@ void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u, int n) {
   }
 
   // copy arrays (do not simply make x_ point to x)
-  for (register int i = (n==-1) ? nvars : n; i--;) {
 
-    x_  [i] = x [i];
-    lb_ [i] = l [i];
-    ub_ [i] = u [i];
-  }
+  if (x) for (register int i = (n==-1) ? nvars : n; i--;)  x_  [i] = x [i];
+  if (l) for (register int i = (n==-1) ? nvars : n; i--;)  lb_ [i] = l [i];
+  if (u) for (register int i = (n==-1) ? nvars : n; i--;)  ub_ [i] = u [i];
 
   expression::update (x_, lb_, ub_);
 }

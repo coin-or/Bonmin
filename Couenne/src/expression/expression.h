@@ -230,12 +230,13 @@ class expression {
     {return 1;}
 
   /// set up branching object by evaluating many branching points for
-  /// each expression's arguments
-  CouNumber selectBranch (expression *w, 
-			  const OsiBranchingInformation *info,
-			  int &ind, 
-			  double * &brpts, 
-			  int &way)
+  /// each expression's arguments. Return estimated improvement in
+  /// objective function
+  virtual CouNumber selectBranch (expression *w, 
+				  const OsiBranchingInformation *info,
+				  int &ind, 
+				  double * &brpts, 
+				  int &way)
     {ind = -1; return 0.;}
 
   /// distance covered by current point if branching rule applied to this expression
@@ -248,8 +249,8 @@ class expression {
 };
 
 
-/// updates maximum violation. Used with all impliedBound. Returns 1
-/// if a bound has been modified, 0 otherwise
+/// updates maximum violation. Used with all impliedBound. Returns true
+/// if a bound has been modified, false otherwise
 
 inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
 

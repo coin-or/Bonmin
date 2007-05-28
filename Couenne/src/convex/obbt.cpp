@@ -55,13 +55,15 @@ int CouenneCutGenerator::obbt (const OsiSolverInterface &si,
   objcoe -= ncols;
 
   // create clone of current solver interface
+  // TODO: clone only at pass 0 and delete at the end
   OsiSolverInterface *csi = si.clone (true);
 
   // apply all (row+column) cuts to formulation
   csi -> applyCuts (cs);
 
   // for all (original+auxiliary) variables x_i,
-  for (int i=0; i<ncols; i++) 
+  for (int i=0; i<ncols; i++)
+    //  for (int i=0; i<problem_ ->nVars(); i++) 
 
     if (i != objind) { // do not improve objective's bounds
 

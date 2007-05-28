@@ -63,6 +63,16 @@ CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index,
 	rcrop_ = x + COUENNE_LCROP;
 	first_ = 0;
 	}*/
+
+  if (0) {
+    printf ("=3= x%d branches on %g and %g (at %g) [%g,%g]\n", 
+	    index_,
+	    lcrop_,
+	    rcrop_,
+	    expression::Variable (index_),
+	    expression::Lbound   (index_),
+	    expression::Ubound   (index_));
+  }
 }
 
 
@@ -101,14 +111,20 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
 
   // TODO: apply bound tightening 
 
-  /*if (0) {
-  printf (" --> [%.6e,%.6e]\n", l, u);
-  printf ("### Branch: x%d %c= %.12f\n", 
-  reference_ -> Index (), way ? '>' : '<', value_);
-  for (int i=0; i < solver -> getNumCols(); i++)
-  printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
-  solver -> getColUpper () [i]);
-  }*/
+  if (0) {
+    switch (way) {
+    case -1: printf ("#3# Branch: x%d <= %g\n",               index_, lcrop_); break; // left
+    case  0: printf ("#3# Branch: %g <= x%d <= %g\n", lcrop_, index_, rcrop_); break; // center
+    case  1: printf ("#3# Branch: x%d >= %g\n",               index_, rcrop_); break; // right
+    default: printf ("Couenne: branching on nonsense way %d\n", way);
+    }
+  }
+    /*printf (" --> [%.6e,%.6e]\n", l, u);
+    printf ("### Branch: x%d %c= %.12f\n", 
+	    reference_ -> Index (), way ? '>' : '<', value_);
+    for (int i=0; i < solver -> getNumCols(); i++)
+      printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
+      solver -> getColUpper () [i]);*/
 
   branchIndex_++;
 

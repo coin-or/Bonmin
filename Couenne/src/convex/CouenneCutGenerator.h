@@ -34,7 +34,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   mutable bool firstcall_;
 
   /// should we add the violated cuts only (true), or all of them (false)?
-  bool addviolated_;
+  mutable bool addviolated_;
 
   /// what kind of sampling should be performed?
   enum conv_type convtype_;
@@ -65,7 +65,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// bound through bestObj())
   Bonmin::Bab *BabPtr_;
 
-  /// signal infeasibility of current node (found through 
+  /// signal infeasibility of current node (found through bound tightening)
   mutable bool infeasNode_;
 
  public:

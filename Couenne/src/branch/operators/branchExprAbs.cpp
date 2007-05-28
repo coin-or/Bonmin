@@ -1,7 +1,7 @@
 /*
  * Name:    branchExprAbs.cpp
  * Author:  Pietro Belotti
- * Purpose: return branch gain and branch object for exprAbs
+ * Purpose: return branch suggestion for exprAbs
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
@@ -23,44 +23,24 @@ CouNumber exprAbs::selectBranch (expression *w,
 				 int &way) {
   ind = argument_ -> Index ();
 
-  CouNumber x0 = info -> solution_ [ind],
-            y0 = info -> solution_ [w -> Index ()];
-
   if (ind < 0) {
     printf ("argument of exprAbs has negative index\n");
     exit (-1);
   }
 
+  CouNumber x0 = info -> solution_ [ind],
+            y0 = info -> solution_ [w -> Index ()];
+
   brpts = (double *) realloc (brpts, sizeof (double));
+
+  // the smartest branching point for |x| is 0, as the two subproblems
+  // will have exact convexifications
   *brpts = 0.;
+
   way = TWO_RAND; // don't really care which subtree to visit first
 
+  // exact distance from current point to the two subsequent
+  // convexifications
   return mymin (project (1., -1., 0., x0, y0, 0., COUENNE_INFINITY,  0, NULL, NULL),
 		project (1., +1., 0., x0, y0, -COUENNE_INFINITY, 0., 0, NULL, NULL));
 }
-
-/*
-/// distance covered by current point if branching rule applied to this expression
-double exprAbs::BranchGain (expression *w, const OsiBranchingInformation *info) {
-
-  int xi = argument_ -> Index (),
-      wi = w         -> Index ();
-
-  if (xi < 0 || wi < 0) {
-    printf ("negative indices inbranchExprAbs\n");
-    exit (-1);
-  }
-
-  CouNumber x0 = expression::Variable (xi),
-            y0 = expression::Variable (wi);
-
-  return
-}
-
-/// branching object best suited for this expression
-OsiBranchingObject *exprAbs::BranchObject (expression *w, const OsiBranchingInformation *) {
-
-  // branching once on 0 is sufficient for expressions w=|x| 
-  return new CouenneBranchingObject (Argument (), 0);
-}
-*/

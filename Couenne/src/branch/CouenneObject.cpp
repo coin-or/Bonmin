@@ -46,7 +46,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
                & var  = (*reference_) ();
 
   //expression::Variable (reference_ -> Index ());
- if (0) {
+  /* if (1) {
 
     printf ("Inf: = |%.6e - %.6e| = %.6e  ",  ////[%.2f,%.2f]
 	    var, expr, 
@@ -56,6 +56,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout); printf ("\n");
   } 
+  */
 
   CouNumber delta = fabs (var - expr);
 
@@ -101,6 +102,9 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     // purpose, and save the output parameter into the branching point
     // that should be used later in createBranch.
 
+    // TODO: how to avoid this part of the code when called from
+    // CbcModel::setSolution() ?
+
     CouNumber improv = reference_ -> Image () -> selectBranch 
       (reference_, info,             // input parameters
        brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
@@ -108,11 +112,11 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     if (brVarInd_ >= 0)
       delta = improv;
 
+    if (fabs (delta) < COUENNE_EPS)
+      delta = 0.;
+
     // This should make getFixVar() useless if used in exprMul or
     // exprDiv, i.e., the only non-unary operators.
-
-    // TODO: how to avoid this part of the code when called from
-    // CbcModel::setSolution() ?
 
     // make delta a function of the variable's rank and multiplicity
 
@@ -120,6 +124,18 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
             + WEI_RANK / (1. + fixvar -> rank ())
             + WEI_MULT * (1. - 1. / fixvar -> Multiplicity ());*/
   }
+
+  if (0) {
+
+    printf ("Inf |%+.4e - %+.4e| = %+.4e  %+.4e ",  ////[%.2f,%.2f]
+	    var, expr, 
+	    //	    expression::Lbound (reference_ -> Index ()),
+	    //	    expression::Ubound (reference_ -> Index ()),
+	    fabs (var - expr), delta);
+
+    reference_             -> print (std::cout); std::cout << " = ";
+    reference_ -> Image () -> print (std::cout); printf ("\n");
+  } 
 
   return delta;
 }
@@ -145,7 +161,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
   // fix all variables upon which this auxiliary depends
 
-  if (expr -> Argument ()){ // unary function
+  if (expr -> Argument ()) { // unary function
 
     index = expr -> Argument () -> Index ();
 
@@ -197,22 +213,25 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
   bool isint = reference_ -> isInteger ();
 
-  if (0)
-  if (brVarInd_ >= 0)
+  if (brVarInd_ >= 0) // if applied latest selectBranching
     switch (way) {
     case TWO_LEFT:
     case TWO_RIGHT:
     case TWO_RAND:
+      //printf ("2 Branch x%d at %g [%d] (%d)\n", brVarInd_, *brPts_, way, isint);
       return new CouenneBranchingObject (brVarInd_, way, *brPts_, isint);
     case THREE_LEFT:
     case THREE_CENTER:
     case THREE_RIGHT:
     case THREE_RAND:
+      //printf ("3 WAY Branch x%d at %g--%g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
       return new CouenneThreeWayBranchObj (brVarInd_, brPts_ [0], brPts_ [1], way, isint);
     default: 
       printf ("CouenneObject::createBranch(): way has no sense\n");
       exit (-1);
     }
+
+  // if selectBranch returned -1, apply default branching rule
 
   if (0) {
     printf ("CO::createBranch: ");
@@ -237,14 +256,6 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   // The infeasibility returned is the minimum of the distances from
   // the current point to the two new convexifications, which is the
   // function that we want to maximize.
-
-  //  CouNumber delta = reference_ -> Image () -> BranchGain (reference_, info);
-
-  // operator-dependent branching object
-  //  OsiBranchingObject *opobj = reference_ -> Image () -> BranchObject (reference_, info);
-
-  //  if (opobj)
-  //    return opobj;
 
   expression *depvar = reference_ -> Image () -> getFixVar ();
   int index;

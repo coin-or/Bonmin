@@ -38,8 +38,8 @@ int CouenneProblem::impliedBounds (char *chg_bds) const {
     //    if ((auxiliaries_ [i] -> Image () -> code () == COU_EXPRSUM) ||
     //	(auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP))
 
-    CouNumber l0 = lb_ [nvar+i], 
-              u0 = ub_ [nvar+i];
+    //    CouNumber l0 = lb_ [nvar+i], 
+    //              u0 = ub_ [nvar+i];
 
    if (auxiliaries_ [i] -> Image () -> impliedBound (nvar+i, lb_, ub_, chg_bds) > COUENNE_EPS) {
      //      printf ("impli %2d [%g,%g] -> [%g,%g] ", nvar+i, l0, u0, lb_ [nvar+i], ub_ [nvar+i]);

@@ -9,7 +9,7 @@
 #include <math.h>
 #include <CouenneTypes.h>
 
-#define MAX_ITER 100
+#define MAX_ITER 10
 #define COU_POW_TOLERANCE 1e-12
 
 CouNumber powNewton (CouNumber xc, CouNumber yc, 
@@ -38,13 +38,14 @@ CouNumber powNewton (CouNumber xc, CouNumber yc,
             Fp  = 1 + fpp (xk) * fk + fpk * fpk;
 
   // Newton loop. Tolerance is set above
-  for (register int k = MAX_ITER; (fabs (F) > COU_POW_TOLERANCE) && k--;) {
+  for (int k = MAX_ITER; k--;) {
 
     xk -= F / Fp;
 
     fk  = f (xk) - yc;
     fpk = fp (xk);
     F   = xk - xc + fpk * fk;
+    if (fabs (F) > COU_POW_TOLERANCE) break;
     Fp  = 1 + fpp (xk) * fk + fpk * fpk;
   }
 

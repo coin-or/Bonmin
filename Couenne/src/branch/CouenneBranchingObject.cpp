@@ -27,9 +27,9 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
   index_   (index),
   integer_ (isint) {
 
-  firstBranch_ = (way == TWO_LEFT)  ? 0 : 
-                 (way == TWO_RIGHT) ? 1 : 
-                 (CoinDrand48 () < 0.5) ? 0 : 1;
+  firstBranch_ =  (way == TWO_LEFT)      ? 0 : 
+                 ((way == TWO_RIGHT)     ? 1 : 
+                 ((CoinDrand48 () < 0.5) ? 0 : 1));
 
   if (index_ < 0) {
     printf ("Couenne: CouenneBranchingObject has negative reference's index\n");
@@ -42,7 +42,9 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
     u = expression::Ubound   (index_),   //         upper
     alpha = CouenneBranchingObject::Alpha ();
 
-  if (brpoint > - COIN_DBL_MAX) 
+  //  printf ("///////////brpt = %g, x = %Lf, l,u = [%Lf,%Lf]\n", brpoint, x, l, u);
+
+  if (fabs (brpoint) < COUENNE_INFINITY) 
     x = brpoint;
 
   if      (x<l) x = l;
@@ -69,8 +71,13 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
 
   if ((x-l < COUENNE_NEAR_BOUND) ||
       (u-x < COUENNE_NEAR_BOUND))
-    value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
+    if (u < COUENNE_INFINITY)
+      if (l > - COUENNE_INFINITY)    value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
+      else                           value_ = (u<0) ? -(1+u) : u/2;
+    else if (l > - COUENNE_INFINITY) value_ = (l>0) ?  (1+l) : l/2;
+    else                             value_ = 0;
   else value_ = x;
+
 
   /*  if ((x > l + COUENNE_NEAR_BOUND) && 
       (x < u - COUENNE_NEAR_BOUND))      // x is not at the boundary
@@ -88,15 +95,14 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
       if (fabs (x-l) < COUENNE_EPS) value_ = l + (1+fabs (l)) / 2.; 
       else                          value_ = u - (1+fabs (u)) / 2.;   */
 
-  /*  if (0) {
-    printf ("Branch::constructor: ");
-    reference_ -> print (std::cout);
-    printf (" on %.6e (%.6e) [%.6e,%.6e]\n", 
+  if (0) {
+    printf ("=== x%d branches on %g (at %g) [%g,%g]\n", 
+	    index_,
 	    value_, 
-	    expression::Variable (reference_ -> Index ()),
-	    expression::Lbound   (reference_ -> Index ()),
-	    expression::Ubound   (reference_ -> Index ()));
-	    }*/
+	    expression::Variable (index_),
+	    expression::Lbound   (index_),
+	    expression::Ubound   (index_));
+  }
 }
 
 
@@ -131,12 +137,12 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   if (!way) solver -> setColUpper (index_, integer_ ? floor (value_) : value_); // down branch
   else      solver -> setColLower (index_, integer_ ? ceil  (value_) : value_); // up   branch
 
-  // TODO: apply bound tightening 
+  // TODO: apply bound tightening to evaluate change in dual bound
 
   if (0) {
 
     //    printf (" --> [%.6e,%.6e]\n", l, u);
-    printf ("### Branch: x%d %c= %.12f\n", 
+    printf ("### Branch: x%d %c= %g\n", 
 	    index_, way ? '>' : '<', value_);
 	   
     /*for (int i=0; i < solver -> getNumCols(); i++)

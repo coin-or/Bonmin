@@ -34,8 +34,10 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
       // TODO: check if list contains all and only aux's to cut
       /*expression * image = problem_ -> Aux (i) -> Image ();
       if (   (image -> Linearity () > LINEAR)          // if linear, no need to cut twice
-	  && (image -> dependsOn (changed, nchanged))  // if expression does not depend on 
-	  )*/                                            // changed variables, do not cut
+
+	  && (image -> dependsOn (changed, nchanged)) // if expression does not depend 
+                                                      // on changed variables, do not cut 
+          || !changed)*/                              // or if no changed variable is passed
       if (problem_ -> Aux (i) -> Multiplicity () > 0)
 	problem_ -> Aux (i) -> generateCuts (si, cs, this);
     }
