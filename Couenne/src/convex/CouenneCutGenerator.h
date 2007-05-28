@@ -9,7 +9,6 @@
 
 #ifndef COUENNE_CUT_GENERATOR_H
 #define COUENNE_CUT_GENERATOR_H
-
 #include <BonOaDecBase.hpp>
 #include <OsiRowCut.hpp>
 #include <CouenneTypes.h>

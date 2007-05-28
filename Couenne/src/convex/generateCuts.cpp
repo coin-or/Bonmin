@@ -82,9 +82,18 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
-  if (babInfo)
+  if (babInfo){
     babInfo -> setFeasibleNode ();
-
+    
+    // PIERRE -> PIETRO
+    //HERE IS THE CODE TO OBTAIN SOLUTION JUST FOUND BY NLP SOLVER (AUXILIARIES SHOULD BE 
+    //CORRECT. SOLUTION SHOULD BE THE ONE FOUND AT THE NODE EVEN IF IT IS NOT AS GOOD AS THE
+    // BEST KNOWN.
+    // YOU CAN DELETE THE COMMENT
+    std::cout<<"Nlp solved: "<< (babInfo -> nlpSolution() != NULL) <<std::endl;
+    const double * nlpSol = babInfo -> nlpSolution();
+    babInfo -> setHasNlpSolution(false);//Have to reset it after use otherwise will stay true at next processed node.
+  }
   double now   = CoinCpuTime ();
   int    ncols = problem_ -> nVars () + problem_ -> nAuxs ();
 
