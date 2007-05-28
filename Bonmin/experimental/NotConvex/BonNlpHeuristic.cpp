@@ -92,12 +92,15 @@ namespace Bonmin{
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();
     
-    Bonmin::BabInfo * babInfo = dynamic_cast<Bonmin::BabInfo *> (solver->getAuxiliaryInfo());
+    OsiAuxInfo * auxInfo = solver->getAuxiliaryInfo();
+    BabInfo * babInfo = dynamic_cast<BabInfo *> (auxInfo);
+    if(babInfo){
+    babInfo->setHasNlpSolution(false);
     if(babInfo && babInfo->infeasibleNode()){
       return 0;
     }
-    
-    
+    }
+
     if(numberSolvePerLevel_ > -1){
       if(numberSolvePerLevel_ == 0) return 0 ;
     double num=CoinDrand48();
@@ -155,7 +158,7 @@ namespace Bonmin{
     nlp_->initialSolve();
     double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
     bool foundSolution = obj < objectiveValue;
-    if(foundSolution)//Better solution found update
+//    if(foundSolution)//Better solution found update
     {
   //    newSolution = new double [solver->getNumCols()];
       CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), newSolution);
@@ -166,6 +169,10 @@ namespace Bonmin{
       if(couenne){
        couenne_->getAuxs(newSolution);
     }
+      if(babInfo){
+      babInfo->setNlpSolution(newSolution,model_->solver()->getNumCols(), obj);
+        babInfo->setHasNlpSolution(true);
+      }
       objectiveValue = obj;
   }
   nlp_->setColLower(saveColLower);

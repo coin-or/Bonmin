@@ -163,7 +163,8 @@ namespace Bonmin{
     branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
                                   const_cast<CouenneProblem *> (couenneProb));
 
-    
+    if(intParam_[NumCutPasses] < 2)
+    intParam_[NumCutPasses] = 2;
 }
  
 void CouenneSetup::registerOptions(){

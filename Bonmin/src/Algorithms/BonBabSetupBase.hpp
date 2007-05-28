@@ -63,6 +63,7 @@ public:
       MaxIterations /** Global iteration limit. */,
       SpecialOption /** Spetial option in particular for Cbc. */,
       DisableSos /** Consider or not SOS constraints.*/,
+      NumCutPasses/** Number of cut passes at nodes.*/,
       NumberIntParam /** Dummy end to size table*/
     };
 

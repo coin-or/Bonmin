@@ -117,7 +117,7 @@ namespace Bonmin
     
   
   
-    model_.setMaximumCutPasses(1);
+    model_.setMaximumCutPasses(s.getIntParameter(BabSetupBase::NumCutPasses));
    
     //Setup cutting plane methods
     for(BabSetupBase::CuttingMethods::iterator i = s.cutGenerators().begin() ;

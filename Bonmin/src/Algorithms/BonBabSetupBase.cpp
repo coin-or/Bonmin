@@ -27,6 +27,7 @@ namespace Bonmin{
   INT_MAX /* MaxIterations*/,
   0 /* SpecialOption*/,
   0 /* DisableSos.*/,
+  1 /* numCutPasses.*/
 };
 
 
@@ -188,6 +189,7 @@ BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options){
   options->GetIntegerValue("solution_limit",intParam_[MaxSolutions],"bonmin.");
   options->GetIntegerValue("iteration_limit",intParam_[MaxIterations],"bonmin.");
   options->GetEnumValue("sos_constraints",intParam_[DisableSos],"bonmin.");
+  options->GetIntegerValue("num_cut_passes",intParam_[NumCutPasses],"bonmin.");
   
   options->GetNumericValue("cutoff_decr",doubleParam_[CutoffDecr],"bonmin.");
   options->GetNumericValue("cutoff",doubleParam_[Cutoff],"bonmin.");
@@ -352,6 +354,11 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "nlp-strong-branching", "Perform strong branching with NLP approximation",
                              "osi-simple", "Osi method to do simple branching",
                              "osi-strong", "Osi method to do strong branching","");
+  
+  roptions->AddLowerBoundedIntegerOption("num_cut_passes",
+                                         "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
+                                         0,INT_MAX,
+                                         "");
   
 }
 
