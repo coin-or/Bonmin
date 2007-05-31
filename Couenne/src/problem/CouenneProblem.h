@@ -144,10 +144,10 @@ class CouenneProblem {
   void getAuxs (CouNumber *);
 
   /// bound tightening
-  int tightenBounds (char *) const;
+  int tightenBounds (t_chg_bounds *) const;
 
   /// search for implied bounds 
-  int impliedBounds (char *) const;
+  int impliedBounds (t_chg_bounds *) const;
 };
 
 #endif

@@ -222,7 +222,7 @@ class expression {
   /// (auxiliary) variable in question and the current lower/upper
   /// bound. The method returns the best bound improvement obtained on
   /// all variables of the expression.
-  virtual bool impliedBound (int, CouNumber *, CouNumber *, char *)
+  virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *)
     {return false;}
 
   /// multiplicity of a variable

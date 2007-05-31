@@ -38,14 +38,42 @@ void exprInv::print (std::ostream &out,
 //  exprUnary::print (out, "1/", PRE);}
 
 
-/// general function (see below)
-bool invPowImplBounds (int, int, CouNumber *, CouNumber *, CouNumber);
+/// general function to tighten implied bounds of a function w = x^k,
+/// k negative, integer or inverse integer, and odd
+
+void invPowImplBounds (int wind, int index, 
+		       CouNumber *l, CouNumber *u, CouNumber k,
+		       bool &resL, bool &resU) {
+
+  CouNumber wl = l [wind], 
+            wu = u [wind];
+
+  // 0 <= l <= w <= u
+
+  if (wl >= 0.) {
+    if (wu > COUENNE_EPS) {
+      if (wu < COUENNE_INFINITY - 1) resL = updateBound (-1, l + index, pow (wu, k));
+      else                           resL = updateBound (-1, l + index, 0.);
+    }
+    if (wl > COUENNE_EPS)            resU = updateBound (+1, u + index, pow (wl, k));
+  }
+
+  // l <= w <= u <= 0
+
+  if (wu <= -0.) {
+    if (wl < - COUENNE_EPS) {
+      if (wl > - COUENNE_INFINITY + 1) resU = updateBound (+1, u + index, pow (wl, k)) || resU;
+      else                             resU = updateBound (+1, u + index, 0.)          || resU;
+    }
+    if (wu < - COUENNE_EPS)            resL = updateBound (-1, l + index, pow (wu, k)) || resL;
+  }
+}
 
 
 /// implied bound processing for expression w = 1/x, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
-bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   // Expression w = 1/x: we can only improve the bounds if 
   //
@@ -56,44 +84,13 @@ bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   int index = argument_ -> Index ();
 
-  bool res = invPowImplBounds (wind, index, l, u, -1.);
+  bool resL, resU = resL = false;
 
-  if (res)
-    chg [index] = 1;
+  invPowImplBounds (wind, index, l, u, -1., resL, resU);
 
-  return res;
+  if (resL) chg [index].lower = CHANGED;
+  if (resU) chg [index].upper = CHANGED;
+
+  return (resL || resU);
 }
 
-
-/// general function to tighten implied bounds of a function w = x^k,
-/// k negative, integer or inverse integer, and odd
-
-bool invPowImplBounds (int wind, int index, CouNumber *l, CouNumber *u, CouNumber k) {
-
-  CouNumber wl = l [wind], 
-            wu = u [wind];
-
-  bool res = false;
-
-  // 0 <= l <= w <= u
-
-  if (wl >= 0.) {
-    if (wu > COUENNE_EPS) {
-      if (wu < COUENNE_INFINITY - 1) res = updateBound (-1, l + index, pow (wu, k));
-      else                           res = updateBound (-1, l + index, 0.);
-    }
-    if (wl > COUENNE_EPS)            res = updateBound (+1, u + index, pow (wl, k)) || res;
-  }
-
-  // l <= w <= u <= 0
-
-  if (wu <= -0.) {
-    if (wl < - COUENNE_EPS) {
-      if (wl > - COUENNE_INFINITY + 1) res = updateBound (+1, u + index, pow (wl, k)) || res;
-      else                             res = updateBound (+1, u + index, 0.)          || res;
-    }
-    if (wu < - COUENNE_EPS)            res = updateBound (-1, l + index, pow (wu, k)) || res;
-  }
-
-  return res;
-}

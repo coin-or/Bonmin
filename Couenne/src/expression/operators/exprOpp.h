@@ -56,11 +56,11 @@ class exprOpp: public exprUnary {
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg);
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code () {return COU_EXPROPP;}
 
   /// implied bound processing
-  bool impliedBound (int, CouNumber *, CouNumber *, char *);
+  bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 };
 
 #endif

@@ -12,6 +12,9 @@
 #include <exprOp.h>
 #include <CouennePrecisions.h>
 
+#define BR_NEXT_ZERO 1e-3
+#define BR_MULT      1e-3
+
 
 // class for divisions
 
@@ -77,7 +80,7 @@ class exprDiv: public exprOp {
   virtual enum expr_type code () {return COU_EXPRDIV;}
 
   /// implied bound processing
-  bool impliedBound (int, CouNumber *, CouNumber *, char *);
+  bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments

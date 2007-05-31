@@ -120,7 +120,7 @@ class exprCopy: public expression {
     {return copy_ -> rank (p);} 
 
   /// implied bound processing
-  bool impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg)
+  bool impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg)
     {return copy_ -> impliedBound (wind, l, u, chg);}
 };
 

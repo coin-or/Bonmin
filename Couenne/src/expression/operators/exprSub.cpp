@@ -91,7 +91,7 @@ void exprSub::getBounds (expression *&lb, expression *&ub) {
 /// implied bound processing for expression w = x-y, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
-bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   // caution, xi or yi might be -1
   int xi = arglist_ [0] -> Index (),
@@ -111,17 +111,17 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   bool res = false;
 
-  return false;
+  /// !!! REMOVED A return false;
 
   // w >= l
 
-  if ((xi >= 0) && (res = updateBound (-1, l + xi, yl + wl)))        chg [xi] = 1;
-  if ((yi >= 0) && (res = updateBound (+1, u + yi, xu - wl) || res)) chg [yi] = 1;
+  if ((xi >= 0) && (updateBound (-1, l + xi, yl + wl))) {res = true; chg [xi].lower = CHANGED;}
+  if ((yi >= 0) && (updateBound (+1, u + yi, xu - wl))) {res = true; chg [yi].upper = CHANGED;}
 
   // w <= u
 
-  if ((xi >= 0) && (res = updateBound (+1, u + xi, yu + wu) || res)) chg [xi] = 1;
-  if ((yi >= 0) && (res = updateBound (-1, l + yi, xl - wu) || res)) chg [yi] = 1;
+  if ((xi >= 0) && (updateBound (+1, u + xi, yu + wu))) {res = true; chg [xi].upper = CHANGED;}
+  if ((yi >= 0) && (updateBound (-1, l + yi, xl - wu))) {res = true; chg [yi].lower = CHANGED;}
 
   return res;
 }

@@ -14,7 +14,7 @@
 /// implied bound processing for expression w = x/y, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
-bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   bool resx, resy = resx = false;
 
@@ -39,24 +39,15 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     if (c > COUENNE_EPS) {
 
-      resx = updateBound (-1, l + ind, l [wind] * c);
-      resx = updateBound ( 1, u + ind, u [wind] * c) || resx;
+      if (updateBound (-1, l + ind, l [wind] * c)) {resx = true; chg [ind].lower = CHANGED;}
+      if (updateBound ( 1, u + ind, u [wind] * c)) {resx = true; chg [ind].upper = CHANGED;}
     } 
     else if (c < - COUENNE_EPS) {
 
-      resx = updateBound (-1, l + ind, u [wind] * c);
-      resx = updateBound ( 1, u + ind, l [wind] * c) || resx;
+      if (updateBound (-1, l + ind, u [wind] * c)) {resx = true; chg [ind].lower = CHANGED;}
+      if (updateBound ( 1, u + ind, l [wind] * c)) {resx = true; chg [ind].upper = CHANGED;}
     } 
-
-    if (resx)
-      chg [ind] = 1;
-
   } else {
-
-    int xi = arglist_ [0] -> Index (),
-        yi = arglist_ [1] -> Index ();
-
-    CouNumber x0;
 
     // deal with all other cases
 
@@ -92,6 +83,11 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     // "nothing to improve", and the rest is improved (those with "?"
     // may improve).
  
+    int xi = arglist_ [0] -> Index (),
+        yi = arglist_ [1] -> Index ();
+
+    CouNumber x0;
+
     CouNumber *xl = l + xi, *yl = l + yi, wl = l [wind],
               *xu = u + xi, *yu = u + yi, wu = u [wind];
 
@@ -114,39 +110,42 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       return resx || resy;
     }
 
+    bool resxL, resxU, resyL, 
+      resyU = resxL = resxU = resyL = false;
+
     // general case
 
     if        (wl < - COUENNE_EPS) { // w >= wl, wl negative
 
       // point C: (xl,yl)
 
-      resy = (*yl<0) && (*yl > *xl/wl) && updateBound (-1, yl, 0) || resy;//
+      resyL = (*yl<0) && (*yl > *xl/wl) && updateBound (-1, yl, 0) || resyL; //
 
       if ((*yl>0) && (*yl < *xl/wl)) { // point C violates x/y >= wl, down
-	resx = updateBound (-1, xl, *yu*wl) || resx;//
-	resy = updateBound (-1, yl, *xu/wl) || resy;//
+	resxL = updateBound (-1, xl, *yu*wl) || resxL; //
+	resyL = updateBound (-1, yl, *xu/wl) || resyL; //
       }
 
       // point B: (xu,yu)
 
       if ((*yu<0) && (*yu > *xu/wl)) { // point B violates x/y >= wl, down
-	resx = updateBound (+1, xu, *yl*wl) || resx;
-	resy = updateBound (+1, yu, *xl/wl) || resy;
+	resxU = updateBound (+1, xu, *yl*wl) || resxU;
+	resyU = updateBound (+1, yu, *xl/wl) || resyU;
       }
 
-      resy = (*yu>0) && (*yu < *xu/wl) && updateBound (+1, yu, 0) || resy;
+      resyU = (*yu>0) && (*yu < *xu/wl) && updateBound (+1, yu, 0) || resyU;
 
     } else if (wl >   COUENNE_EPS) { // w >= wl, wl positive
 
       //
 
-      resy = (*yl<0) && (*yl < *xl/wl) && updateBound (-1, yl, mymin (*xl/wl, 0)) || resy;
-      resx = (*yl>0) && (*yl > *xl/wl) && updateBound (-1, xl, *yl*wl)            || resx;
+      resyL = (*yl<0) && (*yl < *xl/wl) && updateBound (-1, yl, mymin (*xl/wl, 0)) || resyL;
+      resxL = (*yl>0) && (*yl > *xl/wl) && updateBound (-1, xl, *yl*wl)            || resxL;
 
       //
 
-      resx = (*yu<0) && (*yu < *xu/wl) && updateBound (+1, xu, *yu*wl)            || resx;
-      resy = (*yu>0) && (*yu > *xu/wl) && updateBound (+1, yu, mymax (*xu/wl, 0)) || resy;
+      resxU = (*yu<0) && (*yu < *xu/wl) && updateBound (+1, xu, *yu*wl)            || resxU;
+      resyU = (*yu>0) && (*yu > *xu/wl) && updateBound (+1, yu, mymax (*xu/wl, 0)) || resyU;
     }
 
     //////////// deal with upper bound of w=x/y /////////////////////////////////////////////
@@ -155,42 +154,47 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
       //
 
-      resy = (*yl<0) && (*yl > *xu/wu) && updateBound (-1, yl, 0)      || resy;
+      resyL = (*yl<0) && (*yl > *xu/wu) && updateBound (-1, yl, 0)      || resyL;
 
       if ((*yl>0) && (*yl < *xu/wu)) {
-	resx = updateBound (+1, xu, *yu*wu) || resx;
-	resy = updateBound (-1, yl, *xl/wu) || resy;
+	resxU = updateBound (+1, xu, *yu*wu) || resxU;
+	resyL = updateBound (-1, yl, *xl/wu) || resyL;
       }
 
       //
 
       if ((*yu<0) && (*yu > *xl/wu)) {
-	resx = updateBound (-1, xl, *yl*wu) || resx;
-	resy = updateBound (+1, yu, *xu/wu) || resy;
+	resxL = updateBound (-1, xl, *yl*wu) || resxL;
+	resyU = updateBound (+1, yu, *xu/wu) || resyU;
       }
 
-      resy = (*yu>0) && (*yu < *xl/wu) && updateBound (+1, yu, 0)      || resy;
+      resyU = (*yu>0) && (*yu < *xl/wu) && updateBound (+1, yu, 0)      || resyU;
 
     } else if (wu < - COUENNE_EPS) { // w <= wu, wu negative
 
       //
 
-      resy = (*yl<0) && (*yl < *xu/wu) && updateBound (-1, yl, mymin (*xu/wu,0))  || resy;//
-      resx = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, xl, *yu*wu)            || resx;
+      resyL = (*yl<0) && (*yl < *xu/wu) && updateBound (-1, yl, mymin (*xu/wu,0))  || resyL;//
+      resxL = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, xl, *yu*wu)            || resxL;
 
       //
 
-      resx = (*yl>0) && (*yl > *xu/wu) && updateBound (+1, xu, *yl*wu)            || resx;
-      resy = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, yu, mymax (*xl/wu,0))  || resy;
+      resxU = (*yl>0) && (*yl > *xu/wu) && updateBound (+1, xu, *yl*wu)            || resxU;
+      resyU = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, yu, mymax (*xl/wu,0))  || resyU;
     }
 
-    if (resx) chg [xi] = 1;
-    if (resy) chg [yi] = 1;
+    if (resxL) chg [xi].lower = CHANGED;
+    if (resxU) chg [xi].upper = CHANGED;
+    if (resyL) chg [yi].lower = CHANGED;
+    if (resyU) chg [yi].upper = CHANGED;
 
     /*if (resx || resy) 
       printf ("                 \ntightened division: w[%d] [%e %e], x%d [%e %e] / y%d [%e %e]\n",
 	      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);
 	      else printf ("                                                 \r");*/
+
+    resx = resxL || resxU;
+    resy = resyL || resyU;
   }
 
   return (resx || resy);

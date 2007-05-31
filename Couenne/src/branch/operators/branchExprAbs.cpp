@@ -39,7 +39,7 @@ CouNumber exprAbs::selectBranch (expression *w,
 
   way = TWO_RAND; // don't really care which subtree to visit first
 
-  // exact distance from current point to the two subsequent
+  // exact distance between current point and the two subsequent
   // convexifications
   return mymin (project (1., -1., 0., x0, y0, 0., COUENNE_INFINITY,  0, NULL, NULL),
 		project (1., +1., 0., x0, y0, -COUENNE_INFINITY, 0., 0, NULL, NULL));

@@ -60,29 +60,16 @@ expression *exprLog::differentiate (int index) {
 }
 
 
-/// printing
-
-//void exprLog::print (std::ostream& out) const 
-//{exprUnary::print (out, "log", PRE);}
-
-
 /// implied bound processing for expression w = log(x), upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
-bool exprLog::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprLog::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   int ind = argument_ -> Index ();
+  bool res;
 
-  bool res = updateBound (-1, l + ind, exp (l [wind]));
-  res      = updateBound ( 1, u + ind, exp (u [wind])) || res;
-
-  if (res) {
-
-    /*printf ("w_%d [%g,%g] -------> x_%d in [%g,%g] ", 
-	    wind, l [wind], u [wind], 
-	    ind,  l [ind],  u [ind]);*/
-    chg [ind] = 1;
-  }
+  if (updateBound (-1, l + ind, exp (l [wind]))) {res = true; chg [ind].lower = CHANGED;}
+  if (updateBound ( 1, u + ind, exp (u [wind]))) {res = true; chg [ind].upper = CHANGED;}
 
   return res;
 }

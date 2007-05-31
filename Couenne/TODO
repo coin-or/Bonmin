@@ -1,3 +1,4 @@
+- add cuts at subsequent calls at changed bounds also
 - avoid very large coefficients
 - Bilinear cuts
 - trisection

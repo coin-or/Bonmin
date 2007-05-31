@@ -11,7 +11,7 @@
 
 /// Bound tightening for auxiliary variables
 
-int CouenneProblem::impliedBounds (char *chg_bds) const {
+int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
   int nchg = 0, //< number of bounds changed for propagation
       nvar = nVars ();

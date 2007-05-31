@@ -21,7 +21,7 @@
 
 bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 					   OsiCuts &cs, 
-					   char *chg_bds, 
+					   t_chg_bounds *chg_bds, 
 					   Bonmin::BabInfo * babInfo) const {
 
   int objInd = problem_ -> Obj (0) -> Body () -> Index ();
@@ -44,13 +44,13 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 
       //      printf ("updating upper %g <-- %g\n", primal0, primal);
       problem_ -> Ub (objInd) = UB;
-      chg_bds [objInd] = 1;
+      chg_bds [objInd]. upper = CHANGED;
     }
     
     if ((LB   > - COUENNE_INFINITY) && 
 	(LB   > dual0 + COUENNE_EPS)) { // update dual bound
       problem_ -> Lb (objInd) = LB;
-      chg_bds [objInd] = 1;
+      chg_bds [objInd]. lower = CHANGED;
     }
 
     //////////////////////// Reduced cost bound tightening //////////////////////
@@ -79,7 +79,7 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 	  if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
 	    // can improve bound on variable w_i
 	    problem_ -> Ub (i) = x + (UB-LB) / rc;
-	    chg_bds [i] = 1;
+	    chg_bds [i].upper = CHANGED;
 	  }
 	}
       }
@@ -131,6 +131,11 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
   } while (((ntightened > 0) || (nbwtightened > 0)) && (niter++ < MAX_BT_ITER));
   // continue if EITHER procedures gave (positive) results, as
   // expression structure is not a tree.
+
+  // TODO: limit should depend on number of constraints, that is,
+  // bound transmission should be documented and the cycle should stop
+  // as soon as no new constraint subgraph has benefited from bound
+  // transmission.
 
   return true;
 }

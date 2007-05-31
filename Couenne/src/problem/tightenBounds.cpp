@@ -14,7 +14,7 @@
 
 /// Bound propagation for auxiliary variables
 
-int CouenneProblem::tightenBounds (char *chg_bds) const {
+int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
   int nchg = 0; //< number of bounds changed for propagation
 
@@ -66,7 +66,7 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
 	return -1; // declare this node infeasible
       }
 
-      bool chg = false;
+      //      bool chg = false;
 
       // check if lower bound got higher    
       if ((ll > - COUENNE_INFINITY) && (ll >= lb_ [i+j] + COUENNE_EPS)) {
@@ -83,7 +83,8 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
 	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
 
 	lb_ [i+j] = ll;
-	chg = true;
+	chg_bds [i+j].lower = CHANGED;
+	nchg++;
       }
 
       // check if upper bound got lower
@@ -100,12 +101,8 @@ int CouenneProblem::tightenBounds (char *chg_bds) const {
 	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
 
 	ub_ [i+j] = uu;
-	chg = true;
-      }
-
-      if (chg && chg_bds && !(chg_bds [i+j])) {
+	chg_bds [i+j].upper = CHANGED;
 	nchg++;
-	chg_bds [i+j] = 1; 
       }
 
       // useless if assume expression::[lu]b_ etc already point to

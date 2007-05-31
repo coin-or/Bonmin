@@ -1,7 +1,7 @@
 /*
  * Name:    branchExprMul.cpp
  * Author:  Pietro Belotti
- * Purpose: return branch gain and branch object for multiplications
+ * Purpose: return branch data for multiplications
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
@@ -14,6 +14,9 @@
 #include <projections.h>
 
 
+#define LARGE_BOUND 9.9e12
+#define BOUND_WING 100
+
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 CouNumber exprMul::selectBranch (expression *w, 
@@ -21,48 +24,65 @@ CouNumber exprMul::selectBranch (expression *w,
 				 int &ind, 
 				 double * &brpts, 
 				 int &way) {
+  int xi = arglist_ [0] -> Index (),
+      yi = arglist_ [1] -> Index ();
 
-  ind = -1;
-  return 0.;
-
-  //  ind = argument_ -> Index ();
-
-  /*if (ind < 0) {
-    printf ("argument of exprAbs has negative index\n");
+  if ((xi < 0) || (yi < 0)) {
+    printf ("arguments of exprMul have negative index\n");
     exit (-1);
   }
 
-  brpts = (double *) malloc (sizeof (double));
-  *brpts = 0.;
-  way = TWO_LEFT;
+  CouNumber x0 = expression::Variable (xi),   y0 = expression::Variable (yi), 
+            xl = expression::Lbound   (xi),   yl = expression::Lbound   (yi),  
+            xu = expression::Ubound   (xi),   yu = expression::Ubound   (yi);  
 
-  return mymin (project (1., -1., 0., x0, y0, 0., COUENNE_INFINITY,  0, NULL, NULL),
-  project (1., +1., 0., x0, y0, -COUENNE_INFINITY, 0., 0, NULL, NULL));*/
+  // First, try to avoid infinite bounds for multiplications, which
+  // make them pretty hard to deal with
+
+  if ((xl < - COUENNE_INFINITY) && 
+      (xu >   COUENNE_INFINITY)) { // first
+
+    ind = xi;
+
+    // branch around current point. If it is also at a crazy value,
+    // reset it close to zero.
+
+    brpts = (double *) malloc (2 * sizeof (double));
+    CouNumber curr = x0;
+
+    if (fabs (curr) >= LARGE_BOUND) curr = 0;
+
+    brpts [0] = curr - BOUND_WING;
+    brpts [1] = curr + BOUND_WING;
+
+    way = THREE_CENTER;
+
+    return COUENNE_INFINITY;
+  }
+
+  if ((yl < - COUENNE_INFINITY) && 
+      (yu >   COUENNE_INFINITY)) { // and second factor
+
+    ind = yi;
+
+    // branch around current point. If it is also at a crazy value,
+    // reset it close to zero.
+
+    brpts = (double *) malloc (2 * sizeof (double));
+    CouNumber curr = y0;
+
+    if (fabs (curr) >= LARGE_BOUND) curr = 0;
+
+    brpts [0] = curr - BOUND_WING;
+    brpts [1] = curr + BOUND_WING;
+
+    way = THREE_CENTER;
+
+    return COUENNE_INFINITY;
+  }
+
+  // there is at least one finite corner of the bounding box
+
+  ind = -1;
+  return 0.;
 }
-
-/*
-/// distance covered by current point if branching rule applied to this expression
-double exprMul::BranchGain (expression *w, const OsiBranchingInformation *info) {
-
-  int xi = arglist_ [0] -> Index (),
-      yi = arglist_ [1] -> Index (),
-      wi = w            -> Index ();
-
-  CouNumber x0 = expression::Variable (xi),
-            y0 = expression::Variable (yi),
-            w0 = expression::Variable (wi);
-
-  return 0;
-  //  return mymin (project (1, -1, 0, x0, y0, 0, COUENNE_INFINITY,  0, NULL, NULL),
-  //		project (1, +1, 0, x0, y0, -COUENNE_INFINITY, 0, 0, NULL, NULL));
-}
-
-/// branching object best suited for this expression
-OsiBranchingObject *exprMul::BranchObject (expression *w, const OsiBranchingInformation *) {
-
-  // branching once on 0 is sufficient for expressions w=|x| 
-  //  return new CouenneBranchingObject (Argument (), 0);
-  return NULL;
-
-}
-*/

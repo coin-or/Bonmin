@@ -20,7 +20,7 @@ static CouNumber scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
 
 #define MALLOC_STEP 1000
 
-bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   /**
    *  An expression 
@@ -199,27 +199,27 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
       if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [i] + lc [ind]) || tighter)
-	chg [ind] = 1;
+	chg [ind].upper = CHANGED;
     }
 
     // tighten lower bound of variables in I2
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
       if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [i] + uc [ind]) || tighter)
-	chg [ind] = 1;
+	chg [ind].lower = CHANGED;
     }
   } else
 
     if ((infLo1 >= 0) && (infUp2 == -1)) {    // There is one infinite lower bound in I1
       int ind = I1 [infLo1];
       if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [infLo1]) || tighter)
-	chg [ind] = 1;
+	chg [ind].upper = CHANGED;
     }
     else 
       if ((infLo1 == -1) && (infUp2 >= 0)) {  // There is one infinite upper bound in I2
 	int ind = I2 [infUp2];
 	if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [infUp2]) || tighter)
-	  chg [ind] = 1;
+	  chg [ind].lower = CHANGED;
       }
 
   // Update uppers in I1 and lowers in I2
@@ -229,26 +229,26 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
       if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + uc [ind]) || tighter)
-	chg [ind] = 1;
+	chg [ind].lower = CHANGED;
     }
 
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
       if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + lc [ind]) || tighter)
-	chg [ind] = 1;
+	chg [ind].upper = CHANGED;
     }
   } else 
 
     if ((infUp1 >= 0) && (infLo2 == -1)) { // There is one infinite lower bound in I2
       int ind = I1 [infUp1];
       if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [infUp1]) || tighter)
-	chg [ind] = 1;
+	chg [ind].lower = CHANGED;
     }
     else 
       if ((infUp1 == -1) && (infLo2 >= 0)) {  // There is one infinite upper bound in I1
 	int ind = I2 [infLo2];
 	if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [infLo2]) || tighter)
-	  chg [ind] = 1;
+	  chg [ind].upper = CHANGED;
       }
 
   /*if (0) {

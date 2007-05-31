@@ -22,8 +22,6 @@ CouNumber exprExp::selectBranch (expression *w,
 				 int &ind, 
 				 double * &brpts, 
 				 int &way) {
-  ind = -1;
-  return 0.;
 
   // two cases: inside or outside the belly. 
   //
@@ -32,47 +30,54 @@ CouNumber exprExp::selectBranch (expression *w,
   // at it numerically. If both bounds are infinite, create a ThreeWay
   // branch.
   //
-  // Outside: it suffices to project the current point on the line to
-  // get the maxi-min displacement.
+  // Outside: it suffices to project the current point on the line
+  // (i.e. to get the closest point on the line) to get the maxi-min
+  // displacement.
   //
-  // As happens for all monotonous functions, after chosing *brpts it
-  // is equivalent to choose w's or x's index as ind, as the implied
-  // bounds will do the rest.
+  // As for all monotonous functions, after choosing *brpts it is
+  // equivalent to choose w's or x's index as ind, as the implied- and
+  // propagated bounds will do the rest.
 
-  ind = argument_ -> Index ();
-  int wi = w -> Index ();
+  ind    = argument_ -> Index ();
+  int wi = w         -> Index ();
 
-  if ((ind < 0) || (wi < 0)) {printf ("Couenne, w=f(x): negative index\n"); exit (-1);}
+  if ((ind < 0) || (wi < 0)) {printf ("Couenne, w=exp(x): negative index\n"); exit (-1);}
 
-  brpts = (double *) realloc (brpts, sizeof (double));
+  CouNumber y0 = info -> solution_ [wi],
+            x0 = info -> solution_ [ind],
+            l  = info -> lower_    [ind],
+            u  = info -> upper_    [ind];
 
-  CouNumber x0 = info -> solution_ [ind],
-            y0 = info -> solution_ [wi];
+  if (y0 < exp (x0)) { 
 
-  if (y0 < exp (x0)) { // A) Outside
+    // Outside
+
+    brpts = (double *) realloc (brpts, sizeof (double));
 
     *brpts = powNewton (x0, y0, exp, exp, exp);
+
+    if      (*brpts < l) *brpts = (u <   COUENNE_INFINITY) ? ((l+u)/2) : l + 1;
+    else if (*brpts > u) *brpts = (l > - COUENNE_INFINITY) ? ((l+u)/2) : u - 1;
+
     way = TWO_RAND;
     CouNumber dy = y0 - exp (*brpts);
     x0 -= *brpts;
     return sqrt (x0*x0 + dy*dy);
 
-  } else { // B) Inside 
+  } else { 
 
-    CouNumber l = info -> lower_ [ind],
-              u = info -> upper_ [ind];
-
-    // two cases:
+    // Inside. Two cases:
  
     if ((l < -COUENNE_INFINITY) && 
 	(u >  COUENNE_INFINITY)) {
 
-      // B1) bounds are infinite
+      // 1) both bounds are infinite --> three way branching
 
-      brpts = (double *) realloc (brpts, 2*sizeof (double));
-      way = THREE_CENTER;
-      *brpts = x0;
-      brpts [1] = log (y0);
+      brpts = (double *) realloc (brpts, 2 * sizeof (double));
+      way = THREE_CENTER; // focus on central convexification first
+
+      brpts [0] = x0;       // draw vertical   from (x0,y0) south to curve y=exp(x)
+      brpts [1] = log (y0); //      horizontal              east
 
       CouNumber a = y0 - exp (x0), // sides of a triangle with (x0,y0)
 		b = x0 - log (y0), // as one of the vertices
@@ -82,25 +87,32 @@ CouNumber exprExp::selectBranch (expression *w,
 
     } else {
 
-      brpts = (double *) realloc (brpts, sizeof (double));
+      // 2) at least one of them is finite --> two way branching
 
-      // B2) at least one of them is finite
+      brpts = (double *) realloc (brpts, sizeof (double));
 
       if (l < -COUENNE_INFINITY) {
 
 	*brpts = x0;
+	if (*brpts > u - COUENNE_NEAR_BOUND) *brpts = u-1;
 	way = TWO_RIGHT;
 	return y0 - exp (x0);
 
       } else if (u > COUENNE_INFINITY) {
 
 	*brpts = log (y0);
+	if (*brpts < l + COUENNE_NEAR_BOUND) *brpts = l+1;
 	way = TWO_LEFT;
 	return x0 - log (y0);
 
       } else {
 
 	*brpts = powNewton (x0, y0, exp, exp, exp);
+
+	if ((*brpts > u - COUENNE_NEAR_BOUND) ||
+	    (*brpts < l + COUENNE_NEAR_BOUND))
+	  *brpts = (l+u) / 2;
+
 	way = TWO_RAND;
 
 	CouNumber dx = x0 - *brpts,

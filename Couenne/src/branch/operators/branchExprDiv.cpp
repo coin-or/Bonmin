@@ -14,9 +14,6 @@
 #include <projections.h>
 
 
-#define BR_NEXT_ZERO 1e-3
-#define BR_MULT      1e-3
-
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 CouNumber exprDiv::selectBranch (expression *w, 

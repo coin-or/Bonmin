@@ -37,14 +37,6 @@ class exprCos: public exprUnary {
   std::string printOp () const
     {return "cos";}
 
-  /// print position
-  //  virtual const std::string printPos () 
-  //    {return PRE;}
-
-
-  /// print "cos" and argument
-  //  void print (std::ostream&) const;
-
   /// obtain derivative of expression
   expression *differentiate (int index); 
 
@@ -65,11 +57,5 @@ class exprCos: public exprUnary {
 CouNumber trigNewton (CouNumber, CouNumber, CouNumber);
 
 /// convex envelope for sine/cosine 
-
-//void addHexagon (const CouenneCutGenerator *, // pointer to the caller cut generator 
-//		 OsiCuts &,      // cut set to be enriched
-//		 unary_function, // sine or cosine
-//		 exprAux *,      // auxiliary variable
-//		 expression *);  // argument of cos/sin (should be a variable)
 
 #endif

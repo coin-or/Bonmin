@@ -66,7 +66,7 @@ class exprMul: public exprOp {
   virtual enum expr_type code () {return COU_EXPRMUL;}
 
   /// implied bound processing
-  bool impliedBound (int, CouNumber *, CouNumber *, char *);
+  bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments

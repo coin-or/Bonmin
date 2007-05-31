@@ -98,7 +98,7 @@ class exprVar: public expression {
   virtual enum expr_type code () {return COU_EXPRVAR;}
 
   /// implied bound processing
-  virtual bool impliedBound (int, CouNumber *, CouNumber *, char *);
+  virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// rank of an original variable is always one
   virtual int rank (CouenneProblem *p) 

@@ -54,22 +54,10 @@ expression *exprAbs::differentiate (int index) {
 }
 
 
-/// printing
-
-//void exprAbs::print (std::ostream& out) const {
-//  exprUnary::print (out, "abs", PRE);
-  /*
-  out << "|";
-  argument_ -> print (out);
-  out << "|";
-  */
-//}
-
-
 /// implied bound processing for expression w = |x|, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
-bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   int index = argument_ -> Index ();
 
@@ -83,17 +71,14 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
   if (wl > 0) {
 
-    if (*xl > 0) tighter = updateBound (-1, xl,  wl);
-    if (*xu < 0) tighter = updateBound (+1, xu, -wl) || tighter;
+    if      (*xl > 0) {if (updateBound (-1, xl,  wl)) {tighter = true; chg [index].lower = CHANGED;}}
+    else if (*xu < 0) {if (updateBound (+1, xu, -wl)) {tighter = true; chg [index].upper = CHANGED;}}
   }
 
   // w <= u (if u < 0 the problem is infeasible)
 
-  tighter = updateBound (-1, xl, -wu) || tighter;
-  tighter = updateBound (+1, xu,  wu) || tighter;
-
-  if (tighter)
-    chg [index] = 1;
+  if (updateBound (-1, xl, -wu)) {tighter = true; chg [index].lower = CHANGED;}
+  if (updateBound (+1, xu,  wu)) {tighter = true; chg [index].upper = CHANGED;}
 
   return tighter;
 }

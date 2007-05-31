@@ -33,6 +33,17 @@ enum expr_type {/*COU_EXPRAUX,  COU_EXPRCLONE, COU_EXPRCOPY, */
 
 enum convexity {NONCONVEX, CONVEX, CONCAVE, AFFINE};
 
+/** (un)changed bounds */
+
+#define UNCHANGED 0
+#define CHANGED   1
+#define EXACT     2
+
+typedef struct chg_bounds {
+  char lower;
+  char upper;
+} t_chg_bounds;
+
 typedef double CouNumber;
 typedef CouNumber (*unary_function) (CouNumber);
 

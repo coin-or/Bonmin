@@ -1,5 +1,5 @@
 /*
- * Name:    exprExp.C
+ * Name:    exprExp.cpp
  * Author:  Pietro Belotti
  * Purpose: definition of the exponential
  *
@@ -43,26 +43,26 @@ void exprExp::getBounds (expression *&lb, expression *&ub) {
 
 /// implied bound processing for expression w = exp(x), upon change in
 /// lower- and/or upper bound of w, whose index is wind
-bool exprExp::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprExp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
-  bool res = false;
+  bool resU, resL = resU = false;
   int ind = argument_ -> Index ();
 
   CouNumber b;
 
   if ((b = l [wind]) >= COUENNE_EPS) // lower bound
-    res = updateBound (-1, l + ind, log (b));
+    resL = updateBound (-1, l + ind, log (b));
 
   if ((b = u [wind]) >= COUENNE_EPS) // upper bound
-    res = updateBound ( 1, u + ind, log (b)) || res;
+    resU = updateBound ( 1, u + ind, log (b));
   else if (b < - COUENNE_EPS) {
     // make it infeasible
-    res = updateBound ( 1, u + ind, -1) || res;
-    res = updateBound (-1, l + ind,  1) || res;
+    resU = updateBound ( 1, u + ind, -1) || resU;
+    resL = updateBound (-1, l + ind,  1) || resL;
   }
 
-  if (res) 
-    chg [ind] = 1;
+  if (resL) chg [ind].lower = CHANGED;
+  if (resU) chg [ind].upper = CHANGED;
 
-  return res;
+  return (resL || resU);
 }

@@ -13,9 +13,9 @@
 /// implied bound processing for expression w = x*y, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
-bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
-  bool res = false;
+  bool resL, resU = resL = false;
   int ind;
 
   if ((arglist_ [ind=0] -> Type () <= CONST) || 
@@ -37,28 +37,24 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
     if (c > COUENNE_EPS) {
 
       
-      res = (l [wind] > - COUENNE_INFINITY) && updateBound (-1, l + ind, l [wind] / c);
-      res = (u [wind] <   COUENNE_INFINITY) && updateBound ( 1, u + ind, u [wind] / c) || res;
+      resL = (l [wind] > - COUENNE_INFINITY) && updateBound (-1, l + ind, l [wind] / c);
+      resU = (u [wind] <   COUENNE_INFINITY) && updateBound ( 1, u + ind, u [wind] / c);
     } 
     else if (c < - COUENNE_EPS) {
-
-      //      return false;
 
       //      printf ("w_%d [%g,%g] = %g x_%d [%g,%g]\n", 
       //	      wind, l [wind], u [wind], c, ind, l [ind], u [ind]);
 
-      res = (u [wind] <   COUENNE_INFINITY) && updateBound (-1, l + ind, u [wind] / c);
-      res = (l [wind] > - COUENNE_INFINITY) && updateBound ( 1, u + ind, l [wind] / c) || res;
+      resL = (u [wind] <   COUENNE_INFINITY) && updateBound (-1, l + ind, u [wind] / c);
+      resU = (l [wind] > - COUENNE_INFINITY) && updateBound ( 1, u + ind, l [wind] / c);
     } 
 
-    if (res) {
-      chg [ind] = 1;
+    if (resL) chg [ind].lower = CHANGED;
+    if (resU) chg [ind].upper = CHANGED;
 
       /*printf ("w_%d [%g,%g] -------> x_%d in [%g,%g] ", 
 	      wind, l [wind], u [wind], 
 	      ind,  l [ind],  u [ind]);*/
-    }
-
   } else {
 
     // these bounds would be implied by McCormick's convexification,
@@ -76,34 +72,35 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 
     // w's lower bound 
 
-    bool resx = false, resy = false;
+    bool resxL, resxU, resyL, resyU = 
+      resxL = resxU = resyL = false;
 
     if (wl >= 0.) {
 
       // point B in central infeasible area
 
       if (*xu * *yu < wl) {
-	resx = (*xu * *yl < wl) && updateBound (+1, xu, wl / *yl) || resx;
-	resy = (*xl * *yu < wl) && updateBound (+1, yu, wl / *xl) || resy;
+	resxU = (*xu * *yl < wl) && updateBound (+1, xu, wl / *yl);
+	resyU = (*xl * *yu < wl) && updateBound (+1, yu, wl / *xl);
       }
 
       // point C in central infeasible area
 
       if (*xl * *yl < wl) {
-	resx = (*xl * *yu < wl) && updateBound (-1, xl, wl / *yu) || resx;
-	resy = (*xu * *yl < wl) && updateBound (-1, yl, wl / *xu) || resy;
+	resxL = (*xl * *yu < wl) && updateBound (-1, xl, wl / *yu);
+	resyL = (*xu * *yl < wl) && updateBound (-1, yl, wl / *xu);
       }
     } else {
 
       // the infeasible set is a hyperbola with two branches
 
       // upper left
-      resx = (*xl * *yl < wl) && (*yl > 0.) && updateBound (-1, xl, wl / *yl) || resx; // point C
-      resy = (*xu * *yu < wl) && (*yu > 0.) && updateBound (+1, yu, wl / *xu) || resy; // point B
+      resxL = (*xl * *yl < wl) && (*yl > 0.) && updateBound (-1, xl, wl / *yl); // point C
+      resyU = (*xu * *yu < wl) && (*yu > 0.) && updateBound (+1, yu, wl / *xu); // point B
 
       // lower right
-      resy = (*xl * *yl < wl) && (*yl < 0.) && updateBound (-1, yl, wl / *xl) || resy; // point C
-      resx = (*xu * *yu < wl) && (*yu < 0.) && updateBound (+1, xu, wl / *yu) || resx; // point B
+      resyL = (*xl * *yl < wl) && (*yl < 0.) && updateBound (-1, yl, wl / *xl); // point C
+      resxU = (*xu * *yu < wl) && (*yu < 0.) && updateBound (+1, xu, wl / *yu); // point B
     }
 
     // w's upper bound 
@@ -113,27 +110,27 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
       // the infeasible set is a hyperbola with two branches
 
       // upper right
-      resx = (*xu * *yl > wu) && (*yl > 0.) && updateBound (+1, xu, wu / *yl) || resx; // point D
-      resy = (*xl * *yu > wu) && (*yu > 0.) && updateBound (+1, yu, wu / *xl) || resy; // point A
+      resxU = (*xu * *yl > wu) && (*yl > 0.) && updateBound (+1, xu, wu / *yl) || resxU; // point D
+      resyU = (*xl * *yu > wu) && (*yu > 0.) && updateBound (+1, yu, wu / *xl) || resyU; // point A
 
       // lower left
-      resx = (*xl * *yu > wu) && (*yu < 0.) && updateBound (-1, xl, wu / *yu) || resx; // point A
-      resy = (*xu * *yl > wu) && (*yl < 0.) && updateBound (-1, yl, wu / *xu) || resy; // point D
+      resxL = (*xl * *yu > wu) && (*yu < 0.) && updateBound (-1, xl, wu / *yu) || resxL; // point A
+      resyL = (*xu * *yl > wu) && (*yl < 0.) && updateBound (-1, yl, wu / *xu) || resyL; // point D
 
     } else {
 
       // point D in central infeasible area
 
       if (*xu * *yl > wu) {
-	resx = (*xu * *yu > wu) && updateBound (+1, xu, wu / *yu) || resx;
-	resy = (*xl * *yl > wu) && updateBound (-1, yl, wu / *xl) || resy;
+	resxU = (*xu * *yu > wu) && updateBound (+1, xu, wu / *yu) || resxU;
+	resyL = (*xl * *yl > wu) && updateBound (-1, yl, wu / *xl) || resyL;
       }
 
       // point A in central infeasible area
 
       if (*xl * *yu > wu) {
-	resx = (*xl * *yl > wu) && updateBound (-1, xl, wu / *yl) || resx;
-	resy = (*xu * *yu > wu) && updateBound (+1, yu, wu / *xu) || resy;
+	resxL = (*xl * *yl > wu) && updateBound (-1, xl, wu / *yl) || resxL;
+	resyU = (*xu * *yu > wu) && updateBound (+1, yu, wu / *xu) || resyU;
       }
     }
 
@@ -142,11 +139,14 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
 	      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);
 	      else printf ("                                                 \r");*/
 
-    if (resx) chg [xi] = 1;
-    if (resy) chg [yi] = 1;
+    if (resxL) chg [xi].lower = CHANGED;
+    if (resxU) chg [xi].upper = CHANGED;
+    if (resyL) chg [yi].lower = CHANGED;
+    if (resyU) chg [yi].upper = CHANGED;
 
-    res = resx || resy;
+    resL = resxL || resyL;
+    resU = resxU || resyU;
   }
 
-  return res;
+  return (resL || resU);
 }

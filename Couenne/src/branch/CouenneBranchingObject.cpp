@@ -42,8 +42,6 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
     u = expression::Ubound   (index_),   //         upper
     alpha = CouenneBranchingObject::Alpha ();
 
-  //  printf ("///////////brpt = %g, x = %Lf, l,u = [%Lf,%Lf]\n", brpoint, x, l, u);
-
   if (fabs (brpoint) < COUENNE_INFINITY) 
     x = brpoint;
 
@@ -77,23 +75,6 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
     else if (l > - COUENNE_INFINITY) value_ = (l>0) ?  (1+l) : l/2;
     else                             value_ = 0;
   else value_ = x;
-
-
-  /*  if ((x > l + COUENNE_NEAR_BOUND) && 
-      (x < u - COUENNE_NEAR_BOUND))      // x is not at the boundary
-    value_ = x;
-  else // current point is at one of the bounds
-    if ((l > - COUENNE_INFINITY) &&
-	(u <   COUENNE_INFINITY))
-      // finite bounds, apply midpoint rule
-      value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
-
-    else
-      // infinite (one direction) bound interval, x is at the boundary
-      // push it inwards
-      // TODO: look for a proper displacement 
-      if (fabs (x-l) < COUENNE_EPS) value_ = l + (1+fabs (l)) / 2.; 
-      else                          value_ = u - (1+fabs (u)) / 2.;   */
 
   if (0) {
     printf ("=== x%d branches on %g (at %g) [%g,%g]\n", 
@@ -129,10 +110,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     if      (value_ > u)             printf ("Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
     else if (value_ > u+COUENNE_EPS) printf ("## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
   }
-
-  //if (0) printf (" [%.6e,%.6e]", l, u);
-  //  if (way) solver -> setColLower (index_, reference_ -> isInteger () ? ceil  (value_) : value_);
-  //  else     solver -> setColUpper (index_, reference_ -> isInteger () ? floor (value_) : value_);
 
   if (!way) solver -> setColUpper (index_, integer_ ? floor (value_) : value_); // down branch
   else      solver -> setColLower (index_, integer_ ? ceil  (value_) : value_); // up   branch

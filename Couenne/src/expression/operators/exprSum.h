@@ -63,7 +63,7 @@ class exprSum: public exprOp {
     {return COU_EXPRSUM;}
 
   /// implied bound processing
-  virtual bool impliedBound (int, CouNumber *, CouNumber *, char *);
+  virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// compute best variable to branch on (nonsense here, as there is
   /// no nonlinear infeasibility)

@@ -20,7 +20,7 @@
 // variable is branched upon in several points of the BB tree.
 
 enum {TWO_LEFT,                 TWO_RIGHT,   TWO_RAND,
-      THREE_LEFT, THREE_CENTER, THREE_RIGHT, THREE_RAND};
+      THREE_LEFT, THREE_CENTER, THREE_RIGHT, THREE_RAND, BRANCH_NONE};
 
 
 /// OsiObject for auxiliary variables $w=f(x)$. Associated with a
@@ -35,7 +35,8 @@ public:
   CouenneObject (exprAux *ref):
     reference_ (ref),
     brVarInd_  (-1), 
-    brPts_     (NULL) {}
+    brPts_     (NULL),
+    whichWay_  (BRANCH_NONE) {}
 
   /// Destructor
   ~CouenneObject () 
@@ -93,6 +94,13 @@ protected:
   /// where to branch. It is a vector in the event we want to use a
   /// ThreeWayBranching. Ends with a -COIN_DBL_MAX (not considered...)
   mutable CouNumber *brPts_;
+
+  /// how to branch. This should be done automatically from
+  /// ::infeasibility() and ::createBranch(), but for some reason
+  /// obj->whichWay() in the last 20 lines of CbcNode.cpp returns 0,
+  /// therefore we set our own whichWay_ within this object and use it
+  /// between the two methods.
+  mutable int whichWay_;
 };
 
 #endif

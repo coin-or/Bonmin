@@ -88,7 +88,7 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
   // way =  0 if "[a,b]" node
   //        1 if ">= b"  node
 
-  int way;//, ind = reference_ -> Index ();
+  int way;
 
   switch (branchIndex_) {
     // if first offspring, let firstBranch_ decide who's first
@@ -119,12 +119,6 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
     default: printf ("Couenne: branching on nonsense way %d\n", way);
     }
   }
-    /*printf (" --> [%.6e,%.6e]\n", l, u);
-    printf ("### Branch: x%d %c= %.12f\n", 
-	    reference_ -> Index (), way ? '>' : '<', value_);
-    for (int i=0; i < solver -> getNumCols(); i++)
-      printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
-      solver -> getColUpper () [i]);*/
 
   branchIndex_++;
 

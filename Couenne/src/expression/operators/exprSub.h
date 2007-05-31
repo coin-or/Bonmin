@@ -72,7 +72,7 @@ class exprSub: public exprOp {
   virtual enum expr_type code () {return COU_EXPRSUB;}
 
   /// implied bound processing
-  bool impliedBound (int, CouNumber *, CouNumber *, char *);
+  bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 };
 
 

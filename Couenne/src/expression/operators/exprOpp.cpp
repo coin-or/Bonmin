@@ -27,24 +27,16 @@ inline expression *exprOpp::differentiate (int index)
 {return new exprOpp (argument_ -> differentiate (index));}
 
 
-// printing
-
-//void exprOpp::print (std::ostream& out) const
-//{exprUnary::print (out, "-", PRE);}
-
-
 /// implied bound processing for expression w = -x, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 
-bool exprOpp::impliedBound (int wind, CouNumber *l, CouNumber *u, char *chg) {
+bool exprOpp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   int ind = argument_ -> Index ();
+  bool res;
 
-  bool res = updateBound (-1, l + ind, - u [wind]);
-  res      = updateBound ( 1, u + ind, - l [wind]) || res;
-
-  if (res)
-    chg [ind] = 1;
+  if (updateBound (-1, l + ind, - u [wind])) {res = true; chg [ind].lower = CHANGED;}
+  if (updateBound ( 1, u + ind, - l [wind])) {res = true; chg [ind].upper = CHANGED;}
 
   return res;
 }

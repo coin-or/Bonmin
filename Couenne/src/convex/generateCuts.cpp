@@ -51,14 +51,14 @@ void fictitiousBound (OsiCuts &cs,
 
 
 // translate changed bound sparse array into a dense one
-void sparse2dense (int ncols, char *chg_bds, int *&changed, int &nchanged) {
+void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged) {
 
   // convert sparse chg_bds in something handier
   changed  = (int *) malloc (ncols * sizeof (int));
   nchanged = 0;
 
-  for (register int i=ncols, j=0; i--; j++)
-    if (*chg_bds++) {
+  for (register int i=ncols, j=0; i--; j++, chg_bds++)
+    if (chg_bds -> lower || chg_bds -> upper) {
       *changed++ = j;
       nchanged++;
     }
@@ -90,11 +90,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // branching, reduced cost fixing, or bound tightening below. To be
   // used with malloc/realloc/free
 
-  char *chg_bds = new char [ncols];
+  t_chg_bounds *chg_bds = new t_chg_bounds [ncols];
 
   // fill it with zeros
-  for (register int i = ncols; i--;) 
-    *chg_bds++ = 0;
+  for (register int i = ncols; i--; chg_bds++) 
+    chg_bds -> lower = chg_bds -> upper = UNCHANGED;
   chg_bds -= ncols;
 
   if (firstcall_) {
@@ -165,11 +165,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  const double * nowLower = si.getColLower();
 	  const double * nowUpper = si.getColUpper();
 
-	  for (register int i=0; i < ncols; i++)
+	  for (register int i=0; i < ncols; i++) {
 
-	    if (beforeLower && (nowLower [i] >= beforeLower [i] + COUENNE_EPS) ||
-		beforeUpper && (nowUpper [i] <= beforeUpper [i] - COUENNE_EPS))
-	      chg_bds [i] = 1;
+	    if (beforeLower && (nowLower [i] >= beforeLower [i] + COUENNE_EPS))
+	      chg_bds [i].lower = CHANGED;
+	    if (beforeUpper && (nowUpper [i] <= beforeUpper [i] - COUENNE_EPS))
+	      chg_bds [i].upper = CHANGED;
+	  }
 
 	} else printf ("WARNING: could not access parent's bounds\n");
       }
@@ -226,15 +228,20 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 #ifdef USE_OBBT
   if ((!firstcall_ || (info.pass > 0)) && 
       (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1))) {
+
     // apply OBBT at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
     // and then with probability inversely proportional to the level
+
+    OsiSolverInterface *csi = si.clone (true);
+
+    dynamic_cast <OsiClpSolverInterface *> (csi) -> setupForRepeatedUse ();
 
     int nImprov, nIter = 0;
     bool repeat = true;
 
     while (repeat && 
 	   (nIter++ < MAX_OBBT_ITER) &&
-	   ((nImprov = obbt (si, cs, chg_bds, babInfo)) > 0)) 
+	   ((nImprov = obbt (csi, cs, chg_bds, babInfo)) > 0)) 
 
       if (nImprov >= THRES_NBD_CHANGED) {
 
@@ -243,12 +250,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	sparse2dense (ncols, chg_bds, changed, nchanged);
 	
-	genColCuts (si, cs, nchanged, changed);
+	genColCuts (*csi, cs, nchanged, changed);
 
 	int nCurCuts = cs.sizeRowCuts ();
-	genRowCuts (si, cs, nchanged, changed);// !!!
+	genRowCuts (*csi, cs, nchanged, changed);// !!!
 	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
       }
+
+    delete csi;
 
     if (nImprov < 0)
       goto end_genCuts;

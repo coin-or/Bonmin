@@ -24,6 +24,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 				     int &whichWay) const {
 
   // whichWay should be set to which branch first (for two-way branching?)
+  // if selectBranch not called, choose one at random
+  whichWay_ = whichWay = TWO_RAND;
 
   // infeasibility is always null for linear expressions
   if (reference_ -> Image () -> Linearity () <= LINEAR)
@@ -109,6 +111,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
       (reference_, info,             // input parameters
        brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
 
+    whichWay_ = whichWay;
+
     if (brVarInd_ >= 0)
       delta = improv;
 
@@ -127,11 +131,11 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   if (0) {
 
-    printf ("Inf |%+.4e - %+.4e| = %+.4e  %+.4e ",  ////[%.2f,%.2f]
+    printf ("Inf |%+.4e - %+.4e| = %+.4e  %+.4e way %d, ind %d",  ////[%.2f,%.2f]
 	    var, expr, 
 	    //	    expression::Lbound (reference_ -> Index ()),
 	    //	    expression::Ubound (reference_ -> Index ()),
-	    fabs (var - expr), delta);
+	    fabs (var - expr), delta, whichWay, brVarInd_);
 
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout); printf ("\n");
@@ -210,8 +214,11 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 						 int way) const {
 
   // way has suggestion from CouenneObject::infeasibility()
+  // Well, not exactly... it seems 
 
   bool isint = reference_ -> isInteger ();
+
+  way = whichWay_;
 
   if (brVarInd_ >= 0) // if applied latest selectBranching
     switch (way) {
@@ -224,10 +231,10 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     case THREE_CENTER:
     case THREE_RIGHT:
     case THREE_RAND:
-      //printf ("3 WAY Branch x%d at %g--%g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
+      //printf ("3Way Branch x%d @ %g ][ %g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
       return new CouenneThreeWayBranchObj (brVarInd_, brPts_ [0], brPts_ [1], way, isint);
     default: 
-      printf ("CouenneObject::createBranch(): way has no sense\n");
+      printf ("CouenneObject::createBranch(): way=%d has no sense\n", way);
       exit (-1);
     }
 

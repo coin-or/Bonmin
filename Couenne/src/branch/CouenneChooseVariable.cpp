@@ -21,11 +21,11 @@ CouenneChooseVariable::CouenneChooseVariable (const OsiSolverInterface *,
 /// Copy constructor 
 CouenneChooseVariable::CouenneChooseVariable (const CouenneChooseVariable &source):
   OsiChooseVariable (source),
-  problem_ (source.Problem ()) {}
+  problem_ (source.problem_) {}
 
 /// Assignment operator 
 CouenneChooseVariable & CouenneChooseVariable::operator= (const CouenneChooseVariable& rhs)
-{problem_ = rhs.Problem(); return *this;}
+{problem_ = rhs.problem_; return *this;}
 
 /// Clone
 OsiChooseVariable *CouenneChooseVariable::clone() const
