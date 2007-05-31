@@ -22,7 +22,7 @@
 #define COUENNE_INFINITY_CHK  1.0e+40
 #define COUENNE_INFINITY_SET  1.0e+60
 
-#define COU_MAX_COEFF     1e12
+#define COU_MAX_COEFF     1e8
 
 #define COUENNE_round(x) ((int) (floor ((x) + 0.5)))
 

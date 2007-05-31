@@ -71,13 +71,13 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
       (u-x < COUENNE_NEAR_BOUND))
     if (u < COUENNE_INFINITY)
       if (l > - COUENNE_INFINITY)    value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
-      else                           value_ = (u<0) ? -(1+u) : u/2;
-    else if (l > - COUENNE_INFINITY) value_ = (l>0) ?  (1+l) : l/2;
+      else                           value_ = (u<0) ? (u-1) : u/2;
+    else if (l > - COUENNE_INFINITY) value_ = (l>0) ? (l+1) : l/2;
     else                             value_ = 0;
   else value_ = x;
 
   if (0) {
-    printf ("=== x%d branches on %g (at %g) [%g,%g]\n", 
+    printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 
 	    index_,
 	    value_, 
 	    expression::Variable (index_),

@@ -62,36 +62,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   CouNumber delta = fabs (var - expr);
 
-  //  CouNumber l  = info -> lower_ [index],
-  //            u  = info -> upper_ [index];
-  /*  if (0)
-    if ((delta > COUENNE_EPS) &&
-	((fabs (u-l) < COUENNE_EPS) ||
-	((mymin (fabs (l), fabs (u)) > COUENNE_EPS) && 
-	 (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))) {
-      //      ((mymin (fabs (lr), fabs (ur)) > COUENNE_EPS) && 
-      //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
-
-      printf (". Inf: = |%.4f - %.4f| = %.4e. w [%.3f,%.3f], x [%.3f,%.3f] = %.4e ",  ////[%.2f,%.2f]
-	      var, expr, fabs (var - expr), 
-	      info -> lower_ [reference_ -> Index ()],
-	      info -> upper_ [reference_ -> Index ()],
-	      l, u, u-l);
-      reference_             -> print (std::cout); std::cout << " = ";
-      reference_ -> Image () -> print (std::cout);
-      printf ("\n");
-    }
-  */
-  //printf (" delta=%.9f,l=%.9f,u=%.9f ", delta, l, u);
-
   /// avoid branching on (relatively) small deltas
   if (delta < COUENNE_EPS)
-    /*||
-      (fabs (u-l) < COUENNE_EPS) ||
-      ((mymin (fabs (l), fabs (u)) > COUENNE_EPS) && 
-      (fabs (u-l) / mymax (fabs (l), fabs (u)) < COUENNE_EPS)))*/
-    //      ((mymin (fabs (lr), fabs (ur)) > COUENNE_EPS) && 
-    //       (fabs (ur-lr) / mymax (fabs (lr), fabs (ur)) < COUENNE_EPS)))
     delta = 0.;
 
   else {
@@ -130,8 +102,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   }
 
   if (0) {
-
-    printf ("Inf |%+.4e - %+.4e| = %+.4e  %+.4e way %d, ind %d",  ////[%.2f,%.2f]
+    printf ("Inf |%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
 	    var, expr, 
 	    //	    expression::Lbound (reference_ -> Index ()),
 	    //	    expression::Ubound (reference_ -> Index ()),
@@ -213,10 +184,11 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 						 const OsiBranchingInformation *info, 
 						 int way) const {
 
-  // way has suggestion from CouenneObject::infeasibility()
-  // Well, not exactly... it seems 
-
   bool isint = reference_ -> isInteger ();
+
+  // way has suggestion from CouenneObject::infeasibility(), but not
+  // as set in infeasibility, so we use the one stored in member
+  // whichWay_
 
   way = whichWay_;
 
@@ -267,15 +239,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   expression *depvar = reference_ -> Image () -> getFixVar ();
   int index;
 
-  // Create a two- or three-way branching object according to
-  // finiteness of the intervals. For now only check if argument
-  // bounds are finite.
-
-  // TODO: check if function is finite within the interval (if so,
-  // two-way, if not, three-way). Could be operator-dependent, that
-  // is,
-  //
-  // return reference_ -> BranchObject (brVar_);
+  // Create a two-way branching object according to finiteness of the
+  // intervals. For now only check if argument bounds are finite.
 
   int ref_ind = reference_ -> Index ();
 

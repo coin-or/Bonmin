@@ -15,7 +15,7 @@
 
 
 #define LARGE_BOUND 9.9e12
-#define BOUND_WING 100
+#define BOUND_WING 1
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments

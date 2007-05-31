@@ -41,7 +41,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
   // cut has large coefficients/rhs, bail out
   if (numerics || (fabs (rhs) > COU_MAX_COEFF)) {
-    printf ("Warning, too large coefficients/rhs: %g (%d), %g (%d), %g (%d); %g\n", 
+    printf ("### Discarding cut, large coeff/rhs: %g (%d), %g (%d), %g (%d); %g\n", 
 	    c1, i1, c2, i2, c3, i3, rhs);
     return 0;
   }

@@ -65,7 +65,7 @@ CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index,
 	}*/
 
   if (0) {
-    printf ("=3= x%d branches on %g and %g (at %g) [%g,%g]\n", 
+    printf ("=3= x%d will branch on %g ][ %g (now at %g) [%g,%g]\n", 
 	    index_,
 	    lcrop_,
 	    rcrop_,
