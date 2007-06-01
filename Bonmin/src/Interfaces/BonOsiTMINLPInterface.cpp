@@ -341,7 +341,10 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Ipopt::RegisteredOptions> 
     throw -1;
 #endif
   }
-  app_->Initialize("");
+  if (!app_->Initialize("")) {
+    std::cerr<<"OsiTMINLPInterface: Error during initialization of app_"<<std::endl;
+    throw -1;
+  }
   extractInterfaceParams();
   
 }

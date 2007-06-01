@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines (IBM) 2005
+// (C) Copyright International Business Machines (IBM) 2005, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -66,22 +66,32 @@ namespace Bonmin{
   }
 
 
-  void
+  bool
   IpoptSolver::Initialize(std::string params_file)
   {
-    app_->Initialize(params_file);
+    Ipopt::ApplicationReturnStatus status =
+      app_->Initialize(params_file);
+    if (status != Ipopt::Solve_Succeeded) {
+      return false;
+    }
     app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
     setMinlpDefaults(app_->Options());
     optimized_before_ = false;
+    return true;
   }
 
-  void
+  bool
   IpoptSolver::Initialize(std::istream &is)
   {
-    app_->Initialize(is);
+    Ipopt::ApplicationReturnStatus status =
+      app_->Initialize(is);
+    if (status != Ipopt::Solve_Succeeded) {
+      return false;
+    }
     app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
     setMinlpDefaults(app_->Options());
     optimized_before_ = false;
+    return true;
   }
 
   TNLPSolver::ReturnStatus

@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation, Carnegie Mellon University 2006
+// (C) Copyright International Business Machines Corporation, Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -302,7 +302,7 @@ FilterSolver::clone(){
 FilterSolver::~FilterSolver(){
 }
 
-void 
+bool
 FilterSolver::Initialize(std::string optFile){
     std::ifstream is;
     if (optFile != "") {
@@ -311,26 +311,27 @@ FilterSolver::Initialize(std::string optFile){
       }
       catch(std::bad_alloc) {
         journalist_->Printf(Ipopt::J_SUMMARY, Ipopt::J_MAIN, "\nEXIT: Not enough memory.\n");
-        throw -1;
+        return false;
       }
       catch(...) {
         Ipopt::IpoptException E("Unknown Exception caught in ipopt", "Unknown File", -1);
         E.ReportException(*journalist_);
-        throw -1;
+        return false;
       }
     }
-    Initialize(is);
+    bool retval = Initialize(is);
     if (is) {
       is.close();
     }
-  
+    return retval;
 }
 
-void
+bool
 FilterSolver::Initialize(std::istream &is){
   if(is.good()){
     options_->ReadFromStream(*journalist_, is);
   }
+  return true;
 }
 
 /// Solves a problem expresses as a TNLP 

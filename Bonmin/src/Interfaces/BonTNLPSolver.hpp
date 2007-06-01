@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines (IBM) 2006
+// (C) Copyright International Business Machines (IBM) 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -110,11 +110,11 @@ TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
 
    /** Initialize the TNLPSolver (read options from params_file)
    */
-   virtual void Initialize(std::string params_file) = 0;
+   virtual bool Initialize(std::string params_file) = 0;
 
    /** Initialize the TNLPSolver (read options from istream is)
    */
-   virtual void Initialize(std::istream& is) = 0;
+   virtual bool Initialize(std::istream& is) = 0;
 
    /** @name Solve methods */
    //@{
