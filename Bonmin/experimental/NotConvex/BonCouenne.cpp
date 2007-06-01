@@ -16,6 +16,8 @@
 #include <iomanip>
 #include <fstream>
 
+#include <stdlib.h>
+
 #include "CoinTime.hpp"
 #include "BonminConfig.h"
 #include "BonCouenneInterface.hpp"
@@ -77,7 +79,7 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (0) {// print statistics in LaTeX format
+    if (1) {// print statistics in LaTeX format
 
       ////////////////////////////////
       int nr=-1, nt=-1;
@@ -107,7 +109,7 @@ int main (int argc, char *argv[])
 
 	// time limit reached, print upper and (in brackets) lower
 
-	if (fabs (bb.bestBound()) < 1e12 - 1) 
+	if (fabs (bb.bestBound()) < 1e12) 
 	  printf    (" %12.3f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_dual");
 
@@ -118,7 +120,7 @@ int main (int argc, char *argv[])
       else {
 	// time limit not reached, print upper and time
 
-	if (fabs (bb.bestBound()) < 1e12 - 1) 
+	if (fabs (bb.bestBound()) < 1e12) 
 	  printf    (" %12.3f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_dual");
 	  
