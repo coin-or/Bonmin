@@ -18,6 +18,7 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 				       unary_function fprime, // derivative of f
 				       int w_ind, int x_ind, 
 				       CouNumber x, CouNumber l, CouNumber u,
+				       t_chg_bounds *chg,
 				       bool is_global) const {
   CouNumber opp_slope = - fprime (x);
 
@@ -25,10 +26,13 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
   // if bounds are very close, convexify with a single line
 
+  bool cLeft  = !chg || (chg [x_ind].lower != UNCHANGED) || firstcall_,
+       cRight = !chg || (chg [x_ind].upper != UNCHANGED) || firstcall_;
+
   if (fabs (u - l) < COUENNE_EPS) {
 
     CouNumber x0 = 0.5 * (u+l), fp0 = fprime (x0);
-    createCut (cs, f(x0) - fp0 * x0, 0, w_ind, 1., x_ind, - fp0);
+    if (cLeft || cRight) createCut (cs, f(x0) - fp0 * x0, 0, w_ind, 1., x_ind, - fp0);
     return;
   }
 
@@ -43,20 +47,21 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
   if ((convtype_ == UNIFORM_GRID) || firstcall_) {
 
-    // now add tangent at each sampling point
+    if (cLeft || cRight) {
+      // now add tangent at each sampling point
 
-    CouNumber sample = l, 
-              step   = (u-l) / nSamples_;
+      CouNumber sample = l, 
+	step   = (u-l) / nSamples_;
 
-    //    printf ("[%.4f %.4f], step = %.4f, %d samples\n", 
-    //	    l, u, step, nSamples_);
+      //    printf ("[%.4f %.4f], step = %.4f, %d samples\n", 
+      //	    l, u, step, nSamples_);
 
-    for (int i = 0; i <= nSamples_; i++) {
+      for (int i = 0; i <= nSamples_; i++) {
 
-      opp_slope = - fprime (sample);
+	opp_slope = - fprime (sample);
 
-      if ((fabs (opp_slope) < COUENNE_INFINITY) && 
-	  (fabs (sample-x) > COUENNE_EPS)) // do not add twice cut at current point
+	if ((fabs (opp_slope) < COUENNE_INFINITY) && 
+	    (fabs (sample-x) > COUENNE_EPS)) // do not add twice cut at current point
 	  createCut (cs, f (sample) + opp_slope * sample, sign, 
 		     w_ind, 1.,
 		     x_ind, opp_slope, 
@@ -64,10 +69,10 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
 	//	printf ("  Uniform %d: ", i); cut -> print ();
 
-      sample += step;
+	sample += step;
+      }
     }
   }
-
   else if (convtype_ != CURRENT_ONLY) {
 
     CouNumber sample = x;
@@ -79,7 +84,6 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 		 -1, 0.,
 		 is_global);
       //      printf ("  Current tangent: "); cut -> print ();
-
 
     for (int i = 0; i <= nSamples_/2; i++) {
 

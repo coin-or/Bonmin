@@ -50,7 +50,8 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 // generate convexification cut for constraint w = 1/x
 
 void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
 
   // get bounds of numerator and denominator
 
@@ -60,6 +61,9 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   CouNumber l = (*xle) (), 
             u = (*xue) ();
+
+  delete xle; 
+  delete xue;
 
   // if the denominator's bound interval has 0 as internal point,
   // there is no convexification
@@ -77,36 +81,38 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux       -> Index (), 
       x_ind = argument_ -> Index ();
 
+  bool cL = !chg || (cg -> isFirst ()) || (chg [x_ind].lower != UNCHANGED),
+       cR = !chg || (cg -> isFirst ()) || (chg [x_ind].upper != UNCHANGED);
+
   // special case: l and u are very close, replace function with
   // linear term
 
   if (fabs (u - l) < COUENNE_EPS) {
 
     CouNumber x0 = 0.5 * (u+l);
-    cg -> createCut (cs, 2/x0, 0, w_ind, 1., x_ind, 1/(x0*x0));
+    if (cL || cR) cg -> createCut (cs, 2/x0, 0, w_ind, 1., x_ind, 1/(x0*x0));
     return;
   }
 
   // choose sampling points. If unbounded, bound using a rule of thumb
 
   int ns = cg -> nSamples ();
-
   if      (l < - COUENNE_INFINITY) l = ns * (u-1); // (-infinity, u] where u < 0
   else if (u >   COUENNE_INFINITY) u = ns * (l+1); // [l, +infinity) where l > 0
 
+  // upper segment (or lower if x<0)
+
+  if (cL || cR) {
+    if ((l > COUENNE_EPS) && (u < COU_MAX_COEFF)) 
+      cg -> createCut (cs, 1/l + 1/u, -1, w_ind, 1., x_ind, 1/(l*u));
+
+    if ((u < -COUENNE_EPS) && (u > -COU_MAX_COEFF)) 
+      cg -> createCut (cs, 1/l + 1/u, +1, w_ind, 1., x_ind, 1/(l*u));
+  }
+
   // make bounds nonzero
-
-  if (fabs (l) < COUENNE_EPS) {
-    /*l /= (COUENNE_EPS / MIN_DENOMINATOR);
-      if (fabs (l) < COUENNE_EPS) */
-    l = (l<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
-  }
-
-  if (fabs (u) < COUENNE_EPS) {
-    /*u /= (COUENNE_EPS / MIN_DENOMINATOR);
-      if (fabs (u) < COUENNE_EPS) */
-      u = (u<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
-  }
+  if (fabs (l) < COUENNE_EPS) l = (l<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
+  if (fabs (u) < COUENNE_EPS) u = (u<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
 
   // bound
   cg -> addEnvelope 
@@ -117,8 +123,5 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
        ((l > COUENNE_EPS) ? l : u) :
        // otherwise, replace it where it gives deepest cut
        powNewton ((*argument_) (), (*aux) (), inv, oppInvSqr, inv_dblprime),
-     l, u);
-
-  delete xle; 
-  delete xue;
+     l, u, chg);
 }

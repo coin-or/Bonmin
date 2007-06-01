@@ -19,7 +19,8 @@
 // generate convexification cut for constraint w = this
 
 void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
-			    OsiCuts &cs,  const CouenneCutGenerator *cg) {
+			    OsiCuts &cs,  const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
   expression *le, *ue;
 
   argument_ -> getBounds (le, ue);
@@ -27,15 +28,21 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   CouNumber l = (*le) (),
             u = (*ue) ();
 
+  delete le;
+  delete ue;
+
   int w_ind = aux       -> Index (),
       x_ind = argument_ -> Index ();
+
+  bool cL = !chg || (chg [x_ind].lower != UNCHANGED) || cg -> isFirst (),
+       cR = !chg || (chg [x_ind].upper != UNCHANGED) || cg -> isFirst ();
 
   // if bounds are very close, convexify with a single line
 
   if (fabs (u - l) < COUENNE_EPS) {
 
     CouNumber x0 = 0.5 * (u+l), ex0 = exp (x0);
-    cg -> createCut (cs, ex0 * (1 - x0), 0, w_ind, 1., x_ind, - ex0);
+    if (cL || cR) cg -> createCut (cs, ex0 * (1 - x0), 0, w_ind, 1., x_ind, - ex0);
     return;
   }
 
@@ -44,7 +51,8 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   // upper segment
 
-  if ((   u < log (COUENNE_INFINITY) - 1) 
+  if ((cL || cR) 
+      && (u < log (COUENNE_INFINITY) - 1) 
       && (l > -    COUENNE_INFINITY/1e4  + 1)) { // tame lower bound
 
     CouNumber expl     = exp (l),
@@ -64,8 +72,5 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   if (u > log (COUENNE_INFINITY)) u = x + ns;
 
   // approximate the exponential function from below
-  cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u, true);
-
-  delete le;
-  delete ue;
+  cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u, chg, true);
 }

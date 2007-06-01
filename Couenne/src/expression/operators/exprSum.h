@@ -56,7 +56,8 @@ class exprSum: public exprOp {
 
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			     OsiCuts &cs, const CouenneCutGenerator *cg);
+			     OsiCuts &cs, const CouenneCutGenerator *cg, 
+			     t_chg_bounds * = NULL);
 
   /// code for comparison
   virtual enum expr_type code () 

@@ -47,19 +47,6 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   const double & expr = (*(reference_ -> Image ())) (), 
                & var  = (*reference_) ();
 
-  //expression::Variable (reference_ -> Index ());
-  /* if (1) {
-
-    printf ("Inf: = |%.6e - %.6e| = %.6e  ",  ////[%.2f,%.2f]
-	    var, expr, 
-	    //	    expression::Lbound (reference_ -> Index ()),
-	    //	    expression::Ubound (reference_ -> Index ()),
-	    fabs (var - expr));
-    reference_             -> print (std::cout); std::cout << " = ";
-    reference_ -> Image () -> print (std::cout); printf ("\n");
-  } 
-  */
-
   CouNumber delta = fabs (var - expr);
 
   /// avoid branching on (relatively) small deltas
@@ -270,8 +257,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-      return new CouenneBranchingObject (index, TWO_LEFT, x, depvar -> isInteger ());
+      return new CouenneBranchingObject (index, TWO_RAND, x, depvar -> isInteger ());
   }
 
-  return new CouenneBranchingObject (ref_ind, TWO_LEFT, xr, reference_ -> isInteger ());
+  return new CouenneBranchingObject (ref_ind, TWO_RAND, xr, reference_ -> isInteger ());
 }

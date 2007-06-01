@@ -136,7 +136,8 @@ class exprAux: public exprVar {
 
   /// generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &, 
-		     OsiCuts &, const CouenneCutGenerator *);
+		     OsiCuts &, const CouenneCutGenerator *, 
+		     t_chg_bounds * = NULL);
 
   /// used in rank-based branching variable choice
   virtual inline int rank (CouenneProblem *p = NULL)

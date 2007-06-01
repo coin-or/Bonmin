@@ -145,7 +145,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 			const_cast <CouNumber *> (si. getColLower    ()),
 			const_cast <CouNumber *> (si. getColUpper    ()));
 
-    if (info.inTree) {
+    if ((info.inTree) && (info.pass==0)) {
 
       // we are anywhere in the B&B tree but at the root node. Check,
       // through the auxiliary information, which bounds have changed
@@ -226,11 +226,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 #define USE_OBBT
 #ifdef USE_OBBT
-  if ((!firstcall_ || (info.pass > 0)) && 
-      (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1))) {
 
-    // apply OBBT at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
-    // and then with probability inversely proportional to the level
+  // apply OBBT
+  if ((!firstcall_ || (info.pass > 0)) && 
+      //  at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
+      ((info.level <= COU_OBBT_CUTOFF_LEVEL) ||
+       // and then with probability inversely proportional to the level
+      (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1)))) {
 
     OsiSolverInterface *csi = si.clone (true);
 
@@ -249,11 +251,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	/// improved bounds
 
 	sparse2dense (ncols, chg_bds, changed, nchanged);
-	
 	genColCuts (*csi, cs, nchanged, changed);
 
 	int nCurCuts = cs.sizeRowCuts ();
-	genRowCuts (*csi, cs, nchanged, changed);// !!!
+	genRowCuts (*csi, cs, nchanged, changed, chg_bds);// !!!
 	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
       }
 

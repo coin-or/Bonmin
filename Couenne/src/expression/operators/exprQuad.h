@@ -91,7 +91,8 @@ class exprQuad: public exprGroup {
 
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			       OsiCuts &cs, const CouenneCutGenerator *cg) {}
+			     OsiCuts &cs, const CouenneCutGenerator *cg, 
+			     t_chg_bounds * = NULL) {}
 
   /// only compare with people of the same kind
   virtual int compare (exprQuad &);

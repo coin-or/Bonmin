@@ -16,7 +16,8 @@
 // generate convexification cut for constraint w = |x|
 
 void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg, 
+			    t_chg_bounds *chg) {
 
   int w_ind = w         -> Index (),
       x_ind = argument_ -> Index ();
@@ -29,6 +30,9 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   delete lbe;
   delete ube;
+
+  bool cLeft  = !chg || (chg [x_ind].lower != UNCHANGED) || cg -> isFirst (),
+       cRight = !chg || (chg [x_ind].upper != UNCHANGED) || cg -> isFirst ();
 
   // if l, u have the same sign, then w = x (l > 0) or w = -x (u < 0)
 
@@ -52,12 +56,12 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
 	  CouNumber slope = (u+l) / (u-l);
 	  // add an upper segment, which depends on the lower/upper bounds
-	  cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
+	  if (cLeft || cRight) cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
 	}
 	else // slope = 1
-	  cg -> createCut (cs, -2*l, -1, w_ind, 1., x_ind, -1.);
+	  if (cLeft) cg -> createCut (cs, -2*l, -1, w_ind, 1., x_ind, -1.);
       }
       else if (u < COUENNE_INFINITY) // slope = -1
-	cg -> createCut (cs, 2*u, -1, w_ind, 1., x_ind, 1.);
+	if (cRight) cg -> createCut (cs, 2*u, -1, w_ind, 1., x_ind, 1.);
     }
 }

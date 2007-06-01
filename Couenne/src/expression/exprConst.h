@@ -78,7 +78,8 @@ class exprConst: public expression {
 
   /// generate convexification cut for constraint w = this
   void generateCuts (exprAux *, const OsiSolverInterface &, 
-		     OsiCuts &, const CouenneCutGenerator *);
+		     OsiCuts &, const CouenneCutGenerator *, 
+		     t_chg_bounds * = NULL);
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRCONST;}

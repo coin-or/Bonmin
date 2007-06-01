@@ -190,7 +190,8 @@ class expression {
 
   /// generate convexification cut for constraint w = this
   virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
-			     OsiCuts &, const CouenneCutGenerator *) {}
+			     OsiCuts &, const CouenneCutGenerator *,
+			     t_chg_bounds * = NULL) {}
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap

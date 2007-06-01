@@ -17,7 +17,8 @@
 // generate convexification cut for constraint w = - x
 
 void exprOpp::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
   // easy... 
 
   if (cg -> isFirst ())

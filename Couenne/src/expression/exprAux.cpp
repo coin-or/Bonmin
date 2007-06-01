@@ -44,7 +44,8 @@ void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 // generate cuts for expression associated with this auxiliary
 
 void exprAux::generateCuts (const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg, 
+			    t_chg_bounds *chg) {
 
   int j = cs.sizeRowCuts ();
   CouNumber l, u;
@@ -57,7 +58,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       (fabs ((l = expression::Lbound (varIndex_)) - 
              (u = expression::Ubound (varIndex_))) < COUENNE_EPS))
     cg -> createCut (cs, (l+u)/2., 0, varIndex_, 1.);
-  else image_ -> generateCuts (this, si, cs, cg);
+  else image_ -> generateCuts (this, si, cs, cg, chg);
 
   // check if cuts have coefficients, rhs too large or too small
 

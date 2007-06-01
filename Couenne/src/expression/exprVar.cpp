@@ -45,9 +45,11 @@ void exprVar::getBounds (expression *&lb, expression *&ub) {
 // generate convexification cut for constraint w = this
 
 void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg, 
+			    t_chg_bounds *chg) {
 
-  cg -> createCut (cs, 0., 0, w -> Index (), 1., varIndex_);
+  if (cg -> isFirst ())
+    cg -> createCut (cs, 0., 0, w -> Index (), 1., varIndex_);
 }
 
 
@@ -56,9 +58,7 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
 bool exprVar::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   bool res;
-
   if (updateBound (-1, l + varIndex_, l [wind])) {res = true; chg [varIndex_].lower = CHANGED;}
   if (updateBound (+1, u + varIndex_, u [wind])) {res = true; chg [varIndex_].upper = CHANGED;}
-
   return res;
 }

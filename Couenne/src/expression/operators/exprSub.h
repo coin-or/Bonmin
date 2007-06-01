@@ -66,9 +66,10 @@ class exprSub: public exprOp {
 
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-		     OsiCuts &cs, const CouenneCutGenerator *cg);
+		     OsiCuts &cs, const CouenneCutGenerator *cg, 
+		     t_chg_bounds * = NULL);
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRSUB;}
 
   /// implied bound processing
@@ -78,12 +79,7 @@ class exprSub: public exprOp {
 
 // compute subtraction
 
-inline CouNumber exprSub::operator () () {
-
-  //  exprOp:: operator () ();
-
-  //  register CouNumber ret = - *sp--;
-  return (currValue_ = (*(arglist_ [0])) () - (*(arglist_ [1])) ());
-}
+inline CouNumber exprSub::operator () ()
+{return (currValue_ = (*(arglist_ [0])) () - (*(arglist_ [1])) ());}
 
 #endif

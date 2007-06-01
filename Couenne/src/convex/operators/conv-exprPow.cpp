@@ -58,7 +58,8 @@ exprAux *exprPow::standardize (CouenneProblem *p) {
 // generate convexification cut for constraint w = x^k
 
 void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
 
   // after standardization, all such expressions are of the form x^k,
   // with k constant
@@ -77,10 +78,16 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
 
+  bool cL = !chg || (chg [x_ind].lower != UNCHANGED) || cg -> isFirst (),
+       cR = !chg || (chg [x_ind].upper != UNCHANGED) || cg -> isFirst ();
+
   CouNumber w = (*aux) (), 
             x = (*xe)  (),
             l = (*xle) (), 
             u = (*xue) ();
+
+  delete xle; delete xue;
+  delete wle; delete wue;
 
   // if xl and xu are too close, approximate it as a line: sum the
   // segment through the two extreme points (l,l^k) and (u,u^k), and
@@ -93,9 +100,9 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
               lk      = safe_pow (l,   k),
               uk      = safe_pow (u,   k);
 
-    cg -> createCut (cs, u*lk - l*uk + avg * avg_k_1 * (1-k), 0,
-		     w_ind, u - l + 1, 
-		     x_ind, lk-uk - k * avg_k_1);
+    if (cL || cR) cg -> createCut (cs, u*lk - l*uk + avg * avg_k_1 * (1-k), 0,
+				   w_ind, u - l + 1, 
+				   x_ind, lk-uk - k * avg_k_1);
     return;
   }
 
@@ -104,7 +111,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int intk = 0;
 
   if (k < - COUENNE_INFINITY) { // w=x^{-inf} means w=0
-    cg -> createCut (cs, 0., 0, w_ind, 1.);
+    if (cL || cR) cg -> createCut (cs, 0., 0, w_ind, 1.);
     return;
   }
 
@@ -112,7 +119,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     return;
 
   if (fabs (k) < COUENNE_EPS) { // w = x^0 means w=1
-    cg -> createCut (cs, 1., 0, w_ind, 1.);
+    if (cL || cR) cg -> createCut (cs, 1., 0, w_ind, 1.);
     return;
   }
 
@@ -258,7 +265,4 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     addPowEnvelope (cg, cs, w_ind, x_ind, x, w, k, l, u, sign);
   }
-
-  delete xle; delete xue;
-  delete wle; delete wue;
 }

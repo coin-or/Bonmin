@@ -1,7 +1,7 @@
 /*
- * Name:    expression.cpp
+ * Name:    exprUnary.cpp
  * Author:  Pietro Belotti
- * Purpose: methods of the expression class
+ * Purpose: methods of the unary expression class
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -36,18 +36,6 @@ void exprUnary::print (std::ostream &out,
   if (printPos () == POST) out << printOp ();
 }
 
-/*
-void exprUnary::print (std::ostream      &out = std::cout, 
-		       const std::string &op  = "unknown", 
-		       enum pos           pos = PRE)       const 
-{
-  if (pos == PRE)  out << op;
-  out << "(";
-  argument_ -> print (out);
-  out << ")";
-  if (pos == POST) out << op;
-}
-*/
 
 /// comparison when looking for duplicates
 int exprUnary::compare (exprUnary  &e1) { 

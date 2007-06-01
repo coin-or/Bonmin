@@ -23,7 +23,6 @@ class CouenneProblem;
 
 struct ASL;
 
-
 /// Cut Generator for linear convexifications
 
 class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
@@ -132,6 +131,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 		    unary_function, unary_function, 
 		    int, int, 
 		    CouNumber, CouNumber, CouNumber,
+		    t_chg_bounds * = NULL,
 		    bool = false) const;
 
   /// Add half-plane through (x1,y1) and (x2,y2) -- resp. 4th, 5th,
@@ -172,7 +172,8 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
     {return infeasNode_;}
 
   /// generate OsiRowCuts for current convexification
-  void genRowCuts (const OsiSolverInterface &, OsiCuts &cs, int, int *) const;
+  void genRowCuts (const OsiSolverInterface &, OsiCuts &cs, 
+		   int, int *, t_chg_bounds * = NULL) const;
 
   /// generate OsiColCuts for improved (implied and propagated) bounds
   void genColCuts (const OsiSolverInterface &, OsiCuts &, int, int *) const;

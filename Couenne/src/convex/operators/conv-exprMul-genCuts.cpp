@@ -85,7 +85,10 @@ void contourCut (const CouenneCutGenerator *cg,
 /// generate convexification cut for constraint w = x*y
 
 void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
+
+  // TODO: unify with exprDiv::generateCuts
 
   // get bounds of numerator and denominator
 
@@ -99,6 +102,15 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int wi = w  -> Index (), 
       xi = xe -> Index (), 
       yi = ye -> Index ();
+
+  bool cLX,  cRX,  cLY,  cRY,  cLW,  cRW = 
+       cLX = cRX = cLY = cRY = cLW = true;
+
+  if (!(cg -> isFirst ()) && chg) {
+    cLX = chg [xi].lower != UNCHANGED;  cRX = chg [xi].upper != UNCHANGED;
+    cLY = chg [yi].lower != UNCHANGED;  cRY = chg [yi].upper != UNCHANGED;
+    cLW = chg [wi].lower != UNCHANGED;  cRW = chg [wi].upper != UNCHANGED;
+  }
 
   // if expression is x*c or c*y, with c constant from the problem
   // definition or from the branching rules, the expression is
@@ -200,10 +212,10 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   //
   // These cuts are added if the corresponding bounds are finite
 
-  if (is_boundbox_regular (yl, xl)) cg -> createCut (cs, yl*xl, -1, wi, -1., xi, yl, yi, xl);
-  if (is_boundbox_regular (yu, xu)) cg -> createCut (cs, yu*xu, -1, wi, -1., xi, yu, yi, xu);
-  if (is_boundbox_regular (yl, xu)) cg -> createCut (cs, yl*xu, +1, wi, -1., xi, yl, yi, xu);
-  if (is_boundbox_regular (yu, xl)) cg -> createCut (cs, yu*xl, +1, wi, -1., xi, yu, yi, xl);
+  if ((cLX || cLY) && is_boundbox_regular (yl, xl)) cg -> createCut (cs, yl*xl,-1,wi,-1.,xi,yl,yi,xl);
+  if ((cLX || cLY) && is_boundbox_regular (yu, xu)) cg -> createCut (cs, yu*xu,-1,wi,-1.,xi,yu,yi,xu);
+  if ((cLX || cLY) && is_boundbox_regular (yl, xu)) cg -> createCut (cs, yl*xu,+1,wi,-1.,xi,yl,yi,xu);
+  if ((cLX || cLY) && is_boundbox_regular (yu, xl)) cg -> createCut (cs, yu*xl,+1,wi,-1.,xi,yu,yi,xl);
 
   // add different cuts, to cut out current point in bounding box but
   // out of the hyperbola's belly
@@ -218,9 +230,9 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   //
   // McCormick rules induce a tangent to this contour at the bounds of
   // both variables, but it may be useful to add further cuts along
-  // the contour to eliminate infeasible point (x0,y0), whose product
-  // is in the convexification but out of the contour (on its "convex"
-  // side, or "out of the belly"). 
+  // the contour to eliminate infeasible point (x0,y0,w0), which may
+  // be in the convexification but out of the contour (on its "convex"
+  // side, or "out of the belly").
   //
   // Suppose P (xt,l/xt) (resp. (xt,u/xt) is the point on the contour
   // closest to (x0,y0), found through a Newton method. The cut is
@@ -246,7 +258,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((x0 > xl + COUENNE_EPS) && (y0 > yl + COUENNE_EPS) &&
       (x0 < xu + COUENNE_EPS) && (y0 < yu + COUENNE_EPS)) {
 
-    if ((wl > 0) && (x0*y0 < wl)) { // that is, if (x0,y0) is out of the contour
+    if (cLW && (wl > 0) && (x0*y0 < wl)) { // that is, if (x0,y0) is out of the contour
 
       CouNumber xyl = xl * yl;
 
@@ -257,7 +269,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // Similarly for w <= u < 0 
 
-    if ((wu < 0) && (x0*y0 > wu)) { // that is, if (x0,y0) is out of the contour
+    if (cRW && (wu < 0) && (x0*y0 > wu)) { // that is, if (x0,y0) is out of the contour
 
       CouNumber xuyl = xl * yu;
 

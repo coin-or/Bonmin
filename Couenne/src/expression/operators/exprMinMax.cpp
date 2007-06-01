@@ -8,14 +8,17 @@
 
 #include <OsiSolverInterface.hpp>
 #include <CouenneCutGenerator.h>
+#include <CouenneTypes.h>
 #include <exprMax.h>
 #include <exprMin.h>
 
 void exprMin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) 
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) 
 {}
 
 
 void exprMax::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) 
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) 
 {}

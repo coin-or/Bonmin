@@ -38,32 +38,6 @@ CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index,
     firstBranch_ = (rnd < 1.) ? 0 : (rnd < 2.) ? 1: 2;
   }
 
-  // Depending on where x, l, and u are, divide bound interval into
-  // three and set lcrop_ and rcrop_ accordingly.
-
-  // if l and u are unbounded, crop around x using COUENNE_CROP
-  /*
-  if ((x-l > COUENNE_LARGE_INTERVAL) && 
-      (u-x > COUENNE_LARGE_INTERVAL)) {
-    lcrop_ = x - COUENNE_CROP;
-    rcrop_ = x + COUENNE_CROP;
-    first_ = 1;
-  }
-  else
-    if ((x-l > COUENNE_LARGE_INTERVAL) && 
-	(u-x < COUENNE_NEAR_BOUND)) {
-      lcrop_ = x - COUENNE_CROP;
-      rcrop_ = x - COUENNE_LCROP;
-      first_ = 2;
-    }
-    else
-      if ((x-l < COUENNE_NEAR_BOUND) && 
-	  (u-x > COUENNE_LARGE_INTERVAL)) {
-	lcrop_ = x + COUENNE_CROP;
-	rcrop_ = x + COUENNE_LCROP;
-	first_ = 0;
-	}*/
-
   if (0) {
     printf ("=3= x%d will branch on %g ][ %g (now at %g) [%g,%g]\n", 
 	    index_,
@@ -88,7 +62,7 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
   // way =  0 if "[a,b]" node
   //        1 if ">= b"  node
 
-  int way;
+  int way = 0;
 
   switch (branchIndex_) {
     // if first offspring, let firstBranch_ decide who's first

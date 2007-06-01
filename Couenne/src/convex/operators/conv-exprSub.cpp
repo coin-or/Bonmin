@@ -26,7 +26,8 @@ exprAux *exprSub::standardize (CouenneProblem *p) {
 // generate convexification cut for constraint w = x - y
 
 void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
 
   if (!(cg -> isFirst ()))
     return;
@@ -44,6 +45,6 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
     if (y->Type() == CONST) cg -> createCut (cs, x->Value()-y->Value(), 0, wi, 1, -1, 0, -1, 0, true);
     else                    cg -> createCut (cs, x->Value(),            0, wi, 1, yi, 1, -1, 0, true);
   else // (x - y) or (x - d)
-    if (y->Type() == CONST) cg -> createCut (cs, y->Value(),     0, wi, -1., xi, 1., -1, 0.,true);
-    else                    cg -> createCut (cs, 0.,          0, wi, -1., xi, 1., yi, -1.,true);
+    if (y->Type() == CONST) cg -> createCut (cs, y->Value(),  0, wi, -1., xi, 1., -1,  0., true);
+    else                    cg -> createCut (cs, 0.,          0, wi, -1., xi, 1., yi, -1., true);
 }

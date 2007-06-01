@@ -44,9 +44,11 @@ void expression::getBounds (expression *&lb, expression *&ub) {
 // generate one cut for a constant
 
 void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			      OsiCuts &cs, const CouenneCutGenerator *cg) {
+			      OsiCuts &cs, const CouenneCutGenerator *cg, 
+			      t_chg_bounds *chg) {
 
-  cg -> createCut (cs, currValue_, 0, w -> Index (), 1.);
+  if (cg -> isFirst ())
+    cg -> createCut (cs, currValue_, 0, w -> Index (), 1.);
 }
 
 

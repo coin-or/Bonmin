@@ -99,8 +99,9 @@ class exprCopy: public expression {
 
   /// generate convexification cut for constraint w = this
   inline void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) 
-    {copy_ -> generateCuts (w, si, cs, cg);}
+			    OsiCuts &cs, const CouenneCutGenerator *cg, 
+			    t_chg_bounds *chg = NULL) 
+    {copy_ -> generateCuts (w, si, cs, cg, chg);}
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap

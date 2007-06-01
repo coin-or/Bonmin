@@ -22,7 +22,7 @@ int trigEnvelope (const CouenneCutGenerator *, OsiCuts &,
 		   exprAux *, expression *, enum cou_trig);
 
 
-/// 
+/// add four cuts with slope 1 and -1
 int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
 		 OsiCuts &,      // cut set to be enriched
 		 enum cou_trig,  // sine or cosine
@@ -33,7 +33,15 @@ int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
 /// generate convexification cut for constraint w = sin (this)
 
 void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
+
+  int wi = w -> Index ();
+
+  if (chg && !(cg -> isFirst ()) && 
+      (chg [wi].lower == UNCHANGED) && 
+      (chg [wi].upper == UNCHANGED))
+    return;
 
 #ifdef NEW_TRIG
   if (trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_SINE) == 0)
@@ -49,7 +57,15 @@ void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si,
 /// generate convexification cut for constraint w = cos (this)
 
 void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg) {
+			    OsiCuts &cs, const CouenneCutGenerator *cg,
+			    t_chg_bounds *chg) {
+
+  int wi = w -> Index ();
+
+  if (chg && !(cg -> isFirst ()) && 
+      (chg [wi].lower == UNCHANGED) && 
+      (chg [wi].upper == UNCHANGED))
+    return;
 
 #ifdef NEW_TRIG
   if (trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_COSINE) == 0) 

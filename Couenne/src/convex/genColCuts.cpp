@@ -14,7 +14,7 @@
 /// generate OsiColCuts for improved (implied and propagated) bounds
 void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
 				      OsiCuts &cs,
-				      int nchanged, 
+				      int nchanged,
 				      int *changed) const {
 
   int ncols = problem_ -> nVars () + problem_ -> nAuxs (),
