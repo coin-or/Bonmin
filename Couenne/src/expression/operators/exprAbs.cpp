@@ -65,20 +65,21 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
             *xu = u + index, wu = u [wind];
 
   // for w >= b > 0, we can only improve xlb if it is at least  b
-  //                                 xub             most  -b
+  //                                     xub             most  -b
 
   bool tighter = false;
 
   if (wl > 0) {
-
     if      (*xl > 0) {if (updateBound (-1, xl,  wl)) {tighter = true; chg [index].lower = CHANGED;}}
     else if (*xu < 0) {if (updateBound (+1, xu, -wl)) {tighter = true; chg [index].upper = CHANGED;}}
   }
 
   // w <= u (if u < 0 the problem is infeasible)
 
-  if (updateBound (-1, xl, -wu)) {tighter = true; chg [index].lower = CHANGED;}
-  if (updateBound (+1, xu,  wu)) {tighter = true; chg [index].upper = CHANGED;}
+  if (wu < COUENNE_INFINITY) {
+    if (updateBound (-1, xl, -wu)) {tighter = true; chg [index].lower = CHANGED;}
+    if (updateBound (+1, xu,  wu)) {tighter = true; chg [index].upper = CHANGED;}
+  }
 
   return tighter;
 }

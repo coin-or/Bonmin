@@ -52,12 +52,12 @@ CouNumber exprMul::selectBranch (expression *w,
 
     if (fabs (curr) >= LARGE_BOUND) curr = 0;
 
-    brpts [0] = curr - BOUND_WING;
-    brpts [1] = curr + BOUND_WING;
+    brpts [0] = - fabs (curr) - BOUND_WING;
+    brpts [1] =   fabs (curr) + BOUND_WING;
 
     way = THREE_CENTER;
 
-    return COUENNE_INFINITY;
+    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this
   }
 
   if ((yl < - COUENNE_INFINITY) && 
@@ -73,12 +73,12 @@ CouNumber exprMul::selectBranch (expression *w,
 
     if (fabs (curr) >= LARGE_BOUND) curr = 0;
 
-    brpts [0] = curr - BOUND_WING;
-    brpts [1] = curr + BOUND_WING;
+    brpts [0] = - fabs (curr) - BOUND_WING;
+    brpts [1] =   fabs (curr) + BOUND_WING;
 
     way = THREE_CENTER;
 
-    return COUENNE_INFINITY;
+    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this
   }
 
   // there is at least one finite corner of the bounding box

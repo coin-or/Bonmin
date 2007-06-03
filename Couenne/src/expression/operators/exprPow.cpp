@@ -231,6 +231,18 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	  resU = updateBound (+1, u + index,   COUENNE_INFINITY);
 	}
       }
+
+      // invert check, if bounds on x do not contain 0 we may improve them
+
+      bound = (k>0) ? wl : wu;
+
+      CouNumber xl = l [index], 
+	        xu = u [index],
+                xb = pow (bound, 1./k);
+
+      if      (xl > - xb + COUENNE_EPS) resL = updateBound (-1, l + index,   xb) || resL;
+      else if (xu <   xb - COUENNE_EPS) resU = updateBound ( 1, u + index, - xb) || resU;
+
     } else { // x^k, k=(1/h), h integer and even, or x^k, neither k nor 1/k integer
 
       CouNumber lb = wl, ub = wu;

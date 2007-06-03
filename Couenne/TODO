@@ -1,14 +1,12 @@
-- add cuts at subsequent calls at changed bounds also
 - avoid very large coefficients
 - Bilinear cuts
-- trisection
 - variable lhs/rhs of bounds containing expression defining aux vars
 - cut currValue_ from expressions
 - documentation
 - improve convexification of x/y
 - add integrality to bound check
 - decomposition approach
-- order in convexifying x*y*z*...*(1/w)*(1/t)*...
+- unify products and divisions
 - linear convexification has an acyclic structure where x are leaves
 - recognition of quadratic forms
 - q.f. partitioning into PD + nonconvex

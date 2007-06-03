@@ -50,10 +50,6 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   int j = cs.sizeRowCuts ();
   CouNumber l, u;
 
-  /*printf ("### Generating cut for "); 
-  print (std::cout);  printf (" := ");
-  image_ -> print (std::cout); printf ("\n");*/
-
   if ((!(cg -> isFirst ())) && 
       (fabs ((l = expression::Lbound (varIndex_)) - 
              (u = expression::Ubound (varIndex_))) < COUENNE_EPS))
@@ -89,7 +85,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       print (std::cout);  printf (" := ");
       image_ -> print (std::cout); 
 
-      printf (" [%.3e,%.3e] ---> ", 
+      printf (" [%.3e,%.3e] <--- ", 
 	      expression::Lbound (varIndex_), 
 	      expression::Ubound (varIndex_));
 

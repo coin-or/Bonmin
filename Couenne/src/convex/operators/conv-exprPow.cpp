@@ -194,7 +194,7 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
     // 2) all other cases.
 
     // if k is real or inv(k) is even, then lift l to max (0,l) but if
-    // also u is negative, there is no convexification -- this
+    // u is also negative, there is no convexification -- this
     // function is only defined on non-negative numbers
 
     if (!isInt 
@@ -235,7 +235,6 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
               powStep  = 1;
 
     // upper envelope
-
     if ((  (k > COUENNE_EPS)        // when k negative, add only if
 	|| (l > COUENNE_EPS)        // bounds do not contain 0
 	|| (u < - COUENNE_EPS)) &&

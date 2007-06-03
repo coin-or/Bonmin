@@ -87,8 +87,11 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
     if (c1 < 0) sign = -sign;
 
-    if (sign <= 0) {cut -> setUbs (1, &i1, &bound); problem_ -> Ub (i1) = bound;}
-    if (sign >= 0) {cut -> setLbs (1, &i1, &bound); problem_ -> Lb (i1) = bound;}
+    CouNumber &curL = problem_ -> Lb (i1),
+              &curU = problem_ -> Ub (i1);
+
+    if (sign <= 0) {cut -> setUbs (1, &i1, &bound); if (bound < curU - COUENNE_EPS) curU = bound;}
+    if (sign >= 0) {cut -> setLbs (1, &i1, &bound); if (bound > curL + COUENNE_EPS) curL = bound;}
 
     cut -> setGloballyValid (is_global); // global?
     cs.insert (cut);

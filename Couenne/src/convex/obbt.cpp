@@ -23,9 +23,16 @@ bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 
   csi -> setObjSense (sense);
   csi -> setDblParam (OsiDualObjectiveLimit, 
-		      (sense == 1) ? COUENNE_INFINITY : -COUENNE_INFINITY); 
+		      (sense == 1) ? 1e30 : -1e30); 
 
   csi -> setDblParam (OsiPrimalObjectiveLimit, bound);
+
+  /*char fname [20];
+  static int numsave = 0;
+  sprintf (fname, "obbt_%s_%d", (sense>0) ? "max" : "min", numsave++);
+  csi -> writeMps (fname);
+  printf ("\r%s", fname); fflush (stdout);*/
+
   csi -> resolve ();
 
   if (csi -> isProvenOptimal ()) {
@@ -66,9 +73,13 @@ int obbt_stage (const CouenneCutGenerator *cg,
   for (int i=0; i<ncols; i++)
     //  for (int i=0; i<problem_ ->nVars(); i++) 
 
-    if ((i != objind) && 
-	((sense > 0) && !(chg_bds [i].lower & EXACT) || 
-	 (sense < 0) && !(chg_bds [i].upper & EXACT))) { // do not improve objective's bounds
+    // only improve bounds if
+    if (((i != objind) ||                                               // this is not the objective
+	 ((sense ==  1) && (p -> Obj (0) -> Sense () == MINIMIZE)) ||   // or it is, so we use it
+	 ((sense == -1) && (p -> Obj (0) -> Sense () == MAXIMIZE))) &&  // for re-solving
+	((sense > 0) && !(chg_bds [i].lower & EXACT) ||  // lower bound not already proven optimal
+	 (sense < 0) && !(chg_bds [i].upper & EXACT)) && // upper
+	(p -> Lb (i) < p -> Ub (i) - COUENNE_EPS)) {     // bounds are not equal
 
       int nOrig  = p -> nVars ();
 
@@ -82,6 +93,10 @@ int obbt_stage (const CouenneCutGenerator *cg,
       CouNumber &bound = (sense == 1) ? (p -> Lb (i)) :	(p -> Ub (i)); 
 
       // m{in,ax}imize xi on csi
+
+      /*printf ("\rm%simizing x%d [%g,%g] currently %c= %g ",
+	      (sense==1) ? "in" : "ax", i, p -> Lb (i), p -> Ub (i),
+	      (sense==1) ? '>'  : '<',  bound); fflush (stdout);*/
 
       if (updateBound (csi, sense, bound, isInt)) {
 
@@ -107,7 +122,7 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	// a vector with all zero except a one in position i. This
 	// serves as a base to compute modified reduced cost below.
 
-	if (0)
+	if (0) // TODO
 	for (int j=0; j<ncols; j++) 
 	  if ((j!=i) && (j!=objind)) {
 
@@ -117,8 +132,11 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	    // minimization (maximization) of x_j and the
 	    // corresponding chg_bds[j] can be set to EXACT.
 
-	    if (sol [j] <= p -> Lb (j) + COUENNE_EPS) chg_bds [j].lower |= EXACT;
-	    if (sol [j] >= p -> Ub (j) - COUENNE_EPS) chg_bds [j].upper |= EXACT;
+	    if (!(chg_bds [j].lower & EXACT)) {
+	    }
+
+	    if (!(chg_bds [j].upper & EXACT)) {
+	    }
 	  }
 
 	// re-apply bound tightening
@@ -129,6 +147,13 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	nImprov++;
       }
 
+      // if we solved the problem on the objective function's
+      // auxiliary variable, it is worth to update the current point
+      // (it will be used later to generate new cuts).
+      if ((objind == i) && (csi -> isProvenOptimal ()))
+	p -> update (const_cast <CouNumber *> (csi -> getColSolution ()), NULL, NULL);
+
+      //      printf ("\r");
       // restore null obj fun
       objcoe [i] = 0;
     }
@@ -144,7 +169,6 @@ int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
   int nImprov;
 
   csi -> setIntParam (OsiMaxNumIteration, MAX_OBBT_LP_ITERATION);
-
   // apply all (row+column) cuts to formulation
   csi -> applyCuts (cs);
 

@@ -36,8 +36,8 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // if l, u have the same sign, then w = x (l > 0) or w = -x (u < 0)
 
-  if      (l >= -0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, -1.);
-  else if (u <=  0) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, +1.);
+  if      (l >= -0) {if (cLeft)  cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, -1.);}
+  else if (u <=  0) {if (cRight) cg -> createCut (cs, 0., 0, w_ind, 1., x_ind, +1.);}
   else {
 
     // add two global cuts: w >= x and w >= -x
@@ -47,8 +47,8 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
     }
 
     // otherwise check if at most one of the bounds is infinite: even
-    // so, we can still add a plane, whose slope will be 1 (if x is
-    // unbounded from above) or -1 (from below)
+    // so, we can still add a plane, whose slope is 1 (x unbounded
+    // from above) or -1 (from below)
 
     if (l > - COUENNE_INFINITY) {
 

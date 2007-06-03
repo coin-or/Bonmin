@@ -210,13 +210,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // update problem current point with NLP solution
     problem_ -> update (nlpSol, NULL, NULL);
-    genRowCuts (si, cs, nchanged, changed);  // add cuts
+    genRowCuts (si, cs, nchanged, changed, info, chg_bds, true);  // add cuts
+
+    // restore LP point
+    problem_ -> update (const_cast <CouNumber *> (si. getColSolution ()), NULL, NULL);
 
     addviolated_ = save_av;     // restore previous value
 
     babInfo -> setHasNlpSolution (false); // reset it after use 
   }
-  else genRowCuts (si, cs, nchanged, changed);
+  else genRowCuts (si, cs, nchanged, changed, info, chg_bds);
 
   //---------------------------------------------
 
@@ -254,7 +257,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	genColCuts (*csi, cs, nchanged, changed);
 
 	int nCurCuts = cs.sizeRowCuts ();
-	genRowCuts (*csi, cs, nchanged, changed, chg_bds);// !!!
+	genRowCuts (*csi, cs, nchanged, changed, info, chg_bds);// !!!
 	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
       }
 
@@ -265,15 +268,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 #endif
 
-  delete [] chg_bds;
-
-  // clean up
-  free (changed);
-
   if ((firstcall_) && cs.sizeRowCuts ())
     printf ("Couenne: %d initial cuts\n", cs.sizeRowCuts ());
 
  end_genCuts:
+
+  delete [] chg_bds;
+
+  // clean up
+  free (changed);
 
   if (firstcall_)
     fictitiousBound (cs, problem_, true);

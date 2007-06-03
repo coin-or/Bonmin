@@ -201,3 +201,18 @@ expression *exprGroup::getFixVar () {
     return this;
   else return arglist_ [0];
 }
+
+/// check if this expression depends on a set of variables specified
+/// in the parameters
+bool exprGroup::dependsOn (int *chg, int nch) {
+
+  if (exprOp::dependsOn (chg, nch)) 
+    return true;
+
+  /// TODO: check if chg and index_ are sorted to 
+  for (; nch-- && (*chg >= 0); chg++)
+    for (register int *ind = index_; *ind >= 0;)
+      if (*ind++ == *chg) return true;      
+
+  return false;
+}

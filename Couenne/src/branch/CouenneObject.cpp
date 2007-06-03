@@ -72,7 +72,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
     whichWay_ = whichWay;
 
-    if (brVarInd_ >= 0)
+    if ((brVarInd_ >= 0) && (improv >= 0))
       delta = improv;
 
     if (fabs (delta) < COUENNE_EPS)
@@ -88,7 +88,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
             + WEI_MULT * (1. - 1. / fixvar -> Multiplicity ());*/
   }
 
-  if (0) {
+  if ((0) && (delta > 1e-40)) {
     printf ("Inf |%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
 	    var, expr, 
 	    //	    expression::Lbound (reference_ -> Index ()),

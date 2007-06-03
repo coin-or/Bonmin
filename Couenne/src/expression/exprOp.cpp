@@ -63,32 +63,13 @@ void exprOp::print (std::ostream &out,
   fflush (stdout);
 }
 
-/*void exprOp::print (std::ostream      &out = std::cout, 
-		    const std::string &op  = "unknown", 
-		    enum pos           pos = PRE)        const 
-{
-  if (pos == PRE)
-    out << op;
-
-  out << "("; fflush (stdout);
-  for (int i=0; i<nargs_; i++) {
-    if (arglist_ [i])
-      arglist_ [i] -> print (out); 
-    fflush (stdout);
-    if (i < nargs_ - 1) {
-      if (pos == INSIDE) out << op;
-      else               out << ",";
-    }
-    fflush (stdout);
-  }
-  out << ")";
-  fflush (stdout);
-}
-*/
 
 // does this expression depend on variables in varlist?
 
-bool exprOp::dependsOn (int *varlist = NULL, int n = 1) {
+bool exprOp::dependsOn (int *varlist, int n) {
+
+  if (!varlist) 
+    return true;
 
   for (register int i = nargs_; i--;)
     if (arglist_ [i] -> dependsOn (varlist, n))

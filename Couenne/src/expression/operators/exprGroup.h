@@ -55,6 +55,9 @@ class exprGroup: public exprSum {
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();
 
+  /// check if exprGroup depends on a list of variables specified as parameters
+  virtual bool dependsOn (int * = NULL, int = 1);
+
   /// differentiation
   virtual expression *differentiate (int index); 
 

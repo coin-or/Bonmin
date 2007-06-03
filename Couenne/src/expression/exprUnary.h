@@ -80,7 +80,7 @@ class exprUnary: public expression {
 
   /// dependence on variable set
   bool inline dependsOn (int *list, int n) 
-    {return argument_ -> dependsOn (list, n);}
+    {return (!list || (argument_ -> dependsOn (list, n)));}
 
   /// simplification
   expression *simplify ();

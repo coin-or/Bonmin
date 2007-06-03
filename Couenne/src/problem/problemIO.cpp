@@ -36,15 +36,18 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
 
   printf ("auxiliaries:\n");
   for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
-       i != auxiliaries_.end (); i++) {
-    (*i) -> print (out);
-    out << " [" << (*i) -> rank (NULL) 
-	<< ","  << (*i) -> Multiplicity () << "] := ";
-    (*i) -> Image () -> print (out, false, this); 
-    out << " [ " << (*((*i) -> Lb ())) (); //-> print (out);
-    out << " , " << (*((*i) -> Ub ())) (); //-> print (out);
-    out << " ] " << std::endl;
-  }
+       i != auxiliaries_.end (); i++) 
+
+    if ((*i) -> Multiplicity () > 0) {
+
+      (*i) -> print (out);
+      out << " [" << (*i) -> rank (NULL) 
+	  << ","  << (*i) -> Multiplicity () << "] := ";
+      (*i) -> Image () -> print (out, false, this); 
+      out << " [ " << (*((*i) -> Lb ())) (); //-> print (out);
+      out << " , " << (*((*i) -> Ub ())) (); //-> print (out);
+      out << " ] " << std::endl;
+    }
 
   printf ("bounds:\n");
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
@@ -133,9 +136,6 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
 	f << "aux" << i << ": "; auxiliaries_ [i] -> print (f, false, this);
 	f << " = ";  
 
-	//	if (auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP)
-	  //	  dynamic_cast <exprGroup *> (auxiliaries_ [i] -> Image ()) -> print (f, this);
-	  //	else 
 	auxiliaries_ [i] -> Image () -> print (f, false, this);
 	f << ';' << std::endl;
       }
@@ -153,8 +153,6 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
 
       if ((*i) -> Multiplicity () > 0) {
 	
-	//	f << "conAux"; (*i) -> print (f);
-	//    f << " = ";  (*i) -> Image () -> print (f);
 	CouNumber bound;
 
 	if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) {
@@ -168,10 +166,6 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
 	  (*i) -> print (f, true, this);
 	  f << "<= " << bound << ';' << std::endl;
 	}
-
-	//	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
-	//	if ((*i) -> isInteger ()) f << " integer";
-	//	f << ';' << std::endl;
       }
 
 
@@ -203,34 +197,4 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
       f << " <= " << ub << ';' << std::endl;
     }
   }
-  /*
-  // initial values, original variables /////////////////////////////////////////////
-
-  f << std::endl << "# initial values, original" << std::endl << std::endl;
-
-  for (int i=0; i < nVars (); i++) {
-
-    f << "let ";
-    variables_ [i] -> print (f);
-    f << ".init0 := " << x_ [i] << ';' << std::endl;
-  }
-
-  // initial values, auxiliary variables ////////////////////////////////////////////
-
-  if (aux) {
-
-    f << std::endl << "# initial values, auxiliary variables" << std::endl << std::endl;
-
-    for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
-	 i != auxiliaries_.end ();
-	 i++) 
-
-      if ((*i) -> Multiplicity () > 0) {
-
-	f << "let "; 
-	(*i) -> print (f, false, this);
-	f << ".init0 := " << (*((*i) -> Image ())) () << ';' << std::endl;
-      }
-  }
-  */
 }

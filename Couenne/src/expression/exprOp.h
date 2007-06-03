@@ -85,7 +85,7 @@ class exprOp: public expression {
   virtual inline CouNumber operator () ();
 
   /// dependence on variable set
-  virtual bool dependsOn (int *, int);
+  virtual bool dependsOn (int * = NULL, int = 1);
 
   /// simplification
   virtual expression *simplify ();

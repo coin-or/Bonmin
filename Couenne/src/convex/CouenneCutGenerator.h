@@ -67,6 +67,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// signal infeasibility of current node (found through bound tightening)
   mutable bool infeasNode_;
 
+  /// optimal solution (to test validity of cuts)
+  CouNumber *optimum_;
+
  public:
 
   /// constructor
@@ -173,7 +176,8 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// generate OsiRowCuts for current convexification
   void genRowCuts (const OsiSolverInterface &, OsiCuts &cs, 
-		   int, int *, t_chg_bounds * = NULL) const;
+		   int, int *, const CglTreeInfo &, 
+		   t_chg_bounds * = NULL, bool = false) const;
 
   /// generate OsiColCuts for improved (implied and propagated) bounds
   void genColCuts (const OsiSolverInterface &, OsiCuts &, int, int *) const;
