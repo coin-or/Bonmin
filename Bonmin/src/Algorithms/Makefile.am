@@ -46,6 +46,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/contrib/CGPenalty` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \

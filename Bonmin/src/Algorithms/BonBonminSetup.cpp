@@ -348,12 +348,12 @@ algo_(other.algo_){
       options_->SetNumericValue("oa_dec_time_limit",0, true, true);
       options_->SetNumericValue("nlp_solve_frequency", 0, true, true);
     }
-    //#define GREAT_STUFF_FOR_ANDREAS
+#define GREAT_STUFF_FOR_ANDREAS
 #ifdef GREAT_STUFF_FOR_ANDREAS
     printf("ToDo: Clean me up in Bab::branchAndBound\n");
     OsiCuts cuts;
     nonlinearSolver_->getOuterApproximation(cuts, true, NULL, true);
-    si->applyCuts(cuts);
+    continuousSolver_->applyCuts(cuts);
 #endif
 
     

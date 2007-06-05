@@ -391,3 +391,4 @@ namespace Bonmin
 } // namespace Ipopt
 
 #endif
+

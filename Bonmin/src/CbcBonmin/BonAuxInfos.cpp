@@ -71,3 +71,4 @@ OsiAuxInfo *
   }
   
 }/* end namespace Bonmin*/
+
