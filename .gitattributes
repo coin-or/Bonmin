@@ -8,13 +8,13 @@ Bonmin/doc/BONMIN_UsersManual.pdf -text
 Bonmin/doc/BONMIN_UsersManual.tex -text
 Bonmin/doc/BOUM_Install.tex -text
 Bonmin/doc/BOUM_Intro.tex -text
-Bonmin/doc/BOUM_Obtain.tex -text
 Bonmin/doc/BOUM_options.tex -text
-Bonmin/doc/BOUM_use.tex -text
 Bonmin/doc/Head.tex -text
+Bonmin/doc/Obtain.tex -text
 Bonmin/doc/bonmin.css -text
 Bonmin/doc/bonmin.sty -text
 Bonmin/doc/options.tex -text
+Bonmin/doc/use.tex -text
 Bonmin/examples/CppExample/Mybonmin.opt -text
 Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
