@@ -10,7 +10,7 @@
 %Some frequently used html addresses
 
 %Documentation Pages
-\newcommand{\BonPrefix}{../BOUM_}
+\newcommand{\BonPrefix}{../}
 \newcommand{\BibPage}{\BonPrefix bib/index.html}
 \newcommand{\OptSetPage}{\BonPrefix options_set/index.html}
 \newcommand{\OptListPage}{\BonPrefix options_list/index.html}
@@ -50,9 +50,9 @@
 %disclaimer to add at beginning of each page
 \newcommand{\Disclaimer}{
 \html{
-\begin{rawhtml}
-<h1> This is a beta of the html Bonmin User's Manual. Content may not be accurate. </h1>
-\end{rawhtml}
+%\begin{rawhtml}
+%<h1> This is a beta of the html Bonmin User's Manual. Content may not be accurate. </h1>
+%\end{rawhtml}
 }}
 
 
@@ -64,7 +64,7 @@
 \newcommand{\mycite}[2]{\latexhtml{
 \cite{#1}}
 {
-\begin{rawhtml}<a href= \end{rawhtml}"../BOUM_bib/index.html\##1"
+\begin{rawhtml}<a href= \end{rawhtml}"../bib/index.html\##1"
 \begin{rawhtml}> \end{rawhtml}[#2]\begin{rawhtml}</a>\end{rawhtml}}}
 
 \newcommand{\footlink}[2]{\link{#1}{#2}\latex{\footnote{#1}}}
@@ -125,13 +125,13 @@
 <div id="masthead"> 
   <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1> 
   <div id="globalNav"> 
-	<a href="../BOUM_Intro/index.html">Introduction</a> | 
-	<a href="../BOUM_Obtain/index.html">Download</a> |
-	<a href="../BOUM_Install/index.html">Install</a> | 
-	<a href="../BOUM_use/index.html">Use</a> | 
-	<a href="../BOUM_options_set/index.html">Setting Options</a> | 
-	<a href="../BOUM_options_list/index.html">Options List</a> | 
-	<a href="../BOUM_bib/index.html">Bibliography</a> |
+	<a href="../Intro/index.html">Introduction</a> | 
+	<a href="../Obtain/index.html">Download</a> |
+	<a href="../Install/index.html">Install</a> | 
+	<a href="../use/index.html">Use</a> | 
+	<a href="../options_set/index.html">Setting Options</a> | 
+	<a href="../options_list/index.html">Options List</a> | 
+	<a href="../bib/index.html">Bibliography</a> |
   </div> 
   <h2 id="pageName"> \end{rawhtml} #1 \begin{rawhtml} </h2> 
   \end{rawhtml}}
