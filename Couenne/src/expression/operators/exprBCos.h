@@ -43,12 +43,8 @@ class exprLBCos: public exprOp {
     {return PRE;}
 
   /// print operator
-  std::string printOp () 
+  std::string printOp () const
     {return "LB_Cos";}
-
-  // output
-  //  void print (std::ostream &out = std::cout) 
-  //  {exprOp::print (out, "LB_Cos", PRE);}
 };
 
 
@@ -95,16 +91,12 @@ class exprUBCos: public exprOp {
   CouNumber operator () ();
 
   /// print position (PRE, INSIDE, POST)
-  virtual enum pos printPos () 
+  enum pos printPos () const
     {return PRE;}
 
   /// print operator
-  virtual const std::string printOp () 
+  std::string printOp () const
     {return "UB_Cos";}
-
-  // output
-  //  void print (std::ostream &out = std::cout) 
-  //  {exprOp::print (out, "UB_Cos", PRE);}
 };
 
 

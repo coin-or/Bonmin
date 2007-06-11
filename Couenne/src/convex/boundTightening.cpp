@@ -92,17 +92,27 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
       nbwtightened = 0,
       niter = 0;
 
+  bool first = true;
+
   do {
 
     // propagate bounds to auxiliary variables
 
-    ntightened = problem_ -> tightenBounds (chg_bds);
+    //    if ((nbwtightened > 0) || (ntightened > 0))
+    ntightened = ((nbwtightened > 0) || first) ? problem_ -> tightenBounds (chg_bds) : 0;
+
+    //    printf ("#### propagate ---> %d\n", ntightened);
 
     // implied bounds. Call also at the beginning, as some common
     // expression may have non-propagated bounds
 
-    if (ntightened >= 0) // if last call didn't signal infeasibility
-      nbwtightened = problem_ -> impliedBounds (chg_bds);
+    // if last call didn't signal infeasibility
+    nbwtightened = ((ntightened > 0) || first) ? problem_ -> impliedBounds (chg_bds) : 0;
+
+    //    printf ("#### implied ---> %d\n", nbwtightened);
+
+    if (first)
+      first = false;
 
     if ((ntightened < 0) || (nbwtightened < 0)) {
 

@@ -47,6 +47,8 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
 			    t_chg_bounds *chg) {
 
+  static bool warned_large_coeff = false;
+
   int j = cs.sizeRowCuts ();
   CouNumber l, u;
 
@@ -58,28 +60,37 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   // check if cuts have coefficients, rhs too large or too small
 
-  for (int jj=j; jj < cs.sizeRowCuts (); jj++) {
+  if (warned_large_coeff)
+    for (int jj=j; jj < cs.sizeRowCuts (); jj++) {
 
-    int           n   = cs.rowCutPtr (jj) -> row (). getNumElements();
-    const double *el  = cs.rowCutPtr (jj) -> row (). getElements ();
-    const int    *ind = cs.rowCutPtr (jj) -> row (). getIndices ();
-    double        rhs = cs.rowCutPtr (jj) -> rhs ();
+      OsiRowCut        *cut = cs.rowCutPtr (jj);
+      CoinPackedVector  row = cut -> row ();
 
-    while (n--)
-      if      (fabs (el [n]) > COU_MAX_COEFF)  {
-	printf ("coefficient too large: %.12e x%d\n", el [n], ind [n]);
+      int           n   = cut -> row (). getNumElements();
+      const double *el  = row. getElements ();
+      const int    *ind = row. getIndices ();
+      double        rhs = cut -> rhs ();
+
+      while (n--) {
+	if (fabs (el [n]) > COU_MAX_COEFF)  {
+	  printf ("### Warning: coefficient too large: %g x%d [", el [n], ind [n]);
+	  cut -> print (); 
+	  warned_large_coeff = true;
+	  break;
+	}
+
+	if (fabs (rhs) > COU_MAX_COEFF) {
+	  printf ("rhs too large %g: ", rhs);
+	  cut -> print ();
+	  warned_large_coeff = true;
+	  break;
+	}
       }
-    //   else if (fabs (el[n]) < 1e-10) printf ("coefficient too small: %g x%d\n", el [n], ind [n]);
-
-    if      (fabs (rhs) > COU_MAX_COEFF) {
-      printf ("rhs too large: %.12e\n", rhs);
     }
-    //    else if (fabs (rhs) < 1e-10) printf ("rhs too small: %g\n", rhs);
-  }
 
   //  if (!(cg -> isFirst ())) 
+  if (0)
   if (j < cs.sizeRowCuts ())
-    if (0)
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");

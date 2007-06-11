@@ -14,14 +14,11 @@
 #include <OsiRowCut.hpp>
 #include <BonOaDecBase.hpp>
 #include <CglCutGenerator.hpp>
-#include <CoinHelperFunctions.hpp>
 
 #include <CouennePrecisions.h>
 #include <CouenneProblem.h>
 #include <CouenneCutGenerator.h>
 
-
-void readOptimum (const std::string &, CouNumber *&, CouenneProblem *);
 
 /// constructor
 
@@ -43,36 +40,9 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   objValue_       (- DBL_MAX),
   nlp_            (nlp),
   BabPtr_         (NULL),
-  infeasNode_     (false),
-  optimum_        (NULL) {
+  infeasNode_     (false) {
 
-  if (!asl) return;
-
-  problem_ = new CouenneProblem;
-
-  double now = CoinCpuTime ();
-
-  problem_ -> readnl (asl);
-
-  if ((now = (CoinCpuTime () - now)) > 10.)
-    printf ("Couenne: reading time %.3fs\n", now);
-
-  now = CoinCpuTime ();
-  //problem_ -> print (std::cout);
-  //printf ("======================================\n");
-  problem_ -> standardize ();
-
-  if ((now = (CoinCpuTime () - now)) > 10.)
-    printf ("Couenne: standardization time %.3fs\n", now);
-
-  septime_ = now;
-
-  //problem_ -> print (std::cout);
-
-  //  readOptimum ("optimum.txt", optimum_, problem_);
-
-  //problem_ -> writeMod ("extended-aw.mod", true);
-  //problem_ -> writeMod ("extended-pb.mod", false);
+  problem_ = new CouenneProblem (asl);
 }
 
 
@@ -139,18 +109,3 @@ int CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi,
 /// total number of variables (original + auxiliary) of the problem
 const int CouenneCutGenerator::getnvars () const
 {return problem_ -> nVars () + problem_ -> nAuxs ();} 
-
-
-/// read optimal solution into member optimum
-void readOptimum (const std::string &fname, CouNumber *& optimum, CouenneProblem *problem) {
-
-  int nvars = problem -> nVars (),
-      nauxs = problem -> nAuxs ();
-
-  FILE *f = fopen (fname.c_str (), "r");
-
-  optimum = (CouNumber *) realloc (optimum, (nvars + nauxs) * sizeof (CouNumber));
-
-  for (int i=0; i<nvars; i++)
-    if (fscanf (f, "%lf", optimum + i) < 1) break;
-}

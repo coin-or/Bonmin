@@ -68,7 +68,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   mutable bool infeasNode_;
 
   /// optimal solution (to test validity of cuts)
-  CouNumber *optimum_;
+  //  CouNumber *optimum_;
 
  public:
 

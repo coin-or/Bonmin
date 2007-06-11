@@ -46,8 +46,6 @@ class exprLBMul: public exprOp {
   /// print operator
   std::string printOp () const
     {return "LB_Mul";}
-  // output
-  //  void print (std::ostream &) const;
 };
 
 
@@ -76,11 +74,6 @@ inline CouNumber exprLBMul::operator () () {
 }
 
 
-// output
-//inline void exprLBMul::print (std::ostream &out = std::cout) const
-//{exprOp::print (out, "LB_mul", PRE);}
-
-
 //  class to compute lower bound of a fraction based on the bounds of
 //  both numerator and denominator
 
@@ -100,15 +93,12 @@ class exprUBMul: public exprOp {
   CouNumber operator () ();
 
   /// print position (PRE, INSIDE, POST)
-  virtual enum pos printPos () 
+  enum pos printPos () const
     {return PRE;}
 
   /// print operator
-  virtual const std::string printOp () 
+  std::string printOp () const
     {return "UB_Mul";}
-
-  // output
-  //  void print (std::ostream &) const;
 };
 
 
@@ -124,13 +114,6 @@ inline CouNumber exprUBMul::operator () () {
   register CouNumber d = (*(arglist_ [2])) ();
   register CouNumber D = (*(arglist_ [3])) ();
 
-  /*
-  register CouNumber D = *sp--;
-  register CouNumber d = *sp--;
-  register CouNumber N = *sp--;
-  register CouNumber n = *sp--;
-  */
-
   if (d>0)
     if (N<0) return safeProd (N,d);
     else     return safeProd (N,D);
@@ -145,11 +128,5 @@ inline CouNumber exprUBMul::operator () () {
       if (D>0) return safeProd (N,D);
       else     return safeProd (n,D);
 }
-
-
-// output
-
-//void exprUBMul::print (std::ostream &out = std::cout) const
-//{exprOp::print (out, "UB_mul", PRE);}
 
 #endif

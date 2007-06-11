@@ -42,7 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = testconv$(EXEEXT) testeval$(EXEEXT)
+noinst_PROGRAMS = testclp$(EXEEXT)
 
 # If we have the Ampl solver library, we need to add additional things
 @COIN_HAS_ASL_TRUE@am__append_1 = $(ASL_CPPFLAGS)
@@ -57,19 +57,15 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_couenne.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_testconv_OBJECTS = testconv.$(OBJEXT)
-testconv_OBJECTS = $(am_testconv_OBJECTS)
+am_testclp_OBJECTS = clp-try.$(OBJEXT)
+testclp_OBJECTS = $(am_testclp_OBJECTS)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 	$(CBCOBJDIR)/src/libCbc.la $(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-testconv_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
-am_testeval_OBJECTS = testeval.$(OBJEXT)
-testeval_OBJECTS = $(am_testeval_OBJECTS)
-testeval_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_1) \
+testclp_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -81,8 +77,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(testconv_SOURCES) $(testeval_SOURCES)
-DIST_SOURCES = $(testconv_SOURCES) $(testeval_SOURCES)
+SOURCES = $(testclp_SOURCES)
+DIST_SOURCES = $(testclp_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -254,8 +250,10 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-testconv_SOURCES = fun/testconv.cpp
-testeval_SOURCES = fun/testeval.cpp
+
+#testconv_SOURCES = fun/testconv.cpp
+#testeval_SOURCES = fun/testeval.cpp
+testclp_SOURCES = fun/clp-try.cpp
 
 # List libraries of COIN projects
 testconv_LDADD = \
@@ -267,6 +265,14 @@ testconv_LDADD = \
 
 # List libraries of COIN projects
 testeval_LDADD = \
+        ../src/libCouenne.la \
+	$(ASLLIB) \
+	$(COINLIBS) \
+	$(ADDLIBS)
+
+
+# List libraries of COIN projects
+testclp_LDADD = \
         ../src/libCouenne.la \
 	$(ASLLIB) \
 	$(COINLIBS) \
@@ -292,13 +298,16 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src/include` \
 	$(CLPSRCDIR)/src` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(CGLOBJDIR)/inc` -I`$(CYGPATH_W) \
-	$(COUENNESRCDIR)/src/include` -I`$(CYGPATH_W) \
-	$(COUENNESRCDIR)/src/include/operators` -I`$(CYGPATH_W) \
-	$(COUENNESRCDIR)/src/branch` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) \
-	$(OSIOBJDIR)/inc` -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/inc` -I`$(CYGPATH_W) \
-	$(IPOPTSRCDIR)/src/Common` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/expression` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/expression/operators` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/branch` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/util` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/convex` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/problem` -I`$(CYGPATH_W) \
+	$(OSISRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
+	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(CBCSRCDIR)/src` -I`$(CYGPATH_W) $(CBCSRCDIR)/inc` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` -I`$(CYGPATH_W) \
 	$(IPOPTSRCDIR)/src/LinAlg` -I`$(CYGPATH_W) \
 	$(IPOPTSRCDIR)/src/Interfaces` -I`$(CYGPATH_W) \
 	$(IPOPTOBJDIR)/inc` -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
@@ -307,8 +316,12 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src/include` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/OaAlgorithms` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/CbcBonmin` -I`$(CYGPATH_W) \
-	$(objdir)/inc` -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` $(am__append_1)
+	$(BONMINSRCDIR)/src/Algorithms` -I`$(CYGPATH_W) \
+	$(BONMINSRCDIR)/src/Algorithms/OaGenerators` -I`$(CYGPATH_W) \
+	$(BONMINSRCDIR)/src/Algorithms/Branching` -I`$(CYGPATH_W) \
+	$(BONMINSRCDIR)/src/CbcBonmin` -I`$(CYGPATH_W) $(objdir)/inc` \
+	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
+	$(COINUTILSOBJDIR)/inc` $(am__append_1)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
@@ -361,12 +374,9 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-testconv$(EXEEXT): $(testconv_OBJECTS) $(testconv_DEPENDENCIES) 
-	@rm -f testconv$(EXEEXT)
-	$(CXXLINK) $(testconv_LDFLAGS) $(testconv_OBJECTS) $(testconv_LDADD) $(LIBS)
-testeval$(EXEEXT): $(testeval_OBJECTS) $(testeval_DEPENDENCIES) 
-	@rm -f testeval$(EXEEXT)
-	$(CXXLINK) $(testeval_LDFLAGS) $(testeval_OBJECTS) $(testeval_LDADD) $(LIBS)
+testclp$(EXEEXT): $(testclp_OBJECTS) $(testclp_DEPENDENCIES) 
+	@rm -f testclp$(EXEEXT)
+	$(CXXLINK) $(testclp_LDFLAGS) $(testclp_OBJECTS) $(testclp_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -374,8 +384,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testconv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testeval.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clp-try.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -398,33 +407,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-testconv.o: fun/testconv.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT testconv.o -MD -MP -MF "$(DEPDIR)/testconv.Tpo" -c -o testconv.o `test -f 'fun/testconv.cpp' || echo '$(srcdir)/'`fun/testconv.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/testconv.Tpo" "$(DEPDIR)/testconv.Po"; else rm -f "$(DEPDIR)/testconv.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/testconv.cpp' object='testconv.o' libtool=no @AMDEPBACKSLASH@
+clp-try.o: fun/clp-try.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT clp-try.o -MD -MP -MF "$(DEPDIR)/clp-try.Tpo" -c -o clp-try.o `test -f 'fun/clp-try.cpp' || echo '$(srcdir)/'`fun/clp-try.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/clp-try.Tpo" "$(DEPDIR)/clp-try.Po"; else rm -f "$(DEPDIR)/clp-try.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/clp-try.cpp' object='clp-try.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o testconv.o `test -f 'fun/testconv.cpp' || echo '$(srcdir)/'`fun/testconv.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o clp-try.o `test -f 'fun/clp-try.cpp' || echo '$(srcdir)/'`fun/clp-try.cpp
 
-testconv.obj: fun/testconv.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT testconv.obj -MD -MP -MF "$(DEPDIR)/testconv.Tpo" -c -o testconv.obj `if test -f 'fun/testconv.cpp'; then $(CYGPATH_W) 'fun/testconv.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/testconv.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/testconv.Tpo" "$(DEPDIR)/testconv.Po"; else rm -f "$(DEPDIR)/testconv.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/testconv.cpp' object='testconv.obj' libtool=no @AMDEPBACKSLASH@
+clp-try.obj: fun/clp-try.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT clp-try.obj -MD -MP -MF "$(DEPDIR)/clp-try.Tpo" -c -o clp-try.obj `if test -f 'fun/clp-try.cpp'; then $(CYGPATH_W) 'fun/clp-try.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/clp-try.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/clp-try.Tpo" "$(DEPDIR)/clp-try.Po"; else rm -f "$(DEPDIR)/clp-try.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/clp-try.cpp' object='clp-try.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o testconv.obj `if test -f 'fun/testconv.cpp'; then $(CYGPATH_W) 'fun/testconv.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/testconv.cpp'; fi`
-
-testeval.o: fun/testeval.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT testeval.o -MD -MP -MF "$(DEPDIR)/testeval.Tpo" -c -o testeval.o `test -f 'fun/testeval.cpp' || echo '$(srcdir)/'`fun/testeval.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/testeval.Tpo" "$(DEPDIR)/testeval.Po"; else rm -f "$(DEPDIR)/testeval.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/testeval.cpp' object='testeval.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o testeval.o `test -f 'fun/testeval.cpp' || echo '$(srcdir)/'`fun/testeval.cpp
-
-testeval.obj: fun/testeval.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT testeval.obj -MD -MP -MF "$(DEPDIR)/testeval.Tpo" -c -o testeval.obj `if test -f 'fun/testeval.cpp'; then $(CYGPATH_W) 'fun/testeval.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/testeval.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/testeval.Tpo" "$(DEPDIR)/testeval.Po"; else rm -f "$(DEPDIR)/testeval.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/testeval.cpp' object='testeval.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o testeval.obj `if test -f 'fun/testeval.cpp'; then $(CYGPATH_W) 'fun/testeval.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/testeval.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o clp-try.obj `if test -f 'fun/clp-try.cpp'; then $(CYGPATH_W) 'fun/clp-try.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/clp-try.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

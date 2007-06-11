@@ -1,8 +1,7 @@
 /*
- * Name:   createCuts.cpp
- * Author: Pietro Belotti
+ * Name:    createCuts.cpp
+ * Author:  Pietro Belotti
  * Purpose: a standard cut creator for use with convexification
- *
  *
  * (C) 2006 Pietro Belotti, all rights reserved.
  * This file is distributed under the Common Public License
@@ -27,6 +26,8 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 				    bool is_global)       const {
   bool numerics = false;
 
+  static bool warned_large_coeff = false;
+
   // a maximum of three terms are allowed here. If index -1 (default)
   // the term is not considered
 
@@ -41,8 +42,11 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
   // cut has large coefficients/rhs, bail out
   if (numerics || (fabs (rhs) > COU_MAX_COEFF)) {
-    printf ("### Discarding cut, large coeff/rhs: %g (%d), %g (%d), %g (%d); %g\n", 
-	    c1, i1, c2, i2, c3, i3, rhs);
+    if (!warned_large_coeff) {
+      printf ("### Discarding cut, large coeff/rhs: %g (%d), %g (%d), %g (%d); %g\n", 
+	      c1, i1, c2, i2, c3, i3, rhs);
+      warned_large_coeff = true;
+    }
     return 0;
   }
 

@@ -52,20 +52,20 @@ void invPowImplBounds (int wind, int index,
 
   if (wl >= 0.) {
     if (wu > COUENNE_EPS) {
-      if (wu < COUENNE_INFINITY - 1) resL = updateBound (-1, l + index, pow (wu, k));
-      else                           resL = updateBound (-1, l + index, 0.);
+      if (wu < COUENNE_INFINITY) resL = updateBound (-1, l + index, pow (wu, k));
+      else                       resL = updateBound (-1, l + index, 0.);
     }
-    if (wl > COUENNE_EPS)            resU = updateBound (+1, u + index, pow (wl, k));
+    if (wl > COUENNE_EPS)        resU = updateBound (+1, u + index, pow (wl, k));
   }
 
   // l <= w <= u <= 0
 
   if (wu <= -0.) {
     if (wl < - COUENNE_EPS) {
-      if (wl > - COUENNE_INFINITY + 1) resU = updateBound (+1, u + index, pow (wl, k)) || resU;
-      else                             resU = updateBound (+1, u + index, 0.)          || resU;
+      if (wl > - COUENNE_INFINITY) resU = updateBound (+1, u + index, pow (wl, k)) || resU;
+      else                         resU = updateBound (+1, u + index, 0.)          || resU;
     }
-    if (wu < - COUENNE_EPS)            resL = updateBound (-1, l + index, pow (wu, k)) || resL;
+    if (wu < - COUENNE_EPS)        resL = updateBound (-1, l + index, pow (wu, k)) || resL;
   }
 }
 
@@ -93,4 +93,3 @@ bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   return (resL || resU);
 }
-

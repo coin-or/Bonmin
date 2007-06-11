@@ -31,12 +31,11 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     // get the index of the nonconstant part
     ind = arglist_ [1-ind] -> Index ();
 
-    if (ind==-1) // should not happen, it is a product of constant
+    if (ind==-1) // should not happen, it is a product of constants
       return false;
 
     if (c > COUENNE_EPS) {
 
-      
       resL = (l [wind] > - COUENNE_INFINITY) && updateBound (-1, l + ind, l [wind] / c);
       resU = (u [wind] <   COUENNE_INFINITY) && updateBound ( 1, u + ind, u [wind] / c);
     } 
@@ -67,13 +66,11 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     CouNumber *xl = l + xi, *yl = l + yi, wl = l [wind],
               *xu = u + xi, *yu = u + yi, wu = u [wind];
 
-    /*printf ("from             : w[%d] [%e %e], x%d [%e %e] * y%d [%e %e]",
-      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);*/
 
-    // w's lower bound 
+    // w's lower bound ///////////////////////////////////////////
 
-    bool resxL, resxU, resyL, resyU = 
-      resxL = resxU = resyL = false;
+    bool resxL,  resxU,  resyL, resyU = 
+         resxL = resxU = resyL = false;
 
     if (wl >= 0.) {
 
@@ -90,7 +87,7 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	resxL = (*xl * *yu < wl) && updateBound (-1, xl, wl / *yu);
 	resyL = (*xu * *yl < wl) && updateBound (-1, yl, wl / *xu);
       }
-    } else {
+    } else if (wl > -COUENNE_INFINITY) {
 
       // the infeasible set is a hyperbola with two branches
 
@@ -103,19 +100,22 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       resxU = (*xu * *yu < wl) && (*yu < 0.) && updateBound (+1, xu, wl / *yu); // point B
     }
 
-    // w's upper bound 
+
+    // w's upper bound ///////////////////////////////////////////
 
     if (wu >= 0.) {
 
-      // the infeasible set is a hyperbola with two branches
+      if (wu < COUENNE_INFINITY) {
+	// the infeasible set is a hyperbola with two branches
 
-      // upper right
-      resxU = (*xu * *yl > wu) && (*yl > 0.) && updateBound (+1, xu, wu / *yl) || resxU; // point D
-      resyU = (*xl * *yu > wu) && (*yu > 0.) && updateBound (+1, yu, wu / *xl) || resyU; // point A
+	// upper right
+	resxU = (*xu * *yl > wu) && (*yl > 0.) && updateBound (+1, xu, wu / *yl) || resxU; // point D
+	resyU = (*xl * *yu > wu) && (*yu > 0.) && updateBound (+1, yu, wu / *xl) || resyU; // point A
 
-      // lower left
-      resxL = (*xl * *yu > wu) && (*yu < 0.) && updateBound (-1, xl, wu / *yu) || resxL; // point A
-      resyL = (*xu * *yl > wu) && (*yl < 0.) && updateBound (-1, yl, wu / *xu) || resyL; // point D
+	// lower left
+	resxL = (*xl * *yu > wu) && (*yu < 0.) && updateBound (-1, xl, wu / *yu) || resxL; // point A
+	resyL = (*xu * *yl > wu) && (*yl < 0.) && updateBound (-1, yl, wu / *xu) || resyL; // point D
+      }
 
     } else {
 
@@ -133,11 +133,6 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	resyU = (*xu * *yu > wu) && updateBound (+1, yu, wu / *xu) || resyU;
       }
     }
-
-    /*if (resx || resy) 
-      printf ("                 \ntightened product: w[%d] [%e %e], x%d [%e %e] * y%d [%e %e]\n",
-	      wind, wl, wu, xi, *xl, *xu, yi, *yl, *yu);
-	      else printf ("                                                 \r");*/
 
     if (resxL) chg [xi].lower = CHANGED;
     if (resxU) chg [xi].upper = CHANGED;

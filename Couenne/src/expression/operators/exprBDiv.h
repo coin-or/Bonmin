@@ -53,15 +53,7 @@ class exprLBDiv: public exprOp {
   /// print operator
   std::string printOp () const
     {return "LB_Div";}
-
-  /// I/O
-  //  void print (std::ostream &) const;
 };
-
-
-/// output
-//inline void exprLBDiv::print (std::ostream &out = std::cout) const
-//{exprOp::print (out, "LB_div", PRE);}
 
 
 /// compute sum
@@ -82,6 +74,7 @@ inline CouNumber exprLBDiv::operator () () {
     else            return safeDiv (N,d,-1);      // (-,-,-,-) --> N/d
   }
 }
+
 
 ///  class to compute lower bound of a fraction based on the bounds of
 ///  both numerator and denominator
@@ -108,9 +101,6 @@ class exprUBDiv: public exprOp {
   /// print operator
   std::string printOp () const
     {return "UB_Div";}
-
-  /// output
-  //  void print (std::ostream &) const;
 };
 
 
@@ -132,9 +122,5 @@ inline CouNumber exprUBDiv::operator () () {
     else            return safeDiv (n,d,1);      // (+,+,-,-) --> n/d
   }
 }
-
-/// output
-//void exprUBDiv::print (std::ostream &out = std::cout) const
-//{exprOp::print (out, "UB_div", PRE);}
 
 #endif

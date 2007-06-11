@@ -14,6 +14,7 @@
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
+//#define DEBUG_OBBT
 
 /// reoptimize and change bound of a variable if needed
 bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
@@ -21,11 +22,9 @@ bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 		  CouNumber &bound,        /// bound to be updated
 		  bool isint) {            /// is this variable integer
 
-  csi -> setObjSense (sense);
-  csi -> setDblParam (OsiDualObjectiveLimit, 
-		      (sense == 1) ? 1e30 : -1e30); 
-
-  csi -> setDblParam (OsiPrimalObjectiveLimit, bound);
+  csi -> setDblParam (OsiDualObjectiveLimit, COIN_DBL_MAX); 
+  //  csi -> setDblParam (OsiPrimalObjectiveLimit, bound);
+  csi -> setDblParam (OsiPrimalObjectiveLimit, (sense==1) ? bound : -bound);
 
   /*char fname [20];
   static int numsave = 0;
@@ -33,14 +32,17 @@ bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
   csi -> writeMps (fname);
   printf ("\r%s", fname); fflush (stdout);*/
 
+  csi -> setObjSense (1);
+  //csi -> initialSolve ();
   csi -> resolve ();
 
   if (csi -> isProvenOptimal ()) {
 
     double opt = csi -> getObjValue ();
+    //printf ("found optimum: %g\n", opt);
 
-    if (sense > 0) {if (opt > bound + OBBT_EPS) {bound = (isint ? ceil  (opt) : opt); return true;}}
-    else           {if (opt < bound - OBBT_EPS) {bound = (isint ? floor (opt) : opt); return true;}}
+    if (sense > 0) {if (opt > bound + OBBT_EPS)    {bound = (isint ? ceil (opt) : opt); return true;}}
+    else           {if ((opt=-opt)<bound-OBBT_EPS) {bound = (isint ? floor(opt) : opt); return true;}}
   }
 
   return false;
@@ -55,6 +57,9 @@ int obbt_stage (const CouenneCutGenerator *cg,
 		Bonmin::BabInfo * babInfo,
 		int sense) {
 
+  static int iter = -1;
+  iter++;
+
   CouenneProblem *p = cg -> Problem ();
 
   int ncols   = csi -> getNumCols (),
@@ -68,18 +73,23 @@ int obbt_stage (const CouenneCutGenerator *cg,
     *objcoe++ = 0.;
   objcoe -= ncols;
 
+  csi -> setObjective (objcoe);
+  csi -> setObjSense (1); // minimization
+
   // for all (original+auxiliary) variables x_i,
   ////////////////////////////////////////////////////
   for (int i=0; i<ncols; i++)
     //  for (int i=0; i<problem_ ->nVars(); i++) 
 
     // only improve bounds if
-    if (((i != objind) ||                                               // this is not the objective
-	 ((sense ==  1) && (p -> Obj (0) -> Sense () == MINIMIZE)) ||   // or it is, so we use it
-	 ((sense == -1) && (p -> Obj (0) -> Sense () == MAXIMIZE))) &&  // for re-solving
-	((sense > 0) && !(chg_bds [i].lower & EXACT) ||  // lower bound not already proven optimal
-	 (sense < 0) && !(chg_bds [i].upper & EXACT)) && // upper
-	(p -> Lb (i) < p -> Ub (i) - COUENNE_EPS)) {     // bounds are not equal
+    if (((i != objind) || // this is not the objective
+
+	 // or it is, so we use it for re-solving
+	 ((sense ==  1) && (p -> Obj (0) -> Sense () == MINIMIZE) && !(chg_bds [i].lower & EXACT)) ||
+	 ((sense == -1) && (p -> Obj (0) -> Sense () == MAXIMIZE) && !(chg_bds [i].upper & EXACT)))
+
+	// in both cases, bounds are not equal
+	&& (p -> Lb (i) < p -> Ub (i) - COUENNE_EPS)) {
 
       int nOrig  = p -> nVars ();
 
@@ -87,25 +97,36 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	(p -> Var (i)       -> isInteger ()) :
 	(p -> Aux (i-nOrig) -> isInteger ());
 
-      objcoe [i] = 1;
+      //      objcoe [i] = 1;
+      objcoe [i] = sense;
       csi -> setObjective (objcoe);
+      csi -> setObjSense (1); // minimization
 
       CouNumber &bound = (sense == 1) ? (p -> Lb (i)) :	(p -> Ub (i)); 
 
       // m{in,ax}imize xi on csi
 
-      /*printf ("\rm%simizing x%d [%g,%g] currently %c= %g ",
+#ifdef DEBUG_OBBT
+      printf ("m%simizing x%d [%g,%g] currently %c= %g\n",
 	      (sense==1) ? "in" : "ax", i, p -> Lb (i), p -> Ub (i),
-	      (sense==1) ? '>'  : '<',  bound); fflush (stdout);*/
+	      (sense==1) ? '>'  : '<',  bound); fflush (stdout);
+
+      char fname [20];
+      sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", i, iter);
+      csi -> writeLp (fname);
+#endif
 
       if (updateBound (csi, sense, bound, isInt)) {
 
-	const double *sol = csi -> getColSolution ();
+	/*if (fabs (csi -> getColSolution () [i] - bound) > COUENNE_EPS) 
+	  printf ("!!!%d %g != %g", i, csi -> getColSolution () [i], bound);*/
 
 	if (sense==1) {csi -> setColLower (i, bound); chg_bds [i].lower |= CHANGED | EXACT;}
 	else          {csi -> setColUpper (i, bound); chg_bds [i].upper |= CHANGED | EXACT;}
 
 	// check value and bounds of other variables
+
+	const double *sol = csi -> getColSolution ();
 
 	for (int j=0; j<ncols; j++) 
 	  if ((j!=i) && (j!=objind)) {
@@ -148,18 +169,18 @@ int obbt_stage (const CouenneCutGenerator *cg,
       }
 
       // if we solved the problem on the objective function's
-      // auxiliary variable, it is worth to update the current point
+      // auxiliary variable, it is worth updating the current point
       // (it will be used later to generate new cuts).
       if ((objind == i) && (csi -> isProvenOptimal ()))
 	p -> update (const_cast <CouNumber *> (csi -> getColSolution ()), NULL, NULL);
 
-      //      printf ("\r");
       // restore null obj fun
       objcoe [i] = 0;
     }
 
   return nImprov;
 }
+
 
 /// Optimality based bound tightening
 int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
@@ -168,9 +189,10 @@ int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
 			       Bonmin::BabInfo * babInfo) const {
   int nImprov;
 
+  csi -> setObjSense (1); // minimization
   csi -> setIntParam (OsiMaxNumIteration, MAX_OBBT_LP_ITERATION);
-  // apply all (row+column) cuts to formulation
-  csi -> applyCuts (cs);
+  csi -> applyCuts (cs);   // apply all (row+column) cuts to formulation
+  csi -> initialSolve ();
 
   nImprov =  obbt_stage (this, csi, cs, chg_bds, babInfo,  1); // minimization
   nImprov += obbt_stage (this, csi, cs, chg_bds, babInfo, -1); // maximization

@@ -8,6 +8,10 @@
 
 #include <vector>
 
+#include <sys/time.h>
+#include <CoinHelperFunctions.hpp>
+#include <CoinTime.hpp>
+
 #include <CouenneTypes.h>
 #include <expression.h>
 #include <exprConst.h>
@@ -19,6 +23,44 @@
 
 #include <CouenneProblem.h>
 #include <CouenneProblemElem.h>
+
+
+/// constructor
+CouenneProblem::CouenneProblem (const struct ASL *asl):
+
+  auxSet_   (NULL), 
+  curnvars_ (-1),
+  nIntVars_ (0),
+  optimum_  (NULL),
+  bestObj_  (COIN_DBL_MAX) {
+
+  x_ = lb_ = ub_ = NULL; 
+
+  if (!asl) return;
+
+  double now = CoinCpuTime ();
+
+  readnl (asl);
+
+  if ((now = (CoinCpuTime () - now)) > 10.)
+    printf ("Couenne: reading time %.3fs\n", now);
+
+  now = CoinCpuTime ();
+  //print (std::cout);
+  //printf ("======================================\n");
+  standardize ();
+
+  if ((now = (CoinCpuTime () - now)) > 10.)
+    printf ("Couenne: standardization time %.3fs\n", now);
+
+  //readOptimum ("optimum.txt", optimum_, bestObj_, this);
+
+  //print (std::cout);
+
+  //problem_ -> writeMod ("extended-aw.mod", true);
+  //problem_ -> writeMod ("extended-pb.mod", false);
+}
+
 
 /// clone problem
 
@@ -33,7 +75,9 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   lb_       (NULL),
   ub_       (NULL),
   curnvars_ (-1),
-  nIntVars_ (p.nIntVars_) {
+  nIntVars_ (p.nIntVars_),
+  optimum_  (NULL),
+  bestObj_  (p.bestObj_) {
 
   register int i;
 
@@ -41,6 +85,13 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   for (i=0; i < p.nNLCons (); i++) constraints_ . push_back (p.NLCon (i) -> clone ());
   for (i=0; i < p.nVars   (); i++) variables_   . push_back (p.Var   (i) -> clone ());
   for (i=0; i < p.nAuxs   (); i++) auxiliaries_ . push_back (p.Aux   (i) -> clone ());
+
+  if (p.optimum_) {
+    optimum_ = (CouNumber *) malloc ((nVars () + nAuxs ()) * sizeof (CouNumber));
+
+    for (i = nAuxs () + nVars (); i--;)
+      optimum_ [i] = p.optimum_ [i];
+  }
 
   update (p.X(), p.Lb(), p.Ub());
 }
@@ -194,6 +245,10 @@ CouenneProblem::~CouenneProblem () {
     free (lb_);
     free (ub_);
   }
+
+  // delete optimal solution (if any)
+  if (optimum_)
+    free (optimum_);
 
   // delete objectives
   for (std::vector <Objective *>::iterator i  = objectives_ . begin ();

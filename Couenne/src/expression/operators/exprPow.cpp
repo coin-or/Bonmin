@@ -186,7 +186,7 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   CouNumber k = arglist_ [1] -> Value (); // exponent
 
   if ((fabs (k) < COUENNE_EPS) || 
-      (fabs (k) > COUENNE_INFINITY)) // k null or infinite is of little use
+      (fabs (k) > COUENNE_INFINITY)) // a null or infinite k is of little use
     return false;
 
   int intk; // integer (or integer inverse of) exponent
@@ -197,24 +197,33 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   CouNumber wl = l [wind], // lower w
             wu = u [wind]; // upper w
 
-  if ((isint || isinvint) && (intk % 2) ||
-      (!isint && !isinvint)) { // k or 1/k integer and odd, or non-integer
+  if (!(isint || isinvint) || (intk % 2)) { 
+
+    // k or 1/k integer and odd, or non-integer --> it is a monotone
+    // increasing function
 
     if (k > 0.) { // simple, just follow bounds
 
-      resL = (wl > - COUENNE_INFINITY) ?
+      /*resL = (wl > - COUENNE_INFINITY) ?
 	updateBound (-1, l + index, pow (wl, 1./k)) : 
-	updateBound (-1, l + index, - COUENNE_INFINITY);
+	updateBound (-1, l + index, - COUENNE_INFINITY);*/
 
-      resU = (wu < COUENNE_INFINITY) ?
+      if (wl > - COUENNE_INFINITY) 
+	resL = updateBound (-1, l + index, pow (wl, 1./k)); 
+
+
+      /*resU = (wu < COUENNE_INFINITY) ?
 	updateBound (+1, u + index, pow (wu, 1./k)) :
-	updateBound (+1, u + index, COUENNE_INFINITY);
+	updateBound (+1, u + index, COUENNE_INFINITY);*/
+
+      if (wu < COUENNE_INFINITY)
+	resU = updateBound (+1, u + index, pow (wu, 1./k));
 
     } else // slightly more complicated, resort to same method as in exprInv
       invPowImplBounds (wind, index, l, u, 1./k, resL, resU);
   } 
   else 
-    if (isint) { // x^k, k integer and even
+    if (isint) { // x^k, k integer and even --> non monotone
 
       CouNumber bound = (k<0) ? wl : wu;
 
@@ -226,10 +235,10 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	if (fabs (bound) < COUENNE_INFINITY) {
 	  resL = updateBound (-1, l + index, - pow (bound, 1./k));
 	  resU = updateBound (+1, u + index,   pow (bound, 1./k));
-	} else {
+	} /*else {
 	  resL = updateBound (-1, l + index, - COUENNE_INFINITY);
 	  resU = updateBound (+1, u + index,   COUENNE_INFINITY);
-	}
+	  }*/
       }
 
       // invert check, if bounds on x do not contain 0 we may improve them
@@ -256,7 +265,7 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
       if (fabs (ub) < COUENNE_INFINITY) {
 	if (ub > COUENNE_EPS) resU = updateBound (+1, u + index, pow (ub, 1./k));
-      } else                  resU = updateBound (+1, u + index, COUENNE_INFINITY);
+      } //else                  resU = updateBound (+1, u + index, COUENNE_INFINITY);
     }
 
   if (resL) chg [index].lower = CHANGED;

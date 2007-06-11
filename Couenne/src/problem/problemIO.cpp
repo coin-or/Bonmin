@@ -58,6 +58,16 @@ void CouenneProblem::print (std::ostream &out = std::cout) {
 	<< ub_ [(*i) -> Index ()] << "]\n";
   }
 
+  if (optimum_) {
+    printf ("best known solution: (%g", *optimum_);
+    for (int i=1; i < nVars () + nAuxs (); i++)
+      printf (",%g", optimum_ [i]);
+    printf (")\n");
+  }
+
+  if (fabs (bestObj_) < COUENNE_INFINITY)
+    printf ("best known objective: %g\n", bestObj_);
+
   printf ("end\n");
 } 
 
@@ -197,4 +207,41 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
       f << " <= " << ub << ';' << std::endl;
     }
   }
+}
+
+/// read optimal solution into member optimum
+bool readOptimum (const std::string &fname, 
+		  CouNumber *& optimum, 
+		  CouNumber &bestObj, 
+		  CouenneProblem *problem) {
+
+  int nvars = problem -> nVars (),
+      nauxs = problem -> nAuxs ();
+
+  FILE *f = fopen (fname.c_str (), "r");
+  if (!f) return false;
+
+  optimum = (CouNumber *) realloc (optimum, (nvars + nauxs) * sizeof (CouNumber));
+
+  if (fscanf (f, "%lf", &bestObj) < 1) 
+    return false;
+
+  for (int i=0; i<nvars; i++)
+    if (fscanf (f, "%lf", optimum + i) < 1) 
+      return false;
+
+  // now propagate value to aux variables
+  expression::update (optimum, NULL, NULL);
+
+  // only one loop is sufficient here, since auxiliary variables are
+  // defined in such a way that w_i does NOT depend on w_j if i<j.
+
+  for (register int i = 0, j = problem -> nVars (); i < problem -> nAuxs (); i++, j++)
+    optimum [j] = (*(problem -> Aux (i) -> Image ())) ();
+
+  expression::update (problem -> X  (), 
+		      problem -> Lb (), 
+		      problem -> Ub ());
+
+  return true;
 }

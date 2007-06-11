@@ -55,10 +55,16 @@ class CouenneProblem {
   /// number of discrete variables
   int nIntVars_;
 
+  /// best solution known (to be loaded from file)
+  CouNumber *optimum_;
+
+  /// best known objective function
+  CouNumber bestObj_;
+
  public:
 
   /// constructors, destructor
-  CouenneProblem  () {x_ = lb_ = ub_ = NULL; auxSet_ = NULL; curnvars_ = -1; nIntVars_ = 0;}
+  CouenneProblem  (const ASL * = NULL);
   CouenneProblem  (const CouenneProblem &);
   ~CouenneProblem ();
 
@@ -69,11 +75,11 @@ class CouenneProblem {
   void update (CouNumber *, CouNumber *, CouNumber *, int = -1);
 
   /// get size of vectors
-  int nObjs   () const {return objectives_.        size ();}
-  int nNLCons () const {return constraints_.       size ();}
+  int nObjs   () const {return objectives_.   size ();}
+  int nNLCons () const {return constraints_.  size ();}
 
-  int nAuxs    () const {return auxiliaries_.       size ();}
-  int nVars    () const {return variables_.         size ();}
+  int nAuxs    () const {return auxiliaries_. size ();}
+  int nVars    () const {return variables_.   size ();}
   int nIntVars () const {return nIntVars_;}
 
   /// get elements from vectors
@@ -149,5 +155,9 @@ class CouenneProblem {
   /// search for implied bounds 
   int impliedBounds (t_chg_bounds *) const;
 };
+
+
+/// read best known solution from file given in argument
+bool readOptimum (const std::string &, CouNumber *&, CouNumber &, CouenneProblem *);
 
 #endif

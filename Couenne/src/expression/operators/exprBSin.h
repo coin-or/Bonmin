@@ -44,10 +44,6 @@ class exprLBSin: public exprOp {
   /// print position
   enum pos printPos () const
     {return PRE;}
-
-  // output
-  //  void print (std::ostream &out = std::cout) 
-  //    {exprOp::print (out, "LB_Sin", PRE);}
 };
 
 
@@ -101,10 +97,6 @@ class exprUBSin: public exprOp {
   /// print position
   enum pos printPos () const
     {return PRE;}
-
-  // output
-  //  void print (std::ostream &out = std::cout) 
-  //    {exprOp::print (out, "UB_Sin", PRE);}
 };
 
 

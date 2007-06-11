@@ -33,10 +33,9 @@ inline expression *exprOpp::differentiate (int index)
 bool exprOpp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   int ind = argument_ -> Index ();
-  bool res;
+  bool res = false;
 
   if (updateBound (-1, l + ind, - u [wind])) {res = true; chg [ind].lower = CHANGED;}
   if (updateBound ( 1, u + ind, - l [wind])) {res = true; chg [ind].upper = CHANGED;}
-
   return res;
 }

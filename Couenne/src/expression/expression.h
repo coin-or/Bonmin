@@ -239,14 +239,6 @@ class expression {
 				  double * &brpts, 
 				  int &way)
     {ind = -1; return 0.;}
-
-  /// distance covered by current point if branching rule applied to this expression
-  /*virtual double BranchGain (expression *, const OsiBranchingInformation *)
-    {return 0.;}
-
-  /// branching object best suited for this expression
-  virtual OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *)
-  {return NULL;}*/
 };
 
 
@@ -269,7 +261,7 @@ inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
   //          sign < 0                            LOWER
 
   if (delta > COUENNE_EPS) {
-    //printf ("%.9f --> %.9f\n", *dst, src);
+    //printf ("%.12g --> %.12g\n", *dst, src);
     *dst = src; // tighten
     return true;
   }

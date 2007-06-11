@@ -35,8 +35,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	      expression::Lbound (i),
 	      expression::Ubound (i));*/
 
-  for (register int i = nVars (), j=0; 
-       j < naux; j++) 
+  for (register int i = nVars (), j = 0; j < naux; j++) 
 
     if (Aux (j) -> Multiplicity () > 0) {
 
@@ -48,7 +47,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	    expression::Ubound (i+j));*/
 
       CouNumber ll = (*(Aux (j) -> Lb ())) (),
-	uu = (*(Aux (j) -> Ub ())) ();
+  	        uu = (*(Aux (j) -> Ub ())) ();
 
       //    printf (" ---> [%g, %g]\n ", ll, uu);
 
@@ -68,8 +67,12 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
       //      bool chg = false;
 
-      // check if lower bound got higher    
-      if ((ll > - COUENNE_INFINITY) && (ll >= lb_ [i+j] + COUENNE_EPS)) {
+      // check if lower bound got higher
+      if ((ll > - COUENNE_INFINITY) && 
+	  (ll >= lb_ [i+j] + COUENNE_EPS) &&
+	  ((fabs (ll)        < COUENNE_EPS) || 
+	   (fabs (lb_ [i+j]) < COUENNE_EPS) ||
+	   (fabs (ll / (lb_ [i+j]) - 1) > COUENNE_EPS)) ) {
 
 	/*printf ("update lbound %d: %.10e >= %.10e + %.12e\n", 
 	  i+j, ll, lb_ [i+j], COUENNE_EPS);*/
@@ -77,10 +80,20 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	/*printf ("update lbound %d: %g >= %g\n", 
 	  i+j, ll, lb_ [i+j]);*/
 
-	/*printf ("propa %2d [%g,(%g)] -> [%g,(%g)] (%g)", 
+	/*printf ("propa %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
 		i+j, lb_ [i+j], ub_ [i+j], ll, uu, lb_ [i+j] - ll);
 	Aux (j)             -> print (std::cout); printf (" := ");
 	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+
+	if (optimum_ && 
+	    (optimum_ [i+j] >= lb_ [i+j]) && 
+	    (optimum_ [i+j] <= ll - COUENNE_EPS)) {
+
+	  printf ("propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
+		  i+j, lb_ [i+j], optimum_ [i+j], ll);
+	  Aux (j) -> Lb () -> print (std::cout); printf (" --- ");
+	  Aux (j) -> Ub () -> print (std::cout); printf ("\n");
+	}
 
 	lb_ [i+j] = ll;
 	chg_bds [i+j].lower = CHANGED;
@@ -88,17 +101,32 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
       }
 
       // check if upper bound got lower
-      if ((uu < COUENNE_INFINITY) && (uu <= ub_ [i+j] - COUENNE_EPS)) {
+      if ((uu < COUENNE_INFINITY) && 
+	  (uu <= lb_ [i+j] - COUENNE_EPS) &&
+	  ((fabs (uu)        < COUENNE_EPS) || 
+	   (fabs (ub_ [i+j]) < COUENNE_EPS) ||
+	   (fabs (uu / (ub_ [i+j]) - 1) > COUENNE_EPS)) ) {
+	//      if ((uu < COUENNE_INFINITY) && (uu <= ub_ [i+j] - COUENNE_EPS)) {
 
 	/*printf ("update ubound %d: %.10e <= %.10e - %.12e (%.12e)\n", 
 	  i+j, uu, ub_ [i+j], COUENNE_EPS, uu - ub_ [i+j]);*/
 	/*printf ("update ubound %d: %g >= %g\n", 
 	  i+j, uu, ub_ [i+j]);*/
 
-	/*printf ("propa %2d [(%g),%g] -> [(%g),%g] (%g)", 
+	/*printf ("propa %2d [(%g),%g] -> [(%g),%g] (%g) ", 
 		i+j, lb_ [i+j], ub_ [i+j], ll, uu, ub_ [i+j] - uu);
 	Aux (j)             -> print (std::cout); printf (" := ");
 	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+
+	if (optimum_ && 
+	    (optimum_ [i+j] <= ub_ [i+j]) && 
+	    (optimum_ [i+j] >= uu + COUENNE_EPS)) {
+
+	  printf ("propagating u_%d cuts optimum: [%g <-X- %g <-- %g] :: ", 
+		  i+j, uu, optimum_ [i+j], ub_ [i+j]);
+	  Aux (j) -> Lb () -> print (std::cout); printf (" --- ");
+	  Aux (j) -> Ub () -> print (std::cout); printf ("\n");
+	}
 
 	ub_ [i+j] = uu;
 	chg_bds [i+j].upper = CHANGED;

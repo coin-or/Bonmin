@@ -12,10 +12,13 @@ AUTOMAKE_OPTIONS = foreign
 #                        testfun for Feline                            #
 ########################################################################
 
-noinst_PROGRAMS = testconv testeval
+#noinst_PROGRAMS = testconv testeval testclp
 
-testconv_SOURCES = fun/testconv.cpp
-testeval_SOURCES = fun/testeval.cpp
+noinst_PROGRAMS = testclp
+
+#testconv_SOURCES = fun/testconv.cpp
+#testeval_SOURCES = fun/testeval.cpp
+testclp_SOURCES  = fun/clp-try.cpp
 
 # List libraries of COIN projects
 testconv_LDADD = \
@@ -26,6 +29,13 @@ testconv_LDADD = \
 
 # List libraries of COIN projects
 testeval_LDADD = \
+        ../src/libCouenne.la \
+	$(ASLLIB) \
+	$(COINLIBS) \
+	$(ADDLIBS)
+
+# List libraries of COIN projects
+testclp_LDADD = \
         ../src/libCouenne.la \
 	$(ASLLIB) \
 	$(COINLIBS) \
@@ -53,9 +63,12 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include` \
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/include/operators` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression/operators` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/util` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
@@ -71,6 +84,10 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/OaAlgorithms` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/CbcBonmin` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Algorithms` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Algorithms/OaGenerators` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/CbcBonmin` \
 	-I`$(CYGPATH_W) $(objdir)/inc` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
