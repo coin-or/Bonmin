@@ -95,6 +95,7 @@ namespace Bonmin
     bonBabInfo.setBabPtr(this);
     s.continuousSolver()->setAuxiliaryInfo(&bonBabInfo);
     OsiSolverInterface * solver = s.continuousSolver()->clone();
+    model_.passInMessageHandler(s.continuousSolver()->messageHandler());
     model_.assignSolver(solver, true);
 
   //  s.continuousSolver() = model_.solver();
@@ -389,7 +390,6 @@ namespace Bonmin
     }
     s.nonlinearSolver()->model()->finalize_solution(status, s.nonlinearSolver()->getNumCols(), bestSolution_,
                                           bestObj_);
-    std::cout<<"Finished"<<std::endl;
   }
   
   

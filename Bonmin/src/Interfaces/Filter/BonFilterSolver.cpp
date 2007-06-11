@@ -110,8 +110,10 @@ F77_FUNC(gradient,GRADIENT)(fint *n, fint *m, fint * mxa, real * x, real *a, fin
       int indice = permutationJac[i];
       if(indice > nnz)
 	{
+#ifndef NDEBUG
 	  std::cout<<"Error in gradient computation, i: "<<i
                    <<" in row order "<<permutationJac[i]<<std::endl;
+#endif
          }
       *a++ = values[indice];
     }

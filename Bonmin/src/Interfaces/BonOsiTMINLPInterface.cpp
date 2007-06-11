@@ -1699,7 +1699,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 				       rowLower[bindi], rowUpper[bindi],
 				       n, x, infty);
       if (!retval) {
-	std::cout << "error in cut_strengthener_->ComputeCuts\n";
+	(*messageHandler()) << "error in cut_strengthener_->ComputeCuts\n";
 	//exit(-2);
       }
     }
@@ -2145,7 +2145,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 #if 1
   if(optimization_status_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
   {
-    std::cout<<"Too few degrees of freedom...."<<std::endl;
+    (*messageHandler())<<"Too few degrees of freedom...."<<CoinMessageEol;
     int numrows = getNumRows();
     int numcols = getNumCols();
     

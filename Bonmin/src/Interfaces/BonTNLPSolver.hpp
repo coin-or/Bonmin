@@ -60,7 +60,9 @@ class TNLPSolver: public Ipopt::ReferencedObject{
      name_(name)
     {if(name_=="") 
 {
-	std::cout<<"FIXME"<<std::endl;
+#ifndef NDEBUG
+	std::cerr<<"FIXME"<<std::endl;
+#endif
 }}
     /** Print error message.*/
     void printError(std::ostream & os);
