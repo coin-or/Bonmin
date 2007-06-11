@@ -136,9 +136,9 @@ extern int usingCouenne;
 #endif
       }
 #ifdef OA_DEBUG
-    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
-#endif
+   debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
    std::cout<<"milpBound found: "<<milpBound<<std::endl;
+#endif
    if(usingCouenne)
      delete [] nlpSol;
     return milpBound;

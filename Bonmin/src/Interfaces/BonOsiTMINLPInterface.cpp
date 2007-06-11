@@ -250,6 +250,9 @@ OsiTMINLPInterface::Messages::Messages
   addMessage(WARN_RESOLVE_BEFORE_INITIAL_SOLVE, CoinOneMessage
       (3012,1,"resolve called before any call to initialSolve"
        " can not use warm starts."));
+  addMessage(ERROR_NO_TNLPSOLVER, CoinOneMessage
+             (3013,1,"Can not parse options when no IpApplication has been created"));
+                                                
 
 }
 bool OsiTMINLPInterface::hasPrintedOptions=0;
@@ -588,7 +591,7 @@ app_ = NULL;
 SmartPtr<OptionsList> OsiTMINLPInterface::options()
 {
   if(!IsValid(app_)) {
-    std::cout<<"Can not parse options when no IpApplication has been created"<<std::endl;
+    messageHandler()->message(ERROR_NO_TNLPSOLVER, messages_)<<CoinMessageEol;
     return NULL;
   }
   else
@@ -1471,7 +1474,13 @@ int OsiTMINLPInterface::initializeJacobianArrays()
   jCol_ = new Index[nnz_jac];
   jValues_ = new Number[nnz_jac];
   tminlp_->eval_jac_g(n, NULL, 0, m, nnz_jac, jRow_, jCol_, NULL);
-
+  if(index_style == Ipopt::TNLP::FORTRAN_STYLE)//put C-style
+  {
+    for(int i = 0 ; i < nnz_jac ; i++){
+      jRow_[i]--;
+      jCol_[i]--;
+    }
+  }
 
   if(constTypes_ != NULL) delete [] constTypes_;
 //  if(constTypesNum_ != NULL) delete [] constTypesNum_;
@@ -1940,7 +1949,6 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   if(solveNlp)
     initialSolve();
 
-  CoinPackedMatrix mat;
   double * rowLow = NULL;
   double * rowUp = NULL;
 
@@ -1951,7 +1959,6 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   TNLP::IndexStyleEnum index_style;
   //Get problem information
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
-  int offset = index_style == TNLP::FORTRAN_STYLE;
   //if not allocated allocate spaced for stroring jacobian
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
@@ -1965,8 +1972,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
 
   rowLow = new double[m];
   rowUp = new double[m];
-  int * binding = new int[m];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
-  int numBindings = 0;
+  int * nonBindings = new int[m];//store non binding constraints (which are to be removed from OA)
+  int numNonBindings = 0;
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
   const double * colLower = getColLower();
@@ -1975,134 +1982,74 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   assert(m==getNumRows());
   double infty = getInfinity();
   double nlp_infty = infty_;
+  
   for(int i = 0 ; i < m ; i++) {
-    {
-      if(constTypes_[i] == TNLP::NON_LINEAR) {
-        //If constraint is equality not binding do not add
-        if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
-        {
-            binding[i] = -1;
-            continue;
-        }
-        else
-          binding[i] = numBindings;
-        if(rowLower[i] > - nlp_infty)
-          rowLow[numBindings] = (rowLower[i] - g[i]) - 1e-07;
-        else
-          rowLow[numBindings] = - infty;
-        if(rowUpper[i] < nlp_infty)
-          rowUp[numBindings] =  (rowUpper[i] - g[i]) + 1e-07;
-        else
-          rowUp[numBindings] = infty;
-        
-        //If equality or ranged constraint only add one side by looking at sign of dual multiplier
-        if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty)
-        {
-          if(duals[i] >= 0)// <= inequality
-            rowLow[numBindings] = - infty;
-          if(duals[i] <= 0)// >= inequality
-            rowUp[numBindings] = infty;
-        }
-        numBindings++;
-      }
-      else {
-        binding[i] = numBindings;//All are considered as bindings
-        rowLow[numBindings] = (rowLower[i] - g[i]);
-        rowUp[numBindings] =  (rowUpper[i] - g[i]);
-        numBindings++;
-      }
-    }
-  }
-
-  //Then convert everything to a CoinPackedMatrix (col ordered)
-  CoinBigIndex * inds = new CoinBigIndex[nnz_jac_g + 1];
-  double * vals = new double [nnz_jac_g + 1];
-  int * start = new int[n+1];
-  int * length = new int[n];
-  bool needOrder = false;
-  int nnz = 0;
-  if(nnz_jac_g > 0)
   {
-  for(int k = 0; k < jCol_[0]; k++) {
-    start[k] = nnz;
-    length[k] = 0;
-  }
-  for(int i = 0 ; i < nnz_jac_g - 1 ; i++) {
-    {
-      if(jCol_[i + 1] < jCol_ [i] || ( jCol_ [i+1] == jCol_[i] && jRow_[i + 1] <= jRow_[i]) ) {
-        needOrder = 1;
-        break;
+    if(constTypes_[i] == TNLP::NON_LINEAR) {
+      //If constraint is range not binding prepare to remove it
+      if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
+      {
+        nonBindings[numNonBindings++] = i;
+        continue;
       }
-      if(TNLP::LINEAR //Always accept coefficients from linear constraints
-          || //For other clean tinys
-          cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
-              rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
-              getColSolution()[jCol_[i] - offset],
-              rowLow[binding[jRow_[i] - offset]],
-              rowUp[binding[jRow_[i] -offset]], tiny_, veryTiny_)) {
-        if(binding[jRow_[i] - offset] == -1) continue;
-        vals[nnz] = jValues_[i];
-        if(rowLow[binding[jRow_[i] - offset]] > - infty_)
-          rowLow[binding[jRow_[i] - offset]] += jValues_[i] * getColSolution()[jCol_ [i] - offset];
-        if(rowUp[binding[jRow_[i] - offset]] < infty_)
-          rowUp[binding[jRow_[i] -offset]] += jValues_[i] *getColSolution()[jCol_[i] -offset];
-        inds[nnz] = binding[jRow_[i] - offset];//jRow_[i ] - 1;
-        length[jCol_[i] - offset]++;
-        nnz++;
+      else
+        if(rowLower[i] > - nlp_infty)
+          rowLow[i] = (rowLower[i] - g[i]) - 1e-07;
+      else
+        rowLow[i] = - infty;
+      if(rowUpper[i] < nlp_infty)
+        rowUp[i] =  (rowUpper[i] - g[i]) + 1e-07;
+      else
+        rowUp[i] = infty;
+      
+      //If equality or ranged constraint only add one side by looking at sign of dual multiplier
+      if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty)
+      {
+        if(duals[i] >= 0)// <= inequality
+          rowLow[i] = - infty;
+        if(duals[i] <= 0)// >= inequality
+          rowUp[i] = infty;
       }
     }
-    if(jCol_[i + 1] > jCol_[i]) {
-      for(int k = jCol_[i]; k < jCol_[i + 1]; k++) {
-        start[k] = nnz;
-        length[k] = 0;
-      }
+    else {
+      rowLow[i] = (rowLower[i] - g[i]);
+      rowUp[i] =  (rowUpper[i] - g[i]);
     }
   }
-  if(!needOrder) {
-    {
-      length[jCol_[nnz_jac_g -1] - offset]++;
-      vals[nnz] = jValues_[nnz_jac_g - 1];
-      rowLow[binding[jRow_[nnz_jac_g - 1] - 1]] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1] - offset];
-      rowUp[binding[jRow_[nnz_jac_g - 1] -offset]] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] -offset];
-      inds[nnz++] = binding[jRow_[nnz_jac_g - 1] - offset];
+  }
+  
+  
+  //Then convert everything to a CoinPackedMatrix
+  //Go through values, clean coefficients and fix bounds
+  for(int i = 0 ; i < nnz_jac_g ; i++) {
+    if(constTypes_[jRow_[i]] == TNLP::LINEAR //Always accept coefficients from linear constraints
+       || //For other clean tinys
+       cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
+                rowLower[jRow_[i]], rowUpper[jRow_[i]],
+                getColSolution()[jCol_[i]],
+                rowLow[jRow_[i]],
+                rowUp[jRow_[i]], tiny_, veryTiny_)) {      
+      rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
+      rowUp[jRow_[i]] += jValues_[i] *getColSolution()[jCol_[i]];
     }
-    for(int i = jCol_[nnz_jac_g -1] ; i < n ; i++) {
-      start[i] = nnz;
-      length[i] = 0;
-    }
-    start[n]=nnz;
   }
-  else {
-    std::cerr<<"jacobian matrix is not ordered properly"<<std::endl;
-    throw -1;
-  }
-  delete [] g;
-  }
-  else {
-   for (int i = 0 ; i < n ; i++)
-   {
-     length[i] = 0;
-     start[i] = 0;
-   }
-   start[n]=0;
- }
- mat.assignMatrix(false, m, n, nnz, vals, inds, start, length);
+  CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
+  
+  
+
+  //remove non-bindings equality constraints
+  mat.deleteRows(numNonBindings, nonBindings);
+  
   int numcols=getNumCols();
   double *obj = new double[numcols];
   for(int i = 0 ; i < numcols ; i++)
     obj[i] = 0;
-  mat.transpose();
   
-#if 0 
-  std::cout<<"Mat is ordered by "<<
-  <<mat.isColOrdered?"columns.":"rows."
-  <<std::endl;
-#endif
   
   si.loadProblem(mat, getColLower(), getColUpper(), obj, rowLow, rowUp);
   delete [] rowLow;
   delete [] rowUp;
-  delete [] binding;
+  delete [] nonBindings;
   for(int i = 0 ; i < getNumCols() ; i++) {
     if(isInteger(i))
       si.setInteger(i);

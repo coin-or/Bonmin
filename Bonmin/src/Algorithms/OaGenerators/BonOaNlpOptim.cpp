@@ -103,15 +103,19 @@ namespace Bonmin
           char sign = (elements[k]>0.)?'+':'-';
           char type='<';
           if (rowLower[i]>-1e20) type='>';
+#ifdef OA_DEBUG
           std::cout<<"Non zero with sign: "<<sign<<", type: "<<type<<std::endl;
+#endif
         }
       }
       if (nnzExists) {
         numberCuts--;
         continue;
       }
+#ifdef OA_DEBUG
       else
         std::cout<<"No nonzero element"<<std::endl;
+#endif
       int * indsCopy = CoinCopyOfArray(&indices[starts[i]], lengths[i]);
       double * elemsCopy = CoinCopyOfArray(&elements[starts[i]], lengths[i]);
       cuts[numberCuts] = new OsiRowCut(rowLower[i], rowUpper[i], lengths[i], lengths[i],

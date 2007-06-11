@@ -101,6 +101,7 @@ class SimpleError : public CoinError
     WARN_RESOLVE_BEFORE_INITIAL_SOLVE /** resolve() has been called but there
                                               was no previous call to initialSolve().
                                          */,
+    ERROR_NO_TNLPSOLVER /** Trying to access non-existent TNLPSolver*/,
     OSITMINLPINTERFACE_DUMMY_END
   };
 
