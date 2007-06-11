@@ -11,6 +11,9 @@
 
 #include <exprOp.h>
 #include <math.h>
+#ifndef M_PI
+# define M_PI 3.14159265358979323846
+#endif
 
 
 //  class to compute lower bound of a cosine based on the bounds of

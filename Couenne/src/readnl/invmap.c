@@ -26,7 +26,9 @@ typedef struct {
 
 /* compare two AslCoupair's, used in qsort and bsearch below */
 
-inline int pair_compare (const void *p1, const void *p2) {
+/* AW: 2007-06-11: changed b/c of problems with MSVC++ */
+/* inline int pair_compare (const void *p1, const void *p2) { */
+static int pair_compare (const void *p1, const void *p2) {
 
   /* FIX THIS! weak cast for 64 bit machines */
 

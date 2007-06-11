@@ -151,6 +151,7 @@ int exprQuad::Linearity () {
       else                          return LINEAR;
     else                            return nllin;
   */
+return 0;
 }
 
 /// compare affine terms

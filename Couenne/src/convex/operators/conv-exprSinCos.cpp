@@ -7,6 +7,12 @@
  */
 
 #include <math.h>
+#ifndef M_PI
+# define M_PI 3.14159265358979323846
+#endif
+#ifndef M_PI_2
+# define M_PI_2 1.57079632679489661923
+#endif
 
 #include <OsiSolverInterface.hpp>
 #include <CouenneTypes.h>
@@ -86,7 +92,9 @@ int addHexagon (const CouenneCutGenerator *cg, // cut generator that has called 
 		 exprAux *aux,      // auxiliary variable
 		 expression *arg) { // argument of cos/sin (should be a variable)
 
-  unary_function fn = (tt == COU_SINE) ? sin : cos;
+  // AW 2007-06-11: The following doesn't compile with MSVC++ because
+  // sin and cos are ambiguous
+  //unary_function fn = (tt == COU_SINE) ? sin : cos;
 
   // retrieve argument bounds
   expression *lbe, *ube;
@@ -117,14 +125,26 @@ int addHexagon (const CouenneCutGenerator *cg, // cut generator that has called 
 
   // left
   if (lb > -COUENNE_INFINITY) { // if not unbounded
-    ncuts += cg -> createCut (cs, fn (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w-x <= f lb - lb 
-    ncuts += cg -> createCut (cs, fn (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w+x >= f lb + lb 
+    if (tt == COU_SINE) {
+      ncuts += cg -> createCut (cs, sin (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w-x <= f lb - lb 
+      ncuts += cg -> createCut (cs, sin (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w+x >= f lb + lb 
+    }
+    else {
+      ncuts += cg -> createCut (cs, cos (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w-x <= f lb - lb 
+      ncuts += cg -> createCut (cs, cos (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w+x >= f lb + lb 
+    }
   }
 
   // right
   if (ub <  COUENNE_INFINITY) { // if not unbounded
-    ncuts += cg -> createCut (cs, fn (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
-    ncuts += cg -> createCut (cs, fn (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
+    if (tt == COU_SINE) {
+      ncuts += cg -> createCut (cs, sin (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
+      ncuts += cg -> createCut (cs, sin (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
+    }
+    else {
+      ncuts += cg -> createCut (cs, cos (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
+      ncuts += cg -> createCut (cs, cos (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
+    }
   }
 
   return ncuts;
