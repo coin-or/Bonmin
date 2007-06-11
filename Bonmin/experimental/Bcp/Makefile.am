@@ -1,4 +1,4 @@
-# Copyright (C) 2006 International Business Machines and others.
+# Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
@@ -90,10 +90,11 @@ amplsolver.a:
 	cat aslflags.txt ; \
 	eval `sed -e "s/ CFLAGS=\".*\"//" aslflags.txt`; \
 	eval `sed -e "s/.*CFLAGS=\"\(.*\)\".*/CFLAGS=\"-DNO_FUNCADD \1\"/" aslflags.txt` ; \
-	if test x"$$CC" = x; then \
-		CC=cc ; \
-	fi; \
-	$(MAKE) CC="$$CC" $$ASLMAKEFLAGS CFLAGS="$$CFLAGS" -f makefile.u ; \
+	if test "$(EXEEXT)" = ".exe"; then \
+		sed -e 's/a.out/a.exe/' makefile.u > blabla ; \
+		mv blabla makefile.u ; \
+	fi ; \
+	$(MAKE) CC="$(CC)" $$ASLMAKEFLAGS CFLAGS="$$CFLAGS" -f makefile.u ; \
 	cp amplsolver.a ..
 	rm -rf solvers
 
