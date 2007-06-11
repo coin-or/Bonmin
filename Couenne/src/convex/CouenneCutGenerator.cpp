@@ -8,7 +8,8 @@
  */
 
 // for profiling
-#include <sys/time.h>
+//AW 2007-06-11: Taken out this since it doesn't compile with MSVC++
+//#include <sys/time.h>
 
 #include <OsiRowCut.hpp>
 #include <BonOaDecBase.hpp>
