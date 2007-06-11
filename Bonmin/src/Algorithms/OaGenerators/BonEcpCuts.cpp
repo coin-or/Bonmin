@@ -39,7 +39,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
   const int & depth = info.level;
   double beta=10000;
   if(depth == 0) return;
-  if(num> beta*pow(2,-depth))
+  if(num> beta*pow(2.,-depth))
     return;
   double violation = nlp_->getNonLinearitiesViolation(
                      si.getColSolution(), si.getObjValue());
