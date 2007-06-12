@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <CoinHelperFunctions.hpp>
 #include <CoinTime.hpp>
 
