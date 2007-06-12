@@ -16,6 +16,9 @@
 #include "BonEcpCuts.hpp"
 #include "BonOaNlpOptim.hpp"
 
+// The following is included for "min"
+#include "CoinFinite.hpp"
+
 //#############################################################################
 
 BM_lp::BM_lp() :
@@ -238,7 +241,7 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 		continue;
 	    const double psol = primal_solution_[i];
 	    const double frac = psol - floor(psol);
-	    const double dist = std::min(frac, 1.0-frac);
+	    const double dist = min(frac, 1.0-frac);
 	    if (dist >= integerTolerance_)
 		break;
 	}
