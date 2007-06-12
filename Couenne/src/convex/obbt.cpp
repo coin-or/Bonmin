@@ -23,23 +23,15 @@ bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 		  bool isint) {            /// is this variable integer
 
   csi -> setDblParam (OsiDualObjectiveLimit, COIN_DBL_MAX); 
-  //  csi -> setDblParam (OsiPrimalObjectiveLimit, bound);
   csi -> setDblParam (OsiPrimalObjectiveLimit, (sense==1) ? bound : -bound);
-
-  /*char fname [20];
-  static int numsave = 0;
-  sprintf (fname, "obbt_%s_%d", (sense>0) ? "max" : "min", numsave++);
-  csi -> writeMps (fname);
-  printf ("\r%s", fname); fflush (stdout);*/
-
   csi -> setObjSense (1);
-  //csi -> initialSolve ();
+
   csi -> resolve ();
 
   if (csi -> isProvenOptimal ()) {
 
     double opt = csi -> getObjValue ();
-    //printf ("found optimum: %g\n", opt);
+    //    printf ("found optimum: %g\n", opt);
 
     if (sense > 0) {if (opt > bound + OBBT_EPS)    {bound = (isint ? ceil (opt) : opt); return true;}}
     else           {if ((opt=-opt)<bound-OBBT_EPS) {bound = (isint ? floor(opt) : opt); return true;}}
@@ -54,6 +46,7 @@ int obbt_stage (const CouenneCutGenerator *cg,
 		OsiSolverInterface *csi,
 		OsiCuts &cs,
 		t_chg_bounds *chg_bds,
+		const CoinWarmStart *warmstart,
 		Bonmin::BabInfo * babInfo,
 		int sense) {
 
@@ -78,6 +71,7 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
   // for all (original+auxiliary) variables x_i,
   ////////////////////////////////////////////////////
+
   for (int i=0; i<ncols; i++)
     //  for (int i=0; i<problem_ ->nVars(); i++) 
 
@@ -115,6 +109,9 @@ int obbt_stage (const CouenneCutGenerator *cg,
       sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", i, iter);
       csi -> writeLp (fname);
 #endif
+
+      csi -> setWarmStart (warmstart);
+
 
       if (updateBound (csi, sense, bound, isInt)) {
 
@@ -169,8 +166,9 @@ int obbt_stage (const CouenneCutGenerator *cg,
       }
 
       // if we solved the problem on the objective function's
-      // auxiliary variable, it is worth updating the current point
-      // (it will be used later to generate new cuts).
+      // auxiliary variable (that is, we re-solved the extended
+      // problem), it is worth updating the current point (it will be
+      // used later to generate new cuts).
       if ((objind == i) && (csi -> isProvenOptimal ()))
 	p -> update (const_cast <CouNumber *> (csi -> getColSolution ()), NULL, NULL);
 
@@ -187,15 +185,33 @@ int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
 			       OsiCuts &cs,
 			       t_chg_bounds *chg_bds,
 			       Bonmin::BabInfo * babInfo) const {
-  int nImprov;
 
+  // set large bounds to infinity (as per suggestion by JJF)
+
+  int ncols = csi -> getNumCols ();
+  const double *lb = csi -> getColLower (),
+               *ub = csi -> getColUpper ();
+
+  while (ncols--) {
+    if (lb [ncols] < - COUENNE_INFINITY) csi -> setColLower (ncols, -COIN_DBL_MAX);
+    if (ub [ncols] >   COUENNE_INFINITY) csi -> setColUpper (ncols,  COIN_DBL_MAX);
+  }
+
+  //  csi -> setHintParam (OsiDoDualInResolve, false);
+
+  // setup cloned interface for later use
   csi -> setObjSense (1); // minimization
   csi -> setIntParam (OsiMaxNumIteration, MAX_OBBT_LP_ITERATION);
   csi -> applyCuts (cs);   // apply all (row+column) cuts to formulation
   csi -> initialSolve ();
 
-  nImprov =  obbt_stage (this, csi, cs, chg_bds, babInfo,  1); // minimization
-  nImprov += obbt_stage (this, csi, cs, chg_bds, babInfo, -1); // maximization
+  int nImprov;
+
+  const CoinWarmStart *warmstart = csi -> getWarmStart ();
+
+  // improve each bound
+  nImprov =  obbt_stage (this, csi, cs, chg_bds, warmstart, babInfo,  1); // lower
+  nImprov += obbt_stage (this, csi, cs, chg_bds, warmstart, babInfo, -1); // upper
 
   return nImprov;
 }

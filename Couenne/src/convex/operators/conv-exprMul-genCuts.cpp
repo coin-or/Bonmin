@@ -103,15 +103,6 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
       xi = xe -> Index (), 
       yi = ye -> Index ();
 
-  bool cLX,  cRX,  cLY,  cRY,  cLW,  cRW = 
-       cLX = cRX = cLY = cRY = cLW = true;
-
-  if (!(cg -> isFirst ()) && chg) {
-    cLX = chg [xi].lower != UNCHANGED;  cRX = chg [xi].upper != UNCHANGED;
-    cLY = chg [yi].lower != UNCHANGED;  cRY = chg [yi].upper != UNCHANGED;
-    cLW = chg [wi].lower != UNCHANGED;  cRW = chg [wi].upper != UNCHANGED;
-  }
-
   // if expression is x*c or c*y, with c constant from the problem
   // definition or from the branching rules, the expression is
   // linear. Add one convexification equality constraint.
@@ -202,6 +193,15 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
     return;
   }
 
+  bool cLX,  cRX,  cLY,  cRY,  cLW,  cRW = 
+       cLX = cRX = cLY = cRY = cLW = true;
+
+  if (!(cg -> isFirst ()) && chg) {
+    cLX = chg [xi].lower != UNCHANGED;  cRX = chg [xi].upper != UNCHANGED;
+    cLY = chg [yi].lower != UNCHANGED;  cRY = chg [yi].upper != UNCHANGED;
+    cLW = chg [wi].lower != UNCHANGED;  cRW = chg [wi].upper != UNCHANGED;
+  }
+
   // Add McCormick convexification cuts:
   //
   // 1) w >= yl x + xl y - yl xl
@@ -213,9 +213,9 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // These cuts are added if the corresponding bounds are finite
 
   if ((cLX || cLY) && is_boundbox_regular (yl, xl)) cg -> createCut (cs, yl*xl,-1,wi,-1.,xi,yl,yi,xl);
-  if ((cLX || cLY) && is_boundbox_regular (yu, xu)) cg -> createCut (cs, yu*xu,-1,wi,-1.,xi,yu,yi,xu);
-  if ((cLX || cLY) && is_boundbox_regular (yl, xu)) cg -> createCut (cs, yl*xu,+1,wi,-1.,xi,yl,yi,xu);
-  if ((cLX || cLY) && is_boundbox_regular (yu, xl)) cg -> createCut (cs, yu*xl,+1,wi,-1.,xi,yu,yi,xl);
+  if ((cRX || cRY) && is_boundbox_regular (yu, xu)) cg -> createCut (cs, yu*xu,-1,wi,-1.,xi,yu,yi,xu);
+  if ((cRX || cLY) && is_boundbox_regular (yl, xu)) cg -> createCut (cs, yl*xu,+1,wi,-1.,xi,yl,yi,xu);
+  if ((cLX || cRY) && is_boundbox_regular (yu, xl)) cg -> createCut (cs, yu*xl,+1,wi,-1.,xi,yu,yi,xl);
 
   // add different cuts, to cut out current point in bounding box but
   // out of the hyperbola's belly
