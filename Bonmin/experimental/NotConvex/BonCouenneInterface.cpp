@@ -85,8 +85,8 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
 
    // overwrite original bounds, could be improved within generateCuts
    for (register int i=numcolsconv; i--;) {
-     colLower [i] = ll [i];
-     colUpper [i] = uu [i];
+     colLower [i] = (ll [i] > - COUENNE_INFINITY) ? ll [i] : -COIN_DBL_MAX;
+     colUpper [i] = (uu [i] <   COUENNE_INFINITY) ? uu [i] :  COIN_DBL_MAX;
    }
 
    int numrowsconv = cs.sizeRowCuts ();
