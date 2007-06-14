@@ -9,34 +9,45 @@
 AUTOMAKE_OPTIONS = foreign
 
 ########################################################################
-#                        testfun for Feline                            #
+#                        testfun for Couenne                           #
 ########################################################################
 
 #noinst_PROGRAMS = testconv testeval testclp
 
-noinst_PROGRAMS = testclp
+noinst_PROGRAMS = sdpcuts
 
 #testconv_SOURCES = fun/testconv.cpp
 #testeval_SOURCES = fun/testeval.cpp
-testclp_SOURCES  = fun/clp-try.cpp
+#testclp_SOURCES  = fun/clp-try.cpp
 
-# List libraries of COIN projects
-testconv_LDADD = \
-        ../src/libCouenne.la \
-	$(ASLLIB) \
-	$(COINLIBS) \
-	$(ADDLIBS)
+sdpcuts_SOURCES  = fun/sdpcuts.cpp fun/populate.cpp fun/createCut.cpp fun/SdpCutGen.cpp
 
-# List libraries of COIN projects
-testeval_LDADD = \
-        ../src/libCouenne.la \
-	$(ASLLIB) \
-	$(COINLIBS) \
-	$(ADDLIBS)
+# if 0
+# # List libraries of COIN projects
+# testconv_LDADD = \
+#         ../src/libCouenne.la \
+# 	$(ASLLIB) \
+# 	$(COINLIBS) \
+# 	$(ADDLIBS)
+# # List libraries of COIN projects
+# testeval_LDADD = \
+#         ../src/libCouenne.la \
+# 	$(ASLLIB) \
+# 	$(COINLIBS) \
+# 	$(ADDLIBS)
+# # List libraries of COIN projects
+# testclp_LDADD = \
+#         ../src/libCouenne.la \
+# 	$(ASLLIB) \
+# 	$(COINLIBS) \
+# 	$(ADDLIBS)
+# endif
 
-# List libraries of COIN projects
-testclp_LDADD = \
+sdpcuts_LDADD = \
         ../src/libCouenne.la \
+	fun/nmtr/src/blas/libblas.a \
+	fun/nmtr/src/lapack/liblapack.a \
+	fun/nmtr/src/nmtr/libdgqt.a \
 	$(ASLLIB) \
 	$(COINLIBS) \
 	$(ADDLIBS)
@@ -47,27 +58,29 @@ COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
+	$(COINUTILSOBJDIR)/../ThirdParty/Lapack/libcoinlapack.la
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
 AM_CPPFLAGS = \
-        -I`$(CYGPATH_W) $(srcdir)/../src/include` \
-        -I`$(CYGPATH_W) $(srcdir)/../src/include/operators` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/test/fun` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression/operators` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/util` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex/sdpcuts` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
@@ -102,7 +115,8 @@ endif
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
-test: testconv$(EXEEXT) testeval$(EXEEXT)
+#test: testconv$(EXEEXT) testeval$(EXEEXT) sdpcuts
+test: sdpcuts$(EXEEXT)
 #	./testfun$(EXEEXT)
 
 .PHONY: test

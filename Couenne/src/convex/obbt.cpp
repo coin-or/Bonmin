@@ -14,7 +14,7 @@
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
-//#define DEBUG_OBBT
+#define DEBUG_OBBT
 
 /// reoptimize and change bound of a variable if needed
 bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
@@ -31,7 +31,6 @@ bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
   if (csi -> isProvenOptimal ()) {
 
     double opt = csi -> getObjValue ();
-    //    printf ("found optimum: %g\n", opt);
 
     if (sense > 0) {if (opt > bound + OBBT_EPS)    {bound = (isint ? ceil (opt) : opt); return true;}}
     else           {if ((opt=-opt)<bound-OBBT_EPS) {bound = (isint ? floor(opt) : opt); return true;}}
@@ -101,7 +100,7 @@ int obbt_stage (const CouenneCutGenerator *cg,
       // m{in,ax}imize xi on csi
 
 #ifdef DEBUG_OBBT
-      printf ("m%simizing x%d [%g,%g] currently %c= %g\n",
+      printf ("m%simizing x%d [%g,%g] %c= %g",
 	      (sense==1) ? "in" : "ax", i, p -> Lb (i), p -> Ub (i),
 	      (sense==1) ? '>'  : '<',  bound); fflush (stdout);
 
@@ -112,15 +111,23 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
       csi -> setWarmStart (warmstart);
 
-
       if (updateBound (csi, sense, bound, isInt)) {
+
+#ifdef DEBUG_OBBT
+	printf ("                  ----> %g", bound); fflush (stdout);
+#endif
 
 	/*if (fabs (csi -> getColSolution () [i] - bound) > COUENNE_EPS) 
 	  printf ("!!!%d %g != %g", i, csi -> getColSolution () [i], bound);*/
 
+#ifdef DEBUG_OBBT
+	if (sense==1) {printf(" !!");csi->setColLower (i,bound); chg_bds[i].lower |= CHANGED | EXACT;}
+	else          {printf(" !!");csi->setColUpper (i,bound); chg_bds[i].upper |= CHANGED | EXACT;}
+	fflush (stdout);
+#else
 	if (sense==1) {csi -> setColLower (i, bound); chg_bds [i].lower |= CHANGED | EXACT;}
 	else          {csi -> setColUpper (i, bound); chg_bds [i].upper |= CHANGED | EXACT;}
-
+#endif
 	// check value and bounds of other variables
 
 	const double *sol = csi -> getColSolution ();
@@ -164,6 +171,10 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
 	nImprov++;
       }
+
+#ifdef DEBUG_OBBT
+	printf ("\n");
+#endif
 
       // if we solved the problem on the objective function's
       // auxiliary variable (that is, we re-solved the extended

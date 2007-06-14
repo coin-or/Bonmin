@@ -27,6 +27,9 @@
 /* Define to 1 if the Osi package is used */
 #undef COIN_HAS_OSI
 
+/* Define to 1 if the ThirdParty package is used */
+#undef COIN_HAS_THIRDPARTY
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 

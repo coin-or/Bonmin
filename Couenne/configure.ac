@@ -56,6 +56,7 @@ AC_COIN_INIT_AUTO_TOOLS
 #                              COIN components                              #
 #############################################################################
 
+AC_COIN_HAS_PROJECT(ThirdParty)
 AC_COIN_HAS_PROJECT(CoinUtils)
 AC_COIN_HAS_PROJECT(Clp)
 AC_COIN_HAS_PROJECT(Bonmin)

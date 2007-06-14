@@ -131,6 +131,12 @@ Couenne/src/util/rootQ.c -text
 Couenne/src/util/rootQ.h -text
 Couenne/test/Makefile.am -text
 Couenne/test/Makefile.in -text
+Couenne/test/fun/SdpCutGen.cpp -text
+Couenne/test/fun/SdpCutGen.hpp -text
+Couenne/test/fun/clp-try.cpp -text
+Couenne/test/fun/createCut.cpp -text
+Couenne/test/fun/populate.cpp -text
+Couenne/test/fun/sdpcuts.cpp -text
 Couenne/test/fun/testconv.cpp -text
 Couenne/test/fun/testeval.cpp -text
 /Externals -text
