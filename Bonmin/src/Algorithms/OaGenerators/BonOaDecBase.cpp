@@ -238,7 +238,7 @@ OaDecompositionBase::SubMipSolver::performLocalSearch(double cutoff, int logleve
     lp_->messageHandler()->setLogLevel(loglevel);
 #ifdef COIN_HAS_CPX
     if(cpx_){
-      CPXENVptr env = cpx->getEnvironmentPtr();
+      CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXsetintparam(env, CPX_PARAM_NODELIM, maxNodes);
       CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
       CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
@@ -259,7 +259,7 @@ OaDecompositionBase::SubMipSolver::performLocalSearch(double cutoff, int logleve
     {
       //CpxModel = NULL;
       CPXENVptr env = cpx_->getEnvironmentPtr();
-      CPXLPptr cpxlp = cpx_->cpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+      CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
       
       int status = CPXgetbestobjval(env, cpxlp, lowBound_);
       status |= CPXgetnodecnt(env , cpxlp, nodeCount_); 
