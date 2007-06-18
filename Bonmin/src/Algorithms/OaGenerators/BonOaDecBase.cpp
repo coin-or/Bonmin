@@ -261,9 +261,9 @@ OaDecompositionBase::SubMipSolver::performLocalSearch(double cutoff, int logleve
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
       
-      int status = CPXgetbestobjval(env, cpxlp, lowBound_);
-      status |= CPXgetnodecnt(env , cpxlp, nodeCount_); 
-      status |= CPXgetmipitcnt(env , cpxlp, iterationCount_); 
+      int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+      nodeCount_ = CPXgetnodecnt(env , cpxlp); 
+      iterationCount_ = CPXgetmipitcnt(env , cpxlp); 
       if (status)
         throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
     }

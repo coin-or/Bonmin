@@ -69,8 +69,8 @@ extern int usingCouenne;
     else if(ivalue == 2){
 #ifdef COIN_HAS_CPX
       OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
-      b.nonlinearRelaxation()->extractLinearRelaxation(*localSearchSolver);
-      assignLpSolver(cpxSolver);
+      b.nonlinearSolver()->extractLinearRelaxation(*cpxSolver);
+      assignLpInterface(cpxSolver);
 #else
       std::cerr	<< "You have set an option to use CPLEX as the milp\n"
         << "subsolver in oa decomposition. However, apparently\n"
