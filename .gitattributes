@@ -135,8 +135,14 @@ Couenne/test/fun/SdpCutGen.cpp -text
 Couenne/test/fun/SdpCutGen.hpp -text
 Couenne/test/fun/clp-try.cpp -text
 Couenne/test/fun/createCut.cpp -text
+Couenne/test/fun/genrandQP.c -text
+Couenne/test/fun/partialLU.c -text
 Couenne/test/fun/populate.cpp -text
 Couenne/test/fun/sdpcuts.cpp -text
+Couenne/test/fun/separateBK.cpp -text
+Couenne/test/fun/separateEV.cpp -text
+Couenne/test/fun/separateLDL.cpp -text
+Couenne/test/fun/separateTRM.cpp -text
 Couenne/test/fun/testconv.cpp -text
 Couenne/test/fun/testeval.cpp -text
 /Externals -text

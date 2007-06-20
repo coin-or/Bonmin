@@ -3,12 +3,22 @@
 
 #include <CglCutGenerator.hpp>
 
+#define indexQ(i,j,n) ((n) + (i) * (2*(n)-1-(i)) / 2 + (j))
+
 class SdpCutGen: public CglCutGenerator {
 
 private:
 
-  int n_;
-  double *b_;
+  /// order of the matrix
+  int n_; 
+
+  /// indices to be tracked
+  int     *indices_;
+
+  /// value of original variables
+  double  *b_;
+
+  /// value of RLT variables Xij = xi * xj
   double **Q_;
 
 public:
@@ -61,6 +71,20 @@ public:
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, 
 		     const CglTreeInfo = CglTreeInfo ()) const;
+
+  void separateEV  (const OsiSolverInterface &, OsiCuts &) const;
+  void separateLU  (const OsiSolverInterface &, OsiCuts &) const;
+  void separateBK  (const OsiSolverInterface &, OsiCuts &) const;
+  void separateTRM (const OsiSolverInterface &, OsiCuts &) const;
+
+  /// insert a SDP cut a' X a >= 0 given vector a and size of the matrix
+  void genSDPcut   (OsiCuts &, double *, double *) const;
 };
 
+
+/// partially decompose matrix (leave all 0 pivots at lower right
+/// submatrix)
+extern "C" {
+  double **partialLU (double **, int);
+}
 #endif

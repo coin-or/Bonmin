@@ -9,7 +9,7 @@
 #include <sys/resource.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <OsiClpSolverInterface.hpp>
+#include <OsiCpxSolverInterface.hpp>
 #include <SdpCutGen.hpp>
 
 void populateProblem (int, double *, double **, OsiSolverInterface *);
@@ -49,7 +49,7 @@ int main (int argc, char **argv) {
 
   /***** start solver ***********************************************/
 
-  OsiClpSolverInterface si;
+  OsiCpxSolverInterface si;
 
   populateProblem (n, b, Q, &si);
 
@@ -67,7 +67,7 @@ int main (int argc, char **argv) {
     getrusage (RUSAGE_SELF, &use);
     time = use.ru_utime.tv_sec + 1e-6 * use.ru_utime.tv_usec;
 
-    printf ("::: %4d %8.2f %4d %8.4f\n", 
+    printf ("::: %4d %8.2f %5d %12.4f\n", 
 	    niter, time, ntotcuts, si. getObjValue());
 
     OsiCuts cs;

@@ -12,42 +12,51 @@ AUTOMAKE_OPTIONS = foreign
 #                        testfun for Couenne                           #
 ########################################################################
 
-#noinst_PROGRAMS = testconv testeval testclp
+#noinst_PROGRAMS = 
 
-noinst_PROGRAMS = sdpcuts
+noinst_PROGRAMS = sdpcuts genrandQp testconv testeval testclp
 
-#testconv_SOURCES = fun/testconv.cpp
-#testeval_SOURCES = fun/testeval.cpp
-#testclp_SOURCES  = fun/clp-try.cpp
+testconv_SOURCES = fun/testconv.cpp
+testeval_SOURCES = fun/testeval.cpp
+testclp_SOURCES  = fun/clp-try.cpp
 
-sdpcuts_SOURCES  = fun/sdpcuts.cpp fun/populate.cpp fun/createCut.cpp fun/SdpCutGen.cpp
+sdpcuts_SOURCES  = fun/sdpcuts.cpp \
+	           fun/populate.cpp \
+	           fun/createCut.cpp \
+	           fun/SdpCutGen.cpp \
+	           fun/separateEV.cpp \
+	           fun/separateTRM.cpp \
+	           fun/separateLDL.cpp \
+	           fun/separateBK.cpp \
+	           fun/partialLU.c \
+		   fun/genSDPcut.cpp
 
-# if 0
-# # List libraries of COIN projects
-# testconv_LDADD = \
-#         ../src/libCouenne.la \
-# 	$(ASLLIB) \
-# 	$(COINLIBS) \
-# 	$(ADDLIBS)
-# # List libraries of COIN projects
-# testeval_LDADD = \
-#         ../src/libCouenne.la \
-# 	$(ASLLIB) \
-# 	$(COINLIBS) \
-# 	$(ADDLIBS)
-# # List libraries of COIN projects
-# testclp_LDADD = \
-#         ../src/libCouenne.la \
-# 	$(ASLLIB) \
-# 	$(COINLIBS) \
-# 	$(ADDLIBS)
-# endif
+
+genrandQp_SOURCES = fun/genrandQp.c
+
+
+# List libraries of COIN projects
+testconv_LDADD = \
+        ../src/libCouenne.la \
+	$(ASLLIB) \
+	$(COINLIBS) \
+	$(ADDLIBS)
+# List libraries of COIN projects
+testeval_LDADD = \
+        ../src/libCouenne.la \
+	$(ASLLIB) \
+	$(COINLIBS) \
+	$(ADDLIBS)
+# List libraries of COIN projects
+testclp_LDADD = \
+        ../src/libCouenne.la \
+	$(ASLLIB) \
+	$(COINLIBS) \
+	$(ADDLIBS)
 
 sdpcuts_LDADD = \
         ../src/libCouenne.la \
-	fun/nmtr/src/blas/libblas.a \
-	fun/nmtr/src/lapack/liblapack.a \
-	fun/nmtr/src/nmtr/libdgqt.a \
+	/usr/local/lib/libdgqt.a \
 	$(ASLLIB) \
 	$(COINLIBS) \
 	$(ADDLIBS)
@@ -55,6 +64,7 @@ sdpcuts_LDADD = \
 COINLIBS = \
 	$(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 	$(CBCOBJDIR)/src/libCbc.la \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
