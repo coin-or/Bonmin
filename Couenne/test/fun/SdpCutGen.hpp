@@ -77,8 +77,14 @@ public:
   void separateBK  (const OsiSolverInterface &, OsiCuts &) const;
   void separateTRM (const OsiSolverInterface &, OsiCuts &) const;
 
+  /// play with eigenvalues/vectors 
+  void eigenPlay (OsiCuts &, int n, int m, double *vector, double *value) const;
+
   /// insert a SDP cut a' X a >= 0 given vector a and size of the matrix
-  void genSDPcut   (OsiCuts &, double *, double *) const;
+  void genSDPcut (OsiCuts &, double *, double *) const;
+
+  ///
+  void dsyevx_wrapper (int, double *, int &, double *, double *) const;
 };
 
 

@@ -135,6 +135,8 @@ Couenne/test/fun/SdpCutGen.cpp -text
 Couenne/test/fun/SdpCutGen.hpp -text
 Couenne/test/fun/clp-try.cpp -text
 Couenne/test/fun/createCut.cpp -text
+Couenne/test/fun/eigenPlay.cpp -text
+Couenne/test/fun/genSDPcut.cpp -text
 Couenne/test/fun/genrandQP.c -text
 Couenne/test/fun/partialLU.c -text
 Couenne/test/fun/populate.cpp -text

@@ -29,6 +29,7 @@ sdpcuts_SOURCES  = fun/sdpcuts.cpp \
 	           fun/separateLDL.cpp \
 	           fun/separateBK.cpp \
 	           fun/partialLU.c \
+	           fun/eigenPlay.cpp \
 		   fun/genSDPcut.cpp
 
 
