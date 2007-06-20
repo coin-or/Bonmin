@@ -1,13 +1,26 @@
+/*
+ * Name:    createCut.cpp
+ * Author:  Pietro Belotti
+ * Purpose: create simple OsiRowCut (used in initial formulation)
+ *
+ * (C) Pietro Belotti. This file is published under the Common Public License.
+ */
+
 #include <OsiCuts.hpp>
 
 #define COUENNE_EPS 1e-7
 
-int createCut (OsiCuts &cs,
-	       double rhs, int sign, 
-	       int i1, double c1,
-	       int i2, double c2,
-	       int i3, double c3,
-	       bool is_global) {
+/// create a cut. return 1 if cut was inserted into cs, 0 otherwise
+
+int createCut (OsiCuts &cs,           // set of cuts
+	       double rhs,            // rhs 
+	       int sign,              // -1: $\le$, +1: $\ge$, 0: =
+	                              // indices, coefficients 
+	                              // (index == -1 means don't care)
+	       int i1, double c1,     // first 
+	       int i2, double c2,     // second
+	       int i3, double c3,     // third
+	       bool is_global) {      // is this cut global (true) or local (false)?
 
   int nterms = 0;
 

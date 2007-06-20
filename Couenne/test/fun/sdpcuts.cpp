@@ -1,5 +1,5 @@
 /*
- * Apply semidefinite cuts to solve Unconstrained Quadratic
+ * Apply semidefinite cuts to solve Box constrained Quadratic
  * Programming problems
  *
  * (C) Pietro Belotti, Carnegie Mellon University
@@ -80,7 +80,11 @@ int main (int argc, char **argv) {
 
     ntotcuts += ncuts = cs.sizeRowCuts ();
 
-  } while ((ncuts > 0) && (niter < 100));
+    //    char fname [20];
+    //    sprintf (fname, "sdp_%d", niter);
+    //    si.writeLp (fname);
+
+  } while ((ncuts > 0) && (niter < 500));
 
   //  si.writeLp ("sdp-cut");
 

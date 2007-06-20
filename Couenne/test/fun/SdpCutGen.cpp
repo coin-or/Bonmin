@@ -8,24 +8,67 @@
 #include <sys/resource.h>
 
 // sdpcut separator
-void SdpCutGen::generateCuts (const OsiSolverInterface &si, 
-			      OsiCuts &cs, 
+void SdpCutGen::generateCuts (const OsiSolverInterface &si, OsiCuts &cs, 
 			      const CglTreeInfo info) const {
-  static int ncalls = 0;
+  int ncuts;
 
-  int ncuts = cs.sizeRowCuts ();
   printf ("================= Separation:\n");
+
+  ncuts = cs.sizeRowCuts ();
   separateTRM (si, cs);
   printf ("================= TRM: %3d cuts\n", cs.sizeRowCuts () - ncuts);
+
   ncuts = cs.sizeRowCuts ();
   separateEV  (si, cs);
   printf ("================= EV:  %3d cuts\n", cs.sizeRowCuts () - ncuts);
-  ncuts = cs.sizeRowCuts ();
-  //  separateLU (si, cs);
-  printf ("================= LU:  %3d cuts\n", cs.sizeRowCuts () - ncuts);
-  ncuts = cs.sizeRowCuts ();
-  //  separateBK (si, cs);
-  printf ("================= BK:  %3d cuts\n", cs.sizeRowCuts () - ncuts);
 
-  ncalls++;
+  //  ncuts = cs.sizeRowCuts ();
+  //  separateLU (si, cs);
+  //  printf ("================= LU:  %3d cuts\n", cs.sizeRowCuts () - ncuts);
+
+  //  ncuts = cs.sizeRowCuts ();
+  //  separateBK (si, cs);
+  //  printf ("================= BK:  %3d cuts\n", cs.sizeRowCuts () - ncuts);
+}
+
+/// constructor
+SdpCutGen::SdpCutGen  (int n, double *b, double **Q):
+  n_ (n) {
+
+  if (n <= 0) n = 1;
+
+  b_ = new double   [n];
+  Q_ = new double * [n];
+  for (int i=n; i--;)
+    Q_ [i] = new double [n];
+
+  for (int i=n; i--;) {
+    b_ [i] = b [i];
+    for (int j=n; j--;) 
+      Q_ [i] [j] = Q [i] [j];
+  }
+}
+
+/// copy constructor
+SdpCutGen::SdpCutGen  (const SdpCutGen &rhs):
+  n_ (rhs.n_) {
+
+  b_ = new double   [n_];
+  Q_ = new double * [n_];
+  for (int i=n_; i--;)
+    Q_ [i] = new double [n_];
+
+  for (int i=n_; i--;) {
+    b_ [i] = rhs.b_ [i];
+    for (int j=n_; j--;) 
+      Q_ [i] [j] = rhs.Q_ [i] [j];
+  }
+}
+
+/// destructor
+SdpCutGen::~SdpCutGen () {
+  delete [] b_; 
+  while (n_--) 
+    delete [] Q_ [n_];
+  delete [] Q_;
 }
