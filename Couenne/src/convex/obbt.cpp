@@ -14,7 +14,7 @@
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
-#define DEBUG_OBBT
+//#define DEBUG_OBBT
 
 /// reoptimize and change bound of a variable if needed
 bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
@@ -106,13 +106,21 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
       char fname [20];
       sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", i, iter);
-      csi -> writeLp (fname);
+      //      csi -> writeLp (fname);
 #endif
 
       csi -> setWarmStart (warmstart);
 
       if (updateBound (csi, sense, bound, isInt)) {
-
+	/*
+	if (sense == 1) {
+	  if (bound > p -> Ub (i) - COUENNE_EPS) 
+	    printf ("$$$$$$$ %d [%g,%g] >>> %g\n", i, p -> Lb (i), p -> Ub (i), bound);
+	} else {
+	  if (bound < p -> Lb (i) + COUENNE_EPS) 
+	    printf ("$$$$$$$ %d [%g,%g] <<< %g\n", i, p -> Lb (i), p -> Ub (i), bound);
+	}
+	*/
 #ifdef DEBUG_OBBT
 	printf ("                  ----> %g", bound); fflush (stdout);
 #endif
@@ -203,9 +211,11 @@ int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
   const double *lb = csi -> getColLower (),
                *ub = csi -> getColUpper ();
 
+  double inf = csi -> getInfinity ();
+
   while (ncols--) {
-    if (lb [ncols] < - COUENNE_INFINITY) csi -> setColLower (ncols, -COIN_DBL_MAX);
-    if (ub [ncols] >   COUENNE_INFINITY) csi -> setColUpper (ncols,  COIN_DBL_MAX);
+    if (lb [ncols] < - COUENNE_INFINITY) csi -> setColLower (ncols, -inf);
+    if (ub [ncols] >   COUENNE_INFINITY) csi -> setColUpper (ncols,  inf);
   }
 
   //  csi -> setHintParam (OsiDoDualInResolve, false);

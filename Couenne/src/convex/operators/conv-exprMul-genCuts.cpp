@@ -138,21 +138,25 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   bool i0s, i1s = i0s = false;
 
-  if (!is0const) {
+  // TODO: Fix this!
 
-    if (is1const) i0s = (fabs (c1) * (xu-xl) < COUENNE_EPS);
-    else          i0s = ((yu-yl)   * (xu-xl) < COUENNE_EPS);
+  // x...
+
+  if (!is0const && ((xu-xl) < COUENNE_EPS)) {
+
+    if (is1const) i0s = (fabs (c1)                 * (xu-xl) < COUENNE_EPS);
+    else          i0s = ((fabs (yu) + fabs (yl))   * (xu-xl) < COUENNE_EPS);
 
     if (i0s) 
       c0 = 0.5 * (xl+xu);
   }
 
-  // and y
+  // ...and y
 
-  if (!is1const) {
+  if (!is1const && ((yu-yl) < COUENNE_EPS)) {
 
-    if (is0const) i1s = (fabs (c0) * (yu-yl) < COUENNE_EPS);
-    else          i1s = ((xu-xl)   * (yu-yl) < COUENNE_EPS);
+    if (is0const) i1s = (fabs (c0)                 * (yu-yl) < COUENNE_EPS);
+    else          i1s = ((fabs (xu) + fabs (xl))   * (yu-yl) < COUENNE_EPS);
 
     if (i1s) 
       c1 = 0.5 * (yl+yu);
@@ -171,11 +175,9 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	 (ye -> Type () != CONST))) {  // (=> implied by branching rule)
 
       if (is0const && is1const)
-
 	// w = c0*c1, which is either because the intervals got very
 	// narrow, or because these are indeed constant (which should
 	// have been dealt with in simplify(), but who knows...)
-
 	cg -> createCut (cs, c0 * c1, 0, wi, 1.);
 
       else {
@@ -216,6 +218,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if ((cRX || cRY) && is_boundbox_regular (yu, xu)) cg -> createCut (cs, yu*xu,-1,wi,-1.,xi,yu,yi,xu);
   if ((cRX || cLY) && is_boundbox_regular (yl, xu)) cg -> createCut (cs, yl*xu,+1,wi,-1.,xi,yl,yi,xu);
   if ((cLX || cRY) && is_boundbox_regular (yu, xl)) cg -> createCut (cs, yu*xl,+1,wi,-1.,xi,yu,yi,xl);
+
 
   // add different cuts, to cut out current point in bounding box but
   // out of the hyperbola's belly

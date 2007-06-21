@@ -88,6 +88,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       }
     }
 
+
   //  if (!(cg -> isFirst ())) 
   if (0)
   if (j < cs.sizeRowCuts ())

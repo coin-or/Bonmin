@@ -66,7 +66,7 @@ expression *exprLog::differentiate (int index) {
 bool exprLog::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   int ind = argument_ -> Index ();
-  bool res;
+  bool res = false;
 
   if (updateBound (-1, l + ind, exp (l [wind]))) {res = true; chg [ind].lower = CHANGED;}
   if (updateBound ( 1, u + ind, exp (u [wind]))) {res = true; chg [ind].upper = CHANGED;}
