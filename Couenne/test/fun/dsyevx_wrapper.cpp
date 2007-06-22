@@ -42,8 +42,8 @@ extern "C" {
 }
 
 
-#define MAX_EIGENVALUE 1e-1
-//#define MAX_EIGENVALUE COIN_DBL_MAX
+//#define MAX_EIGENVALUE -1e-5
+#define MAX_EIGENVALUE COIN_DBL_MAX
 
 ///
 void dsyevx_wrapper (int n, double *A, int &m, double * &w, double * &z) {

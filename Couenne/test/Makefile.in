@@ -63,9 +63,10 @@ genrandQp_OBJECTS = $(am_genrandQp_OBJECTS)
 genrandQp_LDADD = $(LDADD)
 am_sdpcuts_OBJECTS = sdpcuts.$(OBJEXT) populate.$(OBJEXT) \
 	createCut.$(OBJEXT) SdpCutGen.$(OBJEXT) separateEV.$(OBJEXT) \
-	separateTRM.$(OBJEXT) separateLDL.$(OBJEXT) \
-	separateBK.$(OBJEXT) partialLU.$(OBJEXT) eigenPlay.$(OBJEXT) \
-	dsyevx_wrapper.$(OBJEXT) genSDPcut.$(OBJEXT)
+	separateGrad.$(OBJEXT) separateTRM.$(OBJEXT) \
+	separateLU.$(OBJEXT) separateBK.$(OBJEXT) partialLU.$(OBJEXT) \
+	eigenPlay.$(OBJEXT) dsyevx_wrapper.$(OBJEXT) \
+	genSDPcut.$(OBJEXT)
 sdpcuts_OBJECTS = $(am_sdpcuts_OBJECTS)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(CGLOBJDIR)/src/libCgl.la \
@@ -295,8 +296,9 @@ sdpcuts_SOURCES = fun/sdpcuts.cpp \
 	           fun/createCut.cpp \
 	           fun/SdpCutGen.cpp \
 	           fun/separateEV.cpp \
+	           fun/separateGrad.cpp \
 	           fun/separateTRM.cpp \
-	           fun/separateLDL.cpp \
+	           fun/separateLU.cpp \
 	           fun/separateBK.cpp \
 	           fun/partialLU.c \
 	           fun/eigenPlay.cpp \
@@ -465,7 +467,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdpcuts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateBK.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateEV.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateLDL.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateGrad.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateLU.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateTRM.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testconv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testeval.Po@am__quote@
@@ -610,6 +613,20 @@ separateEV.obj: fun/separateEV.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateEV.obj `if test -f 'fun/separateEV.cpp'; then $(CYGPATH_W) 'fun/separateEV.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateEV.cpp'; fi`
 
+separateGrad.o: fun/separateGrad.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateGrad.o -MD -MP -MF "$(DEPDIR)/separateGrad.Tpo" -c -o separateGrad.o `test -f 'fun/separateGrad.cpp' || echo '$(srcdir)/'`fun/separateGrad.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateGrad.Tpo" "$(DEPDIR)/separateGrad.Po"; else rm -f "$(DEPDIR)/separateGrad.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateGrad.cpp' object='separateGrad.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateGrad.o `test -f 'fun/separateGrad.cpp' || echo '$(srcdir)/'`fun/separateGrad.cpp
+
+separateGrad.obj: fun/separateGrad.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateGrad.obj -MD -MP -MF "$(DEPDIR)/separateGrad.Tpo" -c -o separateGrad.obj `if test -f 'fun/separateGrad.cpp'; then $(CYGPATH_W) 'fun/separateGrad.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateGrad.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateGrad.Tpo" "$(DEPDIR)/separateGrad.Po"; else rm -f "$(DEPDIR)/separateGrad.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateGrad.cpp' object='separateGrad.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateGrad.obj `if test -f 'fun/separateGrad.cpp'; then $(CYGPATH_W) 'fun/separateGrad.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateGrad.cpp'; fi`
+
 separateTRM.o: fun/separateTRM.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateTRM.o -MD -MP -MF "$(DEPDIR)/separateTRM.Tpo" -c -o separateTRM.o `test -f 'fun/separateTRM.cpp' || echo '$(srcdir)/'`fun/separateTRM.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateTRM.Tpo" "$(DEPDIR)/separateTRM.Po"; else rm -f "$(DEPDIR)/separateTRM.Tpo"; exit 1; fi
@@ -624,19 +641,19 @@ separateTRM.obj: fun/separateTRM.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateTRM.obj `if test -f 'fun/separateTRM.cpp'; then $(CYGPATH_W) 'fun/separateTRM.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateTRM.cpp'; fi`
 
-separateLDL.o: fun/separateLDL.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateLDL.o -MD -MP -MF "$(DEPDIR)/separateLDL.Tpo" -c -o separateLDL.o `test -f 'fun/separateLDL.cpp' || echo '$(srcdir)/'`fun/separateLDL.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateLDL.Tpo" "$(DEPDIR)/separateLDL.Po"; else rm -f "$(DEPDIR)/separateLDL.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateLDL.cpp' object='separateLDL.o' libtool=no @AMDEPBACKSLASH@
+separateLU.o: fun/separateLU.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateLU.o -MD -MP -MF "$(DEPDIR)/separateLU.Tpo" -c -o separateLU.o `test -f 'fun/separateLU.cpp' || echo '$(srcdir)/'`fun/separateLU.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateLU.Tpo" "$(DEPDIR)/separateLU.Po"; else rm -f "$(DEPDIR)/separateLU.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateLU.cpp' object='separateLU.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateLDL.o `test -f 'fun/separateLDL.cpp' || echo '$(srcdir)/'`fun/separateLDL.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateLU.o `test -f 'fun/separateLU.cpp' || echo '$(srcdir)/'`fun/separateLU.cpp
 
-separateLDL.obj: fun/separateLDL.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateLDL.obj -MD -MP -MF "$(DEPDIR)/separateLDL.Tpo" -c -o separateLDL.obj `if test -f 'fun/separateLDL.cpp'; then $(CYGPATH_W) 'fun/separateLDL.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateLDL.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateLDL.Tpo" "$(DEPDIR)/separateLDL.Po"; else rm -f "$(DEPDIR)/separateLDL.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateLDL.cpp' object='separateLDL.obj' libtool=no @AMDEPBACKSLASH@
+separateLU.obj: fun/separateLU.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateLU.obj -MD -MP -MF "$(DEPDIR)/separateLU.Tpo" -c -o separateLU.obj `if test -f 'fun/separateLU.cpp'; then $(CYGPATH_W) 'fun/separateLU.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateLU.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateLU.Tpo" "$(DEPDIR)/separateLU.Po"; else rm -f "$(DEPDIR)/separateLU.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateLU.cpp' object='separateLU.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateLDL.obj `if test -f 'fun/separateLDL.cpp'; then $(CYGPATH_W) 'fun/separateLDL.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateLDL.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateLU.obj `if test -f 'fun/separateLU.cpp'; then $(CYGPATH_W) 'fun/separateLU.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateLU.cpp'; fi`
 
 separateBK.o: fun/separateBK.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateBK.o -MD -MP -MF "$(DEPDIR)/separateBK.Tpo" -c -o separateBK.o `test -f 'fun/separateBK.cpp' || echo '$(srcdir)/'`fun/separateBK.cpp; \

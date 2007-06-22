@@ -16,6 +16,9 @@ void SdpCutGen::eigenPlay (OsiCuts &cs,
 
   for (int k=0; k<m; k++) { // eigenvalue negative enough
 
+    if (value [k] < 0)
+      violated_ = true;
+
     /*
       printf ("%3d: %6.3f -- ", k, w [k]);
       for (int j=0; j<np; j++) 
@@ -38,7 +41,7 @@ void SdpCutGen::eigenPlay (OsiCuts &cs,
     // add cuts with sums of eigenvectors (consider pairs whose
     // eigenvalue is below a certain threshold)
 
-#define EVAL_THRES -100
+#define EVAL_THRES -1.5e5
 
     for (int i=0; i<n; i++)
       if (value [i] < EVAL_THRES) {

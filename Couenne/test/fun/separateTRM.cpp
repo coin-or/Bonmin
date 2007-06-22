@@ -190,8 +190,10 @@ void SdpCutGen::separateTRM (const OsiSolverInterface &si,
 
   printf ("---------- violation : %.4f\n", f);
 
-  if (f < -1e-5) // there is a violated cut
+  if (f < -1e-5) { // there is a violated cut
+    violated_ = true;
     genSDPcut (cs, x, x);
+  }
 
   // cleanup /////////////////////////////////////////////////////
 

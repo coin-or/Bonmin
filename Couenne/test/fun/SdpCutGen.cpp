@@ -12,7 +12,19 @@ void SdpCutGen::generateCuts (const OsiSolverInterface &si, OsiCuts &cs,
 			      const CglTreeInfo info) const {
   int ncuts;
 
+  violated_ = false;
+
   printf ("================= Separation:\n");
+
+#if 1
+  static bool firstcall = true;
+  if (firstcall) {
+    ncuts = cs.sizeRowCuts ();
+    separateGrad (si, cs);
+    printf ("================= Grad: %3d cuts\n", cs.sizeRowCuts () - ncuts);
+    firstcall = false;
+  }
+#endif
 
   ncuts = cs.sizeRowCuts ();
   separateTRM (si, cs);

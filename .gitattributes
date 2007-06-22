@@ -144,7 +144,8 @@ Couenne/test/fun/populate.cpp -text
 Couenne/test/fun/sdpcuts.cpp -text
 Couenne/test/fun/separateBK.cpp -text
 Couenne/test/fun/separateEV.cpp -text
-Couenne/test/fun/separateLDL.cpp -text
+Couenne/test/fun/separateGrad.cpp -text
+Couenne/test/fun/separateLU.cpp -text
 Couenne/test/fun/separateTRM.cpp -text
 Couenne/test/fun/testconv.cpp -text
 Couenne/test/fun/testeval.cpp -text
