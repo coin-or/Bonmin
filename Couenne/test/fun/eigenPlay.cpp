@@ -14,6 +14,8 @@ void SdpCutGen::eigenPlay (OsiCuts &cs,
 
   double *v = (double *) malloc (n * sizeof (double));
 
+  //  m /= 2;
+
   for (int k=0; k<m; k++) { // eigenvalue negative enough
 
     if (value [k] < 0)
@@ -28,7 +30,7 @@ void SdpCutGen::eigenPlay (OsiCuts &cs,
 
     double *zbase = vector + k * n;
 
-#define EIG_TOL 0
+#define EIG_TOL 1e-2
 
     for (int j=0; j<n; j++) {
       v [j] = *zbase++;
@@ -41,8 +43,9 @@ void SdpCutGen::eigenPlay (OsiCuts &cs,
     // add cuts with sums of eigenvectors (consider pairs whose
     // eigenvalue is below a certain threshold)
 
-#define EVAL_THRES -1.5e5
+#define EVAL_THRES -1.5
 
+#if 0
     for (int i=0; i<n; i++)
       if (value [i] < EVAL_THRES) {
 
@@ -59,6 +62,7 @@ void SdpCutGen::eigenPlay (OsiCuts &cs,
 	    genSDPcut (cs, v, v);
 	  }
       }
+#endif
   }
 
   free (v);

@@ -32,6 +32,7 @@ sdpcuts_SOURCES  = fun/sdpcuts.cpp \
 	           fun/partialLU.c \
 	           fun/eigenPlay.cpp \
 	           fun/dsyevx_wrapper.cpp \
+	           fun/updateSol.cpp \
 		   fun/genSDPcut.cpp
 
 

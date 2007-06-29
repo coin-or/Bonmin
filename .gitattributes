@@ -149,6 +149,7 @@ Couenne/test/fun/separateLU.cpp -text
 Couenne/test/fun/separateTRM.cpp -text
 Couenne/test/fun/testconv.cpp -text
 Couenne/test/fun/testeval.cpp -text
+Couenne/test/fun/updateSol.cpp -text
 /Externals -text
 /INSTALL -text
 /Makefile.am -text

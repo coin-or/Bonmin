@@ -25,7 +25,9 @@ void SdpCutGen::separateEV (const OsiSolverInterface &si,
   int n  = *(const_cast <int *> (&n_)), 
       np = n + 1;
 
-  const double *sol = si.getColSolution ();
+  const double 
+    *sol  = si.getColSolution (),
+    *best = bestSol_;
 
   /*
    *  get eigenvectors v for all negative eigenvalues of
@@ -38,51 +40,39 @@ void SdpCutGen::separateEV (const OsiSolverInterface &si,
    *  v^T X' v >= 0
    */
 
-  double *A = (double *) malloc (np*np * sizeof (double));
+  double *A = (double *) malloc (np*np * sizeof (double)), 
+    *w, *z, 
+    alpha = 0.9;
 
-  {
-    register int i,j;
+  for (int iter = 0; alpha > 0.2; alpha *= 0.3, iter++) {
 
-    *A = 1;
-
-    for (j=1; j<np; j++)
-      A [np*j] = sol [j-1];
-
-    for (i=1; i<np; i++)
-      for (j=i; j<np; j++)
-	A [np*j+i] = sol [indexQ (i-1,j-1,n)];
-  }
-
-  int m;
-  double *w, *z;
-
-  double alpha = 1;
-
-  for (;;) {
-
-    dsyevx_wrapper (    np, A,   m, w, z);
-    eigenPlay      (cs, np, sol, m, w, z);
-
-    if ((alpha *= 0.95) < 1) 
-      break;
-
-    // change A so that lower right block is 
+    // change A so that lower right block of X is 
     //
     // alpha*(x x^T) + (1-alpha) X 
     //
     // rather than just X
 
-    register int i,j;
-
     *A = 1;
 
-    for (j=1; j<np; j++)
+    for (register int j=1; j<np; j++)
       A [np*j] = sol [j-1];
 
-    for (i=1; i<np; i++)
-      for (j=i; j<np; j++)
-	A [np*j+i] =        alpha  * sol [indexQ (i-1,j-1,n)] 
-	             + (1 - alpha) * sol [i-1] * sol [j-1];
+    if (best && iter)
+      for (register int i=1; i<np; i++)
+	for (register int j=i; j<np; j++)
+	  A [np*j+i] =        alpha  * sol [indexQ (i-1, j-1, n)] 
+	               + (1 - alpha) * best [i-1] * best [j-1];
+    else 
+      if (!iter)
+	for (register int i=1; i<np; i++)
+	  for (register int j=i; j<np; j++)
+	    A [np*j+i] = sol [indexQ (i-1, j-1, n)];
+      else break;
+
+    int m;
+    dsyevx_wrapper (    np, A,   m, w, z);
+    eigenPlay      (cs, np, sol, m, w, z);
+
   } 
 
   free (A); 

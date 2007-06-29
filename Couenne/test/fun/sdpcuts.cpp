@@ -47,7 +47,7 @@ int main (int argc, char **argv) {
 
   fclose (f);
 
-  /***** start solver ***********************************************/
+  /* start solver *****************************************************/
 
   OsiCpxSolverInterface si;
 
@@ -67,14 +67,18 @@ int main (int argc, char **argv) {
     getrusage (RUSAGE_SELF, &use);
     time = use.ru_utime.tv_sec + 1e-6 * use.ru_utime.tv_usec;
 
-    printf ("::: %4d %8.2f %5d %12.4f\n", 
-	    niter, time, ntotcuts, si. getObjValue());
+    printf ("::: %4d %8.2f %5d %12.4f %12.4f %12.4f\n", 
+	    niter, time, ntotcuts, si. getObjValue(), 
+	    (scg.bestObj () > -1e40) ? scg.bestObj () : -1,
+	    (scg.currObj () > -1e40) ? scg.currObj () : -1);
 
     OsiCuts cs;
     scg.generateCuts (si, cs);
 
     si.applyCuts (cs);
     si.resolve();
+
+    scg.updateSol (si);
 
     niter++;
 

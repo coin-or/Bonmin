@@ -30,6 +30,10 @@ private:
 			  /// set this to true if there is at least
 			  /// one violated
 
+  double currObj_;  /// current quadratic objective 
+  double bestObj_;  /// quadratic objective of bestSol_
+  double *bestSol_; /// best solution of original problem
+
 public:
 
   /// constructor
@@ -44,6 +48,12 @@ public:
   /// clone 
   SdpCutGen *clone () const
   {return new SdpCutGen (*this);}
+
+  /// return current lower (primal) bound
+  double currObj () {return currObj_;}
+
+  /// return best lower (primal) bound
+  double bestObj () {return bestObj_;}
 
   /// the main cut generator
   void generateCuts (const OsiSolverInterface &,  OsiCuts &, 
@@ -65,6 +75,9 @@ public:
 
   /// return value of violated_
   bool Violated () {return violated_;}
+
+  /// update quadratic solution
+  void updateSol (OsiSolverInterface &);
 };
 
 

@@ -45,7 +45,10 @@ void SdpCutGen::generateCuts (const OsiSolverInterface &si, OsiCuts &cs,
 
 /// constructor
 SdpCutGen::SdpCutGen  (int n, double *b, double **Q):
-  n_ (n) {
+  n_ (n),
+  currObj_ (-DBL_MAX),
+  bestObj_ (-DBL_MAX),
+  bestSol_ (NULL) {
 
   if (n <= 0) n = 1;
 
@@ -79,8 +82,9 @@ SdpCutGen::SdpCutGen  (const SdpCutGen &rhs):
 
 /// destructor
 SdpCutGen::~SdpCutGen () {
-  delete [] b_; 
-  while (n_--) 
-    delete [] Q_ [n_];
+
+  while (n_--) delete [] Q_ [n_];
   delete [] Q_;
+  delete [] b_; 
+  if (bestSol_) delete [] bestSol_;
 }

@@ -73,7 +73,7 @@ void dsyevx_wrapper (int n, double *A, int &m, double * &w, double * &z) {
     *iwork = (int *) malloc (5*n * sizeof (int));
   
   double
-    abstol = 1e-7,                      // absolute tolerance
+    abstol = 1e-12,                     // absolute tolerance
     vl     = -COIN_DBL_MAX,             // minimum eigenvalue wanted
     vu     = MAX_EIGENVALUE,            // maximum
     *work  = (double *) malloc (lwork * sizeof (double));
@@ -93,10 +93,10 @@ void dsyevx_wrapper (int n, double *A, int &m, double * &w, double * &z) {
     z = (double *) realloc (z, m*n * sizeof (double));
     w = (double *) realloc (w, m   * sizeof (double));
 
-    printf ("%d negative eigenvalues found: ", m);
+    printf ("%d eigenv: ", m);
 
     for (int i=0; i<m; i++) 
-      printf ("%.3f ", w [i]);
+      printf ("%.1g ", w [i]);
     printf ("\n");
   }
 
