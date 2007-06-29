@@ -54,6 +54,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Apps/AmplSolver` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \

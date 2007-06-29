@@ -199,60 +199,62 @@ OsiTMINLPInterface::Messages::Messages
 {
   strcpy(source_ ,"NLP");
   addMessage(SOLUTION_FOUND, CoinOneMessage
-      (1,2,"After %d tries found a solution of %g "
+      (SOLUTION_FOUND + 1,2,"After %d tries found a solution of %g "
        "(previous best %g)."));
 
   addMessage(INFEASIBLE_SOLUTION_FOUND, CoinOneMessage
-      (2,2,"After %d tries found an solution of %g "
+      (INFEASIBLE_SOLUTION_FOUND + 1 ,2,"After %d tries found an solution of %g "
        "infeasible problem."));
 
   addMessage(UNSOLVED_PROBLEM_FOUND, CoinOneMessage
-      (3,2,"After %d tries found an solution of %g "
+      (UNSOLVED_PROBLEM_FOUND + 1,2,"After %d tries found an solution of %g "
        "unsolved problem."));
   addMessage(WARN_SUCCESS_WS,CoinOneMessage
-      (3009,2,
+      (WARN_SUCCESS_WS + 3001,2,
        "Problem not solved with warm start but "
        "solved without"));
 
   addMessage(WARNING_RESOLVING,CoinOneMessage
-      (3010,2,
+      (WARNING_RESOLVING + 3001,2,
        "Trying to resolve NLP with different starting "
        "point (%d attempts)."));
   addMessage(WARN_SUCCESS_RANDOM, CoinOneMessage
-      (3011,1,
+      (WARN_SUCCESS_RANDOM + 3001,1,
        "Problem initially not solved but solved with "
        "a random starting point (success on %d attempt)"));
   addMessage(WARN_CONTINUING_ON_FAILURE, CoinOneMessage
-      (3017,1,
+      (WARN_CONTINUING_ON_FAILURE + 3001, 1,
        "Warning : continuing branching, while there are "
        "unrecovered failures at nodes"));
 
   addMessage(SUSPECT_PROBLEM, CoinOneMessage
-      (4,2,"NLP number %d is suspect (see bounds and start file)"));
+      (SUSPECT_PROBLEM + 1,2,"NLP number %d is suspect (see bounds and start file)"));
   addMessage(IPOPT_SUMMARY, CoinOneMessage
-      (6,2,"Ipopt return (for %s): status %2d, iter count %4d, time %g"));
+      (IPOPT_SUMMARY + 1,2,"Ipopt return (for %s): status %2d, iter count %4d, time %g"));
   addMessage(BETTER_SOL, CoinOneMessage
-      (7,2,"Solution of value %g found on %d'th attempt"));
+      (BETTER_SOL + 1,2,"Solution of value %g found on %d'th attempt"));
 
   addMessage(LOG_HEAD, CoinOneMessage
-      (8,1,"\n          "
+      (LOG_HEAD + 1,1,"\n          "
        "    Num      Status      Obj             It       time"));
   addMessage(LOG_FIRST_LINE, CoinOneMessage
-      (9,1,
+      (LOG_FIRST_LINE + 1,1,
        "    %-8d %-11s %-14g %-8d %-3g"));
   addMessage(LOG_LINE, CoinOneMessage
-      (10,1,
+      (LOG_LINE + 1,1,
        " %c  r%-7d %-11s %-14g %-8d %-3g"));
 
   addMessage(ALTERNATE_OBJECTIVE, CoinOneMessage
-             (18,1,"Objective value recomputed with alternate objective: %g."));
+             (ALTERNATE_OBJECTIVE + 1,1,"Objective value recomputed with alternate objective: %g."));
   
   addMessage(WARN_RESOLVE_BEFORE_INITIAL_SOLVE, CoinOneMessage
-      (3012,1,"resolve called before any call to initialSolve"
+      (WARN_RESOLVE_BEFORE_INITIAL_SOLVE + 3001,1,"resolve called before any call to initialSolve"
        " can not use warm starts."));
   addMessage(ERROR_NO_TNLPSOLVER, CoinOneMessage
-             (3013,1,"Can not parse options when no IpApplication has been created"));
-                                                
+             (ERROR_NO_TNLPSOLVER + 6001,1,"Can not parse options when no IpApplication has been created"));
+  addMessage(WARNING_NON_CONVEX_OA, CoinOneMessage
+             (WARNING_NON_CONVEX_OA + 3001, 1,
+              "OA on non-convex constraint is very experimental, don't know how to remove"));                                          
 
 }
 bool OsiTMINLPInterface::hasPrintedOptions=0;
@@ -428,6 +430,9 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     cut_strengthener_(source.cut_strengthener_)
 {
       messageHandler()->setLogLevel(source.messageHandler()->logLevel());
+  //Pass in message handler
+  if(source.messageHandler())
+    passInMessageHandler(source.messageHandler());
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
     problem_ = new TMINLP2TNLP(tminlp_);
@@ -1563,7 +1568,7 @@ bool cleanNnz(double &value, double colLower, double colUpper,
 
   if(!rowNotLoBounded && ! rowNotUpBounded)//would have to either choose side or duplicate cut
   {
-    std::cerr<<"OA on non-convex constraint is very experimental, don't know how to remove"
+    std::cerr<<""
     <<std::endl;
   }
 
@@ -1609,7 +1614,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
-  int offset = (index_style = TNLP::FORTRAN_STYLE);
+  int offset = (index_style == TNLP::FORTRAN_STYLE);
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
   assert(jRow_ != NULL);
@@ -1621,7 +1626,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   CoinPackedVector * cuts = new CoinPackedVector[nNonLinear_ + 1];
   double * lb = new double[nNonLinear_ + 1];
   double * ub = new double[nNonLinear_ + 1];
-  int * binding = new int[nNonLinear_ + 1];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
+  int * binding = new int[m + 1];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
   int numBindings = 0;
 
   const double * rowLower = getRowLower();
@@ -1662,7 +1667,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   }
 
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i] - 1] == TNLP::NON_LINEAR) {
+    if(constTypes_[jRow_[i] - offset] == TNLP::NON_LINEAR) {
       //"clean" coefficient
       if(cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
 		  rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
@@ -1993,8 +1998,12 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
         continue;
       }
       else
-        if(rowLower[i] > - nlp_infty)
+        if(rowLower[i] > - nlp_infty){
           rowLow[i] = (rowLower[i] - g[i]) - 1e-07;
+          if(rowUpper[i] < nlp_infty){
+             messageHandler()->message(ERROR_NO_TNLPSOLVER, messages_)<<CoinMessageEol;
+          }
+        }
       else
         rowLow[i] = - infty;
       if(rowUpper[i] < nlp_infty)

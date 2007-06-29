@@ -331,6 +331,7 @@ algo_(other.algo_){
     continuousSolver_ = new OsiClpSolverInterface;
     int lpLogLevel;
     options_->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
+    continuousSolver_->passInMessageHandler(nonlinearSolver_->messageHandler());
     continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
     nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
     // say bound dubious, does cuts at solution

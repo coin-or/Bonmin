@@ -102,6 +102,7 @@ class SimpleError : public CoinError
                                               was no previous call to initialSolve().
                                          */,
     ERROR_NO_TNLPSOLVER /** Trying to access non-existent TNLPSolver*/,
+    WARNING_NON_CONVEX_OA /** Warn that there are equality or ranged constraints and OA may works bad.*/,
     OSITMINLPINTERFACE_DUMMY_END
   };
 

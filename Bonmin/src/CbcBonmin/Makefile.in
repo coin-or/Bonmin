@@ -396,7 +396,8 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Algorithms` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` $(am__append_2)
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(CBCSRCDIR)/examples` $(am__append_2)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
