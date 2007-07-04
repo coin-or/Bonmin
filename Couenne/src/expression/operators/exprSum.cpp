@@ -96,12 +96,6 @@ expression *exprSum:: differentiate (int index) {
 }
 
 
-/// print
-
-//void exprSum::print (std::ostream& out) const
-//  {exprOp::print (out, "+", INSIDE);}
-
-
 /// Get lower and upper bound of an expression (if any)
 
 void exprSum::getBounds (expression *&lb, expression *&ub) {

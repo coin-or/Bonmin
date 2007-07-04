@@ -38,8 +38,10 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   expression *fixvar = reference_ -> Image () -> getFixVar ();
   int index = fixvar -> Index ();
 
-  if (index < 0)
+  if (index < 0) {
+    printf ("CouenneObject::infeasibility: Warning, fixvar has no index\n");
     return 0.;
+  }
 
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it

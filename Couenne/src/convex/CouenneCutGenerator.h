@@ -183,7 +183,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   void genColCuts (const OsiSolverInterface &, OsiCuts &, int, int *) const;
 
   /// tighten bounds using propagation, implied bounds and reduced costs
-  bool boundTightening (const OsiSolverInterface &, OsiCuts &, 
+  bool boundTightening (const OsiSolverInterface *, OsiCuts &, 
 			t_chg_bounds *, Bonmin::BabInfo * = NULL) const;
 
   /// Optimality Based Bound Tightening

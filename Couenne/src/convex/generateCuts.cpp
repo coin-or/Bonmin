@@ -72,7 +72,6 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-
   int nInitCuts = cs.sizeRowCuts ();
 
   //  printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
@@ -178,15 +177,51 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
+  // FAKE TIGHTENING AROUND OPTIMUM ///////////////////////////////////////////////////
+  /*
+#define BT_EPS 0.1
+
+  if (problem_ -> bestSol ())
+    for (int i=0; i < problem_ -> nVars () + problem_ -> nAuxs (); i++) {
+      problem_ -> Lb (i) = -BT_EPS + problem_ -> bestSol () [i] * 
+	((problem_ -> bestSol () [i] < 0) ? (1+BT_EPS) : (1-BT_EPS));
+      problem_ -> Ub (i) =  BT_EPS + problem_ -> bestSol () [i] * 
+	((problem_ -> bestSol () [i] < 0) ? (1-BT_EPS) : (1+BT_EPS));
+    }
+  */
+
+  /*for (int i=0; i < problem_ -> nVars () + problem_ -> nAuxs (); i++)
+    //    if ((info.pass==0) && (problem_ -> bestSol ()))
+    if (problem_ -> bestSol ())
+      printf ("%4d: %12g %12g %12g    %c\n", i,
+	      problem_ -> Lb (i), 
+	      problem_ -> Ub (i),
+	      problem_ -> bestSol () [i],
+	      ((problem_ -> bestSol () [i] <=   COUENNE_EPS + problem_ -> Ub (i)) && 
+	       (problem_ -> bestSol () [i] >= - COUENNE_EPS + problem_ -> Lb (i))) ? ' ' : '*');
+    else 
+      printf ("%4d: %12g %12g\n", i,
+	      problem_ -> Lb (i), 
+	      problem_ -> Ub (i));*/
+
   fictitiousBound (cs, problem_, false);
 
   int *changed = NULL, nchanged;
 
+  /////////////////////////////////////////////////////////////////////////////////////
+
+
+
   //////////////////////// Bound tightening ///////////////////////////////////////////
 
-  if ((info.pass == 0)  // do bound tightening only at first pass of cutting plane
-      && (! boundTightening (si, cs, chg_bds, babInfo))) 
+  if ((info.pass <= 0)  // do bound tightening only at first pass of
+			// cutting plane (within BB tree) or if first
+			// call (creation of RLT)
+      && (! boundTightening (&si, cs, chg_bds, babInfo))) {
+
+    //printf ("#### infeasible node at first BT\n");
     goto end_genCuts;
+  }
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
@@ -257,14 +292,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	genColCuts (*csi, cs, nchanged, changed);
 
 	int nCurCuts = cs.sizeRowCuts ();
-	genRowCuts (*csi, cs, nchanged, changed, info, chg_bds);// !!!
+	genRowCuts (*csi, cs, nchanged, changed, info, chg_bds);
 	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
       }
 
     delete csi;
 
-    if (nImprov < 0)
+    if (nImprov < 0) {
+      //printf ("### infeasible node after OBBT\n");
       goto end_genCuts;
+    }
   }
 #endif
 

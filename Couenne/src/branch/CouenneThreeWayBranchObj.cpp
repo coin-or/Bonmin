@@ -85,14 +85,14 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
 
   // TODO: apply bound tightening 
 
-  if (0) {
-    switch (way) {
-    case -1: printf ("#3# Branch: x%d <= %g\n",               index_, lcrop_); break; // left
-    case  0: printf ("#3# Branch: %g <= x%d <= %g\n", lcrop_, index_, rcrop_); break; // center
-    case  1: printf ("#3# Branch: x%d >= %g\n",               index_, rcrop_); break; // right
-    default: printf ("Couenne: branching on nonsense way %d\n", way);
-    }
+#if 0
+  switch (way) {
+  case -1: printf ("#3# Branch: x%d <= %g\n",               index_, lcrop_); break; // left
+  case  0: printf ("#3# Branch: %g <= x%d <= %g\n", lcrop_, index_, rcrop_); break; // center
+  case  1: printf ("#3# Branch: x%d >= %g\n",               index_, rcrop_); break; // right
+  default: printf ("Couenne: branching on nonsense way %d\n", way);
   }
+#endif
 
   branchIndex_++;
 

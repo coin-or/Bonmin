@@ -129,8 +129,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
 	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	util/drawCuts.cpp util/rootQ.c readnl/readnl.cpp \
-	readnl/nl2e.cpp readnl/invmap.c
+	problem/fillQuadIndices.cpp util/drawCuts.cpp util/rootQ.c \
+	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneBranchingObject.lo CouenneObject.lo \
@@ -152,8 +152,8 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	conv-exprGroup.lo trigNewton.lo CouenneCutGenerator.lo \
 	generateCuts.lo boundTightening.lo genColCuts.lo genRowCuts.lo \
 	obbt.lo problem.lo problemIO.lo constraint.lo tightenBounds.lo \
-	impliedBounds.lo readASLfg.lo drawCuts.lo rootQ.lo \
-	$(am__objects_1)
+	impliedBounds.lo readASLfg.lo fillQuadIndices.lo drawCuts.lo \
+	rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -418,7 +418,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	problem/problem.cpp problem/problemIO.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
 	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	util/drawCuts.cpp util/rootQ.c $(am__append_1)
+	problem/fillQuadIndices.cpp util/drawCuts.cpp util/rootQ.c \
+	$(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -643,6 +644,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprUnary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fillQuadIndices.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genColCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genRowCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
@@ -1219,6 +1221,13 @@ readASLfg.lo: problem/readASLfg.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/readASLfg.cpp' object='readASLfg.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o readASLfg.lo `test -f 'problem/readASLfg.cpp' || echo '$(srcdir)/'`problem/readASLfg.cpp
+
+fillQuadIndices.lo: problem/fillQuadIndices.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fillQuadIndices.lo -MD -MP -MF "$(DEPDIR)/fillQuadIndices.Tpo" -c -o fillQuadIndices.lo `test -f 'problem/fillQuadIndices.cpp' || echo '$(srcdir)/'`problem/fillQuadIndices.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/fillQuadIndices.Tpo" "$(DEPDIR)/fillQuadIndices.Plo"; else rm -f "$(DEPDIR)/fillQuadIndices.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/fillQuadIndices.cpp' object='fillQuadIndices.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fillQuadIndices.lo `test -f 'problem/fillQuadIndices.cpp' || echo '$(srcdir)/'`problem/fillQuadIndices.cpp
 
 drawCuts.lo: util/drawCuts.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT drawCuts.lo -MD -MP -MF "$(DEPDIR)/drawCuts.Tpo" -c -o drawCuts.lo `test -f 'util/drawCuts.cpp' || echo '$(srcdir)/'`util/drawCuts.cpp; \

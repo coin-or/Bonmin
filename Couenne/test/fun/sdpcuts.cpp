@@ -88,7 +88,7 @@ int main (int argc, char **argv) {
     //    sprintf (fname, "sdp_%d", niter);
     //    si.writeLp (fname);
 
-  } while ((ncuts > 0) && (niter < 1000) && scg.Violated ());
+  } while ((ncuts > 0) && (niter < 100) && scg.Violated ());
 
   //  si.writeLp ("sdp-cut");
 

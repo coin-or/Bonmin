@@ -49,19 +49,24 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   static bool warned_large_coeff = false;
 
-  int j = cs.sizeRowCuts ();
-  CouNumber l, u;
+  int nrc = cs.sizeRowCuts (), ncc = cs.sizeColCuts ();
 
+  //  CouNumber l, u;
+
+  /*
   if ((!(cg -> isFirst ())) && 
-      (fabs ((l = expression::Lbound (varIndex_)) - 
-             (u = expression::Ubound (varIndex_))) < COUENNE_EPS))
+      ((l = expression::Lbound (varIndex_)) > -COUENNE_INFINITY) &&
+      ((u = expression::Lbound (varIndex_)) <  COUENNE_INFINITY) &&
+      (fabs (u-l) < COUENNE_EPS))
     cg -> createCut (cs, (l+u)/2., 0, varIndex_, 1.);
-  else image_ -> generateCuts (this, si, cs, cg, chg);
+  else 
+  */
+  image_ -> generateCuts (this, si, cs, cg, chg);
 
   // check if cuts have coefficients, rhs too large or too small
 
   if (warned_large_coeff)
-    for (int jj=j; jj < cs.sizeRowCuts (); jj++) {
+    for (int jj=nrc; jj < cs.sizeRowCuts (); jj++) {
 
       OsiRowCut        *cut = cs.rowCutPtr (jj);
       CoinPackedVector  row = cut -> row ();
@@ -90,8 +95,9 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
 
   //  if (!(cg -> isFirst ())) 
-  if (0)
-  if (j < cs.sizeRowCuts ())
+#if 0
+  if ((nrc < cs.sizeRowCuts ()) || 
+      (ncc < cs.sizeColCuts ()))
     {
       printf ("----------------Generated cut for "); 
       print (std::cout);  printf (" := ");
@@ -115,12 +121,13 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 		expression::Ubound (index));
 	
       printf("\n");
-      for (int jj=j; jj < cs.sizeRowCuts ();jj++)
-	cs.rowCutPtr (jj) -> print ();
+      for (int jj = nrc; jj < cs.sizeRowCuts (); jj++) cs.rowCutPtr (jj) -> print ();
+      for (int jj = ncc; jj < cs.sizeColCuts (); jj++) cs.colCutPtr (jj) -> print ();
     }
+#endif
 
   //////////////////////////////////////////////////////////////
 
   if (0)
-    draw_cuts (cs, cg, j, this, image_);
+    draw_cuts (cs, cg, nrc, this, image_);
 }

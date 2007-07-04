@@ -19,7 +19,7 @@
 /// procedure to strengthen variable bounds. Return false if problem
 /// turns out to be infeasible with given bounds, true otherwise.
 
-bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
+bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
 					   OsiCuts &cs, 
 					   t_chg_bounds *chg_bds, 
 					   Bonmin::BabInfo * babInfo) const {
@@ -28,7 +28,7 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
 
   /////////////////////// MIP bound management /////////////////////////////////
 
-  if ((objInd >= 0) && babInfo && (babInfo -> babPtr ())) {
+  if ((psi) && (objInd >= 0) && babInfo && (babInfo -> babPtr ())) {
 
     CouNumber UB      = babInfo  -> babPtr () -> model (). getObjValue(),
               LB      = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
@@ -39,8 +39,7 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
     // (LOWER) bound.
     
     if ((UB < COUENNE_INFINITY) && 
-	(UB < primal0 - COUENNE_EPS)) {
-      // update primal bound (MIP)
+	(UB < primal0 - COUENNE_EPS)) { // update primal bound (MIP)
 
       //      printf ("updating upper %g <-- %g\n", primal0, primal);
       problem_ -> Ub (objInd) = UB;
@@ -67,13 +66,13 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface &si,
       */
 
       if ((LB > -COUENNE_INFINITY) && (UB < COUENNE_INFINITY)) {
-	int ncols = si.getNumCols ();
+	int ncols = psi ->getNumCols ();
 
 	for (int i=0; i<ncols; i++) {
 
 	  CouNumber 
-	    x  = si.getColSolution () [i],
-	    rc = si.getReducedCost () [i],
+	    x  = psi -> getColSolution () [i],
+	    rc = psi -> getReducedCost () [i],
 	    dx = problem_ -> Ub (i) - x;
 
 	  if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {

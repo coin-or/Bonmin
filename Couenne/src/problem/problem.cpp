@@ -28,11 +28,12 @@
 /// constructor
 CouenneProblem::CouenneProblem (const struct ASL *asl):
 
-  auxSet_   (NULL), 
-  curnvars_ (-1),
-  nIntVars_ (0),
-  optimum_  (NULL),
-  bestObj_  (COIN_DBL_MAX) {
+  auxSet_    (NULL), 
+  curnvars_  (-1),
+  nIntVars_  (0),
+  optimum_   (NULL),
+  bestObj_   (COIN_DBL_MAX),
+  quadIndex_ (NULL) {
 
   x_ = lb_ = ub_ = NULL; 
 
@@ -50,10 +51,12 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   //printf ("======================================\n");
   standardize ();
 
+  fillQuadIndices ();
+
   if ((now = (CoinCpuTime () - now)) > 10.)
     printf ("Couenne: standardization time %.3fs\n", now);
 
-  //readOptimum ("optimum.txt", optimum_, bestObj_, this);
+  //readOptimum ("optimum-least.txt", optimum_, bestObj_, this);
 
   //print (std::cout);
 
@@ -329,8 +332,8 @@ void CouenneProblem::initAuxs (CouNumber *x,
     x_ [j] = (*aux) ();
 
     // set bounds 
-    lb_ [j] = (*(aux -> Lb ())) ();
-    ub_ [j] = (*(aux -> Ub ())) ();
+    if ((lb_ [j] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [j] = -DBL_MAX;
+    if ((ub_ [j] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [j] =  DBL_MAX;
   }
 }
 

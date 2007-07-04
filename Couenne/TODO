@@ -1,3 +1,5 @@
+- change chg structure within createCuts when add colCut
+- apply bound tightening AFTER applying branching rule but BEFORE re-solving LP
 - decompose quad form if block diagonal ONLY when looking for $\alpha_i$ (Jon), then use joint convexification
 - field quadCut_ for each expression (unary too! e.g. exp (log (x)) gives gap), especially prod/sum/div
 - similarity () method to check degree of similarity in expressions (1 if compare() gives true)

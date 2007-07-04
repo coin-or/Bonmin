@@ -27,9 +27,9 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
   // lower bound, depending on the bound changes of the variables
   // they depend on
 
-  /*printf ("tighten========================\n");
+  //  printf ("tighten========================\n");
 
-  for (int i=0; i < nVars () + nAuxs (); i++) 
+  /*for (int i=0; i < nVars () + nAuxs (); i++) 
     if ((i < nVars ()) || (Aux (i-nVars ()) -> Multiplicity () > 0))
       printf ("x_%d [%g, %g]\n", i, 
 	      expression::Lbound (i),
@@ -79,17 +79,18 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
 	/*printf ("update lbound %d: %g >= %g\n", 
 	  i+j, ll, lb_ [i+j]);*/
-
-	/*printf ("propa %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
+	/*
+	printf ("propa %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
 		i+j, lb_ [i+j], ub_ [i+j], ll, uu, lb_ [i+j] - ll);
 	Aux (j)             -> print (std::cout); printf (" := ");
-	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+	Aux (j) -> Image () -> print (std::cout); printf ("\n");
+	*/
 
 	if (optimum_ && 
 	    (optimum_ [i+j] >= lb_ [i+j]) && 
 	    (optimum_ [i+j] <= ll - COUENNE_EPS)) {
 
-	  printf ("propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
+	  printf ("#### propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
 		  i+j, lb_ [i+j], optimum_ [i+j], ll);
 	  Aux (j) -> Lb () -> print (std::cout); printf (" --- ");
 	  Aux (j) -> Ub () -> print (std::cout); printf ("\n");
@@ -122,7 +123,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	    (optimum_ [i+j] <= ub_ [i+j]) && 
 	    (optimum_ [i+j] >= uu + COUENNE_EPS)) {
 
-	  printf ("propagating u_%d cuts optimum: [%g <-X- %g <-- %g] :: ", 
+	  printf ("#### propagating u_%d cuts optimum: [%g <-X- %g <-- %g] :: ", 
 		  i+j, uu, optimum_ [i+j], ub_ [i+j]);
 	  Aux (j) -> Lb () -> print (std::cout); printf (" --- ");
 	  Aux (j) -> Ub () -> print (std::cout); printf ("\n");

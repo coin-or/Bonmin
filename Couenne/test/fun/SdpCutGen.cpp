@@ -26,9 +26,11 @@ void SdpCutGen::generateCuts (const OsiSolverInterface &si, OsiCuts &cs,
   }
 #endif
 
+  /*
   ncuts = cs.sizeRowCuts ();
   separateTRM (si, cs);
   printf ("================= TRM: %3d cuts\n", cs.sizeRowCuts () - ncuts);
+  */
 
   ncuts = cs.sizeRowCuts ();
   separateEV  (si, cs);

@@ -116,6 +116,7 @@ Couenne/src/expression/operators/impliedBounds-exprSum.cpp -text
 Couenne/src/problem/CouenneProblem.h -text
 Couenne/src/problem/CouenneProblemElem.h -text
 Couenne/src/problem/constraint.cpp -text
+Couenne/src/problem/fillQuadIndices.cpp -text
 Couenne/src/problem/impliedBounds.cpp -text
 Couenne/src/problem/problem.cpp -text
 Couenne/src/problem/problemIO.cpp -text

@@ -52,8 +52,8 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // upper segment
 
   if ((cL || cR) 
-      && (u < log (COUENNE_INFINITY) - 1) 
-      && (l > -    COUENNE_INFINITY/1e4  + 1)) { // tame lower bound
+      && (u < log (COUENNE_INFINITY) ) 
+      && (l > -    COUENNE_INFINITY / 1e4)) { // tame lower bound
 
     CouNumber expl     = exp (l),
               oppslope = (expl - exp (u)) / (u - l);
@@ -65,11 +65,11 @@ void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   // add tangent points: first choose sampling points
 
-  int ns = cg -> nSamples ();
+  const CouNumber logMC = log (COU_MAX_COEFF);
 
   // add tangents with finite coefficients
-  if (l < log (COUENNE_EPS))      l = x - ns;
-  if (u > log (COUENNE_INFINITY)) u = x + ns;
+  if (l < - logMC) l = - logMC;
+  if (u >   logMC) u =   logMC;
 
   // approximate the exponential function from below
   cg -> addEnvelope (cs, +1, exp, exp, w_ind, x_ind, x, l, u, chg, true);

@@ -109,7 +109,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // now we have correct  I1, I2, C1, C2, ipos, ineg, and a0
 
-  /*if (0) {
+  if (0)
+  if (wind==5) {
 
     printf ("w_%d = ", wind); print (std::cout);
 
@@ -125,7 +126,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
 
     printf ("\n");
-    }*/
+    }
 
   // indices of the variable in I1 or I2 with infinite lower or upper
   // bound. If more than one is found, it is set to -2
@@ -149,10 +150,6 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     upper = a0 + scanBounds (ipos, +1, I1, C1, u, &infUp1)
                + scanBounds (ineg, -1, I2, C2, l, &infLo2);
-
-  if (0)
-    printf ("lower = %g\nupper = %g. (%d,%d,%d,%d)\n", 
-	    lower, upper, infLo1, infUp1, infLo2, infUp2);
   
   // Now compute lower bound for all or for some of the variables:
   // There is a bound for all variables only if both infUp1 and infLo2
@@ -166,12 +163,53 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // check if there is room for improvement
 
-  /*if ((lower < wl + COUENNE_EPS) && 
-      (upper > wu - COUENNE_EPS))
-      return false;*/
+  {
+    CouNumber 
+      slackL = lower - wl, // each is positive if no implication 
+      slackU = wu - upper; // 
 
-  // Very subtle... make two copies of lower and upper to avoid
-  // updating bounds with some previously updated bounds
+    // if lower < wl or upper > wu, some bounds can be tightened.
+    // 
+    // otherwise, there is no implication, but if lower
+    //
+    // steal some work to bound propagation... 
+
+    if ((slackL >  -COUENNE_EPS) && 
+	(infLo1 == -1) && 
+	(infUp2 == -1)) {   // no implication on lower
+
+      // propagate lower bound to w
+      if (updateBound (-1, l + wind, lower)) {
+	chg [wind].lower = CHANGED;
+	tighter = true;
+      }
+
+      if ((slackU > -COUENNE_EPS)  && 
+	  (infLo2 == -1) && 
+	  (infUp1 == -1)) { // no implication on upper
+
+	// propagate upper bound to w
+	if (updateBound (+1, u + wind, upper)) {
+	  chg [wind].upper = CHANGED;
+	}
+
+	return false; // both bounds were weak, no implications possible
+      }
+    }
+    else if ((slackU > -COUENNE_EPS) && 
+	     (infLo2 == -1) && 
+	     (infUp1 == -1)) {
+
+      // propagate upper bound to w
+      if (updateBound (+1, u + wind, upper)) {
+	tighter = true;
+	chg [wind].upper = CHANGED;
+      }
+    }
+  }
+
+  // Subtle... make two copies of lower and upper to avoid updating
+  // bounds with some previously updated bounds
 
   // first of all, find maximum index in I1 and I2
 
@@ -251,7 +289,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	  chg [ind].upper = CHANGED;
       }
 
-  /*if (0) {
+  if (0)
+  if (wind==5) {
 
     printf ("I1 (%d): ", ipos);
     for (int i=0; i<ipos; i++)
@@ -262,7 +301,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
 
     printf ("\n---------------------------------------------------------------\n");
-    }*/
+  }
 
   // ...phew!
 

@@ -89,6 +89,7 @@ libCouenne_la_SOURCES = \
 	problem/tightenBounds.cpp \
 	problem/impliedBounds.cpp \
 	problem/readASLfg.cpp \
+	problem/fillQuadIndices.cpp \
 	util/drawCuts.cpp \
 	util/rootQ.c
 

@@ -46,7 +46,7 @@ void SdpCutGen::separateEV (const OsiSolverInterface &si,
 
   for (int iter = 0; alpha > 0.2; alpha *= 0.3, iter++) {
 
-    // change A so that lower right block of X is 
+    // change A so that its lower right block is 
     //
     // alpha*(x x^T) + (1-alpha) X 
     //

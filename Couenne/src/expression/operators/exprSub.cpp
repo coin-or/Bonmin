@@ -69,11 +69,6 @@ expression *exprSub::differentiate (int index) {
 }
 
 
-// print
-//void exprSub::print (std::ostream& out) const
-//  {exprOp::print (out, "-", INSIDE);}
-
-
 // Get lower and upper bound of an expression (if any)
 void exprSub::getBounds (expression *&lb, expression *&ub) {
 
@@ -111,17 +106,19 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   bool res = false;
 
-  /// !!! REMOVED A return false;
-
   // w >= l
 
-  if ((xi >= 0) && (updateBound (-1, l + xi, yl + wl))) {res = true; chg [xi].lower = CHANGED;}
-  if ((yi >= 0) && (updateBound (+1, u + yi, xu - wl))) {res = true; chg [yi].upper = CHANGED;}
+  if (wl > -COUENNE_INFINITY) {
+    if ((xi >= 0) && (updateBound (-1, l + xi, yl + wl))) {res = true; chg [xi].lower = CHANGED;}
+    if ((yi >= 0) && (updateBound (+1, u + yi, xu - wl))) {res = true; chg [yi].upper = CHANGED;}
+  }
 
   // w <= u
 
-  if ((xi >= 0) && (updateBound (+1, u + xi, yu + wu))) {res = true; chg [xi].upper = CHANGED;}
-  if ((yi >= 0) && (updateBound (-1, l + yi, xl - wu))) {res = true; chg [yi].lower = CHANGED;}
+  if (wu < COUENNE_INFINITY) {
+    if ((xi >= 0) && (updateBound (+1, u + xi, yu + wu))) {res = true; chg [xi].upper = CHANGED;}
+    if ((yi >= 0) && (updateBound (-1, l + yi, xl - wu))) {res = true; chg [yi].lower = CHANGED;}
+  }
 
   return res;
 }

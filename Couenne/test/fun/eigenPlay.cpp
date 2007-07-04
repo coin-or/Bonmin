@@ -14,7 +14,8 @@ void SdpCutGen::eigenPlay (OsiCuts &cs,
 
   double *v = (double *) malloc (n * sizeof (double));
 
-  //  m /= 2;
+  /*  if (m >= 4)
+      m /= 4;*/
 
   for (int k=0; k<m; k++) { // eigenvalue negative enough
 

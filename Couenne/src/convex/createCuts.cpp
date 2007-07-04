@@ -68,6 +68,28 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
       return 0;
   }
 
+  // check if cut violates optimal solution (irrespective of the
+  // branching rules applied, so handle with care)
+
+  CouNumber *best = problem_ -> bestSol (), lhs = 0;
+
+  bool print = false;
+
+  if (best) {
+
+    if (i1 >= 0) lhs += c1 * best [i1];
+    if (i2 >= 0) lhs += c2 * best [i2];
+    if (i3 >= 0) lhs += c3 * best [i3];
+
+    if ((sign <= 0) && (lhs > rhs + COUENNE_EPS)) 
+      {printf ("### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g >= %g [%g]\n", 
+	       i1,i2,i3, c1,c2,c3, lhs, rhs, lhs - rhs); print = true;}
+
+    if ((sign >= 0) && (lhs < rhs - COUENNE_EPS)) 
+      {printf ("### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g <= %g [%g]\n", 
+	       i1,i2,i3, c1,c2,c3, lhs, rhs, rhs - lhs); print = true;}
+  }
+
   // You are here if:
   //
   // 1) this is the first call to CouenneCutGenerator::generateCuts()
@@ -81,7 +103,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
   if ((i2 < 0) && (i3 < 0)) { // column cut
 
     if ((fabs (c1) < COUENNE_EPS) && (fabs (rhs) > 1e10*COUENNE_EPS)) {
-      printf ("nonsense column cut: %e w_%d <>= %e\n", c1, i1, rhs);
+      printf ("#### nonsense column cut: %e w_%d <>= %e\n", c1, i1, rhs);
       return 0;
     }
 
@@ -94,10 +116,24 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
     CouNumber &curL = problem_ -> Lb (i1),
               &curU = problem_ -> Ub (i1);
 
-    if (sign <= 0) {cut -> setUbs (1, &i1, &bound); if (bound < curU - COUENNE_EPS) curU = bound;}
-    if (sign >= 0) {cut -> setLbs (1, &i1, &bound); if (bound > curL + COUENNE_EPS) curL = bound;}
+    if (sign <= 0) {
+      cut -> setUbs (1, &i1, &bound); 
+      if (bound < curU - COUENNE_EPS) {
+	curU = bound;
+      }
+    }
+
+    if (sign >= 0) {
+      cut -> setLbs (1, &i1, &bound); 
+      if (bound > curL + COUENNE_EPS) {
+	curL = bound;
+      }
+    }
 
     cut -> setGloballyValid (is_global); // global?
+
+    //    if (print) cut -> print ();
+
     cs.insert (cut);
     delete cut;
 
@@ -120,6 +156,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
     delete [] index;
 
     cut -> setGloballyValid (is_global); // global?
+    //    if (print) cut -> print ();
     cs.insert (cut);
     delete cut;
   }

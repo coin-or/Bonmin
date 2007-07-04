@@ -65,7 +65,7 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
   // current point (how?)
 
   if (fabs (u-l) < COUENNE_EPS)
-    printf ("Warning, interval is really tiny\n");
+    printf ("#### Warning, interval is really tiny\n");
 
   if ((x-l < COUENNE_NEAR_BOUND) ||
       (u-x < COUENNE_NEAR_BOUND))
@@ -116,17 +116,17 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   // TODO: apply bound tightening to evaluate change in dual bound
 
-  if (0) {
 
-    //    printf (" --> [%.6e,%.6e]\n", l, u);
-    printf ("### Branch: x%d %c= %g\n", 
-	    index_, way ? '>' : '<', value_);
+#if 0
+  //    printf (" --> [%.6e,%.6e]\n", l, u);
+  printf ("### Branch: x%d %c= %g\n", 
+	  index_, way ? '>' : '<', value_);
 	   
     /*for (int i=0; i < solver -> getNumCols(); i++)
       printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
       solver -> getColUpper () [i]);
       }*/
-  }
+#endif
 
   branchIndex_++;
   return 0.; // estimated change in objective function

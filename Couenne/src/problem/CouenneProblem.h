@@ -21,6 +21,9 @@
 struct ASL;
 struct expr;
 
+
+/// structure for comparing expressions
+
 struct compExpr {
   inline bool operator () (exprAux* e0, exprAux* e1) const
   {return (e0 -> Image () -> compare (*(e1 -> Image ())) < 0);}
@@ -61,6 +64,9 @@ class CouenneProblem {
   /// best known objective function
   CouNumber bestObj_;
 
+  /// indices of variables appearing in products (used for SDP cuts)
+  int *quadIndex_;
+
  public:
 
   /// constructors, destructor
@@ -99,6 +105,10 @@ class CouenneProblem {
   CouNumber  *X     () const {return x_;}
   CouNumber  *Lb    () const {return lb_;}
   CouNumber  *Ub    () const {return ub_;}
+
+  /// get optimal solution and objective value
+  CouNumber  *bestSol () const {return optimum_;}
+  CouNumber   bestObj () const {return bestObj_;}
 
   /// add (non linear) objective function
   void addObjective     (expression *, const std::string &);
@@ -154,6 +164,9 @@ class CouenneProblem {
 
   /// search for implied bounds 
   int impliedBounds (t_chg_bounds *) const;
+
+  /// look for quadratic terms to be used with SDP cuts
+  void fillQuadIndices ();
 };
 
 
