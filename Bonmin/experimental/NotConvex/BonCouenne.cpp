@@ -32,8 +32,8 @@
 #endif
 
 #include <CbcCutGenerator.hpp>
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 namespace Bonmin{
 extern int usingCouenne;}

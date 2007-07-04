@@ -11,7 +11,7 @@
 #define BonIpoptHeuristic_HPP
 #include "CbcHeuristic.hpp"
 #include "BonOsiTMINLPInterface.hpp"
-#include "CouenneProblem.h"
+#include "CouenneProblem.hpp"
 namespace Bonmin{
   /** An heuristic to call an NlpSolver if all CouenneObjects are close to be satisfied (for other integer objects, rounding is performed, is SOS are not satisfied does not run).
   */

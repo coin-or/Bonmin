@@ -10,7 +10,7 @@
 #include "BonNlpHeuristic.hpp"
 #include "BonCouenneInterface.hpp"
 #include "CouenneObject.hpp"
-#include "CouenneProblem.h"
+#include "CouenneProblem.hpp"
 #include "CbcBranchActual.hpp"
 #include "BonAuxInfos.hpp"
 

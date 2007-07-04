@@ -3,7 +3,7 @@
 // This code is published under the Common Public License.
 //
 // Authors :
-// Pietro Belloti, Carnegie Mellon University
+// Pietro Belotti, Carnegie Mellon University
 // Pierre Bonami, International Business Machines Corporation
 //
 // Date : 12/19/2006
@@ -11,7 +11,7 @@
 
 #include "BonCouenneInterface.hpp"
 #include "CoinHelperFunctions.hpp"
-#include <CouenneProblem.h>
+#include <CouenneProblem.hpp>
 
 namespace Bonmin {
 
