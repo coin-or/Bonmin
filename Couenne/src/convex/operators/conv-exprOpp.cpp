@@ -7,11 +7,11 @@
  */
 
 #include <CouenneTypes.h>
-#include <exprOpp.h>
-#include <exprConst.h>
+#include <exprOpp.hpp>
+#include <exprConst.hpp>
 
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 
 // generate convexification cut for constraint w = - x

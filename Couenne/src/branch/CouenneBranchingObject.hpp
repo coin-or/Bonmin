@@ -12,7 +12,7 @@
 
 #include <CoinFinite.hpp>
 #include <OsiBranchingObject.hpp>
-#include <exprAux.h>
+#include <exprAux.hpp>
 
 #define COUENNE_CROP 1
 #define COUENNE_LCROP (1e2*COUENNE_CROP)

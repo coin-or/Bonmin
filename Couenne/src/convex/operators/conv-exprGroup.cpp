@@ -9,12 +9,12 @@
 #include <OsiRowCut.hpp>
 #include <OsiCuts.hpp>
 
-#include <exprGroup.h>
-#include <exprBound.h>
-#include <exprMul.h>
+#include <exprGroup.hpp>
+#include <exprBound.hpp>
+#include <exprMul.hpp>
 
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 /// Get lower and upper bound of an expression (if any)
 void exprGroup::getBounds (expression *&lb, expression *&ub) {

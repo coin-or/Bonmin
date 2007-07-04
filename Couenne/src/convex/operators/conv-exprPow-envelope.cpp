@@ -9,11 +9,11 @@
 #include <math.h>
 
 #include <CouenneTypes.h>
-#include <rootQ.h>
-#include <exprPow.h>
+#include <rootQ.hpp>
+#include <exprPow.hpp>
 #include <CouennePrecisions.h>
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 #define COUENNE_POW_CONST 1
 #define POW_FACTOR 2

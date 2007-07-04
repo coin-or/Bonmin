@@ -8,8 +8,8 @@
  */
 
 
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <CouenneProblem.hpp>
 
 bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
 

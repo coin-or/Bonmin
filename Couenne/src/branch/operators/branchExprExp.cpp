@@ -6,8 +6,8 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprExp.h>
-#include <exprPow.h>
+#include <exprExp.hpp>
+#include <exprPow.hpp>
 #include <CouennePrecisions.h>
 #include <CouenneTypes.h>
 #include <CouenneObject.hpp>

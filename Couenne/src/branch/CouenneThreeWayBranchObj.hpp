@@ -13,7 +13,7 @@
 #include <CoinFinite.hpp>
 #include <OsiBranchingObject.hpp>
 
-#include <exprAux.h>
+#include <exprAux.hpp>
 #include <CouenneObject.hpp>
 
 

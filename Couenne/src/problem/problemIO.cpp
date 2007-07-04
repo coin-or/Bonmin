@@ -11,13 +11,13 @@
 #include <iomanip> // to use the setprecision manipulator
 
 #include <CouenneTypes.h>
-#include <expression.h>
-#include <exprConst.h>
-#include <exprGroup.h>
-#include <exprAux.h>
+#include <expression.hpp>
+#include <exprConst.hpp>
+#include <exprGroup.hpp>
+#include <exprAux.hpp>
 
-#include <CouenneProblem.h>
-#include <CouenneProblemElem.h>
+#include <CouenneProblem.hpp>
+#include <CouenneProblemElem.hpp>
 
 
 // output content of the problem

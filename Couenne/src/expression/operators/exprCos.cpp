@@ -6,12 +6,12 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprCos.h>
-#include <exprSin.h>
-#include <exprBCos.h>
-#include <exprOpp.h>
-#include <exprMul.h>
-#include <exprClone.h>
+#include <exprCos.hpp>
+#include <exprSin.hpp>
+#include <exprBCos.hpp>
+#include <exprOpp.hpp>
+#include <exprMul.hpp>
+#include <exprClone.hpp>
 
 #include <math.h>
 

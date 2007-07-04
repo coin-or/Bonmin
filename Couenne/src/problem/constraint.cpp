@@ -10,8 +10,8 @@
 #include <map>
 
 #include <CouenneTypes.h>
-#include <CouenneProblem.h>
-#include <CouenneProblemElem.h>
+#include <CouenneProblem.hpp>
+#include <CouenneProblemElem.hpp>
 
 
 // output nonlinear constraint

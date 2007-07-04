@@ -13,16 +13,16 @@
 #include <CoinTime.hpp>
 
 #include <CouenneTypes.h>
-#include <expression.h>
-#include <exprConst.h>
-#include <exprClone.h>
-#include <exprIVar.h>
-#include <exprAux.h>
-#include <exprMax.h>
-#include <exprMin.h>
+#include <expression.hpp>
+#include <exprConst.hpp>
+#include <exprClone.hpp>
+#include <exprIVar.hpp>
+#include <exprAux.hpp>
+#include <exprMax.hpp>
+#include <exprMin.hpp>
 
-#include <CouenneProblem.h>
-#include <CouenneProblemElem.h>
+#include <CouenneProblem.hpp>
+#include <CouenneProblemElem.hpp>
 
 
 /// constructor

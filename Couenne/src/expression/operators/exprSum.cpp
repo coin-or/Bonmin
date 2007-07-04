@@ -6,9 +6,9 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprSum.h>
-#include <exprCopy.h>
-#include <exprConst.h>
+#include <exprSum.hpp>
+#include <exprCopy.hpp>
+#include <exprConst.hpp>
 
 
 /// Constructor

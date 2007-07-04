@@ -6,10 +6,10 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprMul.h>
-#include <exprSum.h>
-#include <exprConst.h>
-#include <exprClone.h>
+#include <exprMul.hpp>
+#include <exprSum.hpp>
+#include <exprConst.hpp>
+#include <exprClone.hpp>
 #include <CouennePrecisions.h>
 
 

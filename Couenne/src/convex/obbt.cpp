@@ -8,8 +8,8 @@
  */
 
 #include <CglCutGenerator.hpp>
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <CouenneProblem.hpp>
 
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100

@@ -6,14 +6,14 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblem.h>
+#include <CouenneProblem.hpp>
 
 #include <CouenneTypes.h>
 
-#include <exprSum.h>
-#include <exprMul.h>
-#include <exprClone.h>
-#include <exprGroup.h>
+#include <exprSum.hpp>
+#include <exprMul.hpp>
+#include <exprClone.hpp>
+#include <exprGroup.hpp>
 
 #include "asl.h"
 #include "nlp.h"

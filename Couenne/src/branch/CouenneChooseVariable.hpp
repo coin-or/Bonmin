@@ -11,7 +11,7 @@
 #define COUENNECHOOSEVARIABLE_HPP
 
 #include <OsiChooseVariable.hpp>
-#include <CouenneProblem.h>
+#include <CouenneProblem.hpp>
 
 
 /** \brief Choose a variable for branching

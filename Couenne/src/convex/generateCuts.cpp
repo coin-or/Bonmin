@@ -8,8 +8,8 @@
  */
 
 #include <CglCutGenerator.hpp>
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <CouenneProblem.hpp>
 #include "BonAuxInfos.hpp"
 
 

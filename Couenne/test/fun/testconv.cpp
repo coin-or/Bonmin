@@ -18,8 +18,8 @@
 
 //#include <expressions.h>
 #include <CouenneTypes.h>
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 #include <OsiSolverInterface.hpp>
 #include <OsiSolverParameters.hpp>

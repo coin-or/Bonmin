@@ -11,7 +11,7 @@
 #include <OsiRowCut.hpp>
 #include <CouennePrecisions.h>
 #include <CouenneTypes.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneCutGenerator.hpp>
 
 void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 				       unary_function f,      // function to be linearized

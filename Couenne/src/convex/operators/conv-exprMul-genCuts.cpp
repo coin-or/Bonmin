@@ -7,11 +7,11 @@
  */
 
 #include <CouenneTypes.h>
-#include <exprMul.h>
-#include <exprPow.h>
-#include <exprDiv.h>
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <exprMul.hpp>
+#include <exprPow.hpp>
+#include <exprDiv.hpp>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 /// add tangent at intersection with bounding box
 void addImplTangent (const CouenneCutGenerator *, OsiCuts &, 

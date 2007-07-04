@@ -8,19 +8,19 @@
 
 #include <CouenneTypes.h>
 
-#include <exprAbs.h>
-#include <exprSum.h>
-#include <exprSub.h>
-#include <exprMul.h>
-#include <exprDiv.h>
-#include <exprInv.h>
-#include <exprSin.h>
-#include <exprPow.h>
-#include <exprClone.h>
-#include <exprLog.h>
-#include <exprOpp.h>
-#include <exprCos.h>
-#include <exprExp.h>
+#include <exprAbs.hpp>
+#include <exprSum.hpp>
+#include <exprSub.hpp>
+#include <exprMul.hpp>
+#include <exprDiv.hpp>
+#include <exprInv.hpp>
+#include <exprSin.hpp>
+#include <exprPow.hpp>
+#include <exprClone.hpp>
+#include <exprLog.hpp>
+#include <exprOpp.hpp>
+#include <exprCos.hpp>
+#include <exprExp.hpp>
 
 #include <asl.h>
 #include <nlp.h>

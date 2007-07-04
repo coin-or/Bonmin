@@ -7,12 +7,12 @@
  */
 
 #include <CouenneTypes.h>
-#include <exprMul.h>
-#include <exprBMul.h>
-#include <exprConst.h>
-#include <exprPow.h>
-#include <exprClone.h>
-#include <CouenneProblem.h>
+#include <exprMul.hpp>
+#include <exprBMul.hpp>
+#include <exprConst.hpp>
+#include <exprPow.hpp>
+#include <exprClone.hpp>
+#include <CouenneProblem.hpp>
 
 
 /// check if two arguments point to the same variable

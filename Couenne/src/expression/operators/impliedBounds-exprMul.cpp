@@ -6,7 +6,7 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprMul.h>
+#include <exprMul.hpp>
 #include <CouennePrecisions.h>
 
 

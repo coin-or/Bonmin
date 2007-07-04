@@ -6,11 +6,11 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprAbs.h>
-#include <exprClone.h>
-#include <exprMin.h>
-#include <exprMax.h>
-#include <exprOpp.h>
+#include <exprAbs.hpp>
+#include <exprClone.hpp>
+#include <exprMin.hpp>
+#include <exprMax.hpp>
+#include <exprOpp.hpp>
 
 
 /// find lower and upper bound of a given expression

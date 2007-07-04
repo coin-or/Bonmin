@@ -7,9 +7,9 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneCutGenerator.h>
-#include <exprAux.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <exprAux.hpp>
+#include <CouenneProblem.hpp>
 
 
 // [cool!] print graph-readable output for displaying inequalities

@@ -6,11 +6,11 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprSin.h>
-#include <exprClone.h>
-#include <exprCos.h>
-#include <exprBSin.h>
-#include <exprMul.h>
+#include <exprSin.hpp>
+#include <exprClone.hpp>
+#include <exprCos.hpp>
+#include <exprBSin.hpp>
+#include <exprMul.hpp>
 
 
 // differentiation
@@ -24,13 +24,6 @@ expression *exprSin::differentiate (int index) {
 
   return new exprMul (arglist, 2);
 }
-
-
-// printing
-
-//void exprSin::print (std::ostream& out) const {
-//  exprUnary::print (out, "sin", PRE);
-//}
 
 
 // compute bounds of sin x given bounds of x 

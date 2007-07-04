@@ -6,7 +6,7 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprAbs.h>
+#include <exprAbs.hpp>
 #include <CouennePrecisions.h>
 #include <CouenneTypes.h>
 #include <CouenneBranchingObject.hpp>

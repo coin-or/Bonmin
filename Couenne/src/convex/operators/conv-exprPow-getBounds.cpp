@@ -9,15 +9,15 @@
 #include <math.h>
 
 #include <CouenneTypes.h>
-#include <exprPow.h>
-#include <exprConst.h>
-#include <exprCopy.h>
-#include <exprClone.h>
-#include <exprMax.h>
-#include <exprMin.h>
-#include <exprOpp.h>
+#include <exprPow.hpp>
+#include <exprConst.hpp>
+#include <exprCopy.hpp>
+#include <exprClone.hpp>
+#include <exprMax.hpp>
+#include <exprMin.hpp>
+#include <exprOpp.hpp>
 #include <CouennePrecisions.h>
-#include <CouenneProblem.h>
+#include <CouenneProblem.hpp>
 
 
 // compute expressions for lower and upper bounds of a power x^y,

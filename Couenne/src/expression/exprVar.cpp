@@ -6,16 +6,16 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneCutGenerator.h>
+#include <CouenneCutGenerator.hpp>
 #include <CouenneTypes.h>
-#include <expression.h>
-#include <exprAux.h>
-#include <exprOp.h>
-#include <exprUnary.h>
-#include <exprVar.h>
-#include <exprBound.h>
+#include <expression.hpp>
+#include <exprAux.hpp>
+#include <exprOp.hpp>
+#include <exprUnary.hpp>
+#include <exprVar.hpp>
+#include <exprBound.hpp>
 
-#include <CouenneProblem.h>
+#include <CouenneProblem.hpp>
 
 
 // is the variable one of those in varlist?

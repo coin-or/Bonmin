@@ -9,18 +9,18 @@
 #include <string>
 #include <string.h>
 
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <CouenneProblem.hpp>
 
 #include <CouenneTypes.h>
-#include <expression.h>
-#include <exprAux.h>
-#include <exprOp.h>
-#include <exprUnary.h>
-#include <exprVar.h>
-#include <exprIVar.h>
-#include <exprBound.h>
-#include <exprGroup.h>
+#include <expression.hpp>
+#include <exprAux.hpp>
+#include <exprOp.hpp>
+#include <exprUnary.hpp>
+#include <exprVar.hpp>
+#include <exprIVar.hpp>
+#include <exprBound.hpp>
+#include <exprGroup.hpp>
 
 // General N-ary function destructor
 

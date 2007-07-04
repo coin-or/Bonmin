@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include <CouenneObject.hpp>
-#include <exprGroup.h>
+#include <exprGroup.hpp>
 #include <CouenneBranchingObject.hpp>
 #include <CouenneThreeWayBranchObj.hpp>
 

@@ -7,13 +7,13 @@
  */
 
 #include <CouenneTypes.h>
-#include <exprLog.h>
-#include <exprInv.h>
-#include <exprPow.h>
-#include <exprConst.h>
+#include <exprLog.hpp>
+#include <exprInv.hpp>
+#include <exprPow.hpp>
+#include <exprConst.hpp>
 
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 
 #define LOG_STEP 10

@@ -9,12 +9,12 @@
 #include <math.h>
 
 #include <CouennePrecisions.h>
-#include <exprPow.h>
-#include <exprSum.h>
-#include <exprMul.h>
-#include <exprDiv.h>
-#include <exprLog.h>
-#include <exprConst.h>
+#include <exprPow.hpp>
+#include <exprSum.hpp>
+#include <exprMul.hpp>
+#include <exprDiv.hpp>
+#include <exprLog.hpp>
+#include <exprConst.hpp>
 
 
 /// simplify power f(x) ^ g(x)

@@ -8,12 +8,12 @@
 
 #include <math.h>
 
-#include <exprLog.h>
-#include <exprConst.h>
-#include <exprClone.h>
-#include <exprMax.h>
-#include <exprInv.h>
-#include <exprMul.h>
+#include <exprLog.hpp>
+#include <exprConst.hpp>
+#include <exprClone.hpp>
+#include <exprMax.hpp>
+#include <exprInv.hpp>
+#include <exprMul.hpp>
 
 
 /// get bounds of log (x) based on bounds of x

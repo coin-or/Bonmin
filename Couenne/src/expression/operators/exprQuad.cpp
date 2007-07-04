@@ -6,9 +6,9 @@
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblem.h>
-#include <exprConst.h>
-#include <exprQuad.h>
+#include <CouenneProblem.hpp>
+#include <exprConst.hpp>
+#include <exprQuad.hpp>
 
 /// Constructor
 exprQuad::exprQuad  (CouNumber c0,     // constant term

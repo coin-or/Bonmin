@@ -6,16 +6,15 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneCutGenerator.h>
+#include <CouenneCutGenerator.hpp>
 #include <CouenneTypes.h>
-#include <expression.h>
-#include <exprAux.h>
-#include <exprOp.h>
-#include <exprUnary.h>
-#include <exprVar.h>
-#include <exprBound.h>
-
-#include <CouenneProblem.h>
+#include <expression.hpp>
+#include <exprAux.hpp>
+#include <exprOp.hpp>
+#include <exprUnary.hpp>
+#include <exprVar.hpp>
+#include <exprBound.hpp>
+#include <CouenneProblem.hpp>
 
 // auxiliary expression Constructor
 

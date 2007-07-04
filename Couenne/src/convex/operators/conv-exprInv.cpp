@@ -8,18 +8,18 @@
 
 #include <CouenneTypes.h>
 
-#include <exprInv.h>
-#include <exprClone.h>
-#include <exprConst.h>
-#include <exprMin.h>
-#include <exprOpp.h>
-#include <exprDiv.h>
-#include <exprSum.h>
-#include <exprMul.h>
-#include <exprPow.h>
+#include <exprInv.hpp>
+#include <exprClone.hpp>
+#include <exprConst.hpp>
+#include <exprMin.hpp>
+#include <exprOpp.hpp>
+#include <exprDiv.hpp>
+#include <exprSum.hpp>
+#include <exprMul.hpp>
+#include <exprPow.hpp>
 
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 // compute upper- and lower bounds of the expression w = 1/f(x) given
 // bounds of f(x)

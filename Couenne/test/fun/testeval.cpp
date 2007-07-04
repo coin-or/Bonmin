@@ -16,18 +16,18 @@
 
 #include <math.h>
 
-//#include <expressions.h>
-#include <expression.h>
-#include <exprMul.h>
-#include <exprSin.h>
-#include <exprSum.h>
-#include <exprSub.h>
-#include <exprExp.h>
-#include <exprPow.h>
-#include <exprLog.h>
+//#include <expressions.hpp>
+#include <expression.hpp>
+#include <exprMul.hpp>
+#include <exprSin.hpp>
+#include <exprSum.hpp>
+#include <exprSub.hpp>
+#include <exprExp.hpp>
+#include <exprPow.hpp>
+#include <exprLog.hpp>
 #include <CouenneTypes.h>
-#include <CouenneProblem.h>
-#include <rootQ.h>
+#include <CouenneProblem.hpp>
+#include <rootQ.hpp>
 
 /*
 void test (expression * &root_) {

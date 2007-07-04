@@ -9,20 +9,20 @@
 #include <string>
 #include <string.h>
 
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <CouenneProblem.hpp>
 
 #include <CouenneTypes.h>
-#include <expression.h>
-#include <exprAux.h>
-#include <exprOp.h>
-#include <exprUnary.h>
-#include <exprVar.h>
-#include <exprIVar.h>
-#include <exprBound.h>
+#include <expression.hpp>
+#include <exprAux.hpp>
+#include <exprOp.hpp>
+#include <exprUnary.hpp>
+#include <exprVar.hpp>
+#include <exprIVar.hpp>
+#include <exprBound.hpp>
 
 // static vectors for evaluation, see their description in
-// expression.h
+// expression.hpp
 
 CouNumber  expression::stack [STACK_SIZE];
 CouNumber *expression::sp = stack;

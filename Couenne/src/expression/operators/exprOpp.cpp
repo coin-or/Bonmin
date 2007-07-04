@@ -6,7 +6,7 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprOpp.h>
+#include <exprOpp.hpp>
 
 
 // find bounds of -x given bounds on x

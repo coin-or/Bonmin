@@ -16,10 +16,10 @@
 
 #include <OsiSolverInterface.hpp>
 #include <CouenneTypes.h>
-#include <CouenneCutGenerator.h>
-#include <exprSin.h>
-#include <exprCos.h>
-#include <exprAux.h>
+#include <CouenneCutGenerator.hpp>
+#include <exprSin.hpp>
+#include <exprCos.hpp>
+#include <exprAux.hpp>
 
 #define NEW_TRIG
 

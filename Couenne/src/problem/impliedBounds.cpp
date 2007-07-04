@@ -7,7 +7,7 @@
  * This file is licensed under the Common Public License.
  */
 
-#include <CouenneProblem.h>
+#include <CouenneProblem.hpp>
 
 /// Bound tightening for auxiliary variables
 

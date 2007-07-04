@@ -8,9 +8,9 @@
 
 #include <OsiSolverInterface.hpp>
 #include <CouenneTypes.h>
-#include <CouenneCutGenerator.h>
-#include <exprAbs.h>
-#include <exprAux.h>
+#include <CouenneCutGenerator.hpp>
+#include <exprAbs.hpp>
+#include <exprAux.hpp>
 
 
 // generate convexification cut for constraint w = |x|

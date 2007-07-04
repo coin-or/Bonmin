@@ -12,17 +12,17 @@
 #endif
 
 #include <CouenneTypes.h>
-#include <rootQ.h>
-#include <exprPow.h>
-#include <exprExp.h>
-#include <exprConst.h>
-#include <exprClone.h>
-#include <exprMul.h>
-#include <exprSum.h>
-#include <exprLog.h>
+#include <rootQ.hpp>
+#include <exprPow.hpp>
+#include <exprExp.hpp>
+#include <exprConst.hpp>
+#include <exprClone.hpp>
+#include <exprMul.hpp>
+#include <exprSum.hpp>
+#include <exprLog.hpp>
 #include <CouennePrecisions.h>
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 
 std::map <int, CouNumber> Qroot::Qmap;

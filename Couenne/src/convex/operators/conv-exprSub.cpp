@@ -7,9 +7,9 @@
  */
 
 #include <CouenneTypes.h>
-#include <CouenneCutGenerator.h>
-#include <exprSub.h>
-#include <exprOpp.h>
+#include <CouenneCutGenerator.hpp>
+#include <exprSub.hpp>
+#include <exprOpp.hpp>
 
 
 // Create standard formulation of this expression

@@ -6,8 +6,8 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprSum.h>
-#include <exprGroup.h>
+#include <exprSum.hpp>
+#include <exprGroup.hpp>
 
 
 /// vector operation to find bound to variable in a sum

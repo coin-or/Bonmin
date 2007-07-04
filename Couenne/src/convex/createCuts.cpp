@@ -11,8 +11,8 @@
 
 #include <CouenneTypes.h>
 #include <CouennePrecisions.h>
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <CouenneProblem.hpp>
 
 
 /// general procedure for inserting a linear cut with up to three

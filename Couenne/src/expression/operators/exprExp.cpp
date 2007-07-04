@@ -6,9 +6,9 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprExp.h>
-#include <exprClone.h>
-#include <exprMul.h>
+#include <exprExp.hpp>
+#include <exprClone.hpp>
+#include <exprMul.hpp>
 
 
 // differentiation

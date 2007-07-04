@@ -478,42 +478,42 @@ include_HEADERS = \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
 	branch/projections.h \
-	expression/operators/exprAbs.h \
-	expression/operators/exprExp.h \
-	expression/operators/exprInv.h \
-	expression/operators/exprMul.h \
-	expression/operators/exprOpp.h \
-	expression/operators/exprBMul.h \
-	expression/operators/exprLog.h \
-	expression/operators/exprDiv.h \
-	expression/operators/exprMin.h \
-	expression/operators/exprBDiv.h \
-	expression/operators/exprSum.h \
-	expression/operators/exprMax.h \
-	expression/operators/exprPow.h \
-	expression/operators/exprSin.h \
-	expression/operators/exprCos.h \
-	expression/operators/exprBSin.h \
-	expression/operators/exprBCos.h \
-	expression/operators/exprSub.h \
-	expression/operators/exprGroup.h \
-	expression/operators/exprQuad.h \
-	expression/exprConst.h \
-	expression/exprIVar.h \
-	expression/exprVar.h \
-	expression/exprAux.h \
-	expression/exprUnary.h \
-	expression/expression.h \
-	expression/exprClone.h \
-	expression/exprBound.h \
-	expression/exprCopy.h \
-	expression/exprOp.h \
+	expression/operators/exprAbs.hpp \
+	expression/operators/exprExp.hpp \
+	expression/operators/exprInv.hpp \
+	expression/operators/exprMul.hpp \
+	expression/operators/exprOpp.hpp \
+	expression/operators/exprBMul.hpp \
+	expression/operators/exprLog.hpp \
+	expression/operators/exprDiv.hpp \
+	expression/operators/exprMin.hpp \
+	expression/operators/exprBDiv.hpp \
+	expression/operators/exprSum.hpp \
+	expression/operators/exprMax.hpp \
+	expression/operators/exprPow.hpp \
+	expression/operators/exprSin.hpp \
+	expression/operators/exprCos.hpp \
+	expression/operators/exprBSin.hpp \
+	expression/operators/exprBCos.hpp \
+	expression/operators/exprSub.hpp \
+	expression/operators/exprGroup.hpp \
+	expression/operators/exprQuad.hpp \
+	expression/exprConst.hpp \
+	expression/exprIVar.hpp \
+	expression/exprVar.hpp \
+	expression/exprAux.hpp \
+	expression/exprUnary.hpp \
+	expression/expression.hpp \
+	expression/exprClone.hpp \
+	expression/exprBound.hpp \
+	expression/exprCopy.hpp \
+	expression/exprOp.hpp \
 	expression/CouennePrecisions.h \
-	problem/CouenneProblemElem.h \
-	problem/CouenneProblem.h \
+	problem/CouenneProblemElem.hpp \
+	problem/CouenneProblem.hpp \
 	expression/CouenneTypes.h \
-	util/rootQ.h \
-	convex/CouenneCutGenerator.h
+	util/rootQ.hpp \
+	convex/CouenneCutGenerator.hpp
 
 
 #############################################################################

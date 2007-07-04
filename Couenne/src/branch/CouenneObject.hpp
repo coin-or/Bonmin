@@ -12,7 +12,7 @@
 
 #include <CoinFinite.hpp>
 #include <OsiBranchingObject.hpp>
-#include <exprAux.h>
+#include <exprAux.hpp>
 
 // Define what kind of branching (two- or three-way) and where to
 // start from: left, (center,) or right. The last is to help diversify

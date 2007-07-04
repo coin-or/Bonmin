@@ -16,8 +16,8 @@
 #include <CglCutGenerator.hpp>
 
 #include <CouennePrecisions.h>
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 
 /// constructor

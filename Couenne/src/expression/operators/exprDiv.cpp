@@ -6,13 +6,13 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprDiv.h>
-#include <exprConst.h>
-#include <exprClone.h>
-#include <exprMul.h>
-#include <exprInv.h>
-#include <exprSub.h>
-#include <exprBDiv.h>
+#include <exprDiv.hpp>
+#include <exprConst.hpp>
+#include <exprClone.hpp>
+#include <exprMul.hpp>
+#include <exprInv.hpp>
+#include <exprSub.hpp>
+#include <exprBDiv.hpp>
 
 #include <CouennePrecisions.h>
 

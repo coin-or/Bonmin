@@ -7,12 +7,12 @@
  */
 
 #include <CouenneTypes.h>
-#include <exprSum.h>
-#include <exprGroup.h>
-#include <exprConst.h>
+#include <exprSum.hpp>
+#include <exprGroup.hpp>
+#include <exprConst.hpp>
 
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 
 /// used to create linear term

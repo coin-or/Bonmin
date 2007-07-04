@@ -8,8 +8,8 @@
  */
 
 #include <CglCutGenerator.hpp>
-#include <CouenneCutGenerator.h>
-#include <CouenneProblem.h>
+#include <CouenneCutGenerator.hpp>
+#include <CouenneProblem.hpp>
 
 /// generate OsiColCuts for improved (implied and propagated) bounds
 void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,

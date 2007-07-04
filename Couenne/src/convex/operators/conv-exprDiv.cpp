@@ -7,12 +7,12 @@
  */
 
 #include <CouenneTypes.h>
-#include <exprOp.h>
-#include <exprDiv.h>
-#include <exprClone.h>
-#include <exprMul.h>
-#include <CouenneProblem.h>
-#include <CouenneCutGenerator.h>
+#include <exprOp.hpp>
+#include <exprDiv.hpp>
+#include <exprClone.hpp>
+#include <exprMul.hpp>
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
 // Create standard formulation of this expression
 exprAux *exprDiv::standardize (CouenneProblem *p) {
