@@ -7,7 +7,10 @@
 //
 // Date : 04/12/2007
 
-
+#include "BonminConfig.h"
+#ifdef COIN_HAS_FILTERSQP
+# include "BonFilterSolver.hpp"
+#endif
 #include "BonBabSetupBase.hpp"
 #include <fstream>
 #include <sstream>
@@ -455,6 +458,9 @@ BabSetupBase::mayPrintDoc(){
     categories.push_back("bonmin options for robustness");
     categories.push_back("bonmin options for non-convex problems");
     categories.push_back("bonmin options : B-Hyb specific options");
+#ifdef COIN_HAS_FILTERSQP
+    categories.push_back("FilterSQP options");
+#endif
     //    roptions->OutputLatexOptionDocumentation2(*app_->Jnlst(),categories);
     roptions_->OutputOptionDocumentation(*(journalist_),categories);
   }

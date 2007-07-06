@@ -7,6 +7,7 @@
 //
 // Date : 04/13/2007
 
+#include "BonminConfig.h"
 #include "OsiClpSolverInterface.hpp"
 
 #include "BonBonminSetup.hpp"
@@ -23,7 +24,9 @@
 
 #include "BonCbcNode.hpp"
 
-
+#ifdef COIN_HAS_FILTERSQP
+# include "BonFilterSolver.hpp"
+#endif
 
 //MILP cuts
 #include "CglGomory.hpp"
@@ -55,6 +58,10 @@ algo_(other.algo_){
     OACutGenerator2::registerOptions(roptions);
     EcpCuts::registerOptions(roptions);
     OaNlpOptim::registerOptions(roptions);
+
+#ifdef COIN_HAS_FILTERSQP
+    FilterSolver::registerOptions(roptions);
+#endif
     
     BonCbcFullNodeInfo::registerOptions(roptions);
     
