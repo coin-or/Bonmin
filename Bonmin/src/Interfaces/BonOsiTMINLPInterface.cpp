@@ -1614,7 +1614,6 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
-  int offset = (index_style == TNLP::FORTRAN_STYLE);
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
   assert(jRow_ != NULL);
@@ -1626,8 +1625,9 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   CoinPackedVector * cuts = new CoinPackedVector[nNonLinear_ + 1];
   double * lb = new double[nNonLinear_ + 1];
   double * ub = new double[nNonLinear_ + 1];
-  int * binding = new int[m + 1];//store binding constraints at current opt (which are added to OA) -1 if constraint is not binding, otherwise index in subset of binding constraints
-  int numBindings = 0;
+
+  int * row2cutIdx = new int[m];//store correspondance between index of row and index of cut (some cuts are not generated for rows because linear, or not binding). -1 if constraint does not generate a cut, otherwise index in cuts.
+  int numCuts = 0;
 
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
@@ -1637,71 +1637,89 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   double infty = getInfinity();
   double nlp_infty = infty_;
   
-  for(int i = 0; i< m ; i++) {
-    if(constTypes_[i] == TNLP::NON_LINEAR) {
-      if(rowLower[i] > - nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
+  for(int rowIdx = 0; rowIdx < m ; rowIdx++) {
+    if(constTypes_[rowIdx] == TNLP::NON_LINEAR) {
+      if(fabs(duals[rowIdx]) == 0.)
       {
-        binding[i] = -1;
+        row2cutIdx[rowIdx] = -1;
+#ifndef NDEBUG
         std::cerr<<"non binding constraint"<<std::endl;
+#endif
         continue;
       }
-      binding[i] = numBindings;
-      if(rowLower[i] > - nlp_infty)
-        lb[numBindings] = rowLower[i] - g[i];
+      row2cutIdx[rowIdx] = numCuts;
+      if(rowLower[rowIdx] > - nlp_infty)
+        lb[numCuts] = rowLower[rowIdx] - g[rowIdx];
       else
-        lb[numBindings] = - infty;
-      if(rowUpper[i] < nlp_infty)
-        ub[numBindings] = rowUpper[i] - g[i];
+        lb[numCuts] = - infty;
+      if(rowUpper[rowIdx] < nlp_infty)
+        ub[numCuts] = rowUpper[rowIdx] - g[rowIdx];
       else
-        ub[numBindings] = infty;
-      if(rowLower[i] > -infty && rowUpper[i] < infty)
+        ub[numCuts] = infty;
+      if(rowLower[rowIdx] > -infty && rowUpper[rowIdx] < infty)
       {
-        if(duals[i] >= 0)// <= inequality
-          lb[numBindings] = - infty;
-        if(duals[i] <= 0)// >= inequality
-          ub[numBindings] = infty;
+        if(duals[rowIdx] >= 0)// <= inequality
+          lb[numCuts] = - infty;
+        if(duals[rowIdx] <= 0)// >= inequality
+          ub[numCuts] = infty;
       }
       
-      numBindings++;
+      numCuts++;
     }
+    else
+      row2cutIdx[rowIdx] = -1;
   }
 
+
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i] - offset] == TNLP::NON_LINEAR) {
+    const int &rowIdx = jRow_[i];
+    const int & cutIdx = row2cutIdx[ rowIdx ];
+    if(cutIdx != -1) {
+      const int &colIdx = jCol_[i];
       //"clean" coefficient
-      if(cleanNnz(jValues_[i],colLower[jCol_[i] - offset], colUpper[jCol_[i]-offset],
-		  rowLower[jRow_[i] - offset], rowUpper[jRow_[i] - offset],
-		  x[jCol_[i] - offset],
-		  lb[binding[jRow_[i] - offset]],
-		  ub[binding[jRow_[i] - offset]], tiny_, veryTiny_)) {
-        cuts[binding[jRow_[i] - offset]].insert(jCol_[i]-offset,jValues_[i]);
-        if(lb[binding[jRow_[i] - offset]] > - infty)
-          lb[binding[jRow_[i] - offset]] += jValues_[i] * x[jCol_ [i] - offset];
-        if(ub[binding[jRow_[i] - offset]] < infty)
-	  ub[binding[jRow_[i] - offset]] += jValues_[i] * x[jCol_ [i] - offset];
+      if(cleanNnz(jValues_[i],colLower[colIdx], colUpper[colIdx],
+		  rowLower[rowIdx], rowUpper[rowIdx],
+		  x[colIdx],
+		  lb[cutIdx],
+		  ub[cutIdx], tiny_, veryTiny_)) {
+        cuts[cutIdx].insert(colIdx,jValues_[i]);
+        if(lb[cutIdx] > - infty)
+          lb[cutIdx] += jValues_[i] * x[colIdx];
+        if(ub[cutIdx] < infty)
+	  ub[cutIdx] += jValues_[i] * x[colIdx];
       }
     }
   }
 
-  for(int i = 0; i< numBindings ; i++) {
+  int * cut2rowIdx = NULL;
+  if (IsValid(cut_strengthener_)) {
+    cut2rowIdx = new int [numCuts];// Store correspondance between indices of cut and indices of rows. For each cut store the indice of the row which generated it.
+    for(int rowIdx = 0 ; rowIdx < m ; rowIdx++){
+       if(row2cutIdx[rowIdx] > 0){
+          cut2rowIdx[row2cutIdx[rowIdx]] = rowIdx;
+       }
+    }
+  }
+
+  for(int cutIdx = 0; cutIdx < numCuts; cutIdx++) {
     //Compute cut violation
     if(x2 != NULL) {
-      double rhs = cuts[i].dotProduct(x2);
+      double rhs = cuts[cutIdx].dotProduct(x2);
       double violation = 0.;
-      violation = max(violation, rhs - ub[i]);
-      violation = max(violation, lb[i] - rhs);
+      violation = max(violation, rhs - ub[cutIdx]);
+      violation = max(violation, lb[cutIdx] - rhs);
       if(violation == 0.) continue;
     }
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
     if (IsValid(cut_strengthener_)) {
-      const int& bindi = binding[i];
+      const int& rowIdx = cut2rowIdx[cutIdx];
       bool retval =
 	cut_strengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
-				       GetRawPtr(problem_), bindi,
-				       cuts[i], lb[i], ub[i], g[bindi],
-				       rowLower[bindi], rowUpper[bindi],
+				       GetRawPtr(problem_), rowIdx,
+				       cuts[cutIdx], lb[cutIdx], ub[cutIdx], g[rowIdx],
+				       rowLower[rowIdx], rowUpper[rowIdx],
 				       n, x, infty);
       if (!retval) {
 	(*messageHandler()) << "error in cut_strengthener_->ComputeCuts\n";
@@ -1712,9 +1730,9 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       newCut.setGloballyValidAsInteger(1);
     }
     newCut.setEffectiveness(99.99e99);
-    newCut.setLb(lb[i]);
-    newCut.setUb(ub[i]);
-    newCut.setRow(cuts[i]);
+    newCut.setLb(lb[cutIdx]);
+    newCut.setUb(ub[cutIdx]);
+    newCut.setRow(cuts[cutIdx]);
     //    CftValidator validator;
     //    validator(newCut);
     cs.insert(newCut);
@@ -1722,7 +1740,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 
   delete[] g;
   delete [] cuts;
-  delete [] binding;
+  delete [] row2cutIdx;
+  delete [] cut2rowIdx;
 
   if(getObj) { // Get the objective cuts
     double * obj = new double [n];
@@ -2059,6 +2078,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   delete [] rowLow;
   delete [] rowUp;
   delete [] nonBindings;
+  delete [] g;
   for(int i = 0 ; i < getNumCols() ; i++) {
     if(isInteger(i))
       si.setInteger(i);
