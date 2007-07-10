@@ -81,8 +81,6 @@ Bonmin/src/CbcBonmin/BonAuxInfos.cpp -text
 Bonmin/src/CbcBonmin/BonAuxInfos.hpp -text
 Bonmin/src/CbcBonmin/BonCbc2.cpp -text
 Bonmin/src/CbcBonmin/BonCbc2.hpp -text
-Bonmin/src/CbcBonmin/BonLpStrongBranching.cpp -text
-Bonmin/src/CbcBonmin/BonLpStrongBranching.hpp -text
 Bonmin/src/Interfaces/Ampl/Makefile.in -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.cpp -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.hpp -text
