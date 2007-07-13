@@ -60,7 +60,7 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libfilterinterface_la_LIBADD =
-am_libfilterinterface_la_OBJECTS = BonFilterSolver.lo \
+am_libfilterinterface_la_OBJECTS = BonBqpdSolver.lo BonFilterSolver.lo \
 	BonFilterWarmStart.lo
 libfilterinterface_la_OBJECTS = $(am_libfilterinterface_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -325,10 +325,9 @@ noinst_LTLIBRARIES = libfilterinterface.la
 
 # List all source files, including headers
 libfilterinterface_la_SOURCES = \
-        BonFilterSolver.cpp \
-        BonFilterSolver.hpp \
-        BonFilterWarmStart.cpp \
-        BonFilterWarmStart.hpp
+	BonBqpdSolver.cpp BonBqpdSolver.hpp \
+        BonFilterSolver.cpp BonFilterSolver.hpp \
+        BonFilterWarmStart.cpp BonFilterWarmStart.hpp
 
 
 # This is for libtool (on Windows)
@@ -424,6 +423,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBqpdSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFilterSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFilterWarmStart.Plo@am__quote@
 

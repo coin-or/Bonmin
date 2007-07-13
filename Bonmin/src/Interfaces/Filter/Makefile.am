@@ -22,10 +22,9 @@ noinst_LTLIBRARIES = libfilterinterface.la
 
 # List all source files, including headers
 libfilterinterface_la_SOURCES = \
-        BonFilterSolver.cpp \
-        BonFilterSolver.hpp \
-        BonFilterWarmStart.cpp \
-        BonFilterWarmStart.hpp
+	BonBqpdSolver.cpp BonBqpdSolver.hpp \
+        BonFilterSolver.cpp BonFilterSolver.hpp \
+        BonFilterWarmStart.cpp BonFilterWarmStart.hpp
 
 # This is for libtool (on Windows)
 libfilterinterface_la_LDFLAGS = $(LT_LDFLAGS)

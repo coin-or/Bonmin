@@ -16,6 +16,7 @@ namespace Bonmin{
 class FilterSolver : public TNLPSolver{
 public:
 
+  friend class BqpdSolver;
 
   class UnsolvedFilterError: public TNLPSolver::UnsolvedError
   {
@@ -316,6 +317,16 @@ private:
 
   //name of solver (Filter)
   static std::string  solverName_;  
+
+  /** Converting TMatrices into row-ordered matrices */
+  static void TMat2RowPMat(fint n, fint m, int nnz, const Index* iRow,
+			   const Index* iCol,
+			   int * permutation2, fint * lws, int offset);
+
+  /** Converting TMatrices into column-ordered matrices */
+  static void TMat2ColPMat(fint n, fint m, int nnz, const Index* iRow,
+			   const Index* iCol,
+			   int * permutation2, fint * lws, int offset);
 };
 
 }// end namespace Bonmin

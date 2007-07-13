@@ -1,5 +1,9 @@
-// Copyright (C) 2006, International Business Machines
+// Copyright (C) 2006, 2007 International Business Machines
 // Corporation and others.  All Rights Reserved.
+// Authors: Andreas Waechter, Pierre Bonami
+
+#include "BonminConfig.h"
+
 #if defined(_MSC_VER)
 // Turn off compiler warning about long names
 #  pragma warning(disable:4786)
@@ -9,6 +13,7 @@
 
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
+#include "BonBqpdSolver.hpp"
 #endif
 
 namespace Bonmin {
@@ -80,7 +85,8 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
   const double * b_U = solver->getColUpper();
 
   const Number large_number = COIN_DBL_MAX;
- 
+
+#ifdef OLDOLD
   bool first_solve = true;
   SmartPtr<TNLPSolver> tqp_solver =
     tminlp_interface->solver()->clone();
@@ -93,6 +99,30 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
     warmStart = filter_solver->getWarmStart(tminlp2tnlp);
   }
 #endif
+#endif //OLDOLD
+  
+      printf("bladfasfabluuu\n");
+  bool first_solve = true;
+  CoinWarmStart* warmStart = NULL;
+  SmartPtr<TNLPSolver> tqp_solver;
+#ifdef COIN_HAS_FILTERSQP
+  FilterSolver* filter_solver =
+    dynamic_cast<FilterSolver*> (tminlp_interface->solver());
+  if (filter_solver) {
+    if (solve_nlp_) {
+      warmStart = filter_solver->getWarmStart(tminlp2tnlp);
+    }}
+    //}else {
+      printf("blabluuu\n");
+      tqp_solver = new BqpdSolver(tminlp_interface->solver()->RegOptions(),
+				  tminlp_interface->solver()->Options(),
+				  tminlp_interface->solver()->Jnlst());
+      //}
+      //}
+#endif
+  if (IsNull(tqp_solver)) {
+    tqp_solver = tminlp_interface->solver()->clone();
+  }
   
   for (int i=0; i<numStrong; i++) {
     int& index = list_[i];

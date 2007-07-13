@@ -149,23 +149,21 @@ F77_FUNC(hessian,HESSIAN)(real *x, fint *n, fint *m, fint *phase, real *lam,
 
 namespace Bonmin{
 
-
   struct Transposer{
-    int *rowIndices;
-    int * colIndices;
+    const Index* rowIndices;
+    const Index* colIndices;
     bool operator()(int i, int j){
       return rowIndices[i]<rowIndices[j] ||
 	(rowIndices[i]==rowIndices[j] && colIndices[i] < colIndices[j]);}
   };
 
-
   // Convert a sparse matrix from triplet format to row ordered packed matrix
-  void TMat2RowPMat(int n, int m, int nnz, int * iRow, int* iCol, int * permutation2,
-		    fint * lws, int offset)
+  void FilterSolver::TMat2RowPMat(fint n, fint m, int nnz, const Index* iRow,
+				  const Index* iCol, int * permutation2,
+				  fint * lws, int offset)
   {
     for(int i = 0 ; i < nnz ; i++)
       permutation2[i] = i;
-
 
     Transposer lt;
     lt.rowIndices = iRow;
@@ -175,12 +173,12 @@ namespace Bonmin{
 
     fint row = 1;
     lws[0] = nnz + offset + 1;
-    fint * inds = lws + 1;
-    fint * start = inds + nnz + offset + 1;
+    fint * inds = lws + offset + 1;
+    fint * start = inds + nnz + 1;
     
     for(fint i = 0 ; i < nnz ; i++)
       {
-	inds[offset + i] = iCol[permutation2[i]];
+	inds[i] = iCol[permutation2[i]];
 	//DBG_ASSERT(RowJac[permutation2[i]] >= row);
 	if(iRow[permutation2[i]] >= row) {
 	  for(;row <= iRow[permutation2[i]] ; row++)
@@ -193,9 +191,13 @@ namespace Bonmin{
   }
 
   // Convert a sparse matrix from triplet format to row ordered packed matrix
-  void TMat2ColPMat(int n, int m, int nnz, int * iRow, int* iCol,
-		    fint * lws, int offset)
+  void FilterSolver::TMat2ColPMat(fint n, fint m, int nnz, const Index* iRow,
+				  const Index* iCol,
+				  int* permutationHess2, fint * lws, int offset)
   {
+    for(int i = 0 ; i < nnz ; i++)
+      permutationHess2[i] = i;
+
     fint col = 1;
     lws[0] = nnz + offset + 1;
     fint * inds = lws + 1;
@@ -205,14 +207,13 @@ namespace Bonmin{
     lt.rowIndices = iCol;
     lt.colIndices = iRow;
 
-    std::sort(permutationHess, permutationHess + nnz, lt);
+    std::sort(permutationHess2, permutationHess2 + nnz, lt);
 
    for(fint i = 0 ; i < nnz ; i++)
       {
-	inds[offset + i] = iRow[permutationHess[i]];
-	//DBG_ASSERT(iCol[permutationHess[i]] >= col); PIERRE, I took this out
-	if(iCol[permutationHess[i]] >= col) {
-	  for(;col <= iCol[permutationHess[i]] ; col++)
+	inds[offset + i] = iRow[permutationHess2[i]];
+	if(iCol[permutationHess2[i]] >= col) {
+	  for(;col <= iCol[permutationHess2[i]] ; col++)
 	    *start++ = i + offset + 1;
 	}
       }
@@ -473,13 +474,12 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
 
   // Now setup hessian
   permutationHess = permutationHess_ = new int[nnz_h];
-  for(int i = 0 ; i < nnz_h ; i++) permutationHess[i] = i;
   hStruct_ = new fint[nnz_h + n + 3];
   int * cache = new int[2*nnz_h + 1];
   F77_FUNC(hessc,HESSC).phl = 1;
   tnlp->eval_h((Ipopt::Index&) n, NULL, 0, 1., (Ipopt::Index&) m, NULL, 0, (Ipopt::Index&) nnz_h, cache + nnz_h, cache  , NULL);
 
-  TMat2ColPMat(n, m, nnz_h, cache, cache + nnz_h,
+  TMat2ColPMat(n, m, nnz_h, cache, cache + nnz_h, permutationHess,
 	       hStruct_, 0);
 
   delete [] cache;

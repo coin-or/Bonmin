@@ -1,5 +1,5 @@
 // (C) Copyright International Business Machines Corporation and
-// Carnegie Mellon University 2006
+// Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -80,6 +80,46 @@ namespace Bonmin
         Number obj_factor, Index m, const Number* lambda,
         bool new_lambda, Index nele_hess,
         Index* iRow, Index* jCol, Number* values);
+    //@}
+
+    /** Accessor Methods for QP data */
+    //@{
+    const Number ObjVal()
+    {
+      return obj_val_;
+    }
+    const Number* ObjGrad()
+    {
+      return obj_grad_;
+    }
+    const Number* ObjHessVals()
+    {
+      return obj_hess_;
+    }
+    const Index* ObjHessIRow()
+    {
+      return obj_hess_irow_;
+    }
+    const Index* ObjHessJCol()
+    {
+      return obj_hess_jcol_;
+    }
+    const Number* ConstrRhs()
+    {
+      return g_vals_;
+    }
+    const Number* ConstrJacVals()
+    {
+      return g_jac_;
+    }
+    const Index* ConstrJacIRow()
+    {
+      return g_jac_irow_;
+    }
+    const Index* ConstrJacJCol()
+    {
+      return g_jac_jcol_;
+    }
     //@}
 
   private:
