@@ -42,11 +42,11 @@ extern "C" {
 
   extern struct {
     fint nup,nfreq;
-  } F77_FUNC_(refactorc,REFACTORC);
+  } F77_FUNC(refactorc,REFACTORC);
 
   extern struct {
     real vstep;
-  } F77_FUNC_(vstepc,VSTEPC);
+  } F77_FUNC(vstepc,VSTEPC);
 
   extern struct {
     fint phl, phr, phc;
