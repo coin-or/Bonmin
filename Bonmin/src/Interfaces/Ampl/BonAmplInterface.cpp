@@ -14,6 +14,7 @@
 
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
+#include "BonColReader.hpp"
 #ifdef COIN_HAS_FILTERSQP
 # include "BonFilterSolver.hpp"
 #endif
@@ -92,11 +93,35 @@ void AmplInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::Registe
   feasibilityProblem_ = new TNLP2FPNLP
     (Ipopt::SmartPtr<TNLP>(Ipopt::GetRawPtr(problem_)));
   
+  //Read columns and row names if they exists
+  readNames();  
 }
 
 void 
 AmplInterface::setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options)
 {}
 
+
+void
+AmplInterface::readNames() 
+{
+  std::string probName;
+  getStrParam(OsiProbName, probName);
+  NamesReader colRead(probName, ".col");
+  if(colRead.readFile()) {
+    OsiNameVec colNames;
+    colRead.copyNames(colNames);
+    setColNames(colNames, 0, colNames.size(), 0);
+  }
+
+  NamesReader rowRead(probName, ".row");
+  if(rowRead.readFile()) {
+    OsiNameVec rowNames;
+    rowRead.copyNames(rowNames);
+    setRowNames(rowNames, 0, rowNames.size(), 0);
+  }
+
+  
+}
 
 } /* end namespace Bonmin. */

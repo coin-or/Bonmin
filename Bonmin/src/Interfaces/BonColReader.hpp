@@ -7,51 +7,55 @@
 //
 // Date : 26/05/2005
 
-#ifndef ColReader_HPP
-#define ColReader_HPP
+#ifndef NameReader_HPP
+#define NameReader_HPP
 #include <string>
 #include <vector>
 #include <list>
 #include <fstream>
 #include <iostream>
 #include <CoinHelperFunctions.hpp>
+#include "OsiSolverInterface.hpp"
 //#include <tr1/unordered_map>
 #include <map>
 
 namespace Bonmin{
-/** A class for reading a .col file containing name for variables (usually ampl generated file).
+/** A class for reading a .col or .row file containing name for variables and constraints (usually ampl generated file).
    */
-class ColReader
+class NamesReader
 {
 public:
   /** Constructor with a file name given by a const char * */
-  ColReader(const char * fileName);
+  NamesReader(const char * fileName, const char * suffix);
   /** Constructor with a file name given by a string and also default (empty string) */
-  ColReader(const std::string & fileName="");
+  NamesReader(const std::string & fileName="", const std::string& suffix=".col");
   /** Reads the .col file*/
   bool readFile();
   /** Reads the .col file fileName*/
-  bool readFile(const std::string &fileName)
+  bool readFile(const std::string &file)
   {
-    fileName_=fileName;
+    file_=file;
     return readFile();
   }
 
-  /** Copy the names to varNames. */
-  void copyNames(std::string *varNames, int n_var);
+  /** Copy the names to Names. */
+  void copyNames(OsiSolverInterface::OsiNameVec& Names);
 
-  /** Access Names of variable i. */
-  const std::string& varName(int i){
-   return varNames_[i];
+  /** Access Names of indexed by i. */
+  const std::string& name(int i){
+   return names_[i];
   }
 
   /** Access index of variable str */
-  int varIndex(const char * str){
-    return varIndices_[str];
+  int index(const char * str){
+    return indices_[str];
   }
 private:
   /// Name of the file to read.
-  std::string fileName_;
+  std::string file_;
+
+  /// Suffix of the file (".col", ".row")
+  std::string suffix_;
 
   /// String comparison strucutre.
   struct ltstr
@@ -63,13 +67,11 @@ private:
   };
 
   /// Hash type.
- // typedef __gnu_cxx::hash_map<const char *, int> namesHash;//, __gnu_cxx::hash <const char *>, eqstr > namesHash;
- // typedef std::tr1::unordered_map<std::string, int, std::tr1::hash<std::string> > namesHash;
   typedef std::map<const char *, int, ltstr> namesHash;
   ///Hash map used to store the indices.
-  namesHash varIndices_;
+  namesHash indices_;
   ///Variable names.
-  std::vector<std::string> varNames_;
+  std::vector<std::string> names_;
 };
 }
 #endif

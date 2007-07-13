@@ -94,7 +94,8 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
-	experimental/FP experimental/Bcp experimental/NotConvex test
+	experimental/FP experimental/Bcp experimental/NotConvex \
+	experimental/Lgp test
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -334,7 +335,7 @@ AUTOMAKE_OPTIONS = foreign
 # Here list all subdirectories into which to recurse
 SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
 	$(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4)
+	experimental/Lgp $(am__append_4)
 
 ########################################################################
 #             Additional files to be included in tarball               #

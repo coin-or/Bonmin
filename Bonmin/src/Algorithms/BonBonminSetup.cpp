@@ -87,7 +87,7 @@ algo_(other.algo_){
     
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
   void 
-  BonminSetup::initializeBonmin(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/){
+  BonminSetup::initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/){
 
     use(tminlp);
     BabSetupBase::gatherParametersValues(options_);
@@ -99,7 +99,7 @@ algo_(other.algo_){
   
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
   void 
-  BonminSetup::initializeBonmin(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/){
+  BonminSetup::initialize(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/){
     use(nlpSi);
     BabSetupBase::gatherParametersValues(options_);
     Algorithm algo = getAlgorithm();

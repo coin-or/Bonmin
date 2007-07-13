@@ -193,7 +193,6 @@ public:
     Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions(){return roptions_;}
     
 protected:
-      friend class BonminAmplSetup;
     /** storage of integer parameters.*/
     int intParam_[NumberIntParam];
     /** default values for int parameters.*/

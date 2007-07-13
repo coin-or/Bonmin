@@ -307,7 +307,7 @@ class Messages : public CoinMessages
   virtual int getNumRows() const;
 
   ///get name of variables
-  const std::string * getVarNames() const;
+  const OsiSolverInterface::OsiNameVec& getVarNames() ;
   /// Get pointer to array[getNumCols()] of column lower bounds
   virtual const double * getColLower() const;
 
@@ -759,6 +759,8 @@ class Messages : public CoinMessages
 
   //@}
 
+
+  
   //---------------------------------------------------------------------------
 
 
@@ -956,8 +958,6 @@ protected:
   mutable double  *reducedCosts_;
   /** DualObjectiveLimit is used to store the cutoff in Cbc*/
   double OsiDualObjectiveLimit_;
-  /** Variable names */
-  mutable std::string * varNames_;
   /** does the file variable names exists (will check automatically).*/
   mutable bool hasVarNamesFile_;
   //@}

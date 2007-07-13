@@ -160,7 +160,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
 
   /** Reader variables names.*/
   bool hasVarNames = 0;
-  ColReader reader(name_);
+  NamesReader reader(name_,".col");
   
   if(reader.readFile())
       hasVarNames=1;
@@ -174,7 +174,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
       {
         if(hasVarNames)
           fMod<<"bounds"<<i<<": "
-	      <<reader.varName(i)<<" >= "
+	      <<reader.name(i)<<" >= "
 	      <<currentLower[i]<<";\n";
 
 
@@ -184,7 +184,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
       {
 	if(hasVarNames)
 	  fMod<<"bounds"<<i<<": "
-	      <<reader.varName(i)<<" <= "
+	      <<reader.name(i)<<" <= "
 	      <<currentUpper[i]<<";\n";
 	
         fBounds<<"UP"<<"\t"<<i<<"\t"<<currentUpper[i]<<std::endl;

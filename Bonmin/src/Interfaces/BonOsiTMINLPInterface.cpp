@@ -14,7 +14,6 @@
 #include "BonminConfig.h"
 
 #include "BonOsiTMINLPInterface.hpp"
-#include "BonColReader.hpp"
 #include "CoinTime.hpp"
 #include <string>
 #include <sstream>
@@ -273,7 +272,6 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     rowrange_(NULL),
     reducedCosts_(NULL),
     OsiDualObjectiveLimit_(1e200),
-    varNames_(NULL),
     hasVarNamesFile_(true),
     nCallOptimizeTNLP_(0),
     totalNlpSolveTime_(0),
@@ -394,7 +392,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     rowrange_(NULL),
     reducedCosts_(NULL),
     OsiDualObjectiveLimit_(source.OsiDualObjectiveLimit_),
-    varNames_(NULL),
     hasVarNamesFile_(source.hasVarNamesFile_),
     nCallOptimizeTNLP_(0),
     totalNlpSolveTime_(0),
@@ -563,14 +560,6 @@ app_ = NULL;
       CoinCopyN(rhs.obj_, rhs.getNumCols(), obj_);
     }
 
-    delete [] varNames_;
-    varNames_ = NULL;
-
-    if(rhs.varNames_) {
-      rhs.varNames_ = new std::string[getNumCols()];
-      CoinCopyN(rhs.varNames_, getNumCols(), varNames_);
-    }
-
     hasVarNamesFile_ = rhs.hasVarNamesFile_;
 
     nCallOptimizeTNLP_ = rhs.nCallOptimizeTNLP_;
@@ -617,11 +606,7 @@ OsiTMINLPInterface::~OsiTMINLPInterface ()
 void
 OsiTMINLPInterface::freeCachedColRim()
 {
-  if(varNames_!=NULL) {
-    delete [] varNames_;
-    varNames_ = NULL;
-  }
-  if(reducedCosts_!=NULL) {
+    if(reducedCosts_!=NULL) {
     delete []  reducedCosts_;
     reducedCosts_ = NULL;
   }
@@ -859,32 +844,13 @@ OsiTMINLPInterface::getColUpper() const
   return problem_->x_u();
 }
 
-#if 0
-void
-OsiTMINLPInterface::readVarNames() const
-{
-  delete []varNames_;
-  varNames_ = NULL;
-  std::string probName;
-  getStrParam(OsiProbName, probName);
-  ColReader colRead(probName);
-  if(colRead.readFile()) {
-    varNames_ = new std::string[problem_->num_variables()];
-    colRead.copyNames(varNames_,problem_->num_variables());
-    hasVarNamesFile_ = true;
-  }
-  else
-    hasVarNamesFile_ = false;
-}
+#if 1
 
-///get name of a variable
-const std::string *
-OsiTMINLPInterface::getVarNames() const
-{
-  if(varNames_ == NULL && hasVarNamesFile_ ) {
-    readVarNames();
-  }
-  return varNames_;
+
+///get name of variables
+const OsiSolverInterface::OsiNameVec& 
+OsiTMINLPInterface::getVarNames() {
+  return getColNames();
 }
 #endif
 

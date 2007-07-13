@@ -40,9 +40,9 @@ public:
     /** Register all bonmin type executable options.*/
     static void registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
     /** Initialize, read options and create appropriate bonmin setup.*/
-    void initializeBonmin(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver = true);
+    void initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver = true);
     /** Initialize, read options and create appropriate bonmin setup.*/
-    void initializeBonmin(const OsiTMINLPInterface& nlpSi, bool createContinuousSolver = true);
+    void initialize(const OsiTMINLPInterface& nlpSi, bool createContinuousSolver = true);
     /** Get the algorithm used.*/
     Bonmin::Algorithm getAlgorithm();
 protected:

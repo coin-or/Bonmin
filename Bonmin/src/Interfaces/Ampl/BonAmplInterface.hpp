@@ -50,6 +50,8 @@ namespace Bonmin
     virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
   protected:
+    /** Read variables and row names in .col and .row files.*/
+    void readNames() ;
     
     /** TMINLP problem (the original problem usually an AmplTMINLP).*/
     Ipopt::SmartPtr<Bonmin::AmplTMINLP> amplTminlp_;

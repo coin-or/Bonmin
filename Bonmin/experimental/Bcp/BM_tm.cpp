@@ -71,7 +71,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     /* Get the basic options. */
     Bonmin::BonminAmplSetup bonmin;
     bonmin.readOptionsFile(par.entry(BM_par::IpoptParamfile).c_str());
-    bonmin.initializeBonmin(argv);    
+    bonmin.initialize(argv);    
     
     free(argv[1]);
     
@@ -160,7 +160,7 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
   argv[1] = strdup(par.entry(BM_par::NL_filename).c_str());
   argv[2] = NULL;
   Bonmin::BonminAmplSetup bonmin;
-  bonmin.initializeBonmin(argv);    
+  bonmin.initialize(argv);    
   
   Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
   minlpParams_.extractParams(&nlpSolver);

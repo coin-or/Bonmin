@@ -12,26 +12,28 @@
 
 namespace Bonmin{
 
-ColReader::ColReader(const char * fileName)
+NamesReader::NamesReader(const char * file, const char * suffix)
     :
-    fileName_(), varIndices_(), varNames_()
+    file_(), suffix_(suffix), indices_(), names_()
 {
-  assert(fileName != NULL);
-  fileName_=fileName;
+  assert(file!= NULL);
+  file_=file;
+  if (suffix!=NULL)
+    suffix_ = suffix;
 }
-ColReader::ColReader(const std::string & fileName)
+NamesReader::NamesReader(const std::string & file, const std::string & suffix)
     :
-    fileName_(fileName), varIndices_(), varNames_()
+    file_(file), suffix_(suffix), indices_(), names_()
 {}
 
-bool ColReader::readFile()
+bool NamesReader::readFile()
 {
-  std::string colFileName = fileName_;
+  std::string colFileName = file_;
   int size = colFileName.size();
   bool hasNlExtension =  (colFileName.size()>4) && (colFileName[size - 1] =='l') && (colFileName[size - 2] =='n') && (colFileName[size - 3] =='.');
   if(hasNlExtension)
     colFileName.erase(size-3,3);
-  colFileName+=".col";
+  colFileName+=suffix_;
   std::ifstream inFile(colFileName.c_str());
   if(!inFile.is_open()) {
     return false;
@@ -43,25 +45,22 @@ bool ColReader::readFile()
     inFile>>name;
     if(name.size()==0)
       continue;
-    varNames_.push_back(name);
-    varIndices_[varNames_[nVar].c_str()] = nVar;
+    names_.push_back(name);
+    indices_[names_[nVar].c_str()] = nVar;
     nVar++;
   }
   while(!inFile.eof());
 
-  //  varNames_ = new std::string[nVar];
+  //  names_ = new std::string[nVar];
   for(int i = 0 ; i < nVar ; i++) {
-    assert(i==varIndices_ [ varNames_ [i].c_str()]);
+    assert(i==indices_ [ names_ [i].c_str()]);
   }
   return true;
 }
 
 void
-ColReader::copyNames(std::string *varNames, int n_var)
+NamesReader::copyNames(OsiSolverInterface::OsiNameVec& names)
 {
-  assert(n_var >= 0 && (unsigned int) n_var==varNames_.size());
-  for(int i = 0 ; i < n_var ; i++) {
-    varNames[i] = varNames_[i];
-  }
+  names_ = names;
 }
 }

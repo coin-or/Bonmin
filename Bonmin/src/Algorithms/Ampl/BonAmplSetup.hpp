@@ -16,13 +16,13 @@ namespace Bonmin{
   class BonminAmplSetup: public BonminSetup {
 public:
     /** initialize bonmin with ampl model using the command line arguments.*/ 
-    void initializeBonmin(char **& argv);
+    void initialize(char **& argv);
     /** initialize bonmin with ampl model using the command line arguments and an existing OsiTMINLPInterface.*/
-    void initializeBonmin(AmplInterface &toFill, char **& argv);
+    void initialize(AmplInterface &toFill, char **& argv);
     /** initialize bonmin with ampl model using the command line arguments reading options and nl file from strings.*/ 
-    void initializeBonmin(char **& argv, std::string& opt_file_content, std::string& nl_file_content, bool createContinuousSolver /*= false*/);
+    void initialize(char **& argv, std::string& opt_file_content, std::string& nl_file_content, bool createContinuousSolver /*= false*/);
     /** initialize bonmin with ampl model using the command line arguments and an existing OsiTMINLPInterface reading options and nl file from strings.*/
-    void initializeBonmin(AmplInterface &toFill, char **& argv, std::string& opt_file_content, std::string& nl_file_content, bool createContinuousSolver = true);
+    void initialize(AmplInterface &toFill, char **& argv, std::string& opt_file_content, std::string& nl_file_content, bool createContinuousSolver = true);
     /** For Bcp. Initialize the passed OsiTMINLP interface with ampl model using the options and nl files contained in two strings.*/
     void fillOsiInterface(AmplInterface &toFill, char **& argv, std::string & options, std::string & nl, bool createContinuousSolver = true);
 };

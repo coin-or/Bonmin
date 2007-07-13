@@ -9,38 +9,39 @@
 
 #include "BonAmplSetup.hpp"
 namespace Bonmin{
-  void BonminAmplSetup::initializeBonmin(char **& argv){
+  void BonminAmplSetup::initialize(char **& argv){
     readOptionsFile();
     /* Read the model.*/
     SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", NULL);
     mayPrintDoc();
-    BonminSetup::initializeBonmin(GetRawPtr(model), true);
+    BonminSetup::initialize(GetRawPtr(model), true);
   }
   
-   void BonminAmplSetup::initializeBonmin(AmplInterface &toFill, char **& argv){
+   void 
+   BonminAmplSetup::initialize(AmplInterface &toFill, char **& argv){
     /* Get the basic options. */
      readOptionsFile();   
     /* Read the model.*/
     SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", NULL);
     mayPrintDoc();
     toFill.initialize(roptions_, options_, journalist_, GetRawPtr(model));
-    BonminSetup::initializeBonmin(toFill, true);
+    BonminSetup::initialize(toFill, true);
   }
  
   /** initialize bonmin with ampl model using the command line arguments reading options and nl file from strings.*/ 
   void 
-  BonminAmplSetup::initializeBonmin(char **& argv, std::string& opt_file_content, std::string& nl_file_content, bool createContinuousSolver /*= false*/){
+  BonminAmplSetup::initialize(char **& argv, std::string& opt_file_content, std::string& nl_file_content, bool createContinuousSolver /*= false*/){
     /* Get the basic options. */
     readOptionsString(opt_file_content);
     /* read nl file by creating AmplTMINLP.*/
     SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", &nl_file_content);
     mayPrintDoc();
-    BonminSetup::initializeBonmin(GetRawPtr(model), createContinuousSolver);}
+    BonminSetup::initialize(GetRawPtr(model), createContinuousSolver);}
   
   
   /** initialize bonmin with ampl model using the command line arguments and an existing OsiTMINLPInterface reading options and nl file from strings.*/
   void 
-  BonminAmplSetup::initializeBonmin(AmplInterface &toFill, char **& argv, std::string& opt_file_content, 
+  BonminAmplSetup::initialize(AmplInterface &toFill, char **& argv, std::string& opt_file_content, 
                                     std::string& nl_file_content, bool createContinuousSolver /*=  false*/
   ){
     /* Get the basic options. */
@@ -49,7 +50,7 @@ namespace Bonmin{
     SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", &nl_file_content);
     mayPrintDoc();
     toFill.initialize(roptions_, options_, journalist_, GetRawPtr(model));
-    BonminSetup::initializeBonmin(toFill, createContinuousSolver);    
+    BonminSetup::initialize(toFill, createContinuousSolver);    
   }
   
   /** Usefull for Bcp */
