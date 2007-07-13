@@ -17,6 +17,7 @@
 namespace Bonmin{
   class BqpdSolver : public TNLPSolver{
   public:
+    friend class FilterSolver;
 
     class UnsolvedBqpdError: public TNLPSolver::UnsolvedError
     {

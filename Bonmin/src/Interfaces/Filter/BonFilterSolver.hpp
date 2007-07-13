@@ -11,12 +11,13 @@
 #define FilterSolver_H
 
 #include "BonTNLPSolver.hpp"
+#include "BonBqpdSolver.hpp"
 
 namespace Bonmin{
 class FilterSolver : public TNLPSolver{
 public:
 
-  friend class BqpdSolver;
+  friend struct BqpdSolver::cachedInfo;
 
   class UnsolvedFilterError: public TNLPSolver::UnsolvedError
   {
