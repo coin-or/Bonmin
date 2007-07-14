@@ -2632,7 +2632,7 @@ if test x"$CFLAGS" = x; then
         coin_opt_cflags="-O3 -fomit-frame-pointer"
         coin_add_cflags="-pipe"
         coin_dbg_cflags="-g"
-        coin_warn_cflags="-Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall"
+        coin_warn_cflags="-pedantic-errors -Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall"
 	case $enable_doscompile in
 	  mingw)
 	    CFLAGS="-mno-cygwin"
@@ -3469,7 +3469,7 @@ if test x"$CXXFLAGS" = x; then
         coin_opt_cxxflags="-O3 -fomit-frame-pointer"
         coin_add_cxxflags="-pipe"
         coin_dbg_cxxflags="-g"
-        coin_warn_cxxflags="-Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings"
+        coin_warn_cxxflags="-pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion"
 	case $enable_doscompile in
 	  mingw)
 	    CXXFLAGS="-mno-cygwin"
@@ -23988,10 +23988,28 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile experimental/FP/Makefile experimental/NotConvex/Makefile experimental/Lgp/Makefile test/Makefile examples/CppExample/Makefile"
+                                                                                                                                                                ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile experimental/FP/Makefile experimental/NotConvex/Makefile test/Makefile examples/CppExample/Makefile"
 
 
           ac_config_headers="$ac_config_headers inc/config_bonmin.h"
+
+
+
+
+
+
+echo "$as_me:$LINENO: checking which command should be used to link input files" >&5
+echo $ECHO_N "checking which command should be used to link input files... $ECHO_C" >&6
+coin_link_input_cmd="$LN_S"
+if test "$enable_doscompile" = mingw; then
+  coin_link_input_cmd=cp
+fi
+case "$CC" in
+  cl* | */cl* | CL* | */CL*)
+    coin_link_input_cmd=cp ;;
+esac
+echo "$as_me:$LINENO: result: $coin_link_input_cmd" >&5
+echo "${ECHO_T}$coin_link_input_cmd" >&6
 
 
 
@@ -24774,7 +24792,6 @@ do
   "src/Algorithms/OaGenerators/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Algorithms/OaGenerators/Makefile" ;;
   "experimental/FP/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/FP/Makefile" ;;
   "experimental/NotConvex/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/NotConvex/Makefile" ;;
-  "experimental/Lgp/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/Lgp/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
   "examples/CppExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/CppExample/Makefile" ;;
   "test/MyBonmin.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp" ;;
@@ -25913,32 +25930,13 @@ fi
 
 
   if test x"$coin_vpath_link_files" = x; then : ; else
-    lnkcmd=
-    if test "$enable_doscompile" = mingw; then
-      lnkcmd=cp
-    fi
-    case "$CC" in
-      cl* | */cl* | CL* | */CL*)
-        lnkcmd=cp ;;
-    esac
+    lnkcmd="$coin_link_input_cmd"
     if test "$lnkcmd" = cp; then
       { echo "$as_me:$LINENO: Copying data files for VPATH configuration" >&5
 echo "$as_me: Copying data files for VPATH configuration" >&6;}
     else
-      echo "$as_me:$LINENO: checking whether ln -s works" >&5
-echo $ECHO_N "checking whether ln -s works... $ECHO_C" >&6
-LN_S=$as_ln_s
-if test "$LN_S" = "ln -s"; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-  echo "$as_me:$LINENO: result: no, using $LN_S" >&5
-echo "${ECHO_T}no, using $LN_S" >&6
-fi
-
       { echo "$as_me:$LINENO: Creating VPATH links for data files" >&5
 echo "$as_me: Creating VPATH links for data files" >&6;}
-      lnkcmd="$LN_S"
     fi
     for file in $coin_vpath_link_files; do
       dir=`(dirname "./$file") 2>/dev/null ||
