@@ -360,7 +360,7 @@ libbonminampl_la_LIBADD = \
 	../Algorithms/Ampl/libbonamplsetup.la \
 	../Interfaces/Ampl/libbonamplinterface.la 
 
-libbonminampl_la_DEPENDENCIES = $(libamplbonmin_la_LIBADD)
+libbonminampl_la_DEPENDENCIES = $(libbonminampl_la_LIBADD)
 
 # This is for libtool (on Windows)
 libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)

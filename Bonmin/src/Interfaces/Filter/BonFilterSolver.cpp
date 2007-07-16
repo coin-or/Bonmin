@@ -158,67 +158,64 @@ namespace Bonmin{
   };
 
   // Convert a sparse matrix from triplet format to row ordered packed matrix
-  void FilterSolver::TMat2RowPMat(fint n, fint m, int nnz, const Index* iRow,
+  void FilterSolver::TMat2RowPMat(bool symmetric, fint n, fint m, int nnz,
+                                  const Index* iRow,
 				  const Index* iCol, int * permutation2,
-				  fint * lws, int offset)
+				  fint * lws, int nnz_offset, int n_offset,
+                                  Ipopt::TNLP::IndexStyleEnum index_style)
   {
     for(int i = 0 ; i < nnz ; i++)
       permutation2[i] = i;
 
     Transposer lt;
-    lt.rowIndices = iRow;
-    lt.colIndices = iCol;
+    if (symmetric) {
+      // We can really assume that the matrix is given in lower or upper form
+      Index* tmpRow = new Index[nnz];
+      Index* tmpCol = new Index[nnz];
+      for (int i=0; i<nnz; i++) {
+        const Index& irow = iRow[i];
+        const Index& jcol = iCol[i];
+        if (irow < jcol) {
+          tmpRow[i] = irow;
+          tmpCol[i] = jcol;
+        }
+        else {
+          tmpRow[i] = jcol;
+          tmpCol[i] = irow;
+        }
+      }
+      lt.rowIndices = tmpRow;
+      lt.colIndices = tmpCol;
+    }
+    else {
+      lt.rowIndices = iRow;
+      lt.colIndices = iCol;
+    }
 
     std::sort(permutation2, &permutation2[nnz], lt);
 
-    fint row = 1;
-    lws[0] = nnz + offset + 1;
-    fint * inds = lws + offset + 1;
-    fint * start = inds + nnz + 1;
-    
+    const int idx_offset = (index_style == Ipopt::TNLP::C_STYLE);
+    fint row = 1-idx_offset;
+    lws[0] = nnz + nnz_offset + 1;
+    fint * inds = lws + nnz_offset + 1;
+    fint * start = inds + nnz + n_offset;
+    *start++ = 1 + nnz_offset;
     for(fint i = 0 ; i < nnz ; i++)
       {
-	inds[i] = iCol[permutation2[i]];
+	inds[i] = lt.colIndices[permutation2[i]] + idx_offset;
 	//DBG_ASSERT(RowJac[permutation2[i]] >= row);
-	if(iRow[permutation2[i]] >= row) {
-	  for(;row <= iRow[permutation2[i]] ; row++)
-	    *start++ = i + offset + 1;
+	if(lt.rowIndices[permutation2[i]] > row) {
+	  for(;row < lt.rowIndices[permutation2[i]] ; row++)
+	    *start++ = i + nnz_offset + 1;
 	}
       }
-    for(;row <= m+1 ; row++)
-      *start++ = nnz + offset +1;
+    for(;row <= m-idx_offset ; row++)
+      *start++ = nnz + nnz_offset +1;
 
-  }
-
-  // Convert a sparse matrix from triplet format to row ordered packed matrix
-  void FilterSolver::TMat2ColPMat(fint n, fint m, int nnz, const Index* iRow,
-				  const Index* iCol,
-				  int* permutationHess2, fint * lws, int offset)
-  {
-    for(int i = 0 ; i < nnz ; i++)
-      permutationHess2[i] = i;
-
-    fint col = 1;
-    lws[0] = nnz + offset + 1;
-    fint * inds = lws + 1;
-    fint * start = inds + nnz + offset;
-    
-    Transposer lt;
-    lt.rowIndices = iCol;
-    lt.colIndices = iRow;
-
-    std::sort(permutationHess2, permutationHess2 + nnz, lt);
-
-   for(fint i = 0 ; i < nnz ; i++)
-      {
-	inds[offset + i] = iRow[permutationHess2[i]];
-	if(iCol[permutationHess2[i]] >= col) {
-	  for(;col <= iCol[permutationHess2[i]] ; col++)
-	    *start++ = i + offset + 1;
-	}
-      }
-    for(;col <= n+1 ; col++)
-      *start++ = nnz + offset +1;
+    if (symmetric) {
+      delete [] lt.rowIndices;
+      delete [] lt.colIndices;
+    }
 
   }
 
@@ -434,7 +431,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   //for(int i = 0 ; i < n ; i++) x[i] = 0;
   lam = new real [n+m];
   g = g_ = new real[n+m];
-  //#define InitializeAll
+#define InitializeAll
 #ifdef InitializeAll
   for(int i = 0 ; i < n+m ; i++) lam[i] = g_[i] = 0.; 
 #endif
@@ -465,9 +462,8 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   tnlp->eval_jac_g(  nv, NULL, 0, nc , nnz_j,  RowJac,  ColJac, NULL);
 
   permutationJac = permutationJac_ = new int [nnz_jac_g];
-  TMat2RowPMat(n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
-	       la, n);
-
+  TMat2RowPMat(false, n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
+	       la, n, 1, index_style);
 
   delete [] RowJac;
   delete [] ColJac;
@@ -479,8 +475,8 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   F77_FUNC(hessc,HESSC).phl = 1;
   tnlp->eval_h((Ipopt::Index&) n, NULL, 0, 1., (Ipopt::Index&) m, NULL, 0, (Ipopt::Index&) nnz_h, cache + nnz_h, cache  , NULL);
 
-  TMat2ColPMat(n, m, nnz_h, cache, cache + nnz_h, permutationHess,
-	       hStruct_, 0);
+  TMat2RowPMat(true, n, n, nnz_h, cache, cache + nnz_h, permutationHess,
+	       hStruct_, 0, 0, index_style);
 
   delete [] cache;
   // work arrays
@@ -515,6 +511,14 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   
   istat = new fint[14];
   rstat = new real[7];
+#ifdef InitializeAll
+  for (int i=0; i<14; i++) {
+    istat[0] = 43;
+  }
+  for (int i=0; i<7; i++) {
+    rstat[0] = 42.;
+  }
+#endif
 
   fmin = -1e100;
   Ipopt::Index bufy;

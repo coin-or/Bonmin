@@ -235,7 +235,6 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
 
   // Get space for arrays
   x = new real[n];
-  g = new real[n];
   bl = new real[n+m];
   bu = new real[n+m];
   g = new real[n];
@@ -247,6 +246,16 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
   lp = new fint[mlp];
   ws = new real[mxws];
   lws = new fint[mxlws];
+
+#define InitializeAll
+#ifdef InitializeAll
+  for (int i=0; i<mxws; i++) {
+    ws[i] = 42.;
+  }
+  for (int i=0; i<mxlws; i++) {
+    lws[i] = 55;
+  }
+#endif
 
   // Getting the bounds
   tqp->get_bounds_info(n, bl, bu, m, bl+n, bu+n);
@@ -273,12 +282,13 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
 
   // Objective function gradient
   int nnz_grad = 0;
-  for(int i = 1; i < n ; i++) {
+  for(int i = 0; i < n ; i++) {
     if (obj_grad[i]!=0.) {
       a[nnz_grad] = obj_grad[i];
-      la[++nnz_grad] = i;
+      la[++nnz_grad] = i+1;
     }
   }
+  la[amax+1] = 1;
 
   // Constraint Jacobian
   const Number* JacVals = tqp->ConstrJacVals();
@@ -286,13 +296,19 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
   const Index* ColJac = tqp->ConstrJacJCol();
 
   int* permutationJac = new int [nnz_jac_g];
-  FilterSolver::TMat2RowPMat(n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
-			     la, nnz_grad);
+  FilterSolver::TMat2RowPMat(false, n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
+			     la, nnz_grad, 1, TNLP::C_STYLE);
   for(int i=0; i<nnz_jac_g; i++) {
     const int& indice = permutationJac[i];
     a[nnz_grad+i] = JacVals[indice];
   }
   delete [] permutationJac;
+#if 0
+//deleteme
+printf("nnz_grad = %d nnz_jac = %d\n", nnz_grad, nnz_jac_g);
+	for (int i=0; i<1+lamax; i++) printf("la[%2d] = %d\n", i,la[i]);
+	for (int i=0; i<amax; i++) printf("a[%3d] = %e\n",i,a[i]);
+#endif
   
   // Now setup Hessian
   const Number* HessVals = tqp->ObjHessVals();
@@ -303,12 +319,18 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
   ll = nnz_hess + n + 2;
   int* permutationHess = new int[nnz_hess];
 
-  FilterSolver::TMat2ColPMat(n, m, nnz_hess, RowHess, ColHess,
-			     permutationHess, lws, 0);
+  FilterSolver::TMat2RowPMat(true, n, n, nnz_hess, RowHess, ColHess,
+			     permutationHess, lws, 0, 0, TNLP::C_STYLE);
   for(int i=0; i<nnz_hess; i++) {
     ws[i] = HessVals[permutationHess[i]];
   }
   delete [] permutationHess;
+#if 0
+//deleteme
+printf("nnz_hess = %d\n", nnz_hess);
+	for (int i=0; i<ll; i++) printf("lws[%2d] = %d\n", i,lws[i]);
+	for (int i=0; i<kk; i++) printf("ws[%3d] = %e\n",i,ws[i]);
+#endif
 
   Index bufy;
   options->GetIntegerValue("iprint",bufy, "bqpd.");
@@ -352,6 +374,7 @@ BqpdSolver::callOptimizer()
 				   cached_->x, dummy, dummy, 
 				   cached_->m, dummy, dummy, 
 				   cached_->f, NULL, NULL);
+  delete [] dummy;
   return optimizationStatus;
 }
 
@@ -359,7 +382,6 @@ BqpdSolver::callOptimizer()
 void 
 BqpdSolver::cachedInfo::optimize()
 {
-  printf("blabla");
   if (use_warm_start_in_cache_) {
     m0de = 6;
     use_warm_start_in_cache_ = false;
@@ -379,7 +401,7 @@ BqpdSolver::cachedInfo::optimize()
   F77_FUNC(wsc,WSC).mxws = mxws;
   F77_FUNC(wsc,WSC).mxlws = mxlws;
 
-  printf("mode = %d vstep = %e tol = %e\n", m0de, F77_FUNC(vstepc,VSTEPC).vstep,F77_FUNC(epsc,EPSC).tol);
+  //printf("mode = %d vstep = %e tol = %e\n", m0de, F77_FUNC(vstepc,VSTEPC).vstep,F77_FUNC(epsc,EPSC).tol);
 
   cpuTime_ = - CoinCpuTime();
   real fmin = -1e100;
