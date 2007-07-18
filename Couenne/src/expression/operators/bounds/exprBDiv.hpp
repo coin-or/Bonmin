@@ -76,8 +76,8 @@ inline CouNumber exprLBDiv::operator () () {
 }
 
 
-///  class to compute lower bound of a fraction based on the bounds of
-///  both numerator and denominator
+/// class to compute upper bound of a fraction based on the bounds of
+/// both numerator and denominator
 
 class exprUBDiv: public exprOp {
 
@@ -113,11 +113,11 @@ inline CouNumber exprUBDiv::operator () () {
   register CouNumber d = (*(arglist_ [2])) ();
   register CouNumber D = (*(arglist_ [3])) ();
 
-  if (d > 0)                                   // (n,N,d,D)     lb 
+  if (d > 0)                                     // (n,N,d,D)     lb 
     if   (N < 0) return safeDiv (N,D,1);         // (-,-,+,+) --> N/D
     else         return safeDiv (N,d,1);         // (?,+,+,+) --> N/d
   else { // d <= 0
-    if      (D > 0) return + COUENNE_INFINITY; // (?,?,-,+) --> unbounded
+    if      (D > 0) return + COUENNE_INFINITY;   // (?,?,-,+) --> unbounded
     else if (n < 0) return safeDiv (n,D,1);      // (-,?,-,-) --> n/D
     else            return safeDiv (n,d,1);      // (+,+,-,-) --> n/d
   }

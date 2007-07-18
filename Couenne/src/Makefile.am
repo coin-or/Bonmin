@@ -46,6 +46,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprMinMax.cpp \
 	expression/operators/exprGroup.cpp \
 	expression/operators/exprQuad.cpp \
+	expression/operators/bounds/exprBQuad.cpp \
 	expression/operators/impliedBounds-exprSum.cpp \
 	expression/operators/impliedBounds-exprDiv.cpp \
 	expression/operators/impliedBounds-exprMul.cpp \

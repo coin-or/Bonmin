@@ -21,8 +21,8 @@ inline CouNumber safeProd (register CouNumber a, register CouNumber b) {
 }
 
 
-//  class to compute lower bound of a fraction based on the bounds of
-//  both numerator and denominator
+// class to compute lower bound of a product based on the bounds of
+// both factors
 
 class exprLBMul: public exprOp {
 
@@ -74,8 +74,8 @@ inline CouNumber exprLBMul::operator () () {
 }
 
 
-//  class to compute lower bound of a fraction based on the bounds of
-//  both numerator and denominator
+// class to compute upper bound of a product based on the bounds of
+// both factors
 
 class exprUBMul: public exprOp {
 
