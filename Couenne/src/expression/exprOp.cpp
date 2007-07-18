@@ -17,6 +17,7 @@
 #include <exprOp.hpp>
 #include <exprUnary.hpp>
 #include <exprGroup.hpp>
+#include <exprQuad.hpp>
 
 // General N-ary function destructor
 
@@ -94,13 +95,26 @@ int exprOp::compare (exprOp  &e1) {
     if (res) return res;
   }
 
-  // last chance, this might be an exprGroup
-  if (c0==COU_EXPRGROUP) {
+  // last chance, this might be an exprGroup or derived
+  if ((c0 == COU_EXPRGROUP) && 
+      (c0 == COU_EXPRQUAD)) {
 
     exprGroup *ne0 = dynamic_cast <exprGroup *> (this),
               *ne1 = dynamic_cast <exprGroup *> (&e1);
 
-    return ne0 -> compare (*ne1);
+    int cg =  ne0 -> compare (*ne1);
+
+    if (cg) return cg; // exprGroup
+
+    // last chance, the two are quadratic forms
+
+    if (c0 == COU_EXPRQUAD) {
+
+      exprQuad *ne0 = dynamic_cast <exprQuad *> (this),
+   	       *ne1 = dynamic_cast <exprQuad *> (&e1);
+
+      return ne0 -> compare (*ne1);
+    }
   }
 
   return 0;

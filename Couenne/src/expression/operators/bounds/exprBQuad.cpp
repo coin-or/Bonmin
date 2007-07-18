@@ -8,11 +8,6 @@
 
 #include <exprBQuad.hpp>
 
-
-CouNumber exprLBQuad::operator () () {
-  return 0;
-}
-
-CouNumber exprUBQuad::operator () () {
+CouNumber computeQBound (int sign, exprQuad *e) {
   return 0;
 }

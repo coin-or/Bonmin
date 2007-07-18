@@ -138,21 +138,27 @@ expression *exprQuad::differentiate (int index) {
 
 
 /// compare affine terms
+
 int exprQuad::compare (exprQuad &e) {
 
-  CouNumber *coe0 =   coeff_,
-            *coe1 = e.coeff_;
+  if (nqterms_ < e.nqterms_) return -1;
+  if (nqterms_ > e.nqterms_) return  1;
 
-  if (c0_ < e.c0_ - COUENNE_EPS) return -1;
-  if (c0_ > e.c0_ + COUENNE_EPS) return  1;
+  CouNumber *coe0 =   qcoeff_,
+            *coe1 = e.qcoeff_;
 
-  for (register int *ind0 = index_, *ind1 = e.index_; 
-       *ind0 >= 0 || *ind1 >= 0; 
-       ind0++, ind1++, 
-       coe0++, coe1++) {
+  for (register int *indI0 = qindexI_, 
+	            *indJ0 = qindexJ_, 
+	            *indI1 = e.qindexI_, 
+	            *indJ1 = e.qindexJ_, i = nqterms_; 
+       i--; indI0++, indI0++, indI0++, indI0++) {
  
-    if (*ind0 < *ind1) return -1;
-    if (*ind0 > *ind1) return  1;
+    if (*indI0 < *indI1) return -1;
+    if (*indI0 > *indI1) return  1;
+
+    if (*indJ0 < *indJ1) return -1;
+    if (*indJ0 > *indJ1) return  1;
+
     if (*coe0 < *coe1 - COUENNE_EPS) return -1;
     if (*coe0 > *coe1 + COUENNE_EPS) return  1;
   }
@@ -160,25 +166,30 @@ int exprQuad::compare (exprQuad &e) {
   return 0;
 }
 
+
 /// used in rank-based branching variable choice
 
 int exprQuad::rank (CouenneProblem *p) {
 
-  int maxrank = exprOp::rank (p);
+  int maxrank = exprGroup::rank (p);
 
   if (maxrank < 0) 
     maxrank = 0;
 
-  int norig = p -> nVars ();
+  CouNumber *coe = qcoeff_;
 
-  for (register int *ind = index_; *ind>=0; ind++) {
+  int  n = nqterms_, 
+      *i = qindexI_,
+      *j = qindexJ_;
 
-    int r = (*ind >= norig) ? 
-      (p -> Aux (*ind - norig) -> rank (p)) :
-      (p -> Var (*ind)         -> rank (p));
-    if (r > maxrank)
-      maxrank = r;
-  }
+  while (n--) 
+    if (fabs (*coe++) > COUENNE_EPS) {
+
+      register int r;
+
+      if ((r = p -> Var (*i) -> rank (p)) > maxrank) maxrank = r;
+      if ((r = p -> Var (*j) -> rank (p)) > maxrank) maxrank = r;
+    }
 
   return maxrank;
 }
@@ -188,6 +199,9 @@ int exprQuad::rank (CouenneProblem *p) {
 /// in a branching rule for solving a nonconvexity gap
 
 expression *exprQuad::getFixVar () {
+
+  // TODO: this is quite complicated. It is a nonlinear expression but
+  // we have no access to variable pointers
   if (arglist_ [0] -> Type () == CONST) 
     return this;
   else return arglist_ [0];

@@ -13,8 +13,11 @@
 #include <exprQuad.hpp>
 
 
-//  class to compute lower bound of a fraction based on the bounds of
-//  both numerator and denominator
+/// method to actually compute the bound
+CouNumber computeQBound (int, exprQuad *);
+
+/// class to compute lower bound of a fraction based on the bounds of
+/// both numerator and denominator
 
 class exprLBQuad: public exprOp {
 
@@ -39,6 +42,12 @@ class exprLBQuad: public exprOp {
   std::string printOp () const
     {return "LB_Quad";}
 };
+
+
+/// compute bound
+inline CouNumber exprLBQuad::operator () () {
+  return computeQBound (-1, NULL);
+}
 
 
 /// class to compute lower bound of a fraction based on the bounds of
@@ -68,4 +77,11 @@ class exprUBQuad: public exprOp {
     {return "UB_Quad";}
 };
 
+
+/// compute bound
+inline CouNumber exprUBQuad::operator () ()
+  {return computeQBound (1, NULL);}
+
+
 #endif
+
