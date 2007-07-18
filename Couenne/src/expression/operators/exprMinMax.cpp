@@ -15,11 +15,13 @@
 
 void exprMin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) 
+			    t_chg_bounds *chg, int,
+			    CouNumber, CouNumber) 
 {}
 
 
 void exprMax::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) 
+			    t_chg_bounds *chg, int,
+			    CouNumber, CouNumber) 
 {}

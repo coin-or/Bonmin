@@ -45,7 +45,8 @@ void expression::getBounds (expression *&lb, expression *&ub) {
 
 void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			      OsiCuts &cs, const CouenneCutGenerator *cg, 
-			      t_chg_bounds *chg) {
+			      t_chg_bounds *chg, int,
+			      CouNumber, CouNumber) {
 
   if (cg -> isFirst ())
     cg -> createCut (cs, currValue_, 0, w -> Index (), 1.);
@@ -101,3 +102,15 @@ int expression::compare (expression &e1) {
 /// compare expressions (used in bsearch within CouenneProblem::standardize)
 int expression::compare (exprCopy &c)
 {return compare (const_cast <expression &> (*(c. Original ())));}
+
+
+/// replace occurrence of a variable with another variable
+void exprCopy::replace (exprVar *orig, exprVar *aux) {
+
+  if ((copy_ -> Index () == orig -> Index ()) &&
+      (copy_ -> Type  () != AUX)) {
+
+    delete copy_;
+    copy_ = new exprClone (aux);
+  }
+}

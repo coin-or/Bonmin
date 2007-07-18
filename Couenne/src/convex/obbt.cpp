@@ -57,7 +57,8 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
   int ncols   = csi -> getNumCols (),
       objind  = p -> Obj (0) -> Body () -> Index (),
-      nImprov = 0;
+      nImprov = 0,
+      nOrig;
 
   double *objcoe = (double *) malloc (ncols * sizeof (double));
 
@@ -72,11 +73,19 @@ int obbt_stage (const CouenneCutGenerator *cg,
   // for all (original+auxiliary) variables x_i,
   ////////////////////////////////////////////////////
 
+  nOrig = p -> nVars ();
+
   for (int i=0; i<ncols; i++)
-    //  for (int i=0; i<problem_ ->nVars(); i++) 
+
+    // TODO: do not apply OBBT if this is a variable of the form w2 =
+    // c * w1 as it suffices to multiply result. More in general, do
+    // not apply if w2 is a unary monotone function of w1
 
     // only improve bounds if
-    if (((i != objind) || // this is not the objective
+    if (((i < nOrig) ||                                  // it is an original variable 
+	 (p -> Aux (i-nOrig) -> Multiplicity () > 0)) && // or its multiplicity is at least 1
+	
+	((i != objind) || // this is not the objective
 
 	 // or it is, so we use it for re-solving
 	 ((sense ==  1) && (p -> Obj (0) -> Sense () == MINIMIZE) && !(chg_bds [i].lower & EXACT)) ||
@@ -163,32 +172,31 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	    if (sol [j] >= p -> Ub (j) - COUENNE_EPS) chg_bds [j].upper |= EXACT;
 	  }
 
-	if (0) {// TODO
+#if 0
+	// re-check considering reduced costs (more expensive)
 
-	  // re-check considering reduced costs (more expensive)
+	CouNumber *redcost = NULL;
 
-	  CouNumber *redcost = NULL;
+	// first, compute reduced cost when c = c - e_i, where e_i is
+	// a vector with all zero except a one in position i. This
+	// serves as a base to compute modified reduced cost below.
 
-	  // first, compute reduced cost when c = c - e_i, where e_i is
-	  // a vector with all zero except a one in position i. This
-	  // serves as a base to compute modified reduced cost below.
+	for (int j=0; j<ncols; j++) 
+	  if ((j!=i) && (j!=objind)) {
 
-	  for (int j=0; j<ncols; j++) 
-	    if ((j!=i) && (j!=objind)) {
+	    // fake a change in the objective function and compute
+	    // reduced cost. If resulting vector is all positive
+	    // (negative), this solution is also optimal for the
+	    // minimization (maximization) of x_j and the
+	    // corresponding chg_bds[j] can be set to EXACT.
 
-	      // fake a change in the objective function and compute
-	      // reduced cost. If resulting vector is all positive
-	      // (negative), this solution is also optimal for the
-	      // minimization (maximization) of x_j and the
-	      // corresponding chg_bds[j] can be set to EXACT.
-
-	      if (!(chg_bds [j].lower & EXACT)) {
-	      }
-
-	      if (!(chg_bds [j].upper & EXACT)) {
-	      }
+	    if (!(chg_bds [j].lower & EXACT)) {
 	    }
-	}
+
+	    if (!(chg_bds [j].upper & EXACT)) {
+	    }
+	  }
+#endif	
 
 	// re-apply bound tightening -- here WITHOUT reduced cost as
 	// csi is not our problem

@@ -84,12 +84,20 @@ libCouenne_la_SOURCES = \
 	convex/genRowCuts.cpp \
 	convex/obbt.cpp \
 	problem/problem.cpp \
+	problem/CouenneProblem.cpp \
 	problem/problemIO.cpp \
+	problem/extended.cpp \
 	problem/constraint.cpp \
 	problem/tightenBounds.cpp \
 	problem/impliedBounds.cpp \
 	problem/readASLfg.cpp \
 	problem/fillQuadIndices.cpp \
+	problem/constrStandardize.cpp \
+	problem/elementBreak.cpp \
+	problem/splitAux.cpp \
+	problem/auxiliarize.cpp \
+	problem/standardize.cpp \
+	problem/depGraph/depGraph.cpp \
 	util/drawCuts.cpp \
 	util/rootQ.c
 
@@ -123,6 +131,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex/sdpcuts` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem/depGraph` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
@@ -198,6 +207,7 @@ include_HEADERS = \
 	expression/exprCopy.hpp \
 	expression/exprOp.hpp \
 	expression/CouennePrecisions.h \
+	problem/depGraph/depGraph.hpp \
 	problem/CouenneProblemElem.hpp \
 	problem/CouenneProblem.hpp \
 	expression/CouenneTypes.h \

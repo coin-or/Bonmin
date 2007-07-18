@@ -86,7 +86,8 @@ void contourCut (const CouenneCutGenerator *cg,
 
 void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) {
+			    t_chg_bounds *chg, int wind, 
+			    CouNumber lbw, CouNumber ubw) {
 
   // TODO: unify with exprDiv::generateCuts
 

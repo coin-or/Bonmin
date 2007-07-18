@@ -29,7 +29,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   // infeasibility is always null for linear expressions
   if (reference_ -> Image () -> Linearity () <= LINEAR)
-    return 0.;
+      //(reference_ -> Multiplicity () <= 0))
+      return 0.;
 
   expression::update (const_cast <CouNumber *> (info -> solution_),
 		      const_cast <CouNumber *> (info -> lower_),
@@ -43,16 +44,28 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     return 0.;
   }
 
+  /*if (reference_ -> Index () == 9)
+    for (int i=0; i<19; i++)
+      printf ("%4d: %10g [%10g, %10g]\n", i,
+	      info -> solution_ [i], 
+	      info -> lower_ [i], 
+	      info -> upper_ [i]); */
+
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
 
-  const double & expr = (*(reference_ -> Image ())) (), 
-               & var  = (*reference_) ();
+  const double expr = (*(reference_ -> Image ())) (), 
+               var  = (*reference_) ();
+
+  /*printf ("in infeas [%g,%g] ", expr, var); 
+  reference_ -> print (); printf (" := ");
+  reference_ -> Image () -> print (); printf ("\n");*/
 
   CouNumber delta = fabs (var - expr);
 
   /// avoid branching on (relatively) small deltas
-  if (delta < COUENNE_EPS)
+  if ((delta                           < COUENNE_EPS) || 
+      (delta / (1 + fabs (var + expr)) < COUENNE_EPS))
     delta = 0.;
 
   else {
@@ -90,7 +103,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
             + WEI_MULT * (1. - 1. / fixvar -> Multiplicity ());*/
   }
 
-  if ((0) && (delta > 1e-40)) {
+  /*if (delta > 1e-40) {
     printf ("Inf |%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
 	    var, expr, 
 	    //	    expression::Lbound (reference_ -> Index ()),
@@ -99,7 +112,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout); printf ("\n");
-  } 
+    } */
 
   return delta;
 }
@@ -201,15 +214,13 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
   // if selectBranch returned -1, apply default branching rule
 
-  if (0) {
-    printf ("CO::createBranch: ");
-    reference_ -> print (std::cout);
-    printf (" = ");
-    reference_ -> Image () -> print (std::cout);
-    printf (" --> branch on ");
-    reference_ -> Image () -> getFixVar () -> print (std::cout);
-    printf ("\n");
-    }
+  /*printf ("CO::createBranch: ");
+  reference_ -> print (std::cout);
+  printf (" = ");
+  reference_ -> Image () -> print (std::cout);
+  printf (" --> branch on ");
+  reference_ -> Image () -> getFixVar () -> print (std::cout);
+  printf ("\n");*/
 
   // constructor uses actual values of variables and bounds, update them
   expression::update (const_cast <CouNumber *> (info -> solution_),

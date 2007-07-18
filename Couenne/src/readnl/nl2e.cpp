@@ -48,12 +48,12 @@ expression *CouenneProblem::nl2e (expr *e) {
 
   switch (getOperator (e -> op)) {
 
-  case OPPLUS:   return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPMINUS:  return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPMULT:   return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPDIV:    return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPPLUS:  return new exprSum (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPMINUS: return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPMULT:  return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPDIV:   return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPREM:   return notimpl ("remainder");
-  case OPPOW:    return new exprPow (nl2e (e -> L.e), nl2e (e -> R.e));
+  case OPPOW:   return new exprPow (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPLESS:  return notimpl ("less");
   case MINLIST: return notimpl ("min");
   case MAXLIST: return notimpl ("max");
@@ -71,18 +71,18 @@ expression *CouenneProblem::nl2e (expr *e) {
   }
   case OP_sqrt:    return new exprPow (nl2e (e -> L.e), new exprConst (0.5));
   case OP_sinh:    return new exprMul (new exprConst (0.5),
-		   new exprSub (new exprExp (nl2e (e -> L.e)),
-				new exprExp (new exprOpp (nl2e (e -> L.e)))));
+				       new exprSub (new exprExp (nl2e (e -> L.e)),
+						    new exprExp (new exprOpp (nl2e (e -> L.e)))));
   case OP_sin:     return new exprSin (nl2e (e -> L.e));
   case OP_log10:   return new exprMul (new exprConst (1.0 / log (10.0)), 
 				       new exprLog (nl2e (e -> L.e)));
   case OP_log:     return new exprLog (nl2e (e -> L.e));
   case OP_exp:     return new exprExp (nl2e (e -> L.e));
   case OP_cosh:    return new exprMul (new exprConst (0.5),
-		   new exprSum (new exprExp (nl2e (e -> L.e)),
-				new exprExp (new exprOpp (nl2e (e -> L.e)))));
+				       new exprSum (new exprExp (nl2e (e -> L.e)),
+						    new exprExp (new exprOpp (nl2e (e -> L.e)))));
 
-  case OP_cos:     return new exprCos (nl2e (e -> L.e));
+  case OP_cos:   return new exprCos (nl2e (e -> L.e));
   case OP_atanh: return notimpl ("atanh");
   case OP_atan2: return notimpl ("atan2");
   case OP_atan:  return notimpl ("atan");
@@ -109,24 +109,32 @@ expression *CouenneProblem::nl2e (expr *e) {
   case OPCPOW: return new exprPow (new exprConst (((expr_n *)e->L.e)->v),
 				   nl2e (e -> R.e));
   case OPFUNCALL: return notimpl ("function call");
-  case OPNUM:   return new exprConst (((expr_n *)e)->v);
+  case OPNUM:     return new exprConst (((expr_n *)e)->v);
   case OPPLTERM:  return notimpl ("plterm");
   case OPIFSYM:   return notimpl ("ifsym");
   case OPHOL:     return notimpl ("hol");
-  case OPVARVAL:  
+  case OPVARVAL:
     {
-      int j;
-      // check if index is above number of variables (depending on
-      // psb_elem groups in asl)
-      if ((j = ((expr_v *) e) -> a) >= nVars ()) {
-	printf ("ERROR: unknown variable x%d\nAborting...", j);
-	exit (-1);
-      }
+      int j = ((expr_v *) e) -> a, 
+	  d = nVars () - j;
+      // is index above number of variables?
+      //if (j >= nvars)
+      while (d++ <= 0)
+	addVariable (false);
+	//printf ("indexD = %d\n", j);
+	//printf ("Couenne, warning: unknown variable x%d (>%d+%d=%d), returning new variable.\n",
+	//	j, nvars, nAuxs (), nvars + nAuxs ());
+	//	exit (-1);
+	// TODO: aux_ [...] may not be filled yet
+	//return new exprClone (variables_ [j]);
+
+      //printf ("indexV = %d\n", j);
       return new exprClone (variables_ [j]);
     }
-  case -1:
-  default: printf ("ERROR: unknown operator (address %x)\nAborting...", (long int) e -> op); 
+    //  case -1:
+  default: 
+    printf ("ERROR: unknown operator (address %x), aborting.\n", (long int) e -> op); 
     exit (-1);
-    return new exprConst (0);
+    //return new exprConst (0);
   }
 }

@@ -54,14 +54,14 @@ class exprLowerBound: public exprVar {
     {return new exprConst (0);}
 
   /// dependence on variable set
-  bool dependsOn (int *, int) 
-    {return false;}
+  inline int dependsOn (int *, int) 
+    {return 0;}
 
   /// get a measure of "how linear" the expression is:
   virtual inline int Linearity () 
     {return CONST;}
 
-  ///
+  /// code for comparisons
   virtual enum expr_type code ()
     {return COU_EXPRLBOUND;}
 };
@@ -94,8 +94,8 @@ class exprUpperBound: public exprVar {
     {return new exprConst (0);}
 
   /// dependence on variable set
-  bool dependsOn (int *, int) 
-    {return false;}
+  int dependsOn (int *, int) 
+    {return 0;}
 
   /// get a measure of "how linear" the expression is:
   virtual inline int Linearity () 

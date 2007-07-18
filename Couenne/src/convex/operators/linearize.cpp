@@ -8,6 +8,7 @@
 
 #include <CouenneTypes.h>
 #include <exprSum.hpp>
+#include <exprMul.hpp>
 #include <exprGroup.hpp>
 #include <exprConst.hpp>
 
@@ -133,13 +134,6 @@ inline bool termSortPred (const monomial& lhs, const monomial& rhs)
 
 exprAux *exprSum::standardize (CouenneProblem *p) {
 
-  // first of all, standardize all operands
-  //  exprOp::standardize (p);
-
-  // now simply return NULL, (the caller will assume there is nothing
-  // to change), as a sum is already standard
-  //  return p -> addAuxiliary (this);
-
   // rather than flattening, another smarter way (and it prevents
   // DuplicateIndex exceptions) is to return this as a linear term.
   // This involves checking all operands of this sum to see if they
@@ -150,9 +144,50 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
   std::vector <monomial> terms;
   CouNumber a0 = 0;
 
-  //printf ("Here we are:");
-  //print (std::cout);
-  //printf ("\n");
+  if (nargs_ == 1) { // check special cases
+
+    if (code () == COU_EXPRSUM) {
+
+      // only one argument, just return its standardized form as
+      // actual expression
+      exprAux *ret = (*arglist_) -> standardize (p);
+      if (ret) {
+	*arglist_ = NULL;
+	return ret;
+      }
+    } else if (code () == COU_EXPRGROUP) {
+
+      exprGroup *eg = dynamic_cast <exprGroup *> (this);
+
+      // if only one linear argument and no extra (that is, nl = 0 and
+      // c0 = 0) then no standardization
+      if ((fabs (eg -> getc0 ()) < COUENNE_EPS) && 
+	  ((*arglist_) -> Linearity () <= ZERO)) {
+
+	int *index = eg -> getIndices ();
+	if ((*index >= 0) && (index [1] == -1)) {// bingo!
+
+	  expression *var = NULL;
+
+	  for (std::vector <exprVar *>::iterator i = p -> Variables ().begin (); 
+	       i != p -> Variables ().end (); i++)
+	    if ((*i) -> Index () == *index)
+	      var = new exprClone (*i);
+
+	  for (std::vector <exprAux *>::iterator i = p -> Auxiliaries ().begin (); 
+	       i != p -> Auxiliaries ().end (); i++)
+	    if ((*i) -> Index () == *index)
+	      var = new exprClone (*i);
+
+	  // is variable indexed by *index original or auxiliary?
+	  CouNumber coe = *(eg -> getCoeffs ());
+	  if (fabs (coe-1) < COUENNE_EPS)
+	    return    NULL;//p -> addAuxiliary (var);
+	  else return p -> addAuxiliary (new exprMul (new exprConst (coe), var));
+	}
+      }
+    }
+  }
 
   // one by one standardize each argument of arglist_ into a pair
   // (index, coeff)
@@ -162,9 +197,9 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
     /// current argument
     expression *arg = arglist_ [i];
 
-    //printf ("now curing: ");
-    //arg -> print (std::cout);
-    //printf ("\n");
+    /*printf ("now curing: "); fflush (stdout);
+    arg -> print (std::cout);
+    printf ("\n");*/
 
     switch (arg -> code ()) {
 
@@ -176,6 +211,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
       break;
 
     case COU_EXPRCONST: // a constant, add it to scalar term
+      //printf ("found constant\n");
       a0 += arg -> Value ();
       break;
 
@@ -200,7 +236,8 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 	}
 
 	a0 += e -> getc0 ();
-      }
+      } 
+      // no break, as an exprGroup is a derived class of what's below
 
     case COU_EXPRSUM:   // decompose each argument of inner sum
       {
@@ -225,12 +262,14 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
       //  if (arglist_ [0] -> Type () <= CONST)
 
     default: 
+      //printf ("it's something else\n");
       flatten (arglist_ [i], p, &terms, a0, +1.);
       break;
     }
 
     // useless now
-    delete arglist_ [i]; arglist_ [i] = NULL;
+    // delete arglist_ [i]; 
+    //arglist_ [i] = NULL;
   }
 
   // Take care of the exprGroup, if we are.
@@ -275,6 +314,11 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
     }
   }
 
+  /*for (int i=0; i<nterms; i++) 
+    printf ("<%d,%g> ", indices [i], coeffs [i]);
+
+  printf ("[%d terms]\n", nterms); */
+
   indices = (int       *) realloc (indices, (1+ndiff) * sizeof (int));
   coeffs  = (CouNumber *) realloc (coeffs,     ndiff  * sizeof (CouNumber));
 
@@ -283,5 +327,19 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
   expression **zero = new expression * [1];
   *zero = new exprConst (0.);
 
-  return (p -> addAuxiliary (new exprGroup (a0, indices, coeffs, zero, 1)));
+  exprGroup *eg = new exprGroup (a0, indices, coeffs, zero, 1);
+
+  /*printf ("eg -> "); fflush (stdout);
+    eg -> print (); printf ("\n");*/
+
+  exprAux *ret = p -> addAuxiliary (eg);
+
+  /*if (!ret) printf ("returning null\n");
+  else {
+    printf ("returning "); fflush (stdout);
+    ret -> print (); printf (" := "); fflush (stdout); 
+    ret -> Image () -> print (); printf ("\n");
+    }*/
+
+  return ret;
 }

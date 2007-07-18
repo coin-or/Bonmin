@@ -41,9 +41,6 @@ class exprDiv: public exprOp {
   //  virtual enum pos printPos () 
   //    {return INSIDE;}
 
-  // I/O
-  //  void print (std::ostream&) const;
-
   // function for the evaluation of the expression
   inline CouNumber operator () ();
 
@@ -71,13 +68,15 @@ class exprDiv: public exprOp {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
-		     t_chg_bounds * = NULL);
+		     t_chg_bounds * = NULL, int = -1, 
+		     CouNumber = -COUENNE_INFINITY, 
+		     CouNumber =  COUENNE_INFINITY);
 
-  // return an index to the variable's argument that is better fixed
-  // in a branching rule for solving a nonconvexity gap
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
   expression *getFixVar ();
 
-  ///
+  /// code for comparison
   virtual enum expr_type code () {return COU_EXPRDIV;}
 
   /// implied bound processing
@@ -87,12 +86,6 @@ class exprDiv: public exprOp {
   /// each expression's arguments
   CouNumber selectBranch (expression *, const OsiBranchingInformation *,
 			  int &, double * &, int &);
-
-  /*  /// distance covered by current point if branching rule applied to this expression
-  double BranchGain (expression *, const OsiBranchingInformation *);
-
-  /// branching object best suited for this expression
-  OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *);*/
 };
 
 
@@ -104,7 +97,7 @@ inline CouNumber exprDiv::operator () () {
 
   //  register CouNumber denominator = *sp--;
   //  return (currValue_ = (*sp-- / denominator));
-  return (currValue_ = (*(arglist_ [0])) () / (*(arglist_ [1])) ());
+  return (currValue_ = (*(*arglist_)) () / (*(arglist_ [1])) ());
 }
 
 

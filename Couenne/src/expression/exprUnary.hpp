@@ -15,6 +15,7 @@
 #include <CouenneTypes.h>
 #include <exprOp.hpp>
 
+
 /// zero function (used by default by exprUnary)
 inline CouNumber zero_fun (CouNumber x) 
 {return 0;}
@@ -79,8 +80,8 @@ class exprUnary: public expression {
     {return (currValue_ = (F ()) ((*argument_) ()));}
 
   /// dependence on variable set
-  bool inline dependsOn (int *list, int n) 
-    {return (!list || (argument_ -> dependsOn (list, n)));}
+  inline int dependsOn (int *list, int n) 
+    {return (argument_ -> dependsOn (list, n));}
 
   /// simplification
   expression *simplify ();
@@ -108,7 +109,14 @@ class exprUnary: public expression {
 
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *p)
-    {return (1 + argument_ -> rank (p));} 
+    {return (argument_ -> rank (p));} 
+
+  /// fill in dependence structure
+  virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) 
+    {argument_ -> fillDepSet (dep, g);}
+
+  /// replace variable with other
+  virtual void replace (exprVar *, exprVar *);
 };
 
 #endif

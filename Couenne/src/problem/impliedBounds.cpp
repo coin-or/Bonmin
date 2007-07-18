@@ -13,34 +13,33 @@
 
 int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
-  int nchg = 0, //< number of bounds changed for propagation
-    nvar = nVars ();
-  /*
-  printf ("=====================implied\n");
-    for (int i=0; i < nVars () + nAuxs (); i++)
-    if ((i < nVars ()) || (Aux (i-nVars ()) -> Multiplicity () > 0))
-    printf ("x%d: [%g,%g]\n", i, lb_ [i], ub_ [i]);
-  */
-  for (int i=nAuxs (); i--;) 
+  int nchg = 0; //< number of bounds changed for propagation
+  //    nvar = nVars ();
 
-    //    if (i+nVars () != 79) // !!!
-    {
+  /*printf ("=====================implied\n");
+    for (int i=0; i < nVars (); i++)
+    if (variables_ [i] -> Multiplicity () > 0)
+    printf ("x%d: [%g,%g]\n", i, lb_ [i], ub_ [i]);*/
 
-      //    for (int j=0; j<nAuxs () + nVars (); j++ )
-      //      printf ("--- %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
+  for (int i = nVars (); i--;) 
 
-      if (lb_ [nvar+i] > ub_ [nvar+i] + COUENNE_EPS) {
+    if (variables_ [i] -> Type () == AUX) {
+
+    //    for (int j=0; j<nAuxs () + nVars (); j++ )
+    //      printf ("--- %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
+
+      if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
 	//printf ("#### w_%d has infeasible bounds [%g,%g]\n", 
-	//i+nvar, lb_ [nvar+i], ub_ [nvar+i]);
+	//i, lb_ [i], ub_ [i]);
 	return -1;
       }
 
       //    if ((auxiliaries_ [i] -> Image () -> code () == COU_EXPRSUM) ||
       //	(auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP))
 
-      CouNumber 
+      /*CouNumber 
 	l0 = lb_ [nvar+i], 
-	u0 = ub_ [nvar+i];
+	u0 = ub_ [nvar+i];*/
 
       /*if (auxiliaries_ [i] -> Image () -> Argument () || 
 	  auxiliaries_ [i] -> Image () -> ArgList  ()) {
@@ -62,7 +61,8 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       //      auxiliaries_ [i] -> print (std::cout); printf (" := ");
       //      auxiliaries_ [i] -> Image () -> print (std::cout); printf ("\n");
 
-      if (auxiliaries_ [i] -> Image () -> impliedBound (nvar+i, lb_, ub_, chg_bds) > COUENNE_EPS) {
+      if (variables_ [i] -> Image () -> impliedBound 
+	  (variables_ [i] -> Index (), lb_, ub_, chg_bds) > COUENNE_EPS) {
 
 	//printf ("impli %2d [%g,%g] -> [%g,%g]: ", nvar+i, l0, u0, lb_ [nvar+i], ub_ [nvar+i]);
 

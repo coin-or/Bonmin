@@ -38,15 +38,14 @@ CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index,
     firstBranch_ = (rnd < 1.) ? 0 : (rnd < 2.) ? 1: 2;
   }
 
-  if (0) {
-    printf ("=3= x%d will branch on %g ][ %g (now at %g) [%g,%g]\n", 
-	    index_,
-	    lcrop_,
-	    rcrop_,
-	    expression::Variable (index_),
-	    expression::Lbound   (index_),
-	    expression::Ubound   (index_));
-  }
+  /*printf ("=3= x%d will branch on %g ][ %g (now at %g) [%g,%g]\n", 
+	  index_,
+	  lcrop_,
+	  rcrop_,
+	  expression::Variable (index_),
+	  expression::Lbound   (index_),
+	  expression::Ubound   (index_));*/
+
 }
 
 

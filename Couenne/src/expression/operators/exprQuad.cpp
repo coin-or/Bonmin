@@ -9,99 +9,97 @@
 #include <CouenneProblem.hpp>
 #include <exprConst.hpp>
 #include <exprQuad.hpp>
+#include <exprPow.hpp>
+#include <exprMul.hpp>
 
 /// Constructor
-exprQuad::exprQuad  (CouNumber c0,     // constant term
-		       int *index,       // indices (array terminated by a -1)
-		       CouNumber *coeff, // coefficient vector
-		       int *qindexI,       // indices I (array terminated by a -1)
-		       int *qindexJ,       // indices J (array terminated by a -1)
-		       CouNumber *qcoeff, // coefficient vector
-		       expression **al,  // vector of nonlinear expressions to be added 
-		       int n):           // number of *nonlinear* expressions in al
-  exprGroup (c0, index, coeff, al, n) {
-  //  c0_     (c0) {
-  /*  
-  int nlin = 0;
+exprQuad::exprQuad  (CouNumber c0,      // constant term
+		     int *index,        // indices (array terminated by a -1)
+		     CouNumber *coeff,  // coefficient vector
+		     int *qindexI,      // indices I (array terminated by a -1)
+		     int *qindexJ,      // indices J (array terminated by a -1)
+		     CouNumber *qcoeff, // coefficient vector
+		     expression **al,   // vector of nonlinear expressions to be added 
+		     int n):            // number of *nonlinear* expressions in al
+  exprGroup (c0, index, coeff, al, n),
+  nqterms_  (0) {
 
-  // count linear terms
-  for (register int *ind = index; *ind++ >= 0; nlin++);
+  for (register int *qi = qindexI; *qi++ >= 0; nqterms_++);
 
-  index_ = new int       [nlin + 1];
-  coeff_ = new CouNumber [nlin];
+  qindexI_ = new int       [nqterms_];
+  qindexJ_ = new int       [nqterms_];
+  qcoeff_  = new CouNumber [nqterms_];
 
-  index_ [nlin] = index [nlin];
-
-  while (nlin--) {
-    index_ [nlin] = index [nlin];
-    coeff_ [nlin] = coeff [nlin];
+  for (register int i=nqterms_; i--;) {
+    qindexI_ [i] = qindexI [i];
+    qindexJ_ [i] = qindexJ [i];
+    qcoeff_  [i] = qcoeff  [i];
   }
-  */
 } 
 
 
 /// copy constructor
 exprQuad::exprQuad  (const exprQuad &src): 
   exprGroup (src),
-  //  c0_     (src.c0_),
+
   qindexI_  (NULL),
   qindexJ_  (NULL),
-  qcoeff_  (NULL)  {
-  /*
-  register int *ind, size = 0;
+  qcoeff_   (NULL),
+  nqterms_  (src.nqterms_) {
 
-  for (ind = src.index_; (*ind++) >= 0; size++);
-
-  // ind is now PAST the -1, put it back on it
-  --ind;
-
-  coeff_ = new CouNumber [size];
-  index_ = new int       [size+1];
-
-  index_ [size] = -1;
-
-  while (size--) {
-
-    index_ [size] = *--ind;
-    coeff_ [size] = src.coeff_ [size];
+  if (src.qindexI_) {
+    qindexI_ = new int       [nqterms_];
+    qindexJ_ = new int       [nqterms_];
+    qcoeff_  = new CouNumber [nqterms_];
   }
-  */
+
+  int *qi = src.qindexI_,
+      *qj = src.qindexJ_;
+
+  CouNumber *qc = src.qcoeff_;
+
+  for (int i = nqterms_; i--;) {
+    qindexI_ [i] = qi [i];
+    qindexJ_ [i] = qj [i];
+    qcoeff_  [i] = qc [i];
+  }
 } 
 
 
 /// I/O
 void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const {
-//void exprQuad::print (std::ostream &out, CouenneProblem *p = NULL) const {
 
-//  if (nargs_ && ((nargs_ > 1) ||
-//		 ((*arglist_) -> Type () != CONST) ||
-//		 (fabs ((*arglist_) -> Value ()) > COUENNE_EPS)))
   exprGroup::print (out, descend, p);
-  /*
-  int nOrig = p ? (p -> nVars ()) : -1;
 
-  if      (c0_ >   COUENNE_EPS) out << '+' << c0_;
-  else if (c0_ < - COUENNE_EPS) out        << c0_;
+  for (int i = 0; i < nqterms_; i++) {
 
-  for (register int *ind=index_, i=0; *ind>=0; ind++) {
+    out << qcoeff_ [i];
 
-    CouNumber coeff = coeff_ [i++];
+    if (p) {
 
-    out << ' ';
+      int qi = qindexI_ [i], 
+	  qj = qindexJ_ [i];
 
-    if      (coeff >   COUENNE_EPS) out << '+' << coeff << "*";
-    else if (coeff < - COUENNE_EPS) out        << coeff << "*";
-    else continue;
+      expression *prod;
 
-    if (nOrig < 0) out << "x_" << *ind;
-    else {
-      //      out << "(";
-      if (*ind < nOrig) p -> Var (*ind)       -> print (out, descend, p);
-      else              p -> Aux (*ind-nOrig) -> print (out, descend, p);
-      //      out << ")";
+      if (qi == qj) 
+	prod    = (new exprPow (new exprClone (p -> Var (qi)), 
+				new exprConst (2)));
+      else prod = (new exprMul (new exprClone (p -> Var (qi)),
+				new exprClone (p -> Var (qj))));
+
+      prod -> print (out, descend, p);
+      delete prod;
+
+    } else {
+
+      int qi = qindexI_ [i], 
+	  qj = qindexJ_ [i];
+
+      if (qi == qj) out << "x_" << qi << "^2 ";
+      else          out << "x_" << qi << "*x_" << qj;
     }
-    }*/
-
+  }
 }
 
 
@@ -133,26 +131,6 @@ expression *exprQuad::differentiate (int index) {
   else return new exprSum (arglist, nonconst);
 }
 
-
-/// get a measure of "how linear" the expression is:
-int exprQuad::Linearity () {
-  /*
-  // compute linearity of nonlinear part
-  int nllin = exprSum::Linearity ();
-
-  if (nllin == ZERO) // if nonlinear part equals zero
-    if (*index_ == -1)
-      if (fabs (c0_) < COUENNE_EPS) return ZERO;
-      else                          return CONSTANT; 
-    else                            return LINEAR;
-  else // if nonlinear part is anything but zero
-    if (nllin == CONSTANT)
-      if (*index_ == -1)            return CONSTANT; 
-      else                          return LINEAR;
-    else                            return nllin;
-  */
-  return NONLINEAR;
-}
 
 /// compare affine terms
 int exprQuad::compare (exprQuad &e) {
@@ -193,8 +171,7 @@ int exprQuad::rank (CouenneProblem *p) {
     int r = (*ind >= norig) ? 
       (p -> Aux (*ind - norig) -> rank (p)) :
       (p -> Var (*ind)         -> rank (p));
-    if (++r > maxrank) // increment because above exprOp::rank returns
-		       // something already incremented
+    if (r > maxrank)
       maxrank = r;
   }
 

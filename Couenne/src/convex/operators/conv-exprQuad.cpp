@@ -1,5 +1,5 @@
 /*
- * Name:    conv-exprGroup.cpp
+ * Name:    conv-exprQuad.cpp
  * Author:  Pietro Belotti
  * Purpose: implementation of convexification methods for exprGroup
  *
@@ -17,7 +17,7 @@
 #include <CouenneCutGenerator.hpp>
 
 /// Get lower and upper bound of an expression (if any)
-void exprGroup::getBounds (expression *&lb, expression *&ub) {
+void exprQuad::getBounds (expression *&lb, expression *&ub) {
 
   expression *lbnl, *ubnl;
 
@@ -73,10 +73,10 @@ void exprGroup::getBounds (expression *&lb, expression *&ub) {
 
 
 // generate equality between *this and *w
-void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			      OsiCuts &cs, const CouenneCutGenerator *cg,
-			      t_chg_bounds *chg, 
-			      int wind, CouNumber lb, CouNumber ub) {
+void exprQuad::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+			     OsiCuts &cs, const CouenneCutGenerator *cg,
+			     t_chg_bounds *chg, 
+			     int wind, CouNumber lb, CouNumber ub) {
 
   // very similar to exprSum::generateCuts. First of all, this has
   // been standardized into a sum, so it only gets a cut in the

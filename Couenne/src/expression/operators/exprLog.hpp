@@ -39,10 +39,6 @@ class exprLog: public exprUnary {
   //virtual const std::string printPos () 
   //{return PRE;}
 
-
-  // I/O
-  //  void print (std::ostream&) const;
-
   // differentiation
   expression *differentiate (int index); 
 
@@ -60,7 +56,9 @@ class exprLog: public exprUnary {
   // generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
-		     t_chg_bounds * = NULL);
+		     t_chg_bounds * = NULL, int = -1, 
+		     CouNumber = -COUENNE_INFINITY, 
+		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRINV;}
@@ -72,12 +70,6 @@ class exprLog: public exprUnary {
   /// each expression's arguments
   CouNumber selectBranch (expression *, const OsiBranchingInformation *,
 			  int &, double * &, int &);
-
-  /*  /// distance covered by current point if branching rule applied to this expression
-  double BranchGain (expression *, const OsiBranchingInformation *);
-
-  /// branching object best suited for this expression
-  OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *);*/
 };
 
 #endif

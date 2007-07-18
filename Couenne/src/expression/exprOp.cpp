@@ -1,7 +1,7 @@
 /*
- * Name:    expression.cpp
+ * Name:    exprOp.cpp
  * Author:  Pietro Belotti
- * Purpose: methods of the expression class
+ * Purpose: methods for multivariate function class
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -9,7 +9,6 @@
 #include <string>
 #include <string.h>
 
-#include <CouenneCutGenerator.hpp>
 #include <CouenneProblem.hpp>
 
 #include <CouenneTypes.h>
@@ -17,9 +16,6 @@
 #include <exprAux.hpp>
 #include <exprOp.hpp>
 #include <exprUnary.hpp>
-#include <exprVar.hpp>
-#include <exprIVar.hpp>
-#include <exprBound.hpp>
 #include <exprGroup.hpp>
 
 // General N-ary function destructor
@@ -66,16 +62,14 @@ void exprOp::print (std::ostream &out,
 
 // does this expression depend on variables in varlist?
 
-bool exprOp::dependsOn (int *varlist, int n) {
+int exprOp::dependsOn (int *varlist, int n) {
 
-  if (!varlist) 
-    return true;
+  int tot = 0;
 
   for (register int i = nargs_; i--;)
-    if (arglist_ [i] -> dependsOn (varlist, n))
-      return true;
+    tot += arglist_ [i] -> dependsOn (varlist, n);
 
-  return false;
+  return tot;
 }
 
 
@@ -125,7 +119,7 @@ int exprOp::rank (CouenneProblem *p) {
     if (r > maxrank) maxrank = r;
   }
 
-  return (1 + maxrank);
+  return (maxrank);
 }
 
 
@@ -149,4 +143,22 @@ exprAux *exprOp::standardize (CouenneProblem *p) {
       arglist_ [i] = new exprClone (subst);
 
   return NULL;
+}
+
+
+/// replace variable x with new (aux) w
+void exprOp::replace (exprVar *x, exprVar *w) {
+
+  /*printf ("replacing "); fflush (stdout);
+  x -> print (); printf (" with "); fflush (stdout);
+  w -> print (); printf (" in "); fflush (stdout);
+  print (); fflush (stdout); printf ("\n");*/
+
+  for (int i=nargs_; i--;)
+    if (arglist_ [i] -> Type () == VAR) {
+      if (arglist_ [i] -> Index () == x -> Index ()) {
+	delete arglist_ [i];
+	arglist_ [i] = new exprClone (w);
+      }
+    } else arglist_ [i] -> replace (x, w);
 }

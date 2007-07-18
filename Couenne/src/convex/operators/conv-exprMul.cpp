@@ -18,8 +18,10 @@
 /// check if two arguments point to the same variable
 
 inline bool areSameVariables (expression *v1, expression *v2) {
-  return (((v1 -> Type () == VAR) || (v1 -> Type () == AUX)) &&
-	  ((v2 -> Type () == VAR) || (v2 -> Type () == AUX)) && 
+
+  register int t1 = v1 -> Type (), t2;
+  return (((t1 == VAR) || (t1 == AUX)) &&
+	  (((t2 = v2 -> Type ()) == VAR) || (t2 == AUX)) && 
 	  (v1 -> Index () == v2 -> Index ()));
 }
 
@@ -30,7 +32,7 @@ exprAux *exprMul::standardize (CouenneProblem *p) {
 
   exprOp::standardize (p);
 
-  if (nargs_==1) return NULL;
+  if (nargs_ == 1) return NULL;
   /* {
      exprAux *aux = arglist_ [0];
      arglist_ [0] = NULL;

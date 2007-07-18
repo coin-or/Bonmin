@@ -9,6 +9,7 @@
 #include <CouenneProblem.hpp>
 #include <exprConst.hpp>
 #include <exprGroup.hpp>
+#include <depGraph.hpp>
 
 /// Constructor
 exprGroup::exprGroup  (CouNumber c0,     // constant term
@@ -16,22 +17,23 @@ exprGroup::exprGroup  (CouNumber c0,     // constant term
 		       CouNumber *coeff, // coefficient vector
 		       expression **al,  // vector of nonlinear expressions to be added 
 		       int n):           // number of *nonlinear* expressions in al
-  exprSum (al, n),
-  c0_     (c0) {
+  exprSum  (al, n),
+  c0_      (c0),
+  nlterms_ (0) {
   
-  int nlin = 0;
+  //int nlin = 0;
 
   // count linear terms
-  for (register int *ind = index; *ind++ >= 0; nlin++);
+  for (register int *ind = index; *ind++ >= 0; nlterms_++);
 
-  index_ = new int       [nlin + 1];
-  coeff_ = new CouNumber [nlin];
+  index_ = new int       [nlterms_ + 1];
+  coeff_ = new CouNumber [nlterms_];
 
-  index_ [nlin] = index [nlin];
+  index_ [nlterms_] = index [nlterms_]; // assign -1 at end of array
 
-  while (nlin--) {
-    index_ [nlin] = index [nlin];
-    coeff_ [nlin] = coeff [nlin];
+  for (int i=0; i<nlterms_; i++) {
+    index_ [i] = index [i];
+    coeff_ [i] = coeff [i];
   }
 } 
 
@@ -65,14 +67,11 @@ exprGroup::exprGroup  (const exprGroup &src):
 
 /// I/O
 void exprGroup::print (std::ostream &out, bool descend, CouenneProblem *p) const {
-//void exprGroup::print (std::ostream &out, CouenneProblem *p = NULL) const {
 
   if (nargs_ && ((nargs_ > 1) ||
 		 ((*arglist_) -> Type () != CONST) ||
 		 (fabs ((*arglist_) -> Value ()) > COUENNE_EPS)))
     exprSum::print (out, descend, p);
-
-  int nOrig = p ? (p -> nVars ()) : -1;
 
   if      (c0_ >   COUENNE_EPS) out << '+' << c0_;
   else if (c0_ < - COUENNE_EPS) out        << c0_;
@@ -80,20 +79,14 @@ void exprGroup::print (std::ostream &out, bool descend, CouenneProblem *p) const
   for (register int *ind=index_, i=0; *ind>=0; ind++) {
 
     CouNumber coeff = coeff_ [i++];
-
     out << ' ';
 
     if      (coeff >   COUENNE_EPS) out << '+' << coeff << "*";
     else if (coeff < - COUENNE_EPS) out        << coeff << "*";
     else continue;
 
-    if (nOrig < 0) out << "x_" << *ind;
-    else {
-      //      out << "(";
-      if (*ind < nOrig) p -> Var (*ind)       -> print (out, descend, p);
-      else              p -> Aux (*ind-nOrig) -> print (out, descend, p);
-      //      out << ")";
-    }
+    if (!p) out << "x_" << *ind;
+    else p -> Var (*ind) -> print (out, descend, p);
   }
 }
 
@@ -145,6 +138,7 @@ int exprGroup::Linearity () {
     else                            return nllin;
 }
 
+
 /// compare affine terms
 int exprGroup::compare (exprGroup &e) {
 
@@ -168,6 +162,7 @@ int exprGroup::compare (exprGroup &e) {
   return 0;
 }
 
+
 /// used in rank-based branching variable choice
 
 int exprGroup::rank (CouenneProblem *p) {
@@ -177,15 +172,15 @@ int exprGroup::rank (CouenneProblem *p) {
   if (maxrank < 0) 
     maxrank = 0;
 
-  int norig = p -> nVars ();
+  //int norig = p -> nVars ();
 
   for (register int *ind = index_; *ind>=0; ind++) {
 
-    int r = (*ind >= norig) ? 
-      (p -> Aux (*ind - norig) -> rank (p)) :
+    int r = //(*ind >= norig) ? 
+      //(p -> Aux (*ind - norig) -> rank (p)) :
       (p -> Var (*ind)         -> rank (p));
-    if (++r > maxrank) // increment because above exprOp::rank returns
-		       // something already incremented
+
+    if (r > maxrank)
       maxrank = r;
   }
 
@@ -193,26 +188,41 @@ int exprGroup::rank (CouenneProblem *p) {
 }
 
 
-/// return an index to the variable's argument that is better fixed
-/// in a branching rule for solving a nonconvexity gap
-
-expression *exprGroup::getFixVar () {
-  if (arglist_ [0] -> Type () == CONST) 
-    return this;
-  else return arglist_ [0];
-}
-
 /// check if this expression depends on a set of variables specified
 /// in the parameters
-bool exprGroup::dependsOn (int *chg, int nch) {
+int exprGroup::dependsOn (register int *chg, register int nch) {
 
-  if (exprOp::dependsOn (chg, nch)) 
-    return true;
+  int tot = exprOp::dependsOn (chg, nch);
 
-  /// TODO: check if chg and index_ are sorted to 
+  /// TODO: check if chg and index_ are sorted to improve efficiency
   for (; nch-- && (*chg >= 0); chg++)
     for (register int *ind = index_; *ind >= 0;)
-      if (*ind++ == *chg) return true;      
+      if (*ind++ == *chg) 
+	tot++;
 
-  return false;
+  return tot;
 }
+
+
+/// update dependence set with index of this variable
+void exprGroup::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
+
+  exprOp::fillDepSet (dep, g);
+
+  for (int *index = index_; *index >= 0; index++)
+    dep -> insert (g -> lookup (*index));
+}
+
+/// specialized version to check expression of linear term
+int exprGroup::dependsOn (CouenneProblem *p, int *chg, int nch) {
+
+  int tot = dependsOn (chg, nch);
+
+  for (int *ind = index_; *ind >= 0; ind++)
+    for (int i=0; (i < nch) && (chg [i] >= 0); i++)
+      if (p -> Var (*ind) -> Type () == AUX)
+	tot += p -> Var (*ind) -> Image () -> dependsOn (p, chg, nch);
+
+  return tot;
+}
+

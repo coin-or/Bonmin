@@ -25,9 +25,13 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
   // of cuts) and add it to cs
 
   if (firstcall_)
-    for (int i=0, j = problem_ -> nAuxs (); j--; i++) {
-      if (problem_ -> Aux (i) -> Multiplicity () > 0)
-	problem_ -> Aux (i) -> generateCuts (si, cs, this, chg);
+    for (int i=0, j = problem_ -> nVars (); j--; i++) {
+
+      exprVar *var = problem_ -> Var (i);
+
+      if ((var -> Multiplicity () > 0) && 
+	  (var -> Type () == AUX))
+	var -> generateCuts (si, cs, this, chg);
     }
   else { // chg_bds contains the indices of the variables whose bounds
 	 // have changes (a -1 follows the last element)
@@ -41,12 +45,12 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 
     printf ("}\n");
     */
-    for (int i = 0, j = problem_ -> nAuxs (); j--; i++) {
+    for (int i = 0, j = problem_ -> nVars (); j--; i++) {
 
       // TODO: check if list contains all and only aux's to cut
 
-      expression * image = problem_ -> Aux (i) -> Image ();
-      /*
+      /*expression * image = problem_ -> Aux (i) -> Image ();
+      
       if ((image -> dependsOn (changed, nchanged)) && 
 	  (image -> Linearity () > LINEAR)) {
 	printf ("         ");
@@ -64,8 +68,11 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 	|| info.pass > 0)) 
       */
 
-      if (problem_ -> Aux (i) -> Multiplicity () > 0)
-	problem_ -> Aux (i) -> generateCuts (si, cs, this, chg);
+      exprVar *var = problem_ -> Var (i);
+
+      if ((var -> Multiplicity () > 0) && 
+	  (var -> Type () == AUX))
+	var -> generateCuts (si, cs, this, chg);
     }
   }
 }

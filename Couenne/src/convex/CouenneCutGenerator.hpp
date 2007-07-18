@@ -118,6 +118,16 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// create cut and check violation. Insert and return status
   int createCut (OsiCuts &, /// cutset to insert
+		 CouNumber, /// lb
+		 CouNumber, /// ub
+		            /// index, coeff  (index -1: "don't care") 
+		 int,    CouNumber,    /// of first  term
+		 int=-1, CouNumber=0., /// of second term 
+		 int=-1, CouNumber=0., /// of third  term
+		 bool = false) const;  /// is it a global cut? No, by default
+
+  /// create cut and check violation. Other version with only one bound
+  int createCut (OsiCuts &, /// cutset to insert
 		 CouNumber, /// rhs
 		 int,       /// sign: -1: <=, 0: =, +1: >=
 		            /// index, coeff  (index -1: "don't care") 

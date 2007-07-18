@@ -12,7 +12,7 @@
 #include <exprOp.hpp>
 
 
-///  class sum 
+/// class sum 
 
 class exprSum: public exprOp {
 
@@ -31,9 +31,6 @@ class exprSum: public exprOp {
   /// print operator
   std::string printOp () const
     {return "+";}
-
-  /// I/O
-  //  virtual void print (std::ostream &) const;
 
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();
@@ -54,10 +51,12 @@ class exprSum: public exprOp {
   /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);
 
-  /// generate equality between *this and *w
-  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			     OsiCuts &cs, const CouenneCutGenerator *cg, 
-			     t_chg_bounds * = NULL);
+  /// special version for linear constraints
+  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+			     OsiCuts &, const CouenneCutGenerator *,
+			     t_chg_bounds * = NULL, int = -1, 
+			     CouNumber = -COUENNE_INFINITY, 
+			     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparison
   virtual enum expr_type code () 
@@ -68,8 +67,8 @@ class exprSum: public exprOp {
 
   /// compute best variable to branch on (nonsense here, as there is
   /// no nonlinear infeasibility)
-  virtual expression *getFixVar () 
-    {printf ("### Warning: called empty exprSum::getFixVar\n"); return *arglist_;}
+  //virtual expression *getFixVar () 
+  //{printf ("### Warning: called empty exprSum::getFixVar\n"); return *arglist_;}
 };
 
 

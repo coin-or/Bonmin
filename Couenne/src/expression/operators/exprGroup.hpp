@@ -22,6 +22,8 @@ class exprGroup: public exprSum {
   int       *index_; //< indices of linear terms (terminated by a -1)
   CouNumber *coeff_; //< coefficient of linear terms
 
+  int nlterms_;      //< number of linear terms
+
  public:
 
   /// Constructor
@@ -39,24 +41,28 @@ class exprGroup: public exprSum {
     }
   }
 
-  /// get constant, indices and coefficients vectors
+  /// get constant, indices, and coefficients vectors, and number of linear terms
   CouNumber  getc0      () {return c0_;}
   CouNumber *getCoeffs  () {return coeff_;}
   int       *getIndices () {return index_;}
+  int        getNLTerms () {return nlterms_;}
 
   /// cloning method
   virtual expression *clone () const
     {return new exprGroup (*this);}
 
   /// I/O
-  //  virtual void print (std::ostream &, CouenneProblem *) const;
   virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
 
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();
 
   /// check if exprGroup depends on a list of variables specified as parameters
-  virtual bool dependsOn (int * = NULL, int = 1);
+  virtual int dependsOn (int * = NULL, int = 1);
+
+  /// specialized version that checks variables in linear term through
+  /// their image (if any) within the CouenneProblem
+  virtual int dependsOn (CouenneProblem *, int * = NULL, int = 1);
 
   /// differentiation
   virtual expression *differentiate (int index); 
@@ -71,14 +77,12 @@ class exprGroup: public exprSum {
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  /// reduce expression in standard form, creating additional aux
-  /// variables (and constraints)
-  //  virtual exprAux *standardize (CouenneProblem *p);
-
-  /// generate equality between *this and *w
-  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			     OsiCuts &cs, const CouenneCutGenerator *cg, 
-			     t_chg_bounds * = NULL);
+  /// special version for linear constraints
+  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+			     OsiCuts &, const CouenneCutGenerator *,
+			     t_chg_bounds * = NULL, int = -1, 
+			     CouNumber = -COUENNE_INFINITY, 
+			     CouNumber =  COUENNE_INFINITY);
 
   /// only compare with people of the same kind
   virtual int compare (exprGroup &);
@@ -89,9 +93,8 @@ class exprGroup: public exprSum {
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *);
 
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar ();
+  /// update dependence set with index of this variable
+  virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *);
 };
 
 

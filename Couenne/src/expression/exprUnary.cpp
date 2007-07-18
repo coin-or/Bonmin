@@ -65,3 +65,16 @@ exprAux *exprUnary::standardize (CouenneProblem *p) {
 
   return p -> addAuxiliary (this);
 }
+
+
+/// replace variable with other
+
+void exprUnary::replace (exprVar *x, exprVar *w) {
+
+  if (argument_ -> Type () == VAR) {
+    if (argument_ -> Index () == x -> Index ()) {
+      delete argument_;
+      argument_ = new exprClone (w);
+    }
+  } else argument_ -> replace (x, w);
+}

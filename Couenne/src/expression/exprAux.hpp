@@ -98,8 +98,9 @@ class exprAux: public exprVar {
   inline expression *differentiate (int index) 
     {return image_ -> differentiate (index);}
 
-  /// Dependence on variable set
-  inline bool dependsOn (int *indices, int num) 
+  /// Dependence on variable set: return number of times elements of
+  /// indices occur in expression
+  inline int dependsOn (int *indices, int num) 
     {return image_ -> dependsOn (indices, num);}
 
   /// Get a measure of "how linear" the expression is (see CouenneTypes.h)
@@ -128,16 +129,23 @@ class exprAux: public exprVar {
     expression *l0, *u0;
 
     image_ -> getBounds (l0, u0);
+
     //image_ -> getBounds (lb_, ub_);
 
     lb_ = new exprMax (lb_, l0);
     ub_ = new exprMin (ub_, u0);
+
+    /*printf ("lower: ");   lb_ -> print ();
+    printf (", upper: "); ub_ -> print ();
+    printf ("\n");*/
   }
 
   /// generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *, 
-		     t_chg_bounds * = NULL);
+		     t_chg_bounds * = NULL, int = -1, 
+		     CouNumber = -COUENNE_INFINITY, 
+		     CouNumber =  COUENNE_INFINITY);
 
   /// used in rank-based branching variable choice
   virtual inline int rank (CouenneProblem *p = NULL)

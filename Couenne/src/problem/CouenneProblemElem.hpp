@@ -1,5 +1,5 @@
 /*
- * Name:    CouenneProblemElem.h
+ * Name:    CouenneProblemElem.hpp
  * Author:  Pietro Belotti
  * Purpose: define the classes used by class CouenneProblem
  *
@@ -13,8 +13,10 @@
 
 #include <CouenneTypes.h>
 #include <expression.hpp>
+#include <exprConst.hpp>
 
 
+///////////////////////////////////////////////////////////////////////////////////////
 // CouenneConstraint class, with any expression as the body and two range
 // expressions
 
@@ -41,9 +43,10 @@ class CouenneConstraint {
   CouenneConstraint  (expression *body = NULL, 
   	              expression *lb   = NULL, 
 		      expression *ub   = NULL):
-    body_ (body), 
-    lb_   (lb), 
-    ub_   (ub) {
+    body_     (body), 
+    lb_       (lb), 
+    ub_       (ub) {
+    //    isAuxDef_ (false) {
 
     if (!lb_) 
       if (!ub_) {
@@ -81,45 +84,45 @@ class CouenneConstraint {
     {body_ = newBody; return body_;}
 
   /// decompose body of constraint through auxiliary variables
-  inline exprAux *standardize (CouenneProblem *p) 
-    {return body_ -> standardize (p);}
+  exprAux *standardize (CouenneProblem *);
 
   /// print constraint
-  void print (std::ostream &);
+  void print (std::ostream & = std::cout);
 };
 
 
+/////////////////////////////////////////////////////////////////////////////////
 /// Objective function class, with an expression and an optimization
 /// direction
 
-class Objective {
+class CouenneObjective {
 
  protected:
 
   /// expression to optimize
   expression *body_;
 
-  /// can be COUENNE_MAXIMIZE or COUENNE_MINIMIZE
+  /// can be MAXIMIZE or MINIMIZE
   enum opt_sense sense_;
 
  public:
 
   /// constructor
-  Objective  (expression *body, enum opt_sense sense):
+  CouenneObjective  (expression *body, enum opt_sense sense):
     body_ (body), sense_ (sense) {}
 
   /// destructor
-  ~Objective () 
+  ~CouenneObjective () 
     {delete body_;}
 
   /// copy constructor
-  Objective  (const Objective &o):
-    body_  (o.Body  () -> clone ()), 
-    sense_ (o.Sense ()) {}
+  CouenneObjective  (const CouenneObjective &o):
+    body_  (o.body_ -> clone ()), 
+    sense_ (o.sense_) {}
 
   /// cloning method
-  inline Objective *clone () const
-    {return new Objective (*this);}
+  inline CouenneObjective *clone () const
+    {return new CouenneObjective (*this);}
 
   /// optimization sense
   inline enum opt_sense Sense () const

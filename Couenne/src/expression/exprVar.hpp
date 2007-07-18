@@ -10,10 +10,12 @@
 #define COUENNE_EXPRVAR_H
 
 #include <iostream>
+#include <set>
 
 #include <CouenneTypes.h>
 #include <expression.hpp>
 #include <exprConst.hpp>
+//#include <exprBound.hpp>
 
 class CouenneProblem;
 
@@ -52,6 +54,14 @@ class exprVar: public expression {
   inline int Index () const
     {return varIndex_;}
 
+  /// for compatibility with exprAux
+  virtual inline expression *Image () const
+    {return NULL;}
+
+  /// Bound get
+  virtual expression *Lb ();
+  virtual expression *Ub ();
+
   /// print
   virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
     {out << "x_" << varIndex_;}
@@ -69,7 +79,11 @@ class exprVar: public expression {
     {return new exprConst ((index == varIndex_) ? 1 : 0);}
 
   /// dependence on variable set
-  virtual bool dependsOn (int *, int);
+  virtual int dependsOn (int *, int);
+
+  /// set bounds depending on both branching rules and propagated
+  /// bounds. To be used after standardization
+  virtual inline void crossBounds () {}
 
   /// simplify
   inline expression *simplify () 
@@ -86,10 +100,25 @@ class exprVar: public expression {
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
+  /// generate cuts for expression associated with this auxiliary
+  virtual void generateCuts (const OsiSolverInterface &, 
+			     OsiCuts &, const CouenneCutGenerator *, 
+			     t_chg_bounds * = NULL, int = -1, 
+			     CouNumber = -COUENNE_INFINITY, 
+			     CouNumber =  COUENNE_INFINITY) {}
+
+  /// general function to be specialized
+  /*virtual void generateCuts (const OsiSolverInterface &, 
+			     OsiCuts &, const CouenneCutGenerator *, 
+			     t_chg_bounds *, int,
+			     CouNumber, CouNumber) {}*/
+
   /// generate convexification cut for constraint w = this
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-		     OsiCuts &cs, const CouenneCutGenerator *cg, 
-		     t_chg_bounds * = NULL);
+  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+			     OsiCuts &cs, const CouenneCutGenerator *cg, 
+			     t_chg_bounds * = NULL, int = -1, 
+			     CouNumber = -COUENNE_INFINITY, 
+			     CouNumber =  COUENNE_INFINITY);
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
@@ -104,6 +133,9 @@ class exprVar: public expression {
   /// rank of an original variable is always one
   virtual int rank (CouenneProblem *p) 
     {return 1;}
+
+  /// update dependence set with index of this variable
+  virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *);
 };
 
 #endif

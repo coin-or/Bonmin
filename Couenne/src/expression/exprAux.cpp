@@ -44,7 +44,8 @@ void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 
 void exprAux::generateCuts (const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
-			    t_chg_bounds *chg) {
+			    t_chg_bounds *chg, int,
+			    CouNumber, CouNumber) {
 
   static bool warned_large_coeff = false;
 
@@ -63,7 +64,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   image_ -> generateCuts (this, si, cs, cg, chg);
 
   // check if cuts have coefficients, rhs too large or too small
-
+#if 0
   if (warned_large_coeff)
     for (int jj=nrc; jj < cs.sizeRowCuts (); jj++) {
 
@@ -92,9 +93,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       }
     }
 
-
   //  if (!(cg -> isFirst ())) 
-#if 0
   if ((nrc < cs.sizeRowCuts ()) || 
       (ncc < cs.sizeColCuts ()))
     {
@@ -127,6 +126,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   //////////////////////////////////////////////////////////////
 
-  if (0)
-    draw_cuts (cs, cg, nrc, this, image_);
+#if 0
+  draw_cuts (cs, cg, nrc, this, image_);
+#endif
 }

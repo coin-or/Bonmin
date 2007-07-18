@@ -108,4 +108,4 @@ int CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi,
 
 /// total number of variables (original + auxiliary) of the problem
 const int CouenneCutGenerator::getnvars () const
-{return problem_ -> nVars () + problem_ -> nAuxs ();} 
+  {return problem_ -> nVars ();} 

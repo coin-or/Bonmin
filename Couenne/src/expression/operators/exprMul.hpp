@@ -57,7 +57,9 @@ class exprMul: public exprOp {
   /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
-		     t_chg_bounds * = NULL);
+		     t_chg_bounds * = NULL, int = -1, 
+		     CouNumber = -COUENNE_INFINITY, 
+		     CouNumber =  COUENNE_INFINITY);
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
@@ -73,12 +75,6 @@ class exprMul: public exprOp {
   /// each expression's arguments
   CouNumber selectBranch (expression *, const OsiBranchingInformation *,
 			  int &, double * &, int &);
-
-  /*  /// distance covered by current point if branching rule applied to this expression
-  double BranchGain (expression *, const OsiBranchingInformation *);
-
-  /// branching object best suited for this expression
-  OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *);*/
 };
 
 
@@ -94,18 +90,6 @@ inline CouNumber exprMul:: operator () () {
     ret *= (**al++) ();
 
   return (currValue_ = ret);
-
-  /*
-  exprOp:: operator () ();
-
-  register CouNumber ret = *sp--;
-  register int    n   =  nargs_;
-
-  while (--n)
-    ret *= *sp--;
-
-    return (currValue_ = ret);
-  */
 }
 
 #endif

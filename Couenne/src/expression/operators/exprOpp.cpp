@@ -39,3 +39,18 @@ bool exprOpp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   if (updateBound ( 1, u + ind, - l [wind])) {res = true; chg [ind].upper = CHANGED;}
   return res;
 }
+
+
+/// simplification
+
+expression *exprOpp::simplify () {
+
+  if (argument_ -> code () == COU_EXPROPP) {
+    expression *ret = argument_ -> Argument () -> clone ();
+    delete argument_;
+    return ret;
+  }
+
+  return NULL;
+}
+

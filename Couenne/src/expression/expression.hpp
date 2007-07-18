@@ -12,6 +12,7 @@
 #define STACK_SIZE 100000
 
 #include <iostream>
+#include <set>
 
 #include <CouennePrecisions.h>
 #include <CouenneTypes.h>
@@ -26,6 +27,11 @@ class OsiCuts;
 class exprUnary;
 class exprOp;
 class exprCopy;
+class exprVar;
+
+class DepNode;
+class DepGraph;
+struct compNode;
 
 /// expression base class
 
@@ -113,6 +119,10 @@ class expression {
   virtual inline int Index () const
     {return -1;}
 
+  /// return fictitious image
+  //virtual inline expression *Image () const
+  //  {return NULL;}
+
   /// return number of arguments (when applicable, that is, with N-ary functions)
   virtual inline int nArgs () const
     {return 0;}
@@ -157,9 +167,16 @@ class expression {
   virtual inline expression *differentiate (int) 
     {return NULL;}
 
-  /// dependence on variable set
-  virtual inline bool dependsOn (int *, int) 
-    {return false;}
+  /// dependence on variable set: return number of times indices of
+  /// first argument occur in expression. If first argument is NULL,
+  /// return zero if expression is constant, nonzero otherwise
+  virtual inline int dependsOn (int *, int) 
+    {return 0;}
+
+  /// specialized version to be used with expressions with
+  /// non-symbolic content such as exprGroup and exprQuad
+  virtual inline int dependsOn (CouenneProblem *, int *ind, int n) 
+    {return dependsOn (ind, n);}
 
   /// simplify expression (useful for derivatives)
   virtual inline expression *simplify () 
@@ -189,9 +206,11 @@ class expression {
     {return NULL;}
 
   /// generate convexification cut for constraint w = this
-  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
-			     OsiCuts &, const CouenneCutGenerator *,
-			     t_chg_bounds * = NULL) {}
+  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+			     OsiCuts &cs, const CouenneCutGenerator *cg,
+			     t_chg_bounds *chg = NULL, int wind = -1, 
+			     CouNumber lb = -COUENNE_INFINITY, 
+			     CouNumber ub =  COUENNE_INFINITY) {}
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
@@ -239,7 +258,16 @@ class expression {
 				  double * &brpts, 
 				  int &way)
     {ind = -1; return 0.;}
+
+  /// replace expression with another
+  virtual void replace (exprVar *, exprVar *) {}
+
+  /// update dependence set with index of variables on which this
+  /// expression depends
+  virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *) {}
 };
+
+
 
 
 /// updates maximum violation. Used with all impliedBound. Returns true

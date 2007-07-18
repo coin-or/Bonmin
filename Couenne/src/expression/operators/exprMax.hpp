@@ -13,13 +13,13 @@
 #include <exprClone.hpp>
 
 
-//  class max
+///  class max
 
 class exprMax: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprMax  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
@@ -29,56 +29,54 @@ class exprMax: public exprOp {
     arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
   }
 
-  // cloning method
+  /// cloning method
   exprMax *clone () const
     {return new exprMax (clonearglist (), nargs_);}
 
-  /// print operator
+  //// print operator
   std::string printOp () const
     {return "max";}
 
-  /// print position
+  //// print position
   enum pos printPos () const
     {return PRE;}
 
-  // I/O
-  //  void print (std::ostream &out) const
-  //    {exprOp:: print (out, "max", PRE);}
-
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   inline CouNumber operator () ();
 
-  // differentiation
+  /// differentiation
   inline expression *differentiate (int) 
     {return NULL;} 
 
-  // simplification
+  /// simplification
   inline expression *simplify () 
     {return NULL;}
 
-  // get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () 
     {return NONLINEAR;}
 
-  // Get lower and upper bound of an expression (if any)
-  //  void getBounds (expression *&, expression *&);
+  /// Get lower and upper bound of an expression (if any)
+  ///  void getBounds (expression *&, expression *&);
 
-  // reduce expression in standard form, creating additional aux
-  // variables (and constraints)
+  /// reduce expression in standard form, creating additional aux
+  /// variables (and constraints)
   virtual inline exprAux *standardize (CouenneProblem *)
     {return NULL;}
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
-		     t_chg_bounds * = NULL);
+		     t_chg_bounds * = NULL, int = -1, 
+		     CouNumber = -COUENNE_INFINITY, 
+		     CouNumber =  COUENNE_INFINITY);
 
-  /// code for comparisons
+  //// code for comparisons
   virtual enum expr_type code () {return COU_EXPRMAX;}
 };
 
 
-// compute maximum
+/// compute maximum
 
 inline CouNumber exprMax::operator () () {
 

@@ -15,12 +15,11 @@
 #include <CouenneCutGenerator.hpp>
 
 
-/// generate convexification cut for constraint w = this
-
+// generate equality between *this and *w
 void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si, 
-			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) {
-
+			      OsiCuts &cs, const CouenneCutGenerator *cg,
+			      t_chg_bounds *chg, 
+			      int wind, CouNumber lb, CouNumber ub) {
   if (!(cg -> isFirst ()))
     return;
 
@@ -28,18 +27,28 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int       *index = new int       [nargs_ + 1];
   OsiRowCut *cut   = new OsiRowCut;
 
-  CouNumber rhs = 0;
+  //  CouNumber rhs = 0;
 
   /// first, make room for aux variable
-  coeff [0] = -1.; index [0] = w -> Index ();
 
-  int nv = 1;
+  int nv = 0;
+
+  if (wind < 0) {
+    coeff [0] = -1.; index [0] = w -> Index ();
+    nv++;
+    lb = ub = 0;
+  }
 
   /// scan arglist for (aux) variables and constants
   for (int i=0; i<nargs_; i++) {
 
-    if (arglist_ [i] -> Type () == CONST)
-      rhs -= arglist_ [i] -> Value ();
+    if (arglist_ [i] -> Type () == CONST) {
+
+      CouNumber val = arglist_ [i] -> Value ();
+
+      lb -= val;
+      ub -= val;
+    }
     else {
       coeff [nv]   = 1.; 
       index [nv++] = arglist_ [i] -> Index ();
@@ -47,14 +56,16 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   }
 
   cut -> setRow (nv, index, coeff);
-  cut -> setUb (rhs);
-  cut -> setLb (rhs);
 
   delete [] index;
   delete [] coeff;
+
+  if (lb > -COUENNE_INFINITY) cut -> setLb (lb);
+  if (ub <  COUENNE_INFINITY) cut -> setUb (ub);
 
   /// added only once, it is global
   cut -> setGloballyValid ();
 
   cs.insert (cut);
+  delete cut;
 }

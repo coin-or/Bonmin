@@ -126,10 +126,14 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp convex/boundTightening.cpp \
 	convex/genColCuts.cpp convex/genRowCuts.cpp convex/obbt.cpp \
-	problem/problem.cpp problem/problemIO.cpp \
+	problem/problem.cpp problem/CouenneProblem.cpp \
+	problem/problemIO.cpp problem/extended.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
 	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	problem/fillQuadIndices.cpp util/drawCuts.cpp util/rootQ.c \
+	problem/fillQuadIndices.cpp problem/constrStandardize.cpp \
+	problem/elementBreak.cpp problem/splitAux.cpp \
+	problem/auxiliarize.cpp problem/standardize.cpp \
+	problem/depGraph/depGraph.cpp util/drawCuts.cpp util/rootQ.c \
 	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
@@ -151,9 +155,11 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	conv-exprSinCos.lo conv-exprExp.lo conv-exprLog.lo \
 	conv-exprGroup.lo trigNewton.lo CouenneCutGenerator.lo \
 	generateCuts.lo boundTightening.lo genColCuts.lo genRowCuts.lo \
-	obbt.lo problem.lo problemIO.lo constraint.lo tightenBounds.lo \
-	impliedBounds.lo readASLfg.lo fillQuadIndices.lo drawCuts.lo \
-	rootQ.lo $(am__objects_1)
+	obbt.lo problem.lo CouenneProblem.lo problemIO.lo extended.lo \
+	constraint.lo tightenBounds.lo impliedBounds.lo readASLfg.lo \
+	fillQuadIndices.lo constrStandardize.lo elementBreak.lo \
+	splitAux.lo auxiliarize.lo standardize.lo depGraph.lo \
+	drawCuts.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -415,10 +421,14 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp convex/boundTightening.cpp \
 	convex/genColCuts.cpp convex/genRowCuts.cpp convex/obbt.cpp \
-	problem/problem.cpp problem/problemIO.cpp \
+	problem/problem.cpp problem/CouenneProblem.cpp \
+	problem/problemIO.cpp problem/extended.cpp \
 	problem/constraint.cpp problem/tightenBounds.cpp \
 	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	problem/fillQuadIndices.cpp util/drawCuts.cpp util/rootQ.c \
+	problem/fillQuadIndices.cpp problem/constrStandardize.cpp \
+	problem/elementBreak.cpp problem/splitAux.cpp \
+	problem/auxiliarize.cpp problem/standardize.cpp \
+	problem/depGraph/depGraph.cpp util/drawCuts.cpp util/rootQ.c \
 	$(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
@@ -444,6 +454,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
 	$(COUENNESRCDIR)/src/convex` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/convex/sdpcuts` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/problem` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/problem/depGraph` -I`$(CYGPATH_W) \
 	$(OSISRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` -I`$(CYGPATH_W) \
 	$(CBCSRCDIR)/src` -I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
@@ -509,6 +520,7 @@ include_HEADERS = \
 	expression/exprCopy.hpp \
 	expression/exprOp.hpp \
 	expression/CouennePrecisions.h \
+	problem/depGraph/depGraph.hpp \
 	problem/CouenneProblemElem.hpp \
 	problem/CouenneProblem.hpp \
 	expression/CouenneTypes.h \
@@ -595,8 +607,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneObject.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneProblem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneThreeWayBranchObj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addEnvelope.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/auxiliarize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boundTightening.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprAbs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprDiv.Plo@am__quote@
@@ -606,6 +620,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprMul.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprPow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checkNLP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constrStandardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprAbs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprDiv.Plo@am__quote@
@@ -623,7 +638,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depGraph.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawCuts.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elementBreak.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprAbs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprAux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprCos.Plo@am__quote@
@@ -644,6 +661,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprUnary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/extended.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fillQuadIndices.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genColCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genRowCuts.Plo@am__quote@
@@ -666,6 +684,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rootQ.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplifiers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplify.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splitAux.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/standardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trigNewton.Plo@am__quote@
 
@@ -1187,12 +1207,26 @@ problem.lo: problem/problem.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o problem.lo `test -f 'problem/problem.cpp' || echo '$(srcdir)/'`problem/problem.cpp
 
+CouenneProblem.lo: problem/CouenneProblem.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneProblem.lo -MD -MP -MF "$(DEPDIR)/CouenneProblem.Tpo" -c -o CouenneProblem.lo `test -f 'problem/CouenneProblem.cpp' || echo '$(srcdir)/'`problem/CouenneProblem.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CouenneProblem.Tpo" "$(DEPDIR)/CouenneProblem.Plo"; else rm -f "$(DEPDIR)/CouenneProblem.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/CouenneProblem.cpp' object='CouenneProblem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneProblem.lo `test -f 'problem/CouenneProblem.cpp' || echo '$(srcdir)/'`problem/CouenneProblem.cpp
+
 problemIO.lo: problem/problemIO.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT problemIO.lo -MD -MP -MF "$(DEPDIR)/problemIO.Tpo" -c -o problemIO.lo `test -f 'problem/problemIO.cpp' || echo '$(srcdir)/'`problem/problemIO.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/problemIO.Tpo" "$(DEPDIR)/problemIO.Plo"; else rm -f "$(DEPDIR)/problemIO.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/problemIO.cpp' object='problemIO.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o problemIO.lo `test -f 'problem/problemIO.cpp' || echo '$(srcdir)/'`problem/problemIO.cpp
+
+extended.lo: problem/extended.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT extended.lo -MD -MP -MF "$(DEPDIR)/extended.Tpo" -c -o extended.lo `test -f 'problem/extended.cpp' || echo '$(srcdir)/'`problem/extended.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/extended.Tpo" "$(DEPDIR)/extended.Plo"; else rm -f "$(DEPDIR)/extended.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/extended.cpp' object='extended.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o extended.lo `test -f 'problem/extended.cpp' || echo '$(srcdir)/'`problem/extended.cpp
 
 constraint.lo: problem/constraint.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT constraint.lo -MD -MP -MF "$(DEPDIR)/constraint.Tpo" -c -o constraint.lo `test -f 'problem/constraint.cpp' || echo '$(srcdir)/'`problem/constraint.cpp; \
@@ -1228,6 +1262,48 @@ fillQuadIndices.lo: problem/fillQuadIndices.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/fillQuadIndices.cpp' object='fillQuadIndices.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fillQuadIndices.lo `test -f 'problem/fillQuadIndices.cpp' || echo '$(srcdir)/'`problem/fillQuadIndices.cpp
+
+constrStandardize.lo: problem/constrStandardize.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT constrStandardize.lo -MD -MP -MF "$(DEPDIR)/constrStandardize.Tpo" -c -o constrStandardize.lo `test -f 'problem/constrStandardize.cpp' || echo '$(srcdir)/'`problem/constrStandardize.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/constrStandardize.Tpo" "$(DEPDIR)/constrStandardize.Plo"; else rm -f "$(DEPDIR)/constrStandardize.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/constrStandardize.cpp' object='constrStandardize.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o constrStandardize.lo `test -f 'problem/constrStandardize.cpp' || echo '$(srcdir)/'`problem/constrStandardize.cpp
+
+elementBreak.lo: problem/elementBreak.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT elementBreak.lo -MD -MP -MF "$(DEPDIR)/elementBreak.Tpo" -c -o elementBreak.lo `test -f 'problem/elementBreak.cpp' || echo '$(srcdir)/'`problem/elementBreak.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/elementBreak.Tpo" "$(DEPDIR)/elementBreak.Plo"; else rm -f "$(DEPDIR)/elementBreak.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/elementBreak.cpp' object='elementBreak.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o elementBreak.lo `test -f 'problem/elementBreak.cpp' || echo '$(srcdir)/'`problem/elementBreak.cpp
+
+splitAux.lo: problem/splitAux.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT splitAux.lo -MD -MP -MF "$(DEPDIR)/splitAux.Tpo" -c -o splitAux.lo `test -f 'problem/splitAux.cpp' || echo '$(srcdir)/'`problem/splitAux.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/splitAux.Tpo" "$(DEPDIR)/splitAux.Plo"; else rm -f "$(DEPDIR)/splitAux.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/splitAux.cpp' object='splitAux.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o splitAux.lo `test -f 'problem/splitAux.cpp' || echo '$(srcdir)/'`problem/splitAux.cpp
+
+auxiliarize.lo: problem/auxiliarize.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT auxiliarize.lo -MD -MP -MF "$(DEPDIR)/auxiliarize.Tpo" -c -o auxiliarize.lo `test -f 'problem/auxiliarize.cpp' || echo '$(srcdir)/'`problem/auxiliarize.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/auxiliarize.Tpo" "$(DEPDIR)/auxiliarize.Plo"; else rm -f "$(DEPDIR)/auxiliarize.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/auxiliarize.cpp' object='auxiliarize.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o auxiliarize.lo `test -f 'problem/auxiliarize.cpp' || echo '$(srcdir)/'`problem/auxiliarize.cpp
+
+standardize.lo: problem/standardize.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT standardize.lo -MD -MP -MF "$(DEPDIR)/standardize.Tpo" -c -o standardize.lo `test -f 'problem/standardize.cpp' || echo '$(srcdir)/'`problem/standardize.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/standardize.Tpo" "$(DEPDIR)/standardize.Plo"; else rm -f "$(DEPDIR)/standardize.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/standardize.cpp' object='standardize.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o standardize.lo `test -f 'problem/standardize.cpp' || echo '$(srcdir)/'`problem/standardize.cpp
+
+depGraph.lo: problem/depGraph/depGraph.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT depGraph.lo -MD -MP -MF "$(DEPDIR)/depGraph.Tpo" -c -o depGraph.lo `test -f 'problem/depGraph/depGraph.cpp' || echo '$(srcdir)/'`problem/depGraph/depGraph.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/depGraph.Tpo" "$(DEPDIR)/depGraph.Plo"; else rm -f "$(DEPDIR)/depGraph.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/depGraph/depGraph.cpp' object='depGraph.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o depGraph.lo `test -f 'problem/depGraph/depGraph.cpp' || echo '$(srcdir)/'`problem/depGraph/depGraph.cpp
 
 drawCuts.lo: util/drawCuts.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT drawCuts.lo -MD -MP -MF "$(DEPDIR)/drawCuts.Tpo" -c -o drawCuts.lo `test -f 'util/drawCuts.cpp' || echo '$(srcdir)/'`util/drawCuts.cpp; \
@@ -1326,7 +1402,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../inc $(distdir)/branch $(distdir)/convex $(distdir)/expression $(distdir)/expression/operators $(distdir)/problem $(distdir)/util
+	$(mkdir_p) $(distdir)/../inc $(distdir)/branch $(distdir)/convex $(distdir)/expression $(distdir)/expression/operators $(distdir)/problem $(distdir)/problem/depGraph $(distdir)/util
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

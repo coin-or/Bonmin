@@ -22,9 +22,15 @@ class exprQuad: public exprGroup {
   /// j in N} a_{ij} x_i x_j, qindex0_ and qindex1_ contain
   /// respectively entries i and j for which a_{ij} is nonzero
 
-  int       *qindexI_;
-  int       *qindexJ_;
-  CouNumber *qcoeff_;
+                        // in a_ij x_i x_j:
+  int       *qindexI_;  // the term i
+  int       *qindexJ_;  // the term j, (must be qindexJ [k] <= qindexI [k])
+  CouNumber *qcoeff_;   // the term a_ij
+  int        nqterms_;  // number of bilinear terms
+
+
+  CouNumber *dCoeff_;   // diagonal coefficients of additional term for convexfication
+  int       *dIndex_;   // and indices (this is a sparse vector)
 
  public:
 
@@ -56,6 +62,7 @@ class exprQuad: public exprGroup {
   CouNumber *getQCoeffsI () {return qcoeff_;}
   int       *getQIndexI  () {return qindexI_;}
   int       *getQIndexJ  () {return qindexJ_;}
+  int        getnQTerms  () {return nqterms_;}
 
   /// cloning method
   virtual expression *clone () const
@@ -75,23 +82,25 @@ class exprQuad: public exprGroup {
     {exprOp::simplify (); return NULL;}
 
   /// get a measure of "how linear" the expression is:
-  virtual int Linearity ();/* {
-    return ((qindexI_)                   ? QUADRATIC :
-	    ((index_)                    ? LINEAR    :
-	     ((fabs (c0_) > COUENNE_EPS) ? CONSTANT  : ZERO)));
-	     }*/
+  virtual int Linearity () {
+    int 
+      lin  = exprSum::Linearity () >= NONLINEAR,
+      lin2 = (qindexI_)                 ? QUADRATIC :
+             (index_)                   ? LINEAR    :
+	     (fabs (c0_) > COUENNE_EPS) ? CONSTANT  : ZERO;
+
+    return ((lin > lin2) ? lin : lin2);
+  }
 
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&) {}
 
-  /// reduce expression in standard form, creating additional aux
-  /// variables (and constraints)
-  //  virtual exprAux *standardize (CouenneProblem *p);
-
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg, 
-			     t_chg_bounds * = NULL) {}
+			     t_chg_bounds * = NULL, int = -1, 
+			     CouNumber = -COUENNE_INFINITY, 
+			     CouNumber =  COUENNE_INFINITY) {}
 
   /// only compare with people of the same kind
   virtual int compare (exprQuad &);
@@ -117,7 +126,7 @@ inline CouNumber exprQuad::operator () () {
     *coe  = qcoeff_, 
     *vars = expression::Variables ();
 
-  for (register int *qi = qindexI_, *qj = qindexJ_; *qi >= 0; )
+  for (register int *qi = qindexI_, *qj = qindexJ_, i = nqterms_; i--; )
     ret += *coe++ * vars [*qi++] * vars [*qj++];
 
   return (currValue_ = ret);

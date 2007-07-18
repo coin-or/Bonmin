@@ -57,7 +57,7 @@ protected:
   /// The variable this branching object refers to. If the
   /// corresponding CouenneObject was created on w=f(x,y), it is
   /// either x or y, chosen previously with a call to getFixVar()
-  //  expression *reference_;
+  /// expression *reference_;
   int index_;
 
   /// is the variable integer?

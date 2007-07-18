@@ -26,7 +26,6 @@
 
 
 // check if an expression is a null pointer or equals zero
-
 inline bool is_expr_zero (expr* e)
   {return ((e==NULL) || (((((long int) e->op) == OPNUM) && 
 			  (fabs (((expr_n *)e) -> v)  < COUENNE_EPS) 
@@ -39,7 +38,11 @@ inline bool is_expr_zero (expr* e)
 
 int CouenneProblem::readnl (const ASL *asl) {
 
+  // # discrete variables
   int n_intvar = niv + nbv + nlvbi + nlvci + nlvoi;
+
+  // number of defined variables (aka common expressions)
+  ndefined_ = como + comc + comb + como1 + comc1; 
 
   // create continuous variables
   for (int i = n_var-n_intvar; i--;)
@@ -49,12 +52,56 @@ int CouenneProblem::readnl (const ASL *asl) {
   for (int i = n_intvar; i--;)
     addVariable (true);
 
-  //  printf ("readln: added %d (%d + %d) variables\n", n_var, n_var - n_intvar, n_intvar);
+  nOrig_ = n_var;
+
+  // create expression set for binary search
+  auxSet_ = new std::set <exprAux *, compExpr>;
 
   // create room for problem's variables and bounds
-  x_  = (CouNumber *) malloc (n_var * sizeof (CouNumber));
-  lb_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
-  ub_ = (CouNumber *) malloc (n_var * sizeof (CouNumber));
+  x_  = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber));
+  lb_ = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber));
+  ub_ = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber));
+
+  for (int i = n_var + ndefined_; i--;) {
+    x_  [i] =  0;
+    lb_ [i] = -COUENNE_INFINITY;
+    ub_ [i] =  COUENNE_INFINITY;
+  }
+
+  // common expressions (or defined variables) ///////////////////////////////////////
+
+  /*printf ("c_vars_ = %d\n", ((const ASL_fg *) asl) -> i.c_vars_ );
+  printf ("comb_ = %d\n",   ((const ASL_fg *) asl) -> i.comb_  );
+  printf ("combc_ = %d\n",  ((const ASL_fg *) asl) -> i.combc_ );
+  printf ("comc1_ = %d\n",  ((const ASL_fg *) asl) -> i.comc1_ );
+  printf ("comc_ = %d\n",   ((const ASL_fg *) asl) -> i.comc_  );
+  printf ("como1_ = %d\n",  ((const ASL_fg *) asl) -> i.como1_ );
+  printf ("como_ = %d\n",   ((const ASL_fg *) asl) -> i.como_  );*/
+
+  for (int i = 0; i < como + comc + comb; i++) {
+    expression *common = nl2e (((const ASL_fg *) asl) -> I.cexps_  [i] . e);
+    //commonexprs_.push_back (common);
+    //printf ("c %d/%d: ", i, como + comc + comb); 
+    //common -> print (); printf ("\n");    
+    exprAux *aux = addAuxiliary (common);
+    /*if (aux) {
+      printf ("created ");
+      aux -> print (); printf (" := ");
+      aux -> Image () -> print (); printf ("\n");
+      }*/
+  }
+
+  for (int i = 0; i < como1 + comc1; i++) {
+    expression *common = nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e);
+    //commonexprs_.push_back (common);
+    //printf ("c1 %d/%d: ", i, como1 + comc1); common -> print (); printf ("\n");    
+    exprAux *aux = addAuxiliary (common);
+    /*if (aux) {
+      printf ("created ");
+      aux -> print (); printf (" := ");
+      aux -> Image () -> print (); printf ("\n");
+      }*/
+  }
 
 
   // objective functions /////////////////////////////////////////////////////////////
@@ -227,11 +274,10 @@ int CouenneProblem::readnl (const ASL *asl) {
     }
 
     // set constraint sign
-    if (lb > negInfinity + 1) 
-      if (ub < Infinity - 1) 
-	sign = COUENNE_RNG;
-      else sign = COUENNE_GE;
-    else sign = COUENNE_LE;
+    if (lb > negInfinity)
+      if (ub < Infinity) sign = COUENNE_RNG;
+      else               sign = COUENNE_GE;
+    else                 sign = COUENNE_LE;
 
     // this is an equality constraint  
     if (fabs (lb - ub) < COUENNE_EPS)

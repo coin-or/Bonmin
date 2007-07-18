@@ -1,3 +1,4 @@
+- do not apply obbt to auxs of the form w = cx 
 - change chg structure within createCuts when add colCut
 - apply bound tightening AFTER applying branching rule but BEFORE re-solving LP
 - decompose quad form if block diagonal ONLY when looking for $\alpha_i$ (Jon), then use joint convexification
@@ -11,7 +12,6 @@
 - variable lhs/rhs of bounds containing expression defining aux vars
 - cut currValue_ from expressions
 - documentation
-- improve convexification of x/y
 - add integrality to bound check
 - decomposition approach
 - unify products and divisions

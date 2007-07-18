@@ -52,7 +52,9 @@ class exprSin: public exprUnary {
   /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
-		     t_chg_bounds * = NULL);
+		     t_chg_bounds * = NULL, int = -1, 
+		     CouNumber = -COUENNE_INFINITY, 
+		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRSIN;}

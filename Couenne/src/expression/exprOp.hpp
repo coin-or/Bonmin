@@ -70,8 +70,6 @@ class exprOp: public expression {
 
   /// I/O
   virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const;
-  //  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
-  //  virtual void print (std::ostream &, const std::string &, enum pos) const;
 
   /// print position (PRE, INSIDE, POST)
   virtual enum pos printPos () const
@@ -85,7 +83,7 @@ class exprOp: public expression {
   virtual inline CouNumber operator () ();
 
   /// dependence on variable set
-  virtual bool dependsOn (int * = NULL, int = 1);
+  virtual int dependsOn (int * = NULL, int = 1);
 
   /// simplification
   virtual expression *simplify ();
@@ -124,6 +122,16 @@ class exprOp: public expression {
 
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *);
+
+  /// fill in dependence structure
+  /// update dependence set with index of this variable
+  virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
+    for (int i=nargs_; i--;)
+      arglist_ [i] -> fillDepSet (dep, g);
+  }
+
+  /// replace variable with other
+  virtual void replace (exprVar *, exprVar *);
 };
 
 

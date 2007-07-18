@@ -38,6 +38,14 @@ public:
     brPts_     (NULL),
     whichWay_  (BRANCH_NONE) {}
 
+  /// Constructor
+  CouenneObject (exprVar *ref):
+    reference_ (NULL),
+    brVarInd_  (-1), 
+    brPts_     (NULL),
+    whichWay_  (BRANCH_NONE) 
+  {printf ("invalid CouenneObject: original variable %d\n", ref -> Index ()); exit (-1);}
+
   /// Destructor
   ~CouenneObject () 
   {if (brPts_) free (brPts_);}

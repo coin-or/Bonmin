@@ -26,7 +26,8 @@ exprAux *exprDiv::standardize (CouenneProblem *p) {
 
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) {
+			    t_chg_bounds *chg, int wind, 
+			    CouNumber lbw, CouNumber ubw) {
 
   // TODO: Use method on Tawarmalani-Sahinidis
 

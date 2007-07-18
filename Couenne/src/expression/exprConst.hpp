@@ -1,5 +1,5 @@
 /*
- * Name:    exprConst.h
+ * Name:    exprConst.hpp
  * Author:  Pietro Belotti
  * Purpose: definition of the class exprConst
  *
@@ -55,8 +55,8 @@ class exprConst: public expression {
     {return new exprConst (0);}
 
   /// dependence on variable set
-  inline bool dependsOn (int *, int) 
-    {return false;}
+  inline int dependsOn (int *, int) 
+    {return 0;}
 
   /// simplify
   inline expression *simplify () 
@@ -79,7 +79,9 @@ class exprConst: public expression {
   /// generate convexification cut for constraint w = this
   void generateCuts (exprAux *, const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *, 
-		     t_chg_bounds * = NULL);
+		     t_chg_bounds * = NULL, int = -1, 
+		     CouNumber = -COUENNE_INFINITY, 
+		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRCONST;}

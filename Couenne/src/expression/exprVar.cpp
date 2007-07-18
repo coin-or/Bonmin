@@ -16,25 +16,25 @@
 #include <exprBound.hpp>
 
 #include <CouenneProblem.hpp>
+#include <depGraph.hpp>
 
 
 // is the variable one of those in varlist?
 
-bool exprVar::dependsOn (int *varlist = NULL, int n = 1) {
+int exprVar::dependsOn (register int *varlist = NULL, register int n = 1) {
 
   if (!varlist) 
-    return true;
+    return 1;
 
   while (n--) 
     if (varIndex_ == *varlist++) 
-      return true;
+      return 1;
 
-  return false;
+  return 0;
 }
 
 
 // Get lower and upper bound of a variable expression (if any)
-
 void exprVar::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprLowerBound (varIndex_); 
@@ -43,11 +43,10 @@ void exprVar::getBounds (expression *&lb, expression *&ub) {
 
 
 // generate convexification cut for constraint w = this
-
 void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
-			    t_chg_bounds *chg) {
-
+			    t_chg_bounds *chg, int,
+			    CouNumber, CouNumber) {
   if (cg -> isFirst ())
     cg -> createCut (cs, 0., 0, w -> Index (), 1., varIndex_);
 }
@@ -62,3 +61,13 @@ bool exprVar::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   if (updateBound (+1, u + varIndex_, u [wind])) {res = true; chg [varIndex_].upper = CHANGED;}
   return res;
 }
+
+
+/// update dependence set with index of this variable
+void exprVar::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) 
+{dep -> insert (g -> lookup (varIndex_));}
+
+
+/// Bound get
+expression *exprVar::Lb () {return new exprLowerBound (varIndex_);}
+expression *exprVar::Ub () {return new exprUpperBound (varIndex_);}

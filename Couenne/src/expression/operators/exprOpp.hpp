@@ -9,26 +9,27 @@
 #ifndef COUENNE_EXPROPP_H
 #define COUENNE_EXPROPP_H
 
+#include <CouennePrecisions.h>
 #include <exprUnary.hpp>
 
 
-// operator opp: returns the opposite of a number
+/// operator opp: returns the opposite of a number
 
 inline CouNumber opp (register CouNumber arg) 
 {return - arg;}
 
 
-// class opposite 
+/// class opposite 
 
 class exprOpp: public exprUnary {
 
  public:
 
-  // Constructors, destructor
-  exprOpp  (expression *al): 
+  /// Constructors, destructor
+  exprOpp (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprOpp (argument_ -> clone ());}
 
@@ -39,23 +40,25 @@ class exprOpp: public exprUnary {
   std::string printOp () const
     {return "-";}
 
-  // I/O
-  //  void print (std::ostream&) const;
-
-  // differentiation
+  /// differentiation
   expression *differentiate (int index); 
 
-  // get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// simplification
+  virtual expression *simplify ();
+
+  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
     {return argument_ -> Linearity ();}
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // generate equality between *this and *w
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
-		     OsiCuts &cs, const CouenneCutGenerator *cg, 
-		     t_chg_bounds * = NULL);
+  /// special version for linear constraints
+  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+			     OsiCuts &, const CouenneCutGenerator *,
+			     t_chg_bounds * = NULL, int = -1, 
+			     CouNumber = -COUENNE_INFINITY, 
+			     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPROPP;}

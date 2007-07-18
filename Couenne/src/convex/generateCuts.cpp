@@ -25,18 +25,22 @@
 // maximum number of obbt iterations
 #define MAX_OBBT_ITER 1
 
-#define LARGE_TOL (LARGE_BOUND/1e6)
+#define LARGE_TOL (LARGE_BOUND / 1e6)
 
 // set and lift bound for auxiliary variable associated with objective
 // function
 void fictitiousBound (OsiCuts &cs,
 		      CouenneProblem *p, 
-		      bool action) { // true before convexifying, false afterwards
+		      bool action) {     // true before convexifying, false afterwards
 
   // set trivial dual bound to objective function, if there is none
 
   int ind_obj = p -> Obj (0) -> Body () -> Index ();
-  if (ind_obj < 0) return;
+  if (ind_obj < 0) 
+    return;
+
+  // we have a single variable objective function
+
   int sense = (p -> Obj (0) -> Sense () == MINIMIZE) ? -1 : 1;
 
   if (action) {
@@ -51,6 +55,7 @@ void fictitiousBound (OsiCuts &cs,
 
 
 // translate changed bound sparse array into a dense one
+
 void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged) {
 
   // convert sparse chg_bds in something handier
@@ -83,7 +88,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     babInfo -> setFeasibleNode ();    
 
   double now   = CoinCpuTime ();
-  int    ncols = problem_ -> nVars () + problem_ -> nAuxs ();
+  //int    ncols = problem_ -> nVars () + problem_ -> nAuxs ();
+  int    ncols = problem_ -> nVars ();
 
   // This vector contains variables whose bounds have changed due to
   // branching, reduced cost fixing, or bound tightening below. To be
@@ -100,10 +106,23 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     //////////////////////// FIRST CONVEXIFICATION //////////////////////////////////////
 
-    // initialize auxiliary variables and bounds according to originals
+    // initialize auxiliary variables and bounds according to originals from NLP
     problem_ -> initAuxs (const_cast <CouNumber *> (nlp_ -> getColSolution ()), 
 			  const_cast <CouNumber *> (nlp_ -> getColLower    ()),
 			  const_cast <CouNumber *> (nlp_ -> getColUpper    ()));
+
+    /*printf ("=============================\n");
+    for (int i = 0; i < si.getNumCols (); i++)
+      printf ("%4d: %10g [%10g,%10g]\n", i,
+	      si.getColSolution () [i],
+	      si.getColLower    () [i],
+	      si.getColUpper    () [i]);
+    for (int i = problem_ -> nOrig (); i < problem_ -> nVars (); i++)
+      printf ("%4d- %10g [%10g,%10g]\n", i,
+	      problem_ -> X  (i),
+	      problem_ -> Lb (i),
+	      problem_ -> Ub (i));
+	      printf ("=============================\n");*/
 
     // OsiSolverInterface is empty yet, no information can be obtained
     // on variables or bounds -- and none is needed since our
@@ -119,14 +138,50 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     for (int i=0; i<nnlc; i++) {
 
+      // for each constraint
       CouenneConstraint *con = problem_ -> NLCon (i);
 
-      // if there exists violation, add constraint
+      //printf ("RLT, constraint "); fflush (stdout);
+      //con -> print ();
 
+      // linearize if not a definition of an auxiliary variable
+      //      if (!(con -> isAuxDef ())) { 
+
+	// (which has an aux as its body)
       int index = con -> Body () -> Index ();
 
-      if (index >= 0) {
+      if ((index >= 0) && (con -> Body () -> Type () == AUX)) {
 
+	// get the auxiliary that is at the lhs
+
+#if 0
+	exprAux *conaux = dynamic_cast <exprAux *> (problem_ -> Var (index));
+
+	/*if (!conaux) {
+	  printf ("conaux NULL! ");
+	  if (con -> Body ()) printf ("but body is not!");
+	  printf ("\n");
+	  }*/
+
+
+	if (conaux &&
+	    (conaux -> Image ()) && 
+	    (conaux -> Image () -> Linearity () <= LINEAR)) {
+
+	  // the auxiliary w of constraint w <= b is associated with a
+	  // linear expression w = ax: add constraint ax <= b
+	  conaux -> Image () -> generateCuts (conaux, si, cs, this, chg_bds, 
+					      conaux -> Index (), 
+					      (*(con -> Lb ())) (), 
+					      (*(con -> Ub ())) ());
+
+	  // take it from the list of the variables to be linearized
+	  conaux -> decreaseMult ();
+	}
+#endif
+	// also, add constraint w <= b
+
+	// if there exists violation, add constraint
 	CouNumber l = con -> Lb () -> Value (),	
 	          u = con -> Ub () -> Value ();
 
@@ -134,7 +189,19 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
 	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
       }
+	//      }
     }
+
+#if 0
+    printf (":::::::::::::::::::::constraint cuts\n");
+
+    for (int i=0; i<cs.sizeRowCuts (); i++)
+      cs.rowCutPtr (i) -> print ();
+
+    for (int i=0; i<cs.sizeColCuts (); i++)
+      cs.colCutPtr (i) -> print ();
+#endif
+
   } else { // equivalent to info.depth > 0 || info.pass > 0
 
     //////////////////////// GET CHANGED BOUNDS DUE TO BRANCHING ////////////////////////
@@ -177,6 +244,19 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
+  /*printf ("-----------------------------\n");
+  for (int i = 0; i < si.getNumCols (); i++)
+    printf ("%4d: %10g [%10g,%10g]\n", i,
+	    si.getColSolution () [i],
+	    si.getColLower    () [i],
+	    si.getColUpper    () [i]);
+  for (int i = problem_ -> nOrig (); i < problem_ -> nVars (); i++)
+    printf ("%4d- %10g [%10g,%10g]\n", i,
+	    problem_ -> X  (i),
+	    problem_ -> Lb (i),
+	    problem_ -> Ub (i));
+	    printf ("-----------------------------\n");*/
+
   // FAKE TIGHTENING AROUND OPTIMUM ///////////////////////////////////////////////////
   /*
 #define BT_EPS 0.1
@@ -190,7 +270,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   */
 
-  /*for (int i=0; i < problem_ -> nVars () + problem_ -> nAuxs (); i++)
+
+  /*for (int i=0; i < problem_ -> nVars (); i++)
     //    if ((info.pass==0) && (problem_ -> bestSol ()))
     if (problem_ -> bestSol ())
       printf ("%4d: %12g %12g %12g    %c\n", i,
@@ -199,24 +280,23 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	      problem_ -> bestSol () [i],
 	      ((problem_ -> bestSol () [i] <=   COUENNE_EPS + problem_ -> Ub (i)) && 
 	       (problem_ -> bestSol () [i] >= - COUENNE_EPS + problem_ -> Lb (i))) ? ' ' : '*');
-    else 
-      printf ("%4d: %12g %12g\n", i,
-	      problem_ -> Lb (i), 
-	      problem_ -> Ub (i));*/
+    else printf ("%4d: %12g %12g\n", i,
+		 problem_ -> Lb (i), 
+		 problem_ -> Ub (i));*/
+
 
   fictitiousBound (cs, problem_, false);
 
   int *changed = NULL, nchanged;
 
-  /////////////////////////////////////////////////////////////////////////////////////
-
-
-
   //////////////////////// Bound tightening ///////////////////////////////////////////
 
-  if ((info.pass <= 0)  // do bound tightening only at first pass of
-			// cutting plane (within BB tree) or if first
-			// call (creation of RLT)
+
+  // do bound tightening only at first pass of cutting plane in a node
+  // of BB tree (info.pass == 0) or if first call (creation of RLT,
+  // info.pass == -1)
+
+  if ((info.pass <= 0)  
       && (! boundTightening (&si, cs, chg_bds, babInfo))) {
 
     //printf ("#### infeasible node at first BT\n");

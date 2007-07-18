@@ -1,5 +1,5 @@
 /*
- * Name:    exprCopy.h
+ * Name:    exprCopy.hpp
  * Author:  Pietro Belotti
  * Purpose: definition of the class exprCopy
  *
@@ -78,7 +78,7 @@ class exprCopy: public expression {
     {return copy_ -> differentiate (index);}
 
   /// dependence on variable set
-  inline bool dependsOn (int *varlist, int n) 
+  inline int dependsOn (int *varlist, int n) 
     {return copy_ -> dependsOn (varlist, n);}
 
   /// simplify expression (useful for derivatives)
@@ -100,8 +100,11 @@ class exprCopy: public expression {
   /// generate convexification cut for constraint w = this
   inline void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
-			    t_chg_bounds *chg = NULL) 
-    {copy_ -> generateCuts (w, si, cs, cg, chg);}
+			    t_chg_bounds *chg = NULL, int wind= -1, 
+			    CouNumber lb = -COUENNE_INFINITY, 
+			    CouNumber ub =  COUENNE_INFINITY)
+
+    {copy_ -> generateCuts (w, si, cs, cg, chg, wind, lb, ub);}
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
@@ -123,6 +126,13 @@ class exprCopy: public expression {
   /// implied bound processing
   bool impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg)
     {return copy_ -> impliedBound (wind, l, u, chg);}
+
+  /// replace occurrence of a variable with another variable
+  virtual void replace (exprVar *, exprVar *);
+
+  /// fill in dependence structure
+  virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g)
+    {copy_ -> fillDepSet (dep, g);}
 };
 
 #endif

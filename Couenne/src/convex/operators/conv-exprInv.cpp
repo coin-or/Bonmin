@@ -51,7 +51,8 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 
 void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) {
+			    t_chg_bounds *chg, int wind, 
+			    CouNumber lbw, CouNumber ubw) {
 
   // get bounds of numerator and denominator
 

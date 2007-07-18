@@ -76,14 +76,11 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
     else                             value_ = 0;
   else value_ = x;
 
-  if (0) {
-    printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 
-	    index_,
-	    value_, 
-	    expression::Variable (index_),
-	    expression::Lbound   (index_),
-	    expression::Ubound   (index_));
-  }
+  /*printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 
+	  index_, value_, 
+	  expression::Variable (index_),
+	  expression::Lbound   (index_),
+	  expression::Ubound   (index_));*/
 }
 
 
@@ -117,16 +114,15 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   // TODO: apply bound tightening to evaluate change in dual bound
 
 
-#if 0
   //    printf (" --> [%.6e,%.6e]\n", l, u);
-  printf ("### Branch: x%d %c= %g\n", 
-	  index_, way ? '>' : '<', value_);
+  //printf ("### Branch: x%d %c= %g\n", 
+  //	  index_, way ? '>' : '<', value_);
 	   
     /*for (int i=0; i < solver -> getNumCols(); i++)
       printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
       solver -> getColUpper () [i]);
       }*/
-#endif
+
 
   branchIndex_++;
   return 0.; // estimated change in objective function

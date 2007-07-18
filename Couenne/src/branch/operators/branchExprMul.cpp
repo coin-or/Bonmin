@@ -24,11 +24,12 @@ CouNumber exprMul::selectBranch (expression *w,
 				 int &ind, 
 				 double * &brpts, 
 				 int &way) {
+
   int xi = arglist_ [0] -> Index (),
       yi = arglist_ [1] -> Index ();
 
   if ((xi < 0) || (yi < 0)) {
-    printf ("arguments of exprMul have negative index\n");
+    printf ("Couenne, exprMul::selectBranch: arguments of exprMul have negative index\n");
     exit (-1);
   }
 

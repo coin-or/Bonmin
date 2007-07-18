@@ -20,7 +20,8 @@
 
 void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs,  const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) {
+			    t_chg_bounds *chg, int wind, 
+			    CouNumber lbw, CouNumber ubw) {
   expression *le, *ue;
 
   argument_ -> getBounds (le, ue);

@@ -40,7 +40,8 @@ int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
 
 void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) {
+			    t_chg_bounds *chg, int wind, 
+			    CouNumber lbw, CouNumber ubw) {
 
   int wi = w -> Index ();
 
@@ -64,7 +65,8 @@ void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
 void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
-			    t_chg_bounds *chg) {
+			    t_chg_bounds *chg, int wind, 
+			    CouNumber lbw, CouNumber ubw) {
 
   int wi = w -> Index ();
 
