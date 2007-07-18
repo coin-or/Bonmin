@@ -21,8 +21,13 @@ exprQuad::exprQuad  (CouNumber c0,      // constant term
 		     CouNumber *qcoeff, // coefficient vector
 		     expression **al,   // vector of nonlinear expressions to be added 
 		     int n):            // number of *nonlinear* expressions in al
+
   exprGroup (c0, index, coeff, al, n),
-  nqterms_  (0) {
+  nqterms_  (0),
+  dCoeffLo_ (NULL),
+  dCoeffUp_ (NULL),
+  dIndex_   (NULL),
+  nDiag_    (0)     {
 
   for (register int *qi = qindexI; *qi++ >= 0; nqterms_++);
 
@@ -30,7 +35,7 @@ exprQuad::exprQuad  (CouNumber c0,      // constant term
   qindexJ_ = new int       [nqterms_];
   qcoeff_  = new CouNumber [nqterms_];
 
-  for (register int i=nqterms_; i--;) {
+  for (register int i = nqterms_; i--;) {
     qindexI_ [i] = qindexI [i];
     qindexJ_ [i] = qindexJ [i];
     qcoeff_  [i] = qcoeff  [i];

@@ -1,6 +1,8 @@
 /*
  * Name:    conv-exprQuad.cpp
- * Author:  Pietro Belotti
+ * Authors: Pierre Bonami
+ *          Stefan Vigerske
+ *          Pietro Belotti
  * Purpose: implementation of convexification methods for exprQuad
  *
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
@@ -19,10 +21,12 @@ void exprQuad::getBounds (expression *&lb, expression *&ub) {
 
   expression *lbgrp, *ubgrp;
 
-  // compute lower/upper bound of nonlinear part
+  /// compute lower/upper bound of nonlinear part
   exprGroup::getBounds (lbgrp, ubgrp);
 
   ///
+
+
 }
 
 

@@ -128,6 +128,7 @@ endif
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression/operators` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression/operators/bounds` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/util` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
@@ -183,21 +184,21 @@ include_HEADERS = \
 	expression/operators/exprInv.hpp \
 	expression/operators/exprMul.hpp \
 	expression/operators/exprOpp.hpp \
-	expression/operators/exprBMul.hpp \
 	expression/operators/exprLog.hpp \
 	expression/operators/exprDiv.hpp \
 	expression/operators/exprMin.hpp \
-	expression/operators/exprBDiv.hpp \
 	expression/operators/exprSum.hpp \
 	expression/operators/exprMax.hpp \
 	expression/operators/exprPow.hpp \
 	expression/operators/exprSin.hpp \
 	expression/operators/exprCos.hpp \
-	expression/operators/exprBSin.hpp \
-	expression/operators/exprBCos.hpp \
 	expression/operators/exprSub.hpp \
 	expression/operators/exprGroup.hpp \
 	expression/operators/exprQuad.hpp \
+	expression/operators/bounds/exprBMul.hpp \
+	expression/operators/bounds/exprBDiv.hpp \
+	expression/operators/bounds/exprBSin.hpp \
+	expression/operators/bounds/exprBCos.hpp \
 	expression/exprConst.hpp \
 	expression/exprIVar.hpp \
 	expression/exprVar.hpp \

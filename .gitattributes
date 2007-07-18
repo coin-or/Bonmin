@@ -78,12 +78,12 @@ Couenne/src/expression/exprVar.cpp -text
 Couenne/src/expression/exprVar.hpp -text
 Couenne/src/expression/expression.cpp -text
 Couenne/src/expression/expression.hpp -text
+Couenne/src/expression/operators/bounds/exprBCos.hpp -text
+Couenne/src/expression/operators/bounds/exprBDiv.hpp -text
+Couenne/src/expression/operators/bounds/exprBMul.hpp -text
+Couenne/src/expression/operators/bounds/exprBSin.hpp -text
 Couenne/src/expression/operators/exprAbs.cpp -text
 Couenne/src/expression/operators/exprAbs.hpp -text
-Couenne/src/expression/operators/exprBCos.hpp -text
-Couenne/src/expression/operators/exprBDiv.hpp -text
-Couenne/src/expression/operators/exprBMul.hpp -text
-Couenne/src/expression/operators/exprBSin.hpp -text
 Couenne/src/expression/operators/exprCos.cpp -text
 Couenne/src/expression/operators/exprCos.hpp -text
 Couenne/src/expression/operators/exprDiv.cpp -text

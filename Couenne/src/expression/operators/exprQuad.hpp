@@ -32,6 +32,7 @@ class exprQuad: public exprGroup {
   CouNumber *dCoeffLo_; /// diagonal coefficients of additional term for under convexfication
   CouNumber *dCoeffUp_; ///                                              over
   int       *dIndex_;   /// and indices (this is a sparse vector)
+  int        nDiag_;    /// number of elements in the above sparse vectors
 
  public:
 
