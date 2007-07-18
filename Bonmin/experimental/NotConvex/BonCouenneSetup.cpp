@@ -102,26 +102,34 @@ namespace Bonmin{
     continuousSolver_->findIntegersAndSOS(false);
     int numberIntegerObjects = continuousSolver_->numberObjects() > 0;
     {
-      int numAuxs = couenneProb->nAuxs();
-      OsiObject ** objects = new OsiObject*[numAuxs];
-      int nobj = 0;
+      int 
+	nOrig = couenneProb -> nOrig (),
+	nVars = couenneProb -> nVars (),
+	nAuxs = nVars - nOrig,
+	nobj  = 0;
+
+      OsiObject ** objects = new OsiObject* [nAuxs];
       
-      for (int i = 0 ; i < numAuxs; i++) // for each aux variable
-        
+      for (int i = 0; i < nVars; i++) { // for each aux variable
+
+	exprVar *var = couenneProb -> Var (i);
+
         // if this variable is associated with a nonlinear function
-        //	if (couenneProb -> Aux (i) -> Image () -> Linearity () > LINEAR) 
-      {
-        /*
-         printf ("creating CouenneObject for ");
-         
-         couenneProb -> Aux (i) ->             print (std::cout); printf (" := ");
-         couenneProb -> Aux (i) -> Image () -> print (std::cout); printf ("\n");
-         */
-        // then we may have to branch on it
-        objects [nobj] = new CouenneObject (couenneProb -> Aux (i));
-        objects [nobj++] -> setPriority (1);
+	if ((var -> Type () == AUX) && (var -> Image () -> Linearity () > LINEAR)) {
+
+	  exprAux *aux = dynamic_cast <exprAux *> (var);
+
+	  /*printf ("creating CouenneObject for ");
+
+	  aux ->             print (std::cout); printf (" := ");
+	  aux -> Image () -> print (std::cout); printf ("\n");*/
+
+	  // then we may have to branch on it
+	  objects [nobj] = new CouenneObject (aux);
+	  objects [nobj++] -> setPriority (1);
+	}
       }
-      
+
       continuousSolver_ -> addObjects (nobj, objects);
       for(int i = 0 ; i < nobj ; i++){
        	delete objects[i];

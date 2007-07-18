@@ -79,7 +79,7 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (1) {// print statistics in LaTeX format
+    if (0) {// print statistics in LaTeX format
 
       ////////////////////////////////
       int nr=-1, nt=-1;
@@ -109,24 +109,24 @@ int main (int argc, char *argv[])
 
 	// time limit reached, print upper and (in brackets) lower
 
-	if (fabs (bb.bestBound()) < 1e12) 
+	if (fabs (bb.bestObj()) < 9e12) 
 	  printf    (" %12.3f &", bb.bestObj ());
-	else printf (" %8s     &", "inf_dual");
+	else printf (" %8s     &", "inf_prim");
 
-	if (fabs (bb.bestObj()) < 1e40) 
+	if (fabs (bb.bestBound()) < 9e12) 
 	  printf    (" (%12.3f) &", bb.bestBound ());
-	else printf (" %8s       &", "inf_prim");
+	else printf (" %8s       &", "inf_dual");
       }
       else {
 	// time limit not reached, print upper and time
 
-	if (fabs (bb.bestBound()) < 1e12) 
+	if (fabs (bb.bestObj()) < 9e12) 
 	  printf    (" %12.3f &", bb.bestObj ());
-	else printf (" %8s     &", "inf_dual");
+	else printf (" %8s     &", "inf_prim");
 	  
-	if (fabs (bb.bestObj()) < 1e40) 
+	if (fabs (bb.bestBound()) < 9e12) 
 	  printf    (" %12.3f   &", CoinCpuTime () - time1);
-	else printf (" %8s       &", "inf_prim");
+	else printf (" %8s       &", "inf_dual");
       }
 
       printf ("%7d & %7d \\\\\n ",

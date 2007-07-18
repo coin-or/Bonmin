@@ -153,21 +153,20 @@ namespace Bonmin
     int numberIntegerObjects = si->numberObjects() > 0;
     {
       const CouenneProblem * couenneProb = ci->couenneProb();
-      int numAuxs = couenneProb->nAuxs();
+      int numAuxs = couenneProb -> nAuxs();
       OsiObject ** objects = new OsiObject*[numAuxs];
       int nobj = 0;
 
       for (int i = 0 ; i < numAuxs; i++) // for each aux variable
 
 	// if this variable is associated with a nonlinear function
-	//	if (couenneProb -> Aux (i) -> Image () -> Linearity () > LINEAR) 
-	  {
-	    /*
+	if (couenneProb -> Aux (i) -> Image () -> Linearity () > LINEAR) {
+
 	    printf ("creating CouenneObject for ");
 
 	    couenneProb -> Aux (i) ->             print (std::cout); printf (" := ");
 	    couenneProb -> Aux (i) -> Image () -> print (std::cout); printf ("\n");
-	    */
+
 	    // then we may have to branch on it
 	    objects [nobj] = new CouenneObject (couenneProb -> Aux (i));
 	    objects [nobj++] -> setPriority (1);

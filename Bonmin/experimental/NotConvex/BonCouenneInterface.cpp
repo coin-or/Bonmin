@@ -62,8 +62,8 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
   if (solveNlp)
     initialSolve ();
 
-   int numcols     = getNumCols ();             // number of original variables
-   int numcolsconv = couenneCg.getnvars (); // number of original+auxiliary variables
+   int numcols     = getNumCols ();         // # original               variables
+   int numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
 
    const double *lb = getColLower ();
    const double *ub = getColUpper ();
@@ -84,7 +84,7 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
    CouNumber *uu = couenneCg.Problem () -> Ub ();
 
    // overwrite original bounds, could be improved within generateCuts
-   for (register int i=numcolsconv; i--;) {
+   for (register int i = numcolsconv; i--;) {
      colLower [i] = (ll [i] > - COUENNE_INFINITY) ? ll [i] : -COIN_DBL_MAX;
      colUpper [i] = (uu [i] <   COUENNE_INFINITY) ? uu [i] :  COIN_DBL_MAX;
    }
@@ -149,6 +149,11 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
      // some problem may have zero or constant objective function, in
      // that case just put the first variable
 
+     // TODO: replace the only w_obj with linear expression, if any
+
+     couenneCg.Problem() -> fillObjCoeff (obj);
+
+     /*
      int index = couenneCg. Problem () -> Obj (0) -> Body () -> Index ();
 
      obj [(index >= 0) ? index : 0] =
@@ -156,6 +161,7 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
 
      if (index < 0)
        printf ("Warning, objective function has no associated aux variable\n");
+     */
    }
 
    // Finally, load interface si with the initial LP relaxation
