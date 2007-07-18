@@ -10,6 +10,7 @@
 #include <exprSum.hpp>
 #include <exprMul.hpp>
 #include <exprGroup.hpp>
+#include <exprQuad.hpp>
 #include <exprConst.hpp>
 
 #include <CouenneProblem.hpp>
@@ -21,6 +22,11 @@ typedef struct {
   int index;
   CouNumber coeff;
 } monomial;
+
+
+/// check expression for quadratic terms and return an exprQuad if
+/// there are many
+exprAux *createQuadratic (CouenneProblem *, exprSum *);
 
 
 /// get constant multiplicator and aux index from a multiplication
@@ -134,12 +140,11 @@ inline bool termSortPred (const monomial& lhs, const monomial& rhs)
 
 exprAux *exprSum::standardize (CouenneProblem *p) {
 
-  // rather than flattening, another smarter way (and it prevents
-  // DuplicateIndex exceptions) is to return this as a linear term.
-  // This involves checking all operands of this sum to see if they
-  // are of the type k*f(x), meaning each will turn into something
-  // like k*w. In the end, all terms k1*w and k2*w should be grouped
-  // as (k1+k2)*w.
+  // rather than flattening, a better way (preventing DuplicateIndex
+  // exceptions) is to return this as a linear term.  This involves
+  // checking all operands of this sum to see if they are of the type
+  // k*f(x), meaning each will turn into something like k*w. In the
+  // end, all terms k1*w and k2*w should be grouped as (k1+k2)*w.
 
   std::vector <monomial> terms;
   CouNumber a0 = 0;
@@ -187,7 +192,13 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 	}
       }
     }
+
+    // don't check for quadratic terms, as there would be at most one
   }
+
+  // check if this is a potential quadratic form, and return it if so
+  exprAux *q = createQuadratic (p, this);
+  if (q) return q;
 
   // one by one standardize each argument of arglist_ into a pair
   // (index, coeff)

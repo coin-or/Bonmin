@@ -32,7 +32,7 @@ class exprLBQuad: public exprOp {
     {return new exprLBQuad (clonearglist (), nargs_);}
 
   /// function for the evaluation of the expression
-  CouNumber operator () ();
+  CouNumber operator () () {return computeQBound (-1, NULL);}
 
   /// print position (PRE, INSIDE, POST)
   enum pos printPos () const
@@ -42,12 +42,6 @@ class exprLBQuad: public exprOp {
   std::string printOp () const
     {return "LB_Quad";}
 };
-
-
-/// compute bound
-inline CouNumber exprLBQuad::operator () () {
-  return computeQBound (-1, NULL);
-}
 
 
 /// class to compute lower bound of a fraction based on the bounds of
@@ -66,7 +60,7 @@ class exprUBQuad: public exprOp {
     {return new exprUBQuad (clonearglist (), nargs_);}
 
   /// function for the evaluation of the expression
-  CouNumber operator () ();
+  CouNumber operator () () {return computeQBound (1, NULL);}
 
   /// print position (PRE, INSIDE, POST)
   enum pos printPos () const
@@ -76,12 +70,6 @@ class exprUBQuad: public exprOp {
   std::string printOp () const
     {return "UB_Quad";}
 };
-
-
-/// compute bound
-inline CouNumber exprUBQuad::operator () ()
-  {return computeQBound (1, NULL);}
-
 
 #endif
 

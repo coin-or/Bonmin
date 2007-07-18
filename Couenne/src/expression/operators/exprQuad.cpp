@@ -74,13 +74,15 @@ exprQuad::exprQuad  (const exprQuad &src):
 /// I/O
 void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 
+  // print linear and nonquadratic part
   exprGroup::print (out, descend, p);
 
+  // print bilinear terms
   for (int i = 0; i < nqterms_; i++) {
 
     out << qcoeff_ [i];
 
-    if (p) {
+    if (p) { // have problem pointer, use right names (x,w,y)
 
       int qi = qindexI_ [i], 
 	  qj = qindexJ_ [i];
@@ -96,7 +98,7 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
       prod -> print (out, descend, p);
       delete prod;
 
-    } else {
+    } else { // no problem pointer, use x for all variables
 
       int qi = qindexI_ [i], 
 	  qj = qindexJ_ [i];

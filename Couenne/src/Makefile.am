@@ -78,6 +78,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
 	convex/operators/trigNewton.cpp \
+	convex/operators/createQuadratic.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
 	convex/boundTightening.cpp \

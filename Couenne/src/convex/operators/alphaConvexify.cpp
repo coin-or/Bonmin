@@ -122,4 +122,5 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
 	delete[] matrix;
 	delete[] diam;
 	delete[] eigval;
+	delete[] indexmap;
 }

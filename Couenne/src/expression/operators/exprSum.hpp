@@ -64,11 +64,6 @@ class exprSum: public exprOp {
 
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
-
-  /// compute best variable to branch on (nonsense here, as there is
-  /// no nonlinear infeasibility)
-  //virtual expression *getFixVar () 
-  //{printf ("### Warning: called empty exprSum::getFixVar\n"); return *arglist_;}
 };
 
 

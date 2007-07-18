@@ -56,6 +56,7 @@ Couenne/src/convex/operators/conv-exprQuad.cpp -text
 Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
+Couenne/src/convex/operators/createQuadratic.cpp -text
 Couenne/src/convex/operators/linearize.cpp -text
 Couenne/src/convex/operators/powNewton.cpp -text
 Couenne/src/convex/operators/quadCuts.cpp -text
