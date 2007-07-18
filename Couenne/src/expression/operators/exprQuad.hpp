@@ -1,7 +1,7 @@
 /*
  * Name:    exprQuad.hpp
  * Author:  Pietro Belotti
- * Purpose: definition of quadratic expressions (constant+linear+quadratic)
+ * Purpose: definition of quadratic expressions (=exconstant+linear+quadratic)
  *
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
  */
@@ -28,9 +28,13 @@ class exprQuad: public exprGroup {
   CouNumber *qcoeff_;   // the term a_ij
   int        nqterms_;  // number of bilinear terms
 
+  // lower envelope
+  CouNumber *dCoeffLo_;   // diagonal coefficients of additional term for convexfication
+  int       *dIndexLo_;   // and indices (this is a sparse vector)
 
-  CouNumber *dCoeff_;   // diagonal coefficients of additional term for convexfication
-  int       *dIndex_;   // and indices (this is a sparse vector)
+  // upper envelope
+  CouNumber *dCoeffUp_;
+  int       *dIndexUp_;
 
  public:
 
@@ -101,6 +105,14 @@ class exprQuad: public exprGroup {
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
 			     CouNumber =  COUENNE_INFINITY) {}
+
+  /// [Stefan] fills in dCoeff_ and dIndex_ for the convex
+  /// underestimator of this expression
+  virtual void alphaConvexify (const OsiSolverInterface &);
+
+  /// [Pierre] Given the data in dCoeff_ and dIndex_, add
+  /// convexification cuts to the OsiCuts structure
+  virtual void quadCuts (OsiCuts &, CouenneCutGenerator *);
 
   /// only compare with people of the same kind
   virtual int compare (exprQuad &);
