@@ -126,15 +126,17 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp convex/boundTightening.cpp \
 	convex/genColCuts.cpp convex/genRowCuts.cpp convex/obbt.cpp \
-	problem/problem.cpp problem/CouenneProblem.cpp \
-	problem/problemIO.cpp problem/extended.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	problem/fillQuadIndices.cpp problem/constrStandardize.cpp \
-	problem/elementBreak.cpp problem/splitAux.cpp \
-	problem/auxiliarize.cpp problem/standardize.cpp \
-	problem/depGraph/depGraph.cpp util/drawCuts.cpp util/rootQ.c \
-	readnl/readnl.cpp readnl/nl2e.cpp readnl/invmap.c
+	convex/operators/alphaConvexify.cpp \
+	convex/operators/quadCuts.cpp problem/problem.cpp \
+	problem/CouenneProblem.cpp problem/problemIO.cpp \
+	problem/extended.cpp problem/constraint.cpp \
+	problem/tightenBounds.cpp problem/impliedBounds.cpp \
+	problem/readASLfg.cpp problem/fillQuadIndices.cpp \
+	problem/constrStandardize.cpp problem/elementBreak.cpp \
+	problem/splitAux.cpp problem/auxiliarize.cpp \
+	problem/standardize.cpp problem/depGraph/depGraph.cpp \
+	util/drawCuts.cpp util/rootQ.c readnl/readnl.cpp \
+	readnl/nl2e.cpp readnl/invmap.c
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneBranchingObject.lo CouenneObject.lo \
@@ -155,8 +157,9 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	conv-exprSinCos.lo conv-exprExp.lo conv-exprLog.lo \
 	conv-exprGroup.lo trigNewton.lo CouenneCutGenerator.lo \
 	generateCuts.lo boundTightening.lo genColCuts.lo genRowCuts.lo \
-	obbt.lo problem.lo CouenneProblem.lo problemIO.lo extended.lo \
-	constraint.lo tightenBounds.lo impliedBounds.lo readASLfg.lo \
+	obbt.lo alphaConvexify.lo quadCuts.lo problem.lo \
+	CouenneProblem.lo problemIO.lo extended.lo constraint.lo \
+	tightenBounds.lo impliedBounds.lo readASLfg.lo \
 	fillQuadIndices.lo constrStandardize.lo elementBreak.lo \
 	splitAux.lo auxiliarize.lo standardize.lo depGraph.lo \
 	drawCuts.lo rootQ.lo $(am__objects_1)
@@ -421,15 +424,16 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp convex/boundTightening.cpp \
 	convex/genColCuts.cpp convex/genRowCuts.cpp convex/obbt.cpp \
-	problem/problem.cpp problem/CouenneProblem.cpp \
-	problem/problemIO.cpp problem/extended.cpp \
-	problem/constraint.cpp problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp problem/readASLfg.cpp \
-	problem/fillQuadIndices.cpp problem/constrStandardize.cpp \
-	problem/elementBreak.cpp problem/splitAux.cpp \
-	problem/auxiliarize.cpp problem/standardize.cpp \
-	problem/depGraph/depGraph.cpp util/drawCuts.cpp util/rootQ.c \
-	$(am__append_1)
+	convex/operators/alphaConvexify.cpp \
+	convex/operators/quadCuts.cpp problem/problem.cpp \
+	problem/CouenneProblem.cpp problem/problemIO.cpp \
+	problem/extended.cpp problem/constraint.cpp \
+	problem/tightenBounds.cpp problem/impliedBounds.cpp \
+	problem/readASLfg.cpp problem/fillQuadIndices.cpp \
+	problem/constrStandardize.cpp problem/elementBreak.cpp \
+	problem/splitAux.cpp problem/auxiliarize.cpp \
+	problem/standardize.cpp problem/depGraph/depGraph.cpp \
+	util/drawCuts.cpp util/rootQ.c $(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -610,6 +614,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneProblem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneThreeWayBranchObj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addEnvelope.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alphaConvexify.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/auxiliarize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boundTightening.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprAbs.Plo@am__quote@
@@ -679,6 +684,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problemIO.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/projections.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/quadCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readASLfg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readnl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rootQ.Plo@am__quote@
@@ -1199,6 +1205,20 @@ obbt.lo: convex/obbt.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/obbt.cpp' object='obbt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o obbt.lo `test -f 'convex/obbt.cpp' || echo '$(srcdir)/'`convex/obbt.cpp
+
+alphaConvexify.lo: convex/operators/alphaConvexify.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT alphaConvexify.lo -MD -MP -MF "$(DEPDIR)/alphaConvexify.Tpo" -c -o alphaConvexify.lo `test -f 'convex/operators/alphaConvexify.cpp' || echo '$(srcdir)/'`convex/operators/alphaConvexify.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/alphaConvexify.Tpo" "$(DEPDIR)/alphaConvexify.Plo"; else rm -f "$(DEPDIR)/alphaConvexify.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/alphaConvexify.cpp' object='alphaConvexify.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o alphaConvexify.lo `test -f 'convex/operators/alphaConvexify.cpp' || echo '$(srcdir)/'`convex/operators/alphaConvexify.cpp
+
+quadCuts.lo: convex/operators/quadCuts.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT quadCuts.lo -MD -MP -MF "$(DEPDIR)/quadCuts.Tpo" -c -o quadCuts.lo `test -f 'convex/operators/quadCuts.cpp' || echo '$(srcdir)/'`convex/operators/quadCuts.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/quadCuts.Tpo" "$(DEPDIR)/quadCuts.Plo"; else rm -f "$(DEPDIR)/quadCuts.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/quadCuts.cpp' object='quadCuts.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o quadCuts.lo `test -f 'convex/operators/quadCuts.cpp' || echo '$(srcdir)/'`convex/operators/quadCuts.cpp
 
 problem.lo: problem/problem.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT problem.lo -MD -MP -MF "$(DEPDIR)/problem.Tpo" -c -o problem.lo `test -f 'problem/problem.cpp' || echo '$(srcdir)/'`problem/problem.cpp; \

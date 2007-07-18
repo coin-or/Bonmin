@@ -83,8 +83,8 @@ libCouenne_la_SOURCES = \
 	convex/genColCuts.cpp \
 	convex/genRowCuts.cpp \
 	convex/obbt.cpp \
-	convex/alphaConvexify.cpp \
-	convex/quadCuts.cpp \
+	convex/operators/alphaConvexify.cpp \
+	convex/operators/quadCuts.cpp \
 	problem/problem.cpp \
 	problem/CouenneProblem.cpp \
 	problem/problemIO.cpp \

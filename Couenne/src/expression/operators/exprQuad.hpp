@@ -1,7 +1,8 @@
 /*
  * Name:    exprQuad.hpp
  * Author:  Pietro Belotti
- * Purpose: definition of quadratic expressions (=exconstant+linear+quadratic)
+ * Purpose: definition of quadratic expressions (= exprGroup +
+ * quadratic = constant + linear + [nonlinear] + quadratic)
  *
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
  */
@@ -22,19 +23,15 @@ class exprQuad: public exprGroup {
   /// j in N} a_{ij} x_i x_j, qindex0_ and qindex1_ contain
   /// respectively entries i and j for which a_{ij} is nonzero
 
-                        // in a_ij x_i x_j:
-  int       *qindexI_;  // the term i
-  int       *qindexJ_;  // the term j, (must be qindexJ [k] <= qindexI [k])
-  CouNumber *qcoeff_;   // the term a_ij
-  int        nqterms_;  // number of bilinear terms
+                        /// in a_ij x_i x_j:
+  int       *qindexI_;  /// the term i
+  int       *qindexJ_;  /// the term j, (must be qindexJ [k] <= qindexI [k])
+  CouNumber *qcoeff_;   /// the term a_ij
+  int        nqterms_;  /// number of bilinear terms
 
-  // lower envelope
-  CouNumber *dCoeffLo_;   // diagonal coefficients of additional term for convexfication
-  int       *dIndexLo_;   // and indices (this is a sparse vector)
-
-  // upper envelope
-  CouNumber *dCoeffUp_;
-  int       *dIndexUp_;
+  CouNumber *dCoeffLo_; /// diagonal coefficients of additional term for under convexfication
+  CouNumber *dCoeffUp_; ///                                              over
+  int       *dIndex_;   /// and indices (this is a sparse vector)
 
  public:
 
