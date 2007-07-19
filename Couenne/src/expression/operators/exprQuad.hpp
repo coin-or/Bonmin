@@ -19,21 +19,31 @@ class exprQuad: public exprGroup {
 
  protected:
 
-  /// Sparse implementation: given expression of the form sum_{i in N,
-  /// j in N} a_{ij} x_i x_j, qindex0_ and qindex1_ contain
-  /// respectively entries i and j for which a_{ij} is nonzero
+  /** \name Q matrix storage
+    * Sparse implementation: given expression of the form sum_{i in N,
+    * j in N} a_{ij} x_i x_j, qindex0_ and qindex1_ contain
+    * respectively entries i and j for which a_{ij} is nonzero
+    * in a_ij x_i x_j: */
+  /** @{ */
+  /// the term i
+  int       *qindexI_;
+  /// the term j, (must be qindexJ [k] <= qindexI [k])
+  int       *qindexJ_;
+  /// the term a_ij
+  CouNumber *qcoeff_;   
+  /// number of non-zeroes in Q
+  int        nqterms_;  
+  /** @} */
 
-                        /// in a_ij x_i x_j:
-  int       *qindexI_;  /// the term i
-  int       *qindexJ_;  /// the term j, (must be qindexJ [k] <= qindexI [k])
-  CouNumber *qcoeff_;   /// the term a_ij
-  int        nqterms_;  /// number of bilinear terms
 
-  CouNumber *dCoeffLo_; /// diagonal coefficients of additional term for under convexfication
-  CouNumber *dCoeffUp_; ///                                              over
-  int       *dIndex_;   /// and indices (this is a sparse vector)
-  int        nDiag_;    /// number of elements in the above sparse vectors
-
+  /// diagonal coefficients of additional term for under convexfication
+  CouNumber *dCoeffLo_;   
+  /// diagonal coefficients of additional term for over convexfication
+  CouNumber *dCoeffUp_; 
+  /// and indices (this is a sparse vector)
+  int       *dIndex_;  
+  /// number of elements in the above sparse vectors
+  int        nDiag_;    
  public:
 
   /// Constructor
@@ -47,12 +57,6 @@ class exprQuad: public exprGroup {
 
   /// destructor
   virtual ~exprQuad () {
-
-    if (index_) {
-      delete [] index_;
-      delete [] coeff_;
-    }
-
     if (qindexI_) {
       delete [] qindexI_;
       delete [] qindexJ_;
@@ -95,22 +99,66 @@ class exprQuad: public exprGroup {
   }
 
   /// Get lower and upper bound of an expression (if any)
-  virtual void getBounds (expression *&, expression *&) {}
+  virtual void getBounds (expression *&, expression *&);
 
   /// generate equality between *this and *w
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg, 
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
-			     CouNumber =  COUENNE_INFINITY) {}
+			     CouNumber =  COUENNE_INFINITY);
 
   /// [Stefan] fills in dCoeff_ and dIndex_ for the convex
   /// underestimator of this expression
   virtual void alphaConvexify (const OsiSolverInterface &);
 
-  /// [Pierre] Given the data in dCoeff_ and dIndex_, add
-  /// convexification cuts to the OsiCuts structure
-  virtual void quadCuts (OsiCuts &, CouenneCutGenerator *);
+  /** \function exprQuad::quadCuts 
+    * \brief Based on the information (dIndex_, dCoeffLo_, dCoeffUp_)
+    * created/modified by alphaConvexify(), create convexification cuts
+    * for this expression.
+    *
+    * The original constraint is :
+    * \f[
+    * \eta = a_0 + a^T x + x^T Q x + \sum w_j
+    * \f]
+    * where \f$ \eta \f$ is the auxiliary corresponding to this expression and \f$ w_j \f$ are the auxiliaries corresponding
+    * to the other non-linear terms contained in the expression. (I don't think that it is assumed anywhere in the function that Q only involves
+    * original variables of the problem).
+    * 
+    * The under-estimator of \f$ x^T Q x\f$ is given by \f$ x^T Q x + \sum \lambda_{\min,i} (x_i - l_i ) (u_i - x_i )} \f$ and its
+    * over-estimator is given by \f$ Q - \sum \lambda_{\max, i} (x_i - l_i ) (u_i - x_i )  \f$ (where \f$ \lambda_{\min, i} = 
+    * \frac{\lambda_{\min}}{w_i^2} \f$ and  \f$ \lambda_{\max, i} = \frac{\lambda_{\max}}{w_i^2} \f$). 
+    *
+    * Let \f$ \tilde a_0(\lambda)\f$, \f$ \tilde a(\lambda) \f$ and \f$ \tilde Q_(\lambda) \f$ be
+    * \f[ \tilde a_0(\lambda) = a_0 - \sum_{i = 1}^n \lambda_i l_i u_i \f]
+    * \f[ \tilde a(\lambda) = a + \left[ \begin{array}{c} \lambda_1 (u_1 + l_1) \\ \vdots \\ \lambda_n (u_n + l_n) \end{array} \right], \f]
+    * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc} \frac{1}{w_1} & 0 \\ & \ddots & \\ 0 & & \frac{1}{w_n} \end{array} \right). \f] 
+    * The convex relaxation of the initial constraint is then given by the two constraints 
+    * \f[
+    * \eta \geq \tilde a_0(\lambda_{\min}) + \tilde a(\lambda_{\min})^T x + x^T \tilde Q(\lambda_{\min}) x + \sum z_j 
+    * \f] \f[
+    * \eta \leq \tilde a_0(- \lambda_{\max}) + \tilde a(-\lambda_{\max})^T x + x^T \tilde Q(-\lambda_{\max}) x + \sum z_j
+    * \f]
+    *  
+    * The cut is computed as follow. Let \f$ (x^*, z^*, \eta^*) \f$ be the solution at hand. The two outer-approximation cuts
+    * are:
+    * \f[
+    * \eta \geq \tilde a_0(\lambda_{\min}) + \tilde a(\lambda_{\min})^T x + {x^*}^T \tilde Q(\lambda_{\min}) (2x - x^*) + \sum z_j
+    * \f]
+    * and
+    * \f[
+    * \eta \leq \tilde a_0(-\lambda_{\max}) + \tilde a(-\lambda_{\max})^T x + {x^*}^T \tilde Q(-\lambda_{\max}) (2x - x^*) + \sum z_j
+    * \f]
+    * grouping coefficients, we get:
+    * \f[
+    * {x^*}^T \tilde Q(\lambda_{\min}) x^* - \tilde a_0(\lambda_{\min})  \geq ( a(\lambda_{\min}) + 2 Q(\lambda_{\min} ) x^*)^T x + \sum z_j - \eta
+    * \f]
+    * and
+    * \f[
+    * {x^*}^T \tilde Q(-\lambda_{\max}) x^*  - \tilde a_0(-\lambda_{\max}) \leq (  a(-\lambda_{\max}) + 2 Q(-\lambda_{\max}) x^* )^T x + \sum z_j - \eta
+    * \f]
+    */
+  void quadCuts (OsiCuts & cs, const CouenneCutGenerator * cg);
 
   /// only compare with people of the same kind
   virtual int compare (exprQuad &);

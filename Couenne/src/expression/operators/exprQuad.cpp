@@ -70,7 +70,6 @@ exprQuad::exprQuad  (const exprQuad &src):
   }
 } 
 
-
 /// I/O
 void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 
@@ -94,7 +93,6 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
 				new exprConst (2)));
       else prod = (new exprMul (new exprClone (p -> Var (qi)),
 				new exprClone (p -> Var (qj))));
-
       prod -> print (out, descend, p);
       delete prod;
 

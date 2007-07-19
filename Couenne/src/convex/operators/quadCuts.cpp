@@ -5,68 +5,110 @@
  *          Pietro Belotti
  * Purpose: based on upper and lower convexification, add cuts to convexify
  *
- * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
+ * (C) International Business Machines 2007. This file is licensed under the Common Public License (CPL)
  */
 
 #include <exprQuad.hpp>
 
+#include <CouenneProblem.hpp>
+#include <CouenneCutGenerator.hpp>
 
-/// [Pierre] Given the data in dCoeff_ and dIndex_, add
-/// convexification cuts to the OsiCuts structure
-void exprQuad::quadCuts (OsiCuts &cs, CouenneCutGenerator *cg) {
+#include "CoinHelperFunctions.hpp"
 
-  /// retrieve linear coefficients/indices and constant from member of
-  /// the base class, exprGroup
 
-  int  nterms = nlterms_ + nargs_,
-      *index  = new int [nterms];
 
-  CouNumber *coeff   = new CouNumber [nterms],
-             a0      = c0_;
+void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
+  //First get on which side constraint is violated to get the good lambda
+  double * lambda = NULL;
+  double exprVal = (*this) ();
+  double varVal =  expression::Variable(Index());
+  if(varVal < exprVal)//Use under-estimator
+  {
+     lambda = dCoeffLo_;
+  }
+  else //use overestimator
+  {
+     lambda = dCoeffUp_;
+  }
+  const CouenneProblem& problem = *(cg->Problem());
+  const int & numcols = problem.nOrig();
+  const double * colsol = problem.X();
+  const double * lower = problem.Lb();
+  const double * upper = problem.Ub();
 
-  // linear part of exprGroup
-  for (nterms = 0; nterms < nlterms_; nterms++) {
-    index [nterms] = index_ [nterms];
-    coeff [nterms] = coeff_ [nterms];
+  //Initialize by copying a into a dense vector and computing Q x^*
+  double * vec = new double[numcols];
+  CoinFillN(vec, numcols, 0.);
+
+  //Start by computing Q x^*.
+
+  for(int k = 0 ; k < nqterms_ ; k++) {
+     vec[qindexI_[k]] += qcoeff_[k] * colsol[qindexJ_[k]];
+     vec[qindexJ_[k]] += qcoeff_[k] * colsol[qindexI_[k]];
   }
 
-  // deal with nonlinear part (has been standardized into sum of
-  // auxiliary variables)
-
-  for (int i=0; i<nargs_; i++) {
-
-    int ind = arglist_ [i] -> Index ();
-
-    if (ind >= 0) {
-
-      index [nterms]   = ind;
-      coeff [nterms++] = 1.;
-
-    } else 
-      if (arglist_ [i] -> Type () == CONST) // if not a constant, quit
-	a0 += arglist_ [i] -> Value ();
-      else {
-	printf ("non constant, non variable term in standardized exprSum\nAborting.\n");
-	exit (-1);
-      }
+  //multiply it by x^*^T again and store the result for the lower bound
+  double a0 = - c0_;
+  for(int i = 0 ; i < numcols ; i++){
+    a0 += vec[i] * colsol[i];
+    vec[i] *= 2;
   }
 
-  // Pierre: now index[], coeff[], and a0 contain the linear data of
-  // expression a0 + a^Tx + x^T Q x. Variable nterms contains the
-  // number of linear terms.
-  //
-  // The convexification cuts should take into account the linear data
-  // as well, so if we have an auxiliary variable
-  //
-  // w = a0 + ax + x'Qx
-  //
-  // the relative lower envelope cut should be of the form 
-  //
-  // w >= a0 + ax + b + bx
-  //
-  // where w >= b + bx is the convexification cut of the quadratic
-  // expression alone
+  // Add a to it.
+  for(int i = 0 ; i < nlterms_ ; i++){
+     vec[index_[i]] += coeff_[i];
+  }
 
-  delete [] coeff;
-  delete [] index;
+
+  // Don't forget the auxiliaries!
+  for(int i = 0 ; i < nargs_ ; i++){
+     vec[arglist_ [i] -> Index ()] += 1;
+  }
+
+  // And myself
+  vec[Index()] -= 1;
+
+  // Now the part which depends on lambda
+  for(int k = 0 ; k < nDiag_ ; k++){
+     a0 += lambda[k] * lower[dIndex_[k]] * upper[dIndex_[k]];
+     a0 += lambda[k] * colsol[dIndex_[k]] * colsol[dIndex_[k]];
+     vec[dIndex_[k]] += lambda[k] * (lower[dIndex_[k]] + upper[dIndex_[k]]);
+     vec[dIndex_[k]] -= lambda[k] * (colsol[dIndex_[k]]) * 2;
+  } 
+
+
+
+  // Count the number of non-zeroes
+  int nnz = 0;
+  for(int i = 0 ; i < numcols ; i++){
+    if(fabs(vec[i]) > COUENNE_EPS){
+       nnz++;
+    }
+  }
+  // Pack the vector into a CoinPackedVector and generate the cut.
+  CoinPackedVector a(false);
+  a.reserve(nnz);
+  double * elements = a.getElements();
+  int * indices = a.getIndices();
+  nnz = 0;
+  for(int i = 0 ; i < numcols ; i++){
+    if(fabs(vec[i]) > COUENNE_EPS){
+       indices[nnz] = i;
+       elements[nnz++] = vec[i];
+    }
+  }
+  OsiRowCut cut;
+  cut.setRow(a);
+  if( lambda == dCoeffLo_){
+     cut.setUb(a0);
+     cut.setLb(-COUENNE_INFINITY);
+  }
+  else {
+    cut.setLb(a0);
+    cut.setUb(COUENNE_INFINITY);
+  }
+  delete [] vec;
+  cs.insert(cut);
 }
+
+

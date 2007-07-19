@@ -13,9 +13,6 @@
 
 #include <exprQuad.hpp>
 
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
-
 /// Get lower and upper bound of an expression (if any)
 void exprQuad::getBounds (expression *&lb, expression *&ub) {
 
@@ -39,8 +36,8 @@ void exprQuad::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // see if it is necessary to create/renew the alpha-convexification
   alphaConvexify (si);
 
-  // based on the information (dIndex_, dCoeffLo_, dCoeffUp_)
-  // created/modified by alphaConvexify(), create convexification cuts
-  // for this expression
   quadCuts (cs, cg);
 }
+
+
+
