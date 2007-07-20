@@ -71,15 +71,23 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
 		diam[i]=si.getColUpper()[dIndex_[i]]-si.getColLower()[dIndex_[i]];
 
 	// lower triangular of quadratic term matrix, scaled by box diameter
-	double* matrix=new double[nDiag_*(nDiag_+1)/2];
-	for (int i=0; i<(nDiag_*(nDiag_+1))/2; ++i)
+//	double* matrix=new double[nDiag_*(nDiag_+1)/2];
+	double* matrix=new double[nDiag_*nDiag_];
+	for (int i=0; i<nDiag_*nDiag_; ++i)
 		matrix[i]=0.;
 	for (int i=0; i<getnQTerms(); ++i) {
 		int row=indexmap[getQIndexI()[i]];
 		int col=indexmap[getQIndexJ()[i]];
-		matrix[((row+1)*row)/2+col]=getQCoeffs()[i]*diam[row]*diam[col];
+		matrix[col*nDiag_+row]=getQCoeffs()[i]*diam[row]*diam[col];
 	}
 
+
+/*	for (int i=0; i<getnQTerms(); ++i) {
+		int row=indexmap[getQIndexI()[i]];
+		int col=indexmap[getQIndexJ()[i]];
+		matrix[((row+1)*row)/2+col]=getQCoeffs()[i]*diam[row]*diam[col];
+	}
+*/
 	// compute minimum and maximum eigenvalue of matrix
 	// ok, currently computes all eigenvalues
 	double* eigval=new double[nDiag_];
