@@ -33,7 +33,6 @@
  * If Q is negative semidefinite, then dCoeffUp_ will be NULL.
 */
 void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
-
 	if (getnQTerms()==0) {
 		nDiag_=0;
 		return;
@@ -72,31 +71,31 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
 		diam[i]=si.getColUpper()[dIndex_[i]]-si.getColLower()[dIndex_[i]];
 
 	// lower triangular of quadratic term matrix, scaled by box diameter
-//	double* matrix=new double[nDiag_*(nDiag_+1)/2];
 	double* matrix=new double[nDiag_*nDiag_];
 	for (int i=0; i<nDiag_*nDiag_; ++i)
 		matrix[i]=0.;
+
 	for (int i=0; i<getnQTerms(); ++i) {
 		int row=indexmap[getQIndexI()[i]];
 		int col=indexmap[getQIndexJ()[i]];
-		matrix[col*nDiag_+row]=getQCoeffs()[i]*diam[row]*diam[col];
+		if (row<col)
+			matrix[row*nDiag_+col]=getQCoeffs()[i]*diam[row]*diam[col];
+		else
+			matrix[col*nDiag_+row]=getQCoeffs()[i]*diam[row]*diam[col];
+//		printf("row %d, col %d: %f\n", row, col, matrix[col*nDiag_+row]);
 	}
 
-
-/*	for (int i=0; i<getnQTerms(); ++i) {
-		int row=indexmap[getQIndexI()[i]];
-		int col=indexmap[getQIndexJ()[i]];
-		matrix[((row+1)*row)/2+col]=getQCoeffs()[i]*diam[row]*diam[col];
-	}
-*/
 	// compute minimum and maximum eigenvalue of matrix
 	// ok, currently computes all eigenvalues
 	double* eigval=new double[nDiag_];
 	int info;
 	Ipopt::IpLapackDsyev(false, nDiag_, matrix, nDiag_, eigval, info);
 	if (info!=0) {
+		printf("exprQuad::alphaConvexify: problem computing eigenvalue, info=%d\n", info);
+		return;
 		//TODO error handling
 	}
+//	printf("min. eigvalue: %f\n", eigval[0]);
 
 	// if min. eigenvalue negative, setup dCoeffLo_
 	if (eigval[0]<0) {
