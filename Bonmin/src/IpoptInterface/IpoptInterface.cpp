@@ -2223,80 +2223,7 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
     }
   }
 
-#ifdef OLD_CONSTRUCTION
-   CoinPackedMatrix mat;
- //Then convert everything to a CoinPackedMatrix (col ordered)
-  CoinBigIndex * inds = new CoinBigIndex[nnz_jac_g + 1];
-  double * vals = new double [nnz_jac_g + 1];
-  int * start = new int[n+1];
-  int * length = new int[n];
-  bool needOrder = false;
-  int nnz = 0;
-  if(nnz_jac_g > 0)
-  {
-  for(int k = 0; k < jCol_[0]; k++) {
-    start[k] = nnz;
-    length[k] = 0;
-  }
-  int end = nnz_jac_g - 1;
-  for(int i = 0 ; i < end ; i++) {
-    {
-      if(jCol_[i + 1] < jCol_ [i] || ( jCol_ [i+1] == jCol_[i] && jRow_[i + 1] <= jRow_[i]) ) {
-        needOrder = 1;
-        break;
-      }
-      if(constTypes_[jRow_[i]] == Ipopt::TMINLP::LINEAR //Always accept coefficients from linear constraints
-          || //For other clean tinys
-          cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
-              rowLower[jRow_[i]], rowUpper[jRow_[i]],
-              getColSolution()[jCol_[i]],
-              rowLow[jRow_[i]],
-              rowUp[jRow_[i]], tiny_, veryTiny_)) {
-        vals[nnz] = jValues_[i];
-        rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
-        rowUp[jRow_[i]] += jValues_[i] *getColSolution()[jCol_[i]];
-        inds[nnz] = jRow_[i ];
-        length[jCol_[i]]++;
-        nnz++;
-      }
-    }
-    if(jCol_[i + 1] > jCol_[i]) {
-      for(int k = jCol_[i]; k < jCol_[i + 1]; k++) {
-        start[k] = nnz;
-        length[k] = 0;
-      }
-    }
-  }
-  if(!needOrder) {
-    {
-      length[jCol_[nnz_jac_g -1]]++;
-      vals[nnz] = jValues_[nnz_jac_g - 1];
-      rowLow[jRow_[nnz_jac_g - 1]] += jValues_[nnz_jac_g - 1] * getColSolution()[jCol_ [nnz_jac_g - 1]];
-      rowUp[jRow_[nnz_jac_g - 1]] += jValues_[nnz_jac_g - 1] *getColSolution()[jCol_[nnz_jac_g - 1] ];
-      inds[nnz++] = jRow_[nnz_jac_g - 1];
-    }
-    for(int i = jCol_[nnz_jac_g -1] ; i < n ; i++) {
-      start[i] = nnz;
-      length[i] = 0;
-    }
-    start[n]=nnz;
-  }
-  else {
-    std::cerr<<"jacobian matrix is not ordered properly"<<std::endl;
-    throw -1;
-  }
-  }
-  else {
-   for (int i = 0 ; i < n ; i++)
-   {
-     length[i] = 0;
-     start[i] = 0;
-   }
-   start[n]=0;
- }
- mat.assignMatrix(false, m, n, nnz, vals, inds, start, length);
-  mat.transpose();
-#else
+
 //Go through values, clean coefficients and fix bounds
   for(int i = 0 ; i < nnz_jac_g ; i++) {
       if(constTypes_[jRow_[i]] == Ipopt::TMINLP::LINEAR //Always accept coefficients from linear constraints
@@ -2311,7 +2238,8 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
       }
     }
    CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
-#endif
+   //In case matrix was empty or some columns are only in objective set correct dimensions
+   mat.setDimensions(m,n);
   delete [] g;
   int numcols=getNumCols();
   double *obj = new double[numcols];
@@ -2324,12 +2252,15 @@ IpoptInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj)
   <<std::endl;
 #endif
   si.loadProblem(mat, getColLower(), getColUpper(), obj, rowLow, rowUp);
+
   delete [] rowLow;
   delete [] rowUp;
-  for(int i = 0 ; i < getNumCols() ; i++) {
+
+  for(int i = 0 ; i < n ; i++) {
     if(isInteger(i))
       si.setInteger(i);
   }
+
   if(getObj) {
     //add variable alpha
     //(alpha should be empty in the matrix with a coefficient of -1 and unbounded)
