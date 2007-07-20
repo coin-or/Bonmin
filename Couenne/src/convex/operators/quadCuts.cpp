@@ -15,7 +15,7 @@
 
 #include "CoinHelperFunctions.hpp"
 //#define DEBUG
-void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
+void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
 
   assert(dIndex_ != NULL);
 
@@ -27,7 +27,7 @@ void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
   //First get on which side constraint is violated to get the good lambda
   double * lambda = NULL;
   double exprVal = (*this) ();
-  double varVal =  expression::Variable(Index());
+  double varVal =  expression::Variable (w -> Index());
   if(varVal < exprVal)//Use under-estimator
   {
      lambda = dCoeffLo_;
@@ -72,9 +72,9 @@ void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
 
 
   // Don't forget the auxiliaries!
-  for(int i = 0 ; i < nargs_ ; i++){
+  /*for(int i = 0 ; i < nargs_ ; i++){
      vec[arglist_ [i] -> Index ()] += 1;
-  }
+     }*/
 
   // And myself
   vec[Index()] -= 1;

@@ -21,7 +21,7 @@ class exprQuad: public exprGroup {
 
   /** \name Q matrix storage
     * Sparse implementation: given expression of the form sum_{i in N,
-    * j in N} a_{ij} x_i x_j, qindex0_ and qindex1_ contain
+    * j in N} a_{ij} x_i x_j, qindexI_ and qindexJ_ contain
     * respectively entries i and j for which a_{ij} is nonzero
     * in a_ij x_i x_j: */
   /** @{ */
@@ -158,7 +158,7 @@ class exprQuad: public exprGroup {
     * {x^*}^T \tilde Q(-\lambda_{\max}) x^*  - \tilde a_0(-\lambda_{\max}) \leq (  a(-\lambda_{\max}) + 2 Q(-\lambda_{\max}) x^* )^T x + \sum z_j - \eta
     * \f]
     */
-  void quadCuts (OsiCuts & cs, const CouenneCutGenerator * cg);
+  void quadCuts (exprAux *w, OsiCuts & cs, const CouenneCutGenerator * cg);
 
   /// only compare with people of the same kind
   virtual int compare (exprQuad &);
@@ -185,7 +185,9 @@ inline CouNumber exprQuad::operator () () {
     *vars = expression::Variables ();
 
   for (register int *qi = qindexI_, *qj = qindexJ_, i = nqterms_; i--; )
-    ret += *coe++ * vars [*qi++] * vars [*qj++];
+    ret += (*qi == *qj) ?
+      (*coe++ *     vars [*qi++] * vars [*qj++]) :
+      (*coe++ * 2 * vars [*qi++] * vars [*qj++]);
 
   return (currValue_ = ret);
 }

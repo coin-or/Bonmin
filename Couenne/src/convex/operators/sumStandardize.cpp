@@ -90,32 +90,32 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
   }
 
   if (0) {
-  printf ("===============================================\n");
-  int i = 0;
-  for (std::map <std::pair <int, int>, CouNumber>::iterator it = qmap.begin (); 
-       it != qmap.end (); it++) {
-    printf ("%4d %4d %5g  |  ", 
-	    it -> first.first,
-	    it -> first.second,
-	    it -> second);
+    printf ("===============================================\n");
+    int i = 0;
+    for (std::map <std::pair <int, int>, CouNumber>::iterator it = qmap.begin (); 
+	 it != qmap.end (); it++) {
+      printf ("%4d %4d %5g  |  ", 
+	      it -> first.first,
+	      it -> first.second,
+	      it -> second);
 
-    if (!(++i % 10)) printf ("\n");
-  }
+      if (!(++i % 10)) printf ("\n");
+    }
 
-  printf ("\n...................\n");
+    printf ("\n...................\n");
 
-  i = 0;
+    i = 0;
 
-  for (std::map <int, CouNumber>::iterator it = lmap.begin (); 
-       it != lmap.end (); it++) {
+    for (std::map <int, CouNumber>::iterator it = lmap.begin (); 
+	 it != lmap.end (); it++) {
 
-    printf ("%4d %5g  |  ", 
-	    it -> first,
-	    it -> second);
+      printf ("%4d %5g  |  ", 
+	      it -> first,
+	      it -> second);
 
-    if (!(++i % 10)) printf ("\n");
-  }
-  printf ("\n===============================================\n");
+      if (!(++i % 10)) printf ("\n");
+    }
+    printf ("\n===============================================\n");
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +141,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 
     case COU_EXPRCONST: 
       c0 += coeff; 
+      //printf (" [constant] %g ", coeff);
       break;
 
     case COU_EXPRVAR: {
@@ -151,6 +152,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 	  lmap.erase (i);
       } else lmap.insert (npair);
 
+      //      printf (" [var %d] ", ind0);
       //lmap.insert (std::pair <int, CouNumber> (ind0, coeff));
     } break;
 
@@ -170,6 +172,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 
       //std::pair <int, int> ind (ind0, ind1);
       //qmap.insert (std::pair <std::pair <int, int>, CouNumber> (ind, coeff));
+      //printf (" [mul %g %d %d] ", coeff, ind0, ind1);
     } break;
 
     case COU_EXPRPOW: {
@@ -183,42 +186,43 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 
       //      std::pair <int, int> ind (ind0, ind0);
       //      qmap.insert (std::pair <std::pair <int, int>, CouNumber> (ind, coeff));
+      //printf (" [pow] ");
     } break;
 
     default: 
       printf ("Couenne::decomposeTerm failed\n"); 
       exit (-1);
     }
-    //    printf (" --> %g,%d,%d\n", coeff, ind0, ind1);
+    //printf (" --> %g,%d,%d\n", coeff, ind0, ind1);
   }
 
   if (0) {
-  printf ("AFTER READING...\n===============================================\n");
-  int i = 0;
-  for (std::map <std::pair <int, int>, CouNumber>::iterator it = qmap.begin (); 
-       it != qmap.end (); it++) {
-    printf ("%4d %4d %5g  |  ", 
-	    it -> first.first,
-	    it -> first.second,
-	    it -> second);
+    printf ("AFTER READING...\n===============================================\n");
+    int i = 0;
+    for (std::map <std::pair <int, int>, CouNumber>::iterator it = qmap.begin (); 
+	 it != qmap.end (); it++) {
+      printf ("%4d %4d %5g  |  ", 
+	      it -> first.first,
+	      it -> first.second,
+	      it -> second);
 
-    if (!(++i % 10)) printf ("\n");
-  }
+      if (!(++i % 10)) printf ("\n");
+    }
 
-  printf ("\n...................\n");
+    printf ("\n...................\n");
 
-  i = 0;
+    i = 0;
 
-  for (std::map <int, CouNumber>::iterator it = lmap.begin (); 
-       it != lmap.end (); it++) {
+    for (std::map <int, CouNumber>::iterator it = lmap.begin (); 
+	 it != lmap.end (); it++) {
 
-    printf ("%4d %5g  |  ", 
-	    it -> first,
-	    it -> second);
+      printf ("%4d %5g  |  ", 
+	      it -> first,
+	      it -> second);
 
-    if (!(++i % 10)) printf ("\n");
-  }
-  printf ("\n===============================================\n");
+      if (!(++i % 10)) printf ("\n");
+    }
+    printf ("\n===============================================\n");
   }
 
   /// data for exprQuad

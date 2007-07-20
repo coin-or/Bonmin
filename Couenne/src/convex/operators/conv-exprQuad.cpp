@@ -35,8 +35,5 @@ void exprQuad::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // see if it is necessary to create/renew the alpha-convexification
   alphaConvexify (si);
 
-  quadCuts (cs, cg);
+  quadCuts (w, cs, cg);
 }
-
-
-

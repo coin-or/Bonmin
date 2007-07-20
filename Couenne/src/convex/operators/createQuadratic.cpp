@@ -83,14 +83,16 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
 
   case COU_EXPRCONST: /// a constant
     coe *= term -> Value ();
+    //printf (" [0->%g]", coe);
     return COU_EXPRCONST;
 
   case COU_EXPRVAR:   /// a variable
-    if (ind0 < 0) {ind0 = term -> Index (); return COU_EXPRVAR;}
-    else          {ind1 = term -> Index (); return (ind1 == ind0) ? COU_EXPRPOW : COU_EXPRMUL;}
+    if (ind0 < 0) {ind0 = term -> Index (); printf (" [1 %d %d]", ind0, ind1); return COU_EXPRVAR;}
+    else          {ind1 = term -> Index (); printf (" [2 %d %d]", ind0, ind1); return (ind1 == ind0) ? COU_EXPRPOW : COU_EXPRMUL;}
 
   case COU_EXPROPP: ///
     coe = -coe;
+    //printf (" [3 %g]", coe); 
     return decomposeTerm (p, term -> Argument (), coe, ind0, ind1);
 
     // not-so-easy cases /////////////////////////////////////////////////////////////////
@@ -106,20 +108,30 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
     // based on number of factors, decide what to return
     switch (indices.size ()) {
 
-    case 0: return COU_EXPRCONST; // no variables in multiplication (hmmm...)
+    case 0: //printf (" [0 terms]");
+      return COU_EXPRCONST; // no variables in multiplication (hmmm...)
 
     case 1: { // only one term (may be with >1 exponent)
 
       std::map <int, CouNumber>::iterator one = indices.begin ();
 
-      if (fabs (one -> second - 1) > COUENNE_EPS) ind0 = one -> first;
-      else {
+      if (fabs (one -> second - 1) < COUENNE_EPS) {
+	ind0 = one -> first;
+	//printf (" [1 lin term]"); 
+	return COU_EXPRVAR;
+      }
+      else if (fabs (one -> second - 2) < COUENNE_EPS) {
+	ind0 = one -> first;
+	//printf (" [1 sq term]"); 
+	return COU_EXPRPOW;
+      } else {
+
 	exprAux *aux = p -> addAuxiliary (new exprPow (new exprClone (p -> Var (one -> first)),
 						       new exprConst (one -> second)));
 	ind0 = aux -> Index ();
       }
 
-      return COU_EXPRVAR;
+      //printf (" [1 term]"); 
     }
 
     case 2: { // two terms
@@ -141,6 +153,7 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
 	ind1 = aux -> Index ();
       } else ind1 = two -> first;
 
+      //printf (" [2 terms]", coe); 
       return (ind0 == ind1) ? COU_EXPRPOW : COU_EXPRMUL;
     }
 
@@ -159,6 +172,7 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
       exprAux *aux = p -> addAuxiliary (new exprMul (al, indices.size ()));
 
       ind0 = aux -> Index ();
+      //printf (" [...%d]", coe, ind0); 
       return COU_EXPRVAR;
     }
     }
@@ -185,6 +199,7 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
     // behave differently if one space is occupied already
 
     if (ind0 >= 0) {
+      //printf (" [5a]"); 
 
       // standardize power and put new aux as second argument
       //expression *aux = p -> addAuxiliary (term);
@@ -203,6 +218,8 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
 	//if (!aux) 
 	//aux = *al;
 
+	//printf (" [5b]"); 
+
 	ind0 = aux -> Index ();
 	return COU_EXPRPOW;
       } else {
@@ -212,6 +229,8 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
 	//  aux = term;
 
 	ind0 = aux -> Index ();
+
+	//printf (" [5c]"); 
 
 	// standardize argument and return power
 	return COU_EXPRVAR;

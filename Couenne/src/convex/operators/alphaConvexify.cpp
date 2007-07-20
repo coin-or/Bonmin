@@ -33,6 +33,7 @@
  * If Q is negative semidefinite, then dCoeffUp_ will be NULL.
 */
 void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
+
 	if (getnQTerms()==0) {
 		nDiag_=0;
 		return;

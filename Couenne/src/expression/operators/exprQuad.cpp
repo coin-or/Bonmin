@@ -35,10 +35,12 @@ exprQuad::exprQuad  (CouNumber c0,      // constant term
   qindexJ_ = new int       [nqterms_];
   qcoeff_  = new CouNumber [nqterms_];
 
+  int qi, qj;
+
   for (register int i = nqterms_; i--;) {
-    qindexI_ [i] = qindexI [i];
-    qindexJ_ [i] = qindexJ [i];
-    qcoeff_  [i] = qcoeff  [i];
+    qindexI_ [i] = qi = qindexI [i];
+    qindexJ_ [i] = qj = qindexJ [i];
+    qcoeff_  [i] = (qi == qj) ? (qcoeff [i]) : (0.5 * qcoeff [i]); // HIC EST DIVISION
   }
 } 
 
@@ -79,12 +81,15 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
   // print bilinear terms
   for (int i = 0; i < nqterms_; i++) {
 
-    out << qcoeff_ [i];
+    int qi = qindexI_ [i], 
+        qj = qindexJ_ [i];
+
+    CouNumber coe = (qi == qj) ? (qcoeff_ [i]) : (2 * qcoeff_ [i]);
+
+    if (coe > 0) out << '+';
+    out << coe;
 
     if (p) { // have problem pointer, use right names (x,w,y)
-
-      int qi = qindexI_ [i], 
-	  qj = qindexJ_ [i];
 
       expression *prod;
 
@@ -93,16 +98,13 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
 				new exprConst (2)));
       else prod = (new exprMul (new exprClone (p -> Var (qi)),
 				new exprClone (p -> Var (qj))));
-      prod -> print (out, descend, p);
+      prod -> print (out, descend, p); out << ' ';
       delete prod;
 
     } else { // no problem pointer, use x for all variables
 
-      int qi = qindexI_ [i], 
-	  qj = qindexJ_ [i];
-
       if (qi == qj) out << "x_" << qi << "^2 ";
-      else          out << "x_" << qi << "*x_" << qj;
+      else          out << "x_" << qi << "*x_" << qj << ' ';
     }
   }
 }
@@ -112,7 +114,7 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
 expression *exprQuad::differentiate (int index) {
 
   expression **arglist = new expression * [nargs_+1];
-
+  /*
   register int nonconst = 0;
 
   CouNumber totlin=0;
@@ -133,7 +135,10 @@ expression *exprQuad::differentiate (int index) {
     delete [] arglist;
     return new exprConst (0);
   }
-  else return new exprSum (arglist, nonconst);
+  else return new exprSum (arglist, nonconst);*/
+  // TODO!
+
+  return NULL;
 }
 
 
