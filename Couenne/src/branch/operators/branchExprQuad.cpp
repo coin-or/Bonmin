@@ -11,9 +11,6 @@
 #include <CouenneBranchingObject.hpp>
 
 
-//#define LARGE_BOUND 9.9e12
-//#define BOUND_WING 1
-
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 CouNumber exprQuad::selectBranch (expression *w, 
@@ -22,77 +19,48 @@ CouNumber exprQuad::selectBranch (expression *w,
 				  double * &brpts, 
 				  int &way) {
 
-  return 0;
-
   const CouNumber *x = info -> solution_, 
                   *l = info -> lower_,
                   *u = info -> upper_; 
 
 
+  CouNumber delta = (*w) () - (*this) (), 
+    *alpha = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
+    maxcontr = -COUENNE_INFINITY;
 
+  int *indices = dIndex_, bestVar;
 
-#if 0
+  // find i = argmin {alpha_i (x_i - l_i) (u_i - x_i)}
+  for (int i=0; i < nDiag_; i++, indices++) {
+    
+    CouNumber curx = x [*indices],
+      contrib = *alpha++ * 
+      (curx         - l [*indices]) * 
+      (u [*indices] - curx);
 
-  int xi = arglist_ [0] -> Index (),
-      yi = arglist_ [1] -> Index ();
-
-  if ((xi < 0) || (yi < 0)) {
-    printf ("Couenne, exprMul::selectBranch: arguments of exprMul have negative index\n");
-    exit (-1);
+    if (fabs (contrib) > maxcontr) {
+      bestVar  = *indices;
+      maxcontr = contrib;
+    }
   }
 
-  CouNumber x0 = expression::Variable (xi),   y0 = expression::Variable (yi), 
-            xl = expression::Lbound   (xi),   yl = expression::Lbound   (yi),  
-            xu = expression::Ubound   (xi),   yu = expression::Ubound   (yi);  
+  ind = bestVar;
+  way = TWO_RAND;
 
-  // First, try to avoid infinite bounds for multiplications, which
-  // make them pretty hard to deal with
+  brpts = (double *) realloc (brpts, sizeof (double));
 
-  if ((xl < - COUENNE_INFINITY) && 
-      (xu >   COUENNE_INFINITY)) { // first
+  CouNumber lb = l [bestVar], 
+            ub = u [bestVar];
 
-    ind = xi;
+  *brpts = x [bestVar];
 
-    // branch around current point. If it is also at a crazy value,
-    // reset it close to zero.
+  if ((*brpts > ub - COUENNE_NEAR_BOUND) ||
+      (*brpts < lb + COUENNE_NEAR_BOUND)) 
 
-    brpts = (double *) malloc (2 * sizeof (double));
-    CouNumber curr = x0;
+    *brpts = 0.5 * (lb + ub);
 
-    if (fabs (curr) >= LARGE_BOUND) curr = 0;
+  //printf ("brExprQuad: delta = %g, brpt = %g (%g), var = x%d, way = %d\n",
+  //	  delta, *brpts, x [bestVar], bestVar, way);
 
-    brpts [0] = - fabs (curr) - BOUND_WING;
-    brpts [1] =   fabs (curr) + BOUND_WING;
-
-    way = THREE_CENTER;
-
-    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this
-  }
-
-  if ((yl < - COUENNE_INFINITY) && 
-      (yu >   COUENNE_INFINITY)) { // and second factor
-
-    ind = yi;
-
-    // branch around current point. If it is also at a crazy value,
-    // reset it close to zero.
-
-    brpts = (double *) malloc (2 * sizeof (double));
-    CouNumber curr = y0;
-
-    if (fabs (curr) >= LARGE_BOUND) curr = 0;
-
-    brpts [0] = - fabs (curr) - BOUND_WING;
-    brpts [1] =   fabs (curr) + BOUND_WING;
-
-    way = THREE_CENTER;
-
-    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this
-  }
-
-  // there is at least one finite corner of the bounding box
-
-  ind = -1;
-  return 0.;
-#endif
+  return delta;
 }

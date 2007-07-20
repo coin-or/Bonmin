@@ -44,6 +44,7 @@ class exprQuad: public exprGroup {
   int       *dIndex_;  
   /// number of elements in the above sparse vectors
   int        nDiag_;    
+
  public:
 
   /// Constructor
@@ -57,10 +58,17 @@ class exprQuad: public exprGroup {
 
   /// destructor
   virtual ~exprQuad () {
+
     if (qindexI_) {
       delete [] qindexI_;
       delete [] qindexJ_;
       delete [] qcoeff_;
+    }
+
+    if (dIndex_) {
+      delete [] dIndex_;
+      delete [] dCoeffLo_;
+      delete [] dCoeffUp_;
     }
   }
 

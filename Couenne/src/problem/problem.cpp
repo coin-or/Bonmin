@@ -27,7 +27,7 @@
 
 void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u, int n) {
 
-  register int nvars = nVars () + nAuxs ();
+  register int nvars = nVars ();
 
   // expand arrays if needed
 

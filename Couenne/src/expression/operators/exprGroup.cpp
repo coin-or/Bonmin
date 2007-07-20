@@ -40,10 +40,11 @@ exprGroup::exprGroup  (CouNumber c0,     // constant term
 
 /// copy constructor
 exprGroup::exprGroup  (const exprGroup &src): 
-  exprSum (src.clonearglist (), src.nargs_),
-  c0_     (src.c0_),
-  index_  (NULL),
-  coeff_  (NULL)  {
+  exprSum   (src.clonearglist (), src.nargs_),
+  c0_       (src.c0_),
+  index_    (NULL),
+  coeff_    (NULL),
+  nlterms_  (src.nlterms_) {
 
   register int *ind, size = 0;
 

@@ -37,7 +37,7 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
      lambda = dCoeffUp_;
   }
   const CouenneProblem& problem = *(cg->Problem());
-  const int & numcols = problem.nOrig();
+  const int & numcols = problem.nVars();
   const double * colsol = problem.X();
   const double * lower = problem.Lb();
   const double * upper = problem.Ub();
@@ -69,7 +69,6 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
   for(int i = 0 ; i < nlterms_ ; i++){
      vec[index_[i]] += coeff_[i];
   }
-
 
   // Don't forget the auxiliaries!
   /*for(int i = 0 ; i < nargs_ ; i++){

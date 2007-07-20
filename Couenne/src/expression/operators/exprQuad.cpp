@@ -52,23 +52,43 @@ exprQuad::exprQuad  (const exprQuad &src):
   qindexI_  (NULL),
   qindexJ_  (NULL),
   qcoeff_   (NULL),
-  nqterms_  (src.nqterms_) {
+  nqterms_  (src.nqterms_),
+  nDiag_    (src.nDiag_)   {
 
   if (src.qindexI_) {
     qindexI_ = new int       [nqterms_];
     qindexJ_ = new int       [nqterms_];
     qcoeff_  = new CouNumber [nqterms_];
+
+    int *qi = src.qindexI_,
+        *qj = src.qindexJ_;
+
+    CouNumber *qc = src.qcoeff_;
+
+    for (int i = nqterms_; i--;) {
+      qindexI_ [i] = qi [i];
+      qindexJ_ [i] = qj [i];
+      qcoeff_  [i] = qc [i];
+    }
   }
 
-  int *qi = src.qindexI_,
-      *qj = src.qindexJ_;
+  if (src.dIndex_) {
+    
+    dIndex_   = new int       [nDiag_];
+    dCoeffLo_ = new CouNumber [nDiag_];
+    dCoeffUp_ = new CouNumber [nDiag_];
 
-  CouNumber *qc = src.qcoeff_;
+    /*
+    int *qi = src.qindexI_,
+        *qj = src.qindexJ_;
 
-  for (int i = nqterms_; i--;) {
-    qindexI_ [i] = qi [i];
-    qindexJ_ [i] = qj [i];
-    qcoeff_  [i] = qc [i];
+    CouNumber *qc = src.qcoeff_;
+    */
+    for (int i = nDiag_; i--;) {
+      dIndex_   [i] = src.dIndex_   [i];
+      dCoeffLo_ [i] = src.dCoeffLo_ [i];
+      dCoeffUp_ [i] = src.dCoeffUp_ [i];
+    }
   }
 } 
 
@@ -113,8 +133,9 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
 /// differentiation
 expression *exprQuad::differentiate (int index) {
 
+ /*
   expression **arglist = new expression * [nargs_+1];
-  /*
+
   register int nonconst = 0;
 
   CouNumber totlin=0;
