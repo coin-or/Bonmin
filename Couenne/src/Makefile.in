@@ -127,6 +127,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/conv-exprQuad.cpp \
 	convex/operators/trigNewton.cpp \
 	convex/operators/createQuadratic.cpp \
+	convex/operators/sumStandardize.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	convex/boundTightening.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/obbt.cpp \
@@ -160,14 +161,14 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	powNewton.lo conv-exprSub.lo conv-exprSum.lo linearize.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
 	conv-exprLog.lo conv-exprGroup.lo conv-exprQuad.lo \
-	trigNewton.lo createQuadratic.lo CouenneCutGenerator.lo \
-	generateCuts.lo boundTightening.lo genColCuts.lo genRowCuts.lo \
-	obbt.lo alphaConvexify.lo quadCuts.lo problem.lo \
-	CouenneProblem.lo problemIO.lo extended.lo constraint.lo \
-	tightenBounds.lo impliedBounds.lo readASLfg.lo \
-	fillQuadIndices.lo constrStandardize.lo elementBreak.lo \
-	splitAux.lo auxiliarize.lo standardize.lo depGraph.lo \
-	drawCuts.lo rootQ.lo $(am__objects_1)
+	trigNewton.lo createQuadratic.lo sumStandardize.lo \
+	CouenneCutGenerator.lo generateCuts.lo boundTightening.lo \
+	genColCuts.lo genRowCuts.lo obbt.lo alphaConvexify.lo \
+	quadCuts.lo problem.lo CouenneProblem.lo problemIO.lo \
+	extended.lo constraint.lo tightenBounds.lo impliedBounds.lo \
+	readASLfg.lo fillQuadIndices.lo constrStandardize.lo \
+	elementBreak.lo splitAux.lo auxiliarize.lo standardize.lo \
+	depGraph.lo drawCuts.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -430,6 +431,7 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/conv-exprQuad.cpp \
 	convex/operators/trigNewton.cpp \
 	convex/operators/createQuadratic.cpp \
+	convex/operators/sumStandardize.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
 	convex/boundTightening.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/obbt.cpp \
@@ -706,6 +708,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplify.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splitAux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/standardize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sumStandardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trigNewton.Plo@am__quote@
 
@@ -1198,6 +1201,13 @@ createQuadratic.lo: convex/operators/createQuadratic.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/createQuadratic.cpp' object='createQuadratic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o createQuadratic.lo `test -f 'convex/operators/createQuadratic.cpp' || echo '$(srcdir)/'`convex/operators/createQuadratic.cpp
+
+sumStandardize.lo: convex/operators/sumStandardize.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT sumStandardize.lo -MD -MP -MF "$(DEPDIR)/sumStandardize.Tpo" -c -o sumStandardize.lo `test -f 'convex/operators/sumStandardize.cpp' || echo '$(srcdir)/'`convex/operators/sumStandardize.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/sumStandardize.Tpo" "$(DEPDIR)/sumStandardize.Plo"; else rm -f "$(DEPDIR)/sumStandardize.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/sumStandardize.cpp' object='sumStandardize.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o sumStandardize.lo `test -f 'convex/operators/sumStandardize.cpp' || echo '$(srcdir)/'`convex/operators/sumStandardize.cpp
 
 CouenneCutGenerator.lo: convex/CouenneCutGenerator.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneCutGenerator.lo -MD -MP -MF "$(DEPDIR)/CouenneCutGenerator.Tpo" -c -o CouenneCutGenerator.lo `test -f 'convex/CouenneCutGenerator.cpp' || echo '$(srcdir)/'`convex/CouenneCutGenerator.cpp; \

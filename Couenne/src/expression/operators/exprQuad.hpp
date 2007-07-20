@@ -2,7 +2,7 @@
  * Name:    exprQuad.hpp
  * Author:  Pietro Belotti
  * Purpose: definition of quadratic expressions (= exprGroup +
- * quadratic = constant + linear + [nonlinear] + quadratic)
+ *          quadratic = constant + linear + [nonlinear] + quadratic)
  *
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
  */
@@ -65,7 +65,7 @@ class exprQuad: public exprGroup {
   }
 
   /// get indices and coefficients vectors of the quadratic part
-  CouNumber *getQCoeffsI () {return qcoeff_;}
+  CouNumber *getQCoeffs  () {return qcoeff_;}
   int       *getQIndexI  () {return qindexI_;}
   int       *getQIndexJ  () {return qindexJ_;}
   int        getnQTerms  () {return nqterms_;}

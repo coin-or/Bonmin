@@ -45,7 +45,7 @@ class exprGroup: public exprSum {
   CouNumber  getc0      () {return c0_;}
   CouNumber *getCoeffs  () {return coeff_;}
   int       *getIndices () {return index_;}
-  int        getNLTerms () {return nlterms_;}
+  int        getnLTerms () {return nlterms_;}
 
   /// cloning method
   virtual expression *clone () const

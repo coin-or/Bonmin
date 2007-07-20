@@ -16,60 +16,76 @@
 /// method to actually compute the bound
 CouNumber computeQBound (int, exprQuad *);
 
+
 /// class to compute lower bound of a fraction based on the bounds of
 /// both numerator and denominator
 
-class exprLBQuad: public exprOp {
+class exprLBQuad: public expression {
+
+  exprQuad *ref_; //< quadratic form, reference expression
 
  public:
 
-  /// Constructors, destructor
-  exprLBQuad  (expression **al, int n): 
-    exprOp (al, n) {} //< non-leaf expression, with argument list
+  /// Constructor
+  exprLBQuad (exprQuad *ref): ref_ (ref) {}
+
+  /// copy constructor
+  exprLBQuad (const exprLBQuad &src): 
+    ref_ (dynamic_cast <exprQuad *> (src.ref_ -> clone ())) {}
+
+  /// destructor
+  ~exprLBQuad () {}
 
   /// cloning method
   expression *clone () const
-    {return new exprLBQuad (clonearglist (), nargs_);}
+    {return new exprLBQuad (*this);}
 
   /// function for the evaluation of the expression
-  CouNumber operator () () {return computeQBound (-1, NULL);}
+  CouNumber operator () () 
+  {return computeQBound (-1, NULL);}
 
-  /// print position (PRE, INSIDE, POST)
-  enum pos printPos () const
-    {return PRE;}
+  /// I/O
+  virtual void print (std::ostream &s = std::cout,     //< output stream
+		      bool descend = false,            //< descend into auxiliaries' image?
+		      CouenneProblem *p = NULL) const  //< problem pointer (in exprGroup)
 
-  /// print operator
-  std::string printOp () const
-    {return "LB_Quad";}
+  {s << "lower("; ref_ -> print (s, descend, p); s << ')';}
 };
 
 
-/// class to compute lower bound of a fraction based on the bounds of
+/// class to compute upper bound of a fraction based on the bounds of
 /// both numerator and denominator
 
-class exprUBQuad: public exprOp {
+class exprUBQuad: public expression {
+
+  exprQuad *ref_; //< quadratic form, reference expression
 
  public:
 
-  /// Constructors, destructor
-  exprUBQuad  (expression **al, int n): 
-    exprOp (al, n) {} //< non-leaf expression, with argument list
+  /// Constructor
+  exprUBQuad (exprQuad *ref): ref_ (ref) {}
+
+  /// copy constructor
+  exprUBQuad (const exprUBQuad &src): 
+    ref_ (dynamic_cast <exprQuad *> (src.ref_ -> clone ())) {}
+
+  /// destructor
+  ~exprUBQuad () {}
 
   /// cloning method
   expression *clone () const
-    {return new exprUBQuad (clonearglist (), nargs_);}
+    {return new exprUBQuad (*this);}
 
   /// function for the evaluation of the expression
-  CouNumber operator () () {return computeQBound (1, NULL);}
+  CouNumber operator () () 
+  {return computeQBound (1, NULL);}
 
-  /// print position (PRE, INSIDE, POST)
-  enum pos printPos () const
-    {return PRE;}
+  /// I/O
+  virtual void print (std::ostream &s = std::cout,     //< output stream
+		      bool descend = false,            //< descend into auxiliaries' image?
+		      CouenneProblem *p = NULL) const  //< problem pointer (in exprGroup)
 
-  /// print operator
-  std::string printOp () const
-    {return "UB_Quad";}
+  {s << "upper("; ref_ -> print (s, descend, p); s << ')';}
 };
 
 #endif
-

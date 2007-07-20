@@ -90,7 +90,6 @@ void CouenneProblem::standardize () {
 
   std::vector <CouenneConstraint *> con2;
 
-
   // standardize constraints
   for (int i=0, ncon = constraints_.size (); ncon--; i++) {
 
@@ -158,7 +157,7 @@ void CouenneProblem::standardize () {
   // make expression library point to new vectors
   expression::update (x_, lb_, ub_);
 
-  //print ();
+  //  print ();
 
   //for (int i=nVars (), j=0; j < nAuxs (); i++, j++) {
   for (int i=0; i < nVars (); i++) 

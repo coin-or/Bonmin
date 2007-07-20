@@ -140,14 +140,19 @@ int CouenneProblem::readnl (const ASL *asl) {
       index -= nterms;
       coeff -= nterms;
 
-      expression **nll = new expression * [1];
+      if (nl -> code () == COU_EXPRSUM)
+	body = new exprGroup (0, index, coeff, nl -> ArgList (), nl -> nArgs ());
+      else {
 
-      *nll = nl;
+	expression **nll = new expression * [1];
 
-      //body = new exprGroup (objconst (i), index, coeff, nll, 1);
+	*nll = nl;
 
-      // apparently, objconst (i) is included in the obj expression
-      body = new exprGroup (0, index, coeff, nll, 1);
+	//body = new exprGroup (objconst (i), index, coeff, nll, 1);
+
+	// apparently, objconst (i) is included in the obj expression
+	body = new exprGroup (0, index, coeff, nll, 1);
+      }
 
       delete [] index;
       delete [] coeff;
@@ -289,7 +294,10 @@ int CouenneProblem::readnl (const ASL *asl) {
     *nll = nl2e (CON_DE [i] . e);
 
     if (index [i] && (*(index [i]) >= 0)) 
-      body = new exprGroup (0., index [i], coeff [i], nll, 1);
+      if ((*nll) -> code () == COU_EXPRSUM)
+	body = new exprGroup (0., index [i], coeff [i], (*nll) -> ArgList (), (*nll) -> nArgs ());
+      else
+	body = new exprGroup (0., index [i], coeff [i], nll, 1);
     else {
       body = *nll;
       delete [] nll;

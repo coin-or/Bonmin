@@ -13,15 +13,17 @@
 #include <exprAux.hpp>
 #include <CouenneProblem.hpp>
 
+
 /// class for multiplications
 
 class exprMul: public exprOp {
 
  public:
 
-  /// Constructors, destructor
+  /// Constructor
   exprMul (expression **, int);
 
+  /// constructor with two arguments
   exprMul (expression *, expression *);
 
   /// cloning method
@@ -32,10 +34,7 @@ class exprMul: public exprOp {
   std::string printOp () const
     {return "*";}
 
-  /// print expression
-  //  void print (std::ostream&) const;
-
-  /// function for the evaluation of the expression
+  /// method to evaluate the expression
   inline CouNumber operator () ();
 
   /// differentiation

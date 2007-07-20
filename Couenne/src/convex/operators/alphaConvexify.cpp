@@ -77,7 +77,7 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
 	for (int i=0; i<getnQTerms(); ++i) {
 		int row=indexmap[getQIndexI()[i]];
 		int col=indexmap[getQIndexJ()[i]];
-		matrix[((row+1)*row)/2+col]=getQCoeffsI()[i]*diam[row]*diam[col];
+		matrix[((row+1)*row)/2+col]=getQCoeffs()[i]*diam[row]*diam[col];
 	}
 
 	// compute minimum and maximum eigenvalue of matrix

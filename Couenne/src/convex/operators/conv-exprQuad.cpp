@@ -12,18 +12,17 @@
 #include <OsiCuts.hpp>
 
 #include <exprQuad.hpp>
+#include <exprBQuad.hpp>
+
 
 /// Get lower and upper bound of an expression (if any)
 void exprQuad::getBounds (expression *&lb, expression *&ub) {
 
-  expression *lbgrp, *ubgrp;
+  lb = new exprLBQuad (this);
+  ub = new exprUBQuad (this);
 
-  /// compute lower/upper bound of nonlinear part
-  exprGroup::getBounds (lbgrp, ubgrp);
-
-  ///
-
-
+  //lb = new exprConst (-COUENNE_INFINITY);
+  //ub = new exprConst  (COUENNE_INFINITY);
 }
 
 

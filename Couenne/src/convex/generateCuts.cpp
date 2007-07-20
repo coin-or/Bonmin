@@ -77,6 +77,11 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
+
+  /*printf ("problem now:--------------------------------------\n");
+  problem_ -> print ();
+  printf ("--------------------------------------------------\n");*/
+
   int nInitCuts = cs.sizeRowCuts ();
 
   //  printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 

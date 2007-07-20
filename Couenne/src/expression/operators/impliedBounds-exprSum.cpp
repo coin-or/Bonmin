@@ -22,6 +22,9 @@ static CouNumber scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
 
 bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
+  // not yet implemented for quadratic forms... TODO
+  if (code () == COU_EXPRQUAD) return false; 
+
   /**
    *  An expression 
    *

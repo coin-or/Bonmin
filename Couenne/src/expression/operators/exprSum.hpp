@@ -64,6 +64,11 @@ class exprSum: public exprOp {
 
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
+
+  /// checks for quadratic terms in the expression and returns an
+  /// exprQuad if there are enough to create something that can be
+  /// convexified
+  exprAux *createQuadratic (CouenneProblem *);
 };
 
 

@@ -152,7 +152,6 @@ exprAux *exprOp::standardize (CouenneProblem *p) {
   exprVar *subst;
 
   for (register int i = nargs_; i--;)
-
     if ((subst = arglist_ [i] -> standardize (p)))
       arglist_ [i] = new exprClone (subst);
 

@@ -16,17 +16,13 @@
 #include <CouenneProblem.hpp>
 #include <CouenneCutGenerator.hpp>
 
+#if 0
 
 /// used to create linear term
 typedef struct {
   int index;
   CouNumber coeff;
 } monomial;
-
-
-/// check expression for quadratic terms and return an exprQuad if
-/// there are many
-exprAux *createQuadratic (CouenneProblem *, exprSum *);
 
 
 /// get constant multiplicator and aux index from a multiplication
@@ -197,7 +193,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
   }
 
   // check if this is a potential quadratic form, and return it if so
-  exprAux *q = createQuadratic (p, this);
+  exprAux *q = createQuadratic (p);
   if (q) return q;
 
   // one by one standardize each argument of arglist_ into a pair
@@ -354,3 +350,5 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 
   return ret;
 }
+
+#endif

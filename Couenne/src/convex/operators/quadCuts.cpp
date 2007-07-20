@@ -15,8 +15,6 @@
 
 #include "CoinHelperFunctions.hpp"
 
-
-
 void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
 
   assert(dIndex_ != NULL);
@@ -115,5 +113,3 @@ void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
   delete [] vec;
   cs.insert(cut);
 }
-
-

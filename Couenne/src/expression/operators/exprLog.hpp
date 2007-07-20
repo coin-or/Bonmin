@@ -35,10 +35,6 @@ class exprLog: public exprUnary {
   std::string printOp () const
     {return "log";}
 
-  /// print position
-  //virtual const std::string printPos () 
-  //{return PRE;}
-
   // differentiation
   expression *differentiate (int index); 
 

@@ -45,8 +45,8 @@ void CouenneProblem::print (std::ostream &out) {
 	    << ","  << (*i) -> Multiplicity () << "] := ";
 	if ((*i) -> Image ())
 	  (*i) -> Image () -> print (out, false, this); 
-	out << " [ " << (*((*i) -> Lb ())) (); //-> print (out);
-	out << " , " << (*((*i) -> Ub ())) (); //-> print (out);
+	out << " [ " << (*((*i) -> Lb ())) ();
+	out << " , " << (*((*i) -> Ub ())) ();
 	out << " ] " << std::endl;
       }
     } else {

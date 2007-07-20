@@ -60,6 +60,7 @@ Couenne/src/convex/operators/createQuadratic.cpp -text
 Couenne/src/convex/operators/linearize.cpp -text
 Couenne/src/convex/operators/powNewton.cpp -text
 Couenne/src/convex/operators/quadCuts.cpp -text
+Couenne/src/convex/operators/sumStandardize.cpp -text
 Couenne/src/convex/operators/trigNewton.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/CouennePrecisions.h -text

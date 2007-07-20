@@ -213,7 +213,7 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
   std::set <exprAux *, compExpr>::iterator i;
 
   // create new aux associated with that expression
-  exprAux *w = new exprAux (symbolic, 
+  exprAux *w = new exprAux (symbolic,
 			    variables_ . size (), 
 			    1 + symbolic -> rank (this));
 

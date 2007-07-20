@@ -12,6 +12,81 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 
   return (sign < 0) ? -COUENNE_INFINITY : COUENNE_INFINITY;
 
+  int 
+    nlt = e -> getnLTerms (),
+    *li = e -> getIndices (),
+
+    nqt = e -> getnQTerms (),
+    *qi = e -> getQIndexI (),
+    *qj = e -> getQIndexJ ();
+
+  CouNumber
+    *lc = e -> getCoeffs  (),
+    *qc = e -> getQCoeffs (),
+    *lb = expression::Lbounds (),
+    *ub = expression::Lbounds (),
+    bound = e -> getc0 ();
+
+  if (sign < 0) {
+
+    while (nlt--) {
+
+      CouNumber coe = *lc++;
+      int       ind = *li++;
+
+      if (coe < 0) bound += coe * lb [ind];
+      else         bound += coe * ub [ind];
+    }
+
+    while (nqt--) {
+
+      int       i = *qi++,
+                j = *qj++;
+
+      CouNumber coe = *qc++,
+  	        lbi = lb [i],
+  	        ubi = ub [i],
+  	        lbj = lb [j],
+         	ubj = ub [j],
+ 	        b1 = coe * lbi * lbj,
+ 	        b2 = coe * lbi * ubj,
+ 	        b3 = coe * ubi * lbj,
+ 	        b4 = coe * ubi * ubj;
+
+      bound += mymin (mymin (b1, b2), mymin (b3, b4));
+    }
+  } else {
+
+    while (nlt--) {
+
+      CouNumber coe = *lc++;
+      int       ind = *li++;
+
+      if (coe > 0) bound += coe * lb [ind];
+      else         bound += coe * ub [ind];
+    }
+
+    while (nqt--) {
+
+      int       i = *qi++,
+                j = *qj++;
+
+      CouNumber coe = *qc++,
+  	        lbi = lb [i],
+  	        ubi = ub [i],
+  	        lbj = lb [j],
+         	ubj = ub [j],
+ 	        b1 = coe * lbi * lbj,
+ 	        b2 = coe * lbi * ubj,
+ 	        b3 = coe * ubi * lbj,
+ 	        b4 = coe * ubi * ubj;
+
+      bound += mymax (mymax (b1, b2), mymax (b3, b4));
+    }
+  }
+
+  return bound;
+
   // compute lower (if sign == -1) or upper (sign == +1) bound of an
   // exprQuad based on the information obtained through
   // alpha-convexification, if any, or as follows:
@@ -29,6 +104,7 @@ CouNumber computeQBound (int sign, exprQuad *e) {
   // without updating the convexification. Notice also that the
   // direction can also be vertical, not only horizontal
 
+  /*
   int nqt = e -> getnQTerms ();
 
   CouNumber 
@@ -44,6 +120,7 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 
   hL -= nqt;  hU -= nqt;
   vL -= nqt;  vU -= nqt;
+  */
 
   //  for (register int i = nqt; i--;) 
 
