@@ -31,6 +31,7 @@ libCouenne_la_SOURCES = \
 	branch/operators/branchExprLog.cpp \
 	branch/operators/branchExprMul.cpp \
 	branch/operators/branchExprPow.cpp \
+	branch/operators/branchExprQuad.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \

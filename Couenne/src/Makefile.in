@@ -83,6 +83,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	branch/operators/branchExprLog.cpp \
 	branch/operators/branchExprMul.cpp \
 	branch/operators/branchExprPow.cpp \
+	branch/operators/branchExprQuad.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -148,27 +149,28 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneChooseVariable.lo getFixVarBinFun.lo projections.lo \
 	branchExprAbs.lo branchExprExp.lo branchExprDiv.lo \
 	branchExprInv.lo branchExprLog.lo branchExprMul.lo \
-	branchExprPow.lo exprAbs.lo exprDiv.lo exprExp.lo exprInv.lo \
-	exprLog.lo exprMul.lo exprOpp.lo exprPow.lo exprSin.lo \
-	exprCos.lo exprSub.lo exprSum.lo exprMinMax.lo exprGroup.lo \
-	exprQuad.lo exprBQuad.lo impliedBounds-exprSum.lo \
-	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo exprOp.lo \
-	exprUnary.lo exprVar.lo exprAux.lo expression.lo \
-	simplifiers.lo simplify.lo checkNLP.lo addEnvelope.lo \
-	createCuts.lo conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
-	conv-exprMul-genCuts.lo conv-exprOpp.lo conv-exprPow.lo \
-	conv-exprPow-getBounds.lo conv-exprPow-envelope.lo \
-	powNewton.lo conv-exprSub.lo conv-exprSum.lo linearize.lo \
-	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
-	conv-exprLog.lo conv-exprGroup.lo conv-exprQuad.lo \
-	trigNewton.lo createQuadratic.lo sumStandardize.lo \
-	CouenneCutGenerator.lo generateCuts.lo boundTightening.lo \
-	genColCuts.lo genRowCuts.lo obbt.lo alphaConvexify.lo \
-	quadCuts.lo problem.lo CouenneProblem.lo problemIO.lo \
-	extended.lo constraint.lo tightenBounds.lo impliedBounds.lo \
-	readASLfg.lo fillQuadIndices.lo constrStandardize.lo \
-	elementBreak.lo splitAux.lo auxiliarize.lo standardize.lo \
-	depGraph.lo drawCuts.lo rootQ.lo $(am__objects_1)
+	branchExprPow.lo branchExprQuad.lo exprAbs.lo exprDiv.lo \
+	exprExp.lo exprInv.lo exprLog.lo exprMul.lo exprOpp.lo \
+	exprPow.lo exprSin.lo exprCos.lo exprSub.lo exprSum.lo \
+	exprMinMax.lo exprGroup.lo exprQuad.lo exprBQuad.lo \
+	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
+	impliedBounds-exprMul.lo exprOp.lo exprUnary.lo exprVar.lo \
+	exprAux.lo expression.lo simplifiers.lo simplify.lo \
+	checkNLP.lo addEnvelope.lo createCuts.lo conv-exprAbs.lo \
+	conv-exprDiv.lo conv-exprMul.lo conv-exprMul-genCuts.lo \
+	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
+	conv-exprPow-envelope.lo powNewton.lo conv-exprSub.lo \
+	conv-exprSum.lo linearize.lo conv-exprInv.lo \
+	conv-exprSinCos.lo conv-exprExp.lo conv-exprLog.lo \
+	conv-exprGroup.lo conv-exprQuad.lo trigNewton.lo \
+	createQuadratic.lo sumStandardize.lo CouenneCutGenerator.lo \
+	generateCuts.lo boundTightening.lo genColCuts.lo genRowCuts.lo \
+	obbt.lo alphaConvexify.lo quadCuts.lo problem.lo \
+	CouenneProblem.lo problemIO.lo extended.lo constraint.lo \
+	tightenBounds.lo impliedBounds.lo readASLfg.lo \
+	fillQuadIndices.lo constrStandardize.lo elementBreak.lo \
+	splitAux.lo auxiliarize.lo standardize.lo depGraph.lo \
+	drawCuts.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -387,6 +389,7 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	branch/operators/branchExprLog.cpp \
 	branch/operators/branchExprMul.cpp \
 	branch/operators/branchExprPow.cpp \
+	branch/operators/branchExprQuad.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -637,6 +640,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprLog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprMul.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprPow.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/branchExprQuad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checkNLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constrStandardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint.Plo@am__quote@
@@ -858,6 +862,13 @@ branchExprPow.lo: branch/operators/branchExprPow.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/operators/branchExprPow.cpp' object='branchExprPow.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o branchExprPow.lo `test -f 'branch/operators/branchExprPow.cpp' || echo '$(srcdir)/'`branch/operators/branchExprPow.cpp
+
+branchExprQuad.lo: branch/operators/branchExprQuad.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT branchExprQuad.lo -MD -MP -MF "$(DEPDIR)/branchExprQuad.Tpo" -c -o branchExprQuad.lo `test -f 'branch/operators/branchExprQuad.cpp' || echo '$(srcdir)/'`branch/operators/branchExprQuad.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/branchExprQuad.Tpo" "$(DEPDIR)/branchExprQuad.Plo"; else rm -f "$(DEPDIR)/branchExprQuad.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/operators/branchExprQuad.cpp' object='branchExprQuad.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o branchExprQuad.lo `test -f 'branch/operators/branchExprQuad.cpp' || echo '$(srcdir)/'`branch/operators/branchExprQuad.cpp
 
 exprAbs.lo: expression/operators/exprAbs.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprAbs.lo -MD -MP -MF "$(DEPDIR)/exprAbs.Tpo" -c -o exprAbs.lo `test -f 'expression/operators/exprAbs.cpp' || echo '$(srcdir)/'`expression/operators/exprAbs.cpp; \

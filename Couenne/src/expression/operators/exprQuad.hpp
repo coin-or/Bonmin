@@ -27,7 +27,7 @@ class exprQuad: public exprGroup {
   /** @{ */
   /// the term i
   int       *qindexI_;
-  /// the term j, (must be qindexJ [k] <= qindexI [k])
+  /// the term j, (must be qindexJ_ [k] <= qindexI_ [k])
   int       *qindexJ_;
   /// the term a_ij
   CouNumber *qcoeff_;   
@@ -172,6 +172,11 @@ class exprQuad: public exprGroup {
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar ();
+
+  /// set up branching object by evaluating many branching points for
+  /// each expression's arguments
+  virtual CouNumber selectBranch (expression *, const OsiBranchingInformation *,
+				  int &, double * &, int &);
 };
 
 

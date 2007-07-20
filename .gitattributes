@@ -27,6 +27,7 @@ Couenne/src/branch/operators/branchExprInv.cpp -text
 Couenne/src/branch/operators/branchExprLog.cpp -text
 Couenne/src/branch/operators/branchExprMul.cpp -text
 Couenne/src/branch/operators/branchExprPow.cpp -text
+Couenne/src/branch/operators/branchExprQuad.cpp -text
 Couenne/src/branch/projections.c -text
 Couenne/src/branch/projections.h -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
