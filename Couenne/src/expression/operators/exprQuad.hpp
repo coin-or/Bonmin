@@ -132,7 +132,7 @@ class exprQuad: public exprGroup {
     * Let \f$ \tilde a_0(\lambda)\f$, \f$ \tilde a(\lambda) \f$ and \f$ \tilde Q_(\lambda) \f$ be
     * \f[ \tilde a_0(\lambda) = a_0 - \sum_{i = 1}^n \lambda_i l_i u_i \f]
     * \f[ \tilde a(\lambda) = a + \left[ \begin{array}{c} \lambda_1 (u_1 + l_1) \\ \vdots \\ \lambda_n (u_n + l_n) \end{array} \right], \f]
-    * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc} \frac{1}{w_1} & 0 \\ & \ddots & \\ 0 & & \frac{1}{w_n} \end{array} \right). \f] 
+    * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc} {\lambda_1} & 0 \\ & \ddots & \\ 0 & & \lambda_n \end{array} \right). \f] 
     * The convex relaxation of the initial constraint is then given by the two constraints 
     * \f[
     * \eta \geq \tilde a_0(\lambda_{\min}) + \tilde a(\lambda_{\min})^T x + x^T \tilde Q(\lambda_{\min}) x + \sum z_j 

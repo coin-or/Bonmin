@@ -14,10 +14,15 @@
 #include <CouenneCutGenerator.hpp>
 
 #include "CoinHelperFunctions.hpp"
-
+//#define DEBUG
 void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
 
   assert(dIndex_ != NULL);
+
+#ifdef DEBUG
+  std::cout<<"Expression has "<<nlterms_<<" linear terms and "
+           <<nqterms_<<" quadratic terms."<<std::endl;
+#endif
 
   //First get on which side constraint is violated to get the good lambda
   double * lambda = NULL;
@@ -36,6 +41,11 @@ void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
   const double * colsol = problem.X();
   const double * lower = problem.Lb();
   const double * upper = problem.Ub();
+
+  std::cout<<"Point to cut"<<std::endl;
+  for(int i = 0 ; i < numcols ; i++){
+    std::cout<<colsol[i]<<", ";}
+  std::cout<<std::endl;
 
   //Initialize by copying a into a dense vector and computing Q x^*
   double * vec = new double[numcols];
@@ -88,16 +98,15 @@ void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
        nnz++;
     }
   }
+#ifdef DEBUG
+  std::cout<<"My cut should have "<<nnz<<" non zeroes."<<std::endl;
+#endif
   // Pack the vector into a CoinPackedVector and generate the cut.
   CoinPackedVector a(false);
   a.reserve(nnz);
-  double * elements = a.getElements();
-  int * indices = a.getIndices();
-  nnz = 0;
   for(int i = 0 ; i < numcols ; i++){
     if(fabs(vec[i]) > COUENNE_EPS){
-       indices[nnz] = i;
-       elements[nnz++] = vec[i];
+       a.insert(i,vec[i]);
     }
   }
   OsiRowCut cut;
