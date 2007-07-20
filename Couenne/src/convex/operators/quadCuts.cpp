@@ -37,7 +37,7 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
      lambda = dCoeffUp_;
   }
   const CouenneProblem& problem = *(cg->Problem());
-  const int & numcols = problem.nVars();
+  const int & numcols = problem.nOrig();
   const double * colsol = problem.X();
   const double * lower = problem.Lb();
   const double * upper = problem.Ub();
@@ -47,57 +47,54 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
     std::cout<<colsol[i]<<", ";}
   std::cout<<std::endl;
 
-  // Initialize by copying a into a dense vector and computing Q x^*
-  double * vec = new double [numcols];
-  CoinFillN (vec, numcols, 0.);
+  //Initialize by copying a into a dense vector and computing Q x^*
+  double * vec = new double[numcols];
+  CoinFillN(vec, numcols, 0.);
 
   //Start by computing Q x^*.
 
-  for(int k = 0 ; k < nqterms_ ; k++) { // what about element on the diagonal?
-    // derivative of (a_ij x_i x_j) is a_ij (x_i + x_j)
-    vec [qindexI_ [k]] += qcoeff_ [k] * colsol [qindexJ_ [k]];
-    vec [qindexJ_ [k]] += qcoeff_ [k] * colsol [qindexI_ [k]];
+  for(int k = 0 ; k < nqterms_ ; k++) {
+     vec[qindexI_[k]] += qcoeff_[k] * colsol[qindexJ_[k]];
+     vec[qindexJ_[k]] += qcoeff_[k] * colsol[qindexI_[k]];
   }
 
   //multiply it by x^*^T again and store the result for the lower bound
   double a0 = - c0_;
   for(int i = 0 ; i < numcols ; i++){
-    a0 -= vec[i] * colsol[i];
+    a0 += vec[i] * colsol[i];
     vec[i] *= 2;
   }
 
   // Add a to it.
   for(int i = 0 ; i < nlterms_ ; i++){
-    vec [index_[i]] += coeff_[i];
-    a0 -= coeff_ [i] * colsol [index_ [i]];
+     vec[index_[i]] += coeff_[i];
   }
 
 
-  // Don't forget the auxiliaries! Well, forget about them. After
-  // standardization, there is no nonlinear nonquadratic expression in
-  // an exprQuad.
-
+  // Don't forget the auxiliaries!
   /*for(int i = 0 ; i < nargs_ ; i++){
      vec[arglist_ [i] -> Index ()] += 1;
      }*/
 
   // And myself
-  vec [w -> Index()] -= 1;
+  vec [w -> Index ()] -= 1;
 
-  if(lambda != NULL) {
+  if (lambda != NULL) {
     // Now the part which depends on lambda
     for(int k = 0 ; k < nDiag_ ; k++){
-      a0 -= lambda [k] * lower  [dIndex_[k]] * upper  [dIndex_[k]];
-      a0 -= lambda [k] * colsol [dIndex_[k]] * colsol [dIndex_[k]];
-      vec [dIndex_[k]] += lambda[k] * (lower [dIndex_[k]] + upper[dIndex_[k]]);
-      vec [dIndex_[k]] -= lambda[k] * (colsol [dIndex_[k]]) * 2;
+      a0 += lambda[k] * lower[dIndex_[k]] * upper[dIndex_[k]];
+      a0 += lambda[k] * colsol[dIndex_[k]] * colsol[dIndex_[k]];
+      vec[dIndex_[k]] += lambda[k] * (lower[dIndex_[k]] + upper[dIndex_[k]]);
+      vec[dIndex_[k]] -= lambda[k] * (colsol[dIndex_[k]]) * 2;
     }
   }
+
+
 
   // Count the number of non-zeroes
   int nnz = 0;
   for(int i = 0 ; i < numcols ; i++){
-    if (fabs (vec [i]) > COUENNE_EPS){
+    if(fabs(vec[i]) > COUENNE_EPS){
        nnz++;
     }
   }
@@ -109,21 +106,19 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
   a.reserve(nnz);
   for(int i = 0 ; i < numcols ; i++){
     if(fabs(vec[i]) > COUENNE_EPS){
-       a.insert (i, vec [i]);
+       a.insert(i,vec[i]);
     }
   }
-
   OsiRowCut cut;
   cut.setRow(a);
   if( lambda == dCoeffLo_){
      cut.setUb(a0);
-     //cut.setLb(-COUENNE_INFINITY);
+     cut.setLb(-COUENNE_INFINITY);
   }
   else {
     cut.setLb(a0);
-    //cut.setUb(COUENNE_INFINITY);
+    cut.setUb(COUENNE_INFINITY);
   }
-  cut.print (); 
   delete [] vec;
   cs.insert(cut);
 }
