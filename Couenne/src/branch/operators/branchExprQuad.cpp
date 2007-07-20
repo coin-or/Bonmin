@@ -17,12 +17,20 @@
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 CouNumber exprQuad::selectBranch (expression *w, 
-				 const OsiBranchingInformation *info,
-				 int &ind, 
-				 double * &brpts, 
-				 int &way) {
+				  const OsiBranchingInformation *info,
+				  int &ind, 
+				  double * &brpts, 
+				  int &way) {
 
   return 0;
+
+  const CouNumber *x = info -> solution_, 
+                  *l = info -> lower_,
+                  *u = info -> upper_; 
+
+
+
+
 #if 0
 
   int xi = arglist_ [0] -> Index (),

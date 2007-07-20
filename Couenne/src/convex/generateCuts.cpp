@@ -390,8 +390,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 #endif
 
-  if ((firstcall_) && cs.sizeRowCuts ())
-    printf ("Couenne: %d initial cuts\n", cs.sizeRowCuts ());
+ {
+   int ncuts = cs.sizeRowCuts ();
+
+   if (firstcall_ && (ncuts >= 1)) {
+     if (ncuts == 1)
+       printf    ("Couenne: one initial cut\n");
+     else printf ("Couenne: %d initial cuts\n", ncuts);
+   }
+ }
 
  end_genCuts:
 

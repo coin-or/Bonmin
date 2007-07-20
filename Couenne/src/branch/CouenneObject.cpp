@@ -37,12 +37,16 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 		      const_cast <CouNumber *> (info -> upper_));
 
   expression *fixvar = reference_ -> Image () -> getFixVar ();
-  int index = fixvar -> Index ();
 
-  if (index < 0) {
+  int index = -1;
+
+  if (fixvar) 
+    index = fixvar -> Index ();
+
+  /*if (index < 0) {
     printf ("CouenneObject::infeasibility: Warning, fixvar has no index\n");
     return 0.;
-  }
+    }*/
 
   /*if (reference_ -> Index () == 9)
     for (int i=0; i<19; i++)
@@ -84,6 +88,11 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     CouNumber improv = reference_ -> Image () -> selectBranch 
       (reference_, info,             // input parameters
        brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
+
+    if ((brVarInd_ < 0) && (index < 0)) {
+      printf ("error, neither getFixVar() nor selectBranch returned a valid branching variable\n");
+      exit (-1);
+    }
 
     whichWay_ = whichWay;
 
