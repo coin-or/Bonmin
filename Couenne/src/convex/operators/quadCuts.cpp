@@ -18,6 +18,9 @@
 
 
 void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
+
+  assert(dIndex_ != NULL);
+
   //First get on which side constraint is violated to get the good lambda
   double * lambda = NULL;
   double exprVal = (*this) ();
@@ -68,13 +71,15 @@ void exprQuad::quadCuts(OsiCuts &cs, const CouenneCutGenerator *cg){
   // And myself
   vec[Index()] -= 1;
 
-  // Now the part which depends on lambda
-  for(int k = 0 ; k < nDiag_ ; k++){
-     a0 += lambda[k] * lower[dIndex_[k]] * upper[dIndex_[k]];
-     a0 += lambda[k] * colsol[dIndex_[k]] * colsol[dIndex_[k]];
-     vec[dIndex_[k]] += lambda[k] * (lower[dIndex_[k]] + upper[dIndex_[k]]);
-     vec[dIndex_[k]] -= lambda[k] * (colsol[dIndex_[k]]) * 2;
-  } 
+  if(lambda != NULL) {
+    // Now the part which depends on lambda
+    for(int k = 0 ; k < nDiag_ ; k++){
+      a0 += lambda[k] * lower[dIndex_[k]] * upper[dIndex_[k]];
+      a0 += lambda[k] * colsol[dIndex_[k]] * colsol[dIndex_[k]];
+      vec[dIndex_[k]] += lambda[k] * (lower[dIndex_[k]] + upper[dIndex_[k]]);
+      vec[dIndex_[k]] -= lambda[k] * (colsol[dIndex_[k]]) * 2;
+    }
+  }
 
 
 

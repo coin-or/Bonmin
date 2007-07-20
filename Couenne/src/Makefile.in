@@ -124,6 +124,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
+	convex/operators/conv-exprQuad.cpp \
 	convex/operators/trigNewton.cpp \
 	convex/operators/createQuadratic.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
@@ -158,15 +159,15 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	conv-exprPow-getBounds.lo conv-exprPow-envelope.lo \
 	powNewton.lo conv-exprSub.lo conv-exprSum.lo linearize.lo \
 	conv-exprInv.lo conv-exprSinCos.lo conv-exprExp.lo \
-	conv-exprLog.lo conv-exprGroup.lo trigNewton.lo \
-	createQuadratic.lo CouenneCutGenerator.lo generateCuts.lo \
-	boundTightening.lo genColCuts.lo genRowCuts.lo obbt.lo \
-	alphaConvexify.lo quadCuts.lo problem.lo CouenneProblem.lo \
-	problemIO.lo extended.lo constraint.lo tightenBounds.lo \
-	impliedBounds.lo readASLfg.lo fillQuadIndices.lo \
-	constrStandardize.lo elementBreak.lo splitAux.lo \
-	auxiliarize.lo standardize.lo depGraph.lo drawCuts.lo rootQ.lo \
-	$(am__objects_1)
+	conv-exprLog.lo conv-exprGroup.lo conv-exprQuad.lo \
+	trigNewton.lo createQuadratic.lo CouenneCutGenerator.lo \
+	generateCuts.lo boundTightening.lo genColCuts.lo genRowCuts.lo \
+	obbt.lo alphaConvexify.lo quadCuts.lo problem.lo \
+	CouenneProblem.lo problemIO.lo extended.lo constraint.lo \
+	tightenBounds.lo impliedBounds.lo readASLfg.lo \
+	fillQuadIndices.lo constrStandardize.lo elementBreak.lo \
+	splitAux.lo auxiliarize.lo standardize.lo depGraph.lo \
+	drawCuts.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -426,6 +427,7 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/conv-exprExp.cpp \
 	convex/operators/conv-exprLog.cpp \
 	convex/operators/conv-exprGroup.cpp \
+	convex/operators/conv-exprQuad.cpp \
 	convex/operators/trigNewton.cpp \
 	convex/operators/createQuadratic.cpp \
 	convex/CouenneCutGenerator.cpp convex/generateCuts.cpp \
@@ -648,6 +650,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprPow-envelope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprPow-getBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprPow.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprQuad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSinCos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSum.Plo@am__quote@
@@ -1174,6 +1177,13 @@ conv-exprGroup.lo: convex/operators/conv-exprGroup.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprGroup.cpp' object='conv-exprGroup.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprGroup.lo `test -f 'convex/operators/conv-exprGroup.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprGroup.cpp
+
+conv-exprQuad.lo: convex/operators/conv-exprQuad.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprQuad.lo -MD -MP -MF "$(DEPDIR)/conv-exprQuad.Tpo" -c -o conv-exprQuad.lo `test -f 'convex/operators/conv-exprQuad.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprQuad.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/conv-exprQuad.Tpo" "$(DEPDIR)/conv-exprQuad.Plo"; else rm -f "$(DEPDIR)/conv-exprQuad.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprQuad.cpp' object='conv-exprQuad.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprQuad.lo `test -f 'convex/operators/conv-exprQuad.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprQuad.cpp
 
 trigNewton.lo: convex/operators/trigNewton.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT trigNewton.lo -MD -MP -MF "$(DEPDIR)/trigNewton.Tpo" -c -o trigNewton.lo `test -f 'convex/operators/trigNewton.cpp' || echo '$(srcdir)/'`convex/operators/trigNewton.cpp; \
