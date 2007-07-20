@@ -1661,7 +1661,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   if (IsValid(cut_strengthener_)) {
     cut2rowIdx = new int [numCuts];// Store correspondance between indices of cut and indices of rows. For each cut store the indice of the row which generated it.
     for(int rowIdx = 0 ; rowIdx < m ; rowIdx++){
-       if(row2cutIdx[rowIdx] > 0){
+       if(row2cutIdx[rowIdx] >= 0){
           cut2rowIdx[row2cutIdx[rowIdx]] = rowIdx;
        }
     }
@@ -2028,7 +2028,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
     }
   }
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
-  
+  mat.setDimensions(m,n); // In case matrix was empty, this should be enough
   
 
   //remove non-bindings equality constraints
