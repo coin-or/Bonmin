@@ -100,7 +100,10 @@ namespace Bonmin{
  
     
     continuousSolver_->findIntegersAndSOS(false);
-    int numberIntegerObjects = continuousSolver_->numberObjects() > 0;
+
+    // [Pietro: Never used]
+    //    int numberIntegerObjects = continuousSolver_->numberObjects() > 0; 
+
     {
       int 
 	nOrig = couenneProb -> nOrig (),
@@ -138,11 +141,10 @@ namespace Bonmin{
     }
     
     //Setup Convexifier generators
-    
-    
-    
-    
-    int numGen = 0;
+
+
+    // [Pietro: never used]
+    //    int numGen = 0;
     int freq;
     options()->GetIntegerValue("convexification_cuts",freq,"couenne.");
     if (freq != 0) {

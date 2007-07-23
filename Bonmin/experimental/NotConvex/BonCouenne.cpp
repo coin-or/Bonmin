@@ -79,7 +79,7 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (0) {// print statistics in LaTeX format
+    if (1) { // print statistics in LaTeX format
 
       ////////////////////////////////
       int nr=-1, nt=-1;
@@ -97,10 +97,11 @@ int main (int argc, char *argv[])
 
       printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & ", 
 	      basename,
-	      (cg) ? cg -> Problem () -> nVars   () : -1, 
-	      (cg) ? cg -> Problem () -> nIntVars() : -1, 
-	      (cg) ? cg -> Problem () -> nNLCons () : -1,
-	      (cg) ? cg -> Problem () -> nAuxs   () : -1,
+	      (cg) ? cg -> Problem () -> nOrig    () : -1, 
+	      (cg) ? cg -> Problem () -> nIntVars () : -1, 
+	      (cg) ? cg -> Problem () -> nNLCons  () : -1,
+	      (cg) ? (cg -> Problem () -> nVars   () - 
+		      cg -> Problem () -> nOrig   ()): -1,
 	      nr, nt, st);
 
       /////////////////////////////////
