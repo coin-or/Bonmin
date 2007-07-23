@@ -82,8 +82,8 @@ int obbt_stage (const CouenneCutGenerator *cg,
     // not apply if w2 is a unary monotone function of w1
 
     // only improve bounds if
-    if (((i < nOrig) ||                                  // it is an original variable 
-	 (p -> Aux (i-nOrig) -> Multiplicity () > 0)) && // or its multiplicity is at least 1
+    if (((p -> Var (i) -> Type () == VAR) ||       // it is an original variable 
+	 (p -> Var (i) -> Multiplicity () > 0)) && // or its multiplicity is at least 1
 	
 	((i != objind) || // this is not the objective
 
@@ -96,9 +96,9 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
       int nOrig  = p -> nVars ();
 
-      bool isInt = (i < nOrig) ? 
-	(p -> Var (i)       -> isInteger ()) :
-	(p -> Aux (i-nOrig) -> isInteger ());
+      bool isInt = //(i < nOrig) ? 
+	(p -> Var (i)       -> isInteger ());
+	//(p -> Aux (i-nOrig) -> isInteger ());
 
       //      objcoe [i] = 1;
       objcoe [i] = sense;
@@ -198,8 +198,9 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	  }
 #endif	
 
-	// re-apply bound tightening -- here WITHOUT reduced cost as
-	// csi is not our problem
+	// re-apply bound tightening -- here WITHOUT reduced cost
+	// (first argument =NULL is pointer to solverInterface) as csi
+	// is not our problem
 
 	if (!(cg -> boundTightening (NULL, cs, chg_bds, babInfo))) {
 	  //printf ("##### infeasible after bound tightening\n");

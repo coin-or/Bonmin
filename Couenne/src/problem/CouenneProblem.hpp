@@ -24,7 +24,10 @@ struct expr;
 class DepGraph;
 
 
-/// structure for comparing expressions
+/** Structure for comparing expressions
+ *
+ *  Used in compare() method for same-class expressions
+ */
 
 struct compExpr {
   inline bool operator () (exprAux* e0, exprAux* e1) const
@@ -32,27 +35,28 @@ struct compExpr {
 };
 
 
-/// The CouenneProblem class
+/** Class for MINLP problems
+ *
+ *  It is read from an AMPL .nl file and contains variables, AMPL's
+ *  "defined variables" (aka common expressions), objective(s), and
+ *  constraints in the form of expression's. Changes throughout the
+ *  program occur in standardization.
+ */
 
 class CouenneProblem {
 
  protected:
 
-  /// data of the original problem
-  std::vector <CouenneObjective  *> objectives_;
-  std::vector <CouenneConstraint *> constraints_;
+  std::vector <CouenneObjective  *> objectives_;  ///< objectives
+  std::vector <CouenneConstraint *> constraints_; ///< constraints
+  std::vector <exprVar           *> variables_;   ///< variables (original, auxiliary, and defined)
 
-  /// data of the linearized problem
-  std::vector <exprAux          *> auxiliaries_;
-  std::vector <exprVar          *> variables_;
+  /// AMPL's common expressions (read from AMPL through structures cexps and cexps1)
+  std::vector <expression *> commonexprs_; 
 
-  /// common expressions (read from AMPL through structures cexps and cexps1)
-  //std::vector <expression       *> commonexprs_;
-
-  /// current value and bounds for original- and auxiliary variables
-  CouNumber *x_;
-  CouNumber *lb_;
-  CouNumber *ub_;
+  CouNumber *x_;  ///< current value of all variables
+  CouNumber *lb_; ///< current lower bound on all variables
+  CouNumber *ub_; ///< current upper bound on all variables
 
   /// expression map for comparison in standardization
   std::set <exprAux *, compExpr> *auxSet_; // int to count occurrences
@@ -93,10 +97,9 @@ class CouenneProblem {
 
  public:
 
-  /// constructors, destructor
-  CouenneProblem  (const ASL * = NULL);
-  CouenneProblem  (const CouenneProblem &);
-  ~CouenneProblem ();
+  CouenneProblem  (const ASL * = NULL);     ///< Constructor
+  CouenneProblem  (const CouenneProblem &); ///< Copy constructor
+  ~CouenneProblem ();                       ///< Destructor
 
   /// clone method (for use within CouenneCutGenerator::clone)
   CouenneProblem *clone () const;
@@ -104,28 +107,22 @@ class CouenneProblem {
   /// update value of variables and bounds
   void update (CouNumber *, CouNumber *, CouNumber *, int = -1);
 
-  /// get size of vectors
-  int nObjs   () const {return objectives_.   size ();}
-  int nNLCons () const {return constraints_.  size ();}
+  int nObjs   () const {return objectives_.   size ();} ///< get number of objectives
+  int nNLCons () const {return constraints_.  size ();} ///< get number of constraints
 
-  int nAuxs    () const {return variables_.size () - nOrig_;}
-  //  int ret = auxiliaries_. size (); 
-  //  if (ret < ndefined_) return ndefined_; 
-  //  return ret;
-  //}
-  int nOrig    () const {return nOrig_;}
-  int nVars    () const {return variables_.   size ();}
-  int nIntVars () const {return nIntVars_;}
 
-  /// get elements from vectors
-  CouenneConstraint *NLCon (int i) const {return constraints_  [i];}
-  CouenneObjective  *Obj   (int i) const {return objectives_   [i];}
+  int nOrig    () const {return nOrig_;}              ///< number of original (independent) variables
+  int nIntVars () const {return nIntVars_;}           ///< number of original integer variables
+  int nVars    () const {return variables_. size ();} ///< total number of variables
 
-  exprAux     *Aux   (int i) const {return dynamic_cast <exprAux *> (variables_ [i+nOrig_]);}
-  exprVar     *Var   (int i) const {return variables_    [i];}
+  // get elements from vectors
+  CouenneConstraint *NLCon (int i) const {return constraints_  [i];} ///< pointer to i-th constraint
+  CouenneObjective  *Obj   (int i) const {return objectives_   [i];} ///< pointer to i-th objective
 
-  /// return whole vectors
-  std::vector <exprAux *> &Auxiliaries () {return auxiliaries_;}
+  /// return i-th variable
+  exprVar *Var   (int i) const {return variables_ [i];}
+
+  /// return vector of variables (symbolic representation
   std::vector <exprVar *> &Variables   () {return variables_;}
 
   /// return pointer to set for comparisons
@@ -134,19 +131,19 @@ class CouenneProblem {
   /// return pointer to dependence graph
   DepGraph *getDepGraph () {return graph_;}
 
-  /// get and set current variable and bounds
-  CouNumber   &X     (int i) {return x_   [i];}
-  CouNumber   &Lb    (int i) {return lb_  [i];}
-  CouNumber   &Ub    (int i) {return ub_  [i];}
+  // get and set current variable and bounds
+  CouNumber   &X     (int i) {return x_   [i];} ///< return current \f$x_i\f$
+  CouNumber   &Lb    (int i) {return lb_  [i];} ///< return current lower bound on \f$x_i\f$
+  CouNumber   &Ub    (int i) {return ub_  [i];} ///< return current upper bound on\f$x_i\f$
 
-  /// get and set current variable and bounds
-  CouNumber  *X     () const {return x_;}
-  CouNumber  *Lb    () const {return lb_;}
-  CouNumber  *Ub    () const {return ub_;}
+  // get and set current variable and bounds
+  CouNumber  *X     () const {return x_;}  ///< return vector of variables
+  CouNumber  *Lb    () const {return lb_;} ///< return vector of lower bounds
+  CouNumber  *Ub    () const {return ub_;} ///< return vector of upper bounds
 
-  /// get optimal solution and objective value
-  CouNumber  *bestSol () const {return optimum_;}
-  CouNumber   bestObj () const {return bestObj_;}
+  // get optimal solution and objective value
+  CouNumber  *bestSol () const {return optimum_;} ///< best known solution (read from file)
+  CouNumber   bestObj () const {return bestObj_;} ///< objective of best known solution
 
   /// get vector of commuted variables
   bool *&Commuted () {return commuted_;}
@@ -154,11 +151,12 @@ class CouenneProblem {
   /// add (non linear) objective function
   void addObjective     (expression *, const std::string &);
 
-  /// add (non linear) "=", ">=", "<=", and range constraints
-  void addEQConstraint  (expression *, expression *);
-  void addGEConstraint  (expression *, expression *);
-  void addLEConstraint  (expression *, expression *);
-  void addRNGConstraint (expression *, expression *, expression *);
+  // add (non linear) "=", ">=", "<=", and range constraints
+  void addEQConstraint  (expression *, expression *); ///< add equality (\f$ h(x) = b\f$) constraint
+  void addGEConstraint  (expression *, expression *); ///< add  (\f$h(x)\ge b\f$) constraint
+  void addLEConstraint  (expression *, expression *); ///< add  (\f$h(x)\le b\f$) constraint
+  void addRNGConstraint (expression *, expression *, 
+			 expression *);               ///< add range (\f$a\le h(x)\le b\f$) constraint
 
   /// add variable
   expression *addVariable (bool);
@@ -183,15 +181,16 @@ class CouenneProblem {
 
   /// store nonlinear problem into a .mod file (with lots of defined
   /// variables)
-  ///
-  /// @aux controls the use of auxiliaries. If true, a problem is
-  /// written with auxiliary variables written with their associated
-  /// expression, i.e. w_i = h_i(x,y,w) and bounds l_i <= w_i <= u_i,
-  /// while if false these constraints are written in the form l_i <=
-  /// h_i (x,y) <= u_i
   /// 
-  void writeMod (const std::string &, /// Name of the .mod file to be written
-		 bool);               /// true: with aux, false: without.
+  /// @param fname Name of the .mod file to be written
+  ///
+  /// @param aux controls the use of auxiliaries. If true, a problem
+  /// is written with auxiliary variables written with their
+  /// associated expression, i.e. w_i = h_i(x,y,w) and bounds l_i <=
+  /// w_i <= u_i, while if false these constraints are written in the
+  /// form l_i <= h_i (x,y) <= u_i
+
+  void writeMod (const std::string &fname, bool aux);
 
   /// initialize auxiliary variables and their bounds from original
   /// variables

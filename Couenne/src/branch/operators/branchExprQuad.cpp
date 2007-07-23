@@ -23,14 +23,51 @@ CouNumber exprQuad::selectBranch (expression *w,
                   *l = info -> lower_,
                   *u = info -> upper_; 
 
-
   CouNumber delta = (*w) () - (*this) (), 
     *alpha = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
     maxcontr = -COUENNE_INFINITY;
 
-  int *indices = dIndex_, bestVar;
+  //  if (!alpha) printf ("///////////////// alpha null! %p %p\n", dCoeffLo_, dCoeffUp_);
 
-  // find i = argmin {alpha_i (x_i - l_i) (u_i - x_i)}
+  int bestVar;
+
+  if (!alpha) { // no convexification available, 
+                // find the largest interval
+
+    //    std::set <int> touched;
+
+    CouNumber lb, ub, 
+      maxcontr = -COUENNE_INFINITY; // maximum contribution to 
+
+    int bestVar = -1;
+
+    for (int i=nqterms_; i--;) {
+
+      // find largest (in abs. value) coefficient with at least one
+      // index within bounds
+
+      int qi = qindexI_ [i],
+          qj = qindexJ_ [i];
+
+      CouNumber xb = x [qi], diff;
+
+      if ((diff = mymin (xb - l [qi], u [qi] - xb)) > maxcontr) {bestVar = qi; maxcontr = diff;}
+      if ((diff = mymin (xb - l [qj], u [qj] - xb)) > maxcontr) {bestVar = qj; maxcontr = diff;}
+    }
+
+    ind = bestVar;
+    brpts = (double *) realloc (brpts, sizeof (double));
+    *brpts = x [bestVar];
+    way = TWO_RAND;
+
+    return delta;
+  }
+
+  int *indices = dIndex_;
+
+  // there is a convexification already, find i = argmin {alpha_i (x_i
+  // - l_i) (u_i - x_i)}
+
   for (int i=0; i < nDiag_; i++, indices++) {
     
     CouNumber curx = x [*indices],
@@ -59,8 +96,8 @@ CouNumber exprQuad::selectBranch (expression *w,
 
     *brpts = 0.5 * (lb + ub);
 
-  //printf ("brExprQuad: delta = %g, brpt = %g (%g), var = x%d, way = %d\n",
-  //	  delta, *brpts, x [bestVar], bestVar, way);
+  /*printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
+    fabs (delta), *brpts, x [bestVar], bestVar, way);*/
 
-  return delta;
+  return fabs (delta);
 }

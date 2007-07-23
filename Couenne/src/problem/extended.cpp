@@ -45,21 +45,26 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
 
     f << std::endl << "# auxiliary variables" << std::endl << std::endl;
 
-    for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
-	 i != auxiliaries_.end ();
+    for (std::vector <exprVar *>::iterator i = variables_.begin ();
+	 i != variables_.end ();
 	 i++) 
 
-      if ((*i) -> Multiplicity () > 0) {
+      if ((*i) -> Type () == AUX) {
 
-	f << "var "; (*i) -> print (f, false, this);
-	//    f << " = ";  (*i) -> Image () -> print (f);
-	CouNumber bound;
+	exprAux *aux = dynamic_cast <exprAux *> (*i);
 
-	if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) f << " >= " << bound;
-	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
-	if ((*i) -> isInteger ()) f << " integer";
+	if (aux -> Multiplicity () > 0) {
 
-	f << " default " << (*((*i) -> Image ())) () << ';' << std::endl;
+	  f << "var "; (*i) -> print (f, false, this);
+	  //    f << " = ";  (*i) -> Image () -> print (f);
+	  CouNumber bound;
+
+	  if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) f << " >= " << bound;
+	  if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) f << " <= " << bound;
+	  if ((*i) -> isInteger ()) f << " integer";
+
+	  f << " default " << (*((*i) -> Image ())) () << ';' << std::endl;
+	}
       }
   }
 
@@ -79,15 +84,18 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
   // defined (aux) variables, with formula ///////////////////////////////////////////
 
   if (aux) {
+
     f << std::endl << "# aux. variables defined" << std::endl << std::endl;
 
-    for (int i=0; i < nAuxs (); i++) 
-      if (auxiliaries_ [i] -> Multiplicity () > 0) {
+    for (int i=0; i < nVars (); i++)
 
-	f << "aux" << i << ": "; auxiliaries_ [i] -> print (f, false, this);
+      if ((variables_ [i] -> Type () == AUX) && 
+	  (variables_ [i] -> Multiplicity () > 0)) {
+
+	f << "aux" << i << ": "; variables_ [i] -> print (f, false, this);
 	f << " = ";  
 
-	auxiliaries_ [i] -> Image () -> print (f, false, this);
+	variables_ [i] -> Image () -> print (f, false, this);
 	f << ';' << std::endl;
       }
   }
@@ -98,11 +106,12 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
   f << std::endl << "# constraints" << std::endl << std::endl;
 
   if (!aux) // print h_i(x,y) <= ub, >= lb
-    for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
-	 i != auxiliaries_.end ();
+    for (std::vector <exprVar *>::iterator i = variables_.begin ();
+	 i != variables_.end ();
 	 i++) 
 
-      if ((*i) -> Multiplicity () > 0) {
+      if (((*i) -> Type () == AUX) && 
+	  ((*i) -> Multiplicity () > 0)) {
 	
 	CouNumber bound;
 

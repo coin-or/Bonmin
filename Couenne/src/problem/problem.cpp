@@ -83,7 +83,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
     exprAux *aux = dynamic_cast <exprAux *> (variables_ [j]);
 
-    x_ [j] = (*aux) ();
+    x_ [j] = (*(aux -> Image ())) ();
 
     // set bounds 
     if ((lb_ [j] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [j] = -DBL_MAX;
@@ -107,14 +107,14 @@ void CouenneProblem::getAuxs (CouNumber *x) {
   // at the end of this function)
   expression::update (x, NULL, NULL);
 
-  //int nAux = nVars () - nOrig_;
-
   // set auxiliary w to f(x). This procedure is exact even though the
   // auxiliary variables have an incomplete image, i.e. they have been
   // decomposed previously, since they are updated with increasing
   // index.
-  for (register int j = nOrig_, i = nVars () - j; i--; j++)
-    x [j] = (*(variables_ [j] -> Image ())) ();
+  for (std::vector <exprVar *>::iterator i = variables_.begin ();
+       i != variables_.end (); i++)
+    if ((*i) -> Type () == AUX)
+      x [(*i) -> Index ()] = (*((*i) -> Image ())) ();
 
   // now get the x and the bound vectors back to their previous state
   expression::update (xS, lS, uS);

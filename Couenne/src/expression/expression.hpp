@@ -1,5 +1,5 @@
 /*
- * Name:    expression.h
+ * Name:    expression.hpp
  * Author:  Pietro Belotti
  * Purpose: definition of the class expression
  *
@@ -59,6 +59,8 @@ class expression {
   /// operators
 
   static CouNumber stack [STACK_SIZE];
+
+  /// stack pointer
   static CouNumber *sp;
 
   /// these "global" variables, static members of expression, contain
@@ -74,8 +76,8 @@ class expression {
   /// mylbounds, myubounds) below.
 
   static CouNumber *variables_;
-  static CouNumber *lbounds_;
-  static CouNumber *ubounds_;
+  static CouNumber *lbounds_;   ///< vector of lower bounds
+  static CouNumber *ubounds_;   ///< vector of upper bounds
 
   /// current value of the expression, used when accessing a copy of
   /// the expression created for a node that is evaluated after the
@@ -96,19 +98,23 @@ class expression {
     if (ubounds)   ubounds_   = ubounds;
   }
 
-  /// return current values of variables and bounds
-  static CouNumber Lbound   (int i) {return lbounds_   [i];}
-  static CouNumber Ubound   (int i) {return ubounds_   [i];}
-  static CouNumber Variable (int i) {return variables_ [i];}
+  // return current values of variables and bounds
+  static CouNumber Lbound   (int i) {return lbounds_   [i];} ///< return \f$l_i\f$
+  static CouNumber Ubound   (int i) {return ubounds_   [i];} ///< return \f$u_i\f$
+  static CouNumber Variable (int i) {return variables_ [i];} ///< return \f$x_i\f$
 
-  /// return arrays
-  static CouNumber *Lbounds   () {return lbounds_;}
-  static CouNumber *Ubounds   () {return ubounds_;}
-  static CouNumber *Variables () {return variables_;}
+  // return whole vectors
+  static CouNumber *Lbounds   () {return lbounds_;}   ///< return vector of lower bounds
+  static CouNumber *Ubounds   () {return ubounds_;}   ///< return vector of upper bounds
+  static CouNumber *Variables () {return variables_;} ///< return vector of variables
 
-  /// Constructor, destructor
+  /// Constructor
   expression () {}
+
+  /// Copy constructor
   expression (const expression &e) {}
+
+  /// Destructor
   virtual ~expression () {}
 
   /// cloning method
@@ -118,10 +124,6 @@ class expression {
   /// return index of variable (only valid for exprVar and exprAux)
   virtual inline int Index () const
     {return -1;}
-
-  /// return fictitious image
-  //virtual inline expression *Image () const
-  //  {return NULL;}
 
   /// return number of arguments (when applicable, that is, with N-ary functions)
   virtual inline int nArgs () const
@@ -228,6 +230,8 @@ class expression {
 
   /// compare expressions
   virtual int compare (expression &);
+
+  /// compare copies of expressions
   virtual int compare (exprCopy   &);
 
   /// used in rank-based branching variable choice: original variables

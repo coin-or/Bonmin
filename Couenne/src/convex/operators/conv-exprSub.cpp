@@ -14,13 +14,13 @@
 
 // Create standard formulation of this expression
 
-exprAux *exprSub::standardize (CouenneProblem *p) {
+/*exprAux *exprSub::standardize (CouenneProblem *p) {
 
   // first of all, standardize all operands
   exprOp::standardize (p);
 
   return p -> addAuxiliary (this);
-}
+  }*/
 
 
 // generate equality between *this and *w

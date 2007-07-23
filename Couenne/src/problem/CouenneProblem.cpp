@@ -52,6 +52,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   now = CoinCpuTime ();
   //print (std::cout);
   //printf ("======================================\n");
+
   standardize ();
 
   fillQuadIndices ();
@@ -88,6 +89,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   ndefined_ (p.ndefined_),
   graph_    (NULL),
   nOrig_    (p.nOrig_) { // needed only in standardize (), unnecessary to update it
+
+  // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
 
   register int i;
 
@@ -137,12 +140,7 @@ CouenneProblem::~CouenneProblem () {
        i != variables_ . end (); i++)
     delete (*i);
 
-  // delete auxiliary variables
-  /*for (std::vector <exprAux *>::iterator i = auxiliaries_ . begin ();
-       i != auxiliaries_ . end (); i++)
-       delete (*i);*/
-
-  // 
+  // delete extra structures
   if (commuted_) delete [] commuted_;
   if (graph_)    delete    graph_;
 }
@@ -224,9 +222,10 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
     variables_ . push_back (w);
     auxSet_ -> insert (w); // insert into repetition checking structure
     graph_  -> insert (w); // insert into acyclic structure
-  }
-  else { // otherwise, just return the entry's pointer
 
+  } else {
+
+    // otherwise, just return the entry's pointer
     delete w;
     w = *i;
     w -> increaseMult ();

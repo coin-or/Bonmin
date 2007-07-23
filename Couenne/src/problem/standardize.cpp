@@ -33,9 +33,11 @@ void CouenneProblem::standardize () {
 
   // allocate space in auxiliaries_ from commonexprs_
 
-  /*for (std::vector <expression *>::iterator i = commonexprs_.begin (); 
+  for (std::vector <expression *>::iterator i = commonexprs_.begin (); 
        i != commonexprs_.end (); i++) 
-       auxiliaries_. push_back (NULL);*/
+       variables_. push_back (new exprAux (*i, 
+					   variables_.size (), 
+					   1 + (*i) -> rank (this)));
 
   // standardize initial aux variables (aka defined variables, common
   // expression)
@@ -71,12 +73,23 @@ void CouenneProblem::standardize () {
     }*/
 
   // standardize objectives
+
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); i++) {
 
+    /*printf ("Objective ");
+      (*i) -> print ();*/
+
     exprAux *aux = (*i) -> standardize (this);
+
+    /*printf (" --> \n");
+      (*i) -> print ();*/
     if (aux) 
       (*i) -> Body (new exprClone (aux));
+
+    /*printf (" --> \n");
+    (*i) -> print ();
+    printf ("...................\n");*/
   }
 
   // commuted_ is an array with a flag for each original variable,
@@ -91,13 +104,16 @@ void CouenneProblem::standardize () {
   std::vector <CouenneConstraint *> con2;
 
   // standardize constraints
-  for (int i=0, ncon = constraints_.size (); ncon--; i++) {
+  for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin (); 
+       i != constraints_.end (); i++) {
 
-    /*printf ("prima  --------------------------------------\n");
-    print ();
-    printf ("--------------------------------------\n");*/
+    /*printf ("Constraint ");
+      (*i) -> print ();*/
 
-    exprAux *aux = constraints_ [i] -> standardize (this);
+    exprAux *aux = (*i) -> standardize (this);
+
+    /*printf (" ==> [%d]\n", aux ? (aux -> Index ()) : -1);
+      (*i) -> print ();*/
 
     /*printf ("dopo--------------------------------------\n");
       print ();*/
@@ -110,9 +126,13 @@ void CouenneProblem::standardize () {
       }*/
 
     if (aux) { // save if standardized
-      constraints_ [i] -> Body (new exprClone (aux));
-      con2.push_back (constraints_ [i]);
+      (*i) -> Body (new exprClone (aux));
+      con2.push_back (*i);
     }
+
+    /*printf (" --> \n");
+    (*i) -> print ();
+    printf ("...................\n");*/
 
     // now aux is an auxiliary variable. If it is linear, three cases:
     //
@@ -141,7 +161,7 @@ void CouenneProblem::standardize () {
 
   constraints_ = con2;
 
-  //print ();
+  //printf ("ok, done with standardization <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
   delete auxSet_;
 
@@ -157,7 +177,7 @@ void CouenneProblem::standardize () {
   // make expression library point to new vectors
   expression::update (x_, lb_, ub_);
 
-  //  print ();
+  //printf ("###################################################\n");
 
   //for (int i=nVars (), j=0; j < nAuxs (); i++, j++) {
   for (int i=0; i < nVars (); i++) 
@@ -183,9 +203,9 @@ void CouenneProblem::standardize () {
       variables_ [i] -> Ub () -> print (); printf ("]\n");*/
     }
 
-  //graph_ -> print ();
+  /*graph_ -> print ();
   graph_ -> createOrder ();
-  //graph_ -> print ();
+  graph_ -> print ();*/
 
   // TODO: fill in numbering structure
 

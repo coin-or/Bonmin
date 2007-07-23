@@ -20,8 +20,7 @@ exprGroup::exprGroup  (CouNumber c0,     // constant term
   exprSum  (al, n),
   c0_      (c0),
   nlterms_ (0) {
-  
-  //int nlin = 0;
+
 
   // count linear terms
   for (register int *ind = index; *ind++ >= 0; nlterms_++);
@@ -46,22 +45,15 @@ exprGroup::exprGroup  (const exprGroup &src):
   coeff_    (NULL),
   nlterms_  (src.nlterms_) {
 
-  register int *ind, size = 0;
+  coeff_ = new CouNumber [nlterms_];
+  index_ = new int       [nlterms_ + 1];
 
-  for (ind = src.index_; (*ind++) >= 0; size++);
+  index_ [nlterms_] = -1;
 
-  // ind is now PAST the -1, put it back on it
-  --ind;
+  for (int i=0; i < nlterms_; i++) {
 
-  coeff_ = new CouNumber [size];
-  index_ = new int       [size+1];
-
-  index_ [size] = -1;
-
-  while (size--) {
-
-    index_ [size] = *--ind;
-    coeff_ [size] = src.coeff_ [size];
+    index_ [i] = src.index_ [i];
+    coeff_ [i] = src.coeff_ [i];
   }
 } 
 
@@ -127,16 +119,11 @@ int exprGroup::Linearity () {
   // compute linearity of nonlinear part
   int nllin = exprSum::Linearity ();
 
-  if (nllin == ZERO) // if nonlinear part equals zero
-    if (*index_ == -1)
-      if (fabs (c0_) < COUENNE_EPS) return ZERO;
-      else                          return CONSTANT; 
-    else                            return LINEAR;
-  else // if nonlinear part is anything but zero
-    if (nllin == CONSTANT)
-      if (*index_ == -1)            return CONSTANT; 
-      else                          return LINEAR;
-    else                            return nllin;
+  int llin  = (nlterms_ == 0) ? 
+    ((fabs (c0_) < COUENNE_EPS) ? ZERO : CONSTANT) : 
+    LINEAR;
+
+  return (llin > nllin) ? llin : nllin;
 }
 
 

@@ -84,8 +84,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   int nInitCuts = cs.sizeRowCuts ();
 
-  //  printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
-  //  info.level, info.pass, info.inTree);
+  //printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
+  //info.level, info.pass, info.inTree);
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
@@ -93,7 +93,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     babInfo -> setFeasibleNode ();    
 
   double now   = CoinCpuTime ();
-  //int    ncols = problem_ -> nVars () + problem_ -> nAuxs ();
   int    ncols = problem_ -> nVars ();
 
   // This vector contains variables whose bounds have changed due to
@@ -117,13 +116,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 			  const_cast <CouNumber *> (nlp_ -> getColUpper    ()));
 
     /*printf ("=============================\n");
-    for (int i = 0; i < si.getNumCols (); i++)
-      printf ("%4d: %10g [%10g,%10g]\n", i,
-	      si.getColSolution () [i],
-	      si.getColLower    () [i],
-	      si.getColUpper    () [i]);
-    for (int i = problem_ -> nOrig (); i < problem_ -> nVars (); i++)
-      printf ("%4d- %10g [%10g,%10g]\n", i,
+    for (int i = 0; i < problem_ -> nVars (); i++)
+      printf ("%4d %10g [%10g,%10g]\n", i,
 	      problem_ -> X  (i),
 	      problem_ -> Lb (i),
 	      problem_ -> Ub (i));
@@ -159,7 +153,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	// get the auxiliary that is at the lhs
 
-#if 0
+#if 1
 	exprAux *conaux = dynamic_cast <exprAux *> (problem_ -> Var (index));
 
 	/*if (!conaux) {
@@ -167,7 +161,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  if (con -> Body ()) printf ("but body is not!");
 	  printf ("\n");
 	  }*/
-
 
 	if (conaux &&
 	    (conaux -> Image ()) && 
@@ -196,6 +189,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
 	//      }
     }
+
+    /*printf ("problem now:++++++++++++++++++++++++++++++++++++++\n");
+    problem_ -> print ();
+    printf ("++++++++++++++++++++++++++++++++++++++++++++++++++\n");*/
 
 #if 0
     printf (":::::::::::::::::::::constraint cuts\n");
@@ -301,6 +298,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // of BB tree (info.pass == 0) or if first call (creation of RLT,
   // info.pass == -1)
 
+  if (0)
   if ((info.pass <= 0)  
       && (! boundTightening (&si, cs, chg_bds, babInfo))) {
 
@@ -347,7 +345,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
-#define USE_OBBT
+  //#define USE_OBBT
 #ifdef USE_OBBT
 
   // apply OBBT

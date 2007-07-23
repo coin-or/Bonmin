@@ -96,7 +96,7 @@ int exprOp::compare (exprOp  &e1) {
   }
 
   // last chance, this might be an exprGroup or derived
-  if ((c0 == COU_EXPRGROUP) && 
+  if ((c0 == COU_EXPRGROUP) ||
       (c0 == COU_EXPRQUAD)) {
 
     exprGroup *ne0 = dynamic_cast <exprGroup *> (this),

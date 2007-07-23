@@ -33,7 +33,7 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
   if (fabs (realobj - obj) > COUENNE_EPS) {
     //    obj = realobj;
 
-    printf ("checkNLP: false objective function! %.3f != %.3f\n", realobj, obj);
+    printf ("checkNLP: false objective function. %.3f != %.3f\n", realobj, obj);
   }
 
   for (int i=0; i<p->nNLCons (); i++) {
@@ -49,7 +49,7 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
     if ((body > rhs + COUENNE_EPS) || 
 	(body < lhs - COUENNE_EPS)) {
 
-      printf ("############### NLCons NO!\n");
+      printf ("checkNLP: Nonlinear constraint not satisfied\n");
       return false;
     }
     //    else printf ("yes\n");
@@ -57,24 +57,26 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
 
   // check auxiliary variables
 
-  for (int i=0; i<p->nAuxs (); i++) {
+  for (int i=0; i<p->nVars (); i++) 
 
-    exprAux *w = p -> Aux (i);
+    if (p -> Var (i) -> Type () == AUX) {
 
-    CouNumber aux = expression::Variable (i+p->nVars ()),
-              img = (*(w -> Image ())) ();
+      exprAux *w = dynamic_cast <exprAux *> (p -> Var (i));
 
-    //    printf ("is w_%d = %.2f really equal to %.2f =", i+p->nVars(), aux, img);
-    //    w -> Image () -> print (std::cout);
-    //    printf ("? ");
+      CouNumber aux = expression::Variable (i),
+	        img = (*(w -> Image ())) ();
 
-    if (fabs (aux - img) > COUENNE_EPS) {
+      //    printf ("is w_%d = %.2f really equal to %.2f =", i+p->nVars(), aux, img);
+      //    w -> Image () -> print (std::cout);
+      //    printf ("? ");
 
-      printf ("######### Aux NO!\n");
-      return false;
-    } 
-    //    else printf ("yes (%.15f)\n", aux-img);
-  }
+      if (fabs (aux - img) > COUENNE_EPS) {
+
+	printf ("checkNLP: Auxiliary different from its expression\n");
+	return false;
+      } 
+      //    else printf ("yes (%.15f)\n", aux-img);
+    }
 
   return true;
 }

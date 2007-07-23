@@ -19,7 +19,14 @@
 #include <CglCutGenerator.hpp>
 
 
-/// expression base class
+/** Auxiliary variable
+ *
+ *  It is associated with an expression which may depend on original
+ *  and/or other auxiliary variables. It is used for AMPL's defined
+ *  variables (aka common expressions) and to reformulate nonlinear
+ *  constraints/objectives.
+ *
+ */
 
 class exprAux: public exprVar {
 
@@ -28,9 +35,12 @@ class exprAux: public exprVar {
   /// The expression associated with this auxiliary variable
   expression *image_;
 
-  /// bounds determined by the associated expression's bounds and the
-  /// relative constraint's bound
+  /// lower bound, a function of the associated expression and the
+  /// bounds on the variables in the expression
   expression *lb_;
+
+  /// upper bound, a function of the associated expression and the
+  /// bounds on the variables in the expression
   expression *ub_;
 
   /// used in rank-based branching variable choice: original variables
@@ -79,11 +89,10 @@ class exprAux: public exprVar {
   virtual exprAux *clone () const
     {return new exprAux (*this);}
 
-  /// Bound get
-  expression *Lb () {return lb_;}
-  expression *Ub () {return ub_;}
+  expression *Lb () {return lb_;} ///< get lower bound expression
+  expression *Ub () {return ub_;} ///< get upper bound expression
 
-  /// I/O
+  /// print expression
   virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
 
   /// The expression associated with this auxiliary variable
@@ -111,12 +120,12 @@ class exprAux: public exprVar {
   /// Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lb, expression *&ub) {
 
-    /// this replaces the previous 
-    ///
-    ///    image_ -> getBounds (lb0, ub0);
-    ///
-    /// which created large expression trees, now useless since all
-    /// auxiliaries are standardized.
+    // this replaces the previous 
+    //
+    //    image_ -> getBounds (lb0, ub0);
+    //
+    // which created large expression trees, now useless since all
+    // auxiliaries are standardized.
 
     lb = new exprLowerBound (varIndex_);
     ub = new exprUpperBound (varIndex_);

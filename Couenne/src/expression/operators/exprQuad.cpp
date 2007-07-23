@@ -11,6 +11,8 @@
 #include <exprQuad.hpp>
 #include <exprPow.hpp>
 #include <exprMul.hpp>
+#include <depGraph.hpp>
+
 
 /// Constructor
 exprQuad::exprQuad  (CouNumber c0,      // constant term
@@ -40,7 +42,7 @@ exprQuad::exprQuad  (CouNumber c0,      // constant term
   for (register int i = nqterms_; i--;) {
     qindexI_ [i] = qi = qindexI [i];
     qindexJ_ [i] = qj = qindexJ [i];
-    qcoeff_  [i] = (qi == qj) ? (qcoeff [i]) : (0.5 * qcoeff [i]); // HIC EST DIVISION
+    qcoeff_  [i] = (qi == qj) ? (qcoeff [i]) : (0.5 * qcoeff [i]); // Division
   }
 } 
 
@@ -56,6 +58,7 @@ exprQuad::exprQuad  (const exprQuad &src):
   nDiag_    (src.nDiag_)   {
 
   if (src.qindexI_) {
+
     qindexI_ = new int       [nqterms_];
     qindexJ_ = new int       [nqterms_];
     qcoeff_  = new CouNumber [nqterms_];
@@ -71,26 +74,19 @@ exprQuad::exprQuad  (const exprQuad &src):
       qcoeff_  [i] = qc [i];
     }
   }
-
+  
   if (src.dIndex_) {
     
-    dIndex_   = new int       [nDiag_];
-    dCoeffLo_ = new CouNumber [nDiag_];
-    dCoeffUp_ = new CouNumber [nDiag_];
+    dIndex_                     = new int       [nDiag_];
+    dCoeffLo_ = (src.dCoeffLo_) ? new CouNumber [nDiag_] : NULL; 
+    dCoeffUp_ = (src.dCoeffUp_) ? new CouNumber [nDiag_] : NULL; 
 
-    /*
-    int *qi = src.qindexI_,
-        *qj = src.qindexJ_;
-
-    CouNumber *qc = src.qcoeff_;
-    */
-    for (int i = nDiag_; i--;) {
-      dIndex_   [i] = src.dIndex_   [i];
-      dCoeffLo_ [i] = src.dCoeffLo_ [i];
-      dCoeffUp_ [i] = src.dCoeffUp_ [i];
-    }
+    for                    (int i = nDiag_; i--;) dIndex_   [i] = src.dIndex_   [i];
+    if (src.dCoeffLo_) for (int i = nDiag_; i--;) dCoeffLo_ [i] = src.dCoeffLo_ [i];
+    if (src.dCoeffUp_) for (int i = nDiag_; i--;) dCoeffUp_ [i] = src.dCoeffUp_ [i];
   }
 } 
+
 
 /// I/O
 void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const {
@@ -107,7 +103,7 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
     CouNumber coe = (qi == qj) ? (qcoeff_ [i]) : (2 * qcoeff_ [i]);
 
     if (coe > 0) out << '+';
-    out << coe;
+    out << coe << '*';
 
     if (p) { // have problem pointer, use right names (x,w,y)
 
@@ -157,6 +153,7 @@ expression *exprQuad::differentiate (int index) {
     return new exprConst (0);
   }
   else return new exprSum (arglist, nonconst);*/
+
   // TODO!
 
   return NULL;
@@ -226,9 +223,25 @@ int exprQuad::rank (CouenneProblem *p) {
 
 expression *exprQuad::getFixVar () {
 
+  return NULL;
+
   // TODO: this is quite complicated. It is a nonlinear expression but
   // we have no access to variable pointers
-  if (arglist_ [0] -> Type () == CONST) 
-    return this;
-  else return arglist_ [0];
+
+  //if (arglist_ [0] -> Type () == CONST) 
+  //  return this;
+  //else return arglist_ [0];
 }
+
+
+/// update dependence set with index of this variable
+void exprQuad::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
+
+  exprGroup::fillDepSet (dep, g);
+
+  for (int *qi = qindexI_, *qj = qindexJ_, n = nqterms_; n--;) {
+    dep -> insert (g -> lookup (*qi++));
+    dep -> insert (g -> lookup (*qj++));
+  }
+}
+

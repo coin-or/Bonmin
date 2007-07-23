@@ -18,11 +18,11 @@ class exprGroup: public exprSum {
 
  protected:
 
-  CouNumber  c0_;    //< constant term
-  int       *index_; //< indices of linear terms (terminated by a -1)
-  CouNumber *coeff_; //< coefficient of linear terms
+  CouNumber  c0_;    ///< constant term
+  int       *index_; ///< indices of linear terms (terminated by a -1)
+  CouNumber *coeff_; ///< coefficient of linear terms
 
-  int nlterms_;      //< number of linear terms
+  int nlterms_;      ///< number of linear terms
 
  public:
 

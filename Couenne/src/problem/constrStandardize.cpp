@@ -56,7 +56,7 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
       exprAux *w = new exprAux (rest, wind, 1 + rest -> rank (p));
 
       // no such expression found in the set:
-      p -> Auxiliaries () . push_back (w); // 1) create entry therein
+      p -> Variables   () . push_back (w); // 1) create entry therein
       p -> AuxSet      () -> insert   (w); // 2) beware of useless copies
       p -> getDepGraph () -> insert   (w); // 3) introduce it in acyclic structure
 

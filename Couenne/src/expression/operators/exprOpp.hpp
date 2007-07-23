@@ -34,7 +34,8 @@ class exprOpp: public exprUnary {
     {return new exprOpp (argument_ -> clone ());}
 
   /// the operator's function
-  inline unary_function F () {return opp;}
+  inline unary_function F () 
+    {return opp;}
 
   /// print operator
   std::string printOp () const
@@ -61,10 +62,14 @@ class exprOpp: public exprUnary {
 			     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
-  virtual enum expr_type code () {return COU_EXPROPP;}
+  virtual enum expr_type code () 
+    {return COU_EXPROPP;}
 
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
+
+  /// standardization (to deal with complex arguments)
+  exprAux *standardize (CouenneProblem *);
 };
 
 #endif

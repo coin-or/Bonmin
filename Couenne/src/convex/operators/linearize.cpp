@@ -166,7 +166,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 	  ((*arglist_) -> Linearity () <= ZERO)) {
 
 	int *index = eg -> getIndices ();
-	if ((*index >= 0) && (index [1] == -1)) {// bingo!
+	if ((*index >= 0) && (index [1] == -1)) { // bingo! It's of the form (0) + cx
 
 	  expression *var = NULL;
 
@@ -175,10 +175,10 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 	    if ((*i) -> Index () == *index)
 	      var = new exprClone (*i);
 
-	  for (std::vector <exprAux *>::iterator i = p -> Auxiliaries ().begin (); 
+	  /*for (std::vector <exprAux *>::iterator i = p -> Auxiliaries ().begin (); 
 	       i != p -> Auxiliaries ().end (); i++)
 	    if ((*i) -> Index () == *index)
-	      var = new exprClone (*i);
+	    var = new exprClone (*i);*/
 
 	  // is variable indexed by *index original or auxiliary?
 	  CouNumber coe = *(eg -> getCoeffs ());
@@ -279,7 +279,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
     //arglist_ [i] = NULL;
   }
 
-  // Take care of the exprGroup, if we are.
+  // Take care of the exprGroup
   if (code () == COU_EXPRGROUP) {
 
     exprGroup *e = dynamic_cast <exprGroup *> (this);
@@ -293,6 +293,8 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
       terms.push_back (term);
     }
   }
+
+  /////////////////////////////////////////////////////////////////////////////////
 
   // Group all terms with the same variable, and create an exprGroup
 

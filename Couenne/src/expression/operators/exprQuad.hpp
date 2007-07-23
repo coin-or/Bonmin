@@ -13,7 +13,17 @@
 #include <exprGroup.hpp>
 
 
-///  class exprQuad, with constant, linear and quadratic terms
+/**  class exprQuad, with constant, linear and quadratic terms
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
 class exprQuad: public exprGroup {
 
@@ -25,38 +35,45 @@ class exprQuad: public exprGroup {
     * respectively entries i and j for which a_{ij} is nonzero
     * in a_ij x_i x_j: */
   /** @{ */
-  /// the term i
-  int       *qindexI_;
-  /// the term j, (must be qindexJ_ [k] <= qindexI_ [k])
-  int       *qindexJ_;
-  /// the term a_ij
-  CouNumber *qcoeff_;   
-  /// number of non-zeroes in Q
-  int        nqterms_;  
+
+  int       *qindexI_; ///< the term i
+  int       *qindexJ_; ///< the term j, (must be qindexJ_ [k] <= qindexI_ [k])
+  CouNumber *qcoeff_;  ///< the term a_ij
+  int        nqterms_; ///< number of non-zeroes in Q
   /** @} */
 
-
-  /// diagonal coefficients of additional term for under convexfication
-  CouNumber *dCoeffLo_;   
-  /// diagonal coefficients of additional term for over convexfication
-  CouNumber *dCoeffUp_; 
-  /// and indices (this is a sparse vector)
-  int       *dIndex_;  
-  /// number of elements in the above sparse vectors
-  int        nDiag_;    
+  CouNumber *dCoeffLo_;  ///< diagonal coefficients of additional term for under convexfication
+  CouNumber *dCoeffUp_;  ///< diagonal coefficients of additional term for over convexfication
+  int       *dIndex_;    ///< and indices (this is a sparse vector)
+  int        nDiag_;     ///< number of elements in the above sparse vectors
 
  public:
 
-  /// Constructor
-  exprQuad  (CouNumber,                      /// constant part
-	     int *, CouNumber *,             /// linear
-	     int *, int *, CouNumber *,      /// quadratic
-	     expression ** = NULL, int = 0); /// nonlinear
+  /** Constructor
+   *
+   * @param c0 constant part		     
+   * @param li linear indices		     
+   * @param lc linear coefficients		     
+   * @param qi quadratic index \f$i\f$	     
+   * @param qj quadratic index \f$j\f$	     
+   * @param qc quadratic coefficient \f$a_{ij}\f$
+   * @param al nonlinear arguments		     
+   * @param n number of nonlinear arguments     
+   */
 
-  /// copy constructor
+  exprQuad  (CouNumber c0,
+	     int *li,
+	     CouNumber *lc,
+	     int *qi,
+	     int *qj,
+	     CouNumber *qc,
+	     expression **al = NULL,
+	     int n = 0);
+
+  /// Copy constructor
   exprQuad (const exprQuad &src);
 
-  /// destructor
+  /// Destructor
   virtual ~exprQuad () {
 
     if (qindexI_) {
@@ -129,43 +146,69 @@ class exprQuad: public exprGroup {
     * \f[
     * \eta = a_0 + a^T x + x^T Q x + \sum w_j
     * \f]
-    * where \f$ \eta \f$ is the auxiliary corresponding to this expression and \f$ w_j \f$ are the auxiliaries corresponding
-    * to the other non-linear terms contained in the expression. (I don't think that it is assumed anywhere in the function that Q only involves
-    * original variables of the problem).
+    * where \f$ \eta \f$ is the auxiliary corresponding to this
+    * expression and \f$ w_j \f$ are the auxiliaries corresponding to
+    * the other non-linear terms contained in the expression. (I don't
+    * think that it is assumed anywhere in the function that Q only
+    * involves original variables of the problem).
     * 
-    * The under-estimator of \f$ x^T Q x\f$ is given by \f$ x^T Q x + \sum \lambda_{\min,i} (x_i - l_i ) (u_i - x_i )} \f$ and its
-    * over-estimator is given by \f$ Q - \sum \lambda_{\max, i} (x_i - l_i ) (u_i - x_i )  \f$ (where \f$ \lambda_{\min, i} = 
-    * \frac{\lambda_{\min}}{w_i^2} \f$ and  \f$ \lambda_{\max, i} = \frac{\lambda_{\max}}{w_i^2} \f$). 
+    * The under-estimator of \f$ x^T Q x\f$ is given by \f$ x^T Q x +
+    * \sum \lambda_{\min,i} (x_i - l_i ) (u_i - x_i )} \f$ and its
+    * over-estimator is given by \f$ Q - \sum \lambda_{\max, i} (x_i -
+    * l_i ) (u_i - x_i ) \f$ (where \f$ \lambda_{\min, i} =
+    * \frac{\lambda_{\min}}{w_i^2} \f$ and \f$ \lambda_{\max, i} =
+    * \frac{\lambda_{\max}}{w_i^2} \f$).
     *
-    * Let \f$ \tilde a_0(\lambda)\f$, \f$ \tilde a(\lambda) \f$ and \f$ \tilde Q_(\lambda) \f$ be
+    * Let \f$ \tilde a_0(\lambda)\f$, \f$ \tilde a(\lambda) \f$ and
+    * \f$ \tilde Q_(\lambda) \f$ be
+    *
     * \f[ \tilde a_0(\lambda) = a_0 - \sum_{i = 1}^n \lambda_i l_i u_i \f]
-    * \f[ \tilde a(\lambda) = a + \left[ \begin{array}{c} \lambda_1 (u_1 + l_1) \\ \vdots \\ \lambda_n (u_n + l_n) \end{array} \right], \f]
-    * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc} {\lambda_1} & 0 \\ & \ddots & \\ 0 & & \lambda_n \end{array} \right). \f] 
-    * The convex relaxation of the initial constraint is then given by the two constraints 
-    * \f[
-    * \eta \geq \tilde a_0(\lambda_{\min}) + \tilde a(\lambda_{\min})^T x + x^T \tilde Q(\lambda_{\min}) x + \sum z_j 
-    * \f] \f[
-    * \eta \leq \tilde a_0(- \lambda_{\max}) + \tilde a(-\lambda_{\max})^T x + x^T \tilde Q(-\lambda_{\max}) x + \sum z_j
-    * \f]
+    *
+    * \f[ \tilde a(\lambda) = a + \left[ \begin{array}{c} \lambda_1
+    * (u_1 + l_1) \\ \vdots \\ \lambda_n (u_n + l_n) \end{array}
+    * \right], \f]
+    *
+    * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc}
+    * {\lambda_1} & 0 \\ & \ddots & \\ 0 & & \lambda_n \end{array}
+    * \right). \f]
+    *
+    * The convex relaxation of the initial constraint is then given by
+    * the two constraints
+    *
+    * \f[ \eta \geq \tilde a_0(\lambda_{\min}) + \tilde
+    * a(\lambda_{\min})^T x + x^T \tilde Q(\lambda_{\min}) x + \sum
+    * z_j \f]
+    *
+    * \f[ \eta \leq \tilde a_0(- \lambda_{\max}) + \tilde
+    * a(-\lambda_{\max})^T x + x^T \tilde Q(-\lambda_{\max}) x + \sum
+    * z_j \f]
     *  
-    * The cut is computed as follow. Let \f$ (x^*, z^*, \eta^*) \f$ be the solution at hand. The two outer-approximation cuts
-    * are:
-    * \f[
-    * \eta \geq \tilde a_0(\lambda_{\min}) + \tilde a(\lambda_{\min})^T x + {x^*}^T \tilde Q(\lambda_{\min}) (2x - x^*) + \sum z_j
-    * \f]
+    * The cut is computed as follow. Let \f$ (x^*, z^*, \eta^*) \f$ be
+    * the solution at hand. The two outer-approximation cuts are:
+    *
+    * \f[ \eta \geq \tilde a_0(\lambda_{\min}) + \tilde
+    * a(\lambda_{\min})^T x + {x^*}^T \tilde Q(\lambda_{\min}) (2x -
+    * x^*) + \sum z_j \f]
+    *
     * and
-    * \f[
-    * \eta \leq \tilde a_0(-\lambda_{\max}) + \tilde a(-\lambda_{\max})^T x + {x^*}^T \tilde Q(-\lambda_{\max}) (2x - x^*) + \sum z_j
-    * \f]
+    *
+    * \f[ \eta \leq \tilde a_0(-\lambda_{\max}) + \tilde
+    * a(-\lambda_{\max})^T x + {x^*}^T \tilde Q(-\lambda_{\max}) (2x -
+    * x^*) + \sum z_j \f]
+    *
     * grouping coefficients, we get:
-    * \f[
-    * {x^*}^T \tilde Q(\lambda_{\min}) x^* - \tilde a_0(\lambda_{\min})  \geq ( a(\lambda_{\min}) + 2 Q(\lambda_{\min} ) x^*)^T x + \sum z_j - \eta
-    * \f]
+    *
+    * \f[ {x^*}^T \tilde Q(\lambda_{\min}) x^* - \tilde
+    * a_0(\lambda_{\min}) \geq ( a(\lambda_{\min}) + 2
+    * Q(\lambda_{\min} ) x^*)^T x + \sum z_j - \eta \f]
+    *
     * and
-    * \f[
-    * {x^*}^T \tilde Q(-\lambda_{\max}) x^*  - \tilde a_0(-\lambda_{\max}) \leq (  a(-\lambda_{\max}) + 2 Q(-\lambda_{\max}) x^* )^T x + \sum z_j - \eta
-    * \f]
+    *
+    * \f[ {x^*}^T \tilde Q(-\lambda_{\max}) x^* - \tilde
+    * a_0(-\lambda_{\max}) \leq ( a(-\lambda_{\max}) + 2
+    * Q(-\lambda_{\max}) x^* )^T x + \sum z_j - \eta \f]
     */
+
   void quadCuts (exprAux *w, OsiCuts & cs, const CouenneCutGenerator * cg);
 
   /// only compare with people of the same kind
@@ -185,6 +228,10 @@ class exprQuad: public exprGroup {
   /// each expression's arguments
   virtual CouNumber selectBranch (expression *, const OsiBranchingInformation *,
 				  int &, double * &, int &);
+
+  /// fill dependence set of the expression associated with this
+  /// auxiliary variable
+  virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g);
 };
 
 
@@ -197,7 +244,8 @@ inline CouNumber exprQuad::operator () () {
     *coe  = qcoeff_, 
     *vars = expression::Variables ();
 
-  for (register int *qi = qindexI_, *qj = qindexJ_, i = nqterms_; i--; )
+  for (register int *qi = qindexI_, *qj = qindexJ_, i = nqterms_; i--;)
+
     ret += (*qi == *qj) ?
       (*coe++ *     vars [*qi++] * vars [*qj++]) :
       (*coe++ * 2 * vars [*qi++] * vars [*qj++]);

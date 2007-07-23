@@ -50,16 +50,47 @@ void flattenMul (expression *mul, CouNumber &coe,
 
     default: { // for all other expression, add associated new auxiliary
 
-      exprAux *aux = p -> addAuxiliary (arg);
+      exprAux *aux = arg -> standardize (p);
 
-      std::map <int, CouNumber>::iterator where = indices.find (aux -> Index ());
+      int ind = (aux) ? aux -> Index () : arg -> Index ();
+
+      std::map <int, CouNumber>::iterator where = indices.find (ind);
 
       if (where == indices.end ()) 
-	indices.insert (std::pair <int, CouNumber> (aux -> Index (), 1));
+	indices.insert (std::pair <int, CouNumber> (ind, 1));
       else ++ (where -> second);
     } break;
     }
   }
+}
+
+
+// insert a pair <int,CouNumber> into a map for linear terms
+static void linsert (std::map <int, CouNumber> &lmap, 
+		     int index, CouNumber coe) {
+
+  std::map <int, CouNumber>::iterator i = lmap.find (index);
+  if (i != lmap.end()) {
+    if (fabs (i -> second += coe) < COUENNE_EPS)
+      lmap.erase (i);
+  } else {
+    std::pair <int, CouNumber> npair (index, coe);
+    lmap.insert (npair);
+  }
+}
+
+// insert a pair <<int,int>,CouNumber> into a map for quadratic terms
+static void qinsert (std::map <std::pair <int, int>, CouNumber> &map, 
+		     int indI, int indJ, CouNumber coe) {
+
+  std::pair <int, int> nind (indI, indJ);
+  std::pair <std::pair <int, int>, CouNumber> npair (nind, coe);
+  std::map  <std::pair <int, int>, CouNumber>::iterator i = map.find (nind);
+
+  if (i != map.end()) {
+    if (fabs (i -> second += coe) < COUENNE_EPS)
+      map.erase (i);
+  } else map.insert (npair);
 }
 
 
@@ -74,33 +105,73 @@ void flattenMul (expression *mul, CouNumber &coe,
 /// x_i and/or x_j may come from standardizing other (linear or
 /// quadratic operator) sub-expressions
 
-int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind0, int &ind1) {
+void decomposeTerm (CouenneProblem *p, expression *term,
+		    CouNumber initCoe,
+		    CouNumber &c0,
+		    std::map <int,                 CouNumber> &lmap,
+		    std::map <std::pair <int,int>, CouNumber> &qmap) {
 
   switch (term -> code ()) {
 
     // easy cases ////////////////////////////////////////////////////////////////////////
-    // only add term to triplet
 
   case COU_EXPRCONST: /// a constant
-    coe *= term -> Value ();
-    //printf (" [0->%g]", coe);
-    return COU_EXPRCONST;
+    c0 += initCoe * term -> Value ();
+    break;
 
   case COU_EXPRVAR:   /// a variable
-    if (ind0 < 0) {ind0 = term -> Index (); printf (" [1 %d %d]", ind0, ind1); return COU_EXPRVAR;}
-    else          {ind1 = term -> Index (); printf (" [2 %d %d]", ind0, ind1); return (ind1 == ind0) ? COU_EXPRPOW : COU_EXPRMUL;}
+    linsert (lmap, term -> Index (), 1.);
+    break;
 
-  case COU_EXPROPP: ///
-    coe = -coe;
-    //printf (" [3 %g]", coe); 
-    return decomposeTerm (p, term -> Argument (), coe, ind0, ind1);
+  case COU_EXPROPP:   /// the opposite of a term
+    decomposeTerm (p, term -> Argument (), -initCoe, c0, lmap, qmap);
+    break;
+
+  case COU_EXPRSUB:   /// a subtraction
+    decomposeTerm (p, term -> ArgList () [0],  initCoe, c0, lmap, qmap);
+    decomposeTerm (p, term -> ArgList () [1], -initCoe, c0, lmap, qmap);
+    break;
+
+  case COU_EXPRQUAD: { /// a quadratic form
+
+    exprQuad *t = dynamic_cast <exprQuad *> (term);
+
+    int       *qi = t -> getQIndexI ();
+    int       *qj = t -> getQIndexJ ();
+    CouNumber *qc = t -> getQCoeffs ();
+
+    for (int i = t -> getnQTerms (); i--;)
+      qinsert (qmap, *qi++, *qj++, initCoe * *qc++);
+  } // NO break here, exprQuad generalizes exprGroup
+
+  case COU_EXPRGROUP: { /// a linear term
+
+    exprGroup *t = dynamic_cast <exprGroup *> (term);
+
+    int       *ind = t -> getIndices ();
+    CouNumber *coe = t -> getCoeffs ();
+
+    for (int i = t -> getnLTerms (); i--;)
+      linsert (lmap, *ind++, initCoe * *coe++);
+
+    c0 += initCoe * t -> getc0 ();
+  } // NO break here, exprGroup generalizes exprSum
+
+  case COU_EXPRSUM: { /// a sum of (possibly) nonlinear elements
+
+    expression **al = term -> ArgList ();
+    for (int i = term -> nArgs (); i--;)
+      decomposeTerm (p, *al++, initCoe, c0, lmap, qmap);
+
+  } break;
 
     // not-so-easy cases /////////////////////////////////////////////////////////////////
     // cannot add terms as it may fill up the triplet
 
-  case COU_EXPRMUL: { /// will probably have to use recursion
+  case COU_EXPRMUL: { /// a product of n factors /////////////////////////////////////////
 
     std::map <int, CouNumber> indices;
+    CouNumber coe = initCoe;
 
     // return list of variables (some of which auxiliary)
     flattenMul (term, coe, indices, p);
@@ -108,36 +179,34 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
     // based on number of factors, decide what to return
     switch (indices.size ()) {
 
-    case 0: //printf (" [0 terms]");
-      return COU_EXPRCONST; // no variables in multiplication (hmmm...)
+    case 0: // no variables in multiplication (hmmm...)
+      c0 += coe;
+      break;
 
     case 1: { // only one term (may be with >1 exponent)
 
       std::map <int, CouNumber>::iterator one = indices.begin ();
+      int       index = one -> first;
+      CouNumber expon = one -> second;
 
-      if (fabs (one -> second - 1) < COUENNE_EPS) {
-	ind0 = one -> first;
-	//printf (" [1 lin term]"); 
-	return COU_EXPRVAR;
+      if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, index, coe);
+      else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, index, index, coe);
+      else {
+	exprAux *aux = p -> addAuxiliary 
+	  (new exprPow (new exprClone (p -> Var (index)),
+			new exprConst (expon)));
+
+	linsert (lmap, aux -> Index (), 1.);
       }
-      else if (fabs (one -> second - 2) < COUENNE_EPS) {
-	ind0 = one -> first;
-	//printf (" [1 sq term]"); 
-	return COU_EXPRPOW;
-      } else {
-
-	exprAux *aux = p -> addAuxiliary (new exprPow (new exprClone (p -> Var (one -> first)),
-						       new exprConst (one -> second)));
-	ind0 = aux -> Index ();
-      }
-
-      //printf (" [1 term]"); 
-    }
+    } break;
 
     case 2: { // two terms
 
-      std::map <int, CouNumber>::iterator one = indices.begin (), two = one;
-      ++two;
+      int ind0, ind1;
+
+      std::map <int, CouNumber>::iterator one = indices.begin (), 
+	two = one;
+      ++two; // now "two" points to the other variable
 
       // first variable
       if (fabs (one -> second - 1) > COUENNE_EPS) {
@@ -153,11 +222,12 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
 	ind1 = aux -> Index ();
       } else ind1 = two -> first;
 
-      //printf (" [2 terms]", coe); 
-      return (ind0 == ind1) ? COU_EXPRPOW : COU_EXPRMUL;
-    }
+      qinsert (qmap, ind0, ind1, coe);
+    } break;
 
-    default: {// create new auxiliary variable containing product of 3+ factors
+    default: { 
+
+      // create new auxiliary variable containing product of 3+ factors
 
       expression **al = new expression * [indices.size ()];
       std::map <int, CouNumber>::iterator one = indices.begin ();
@@ -170,82 +240,56 @@ int decomposeTerm (CouenneProblem *p, expression *term, CouNumber &coe, int &ind
 	} else al [i] = new exprClone (p -> Var (one -> first));
 
       exprAux *aux = p -> addAuxiliary (new exprMul (al, indices.size ()));
+      linsert (lmap, aux -> Index (), coe);
 
-      ind0 = aux -> Index ();
-      //printf (" [...%d]", coe, ind0); 
-      return COU_EXPRVAR;
-    }
-    }
-  }      
-
-  case COU_EXPRPOW: { // this is something of the form x^k.  If k=2,
-		      // return square. If k=1, return var. Otherwise,
-		      // generate new auxiliary.
-
-    expression **al  = term -> ArgList (); 
-    expression  *aux = (*al) -> standardize (p);
-
-    if (!aux)
-      aux = *al; // it was a simple variable, and was not standardized.
-
-    // special case: exponent = 1
-    if ((al [1] -> Type () == CONST) && 
-	(fabs (al [1] -> Value () - 1) < COUENNE_EPS)) { // trivial power, 
-
-      if (ind0 < 0) {ind0 = aux -> Index (); return COU_EXPRVAR;}
-      else          {ind1 = aux -> Index (); return (ind1 == ind0) ? COU_EXPRPOW : COU_EXPRMUL;}
+    } break;
     }
 
-    // behave differently if one space is occupied already
+  } break;
 
-    if (ind0 >= 0) {
-      //printf (" [5a]"); 
+  case COU_EXPRPOW: { // expression = f(x)^g(x) ////////////////////////////////////////////////
 
-      // standardize power and put new aux as second argument
-      //expression *aux = p -> addAuxiliary (term);
-      //if (!aux) aux = term;
 
-      ind1 = aux -> Index ();
-      return (ind1 == ind0) ? COU_EXPRPOW : COU_EXPRMUL;
+    expression **al = term -> ArgList (); 
 
-    } else {
+    if (al [1] -> Type () != CONST) { 
 
-      // special subcase, exponent is 2
-      if ((al [1] -> Type () == CONST) && 
-	  (fabs (al [1] -> Value () - 2) < COUENNE_EPS)) {
+      // non-constant exponent, standardize the whole term and add
+      // linear component (single aux)
 
-	//exprAux *aux = p -> addAuxiliary (*al);
-	//if (!aux) 
-	//aux = *al;
+      expression *aux = term -> standardize (p);
+      if (!aux) aux = term;
+      linsert (lmap, aux -> Index (), 1.);
 
-	//printf (" [5b]"); 
+    } else { // this is of the form f(x)^k.  If k=2, return square. If
+	     // k=1, return var. Otherwise, generate new auxiliary.
 
-	ind0 = aux -> Index ();
-	return COU_EXPRPOW;
-      } else {
+      expression *aux = (*al) -> standardize (p);
 
-	//exprAux *aux = p -> addAuxiliary (term);
-	//if (!aux)
-	//  aux = term;
+      if (!aux)
+	aux = *al; // it was a simple variable, and was not standardized.
 
-	ind0 = aux -> Index ();
+      CouNumber expon = al [1] -> Value ();
+      int ind = aux -> Index ();
 
-	//printf (" [5c]"); 
+      if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, ind, 1.);
+      else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, ind, ind, 2.);
+      else {
 
-	// standardize argument and return power
-	return COU_EXPRVAR;
+	exprAux *aux = p -> addAuxiliary (term);
+	if (!aux) ind = term -> Index ();
+
+	linsert (lmap, ind, 1.);
       }
     }
-  }
+  } break;
 
-  default: { /// for all other cases, standardize this expression and
-	     /// return its data
+  default: { /// otherwise, simply standardize expression 
+
     expression *aux = p -> addAuxiliary (term);
     if (!aux) 
       aux = term;
-
-    if (ind0 >= 0) {ind1 = aux -> Index (); return (ind1 == ind0) ? COU_EXPRPOW : COU_EXPRMUL;}
-    else           {ind0 = aux -> Index (); return COU_EXPRVAR;}    
-  }
+    linsert (lmap, aux -> Index (), 1.);
+  } break;
   }
 }

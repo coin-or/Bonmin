@@ -301,15 +301,15 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     // find aux in vector and delete it (otherwise LP relaxation will
     // count those variables)
 
-    for (std::vector <exprAux *>:: iterator i = p -> Auxiliaries ().end(); 
-	 i-- != p -> Auxiliaries ().begin();)
+    for (std::vector <exprVar *>:: iterator i = p -> Variables ().end(); 
+	 i-- != p -> Variables ().begin();)
       if ((*i) -> Index() == aux -> Index ()) {
-	printf (" fictitious %d to be erased: ", p -> Auxiliaries ().size ());
+	printf (" fictitious %d to be erased: ", p -> Variables ().size ());
 	(*i) -> print ();
 	printf (" := ");
 	(*i) -> Image () -> print ();
 	printf ("\n");
-	p -> Auxiliaries () . erase (i);
+	p -> Variables () . erase (i);
 	break;
       }
   }

@@ -72,7 +72,6 @@ libCouenne_la_SOURCES = \
 	convex/operators/powNewton.cpp \
 	convex/operators/conv-exprSub.cpp \
 	convex/operators/conv-exprSum.cpp \
-	convex/operators/linearize.cpp \
 	convex/operators/conv-exprInv.cpp \
 	convex/operators/conv-exprSinCos.cpp \
 	convex/operators/conv-exprExp.cpp \
@@ -107,6 +106,9 @@ libCouenne_la_SOURCES = \
 	problem/depGraph/depGraph.cpp \
 	util/drawCuts.cpp \
 	util/rootQ.c
+
+#	convex/operators/linearize.cpp 
+
 
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
