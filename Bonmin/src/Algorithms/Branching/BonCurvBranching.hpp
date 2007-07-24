@@ -28,6 +28,9 @@ public:
   /// Clone
   virtual OsiChooseVariable * clone() const;
 
+  /// Clone
+  virtual ChooseVariable * clone2() const;
+
   /// Destructor
   virtual ~BonCurvBranching ();
 
@@ -44,6 +47,8 @@ private:
   /// Default Constructor 
   BonCurvBranching ();
 };
+
+typedef BonCurvBranching CurvBranching;
 
 }
 

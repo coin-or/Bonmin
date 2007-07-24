@@ -12,6 +12,7 @@
 # include "BonFilterSolver.hpp"
 #endif
 #include "BonBabSetupBase.hpp"
+#include <climits>
 #include <fstream>
 #include <sstream>
 

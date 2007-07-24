@@ -32,6 +32,11 @@ namespace Bonmin{
      return new LpStrongBranching(*this);
    }
 
+   ChooseVariable *
+   LpStrongBranching::clone2() const{
+     return new LpStrongBranching(*this);
+   }
+
   LpStrongBranching::~LpStrongBranching(){
   }
    int

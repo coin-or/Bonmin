@@ -67,6 +67,9 @@ namespace Bonmin
     /** read the sos constraints from ampl suffixes */
     void read_sos();
 
+    /** Read suffixes which indicate which constraints are convex.*/
+    void read_convexities();
+
     /** Read suffixes on objective functions for upper bounding*/
     void read_obj_suffixes();
     
@@ -205,6 +208,36 @@ namespace Bonmin
       upper bounding (if one has been declared by using the prefix UBObj).*/
     virtual bool eval_upper_bound_f(Index n, const Number* x,
                                     Number& obj_value);
+
+  
+   /** Give access to constraint convexities */
+   virtual const Convexity *  constraintsTypes(){
+     return constraintsConvexities_;}
+   /** Give access to constraint convexities */
+   virtual Convexity contraintType(int i){
+     if(constraintsConvexities_ != NULL){
+       return constraintsConvexities_[i];}
+     else
+       return TMINLP::Convex;}
+
+   /** Index in the set of all constraints of the non convex constraint i*/
+   virtual int indexOfNonConv(int i){
+       if(nonConvexConstraintsAndRelaxations_.size() > 0){
+           return nonConvexConstraintsAndRelaxations_[i].first;}
+        else
+           return -1;}
+   /** Index of constraint relaxing the non convex constraint i (
+    * if no relaxation is known returns -i).*/
+   virtual int relaxationOfNonConv(int i){
+       if(nonConvexConstraintsAndRelaxations_.size() > 0){
+          return nonConvexConstraintsAndRelaxations_[i].second;}
+       else
+          return -1;
+      
+  }
+
+  virtual int  getNumberNonConvex(){
+    return nonConvexConstraintsAndRelaxations_.size();}
 private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -235,9 +268,16 @@ private:
     SosInfo sos_;
     /** Storage for perturbation radii */
     PerturbInfo perturb_info_;
-    /** Store a suffix handler (since Ipopt does not want to give access to his >:( ).*/
+    /** Store a suffix handler.*/
     SmartPtr<AmplSuffixHandler> suffix_handler_;
+
+    /** Store constraints types.*/
+    TMINLP::Convexity * constraintsConvexities_;
+
+   /** Store pair of non-convex constraints and their relaxations.*/
+   std::vector<std::pair < int, int > > nonConvexConstraintsAndRelaxations_;
   };
 } // namespace Ipopt
 
 #endif
+

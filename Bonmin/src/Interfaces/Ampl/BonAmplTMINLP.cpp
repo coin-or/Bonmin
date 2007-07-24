@@ -35,7 +35,9 @@ namespace Bonmin
   upperBoundingObj_(-1),
   ampl_tnlp_(NULL),
   branch_(),
-  sos_()
+  sos_(),
+  suffix_handler_(NULL),
+  constraintsConvexities_(NULL)
   {}
   
   
@@ -52,7 +54,8 @@ namespace Bonmin
   ampl_tnlp_(NULL),
   branch_(),
   sos_(),
-  suffix_handler_(NULL)
+  suffix_handler_(NULL),
+  constraintsConvexities_(NULL)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
   }
@@ -100,6 +103,9 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
     suffix_handler->AddAvailableSuffix("sstatus", AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
     
+
+   // For marking convex/nonconvex constraints
+   suffix_handler->AddAvailableSuffix("nonconvex",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
     
     // For objectives
     suffix_handler->AddAvailableSuffix("UBObj", AmplSuffixHandler::Objective_Source, AmplSuffixHandler::Index_Type);
@@ -118,11 +124,13 @@ namespace Bonmin
     /* Read suffixes */
     read_obj_suffixes();
     read_priorities();
+    read_convexities();
     read_sos();
   }
   
   AmplTMINLP::~AmplTMINLP()
   {
+    delete [] constraintsConvexities_;
     delete ampl_tnlp_;
   }
   
@@ -239,7 +247,43 @@ namespace Bonmin
       ampl_tnlp_->set_active_objective(0);
     }
   }
-  
+ 
+ void AmplTMINLP::read_convexities(){
+    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
+    DBG_ASSERT(asl);
+
+   const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
+   const Index * nonConvexities = suffix_handler->GetIntegerSuffixValues("nonconvex", AmplSuffixHandler::AmplSuffixHandler::Constraint_Source);
+   if(nonConvexities != NULL){
+     //int numberNonConvex = 0;
+     if(constraintsConvexities_ != NULL){
+       delete [] constraintsConvexities_;}
+     constraintsConvexities_ = new TMINLP::Convexity[n_con];
+     std::map<int, std::pair<int, int> > nonConvexConstraints;
+     for(int i = 0 ; i < n_con ; i++){
+       if(nonConvexities[i] > 0){
+         constraintsConvexities_[i] = TMINLP::NonConvex;
+         nonConvexConstraints[nonConvexities[i]].first = i;
+       }
+       else {
+         constraintsConvexities_[i] = TMINLP::Convex;
+         if(nonConvexities[i] != 0){
+           nonConvexConstraints[-nonConvexities[i]].second = i;
+         }
+       }
+     }
+
+     for(std::map<int, std::pair< int, int> >::iterator i = nonConvexConstraints.begin() ; i != nonConvexConstraints.end() ; i++){
+       nonConvexConstraintsAndRelaxations_.push_back(std::pair<int, int> ((*i).second.first,(*i).second.second));
+     }
+
+     for(unsigned int i = 0 ; i < nonConvexConstraintsAndRelaxations_.size() ; i++){
+       std::cout<<"Non convex constraints "<<i<<" has index "
+                <<  nonConvexConstraintsAndRelaxations_[i].first<<" and relaxation is given in constraint "
+                <<  nonConvexConstraintsAndRelaxations_[i].second<<std::endl;
+     }
+   }
+ } 
   
   bool AmplTMINLP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g, Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
   {

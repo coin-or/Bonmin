@@ -47,6 +47,13 @@ BonCurvBranching::clone() const
   return new BonCurvBranching(*this);
 }
 
+// Clone
+ChooseVariable *
+BonCurvBranching::clone2() const
+{
+  return new BonCurvBranching(*this);
+}
+
 static int find_where_to_branch_sos(
   const double* solution,
   OsiBranchingInformation *info,

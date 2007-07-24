@@ -229,12 +229,12 @@ namespace Bonmin
     }
 
 
-    /** overload this method to set the variable type. The var_types
+    /** overload this method to provide the variables types. The var_types
      *  array will be allocated with length n. */
     virtual bool get_variables_types(Index n, VariableType* var_types)=0;
 
-    /** overload this method to return the constraint linearity.
-     * array should be alocated with length at least n.*/
+    /** overload this method to provide the constraint linearity.
+     * array should be alocated with length at least m.*/
     virtual bool get_constraints_linearity(Index m, 
 					   Ipopt::TNLP::LinearityType* const_types) = 0;
 
@@ -347,6 +347,31 @@ namespace Bonmin
       upper bounding (to use it hasUpperBoundingObjective should return true).*/
     virtual bool eval_upper_bound_f(Index n, const Number* x,
                                     Number& obj_value){ return false; }
+
+   /** Used to mark constraints of the problem.*/
+   enum Convexity {
+     Convex/** Constraint is convex.*/,
+     NonConvex/** Constraint is non-convex.*/};
+
+    /** Overload to give access to array describing constraint convexities*/
+    virtual const Convexity * constraintsTypes(){
+      return NULL;}
+  /** Overload to give access to constraint convexities */
+  virtual Convexity constraintType(int i) {
+     return Convex;}
+
+  /** Index in the set of all constraints of the non convex constraint i*/
+  virtual int indexOfNonConv(int i) {
+     return -1;}
+  /** Index of constraint relaxing the non convex constraint i (
+    * if no relaxation is known returns -i).*/
+  virtual int relaxationOfNonConv(int i){
+    return -1;
+  }
+
+  virtual int getNumberNonConvex(){
+    return 0;}
+
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -356,9 +381,6 @@ namespace Bonmin
      * and do not define them. This ensures that
      * they will not be implicitly created/called. */
     //@{
-    /** Default Constructor */
-    //TMINLP();
-
     /** Copy Constructor */
     TMINLP(const TMINLP&);
 

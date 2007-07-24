@@ -823,12 +823,26 @@ class Messages : public CoinMessages
   /** Get the outer approximation constraints at the current optimal point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  virtual void getOuterApproximation(OsiCuts &cs, bool getObj, const double * x2, bool global);
+  void getOuterApproximation(OsiCuts &cs, bool getObj, const double * x2, bool global)
+{
+  getOuterApproximation(cs, getColSolution(), getObj, x2, global);
+}
 
   /** Get the outer approximation constraints at provided point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
   virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
+
+ /** Get the outer approximation at provided point for given constraint. */
+  virtual void getConstraintOuterApproximation(OsiCuts & cs, int constraintNumber,
+                                               const double * x, 
+                                               const double * x2, bool global);
+
+ /** Get the outer approximation at current optimal point for given constraint. */
+  void getConstraintOuterApproximation(OsiCuts & cs, int constraintNumber,
+                                       const double * x2, bool global){
+     getConstraintOuterApproximation(cs, constraintNumber, getColSolution(),x2,global);
+  }
 
   /** Get the Benders cut at provided point with provided multipliers.*/
   void getBendersCut(OsiCuts &cs, const double * x, const double *lambda, bool getObj = 1);

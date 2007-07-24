@@ -12,7 +12,8 @@ namespace Bonmin {
 /** This class chooses a variable to branch on
 
     This is the base class for the branching rules in Bonmin (inherits
-    from OsiChooseVariable).
+    from OsiChooseVariable). This class implements a simple strong branching algorithm where the changes in the objective
+    value induced by branching on a specific object are estimated with the pure virtual function fill_changes.
 */
 
 class BonChooseVariable : public OsiChooseVariable  {
@@ -31,6 +32,8 @@ public:
   /// Destructor
   virtual ~BonChooseVariable ();
 
+  /// Virtual copy constructor to an OsiChooseVariable
+  virtual BonChooseVariable * clone2() const = 0;
 #define UseOurOwn
 #ifdef UseOurOwn
   /** Sets up strong list and clears all if initialize is true.
@@ -86,10 +89,36 @@ protected:
   /// verbosity level
   int bb_log_level_;
 
+
+
 private:
-  /// Default Constructor 
+  /** Default Constructor, forbiden for some reason.*/
   BonChooseVariable ();
 
+};
+
+typedef BonChooseVariable ChooseVariable;
+
+
+/** Bonmin's implementation of a pseudo-cost based branching with eventualy strong branching initialization.*/
+class PseudoCostChooseVariable : public ChooseVariable {
+  public:
+  /** Constructor from solver.*/
+  PseudoCostChooseVariable(OsiTMINLPInterface * solver);
+  /** Copy constructor.*/
+  PseudoCostChooseVariable(const PseudoCostChooseVariable& other);
+  /** Destructor.*/
+  virtual ~PseudoCostChooseVariable();
+
+  /// Virtual copy constructor to an OsiChooseVariable
+  virtual OsiChooseVariable * clone() const = 0;
+
+  /// Virtual copy constructor to an OsiChooseVariable
+  virtual ChooseVariable * clone2() const = 0;
+
+private:
+    /** Default Constructor, forbiden for some reason.*/
+  PseudoCostChooseVariable();
 };
 
 }

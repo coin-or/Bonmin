@@ -52,6 +52,13 @@ BonQPStrongBranching::clone() const
   return new BonQPStrongBranching(*this);
 }
 
+// Clone
+ChooseVariable *
+BonQPStrongBranching::clone2() const
+{
+  return new BonQPStrongBranching(*this);
+}
+
 int
 BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
 				   OsiBranchingInformation *info,

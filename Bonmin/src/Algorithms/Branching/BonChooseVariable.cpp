@@ -5,6 +5,7 @@
 #  pragma warning(disable:4786)
 #endif
 
+#include <climits>
 #include "BonChooseVariable.hpp"
 #include "IpBlas.hpp"
 
@@ -232,4 +233,15 @@ BonChooseVariable::chooseVariable(
   }
 }
 
+PseudoCostChooseVariable::PseudoCostChooseVariable(OsiTMINLPInterface * solver):
+ChooseVariable(solver){
 }
+
+PseudoCostChooseVariable::PseudoCostChooseVariable(const PseudoCostChooseVariable& other):
+ChooseVariable(other){
+}
+
+PseudoCostChooseVariable::~PseudoCostChooseVariable(){
+}
+
+}/* Ends Bonmin's namespace.*/

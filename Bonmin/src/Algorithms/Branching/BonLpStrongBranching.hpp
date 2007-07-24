@@ -22,6 +22,9 @@ namespace Bonmin {
  ///Virtual copy constructor
  virtual OsiChooseVariable * clone() const;
 
+ ///Virtual copy constructor
+ virtual ChooseVariable * clone2() const;
+
  /// Destructor
  virtual ~LpStrongBranching();
 

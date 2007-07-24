@@ -31,6 +31,9 @@ public:
   /// Clone
   virtual OsiChooseVariable * clone() const;
 
+  /// Virtual copy constructor to an OsiChooseVariable
+  virtual BonChooseVariable * clone2() const;
+
   /// Destructor
   virtual ~BonQPStrongBranching ();
 

@@ -13,6 +13,7 @@
 #include "BonTMINLP2TNLP.hpp"
 #include "IpBlas.hpp"
 #include "IpAlgTypes.hpp"
+#include <climits>
 #include <string>
 #include <fstream>
 #include <sstream>
