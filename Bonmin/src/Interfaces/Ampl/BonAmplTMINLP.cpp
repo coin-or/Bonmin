@@ -276,12 +276,13 @@ namespace Bonmin
      for(std::map<int, std::pair< int, int> >::iterator i = nonConvexConstraints.begin() ; i != nonConvexConstraints.end() ; i++){
        nonConvexConstraintsAndRelaxations_.push_back(std::pair<int, int> ((*i).second.first,(*i).second.second));
      }
-
+#if 0
      for(unsigned int i = 0 ; i < nonConvexConstraintsAndRelaxations_.size() ; i++){
        std::cout<<"Non convex constraints "<<i<<" has index "
                 <<  nonConvexConstraintsAndRelaxations_[i].first<<" and relaxation is given in constraint "
                 <<  nonConvexConstraintsAndRelaxations_[i].second<<std::endl;
      }
+#endif
    }
  } 
   
