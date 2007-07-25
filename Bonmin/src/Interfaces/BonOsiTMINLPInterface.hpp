@@ -831,7 +831,14 @@ class Messages : public CoinMessages
   /** Get the outer approximation constraints at provided point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
-  virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global);
+  void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global){
+    getOuterApproximation(cs, x, getObj, x2, 0., global);}
+
+  /** Get the outer approximation constraints at provided point.
+      If x2 is different from NULL only add cuts violated by x2 by more than delta.
+   (Only get outer-approximations of nonlinear constraints of the problem.)*/
+  virtual void getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2,
+                                     double theta, bool global);
 
  /** Get the outer approximation at provided point for given constraint. */
   virtual void getConstraintOuterApproximation(OsiCuts & cs, int constraintNumber,

@@ -1568,7 +1568,7 @@ bool cleanNnz(double &value, double colLower, double colUpper,
 /** Get the outer approximation constraints at the point x.
 */
 void
-OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, bool global)
+OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, double theta, bool global)
 {
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
@@ -1667,7 +1667,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       double violation = 0.;
       violation = max(violation, rhs - ub[cutIdx]);
       violation = max(violation, lb[cutIdx] - rhs);
-      if(violation == 0.) continue;
+      if(violation < theta) continue;
     }
     OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
@@ -1731,7 +1731,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     if(x2 != NULL) {
       double rhs = v.dotProduct(x2);
       double violation = max(0., rhs - ub[nNonLinear_]);
-      if(violation == 0.) genCut = false;
+      if(violation < theta) genCut = false;
     }
     if(genCut) {
       if (IsValid(cut_strengthener_)) {
