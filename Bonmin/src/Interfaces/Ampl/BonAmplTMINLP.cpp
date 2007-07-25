@@ -261,14 +261,16 @@ namespace Bonmin
      constraintsConvexities_ = new TMINLP::Convexity[n_con];
      std::map<int, std::pair<int, int> > nonConvexConstraints;
      for(int i = 0 ; i < n_con ; i++){
-       if(nonConvexities[i] > 0){
+       if(nonConvexities[i] < 0){
+         std::cout<<"Constraint "<<i<<" is non-convex"<<std::endl;
          constraintsConvexities_[i] = TMINLP::NonConvex;
-         nonConvexConstraints[nonConvexities[i]].first = i;
+         nonConvexConstraints[-nonConvexities[i]].first = i;
        }
        else {
+         std::cout<<"Constraint "<<i<<" is convex"<<std::endl;
          constraintsConvexities_[i] = TMINLP::Convex;
          if(nonConvexities[i] != 0){
-           nonConvexConstraints[-nonConvexities[i]].second = i;
+           nonConvexConstraints[nonConvexities[i]].second = i;
          }
        }
      }
@@ -276,7 +278,7 @@ namespace Bonmin
      for(std::map<int, std::pair< int, int> >::iterator i = nonConvexConstraints.begin() ; i != nonConvexConstraints.end() ; i++){
        nonConvexConstraintsAndRelaxations_.push_back(std::pair<int, int> ((*i).second.first,(*i).second.second));
      }
-#if 0
+#if 1
      for(unsigned int i = 0 ; i < nonConvexConstraintsAndRelaxations_.size() ; i++){
        std::cout<<"Non convex constraints "<<i<<" has index "
                 <<  nonConvexConstraintsAndRelaxations_[i].first<<" and relaxation is given in constraint "
