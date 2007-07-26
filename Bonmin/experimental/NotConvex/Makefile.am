@@ -102,6 +102,7 @@ fun_SOURCES = BonCouenne.cpp \
               BonCouenneInterface.hpp \
               BonNlpHeuristic.hpp \
               BonNlpHeuristic.cpp \
+              BonCouenneTMINLP.hpp \
               BonCouenneInterface.cpp
 
 fun_LDADD = \
