@@ -165,7 +165,7 @@ namespace Bonmin{
       NlpSolveHeuristic * nlpHeuristic = new NlpSolveHeuristic;
       nlpHeuristic->setNlp(*ci,false);
       nlpHeuristic->setCouenneProblem(couenneProb);
-      nlpHeuristic->setMaxNlpInf(-1e4);
+      nlpHeuristic->setMaxNlpInf(1e-4);
       nlpHeuristic->setNumberSolvePerLevel(numSolve);
       heuristics_.push_back(nlpHeuristic);
     }
