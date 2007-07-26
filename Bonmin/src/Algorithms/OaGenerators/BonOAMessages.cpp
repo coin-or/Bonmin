@@ -9,6 +9,7 @@
 
 
 #include "BonOAMessages.hpp"
+#include <cstring>
 
 namespace Bonmin
 {
