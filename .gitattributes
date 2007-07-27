@@ -41,6 +41,7 @@ Couenne/src/convex/genRowCuts.cpp -text
 Couenne/src/convex/generateCuts.cpp -text
 Couenne/src/convex/obbt.cpp -text
 Couenne/src/convex/operators/alphaConvexify.cpp -text
+Couenne/src/convex/operators/analyzeSparsity.cpp -text
 Couenne/src/convex/operators/conv-exprAbs.cpp -text
 Couenne/src/convex/operators/conv-exprDiv.cpp -text
 Couenne/src/convex/operators/conv-exprExp.cpp -text
@@ -58,7 +59,6 @@ Couenne/src/convex/operators/conv-exprSinCos.cpp -text
 Couenne/src/convex/operators/conv-exprSub.cpp -text
 Couenne/src/convex/operators/conv-exprSum.cpp -text
 Couenne/src/convex/operators/createQuadratic.cpp -text
-Couenne/src/convex/operators/linearize.cpp -text
 Couenne/src/convex/operators/powNewton.cpp -text
 Couenne/src/convex/operators/quadCuts.cpp -text
 Couenne/src/convex/operators/sumStandardize.cpp -text

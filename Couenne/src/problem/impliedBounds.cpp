@@ -9,6 +9,8 @@
 
 #include <CouenneProblem.hpp>
 
+//#define DEBUG
+
 /// Bound tightening for auxiliary variables
 
 int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
@@ -21,7 +23,9 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
     if (variables_ [i] -> Multiplicity () > 0)
     printf ("x%d: [%g,%g]\n", i, lb_ [i], ub_ [i]);*/
 
-  for (int i = nVars (); i--;) 
+  for (int ii = nVars (); ii--;) {
+
+    int i = numbering_ [ii];
 
     if (variables_ [i] -> Type () == AUX) {
 
@@ -29,8 +33,10 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
     //      printf ("--- %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
 
       if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
-	//printf ("#### w_%d has infeasible bounds [%g,%g]\n", 
-	//i, lb_ [i], ub_ [i]);
+#ifdef DEBUG
+	printf ("#### w_%d has infeasible bounds [%g,%g]\n", 
+	i, lb_ [i], ub_ [i]);
+#endif
 	return -1;
       }
 
@@ -58,11 +64,11 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	  printf ("\n");
       }*/
 
-      //      auxiliaries_ [i] -> print (std::cout); printf (" := ");
-      //      auxiliaries_ [i] -> Image () -> print (std::cout); printf ("\n");
+      /*variables_ [i] -> print (std::cout); printf (" := ");
+	variables_ [i] -> Image () -> print (std::cout); printf (" [implied bd]\n");*/
 
       if (variables_ [i] -> Image () -> impliedBound 
-	  (variables_ [i] -> Index (), lb_, ub_, chg_bds) > COUENNE_EPS) {
+	  (variables_ [i] -> Index (), lb_, ub_, chg_bds)) {
 
 	//printf ("impli %2d [%g,%g] -> [%g,%g]: ", nvar+i, l0, u0, lb_ [nvar+i], ub_ [nvar+i]);
 
@@ -112,6 +118,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	nchg++;
       }
     }
+  }
   /*
     for (int i=0; i<nvar; i++) 
     printf (" [%g, %g]\n", 

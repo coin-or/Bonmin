@@ -17,22 +17,14 @@
 
 expression *exprSin::differentiate (int index) {
 
-  expression **arglist = new expression * [2];
-
-  arglist [0] = new exprCos (new exprClone (argument_));
-  arglist [1] = argument_ -> differentiate (index);
-
-  return new exprMul (arglist, 2);
+  return new exprMul (new exprCos (new exprClone (argument_)),
+		      argument_ -> differentiate (index));
 }
 
 
 // compute bounds of sin x given bounds of x 
 
 void exprSin::getBounds (expression *&lb, expression *&ub) {
-
-  //  lb = new exprConst (-1); 
-  //  ub = new exprConst (1);
-  //  return;
 
   expression *xl, *xu;
 

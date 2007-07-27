@@ -23,15 +23,12 @@
 
 exprOp::~exprOp () {
 
-  register expression *elem;
-
   if (arglist_) {
     for (register int i = nargs_; i--;)
-      if ((elem = arglist_ [i]))
-	delete elem;
+      if (arglist_ [i])
+	delete arglist_ [i];
 
     delete [] arglist_;
-    arglist_ = NULL;
   }
 }
 
@@ -102,7 +99,7 @@ int exprOp::compare (exprOp  &e1) {
     exprGroup *ne0 = dynamic_cast <exprGroup *> (this),
               *ne1 = dynamic_cast <exprGroup *> (&e1);
 
-    int cg =  ne0 -> compare (*ne1);
+    int cg = ne0 -> compare (*ne1);
 
     if (cg) return cg; // exprGroup
 
@@ -147,9 +144,9 @@ int exprOp::rank (CouenneProblem *p) {
 // list components only), and the calling class (Sum, Sub, Mul, Pow,
 // and the like) will do the part for its own object
 
-exprAux *exprOp::standardize (CouenneProblem *p) {
+exprAux *exprOp::standardize (register CouenneProblem *p) {
 
-  exprVar *subst;
+  register exprVar *subst;
 
   for (register int i = nargs_; i--;)
     if ((subst = arglist_ [i] -> standardize (p)))
@@ -167,11 +164,13 @@ void exprOp::replace (exprVar *x, exprVar *w) {
   w -> print (); printf (" in "); fflush (stdout);
   print (); fflush (stdout); printf ("\n");*/
 
-  for (int i=nargs_; i--;)
-    if (arglist_ [i] -> Type () == VAR) {
-      if (arglist_ [i] -> Index () == x -> Index ()) {
-	delete arglist_ [i];
-	arglist_ [i] = new exprClone (w);
+  register expression **al = arglist_;
+
+  for (register int i=nargs_; i--;)
+    if ((*al) -> Type () == VAR) {
+      if ((*al) -> Index () == x -> Index ()) {
+	delete *al;
+	*al = new exprClone (w);
       }
-    } else arglist_ [i] -> replace (x, w);
+    } else (*al) -> replace (x, w);
 }

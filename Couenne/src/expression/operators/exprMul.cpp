@@ -22,6 +22,7 @@ exprMul::exprMul  (expression **al, int n):
   qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
 }
 
+/// constructor with only two factors
 exprMul::exprMul (expression *arg0, expression *arg1):
   exprOp (arg0, arg1) {
 
@@ -32,8 +33,6 @@ exprMul::exprMul (expression *arg0, expression *arg1):
     arglist_ [0] = arglist_ [1];
     arglist_ [1] = swap;
   }
-
-  //  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
 }
 
 
@@ -124,11 +123,6 @@ expression *exprMul::differentiate (int index) {
     return new exprConst (0);
   }
 }
-
-
-/// print
-//void exprMul::print (std::ostream& out) const
-//  {exprOp::print (out, "*", INSIDE);}
 
 
 // get a measure of "how linear" the expression is:

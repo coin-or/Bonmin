@@ -38,11 +38,14 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
 		return;
 	}
 
-	// inverse of dIndex_ mapping, for each variable tell me the index that it will have in dIndex_, or -1 if not there
+	// inverse of dIndex_ mapping, for each variable tell me the
+	// index that it will have in dIndex_, or -1 if not there
 	int* indexmap=new int[si.getNumCols()];
 	for (int i=0; i<si.getNumCols(); ++i)
 		indexmap[i]=-1;
-	if (dIndex_==NULL) { // first time called... check which variables are there, and where we will put in the dIndex_ array
+	if (dIndex_==NULL) { // first time called... check which
+			     // variables are there, and where we will
+			     // put in the dIndex_ array
 		nDiag_=0;
 		for (int i=0; i<getnQTerms(); ++i) {
 			if (indexmap[getQIndexI()[i]]==-1) {

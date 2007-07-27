@@ -12,8 +12,8 @@
 #include <exprConst.hpp>
 #include <exprClone.hpp>
 #include <exprMax.hpp>
-#include <exprInv.hpp>
-#include <exprMul.hpp>
+#include <exprMin.hpp>
+#include <exprDiv.hpp>
 
 
 /// get bounds of log (x) based on bounds of x
@@ -51,12 +51,8 @@ void exprLog::getBounds (expression *&lb, expression *&ub) {
 
 expression *exprLog::differentiate (int index) {
 
-  expression **arglist = new expression * [2];
-
-  arglist [0] = new exprInv (new exprClone (argument_));
-  arglist [1] = argument_ -> differentiate (index);
-
-  return new exprMul (arglist, 2);
+  return new exprDiv (argument_ -> differentiate (index),
+		      new exprClone (argument_));
 }
 
 

@@ -19,10 +19,11 @@ class exprMax: public exprOp {
 
  public:
 
-  /// Constructors, destructor
+  /// Constructor
   exprMax  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
+  /// Constructor with only two arguments
   exprMax  (expression *el0, expression *el1):
     exprOp (new expression * [4], 4) {
     arglist_ [0] = el0; arglist_ [1] = new exprClone (el0);
@@ -33,11 +34,11 @@ class exprMax: public exprOp {
   exprMax *clone () const
     {return new exprMax (clonearglist (), nargs_);}
 
-  //// print operator
+  /// print operator
   std::string printOp () const
     {return "max";}
 
-  //// print position
+  /// print position
   enum pos printPos () const
     {return PRE;}
 
@@ -56,8 +57,8 @@ class exprMax: public exprOp {
   virtual inline int Linearity () 
     {return NONLINEAR;}
 
-  /// Get lower and upper bound of an expression (if any)
-  ///  void getBounds (expression *&, expression *&);
+  // Get lower and upper bound of an expression (if any)
+  //  void getBounds (expression *&, expression *&);
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)
@@ -71,8 +72,9 @@ class exprMax: public exprOp {
 		     CouNumber = -COUENNE_INFINITY, 
 		     CouNumber =  COUENNE_INFINITY);
 
-  //// code for comparisons
-  virtual enum expr_type code () {return COU_EXPRMAX;}
+  /// code for comparisons
+  virtual enum expr_type code ()
+  {return COU_EXPRMAX;}
 };
 
 
@@ -83,7 +85,7 @@ inline CouNumber exprMax::operator () () {
   CouNumber best_val = (*(arglist_ [0])) ();
   int best_ind = 0;
 
-  for (int ind = 2; ind < nargs_; ind += 2) {
+  for (register int ind = 2; ind < nargs_; ind += 2) {
 
     register CouNumber val = (*(arglist_ [ind])) ();
 
@@ -96,30 +98,6 @@ inline CouNumber exprMax::operator () () {
   best_val = (*(arglist_ [best_ind + 1])) ();
 
   return (currValue_ = best_val);
-
-  /*
-  exprOp:: operator () ();
-
-  register CouNumber best_val = *sp--; 
-  register CouNumber best_el  = *sp--; 
-
-  int n = nargs_ / 2;
-
-  while (--n) {
-
-    printf ("::max: curr val = %.3f\n", *sp);
-
-    register CouNumber val = *sp--;
-    register CouNumber el  = *sp--;
-
-    if (el > best_el) {
-      best_el  = el;
-      best_val = val;
-    }
-  }
-
-  return (currValue_ = best_val);
-  */
 }
 
 #endif

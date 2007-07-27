@@ -5,7 +5,8 @@
  *          Pietro Belotti
  * Purpose: based on upper and lower convexification, add cuts to convexify
  *
- * (C) International Business Machines 2007. This file is licensed under the Common Public License (CPL)
+ * (C) International Business Machines 2007. This file is licensed
+ * under the Common Public License (CPL)
  */
 
 #include <exprQuad.hpp>
@@ -14,7 +15,9 @@
 #include <CouenneCutGenerator.hpp>
 
 #include "CoinHelperFunctions.hpp"
+
 //#define DEBUG
+
 void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
 
   assert(dIndex_ != NULL);
@@ -103,21 +106,44 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
   // Pack the vector into a CoinPackedVector and generate the cut.
   CoinPackedVector a(false);
   a.reserve(nnz);
+
+  CouNumber lhs = 0,
+    *optimum = cg -> Problem () -> bestSol ();
+
   for(int i = 0 ; i < numcols ; i++){
+
     if(fabs(vec[i]) > COUENNE_EPS){
-       a.insert(i,vec[i]);
+
+      // compute violation
+      if (optimum) {
+	printf ("%+g * %g ", vec [i], optimum [i]);
+	lhs += vec [i] * optimum [i];
+      }
+      a.insert(i,vec[i]);
     }
   }
+
   OsiRowCut cut;
   cut.setRow(a);
+
+  delete [] vec;
+
   if( lambda == dCoeffLo_){
      cut.setUb(a0);
-     cut.setLb(-COUENNE_INFINITY);
+     if (optimum && (lhs - a0 > COUENNE_EPS)) {
+       printf ("cut violates optimal solution: %g > %g\n", lhs, a0);
+       cut.print ();
+     }
+     //     cut.setLb(-COUENNE_INFINITY);
   }
   else {
     cut.setLb(a0);
-    cut.setUb(COUENNE_INFINITY);
+    if (optimum && (lhs - a0 < -COUENNE_EPS)) {
+       printf ("cut violates optimal solution: %g < %g\n", lhs, a0);
+       cut.print ();
+    }
+    //    cut.setUb(COUENNE_INFINITY);
   }
-  delete [] vec;
+
   cs.insert(cut);
 }

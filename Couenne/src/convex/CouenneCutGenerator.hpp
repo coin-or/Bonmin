@@ -9,6 +9,7 @@
 
 #ifndef COUENNE_CUT_GENERATOR_H
 #define COUENNE_CUT_GENERATOR_H
+
 #include <BonOaDecBase.hpp>
 #include <OsiRowCut.hpp>
 #include <CouenneTypes.h>
@@ -67,9 +68,6 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// signal infeasibility of current node (found through bound tightening)
   mutable bool infeasNode_;
 
-  /// optimal solution (to test validity of cuts)
-  //  CouNumber *optimum_;
-
  public:
 
   /// constructor
@@ -78,6 +76,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 			bool = false, 
 			enum conv_type = UNIFORM_GRID, 
 			int = 2);
+
   /// copy constructor
   CouenneCutGenerator  (const CouenneCutGenerator &);
 
@@ -117,24 +116,24 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 		     const CglTreeInfo = CglTreeInfo ()) const;
 
   /// create cut and check violation. Insert and return status
-  int createCut (OsiCuts &, /// cutset to insert
-		 CouNumber, /// lb
-		 CouNumber, /// ub
-		            /// index, coeff  (index -1: "don't care") 
-		 int,    CouNumber,    /// of first  term
-		 int=-1, CouNumber=0., /// of second term 
-		 int=-1, CouNumber=0., /// of third  term
-		 bool = false) const;  /// is it a global cut? No, by default
+  int createCut (OsiCuts &, // cutset to insert
+		 CouNumber, // lb
+		 CouNumber, // ub
+		            // index, coeff  (index -1: "don't care") 
+		 int,    CouNumber,    // of first  term
+		 int=-1, CouNumber=0., // of second term 
+		 int=-1, CouNumber=0., // of third  term
+		 bool = false) const;  // is it a global cut? No, by default
 
   /// create cut and check violation. Other version with only one bound
-  int createCut (OsiCuts &, /// cutset to insert
-		 CouNumber, /// rhs
-		 int,       /// sign: -1: <=, 0: =, +1: >=
-		            /// index, coeff  (index -1: "don't care") 
-		 int,    CouNumber,    /// of first  term
-		 int=-1, CouNumber=0., /// of second term 
-		 int=-1, CouNumber=0., /// of third  term
-		 bool = false) const;  /// is it a global cut? No, by default
+  int createCut (OsiCuts &, // cutset to insert
+		 CouNumber, // rhs
+		 int,       // sign: -1: <=, 0: =, +1: >=
+		            // index, coeff  (index -1: "don't care") 
+		 int,    CouNumber,    // of first  term
+		 int=-1, CouNumber=0., // of second term 
+		 int=-1, CouNumber=0., // of third  term
+		 bool = false) const;  // is it a global cut? No, by default
 
   /// Add general linear envelope to convex function, given its
   /// variables' indices, the (univariate) function and its first

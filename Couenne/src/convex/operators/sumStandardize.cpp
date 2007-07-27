@@ -42,10 +42,19 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 		    std::map <std::pair <int,int>, CouNumber> &qmap);
 
 
+/// general procedure to standardize a sum under different forms
+/// (exprGroup, exprSum, exprSub, exprOpp)
 exprAux *linStandardize (CouenneProblem *, CouNumber, 
 			 std::map <int,                 CouNumber> &,
 			 std::map <std::pair <int,int>, CouNumber> &);
 
+
+/// analyze sparsity of potential exprQuad/exprGroup and change
+/// linear/quadratic maps accordingly, if necessary by adding new
+/// auxiliary variables and including them in the linear map
+void analyzeSparsity (CouenneProblem *, CouNumber, 
+			 std::map <int,                 CouNumber> &,
+			 std::map <std::pair <int,int>, CouNumber> &);
 
 /// translate a sum/difference/exprOpp into:
 ///
@@ -131,7 +140,7 @@ exprAux *exprOpp::standardize (CouenneProblem *p) {
 
 
 
-/// translate a difference into:
+/// translate a difference (exprSub) into:
 ///
 /// 1) an exprGroup, if only linear terms are present
 /// 2) an exprQuad,  if some quadratic/bilinear terms exist
@@ -167,7 +176,7 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
 
   ////////////////////////////////////////////////////////////////////////////////////////
 
-  // here put sparsity analysis etc
+  analyzeSparsity (p, c0, lmap, qmap);
 
   ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -206,18 +215,19 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
 
   // particular cases ///////////////////////////////////////////////////////////
 
+  exprAux *ret;
+
   // a constant
-  if ((nq==0) && (nl==0))
-    return p -> addAuxiliary (new exprConst (c0));
+  if ((nq==0) && (nl==0)) ret = p -> addAuxiliary (new exprConst (c0));
 
-  // a linear monomial, cx
-  if ((nq==0) && (fabs (c0) < COUENNE_EPS) && (nl==1)) {
-    if (fabs (*lc - 1) < COUENNE_EPS) return  p -> addAuxiliary (new exprClone (p -> Var (*li)));
-    else return p -> addAuxiliary (new exprMul (new exprConst (*lc), new exprClone (p -> Var (*li))));
-  }
+  else if ((nq==0) && (fabs (c0) < COUENNE_EPS) && (nl==1)) {   // a linear monomial, cx
 
-  // a bilinear/quadratic monomial, cx^2 or cxy
-  if ((nl==0) && (fabs (c0) < COUENNE_EPS) && (nq==1)) {
+    if (fabs (*lc - 1) < COUENNE_EPS) ret = p -> addAuxiliary (new exprClone (p -> Var (*li)));
+    else ret = p -> addAuxiliary (new exprMul (new exprConst (*lc), new exprClone (p -> Var (*li))));
+
+  } else if ((nl==0) && (fabs (c0) < COUENNE_EPS) && (nq==1)) { 
+
+    // a bilinear/quadratic monomial, cx^2 or cxy
 
     expression *quad;
 
@@ -225,19 +235,26 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
     else            quad = new exprMul (new exprClone (p -> Var (*qi)), 
 					new exprClone (p -> Var (*qj)));
 
-    if (fabs (*qc - 1) < COUENNE_EPS) return p -> addAuxiliary (quad);
-    else return p -> addAuxiliary (new exprMul (new exprConst (*qc), quad));
-  }
+    if (fabs (*qc - 1) < COUENNE_EPS) 
+      ret    = p -> addAuxiliary (quad);
+    else ret = p -> addAuxiliary (new exprMul (new exprConst (*qc), quad));
+  } else {
 
   // general case ///////////////////////////////////////////////////////////////
 
   expression **zero = new expression * [1];
   *zero = new exprConst (0.);
 
-  exprAux *ret =
-    (nq==0) ? 
+  ret = (nq==0) ? 
     (p -> addAuxiliary (new exprGroup (c0, li, lc,             zero, 1))) :
     (p -> addAuxiliary (new exprQuad  (c0, li, lc, qi, qj, qc, zero, 1)));
+  }
+
+  delete [] li;
+  delete [] lc;
+  delete [] qi;
+  delete [] qj;
+  delete [] qc;
 
   /*printf (" ==> "); 
   ret -> print (); printf (" := "); 

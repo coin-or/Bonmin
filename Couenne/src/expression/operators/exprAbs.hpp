@@ -15,17 +15,17 @@
 #include <exprConst.hpp>
 
 
-/// class for abs f(x)
+/// class for \f$w=|f(x)|\f$
 
 class exprAbs: public exprUnary {
 
  public:
 
-  /// Constructors, destructor
+  /// Constructor
   exprAbs  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
-  /// the operator's function
+  /// The operator's function
   inline unary_function F () {return fabs;}
 
   /// cloning method

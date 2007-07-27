@@ -16,6 +16,7 @@
 inline CouNumber inv (register CouNumber arg) 
 {return 1.0 / arg;}
 
+
 /// derivative of inv (x)
 inline CouNumber oppInvSqr (register CouNumber x) 
 {return (- inv (x*x));}

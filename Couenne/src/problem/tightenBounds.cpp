@@ -11,6 +11,7 @@
 #include <CouenneCutGenerator.hpp>
 #include <CouenneProblem.hpp>
 
+//#define DEBUG
 
 /// Bound propagation for auxiliary variables
 
@@ -32,7 +33,11 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	      expression::Lbound (i),
 	      expression::Ubound (i));*/
 
-  for (register int i = nOrig_, j = nVars (); i < j; i++) 
+  expression::update (NULL, lb_, ub_);
+
+  for (register int ii = 0, j = nVars (); j--; ii++) {
+
+    int i = numbering_ [ii];
 
     if (Var (i) -> Multiplicity () > 0) {
 
@@ -54,11 +59,11 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	printf ("\n");*/
 
       if (ll > uu + COUENNE_EPS) {
-	/*
-	printf ("w_%d has infeasible bounds [%g,%g]: ", i+j, ll, uu);
-	Aux (j) -> Lb () -> print (std::cout); printf (" --- ");
-	Aux (j) -> Ub () -> print (std::cout); printf ("\n");
-	*/
+#ifdef DEBUG
+	printf ("w_%d has infeasible bounds [%g,%g]: ", i, ll, uu);
+	Var (i) -> Lb () -> print (std::cout); printf (" --- ");
+	Var (i) -> Ub () -> print (std::cout); printf ("\n");
+#endif
 	return -1; // declare this node infeasible
       }
 
@@ -87,10 +92,12 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	    (optimum_ [i] >= lb_ [i]) && 
 	    (optimum_ [i] <= ll - COUENNE_EPS)) {
 
+#ifdef DEBUG
 	  printf ("#### propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
 		  i+j, lb_ [i], optimum_ [i], ll);
 	  Var (i) -> Lb () -> print (std::cout); printf (" --- ");
 	  Var (i) -> Ub () -> print (std::cout); printf ("\n");
+#endif
 	}
 
 	lb_ [i] = ll;
@@ -119,11 +126,12 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	if (optimum_ && 
 	    (optimum_ [i] <= ub_ [i]) && 
 	    (optimum_ [i] >= uu + COUENNE_EPS)) {
-
+#ifdef DEBUG
 	  printf ("#### propagating u_%d cuts optimum: [%g <-X- %g <-- %g] :: ", 
 		  i, uu, optimum_ [i], ub_ [i]);
 	  Var (i) -> Lb () -> print (std::cout); printf (" --- ");
 	  Var (i) -> Ub () -> print (std::cout); printf ("\n");
+#endif
 	}
 
 	ub_ [i] = uu;
@@ -133,8 +141,8 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
       // useless if assume expression::[lu]b_ etc already point to
       // problem::[lu]b_
-      expression::update (NULL, lb_, ub_);
     }
+  }
 
   return nchg;
 }

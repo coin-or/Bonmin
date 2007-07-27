@@ -21,10 +21,14 @@
 #include <depGraph.hpp>
 
 
+//#define DEBUG
+
 /// standardize (nonlinear) common expressions, objectives, and constraints
 
 void CouenneProblem::standardize () {
 
+  // create dependence graph to assign an order to the evaluation (and
+  // bound propagation, and -- in reverse direction -- implied bounds)
   graph_ = new DepGraph;
 
   for (std::vector <exprVar *>::iterator i = variables_ . begin ();
@@ -35,61 +39,69 @@ void CouenneProblem::standardize () {
 
   for (std::vector <expression *>::iterator i = commonexprs_.begin (); 
        i != commonexprs_.end (); i++) 
-       variables_. push_back (new exprAux (*i, 
-					   variables_.size (), 
-					   1 + (*i) -> rank (this)));
+    variables_. push_back 
+      (new exprAux (*i, variables_.size (), 1 + (*i) -> rank (this)));
 
-  // standardize initial aux variables (aka defined variables, common
-  // expression)
-  /*for (int i=0; i < commonexprs_ . size (); i++) {
+  // standardize initial aux variables (aka defined variables, aka
+  // common expression)
+  for (int nc = commonexprs_ . size (), i=0; i<nc; i++) {
 
     exprAux *aux = addAuxiliary (commonexprs_ [i]);
     //exprAux *aux = auxiliaries_ [i];
 
-    exprAux *w = new exprAux (symbolic, 
+    /*exprAux *w = new exprAux (symbolic, 
 			    variables_ . size () + auxiliaries_ . size (), 
-			    1 + symbolic -> rank (this));
+			    1 + symbolic -> rank (this));*/
 
+#ifdef DEBUG
     printf ("////////////// now attempting to standardize defVar "); fflush (stdout);
     aux -> print ();
     printf (" := "); fflush (stdout);
     aux -> Image () -> print (); 
     printf ("\n ----> "); fflush (stdout);
+#endif
 
     exprAux *naux = aux -> Image () -> standardize (this);
 
+#ifdef DEBUG
     if (naux) {
       printf ("done: "); fflush (stdout);
       naux -> print (); printf ("\n");
-      //printf (" := "); fflush (stdout);
-      //naux -> Image () -> print (); printf ("\n..."); fflush (stdout);
+      printf (" := "); fflush (stdout);
+      naux -> Image () -> print (); printf ("\n..."); fflush (stdout);
     } else if (aux) {
       aux -> print ();
       printf (" := "); fflush (stdout);
       aux -> Image () -> print (); printf ("\n");
     } else printf ("[n]aux NULL!\n");
-    //    if (aux) 
-    //  (*i) -> Body (new exprClone (aux));
-    }*/
+#endif
+  }
 
   // standardize objectives
 
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); i++) {
 
-    /*printf ("Objective ");
-      (*i) -> print ();*/
+#ifdef DEBUG
+    printf ("Objective ");
+      (*i) -> print ();
+#endif
 
     exprAux *aux = (*i) -> standardize (this);
 
-    /*printf (" --> \n");
-      (*i) -> print ();*/
+#ifdef DEBUG
+    printf (" --> \n");
+      (*i) -> print ();
+#endif
+
     if (aux) 
       (*i) -> Body (new exprClone (aux));
 
-    /*printf (" --> \n");
+#ifdef DEBUG
+    printf (" --> \n");
     (*i) -> print ();
-    printf ("...................\n");*/
+    printf ("...................\n");
+#endif
   }
 
   // commuted_ is an array with a flag for each original variable,
@@ -107,50 +119,28 @@ void CouenneProblem::standardize () {
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin (); 
        i != constraints_.end (); i++) {
 
-    /*printf ("Constraint ");
-      (*i) -> print ();*/
+#ifdef DEBUG
+    printf ("Constraint ");
+      (*i) -> print ();
+#endif
 
     exprAux *aux = (*i) -> standardize (this);
 
-    /*printf (" ==> [%d]\n", aux ? (aux -> Index ()) : -1);
-      (*i) -> print ();*/
-
-    /*printf ("dopo--------------------------------------\n");
-      print ();*/
-
-    //Back to normal
-    /*if (!aux) {
-      delete constraints_ [i];
-      constraints_ [i] = NULL;
-      continue;
-      }*/
+#ifdef DEBUG
+    printf (" ==> [%d]\n", aux ? (aux -> Index ()) : -1);
+      (*i) -> print ();
+#endif
 
     if (aux) { // save if standardized
       (*i) -> Body (new exprClone (aux));
       con2.push_back (*i);
     }
 
-    /*printf (" --> \n");
+#ifdef DEBUG
+    printf (" --> \n");
     (*i) -> print ();
-    printf ("...................\n");*/
-
-    // now aux is an auxiliary variable. If it is linear, three cases:
-    //
-    // 1) it is an expr{Sum,Group,Sub}
-    //
-    //  1a) it is an equality constraint. Look for a proper element to
-    //      "recreate" an auxiliary variable from within the linear
-    //      expression, and discard the one just created or simply
-    //      decrease its multiplicity
-    //
-    //  1b) it is an inequality, just replace the body of the
-    //      constraint
-    //
-    // 2) it is a variable itself, which means the original constraint
-    //    was of the form aw >= k or w = h. In both cases, the auxiliary
-    //    variable can be removed and replaced with its image
-    //
-    // 3) it is nonlinear: the good old case, do nothing.
+    printf ("...................\n");
+#endif
 
     /*printf ("=== "); fflush (stdout); 
     aux -> print (); printf (" := "); fflush (stdout);
@@ -167,7 +157,7 @@ void CouenneProblem::standardize () {
 
   //printf ("ntotvars = %d\n", nVars());
 
-  int nTotVar = nVars ();// + nAuxs ();
+  int nTotVar = nVars ();
 
   // reallocate space for enlarged set of variables
   x_  = (CouNumber *) realloc (x_,  nTotVar * sizeof (CouNumber));
@@ -177,46 +167,56 @@ void CouenneProblem::standardize () {
   // make expression library point to new vectors
   expression::update (x_, lb_, ub_);
 
+  //print ();
   //printf ("###################################################\n");
 
-  //for (int i=nVars (), j=0; j < nAuxs (); i++, j++) {
-  for (int i=0; i < nVars (); i++) 
-    if (variables_ [i] -> Type () == AUX) {
+  graph_ -> createOrder ();
+  //graph_ -> print ();
+
+
+  // fill numbering structure /////////////////////////////////////////////////
+
+  int n = nVars ();
+  numbering_ = new int [n];
+  std::set <DepNode *, compNode> vertices = graph_ -> Vertices ();
+
+  for (std::set <DepNode *, compNode>::iterator i = vertices.begin ();
+       i != vertices.end (); i++)
+    numbering_ [(*i) -> Order ()] = (*i) -> Index (); 
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  for (int i=0; i < nVars (); i++) {
+
+    int ord = numbering_ [i];
+
+    if (variables_ [ord] -> Type () == AUX) {
 
       // initial auxiliary bounds are infinite (they are later changed
       // through branching)
 
-      lb_ [i] = -COUENNE_INFINITY;
-      ub_ [i] =  COUENNE_INFINITY;
+      lb_ [ord] = -COUENNE_INFINITY;
+      ub_ [ord] =  COUENNE_INFINITY;
 
       // tighten them with propagated bounds
-      variables_ [i] -> crossBounds ();
+      variables_ [ord] -> crossBounds ();
 
       // and evaluate them
-      x_  [i] = (*(variables_ [i] -> Image ())) ();
-      lb_ [i] = (*(variables_ [i] -> Lb    ())) ();
-      ub_ [i] = (*(variables_ [i] -> Ub    ())) ();
+      x_  [ord] = (*(variables_ [ord] -> Image ())) ();
+      lb_ [ord] = (*(variables_ [ord] -> Lb    ())) ();
+      ub_ [ord] = (*(variables_ [ord] -> Ub    ())) ();
 
-      /*printf (":: %10g [%10g, %10g] [", x_ [i], lb_ [i], ub_ [i]);
+#ifdef DEBUG
+      printf (":::: %10g [%10g, %10g] [", x_ [ord], lb_ [ord], ub_ [ord]);
 
-      variables_ [i] -> Lb () -> print (); printf (",");
-      variables_ [i] -> Ub () -> print (); printf ("]\n");*/
+      variables_ [ord] -> Lb () -> print (); printf (",");
+      variables_ [ord] -> Ub () -> print (); printf ("]\n");
+#endif
     }
+  }
 
-  /*graph_ -> print ();
-  graph_ -> createOrder ();
-  graph_ -> print ();*/
-
-  // TODO: fill in numbering structure
-
-  /*for (int k=100; k--;)
-    for (int i = 0; i < nVars (); i++)
-      if (Var (i) -> Type () == AUX) {
-	lb_ [i] = (*(Var (i) -> Lb ())) ();
-	ub_ [i] = (*(Var (i) -> Ub ())) ();
-	}*/
-
-  //print ();
+  //for (int i=0; i<n; i++)
+  //printf ("[%4d %4d]\n", i, numbering_ [i]);
 
   delete graph_;
   graph_ = NULL;

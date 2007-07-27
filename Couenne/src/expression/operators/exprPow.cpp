@@ -97,12 +97,6 @@ expression *exprPow::differentiate (int index) {
 }
 
 
-/// output
-
-//void exprPow::print (std::ostream& out) const
-//  {exprOp::print (out, "^", INSIDE);}
-
-
 /// get a measure of "how linear" the expression is:
 ///
 /// ZERO      = 0: a zero

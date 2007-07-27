@@ -1,7 +1,7 @@
 /*
  * Name:    branchExprQuad.cpp
  * Author:  Pietro Belotti
- * Purpose: return branch data for qudratic forms
+ * Purpose: return branch data for quadratic forms
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
@@ -27,17 +27,12 @@ CouNumber exprQuad::selectBranch (expression *w,
     *alpha = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
     maxcontr = -COUENNE_INFINITY;
 
-  //  if (!alpha) printf ("///////////////// alpha null! %p %p\n", dCoeffLo_, dCoeffUp_);
-
   int bestVar;
 
   if (!alpha) { // no convexification available, 
                 // find the largest interval
 
-    //    std::set <int> touched;
-
-    CouNumber lb, ub, 
-      maxcontr = -COUENNE_INFINITY; // maximum contribution to 
+    CouNumber maxcontr = -COUENNE_INFINITY; // maximum contribution to current value
 
     int bestVar = -1;
 
@@ -60,7 +55,7 @@ CouNumber exprQuad::selectBranch (expression *w,
     *brpts = x [bestVar];
     way = TWO_RAND;
 
-    return delta;
+    return fabs (delta);
   }
 
   int *indices = dIndex_;

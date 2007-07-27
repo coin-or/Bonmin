@@ -12,6 +12,7 @@
 #include <exprAux.hpp>
 #include <depGraph.hpp>
 
+//#define DEBUG
 
 /// split a constraint w - f(x) = c into w's index (it is returned)
 /// and rest = f(x) + c
@@ -30,15 +31,26 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
   // least one variable that did not show up so far (need a problem
   // structure)
 
-  //printf ("||||||| standardizing constraint: "); print ();
+#ifdef DEBUG
+  printf ("||||||| standardizing constraint: "); print ();
 
-  /*printf (" ["); fflush (stdout);
+  printf (" ["); fflush (stdout);
   lb_ -> print ();
   printf (","); fflush (stdout);
   ub_ -> print ();
-  printf ("] \n");*/
+  printf ("] {with auxset = ");
 
-  if (0) // Back to normal
+
+  for (std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> begin ();
+       i != p -> AuxSet () -> end (); i++) {
+    printf ("<"); (*i) -> print (); 
+    printf (","); (*i) -> Image () -> print (); printf ("> ");
+  }
+
+  printf ("}\n");
+#endif
+
+  //  if (0) // Back to normal
   if (compareExpr (&lb_, &ub_) == 0) { // this is an equality constraint
 
     expression *rest;
@@ -50,25 +62,46 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
 
       p -> Commuted () [wind] = true;
 
-      //printf ("---> %d & ", wind); fflush (stdout);
-      //rest -> print (); printf ("\n");
+#ifdef DEBUG
+      printf ("---> %d & ", wind); fflush (stdout);
+      rest -> print (); printf ("\n");
+#endif
 
       exprAux *w = new exprAux (rest, wind, 1 + rest -> rank (p));
 
-      // no such expression found in the set:
-      p -> Variables   () . push_back (w); // 1) create entry therein
-      p -> AuxSet      () -> insert   (w); // 2) beware of useless copies
-      p -> getDepGraph () -> insert   (w); // 3) introduce it in acyclic structure
+      std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> find (w);
 
-      // replace ALL occurrences of original variable (with index
-      // wind) with newly created auxiliary
-      p -> auxiliarize (w);
+      // no such expression found in the set:
+      if (i == p -> AuxSet () -> end ()) {
+
+	//	p -> Variables   () . push_back (w); // 1) create entry therein
+	p -> AuxSet      () -> insert   (w); // 2) beware of useless copies
+	p -> getDepGraph () -> insert   (w); // 3) introduce it in acyclic structure
+
+	// replace ALL occurrences of original variable (with index
+	// wind) with newly created auxiliary
+	p -> auxiliarize (w);
+	p -> decreaseNOrig ();
+
+      } 
+#ifdef DEBUG
+      else {
+	printf ("found aux occurrence of "); 
+	w -> print (); printf (" := ");
+	w -> Image () -> print (); printf (" ... ");
+	(*i) -> print (); printf (" := ");
+	(*i) -> Image () -> print (); printf ("\n");
+
+      }
+#endif
 
       return NULL;
     }
   }
 
-  //printf ("\nnormal\n-----------------\n");
+#ifdef DEBUG
+  printf ("\nnormal\n-----------------\n");
+#endif
 
   return body_ -> standardize (p);
 }

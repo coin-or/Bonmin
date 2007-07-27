@@ -43,12 +43,6 @@ protected:
 
 public:
 
-  /// empty constructor
-  /*DepNode ():
-    index_   (-1),
-    depList_ (NULL),
-    order_   (-1) {printf ("=============== called null destructor\n");}*/
-
   /// fictitious constructor: only fill in index (such object is used
   /// in find() and then discarded)
   DepNode  (int ind):
@@ -113,6 +107,10 @@ public:
 	 i != vertices_.end (); i++) 
       delete (*i);
   }
+
+  /// return vertex set
+  std::set <DepNode *, compNode> &Vertices () 
+  {return vertices_;}
 
   /// node index counter
   inline int &Counter () 

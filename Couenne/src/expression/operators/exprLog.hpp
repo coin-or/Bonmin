@@ -14,17 +14,17 @@
 #include <math.h>
 
 
-// class logarithm
+/// class logarithm
 
 class exprLog: public exprUnary {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprLog  (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprLog (argument_ -> clone ());}
 
@@ -35,21 +35,21 @@ class exprLog: public exprUnary {
   std::string printOp () const
     {return "log";}
 
-  // differentiation
+  /// differentiation
   expression *differentiate (int index); 
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // return expression of this same type with argument arg
+  /// return expression of this same type with argument arg
   inline expression *mirror (expression *arg)
     {return new exprLog (arg);}
 
-  // return derivative of univariate function of this type
+  /// return derivative of univariate function of this type
   inline expression *mirror_d (expression *arg)
     {return new exprInv (arg);}
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 

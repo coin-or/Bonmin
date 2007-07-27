@@ -14,18 +14,21 @@
 #include <OsiBranchingObject.hpp>
 #include <exprAux.hpp>
 
-// Define what kind of branching (two- or three-way) and where to
-// start from: left, (center,) or right. The last is to help diversify
-// branching through randomization, which may help when the same
-// variable is branched upon in several points of the BB tree.
+
+/// Define what kind of branching (two- or three-way) and where to
+/// start from: left, (center,) or right. The last is to help diversify
+/// branching through randomization, which may help when the same
+/// variable is branched upon in several points of the BB tree.
 
 enum {TWO_LEFT,                 TWO_RIGHT,   TWO_RAND,
       THREE_LEFT, THREE_CENTER, THREE_RIGHT, THREE_RAND, BRANCH_NONE};
 
 
-/// OsiObject for auxiliary variables $w=f(x)$. Associated with a
-/// multi-variate function $f(x)$ and a related infeasibility
-/// $|w=f(x)|$, creates branches to help restoring feasibility
+/// OsiObject for auxiliary variables $w=f(x)$. 
+///
+/// Associated with a multi-variate function $f(x)$ and a related
+/// infeasibility $|w=f(x)|$, creates branches to help restoring
+/// feasibility
 
 class CouenneObject: public OsiObject {
 
@@ -103,7 +106,7 @@ protected:
   /// ThreeWayBranching. Ends with a -COIN_DBL_MAX (not considered...)
   mutable CouNumber *brPts_;
 
-  /// how to branch. This should be done automatically from
+  /// How to branch. This should be done automatically from
   /// ::infeasibility() and ::createBranch(), but for some reason
   /// obj->whichWay() in the last 20 lines of CbcNode.cpp returns 0,
   /// therefore we set our own whichWay_ within this object and use it

@@ -28,23 +28,25 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   /**
    *  An expression 
    *
-   *  $w = a0 + \sum_{i\in I1} a_i x_i + \sum_{i\in I2} a_i x_i$ 
+   *  \f$w = a0 + \sum_{i\in I1} a_i x_i + \sum_{i\in I2} a_i x_i\f$ 
    *
    *  is given such that all $a_i$ are positive for $i \in I1$ and
    *  negative for $i in I2$. If the bounds on $w \in [l,b]$, implied
    *  bounds on all $x_i, i\in I1 \cup I2$ are as follows:
    *
-   *  $\forall i\in I1$
-   *    $x_i \ge (l - a0 - sum_{j\in I1 | j\neq i} a_j u_j - sum_{j\in I2}           a_j l_j) / a_i$
-   *    $x_i \le (u - a0 - sum_{j\in I1 | j\neq i} a_j l_j - sum_{j\in I2}           a_j u_j) / a_i$
+   *  \f$\forall i\in I1\f$
    *
-   *  $\forall i\in I2$
-   *    $x_i \ge (u - a0 - sum_{j\in I1} a_j u_j           - sum_{j\in I2 | j\neq i} a_j l_j) / a_i$
-   *    $x_i \le (l - a0 - sum_{j\in I1} a_j l_j           - sum_{j\in I2 | j\neq i} a_j u_j) / a_i$,
+   *    \f$x_i \ge (l - a0 - sum_{j\in I1 | j\neq i} a_j u_j - sum_{j\in I2}        a_j l_j) / a_i\f$
+   *    \f$x_i \le (u - a0 - sum_{j\in I1 | j\neq i} a_j l_j - sum_{j\in I2}        a_j u_j) / a_i\f$
    *
-   *  where $l_i$ and $u_i$ are lower and upper bound, respectively,
-   *  of $x_i$. We also have to check if some of these bounds are
-   *  infinite.
+   *  \f$\forall i\in I2\f$
+   *
+   *    \f$x_i \ge (u - a0 - sum_{j\in I1} a_j u_j        - sum_{j\in I2 | j\neq i} a_j l_j) / a_i\f$
+   *    \f$x_i \le (l - a0 - sum_{j\in I1} a_j l_j        - sum_{j\in I2 | j\neq i} a_j u_j) / a_i\f$,
+   *
+   *  where \f$l_i\f$ and \f$u_i\f$ are lower and upper bound,
+   *  respectively, of \f$x_i\f$. We also have to check if some of
+   *  these bounds are infinite.
    */
 
   // compute number of pos/neg coefficients and sum up constants

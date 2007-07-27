@@ -19,31 +19,32 @@ class exprSub: public exprOp {
 
  public:
 
-  /// Constructors, destructor
+  /// Constructor
   exprSub  (expression **al, int n = 2): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
+  /// Constructor with two explicit elements
   exprSub (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  /// cloning method
+  /// Cloning method
   expression *clone () const
     {return new exprSub (clonearglist (), nargs_);}
 
-  //// print operator
+  //// Print operator
   std::string printOp () const
     {return "-";}
 
-  /// function for the evaluation of the expression
+  /// Function for the evaluation of the difference
   CouNumber operator () ();
 
-  /// differentiation
+  /// Differentiation
   expression *differentiate (int index); 
 
-  /// simplification
+  /// Simplification
   expression *simplify ();
 
-  /// get a measure of "how linear" the expression is (see CouenneTypes.h)
+  /// Get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity () {
 
     int lin1 = arglist_ [0] -> Linearity ();
@@ -56,26 +57,26 @@ class exprSub: public exprOp {
   /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  /// reduce expression in standard form, creating additional aux
+  /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p);
 
-  /// special version for linear constraints
+  /// Special version for linear constraints
   virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,
 			     t_chg_bounds * = NULL, int = -1,
 			     CouNumber = -COUENNE_INFINITY, 
 			     CouNumber =  COUENNE_INFINITY);
 
-  /// code for comparisons
+  /// Code for comparisons
   virtual enum expr_type code () {return COU_EXPRSUB;}
 
-  /// implied bound processing
+  /// Implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 };
 
 
-/// compute subtraction
+/// Compute difference
 
 inline CouNumber exprSub::operator () ()
 {return (currValue_ = (*(*arglist_)) () - (*(arglist_ [1])) ());}

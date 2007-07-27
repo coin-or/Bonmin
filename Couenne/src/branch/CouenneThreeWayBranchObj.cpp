@@ -12,6 +12,8 @@
 #include <CouenneThreeWayBranchObj.hpp>
 
 
+//#define DEBUG
+
 /** \brief Constructor. Get a variable as an argument and set value_
            through a call to operator () of that exprAux.
 */
@@ -84,7 +86,7 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
 
   // TODO: apply bound tightening 
 
-#if 0
+#ifdef DEBUG
   switch (way) {
   case -1: printf ("#3# Branch: x%d <= %g\n",               index_, lcrop_); break; // left
   case  0: printf ("#3# Branch: %g <= x%d <= %g\n", lcrop_, index_, rcrop_); break; // center

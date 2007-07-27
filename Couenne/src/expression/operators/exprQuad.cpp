@@ -88,6 +88,34 @@ exprQuad::exprQuad  (const exprQuad &src):
 } 
 
 
+/// Destructor
+exprQuad::~exprQuad () {
+
+  register expression *elem;
+
+  if (arglist_) {
+    for (register int i = nargs_; i--;)
+      if ((elem = arglist_ [i]))
+	delete elem;
+
+    delete [] arglist_;
+    arglist_ = NULL;
+  }
+
+  if (qindexI_) {
+    delete [] qindexI_;
+    delete [] qindexJ_;
+    delete [] qcoeff_;
+  }
+
+  if (dIndex_) {
+    delete [] dIndex_;
+    delete [] dCoeffLo_;
+    delete [] dCoeffUp_;
+  }
+}
+
+
 /// I/O
 void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 
@@ -129,34 +157,62 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
 /// differentiation
 expression *exprQuad::differentiate (int index) {
 
- /*
-  expression **arglist = new expression * [nargs_+1];
+  std::map <int, CouNumber> lmap;
 
-  register int nonconst = 0;
+  CouNumber c0 = 0;
 
-  CouNumber totlin=0;
+  // derive linear part (obtain constant)
   for (register int *ind = index_, i=0; *ind>=0; i++)
-    if (*ind++ == index) {
-      nonconst = 1;
-      totlin += coeff_ [i];
-    }
+    if (*ind++ == index)
+      c0 += coeff_ [i];
 
-  if (nonconst && (fabs (totlin) > COUENNE_EPS))
-    *arglist = new exprConst (totlin);
+  // derive quadratic part (obtain linear part)
+  for (register int *qi = qindexI_, *qj = qindexJ_, i=0; 
+       i < nqterms_; i++, qi++, qj++)
+
+    if      (*qi == index)
+      if    (*qj == index) linsert (lmap, index, 2 * qcoeff_ [i]);
+      else                 linsert (lmap, *qj,       qcoeff_ [i]);
+    else if (*qj == index) linsert (lmap, *qi,       qcoeff_ [i]);
+
+  // derive nonlinear sum
+  expression **arglist = new expression * [nargs_ + 1];
+  int nargs = 0;
 
   for (int i = 0; i < nargs_; i++) 
     if (arglist_ [i] -> dependsOn (&index, 1))
-      arglist [nonconst++] = arglist_ [i] -> differentiate (index);
+      arglist [nargs++] = arglist_ [i] -> differentiate (index);
 
-  if (!nonconst) {
-    delete [] arglist;
-    return new exprConst (0);
+  // special cases
+
+  // 1) no linear part
+  if (lmap.empty ()) {
+
+    // and no nonlinear part either
+    if (!nargs) {
+      delete arglist;
+      return new exprConst (c0);
+    }
+
+    if (fabs (c0) > COUENNE_EPS)
+      arglist [nargs++] = new exprConst (c0);
+
+    return new exprSum (arglist, nargs);
   }
-  else return new exprSum (arglist, nonconst);*/
 
-  // TODO!
+  // translate lmap into a vector
 
-  return NULL;
+  int nl = lmap.size(), *linin = new int [1 + nl], j = 0;
+  CouNumber *coeff = new CouNumber [nl];
+
+  for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); i++) {
+    linin [j]   = i -> first;
+    coeff [j++] = i -> second;
+  }
+
+  linin [j] = -1;
+
+  return new exprGroup (c0, linin, coeff, arglist, nargs);
 }
 
 
@@ -245,3 +301,31 @@ void exprQuad::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
   }
 }
 
+
+// insert a pair <int,CouNumber> into a map for linear terms
+void linsert (std::map <int, CouNumber> &lmap, 
+	      int index, CouNumber coe) {
+
+  std::map <int, CouNumber>::iterator i = lmap.find (index);
+  if (i != lmap.end()) {
+    if (fabs (i -> second += coe) < COUENNE_EPS)
+      lmap.erase (i);
+  } else {
+    std::pair <int, CouNumber> npair (index, coe);
+    lmap.insert (npair);
+  }
+}
+
+// insert a pair <<int,int>,CouNumber> into a map for quadratic terms
+void qinsert (std::map <std::pair <int, int>, CouNumber> &map, 
+	      int indI, int indJ, CouNumber coe) {
+
+  std::pair <int, int> nind (indI, indJ);
+  std::pair <std::pair <int, int>, CouNumber> npair (nind, coe);
+  std::map  <std::pair <int, int>, CouNumber>::iterator i = map.find (nind);
+
+  if (i != map.end()) {
+    if (fabs (i -> second += coe) < COUENNE_EPS)
+      map.erase (i);
+  } else map.insert (npair);
+}

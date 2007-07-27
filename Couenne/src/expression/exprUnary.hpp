@@ -21,16 +21,19 @@ inline CouNumber zero_fun (CouNumber x)
 {return 0;}
 
 
+/// expression class for unary functions (sin, log, etc.)
+///
 /// univariate operator-type expression: requires single argument. All
 /// unary functions are derived from this base class, which has a lot
-/// of common methods that need not be re-implemented by any univariate
-/// class.
+/// of common methods that need not be re-implemented by any
+/// univariate class.
 
 class exprUnary: public expression {
 
  protected:
 
-  expression *argument_; //< single argument taken by this expression
+  /// single argument taken by this expression
+  expression *argument_;
 
  public:
 
@@ -63,9 +66,9 @@ class exprUnary: public expression {
   virtual inline expression **ArgPtr () 
     {return &argument_;}
 
-  /// I/O
-  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const;
-  //  virtual void print (std::ostream &, const std::string &, enum pos) const;
+  /// print this expression to iostream
+  virtual void print (std::ostream &out = std::cout, 
+		      bool = false, CouenneProblem * = NULL) const;
 
   /// print position (PRE, INSIDE, POST)
   virtual enum pos printPos () const

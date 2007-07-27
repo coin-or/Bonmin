@@ -104,7 +104,6 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
   // cut, or it is of the form (a w1 + b w2 + c w3 [<|>]= alpha), a
   // row cut
 
-
   if ((i2 < 0) && (i3 < 0)) { // column cut /////////////////////////////////////////
 
     if (   (fabs (c1) < COUENNE_EPS)
@@ -149,7 +148,9 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
     cs.insert (cut);
     delete cut;
 
-  } else { // row cut //////////////////////////////////////////////////////////////////////
+  } else {
+
+    // row cut //////////////////////////////////////////////////////////////////////
 
     CouNumber *coeff = new CouNumber [nterms]; 
     int       *index = new int       [nterms];

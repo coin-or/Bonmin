@@ -9,7 +9,7 @@
 #ifndef COUENNE_EXPRESSION_H
 #define COUENNE_EXPRESSION_H
 
-#define STACK_SIZE 100000
+#define STACK_SIZE 10000
 
 #include <iostream>
 #include <set>
@@ -19,11 +19,13 @@
 
 class OsiBranchingInformation;
 class OsiBranchingObject;
-class CouenneProblem;
-class CouenneCutGenerator;
-class exprAux;
 class OsiSolverInterface;
 class OsiCuts;
+
+class CouenneProblem;
+class CouenneCutGenerator;
+
+class exprAux;
 class exprUnary;
 class exprOp;
 class exprCopy;
@@ -31,9 +33,14 @@ class exprVar;
 
 class DepNode;
 class DepGraph;
+
 struct compNode;
 
-/// expression base class
+/// Expression base class
+///
+/// An empty expression class with no type or operator() from which
+/// all other expression classes (for constants, variables, and
+/// operators) are derived.
 
 class expression {
 
@@ -155,7 +162,7 @@ class expression {
   virtual inline const expression *Original () const 
     {return this;}
 
-  /// I/O
+  /// print expression to iostream
   virtual void print (std::ostream &s = std::cout,    /// output stream
 		      bool = false,                   /// descend into auxiliaries' image?
 		      CouenneProblem * = NULL) const  /// problem pointer (in exprGroup)
@@ -244,8 +251,8 @@ class expression {
   /// including exprSums although already done by Clp (useful when
   /// repeated within Couenne). Parameters are the index of the
   /// (auxiliary) variable in question and the current lower/upper
-  /// bound. The method returns the best bound improvement obtained on
-  /// all variables of the expression.
+  /// bound. The method returns true if there has been a change on any
+  /// bound on the variables on which the expression depends.
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *)
     {return false;}
 
@@ -270,8 +277,6 @@ class expression {
   /// expression depends
   virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *) {}
 };
-
-
 
 
 /// updates maximum violation. Used with all impliedBound. Returns true

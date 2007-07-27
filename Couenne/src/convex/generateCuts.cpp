@@ -12,6 +12,7 @@
 #include <CouenneProblem.hpp>
 #include "BonAuxInfos.hpp"
 
+//#define DEBUG
 
 // fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 9.999e12
@@ -77,15 +78,12 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-
-  /*printf ("problem now:--------------------------------------\n");
-  problem_ -> print ();
-  printf ("--------------------------------------------------\n");*/
-
   int nInitCuts = cs.sizeRowCuts ();
 
-  //printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
-  //info.level, info.pass, info.inTree);
+#ifdef DEBUG
+  printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
+    info.level, info.pass, info.inTree);
+#endif
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
@@ -140,27 +138,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       // for each constraint
       CouenneConstraint *con = problem_ -> NLCon (i);
 
-      //printf ("RLT, constraint "); fflush (stdout);
-      //con -> print ();
-
-      // linearize if not a definition of an auxiliary variable
-      //      if (!(con -> isAuxDef ())) { 
-
-	// (which has an aux as its body)
+      // (which has an aux as its body)
       int index = con -> Body () -> Index ();
 
       if ((index >= 0) && (con -> Body () -> Type () == AUX)) {
 
 	// get the auxiliary that is at the lhs
-
-#if 1
 	exprAux *conaux = dynamic_cast <exprAux *> (problem_ -> Var (index));
-
-	/*if (!conaux) {
-	  printf ("conaux NULL! ");
-	  if (con -> Body ()) printf ("but body is not!");
-	  printf ("\n");
-	  }*/
 
 	if (conaux &&
 	    (conaux -> Image ()) && 
@@ -176,7 +160,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  // take it from the list of the variables to be linearized
 	  conaux -> decreaseMult ();
 	}
-#endif
+
 	// also, add constraint w <= b
 
 	// if there exists violation, add constraint
@@ -187,14 +171,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
 	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
       }
-	//      }
     }
 
-    /*printf ("problem now:++++++++++++++++++++++++++++++++++++++\n");
-    problem_ -> print ();
-    printf ("++++++++++++++++++++++++++++++++++++++++++++++++++\n");*/
-
-#if 0
+#ifdef DEBUG
     printf (":::::::::::::::::::::constraint cuts\n");
 
     for (int i=0; i<cs.sizeRowCuts (); i++)
@@ -246,18 +225,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  /*printf ("-----------------------------\n");
+  /*printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
   for (int i = 0; i < si.getNumCols (); i++)
     printf ("%4d: %10g [%10g,%10g]\n", i,
 	    si.getColSolution () [i],
 	    si.getColLower    () [i],
 	    si.getColUpper    () [i]);
-  for (int i = problem_ -> nOrig (); i < problem_ -> nVars (); i++)
-    printf ("%4d- %10g [%10g,%10g]\n", i,
-	    problem_ -> X  (i),
-	    problem_ -> Lb (i),
-	    problem_ -> Ub (i));
-	    printf ("-----------------------------\n");*/
+	    printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");*/
 
   // FAKE TIGHTENING AROUND OPTIMUM ///////////////////////////////////////////////////
   /*
@@ -293,16 +267,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   //////////////////////// Bound tightening ///////////////////////////////////////////
 
-
   // do bound tightening only at first pass of cutting plane in a node
   // of BB tree (info.pass == 0) or if first call (creation of RLT,
   // info.pass == -1)
 
-  if (0)
   if ((info.pass <= 0)  
       && (! boundTightening (&si, cs, chg_bds, babInfo))) {
-
-    //printf ("#### infeasible node at first BT\n");
+#ifdef DEBUG
+    printf ("#### infeasible node at first BT\n");
+#endif
     goto end_genCuts;
   }
 
@@ -345,7 +318,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
-  //#define USE_OBBT
+#define USE_OBBT
 #ifdef USE_OBBT
 
   // apply OBBT
@@ -382,7 +355,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     delete csi;
 
     if (nImprov < 0) {
-      //printf ("### infeasible node after OBBT\n");
+#ifdef DEBUG
+      printf ("### infeasible node after OBBT\n");
+#endif
       goto end_genCuts;
     }
   }

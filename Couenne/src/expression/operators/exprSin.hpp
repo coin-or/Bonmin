@@ -19,6 +19,7 @@
 
 enum cou_trig {COU_SINE, COU_COSINE};
 
+
 /// class for sin f(x)
 
 class exprSin: public exprUnary {
@@ -39,9 +40,6 @@ class exprSin: public exprUnary {
   /// print operator
   std::string printOp () const
     {return "sin";}
-
-  /// I/O
-  //  void print (std::ostream&) const;
 
   /// differentiation
   expression *differentiate (int index); 

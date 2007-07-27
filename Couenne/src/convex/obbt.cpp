@@ -14,7 +14,7 @@
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
-//#define DEBUG_OBBT
+//#define DEBUG
 
 /// reoptimize and change bound of a variable if needed
 bool updateBound (OsiSolverInterface *csi, /// interface to use as a solver
@@ -57,8 +57,7 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
   int ncols   = csi -> getNumCols (),
       objind  = p -> Obj (0) -> Body () -> Index (),
-      nImprov = 0,
-      nOrig;
+      nImprov = 0;
 
   double *objcoe = (double *) malloc (ncols * sizeof (double));
 
@@ -73,9 +72,11 @@ int obbt_stage (const CouenneCutGenerator *cg,
   // for all (original+auxiliary) variables x_i,
   ////////////////////////////////////////////////////
 
-  nOrig = p -> nVars ();
+  int psense = p -> Obj (0) -> Sense ();
 
-  for (int i=0; i<ncols; i++)
+  for (int ii=0; ii<ncols; ii++) {
+
+    int i = p -> evalOrder (ii);
 
     // TODO: do not apply OBBT if this is a variable of the form w2 =
     // c * w1 as it suffices to multiply result. More in general, do
@@ -88,17 +89,13 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	((i != objind) || // this is not the objective
 
 	 // or it is, so we use it for re-solving
-	 ((sense ==  1) && (p -> Obj (0) -> Sense () == MINIMIZE) && !(chg_bds [i].lower & EXACT)) ||
-	 ((sense == -1) && (p -> Obj (0) -> Sense () == MAXIMIZE) && !(chg_bds [i].upper & EXACT)))
+	 ((sense ==  1) && (psense == MINIMIZE) && !(chg_bds [i].lower & EXACT)) ||
+	 ((sense == -1) && (psense == MAXIMIZE) && !(chg_bds [i].upper & EXACT)))
 
 	// in both cases, bounds are not equal
 	&& (p -> Lb (i) < p -> Ub (i) - COUENNE_EPS)) {
 
-      int nOrig  = p -> nVars ();
-
-      bool isInt = //(i < nOrig) ? 
-	(p -> Var (i)       -> isInteger ());
-	//(p -> Aux (i-nOrig) -> isInteger ());
+      bool isInt = (p -> Var (i) -> isInteger ());
 
       //      objcoe [i] = 1;
       objcoe [i] = sense;
@@ -109,7 +106,7 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
       // m{in,ax}imize xi on csi
 
-#ifdef DEBUG_OBBT
+#ifdef DEBUG
       printf ("m%simizing x%d [%g,%g] %c= %g",
 	      (sense==1) ? "in" : "ax", i, p -> Lb (i), p -> Ub (i),
 	      (sense==1) ? '>'  : '<',  bound); fflush (stdout);
@@ -137,30 +134,10 @@ int obbt_stage (const CouenneCutGenerator *cg,
 		      i, p -> Ub (i), p -> bestSol () [i], bound);
 	  }
 	}
-	/*
-	if (sense == 1) {
-	  if (bound > p -> Ub (i) - COUENNE_EPS) 
-	    printf ("$$$$$$$ %d [%g,%g] >>> %g\n", i, p -> Lb (i), p -> Ub (i), bound);
-	} else {
-	  if (bound < p -> Lb (i) + COUENNE_EPS) 
-	    printf ("$$$$$$$ %d [%g,%g] <<< %g\n", i, p -> Lb (i), p -> Ub (i), bound);
-	}
-	*/
-#ifdef DEBUG_OBBT
-	printf ("                  ----> %g", bound); fflush (stdout);
-#endif
 
-	/*if (fabs (csi -> getColSolution () [i] - bound) > COUENNE_EPS) 
-	  printf ("!!!%d %g != %g", i, csi -> getColSolution () [i], bound);*/
-
-#ifdef DEBUG_OBBT
-	if (sense==1) {printf(" !!\n");csi->setColLower (i,bound); chg_bds[i].lower |= CHANGED | EXACT;}
-	else          {printf(" !!\n");csi->setColUpper (i,bound); chg_bds[i].upper |= CHANGED | EXACT;}
-	fflush (stdout);
-#else
 	if (sense==1) {csi -> setColLower (i, bound); chg_bds [i].lower |= CHANGED | EXACT;}
 	else          {csi -> setColUpper (i, bound); chg_bds [i].upper |= CHANGED | EXACT;}
-#endif
+
 	// check value and bounds of other variables
 
 	const double *sol = csi -> getColSolution ();
@@ -202,15 +179,19 @@ int obbt_stage (const CouenneCutGenerator *cg,
 	// (first argument =NULL is pointer to solverInterface) as csi
 	// is not our problem
 
-	if (!(cg -> boundTightening (NULL, cs, chg_bds, babInfo))) {
-	  //printf ("##### infeasible after bound tightening\n");
+	int psenseI = (psense == MINIMIZE) ? 1 : -1;
+
+	if (!(cg -> boundTightening (((objind == i) && (sense == psenseI)) ? csi : NULL, 
+				     cs, chg_bds, babInfo))) {
+#ifdef DEBUG
+	  printf ("##### infeasible, bound tightening after OBBT\n");
+#endif
 	  return -1; // tell caller this is infeasible
 	}
 
 	nImprov++;
       }
-
-#ifdef DEBUG_OBBT
+#ifdef DEBUG
 	printf ("\n");
 #endif
 
@@ -224,6 +205,7 @@ int obbt_stage (const CouenneCutGenerator *cg,
       // restore null obj fun
       objcoe [i] = 0;
     }
+  }
 
   return nImprov;
 }

@@ -81,6 +81,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/trigNewton.cpp \
 	convex/operators/createQuadratic.cpp \
 	convex/operators/sumStandardize.cpp \
+	convex/operators/analyzeSparsity.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
 	convex/boundTightening.cpp \

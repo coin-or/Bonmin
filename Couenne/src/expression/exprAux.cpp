@@ -10,11 +10,11 @@
 #include <CouenneTypes.h>
 #include <expression.hpp>
 #include <exprAux.hpp>
-#include <exprOp.hpp>
-#include <exprUnary.hpp>
 #include <exprVar.hpp>
-#include <exprBound.hpp>
 #include <CouenneProblem.hpp>
+
+//#define DEBUG
+
 
 // auxiliary expression Constructor
 
@@ -51,8 +51,6 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   int nrc = cs.sizeRowCuts (), ncc = cs.sizeColCuts ();
 
-  //  CouNumber l, u;
-
   /*
   if ((!(cg -> isFirst ())) && 
       ((l = expression::Lbound (varIndex_)) > -COUENNE_INFINITY) &&
@@ -64,7 +62,8 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   image_ -> generateCuts (this, si, cs, cg, chg);
 
   // check if cuts have coefficients, rhs too large or too small
-#if 0
+
+#ifdef DEBUG
   if (warned_large_coeff)
     for (int jj=nrc; jj < cs.sizeRowCuts (); jj++) {
 

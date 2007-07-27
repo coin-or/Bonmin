@@ -12,16 +12,17 @@
 #include <exprOp.hpp>
 
 
-///  class for minima
+/// class for minima
 
 class exprMin: public exprOp {
 
  public:
 
-  /// Constructors, destructor
+  /// Constructor
   exprMin  (expression **al, int n): 
     exprOp (al, n) {}
  
+  /// Constructor with only two arguments
   exprMin  (expression *el0, expression *el1):
     exprOp (new expression * [4], 4) {
     arglist_ [0] = el0; arglist_ [1] = new exprClone (el0);
@@ -55,8 +56,8 @@ class exprMin: public exprOp {
   virtual inline int Linearity () 
     {return NONLINEAR;}
 
-  /// Get lower and upper bound of an expression (if any)
-  ///  void getBounds (expression *&, expression *&);
+  // Get lower and upper bound of an expression (if any)
+  //  void getBounds (expression *&, expression *&);
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)
@@ -71,7 +72,8 @@ class exprMin: public exprOp {
 		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
-  virtual enum expr_type code () {return COU_EXPRMIN;}
+  virtual enum expr_type code () 
+  {return COU_EXPRMIN;}
 };
 
 

@@ -11,6 +11,7 @@
 #include <exprGroup.hpp>
 #include <depGraph.hpp>
 
+
 /// Constructor
 exprGroup::exprGroup  (CouNumber c0,     // constant term
 		       int *index,       // indices (array terminated by a -1)
@@ -18,9 +19,8 @@ exprGroup::exprGroup  (CouNumber c0,     // constant term
 		       expression **al,  // vector of nonlinear expressions to be added 
 		       int n):           // number of *nonlinear* expressions in al
   exprSum  (al, n),
-  c0_      (c0),
-  nlterms_ (0) {
-
+  nlterms_ (0),
+  c0_      (c0) {
 
   // count linear terms
   for (register int *ind = index; *ind++ >= 0; nlterms_++);
@@ -40,10 +40,10 @@ exprGroup::exprGroup  (CouNumber c0,     // constant term
 /// copy constructor
 exprGroup::exprGroup  (const exprGroup &src): 
   exprSum   (src.clonearglist (), src.nargs_),
-  c0_       (src.c0_),
+  nlterms_  (src.nlterms_),
   index_    (NULL),
   coeff_    (NULL),
-  nlterms_  (src.nlterms_) {
+  c0_       (src.c0_) {
 
   coeff_ = new CouNumber [nlterms_];
   index_ = new int       [nlterms_ + 1];
@@ -56,6 +56,27 @@ exprGroup::exprGroup  (const exprGroup &src):
     coeff_ [i] = src.coeff_ [i];
   }
 } 
+
+
+/// destructor
+exprGroup::~exprGroup () {
+
+  register expression *elem;
+
+  if (arglist_) {
+    for (register int i = nargs_; i--;)
+      if ((elem = arglist_ [i]))
+	delete elem;
+
+    delete [] arglist_;
+    arglist_ = NULL;
+  }
+
+  if (index_) {
+    delete [] index_;
+    delete [] coeff_;
+  }
+}
 
 
 /// I/O
@@ -87,29 +108,29 @@ void exprGroup::print (std::ostream &out, bool descend, CouenneProblem *p) const
 /// differentiation
 expression *exprGroup::differentiate (int index) {
 
-  expression **arglist = new expression * [nargs_+1];
-
-  register int nonconst = 0;
+  expression **arglist = new expression * [nargs_ + 1];
 
   CouNumber totlin=0;
-  for (register int *ind = index_, i=0; *ind>=0; i++)
-    if (*ind++ == index) {
-      nonconst = 1;
-      totlin += coeff_ [i];
-    }
 
-  if (nonconst && (fabs (totlin) > COUENNE_EPS))
-    *arglist = new exprConst (totlin);
+  for (register int *ind = index_, i=0; *ind>=0; i++)
+    if (*ind++ == index)
+      totlin += coeff_ [i];
+
+  int nargs = 0;
+
+  if (fabs (totlin) > COUENNE_EPS)
+    arglist [nargs++] = new exprConst (totlin);
 
   for (int i = 0; i < nargs_; i++) 
     if (arglist_ [i] -> dependsOn (&index, 1))
-      arglist [nonconst++] = arglist_ [i] -> differentiate (index);
+      arglist [nargs++] = arglist_ [i] -> differentiate (index);
 
-  if (!nonconst) {
+  if ((nargs == 0) ||
+      (nargs == 1) && (fabs (totlin) > COUENNE_EPS)) {
     delete [] arglist;
-    return new exprConst (0);
+    return new exprConst (totlin);
   }
-  else return new exprSum (arglist, nonconst);
+  else return new exprSum (arglist, nargs);
 }
 
 
@@ -160,14 +181,9 @@ int exprGroup::rank (CouenneProblem *p) {
   if (maxrank < 0) 
     maxrank = 0;
 
-  //int norig = p -> nVars ();
-
   for (register int *ind = index_; *ind>=0; ind++) {
 
-    int r = //(*ind >= norig) ? 
-      //(p -> Aux (*ind - norig) -> rank (p)) :
-      (p -> Var (*ind)         -> rank (p));
-
+    int r = (p -> Var (*ind) -> rank (p));
     if (r > maxrank)
       maxrank = r;
   }
@@ -201,16 +217,16 @@ void exprGroup::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
     dep -> insert (g -> lookup (*index));
 }
 
+
 /// specialized version to check expression of linear term
 int exprGroup::dependsOn (CouenneProblem *p, int *chg, int nch) {
 
   int tot = dependsOn (chg, nch);
 
   for (int *ind = index_; *ind >= 0; ind++)
-    for (int i=0; (i < nch) && (chg [i] >= 0); i++)
+    for (register int i=0; (i < nch) && (chg [i] >= 0); i++)
       if (p -> Var (*ind) -> Type () == AUX)
 	tot += p -> Var (*ind) -> Image () -> dependsOn (p, chg, nch);
 
   return tot;
 }
-

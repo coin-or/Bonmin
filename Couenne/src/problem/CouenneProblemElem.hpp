@@ -16,26 +16,31 @@
 #include <exprConst.hpp>
 
 
-///////////////////////////////////////////////////////////////////////////////////////
-// CouenneConstraint class, with any expression as the body and two range
-// expressions
+/** Class to represent nonlinear constraints
+ *
+ *  It consists of an expression as the body and two range expressions
+ *  as lower- and upper bounds.  
+ *
+ *  A general constraint is defined as lb_ <= body_ <= ub_, where all
+ *  three components are expressions, depending on variables,
+ *  auxiliaries and bounds. If the constraint is 2 <= exp (x1+x2) <=
+ *  4, then:
+ *
+ *  body_ = exp (x1+x2), that is, 
+ *
+ *  new exprExp (new exprSum (new exprVar (1), new exprVar (2))
+ *
+ *  while lb_ = new exprConst (2) and ub_ = new exprConst (4).
+ */
 
 class CouenneConstraint {
 
  protected:
 
-  /// a general constraint is defined as lb_ <= body_ <= ub_, where all
-  /// three components are expressions, depending on variables,
-  /// auxiliaries and bounds. If the constraint is 2 <= exp (x1+x2) <=
-  /// 4, then:
+  expression *body_; ///< body of constraint
 
-  /// body_ = exp (x1+x2), that is, 
-  /// new exprExp (new exprSum (new exprVar (1), new exprVar (2)),
-  expression *body_;
-
-  /// while lb_ = new exprConst (2) and ub_ = new exprConst (4).
-  expression *lb_;
-  expression *ub_;
+  expression *lb_;   ///< lower bound
+  expression *ub_;   ///< upper bound
 
  public:
 
@@ -46,7 +51,6 @@ class CouenneConstraint {
     body_     (body), 
     lb_       (lb), 
     ub_       (ub) {
-    //    isAuxDef_ (false) {
 
     if (!lb_) 
       if (!ub_) {
@@ -74,10 +78,10 @@ class CouenneConstraint {
   inline CouenneConstraint *clone () const
     {return new CouenneConstraint (*this);}
 
-  /// get constraint's elements
-  inline expression *Lb   () const {return lb_;}
-  inline expression *Ub   () const {return ub_;}
-  inline expression *Body () const {return body_;}
+  // get constraint's elements
+  inline expression *Lb   () const {return lb_;}   ///< expression of lower bound
+  inline expression *Ub   () const {return ub_;}   ///< expression of upper bound
+  inline expression *Body () const {return body_;} ///< expression of body of constraint
 
   /// set body of constraint
   inline expression *Body (expression *newBody) 
@@ -91,9 +95,12 @@ class CouenneConstraint {
 };
 
 
-/////////////////////////////////////////////////////////////////////////////////
-/// Objective function class, with an expression and an optimization
-/// direction
+
+/**
+ * Objective function
+ *
+ * It consists of an expression and an optimization direction.
+ */
 
 class CouenneObjective {
 
@@ -124,7 +131,7 @@ class CouenneObjective {
   inline CouenneObjective *clone () const
     {return new CouenneObjective (*this);}
 
-  /// optimization sense
+  /// get optimization sense
   inline enum opt_sense Sense () const
     {return sense_;}
 
@@ -132,15 +139,15 @@ class CouenneObjective {
   inline expression *Body () const
     {return body_;}
 
-  /// set body
+  /// Set body
   expression *Body (expression *newBody) 
     {body_ = newBody; return body_;}
 
-  /// get standard form of this objective function
+  /// Get standard form of this objective function
   inline exprAux *standardize (CouenneProblem *p) 
     {return body_ -> standardize (p);}
 
-  /// I/O
+  /// Print to iostream
   void print (std::ostream &out = std::cout) {
     out << (sense_ == MAXIMIZE ? "max " : "min ");
     body_ -> print (out);

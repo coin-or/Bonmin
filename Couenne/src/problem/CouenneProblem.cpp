@@ -34,6 +34,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   bestObj_   (COIN_DBL_MAX),
   quadIndex_ (NULL),
   commuted_  (NULL),
+  numbering_ (NULL),
   ndefined_  (0),
   graph_     (NULL),
   nOrig_     (0) {
@@ -53,8 +54,10 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   //print (std::cout);
   //printf ("======================================\n");
 
+  // reformulation
   standardize ();
 
+  // quadratic handling
   fillQuadIndices ();
 
   if ((now = (CoinCpuTime () - now)) > 10.)
@@ -78,17 +81,18 @@ CouenneProblem *CouenneProblem::clone () const
 /// copy constructor
 
 CouenneProblem::CouenneProblem (const CouenneProblem &p):
-  x_        (NULL),
-  lb_       (NULL),
-  ub_       (NULL),
-  curnvars_ (-1),
-  nIntVars_ (p.nIntVars_),
-  optimum_  (NULL),
-  bestObj_  (p.bestObj_),
-  commuted_ (NULL),
-  ndefined_ (p.ndefined_),
-  graph_    (NULL),
-  nOrig_    (p.nOrig_) { // needed only in standardize (), unnecessary to update it
+  x_         (NULL),
+  lb_        (NULL),
+  ub_        (NULL),
+  curnvars_  (-1),
+  nIntVars_  (p.nIntVars_),
+  optimum_   (NULL),
+  bestObj_   (p.bestObj_),
+  commuted_  (NULL),
+  numbering_ (NULL),
+  ndefined_  (p.ndefined_),
+  graph_     (NULL),
+  nOrig_     (p.nOrig_) { // needed only in standardize (), unnecessary to update it
 
   // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
 
@@ -97,7 +101,12 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   for (i=0; i < p.nObjs   (); i++) objectives_  . push_back (p.Obj   (i) -> clone ());
   for (i=0; i < p.nNLCons (); i++) constraints_ . push_back (p.NLCon (i) -> clone ());
   for (i=0; i < p.nVars   (); i++) variables_   . push_back (p.Var   (i) -> clone ());
-  //  for (i=0; i < p.nAuxs   (); i++) auxiliaries_ . push_back (p.Aux   (i) -> clone ());
+
+  if (p.numbering_) {
+    numbering_ = new int [i = nVars ()];
+    while (i--)
+      numbering_ [i] = p.numbering_ [i];
+  }
 
   if (p.optimum_) {
     optimum_ = (CouNumber *) malloc (nVars () * sizeof (CouNumber));
@@ -141,8 +150,9 @@ CouenneProblem::~CouenneProblem () {
     delete (*i);
 
   // delete extra structures
-  if (commuted_) delete [] commuted_;
-  if (graph_)    delete    graph_;
+  if (graph_)     delete    graph_;
+  if (commuted_)  delete [] commuted_;
+  if (numbering_) delete [] numbering_;
 }
 
 

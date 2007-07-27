@@ -45,7 +45,7 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
       problem_ -> Ub (objInd) = UB;
       chg_bds [objInd]. upper = CHANGED;
     }
-    
+
     if ((LB   > - COUENNE_INFINITY) && 
 	(LB   > dual0 + COUENNE_EPS)) { // update dual bound
       problem_ -> Lb (objInd) = LB;
@@ -57,20 +57,13 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
     // do it only if a linear convexification is in place already
 
     if (!firstcall_) {
-      /*
-    CouNumber 
-      LB = si.getObjValue (), 
-      UB = (babInfo && (babInfo -> babPtr ())) ? 
-              babInfo  -> babPtr () -> model (). getObjValue() : 
-              problem_ -> Ub (objInd);
-      */
 
       if ((LB > -COUENNE_INFINITY) && (UB < COUENNE_INFINITY)) {
 	int ncols = psi ->getNumCols ();
 
 	for (int i=0; i<ncols; i++) {
 
-	  CouNumber 
+	  CouNumber
 	    x  = psi -> getColSolution () [i],
 	    rc = psi -> getReducedCost () [i],
 	    dx = problem_ -> Ub (i) - x;
@@ -98,7 +91,8 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
     // propagate bounds to auxiliary variables
 
     //    if ((nbwtightened > 0) || (ntightened > 0))
-    ntightened = ((nbwtightened > 0) || first) ? problem_ -> tightenBounds (chg_bds) : 0;
+    ntightened = ((nbwtightened > 0) || first) ? 
+      problem_ -> tightenBounds (chg_bds) : 0;
 
     //    printf ("#### propagate ---> %d\n", ntightened);
 

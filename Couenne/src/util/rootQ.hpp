@@ -9,8 +9,8 @@
 #include <CouenneTypes.h>
 #include <map>
 
-// Find roots of polynomial $Q^k(x) = \sum_{i=1}^{2k} i x^{i-1}$. Used
-// in convexification of powers with odd exponent
+/// Find roots of polynomial $Q^k(x) = \sum_{i=1}^{2k} i x^{i-1}$. Used
+/// in convexification of powers with odd exponent
 
 extern "C" {
   CouNumber rootQ (int k);
@@ -23,19 +23,21 @@ class Qroot {
 
  protected:
 
-  // maps an integer k with the root of Q^k(x)
+  /// Maps an integer k with the root of \f$Q^k(x)\f$.
 
   static std::map <int, CouNumber> Qmap;
 
  public:
 
-  /// empty constructors (we only need the method to work on the static
-  /// structure)
+  /// Empty constructor --we only need the method to work on the static
+  /// structure.
   
   Qroot  () {}
+
+  /// Empty destructor.
   ~Qroot () {}
 
-  /// retrieve root of Q with order = k. If no such computation has
+  /// Retrieve root of Q with order = k. If no such computation has
   /// been performed yet, do it here
 
   inline CouNumber operator () (int k) {

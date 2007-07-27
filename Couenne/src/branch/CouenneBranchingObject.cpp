@@ -12,14 +12,18 @@
 #include <CouenneObject.hpp>
 #include <CouenneBranchingObject.hpp>
 
+//#define DEBUG
+
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
 
 CouNumber CouenneBranchingObject::alpha_ = 0.25;
 
 
-/** \brief Constructor. Get a variable as an argument and set value_
-           through a call to operator () of that exprAux.
+/** \brief Constructor. 
+ *
+ * Get a variable as an argument and set value_ through a call to
+ * operator () of that exprAux.
 */
 
 CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber brpoint, bool isint): 
@@ -36,7 +40,7 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
     exit (-1);
   }
 
-  long double
+  CouNumber
     x = expression::Variable (index_),   // current solution
     l = expression::Lbound   (index_),   //         lower bound
     u = expression::Ubound   (index_),   //         upper
@@ -64,8 +68,10 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
   // TODO: consider branching value that maximizes distance from
   // current point (how?)
 
+#ifdef DEBUG
   if (fabs (u-l) < COUENNE_EPS)
     printf ("#### Warning, interval is really tiny\n");
+#endif
 
   if ((x-l < COUENNE_NEAR_BOUND) ||
       (u-x < COUENNE_NEAR_BOUND))
@@ -76,11 +82,13 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
     else                             value_ = 0;
   else value_ = x;
 
-  /*printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 
+#ifdef DEBUG
+  printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 
 	  index_, value_, 
 	  expression::Variable (index_),
 	  expression::Lbound   (index_),
-	  expression::Ubound   (index_));*/
+	  expression::Ubound   (index_));
+#endif
 }
 
 
@@ -100,6 +108,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   CouNumber l = solver -> getColLower () [index_],
             u = solver -> getColUpper () [index_];
 
+#ifdef DEBUG
   if (way) {
     if      (value_ < l)             printf ("Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
     else if (value_ < l+COUENNE_EPS) printf ("## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
@@ -107,22 +116,19 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     if      (value_ > u)             printf ("Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
     else if (value_ > u+COUENNE_EPS) printf ("## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
   }
+#endif
 
   if (!way) solver -> setColUpper (index_, integer_ ? floor (value_) : value_); // down branch
   else      solver -> setColLower (index_, integer_ ? ceil  (value_) : value_); // up   branch
 
   // TODO: apply bound tightening to evaluate change in dual bound
 
-
   //    printf (" --> [%.6e,%.6e]\n", l, u);
-  //printf ("### Branch: x%d %c= %g\n", 
-  //	  index_, way ? '>' : '<', value_);
-	   
-    /*for (int i=0; i < solver -> getNumCols(); i++)
-      printf (" %3d [%.3e,%.3e]\n", i, solver -> getColLower () [i],
-      solver -> getColUpper () [i]);
-      }*/
 
+#ifdef DEBUG
+  printf ("### Branch: x%d %c= %g\n", 
+  	  index_, way ? '>' : '<', value_);
+#endif
 
   branchIndex_++;
   return 0.; // estimated change in objective function

@@ -92,12 +92,6 @@ expression *exprDiv::differentiate (int index) {
 }
 
 
-// output
-
-//void exprDiv::print (std::ostream& out) const
-//  {exprOp::print (out, "/", INSIDE);}
-
-
 // get lower/upper bounds as a function of the arguments' lower/upper
 // bounds
 

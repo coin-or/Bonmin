@@ -7,9 +7,6 @@
  * This file is licensed under the Common Public License.
  */
 
-// for profiling
-//AW 2007-06-11: Taken out this since it doesn't compile with MSVC++
-//#include <sys/time.h>
 
 #include <OsiRowCut.hpp>
 #include <BonOaDecBase.hpp>

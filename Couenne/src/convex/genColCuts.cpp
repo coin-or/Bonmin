@@ -25,7 +25,7 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
 
   // values fo OsiColCut
   CouNumber *bndLow = new CouNumber [ncols],
-    *bndUpp = new CouNumber [ncols];
+            *bndUpp = new CouNumber [ncols];
 
   const CouNumber 
     *oldLow = si.getColLower (), // old bounds
@@ -34,11 +34,12 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
     *newUpp = problem_ -> Ub ();
 
   // check all changed bounds
-  for (int i=0; i<nchanged; i++) {
+  for (int i = 0; i < nchanged; i++) {
 
     register int index = changed [i];
 
-    if (index == ind_obj) continue;
+    if (index == ind_obj) 
+      continue;
 
     CouNumber bd;
 

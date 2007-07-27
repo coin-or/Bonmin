@@ -30,10 +30,6 @@ void CouenneProblem::print (std::ostream &out) {
        i != constraints_.end (); i++)
     (*i) -> print (out);
 
-  /*printf ("auxiliaries:\n");
-  for (std::vector <exprAux *>::iterator i = auxiliaries_.begin ();
-  i != auxiliaries_.end (); i++) */
-
   printf ("variables:\n");
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
        i != variables_.end (); i++) 
@@ -104,14 +100,17 @@ bool readOptimum (const std::string &fname,
   // only one loop is sufficient here, since auxiliary variables are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
 
-  for (register int i = 0, j = problem -> nVars (); j--; i++)
-    if (problem -> Var (i) -> Type () == AUX)
-      optimum [problem -> Var (i) -> Index ()] = (*(problem -> Var (i) -> Image ())) ();
+  for (register int i = 0, j = problem -> nVars (); j--; i++) {
+    exprVar *var = problem -> Var (problem -> evalOrder (i));
+    if (var -> Type () == AUX)
+      optimum [var -> Index ()] = (*(var -> Image ())) ();
+  }
 
+  /*
   expression::update (problem -> X  (), 
 		      problem -> Lb (), 
 		      problem -> Ub ());
-
+  */
   // restore previous value/bound vectors
   expression::update (xS, lS, uS);
 

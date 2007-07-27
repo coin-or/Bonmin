@@ -36,7 +36,7 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
     printf ("checkNLP: false objective function. %.3f != %.3f\n", realobj, obj);
   }
 
-  for (int i=0; i<p->nNLCons (); i++) {
+  for (int i=0; i < p -> nNLCons (); i++) {
 
     CouenneConstraint *c = p -> NLCon (i);
 
@@ -57,9 +57,11 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
 
   // check auxiliary variables
 
-  for (int i=0; i<p->nVars (); i++) 
+  for (int n = p -> nVars (), i=0; i<n; i++) {
 
-    if (p -> Var (i) -> Type () == AUX) {
+    int order = p -> evalOrder (i);
+
+    if (p -> Var (order) -> Type () == AUX) {
 
       exprAux *w = dynamic_cast <exprAux *> (p -> Var (i));
 
@@ -77,6 +79,7 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
       } 
       //    else printf ("yes (%.15f)\n", aux-img);
     }
+  }
 
   return true;
 }

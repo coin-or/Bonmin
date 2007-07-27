@@ -65,35 +65,6 @@ void flattenMul (expression *mul, CouNumber &coe,
 }
 
 
-// insert a pair <int,CouNumber> into a map for linear terms
-static void linsert (std::map <int, CouNumber> &lmap, 
-		     int index, CouNumber coe) {
-
-  std::map <int, CouNumber>::iterator i = lmap.find (index);
-  if (i != lmap.end()) {
-    if (fabs (i -> second += coe) < COUENNE_EPS)
-      lmap.erase (i);
-  } else {
-    std::pair <int, CouNumber> npair (index, coe);
-    lmap.insert (npair);
-  }
-}
-
-// insert a pair <<int,int>,CouNumber> into a map for quadratic terms
-static void qinsert (std::map <std::pair <int, int>, CouNumber> &map, 
-		     int indI, int indJ, CouNumber coe) {
-
-  std::pair <int, int> nind (indI, indJ);
-  std::pair <std::pair <int, int>, CouNumber> npair (nind, coe);
-  std::map  <std::pair <int, int>, CouNumber>::iterator i = map.find (nind);
-
-  if (i != map.end()) {
-    if (fabs (i -> second += coe) < COUENNE_EPS)
-      map.erase (i);
-  } else map.insert (npair);
-}
-
-
 /// given (expression *) element of sum, returns (coe,ind0,ind1)
 /// depending on element:
 ///
@@ -239,7 +210,12 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 	  al [i] = new exprClone (aux);
 	} else al [i] = new exprClone (p -> Var (one -> first));
 
-      exprAux *aux = p -> addAuxiliary (new exprMul (al, indices.size ()));
+      // TODO: when we have a convexification for \prod_{i \in I}...
+      //      exprAux *aux = p -> addAuxiliary (new exprMul (al, indices.size ()));
+
+      exprMul *mul = new exprMul (al, indices.size ());
+      exprAux *aux = mul -> standardize (p);
+
       linsert (lmap, aux -> Index (), coe);
 
     } break;
@@ -286,7 +262,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
   default: { /// otherwise, simply standardize expression 
 
-    expression *aux = p -> addAuxiliary (term);
+    expression *aux = term -> standardize (p);
     if (!aux) 
       aux = term;
     linsert (lmap, aux -> Index (), 1.);

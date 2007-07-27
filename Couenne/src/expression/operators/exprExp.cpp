@@ -12,22 +12,11 @@
 
 
 // differentiation
-
 expression *exprExp::differentiate (int index) {
 
-  expression **arglist = new expression * [2];
-
-  arglist [0] = new exprExp (new exprClone (argument_));
-  arglist [1] = argument_ -> differentiate (index);
-
-  return new exprMul (arglist, 2);
+  return new exprMul (new exprExp (new exprClone (argument_)),
+		      argument_ -> differentiate (index));
 }
-
-
-// printing
-
-//void exprExp::print (std::ostream& out) const
-//  {exprUnary::print (out, "exp", PRE);}
 
 
 // Get lower and upper bound of an expression (if any)

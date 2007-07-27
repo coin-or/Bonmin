@@ -65,13 +65,13 @@ public:
 			      OsiBranchingInformation *, 
 			      bool);
 
-  /// return pointer to MINLP symbolic representation
+  /// Return pointer to associated MINLP problem
   CouenneProblem *Problem () const 
   {return problem_;}
 
 protected:
 
-  /// pointer to the CouenneProblem 
+  /// Pointer to the associated MINLP problem
   CouenneProblem *problem_;
 };
 

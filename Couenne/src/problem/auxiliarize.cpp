@@ -29,7 +29,8 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
 
   for (orig = variables_.begin ();
        orig != variables_.end (); orig++)
-    if ((*orig) -> Index () == index) // found it
+
+    if ((*orig) -> Index () == index) // found it!
       break;
 
   if (orig == variables_ . end ()) {
@@ -37,15 +38,11 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
     return;
   }
 
-  //print ();
-
   // all objectives
 
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); i++)
     (*i) -> Body () -> replace (*orig, aux);
-
-  //print ();
 
   // and all constraints
 
@@ -54,8 +51,6 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
     if ((*i) -> Body ()) 
       (*i) -> Body () -> replace (*orig, aux);
 
-  //print ();
-
   // substitute it with w in all auxiliaries
 
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
@@ -63,12 +58,7 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
     if (((*i) -> Type () == AUX) && ((*i) -> Index () != (*orig) -> Index ()))
       (*i) -> Image () -> replace (*orig, aux);
 
-  //print ();
+  // replace it with new auxiliary
 
-  // remove original from the vector
-
-  //variables_.erase (orig);
-
-  // TODO: No, replace it with new auxiliary
   *orig = aux;
 }

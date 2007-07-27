@@ -16,7 +16,7 @@
 #include <exprCopy.hpp>
 
 
-/// expression clone (points to VALUE and EXPRESSION of another expression) 
+/// expression clone (points to another expression) 
 
 class exprClone: public exprCopy {
 

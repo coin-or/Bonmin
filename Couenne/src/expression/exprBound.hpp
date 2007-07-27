@@ -34,15 +34,17 @@ class exprLowerBound: public exprVar {
 
  public:
 
-  /// node type
+  /// Node type
   inline enum nodeType Type () 
     {return CONST;}
 
-  /// Constructors, destructor
-  exprLowerBound  (int varIndex): exprVar (varIndex) {}
+  /// Constructors
+  exprLowerBound (int varIndex): 
+    exprVar (varIndex) {}
 
-  /// I/O
-  void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
+  /// Print to iostream
+  void print (std::ostream &out = std::cout, 
+	      bool = false, CouenneProblem * = NULL) const
     {out << "l_" << varIndex_;}
 
   /// return the value of the variable
@@ -81,8 +83,9 @@ class exprUpperBound: public exprVar {
   exprUpperBound  (int varIndex): 
     exprVar (varIndex) {}
 
-  /// I/O
-  void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
+  /// print to iostream
+  void print (std::ostream &out = std::cout, 
+	      bool = false, CouenneProblem * = NULL) const
     {out << "u_" << varIndex_;}
 
   /// return the value of the variable

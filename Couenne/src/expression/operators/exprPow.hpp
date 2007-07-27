@@ -17,20 +17,21 @@
 #include <exprConst.hpp>
 
 
-// Power of an expression (binary operator)
+/// Power of an expression (binary operator)
 
 class exprPow: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructor
   exprPow  (expression **al, int n = 2): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
+  /// Constructor with only two arguments
   exprPow (expression *arg0, expression *arg1):
     exprOp (arg0, arg1) {}
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprPow (clonearglist (), nargs_);}
 
@@ -38,37 +39,34 @@ class exprPow: public exprOp {
   std::string printOp () const
     {return "^";}
 
-  // I/O
-  //  void print (std::ostream&) const;
-
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
-  // differentiation
+  /// differentiation
   expression *differentiate (int index); 
 
-  // simplification
+  /// simplification
   expression *simplify ();
 
-  // get a measure of "how linear" the expression is
+  /// get a measure of "how linear" the expression is
   int Linearity ();
 
-  // Get lower and upper bound of an expression (if any)
+  /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
-  // reduce expression in standard form, creating additional aux
-  // variables (and constraints)
+  /// reduce expression in standard form, creating additional aux
+  /// variables (and constraints)
   exprAux *standardize (CouenneProblem *p);
 
-  // generate equality between *this and *w
+  /// generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 
 		     CouNumber =  COUENNE_INFINITY);
 
-  // return an index to the variable's argument that is better fixed
-  // in a branching rule for solving a nonconvexity gap
+  /// return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap
   expression *getFixVar () 
     {return arglist_ [0];}
 
@@ -83,16 +81,10 @@ class exprPow: public exprOp {
   /// each expression's arguments
   CouNumber selectBranch (expression *, const OsiBranchingInformation *,
 			  int &, double * &, int &);
-
-  /*  /// distance covered by current point if branching rule applied to this expression
-  double BranchGain (expression *, const OsiBranchingInformation *);
-
-  /// branching object best suited for this expression
-  OsiBranchingObject *BranchObject (expression *, const OsiBranchingInformation *);*/
 };
 
 
-// compute power and check for integer-and-odd inverse exponent
+/// compute power and check for integer-and-odd inverse exponent
 
 inline CouNumber safe_pow (register CouNumber base, 
 			   register CouNumber exponent) {
@@ -124,24 +116,25 @@ inline CouNumber safe_pow (register CouNumber base,
 }
 
 
-// compute power
+/// compute power
 inline CouNumber exprPow::operator () () {
 
-  exprOp:: operator () ();
+  //  exprOp:: operator () ();
 
-  register CouNumber exponent = *sp--;
-  register CouNumber base     = *sp--;
+  //  register CouNumber exponent = *sp--;
+  //  register CouNumber base     = *sp--;
 
-  return (currValue_ = safe_pow (base, exponent));
+  //  return (currValue_ = safe_pow (base, exponent));
+  return (currValue_ = safe_pow ((**arglist_) (), (*(arglist_ [1])) ()));
 }
 
 
-// add upper/lower envelope to power in convex/concave areas
+/// add upper/lower envelope to power in convex/concave areas
 void addPowEnvelope (const CouenneCutGenerator *, OsiCuts &, int, int,
 		     CouNumber, CouNumber, CouNumber, CouNumber, CouNumber, int);
 
 
-// find proper tangent point to add deepest tangent cut
+/// find proper tangent point to add deepest tangent cut
 CouNumber powNewton (CouNumber, CouNumber, unary_function, unary_function, unary_function);
 
 #endif

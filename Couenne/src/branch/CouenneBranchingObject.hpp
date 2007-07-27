@@ -21,16 +21,19 @@
 #define COUENNE_NEAR_BOUND 1e-2
 
 
-/// "Spatial" Branching object. Branching can also be performed on
-/// continuous variables.
+/* "Spatial" branching object. 
+ *
+ *  Branching can also be performed on continuous variables.
+ */
 
 class CouenneBranchingObject: public OsiTwoWayBranchingObject {
 
 public:
 
-  /// return global value for convex combination between current point
-  /// and midpoint
-  static CouNumber Alpha () {return alpha_;}
+  /// Return global value for convex combination between current point
+  /// and midpoint.
+  static CouNumber Alpha () 
+  {return alpha_;}
 
   /// Constructor
   CouenneBranchingObject (int, int, CouNumber = - COIN_DBL_MAX, bool = false);
@@ -42,7 +45,7 @@ public:
     integer_ (src.integer_) {}
 
   /// Cloning method
-  virtual OsiBranchingObject * clone() const
+  virtual OsiBranchingObject * clone () const
   {return new CouenneBranchingObject (*this);}
 
   /** \brief Execute the actions required to branch, as specified by the
@@ -54,13 +57,13 @@ public:
 
 protected:
 
-  /// The variable this branching object refers to. If the
-  /// corresponding CouenneObject was created on w=f(x,y), it is
+  /// The index of the variable this branching object refers to. If
+  /// the corresponding CouenneObject was created on w=f(x,y), it is
   /// either x or y, chosen previously with a call to getFixVar()
   /// expression *reference_;
   int index_;
 
-  /// is the variable integer?
+  /// True if the related variable is integer
   bool integer_;
 
   /// Global value for convex combination between current point and

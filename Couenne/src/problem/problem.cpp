@@ -66,28 +66,39 @@ void CouenneProblem::initAuxs (CouNumber *x,
   // variables, as no auxiliaries exist yet
   update (x, l, u, nOrig_);
 
-  int nAux = nVars () - nOrig_;
+  //  int nAux = nVars () - nOrig_;
 
   // initially, auxiliary variables are unbounded, their bounds only
   // depending on their function
 
-  for (register int i = nOrig_, j = nAux; j--; i++)
-    lb_ [i] = - (ub_ [i] = COUENNE_INFINITY);
+  for (register std::vector <exprVar *>::iterator i = variables_ . begin ();
+       i != variables_ . end (); i++)
+
+    if ((*i) -> Type () == AUX) {
+
+      int index = (*i) -> Index ();
+      lb_ [index] = - (ub_ [index] = COUENNE_INFINITY);
+    }
 
   expression::update (x_, lb_, ub_);
 
   // only one loop is sufficient here, since auxiliary variable are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
 
-  for (register int j = nOrig_, i = nVars () - j; i--; j++) {
+  for (register int j = 0, i = nVars (); i--; j++) {
 
-    exprAux *aux = dynamic_cast <exprAux *> (variables_ [j]);
+    int ord = numbering_ [j];
 
-    x_ [j] = (*(aux -> Image ())) ();
+    if (variables_ [ord] -> Type () == AUX) {
 
-    // set bounds 
-    if ((lb_ [j] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [j] = -DBL_MAX;
-    if ((ub_ [j] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [j] =  DBL_MAX;
+      exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
+
+      x_ [ord] = (*(aux -> Image ())) ();
+
+      // set bounds 
+      if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
+      if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
+    }
   }
 }
 
@@ -111,11 +122,19 @@ void CouenneProblem::getAuxs (CouNumber *x) {
   // auxiliary variables have an incomplete image, i.e. they have been
   // decomposed previously, since they are updated with increasing
   // index.
+  for (register int j = 0, i = nVars (); i--; j++) {
+
+    exprVar *var = variables_ [numbering_ [j]];
+    if (var -> Type () == AUX)
+      x [var -> Index ()] = (*(var -> Image ())) ();
+  }
+
+    /*
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
        i != variables_.end (); i++)
     if ((*i) -> Type () == AUX)
       x [(*i) -> Index ()] = (*((*i) -> Image ())) ();
-
+    */
   // now get the x and the bound vectors back to their previous state
   expression::update (xS, lS, uS);
 }

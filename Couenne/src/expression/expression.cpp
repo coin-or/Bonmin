@@ -6,9 +6,6 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <string>
-#include <string.h>
-
 #include <CouenneCutGenerator.hpp>
 #include <CouenneProblem.hpp>
 
@@ -17,9 +14,7 @@
 #include <exprAux.hpp>
 #include <exprOp.hpp>
 #include <exprUnary.hpp>
-#include <exprVar.hpp>
-#include <exprIVar.hpp>
-#include <exprBound.hpp>
+
 
 // static vectors for evaluation, see their description in
 // expression.hpp

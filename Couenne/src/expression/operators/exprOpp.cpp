@@ -53,4 +53,3 @@ expression *exprOpp::simplify () {
 
   return NULL;
 }
-

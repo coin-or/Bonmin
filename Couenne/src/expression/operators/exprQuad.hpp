@@ -1,4 +1,4 @@
-/*
+/**
  * Name:    exprQuad.hpp
  * Author:  Pietro Belotti
  * Purpose: definition of quadratic expressions (= exprGroup +
@@ -10,30 +10,37 @@
 #ifndef COUENNE_EXPRQUAD_H
 #define COUENNE_EXPRQUAD_H
 
+#include <map>
+
 #include <exprGroup.hpp>
 
 
 /**  class exprQuad, with constant, linear and quadratic terms
  *
+ *  It represents an expression of the form \f$a_0 + \sum_{i\in I} b_i
+ *  x_i + x^T Q x + \sum_{i \in J} h_i (x)\f$, with \f$a_0 + \sum_{i\in
+ *  I} b_i x_i\f$ an affine term, \f$x^T Q x\f$ a quadratic term, and
+ *  a nonlinear sum \f$\sum_{i \in J} h_i (x)\f$. Standardization
+ *  checks possible quadratic or linear terms in the latter and
+ *  includes them in the former parts. 
  *
- *
- *
- *
- *
- *
- *
- *
+ *  If \f$h_i(x)\f$ is a product of two nonlinear, nonquadratic
+ *  functions \f$h'(x)h''(x)\f$, two auxiliary variables
+ *  \f$w'=f'(x)\f$ and \f$w''=h''(x)\f$ are created and the product
+ *  \f$w'w''\f$ is included in the quadratic part of the exprQuad. If
+ *  \f$h(x)\f$ nonquadratic, nonlinear function, an auxiliary variable
+ *  \f$w=h(x)\f$ is created and included in the linear part.
  */
 
 class exprQuad: public exprGroup {
 
  protected:
 
-  /** \name Q matrix storage
-    * Sparse implementation: given expression of the form sum_{i in N,
-    * j in N} a_{ij} x_i x_j, qindexI_ and qindexJ_ contain
-    * respectively entries i and j for which a_{ij} is nonzero
-    * in a_ij x_i x_j: */
+  /** \name \f$Q\f$ matrix storage
+    * Sparse implementation: given expression of the form \f$\sum_{i \in N,
+    * j \in N} q_{ij} x_i x_j\f$, qindexI_ and qindexJ_ contain
+    * respectively entries \f$i\f$ and \f$j\f$ for which \f$q_{ij}\f$ is nonzero
+    * in \f$q_{ij} x_i x_j\f$: */
   /** @{ */
 
   int       *qindexI_; ///< the term i
@@ -74,45 +81,33 @@ class exprQuad: public exprGroup {
   exprQuad (const exprQuad &src);
 
   /// Destructor
-  virtual ~exprQuad () {
+  virtual ~exprQuad ();
 
-    if (qindexI_) {
-      delete [] qindexI_;
-      delete [] qindexJ_;
-      delete [] qcoeff_;
-    }
-
-    if (dIndex_) {
-      delete [] dIndex_;
-      delete [] dCoeffLo_;
-      delete [] dCoeffUp_;
-    }
-  }
-
-  /// get indices and coefficients vectors of the quadratic part
-  CouNumber *getQCoeffs  () {return qcoeff_;}
-  int       *getQIndexI  () {return qindexI_;}
-  int       *getQIndexJ  () {return qindexJ_;}
-  int        getnQTerms  () {return nqterms_;}
+  // get indices and coefficients vectors of the quadratic part
+  CouNumber *getQCoeffs  () {return qcoeff_;}  ///< Get quadratic coefficients \f$q_{ij}\f$
+  int       *getQIndexI  () {return qindexI_;} ///< Get index \f$i\f$ of the term \f$q_{ij}x_i x_j\f$
+  int       *getQIndexJ  () {return qindexJ_;} ///< Get index \f$j\f$ of the term \f$q_{ij}x_i x_j\f$
+  int        getnQTerms  () {return nqterms_;} ///< Get number of quadratic terms
 
   /// cloning method
   virtual expression *clone () const
     {return new exprQuad (*this);}
 
-  /// I/O
+  /// Print expression to an iostream
   virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
 
-  /// function for the evaluation of the expression
+  /// Function for the evaluation of the expression
   virtual CouNumber operator () ();
 
-  /// differentiation
+  /// Compute derivative of this expression with respect to variable
+  /// whose index is passed as argument
   virtual expression *differentiate (int index);
 
-  /// simplification
+  /// Simplify expression
   virtual expression *simplify ()
     {exprOp::simplify (); return NULL;}
 
-  /// get a measure of "how linear" the expression is:
+  /// Get a measure of "how linear" the expression is
   virtual int Linearity () {
     int 
       lin  = exprSum::Linearity () >= NONLINEAR,
@@ -126,15 +121,15 @@ class exprQuad: public exprGroup {
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  /// generate equality between *this and *w
+  /// Generate 
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg, 
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
 			     CouNumber =  COUENNE_INFINITY);
 
-  /// [Stefan] fills in dCoeff_ and dIndex_ for the convex
-  /// underestimator of this expression
+  /// Compute data for \f$\alpha\f$-convexification of a quadratic form
+  /// (fills in dCoeff_ and dIndex_ for the convex underestimator)
   virtual void alphaConvexify (const OsiSolverInterface &);
 
   /** \function exprQuad::quadCuts 
@@ -211,31 +206,33 @@ class exprQuad: public exprGroup {
 
   void quadCuts (exprAux *w, OsiCuts & cs, const CouenneCutGenerator * cg);
 
-  /// only compare with people of the same kind
+  /// Compare two exprQuad
   virtual int compare (exprQuad &);
 
-  /// code for comparisons
+  /// Code for comparisons
   virtual enum expr_type code () {return COU_EXPRQUAD;}
 
-  /// used in rank-based branching variable choice
+  /// Used in rank-based branching variable choice
   virtual int rank (CouenneProblem *);
 
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
+  /// Return an index to the variable's argument that is better fixed
+  /// in a branching rule for solving a nonconvexity gap. For this
+  /// expression, always return NULL as selectBranch() will return the
+  /// correct variable
   virtual expression *getFixVar ();
 
-  /// set up branching object by evaluating many branching points for
+  /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
   virtual CouNumber selectBranch (expression *, const OsiBranchingInformation *,
 				  int &, double * &, int &);
 
-  /// fill dependence set of the expression associated with this
+  /// Fill dependence set of the expression associated with this
   /// auxiliary variable
   virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g);
 };
 
 
-/// compute sum of linear and nonlinear terms
+/// Compute sum of linear and nonlinear terms
 
 inline CouNumber exprQuad::operator () () {
 
@@ -252,5 +249,14 @@ inline CouNumber exprQuad::operator () () {
 
   return (currValue_ = ret);
 }
+
+
+/// Insert a pair <int,CouNumber> into a map for linear terms
+void linsert (std::map <int, CouNumber> &lmap, 
+	      int index, CouNumber coe);
+
+/// Insert a pair <<int,int>,CouNumber> into a map for quadratic terms
+void qinsert (std::map <std::pair <int, int>, CouNumber> &map, 
+	      int indI, int indJ, CouNumber coe);
 
 #endif

@@ -93,7 +93,8 @@ class exprAux: public exprVar {
   expression *Ub () {return ub_;} ///< get upper bound expression
 
   /// print expression
-  virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
+  virtual void print (std::ostream & = std::cout, 
+		      bool = false, CouenneProblem * = NULL) const;
 
   /// The expression associated with this auxiliary variable
   inline expression *Image () const

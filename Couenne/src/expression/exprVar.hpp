@@ -15,19 +15,20 @@
 #include <CouenneTypes.h>
 #include <expression.hpp>
 #include <exprConst.hpp>
-//#include <exprBound.hpp>
 
 class CouenneProblem;
 
 
-/// variable-type operator. All variables of the expression must be
-/// objects of this class
+/// variable-type operator
+///
+/// All variables of the expression must be objects of this class or
+/// of the derived exprAux class
 
 class exprVar: public expression {
 
  protected:
 
-  int varIndex_; //< the index of the variable's current value
+  int varIndex_; ///< the index of the variable's current value
 
  public:
 
@@ -58,12 +59,13 @@ class exprVar: public expression {
   virtual inline expression *Image () const
     {return NULL;}
 
-  /// Bound get
-  virtual expression *Lb ();
-  virtual expression *Ub ();
+  // Bound get
+  virtual expression *Lb (); ///< get lower bound expression
+  virtual expression *Ub (); ///< get upper bound expression
 
   /// print
-  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const
+  virtual void print (std::ostream &out = std::cout,
+		      bool = false, CouenneProblem * = NULL) const
     {out << "x_" << varIndex_;}
 
   /// return the value of the variable
@@ -106,12 +108,6 @@ class exprVar: public expression {
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
 			     CouNumber =  COUENNE_INFINITY) {}
-
-  /// general function to be specialized
-  /*virtual void generateCuts (const OsiSolverInterface &, 
-			     OsiCuts &, const CouenneCutGenerator *, 
-			     t_chg_bounds *, int,
-			     CouNumber, CouNumber) {}*/
 
   /// generate convexification cut for constraint w = this
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 

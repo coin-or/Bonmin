@@ -20,7 +20,6 @@
 
 
 // is the variable one of those in varlist?
-
 int exprVar::dependsOn (register int *varlist = NULL, register int n = 1) {
 
   if (!varlist) 
@@ -48,7 +47,7 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    t_chg_bounds *chg, int,
 			    CouNumber, CouNumber) {
   if (cg -> isFirst ())
-    cg -> createCut (cs, 0., 0, w -> Index (), 1., varIndex_);
+    cg -> createCut (cs, 0., 0, w -> Index (), 1., varIndex_, -1);
 }
 
 
@@ -56,7 +55,7 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
 /// or upper bound of w, whose index is wind
 bool exprVar::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
-  bool res;
+  bool res = false;
   if (updateBound (-1, l + varIndex_, l [wind])) {res = true; chg [varIndex_].lower = CHANGED;}
   if (updateBound (+1, u + varIndex_, u [wind])) {res = true; chg [varIndex_].upper = CHANGED;}
   return res;

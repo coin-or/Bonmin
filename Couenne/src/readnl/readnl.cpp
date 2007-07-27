@@ -311,7 +311,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 
     // add them (and set lower-upper bound)
     switch (sign) {
-	
+
     case COUENNE_EQ:  addEQConstraint  (body, new exprConst (ub)); break;
     case COUENNE_LE:  addLEConstraint  (body, new exprConst (ub)); break;
     case COUENNE_GE:  addGEConstraint  (body, new exprConst (lb)); break;

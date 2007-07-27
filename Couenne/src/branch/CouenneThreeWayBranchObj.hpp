@@ -17,9 +17,11 @@
 #include <CouenneObject.hpp>
 
 
-/// Spatial, three-way branching object. Branching is performed on
-/// continuous variables but a better convexification is sought around
-/// the current point by dividing the interval in three parts
+/// \brief Spatial, three-way branching object. 
+///
+/// Branching is performed on continuous variables but a better
+/// convexification is sought around the current point by dividing the
+/// interval in three parts
 
 class CouenneThreeWayBranchObj: public OsiBranchingObject {
 
@@ -58,17 +60,15 @@ protected:
   /// The variable this branching object refers to. If the
   /// corresponding CouenneObject was created on w=f(x,y), it is
   /// either x or y.
-  //  expression *reference_;
   int index_;
 
-  /// Dividing points of interval
-  CouNumber lcrop_;
-  CouNumber rcrop_;
+  CouNumber lcrop_;  ///< left divider
+  CouNumber rcrop_;  ///< right divider
 
-  /// first branch to be performed: 0 is left, 1 is central, 2 is right
+  /// First branch to be performed: 0 is left, 1 is central, 2 is right
   int firstBranch_;
 
-  /// is the variable integer?
+  /// True if the associated variable is integer
   bool integer_;
 };
 

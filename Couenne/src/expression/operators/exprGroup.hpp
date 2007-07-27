@@ -12,46 +12,39 @@
 #include <exprSum.hpp>
 
 
-///  class Group, with constant, linear and nonlinear terms
+/// class Group, with constant, linear and nonlinear terms
 
 class exprGroup: public exprSum {
 
  protected:
 
-  CouNumber  c0_;    ///< constant term
-  int       *index_; ///< indices of linear terms (terminated by a -1)
-  CouNumber *coeff_; ///< coefficient of linear terms
-
-  int nlterms_;      ///< number of linear terms
+  int        nlterms_; ///< number of linear terms
+  int       *index_;   ///< indices of linear terms (terminated by a -1)
+  CouNumber *coeff_;   ///< coefficient of linear terms
+  CouNumber  c0_;      ///< constant term
 
  public:
 
   /// Constructor
   exprGroup  (CouNumber, int *, CouNumber *, expression ** = NULL, int = 0);
 
-  /// copy constructor
+  /// Copy constructor
   exprGroup (const exprGroup &src);
 
-  /// destructor
-  virtual ~exprGroup () {
+  /// Destructor
+  virtual ~exprGroup ();
 
-    if (index_) {
-      delete [] index_;
-      delete [] coeff_;
-    }
-  }
+  // Get constant, indices, and coefficients vectors, and number of linear terms
+  CouNumber  getc0      () {return c0_;}      ///< return constant term
+  CouNumber *getCoeffs  () {return coeff_;}   ///< return coefficients of linear part
+  int       *getIndices () {return index_;}   ///< return indices of linear part
+  int        getnLTerms () {return nlterms_;} ///< return number of linear terms
 
-  /// get constant, indices, and coefficients vectors, and number of linear terms
-  CouNumber  getc0      () {return c0_;}
-  CouNumber *getCoeffs  () {return coeff_;}
-  int       *getIndices () {return index_;}
-  int        getnLTerms () {return nlterms_;}
-
-  /// cloning method
+  /// Cloning method
   virtual expression *clone () const
     {return new exprGroup (*this);}
 
-  /// I/O
+  /// Print expression to iostream
   virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
 
   /// function for the evaluation of the expression
@@ -103,11 +96,12 @@ class exprGroup: public exprSum {
 inline CouNumber exprGroup::operator () () {
 
   register CouNumber
-     ret  = c0_ + exprSum::operator () (),
+     ret  = c0_ + exprSum::operator () (), // add constant and nonlinear part
     *coe  = coeff_,
     *vars = expression::Variables ();
 
-  for (register int *ind = index_; *ind >= 0;)
+  // add linear part
+  for (register int n = nlterms_, *ind = index_; n--;)
     ret += *coe++ * vars [*ind++];
 
   return (currValue_ = ret);

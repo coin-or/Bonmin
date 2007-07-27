@@ -137,4 +137,6 @@ expression *CouenneProblem::nl2e (expr *e) {
     exit (-1);
     //return new exprConst (0);
   }
+
+  return new exprConst (0);
 }

@@ -30,7 +30,7 @@ class exprOp: public expression {
 
  public:
 
-  /// node type
+  /// Node type
   virtual inline enum nodeType Type () 
     {return N_ARY;}
 
@@ -40,21 +40,20 @@ class exprOp: public expression {
     nargs_   (nargs)
     {}
 
-  /// constructor with two arguments (for convenience)
+  /// Constructor with two arguments (for convenience)
   exprOp (expression *arg0, expression *arg1):  //< two arguments 
     arglist_ (new expression * [2]),
     nargs_   (2)
     {arglist_ [0] = arg0; arglist_ [1] = arg1;}
 
-  /// destructor
+  /// Destructor
   ~exprOp ();
 
-  /// copy constructor
+  /// Copy constructor: only allocate space for argument list, which
+  /// will be copied with clonearglist()
   exprOp (const exprOp &e):
     arglist_ (new expression * [e.nArgs ()]),
-    nargs_   (e.nArgs ()) {
-
-  }
+    nargs_   (e.nArgs ()) {}
 
   /// cloning method
   virtual expression *clone () const
@@ -69,7 +68,8 @@ class exprOp: public expression {
     {return nargs_;}
 
   /// I/O
-  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const;
+  virtual void print (std::ostream &out = std::cout,
+		      bool = false, CouenneProblem * = NULL) const;
 
   /// print position (PRE, INSIDE, POST)
   virtual enum pos printPos () const
@@ -106,7 +106,7 @@ class exprOp: public expression {
     {return NONLINEAR;}
 
   /// generate auxiliary variable
-  exprAux *standardize (CouenneProblem *);
+  virtual exprAux *standardize (CouenneProblem *);
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap

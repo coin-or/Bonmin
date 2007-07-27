@@ -12,8 +12,6 @@ AUTOMAKE_OPTIONS = foreign
 #                        testfun for Couenne                           #
 ########################################################################
 
-#noinst_PROGRAMS = 
-
 noinst_PROGRAMS = sdpcuts genrandQp testconv testeval testclp
 
 testconv_SOURCES = fun/testconv.cpp

@@ -45,6 +45,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 
     printf ("}\n");
     */
+
     for (int i = 0, j = problem_ -> nVars (); j--; i++) {
 
       // TODO: check if list contains all and only aux's to cut
@@ -68,7 +69,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 	|| info.pass > 0)) 
       */
 
-      exprVar *var = problem_ -> Var (i);
+      exprVar *var = problem_ -> Var (problem_ -> evalOrder (i));
 
       if ((var -> Type () == AUX) &&
 	  (var -> Multiplicity () > 0))
