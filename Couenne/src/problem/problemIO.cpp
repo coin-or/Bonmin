@@ -106,11 +106,6 @@ bool readOptimum (const std::string &fname,
       optimum [var -> Index ()] = (*(var -> Image ())) ();
   }
 
-  /*
-  expression::update (problem -> X  (), 
-		      problem -> Lb (), 
-		      problem -> Ub ());
-  */
   // restore previous value/bound vectors
   expression::update (xS, lS, uS);
 

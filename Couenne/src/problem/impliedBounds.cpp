@@ -18,10 +18,12 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
   int nchg = 0; //< number of bounds changed for propagation
   //    nvar = nVars ();
 
-  /*printf ("=====================implied\n");
+#ifdef DEBUG
+  printf ("=====================implied\n");
     for (int i=0; i < nVars (); i++)
-    if (variables_ [i] -> Multiplicity () > 0)
-    printf ("x%d: [%g,%g]\n", i, lb_ [i], ub_ [i]);*/
+      //if (variables_ [i] -> Multiplicity () > 0)
+      printf ("x%d: [%g,%g]\n", i, lb_ [i], ub_ [i]);
+#endif
 
   for (int ii = nVars (); ii--;) {
 
@@ -43,9 +45,9 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       //    if ((auxiliaries_ [i] -> Image () -> code () == COU_EXPRSUM) ||
       //	(auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP))
 
-      /*CouNumber 
-	l0 = lb_ [nvar+i], 
-	u0 = ub_ [nvar+i];*/
+      CouNumber 
+	l0 = lb_ [i], 
+	u0 = ub_ [i];
 
       /*if (auxiliaries_ [i] -> Image () -> Argument () || 
 	  auxiliaries_ [i] -> Image () -> ArgList  ()) {
@@ -70,10 +72,13 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       if (variables_ [i] -> Image () -> impliedBound 
 	  (variables_ [i] -> Index (), lb_, ub_, chg_bds)) {
 
-	//printf ("impli %2d [%g,%g] -> [%g,%g]: ", nvar+i, l0, u0, lb_ [nvar+i], ub_ [nvar+i]);
+#ifdef DEBUG
+	printf ("impli %2d [%g,%g] -> [%g,%g]: ", i, l0, u0, lb_ [i], ub_ [i]);
 
-	//auxiliaries_ [i] -> print (std::cout); printf (" := ");
-	//auxiliaries_ [i] -> Image () -> print (std::cout); printf ("\n");
+	variables_ [i]             -> print (std::cout); printf (" := ");
+	variables_ [i] -> Image () -> print (std::cout); printf ("\n");
+#endif
+
 	/*
 	if (optimum_ && 
 	    ((optimum_ [i+nvar] < lb_ [i+nvar] - COUENNE_EPS) ||

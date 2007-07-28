@@ -36,7 +36,11 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
   switch (code) { // constraint h(x) = 0 may be in different forms:
 		  // subtraction, sum, linear group
 
-  case COU_EXPRSUB: { // simplest case, we have w-f(x)=rhs or f(x)-w=rhs or f(x)-g(x)=rhs
+    /////////////////////////////////////////////////////////////////////////////
+
+  case COU_EXPRSUB: { 
+
+    // simplest case, we have w-f(x)=rhs or f(x)-w=rhs or f(x)-g(x)=rhs
 
     int pos = 0;
     CouNumber coeff;
@@ -59,17 +63,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       pos = 1;
     }
 
-    /*
-    if ((auxInd < 0) ||                     // first argument is not a variable
-	(wentAux [auxInd]))                 // or it was taken as a definition
-      auxInd = alist [pos = 1] -> Index (); // default to second argument
-
-    if ((auxInd < 0) ||     // if second argument is not a variable either
-	(wentAux [auxInd])) // if it was not taken as a definition already
-      return -1;            // then this is not an aux definition
-    */
-
-    //    printf ("{ind %d #%d} ", auxInd, pos); 
+    //////////////////////
 
     expression *clone = alist [1 - pos] -> clone (); // what remains is the "independent" expression
 
@@ -84,17 +78,18 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
   } break;
 
-  // another case is an exprGroup or exprSum, which requires to
-  // decompose the expression and re-assemble
+  ////////////////////////////////////////////////////////////////////////////
 
   //  case COU_EXPRQUAD: // TODO
   case COU_EXPRGROUP:
-  case COU_EXPRSUM: { // more complicated, have to look for right variable
+  case COU_EXPRSUM: {
+
+    // an exprGroup or exprSum. Decompose the expression and
+    // re-assemble (to look for right variable)
 
     // data structure to be used below if there is a linear term.
     // which specifies position within arrays (negative for linear
     // part of exprGroup, positive for all elements of exprSum)
-
     int maxindex = -1, *linind = NULL, nlin = 0, which;
     CouNumber c0 = 0., *lincoe = NULL, auxcoe = 1;
 
@@ -120,7 +115,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	}
     }
 
-    // check indices of nonlinear elements of the sum
+    // check indices of possible linear elements of (nonlinear) sum
 
     for (int i = body -> nArgs (); i--;) {
 
@@ -140,19 +135,21 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       }
     }
 
-    // if found no possible substitute, break
-    if (maxindex < 0) break;
+    ///////////////////////////////////////////////////////////////////
+
+    if (maxindex < 0) break; // no substitute found, bail out of this expression
 
     // create a new exprGroup or exprSum with all elements but the
     // extracted auxiliary
 
     // start with exprSum
-
     int nargs = body -> nArgs ();
     expression **newarglist;
 
-    //    printf (" [[ind %d, coe %.1g, wh %d, nargs %d, nlin %d]] ", 
-    //	    maxindex, auxcoe, which, nargs, nlin);
+#ifdef DEBUG
+    printf (" [[ind %d, coe %.1g, wh %d, nargs %d, nlin %d]] ", 
+	    maxindex, auxcoe, which, nargs, nlin);
+#endif
 
     if (nargs > 0) { // there is an element in the nonlinear sum to be drawn
 
@@ -160,19 +157,19 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
       newarglist = new expression * [nargs + 1];
 
-      for (j=0; j<mid;   j++) {newarglist [j]  =alist [j];}// newarglist [j]->  print ();printf(",");}
-      for (j++; j<nargs; j++) {newarglist [j-1]=alist [j];}// newarglist [j-1]->print ();printf(";");}
+      for (j=0; j<mid;   j++) newarglist [j]   = alist [j];// newarglist [j]->  print ();printf(",");}
+      for (j++; j<nargs; j++) newarglist [j-1] = alist [j];// newarglist [j-1]->print ();printf(";");}
 
       // nl arglist is done, later decide whether to incorporate it as
       // it is or with a coefficient
-    } else {
 
-      // no nonlinear arguments, or the only one is the new aux
+    } else { // no nonlinear arguments, or the only one is the new aux
+      nargs++; // !!!!!!!!!!!!!!!!!!!!!!!!!
       newarglist  = new expression *;
       *newarglist = new exprConst (0);
     }
 
-    auxcoe = -1. / auxcoe;
+    // form rhs linear part ////////////////////////////////////////////////////
 
     int       *linind2 = NULL;
     CouNumber *lincoe2 = NULL;
@@ -191,8 +188,11 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       for (j++; j<nlin; j++) printf ("{%g x%d} ", lincoe [j], linind [j]);
 #endif
 
-      for (j=0; j<mid;  j++) {linind2 [j]   = linind [j]; lincoe2 [j]   = auxcoe * lincoe [j];}
-      for (j++; j<nlin; j++) {linind2 [j-1] = linind [j]; lincoe2 [j-1] = auxcoe * lincoe [j];}
+      CouNumber divider = -1. / auxcoe;
+
+      for (j=0; j<mid;  j++) {linind2 [j]   = linind [j]; lincoe2 [j]   = divider * lincoe [j];}
+      for (j++; j<nlin; j++) {linind2 [j-1] = linind [j]; lincoe2 [j-1] = divider * lincoe [j];}
+
       linind2 [j-1] = -1; // terminate list of indices
 
 #ifdef DEBUG
@@ -204,40 +204,52 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       // it is or with a coefficient
     }
 
-    // add constant(s)
+    // the extracted index is one term of...
+    if (which >= 0) --nargs; // ...the nonlinear sum
+    else            --nlin;  // ...the linear part
 
-    if (which >= 0) --nargs;
-    else            --nlin;
+#ifdef DEBUG
+    printf ("\n::: rhs %g, lin %d, nl %d\n", rhs, nlin, nargs);
+#endif
 
-    rhs = auxcoe * (c0 - rhs);
+    if ((code == COU_EXPRGROUP) && (nlin > 0)) { 
 
-    //    printf ("\n::: rhs %g, lin %d, nl %d\n", rhs, nlin, nargs);
+      // an exprGroup with at least one linear term left
 
-    if ((code == COU_EXPRGROUP) && (nlin > 0)) {
+      // build new vectors for index and coeff
+      if    (fabs (auxcoe + 1) < COUENNE_EPS)
 
-      //      printf ("new group\n");
-      // build new vectors for index and coeff;
-      if    (fabs (auxcoe - 1) < COUENNE_EPS) 
-	rest = new exprGroup (rhs, linind2, lincoe2, newarglist, nargs);
-      else {
+	//      f(x) + c0 -  w = rhs   =====>   w =       f(x) + c0 - rhs
+	rest = new exprGroup (c0 - rhs, linind2, lincoe2, newarglist, nargs);
+
+      else { // f(x) + c0 + aw = rhs   =====>   w = -1/a (f(x) + c0 - rhs), a != -1
 
 	expression **mullist = new expression * [1];
 
-	if ((nargs == 1) && ((*newarglist) -> Linearity () <= ZERO)) {
-	  *mullist = *newarglist;
+	if ((nargs <= 1) && ((*newarglist) -> Linearity () <= CONSTANT)) {
+	  // the only nonlinear term is a constant
+	  *mullist = new exprConst ((*newarglist) -> Value ());
+	  //delete *newarglist;
 	  delete [] newarglist;
 	}
-	else
-	  *mullist = new exprMul (new exprConst (auxcoe), 
+	else // multiple nonlinear terms, multiply them by -1/auxcoe
+	  *mullist = new exprMul (new exprConst (-1. / auxcoe), 
 				  new exprSum (newarglist, nargs));
 
-	rest = new exprGroup (rhs, linind2, lincoe2, mullist, 1);
+	// final outcome: -1/a (f(x) + c0 - rhs)
+	rest = new exprGroup (-1. / auxcoe * (c0-rhs), linind2, lincoe2, mullist, 1);
       }
     }
-    else {
+    else { // simple exprSum
 
-      if (fabs (rhs) > COUENNE_EPS)
-	newarglist [nargs++] = new exprConst (rhs);
+      if (fabs (rhs) > COUENNE_EPS) // have to add constant to exprSum
+	if ((nargs == 1) && ((*newarglist) -> Type () == CONST)) {
+	  CouNumber val = (*newarglist) -> Value () - rhs;
+	  delete *newarglist;
+	  *newarglist = new exprConst (val);
+	} else newarglist [nargs++] = new exprConst (-rhs);
+
+      // now exprSum is complete with -rhs. Send it to right hand side
 
       expression *auxDef;
 
@@ -246,30 +258,31 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	delete [] newarglist;
       } else auxDef = new exprSum (newarglist, nargs);
 
-      if (fabs (auxcoe - 1) < COUENNE_EPS)
+      if (fabs (auxcoe + 1) < COUENNE_EPS)
 	rest = auxDef;
-      else if ((fabs (auxcoe + 1) < COUENNE_EPS) && 
+      else if ((fabs (auxcoe - 1) < COUENNE_EPS) && 
 	       (auxDef -> code () == COU_EXPROPP))
 	rest = auxDef -> Argument ();
-      else rest = new exprMul (new exprConst (auxcoe), auxDef);
+      else rest = new exprMul (new exprConst (-1/auxcoe), auxDef);
     }
 
-    //    printf ("gotten ");
-    //    rest -> print (); printf ("\n");
+#ifdef DEBUG
+    printf ("gotten ");
+    rest -> print (); printf ("\n");
+#endif
 
     auxInd = maxindex;
 
-    //rest = new exprGroup 
   } break;
 
   default: break;
-  }
+  } // end switch () ////////////////////////////////////////////////////////
 
   if ((auxInd < 0) || (wentAux [auxInd]))
     return -1;
 
   // we have a variable, meaning the constraint body is of the form
-  // $w +/- f(x)$ or $f(x) +/- w$
+  // w +/- f(x) or f(x) +/- w
 
   // standardize remaining of the expression
 
@@ -280,18 +293,21 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
   int rtype = rest -> Type ();
 
-  if (rtype == UNARY) {
+  if (rtype == UNARY) { //////////////////////////////////////////
 
     exprAux *aux = rest -> Argument () -> standardize (p);
+
     if (aux) {
       //delete rest -> Argument ();
       *(rest -> ArgPtr ()) = new exprClone (aux);
     }
 
-  } else if (rtype == N_ARY)
+  } else if (rtype == N_ARY) ///////////////////////////////////////////
 
     for (int nargs = rest -> nArgs (), i=0; i < nargs; i++) {
+
       exprAux *aux = rest -> ArgList () [i] -> standardize (p);
+
       if (aux) {
 	//delete rest -> ArgList () [i];
 	rest -> ArgList () [i] = new exprClone (aux);
@@ -300,22 +316,21 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
   //  exprAux *aux = rest -> standardize (p);
 
-  /*
+#if 0
   printf ("... done, auxind %d\n", auxInd);
 
   if (aux) {
 
-    rest = aux -> Image () -> clone ();
+//    rest = aux -> Image () -> clone ();
 
-    aux -> decreaseMult ();
+//    aux -> decreaseMult ();
     printf ("... fictitious "); fflush (stdout); aux -> print (); 
     printf (" := "); aux -> Image () -> print (); 
 
     // find aux in vector and delete it (otherwise LP relaxation will
     // count those variables)
-
-    for (std::vector <exprVar *>:: iterator i = p -> Variables ().end(); 
-	 i-- != p -> Variables ().begin();)
+    for (std::vector <exprVar *>:: iterator i = p -> Variables ().begin (); 
+	 i != p -> Variables ().end(); i++)
 
       if ((*i) -> Index() == aux -> Index ()) {
 	printf (" fictitious %d to be erased: ", p -> Variables ().size ());
@@ -323,18 +338,19 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	printf (" := ");
 	(*i) -> Image () -> print ();
 	printf ("\n");
-	p -> Variables () . erase (i);
+	//	p -> Variables () . erase (i);
 	break;
       }
   }
-  */
-
+#endif
+  
   //  rest = aux -> Image ();
 
 #ifdef DEBUG
   printf (" and "); fflush (stdout);
-  rest -> print (); printf (", "); fflush (stdout);
-  body -> print (); printf ("\n");
+  rest -> print (); 
+  //printf (", "); fflush (stdout); body -> print (); 
+  printf ("\n");
 #endif
 
   return auxInd;

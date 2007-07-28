@@ -63,7 +63,7 @@ void elementBreak (expression *arg, int &index, CouNumber &coeff) {
       // non-constant arguments.
 
       expression **factors = arg -> ArgList ();
-      //CouNumber coe = 1;
+
       int pos = 0;
 
       index = (*factors) -> Index ();

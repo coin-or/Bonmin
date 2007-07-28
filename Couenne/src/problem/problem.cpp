@@ -66,15 +66,15 @@ void CouenneProblem::initAuxs (CouNumber *x,
   // variables, as no auxiliaries exist yet
   update (x, l, u, nOrig_);
 
-  //  int nAux = nVars () - nOrig_;
-
   // initially, auxiliary variables are unbounded, their bounds only
   // depending on their function
+
 
   for (register std::vector <exprVar *>::iterator i = variables_ . begin ();
        i != variables_ . end (); i++)
 
-    if ((*i) -> Type () == AUX) {
+    if (((*i) -> Type  () == AUX) &&   // this is an auxiliary
+	((*i) -> Index () >= nOrig_)) { // and one that was not an original before
 
       int index = (*i) -> Index ();
       lb_ [index] = - (ub_ [index] = COUENNE_INFINITY);
@@ -129,13 +129,7 @@ void CouenneProblem::getAuxs (CouNumber *x) {
       x [var -> Index ()] = (*(var -> Image ())) ();
   }
 
-    /*
-  for (std::vector <exprVar *>::iterator i = variables_.begin ();
-       i != variables_.end (); i++)
-    if ((*i) -> Type () == AUX)
-      x [(*i) -> Index ()] = (*((*i) -> Image ())) ();
-    */
-  // now get the x and the bound vectors back to their previous state
+  // get the x and the bound vectors back to their previous state
   expression::update (xS, lS, uS);
 }
 
@@ -175,7 +169,7 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 
     if (sense == MINIMIZE) while (*index >= 0) obj [*index++] =  *coeff++;
     else                   while (*index >= 0) obj [*index++] = -*coeff++;      
-  }
+  } // no break, as exprGroup is derived from exprSum
 
   case COU_EXPRSUM: { // 
 

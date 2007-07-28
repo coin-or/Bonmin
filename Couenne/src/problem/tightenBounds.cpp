@@ -26,12 +26,14 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
   // lower bound, depending on the bound changes of the variables
   // they depend on
 
-  /*printf ("tighten========================\n");
+#ifdef DEBUG
+  printf ("tighten========================\n");
   for (int i=0; i < nVars (); i++) 
     if (variables_ [i] -> Multiplicity () > 0)
       printf ("x_%d [%g, %g]\n", i, 
 	      expression::Lbound (i),
-	      expression::Ubound (i));*/
+	      expression::Ubound (i));
+#endif
 
   expression::update (NULL, lb_, ub_);
 
@@ -39,7 +41,8 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
     int i = numbering_ [ii];
 
-    if (Var (i) -> Multiplicity () > 0) {
+    if ((Var (i) -> Multiplicity () > 0) &&
+	(Var (i) -> Type         () == AUX)) {
 
       //    for (int j=0; j<nAuxs () + nVars (); j++ )
       //      printf ("+++ %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
@@ -88,17 +91,17 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	Aux (j) -> Image () -> print (std::cout); printf ("\n");
 	*/
 
+#ifdef DEBUG
 	if (optimum_ && 
 	    (optimum_ [i] >= lb_ [i]) && 
 	    (optimum_ [i] <= ll - COUENNE_EPS)) {
 
-#ifdef DEBUG
 	  printf ("#### propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
 		  i+j, lb_ [i], optimum_ [i], ll);
 	  Var (i) -> Lb () -> print (std::cout); printf (" --- ");
 	  Var (i) -> Ub () -> print (std::cout); printf ("\n");
-#endif
 	}
+#endif
 
 	lb_ [i] = ll;
 	chg_bds [i].lower = CHANGED;
@@ -118,21 +121,22 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	/*printf ("update ubound %d: %g >= %g\n", 
 	  i+j, uu, ub_ [i+j]);*/
 
-	/*printf ("propa %2d [(%g),%g] -> [(%g),%g] (%g) ", 
-		i+j, lb_ [i+j], ub_ [i+j], ll, uu, ub_ [i+j] - uu);
-	Aux (j)             -> print (std::cout); printf (" := ");
-	Aux (j) -> Image () -> print (std::cout); printf ("\n");*/
+#ifdef DEBUG
+	printf ("propa %2d [(%g),%g] -> [(%g),%g] (%g) ", 
+		i, lb_ [i], ub_ [i], ll, uu, ub_ [i] - uu);
+	Var (i)             -> print (std::cout); printf (" := ");
+	Var (i) -> Image () -> print (std::cout); printf ("\n");
 
 	if (optimum_ && 
 	    (optimum_ [i] <= ub_ [i]) && 
 	    (optimum_ [i] >= uu + COUENNE_EPS)) {
-#ifdef DEBUG
+
 	  printf ("#### propagating u_%d cuts optimum: [%g <-X- %g <-- %g] :: ", 
 		  i, uu, optimum_ [i], ub_ [i]);
 	  Var (i) -> Lb () -> print (std::cout); printf (" --- ");
 	  Var (i) -> Ub () -> print (std::cout); printf ("\n");
-#endif
 	}
+#endif
 
 	ub_ [i] = uu;
 	chg_bds [i].upper = CHANGED;

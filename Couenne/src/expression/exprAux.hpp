@@ -81,8 +81,8 @@ class exprAux: public exprVar {
     image_ -> getBounds (lb_, ub_);
     // getBounds (lb_, ub_);
 
-    lb_ = new exprMax (lb_, new exprLowerBound (varIndex_));
-    ub_ = new exprMin (ub_, new exprUpperBound (varIndex_));
+    lb_ = new exprMax (new exprLowerBound (varIndex_), lb_);
+    ub_ = new exprMin (new exprUpperBound (varIndex_), ub_);
   }
 
   /// cloning method

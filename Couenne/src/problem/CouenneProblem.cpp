@@ -23,6 +23,7 @@
 #include <CouenneProblemElem.hpp>
 #include <depGraph.hpp>
 
+//#define DEBUG
 
 /// constructor
 CouenneProblem::CouenneProblem (const struct ASL *asl):
@@ -51,8 +52,10 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
     printf ("Couenne: reading time %.3fs\n", now);
 
   now = CoinCpuTime ();
-  //print (std::cout);
-  //printf ("======================================\n");
+#ifdef DEBUG
+  print (std::cout);
+  printf ("======================================\n");
+#endif
 
   // reformulation
   standardize ();
@@ -65,7 +68,9 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
 
   //readOptimum ("optimum-3_1_1.txt", optimum_, bestObj_, this);
 
-  //print (std::cout);
+#ifdef DEBUG
+  print (std::cout);
+#endif
 
   //writeMod ("extended-aw.mod", true);
   //writeMod ("extended-pb.mod", false);

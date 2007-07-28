@@ -158,7 +158,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					      (*(con -> Ub ())) ());
 
 	  // take it from the list of the variables to be linearized
-	  conaux -> decreaseMult ();
+	  //conaux -> decreaseMult (); // !!!
 	}
 
 	// also, add constraint w <= b

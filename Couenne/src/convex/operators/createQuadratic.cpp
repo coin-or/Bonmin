@@ -91,7 +91,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
     break;
 
   case COU_EXPRVAR:   /// a variable
-    linsert (lmap, term -> Index (), 1.);
+    linsert (lmap, term -> Index (), initCoe);
     break;
 
   case COU_EXPROPP:   /// the opposite of a term
@@ -167,7 +167,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 	  (new exprPow (new exprClone (p -> Var (index)),
 			new exprConst (expon)));
 
-	linsert (lmap, aux -> Index (), 1.);
+	linsert (lmap, aux -> Index (), initCoe);
       }
     } break;
 
@@ -235,7 +235,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
       expression *aux = term -> standardize (p);
       if (!aux) aux = term;
-      linsert (lmap, aux -> Index (), 1.);
+      linsert (lmap, aux -> Index (), initCoe);
 
     } else { // this is of the form f(x)^k.  If k=2, return square. If
 	     // k=1, return var. Otherwise, generate new auxiliary.
@@ -248,14 +248,11 @@ void decomposeTerm (CouenneProblem *p, expression *term,
       CouNumber expon = al [1] -> Value ();
       int ind = aux -> Index ();
 
-      if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, ind, 1.);
-      else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, ind, ind, 2.);
+      if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, ind, initCoe);
+      else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, ind, ind, initCoe);
       else {
-
 	exprAux *aux = p -> addAuxiliary (term);
-	if (!aux) ind = term -> Index ();
-
-	linsert (lmap, ind, 1.);
+	linsert (lmap, aux -> Index (), initCoe);
       }
     }
   } break;
@@ -265,7 +262,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
     expression *aux = term -> standardize (p);
     if (!aux) 
       aux = term;
-    linsert (lmap, aux -> Index (), 1.);
+    linsert (lmap, aux -> Index (), initCoe);
   } break;
   }
 }

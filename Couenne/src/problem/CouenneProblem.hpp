@@ -114,11 +114,6 @@ class CouenneProblem {
   int nIntVars () const {return nIntVars_;}           ///< Number of original integer variables
   int nVars    () const {return variables_. size ();} ///< Total number of variables
 
-  /// decrease number of original variables, when one of them has been
-  /// found to be actually an auxiliary variable
-  inline void decreaseNOrig () 
-  {--nOrig_;}
-
   /// get evaluation order index 
   inline int evalOrder (int i)
   {return numbering_ [i];}

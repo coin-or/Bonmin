@@ -90,7 +90,7 @@ void CouenneProblem::standardize () {
     exprAux *aux = (*i) -> standardize (this);
 
 #ifdef DEBUG
-    printf (" --> \n");
+    printf (" --> ");
       (*i) -> print ();
 #endif
 
@@ -98,7 +98,7 @@ void CouenneProblem::standardize () {
       (*i) -> Body (new exprClone (aux));
 
 #ifdef DEBUG
-    printf (" --> \n");
+    printf (" --> ");
     (*i) -> print ();
     printf ("...................\n");
 #endif
@@ -127,7 +127,7 @@ void CouenneProblem::standardize () {
     exprAux *aux = (*i) -> standardize (this);
 
 #ifdef DEBUG
-    printf (" ==> [%d]\n", aux ? (aux -> Index ()) : -1);
+    printf (" ==> [%d] ", aux ? (aux -> Index ()) : -1);
       (*i) -> print ();
 #endif
 
@@ -137,7 +137,7 @@ void CouenneProblem::standardize () {
     }
 
 #ifdef DEBUG
-    printf (" --> \n");
+    printf (" --> ");
     (*i) -> print ();
     printf ("...................\n");
 #endif
@@ -154,8 +154,6 @@ void CouenneProblem::standardize () {
   //printf ("ok, done with standardization <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
   delete auxSet_;
-
-  //printf ("ntotvars = %d\n", nVars());
 
   int nTotVar = nVars ();
 

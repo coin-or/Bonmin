@@ -18,6 +18,9 @@
 #include <exprQuad.hpp>
 
 
+//#define DEBUG
+
+
 /// re-organizes multiplication and stores indices (and exponents) of its variables
 void flattenMul (expression *mul, CouNumber &, 
 		 std::map <int, CouNumber> &, 
@@ -112,7 +115,15 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 
   for (int i=0; i<nargs_; i++)
     decomposeTerm (p, arglist_ [i], 1, c0, lmap, qmap);
-
+#ifdef DEBUG
+  printf ("decompTerm returns: [");
+  for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); i++)
+    printf ("<%d,%g>", i -> first, i -> second);
+  printf ("] || [");
+  for (std::map <std::pair <int, int>, CouNumber>::iterator i = qmap.begin (); i != qmap.end (); i++)
+    printf ("<%d,%d,%g>", i -> first.first, i -> first.second, i -> second);
+  printf ("]\n");
+#endif
   return linStandardize (p, c0, lmap, qmap);
 }
 
@@ -238,16 +249,17 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
     if (fabs (*qc - 1) < COUENNE_EPS) 
       ret    = p -> addAuxiliary (quad);
     else ret = p -> addAuxiliary (new exprMul (new exprConst (*qc), quad));
+
   } else {
 
-  // general case ///////////////////////////////////////////////////////////////
+    // general case ///////////////////////////////////////////////////////////////
 
-  expression **zero = new expression * [1];
-  *zero = new exprConst (0.);
+    expression **zero = new expression * [1];
+    *zero = new exprConst (0.);
 
-  ret = (nq==0) ? 
-    (p -> addAuxiliary (new exprGroup (c0, li, lc,             zero, 1))) :
-    (p -> addAuxiliary (new exprQuad  (c0, li, lc, qi, qj, qc, zero, 1)));
+    ret = (nq==0) ? 
+      (p -> addAuxiliary (new exprGroup (c0, li, lc,             zero, 1))) :
+      (p -> addAuxiliary (new exprQuad  (c0, li, lc, qi, qj, qc, zero, 1)));
   }
 
   delete [] li;
@@ -256,9 +268,11 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
   delete [] qj;
   delete [] qc;
 
-  /*printf (" ==> "); 
+#ifdef DEBUG
+  printf ("\nlinstand ==> "); 
   ret -> print (); printf (" := "); 
-  ret -> Image () -> print (); printf ("\n");*/
+  ret -> Image () -> print (); printf ("\n");
+#endif
 
  return ret;
 }

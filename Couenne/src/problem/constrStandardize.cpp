@@ -32,7 +32,7 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
   // structure)
 
 #ifdef DEBUG
-  printf ("||||||| standardizing constraint: "); print ();
+  printf (":#:#:#:#:#:#:#: standardizing constraint: "); print ();
 
   printf (" ["); fflush (stdout);
   lb_ -> print ();
@@ -50,7 +50,6 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
   printf ("}\n");
 #endif
 
-  //  if (0) // Back to normal
   if (compareExpr (&lb_, &ub_) == 0) { // this is an equality constraint
 
     expression *rest;
@@ -74,15 +73,12 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
       // no such expression found in the set:
       if (i == p -> AuxSet () -> end ()) {
 
-	//	p -> Variables   () . push_back (w); // 1) create entry therein
-	p -> AuxSet      () -> insert   (w); // 2) beware of useless copies
-	p -> getDepGraph () -> insert   (w); // 3) introduce it in acyclic structure
+	p -> AuxSet      () -> insert   (w); // 1) beware of useless copies
+	p -> getDepGraph () -> insert   (w); // 2) introduce it in acyclic structure
 
 	// replace ALL occurrences of original variable (with index
 	// wind) with newly created auxiliary
 	p -> auxiliarize (w);
-	p -> decreaseNOrig ();
-
       } 
 #ifdef DEBUG
       else {
