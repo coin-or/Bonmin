@@ -108,7 +108,6 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
 #endif
 #endif //OLDOLD
   
-      printf("bladfasfabluuu\n");
   bool first_solve = true;
   CoinWarmStart* warmStart = NULL;
   SmartPtr<TNLPSolver> tqp_solver;
@@ -118,14 +117,12 @@ BonQPStrongBranching::fill_changes(OsiSolverInterface * solver,
   if (filter_solver) {
     if (solve_nlp_) {
       warmStart = filter_solver->getWarmStart(tminlp2tnlp);
-    }}
-    //}else {
-      printf("blabluuu\n");
+    }else {
       tqp_solver = new BqpdSolver(tminlp_interface->solver()->RegOptions(),
 				  tminlp_interface->solver()->Options(),
 				  tminlp_interface->solver()->Jnlst());
-      //}
-      //}
+    }
+  }
 #endif
   if (IsNull(tqp_solver)) {
     tqp_solver = tminlp_interface->solver()->clone();

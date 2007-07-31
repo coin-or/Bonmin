@@ -120,13 +120,13 @@ AC_ARG_WITH([filtersqp],
 
 if test "$use_filtersqp" = BUILD || test "$use_filtersqp" = detect; then
 # Check which files are available
-  AC_CHECK_FILE([$filtersqpsrcdir/source/src/filter.f],
-                [AC_DEFINE(COIN_HAS_FILTERSQP,1,
-                           [Define to 1 if FilterSQP is available])
-                 use_filtersqp=BUILD],
-                [if test "$use_filtersqp" = BUILD; then
-                   AC_MSG_ERROR([Filter SQP files are not available])
-                 fi])
+  AC_COIN_CHECK_FILE([$filtersqpsrcdir/source/src/filter.f],
+	             [AC_DEFINE(COIN_HAS_FILTERSQP,1,
+                                [Define to 1 if FilterSQP is available])
+                      use_filtersqp=BUILD],
+                     [if test "$use_filtersqp" = BUILD; then
+                       AC_MSG_ERROR([Filter SQP files are not available])
+                      fi])
 fi
 if test "$use_filtersqp" = detect; then
   use_filtersqp=no

@@ -65,7 +65,7 @@ int main (int argc, char *argv[])
   }
 
   //Now initialize from tminlp
-  bonmin.initializeBonmin(GetRawPtr(tminlp));
+  bonmin.initialize(GetRawPtr(tminlp));
 
 
 
