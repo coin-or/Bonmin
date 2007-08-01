@@ -402,6 +402,7 @@ algo_(other.algo_){
       CuttingMethod cg;
       cg.frequency = ival;
       OACutGenerator2 * oa = new OACutGenerator2(*this);
+      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
       cg.cgl = oa;
       cg.id = "Outer Approximation decomposition.";
       cutGenerators_.push_back(cg);
@@ -412,6 +413,7 @@ algo_(other.algo_){
       CuttingMethod cg;
       cg.frequency = 1;
       OaFeasibilityChecker * oa = new OaFeasibilityChecker(*this);
+      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
       cg.cgl = oa;
       cg.id = "Outer Approximation feasibility check.";
       cg.atSolution = 1;

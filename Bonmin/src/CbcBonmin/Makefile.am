@@ -119,8 +119,10 @@ CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
 
 include_HEADERS = \
 	BonCbc.hpp \
-        BonCbc2.hpp \
-        BonAuxInfos.hpp \
+     BonCbcNlpStrategy.hpp \
+     BonCbc2.hpp \
+     BonAuxInfos.hpp \
+     BonCbcNode.hpp \
 	BonCbcParam.hpp
 
 ########################################################################

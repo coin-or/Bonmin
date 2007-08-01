@@ -408,8 +408,10 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 include_HEADERS = \
 	BonCbc.hpp \
-        BonCbc2.hpp \
-        BonAuxInfos.hpp \
+     BonCbcNlpStrategy.hpp \
+     BonCbc2.hpp \
+     BonAuxInfos.hpp \
+     BonCbcNode.hpp \
 	BonCbcParam.hpp
 
 

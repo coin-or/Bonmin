@@ -278,6 +278,8 @@ namespace Bonmin
     void setLogLevel(int level){
       handler_->setLogLevel(level);} 
 
+    void passInMessageHandler(CoinMessageHandler * handler){
+          }
   protected:
    /// \name Protected helper functions
    /**@{ */
@@ -308,7 +310,7 @@ namespace Bonmin
     mutable int nLocalSearch_;
     /** messages handler. */
     CoinMessageHandler * handler_;
-    /** handler */
+    /** Messages for OA */
     CoinMessages messages_;
     /** Wether or not we should remove cuts at the end of the procedure */
     bool leaveSiUnchanged_;
