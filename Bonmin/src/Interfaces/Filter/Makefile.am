@@ -59,6 +59,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 include_HEADERS =  \
                   BonFilterSolver.hpp \
+                  BonBqpdSolver.hpp \
                   BonFilterWarmStart.hpp
 
 ########################################################################

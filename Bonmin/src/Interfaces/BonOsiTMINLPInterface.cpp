@@ -254,7 +254,7 @@ OsiTMINLPInterface::Messages::Messages
              (ERROR_NO_TNLPSOLVER + 6001,1,"Can not parse options when no IpApplication has been created"));
   addMessage(WARNING_NON_CONVEX_OA, CoinOneMessage
              (WARNING_NON_CONVEX_OA + 3001, 1,
-              "OA on non-convex constraint is very experimental, don't know how to remove"));                                          
+              "OA on non-convex constraint is very experimental."));                                          
 
 }
 bool OsiTMINLPInterface::hasPrintedOptions=0;
@@ -1533,12 +1533,6 @@ bool cleanNnz(double &value, double colLower, double colUpper,
   bool rowNotUpBounded = rowUpper >= infty;
   bool pos =  value > 0;
 
-  if(!rowNotLoBounded && ! rowNotUpBounded)//would have to either choose side or duplicate cut
-  {
-    std::cerr<<""
-    <<std::endl;
-  }
-
   if(colLoBounded && pos && rowNotUpBounded) {
     lb += value * (colsol - colLower);
     return 0;
@@ -1862,7 +1856,7 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
 }
 
 
-
+static bool WarnedForNonConvexOa=true;
 
 
 void
@@ -1916,10 +1910,11 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
         continue;
       }
       else
-        if(rowLower[i] > - nlp_infty){
+        if(! WarnedForNonConvexOa && rowLower[i] > - nlp_infty){
           rowLow[i] = (rowLower[i] - g[i]) - 1e-07;
           if(rowUpper[i] < nlp_infty){
-             messageHandler()->message(ERROR_NO_TNLPSOLVER, messages_)<<CoinMessageEol;
+             messageHandler()->message(WARNING_NON_CONVEX_OA, messages_)<<CoinMessageEol;
+             WarnedForNonConvexOa = false;
           }
         }
       else

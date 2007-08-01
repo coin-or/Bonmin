@@ -351,8 +351,32 @@ namespace Bonmin
    /** Used to mark constraints of the problem.*/
    enum Convexity {
      Convex/** Constraint is convex.*/,
-     NonConvex/** Constraint is non-convex.*/};
+     NonConvex/** Constraint is non-convex.*/,
+     SimpleConcave/** Constraint is concave of the simple form y >= F(x).*/};
 
+   /** Structure for marked non-convex constraints. With possibility of
+       storing index of a constraint relaxing the non-convex constraint*/
+   struct MarkedNonConvex {
+      /** Default constructor gives "safe" values.*/
+	 MarkedNonConvex():
+	 cIdx(-1), cRelaxIdx(-1){}
+	 /** Index of the nonconvex constraint.*/
+      int cIdx;
+	 /** Index of constraint relaxing the nonconvex constraint.*/
+	 int cRelaxIdx;};
+   /** Structure which describes a constraints of the form
+       $f[ y \gt F(x) \f]
+	  with \f$ F(x) \f$ a concave function.*/
+   struct SimpleConcaveConstraint{
+      /** Default constructor gives "safe" values.*/
+	 SimpleConcaveConstraint():
+	   xIdx(-1), yIdx(-1), cIdx(-1){}
+      /** Index of the variable x.*/
+      int xIdx;
+      /** Index of the variable y.*/
+	 int yIdx;
+      /** Index of the constraint.*/
+	 int cIdx;};
     /** Overload to give access to array describing constraint convexities*/
     virtual const Convexity * constraintsTypes(){
       return NULL;}
@@ -360,18 +384,21 @@ namespace Bonmin
   virtual Convexity constraintType(int i) {
      return Convex;}
 
-  /** Index in the set of all constraints of the non convex constraint i*/
-  virtual int indexOfNonConv(int i) {
-     return -1;}
-  /** Index of constraint relaxing the non convex constraint i (
-    * if no relaxation is known returns -i).*/
-  virtual int relaxationOfNonConv(int i){
-    return -1;
-  }
-
+  /** Get the number of constraints marked non convex in the problem.*/
   virtual int getNumberNonConvex(){
     return 0;}
+  
+  /** Get array describing the constraints marќed as nonconvex.*/
+  virtual MarkedNonConvex * getMarkedNonConvex(){
+    return NULL;}
 
+  /** Get the number of constraints marked simple concave in the problem.*/
+  virtual int getNumberSimpleConcave(){
+    return 0;}
+
+  /** Get array of simple concave constraints descriptions.*/
+  virtual SimpleConcaveConstraint * getSimpleConcaveConstraints(){
+     return NULL;}
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).

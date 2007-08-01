@@ -59,7 +59,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 
-include_HEADERS =
+include_HEADERS = BonAmplInterface.hpp BonAmplTMINLP.hpp
 
 ########################################################################
 #                            Astyle stuff                              #

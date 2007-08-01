@@ -387,12 +387,14 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 include_HEADERS = \
+     ../../inc/config_bonmin.h \
 	BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.hpp \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
-        BonCutStrengthener.hpp \
-        BonTNLPSolver.hpp 
+     BonCutStrengthener.hpp \
+     BonTNLPSolver.hpp \
+     BonBranchingTQP.hpp
 
 
 #############################################################################
@@ -664,6 +666,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
+	$(mkdir_p) $(distdir)/../../inc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

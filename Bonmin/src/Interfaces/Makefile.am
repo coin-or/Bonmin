@@ -78,12 +78,14 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 include_HEADERS = \
+     ../../inc/config_bonmin.h \
 	BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.hpp \
 	BonTMINLP.hpp \
 	BonTNLP2FPNLP.hpp \
-        BonCutStrengthener.hpp \
-        BonTNLPSolver.hpp 
+     BonCutStrengthener.hpp \
+     BonTNLPSolver.hpp \
+     BonBranchingTQP.hpp
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #

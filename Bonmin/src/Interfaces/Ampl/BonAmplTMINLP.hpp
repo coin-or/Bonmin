@@ -212,6 +212,7 @@ namespace Bonmin
   
    /** Give access to constraint convexities */
    virtual const Convexity *  constraintsTypes(){
+     std::cout<<" in AmplTMINLP::constraintsTypes"<<std::endl;
      return constraintsConvexities_;}
    /** Give access to constraint convexities */
    virtual Convexity contraintType(int i){
@@ -221,23 +222,17 @@ namespace Bonmin
        return TMINLP::Convex;}
 
    /** Index in the set of all constraints of the non convex constraint i*/
-   virtual int indexOfNonConv(int i){
-       if(nonConvexConstraintsAndRelaxations_.size() > 0){
-           return nonConvexConstraintsAndRelaxations_[i].first;}
-        else
-           return -1;}
-   /** Index of constraint relaxing the non convex constraint i (
-    * if no relaxation is known returns -i).*/
-   virtual int relaxationOfNonConv(int i){
-       if(nonConvexConstraintsAndRelaxations_.size() > 0){
-          return nonConvexConstraintsAndRelaxations_[i].second;}
-       else
-          return -1;
-      
-  }
-
+   virtual MarkedNonConvex * getMarkedNonConvex(){
+      return nonConvexConstraintsAndRelaxations_;}
   virtual int  getNumberNonConvex(){
-    return nonConvexConstraintsAndRelaxations_.size();}
+    return numberNonConvex_;}
+
+  virtual int getNumberSimpleConcave(){
+     std::cout<<" in AmplTMINLP::constraintsTypes"<<std::endl;
+     return numberSimpleConcave_;}
+
+  virtual SimpleConcaveConstraint* getSimpleConcaveConstraints(){
+     return simpleConcaves_;}
 private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -274,8 +269,14 @@ private:
     /** Store constraints types.*/
     TMINLP::Convexity * constraintsConvexities_;
 
-   /** Store pair of non-convex constraints and their relaxations.*/
-   std::vector<std::pair < int, int > > nonConvexConstraintsAndRelaxations_;
+   /** Number of nonConvex constraints.*/
+   int numberNonConvex_;
+   /** Store marked non-convex constraints and their relaxations.*/
+   MarkedNonConvex * nonConvexConstraintsAndRelaxations_;
+   /** Number of simpleConcave constraints.*/
+   int numberSimpleConcave_;
+   /** Store simple concave constraints descriptions.*/
+   SimpleConcaveConstraint * simpleConcaves_;
   };
 } // namespace Ipopt
 

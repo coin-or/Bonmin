@@ -21,7 +21,7 @@
 #include "getstub.h"
 
 #include "CoinHelperFunctions.hpp"
-
+#include "BonExitCodes.hpp"
 namespace ampl_utils
 {
   void sos_kludge(int nsos, int *sosbeg, double *sosref);
@@ -105,7 +105,8 @@ namespace Bonmin
     
 
    // For marking convex/nonconvex constraints
-   suffix_handler->AddAvailableSuffix("nonconvex",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
+   suffix_handler->AddAvailableSuffix("id",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
+   suffix_handler->AddAvailableSuffix("primary_var",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
     
     // For objectives
     suffix_handler->AddAvailableSuffix("UBObj", AmplSuffixHandler::Objective_Source, AmplSuffixHandler::Index_Type);
@@ -131,6 +132,8 @@ namespace Bonmin
   AmplTMINLP::~AmplTMINLP()
   {
     delete [] constraintsConvexities_;
+    delete [] simpleConcaves_;
+    delete [] nonConvexConstraintsAndRelaxations_;
     delete ampl_tnlp_;
   }
   
@@ -247,46 +250,98 @@ namespace Bonmin
       ampl_tnlp_->set_active_objective(0);
     }
   }
- 
+ /** To store all data stored in the nonconvex suffixes.*/
+ struct NonConvexSuff{
+    /** Default constructor.*/
+    NonConvexSuff():
+    cIdx(-1),relIdx(-1),scXIdx(-1),scYIdx(-1){}
+    /** Copy constructor.*/
+    NonConvexSuff(const NonConvexSuff& other):
+    cIdx(other.cIdx), relIdx(other.relIdx),
+    scXIdx(other.scXIdx), scYIdx(other.scYIdx){}
+    /** Index of the nonconvex constraint.*/
+    int cIdx;
+    /** Index of its relaxation.*/
+    int relIdx;
+    /** Index of variable x in a simple concave constraint of type y >= F(x).*/
+    int scXIdx;
+    /** Index of variable y in a simple concave constraint of type y >= F(x).*/
+    int scYIdx;
+    };
  void AmplTMINLP::read_convexities(){
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
     DBG_ASSERT(asl);
 
    const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
-   const Index * nonConvexities = suffix_handler->GetIntegerSuffixValues("nonconvex", AmplSuffixHandler::AmplSuffixHandler::Constraint_Source);
-   if(nonConvexities != NULL){
-     //int numberNonConvex = 0;
+   const Index * id = suffix_handler->GetIntegerSuffixValues("id", AmplSuffixHandler::AmplSuffixHandler::Variable_Source);
+   const Index * primary_var = suffix_handler->GetIntegerSuffixValues("primary_var", AmplSuffixHandler::AmplSuffixHandler::Constraint_Source);
+
+   if(primary_var!= NULL)
+   {
      if(constraintsConvexities_ != NULL){
        delete [] constraintsConvexities_;}
      constraintsConvexities_ = new TMINLP::Convexity[n_con];
-     std::map<int, std::pair<int, int> > nonConvexConstraints;
-     for(int i = 0 ; i < n_con ; i++){
-       if(nonConvexities[i] < 0){
-         std::cout<<"Constraint "<<i<<" is non-convex"<<std::endl;
-         constraintsConvexities_[i] = TMINLP::NonConvex;
-         nonConvexConstraints[-nonConvexities[i]].first = i;
-       }
-       else {
-         std::cout<<"Constraint "<<i<<" is convex"<<std::endl;
-         constraintsConvexities_[i] = TMINLP::Convex;
-         if(nonConvexities[i] != 0){
-           nonConvexConstraints[nonConvexities[i]].second = i;
-         }
-       }
-     }
+     if(id == NULL){
+        std::cout<<"Incorrect suffixes description in ampl model. id's are not declared "<<std::endl;
+      exit(ERROR_IN_AMPL_SUFFIXES);
+	}
+     int numberSimpleConcave = 0; 
+     std::map<int, int> id_map;
 
-     for(std::map<int, std::pair< int, int> >::iterator i = nonConvexConstraints.begin() ; i != nonConvexConstraints.end() ; i++){
-       nonConvexConstraintsAndRelaxations_.push_back(std::pair<int, int> ((*i).second.first,(*i).second.second));
+     for(int i = 0 ; i < n_var ; i++){
+        id_map[id[i]] = i;}
+
+
+     for(int i = 0 ; i < n_con ; i++){
+        if(primary_var[i] != 0){
+            constraintsConvexities_[i] = TMINLP::SimpleConcave;
+            std::cout<<"A non convex constraint."<<std::endl;
+            numberSimpleConcave++; 
+        }
+        else constraintsConvexities_[i] = TMINLP::Convex;
      }
-#if 1
-     for(unsigned int i = 0 ; i < nonConvexConstraintsAndRelaxations_.size() ; i++){
-       std::cout<<"Non convex constraints "<<i<<" has index "
-                <<  nonConvexConstraintsAndRelaxations_[i].first<<" and relaxation is given in constraint "
-                <<  nonConvexConstraintsAndRelaxations_[i].second<<std::endl;
+    simpleConcaves_ = new SimpleConcaveConstraint[numberSimpleConcave];
+    nonConvexConstraintsAndRelaxations_ = new MarkedNonConvex[numberSimpleConcave];
+    numberSimpleConcave = 0;
+    for(int i = 0 ; i < n_con ; i++){
+        if(primary_var[i] != 0){
+           nonConvexConstraintsAndRelaxations_[numberSimpleConcave].cIdx = i;
+           nonConvexConstraintsAndRelaxations_[numberSimpleConcave].cRelaxIdx = -1;
+           simpleConcaves_[numberSimpleConcave].cIdx = i;
+           simpleConcaves_[numberSimpleConcave].yIdx = id_map[primary_var[i]];
+           
+        //Now get gradient of i to get xIdx.
+         int nnz;
+        int * jCol = new int[n_var];
+        int & yIdx = simpleConcaves_[numberSimpleConcave].yIdx;
+	   int & xIdx = simpleConcaves_[numberSimpleConcave].xIdx;
+        eval_grad_gi(n_var, NULL, false, i, nnz, jCol, NULL);
+        if(nnz != 2){//Error in ampl model
+        std::cout<<"Incorrect suffixes description in ampl model. Constraint with id "
+                 <<id<<" is simple concave and should have only two nonzero elements"<<std::endl;
+         exit(ERROR_IN_AMPL_SUFFIXES);
+        }
+        if(jCol[0] == yIdx){
+          xIdx = jCol[1];
+        }
+        else{
+             if(jCol[1] != yIdx){//Error in ampl model
+               std::cout<<"Incorrect suffixes description in ampl model. Constraint with id "
+                        <<id<<" : variable marked as y does not appear in the constraint."<<std::endl;
+               exit(ERROR_IN_AMPL_SUFFIXES);
+             }       
+          xIdx = jCol[0];
+        }
+	   std::cout<<"constraint is of the form y >= f(x). "
+         <<"With y index "<<yIdx<<" and x index "<<xIdx<<std::endl;
+	   numberSimpleConcave++;
      }
-#endif
    }
- } 
+   numberSimpleConcave_ = numberSimpleConcave;
+   numberNonConvex_ = numberSimpleConcave;
+   }
+   
+ }
   
   bool AmplTMINLP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g, Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
   {
