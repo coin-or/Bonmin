@@ -37,7 +37,9 @@ namespace Bonmin
   branch_(),
   sos_(),
   suffix_handler_(NULL),
-  constraintsConvexities_(NULL)
+  constraintsConvexities_(NULL),
+  simpleConcaves_(NULL),
+  nonConvexConstraintsAndRelaxations_(NULL)
   {}
   
   
@@ -55,7 +57,9 @@ namespace Bonmin
   branch_(),
   sos_(),
   suffix_handler_(NULL),
-  constraintsConvexities_(NULL)
+  constraintsConvexities_(NULL),
+  simpleConcaves_(NULL),
+  nonConvexConstraintsAndRelaxations_(NULL)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
   }
