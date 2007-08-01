@@ -30,8 +30,6 @@ if COIN_HAS_COUENNE
 SUBDIRS += experimental/NotConvex
 endif
 
-#SUBDIRS += experimental/Lgp
-
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball

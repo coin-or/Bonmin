@@ -55,8 +55,6 @@ host_triplet = @host@
 @COIN_HAS_BCP_TRUE@am__append_2 = experimental/Bcp
 @COIN_HAS_COUENNE_TRUE@am__append_3 = experimental/NotConvex
 
-#SUBDIRS += experimental/Lgp
-
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball
