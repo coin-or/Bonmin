@@ -1856,7 +1856,7 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
 }
 
 
-static bool WarnedForNonConvexOa=true;
+static bool WarnedForNonConvexOa=false;
 
 
 void
@@ -1914,7 +1914,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
           rowLow[i] = (rowLower[i] - g[i]) - 1e-07;
           if(rowUpper[i] < nlp_infty){
              messageHandler()->message(WARNING_NON_CONVEX_OA, messages_)<<CoinMessageEol;
-             WarnedForNonConvexOa = false;
+             WarnedForNonConvexOa = true;
           }
         }
       else
