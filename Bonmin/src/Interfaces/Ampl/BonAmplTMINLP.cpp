@@ -299,7 +299,6 @@ namespace Bonmin
      for(int i = 0 ; i < n_con ; i++){
         if(primary_var[i] != 0){
             constraintsConvexities_[i] = TMINLP::SimpleConcave;
-            std::cout<<"A non convex constraint."<<std::endl;
             numberSimpleConcave++; 
         }
         else constraintsConvexities_[i] = TMINLP::Convex;
@@ -336,8 +335,6 @@ namespace Bonmin
              }       
           xIdx = jCol[0];
         }
-	   std::cout<<"constraint is of the form y >= f(x). "
-         <<"With y index "<<yIdx<<" and x index "<<xIdx<<std::endl;
 	   numberSimpleConcave++;
      }
    }
