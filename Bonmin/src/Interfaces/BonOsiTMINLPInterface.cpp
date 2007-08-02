@@ -1910,9 +1910,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
         continue;
       }
       else
-        if(! WarnedForNonConvexOa && rowLower[i] > - nlp_infty){
+        if(rowLower[i] > - nlp_infty){
           rowLow[i] = (rowLower[i] - g[i]) - 1e-07;
-          if(rowUpper[i] < nlp_infty){
+          if(! WarnedForNonConvexOa && rowUpper[i] < nlp_infty){
              messageHandler()->message(WARNING_NON_CONVEX_OA, messages_)<<CoinMessageEol;
              WarnedForNonConvexOa = true;
           }
