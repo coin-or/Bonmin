@@ -306,6 +306,7 @@ namespace Bonmin
     simpleConcaves_ = new SimpleConcaveConstraint[numberSimpleConcave];
     nonConvexConstraintsAndRelaxations_ = new MarkedNonConvex[numberSimpleConcave];
     numberSimpleConcave = 0;
+    int * jCol = new int[n_var];
     for(int i = 0 ; i < n_con ; i++){
         if(primary_var[i] != 0){
            nonConvexConstraintsAndRelaxations_[numberSimpleConcave].cIdx = i;
@@ -315,7 +316,6 @@ namespace Bonmin
            
         //Now get gradient of i to get xIdx.
          int nnz;
-        int * jCol = new int[n_var];
         int & yIdx = simpleConcaves_[numberSimpleConcave].yIdx;
 	   int & xIdx = simpleConcaves_[numberSimpleConcave].xIdx;
         eval_grad_gi(n_var, NULL, false, i, nnz, jCol, NULL);
@@ -338,6 +338,7 @@ namespace Bonmin
 	   numberSimpleConcave++;
      }
    }
+   delete [] jCol;
    numberSimpleConcave_ = numberSimpleConcave;
    numberNonConvex_ = numberSimpleConcave;
    }
