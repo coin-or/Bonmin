@@ -41,13 +41,14 @@ namespace Bonmin {
       lp_(si),
       nLocalSearch_(0),
       handler_(NULL),
+      default_handler_(true),
       leaveSiUnchanged_(leaveSiUnchanged),
     reassignLpsolver_(false),
       timeBegin_(0),
       parameters_()
   {
     handler_ = new CoinMessageHandler();
-    handler_ -> setLogLevel(2);
+ 	  handler_ -> setLogLevel(2);
     messages_ = OaMessages();
     if (strategy)
       parameters_.setStrategy(*strategy);
@@ -62,6 +63,7 @@ namespace Bonmin {
   lp_(b.continuousSolver()),
   nLocalSearch_(0),
   handler_(NULL),
+  default_handler_(true),
   leaveSiUnchanged_(leaveSiUnchanged),
   reassignLpsolver_(reassignLpsolver),
   timeBegin_(0),
@@ -92,15 +94,14 @@ namespace Bonmin {
       nlp_(other.nlp_),
       lp_(other.lp_),
       nLocalSearch_(0),
-      handler_(NULL), 
+      handler_(other.handler_),
+      default_handler_(false), 
       messages_(other.messages_),
       leaveSiUnchanged_(other.leaveSiUnchanged_),
   reassignLpsolver_(other.reassignLpsolver_),
       timeBegin_(0),
       parameters_(other.parameters_)
     {
-      handler_ = new CoinMessageHandler();
-      handler_->setLogLevel(other.handler_->logLevel());
       timeBegin_ = CoinCpuTime();
     }
 /// Constructor with default values for parameters
@@ -120,7 +121,8 @@ OaDecompositionBase::Parameters::Parameters():
 
 /** Destructor.*/ 
 OaDecompositionBase::~OaDecompositionBase(){
-  delete handler_;}
+  if (default_handler_) delete handler_;
+}
 
 
 /// Constructor with default values for parameters
@@ -368,6 +370,14 @@ OaDecompositionBase::solverManip::restore(){
   getCached();
 }
 
+void 
+OaDecompositionBase::passInMessageHandler(CoinMessageHandler * handler) {
+  if (default_handler_) {
+    delete handler_;
+  	default_handler_=false;
+  }
+  handler_=handler;
+}
 
 /// Check for integer feasibility of a solution return 1 if it is
 bool 
