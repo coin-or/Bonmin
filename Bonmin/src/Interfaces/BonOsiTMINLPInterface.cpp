@@ -287,7 +287,7 @@ OsiTMINLPInterface::OaMessages::OaMessages(): CoinMessages((int) OA_MESSAGES_DUM
               VIOLATED_OA_CUT_GENERATED + 1, 1,"Row %d, cut violation is %g: Outer approximation cut generated."));
 
    addMessage(CUT_NOT_VIOLATED_ENOUGH, CoinOneMessage(
-              CUT_NOT_VIOLATED_ENOUGH + 1, 1,"Row %d, cut violation is %g: Outer approximation cut not generated."));
+              CUT_NOT_VIOLATED_ENOUGH + 1, 2,"Row %d, cut violation is %g: Outer approximation cut not generated."));
 
    addMessage(OA_CUT_GENERATED, CoinOneMessage(
               OA_CUT_GENERATED + 1, 1,"Row %d: Outer approximation cut not generated."));
