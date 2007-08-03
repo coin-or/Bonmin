@@ -16,7 +16,7 @@
 
 #include "CoinHelperFunctions.hpp"
 
-//#define DEBUG
+#define DEBUG
 
 void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
 
@@ -31,52 +31,55 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
   double * lambda = NULL;
   double exprVal = (*this) ();
   double varVal =  expression::Variable (w -> Index());
-  if(varVal < exprVal)//Use under-estimator
-  {
-     lambda = dCoeffLo_;
-  }
-  else //use overestimator
-  {
-     lambda = dCoeffUp_;
-  }
+
+  lambda = (varVal < exprVal) ? 
+    dCoeffLo_ : // Use under-estimator
+    dCoeffUp_;  // use  over-estimator
+
   const CouenneProblem& problem = *(cg->Problem());
   const int & numcols = problem.nVars();
   const double * colsol = problem.X();
-  const double * lower = problem.Lb();
-  const double * upper = problem.Ub();
+  const double * lower  = problem.Lb();
+  const double * upper  = problem.Ub();
 
-  std::cout<<"Point to cut"<<std::endl;
-  for(int i = 0 ; i < numcols ; i++){
-    std::cout<<colsol[i]<<", ";}
-  std::cout<<std::endl;
+#ifdef DEBUG
+  std::cout << "Point to cut:" << std::endl;
+  for(int i = 0 ; i < numcols ; i++)
+    std::cout << colsol [i] << ", ";
+  std::cout << std::endl;
+#endif
 
-  //Initialize by copying a into a dense vector and computing Q x^*
-  double * vec = new double[numcols];
-  CoinFillN(vec, numcols, 0.);
+  // Initialize by copying a into a dense vector and computing Q x^*
+  double * vec = new double [numcols]; // sparse coefficient vector
+  CoinFillN (vec, numcols, 0.);
 
-  //Start by computing Q x^*.
+  // Start by computing Q x^*.
+  for (int k = 0 ; k < nqterms_ ; k++) {
 
-  for(int k = 0 ; k < nqterms_ ; k++) {
-     vec[qindexI_[k]] += qcoeff_[k] * colsol[qindexJ_[k]];
-     vec[qindexJ_[k]] += qcoeff_[k] * colsol[qindexI_[k]];
+    int qi = qindexI_ [k],
+        qj = qindexJ_ [k];
+
+    CouNumber qc = qcoeff_ [k];
+
+    //if (qi != qj) {
+    vec [qi] += qc * colsol [qj];
+    vec [qj] += qc * colsol [qi];
+    //}
+    //else 
+    //vec [qi] += 2 * qc * colsol [qj];
   }
 
   //multiply it by x^*^T again and store the result for the lower bound
-  double a0 = - c0_;
+  double a0 = c0_; // it was -c0_
   for(int i = 0 ; i < numcols ; i++){
     a0 += vec[i] * colsol[i];
     vec[i] *= 2;
   }
 
   // Add a to it.
-  for(int i = 0 ; i < nlterms_ ; i++){
-     vec[index_[i]] += coeff_[i];
+  for (int i = 0 ; i < nlterms_ ; i++){
+     vec [index_ [i]] += coeff_ [i];
   }
-
-  // Don't forget the auxiliaries!
-  /*for(int i = 0 ; i < nargs_ ; i++){
-     vec[arglist_ [i] -> Index ()] += 1;
-     }*/
 
   // And myself
   vec [w -> Index ()] -= 1;
@@ -84,13 +87,12 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
   if (lambda != NULL) {
     // Now the part which depends on lambda
     for(int k = 0 ; k < nDiag_ ; k++){
-      a0 += lambda[k] * lower[dIndex_[k]] * upper[dIndex_[k]];
-      a0 += lambda[k] * colsol[dIndex_[k]] * colsol[dIndex_[k]];
-      vec[dIndex_[k]] += lambda[k] * (lower[dIndex_[k]] + upper[dIndex_[k]]);
-      vec[dIndex_[k]] -= lambda[k] * (colsol[dIndex_[k]]) * 2;
+      a0 += lambda [k] * lower  [dIndex_[k]] * upper  [dIndex_[k]];
+      a0 += lambda [k] * colsol [dIndex_[k]] * colsol [dIndex_[k]];
+      vec [dIndex_ [k]] += lambda [k] * (lower  [dIndex_ [k]] + upper[dIndex_[k]]);
+      vec [dIndex_ [k]] -= lambda [k] * (colsol [dIndex_ [k]]) * 2;
     }
   }
-
 
 
   // Count the number of non-zeroes
@@ -112,24 +114,25 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
 
   for(int i = 0 ; i < numcols ; i++){
 
-    if(fabs(vec[i]) > COUENNE_EPS){
+    if (fabs (vec [i]) > COUENNE_EPS){
 
       // compute violation
       if (optimum) {
 	printf ("%+g * %g ", vec [i], optimum [i]);
 	lhs += vec [i] * optimum [i];
       }
-      a.insert(i,vec[i]);
+
+      a.insert (i, vec [i]);
     }
   }
 
   OsiRowCut cut;
-  cut.setRow(a);
+  cut.setRow (a);
 
   delete [] vec;
 
-  if( lambda == dCoeffLo_){
-     cut.setUb(a0);
+  if (lambda == dCoeffLo_){
+     cut.setUb (a0);
      if (optimum && (lhs - a0 > COUENNE_EPS)) {
        printf ("cut violates optimal solution: %g > %g\n", lhs, a0);
        cut.print ();
@@ -137,7 +140,7 @@ void exprQuad::quadCuts(exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
      //     cut.setLb(-COUENNE_INFINITY);
   }
   else {
-    cut.setLb(a0);
+    cut.setLb (a0);
     if (optimum && (lhs - a0 < -COUENNE_EPS)) {
        printf ("cut violates optimal solution: %g < %g\n", lhs, a0);
        cut.print ();

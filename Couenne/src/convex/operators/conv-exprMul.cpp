@@ -66,7 +66,7 @@ void exprMul::getBounds (expression *&lb, expression *&ub) {
     if (!i && (arglist_ [1] -> Type () == CONST)) { 
 
       // !i means i==0, or the first is constant. If you are here,
-      // both are constant, which should not happen. Anyway...
+      // both are constant, which should not happen...
 
       CouNumber prod = c * arglist_ [1] -> Value ();
 

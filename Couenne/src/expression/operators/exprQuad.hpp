@@ -36,7 +36,7 @@ class exprQuad: public exprGroup {
 
  protected:
 
-  /** \name \f$Q\f$ matrix storage
+  /** \name Q matrix storage
     * Sparse implementation: given expression of the form \f$\sum_{i \in N,
     * j \in N} q_{ij} x_i x_j\f$, qindexI_ and qindexJ_ contain
     * respectively entries \f$i\f$ and \f$j\f$ for which \f$q_{ij}\f$ is nonzero
@@ -94,7 +94,8 @@ class exprQuad: public exprGroup {
     {return new exprQuad (*this);}
 
   /// Print expression to an iostream
-  virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
+  virtual void print (std::ostream & = std::cout, 
+		      bool = false, CouenneProblem * = NULL) const;
 
   /// Function for the evaluation of the expression
   virtual CouNumber operator () ();
@@ -164,7 +165,7 @@ class exprQuad: public exprGroup {
     * \right], \f]
     *
     * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc}
-    * {\lambda_1} & 0 \\ & \ddots & \\ 0 & & \lambda_n \end{array}
+    * {\lambda_1} & & 0 \\ & \ddots & \\ 0 & & \lambda_n \end{array}
     * \right). \f]
     *
     * The convex relaxation of the initial constraint is then given by
@@ -229,6 +230,9 @@ class exprQuad: public exprGroup {
   /// Fill dependence set of the expression associated with this
   /// auxiliary variable
   virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g);
+
+  /// implied bound processing
+  virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 };
 
 

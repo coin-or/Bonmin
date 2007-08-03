@@ -91,4 +91,13 @@ inline CouNumber exprMul:: operator () () {
   return (currValue_ = ret);
 }
 
+
+/// unified convexification of products and divisions
+
+void unifiedProdCuts (const CouenneCutGenerator *, OsiCuts &, 
+		      int, CouNumber, CouNumber, CouNumber,
+		      int, CouNumber, CouNumber, CouNumber,
+		      int, CouNumber, CouNumber, CouNumber,
+		      t_chg_bounds *);
+
 #endif

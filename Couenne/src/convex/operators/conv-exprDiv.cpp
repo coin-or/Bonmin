@@ -30,6 +30,7 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    CouNumber lbw, CouNumber ubw) {
 
   // TODO: Use method on Tawarmalani-Sahinidis
+  // PS: is it equivalent to unified approach?
 
   // compute y bounds
 
@@ -39,12 +40,11 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   CouNumber yl = (*yle) (), 
             yu = (*yue) (), k;
 
-  delete yle;
-  delete yue;
+  delete yle; delete yue;
 
   int xi = arglist_ [0] -> Index (),
-      wi = w  -> Index (),
-      yi = ye -> Index ();
+      wi = w            -> Index (),
+      yi = ye           -> Index ();
 
   bool cLW,  cRW,  cLY,  cRY = 
        cLW = cRW = cLY = true;
@@ -78,6 +78,9 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   delete wle; delete wue;
 
+  if (lbw > wl) wl = lbw;
+  if (ubw < wu) wu = ubw;
+
   // special case #2: w is almost constant (nonzero) --> w = x/y = k. We
   // only need a single plane x = y*k.
 
@@ -86,6 +89,22 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
     if (cLW || cRW) cg -> createCut (cs, 0., 0, yi, k, xi, -1.);
     return;
   }
+
+  expression *xle, *xue;
+  arglist_ [0] -> getBounds (xle, xue);
+
+  CouNumber xl = (*xle) (),
+            xu = (*xue) ();
+
+  delete xle;
+  delete xue;
+
+  unifiedProdCuts (cg, cs,
+		   wi, expression::Variable (wi), wl, wu,
+		   yi, expression::Variable (yi), yl, yu,
+		   xi, expression::Variable (xi), xl, xu, chg);
+
+
 
   // Add McCormick convexification cuts. Reduce w = x/y to x = wy and
   // apply the same rule as for multiplications:
@@ -96,8 +115,8 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
   // 3) x <= yl w + wu y - yl wu
   // 4) x <= yu w + wl y - yu wl
 
-  if ((cLY || cLW) && (is_boundbox_regular (yl,wl))) cg->createCut (cs,yl*wl,-1,xi,-1.,wi,yl,yi,wl);
-  if ((cRY || cRW) && (is_boundbox_regular (yu,wu))) cg->createCut (cs,yu*wu,-1,xi,-1.,wi,yu,yi,wu);
-  if ((cLY || cRW) && (is_boundbox_regular (yl,wu))) cg->createCut (cs,yl*wu,+1,xi,-1.,wi,yl,yi,wu);
-  if ((cRY || cLW) && (is_boundbox_regular (yu,wl))) cg->createCut (cs,yu*wl,+1,xi,-1.,wi,yu,yi,wl);
+  //if ((cLY || cLW) && (is_boundbox_regular (yl,wl))) cg->createCut (cs,yl*wl,-1,xi,-1.,wi,yl,yi,wl);
+  //if ((cRY || cRW) && (is_boundbox_regular (yu,wu))) cg->createCut (cs,yu*wu,-1,xi,-1.,wi,yu,yi,wu);
+  //if ((cLY || cRW) && (is_boundbox_regular (yl,wu))) cg->createCut (cs,yl*wu,+1,xi,-1.,wi,yl,yi,wu);
+  //if ((cRY || cLW) && (is_boundbox_regular (yu,wl))) cg->createCut (cs,yu*wl,+1,xi,-1.,wi,yu,yi,wl);
 }

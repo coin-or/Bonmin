@@ -49,6 +49,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprQuad.cpp \
 	expression/operators/bounds/exprBQuad.cpp \
 	expression/operators/impliedBounds-exprSum.cpp \
+	expression/operators/impliedBounds-exprQuad.cpp \
 	expression/operators/impliedBounds-exprDiv.cpp \
 	expression/operators/impliedBounds-exprMul.cpp \
 	expression/exprOp.cpp \
@@ -65,6 +66,7 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprMul-genCuts.cpp \
+	convex/operators/unifiedProdCuts.cpp \
 	convex/operators/conv-exprOpp.cpp \
 	convex/operators/conv-exprPow.cpp \
 	convex/operators/conv-exprPow-getBounds.cpp \

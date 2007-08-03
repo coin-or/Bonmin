@@ -101,6 +101,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	expression/operators/exprQuad.cpp \
 	expression/operators/bounds/exprBQuad.cpp \
 	expression/operators/impliedBounds-exprSum.cpp \
+	expression/operators/impliedBounds-exprQuad.cpp \
 	expression/operators/impliedBounds-exprDiv.cpp \
 	expression/operators/impliedBounds-exprMul.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
@@ -112,6 +113,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprMul-genCuts.cpp \
+	convex/operators/unifiedProdCuts.cpp \
 	convex/operators/conv-exprOpp.cpp \
 	convex/operators/conv-exprPow.cpp \
 	convex/operators/conv-exprPow-getBounds.cpp \
@@ -153,12 +155,13 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	exprExp.lo exprInv.lo exprLog.lo exprMul.lo exprOpp.lo \
 	exprPow.lo exprSin.lo exprCos.lo exprSub.lo exprSum.lo \
 	exprMinMax.lo exprGroup.lo exprQuad.lo exprBQuad.lo \
-	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
-	impliedBounds-exprMul.lo exprOp.lo exprUnary.lo exprVar.lo \
-	exprAux.lo expression.lo simplifiers.lo simplify.lo \
-	checkNLP.lo addEnvelope.lo createCuts.lo conv-exprAbs.lo \
-	conv-exprDiv.lo conv-exprMul.lo conv-exprMul-genCuts.lo \
-	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
+	impliedBounds-exprSum.lo impliedBounds-exprQuad.lo \
+	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo exprOp.lo \
+	exprUnary.lo exprVar.lo exprAux.lo expression.lo \
+	simplifiers.lo simplify.lo checkNLP.lo addEnvelope.lo \
+	createCuts.lo conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
+	conv-exprMul-genCuts.lo unifiedProdCuts.lo conv-exprOpp.lo \
+	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo powNewton.lo conv-exprSub.lo \
 	conv-exprSum.lo conv-exprInv.lo conv-exprSinCos.lo \
 	conv-exprExp.lo conv-exprLog.lo conv-exprGroup.lo \
@@ -407,6 +410,7 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	expression/operators/exprQuad.cpp \
 	expression/operators/bounds/exprBQuad.cpp \
 	expression/operators/impliedBounds-exprSum.cpp \
+	expression/operators/impliedBounds-exprQuad.cpp \
 	expression/operators/impliedBounds-exprDiv.cpp \
 	expression/operators/impliedBounds-exprMul.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
@@ -418,6 +422,7 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprMul-genCuts.cpp \
+	convex/operators/unifiedProdCuts.cpp \
 	convex/operators/conv-exprOpp.cpp \
 	convex/operators/conv-exprPow.cpp \
 	convex/operators/conv-exprPow-getBounds.cpp \
@@ -697,6 +702,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getFixVarBinFun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprMul.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprQuad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
@@ -717,6 +723,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sumStandardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trigNewton.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unifiedProdCuts.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -991,6 +998,13 @@ impliedBounds-exprSum.lo: expression/operators/impliedBounds-exprSum.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprSum.lo `test -f 'expression/operators/impliedBounds-exprSum.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprSum.cpp
 
+impliedBounds-exprQuad.lo: expression/operators/impliedBounds-exprQuad.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-exprQuad.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-exprQuad.Tpo" -c -o impliedBounds-exprQuad.lo `test -f 'expression/operators/impliedBounds-exprQuad.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprQuad.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-exprQuad.Tpo" "$(DEPDIR)/impliedBounds-exprQuad.Plo"; else rm -f "$(DEPDIR)/impliedBounds-exprQuad.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/operators/impliedBounds-exprQuad.cpp' object='impliedBounds-exprQuad.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprQuad.lo `test -f 'expression/operators/impliedBounds-exprQuad.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprQuad.cpp
+
 impliedBounds-exprDiv.lo: expression/operators/impliedBounds-exprDiv.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-exprDiv.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-exprDiv.Tpo" -c -o impliedBounds-exprDiv.lo `test -f 'expression/operators/impliedBounds-exprDiv.cpp' || echo '$(srcdir)/'`expression/operators/impliedBounds-exprDiv.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-exprDiv.Tpo" "$(DEPDIR)/impliedBounds-exprDiv.Plo"; else rm -f "$(DEPDIR)/impliedBounds-exprDiv.Tpo"; exit 1; fi
@@ -1102,6 +1116,13 @@ conv-exprMul-genCuts.lo: convex/operators/conv-exprMul-genCuts.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/conv-exprMul-genCuts.cpp' object='conv-exprMul-genCuts.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o conv-exprMul-genCuts.lo `test -f 'convex/operators/conv-exprMul-genCuts.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprMul-genCuts.cpp
+
+unifiedProdCuts.lo: convex/operators/unifiedProdCuts.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unifiedProdCuts.lo -MD -MP -MF "$(DEPDIR)/unifiedProdCuts.Tpo" -c -o unifiedProdCuts.lo `test -f 'convex/operators/unifiedProdCuts.cpp' || echo '$(srcdir)/'`convex/operators/unifiedProdCuts.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/unifiedProdCuts.Tpo" "$(DEPDIR)/unifiedProdCuts.Plo"; else rm -f "$(DEPDIR)/unifiedProdCuts.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/operators/unifiedProdCuts.cpp' object='unifiedProdCuts.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unifiedProdCuts.lo `test -f 'convex/operators/unifiedProdCuts.cpp' || echo '$(srcdir)/'`convex/operators/unifiedProdCuts.cpp
 
 conv-exprOpp.lo: convex/operators/conv-exprOpp.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT conv-exprOpp.lo -MD -MP -MF "$(DEPDIR)/conv-exprOpp.Tpo" -c -o conv-exprOpp.lo `test -f 'convex/operators/conv-exprOpp.cpp' || echo '$(srcdir)/'`convex/operators/conv-exprOpp.cpp; \

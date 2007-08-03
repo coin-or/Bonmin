@@ -31,6 +31,7 @@ exprQuad::exprQuad  (CouNumber c0,      // constant term
   dIndex_   (NULL),
   nDiag_    (0)     {
 
+  // count quadratic terms
   for (register int *qi = qindexI; *qi++ >= 0; nqterms_++);
 
   qindexI_ = new int       [nqterms_];
@@ -40,6 +41,7 @@ exprQuad::exprQuad  (CouNumber c0,      // constant term
   int qi, qj;
 
   for (register int i = nqterms_; i--;) {
+
     qindexI_ [i] = qi = qindexI [i];
     qindexJ_ [i] = qj = qindexJ [i];
     qcoeff_  [i] = (qi == qj) ? (qcoeff [i]) : (0.5 * qcoeff [i]); // Division
