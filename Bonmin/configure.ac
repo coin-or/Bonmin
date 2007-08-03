@@ -197,8 +197,6 @@ AC_CONFIG_FILES([Makefile
                  src/Algorithms/OaGenerators/Makefile
                  experimental/FP/Makefile
                  experimental/NotConvex/Makefile
-                 experimental/Lgp/Makefile
-                 experimental/Lgp/AsxCg/Makefile
                  test/Makefile
                  examples/CppExample/Makefile])
 

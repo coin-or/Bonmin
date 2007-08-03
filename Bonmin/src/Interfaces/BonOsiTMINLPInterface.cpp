@@ -1716,7 +1716,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
           oaHandler_->message(CUT_NOT_VIOLATED_ENOUGH, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEol;
         continue;}
         if(oaHandler_->logLevel() > 0)
-          oaHandler_->message(VIOLATED_OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEo
+          oaHandler_->message(VIOLATED_OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEol;
     }
     else if (oaHandler_->logLevel() > 0)
       oaHandler_->message(OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<CoinMessageEol;
