@@ -162,6 +162,14 @@ static void register_OA_options
       "Algorithm will take the risk of neglecting an element lower"
       " than this.");
 
+  roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
+                                         "level of log when generating OA cuts.",
+                                         0, 0,
+                                         "0: ouputs nothings,\n"
+                                         "1: when a cut is generated, its violation and index of row from which it originates,\n"
+                                         "2: always output violation of the cut.\n"
+                                         "3: ouput generated cuts incidence vectors.");
+
 }
 
 
@@ -257,6 +265,33 @@ OsiTMINLPInterface::Messages::Messages
               "OA on non-convex constraint is very experimental."));                                          
 
 }
+
+
+void  
+OsiTMINLPInterface::OaMessageHandler::print(OsiRowCut &row){
+  FILE * fp = filePointer();
+  const int &n = row.row().getNumElements();
+  fprintf(fp,"Row cut has %d elements. Lower bound: %g, upper bound %g.\n", n, row.lb(), row.ub());
+  const int * idx = row.row().getIndices();
+  const double * val = row.row().getElements();
+  for(int i = 0 ; i < n ; i++){
+    fprintf(fp,"%g, x%d",val[i], idx[i]);
+    if(i && i % 7 == 0)
+      fprintf(fp,"\n");
+  } 
+}
+
+OsiTMINLPInterface::OaMessages::OaMessages(): CoinMessages((int) OA_MESSAGES_DUMMY_END){
+   strcpy(source_,"OaCg");
+   addMessage(VIOLATED_OA_CUT_GENERATED, CoinOneMessage(
+              VIOLATED_OA_CUT_GENERATED + 1, 1,"Row %d, cut violation is %g: Outer approximation cut generated."));
+
+   addMessage(CUT_NOT_VIOLATED_ENOUGH, CoinOneMessage(
+              CUT_NOT_VIOLATED_ENOUGH + 1, 1,"Row %d, cut violation is %g: Outer approximation cut not generated."));
+
+   addMessage(OA_CUT_GENERATED, CoinOneMessage(
+              OA_CUT_GENERATED + 1, 1,"Row %d: Outer approximation cut not generated."));
+}
 bool OsiTMINLPInterface::hasPrintedOptions=0;
 
 ////////////////////////////////////////////////////////////////////
@@ -303,8 +338,13 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     veryTiny_(1e-20),
     infty_(1e100),
     exposeWarmStart_(false),
-    firstSolve_(true)
+    firstSolve_(true),
+    cutStrengthener_(NULL),
+    oaMessages_(),
+    oaHandler_(NULL)
 {
+   oaHandler_ = new OaMessageHandler;
+   oaHandler_->setLogLevel(0);
 }
 
 void 
@@ -425,7 +465,9 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     infty_(source.infty_),
     exposeWarmStart_(source.exposeWarmStart_),
     firstSolve_(true),
-    cut_strengthener_(source.cut_strengthener_)
+    cutStrengthener_(source.cutStrengthener_),
+    oaMessages_(),
+    oaHandler_(NULL)
 {
       messageHandler()->setLogLevel(source.messageHandler()->logLevel());
   //Pass in message handler
@@ -474,6 +516,10 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     throw SimpleError("Arrays for storing jacobian are inconsistant.",
         "copy constructor");
   }
+
+
+   oaHandler_ = new OaMessageHandler(*source.oaHandler_);;
+
 }
 
 OsiSolverInterface * 
@@ -576,7 +622,10 @@ app_ = NULL;
     numIterationSuspect_ = rhs.numIterationSuspect_;
 
     hasBeenOptimized_ = rhs.hasBeenOptimized_;
-    cut_strengthener_ = rhs.cut_strengthener_;
+    cutStrengthener_ = rhs.cutStrengthener_;
+
+    delete oaHandler_;
+    oaHandler_ = new OaMessageHandler(*rhs.oaHandler_);
 
     freeCachedData();
   }
@@ -602,6 +651,7 @@ OsiTMINLPInterface::~OsiTMINLPInterface ()
   delete [] jValues_;
   delete [] constTypes_;
   delete [] obj_;
+  delete oaHandler_;
 }
 
 void
@@ -728,7 +778,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
   app_->enableWarmStart();
   delete [] point;
 
-  optimization_status_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
+  optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
   hasBeenOptimized_ = true;
 }
 
@@ -775,7 +825,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
 
 
     messageHandler()->message(IPOPT_SUMMARY, messages_)
-    <<"resolveForRobustness"<<optimization_status_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<"resolveForRobustness"<<optimizationStatus_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
 
     const char * status=OPT_SYMB;
@@ -1645,8 +1695,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   }
 
   int * cut2rowIdx = NULL;
-  if (IsValid(cut_strengthener_)) {
-    cut2rowIdx = new int [numCuts];// Store correspondance between indices of cut and indices of rows. For each cut store the indice of the row which generated it.
+  if (IsValid(cutStrengthener_) || oaHandler_->logLevel() > 0) {
+    cut2rowIdx = new int [numCuts];// Store correspondance between indices of cut and indices of rows. For each cut
     for(int rowIdx = 0 ; rowIdx < m ; rowIdx++){
        if(row2cutIdx[rowIdx] >= 0){
           cut2rowIdx[row2cutIdx[rowIdx]] = rowIdx;
@@ -1661,21 +1711,28 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       double violation = 0.;
       violation = max(violation, rhs - ub[cutIdx]);
       violation = max(violation, lb[cutIdx] - rhs);
-      if(violation < theta) continue;
+      if(violation < theta) {
+        if(oaHandler_->logLevel() > 0)
+          oaHandler_->message(CUT_NOT_VIOLATED_ENOUGH, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEol;
+        continue;}
+        if(oaHandler_->logLevel() > 0)
+          oaHandler_->message(VIOLATED_OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEo
     }
-    OsiRowCut newCut;
+    else if (oaHandler_->logLevel() > 0)
+      oaHandler_->message(OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<CoinMessageEol;
+  OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
-    if (IsValid(cut_strengthener_)) {
+    if (IsValid(cutStrengthener_)) {
       const int& rowIdx = cut2rowIdx[cutIdx];
       bool retval =
-	cut_strengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
+	cutStrengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
 				       GetRawPtr(problem_), rowIdx,
 				       cuts[cutIdx], lb[cutIdx], ub[cutIdx], g[rowIdx],
 				       rowLower[rowIdx], rowUpper[rowIdx],
 				       n, x, infty);
       if (!retval) {
-	(*messageHandler()) << "error in cut_strengthener_->ComputeCuts\n";
+	(*messageHandler()) << "error in cutStrengthener_->ComputeCuts\n";
 	//exit(-2);
       }
     }
@@ -1688,6 +1745,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     newCut.setRow(cuts[cutIdx]);
     //    CftValidator validator;
     //    validator(newCut);
+    if(oaHandler_->logLevel()>2){
+      oaHandler_->print(newCut);}
     cs.insert(newCut);
   }
 
@@ -1728,16 +1787,16 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       if(violation < theta) genCut = false;
     }
     if(genCut) {
-      if (IsValid(cut_strengthener_)) {
+      if (IsValid(cutStrengthener_)) {
 	lb[nNonLinear_] = -infty;
 	bool retval =
-	  cut_strengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
+	  cutStrengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
 					 GetRawPtr(problem_), -1,
 					 v, lb[nNonLinear_], ub[nNonLinear_],
 					 ub[nNonLinear_], -infty, 0.,
 					 n, x, infty);
 	if (!retval) {
-	  std::cerr << "error in cut_strengthener_->ComputeCuts\n";
+	  std::cerr << "error in cutStrengthener_->ComputeCuts\n";
 	  //exit(-2);
 	}
       }
@@ -1847,7 +1906,7 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
   totalNlpSolveTime_-=CoinCpuTime();
   SmartPtr<TNLPSolver> app2 = app_->clone();
   app2->Options()->SetIntegerValue("print_level", (Index) 0);
-  optimization_status_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
+  optimizationStatus_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
   getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
 			, global);
@@ -2050,9 +2109,9 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 {
   totalNlpSolveTime_-=CoinCpuTime();
   if(warmStarted)
-    optimization_status_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
+    optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
   else
-    optimization_status_ = app_->OptimizeTNLP(GetRawPtr(problem_));
+    optimizationStatus_ = app_->OptimizeTNLP(GetRawPtr(problem_));
   totalNlpSolveTime_+=CoinCpuTime();
   nCallOptimizeTNLP_++;
   hasBeenOptimized_ = true;
@@ -2066,7 +2125,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   
   
 #if 1
-  if(optimization_status_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
+  if(optimizationStatus_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
   {
     (*messageHandler())<<"Too few degrees of freedom...."<<CoinMessageEol;
     int numrows = getNumRows();
@@ -2126,7 +2185,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   }
   else 
 #endif
-    if(!app_->isRecoverable(optimization_status_))//Solver failed and the error can not be recovered, throw it
+    if(!app_->isRecoverable(optimizationStatus_))//Solver failed and the error can not be recovered, throw it
     {
       std::string probName;
       getStrParam(OsiProbName, probName);
@@ -2179,7 +2238,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     }
   }
   messageHandler()->message(IPOPT_SUMMARY, messages_)
-    <<whereFrom<<optimization_status_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<whereFrom<<optimizationStatus_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
   
   if((nCallOptimizeTNLP_ % 20) == 1)
     messageHandler()->message(LOG_HEAD, messages_)<<CoinMessageEol;
@@ -2284,30 +2343,30 @@ OsiTMINLPInterface::resolve()
 bool OsiTMINLPInterface::isAbandoned() const
 {
   return (
-        (optimization_status_==TNLPSolver::iterationLimit)||
-        (optimization_status_==TNLPSolver::computationError)||
-        (optimization_status_==TNLPSolver::illDefinedProblem)||
-        (optimization_status_==TNLPSolver::illegalOption)||
-        (optimization_status_==TNLPSolver::externalException)||
-        (optimization_status_==TNLPSolver::exception)
+        (optimizationStatus_==TNLPSolver::iterationLimit)||
+        (optimizationStatus_==TNLPSolver::computationError)||
+        (optimizationStatus_==TNLPSolver::illDefinedProblem)||
+        (optimizationStatus_==TNLPSolver::illegalOption)||
+        (optimizationStatus_==TNLPSolver::externalException)||
+        (optimizationStatus_==TNLPSolver::exception)
       );
 }
 
 /// Is optimality proven?
 bool OsiTMINLPInterface::isProvenOptimal() const
 {
-  return (optimization_status_==TNLPSolver::solvedOptimal ||
-	  optimization_status_==TNLPSolver::solvedOptimalTol);
+  return (optimizationStatus_==TNLPSolver::solvedOptimal ||
+	  optimizationStatus_==TNLPSolver::solvedOptimalTol);
 }
 /// Is primal infeasiblity proven?
 bool OsiTMINLPInterface::isProvenPrimalInfeasible() const
 {
-  return (optimization_status_ == TNLPSolver::provenInfeasible);
+  return (optimizationStatus_ == TNLPSolver::provenInfeasible);
 }
 /// Is dual infeasiblity proven?
 bool OsiTMINLPInterface::isProvenDualInfeasible() const
 {
-  return (optimization_status_ == TNLPSolver::unbounded);
+  return (optimizationStatus_ == TNLPSolver::unbounded);
 }
 /// Is the given primal objective limit reached?
 bool OsiTMINLPInterface::isPrimalObjectiveLimitReached() const
@@ -2319,13 +2378,13 @@ bool OsiTMINLPInterface::isPrimalObjectiveLimitReached() const
 bool OsiTMINLPInterface::isDualObjectiveLimitReached() const
 {
   //  std::cerr<<"Warning : isDualObjectiveLimitReached not implemented yet"<<std::endl;
-  return (optimization_status_==TNLPSolver::unbounded);
+  return (optimizationStatus_==TNLPSolver::unbounded);
 
 }
 /// Iteration limit reached?
 bool OsiTMINLPInterface::isIterationLimitReached() const
 {
-  return (optimization_status_==TNLPSolver::iterationLimit);
+  return (optimizationStatus_==TNLPSolver::iterationLimit);
 }
 
 void
@@ -2349,7 +2408,10 @@ OsiTMINLPInterface::extractInterfaceParams()
       maxRandomRadius_ = 10.;
     }
 #endif
-    
+   
+   int oaCgLogLevel = 0;
+   app_->Options()->GetIntegerValue("oa_cuts_log_level", oaCgLogLevel,"bonmin.");
+   oaHandler_->setLogLevel(oaCgLogLevel); 
     
     int exposeWs = false;
     app_->Options()->GetEnumValue("warm_start", exposeWs, "bonmin.");
@@ -2372,7 +2434,7 @@ OsiTMINLPInterface::extractInterfaceParams()
 
     if (cut_strengthening_type != CS_None) {
       // TNLP solver to be used in the cut strengthener
-      cut_strengthener_ = new CutStrengthener(app_->clone(), app_->Options());
+      cutStrengthener_ = new CutStrengthener(app_->clone(), app_->Options());
     }
   }
 }

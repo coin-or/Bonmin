@@ -38,8 +38,8 @@ namespace Bonmin
   sos_(),
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
-  simpleConcaves_(NULL),
-  nonConvexConstraintsAndRelaxations_(NULL)
+  nonConvexConstraintsAndRelaxations_(NULL),
+  simpleConcaves_(NULL)
   {}
   
   
@@ -58,8 +58,8 @@ namespace Bonmin
   sos_(),
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
-  simpleConcaves_(NULL),
-  nonConvexConstraintsAndRelaxations_(NULL)
+  nonConvexConstraintsAndRelaxations_(NULL),
+  simpleConcaves_(NULL)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
   }
@@ -315,7 +315,7 @@ namespace Bonmin
            simpleConcaves_[numberSimpleConcave].yIdx = id_map[primary_var[i]];
            
         //Now get gradient of i to get xIdx.
-         int nnz;
+        int nnz;
         int & yIdx = simpleConcaves_[numberSimpleConcave].yIdx;
 	   int & xIdx = simpleConcaves_[numberSimpleConcave].xIdx;
         eval_grad_gi(n_var, NULL, false, i, nnz, jCol, NULL);

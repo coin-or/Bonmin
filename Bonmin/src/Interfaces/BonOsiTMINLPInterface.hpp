@@ -811,7 +811,7 @@ class Messages : public CoinMessages
   {
     return GetRawPtr(app_);
   } 
-  /** Methods to build outer approximations */
+  /** \name Methods to build outer approximations */
   //@{
   /** \brief Extract a linear relaxation of the MINLP.
    * Solve the continuous relaxation and takes first-order outer-approximation constraints at the optimum.
@@ -863,7 +863,55 @@ class Messages : public CoinMessages
    * \param ind indices of the coordinate*/
   double getFeasibilityOuterApproximation(int n, const double * x_bar,const int *ind, OsiCuts &cs, bool addOnlyViolated, bool global);
   //@}
-  /** get NLP constraint violation of current point */
+
+  /** \name output for OA cut generation
+       \todo All OA code here should be moved to a separate class sometime.*/
+  //@{
+  /** OA Messages types.*/
+  enum OaMessagesTypes {
+    CUT_NOT_VIOLATED_ENOUGH = 0/** Says that one cut has been generarted, where from, which is the violation.*/,
+    VIOLATED_OA_CUT_GENERATED/** Cut is not violated enough, give violation.*/,
+    OA_CUT_GENERATED/** Print the cut which has been generated.*/,
+    OA_MESSAGES_DUMMY_END/** Dummy end.*/};
+  /** Class to store OA Messages.*/
+  class OaMessages :public CoinMessages{
+     public:
+     /** Default constructor.*/
+     OaMessages();
+  };
+  /** Like a CoinMessageHandler but can print a cut also.*/
+  class OaMessageHandler : public CoinMessageHandler{
+    public:
+    /** Default constructor.*/
+    OaMessageHandler():CoinMessageHandler(){
+    }
+    /** Constructor to put to file pointer (fp won't be closed).*/
+    OaMessageHandler(FILE * fp):CoinMessageHandler(fp){
+    }
+    /** Destructor.*/
+    virtual ~OaMessageHandler(){
+    }
+    /** Copy constructor.*/
+    OaMessageHandler(const OaMessageHandler &other):
+    CoinMessageHandler(other){}
+    /** Constructor from a regular CoinMessageHandler.*/
+    OaMessageHandler(const CoinMessageHandler &other):
+    CoinMessageHandler(other){}
+    /** Assignment operator.*/
+    OaMessageHandler & operator=(const OaMessageHandler &rhs){
+       CoinMessageHandler::operator=(rhs);
+       return *this;}
+    /** Virtual copy */
+    virtual CoinMessageHandler* clone() const{
+      return new OaMessageHandler(*this);}
+    /** print an OsiRowCut.*/
+    void print(OsiRowCut &row);
+  };
+  void setOaMessageHandler(const CoinMessageHandler &handler){
+    delete oaHandler_;
+    oaHandler_ = new OaMessageHandler(handler);
+  }
+  //@}
 
 
    /** Add a collection of linear cuts to problem formulation.*/
@@ -1058,13 +1106,22 @@ protected:
   /** Value for infinity. */
   double infty_;
   /** status of last optimization. */
-  TNLPSolver::ReturnStatus optimization_status_;
+  TNLPSolver::ReturnStatus optimizationStatus_;
   /** Flag indicating if the warm start methods actually do something.*/
   bool exposeWarmStart_;
   /** Is it the first solve (for random starting point at root options).*/
   bool firstSolve_;
   /** Object for strengthening cuts */
-  SmartPtr<CutStrengthener> cut_strengthener_;
+  SmartPtr<CutStrengthener> cutStrengthener_;
+
+  /** \name output for OA cut generation
+       \todo All OA code here should be moved to a separate class sometime.*/
+  //@{
+  /** OA Messages.*/
+  OaMessages oaMessages_;
+  /** OA Message handler. */
+  OaMessageHandler * oaHandler_;
+  //@}
 protected:
   /** Facilitator to create an application. */
   void createApplication(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,

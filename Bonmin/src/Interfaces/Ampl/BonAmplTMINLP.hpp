@@ -212,7 +212,6 @@ namespace Bonmin
   
    /** Give access to constraint convexities */
    virtual const Convexity *  constraintsTypes(){
-     std::cout<<" in AmplTMINLP::constraintsTypes"<<std::endl;
      return constraintsConvexities_;}
    /** Give access to constraint convexities */
    virtual Convexity contraintType(int i){
@@ -228,7 +227,6 @@ namespace Bonmin
     return numberNonConvex_;}
 
   virtual int getNumberSimpleConcave(){
-     std::cout<<" in AmplTMINLP::constraintsTypes"<<std::endl;
      return numberSimpleConcave_;}
 
   virtual SimpleConcaveConstraint* getSimpleConcaveConstraints(){

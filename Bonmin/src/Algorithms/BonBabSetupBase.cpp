@@ -165,7 +165,9 @@ readOptions_(true)
 
 BabSetupBase::~BabSetupBase(){
   if(nonlinearSolver_ != continuousSolver_)
+  {
     delete nonlinearSolver_;
+  }
   delete continuousSolver_;
   delete branchingMethod_;
   for(CuttingMethods::iterator i = cutGenerators_.begin() ; i != cutGenerators_.end() ; i++){
