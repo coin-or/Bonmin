@@ -183,7 +183,7 @@ namespace Bonmin{
       fint* lws;
       fint m0de;
       fint ifail;
-      fint info[100]; // only [1] maybe...?
+      fint info[1];
       fint iprint;
       fint nout;
 

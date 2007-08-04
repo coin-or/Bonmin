@@ -184,6 +184,7 @@ namespace Bonmin{
     tnlp->get_bounds_info(n, cached_->bl, cached_->bu, 
 			  m, cached_->bl+n, cached_->bu+n);
 
+    cached_->use_warm_start_in_cache_ = true;  // Trying...
     return callOptimizer();
   }
 
@@ -247,7 +248,7 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
   ws = new real[mxws];
   lws = new fint[mxlws];
 
-#define InitializeAll
+  //#define InitializeAll
 #ifdef InitializeAll
   for (int i=0; i<mxws; i++) {
     ws[i] = 42.;
