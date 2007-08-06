@@ -46,10 +46,11 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
 			    t_chg_bounds *chg, int,
 			    CouNumber, CouNumber) {
-
+#ifdef DEBUG
   static bool warned_large_coeff = false;
 
   int nrc = cs.sizeRowCuts (), ncc = cs.sizeColCuts ();
+#endif
 
   /*
   if ((!(cg -> isFirst ())) && 

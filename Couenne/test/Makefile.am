@@ -12,29 +12,11 @@ AUTOMAKE_OPTIONS = foreign
 #                        testfun for Couenne                           #
 ########################################################################
 
-noinst_PROGRAMS = sdpcuts genrandQp testconv testeval testclp
+noinst_PROGRAMS = testconv testeval testclp
 
 testconv_SOURCES = fun/testconv.cpp
 testeval_SOURCES = fun/testeval.cpp
 testclp_SOURCES  = fun/clp-try.cpp
-
-sdpcuts_SOURCES  = fun/sdpcuts.cpp \
-	           fun/populate.cpp \
-	           fun/createCut.cpp \
-	           fun/SdpCutGen.cpp \
-	           fun/separateEV.cpp \
-	           fun/separateGrad.cpp \
-	           fun/separateTRM.cpp \
-	           fun/separateLU.cpp \
-	           fun/separateBK.cpp \
-	           fun/partialLU.c \
-	           fun/eigenPlay.cpp \
-	           fun/dsyevx_wrapper.cpp \
-	           fun/updateSol.cpp \
-		   fun/genSDPcut.cpp
-
-
-genrandQp_SOURCES = fun/genrandQp.c
 
 
 # List libraries of COIN projects
@@ -56,22 +38,13 @@ testclp_LDADD = \
 	$(COINLIBS) \
 	$(ADDLIBS)
 
-sdpcuts_LDADD = \
-        ../src/libCouenne.la \
-	/usr/local/lib/libdgqt.a \
-	$(ASLLIB) \
-	$(COINLIBS) \
-	$(ADDLIBS)
-
 COINLIBS = \
 	$(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 	$(CBCOBJDIR)/src/libCbc.la \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(COINUTILSOBJDIR)/../ThirdParty/Lapack/libcoinlapack.la
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
@@ -92,7 +65,6 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/util` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex/sdpcuts` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
@@ -127,9 +99,7 @@ endif
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
-#test: testconv$(EXEEXT) testeval$(EXEEXT) sdpcuts
-test: sdpcuts$(EXEEXT)
-#	./testfun$(EXEEXT)
+test: testconv$(EXEEXT) testeval$(EXEEXT)
 
 .PHONY: test
 

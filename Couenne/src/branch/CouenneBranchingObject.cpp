@@ -105,10 +105,11 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   int way = (!branchIndex_) ? firstBranch_ : !firstBranch_;
 
+#ifdef DEBUG
+
   CouNumber l = solver -> getColLower () [index_],
             u = solver -> getColUpper () [index_];
 
-#ifdef DEBUG
   if (way) {
     if      (value_ < l)             printf ("Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
     else if (value_ < l+COUENNE_EPS) printf ("## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);

@@ -27,9 +27,10 @@ CouNumber exprQuad::selectBranch (expression *w,
     *alpha = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
     maxcontr = -COUENNE_INFINITY;
 
-  int bestVar;
+  int bestVar = nqterms_ ? *qindexI_ : 
+    nlterms_ ? *index_ : -1; // initialize it to something very default
 
-  if (!alpha) { // no convexification available, 
+  if (!alpha) { // no convexification available,
                 // find the largest interval
 
     CouNumber maxcontr = -COUENNE_INFINITY; // maximum contribution to current value

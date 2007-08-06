@@ -43,7 +43,7 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
   bool is0const = (xe -> Type () == CONST),
        is1const = (ye -> Type () == CONST);
 
-  CouNumber c0, c1;
+  CouNumber c0=0, c1=0;
 
   // is one of the two constant?
 

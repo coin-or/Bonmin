@@ -45,9 +45,11 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       //    if ((auxiliaries_ [i] -> Image () -> code () == COU_EXPRSUM) ||
       //	(auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP))
 
+#ifdef DEBUG
       CouNumber 
 	l0 = lb_ [i], 
 	u0 = ub_ [i];
+#endif
 
       /*if (auxiliaries_ [i] -> Image () -> Argument () || 
 	  auxiliaries_ [i] -> Image () -> ArgList  ()) {

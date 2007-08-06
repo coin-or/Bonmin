@@ -90,8 +90,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     // data structure to be used below if there is a linear term.
     // which specifies position within arrays (negative for linear
     // part of exprGroup, positive for all elements of exprSum)
-    int maxindex = -1, *linind = NULL, nlin = 0, which;
+    int maxindex = -1, *linind = NULL, nlin = 0, which = 1;
     CouNumber c0 = 0., *lincoe = NULL, auxcoe = 1;
+    bool which_was_set = false;
 
     if (code != COU_EXPRSUM) { // check indices of linear part
 
@@ -115,6 +116,10 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	}
     }
 
+    if (which != 1) 
+      which_was_set = true;
+    else which = -1;
+
     // check indices of possible linear elements of (nonlinear) sum
 
     for (int i = body -> nArgs (); i--;) {
@@ -134,6 +139,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	auxcoe   = coeff;
       }
     }
+
+    if (!which_was_set && (which == -1)) // which has not been set
+      return -1;
 
     ///////////////////////////////////////////////////////////////////
 

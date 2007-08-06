@@ -78,30 +78,11 @@ int CouenneProblem::readnl (const ASL *asl) {
   printf ("como1_ = %d\n",  ((const ASL_fg *) asl) -> i.como1_ );
   printf ("como_ = %d\n",   ((const ASL_fg *) asl) -> i.como_  );*/
 
-  for (int i = 0; i < como + comc + comb; i++) {
-    expression *common = nl2e (((const ASL_fg *) asl) -> I.cexps_  [i] . e);
-    //commonexprs_.push_back (common);
-    //printf ("c %d/%d: ", i, como + comc + comb); 
-    //common -> print (); printf ("\n");    
-    exprAux *aux = addAuxiliary (common);
-    /*if (aux) {
-      printf ("created ");
-      aux -> print (); printf (" := ");
-      aux -> Image () -> print (); printf ("\n");
-      }*/
-  }
+  for (int i = 0; i < como + comc + comb; i++)
+    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps_  [i] . e));
 
-  for (int i = 0; i < como1 + comc1; i++) {
-    expression *common = nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e);
-    //commonexprs_.push_back (common);
-    //printf ("c1 %d/%d: ", i, como1 + comc1); common -> print (); printf ("\n");    
-    exprAux *aux = addAuxiliary (common);
-    /*if (aux) {
-      printf ("created ");
-      aux -> print (); printf (" := ");
-      aux -> Image () -> print (); printf ("\n");
-      }*/
-  }
+  for (int i = 0; i < como1 + comc1; i++) 
+    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e));
 
 
   // objective functions /////////////////////////////////////////////////////////////
