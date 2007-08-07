@@ -89,6 +89,7 @@ public:
         end_of_int_params
     };
     enum dbl_params {
+        dummy_dbl_param,
         //
         end_of_dbl_params
     };
@@ -99,6 +100,7 @@ public:
         end_of_str_params
     };
     enum str_array_params {
+        dummy_str_array_param,
         //
         end_of_str_array_params
     };
@@ -298,7 +300,8 @@ public:
 				const BCP_vec<BCP_cut*>& cuts,
 				const BCP_lp_var_pool& local_var_pool,
 				const BCP_lp_cut_pool& local_cut_pool,
-				BCP_vec<BCP_lp_branching_object*>& cans);
+				BCP_vec<BCP_lp_branching_object*>& cans,
+				bool force_branch = false);
 
     BCP_branching_decision bbBranch(OsiBranchingInformation& brInfo,
 				    BCP_vec<BCP_lp_branching_object*>& cands);

@@ -75,9 +75,7 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
 				       BCP_vec<double>& cut_new_bd)
 {
     BM_node* data = dynamic_cast<BM_node*>(get_user_data());
-    if (data) {
-	numNlpFailed_ = data->numNlpFailed_;
-    }
+    numNlpFailed_ = data->numNlpFailed_;
 
     int i;
     // First copy the bounds into nlp. That way all the branching decisions
@@ -156,9 +154,7 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 
     char prefix[100];
 #ifdef COIN_HAS_MPI
-    const BCP_proc_id* id = getLpProblemPointer()->get_process_id();
-    const BCP_mpi_id* mid = dynamic_cast<const BCP_mpi_id*>(id);
-    sprintf(prefix, "%i", mid->pid());
+    sprintf(prefix, "%i", getLpProblemPointer()->get_process_id());
 #else
     prefix[0] = 0;
 #endif
@@ -249,8 +245,9 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 	    /* yipee! a feasible solution! */
 	    sol = new BM_solution;
 	    //Just copy the solution stored in solver to sol
-	    double ptol;
-	    nlp.getDblParam(OsiPrimalTolerance, ptol);
+	    double ptol = 1e-8;
+	    // FIXME: I really should use the next line...
+	    // nlp.getDblParam(OsiPrimalTolerance, ptol);
 	    for (i = 0 ; i < numCols ; i++) {
 		if (fabs(primal_solution_[i]) > ptol)
 		    sol->add_entry(i, primal_solution_[i]); 

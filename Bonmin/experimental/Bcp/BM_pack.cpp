@@ -48,6 +48,8 @@ BM_tm::pack_module_data(BCP_buffer& buf, BCP_process_t ptype)
 	buf.pack(nl_file_content);
 	buf.pack(ipopt_file_content);
 	break;
+    case BCP_ProcessType_TS:
+	break;
     default:
 	abort();
     }

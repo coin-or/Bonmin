@@ -23,7 +23,8 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
                                    const BCP_vec<BCP_cut*>& cuts,
                                    const BCP_lp_var_pool& local_var_pool,
                                    const BCP_lp_cut_pool& local_cut_pool,
-                                   BCP_vec<BCP_lp_branching_object*>& cands)
+                                   BCP_vec<BCP_lp_branching_object*>& cands,
+				   bool force_branch)
 {
     const double objLimit = upper_bound() + cutOffDecrement_;
 
