@@ -218,9 +218,15 @@ namespace Bonmin
     }
 
     // Space for gradient
+    delete [] grad_f_;
+    grad_f_ = NULL;
     grad_f_ = new Number[n_];
 
     // Get nonzero entries in the matrices
+    delete [] irows_jac_;
+    delete [] jcols_jac_;
+    irows_jac_ = NULL;
+    jcols_jac_ = NULL;
     irows_jac_ = new Index[nnz_jac_];
     jcols_jac_ = new Index[nnz_jac_];
     if (!tnlp_->eval_jac_g(n_, NULL, false, m_, nnz_jac_,
@@ -233,9 +239,15 @@ namespace Bonmin
 	jcols_jac_[i]--;
       }
     }
+    delete [] jac_vals_;
+    jac_vals_ = NULL;
     jac_vals_ = new Number[nnz_jac_];
 
+    delete [] irows_hess_;
+    irows_hess_ = NULL;
     irows_hess_ = new Index[nnz_hess_];
+    delete [] jcols_hess_;
+    jcols_hess_ = NULL;
     jcols_hess_ = new Index[nnz_hess_];
     if (!tnlp_->eval_h(n_, NULL, false, 1., m_, NULL, false, nnz_hess_,
 		       irows_hess_, jcols_hess_, NULL)) {
@@ -247,25 +259,46 @@ namespace Bonmin
 	jcols_hess_[i]--;
       }
     }
+    delete [] hess_vals_;
     hess_vals_ = NULL; // We set it to NULL, so that we know later
     // that we still need to compute the values
 
     // Space for bounds
+    delete [] x_l_;
+    delete [] x_u_;
+    delete [] g_l_;
+    delete [] g_u_;
+    x_l_ = NULL;
+    x_u_ = NULL;
+    g_l_ = NULL;
+    g_u_ = NULL;
     x_l_ = new Number[n_];
     x_u_ = new Number[n_];
     g_l_ = new Number[m_];
     g_u_ = new Number[m_];
 
     // Get space for the activities maps
+    delete [] eq_x_free_map_;
+    delete [] eq_g_fixed_map_;
+    delete [] all_x_free_map_;
+    delete [] all_g_fixed_map_;
+    eq_x_free_map_ = NULL;
+    eq_g_fixed_map_ = NULL;
+    all_x_free_map_ = NULL;
+    all_g_fixed_map_ = NULL;
     eq_x_free_map_ = new Index[n_];
     eq_g_fixed_map_ = new Index[m_];
     all_x_free_map_ = new Index[n_];
     all_g_fixed_map_ = new Index[m_];
 
     // Get space for the multipliers
+    delete [] lambda_;
+    lambda_ = NULL;
     lambda_ = new Number[m_];
 
     // Get space for projected d
+    delete [] eq_projected_d_;
+    eq_projected_d_ = NULL;
     eq_projected_d_ = new Number[n_];
 
     initialized_ = true;
@@ -360,13 +393,13 @@ namespace Bonmin
 	  if (x_l_[i] < x_u_[i]) {
 	    if (orig_d[i]>0. && z_U[i]*orig_d[i]>zTol) {
 	      active_x_.push_back(i+1);
-	      DBG_ASSERT(x_u_[i] < 1e19);
+	      // CHECK DBG_ASSERT(x_u_[i] < 1e19);
 	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_U[i]);
 	    }
 	    else if (orig_d[i]<0. && -z_L[i]*orig_d[i]>zTol) {
 	      active_x_.push_back(-(i+1));
-	      DBG_ASSERT(x_l_[i] > -1e19);
+	      // CHECK DBG_ASSERT(x_l_[i] > -1e19);
 	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_L[i]);
 	    }
