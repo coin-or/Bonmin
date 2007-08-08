@@ -42,6 +42,9 @@ namespace Bonmin
       g_l_(NULL),
       g_u_(NULL),
       x_init_(NULL),
+      n_x_init_(0),
+      m_x_init_(0),
+      capacity_x_init_(0),
       x_init_user_(NULL),
       x_sol_(NULL),
       g_sol_(NULL),
@@ -88,7 +91,10 @@ namespace Bonmin
     //    }
 
     // Allocate space for the initial point
-    x_init_ = new Number[3*n_ + m_];
+    n_x_init_ = n_;
+    m_x_init_ = m_;
+    capacity_x_init_ = 3*n_ + 2* m_;//Leave space for adding constraint
+    x_init_ = new Number[capacity_x_init_];
     tminlp_->get_starting_point(n_, true, x_init_, false, NULL, NULL,
         m_, false, NULL);
     x_init_user_ = new Number[n_];
@@ -114,6 +120,9 @@ namespace Bonmin
     nnz_h_lag_(other.nnz_h_lag_),
     index_style_(other.index_style_),
     duals_init_(NULL),
+    n_x_init_(other.n_x_init_),
+    m_x_init_(other.m_x_init_),
+    capacity_x_init_(other.capacity_x_init_),
     x_sol_(NULL),
     g_sol_(NULL),
     duals_sol_(NULL)
@@ -136,9 +145,9 @@ namespace Bonmin
     IpBlasDcopy(m_, other.g_l_, 1, g_l_, 1);
     IpBlasDcopy(m_, other.g_u_, 1, g_u_, 1);
 
-    x_init_ = new Number[3*n_ + m_];
+    x_init_ = new Number[capacity_x_init_];
     x_init_user_ = new Number[n_];
-    IpBlasDcopy(n_, other.x_init_, 1, x_init_, 1);
+    IpBlasDcopy(n_, other.x_init_user_, 1, x_init_user_, 1);
 
     copyUserModification(other);
   }
@@ -192,7 +201,7 @@ namespace Bonmin
 
     if(other.duals_init_) {
       duals_init_ = &x_init_[n_];
-      IpBlasDcopy(3*n_+ m_, other.x_init_, 1, x_init_, 1);
+      IpBlasDcopy(capacity_x_init_, other.x_init_, 1, x_init_, 1);
     }
     else
       IpBlasDcopy(n_, other.x_init_, 1, x_init_, 1);
@@ -349,8 +358,8 @@ namespace Bonmin
     IpBlasDcopy(n_, x_u_, 1, x_u, 1);
     IpBlasDcopy(m_, g_l_, 1, g_l, 1);
     IpBlasDcopy(m_, g_u_, 1, g_u, 1);
-    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->lower_, 1, &g_l[m_],1); 
-    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->upper_, 1, &g_u[m_],1); 
+    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->cutsLower_, 1, &g_l[m_],1); 
+    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->cutsUpper_, 1, &g_u[m_],1); 
     return true;
   }
 
@@ -369,18 +378,17 @@ namespace Bonmin
     if (init_z == true) {
       if(duals_init_ == NULL)
         return false;
-      IpBlasDcopy(n, &duals_init_[m], 1, z_L, 1);
-      IpBlasDcopy(n, &duals_init_[m + n], 1, z_U, 1);
+      IpBlasDcopy(n, duals_init_, 1, z_L, 1);
+      IpBlasDcopy(n, duals_init_ + n, 1, z_U, 1);
 
     }
     if(init_lambda == true) {
       if(duals_init_ == NULL)
         return false;
-      IpBlasDcopy(m_, duals_init_, 1, lambda, 1);
-      for(int i = 0 ; i < tminlp_->nLinearCuts_; i++)
-      {
-        lambda [i + m_] = 0.;
-      }
+      int size= 3*n + m_ + tminlp_->nLinearCuts_;
+      if(size > capacity_x_init_)
+        resizeStartingPoint();
+      IpBlasDcopy(m_, duals_init_ + 2*n , 1, lambda, 1);
     }
 
     need_new_warm_starter_ = true;
@@ -416,15 +424,12 @@ namespace Bonmin
   {
     // Add the linear cuts
     int nnz = 0;
-    for(int i = 0 ; i < tminlp_->nLinearCuts_ ; i++)
-    {
-      int iplusm = m_ + i;
-      g[iplusm] = 0.;
-      while(tminlp_->iRow_[nnz]==i) {
-	g[iplusm] += tminlp_->elems_[nnz] * x[tminlp_->jCol_[nnz]];
-	nnz++;
-      }
+    g += m_;
+    CoinZeroN(g , tminlp_->nLinearCuts_);
+    for(int nnz = 0 ; nnz < tminlp_->linearCutsNnz_ ; nnz++){
+      g[tminlp_->cutsiRow_[nnz]] += tminlp_->cutsElems_[nnz] * x[tminlp_->cutsjCol_[nnz]];
     }
+
   }
 
   bool TMINLP2TNLP::eval_g(Index n, const Number* x, bool new_x,
@@ -445,23 +450,16 @@ namespace Bonmin
       DBG_ASSERT(values == NULL);
 
       int nnz = nele_jac - tminlp_->linearCutsNnz_ ;
-      if (index_style_ == TNLP::FORTRAN_STYLE) {
+      int offset = (index_style_ == TNLP::FORTRAN_STYLE);
 	for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++) {
-	  iRow[nnz] = tminlp_->iRow_[i] + m_ + 1; 
-	  jCol[nnz] = tminlp_->jCol_[i] + 1;
+	  iRow[nnz] = tminlp_->cutsiRow_[i] + m_ + offset; 
+	  jCol[nnz] = tminlp_->cutsjCol_[i] + offset;
 	}
-      }
-      else {
-	for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++) {
-	  iRow[nnz] = tminlp_->iRow_[i] + m_; 
-	  jCol[nnz] = tminlp_->jCol_[i];
-	}
-      }
     }
     else {
       DBG_ASSERT(jCol == NULL);
       DBG_ASSERT(values != NULL);
-      IpBlasDcopy(tminlp_->linearCutsNnz_ , tminlp_->elems_, 1,
+      IpBlasDcopy(tminlp_->linearCutsNnz_ , tminlp_->cutsElems_, 1,
 		  &values[nele_jac - tminlp_->linearCutsNnz_],1);
     }
   }
@@ -484,7 +482,7 @@ namespace Bonmin
       bool new_lambda, Index nele_hess,
       Index* iRow, Index* jCol, Number* values)
   {
-    return tminlp_->eval_h(n, x, new_x, obj_factor, m, lambda,
+    return tminlp_->eval_h(n, x, new_x, obj_factor, m_ , lambda,
         new_lambda, nele_hess,
         iRow, jCol, values);
   }
@@ -503,18 +501,16 @@ namespace Bonmin
     }
     IpBlasDcopy(n, x, 1, x_sol_, 1);
 
-    if(!g_sol_) {
-      g_sol_ = new Number [m];
-    }
+    delete [] g_sol_;
+    g_sol_ = new Number [m];
     IpBlasDcopy(m, g, 1, g_sol_, 1);
-    if (!duals_sol_) {
-      duals_sol_ = new Number[m + 2*n];
-    }
+    delete [] duals_sol_;
+    duals_sol_ = new Number[m + 2*n];
     if(lambda){
-      IpBlasDcopy(m, lambda, 1, duals_sol_, 1);
+      IpBlasDcopy(m, lambda, 1, duals_sol_ + 2*n, 1);
       
-      IpBlasDcopy(n, z_L, 1 , duals_sol_ + m, 1);
-      IpBlasDcopy(n, z_U, 1 , duals_sol_ + m + n, 1);
+      IpBlasDcopy(n, z_L, 1 , duals_sol_ , 1);
+      IpBlasDcopy(n, z_U, 1 , duals_sol_ + n, 1);
     }
 
     return_status_ = status;
@@ -704,6 +700,18 @@ namespace Bonmin
   TMINLP2TNLP::evaluateUpperBoundingFunction(const double * x){
     tminlp_->eval_upper_bound_f(n_, x, obj_value_);
   }
-}
-// namespace Ipopt
+  /** Resizes the starting point array in case cuts have been added or removed.
+      Puts zeroes for eventually added cuts*/
+  void 
+  TMINLP2TNLP::resizeStartingPoint(){
+    //Always resize to have the capacity to hold twice the current number of constraints
+    int newCapacity = 3 * n_ + 2 * (m_ + tminlp_->nLinearCuts_);
+    double * new_x_init= new double [newCapacity];
+    CoinCopyN(x_init_, min(capacity_x_init_, newCapacity) , new_x_init);
+    CoinZeroN(new_x_init, max(newCapacity - capacity_x_init_, 0));
+    delete [] x_init_;
+    x_init_ = new_x_init;
+    duals_init_ = x_init_ + n_;
+  }
+}// namespace Ipopt
 

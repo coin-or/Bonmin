@@ -109,9 +109,9 @@ BonCurvBranching::fill_changes(OsiSolverInterface * solver,
   const double* solution = solver->getColSolution();// Current solution
   int numCols = solver->getNumCols();
   int numRows = solver->getNumRows();
-  const double* lam = solver->getRowPrice();
-  const double* z_L = lam + numRows;
+  const double* z_L = solver->getRowPrice();
   const double* z_U = z_L + numCols;
+  const double* lam = z_U + numCols;
   const double* b_L = solver->getColLower();
   const double* b_U = solver->getColUpper();
 

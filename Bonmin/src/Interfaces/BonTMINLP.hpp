@@ -418,15 +418,15 @@ namespace Bonmin
   /** resize arrays for linear cuts */
   void resizeLinearCuts(int newNumberCuts, int newNnz);
   /** columnindices of linear cuts. */
-   int * jCol_;
+   int * cutsjCol_;
   /** rows indices of linear cuts. */
-   int * iRow_;
+   int * cutsiRow_;
   /** elements of linear cuts.*/
-  double * elems_;
+  double * cutsElems_;
   /** lower bounds for linear cuts. */
-  double * lower_;
+  double * cutsLower_;
   /** upper bounds for linear cuts. */
-  double * upper_;
+  double * cutsUpper_;
   /** number of linear cuts.*/
   int nLinearCuts_;
   /** number of non-zeroes in linear cuts*/

@@ -317,21 +317,21 @@ IpoptSolver::setWarmStart(const CoinWarmStart* warmstart,
     CoinWarmStartBasis::Status status = ws->getStructStatus(i);
     if(status == CoinWarmStartBasis::atLowerBound) {
       tnlp->setxInit(i,colLow[i]);
-      tnlp->setDualInit(i + numcols + numrows,0.);
+      tnlp->setDualInit(i + numcols,0.);
     }
     else if(status == CoinWarmStartBasis::atUpperBound) {
       tnlp->setxInit(i,colUp[i]);
-      tnlp->setDualInit(i + numrows,0.);
+      tnlp->setDualInit(i ,0.);
     }
     else {
-      tnlp->setDualInit(i + numrows,0.);
-      tnlp->setDualInit(i + numcols + numrows, 0.);
+      tnlp->setDualInit(i ,0.);
+      tnlp->setDualInit(i + numcols , 0.);
     }
   }
   for(int i = 0; i < numrows ; i++) {
     CoinWarmStartBasis::Status status = ws->getArtifStatus(i);
     if(status == CoinWarmStartBasis::atLowerBound) {
-      tnlp->setDualInit(i,0.);
+      tnlp->setDualInit(i + 2*numcols , 0.);
     }
   }
   int nElem = ws->values()->getNumElements();

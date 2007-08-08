@@ -78,9 +78,9 @@ private:
   /** Non zero values of the starting point. Primal and dual values are stored in the following order <p>
       <UL>
       <li> From 1 to CoinWarmStartBasis::numStrtucturals_ : values for primal variables (\f$ x \f$ ),
-      <li> From numStructurals_+1 to  2numStructurals_ : values for dual variables associated to lower bound constraints on structurals (constraints \f$ l \leq x \f$).
-      <li> From 2 numStructurals_+1 to  3 numStructurals_ : values for dual variables associated to lower bound constraints on structurals (constraints \f$ x \leq u\f$).
-      <li> From 3 numStructurals_+1 to  3 numStructurals_ + numArtificials_ : values for dual varaibles associated with regular constraints (constraints \f$ g(x) = 0 \f$).
+      <li> From numStructurals_+1 to  2 * numStructurals_ : values for dual variables associated to lower bound constraints on structurals (constraints \f$ l \leq x \f$).
+      <li> From 2 numStructurals_+1 to  3 * numStructurals_ : values for dual variables associated to upper bound constraints on structurals (constraints \f$ x \leq u\f$).
+      <li> From 3 numStructurals_+1 to  3 * numStructurals_ + numArtificials_ : values for dual variables associated with regular constraints (constraints \f$ g(x) \leq 0 \f$).
       </UL>
   */
   mutable CoinPackedVector values_;

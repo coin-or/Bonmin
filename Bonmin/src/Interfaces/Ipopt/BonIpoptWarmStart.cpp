@@ -52,8 +52,8 @@ IpoptWarmStart::IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
   for(int i = 0 ; i < numcols ; i++) {
     if(primals[i] - colLo[i] < epsilon) {
       setStructStatus(i, atLowerBound);
-      if(fabs(duals[i + numrows]) > epsilon) {
-        values_.insert(i + numcols + numrows ,duals[i + numrows]);
+      if(fabs(duals[i]) > epsilon) {
+        values_.insert(i + numcols ,duals[i]);
       }
 
 //       assert(duals[i +numrows + numcols] <= 100 * epsilon
@@ -65,8 +65,8 @@ IpoptWarmStart::IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
     }
     else if( colUp[i] - primals[i] < epsilon) {
       setStructStatus(i, atUpperBound);
-      if(fabs(duals[i + numrows + numcols]) > epsilon) {
-        values_.insert(i + 2 * numcols + numrows ,duals[i + numrows + numcols]);
+      if(fabs(duals[i + numcols]) > epsilon) {
+        values_.insert(i + 2 * numcols ,duals[i + numcols]);
       }
 //       assert(duals[i + numrows] <= epsilon
 // 	     ||
@@ -88,8 +88,8 @@ IpoptWarmStart::IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
 
   // int i2 = 2*numcols;
   for(int i = 0 ; i < numrows ; i++) {
-    if(fabs(duals[i])> epsilon) {
-      values_.insert(i + numcols,duals[i]);
+    if(fabs(duals[i + 2*numcols])> epsilon) {
+      values_.insert(i + 3 * numcols,duals[i + 2*numcols]);
       setArtifStatus(i, basic);
     }
     else {

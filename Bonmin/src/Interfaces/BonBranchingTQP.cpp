@@ -43,7 +43,7 @@ namespace Bonmin
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate objective gradient in BranchingTQP");
     bool new_lambda = true; // ToDo: maybe NOT new?
-    retval = tminlp_->eval_h(n_, x_sol_, new_x, 1., m_, duals_sol_,
+    retval = tminlp_->eval_h(n_, x_sol_, new_x, 1., m_, duals_sol_ + 2 * n_,
 			     new_lambda, nnz_h_lag_, obj_hess_irow_,
 			     obj_hess_jcol_, NULL);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
@@ -54,7 +54,7 @@ namespace Bonmin
 	obj_hess_jcol_[i]--;
       }
     }
-    retval = tminlp_->eval_h(n_, x_sol_, new_x, 1., m_, duals_sol_,
+    retval = tminlp_->eval_h(n_, x_sol_, new_x, 1., m_, duals_sol_ + 2*n_,
 			     new_lambda, nnz_h_lag_, NULL, NULL, obj_hess_);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate objective Hessian values in BranchingTQP");
@@ -114,13 +114,13 @@ namespace Bonmin
     }
     if (init_z == true) {
       DBG_ASSERT(duals_sol_copy_);
-      IpBlasDcopy(n, &duals_sol_copy_[m], 1, z_L, 1);
-      IpBlasDcopy(n, &duals_sol_copy_[m + n], 1, z_U, 1);
+      IpBlasDcopy(n, duals_sol_copy_, 1, z_L, 1);
+      IpBlasDcopy(n, duals_sol_copy_ + n, 1, z_U, 1);
 
     }
     if(init_lambda == true) {
       DBG_ASSERT(duals_sol_copy_);
-      IpBlasDcopy(m_, duals_sol_copy_, 1, lambda, 1);
+      IpBlasDcopy(m_, duals_sol_copy_ + 2*n_, 1, lambda, 1);
       for(int i = m_ ; i < m; i++)
       {
         lambda[i] = 0.;

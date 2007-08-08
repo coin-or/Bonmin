@@ -1636,7 +1636,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   const double * rowUpper = getRowUpper();
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
-  const double * duals = getRowPrice();
+  const double * duals = getRowPrice() + 2 * n;
   double infty = getInfinity();
   double nlp_infty = infty_;
   
@@ -1843,7 +1843,7 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   const double rowUpper = getRowUpper()[rowIdx];
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
-  const double dual = getRowPrice()[rowIdx];
+  const double dual = (getRowPrice() + 2 * getNumCols())[rowIdx];
   double infty = getInfinity();
   double nlp_infty = infty_;
   
@@ -1954,7 +1954,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   const double * rowUpper = getRowUpper();
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
-  const double * duals = getRowPrice();
+  const double * duals = getRowPrice() + 2*n;
   assert(m==getNumRows());
   double infty = getInfinity();
   double nlp_infty = infty_;

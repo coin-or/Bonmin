@@ -96,11 +96,11 @@ void TMINLP::PerturbInfo::SetPerturbationArray(Index numvars, const double* pert
 }
 
 TMINLP::TMINLP():
-    jCol_(NULL),
-    iRow_(NULL),
-    elems_(NULL),
-    lower_(NULL),
-    upper_(NULL),
+    cutsjCol_(NULL),
+    cutsiRow_(NULL),
+    cutsElems_(NULL),
+    cutsLower_(NULL),
+    cutsUpper_(NULL),
     nLinearCuts_(0),
     linearCutsNnz_(0),
     linearCutsCapacity_(0),
@@ -139,12 +139,12 @@ TMINLP::addCuts(int numberCuts, const OsiRowCut ** cuts){
    for(int j = 0; j < size ; j++)
    {
     DBG_ASSERT(ind[j] < n);
-    jCol_[nnz] = ind[j];
-    iRow_[nnz] = iplusn;
-    elems_[nnz++] = values[j];
+    cutsjCol_[nnz] = ind[j];
+    cutsiRow_[nnz] = iplusn;
+    cutsElems_[nnz++] = values[j];
    }
-   lower_[iplusn] = cuts[i]->lb();
-   upper_[iplusn] = cuts[i]->ub();
+   cutsLower_[iplusn] = cuts[i]->lb();
+   cutsUpper_[iplusn] = cuts[i]->ub();
   }
  nLinearCuts_+=numberCuts;
  linearCutsNnz_=nnz;
@@ -159,13 +159,13 @@ TMINLP::resizeLinearCuts(int newNumberCuts, int newNnz)
      double * newUpper = new double[newNumberCuts];
      if(linearCutsCapacity_)
      {
-       IpBlasDcopy(nLinearCuts_, lower_, 1, newLower, 1);
-       IpBlasDcopy(nLinearCuts_, upper_, 1, newUpper, 1);
-       delete [] lower_;
-       delete [] upper_;
+       IpBlasDcopy(nLinearCuts_, cutsLower_, 1, newLower, 1);
+       IpBlasDcopy(nLinearCuts_, cutsUpper_, 1, newUpper, 1);
+       delete [] cutsLower_;
+       delete [] cutsUpper_;
      }
-     lower_ = newLower;
-     upper_ = newUpper;
+     cutsLower_ = newLower;
+     cutsUpper_ = newUpper;
      linearCutsCapacity_ = newNumberCuts;
   }
   if(newNnz > linearCutsNnzCapacity_)
@@ -175,43 +175,54 @@ TMINLP::resizeLinearCuts(int newNumberCuts, int newNnz)
     int * newjCol = new int [newNnz];
     if(linearCutsNnz_)
     {
-      IpBlasDcopy(linearCutsNnz_, elems_, 1, newElems, 1);
+      IpBlasDcopy(linearCutsNnz_, cutsElems_, 1, newElems, 1);
       for(int i = 0 ; i < linearCutsNnz_ ; i++) 
       {
-        newiRow[i] = iRow_[i];
-        newjCol[i] = jCol_[i];
+        newiRow[i] = cutsiRow_[i];
+        newjCol[i] = cutsjCol_[i];
       }
-      delete [] elems_;
-      delete [] iRow_;
-      delete [] jCol_;
+      delete [] cutsElems_;
+      delete [] cutsiRow_;
+      delete [] cutsjCol_;
     }
-    elems_ = newElems;
-    iRow_ = newiRow;
-    jCol_ = newjCol;
+    cutsElems_ = newElems;
+    cutsiRow_ = newiRow;
+    cutsjCol_ = newjCol;
     linearCutsNnzCapacity_ = newNnz;
   }
 }
 void
 TMINLP::removeCuts(int number, const int * toRemove){
- if(! CoinIsSorted(toRemove, number))
- {
+   if(number==0) return;
+    int n,m,nnz_lag,nnz_hess;
+   Ipopt::TNLP::IndexStyleEnum fort;
+   get_nlp_info(n,m,nnz_lag,nnz_hess,fort);
+
    int * sorted = new int[number];
-   for(int i = 0 ; i < number ; i++) sorted[i] = toRemove[i];
+   for(int i = 0 ; i < number ; i++) sorted[i] = toRemove[i] - m;
    std::sort(sorted, sorted + number);  
    int iNew = 0;
    int k = 0;
    for(int i = 0 ; i < linearCutsNnz_ ; i++)
    {
-     if(toRemove[k] < iRow_[i]) k++;
-     if(toRemove[k] < iRow_[i]) throw -1;
-     if(toRemove[k] == iRow_[i]) continue;
-     iRow_[iNew] = iRow_[i] - k;
-     jCol_[iNew] = jCol_[i];
-     elems_[iNew++] = jCol_[i];
+     if(sorted[k] < cutsiRow_[i]) k++;
+     if(sorted[k] < cutsiRow_[i]) throw -1;
+     if(sorted[k] == cutsiRow_[i]) continue;
+     cutsiRow_[iNew] = cutsiRow_[i] - k;
+     cutsjCol_[iNew] = cutsjCol_[i];
+     cutsElems_[iNew++] = cutsElems_[i];
    }
+ k=0;
+ for(int i = sorted[k] ; i < nLinearCuts_ ; i++){
+    if(sorted[k] < i) k++;
+    if(sorted[k] < i) throw -1;
+    if(sorted[k] == i) continue;
+    cutsLower_[i - k] = cutsLower_[i];
+    cutsUpper_[i - k] = cutsUpper_[i];
+ }
  linearCutsNnz_ = iNew;
  nLinearCuts_ -= number;
- }
+ delete [] sorted;
 }
 void
 TMINLP::removeLastCuts(int number){
@@ -219,11 +230,11 @@ TMINLP::removeLastCuts(int number){
  int iNew = 0;
    for(int i = 0 ; i < linearCutsNnz_ ; i++)
    {
-     if(iRow_[i] >= number) {
+     if(cutsiRow_[i] >= number) {
      continue;}
-     iRow_[iNew] = iRow_[i];
-     jCol_[iNew] = jCol_[i];
-     elems_[iNew++] = elems_[i];
+     cutsiRow_[iNew] = cutsiRow_[i];
+     cutsjCol_[iNew] = cutsjCol_[i];
+     cutsElems_[iNew++] = cutsElems_[i];
    }
  linearCutsNnz_ = iNew;
  nLinearCuts_ = number;
