@@ -97,7 +97,7 @@ namespace Bonmin
     /** virtual callback function to eventually modify objects for integer variable
         (replace with user set). This is called after CbcModel::findIntegers */
     virtual void replaceIntegers(OsiObject ** objects, int numberObjects)
-    {};
+    {}
 
   protected:
     /** Stores the solution of MIP. */

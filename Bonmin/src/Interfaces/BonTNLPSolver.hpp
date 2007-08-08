@@ -155,7 +155,7 @@ TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
    virtual Ipopt::SmartPtr<Ipopt::OptionsList> Options() = 0;
 
    /// Register this solver options into passed roptions
-static void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){};
+static void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){}
 
    /// Get the CpuTime of the last optimization.
    virtual double CPUTime() = 0;
