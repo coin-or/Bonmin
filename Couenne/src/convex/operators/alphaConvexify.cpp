@@ -100,8 +100,10 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
     int col = indexmap [getQIndexJ () [i]];
 
     // compute value of matrix entry = q_ij * (u_i-l_i) * (u_j-l_j)
-    if (row < col) matrix [row * nDiag_ + col] = getQCoeffs () [i] * diam [row] * diam [col];
-    else           matrix [col * nDiag_ + row] = getQCoeffs () [i] * diam [row] * diam [col];
+    // I (Stefan) do not understand the Lapack docu; it says it needs only the lower triangular
+    // but it seem to need both parts to work correct
+                    matrix [col * nDiag_ + row] = getQCoeffs () [i] * diam [row] * diam [col];
+    if (row != col) matrix [row * nDiag_ + col] = getQCoeffs () [i] * diam [row] * diam [col];
     //		printf("row %d, col %d: %f\n", row, col, matrix[col*nDiag_+row]);
   }
 
