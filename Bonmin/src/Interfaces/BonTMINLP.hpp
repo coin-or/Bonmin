@@ -200,8 +200,7 @@ namespace Bonmin
     TMINLP();
 
     /** Default destructor */
-    virtual ~TMINLP()
-    {}
+    virtual ~TMINLP();
     //@}
 
     /**@name methods to gather information about the MINLP */
@@ -389,7 +388,7 @@ namespace Bonmin
     return 0;}
   
   /** Get array describing the constraints marќed as nonconvex.*/
-  virtual MarkedNonConvex * getMarkedNonConvex(){
+  virtual const MarkedNonConvex * getMarkedNonConvex() const{
     return NULL;}
 
   /** Get the number of constraints marked simple concave in the problem.*/
@@ -397,7 +396,7 @@ namespace Bonmin
     return 0;}
 
   /** Get array of simple concave constraints descriptions.*/
-  virtual SimpleConcaveConstraint * getSimpleConcaveConstraints(){
+  virtual const SimpleConcaveConstraint * getSimpleConcaveConstraints() const{
      return NULL;}
   private:
     /**@name Default Compiler Generated Methods

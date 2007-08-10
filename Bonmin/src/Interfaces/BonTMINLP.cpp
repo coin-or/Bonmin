@@ -108,6 +108,18 @@ TMINLP::TMINLP():
     {}
 
 
+/** Default destructor */
+virtual 
+TMINLP::~TMINLP()
+{
+   delete [] cutsElems_;
+   delete [] cutsiRow_;
+   delete [] cutsjCol_;
+   delete [] cutsLower_;
+   delete [] cutsUpper_;
+}
+
+
 void
 TMINLP::addCuts(int numberCuts, const OsiRowCut ** cuts){
 
@@ -173,7 +185,7 @@ TMINLP::resizeLinearCuts(int newNumberCuts, int newNnz)
     double * newElems = new double [newNnz];
     int * newiRow = new int [newNnz];
     int * newjCol = new int [newNnz];
-    if(linearCutsNnz_)
+    if(linearCutsNnzCapacity_)
     {
       IpBlasDcopy(linearCutsNnz_, cutsElems_, 1, newElems, 1);
       for(int i = 0 ; i < linearCutsNnz_ ; i++) 

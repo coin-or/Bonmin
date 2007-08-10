@@ -221,7 +221,7 @@ namespace Bonmin
        return TMINLP::Convex;}
 
    /** Index in the set of all constraints of the non convex constraint i*/
-   virtual MarkedNonConvex * getMarkedNonConvex(){
+   virtual const MarkedNonConvex * getMarkedNonConvex() const{
       return nonConvexConstraintsAndRelaxations_;}
   virtual int  getNumberNonConvex(){
     return numberNonConvex_;}
@@ -229,7 +229,7 @@ namespace Bonmin
   virtual int getNumberSimpleConcave(){
      return numberSimpleConcave_;}
 
-  virtual SimpleConcaveConstraint* getSimpleConcaveConstraints(){
+  virtual const SimpleConcaveConstraint* getSimpleConcaveConstraints() const{
      return simpleConcaves_;}
 private:
     /**@name Default Compiler Generated Methods

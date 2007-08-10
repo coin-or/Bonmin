@@ -42,8 +42,6 @@ namespace Bonmin
       g_l_(NULL),
       g_u_(NULL),
       x_init_(NULL),
-      n_x_init_(0),
-      m_x_init_(0),
       capacity_x_init_(0),
       x_init_user_(NULL),
       x_sol_(NULL),
@@ -91,12 +89,11 @@ namespace Bonmin
     //    }
 
     // Allocate space for the initial point
-    n_x_init_ = n_;
-    m_x_init_ = m_;
     capacity_x_init_ = 3*n_ + 2* m_;//Leave space for adding constraint
     x_init_ = new Number[capacity_x_init_];
     tminlp_->get_starting_point(n_, true, x_init_, false, NULL, NULL,
         m_, false, NULL);
+    CoinZeroN(x_init_ + n_ , 2*n_ + 2*m_);
     x_init_user_ = new Number[n_];
     IpBlasDcopy(n_, x_init_, 1, x_init_user_, 1);
     duals_sol_ = NULL;
@@ -120,8 +117,6 @@ namespace Bonmin
     nnz_h_lag_(other.nnz_h_lag_),
     index_style_(other.index_style_),
     duals_init_(NULL),
-    n_x_init_(other.n_x_init_),
-    m_x_init_(other.m_x_init_),
     capacity_x_init_(other.capacity_x_init_),
     x_sol_(NULL),
     g_sol_(NULL),
@@ -388,7 +383,7 @@ namespace Bonmin
       int size= 3*n + m_ + tminlp_->nLinearCuts_;
       if(size > capacity_x_init_)
         resizeStartingPoint();
-      IpBlasDcopy(m_, duals_init_ + 2*n , 1, lambda, 1);
+      IpBlasDcopy(m_ + tminlp_->nLinearCuts_ , duals_init_ + 2*n , 1, lambda, 1);
     }
 
     need_new_warm_starter_ = true;
@@ -707,11 +702,15 @@ namespace Bonmin
     //Always resize to have the capacity to hold twice the current number of constraints
     int newCapacity = 3 * n_ + 2 * (m_ + tminlp_->nLinearCuts_);
     double * new_x_init= new double [newCapacity];
-    CoinCopyN(x_init_, min(capacity_x_init_, newCapacity) , new_x_init);
-    CoinZeroN(new_x_init, max(newCapacity - capacity_x_init_, 0));
+    int end = min(capacity_x_init_, newCapacity);
+    CoinCopyN(x_init_, end , new_x_init);
+    int remaining = newCapacity - end;
+    if(remaining){
+      CoinZeroN(new_x_init + end , remaining);}
     delete [] x_init_;
     x_init_ = new_x_init;
     duals_init_ = x_init_ + n_;
+    capacity_x_init_ = newCapacity;
   }
 }// namespace Ipopt
 

@@ -402,10 +402,6 @@ namespace Bonmin
     Number* x_init_;
     /** Initial values for all dual multipliers (constraints then lower bounds then upper bounds) */
     Number * duals_init_;
-    /** Number of variables in starting point.*/
-    Index n_x_init_;
-    /** Number of constraints in starting point.*/
-    Index m_x_init_;
     /** storage capacity for starting point.*/
     Index capacity_x_init_;
     /// User-provideed initial prmal point
