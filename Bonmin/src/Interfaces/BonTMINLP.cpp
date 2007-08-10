@@ -109,7 +109,6 @@ TMINLP::TMINLP():
 
 
 /** Default destructor */
-virtual 
 TMINLP::~TMINLP()
 {
    delete [] cutsElems_;
