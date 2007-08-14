@@ -42,7 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COIN_HAS_ASL_TRUE@bin_PROGRAMS = fun$(EXEEXT)
+@COIN_HAS_ASL_TRUE@bin_PROGRAMS = boncouenne$(EXEEXT)
 @COIN_HAS_CPX_TRUE@am__append_1 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 @COIN_HAS_CPX_TRUE@        $(COINUTILSOBJDIR)/src/libCoinUtils.la \
 @COIN_HAS_CPX_TRUE@        $(CPXLIB)
@@ -74,9 +74,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_fun_OBJECTS = BonCouenne.$(OBJEXT) BonCouenneSetup.$(OBJEXT) \
+am_boncouenne_OBJECTS = BonCouenne.$(OBJEXT) BonCouenneSetup.$(OBJEXT) \
 	BonNlpHeuristic.$(OBJEXT) BonCouenneInterface.$(OBJEXT)
-fun_OBJECTS = $(am_fun_OBJECTS)
+boncouenne_OBJECTS = $(am_boncouenne_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
 @COIN_HAS_CPX_TRUE@am__DEPENDENCIES_3 =  \
@@ -91,7 +91,7 @@ am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4)
-fun_DEPENDENCIES = ../../src/CbcBonmin/libbonminampl.la \
+boncouenne_DEPENDENCIES = ../../src/CbcBonmin/libbonminampl.la \
 	../../src/CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
@@ -115,8 +115,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(fun_SOURCES)
-DIST_SOURCES = $(fun_SOURCES)
+SOURCES = $(boncouenne_SOURCES)
+DIST_SOURCES = $(boncouenne_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -383,7 +383,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src` $(am__append_3) $(ASL_CPPFLAGS) \
 	$(am__append_4) $(am__append_5)
-fun_SOURCES = BonCouenne.cpp \
+boncouenne_SOURCES = BonCouenne.cpp \
               BonCouenneSetup.cpp \
               BonCouenneSetup.hpp \
               BonCouenneInterface.hpp \
@@ -392,7 +392,7 @@ fun_SOURCES = BonCouenne.cpp \
               BonCouenneTMINLP.hpp \
               BonCouenneInterface.cpp
 
-fun_LDADD = \
+boncouenne_LDADD = \
         ../../src/CbcBonmin/libbonminampl.la \
         ../../src/CbcBonmin/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
@@ -406,7 +406,7 @@ fun_LDADD = \
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
 # libraries.
-fun_LDFLAGS = -rpath $(libdir)
+boncouenne_LDFLAGS = -rpath $(libdir)
 all: all-am
 
 .SUFFIXES:
@@ -468,9 +468,9 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-fun$(EXEEXT): $(fun_OBJECTS) $(fun_DEPENDENCIES) 
-	@rm -f fun$(EXEEXT)
-	$(CXXLINK) $(fun_LDFLAGS) $(fun_OBJECTS) $(fun_LDADD) $(LIBS)
+boncouenne$(EXEEXT): $(boncouenne_OBJECTS) $(boncouenne_DEPENDENCIES) 
+	@rm -f boncouenne$(EXEEXT)
+	$(CXXLINK) $(boncouenne_LDFLAGS) $(boncouenne_OBJECTS) $(boncouenne_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

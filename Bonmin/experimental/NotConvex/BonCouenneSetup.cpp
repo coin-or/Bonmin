@@ -105,25 +105,35 @@ namespace Bonmin{
     //    int numberIntegerObjects = continuousSolver_->numberObjects() > 0; 
 
     {
-      int 
-	nOrig = couenneProb -> nOrig (),
-	nVars = couenneProb -> nVars (),
-	nAuxs = nVars - nOrig,
-	nobj  = 0;
 
-      OsiObject ** objects = new OsiObject* [nAuxs];
-      
+      int nAuxs = 0, nobj = 0,
+	  nVars = couenneProb -> nVars ();
+
+      // Count # auxiliary variables
+
       for (int i = 0; i < nVars; i++) { // for each aux variable
 
 	exprVar *var = couenneProb -> Var (i);
 
         // if this variable is associated with a nonlinear function
-	if ((var -> Type () == AUX) && (var -> Image () -> Linearity () > LINEAR)) {
+	if ((var -> Type () == AUX) && 
+	    (var -> Image () -> Linearity () > LINEAR)) 
+	  nAuxs++;
+      }
+
+      OsiObject ** objects = new OsiObject* [nAuxs];
+
+      for (int i = 0; i < nVars; i++) { // for each aux variable
+
+	exprVar *var = couenneProb -> Var (i);
+
+        // if this variable is associated with a nonlinear function
+	if ((var -> Type () == AUX) && 
+	    (var -> Image () -> Linearity () > LINEAR)) {
 
 	  exprAux *aux = dynamic_cast <exprAux *> (var);
 
 	  /*printf ("creating CouenneObject for ");
-
 	  aux ->             print (std::cout); printf (" := ");
 	  aux -> Image () -> print (std::cout); printf ("\n");*/
 

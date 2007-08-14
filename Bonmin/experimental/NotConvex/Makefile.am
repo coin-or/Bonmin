@@ -9,7 +9,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 if COIN_HAS_ASL
-  bin_PROGRAMS = fun
+  bin_PROGRAMS = boncouenne
 endif
 
 COINLIBS = \
@@ -96,7 +96,7 @@ if COIN_HAS_COUENNE
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch`
 endif
 
-fun_SOURCES = BonCouenne.cpp \
+boncouenne_SOURCES = BonCouenne.cpp \
               BonCouenneSetup.cpp \
               BonCouenneSetup.hpp \
               BonCouenneInterface.hpp \
@@ -105,7 +105,7 @@ fun_SOURCES = BonCouenne.cpp \
               BonCouenneTMINLP.hpp \
               BonCouenneInterface.cpp
 
-fun_LDADD = \
+boncouenne_LDADD = \
         ../../src/CbcBonmin/libbonminampl.la \
         ../../src/CbcBonmin/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
@@ -118,4 +118,4 @@ fun_LDADD = \
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
 # libraries.
-fun_LDFLAGS = -rpath $(libdir)
+boncouenne_LDFLAGS = -rpath $(libdir)
