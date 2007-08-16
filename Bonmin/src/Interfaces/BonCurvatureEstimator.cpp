@@ -393,15 +393,15 @@ namespace Bonmin
 	  if (x_l_[i] < x_u_[i]) {
 	    if (orig_d[i]>0. && z_U[i]*orig_d[i]>zTol) {
 	      active_x_.push_back(i+1);
-	      // CHECK DBG_ASSERT(x_u_[i] < 1e19);
 	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_U[i]);
+	      DBG_ASSERT(x_u_[i] < 1e19);
 	    }
 	    else if (orig_d[i]<0. && -z_L[i]*orig_d[i]>zTol) {
 	      active_x_.push_back(-(i+1));
-	      // CHECK DBG_ASSERT(x_l_[i] > -1e19);
 	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_L[i]);
+	      DBG_ASSERT(x_l_[i] > -1e19);
 	    }
 	  }
 	}

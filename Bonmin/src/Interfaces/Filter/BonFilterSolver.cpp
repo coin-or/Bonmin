@@ -40,7 +40,6 @@ static fint nnz_h = -1;
 
 static fint * hStruct = NULL;
 
-static real * g;
 //Permutation to apply to jacobian in order to get it row ordered
 static int * permutationJac = NULL;
 static int * permutationHess = NULL;
@@ -135,14 +134,18 @@ F77_FUNC(hessian,HESSIAN)(real *x, fint *n, fint *m, fint *phase, real *lam,
     }
   *l_hess = nnz_h;
   *li_hess = nnz_h + *n + 3;
-  end = *n + *m;
-  for(int i = *n ; i < end ; i++){
-    g[i] = - lam[i];
-   }
+  Number * mlam = NULL;
+  if (*m > 0) {
+    mlam = new Number[*m];
+  }
+  for (int i = 0; i<*m; i++) {
+    mlam[i] = -lam[*n+i];
+  }
   Number * values = new Number [nnz_h];
-  (*errflag) = !tnlpSolved->eval_h(*n, x, 1, obj_factor, *m, g + *n ,1, hStruct[0] - 1, NULL, NULL, values);
-   for(int i = 0 ; i < nnz_h ; i++) ws[i] = values[permutationHess[i]];
-   delete [] values;
+  (*errflag) = !tnlpSolved->eval_h(*n, x, 1, obj_factor, *m, mlam ,1, hStruct[0] - 1, NULL, NULL, values);
+  delete [] mlam;
+  for(int i = 0 ; i < nnz_h ; i++) ws[i] = values[permutationHess[i]];
+  delete [] values;
 }
 
 }
@@ -420,6 +423,18 @@ FilterSolver::Initialize(std::string optFile){
 
 bool
 FilterSolver::Initialize(std::istream &is){
+
+  Index ivalue;
+  options_->GetIntegerValue("print_level", ivalue, "");
+  EJournalLevel print_level = (EJournalLevel)ivalue;
+  printf("ivalue = %d\n", ivalue);
+  SmartPtr<Journal> stdout_jrnl = journalist_->GetJournal("console");
+  if (IsValid(stdout_jrnl)) {
+    // Set printlevel for stdout
+    stdout_jrnl->SetAllPrintLevels(print_level);
+    stdout_jrnl->SetPrintLevel(J_DBG, J_NONE);
+  }
+
   if(is.good()){
     options_->ReadFromStream(*journalist_, is);
   }
@@ -453,7 +468,6 @@ FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
 
   hStruct = cached_->hStruct_;
 
-  g = cached_->g_;
 //Permutation to apply to jacobian in order to get it row ordered
   permutationJac = cached_->permutationJac_;
   permutationHess = cached_->permutationHess_;
@@ -522,10 +536,9 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   use_warm_start_in_cache_ = false;
   //for(int i = 0 ; i < n ; i++) x[i] = 0;
   lam = new real [n+m];
-  g = g_ = new real[n+m];
-  //#define InitializeAll
+#define InitializeAll
 #ifdef InitializeAll
-  for(int i = 0 ; i < n+m ; i++) lam[i] = g_[i] = 0.; 
+  for(int i = 0 ; i < n+m ; i++) lam[i] = 0.; 
 #endif
   //bounds
   bounds = new real [2*n + 2*m];
@@ -675,14 +688,38 @@ FilterSolver::callOptimizer()
     status = Ipopt::INTERNAL_ERROR;
     break;
   }
-  int end = cached_->n + cached_->m;
-  for(int i = cached_->n ; i < end ; i++)
-    cached_->g_[i] = - cached_->lam[i];
 
+  Number* mlam = NULL;
+  if (cached_->m>0) {
+    mlam = new Number[cached_->m];
+  }
+  for (int i = 0; i<cached_->m; i++) {
+    mlam[i] = -cached_->lam[cached_->n+i];
+  }
+  Number* z_L = new Number[cached_->n];
+  Number* z_U = new Number[cached_->n];
+  const int os = cached_->n+cached_->m;
+  for (int i=0; i<cached_->n; i++) {
+    if (cached_->x[i] == cached_->bounds[i]) {
+      z_L[i] = Max(0.,cached_->lam[i]);
+    }
+    else {
+      z_L[i] = 0.;
+    }
+    if (cached_->x[i] == cached_->bounds[os+i]) {
+      z_U[i] = Max(0.,-cached_->lam[i]);
+    }
+    else {
+      z_U[i] = 0.;
+    }
+  }
   cached_->tnlp_->finalize_solution(status, cached_->n, 
-			  cached_->x, cached_->lam, cached_->lam, 
-			  cached_->m, cached_->c, cached_->g_ + cached_->n, 
+			  cached_->x, z_L, z_U, 
+			  cached_->m, cached_->c, mlam, 
 			  cached_->f, NULL, NULL);
+  delete [] mlam;
+  delete [] z_L;
+  delete [] z_U;
   return optimizationStatus;
 }
 

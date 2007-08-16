@@ -248,7 +248,7 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
   ws = new real[mxws];
   lws = new fint[mxlws];
 
-  //#define InitializeAll
+#define InitializeAll
 #ifdef InitializeAll
   for (int i=0; i<mxws; i++) {
     ws[i] = 42.;

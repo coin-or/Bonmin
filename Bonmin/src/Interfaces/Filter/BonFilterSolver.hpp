@@ -189,7 +189,6 @@ private:
     real * ws;
     fint * lws;
     real * lam;
-    real * g_;
     char * cstype;
     fint maxiter;
     fint * istat;
@@ -231,7 +230,6 @@ private:
       ws(NULL),
       lws(NULL),
       lam(NULL),
-     g_(NULL),
      cstype(NULL),
      maxiter(1000),
      istat(NULL),
@@ -270,7 +268,6 @@ private:
       ws(NULL),
       lws(NULL),
       lam(NULL),
-     g_(NULL),
      cstype(NULL),
      maxiter(1000),
      istat(NULL),
@@ -294,7 +291,7 @@ private:
     /** Destructor. */
     ~cachedInfo(){
       delete [] x;
-      delete []c;
+      delete [] c;
       delete [] bounds;
       delete [] s;
       delete [] a;
@@ -302,7 +299,6 @@ private:
       delete [] ws;
       delete [] lws;
       delete [] lam;
-      delete [] g_;
       delete [] cstype;      
       delete [] istat;
       delete [] rstat;

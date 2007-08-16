@@ -508,6 +508,15 @@ namespace Bonmin
       IpBlasDcopy(n, z_U, 1 , duals_sol_ + n, 1);
     }
 
+#if 0
+    for (Index i=0; i<n; i++) {
+      printf("x[%3d] = %13.6e z_L[%3d] = %13.6e z_U[%3d] = %13.6e\n", i, x[i], i, z_L[i], i, z_U[i]);
+    }
+    for (Index i=0; i<m; i++) {
+      printf("lam[%3d] = %13.6e g[%3d] = %13.6e\n", i, lambda[i], i, g[i]);
+    }
+#endif
+
     return_status_ = status;
     obj_value_ = obj_value;
 
