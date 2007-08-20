@@ -87,7 +87,7 @@ namespace Bonmin
     }
     else if (algo==1)//B-OA
     {
-      oaDecMaxTime = DBL_MAX;
+      oaDecMaxTime = COIN_DBL_MAX;
       nlpSolveFrequency = 0;
       bbLogLevel = 0;
     }

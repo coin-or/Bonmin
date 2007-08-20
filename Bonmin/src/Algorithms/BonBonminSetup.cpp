@@ -348,7 +348,7 @@ algo_(other.algo_){
     }
     Algorithm algo = getAlgorithm();
     if(algo == B_OA){
-      options_->SetNumericValue("oa_dec_time_limit",DBL_MAX, true, true);
+      options_->SetNumericValue("oa_dec_time_limit",COIN_DBL_MAX, true, true);
       options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
       intParam_[BabLogLevel] = 0;
     }

@@ -53,7 +53,7 @@ extern int usingCouenne;
    OsiSolverInterface * lp = lpManip.si();
    int numcols = lp->getNumCols();
    int origNumcols = nlp_->getNumCols();
-   double milpBound = -DBL_MAX;
+   double milpBound = -COIN_DBL_MAX;
    int numberPasses = 0;
    double * nlpSol = usingCouenne ? new double[numcols] : NULL;
    while (isInteger && feasible ) {

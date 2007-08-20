@@ -270,12 +270,12 @@ namespace Bonmin
     }
 
     bool lower_bound;
-    if (lb <= -DBL_MAX) {
-      assert(ub < DBL_MAX);
+    if (lb <= -COIN_DBL_MAX) {
+      assert(ub < COIN_DBL_MAX);
       lower_bound = false;
     }
     else {
-      assert(ub >= DBL_MAX);
+      assert(ub >= COIN_DBL_MAX);
       lower_bound = true;
     }
     SmartPtr<StrengtheningTNLP> stnlp =

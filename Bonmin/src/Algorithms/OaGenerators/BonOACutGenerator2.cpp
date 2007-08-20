@@ -119,7 +119,7 @@ extern int usingCouenne;
     bool milpOptimal = 1;
 
 
-    double milpBound = -DBL_MAX;
+    double milpBound = -COIN_DBL_MAX;
     bool milpFeasible = 1;
     bool feasible = 1;
     if (subMip)//Perform a local search

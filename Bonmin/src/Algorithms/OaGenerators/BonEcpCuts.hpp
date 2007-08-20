@@ -19,7 +19,7 @@ namespace Bonmin {
             int numRounds = 1
 	    ):
       OaDecompositionBase(nlp,NULL, NULL,0,0,0),
-      objValue_(-DBL_MAX),
+      objValue_(-COIN_DBL_MAX),
       numRounds_(numRounds){
     }
     EcpCuts(BabSetupBase & b);

@@ -314,7 +314,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     totalIterations_(0),
     maxRandomRadius_(1e08),
     randomGenerationType_(0),
-    max_perturbation_(DBL_MAX),
+    max_perturbation_(COIN_DBL_MAX),
     pushValue_(1e-02),
     numRetryInitial_(-1),
     numRetryResolve_(-1),
@@ -1028,7 +1028,7 @@ OsiTMINLPInterface::isFreeBinary(int colNumber) const
 double
 OsiTMINLPInterface::getInfinity() const
 {
-  return DBL_MAX;
+  return COIN_DBL_MAX;
 }
 
 /// Get pointer to array[getNumCols()] of primal solution vector
@@ -1351,7 +1351,7 @@ OsiTMINLPInterface::getIntParam(OsiIntParam key, int& value) const
 {
   //  debugMessage("OsiTMINLPInterface::getIntParam(%d)\n", key);
 
-  value = -INT_MAX; // Give a dummy value
+  value = -COIN_INT_MAX; // Give a dummy value
   bool retval = false;
   switch (key) {
   case OsiMaxNumIteration:
@@ -1805,7 +1805,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 	newCut.setGloballyValidAsInteger(1);
       newCut.setEffectiveness(99.99e99);
       newCut.setRow(v);
-      newCut.setLb(-DBL_MAX/*Infinity*/);
+      newCut.setLb(-COIN_DBL_MAX/*Infinity*/);
       newCut.setUb(ub[nNonLinear_]);
       //     CftValidator validator;
       //     validator(newCut);

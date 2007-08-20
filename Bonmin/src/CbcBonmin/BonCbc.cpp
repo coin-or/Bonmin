@@ -180,7 +180,7 @@ namespace Bonmin
       mipStatus_(),
       bestObj_(1e200),
       bestBound_(-1e200),
-      continuousRelaxation_(-DBL_MAX),
+      continuousRelaxation_(-COIN_DBL_MAX),
       numNodes_(0),
       mipIterationCount_(0)
   {}

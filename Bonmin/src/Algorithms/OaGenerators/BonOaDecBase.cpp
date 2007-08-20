@@ -151,7 +151,7 @@ OaDecompositionBase::SubMipSolver::SubMipSolver(OsiSolverInterface * lp,
  clp_(NULL),
  cpx_(NULL),
  cbc_(NULL),
- lowBound_(-DBL_MAX),
+ lowBound_(-COIN_DBL_MAX),
  optimal_(false),
  integerSolution_(NULL),
  strategy_(NULL)
@@ -181,7 +181,7 @@ OaDecompositionBase::SubMipSolver::setLpSolver(OsiSolverInterface * lp)
   cpx_ = (lp_ == NULL) ? NULL :
          dynamic_cast<OsiCpxSolverInterface *>(lp_);
 #endif
-  lowBound_ = -DBL_MAX;
+  lowBound_ = -COIN_DBL_MAX;
   optimal_ = false;
   if(integerSolution_){
     delete [] integerSolution_;
@@ -295,7 +295,7 @@ OaDecompositionBase::solverManip::solverManip
   colLower_(NULL),
   colUpper_(NULL),
   warm_(NULL),
-  cutoff_(DBL_MAX),
+  cutoff_(COIN_DBL_MAX),
   deleteSolver_(false)
 {
   getCached();
@@ -322,7 +322,7 @@ OaDecompositionBase::solverManip::solverManip
   colLower_(NULL),
   colUpper_(NULL),
   warm_(NULL),
-  cutoff_(DBL_MAX),
+  cutoff_(COIN_DBL_MAX),
   deleteSolver_(true)
 {
   si_ = si.clone();
@@ -357,7 +357,7 @@ OaDecompositionBase::solverManip::restore(){
     si_->setColUpper(colUpper_);
   }
 
-  if(cutoff_<DBL_MAX){
+  if(cutoff_<COIN_DBL_MAX){
      si_->setDblParam(OsiDualObjectiveLimit, cutoff_);
   }
 

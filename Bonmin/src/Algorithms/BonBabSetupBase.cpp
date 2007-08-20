@@ -26,9 +26,9 @@ namespace Bonmin{
   0 /* MaxInfeasible*/,
   5 /*NumberStrong*/,
   2 /* MinReliability*/,
-  INT_MAX /* MaxNodes*/,
-  INT_MAX /* MaxSolutions*/,
-  INT_MAX /* MaxIterations*/,
+  COIN_INT_MAX /* MaxNodes*/,
+  COIN_INT_MAX /* MaxSolutions*/,
+  COIN_INT_MAX /* MaxIterations*/,
   0 /* SpecialOption*/,
   0 /* DisableSos.*/,
   1 /* numCutPasses.*/
@@ -37,11 +37,11 @@ namespace Bonmin{
 
 double BabSetupBase::defaultDoubleParam_[BabSetupBase::NumberDoubleParam] = {
   0 /* CutoffDecr*/,
-  DBL_MAX /* Cutoff*/,
+  COIN_DBL_MAX /* Cutoff*/,
   0 /* AllowableGap*/,
   0 /*AllowableFractionGap*/,
   1e-09 /*IntTol*/,
-  DBL_MAX /* MaxTime*/,
+  COIN_DBL_MAX /* MaxTime*/,
 };
 
   BabSetupBase::BabSetupBase():
@@ -263,17 +263,17 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
   
   roptions->AddLowerBoundedIntegerOption("node_limit",
                                          "Set the maximum number of nodes explored in the branch-and-bound search.",
-                                         0,INT_MAX,
+                                         0,COIN_INT_MAX,
                                          "");
   
   roptions->AddLowerBoundedIntegerOption("iteration_limit",
                                          "Set the cummulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
-                                         0,INT_MAX,
+                                         0,COIN_INT_MAX,
                                          "value 0 deactivates option.");
   
   roptions->AddLowerBoundedIntegerOption("solution_limit",
                                          "Abort after that much integer feasible solution have been found by algorithm",
-                                         0,INT_MAX,
+                                         0,COIN_INT_MAX,
                                          "value 0 deactivates option");
   
   roptions->AddBoundedNumberOption("integer_tolerance",
@@ -363,7 +363,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
   
   roptions->AddLowerBoundedIntegerOption("num_cut_passes",
                                          "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
-                                         0,INT_MAX,
+                                         0,COIN_INT_MAX,
                                          "");
   
 }

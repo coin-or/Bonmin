@@ -536,7 +536,7 @@ namespace Bonmin
                       );
     }
     else if (var_types_[i] == TMINLP::INTEGER) {
-      if(fabs(x_l_[i])<INT_MAX && fabs(x_u_[i]) < INT_MAX)//round to closest valid integer
+      if(fabs(x_l_[i])<COIN_INT_MAX && fabs(x_u_[i]) < COIN_INT_MAX)//round to closest valid integer
       {
         int x_l = (int)ceil(x_l_[i]);
         int x_u = (int)floor(x_u_[i]);
