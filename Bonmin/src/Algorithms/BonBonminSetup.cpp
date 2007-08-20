@@ -289,7 +289,7 @@ algo_(other.algo_){
     continuousSolver_->setAuxiliaryInfo(&extraStuff);
     
     intParam_[BabSetupBase::SpecialOption] = 16;
-    intParam_[BabSetupBase::MinReliability] = 0;
+    //AW: Took this out: intParam_[BabSetupBase::MinReliability] = 0;
     if(!options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin.")){
       intParam_[BabSetupBase::NumberStrong] = 0;
     }
