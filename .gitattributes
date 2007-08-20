@@ -90,6 +90,8 @@ Bonmin/src/Interfaces/BonTNLPSolver.cpp -text
 Bonmin/src/Interfaces/BonTNLPSolver.hpp -text
 Bonmin/src/Interfaces/Filter/BonBqpdSolver.cpp -text
 Bonmin/src/Interfaces/Filter/BonBqpdSolver.hpp -text
+Bonmin/src/Interfaces/Filter/BonBqpdWarmStart.cpp -text
+Bonmin/src/Interfaces/Filter/BonBqpdWarmStart.hpp -text
 Bonmin/src/Interfaces/Filter/BonFilterSolver.cpp -text
 Bonmin/src/Interfaces/Filter/BonFilterSolver.hpp -text
 Bonmin/src/Interfaces/Filter/BonFilterWarmStart.cpp -text
