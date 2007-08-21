@@ -8,7 +8,7 @@
 // Date : 04/19/2007
 
 
-#include "BonCbc2.hpp"
+#include "BonCbc.hpp"
 #include "BonOACutGenerator2.hpp"
 #include "BonCbcNlpStrategy.hpp"
 #include "BonAuxInfos.hpp"

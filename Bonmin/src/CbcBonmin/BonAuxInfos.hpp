@@ -11,7 +11,7 @@
 #define BonAuxInfos_H
 #include <stdlib.h>
 #include "OsiAuxInfo.hpp"
-#include "BonCbc2.hpp"
+#include "BonCbc.hpp"
 
 namespace Bonmin {
   /** Bonmin class for passing info between components of branch-and-cuts.*/

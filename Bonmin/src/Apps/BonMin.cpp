@@ -18,7 +18,7 @@
 
 #include "CoinTime.hpp"
 #include "BonAmplSetup.hpp"
-#include "BonCbc2.hpp"
+#include "BonCbc.hpp"
 
 namespace Bonmin{
 extern int usingCouenne;}

@@ -19,7 +19,7 @@ endif
 
 # List all source files, including headers
 libbonmin_la_SOURCES = \
-	BonCbc2.cpp BonCbc2.hpp \
+	BonCbc.cpp BonCbc.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
@@ -118,7 +118,7 @@ CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
 
 include_HEADERS = \
      BonCbcNlpStrategy.hpp \
-     BonCbc2.hpp \
+     BonCbc.hpp \
      BonAuxInfos.hpp \
      BonCbcNode.hpp \
 	BonCbcParam.hpp
