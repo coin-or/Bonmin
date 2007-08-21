@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
 
     BonminAmplSetup bonmin;
     bonmin.initialize(argv);
-    Bab2 bb;
+    Bab bb;
 
     bb(bonmin);//do branch and bound
 

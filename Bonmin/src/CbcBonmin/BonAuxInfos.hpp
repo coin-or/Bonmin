@@ -33,11 +33,11 @@ public:
   virtual OsiAuxInfo * clone() const;
   
   /** Set pointer to the branch-and-bound algorithm (to access CbcModel).*/
-  void setBabPtr(Bab2 * babPtr){
+  void setBabPtr(Bab * babPtr){
     babPtr_ = babPtr;}
   
   /** Pointer to the branch-and-bound algorithm (to access CbcModel).*/
-  Bab2 * babPtr(){
+  Bab * babPtr(){
     return babPtr_;}
   
   /** Declare the node to be feasible.*/
@@ -68,7 +68,7 @@ public:
     hasNlpSolution_ = b;}
 protected: 
   /** Pointer to branch-and-bound algorithm.*/
-  Bab2 * babPtr_;
+  Bab * babPtr_;
   /** Say if current node was found infeasible during cut generation*/
   bool infeasibleNode_;
   /** nlp solution found by heuristic if any.*/

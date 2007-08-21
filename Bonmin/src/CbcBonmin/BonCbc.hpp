@@ -15,7 +15,7 @@
 
 namespace Bonmin{
   
-  class Bab2
+  class Bab
 {
 public:
   /** Integer optimization return codes.*/
@@ -24,9 +24,9 @@ public:
     Feasible /** An integer solution to the problem has been found.*/,
     NoSolutionKnown/** No feasible solution to the problem is known*/};
   /** Constructor.*/
-  Bab2();
+  Bab();
   /** destructor.*/
-  virtual ~Bab2();
+  virtual ~Bab();
   /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
   virtual void branchAndBound(BabSetupBase & s);
   

@@ -61,7 +61,7 @@ namespace Bonmin
   int usingCouenne = 0;
   
   /** Constructor.*/
-  Bab2::Bab2():
+  Bab::Bab():
   bestSolution_(NULL),
   mipStatus_(),
   bestObj_(1e200),
@@ -73,7 +73,7 @@ namespace Bonmin
   {}
   
   /** Destructor.*/
-  Bab2::~Bab2()
+  Bab::~Bab()
   {
     if (bestSolution_) delete [] bestSolution_;
     bestSolution_ = NULL;
@@ -81,14 +81,14 @@ namespace Bonmin
   
   /**operator() performs the branchAndBound*/
   void 
-  Bab2::operator()(BabSetupBase & s)
+  Bab::operator()(BabSetupBase & s)
   {
     branchAndBound(s);
   }
   
   /** Perform a branch-and-bound on given setup.*/
   void
-  Bab2::branchAndBound(BabSetupBase & s)
+  Bab::branchAndBound(BabSetupBase & s)
   {
     /* Put a link to this into solver.*/
     OsiBabSolver *  babInfo = dynamic_cast<OsiBabSolver *>(s.continuousSolver()->getAuxiliaryInfo());
@@ -396,7 +396,7 @@ namespace Bonmin
   
   /** return the best known lower bound on the objective value*/
   double
-  Bab2::bestBound()
+  Bab::bestBound()
   {
     if (mipStatus_ == FeasibleOptimal) return bestObj_;
     else if (mipStatus_ == ProvenInfeasible) return 1e200;
