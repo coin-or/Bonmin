@@ -54,7 +54,7 @@ int main (int argc, char *argv[])
 
     CouenneSetup bonmin;
     bonmin.InitializeBonmin(argv);
-    Bab2 bb;
+    Bab bb;
 
     bb (bonmin);//do branch and bound
 
@@ -62,19 +62,19 @@ int main (int argc, char *argv[])
 
     std::string message;
     std::string status;
-    if(bb.mipStatus()==Bab2::FeasibleOptimal) {
+    if(bb.mipStatus()==Bab::FeasibleOptimal) {
       status = "\t\"Finished\"";
       message = "\nbonmin: Optimal";
     }
-    else if(bb.mipStatus()==Bab2::ProvenInfeasible) {
+    else if(bb.mipStatus()==Bab::ProvenInfeasible) {
       status = "\t\"Finished\"";
       message = "\nbonmin: Infeasible problem";
     }
-    else if(bb.mipStatus()==Bab2::Feasible) {
+    else if(bb.mipStatus()==Bab::Feasible) {
       status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
-    else if(bb.mipStatus()==Bab2::NoSolutionKnown) {
+    else if(bb.mipStatus()==Bab::NoSolutionKnown) {
       status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
     }
