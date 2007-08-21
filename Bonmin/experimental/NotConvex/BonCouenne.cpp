@@ -26,7 +26,7 @@
 
 #include "BonCouenneSetup.hpp"
 
-#include "BonCbc2.hpp"
+#include "BonCbc.hpp"
 #ifdef COIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
