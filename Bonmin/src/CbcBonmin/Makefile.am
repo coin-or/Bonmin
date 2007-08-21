@@ -19,7 +19,6 @@ endif
 
 # List all source files, including headers
 libbonmin_la_SOURCES = \
-	BonCbc.cpp BonCbc.hpp \
 	BonCbc2.cpp BonCbc2.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
@@ -118,7 +117,6 @@ CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
 ########################################################################
 
 include_HEADERS = \
-	BonCbc.hpp \
      BonCbcNlpStrategy.hpp \
      BonCbc2.hpp \
      BonAuxInfos.hpp \
@@ -132,7 +130,6 @@ include_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonCbcParam.cppbak BonCbcParam.hppbak \
-	BonCbc.cppbak BonCbc.hppbak \
 	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
 	BonCbcNode.cppbak BonCbcNode.hppbak 

@@ -69,7 +69,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am_libbonmin_la_OBJECTS = BonCbc.lo BonCbc2.lo BonCbcNlpStrategy.lo \
+am_libbonmin_la_OBJECTS = BonCbc2.lo BonCbcNlpStrategy.lo \
 	BonCbcNode.lo BonAuxInfos.lo BonCbcParam.lo
 nodist_libbonmin_la_OBJECTS = CbcCompareUser.lo CbcBranchUser.lo
 libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS) \
@@ -332,7 +332,6 @@ lib_LTLIBRARIES = libbonmin.la $(am__append_1)
 
 # List all source files, including headers
 libbonmin_la_SOURCES = \
-	BonCbc.cpp BonCbc.hpp \
 	BonCbc2.cpp BonCbc2.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
@@ -407,7 +406,6 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 include_HEADERS = \
-	BonCbc.hpp \
      BonCbcNlpStrategy.hpp \
      BonCbc2.hpp \
      BonAuxInfos.hpp \
@@ -422,7 +420,6 @@ include_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonCbcParam.cppbak BonCbcParam.hppbak \
-	BonCbc.cppbak BonCbc.hppbak \
 	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
 	BonCbcNode.cppbak BonCbcNode.hppbak 
@@ -504,7 +501,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonAuxInfos.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNlpStrategy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@
