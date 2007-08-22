@@ -412,6 +412,7 @@ namespace Bonmin
   bool TMINLP2TNLP::eval_grad_f(Index n, const Number* x, bool new_x,
       Number* grad_f)
   {
+    grad_f[n-1] = 0;
     return tminlp_->eval_grad_f(n, x, new_x, grad_f);
   }
 

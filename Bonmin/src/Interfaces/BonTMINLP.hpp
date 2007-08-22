@@ -376,28 +376,23 @@ namespace Bonmin
 	 int yIdx;
       /** Index of the constraint.*/
 	 int cIdx;};
-    /** Overload to give access to array describing constraint convexities*/
-    virtual const Convexity * constraintsTypes(){
-      return NULL;}
-  /** Overload to give access to constraint convexities */
-  virtual Convexity constraintType(int i) {
-     return Convex;}
-
-  /** Get the number of constraints marked non convex in the problem.*/
-  virtual int getNumberNonConvex(){
-    return 0;}
-  
-  /** Get array describing the constraints marќed as nonconvex.*/
-  virtual const MarkedNonConvex * getMarkedNonConvex() const{
-    return NULL;}
-
-  /** Get the number of constraints marked simple concave in the problem.*/
-  virtual int getNumberSimpleConcave(){
-    return 0;}
-
-  /** Get array of simple concave constraints descriptions.*/
-  virtual const SimpleConcaveConstraint * getSimpleConcaveConstraints() const{
-     return NULL;}
+    /** Get accest to constraint convexities.*/
+    virtual bool get_constraint_convexities(int m, TMINLP::Convexity * constraints_convexities)const {
+      CoinFillN(constraints_convexities, m, TMINLP::Convex);
+      return true;}
+  /** Get dimension information on nonconvex constraints.*/
+  virtual bool get_number_nonconvex(int & number_non_conv, int & number_concave) const{
+    number_non_conv = 0;
+    number_concave = 0;
+    return true;} 
+  /** Get array describing the constraints marked nonconvex in the model.*/
+  virtual bool get_constraint_convexities(int number_non_conv, MarkedNonConvex * non_convs) const{
+    assert(number_non_conv == 0);
+    return true;}
+  /** Fill array containing indices of simple concave constraints.*/ 
+  virtual bool get_simple_concave_constraints(int number_concave, SimpleConcaveConstraint * simple_concave) const{
+    assert(number_concave == 0);
+    return true;}
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).

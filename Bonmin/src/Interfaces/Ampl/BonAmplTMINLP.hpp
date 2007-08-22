@@ -209,28 +209,26 @@ namespace Bonmin
     virtual bool eval_upper_bound_f(Index n, const Number* x,
                                     Number& obj_value);
 
+    /** Get accest to constraint convexities.*/
+    virtual bool get_constraint_convexities(int m, TMINLP::Convexity * constraints_convexities)const {
+      CoinCopyN(constraintsConvexities_, m, constraints_convexities);
+      return true;}
+  /** Get dimension information on nonconvex constraints.*/
+  virtual bool get_number_nonconvex(int & number_non_conv, int & number_concave) const{
+    number_non_conv = numberNonConvex_;
+    number_concave = numberSimpleConcave_;
+    return true;} 
+  /** Get array describing the constraints marked nonconvex in the model.*/
+  virtual bool get_constraint_convexities(int number_non_conv, MarkedNonConvex * non_convexes) const{
+    assert(number_non_conv == numberNonConvex_);
+    CoinCopyN( nonConvexConstraintsAndRelaxations_, number_non_conv, non_convexes);
+    return true;}
+  /** Fill array containing indices of simple concave constraints.*/ 
+  virtual bool get_simple_concave_constraints(int number_concave, SimpleConcaveConstraint * simple_concave) const{
+    assert(number_concave == numberSimpleConcave_);
+    CoinCopyN(simpleConcaves_, numberSimpleConcave_, simple_concave);
+    return true;}
   
-   /** Give access to constraint convexities */
-   virtual const Convexity *  constraintsTypes(){
-     return constraintsConvexities_;}
-   /** Give access to constraint convexities */
-   virtual Convexity contraintType(int i){
-     if(constraintsConvexities_ != NULL){
-       return constraintsConvexities_[i];}
-     else
-       return TMINLP::Convex;}
-
-   /** Index in the set of all constraints of the non convex constraint i*/
-   virtual const MarkedNonConvex * getMarkedNonConvex() const{
-      return nonConvexConstraintsAndRelaxations_;}
-  virtual int  getNumberNonConvex(){
-    return numberNonConvex_;}
-
-  virtual int getNumberSimpleConcave(){
-     return numberSimpleConcave_;}
-
-  virtual const SimpleConcaveConstraint* getSimpleConcaveConstraints() const{
-     return simpleConcaves_;}
 private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
