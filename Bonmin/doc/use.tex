@@ -2,6 +2,8 @@
 \StartPageSummary
 \PageSection{On an .nl file}{sec:run_nl}
 \PageSection{From Ampl}{sec:run_ampl}
+\PageSection{priorities and SOS in Ampl}{sub_sec:prio}
+\PageSection{From GAMS}{sec:run_gams}
 \PageSection{From a C++ Programm}{sec:run_cpp}
 \EndPageSummary
 \NavigationPanel
@@ -65,6 +67,7 @@ After the optimization is finished, the values of the variables in the best-know
 or optimal solution can be accessed in {\tt Ampl}. If the optimization is interrupted
 with {\tt <CTRL-C>} the best known solution is accessible (this feature is not available in Cygwin).\\
 
+\subsubsectionH{Example {\tt Ampl} model}
 A simple {\tt Ampl} example model follows:
 
 \begin{colorverb}
@@ -98,6 +101,7 @@ A simple {\tt Ampl} example model follows:
 (This example can be found in the subdirectory {\tt Bonmin/examples/amplExamples/} of
 the \Bonmin\ package.)
 
+\subsubsectionH{Setting up branching priorities, directions and declaring SOS1 constraints in ampl}{sub_sec:prio}
 Branching priorities, branching directions and pseudo-costs can be passed using {\tt Ampl} suffixes.
 The suffix for branching priorities is {\tt "priority"} (variables with a higher priority
 will be chosen first for branching),
@@ -169,19 +173,17 @@ let {i in 1..M, j in 1..N} X[i,j].sosno := i;
 \end{verbatim}
 \end{colorverb}
 
-\subsubsection{From {\tt Gams} using {\tt Ampl}}
-The modeling system {\tt Gams} offers the possibility to solve {\tt Gams} models using any
-{\tt Ampl} capable solver. The {\tt Gams}/{\tt Ampl} link comes free with the {\tt Gams}
-system, but users must have a licensed {\tt Ampl} on their machine.
+\subsectionH{From {\tt Gams}}{sec:run_gams}
+Thanks to the \footlink{http://projects.coin-or.org/GAMSLinks}{GAMSlinks} project, 
+Bonmin is available in {\tt Gams} from release 22.5 of the \footlink{http://www.gams.com/}{\tt GAMS} modeling system. 
+The system is available for \footlink{http://download.gams-software.com/}{download from GAMS}. Without buying a license it works as a demo with limited capabilities. Documentation for using \Bonmin\ in {\tt GAMS} is available
+\begin{latexonly} at
+\begin{verbatim}
+         http://www.gams.com/solvers/coin.pdf
+\end{verbatim}
+\end{latexonly}
+\begin{htmlonly} \link{https://projects.coin-or.org/Bonmin}{here}. \end{htmlonly}
 
-To be able to use \Bonmin\ with {\tt Gams}, you must compile the COIN-OR libraries as static.
-This can be done by passing the option {\tt --enable-static} to the configure file.
-
-Detailed instruction for using {\tt Gams}/{\tt Ampl} can be found
-on \footlink{http://www.gams.com/solvers/gamsampl.pdf}{{\tt Gams} website}.\\
-
-Note that user set branching priorities and SOS Type-1 branching is not
-available from this interface.
 
 \subsectionH{From a C/C++ program}{sec:run_cpp}
 \Bonmin\ can also be run from within a C/C++ program if the user codes
