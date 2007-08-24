@@ -1,11 +1,18 @@
 \PageHead{Downloading \Bonmin}
-\StartPageSummary
+\begin{PageSummary}
 \PageSection{Obtaining \Bonmin}{sec:obtain}
 \PageSection{Obtaining required third party code}{sec:obtain_3rd}
-\EndPageSummary
-\NavigationPanel
+\end{PageSummary}
 
-
+\begin{quickref}
+\quickcitation{Bonmin Wiki Pages}{\linkCoin Bonmin}
+\quickcitation{subversion web page}{http://subversion.tigris.org/}
+\quickcitation{Using subversion on windows}{http://www.coin-or.org/faqs.html\#q4}
+\quickcitation{Linear Algebra PACKage}{http://www.netlib.org/lapack/}
+\quickcitation{Basic Linear Algebra Subroutines}{http://www.netlib.org/blas/}
+\quickcitation{Harwell Subroutine Library}{http://www.cse.clrc.ac.uk/nag/hsl/contents.shtml}
+\quickcitation{Ampl Solver Library}{http://www.ampl.com}
+\end{quickref}
 
 \PageTitle{Obtaining \Bonmin}{sec:obtain}
 
@@ -26,7 +33,6 @@ project but also source code from other \COINOR\ projects:
 When downloading the \Bonmin\ package you will download the source code for all these and
 libraries of problems to test the codes.\\
 
-
 Before downloading \Bonmin\ you need to know which branch of Bonmin you want to download. 
 In particular you need to know if you want to download the latest version from:
 \begin{itemize}
@@ -39,7 +45,7 @@ The main distinction between the Stable and Release branch is that a stable vers
 
 The easiest way to obtain the released version is by downloading a compressed archive. The latest release is Bonmin-0.1.0.
 
-The only way to obain one of the stable versions is through subversion.
+The only way to obain one of the stable versions is through \link{http://subversion.tigris.org/}{subversion}.
 
 In Unix\footnote{UNIX is a registered trademark of The Open
 Group.}-like environments, to download the latest stable version of Bonmin (0.1) in a sub-directory, say {\tt Bonmin-0.1} 
@@ -47,12 +53,10 @@ issue the following command
 %\begin{verbatim}
 \break
 
- \noindent {\tt svn co 
+\begin{colorverb}
+ \noindent {\tt  svn co
 https://projects.coin-or.org/svn/Bonmin/stable/0.1 Bonmin-0.1 }
-
-This copies all the necessary COIN-OR files to compile Bonmin to Bonmin-0.1. 
-You can obtain the \Bonmin\ package by using
-\link{http://subversion.tigris.org/}{subversion}.
+\end{colorverb}
 
 \noindent This copies all the necessary COIN-OR files to compile \Bonmin\ to
 {\tt Bonmin-0.1}. To download \Bonmin\ using svn on Windows,

@@ -1,40 +1,19 @@
 \PageHead{Installation}
-\StartPageSummary
+\begin{PageSummary}
 \PageSection{Installing \Bonmin}{sec:install}
-\PageSection{Algorithms}{Algos}
-\PageSection{Building the documentation}{sec:ref_man}
-\PageSection{Running the test programs}{sec:test}
-\EndPageSummary
-\NavigationPanel
+\PageSection{Configuring {\tt Cplex}}{sec:cplex_install}
+\PageSection{Compiling \Bonmin\ in a external directory}{sec:vpath}
+\PageSection{Building documentation}{sec:ref_man}
+\PageSection{Running test program}{sec:test}
+\end{PageSummary}
 
-%\section{Layout of the \Bonmin\ package directory}
-
-%\section{Layout of the \Bonmin\ project directory}
-%The \Bonmin\ directory contains several sub-folders and files. We give here a brief overview of their content:
-%\begin{itemize}
-%\item {\tt Apps/} contains the sources to build the executable {\tt bonmin},
-%\item {\tt BCP/} (undocumented) an experimental MINLP solver for parallel environments using
-%  \href{http://www.coin-or.org/documentation.html\#BCP}{BCP}\footnote{http://www.coin-or.org/documentation.html\#BCP},
-%\item {\BonminBB} contains the source of the library to interface {\tt IpoptInterface}, {\tt Oa} and {\tt Cbc} and
-%to carry out a branch-and-bound algorithm,
-%\item {\tt CbcCopy/} contains a copy of the most recent version of
-%\href{http://www.coin-or.org/Cbc}{\tt Cbc} that has been tested and fully works with \Bonmin,
-%\item {\tt Doc/} contains this documentation and the reference manual
-%(to generate the reference manual see Section \ref{sec:ref_man}),
-%\item {\tt IpoptInterface/} contains the source for an
-%\href{http://www.coin-or.org/projects.html\#OSI}{\tt OsiInterface}\footnote{http://www.coin-or.org/projects.html\#OSI}
-%interface to {\tt Ipopt} ({\tt OsiInterface}'s are mainly for LP solvers, with some
-%rudimentary support for MILP solvers; so it is not truly an {\tt OsiInterface},
-%but it implements sufficient
-%functions for carrying out branch-and-bound),
-%\item {\tt OaInterface} contains the necessary elements for interfacing outer-approximation inside {\tt Cbc} using an
-%{\tt IpoptInterface},
-%\item {\tt Test} contains some test problems (see Section \ref{sec:test}),
-%\item {\tt Makefile} is the main Makefile,
-%\item {\tt Makefile.conf} contains the information for configuring the build process of \Bonmin,
-%\item {\tt Makefile.lib} contains general building rules.
-%\end{itemize}
-
+\begin{quickref}
+\quickcitation{Generic Coin Installation on Coin BuildTools web page}{\linkCoin BuildTools}
+\quickcitation{Known issues for building Coin packages}{\linkCoin BuildTools}
+\quickcitation{\Bonmin\ build Wiki page.}{\linkCoin Bonmin/wiki/GettingStarted}
+\quickcitation{Specific Instructions for building \Bonmin\ on Cygwin}{\linkCoin Bonmin/Wiki/CygwinInstall}
+\quickcitation{Specific instructions for building \Bonmin\ on Mac OSX}{\linkCoin Bonmin/Wiki/OsXInstall}
+\end{quickref}
 \PageTitle{Installing \Bonmin}{sec:install}
 The build process for \Bonmin\ should be fairly automatic as it uses
 \link{http://sources.redhat.com/autobook/autobook/}{GNU autotools}.
@@ -49,6 +28,7 @@ For Cygwin and OS X some specific setup has to be done prior to instalation. The
 
 
 \Bonmin\ is compiled and installed using the commands:
+\begin{colorverb}
 \begin{verbatim}
 
 ./configure -C
@@ -56,6 +36,7 @@ make
 make install
 
 \end{verbatim}
+\end{colorverb}
 
 This installs the executable {\tt bonmin} in {\tt coin-Bonmin/bin}. In what follows, we assume
 that you have put the executable {\tt bonmin} on your path.
@@ -64,15 +45,19 @@ The {\tt configure} script attempts to find all of the machine specific settings
 necessary to compile and run the code. Although {\tt configure} should find most of the standard
 ones, you may have to manually specify a few of the settings.
 The options for the configure script can be found by issuing the command
+
+\begin{colorverb}
 \begin{verbatim}
 
 ./configure --help
 
 \end{verbatim}
+\end{colorverb}
+
 For a more in depth description of these options,
 the reader is invited to refer to the COIN-OR {\tt BuildTools} \footlink{\linkCoin BuildTools}{trac page}.
 
-\subsectionH{Specifying the location of {\tt Cplex} libraries}{}
+\subsectionH{Specifying the location of {\tt Cplex} libraries}{sec:cplex_install}
 If you have {\tt Cplex} installed on your machine, you may want to use it
 as the Mixed Integer Linear Programming subsolver in {\tt B-OA} and {\tt B-Hyb}.
 To do so you have to specify the location of the header files and libraries.
@@ -86,22 +71,31 @@ need to add {\tt -lpthread} as an argument to {\tt --with-cplexlib}).\\
 
 For example, on a Linux machine if {\tt Cplex} is installed in {\tt /usr/ilog}~, you would
 invoke configure with the arguments as follows:
+
+\begin{colorverb}
 \begin{verbatim}
 
 ./configure --with-cplex-incdir=/usr/ilog/cplex/include/ilcplex \
   --with-cplex-lib="/usr/ilog/cplex/lib/libcplex.a -lpthread"
  \end{verbatim}
+ \end{colorverb}
+ 
 In the latter case, put a file called {\tt config.site} in a subdirectory named
 {\tt share} of the installation directory (if you do not specify an alternate
 installation directory to the {\tt configure} script with the {\tt --prefix}
 argument, the installation directory is the directory where you execute the
 {\tt configure} script). To specify the location of {\tt Cplex}~, insert the
 following lines in the {\tt config.site} file:
+
+\begin{colorverb}
  \begin{verbatim}
 
  with_cplex_lib="/usr/ilog/cplex/lib/libcplex.a -lpthread"
  with_cplex_incdir="/usr/ilog/cplex/include/ilcplex"
+ 
  \end{verbatim}
+\end{colorverb}
+
  (You will find a {\tt config.site} example in the subdirectory {\tt BuildTools} of {\tt coin-Bonmin}.)
 
 \subsectionH{Compiling \Bonmin\ in a external directory}{sec:vpath}
@@ -112,11 +106,16 @@ rchitectures or have several executables compiled with different options
 
 To do this just create a new directory, for example {\tt Bonmin-build} in the parent directory of
 {\tt coin-Bonmin} and run the configure command from {\tt Bonmin-build}:
+
+
+\begin{colorverb}
 \begin{verbatim}
 
 ../Bonmin-0.1/configure -C
 
 \end{verbatim}
+\end{colorverb}
+
 This will create the makefiles in {\tt coin-Bonmin}, and
 you can then compile with the usual {\tt make} and {\tt make install}
 (in {\tt Bonmin-build}).
