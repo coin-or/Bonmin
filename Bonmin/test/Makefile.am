@@ -15,7 +15,7 @@ AUTOMAKE_OPTIONS = foreign
 noinst_PROGRAMS = 
 
 if COIN_HAS_ASL
-noinst_PROGRAMS += unitTest 
+noinst_PROGRAMS += unitTest
 endif
 
 noinst_PROGRAMS += CppExample
@@ -88,6 +88,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/contrib/CGPenalty` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
