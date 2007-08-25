@@ -20,7 +20,7 @@
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "MyTMINLP.hpp"
-#include "BonCbc2.hpp"
+#include "BonCbc.hpp"
 #include "BonBonminSetup.hpp"
 
 #include "BonOACutGenerator2.hpp"
@@ -72,7 +72,7 @@ int main (int argc, char *argv[])
   //Set up done, now let's branch and bound
   double time1 = CoinCpuTime();
   try {
-    Bab2 bb;
+    Bab bb;
     bb(bonmin);//process parameter file using Ipopt and do branch and bound using Cbc
 
 
