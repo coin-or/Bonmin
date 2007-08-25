@@ -138,6 +138,11 @@
   \end{rawhtml}}
   }
   
+  \newcommand{\PageName}[1]{\latexhtml{}{
+\begin{rawhtml}
+ <h2 id="pageName"> \end{rawhtml} #1 \begin{rawhtml} </h2> 
+\end{rawhtml}}}
+
   \newcommand{\PageSection}[2]{\latexhtml{}{\begin{rawhtml} <a href="\end{rawhtml}\##2 \begin{rawhtml}" > \end{rawhtml} #1 \begin{rawhtml} </a>  / \end{rawhtml}}}
  
  \newcommand{\EndPageSummary}{
