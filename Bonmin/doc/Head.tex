@@ -122,10 +122,26 @@
 }
 
 %Header of the page
-\newcommand{\PageHead}[1]{
+  
+  \newcommand{\PageName}[1]{\latexhtml{}{
+\begin{rawhtml}
+ <h2 id="pageName"> \end{rawhtml} #1 \begin{rawhtml} </h2> 
+\end{rawhtml}}}
+
+  \newcommand{\PageSection}[2]{\latexhtml{}{\begin{rawhtml} <a href="\end{rawhtml}\##2 \begin{rawhtml}" > \end{rawhtml} #1 \begin{rawhtml} </a>  / \end{rawhtml}}}
+ 
+ \newcommand{\EndPageSummary}{
+ \latexhtml{}{\begin{rawhtml}
+</div>
+\end{rawhtml}
+}
+}
+
+%Panels of links
+\newcommand{\NavigationPanels}{
 \latexhtml{}{
 \begin{rawhtml}
-<div id="masthead"> 
+<div id="header"> 
   <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1> 
   <div id="globalNav"> 
 	<a href="../Intro/index.html">Introduction</a> | 
@@ -136,77 +152,37 @@
 	<a href="../options_list/index.html">Options List</a> | 
 	<a href="../bib/index.html">Bibliography</a> |
   </div> 
-  <h2 id="pageName"> \end{rawhtml} #1 \begin{rawhtml} </h2> 
-  \end{rawhtml}}
-  }
-  
-  \newcommand{\StartPageSummary}{
-  \latexhtml{}{
-  \begin{rawhtml}
-  <div id="breadCrumb"> 
-  \end{rawhtml}}
-  }
-  
-  \newcommand{\PageSection}[2]{\latexhtml{}{\begin{rawhtml} <a href="\end{rawhtml}\##2 \begin{rawhtml}" > \end{rawhtml} #1 \begin{rawhtml} </a>  / \end{rawhtml}}}
- 
- \newcommand{\EndPageSummary}{
- \latexhtml{}{\begin{rawhtml}
-</div> 
-</div>
-\end{rawhtml}
-}
-}
-
-%Left panel for links
-\newcommand{\NavigationPanel}{
-\latexhtml{}{
-\begin{rawhtml}
+  </div> 
 <div id="leftPanel">
-<div id="navBar"> 
-  <div id="sectionLinks"> 
-   <h4>BONMIN links </h4> 
-	<ul> 
-	  <li><a href="https://projects.coin-or.org/Bonmin">Project Wiki</a></li> 
-	  	  <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS Interface </a> </li>
-	  <li><a href="http://list.coin-or.org/mailman/listinfo/Bonmin"> Mailing list </a> </li>
-	  <li><a href="http://projects.coin-or.org/Bonmin/report"> Bug reports</a></li>
-	  <li><a href="https://projects.coin-or.org/Bonmin/browser/trunk>Browse source</a></li> 
-	  <li><a href="" >Doxygen Manual</a></li> 
-		 <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU Open Source MINLP </a></li>
-	  <li><a href="http://www.coin-or.org">COIN-OR</a></li>
-	</ul> 
-   </div>
-</div>
-	<div class="relatedLinks"> 
-	<h4>COIN-OR links </h4> 
-	<ul> 
-	  <li><a href="http://www.coin-or.org/Cbc/index.html">Cbc</a></li> 
-	  <li><a href="http://www.coin-or.org/Clp/index.html">Clp</a></li> 
-	  <li><a href="http://projects.coin-or.org/Ipopt">Ipopt</a></li> 
-	</ul> 
-  </div> 
-  <div class="relatedLinks"> 
-	<h4>Problems libraries</h4> 
-	<ul> 
-	  <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU MINLP library </a></li>
-	  <li><a href="http://www.gamsworld.org/minlp/index.htm">GAMS MINLPLib </a></li> 
-	  <li><a href="http://www-unix.mcs.anl.gov/Eleyffer/macminlp/index.html">MacMinlp</a></li> 
-	</ul> 
-  </div> 
-  <div class="relatedLinks"> 
-	<h4>Other MINLP software</h4> 
-	<ul> 
-	  <li><a href="http://www.abo.fi/~Tapio.Westerlund/">alpha-CP</a></li>
-	  <li><a href="http://archimedes.scs.uiuc.edu/baron/baron.html">Baron</a></li>
-	  <li><a href="http://www.gamsworld.org/">GAMS</a></li> 
-	  <li><a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html">MINLPBB</a></li> 
-	  <li><a href="http://titan.princeton.edu/MINOPT/">MINOPT</a></li>
-	  <li><a href="http://www-neos.mcs.anl.gov/neos/solvers/index.html">NEOS</a></li>
-	</ul> 
-  </div> 
-</div>
+<div id="side-bar"> 
+<ul>
+<li class="main"><a href="/index.html">Bonmin</a></li>
+	  <li><a href="https://projects.coin-or.org/Bonmin">Wiki</a></li> 
+	  <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS </a> </li>
+		<li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU OCR </a></li>
+		<li><a href="http://domino.research.ibm.com/comm/research_projects.nsf/pages/minlp.index.html">
+		IBM MINLP </a></li>
+		<br>
+		<br>
+             <li class="main"><a href="/index.html">COIN-OR Home</a></li>
+              <li><a href="/projects.html">Projects</a></li>
+              <li><a href="/faqs.html">FAQs</a></li>
 
+              <li><a href="/download.html">Download</a></li>
+              <li><a href="/mail.html">Mailing Lists</a></li>
+              <li><a href="/how-to-help.html">Get Involved</a></li>
+              <li><a href="/resources.html">Related Resources</a></li>
+              <li class="main"><a href="/foundation.html">
+     <br>
+     <br>
+                COIN-OR Foundation
+              </a></li>
 
+              <li><a href="/events.html">Events</a></li>
+              <li><a href="/members.html">Members</a></li>
+	</ul> 
+</div>
+</div>
 <!--end navBar div --> 
 
 
@@ -215,7 +191,7 @@
 }}
 
 
-\newenvironment{PageSummary}{\StartPageSummary}{\EndPageSummary \NavigationPanel}
+\newenvironment{PageSummary}{\NavigationPanels}{\EndPageSummary }
 
 \newcounter{refnum}
 
