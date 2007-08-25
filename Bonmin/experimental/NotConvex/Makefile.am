@@ -12,23 +12,31 @@ if COIN_HAS_ASL
   bin_PROGRAMS = boncouenne
 endif
 
-COINLIBS = \
-	$(CBCOBJDIR)/src/libCbc.la \
-	$(CGLOBJDIR)/src/libCgl.la \
-        $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-        $(OSIOBJDIR)/src/libOsi.la \
-        $(CLPOBJDIR)/src/libClp.la \
-        $(COINUTILSOBJDIR)/src/libCoinUtils.la
-
-if COIN_HAS_CPX
-COINLIBS += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-        $(COINUTILSOBJDIR)/src/libCoinUtils.la \
-        $(CPXLIB)
-endif
+COINLIBS = 
 
 if COIN_HAS_COUENNE
 COINLIBS += $(COUENNEOBJDIR)/src/libCouenne.la
 endif
+
+COINLIBS += \
+	$(CBCOBJDIR)/src/libCbc.la \
+	$(CGLOBJDIR)/src/libCgl.la \
+     $(OSIOBJDIR)/src/OsiClp/libOsiClp.la
+
+if COIN_HAS_CPX
+     COINLIBS += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+endif
+
+COINLIBS += \
+     $(OSIOBJDIR)/src/libOsi.la \
+     $(CLPOBJDIR)/src/libClp.la \
+     $(COINUTILSOBJDIR)/src/libCoinUtils.la
+
+if COIN_HAS_CPX
+COINLIBS += \
+        $(CPXLIB)
+endif
+
 
 IPOPTLIBS = \
         $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
