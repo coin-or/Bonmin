@@ -1,4 +1,4 @@
- // (C) Copyright International Business Machines (IBM) 2006, 2007
+// (C) Copyright International Business Machines (IBM) 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -50,7 +50,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
   }
   double orig_violation = nlp_->getNonLinearitiesViolation(
                           si.getColSolution(), si.getObjValue());
-#define ECP_DEBUG
+//#define ECP_DEBUG
 #ifdef ECP_DEBUG
   std::cout<<"Initial Constraint violation: "<<orig_violation<<std::endl;
 #endif
