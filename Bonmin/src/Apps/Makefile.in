@@ -45,10 +45,14 @@ host_triplet = @host@
 @COIN_HAS_ASL_TRUE@bin_PROGRAMS = bonmin$(EXEEXT) nodeSolver$(EXEEXT)
 @COIN_HAS_CPX_TRUE@am__append_1 = \
 @COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-@COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
 @COIN_HAS_CPX_TRUE@	$(CPXLIB)
 
 @COIN_HAS_CPX_TRUE@am__append_2 = \
+@COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
+@COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
+@COIN_HAS_CPX_TRUE@	$(CPXLIB)
+
+@COIN_HAS_CPX_TRUE@am__append_3 = \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
@@ -71,24 +75,27 @@ am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
 @COIN_HAS_CPX_TRUE@am__DEPENDENCIES_3 =  \
 @COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
+@COIN_HAS_CPX_TRUE@	$(am__DEPENDENCIES_2)
+@COIN_HAS_CPX_TRUE@am__DEPENDENCIES_4 =  \
+@COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 @COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
 @COIN_HAS_CPX_TRUE@	$(am__DEPENDENCIES_2)
-am__DEPENDENCIES_4 = $(CBCOBJDIR)/src/libCbc.la \
+am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
 	$(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la $(am__DEPENDENCIES_3) \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3)
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_4)
 bonmin_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
 am_nodeSolver_OBJECTS = BonNodeSolver.$(OBJEXT)
 nodeSolver_OBJECTS = $(am_nodeSolver_OBJECTS)
 nodeSolver_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -328,9 +335,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 COINLIBS = $(CBCOBJDIR)/src/libCbc.la $(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la $(am__append_1) \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__append_1)
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__append_2)
 IPOPTLIBS = \
 	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
@@ -372,7 +379,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Algorithms` -I`$(CYGPATH_W) \
 	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(CBCSRCDIR)/src` -I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` $(am__append_2)
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` $(am__append_3)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin

@@ -17,7 +17,16 @@ endif
 COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \
 	$(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la
+
+if COIN_HAS_CPX
+  COINLIBS += \
+	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
+	$(CPXLIB)
+endif
+
+
+COINLIBS += \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
