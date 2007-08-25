@@ -42,8 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = sdpcuts$(EXEEXT) genrandQp$(EXEEXT) \
-	testconv$(EXEEXT) testeval$(EXEEXT) testclp$(EXEEXT)
+noinst_PROGRAMS = testconv$(EXEEXT) testeval$(EXEEXT) testclp$(EXEEXT)
 
 # If we have the Ampl solver library, we need to add additional things
 @COIN_HAS_ASL_TRUE@am__append_1 = $(ASL_CPPFLAGS)
@@ -58,29 +57,14 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_couenne.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_genrandQp_OBJECTS = genrandQp.$(OBJEXT)
-genrandQp_OBJECTS = $(am_genrandQp_OBJECTS)
-genrandQp_LDADD = $(LDADD)
-am_sdpcuts_OBJECTS = sdpcuts.$(OBJEXT) populate.$(OBJEXT) \
-	createCut.$(OBJEXT) SdpCutGen.$(OBJEXT) separateEV.$(OBJEXT) \
-	separateGrad.$(OBJEXT) separateTRM.$(OBJEXT) \
-	separateLU.$(OBJEXT) separateBK.$(OBJEXT) partialLU.$(OBJEXT) \
-	eigenPlay.$(OBJEXT) dsyevx_wrapper.$(OBJEXT) \
-	updateSol.$(OBJEXT) genSDPcut.$(OBJEXT)
-sdpcuts_OBJECTS = $(am_sdpcuts_OBJECTS)
+am_testclp_OBJECTS = clp-try.$(OBJEXT)
+testclp_OBJECTS = $(am_testclp_OBJECTS)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 	$(CBCOBJDIR)/src/libCbc.la $(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(COINUTILSOBJDIR)/../ThirdParty/Lapack/libcoinlapack.la
-sdpcuts_DEPENDENCIES = ../src/libCouenne.la /usr/local/lib/libdgqt.a \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_1)
-am_testclp_OBJECTS = clp-try.$(OBJEXT)
-testclp_OBJECTS = $(am_testclp_OBJECTS)
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 testclp_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
 am_testconv_OBJECTS = testconv.$(OBJEXT)
@@ -93,14 +77,6 @@ testeval_DEPENDENCIES = ../src/libCouenne.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
@@ -109,10 +85,9 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(genrandQp_SOURCES) $(sdpcuts_SOURCES) $(testclp_SOURCES) \
-	$(testconv_SOURCES) $(testeval_SOURCES)
-DIST_SOURCES = $(genrandQp_SOURCES) $(sdpcuts_SOURCES) \
-	$(testclp_SOURCES) $(testconv_SOURCES) $(testeval_SOURCES)
+SOURCES = $(testclp_SOURCES) $(testconv_SOURCES) $(testeval_SOURCES)
+DIST_SOURCES = $(testclp_SOURCES) $(testconv_SOURCES) \
+	$(testeval_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -291,22 +266,6 @@ AUTOMAKE_OPTIONS = foreign
 testconv_SOURCES = fun/testconv.cpp
 testeval_SOURCES = fun/testeval.cpp
 testclp_SOURCES = fun/clp-try.cpp
-sdpcuts_SOURCES = fun/sdpcuts.cpp \
-	           fun/populate.cpp \
-	           fun/createCut.cpp \
-	           fun/SdpCutGen.cpp \
-	           fun/separateEV.cpp \
-	           fun/separateGrad.cpp \
-	           fun/separateTRM.cpp \
-	           fun/separateLU.cpp \
-	           fun/separateBK.cpp \
-	           fun/partialLU.c \
-	           fun/eigenPlay.cpp \
-	           fun/dsyevx_wrapper.cpp \
-	           fun/updateSol.cpp \
-		   fun/genSDPcut.cpp
-
-genrandQp_SOURCES = fun/genrandQp.c
 
 # List libraries of COIN projects
 testconv_LDADD = \
@@ -329,22 +288,13 @@ testclp_LDADD = \
 	$(COINLIBS) \
 	$(ADDLIBS)
 
-sdpcuts_LDADD = \
-        ../src/libCouenne.la \
-	/usr/local/lib/libdgqt.a \
-	$(ASLLIB) \
-	$(COINLIBS) \
-	$(ADDLIBS)
-
 COINLIBS = \
 	$(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 	$(CBCOBJDIR)/src/libCbc.la \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(COINUTILSOBJDIR)/../ThirdParty/Lapack/libcoinlapack.la
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
 
 # Here list all include flags, relative to this "srcdir" directory.  This
@@ -362,7 +312,6 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/util` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/convex` -I`$(CYGPATH_W) \
-	$(COUENNESRCDIR)/src/convex/sdpcuts` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/problem` -I`$(CYGPATH_W) \
 	$(OSISRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` -I`$(CYGPATH_W) \
@@ -397,7 +346,7 @@ DISTCLEANFILES =
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .lo .o .obj
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -434,12 +383,6 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-genrandQp$(EXEEXT): $(genrandQp_OBJECTS) $(genrandQp_DEPENDENCIES) 
-	@rm -f genrandQp$(EXEEXT)
-	$(LINK) $(genrandQp_LDFLAGS) $(genrandQp_OBJECTS) $(genrandQp_LDADD) $(LIBS)
-sdpcuts$(EXEEXT): $(sdpcuts_OBJECTS) $(sdpcuts_DEPENDENCIES) 
-	@rm -f sdpcuts$(EXEEXT)
-	$(CXXLINK) $(sdpcuts_LDFLAGS) $(sdpcuts_OBJECTS) $(sdpcuts_LDADD) $(LIBS)
 testclp$(EXEEXT): $(testclp_OBJECTS) $(testclp_DEPENDENCIES) 
 	@rm -f testclp$(EXEEXT)
 	$(CXXLINK) $(testclp_LDFLAGS) $(testclp_OBJECTS) $(testclp_LDADD) $(LIBS)
@@ -456,73 +399,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SdpCutGen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clp-try.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCut.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dsyevx_wrapper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eigenPlay.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genSDPcut.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genrandQp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/partialLU.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/populate.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdpcuts.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateBK.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateEV.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateGrad.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateLU.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateTRM.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testconv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testeval.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/updateSol.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-genrandQp.o: fun/genrandQp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT genrandQp.o -MD -MP -MF "$(DEPDIR)/genrandQp.Tpo" -c -o genrandQp.o `test -f 'fun/genrandQp.c' || echo '$(srcdir)/'`fun/genrandQp.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/genrandQp.Tpo" "$(DEPDIR)/genrandQp.Po"; else rm -f "$(DEPDIR)/genrandQp.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fun/genrandQp.c' object='genrandQp.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o genrandQp.o `test -f 'fun/genrandQp.c' || echo '$(srcdir)/'`fun/genrandQp.c
-
-genrandQp.obj: fun/genrandQp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT genrandQp.obj -MD -MP -MF "$(DEPDIR)/genrandQp.Tpo" -c -o genrandQp.obj `if test -f 'fun/genrandQp.c'; then $(CYGPATH_W) 'fun/genrandQp.c'; else $(CYGPATH_W) '$(srcdir)/fun/genrandQp.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/genrandQp.Tpo" "$(DEPDIR)/genrandQp.Po"; else rm -f "$(DEPDIR)/genrandQp.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fun/genrandQp.c' object='genrandQp.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o genrandQp.obj `if test -f 'fun/genrandQp.c'; then $(CYGPATH_W) 'fun/genrandQp.c'; else $(CYGPATH_W) '$(srcdir)/fun/genrandQp.c'; fi`
-
-partialLU.o: fun/partialLU.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT partialLU.o -MD -MP -MF "$(DEPDIR)/partialLU.Tpo" -c -o partialLU.o `test -f 'fun/partialLU.c' || echo '$(srcdir)/'`fun/partialLU.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/partialLU.Tpo" "$(DEPDIR)/partialLU.Po"; else rm -f "$(DEPDIR)/partialLU.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fun/partialLU.c' object='partialLU.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o partialLU.o `test -f 'fun/partialLU.c' || echo '$(srcdir)/'`fun/partialLU.c
-
-partialLU.obj: fun/partialLU.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT partialLU.obj -MD -MP -MF "$(DEPDIR)/partialLU.Tpo" -c -o partialLU.obj `if test -f 'fun/partialLU.c'; then $(CYGPATH_W) 'fun/partialLU.c'; else $(CYGPATH_W) '$(srcdir)/fun/partialLU.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/partialLU.Tpo" "$(DEPDIR)/partialLU.Po"; else rm -f "$(DEPDIR)/partialLU.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fun/partialLU.c' object='partialLU.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o partialLU.obj `if test -f 'fun/partialLU.c'; then $(CYGPATH_W) 'fun/partialLU.c'; else $(CYGPATH_W) '$(srcdir)/fun/partialLU.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -544,188 +423,6 @@ partialLU.obj: fun/partialLU.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
-
-sdpcuts.o: fun/sdpcuts.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT sdpcuts.o -MD -MP -MF "$(DEPDIR)/sdpcuts.Tpo" -c -o sdpcuts.o `test -f 'fun/sdpcuts.cpp' || echo '$(srcdir)/'`fun/sdpcuts.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/sdpcuts.Tpo" "$(DEPDIR)/sdpcuts.Po"; else rm -f "$(DEPDIR)/sdpcuts.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/sdpcuts.cpp' object='sdpcuts.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o sdpcuts.o `test -f 'fun/sdpcuts.cpp' || echo '$(srcdir)/'`fun/sdpcuts.cpp
-
-sdpcuts.obj: fun/sdpcuts.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT sdpcuts.obj -MD -MP -MF "$(DEPDIR)/sdpcuts.Tpo" -c -o sdpcuts.obj `if test -f 'fun/sdpcuts.cpp'; then $(CYGPATH_W) 'fun/sdpcuts.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/sdpcuts.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/sdpcuts.Tpo" "$(DEPDIR)/sdpcuts.Po"; else rm -f "$(DEPDIR)/sdpcuts.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/sdpcuts.cpp' object='sdpcuts.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o sdpcuts.obj `if test -f 'fun/sdpcuts.cpp'; then $(CYGPATH_W) 'fun/sdpcuts.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/sdpcuts.cpp'; fi`
-
-populate.o: fun/populate.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT populate.o -MD -MP -MF "$(DEPDIR)/populate.Tpo" -c -o populate.o `test -f 'fun/populate.cpp' || echo '$(srcdir)/'`fun/populate.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/populate.Tpo" "$(DEPDIR)/populate.Po"; else rm -f "$(DEPDIR)/populate.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/populate.cpp' object='populate.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o populate.o `test -f 'fun/populate.cpp' || echo '$(srcdir)/'`fun/populate.cpp
-
-populate.obj: fun/populate.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT populate.obj -MD -MP -MF "$(DEPDIR)/populate.Tpo" -c -o populate.obj `if test -f 'fun/populate.cpp'; then $(CYGPATH_W) 'fun/populate.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/populate.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/populate.Tpo" "$(DEPDIR)/populate.Po"; else rm -f "$(DEPDIR)/populate.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/populate.cpp' object='populate.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o populate.obj `if test -f 'fun/populate.cpp'; then $(CYGPATH_W) 'fun/populate.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/populate.cpp'; fi`
-
-createCut.o: fun/createCut.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT createCut.o -MD -MP -MF "$(DEPDIR)/createCut.Tpo" -c -o createCut.o `test -f 'fun/createCut.cpp' || echo '$(srcdir)/'`fun/createCut.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/createCut.Tpo" "$(DEPDIR)/createCut.Po"; else rm -f "$(DEPDIR)/createCut.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/createCut.cpp' object='createCut.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o createCut.o `test -f 'fun/createCut.cpp' || echo '$(srcdir)/'`fun/createCut.cpp
-
-createCut.obj: fun/createCut.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT createCut.obj -MD -MP -MF "$(DEPDIR)/createCut.Tpo" -c -o createCut.obj `if test -f 'fun/createCut.cpp'; then $(CYGPATH_W) 'fun/createCut.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/createCut.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/createCut.Tpo" "$(DEPDIR)/createCut.Po"; else rm -f "$(DEPDIR)/createCut.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/createCut.cpp' object='createCut.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o createCut.obj `if test -f 'fun/createCut.cpp'; then $(CYGPATH_W) 'fun/createCut.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/createCut.cpp'; fi`
-
-SdpCutGen.o: fun/SdpCutGen.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT SdpCutGen.o -MD -MP -MF "$(DEPDIR)/SdpCutGen.Tpo" -c -o SdpCutGen.o `test -f 'fun/SdpCutGen.cpp' || echo '$(srcdir)/'`fun/SdpCutGen.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/SdpCutGen.Tpo" "$(DEPDIR)/SdpCutGen.Po"; else rm -f "$(DEPDIR)/SdpCutGen.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/SdpCutGen.cpp' object='SdpCutGen.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o SdpCutGen.o `test -f 'fun/SdpCutGen.cpp' || echo '$(srcdir)/'`fun/SdpCutGen.cpp
-
-SdpCutGen.obj: fun/SdpCutGen.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT SdpCutGen.obj -MD -MP -MF "$(DEPDIR)/SdpCutGen.Tpo" -c -o SdpCutGen.obj `if test -f 'fun/SdpCutGen.cpp'; then $(CYGPATH_W) 'fun/SdpCutGen.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/SdpCutGen.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/SdpCutGen.Tpo" "$(DEPDIR)/SdpCutGen.Po"; else rm -f "$(DEPDIR)/SdpCutGen.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/SdpCutGen.cpp' object='SdpCutGen.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o SdpCutGen.obj `if test -f 'fun/SdpCutGen.cpp'; then $(CYGPATH_W) 'fun/SdpCutGen.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/SdpCutGen.cpp'; fi`
-
-separateEV.o: fun/separateEV.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateEV.o -MD -MP -MF "$(DEPDIR)/separateEV.Tpo" -c -o separateEV.o `test -f 'fun/separateEV.cpp' || echo '$(srcdir)/'`fun/separateEV.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateEV.Tpo" "$(DEPDIR)/separateEV.Po"; else rm -f "$(DEPDIR)/separateEV.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateEV.cpp' object='separateEV.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateEV.o `test -f 'fun/separateEV.cpp' || echo '$(srcdir)/'`fun/separateEV.cpp
-
-separateEV.obj: fun/separateEV.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateEV.obj -MD -MP -MF "$(DEPDIR)/separateEV.Tpo" -c -o separateEV.obj `if test -f 'fun/separateEV.cpp'; then $(CYGPATH_W) 'fun/separateEV.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateEV.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateEV.Tpo" "$(DEPDIR)/separateEV.Po"; else rm -f "$(DEPDIR)/separateEV.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateEV.cpp' object='separateEV.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateEV.obj `if test -f 'fun/separateEV.cpp'; then $(CYGPATH_W) 'fun/separateEV.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateEV.cpp'; fi`
-
-separateGrad.o: fun/separateGrad.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateGrad.o -MD -MP -MF "$(DEPDIR)/separateGrad.Tpo" -c -o separateGrad.o `test -f 'fun/separateGrad.cpp' || echo '$(srcdir)/'`fun/separateGrad.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateGrad.Tpo" "$(DEPDIR)/separateGrad.Po"; else rm -f "$(DEPDIR)/separateGrad.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateGrad.cpp' object='separateGrad.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateGrad.o `test -f 'fun/separateGrad.cpp' || echo '$(srcdir)/'`fun/separateGrad.cpp
-
-separateGrad.obj: fun/separateGrad.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateGrad.obj -MD -MP -MF "$(DEPDIR)/separateGrad.Tpo" -c -o separateGrad.obj `if test -f 'fun/separateGrad.cpp'; then $(CYGPATH_W) 'fun/separateGrad.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateGrad.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateGrad.Tpo" "$(DEPDIR)/separateGrad.Po"; else rm -f "$(DEPDIR)/separateGrad.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateGrad.cpp' object='separateGrad.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateGrad.obj `if test -f 'fun/separateGrad.cpp'; then $(CYGPATH_W) 'fun/separateGrad.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateGrad.cpp'; fi`
-
-separateTRM.o: fun/separateTRM.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateTRM.o -MD -MP -MF "$(DEPDIR)/separateTRM.Tpo" -c -o separateTRM.o `test -f 'fun/separateTRM.cpp' || echo '$(srcdir)/'`fun/separateTRM.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateTRM.Tpo" "$(DEPDIR)/separateTRM.Po"; else rm -f "$(DEPDIR)/separateTRM.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateTRM.cpp' object='separateTRM.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateTRM.o `test -f 'fun/separateTRM.cpp' || echo '$(srcdir)/'`fun/separateTRM.cpp
-
-separateTRM.obj: fun/separateTRM.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateTRM.obj -MD -MP -MF "$(DEPDIR)/separateTRM.Tpo" -c -o separateTRM.obj `if test -f 'fun/separateTRM.cpp'; then $(CYGPATH_W) 'fun/separateTRM.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateTRM.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateTRM.Tpo" "$(DEPDIR)/separateTRM.Po"; else rm -f "$(DEPDIR)/separateTRM.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateTRM.cpp' object='separateTRM.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateTRM.obj `if test -f 'fun/separateTRM.cpp'; then $(CYGPATH_W) 'fun/separateTRM.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateTRM.cpp'; fi`
-
-separateLU.o: fun/separateLU.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateLU.o -MD -MP -MF "$(DEPDIR)/separateLU.Tpo" -c -o separateLU.o `test -f 'fun/separateLU.cpp' || echo '$(srcdir)/'`fun/separateLU.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateLU.Tpo" "$(DEPDIR)/separateLU.Po"; else rm -f "$(DEPDIR)/separateLU.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateLU.cpp' object='separateLU.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateLU.o `test -f 'fun/separateLU.cpp' || echo '$(srcdir)/'`fun/separateLU.cpp
-
-separateLU.obj: fun/separateLU.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateLU.obj -MD -MP -MF "$(DEPDIR)/separateLU.Tpo" -c -o separateLU.obj `if test -f 'fun/separateLU.cpp'; then $(CYGPATH_W) 'fun/separateLU.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateLU.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateLU.Tpo" "$(DEPDIR)/separateLU.Po"; else rm -f "$(DEPDIR)/separateLU.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateLU.cpp' object='separateLU.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateLU.obj `if test -f 'fun/separateLU.cpp'; then $(CYGPATH_W) 'fun/separateLU.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateLU.cpp'; fi`
-
-separateBK.o: fun/separateBK.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateBK.o -MD -MP -MF "$(DEPDIR)/separateBK.Tpo" -c -o separateBK.o `test -f 'fun/separateBK.cpp' || echo '$(srcdir)/'`fun/separateBK.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateBK.Tpo" "$(DEPDIR)/separateBK.Po"; else rm -f "$(DEPDIR)/separateBK.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateBK.cpp' object='separateBK.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateBK.o `test -f 'fun/separateBK.cpp' || echo '$(srcdir)/'`fun/separateBK.cpp
-
-separateBK.obj: fun/separateBK.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateBK.obj -MD -MP -MF "$(DEPDIR)/separateBK.Tpo" -c -o separateBK.obj `if test -f 'fun/separateBK.cpp'; then $(CYGPATH_W) 'fun/separateBK.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateBK.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateBK.Tpo" "$(DEPDIR)/separateBK.Po"; else rm -f "$(DEPDIR)/separateBK.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/separateBK.cpp' object='separateBK.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateBK.obj `if test -f 'fun/separateBK.cpp'; then $(CYGPATH_W) 'fun/separateBK.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/separateBK.cpp'; fi`
-
-eigenPlay.o: fun/eigenPlay.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT eigenPlay.o -MD -MP -MF "$(DEPDIR)/eigenPlay.Tpo" -c -o eigenPlay.o `test -f 'fun/eigenPlay.cpp' || echo '$(srcdir)/'`fun/eigenPlay.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/eigenPlay.Tpo" "$(DEPDIR)/eigenPlay.Po"; else rm -f "$(DEPDIR)/eigenPlay.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/eigenPlay.cpp' object='eigenPlay.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o eigenPlay.o `test -f 'fun/eigenPlay.cpp' || echo '$(srcdir)/'`fun/eigenPlay.cpp
-
-eigenPlay.obj: fun/eigenPlay.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT eigenPlay.obj -MD -MP -MF "$(DEPDIR)/eigenPlay.Tpo" -c -o eigenPlay.obj `if test -f 'fun/eigenPlay.cpp'; then $(CYGPATH_W) 'fun/eigenPlay.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/eigenPlay.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/eigenPlay.Tpo" "$(DEPDIR)/eigenPlay.Po"; else rm -f "$(DEPDIR)/eigenPlay.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/eigenPlay.cpp' object='eigenPlay.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o eigenPlay.obj `if test -f 'fun/eigenPlay.cpp'; then $(CYGPATH_W) 'fun/eigenPlay.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/eigenPlay.cpp'; fi`
-
-dsyevx_wrapper.o: fun/dsyevx_wrapper.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT dsyevx_wrapper.o -MD -MP -MF "$(DEPDIR)/dsyevx_wrapper.Tpo" -c -o dsyevx_wrapper.o `test -f 'fun/dsyevx_wrapper.cpp' || echo '$(srcdir)/'`fun/dsyevx_wrapper.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/dsyevx_wrapper.Tpo" "$(DEPDIR)/dsyevx_wrapper.Po"; else rm -f "$(DEPDIR)/dsyevx_wrapper.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/dsyevx_wrapper.cpp' object='dsyevx_wrapper.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o dsyevx_wrapper.o `test -f 'fun/dsyevx_wrapper.cpp' || echo '$(srcdir)/'`fun/dsyevx_wrapper.cpp
-
-dsyevx_wrapper.obj: fun/dsyevx_wrapper.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT dsyevx_wrapper.obj -MD -MP -MF "$(DEPDIR)/dsyevx_wrapper.Tpo" -c -o dsyevx_wrapper.obj `if test -f 'fun/dsyevx_wrapper.cpp'; then $(CYGPATH_W) 'fun/dsyevx_wrapper.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/dsyevx_wrapper.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/dsyevx_wrapper.Tpo" "$(DEPDIR)/dsyevx_wrapper.Po"; else rm -f "$(DEPDIR)/dsyevx_wrapper.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/dsyevx_wrapper.cpp' object='dsyevx_wrapper.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o dsyevx_wrapper.obj `if test -f 'fun/dsyevx_wrapper.cpp'; then $(CYGPATH_W) 'fun/dsyevx_wrapper.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/dsyevx_wrapper.cpp'; fi`
-
-updateSol.o: fun/updateSol.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT updateSol.o -MD -MP -MF "$(DEPDIR)/updateSol.Tpo" -c -o updateSol.o `test -f 'fun/updateSol.cpp' || echo '$(srcdir)/'`fun/updateSol.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/updateSol.Tpo" "$(DEPDIR)/updateSol.Po"; else rm -f "$(DEPDIR)/updateSol.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/updateSol.cpp' object='updateSol.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o updateSol.o `test -f 'fun/updateSol.cpp' || echo '$(srcdir)/'`fun/updateSol.cpp
-
-updateSol.obj: fun/updateSol.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT updateSol.obj -MD -MP -MF "$(DEPDIR)/updateSol.Tpo" -c -o updateSol.obj `if test -f 'fun/updateSol.cpp'; then $(CYGPATH_W) 'fun/updateSol.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/updateSol.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/updateSol.Tpo" "$(DEPDIR)/updateSol.Po"; else rm -f "$(DEPDIR)/updateSol.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/updateSol.cpp' object='updateSol.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o updateSol.obj `if test -f 'fun/updateSol.cpp'; then $(CYGPATH_W) 'fun/updateSol.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/updateSol.cpp'; fi`
-
-genSDPcut.o: fun/genSDPcut.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT genSDPcut.o -MD -MP -MF "$(DEPDIR)/genSDPcut.Tpo" -c -o genSDPcut.o `test -f 'fun/genSDPcut.cpp' || echo '$(srcdir)/'`fun/genSDPcut.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/genSDPcut.Tpo" "$(DEPDIR)/genSDPcut.Po"; else rm -f "$(DEPDIR)/genSDPcut.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/genSDPcut.cpp' object='genSDPcut.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o genSDPcut.o `test -f 'fun/genSDPcut.cpp' || echo '$(srcdir)/'`fun/genSDPcut.cpp
-
-genSDPcut.obj: fun/genSDPcut.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT genSDPcut.obj -MD -MP -MF "$(DEPDIR)/genSDPcut.Tpo" -c -o genSDPcut.obj `if test -f 'fun/genSDPcut.cpp'; then $(CYGPATH_W) 'fun/genSDPcut.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/genSDPcut.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/genSDPcut.Tpo" "$(DEPDIR)/genSDPcut.Po"; else rm -f "$(DEPDIR)/genSDPcut.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fun/genSDPcut.cpp' object='genSDPcut.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o genSDPcut.obj `if test -f 'fun/genSDPcut.cpp'; then $(CYGPATH_W) 'fun/genSDPcut.cpp'; else $(CYGPATH_W) '$(srcdir)/fun/genSDPcut.cpp'; fi`
 
 clp-try.o: fun/clp-try.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT clp-try.o -MD -MP -MF "$(DEPDIR)/clp-try.Tpo" -c -o clp-try.o `test -f 'fun/clp-try.cpp' || echo '$(srcdir)/'`fun/clp-try.cpp; \
@@ -947,9 +644,7 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
-#test: testconv$(EXEEXT) testeval$(EXEEXT) sdpcuts
-test: sdpcuts$(EXEEXT)
-#	./testfun$(EXEEXT)
+test: testconv$(EXEEXT) testeval$(EXEEXT)
 
 .PHONY: test
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
