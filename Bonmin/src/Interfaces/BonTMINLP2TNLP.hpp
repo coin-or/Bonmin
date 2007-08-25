@@ -352,7 +352,15 @@ namespace Bonmin
         return tminlp_->hasUpperBoundingObjective();}
 
       /** Evaluate the upper bounding function at given point and store the result.*/
-      void evaluateUpperBoundingFunction(const double * x);
+    void evaluateUpperBoundingFunction(const double * x);
+    
+    /** @name Methods for adding the linear cut information */
+    //@{
+    void eval_g_add_linear_cuts(Number* g, const Number* x);
+    void eval_jac_g_add_linear_cuts(Index nele_jac, Index* iRow,
+				    Index *jCol, Number* values);
+    //@}
+
   protected:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -439,13 +447,6 @@ namespace Bonmin
     /** Private method that throws an exception if the variable bounds
      * are not consistent with the variable type */
     void throw_exception_on_bad_variable_bound(Index i);
-
-    /** @name Methods for adding the linear cut information */
-    //@{
-    void eval_g_add_linear_cuts(Number* g, const Number* x);
-    void eval_jac_g_add_linear_cuts(Index nele_jac, Index* iRow,
-				    Index *jCol, Number* values);
-    //@}
 
     private:
     void resizeStartingPoint();

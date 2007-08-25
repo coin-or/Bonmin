@@ -25,8 +25,9 @@
 #include "Filter/BonFilterSolver.hpp"
 #endif
 
-
 #include "OsiBranchingObject.hpp"
+#include "BonStrongBranchingSolver.hpp"
+
 using namespace Ipopt;
 
 
@@ -467,7 +468,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     firstSolve_(true),
     cutStrengthener_(source.cutStrengthener_),
     oaMessages_(),
-    oaHandler_(NULL)
+    oaHandler_(NULL),
+    strong_branching_solver_(source.strong_branching_solver_)
 {
       messageHandler()->setLogLevel(source.messageHandler()->logLevel());
   //Pass in message handler
@@ -626,6 +628,7 @@ app_ = NULL;
 
     delete oaHandler_;
     oaHandler_ = new OaMessageHandler(*rhs.oaHandler_);
+    strong_branching_solver_ = rhs.strong_branching_solver_;
 
     freeCachedData();
   }
@@ -1960,7 +1963,6 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   double nlp_infty = infty_;
   
   for(int i = 0 ; i < m ; i++) {
-  {
     if(constTypes_[i] == TNLP::NON_LINEAR) {
       //If constraint is range not binding prepare to remove it
       if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
@@ -1986,9 +1988,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
       //If equality or ranged constraint only add one side by looking at sign of dual multiplier
       if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty)
       {
-        if(duals[i] >= 0)// <= inequality
+        if(duals[i] >= 0.)// <= inequality
           rowLow[i] = - infty;
-        if(duals[i] <= 0)// >= inequality
+        if(duals[i] <= 0.)// >= inequality
           rowUp[i] = infty;
       }
     }
@@ -1997,7 +1999,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
       rowUp[i] =  (rowUpper[i] - g[i]);
     }
   }
-  }
+
   
   
   //Then convert everything to a CoinPackedMatrix
@@ -2024,7 +2026,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   int numcols=getNumCols();
   double *obj = new double[numcols];
   for(int i = 0 ; i < numcols ; i++)
-    obj[i] = 0;
+    obj[i] = 0.;
   
   
   si.loadProblem(mat, getColLower(), getColUpper(), obj, rowLow, rowUp);
@@ -2437,6 +2439,71 @@ OsiTMINLPInterface::extractInterfaceParams()
       cutStrengthener_ = new CutStrengthener(app_->clone(), app_->Options());
     }
   }
+}
+
+void
+OsiTMINLPInterface::SetStrongBrachingSolver(SmartPtr<StrongBranchingSolver> strong_branching_solver)
+{
+  strong_branching_solver_ = strong_branching_solver;
+}
+
+void
+OsiTMINLPInterface::markHotStart()
+{
+  if (IsValid(strong_branching_solver_)) {
+    optimizationStatusBeforeHotStart_ = optimizationStatus_;
+    strong_branching_solver_->markHotStart(this);
+  }
+  else {
+    // Default Implementation
+    OsiSolverInterface::markHotStart();
+  }
+}
+
+void
+OsiTMINLPInterface::solveFromHotStart()
+{
+  if (IsValid(strong_branching_solver_)) {
+    optimizationStatus_ = strong_branching_solver_->solveFromHotStart(this);
+  }
+  else {
+    // Default Implementation
+    OsiSolverInterface::solveFromHotStart();
+  }
+}
+
+void
+OsiTMINLPInterface::unmarkHotStart()
+{
+  if (IsValid(strong_branching_solver_)) {
+    strong_branching_solver_->unmarkHotStart(this);
+    optimizationStatus_ = optimizationStatusBeforeHotStart_;
+  }
+  else {
+    // Default Implementation
+    OsiSolverInterface::unmarkHotStart();
+  }
+}
+
+const double * OsiTMINLPInterface::getObjCoefficients() const
+{
+  const int n = getNumCols();
+  delete [] obj_;
+  obj_ = NULL;
+  obj_ = new double[n];
+
+  bool new_x = true;
+  const double* x_sol = problem_->x_sol();
+  bool retval = problem_->eval_grad_f(n, x_sol, new_x, obj_);
+  
+  if (!retval) {
+    // Let's see if that happens - it will cause a crash
+    printf("ERROR WHILE EVALUATING GRAD_F in OsiTMINLPInterface::getObjCoefficients()\n");
+    delete [] obj_;
+    obj_ = NULL;
+  }
+
+  return obj_;
 }
 
 

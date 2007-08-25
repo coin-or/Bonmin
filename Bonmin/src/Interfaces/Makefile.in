@@ -65,7 +65,8 @@ am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonColReader.lo \
 	BonCurvatureEstimator.lo BonCutStrengthener.lo \
 	BonStartPointReader.lo BonOsiTMINLPInterface.lo \
 	BonTMINLP2TNLP.lo BonTMINLP.lo BonTNLPSolver.lo \
-	BonTNLP2FPNLP.lo BonBranchingTQP.lo
+	BonTNLP2FPNLP.lo BonBranchingTQP.lo \
+	BonStrongBranchingSolver.lo
 libbonmininterfaces_la_OBJECTS = $(am_libbonmininterfaces_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -348,7 +349,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
-	BonBranchingTQP.cpp BonBranchingTQP.hpp
+	BonBranchingTQP.cpp BonBranchingTQP.hpp \
+	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp
 
 
 #sublibraries for various installed solvers
@@ -418,7 +420,8 @@ ASTYLE_FILES = \
 	BonTMINLP.cppbak BonTMINLP.hppbak \
 	BonTNLPSolver.hppbak BonTNLPSolver.cppbak \
 	BonTNLP2FPNLP.cppbak BonTNLP2FPNLP.hppbak \
-	BonBranchingTQP.cppbak BonBranchingTQP.hppbak
+	BonBranchingTQP.cppbak BonBranchingTQP.hppbak \
+	BonStrongBranchingSolver.cppbak BonStrongBranchingSolver.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -480,6 +483,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCutStrengthener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOsiTMINLPInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStartPointReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStrongBranchingSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP2TNLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTNLP2FPNLP.Plo@am__quote@

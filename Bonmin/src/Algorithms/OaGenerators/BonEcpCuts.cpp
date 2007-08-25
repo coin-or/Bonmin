@@ -1,4 +1,4 @@
- // (C) Copyright International Business Machines (IBM) 2006
+ // (C) Copyright International Business Machines (IBM) 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -12,51 +12,60 @@ namespace Bonmin{
 
   
   EcpCuts::EcpCuts(BabSetupBase & b):
-  OaDecompositionBase(b,false, false){
-  b.options()->GetIntegerValue("number_ecp_rounds", numRounds_,"bonmin.");
+    OaDecompositionBase(b,false, false){
+    b.options()->GetIntegerValue("ecp_max_rounds", numRounds_,"bonmin.");
+    b.options()->GetNumericValue("ecp_abs_tol", abs_violation_tol_,"bonmin.");
+    b.options()->GetNumericValue("ecp_rel_tol", rel_violation_tol_,"bonmin.");
+    b.options()->GetNumericValue("ecp_propability_factor", beta_,"bonmin.");
   }
   
   double 
-EcpCuts::doEcpRounds(OsiSolverInterface &si, 
-                     bool leaveSiUnchanged){
-  OsiSolverInterface * saveLp = lp_;
-  lp_ = &si;
-  OsiCuts cs;
-  bool saveLeaveSi = leaveSiUnchanged_;
-  leaveSiUnchanged_ = leaveSiUnchanged;
-  generateCuts(si, cs);
-  lp_ = saveLp;
-  leaveSiUnchanged_ = saveLeaveSi;
-  return objValue_;
-}
+  EcpCuts::doEcpRounds(OsiSolverInterface &si, 
+		       bool leaveSiUnchanged,
+		       double* violation){
+    OsiSolverInterface * saveLp = lp_;
+    lp_ = &si;
+    OsiCuts cs;
+    bool saveLeaveSi = leaveSiUnchanged_;
+    leaveSiUnchanged_ = leaveSiUnchanged;
+    generateCuts(si, cs);
+    lp_ = saveLp;
+    leaveSiUnchanged_ = saveLeaveSi;
+    if (violation) *violation = violation_;
+    return objValue_;
+  }
 
 void
 EcpCuts::generateCuts(const OsiSolverInterface &si, 
                       OsiCuts & cs,
                       const CglTreeInfo info) const
 {
-  double num=CoinDrand48();
-  const int & depth = info.level;
-  double beta=10000;
-  if(depth == 0) return;
-  if(num> beta*pow(2.,-depth))
-    return;
-  double violation = nlp_->getNonLinearitiesViolation(
-                     si.getColSolution(), si.getObjValue());
+  if (beta_ >=0) {
+    //Get a random number
+    double num=CoinDrand48();
+    const int & depth = info.level;
+    if(depth == 0) return;
+    if(num> beta_*pow(2.,-depth))
+      return;
+  }
+  double orig_violation = nlp_->getNonLinearitiesViolation(
+                          si.getColSolution(), si.getObjValue());
+#define ECP_DEBUG
 #ifdef ECP_DEBUG
-  std::cout<<"Constraint violation: "<<violation<<std::endl;
+  std::cout<<"Initial Constraint violation: "<<orig_violation<<std::endl;
 #endif
-  //Get a random number
-  if(violation <= 1e-12)
+  if(orig_violation <= abs_violation_tol_)
     return;
 #ifdef ECP_DEBUG
   std::cout<<"Generating ECP cuts"<<std::endl;
 #endif
   solverManip * lpManip = NULL;
   bool infeasible = false;
+  violation_ = orig_violation;
   for(int i = 0 ; i < numRounds_ ; i++)
   {
-    if( violation > 1e-06)
+    if( violation_ > abs_violation_tol_ &&
+	violation_ > rel_violation_tol_*orig_violation)
     {
       int numberCuts =  - cs.sizeRowCuts();
       const double * toCut = parameter().addOnlyViolated_ ?
@@ -81,11 +90,11 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
 #endif
           break;
         }
-        violation =  nlp_->getNonLinearitiesViolation(
+        violation_ =  nlp_->getNonLinearitiesViolation(
                      lpManip->si()->getColSolution(), 
                      lpManip->si()->getObjValue());
 #ifdef ECP_DEBUG
-        std::cout<<"Constraint violation: "<<violation<<std::endl;
+        std::cout<<"Constraint violation: "<<violation_<<std::endl;
 #endif
          }
       else break;
@@ -97,11 +106,11 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
       {
 	lpManip->si()->resolve();
 	if(lpManip->si()->isProvenPrimalInfeasible())
-	  objValue_ = 2e50;
+	  objValue_ = COIN_DBL_MAX;
 	else
 	  objValue_ = lpManip->si()->getObjValue();}
   }
-  else objValue_ = 2e50;
+  else objValue_ = COIN_DBL_MAX;
   if(lpManip)
     {
       if(lp_ != NULL && lpManip != NULL)
@@ -126,9 +135,24 @@ EcpCuts::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
                                          "A frequency of 0 amounts to to never solve the NLP relaxation.");
   
   roptions->AddLowerBoundedIntegerOption
-    ("number_ecp_rounds",
-     "Set the number of rounds of ecp cuts.",
+    ("ecp_max_rounds",
+     "Set the maximal number of rounds of ECP cuts.",
      0,5,
      "");
+  roptions->AddLowerBoundedNumberOption
+    ("ecp_abs_tol",
+     "Set the absolute termination tolerance for ECP rounds.",
+     0,false,1e-6,
+     "");
+  roptions->AddLowerBoundedNumberOption
+    ("ecp_rel_tol",
+     "Set the relative termination tolerance for ECP rounds.",
+     0,false,0.,
+     "");
+  roptions->AddNumberOption
+    ("ecp_propability_factor",
+     "Factor appearing in formula for skipping ECP cuts.",
+     1000.,
+     "Choosing -1 disables the skipping.");
 }
 } // end namespace bonmin.

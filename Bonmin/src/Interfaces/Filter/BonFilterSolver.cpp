@@ -427,7 +427,6 @@ FilterSolver::Initialize(std::istream &is){
   Index ivalue;
   options_->GetIntegerValue("print_level", ivalue, "");
   EJournalLevel print_level = (EJournalLevel)ivalue;
-  printf("ivalue = %d\n", ivalue);
   SmartPtr<Journal> stdout_jrnl = journalist_->GetJournal("console");
   if (IsValid(stdout_jrnl)) {
     // Set printlevel for stdout

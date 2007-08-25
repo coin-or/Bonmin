@@ -16,7 +16,7 @@ namespace Bonmin {
     value induced by branching on a specific object are estimated with the pure virtual function fill_changes.
 */
 
-class BonChooseVariable : public OsiChooseVariable  {
+class BonChooseVariable : public OsiChooseStrong  {
  
 public:
 
@@ -29,17 +29,15 @@ public:
   /// Assignment operator 
   BonChooseVariable & operator= (const BonChooseVariable& rhs);
 
+  /// Clone
+  virtual OsiChooseVariable * clone() const;
+
   /// Destructor
   virtual ~BonChooseVariable ();
 
-  /// Virtual copy constructor to an OsiChooseVariable
-  virtual BonChooseVariable * clone2() const = 0;
-#define UseOurOwn
-#ifdef UseOurOwn
   /** Sets up strong list and clears all if initialize is true.
       Returns number of infeasibilities. */
   virtual int setupList ( OsiBranchingInformation *info, bool initialize);
-#endif
   /** Choose a variable
       Returns - 
      -1 Node is infeasible
@@ -67,21 +65,14 @@ public:
        
   */
 
-#ifdef AWAWAWAW
   /// Given a candidate fill in useful information e.g. estimates
   virtual void updateInformation(const OsiBranchingInformation *info,
-				 int branch, OsiHotInfo * hotInfo);
-#endif
-
+				  int branch, OsiHotInfo * hotInfo);
+  /// Given a branch fill in useful information e.g. estimates
+  virtual void updateInformation( int whichObject, int branch, 
+				  double changeInObjective, double changeInValue,
+				  int status);
 protected:
-  /// This method determines the predicted changes in the objective
-  /// function. It has to be implemented by any class that inherits
-  /// off of this class.
-  virtual int fill_changes(OsiSolverInterface * solver,
-			   OsiBranchingInformation *info,
-			   bool fixVariables,
-			   int numStrong, double* change_down,
-			   double* change_up, int& best_way) = 0;
 
   /// Holding on the a pointer to the journalist
   SmartPtr<Journalist> jnlst_;
@@ -89,38 +80,30 @@ protected:
   /// verbosity level
   int bb_log_level_;
 
-
+  /**  This is a utility function which does strong branching on
+       a list of objects and stores the results in OsiHotInfo.objects.
+       On entry the object sequence is stored in the OsiHotInfo object
+       and maybe more.
+       It returns -
+       -1 - one branch was infeasible both ways
+       0 - all inspected - nothing can be fixed
+       1 - all inspected - some can be fixed (returnCriterion==0)
+       2 - may be returning early - one can be fixed (last one done) (returnCriterion==1) 
+       3 - returning because max time
+       
+  */
+  virtual int doBonStrongBranching( OsiSolverInterface * solver, 
+				    OsiBranchingInformation *info, int numberToDo,
+				    OsiHotInfo * results, int returnCriterion,
+				    int & numberDone);
 
 private:
   /** Default Constructor, forbiden for some reason.*/
   BonChooseVariable ();
 
-};
-
-typedef BonChooseVariable ChooseVariable;
-
-
-/** Bonmin's implementation of a pseudo-cost based branching with eventualy strong branching initialization.*/
-class PseudoCostChooseVariable : public ChooseVariable {
-  public:
-  /** Constructor from solver.*/
-  PseudoCostChooseVariable(OsiTMINLPInterface * solver);
-  /** Copy constructor.*/
-  PseudoCostChooseVariable(const PseudoCostChooseVariable& other);
-  /** Destructor.*/
-  virtual ~PseudoCostChooseVariable();
-
-  /// Virtual copy constructor to an OsiChooseVariable
-  virtual OsiChooseVariable * clone() const = 0;
-
-  /// Virtual copy constructor to an OsiChooseVariable
-  virtual ChooseVariable * clone2() const = 0;
-
-private:
-    /** Default Constructor, forbiden for some reason.*/
-  PseudoCostChooseVariable();
+  // ToDo: Make this an option
+  Number MAXMIN_CRITERION;
 };
 
 }
-
 #endif

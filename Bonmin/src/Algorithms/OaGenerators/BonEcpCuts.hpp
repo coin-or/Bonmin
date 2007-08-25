@@ -1,4 +1,4 @@
- // (C) Copyright International Business Machines (IBM) 2006
+ // (C) Copyright International Business Machines (IBM) 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -16,11 +16,18 @@ namespace Bonmin {
   class EcpCuts: public OaDecompositionBase {
     public:
     EcpCuts(OsiTMINLPInterface *nlp = NULL,
-            int numRounds = 1
+            int numRounds = 1,
+	    double abs_violation_tol = 1e-6,
+	    double rel_violation_tol = 1000.,
+	    double beta = -1.
 	    ):
       OaDecompositionBase(nlp,NULL, NULL,0,0,0),
       objValue_(-COIN_DBL_MAX),
-      numRounds_(numRounds){
+      numRounds_(numRounds),
+      abs_violation_tol_(abs_violation_tol),
+      rel_violation_tol_(rel_violation_tol),
+      beta_(beta)
+    {
     }
     EcpCuts(BabSetupBase & b);
     
@@ -28,8 +35,11 @@ namespace Bonmin {
     EcpCuts(const EcpCuts & copy):
       OaDecompositionBase(copy),
       objValue_(copy.objValue_),
-      numRounds_(copy.numRounds_)
-      {
+      numRounds_(copy.numRounds_),
+      abs_violation_tol_(copy.abs_violation_tol_),
+      rel_violation_tol_(copy.rel_violation_tol_),
+      beta_(copy.beta_)
+    {
     }
     
     /// clone
@@ -44,12 +54,25 @@ namespace Bonmin {
     virtual void generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
                               const CglTreeInfo info = CglTreeInfo()) const;
     double doEcpRounds(OsiSolverInterface &si,
-                     bool leaveSiUnchanged);
+		       bool leaveSiUnchanged,
+		       double* violation = NULL);
 
-   void setNumRounds(int value){
-   numRounds_ = value;}
-     /** Register ecp cuts options.*/
-     static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    void setNumRounds(int value){
+      numRounds_ = value;}
+
+    void setPropabilityFactor(double value){
+      beta_ = value;
+    }
+
+    void setAbsViolationTolerance(double value){
+      abs_violation_tol_ = value;
+    }
+    void setRelViolationTolerance(double value){
+      rel_violation_tol_ = value;
+    }
+
+    /** Register ecp cuts options.*/
+    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
 
 protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
@@ -60,11 +83,19 @@ protected:
     /// virutal method to decide if local search is performed
     virtual bool doLocalSearch() const{
       return 0;}
-    private:
-      /** Record obj value at final point of Ecp. */
-      mutable double objValue_;
-     /** number of iterations of generation. */
-     int numRounds_;
+  private:
+    /** Record obj value at final point of Ecp. */
+    mutable double objValue_;
+    /** Record NLP infeasibility at final point of Ecp */
+    mutable double violation_;
+    /** maximum number of iterations of generation. */
+    int numRounds_;
+    /** absolute tolerance for NLP constraint violation to stop ECP rounds */
+    double abs_violation_tol_;
+    /** relative tolerance for NLP constraint violation to stop ECP rounds */
+    double rel_violation_tol_;
+    /** Factor for probability for skipping cuts */
+    double beta_;
   };
 } /* end namespace Bonmin.*/
 #endif

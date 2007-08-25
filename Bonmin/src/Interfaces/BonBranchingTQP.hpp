@@ -15,26 +15,30 @@
 namespace Bonmin
 {
   /** This is an adapter class that converts a TMINLP2TNLP object into
-   *  another such class, which is now just a QP.  The QP is the
-   *  linear quadratic of the TNLP at the optimal point.  The purpose
-   *  of the BranchingTQP is that it is used in a strong-branching
-   *  framework, we strong branching is only done for the QP
-   *  approximation of the TNLP, not on the TNLP itself.
+   *  a TNLP, which is now just a QP.  The QP is the linear quadratic
+   *  of the TNLP at the optimal point.  The purpose of the
+   *  BranchingTQP is that it is used in a strong-branching framework,
+   *  strong branching is only done for the QP approximation of the
+   *  TNLP, not on the TNLP itself.
    */
-  class BranchingTQP : public TMINLP2TNLP
+  class BranchingTQP : public TNLP
   {
   public:
     /**@name Constructors/Destructors */
     //@{
-    BranchingTQP(const TMINLP2TNLP& tminlp2tnlp);
+    BranchingTQP(SmartPtr<TMINLP2TNLP> tminlp2tnlp);
 
     /** Default destructor */
     virtual ~BranchingTQP();
     //@}
 
     /**@name methods to gather information about the NLP, only those
-     *  that need to be overloaded from TMINLP2TNLP */
+     *  that need to be overloaded from TNLP */
     //@{
+    virtual bool get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
+                              Index& nnz_h_lag, IndexStyleEnum& index_style);
+    virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
+                                 Index m, Number* g_l, Number* g_u);
     /** Method called by Ipopt to get the starting point. The bools
      *  init_x and init_lambda are both inputs and outputs. As inputs,
      *  they indicate whether or not the algorithm wants you to
@@ -80,6 +84,12 @@ namespace Bonmin
         Number obj_factor, Index m, const Number* lambda,
         bool new_lambda, Index nele_hess,
         Index* iRow, Index* jCol, Number* values);
+    virtual void finalize_solution(SolverReturn status,
+                                   Index n, const Number* x, const Number* z_L, const Number* z_U,
+                                   Index m, const Number* g, const Number* lambda,
+                                   Number obj_value,
+                                   const IpoptData* ip_data,
+                                   IpoptCalculatedQuantities* ip_cq);
     //@}
 
     /** Accessor Methods for QP data */
@@ -155,6 +165,15 @@ namespace Bonmin
     Index* g_jac_jcol_;
     //@}
 
+    /** @name Data from the MINLP */
+    //@{
+    Index n_;
+    Index m_;
+    Index nnz_jac_g_;
+    Index nnz_h_lag_;
+    IndexStyleEnum index_style_;
+    //@}
+
     /** Displacement with respect to x_sol_copy_ */
     Number* d_;
 
@@ -168,6 +187,10 @@ namespace Bonmin
 
     /** Method for updating the displacement */
     void update_displacement(const Number* x);
+
+    /** Pointer to the TMINLP2TNLP model which stores the bounds
+     *  information */
+    SmartPtr<TMINLP2TNLP> tminlp2tnlp_;
   };
 
 } // namespace Ipopt

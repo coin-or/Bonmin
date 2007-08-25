@@ -61,8 +61,8 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonbranching_la_LIBADD =
 am_libbonbranching_la_OBJECTS = BonChooseVariable.lo \
-	BonQPStrongBranching.lo BonCurvBranching.lo \
-	BonLpStrongBranching.lo
+	BonCurvBranchingSolver.lo BonLpBranchingSolver.lo \
+	BonQpBranchingSolver.lo
 libbonbranching_la_OBJECTS = $(am_libbonbranching_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -327,9 +327,9 @@ noinst_LTLIBRARIES = libbonbranching.la
 # List all source files, including headers
 libbonbranching_la_SOURCES = \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
-	BonQPStrongBranching.cpp BonQPStrongBranching.hpp \
-	BonCurvBranching.cpp BonCurvBranching.hpp \
-        BonLpStrongBranching.cpp BonLpStrongBranching.hpp
+	BonCurvBranchingSolver.cpp BonCurvBranchingSolver.hpp \
+        BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
+	BonQpBranchingSolver.cpp BonQpBranchingSolver.hpp
 
 
 # This is for libtool (on Windows)
@@ -376,9 +376,9 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 include_HEADERS = \
 	BonChooseVariable.hpp \
-	BonCurvBranching.hpp \
-        BonLpStrongBranching.hpp \
-        BonQPStrongBranching.hpp
+	BonCurvBranchingSolver.hpp \
+        BonLpBranchingSolver.hpp \
+        BonQpBranchingSolver.hpp
 
 
 ########################################################################
@@ -388,9 +388,9 @@ include_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonChooseVariable.cppbak BonChooseVariable.hppbak \
-	BonQPStrongBranching.cppbak BonQPStrongBranching.hppbak \
-	BonCurvBranching.cppbak BonCurvBranching.hppbak \
-        BonLpStrongBranching.hppbak BonLpStrongBranching.cppbak
+	BonQpBranchingSolver.cppbak BonQpBranchingSolver.hppbak \
+	BonCurvBranchingSolver.cppbak BonCurvBranchingSolver.hppbak \
+        BonLpBranchingSolver.hppbak BonLpBranchingSolver.cppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -446,9 +446,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonChooseVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvBranching.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLpStrongBranching.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQPStrongBranching.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvBranchingSolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLpBranchingSolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQpBranchingSolver.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

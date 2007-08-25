@@ -10,9 +10,10 @@
 #include "BCP_lp_node.hpp"
 #include "BCP_lp.hpp"
 #include "BM.hpp"
-#include "BonCurvBranching.hpp"
-#include "BonQPStrongBranching.hpp"
-#include "BonLpStrongBranching.hpp"
+#include "BonChooseVariable.hpp"
+#include "BonCurvBranchingSolver.hpp"
+#include "BonQpBranchingSolver.hpp"
+#include "BonLpBranchingSolver.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 
 //#############################################################################
@@ -95,40 +96,52 @@ BM_lp::bbBranch(OsiBranchingInformation& brInfo,
       switch (varselect_) {
       case Bonmin::OsiTMINLPInterface::MOST_FRACTIONAL: {
 	// AW: Try to set new chooseVariable object
-	Bonmin::BonCurvBranching* chooseVariable =
-	  new Bonmin::BonCurvBranching(&nlp);
+	Bonmin::BonChooseVariable * chooseVariable =
+	  new Bonmin::BonChooseVariable(&nlp);
 	chooseVariable->setNumberStrong(0);
 	chooseVar_ = chooseVariable;
 	break;
       }
       case Bonmin::OsiTMINLPInterface::CURVATURE_ESTIMATOR: {
-	// AW: Try to set new chooseVariable object
-	Bonmin::BonCurvBranching* chooseVariable =
-	  new Bonmin::BonCurvBranching(&nlp);
+	SmartPtr<Bonmin::StrongBranchingSolver> curv_solver =
+	  new Bonmin::CurvBranchingSolver(&nlp);
+	nlp.SetStrongBrachingSolver(curv_solver);
+	Bonmin::BonChooseVariable * chooseVariable =
+	  new Bonmin::BonChooseVariable(&nlp);
+	// The bound returned from the QP can be wrong, since the
+	// objective is not guaranteed to be an underestimator:
+	chooseVariable->setTrustStrongForSolution(false);
+	chooseVariable->setTrustStrongForBound(false);
 	chooseVariable->setNumberStrong(numberStrong_);
 	chooseVar_ = chooseVariable;
 	break;
       }
       case Bonmin::OsiTMINLPInterface::QP_STRONG_BRANCHING: {
-	Bonmin::BonQPStrongBranching* chooseVariable =
-	  new Bonmin::BonQPStrongBranching(&nlp);
+	SmartPtr<Bonmin::StrongBranchingSolver> qp_solver =
+	  new Bonmin::QpBranchingSolver(&nlp);
+	nlp.SetStrongBrachingSolver(qp_solver);
+	Bonmin::BonChooseVariable * chooseVariable =
+	  new Bonmin::BonChooseVariable(&nlp);
+	// The bound returned from the QP can be wrong, since the
+	// objective is not guaranteed to be an underestimator:
+	chooseVariable->setTrustStrongForBound(false);
 	chooseVariable->setNumberStrong(numberStrong_);
 	chooseVar_ = chooseVariable;
 	break;
       }
       case Bonmin::OsiTMINLPInterface::LP_STRONG_BRANCHING: {
-	Bonmin::LpStrongBranching* chooseVariable =
-	  new Bonmin::LpStrongBranching(&nlp);
-	chooseVariable->setMaxCuttingPlaneIter(numEcpRounds_);
+	SmartPtr<Bonmin::StrongBranchingSolver> lp_solver =
+	  new Bonmin::LpBranchingSolver(&nlp);
+	nlp.SetStrongBrachingSolver(lp_solver);
+	Bonmin::BonChooseVariable * chooseVariable =
+	  new Bonmin::BonChooseVariable(&nlp);
 	chooseVariable->setNumberStrong(numberStrong_);
 	chooseVar_ = chooseVariable;
 	break;
       }
       case Bonmin::OsiTMINLPInterface::NLP_STRONG_BRANCHING: {
-	const bool solve_nlp = true;
-	Bonmin::BonQPStrongBranching* chooseVariable = 
-	  new Bonmin::BonQPStrongBranching(&nlp, solve_nlp);
-	chooseVariable->setNumberStrong(numberStrong_);
+	Bonmin::BonChooseVariable * chooseVariable =
+	  new Bonmin::BonChooseVariable(&nlp);
 	chooseVar_ = chooseVariable;
 	break;
       }

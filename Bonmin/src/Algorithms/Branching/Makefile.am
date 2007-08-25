@@ -18,9 +18,10 @@ noinst_LTLIBRARIES = libbonbranching.la
 # List all source files, including headers
 libbonbranching_la_SOURCES = \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
-	BonQPStrongBranching.cpp BonQPStrongBranching.hpp \
-	BonCurvBranching.cpp BonCurvBranching.hpp \
-        BonLpStrongBranching.cpp BonLpStrongBranching.hpp
+	BonCurvBranchingSolver.cpp BonCurvBranchingSolver.hpp \
+        BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
+	BonQpBranchingSolver.cpp BonQpBranchingSolver.hpp
+
 
 # This is for libtool (on Windows)
 libbonbranching_la_LDFLAGS = $(LT_LDFLAGS)
@@ -78,9 +79,9 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 include_HEADERS = \
 	BonChooseVariable.hpp \
-	BonCurvBranching.hpp \
-        BonLpStrongBranching.hpp \
-        BonQPStrongBranching.hpp
+	BonCurvBranchingSolver.hpp \
+        BonLpBranchingSolver.hpp \
+        BonQpBranchingSolver.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -89,9 +90,9 @@ include_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonChooseVariable.cppbak BonChooseVariable.hppbak \
-	BonQPStrongBranching.cppbak BonQPStrongBranching.hppbak \
-	BonCurvBranching.cppbak BonCurvBranching.hppbak \
-        BonLpStrongBranching.hppbak BonLpStrongBranching.cppbak
+	BonQpBranchingSolver.cppbak BonQpBranchingSolver.hppbak \
+	BonCurvBranchingSolver.cppbak BonCurvBranchingSolver.hppbak \
+        BonLpBranchingSolver.hppbak BonLpBranchingSolver.cppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

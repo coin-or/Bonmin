@@ -47,10 +47,12 @@ Bonmin/src/Algorithms/Branching/BonChooseVariable.cpp -text
 Bonmin/src/Algorithms/Branching/BonChooseVariable.hpp -text
 Bonmin/src/Algorithms/Branching/BonCurvBranching.cpp -text
 Bonmin/src/Algorithms/Branching/BonCurvBranching.hpp -text
-Bonmin/src/Algorithms/Branching/BonLpStrongBranching.cpp -text
-Bonmin/src/Algorithms/Branching/BonLpStrongBranching.hpp -text
-Bonmin/src/Algorithms/Branching/BonQPStrongBranching.cpp -text
-Bonmin/src/Algorithms/Branching/BonQPStrongBranching.hpp -text
+Bonmin/src/Algorithms/Branching/BonCurvBranchingSolver.cpp -text
+Bonmin/src/Algorithms/Branching/BonCurvBranchingSolver.hpp -text
+Bonmin/src/Algorithms/Branching/BonLpBranchingSolver.cpp -text
+Bonmin/src/Algorithms/Branching/BonLpBranchingSolver.hpp -text
+Bonmin/src/Algorithms/Branching/BonQpBranchingSolver.cpp -text
+Bonmin/src/Algorithms/Branching/BonQpBranchingSolver.hpp -text
 Bonmin/src/Algorithms/Branching/Makefile.am -text
 Bonmin/src/Algorithms/Branching/Makefile.in -text
 Bonmin/src/Algorithms/Makefile.am -text
@@ -83,6 +85,8 @@ Bonmin/src/Interfaces/Ampl/Makefile.in -text
 Bonmin/src/Interfaces/BonExitCodes.hpp -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.cpp -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.hpp -text
+Bonmin/src/Interfaces/BonStrongBranchingSolver.cpp -text
+Bonmin/src/Interfaces/BonStrongBranchingSolver.hpp -text
 Bonmin/src/Interfaces/BonTMINLP.cpp -text
 Bonmin/src/Interfaces/BonTNLPSolver.cpp -text
 Bonmin/src/Interfaces/BonTNLPSolver.hpp -text

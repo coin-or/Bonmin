@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -16,12 +16,16 @@
 #include <sstream>
 namespace Bonmin
 {
-  BranchingTQP::BranchingTQP(const TMINLP2TNLP& tminlp2tnlp)
+  BranchingTQP::BranchingTQP(SmartPtr<TMINLP2TNLP> tminlp2tnlp)
     :
-    TMINLP2TNLP(tminlp2tnlp)
+    tminlp2tnlp_(tminlp2tnlp)
   {
-    DBG_ASSERT(x_sol_);
-    DBG_ASSERT(duals_sol_);
+    bool retval = tminlp2tnlp_->get_nlp_info(n_, m_, nnz_jac_g_,
+					     nnz_h_lag_, index_style_);
+    ASSERT_EXCEPTION(retval, TMINLP_INVALID,
+		     "Can't get NLP infor in BranchingTQP");
+    //DBG_ASSERT(x_sol_);
+    //DBG_ASSERT(duals_sol_);
 
     obj_grad_ = new Number[n_];
     obj_hess_ = new Number[nnz_h_lag_];
@@ -32,18 +36,21 @@ namespace Bonmin
     g_jac_irow_ = new Index[nnz_jac_g_];
     g_jac_jcol_ = new Index[nnz_jac_g_];
 
+    const Number* x_sol = tminlp2tnlp_->x_sol();
+    const Number* duals_sol = tminlp2tnlp_->duals_sol();
+
     // Compute all nonlinear values at the starting point so that we
     // have all the information for the QP
     bool new_x = true;   // ToDo: maybe NOT new?
-    bool retval = tminlp_->eval_f(n_, x_sol_, new_x, obj_val_);
+    retval = tminlp2tnlp_->eval_f(n_, x_sol, new_x, obj_val_);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate objective function in BranchingTQP");
     new_x = false;
-    retval = tminlp_->eval_grad_f(n_, x_sol_, new_x, obj_grad_);
+    retval = tminlp2tnlp_->eval_grad_f(n_, x_sol, new_x, obj_grad_);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate objective gradient in BranchingTQP");
     bool new_lambda = true; // ToDo: maybe NOT new?
-    retval = tminlp_->eval_h(n_, x_sol_, new_x, 1., m_, duals_sol_ + 2 * n_,
+    retval = tminlp2tnlp_->eval_h(n_, x_sol, new_x, 1., m_, duals_sol + 2 * n_,
 			     new_lambda, nnz_h_lag_, obj_hess_irow_,
 			     obj_hess_jcol_, NULL);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
@@ -54,14 +61,14 @@ namespace Bonmin
 	obj_hess_jcol_[i]--;
       }
     }
-    retval = tminlp_->eval_h(n_, x_sol_, new_x, 1., m_, duals_sol_ + 2*n_,
+    retval = tminlp2tnlp_->eval_h(n_, x_sol, new_x, 1., m_, duals_sol + 2*n_,
 			     new_lambda, nnz_h_lag_, NULL, NULL, obj_hess_);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate objective Hessian values in BranchingTQP");
-    retval = tminlp_->eval_g(n_, x_sol_, new_x, m_, g_vals_);
+    retval = tminlp2tnlp_->eval_g(n_, x_sol, new_x, m_, g_vals_);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate constraint values in BranchingTQP");
-    retval = tminlp_->eval_jac_g(n_, x_sol_, new_x, m_, nnz_jac_g_,
+    retval = tminlp2tnlp_->eval_jac_g(n_, x_sol, new_x, m_, nnz_jac_g_,
 				 g_jac_irow_, g_jac_jcol_, NULL);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate constraint Jacobian structure in BranchingTQP");
@@ -71,19 +78,19 @@ namespace Bonmin
 	g_jac_jcol_[i]--;
       }
     }
-    retval = tminlp_->eval_jac_g(n_, x_sol_, new_x, m_, nnz_jac_g_,
+    retval = tminlp2tnlp_->eval_jac_g(n_, x_sol, new_x, m_, nnz_jac_g_,
 				 NULL, NULL, g_jac_);
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate constraint Jacobian values in BranchingTQP");
 
-    // Get room for "displacement" and copy of x_sol_
+    // Get room for "displacement" and copy of x_sol
     d_ = new Number[n_];
 
-    // Keep copy of original x_sol_ and duals_sol_ values
+    // Keep copy of original x_sol and duals_sol values
     x_sol_copy_ = new Number[n_];
-    IpBlasDcopy(n_, x_sol_, 1, x_sol_copy_, 1);
+    IpBlasDcopy(n_, x_sol, 1, x_sol_copy_, 1);
     duals_sol_copy_ = new Number[m_ + 2*n_];
-    IpBlasDcopy(m_+2*n_, duals_sol_, 1, duals_sol_copy_, 1);
+    IpBlasDcopy(m_+2*n_, duals_sol, 1, duals_sol_copy_, 1);
   }
 
   BranchingTQP::~BranchingTQP()
@@ -101,6 +108,27 @@ namespace Bonmin
     delete [] duals_sol_copy_;
   }
 
+  bool BranchingTQP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
+				  Index& nnz_h_lag,
+				  IndexStyleEnum& index_style)
+  {
+    n = n_;
+    m = m_;
+    nnz_jac_g = nnz_jac_g_;
+    nnz_h_lag = nnz_h_lag_;
+    index_style = index_style_;
+    return true;
+  }
+
+  bool BranchingTQP::get_bounds_info(Index n, Number* x_l, Number* x_u,
+				     Index m, Number* g_l, Number* g_u)
+  {
+    bool retval = tminlp2tnlp_->get_bounds_info(n, x_l, x_u, m, g_l, g_u);
+    DBG_ASSERT(n == n_);
+    DBG_ASSERT(m == m_);
+    return retval;
+  }
+
   bool BranchingTQP::get_starting_point(Index n, bool init_x, Number* x,
       bool init_z, Number* z_L, Number* z_U,
       Index m, bool init_lambda,
@@ -108,8 +136,6 @@ namespace Bonmin
   {
     DBG_ASSERT(n==n_);
     if (init_x == true) {
-      if(x_init_==NULL)
-        return false;
       IpBlasDcopy(n, x_sol_copy_, 1, x, 1);
     }
     if (init_z == true) {
@@ -127,7 +153,6 @@ namespace Bonmin
       }
     }
 
-    need_new_warm_starter_ = true;
     return true;
   }
 
@@ -190,7 +215,7 @@ namespace Bonmin
       g[irow] += g_jac_[i]*d_[jcol];
     }
 
-    eval_g_add_linear_cuts(g, x);
+    tminlp2tnlp_->eval_g_add_linear_cuts(g, x);
     return true;
   }
 
@@ -222,7 +247,7 @@ namespace Bonmin
       IpBlasDcopy(nnz_jac_g_, g_jac_, 1, values, 1);
     }
 
-    eval_jac_g_add_linear_cuts(nele_jac, iRow, jCol, values);
+    tminlp2tnlp_->eval_jac_g_add_linear_cuts(nele_jac, iRow, jCol, values);
 
     return true;
   }
@@ -267,6 +292,17 @@ namespace Bonmin
     }
 
     return true;
+  }
+
+  void BranchingTQP::finalize_solution(SolverReturn status,
+				       Index n, const Number* x, const Number* z_L, const Number* z_U,
+				       Index m, const Number* g, const Number* lambda,
+				       Number obj_value,
+				       const IpoptData* ip_data,
+				       IpoptCalculatedQuantities* ip_cq)
+  {
+    tminlp2tnlp_->finalize_solution(status, n, x, z_L, z_U, m, g, lambda,
+				    obj_value, ip_data, ip_cq);
   }
 
   void BranchingTQP::update_displacement(const Number* x)

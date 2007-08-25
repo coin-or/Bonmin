@@ -28,7 +28,9 @@
 #include "BonCutStrengthener.hpp"
 
 namespace Bonmin {
-  
+
+  class StrongBranchingSolver;
+
   /** Solvers for solving nonlinear programs.*/
   enum Solver{
     EIpopt=0 /** <a href="http://projects.coin-or.org/Ipopt">
@@ -575,12 +577,11 @@ class Messages : public CoinMessages
   }
 
 
-  /** We have to keep this but it will return NULL.
+  /** This returns the objective function gradient at the current
+   *  point.  It seems to be required for Cbc's pseudo cost
+   *  initialization
   */
-  virtual const double * getObjCoefficients() const
-  {
-      return obj_;
-  }
+  virtual const double * getObjCoefficients() const;
 
   /** We have to keep this but it will return NULL.
    */
@@ -949,6 +950,23 @@ class Messages : public CoinMessages
     else
       return NULL;
   }
+
+  /** @name Methods related to strong branching */
+  //@{
+  /// Set the strong branching solver
+  void SetStrongBrachingSolver(Ipopt::SmartPtr<StrongBranchingSolver> strong_branching_solver);
+  /// Create a hot start snapshot of the optimization process.  In our
+  /// case, we initialize the StrongBrachingSolver.
+  virtual void markHotStart();
+  /// Optimize starting from the hot start snapshot. In our case, we
+  /// call the StrongBranchingSolver to give us an approximate
+  /// solution for the current state of the bounds
+  virtual void solveFromHotStart();
+  /// Delete the hot start snapshot. In our case we deactivate the
+  /// StrongBrachingSolver.
+  virtual void unmarkHotStart();
+  //@}
+
 protected:
   
   //@}
@@ -1067,8 +1085,10 @@ protected:
      If yes getColSolution will return Ipopt point, otherwise will return
      initial point.*/
   bool hasBeenOptimized_;
-  /** A fake objective function (all variables to 1) to please Cbc pseudo costs initialization.*/
-  double * obj_;
+  /** A fake objective function (all variables to 1) to please Cbc
+      pseudo costs initialization.  AW: I changed this, it will now be
+      the objective gradient at current point. */
+  mutable double * obj_;
   /** flag to say wether options have been printed or not.*/
   static bool hasPrintedOptions;
 
@@ -1129,7 +1149,11 @@ protected:
                          Ipopt::SmartPtr<Ipopt::Journalist> journalist);
   ///Constructor without model only for derived classes
   OsiTMINLPInterface(Ipopt::SmartPtr<TNLPSolver> app);
-  
+
+private:
+  SmartPtr<StrongBranchingSolver> strong_branching_solver_;
+  /** status of last optimization before hot start was marked. */
+  TNLPSolver::ReturnStatus optimizationStatusBeforeHotStart_;
 
 };
 }

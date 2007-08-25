@@ -35,7 +35,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
-	BonBranchingTQP.cpp BonBranchingTQP.hpp
+	BonBranchingTQP.cpp BonBranchingTQP.hpp \
+	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
@@ -119,7 +120,8 @@ ASTYLE_FILES = \
 	BonTMINLP.cppbak BonTMINLP.hppbak \
 	BonTNLPSolver.hppbak BonTNLPSolver.cppbak \
 	BonTNLP2FPNLP.cppbak BonTNLP2FPNLP.hppbak \
-	BonBranchingTQP.cppbak BonBranchingTQP.hppbak
+	BonBranchingTQP.cppbak BonBranchingTQP.hppbak \
+	BonStrongBranchingSolver.cppbak BonStrongBranchingSolver.hppbak
 
 
 ASTYLE = @ASTYLE@
