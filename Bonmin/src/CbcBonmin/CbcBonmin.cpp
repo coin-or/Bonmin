@@ -383,6 +383,9 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
     model.setNodeComparison(compare2);
   }
 
+  model.setMaximumCutPassesAtRoot(20);
+  model.setMaximumCutPasses(1);
+
   model.setNumberStrong(par.numberStrong);
 
   model.setNumberBeforeTrust(par.minReliability);
@@ -495,6 +498,20 @@ BonminBB::branchAndBound(IpoptInterface &nlpSolver,
   }
   nlpSolver.model()->finalize_solution(status, nlpSolver.getNumCols(), bestSolution_,
                                        nlpSolver.getObjValue());
+#if 0
+  if(bestSolution_){
+    FILE * solOut = fopen("solution","w");
+    int numcols = nlpSolver.getNumCols();
+    for(int i = 0 ; i < numcols ; i++){
+      fprintf(solOut, "%d %f\n",i, bestSolution_[i]);
+    }
+    if(mipStatus_ == FeasibleOptimal)
+      fprintf(solOut,"-1");
+    else fprintf(solOut, "-2");
+    fclose(solOut);
+    solOut = NULL;
+  }
+#endif
   if(par.algo > 0)
     delete si;
 #ifdef COIN_HAS_CPX
