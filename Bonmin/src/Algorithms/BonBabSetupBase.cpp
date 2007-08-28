@@ -328,8 +328,8 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
     ("number_before_trust",
      "Set the number of branches on a variable before its pseudo costs are to be believed "
      "in dynamic strong branching.",
-     0,8,
-     "A value of 0 disables dynamic strong branching.");
+     -1,8,
+     "A value of -1 disables pseudo costs.");
   
   roptions->AddStringOption2("nlp_failure_behavior",
                              "Set the behavior when an NLP or a series of NLP are unsolved by Ipopt (we call unsolved an NLP for which Ipopt is not "

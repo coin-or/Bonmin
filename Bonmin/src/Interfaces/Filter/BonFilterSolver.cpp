@@ -535,7 +535,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   use_warm_start_in_cache_ = false;
   //for(int i = 0 ; i < n ; i++) x[i] = 0;
   lam = new real [n+m];
-#define InitializeAll
+  //#define InitializeAll
 #ifdef InitializeAll
   for(int i = 0 ; i < n+m ; i++) lam[i] = 0.; 
 #endif
@@ -544,12 +544,15 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   
   tnlp->get_bounds_info(n, bounds, bounds + nplusm, m, bounds + n, bounds + n + nplusm);
 
+#if 0
+  // AW: I don't think we need this, it isn't done for ReOptimize either
   for(int i = 0 ; i < nplusm ; i++){
   if(bounds[i] < -infty) bounds[i] = - infty;}
 
   real * ubounds = bounds + nplusm;
   for(int i = 0 ; i < nplusm ; i++){
   if(ubounds[i] > infty) ubounds[i] = infty;}
+#endif
 
   maxa = n + nnz_jac_g;
   fint maxia = n + nnz_jac_g + m + 3;
@@ -738,6 +741,12 @@ FilterSolver::cachedInfo::optimize()
   cpuTime_ = - CoinCpuTime();
   fint cstype_len = 1;
   rho = 10;
+#if 0
+  printf("========= 3333333333333333 =============\n");
+  for (int i=0; i<n; i++) {
+    printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, bounds[i], i, bounds[m+n+i]);
+  }
+#endif
   F77_FUNC(filtersqp,FILTERSQP)(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk, 
 	     &maxiWk, &iprint, &nout, &ifail, &rho, x, 
 	     c, &f, &fmin, bounds, 

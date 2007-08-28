@@ -91,6 +91,20 @@ namespace Bonmin
     IpBlasDcopy(n_, x_sol, 1, x_sol_copy_, 1);
     duals_sol_copy_ = new Number[m_ + 2*n_];
     IpBlasDcopy(m_+2*n_, duals_sol, 1, duals_sol_copy_, 1);
+#if 0
+    for (int i=0; i<n_; i++) {
+      printf("x_sol_copy_[%3d] = %15.8e duals_sol_copy_[%3d] = %15.8e obj_grad_[%3d] = %15.8e\n", i,x_sol_copy_[i],i,duals_sol_copy_[i],i,obj_grad_[i]);
+    }
+    for (int i=0; i<m_; i++) {
+      printf("g_vals_[%3d] = %15.8e\n", i, g_vals_[i]);
+    }
+    for (int i=0; i<nnz_h_lag_; i++) {
+      printf("Hess[%3d,%3d] = %15.8e\n",obj_hess_irow_[i],obj_hess_jcol_[i],obj_hess_[i]);
+    }
+    for (int i=0; i<nnz_jac_g_; i++) {
+      printf("Jac[%3d,%3d] = %15.8e\n",g_jac_irow_[i],g_jac_jcol_[i],g_jac_[i]);
+    }
+#endif
   }
 
   BranchingTQP::~BranchingTQP()

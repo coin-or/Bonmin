@@ -50,6 +50,10 @@ private:
   bool new_mults_;
   double* orig_d_;
   double* projected_d_;
+  Number* x_l_orig_;
+  Number* x_u_orig_;
+  Number* g_l_orig_;
+  Number* g_u_orig_;
   //@}
 
   /** @name Information about the problem */

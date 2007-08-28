@@ -1645,6 +1645,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   
   for(int rowIdx = 0; rowIdx < m ; rowIdx++) {
     if(constTypes_[rowIdx] == TNLP::NON_LINEAR) {
+#if 0
       if(fabs(duals[rowIdx]) == 0.)
       {
         row2cutIdx[rowIdx] = -1;
@@ -1653,6 +1654,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 #endif
         continue;
       }
+#endif
       row2cutIdx[rowIdx] = numCuts;
       if(rowLower[rowIdx] > - nlp_infty)
         lb[numCuts] = rowLower[rowIdx] - g[rowIdx];
@@ -2463,6 +2465,12 @@ OsiTMINLPInterface::markHotStart()
 void
 OsiTMINLPInterface::solveFromHotStart()
 {
+#if 0
+  printf("========= 1111111111111 ==============\n");
+  for (int i=0; i<getNumCols(); i++) {
+    printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, getColLower()[i], i, getColUpper()[i]);
+  }
+#endif
   if (IsValid(strong_branching_solver_)) {
     optimizationStatus_ = strong_branching_solver_->solveFromHotStart(this);
   }

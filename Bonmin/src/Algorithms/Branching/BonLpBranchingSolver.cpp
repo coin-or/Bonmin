@@ -99,6 +99,12 @@ solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
   std::vector<int> diff_up_bnd_index;
   std::vector<double> diff_up_bnd_value;
 
+#if 0
+  // deleteme
+  for (int i=0; i<tminlp_interface->getNumCols(); i++) {
+    printf("%3d ol = %e nl = %e   ou = %e nu = %e\n",i,tminlp_interface->getColLower()[i],lin_->getColLower()[i],tminlp_interface->getColUpper()[i],lin_->getColUpper()[i]);
+  }
+#endif
   // Get the bounds.  We assume that the bounds in the linear solver
   // are always the original ones
   const int numCols = tminlp_interface->getNumCols();
@@ -123,9 +129,17 @@ solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
     }
   }
 
+#if 0
+  // deleteme
+  for (int i=0; i<numCols; i++) {
+    printf("%3d ol = %e nl = %e   ou = %e nu = %e\n",i,tminlp_interface->getColLower()[i],lin_->getColLower()[i],tminlp_interface->getColUpper()[i],lin_->getColUpper()[i]);
+  }
+#endif
+
   lin_->setWarmStart(warm_);
   lin_->resolve();
 
+  double obj = lin_->getObjValue();
   bool go_on = true;
   if (lin_->isProvenPrimalInfeasible()) {
     retstatus = TNLPSolver::provenInfeasible;
@@ -136,7 +150,6 @@ solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
     go_on = false;
   }
   else {
-    double obj;
     if (maxCuttingPlaneIterations_ > 0 && go_on) {
       double violation;
       obj = ecp_->doEcpRounds(*lin_, true, &violation);
@@ -147,14 +160,8 @@ solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
 	retstatus = TNLPSolver::solvedOptimal;
       }
     }
-    else {
-      obj = lin_->getObjValue();
-    }
-    if (retstatus == TNLPSolver::solvedOptimal ||
-	retstatus == TNLPSolver::iterationLimit) {
-      tminlp_interface->problem()->set_obj_value(obj);
-    }
   }
+  tminlp_interface->problem()->set_obj_value(obj);
 
   //restore the original bounds
   for (unsigned int i = 0; i < diff_low_bnd_index.size(); i++) {

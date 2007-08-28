@@ -260,13 +260,6 @@ BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
 
   // Getting the bounds
   tqp->get_bounds_info(n, bl, bu, m, bl+n, bu+n);
-  const double infty = 1e30;
-  for(int i = 0 ; i < n+m ; i++){
-    if(bl[i] < -infty) bl[i] = - infty;
-  }
-  for(int i = 0 ; i < n+m ; i++){
-    if(bu[i] > infty) bu[i] = infty;
-  }
 
   // Set up sparse matrix with objective gradient and constraint Jacobian
 
@@ -392,6 +385,7 @@ BqpdSolver::cachedInfo::optimize()
     tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
     ifail = 0;
   }
+  //m0de = 0;
 
   // Set up some common block stuff
   F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
@@ -402,8 +396,12 @@ BqpdSolver::cachedInfo::optimize()
   F77_FUNC(wsc,WSC).mxws = mxws;
   F77_FUNC(wsc,WSC).mxlws = mxlws;
 
-  //printf("mode = %d vstep = %e tol = %e\n", m0de, F77_FUNC(vstepc,VSTEPC).vstep,F77_FUNC(epsc,EPSC).tol);
-
+#if 0
+  printf("========= 222222222222 =============\n");
+  for (int i=0; i<n; i++) {
+    printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, bl[i], i, bu[i]);
+  }
+#endif
   cpuTime_ = - CoinCpuTime();
   real fmin = -1e100;
   F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,

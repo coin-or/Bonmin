@@ -12,20 +12,29 @@ namespace Bonmin {
 CurvBranchingSolver::CurvBranchingSolver(OsiTMINLPInterface * solver) :
   StrongBranchingSolver(solver),
   orig_d_(NULL),
-  projected_d_(NULL)
+  projected_d_(NULL),
+  x_l_orig_(NULL),
+  x_u_orig_(NULL),
+  g_l_orig_(NULL),
+  g_u_orig_(NULL)
 {
 }
 
 CurvBranchingSolver::CurvBranchingSolver(const CurvBranchingSolver & rhs) :
   StrongBranchingSolver(rhs),
   orig_d_(NULL),
-  projected_d_(NULL)
+  projected_d_(NULL),
+  x_l_orig_(NULL),
+  x_u_orig_(NULL),
+  g_l_orig_(NULL),
+  g_u_orig_(NULL)
 {
 }
 
 CurvBranchingSolver &
 CurvBranchingSolver::operator=(const CurvBranchingSolver & rhs)
 {
+  assert(!x_l_orig_);
   if (this != &rhs) {
     StrongBranchingSolver::operator=(rhs);
   }
@@ -36,6 +45,10 @@ CurvBranchingSolver::~CurvBranchingSolver ()
 {
   delete [] orig_d_;
   delete [] projected_d_;
+  delete [] x_l_orig_;
+  delete [] x_u_orig_;
+  delete [] g_l_orig_;
+  delete [] g_u_orig_;
 }
 
 void CurvBranchingSolver::
@@ -60,6 +73,25 @@ markHotStart(OsiTMINLPInterface* tminlp_interface)
   projected_d_ = NULL;
   orig_d_ = new double[numCols_];
   projected_d_ = new double[numCols_];
+
+  // Get a copy of the current bounds
+  delete [] x_l_orig_;
+  delete [] x_u_orig_;
+  delete [] g_l_orig_;
+  delete [] g_u_orig_;
+  x_l_orig_ = NULL;
+  x_u_orig_ = NULL;
+  g_l_orig_ = NULL;
+  g_u_orig_ = NULL;
+  x_l_orig_ = new Number[numCols_];
+  x_u_orig_ = new Number[numCols_];
+  g_l_orig_ = new Number[numRows_];
+  g_u_orig_ = new Number[numRows_];
+
+  bool retval = tminlp_interface->problem()->
+    get_bounds_info(numCols_, x_l_orig_, x_u_orig_,
+		    numRows_, g_l_orig_, g_u_orig_);
+  assert(retval);
 }
 
 void CurvBranchingSolver::
@@ -71,6 +103,14 @@ unmarkHotStart(OsiTMINLPInterface* tminlp_interface)
   delete [] projected_d_;
   orig_d_ = NULL;
   projected_d_ = NULL;
+  delete [] x_l_orig_;
+  delete [] x_u_orig_;
+  delete [] g_l_orig_;
+  delete [] g_u_orig_;
+  x_l_orig_ = NULL;
+  x_u_orig_ = NULL;
+  g_l_orig_ = NULL;
+  g_u_orig_ = NULL;
 }
 
 TNLPSolver::ReturnStatus CurvBranchingSolver::
@@ -91,14 +131,22 @@ solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
   // Compute the step from the current point to the solution
   // ToDo: If we know what changes, we can be more efficient
   for (int i=0; i<numCols_; i++) {
-    orig_d_[i] = max(max(0., b_L[i]-solution_[i]), solution_[i]-b_U[i]);
+    if (b_L[i]>solution_[i]) {
+      orig_d_[i] = solution_[i]-b_L[i];
+    }
+    else if (b_U[i]<solution_[i]) {
+      orig_d_[i] = solution_[i]-b_U[i];
+    } else {
+      orig_d_[i] = 0.;
+    }
   }
 
   double gradLagTd;
   double dTHLagd;
   bool retval =
     cur_estimator_->ComputeNullSpaceCurvature(
-           new_bounds_, numCols_, solution_, new_x_, z_L, z_U,
+	   numCols_, solution_, new_x_, x_l_orig_, x_u_orig_,
+	   g_l_orig_, g_u_orig_, new_bounds_, z_L, z_U,
 	   numRows_, lam, new_mults_, orig_d_, projected_d_,
            gradLagTd, dTHLagd);
 

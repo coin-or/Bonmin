@@ -101,6 +101,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   OsiObject ** object = info->solver_->objects();
   // Get average pseudo costs and see if pseudo shadow prices possible
   int shadowPossible=shadowPriceMode_;
+  assert(!shadowPossible);
   if (shadowPossible) {
     for ( i=0;i<numberObjects;i++) {
       if ( !object[i]->canHandleShadowPrices()) {
@@ -173,15 +174,20 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 	numberDown = downNumber_[i];
 	double upEstimate = object[i]->upEstimate();
 	double downEstimate = object[i]->downEstimate();
-	if (shadowPossible<2) {
-	  upEstimate = numberUp ? ((upEstimate*sumUp)/numberUp) : (upEstimate*upMultiplier);
-	  if (numberUp<numberBeforeTrusted_)
-	    upEstimate *= (numberBeforeTrusted_+1.0)/(numberUp+1.0);
-	  downEstimate = numberDown ? ((downEstimate*sumDown)/numberDown) : (downEstimate*downMultiplier);
-	  if (numberDown<numberBeforeTrusted_)
-	    downEstimate *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
+	if (numberBeforeTrusted_>=0) {
+	  if (shadowPossible<2) {
+	    upEstimate = numberUp ? ((upEstimate*sumUp)/numberUp) : (upEstimate*upMultiplier);
+	    if (numberUp<numberBeforeTrusted_)
+	      upEstimate *= (numberBeforeTrusted_+1.0)/(numberUp+1.0);
+	    downEstimate = numberDown ? ((downEstimate*sumDown)/numberDown) : (downEstimate*downMultiplier);
+	    if (numberDown<numberBeforeTrusted_)
+	      downEstimate *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
+	  } else {
+	    // use shadow prices always
+	  }
 	} else {
-	  // use shadow prices always
+	  printf("numberBeforeTrusted_ < 0 is buggy\n");
+	  abort();
 	}
 	value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
 	if (value>check) {
@@ -291,7 +297,7 @@ BonChooseVariable::chooseVariable(
     double bestTrusted=-COIN_DBL_MAX;
     for (int i=0;i<numberLeft;i++) {
       int iObject = list_[i];
-      if (upNumber_[iObject]<numberBeforeTrusted_||downNumber_[iObject]<numberBeforeTrusted_) {
+      if (numberBeforeTrusted_<0||upNumber_[iObject]<numberBeforeTrusted_||downNumber_[iObject]<numberBeforeTrusted_) {
 	results[numberToDo] = OsiHotInfo(solver,info,const_cast<const OsiObject **> (solver->objects()),iObject);
 	temp[numberToDo++]=iObject;
       } else if (bestObjectIndex_<0) {
@@ -400,6 +406,9 @@ BonChooseVariable::chooseVariable(
     if ( bestObjectIndex_ >=0 ) {
       OsiObject * obj = solver->objects()[bestObjectIndex_];
       obj->setWhichWay(	bestWhichWay_);
+    }
+    if (bb_log_level_>4) {
+      printf("           Choosing %d\n", bestObjectIndex_);
     }
     if (numberFixed==numberUnsatisfied_&&numberFixed)
       returnCode=4;

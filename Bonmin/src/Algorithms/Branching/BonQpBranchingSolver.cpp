@@ -52,7 +52,8 @@ markHotStart(OsiTMINLPInterface* tminlp_interface)
   FilterSolver* filter_solver =
     dynamic_cast<FilterSolver*> (tminlp_interface->solver());
   if (filter_solver) {
-    tqp_solver_ = new BqpdSolver(RegOptions(), Options(), Jnlst());
+    //tqp_solver_ = new BqpdSolver(RegOptions(), Options(), Jnlst());
+    tqp_solver_ = new FilterSolver(RegOptions(), Options(), Jnlst());
   }
 #endif
   if (IsNull(tqp_solver_)) {
@@ -88,6 +89,7 @@ solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
     //retstatus = TNLPSolver::iterationLimit;
     first_solve_ = false;
   }
+  //retstatus = TNLPSolver::iterationLimit;
   return retstatus;
 }
 

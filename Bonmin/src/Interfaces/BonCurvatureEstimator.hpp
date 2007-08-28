@@ -54,10 +54,14 @@ namespace Bonmin
 	possible, and true otherwise. */
 
     bool ComputeNullSpaceCurvature(
-      bool new_bounds,
       int n,
       const Number* x,
       bool new_x,
+      const Number* x_l,
+      const Number* x_u,
+      const Number* g_l,
+      const Number* g_u,
+      bool new_bounds,
       const Number* z_L,
       const Number* z_U,
       int m,
@@ -116,10 +120,6 @@ namespace Bonmin
     Index* irows_hess_;
     Index* jcols_hess_;
     Number* hess_vals_;
-    Number* x_l_;
-    Number* x_u_;
-    Number* g_l_;
-    Number* g_u_;
     //@}
 
     /** @name Information about activities for equality projection
@@ -197,6 +197,10 @@ namespace Bonmin
     bool Initialize();
 
     bool PrepareNewMatrixStructure(
+      const Number* x_l,
+      const Number* x_u,
+      const Number* g_l,
+      const Number* g_u,
       std::vector<int>& active_x,
       std::vector<int>& active_g,
       Index& nx_free,

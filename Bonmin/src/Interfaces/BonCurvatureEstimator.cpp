@@ -58,10 +58,6 @@ namespace Bonmin
       irows_hess_(NULL),
       jcols_hess_(NULL),
       hess_vals_(NULL),
-      x_l_(NULL),
-      x_u_(NULL),
-      g_l_(NULL),
-      g_u_(NULL),
       eq_x_free_map_(NULL),
       eq_g_fixed_map_(NULL),
       all_x_free_map_(NULL),
@@ -190,10 +186,6 @@ namespace Bonmin
       delete [] irows_hess_;
       delete [] jcols_hess_;
       delete [] hess_vals_;
-      delete [] x_l_;
-      delete [] x_u_;
-      delete [] g_l_;
-      delete [] g_u_;
       delete [] eq_x_free_map_;
       delete [] eq_g_fixed_map_;
       delete [] all_x_free_map_;
@@ -263,20 +255,6 @@ namespace Bonmin
     hess_vals_ = NULL; // We set it to NULL, so that we know later
     // that we still need to compute the values
 
-    // Space for bounds
-    delete [] x_l_;
-    delete [] x_u_;
-    delete [] g_l_;
-    delete [] g_u_;
-    x_l_ = NULL;
-    x_u_ = NULL;
-    g_l_ = NULL;
-    g_u_ = NULL;
-    x_l_ = new Number[n_];
-    x_u_ = new Number[n_];
-    g_l_ = new Number[m_];
-    g_u_ = new Number[m_];
-
     // Get space for the activities maps
     delete [] eq_x_free_map_;
     delete [] eq_g_fixed_map_;
@@ -307,10 +285,14 @@ namespace Bonmin
 
   bool
   CurvatureEstimator::ComputeNullSpaceCurvature(
-    bool new_bounds,
     int n,
     const Number* x,
     bool new_x,
+    const Number* x_l,
+    const Number* x_u,
+    const Number* g_l,
+    const Number* g_u,
+    bool new_bounds,
     const Number* z_L,
     const Number* z_U,
     int m,
@@ -321,6 +303,15 @@ namespace Bonmin
     Number& gradLagTd,
     Number& dTHLagd)
   {
+#if 0
+    printf("new_bounds = %d new_x = %d new_mults = %d\n", new_bounds, new_x, new_mults);
+  for (int i=0;  i<n; i++) {
+    printf("x[%3d] = %15.8e orig_d[%3d] = %15.8e z_L[%3d] = %15.8e z_U[%3d] = %15.8e\n",i,x[i],i,orig_d[i],i,z_L[i],i,z_U[i]);
+  }
+  for (int i=0; i<m; i++) {
+    printf("lam[%3d] = %15.8e\n", i, lam[i]);
+  }
+#endif
     if (!initialized_) {
       Initialize();
       new_bounds = true;
@@ -340,19 +331,13 @@ namespace Bonmin
       }
     }
 
-    if (new_bounds) {
-      // Get bounds
-      if (!tnlp_->get_bounds_info(n_, x_l_, x_u_, m_, g_l_, g_u_)) {
-	return false;
-      }
-    }
-
     // First we compute the direction projected into the space of only
     // the equality constraints
     if (new_x) {
       std::vector<int> dummy_active_x;
       std::vector<int> dummy_active_g;
-      if (!PrepareNewMatrixStructure(dummy_active_x, dummy_active_g,
+      if (!PrepareNewMatrixStructure(x_l, x_u, g_l, g_u,
+				     dummy_active_x, dummy_active_g,
 				     eq_nx_free_, eq_x_free_map_,
 				     eq_ng_fixed_, eq_g_fixed_map_,
 				     eq_comp_proj_matrix_space_,
@@ -390,18 +375,18 @@ namespace Bonmin
 	jnlst_->Printf(J_MOREDETAILED, J_NLP,
 		       "List of variables considered fixed (with orig_d and z)\n");
 	for (Index i=0; i<n; i++) {
-	  if (x_l_[i] < x_u_[i]) {
+	  if (x_l[i] < x_u[i]) {
 	    if (orig_d[i]>0. && z_U[i]*orig_d[i]>zTol) {
 	      active_x_.push_back(i+1);
 	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_U[i]);
-	      DBG_ASSERT(x_u_[i] < 1e19);
+	      DBG_ASSERT(x_u[i] < 1e19);
 	    }
 	    else if (orig_d[i]<0. && -z_L[i]*orig_d[i]>zTol) {
 	      active_x_.push_back(-(i+1));
 	      jnlst_->Printf(J_MOREDETAILED, J_NLP,
 			     "x[%5d] (%e,%e)\n", i, orig_d[i], z_L[i]);
-	      DBG_ASSERT(x_l_[i] > -1e19);
+	      DBG_ASSERT(x_l[i] > -1e19);
 	    }
 	  }
 	}
@@ -423,15 +408,15 @@ namespace Bonmin
       jnlst_->Printf(J_MOREDETAILED, J_NLP,
 		     "List of constraints considered fixed (with lam and jacTd)\n");
       for (Index j=0; j<m; j++) {
-	if (g_l_[j] < g_u_[j] && fabs(lam[j]) > lamTol) {
+	if (g_l[j] < g_u[j] && fabs(lam[j]) > lamTol) {
 	  if (lam[j]*jacTd[j] > 0) {
 	    if (lam[j] < 0.) {
 	      active_g_.push_back(-(j+1));
-	      DBG_ASSERT(g_l_[j] > -1e19);
+	      DBG_ASSERT(g_l[j] > -1e19);
 	    }
 	    else {
 	      active_g_.push_back(j+1);
-	      DBG_ASSERT(g_u_[j] < 1e19);
+	      DBG_ASSERT(g_u[j] < 1e19);
 	    }
 	    //	    active_g_.push_back(j+1);
 	    jnlst_->Printf(J_MOREDETAILED, J_NLP,
@@ -444,7 +429,8 @@ namespace Bonmin
 
     // Check if the structure of the matrix has changed
     if (new_activities) {
-      if (!PrepareNewMatrixStructure(active_x_, active_g_,
+      if (!PrepareNewMatrixStructure(x_l, x_u, g_l, g_u,
+				     active_x_, active_g_,
 				     all_nx_free_, all_x_free_map_,
 				     all_ng_fixed_, all_g_fixed_map_,
 				     all_comp_proj_matrix_space_,
@@ -550,10 +536,17 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
       return false;
     }
 
+#if 0
+    printf("gradLagTd = %e dTHLagd = %e\n",gradLagTd,dTHLagd);
+#endif
     return true;
   }
 
   bool CurvatureEstimator::PrepareNewMatrixStructure(
+    const Number* x_l,
+    const Number* x_u,
+    const Number* g_l,
+    const Number* g_u,
     std::vector<int>& active_x,
     std::vector<int>& active_g,
     Index& nx_free,
@@ -573,16 +566,16 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
       DBG_ASSERT(*i != 0 && *i<=n_ && *i>=-n_);
       if (*i<0) {
 	x_free_map[(-*i)-1] = -1;
-	DBG_ASSERT(x_l_[(-*i)-1] > -1e19);
+	DBG_ASSERT(x_l[(-*i)-1] > -1e19);
       }
       else {
 	x_free_map[(*i)-1] = -1;
-	DBG_ASSERT(x_u_[(*i)-1] < 1e19);
+	DBG_ASSERT(x_u[(*i)-1] < 1e19);
       }
     }
     // fixed by bounds
     for (Index i=0; i<n_; i++) {
-      if (x_l_[i] == x_u_[i]) {
+      if (x_l[i] == x_u[i]) {
 	x_free_map[i] = -1;
       }
     }
@@ -605,16 +598,16 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
       DBG_ASSERT(*i != 0 && *i<=m_ && *i>=-m_);
       if (*i<0) {
 	g_fixed_map[(-*i)-1] = 0;
-	DBG_ASSERT(g_l_[(-*i)-1] > -1e19); //ToDo look at option?
+	DBG_ASSERT(g_l[(-*i)-1] > -1e19); //ToDo look at option?
       }
       else {
 	g_fixed_map[(*i)-1] = 0;
-	DBG_ASSERT(g_u_[(*i)-1] < 1e19);
+	DBG_ASSERT(g_u[(*i)-1] < 1e19);
       }
     }
     // fixed by bounds
     for (Index j=0; j<m_; j++) {
-      if (g_l_[j] == g_u_[j]) {
+      if (g_l[j] == g_u[j]) {
 	g_fixed_map[j] = 0;
       }
     }
