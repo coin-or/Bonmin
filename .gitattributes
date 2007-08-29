@@ -45,8 +45,6 @@ Bonmin/src/Algorithms/BonBonminSetup.cpp -text
 Bonmin/src/Algorithms/BonBonminSetup.hpp -text
 Bonmin/src/Algorithms/Branching/BonChooseVariable.cpp -text
 Bonmin/src/Algorithms/Branching/BonChooseVariable.hpp -text
-Bonmin/src/Algorithms/Branching/BonCurvBranching.cpp -text
-Bonmin/src/Algorithms/Branching/BonCurvBranching.hpp -text
 Bonmin/src/Algorithms/Branching/BonCurvBranchingSolver.cpp -text
 Bonmin/src/Algorithms/Branching/BonCurvBranchingSolver.hpp -text
 Bonmin/src/Algorithms/Branching/BonLpBranchingSolver.cpp -text
