@@ -128,7 +128,7 @@ BM: Switching to WarmStartFromRoot.\n");
       // For Bcp, we change the default to most-fractional for now
       varselect_ = Bonmin::OsiTMINLPInterface::MOST_FRACTIONAL;
     }
-    options->GetIntegerValue("number_ecp_rounds", numEcpRounds_,"bonmin.");
+    options->GetIntegerValue("ecp_max_rounds", numEcpRounds_,"bonmin.");
     options->GetIntegerValue("number_strong_branch",numberStrong_,"bonmin.");
     options->GetIntegerValue("number_before_trust", minReliability_,"bonmin.");
     delete chooseVar_;
