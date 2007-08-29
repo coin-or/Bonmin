@@ -296,47 +296,46 @@ algo_(other.algo_){
     }
     int varSelection;
     options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
-    
-    if(varSelection == OsiTMINLPInterface::CURVATURE_ESTIMATOR){
-      continuousSolver_->findIntegersAndSOS(false);
-      SmartPtr<StrongBranchingSolver> curv_solver = new CurvBranchingSolver(nonlinearSolver_);
-      nonlinearSolver_->SetStrongBrachingSolver(curv_solver);
-      BonChooseVariable * chooseVariable = new BonChooseVariable(nonlinearSolver_);
-      // We cannot believe much from this strong braching solver
-      chooseVariable->setTrustStrongForSolution(false);
-      chooseVariable->setTrustStrongForBound(false);
-      branchingMethod_ = chooseVariable;      
-    }
-    else if(varSelection == OsiTMINLPInterface::QP_STRONG_BRANCHING){
-      continuousSolver_->findIntegersAndSOS(false);
-      SmartPtr<StrongBranchingSolver> qp_solver = new QpBranchingSolver(nonlinearSolver_);
-      nonlinearSolver_->SetStrongBrachingSolver(qp_solver);
-      BonChooseVariable * chooseVariable = new BonChooseVariable(nonlinearSolver_);
-      // The bound returned from the QP can be wrong, since the
-      // objective is not guaranteed to be an underestimator:
-      chooseVariable->setTrustStrongForBound(false);
-      branchingMethod_ = chooseVariable;
-    }
-    else if(varSelection == OsiTMINLPInterface::LP_STRONG_BRANCHING){
-      continuousSolver_->findIntegersAndSOS(false);
-      SmartPtr<StrongBranchingSolver> lp_solver = new LpBranchingSolver(nonlinearSolver_);
-      nonlinearSolver_->SetStrongBrachingSolver(lp_solver);
-      BonChooseVariable * chooseVariable = new BonChooseVariable(nonlinearSolver_);
 
-      branchingMethod_ = chooseVariable;
-    }
-    else if(varSelection == OsiTMINLPInterface::NLP_STRONG_BRANCHING){
-      continuousSolver_->findIntegersAndSOS(false);
-      BonChooseVariable * chooseVariable = new BonChooseVariable(nonlinearSolver_);
-      branchingMethod_ = chooseVariable;
-    }
-    else if(varSelection == OsiTMINLPInterface::OSI_SIMPLE){
+    switch (varSelection) {
+    case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
+    case OsiTMINLPInterface::QP_STRONG_BRANCHING:
+    case OsiTMINLPInterface::LP_STRONG_BRANCHING:
+    case OsiTMINLPInterface::NLP_STRONG_BRANCHING:
+      {
+	continuousSolver_->findIntegersAndSOS(false);
+	SmartPtr<StrongBranchingSolver> strong_solver = NULL;
+	BonChooseVariable * chooseVariable = new BonChooseVariable(nonlinearSolver_);
+	switch(varSelection) {
+	case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
+	  strong_solver = new CurvBranchingSolver(nonlinearSolver_);
+	  chooseVariable->setTrustStrongForSolution(false);
+	  chooseVariable->setTrustStrongForBound(false);
+	  break;
+	case OsiTMINLPInterface::QP_STRONG_BRANCHING:
+	  strong_solver = new QpBranchingSolver(nonlinearSolver_);
+	  // The bound returned from the QP can be wrong, since the
+	  // objective is not guaranteed to be an underestimator:
+	  chooseVariable->setTrustStrongForBound(false);
+	  break;
+	case OsiTMINLPInterface::LP_STRONG_BRANCHING:
+	  strong_solver = new LpBranchingSolver(nonlinearSolver_);
+	  break;
+	}
+	nonlinearSolver_->SetStrongBrachingSolver(strong_solver);
+	branchingMethod_ = chooseVariable;
+      }
+      break;
+    case OsiTMINLPInterface::OSI_SIMPLE:
       continuousSolver_->findIntegersAndSOS(false);
       branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
-    }
-    else if(varSelection == OsiTMINLPInterface::OSI_STRONG){
+      break;
+    case OsiTMINLPInterface::OSI_STRONG:
       continuousSolver_->findIntegersAndSOS(false);
       branchingMethod_ = new OsiChooseStrong(nonlinearSolver_);
+      break;
+    //default:
+      //abort();
     }
   }  
   

@@ -1,4 +1,4 @@
-// Copyright (C) 2006, International Business Machines
+// Copyright (C) 2006, 2007 International Business Machines
 // Corporation and others.  All Rights Reserved.
 #if defined(_MSC_VER)
 // Turn off compiler warning about long names

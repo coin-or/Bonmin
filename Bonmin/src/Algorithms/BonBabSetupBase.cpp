@@ -74,7 +74,7 @@ roptions_(other.roptions_),
 readOptions_(other.readOptions_)
 {
   if(other.nonlinearSolver_){
-    nonlinearSolver_ = (OsiTMINLPInterface *) other.nonlinearSolver_->clone();}
+    nonlinearSolver_ = static_cast<OsiTMINLPInterface *>(other.nonlinearSolver_->clone());}
   if(other.continuousSolver_){
     continuousSolver_ = other.continuousSolver_->clone();}
  

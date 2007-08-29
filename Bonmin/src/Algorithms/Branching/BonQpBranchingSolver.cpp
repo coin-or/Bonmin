@@ -52,6 +52,8 @@ markHotStart(OsiTMINLPInterface* tminlp_interface)
   FilterSolver* filter_solver =
     dynamic_cast<FilterSolver*> (tminlp_interface->solver());
   if (filter_solver) {
+    // The following doesn't seem to work - it returns some QPs as
+    // infeasible, while FilterSQP doesn't
     //tqp_solver_ = new BqpdSolver(RegOptions(), Options(), Jnlst());
     tqp_solver_ = new FilterSolver(RegOptions(), Options(), Jnlst());
   }
