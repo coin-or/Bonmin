@@ -148,10 +148,10 @@ class exprQuad: public exprGroup {
     * think that it is assumed anywhere in the function that Q only
     * involves original variables of the problem).
     * 
-    * The under-estimator of \f$ x^T Q x\f$ is given by \f$ x^T Q x +
-    * \sum \lambda_{\min,i} (x_i - l_i ) (u_i - x_i )} \f$ and its
-    * over-estimator is given by \f$ Q - \sum \lambda_{\max, i} (x_i -
-    * l_i ) (u_i - x_i ) \f$ (where \f$ \lambda_{\min, i} =
+    * The under-estimator of \f$ x^T Q x\f$ is given by \f[ x^T Q x +
+     \sum \lambda_{\min,i} (x_i - l_i ) (u_i - x_i ) \f] and its
+    * over-estimator is given by \f[ Q - \sum \lambda_{\max, i} (x_i -
+    * l_i ) (u_i - x_i ) \f] (where \f$ \lambda_{\min, i} =
     * \frac{\lambda_{\min}}{w_i^2} \f$ and \f$ \lambda_{\max, i} =
     * \frac{\lambda_{\max}}{w_i^2} \f$).
     *
