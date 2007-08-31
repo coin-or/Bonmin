@@ -1,4 +1,4 @@
-// Copyright (C) 2006, International Business Machines
+// Copyright (C) 2006, 2007 International Business Machines
 // Corporation and others.  All Rights Reserved.
 #ifndef BonChooseVariable_H
 #define BonChooseVariable_H
@@ -6,6 +6,9 @@
 #include "OsiChooseVariable.hpp"
 #include "BonCurvatureEstimator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
+
+// Forward declaration
+class CbcModel;
 
 namespace Bonmin {
 
@@ -72,6 +75,12 @@ public:
   virtual void updateInformation( int whichObject, int branch, 
 				  double changeInObjective, double changeInValue,
 				  int status);
+
+  /** Method for setting CbcModel, which is used to get statusOfSearch */
+  void setCbcModel(CbcModel* cbc_model)
+  {
+    cbc_model_ = cbc_model;
+  }
 protected:
 
   /// Holding on the a pointer to the journalist
@@ -79,6 +88,9 @@ protected:
 
   /// verbosity level
   int bb_log_level_;
+
+  /// CbcModel, used to get status of search
+  CbcModel* cbc_model_;
 
   /**  This is a utility function which does strong branching on
        a list of objects and stores the results in OsiHotInfo.objects.
