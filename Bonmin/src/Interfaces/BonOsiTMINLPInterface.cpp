@@ -2449,10 +2449,20 @@ OsiTMINLPInterface::SetStrongBrachingSolver(SmartPtr<StrongBranchingSolver> stro
   strong_branching_solver_ = strong_branching_solver;
 }
 
+  //#define STRONG_COMPARE
+#ifdef STRONG_COMPARE
+  static double objorig;
+#endif
+
 void
 OsiTMINLPInterface::markHotStart()
 {
   if (IsValid(strong_branching_solver_)) {
+#ifdef STRONG_COMPARE
+    // AWDEBUG
+    OsiSolverInterface::markHotStart();
+    objorig = getObjValue();
+#endif
     optimizationStatusBeforeHotStart_ = optimizationStatus_;
     strong_branching_solver_->markHotStart(this);
   }
@@ -2472,7 +2482,17 @@ OsiTMINLPInterface::solveFromHotStart()
   }
 #endif
   if (IsValid(strong_branching_solver_)) {
+#ifdef STRONG_COMPARE
+    // AWDEBUG
+    OsiSolverInterface::solveFromHotStart();
+    double obj_nlp = getObjValue() - objorig;
+#endif
     optimizationStatus_ = strong_branching_solver_->solveFromHotStart(this);
+#ifdef STRONG_COMPARE
+    double obj_other = getObjValue() - objorig;
+    printf("AWDEBUG: Strong Branching results: NLP = %15.8e Other = %15.8e\n",
+	   obj_nlp, obj_other);
+#endif
   }
   else {
     // Default Implementation
@@ -2484,6 +2504,10 @@ void
 OsiTMINLPInterface::unmarkHotStart()
 {
   if (IsValid(strong_branching_solver_)) {
+#ifdef STRONG_COMPARE
+    // AWDEBUG
+    OsiSolverInterface::unmarkHotStart();
+#endif
     strong_branching_solver_->unmarkHotStart(this);
     optimizationStatus_ = optimizationStatusBeforeHotStart_;
   }

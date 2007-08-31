@@ -81,6 +81,11 @@ public:
   {
     cbc_model_ = cbc_model;
   }
+
+  void setOnlyPseudoWhenTrusted(bool only_pseudo_when_trusted)
+  {
+    only_pseudo_when_trusted_ = only_pseudo_when_trusted;
+  }
 protected:
 
   /// Holding on the a pointer to the journalist
@@ -88,9 +93,6 @@ protected:
 
   /// verbosity level
   int bb_log_level_;
-
-  /// CbcModel, used to get status of search
-  CbcModel* cbc_model_;
 
   /**  This is a utility function which does strong branching on
        a list of objects and stores the results in OsiHotInfo.objects.
@@ -113,8 +115,32 @@ private:
   /** Default Constructor, forbiden for some reason.*/
   BonChooseVariable ();
 
+  /// CbcModel, used to get status of search
+  CbcModel* cbc_model_;
+
+  /** Flag indicating whether we don't want to mix strong branching
+   *  and pseudo costs during the decision which variable to branch
+   *  on */
+  bool only_pseudo_when_trusted_;
+
+  /** Number of variables put into the list because there were not
+   *  trusted */
+  int number_not_trusted_;
+
   // ToDo: Make this an option
-  Number MAXMIN_CRITERION;
+  /** @name Algoirithmic options */
+  //@{
+  /** maxmin weight in branching decision when no solution has been
+   *  found yet */
+  double maxmin_crit_no_sol_;
+  /** maxmin weight in branching decision when no solution has been
+   *  found yet */
+  double maxmin_crit_have_sol_;
+  /** fraction of branching candidates that are not trusted yet */
+  double setup_pseudo_frac_;
+  //@}
+
+  double maxminCrit() const;
 };
 
 }

@@ -20,6 +20,8 @@
 
 #include "CbcBranchUser.hpp"
 
+#include "BonChooseVariable.hpp"
+
 // sets cutoff a bit above real one, to avoid single-point feasible sets
 #define CUTOFF_TOL 1e-6
 
@@ -295,6 +297,9 @@ namespace Bonmin
       OsiChooseStrong * strong = dynamic_cast<OsiChooseStrong *>(s.branchingMethod());
       if(strong)
         strong->setNumberBeforeTrusted(model_.numberBeforeTrust());
+      BonChooseVariable * strong2 = dynamic_cast<BonChooseVariable *>(s.branchingMethod());
+      if (strong2)
+	strong2->setCbcModel(&model_);
       branch.setChooseMethod(*s.branchingMethod());
     }
     

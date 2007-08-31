@@ -1151,10 +1151,13 @@ protected:
   OsiTMINLPInterface(Ipopt::SmartPtr<TNLPSolver> app);
 
 private:
+  /** solver to be used for all strong branching solves */
   SmartPtr<StrongBranchingSolver> strong_branching_solver_;
   /** status of last optimization before hot start was marked. */
   TNLPSolver::ReturnStatus optimizationStatusBeforeHotStart_;
 
+  // DELETEME
+  SmartPtr<StrongBranchingSolver> strong_branching_solver_compare_;
 };
 }
 #endif

@@ -16,7 +16,9 @@ CurvBranchingSolver::CurvBranchingSolver(OsiTMINLPInterface * solver) :
   x_l_orig_(NULL),
   x_u_orig_(NULL),
   g_l_orig_(NULL),
-  g_u_orig_(NULL)
+  g_u_orig_(NULL),
+  solution_(NULL),
+  duals_(NULL)
 {
 }
 
@@ -27,7 +29,9 @@ CurvBranchingSolver::CurvBranchingSolver(const CurvBranchingSolver & rhs) :
   x_l_orig_(NULL),
   x_u_orig_(NULL),
   g_l_orig_(NULL),
-  g_u_orig_(NULL)
+  g_u_orig_(NULL),
+  solution_(NULL),
+  duals_(NULL)
 {
 }
 
@@ -49,22 +53,33 @@ CurvBranchingSolver::~CurvBranchingSolver ()
   delete [] x_u_orig_;
   delete [] g_l_orig_;
   delete [] g_u_orig_;
+  delete [] solution_;
+  delete [] duals_;
 }
 
 void CurvBranchingSolver::
 markHotStart(OsiTMINLPInterface* tminlp_interface)
 {
-  // Get a new curvature estimator (or should we just keep one?)
-  cur_estimator_ = new CurvatureEstimator(Jnlst(), Options(),
-					  tminlp_interface->problem());
+  if (IsNull(cur_estimator_)) {
+    // Get a curvature estimator
+    cur_estimator_ = new CurvatureEstimator(Jnlst(), Options(),
+					    tminlp_interface->problem());
+  }
+
   new_bounds_ = true;
   new_x_ = true;
   new_mults_ = true;
 
+  delete [] solution_;
+  delete [] duals_;
+  solution_ =  NULL;
+  duals_ =  NULL;
+
   numCols_ = tminlp_interface->getNumCols();
   numRows_ = tminlp_interface->getNumRows();
-  solution_ = tminlp_interface->problem()->x_sol();
-  duals_ = tminlp_interface->problem()->duals_sol();
+  solution_ = CoinCopyOfArray(tminlp_interface->problem()->x_sol(), numCols_);
+  duals_ = CoinCopyOfArray(tminlp_interface->problem()->duals_sol(),
+			   numRows_ + 2*numCols_);
   obj_value_ = tminlp_interface->problem()->obj_value();
 
   delete [] orig_d_;
@@ -98,7 +113,10 @@ void CurvBranchingSolver::
 unmarkHotStart(OsiTMINLPInterface* tminlp_interface)
 {
   // Free memory
-  cur_estimator_ = NULL;
+  delete [] solution_;
+  delete [] duals_;
+  solution_ =  NULL;
+  duals_ =  NULL;
   delete [] orig_d_;
   delete [] projected_d_;
   orig_d_ = NULL;

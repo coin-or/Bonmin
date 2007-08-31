@@ -311,15 +311,18 @@ algo_(other.algo_){
 	  strong_solver = new CurvBranchingSolver(nonlinearSolver_);
 	  chooseVariable->setTrustStrongForSolution(false);
 	  chooseVariable->setTrustStrongForBound(false);
+	  chooseVariable->setOnlyPseudoWhenTrusted(true);
 	  break;
 	case OsiTMINLPInterface::QP_STRONG_BRANCHING:
 	  strong_solver = new QpBranchingSolver(nonlinearSolver_);
 	  // The bound returned from the QP can be wrong, since the
 	  // objective is not guaranteed to be an underestimator:
 	  chooseVariable->setTrustStrongForBound(false);
+	  chooseVariable->setOnlyPseudoWhenTrusted(true);
 	  break;
 	case OsiTMINLPInterface::LP_STRONG_BRANCHING:
 	  strong_solver = new LpBranchingSolver(nonlinearSolver_);
+	  chooseVariable->setOnlyPseudoWhenTrusted(true);
 	  break;
 	}
 	nonlinearSolver_->SetStrongBrachingSolver(strong_solver);

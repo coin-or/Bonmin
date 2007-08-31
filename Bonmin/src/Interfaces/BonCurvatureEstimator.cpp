@@ -670,7 +670,7 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
   {
     comp_proj_matrix = comp_proj_matrix_space->MakeNewCompoundSymMatrix();
     SmartPtr<Matrix> jac = comp_proj_matrix->GetCompNonConst(1, 0);
-    SmartPtr<GenTMatrix> tjac = dynamic_cast<GenTMatrix*> (GetRawPtr(jac));
+    SmartPtr<GenTMatrix> tjac = static_cast<GenTMatrix*> (GetRawPtr(jac));
     Number* vals = tjac->Values();
     Index inz=0;
     for (Index i=0; i<nnz_jac_; i++) {
@@ -706,7 +706,7 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
     // Now fill this vector with the values, extracting the relevant entries
     if (rhs_x) {
       SmartPtr<DenseVector> drhs_x =
-	dynamic_cast<DenseVector*> (GetRawPtr(vrhs_x));
+	static_cast<DenseVector*> (GetRawPtr(vrhs_x));
       Number* xvals = drhs_x->Values();
       for (Index i=0; i<n_; i++) {
 	const Index& ix = x_free_map[i];
@@ -720,7 +720,7 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
     }
     if (rhs_g) {
       SmartPtr<DenseVector> drhs_g =
-	dynamic_cast<DenseVector*> (GetRawPtr(vrhs_g));
+	static_cast<DenseVector*> (GetRawPtr(vrhs_g));
       Number* gvals = drhs_g->Values();
       for (Index j=0; j<m_; j++) {
 	const Index& jg = g_fixed_map[j];
@@ -756,7 +756,7 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
     if (sol_x) {
       SmartPtr<Vector> vsol_x = sol->GetCompNonConst(0);
       SmartPtr<const DenseVector> dsol_x =
-	dynamic_cast<const DenseVector*> (GetRawPtr(vsol_x));
+	static_cast<const DenseVector*> (GetRawPtr(vsol_x));
       const Number* xvals = dsol_x->Values();
       for (Index i=0; i<n_; i++) {
 	const Index& ix = x_free_map[i];
@@ -771,7 +771,7 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
     if (sol_g) {
       SmartPtr<Vector> vsol_g = sol->GetCompNonConst(1);
       SmartPtr<const DenseVector> dsol_g =
-	dynamic_cast<const DenseVector*> (GetRawPtr(vsol_g));
+	static_cast<const DenseVector*> (GetRawPtr(vsol_g));
       const Number* gvals = dsol_g->Values();
       for (Index j=0; j<m_; j++) {
 	const Index& ig = g_fixed_map[j];
