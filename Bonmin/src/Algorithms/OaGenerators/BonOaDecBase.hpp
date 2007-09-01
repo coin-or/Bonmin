@@ -18,6 +18,8 @@
 
 #include "CoinTime.hpp"
 #include "OsiAuxInfo.hpp"
+#include "OsiBranchingObject.hpp"
+
 
 /* forward declarations.*/
 class OsiClpSolverInterface;
@@ -121,11 +123,14 @@ namespace Bonmin
 
       /** Clone the state of another solver (bounds, cutoff, basis).*/
       void cloneOther(const OsiSolverInterface &si);
+      /** Check for integer feasibility of a solution return true if it is feasible.
+	  \todo Handle SOS Type 2 constraints. */
+      bool integerFeasible(const OsiBranchingInformation & info) const;
   
      /** Fix integer variables in si to their values in colsol.
          \remark colsol is assumed to be integer on the integer constrained variables.
          \todo Handle SOS type 2.*/
-     void fixIntegers(const double * colsol);
+     void fixIntegers(const OsiBranchingInformation & info);
 
      /** Check if solution in solver is the same as colsol on integer variables. */
      bool isDifferentOnIntegers(const double * colsol);
@@ -141,7 +146,13 @@ namespace Bonmin
        return si_;
      }
 
+    /** Set objects.*/
+    void setObjects(OsiObject ** objects, int nObjects){
+      objects_ = objects;
+      nObjects_ = nObjects;}
 
+    void setIntegerTolerance(double v){
+      integerTolerance_ = v;}
       private:
       /** Interface saved. */
       OsiSolverInterface * si_;
@@ -163,6 +174,10 @@ namespace Bonmin
      /** delete si_ ? */
      bool deleteSolver_;
 
+    /// Some objects the feasiblitiy of which to verify.
+    OsiObject * * objects_;
+    /// Number of objects.*/
+    int nObjects_;
      /** \name Cached info from solver interface.*/
      /** @{ */
      /** Number of columns. */
@@ -176,7 +191,7 @@ namespace Bonmin
 
      void getCached();
      /** @} */
-
+     double integerTolerance_;
    };
     /// Old usefull constructor
     OaDecompositionBase(OsiTMINLPInterface * nlp = NULL,
@@ -214,6 +229,10 @@ namespace Bonmin
     bool reassignLpsolver(){
       return reassignLpsolver_;
     }
+    /** Set objects.*/
+    void setObjects(OsiObject ** objects, int nObjects){
+      objects_ = objects;
+      nObjects_ = nObjects;}
     /// Set whether to leave the solverinterface unchanged
     inline void setLeaveSiUnchanged(bool yesno)
     {
@@ -282,9 +301,6 @@ namespace Bonmin
   protected:
    /// \name Protected helper functions
    /**@{ */
-   /** Check for integer feasibility of a solution return true if it is feasible.
-   \todo Handle SOS Type 2 constraints. */
-   bool integerFeasible(const double * sol, int numcols) const;
 
    /** Solve the nlp and do output. 
        \return true if feasible*/
@@ -305,12 +321,14 @@ namespace Bonmin
     mutable int nSolve_;
     /// A linear solver
     mutable OsiSolverInterface * lp_;
+    /// Some objects the feasiblitiy of which to verify.
+    OsiObject * * objects_;
+    /// Number of objects.*/
+    int nObjects_;
     ///number of local searches performed
     mutable int nLocalSearch_;
     /** messages handler. */
     CoinMessageHandler * handler_;
-    /** whether we use a default handler or a user given one. */
-    bool default_handler_;
     /** Messages for OA */
     CoinMessages messages_;
     /** Wether or not we should remove cuts at the end of the procedure */

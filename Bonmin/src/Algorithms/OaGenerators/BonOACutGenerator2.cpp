@@ -116,6 +116,7 @@ extern int usingCouenne;
     bool isInteger = false;
 
     OsiSolverInterface * lp = lpManip.si();
+    OsiBranchingInformation info(lp, false);
     bool milpOptimal = 1;
 
 
@@ -173,7 +174,8 @@ extern int usingCouenne;
     //Fix the variable which have to be fixed, after having saved the bounds
       const double * colsol = subMip == NULL ? lp->getColSolution():
 					  subMip->getLastSolution();
-   nlpManip.fixIntegers(colsol);
+     info.solution_ = colsol;
+     nlpManip.fixIntegers(info);
 
 
     if(solveNlp(babInfo, cutoff)){
@@ -211,11 +213,13 @@ extern int usingCouenne;
 		!lp->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
     //if value of integers are unchanged then we have to get out
     bool changed = !feasible;//if lp is infeasible we don't have to check anything
+    info.solution_ = lp->getColSolution();
     if(!changed)
 	  if(!usingCouenne)
 	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
     if (changed) {
-      isInteger = integerFeasible(lp->getColSolution(), numcols);
+
+      isInteger = lpManip.integerFeasible(info);
     }
     else {
       isInteger = 0;

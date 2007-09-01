@@ -51,8 +51,8 @@ extern int usingCouenne;
    bool feasible = 1;
 
    OsiSolverInterface * lp = lpManip.si();
+   OsiBranchingInformation info(lp,false);
    int numcols = lp->getNumCols();
-   int origNumcols = nlp_->getNumCols();
    double milpBound = -COIN_DBL_MAX;
    int numberPasses = 0;
    double * nlpSol = usingCouenne ? new double[numcols] : NULL;
@@ -72,7 +72,8 @@ extern int usingCouenne;
    std::cerr<<std::endl;
    lp->writeLp("toto");
 #endif
-   nlpManip.fixIntegers(colsol);
+   info.solution_ = colsol;
+   nlpManip.fixIntegers(info);
 
 
    //Now solve the NLP get the cuts, and intall them in the local LP
@@ -108,8 +109,9 @@ extern int usingCouenne;
         //if value of integers are unchanged then we have to get out
         bool changed = true;//if lp is infeasible we don't have to check anything
 	if(usingCouenne){
-	  if(feasible){	    
-	  isInteger = integerFeasible(lp->getColSolution(), origNumcols);
+	  if(feasible){
+          info.solution_ = lp->getColSolution(); 
+	  isInteger = lpManip.integerFeasible(info);
 	  }
 	  else{
 	    isInteger = 0;
@@ -122,7 +124,8 @@ extern int usingCouenne;
 	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
 	  }
 	  if (changed) {
-	    isInteger = integerFeasible(lp->getColSolution(), origNumcols);
+            info.solution_ = lp->getColSolution();
+	    isInteger = lpManip.integerFeasible(info);
 	  }
 	  else {
 	    isInteger = 0;

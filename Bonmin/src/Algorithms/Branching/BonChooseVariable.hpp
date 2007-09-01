@@ -22,9 +22,29 @@ namespace Bonmin {
 */
 
 class BonChooseVariable : public OsiChooseStrong  {
- 
+  /** Statuses for strong branching candidates.*/
+  enum StrongStatus{
+    NotDone=-1,
+    Feasible/** Child is proven feasible.*/,
+    Infeasible /** Child is proven infeasible.*/,
+    NotFinished /** Child is not finished.*/};
 public:
+  enum DoStrongReturnStatuses{
+  provenInfeasible = -1 /** One branch has two infeasible childs.*/,
+  doneNoFixing /** All done no variable can be fixed.*/,
+  doneCanFix /** Several variable can be fixed.*/,
+  interuptedCanFix /** Interupted and found a variable to fix.*/,
+  maxTime /** Interupted because of time limit.*/};
 
+  /** Return statuses for chooseVariable.*/
+  enum chooseVariableReturnStatuses{
+    infeasibleNode = -1/** Node has been proven infeasible.*/,
+    hasCandidate /** Normal termination, found a variable to branch on.*/,
+    feasibleNode /** All variable are feasible, the node is feasible.*/,
+    canFixAndStrongBranch /** Found variable to fix and also has remaining candidate for strong branching.*/,
+    canFixAndBranch/** Found variable to fix and also has a (non-strong) branching candidate.*/,
+    canFixNoCandidate /** Can fix variables but does not have strong branching candidates.*/
+  };
   /// Constructor from solver (so we can set up arrays etc)
   BonChooseVariable (OsiTMINLPInterface * solver);
 

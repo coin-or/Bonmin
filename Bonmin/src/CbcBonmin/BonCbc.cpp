@@ -14,11 +14,13 @@
 #include "BonAuxInfos.hpp"
 #include "CbcModel.hpp"
 #include "CbcBranchActual.hpp"
-
+#include "CbcCutGenerator.hpp"
 #include "CbcCompareUser.hpp"
 #include "CbcCompareActual.hpp"
 
 #include "CbcBranchUser.hpp"
+
+#include "BonExitCodes.hpp"
 
 #include "BonChooseVariable.hpp"
 #include "BonGuessHeuristic.hpp"
@@ -61,6 +63,7 @@ extern "C"
 
 namespace Bonmin
 {
+
   int usingCouenne = 0;
   
   /** Constructor.*/
@@ -72,7 +75,10 @@ namespace Bonmin
   continuousRelaxation_(-COIN_DBL_MAX),
   numNodes_(0),
   mipIterationCount_(0),
-  model_()
+  model_(),
+  modelHandler_(NULL),
+  objects_(0),
+  nObjects_(0)
   {}
   
   /** Destructor.*/
@@ -80,6 +86,10 @@ namespace Bonmin
   {
     if (bestSolution_) delete [] bestSolution_;
     bestSolution_ = NULL;
+    for ( int i = 0 ; i < nObjects_ ; i++){
+      delete objects_[i];}
+    delete [] objects_;
+    delete modelHandler_;
   }
   
   /**operator() performs the branchAndBound*/
@@ -99,7 +109,9 @@ namespace Bonmin
     bonBabInfo.setBabPtr(this);
     s.continuousSolver()->setAuxiliaryInfo(&bonBabInfo);
     OsiSolverInterface * solver = s.continuousSolver()->clone();
-    model_.passInMessageHandler(s.continuousSolver()->messageHandler());
+    delete modelHandler_;
+    modelHandler_ = s.continuousSolver()->messageHandler()->clone();
+    model_.passInMessageHandler(modelHandler_);
     model_.assignSolver(solver, true);
 
   //  s.continuousSolver() = model_.solver();
@@ -196,7 +208,6 @@ namespace Bonmin
     const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
     if (!s.getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
     {
-      ChangedObject = true;
       const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
       const int & numSos = sos->num;
       CbcObject ** objects = new CbcObject*[numSos];
@@ -315,8 +326,48 @@ namespace Bonmin
 	strong2->setCbcModel(&model_);
       branch.setChooseMethod(*s.branchingMethod());
     }
-    
-    
+   
+    //Get objects from model_ if it is not null means there are some sos constraints or non-integer branching object
+    // pass them to cut generators. 
+    OsiObject ** objects = model_.objects();
+    if(objects){
+      int numberObjects = model_.numberObjects();
+      if(objects_ != NULL){
+         for(int i = 0 ; i < nObjects_; i++)
+           delete objects_[i];
+      }
+      delete [] objects_;
+      objects_ = new OsiObject*[numberObjects];
+      nObjects_ = numberObjects;
+      for(int i = 0 ; i < numberObjects; i++){
+        OsiObject * obj = objects[i];
+        CbcSimpleInteger * intObj = dynamic_cast<CbcSimpleInteger *> (obj);
+        if(intObj){
+          objects_[i] = intObj->osiObject();
+        }
+        else{
+          CbcSOS * sosObj = dynamic_cast<CbcSOS *>(obj);
+          if(sosObj) objects_[i] = sosObj->osiObject(model_.solver());
+          else{//Maybe an unsupported CbcObject
+            CbcObject * cbcObj = dynamic_cast<CbcObject *>(obj);
+            if(cbcObj){
+               std::cerr<<"Unsupported CbcObject appears in the code"<<std::endl;
+               throw UNSUPPORTED_CBC_OBJECT;
+            }
+            else{//It has to be an OsiObject.
+              objects_[i]=obj->clone();
+            }
+          }
+        } 
+      }
+      CbcCutGenerator ** gen = model_.cutGenerators();
+      int numGen = model_.numberCutGenerators();
+      for(int i = 0 ; i < numGen ; i++){
+        OaDecompositionBase * oa = dynamic_cast<OaDecompositionBase * >(gen[i]->generator());
+        if(oa)//pass objects
+          oa->setObjects(objects_,nObjects_);
+      }
+    }
     model_.setBranchingMethod(&branch);
     
     //Get the time and start.

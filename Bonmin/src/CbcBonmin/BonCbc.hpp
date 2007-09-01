@@ -7,8 +7,8 @@
 //
 // Date : 04/19/2007
 
-#ifndef BonCbc2_H
-#define BonCbc2_H
+#ifndef BonCbc_H
+#define BonCbc_H
 
 #include "BonBabSetupBase.hpp"
 #include "CbcModel.hpp"
@@ -82,6 +82,13 @@ public:
   }
   
 protected:
+  template<class T> struct deleter 
+  //       :public unary_function<T, void>
+  {
+    void operator()(T x) {delete x;}
+  };
+  static deleter<OsiObject *> del;
+
     /** Stores the solution of MIP. */
     double * bestSolution_;
   /** Status of the mixed integer program. */
@@ -98,6 +105,14 @@ protected:
   int mipIterationCount_;
   /** CbcModel used to solve problem.*/
   CbcModel model_;
+  /** Message handler for CbcModel. */
+  CoinMessageHandler * modelHandler_;
+  /** \brief OsiObjects of the model.
+    * this is not null if and only if there are some non-simple-integer branching objects such as SOS constraints.
+    * It is up to Bab to pass them over to appropriate components of the algorithm. */
+  OsiObject** objects_;
+  /** number of objects.*/
+  int nObjects_;
 };
 }
 #endif

@@ -77,7 +77,6 @@ protected:
   int numcols_;
   /** say if has a solution.*/
   bool hasNlpSolution_;
-  
   };
 }/* End namespace.*/
 

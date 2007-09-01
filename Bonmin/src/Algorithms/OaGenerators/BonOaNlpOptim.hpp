@@ -40,7 +40,10 @@ namespace Bonmin
       handler_ -> setLogLevel(copy.handler_->logLevel());
       messages_ = OaMessages();
     }
-
+    void passInMessageHandler(const CoinMessageHandler * handler){
+      delete handler_;
+      handler_ = handler->clone();
+    }
     ///Abstract constructor
     virtual CglCutGenerator * clone() const
     {

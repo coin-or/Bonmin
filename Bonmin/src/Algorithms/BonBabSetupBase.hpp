@@ -225,7 +225,8 @@ protected:
     Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions_;
     /** flag to say if option file was read.*/
     bool readOptions_;
-    
+    /** separate message handler if continuousSolver_!= nonlinearSolver.*/
+    CoinMessageHandler * lpMessageHandler_;
   };
 }/* End namespace Bonmin. */
 #endif

@@ -39,9 +39,10 @@ namespace Bonmin {
       nlp_(nlp),
       nSolve_(0),
       lp_(si),
+      objects_(NULL),
+      nObjects_(0),
       nLocalSearch_(0),
       handler_(NULL),
-      default_handler_(true),
       leaveSiUnchanged_(leaveSiUnchanged),
     reassignLpsolver_(false),
       timeBegin_(0),
@@ -61,9 +62,10 @@ namespace Bonmin {
   CglCutGenerator(),
   nlp_(b.nonlinearSolver()),
   lp_(b.continuousSolver()),
+  objects_(NULL),
+  nObjects_(0),
   nLocalSearch_(0),
   handler_(NULL),
-  default_handler_(true),
   leaveSiUnchanged_(leaveSiUnchanged),
   reassignLpsolver_(reassignLpsolver),
   timeBegin_(0),
@@ -93,9 +95,9 @@ namespace Bonmin {
       CglCutGenerator(other),
       nlp_(other.nlp_),
       lp_(other.lp_),
+      objects_(other.objects_),
+      nObjects_(other.nObjects_),
       nLocalSearch_(0),
-      handler_(other.handler_),
-      default_handler_(false), 
       messages_(other.messages_),
       leaveSiUnchanged_(other.leaveSiUnchanged_),
   reassignLpsolver_(other.reassignLpsolver_),
@@ -103,6 +105,7 @@ namespace Bonmin {
       parameters_(other.parameters_)
     {
       timeBegin_ = CoinCpuTime();
+      handler_ = other.handler_->clone();
     }
 /// Constructor with default values for parameters
 OaDecompositionBase::Parameters::Parameters():
@@ -121,7 +124,7 @@ OaDecompositionBase::Parameters::Parameters():
 
 /** Destructor.*/ 
 OaDecompositionBase::~OaDecompositionBase(){
-  if (default_handler_) delete handler_;
+  delete handler_;
 }
 
 
@@ -296,7 +299,10 @@ OaDecompositionBase::solverManip::solverManip
   colUpper_(NULL),
   warm_(NULL),
   cutoff_(COIN_DBL_MAX),
-  deleteSolver_(false)
+  deleteSolver_(false),
+  objects_(NULL),
+  nObjects_(0),
+  integerTolerance_(1e-08)
 {
   getCached();
   if(saveNumRows)
@@ -323,7 +329,10 @@ OaDecompositionBase::solverManip::solverManip
   colUpper_(NULL),
   warm_(NULL),
   cutoff_(COIN_DBL_MAX),
-  deleteSolver_(true)
+  deleteSolver_(true),
+  objects_(NULL),
+  nObjects_(0),
+  integerTolerance_(1e-08)
 {
   si_ = si.clone();
   getCached();
@@ -372,22 +381,31 @@ OaDecompositionBase::solverManip::restore(){
 
 void 
 OaDecompositionBase::passInMessageHandler(CoinMessageHandler * handler) {
-  if (default_handler_) {
+    int logLevel = handler_->logLevel();
     delete handler_;
-  	default_handler_=false;
-  }
-  handler_=handler;
+    handler_=handler->clone();
+    handler_->setLogLevel(logLevel);
 }
 
 /// Check for integer feasibility of a solution return 1 if it is
 bool 
-OaDecompositionBase::integerFeasible(const double * sol, int numcols) const{
-  for(int i = 0 ; i < numcols ; i++)
-  {
-    if(nlp_->isInteger(i)) {
-      if(fabs(sol[i] - floor(sol[i] + 0.5)) >
-         parameters_.cbcIntegerTolerance_) {
-         return false;
+OaDecompositionBase::solverManip::integerFeasible(const OsiBranchingInformation& info) const{
+  if(objects_){
+     int dummy;
+    for(int i = 0 ; i < nObjects_ ; i++){
+        if(objects_[i]->infeasibility(&info, dummy) > 0.0) return false; 
+    }
+  }
+  else {
+    const double * sol = info.solution_;
+    int numcols = si_->getNumCols();
+    for(int i = 0 ; i < numcols ; i++)
+    {
+      if(si_->isInteger(i)) {
+        if(fabs(sol[i] - floor(sol[i] + 0.5)) >
+           integerTolerance_) {
+           return false;
+        }
       }
     }
   }
@@ -397,54 +415,79 @@ OaDecompositionBase::integerFeasible(const double * sol, int numcols) const{
 /** Fix integer variables in si to their values in colsol
 \todo Handle SOS type 2.*/
 void 
-OaDecompositionBase::solverManip::fixIntegers(const double * colsol) {
-  for (int i = 0; i < numcols_; i++) {
-    if (si_->isInteger(i)) {
-      double  value =  colsol[i];
-      if(fabs(value - floor(value+0.5)) > 1e-04){
-	std::cerr<<"Error not integer valued solution"<<std::endl;
-	std::cerr<<"---------------- x["<<i<<"] = "<<value<<std::endl;
-      }
-      value = floor(value+0.5);
-      value = max(colLower_[i],value);
-      value = min(value, colUpper_[i]);
-
-      if (fabs(value) > 1e10) {
-        std::cerr<<"ERROR: Can not fix variable in nlp because it has too big a value ("<<value
-        <<") at optimium of LP relaxation. You should try running the problem with B-BB"<<std::endl;
-        throw -1;
-      }
-#ifdef OA_DEBUG
-      //         printf("xx %d at %g (bounds %g, %g)",i,value,nlp_->getColLower()[i],
-      //                nlp_->getColUpper()[i]);
-      std::cout<<(int)value;
-#endif
-      si_->setColLower(i,value);
-      si_->setColUpper(i,value);
+OaDecompositionBase::solverManip::fixIntegers(const OsiBranchingInformation& info) {
+  if(objects_){
+    for(int i = 0 ; i < nObjects_ ; i++){
+        if(objects_[i]->feasibleRegion(si_, &info));
     }
   }
+  else {
+    const double * colsol = info.solution_;
+    for (int i = 0; i < numcols_; i++) {
+      if (si_->isInteger(i)) {
+        double  value =  colsol[i];
+        if(fabs(value - floor(value+0.5)) > integerTolerance_){
+  	std::cerr<<"Error not integer valued solution"<<std::endl;
+  	std::cerr<<"---------------- x["<<i<<"] = "<<value<<std::endl;
+        }
+        value = floor(value+0.5);
+        value = max(colLower_[i],value);
+        value = min(value, colUpper_[i]);
+  
+        if (fabs(value) > 1e10) {
+          std::cerr<<"ERROR: Can not fix variable in nlp because it has too big a value ("<<value
+          <<") at optimium of LP relaxation. You should try running the problem with B-BB"<<std::endl;
+          throw -1;
+        }
 #ifdef OA_DEBUG
-  std::cout<<std::endl;
+        //         printf("xx %d at %g (bounds %g, %g)",i,value,nlp_->getColLower()[i],
+        //                nlp_->getColUpper()[i]);
+        std::cout<<(int)value;
 #endif
+        si_->setColLower(i,value);
+        si_->setColUpper(i,value);
+      }
+    }
+#ifdef OA_DEBUG
+    std::cout<<std::endl;
+  #endif
+  }
 }
-
 /** Check if solution in solver is the same as colsol on integer variables. */
 bool 
 OaDecompositionBase::solverManip::isDifferentOnIntegers(const double * colsol){
-  const double * siSol= si_->getColSolution();
-  for (int i = 0; i < numcols_ ; i++) {
-     if (si_->isInteger(i) && fabs(siSol[i] - colsol[i])>0.001)
-       return true;
-  }
-  return false;
+  return isDifferentOnIntegers(colsol, si_->getColSolution());
 }
 
 /** Check if two solutions are the same on integer variables. */
 bool 
 OaDecompositionBase::solverManip::isDifferentOnIntegers(const double * colsol, const double *otherSol){
-  for (int i = 0; i < numcols_ ; i++) {
-     if (si_->isInteger(i) && fabs(otherSol[i] - colsol[i])>0.001)
-       return true;
+  if(objects_){
+    for(int i = 0 ; i < nObjects_ ; i++){
+      OsiObject * obj = objects_[i];
+      int colnum = obj->columnNumber();
+      if(colnum >= 0){//Variable branching object
+         if(fabs(otherSol[colnum] - colsol[colnum]) > 100*integerTolerance_){
+          return true;}
+      }
+      else{//It is a sos branching object
+        OsiSOS * sos = dynamic_cast<OsiSOS *>(obj);
+        assert(sos);
+        const int * members = sos->members();
+        int end = sos->numberMembers();
+        for(int k = 0 ; k < end ; k++){
+           if(fabs(otherSol[members[k]] - colsol[members[k]]) > 0.001){
+              return true;
+           }
+        }
+      } 
+    }
+  }
+  else {
+    for (int i = 0; i < numcols_ ; i++) {
+       if (si_->isInteger(i) && fabs(otherSol[i] - colsol[i])>0.001)
+         return true;
+    }
   }
   return false;
 }
@@ -572,8 +615,13 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
     const double *colsol = si.getColSolution();
 
 
+    solverManip nlpManip(nlp_, false, false, true, false, false);
+    nlpManip.setIntegerTolerance(parameters_.cbcIntegerTolerance_);
+    nlpManip.setObjects(objects_, nObjects_);
+    OsiBranchingInformation brInfo(nlp_, false);
+    brInfo.solution_ = colsol;
     //Check integer infeasibility
-    bool isInteger = integerFeasible(colsol, numcols);
+    bool isInteger = nlpManip.integerFeasible(brInfo);
 
     SubMipSolver * subMip = NULL;
 
@@ -596,7 +644,6 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
     si.getDblParam(OsiDualObjectiveLimit, cutoff);
 
     // Save solvers state if needed
-    solverManip nlpManip(nlp_, false, false, true, false, false);
 
     solverManip * lpManip = NULL; 
     if(lp_ != NULL){
@@ -616,6 +663,8 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
     else{
       lpManip = new solverManip(si);
     }
+    lpManip->setObjects(objects_, nObjects_);
+    lpManip->setIntegerTolerance(parameters_.cbcIntegerTolerance_);
     double milpBound = performOa(cs, nlpManip, *lpManip, subMip, babInfo, cutoff);
 
     //Transmit the bound found by the milp

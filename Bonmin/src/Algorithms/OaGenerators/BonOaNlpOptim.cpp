@@ -31,7 +31,7 @@ namespace Bonmin
   OaNlpOptim::OaNlpOptim(BabSetupBase &b):
   CglCutGenerator(),
   nlp_(b.nonlinearSolver()),
-  maxDepth_(10),
+  maxDepth_(1000),
   nSolve_(0)
 {
   int ivalue;

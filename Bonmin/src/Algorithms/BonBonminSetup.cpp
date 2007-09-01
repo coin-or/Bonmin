@@ -291,8 +291,13 @@ algo_(other.algo_){
     
     intParam_[BabSetupBase::SpecialOption] = 16;
     //AW: Took this out: intParam_[BabSetupBase::MinReliability] = 0;
+    if(!options_->GetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.")){
+      intParam_[BabSetupBase::MinReliability] = 0;
+      options_->SetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.");
+    }
     if(!options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin.")){
       intParam_[BabSetupBase::NumberStrong] = 0;
+      options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin."); 
     }
     int varSelection;
     options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
@@ -350,7 +355,8 @@ algo_(other.algo_){
     continuousSolver_ = new OsiClpSolverInterface;
     int lpLogLevel;
     options_->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
-    continuousSolver_->passInMessageHandler(nonlinearSolver_->messageHandler());
+    lpMessageHandler_ = nonlinearSolver_->messageHandler()->clone();
+    continuousSolver_->passInMessageHandler(lpMessageHandler_);
     continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
     nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
     // say bound dubious, does cuts at solution
@@ -389,6 +395,7 @@ algo_(other.algo_){
       CuttingMethod cg;
       cg.frequency = ival;
       OaNlpOptim * nlpsol = new OaNlpOptim(*this);
+      nlpsol->passInMessageHandler(nonlinearSolver_->messageHandler());
       cg.cgl = nlpsol;
       cg.id="NLP solution based oa cuts";
       cutGenerators_.push_back(cg);
@@ -399,6 +406,7 @@ algo_(other.algo_){
       CuttingMethod cg;
       cg.frequency = ival;
       EcpCuts * ecp = new EcpCuts(*this);
+      ecp->passInMessageHandler(nonlinearSolver_->messageHandler());
       cg.cgl = ecp;
       cg.id = "Ecp cuts";
       cutGenerators_.push_back(cg);

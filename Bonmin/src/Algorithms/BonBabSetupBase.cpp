@@ -53,8 +53,9 @@ double BabSetupBase::defaultDoubleParam_[BabSetupBase::NumberDoubleParam] = {
   nodeSelectionMethod_(),
   journalist_(NULL),
   options_(NULL),
-roptions_(NULL),
-readOptions_(false)
+  roptions_(NULL),
+  readOptions_(false),
+  lpMessageHandler_(NULL)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -77,7 +78,9 @@ readOptions_(other.readOptions_)
     nonlinearSolver_ = static_cast<OsiTMINLPInterface *>(other.nonlinearSolver_->clone());}
   if(other.continuousSolver_){
     continuousSolver_ = other.continuousSolver_->clone();}
- 
+  if(other.lpMessageHandler_){
+    lpMessageHandler_ = other.lpMessageHandler_->clone();}
+  continuousSolver_->passInMessageHandler(lpMessageHandler_);
   for(CuttingMethods::const_iterator i = other.cutGenerators_.begin() ; i != other.cutGenerators_.end() ; i++){
     cutGenerators_.push_back(*i);
     cutGenerators_.back().cgl = cutGenerators_.back().cgl->clone();
@@ -102,7 +105,8 @@ cutGenerators_(),
 heuristics_(),
 branchingMethod_(NULL),
 nodeSelectionMethod_(),
-readOptions_(false)
+readOptions_(false),
+lpMessageHandler_(NULL)
 { 
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -130,7 +134,8 @@ nodeSelectionMethod_(),
 journalist_(NULL),
 options_(NULL),
 roptions_(NULL),
-readOptions_(false)
+readOptions_(false),
+lpMessageHandler_(NULL)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -178,6 +183,7 @@ BabSetupBase::~BabSetupBase(){
   for(HeuristicMethods::iterator i = heuristics_.begin() ; i != heuristics_.end() ; i++){
     delete *i;
   }
+  delete lpMessageHandler_;
 }
 
 
@@ -364,7 +370,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
   
   roptions->AddLowerBoundedIntegerOption("num_cut_passes",
                                          "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
-                                         0,COIN_INT_MAX,
+                                         0,1,
                                          "");
   
 }
