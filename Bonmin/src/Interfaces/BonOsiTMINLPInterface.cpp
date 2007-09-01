@@ -53,7 +53,7 @@ register_general_options
 
   roptions->AddStringOption3("warm_start",
       "Select the warm start method",
-      "optimum",
+      "none",
       "none","No warm start",
       "optimum","Warm start with direct parent optimum",
       "interior_point","Warm start with an interior point of direct parent",

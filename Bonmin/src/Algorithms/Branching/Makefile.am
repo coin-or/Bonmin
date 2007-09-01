@@ -62,6 +62,11 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples`
 
+# Currently, the following has to be included for BonChooseVariable.hpp, but
+# we should try to unmangle the connection to Cbc
+
+AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin`
+
 if COIN_HAS_CPX
   AM_CPPFLAGS += \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \

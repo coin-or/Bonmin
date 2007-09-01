@@ -45,7 +45,8 @@ public:
       DFS /** Depth First Search*/,
       BFS /** Best First Search */,
       dynamic /** Dynamic strategy, see <a href="http://www.coin-or.org/Doxygen/Cbc/class_cbc_branch_dynamic_decision.html">
-      CbcBranchActual.hpp </a> for explanations.*/
+		  CbcBranchActual.hpp </a> for explanations.*/,
+      bestGuess /** Best guessed integer solution is subtree below, based on pseudo costs */
       };
      
     /** Parameters represented by an integer. */

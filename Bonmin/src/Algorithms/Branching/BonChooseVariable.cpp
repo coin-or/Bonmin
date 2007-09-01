@@ -12,6 +12,7 @@
 
 // This couples Cbc code into Bonmin code...
 #include "CbcModel.hpp"
+#include "BonGuessHeuristic.hpp"
 
 namespace Bonmin {
 
@@ -21,7 +22,10 @@ BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   only_pseudo_when_trusted_(false),
   maxmin_crit_no_sol_(0.7),
   maxmin_crit_have_sol_(0.1),
-  setup_pseudo_frac_(0.5)
+  setup_pseudo_frac_(0.5),
+  numberBeforeTrustedList_(1),
+  numberStrongRoot_(COIN_INT_MAX),
+  guessHeuristic_(NULL)
 {
   SmartPtr<TNLPSolver> tnlp_solver =
     static_cast<TNLPSolver *> (solver->solver());
@@ -39,7 +43,10 @@ BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
   only_pseudo_when_trusted_(rhs.only_pseudo_when_trusted_),
   maxmin_crit_no_sol_(rhs.maxmin_crit_no_sol_),
   maxmin_crit_have_sol_(rhs.maxmin_crit_have_sol_),
-  setup_pseudo_frac_(rhs.setup_pseudo_frac_)
+  setup_pseudo_frac_(rhs.setup_pseudo_frac_),
+  numberBeforeTrustedList_(rhs.numberBeforeTrustedList_),
+  numberStrongRoot_(rhs.numberStrongRoot_),
+  guessHeuristic_(rhs.guessHeuristic_)
 {
   jnlst_ = rhs.jnlst_;
   bb_log_level_ = rhs.bb_log_level_;
@@ -58,6 +65,9 @@ BonChooseVariable::operator=(const BonChooseVariable & rhs)
     maxmin_crit_no_sol_ = rhs.maxmin_crit_no_sol_;
     maxmin_crit_have_sol_ = rhs.maxmin_crit_have_sol_;
     setup_pseudo_frac_ = rhs.setup_pseudo_frac_;
+    numberBeforeTrustedList_ = rhs.numberBeforeTrustedList_;
+    numberStrongRoot_ = rhs.numberStrongRoot_;
+    guessHeuristic_ = rhs.guessHeuristic_;
   }
   return *this;
 }
@@ -71,11 +81,15 @@ BonChooseVariable::clone() const
 BonChooseVariable::~BonChooseVariable ()
 {}
 
-int 
+int
 BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 {
-  if (numberBeforeTrusted_ < 0) {
-    number_not_trusted_=1;
+  if (guessHeuristic_) {
+    guessHeuristic_->setChooseMethod(this);
+    //guessHeuristic_ = NULL;
+  }
+  if (numberBeforeTrustedList_ < 0) {
+    number_not_trusted_ = 1;
     return OsiChooseVariable::setupList(info, initialize);
   }
   if (initialize) {
@@ -117,7 +131,8 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   double check = -COIN_DBL_MAX;
   int checkIndex=0;
   int bestPriority=COIN_INT_MAX;
-  int maximumStrong= CoinMin(numberStrong_,numberObjects) ;
+  int maximumStrong= CoinMin(CoinMax(numberStrong_,numberStrongRoot_),
+			     numberObjects) ;
   int putOther = numberObjects;
   int i;
   for (i=0;i<numberObjects;i++) {
@@ -244,7 +259,8 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 	  // use shadow prices always
 	}
 	double value2 = -COIN_DBL_MAX;
-	if (numberUp<numberBeforeTrusted_ || numberDown<numberBeforeTrusted_) {
+	if (numberUp<numberBeforeTrustedList_ ||
+	    numberDown<numberBeforeTrustedList_) {
 	  value2 = value;
 	}
 	double MAXMIN_CRITERION = maxminCrit();
@@ -377,7 +393,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
       for (;putOther<numberObjects;putOther++) 
 	list_[i++]=list_[putOther];
       assert (i==numberUnsatisfied_);
-      if (!numberStrong_)
+      if (!CoinMax(numberStrong_,numberStrongRoot_))
 	numberOnList_=0;
     }
   } else {
@@ -418,8 +434,15 @@ BonChooseVariable::chooseVariable(
   OsiBranchingInformation *info,
   bool fixVariables)
 {
+  // We assume here that chooseVariable is called once at the very
+  // beginning with fixVariables set to true.  This is then the root
+  // node.
+  bool isRoot = isRootNode();
+  if (!isRoot) {
+    numberStrongRoot_ = numberStrong_;
+  }
   if (numberUnsatisfied_) {
-    int numberLeft = CoinMin(numberStrong_-numberStrongDone_,numberUnsatisfied_);
+    int numberLeft = CoinMin(numberStrongRoot_-numberStrongDone_,numberUnsatisfied_);
     int numberToDo=0;
     int * temp = (int *) useful_;
     OsiHotInfo * results = new OsiHotInfo [numberLeft];
@@ -433,8 +456,9 @@ BonChooseVariable::chooseVariable(
       int iObject = list_[i];
       if (numberBeforeTrusted_<0||
 	  (only_pseudo_when_trusted_ && number_not_trusted_>0) ||
-	  upNumber_[iObject]<numberBeforeTrusted_||
-	  downNumber_[iObject]<numberBeforeTrusted_) {
+	  !isRoot && (upNumber_[iObject]<numberBeforeTrusted_ ||
+		      downNumber_[iObject]<numberBeforeTrusted_ )||
+	  isRoot && (!upNumber_[iObject] && !downNumber_[iObject]) ) {
 	results[numberToDo] = OsiHotInfo(solver,info,const_cast<const OsiObject **> (solver->objects()),iObject);
 	temp[numberToDo++]=iObject;
       } else if (bestObjectIndex_<0) {
@@ -452,7 +476,7 @@ BonChooseVariable::chooseVariable(
     if (numberToDo) {
       int numberDone=0;
       returnCode = doBonStrongBranching(solver,info,numberToDo,results,1,numberDone);
-      if (bb_log_level_>3) {
+      if (bb_log_level_>=3) {
 	const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"};
 	printf("BON0001I           DownStat    DownChange     UpStat      UpChange\n");
 	for (int i = 0; i<numberDone; i++) {
@@ -701,6 +725,12 @@ BonChooseVariable::doBonStrongBranching( OsiSolverInterface * solver,
   // Delete the snapshot
   solver->unmarkHotStart();
   return returnCode;
+}
+
+bool BonChooseVariable::isRootNode() const {
+  assert(cbc_model_);
+  const int depth = cbc_model_->currentNode()->depth();
+  return (depth == 0);
 }
 
 double

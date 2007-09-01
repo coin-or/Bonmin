@@ -21,6 +21,7 @@
 #include "CbcBranchUser.hpp"
 
 #include "BonChooseVariable.hpp"
+#include "BonGuessHeuristic.hpp"
 
 // sets cutoff a bit above real one, to avoid single-point feasible sets
 #define CUTOFF_TOL 1e-6
@@ -272,6 +273,18 @@ namespace Bonmin
     else if (s.nodeSelectionMethod()==BabSetupBase::dynamic) {
       CbcCompareUser compare;
       model_.setNodeComparison(compare);
+    }
+    else if (s.nodeSelectionMethod()==BabSetupBase::bestGuess) {
+      // Right now, this is a mess.  We need a separation of the
+      // pseudo costs from the ChooseVariable method
+      CbcCompareEstimate compare;
+      model_.setNodeComparison(compare);
+      BonChooseVariable* bonchoosemethod = dynamic_cast<BonChooseVariable*>(s.branchingMethod());
+      assert(bonchoosemethod);
+      GuessHeuristic * guessHeu = new GuessHeuristic(model_);
+      model_.addHeuristic(guessHeu);
+      bonchoosemethod->registerGuessHeuristic(guessHeu);
+      delete guessHeu;
     }
     
     model_.setNumberStrong(s.getIntParameter(BabSetupBase::NumberStrong));

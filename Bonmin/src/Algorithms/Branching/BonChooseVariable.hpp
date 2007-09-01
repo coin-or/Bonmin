@@ -12,6 +12,8 @@ class CbcModel;
 
 namespace Bonmin {
 
+  class GuessHeuristic;
+
 /** This class chooses a variable to branch on
 
     This is the base class for the branching rules in Bonmin (inherits
@@ -86,6 +88,38 @@ public:
   {
     only_pseudo_when_trusted_ = only_pseudo_when_trusted;
   }
+
+  /** @name Accessor methods to pseudo cost data*/
+  //@{
+  int numberObjects() const {
+    return numberObjects_;
+  }
+  const double* upTotalChange() const
+  {
+    return upTotalChange_;
+  }
+  const double* downTotalChange() const
+  {
+    return downTotalChange_;
+  }
+  const int* upNumber() const 
+  {
+    return upNumber_;
+  }
+  const int* downNumber() const 
+  {
+    return downNumber_;
+  }
+  //@}
+
+  /// For now, we need to communicate pseudo costs to
+  /// GuessHeuristic. Right now, we need to call it back so that it
+  /// gets the correct pointers to the arrays (after cloning)
+  void registerGuessHeuristic(GuessHeuristic* guessHeuristic)
+  {
+    guessHeuristic_ = guessHeuristic;
+  }
+
 protected:
 
   /// Holding on the a pointer to the journalist
@@ -127,7 +161,7 @@ private:
    *  trusted */
   int number_not_trusted_;
 
-  // ToDo: Make this an option
+  // ToDo: Make this options
   /** @name Algoirithmic options */
   //@{
   /** maxmin weight in branching decision when no solution has been
@@ -138,9 +172,21 @@ private:
   double maxmin_crit_have_sol_;
   /** fraction of branching candidates that are not trusted yet */
   double setup_pseudo_frac_;
+  /** number of times a branch has to happen so that it is trusted in
+   *  setupList */
+  int numberBeforeTrustedList_;
+  /** number of strong branching points at root node */
+  int numberStrongRoot_;
+  /** backup of numberStrong_ before Root node solve */
+  int numberStrongBackup_;
   //@}
 
   double maxminCrit() const;
+
+  /** detecting if this is root node */
+  bool isRootNode() const;
+
+  GuessHeuristic* guessHeuristic_;
 };
 
 }

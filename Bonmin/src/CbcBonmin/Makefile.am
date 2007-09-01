@@ -23,7 +23,8 @@ libbonmin_la_SOURCES = \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
-	BonCbcParam.cpp BonCbcParam.hpp 
+	BonCbcParam.cpp BonCbcParam.hpp \
+	BonGuessHeuristic.cpp BonGuessHeuristic.hpp
 
 nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 
@@ -121,7 +122,7 @@ include_HEADERS = \
      BonCbc.hpp \
      BonAuxInfos.hpp \
      BonCbcNode.hpp \
-	BonCbcParam.hpp
+     BonCbcParam.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -132,7 +133,9 @@ ASTYLE_FILES = \
 	BonCbcParam.cppbak BonCbcParam.hppbak \
 	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
-	BonCbcNode.cppbak BonCbcNode.hppbak 
+	BonCbcNode.cppbak BonCbcNode.hppbak  \
+	BonGuessHeuristic.cppbak BonGuessHeuristic.hppbak
+
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

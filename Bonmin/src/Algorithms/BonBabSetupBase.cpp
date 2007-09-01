@@ -309,7 +309,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                    " (usually a small postive value but in non-convex problems it may be a negative value).");
   
   
-  roptions->AddStringOption4("nodeselect_stra",
+  roptions->AddStringOption5("nodeselect_stra",
                              "Choose the node selection strategy.",
                              "dynamic",
                              "best-bound", "choose node whith the smallest bound,",
@@ -317,6 +317,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "breadth-first", "Perform breadth first search,",
                              "dynamic", "Cbc dynamic strategy (starts with a depth first search and turn to best bound after 3 "
                              "integer feasible solutions have been found).",
+			     "best-guess", "choose node with smallest guessed integer solution",
                              "Choose the strategy for selecting the next node to be processed.");
   
   roptions->AddLowerBoundedIntegerOption("number_strong_branch",

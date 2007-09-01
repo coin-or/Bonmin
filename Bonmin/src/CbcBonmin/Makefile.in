@@ -70,7 +70,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 am_libbonmin_la_OBJECTS = BonCbc.lo BonCbcNlpStrategy.lo BonCbcNode.lo \
-	BonAuxInfos.lo BonCbcParam.lo
+	BonAuxInfos.lo BonCbcParam.lo BonGuessHeuristic.lo
 nodist_libbonmin_la_OBJECTS = CbcCompareUser.lo CbcBranchUser.lo
 libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS) \
 	$(nodist_libbonmin_la_OBJECTS)
@@ -336,7 +336,8 @@ libbonmin_la_SOURCES = \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
-	BonCbcParam.cpp BonCbcParam.hpp 
+	BonCbcParam.cpp BonCbcParam.hpp \
+	BonGuessHeuristic.cpp BonGuessHeuristic.hpp
 
 nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 libbonmin_la_LIBADD = \
@@ -410,7 +411,7 @@ include_HEADERS = \
      BonCbc.hpp \
      BonAuxInfos.hpp \
      BonCbcNode.hpp \
-	BonCbcParam.hpp
+     BonCbcParam.hpp
 
 
 ########################################################################
@@ -422,7 +423,8 @@ ASTYLE_FILES = \
 	BonCbcParam.cppbak BonCbcParam.hppbak \
 	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
-	BonCbcNode.cppbak BonCbcNode.hppbak 
+	BonCbcNode.cppbak BonCbcNode.hppbak  \
+	BonGuessHeuristic.cppbak BonGuessHeuristic.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 DISTCLEANFILES = \
@@ -505,6 +507,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNlpStrategy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcParam.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonGuessHeuristic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcBranchUser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcCompareUser.Plo@am__quote@
 
