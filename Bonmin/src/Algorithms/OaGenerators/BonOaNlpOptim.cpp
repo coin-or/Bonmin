@@ -38,6 +38,8 @@ namespace Bonmin
   b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
   addOnlyViolated_ = ivalue;
   b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
+
+  b.options()->GetIntegerValue("nlp_solve_max_depth", maxDepth_,"bonmin.");
   global_ = ivalue;
   handler_ = new CoinMessageHandler();
   handler_ -> setLogLevel(1);
@@ -208,6 +210,10 @@ namespace Bonmin
                                              "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
                                              0,10,
                                              "A frequency of 0 amounts to to never solve the NLP relaxation.");
+      roptions->AddLowerBoundedIntegerOption("nlp_solve_max_depth",
+                                             "Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.",
+                                             0,10,
+                                             "A depth of 0 amounts to to never solve the NLP relaxation.");
   }
 
       
