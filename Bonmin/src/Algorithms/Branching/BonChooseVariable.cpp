@@ -114,19 +114,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
     //AW : How could that ever happen?  Right now, all old content is deleted!
     assert(false && "Right now, all old content is deleted!");
     // redo useful arrays
-    delete [] upTotalChange_;
-    delete [] downTotalChange_;
-    delete [] upNumber_;
-    delete [] downNumber_;
-    numberObjects_ = solver_->numberObjects();
-    upTotalChange_ = new double [numberObjects_];
-    downTotalChange_ = new double [numberObjects_];
-    upNumber_ = new int [numberObjects_];
-    downNumber_ = new int [numberObjects_];
-    CoinZeroN(upTotalChange_,numberObjects_);
-    CoinZeroN(downTotalChange_,numberObjects_);
-    CoinZeroN(upNumber_,numberObjects_);
-    CoinZeroN(downNumber_,numberObjects_);
+    OsiPseudoCosts::initialize(numberObjects);
   }
   double check = -COIN_DBL_MAX;
   int checkIndex=0;
@@ -461,15 +449,17 @@ BonChooseVariable::chooseVariable(
 	  isRoot && (!upNumber_[iObject] && !downNumber_[iObject]) ) {
 	results[numberToDo] = OsiHotInfo(solver,info,const_cast<const OsiObject **> (solver->objects()),iObject);
 	temp[numberToDo++]=iObject;
-      } else if (bestObjectIndex_<0) {
+      } else {
 	const OsiObject * obj = solver->object(iObject);
-	bestObjectIndex_=iObject;
 	double upEstimate = (upTotalChange_[iObject]*obj->upEstimate())/upNumber_[iObject];
 	double downEstimate = (downTotalChange_[iObject]*obj->downEstimate())/downNumber_[iObject];
-	bestWhichWay_ = upEstimate>downEstimate ? 0 : 1;
 	double MAXMIN_CRITERION = maxminCrit();
 	double value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
-	bestTrusted = value;
+	if (value > bestTrusted) {
+	  bestObjectIndex_=iObject;
+	  bestWhichWay_ = upEstimate>downEstimate ? 0 : 1;
+	  bestTrusted = value;
+	}
       }
     }
     int numberFixed=0;
