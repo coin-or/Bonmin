@@ -25,6 +25,8 @@
 #include "BonChooseVariable.hpp"
 #include "BonGuessHeuristic.hpp"
 
+#include "BonDiver.hpp"
+
 // sets cutoff a bit above real one, to avoid single-point feasible sets
 #define CUTOFF_TOL 1e-6
 
@@ -268,24 +270,24 @@ namespace Bonmin
     
     // Definition of node selection strategy
 
-    if (s.nodeSelectionMethod()==BabSetupBase::bestBound) {
+    if (s.nodeComparisonMethod()==BabSetupBase::bestBound) {
       CbcCompareObjective compare;
       model_.setNodeComparison(compare);
     }
-    else if (s.nodeSelectionMethod()==BabSetupBase::DFS) {
+    else if (s.nodeComparisonMethod()==BabSetupBase::DFS) {
       CbcCompareDepth compare;
       model_.setNodeComparison(compare);
     }
-    else if (s.nodeSelectionMethod()==BabSetupBase::BFS) {
+    else if (s.nodeComparisonMethod()==BabSetupBase::BFS) {
       CbcCompareUser compare;
       compare.setWeight(0.0);
       model_.setNodeComparison(compare);
     }
-    else if (s.nodeSelectionMethod()==BabSetupBase::dynamic) {
+    else if (s.nodeComparisonMethod()==BabSetupBase::dynamic) {
       CbcCompareUser compare;
       model_.setNodeComparison(compare);
     }
-    else if (s.nodeSelectionMethod()==BabSetupBase::bestGuess) {
+    else if (s.nodeComparisonMethod()==BabSetupBase::bestGuess) {
       // Right now, this is a mess.  We need a separation of the
       // pseudo costs from the ChooseVariable method
       CbcCompareEstimate compare;
@@ -296,6 +298,19 @@ namespace Bonmin
       model_.addHeuristic(guessHeu);
       bonchoosemethod->registerGuessHeuristic(guessHeu);
       delete guessHeu;
+    }
+
+    if(s.treeTraversalMethod() == BabSetupBase::HeapOnly){
+      //Do nothing this is the default of Cbc.
+    }
+    else if(s.treeTraversalMethod() == BabSetupBase::DiveFromBest){
+      CbcDiver treeTraversal;
+      model_.passInTreeHandler(treeTraversal);
+    }
+    else if(s.treeTraversalMethod() == BabSetupBase::DfsDiveFromBest){
+      CbcDfsDiver treeTraversal;
+      treeTraversal.initialize(s.options());
+      model_.passInTreeHandler(treeTraversal);
     }
     
     model_.setNumberStrong(s.getIntParameter(BabSetupBase::NumberStrong));

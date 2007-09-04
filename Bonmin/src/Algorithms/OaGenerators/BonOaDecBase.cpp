@@ -609,8 +609,6 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
       if(!babInfo->mipFeasible())
       return;
   
-    const int numcols = nlp_->getNumCols();
-
     //Get the continuous solution
     const double *colsol = si.getColSolution();
 

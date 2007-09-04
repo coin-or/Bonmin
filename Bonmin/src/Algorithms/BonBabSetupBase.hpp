@@ -39,8 +39,8 @@ public:
     typedef std::list<CuttingMethod> CuttingMethods;
     typedef std::list<CbcHeuristic * > HeuristicMethods;
     
-    /** Default strategies for processing next node. */
-    enum NodeSelectionStrategy {
+    /** Strategies for comparing the nodes on the heap. */
+    enum NodeComparison {
       bestBound = 0 /** Best bound*/,
       DFS /** Depth First Search*/,
       BFS /** Best First Search */,
@@ -48,7 +48,15 @@ public:
 		  CbcBranchActual.hpp </a> for explanations.*/,
       bestGuess /** Best guessed integer solution is subtree below, based on pseudo costs */
       };
-     
+
+    /** Strategies for traversing the tree.*/
+    enum TreeTraversal {
+      HeapOnly=0 /** Only using the heap, uses CbcTree.*/,
+      DiveFromBest /** dive from top node of the heap untill it gets to a leaf of the tree. Uses Bonmin::CbcDiver.*/,
+      DfsDiveFromBest /** dive from top node of the heap with more elaborate strategy (see options doc). Uses Bonmin::CbcDfsDiver.*/
+    };
+
+
     /** Parameters represented by an integer. */
     enum IntParameter{
       BabLogLevel = 0 /** Log level of main branch-and-bound*/,
@@ -167,9 +175,12 @@ public:
     /** branching method to use. */
     OsiChooseVariable * branchingMethod()
     { return branchingMethod_;}
-    /** Node selection strategy. */
-    NodeSelectionStrategy nodeSelectionMethod()
-    {return nodeSelectionMethod_;}
+    /** Method used to compare nodes. */
+    NodeComparison nodeComparisonMethod()
+    {return nodeComparisonMethod_;}
+    /** Method used to traverse tree.*/
+    TreeTraversal treeTraversalMethod(){
+      return treeTraversalMethod_;}
     /** Return value of integer parameter. */
     int getIntParameter(const IntParameter &p)
     {return intParam_[p];}
@@ -212,9 +223,10 @@ protected:
     HeuristicMethods heuristics_;
     /** Branching method.*/
     OsiChooseVariable * branchingMethod_;
-    /** Node selection method.*/
-    NodeSelectionStrategy nodeSelectionMethod_;
-    
+    /** Node comparison method.*/
+    NodeComparison nodeComparisonMethod_;
+    /** Tree traversal method.*/
+    TreeTraversal treeTraversalMethod_;
     /** Storage of Journalist for output */
     Ipopt::SmartPtr<Ipopt::Journalist> journalist_;
     

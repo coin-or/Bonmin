@@ -24,7 +24,7 @@
 #include "BonEcpCuts.hpp"
 
 #include "BonCbcNode.hpp"
-
+#include "BonDiver.hpp"
 #ifdef COIN_HAS_FILTERSQP
 # include "BonFilterSolver.hpp"
 #endif
@@ -65,7 +65,9 @@ algo_(other.algo_){
 #endif
     
     BonCbcFullNodeInfo::registerOptions(roptions);
-    
+   
+    CbcDfsDiver::registerOptions(roptions);
+ 
     registerMilpCutGenerators(roptions);
     
     roptions->SetRegisteringCategory("Bonmin algotihm choice");

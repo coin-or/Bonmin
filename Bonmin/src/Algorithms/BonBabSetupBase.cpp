@@ -50,7 +50,8 @@ double BabSetupBase::defaultDoubleParam_[BabSetupBase::NumberDoubleParam] = {
   cutGenerators_(),
   heuristics_(),
   branchingMethod_(NULL),
-  nodeSelectionMethod_(),
+  nodeComparisonMethod_(),
+  treeTraversalMethod_(),
   journalist_(NULL),
   options_(NULL),
   roptions_(NULL),
@@ -68,7 +69,8 @@ continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(),
-nodeSelectionMethod_(other.nodeSelectionMethod_),
+nodeComparisonMethod_(other.nodeComparisonMethod_),
+treeTraversalMethod_(other.treeTraversalMethod_),
 journalist_(other.journalist_),
 options_(NULL),
 roptions_(other.roptions_),
@@ -104,7 +106,8 @@ continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(NULL),
-nodeSelectionMethod_(),
+nodeComparisonMethod_(),
+treeTraversalMethod_(),
 readOptions_(false),
 lpMessageHandler_(NULL)
 { 
@@ -130,7 +133,8 @@ continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(NULL),
-nodeSelectionMethod_(),
+nodeComparisonMethod_(),
+treeTraversalMethod_(),
 journalist_(NULL),
 options_(NULL),
 roptions_(NULL),
@@ -157,7 +161,8 @@ continuousSolver_(NULL),
 cutGenerators_(),
 heuristics_(),
 branchingMethod_(NULL),
-nodeSelectionMethod_(),
+nodeComparisonMethod_(),
+treeTraversalMethod_(),
 journalist_(app->Jnlst()),
 options_(app->Options()),
 roptions_(app->RegOptions()),
@@ -211,8 +216,11 @@ BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options){
   options->GetNumericValue("time_limit", doubleParam_[MaxTime],"bonmin.");
 
   int ival;
-  options->GetEnumValue("nodeselect_stra",ival,"bonmin.");
-  nodeSelectionMethod_ = NodeSelectionStrategy(ival);
+  options->GetEnumValue("node_comparison",ival,"bonmin.");
+  nodeComparisonMethod_ = NodeComparison(ival);
+  
+  options->GetEnumValue("tree_search_strategy", ival, "bonmin.");
+  treeTraversalMethod_ = TreeTraversal(ival);
   
   int varSelection;
   options->GetEnumValue("varselect_stra",varSelection,"bonmin.");
@@ -315,7 +323,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                    " (usually a small postive value but in non-convex problems it may be a negative value).");
   
   
-  roptions->AddStringOption5("nodeselect_stra",
+  roptions->AddStringOption5("node_comparison",
                              "Choose the node selection strategy.",
                              "dynamic",
                              "best-bound", "choose node whith the smallest bound,",
@@ -325,6 +333,22 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "integer feasible solutions have been found).",
 			     "best-guess", "choose node with smallest guessed integer solution",
                              "Choose the strategy for selecting the next node to be processed.");
+
+  roptions->AddStringOption3("tree_search_strategy",
+			     "Pick a strategy for traversing the tree",
+			     "top-node",
+			     "top-node"," Always pick the top node as sorted by the node comparison function",
+			     "dive","Dive in the tree if possible, otherwise pick top node as sorted by the tree comparison function",
+			     "dfs-dive","Dive in the tree if possible doing a depth first search."
+                                        "Backtrack on leaves or when a prescribed depth is attained or "
+                                        "when estimate of best possible integer feasible solution in subtree "
+                                        "is worst than cutoff. "
+                                        "Once a prescribed limit of backtracks is attained pick top node "
+                                        "as sorted by the tree comparison function",
+			     "All strategies can be used in conjunction with any of the node comparison functions."
+                             "Options which affect dfs-dive are max-backtracks-in-dive and max-dive-depth. "
+                             "The dfs-dive won't work in a non-convex problem where objective does not decrease down branches."
+                              ); 
   
   roptions->AddLowerBoundedIntegerOption("number_strong_branch",
                                          "Choose the maximum number of variables considered for strong branching.",
