@@ -10,6 +10,7 @@
 #include "BonDiver.hpp"
 #include "CoinFinite.hpp"
 #include "CbcModel.hpp"
+#include "CbcConfig.h"
 #define DIVE_DEBUG
 namespace Bonmin {
 
@@ -341,7 +342,7 @@ namespace Bonmin {
       }
       return bestPossibleObjective;
     }
-#ifdef COIN_HAS_BONMIN
+//#ifdef COIN_HAS_BONMIN
     ///Register the options of the method.
     void 
     CbcDfsDiver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
@@ -365,6 +366,7 @@ namespace Bonmin {
       options->GetIntegerValue("max-dive-depth", maxDiveDepth_,"bonmin.");
       options->GetIntegerValue("max-backtracks-in-dive", maxDiveBacktracks_,"bonmin.");
     }
+//#endif
 
   /** Changes the mode of comparison of the tree for "safety reasons" if the mode really changes we always 
       finish the current dive and put all the node back onto the heap.*/
@@ -402,6 +404,9 @@ namespace Bonmin {
       comparisonBound_->test(x,y);}
     else if(mode == CbcDfsDiver::LimitTreeSize){
        comparisonDepth_.test(x,y);}
+    else{
+       throw -1;
+    }
   }
 
 
@@ -423,8 +428,8 @@ namespace Bonmin {
       diver_->setComparisonMode(CbcDfsDiver::LimitTreeSize);
       return true;
     }
+   return false;
   }
 
 }/* Ends namespace Bonmin.*/
-#endif
 
