@@ -53,7 +53,8 @@ public:
     enum TreeTraversal {
       HeapOnly=0 /** Only using the heap, uses CbcTree.*/,
       DiveFromBest /** dive from top node of the heap untill it gets to a leaf of the tree. Uses Bonmin::CbcDiver.*/,
-      DfsDiveFromBest /** dive from top node of the heap with more elaborate strategy (see options doc). Uses Bonmin::CbcDfsDiver.*/
+      DfsDiveFromBest /** dive from top node of the heap with more elaborate strategy (see options doc). Uses Bonmin::CbcDfsDiver.*/,
+      DfsDiveDynamic /** Same as DfsDiveFromBest, but after a prescribed number of integer solution are found switch to best-bound and if too many node switches to depth-first. Uses Bonmin::CbcDfsDiver.*/
     };
 
 

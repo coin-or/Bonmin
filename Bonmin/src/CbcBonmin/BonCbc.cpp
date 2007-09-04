@@ -312,6 +312,18 @@ namespace Bonmin
       treeTraversal.initialize(s.options());
       model_.passInTreeHandler(treeTraversal);
     }
+    else if(s.treeTraversalMethod() == BabSetupBase::DfsDiveDynamic){
+      CbcDfsDiver treeTraversal;
+      treeTraversal.initialize(s.options());
+      model_.passInTreeHandler(treeTraversal);
+
+      DiverCompare compare;
+      compare.setComparisonDive(*model_.nodeComparison());
+      compare.setComparisonBound(CbcCompareObjective());
+      CbcDfsDiver * dfs = dynamic_cast<CbcDfsDiver *> (model_.tree());
+      assert(dfs);
+      compare.setDiver(dfs);
+    }
     
     model_.setNumberStrong(s.getIntParameter(BabSetupBase::NumberStrong));
     

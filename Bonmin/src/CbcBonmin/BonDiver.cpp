@@ -145,7 +145,8 @@ namespace Bonmin {
                               cutoff_(1e100),
                               nBacktracks_(0),
                               maxDiveBacktracks_(5),
-                              maxDiveDepth_(COIN_INT_MAX){
+                              maxDiveDepth_(COIN_INT_MAX),
+                              mode_(FindSolutions){
   }
 
     ///Copy constructor.
@@ -156,7 +157,8 @@ namespace Bonmin {
                                                    cutoff_(rhs.cutoff_),
                                                    nBacktracks_(rhs.nBacktracks_),
                                                    maxDiveBacktracks_(rhs.maxDiveBacktracks_),
-                                                   maxDiveDepth_(maxDiveDepth_){
+                                                   maxDiveDepth_(rhs.maxDiveDepth_),
+                                                   mode_(rhs.mode_){
   }
 
     /// Assignment operator.
@@ -170,7 +172,8 @@ namespace Bonmin {
       cutoff_ = rhs.cutoff_;
       nBacktracks_ = rhs.nBacktracks_;
       maxDiveBacktracks_ = rhs.maxDiveBacktracks_;
-      maxDiveDepth_ = maxDiveDepth_;}
+      maxDiveDepth_ = maxDiveDepth_;
+      mode_ = rhs.mode_;}
     return *this;
   }
 
@@ -304,7 +307,7 @@ namespace Bonmin {
   }
 
 
-  bool CbcDfsDiver::pushDiveOntoHeap(double cutoff){
+  void CbcDfsDiver::pushDiveOntoHeap(double cutoff){
     while(!dive_.empty() && (dive_.front() == NULL || dive_.front()->objectiveValue() > cutoff)){
         if(dive_.front() != NULL) CbcTree::push(dive_.front());
         dive_.pop_front();

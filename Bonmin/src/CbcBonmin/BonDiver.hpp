@@ -193,7 +193,7 @@ namespace Bonmin {
     /** @} */
     private:
     /** Pushes onto heap all the nodes with objective value > cutoff. */
-    bool pushDiveOntoHeap(double cutoff);
+    void pushDiveOntoHeap(double cutoff);
 
    };
 
@@ -279,11 +279,11 @@ public:
     numberNodesToLimitTreeSize_ = val;}
 
   /** Set comparison method when diving.*/
-  void setComparisonDive(const CbcCompareBase * val){
-    comparisonDive_ = val->clone();}
+  void setComparisonDive(const CbcCompareBase & val){
+    comparisonDive_ = val.clone();}
   /** Set comparison method when closing bound.*/
-  void setComparisonBound(const CbcCompareBase * val){
-    comparisonBound_ = val->clone();}
+  void setComparisonBound(const CbcCompareBase & val){
+    comparisonBound_ = val.clone();}
   private:
   /** Pointer to the CbcDfsDiver handling the tree.*/
   CbcDfsDiver * diver_;

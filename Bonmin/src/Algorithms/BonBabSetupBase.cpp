@@ -334,7 +334,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
 			     "best-guess", "choose node with smallest guessed integer solution",
                              "Choose the strategy for selecting the next node to be processed.");
 
-  roptions->AddStringOption3("tree_search_strategy",
+  roptions->AddStringOption4("tree_search_strategy",
 			     "Pick a strategy for traversing the tree",
 			     "top-node",
 			     "top-node"," Always pick the top node as sorted by the node comparison function",
@@ -345,6 +345,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                         "is worst than cutoff. "
                                         "Once a prescribed limit of backtracks is attained pick top node "
                                         "as sorted by the tree comparison function",
+			     "dfs-dive-dynamic","Same as dfs-dive but once enough solution are found switch to best-bound and if too many nodes switch to depth-first.",
 			     "All strategies can be used in conjunction with any of the node comparison functions."
                              "Options which affect dfs-dive are max-backtracks-in-dive and max-dive-depth. "
                              "The dfs-dive won't work in a non-convex problem where objective does not decrease down branches."
