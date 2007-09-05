@@ -67,7 +67,7 @@ namespace Bonmin {
 #ifdef DIVE_DEBUG
     std::cout<<"CbcDiver::push"<<std::endl;
 #endif
-    if(treeCleaning_) CbcTree::push(x);
+    if(treeCleaning_) return CbcTree::push(x);
 
     if(x->branchingObject()->numberBranchesLeft() == x->branchingObject()->numberBranches()){//Not Backtracking
       assert(nextOnBranch_==NULL);//Should not happen twice in a row
@@ -117,10 +117,7 @@ namespace Bonmin {
     void 
     CbcDiver::cleanTree(CbcModel * model, double cutoff, double & bestPossibleObjective)
     {
-      if(nextOnBranch_ != NULL){
-	CbcTree::push(nextOnBranch_);
-	nextOnBranch_=NULL;
-      }
+      nextOnBranch_=NULL;
       treeCleaning_ = true;
       CbcTree::cleanTree(model,cutoff, bestPossibleObjective);
       treeCleaning_ = false;
