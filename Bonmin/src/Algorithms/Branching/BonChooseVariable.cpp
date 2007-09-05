@@ -20,11 +20,6 @@ BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   OsiChooseStrong(solver),
   cbc_model_(NULL),
   only_pseudo_when_trusted_(false),
-  maxmin_crit_no_sol_(0.7),
-  maxmin_crit_have_sol_(0.1),
-  setup_pseudo_frac_(0.5),
-  numberBeforeTrustedList_(1),
-  numberStrongRoot_(COIN_INT_MAX),
   guessHeuristic_(NULL)
 {
   SmartPtr<TNLPSolver> tnlp_solver =
@@ -35,6 +30,15 @@ BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   SmartPtr<OptionsList> options = tnlp_solver->Options();
 
   options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
+  options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
+  options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
+  options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
+  if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, "bonmin.")) {
+    // default is to use the same value as for numberBeforeTrusted
+    options->GetIntegerValue("number_before_trust", numberBeforeTrustedList_, "bonmin.");
+  }
+  options->GetIntegerValue("number_strong_branch_root", numberStrongRoot_, "bonmin.");
+
 }
 
 BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :

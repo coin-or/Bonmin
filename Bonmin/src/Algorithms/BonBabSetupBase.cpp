@@ -397,6 +397,22 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                          "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
                                          0,1,
                                          "");
+
+  roptions->SetRegisteringCategory("bonmin experimental options");
+  // Some options for the strong branching and pseudo-costs that we
+  // still expored
+  roptions->AddBoundedNumberOption("setup_pseudo_frac", "Proportion of strong branching list that has to be taken from most-integer-infeasible list.",
+				   0., false, 1., false, 0.5);
+  roptions->AddBoundedNumberOption("maxmin_crit_no_sol", "Weight towards minimum in of lower and upper branching estimates when no solution has been found yet.",
+				   0., false, 1., false, 0.7);
+  roptions->AddBoundedNumberOption("maxmin_crit_have_sol", "Weight towards minimum in of lower and upper branching estimates when a solution has been found.",
+				   0., false, 1., false, 0.1);
+  roptions->AddLowerBoundedIntegerOption("number_before_trust_list",
+					 "Set the number of branches on a variable before its pseudo costs are to be believed during setup of strong branching candidate list.",
+					 -1, 0, "The default value is that of \"number_before_trust\"");
+  roptions->AddLowerBoundedIntegerOption("number_strong_branch_root",
+					 "Maximum number of variables considered for strong branching in root node.",
+					 0, COIN_INT_MAX, "");
   
 }
 
