@@ -100,7 +100,8 @@ namespace Bonmin {
       nextOnBranch_ = NULL;
       return ret_val;
       }
-      else nextOnBranch_ = NULL;
+      CbcTree::push(nextOnBranch_);//For safety
+      nextOnBranch_ = NULL;
     }
     return CbcTree::bestNode(cutoff);
   }
@@ -117,6 +118,8 @@ namespace Bonmin {
     void 
     CbcDiver::cleanTree(CbcModel * model, double cutoff, double & bestPossibleObjective)
     {
+      if(nextOnBranch_ != NULL)
+        CbcTree::push(nextOnBranch_);
       nextOnBranch_=NULL;
       treeCleaning_ = true;
       CbcTree::cleanTree(model,cutoff, bestPossibleObjective);
