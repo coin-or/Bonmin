@@ -75,12 +75,13 @@ namespace Bonmin {
     ///Don't know what this is yet?
     virtual void endSearch(){
       nextOnBranch_ = NULL;
-      lastOnBranch_ = NULL;
     }
       
   protected:
+    /** Say if we are cleaning the tree (then only call CbcTree functions).*/
+    bool treeCleaning_;
+    /** Noext node on the branch.*/
     CbcNode * nextOnBranch_;
-    CbcNode * lastOnBranch_;
   };
 
 
@@ -101,6 +102,7 @@ namespace Bonmin {
    class CbcDfsDiver :public CbcTree {
       public:
     enum ComparisonModes{
+    Enlarge/** At the very beginning we might want to enlarge the tree just a bit*/,
     FindSolutions,
     CloseBound,
     LimitTreeSize};
@@ -172,6 +174,9 @@ namespace Bonmin {
     ComparisonModes getComparisonMode(){
       return mode_;}
     protected:
+    /**Flag to say that we are currently cleaning the tree and should work only
+       on the heap.*/
+    int treeCleaning_;
     /** List of the nodes in the current dive.*/
     std::list<CbcNode *> dive_;
     /** Record dive list size for constant time access.*/
@@ -184,6 +189,8 @@ namespace Bonmin {
     int nBacktracks_;
     /** \name Parameters of the method.*/
     /** @{ */
+    /** Maximum depth until which we'll do a bredth-first-search.*/
+    int maxDepthBFS_;
     /** Maximum number of backtrack in one dive.*/
     int maxDiveBacktracks_;
     /** Maximum depth to go from divingBoard.*/
@@ -250,19 +257,16 @@ public:
   /// This is test function
   virtual bool test (CbcNode * x, CbcNode * y);
 
-  // This allows any method to change behavior as it is called
-  // after each solution
+  ///  Called after each new solution
   virtual void newSolution(CbcModel * model);
 
-  // This Also allows any method to change behavior as it is called
-  // after each solution
+  ///  Called after each new solution
   virtual void newSolution(CbcModel * model,
 			   double objectiveAtContinuous,
 			   int numberInfeasibilitiesAtContinuous);
 
-  // This allows any method to change behavior as it is called
-  // after every 1000 nodes.
-  // Return true if want tree re-sorted
+  /** Called 1000 nodes.
+    * Return true if want tree re-sorted.*/
   virtual bool every1000Nodes(CbcModel * model,int numberNodes);
 
   /** Set the dfs diver to use.*/

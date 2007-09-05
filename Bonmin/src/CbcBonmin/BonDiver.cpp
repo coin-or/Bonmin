@@ -20,11 +20,13 @@ namespace Bonmin {
 
       /// Default constructor.
   CbcDiver::CbcDiver(): CbcTree(),
+                              treeCleaning_(false),
 			      nextOnBranch_(NULL){
   }
 
     ///Copy constructor.
   CbcDiver::CbcDiver(const CbcDiver &rhs):CbcTree(rhs),
+                                  treeCleaning_(rhs.treeCleaning_),
 				  nextOnBranch_(rhs.nextOnBranch_){
   }
 
@@ -33,6 +35,7 @@ namespace Bonmin {
   CbcDiver::operator=(const CbcDiver &rhs){
     if(this != &rhs){
       CbcTree::operator=(rhs);
+      treeCleaning_ = rhs.treeCleaning_;
       nextOnBranch_ = rhs.nextOnBranch_;}
     return *this;
   }
@@ -51,9 +54,9 @@ namespace Bonmin {
   CbcNode * 
   CbcDiver::top() const{
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDiver::top"<<std::endl;
+    std::cout<<"CbcDiver::top"<<std::endl;
 #endif
-    if(nextOnBranch_ != NULL){
+    if(nextOnBranch_ != NULL && !treeCleaning_){
       return nextOnBranch_;}
     else return CbcTree::top();
   }
@@ -62,8 +65,10 @@ namespace Bonmin {
   void 
   CbcDiver::push(CbcNode * x){
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDiver::push"<<std::endl;
+    std::cout<<"CbcDiver::push"<<std::endl;
 #endif
+    if(treeCleaning_) CbcTree::push(x);
+
     if(x->branchingObject()->numberBranchesLeft() == x->branchingObject()->numberBranches()){//Not Backtracking
       assert(nextOnBranch_==NULL);//Should not happen twice in a row
       nextOnBranch_ = x;
@@ -76,9 +81,9 @@ namespace Bonmin {
   void 
   CbcDiver::pop(){
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDiver::pop"<<std::endl;
+    std::cout<<"CbcDiver::pop"<<std::endl;
 #endif
-    if(nextOnBranch_ != NULL){
+    if(nextOnBranch_ != NULL && !treeCleaning_){
       nextOnBranch_ = NULL;}
     else
       CbcTree::pop();
@@ -87,9 +92,9 @@ namespace Bonmin {
   CbcNode * 
   CbcDiver::bestNode(double cutoff){
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDiver::bestNode"<<std::endl;
+    std::cout<<"CbcDiver::bestNode"<<std::endl;
 #endif
-    if(nextOnBranch_ != NULL){
+    if(nextOnBranch_ != NULL && !treeCleaning_){
       if(nextOnBranch_->objectiveValue() < cutoff){
       CbcNode * ret_val = nextOnBranch_;
       nextOnBranch_ = NULL;
@@ -116,7 +121,9 @@ namespace Bonmin {
 	CbcTree::push(nextOnBranch_);
 	nextOnBranch_=NULL;
       }
+      treeCleaning_ = true;
       CbcTree::cleanTree(model,cutoff, bestPossibleObjective);
+      treeCleaning_ = false;
     }
 
     /// Get best possible objective function in the tree
@@ -139,11 +146,13 @@ namespace Bonmin {
 /************************************************************************/
       /// Default constructor.
   CbcDfsDiver::CbcDfsDiver(): CbcTree(),
+                              treeCleaning_(false),
 			      dive_(),
                               diveListSize_(0),
                               divingBoardDepth_(-1),
                               cutoff_(1e100),
                               nBacktracks_(0),
+                              maxDepthBFS_(4),
                               maxDiveBacktracks_(5),
                               maxDiveDepth_(COIN_INT_MAX),
                               mode_(FindSolutions){
@@ -151,11 +160,13 @@ namespace Bonmin {
 
     ///Copy constructor.
   CbcDfsDiver::CbcDfsDiver(const CbcDfsDiver &rhs):CbcTree(rhs),
+                                                   treeCleaning_(rhs.treeCleaning_),
 			                           dive_(rhs.dive_),
                                                    diveListSize_(rhs.diveListSize_),
                                                    divingBoardDepth_(rhs.divingBoardDepth_),
                                                    cutoff_(rhs.cutoff_),
                                                    nBacktracks_(rhs.nBacktracks_),
+                                                   maxDepthBFS_(rhs.maxDepthBFS_),
                                                    maxDiveBacktracks_(rhs.maxDiveBacktracks_),
                                                    maxDiveDepth_(rhs.maxDiveDepth_),
                                                    mode_(rhs.mode_){
@@ -166,11 +177,13 @@ namespace Bonmin {
   CbcDfsDiver::operator=(const CbcDfsDiver &rhs){
     if(this != &rhs){
       CbcTree::operator=(rhs);
+      treeCleaning_ = rhs.treeCleaning_;
       dive_ = rhs.dive_;
       diveListSize_ = rhs.diveListSize_;
       divingBoardDepth_ = rhs.divingBoardDepth_;
       cutoff_ = rhs.cutoff_;
       nBacktracks_ = rhs.nBacktracks_;
+      maxDepthBFS_ = rhs.maxDepthBFS_;
       maxDiveBacktracks_ = rhs.maxDiveBacktracks_;
       maxDiveDepth_ = maxDiveDepth_;
       mode_ = rhs.mode_;}
@@ -189,8 +202,9 @@ namespace Bonmin {
   ///Return top node (next node to process.*/
   CbcNode * 
   CbcDfsDiver::top() const{
+    if(treeCleaning_) return CbcTree::top();
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDfsDiver::top"<<std::endl;
+    std::cout<<"CbcDfsDiver::top"<<std::endl;
 #endif
     if(mode_ != CbcDfsDiver::FindSolutions){
       assert(dive_.empty());
@@ -204,12 +218,14 @@ namespace Bonmin {
   /// Add node to the heap.
   void 
   CbcDfsDiver::push(CbcNode * x){
+    if(treeCleaning_) return CbcTree::push(x);
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDfsDiver::push"<<std::endl;
+    std::cout<<"CbcDfsDiver::push"<<std::endl;
 #endif
-    if(mode_ != CbcDfsDiver::FindSolutions){
+    if(mode_ > CbcDfsDiver::FindSolutions){
       CbcTree::push(x);
       assert(dive_.empty());
+      return;
     }
     //Always push on dive;
     dive_.push_front(x);
@@ -219,8 +235,9 @@ namespace Bonmin {
   /// Remove the top node of the heap.
   void 
   CbcDfsDiver::pop(){
+    if(treeCleaning_) return CbcTree::pop();
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDfsDiver::pop"<<std::endl;
+    std::cout<<"CbcDfsDiver::pop"<<std::endl;
 #endif
     if(mode_ != CbcDfsDiver::FindSolutions){
       assert(dive_.empty());
@@ -235,12 +252,38 @@ namespace Bonmin {
   /// Remove the best node from the heap and return it
   CbcNode * 
   CbcDfsDiver::bestNode(double cutoff){
+    if(treeCleaning_) return CbcTree::bestNode(cutoff);
+#ifdef DIVE_DEBUG
+    for(unsigned int i = 0 ; i < nodes_.size() ; i++){
+      if(nodes_[i]->objectiveValue() >= cutoff)
+        std::cerr<<"CbcDfsDiver::bestNode"<<std::endl
+                 <<nodes_[i]->objectiveValue()<<", "<<cutoff<<std::endl;
+      assert(nodes_[i]->objectiveValue() < cutoff);
+    }
+#endif
+    if(mode_ == CbcDfsDiver::Enlarge){
+     if(diveListSize_ == 0)
+       mode_ = CbcDfsDiver::FindSolutions;
+     else {
+       CbcNode * node = dive_.back();
+       assert(node != NULL);
+       if(node->depth() > maxDepthBFS_){
+        //Switch mode to Diving
+        setComparisonMode(FindSolutions);
+       }
+       else{
+          //pop and return node;
+          dive_.pop_back();
+          return node;
+       }
+     }
+    }
     if(mode_ != CbcDfsDiver::FindSolutions){
       assert(dive_.empty());
       CbcTree::bestNode(cutoff);
     }
 #ifdef DIVE_DEBUG
-    std::cerr<<"CbcDfsDiver::bestNode"<<std::endl;
+    std::cout<<"CbcDfsDiver::bestNode"<<std::endl;
 #endif
     assert(nBacktracks_ < maxDiveBacktracks_);
     CbcNode * node = NULL;
@@ -253,7 +296,7 @@ namespace Bonmin {
        if(node->objectiveValue() > cutoff){//throw away node for now just put it on the heap as deleting a node is
                                            //more complicated than that (has to delete nodeInfo, cuts...)
 #ifdef DIVE_DEBUG
-         std::cerr<<"CbcDfsDiver::bestNode"
+         std::cout<<"CbcDfsDiver::bestNode"
                   <<", node above cutoff"<<std::endl;
 #endif
          CbcTree::push(node);
@@ -262,7 +305,7 @@ namespace Bonmin {
        }
        else if(node->guessedObjectiveValue() > cutoff){//Put it on the real heap
 #ifdef DIVE_DEBUG
-         std::cerr<<"CbcDfsDiver::bestNode"
+         std::cout<<"CbcDfsDiver::bestNode"
                   <<", node estimates above cutoff"<<std::endl;
 #endif
          CbcTree::push(node);
@@ -271,7 +314,7 @@ namespace Bonmin {
        }
        else if((node->depth() - divingBoardDepth_) > maxDiveDepth_){//Put it on the real heap
 #ifdef DIVE_DEBUG
-         std::cerr<<"CbcDfsDiver::bestNode"
+         std::cout<<"CbcDfsDiver::bestNode"
                   <<", node too deep"<<std::endl;
 #endif
          CbcTree::push(node);
@@ -281,13 +324,13 @@ namespace Bonmin {
       else if(node->branchingObject()->numberBranchesLeft() < node->branchingObject()->numberBranches()){//Backtracking
         nBacktracks_++;
 #ifdef DIVE_DEBUG
-         std::cerr<<"CbcDfsDiver::bestNode"
+         std::cout<<"CbcDfsDiver::bestNode"
                   <<", backtracking"<<std::endl;
 #endif
       }
       if(nBacktracks_ >= maxDiveBacktracks_){//Push all the node in dive_ onto nodes_
 #ifdef DIVE_DEBUG
-         std::cerr<<"CbcDfsDiver::bestNode"
+         std::cout<<"CbcDfsDiver::bestNode"
                   <<", maximum number of backtracks attained emptying dive_"<<std::endl;
 #endif
         pushDiveOntoHeap(-COIN_DBL_MAX);
@@ -308,10 +351,14 @@ namespace Bonmin {
 
 
   void CbcDfsDiver::pushDiveOntoHeap(double cutoff){
-    while(!dive_.empty() && (dive_.front() == NULL || dive_.front()->objectiveValue() > cutoff)){
-        if(dive_.front() != NULL) CbcTree::push(dive_.front());
+    while(!dive_.empty() && dive_.front()->objectiveValue() >= cutoff){
+        CbcTree::push(dive_.front());
         dive_.pop_front();
         diveListSize_--;
+    }
+    for(std::list<CbcNode *>::iterator i = dive_.begin() ; i != dive_.end();
+        i++){
+      assert(*i != NULL); 
     }
   }
   /** Test if empty. */
@@ -325,15 +372,21 @@ namespace Bonmin {
     void 
     CbcDfsDiver::cleanTree(CbcModel * model, double cutoff, double & bestPossibleObjective)
     {
+#ifdef DIVE_DEBUG
+         std::cout<<"CbcDfsDiver::cleanTree"<<std::endl;
+         std::cout<<"cutoff: "<<cutoff<<std::endl;
+#endif
       pushDiveOntoHeap(cutoff);
+      treeCleaning_ = true;
       CbcTree::cleanTree(model,cutoff, bestPossibleObjective);
+      treeCleaning_ = false;
     }
 
     /// Get best possible objective function in the tree
     double 
     CbcDfsDiver::getBestPossibleObjective(){
 #ifdef DIVE_DEBUG
-         std::cerr<<"CbcDfsDiver::getBestPossibleObjective"<<std::endl;
+         std::cout<<"CbcDfsDiver::getBestPossibleObjective"<<std::endl;
 #endif
       double bestPossibleObjective = CbcTree::empty() ? COIN_DBL_MAX : CbcTree::getBestPossibleObjective();
       for(std::list<CbcNode *>::iterator i = dive_.begin() ; i != dive_.end() ; i++){
@@ -379,6 +432,25 @@ namespace Bonmin {
        mode_ = newMode;
        //Empty heap
        pushDiveOntoHeap(-COIN_DBL_MAX);
+       nBacktracks_ = maxDiveBacktracks_ -1;//Force to start a new dive
+#ifdef DIVE_DEBUG
+         std::cout<<"CbcDfsDiver::setComparisonMode"
+                  <<std::endl;
+         switch(mode_){
+           case Enlarge:
+              std::cout<<"Enlarge"<<std::endl;
+              break;
+           case FindSolutions:
+              std::cout<<"FindSolutions"<<std::endl;
+              break;
+           case CloseBound:
+              std::cout<<"CloseBound"<<std::endl;
+              break;
+           case LimitTreeSize:
+              std::cout<<"LimitTreeSize"<<std::endl;
+              break;
+         }
+#endif
     }
   }
 
@@ -389,7 +461,14 @@ namespace Bonmin {
   void 
   DiverCompare::newSolution(CbcModel * model){
     assert(diver_);
-    if(model->getSolutionCount() > numberSolToStopDive_ && diver_->getComparisonMode() != CbcDfsDiver::FindSolutions){
+#ifdef DIVE_DEBUG
+      std::cout<<"CbcDfsDiver::newSolution"
+                <<std::endl;
+      std::cout<<"Found "<<model->getSolutionCount()<<" solutions"<<std::endl;
+#endif
+    if(diver_->getComparisonMode() == CbcDfsDiver::Enlarge)
+      diver_->setComparisonMode(CbcDfsDiver::FindSolutions);
+    if(model->getSolutionCount() >= numberSolToStopDive_ && diver_->getComparisonMode() == CbcDfsDiver::FindSolutions){
       diver_->setComparisonMode(CbcDfsDiver::CloseBound);
     }
   }
@@ -419,7 +498,7 @@ namespace Bonmin {
   DiverCompare::newSolution(CbcModel * model,
 			   double objectiveAtContinuous,
 			   int numberInfeasibilitiesAtContinuous){
-    newSolution(model);}
+    }
 
   // This allows any method to change behavior as it is called
   // after every 1000 nodes.

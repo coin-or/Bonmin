@@ -323,6 +323,7 @@ namespace Bonmin
       CbcDfsDiver * dfs = dynamic_cast<CbcDfsDiver *> (model_.tree());
       assert(dfs);
       compare.setDiver(dfs);
+      model_.setNodeComparison(compare);
     }
     
     model_.setNumberStrong(s.getIntParameter(BabSetupBase::NumberStrong));
