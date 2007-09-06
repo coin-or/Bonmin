@@ -12,15 +12,14 @@
 
 // This couples Cbc code into Bonmin code...
 #include "CbcModel.hpp"
-#include "BonGuessHeuristic.hpp"
 
 namespace Bonmin {
 
 BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
-  OsiChooseStrong(solver),
+  OsiChooseVariable(solver),
   cbc_model_(NULL),
   only_pseudo_when_trusted_(false),
-  guessHeuristic_(NULL)
+  pseudoCosts_(new BonPseudoCosts())
 {
   SmartPtr<TNLPSolver> tnlp_solver =
     static_cast<TNLPSolver *> (solver->solver());
@@ -33,35 +32,40 @@ BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
   options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
   options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
+  int numberBeforeTrusted;
+  options->GetIntegerValue("number_before_trust", numberBeforeTrusted, "bonmin.");
   if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, "bonmin.")) {
     // default is to use the same value as for numberBeforeTrusted
     options->GetIntegerValue("number_before_trust", numberBeforeTrustedList_, "bonmin.");
   }
   options->GetIntegerValue("number_strong_branch_root", numberStrongRoot_, "bonmin.");
 
+  int numberObjects = solver_->numberObjects();
+  pseudoCosts_->initialize(numberObjects);
+  pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
 }
 
 BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
-  OsiChooseStrong(rhs),
+  OsiChooseVariable(rhs),
   cbc_model_(rhs.cbc_model_),
   only_pseudo_when_trusted_(rhs.only_pseudo_when_trusted_),
   maxmin_crit_no_sol_(rhs.maxmin_crit_no_sol_),
   maxmin_crit_have_sol_(rhs.maxmin_crit_have_sol_),
   setup_pseudo_frac_(rhs.setup_pseudo_frac_),
   numberBeforeTrustedList_(rhs.numberBeforeTrustedList_),
-  numberStrongRoot_(rhs.numberStrongRoot_),
-  guessHeuristic_(rhs.guessHeuristic_)
+  numberStrongRoot_(rhs.numberStrongRoot_)
 {
   jnlst_ = rhs.jnlst_;
   bb_log_level_ = rhs.bb_log_level_;
   DBG_ASSERT(IsValid(jnlst_));
+  pseudoCosts_ = new BonPseudoCosts(*rhs.pseudoCosts_);
 }
 
 BonChooseVariable &
 BonChooseVariable::operator=(const BonChooseVariable & rhs)
 {
   if (this != &rhs) {
-    OsiChooseStrong::operator=(rhs);
+    OsiChooseVariable::operator=(rhs);
     jnlst_ = rhs.jnlst_;
     bb_log_level_ = rhs.bb_log_level_;
     cbc_model_ = rhs.cbc_model_;
@@ -71,7 +75,7 @@ BonChooseVariable::operator=(const BonChooseVariable & rhs)
     setup_pseudo_frac_ = rhs.setup_pseudo_frac_;
     numberBeforeTrustedList_ = rhs.numberBeforeTrustedList_;
     numberStrongRoot_ = rhs.numberStrongRoot_;
-    guessHeuristic_ = rhs.guessHeuristic_;
+    *pseudoCosts_ = *rhs.pseudoCosts_;
   }
   return *this;
 }
@@ -83,15 +87,13 @@ BonChooseVariable::clone() const
 }
 
 BonChooseVariable::~BonChooseVariable ()
-{}
+{
+  delete pseudoCosts_;
+}
 
 int
 BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 {
-  if (guessHeuristic_) {
-    guessHeuristic_->setChooseMethod(this);
-    //guessHeuristic_ = NULL;
-  }
   if (numberBeforeTrustedList_ < 0) {
     number_not_trusted_ = 1;
     return OsiChooseVariable::setupList(info, initialize);
@@ -114,11 +116,11 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   numberUnsatisfied_=0;
   int numberObjects = solver_->numberObjects();
   assert (numberObjects);
-  if (numberObjects>numberObjects_) {
+  if (numberObjects>pseudoCosts_->numberObjects()) {
     //AW : How could that ever happen?  Right now, all old content is deleted!
     assert(false && "Right now, all old content is deleted!");
     // redo useful arrays
-    OsiPseudoCosts::initialize(numberObjects);
+    pseudoCosts_->initialize(numberObjects);
   }
   double check = -COIN_DBL_MAX;
   int checkIndex=0;
@@ -150,44 +152,21 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   }
 
   OsiObject ** object = info->solver_->objects();
-  // Get average pseudo costs and see if pseudo shadow prices possible
-  int shadowPossible=shadowPriceMode_;
-  assert(!shadowPossible);
-  if (shadowPossible) {
-    for ( i=0;i<numberObjects;i++) {
-      if ( !object[i]->canHandleShadowPrices()) {
-	shadowPossible=0;
-	break;
-      }
-    }
-    if (shadowPossible) {
-      int numberRows = solver_->getNumRows();
-      const double * pi = info->pi_;
-      double sumPi=0.0;
-      for (i=0;i<numberRows;i++) 
-	sumPi += fabs(pi[i]);
-      sumPi /= ((double) numberRows);
-      // and scale back
-      sumPi *= 0.01;
-      info->defaultDual_ = sumPi; // switch on
-      int numberColumns = solver_->getNumCols();
-      int size = CoinMax(numberColumns,2*numberRows);
-      info->usefulRegion_ = new double [size];
-      CoinZeroN(info->usefulRegion_,size);
-      info->indexRegion_ = new int [size];
-    }
-  }
+  const double* upTotalChange = pseudoCosts_->upTotalChange();
+  const double* downTotalChange = pseudoCosts_->downTotalChange();
+  const int* upNumber = pseudoCosts_->upNumber();
+  const int* downNumber = pseudoCosts_->downNumber();
   double sumUp=0.0;
   double numberUp=0.0;
   double sumDown=0.0;
   double numberDown=0.0;
   for ( i=0;i<numberObjects;i++) {
-    sumUp += upTotalChange_[i];
-    numberUp += upNumber_[i];
-    sumDown += downTotalChange_[i];
-    numberDown += downNumber_[i];
+    sumUp += upTotalChange[i];
+    numberUp += upNumber[i];
+    sumDown += downTotalChange[i];
+    numberDown += downNumber[i];
     if (bb_log_level_>4) {
-      printf("%3d up %3d  %15.8e  down %3d  %15.8e\n",i, upNumber_[i], upTotalChange_[i], downNumber_[i], downTotalChange_[i]);
+      printf("%3d up %3d  %15.8e  down %3d  %15.8e\n",i, upNumber[i], upTotalChange[i], downNumber[i], downTotalChange[i]);
     }
   }
   double upMultiplier=(1.0+sumUp)/(1.0+numberUp);
@@ -234,22 +213,18 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
       } 
       if (priorityLevel==bestPriority) {
 	// Modify value
-	sumUp = upTotalChange_[i]+1.0e-30;
-	numberUp = upNumber_[i];
-	sumDown = downTotalChange_[i]+1.0e-30;
-	numberDown = downNumber_[i];
+	sumUp = upTotalChange[i]+1.0e-30;
+	numberUp = upNumber[i];
+	sumDown = downTotalChange[i]+1.0e-30;
+	numberDown = downNumber[i];
 	double upEstimate = object[i]->upEstimate();
 	double downEstimate = object[i]->downEstimate();
-	if (shadowPossible<2) {
-	  upEstimate = numberUp ? ((upEstimate*sumUp)/numberUp) : (upEstimate*upMultiplier);
-	  //if (numberUp<numberBeforeTrusted_)
-	  //  upEstimate *= (numberBeforeTrusted_+1.0)/(numberUp+1.0);
-	  downEstimate = numberDown ? ((downEstimate*sumDown)/numberDown) : (downEstimate*downMultiplier);
-	  //if (numberDown<numberBeforeTrusted_)
-	  //  downEstimate *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
-	} else {
-	  // use shadow prices always
-	}
+	upEstimate = numberUp ? ((upEstimate*sumUp)/numberUp) : (upEstimate*upMultiplier);
+	//if (numberUp<numberBeforeTrusted_)
+	//  upEstimate *= (numberBeforeTrusted_+1.0)/(numberUp+1.0);
+	downEstimate = numberDown ? ((downEstimate*sumDown)/numberDown) : (downEstimate*downMultiplier);
+	//if (numberDown<numberBeforeTrusted_)
+	//  downEstimate *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
 	double value2 = -COIN_DBL_MAX;
 	if (numberUp<numberBeforeTrustedList_ ||
 	    numberDown<numberBeforeTrustedList_) {
@@ -434,6 +409,11 @@ BonChooseVariable::chooseVariable(
     numberStrongRoot_ = numberStrong_;
   }
   if (numberUnsatisfied_) {
+    const double* upTotalChange = pseudoCosts_->upTotalChange();
+    const double* downTotalChange = pseudoCosts_->downTotalChange();
+    const int* upNumber = pseudoCosts_->upNumber();
+    const int* downNumber = pseudoCosts_->downNumber();
+    int numberBeforeTrusted = pseudoCosts_->numberBeforeTrusted();
     int numberLeft = CoinMin(numberStrongRoot_-numberStrongDone_,numberUnsatisfied_);
     int numberToDo=0;
     int * temp = (int *) useful_;
@@ -446,17 +426,17 @@ BonChooseVariable::chooseVariable(
     double bestTrusted=-COIN_DBL_MAX;
     for (int i=0;i<numberLeft;i++) {
       int iObject = list_[i];
-      if (numberBeforeTrusted_<0||
+      if (numberBeforeTrusted<0||
 	  (only_pseudo_when_trusted_ && number_not_trusted_>0) ||
-	  !isRoot && (upNumber_[iObject]<numberBeforeTrusted_ ||
-		      downNumber_[iObject]<numberBeforeTrusted_ )||
-	  isRoot && (!upNumber_[iObject] && !downNumber_[iObject]) ) {
+	  !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
+		      downNumber[iObject]<numberBeforeTrusted )||
+	  isRoot && (!upNumber[iObject] && !downNumber[iObject]) ) {
 	results[numberToDo] = OsiHotInfo(solver,info,const_cast<const OsiObject **> (solver->objects()),iObject);
 	temp[numberToDo++]=iObject;
       } else {
 	const OsiObject * obj = solver->object(iObject);
-	double upEstimate = (upTotalChange_[iObject]*obj->upEstimate())/upNumber_[iObject];
-	double downEstimate = (downTotalChange_[iObject]*obj->downEstimate())/downNumber_[iObject];
+	double upEstimate = (upTotalChange[iObject]*obj->upEstimate())/upNumber[iObject];
+	double downEstimate = (downTotalChange[iObject]*obj->downEstimate())/downNumber[iObject];
 	double MAXMIN_CRITERION = maxminCrit();
 	double value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
 	if (value > bestTrusted) {
@@ -750,34 +730,38 @@ BonChooseVariable::updateInformation(const OsiBranchingInformation *info,
   const OsiObject * object = info->solver_->object(index);
   assert (object->upEstimate()>0.0&&object->downEstimate()>0.0);
   assert (branch<2);
-  if (branch) {
+  double* upTotalChange = pseudoCosts_->upTotalChange();
+  double* downTotalChange = pseudoCosts_->downTotalChange();
+  int* upNumber = pseudoCosts_->upNumber();
+  int* downNumber = pseudoCosts_->downNumber();
+   if (branch) {
     //if (hotInfo->upStatus()!=1) {
     // AW: Let's update the pseudo costs only if the strong branching
     // problem was marked as "solved"
     if (hotInfo->upStatus()==0) {
       assert (hotInfo->upStatus()>=0);
-      upTotalChange_[index] += hotInfo->upChange()/object->upEstimate();
-      upNumber_[index]++;
+      upTotalChange[index] += hotInfo->upChange()/object->upEstimate();
+      upNumber[index]++;
     } else if (hotInfo->upStatus()==1) {
       // infeasible - just say expensive
-      upNumber_[index]++;
+      upNumber[index]++;
       if (info->cutoff_<1.0e50)
-	upTotalChange_[index] += 2.0*(info->cutoff_-info->objectiveValue_)/object->upEstimate();
+	upTotalChange[index] += 2.0*(info->cutoff_-info->objectiveValue_)/object->upEstimate();
       else
-	upTotalChange_[index] += 2.0*fabs(info->objectiveValue_)/object->upEstimate();
+	upTotalChange[index] += 2.0*fabs(info->objectiveValue_)/object->upEstimate();
     }
   } else {
     if (hotInfo->downStatus()==0) {
       assert (hotInfo->downStatus()>=0);
-      downTotalChange_[index] += hotInfo->downChange()/object->downEstimate();
-      downNumber_[index]++;
+      downTotalChange[index] += hotInfo->downChange()/object->downEstimate();
+      downNumber[index]++;
     } else if (hotInfo->upStatus()==1) {
-      downNumber_[index]++;
+      downNumber[index]++;
       // infeasible - just say expensive
       if (info->cutoff_<1.0e50)
-	downTotalChange_[index] += 2.0*(info->cutoff_-info->objectiveValue_)/object->downEstimate();
+	downTotalChange[index] += 2.0*(info->cutoff_-info->objectiveValue_)/object->downEstimate();
       else
-	downTotalChange_[index] += 2.0*fabs(info->objectiveValue_)/object->downEstimate();
+	downTotalChange[index] += 2.0*fabs(info->objectiveValue_)/object->downEstimate();
     }
   }  
 }
@@ -791,38 +775,42 @@ BonChooseVariable::updateInformation( int index, int branch,
   assert (branch<2);
   assert (changeInValue>0.0);
   assert (branch<2);
+  double* upTotalChange = pseudoCosts_->upTotalChange();
+  double* downTotalChange = pseudoCosts_->downTotalChange();
+  int* upNumber = pseudoCosts_->upNumber();
+  int* downNumber = pseudoCosts_->downNumber();
   //printf("update %3d %3d %e %e %3d\n",index, branch, changeInObjective,changeInValue,status);
   if (branch) {
     if (status!=1) {
       assert (status>=0);
-      upTotalChange_[index] += changeInObjective/changeInValue;
-      upNumber_[index]++;
+      upTotalChange[index] += changeInObjective/changeInValue;
+      upNumber[index]++;
     } else {
       // infeasible - just say expensive
       assert(cbc_model_); // Later, we need to get this information in a different way...
-      upNumber_[index]++;
+      upNumber[index]++;
       double cutoff = cbc_model_->getCutoff();
       double objectiveValue = cbc_model_->getCurrentObjValue();
       if (cutoff<1.0e50)
-	upTotalChange_[index] += 2.0*(cutoff-objectiveValue)/changeInValue;
+	upTotalChange[index] += 2.0*(cutoff-objectiveValue)/changeInValue;
       else
-	upTotalChange_[index] += 2.0*fabs(objectiveValue)/changeInValue;
+	upTotalChange[index] += 2.0*fabs(objectiveValue)/changeInValue;
     }
   } else {
     if (status!=1) {
       assert (status>=0);
-      downTotalChange_[index] += changeInObjective/changeInValue;
-      downNumber_[index]++;
+      downTotalChange[index] += changeInObjective/changeInValue;
+      downNumber[index]++;
     } else {
       assert(cbc_model_);
       // infeasible - just say expensive
-      downNumber_[index]++;
+      downNumber[index]++;
       double cutoff = cbc_model_->getCutoff();
       double objectiveValue = cbc_model_->getCurrentObjValue();
       if (cutoff<1.0e50)
-	downTotalChange_[index] += 2.0*(cutoff-objectiveValue)/changeInValue;
+	downTotalChange[index] += 2.0*(cutoff-objectiveValue)/changeInValue;
       else
-	downTotalChange_[index] += 2.0*fabs(objectiveValue)/changeInValue;
+	downTotalChange[index] += 2.0*fabs(objectiveValue)/changeInValue;
     }
   }  
 }

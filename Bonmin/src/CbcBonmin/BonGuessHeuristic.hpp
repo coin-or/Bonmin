@@ -11,9 +11,6 @@
 
 #include "CbcHeuristic.hpp"
 
-// need to change this so that we use pseudo cost objects
-#include "BonChooseVariable.hpp"
-
 namespace Bonmin
 {
   class  GuessHeuristic : public CbcHeuristic
@@ -25,11 +22,6 @@ namespace Bonmin
     GuessHeuristic( const GuessHeuristic &copy):
       CbcHeuristic(copy)
     {}
-    /// Set ChooseMethod - we need this to get pseudo costs
-    inline void setChooseMethod(BonChooseVariable * chooseMethod)
-    {
-      chooseMethod_ = chooseMethod;
-    }
 
     /// heuristic method providing guess, based on pseudo costs
     virtual int solution(double &solutionValue, double *betterSolution);
@@ -49,10 +41,6 @@ namespace Bonmin
     
     /// Assignment operator 
     GuessHeuristic & operator=(const GuessHeuristic& rhs);
-
-    /// Pointer for choose method
-    /// TODO: BAD THIS IS STATIC BUT I DON"T KNOW WHAT TO DO
-    static BonChooseVariable * chooseMethod_;
   };
 }
 #endif

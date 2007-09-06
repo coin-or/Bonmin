@@ -292,11 +292,8 @@ namespace Bonmin
       // pseudo costs from the ChooseVariable method
       CbcCompareEstimate compare;
       model_.setNodeComparison(compare);
-      BonChooseVariable* bonchoosemethod = dynamic_cast<BonChooseVariable*>(s.branchingMethod());
-      assert(bonchoosemethod);
       GuessHeuristic * guessHeu = new GuessHeuristic(model_);
       model_.addHeuristic(guessHeu);
-      bonchoosemethod->registerGuessHeuristic(guessHeu);
       delete guessHeu;
     }
 

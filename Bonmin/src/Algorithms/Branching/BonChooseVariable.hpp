@@ -10,9 +10,9 @@
 // Forward declaration
 class CbcModel;
 
-namespace Bonmin {
+typedef OsiPseudoCosts BonPseudoCosts;
 
-  class GuessHeuristic;
+namespace Bonmin {
 
 /** This class chooses a variable to branch on
 
@@ -21,7 +21,7 @@ namespace Bonmin {
     value induced by branching on a specific object are estimated with the pure virtual function fill_changes.
 */
 
-class BonChooseVariable : public OsiChooseStrong  {
+class BonChooseVariable : public OsiChooseVariable  {
   /** Statuses for strong branching candidates.*/
   enum StrongStatus{
     NotDone=-1,
@@ -109,36 +109,9 @@ public:
     only_pseudo_when_trusted_ = only_pseudo_when_trusted;
   }
 
-  /** @name Accessor methods to pseudo cost data*/
-  //@{
-  int numberObjects() const {
-    return numberObjects_;
-  }
-  const double* upTotalChange() const
-  {
-    return upTotalChange_;
-  }
-  const double* downTotalChange() const
-  {
-    return downTotalChange_;
-  }
-  const int* upNumber() const 
-  {
-    return upNumber_;
-  }
-  const int* downNumber() const 
-  {
-    return downNumber_;
-  }
-  //@}
-
-  /// For now, we need to communicate pseudo costs to
-  /// GuessHeuristic. Right now, we need to call it back so that it
-  /// gets the correct pointers to the arrays (after cloning)
-  void registerGuessHeuristic(GuessHeuristic* guessHeuristic)
-  {
-    guessHeuristic_ = guessHeuristic;
-  }
+  /** Accessor method to pseudo cost object*/
+  const BonPseudoCosts* pseudoCosts() const
+  { return pseudoCosts_; }
 
 protected:
 
@@ -206,7 +179,7 @@ private:
   /** detecting if this is root node */
   bool isRootNode() const;
 
-  GuessHeuristic* guessHeuristic_;
+  BonPseudoCosts* pseudoCosts_;
 };
 
 }

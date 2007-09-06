@@ -8,11 +8,11 @@
 #include "BonGuessHeuristic.hpp"
 #include "CoinHelperFunctions.hpp"
 #include "CbcModel.hpp"
+#include "BonChooseVariable.hpp"
 
 //#include "OsiAuxInfo.hpp"
 namespace Bonmin
 {
-  BonChooseVariable* GuessHeuristic::chooseMethod_ = NULL;
 /// Default constructor
   GuessHeuristic::GuessHeuristic(CbcModel &model)
       :
@@ -23,17 +23,21 @@ namespace Bonmin
   int
   GuessHeuristic::solution(double &solutionValue, double *betterSolution)
   {
-    if (!chooseMethod_) {
-      //printf("No choose method set yet\n");
+    // Get pointer to pseudo costs object
+    const BonChooseVariable* chooseMethod = dynamic_cast<BonChooseVariable*>(model_->branchingMethod()->chooseMethod());
+
+    if (!chooseMethod) {
+      std::cerr << "Can't get pseudo costs!!!\n";
       solutionValue = model_->getCurrentMinimizationObjValue();
       return -1;
     }
-    int numberObjects = chooseMethod_->numberObjects();
+    const BonPseudoCosts* pseudoCosts = chooseMethod->pseudoCosts();
+    int numberObjects = pseudoCosts->numberObjects();
     assert(numberObjects == model_->numberObjects());
-    const double* upTotalChange = chooseMethod_->upTotalChange();
-    const double* downTotalChange = chooseMethod_->downTotalChange();
-    const int* upNumber = chooseMethod_->upNumber();
-    const int* downNumber = chooseMethod_->downNumber();
+    const double* upTotalChange = pseudoCosts->upTotalChange();
+    const double* downTotalChange = pseudoCosts->downTotalChange();
+    const int* upNumber = pseudoCosts->upNumber();
+    const int* downNumber = pseudoCosts->downNumber();
 
     double sumUpTot = 0.;
     int numberUpTot = 0;
@@ -45,7 +49,11 @@ namespace Bonmin
       sumDownTot += downTotalChange[i];
       numberDownTot += downNumber[i];
     }
-    assert(numberUpTot && numberDownTot);
+    if (!numberUpTot || !numberDownTot) {
+      // don't have ANY pseudo-costs information yet
+      solutionValue = COIN_DBL_MAX;
+      return -1;
+    }
     double upAvrg=sumUpTot/numberUpTot;
     double downAvrg=sumDownTot/numberDownTot;
 
