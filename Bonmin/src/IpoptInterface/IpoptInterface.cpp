@@ -1844,17 +1844,12 @@ IpoptInterface::getDblParam(OsiDblParam key, double& value) const
     retval = true;
     break;
   case OsiDualTolerance:
-    retval = false;
-    break;
   case OsiPrimalTolerance:
-    retval = false;
-    break;
   case OsiObjOffset:
-    retval = OsiSolverInterface::getDblParam(key, value);
-    break;
   case OsiLastDblParam:
+   default:
     retval = false;
-    break;
+    retval = OsiSolverInterface::getDblParam(key, value);
   }
   return retval;
 }

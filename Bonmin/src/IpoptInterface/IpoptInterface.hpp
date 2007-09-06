@@ -793,8 +793,14 @@ class Messages : public CoinMessages
 
   //@}
 
-  /** get pointer to the TMINLP2TNLP adapter */
+  /** get const pointer to the TMINLP2TNLP adapter */
   const Ipopt::TMINLP2TNLP * problem() const
+  {
+    return GetRawPtr(problem_);
+  }
+
+  /** get pointer to the TMINLP2TNLP adapter */
+  Ipopt::TMINLP2TNLP * problem()
   {
     return GetRawPtr(problem_);
   }
