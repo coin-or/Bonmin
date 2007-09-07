@@ -69,6 +69,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/CppExample/MyBonmin.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.hpp \
+	$(top_srcdir)/examples/Lgp/Makefile.in \
 	$(top_srcdir)/inc/config_bonmin.h.in AUTHORS INSTALL
 @HAVE_EXTERNALS_TRUE@am__append_5 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_6 = .Externals-stamp
@@ -82,7 +83,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
-CONFIG_CLEAN_FILES = examples/CppExample/Makefile
+CONFIG_CLEAN_FILES = examples/Lgp/Makefile \
+	examples/CppExample/Makefile
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -409,6 +411,8 @@ $(top_srcdir)/inc/config_bonmin.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_dep
 
 distclean-hdr:
 	-rm -f inc/config_bonmin.h inc/stamp-h1
+examples/Lgp/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/Lgp/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/CppExample/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/CppExample/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
@@ -557,7 +561,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/Lgp $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

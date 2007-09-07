@@ -6,11 +6,11 @@
 #include "OsiChooseVariable.hpp"
 #include "BonCurvatureEstimator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
+#include "BonPseudoCosts.hpp"
 
 // Forward declaration
 class CbcModel;
 
-typedef OsiPseudoCosts BonPseudoCosts;
 
 namespace Bonmin {
 
@@ -110,7 +110,7 @@ public:
   }
 
   /** Accessor method to pseudo cost object*/
-  const BonPseudoCosts* pseudoCosts() const
+  const PseudoCosts* pseudoCosts() const
   { return pseudoCosts_; }
 
 protected:
@@ -179,7 +179,7 @@ private:
   /** detecting if this is root node */
   bool isRootNode() const;
 
-  BonPseudoCosts* pseudoCosts_;
+  PseudoCosts* pseudoCosts_;
 };
 
 }

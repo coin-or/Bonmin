@@ -198,6 +198,7 @@ AC_CONFIG_FILES([Makefile
                  experimental/FP/Makefile
                  experimental/NotConvex/Makefile
                  test/Makefile
+                 examples/Lgp/Makefile
                  examples/CppExample/Makefile])
 
 AC_CONFIG_HEADER([inc/config_bonmin.h])

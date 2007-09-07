@@ -19,7 +19,7 @@ BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
   OsiChooseVariable(solver),
   cbc_model_(NULL),
   only_pseudo_when_trusted_(false),
-  pseudoCosts_(new BonPseudoCosts())
+  pseudoCosts_(new PseudoCosts())
 {
   SmartPtr<TNLPSolver> tnlp_solver =
     static_cast<TNLPSolver *> (solver->solver());
@@ -58,7 +58,7 @@ BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
   jnlst_ = rhs.jnlst_;
   bb_log_level_ = rhs.bb_log_level_;
   DBG_ASSERT(IsValid(jnlst_));
-  pseudoCosts_ = new BonPseudoCosts(*rhs.pseudoCosts_);
+  pseudoCosts_ = new PseudoCosts(*rhs.pseudoCosts_);
 }
 
 BonChooseVariable &

@@ -19,6 +19,7 @@ noinst_LTLIBRARIES = libbonbranching.la
 libbonbranching_la_SOURCES = \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
 	BonCurvBranchingSolver.cpp BonCurvBranchingSolver.hpp \
+        BonPseudoCosts.cpp BonPseudoCosts.hpp \
         BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
 	BonQpBranchingSolver.cpp BonQpBranchingSolver.hpp
 
@@ -84,6 +85,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 include_HEADERS = \
 	BonChooseVariable.hpp \
+	BonPseudoCosts.hpp \
 	BonCurvBranchingSolver.hpp \
         BonLpBranchingSolver.hpp \
         BonQpBranchingSolver.hpp
@@ -95,6 +97,7 @@ include_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonChooseVariable.cppbak BonChooseVariable.hppbak \
+        BonPseudoCosts.cppbak BonPseudoCosts.hppbak \
 	BonQpBranchingSolver.cppbak BonQpBranchingSolver.hppbak \
 	BonCurvBranchingSolver.cppbak BonCurvBranchingSolver.hppbak \
         BonLpBranchingSolver.hppbak BonLpBranchingSolver.cppbak

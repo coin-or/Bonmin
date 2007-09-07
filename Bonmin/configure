@@ -2639,7 +2639,7 @@ if test x"$CFLAGS" = x; then
         coin_opt_cflags="-O3 -fomit-frame-pointer"
         coin_add_cflags="-pipe"
         coin_dbg_cflags="-g"
-        coin_warn_cflags="-pedantic-errors -Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall"
+        coin_warn_cflags="-Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall"
 	case $enable_doscompile in
 	  mingw)
 	    CFLAGS="-mno-cygwin"
@@ -3476,7 +3476,7 @@ if test x"$CXXFLAGS" = x; then
         coin_opt_cxxflags="-O3 -fomit-frame-pointer"
         coin_add_cxxflags="-pipe"
         coin_dbg_cxxflags="-g"
-        coin_warn_cxxflags="-pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion"
+        coin_warn_cxxflags="-Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings"
 	case $enable_doscompile in
 	  mingw)
 	    CXXFLAGS="-mno-cygwin"
@@ -23819,7 +23819,7 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile experimental/FP/Makefile experimental/NotConvex/Makefile test/Makefile examples/CppExample/Makefile"
+                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile experimental/FP/Makefile experimental/NotConvex/Makefile test/Makefile examples/Lgp/Makefile examples/CppExample/Makefile"
 
 
           ac_config_headers="$ac_config_headers inc/config_bonmin.h"
@@ -24624,6 +24624,7 @@ do
   "experimental/FP/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/FP/Makefile" ;;
   "experimental/NotConvex/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/NotConvex/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
+  "examples/Lgp/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/Lgp/Makefile" ;;
   "examples/CppExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/CppExample/Makefile" ;;
   "test/MyBonmin.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp" ;;
   "test/MyTMINLP.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp" ;;
