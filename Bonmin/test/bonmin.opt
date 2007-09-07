@@ -19,7 +19,8 @@ bonmin.nlp_failure_behavior        stop       #Set the behavior when the nlp fai
 bonmin.nlp_log_level               0          #specify sub-NLP log level
 bonmin.nlp_solve_frequency         10         #Specify the frequency at which nlp relaxations are solved in hybrid.
 bonmin.node_limit                  60000      #Set maximum number of nodes explored
-bonmin.nodeselect_stra             best-bound #Choose the node selection strategy
+bonmin.node_comparison             best-bound #Choose the node comparison
+bonmin.tree_search_strategy        top-node   #Choose a tree search strategy                 
 bonmin.num_iterations_suspect      -1         #Number of iteration over which a node is considered suspect
 bonmin.num_retry_unsolved_random_point          0          #Number of time retry to solve a failed NLP with a random starting point
 bonmin.num_resolve_at_root           0          #Number of time retry to solve the root node with different starting point (only usefull in non_convex).

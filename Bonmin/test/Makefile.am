@@ -41,15 +41,9 @@ CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
 # List libraries of COIN projects
 CppExample_LDADD = \
-        ../src/CbcBonmin/libbonminampl.la \
         ../src/CbcBonmin/libbonmin.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
         $(IPOPTLIBS) \
         $(COINLIBS)
-
-if COIN_HAS_ASL
-CppExample_LDADD += $(ASLLIB)
-endif
 
 CppExample_LDADD += $(ADDLIBS)
 
