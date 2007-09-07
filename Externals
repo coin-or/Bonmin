@@ -6,10 +6,10 @@ ThirdParty/ASL https://projects.coin-or.org/svn/BuildTools/ThirdParty/ASL/stable
 Data/Netlib   https://projects.coin-or.org/svn/Data/stable/1.0/Netlib
 Data/Sample   https://projects.coin-or.org/svn/Data/stable/1.0/Sample
 Data/miplib3  https://projects.coin-or.org/svn/Data/stable/1.0/miplib3
-CoinUtils     https://projects.coin-or.org/svn/CoinUtils/stable/1.0/CoinUtils
-Cbc           https://projects.coin-or.org/svn/Cbc/stable/1.1/Cbc
+CoinUtils     https://projects.coin-or.org/svn/CoinUtils/stable/2.1/CoinUtils
+Cbc           https://projects.coin-or.org/svn/Cbc/stable/1.2/Cbc
 Cgl           https://projects.coin-or.org/svn/Cgl/stable/0.5/Cgl
-Clp           https://projects.coin-or.org/svn/Clp/stable/1.3/Clp
+Clp           https://projects.coin-or.org/svn/Clp/stable/1.5/Clp
 Ipopt         https://projects.coin-or.org/svn/Ipopt/stable/3.2/Ipopt
-Osi           https://projects.coin-or.org/svn/Osi/stable/0.95/Osi
+Osi           https://projects.coin-or.org/svn/Osi/stable/0.96/Osi
 
