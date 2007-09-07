@@ -213,7 +213,7 @@ namespace Bonmin
       ampl_utils::sos_kludge(sos_.num, sos_.starts, sos_.weights);
       for (int ii=0;ii<sos_.num;ii++) {
         int ichar = sos_.types[ii];
-        if (ichar != '1') {
+        if (ichar != '1' && ichar != '2') {
           std::cerr<<"Unsuported type of sos constraint: "<<sos_.types[ii]<<std::endl;
           throw;
         }
