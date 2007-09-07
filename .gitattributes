@@ -49,6 +49,8 @@ Bonmin/src/Algorithms/Branching/BonCurvBranchingSolver.cpp -text
 Bonmin/src/Algorithms/Branching/BonCurvBranchingSolver.hpp -text
 Bonmin/src/Algorithms/Branching/BonLpBranchingSolver.cpp -text
 Bonmin/src/Algorithms/Branching/BonLpBranchingSolver.hpp -text
+Bonmin/src/Algorithms/Branching/BonPseudoCosts.cpp -text
+Bonmin/src/Algorithms/Branching/BonPseudoCosts.hpp -text
 Bonmin/src/Algorithms/Branching/BonQpBranchingSolver.cpp -text
 Bonmin/src/Algorithms/Branching/BonQpBranchingSolver.hpp -text
 Bonmin/src/Algorithms/Branching/Makefile.am -text
