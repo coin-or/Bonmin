@@ -76,12 +76,21 @@ namespace Bonmin {
     virtual void endSearch(){
       nextOnBranch_ = NULL;
     }
-      
-  protected:
+
+    ///Register the options of the method.
+    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+   
+    /// Initialize the method (get options)
+    void initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
+
+  private:
     /** Say if we are cleaning the tree (then only call CbcTree functions).*/
     bool treeCleaning_;
     /** Noext node on the branch.*/
     CbcNode * nextOnBranch_;
+    /** Flag indicating if we want to stop diving based on the guessed
+	objective value and the cutoff value */
+    bool stop_diving_on_cutoff_;
   };
 
 

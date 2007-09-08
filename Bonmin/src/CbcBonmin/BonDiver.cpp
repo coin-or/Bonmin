@@ -11,7 +11,7 @@
 #include "CoinFinite.hpp"
 #include "CbcModel.hpp"
 #include "CbcConfig.h"
-#define DIVE_DEBUG
+//#define DIVE_DEBUG
 namespace Bonmin {
 
 /************************************************************************/
@@ -20,14 +20,18 @@ namespace Bonmin {
 
       /// Default constructor.
   CbcDiver::CbcDiver(): CbcTree(),
-                              treeCleaning_(false),
-			      nextOnBranch_(NULL){
+			treeCleaning_(false),
+			nextOnBranch_(NULL),
+			stop_diving_on_cutoff_(false)
+  {
   }
 
     ///Copy constructor.
   CbcDiver::CbcDiver(const CbcDiver &rhs):CbcTree(rhs),
-                                  treeCleaning_(rhs.treeCleaning_),
-				  nextOnBranch_(rhs.nextOnBranch_){
+					  treeCleaning_(rhs.treeCleaning_),
+					  nextOnBranch_(rhs.nextOnBranch_),
+					  stop_diving_on_cutoff_(rhs.stop_diving_on_cutoff_)
+{
   }
 
     /// Assignment operator.
@@ -36,7 +40,9 @@ namespace Bonmin {
     if(this != &rhs){
       CbcTree::operator=(rhs);
       treeCleaning_ = rhs.treeCleaning_;
-      nextOnBranch_ = rhs.nextOnBranch_;}
+      nextOnBranch_ = rhs.nextOnBranch_;
+      stop_diving_on_cutoff_ = rhs.stop_diving_on_cutoff_;
+    }
     return *this;
   }
 
@@ -96,10 +102,18 @@ namespace Bonmin {
 #endif
     if(nextOnBranch_ != NULL && !treeCleaning_){
       if(nextOnBranch_->objectiveValue() < cutoff){
-      CbcNode * ret_val = nextOnBranch_;
-      nextOnBranch_ = NULL;
-      return ret_val;
+	if (stop_diving_on_cutoff_ && nextOnBranch_->guessedObjectiveValue() >= cutoff) {
+	  //printf("Stopping dive %g %g\n", nextOnBranch_->objectiveValue(), nextOnBranch_->guessedObjectiveValue());
+	  CbcTree::push(nextOnBranch_);
+	  nextOnBranch_ = NULL;
+	  return CbcTree::bestNode(cutoff);
+	}
+	//printf("Diving!! %g %g\n", nextOnBranch_->objectiveValue(), nextOnBranch_->guessedObjectiveValue());
+	CbcNode * ret_val = nextOnBranch_;
+	nextOnBranch_ = NULL;
+	return ret_val;
       }
+      assert(true && "We did not think we get here.");
       CbcTree::push(nextOnBranch_);//For safety
       nextOnBranch_ = NULL;
     }
@@ -112,34 +126,51 @@ namespace Bonmin {
     return (CbcTree::empty() && (nextOnBranch_ == NULL) );
   }
 
-    /*! \brief Prune the tree using an objective function cutoff
-      if nextOnBranch_ exists we push it on the heap and call CbcTree function
-    */
-    void 
-    CbcDiver::cleanTree(CbcModel * model, double cutoff, double & bestPossibleObjective)
-    {
-      if(nextOnBranch_ != NULL)
-        CbcTree::push(nextOnBranch_);
-      nextOnBranch_=NULL;
-      treeCleaning_ = true;
-      CbcTree::cleanTree(model,cutoff, bestPossibleObjective);
-      treeCleaning_ = false;
-    }
+  /*! \brief Prune the tree using an objective function cutoff
+    if nextOnBranch_ exists we push it on the heap and call CbcTree function
+  */
+  void 
+  CbcDiver::cleanTree(CbcModel * model, double cutoff, double & bestPossibleObjective)
+  {
+    if(nextOnBranch_ != NULL)
+      CbcTree::push(nextOnBranch_);
+    nextOnBranch_=NULL;
+    treeCleaning_ = true;
+    CbcTree::cleanTree(model,cutoff, bestPossibleObjective);
+    treeCleaning_ = false;
+  }
 
-    /// Get best possible objective function in the tree
-    double 
-    CbcDiver::getBestPossibleObjective(){
-      double bestPossibleObjective = (nextOnBranch_ != NULL) ? nextOnBranch_->objectiveValue() : 1e100;
-      for(unsigned int i = 0 ; i < nodes_.size() ; i++){
-	if(nodes_[i] == NULL) continue;
-	const double & obj = nodes_[i]->objectiveValue();
-	if(obj < bestPossibleObjective){
-	  bestPossibleObjective = obj;
-	}
+  /// Get best possible objective function in the tree
+  double 
+  CbcDiver::getBestPossibleObjective(){
+    double bestPossibleObjective = (nextOnBranch_ != NULL) ? nextOnBranch_->objectiveValue() : 1e100;
+    for(unsigned int i = 0 ; i < nodes_.size() ; i++){
+      if(nodes_[i] == NULL) continue;
+      const double & obj = nodes_[i]->objectiveValue();
+      if(obj < bestPossibleObjective){
+	bestPossibleObjective = obj;
       }
-      return bestPossibleObjective;
     }
+    return bestPossibleObjective;
+  }
 
+  void 
+  CbcDiver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+    roptions->AddStringOption2(
+      "stop_diving_on_cutoff",
+      "Flag indicating whether we stop diving based on guessed feasible objective and the current cutoff",
+      "no",
+      "no", "",
+      "yes", "");
+
+  }
+   
+  /// Initialize the method (get options)
+  void 
+  CbcDiver::initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
+    options->GetBoolValue("stop_diving_on_cutoff", stop_diving_on_cutoff_,
+			  "bonmin.");
+  }
 
 /************************************************************************/
 /*                CbcDfsDiver methods                                    */
@@ -402,13 +433,13 @@ namespace Bonmin {
     ///Register the options of the method.
     void 
     CbcDfsDiver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-      roptions->AddLowerBoundedIntegerOption("max-backtracks-in-dive",
+      roptions->AddLowerBoundedIntegerOption("max_backtracks_in_dive",
                                                   "Set the number of backtracks in a dive when using dfs-dive tree search"
                                                   "strategy.",
                                                   0,5,
                                                   "");
 
-      roptions->AddLowerBoundedIntegerOption("max-dive-depth",
+      roptions->AddLowerBoundedIntegerOption("max_dive_depth",
                                                    "When using dfs-dive search. Maximum depth to go to from the diving "
                                                    "board (node where the diving started.",
                                                    0,INT_MAX,
@@ -419,8 +450,8 @@ namespace Bonmin {
     /// Initialize the method (get options)
     void 
     CbcDfsDiver::initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
-      options->GetIntegerValue("max-dive-depth", maxDiveDepth_,"bonmin.");
-      options->GetIntegerValue("max-backtracks-in-dive", maxDiveBacktracks_,"bonmin.");
+      options->GetIntegerValue("max_dive_depth", maxDiveDepth_,"bonmin.");
+      options->GetIntegerValue("max_backtracks_in_dive", maxDiveBacktracks_,"bonmin.");
     }
 //#endif
 

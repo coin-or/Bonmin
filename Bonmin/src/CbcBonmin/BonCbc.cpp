@@ -302,6 +302,7 @@ namespace Bonmin
     }
     else if(s.treeTraversalMethod() == BabSetupBase::DiveFromBest){
       CbcDiver treeTraversal;
+      treeTraversal.initialize(s.options());
       model_.passInTreeHandler(treeTraversal);
     }
     else if(s.treeTraversalMethod() == BabSetupBase::DfsDiveFromBest){

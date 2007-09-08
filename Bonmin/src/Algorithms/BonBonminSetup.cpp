@@ -66,6 +66,7 @@ algo_(other.algo_){
     
     BonCbcFullNodeInfo::registerOptions(roptions);
    
+    CbcDiver::registerOptions(roptions);
     CbcDfsDiver::registerOptions(roptions);
  
     registerMilpCutGenerators(roptions);
