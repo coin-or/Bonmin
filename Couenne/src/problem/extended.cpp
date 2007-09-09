@@ -129,7 +129,7 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
       }
 
 
-  for (int i=0; i < nNLCons (); i++) {
+  for (int i=0; i < nCons (); i++) {
 
     // get numerical value of lower, upper bound
     CouNumber lb = (constraints_ [i] -> Lb () -> Value ()),

@@ -36,9 +36,9 @@ bool checkNLP (CglCutGenerator *g, const double *solution, double &obj) {
     printf ("checkNLP: false objective function. %.3f != %.3f\n", realobj, obj);
   }
 
-  for (int i=0; i < p -> nNLCons (); i++) {
+  for (int i=0; i < p -> nCons (); i++) {
 
-    CouenneConstraint *c = p -> NLCon (i);
+    CouenneConstraint *c = p -> Con (i);
 
     CouNumber body = (*(c -> Body ())) (),
               lhs  = (*(c -> Lb   ())) (),

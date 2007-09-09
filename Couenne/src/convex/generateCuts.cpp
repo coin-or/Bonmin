@@ -131,12 +131,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // constraints, check if corresponding bounds are violated, and
     // add cut to cs
 
-    int nnlc = problem_ -> nNLCons ();
+    int nnlc = problem_ -> nCons ();
 
     for (int i=0; i<nnlc; i++) {
 
       // for each constraint
-      CouenneConstraint *con = problem_ -> NLCon (i);
+      CouenneConstraint *con = problem_ -> Con (i);
 
       // (which has an aux as its body)
       int index = con -> Body () -> Index ();

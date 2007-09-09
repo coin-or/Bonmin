@@ -95,6 +95,10 @@ class CouenneProblem {
   /// Number of original variables
   int nOrig_;
 
+  /// Number of original constraints (disregarding those that turned
+  /// into auxiliary variable definition)
+  int nOrigConstraints_;
+
  public:
 
   CouenneProblem  (const ASL * = NULL);     ///< Constructor
@@ -107,8 +111,9 @@ class CouenneProblem {
   /// Update value of variables and bounds
   void update (CouNumber *, CouNumber *, CouNumber *, int = -1);
 
-  int nObjs   () const {return objectives_.   size ();} ///< Get number of objectives
-  int nNLCons () const {return constraints_.  size ();} ///< Get number of constraints
+  int nObjs     () const {return objectives_.   size ();} ///< Get number of objectives
+  int nCons     () const {return constraints_.  size ();} ///< Get number of constraints
+  int nOrigCons () const {return nOrigConstraints_;}      ///< Get number of original constraints
 
   int nOrig    () const {return nOrig_;}              ///< Number of original (independent) variables
   int nIntVars () const {return nIntVars_;}           ///< Number of original integer variables
@@ -123,8 +128,8 @@ class CouenneProblem {
   {return numbering_;}
 
   // get elements from vectors
-  CouenneConstraint *NLCon (int i) const {return constraints_  [i];} ///< Pointer to i-th constraint
-  CouenneObjective  *Obj   (int i) const {return objectives_   [i];} ///< Pointer to i-th objective
+  CouenneConstraint *Con (int i) const {return constraints_  [i];} ///< Pointer to i-th constraint
+  CouenneObjective  *Obj (int i) const {return objectives_   [i];} ///< Pointer to i-th objective
 
   /// Return pointer to i-th variable
   exprVar *Var   (int i) const 

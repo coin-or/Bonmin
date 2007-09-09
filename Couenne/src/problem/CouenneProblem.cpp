@@ -57,6 +57,11 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   printf ("======================================\n");
 #endif
 
+  // save -- for statistics purposes -- number of original
+  // constraints. Some of them will be deleted as definition of
+  // auxiliary variables.
+  nOrigConstraints_ = constraints_. size ();
+
   // reformulation
   standardize ();
 
@@ -103,9 +108,9 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
 
   register int i;
 
-  for (i=0; i < p.nObjs   (); i++) objectives_  . push_back (p.Obj   (i) -> clone ());
-  for (i=0; i < p.nNLCons (); i++) constraints_ . push_back (p.NLCon (i) -> clone ());
-  for (i=0; i < p.nVars   (); i++) variables_   . push_back (p.Var   (i) -> clone ());
+  for (i=0; i < p.nObjs (); i++) objectives_  . push_back (p.Obj (i) -> clone ());
+  for (i=0; i < p.nCons (); i++) constraints_ . push_back (p.Con (i) -> clone ());
+  for (i=0; i < p.nVars (); i++) variables_   . push_back (p.Var (i) -> clone ());
 
   if (p.numbering_) {
     numbering_ = new int [i = nVars ()];
