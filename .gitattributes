@@ -17,6 +17,10 @@ Bonmin/doc/options_list.tex -text
 Bonmin/doc/options_set.tex -text
 Bonmin/doc/use.tex -text
 Bonmin/examples/CppExample/Mybonmin.opt -text
+Bonmin/examples/OptionDocGen/DocGen.cpp -text
+Bonmin/examples/OptionDocGen/Makefile.in -text
+Bonmin/examples/OptionDocGen/MyTMINLP.cpp -text
+Bonmin/examples/OptionDocGen/MyTMINLP.hpp -text
 Bonmin/examples/amplExamples/toy.mod -text
 Bonmin/experimental/Bcp/BM.par -text
 Bonmin/experimental/Bcp/BM_lp.cpp -text
