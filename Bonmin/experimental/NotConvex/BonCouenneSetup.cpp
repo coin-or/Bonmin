@@ -55,12 +55,11 @@ namespace Bonmin{
     /* Get the basic options. */
     readOptionsFile();
     
-    
     /** Change default value for failure behavior so that code doesn't crash when Ipopt does not solve a sub-problem.*/
     options_->SetStringValue("nlp_failure_behavior","fathom","bonmin.");
 
     gatherParametersValues(options_);
-    
+
     continuousSolver_ = new OsiClpSolverInterface;
     CouenneInterface * ci = new CouenneInterface;
     nonlinearSolver_ = ci;
@@ -69,20 +68,21 @@ namespace Bonmin{
     aslfg_ = new SmartAsl;
     aslfg_->asl = readASLfg (argv);
     
-    
     /* Initialize Couenne cut generator.*/
     int ivalue, num_points;
     options()->GetEnumValue("convexification_type", ivalue,"bonmin.");
     enum conv_type convtype((enum conv_type) ivalue);
     options()->GetIntegerValue("convexification_points",num_points,"bonmin.");
     
-    CouenneCutGenerator * couenneCg = new CouenneCutGenerator(ci, aslfg_->asl, true, convtype,num_points);
+    CouenneCutGenerator * couenneCg = 
+      new CouenneCutGenerator(ci, aslfg_->asl, true, convtype,num_points);
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
-    
+
     // as per instructions by John Forrest, to get changed bounds
     extraStuff -> setExtraCharacteristics (extraStuff -> extraCharacteristics () | 2);
+
     
     continuousSolver_ -> setAuxiliaryInfo (extraStuff);
     delete extraStuff;
@@ -91,13 +91,13 @@ namespace Bonmin{
     int lpLogLevel;
     options()->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
     continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+
     ci->extractLinearRelaxation(*continuousSolver_, *couenneCg);
-    
+
     if(extraStuff->infeasibleNode()){
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
       return;
     }
- 
     
     continuousSolver_->findIntegersAndSOS(false);
 

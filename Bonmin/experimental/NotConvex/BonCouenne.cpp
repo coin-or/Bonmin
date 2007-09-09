@@ -52,6 +52,7 @@ int main (int argc, char *argv[])
   }  double time1 = CoinCpuTime();
   try {
 
+
     CouenneSetup bonmin;
     bonmin.InitializeBonmin(argv);
     Bab bb;
@@ -79,7 +80,7 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (1) { // print statistics in LaTeX format
+    if (0) { // print statistics in LaTeX format
 
       ////////////////////////////////
       int nr=-1, nt=-1;
@@ -95,13 +96,15 @@ int main (int argc, char *argv[])
       if (!basename) basename = pbName;
       else basename++;
 
+      CouenneProblem *cp = cg ? cg -> Problem () : NULL;
+
       printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & ", 
 	      basename,
-	      (cg) ? cg -> Problem () -> nOrig    () : -1, 
-	      (cg) ? cg -> Problem () -> nIntVars () : -1, 
-	      (cg) ? cg -> Problem () -> nNLCons  () : -1,
-	      (cg) ? (cg -> Problem () -> nVars   () - 
-		      cg -> Problem () -> nOrig   ()): -1,
+	      (cg) ? cp -> nOrig     () : -1, 
+	      (cg) ? cp -> nIntVars  () : -1, 
+	      (cg) ? cp -> nOrigCons () : -1,
+	      (cg) ? (cp -> nVars   () - 
+		      cp -> nOrig   ()): -1,
 	      nr, nt, st);
 
       /////////////////////////////////

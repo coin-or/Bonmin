@@ -463,7 +463,7 @@ namespace Bonmin
     }
     delete si;
 
-    if (1) { // print some statistics in LaTeX format
+    if (0) { // print some statistics in LaTeX format
 
       int nr, nt;
       double st;
@@ -476,7 +476,7 @@ namespace Bonmin
       printf ("::: %6d & %6d & %6d & %6d & %6d & %6d & %8.3f & ", 
 	      cg -> Problem () -> nVars (), 
 	      cg -> Problem () -> nIntVars(), 
-	      cg -> Problem () -> nNLCons (),
+	      cg -> Problem () -> nOrigCons (),
 	      cg -> Problem () -> nAuxs (),
 	      nr, nt, st);
     }
