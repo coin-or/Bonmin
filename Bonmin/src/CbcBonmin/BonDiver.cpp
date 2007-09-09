@@ -442,7 +442,7 @@ namespace Bonmin {
       roptions->AddLowerBoundedIntegerOption("max_dive_depth",
                                                    "When using dfs-dive search. Maximum depth to go to from the diving "
                                                    "board (node where the diving started.",
-                                                   0,INT_MAX,
+                                                   0,COIN_INT_MAX,
                                                    "");
 
     }
