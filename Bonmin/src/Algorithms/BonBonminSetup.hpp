@@ -34,11 +34,11 @@ public:
     /** Register all the options for this algorithm instance.*/
     virtual void registerOptions();
     /** Setup the defaults options for this algorithm. */
-    virtual void setBabDefaultOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+    virtual void setBabDefaultOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     }
     /** @} */
     /** Register all bonmin type executable options.*/
-    static void registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
     /** Initialize, read options and create appropriate bonmin setup.*/
     void initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver = true);
     /** Initialize, read options and create appropriate bonmin setup.*/
@@ -47,7 +47,7 @@ public:
     Bonmin::Algorithm getAlgorithm();
 protected:
       /** Register standard MILP cut generators. */
-      static void registerMilpCutGenerators(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+      static void registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
     /** Add milp cut generators according to options.*/
     void addMilpCutGenerators();
     /** Initialize an plain branch-and-bound.*/

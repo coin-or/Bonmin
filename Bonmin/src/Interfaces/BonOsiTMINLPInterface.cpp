@@ -37,19 +37,21 @@ static void
 register_general_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("bonmin nlp interface option");
+  roptions->SetRegisteringCategory("bonmin nlp interface option", RegisteredOptions::BonminCategory);
   roptions->AddStringOption2("nlp_solver",
                              "Choice of the solver for local optima of continuous nlp's",
                              "Ipopt",
                              "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
                              "filterSQP", "Sequential quadratic programming trust region algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
                              "");
+  roptions->setOptionExtraInfo("nlp_solver",15);
   roptions->AddBoundedIntegerOption("nlp_log_level",
       "specify NLP solver interface log level (independent from ipopt print_level).",
       0,2,1,
       "Set the level of output of the OsiTMINLPInterface : "
       "0 - none, 1 - normal, 2 - verbose"
                                    );
+  roptions->setOptionExtraInfo("nlp_log_level",15);
 
   roptions->AddStringOption3("warm_start",
       "Select the warm start method",
@@ -58,14 +60,16 @@ register_general_options
       "optimum","Warm start with direct parent optimum",
       "interior_point","Warm start with an interior point of direct parent",
       "This will affect the function getWarmStart(), and as a consequence the wam starting in the various algorithms.");
+  roptions->setOptionExtraInfo("warm_start",8);
 
-  roptions->SetRegisteringCategory("bonmin options for robustness");
+  roptions->SetRegisteringCategory("bonmin options for robustness", RegisteredOptions::BonminCategory);
 
   roptions->AddLowerBoundedNumberOption("max_random_point_radius",
       "Set max value r for coordinate of a random point.",
       0.,1,1e5,
       "When picking a random point coordinate i will be in the interval [min(max(l,-r),u-r), max(min(u,r),l+r)] "
       "(where l is the lower bound for the variable and u is its upper bound)");
+  roptions->setOptionExtraInfo("max_random_point_radius",8);
 
   roptions->AddStringOption3("random_point_type","method to choose a random starting point",
 			     "Jon",
@@ -73,10 +77,13 @@ register_general_options
 			     "Andreas", "perturb the starting point of the problem within a prescriped interval",
 			     "Claudia", "perturb the starting point using the perturbation radius suffix information",
 			     "");
+  roptions->setOptionExtraInfo("random_point_type",8);
+
     roptions->AddLowerBoundedNumberOption("random_point_perturbation_interval",
 					   "Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point",
 					   0.,true, 1.,
 					   "");
+  roptions->setOptionExtraInfo("random_point_perturbation_interval",8);
 					   
 
   roptions->AddLowerBoundedIntegerOption
@@ -85,6 +92,7 @@ register_general_options
    -1,-1,
    "When the number of iterations to solve a node is above this number, the subproblem at this"
    " node is considered to be suspect and it will be outputed in a file (set to -1 to deactivate this).");
+  roptions->setOptionExtraInfo("num_iterations_suspect",15);
 
   
 
@@ -96,9 +104,10 @@ register_general_options
       "When Ipopt fails to solve a continuous NLP sub-problem, if $k > 0$, the algorithm will "
       "try again to solve the failed NLP with $k$ new randomly chosen starting points "
       " or until the problem is solved with success.");
+  roptions->setOptionExtraInfo("num_retry_unsolved_random_point",15);
 
 
-  roptions->SetRegisteringCategory("bonmin options for non-convex problems");
+  roptions->SetRegisteringCategory("bonmin options for non-convex problems", RegisteredOptions::BonminCategory);
 
 
   roptions->AddLowerBoundedIntegerOption("num_resolve_at_root",
@@ -106,43 +115,50 @@ register_general_options
       0,0,
       "The algorithm will solve the root node with $k$ random starting points"
       " and will keep the best local optimum found.");
+  roptions->setOptionExtraInfo("num_resolve_at_root",8);
 
   roptions->AddLowerBoundedIntegerOption("num_resolve_at_node",
       "Number $k$ of tries to resolve a node (other than the root) of the tree with different starting point.",
       0,0,
       "The algorithm will solve all the nodes with $k$ different random starting points "
       "and will keep the best local optimum found.");
+  roptions->setOptionExtraInfo("num_resolve_at_node",8);
 
   roptions->AddLowerBoundedIntegerOption("num_resolve_at_infeasibles",
       "Number $k$ of tries to resolve an infeasible node (other than the root) of the tree with different starting point.",
       0,0,
       "The algorithm will solve all the infeasible nodes with $k$ different random starting points "
       "and will keep the best local optimum found.");
+  roptions->setOptionExtraInfo("num_resolve_at_infeasibles",8);
 
 
 
+  }
+
+static void register_OA_options
+(SmartPtr<RegisteredOptions> roptions)
+{
+  roptions->SetRegisteringCategory("bonmin options : Outer Approximation cuts", RegisteredOptions::BonminCategory);
+  
   roptions->AddStringOption2("disjunctive_cut_type",
       "Determine if and what kind of disjunctive cuts should be computed.",
       "none",
       "none", "No disjunctive cuts.",
       "most-fractional", "If discrete variables present, compute disjunction for most-fractional variable");
-}
-
-static void register_OA_options
-(SmartPtr<RegisteredOptions> roptions)
-{
-  roptions->SetRegisteringCategory("bonmin options : Outer Approximation cuts");
+  roptions->setOptionExtraInfo("disjunctive_cut_type",7);
 
   roptions->AddStringOption2("oa_cuts_scope","Specify if OA cuts added are to be set globally or locally valid",
                              "global",
 			     "local","Cuts are treated as globally valid",
 			     "global", "Cuts are treated as locally valid",
 			     "");
+  roptions->setOptionExtraInfo("oa_cuts_scope",7);
 
   roptions->AddStringOption2("add_only_violated_oa","Do we add all OA cuts or only the ones violated by current point?",
 			     "no",
 			     "no","Add all cuts",
 			     "yes","Add only violated Cuts","");
+  roptions->setOptionExtraInfo("add_only_violated_oa",7);
 
   roptions->AddStringOption4("cut_strengthening_type",
                              "Determines if and what kind of cut strengthening should be performed.",
@@ -152,16 +168,19 @@ static void register_OA_options
                              "uglobal-slocal", "Unstrengthened global and strengthened local cuts",
                              "sglobal-slocal", "Strengthened global and strengthened local cuts",
                              "");
+  roptions->setOptionExtraInfo("cut_strengthening_type",7);
   
   roptions->AddLowerBoundedNumberOption("tiny_element","Value for tiny element in OA cut",
       -0.,0,1e-08,
       "We will remove \"cleanly\" (by relaxing cut) an element lower"
       " than this.");
+  roptions->setOptionExtraInfo("tiny_element",7);
 
   roptions->AddLowerBoundedNumberOption("very_tiny_element","Value for very tiny element in OA cut",
       -0.,0,1e-17,
       "Algorithm will take the risk of neglecting an element lower"
       " than this.");
+  roptions->setOptionExtraInfo("very_tiny_element",7);
 
   roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
                                          "level of log when generating OA cuts.",
@@ -170,6 +189,7 @@ static void register_OA_options
                                          "1: when a cut is generated, its violation and index of row from which it originates,\n"
                                          "2: always output violation of the cut.\n"
                                          "3: ouput generated cuts incidence vectors.");
+  roptions->setOptionExtraInfo("oa_cuts_log_level",7);
 
 }
 
@@ -349,7 +369,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
 }
 
 void 
-OsiTMINLPInterface::initialize(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+OsiTMINLPInterface::initialize(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                Ipopt::SmartPtr<Ipopt::Journalist> journalist,
                                Ipopt::SmartPtr<TMINLP> tminlp){
@@ -363,7 +383,7 @@ void OsiTMINLPInterface::setSolver(Ipopt::SmartPtr<TNLPSolver> app){
 
 
 void
-OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                       Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                       Ipopt::SmartPtr<Ipopt::Journalist> journalist
                                       )
@@ -1649,7 +1669,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       if(fabs(duals[rowIdx]) == 0.)
       {
         row2cutIdx[rowIdx] = -1;
-#ifndef NDEBUG
+#ifdef NDEBUG
         std::cerr<<"non binding constraint"<<std::endl;
 #endif
         continue;

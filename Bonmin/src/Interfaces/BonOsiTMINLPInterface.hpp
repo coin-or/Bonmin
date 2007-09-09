@@ -26,6 +26,7 @@
 #include "BonTNLP2FPNLP.hpp"
 #include "BonTNLPSolver.hpp"
 #include "BonCutStrengthener.hpp"
+#include "BonRegisteredOptions.hpp"
 
 namespace Bonmin {
 
@@ -129,7 +130,7 @@ class Messages : public CoinMessages
   OsiTMINLPInterface();
 
   /** Facilitator to initialize interface. */
-  void initialize(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+  void initialize(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                   Ipopt::SmartPtr<Ipopt::OptionsList> options,
                   Ipopt::SmartPtr<Ipopt::Journalist> journalist_,
                   Ipopt::SmartPtr<TMINLP> tminlp);
@@ -942,9 +943,9 @@ class Messages : public CoinMessages
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
   /** Register all possible options to Bonmin */
-  static void registerOptions (Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+  static void registerOptions (Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
   
-  Ipopt::SmartPtr<Ipopt::RegisteredOptions> regOptions(){
+  Ipopt::SmartPtr<Bonmin::RegisteredOptions> regOptions(){
     if(IsValid(app_))
       return app_->RegOptions();
     else
@@ -1144,7 +1145,7 @@ protected:
   //@}
 protected:
   /** Facilitator to create an application. */
-  void createApplication(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+  void createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                          Ipopt::SmartPtr<Ipopt::OptionsList> options,
                          Ipopt::SmartPtr<Ipopt::Journalist> journalist);
   ///Constructor without model only for derived classes

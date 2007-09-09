@@ -54,10 +54,10 @@ public:
 
 
   /// Constructor with passed journalist, roptions, options.
-FilterSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+FilterSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
              Ipopt::SmartPtr<Ipopt::OptionsList> options,
              Ipopt::SmartPtr<Ipopt::Journalist> journalist
-               );
+             );
 
   ///destructor
   virtual ~FilterSolver();
@@ -104,7 +104,7 @@ FilterSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
     return journalist_;}
 
   ///Get a pointer to RegisteredOptions (generally used to add new ones)
-  virtual Ipopt::SmartPtr<Ipopt::RegisteredOptions> RegOptions(){
+  virtual Ipopt::SmartPtr<Bonmin::RegisteredOptions> RegOptions(){
     return roptions_;}
   
   /// Get the options (for getting theur values).
@@ -142,7 +142,7 @@ FilterSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
 virtual int errorCode() const{
   return -1;}
    /// Register this solver options into passed roptions
-   static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+   static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 private:
   /** @name Private function members. */
   /** @{ */
@@ -159,7 +159,7 @@ private:
   Ipopt::SmartPtr<Ipopt::OptionsList> options_;
 
   /** Registered Options */
-  Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions_;
+  Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
 
 
 

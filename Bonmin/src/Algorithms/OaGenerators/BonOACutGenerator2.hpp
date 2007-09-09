@@ -49,7 +49,7 @@ namespace Bonmin
       return new OACutGenerator2(*this);
     }
     /** Register OA options.*/
-    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
 protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.

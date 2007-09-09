@@ -16,6 +16,7 @@
 #include "IpRegOptions.hpp"
 #include "IpOptionsList.hpp"
 #include "CbcCompareActual.hpp"
+#include "BonRegisteredOptions.hpp"
 #include <list>
 namespace Bonmin {
   /** Class to do diving in the tree. Principle is that branch-and-bound follows current branch of the tree untill it 
@@ -78,7 +79,7 @@ namespace Bonmin {
     }
 
     ///Register the options of the method.
-    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
    
     /// Initialize the method (get options)
     void initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
@@ -167,7 +168,7 @@ namespace Bonmin {
 
 //#ifdef COIN_HAS_BONMIN
     ///Register the options of the method.
-    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
    
     /// Initialize the method (get options)
     void initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);

@@ -88,7 +88,7 @@ namespace Bonmin
     }
 
     /** Register OaNlpOptim options.*/
-    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
   private:
     /// Pointer to the Ipopt interface

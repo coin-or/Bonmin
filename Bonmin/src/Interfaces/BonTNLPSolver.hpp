@@ -15,9 +15,8 @@
 
 //Some declarations
 #include "IpOptionsList.hpp"
-#include "IpRegOptions.hpp"
 #include "CoinWarmStart.hpp"
-
+#include "BonRegisteredOptions.hpp"
 namespace Bonmin  {
 /** This is a generic class for calling an NLP solver to solve a TNLP.
     A TNLPSolver is able to solve and resolve a problem, it has some options (stored
@@ -100,7 +99,7 @@ class TNLPSolver: public Ipopt::ReferencedObject{
    TNLPSolver();
 
   ///Constructor with options initialization
-TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
            Ipopt::SmartPtr<Ipopt::OptionsList> options,
            Ipopt::SmartPtr<Ipopt::Journalist> journalist);
 
@@ -146,7 +145,7 @@ TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
   virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst() = 0;
 
    ///Get a pointer to RegisteredOptions (generally used to add new ones)
-   virtual Ipopt::SmartPtr<Ipopt::RegisteredOptions> RegOptions() = 0;
+   virtual Ipopt::SmartPtr<Bonmin::RegisteredOptions> RegOptions() = 0;
 
    /// Get the options (for getting their values).
    virtual Ipopt::SmartPtr<const Ipopt::OptionsList> Options() const = 0;
@@ -155,7 +154,7 @@ TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
    virtual Ipopt::SmartPtr<Ipopt::OptionsList> Options() = 0;
 
    /// Register this solver options into passed roptions
-static void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){}
+static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){}
 
    /// Get the CpuTime of the last optimization.
    virtual double CPUTime() = 0;

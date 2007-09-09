@@ -264,7 +264,7 @@ extern int usingCouenne;
 
             if(feasible && isInteger)
              {
-	       bool changed;
+	       bool changed = false;
 	       if(!usingCouenne)
 		 changed = nlpManip.isDifferentOnIntegers(colsol);//If integer solution is the same as nlp
                                                                    //solution problem is solved
@@ -304,9 +304,9 @@ extern int usingCouenne;
 
 /** Register OA options.*/
 void 
-OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
+OACutGenerator2::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("bonmin options : Options for OA decomposition");
+  roptions->SetRegisteringCategory("bonmin options : Options for OA decomposition", RegisteredOptions::BonminCategory);
   roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
                                         "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
                                         0.,0,30.,
@@ -324,7 +324,7 @@ OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                         0.,1.,100.,
                                         "");
   
-  roptions->SetRegisteringCategory("bonmin options : Options for MILP subsolver in OA decomposition");
+  roptions->SetRegisteringCategory("bonmin options : Options for MILP subsolver in OA decomposition", RegisteredOptions::BonminCategory);
   roptions->AddStringOption3("milp_subsolver",
                              "Choose the subsolver to solve MILPs sub-problems in OA decompositions.",
                              "Cbc_D",
@@ -332,7 +332,7 @@ OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "Cbc_Par", "Coin Branch and Cut with passed parameters",
                              "Cplex","Ilog Cplex",
                              " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
-  
+  roptions->setOptionExtraInfo("milp_subsolver",5); 
   
   roptions->AddBoundedIntegerOption("milp_log_level",
                                     "specify MILP subsolver log level.",
@@ -340,6 +340,7 @@ OACutGenerator2::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                     "Set the level of output of the MILP subsolver in OA : "
                                     "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                     );
+  roptions->setOptionExtraInfo("milp_log_level",5); 
 
   
 }

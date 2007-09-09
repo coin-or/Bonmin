@@ -62,8 +62,8 @@ namespace Bonmin{
   std::string BqpdSolver::solverName_ = "Bqpd QP";
 
   void BqpdSolver::
-  registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("Bqpd options");
+  registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+    roptions->SetRegisteringCategory("Bqpd options",RegisteredOptions::BqpdCategory);
   }
 
   BqpdSolver::BqpdSolver(bool createEmpty /* = false */)
@@ -74,7 +74,7 @@ namespace Bonmin{
     if (createEmpty) return;
 
     journalist_= new Ipopt::Journalist();
-    roptions_ = new Ipopt::RegisteredOptions();
+    roptions_ = new Bonmin::RegisteredOptions();
   
     try{
       Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
@@ -83,7 +83,7 @@ namespace Bonmin{
       registerOptions();
 
       options_->SetJournalist(journalist_);
-      options_->SetRegisteredOptions(roptions_);
+      options_->SetRegisteredOptions(GetRawPtr(roptions_));
     }
     catch (Ipopt::IpoptException &E){
       E.ReportException(*journalist_);
@@ -100,7 +100,7 @@ namespace Bonmin{
     }
   }
 
-  BqpdSolver::BqpdSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+  BqpdSolver::BqpdSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
 			 Ipopt::SmartPtr<Ipopt::OptionsList> options,
 			 Ipopt::SmartPtr<Ipopt::Journalist> journalist)
     :

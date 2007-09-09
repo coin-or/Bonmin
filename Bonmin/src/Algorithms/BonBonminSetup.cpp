@@ -50,7 +50,7 @@ namespace Bonmin{
 algo_(other.algo_){
   }
   
-  void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+  void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     BabSetupBase::registerAllOptions(roptions);
     /* Branching options.*/
     LpBranchingSolver::registerOptions(roptions);
@@ -71,7 +71,7 @@ algo_(other.algo_){
  
     registerMilpCutGenerators(roptions);
     
-    roptions->SetRegisteringCategory("Bonmin algotihm choice");
+    roptions->SetRegisteringCategory("Bonmin algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption4("algorithm",
                                "Choice of the algorithm.",
                                "B-Hyb",
@@ -81,6 +81,7 @@ algo_(other.algo_){
                                "B-Hyb","hybrid outer approximation based branch-and-cut.",
                                "This will preset some of the options of bonmin depending on the algorithm choice."
                                );
+    roptions->setOptionExtraInfo("algorithm",31);
   }
   
   /** Register all the Bonmin options.*/
@@ -115,8 +116,8 @@ algo_(other.algo_){
   
   /** Register standard MILP cut generators. */
   void 
-  BonminSetup::registerMilpCutGenerators(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("bonmin options for MILP cutting planes");
+  BonminSetup::registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+    roptions->SetRegisteringCategory("bonmin options for MILP cutting planes", RegisteredOptions::BonminCategory);
     
     roptions->AddLowerBoundedIntegerOption("Gomory_cuts",
                                            "Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.",
@@ -124,12 +125,14 @@ algo_(other.algo_){
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("Gomory_cuts",5);
     roptions->AddLowerBoundedIntegerOption("probing_cuts",
                                            "Frequency (in terms of nodes) for generating probing cuts in branch-and-cut",
                                            -100,-5,
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("probing_cuts",5);
     
     roptions->AddLowerBoundedIntegerOption("cover_cuts",
                                            "Frequency (in terms of nodes) for generating cover cuts in branch-and-cut",
@@ -137,6 +140,7 @@ algo_(other.algo_){
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("cover_cuts",5);
     
     roptions->AddLowerBoundedIntegerOption("mir_cuts",
                                            "Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut",
@@ -144,36 +148,42 @@ algo_(other.algo_){
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("mir_cuts",5);
     roptions->AddLowerBoundedIntegerOption("2mir_cuts",
                                            "Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut",
                                            -100,0,
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("2mir_cuts",5);
     roptions->AddLowerBoundedIntegerOption("flow_covers_cuts",
                                            "Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut",
                                            -100,-5,
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("flow_covers_cuts",5);
     roptions->AddLowerBoundedIntegerOption("lift_and_project_cuts",
                                            "Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut",
                                            -100,0,
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("lift_and_project_cuts",5);
     roptions->AddLowerBoundedIntegerOption("reduce_and_split_cuts",
                                            "Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut",
                                            -100,0,
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("reduce_and_split_cuts",5);
     roptions->AddLowerBoundedIntegerOption("clique_cuts",
                                            "Frequency (in terms of nodes) for generating clique cuts in branch-and-cut",
                                            -100,-5,
                                            "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
                                            "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
                                            "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+    roptions->setOptionExtraInfo("clique_cuts",5);
   }
   /** Add milp cut generators according to options.*/
   void 

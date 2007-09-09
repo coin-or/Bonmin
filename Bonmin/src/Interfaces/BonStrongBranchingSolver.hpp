@@ -7,7 +7,7 @@
 #define BonStrongBranchingSolver_H
 
 #include "BonOsiTMINLPInterface.hpp"
-
+#include "BonRegisteredOptions.hpp"
 namespace Bonmin {
 
 /** This class is the base class for a solver that can be used in
@@ -59,7 +59,7 @@ private:
 
   SmartPtr<Journalist> jnlst_;
   SmartPtr<OptionsList> options_;
-  SmartPtr<RegisteredOptions> reg_options_;
+  SmartPtr<Bonmin::RegisteredOptions> reg_options_;
 
   int bb_log_level_;
 

@@ -71,10 +71,10 @@ namespace Bonmin
   }
   
   void
-  BonCbcFullNodeInfo::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+  BonCbcFullNodeInfo::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     
     
-    roptions->SetRegisteringCategory("bonmin options for non-convex problems");
+    roptions->SetRegisteringCategory("bonmin options for non-convex problems", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption("max_consecutive_infeasible",
                                            "Number of consecutive infeasible subproblems before aborting a"
                                            " branch.",
@@ -82,7 +82,7 @@ namespace Bonmin
                                            "Will continue exploring a branch of the tree until \"max_consecutive_infeasible\""
                                            "consecutive problems are infeasibles by the NLP sub-solver.");
     
-    roptions->SetRegisteringCategory("bonmin options for robustness"); 
+    roptions->SetRegisteringCategory("bonmin options for robustness", RegisteredOptions::BonminCategory); 
     roptions->AddLowerBoundedIntegerOption
     ("max_consecutive_failures",
    "(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.",

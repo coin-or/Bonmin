@@ -41,7 +41,7 @@ namespace Bonmin{
   {
   }
 
-  TNLPSolver::TNLPSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+  TNLPSolver::TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
     Ipopt::SmartPtr<Ipopt::OptionsList> options,
     Ipopt::SmartPtr<Ipopt::Journalist> journalist)
   {

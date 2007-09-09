@@ -36,7 +36,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
 	BonBranchingTQP.cpp BonBranchingTQP.hpp \
-	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp
+	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp \
+     BonRegisteredOption.hpp BonRegisteredOptions.cpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
@@ -86,7 +87,8 @@ include_HEADERS = \
      BonTNLP2FPNLP.hpp \
      BonCutStrengthener.hpp \
      BonTNLPSolver.hpp \
-     BonBranchingTQP.hpp
+     BonBranchingTQP.hpp \
+     BonRegisteredOptions.hpp
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #

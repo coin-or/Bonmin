@@ -175,22 +175,26 @@ solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
 }
 
 void
-LpBranchingSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+LpBranchingSolver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+  roptions->SetRegisteringCategory("Bonmin ecp based strong branching",RegisteredOptions::BonminCategory);
   roptions->AddLowerBoundedIntegerOption
     ("ecp_max_rounds_strong",
      "Set the maximal number of rounds of ECP cuts in strong branching.",
      0,5,
      "");
+  roptions->setOptionExtraInfo("ecp_max_rounds_strong",15);
   roptions->AddLowerBoundedNumberOption
     ("ecp_abs_tol_strong",
      "Set the absolute termination tolerance for ECP rounds in strong branching.",
      0,false,1e-6,
      "");
+  roptions->setOptionExtraInfo("ecp_abs_tol_strong",15);
   roptions->AddLowerBoundedNumberOption
     ("ecp_rel_tol_strong",
      "Set the relative termination tolerance for ECP rounds in strong branching.",
      0,false,1e-1,
      "");
+  roptions->setOptionExtraInfo("ecp_rel_tol_strong",15);
 }
 
 }

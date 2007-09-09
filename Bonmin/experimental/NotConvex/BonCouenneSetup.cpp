@@ -193,11 +193,11 @@ void CouenneSetup::registerOptions(){
 
 
 void
-  CouenneSetup::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+  CouenneSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
 
-    roptions->SetRegisteringCategory("Couenne options");
+    roptions->SetRegisteringCategory("Couenne options", RegisteredOptions::CouenneCategory);
     
     roptions->AddLowerBoundedIntegerOption("convexification_cuts",
                                            "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",

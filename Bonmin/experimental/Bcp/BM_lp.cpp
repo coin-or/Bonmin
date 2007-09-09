@@ -256,8 +256,7 @@ BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
 	}
 	if (lower_bound_ > upper_bound()-get_param(BCP_lp_par::Granularity) &&
 	    par.entry(BM_par::PrintBranchingInfo)) {
-	    printf("\
-BM_lp: At node %i : will fathom because of high lower bound\n",
+	    printf("BM_lp: At node %i : will fathom because of high lower bound\n",
 		   current_index());
 	}
     }
@@ -267,8 +266,7 @@ BM_lp: At node %i : will fathom because of high lower bound\n",
 	lower_bound_ = 1e200;
 	numNlpFailed_ = 0;
 	if (par.entry(BM_par::PrintBranchingInfo)) {
-	    printf("\
-BM_lp: At node %i : will fathom because of infeasibility\n",
+	    printf("BM_lp: At node %i : will fathom because of infeasibility\n",
 		   current_index());
 	}
     }

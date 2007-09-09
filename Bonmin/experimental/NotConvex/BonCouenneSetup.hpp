@@ -49,7 +49,7 @@ public:
     /** register the options */
     virtual void registerOptions();
     /** Register all Couenne options.*/
-    static void registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
     
     /** Get the basic options if don't already have them.*/
     virtual void readOptionsFile(){

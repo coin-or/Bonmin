@@ -74,6 +74,7 @@ public:
       SpecialOption /** Spetial option in particular for Cbc. */,
       DisableSos /** Consider or not SOS constraints.*/,
       NumCutPasses/** Number of cut passes at nodes.*/,
+      NumCutPassesAtRoot/** Number of cut passes at nodes.*/,
       NumberIntParam /** Dummy end to size table*/
     };
 
@@ -125,9 +126,9 @@ public:
     /** Register all the options for this algorithm instance.*/
     virtual void registerOptions();
     /** Setup the defaults options for this algorithm. */
-    virtual void setBabDefaultOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions) {}
+    virtual void setBabDefaultOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions) {}
     /** Register all the options for this algorithm instance.*/
-    static void registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
     /** Get the options from default text file (bonmin.opt) if don't already have them.*/
     virtual void readOptionsFile(){
@@ -148,7 +149,7 @@ public:
     
 
     /** Set the value for options, output...*/
-    void setOptionsAndJournalist(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+    void setOptionsAndJournalist(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                  Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                  Ipopt::SmartPtr<Ipopt::Journalist> journalist){
       options_ = options;
@@ -203,7 +204,7 @@ public:
     Ipopt::SmartPtr<Ipopt::OptionsList> options(){return options_;}
     
     /** Access registered Options */
-    Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions(){return roptions_;}
+    Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions(){return roptions_;}
     
 protected:
     /** storage of integer parameters.*/
@@ -235,7 +236,7 @@ protected:
     Ipopt::SmartPtr<Ipopt::OptionsList> options_;
     
     /** Registered Options */
-    Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions_;
+    Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
     /** flag to say if option file was read.*/
     bool readOptions_;
     /** separate message handler if continuousSolver_!= nonlinearSolver.*/

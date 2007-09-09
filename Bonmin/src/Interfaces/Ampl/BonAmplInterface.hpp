@@ -27,7 +27,7 @@ namespace Bonmin
     AmplInterface();
     /**@name Methods to input a problem */
     //@{    
-        virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+        virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                     Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                     Ipopt::SmartPtr<Ipopt::Journalist> journalist,
                                     std::string* nl_file_content  = NULL);

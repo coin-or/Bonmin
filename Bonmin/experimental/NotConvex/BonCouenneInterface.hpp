@@ -37,7 +37,7 @@ class CouenneInterface : public AmplInterface
 
     
   /** read ampl file using inputed options, journalist....*/
-  virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+  virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                               Ipopt::SmartPtr<Ipopt::OptionsList> options,
                               Ipopt::SmartPtr<Ipopt::Journalist> journalist);
   

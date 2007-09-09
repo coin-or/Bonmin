@@ -12,7 +12,7 @@
 #define BonminCbcNode_H
 
 #include "CbcNode.hpp"
-#include "IpRegOptions.hpp"
+#include "BonRegisteredOptions.hpp"
 
 
 namespace Bonmin
@@ -60,7 +60,7 @@ namespace Bonmin
       return sequenceOfUnsolvedSize_;
     }
     /** Register all the options for class instance.*/
-    static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
   private:
     /* Data values */

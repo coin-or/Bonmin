@@ -31,7 +31,8 @@ namespace Bonmin{
   COIN_INT_MAX /* MaxIterations*/,
   0 /* SpecialOption*/,
   0 /* DisableSos.*/,
-  1 /* numCutPasses.*/
+  1 /* numCutPasses.*/,
+  20 /* numCutPassesAtRoot.*/
 };
 
 
@@ -207,6 +208,7 @@ BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options){
   options->GetIntegerValue("iteration_limit",intParam_[MaxIterations],"bonmin.");
   options->GetEnumValue("sos_constraints",intParam_[DisableSos],"bonmin.");
   options->GetIntegerValue("num_cut_passes",intParam_[NumCutPasses],"bonmin.");
+  options->GetIntegerValue("num_cut_passes_at_root",intParam_[NumCutPassesAtRoot],"bonmin.");
   
   options->GetNumericValue("cutoff_decr",doubleParam_[CutoffDecr],"bonmin.");
   options->GetNumericValue("cutoff",doubleParam_[Cutoff],"bonmin.");
@@ -243,10 +245,10 @@ BabSetupBase::registerOptions(){
 }
 
 void 
-BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
+BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
   OsiTMINLPInterface::registerOptions(roptions);
   /* BabSetup options.*/
-  roptions->SetRegisteringCategory("bonmin output options");
+  roptions->SetRegisteringCategory("bonmin output options", RegisteredOptions::BonminCategory);
   
   roptions->AddBoundedIntegerOption("bb_log_level",
                                     "specify main branch-and-bound log level.",
@@ -254,12 +256,14 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                     "Set the level of output of the branch-and-bound : "
                                     "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                     );
+  roptions->setOptionExtraInfo("bb_log_level", 11);
   
   roptions->AddLowerBoundedIntegerOption("bb_log_interval",
                                          "Interval at which node level output is printed.",
                                          0,100,
                                          "Set the interval (in terms of number of nodes) at which "
                                          "a log on node resolutions (consisting of lower and upper bounds) is given.");
+  roptions->setOptionExtraInfo("bb_log_interval", 11);
   
   roptions->AddBoundedIntegerOption("lp_log_level",
                                     "specify LP log level.",
@@ -267,39 +271,46 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                     "Set the level of output of the linear programming sub-solver in B-Hyb or B-QG : "
                                     "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
                                     );
+  roptions->setOptionExtraInfo("lp_log_level", 3);
   
-  roptions->SetRegisteringCategory("bonmin branch-and-bound options");
+  roptions->SetRegisteringCategory("bonmin branch-and-bound options", RegisteredOptions::BonminCategory);
   
   roptions->AddLowerBoundedNumberOption("time_limit",
                                         "Set the global maximum computation time (in secs) for the algorithm.",
                                         0.,1,1e10,
                                         "");
+  roptions->setOptionExtraInfo("time_limit", 31);
   
   roptions->AddLowerBoundedIntegerOption("node_limit",
                                          "Set the maximum number of nodes explored in the branch-and-bound search.",
                                          0,COIN_INT_MAX,
                                          "");
+  roptions->setOptionExtraInfo("node_limit", 31);
   
   roptions->AddLowerBoundedIntegerOption("iteration_limit",
                                          "Set the cummulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
                                          0,COIN_INT_MAX,
                                          "value 0 deactivates option.");
+  roptions->setOptionExtraInfo("iteration_limit", 31);
   
   roptions->AddLowerBoundedIntegerOption("solution_limit",
                                          "Abort after that much integer feasible solution have been found by algorithm",
                                          0,COIN_INT_MAX,
                                          "value 0 deactivates option");
-  
+  roptions->setOptionExtraInfo("solution_limit", 31);
+ 
   roptions->AddBoundedNumberOption("integer_tolerance",
                                    "Set integer tolerance.",
                                    0.,1,.5,1,1e-06,
                                    "Any number within that value of an integer is considered integer.");
+  roptions->setOptionExtraInfo("integer_tolerance", 31);
   
   roptions->AddBoundedNumberOption("allowable_gap",
                                    "Specify the value of absolute gap under which the algorithm stops.",
                                    -1.e20,0,1.e20,0,0.,
                                    "Stop the tree search when the gap between the objective value of the best known solution"
                                    " and the best bound on the objective of any solution is less than this.");
+  roptions->setOptionExtraInfo("allowable_gap", 31);
   
   roptions->AddBoundedNumberOption("allowable_fraction_gap",
                                    "Specify the value of relative gap under which the algorithm stops.",
@@ -307,12 +318,14 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                    "Stop the tree search when the gap between the objective value of the best known solution "
                                    "and the best bound on the objective of any solution is less than this "
                                    "fraction of the absolute value of the best known solution value.");
+  roptions->setOptionExtraInfo("allowable_fraction_gap", 31);
   
   roptions->AddBoundedNumberOption("cutoff",
                                    "Specify cutoff value.",
                                    -1e100,0,1e100,0,1e100,
                                    "cutoff should be the value of a feasible solution known by the user "
                                    "(if any). The algorithm will only look for solutions better than cutoof.");
+  roptions->setOptionExtraInfo("cutoff", 31);
   
   
   roptions->AddBoundedNumberOption("cutoff_decr",
@@ -321,6 +334,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                                    "Specify the amount by which cutoff is decremented below "
                                    "a new best upper-bound"
                                    " (usually a small postive value but in non-convex problems it may be a negative value).");
+  roptions->setOptionExtraInfo("cutoff_decr", 31);
   
   
   roptions->AddStringOption5("node_comparison",
@@ -333,6 +347,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "integer feasible solutions have been found).",
 			     "best-guess", "choose node with smallest guessed integer solution",
                              "Choose the strategy for selecting the next node to be processed.");
+  roptions->setOptionExtraInfo("node_comparison", 31);
 
   roptions->AddStringOption4("tree_search_strategy",
 			     "Pick a strategy for traversing the tree",
@@ -350,11 +365,13 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "Options which affect dfs-dive are max-backtracks-in-dive and max-dive-depth. "
                              "The dfs-dive won't work in a non-convex problem where objective does not decrease down branches."
                               ); 
+  roptions->setOptionExtraInfo("tree_search_strategy", 31);
   
   roptions->AddLowerBoundedIntegerOption("number_strong_branch",
                                          "Choose the maximum number of variables considered for strong branching.",
                                          0,20,
                                          "Set the number of variables on which to do strong branching.");
+  roptions->setOptionExtraInfo("number_strong_branch", 31);
   
   roptions->AddLowerBoundedIntegerOption
     ("number_before_trust",
@@ -362,6 +379,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
      "in dynamic strong branching.",
      -1,8,
      "A value of -1 disables pseudo costs.");
+  roptions->setOptionExtraInfo("number_before_trust", 31);
   
   roptions->AddStringOption2("nlp_failure_behavior",
                              "Set the behavior when an NLP or a series of NLP are unsolved by Ipopt (we call unsolved an NLP for which Ipopt is not "
@@ -372,6 +390,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "If set to \"fathom\", the algorithm will fathom the node when Ipopt fails to find a solution to the nlp "
                              "at that node whithin the specified tolerances. "
                              "The algorithm then becomes a heuristic, and the user will be warned that the solution might not be optimal.");
+  roptions->setOptionExtraInfo("nlp_failure_behavior", 31);
   
   roptions->AddStringOption2("sos_constraints",
                              "Wether or not to activate SOS constraints.",
@@ -379,6 +398,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "enable","",
                              "disable","",
                              "(only type 1 SOS are supported at the moment)");
+  roptions->setOptionExtraInfo("sos_constraints", 11);
   
   roptions->AddStringOption9("varselect_stra",
                              "Chooses variable selection strategy",
@@ -392,13 +412,21 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> ropti
                              "nlp-strong-branching", "Perform strong branching with NLP approximation",
                              "osi-simple", "Osi method to do simple branching",
                              "osi-strong", "Osi method to do strong branching","");
+  roptions->setOptionExtraInfo("varselect_stra", 15);
   
   roptions->AddLowerBoundedIntegerOption("num_cut_passes",
                                          "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
                                          0,1,
                                          "");
+  roptions->setOptionExtraInfo("num_cut_passes", 7);
 
-  roptions->SetRegisteringCategory("bonmin experimental options");
+  roptions->AddLowerBoundedIntegerOption("num_cut_passes_at_root",
+                                         "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
+                                         0,20,
+                                         "");
+  roptions->setOptionExtraInfo("num_cut_passes_at_root", 7);
+
+  roptions->SetRegisteringCategory("bonmin experimental options",  RegisteredOptions::BonminCategory);
   // Some options for the strong branching and pseudo-costs that we
   // still expored
   roptions->AddBoundedNumberOption("setup_pseudo_frac", "Proportion of strong branching list that has to be taken from most-integer-infeasible list.",
@@ -423,14 +451,14 @@ BabSetupBase::initializeOptionsAndJournalist(){
   options_ = new Ipopt::OptionsList();
   
   journalist_= new Ipopt::Journalist();
-  roptions_ = new Ipopt::RegisteredOptions();
+  roptions_ = new Bonmin::RegisteredOptions();
   
   try{
     Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
     journalist_->AddFileJournal("console", "stdout", Ipopt::J_ITERSUMMARY);
     
     options_->SetJournalist(journalist_);
-    options_->SetRegisteredOptions(roptions_);
+    options_->SetRegisteredOptions(GetRawPtr(roptions_));
   }
   catch (Ipopt::IpoptException &E){
     E.ReportException(*journalist_);

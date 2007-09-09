@@ -127,32 +127,36 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
 }
 
 void
-EcpCuts::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-  roptions->SetRegisteringCategory("bonmin options : Options for ecp cuts generation");
+EcpCuts::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+  roptions->SetRegisteringCategory("bonmin options : Options for ecp cuts generation", RegisteredOptions::BonminCategory);
   roptions->AddLowerBoundedIntegerOption("filmint_ecp_cuts",
                                          "Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.",
                                          0,0,
                                          "A frequency of 0 amounts to to never solve the NLP relaxation.");
-  
+  roptions->setOptionExtraInfo("filmint_ecp_cuts",1); 
   roptions->AddLowerBoundedIntegerOption
     ("ecp_max_rounds",
      "Set the maximal number of rounds of ECP cuts.",
      0,5,
      "");
+  roptions->setOptionExtraInfo("ecp_max_rounds",1); 
   roptions->AddLowerBoundedNumberOption
     ("ecp_abs_tol",
      "Set the absolute termination tolerance for ECP rounds.",
      0,false,1e-6,
      "");
+  roptions->setOptionExtraInfo("ecp_abs_tol",1); 
   roptions->AddLowerBoundedNumberOption
     ("ecp_rel_tol",
      "Set the relative termination tolerance for ECP rounds.",
      0,false,0.,
      "");
+  roptions->setOptionExtraInfo("ecp_rel_tol",1); 
   roptions->AddNumberOption
     ("ecp_propability_factor",
      "Factor appearing in formula for skipping ECP cuts.",
      1000.,
      "Choosing -1 disables the skipping.");
+  roptions->setOptionExtraInfo("ecp_propability_factor",1); 
 }
 } // end namespace bonmin.

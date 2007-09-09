@@ -82,6 +82,29 @@ namespace Bonmin
   int
   CbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFrom)
   {
+
+#if 0
+    if(whereFrom == 1){
+       std::cerr<<"Node "<<parent<<" same as ? "<<model->currentNode()->nodeInfo()<<std::endl;
+       CbcNodeInfo * current = parent;
+       CbcNodeInfo * father = current->parent();
+       int fatherNumber = -1;
+       int nodeNumber = current->nodeNumber();
+       std::string way;
+       int branch_var;
+       if(father != NULL){
+          fatherNumber = father->nodeNumber();
+          way = (model->currentNode()->way()==1) ? "Down": "Up";
+          //branch_var = model->currentNode()->variable();
+       }
+       std::cout<<"node: "<<model->getNodeCount2()
+                <<"father: "<<nodeNumber
+                <<" , grand-father "<<fatherNumber
+                <<". Branched  way "<<way
+                //<<" on variable "
+                <<std::endl;
+    }
+#endif
     OsiSolverInterface * solver = model->solver();//get solver
     int feasible = 1;
     bool solved = true;

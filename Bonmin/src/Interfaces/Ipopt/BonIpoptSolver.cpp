@@ -30,11 +30,12 @@ namespace Bonmin{
     optimized_before_(false)
   {
     if(createEmpty) return;
-    app_ = new Ipopt::IpoptApplication();
+    roptions_ = new Bonmin::RegisteredOptions;
+    app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions_));
   }
 
   /// Constructor with Passed in journalist, registered options, options
-  IpoptSolver::IpoptSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+  IpoptSolver::IpoptSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                            Ipopt::SmartPtr<Ipopt::OptionsList> options,
                            Ipopt::SmartPtr<Ipopt::Journalist> journalist):
   TNLPSolver(roptions, options, journalist),
@@ -43,7 +44,8 @@ namespace Bonmin{
   enable_warm_start_(false),
   optimized_before_(false)
 {
-    app_ = new Ipopt::IpoptApplication(roptions, options, journalist);
+    roptions_ = roptions;
+    app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions), options, journalist);
 }
   
   IpoptSolver::~IpoptSolver(){}
@@ -157,10 +159,11 @@ namespace Bonmin{
   IpoptSolver::Jnlst()
   {return app_->Jnlst();}
 
-  Ipopt::SmartPtr<Ipopt::RegisteredOptions>
+  Ipopt::SmartPtr<Bonmin::RegisteredOptions>
   IpoptSolver::RegOptions()
   {
-    return app_->RegOptions();
+    throw -1;
+    return roptions_;
   }
 
   Ipopt::SmartPtr<const Ipopt::OptionsList>

@@ -38,7 +38,7 @@ CouenneInterface::~CouenneInterface(){
 
 
 void 
-CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                  Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                  Ipopt::SmartPtr<Ipopt::Journalist> journalist){
   AmplInterface::readAmplNlFile(argv, roptions, options, journalist);

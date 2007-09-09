@@ -44,7 +44,7 @@ class UnsolvedIpoptError: public TNLPSolver::UnsolvedError
   IpoptSolver(bool createEmpty = false);
 
 /// Constructor with Passed in journalist, registered options, options
-IpoptSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+IpoptSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
             Ipopt::SmartPtr<Ipopt::OptionsList> options,
             Ipopt::SmartPtr<Ipopt::Journalist> journalist);
 
@@ -93,7 +93,7 @@ IpoptSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
   virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst();
 
   ///Get a pointer to RegisteredOptions (generally used to add new ones)
-  virtual Ipopt::SmartPtr<Ipopt::RegisteredOptions> RegOptions();
+  virtual Ipopt::SmartPtr<Bonmin::RegisteredOptions> RegOptions();
 
   /// Get the options (for getting their values).
   virtual Ipopt::SmartPtr<const Ipopt::OptionsList> Options() const;
@@ -117,8 +117,8 @@ IpoptSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
     return solverName_;}
 
    /// Register this solver options into passed roptions
-   static void RegisterOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-     Ipopt::IpoptApplication::RegisterAllIpoptOptions(roptions);
+   static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+     Ipopt::IpoptApplication::RegisterAllIpoptOptions(GetRawPtr(roptions));
    }
 
 
@@ -168,7 +168,8 @@ virtual int errorCode() const{
   /** flag remembering if we have call the Optimize method of the
       IpoptInterface before */
   bool optimized_before_;
-
+  /** Store Bonmin::RegisteredOptions.*/
+  Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
   //name of solver (Ipopt)
   static std::string  solverName_;
 };

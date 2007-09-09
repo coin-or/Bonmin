@@ -41,7 +41,7 @@ public:
     maxCuttingPlaneIterations_ = num;
   }
 
- static void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions);
+ static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
 private:
   /// Default Constructor 

@@ -317,8 +317,8 @@ namespace Bonmin{
   std::string FilterSolver::solverName_ = "filter SQP";
 
 void
-FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions){
-  roptions->SetRegisteringCategory("FilterSQP options");
+FilterSolver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+  roptions->SetRegisteringCategory("FilterSQP options", RegisteredOptions::FilterCategory);
   roptions->AddLowerBoundedNumberOption("eps", "Tolerance for SQP solver",
 					0., 1, 1e-06, "");
   roptions->AddLowerBoundedNumberOption("infty","A large number (1E20)",0.,1, 1e20, "");
@@ -347,7 +347,7 @@ FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
   if (createEmpty) return;
 
   journalist_= new Ipopt::Journalist();
-  roptions_ = new Ipopt::RegisteredOptions();
+  roptions_ = new Bonmin::RegisteredOptions();
   
   try{
     Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
@@ -356,7 +356,7 @@ FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
     registerOptions();
 
     options_->SetJournalist(journalist_);
-    options_->SetRegisteredOptions(roptions_);
+    options_->SetRegisteredOptions(GetRawPtr(roptions_));
   }
   catch (Ipopt::IpoptException &E){
     E.ReportException(*journalist_);
@@ -373,7 +373,7 @@ FilterSolver::registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions
   }
 }
 
-FilterSolver::FilterSolver(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions,
+FilterSolver::FilterSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                            Ipopt::SmartPtr<Ipopt::OptionsList> options,
                            Ipopt::SmartPtr<Ipopt::Journalist> journalist):
 
