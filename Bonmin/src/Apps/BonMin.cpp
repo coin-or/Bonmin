@@ -40,7 +40,6 @@ int main (int argc, char *argv[])
 
     BonminAmplSetup bonmin;
     bonmin.initialize(argv);
-    bonmin.roptions()->writeLatexOptionsTable(std::cout, Bonmin::RegisteredOptions::BonminCategory);
     Bab bb;
 
     bb(bonmin);//do branch and bound
