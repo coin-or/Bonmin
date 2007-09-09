@@ -23,7 +23,7 @@ void analyzeSparsity (CouenneProblem *p, CouNumber c0,
 		      std::map <int,                 CouNumber> &lmap,
 		      std::map <std::pair <int,int>, CouNumber> &qmap) {
 
-  return;
+  //  return;
 
   for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.begin ();
        i != qmap.end (); i++) {

@@ -54,7 +54,7 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
     // we will put in the dIndex_ array
 
     int *qindexI = getQIndexI (),
-      *qindexJ = getQIndexJ ();
+        *qindexJ = getQIndexJ ();
 
     nDiag_=0;
 

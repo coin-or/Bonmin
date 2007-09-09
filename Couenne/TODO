@@ -1,8 +1,11 @@
+- Fix excessively large coefficients
+- Fix branching point, always too close to current bound
+- recognize convex objectives/constraints and apply OA
 - do not apply obbt to auxs of the form w = cx 
-- change chg structure within createCuts when add colCut
+- change chg_bds structure within createCuts when add colCut
 - apply bound tightening AFTER applying branching rule but BEFORE re-solving LP
 - decompose quad form if block diagonal ONLY when looking for $\alpha_i$ (Jon), then use joint convexification
-- field quadCut_ for each expression (unary too! e.g. exp (log (x)) gives gap), especially prod/sum/div
+- field quadCut_ for each expression (unary too! eg exp (log (x)) gives gap), especially prod/sum/div
 - similarity () method to check degree of similarity in expressions (1 if compare() gives true)
 - check common subexpressions in different constraints (e.g. min {x^2 + y^2: xy >=3} can use quad cut)
 - quad form from explicit quadratic expressions
@@ -15,10 +18,9 @@
 - add integrality to bound check
 - decomposition approach
 - unify products and divisions
-- linear convexification has an acyclic structure where x are leaves
+- linear convexification has an acyclic structure where x are leaves. How to exploit it?
 - recognition of quadratic forms
-- q.f. partitioning into PD + nonconvex
-- (reverse Polish notation)-based evaluation for efficiency
+- (reverse Polish notation)-based evaluation, for efficiency
 - create CouenneTMINLP interface for Ipopt
 - separate function evaluation lib from convexification
 - QQP convexification

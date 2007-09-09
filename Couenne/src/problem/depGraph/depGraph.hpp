@@ -133,6 +133,9 @@ public:
 
   /// search for node in vertex set
   DepNode *lookup (int index);
+
+  /// check for dependence cycles in graph
+  bool checkCycles ();
 };
 
 #endif

@@ -33,9 +33,9 @@ CouNumber exprMul::selectBranch (expression *w,
     exit (-1);
   }
 
-  CouNumber x0 = expression::Variable (xi),   y0 = expression::Variable (yi), 
-            xl = expression::Lbound   (xi),   yl = expression::Lbound   (yi),  
-            xu = expression::Ubound   (xi),   yu = expression::Ubound   (yi);  
+  CouNumber x0 = expression::Variable (xi),  y0 = expression::Variable (yi), 
+            xl = expression::Lbound   (xi),  yl = expression::Lbound   (yi),  
+            xu = expression::Ubound   (xi),  yu = expression::Ubound   (yi);  
 
   // First, try to avoid infinite bounds for multiplications, which
   // make them pretty hard to deal with

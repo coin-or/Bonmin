@@ -166,7 +166,7 @@ void exprOp::replace (exprVar *x, exprVar *w) {
 
   register expression **al = arglist_;
 
-  for (register int i=nargs_; i--;)
+  for (register int i=nargs_; i--; al++)
     if ((*al) -> Type () == VAR) {
       if ((*al) -> Index () == x -> Index ()) {
 	delete *al;

@@ -15,7 +15,9 @@
 
 
 /// set up branching object by evaluating many branching points for
-/// each expression's arguments
+/// each expression's arguments. For an exprAbs, simply branch at
+/// zero.
+
 CouNumber exprAbs::selectBranch (expression *w, 
 				 const OsiBranchingInformation *info,
 				 int &ind, 
@@ -24,7 +26,7 @@ CouNumber exprAbs::selectBranch (expression *w,
   ind = argument_ -> Index ();
 
   if (ind < 0) {
-    printf ("argument of exprAbs has negative index\n");
+    printf ("selectBranch: argument of exprAbs has negative index\n");
     exit (-1);
   }
 
@@ -33,7 +35,7 @@ CouNumber exprAbs::selectBranch (expression *w,
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
-  // the smartest branching point for |x| is 0, as the two subproblems
+  // the best branching point for |x| is 0, as the two subproblems
   // will have exact convexifications
   *brpts = 0.;
 

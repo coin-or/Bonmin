@@ -11,30 +11,19 @@
 
 // Methods of the class DepNode ///////////////////////////////////////////////////////////
 
-
 /// does this variable depend on variable with index xi?
 bool DepNode::depends (int xi, bool recursive) const {
 
   // check if any node of the forward star has index xi
   for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin (); 
-       i != depList_ -> end (); i++) {
+       i != depList_ -> end (); i++)
 
-    if ((*i) -> Index () == xi) 
+    if (((*i) -> Index () == xi) || // check current node
+	(recursive && 
+	 ((*i) -> depends (xi, recursive)))) // check deplist recursively
+
       return true;
 
-    if (recursive) {
-
-      // if recursive, propagate the search on elements of the
-      // forward star
-
-      std::set <DepNode *, compNode> *gen2 = (*i) -> DepList ();
-
-      for (std::set <DepNode *, compNode>::iterator j = gen2 -> begin (); 
-	   j != gen2 -> end (); j++)
-	if ((*j) -> Index () == xi) 
-	  return true;
-    }
-  }
   return false;
 }
 
@@ -44,16 +33,25 @@ void DepNode::createOrder (DepGraph *g) {
 
   if (order_ != -1) return;
 
-  //printf ("[%d ", index_);
+  if (order_ == -2) {
+
+    printf ("detected cycle in creating order, exiting\n");
+    exit (-1);
+  }
+
+  order_ = -2;
+
+  //  printf ("[%d ", index_); fflush (stdout);
 
   for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin();
        i != depList_ -> end (); i++)
     if ((*i) -> Order () == -1)
       (*i) -> createOrder (g);
 
-  if (order_ == -1) 
+  if (order_ == -2)
     order_ = g -> Counter () ++;
-  //printf ("->%d] ", order_);
+
+  //  printf ("->%d] ", order_); fflush (stdout);
 }
 
 
@@ -123,12 +121,8 @@ bool DepGraph::depends (int wi, int xi, bool recursive) {
 void DepGraph::createOrder () {
 
   for (std::set <DepNode *, compNode>::iterator i = vertices_. begin();
-       i != vertices_. end (); i++) {
-    //printf ("creating order, vertex %d (%d) ", 
-    //	    (*i) -> Index (), (*i) -> Order ());
+       i != vertices_. end (); i++)
     (*i) -> createOrder (this);
-    //printf ("---> %d\n", (*i) -> Order ());
-  }
 }
 
 

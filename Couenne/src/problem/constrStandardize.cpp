@@ -38,19 +38,22 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
   lb_ -> print ();
   printf (","); fflush (stdout);
   ub_ -> print ();
-  printf ("] {with auxset = ");
+  /*  printf ("] {with auxset = ");
 
 
-  for (std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> begin ();
+  /*  for (std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> begin ();
        i != p -> AuxSet () -> end (); i++) {
     printf ("<"); (*i) -> print (); 
     printf (","); (*i) -> Image () -> print (); printf ("> ");
-  }
+    }*/
 
   printf ("}\n");
 #endif
 
-  if (compareExpr (&lb_, &ub_) == 0) { // this is an equality constraint
+  if (compareExpr (&lb_, &ub_) == 0) {
+
+    // this is an equality constraint, and as such it could be the
+    // definition of an auxiliary
 
     expression *rest;
 
@@ -73,8 +76,8 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
       // no such expression found in the set:
       if (i == p -> AuxSet () -> end ()) {
 
-	p -> AuxSet      () -> insert   (w); // 1) beware of useless copies
-	p -> getDepGraph () -> insert   (w); // 2) introduce it in acyclic structure
+	p -> AuxSet      () -> insert (w); // 1) beware of useless copies
+	p -> getDepGraph () -> insert (w); // 2) introduce it in acyclic structure
 
 	// replace ALL occurrences of original variable (with index
 	// wind) with newly created auxiliary
@@ -87,7 +90,6 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
 	w -> Image () -> print (); printf (" ... ");
 	(*i) -> print (); printf (" := ");
 	(*i) -> Image () -> print (); printf ("\n");
-
       }
 #endif
 

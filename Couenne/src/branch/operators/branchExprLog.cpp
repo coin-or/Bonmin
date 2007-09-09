@@ -16,6 +16,8 @@
 #include <projections.h>
 
 
+#define SQ_COUENNE_EPS COUENNE_EPS * COUENNE_EPS
+
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 CouNumber exprLog::selectBranch (expression *w, 
@@ -44,16 +46,23 @@ CouNumber exprLog::selectBranch (expression *w,
   ind    = argument_ -> Index ();
   int wi = w         -> Index ();
 
-  if ((ind < 0) || (wi < 0)) {printf ("Couenne, w=log(x): negative index\n"); exit (-1);}
+  if ((ind < 0) || (wi < 0)) 
+    {printf ("Couenne, w=log(x): negative index\n"); exit (-1);}
 
   CouNumber y0 = info -> solution_ [wi],
     x0 = info -> solution_ [ind],
     l  = info -> lower_    [ind],
     u  = info -> upper_    [ind];
 
-  if (y0 > log (x0)) { 
+  if (u < COUENNE_EPS) { // strange case, return default branching rule
+    ind = -1; 
+    return 0;
+  }
 
-    if (x0 == 0) x0 = 1e-30;
+  if (x0 < SQ_COUENNE_EPS) // very unlikely...
+    x0 = SQ_COUENNE_EPS;
+
+  if (y0 > log (x0)) { 
 
     // Outside
 
@@ -61,19 +70,20 @@ CouNumber exprLog::selectBranch (expression *w,
 
     *brpts = powNewton (x0, y0, log, inv, oppInvSqr);
 
-    if      (*brpts < l) *brpts = (u < COUENNE_INFINITY) ? ((l+u)/2) : (10*l + 1);
-    else if (*brpts > u) *brpts = (l+u) / 2;
+    if      (*brpts < l) if (u <   COUENNE_INFINITY) *brpts = (l+u)/2;
+                         else                        *brpts = 10*l + 1;
+    else if (*brpts > u) if (l < - COUENNE_INFINITY) *brpts = u/2;
+                         else                        *brpts = (l+u)/2;
 
     way = TWO_LEFT;
     CouNumber dy = y0 - log (*brpts);
     x0 -= *brpts;
     return sqrt (x0*x0 + dy*dy);
-
   } 
 
   // Inside. Two cases:
  
-  if ((l < COUENNE_EPS * COUENNE_EPS) && 
+  if ((l <= SQ_COUENNE_EPS) && 
       (u > COUENNE_INFINITY)) {
 
     // 1) curve is unlimited in both senses --> three way branching
@@ -81,22 +91,21 @@ CouNumber exprLog::selectBranch (expression *w,
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
     way = THREE_CENTER; // focus on central convexification first
 
-    brpts [0] = exp (y0); // draw horizontal from (x0,y0) south to curve y=log(x)
-    brpts [1] = x0;       //      vertical                east
+    brpts [0] = exp (y0); // draw horizontal from (x0,y0) east  to curve y=log(x)
+    brpts [1] = x0;       //      vertical                north
 
     CouNumber a = x0 - exp (y0), // sides of a triangle with (x0,y0)
-      b = y0 - log (x0), // as one of the vertices
-      c = a * cos (atan (a/b));
+              b = y0 - log (x0), // as one of the vertices
+              c = a * cos (atan (a/b));
 
     return mymin (a, mymin (b, c));
-
   } 
 
   // 2) at least one of them is finite --> two way branching
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
-  if (l < COUENNE_EPS * COUENNE_EPS) {
+  if (l <= SQ_COUENNE_EPS) { // u is finite
 
     *brpts = exp (y0);
     if ((*brpts > u - COUENNE_NEAR_BOUND) ||
@@ -105,16 +114,15 @@ CouNumber exprLog::selectBranch (expression *w,
 
     way = TWO_RIGHT;
     return mymin (x0 - exp (y0), y0 - log (x0));
-
   }
  
-  if (u > COUENNE_INFINITY) {
+  if (u > COUENNE_INFINITY) { // l is far from zero
 
     *brpts = x0;
-    if (*brpts < l + COUENNE_NEAR_BOUND) *brpts = l+1;
+    if (*brpts < l + COUENNE_NEAR_BOUND)
+      *brpts = l+1;
     way = TWO_LEFT;
     return y0 - log (x0);
-
   } 
 
   // both are finite

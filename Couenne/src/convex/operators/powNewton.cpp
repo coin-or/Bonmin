@@ -26,7 +26,7 @@ CouNumber powNewton (CouNumber xc, CouNumber yc,
   //
   // F'(x) = 1 + f''(x) (f(x) - yc) + (f'(x))^2
   //
-  // Follow usual update:
+  // Apply usual update:
   //
   // x(k+1) = x(k) - f(x(k))/f'(x(k))
 
@@ -55,15 +55,20 @@ CouNumber powNewton (CouNumber xc, CouNumber yc,
 /*
 CouNumber expon = 4;
 
-inline CouNumber f (CouNumber x)
-{return pow (x, expon);}
+inline CouNumber f (CouNumber x) {
+  return pow (x, expon);
+}
 
-inline CouNumber fp (CouNumber x) 
-{return expon * pow (x, expon-1);}
+inline CouNumber fp (CouNumber x) {
+  return expon * pow (x, expon-1);
+}
 
-inline CouNumber fpp (CouNumber x) 
-{return expon * (expon-1) * pow (x, expon-2);}
+inline CouNumber fpp (CouNumber x) {
+  return expon * (expon-1) * pow (x, expon-2);
+}
+*/
 
+/*
 int main (int argc, char **argv) {
 
   CouNumber r, 
@@ -79,5 +84,4 @@ int main (int argc, char **argv) {
 	  xc, r, fp (r), (yc - f (r)) / (xc - r), fp (r) * (yc - f (r)) / (xc - r));
 
   return 0;
-}
-*/
+}*/

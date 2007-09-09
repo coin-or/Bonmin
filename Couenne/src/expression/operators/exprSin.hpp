@@ -16,8 +16,16 @@
 
 
 /// specify which trigonometric function is dealt with in trigEnvelope
-
 enum cou_trig {COU_SINE, COU_COSINE};
+
+
+/// generalized procedure for both sine and cosine
+CouNumber trigSelBranch (expression *w, 
+			 const OsiBranchingInformation *info,
+			 int &ind, 
+			 double * &brpts, 
+			 int &way,
+			 enum cou_trig type);
 
 
 /// class for sin f(x)
@@ -56,6 +64,12 @@ class exprSin: public exprUnary {
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRSIN;}
+
+  /// Set up branching object by evaluating many branching points for
+  /// each expression's arguments
+  CouNumber selectBranch (expression *w, const OsiBranchingInformation *info,
+			  int &ind, double * &brpts, int &way)
+  {return trigSelBranch (w, info, ind, brpts, way, COU_SINE);}
 };
 
 #endif

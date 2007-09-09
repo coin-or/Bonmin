@@ -32,6 +32,7 @@ libCouenne_la_SOURCES = \
 	branch/operators/branchExprMul.cpp \
 	branch/operators/branchExprPow.cpp \
 	branch/operators/branchExprQuad.cpp \
+	branch/operators/branchExprSinCos.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -107,6 +108,7 @@ libCouenne_la_SOURCES = \
 	problem/auxiliarize.cpp \
 	problem/standardize.cpp \
 	problem/depGraph/depGraph.cpp \
+	problem/depGraph/checkCycles.cpp \
 	util/drawCuts.cpp \
 	util/rootQ.c
 

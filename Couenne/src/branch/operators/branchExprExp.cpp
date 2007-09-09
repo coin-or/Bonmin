@@ -50,7 +50,8 @@ CouNumber exprExp::selectBranch (expression *w,
 
   if (y0 < exp (x0)) { 
 
-    // Outside
+    // Outside: look for point (x1,y1) on curve y=exp(x) closest to
+    // current (x0,y0), branch at x1
 
     brpts = (double *) realloc (brpts, sizeof (double));
 
@@ -91,22 +92,25 @@ CouNumber exprExp::selectBranch (expression *w,
 
       brpts = (double *) realloc (brpts, sizeof (double));
 
-      if (l < -COUENNE_INFINITY) {
+      if (l < -COUENNE_INFINITY) { // u is finite
 
 	*brpts = x0;
-	if (*brpts > u - COUENNE_NEAR_BOUND) *brpts = u-1;
+	if (*brpts > u - COUENNE_NEAR_BOUND) 
+	  *brpts = u-1;
 	way = TWO_RIGHT;
 	return y0 - exp (x0);
 
-      } else if (u > COUENNE_INFINITY) {
+      } else if (u > COUENNE_INFINITY) { // l is finite
 
 	*brpts = log (y0);
-	if (*brpts < l + COUENNE_NEAR_BOUND) *brpts = l+1;
+	if (*brpts < l + COUENNE_NEAR_BOUND) 
+	  *brpts = l+1;
 	way = TWO_LEFT;
 	return x0 - log (y0);
 
-      } else {
+      } else { // both are finite
 
+	// find closest point on curve
 	*brpts = powNewton (x0, y0, exp, exp, exp);
 
 	if ((*brpts > u - COUENNE_NEAR_BOUND) ||

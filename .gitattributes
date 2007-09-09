@@ -28,6 +28,7 @@ Couenne/src/branch/operators/branchExprLog.cpp -text
 Couenne/src/branch/operators/branchExprMul.cpp -text
 Couenne/src/branch/operators/branchExprPow.cpp -text
 Couenne/src/branch/operators/branchExprQuad.cpp -text
+Couenne/src/branch/operators/branchExprSinCos.cpp -text
 Couenne/src/branch/projections.c -text
 Couenne/src/branch/projections.h -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
@@ -129,6 +130,7 @@ Couenne/src/problem/CouenneProblemElem.hpp -text
 Couenne/src/problem/auxiliarize.cpp -text
 Couenne/src/problem/constrStandardize.cpp -text
 Couenne/src/problem/constraint.cpp -text
+Couenne/src/problem/depGraph/checkCycles.cpp -text
 Couenne/src/problem/depGraph/depGraph.cpp -text
 Couenne/src/problem/depGraph/depGraph.hpp -text
 Couenne/src/problem/elementBreak.cpp -text

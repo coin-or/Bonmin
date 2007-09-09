@@ -60,6 +60,8 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	  (body -> dependsOn (&auxInd, 1) > 1)) // or, variable depends upon itself
 	return -1;
 
+      //      printf ("no dependence0 %d\n", auxInd);
+
       pos = 1;
     }
 
@@ -110,6 +112,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	    (fabs (lincoe [nlin]) > COUENNE_EPS) &&
 	    (body -> dependsOn (p, &j, 1) <= 1)) {
 
+	  //	  printf ("no dependence (1) %d on", j);
+	  //	  body -> print (); printf ("\n");
+
 	  which    = - nlin - 1;    // mark which with negative number 
 	  auxcoe   = lincoe [nlin];
 	  maxindex = j;
@@ -133,6 +138,8 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	  !(wentAux [index]) &&
 	  (fabs (coeff) > COUENNE_EPS) && 
 	  (body -> dependsOn (&index, 1) <= 1)) {
+
+	//	printf ("no dependence2 %d\n", index);
 
 	maxindex = index;
 	which    = i;
@@ -342,10 +349,8 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
       if ((*i) -> Index() == aux -> Index ()) {
 	printf (" fictitious %d to be erased: ", p -> Variables ().size ());
-	(*i) -> print ();
-	printf (" := ");
-	(*i) -> Image () -> print ();
-	printf ("\n");
+	(*i)             -> print (); printf (" := ");
+	(*i) -> Image () -> print (); printf ("\n");
 	//	p -> Variables () . erase (i);
 	break;
       }

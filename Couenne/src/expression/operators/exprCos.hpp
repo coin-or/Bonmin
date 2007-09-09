@@ -10,11 +10,20 @@
 #define COUENNE_EXPRCOS_H
 
 #include <exprUnary.hpp>
+#include <exprSin.hpp>
 #include <exprConst.hpp>
 #include <CouennePrecisions.h>
 
 #include <math.h>
 
+
+/// generalized procedure for both sine and cosine
+CouNumber trigSelBranch (expression *w, 
+			 const OsiBranchingInformation *info,
+			 int &ind, 
+			 double * &brpts, 
+			 int &way,
+			 enum cou_trig type);
 
 /// class cosine
 
@@ -52,6 +61,12 @@ class exprCos: public exprUnary {
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRCOS;}
+
+  /// Set up branching object by evaluating many branching points for
+  /// each expression's arguments
+  CouNumber selectBranch (expression *w, const OsiBranchingInformation *info,
+			  int &ind, double * &brpts, int &way)
+  {return trigSelBranch (w, info, ind, brpts, way, COU_COSINE);}
 };
 
 

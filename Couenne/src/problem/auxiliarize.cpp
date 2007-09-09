@@ -27,7 +27,7 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
 
   std::vector <exprVar *>::iterator orig;
 
-  for (orig = variables_.begin ();
+  for (orig  = variables_.begin ();
        orig != variables_.end (); orig++)
 
     if ((*orig) -> Index () == index) // found it!
@@ -55,7 +55,8 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
 
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
        i != variables_.end (); i++)
-    if (((*i) -> Type () == AUX) && ((*i) -> Index () != (*orig) -> Index ()))
+    if (((*i) -> Type () == AUX) && 
+	((*i) -> Index () != (*orig) -> Index ()))
       (*i) -> Image () -> replace (*orig, aux);
 
   // replace it with new auxiliary
