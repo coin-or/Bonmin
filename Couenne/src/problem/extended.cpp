@@ -33,12 +33,14 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
     if (lb_ [i] > - COUENNE_INFINITY + 1) f << " >= " << lb_ [i];
     if (ub_ [i] < + COUENNE_INFINITY - 1) f << " <= " << ub_ [i];
     if (variables_ [i] -> isInteger ())   f << " integer";
-    f << " default " << x_ [i] << ';' << std::endl;
+    if (fabs (x_ [i]) < COUENNE_INFINITY)    
+      f << " default " << x_ [i]; 
+    f << ';' << std::endl;
   }
 
 
   // defined (aux) variables, declaration ///////////////////////////////////////////
-
+  /*
   if (aux) {
 
     initAuxs (x_, lb_, ub_);
@@ -67,7 +69,7 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
 	}
       }
   }
-
+  */
 
   // objective function /////////////////////////////////////////////////////////////
 
