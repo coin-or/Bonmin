@@ -42,7 +42,7 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
       continue;
 
     if (newLow [index] > newUpp [index])
-      newLow [index] = newUpp [index];
+      problem_ -> Lb (index) = problem_ -> Ub (index);
 
     CouNumber bd;
 
