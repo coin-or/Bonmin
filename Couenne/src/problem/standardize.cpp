@@ -53,7 +53,6 @@ void CouenneProblem::standardize () {
 			    variables_ . size () + auxiliaries_ . size (), 
 			    1 + symbolic -> rank (this));*/
 #ifdef DEBUG
-
     printf ("////////////// now attempting to standardize defVar "); fflush (stdout);
     aux -> print ();
     printf (" := "); fflush (stdout);
@@ -84,13 +83,13 @@ void CouenneProblem::standardize () {
 
 #ifdef DEBUG
     printf ("Objective ");
-      (*i) -> print ();
+    (*i) -> print ();
 #endif
 
     exprAux *aux = (*i) -> standardize (this);
 
 #ifdef DEBUG
-    printf (" --> ");
+    printf ("      --> ");
       (*i) -> print ();
 #endif
 
@@ -98,7 +97,7 @@ void CouenneProblem::standardize () {
       (*i) -> Body (new exprClone (aux));
 
 #ifdef DEBUG
-    printf (" --> ");
+    printf ("      --> ");
     (*i) -> print ();
     printf ("...................\n");
 #endif
@@ -167,11 +166,6 @@ void CouenneProblem::standardize () {
   // make expression library point to new vectors
   expression::update (x_, lb_, ub_);
 
-  //  print ();
-  //printf ("###################################################\n");
-
-  //  graph_ -> print ();
-  //  printf ("###################################################\n");
   /*
   if (graph_ -> checkCycles ()) {
     printf ("CYCLE!\n\n\n");
@@ -180,14 +174,6 @@ void CouenneProblem::standardize () {
   */
 
   graph_ -> createOrder ();
-
-  /*
-  if (graph_ -> checkCycles ()) {
-    printf ("one CYCLE!\n\n\n");
-    exit (-1);
-  }
-  */
-  //  graph_ -> print ();
 
   // fill numbering structure /////////////////////////////////////////////////
 

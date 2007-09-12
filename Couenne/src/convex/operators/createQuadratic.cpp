@@ -41,12 +41,44 @@ void flattenMul (expression *mul, CouNumber &coe,
 
     case COU_EXPRVAR: { // insert index or increment 
 
-      std::map <int, CouNumber>::iterator where = indices.find (arg -> Index ());
+      std::map <int, CouNumber>::iterator 
+	where = indices.find (arg -> Index ());
 
       if (where == indices.end ()) 
 	indices.insert (std::pair <int, CouNumber> (arg -> Index (), 1));
       else ++ (where -> second);
     } break;
+
+    case COU_EXPROPP: // equivalent to multiplying by -1
+
+      coe *= -1;
+      flattenMul (arg -> Argument (), coe, indices, p);
+      break;
+
+    case COU_EXPRPOW: {
+
+      expression *base     = arg -> ArgList () [0],
+	         *exponent = arg -> ArgList () [1];
+
+      if (exponent -> Type () == CONST) { // could be of the form k x^2
+
+	double expnum = exponent -> Value ();
+
+	expression *aux = base -> standardize (p);
+
+	if (!aux)
+	  aux = base;
+
+	std::map <int, CouNumber>::iterator 
+	  where = indices.find (aux -> Index ());
+
+	if (where == indices.end ())
+	  indices.insert (std::pair <int, CouNumber> (aux -> Index (), expnum));
+	else (where -> second += expnum);
+
+	break;
+      }  // otherwise, revert to default
+    }
 
     default: { // for all other expression, add associated new auxiliary
 
@@ -221,7 +253,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
     } break;
     }
 
-  } break;
+  } break; // end of case COU_EXPRMUL
 
   case COU_EXPRPOW: { // expression = f(x)^g(x) ////////////////////////////////////////////////
 

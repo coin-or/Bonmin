@@ -17,7 +17,6 @@
 #include <exprGroup.hpp>
 #include <exprQuad.hpp>
 
-
 //#define DEBUG
 
 
@@ -59,6 +58,7 @@ void analyzeSparsity (CouenneProblem *, CouNumber,
 			 std::map <int,                 CouNumber> &,
 			 std::map <std::pair <int,int>, CouNumber> &);
 
+
 /// translate a sum/difference/exprOpp into:
 ///
 /// 1) an exprGroup, if only linear terms are present
@@ -78,7 +78,8 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  // initialize linear/quad terms with the original values/indices
+  // initialize linear/quad maps with the original values/indices of
+  // the linear part
 
   if ((cod == COU_EXPRGROUP) ||
       (cod == COU_EXPRQUAD)) {
@@ -119,7 +120,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
   printf ("decompTerm returns: [");
   for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); i++)
     printf ("<%d,%g>", i -> first, i -> second);
-  printf ("] || [");
+  printf ("] -- [");
   for (std::map <std::pair <int, int>, CouNumber>::iterator i = qmap.begin (); i != qmap.end (); i++)
     printf ("<%d,%d,%g>", i -> first.first, i -> first.second, i -> second);
   printf ("]\n");

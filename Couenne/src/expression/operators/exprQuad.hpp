@@ -43,16 +43,24 @@ class exprQuad: public exprGroup {
     * in \f$q_{ij} x_i x_j\f$: */
   /** @{ */
 
-  int       *qindexI_; ///< the term i
-  int       *qindexJ_; ///< the term j, (must be qindexJ_ [k] <= qindexI_ [k])
-  CouNumber *qcoeff_;  ///< the term a_ij
+  int       *qindexI_; ///< the term \f$i\f$
+  int       *qindexJ_; ///< the term \f$j\f$, (must be qindexJ_ [k] <= qindexI_ [k])
+  CouNumber *qcoeff_;  ///< the term \f$a_{ij}\f$
   int        nqterms_; ///< number of non-zeroes in Q
   /** @} */
 
+  /** \name Convexification data structures
+   *
+   *  These are filled by alphaConvexify through the method described
+   *  in the LaGO paper by Nowak and Vigerske.
+   */
+
+  /// @{
   CouNumber *dCoeffLo_;  ///< diagonal coefficients of additional term for under convexfication
   CouNumber *dCoeffUp_;  ///< diagonal coefficients of additional term for over convexfication
-  int       *dIndex_;    ///< and indices (this is a sparse vector)
+  int       *dIndex_;    ///< indices of the \f$\alpha_i\f$'s in convexification
   int        nDiag_;     ///< number of elements in the above sparse vectors
+  /// @}
 
  public:
 
@@ -122,7 +130,9 @@ class exprQuad: public exprGroup {
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  /// Generate 
+  /// Generate cuts for the quadratic expression, which are supporting
+  /// hyperplanes of the concave upper envelope and the convex lower
+  /// envelope.
   virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg, 
 			     t_chg_bounds * = NULL, int = -1, 
@@ -134,76 +144,75 @@ class exprQuad: public exprGroup {
   virtual void alphaConvexify (const OsiSolverInterface &);
 
   /** \function exprQuad::quadCuts 
-    * \brief Based on the information (dIndex_, dCoeffLo_, dCoeffUp_)
-    * created/modified by alphaConvexify(), create convexification cuts
-    * for this expression.
-    *
-    * The original constraint is :
-    * \f[
-    * \eta = a_0 + a^T x + x^T Q x + \sum w_j
-    * \f]
-    * where \f$ \eta \f$ is the auxiliary corresponding to this
-    * expression and \f$ w_j \f$ are the auxiliaries corresponding to
-    * the other non-linear terms contained in the expression. (I don't
-    * think that it is assumed anywhere in the function that Q only
-    * involves original variables of the problem).
-    * 
-    * The under-estimator of \f$ x^T Q x\f$ is given by \f[ x^T Q x +
-     \sum \lambda_{\min,i} (x_i - l_i ) (u_i - x_i ) \f] and its
-    * over-estimator is given by \f[ Q - \sum \lambda_{\max, i} (x_i -
-    * l_i ) (u_i - x_i ) \f] (where \f$ \lambda_{\min, i} =
-    * \frac{\lambda_{\min}}{w_i^2} \f$ and \f$ \lambda_{\max, i} =
-    * \frac{\lambda_{\max}}{w_i^2} \f$).
-    *
-    * Let \f$ \tilde a_0(\lambda)\f$, \f$ \tilde a(\lambda) \f$ and
-    * \f$ \tilde Q_(\lambda) \f$ be
-    *
-    * \f[ \tilde a_0(\lambda) = a_0 - \sum_{i = 1}^n \lambda_i l_i u_i \f]
-    *
-    * \f[ \tilde a(\lambda) = a + \left[ \begin{array}{c} \lambda_1
-    * (u_1 + l_1) \\ \vdots \\ \lambda_n (u_n + l_n) \end{array}
-    * \right], \f]
-    *
-    * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc}
-    * {\lambda_1} & & 0 \\ & \ddots & \\ 0 & & \lambda_n \end{array}
-    * \right). \f]
-    *
-    * The convex relaxation of the initial constraint is then given by
-    * the two constraints
-    *
-    * \f[ \eta \geq \tilde a_0(\lambda_{\min}) + \tilde
-    * a(\lambda_{\min})^T x + x^T \tilde Q(\lambda_{\min}) x + \sum
-    * z_j \f]
-    *
-    * \f[ \eta \leq \tilde a_0(- \lambda_{\max}) + \tilde
-    * a(-\lambda_{\max})^T x + x^T \tilde Q(-\lambda_{\max}) x + \sum
-    * z_j \f]
-    *  
-    * The cut is computed as follow. Let \f$ (x^*, z^*, \eta^*) \f$ be
-    * the solution at hand. The two outer-approximation cuts are:
-    *
-    * \f[ \eta \geq \tilde a_0(\lambda_{\min}) + \tilde
-    * a(\lambda_{\min})^T x + {x^*}^T \tilde Q(\lambda_{\min}) (2x -
-    * x^*) + \sum z_j \f]
-    *
-    * and
-    *
-    * \f[ \eta \leq \tilde a_0(-\lambda_{\max}) + \tilde
-    * a(-\lambda_{\max})^T x + {x^*}^T \tilde Q(-\lambda_{\max}) (2x -
-    * x^*) + \sum z_j \f]
-    *
-    * grouping coefficients, we get:
-    *
-    * \f[ {x^*}^T \tilde Q(\lambda_{\min}) x^* - \tilde
-    * a_0(\lambda_{\min}) \geq ( a(\lambda_{\min}) + 2
-    * Q(\lambda_{\min} ) x^*)^T x + \sum z_j - \eta \f]
-    *
-    * and
-    *
-    * \f[ {x^*}^T \tilde Q(-\lambda_{\max}) x^* - \tilde
-    * a_0(-\lambda_{\max}) \leq ( a(-\lambda_{\max}) + 2
-    * Q(-\lambda_{\max}) x^* )^T x + \sum z_j - \eta \f]
-    */
+   *
+   * \brief Based on the information (dIndex_, dCoeffLo_, dCoeffUp_)
+   * created/modified by alphaConvexify(), create convexification cuts
+   * for this expression.
+   *
+   * The original constraint is :
+   * \f[
+   * \eta = a_0 + a^T x + x^T Q x
+   * \f]
+   * where \f$ \eta \f$ is the auxiliary corresponding to this
+   * expression and \f$ w_j \f$ are the auxiliaries corresponding to
+   * the other non-linear terms contained in the expression. 
+   * 
+   * The under-estimator of \f$ x^T Q x\f$ is given by \f[ x^T Q x +
+   * \sum \lambda_{\min,i} (x_i - l_i ) (u_i - x_i ) \f] and its 
+   * over-estimator is given by
+   *
+   * \f[ x^T Q x + \sum \lambda_{\max, i} (x_i - l_i ) (u_i - x_i )
+   * \f] (where \f$ \lambda_{\min, i} = \frac{\lambda_{\min}}{w_i^2}
+   * \f$, \f$ \lambda_{\max, i} = \frac{\lambda_{\max}}{w_i^2} \f$,
+   * and \f$w_i = u_i - l_i\f$).
+   *
+   * Let \f$ \tilde a_0(\lambda)\f$, \f$ \tilde a(\lambda) \f$ and
+   * \f$ \tilde Q (\lambda) \f$ be
+   *
+   * \f[ \tilde a_0(\lambda) = a_0 - \sum_{i = 1}^n \lambda_i l_i u_i \f]
+   *
+   * \f[ \tilde a(\lambda) = a + \left[ \begin{array}{c} \lambda_1
+   * (u_1 + l_1) \\ \vdots \\ \lambda_n (u_n + l_n) \end{array}
+   * \right], \f]
+   *
+   * \f[ \tilde Q(\lambda) = Q - \left( \begin{array}{ccc}
+   * {\lambda_1} & & 0 \\ & \ddots & \\ 0 & & \lambda_n \end{array}
+   * \right). \f]
+   *
+   * The convex relaxation of the initial constraint is then given by
+   * the two constraints
+   *
+   * \f[ \eta \geq \tilde a_0(\lambda_{\min}) + \tilde
+   * a(\lambda_{\min})^T x + x^T \tilde Q(\lambda_{\min}) x \f]
+   *
+   * \f[ \eta \leq \tilde a_0(\lambda_{\max}) + \tilde
+   * a(\lambda_{\max})^T x + x^T \tilde Q(\lambda_{\max}) x \f]
+   *  
+   * The cut is computed as follow. Let \f$ (x^*, \eta^*) \f$ be
+   * the solution at hand. The two outer-approximation cuts are:
+   *
+   * \f[ \eta \geq \tilde a_0(\lambda_{\min}) + \tilde
+   * a(\lambda_{\min})^T x + {x^*}^T \tilde Q(\lambda_{\min}) (2x -
+   * x^*) \f]
+   *
+   * and
+   *
+   * \f[ \eta \leq \tilde a_0(\lambda_{\max}) + \tilde
+   * a(\lambda_{\max})^T x + {x^*}^T \tilde Q(\lambda_{\max}) (2x -
+   * x^*) \f]
+   *
+   * grouping coefficients, we get:
+   *
+   * \f[ {x^*}^T \tilde Q(\lambda_{\min}) x^* - \tilde
+   * a_0(\lambda_{\min}) \geq ( a(\lambda_{\min}) + 2
+   * \tilde Q(\lambda_{\min} ) x^*)^T x - \eta \f]
+   *
+   * and
+   *
+   * \f[ {x^*}^T \tilde Q(\lambda_{\max}) x^* - \tilde
+   * a_0(\lambda_{\max}) \leq ( a(\lambda_{\max}) + 2
+   * \tilde Q (\lambda_{\max}) x^* )^T x - \eta \f]
+   */
 
   void quadCuts (exprAux *w, OsiCuts & cs, const CouenneCutGenerator * cg);
 
@@ -233,6 +242,9 @@ class exprQuad: public exprGroup {
 
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
+
+  /// create dIndex_ based on occurrences in qindexI_ and qindexJ_
+  void make_dIndex (int, int *);
 };
 
 
@@ -240,16 +252,20 @@ class exprQuad: public exprGroup {
 
 inline CouNumber exprQuad::operator () () {
 
-  register CouNumber  
-     ret  = exprGroup::operator () (),
+  register CouNumber
+     ret  = exprGroup::operator () (), // compute non-quadratic part (linear+constant)
     *coe  = qcoeff_, 
     *vars = expression::Variables ();
 
-  for (register int *qi = qindexI_, *qj = qindexJ_, i = nqterms_; i--;)
+  for (register int *qi = qindexI_, 
+	            *qj = qindexJ_, 
+	 i = nqterms_; i--; qi++, qj++) {
 
-    ret += (*qi == *qj) ?
-      (*coe++ *     vars [*qi++] * vars [*qj++]) :
-      (*coe++ * 2 * vars [*qi++] * vars [*qj++]);
+    register double term = 
+      *coe++ * vars [*qi] * vars [*qj];
+
+    ret += (*qi == *qj) ? term : 2 * term;
+  }
 
   return (currValue_ = ret);
 }

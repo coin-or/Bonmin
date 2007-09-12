@@ -38,7 +38,7 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
   lb_ -> print ();
   printf (","); fflush (stdout);
   ub_ -> print ();
-  /*  printf ("] {with auxset = ");
+  /*  printf ("] {with auxset = ");*/
 
 
   /*  for (std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> begin ();

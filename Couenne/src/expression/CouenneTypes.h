@@ -48,8 +48,8 @@ enum expr_type {/*COU_EXPRAUX,  COU_EXPRCLONE, COU_EXPRCOPY, */
 		COU_EXPROPP,   COU_EXPRSIN
 		};
 
-/** convexity type of an expression (not used) */
-enum convexity {NONCONVEX, CONVEX, CONCAVE, AFFINE};
+/** convexity type of an expression */
+enum convexity {UNSET, NONCONVEX, CONVEX, CONCAVE, AFFINE};
 
 /** (un)changed bounds */
 

@@ -110,8 +110,7 @@ class exprAux: public exprVar {
 
   /// Dependence on variable set: return number of times elements of
   /// indices occur in expression
-  inline int dependsOn (int *indices, int num) 
-    {return image_ -> dependsOn (indices, num);}
+  int dependsOn (int *indices, int num);
 
   /// Get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()

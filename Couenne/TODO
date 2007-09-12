@@ -1,6 +1,9 @@
+- implied/propagated bounds to follow graph and not enumerated for all variables (for huge instances)
+- implied bounds, branching rule, getfixvar and sparsity graph for exprQuad
+- on some big instances (eg gasoil100), dependsOn() is awfully slow. Create a dependence list for each exprAux?
 - Fix excessively large coefficients
 - Fix branching point, always too close to current bound
-- recognize convex objectives/constraints and apply OA
+- recognize convex objectives/constraints and apply OA as extra cuts (still keep symbolic info)
 - do not apply obbt to auxs of the form w = cx 
 - change chg_bds structure within createCuts when add colCut
 - apply bound tightening AFTER applying branching rule but BEFORE re-solving LP

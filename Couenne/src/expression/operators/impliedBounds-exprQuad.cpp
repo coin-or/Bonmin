@@ -2,7 +2,7 @@
  * Name:    impliedBounds-exprQuad.cpp
  * Author:  Pietro Belotti
  * Purpose: inferring bounds on independent variables of an exprQuad
- *          given bounds on the auxiliary varible
+ *          given bounds on the auxiliary variable
  *
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */

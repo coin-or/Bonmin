@@ -10,7 +10,7 @@
 
 CouNumber computeQBound (int sign, exprQuad *e) {
 
-  return (sign < 0) ? -COUENNE_INFINITY : COUENNE_INFINITY;
+  return (sign < 0) ? -COUENNE_INFINITY : COUENNE_INFINITY; // TODO
 
   int 
     nlt = e -> getnLTerms (),
@@ -123,5 +123,4 @@ CouNumber computeQBound (int sign, exprQuad *e) {
   */
 
   //  for (register int i = nqt; i--;) 
-
 }

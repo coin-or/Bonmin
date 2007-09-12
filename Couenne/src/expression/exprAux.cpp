@@ -40,6 +40,27 @@ void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 }
 
 
+/// Dependence on variable set: return number of times elements of
+/// indices occur in expression
+int exprAux::dependsOn (int *indices, int num) {
+
+  if (!indices)
+    return 1;
+
+  register int *il = indices;
+
+  int cnt = 0;
+
+  for (register int i=num; i--;)
+    if (varIndex_ == *il++) {
+      if (num==1) return 1;
+      cnt++;
+    }
+
+  return image_ -> dependsOn (indices, num);
+}
+
+
 // generate cuts for expression associated with this auxiliary
 
 void exprAux::generateCuts (const OsiSolverInterface &si, 

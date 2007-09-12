@@ -23,12 +23,13 @@ CouNumber exprQuad::selectBranch (expression *w,
                   *l = info -> lower_,
                   *u = info -> upper_; 
 
-  CouNumber delta = (*w) () - (*this) (), 
-    *alpha = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
-    maxcontr = -COUENNE_INFINITY;
+  CouNumber delta    = (*w) () - (*this) (), 
+           *alpha    = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
+            maxcontr = -COUENNE_INFINITY;
 
-  int bestVar = nqterms_ ? *qindexI_ : 
-    nlterms_ ? *index_ : -1; // initialize it to something very default
+  int bestVar = 
+    nqterms_ ? *qindexI_ : 
+    nlterms_ ? *index_   : -1; // initialize it to something very default
 
   if (!alpha) { // no convexification available,
                 // find the largest interval
@@ -55,6 +56,9 @@ CouNumber exprQuad::selectBranch (expression *w,
     brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = x [bestVar];
     way = TWO_RAND;
+
+    //printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
+    //  fabs (delta), *brpts, x [bestVar], bestVar, way);
 
     return fabs (delta);
   }
@@ -92,8 +96,8 @@ CouNumber exprQuad::selectBranch (expression *w,
 
     *brpts = 0.5 * (lb + ub);
 
-  /*printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
-    fabs (delta), *brpts, x [bestVar], bestVar, way);*/
+  //printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
+  //  fabs (delta), *brpts, x [bestVar], bestVar, way);
 
   return fabs (delta);
 }

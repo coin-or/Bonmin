@@ -22,7 +22,7 @@
 // is the variable one of those in varlist?
 int exprVar::dependsOn (register int *varlist = NULL, register int n = 1) {
 
-  if (!varlist) 
+  if (!varlist)
     return 1;
 
   while (n--) 

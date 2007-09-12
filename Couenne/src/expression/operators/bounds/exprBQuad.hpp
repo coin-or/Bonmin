@@ -49,7 +49,7 @@ class exprLBQuad: public expression {
 		      bool descend = false,            //< descend into auxiliaries' image?
 		      CouenneProblem *p = NULL) const  //< problem pointer (in exprGroup)
 
-  {s << "lower("; ref_ -> print (s, descend, p); s << ')';}
+  {s << "quadLower("; ref_ -> print (s, descend, p); s << ')';}
 };
 
 
@@ -85,7 +85,7 @@ class exprUBQuad: public expression {
 		      bool descend = false,            //< descend into auxiliaries' image?
 		      CouenneProblem *p = NULL) const  //< problem pointer (in exprGroup)
 
-  {s << "upper("; ref_ -> print (s, descend, p); s << ')';}
+  {s << "quadUpper("; ref_ -> print (s, descend, p); s << ')';}
 };
 
 #endif

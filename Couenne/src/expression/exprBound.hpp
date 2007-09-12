@@ -79,7 +79,7 @@ class exprUpperBound: public exprVar {
   inline enum nodeType Type () 
     {return CONST;}
 
-  /// Constructors, destructor
+  /// Constructor
   exprUpperBound  (int varIndex): 
     exprVar (varIndex) {}
 
@@ -97,7 +97,7 @@ class exprUpperBound: public exprVar {
     {return new exprConst (0);}
 
   /// dependence on variable set
-  int dependsOn (int *, int) 
+  inline int dependsOn (int *, int) 
     {return 0;}
 
   /// get a measure of "how linear" the expression is:

@@ -11,6 +11,7 @@
 #include <OsiRowCut.hpp>
 #include <OsiCuts.hpp>
 
+#include <exprAux.hpp>
 #include <exprQuad.hpp>
 #include <exprBQuad.hpp>
 
@@ -32,8 +33,14 @@ void exprQuad::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			     t_chg_bounds *chg, 
 			     int wind, CouNumber lb, CouNumber ub) {
 
+  // check if we really need a convexification cut
+  if (fabs ((*this) () - (*w) ()) < COUENNE_EPS)
+    return;
+
   // see if it is necessary to create/renew the alpha-convexification
   alphaConvexify (si);
 
+  // generate linear cuts for convex quadratic [upper|lower]-envelope
+  // of this expression
   quadCuts (w, cs, cg);
 }

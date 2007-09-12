@@ -10,12 +10,15 @@
 
 #include <exprQuad.hpp>
 
+#include <CoinHelperFunctions.hpp>
+
 #include <OsiSolverInterface.hpp>
 #include <IpLapack.hpp>
 
 
 // fill in one of the two dCoeff vectors
 void fill_dCoeff (CouNumber * &, CouNumber, CouNumber *, int);
+
 
 /** Computes alpha coefficients for an alpha under- and overestimator of the quadratic term.
  * For the underestimator, dCoeffLo_ is computed such that
@@ -35,51 +38,23 @@ void fill_dCoeff (CouNumber * &, CouNumber, CouNumber *, int);
 
 void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
 
-  if (getnQTerms () == 0) {
+  if (nqterms_ == 0) {
     nDiag_ = 0;
     return;
   }
 
-  // inverse of dIndex_ mapping, for each variable tell me the
+  // inverse of dIndex_ mapping: for each variable tell me the
   // index that it will have in dIndex_, or -1 if not there
 
   int* indexmap = new int [si.getNumCols ()];
+  CoinFillN (indexmap, si.getNumCols (), -1);
 
-  for (int i=0; i<si.getNumCols(); ++i)
-    indexmap [i] = -1;
-
-  if (dIndex_ == NULL) { 
-
-    // first time called... check which variables are there, and where
-    // we will put in the dIndex_ array
-
-    int *qindexI = getQIndexI (),
-        *qindexJ = getQIndexJ ();
-
-    nDiag_=0;
-
-    // fill indexmap
-    for (int i=0; i<getnQTerms(); ++i) {
-
-      int qi = qindexI [i], 
-	  qj = qindexJ [i];
-
-      if                (indexmap [qi] == -1)  indexmap [qi] = nDiag_++;
-      if ((qi != qj) && (indexmap [qj] == -1)) indexmap [qj] = nDiag_++;
-    }
-
-    dIndex_ = new int [nDiag_];
-
-    for (int i=0; i<si.getNumCols(); ++i) {
-      if (indexmap[i] > -1) {
-	dIndex_ [indexmap [i]] = i;
-      }
-    }
-  } else {
+  if (dIndex_ == NULL)
+    make_dIndex (si.getNumCols (), indexmap);
+  else
     // build indexmap as inverse of dIndex_
     for (int i=0; i<nDiag_; ++i)
       indexmap [dIndex_ [i]] = i;
-  }
 
   // box diameter
   double* diam = new double [nDiag_];
@@ -94,32 +69,42 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
   for (int i=0; i < nDiag_ * nDiag_; ++i)
     matrix [i] = 0.;
 
-  for (int i=0; i<getnQTerms(); ++i) {
+  for (int i=0; i < nqterms_; ++i) {
 
     int row = indexmap [getQIndexI () [i]];
     int col = indexmap [getQIndexJ () [i]];
 
     // compute value of matrix entry = q_ij * (u_i-l_i) * (u_j-l_j)
-    // I (Stefan) do not understand the Lapack docu; it says it needs only the lower triangular
-    // but it seem to need both parts to work correct
-                    matrix [col * nDiag_ + row] = getQCoeffs () [i] * diam [row] * diam [col];
-    if (row != col) matrix [row * nDiag_ + col] = getQCoeffs () [i] * diam [row] * diam [col];
-    //		printf("row %d, col %d: %f\n", row, col, matrix[col*nDiag_+row]);
+    // I (Stefan) do not understand the Lapack docu; it says it needs
+    // only the lower triangular but it seem to need both parts to
+    // work correct
+    double cell = getQCoeffs () [i] * diam [row] * diam [col];
+
+    matrix          [col * nDiag_ + row] = cell;
+    if (row != col) 
+      matrix        [row * nDiag_ + col] = cell;
+    //    printf("row %d, col %d: %f\n", row, col, matrix[col*nDiag_+row]);
   }
 
+  delete [] indexmap;
+
   // compute minimum and maximum eigenvalue of matrix
-  // ok, currently computes all eigenvalues
   double* eigval = new double [nDiag_];
   int info;
 
-  Ipopt::IpLapackDsyev (false, nDiag_, matrix, nDiag_, eigval, info);
+  Ipopt::IpLapackDsyev (false,  // do not compute eigenvector
+			nDiag_, // dimension
+			matrix, // matrix
+			nDiag_, // "leading dimension" (number of columns, I think)
+			eigval, // output vector to store eigenvalues
+			info);  // output status variable
+  delete [] matrix;
 
   if (info != 0) {
     printf ("exprQuad::alphaConvexify: problem computing eigenvalue, info=%d\n", info);
     return;
     //TODO error handling
   }
-  //	printf("min. eigvalue: %f\n", eigval[0]);
 
   // if min. eigenvalue negative, setup dCoeffLo_
   if (eigval [0] < 0) 
@@ -139,10 +124,8 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
       dCoeffUp_ = NULL;
     }
 
-  delete[] matrix;
-  delete[] diam;
-  delete[] eigval;
-  delete[] indexmap;
+  delete [] diam;
+  delete [] eigval;
 }
 
 
@@ -151,8 +134,9 @@ void fill_dCoeff (CouNumber * &dCoeff, CouNumber eigval, CouNumber *diam, int n)
 
   if (dCoeff == NULL)
     dCoeff = new CouNumber [n];
-  for (int i=0; i<n; ++i) {
-    if (diam [i] == 0.) dCoeff [i] = 0.;
-    else                dCoeff [i] = eigval / (diam [i] * diam [i]);
-  }
+
+  for (int i=0; i<n; ++i)
+    dCoeff [i] = (fabs (diam [i]) < COUENNE_EPS) ? 
+      0. : 
+      eigval / (diam [i] * diam [i]);
 }

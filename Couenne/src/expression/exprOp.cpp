@@ -62,10 +62,11 @@ void exprOp::print (std::ostream &out,
 
 int exprOp::dependsOn (int *varlist, int n) {
 
-  int tot = 0;
+  register int tot = 0;
+  register expression **al = arglist_;
 
   for (register int i = nargs_; i--;)
-    tot += arglist_ [i] -> dependsOn (varlist, n);
+    tot += (*al++) -> dependsOn (varlist, n);
 
   return tot;
 }

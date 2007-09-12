@@ -57,7 +57,12 @@ exprQuad::exprQuad  (const exprQuad &src):
   qindexJ_  (NULL),
   qcoeff_   (NULL),
   nqterms_  (src.nqterms_),
-  nDiag_    (src.nDiag_)   {
+  dCoeffLo_ (NULL),
+  dCoeffUp_ (NULL),
+  dIndex_   (NULL), 
+  nDiag_    (src.nDiag_) {
+
+  // copy quadratic part (if any)
 
   if (src.qindexI_) {
 
@@ -76,6 +81,8 @@ exprQuad::exprQuad  (const exprQuad &src):
       qcoeff_  [i] = qc [i];
     }
   }
+
+  // copy convexification part (if any)
   
   if (src.dIndex_) {
     
@@ -112,8 +119,8 @@ exprQuad::~exprQuad () {
 
   if (dIndex_) {
     delete [] dIndex_;
-    delete [] dCoeffLo_;
-    delete [] dCoeffUp_;
+    if (dCoeffLo_) delete [] dCoeffLo_;
+    if (dCoeffUp_) delete [] dCoeffUp_;
   }
 }
 
@@ -147,7 +154,7 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
       prod -> print (out, descend, p); out << ' ';
       delete prod;
 
-    } else { // no problem pointer, use x for all variables
+    } else { // there is no problem pointer, use x for all variables
 
       if (qi == qj) out << "x_" << qi << "^2 ";
       else          out << "x_" << qi << "*x_" << qj << ' ';
@@ -304,7 +311,7 @@ void exprQuad::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
 }
 
 
-// insert a pair <int,CouNumber> into a map for linear terms
+/// insert a pair <int,CouNumber> into a map for linear terms
 void linsert (std::map <int, CouNumber> &lmap, 
 	      int index, CouNumber coe) {
 
@@ -318,7 +325,7 @@ void linsert (std::map <int, CouNumber> &lmap,
   }
 }
 
-// insert a pair <<int,int>,CouNumber> into a map for quadratic terms
+/// insert a pair <<int,int>,CouNumber> into a map for quadratic terms
 void qinsert (std::map <std::pair <int, int>, CouNumber> &map, 
 	      int indI, int indJ, CouNumber coe) {
 
@@ -330,4 +337,30 @@ void qinsert (std::map <std::pair <int, int>, CouNumber> &map,
     if (fabs (i -> second += coe) < COUENNE_EPS)
       map.erase (i);
   } else map.insert (npair);
+}
+
+
+/// create dIndex_ based on occurrences in qindexI_ and qindexJ_
+void exprQuad::make_dIndex (int numcols, int *indexmap) { 
+
+  int *qindexI = getQIndexI (),
+      *qindexJ = getQIndexJ ();
+
+  nDiag_ = 0; // initialize sparse diagonal index vector
+
+  // fill indexmap
+  for (int i = 0; i < nqterms_; ++i) {
+
+    int qi = qindexI [i], 
+        qj = qindexJ [i];
+
+    if                (indexmap [qi] == -1)  indexmap [qi] = nDiag_++;
+    if ((qi != qj) && (indexmap [qj] == -1)) indexmap [qj] = nDiag_++;
+  }
+
+  dIndex_ = new int [nDiag_];
+
+  for (int i=0; i<numcols; ++i)
+    if (indexmap [i] > -1)
+      dIndex_ [indexmap [i]] = i;
 }

@@ -106,7 +106,8 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       lincoe = egBody -> getCoeffs  ();
       c0     = egBody -> getc0      ();
 
-      for (int j; (j = linind [nlin]) >= 0; nlin++)
+      for (int j; (j = linind [nlin]) >= 0; nlin++) {
+
 	if ((j > maxindex) && 
 	    !(wentAux [j]) && 
 	    (fabs (lincoe [nlin]) > COUENNE_EPS) &&
@@ -119,6 +120,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	  auxcoe   = lincoe [nlin];
 	  maxindex = j;
 	}
+      }
     }
 
     if (which != 1) 
