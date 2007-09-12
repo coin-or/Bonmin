@@ -107,8 +107,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
 #ifdef DEBUG
 
-  CouNumber l = solver -> getColLower () [index_],
-            u = solver -> getColUpper () [index_];
 
   if (way) {
     if      (value_ < l)             printf ("Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
@@ -119,8 +117,16 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   }
 #endif
 
-  if (!way) solver -> setColUpper (index_, integer_ ? floor (value_) : value_); // down branch
-  else      solver -> setColLower (index_, integer_ ? ceil  (value_) : value_); // up   branch
+  CouNumber
+    l    = solver -> getColLower () [index_],
+    u    = solver -> getColUpper () [index_],
+    brpt = value_;
+
+  if (brpt < l) brpt = l;
+  if (brpt > u) brpt = u;
+
+  if (!way) solver -> setColUpper (index_, integer_ ? floor (brpt) : brpt); // down branch
+  else      solver -> setColLower (index_, integer_ ? ceil  (brpt) : brpt); // up   branch
 
   // TODO: apply bound tightening to evaluate change in dual bound
 

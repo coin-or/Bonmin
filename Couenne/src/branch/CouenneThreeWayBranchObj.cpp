@@ -75,6 +75,13 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
 
   // set lower or upper bound (round if this variable is integer)
 
+  CouNumber
+    l = solver -> getColLower () [index_],
+    u = solver -> getColUpper () [index_];
+
+  if (lcrop_ < l) lcrop_ = l;
+  if (rcrop_ > u) rcrop_ = u;
+
   switch (--way) { // from {0,1,2} to {-1,0,1}
 
   case -1: solver -> setColUpper (index_, integer_ ? floor (lcrop_) : lcrop_); break; // left

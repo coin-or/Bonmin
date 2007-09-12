@@ -41,6 +41,9 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
     if (index == ind_obj) 
       continue;
 
+    if (newLow [index] > newUpp [index])
+      newLow [index] = newUpp [index];
+
     CouNumber bd;
 
     if (firstcall_ || ((bd = newLow [index]) > oldLow [index] + COUENNE_EPS)) { // lower
