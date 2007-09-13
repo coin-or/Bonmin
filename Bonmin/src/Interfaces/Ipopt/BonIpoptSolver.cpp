@@ -162,7 +162,6 @@ namespace Bonmin{
   Ipopt::SmartPtr<Bonmin::RegisteredOptions>
   IpoptSolver::RegOptions()
   {
-    throw -1;
     return roptions_;
   }
 
