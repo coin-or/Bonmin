@@ -22,7 +22,6 @@
 #include "BonminConfig.h"
 #include "BonCouenneInterface.hpp"
 #include "BonIpoptSolver.hpp"
-#include "BonCouenneCbc.hpp"
 
 #include "BonCouenneSetup.hpp"
 
