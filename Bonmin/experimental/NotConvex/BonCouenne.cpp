@@ -35,14 +35,11 @@
 #include <CouenneProblem.hpp>
 #include <CouenneCutGenerator.hpp>
 
-namespace Bonmin{
-extern int usingCouenne;}
 using namespace Bonmin;
 
 int main (int argc, char *argv[])
 {
   using namespace Ipopt;
-  Bonmin::usingCouenne = 1;  
 
   char * pbName = NULL;
   if(argc > 1)
