@@ -72,13 +72,14 @@ algo_(other.algo_){
     registerMilpCutGenerators(roptions);
     
     roptions->SetRegisteringCategory("Bonmin algorithm choice", RegisteredOptions::BonminCategory);
-    roptions->AddStringOption4("algorithm",
+    roptions->AddStringOption5("algorithm",
                                "Choice of the algorithm.",
                                "B-Hyb",
                                "B-BB","simple branch-and-bound algorithm,",
                                "B-OA","OA Decomposition algorithm,",
                                "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
                                "B-Hyb","hybrid outer approximation based branch-and-cut.",
+                               "B-Ecp","ecp cuts based branch-and-cut a la FilMINT.",
                                "This will preset some of the options of bonmin depending on the algorithm choice."
                                );
     roptions->setOptionExtraInfo("algorithm",31);
@@ -305,11 +306,11 @@ algo_(other.algo_){
     intParam_[BabSetupBase::SpecialOption] = 16;
     //AW: Took this out: intParam_[BabSetupBase::MinReliability] = 0;
     if(!options_->GetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.")){
-      intParam_[BabSetupBase::MinReliability] = 0;
+      intParam_[BabSetupBase::MinReliability] = 1;
       options_->SetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.");
     }
     if(!options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin.")){
-      intParam_[BabSetupBase::NumberStrong] = 0;
+      intParam_[BabSetupBase::NumberStrong] = 1000;
       options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin."); 
     }
     int varSelection;
@@ -385,7 +386,13 @@ algo_(other.algo_){
     }
     else if (algo==B_QG) {
       options_->SetNumericValue("oa_dec_time_limit",0, true, true);
-      options_->SetNumericValue("nlp_solve_frequency", 0, true, true);
+      options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
+    }
+    else if(algo==B_Ecp){
+      options_->SetNumericValue("oa_dec_time_limit",0, true, true);
+      options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
+      options_->SetIntegerValue("filmint_ecp_cuts", 1, true, true);
+      options_->SetIntegerValue("number_cut_passes", 1, true, true);
     }
 //#define GREAT_STUFF_FOR_ANDREAS
 #ifdef GREAT_STUFF_FOR_ANDREAS

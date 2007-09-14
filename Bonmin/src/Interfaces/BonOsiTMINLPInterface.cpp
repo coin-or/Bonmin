@@ -1582,7 +1582,8 @@ OsiTMINLPInterface::getNonLinearitiesViolation(const double *x, const double obj
 {
   double f;
   double norm = getConstraintsViolation(x, f);
-  norm =  fabs(f - obj) > norm ? fabs(f - obj) : norm;
+  assert((f - obj) > -1e-08);
+  norm =  (f - obj) > norm ? f - obj : norm;
   return norm;
 }
 

@@ -20,8 +20,6 @@
 #include "BonAmplSetup.hpp"
 #include "BonCbc.hpp"
 
-namespace Bonmin{
-extern int usingCouenne;}
 using namespace Bonmin;
 int main (int argc, char *argv[])
 {

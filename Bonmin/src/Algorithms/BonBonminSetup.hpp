@@ -16,7 +16,8 @@ namespace Bonmin{
     B_BB=0/** Bonmin's Branch-and-bound.*/,
     B_OA=1/** Bonmin's Outer Approximation Decomposition.*/,
     B_QG=2/** Bonmin's Quesada & Grossmann branch-and-cut.*/,
-    B_Hyb=3/** Bonmin's hybrid outer approximation.*/
+    B_Hyb=3/** Bonmin's hybrid outer approximation.*/,
+    B_Ecp=4/** Bonmin's implemantation of ecp cuts based branch-and-cut a la FilMINT.*/
   };
   /* Bonmin algorithm setup. */
   class BonminSetup : public BabSetupBase{
@@ -50,7 +51,7 @@ protected:
       static void registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
     /** Add milp cut generators according to options.*/
     void addMilpCutGenerators();
-    /** Initialize an plain branch-and-bound.*/
+    /** Initialize a plain branch-and-bound.*/
     void initializeBBB();
     /** Initialize a branch-and-cut with some OA.*/
     void initializeBHyb(bool createContinuousSolver = false);

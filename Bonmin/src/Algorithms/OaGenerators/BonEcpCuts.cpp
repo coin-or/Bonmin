@@ -6,7 +6,7 @@
 // P. Bonami, International Business Machines
 //
 // Date :  12/20/2006
-
+//#define ECP_DEBUG
 #include "BonEcpCuts.hpp"
 namespace Bonmin{
 
@@ -53,6 +53,7 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
 //#define ECP_DEBUG
 #ifdef ECP_DEBUG
   std::cout<<"Initial Constraint violation: "<<orig_violation<<std::endl;
+  std::cout<<"Initial objectvie value"<<si.getObjValue()<<std::endl;
 #endif
   if(orig_violation <= abs_violation_tol_)
     return;
@@ -70,10 +71,13 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
       int numberCuts =  - cs.sizeRowCuts();
       const double * toCut = parameter().addOnlyViolated_ ?
 	si.getColSolution():NULL;
-      nlp_->getOuterApproximation(cs, si.getColSolution(), 1, toCut, parameter().global_);
+     const OsiSolverInterface &localSi = (lpManip == NULL) ?
+                                  si : *(lpManip->si());
+      nlp_->getOuterApproximation(cs, localSi.getColSolution(), 1, toCut, parameter().global_);
       numberCuts += cs.sizeRowCuts();
-      if(numberCuts > 0 && (lp_ || i + 1 < numRounds_ )){
+      if(numberCuts > 0 && i + 1 < numRounds_ ){
         if(lpManip==NULL) {
+        assert(lp_ == NULL);
           if(lp_ == NULL)
             lpManip = new solverManip(si);
           else
@@ -81,7 +85,13 @@ EcpCuts::generateCuts(const OsiSolverInterface &si,
                                       false,false);
         }
         lpManip->installCuts(cs,numberCuts);
+#ifdef ECP_DEBUG
+        std::cerr<<"Installed "<<numberCuts<<"cuts in lp"<<std::endl;
+#endif
         lpManip->si()->resolve();
+#ifdef ECP_DEBUG
+        std::cerr<<"New objective "<<lpManip->si()->getObjValue()<<std::endl; 
+#endif
         if(lpManip->si()->isProvenPrimalInfeasible())
         {
           infeasible = true;

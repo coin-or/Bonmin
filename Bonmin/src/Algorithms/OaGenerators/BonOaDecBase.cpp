@@ -61,7 +61,7 @@ namespace Bonmin {
                              bool reassignLpsolver):
   CglCutGenerator(),
   nlp_(b.nonlinearSolver()),
-  lp_(b.continuousSolver()),
+  lp_(NULL),//(b.continuousSolver()),
   objects_(NULL),
   nObjects_(0),
   nLocalSearch_(0),
@@ -437,7 +437,8 @@ OaDecompositionBase::solverManip::fixIntegers(const OsiBranchingInformation& inf
         if (fabs(value) > 1e10) {
           std::cerr<<"ERROR: Can not fix variable in nlp because it has too big a value ("<<value
           <<") at optimium of LP relaxation. You should try running the problem with B-BB"<<std::endl;
-          throw -1;
+       throw CoinError("LP solution has too big values.",
+                "fixIntegers","OaDecompositionBase::solverManip") ;
         }
 #ifdef OA_DEBUG
         //         printf("xx %d at %g (bounds %g, %g)",i,value,nlp_->getColLower()[i],
@@ -600,7 +601,6 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
                           const CglTreeInfo info) const{
     if (nlp_ == NULL) {
       std::cerr<<"Error in cut generator for outer approximation no NLP ipopt assigned"<<std::endl;
-      throw -1;
     }
 
     // babInfo is used to communicate with the b-and-b solver (Cbc or Bcp).

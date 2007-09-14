@@ -24,7 +24,6 @@
 
 namespace Bonmin
 {
-extern int usingCouenne;
 
 /// Default constructor
   OACutGenerator2::OACutGenerator2
@@ -149,9 +148,6 @@ extern int usingCouenne;
     bool foundSolution = 0;
 #endif
     double * nlpSol = NULL;
-    if(usingCouenne){
-      nlpSol = new double [numcols];
-    }
 
     while (isInteger && feasible ) {
       numberPasses++;
@@ -186,15 +182,7 @@ extern int usingCouenne;
       lp->setDblParam(OsiDualObjectiveLimit, cutoff);
     }
 
-    if(usingCouenne)//Need to backup solution and restore bounds
-      {
-	CoinCopyN(nlp_->getColSolution(), numcols, nlpSol);
-	nlpManip.restore();
-      }
-    else
-      {
-	nlpSol = const_cast<double *>(nlp_->getColSolution());
-      }
+    nlpSol = const_cast<double *>(nlp_->getColSolution());
       
     // Get the cuts outer approximation at the current point
     const double * toCut = (parameter().addOnlyViolated_)?
@@ -215,7 +203,6 @@ extern int usingCouenne;
     bool changed = !feasible;//if lp is infeasible we don't have to check anything
     info.solution_ = lp->getColSolution();
     if(!changed)
-	  if(!usingCouenne)
 	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
     if (changed) {
 
@@ -265,7 +252,6 @@ extern int usingCouenne;
             if(feasible && isInteger)
              {
 	       bool changed = false;
-	       if(!usingCouenne)
 		 changed = nlpManip.isDifferentOnIntegers(colsol);//If integer solution is the same as nlp
                                                                    //solution problem is solved
               if (!changed) {
@@ -293,8 +279,6 @@ extern int usingCouenne;
       subMip = NULL;
     }
     }
-    if(usingCouenne)
-      delete [] nlpSol;
 
 #ifdef OA_DEBUG
   debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);

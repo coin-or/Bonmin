@@ -18,7 +18,6 @@
 namespace Bonmin
 {
 
-extern int usingCouenne;
 // Default constructor
   OaFeasibilityChecker ::OaFeasibilityChecker 
   (OsiTMINLPInterface * nlp,
@@ -55,7 +54,7 @@ extern int usingCouenne;
    int numcols = lp->getNumCols();
    double milpBound = -COIN_DBL_MAX;
    int numberPasses = 0;
-   double * nlpSol = usingCouenne ? new double[numcols] : NULL;
+   double * nlpSol =  NULL;
    while (isInteger && feasible ) {
      numberPasses++;
 
@@ -87,11 +86,7 @@ extern int usingCouenne;
    }
    // Get the cuts outer approximation at the current point
 
-   if(usingCouenne){//Store solution and restore bounds because Couenne gives local cuts
-     CoinCopyN(nlp_->getColSolution(), numcols, nlpSol);
-     nlpManip.restore();}
-   else{
-     nlpSol = const_cast<double *>(nlp_->getColSolution());}
+   nlpSol = const_cast<double *>(nlp_->getColSolution());
    
    const double * toCut = (parameter().addOnlyViolated_)?
 			      colsol:NULL;
@@ -108,30 +103,20 @@ extern int usingCouenne;
             !lp->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
         //if value of integers are unchanged then we have to get out
         bool changed = true;//if lp is infeasible we don't have to check anything
-	if(usingCouenne){
-	  if(feasible){
-          info.solution_ = lp->getColSolution(); 
-	  isInteger = lpManip.integerFeasible(info);
-	  }
-	  else{
-	    isInteger = 0;
-	    //	  if(!fixed)//fathom on bounds
-	    milpBound = 1e200;
-	  }
+	isInteger = 0;
+	//	  if(!fixed)//fathom on bounds
+	milpBound = 1e200;
+	if(feasible){
+	  changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
 	}
-	else{
-	  if(feasible){
-	    changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
-	  }
-	  if (changed) {
-            info.solution_ = lp->getColSolution();
-	    isInteger = lpManip.integerFeasible(info);
-	  }
-	  else {
-	    isInteger = 0;
-	    //	  if(!fixed)//fathom on bounds
-	    milpBound = 1e200;
-	  }
+	if (changed) {
+          info.solution_ = lp->getColSolution();
+	  isInteger = lpManip.integerFeasible(info);
+	}
+	else {
+	  isInteger = 0;
+	  //	  if(!fixed)//fathom on bounds
+	  milpBound = 1e200;
 	}
 #ifdef OA_DEBUG
 	printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
@@ -142,8 +127,6 @@ extern int usingCouenne;
    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
    std::cout<<"milpBound found: "<<milpBound<<std::endl;
 #endif
-   if(usingCouenne)
-     delete [] nlpSol;
     return milpBound;
   }
 

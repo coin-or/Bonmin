@@ -184,9 +184,9 @@ namespace Bonmin {
                               cutoff_(1e100),
                               nBacktracks_(0),
                               maxDepthBFS_(4),
-                              maxDiveBacktracks_(5),
+                              maxDiveBacktracks_(2),
                               maxDiveDepth_(COIN_INT_MAX),
-                              mode_(FindSolutions){
+                              mode_(Enlarge){
   }
 
     ///Copy constructor.
@@ -319,6 +319,10 @@ namespace Bonmin {
     assert(nBacktracks_ < maxDiveBacktracks_);
     CbcNode * node = NULL;
     while(diveListSize_ > 0){
+#ifdef DIVE_DEBUG
+         std::cerr<<"CbcDfsDiver::bestNode"
+                  <<", exmining node"<<std::endl;
+#endif
        node = dive_.front();
        dive_.pop_front();
        diveListSize_ --;
@@ -512,11 +516,11 @@ namespace Bonmin {
     assert(comparisonBound_);
     CbcDfsDiver::ComparisonModes mode = diver_->getComparisonMode();
     if(mode == CbcDfsDiver::FindSolutions){
-      comparisonDive_->test(x,y);}
+      return comparisonDive_->test(x,y);}
     else if(mode == CbcDfsDiver::CloseBound){
-      comparisonBound_->test(x,y);}
+      return comparisonBound_->test(x,y);}
     else if(mode == CbcDfsDiver::LimitTreeSize){
-       comparisonDepth_.test(x,y);}
+      return comparisonDepth_.test(x,y);}
     else{
        throw -1;
     }

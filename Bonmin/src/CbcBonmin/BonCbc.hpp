@@ -80,7 +80,13 @@ public:
   const CbcModel&  model(){
     return model_;
   }
-  
+ /** Say that algorithm is using Couenne.*/
+ void setUsingCouenne(bool v){
+   usingCouenne_ = v;}
+
+ /** Get value of usingCouenne variable.*/
+ bool getUsingCouenne(){
+   return usingCouenne_;} 
 protected:
   template<class T> struct deleter 
   //       :public unary_function<T, void>
@@ -113,6 +119,9 @@ protected:
   OsiObject** objects_;
   /** number of objects.*/
   int nObjects_;
+
+  /** Say if current algorithm is Couenne.*/
+  bool usingCouenne_;
 };
 }
 #endif
