@@ -2296,6 +2296,7 @@ void OsiTMINLPInterface::initialSolve()
     if(printOptions)
       app_->Options()->SetStringValue("print_user_options","yes");
   }
+  app_->disableWarmStart(); 
   solveAndCheckErrors(0,1,"initialSolve");
   
   //Options should have been printed if not done already turn off Ipopt output
@@ -2339,8 +2340,9 @@ OsiTMINLPInterface::resolve()
     app_->Options()->SetStringValue("warm_start_same_structure", "no");
   }
 
-  app_->enableWarmStart();
-
+  if(problem_->duals_init() != NULL)
+    app_->enableWarmStart();
+  else app_->disableWarmStart();
   solveAndCheckErrors(1,1,"resolve");
   
   const char * status=OPT_SYMB;
