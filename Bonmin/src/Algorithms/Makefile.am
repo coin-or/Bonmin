@@ -74,8 +74,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples`
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
 
 if COIN_HAS_CPX
   AM_CPPFLAGS += \

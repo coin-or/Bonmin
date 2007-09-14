@@ -23,10 +23,9 @@
 
 
 // Node selection
-#include "CbcCompareUser.hpp"
 #include "CbcCompareActual.hpp"
 
-#include "CbcBranchUser.hpp"
+#include "CbcBranchActual.hpp"
 
 
 namespace Bonmin
@@ -116,7 +115,7 @@ namespace Bonmin
     // Definition of node selection strategy
     CbcCompareObjective compare0;
     CbcCompareDepth compare1;
-    CbcCompareUser compare2;
+    CbcCompareDefault compare2;
     if (nodeSelection_==0) {
       model.setNodeComparison(compare0);
     }

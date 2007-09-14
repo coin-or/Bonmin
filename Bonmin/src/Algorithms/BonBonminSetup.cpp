@@ -311,11 +311,13 @@ algo_(other.algo_){
     }
     if(!options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin.")){
       intParam_[BabSetupBase::NumberStrong] = 1000;
-      options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin."); 
+      options_->SetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin."); 
     }
     int varSelection;
-    options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
-
+    bool val = options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
+    if(!val){
+      options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
+    }
     switch (varSelection) {
     case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
     case OsiTMINLPInterface::QP_STRONG_BRANCHING:
