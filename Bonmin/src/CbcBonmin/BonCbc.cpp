@@ -15,10 +15,7 @@
 #include "CbcModel.hpp"
 #include "CbcBranchActual.hpp"
 #include "CbcCutGenerator.hpp"
-#include "CbcCompareUser.hpp"
 #include "CbcCompareActual.hpp"
-
-#include "CbcBranchUser.hpp"
 
 #include "BonExitCodes.hpp"
 
@@ -278,12 +275,12 @@ namespace Bonmin
       model_.setNodeComparison(compare);
     }
     else if (s.nodeComparisonMethod()==BabSetupBase::BFS) {
-      CbcCompareUser compare;
+      CbcCompareDefault compare;
       compare.setWeight(0.0);
       model_.setNodeComparison(compare);
     }
     else if (s.nodeComparisonMethod()==BabSetupBase::dynamic) {
-      CbcCompareUser compare;
+      CbcCompareDefault compare;
       model_.setNodeComparison(compare);
     }
     else if (s.nodeComparisonMethod()==BabSetupBase::bestGuess) {
@@ -339,7 +336,7 @@ namespace Bonmin
     
     
     // Redundant definition of default branching (as Default == User)
-    CbcBranchUserDecision branch;
+    CbcBranchDefaultDecision branch;
     if(s.branchingMethod() != NULL){
       s.branchingMethod()->setSolver(model_.solver());
       s.branchingMethod()->setNumberStrong(model_.numberStrong());
@@ -444,7 +441,7 @@ namespace Bonmin
       <<" beware that reported solution may not be optimal"<<std::endl
       <<"************************************************************"<<std::endl;
     }
-    TMINLP::SolverReturn status;
+    TMINLP::SolverReturn status = TMINLP::MINLP_ERROR;
     
     if(model_.numberObjects()==0){
       if(bestSolution_)

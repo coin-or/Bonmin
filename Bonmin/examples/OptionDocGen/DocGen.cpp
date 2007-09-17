@@ -40,8 +40,14 @@ int main (int argc, char *argv[])
   //Now initialize from tminlp
   bonmin.initialize(GetRawPtr(tminlp));
 
-  std::ofstream of("Table.tex");
-  bonmin.roptions()->writeLatexOptionsTable(of, Bonmin::RegisteredOptions::BonminCategory);
+  std::ofstream of("options_list_bonmin_content.tex");
+  bonmin.roptions()->writeLatexHtmlDoc(of, Bonmin::RegisteredOptions::BonminCategory);
+  of.close();
+  of.open("options_list_ipopt_content.tex");
+  bonmin.roptions()->writeLatexHtmlDoc(of, Bonmin::RegisteredOptions::IpoptCategory);
+  of.close();
+  of.open("options_list_filter_content.tex");
+  bonmin.roptions()->writeLatexHtmlDoc(of, Bonmin::RegisteredOptions::FilterCategory);
   return 0;
 }
 

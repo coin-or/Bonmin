@@ -70,10 +70,8 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 am_libbonmin_la_OBJECTS = BonCbc.lo BonCbcNlpStrategy.lo BonCbcNode.lo \
-	BonAuxInfos.lo BonCbcParam.lo BonGuessHeuristic.lo BonDiver.lo
-nodist_libbonmin_la_OBJECTS = CbcCompareUser.lo CbcBranchUser.lo
-libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS) \
-	$(nodist_libbonmin_la_OBJECTS)
+	BonAuxInfos.lo BonGuessHeuristic.lo BonDiver.lo
+libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS)
 am_libbonminampl_la_OBJECTS =
 libbonminampl_la_OBJECTS = $(am_libbonminampl_la_OBJECTS)
 @COIN_HAS_ASL_TRUE@am_libbonminampl_la_rpath = -rpath $(libdir)
@@ -95,8 +93,7 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libbonmin_la_SOURCES) $(nodist_libbonmin_la_SOURCES) \
-	$(libbonminampl_la_SOURCES)
+SOURCES = $(libbonmin_la_SOURCES) $(libbonminampl_la_SOURCES)
 DIST_SOURCES = $(libbonmin_la_SOURCES) $(libbonminampl_la_SOURCES)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
@@ -336,11 +333,13 @@ libbonmin_la_SOURCES = \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
-	BonCbcParam.cpp BonCbcParam.hpp \
 	BonGuessHeuristic.cpp BonGuessHeuristic.hpp \
 	BonDiver.cpp BonDiver.hpp
 
-nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
+
+#	BonCbcParam.cpp BonCbcParam.hpp 
+
+#nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 libbonmin_la_LIBADD = \
 	../Algorithms/libbonalgorithms.la \
 	../Interfaces/libbonmininterfaces.la \
@@ -397,12 +396,22 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Algorithms` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` -I`$(CYGPATH_W) \
-	$(CBCSRCDIR)/examples` $(am__append_2)
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` $(am__append_2)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+
+# The following is a trick to get the source code of Cbc/Samples correctly in
+# here, and also to get a link to libCbc into this directory (so that it
+# is made)
+#CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
+#rm -f $@
+#$(LN_S) $? $@
+
+#CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
+#rm -f $@
+#$(LN_S) $? $@
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -510,11 +519,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNlpStrategy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcParam.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDiver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonGuessHeuristic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcBranchUser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CbcCompareUser.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -738,17 +744,6 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am \
 	uninstall-includeHEADERS uninstall-info-am \
 	uninstall-libLTLIBRARIES
 
-
-# The following is a trick to get the source code of Cbc/Samples correctly in
-# here, and also to get a link to libCbc into this directory (so that it
-# is made)
-CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
-
-CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
 
 astyle: $(ASTYLE_FILES)
 

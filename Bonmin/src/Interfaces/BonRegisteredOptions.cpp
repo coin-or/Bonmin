@@ -11,6 +11,8 @@
 #include "BonRegisteredOptions.hpp"
 #include "IpSmartPtr.hpp"
 #include <sstream>
+#include <climits>
+#include <cfloat>
 
 namespace Bonmin{
   struct optionsCmp{
@@ -39,6 +41,22 @@ namespace Bonmin{
    return ret_val;
   }
 
+  static std::string makeSpaceLess(const std::string &s){
+    std::string ret_val;
+    std::string::const_iterator i = s.begin();
+    for(; i != s.end() ; i++){
+       switch (*i) {
+         case ' ':
+         case '\t':
+           ret_val +='_';
+           break;
+         default:
+           ret_val += *i;
+       }
+    }
+   return ret_val;
+  }
+
   static std::string makeLatex(double value){
     std::string ret_val = "$";
     std::stringstream s_val;
@@ -53,6 +71,33 @@ namespace Bonmin{
     }
     else ret_val += s_val.str();
     ret_val += '$';
+    return ret_val;
+  }
+  static std::string makeString(int value){
+    std::string ret_val;
+    if(value >= INT_MAX){
+     ret_val="INT_MAX";}
+    else if(value <= - INT_MAX){
+      ret_val="-INT_MAX";}
+    else{
+      std::stringstream s_val;
+      s_val<<value;
+      ret_val = s_val.str();
+    }
+    return ret_val;
+  }
+
+  static std::string makeString(double value){
+    std::string ret_val;
+    if(value >= DBL_MAX){
+     ret_val="DBL_MAX";}
+    else if(value <= - DBL_MAX){
+      ret_val="-DBL_MAX";}
+    else{
+      std::stringstream s_val;
+      s_val<<value;
+      ret_val = s_val.str();
+    }
     return ret_val;
   }
   static std::string makeLatex(int value){
@@ -77,9 +122,9 @@ namespace Bonmin{
   static std::string defaultAsString(Ipopt::SmartPtr< Ipopt::RegisteredOption > opt){
     Ipopt::RegisteredOptionType T = opt->Type();
     switch(T){
-      case Ipopt::OT_Number: return makeLatex(opt->DefaultNumber());
-      case Ipopt::OT_Integer: return makeLatex(opt->DefaultInteger());
-      case Ipopt::OT_String: return makeLatex(opt->DefaultString());
+      case Ipopt::OT_Number: return makeString(opt->DefaultNumber());
+      case Ipopt::OT_Integer: return makeString(opt->DefaultInteger());
+      case Ipopt::OT_String: return (opt->DefaultString());
       case Ipopt::OT_Unknown: 
       default:
          return "Unknown type of option";
@@ -124,7 +169,7 @@ namespace Bonmin{
      }
      
      of<<makeLatex((*i)->Name())<<"& "<<OptionType2Char((*i)->Type())<<"& "
-       <<defaultAsString(*i)
+       <<makeLatex(defaultAsString(*i))
        <<"& "<<( (isValidForBBB((*i)->Name()))? '+' : '-' )
        <<"& "<<( (isValidForBOA((*i)->Name()))? '+' : '-' )
        <<"& "<<( (isValidForBQG((*i)->Name()))? '+' : '-' )
@@ -175,6 +220,16 @@ namespace Bonmin{
    void 
    RegisteredOptions::writeHtmlOptionsTable(std::ostream &os, std::list<Ipopt::RegisteredOption *> &options)
    {
+   os<<"<table border=\"1\">"<<std::endl;
+   os<<"<tr>"<<std::endl;
+   os<<"<td>Option </td>"<<std::endl;
+   os<<"<td> type </td>"<<std::endl;
+   os<<"<td> default </td>"<<std::endl;
+   os<<"<td> B-BB</td>"<<std::endl;
+   os<<"<td> B-OA</td>"<<std::endl;
+   os<<"<td> B-QG</td>"<<std::endl;
+   os<<"<td> B-Hyb</td>"<<std::endl;
+   os<<"</tr>"<<std::endl;
    std::string registeringCategory = "";
    for(std::list< Ipopt::RegisteredOption * >::iterator i = options.begin();
        i != options.end() ; i++)
@@ -183,12 +238,13 @@ namespace Bonmin{
      registeringCategory = (*i)->RegisteringCategory();
      os<<"<tr>"
        <<"   <th colspan=7>"
-       <<registeringCategory<<"</th>"<<std::endl
+       <<" <a href=\"#sec:"<<makeSpaceLess(registeringCategory)<<"\">"
+       <<registeringCategory<<"</a> </th>"<<std::endl
        <<"</tr>"<<std::endl;
      }
      
      os<<"<tr>"<<std::endl
-       <<"<td> <a href=\"#"<<((*i)->Name())<<"\">"
+       <<"<td> <a href=\"#sec:"<<makeSpaceLess((*i)->Name())<<"\">"
        <<((*i)->Name())<<"</a> </td>"<<std::endl
        <<"<td>"<<OptionType2Char((*i)->Type())<<"</td>"<<std::endl
        <<"<td>"<<defaultAsString(*i)<<"</td>"<<std::endl
@@ -203,113 +259,22 @@ namespace Bonmin{
     <<"</table>"<<std::endl;
   }
 
-//Copiedand modified from Ipopt/src/Common adapt to output to an ostream
-  static void 
-  OutputLatexDescription(std::ostream & os, const Ipopt::RegisteredOption opt)
-  {
-    std::string latex_name = makeLatex(opt.Name());
-    std::string latex_desc = makeLatex(opt.ShortDescription());
-    os<<"\\paragraph{"<<latex_name<<"}\n"
-      <<"\\label{"<<latex_name<<"}\n"
-      <<latex_desc<<"\\\\"<<std::endl;
-
-    os<<makeLatex(opt.LongDescription());
-
-    Ipopt::RegisteredOptionType type = opt.Type();
-    if (type == Ipopt::OT_Number) {
-      os<<" The valid range for this real option is \n$";
-      if (opt.HasLower()) {
-         os<<makeLatex(opt.LowerNumber());
-      }
-      else {
-         os<<"-\\infty$";
-      }
-
-      if (opt.HasLower() && !opt.LowerStrict()) {
-         os<<" \\le ";
-      }
-      else {
-        os<<" <  ";
-      }
-
-      os<<"{\\tt "<<latex_name<<"}";
-
-      if (opt.HasUpper() && !opt.UpperStrict()) {
-        os<<" \\le ";
-      }
-      else {
-        os<<" <  ";
-      }
-
-      if (opt.HasUpper()) {
-        os<<makeLatex(opt.UpperNumber());
-      }
-      else {
-        os<<"\\infty";
-      }
-
-      os<<"$\nand its default value is $"<<
-          opt.DefaultNumber()<<"$.\n\n";
-    }
-    else if (type == Ipopt::OT_Integer) {
-      os<<" The valid range for this integer option is\n$";
-      if (opt.HasLower()) {
-        os<<opt.LowerInteger()<<" \\le ";
-      }
-      else {
-        os<<"{\\tt - \\infty}";
-      }
-
-      os<< "{\\tt "<<latex_name<<"}";
-
-      if (opt.HasUpper()) {
-        os<<" \\le "<<opt.UpperInteger();
-      }
-      else {
-        os<<" <  {\\tt \\infty}";
-      }
-
-      os<<"$\nand its default value is $"
-        <<opt.DefaultInteger()<<"$.\n\n";
-    }
-    else if (type == Ipopt::OT_String) {
-      std::string buff;
-      os<<"\nThe default value for this string option is {\\tt "
-         <<opt.DefaultString()<<"}.\n";
-
-      os<<"\\\\ \nPossible values:\n";
-      os<<"\\begin{itemize}\n";
-#if TOFIX
-      for (std::vector<string_entry>::const_iterator
-           i = valid_strings_.begin();
-           i != valid_strings_.end(); i++) {
-        std::string latex_value;
-        MakeValidLatexString((*i).value_, latex_value);
-        jnlst.Printf(J_SUMMARY, J_DOCUMENTATION, "   \\item %s: ",
-                     latex_value.c_str());
-
-        std::string latex_desc;
-        MakeValidLatexString((*i).description_, latex_desc);
-        jnlst.PrintStringOverLines(J_SUMMARY, J_DOCUMENTATION, 0, 48,
-                                   latex_desc.c_str());
-        jnlst.Printf(J_SUMMARY, J_DOCUMENTATION, "\n");
-      }
-#endif
-      std::cout<<"\\end{itemize}\n"<<std::endl;
-    }
-   std::cout<<std::endl;
-  }
    /** Output Latex/Html ooptions documentation.*/
    void 
    RegisteredOptions::writeLatexHtmlDoc(std::ostream &os, ExtraCategoriesInfo which){
-#ifdef FIXME
-      std::list< Ipopt::RegisteredOptions * > options;
-      ExtraCategoriesInfo which = Bonmin
+      std::list< Ipopt::RegisteredOption * > options;
       chooseOptions(which, options);
-      os<<"\\htmlonly{"
+      os<<"\\latexhtml{}{"<<std::endl;
       os<<"\\begin{rawhtml}"<<std::endl;
-      writeHtmlOptionsTable(os, options)
-      os<<"\\end{rawhtml} }"<<std::endl;
+      writeHtmlOptionsTable(os, options);
+      os<<"\\end{rawhtml}\n}"<<std::endl;
+
+      //Create journalist to write to os
+      Ipopt::Journalist jnlst;
+      Ipopt::SmartPtr<Ipopt::StreamJournal> J = new Ipopt::StreamJournal("options_journal", Ipopt::J_ALL);
+      J->SetOutputStream(&os);
+      J->SetPrintLevel(Ipopt::J_DOCUMENTATION, Ipopt::J_SUMMARY);
+      jnlst.AddJournal(GetRawPtr(J));
 
       std::string registeringCategory = "";
       for(std::list< Ipopt::RegisteredOption * >::iterator i = options.begin();
@@ -318,12 +283,11 @@ namespace Bonmin{
           if((*i)->RegisteringCategory() != registeringCategory){
            registeringCategory = (*i)->RegisteringCategory();
              os<<"\\subsection{"<<registeringCategory<<"}"<<std::endl;      
-             os<<"\\label{sec:"<<registeringCategory<<"}"<<std::endl;
+             os<<"\\label{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
            }
        
-       //MISSING CODE     
+           (*i)->OutputLatexDescription(jnlst);
        }
-#endif
     }
 
 }/*Ends bonmin namespace.*/

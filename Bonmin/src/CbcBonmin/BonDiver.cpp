@@ -156,6 +156,7 @@ namespace Bonmin {
 
   void 
   CbcDiver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+    roptions->SetRegisteringCategory("Diving options", RegisteredOptions::BonminCategory);
     roptions->AddStringOption2(
       "stop_diving_on_cutoff",
       "Flag indicating whether we stop diving based on guessed feasible objective and the current cutoff",
@@ -437,6 +438,7 @@ namespace Bonmin {
     ///Register the options of the method.
     void 
     CbcDfsDiver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+      roptions->SetRegisteringCategory("Diving options", RegisteredOptions::BonminCategory);
       roptions->AddLowerBoundedIntegerOption("max_backtracks_in_dive",
                                                   "Set the number of backtracks in a dive when using dfs-dive tree search"
                                                   "strategy.",

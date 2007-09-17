@@ -7,6 +7,7 @@
 // Pierre Bonami, Carnegie Mellon University,
 //
 // Date : 03/15/2006
+#define BonminCbcParam_H
 
 #ifndef BonminCbcParam_H
 #define BonminCbcParam_H

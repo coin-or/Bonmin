@@ -23,11 +23,12 @@ libbonmin_la_SOURCES = \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
-	BonCbcParam.cpp BonCbcParam.hpp \
 	BonGuessHeuristic.cpp BonGuessHeuristic.hpp \
 	BonDiver.cpp BonDiver.hpp
 
-nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
+#	BonCbcParam.cpp BonCbcParam.hpp 
+
+#nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 
 libbonmin_la_LIBADD = \
 	../Algorithms/libbonalgorithms.la \
@@ -90,8 +91,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples`
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
 
 if COIN_HAS_CPX
   AM_CPPFLAGS += \
@@ -106,13 +106,13 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # The following is a trick to get the source code of Cbc/Samples correctly in
 # here, and also to get a link to libCbc into this directory (so that it
 # is made)
-CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
+#CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
+#rm -f $@
+#$(LN_S) $? $@
 
-CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
-	rm -f $@
-	$(LN_S) $? $@
+#CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
+#rm -f $@
+#$(LN_S) $? $@
 
 ########################################################################
 #                Headers that need to be installed                     #

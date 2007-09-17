@@ -10,7 +10,6 @@
 #ifndef _BM_H
 #define _BM_H
 
-#include "BonCbcParam.hpp"
 
 #include "BCP_USER.hpp"
 #include "BCP_parameters.hpp"
@@ -116,7 +115,6 @@ public:
     BCP_string ipopt_file_content;
     BCP_string nl_file_content;
     BCP_parameter_set<BM_par> par;
-    Bonmin::BonminCbcParam minlpParams_;
 
 public:
 

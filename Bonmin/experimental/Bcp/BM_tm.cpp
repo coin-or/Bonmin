@@ -163,7 +163,6 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
   bonmin.initialize(argv);    
   
   Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
-  minlpParams_.extractParams(&nlpSolver);
   free(argv[1]);
   OsiSolverInterface& clp = *bonmin.continuousSolver();
 

@@ -59,7 +59,7 @@ ASLLIB = @ASLLIB@
 LIBS = -L$(COINLIBDIR) \
 	-lbonmin -lipopt \
        -lCbc -lCgl -lOsiClp -lOsi -lClp -lCoinUtils \
-        $(ASLLIB) @ADDLIBS@ \
+         @ADDLIBS@ \
 	`cat $(COINLIBDIR)/ipopt_addlibs_cpp.txt` \
 	`cat $(COINLIBDIR)/cgl_addlibs.txt` \
 	`cat $(COINLIBDIR)/osi_addlibs.txt` \
