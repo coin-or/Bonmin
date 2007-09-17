@@ -13,6 +13,7 @@
 #include "BonBonminSetup.hpp"
 #include "BonCurvBranchingSolver.hpp"
 #include "BonChooseVariable.hpp"
+#include "BonDiver.hpp"
 #include "BonQpBranchingSolver.hpp"
 #include "BonLpBranchingSolver.hpp"
 
@@ -24,7 +25,6 @@
 #include "BonEcpCuts.hpp"
 
 #include "BonCbcNode.hpp"
-#include "BonDiver.hpp"
 #ifdef COIN_HAS_FILTERSQP
 # include "BonFilterSolver.hpp"
 #endif
@@ -52,22 +52,15 @@ algo_(other.algo_){
   
   void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     BabSetupBase::registerAllOptions(roptions);
-    /* Branching options.*/
-    LpBranchingSolver::registerOptions(roptions);
     
     /* Outer Approximation options.*/
     OACutGenerator2::registerOptions(roptions);
     EcpCuts::registerOptions(roptions);
     OaNlpOptim::registerOptions(roptions);
 
-#ifdef COIN_HAS_FILTERSQP
-    FilterSolver::registerOptions(roptions);
-#endif
     
     BonCbcFullNodeInfo::registerOptions(roptions);
    
-    CbcDiver::registerOptions(roptions);
-    CbcDfsDiver::registerOptions(roptions);
  
     registerMilpCutGenerators(roptions);
     

@@ -16,6 +16,9 @@
 #include <fstream>
 #include <sstream>
 
+#include "BonDiver.hpp"
+#include "BonQpBranchingSolver.hpp"
+#include "BonLpBranchingSolver.hpp"
 
 namespace Bonmin{
   int BabSetupBase::defaultIntParam_[BabSetupBase::NumberIntParam] = {
@@ -442,6 +445,16 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
 					 "Maximum number of variables considered for strong branching in root node.",
 					 0, COIN_INT_MAX, "");
   
+
+
+    /* Branching options.*/
+    LpBranchingSolver::registerOptions(roptions);
+
+#ifdef COIN_HAS_FILTERSQP
+    FilterSolver::registerOptions(roptions);
+#endif
+    CbcDiver::registerOptions(roptions);
+    CbcDfsDiver::registerOptions(roptions);
 }
 
 

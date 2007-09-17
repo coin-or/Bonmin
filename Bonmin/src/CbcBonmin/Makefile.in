@@ -337,8 +337,6 @@ libbonmin_la_SOURCES = \
 	BonDiver.cpp BonDiver.hpp
 
 
-#	BonCbcParam.cpp BonCbcParam.hpp 
-
 #nodist_libbonmin_la_SOURCES = CbcCompareUser.cpp CbcBranchUser.cpp
 libbonmin_la_LIBADD = \
 	../Algorithms/libbonalgorithms.la \
@@ -421,7 +419,6 @@ include_HEADERS = \
      BonCbc.hpp \
      BonAuxInfos.hpp \
      BonCbcNode.hpp \
-     BonCbcParam.hpp \
      BonDiver.hpp \
      BonGuessHeuristic.hpp
 
@@ -432,7 +429,6 @@ include_HEADERS = \
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonCbcParam.cppbak BonCbcParam.hppbak \
 	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
 	BonCbcNode.cppbak BonCbcNode.hppbak  \
