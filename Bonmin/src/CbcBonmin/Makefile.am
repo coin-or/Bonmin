@@ -123,7 +123,6 @@ include_HEADERS = \
      BonCbc.hpp \
      BonAuxInfos.hpp \
      BonCbcNode.hpp \
-     BonCbcParam.hpp \
      BonDiver.hpp \
      BonGuessHeuristic.hpp
 
