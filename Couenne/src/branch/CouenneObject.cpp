@@ -16,9 +16,6 @@
 #include <exprGroup.hpp>
 #include <exprQuad.hpp>
 
-//#define WEI_INF   1.
-//#define WEI_RANK  0.
-//#define WEI_MULT  0.
 
 //#define DEBUG
 

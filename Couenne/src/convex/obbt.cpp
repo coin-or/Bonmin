@@ -14,6 +14,10 @@
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
+// TODO: seems like Clp doesn't like big bounds and crashes on
+// explicit bounds around 1e200 or so. For now simply use fictitious
+// bounds around 1e14. Fix.
+
 //#define DEBUG
 
 /// reoptimize and change bound of a variable if needed
@@ -102,6 +106,14 @@ int obbt_stage (const CouenneCutGenerator *cg,
       csi -> setObjective (objcoe);
       csi -> setObjSense (1); // minimization
 
+      // TODO: Use something else!
+#if 0
+      for (int iv=0; iv<csi->getNumCols (); iv++) {
+	if (fabs (csi -> getColLower () [iv]) > 1e7) csi -> setColLower (iv, -1e14);
+	if (fabs (csi -> getColUpper () [iv]) > 1e7) csi -> setColUpper (iv,  1e14);
+      }
+#endif
+
       CouNumber &bound = (sense == 1) ? (p -> Lb (i)) :	(p -> Ub (i)); 
 
       // m{in,ax}imize xi on csi
@@ -113,8 +125,8 @@ int obbt_stage (const CouenneCutGenerator *cg,
 
       char fname [20];
       sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", i, iter);
-      //printf ("\nwriting %s\n", fname);
-      //csi -> writeLp (fname);
+      printf ("\nwriting %s\n", fname);
+      csi -> writeLp (fname);
 #endif
 
       csi -> setWarmStart (warmstart);

@@ -175,6 +175,8 @@ void CouenneProblem::standardize () {
 
   graph_ -> createOrder ();
 
+  //  graph_ -> print ();
+
   // fill numbering structure /////////////////////////////////////////////////
 
   int n = nVars ();

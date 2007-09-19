@@ -276,9 +276,8 @@ int CouenneProblem::readnl (const ASL *asl) {
 
     if (index [i] && (*(index [i]) >= 0)) 
       if ((*nll) -> code () == COU_EXPRSUM)
-	body = new exprGroup (0., index [i], coeff [i], (*nll) -> ArgList (), (*nll) -> nArgs ());
-      else
-	body = new exprGroup (0., index [i], coeff [i], nll, 1);
+	body    = new exprGroup (0., index [i], coeff [i], (*nll) -> ArgList (), (*nll) -> nArgs ());
+      else body = new exprGroup (0., index [i], coeff [i], nll, 1);
     else {
       body = *nll;
       delete [] nll;

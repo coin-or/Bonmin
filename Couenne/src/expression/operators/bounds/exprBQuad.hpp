@@ -42,7 +42,7 @@ class exprLBQuad: public expression {
 
   /// function for the evaluation of the expression
   CouNumber operator () () 
-  {return computeQBound (-1, NULL);}
+  {return computeQBound (-1, ref_);}
 
   /// I/O
   virtual void print (std::ostream &s = std::cout,     //< output stream
@@ -78,7 +78,7 @@ class exprUBQuad: public expression {
 
   /// function for the evaluation of the expression
   CouNumber operator () () 
-  {return computeQBound (1, NULL);}
+  {return computeQBound (1, ref_);}
 
   /// I/O
   virtual void print (std::ostream &s = std::cout,     //< output stream

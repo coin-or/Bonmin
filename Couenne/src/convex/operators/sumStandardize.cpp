@@ -116,6 +116,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
 
   for (int i=0; i<nargs_; i++)
     decomposeTerm (p, arglist_ [i], 1, c0, lmap, qmap);
+
 #ifdef DEBUG
   printf ("decompTerm returns: [");
   for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); i++)
@@ -125,6 +126,7 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
     printf ("<%d,%d,%g>", i -> first.first, i -> first.second, i -> second);
   printf ("]\n");
 #endif
+
   return linStandardize (p, c0, lmap, qmap);
 }
 

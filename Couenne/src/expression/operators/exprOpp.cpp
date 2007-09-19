@@ -45,6 +45,9 @@ bool exprOpp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
 expression *exprOpp::simplify () {
 
+  exprUnary::simplify (); // simplify what's inside first
+
+  // check if this is a -(-f(x))
   if (argument_ -> code () == COU_EXPROPP) {
     expression *ret = argument_ -> Argument () -> clone ();
     delete argument_;

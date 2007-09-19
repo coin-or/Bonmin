@@ -16,8 +16,6 @@
 
 expression *exprOp:: simplify () {
 
-  //  print (std::cout, "op", PRE); printf (" --> ");
-
   //  Simplify arguments g_1(x), g_2(x)... g_n(x) first
   for (register int i=0; i<nargs_; i++) {
 
@@ -29,8 +27,6 @@ expression *exprOp:: simplify () {
       arglist_ [i] = subst;
     }
   }
-
-  //  print (std::cout, "op", PRE); printf ("\n");
 
   return NULL;
 }
@@ -56,8 +52,6 @@ expression *exprUnary:: simplify () {
       delete subst;
 
       return ret;
-    }
-    else return NULL;
-  }
-  else return NULL;
+    } else return NULL;
+  } else return NULL;
 }

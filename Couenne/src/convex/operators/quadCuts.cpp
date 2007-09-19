@@ -44,10 +44,19 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
   }
 #endif
 
+  // TODO: compute (*this') () where this' is convexification. If
+  // current point is between nonconvex quad form and its
+  // convexification, a cut won't be of help
+
   // Get on which side constraint is violated to get the good lambda
-  double *lambda = ((*w) () < (*this) ()) ? 
-    dCoeffLo_ : // Use under-estimator
-    dCoeffUp_;  // Use  over-estimator
+
+  double 
+     varVal  = (*w)    (), 
+     exprVal = (*this) (),
+    *lambda  = (varVal < exprVal) ? 
+      dCoeffLo_ : // Use under-estimator
+      dCoeffUp_,  // Use  over-estimator
+    convVal = 0;
 
   const CouenneProblem& problem = *(cg -> Problem ());
   const int & numcols = problem.nVars();
@@ -57,11 +66,30 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
     *lower  = problem.Lb (), //         lower bound
     *upper  = problem.Ub (); //         upper
 
+  // compute lower or upper convexification and check if it contains
+  // the current point
+
+  if (dIndex_) {
+
+    convVal = exprVal;
+
+    if (lambda)
+      for (int i=0; i<nDiag_; i++) {
+
+	int ind = dIndex_ [i];
+	CouNumber xi = colsol [ind];
+	convVal += lambda [i] * (xi - lower [i]) * (upper [i] - xi);
+      }
+
+    if (varVal < exprVal) {if (convVal < varVal) return;}
+    else                  {if (convVal > varVal) return;}
+  }
+
 #ifdef DEBUG
   std::cout << "Point to cut: ";
   for(int i = 0 ; i < numcols ; i++)
     std::cout << colsol [i] << ", ";
-  printf (" (w,f(x)) = (%g,%g)\n", (*w) (), (*this) ());
+  printf (" (w,f(x),c) = (%g,%g,%g)\n", (*w) (), (*this) (), convVal);
 #endif
 
   // Initialize by copying a into a dense vector and computing Q x^*
@@ -150,8 +178,9 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
   CoinPackedVector a (false);
   a.reserve (nnz);
 
-  CouNumber lhs = 0,
-    *optimum = cg -> Problem () -> bestSol ();
+  CouNumber lhs = 0, lhsc = 0,
+    *optimum = cg -> Problem () -> bestSol (),
+    *current = cg -> Problem () -> X ();
 
   for (int i = 0 ; i < numcols ; i++)
 
@@ -161,7 +190,8 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
 #ifdef DEBUG
       if (optimum) {
 	printf ("%+g * %g ", Qxs [i], optimum [i]);
-	lhs += Qxs [i] * optimum [i];
+	lhs  += Qxs [i] * optimum [i];
+	lhsc += Qxs [i] * current [i];
       }
 #endif
       a.insert (i, Qxs [i]);
@@ -180,6 +210,10 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
        printf ("cut violates optimal solution: %g > %g\n", lhs, a0);
        cut.print ();
      }
+     if (lhsc < a0 + COUENNE_EPS){
+       printf ("cut (+) is not cutting: ");
+       cut.print ();
+     }
 #endif
      //     cut.setLb(-COUENNE_INFINITY);
   }
@@ -190,6 +224,10 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
        printf ("cut violates optimal solution: %g < %g\n", lhs, a0);
        cut.print ();
     }
+    if (lhsc > a0 - COUENNE_EPS){
+       printf ("cut (-) is not cutting: ");
+       cut.print ();
+     }
 #endif
     //    cut.setUb(COUENNE_INFINITY);
   }

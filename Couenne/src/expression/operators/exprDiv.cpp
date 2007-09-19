@@ -42,7 +42,16 @@ expression *exprDiv::simplify () {
 	return new exprConst (0);
 
       // otherwise, expression = k/y, return k*inv(y)
-      expression *ret = new exprMul (arglist_ [0], new exprInv (arglist_ [1]));
+
+      expression *ret;
+
+      if (fabs (arglist_ [0] -> Value ()-1) < COUENNE_EPS) {
+	delete *arglist_;
+	*arglist_ = NULL;
+	ret = new exprInv (arglist_ [1]);
+      }
+      else ret = new exprMul (arglist_ [0], new exprInv (arglist_ [1]));
+
       arglist_ = NULL;
       return ret;
     }

@@ -257,7 +257,6 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
   case COU_EXPRPOW: { // expression = f(x)^g(x) ////////////////////////////////////////////////
 
-
     expression **al = term -> ArgList (); 
 
     if (al [1] -> Type () != CONST) { 
@@ -283,8 +282,8 @@ void decomposeTerm (CouenneProblem *p, expression *term,
       if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, ind, initCoe);
       else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, ind, ind, initCoe);
       else {
-	exprAux *aux = p -> addAuxiliary (term);
-	linsert (lmap, aux -> Index (), initCoe);
+	exprAux *aux2 = p -> addAuxiliary (new exprPow (aux, new exprConst (expon))); // TODO: FIX!
+	linsert (lmap, aux2 -> Index (), initCoe);
       }
     }
   } break;

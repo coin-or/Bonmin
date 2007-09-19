@@ -1,3 +1,4 @@
+- check if z_nlp=z_lp ==> fathom and return x_nlp as feas solution of node
 - implied/propagated bounds to follow graph and not enumerated for all variables (for huge instances)
 - implied bounds, branching rule, getfixvar and sparsity graph for exprQuad
 - on some big instances (eg gasoil100), dependsOn() is awfully slow. Create a dependence list for each exprAux?

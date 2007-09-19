@@ -8,7 +8,7 @@
 
 #include <math.h>
 #ifndef M_E
-# define M_E             2.7182818284590452354
+# define M_E  2.7182818284590452354
 #endif
 
 #include <CouenneTypes.h>

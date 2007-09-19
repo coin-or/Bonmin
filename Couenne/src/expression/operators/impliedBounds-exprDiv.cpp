@@ -86,7 +86,7 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     int xi = arglist_ [0] -> Index (),
         yi = arglist_ [1] -> Index ();
 
-    CouNumber x0;
+    CouNumber x0=0;
 
     CouNumber *xl = l + xi, *yl = l + yi, wl = l [wind],
               *xu = u + xi, *yu = u + yi, wu = u [wind];
