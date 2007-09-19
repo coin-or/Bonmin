@@ -67,7 +67,7 @@ namespace Bonmin{
     ci->readAmplNlFile(argv,roptions(),options(),journalist());
     aslfg_ = new SmartAsl;
     aslfg_->asl = readASLfg (argv);
-    
+
     /* Initialize Couenne cut generator.*/
     int ivalue, num_points;
     options()->GetEnumValue("convexification_type", ivalue,"bonmin.");
@@ -83,10 +83,11 @@ namespace Bonmin{
     // as per instructions by John Forrest, to get changed bounds
     extraStuff -> setExtraCharacteristics (extraStuff -> extraCharacteristics () | 2);
 
-    
     continuousSolver_ -> setAuxiliaryInfo (extraStuff);
     delete extraStuff;
+    
     extraStuff = dynamic_cast<Bonmin::BabInfo *>(continuousSolver_ -> getAuxiliaryInfo());
+    
     /* Setup log level*/
     int lpLogLevel;
     options()->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
@@ -98,7 +99,7 @@ namespace Bonmin{
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
       return;
     }
-    
+
     continuousSolver_->findIntegersAndSOS(false);
 
     // [Pietro: Never used]
@@ -151,7 +152,6 @@ namespace Bonmin{
     }
     
     //Setup Convexifier generators
-
 
     // [Pietro: never used]
     //    int numGen = 0;

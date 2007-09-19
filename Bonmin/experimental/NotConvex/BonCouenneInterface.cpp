@@ -57,7 +57,8 @@ CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::Register
    */
 
 void 
-CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
+CouenneInterface::extractLinearRelaxation 
+(OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 
   if (solveNlp)
     initialSolve ();
@@ -165,10 +166,13 @@ CouenneInterface::extractLinearRelaxation (OsiSolverInterface &si, CouenneCutGen
    }
  
    //si.writeMpsNative("toto",NULL,NULL,1);
-   si.writeLp("toto");
-  app_->enableWarmStart();
-  setColSolution(problem()->x_sol());
-  setRowPrice(problem()->duals_sol());
+   //si.writeLp("toto");
+   app_ -> enableWarmStart();
+
+   //   if (problem () -> x_sol ()) {
+   setColSolution (problem () -> x_sol     ());
+   setRowPrice    (problem () -> duals_sol ());
+     //   }
 }
 
 

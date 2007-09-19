@@ -48,12 +48,15 @@ int main (int argc, char *argv[])
   }  double time1 = CoinCpuTime();
   try {
 
-
     CouenneSetup bonmin;
     bonmin.InitializeBonmin(argv);
     Bab bb;
 
-    bb (bonmin);//do branch and bound
+    //////////////////////////////////
+
+    bb (bonmin); // do branch and bound
+
+    //////////////////////////////////
 
     std::cout.precision(10);
 
