@@ -61,7 +61,7 @@ namespace Bonmin {
                              bool reassignLpsolver):
   CglCutGenerator(),
   nlp_(b.nonlinearSolver()),
-  lp_(NULL),//(b.continuousSolver()),
+  lp_(b.continuousSolver()),
   objects_(NULL),
   nObjects_(0),
   nLocalSearch_(0),
