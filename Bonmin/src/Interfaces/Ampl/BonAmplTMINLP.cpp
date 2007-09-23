@@ -20,6 +20,8 @@
 #include "asl_pfgh.h"
 #include "getstub.h"
 
+#include <fstream>
+
 #include "CoinHelperFunctions.hpp"
 #include "BonExitCodes.hpp"
 namespace ampl_utils
@@ -73,7 +75,7 @@ namespace Bonmin
                          std::string* nl_file_content /* = NULL */
                          )
   {
-    
+    options->GetEnumValue("file_solution",writeAmplSolFile_,"bonmin.");
     jnlst_ = jnlst;
 
     if (suffix_handler==NULL)
@@ -572,10 +574,21 @@ namespace Bonmin
       status_str = "\t\"Aborted\"";
       message = "\n Error encountered in optimization.";
     }
-    write_solution(message, x);
-    std::cout<<"\n "<<status_str<<std::endl;    
+    if(writeAmplSolFile_)
+    {
+      write_solution(message, x);
+      std::cout<<"\n "<<status_str<<std::endl;    
+    }
+   else {
+      std::cout<<status_str<<message<<std::endl; 
+      std::ofstream of("bonmin.sol");
+      for(int i = 0 ; i < n ; i++){
+         of<<i<<"\t"<<x[i]<<std::endl;
+      }
+     of<<"-1\n";
   }
-  
+} 
+
   void AmplTMINLP::write_solution(const std::string & message, const Number *x_sol)
   {
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
@@ -700,7 +713,11 @@ namespace Bonmin
                                AmplOptionsList::Number_Option,
                                "Specify cutoff");
     
-    amplOptList->AddAmplOption("bonmin.nodeselect_stra","bonmin.nodeselect_stra",
+    amplOptList->AddAmplOption("bonmin.node_comparison","bonmin.node_comparison",
+                               AmplOptionsList::String_Option,
+                               "Choose the node comparison function");
+    
+    amplOptList->AddAmplOption("bonmin.tree_search_strategy","bonmin.tree_search_strategy",
                                AmplOptionsList::String_Option,
                                "Choose the node selection strategy");
     

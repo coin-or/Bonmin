@@ -55,6 +55,10 @@ namespace Bonmin
     
     /** TMINLP problem (the original problem usually an AmplTMINLP).*/
     Ipopt::SmartPtr<Bonmin::AmplTMINLP> amplTminlp_;
-  };
+
+  private:
+   /** Write the ampl solution file or write a bonmin one?*/
+   int writeAmplSolFile_;
+};
 }
 #endif

@@ -18,7 +18,7 @@
 #include <climits>
 #include <string>
 #include <sstream>
-
+#include "BonAuxInfos.hpp"
 
 #include "Ipopt/BonIpoptSolver.hpp"
 #ifdef COIN_HAS_FILTERSQP
@@ -52,6 +52,12 @@ register_general_options
       "0 - none, 1 - normal, 2 - verbose"
                                    );
   roptions->setOptionExtraInfo("nlp_log_level",15);
+
+  roptions->AddStringOption2("file_solution",
+       "Write a file bonmin.sol with the solution",
+       "no",
+       "yes","",
+       "no","","");
 
   roptions->AddStringOption3("warm_start",
       "Select the warm start method",
@@ -501,6 +507,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     problem_->copyUserModification(*source.problem_);
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
 
+    setAuxiliaryInfo(source.getAuxiliaryInfo());
     // Copy options from old application
     app_ = source.app_->clone();
   }
@@ -2132,6 +2139,12 @@ void
 OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     const char * whereFrom)
 {
+
+  OsiAuxInfo * auxInfo = getAuxiliaryInfo();
+  Bonmin::BabInfo * babInfo = dynamic_cast<Bonmin::BabInfo *>(auxInfo);
+  assert(babInfo);
+
+
   totalNlpSolveTime_-=CoinCpuTime();
   if(warmStarted)
     optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));

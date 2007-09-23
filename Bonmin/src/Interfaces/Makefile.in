@@ -365,6 +365,24 @@ libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
+	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
+	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
+	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(top_srcdir)/src/Algorithms` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/contrib/CGPenalty` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \

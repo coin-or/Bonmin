@@ -273,6 +273,8 @@ private:
    int numberSimpleConcave_;
    /** Store simple concave constraints descriptions.*/
    SimpleConcaveConstraint * simpleConcaves_;
+
+   int writeAmplSolFile_;
   };
 } // namespace Ipopt
 
