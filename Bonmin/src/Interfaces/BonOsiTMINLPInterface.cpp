@@ -2139,12 +2139,6 @@ void
 OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     const char * whereFrom)
 {
-
-  OsiAuxInfo * auxInfo = getAuxiliaryInfo();
-  Bonmin::BabInfo * babInfo = dynamic_cast<Bonmin::BabInfo *>(auxInfo);
-  assert(babInfo);
-
-
   totalNlpSolveTime_-=CoinCpuTime();
   if(warmStarted)
     optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
