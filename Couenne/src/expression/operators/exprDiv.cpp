@@ -131,3 +131,51 @@ expression *getFixVarBinFun (expression *, expression *);
 // in a branching rule for solving a nonconvexity gap
 expression *exprDiv::getFixVar () 
 {return getFixVarBinFun (arglist_ [0], arglist_ [1]);}
+
+
+/// is this expression integer?
+bool exprDiv::isInteger () {
+
+  // only check if arguments are, *at this point in the algorithm*,
+  // constant -- due to branching rules, for instance. If so, check if
+  // the corresponding evaluated expression is integer. Otherwise,
+  // check if denominator is +1 or -1.
+
+  expression *dl, *du, *nl, *nu;
+
+  arglist_ [1] -> getBounds (dl, du);
+  arglist_ [0] -> getBounds (nl, nu);
+
+  register CouNumber 
+    num = (*nl) (), 
+    den = (*dl) ();
+
+  bool
+    denzero  = (fabs (den) < COUENNE_EPS),
+    numconst = (fabs (num - (*nu) ()) < COUENNE_EPS);
+
+  if ((fabs (num) < COUENNE_EPS)  && // numerator is zero
+      !denzero                    && // denominator is nonzero
+      numconst)                      // and constant
+    return true;
+
+  // otherwise...
+
+  if (fabs (den - (*du) ()) < COUENNE_EPS) { // denominator is constant
+
+    if (fabs (fabs (den) - 1) < COUENNE_EPS) // it is +1 or -1, check numerator
+      return arglist_ [0] -> isInteger ();
+
+    if (denzero) // it is zero, better leave...
+      return false;
+
+    if (numconst) { // numerator is constant, too
+
+      CouNumber quot = num / den;
+
+      if (fabs (COUENNE_round (quot) - quot) < COUENNE_EPS)
+	return true;
+    }
+  }
+  return false;
+}

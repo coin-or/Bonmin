@@ -122,6 +122,9 @@ public:
   /// insert new auxiliary if new
   void insert (exprAux *);
 
+  /// delete element
+  void erase (exprVar *);
+
   /// does w depend on x?
   bool depends (int, int, bool = false);
 

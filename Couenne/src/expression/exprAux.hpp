@@ -53,6 +53,9 @@ class exprAux: public exprVar {
   /// branching has on other variables
   int multiplicity_;
 
+  /// is this variable integer?
+  bool integer_;
+
  public:
 
   /// Node type
@@ -60,23 +63,25 @@ class exprAux: public exprVar {
     {return AUX;}
 
   /// Constructor
-  exprAux (expression *, int, int);
+  exprAux (expression *, int, int, bool = false);
 
   /// Destructor
   ~exprAux () {
-    delete image_; 
+    if (image_) 
+      delete image_; 
     delete lb_; 
     delete ub_;
   }
 
-  /// copy constructor
+  /// Copy constructor
   exprAux (const exprAux &e):
     exprVar       (e.varIndex_),
     image_        (e.image_ -> clone ()),
     //    lb_           (e.lb_    -> clone ()),
     //    ub_           (e.ub_    -> clone ()),
     rank_         (e.rank_),
-    multiplicity_ (e.multiplicity_) {
+    multiplicity_ (e.multiplicity_),
+    integer_      (e.integer_) {
 
     image_ -> getBounds (lb_, ub_);
     // getBounds (lb_, ub_);
@@ -85,14 +90,14 @@ class exprAux: public exprVar {
     ub_ = new exprMin (new exprUpperBound (varIndex_), ub_);
   }
 
-  /// cloning method
+  /// Cloning method
   virtual exprAux *clone () const
     {return new exprAux (*this);}
 
   expression *Lb () {return lb_;} ///< get lower bound expression
   expression *Ub () {return ub_;} ///< get upper bound expression
 
-  /// print expression
+  /// Print expression
   virtual void print (std::ostream & = std::cout, 
 		      bool = false, CouenneProblem * = NULL) const;
 
@@ -108,9 +113,39 @@ class exprAux: public exprVar {
   inline expression *differentiate (int index) 
     {return image_ -> differentiate (index);}
 
-  /// Dependence on variable set: return number of times elements of
-  /// indices occur in expression
-  int dependsOn (int *indices, int num);
+  /// fill in the set with all indices of variables appearing in the
+  /// expression
+  inline int DepList (std::set <int> &deplist, 
+		      enum dig_type type = ORIG_ONLY,
+		      CouenneProblem *p = NULL) {
+
+    if (type == ORIG_ONLY)   
+      return image_ -> DepList (deplist, type, p);
+
+    if (deplist.find (varIndex_) == deplist.end ())
+      deplist.insert (varIndex_); 
+    else return 0;
+
+    if (type == STOP_AT_AUX) 
+      return 1;
+
+    return 1 + image_ -> DepList (deplist, type, p);
+  }
+
+  /// simplify
+  inline expression *simplify () {
+
+    if ((image_ -> Type () == AUX) || 
+	(image_ -> Type () == VAR)) {
+
+      --multiplicity_;
+      expression *ret = image_;
+      image_ = NULL;
+      return ret;
+    }
+
+    return NULL;
+  }
 
   /// Get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
@@ -159,6 +194,10 @@ class exprAux: public exprVar {
   /// used in rank-based branching variable choice
   virtual inline int rank (CouenneProblem *p = NULL)
     {return rank_;} 
+
+  /// is this expression integer?
+  virtual inline bool isInteger () 
+    {return (integer_) || (image_ -> isInteger ());}
 
   /// Tell this variable appears once more
   inline void increaseMult () {++multiplicity_;}

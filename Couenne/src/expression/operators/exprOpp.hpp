@@ -65,6 +65,10 @@ class exprOpp: public exprUnary {
   virtual enum expr_type code () 
     {return COU_EXPROPP;}
 
+  /// is this expression integer?
+  bool isInteger ()
+  {return argument_ -> isInteger ();}
+
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 

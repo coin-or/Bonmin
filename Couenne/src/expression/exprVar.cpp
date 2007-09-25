@@ -19,20 +19,6 @@
 #include <depGraph.hpp>
 
 
-// is the variable one of those in varlist?
-int exprVar::dependsOn (register int *varlist = NULL, register int n = 1) {
-
-  if (!varlist)
-    return 1;
-
-  while (n--) 
-    if (varIndex_ == *varlist++) 
-      return 1;
-
-  return 0;
-}
-
-
 // Get lower and upper bound of a variable expression (if any)
 void exprVar::getBounds (expression *&lb, expression *&ub) {
 

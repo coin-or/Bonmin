@@ -221,7 +221,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 						 const OsiBranchingInformation *info, 
 						 int way) const {
 
-  bool isint = reference_ -> isInteger ();
+  bool isint = (brVarInd_ >= 0) && (si -> isInteger (brVarInd_));
 
   // way has suggestion from CouenneObject::infeasibility(), but not
   // as set in infeasibility, so we use the one stored in member
@@ -230,17 +230,23 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   way = whichWay_;
 
   if (brVarInd_ >= 0) // if applied latest selectBranching
+
     switch (way) {
+
     case TWO_LEFT:
     case TWO_RIGHT:
     case TWO_RAND:
-      //printf ("2 Branch x%d at %g [%d] (%d)\n", brVarInd_, *brPts_, way, isint);
+#ifdef DEBUG
+      printf ("2way Branch x%d at %g [%d] (%d)\n", brVarInd_, *brPts_, way, isint);
+#endif
       return new CouenneBranchingObject (brVarInd_, way, *brPts_, isint);
     case THREE_LEFT:
     case THREE_CENTER:
     case THREE_RIGHT:
     case THREE_RAND:
-      //printf ("3Way Branch x%d @ %g ][ %g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
+#ifdef DEBUG
+      printf ("3Way Branch x%d @ %g ][ %g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
+#endif
       return new CouenneThreeWayBranchObj (brVarInd_, brPts_ [0], brPts_ [1], way, isint);
     default: 
       printf ("CouenneObject::createBranch(): way=%d has no sense\n", way);

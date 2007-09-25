@@ -1,8 +1,6 @@
 /*
  * Name:    quadCuts.cpp
- * Authors: Pierre Bonami
- *          Stefan Vigerske
- *          Pietro Belotti
+ * Author:  Pierre Bonami
  * Purpose: based on upper and lower convexification, add cuts to convexify
  *
  * (C) International Business Machines 2007. This file is licensed
@@ -56,7 +54,7 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
     *lambda  = (varVal < exprVal) ? 
       dCoeffLo_ : // Use under-estimator
       dCoeffUp_,  // Use  over-estimator
-    convVal = 0;
+     convVal = 0;
 
   const CouenneProblem& problem = *(cg -> Problem ());
   const int & numcols = problem.nVars();
@@ -232,5 +230,5 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
     //    cut.setUb(COUENNE_INFINITY);
   }
 
-  cs.insert(cut);
+  cs.insert (cut);
 }

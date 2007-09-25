@@ -1,8 +1,6 @@
 /*
  * Name:    alphaConvexify.cpp
- * Authors: Pierre Bonami
- *          Stefan Vigerske
- *          Pietro Belotti
+ * Author:  Stefan Vigerske
  * Purpose: create alpha-convexification of a quadratic expression
  *
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)

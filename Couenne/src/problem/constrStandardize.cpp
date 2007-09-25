@@ -69,7 +69,9 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
       rest -> print (); printf ("\n");
 #endif
 
-      exprAux *w = new exprAux (rest, wind, 1 + rest -> rank (p));
+      // create new variable, it has to be integer if original variable was integer
+      exprAux *w = new exprAux (rest, wind, 1 + rest -> rank (p), 
+				p -> Var (wind) -> isInteger ());
 
       std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> find (w);
 

@@ -79,11 +79,11 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   //  CouNumber x;
 
-  int w_ind = aux       -> Index (), 
-      x_ind = argument_ -> Index ();
+  int wi = aux       -> Index (), 
+      xi = argument_ -> Index ();
 
-  bool cL = !chg || (cg -> isFirst ()) || (chg [x_ind].lower != UNCHANGED),
-       cR = !chg || (cg -> isFirst ()) || (chg [x_ind].upper != UNCHANGED);
+  bool cL = !chg || (cg -> isFirst ()) || (chg [xi].lower != UNCHANGED),
+       cR = !chg || (cg -> isFirst ()) || (chg [xi].upper != UNCHANGED);
 
   // special case: l and u are very close, replace function with
   // linear term
@@ -91,25 +91,26 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   if (fabs (u - l) < COUENNE_EPS) {
 
     CouNumber x0 = 0.5 * (u+l);
-    if (cL || cR) cg -> createCut (cs, 2/x0, 0, w_ind, 1., x_ind, 1/(x0*x0));
+    if (cL || cR) 
+      cg -> createCut (cs, 2/x0, 0, wi, 1., xi, 1/(x0*x0));
     return;
   }
-
-  // choose sampling points. If unbounded, bound using a rule of thumb
-
-  int ns = cg -> nSamples ();
-  if      (l < - COUENNE_INFINITY) l = ns * (u-1); // (-infinity, u] where u < 0
-  else if (u >   COUENNE_INFINITY) u = ns * (l+1); // [l, +infinity) where l > 0
 
   // upper segment (or lower if x<0)
 
   if (cL || cR) {
-    if ((l > COUENNE_EPS) && (u < COU_MAX_COEFF)) 
-      cg -> createCut (cs, 1/l + 1/u, -1, w_ind, 1., x_ind, 1/(l*u));
-
-    if ((u < -COUENNE_EPS) && (u > -COU_MAX_COEFF)) 
-      cg -> createCut (cs, 1/l + 1/u, +1, w_ind, 1., x_ind, 1/(l*u));
+    // bounding box is within ]0,+inf[
+    if ((l> COUENNE_EPS) && (u< COU_MAX_COEFF)) cg -> createCut (cs, 1/l+1/u, -1, wi,1., xi,1/(l*u));
+    if ((u<-COUENNE_EPS) && (l>-COU_MAX_COEFF)) cg -> createCut (cs, 1/l+1/u, +1, wi,1., xi,1/(l*u));
+    // bounding box is within ]-inf,0[
   }
+
+  // choose sampling points. 
+
+  // if unbounded, use a rule of thumb
+  int ns = cg -> nSamples ();
+  if      (l < - COUENNE_INFINITY) l = ns * (u-1); // (-infinity, u] where u < 0
+  else if (u >   COUENNE_INFINITY) u = ns * (l+1); // [l, +infinity) where l > 0
 
   // make bounds nonzero
   if (fabs (l) < COUENNE_EPS) l = (l<0) ? - MIN_DENOMINATOR : MIN_DENOMINATOR;
@@ -118,7 +119,7 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   // bound
   cg -> addEnvelope 
     (cs, (l > 0) ? +1 : -1, 
-     inv, oppInvSqr, w_ind, x_ind, 
+     inv, oppInvSqr, wi, xi, 
      (cg -> isFirst ()) ? // is this first call?
        // place it somewhere in the interval (we don't care)
        ((l > COUENNE_EPS) ? l : u) :

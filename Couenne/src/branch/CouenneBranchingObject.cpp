@@ -133,7 +133,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
 #ifdef DEBUG
   printf ("### Branch: x%d %c= %g\n", 
-  	  index_, way ? '>' : '<', value_);
+  	  index_, way ? '>' : '<', integer_ ? (way ? ceil : floor) (brpt) : brpt);
 #endif
 
   branchIndex_++;

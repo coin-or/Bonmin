@@ -21,10 +21,10 @@
 #define THRES_NBD_CHANGED 1
 
 // depth of the BB tree until which obbt is applied at all nodes
-#define COU_OBBT_CUTOFF_LEVEL 3
+#define COU_OBBT_CUTOFF_LEVEL 2
 
 // maximum number of obbt iterations
-#define MAX_OBBT_ITER 1
+#define MAX_OBBT_ITER 5
 
 #define LARGE_TOL (LARGE_BOUND / 1e6)
 
@@ -354,12 +354,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     delete csi;
 
-    if (nImprov < 0) {
 #ifdef DEBUG
-      printf ("### infeasible node after OBBT\n");
+    if (nImprov < 0) printf ("### infeasible node after OBBT\n");
 #endif
+
+    if (nImprov < 0)
       goto end_genCuts;
-    }
   }
 #endif
   

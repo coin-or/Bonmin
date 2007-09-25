@@ -24,7 +24,6 @@
 
 // print unary expression
 
-
 void exprUnary::print (std::ostream &out, 
 		       bool descend, 
 		       CouenneProblem *p) const {
@@ -77,4 +76,27 @@ void exprUnary::replace (exprVar *x, exprVar *w) {
       argument_ = new exprClone (w);
     }
   } else argument_ -> replace (x, w);
+}
+
+/// is this expression integer?
+bool exprUnary::isInteger () {
+
+  // only check if argument is, *at this point in the algorithm*,
+  // constant -- due to branching rules, for instance. If so, check if
+  // the corresponding evaluated expression is integer.
+
+  expression *al, *au;
+
+  argument_ -> getBounds (al, au);
+  CouNumber val = (*al) ();
+
+  if (fabs (val - (*au) ()) < COUENNE_EPS) { // argument is constant
+
+    register CouNumber fval = (F ()) (val); 
+
+    // check if f(lb=ub) is integer
+    if (fabs (COUENNE_round (fval) - fval) < COUENNE_EPS)
+      return true;
+  }
+  return false;
 }

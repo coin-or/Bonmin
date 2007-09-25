@@ -45,17 +45,17 @@ class exprGroup: public exprSum {
     {return new exprGroup (*this);}
 
   /// Print expression to iostream
-  virtual void print (std::ostream & = std::cout, bool = false, CouenneProblem * = NULL) const;
+  virtual void print (std::ostream & = std::cout, bool = false, 
+		      CouenneProblem * = NULL) const;
 
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();
 
-  /// check if exprGroup depends on a list of variables specified as parameters
-  virtual int dependsOn (int * = NULL, int = 1);
-
-  /// specialized version that checks variables in linear term through
-  /// their image (if any) within the CouenneProblem
-  virtual int dependsOn (CouenneProblem *, int * = NULL, int = 1);
+  /// fill in the set with all indices of variables appearing in the
+  /// expression
+  virtual int DepList (std::set <int> &deplist, 
+		       enum dig_type type = ORIG_ONLY,
+		       CouenneProblem *p = NULL);
 
   /// differentiation
   virtual expression *differentiate (int index); 
@@ -83,6 +83,10 @@ class exprGroup: public exprSum {
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRGROUP;}
 
+  /// is this expression integer?
+  virtual inline bool isInteger ()
+    {return false;}
+
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *);
 
@@ -106,5 +110,9 @@ inline CouNumber exprGroup::operator () () {
 
   return (currValue_ = ret);
 }
+
+
+/// scan subexpression for single index
+int scanIndex (int index, std::set <int> &deplist, CouenneProblem *p, enum dig_type type);
 
 #endif

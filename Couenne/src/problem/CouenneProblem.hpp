@@ -192,7 +192,11 @@ class CouenneProblem {
   void print (std::ostream & = std::cout);
 
   /// Read problem from .nl file using the Ampl Solver Library (ASL)
-  int readnl (const struct ASL *);
+  int readnl      (const struct ASL *);
+  int readCon     (const struct ASL *) {return 0;}
+  int readDefVar  (const struct ASL *) {return 0;}
+  int readObj     (const struct ASL *) {return 0;}
+  int readLinPart (const struct ASL *) {return 0;}
 
   /// Generate a Couenne expression from an ASL expression
   expression *nl2e (struct expr *);

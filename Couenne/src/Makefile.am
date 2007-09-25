@@ -91,6 +91,7 @@ libCouenne_la_SOURCES = \
 	convex/genColCuts.cpp \
 	convex/genRowCuts.cpp \
 	convex/obbt.cpp \
+	convex/obbt_iter.cpp \
 	convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp \
 	problem/problem.cpp \
@@ -225,7 +226,8 @@ include_HEADERS = \
 	problem/depGraph/depGraph.hpp \
 	problem/CouenneProblemElem.hpp \
 	problem/CouenneProblem.hpp \
-	expression/CouenneTypes.h \
+	problem/CouenneSolverInterface.hpp \
+	expression/CouenneTypes.hpp \
 	util/rootQ.hpp \
 	convex/CouenneCutGenerator.hpp
 

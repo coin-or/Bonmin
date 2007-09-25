@@ -80,15 +80,25 @@ class exprVar: public expression {
   virtual inline expression *differentiate (int index) 
     {return new exprConst ((index == varIndex_) ? 1 : 0);}
 
-  /// dependence on variable set
-  virtual int dependsOn (int *, int);
+  /// fill in the set with all indices of variables appearing in the
+  /// expression
+  virtual inline int DepList (std::set <int> &deplist, 
+			      enum dig_type type = ORIG_ONLY,
+			      CouenneProblem * = NULL) {
+
+    if (deplist.find (varIndex_) == deplist.end ()) {
+      deplist.insert (varIndex_); 
+      return 1;
+    }
+    return 0;
+  }
 
   /// set bounds depending on both branching rules and propagated
   /// bounds. To be used after standardization
   virtual inline void crossBounds () {}
 
   /// simplify
-  inline expression *simplify () 
+  virtual inline expression *simplify () 
     {return NULL;}
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
@@ -96,7 +106,7 @@ class exprVar: public expression {
     {return LINEAR;}
 
   /// is this expression integer?
-  virtual bool isInteger ()
+  virtual inline bool isInteger ()
     {return false;}
 
   /// Get lower and upper bound of an expression (if any)

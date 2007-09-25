@@ -36,7 +36,7 @@ class exprConst: public expression {
 
   /// Copy constructor
   exprConst (const exprConst &e)
-    {currValue_ = e.Value ();}
+    {currValue_ = e.currValue_;}
 
   /// Cloning method
   virtual exprConst *clone () const
@@ -56,12 +56,10 @@ class exprConst: public expression {
     {return new exprConst (0);}
 
   /// dependence on variable set
-  inline int dependsOn (int *, int) 
+  int dependsOn (int *ind, int n, 
+		 CouenneProblem *p = NULL, 
+		 enum dig_type   type = STOP_AT_AUX)
     {return 0;}
-
-  /// simplify
-  inline expression *simplify () 
-    {return NULL;}
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
@@ -73,10 +71,6 @@ class exprConst: public expression {
     upper = new exprClone (this);
   }
 
-  /// Create standard formulation of this expression
-  inline exprAux *standardize (CouenneProblem *)
-    {return NULL;}
-
   /// generate convexification cut for constraint w = this
   void generateCuts (exprAux *, const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *, 
@@ -86,6 +80,10 @@ class exprConst: public expression {
 
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRCONST;}
+
+  /// is this expression integer?
+  virtual bool isInteger () 
+  {return (fabs (currValue_ - COUENNE_round (currValue_)) < COUENNE_EPS);}
 
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *p)

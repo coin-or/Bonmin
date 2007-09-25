@@ -83,8 +83,15 @@ class exprUnary: public expression {
     {return (currValue_ = (F ()) ((*argument_) ()));}
 
   /// dependence on variable set
-  inline int dependsOn (int *list, int n) 
-    {return (argument_ -> dependsOn (list, n));}
+  //  inline int dependsOn (int *list, int n) 
+  //    {return (argument_ -> dependsOn (list, n));}
+
+  /// fill in the set with all indices of variables appearing in the
+  /// expression
+  virtual inline int DepList (std::set <int> &deplist, 
+			      enum dig_type type = ORIG_ONLY,
+			      CouenneProblem *p = NULL)
+    {return argument_ -> DepList (deplist, type, p);}
 
   /// simplification
   expression *simplify ();
@@ -106,6 +113,9 @@ class exprUnary: public expression {
   /// type of operator
   virtual enum expr_type code () 
     {return COU_EXPRUNARY;}
+
+  /// is this expression integer?
+  virtual bool isInteger ();
 
   /// compare two unary functions
   virtual int compare (exprUnary &); 

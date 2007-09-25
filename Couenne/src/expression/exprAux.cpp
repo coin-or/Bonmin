@@ -18,12 +18,13 @@
 
 // auxiliary expression Constructor
 
-exprAux::exprAux (expression *image, int index, int rank): 
+exprAux::exprAux (expression *image, int index, int rank, bool integer): 
 
-  exprVar  (index),
-  image_   (image),
-  rank_    (rank),
-  multiplicity_ (1) {
+  exprVar       (index),
+  image_        (image),
+  rank_         (rank),
+  multiplicity_ (1),
+  integer_      (integer) {
 
   // do this later, in standardize()
   //  image_ -> getBounds (lb_, ub_);
@@ -36,28 +37,13 @@ void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 
   if (descend) 
     image_ -> print (out, descend, p);
-  else out << "w_" << varIndex_;
-}
-
-
-/// Dependence on variable set: return number of times elements of
-/// indices occur in expression
-int exprAux::dependsOn (int *indices, int num) {
-
-  if (!indices)
-    return 1;
-
-  register int *il = indices;
-
-  int cnt = 0;
-
-  for (register int i=num; i--;)
-    if (varIndex_ == *il++) {
-      if (num==1) return 1;
-      cnt++;
-    }
-
-  return image_ -> dependsOn (indices, num);
+  else {
+    if (integer_) out << "u_"; // TODO: should be isInteger instead of
+			       // integer_. Change all "isInteger()"
+			       // to "isInteger() const"
+    else          out << "w_";
+    out << varIndex_;
+  }
 }
 
 

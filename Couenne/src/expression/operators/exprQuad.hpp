@@ -225,6 +225,16 @@ class exprQuad: public exprGroup {
   /// Used in rank-based branching variable choice
   virtual int rank (CouenneProblem *);
 
+  /// is this expression integer?
+  virtual inline bool isInteger ()
+    {return false;}
+
+  /// fill in the set with all indices of variables appearing in the
+  /// expression
+  virtual int DepList (std::set <int> &deplist, 
+		       enum dig_type type = ORIG_ONLY,
+		       CouenneProblem *p = NULL);
+
   /// Return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap. For this
   /// expression, always return NULL as selectBranch() will return the

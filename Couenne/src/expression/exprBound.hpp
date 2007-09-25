@@ -38,7 +38,7 @@ class exprLowerBound: public exprVar {
   inline enum nodeType Type () 
     {return CONST;}
 
-  /// Constructors
+  /// Constructor
   exprLowerBound (int varIndex): 
     exprVar (varIndex) {}
 
@@ -75,15 +75,15 @@ class exprUpperBound: public exprVar {
 
  public:
 
-  /// node type
+  /// Node type
   inline enum nodeType Type () 
     {return CONST;}
 
   /// Constructor
-  exprUpperBound  (int varIndex): 
+  exprUpperBound (int varIndex): 
     exprVar (varIndex) {}
 
-  /// print to iostream
+  /// Print to iostream
   void print (std::ostream &out = std::cout, 
 	      bool = false, CouenneProblem * = NULL) const
     {out << "u_" << varIndex_;}
@@ -104,7 +104,7 @@ class exprUpperBound: public exprVar {
   virtual inline int Linearity () 
     {return CONST;}
 
-  /// code for comparison
+  /// code for comparisons
   virtual enum expr_type code ()
     {return COU_EXPRUBOUND;}
 };

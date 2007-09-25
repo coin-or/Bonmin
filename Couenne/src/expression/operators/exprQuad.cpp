@@ -364,3 +364,43 @@ void exprQuad::make_dIndex (int numcols, int *indexmap) {
     if (indexmap [i] > -1)
       dIndex_ [indexmap [i]] = i;
 }
+
+
+/// fill in the set with all indices of variables appearing in the
+/// expression
+int exprQuad::DepList (std::set <int> &deplist, 
+			enum dig_type type,
+			CouenneProblem *p) {
+
+  int deps = exprGroup::DepList (deplist, type, p);
+
+  if (!p) // no problem pointer, have to suppose all terms appear
+
+    for (int i = nqterms_; i--;) {
+
+      int qi = qindexI_ [i],
+          qj = qindexJ_ [i];
+
+      if (deplist.find (qi) == deplist.end ()) {
+	deplist.insert (qi);
+	deps++;
+      }
+
+      if ((qi != qj) &&  (deplist.find (qj) == deplist.end ())) {
+	deplist.insert (qj);
+	deps++;
+      }
+    }
+  else
+    for (int i = nqterms_; i--;) {
+
+      int qi = qindexI_ [i],
+          qj = qindexJ_ [i];
+
+      deps += scanIndex   (qi, deplist, p, type);
+      if (qi != qj)
+	deps += scanIndex (qj, deplist, p, type);
+    }
+
+  return deps;
+}

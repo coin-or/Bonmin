@@ -19,6 +19,7 @@
 #include <exprGroup.hpp>
 #include <exprQuad.hpp>
 
+
 // General N-ary function destructor
 
 exprOp::~exprOp () {
@@ -55,20 +56,6 @@ void exprOp::print (std::ostream &out,
   }
   out << ")";
   fflush (stdout);
-}
-
-
-// does this expression depend on variables in varlist?
-
-int exprOp::dependsOn (int *varlist, int n) {
-
-  register int tot = 0;
-  register expression **al = arglist_;
-
-  for (register int i = nargs_; i--;)
-    tot += (*al++) -> dependsOn (varlist, n);
-
-  return tot;
 }
 
 
@@ -174,4 +161,15 @@ void exprOp::replace (exprVar *x, exprVar *w) {
 	*al = new exprClone (w);
       }
     } else (*al) -> replace (x, w);
+}
+
+
+/// is this expression integer?
+bool exprOp::isInteger () {
+
+  for (int i = nargs_; i--;)
+    if (!(arglist_ [i] -> isInteger ())) 
+      return false;
+
+  return true;
 }

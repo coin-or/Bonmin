@@ -47,7 +47,6 @@ CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index,
 	  expression::Variable (index_),
 	  expression::Lbound   (index_),
 	  expression::Ubound   (index_));*/
-
 }
 
 

@@ -41,6 +41,7 @@ Couenne/src/convex/genColCuts.cpp -text
 Couenne/src/convex/genRowCuts.cpp -text
 Couenne/src/convex/generateCuts.cpp -text
 Couenne/src/convex/obbt.cpp -text
+Couenne/src/convex/obbt_iter.cpp -text
 Couenne/src/convex/operators/alphaConvexify.cpp -text
 Couenne/src/convex/operators/analyzeSparsity.cpp -text
 Couenne/src/convex/operators/conv-exprAbs.cpp -text
@@ -67,7 +68,6 @@ Couenne/src/convex/operators/trigNewton.cpp -text
 Couenne/src/convex/operators/unifiedProdCuts.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/CouennePrecisions.h -text
-Couenne/src/expression/CouenneTypes.h -text
 Couenne/src/expression/CouenneTypes.hpp -text
 Couenne/src/expression/exprAux.cpp -text
 Couenne/src/expression/exprAux.hpp -text
@@ -128,6 +128,7 @@ Couenne/src/expression/operators/impliedBounds-exprSum.cpp -text
 Couenne/src/problem/CouenneProblem.cpp -text
 Couenne/src/problem/CouenneProblem.hpp -text
 Couenne/src/problem/CouenneProblemElem.hpp -text
+Couenne/src/problem/CouenneSolverInterface.hpp -text
 Couenne/src/problem/auxiliarize.cpp -text
 Couenne/src/problem/constrStandardize.cpp -text
 Couenne/src/problem/constraint.cpp -text

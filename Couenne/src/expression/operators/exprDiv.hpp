@@ -76,6 +76,9 @@ class exprDiv: public exprOp {
   /// Code for comparisons
   virtual enum expr_type code () {return COU_EXPRDIV;}
 
+  /// is this expression integer?
+  bool isInteger ();
+
   /// Implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 

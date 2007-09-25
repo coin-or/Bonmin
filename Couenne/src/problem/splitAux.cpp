@@ -38,26 +38,32 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
     /////////////////////////////////////////////////////////////////////////////
 
-  case COU_EXPRSUB: { 
+  case COU_EXPRSUB: {
 
     // simplest case, we have w-f(x)=rhs or f(x)-w=rhs or f(x)-g(x)=rhs
 
     int pos = 0;
-    CouNumber coeff;
+    CouNumber coeff = 1;
 
     auxInd = (*alist) -> Index ();
 
-    elementBreak (*alist, auxInd, coeff); // check first element 
+    if (auxInd < 0)
+      elementBreak (*alist, auxInd, coeff); // check first element 
 
     if ((auxInd < 0) || 
 	wentAux [auxInd] || 
-	(body -> dependsOn (&auxInd, 1) > 1)) {
+	(alist [1] -> dependsOn (&auxInd, 1, p, TAG_AND_RECURSIVE) >= 1)) {
 
-      elementBreak (alist [1], auxInd, coeff); // check second element
+      auxInd = (alist [1]) -> Index ();
 
-      if ((auxInd < 0) ||                       // no index found
-	  wentAux [auxInd] ||                   // or, found but invalid
-	  (body -> dependsOn (&auxInd, 1) > 1)) // or, variable depends upon itself
+      if (auxInd < 0)
+	elementBreak (alist [1], auxInd, coeff); // check second element
+      else coeff = 1;
+
+      if ((auxInd < 0) ||       // no index found
+	  wentAux [auxInd] ||   // or, found but invalid
+	  (alist [0] -> dependsOn (&auxInd, 1, p, TAG_AND_RECURSIVE) >= 1)) 
+	                        // or, variable depends upon itself
 	return -1;
 
       //      printf ("no dependence0 %d\n", auxInd);
@@ -82,7 +88,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
   ////////////////////////////////////////////////////////////////////////////
 
-  //  case COU_EXPRQUAD: // TODO
+  case COU_EXPRQUAD: // TODO -- no need, check in quad is equal to the
+		     // check in group as we don't check the quadratic
+		     // terms
   case COU_EXPRGROUP:
   case COU_EXPRSUM: {
 
@@ -92,6 +100,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     // data structure to be used below if there is a linear term.
     // which specifies position within arrays (negative for linear
     // part of exprGroup, positive for all elements of exprSum)
+
     int maxindex = -1, *linind = NULL, nlin = 0, which = 1;
     CouNumber c0 = 0., *lincoe = NULL, auxcoe = 1;
     bool which_was_set = false;
@@ -110,15 +119,22 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
 	if ((j > maxindex) && 
 	    !(wentAux [j]) && 
-	    (fabs (lincoe [nlin]) > COUENNE_EPS) &&
-	    (body -> dependsOn (p, &j, 1) <= 1)) {
+	    (fabs (lincoe [nlin]) > COUENNE_EPS)) {
 
-	  //	  printf ("no dependence (1) %d on", j);
-	  //	  body -> print (); printf ("\n");
+	  // fake cut in linind and check dependence. Only mark if
+	  // dependson gives 0
 
-	  which    = - nlin - 1;    // mark which with negative number 
-	  auxcoe   = lincoe [nlin];
-	  maxindex = j;
+	  int indInd = linind [nlin];
+	  linind [nlin] = -1; // fictitious index to bypass check
+
+	  if (body -> dependsOn (&j, 1, p, TAG_AND_RECURSIVE) == 0) {
+
+	    which    = - nlin - 1;    // mark which with negative number 
+	    auxcoe   = lincoe [nlin];
+	    maxindex = j;
+	  }
+
+	  linind [nlin] = indInd;
 	}
       }
     }
@@ -131,21 +147,33 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
     for (int i = body -> nArgs (); i--;) {
 
-      CouNumber coeff;
-      int index;
+      CouNumber coeff = 1;
+      int index = alist [i] -> Index ();
 
-      elementBreak (alist [i], index, coeff);
+      if (index < 0)
+	elementBreak (alist [i], index, coeff);
 
       if ((index > maxindex) &&
 	  !(wentAux [index]) &&
-	  (fabs (coeff) > COUENNE_EPS) && 
-	  (body -> dependsOn (&index, 1) <= 1)) {
+	  (fabs (coeff) > COUENNE_EPS)) {
 
+	// fake a cut in the arglist and check
+
+	expression *cut = alist [i];
+	alist [i] = new exprConst (0);
+
+	// not enough... check now linear (and quadratic!) terms 
 	//	printf ("no dependence2 %d\n", index);
 
-	maxindex = index;
-	which    = i;
-	auxcoe   = coeff;
+	if (body -> dependsOn (&index, 1, p, TAG_AND_RECURSIVE) == 0) {
+
+	  maxindex = index;
+	  which    = i;
+	  auxcoe   = coeff;
+	}
+
+	delete alist [i];
+	alist [i] = cut;
       }
     }
 
@@ -181,6 +209,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       // it is or with a coefficient
 
     } else { // no nonlinear arguments, or the only one is the new aux
+
       nargs++; // !!!!!!!!!!!!!!!!!!!!!!!!!
       newarglist  = new expression *;
       *newarglist = new exprConst (0);

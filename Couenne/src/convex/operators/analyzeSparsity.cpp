@@ -58,6 +58,5 @@ void analyzeSparsity (CouenneProblem *p, CouNumber c0,
   // each corresponds to an exprQuad to be transformed into a single
   // auxiliary variable
 
-  // build graph and look for components
-
+  // build graph and look for components -- TODO
 }

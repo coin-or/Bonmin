@@ -37,30 +37,39 @@ void CouenneProblem::standardize () {
 
   // allocate space in auxiliaries_ from commonexprs_
 
-  for (std::vector <expression *>::iterator i = commonexprs_.begin (); 
-       i != commonexprs_.end (); i++) 
-    variables_. push_back 
-      (new exprAux (*i, variables_.size (), 1 + (*i) -> rank (this)));
+  int initVar = variables_ . size () - commonexprs_ . size ();
+
+  // DEFINED VARIABLES ///////////////////////////////////////////////////////////////////////
 
   // standardize initial aux variables (aka defined variables, aka
   // common expression)
+
   for (int nc = commonexprs_ . size (), i=0; i<nc; i++) {
 
-    exprAux *aux = addAuxiliary (commonexprs_ [i]);
-    //exprAux *aux = auxiliaries_ [i];
+    expression *aux = commonexprs_ [i];
 
-    /*exprAux *w = new exprAux (symbolic, 
-			    variables_ . size () + auxiliaries_ . size (), 
-			    1 + symbolic -> rank (this));*/
 #ifdef DEBUG
     printf ("////////////// now attempting to standardize defVar "); fflush (stdout);
     aux -> print ();
-    printf (" := "); fflush (stdout);
-    aux -> Image () -> print (); 
+    //    printf (" := "); fflush (stdout);
+    //    aux -> print (); 
     printf ("\n ----> "); fflush (stdout);
 #endif
 
-    exprAux *naux = aux -> Image () -> standardize (this);
+    exprAux *naux = aux -> standardize (this);
+
+    expression *img = naux -> Image ();
+
+    exprAux *newvar = new exprAux (img, initVar, 1 + img -> rank (this));
+    variables_ [initVar] = newvar;
+
+    graph_ -> insert (newvar);
+
+    initVar++;
+
+    graph_ -> erase (naux);
+
+    variables_ . erase (variables_ . end () - 1);
 
 #ifdef DEBUG
     if (naux) {
@@ -70,13 +79,14 @@ void CouenneProblem::standardize () {
       naux -> Image () -> print (); printf ("\n..."); fflush (stdout);
     } else if (aux) {
       aux -> print ();
-      printf (" := "); fflush (stdout);
-      aux -> Image () -> print (); printf ("\n");
+      //printf (" := "); fflush (stdout);
+      //aux -> Image () -> print (); 
+      printf ("\n");
     } else printf ("[n]aux NULL!\n");
 #endif
   }
 
-  // standardize objectives
+  // OBJECTIVES //////////////////////////////////////////////////////////////////////////////
 
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); i++) {
@@ -114,12 +124,13 @@ void CouenneProblem::standardize () {
 
   std::vector <CouenneConstraint *> con2;
 
-  // standardize constraints
+  // CONSTRAINTS /////////////////////////////////////////////////////////////////////////////
+
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin (); 
        i != constraints_.end (); i++) {
 
 #ifdef DEBUG
-    printf ("Constraint ");
+    printf ("############# Constraint ");
       (*i) -> print ();
 #endif
 
@@ -151,8 +162,11 @@ void CouenneProblem::standardize () {
   constraints_ = con2;
 
 #ifdef DEBUG
-  printf ("done with standardization\n");
+  printf ("done with standardization:\n");
+  print ();
 #endif
+
+  // CREATE EVALUATION ORDER /////////////////////////////////////////////////////////////////
 
   delete auxSet_;
 
@@ -166,15 +180,8 @@ void CouenneProblem::standardize () {
   // make expression library point to new vectors
   expression::update (x_, lb_, ub_);
 
-  /*
-  if (graph_ -> checkCycles ()) {
-    printf ("CYCLE!\n\n\n");
-    exit (-1);
-  }
-  */
-
+  //  graph_ -> print ();
   graph_ -> createOrder ();
-
   //  graph_ -> print ();
 
   // fill numbering structure /////////////////////////////////////////////////
@@ -189,7 +196,7 @@ void CouenneProblem::standardize () {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  for (int i=0; i < nVars (); i++) {
+  for (int i = 0; i < nVars (); i++) {
 
     int ord = numbering_ [i];
 

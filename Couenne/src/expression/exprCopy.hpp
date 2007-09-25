@@ -53,6 +53,22 @@ class exprCopy: public expression {
   inline int Index () const
     {return copy_ -> Index ();}
 
+  /// return number of arguments (when applicable, that is, with N-ary functions)
+  virtual inline int nArgs () const
+    {return copy_ -> nArgs ();}
+
+  /// return arglist (when applicable, that is, with N-ary functions)
+  virtual inline expression **ArgList () const
+    {return copy_ -> ArgList ();}
+
+  /// return argument (when applicable, i.e., with univariate functions)
+  virtual inline expression *Argument () const
+    {return copy_ -> Argument ();}
+
+  /// return pointer to argument (when applicable, i.e., with univariate functions)
+  virtual inline expression **ArgPtr ()
+    {return copy_ -> ArgPtr ();}
+
   /// I/O
   virtual void print (std::ostream &out = std::cout, 
 		      bool descend      = false, 
@@ -64,9 +80,9 @@ class exprCopy: public expression {
     //    {return currValue_;}
     {return copy_ -> Value ();} // *** Check this! Should be the commented one 
 
-  // FIX ME! a copy should just return an already evaluated number,
-  // that's why it is very important that exprCopy should only be used
-  // in successive evaluations. 
+  // TODO: FIX ME! a copy should just return an already evaluated
+  // number, that's why it is very important that exprCopy should only
+  // be used in successive evaluations.
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
@@ -77,9 +93,12 @@ class exprCopy: public expression {
   inline expression *differentiate (int index) 
     {return copy_ -> differentiate (index);}
 
-  /// dependence on variable set
-  inline int dependsOn (int *varlist, int n) 
-    {return copy_ -> dependsOn (varlist, n);}
+  /// fill in the set with all indices of variables appearing in the
+  /// expression
+  inline int DepList (std::set <int> &deplist, 
+		      enum dig_type   type = ORIG_ONLY,
+		      CouenneProblem *p    = NULL)
+    {return copy_ -> DepList (deplist, type, p);}
 
   /// simplify expression (useful for derivatives)
   inline expression *simplify () 
@@ -88,6 +107,9 @@ class exprCopy: public expression {
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
     {return copy_ -> Linearity ();}
+
+  virtual inline bool isInteger ()
+    {return copy_ -> isInteger ();}
 
   /// Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lower, expression *&upper) 
@@ -108,30 +130,48 @@ class exprCopy: public expression {
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar () 
+  expression *getFixVar () 
     {return copy_ -> getFixVar ();}
 
   /// code for comparisons
-  virtual enum expr_type code () 
+  enum expr_type code () 
     {return copy_ -> code ();}
+
+  /// either CONVEX, CONCAVE, AFFINE, or NONCONVEX 
+  virtual enum convexity convexity ()
+  {return copy_ -> convexity ();}
 
   /// compare this with other expression
   int compare (expression &e) 
     {return copy_ -> compare (e);}
 
   /// used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *p)
+  int rank (CouenneProblem *p)
     {return copy_ -> rank (p);} 
 
   /// implied bound processing
   bool impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg)
     {return copy_ -> impliedBound (wind, l, u, chg);}
 
+  /// multiplicity of a variable: how many times this variable occurs
+  /// in expressions throughout the problem
+  virtual int Multiplicity ()
+    {return copy_ -> Multiplicity ();}
+
+  /// Set up branching object by evaluating many branching points for each expression's arguments.
+  /// Return estimated improvement in objective function 
+  virtual CouNumber selectBranch (expression *w,
+				  const OsiBranchingInformation *info,
+				  int     &ind,
+				  double *&brpts,
+				  int     &way) 
+  {return copy_ -> selectBranch (w, info, ind, brpts, way);}
+
   /// replace occurrence of a variable with another variable
-  virtual void replace (exprVar *, exprVar *);
+  void replace (exprVar *, exprVar *);
 
   /// fill in dependence structure
-  virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g)
+  void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g)
     {copy_ -> fillDepSet (dep, g);}
 };
 

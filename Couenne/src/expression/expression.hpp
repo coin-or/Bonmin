@@ -13,6 +13,9 @@
 
 #include <iostream>
 #include <set>
+#include <cmath>
+#include <algorithm>
+#include <iterator>
 
 #include <CouennePrecisions.h>
 #include <CouenneTypes.h>
@@ -176,16 +179,19 @@ class expression {
   virtual inline expression *differentiate (int) 
     {return NULL;}
 
-  /// dependence on variable set: return number of times indices of
-  /// first argument occur in expression. If first argument is NULL,
-  /// return zero if expression is constant, nonzero otherwise
-  virtual inline int dependsOn (int *, int) 
-    {return 0;}
+  /// dependence on variable set: return cardinality of subset of the
+  /// set of indices in first argument which occur in expression. 
+  virtual int dependsOn (int *ind, int n, 
+			 CouenneProblem *p = NULL, 
+			 enum dig_type   type = STOP_AT_AUX);
 
-  /// specialized version to be used with expressions with
-  /// non-symbolic content such as exprGroup and exprQuad
-  virtual inline int dependsOn (CouenneProblem *, int *ind, int n) 
-    {return dependsOn (ind, n);}
+  /// fill std::set with indices of variables on which this expression
+  /// depends. Also deal with expressions that have no variable
+  /// pointers (exprGroup, exprQuad)
+  virtual inline int DepList (std::set <int> &deplist, 
+			      enum dig_type   type = ORIG_ONLY,
+			      CouenneProblem *p    = NULL)
+    {return 0;}
 
   /// simplify expression (useful for derivatives)
   virtual inline expression *simplify () 
@@ -196,7 +202,7 @@ class expression {
     {return NONLINEAR;}
 
   /// is this expression integer?
-  virtual bool isInteger ()
+  virtual inline bool isInteger ()
     {return false;}
 
   /// Get lower and upper bound of an expression (if any)

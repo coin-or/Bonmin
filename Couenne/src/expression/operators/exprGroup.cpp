@@ -194,7 +194,7 @@ int exprGroup::rank (CouenneProblem *p) {
 
 /// check if this expression depends on a set of variables specified
 /// in the parameters
-int exprGroup::dependsOn (register int *chg, register int nch) {
+/*int exprGroup::dependsOn (register int *chg, register int nch) {
 
   int tot = exprOp::dependsOn (chg, nch);
 
@@ -205,7 +205,7 @@ int exprGroup::dependsOn (register int *chg, register int nch) {
 	tot++;
 
   return tot;
-}
+  }*/
 
 
 /// update dependence set with index of this variable
@@ -219,7 +219,7 @@ void exprGroup::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
 
 
 /// specialized version to check expression of linear term
-int exprGroup::dependsOn (CouenneProblem *p, int *chg, int nch) {
+/*int exprGroup::dependsOn (CouenneProblem *p, int *chg, int nch) {
 
   int tot = dependsOn (chg, nch);
 
@@ -229,4 +229,72 @@ int exprGroup::dependsOn (CouenneProblem *p, int *chg, int nch) {
 	tot += p -> Var (*ind) -> Image () -> dependsOn (p, chg, nch);
 
   return tot;
+  }*/
+
+
+/// scan expression for single index
+int scanIndex (int index, std::set <int> &deplist, CouenneProblem *p, enum dig_type type) {
+
+  if (deplist.find (index) != deplist.end ()) 
+    return 0;
+
+  int deps = 0;
+
+  // this variable not seen before in the expression
+
+  if (p -> Var (index) -> Type () == VAR) { 
+
+    // it's a leaf, stop here
+    deplist.insert (index);
+    deps++;
+
+  } else {
+
+    // it's an aux
+    if (type != ORIG_ONLY) {
+      deps++;
+      deplist.insert (index);
+    }
+
+    if (type != STOP_AT_AUX) 
+      deps += p -> Var (index) -> Image () -> DepList (deplist, type, p);
+  }
+
+  return deps;
+}
+
+
+/// fill in the set with all indices of variables appearing in the
+/// expression
+int exprGroup::DepList (std::set <int> &deplist,
+			enum dig_type type,
+			CouenneProblem *p) {
+
+  int deps = exprOp::DepList (deplist, type, p);
+
+  if (!p)
+    for (int i = nlterms_; i--;) {
+
+      int index = index_ [i];
+
+      if (index < 0) 
+	continue;
+
+      if (deplist.find (index) == deplist.end ()) {
+	deplist.insert (index);
+	deps++;
+      }
+    }
+  else
+    for (int i = nlterms_; i--;) {
+
+      int index = index_ [i];
+
+      if (index < 0) 
+	continue;
+
+      deps += scanIndex (index, deplist, p, type);
+    }
+
+  return deps;
 }

@@ -109,3 +109,24 @@ void exprCopy::replace (exprVar *orig, exprVar *aux) {
     copy_ = new exprClone (aux);
   }
 }
+
+
+/// dependence on variable set: return cardinality of subset of the
+/// set of indices in first argument which occur in expression. 
+int expression::dependsOn (int *ind, int n, 
+			   CouenneProblem *p, 
+			   enum dig_type type) {
+
+  std::set <int> 
+    indlist (ind, ind + n), 
+    deplist,
+    intersectn;
+
+  DepList (deplist, type, p);
+
+  std::set_intersection (indlist .begin (), indlist .end (), 
+			 deplist .begin (), deplist .end (),
+			 std::inserter (intersectn, intersectn.begin ()));
+
+  return intersectn.size();
+}

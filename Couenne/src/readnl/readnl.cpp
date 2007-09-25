@@ -21,6 +21,7 @@
 #include "opcode.hd"
 
 #define OBJ_DE    ((const ASL_fg *) asl) -> I.obj_de_
+#define VAR_E     ((const ASL_fg *) asl) -> I.var_e_
 #define CON_DE    ((const ASL_fg *) asl) -> I.con_de_
 #define OBJ_sense ((const ASL_fg *) asl) -> i.objtype_
 
@@ -45,7 +46,7 @@ int CouenneProblem::readnl (const ASL *asl) {
   ndefined_ = como + comc + comb + como1 + comc1; 
 
   // create continuous variables
-  for (int i = n_var-n_intvar; i--;)
+  for (int i = n_var - n_intvar; i--;)
     addVariable (false);
 
   // create integer variables
@@ -78,12 +79,86 @@ int CouenneProblem::readnl (const ASL *asl) {
   printf ("como1_ = %d\n",  ((const ASL_fg *) asl) -> i.como1_ );
   printf ("como_ = %d\n",   ((const ASL_fg *) asl) -> i.como_  );*/
 
-  for (int i = 0; i < como + comc + comb; i++)
-    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps_  [i] . e));
+  // Each has a linear and a nonlinear part (credit to Dominique
+  // Orban: http://www.gerad.ca/~orban/drampl/def-vars.html)
 
-  for (int i = 0; i < como1 + comc1; i++) 
-    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e));
+  for (int i = 0; i < como + comc + comb; i++) {
 
+    struct cexp *common = ((const ASL_fg *) asl) -> I.cexps_ + i;
+    expression *nle = nl2e (common -> e);
+
+    //    printf ("cexp  %d: ", i); nle -> print ();  printf (" ||| ");
+
+    int nlin = common -> nlin;  // Number of linear terms
+
+    if (nlin > 0) {
+
+      int       *index = new int       [nlin+1];
+      CouNumber *coeff = new CouNumber [nlin];
+
+      linpart *L = common -> L;
+
+      for (int j = 0; j < nlin; j++ ) {
+	//	vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
+	//	Printf( " %-g x[%-d]", L->fac, (int)(vp - VAR_E) );	
+	coeff [j] = L [j]. fac;
+	index [j] = (expr_v *) (L [j].v.rp) - VAR_E;
+	/*	Printf( " %-g x[%-d]", L [j]. fac, 
+		(expr_v *) (L [j].v.rp) - VAR_E //((const ASL_fg *) asl) -> I.cexps_
+		//L [j]. v.i
+		);*/
+      }
+
+      index [nlin] = -1;
+
+      expression **al = new expression * [1];
+      *al = nle;
+
+      exprGroup *eg = new exprGroup (0, index, coeff, al, 1);
+      commonexprs_ . push_back (eg);
+    } 
+    else commonexprs_ . push_back (nle);
+    //    printf ("\n");
+  }
+
+  for (int i = 0; i < como1 + comc1; i++) {
+
+    struct cexp1 *common = ((const ASL_fg *) asl) -> I.cexps1_ + i;
+    expression *nle = nl2e (common -> e);
+
+    //    printf ("cexp1 %d: ", i); nle -> print ();  printf (" ||| ");
+
+    int nlin = common -> nlin;  // Number of linear terms
+
+    if (nlin > 0) {
+
+      int       *index = new int       [nlin+1];
+      CouNumber *coeff = new CouNumber [nlin];
+
+      linpart *L = common -> L;
+
+      for (int j = 0; j < nlin; j++ ) {
+	//	vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
+	coeff [j] = L [j]. fac;
+	index [j] = (expr_v *) (L [j].v.rp) - VAR_E;
+	/*	Printf( " %-g x[%-d]", L [j]. fac, 
+		(expr_v *) (L [j].v.rp) - VAR_E //((const ASL_fg *) asl) -> I.cexps_
+		//L [j]. v.i
+		);*/
+      }
+
+      index [nlin] = -1;
+
+      expression **al = new expression * [1];
+      *al = nle;
+
+      exprGroup *eg = new exprGroup (0, index, coeff, al, 1);
+      commonexprs_ . push_back (eg);
+    } 
+    else commonexprs_ . push_back (nle);
+    //    printf ("\n");
+    //    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e));
+  }
 
   // objective functions /////////////////////////////////////////////////////////////
 

@@ -103,6 +103,16 @@ void DepGraph::insert (exprAux *aux) {
   } else aux -> Image () -> fillDepSet ((*i) -> DepList (), this);
 }
 
+/// erase element from graph
+void DepGraph::erase (exprVar *var) {
+
+  DepNode *el = new DepNode (var -> Index ());
+  std::set <DepNode *, compNode>::iterator i = vertices_ . find (el); 
+
+  if (i != vertices_ . end ())
+    vertices_.erase (i);
+  delete el;
+}
 
 /// does w depend on x?
 bool DepGraph::depends (int wi, int xi, bool recursive) {

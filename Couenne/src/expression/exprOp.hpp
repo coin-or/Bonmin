@@ -83,7 +83,18 @@ class exprOp: public expression {
   virtual inline CouNumber operator () ();
 
   /// dependence on variable set
-  virtual int dependsOn (int * = NULL, int = 1);
+  //  virtual int dependsOn (int * = NULL, int = 1);
+
+  /// fill in the set with all indices of variables appearing in the
+  /// expression
+  virtual inline int DepList (std::set <int> &deplist, 
+			      enum dig_type type = ORIG_ONLY,
+			      CouenneProblem *p = NULL) {
+    int tot = 0;
+    for (int i = nargs_; i--;)
+      tot += arglist_ [i] -> DepList (deplist, type, p);
+    return tot;
+  }
 
   /// simplification
   virtual expression *simplify ();
@@ -116,6 +127,9 @@ class exprOp: public expression {
   /// return code to classify type of expression
   virtual enum expr_type code ()
     {return COU_EXPROP;}
+
+  /// is this expression integer?
+  virtual bool isInteger ();
 
   /// compare with other generic exprOp
   virtual int compare (exprOp &);
