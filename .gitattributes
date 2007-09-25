@@ -68,6 +68,7 @@ Couenne/src/convex/operators/trigNewton.cpp -text
 Couenne/src/convex/operators/unifiedProdCuts.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/CouennePrecisions.h -text
+Couenne/src/expression/CouenneTypes.h -text
 Couenne/src/expression/CouenneTypes.hpp -text
 Couenne/src/expression/exprAux.cpp -text
 Couenne/src/expression/exprAux.hpp -text
