@@ -311,7 +311,9 @@ algo_(other.algo_){
     if(!val){
       options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
       varSelection = OsiTMINLPInterface::NLP_STRONG_BRANCHING;
+#ifndef DISALLOW_PRINTING
       std::cout<<"Change varSelection"<<std::endl;
+#endif
     }
     switch (varSelection) {
     case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
