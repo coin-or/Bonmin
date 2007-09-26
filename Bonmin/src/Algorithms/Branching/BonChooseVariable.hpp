@@ -8,6 +8,7 @@
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonPseudoCosts.hpp"
 
+#include "BonBabSetupBase.hpp"
 // Forward declaration
 class CbcModel;
 
@@ -46,7 +47,7 @@ public:
     canFixNoCandidate /** Can fix variables but does not have strong branching candidates.*/
   };
   /// Constructor from solver (so we can set up arrays etc)
-  BonChooseVariable (OsiTMINLPInterface * solver);
+  BonChooseVariable (BabSetupBase& b);
 
   /// Copy constructor 
   BonChooseVariable (const BonChooseVariable &);

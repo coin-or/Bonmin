@@ -298,18 +298,20 @@ algo_(other.algo_){
     
     intParam_[BabSetupBase::SpecialOption] = 16;
     //AW: Took this out: intParam_[BabSetupBase::MinReliability] = 0;
-    if(!options_->GetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.")){
+    if(!options_->GetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.")){
       intParam_[BabSetupBase::MinReliability] = 1;
-      options_->SetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.");
+      options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
     }
-    if(!options_->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin.")){
+    if(!options_->GetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.")){
       intParam_[BabSetupBase::NumberStrong] = 1000;
-      options_->SetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin."); 
+      options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin."); 
     }
     int varSelection;
     bool val = options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     if(!val){
       options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
+      varSelection = OsiTMINLPInterface::NLP_STRONG_BRANCHING;
+      std::cout<<"Change varSelection"<<std::endl;
     }
     switch (varSelection) {
     case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
@@ -319,7 +321,7 @@ algo_(other.algo_){
       {
 	continuousSolver_->findIntegersAndSOS(false);
 	SmartPtr<StrongBranchingSolver> strong_solver = NULL;
-	BonChooseVariable * chooseVariable = new BonChooseVariable(nonlinearSolver_);
+	BonChooseVariable * chooseVariable = new BonChooseVariable(*this);
 	switch(varSelection) {
 	case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
 	  strong_solver = new CurvBranchingSolver(nonlinearSolver_);
@@ -354,6 +356,8 @@ algo_(other.algo_){
     //default:
       //abort();
     }
+    if(branchingMethod_ != NULL)
+      branchingMethod_->setNumberStrong(intParam_[NumberStrong]);
   }  
   
   void 
