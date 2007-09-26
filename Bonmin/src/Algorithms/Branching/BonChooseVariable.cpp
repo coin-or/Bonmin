@@ -15,34 +15,36 @@
 
 namespace Bonmin {
 
-BonChooseVariable::BonChooseVariable(OsiTMINLPInterface * solver) :
-  OsiChooseVariable(solver),
+BonChooseVariable::BonChooseVariable(BabSetupBase &b):
+  OsiChooseVariable(const_cast<OsiTMINLPInterface *>(b.nonlinearSolver())),
   cbc_model_(NULL),
   only_pseudo_when_trusted_(false),
   pseudoCosts_(new PseudoCosts())
 {
-  SmartPtr<TNLPSolver> tnlp_solver =
-    static_cast<TNLPSolver *> (solver->solver());
-  DBG_ASSERT(IsValid(tnlp_solver));
-  jnlst_ = tnlp_solver->Jnlst();
-  DBG_ASSERT(IsValid(jnlst_));
-  SmartPtr<OptionsList> options = tnlp_solver->Options();
+  jnlst_ = b.journalist();
+  SmartPtr<OptionsList> options = b.options();
 
   options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
   options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
   options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
   options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
-  int numberBeforeTrusted;
-  options->GetIntegerValue("number_before_trust", numberBeforeTrusted, "bonmin.");
+
+  /** Set values of standard branching options.*/
+  int numberObjects = solver_->numberObjects();
+  pseudoCosts_->initialize(numberObjects);
+  int numberBeforeTrusted = b.getIntParameter(BabSetupBase::MinReliability);
+  pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
+
+  setNumberStrong(b.getIntParameter(BabSetupBase::NumberStrong));
+  pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
+
+  /** Get values of options specific to BonChooseVariable.*/
   if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, "bonmin.")) {
     // default is to use the same value as for numberBeforeTrusted
-    options->GetIntegerValue("number_before_trust", numberBeforeTrustedList_, "bonmin.");
+    numberBeforeTrustedList_ = numberBeforeTrusted;
   }
   options->GetIntegerValue("number_strong_branch_root", numberStrongRoot_, "bonmin.");
 
-  int numberObjects = solver_->numberObjects();
-  pseudoCosts_->initialize(numberObjects);
-  pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
 }
 
 BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
