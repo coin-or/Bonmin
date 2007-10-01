@@ -10,7 +10,6 @@
 #ifndef _BM_H
 #define _BM_H
 
-
 #include "BCP_USER.hpp"
 #include "BCP_parameters.hpp"
 #include "BCP_tm_user.hpp"
@@ -41,12 +40,6 @@ public:
 
 //#############################################################################
     
-enum BM_WarmStartStrategy {
-    WarmStartNone,
-    WarmStartFromRoot,
-    WarmStartFromParent
-};
-
 // This needs to be the same as enum VarSelectStra_Enum in
 // BonOsiTMINLPInterface.hpp
 enum BM_BranchingStrategy {
@@ -84,7 +77,6 @@ public:
 	BranchingStrategy,
 	FullStrongBranch,
         NumNlpFailureMax,
-	WarmStartStrategy,
         end_of_int_params
     };
     enum dbl_params {
@@ -131,7 +123,6 @@ public:
     //@{
     virtual void pack_module_data(BCP_buffer& buf, BCP_process_t ptype);
 
-    virtual BCP_solution* unpack_feasible_solution(BCP_buffer& buf);
     //@}
 
     /// Pass the core constraints and core variables to bcp
@@ -197,27 +188,11 @@ class BM_lp : public BCP_lp_user
     BCP_string nl_file_content;
     BCP_parameter_set<BM_par> par;
 
-    OsiBabSolver babSolver_;
-    /** PIERRE: This contains the setup for running Bonmin in particular nlp solver, continuous solver,
-      cut generators,...*/
+    /** This contains the setup for running Bonmin in particular nlp
+	solver, continuous solver, cut generators,...*/
     Bonmin::BonminAmplSetup bonmin_;
 
-    CoinWarmStart* ws_;
-    OsiChooseVariable* chooseVar_;
-    int numEcpRounds_;
-    int numberStrong_;
-    int minReliability_;
-    int varselect_;
     double integerTolerance_;
-    double cutOffDecrement_;
-
-    /* FIXME: gross cheating. works only for serial mode. Store the warmstart
-       informations in the lp process, do not send them over in user data or
-       anywhere. MUST be fixed. The map is indexed by the node index. */
-    std::map<int, CoinWarmStart*> warmStart;
-
-    double lower_bound_;
-    double* primal_solution_;
 
     /** A counter for how many times in a row did the NLP code fail. When the
 	NLP fails we branch; hopefully it'll be OK in the children. If it
@@ -226,11 +201,6 @@ class BM_lp : public BCP_lp_user
     int numNlpFailed_;
 
     OsiCuts cuts_;
-
-    /** The last free-to-busy ratio (among the LP processes) that the TM has
-	sent over. It is used to decide whether we want distributed strong
-	branching */
-    double freeToBusyRatio_;
 
 public:
     BM_lp();
@@ -243,9 +213,6 @@ public:
     virtual void
     unpack_module_data(BCP_buffer& buf);
 
-    virtual void
-    pack_feasible_solution(BCP_buffer& buf, const BCP_solution* sol);
-
     /** Process a message that has been sent by another process' user part to
 	this process' user part. */
     virtual void
@@ -254,11 +221,19 @@ public:
     virtual OsiSolverInterface *
     initialize_solver_interface();
 
+    virtual void
+    load_problem(OsiSolverInterface& osi, BCP_problem_core* core,
+		 BCP_var_set& vars, BCP_cut_set& cuts);
+
+    virtual void
+    modify_lp_parameters(OsiSolverInterface* lp, bool in_strong_branching);
+
     virtual BCP_solution*
     test_feasibility(const BCP_lp_result& lp_result,
 		     const BCP_vec<BCP_var*>& vars,
 		     const BCP_vec<BCP_cut*>& cuts);
-    BCP_solution* test_feasibility_BB(const BCP_vec<BCP_var*>& vars);
+    BCP_solution* test_feasibility_BB(const BCP_lp_result& lp_result,
+				      const BCP_vec<BCP_var*>& vars);
     BCP_solution* test_feasibility_hybrid(const BCP_lp_result& lp_result,
 					  const BCP_vec<BCP_var*>& vars,
 					  const BCP_vec<BCP_cut*>& cuts);
@@ -309,9 +284,6 @@ public:
     set_user_data_for_children(BCP_presolved_lp_brobj* best, 
 			       const int selected);
 
-    virtual void
-    modify_lp_parameters(OsiSolverInterface* lp, bool in_strong_branching);
-
 private:
     /* There's no totalTime_ and nodeTime_. Look at the top of BM.cpp */
     //   double totalTime_;
@@ -350,27 +322,6 @@ public:
     virtual BCP_lp_user * lp_init(BCP_lp_prob& p);
 
     virtual BCP_user_pack * packer_init(BCP_user_class* p);
-};
-
-//#############################################################################
-
-class BM_solution : public BCP_solution { 
-public:
-    double _objective;
-    BCP_vec<int> _ind;
-    BCP_vec<double> _values;
-
-public:
-    BM_solution() : _objective(0), _ind(), _values() {}
-    virtual ~BM_solution() {}
-
-    inline virtual double objective_value() const { return _objective; }
-    inline void setObjective(double obj) { _objective = obj; }
-
-    void add_entry(int i, double value) {
-	_ind.push_back(i);
-	_values.push_back(value);
-    }
 };
 
 #endif

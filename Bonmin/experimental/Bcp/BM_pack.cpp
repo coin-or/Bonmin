@@ -13,32 +13,6 @@
 //#############################################################################
 
 void
-BM_lp::pack_feasible_solution(BCP_buffer& buf, const BCP_solution* sol)
-{
-    const BM_solution* bs = dynamic_cast<const BM_solution*>(sol);
-    if (!bs) {
-	throw BCP_fatal_error("Trying to pack non-BM_solution.\n");
-    }
-    buf.pack(bs->_objective);
-    buf.pack(bs->_ind);
-    buf.pack(bs->_values);
-}
-
-/****************************************************************************/
-
-BCP_solution*
-BM_tm::unpack_feasible_solution(BCP_buffer& buf)
-{
-    BM_solution* bs = new BM_solution;
-    buf.unpack(bs->_objective);
-    buf.unpack(bs->_ind);
-    buf.unpack(bs->_values);
-    return bs;
-}
-
-//#############################################################################
-
-void
 BM_tm::pack_module_data(BCP_buffer& buf, BCP_process_t ptype)
 {
     // possible process types looked up in BCP_enum_process_t.hpp
@@ -78,18 +52,8 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
       continuous relaxation should not be created.*/
     bonmin_.initialize(argv, ipopt_content, nl_content, false);
     bonmin_.nonlinearSolver()->setExposeWarmStart(true);
-    babSolver_.setSolver(bonmin_.nonlinearSolver());
 
     free(argv[1]);
-    if (! get_param(BCP_lp_par::MessagePassingIsSerial) &&
-	bonmin_.getAlgorithm() == 0 /* pure B&B */ &&
-	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
-	printf("\
-BM: WarmStartFromParent is not supported for pure B&B in parallel env.\n");
-	printf("\
-BM: Switching to WarmStartFromRoot.\n");
-	par.set_entry(BM_par::WarmStartStrategy, WarmStartFromRoot);
-    }
 
     /* synchronize bonmin & BCP parameters */
     Ipopt::SmartPtr<Ipopt::OptionsList> options = bonmin_.options();
@@ -98,7 +62,8 @@ BM: Switching to WarmStartFromRoot.\n");
 	local to the BM_lp object */
     integerTolerance_ = bonmin_.getDoubleParameter(BabSetupBase::IntTol);
     // cutOffDecrement_ could be negative
-    cutOffDecrement_ = bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr);
+    double cutOffDecrement;
+    bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr);
 
     BCP_lp_prob* bcp_lp = getLpProblemPointer();
     const double bcp_intTol = bcp_lp->par.entry(BCP_lp_par::IntegerTolerance);
@@ -111,29 +76,15 @@ BM: Switching to WarmStartFromRoot.\n");
 	       bcp_intTol, integerTolerance_);
 	printf("   For now both will be set to that of bonmin.\n");
     }
-    if (fabs(cutOffDecrement_ - cutOffDecrement_) > 1e-10) {
+    if (fabs(bcp_cutoffIncr - cutOffDecrement) > 1e-10) {
 	printf("WARNING!\n");
 	printf("   The granularity (cutoff increment) parameters are different\n");
 	printf("   BCP (%f) and bonmin (%f). They should be identical.\n",
-	       bcp_cutoffIncr, cutOffDecrement_);
+	       bcp_cutoffIncr, cutOffDecrement);
 	printf("   For now both will be set to that of bonmin.\n");
     }
     bcp_lp->par.set_entry(BCP_lp_par::IntegerTolerance, integerTolerance_);
-    bcp_lp->par.set_entry(BCP_lp_par::Granularity, cutOffDecrement_);
-
-    /* Store a few more options in vars local to the BM_lp object */
-
-    // Getting the options for the choose variable object
-    if (!options->GetEnumValue("varselect_stra",varselect_,"bonmin.")) {
-      // For Bcp, we change the default to most-fractional for now
-      varselect_ = Bonmin::OsiTMINLPInterface::MOST_FRACTIONAL;
-    }
-    options->GetIntegerValue("ecp_max_rounds", numEcpRounds_,"bonmin.");
-    options->GetIntegerValue("number_strong_branch",numberStrong_,"bonmin.");
-    options->GetIntegerValue("number_before_trust", minReliability_,"bonmin.");
-    delete chooseVar_;
-    chooseVar_ = NULL;
-
+    bcp_lp->par.set_entry(BCP_lp_par::Granularity, cutOffDecrement);
 
     /* If pure BB is selected then a number of BCP parameters are changed */
     if (bonmin_.getAlgorithm() == 0 /* pure B&B */) {
@@ -141,71 +92,16 @@ BM: Switching to WarmStartFromRoot.\n");
 	bcp_lp->par.set_entry(BCP_lp_par::MaxPresolveIter, -1);
 	/* disable a bunch of printing, all of which are meaningless, since the
 	   LP relaxation is meaningless */
-	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_LpSolutionValue, false);
-	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_FinalRelaxedSolution, false);
-	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_RelaxedSolution, false);
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_ReportLocalCutPoolSize, false);
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_ReportLocalVarPoolSize, false);
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_GeneratedCutCount, false);
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_GeneratedVarCount, false);
-	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_IterationCount, false);
 	bcp_lp->par.set_entry(BCP_lp_par::LpVerb_RowEffectivenessCount, false);
-	//  bcp_lp->par.set_entry(BCP_lp_par::LpVerb_FathomInfo, false);
-    } else {
-#if 0 // Pierre cut generators have already been initialized
-	/* for hybrid: initialize the cut generators */
-
-	/* NOTE:
-	   
-	   if the localSerchSolver for oaDec_ is NULL, that will force the cut
-	   generator to create a clone of the solverinterface in bcp and use
-	   that to solve the milp subproblem.
-
-	   If localSearchSolver is set then if it is *not* the same as bcp's
-	   solverinterface then bcp's si's data gets copied into
-	   localsearchsolver when the milp is solvede.
-
-	   Finally, if localSearchSolver is set and it is the same as bcp's
-	   si, then bcp's si will be modified by the oaDec_. A big NO-NO!
-	   Fortunately, this will never happen as in each search tree node bcp
-	   creates a clone of the master lp.
-	*/
-	OsiSolverInterface * localSearchSolver = NULL;
-	if (minlpParams_.milpSubSolver == 2) {/* try to use cplex */
-#ifdef COIN_HAS_CPX
-	    localSearchSolver = new OsiCpxSolverInterface;
-	    nlpSolver->extractLinearRelaxation(*localSearchSolver);
-#else
-	    std::cerr << "You have set an option to use CPLEX as the milp\n"
-		      << "subsolver in oa decomposition. However, apparently\n"
-		      << "CPLEX is not configured to be used in bonmin.\n"
-		      << "See the manual for configuring CPLEX\n";
-	    throw -1;
-#endif
-	}
-	Bonmin::initializeCutGenerators(minlpParams_, &nlp_,
-					miGGen_, probGen_,
-					knapsackGen_, mixedGen_,
-					oaGen_, ecpGen_,
-					oaDec_, localSearchSolver,
-					feasCheck_, NULL
-					);
-#else
-  //Check if OA decomposition is in cut generators and remove it
-    for(BabSetupBase::CuttingMethods::iterator i = bonmin_.cutGenerators().begin() ; 
-        i != bonmin_.cutGenerators().end() ; i++){
-      OACutGenerator2 * oaDec = dynamic_cast<OACutGenerator2 *> (i->cgl);
-      if(oaDec)//Disable it
-      {
-        i->frequency = 0;
-      }
-    }
-#endif
     }
 
     /* extract the sos constraints */
-Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
-const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
+    Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
+    const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
     
     int i;
     const int numCols = nlp.getNumCols();
@@ -237,18 +133,6 @@ const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
 	delete osiObj[i];
     }
     delete[] osiObj;
-
-    /* just to be on the safe side... always allocate */
-    primal_solution_ = new double[nlp.getNumCols()];
-
-    /* solve the initial nlp to get warmstart info in the root */
-    nlp.initialSolve();
-    ws_ = nlp.getWarmStart();
-    if (get_param(BCP_lp_par::MessagePassingIsSerial) &&
-	par.entry(BM_par::WarmStartStrategy) == WarmStartFromParent) {
-	warmStart[0] = ws_;
-	ws_ = NULL;
-    }
 }
 
 //#############################################################################
