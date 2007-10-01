@@ -526,7 +526,6 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   options->GetIntegerValue("mxlws",  mxiwk0_ipt, "filter.");
   mxiwk0 = mxiwk0_ipt;
   // Setup storage for Filter
-  double infty = F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty;
   int nplusm = n + m;
   //Starting point
   x = new real [n];
@@ -545,6 +544,7 @@ FilterSolver::cachedInfo::initialize(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp,
   tnlp->get_bounds_info(n, bounds, bounds + nplusm, m, bounds + n, bounds + n + nplusm);
 
 #if 0
+  double infty = F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty;
   // AW: I don't think we need this, it isn't done for ReOptimize either
   for(int i = 0 ; i < nplusm ; i++){
   if(bounds[i] < -infty) bounds[i] = - infty;}
@@ -737,10 +737,12 @@ FilterSolver::cachedInfo::optimize()
     tnlp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
     ifail = 0;
   }
-
+  printf("ifail = %d\n", ifail);
   cpuTime_ = - CoinCpuTime();
   fint cstype_len = 1;
   rho = 10;
+  //  rho = 1e6;
+  //  printf("rho = %e\n", rho);
 #if 0
   printf("========= 3333333333333333 =============\n");
   for (int i=0; i<n; i++) {
