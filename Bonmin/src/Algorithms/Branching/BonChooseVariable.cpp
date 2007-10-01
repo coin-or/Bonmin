@@ -406,7 +406,7 @@ BonChooseVariable::chooseVariable(
   // We assume here that chooseVariable is called once at the very
   // beginning with fixVariables set to true.  This is then the root
   // node.
-  bool isRoot = isRootNode();
+  bool isRoot = isRootNode(info);
   if (!isRoot) {
     numberStrongRoot_ = numberStrong_;
   }
@@ -703,10 +703,8 @@ BonChooseVariable::doBonStrongBranching( OsiSolverInterface * solver,
   return returnCode;
 }
 
-bool BonChooseVariable::isRootNode() const {
-  assert(cbc_model_);
-  const int depth = cbc_model_->currentNode()->depth();
-  return (depth == 0);
+bool BonChooseVariable::isRootNode(const OsiBranchingInformation *info) const {
+  return info->depth_ == 0;
 }
 
 double
