@@ -19,7 +19,7 @@ LpBranchingSolver::LpBranchingSolver(OsiTMINLPInterface * solver) :
 {
   SmartPtr<TNLPSolver> tnlp_solver =
     static_cast<TNLPSolver *> (solver->solver());
-  SmartPtr<OptionsList> options = tnlp_solver->Options();
+  SmartPtr<OptionsList> options = tnlp_solver->options();
 
   options->GetIntegerValue("ecp_max_rounds_strong",
 			   maxCuttingPlaneIterations_, "bonmin.");

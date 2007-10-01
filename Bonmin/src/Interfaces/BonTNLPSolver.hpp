@@ -142,16 +142,20 @@ TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
    //@}
 
   ///Get a pointer to a journalist
-  virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst() = 0;
+  Ipopt::SmartPtr<Ipopt::Journalist> journalist(){
+    return journalist_;}
 
    ///Get a pointer to RegisteredOptions (generally used to add new ones)
-   virtual Ipopt::SmartPtr<Bonmin::RegisteredOptions> RegOptions() = 0;
+   Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions(){
+     return roptions_;}
 
    /// Get the options (for getting their values).
-   virtual Ipopt::SmartPtr<const Ipopt::OptionsList> Options() const = 0;
+   Ipopt::SmartPtr<const Ipopt::OptionsList> options() const {
+     return ConstPtr(options_);}
 
    /// Get the options (for getting and setting their values).
-   virtual Ipopt::SmartPtr<Ipopt::OptionsList> Options() = 0;
+   Ipopt::SmartPtr<Ipopt::OptionsList> options() {
+     return options_;}
 
    /// Register this solver options into passed roptions
 static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){}
@@ -177,8 +181,23 @@ static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   /** Error code (solver specific).*/
 virtual int errorCode() const = 0;
 protected:
-  bool zeroDimension(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp, 
+   /** Determine if problem is of dimension zero and if it is check if solution
+       is feasible.*/
+   bool zeroDimension(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp, 
 		     ReturnStatus &optimization_status);
+
+   /** Initializes options and journalist.*/
+   void initializeOptionsAndJournalist();
+
+    /** Storage of Journalist for output */
+    Ipopt::SmartPtr<Ipopt::Journalist> journalist_;
+    
+    /** List of Options */
+    Ipopt::SmartPtr<Ipopt::OptionsList> options_;
+    
+    /** Registered Options */
+    Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
+   
    private:
    /// There is no copy constructor for this class
    TNLPSolver(TNLPSolver &other); 

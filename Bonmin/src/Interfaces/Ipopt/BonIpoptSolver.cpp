@@ -24,14 +24,14 @@ namespace Bonmin{
 
   /// Constructor
   IpoptSolver::IpoptSolver(bool createEmpty /*= false*/):
+    TNLPSolver(),
     problemHadZeroDimension_(false),
     warmStartStrategy_(1),
     enable_warm_start_(false),
     optimized_before_(false)
   {
     if(createEmpty) return;
-    roptions_ = new Bonmin::RegisteredOptions;
-    app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions_));
+    app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions_), options_, journalist_);
   }
 
   /// Constructor with Passed in journalist, registered options, options
@@ -54,16 +54,14 @@ namespace Bonmin{
   Ipopt::SmartPtr<TNLPSolver> 
   IpoptSolver::clone()
   {
-    SmartPtr<IpoptSolver> retval = new IpoptSolver(true);
-
+    SmartPtr<IpoptSolver> retval = new IpoptSolver(GetRawPtr(roptions_), new Ipopt::OptionsList(), journalist_);
+    *retval->options_ = *options_;
     retval->warmStartStrategy_ = warmStartStrategy_;
     retval->problemHadZeroDimension_ = problemHadZeroDimension_;
     retval->optimizationStatus_ = optimizationStatus_;
 
-    retval->app_ = app_->clone();
     enable_warm_start_ = false;
     optimized_before_ = false;
-
     return GetRawPtr(retval);
   }
 
@@ -76,8 +74,8 @@ namespace Bonmin{
     if (status != Ipopt::Solve_Succeeded) {
       return false;
     }
-    app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
-    setMinlpDefaults(app_->Options());
+    options_->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
+    setMinlpDefaults(options_);
     optimized_before_ = false;
     return true;
   }
@@ -90,7 +88,7 @@ namespace Bonmin{
     if (status != Ipopt::Solve_Succeeded) {
       return false;
     }
-    app_->Options()->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
+    options_->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
     setMinlpDefaults(app_->Options());
     optimized_before_ = false;
     return true;
@@ -153,28 +151,6 @@ namespace Bonmin{
      if(BonminAbortAll)
        optimizationStatus_ = Ipopt::Infeasible_Problem_Detected;
       return solverReturnStatus(optimizationStatus_);
-  }
-
-  Ipopt::SmartPtr<Ipopt::Journalist>
-  IpoptSolver::Jnlst()
-  {return app_->Jnlst();}
-
-  Ipopt::SmartPtr<Bonmin::RegisteredOptions>
-  IpoptSolver::RegOptions()
-  {
-    return roptions_;
-  }
-
-  Ipopt::SmartPtr<const Ipopt::OptionsList>
-  IpoptSolver::Options() const
-  {
-    return ConstPtr(app_)->Options();
-  }
-
-  Ipopt::SmartPtr<Ipopt::OptionsList>
-  IpoptSolver::Options()
-  {
-    return app_->Options();
   }
 
   /// Get the CpuTime of the last optimization.
@@ -358,14 +334,14 @@ IpoptSolver::getEmptyWarmStart() const
   IpoptSolver::enableWarmStart()
   {
     enable_warm_start_ = true;
-    Options()->SetStringValue("warm_start_init_point", "yes");
+    options_->SetStringValue("warm_start_init_point", "yes");
   }
 
   void 
   IpoptSolver::disableWarmStart()
   {
     enable_warm_start_ = false;
-    Options()->SetStringValue("warm_start_init_point", "no");
+    options_->SetStringValue("warm_start_init_point", "no");
   }
 
 

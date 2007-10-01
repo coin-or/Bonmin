@@ -269,6 +269,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
        const char ** argv = args;
        AmplInterface amplSi;
        amplSi.setSolver(solver);
+       BonminSetup::registerAllOptions(solver->roptions());
        BonminAmplSetup bonmin;
        bonmin.initialize(amplSi,const_cast<char **&>(argv));
        OsiTMINLPInterface& si = *bonmin.nonlinearSolver();
@@ -355,12 +356,10 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 int main()
 {
   Ipopt::SmartPtr<IpoptSolver> ipopt_solver = new IpoptSolver;
-  BonminSetup::registerAllOptions(ipopt_solver->RegOptions());
   interfaceTest(GetRawPtr(ipopt_solver));
 
 #ifdef COIN_HAS_FSQP
   Ipopt::SmartPtr<FilterSolver> filter_solver = new FilterSolver;
-  BonminSetup::registerAllOptions(filter_solver->RegOptions());
   interfaceTest(GetRawPtr(filter_solver));
 #endif
   return 0;

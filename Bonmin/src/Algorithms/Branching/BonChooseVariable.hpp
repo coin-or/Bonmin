@@ -178,7 +178,7 @@ private:
   double maxminCrit() const;
 
   /** detecting if this is root node */
-  bool isRootNode() const;
+  bool isRootNode(const OsiBranchingInformation *info) const;
 
   PseudoCosts* pseudoCosts_;
 };

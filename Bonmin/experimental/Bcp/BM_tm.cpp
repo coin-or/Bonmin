@@ -80,56 +80,34 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     const int numCols = clp.getNumCols();
     const int numRows = clp.getNumRows();
 
+    const double* clb = clp.getColLower();
+    const double* cub = clp.getColUpper();
+
     double* obj = new double[numCols];
     if (bonmin.getAlgorithm() == Bonmin::B_BB /* pure B&B */) {
       std::cout<<"Doing branch and bound"<<std::endl;
       CoinFillN(obj, numCols, 0.0);
-    }
-    else {
+      matrix = NULL;
+    } else {
       std::cout<<"Doing hybrid"<<std::endl;
       CoinDisjointCopyN(clp.getObjCoefficients(), numCols, obj);
+      cuts.reserve(numRows);
+      const double* rlb = clp.getRowLower();
+      const double* rub = clp.getRowUpper();
+      for (int i = 0; i < numRows; ++i)	{
+	cuts.push_back(new BCP_cut_core(rlb[i], rub[i]));
+      }
+      matrix = new BCP_lp_relax(true /*column major ordered*/);
+      matrix->copyOf(*clp.getMatrixByCol(), obj, clb, cub, rlb, rub);
     }
 
     vars.reserve(numCols);
-    const double* clb = clp.getColLower();
-    const double* cub = clp.getColUpper();
-    for (int i = 0; i < numCols; ++i)
-	{
-	    BCP_var_t type = BCP_ContinuousVar;
-	    if (clp.isBinary(i)) type = BCP_BinaryVar;
-	    if (clp.isInteger(i)) type = BCP_IntegerVar;
-	    vars.push_back(new BCP_var_core(type, obj[i], clb[i], cub[i]));
-	}
-
-    if (bonmin.getAlgorithm() == Bonmin::B_BB /* pure B&B */) {
-	// Just fake something into the core matrix. In this case: 0 <= 1
-	BCP_vec<double> OBJ(obj, numCols);
-	BCP_vec<double> CLB(clb, numCols);
-	BCP_vec<double> CUB(cub, numCols);
-	BCP_vec<double> RLB(1, 0.0);
-	BCP_vec<double> RUB(1, 1.0);
-	BCP_vec<int> VB;
-	BCP_vec<int> EI;
-	BCP_vec<double> EV;
-	VB.push_back(0);
-	VB.push_back(2);
-	EI.push_back(0);         EV.push_back(0.0);
-	EI.push_back(numCols-1); EV.push_back(0.0);
-	matrix = new BCP_lp_relax(false, VB, EI, EV, OBJ, CLB, CUB, RLB, RUB);
-	cuts.push_back(new BCP_cut_core(0.0, 1.0));
-    } else {
-	cuts.reserve(numRows);
-	const double* rlb = clp.getRowLower();
-	const double* rub = clp.getRowUpper();
-	for (int i = 0; i < numRows; ++i)
-	    {
-		cuts.push_back(new BCP_cut_core(rlb[i], rub[i]));
-	    }
-
-	matrix = new BCP_lp_relax(true /*column major ordered*/);
-	matrix->copyOf(*clp.getMatrixByCol(), obj, clb, cub, rlb, rub);
+    for (int i = 0; i < numCols; ++i)	{
+      BCP_var_t type = BCP_ContinuousVar;
+      if (clp.isBinary(i)) type = BCP_BinaryVar;
+      if (clp.isInteger(i)) type = BCP_IntegerVar;
+      vars.push_back(new BCP_var_core(type, obj[i], clb[i], cub[i]));
     }
-    delete[] obj;
 }
 
 /****************************************************************************/
@@ -147,13 +125,11 @@ void
 BM_tm::write_AMPL_solution(const BCP_solution* sol,
 			   bool write_file, bool write_screen)
 {
-  const BM_solution* bs = dynamic_cast<const BM_solution*>(sol);
-  if (!bs) {
-    throw BCP_fatal_error("Trying to pack non-BM_solution.\n");
-  }
+  const BCP_solution_generic* bg =
+    dynamic_cast<const BCP_solution_generic*>(sol);
+
   /* Parse again the input file so that we have a nice and clean ampl
      setup */  
-  
   char* argv_[3];
   char** argv = argv_;
   argv[0] = NULL;
@@ -170,10 +146,6 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
 
   int i;
   
-  /* This will give the vector of core variables we have created in
-     BM_tm::initialize_core */
-  const BCP_vec<BCP_var_core*>& vars = getTmProblemPointer()->core->vars;
-
   /* Create a dense vector with the value of each variable. Round the
      integer vars (they were tested to be near enough to integrality) so
      in the printouts we won't have 9.99999991234, etc.) */
@@ -181,20 +153,23 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
   for (i = 0; i < numCols; ++i) {
     dsol[i] = 0.0;
   }
-  const int size = bs->_ind.size();
+  const BCP_vec<BCP_var*>& vars = bg->_vars;
+  const BCP_vec<double>& values = bg->_values;;
+  const int size = vars.size();
   for (i = 0; i < size; ++i) {
-    const int ind = bs->_ind[i];
-    const double v = bs->_values[i];
-    const BCP_var_t type = vars[ind]->var_type();
+    const int ind = vars[i]->bcpind();
+    const double v = values[i];
+    const BCP_var_t type = vars[i]->var_type();
     dsol[ind] = (type == BCP_ContinuousVar) ? v : floor(v+0.5);
   }
 
   if (write_screen) {
     /* Display the solution on the screen */
     printf("bonmin: feasible solution found.  Objective value: %f\n",
-	   bs->_objective);
+	   bg->objective_value());
     for (i = 0; i < size; ++i) {
-      printf("    index: %5i   value: %f\n", bs->_ind[i], dsol[bs->_ind[i]]);
+      printf("    index: %5i   value: %f\n",
+	     vars[i]->bcpind(), dsol[vars[i]->bcpind()]);
     }
     printf("\n");
   }
@@ -202,7 +177,7 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
   if (write_file) {
     /* create the AMPL solfile */
     nlpSolver.model()->finalize_solution(Bonmin::TMINLP::SUCCESS, nlpSolver.getNumCols(), 
-                                         dsol, bs->_objective);
+                                         dsol, bg->objective_value());
   }
   delete[] dsol;
 }

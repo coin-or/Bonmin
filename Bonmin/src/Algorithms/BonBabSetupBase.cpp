@@ -153,9 +153,9 @@ lpMessageHandler_(NULL)
 void 
 BabSetupBase::use(const OsiTMINLPInterface& nlp){
   nonlinearSolver_ = dynamic_cast<OsiTMINLPInterface *>(nlp.clone());
-  options_ = nonlinearSolver_->options();
-  roptions_ = nonlinearSolver_->regOptions();
-  journalist_ = nonlinearSolver_->solver()->Jnlst();
+  options_ = nonlinearSolver_->solver()->options();
+  roptions_ = nonlinearSolver_->solver()->roptions();
+  journalist_ = nonlinearSolver_->solver()->journalist();
   readOptions_ = true;
 }
 
@@ -167,9 +167,9 @@ heuristics_(),
 branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
-journalist_(app->Jnlst()),
-options_(app->Options()),
-roptions_(app->RegOptions()),
+journalist_(app->journalist()),
+options_(app->options()),
+roptions_(app->roptions()),
 readOptions_(true)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);

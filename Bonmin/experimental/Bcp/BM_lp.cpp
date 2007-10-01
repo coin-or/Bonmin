@@ -19,32 +19,21 @@
 // The following is included for "min"
 #include "CoinFinite.hpp"
 
+static char prefix[100];
+
 //#############################################################################
 
 BM_lp::BM_lp() :
     BCP_lp_user(),
-    babSolver_(3),
     bonmin_(),
-    ws_(NULL),
-    chooseVar_(NULL),
-    freeToBusyRatio_(0.0),
     in_strong(0)
 {
-      setOsiBabSolver(&babSolver_);
 }
 
 /****************************************************************************/
 
 BM_lp::~BM_lp()
 {
-    delete chooseVar_;
-    delete ws_;
-    delete[] primal_solution_;
-    /* FIXME: CHEATING */
-    for (std::map<int, CoinWarmStart*>::iterator it = warmStart.begin();
-	 it != warmStart.end(); ++it) {
-	delete it->second;
-    }
 }
 
 /****************************************************************************/
@@ -52,14 +41,26 @@ BM_lp::~BM_lp()
 OsiSolverInterface *
 BM_lp::initialize_solver_interface()
 {
+#ifdef COIN_HAS_MPI
+  sprintf(prefix, "%i", getLpProblemPointer()->get_process_id());
+#else
+  prefix[0] = 0;
+#endif
+
+  OsiSolverInterface* solver = NULL;
+  if (bonmin_.getAlgorithm() == 0) {
+    // Pure B&B
+    solver = bonmin_.nonlinearSolver()->clone();
+  } else {
     OsiClpSolverInterface * clp = new OsiClpSolverInterface;
     OsiBabSolver babSolver(3);
     babSolver.setSolver(clp);
     clp->setAuxiliaryInfo(&babSolver);
     clp->messageHandler()->setLogLevel(0);
     setOsiBabSolver(dynamic_cast<OsiBabSolver *>(clp->getAuxiliaryInfo()));
-
-    return clp;
+    solver = clp;
+  }
+  return solver;
 }
 
 /****************************************************************************/
@@ -77,31 +78,33 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
     BM_node* data = dynamic_cast<BM_node*>(get_user_data());
     numNlpFailed_ = data->numNlpFailed_;
 
-    int i;
-    // First copy the bounds into nlp. That way all the branching decisions
-    // will be transferred over.
-    OsiSolverInterface * osi = getLpProblemPointer()->lp_solver;
-    Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
-    nlp.setColLower(osi->getColLower());
-    nlp.setColUpper(osi->getColUpper());
+    if (bonmin_.getAlgorithm() != 0) {
+      // Not pure BB, so an LP solver will be used. Now we have to...
 
-    // Carry the changes over to the object lists in nlp
-    const int numObj = nlp.numberObjects();
-    OsiObject** nlpObj = nlp.objects();
-    for (i = 0; i < numObj; ++i) {
+      // First copy the bounds into nlp. That way all the branching decisions
+      // will be transferred over.
+      int i;
+
+      OsiSolverInterface * osi = getLpProblemPointer()->lp_solver;
+      Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
+      nlp.setColLower(osi->getColLower());
+      nlp.setColUpper(osi->getColUpper());
+
+      // Carry the changes over to the object lists in nlp
+      const int numObj = nlp.numberObjects();
+      OsiObject** nlpObj = nlp.objects();
+      for (i = 0; i < numObj; ++i) {
 	OsiSimpleInteger* io = dynamic_cast<OsiSimpleInteger*>(nlpObj[i]);
 	if (io) {
-	    io->resetBounds(&nlp);
+	  io->resetBounds(&nlp);
 	} else {
-	    // The rest is OsiSOS where we don't need to do anything
-	    break;
+	  // The rest is OsiSOS where we don't need to do anything
+	  break;
 	}
-    }
+      }
 
-    // copy over the OsiObjects from the nlp solver if the lp solver is to be
-    // used at all (i.e., not pure B&B)
-    if (bonmin_.getAlgorithm() > 0) {
-	osi->addObjects(nlp.numberObjects(), nlp.objects());
+      // copy over the OsiObjects from the nlp solver
+      osi->addObjects(nlp.numberObjects(), nlp.objects());
     }
 
     in_strong = 0;
@@ -109,15 +112,30 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
 
 /************************************************************************/
 void
-BM_lp::modify_lp_parameters(OsiSolverInterface* lp, bool in_strong_branching)
-
-    // Called each time the node LP is solved
-
+BM_lp::load_problem(OsiSolverInterface& osi, BCP_problem_core* core,
+		    BCP_var_set& vars, BCP_cut_set& cuts)
 {
-    if (in_strong_branching) {
-	in_strong = 1;
-	//     lp->setIntParam(OsiMaxNumIterationHotStart, 50);
-    }
+  if (bonmin_.getAlgorithm() != 0) {
+    // We are doing hybrid, so osi is an LP solver. Call the default.
+    BCP_lp_user::load_problem(osi, core, vars, cuts);
+    return;
+  }
+  // Otherwise we do B&B and osi is an NLP solver.
+  // There is no need to fill it with the data from bonmin_.nonlinearSolver()
+  // since osi is a clone() of the master_lp in the BCP_lp object, and the
+  // master_lp is a clone() of bonmin_.nonlinearSolver(), and that clone()
+  // copies the data as well.
+}
+
+/************************************************************************/
+void
+BM_lp::modify_lp_parameters(OsiSolverInterface* lp, bool in_strong_branching)
+    // Called each time the node LP is solved
+{
+  if (in_strong_branching) {
+    in_strong = 1;
+    //     lp->setIntParam(OsiMaxNumIterationHotStart, 50);
+  }
 }
 
 /****************************************************************************/
@@ -127,173 +145,28 @@ BM_lp::test_feasibility(const BCP_lp_result& lp_result,
                         const BCP_vec<BCP_var*>& vars,
                         const BCP_vec<BCP_cut*>& cuts)
 {
-    if (bonmin_.getAlgorithm() == 0) {
-	// if pure B&B
-	return test_feasibility_BB(vars);
-    } else {
-	return test_feasibility_hybrid(lp_result, vars, cuts);
-    }
-    return NULL; // fake return to quiet gcc
+  if (bonmin_.getAlgorithm() == 0) {
+    // if pure B&B
+    return test_feasibility_BB(lp_result, vars);
+  } else {
+    return test_feasibility_hybrid(lp_result, vars, cuts);
+  }
+  return NULL; // fake return to quiet gcc
 }
 
 /****************************************************************************/
 
 BCP_solution*
-BM_lp::test_feasibility_BB(const BCP_vec<BCP_var*>& vars)
+BM_lp::test_feasibility_BB(const BCP_lp_result& lpres,
+			   const BCP_vec<BCP_var*>& vars)
 {
-  Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
-    /* PURE_BB TODO:
-       Do whatever must be done to:
-       1) compute a lower bound using NLP and save it in "lower_bound_"
-       2) save the solution of the NLP in "primal_solution_"
-       3) if the optimum (well, local opt anyway...) happens to be
-       feasible (or along the NLP optimization we have blundered into
-       a feas sol) then create "sol"
-    */
-    BM_solution* sol = NULL;
-
-    char prefix[100];
-#ifdef COIN_HAS_MPI
-    sprintf(prefix, "%i", getLpProblemPointer()->get_process_id());
-#else
-    prefix[0] = 0;
-#endif
-    try {
-    switch (par.entry(BM_par::WarmStartStrategy)) {
-    case WarmStartNone:
-	nlp.initialSolve();
-	break;
-    case WarmStartFromRoot:
-	nlp.setWarmStart(ws_);
-	nlp.resolve();
-	break;
-    case WarmStartFromParent:
-	/* FIXME: CHEAT! this works only in serial mode! */
-	{
-	    const int ind = current_index();
-	    const int parentind =
-		getLpProblemPointer()->parent->index;
-	    std::map<int, CoinWarmStart*>::iterator it =
-		warmStart.find(parentind);
-	    nlp.setWarmStart(it->second);
-	    nlp.resolve();
-	    warmStart[ind] = nlp.getWarmStart();
-	    bool sibling_seen =  ((ind & 1) == 0) ?
-		warmStart.find(ind-1) != warmStart.end() :
-		warmStart.find(ind+1) != warmStart.end() ;
-	    if (sibling_seen) {
-		delete it->second;
-		warmStart.erase(it);
-	    }
-	}
-	break;
-    }
-    }
-    catch(Bonmin::TNLPSolver::UnsolvedError &E) {
-      E.writeDiffFiles(prefix);
-      E.printError(std::cerr);
-      //There has been a failure to solve a problem with Ipopt.  And
-      //we will output file with information on what has been changed
-      //in the problem to make it fail.
-      //Now depending on what algorithm has been called (B-BB or
-      //other) the failed problem may be at different place.
-      //    const OsiSolverInterface &si1 = (algo > 0) ? nlpSolver : *model.solver();
-    }
-    catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
-      std::cerr<<E.className()<<"::"<<E.methodName()
-	       <<std::endl
-	       <<E.message()<<std::endl;
-    }
-    catch(CoinError &E) {
-      std::cerr<<E.className()<<"::"<<E.methodName()
-	       <<std::endl
-	       <<E.message()<<std::endl;
-    }
-    catch (Ipopt::OPTION_INVALID &E) {
-      std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
-    }
-    catch(...) {
-      std::cerr<<" unrecognized exception"<<std::endl;
-      throw;
-    }
-
-    const int numCols = nlp.getNumCols();
-    const double* colsol = nlp.getColSolution();
-    if (nlp.isProvenOptimal()) {
-	int i;
-	const double* clb = nlp.getColLower();
-	const double* cub = nlp.getColUpper();
-	// Make sure we are within bounds (get rid of rounding problems)
-	for (i = 0; i < numCols; ++i) {
-	    primal_solution_[i] =
-		CoinMin(CoinMax(clb[i], colsol[i]), cub[i]);
-	}
-	
-	lower_bound_ = nlp.getObjValue();
-	numNlpFailed_ = 0;
-
-	for (i = 0; i < numCols; ++i) {
-	    if (vars[i]->var_type() == BCP_ContinuousVar)
-		continue;
-	    const double psol = primal_solution_[i];
-	    const double frac = psol - floor(psol);
-	    const double dist = min(frac, 1.0-frac);
-	    if (dist >= integerTolerance_)
-		break;
-	}
-	if (i == numCols) {
-	    /* yipee! a feasible solution! */
-	    sol = new BM_solution;
-	    //Just copy the solution stored in solver to sol
-	    double ptol = 1e-8;
-	    // FIXME: I really should use the next line...
-	    // nlp.getDblParam(OsiPrimalTolerance, ptol);
-	    for (i = 0 ; i < numCols ; i++) {
-		if (fabs(primal_solution_[i]) > ptol)
-		    sol->add_entry(i, primal_solution_[i]); 
-	    }
-	    sol->setObjective(lower_bound_);
-	}
-	if (lower_bound_ > upper_bound()-get_param(BCP_lp_par::Granularity) &&
-	    par.entry(BM_par::PrintBranchingInfo)) {
-	    printf("BM_lp: At node %i : will fathom because of high lower bound\n",
-		   current_index());
-	}
-    }
-    else if (nlp.isProvenPrimalInfeasible()) {
-	// prune it!
-	// FIXME: if nonconvex, restart from a different place...
-	lower_bound_ = 1e200;
-	numNlpFailed_ = 0;
-	if (par.entry(BM_par::PrintBranchingInfo)) {
-	    printf("BM_lp: At node %i : will fathom because of infeasibility\n",
-		   current_index());
-	}
-    }
-    else if (nlp.isAbandoned()) {
-	if (nlp.isIterationLimitReached()) {
-	    printf("\
-BM_lp: At node %i : WARNING: nlp reached iter limit. Will force branching\n",
-		   current_index());
-	} else {
-	    printf("\
-BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
-		   current_index());
-	}
-	// nlp failed
-	nlp.forceBranchable();
-	lower_bound_ = nlp.getObjValue();
-	CoinDisjointCopyN(colsol, numCols, primal_solution_);
-	numNlpFailed_ += 1;
-	// will branch, but save in the user data how many times we have
-	// failed, and if we fail too many times in a row then just abandon
-	// the node.
-    }
-    else {
-	// complain loudly about a bug
-	throw BCP_fatal_error("Impossible outcome by nlp.initialSolve()\n");
-    }
-    return sol;
+  // We can just take the primal solution and test whether it satisfies
+  // integrality requirements
+  BCP_solution_generic* sol = test_full(lpres, vars, integerTolerance_);
+  if (sol) {
+    sol->set_objective_value(lpres.objval());
+  }
+  return sol;
 }
 
 /****************************************************************************/
@@ -322,7 +195,6 @@ BM_lp::test_feasibility_hybrid(const BCP_lp_result& lp_result,
     // The babSolver info used is the one containted in osi
     OsiBabSolver * babSolver =
 	dynamic_cast<OsiBabSolver *> (osi->getAuxiliaryInfo());
-    //assert(babSolver == &babSolver_);
     babSolver->setSolver(*bonmin_.nonlinearSolver()); 
     //Last cut generator is used to check feasibility
     bonmin_.cutGenerators().back().cgl->generateCuts(*osi, cuts_);
@@ -330,15 +202,15 @@ BM_lp::test_feasibility_hybrid(const BCP_lp_result& lp_result,
     double* solverSol = new double[numvar];
     double objValue = 1e200;
     
-    BM_solution* sol = NULL;
-    if (babSolver->solution(objValue, solverSol,numvar)) {
-	sol = new BM_solution;
+    BCP_solution_generic* sol = NULL;
+    if (babSolver->solution(objValue, solverSol, numvar)) {
+        sol = new BCP_solution_generic(false);
 	// Just copy the solution stored in solver to sol
 	for (int i = 0 ; i < numvar ; i++) {
 	    if (solverSol[i] > lp_result.primalTolerance())
-		sol->add_entry(i, solverSol[i]); 
+		sol->add_entry(vars[i], solverSol[i]); 
 	}
-	sol->setObjective(objValue);
+	sol->set_objective_value(objValue);
     }
     delete[] solverSol;
     return sol;
@@ -420,9 +292,11 @@ BM_lp::compute_lower_bound(const double old_lower_bound,
     double bd;
     if (bonmin_.getAlgorithm() == 0) {
 	/* if pure B&B */
-	bd = lower_bound_;
+	bd = lpres.objval();
     } else {
+      /* FIXME: what the heck was this...
 	bd = CoinMax(babSolver_.mipBound(), lpres.objval());
+      */
     }
     return CoinMax(bd, old_lower_bound);
 }

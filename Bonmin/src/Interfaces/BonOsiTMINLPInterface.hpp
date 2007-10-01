@@ -947,7 +947,7 @@ class Messages : public CoinMessages
   
   Ipopt::SmartPtr<Bonmin::RegisteredOptions> regOptions(){
     if(IsValid(app_))
-      return app_->RegOptions();
+      return app_->roptions();
     else
       return NULL;
   }

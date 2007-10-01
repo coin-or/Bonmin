@@ -19,8 +19,12 @@ namespace Bonmin{
   
    void 
    BonminAmplSetup::initialize(AmplInterface &toFill, char **& argv){
+    Ipopt::SmartPtr<TNLPSolver> solver = toFill.solver();
+    setOptionsAndJournalist(solver->roptions(), 
+                            solver->options(),
+                            solver->journalist());
     /* Get the basic options. */
-     readOptionsFile();   
+     readOptionsFile(); 
     /* Read the model.*/
     SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", NULL);
     mayPrintDoc();

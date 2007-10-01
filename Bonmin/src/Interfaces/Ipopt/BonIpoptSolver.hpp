@@ -49,9 +49,8 @@ IpoptSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
             Ipopt::SmartPtr<Ipopt::Journalist> journalist);
 
 
-  ///virtual constructor
+  ///virtual copy constructor
   virtual Ipopt::SmartPtr<TNLPSolver> clone();
-
 
   /// Virtual destructor
   virtual ~IpoptSolver();
@@ -88,18 +87,6 @@ IpoptSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
   virtual void disableWarmStart();
 
   //@}
-
-  ///Get a pointer to a journalist
-  virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst();
-
-  ///Get a pointer to RegisteredOptions (generally used to add new ones)
-  virtual Ipopt::SmartPtr<Bonmin::RegisteredOptions> RegOptions();
-
-  /// Get the options (for getting their values).
-  virtual Ipopt::SmartPtr<const Ipopt::OptionsList> Options() const;
-
-   /// Get the options (for getting and setting their values).
-   virtual Ipopt::SmartPtr<Ipopt::OptionsList> Options();
 
    /// Get the CpuTime of the last optimization.
    virtual double CPUTime();
@@ -168,8 +155,6 @@ virtual int errorCode() const{
   /** flag remembering if we have call the Optimize method of the
       IpoptInterface before */
   bool optimized_before_;
-  /** Store Bonmin::RegisteredOptions.*/
-  Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
   //name of solver (Ipopt)
   static std::string  solverName_;
 };

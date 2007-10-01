@@ -385,7 +385,8 @@ OsiTMINLPInterface::initialize(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptio
 }
 
 void OsiTMINLPInterface::setSolver(Ipopt::SmartPtr<TNLPSolver> app){
-  app_ = app;}
+  app_ = app;
+  }
 
 
 void
@@ -445,7 +446,7 @@ OsiTMINLPInterface::readOptionFile(const std::string & fileName)
       throw -1;
     }
   }
-  options()->ReadFromStream(*app_->Jnlst(), is);
+  options()->ReadFromStream(*app_->journalist(), is);
   extractInterfaceParams();
   }
 }
@@ -669,7 +670,7 @@ SmartPtr<OptionsList> OsiTMINLPInterface::options()
     return NULL;
   }
   else
-    return app_->Options();
+    return app_->options();
 }
 
 /// Destructor
@@ -1938,7 +1939,7 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
   nCallOptimizeTNLP_++;
   totalNlpSolveTime_-=CoinCpuTime();
   SmartPtr<TNLPSolver> app2 = app_->clone();
-  app2->Options()->SetIntegerValue("print_level", (Index) 0);
+  app2->options()->SetIntegerValue("print_level", (Index) 0);
   optimizationStatus_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
   getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
@@ -2152,7 +2153,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   if(!hasPrintedOptions) {
     hasPrintedOptions = 1;
     //app_->Options()->SetIntegerValue("print_level",0, true, true);
-    app_->Options()->SetStringValue("print_user_options","no", false, true);
+    app_->options()->SetStringValue("print_user_options","no", false, true);
   }
   
   
@@ -2300,9 +2301,9 @@ void OsiTMINLPInterface::initialSolve()
 
   if(!hasPrintedOptions) {
     int printOptions;
-    app_->Options()->GetEnumValue("print_user_options",printOptions,"bonmin.");
+    app_->options()->GetEnumValue("print_user_options",printOptions,"bonmin.");
     if(printOptions)
-      app_->Options()->SetStringValue("print_user_options","yes");
+      app_->options()->SetStringValue("print_user_options","yes");
   }
   app_->disableWarmStart(); 
   solveAndCheckErrors(0,1,"initialSolve");
@@ -2310,8 +2311,8 @@ void OsiTMINLPInterface::initialSolve()
   //Options should have been printed if not done already turn off Ipopt output
   if(!hasPrintedOptions) {
     hasPrintedOptions = 1;
-    app_->Options()->SetStringValue("print_user_options","no");
-    app_->Options()->SetIntegerValue("print_level",0);
+    app_->options()->SetStringValue("print_user_options","no");
+    app_->options()->SetIntegerValue("print_level",0);
   }
   
   const char * status=OPT_SYMB;
@@ -2342,10 +2343,10 @@ OsiTMINLPInterface::resolve()
   assert(IsValid(app_));
   assert(IsValid(problem_));
   if (INT_BIAS > 0.) {
-    app_->Options()->SetStringValue("warm_start_same_structure", "yes");
+    app_->options()->SetStringValue("warm_start_same_structure", "yes");
   }
   else {
-    app_->Options()->SetStringValue("warm_start_same_structure", "no");
+    app_->options()->SetStringValue("warm_start_same_structure", "no");
   }
 
   if(problem_->duals_init() != NULL)
@@ -2426,7 +2427,7 @@ OsiTMINLPInterface::extractInterfaceParams()
 {
   if (IsValid(app_)) {
     int logLevel;
-    app_->Options()->GetIntegerValue("nlp_log_level", logLevel,"bonmin.");
+    app_->options()->GetIntegerValue("nlp_log_level", logLevel,"bonmin.");
     messageHandler()->setLogLevel(logLevel);
 
 #ifdef COIN_HAS_FILTERSQP
@@ -2434,7 +2435,7 @@ OsiTMINLPInterface::extractInterfaceParams()
 
     bool is_given =
 #endif
-      app_->Options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
+      app_->options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
 
 #ifdef COIN_HAS_FILTERSQP
     if(filter && !is_given){
@@ -2444,31 +2445,31 @@ OsiTMINLPInterface::extractInterfaceParams()
 #endif
    
    int oaCgLogLevel = 0;
-   app_->Options()->GetIntegerValue("oa_cuts_log_level", oaCgLogLevel,"bonmin.");
+   app_->options()->GetIntegerValue("oa_cuts_log_level", oaCgLogLevel,"bonmin.");
    oaHandler_->setLogLevel(oaCgLogLevel); 
     
     int exposeWs = false;
-    app_->Options()->GetEnumValue("warm_start", exposeWs, "bonmin.");
+    app_->options()->GetEnumValue("warm_start", exposeWs, "bonmin.");
     setExposeWarmStart(exposeWs > 0);
     
-    app_->Options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,"bonmin.");
-    app_->Options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,"bonmin.");
-    app_->Options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,"bonmin.");
-    app_->Options()->GetIntegerValue("num_resolve_at_infeasibles", numRetryInfeasibles_,"bonmin.");
-    app_->Options()->GetIntegerValue("num_iterations_suspect", numIterationSuspect_,"bonmin.");
-    app_->Options()->GetEnumValue("nlp_failure_behavior",pretendFailIsInfeasible_,"bonmin.");
-    app_->Options()->GetNumericValue
+    app_->options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,"bonmin.");
+    app_->options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,"bonmin.");
+    app_->options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,"bonmin.");
+    app_->options()->GetIntegerValue("num_resolve_at_infeasibles", numRetryInfeasibles_,"bonmin.");
+    app_->options()->GetIntegerValue("num_iterations_suspect", numIterationSuspect_,"bonmin.");
+    app_->options()->GetEnumValue("nlp_failure_behavior",pretendFailIsInfeasible_,"bonmin.");
+    app_->options()->GetNumericValue
     ("warm_start_bound_frac" ,pushValue_,"bonmin.");
-    app_->Options()->GetNumericValue("tiny_element",tiny_,"bonmin.");
-    app_->Options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
-    app_->Options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,"bonmin.");
-    app_->Options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
+    app_->options()->GetNumericValue("tiny_element",tiny_,"bonmin.");
+    app_->options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
+    app_->options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,"bonmin.");
+    app_->options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
     int cut_strengthening_type;
-    app_->Options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type,"bonmin.");
+    app_->options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type,"bonmin.");
 
     if (cut_strengthening_type != CS_None) {
       // TNLP solver to be used in the cut strengthener
-      cutStrengthener_ = new CutStrengthener(app_->clone(), app_->Options());
+      cutStrengthener_ = new CutStrengthener(app_->clone(), app_->options());
     }
   }
 }

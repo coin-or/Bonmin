@@ -39,11 +39,15 @@ namespace Bonmin{
     
   TNLPSolver::TNLPSolver()
   {
+    initializeOptionsAndJournalist();
   }
 
   TNLPSolver::TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
     Ipopt::SmartPtr<Ipopt::OptionsList> options,
-    Ipopt::SmartPtr<Ipopt::Journalist> journalist)
+    Ipopt::SmartPtr<Ipopt::Journalist> journalist):
+    journalist_(journalist),
+    options_(options),
+    roptions_(roptions)
   {
   }
   
@@ -227,6 +231,37 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
   TNLPSolver::isRecoverable(ReturnStatus &r){
     return (r >=0 || (r != illDefinedProblem && r != illegalOption) );
   }
+
+/** Initialize the options and the journalist.*/
+void 
+TNLPSolver::initializeOptionsAndJournalist(){
+  options_ = new Ipopt::OptionsList();
+  
+  journalist_= new Ipopt::Journalist();
+  roptions_ = new Bonmin::RegisteredOptions();
+  
+  try{
+    Ipopt::SmartPtr<Ipopt::Journal> stdout_journal =
+    journalist_->AddFileJournal("console", "stdout", Ipopt::J_ITERSUMMARY);
+    
+    options_->SetJournalist(journalist_);
+    options_->SetRegisteredOptions(GetRawPtr(roptions_));
+  }
+  catch (Ipopt::IpoptException &E){
+    E.ReportException(*journalist_);
+    throw E;
+  }
+  catch(std::bad_alloc){
+    journalist_->Printf(Ipopt::J_ERROR, Ipopt::J_MAIN, "\n Not enough memory .... EXIT\n");
+    throw -1;
+  }
+  catch(...){
+    Ipopt::IpoptException E("Uncaught exception in FilterSolver::FilterSolver()",
+                            "BonFilterSolver.cpp",-1);
+    throw E;
+  }
+  
+}
 
 
 }//end namespace Bonmin

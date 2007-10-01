@@ -51,7 +51,7 @@ namespace Bonmin
 
    OsiSolverInterface * lp = lpManip.si();
    OsiBranchingInformation info(lp,false);
-   int numcols = lp->getNumCols();
+   //int numcols = lp->getNumCols();
    double milpBound = -COIN_DBL_MAX;
    int numberPasses = 0;
    double * nlpSol =  NULL;

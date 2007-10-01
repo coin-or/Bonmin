@@ -24,13 +24,13 @@ namespace Bonmin
     options->GetEnumValue("disjunctive_cut_type", disjunctive_cut_type_,
 			  "bonmin.");
 
-    tnlp_solver_->Options()->clear();
+    tnlp_solver_->options()->clear();
     if (!tnlp_solver_->Initialize("strength.opt")) {
       std::cerr<<"CutStrengthener: Error during initialization of tnlp_solver_"<<std::endl;
       throw -1;
     }
-    tnlp_solver_->Options()->SetStringValue("hessian_approximation","limited-memory");
-    tnlp_solver_->Options()->SetStringValue("mu_strategy", "adaptive");
+    tnlp_solver_->options()->SetStringValue("hessian_approximation","limited-memory");
+    tnlp_solver_->options()->SetStringValue("mu_strategy", "adaptive");
   }
 
   CutStrengthener::~CutStrengthener()

@@ -229,6 +229,8 @@ protected:
     NodeComparison nodeComparisonMethod_;
     /** Tree traversal method.*/
     TreeTraversal treeTraversalMethod_;
+
+
     /** Storage of Journalist for output */
     Ipopt::SmartPtr<Ipopt::Journalist> journalist_;
     
@@ -237,6 +239,7 @@ protected:
     
     /** Registered Options */
     Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
+
     /** flag to say if option file was read.*/
     bool readOptions_;
     /** separate message handler if continuousSolver_!= nonlinearSolver.*/
