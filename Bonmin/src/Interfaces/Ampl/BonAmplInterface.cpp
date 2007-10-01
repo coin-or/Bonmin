@@ -60,7 +60,7 @@ void AmplInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::Regist
   }
   // set the default options... expect_infeasible, etc...
   if (!IsValid(tminlp_)) {
-    amplTminlp_ = new AmplTMINLP(Ipopt::ConstPtr(app_->Jnlst()), app_->Options(), argv,
+    amplTminlp_ = new AmplTMINLP(Ipopt::ConstPtr(app_->journalist()), app_->options(), argv,
                                  NULL, appName() , nl_file_content);
     tminlp_ = GetRawPtr(amplTminlp_);
   }
@@ -68,13 +68,13 @@ void AmplInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::Regist
     AmplTMINLP * amplTMINLP = dynamic_cast<AmplTMINLP *> (GetRawPtr(tminlp_));
     if (amplTMINLP) {
       AmplTMINLP * newAmpl = amplTMINLP->createEmpty();
-      newAmpl->Initialize(ConstPtr(app_->Jnlst()), app_->Options(), argv,
+      newAmpl->Initialize(ConstPtr(app_->journalist()), app_->options(), argv,
                           NULL, appName() , nl_file_content);
       amplTminlp_ = newAmpl;
       tminlp_ = GetRawPtr(amplTminlp_);
     }
     else {
-      amplTminlp_ = new AmplTMINLP(ConstPtr(app_->Jnlst()), app_->Options(), argv,
+      amplTminlp_ = new AmplTMINLP(ConstPtr(app_->journalist()), app_->options(), argv,
                                    NULL, appName() , nl_file_content);
       tminlp_ = GetRawPtr(amplTminlp_);
     }

@@ -99,22 +99,6 @@ FilterSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
   /// Virtual copy constructor
   virtual SmartPtr<TNLPSolver> clone();
 
-  ///Get a pointer to a journalist
-  virtual Ipopt::SmartPtr<Ipopt::Journalist> Jnlst(){
-    return journalist_;}
-
-  ///Get a pointer to RegisteredOptions (generally used to add new ones)
-  virtual Ipopt::SmartPtr<Bonmin::RegisteredOptions> RegOptions(){
-    return roptions_;}
-  
-  /// Get the options (for getting theur values).
-  virtual Ipopt::SmartPtr<const Ipopt::OptionsList> Options() const{
-    return ConstPtr(options_);}
-  
-  /// Get the options (for getting and setting their values).
-  virtual Ipopt::SmartPtr<Ipopt::OptionsList> Options(){
-    return options_;}
-
    /// Get the CpuTime of the last optimization.
    virtual double CPUTime(){
    return (Ipopt::IsValid(cached_)) ? cached_->cpuTime_: 0.;}
@@ -151,17 +135,6 @@ private:
   /** @} */
   /** Register all the options for filter. */
   
-
-  /** Journalist */
-  Ipopt::SmartPtr<Ipopt::Journalist> journalist_;
-
-  /** Options */
-  Ipopt::SmartPtr<Ipopt::OptionsList> options_;
-
-  /** Registered Options */
-  Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
-
-
 
   /** Cached information for reoptimizing. */
   struct cachedInfo : public Ipopt::ReferencedObject {

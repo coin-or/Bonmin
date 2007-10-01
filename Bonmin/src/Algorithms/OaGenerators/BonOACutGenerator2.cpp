@@ -109,7 +109,7 @@ namespace Bonmin
   {
     double lastPeriodicLog= CoinCpuTime();
 
-    const int numcols = nlp_->getNumCols();
+    //const int numcols = nlp_->getNumCols();
 
 
     bool isInteger = false;
