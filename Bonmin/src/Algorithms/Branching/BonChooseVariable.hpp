@@ -6,7 +6,6 @@
 #include "OsiChooseVariable.hpp"
 #include "BonCurvatureEstimator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
-#include "BonPseudoCosts.hpp"
 
 #include "BonBabSetupBase.hpp"
 // Forward declaration
@@ -22,7 +21,7 @@ namespace Bonmin {
     value induced by branching on a specific object are estimated with the pure virtual function fill_changes.
 */
 
-class BonChooseVariable : public OsiChooseVariable  {
+class BonChooseVariable : public OsiChooseStrong  {
   /** Statuses for strong branching candidates.*/
   enum StrongStatus{
     NotDone=-1,
@@ -94,10 +93,12 @@ public:
   /// Given a candidate fill in useful information e.g. estimates
   virtual void updateInformation(const OsiBranchingInformation *info,
 				  int branch, OsiHotInfo * hotInfo);
+#if 0
   /// Given a branch fill in useful information e.g. estimates
   virtual void updateInformation( int whichObject, int branch, 
 				  double changeInObjective, double changeInValue,
 				  int status);
+#endif
 
   /** Method for setting CbcModel, which is used to get statusOfSearch */
   void setCbcModel(CbcModel* cbc_model)
@@ -109,10 +110,6 @@ public:
   {
     only_pseudo_when_trusted_ = only_pseudo_when_trusted;
   }
-
-  /** Accessor method to pseudo cost object*/
-  const PseudoCosts* pseudoCosts() const
-  { return pseudoCosts_; }
 
 protected:
 
@@ -175,12 +172,10 @@ private:
   int numberStrongBackup_;
   //@}
 
-  double maxminCrit() const;
+  double maxminCrit(const OsiBranchingInformation* info) const;
 
   /** detecting if this is root node */
   bool isRootNode(const OsiBranchingInformation *info) const;
-
-  PseudoCosts* pseudoCosts_;
 };
 
 }

@@ -16,10 +16,9 @@
 namespace Bonmin {
 
 BonChooseVariable::BonChooseVariable(BabSetupBase &b):
-  OsiChooseVariable(const_cast<OsiTMINLPInterface *>(b.nonlinearSolver())),
+  OsiChooseStrong(const_cast<OsiTMINLPInterface *>(b.nonlinearSolver())),
   cbc_model_(NULL),
-  only_pseudo_when_trusted_(false),
-  pseudoCosts_(new PseudoCosts())
+  only_pseudo_when_trusted_(false)
 {
   jnlst_ = b.journalist();
   SmartPtr<OptionsList> options = b.options();
@@ -48,7 +47,7 @@ BonChooseVariable::BonChooseVariable(BabSetupBase &b):
 }
 
 BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
-  OsiChooseVariable(rhs),
+  OsiChooseStrong(rhs),
   cbc_model_(rhs.cbc_model_),
   only_pseudo_when_trusted_(rhs.only_pseudo_when_trusted_),
   maxmin_crit_no_sol_(rhs.maxmin_crit_no_sol_),
@@ -60,7 +59,7 @@ BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
   jnlst_ = rhs.jnlst_;
   bb_log_level_ = rhs.bb_log_level_;
   DBG_ASSERT(IsValid(jnlst_));
-  pseudoCosts_ = new PseudoCosts(*rhs.pseudoCosts_);
+  pseudoCosts_ = new OsiPseudoCosts(*rhs.pseudoCosts_);
 }
 
 BonChooseVariable &
@@ -232,7 +231,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 	    numberDown<numberBeforeTrustedList_) {
 	  value2 = value;
 	}
-	double MAXMIN_CRITERION = maxminCrit();
+	double MAXMIN_CRITERION = maxminCrit(info);
 	value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
 	if (bb_log_level_>4) {
 	  printf("%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n", i,value,upEstimate,downEstimate,object[i]->infeasibility(info,way),value2);
@@ -439,7 +438,7 @@ BonChooseVariable::chooseVariable(
 	const OsiObject * obj = solver->object(iObject);
 	double upEstimate = (upTotalChange[iObject]*obj->upEstimate())/upNumber[iObject];
 	double downEstimate = (downTotalChange[iObject]*obj->downEstimate())/downNumber[iObject];
-	double MAXMIN_CRITERION = maxminCrit();
+	double MAXMIN_CRITERION = maxminCrit(info);
 	double value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
 	if (value > bestTrusted) {
 	  bestObjectIndex_=iObject;
@@ -519,7 +518,7 @@ BonChooseVariable::chooseVariable(
 	      delete branch;
 	    }
 	  }
-	  double MAXMIN_CRITERION = maxminCrit();
+	  double MAXMIN_CRITERION = maxminCrit(info);
 	  double value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
 	  if (value>bestTrusted) {
 	    bestTrusted = value;
@@ -708,11 +707,12 @@ bool BonChooseVariable::isRootNode(const OsiBranchingInformation *info) const {
 }
 
 double
-BonChooseVariable::maxminCrit() const {
+BonChooseVariable::maxminCrit(const OsiBranchingInformation *info) const {
   double retval = maxmin_crit_no_sol_;
   if (cbc_model_) {
+    // FIXME: should be replaced by info->stateOfSearch_
     const int stateOfSearch = cbc_model_->stateOfSearch();
-    const int depth = cbc_model_->currentNode()->depth();
+    const int depth = info->depth_;
     if (stateOfSearch>1 && depth>10) {
       retval = maxmin_crit_have_sol_;
     }
@@ -765,6 +765,7 @@ BonChooseVariable::updateInformation(const OsiBranchingInformation *info,
     }
   }  
 }
+#if 0
 // Given a branch fill in useful information e.g. estimates
 void 
 BonChooseVariable::updateInformation( int index, int branch, 
@@ -787,10 +788,11 @@ BonChooseVariable::updateInformation( int index, int branch,
       upNumber[index]++;
     } else {
       // infeasible - just say expensive
-      assert(cbc_model_); // Later, we need to get this information in a different way...
       upNumber[index]++;
+      assert(cbc_model_); // Later, we need to get this information in a different way...
       double cutoff = cbc_model_->getCutoff();
       double objectiveValue = cbc_model_->getCurrentObjValue();
+      double cutoff = 
       if (cutoff<1.0e50)
 	upTotalChange[index] += 2.0*(cutoff-objectiveValue)/changeInValue;
       else
@@ -814,5 +816,6 @@ BonChooseVariable::updateInformation( int index, int branch,
     }
   }  
 }
+#endif
 
 }/* Ends Bonmin's namespace.*/
