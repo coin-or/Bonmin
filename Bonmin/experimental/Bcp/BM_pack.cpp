@@ -62,8 +62,8 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 	local to the BM_lp object */
     integerTolerance_ = bonmin_.getDoubleParameter(BabSetupBase::IntTol);
     // cutOffDecrement_ could be negative
-    double cutOffDecrement;
-    bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr);
+    double cutOffDecrement =
+      bonmin_.getDoubleParameter(BabSetupBase::CutoffDecr);
 
     BCP_lp_prob* bcp_lp = getLpProblemPointer();
     const double bcp_intTol = bcp_lp->par.entry(BCP_lp_par::IntegerTolerance);
