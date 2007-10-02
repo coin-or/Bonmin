@@ -119,23 +119,6 @@ protected:
   /// verbosity level
   int bb_log_level_;
 
-  /**  This is a utility function which does strong branching on
-       a list of objects and stores the results in OsiHotInfo.objects.
-       On entry the object sequence is stored in the OsiHotInfo object
-       and maybe more.
-       It returns -
-       -1 - one branch was infeasible both ways
-       0 - all inspected - nothing can be fixed
-       1 - all inspected - some can be fixed (returnCriterion==0)
-       2 - may be returning early - one can be fixed (last one done) (returnCriterion==1) 
-       3 - returning because max time
-       
-  */
-  virtual int doBonStrongBranching( OsiSolverInterface * solver, 
-				    OsiBranchingInformation *info, int numberToDo,
-				    OsiHotInfo * results, int returnCriterion,
-				    int & numberDone);
-
 private:
   /** Default Constructor, forbiden for some reason.*/
   BonChooseVariable ();

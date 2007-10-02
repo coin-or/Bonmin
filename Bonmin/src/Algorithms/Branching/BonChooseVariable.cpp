@@ -30,12 +30,12 @@ BonChooseVariable::BonChooseVariable(BabSetupBase &b):
 
   /** Set values of standard branching options.*/
   int numberObjects = solver_->numberObjects();
-  pseudoCosts_->initialize(numberObjects);
+  pseudoCosts_.initialize(numberObjects);
   int numberBeforeTrusted = b.getIntParameter(BabSetupBase::MinReliability);
-  pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
+  pseudoCosts_.setNumberBeforeTrusted(numberBeforeTrusted);
 
   setNumberStrong(b.getIntParameter(BabSetupBase::NumberStrong));
-  pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
+  pseudoCosts_.setNumberBeforeTrusted(numberBeforeTrusted);
 
   /** Get values of options specific to BonChooseVariable.*/
   if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, "bonmin.")) {
@@ -59,7 +59,6 @@ BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
   jnlst_ = rhs.jnlst_;
   bb_log_level_ = rhs.bb_log_level_;
   DBG_ASSERT(IsValid(jnlst_));
-  pseudoCosts_ = new OsiPseudoCosts(*rhs.pseudoCosts_);
 }
 
 BonChooseVariable &
@@ -76,7 +75,6 @@ BonChooseVariable::operator=(const BonChooseVariable & rhs)
     setup_pseudo_frac_ = rhs.setup_pseudo_frac_;
     numberBeforeTrustedList_ = rhs.numberBeforeTrustedList_;
     numberStrongRoot_ = rhs.numberStrongRoot_;
-    *pseudoCosts_ = *rhs.pseudoCosts_;
   }
   return *this;
 }
@@ -89,7 +87,6 @@ BonChooseVariable::clone() const
 
 BonChooseVariable::~BonChooseVariable ()
 {
-  delete pseudoCosts_;
 }
 
 int
@@ -117,11 +114,11 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   numberUnsatisfied_=0;
   int numberObjects = solver_->numberObjects();
   assert (numberObjects);
-  if (numberObjects>pseudoCosts_->numberObjects()) {
+  if (numberObjects>pseudoCosts_.numberObjects()) {
     //AW : How could that ever happen?  Right now, all old content is deleted!
     assert(false && "Right now, all old content is deleted!");
     // redo useful arrays
-    pseudoCosts_->initialize(numberObjects);
+    pseudoCosts_.initialize(numberObjects);
   }
   double check = -COIN_DBL_MAX;
   int checkIndex=0;
@@ -153,10 +150,10 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   }
 
   OsiObject ** object = info->solver_->objects();
-  const double* upTotalChange = pseudoCosts_->upTotalChange();
-  const double* downTotalChange = pseudoCosts_->downTotalChange();
-  const int* upNumber = pseudoCosts_->upNumber();
-  const int* downNumber = pseudoCosts_->downNumber();
+  const double* upTotalChange = pseudoCosts_.upTotalChange();
+  const double* downTotalChange = pseudoCosts_.downTotalChange();
+  const int* upNumber = pseudoCosts_.upNumber();
+  const int* downNumber = pseudoCosts_.downNumber();
   double sumUp=0.0;
   double numberUp=0.0;
   double sumDown=0.0;
@@ -410,15 +407,14 @@ BonChooseVariable::chooseVariable(
     numberStrongRoot_ = numberStrong_;
   }
   if (numberUnsatisfied_) {
-    const double* upTotalChange = pseudoCosts_->upTotalChange();
-    const double* downTotalChange = pseudoCosts_->downTotalChange();
-    const int* upNumber = pseudoCosts_->upNumber();
-    const int* downNumber = pseudoCosts_->downNumber();
-    int numberBeforeTrusted = pseudoCosts_->numberBeforeTrusted();
+    const double* upTotalChange = pseudoCosts_.upTotalChange();
+    const double* downTotalChange = pseudoCosts_.downTotalChange();
+    const int* upNumber = pseudoCosts_.upNumber();
+    const int* downNumber = pseudoCosts_.downNumber();
+    int numberBeforeTrusted = pseudoCosts_.numberBeforeTrusted();
     int numberLeft = CoinMin(numberStrongRoot_-numberStrongDone_,numberUnsatisfied_);
     int numberToDo=0;
-    int * temp = (int *) useful_;
-    OsiHotInfo * results = new OsiHotInfo [numberLeft];
+    resetResults(numberLeft);
     int returnCode=0;
     bestObjectIndex_ = -1;
     bestWhichWay_ = -1;
@@ -432,8 +428,8 @@ BonChooseVariable::chooseVariable(
 	  !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
 		      downNumber[iObject]<numberBeforeTrusted )||
 	  isRoot && (!upNumber[iObject] && !downNumber[iObject]) ) {
-	results[numberToDo] = OsiHotInfo(solver,info,const_cast<const OsiObject **> (solver->objects()),iObject);
-	temp[numberToDo++]=iObject;
+	results_[numberToDo++] = OsiHotInfo(solver, info,
+					    solver->objects(), iObject);
       } else {
 	const OsiObject * obj = solver->object(iObject);
 	double upEstimate = (upTotalChange[iObject]*obj->upEstimate())/upNumber[iObject];
@@ -449,34 +445,31 @@ BonChooseVariable::chooseVariable(
     }
     int numberFixed=0;
     if (numberToDo) {
-      int numberDone=0;
-      returnCode = doBonStrongBranching(solver,info,numberToDo,results,1,numberDone);
+      returnCode = doStrongBranching(solver, info, numberToDo, 1);
       if (bb_log_level_>=3) {
 	const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"};
 	printf("BON0001I           DownStat    DownChange     UpStat      UpChange\n");
-	for (int i = 0; i<numberDone; i++) {
-	  double up_change = results[i].upChange();
-	  double down_change = results[i].downChange();
-	  int up_status = results[i].upStatus();
-	  int down_status = results[i].downStatus();
+	for (int i = 0; i<numResults_; i++) {
+	  double up_change = results_[i].upChange();
+	  double down_change = results_[i].downChange();
+	  int up_status = results_[i].upStatus();
+	  int down_status = results_[i].downStatus();
 	  printf("BON0002I    %3d    %6s    %13.6e   %6s    %13.6e\n",
 		 i, stat_msg[down_status+1], down_change, stat_msg[up_status+1], up_change);
 	}
       }
       if (returnCode>=0&&returnCode<=2) {
 	if (returnCode) {
-	  if (returnCode==2)
-	    numberToDo = numberDone;
 	  returnCode=4;
 	  if (bestObjectIndex_>=0)
 	    returnCode=3;
 	}
-	for (int i=0;i<numberToDo;i++) {
-	  int iObject = temp[i];
+	for (int i=0;i<numResults_;i++) {
+	  int iObject = results_[i].whichObject();
 	  double upEstimate;
-	  if (results[i].upStatus()!=1) {
-	    assert (results[i].upStatus()>=0);
-	    upEstimate = results[i].upChange();
+	  if (results_[i].upStatus()!=1) {
+	    assert (results_[i].upStatus()>=0);
+	    upEstimate = results_[i].upChange();
 	  } else {
 	    // infeasible - just say expensive
 	    if (info->cutoff_<1.0e50)
@@ -497,9 +490,9 @@ BonChooseVariable::chooseVariable(
 	    }
 	  }
 	  double downEstimate;
-	  if (results[i].downStatus()!=1) {
-	    assert (results[i].downStatus()>=0);
-	    downEstimate = results[i].downChange();
+	  if (results_[i].downStatus()!=1) {
+	    assert (results_[i].downStatus()>=0);
+	    downEstimate = results_[i].downChange();
 	  } else {
 	    // infeasible - just say expensive
 	    if (info->cutoff_<1.0e50)
@@ -541,7 +534,6 @@ BonChooseVariable::chooseVariable(
     } else {
       bestObjectIndex_=list_[0];
     }
-    delete [] results;
     if ( bestObjectIndex_ >=0 ) {
       OsiObject * obj = solver->objects()[bestObjectIndex_];
       obj->setWhichWay(	bestWhichWay_);
@@ -555,152 +547,8 @@ BonChooseVariable::chooseVariable(
   } else {
     return 1;
   }
-
 }
 
-int 
-BonChooseVariable::doBonStrongBranching( OsiSolverInterface * solver, 
-					 OsiBranchingInformation *info, int numberToDo,
-					 OsiHotInfo * results, int returnCriterion,
-					 int & numberDone)
-{
-  // Might be faster to extend branch() to return bounds changed
-  double * saveLower = NULL;
-  double * saveUpper = NULL;
-  int numberColumns = solver->getNumCols();
-  solver->markHotStart();
-  const double * lower = info->lower_;
-  const double * upper = info->upper_;
-  saveLower = CoinCopyOfArray(info->lower_,numberColumns);
-  saveUpper = CoinCopyOfArray(info->upper_,numberColumns);
-  numberDone=0;
-  int returnCode=0;
-  double timeStart = CoinCpuTime();
-  for (int iDo=0;iDo<numberToDo;iDo++) {
-    OsiHotInfo * result = results + iDo;
-    // For now just 2 way
-    OsiBranchingObject * branch = result->branchingObject();
-    assert (branch->numberBranches()==2);
-    /*
-      Try the first direction.  Each subsequent call to branch() performs the
-      specified branch and advances the branch object state to the next branch
-      alternative.)
-    */
-    OsiSolverInterface * thisSolver = solver; 
-    if (branch->boundBranch()) {
-      // ordinary
-      branch->branch(solver);
-      // maybe we should check bounds for stupidities here?
-      solver->solveFromHotStart() ;
-    } else {
-      // adding cuts or something 
-      thisSolver = solver->clone();
-      branch->branch(thisSolver);
-      // set hot start iterations
-      int limit;
-      thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
-      thisSolver->setIntParam(OsiMaxNumIteration,limit); 
-      thisSolver->resolve();
-    }
-    // can check if we got solution
-    // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
-    int status0 = result->updateInformation(thisSolver,info,this);
-    // is decrease already below, once should be enough... ??????
-    numberStrongDone_++;
-    numberStrongIterations_ += thisSolver->getIterationCount();
-    if (status0==3) {
-      // new solution already saved
-      if (trustStrongForSolution_) {
-	info->cutoff_ = goodObjectiveValue_;
-	status0=0;
-      }
-    }
-    if (solver!=thisSolver)
-      delete thisSolver;
-    // Restore bounds
-    for (int j=0;j<numberColumns;j++) {
-      if (saveLower[j] != lower[j])
-	solver->setColLower(j,saveLower[j]);
-      if (saveUpper[j] != upper[j])
-	solver->setColUpper(j,saveUpper[j]);
-    }
-    /*
-      Try the next direction
-    */
-    thisSolver = solver; 
-    if (branch->boundBranch()) {
-      // ordinary
-      branch->branch(solver);
-      // maybe we should check bounds for stupidities here?
-      solver->solveFromHotStart() ;
-    } else {
-      // adding cuts or something 
-      thisSolver = solver->clone();
-      branch->branch(thisSolver);
-      // set hot start iterations
-      int limit;
-      thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
-      thisSolver->setIntParam(OsiMaxNumIteration,limit); 
-      thisSolver->resolve();
-    }
-    // can check if we got solution
-    // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
-    int status1 = result->updateInformation(thisSolver,info,this);
-    numberStrongDone_++;
-    numberStrongIterations_ += thisSolver->getIterationCount();
-    if (status1==3) {
-      // new solution already saved
-      if (trustStrongForSolution_) {
-	info->cutoff_ = goodObjectiveValue_;
-	status1=0;
-      }
-    }
-    if (solver!=thisSolver)
-      delete thisSolver;
-    // Restore bounds
-    for (int j=0;j<numberColumns;j++) {
-      if (saveLower[j] != lower[j])
-	solver->setColLower(j,saveLower[j]);
-      if (saveUpper[j] != upper[j])
-	solver->setColUpper(j,saveUpper[j]);
-    }
-
-    /*
-      End of evaluation for this candidate variable. Possibilities are:
-      * Both sides below cutoff; this variable is a candidate for branching.
-      * Both sides infeasible or above the objective cutoff: no further action
-      here. Break from the evaluation loop and assume the node will be purged
-      by the caller.
-      * One side below cutoff: Install the branch (i.e., fix the variable). Possibly break
-      from the evaluation loop and assume the node will be reoptimised by the
-      caller.
-    */
-    numberDone++;
-    if (status0==1&&status1==1) {
-      // infeasible
-      returnCode=-1;
-      break; // exit loop
-    } else if (status0==1||status1==1) {
-      numberStrongFixed_++;
-      if (!returnCriterion) {
-	returnCode=1;
-      } else {
-	returnCode=2;
-	break;
-      }
-    }
-    bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_);
-    if (hitMaxTime) {
-      returnCode=3;
-      break;
-    }
-  }
-  delete [] saveLower;
-  delete [] saveUpper;
-  // Delete the snapshot
-  solver->unmarkHotStart();
-  return returnCode;
-}
 
 bool BonChooseVariable::isRootNode(const OsiBranchingInformation *info) const {
   return info->depth_ == 0;
@@ -730,10 +578,10 @@ BonChooseVariable::updateInformation(const OsiBranchingInformation *info,
   const OsiObject * object = info->solver_->object(index);
   assert (object->upEstimate()>0.0&&object->downEstimate()>0.0);
   assert (branch<2);
-  double* upTotalChange = pseudoCosts_->upTotalChange();
-  double* downTotalChange = pseudoCosts_->downTotalChange();
-  int* upNumber = pseudoCosts_->upNumber();
-  int* downNumber = pseudoCosts_->downNumber();
+  double* upTotalChange = pseudoCosts_.upTotalChange();
+  double* downTotalChange = pseudoCosts_.downTotalChange();
+  int* upNumber = pseudoCosts_.upNumber();
+  int* downNumber = pseudoCosts_.downNumber();
    if (branch) {
     //if (hotInfo->upStatus()!=1) {
     // AW: Let's update the pseudo costs only if the strong branching
@@ -776,10 +624,10 @@ BonChooseVariable::updateInformation( int index, int branch,
   assert (branch<2);
   assert (changeInValue>0.0);
   assert (branch<2);
-  double* upTotalChange = pseudoCosts_->upTotalChange();
-  double* downTotalChange = pseudoCosts_->downTotalChange();
-  int* upNumber = pseudoCosts_->upNumber();
-  int* downNumber = pseudoCosts_->downNumber();
+  double* upTotalChange = pseudoCosts_.upTotalChange();
+  double* downTotalChange = pseudoCosts_.downTotalChange();
+  int* upNumber = pseudoCosts_.upNumber();
+  int* downNumber = pseudoCosts_.downNumber();
   //printf("update %3d %3d %e %e %3d\n",index, branch, changeInObjective,changeInValue,status);
   if (branch) {
     if (status!=1) {
