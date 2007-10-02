@@ -108,6 +108,7 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
       if (clp.isInteger(i)) type = BCP_IntegerVar;
       vars.push_back(new BCP_var_core(type, obj[i], clb[i], cub[i]));
     }
+    delete[] obj;
 }
 
 /****************************************************************************/
