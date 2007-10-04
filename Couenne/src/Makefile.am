@@ -23,7 +23,7 @@ libCouenne_la_SOURCES = \
 	branch/CouenneObject.cpp \
 	branch/CouenneChooseVariable.cpp \
 	branch/getFixVarBinFun.cpp \
-	branch/projections.c \
+	branch/projections.cpp \
 	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
@@ -49,10 +49,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprGroup.cpp \
 	expression/operators/exprQuad.cpp \
 	expression/operators/bounds/exprBQuad.cpp \
-	expression/operators/impliedBounds-exprSum.cpp \
 	expression/operators/impliedBounds-exprQuad.cpp \
-	expression/operators/impliedBounds-exprDiv.cpp \
-	expression/operators/impliedBounds-exprMul.cpp \
 	expression/operators/compQuadFinBounds.cpp \
 	expression/exprOp.cpp \
 	expression/exprUnary.cpp \
@@ -83,36 +80,39 @@ libCouenne_la_SOURCES = \
 	convex/operators/conv-exprGroup.cpp \
 	convex/operators/conv-exprQuad.cpp \
 	convex/operators/trigNewton.cpp \
-	convex/operators/createQuadratic.cpp \
-	convex/operators/sumStandardize.cpp \
-	convex/operators/analyzeSparsity.cpp \
 	convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp \
-	convex/boundTightening.cpp \
 	convex/genColCuts.cpp \
 	convex/genRowCuts.cpp \
-	convex/obbt.cpp \
-	convex/obbt_iter.cpp \
 	convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp \
+	standardize/createQuadratic.cpp \
+	standardize/sumStandardize.cpp \
+	standardize/analyzeSparsity.cpp \
+	standardize/constrStandardize.cpp \
+	standardize/elementBreak.cpp \
+	standardize/splitAux.cpp \
+	standardize/auxiliarize.cpp \
+	standardize/standardize.cpp \
 	problem/problem.cpp \
 	problem/CouenneProblem.cpp \
 	problem/problemIO.cpp \
 	problem/extended.cpp \
 	problem/constraint.cpp \
-	problem/tightenBounds.cpp \
-	problem/impliedBounds.cpp \
 	problem/readASLfg.cpp \
 	problem/fillQuadIndices.cpp \
-	problem/constrStandardize.cpp \
-	problem/elementBreak.cpp \
-	problem/splitAux.cpp \
-	problem/auxiliarize.cpp \
-	problem/standardize.cpp \
 	problem/depGraph/depGraph.cpp \
 	problem/depGraph/checkCycles.cpp \
+	bound_tightening/boundTightening.cpp \
+	bound_tightening/obbt.cpp \
+	bound_tightening/obbt_iter.cpp \
+	bound_tightening/tightenBounds.cpp \
+	bound_tightening/impliedBounds.cpp \
+	bound_tightening/operators/impliedBounds-exprSum.cpp \
+	bound_tightening/operators/impliedBounds-exprDiv.cpp \
+	bound_tightening/operators/impliedBounds-exprMul.cpp \
 	util/drawCuts.cpp \
-	util/rootQ.c
+	util/rootQ.cpp
 
 #	convex/operators/linearize.cpp 
 
@@ -131,7 +131,7 @@ libCouenne_la_LDFLAGS = $(LT_LDFLAGS)
 if COIN_HAS_ASL
 libCouenne_la_SOURCES += readnl/readnl.cpp \
 			 readnl/nl2e.cpp \
-			 readnl/invmap.c
+			 readnl/invmap.cpp
 endif
 
 ########################################################################
@@ -192,7 +192,7 @@ include_HEADERS = \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
-	branch/projections.h \
+	branch/projections.hpp \
 	expression/operators/exprAbs.hpp \
 	expression/operators/exprExp.hpp \
 	expression/operators/exprInv.hpp \
@@ -223,7 +223,7 @@ include_HEADERS = \
 	expression/exprBound.hpp \
 	expression/exprCopy.hpp \
 	expression/exprOp.hpp \
-	expression/CouennePrecisions.h \
+	expression/CouennePrecisions.hpp \
 	problem/depGraph/depGraph.hpp \
 	problem/CouenneProblemElem.hpp \
 	problem/CouenneProblem.hpp \

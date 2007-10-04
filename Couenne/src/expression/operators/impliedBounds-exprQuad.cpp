@@ -257,9 +257,13 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
     CouNumber 
       al = linCoeMin [indn],
       au = linCoeMax [indn],
-      q  = qii       [indn],
+      q  = qii       [indn];
+
+#ifdef DEBUG
+    CouNumber
       ol = l [ind], 
       ou = u [ind];
+#endif
 
     if (fabs (q) < COUENNE_EPS) { // case 1: qii is zero, term is "linear"
 

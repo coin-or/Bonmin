@@ -1,5 +1,5 @@
 /*
- * Name: invmap.c
+ * Name: invmap.cpp
  * Author: Pietro Belotti
  * Purpose: create a bijection between ASL's efunc and integer to
  *          inversely map e->op fields into constant operators
@@ -30,7 +30,7 @@ typedef struct {
 /* inline int pair_compare (const void *p1, const void *p2) { */
 static int pair_compare (const void *p1, const void *p2) {
 
-  /* FIX THIS! weak cast for 64 bit machines */
+  /* FIX! weak cast for 64 bit machines */
 
   register int f1 = (int) (((AslCouPair *) p1) -> fp); 
   register int f2 = (int) (((AslCouPair *) p2) -> fp); 
@@ -78,7 +78,7 @@ int getOperator (efunc *f) {
   }
 
   /* find int operator through binary search */
-  res = bsearch (&key, opmap, N_OPS, sizeof (AslCouPair), pair_compare);
+  res = (AslCouPair *) bsearch (&key, opmap, N_OPS, sizeof (AslCouPair), pair_compare);
 
   if (!res) 
     return -1;

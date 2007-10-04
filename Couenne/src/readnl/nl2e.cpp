@@ -29,9 +29,9 @@
 
 // get ASL op. code relative to function pointer passed as parameter 
 
-extern "C" {
+//extern "C" {
   int getOperator (efunc *);
-}
+//}
 
 
 // warning for non-implemented functions -- return 0 constant expression

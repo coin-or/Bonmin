@@ -12,9 +12,9 @@
 /// Find roots of polynomial $Q^k(x) = \sum_{i=1}^{2k} i x^{i-1}$. Used
 /// in convexification of powers with odd exponent
 
-extern "C" {
+//extern "C" {
   CouNumber rootQ (int k);
-}
+//}
 
 /// class that stores result of previous calls to rootQ into a map for
 /// faster access
@@ -29,9 +29,8 @@ class Qroot {
 
  public:
 
-  /// Empty constructor --we only need the method to work on the static
+  /// Empty constructor -- we only need the method to work on the static
   /// structure.
-  
   Qroot  () {}
 
   /// Empty destructor.
