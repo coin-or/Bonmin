@@ -49,7 +49,6 @@ libCouenne_la_SOURCES = \
 	expression/operators/exprGroup.cpp \
 	expression/operators/exprQuad.cpp \
 	expression/operators/bounds/exprBQuad.cpp \
-	expression/operators/impliedBounds-exprQuad.cpp \
 	expression/operators/compQuadFinBounds.cpp \
 	expression/exprOp.cpp \
 	expression/exprUnary.cpp \
@@ -111,10 +110,9 @@ libCouenne_la_SOURCES = \
 	bound_tightening/operators/impliedBounds-exprSum.cpp \
 	bound_tightening/operators/impliedBounds-exprDiv.cpp \
 	bound_tightening/operators/impliedBounds-exprMul.cpp \
+	bound_tightening/operators/impliedBounds-exprQuad.cpp \
 	util/drawCuts.cpp \
 	util/rootQ.cpp
-
-#	convex/operators/linearize.cpp 
 
 
 COINLIBS = \
