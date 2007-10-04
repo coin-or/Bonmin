@@ -17,6 +17,7 @@ Couenne/src/bound_tightening/obbt.cpp -text
 Couenne/src/bound_tightening/obbt_iter.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprDiv.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprMul.cpp -text
+Couenne/src/bound_tightening/operators/impliedBounds-exprQuad.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprSum.cpp -text
 Couenne/src/bound_tightening/tightenBounds.cpp -text
 Couenne/src/branch/CouenneBranchingObject.cpp -text
@@ -124,7 +125,6 @@ Couenne/src/expression/operators/exprSub.cpp -text
 Couenne/src/expression/operators/exprSub.hpp -text
 Couenne/src/expression/operators/exprSum.cpp -text
 Couenne/src/expression/operators/exprSum.hpp -text
-Couenne/src/expression/operators/impliedBounds-exprQuad.cpp -text
 Couenne/src/problem/CouenneProblem.cpp -text
 Couenne/src/problem/CouenneProblem.hpp -text
 Couenne/src/problem/CouenneProblemElem.hpp -text
