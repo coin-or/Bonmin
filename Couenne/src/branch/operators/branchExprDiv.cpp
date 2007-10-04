@@ -7,8 +7,8 @@
  */
 
 #include <exprDiv.hpp>
-#include <CouennePrecisions.h>
-#include <CouenneTypes.h>
+#include <CouennePrecisions.hpp>
+#include <CouenneTypes.hpp>
 #include <CouenneBranchingObject.hpp>
 #include <CouenneObject.hpp>
 

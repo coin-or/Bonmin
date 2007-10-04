@@ -6,8 +6,8 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_PRECISIONS_H
-#define COUENNE_PRECISIONS_H
+#ifndef COUENNE_PRECISIONS_HPP
+#define COUENNE_PRECISIONS_HPP
 
 #include <math.h>
 

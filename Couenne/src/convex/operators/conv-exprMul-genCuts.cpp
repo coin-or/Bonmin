@@ -6,7 +6,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <exprMul.hpp>
 #include <exprPow.hpp>
 #include <exprDiv.hpp>

@@ -6,12 +6,12 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRCOPY_H
-#define COUENNE_EXPRCOPY_H
+#ifndef COUENNE_EXPRCOPY_HPP
+#define COUENNE_EXPRCOPY_HPP
 
 #include <iostream>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <expression.hpp>
 
 

@@ -6,12 +6,12 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRBOUND_H
-#define COUENNE_EXPRBOUND_H
+#ifndef COUENNE_EXPRBOUND_HPP
+#define COUENNE_EXPRBOUND_HPP
 
 #include <iostream>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <exprVar.hpp>
 
 /// These are bound expression classes. They are used in the parametric

@@ -8,10 +8,10 @@
 
 #include <math.h>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <rootQ.hpp>
 #include <exprPow.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 #include <CouenneProblem.hpp>
 #include <CouenneCutGenerator.hpp>
 

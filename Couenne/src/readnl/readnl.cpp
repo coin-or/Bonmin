@@ -8,7 +8,7 @@
 
 #include <CouenneProblem.hpp>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 
 #include <exprSum.hpp>
 #include <exprMul.hpp>

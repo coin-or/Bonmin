@@ -7,11 +7,11 @@
  */
 
 #include <exprPow.hpp>
-#include <CouennePrecisions.h>
-#include <CouenneTypes.h>
+#include <CouennePrecisions.hpp>
+#include <CouenneTypes.hpp>
 #include <CouenneObject.hpp>
 #include <CouenneBranchingObject.hpp>
-#include <projections.h>
+#include <projections.hpp>
 
 
 /// set up branching object by evaluating many branching points for

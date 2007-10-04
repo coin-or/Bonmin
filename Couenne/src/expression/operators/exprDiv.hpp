@@ -6,11 +6,11 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRDIV_H
-#define COUENNE_EXPRDIV_H
+#ifndef COUENNE_EXPRDIV_HPP
+#define COUENNE_EXPRDIV_HPP
 
 #include <exprOp.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 
 #define BR_NEXT_ZERO 1e-3
 #define BR_MULT      1e-3

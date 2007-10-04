@@ -6,14 +6,14 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_PROBLEM_H
-#define COUENNE_PROBLEM_H
+#ifndef COUENNE_PROBLEM_HPP
+#define COUENNE_PROBLEM_HPP
 
 #include <vector>
 
 #include <OsiRowCut.hpp>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <expression.hpp>
 #include <exprAux.hpp>
 #include <CouenneProblemElem.hpp>

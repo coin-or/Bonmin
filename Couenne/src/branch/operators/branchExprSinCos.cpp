@@ -10,11 +10,10 @@
 
 #include <exprSin.hpp>
 #include <exprCos.hpp>
-#include <CouennePrecisions.h>
-#include <CouenneTypes.h>
+#include <CouennePrecisions.hpp>
+#include <CouenneTypes.hpp>
 #include <CouenneObject.hpp>
 #include <CouenneBranchingObject.hpp>
-//#include <projections.h>
 
 
 /// generalized procedure for both sine and cosine

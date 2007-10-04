@@ -8,7 +8,7 @@
 
 #include <exprSub.hpp>
 #include <exprOpp.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 
 
 // simplify subtractions

@@ -12,7 +12,7 @@
 #include <BonOaDecBase.hpp>
 #include <CglCutGenerator.hpp>
 
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 #include <CouenneProblem.hpp>
 #include <CouenneCutGenerator.hpp>
 

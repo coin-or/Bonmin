@@ -7,12 +7,12 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRCLONE_H
-#define COUENNE_EXPRCLONE_H
+#ifndef COUENNE_EXPRCLONE_HPP
+#define COUENNE_EXPRCLONE_HPP
 
 #include <iostream>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <exprCopy.hpp>
 
 

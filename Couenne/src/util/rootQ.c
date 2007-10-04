@@ -1,5 +1,5 @@
 /*
- * Name:    rootQ.c
+ * Name:    rootQ.cpp
  * Author:  Pietro Belotti
  * Purpose: find roots of polynomial Q^k(x) (see Liberti and Pantelides, 2003)
  *
@@ -7,10 +7,10 @@
  */
 
 #include <math.h>
-
-#include <CouenneTypes.h>
-#include <CouennePrecisions.h>
 #include <stdio.h>
+
+#include <CouenneTypes.hpp>
+#include <CouennePrecisions.hpp>
 
 
 /* compute Q(x)*/

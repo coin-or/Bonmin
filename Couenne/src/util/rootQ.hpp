@@ -6,7 +6,7 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <map>
 
 /// Find roots of polynomial $Q^k(x) = \sum_{i=1}^{2k} i x^{i-1}$. Used

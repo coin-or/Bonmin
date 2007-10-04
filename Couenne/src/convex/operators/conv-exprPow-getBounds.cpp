@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <exprPow.hpp>
 #include <exprConst.hpp>
 #include <exprCopy.hpp>
@@ -16,7 +16,7 @@
 #include <exprMax.hpp>
 #include <exprMin.hpp>
 #include <exprOpp.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 #include <CouenneProblem.hpp>
 
 

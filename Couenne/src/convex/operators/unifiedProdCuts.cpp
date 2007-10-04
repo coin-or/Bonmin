@@ -6,8 +6,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.h>
-#include <CouennePrecisions.h>
+#include <CouenneTypes.hpp>
+#include <CouennePrecisions.hpp>
 #include <CouenneCutGenerator.hpp>
 #include <exprDiv.hpp>
 #include <exprMul.hpp>

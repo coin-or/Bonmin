@@ -6,12 +6,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_PROBLEM_ELEM_H
-#define COUENNE_PROBLEM_ELEM_H
+#ifndef COUENNE_PROBLEM_ELEM_HPP
+#define COUENNE_PROBLEM_ELEM_HPP
 
 #include <iostream>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <expression.hpp>
 #include <exprConst.hpp>
 

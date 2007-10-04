@@ -6,13 +6,13 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef DEPGRAPH_H
-#define DEPGRAPH_H
+#ifndef DEPGRAPH_HPP
+#define DEPGRAPH_HPP
 
 #include <vector>
 #include <set>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <expression.hpp>
 #include <exprAux.hpp>
 #include <CouenneProblemElem.hpp>

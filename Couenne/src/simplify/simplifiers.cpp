@@ -8,7 +8,7 @@
 
 #include <exprOp.hpp>
 #include <exprConst.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 
 
 //

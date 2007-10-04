@@ -9,11 +9,11 @@
 #include <exprLog.hpp>
 #include <exprPow.hpp>
 
-#include <CouennePrecisions.h>
-#include <CouenneTypes.h>
+#include <CouennePrecisions.hpp>
+#include <CouenneTypes.hpp>
 #include <CouenneObject.hpp>
 #include <CouenneBranchingObject.hpp>
-#include <projections.h>
+#include <projections.hpp>
 
 
 #define SQ_COUENNE_EPS COUENNE_EPS * COUENNE_EPS

@@ -7,7 +7,7 @@
  */
 
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CouenneProblem.hpp>
 #include <exprMul.hpp>
 #include <exprPow.hpp>

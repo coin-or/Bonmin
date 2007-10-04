@@ -11,7 +11,7 @@
 #include <CoinHelperFunctions.hpp>
 #include <CoinTime.hpp>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 
 #include <expression.hpp>
 #include <exprConst.hpp>

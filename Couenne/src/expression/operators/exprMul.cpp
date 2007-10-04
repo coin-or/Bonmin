@@ -10,7 +10,7 @@
 #include <exprSum.hpp>
 #include <exprConst.hpp>
 #include <exprClone.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 
 
 /// Constructors, destructor

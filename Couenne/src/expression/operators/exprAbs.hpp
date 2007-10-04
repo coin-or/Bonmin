@@ -6,8 +6,8 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRABS_H
-#define COUENNE_EXPRABS_H
+#ifndef COUENNE_EXPRABS_HPP
+#define COUENNE_EXPRABS_HPP
 
 #include <math.h>
 

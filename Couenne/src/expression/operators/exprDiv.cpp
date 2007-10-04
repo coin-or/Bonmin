@@ -14,7 +14,7 @@
 #include <exprSub.hpp>
 #include <exprBDiv.hpp>
 
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 
 
 // simplify division

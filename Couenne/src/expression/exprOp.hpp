@@ -6,13 +6,13 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPROP_H
-#define COUENNE_EXPROP_H
+#ifndef COUENNE_EXPROP_HPP
+#define COUENNE_EXPROP_HPP
 
 #include <iostream>
 
 #include <expression.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <exprUnary.hpp>
 
 

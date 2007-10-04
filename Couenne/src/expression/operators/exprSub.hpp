@@ -6,11 +6,11 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRSUB_H
-#define COUENNE_EXPRSUB_H
+#ifndef COUENNE_EXPRSUB_HPP
+#define COUENNE_EXPRSUB_HPP
 
 #include <exprOp.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 #include <CouenneProblem.hpp>
 
 /// class for subtraction

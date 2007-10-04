@@ -7,7 +7,7 @@
  */
 
 #include <math.h>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 
 #define MAX_ITER 10
 #define COU_POW_TOLERANCE 1e-12

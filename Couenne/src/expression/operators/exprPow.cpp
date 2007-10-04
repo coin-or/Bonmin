@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 #include <exprPow.hpp>
 #include <exprSum.hpp>
 #include <exprMul.hpp>

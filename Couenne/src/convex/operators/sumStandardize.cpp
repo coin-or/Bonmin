@@ -7,7 +7,7 @@
  */
 
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CouenneProblem.hpp>
 #include <exprSum.hpp>
 #include <exprSub.hpp>

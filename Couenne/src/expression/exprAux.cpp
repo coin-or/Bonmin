@@ -7,7 +7,7 @@
  */
 
 #include <CouenneCutGenerator.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <expression.hpp>
 #include <exprAux.hpp>
 #include <exprVar.hpp>

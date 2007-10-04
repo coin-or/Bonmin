@@ -11,7 +11,7 @@
 
 #include <CouenneProblem.hpp>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <expression.hpp>
 #include <exprAux.hpp>
 #include <exprOp.hpp>

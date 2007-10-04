@@ -25,7 +25,7 @@
 #include <exprExp.hpp>
 #include <exprPow.hpp>
 #include <exprLog.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CouenneProblem.hpp>
 #include <rootQ.hpp>
 

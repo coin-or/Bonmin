@@ -9,7 +9,7 @@
 
 #include <map>
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CouenneProblem.hpp>
 
 #include <exprQuad.hpp>

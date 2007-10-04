@@ -7,7 +7,7 @@
  */
 
 #include <exprMul.hpp>
-#include <CouennePrecisions.h>
+#include <CouennePrecisions.hpp>
 
 
 /// implied bound processing for expression w = x*y, upon change in

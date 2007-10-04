@@ -6,8 +6,8 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRESSION_H
-#define COUENNE_EXPRESSION_H
+#ifndef COUENNE_EXPRESSION_HPP
+#define COUENNE_EXPRESSION_HPP
 
 #define STACK_SIZE 10000
 
@@ -17,8 +17,8 @@
 #include <algorithm>
 #include <iterator>
 
-#include <CouennePrecisions.h>
-#include <CouenneTypes.h>
+#include <CouennePrecisions.hpp>
+#include <CouenneTypes.hpp>
 
 class OsiBranchingInformation;
 class OsiBranchingObject;

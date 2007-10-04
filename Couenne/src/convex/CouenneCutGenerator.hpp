@@ -7,12 +7,12 @@
  * This file is licensed under the Common Public License.
  */
 
-#ifndef COUENNE_CUT_GENERATOR_H
-#define COUENNE_CUT_GENERATOR_H
+#ifndef COUENNE_CUT_GENERATOR_HPP
+#define COUENNE_CUT_GENERATOR_HPP
 
 #include <BonOaDecBase.hpp>
 #include <OsiRowCut.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include "BonAuxInfos.hpp"
 
 #include <OsiSolverInterface.hpp>

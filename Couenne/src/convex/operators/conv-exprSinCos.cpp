@@ -15,7 +15,7 @@
 #endif
 
 #include <OsiSolverInterface.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CouenneCutGenerator.hpp>
 #include <exprSin.hpp>
 #include <exprCos.hpp>

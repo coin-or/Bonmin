@@ -9,8 +9,8 @@
 
 
 #include <OsiRowCut.hpp>
-#include <CouennePrecisions.h>
-#include <CouenneTypes.h>
+#include <CouennePrecisions.hpp>
+#include <CouenneTypes.hpp>
 #include <CouenneCutGenerator.hpp>
 
 void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,

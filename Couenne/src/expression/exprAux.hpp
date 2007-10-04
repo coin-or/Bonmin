@@ -7,15 +7,15 @@
  * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
  */
 
-#ifndef COUENNE_EXPRAUX_H
-#define COUENNE_EXPRAUX_H
+#ifndef COUENNE_EXPRAUX_HPP
+#define COUENNE_EXPRAUX_HPP
 
 #include <iostream>
 #include <exprVar.hpp>
 #include <exprBound.hpp>
 #include <exprMax.hpp>
 #include <exprMin.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CglCutGenerator.hpp>
 
 

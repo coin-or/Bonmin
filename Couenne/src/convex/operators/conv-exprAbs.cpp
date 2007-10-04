@@ -7,7 +7,7 @@
  */
 
 #include <OsiSolverInterface.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CouenneCutGenerator.hpp>
 #include <exprAbs.hpp>
 #include <exprAux.hpp>

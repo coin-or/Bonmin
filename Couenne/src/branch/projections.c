@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <CouenneTypes.h>
-#include <CouennePrecisions.h>
+#include <CouenneTypes.hpp>
+#include <CouennePrecisions.hpp>
 
 /*  compute projection of point (x0, y0) on the segment defined by
  *  line ax + by + c <>= 0 (sign provided by parameter sign) and

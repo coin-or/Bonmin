@@ -9,7 +9,7 @@
 #include <OsiSolverInterface.hpp>
 
 #include <CouenneCutGenerator.hpp>
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <exprMax.hpp>
 #include <exprMin.hpp>
 

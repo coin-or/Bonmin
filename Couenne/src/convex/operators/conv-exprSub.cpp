@@ -6,22 +6,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.h>
+#include <CouenneTypes.hpp>
 #include <CouenneCutGenerator.hpp>
 #include <exprSub.hpp>
 #include <exprOpp.hpp>
-
-
-// Create standard formulation of this expression
-
-/*exprAux *exprSub::standardize (CouenneProblem *p) {
-
-  // first of all, standardize all operands
-  exprOp::standardize (p);
-
-  return p -> addAuxiliary (this);
-  }*/
-
 
 // generate equality between *this and *w
 void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si, 
