@@ -32,8 +32,8 @@ static int pair_compare (const void *p1, const void *p2) {
 
   /* FIX! weak cast for 64 bit machines */
 
-  register int f1 = (int) (((AslCouPair *) p1) -> fp); 
-  register int f2 = (int) (((AslCouPair *) p2) -> fp); 
+  register long int f1 = (long int) (((AslCouPair *) p1) -> fp); 
+  register long int f2 = (long int) (((AslCouPair *) p2) -> fp); 
 
   if      (f1 < f2) return -1;
   else if (f1 > f2) return  1;
@@ -55,9 +55,9 @@ int getOperator (efunc *f) {
 
   /* FIX cast fo 64 bit machines */
 
-  if (((int) f <  N_OPS) && 
-      ((int) f > -N_OPS))
-    return (int) f;
+  if (((long int) f <  N_OPS) && 
+      ((long int) f > -N_OPS))
+    return (long int) f;
 
   key.fp = f;
 
