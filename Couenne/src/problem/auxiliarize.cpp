@@ -41,20 +41,20 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
   // all objectives
 
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
-       i != objectives_.end (); i++)
+       i != objectives_.end (); ++i)
     (*i) -> Body () -> replace (*orig, aux);
 
   // and all constraints
 
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
-       i != constraints_.end (); i++)
+       i != constraints_.end (); ++i)
     if ((*i) -> Body ()) 
       (*i) -> Body () -> replace (*orig, aux);
 
   // substitute it with w in all auxiliaries
 
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
-       i != variables_.end (); i++)
+       i != variables_.end (); ++i)
     if (((*i) -> Type () == AUX) && 
 	((*i) -> Index () != (*orig) -> Index ()))
       (*i) -> Image () -> replace (*orig, aux);

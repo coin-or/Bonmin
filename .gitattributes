@@ -91,6 +91,7 @@ Couenne/src/expression/operators/bounds/exprBMul.hpp -text
 Couenne/src/expression/operators/bounds/exprBQuad.cpp -text
 Couenne/src/expression/operators/bounds/exprBQuad.hpp -text
 Couenne/src/expression/operators/bounds/exprBSin.hpp -text
+Couenne/src/expression/operators/compQuadFinBounds.cpp -text
 Couenne/src/expression/operators/exprAbs.cpp -text
 Couenne/src/expression/operators/exprAbs.hpp -text
 Couenne/src/expression/operators/exprCos.cpp -text

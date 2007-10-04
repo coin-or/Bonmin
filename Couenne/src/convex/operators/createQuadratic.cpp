@@ -51,11 +51,11 @@ void flattenMul (expression *mul, CouNumber &coe,
 
     case COU_EXPROPP: // equivalent to multiplying by -1
 
-      coe *= -1;
+      coe = -coe;
       flattenMul (arg -> Argument (), coe, indices, p);
       break;
 
-    case COU_EXPRPOW: {
+    case COU_EXPRPOW: { // power
 
       expression *base     = arg -> ArgList () [0],
 	         *exponent = arg -> ArgList () [1];
@@ -80,13 +80,21 @@ void flattenMul (expression *mul, CouNumber &coe,
       }  // otherwise, revert to default
     }
 
+    case COU_EXPRSUM: // well, only if there is one element
+
+      if (arg -> nArgs () == 1) {
+	flattenMul (arg, coe, indices, p);
+	break;
+      }
+
     default: { // for all other expression, add associated new auxiliary
 
       exprAux *aux = arg -> standardize (p);
 
       int ind = (aux) ? aux -> Index () : arg -> Index ();
 
-      std::map <int, CouNumber>::iterator where = indices.find (ind);
+      std::map <int, CouNumber>::iterator 
+	where = indices.find (ind);
 
       if (where == indices.end ()) 
 	indices.insert (std::pair <int, CouNumber> (ind, 1));
@@ -168,8 +176,9 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
   } break;
 
-    // not-so-easy cases /////////////////////////////////////////////////////////////////
-    // cannot add terms as it may fill up the triplet
+  // not-so-easy cases /////////////////////////////////////////////////////////////////
+  //
+  // cannot add terms as it may fill up the triplet
 
   case COU_EXPRMUL: { /// a product of n factors /////////////////////////////////////////
 
@@ -282,7 +291,8 @@ void decomposeTerm (CouenneProblem *p, expression *term,
       if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, ind, initCoe);
       else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, ind, ind, initCoe);
       else {
-	exprAux *aux2 = p -> addAuxiliary (new exprPow (aux, new exprConst (expon))); // TODO: FIX!
+	exprAux *aux2 = p -> addAuxiliary 
+	  (new exprPow (new exprClone (aux), new exprConst (expon))); // TODO: FIX!
 	linsert (lmap, aux2 -> Index (), initCoe);
       }
     }

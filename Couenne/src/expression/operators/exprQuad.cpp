@@ -6,6 +6,7 @@
  * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
  */
 
+#include <CoinHelperFunctions.hpp>
 #include <CouenneProblem.hpp>
 #include <exprConst.hpp>
 #include <exprQuad.hpp>
@@ -13,6 +14,7 @@
 #include <exprMul.hpp>
 #include <depGraph.hpp>
 
+//#define DEBUG
 
 /// Constructor
 exprQuad::exprQuad  (CouNumber c0,      // constant term
@@ -38,14 +40,21 @@ exprQuad::exprQuad  (CouNumber c0,      // constant term
   qindexJ_ = new int       [nqterms_];
   qcoeff_  = new CouNumber [nqterms_];
 
-  int qi, qj;
+  int qi, qj, maxind = -1;
 
   for (register int i = nqterms_; i--;) {
 
     qindexI_ [i] = qi = qindexI [i];
     qindexJ_ [i] = qj = qindexJ [i];
     qcoeff_  [i] = (qi == qj) ? (qcoeff [i]) : (0.5 * qcoeff [i]); // Division
+
+    if (qi > maxind) maxind = qi;
+    if (qj > maxind) maxind = qj;
   }
+
+  int *indexmap = new int [maxind + 1];
+  make_dIndex (maxind+1, indexmap);
+  delete [] indexmap;
 } 
 
 
@@ -99,17 +108,6 @@ exprQuad::exprQuad  (const exprQuad &src):
 
 /// Destructor
 exprQuad::~exprQuad () {
-
-  register expression *elem;
-
-  if (arglist_) {
-    for (register int i = nargs_; i--;)
-      if ((elem = arglist_ [i]))
-	delete elem;
-
-    delete [] arglist_;
-    arglist_ = NULL;
-  }
 
   if (qindexI_) {
     delete [] qindexI_;
@@ -214,7 +212,7 @@ expression *exprQuad::differentiate (int index) {
   int nl = lmap.size(), *linin = new int [1 + nl], j = 0;
   CouNumber *coeff = new CouNumber [nl];
 
-  for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); i++) {
+  for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); ++i) {
     linin [j]   = i -> first;
     coeff [j++] = i -> second;
   }
@@ -316,6 +314,7 @@ void linsert (std::map <int, CouNumber> &lmap,
 	      int index, CouNumber coe) {
 
   std::map <int, CouNumber>::iterator i = lmap.find (index);
+
   if (i != lmap.end()) {
     if (fabs (i -> second += coe) < COUENNE_EPS)
       lmap.erase (i);
@@ -343,6 +342,8 @@ void qinsert (std::map <std::pair <int, int>, CouNumber> &map,
 /// create dIndex_ based on occurrences in qindexI_ and qindexJ_
 void exprQuad::make_dIndex (int numcols, int *indexmap) { 
 
+  CoinFillN (indexmap, numcols, -1);
+
   int *qindexI = getQIndexI (),
       *qindexJ = getQIndexJ ();
 
@@ -363,14 +364,21 @@ void exprQuad::make_dIndex (int numcols, int *indexmap) {
   for (int i=0; i<numcols; ++i)
     if (indexmap [i] > -1)
       dIndex_ [indexmap [i]] = i;
+
+#ifdef DEBUG
+  printf ("make_Index, %d indices: ", nDiag_);
+  for (int i=0; i<nDiag_; i++)
+    printf ("(%d) %d ", indexmap [i], dIndex_ [i]);
+  printf ("\n");
+#endif
 }
 
 
 /// fill in the set with all indices of variables appearing in the
 /// expression
 int exprQuad::DepList (std::set <int> &deplist, 
-			enum dig_type type,
-			CouenneProblem *p) {
+		       enum dig_type type,
+		       CouenneProblem *p) {
 
   int deps = exprGroup::DepList (deplist, type, p);
 

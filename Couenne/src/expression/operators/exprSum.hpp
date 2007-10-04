@@ -24,48 +24,51 @@ class exprSum: public exprOp {
   /// Constructor with two elements
   exprSum (expression *, expression *);
 
-  /// cloning method
+  /// Empty destructor
+  ~exprSum () {}
+ 
+  /// Cloning method
   virtual expression *clone () const
     {return new exprSum (clonearglist (), nargs_);}
 
-  /// print operator
+  /// Print operator
   std::string printOp () const
     {return "+";}
 
-  /// function for the evaluation of the expression
+  /// Function for the evaluation of the expression
   virtual CouNumber operator () ();
 
-  /// differentiation
+  /// Differentiation
   virtual expression *differentiate (int index); 
 
-  /// simplification
+  /// Simplification
   virtual expression *simplify ();
 
-  /// get a measure of "how linear" the expression is:
+  /// Get a measure of "how linear" the expression is:
   virtual int Linearity ();
 
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  /// reduce expression in standard form, creating additional aux
+  /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)
-  virtual exprAux *standardize (CouenneProblem *p);
+  virtual exprAux *standardize (CouenneProblem *p, bool addAux = true);
 
-  /// special version for linear constraints
+  /// Special version for linear constraints
   virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
 			     CouNumber =  COUENNE_INFINITY);
 
-  /// code for comparison
+  /// Code for comparison
   virtual enum expr_type code () 
     {return COU_EXPRSUM;}
 
-  /// implied bound processing
+  /// Implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
-  /// checks for quadratic terms in the expression and returns an
+  /// Checks for quadratic terms in the expression and returns an
   /// exprQuad if there are enough to create something that can be
   /// convexified
   exprAux *createQuadratic (CouenneProblem *);

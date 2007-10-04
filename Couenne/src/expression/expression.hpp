@@ -217,7 +217,10 @@ class expression {
   /// For the base exprOp class we only do the first part (for argument
   /// list components only), and the calling class (Sum, Sub, Mul, Pow,
   /// and the like) will do the part for its own object
-  virtual inline exprAux *standardize (CouenneProblem *) 
+  ///
+  /// addAux is true if a new auxiliary variable should be added
+  /// associated with the standardized expression
+  virtual inline exprAux *standardize (CouenneProblem *p, bool addAux = true) 
     {return NULL;}
 
   /// generate convexification cut for constraint w = this

@@ -59,7 +59,7 @@ class exprSub: public exprOp {
 
   /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)
-  virtual exprAux *standardize (CouenneProblem *p);
+  virtual exprAux *standardize (CouenneProblem *p, bool addAux = true);
 
   /// Special version for linear constraints
   virtual void generateCuts (exprAux *, const OsiSolverInterface &, 

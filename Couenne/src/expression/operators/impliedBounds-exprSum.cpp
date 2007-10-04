@@ -22,9 +22,6 @@ static CouNumber scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
 
 bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
-  // not yet implemented for quadratic forms... TODO
-  if (code () == COU_EXPRQUAD) return false; 
-
   /**
    *  An expression 
    *
@@ -113,25 +110,6 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   C2 = (CouNumber *) realloc (C2, ineg * sizeof (CouNumber));
 
   // now we have correct  I1, I2, C1, C2, ipos, ineg, and a0
-
-  if (0)
-  if (wind==5) {
-
-    printf ("w_%d = ", wind); print (std::cout);
-
-    printf (" --> w%d [%g,%g] a0 = %g\n", 
-	    wind, l [wind], u [wind], a0);
-
-    printf ("I1 (%d): ", ipos);
-    for (int i=0; i<ipos; i++)
-      printf ("%+.3f x%d [%g,%g] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]);
-
-    printf ("\nI2 (%d): ", ineg);
-    for (int i=0; i<ineg; i++)
-      printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
-
-    printf ("\n");
-    }
 
   // indices of the variable in I1 or I2 with infinite lower or upper
   // bound. If more than one is found, it is set to -2
@@ -293,20 +271,6 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [infLo2]) || tighter)
 	  chg [ind].upper = CHANGED;
       }
-
-  if (0)
-  if (wind==5) {
-
-    printf ("I1 (%d): ", ipos);
-    for (int i=0; i<ipos; i++)
-      printf ("%+.3f x%d [%g,%g] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]);
-
-    printf ("\nI2 (%d): ", ineg);
-    for (int i=0; i<ineg; i++)
-      printf ("%+.3f x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]);
-
-    printf ("\n---------------------------------------------------------------\n");
-  }
 
   // ...phew!
 

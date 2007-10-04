@@ -61,17 +61,6 @@ exprGroup::exprGroup  (const exprGroup &src):
 /// destructor
 exprGroup::~exprGroup () {
 
-  register expression *elem;
-
-  if (arglist_) {
-    for (register int i = nargs_; i--;)
-      if ((elem = arglist_ [i]))
-	delete elem;
-
-    delete [] arglist_;
-    arglist_ = NULL;
-  }
-
   if (index_) {
     delete [] index_;
     delete [] coeff_;

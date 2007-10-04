@@ -9,9 +9,12 @@
 #include <CouenneProblemElem.hpp>
 #include <CouenneProblem.hpp>
 
+#include <CoinHelperFunctions.hpp>
+
 #include <exprSum.hpp>
 #include <exprMul.hpp>
 #include <exprGroup.hpp>
+#include <exprQuad.hpp>
 
 //#define DEBUG
 
@@ -105,7 +108,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     CouNumber c0 = 0., *lincoe = NULL, auxcoe = 1;
     bool which_was_set = false;
 
-    if (code != COU_EXPRSUM) { // check indices of linear part
+    // check indices of linear part /////////////////////////////////
+
+    if (code != COU_EXPRSUM) {
 
       exprGroup *egBody = dynamic_cast <exprGroup *> (body);
 
@@ -143,7 +148,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       which_was_set = true;
     else which = -1;
 
-    // check indices of possible linear elements of (nonlinear) sum
+    // check indices of elements of (nonlinear) sum /////////////////////////////////
 
     for (int i = body -> nArgs (); i--;) {
 
@@ -182,9 +187,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
     ///////////////////////////////////////////////////////////////////
 
-    if (maxindex < 0) break; // no substitute found, bail out of this expression
+    if (maxindex < 0) break; // no substitute found ==> no hidden auxiliary
 
-    // create a new exprGroup or exprSum with all elements but the
+    // create a new exprGroup, exprQuad, or exprSum with all elements but the
     // extracted auxiliary
 
     // start with exprSum
@@ -220,6 +225,11 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     int       *linind2 = NULL;
     CouNumber *lincoe2 = NULL;
 
+    // in case this was (and will be) an exprQuad
+    int *qindI = NULL, 
+        *qindJ = NULL;
+    CouNumber *qcoe = NULL;
+
     if (nlin > 0) { // there is an element in the linear sum to be drawn
 
       int mid = (which >= 0) ? nlin : - which - 1;
@@ -246,6 +256,27 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       for (j++; j<nlin; j++) printf ("<%g x%d> ", lincoe2 [j-1], linind2 [j-1]);
 #endif
 
+      if (code == COU_EXPRQUAD) { // copy quadratic elements
+
+	exprQuad *eq = dynamic_cast <exprQuad *> (body);
+
+	int nqt = eq -> getnQTerms ();
+
+	qindI = new int [nqt];
+	qindJ = new int [nqt];
+	qcoe  = new CouNumber [nqt];
+
+	CoinCopyN (eq -> getQIndexI (), nqt, qindI);
+	CoinCopyN (eq -> getQIndexJ (), nqt, qindJ);
+
+	if (fabs (divider - 1) < COUENNE_EPS)
+	  CoinCopyN (eq -> getQCoeffs (), nqt, qcoe);
+	else {
+	  CouNumber *coe = eq -> getQCoeffs ();
+	  while (nqt--) qcoe [nqt] = divider * coe [nqt];
+	}
+      }
+
       // nl arglist is done, later decide whether to incorporate it as
       // it is or with a coefficient
     }
@@ -258,22 +289,31 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     printf ("\n::: rhs %g, lin %d, nl %d\n", rhs, nlin, nargs);
 #endif
 
-    if ((code == COU_EXPRGROUP) && (nlin > 0)) { 
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // all is ready to take the independent stuff to the other side of
+    // the inequality.
+
+    if ((code == COU_EXPRQUAD) || 
+	(code == COU_EXPRGROUP) && (nlin > 0)) { 
 
       // an exprGroup with at least one linear term left
+      //
+      // build new vectors for index and coeff. Two cases:
+      //
+      // 1)  f(x) + c0 -  w = rhs   =====>   w =       f(x) + c0 - rhs
+      // 2)  f(x) + c0 + aw = rhs   =====>   w = -1/a (f(x) + c0 - rhs), a != -1
 
-      // build new vectors for index and coeff
       if    (fabs (auxcoe + 1) < COUENNE_EPS)
-
-	//      f(x) + c0 -  w = rhs   =====>   w =       f(x) + c0 - rhs
-	rest = new exprGroup (c0 - rhs, linind2, lincoe2, newarglist, nargs);
-
-      else { // f(x) + c0 + aw = rhs   =====>   w = -1/a (f(x) + c0 - rhs), a != -1
+	if (code == COU_EXPRGROUP) rest = new exprGroup (c0-rhs, linind2, lincoe2, newarglist, nargs);
+	else                       rest = new exprQuad  (c0-rhs, linind2, lincoe2, 
+							 qindI, qindJ, qcoe, newarglist, nargs);
+      else {
 
 	expression **mullist = new expression * [1];
 
+	// only nl term is constant
 	if ((nargs <= 1) && ((*newarglist) -> Linearity () <= CONSTANT)) {
-	  // the only nonlinear term is a constant
 	  *mullist = new exprConst ((*newarglist) -> Value ());
 	  //delete *newarglist;
 	  delete [] newarglist;
@@ -283,17 +323,24 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 				  new exprSum (newarglist, nargs));
 
 	// final outcome: -1/a (f(x) + c0 - rhs)
-	rest = new exprGroup (-1. / auxcoe * (c0-rhs), linind2, lincoe2, mullist, 1);
+	if (code == COU_EXPRGROUP) 
+	  rest    = new exprGroup (-1. / auxcoe * (c0-rhs), linind2, lincoe2, mullist, 1);
+	else rest = new exprQuad  (-1. / auxcoe * (c0-rhs), linind2, lincoe2, 
+				   qindI, qindJ, qcoe, mullist, 1);
       }
     }
     else { // simple exprSum
 
-      if (fabs (rhs) > COUENNE_EPS) // have to add constant to exprSum
+      if (fabs (rhs) > COUENNE_EPS) { // have to add constant to exprSum
+
 	if ((nargs == 1) && ((*newarglist) -> Type () == CONST)) {
+
 	  CouNumber val = (*newarglist) -> Value () - rhs;
 	  delete *newarglist;
 	  *newarglist = new exprConst (val);
-	} else newarglist [nargs++] = new exprConst (-rhs);
+	} 
+	else newarglist [nargs++] = new exprConst (-rhs);
+      }
 
       // now exprSum is complete with -rhs. Send it to right hand side
 
@@ -309,7 +356,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       else if ((fabs (auxcoe - 1) < COUENNE_EPS) && 
 	       (auxDef -> code () == COU_EXPROPP))
 	rest = auxDef -> Argument ();
-      else rest = new exprMul (new exprConst (-1/auxcoe), auxDef);
+      else // TODO: check if auxdef is an exprOpp or an exprMul
+	   // (k*f(x)) and -1/auxcoe simplifies
+	rest = new exprMul (new exprConst (-1./auxcoe), new exprClone (auxDef));
     }
 
 #ifdef DEBUG
@@ -337,7 +386,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
   rest -> print ();
 #endif
 
-  int rtype = rest -> Type ();
+  /*
+
+  enum nodeType rtype = rest -> Type ();
 
   if (rtype == UNARY) { //////////////////////////////////////////
 
@@ -359,8 +410,21 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	rest -> ArgList () [i] = new exprClone (aux);
       }
     }
+  */
 
-  //  exprAux *aux = rest -> standardize (p);
+  exprAux *aux = rest -> standardize (p, false);
+
+  if (aux) {
+    rest = aux -> Image () -> clone ();
+    delete aux;
+  }
+
+#ifdef DEBUG
+  printf (" ==> ");
+  rest -> print ();
+  printf ("\n");
+#endif
+
 
 #if 0
   printf ("... done, auxind %d\n", auxInd);
@@ -376,7 +440,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     // find aux in vector and delete it (otherwise LP relaxation will
     // count those variables)
     for (std::vector <exprVar *>:: iterator i = p -> Variables ().begin (); 
-	 i != p -> Variables ().end(); i++)
+	 i != p -> Variables ().end(); ++i)
 
       if ((*i) -> Index() == aux -> Index ()) {
 	printf (" fictitious %d to be erased: ", p -> Variables ().size ());

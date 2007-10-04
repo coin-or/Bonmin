@@ -11,7 +11,6 @@
 #include <CouenneTypes.h>
 #include <CouenneBranchingObject.hpp>
 #include <CouenneObject.hpp>
-#include <projections.h>
 
 
 /// set up branching object by evaluating many branching points for
@@ -26,10 +25,7 @@ CouNumber exprDiv::selectBranch (expression *w,
       yi = arglist_ [1] -> Index (),
       wi = w            -> Index ();
 
-  if ((xi < 0) || (yi < 0)) {
-    printf ("arguments of exprDiv have negative index\n");
-    exit (-1);
-  }
+  assert ((xi >= 0) && (yi >= 0));
 
   // choosing branching variable and -point is difficult, use
   // proportion in bound intervals
@@ -45,18 +41,23 @@ CouNumber exprDiv::selectBranch (expression *w,
   if ((yl < 0) && (yu > 0)) {
 
     ind = yi;
-    brpts = (double *) realloc (brpts, 2 * sizeof (CouNumber));
-    way = THREE_RIGHT;
+    //    brpts = (double *) realloc (brpts, 2 * sizeof (CouNumber));
+    //    way = THREE_RIGHT;
+    way = TWO_RAND;
+    brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
-    brpts [0] = (yl >= -BR_NEXT_ZERO - COUENNE_EPS) ? (yl * BR_MULT) : -BR_NEXT_ZERO;
-    brpts [1] = (yu <=  BR_NEXT_ZERO + COUENNE_EPS) ? (yu * BR_MULT) :  BR_NEXT_ZERO;
+    // TODO: is it better to use TWO_RAND?
+
+    brpts [0] = 0;
+    //    brpts [0] = (yl >= -BR_NEXT_ZERO - COUENNE_EPS) ? (yl * BR_MULT) : -BR_NEXT_ZERO;
+    //    brpts [1] = (yu <=  BR_NEXT_ZERO + COUENNE_EPS) ? (yu * BR_MULT) :  BR_NEXT_ZERO;
 
     return ((fabs (y0) < COUENNE_EPS) ? 1. : 
-	    (info -> solution_ [xi] / y0 - info -> solution_ [w -> Index ()]));
+	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [w -> Index ()]));
   }
 
-  // [yl,yu] can only be unlimited in one sense, and interval does not
-  // contain 0.
+  // From now on, [yl,yu] can only be unlimited in one sense, and
+  // interval does not contain 0.
   //
   // As convexification is still carried out by applying McCormick
   // rules to x=w*y (where original operator is w=x/y), try to get
@@ -80,7 +81,7 @@ CouNumber exprDiv::selectBranch (expression *w,
     way = (y0 > 0) ? TWO_LEFT : TWO_RIGHT;
 
     return ((fabs (y0) < COUENNE_EPS) ? 1. : 
-	    (info -> solution_ [xi] / y0 - info -> solution_ [w -> Index ()]));
+	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [w -> Index ()]));
   }
 
   // y is bounded, and y0 should not be 0; if w is unbounded, it is
@@ -129,7 +130,7 @@ CouNumber exprDiv::selectBranch (expression *w,
       way = (wl < - COUENNE_INFINITY) ? TWO_RIGHT : TWO_LEFT;
     }
 
-    return ((fabs (y0) < COUENNE_EPS) ? 1. : (x0/y0 - w0));
+    return ((fabs (y0) < COUENNE_EPS) ? 1. : fabs (x0/y0 - w0));
   }
 
   // w and y are bounded (and so is x). Choose between x, y, z

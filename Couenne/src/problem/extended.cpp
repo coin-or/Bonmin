@@ -110,7 +110,7 @@ void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod fi
   if (!aux) // print h_i(x,y) <= ub, >= lb
     for (std::vector <exprVar *>::iterator i = variables_.begin ();
 	 i != variables_.end ();
-	 i++) 
+	 ++i) 
 
       if (((*i) -> Type () == AUX) && 
 	  ((*i) -> Multiplicity () > 0)) {

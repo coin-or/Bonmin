@@ -53,6 +53,7 @@ libCouenne_la_SOURCES = \
 	expression/operators/impliedBounds-exprQuad.cpp \
 	expression/operators/impliedBounds-exprDiv.cpp \
 	expression/operators/impliedBounds-exprMul.cpp \
+	expression/operators/compQuadFinBounds.cpp \
 	expression/exprOp.cpp \
 	expression/exprUnary.cpp \
 	expression/exprVar.cpp \

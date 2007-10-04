@@ -13,12 +13,14 @@
 #include <OsiSolverInterface.hpp>
 #include <IpLapack.hpp>
 
+//#define DEBUG
 
 // fill in one of the two dCoeff vectors
 void fill_dCoeff (CouNumber * &, CouNumber, CouNumber *, int);
 
 
 /** Computes alpha coefficients for an alpha under- and overestimator of the quadratic term.
+ *
  * For the underestimator, dCoeffLo_ is computed such that
  *
  * x^TQx + sum_i dCoeffLo_i (x_i - lb x_i)(ub x_i - x-i) is convex and
@@ -55,28 +57,34 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
       indexmap [dIndex_ [i]] = i;
 
   // box diameter
-  double* diam = new double [nDiag_];
-  for (int i=0; i<nDiag_; ++i)
-    diam [i] = 
-      si.getColUpper () [dIndex_ [i]] -
-      si.getColLower () [dIndex_ [i]];
+  double *diam = new double [nDiag_];
+
+  const double
+    *lower = si.getColLower (),
+    *upper = si.getColUpper ();
+
+  for (int i=0; i<nDiag_; ++i) {
+
+    int di = dIndex_ [i];
+    diam [i] = upper [di] - lower [di];
+  }
 
   // lower triangular of quadratic term matrix, scaled by box diameter
-  double* matrix = new double [nDiag_ * nDiag_];
 
-  for (int i=0; i < nDiag_ * nDiag_; ++i)
-    matrix [i] = 0.;
+  double *matrix = new double [nDiag_ * nDiag_];
+
+  CoinFillN (matrix, nDiag_ * nDiag_, 0.);
 
   for (int i=0; i < nqterms_; ++i) {
 
-    int row = indexmap [getQIndexI () [i]];
-    int col = indexmap [getQIndexJ () [i]];
+    int row = indexmap [qindexI_ [i]];
+    int col = indexmap [qindexJ_ [i]];
 
     // compute value of matrix entry = q_ij * (u_i-l_i) * (u_j-l_j)
     // I (Stefan) do not understand the Lapack docu; it says it needs
     // only the lower triangular but it seem to need both parts to
     // work correct
-    double cell = getQCoeffs () [i] * diam [row] * diam [col];
+    double cell = qcoeff_ [i] * diam [row] * diam [col];
 
     matrix          [col * nDiag_ + row] = cell;
     if (row != col) 
@@ -133,8 +141,10 @@ void fill_dCoeff (CouNumber * &dCoeff, CouNumber eigval, CouNumber *diam, int n)
   if (dCoeff == NULL)
     dCoeff = new CouNumber [n];
 
-  for (int i=0; i<n; ++i)
-    dCoeff [i] = (fabs (diam [i]) < COUENNE_EPS) ? 
+  for (int i=n; i--;) {
+    CouNumber di = diam [i];
+    dCoeff [i] = (fabs (di) < COUENNE_EPS) ? 
       0. : 
-      eigval / (diam [i] * diam [i]);
+      eigval / (di * di);
+  }
 }

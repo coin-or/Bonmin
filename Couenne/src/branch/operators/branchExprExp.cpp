@@ -82,7 +82,7 @@ CouNumber exprExp::selectBranch (expression *w,
 
       CouNumber a = y0 - exp (x0), // sides of a triangle with (x0,y0)
 		b = x0 - log (y0), // as one of the vertices
-        	c = a * cos (atan (a/b));
+  	        c = a * cos (atan (a/b)); // all three quantities are nonnegative
 
       return mymin (a, mymin (b, c));
 

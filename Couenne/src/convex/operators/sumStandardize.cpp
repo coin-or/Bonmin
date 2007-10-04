@@ -1,7 +1,7 @@
 /*
  * Name:    sumStandardize.cpp
  * Author:  Pietro Belotti
- * Purpose: check if exprGroup/exprSum contains a lot of quadratic/bilinear terms
+ * Purpose: check if expr{Group,Sum,Sub} contains a lot of quadratic/bilinear terms
  *
  * This file is licensed under the Common Public License (CPL)
  */
@@ -46,7 +46,9 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
 /// general procedure to standardize a sum under different forms
 /// (exprGroup, exprSum, exprSub, exprOpp)
-exprAux *linStandardize (CouenneProblem *, CouNumber, 
+exprAux *linStandardize (CouenneProblem *, 
+			 bool addAux, 
+			 CouNumber, 
 			 std::map <int,                 CouNumber> &,
 			 std::map <std::pair <int,int>, CouNumber> &);
 
@@ -55,8 +57,8 @@ exprAux *linStandardize (CouenneProblem *, CouNumber,
 /// linear/quadratic maps accordingly, if necessary by adding new
 /// auxiliary variables and including them in the linear map
 void analyzeSparsity (CouenneProblem *, CouNumber, 
-			 std::map <int,                 CouNumber> &,
-			 std::map <std::pair <int,int>, CouNumber> &);
+		      std::map <int,                 CouNumber> &,
+		      std::map <std::pair <int,int>, CouNumber> &);
 
 
 /// translate a sum/difference/exprOpp into:
@@ -64,7 +66,7 @@ void analyzeSparsity (CouenneProblem *, CouNumber,
 /// 1) an exprGroup, if only linear terms are present
 /// 2) an exprQuad,  if some quadratic/bilinear terms exist
 
-exprAux *exprSum::standardize (CouenneProblem *p) {
+exprAux *exprSum::standardize (CouenneProblem *p, bool addAux) {
 
   // turn all elements of arglist_ and of the linear part into an exprQuad.
   // count all potential quadratic terms for exprQuad
@@ -110,34 +112,36 @@ exprAux *exprSum::standardize (CouenneProblem *p) {
   }
 
   ////////////////////////////////////////////////////////////////////////////////
-
+  //
   // standardize all nonlinear arguments and put them into linear or
   // quadratic form
 
   for (int i=0; i<nargs_; i++)
     decomposeTerm (p, arglist_ [i], 1, c0, lmap, qmap);
 
+  ////////////////////////////////////////////////////////////////////////////////
+
 #ifdef DEBUG
   printf ("decompTerm returns: [");
-  for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); i++)
+  for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); ++i)
     printf ("<%d,%g>", i -> first, i -> second);
   printf ("] -- [");
-  for (std::map <std::pair <int, int>, CouNumber>::iterator i = qmap.begin (); i != qmap.end (); i++)
+  for (std::map <std::pair <int, int>, CouNumber>::iterator i = qmap.begin (); i != qmap.end (); ++i)
     printf ("<%d,%d,%g>", i -> first.first, i -> first.second, i -> second);
   printf ("]\n");
 #endif
 
-  return linStandardize (p, c0, lmap, qmap);
+  return linStandardize (p, addAux, c0, lmap, qmap);
 }
 
 
 
-/// translate a exprOpp into:
+/// translate an exprOpp into:
 ///
 /// 1) an exprGroup, if only linear terms are present
 /// 2) an exprQuad,  if some quadratic/bilinear terms exist
 
-exprAux *exprOpp::standardize (CouenneProblem *p) {
+exprAux *exprOpp::standardize (CouenneProblem *p, bool addAux) {
 
   // turn all elements of arglist_ and of the linear part into an exprQuad.
   // count all potential quadratic terms for exprQuad
@@ -149,7 +153,7 @@ exprAux *exprOpp::standardize (CouenneProblem *p) {
 
   decomposeTerm (p, argument_, -1, c0, lmap, qmap);
 
-  return linStandardize (p, c0, lmap, qmap);
+  return linStandardize (p, addAux, c0, lmap, qmap);
 }
 
 
@@ -159,7 +163,7 @@ exprAux *exprOpp::standardize (CouenneProblem *p) {
 /// 1) an exprGroup, if only linear terms are present
 /// 2) an exprQuad,  if some quadratic/bilinear terms exist
 
-exprAux *exprSub::standardize (CouenneProblem *p) {
+exprAux *exprSub::standardize (CouenneProblem *p, bool addAux) {
 
   // turn all elements of arglist_ and of the linear part into an exprQuad.
   // count all potential quadratic terms for exprQuad
@@ -177,14 +181,16 @@ exprAux *exprSub::standardize (CouenneProblem *p) {
   decomposeTerm (p, arglist_ [0],  1, c0, lmap, qmap);
   decomposeTerm (p, arglist_ [1], -1, c0, lmap, qmap);
 
-  return linStandardize (p, c0, lmap, qmap);
+  return linStandardize (p, addAux, c0, lmap, qmap);
 }
 
 
 
 /// standardization of linear exprOp's
 
-exprAux *linStandardize (CouenneProblem *p, CouNumber c0, 
+exprAux *linStandardize (CouenneProblem *p, 
+			 bool addAux, 
+			 CouNumber c0, 
 			 std::map <int,                 CouNumber> &lmap,
  			 std::map <std::pair <int,int>, CouNumber> &qmap) {
 
@@ -229,15 +235,16 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
 
   // particular cases ///////////////////////////////////////////////////////////
 
-  exprAux *ret;
+  expression *ret;
 
   // a constant
   if ((nq==0) && (nl==0)) ret = p -> addAuxiliary (new exprConst (c0));
 
   else if ((nq==0) && (fabs (c0) < COUENNE_EPS) && (nl==1)) {   // a linear monomial, cx
 
-    if (fabs (*lc - 1) < COUENNE_EPS) ret = p -> addAuxiliary (new exprClone (p -> Var (*li)));
-    else ret = p -> addAuxiliary (new exprMul (new exprConst (*lc), new exprClone (p -> Var (*li))));
+    if (fabs (*lc - 1) < COUENNE_EPS) 
+      ret    = new exprClone (p -> Var (*li));
+    else ret = new exprMul (new exprConst (*lc), new exprClone (p -> Var (*li)));
 
   } else if ((nl==0) && (fabs (c0) < COUENNE_EPS) && (nq==1)) { 
 
@@ -250,8 +257,8 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
 					new exprClone (p -> Var (*qj)));
 
     if (fabs (*qc - 1) < COUENNE_EPS) 
-      ret    = p -> addAuxiliary (quad);
-    else ret = p -> addAuxiliary (new exprMul (new exprConst (*qc), quad));
+      ret    = quad;
+    else ret = new exprMul (new exprConst (*qc), quad);
 
   } else {
 
@@ -260,9 +267,9 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
     expression **zero = new expression * [1];
     *zero = new exprConst (0.);
 
-    ret = (nq==0) ? 
-      (p -> addAuxiliary (new exprGroup (c0, li, lc,             zero, 1))) :
-      (p -> addAuxiliary (new exprQuad  (c0, li, lc, qi, qj, qc, zero, 1)));
+    ret = ((nq==0) ? 
+      (new exprGroup (c0, li, lc,             zero, 1)) :
+      (new exprQuad  (c0, li, lc, qi, qj, qc, zero, 1)));
   }
 
   delete [] li;
@@ -273,9 +280,9 @@ exprAux *linStandardize (CouenneProblem *p, CouNumber c0,
 
 #ifdef DEBUG
   printf ("\nlinstand ==> "); 
-  ret -> print (); printf (" := "); 
-  ret -> Image () -> print (); printf ("\n");
+  ret -> print (); printf ("\n"); 
+  //  ret -> Image () -> print (); printf ("\n");
 #endif
 
- return ret;
+  return (addAux ? (p -> addAuxiliary (ret)) : new exprAux (ret));
 }

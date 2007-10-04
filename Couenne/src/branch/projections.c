@@ -33,11 +33,8 @@ CouNumber project (CouNumber a, CouNumber b, CouNumber c,
   if (fabs (t) < COUENNE_EPS) return 0.; 
 
   /* check if point satisfies inequality */
-  if ((sign > 0) && (t < 0.)) return 0.;
-  if ((sign < 0) && (t > 0.)) return 0.;
-
-  /* don't need sign any longer, take its absolute value */
-  if (t<0) t = -t;
+  if      (sign > 0) {if (t < 0.) return 0.;}
+  else if (sign < 0) {if (t > 0.) return 0.;}
 
   /* t corresponding to intersection point */
   t /= sqrt (a*a + b*b);
@@ -46,6 +43,9 @@ CouNumber project (CouNumber a, CouNumber b, CouNumber c,
   xpr = x0 + a*t;
   ypr = y0 + b*t;
 
+  /* don't need sign any longer, take its absolute value */
+  if (t < 0.) t = -t;
+
   /* if projected point is outside [lb,ub], set xp to closest bound
      and yp accordingly, and compute distance to (x0,y0) */
   if ((xpr < lb) || (xpr > ub)) {
@@ -53,7 +53,7 @@ CouNumber project (CouNumber a, CouNumber b, CouNumber c,
     if      (xpr < lb) xpr = lb; 
     else if (xpr > ub) xpr = ub; 
 
-    ypr = (- c - a* xpr) / b - y0;
+    ypr = (- c - a * xpr) / b - y0;
     xpr -= x0;
 
     t = sqrt (xpr * xpr + ypr * ypr);
@@ -71,7 +71,7 @@ CouNumber project (CouNumber a, CouNumber b, CouNumber c,
 /*  Compute best branching point (within interval [lb,ub]) given
  *  function f, its derivative fp and the current optimum (x0,y0)
  */
-
+/*
 CouNumber bestBranchPoint (CouNumber lb, CouNumber ub, 
 			   CouNumber x0, CouNumber y0, 
 			   unary_function f,
@@ -79,7 +79,7 @@ CouNumber bestBranchPoint (CouNumber lb, CouNumber ub,
 
   return 0;
 }
-
+*/
 /*
 int main (int argc, char **argv) {
 

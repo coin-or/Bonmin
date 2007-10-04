@@ -22,13 +22,14 @@
 void analyzeSparsity (CouenneProblem *p, CouNumber c0, 
 		      std::map <int,                 CouNumber> &lmap,
 		      std::map <std::pair <int,int>, CouNumber> &qmap) {
-  //  return;
+
+  return; // comment this if you don't want exprQuad's around
 
   // flatten exprQuad to a sum of terms (disaggregate). This is while
   // we are testing exprQuad's
 
   for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.begin ();
-       i != qmap.end (); i++) {
+       i != qmap.end (); ++i) {
 
     int indI = i -> first.first,
         indJ = i -> first.second;

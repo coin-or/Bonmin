@@ -73,7 +73,7 @@ class exprOpp: public exprUnary {
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// standardization (to deal with complex arguments)
-  exprAux *standardize (CouenneProblem *);
+  exprAux *standardize (CouenneProblem *, bool addAux = true);
 };
 
 #endif

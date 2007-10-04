@@ -29,32 +29,36 @@ std::map <int, CouNumber> Qroot::Qmap;
 
 // Create standard formulation of this expression
 
-exprAux *exprPow::standardize (CouenneProblem *p) {
+exprAux *exprPow::standardize (CouenneProblem *p, bool addAux) {
 
   exprOp::standardize (p);
+
+  expression *ret;
 
   if (arglist_ [0] -> Type () == CONST) { // expression is a^y, reduce
 					  // to exp (x * log a)
     CouNumber base = arglist_ [0] -> Value ();
 
     if (fabs (base - M_E) < COUENNE_EPS) // is base e = 2.7182818...
-      return p -> addAuxiliary (new exprExp (new exprClone (arglist_ [1])));
+      ret = new exprExp (new exprClone (arglist_ [1]));
     else // no? convert k^x to e^(x log (k))
-      return p -> addAuxiliary 
-	(new exprExp (new exprClone 
-		      (p -> addAuxiliary (new exprMul (new exprClone (arglist_ [1]), 
-						       new exprConst (log (base)))))));
+      ret = new exprExp (new exprClone 
+			 (p -> addAuxiliary (new exprMul (new exprClone (arglist_ [1]), 
+							  new exprConst (log (base))))));
   }
   else
     if (arglist_ [1] -> Type () != CONST) //  x^y, convert to exp (y*log(x));
-      return p -> addAuxiliary 
-	(new exprExp (new exprClone (p -> addAuxiliary 
-		      (new exprMul 
-		       (new exprClone (arglist_ [1]), 
-			new exprClone (p -> addAuxiliary 
-				       (new exprLog (new exprClone (arglist_ [0])))))))));
+      ret = new exprExp (new exprClone (p -> addAuxiliary 
+					(new exprMul 
+					 (new exprClone (arglist_ [1]), 
+					  new exprClone 
+					  (p -> addAuxiliary 
+					   (new exprLog (new exprClone (arglist_ [0]))))))));
 
-    else return p -> addAuxiliary (this);  // expression is x^k, return as it is
+    else // expression is x^k, return as it is
+      return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this));
+
+  return (addAux ? (p -> addAuxiliary (ret)) : new exprAux (ret));
 }
 
 

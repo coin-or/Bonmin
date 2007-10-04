@@ -71,7 +71,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   if ((now = (CoinCpuTime () - now)) > 10.)
     printf ("Couenne: standardization time %.3fs\n", now);
 
-  //readOptimum ("optimum-3_1_1.txt", optimum_, bestObj_, this);
+  //  readOptimum ("alkyl.txt", optimum_, bestObj_, this);
 
 #ifdef DEBUG
   print (std::cout);
@@ -146,17 +146,17 @@ CouenneProblem::~CouenneProblem () {
 
   // delete objectives
   for (std::vector <CouenneObjective *>::iterator i  = objectives_ . begin ();
-       i != objectives_ . end (); i++)
+       i != objectives_ . end (); ++i)
     delete (*i);
 
   // delete constraints
   for (std::vector <CouenneConstraint *>::iterator i = constraints_ . begin ();
-       i != constraints_ . end (); i++)
+       i != constraints_ . end (); ++i)
     delete (*i);
 
   // delete variables
   for (std::vector <exprVar *>::iterator i = variables_ . begin ();
-       i != variables_ . end (); i++)
+       i != variables_ . end (); ++i)
     delete (*i);
 
   // delete extra structures

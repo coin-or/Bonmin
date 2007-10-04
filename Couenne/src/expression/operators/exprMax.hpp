@@ -62,7 +62,7 @@ class exprMax: public exprOp {
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)
-  virtual inline exprAux *standardize (CouenneProblem *)
+  virtual inline exprAux *standardize (CouenneProblem *, bool addAux = true)
     {return NULL;}
 
   /// generate equality between *this and *w

@@ -32,16 +32,14 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
   // structure)
 
 #ifdef DEBUG
-  printf (":#:#:#:#:#:#:#: standardizing constraint: "); print ();
+  printf ("################################\nStandardizing constraint: "); print ();
 
   printf (" ["); fflush (stdout);
   lb_ -> print ();
   printf (","); fflush (stdout);
   ub_ -> print ();
-  /*  printf ("] {with auxset = ");*/
-
-
-  /*  for (std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> begin ();
+  /*  printf ("] {with auxset = ");
+  for (std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> begin ();
        i != p -> AuxSet () -> end (); i++) {
     printf ("<"); (*i) -> print (); 
     printf (","); (*i) -> Image () -> print (); printf ("> ");
@@ -85,6 +83,7 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
 	// wind) with newly created auxiliary
 	p -> auxiliarize (w);
       } 
+
 #ifdef DEBUG
       else {
 	printf ("found aux occurrence of "); 

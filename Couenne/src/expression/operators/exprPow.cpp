@@ -66,6 +66,8 @@ expression *exprPow::differentiate (int index) {
       !(arglist_ [1] -> dependsOn (&index, 1)))
     return new exprConst (0);
 
+  // TODO: two cases
+
   expression **alm  = new expression * [2];
   expression **alp  = new expression * [2];
   expression **als  = new expression * [2];

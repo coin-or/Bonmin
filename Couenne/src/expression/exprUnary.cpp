@@ -55,19 +55,18 @@ int exprUnary::compare (exprUnary  &e1) {
 // - returning linear counterpart as new constraint (to replace 
 //   current one)
 
-exprAux *exprUnary::standardize (CouenneProblem *p) {
+exprAux *exprUnary::standardize (CouenneProblem *p, bool addAux) {
 
   exprAux *subst;
 
   if ((subst = argument_ -> standardize (p)))
     argument_ = new exprClone (subst);
 
-  return p -> addAuxiliary (this);
+  return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this));
 }
 
 
 /// replace variable with other
-
 void exprUnary::replace (exprVar *x, exprVar *w) {
 
   if (argument_ -> Type () == VAR) {
@@ -77,6 +76,7 @@ void exprUnary::replace (exprVar *x, exprVar *w) {
     }
   } else argument_ -> replace (x, w);
 }
+
 
 /// is this expression integer?
 bool exprUnary::isInteger () {

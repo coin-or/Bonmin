@@ -116,8 +116,8 @@ class exprCopy: public expression {
     {copy_ -> getBounds (lower, upper);}
 
   /// Create standard formulation of this expression
-  inline exprAux *standardize (CouenneProblem *p)
-    {return copy_ -> standardize (p);}
+  inline exprAux *standardize (CouenneProblem *p, bool addAux = true)
+    {return copy_ -> standardize (p, addAux);}
 
   /// generate convexification cut for constraint w = this
   inline void generateCuts (exprAux *w, const OsiSolverInterface &si, 

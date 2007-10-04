@@ -46,10 +46,10 @@ CouNumber exprLog::selectBranch (expression *w,
   ind    = argument_ -> Index ();
   int wi = w         -> Index ();
 
-  if ((ind < 0) || (wi < 0)) 
-    {printf ("Couenne, w=log(x): negative index\n"); exit (-1);}
+  assert ((ind >= 0) && (wi >= 0));
 
-  CouNumber y0 = info -> solution_ [wi],
+  CouNumber 
+    y0 = info -> solution_ [wi],
     x0 = info -> solution_ [ind],
     l  = info -> lower_    [ind],
     u  = info -> upper_    [ind];
@@ -95,7 +95,7 @@ CouNumber exprLog::selectBranch (expression *w,
     brpts [1] = x0;       //      vertical                north
 
     CouNumber a = x0 - exp (y0), // sides of a triangle with (x0,y0)
-              b = y0 - log (x0), // as one of the vertices
+              b = log (x0) - y0, // as one of the vertices
               c = a * cos (atan (a/b));
 
     return mymin (a, mymin (b, c));
@@ -113,7 +113,7 @@ CouNumber exprLog::selectBranch (expression *w,
       *brpts = (l+u) / 2;
 
     way = TWO_RIGHT;
-    return mymin (x0 - exp (y0), y0 - log (x0));
+    return mymin (x0 - exp (y0), log (x0) - y0);
   }
  
   if (u > COUENNE_INFINITY) { // l is far from zero
@@ -122,7 +122,7 @@ CouNumber exprLog::selectBranch (expression *w,
     if (*brpts < l + COUENNE_NEAR_BOUND)
       *brpts = l+1;
     way = TWO_LEFT;
-    return y0 - log (x0);
+    return log (x0) - y0;
   } 
 
   // both are finite

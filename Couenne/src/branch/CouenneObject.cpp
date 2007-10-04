@@ -42,13 +42,6 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 		      const_cast <CouNumber *> (info -> lower_),
 		      const_cast <CouNumber *> (info -> upper_));
 
-  expression *fixvar = reference_ -> Image () -> getFixVar ();
-
-  int index = -1;
-
-  if (fixvar) 
-    index = fixvar -> Index ();
-
   /*if (index < 0) {
     printf ("CouenneObject::infeasibility: Warning, fixvar has no index\n");
     return 0.;
@@ -94,18 +87,27 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
       (reference_, info,             // input parameters
        brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
 
-    if ((brVarInd_ < 0) && (index < 0)) {
-      printf ("error, neither getFixVar() nor selectBranch returned a valid branching variable\n");
-      exit (-1);
+    if (brVarInd_ >= 0) {
+
+      delta = improv;
+      //      expression *fixvar = reference_ -> Image () -> getFixVar ();
+
+      /*
+      if (fixvar) 
+	brVarInd_ = fixvar -> Index ();
+
+      assert (brVarInd_ >= 0);
+      */
+      whichWay_ = whichWay;
     }
 
-    whichWay_ = whichWay;
-
-    if ((brVarInd_ >= 0) && (improv >= 0))
+    /*
+    if (improv >= 0)
       delta = improv;
 
-    if (fabs (delta) < COUENNE_EPS)
+    if (fabs (improv) < COUENNE_EPS)
       delta = 0.;
+    */
 
     // This should make getFixVar() useless if used in exprMul or
     // exprDiv, i.e., the only non-unary operators.
@@ -137,10 +139,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 				      const OsiBranchingInformation *info) const {
   int index = reference_ -> Index ();
 
-  if (index < 0) {   // should never happen...
-    printf ("Warning, CouenneObject::feasibleRegion: reference_'s index negative\n");
-    return 0;
-  }
+  assert (index >= 0);
 
   double val = info -> solution_ [index];
 
@@ -152,7 +151,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
   // fix all variables upon which this auxiliary depends
 
-  if (expr -> Argument ()) { // unary function
+  if (expr -> Type () == UNARY) { // unary function
 
     index = expr -> Argument () -> Index ();
 
@@ -164,12 +163,12 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   }
   else // n-ary function
 
-    if (expr -> ArgList ()) {
+    if (expr -> Type () == N_ARY) {
 
       expression ** args = expr -> ArgList ();
       int nargs = expr -> nArgs ();
 
-      for (register int i = 0 ; i < nargs ; i++) {
+      for (register int i=0; i < nargs; i++) {
 
 	if ((index = args [i] -> Index()) >= 0) {
 	  val = info -> solution_ [index];

@@ -43,7 +43,7 @@ CouNumber exprInv::selectBranch (expression *w,
   ind    = argument_ -> Index ();
   int wi = w         -> Index ();
 
-  if ((ind < 0) || (wi < 0)) {printf ("Couenne, w=exp(x): negative index\n"); exit (-1);}
+  assert ((ind >= 0) && (wi >= 0));
 
   CouNumber y0 = info -> solution_ [wi],
             x0 = info -> solution_ [ind],
@@ -64,11 +64,10 @@ CouNumber exprInv::selectBranch (expression *w,
     brpts [1] = (u <=   BR_NEXT_ZERO + COUENNE_EPS) ? (u * BR_MULT) :   BR_NEXT_ZERO;
 
     return ((fabs (x0) < COUENNE_EPS) ? 1. : 
-	    (1 / x0 - info -> solution_ [wi]));
+	    fabs (1 / x0 - info -> solution_ [wi]));
   }
 
   // case 2: look if inside or outside of belly (refer to branchExprExp.cpp)
-
 
   if (x0*y0 < 1) { // outside bellies 
 
@@ -84,10 +83,9 @@ CouNumber exprInv::selectBranch (expression *w,
     CouNumber dy = y0 - 1. / *brpts;
     x0 -= *brpts;
     return sqrt (x0*x0 + dy*dy);
-
   }
 
-  // Inside. Two cases:
+  // Inside, x0*y0 >= 1. Two cases:
  
   if ((l <   COUENNE_EPS) && (u >   COUENNE_INFINITY) || 
       (u > - COUENNE_EPS) && (l < - COUENNE_INFINITY)) {
@@ -98,12 +96,12 @@ CouNumber exprInv::selectBranch (expression *w,
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
     way = THREE_CENTER; // focus on central convexification first
 
-    brpts [0] = x0;        // draw vertical   from (x0,y0) south (north) to curve y=1/x
-    brpts [1] = 1. / (y0); //      horizontal              west  (east)
+    brpts [0] = x0;      // draw vertical   from (x0,y0) south (north) to curve y=1/x
+    brpts [1] = 1. / y0; //      horizontal              west  (east)
 
-    CouNumber a = y0 - 1 / x0, // sides of a triangle with (x0,y0)
-      b = x0 - 1 / y0, // as one of the vertices
-      c = a * cos (atan (a/b));
+    CouNumber a = fabs (y0 - 1 / x0), // sides of a triangle with (x0,y0)
+              b = fabs (x0 - 1 / y0), // as one of the vertices
+              c = a * cos (atan (a/b));
 
     return mymin (a, mymin (b, c));
   }

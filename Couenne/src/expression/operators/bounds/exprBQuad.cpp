@@ -8,7 +8,11 @@
 
 #include <exprBQuad.hpp>
 
+//#define DEBUG
+
 CouNumber computeQBound (int sign, exprQuad *e) {
+
+  //  return (sign > 0) ? COUENNE_INFINITY : -COUENNE_INFINITY;
 
   // compute lower (if sign == -1) or upper (sign == +1) bound of an
   // exprQuad based on the information obtained through
@@ -40,64 +44,157 @@ CouNumber computeQBound (int sign, exprQuad *e) {
     *qc = e -> getQCoeffs (),
     *lb = expression::Lbounds (),
     *ub = expression::Ubounds (),
-    bound = e -> getc0 ();
+    bound = e -> getc0 (),
+    term;
 
-  if (sign < 0) { // compute lower bound
+#ifdef DEBUG
+  printf ("\n");
+  for (int i=0; i<12; i++) printf ("%3d [%g,%g]\n",i, lb [i], ub [i]);
+  e -> print ();
+  printf ("\n (%g)\n ", bound);
+#endif
+
+  if (sign < 0) { // compute lower bound ////////////////////////////////////////////////
 
     while (nlt--) {
 
-      CouNumber coe = *lc++;
-      int       ind = *li++;
+#ifdef DEBUG
+      printf ("lin %d %g %g ", *li, *lc, (*lc < 0) ? ub [*li] : lb [*li]);
+#endif
 
-      if (coe < 0) bound += coe * ub [ind];
-      else         bound += coe * lb [ind];
+      if (*lc < 0) {if ((term = ub [*li++]) >  COUENNE_INFINITY) return -COUENNE_INFINITY;} 
+      else         {if ((term = lb [*li++]) < -COUENNE_INFINITY) return -COUENNE_INFINITY;}
+
+      bound += *lc++ * term;
+
+#ifdef DEBUG
+      printf (" --> %g\n", bound);
+#endif
     }
 
     while (nqt--) {
 
-      int       i = *qi++,
-                j = *qj++;
+      int i = *qi++,
+          j = *qj++;
 
-      CouNumber coe = *qc++,
-  	        lbi = lb [i],
-  	        ubi = ub [i],
-  	        lbj = lb [j],
-         	ubj = ub [j],
- 	        b1 = coe * lbi * lbj,
- 	        b2 = coe * lbi * ubj,
- 	        b3 = coe * ubi * lbj,
- 	        b4 = coe * ubi * ubj;
+      CouNumber 
+	coe = *qc++,
+	lbi = lb [i],
+	ubi = ub [i];
 
-      if ((i!=j) || (lbi >= 0) || (ubi <= 0))
-	bound += mymin (mymin (b1, b2), mymin (b3, b4));
+      if (i==j) {
+
+	if (coe > 0) term = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0;
+	else if ((term = mymax (lbi*lbi, ubi*ubi)) > COUENNE_INFINITY) 
+	  return -COUENNE_INFINITY;
+
+	term *= coe;
+
+#ifdef DEBUG
+	printf ("Qii %d %g %g -> %g\n", i, coe, term, bound + term);
+#endif
+      } else {
+
+	coe *= 2;
+
+	CouNumber
+	  lbj = lb [j], ubj = ub [j],
+	  b1 = coe * lbi * lbj, 
+	  b2 = coe * lbi * ubj,
+	  b3 = coe * ubi * lbj, 
+	  b4 = coe * ubi * ubj;
+
+	if (fabs (lbi) == 0) b1 = b2 = 0;
+	if (fabs (lbj) == 0) b1 = b3 = 0;
+	if (fabs (ubi) == 0) b3 = b4 = 0;
+	if (fabs (ubj) == 0) b2 = b4 = 0;
+
+	if ((term = mymin (mymin (b1, b2), mymin (b3, b4))) < -COUENNE_INFINITY) 
+	  return -COUENNE_INFINITY; 
+
+#ifdef DEBUG
+	printf ("Qij %d %d %g %g -> %g\n", i, j, coe, term, bound + term);
+#endif
+      }
+
+      //      if ((i!=j) || (lbi >= 0) || (ubi <= 0))
+      bound += term;
     }
-  } else { // compute upper bound
+  } else { // compute upper bound /////////////////////////////////////////////////////////////
 
-    while (nlt--) {
+    while (nlt--) { // linear part
 
-      CouNumber coe = *lc++;
-      int       ind = *li++;
+#ifdef DEBUG
+      printf ("lin %d %g %g %g\n", *li, *lc, (*lc < 0) ? ub [*li] : lb [*li], bound);
+#endif
 
-      if (coe > 0) bound += coe * ub [ind];
-      else         bound += coe * lb [ind];
+      if (*lc > 0) {if ((term = ub [*li++]) >  COUENNE_INFINITY) return COUENNE_INFINITY;}
+      else         {if ((term = lb [*li++]) < -COUENNE_INFINITY) return COUENNE_INFINITY;}
+
+      bound += *lc++ * term;
     }
 
-    while (nqt--) {
+    while (nqt--) { // quadratic part
 
-      int       i = *qi++,
-                j = *qj++;
+      int i = *qi++,
+          j = *qj++;
 
-      CouNumber coe = *qc++,
-  	        lbi = lb [i],
-  	        ubi = ub [i],
-  	        lbj = lb [j],
-         	ubj = ub [j],
- 	        b1 = coe * lbi * lbj,
- 	        b2 = coe * lbi * ubj,
- 	        b3 = coe * ubi * lbj,
- 	        b4 = coe * ubi * ubj;
+      CouNumber 
+	coe = *qc++,
+	lbi = lb [i], 
+	ubi = ub [i];
 
-      bound += mymax (mymax (b1, b2), mymax (b3, b4));
+      if (i==j) {
+
+	if (coe > 0) term = mymax (lbi * lbi, ubi * ubi);
+	else         term = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0;
+
+	if (term > COUENNE_INFINITY) 
+	  return COUENNE_INFINITY;
+
+	term *= coe;
+
+#ifdef DEBUG
+	printf ("Qii %d %g %g --> %g ", i, coe, term, bound + term);
+#endif
+      } else {
+
+	coe *= 2;
+
+	CouNumber 
+	  lbj = lb [j], 
+	  ubj = ub [j],
+	  b1 = coe * lbi * lbj,
+	  b2 = coe * lbi * ubj,
+	  b3 = coe * ubi * lbj,
+	  b4 = coe * ubi * ubj;
+
+	// I hate this... but when you see 
+	//
+	//   mymax (mymax (-0, nan), mymax (nan, -inf)) =
+	// = mymax (nan, -inf) = -inf
+	//
+	// you feel changed.
+
+	if (fabs (lbi) == 0) b1 = b2 = 0;
+	if (fabs (lbj) == 0) b1 = b3 = 0;
+	if (fabs (ubi) == 0) b3 = b4 = 0;
+	if (fabs (ubj) == 0) b2 = b4 = 0;
+
+	if ((term = mymax (mymax (b1, b2), mymax (b3, b4))) > COUENNE_INFINITY)
+	  return COUENNE_INFINITY;
+
+#ifdef DEBUG
+	printf ("Qij %d %d %g %g -> %g [%g,%g,%g,%g] (%g,%g,%g,%g) {%g,%g,%g}\n", 
+		i, j, coe, term, bound + term,
+		lbi, ubi, lbj, ubj, 
+		b1, b2, b3, b4,
+		mymax (b1, b2), mymax (b3, b4),
+		mymax (mymax (b1, b2), mymax (b3, b4)));
+#endif
+      }
+
+      bound += term;
     }
   }
 

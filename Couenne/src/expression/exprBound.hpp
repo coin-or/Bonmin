@@ -42,6 +42,14 @@ class exprLowerBound: public exprVar {
   exprLowerBound (int varIndex): 
     exprVar (varIndex) {}
 
+  /// Copy constructor
+  exprLowerBound (const exprLowerBound &src): 
+    exprVar (src) {}
+
+  /// cloning method
+  exprLowerBound *clone () const
+    {return new exprLowerBound (*this);}
+
   /// Print to iostream
   void print (std::ostream &out = std::cout, 
 	      bool = false, CouenneProblem * = NULL) const
@@ -82,6 +90,14 @@ class exprUpperBound: public exprVar {
   /// Constructor
   exprUpperBound (int varIndex): 
     exprVar (varIndex) {}
+
+  /// Copy constructor
+  exprUpperBound (const exprUpperBound &src): 
+    exprVar (src) {}
+
+  /// cloning method
+  exprUpperBound *clone () const
+    {return new exprUpperBound (*this);}
 
   /// Print to iostream
   void print (std::ostream &out = std::cout, 

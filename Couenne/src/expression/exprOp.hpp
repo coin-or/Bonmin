@@ -47,7 +47,7 @@ class exprOp: public expression {
     {arglist_ [0] = arg0; arglist_ [1] = arg1;}
 
   /// Destructor
-  ~exprOp ();
+  virtual ~exprOp ();
 
   /// Copy constructor: only allocate space for argument list, which
   /// will be copied with clonearglist()
@@ -117,7 +117,7 @@ class exprOp: public expression {
     {return NONLINEAR;}
 
   /// generate auxiliary variable
-  virtual exprAux *standardize (CouenneProblem *);
+  virtual exprAux *standardize (CouenneProblem *, bool addAux = true);
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap

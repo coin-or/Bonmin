@@ -16,7 +16,7 @@ bool DepNode::depends (int xi, bool recursive) const {
 
   // check if any node of the forward star has index xi
   for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin (); 
-       i != depList_ -> end (); i++)
+       i != depList_ -> end (); ++i)
 
     if (((*i) -> Index () == xi) || // check current node
 	(recursive && 
@@ -44,7 +44,7 @@ void DepNode::createOrder (DepGraph *g) {
   //  printf ("[%d ", index_); fflush (stdout);
 
   for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin();
-       i != depList_ -> end (); i++)
+       i != depList_ -> end (); ++i)
     if ((*i) -> Order () == -1)
       (*i) -> createOrder (g);
 
@@ -66,7 +66,7 @@ void DepNode::print (int indent) const {
     printf ("("); fflush (stdout);
 
     for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin();
-	 i != depList_ -> end (); i++)
+	 i != depList_ -> end (); ++i)
       (*i) -> print (indent + 1);
 
     printf (") "); fflush (stdout);
@@ -131,7 +131,7 @@ bool DepGraph::depends (int wi, int xi, bool recursive) {
 void DepGraph::createOrder () {
 
   for (std::set <DepNode *, compNode>::iterator i = vertices_. begin();
-       i != vertices_. end (); i++)
+       i != vertices_. end (); ++i)
     (*i) -> createOrder (this);
 }
 
@@ -141,7 +141,7 @@ void DepGraph::print () {
 
   printf ("------------------------------ dependence graph\n");
   for (std::set <DepNode *, compNode>::iterator i = vertices_. begin();
-       i != vertices_. end (); i++) {
+       i != vertices_. end (); ++i) {
     (*i) -> print ();
     printf ("\n");
   }

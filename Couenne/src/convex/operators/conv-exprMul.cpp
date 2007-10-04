@@ -28,11 +28,12 @@ inline bool areSameVariables (expression *v1, expression *v2) {
 
 /// Create standard formulation of this expression
 
-exprAux *exprMul::standardize (CouenneProblem *p) {
+exprAux *exprMul::standardize (CouenneProblem *p, bool addAux) {
 
   exprOp::standardize (p);
 
-  if (nargs_ == 1) return NULL;
+  if (nargs_ == 1)  // TODO: what really happens?
+    return NULL;
   /* {
      exprAux *aux = arglist_ [0];
      arglist_ [0] = NULL;
@@ -41,14 +42,16 @@ exprAux *exprMul::standardize (CouenneProblem *p) {
 
   expression *aux = new exprClone (arglist_ [0]);
 
-  for (int i=1; i < nargs_ - 1; i++)
-    if (areSameVariables (aux, arglist_ [i]))
-         aux = p -> addAuxiliary (new exprPow (aux, new exprConst (2)));
-    else aux = p -> addAuxiliary (new exprMul (aux, new exprClone (arglist_ [i])));
+  for (int i = 1; i < nargs_ - 1; i++)
+    aux = (areSameVariables (aux, arglist_ [i])) ? 
+      (p -> addAuxiliary (new exprPow (aux, new exprConst (2)))) : 
+      (p -> addAuxiliary (new exprMul (aux, new exprClone (arglist_ [i]))));
 
-  if (areSameVariables (aux, arglist_ [nargs_ - 1]))
-       return  p -> addAuxiliary (new exprPow (aux, new exprConst (2)));
-  else return  p -> addAuxiliary (new exprMul (aux, new exprClone (arglist_ [nargs_ - 1])));
+  if (areSameVariables (aux, arglist_ [nargs_ - 1])) 
+    aux    = new exprPow (aux, new exprConst (2));
+  else aux = new exprMul (aux, new exprClone (arglist_ [nargs_ - 1]));
+
+  return (addAux ? (p -> addAuxiliary (aux)) : new exprAux (this));
 }
 
 

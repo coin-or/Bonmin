@@ -15,6 +15,7 @@
 // max # bound tightening iterations
 #define MAX_BT_ITER 10
 
+//#define DEBUG
 
 /// procedure to strengthen variable bounds. Return false if problem
 /// turns out to be infeasible with given bounds, true otherwise.
@@ -25,6 +26,13 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
 					   Bonmin::BabInfo * babInfo) const {
 
   int objInd = problem_ -> Obj (0) -> Body () -> Index ();
+
+#ifdef DEBUG
+  printf ("===================== BT\n");
+    for (int i=0; i < problem_ -> nVars (); i++)
+      //if (variables_ [i] -> Multiplicity () > 0)
+      printf ("x%d: [%g,%g]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));
+#endif
 
   /////////////////////// MIP bound management /////////////////////////////////
 
@@ -94,15 +102,11 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
     ntightened = ((nbwtightened > 0) || first) ? 
       problem_ -> tightenBounds (chg_bds) : 0;
 
-    //    printf ("#### propagate ---> %d\n", ntightened);
-
     // implied bounds. Call also at the beginning, as some common
     // expression may have non-propagated bounds
 
     // if last call didn't signal infeasibility
     nbwtightened = ((ntightened > 0) || first) ? problem_ -> impliedBounds (chg_bds) : 0;
-
-    //    printf ("#### implied ---> %d\n", nbwtightened);
 
     if (first)
       first = false;
@@ -132,13 +136,20 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
     }
 
   } while (((ntightened > 0) || (nbwtightened > 0)) && (niter++ < MAX_BT_ITER));
+
   // continue if EITHER procedures gave (positive) results, as
   // expression structure is not a tree.
 
   // TODO: limit should depend on number of constraints, that is,
   // bound transmission should be documented and the cycle should stop
   // as soon as no new constraint subgraph has benefited from bound
-  // transmission.
+  // transmission. 
+
+  // In other words, BT should be more of a graph spanning procedure
+  // that moves from one vertex to another when either tightening
+  // procedure has given some result. This should save some time
+  // especially w.r.t. applying implied bounds to ALL expressions just
+  // because one single propagation was found.
 
   return true;
 }

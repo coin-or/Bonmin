@@ -51,8 +51,12 @@ class exprUnary: public expression {
     {return zero_fun;}
 
   /// Destructor
-  ~exprUnary () 
-    {if (argument_) delete argument_;}
+  ~exprUnary () {
+    if (argument_) {
+      delete argument_; 
+      argument_ = NULL;
+    }
+  }
 
   /// return number of arguments
   inline int nArgs () const
@@ -82,10 +86,6 @@ class exprUnary: public expression {
   virtual inline CouNumber operator () ()
     {return (currValue_ = (F ()) ((*argument_) ()));}
 
-  /// dependence on variable set
-  //  inline int dependsOn (int *list, int n) 
-  //    {return (argument_ -> dependsOn (list, n));}
-
   /// fill in the set with all indices of variables appearing in the
   /// expression
   virtual inline int DepList (std::set <int> &deplist, 
@@ -103,7 +103,7 @@ class exprUnary: public expression {
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)
-  virtual exprAux *standardize (CouenneProblem *);
+  virtual exprAux *standardize (CouenneProblem *, bool addAux = true);
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap

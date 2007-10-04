@@ -11,6 +11,8 @@
 #include <CouenneBranchingObject.hpp>
 
 
+//#define DEBUG
+
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 CouNumber exprQuad::selectBranch (expression *w, 
@@ -38,27 +40,49 @@ CouNumber exprQuad::selectBranch (expression *w,
 
     int bestVar = -1;
 
-    for (int i=nqterms_; i--;) {
+    if (dIndex_) { // use indices in dIndex_ -- TODO: dIndex_ should
+		   // be created by constructor
 
-      // find largest (in abs. value) coefficient with at least one
-      // index within bounds
+      for (int i=nDiag_; i--;) {
 
-      int qi = qindexI_ [i],
-          qj = qindexJ_ [i];
+	int ind = dIndex_ [i];
+	CouNumber diff;
 
-      CouNumber xb = x [qi], diff;
+#ifdef DEBUG
+	printf ("[%10g %10g %10g] %4d %10g\n", x [ind], l [ind], u [ind], bestVar, maxcontr);
+#endif
 
-      if ((diff = mymin (xb - l [qi], u [qi] - xb)) > maxcontr) {bestVar = qi; maxcontr = diff;}
-      if ((diff = mymin (xb - l [qj], u [qj] - xb)) > maxcontr) {bestVar = qj; maxcontr = diff;}
-    }
+	//if ((diff = mymin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
+	if ((diff = u [ind] - l [ind])                  > maxcontr) {bestVar = ind; maxcontr = diff;}
+      }
+    } else
+      for (int i=nqterms_; i--;) {
+
+	// find largest (in abs. value) coefficient with at least one
+	// index within bounds
+
+	int qi = qindexI_ [i],
+            qj = qindexJ_ [i];
+
+	CouNumber 
+	  xi = x [qi], 
+	  xj = x [qj], diff;
+
+	if ((diff = mymin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
+	if ((diff = mymin (xj - l [qj], u [qj] - xj)) > maxcontr) {bestVar = qj; maxcontr = diff;}
+      }
 
     ind = bestVar;
     brpts = (double *) realloc (brpts, sizeof (double));
-    *brpts = x [bestVar];
+    //    *brpts = x [bestVar];
+    *brpts = (l [bestVar] + u [bestVar]) / 2;
     way = TWO_RAND;
 
-    //printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
-    //  fabs (delta), *brpts, x [bestVar], bestVar, way);
+#ifdef DEBUG
+    printf ("brExprQuad (%s): |delta| = %g, brpt = %g (%g), var = x%d, way = %d -- NO alpha\n",
+	    (delta < 0) ? "lower" : "upper",
+	    fabs (delta), *brpts, x [bestVar], bestVar, way);
+#endif
 
     return fabs (delta);
   }
@@ -96,8 +120,10 @@ CouNumber exprQuad::selectBranch (expression *w,
 
     *brpts = 0.5 * (lb + ub);
 
-  //printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
-  //  fabs (delta), *brpts, x [bestVar], bestVar, way);
+#ifdef DEBUG
+  printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
+	  fabs (delta), *brpts, x [bestVar], bestVar, way);
+#endif
 
   return fabs (delta);
 }

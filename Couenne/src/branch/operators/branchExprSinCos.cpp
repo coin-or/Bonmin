@@ -14,7 +14,7 @@
 #include <CouenneTypes.h>
 #include <CouenneObject.hpp>
 #include <CouenneBranchingObject.hpp>
-#include <projections.h>
+//#include <projections.h>
 
 
 /// generalized procedure for both sine and cosine

@@ -32,7 +32,7 @@ void CouenneProblem::standardize () {
   graph_ = new DepGraph;
 
   for (std::vector <exprVar *>::iterator i = variables_ . begin ();
-       i != variables_ . end (); i++)
+       i != variables_ . end (); ++i)
     graph_ -> insert (*i);
 
   // allocate space in auxiliaries_ from commonexprs_
@@ -89,7 +89,7 @@ void CouenneProblem::standardize () {
   // OBJECTIVES //////////////////////////////////////////////////////////////////////////////
 
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
-       i != objectives_.end (); i++) {
+       i != objectives_.end (); ++i) {
 
 #ifdef DEBUG
     printf ("Objective ");
@@ -127,7 +127,7 @@ void CouenneProblem::standardize () {
   // CONSTRAINTS /////////////////////////////////////////////////////////////////////////////
 
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin (); 
-       i != constraints_.end (); i++) {
+       i != constraints_.end (); ++i) {
 
 #ifdef DEBUG
     printf ("############# Constraint ");
@@ -191,7 +191,7 @@ void CouenneProblem::standardize () {
   std::set <DepNode *, compNode> vertices = graph_ -> Vertices ();
 
   for (std::set <DepNode *, compNode>::iterator i = vertices.begin ();
-       i != vertices.end (); i++)
+       i != vertices.end (); ++i)
     numbering_ [(*i) -> Order ()] = (*i) -> Index (); 
 
   //////////////////////////////////////////////////////////////////////////////

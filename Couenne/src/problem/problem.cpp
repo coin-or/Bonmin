@@ -22,6 +22,7 @@
 #include <CouenneProblem.hpp>
 #include <CouenneProblemElem.hpp>
 
+//#define DEBUG
 
 /// update value of variables, bounds
 
@@ -69,9 +70,8 @@ void CouenneProblem::initAuxs (CouNumber *x,
   // initially, auxiliary variables are unbounded, their bounds only
   // depending on their function
 
-
   for (register std::vector <exprVar *>::iterator i = variables_ . begin ();
-       i != variables_ . end (); i++)
+       i != variables_ . end (); ++i)
 
     if (((*i) -> Type  () == AUX) &&   // this is an auxiliary
 	((*i) -> Index () >= nOrig_)) { // and one that was not an original before
@@ -93,11 +93,13 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
       exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
 
-      x_ [ord] = (*(aux -> Image ())) ();
-
       // set bounds 
-      if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
-      if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
+      if ((lb_[ord] = mymax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord] = -DBL_MAX;
+      if ((ub_[ord] = mymin (ub_[ord], (*(aux -> Ub()))())) >=  COUENNE_INFINITY) ub_[ord] =  DBL_MAX;
+      //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
+      //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
+
+      x_ [ord] = mymax (lb_ [ord], mymin (ub_ [ord], (*(aux -> Image ())) ()));
     }
   }
 }

@@ -22,17 +22,17 @@ void CouenneProblem::print (std::ostream &out) {
 
   printf ("objectives:\n");
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
-       i != objectives_.end (); i++)
+       i != objectives_.end (); ++i)
     (*i) -> print (out);
 
   printf ("constraints:\n");
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
-       i != constraints_.end (); i++)
+       i != constraints_.end (); ++i)
     (*i) -> print (out);
 
   printf ("variables:\n");
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
-       i != variables_.end (); i++) 
+       i != variables_.end (); ++i) 
     if ((*i) -> Type () == AUX) {
       if ((*i) -> Multiplicity () > 0) {
 
@@ -44,6 +44,13 @@ void CouenneProblem::print (std::ostream &out) {
 	out << " [ " << (*((*i) -> Lb ())) ();
 	out << " , " << (*((*i) -> Ub ())) ();
 	out << " ] " << std::endl;
+	/*
+	expression *lb, *ub;
+	(*i) -> getBounds (lb, ub);
+	out << " {";  lb -> print (out);
+	out << " , "; ub -> print (out);
+	out << "}\n"; 
+	*/
       }
     } else {
       (*i) -> print (out);
@@ -71,6 +78,15 @@ bool readOptimum (const std::string &fname,
 		  CouNumber *& optimum, 
 		  CouNumber &bestObj, 
 		  CouenneProblem *problem) {
+
+  // TODO: this procedure is crippled by the new auxiliary handling
+  // which replaces original variables with auxiliaries. The problem
+  // could be that some originally auxiliary variables (er) do not
+  // have an optimal value but are evaluated as independent.
+
+  // Actually, forget the above. It can only happen in extended
+  // formulations, whose original variables are either original or
+  // auxiliary in the original problem.
 
   int nvars = problem -> nVars (),
       nOrig = problem -> nOrig ();

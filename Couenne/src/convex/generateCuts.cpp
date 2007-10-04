@@ -21,7 +21,7 @@
 #define THRES_NBD_CHANGED 1
 
 // depth of the BB tree until which obbt is applied at all nodes
-#define COU_OBBT_CUTOFF_LEVEL 2
+#define COU_OBBT_CUTOFF_LEVEL 1
 
 // maximum number of obbt iterations
 #define MAX_OBBT_ITER 5
@@ -104,6 +104,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     chg_bds -> lower = chg_bds -> upper = UNCHANGED;
   chg_bds -= ncols;
 
+#ifdef DEBUG
+  printf ("=============================\n");
+  for (int i = 0; i < problem_ -> nVars (); i++)
+    printf ("%4d %+10g [%+10g,%+10g]\n", i,
+	    problem_ -> X  (i),
+	    problem_ -> Lb (i),
+	    problem_ -> Ub (i));
+  printf ("=============================\n");
+#endif
+
   if (firstcall_) {
 
     //////////////////////// FIRST CONVEXIFICATION //////////////////////////////////////
@@ -112,14 +122,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     problem_ -> initAuxs (const_cast <CouNumber *> (nlp_ -> getColSolution ()), 
 			  const_cast <CouNumber *> (nlp_ -> getColLower    ()),
 			  const_cast <CouNumber *> (nlp_ -> getColUpper    ()));
-
-    /*printf ("=============================\n");
-    for (int i = 0; i < problem_ -> nVars (); i++)
-      printf ("%4d %10g [%10g,%10g]\n", i,
-	      problem_ -> X  (i),
-	      problem_ -> Lb (i),
-	      problem_ -> Ub (i));
-	      printf ("=============================\n");*/
 
     // OsiSolverInterface is empty yet, no information can be obtained
     // on variables or bounds -- and none is needed since our
@@ -225,13 +227,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
   }
 
-  /*printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+#ifdef DEBUG
+  printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
   for (int i = 0; i < si.getNumCols (); i++)
     printf ("%4d: %10g [%10g,%10g]\n", i,
 	    si.getColSolution () [i],
 	    si.getColLower    () [i],
 	    si.getColUpper    () [i]);
-	    printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");*/
+  printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+#endif
 
   // FAKE TIGHTENING AROUND OPTIMUM ///////////////////////////////////////////////////
   /*
@@ -271,7 +275,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // of BB tree (info.pass == 0) or if first call (creation of RLT,
   // info.pass == -1)
 
-  if ((info.pass <= 0)  
+  if ((info.pass <= 0)
       && (! boundTightening (&si, cs, chg_bds, babInfo))) {
 #ifdef DEBUG
     printf ("#### infeasible node at first BT\n");
@@ -319,7 +323,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     genColCuts (si, cs, nchanged, changed);
 
 #define USE_OBBT
-#ifdef USE_OBBT
+#ifdef  USE_OBBT
 
   // apply OBBT
   if ((!firstcall_ || (info.pass > 0)) && 
@@ -372,6 +376,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       else printf ("Couenne: %d initial cuts\n", ncuts);
     }
   }
+
+  // end of the procedure /////////////////////////////////////////////////////////////
 
 end_genCuts:
 

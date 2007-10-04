@@ -24,8 +24,9 @@ extern "C" {
   /*  Compute best branching point (within interval [lb,ub]) given
    *  function f, its derivative fp and the current optimum (x0,y0)
    */
-  CouNumber bestBranchPoint (CouNumber lb, CouNumber ub, 
+  /*  CouNumber bestBranchPoint (CouNumber lb, CouNumber ub, 
 			     CouNumber x0, CouNumber y0, 
 			     unary_function f,
 			     unary_function fp);
+  */
 }

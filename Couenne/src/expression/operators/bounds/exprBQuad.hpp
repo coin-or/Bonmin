@@ -41,7 +41,7 @@ class exprLBQuad: public expression {
     {return new exprLBQuad (*this);}
 
   /// function for the evaluation of the expression
-  CouNumber operator () () 
+  inline CouNumber operator () () 
   {return computeQBound (-1, ref_);}
 
   /// I/O
@@ -77,7 +77,7 @@ class exprUBQuad: public expression {
     {return new exprUBQuad (*this);}
 
   /// function for the evaluation of the expression
-  CouNumber operator () () 
+  inline CouNumber operator () () 
   {return computeQBound (1, ref_);}
 
   /// I/O

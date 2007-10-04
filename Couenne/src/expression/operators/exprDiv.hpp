@@ -60,7 +60,7 @@ class exprDiv: public exprOp {
 
   /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)
-  exprAux *standardize (CouenneProblem *p);
+  exprAux *standardize (CouenneProblem *p, bool addAux = true);
 
   /// Generate equality between *this and *w
   void generateCuts (exprAux *w, const OsiSolverInterface &si, 

@@ -25,10 +25,7 @@ CouNumber exprAbs::selectBranch (expression *w,
 				 int &way) {
   ind = argument_ -> Index ();
 
-  if (ind < 0) {
-    printf ("selectBranch: argument of exprAbs has negative index\n");
-    exit (-1);
-  }
+  assert (ind >= 0);
 
   CouNumber x0 = info -> solution_ [ind],
             y0 = info -> solution_ [w -> Index ()];

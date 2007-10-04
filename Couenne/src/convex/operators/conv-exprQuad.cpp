@@ -21,9 +21,6 @@ void exprQuad::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprLBQuad (this);
   ub = new exprUBQuad (this);
-
-  //lb = new exprConst (-COUENNE_INFINITY);
-  //ub = new exprConst  (COUENNE_INFINITY);
 }
 
 

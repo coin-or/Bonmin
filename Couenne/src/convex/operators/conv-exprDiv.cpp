@@ -15,10 +15,10 @@
 #include <CouenneCutGenerator.hpp>
 
 // Create standard formulation of this expression
-exprAux *exprDiv::standardize (CouenneProblem *p) {
+exprAux *exprDiv::standardize (CouenneProblem *p, bool addAux) {
 
   exprOp::standardize (p);
-  return p -> addAuxiliary (this);
+  return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this));
 }
 
 

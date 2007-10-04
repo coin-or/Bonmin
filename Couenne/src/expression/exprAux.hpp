@@ -65,30 +65,14 @@ class exprAux: public exprVar {
   /// Constructor
   exprAux (expression *, int, int, bool = false);
 
+  /// Constructor to be used with standardize ([...], false)
+  exprAux (expression *);
+
   /// Destructor
-  ~exprAux () {
-    if (image_) 
-      delete image_; 
-    delete lb_; 
-    delete ub_;
-  }
+  ~exprAux ();
 
   /// Copy constructor
-  exprAux (const exprAux &e):
-    exprVar       (e.varIndex_),
-    image_        (e.image_ -> clone ()),
-    //    lb_           (e.lb_    -> clone ()),
-    //    ub_           (e.ub_    -> clone ()),
-    rank_         (e.rank_),
-    multiplicity_ (e.multiplicity_),
-    integer_      (e.integer_) {
-
-    image_ -> getBounds (lb_, ub_);
-    // getBounds (lb_, ub_);
-
-    lb_ = new exprMax (new exprLowerBound (varIndex_), lb_);
-    ub_ = new exprMin (new exprUpperBound (varIndex_), ub_);
-  }
+  exprAux (const exprAux &);
 
   /// Cloning method
   virtual exprAux *clone () const
@@ -115,37 +99,12 @@ class exprAux: public exprVar {
 
   /// fill in the set with all indices of variables appearing in the
   /// expression
-  inline int DepList (std::set <int> &deplist, 
-		      enum dig_type type = ORIG_ONLY,
-		      CouenneProblem *p = NULL) {
-
-    if (type == ORIG_ONLY)   
-      return image_ -> DepList (deplist, type, p);
-
-    if (deplist.find (varIndex_) == deplist.end ())
-      deplist.insert (varIndex_); 
-    else return 0;
-
-    if (type == STOP_AT_AUX) 
-      return 1;
-
-    return 1 + image_ -> DepList (deplist, type, p);
-  }
+  int DepList (std::set <int> &deplist, 
+	       enum dig_type type = ORIG_ONLY,
+	       CouenneProblem *p = NULL);
 
   /// simplify
-  inline expression *simplify () {
-
-    if ((image_ -> Type () == AUX) || 
-	(image_ -> Type () == VAR)) {
-
-      --multiplicity_;
-      expression *ret = image_;
-      image_ = NULL;
-      return ret;
-    }
-
-    return NULL;
-  }
+  expression *simplify ();
 
   /// Get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
@@ -153,36 +112,11 @@ class exprAux: public exprVar {
     /*return image_ -> Linearity ();*/
 
   /// Get lower and upper bound of an expression (if any)
-  inline void getBounds (expression *&lb, expression *&ub) {
-
-    // this replaces the previous 
-    //
-    //    image_ -> getBounds (lb0, ub0);
-    //
-    // which created large expression trees, now useless since all
-    // auxiliaries are standardized.
-
-    lb = new exprLowerBound (varIndex_);
-    ub = new exprUpperBound (varIndex_);
-  }
+  void getBounds (expression *&lb, expression *&ub);
 
   /// set bounds depending on both branching rules and propagated
   /// bounds. To be used after standardization
-  inline void crossBounds () {
-
-    expression *l0, *u0;
-
-    image_ -> getBounds (l0, u0);
-
-    //image_ -> getBounds (lb_, ub_);
-
-    lb_ = new exprMax (lb_, l0);
-    ub_ = new exprMin (ub_, u0);
-
-    /*printf ("lower: ");   lb_ -> print ();
-    printf (", upper: "); ub_ -> print ();
-    printf ("\n");*/
-  }
+  void crossBounds ();
 
   /// generate cuts for expression associated with this auxiliary
   void generateCuts (const OsiSolverInterface &, 

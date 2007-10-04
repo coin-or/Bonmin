@@ -25,11 +25,19 @@
 exprOp::~exprOp () {
 
   if (arglist_) {
-    for (register int i = nargs_; i--;)
-      if (arglist_ [i])
-	delete arglist_ [i];
+
+    for (int i = nargs_; i--;) {
+
+      expression *&arg = arglist_ [i];
+
+      if (arg) {
+	delete arg;
+	arg = NULL;
+      }
+    }
 
     delete [] arglist_;
+    arglist_ = NULL;
   }
 }
 
@@ -132,7 +140,7 @@ int exprOp::rank (CouenneProblem *p) {
 // list components only), and the calling class (Sum, Sub, Mul, Pow,
 // and the like) will do the part for its own object
 
-exprAux *exprOp::standardize (register CouenneProblem *p) {
+exprAux *exprOp::standardize (register CouenneProblem *p, bool addAux) {
 
   register exprVar *subst;
 

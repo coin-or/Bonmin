@@ -104,7 +104,7 @@ public:
   /// destructor
   ~DepGraph () {
     for (std::set <DepNode *, compNode>::iterator i = vertices_.begin ();
-	 i != vertices_.end (); i++) 
+	 i != vertices_.end (); ++i) 
       delete (*i);
   }
 
