@@ -2078,7 +2078,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
        // for now
        double zero;
        tminlp_->eval_f(n, obj, 1, zero);
-       si.setDblParam(OsiObjOffset, zero);
+       si.setDblParam(OsiObjOffset, -zero);
        //if(fabs(zero - 0) > 1e-10)
          //addObjVar = true;
        //else { 
