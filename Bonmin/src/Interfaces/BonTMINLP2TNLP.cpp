@@ -416,11 +416,11 @@ namespace Bonmin
     return tminlp_->eval_grad_f(n, x, new_x, grad_f);
   }
 
-  void TMINLP2TNLP::eval_g_add_linear_cuts(Number* g, const Number* x)
+  void TMINLP2TNLP::eval_g_add_linear_cuts(Index n, const Number *x, Index nCuts, Number* g)
   {
+    DBG_ASSERT(nCuts == nCuts);
+    DBG_ASSERT(n == n_);
     // Add the linear cuts
-    int nnz = 0;
-    g += m_;
     CoinZeroN(g , tminlp_->nLinearCuts_);
     for(int nnz = 0 ; nnz < tminlp_->linearCutsNnz_ ; nnz++){
       g[tminlp_->cutsiRow_[nnz]] += tminlp_->cutsElems_[nnz] * x[tminlp_->cutsjCol_[nnz]];
@@ -433,30 +433,31 @@ namespace Bonmin
   {
     int return_code = tminlp_->eval_g(n, x, new_x, m_, g);
     if (return_code) {
-      eval_g_add_linear_cuts(g, x);
+      eval_g_add_linear_cuts(n, x, tminlp_->nLinearCuts_, 
+                             g + m_);
     }
     return return_code;
   }
 
-  void TMINLP2TNLP::eval_jac_g_add_linear_cuts(Index nele_jac, Index* iRow,
+  void TMINLP2TNLP::eval_jac_g_add_linear_cuts(Index nele_cuts_jac, Index* iRow,
 					       Index* jCol, Number* values)
   {
+    DBG_ASSERT(nele_cuts_jac == tminlp_->linearCutsNnz_);
     if(iRow != NULL) {
       DBG_ASSERT(jCol != NULL);
       DBG_ASSERT(values == NULL);
 
-      int nnz = nele_jac - tminlp_->linearCutsNnz_ ;
       int offset = (index_style_ == TNLP::FORTRAN_STYLE);
-	for(int i = 0; i < tminlp_->linearCutsNnz_ ; i++ , nnz++) {
-	  iRow[nnz] = tminlp_->cutsiRow_[i] + m_ + offset; 
-	  jCol[nnz] = tminlp_->cutsjCol_[i] + offset;
+	for(int i = 0; i < nele_cuts_jac; i++ ) {
+	  iRow[i] = tminlp_->cutsiRow_[i] + m_ + offset; 
+	  jCol[i] = tminlp_->cutsjCol_[i] + offset;
 	}
     }
     else {
       DBG_ASSERT(jCol == NULL);
       DBG_ASSERT(values != NULL);
-      IpBlasDcopy(tminlp_->linearCutsNnz_ , tminlp_->cutsElems_, 1,
-		  &values[nele_jac - tminlp_->linearCutsNnz_],1);
+      IpBlasDcopy(nele_cuts_jac, tminlp_->cutsElems_, 1,
+		  values,1);
     }
   }
 
@@ -468,7 +469,12 @@ namespace Bonmin
       tminlp_->eval_jac_g(n, x, new_x, m_, nele_jac - tminlp_->linearCutsNnz_,
 			  iRow, jCol, values);
     if (return_code) {
-      eval_jac_g_add_linear_cuts(nele_jac, iRow, jCol, values);
+      int start = nele_jac - tminlp_->linearCutsNnz_ ;
+      if(iRow != NULL) iRow += start;
+      if(jCol != NULL) jCol += start;
+      if(values != NULL) values += start;
+      eval_jac_g_add_linear_cuts(tminlp_->linearCutsNnz_ , iRow, jCol, 
+                                 values);
     }
     return return_code;
   }

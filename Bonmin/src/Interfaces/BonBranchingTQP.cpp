@@ -229,7 +229,10 @@ namespace Bonmin
       g[irow] += g_jac_[i]*d_[jcol];
     }
 
-    tminlp2tnlp_->eval_g_add_linear_cuts(g, x);
+#if 0
+    //This should (and is) already done at construction use here is innapropriate.
+    tminlp2tnlp_->eval_g_add_linear_cuts(n, x, tminlp);
+#endif
     return true;
   }
 
@@ -261,8 +264,10 @@ namespace Bonmin
       IpBlasDcopy(nnz_jac_g_, g_jac_, 1, values, 1);
     }
 
+#if 0
+    //This should (and is) already done at construction use here is innapropriate.
     tminlp2tnlp_->eval_jac_g_add_linear_cuts(nele_jac, iRow, jCol, values);
-
+#endif
     return true;
   }
 
