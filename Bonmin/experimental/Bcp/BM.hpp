@@ -55,9 +55,13 @@ enum BM_BranchingStrategy {
 };
 
 enum BM_message {
-    StrongBranchRequest,
-    StrongBranchResult,
-    FreeToBusyRatio
+    BM_StrongBranchRequest,
+    BM_StrongBranchResult
+};
+
+enum BM_BoundChange {
+    BM_Var_DownBranch,
+    BM_Var_UpBranch
 };
 
 //#############################################################################
@@ -168,6 +172,19 @@ public:
 
 //#############################################################################
 
+struct BM_SB_result
+{
+  /** 0: Not done   1: Only down   2: only up   3: both ways */
+  int branchEval; 
+  int objInd;
+  int colInd;
+  int status[2];
+  int iter[2];
+  int objval[2];
+};
+
+//#############################################################################
+
 #include <OsiAuxInfo.hpp>
 #include <OsiCuts.hpp>
 #include "CglGomory.hpp"
@@ -181,12 +198,19 @@ public:
 
 #include "BCP_lp_user.hpp"
 #include "BonAmplSetup.hpp"
+#include "BonChooseVariable.hpp"
 
 class BM_lp : public BCP_lp_user
 {
+    /* There's no totalTime_ and nodeTime_. Look at the top of BM.cpp */
+    //   double totalTime_;
+    //   double nodeTime_;
+    int in_strong;
+
     BCP_string ipopt_file_content;
     BCP_string nl_file_content;
     BCP_parameter_set<BM_par> par;
+    BCP_buffer bm_buf;
 
     /** This contains the setup for running Bonmin in particular nlp
 	solver, continuous solver, cut generators,...*/
@@ -201,6 +225,32 @@ class BM_lp : public BCP_lp_user
     int numNlpFailed_;
 
     OsiCuts cuts_;
+
+  /** These are the indices of the integral (i.e., things that can be branched
+      on) objects in the solver, sorted based on the priority of the
+      corresponding objects */
+  int* objInd_;
+  int objNum_;
+
+  /** Every time when branching decisions are to be made, we create 6 arrays,
+      3 for those objects that are infeasible and 3 for those that are
+      feasible. infInd_ contains the indices of the objects (into the objects_
+      array of objects) that are not feasible, infUseful_ cointains their
+      usefulness and infNum_ their number. They are ordered by their priority
+      and within that by their usefulness (that depends on their pseudocosts,
+      etc.). feasXXX_ contains the same for objects that are feasible, except
+      that SOS objects are not listed there, nor variables that are fixed. */
+  int*    infInd_;
+  double* infUseful_;
+  int     infNum_;
+  int*    feasInd_;
+  double* feasUseful_;
+  int     feasNum_;
+
+  /** This is where we keep the results in case of distributed strong
+      branching. The length of the array is objNum_ */
+  BM_SB_result* sbResult_;
+      
 
 public:
     BM_lp();
@@ -280,15 +330,30 @@ public:
 				    BCP_vec<BCP_lp_branching_object*>& cands);
     BCP_branching_decision hybridBranch();
 
+    /** Methods invoked from bbBranch() */
+    int sort_objects(OsiBranchingInformation& branchInfo,
+		     Bonmin::BonChooseVariable* choose, int& branchNum);
+    void clear_SB_results();
+    void send_one_SB_data(int fix_size, int changeType, int objInd, int colInd,
+			  double solval, double bd, int pid);
+    int send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
+				     OsiSolverInterface* solver,
+				     const int* pids, const int pidNum);
+    void receive_distributed_SB_result();
+  bool isBranchFathomable(int status, double obj);
+    int process_SB_results(OsiBranchingInformation& branchInfo,
+			   OsiSolverInterface* solver,
+			   Bonmin::BonChooseVariable* choose,
+			   OsiBranchingObject*& branchObject);
+    int try_to_branch(OsiBranchingInformation& branchInfo,
+		      OsiSolverInterface* solver,
+		      Bonmin::BonChooseVariable* choose,
+		      OsiBranchingObject*& branchObject,
+		      bool allowVarFix);
+
     virtual void
     set_user_data_for_children(BCP_presolved_lp_brobj* best, 
 			       const int selected);
-
-private:
-    /* There's no totalTime_ and nodeTime_. Look at the top of BM.cpp */
-    //   double totalTime_;
-    //   double nodeTime_;
-    int in_strong;
 
 };
 

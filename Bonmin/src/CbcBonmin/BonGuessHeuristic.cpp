@@ -31,13 +31,13 @@ namespace Bonmin
       solutionValue = model_->getCurrentMinimizationObjValue();
       return -1;
     }
-    const PseudoCosts* pseudoCosts = chooseMethod->pseudoCosts();
-    int numberObjects = pseudoCosts->numberObjects();
+    const OsiPseudoCosts& pseudoCosts = chooseMethod->pseudoCosts();
+    int numberObjects = pseudoCosts.numberObjects();
     assert(numberObjects == model_->numberObjects());
-    const double* upTotalChange = pseudoCosts->upTotalChange();
-    const double* downTotalChange = pseudoCosts->downTotalChange();
-    const int* upNumber = pseudoCosts->upNumber();
-    const int* downNumber = pseudoCosts->downNumber();
+    const double* upTotalChange = pseudoCosts.upTotalChange();
+    const double* downTotalChange = pseudoCosts.downTotalChange();
+    const int* upNumber = pseudoCosts.upNumber();
+    const int* downNumber = pseudoCosts.downNumber();
 
     double sumUpTot = 0.;
     int numberUpTot = 0;

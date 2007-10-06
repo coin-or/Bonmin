@@ -229,6 +229,8 @@ namespace Bonmin
     CoinCopyN(simpleConcaves_, numberSimpleConcave_, simple_concave);
     return true;}
   
+  /** Say if problem has a linear objective (for OA) */
+  virtual bool hasLinearObjective(){return hasLinearObjective_;}
 private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -274,6 +276,10 @@ private:
    /** Store simple concave constraints descriptions.*/
    SimpleConcaveConstraint * simpleConcaves_;
 
+   /** Flag to indicate if objective function is linear */
+   bool hasLinearObjective_;
+  
+   /** Flag to say if AMPL solution file should be written.*/
    int writeAmplSolFile_;
   };
 } // namespace Ipopt

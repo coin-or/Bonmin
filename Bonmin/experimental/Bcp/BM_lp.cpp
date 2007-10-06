@@ -25,8 +25,17 @@ static char prefix[100];
 
 BM_lp::BM_lp() :
     BCP_lp_user(),
+    in_strong(0),
     bonmin_(),
-    in_strong(0)
+    objInd_(NULL),
+    objNum_(0),
+    infInd_(NULL),
+    infUseful_(NULL),
+    infNum_(0),
+    feasInd_(NULL),
+    feasUseful_(NULL),
+    feasNum_(0),
+    sbResult_(NULL)
 {
 }
 
@@ -34,6 +43,12 @@ BM_lp::BM_lp() :
 
 BM_lp::~BM_lp()
 {
+  delete[] objInd_;
+  delete[] infInd_;
+  delete[] infUseful_;
+  delete[] feasInd_;
+  delete[] feasUseful_;
+  delete[] sbResult_;
 }
 
 /****************************************************************************/

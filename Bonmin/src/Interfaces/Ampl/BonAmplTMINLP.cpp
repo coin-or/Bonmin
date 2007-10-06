@@ -41,7 +41,8 @@ namespace Bonmin
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
   nonConvexConstraintsAndRelaxations_(NULL),
-  simpleConcaves_(NULL)
+  simpleConcaves_(NULL),
+  hasLinearObjective_(false)
   {}
   
   
@@ -61,7 +62,8 @@ namespace Bonmin
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
   nonConvexConstraintsAndRelaxations_(NULL),
-  simpleConcaves_(NULL)
+  simpleConcaves_(NULL),
+  hasLinearObjective_(false)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
   }
@@ -133,6 +135,23 @@ namespace Bonmin
     read_priorities();
     read_convexities();
     read_sos();
+
+
+    /* Determine if objective is linear.*/
+    Index n_non_linear_b= 0;
+    Index n_non_linear_bi= 0;
+    Index n_non_linear_c= 0;
+    Index n_non_linear_ci = 0;
+    Index n_non_linear_o= 0;
+    Index n_non_linear_oi = 0;
+    Index n_binaries = 0;
+    Index n_integers = 0;
+    ampl_tnlp_->get_discrete_info(n_non_linear_b, n_non_linear_bi, n_non_linear_c,
+                                  n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
+                                  n_binaries, n_integers);
+    if(n_non_linear_b == 0 && n_non_linear_o == 0){
+        std::cout<<"Problem has a linear objective"<<std::endl;
+        hasLinearObjective_ = true;}
   }
   
   AmplTMINLP::~AmplTMINLP()
@@ -370,6 +389,8 @@ namespace Bonmin
                                   n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
                                   n_binaries, n_integers);
     int totalNumberOfNonContinuous = 0;
+
+
     //begin with variables non-linear both in the objective function and in some constraints
     // The first ones are continuous
     Index start = 0;
@@ -385,7 +406,6 @@ namespace Bonmin
       var_types[i] = INTEGER;
       totalNumberOfNonContinuous++;
     }
-    
     //next variables non-linear in some constraints
     // The first ones are continuous
     start = end;
