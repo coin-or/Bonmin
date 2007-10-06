@@ -89,6 +89,66 @@ BonChooseVariable::~BonChooseVariable ()
 {
 }
 
+void
+BonChooseVariable::computeMultipliers(double& upMult, double& downMult) const
+{
+  const double* upTotalChange = pseudoCosts_.upTotalChange();
+  const double* downTotalChange = pseudoCosts_.downTotalChange();
+  const int* upNumber = pseudoCosts_.upNumber();
+  const int* downNumber = pseudoCosts_.downNumber();
+  double sumUp=0.0;
+  double numberUp=0.0;
+  double sumDown=0.0;
+  double numberDown=0.0;
+  for (int i=numberObjects() - 1; i >= 0; --i) {
+    sumUp += upTotalChange[i];
+    numberUp += upNumber[i];
+    sumDown += downTotalChange[i];
+    numberDown += downNumber[i];
+    if (bb_log_level_>4) {
+      printf("%3d up %3d  %15.8e  down %3d  %15.8e\n",i, upNumber[i], upTotalChange[i], downNumber[i], downTotalChange[i]);
+    }
+  }
+  upMult=(1.0+sumUp)/(1.0+numberUp);
+  downMult=(1.0+sumDown)/(1.0+numberDown);
+
+  if (bb_log_level_>4) {
+    printf("upMultiplier = %e downMultiplier = %e\n", upMult, downMult);
+  }
+}
+
+double
+BonChooseVariable::computeUsefulness(const double MAXMIN_CRITERION,
+				     const double upMult, const double downMult,
+				     const double value,
+				     const OsiObject* object, int i,
+				     double& value2) const
+{
+  double sumUp = pseudoCosts_.upTotalChange()[i]+1.0e-30;
+  int numberUp = pseudoCosts_.upNumber()[i];
+  double sumDown = pseudoCosts_.downTotalChange()[i]+1.0e-30;
+  int numberDown = pseudoCosts_.downNumber()[i];
+  double upEst = object->upEstimate();
+  double downEst = object->downEstimate();
+  upEst = numberUp ? ((upEst*sumUp)/numberUp) : (upEst*upMult);
+  //if (numberUp<numberBeforeTrusted_)
+  //  upEst *= (numberBeforeTrusted_+1.0)/(numberUp+1.0);
+  downEst = numberDown ? ((downEst*sumDown)/numberDown) : (downEst*downMult);
+  //if (numberDown<numberBeforeTrusted_)
+  //  downEst *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
+  double useful = ( MAXMIN_CRITERION*CoinMin(upEst,downEst) +
+		    (1.0-MAXMIN_CRITERION)*CoinMax(upEst,downEst) );
+  value2 = -COIN_DBL_MAX;
+  if (numberUp   < numberBeforeTrustedList_ ||
+      numberDown < numberBeforeTrustedList_) {
+    value2 = value;
+  }
+  if (bb_log_level_>4) {
+    printf("%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n", i,useful,upEst,downEst,value,value2);
+  }
+  return useful;
+}
+
 int
 BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 {
@@ -150,30 +210,12 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   }
 
   OsiObject ** object = info->solver_->objects();
-  const double* upTotalChange = pseudoCosts_.upTotalChange();
-  const double* downTotalChange = pseudoCosts_.downTotalChange();
-  const int* upNumber = pseudoCosts_.upNumber();
-  const int* downNumber = pseudoCosts_.downNumber();
-  double sumUp=0.0;
-  double numberUp=0.0;
-  double sumDown=0.0;
-  double numberDown=0.0;
-  for ( i=0;i<numberObjects;i++) {
-    sumUp += upTotalChange[i];
-    numberUp += upNumber[i];
-    sumDown += downTotalChange[i];
-    numberDown += downNumber[i];
-    if (bb_log_level_>4) {
-      printf("%3d up %3d  %15.8e  down %3d  %15.8e\n",i, upNumber[i], upTotalChange[i], downNumber[i], downTotalChange[i]);
-    }
-  }
-  double upMultiplier=(1.0+sumUp)/(1.0+numberUp);
-  double downMultiplier=(1.0+sumDown)/(1.0+numberDown);
-  if (bb_log_level_>4) {
-    printf("upMultiplier = %e downMultiplier = %e\n",upMultiplier,downMultiplier);
-  }
+  double upMultiplier, downMultiplier;
+  computeMultipliers(upMultiplier, downMultiplier);
+
   // Say feasible
   bool feasible = true;
+  const double MAXMIN_CRITERION = maxminCrit(info);
   for ( i=0;i<numberObjects;i++) {
     int way;
     double value = object[i]->infeasibility(info,way);
@@ -211,28 +253,10 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
       } 
       if (priorityLevel==bestPriority) {
 	// Modify value
-	sumUp = upTotalChange[i]+1.0e-30;
-	numberUp = upNumber[i];
-	sumDown = downTotalChange[i]+1.0e-30;
-	numberDown = downNumber[i];
-	double upEstimate = object[i]->upEstimate();
-	double downEstimate = object[i]->downEstimate();
-	upEstimate = numberUp ? ((upEstimate*sumUp)/numberUp) : (upEstimate*upMultiplier);
-	//if (numberUp<numberBeforeTrusted_)
-	//  upEstimate *= (numberBeforeTrusted_+1.0)/(numberUp+1.0);
-	downEstimate = numberDown ? ((downEstimate*sumDown)/numberDown) : (downEstimate*downMultiplier);
-	//if (numberDown<numberBeforeTrusted_)
-	//  downEstimate *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
-	double value2 = -COIN_DBL_MAX;
-	if (numberUp<numberBeforeTrustedList_ ||
-	    numberDown<numberBeforeTrustedList_) {
-	  value2 = value;
-	}
-	double MAXMIN_CRITERION = maxminCrit(info);
-	value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
-	if (bb_log_level_>4) {
-	  printf("%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n", i,value,upEstimate,downEstimate,object[i]->infeasibility(info,way),value2);
-	}
+	double value2;
+	value = computeUsefulness(MAXMIN_CRITERION,
+				  upMultiplier, downMultiplier, value,
+				  object[i], i, value2);
 	if (value>check) {
 	  //add to list
 	  int iObject = list_[checkIndex];

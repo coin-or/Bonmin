@@ -60,9 +60,19 @@ public:
   /// Destructor
   virtual ~BonChooseVariable ();
 
+  /** Helper functions for setupList and chooseVariable */
+  double maxminCrit(const OsiBranchingInformation* info) const;
+  void computeMultipliers(double& upMult, double& downMult) const;
+  double computeUsefulness(const double MAXMIN_CRITERION,
+			   const double upMult, const double dowMult,
+			   const double value,
+			   const OsiObject* object, int i,
+			   double& value2) const;
+
   /** Sets up strong list and clears all if initialize is true.
       Returns number of infeasibilities. */
   virtual int setupList ( OsiBranchingInformation *info, bool initialize);
+
   /** Choose a variable
       Returns - 
      -1 Node is infeasible
@@ -154,8 +164,6 @@ private:
   /** backup of numberStrong_ before Root node solve */
   int numberStrongBackup_;
   //@}
-
-  double maxminCrit(const OsiBranchingInformation* info) const;
 
   /** detecting if this is root node */
   bool isRootNode(const OsiBranchingInformation *info) const;
