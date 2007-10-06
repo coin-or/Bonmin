@@ -1969,6 +1969,14 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   TNLP::IndexStyleEnum index_style;
   //Get problem information
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
+
+  int nCuts = 0, cutsNnz = 0;
+  const int * cutsiRow = NULL, * cutsjCol = NULL;
+  const double * cutsElem = NULL, * cutsLow = NULL, * cutsUp = NULL;
+
+  tminlp_->getCutStorage(nCuts, cutsLow, cutsUp, cutsNnz, 
+                         cutsjCol, cutsiRow, cutsElem);
+
   //if not allocated allocate spaced for stroring jacobian
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
@@ -1980,8 +1988,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   double *g = new double[m];
   tminlp_->eval_g(n, getColSolution(),1,m,g);
 
-  rowLow = new double[m];
-  rowUp = new double[m];
+  rowLow = new double[m + nCuts];
+  rowUp = new double[m + nCuts];
   int * nonBindings = new int[m];//store non binding constraints (which are to be removed from OA)
   int numNonBindings = 0;
   const double * rowLower = getRowLower();
@@ -2026,8 +2034,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
       }
     }
     else {
-      rowLow[i] = (rowLower[i] - g[i]);
-      rowUp[i] =  (rowUpper[i] - g[i]);
+      rowLow[i] = (rowLower[i]);
+      rowUp[i] =  (rowUpper[i]);
     }
   }
 
@@ -2036,15 +2044,16 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   //Then convert everything to a CoinPackedMatrix
   //Go through values, clean coefficients and fix bounds
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i]] == TNLP::LINEAR //Always accept coefficients from linear constraints
-       || //For other clean tinys
+    if(constTypes_[jRow_[i]] != TNLP::LINEAR){//For linear just copy is fine.
+       if(//For other clean tinys
        cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
                 rowLower[jRow_[i]], rowUpper[jRow_[i]],
                 getColSolution()[jCol_[i]],
                 rowLow[jRow_[i]],
                 rowUp[jRow_[i]], tiny_, veryTiny_)) {      
-      rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
-      rowUp[jRow_[i]] += jValues_[i] *getColSolution()[jCol_[i]];
+          rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
+          rowUp[jRow_[i]] += jValues_[i] *getColSolution()[jCol_[i]];
+       }
     }
   }
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);

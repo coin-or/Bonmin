@@ -354,9 +354,17 @@ namespace Bonmin
       /** Evaluate the upper bounding function at given point and store the result.*/
     void evaluateUpperBoundingFunction(const double * x);
     
-    /** @name Methods for adding the linear cut information */
+    /** @name Methods for evaluation the linear cuts. */
     //@{
-    void eval_g_add_linear_cuts(Number* g, const Number* x);
+    /** Evaluate g for the linear cuts.
+        \param n number of variables in the problem
+        \param x points at which to evaluate
+        \param nCuts number of cuts
+        \param g where to put the results (array of size at least nCuts).
+      */
+    void eval_g_add_linear_cuts(Index n, const Number * x,
+                                Index nCuts, Number* g);
+    /** Evaluate the gradients of the cuts.*/
     void eval_jac_g_add_linear_cuts(Index nele_jac, Index* iRow,
 				    Index *jCol, Number* values);
     //@}

@@ -322,6 +322,8 @@ namespace Bonmin
     
     virtual const BranchingInfo * branchingInfo() const = 0;
 
+    /** \name Cuts management. */
+    //@{
     /** Add some linear cuts to the problem formulation */
     void addCuts(int numberCuts, const OsiRowCut ** cuts);
   
@@ -331,6 +333,19 @@ namespace Bonmin
     /** remove the last number cuts.*/
     void removeLastCuts(int number);
 
+    /** Facilitators to pointers storing the cuts */
+    void getCutStorage(int& numCuts, 
+                       const double * & cutsLower, const double * &cutsUpper, 
+                       int & numNnz, const int * & cutsjCol, const int * & cutsiRow,
+                       const double * & cutsElem) const{
+      numCuts = nLinearCuts_;
+      cutsLower = cutsLower_;
+      cutsUpper = cutsUpper_;
+      numNnz = linearCutsNnz_;
+      cutsjCol = cutsjCol_;
+      cutsiRow = cutsiRow_;
+   }
+    //@}
     virtual const SosInfo * sosConstraints() const = 0;
 
     virtual const PerturbInfo* perturbInfo() const
