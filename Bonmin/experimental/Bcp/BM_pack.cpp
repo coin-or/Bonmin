@@ -107,13 +107,18 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
     const int numCols = nlp.getNumCols();
     const double* clb = nlp.getColLower();
     const double* cub = nlp.getColUpper();
+    const int* cPrio = nlp.getPriorities();
 
     /* Find first the integer variables and then the SOS constraints */
     int nObj = 0;
     OsiObject** osiObj = new OsiObject*[numCols + sos->num];
     for (i = 0; i < numCols; ++i) {
 	if (nlp.isInteger(i)) {
-	    osiObj[nObj++] = new OsiSimpleInteger(i, clb[i], cub[i]);
+	    osiObj[nObj] = new OsiSimpleInteger(i, clb[i], cub[i]);
+	    if (cPrio) {
+	      osiObj[nObj]->setPriority(cPrio[i]);
+	    }
+	    ++nObj;
 	}
     }
     const int* starts = sos->starts;
@@ -123,12 +128,31 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 				sos->indices + starts[i],
 				sos->weights + starts[i],
 				sos->types[i]);
-	// FIXME: this should go when SOS object can get a priority
-	so->setPriority(1);
+	so->setPriority(sos->priorities ? sos->priorities[i] : 1);
 	osiObj[nObj++] = so;
 	
     }
     nlp.addObjects(nObj, osiObj);
+
+    objNum_ = nObj;
+    /* Allocate the storage arrays */
+    infInd_ = new int[objNum_];
+    infUseful_ = new double[objNum_];
+    feasInd_ = new int[objNum_];
+    feasUseful_ = new double[objNum_];
+    sbResult_ = new BM_SB_result[objNum_];
+
+    /* Sort the objects based on their priority */
+    int* prio = new int[objNum_];
+    objInd_ = new int[objNum_];
+    for (i = 0; i < objNum_; ++i) {
+      sbResult_[i].colInd = osiObj[i]->columnNumber();
+      objInd_[i] = i;
+      prio[i] = osiObj[i]->priority();
+    }
+    CoinSort_2(prio, prio+objNum_, objInd_);
+    delete[] prio;
+    
     for (i = 0; i < nObj; ++i) {
 	delete osiObj[i];
     }
