@@ -393,6 +393,9 @@ namespace Bonmin
   virtual bool get_simple_concave_constraints(int number_concave, SimpleConcaveConstraint * simple_concave) const{
     assert(number_concave == 0);
     return true;}
+
+  /** Say if problem has a linear objective (for OA) */
+  virtual bool hasLinearObjective(){return false;}
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).

@@ -1789,7 +1789,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   delete [] row2cutIdx;
   delete [] cut2rowIdx;
 
-  if(getObj) { // Get the objective cuts
+  if(getObj && ! tminlp_->hasLinearObjective()) { // Get the objective cuts
     double * obj = new double [n];
     tminlp_->eval_grad_f(n, x, 1,obj);
     double f;
@@ -2070,49 +2070,72 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
       si.setInteger(i);
   }
   if(getObj) {
-    //add variable alpha
-    //(alpha should be empty in the matrix with a coefficient of -1 and unbounded)
-    CoinPackedVector a;
-    si.addCol(a,-si.getInfinity(), si.getInfinity(), 1.);
-
-    // Now get the objective cuts
-    // get the gradient, pack it and add the cut
-    tminlp_->eval_grad_f(n, getColSolution(), 1,obj);
-    double ub;
-    tminlp_->eval_f(n, getColSolution(), 1, ub);
-    ub*=-1;
-    double lb = -1e300;
-    CoinPackedVector objCut;
-    CoinPackedVector * v = &objCut;
-    v->reserve(n);
-    for(int i = 0; i<n ; i++) {
-     if(nnz_jac_g)
-     {
-      if(cleanNnz(obj[i],colLower[i], colUpper[i],
-          -getInfinity(), 0,
-          getColSolution()[i],
-          lb,
-          ub, tiny_, veryTiny_)) {
-        v->insert(i,obj[i]);
-        lb += obj[i] * getColSolution()[i];
-        ub += obj[i] * getColSolution()[i];
-      }
-     }
-     else //Unconstrained problem can not put clean coefficient
-     {
-         if(cleanNnz(obj[i],colLower[i], colUpper[i],
-          -getInfinity(), 0,
-          getColSolution()[i],
-          lb,
-          ub, 1e-03, 1e-08)) {
-        v->insert(i,obj[i]);
-        lb += obj[i] * getColSolution()[i];
-        ub += obj[i] * getColSolution()[i];
-         }
-     }
+     bool addObjVar = false;
+     if(tminlp_->hasLinearObjective()){
+       //Might be in trouble if objective has a constant part
+       // for now just check that f(0) = 0. 
+       // If it is not adding a constant term does not seem supported by Osi
+       // for now
+       double zero;
+       tminlp_->eval_f(n, obj, 1, zero);
+       si.setDblParam(OsiObjOffset, zero);
+       //if(fabs(zero - 0) > 1e-10)
+         //addObjVar = true;
+       //else { 
+         //Copy the linear objective and don't create a dummy variable.
+         tminlp_->eval_grad_f(n, getColSolution(), 1,obj);
+         si.setObjective(obj);
+       //}
     }
+    else {
+      addObjVar = true;
+   }
+
+   if(addObjVar){
+      //add variable alpha
+      //(alpha should be empty in the matrix with a coefficient of -1 and unbounded)
+      CoinPackedVector a;
+      si.addCol(a,-si.getInfinity(), si.getInfinity(), 1.);
+  
+      // Now get the objective cuts
+      // get the gradient, pack it and add the cut
+      tminlp_->eval_grad_f(n, getColSolution(), 1,obj);
+      double ub;
+      tminlp_->eval_f(n, getColSolution(), 1, ub);
+      ub*=-1;
+      double lb = -1e300;
+      CoinPackedVector objCut;
+      CoinPackedVector * v = &objCut;
+      v->reserve(n);
+      for(int i = 0; i<n ; i++) {
+       if(nnz_jac_g)
+       {
+        if(cleanNnz(obj[i],colLower[i], colUpper[i],
+            -getInfinity(), 0,
+            getColSolution()[i],
+            lb,
+            ub, tiny_, veryTiny_)) {
+          v->insert(i,obj[i]);
+          lb += obj[i] * getColSolution()[i];
+          ub += obj[i] * getColSolution()[i];
+        }
+       }
+       else //Unconstrained problem can not put clean coefficient
+       {
+           if(cleanNnz(obj[i],colLower[i], colUpper[i],
+            -getInfinity(), 0,
+            getColSolution()[i],
+            lb,
+            ub, 1e-03, 1e-08)) {
+          v->insert(i,obj[i]);
+          lb += obj[i] * getColSolution()[i];
+          ub += obj[i] * getColSolution()[i];
+           }
+       }
+      }
     v->insert(n,-1);
     si.addRow(objCut, lb, ub);
+    }
   }
   delete [] obj;
   
