@@ -13,7 +13,6 @@
 #include <exprVar.hpp>
 #include <CouenneProblem.hpp>
 
-
 //#define DEBUG
 
 

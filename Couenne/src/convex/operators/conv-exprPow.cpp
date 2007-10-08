@@ -108,9 +108,9 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
               lk      = safe_pow (l,   k),
               uk      = safe_pow (u,   k);
 
-    if (cL || cR) cg -> createCut (cs, u*lk - l*uk + avg * avg_k_1 * (1-k), 0,
-				   w_ind, u - l + 1, 
-				   x_ind, lk-uk - k * avg_k_1);
+    if (cL || cR) 
+      cg -> createCut (cs, u*lk - l*uk + avg * avg_k_1 * (1-k), 0,
+		       w_ind, u - l + 1, x_ind, lk-uk - k * avg_k_1);
     return;
   }
 
@@ -261,8 +261,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     if (k > COUENNE_EPS) {
 
-      if (u >   powThres) u = x + powStep;
-      if (l < - powThres) l = x - powStep;
+      if (u >   powThres) u = mymax (x,l) + powStep;
+      if (l < - powThres) l = mymin (x,u) - powStep;
     }
     else {
 

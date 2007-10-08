@@ -70,7 +70,6 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
       u = x + step;
 
   // convex envelope
-
   cg -> addEnvelope (cs, sign, power_k, power_k_prime, 
 		     wi, xi, x, l, u);
 }

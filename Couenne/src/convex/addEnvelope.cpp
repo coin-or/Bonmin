@@ -32,7 +32,8 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
   if (fabs (u - l) < COUENNE_EPS) {
 
     CouNumber x0 = 0.5 * (u+l), fp0 = fprime (x0);
-    if (cLeft || cRight) createCut (cs, f(x0) - fp0 * x0, 0, w_ind, 1., x_ind, - fp0);
+    if (cLeft || cRight) 
+      createCut (cs, f(x0) - fp0 * x0, 0, w_ind, 1., x_ind, - fp0);
     return;
   }
 

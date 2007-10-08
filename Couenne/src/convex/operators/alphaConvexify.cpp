@@ -108,7 +108,7 @@ void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
 
   if (info != 0) {
     printf ("exprQuad::alphaConvexify: problem computing eigenvalue, info=%d\n", info);
-    return;
+    exit (-1);
     //TODO error handling
   }
 

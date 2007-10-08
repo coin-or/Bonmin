@@ -80,6 +80,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					const CglTreeInfo info) const {
   int nInitCuts = cs.sizeRowCuts ();
 
+  /*  static int count = 0;
+
+  char fname [20];
+  sprintf (fname, "relax_%d", count++);
+
+  si.writeLp (fname);*/
+
 #ifdef DEBUG
   printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
     info.level, info.pass, info.inTree);
@@ -226,44 +233,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
   }
-
-#ifdef DEBUG
-  printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-  for (int i = 0; i < si.getNumCols (); i++)
-    printf ("%4d: %10g [%10g,%10g]\n", i,
-	    si.getColSolution () [i],
-	    si.getColLower    () [i],
-	    si.getColUpper    () [i]);
-  printf ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-#endif
-
-  // FAKE TIGHTENING AROUND OPTIMUM ///////////////////////////////////////////////////
-  /*
-#define BT_EPS 0.1
-
-  if (problem_ -> bestSol ())
-    for (int i=0; i < problem_ -> nVars () + problem_ -> nAuxs (); i++) {
-      problem_ -> Lb (i) = -BT_EPS + problem_ -> bestSol () [i] * 
-	((problem_ -> bestSol () [i] < 0) ? (1+BT_EPS) : (1-BT_EPS));
-      problem_ -> Ub (i) =  BT_EPS + problem_ -> bestSol () [i] * 
-	((problem_ -> bestSol () [i] < 0) ? (1-BT_EPS) : (1+BT_EPS));
-    }
-  */
-
-
-  /*for (int i=0; i < problem_ -> nVars (); i++)
-    //    if ((info.pass==0) && (problem_ -> bestSol ()))
-    if (problem_ -> bestSol ())
-      printf ("%4d: %12g %12g %12g    %c\n", i,
-	      problem_ -> Lb (i), 
-	      problem_ -> Ub (i),
-	      problem_ -> bestSol () [i],
-	      ((problem_ -> bestSol () [i] <=   COUENNE_EPS + problem_ -> Ub (i)) && 
-	       (problem_ -> bestSol () [i] >= - COUENNE_EPS + problem_ -> Lb (i))) ? ' ' : '*');
-    else printf ("%4d: %12g %12g\n", i,
-		 problem_ -> Lb (i), 
-		 problem_ -> Ub (i));*/
-
 
   fictitiousBound (cs, problem_, false);
 
