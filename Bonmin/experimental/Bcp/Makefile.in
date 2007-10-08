@@ -63,8 +63,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_bonminbcp_OBJECTS = BB_cut.$(OBJEXT) BM.$(OBJEXT) BM_tm.$(OBJEXT) \
-	BM_lp.$(OBJEXT) BM_lp_branch.$(OBJEXT) BM_pack.$(OBJEXT) \
-	BM_scheduler.$(OBJEXT)
+	BM_lp.$(OBJEXT) BM_lp_branch.$(OBJEXT) BM_pack.$(OBJEXT)
 bonminbcp_OBJECTS = $(am_bonminbcp_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
@@ -345,8 +344,7 @@ IPOPTLIBS = \
 #                                bonminbcp                                #
 ########################################################################
 bonminbcp_SOURCES = BB_cut.hpp BM.hpp \
-	BB_cut.cpp BM.cpp BM_tm.cpp BM_lp.cpp BM_lp_branch.cpp BM_pack.cpp \
-        BM_scheduler.cpp
+	BB_cut.cpp BM.cpp BM_tm.cpp BM_lp.cpp BM_lp_branch.cpp BM_pack.cpp
 
 bonminbcp_DEPENDENCIES = \
 	../../src/CbcBonmin/libbonminampl.la \
@@ -484,7 +482,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_lp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_lp_branch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_pack.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_scheduler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BM_tm.Po@am__quote@
 
 .cpp.o:
