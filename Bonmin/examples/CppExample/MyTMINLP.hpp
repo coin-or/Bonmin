@@ -50,11 +50,14 @@ public:
   */
   virtual bool get_var_types(Index n, VariableType* var_types);
  
+  /** Pass info about linear and nonlinear variables.*/
+  virtual bool get_variables_linearity(Index n, Linearity* var_types);
+
   /** Pass the type of the constraints (LINEAR, NON_LINEAR) to the optimizer.
   \param m size of const_types (has to be equal to the number of constraints in the problem)
   \param const_types types of the constraints (has to be filled by function).
   */
-  virtual bool get_constraints_types(Index m, ConstraintType* const_types);
+  virtual bool get_constraints_types(Index m, Linearity* const_types);
 //@}  
     
   /** \name Overloaded functions defining a TNLP.

@@ -80,8 +80,12 @@ namespace Ipopt
 
     /** returns the vector of variable types */
     virtual bool get_var_types(Index n, VariableType* var_types);
+
+    /** return the variables linearity (linear or not)*/
+    virtual bool get_variables_linearity(Index n, Linearity* var_types);
+    
     /** return the vector of constraints types*/
-    virtual bool get_constraints_types(Index n, ConstraintType* const_types);
+    virtual bool get_constraints_types(Index n, Linearity* const_types);
     /** returns bounds of the nlp. Overloaded from TMINLP */
     virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
         Index m, Number* g_l, Number* g_u);

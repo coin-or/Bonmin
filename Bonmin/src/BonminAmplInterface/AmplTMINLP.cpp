@@ -278,7 +278,42 @@ namespace Ipopt
     return true;
   }
 
-  bool AmplTMINLP::get_constraints_types(Index n, ConstraintType* const_types)
+  bool AmplTMINLP::get_variables_linearity(Index n, Linearity* var_types){
+    // The variables are sorted by type in AMPL, so all we need to
+    // know are the counts of each type.
+
+
+    Index n_non_linear_b= 0;
+    Index n_non_linear_bi= 0;
+    Index n_non_linear_c= 0;
+    Index n_non_linear_ci = 0;
+    Index n_non_linear_o= 0;
+    Index n_non_linear_oi = 0;
+    Index n_binaries = 0;
+    Index n_integers = 0;
+    ampl_tnlp_->get_discrete_info(n_non_linear_b, n_non_linear_bi, n_non_linear_c,
+        n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
+        n_binaries, n_integers);
+
+    //Compute the number of non linear variables:
+    int n_non_linear = n_non_linear_c + n_non_linear_o - n_non_linear_b;
+
+    int start = 0;
+    int end = n_non_linear;
+    for (int i=start; i<end; i++) {
+      var_types[i] = NON_LINEAR;
+    }
+
+    //At last the linear variables
+    // The first ones are continuous
+    start = end;
+    end = n;
+    for (int i=start; i<end; i++) {
+      var_types[i] = LINEAR;
+    }
+    return true;
+  }
+  bool AmplTMINLP::get_constraints_types(Index n, Linearity* const_types)
   {
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
     //check that n is good

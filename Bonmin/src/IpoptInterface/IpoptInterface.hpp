@@ -981,7 +981,7 @@ protected:
   //@}
 
   ///Store the types of the constraints (linear and nonlinear).
-  Ipopt::TMINLP::ConstraintType * constTypes_;
+  Ipopt::TMINLP::Linearity* constTypes_;
   /** Numerotation of linear/nonlinear constraints
    * Perform independent numerotation of linear (resp. nonlinear constraints)
    * so that constraints of each type are numeroted consecutively */

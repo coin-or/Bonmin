@@ -13,4 +13,4 @@ all: $(OUTPUTS) Head.tex
 	touch $@
 
 install_www:
-	cp -rv bib/ Install/ Intro/ Obtain/ options_list/ options_set/ use/ ../../../../html/
+	cp -rv bib Install Intro Obtain options_list options_set use ../../../../html/

@@ -208,7 +208,7 @@ namespace Ipopt
     };
 
     /** Type of the constraints*/
-    enum ConstraintType
+    enum Linearity
     {
       LINEAR/** Constraint contains only linear terms.*/,
       NON_LINEAR/**Constraint contains some non-linear terms.*/
@@ -226,8 +226,11 @@ namespace Ipopt
      *  array will be allocated with length n. */
     virtual bool get_var_types(Index n, VariableType* var_types)=0;
 
+    /** overload this method to set the variables linearity (linear or not)*/
+    virtual bool get_variables_linearity(Index n, Linearity* var_types)=0;
+    
     /** overload this method to set the constraint types (linear or not)*/
-    virtual bool get_constraints_types(Index m, ConstraintType* const_types)=0;
+    virtual bool get_constraints_types(Index m, Linearity* const_types)=0;
 
     /** overload this method to return the information about the bound
      *  on the variables and constraints. The value that indicates

@@ -20,7 +20,17 @@ MyTMINLP::get_var_types(Index n, VariableType* var_types)
 }
 
 bool 
-MyTMINLP::get_constraints_types(Index m, ConstraintType* const_types)
+MyTMINLP::get_variables_linearity(Index n, Linearity* var_types)
+{
+  var_types[0] = LINEAR;
+  var_types[1] = NON_LINEAR;
+  var_types[2] = NON_LINEAR;
+  var_types[3] = LINEAR;
+  return true;
+}
+
+bool 
+MyTMINLP::get_constraints_types(Index m, Linearity* const_types)
 {
   assert (m==3);
   const_types[0] = NON_LINEAR;

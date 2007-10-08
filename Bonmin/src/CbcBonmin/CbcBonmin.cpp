@@ -68,7 +68,7 @@ extern "C" {
    }
 }
 
-double GlobalTimeEnd;
+double GlobalTimeEnd = DBL_MAX;
 /** Constructor.*/
 BonminBB::BonminBB():
     bestSolution_(NULL),

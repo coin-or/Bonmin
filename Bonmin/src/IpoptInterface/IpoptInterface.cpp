@@ -649,7 +649,7 @@ IpoptInterface::IpoptInterface (const IpoptInterface &source):
     CoinCopyN(source.jRow_    , nnz_jac,jRow_    );
 
     if(source.constTypes_ != NULL) {
-      constTypes_ = new Ipopt::TMINLP::ConstraintType[getNumRows()];
+      constTypes_ = new Ipopt::TMINLP::Linearity[getNumRows()];
       CoinCopyN(source.constTypes_, getNumRows(), constTypes_);
     }
     if(source.constTypesNum_ != NULL) {
@@ -713,7 +713,7 @@ IpoptInterface & IpoptInterface::operator=(const IpoptInterface& rhs)
         constTypes_ = NULL;
       }
       if(rhs.constTypes_ != NULL) {
-        constTypes_ = new Ipopt::TMINLP::ConstraintType[getNumRows()];
+        constTypes_ = new Ipopt::TMINLP::Linearity[getNumRows()];
         CoinCopyN(rhs.constTypes_, getNumRows(), constTypes_);
       }
 
@@ -1815,13 +1815,12 @@ IpoptInterface::getIntParam(OsiIntParam key, int& value) const
   switch (key) {
   case OsiMaxNumIteration:
     retval = false;
-    break;
   case OsiMaxNumIterationHotStart:
     retval = false;
-    break;
   case OsiLastIntParam:
     retval = false;
-    break;
+  default:
+    OsiSolverInterface::getIntParam(key,value);
   }
   return retval;
 }
@@ -2001,7 +2000,7 @@ int IpoptInterface::initializeJacobianArrays()
   if(constTypes_ != NULL) delete [] constTypes_;
   if(constTypesNum_ != NULL) delete [] constTypesNum_;
 
-  constTypes_ = new Ipopt::TMINLP::ConstraintType[getNumRows()];
+  constTypes_ = new Ipopt::TMINLP::Linearity[getNumRows()];
   tminlp_->get_constraints_types(getNumRows(), constTypes_);
   constTypesNum_ = new int[getNumRows()];
   for(int i = 0; i < getNumRows() ; i++) {
