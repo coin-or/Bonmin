@@ -121,6 +121,7 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 	    ++nObj;
 	}
     }
+#if ! defined(BM_DISREGARD_SOS)
     const int* starts = sos->starts;
     for (i = 0; i < sos->num; ++i) {
 	OsiSOS* so = new OsiSOS(NULL, /* FIXME: why does the constr need */
@@ -132,6 +133,7 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 	osiObj[nObj++] = so;
 	
     }
+#endif
     nlp.addObjects(nObj, osiObj);
 
     objNum_ = nObj;

@@ -75,15 +75,11 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     
     free(argv[1]);
 
-#if 1
-    /* FIXME: For now we just abort if there are SOS constraints */
+#if defined(BM_DISREGARD_SOS)
     Bonmin::OsiTMINLPInterface& nlp = *bonmin.nonlinearSolver();
     const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
     if (sos->num > 0) {
-      printf("Sorry, at the moment we don't deal with SOS constraints.\n");
-      throw BCP_fatal_error("\
-Sorry, at the moment we don't deal with SOS constraints.\n");
-      abort();
+      printf("There are SOS constraints... disregarding them...\n");
     }
 #endif
     

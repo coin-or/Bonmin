@@ -17,6 +17,8 @@
 
 #include "BB_cut.hpp"
 
+#define BM_DISREGARD_SOS
+
 //#############################################################################
 
 class BM_node : public BCP_user_data {
