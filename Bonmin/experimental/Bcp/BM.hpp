@@ -105,6 +105,52 @@ public:
 
 //#############################################################################
 
+class BM_stats {
+public:
+  BM_stats() :
+    numberNodeSolves_(0),
+    numberSbSolves_(0),
+    numberFixed_(0),
+    numberStrongBranching_(0),
+    sumStrongBranchingListIndices_(0),
+    sumStrongBranchingListPositions_(0.)
+  {}
+
+  ~BM_stats();
+
+  inline void incNumberNodeSolves() {
+    numberNodeSolves_++;
+  }
+  inline void incNumberSbSolves() {
+    numberSbSolves_++;
+  }
+  inline void incNumberFixed() {
+    numberFixed_;
+  }
+  inline void updateStrongBrachingInfo(int chosenIndex, int listLength) {
+    numberStrongBranching_++;
+    sumStrongBranchingListIndices_ += chosenIndex;
+    sumStrongBranchingListPositions_ +=
+      (double)(listLength-chosenIndex)/(double)listLength;
+  }
+private:
+  /** Total number of NLP solves as node solves */
+  int numberNodeSolves_;
+  /** Total number of NLP solves for strong-branching */
+  int numberSbSolves_;
+  /** Total number of times variables were fixed due to strong branching */
+  int numberFixed_;
+  /** Total number of times this node did strong branching */
+  int numberStrongBranching_;
+  /** Sum of all list indices */
+  int sumStrongBranchingListIndices_;
+  /** Sum of all relative list positions */
+  double sumStrongBranchingListPositions_;
+};
+
+
+//#############################################################################
+
 class BM_tm : public BCP_tm_user {
 
 public:
@@ -113,7 +159,6 @@ public:
     BCP_string ipopt_file_content;
     BCP_string nl_file_content;
     BCP_parameter_set<BM_par> par;
-
 public:
 
     /**@name Constructors and destructors */
@@ -253,6 +298,8 @@ class BM_lp : public BCP_lp_user
       branching. The length of the array is objNum_ */
   BM_SB_result* sbResult_;
       
+  /** Class for collecting statistics */
+  BM_stats bm_stats;
 
 public:
     BM_lp();
@@ -374,7 +421,6 @@ public:
     virtual BCP_cut_algo* unpack_cut_algo(BCP_buffer& buf);
 
 };
-
 
 //#############################################################################
 

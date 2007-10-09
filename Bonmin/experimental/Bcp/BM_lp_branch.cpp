@@ -199,6 +199,9 @@ BM_lp::send_one_SB_data(int fixed_size, int changeType, int objInd, int colInd,
   bm_buf.pack(solval);
   bm_buf.pack(bd);
   send_message(pid, bm_buf);
+  // LACI: not sure if that is the best place to count number of NLP
+  // solves for strng branching
+  bm_stats.incNumberSbSolves();
 }
 
 //-----------------------------------------------------------------------------
@@ -323,6 +326,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   }
 #endif
   // First check if we can fathom the node
+  int listLen=0; // we want this for the bm_stats
   for (i = 0; i < infNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[infInd_[i]];
     if (sbres.branchEval == 0) {
@@ -333,6 +337,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
 	isBranchFathomable(sbres.status[1], sbres.objval[1])) {
       return -2;
     }
+    ++listLen;
   }
 
   // Nope. Let's see if we can fix anything. 
@@ -347,11 +352,13 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
       const int colInd = sbres.colInd;
       solver->setColLower(colInd, ceil(branchInfo.solution_[colInd]));
       fixedStat |= 2;
+      bm_stats.incNumberFixed();
     }
     if (isBranchFathomable(sbres.status[1], sbres.objval[1])) {
       const int colInd = sbres.colInd;
       solver->setColUpper(colInd, floor(branchInfo.solution_[colInd]));
       fixedStat |= 2;
+      bm_stats.incNumberFixed();
     }
   }
   for (i = 0; i < feasNum_; ++i) {
@@ -365,6 +372,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
       const int colInd = sbres.colInd;
       solver->setColLower(colInd, ceil(branchInfo.solution_[colInd] - 0.5));
       fixedStat |= 1;
+      bm_stats.incNumberFixed();
     }
     if ( (sbres.branchEval & 2) &&
 	 isBranchFathomable(sbres.status[1], sbres.objval[1]) ) {
@@ -372,6 +380,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
       const int colInd = sbres.colInd;
       solver->setColUpper(colInd, floor(branchInfo.solution_[colInd] + 0.5));
       fixedStat |= 1;
+      bm_stats.incNumberFixed();
     }
   }
   if ((fixedStat & 2) != 0) {
@@ -437,6 +446,8 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
       }
     }
   }
+
+  bm_stats.updateStrongBrachingInfo(best, listLen);
   
   // At this point best is not -1, create the branching object
   const OsiObject * object = solver->object(infInd_[best]);

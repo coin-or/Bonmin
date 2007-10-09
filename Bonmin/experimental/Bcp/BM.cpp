@@ -135,3 +135,13 @@ BM_init::packer_init(BCP_user_class* p)
 {
     return new BM_pack;
 }
+
+/****************************************************************************/
+
+BM_stats::~BM_stats()
+{
+  // LACI: It would be nice to also print the process ID here, but I
+  // wasn't sure how to get it...
+
+  printf("Stats: #NodesSol = %d #SbSol = %d #Fixed = %d #SbDone = %d SumInd = %d SumPos = %e\n", numberNodeSolves_, numberSbSolves_, numberFixed_, numberStrongBranching_, sumStrongBranchingListIndices_, sumStrongBranchingListPositions_);
+}
