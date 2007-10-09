@@ -299,6 +299,29 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
 			  OsiBranchingObject*& branchObject)
 {
   int i;
+#define BM_PRINT_DATA
+#ifdef BM_PRINT_DATA
+  printf("Infeas\n");
+  for (i = 0; i < infNum_; ++i) {
+    const BM_SB_result& sbres = sbResult_[infInd_[i]];
+    if (sbres.branchEval == 0) {
+      continue;
+    }
+    printf("eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
+	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
+	   sbres.objval[0], sbres.objval[1]);
+  }
+  printf("Feas\n");
+  for (i = 0; i < feasNum_; ++i) {
+    const BM_SB_result& sbres = sbResult_[feasInd_[i]];
+    if (sbres.branchEval == 0) {
+      continue;
+    }
+    printf("eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
+	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
+	   sbres.objval[0], sbres.objval[1]);
+  }
+#endif
   // First check if we can fathom the node
   for (i = 0; i < infNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[infInd_[i]];
@@ -313,8 +336,8 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   }
 
   // Nope. Let's see if we can fix anything. 
-  // 0: nothing fixed    1: fixed but stayd feas    2: fixed and lost feas
-  bool fixedStat = 0; 
+  // 0: nothing fixed   bit 0: fixed but stayd feas  bit 1: fixed and lost feas
+  int fixedStat = 0; 
   for (i = 0; i < infNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[infInd_[i]];
     if (sbres.branchEval == 0) {
@@ -322,13 +345,13 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
     }
     if (isBranchFathomable(sbres.status[0], sbres.objval[0])) {
       const int colInd = sbres.colInd;
-      solver->setColUpper(colInd, floor(branchInfo.solution_[colInd]));
-      fixedStat = 2;
+      solver->setColLower(colInd, ceil(branchInfo.solution_[colInd]));
+      fixedStat |= 2;
     }
     if (isBranchFathomable(sbres.status[1], sbres.objval[1])) {
       const int colInd = sbres.colInd;
-      solver->setColLower(colInd, ceil(branchInfo.solution_[colInd]));
-      fixedStat = 2;
+      solver->setColUpper(colInd, floor(branchInfo.solution_[colInd]));
+      fixedStat |= 2;
     }
   }
   for (i = 0; i < feasNum_; ++i) {
@@ -340,18 +363,18 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
 	 isBranchFathomable(sbres.status[0], sbres.objval[0]) ) {
       // Down branch evaluated and fathomable
       const int colInd = sbres.colInd;
-      solver->setColUpper(colInd, floor(branchInfo.solution_[colInd] - 0.5));
-      fixedStat = 1;
+      solver->setColLower(colInd, ceil(branchInfo.solution_[colInd] - 0.5));
+      fixedStat |= 1;
     }
     if ( (sbres.branchEval & 2) &&
 	 isBranchFathomable(sbres.status[1], sbres.objval[1]) ) {
       // Up branch evaluated and fathomable
       const int colInd = sbres.colInd;
-      solver->setColLower(colInd, ceil(branchInfo.solution_[colInd] + 0.5));
-      fixedStat = 1;
+      solver->setColUpper(colInd, floor(branchInfo.solution_[colInd] + 0.5));
+      fixedStat |= 1;
     }
   }
-  if (fixedStat == 2) {
+  if ((fixedStat & 2) != 0) {
     return -1;
   }
 
@@ -418,8 +441,10 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   // At this point best is not -1, create the branching object
   const OsiObject * object = solver->object(infInd_[best]);
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
+  printf("Branched on variable %i, bestWhichWay: %i\n",
+	 object->columnNumber(), bestWhichWay);
 
-  return fixedStat == 1 ? -1 : 0;
+  return (fixedStat & 1) != 0 ? -1 : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -449,7 +474,7 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
   int pidNum;
   bm_buf.unpack(pids, pidNum);
 
-  if (pidNum >= (infNum_ > 0 ? 2 : 1)) {
+  if (pidNum >= 2) {
     pidNum = send_data_for_distributed_SB(branchInfo, solver, pids, pidNum);
     // While the others are working, initialize the result array
     clear_SB_results();

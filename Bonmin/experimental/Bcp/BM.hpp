@@ -182,7 +182,7 @@ struct BM_SB_result
   int colInd;
   int status[2];
   int iter[2];
-  int objval[2];
+  double objval[2];
 };
 
 //#############################################################################
