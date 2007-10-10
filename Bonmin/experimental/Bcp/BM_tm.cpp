@@ -75,8 +75,8 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
     
     free(argv[1]);
 
-#if defined(BM_DISREGARD_SOS)
     Bonmin::OsiTMINLPInterface& nlp = *bonmin.nonlinearSolver();
+#if defined(BM_DISREGARD_SOS)
     const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
     if (sos->num > 0) {
       printf("There are SOS constraints... disregarding them...\n");
@@ -117,6 +117,19 @@ BM_tm::initialize_core(BCP_vec<BCP_var_core*>& vars,
       vars.push_back(new BCP_var_core(type, obj[i], clb[i], cub[i]));
     }
     delete[] obj;
+
+    /* Initialize pseudocosts */
+    int nObj = 0;
+    for (int i = 0; i < numCols; ++i) {
+	if (nlp.isInteger(i)) {
+	    ++nObj;
+	}
+    }
+#if ! defined(BM_DISREGARD_SOS)
+    const Bonmin::TMINLP::SosInfo * sos = nlp.model()->sosConstraints();
+    nObj += sos->num;
+#endif
+    pseudoCosts_.initialize(nObj);
 }
 
 /****************************************************************************/
@@ -196,6 +209,11 @@ BM_tm::write_AMPL_solution(const BCP_solution* sol,
 void
 BM_tm::process_message(BCP_buffer& buf)
 {
+  int msgtag;
+  buf.unpack(msgtag);
+  if (msgtag == BM_PseudoCostUpdate) {
+    receive_pseudo_cost_update(buf);
+  }
 }
 
 /****************************************************************************/
@@ -270,3 +288,42 @@ BM_tm::init_new_phase(int phase,
   }
 }
 
+//#############################################################################
+
+void
+BM_tm::receive_pseudo_cost_update(BCP_buffer& buf)
+{
+  double* upTotalChange = pseudoCosts_.upTotalChange();
+  double* downTotalChange = pseudoCosts_.downTotalChange();
+  int* upNumber = pseudoCosts_.upNumber();
+  int* downNumber = pseudoCosts_.downNumber();
+  int objInd;
+  int branch;
+  double pcChange;
+  while (true) {
+    buf.unpack(objInd);
+    if (objInd == -1) {
+      break;
+    }
+    buf.unpack(branch);
+    buf.unpack(pcChange);
+    if (branch == 0) {
+      downTotalChange[objInd] += pcChange;
+      ++downNumber[objInd];
+    } else {
+      upTotalChange[objInd] += pcChange;
+      ++upNumber[objInd];
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void
+BM_tm::pack_pseudo_costs(BCP_buffer& buf)
+{
+  buf.pack(pseudoCosts_.upTotalChange(), pseudoCosts_.numberObjects());
+  buf.pack(pseudoCosts_.upNumber(), pseudoCosts_.numberObjects());
+  buf.pack(pseudoCosts_.downTotalChange(), pseudoCosts_.numberObjects());
+  buf.pack(pseudoCosts_.downNumber(), pseudoCosts_.numberObjects());
+}

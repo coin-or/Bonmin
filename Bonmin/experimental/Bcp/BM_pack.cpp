@@ -131,7 +131,6 @@ BM_lp::unpack_module_data(BCP_buffer& buf)
 				sos->types[i]);
 	so->setPriority(sos->priorities ? sos->priorities[i] : 1);
 	osiObj[nObj++] = so;
-	
     }
 #endif
     nlp.addObjects(nObj, osiObj);
@@ -168,6 +167,10 @@ BM_pack::pack_user_data(const BCP_user_data* ud, BCP_buffer& buf)
 {
     const BM_node* data = dynamic_cast<const BM_node*>(ud);
     data->pack(buf);
+    BM_tm* tm = dynamic_cast<BM_tm*>(user_class);
+    if (tm) {
+      tm->pack_pseudo_costs(buf);
+    }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -175,7 +178,12 @@ BM_pack::pack_user_data(const BCP_user_data* ud, BCP_buffer& buf)
 BCP_user_data*
 BM_pack::unpack_user_data(BCP_buffer& buf)
 {
-    return new BM_node(buf);
+    BM_node* node = new BM_node(buf);
+    BM_lp* lp = dynamic_cast<BM_lp*>(user_class);
+    if (lp) {
+      lp->unpack_pseudo_costs(buf);
+    }
+    return node;
 }
 
 /*---------------------------------------------------------------------------*/

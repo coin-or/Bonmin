@@ -64,6 +64,7 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 
   OsiBranchingInformation brInfo(nlp, false, true);
   brInfo.cutoff_ = upper_bound() + get_param(BCP_lp_par::Granularity);
+  brInfo.objectiveValue_ = lpres.objval();
   brInfo.integerTolerance_ = integerTolerance_;
   brInfo.timeRemaining_ = get_param(BCP_lp_par::MaxRunTime) - CoinCpuTime();
   brInfo.numberSolutions_ = 0; /*FIXME*/
@@ -88,6 +89,76 @@ BM_lp::hybridBranch()
 {
     // FIXME: most of the pureBB stuff should work here.
     throw BCP_fatal_error("BM_lp: FIXME: make hybrid work...");
+}
+
+/*****************************************************************************/
+
+void
+BM_lp::unpack_pseudo_costs(BCP_buffer& buf)
+{
+  Bonmin::BonChooseVariable* choose =
+    dynamic_cast<Bonmin::BonChooseVariable*>(bonmin_.branchingMethod());
+  OsiPseudoCosts& pseudoCosts = choose->pseudoCosts();
+  int numObj = pseudoCosts.numberObjects();
+  double* upTotalChange = pseudoCosts.upTotalChange();
+  int* upNumber = pseudoCosts.upNumber();
+  double* downTotalChange = pseudoCosts.downTotalChange();
+  int* downNumber = pseudoCosts.downNumber();
+  
+  buf.unpack(upTotalChange, numObj, false);
+  buf.unpack(upNumber, numObj, false);
+  buf.unpack(downTotalChange, numObj, false);
+  buf.unpack(downNumber, numObj, false);
+}
+
+
+//-----------------------------------------------------------------------------
+
+void
+BM_lp::send_pseudo_cost_update(OsiBranchingInformation& branchInfo)
+{
+  bm_buf.clear();
+  int itmp;
+  double objchange;
+  itmp = BM_PseudoCostUpdate;
+  bm_buf.pack(itmp);
+  for (int i = 0; i < objNum_; ++i) {
+    const BM_SB_result& sbres = sbResult_[i];
+    if ((sbres.branchEval & 1) != 0 && sbres.status[0] != BCP_Abandoned) {
+      bm_buf.pack(sbres.objInd);
+      itmp = 0;
+      bm_buf.pack(itmp);
+      if (sbres.status[0] == BCP_ProvenOptimal) {
+	objchange = sbres.objval[0] - branchInfo.objectiveValue_;
+      } else { // Must be BCP_ProvenPrimalInf
+	if (branchInfo.cutoff_ < 1e50) {
+	  objchange = 2*(branchInfo.cutoff_-branchInfo.objectiveValue_);
+	} else {
+	  objchange = 2*fabs(branchInfo.objectiveValue_);
+	}
+      }
+      bm_buf.pack(objchange/sbres.varChange[0]);
+    }
+    if ((sbres.branchEval & 2) != 0 && sbres.status[1] != BCP_Abandoned) {
+      bm_buf.pack(sbres.objInd);
+      itmp = 1;
+      bm_buf.pack(itmp);
+      if (sbres.status[1] == BCP_ProvenOptimal) {
+	objchange = sbres.objval[1] - branchInfo.objectiveValue_;
+      } else { // Must be BCP_ProvenPrimalInf
+	if (branchInfo.cutoff_ < 1e50) {
+	  objchange = 2*(branchInfo.cutoff_-branchInfo.objectiveValue_);
+	} else {
+	  objchange = 2*fabs(branchInfo.objectiveValue_);
+	}
+      }
+      bm_buf.pack(objchange/sbres.varChange[1]);
+    }
+  }
+  itmp = -1;
+  bm_buf.pack(itmp);
+  send_message(parent(), bm_buf);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -206,6 +277,13 @@ BM_lp::send_one_SB_data(int fixed_size, int changeType, int objInd, int colInd,
   bm_buf.pack(solval);
   bm_buf.pack(bd);
   send_message(pid, bm_buf);
+  BM_SB_result& sbres = sbResult_[objInd];
+  if (changeType == BM_Var_DownBranch) {
+    sbres.varChange[0] = solval - bd;
+  } else {
+    sbres.varChange[1] = bd - solval;
+  }
+  
   // LACI: not sure if that is the best place to count number of NLP
   // solves for strng branching
   bm_stats.incNumberSbSolves();
@@ -304,6 +382,7 @@ BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
   sbres.objval[0] =
     (sbres.status[0] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
   sbres.iter[0] = solver->getIterationCount();
+  sbres.varChange[0] = val - floor(val);
   solver->setColUpper(ind, old_bd);
 }
 
@@ -543,7 +622,8 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
       --pidNum;
     }
     returnStatus = process_SB_results(branchInfo, solver, choose, branchObject);
-
+    send_pseudo_cost_update(branchInfo);
+    
   } else { /* Do something locally */
 
     returnStatus = BCP_lp_user::try_to_branch(branchInfo, solver, choose,

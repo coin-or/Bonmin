@@ -58,7 +58,8 @@ enum BM_BranchingStrategy {
 
 enum BM_message {
     BM_StrongBranchRequest,
-    BM_StrongBranchResult
+    BM_StrongBranchResult,
+    BM_PseudoCostUpdate
 };
 
 enum BM_BoundChange {
@@ -159,6 +160,8 @@ public:
     BCP_string ipopt_file_content;
     BCP_string nl_file_content;
     BCP_parameter_set<BM_par> par;
+    OsiPseudoCosts pseudoCosts_;
+
 public:
 
     /**@name Constructors and destructors */
@@ -199,6 +202,9 @@ public:
 	this process' user part. */
     virtual void
     process_message(BCP_buffer& buf);
+  
+    void receive_pseudo_cost_update(BCP_buffer& buf);
+    void pack_pseudo_costs(BCP_buffer& buf);
 
     /// Output the final solution
     virtual void display_final_information(const BCP_lp_statistics& lp_stat);
@@ -228,6 +234,7 @@ struct BM_SB_result
   int status[2];
   int iter[2];
   double objval[2];
+  double varChange[2];
 };
 
 //#############################################################################
@@ -380,6 +387,8 @@ public:
     BCP_branching_decision hybridBranch();
 
     /** Methods invoked from bbBranch() */
+    void send_pseudo_cost_update(OsiBranchingInformation& branchInfo);
+    void unpack_pseudo_costs(BCP_buffer& buf);
     int sort_objects(OsiBranchingInformation& branchInfo,
 		     Bonmin::BonChooseVariable* choose, int& branchNum);
     void clear_SB_results();
@@ -391,7 +400,7 @@ public:
 				     OsiSolverInterface* solver,
 				     const int* pids, const int pidNum);
     void receive_distributed_SB_result();
-  bool isBranchFathomable(int status, double obj);
+    bool isBranchFathomable(int status, double obj);
     int process_SB_results(OsiBranchingInformation& branchInfo,
 			   OsiSolverInterface* solver,
 			   Bonmin::BonChooseVariable* choose,
