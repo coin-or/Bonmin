@@ -42,20 +42,6 @@ public:
 
 //#############################################################################
     
-// This needs to be the same as enum VarSelectStra_Enum in
-// BonOsiTMINLPInterface.hpp
-enum BM_BranchingStrategy {
-    BM_MostFractional=0,
-    BM_StrongBranching,
-    BM_ReliabilityBranching,
-    BM_CurvatureEstimator,
-    BM_QpStrongBranching,
-    BM_LpStrongBranching,
-    BM_NlpStrongBranching,
-    BM_OsiChooseVariable,
-    BM_OsiChooseStrong
-};
-
 enum BM_message {
     BM_StrongBranchRequest,
     BM_StrongBranchResult,
@@ -73,16 +59,11 @@ class BM_par {
 public:
     enum chr_params {
         //
-        CombinedDistanceAndPriority,
 	PrintBranchingInfo,
-	SosWithLowPriorityMoreImportant,
-        VarWithLowPriorityMoreImportant,
         end_of_chr_params
     };
     enum int_params {
         //
-	BranchingStrategy,
-	FullStrongBranch,
         NumNlpFailureMax,
         end_of_int_params
     };
