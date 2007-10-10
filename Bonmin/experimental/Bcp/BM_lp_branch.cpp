@@ -16,6 +16,10 @@
 #include "BonLpBranchingSolver.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 
+static bool ifprint = true;
+
+static bool ifprint2 = true;
+
 //#############################################################################
 
 BCP_branching_decision
@@ -27,6 +31,9 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
                                    BCP_vec<BCP_lp_branching_object*>& cands,
 				   bool force_branch)
 {
+  /* FIXME: this is good only for BB and using NLP to solve a node */
+  bm_stats.incNumberNodeSolves();
+
   Bonmin::OsiTMINLPInterface* nlp =
     dynamic_cast<Bonmin::OsiTMINLPInterface*>(getLpProblemPointer()->lp_solver);
   // If we are doing pure B&B then we have an nlp, and then we check for
@@ -34,11 +41,11 @@ BM_lp::select_branching_candidates(const BCP_lp_result& lpres,
   if (nlp) {
     if (lpres.termcode() & BCP_Abandoned) {
       if (nlp->isIterationLimitReached()) {
-	printf("\
+	print(ifprint, "\
 BM_lp: At node %i : WARNING: nlp reached iter limit. Will force branching\n",
 	       current_index());
       } else {
-	printf("\
+	print(ifprint, "\
 BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
 	       current_index());
       }
@@ -46,7 +53,7 @@ BM_lp: At node %i : WARNING: nlp is abandoned. Will force branching\n",
       nlp->forceBranchable();
       numNlpFailed_++;
       if (numNlpFailed_ >= par.entry(BM_par::NumNlpFailureMax)) {
-	printf("WARNING! Too many (%i) NLP failures in a row. Abandoning node.",
+	print(ifprint, "WARNING! Too many (%i) NLP failures in a row. Abandoning node.",
 	       numNlpFailed_);
 	return BCP_DoNotBranch_Fathomed;
       }
@@ -135,9 +142,9 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
 	continue;
       }
       const int iCol = object->columnNumber();
-      const double lb = branchInfo.lower_[ind];
-      const double ub = branchInfo.upper_[ind];
-      if (lb == ub) {
+      const double lb = branchInfo.lower_[iCol];
+      const double ub = branchInfo.upper_[iCol];
+      if (fabs(ub - lb) < 0.1) {
 	continue;
       }
       value = branchInfo.solution_[iCol];
@@ -224,39 +231,80 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
   const int fixed_size = bm_buf.size();
   // We got a few procs to work with, so do distributed strong branching
   int pidCnt = 0;
+  print(ifprint2, "pidNum: %i,  infNum_: %i,  feasNum_: %i\n",
+	pidNum, infNum_, feasNum_);
+  for (int j = 0; j < feasNum_; ++j) {
+    const int ind =  solver->object(feasInd_[j])->columnNumber();
+    print(ifprint2, "feasInd_[%i]: %i    lb: %lf   ub: %lf\n",
+	  j, ind, branchInfo.lower_[ind], branchInfo.upper_[ind]);
+  }
+  /* For the 0-th object just send out the up-branch, the down branch will be
+     processed locally. */
+  {
+    const int ind = solver->object(infInd_[0])->columnNumber();
+    const double val = branchInfo.solution_[ind];
+    send_one_SB_data(fixed_size, BM_Var_UpBranch, infInd_[0], ind,
+		     val, ceil(val), pids[pidCnt++]);
+  }
   int i;
-  const int infSend = CoinMin(infNum_, pidNum >> 1);
-  for (i = 0; i < infSend; ++i) {
+  for (i = 1; i < infNum_ && pidCnt < pidNum; ++i) {
     /* FIXME: think about SOS */
-    const OsiObject* object = solver->object(infInd_[i]);
-    const int ind = object->columnNumber();
+    const int ind = solver->object(infInd_[i])->columnNumber();
     const double val = branchInfo.solution_[ind];
     send_one_SB_data(fixed_size, BM_Var_DownBranch, infInd_[i], ind,
 		     val, floor(val), pids[pidCnt++]);
+    assert(pidCnt < pidNum);
     send_one_SB_data(fixed_size, BM_Var_UpBranch, infInd_[i], ind,
 		     val, ceil(val), pids[pidCnt++]);
   }
-  if (infSend == infNum_) {
-    i = 0;
-    while (pidCnt < pidNum) {
-      const OsiObject* object = solver->object(feasInd_[i]);
-      const int ind = object->columnNumber();
-      const double lb = branchInfo.lower_[ind];
-      const double ub = branchInfo.upper_[ind];
-      const double val = branchInfo.solution_[ind];
-      if (floor(val+0.5) > lb) { // not at its lb
-	send_one_SB_data(fixed_size, BM_Var_DownBranch, feasInd_[i], ind,
-			 val, floor(val - 0.5), pids[pidCnt++]);
+  i = 0;
+  while (pidCnt < pidNum) {
+    print(ifprint2, "running through feas: i: %i   feasInd_[i]: %i\n",
+	  i, feasInd_[i]);
+    const int ind = solver->object(feasInd_[i])->columnNumber();
+    const double lb = branchInfo.lower_[ind];
+    const double ub = branchInfo.upper_[ind];
+    const double val = branchInfo.solution_[ind];
+    if (floor(val+0.5) > lb) { // not at its lb
+      send_one_SB_data(fixed_size, BM_Var_DownBranch, feasInd_[i], ind,
+		       val, floor(val - 0.5), pids[pidCnt++]);
+      if (pidCnt == pidNum) {
+	break;
       }
-      if (ceil(val-0.5) < ub) { // not at its ub
-	send_one_SB_data(fixed_size, BM_Var_UpBranch, feasInd_[i], ind,
-			 val, ceil(val + 0.5), pids[pidCnt++]);
-      }
-      ++i;
     }
+    if (ceil(val-0.5) < ub) { // not at its ub
+      send_one_SB_data(fixed_size, BM_Var_UpBranch, feasInd_[i], ind,
+		       val, ceil(val + 0.5), pids[pidCnt++]);
+    }
+    ++i;
   }
   bm_buf.clear();
   return pidCnt;
+}
+
+//-----------------------------------------------------------------------------
+
+/* FIXME: this assumes that the solver is the NLP solver. Maybe we should use
+   the nlp solver in BM_lp */
+void
+BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
+			     OsiSolverInterface* solver)
+{
+  BM_SB_result& sbres = sbResult_[infInd_[0]];
+  const int ind = solver->object(infInd_[0])->columnNumber();
+  const double val = branchInfo.solution_[ind];
+  const double old_bd = solver->getColUpper()[ind];
+  solver->setColUpper(ind, floor(val));
+  solver->resolve();
+  sbres.branchEval |= 1;
+  sbres.status[0] =
+    (solver->isAbandoned()           ? BCP_Abandoned : 0) |
+    (solver->isProvenOptimal()       ? BCP_ProvenOptimal : 0) |
+    (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
+  sbres.objval[0] =
+    (sbres.status[0] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
+  sbres.iter[0] = solver->getIterationCount();
+  solver->setColUpper(ind, old_bd);
 }
 
 //-----------------------------------------------------------------------------
@@ -304,23 +352,23 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   int i;
 #define BM_PRINT_DATA
 #ifdef BM_PRINT_DATA
-  printf("Infeas\n");
+  print(ifprint, "Infeas\n");
   for (i = 0; i < infNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[infInd_[i]];
     if (sbres.branchEval == 0) {
       continue;
     }
-    printf("eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
+    print(ifprint, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
 	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
 	   sbres.objval[0], sbres.objval[1]);
   }
-  printf("Feas\n");
+  print(ifprint, "Feas\n");
   for (i = 0; i < feasNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[feasInd_[i]];
     if (sbres.branchEval == 0) {
       continue;
     }
-    printf("eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
+    print(ifprint, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
 	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
 	   sbres.objval[0], sbres.objval[1]);
   }
@@ -452,7 +500,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   // At this point best is not -1, create the branching object
   const OsiObject * object = solver->object(infInd_[best]);
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
-  printf("Branched on variable %i, bestWhichWay: %i\n",
+  print(ifprint, "Branched on variable %i, bestWhichWay: %i\n",
 	 object->columnNumber(), bestWhichWay);
 
   return (fixedStat & 1) != 0 ? -1 : 0;
@@ -477,18 +525,19 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
   }
 
   bm_buf.clear();
-  bm_buf.pack(branchNum);
+  bm_buf.pack(branchNum-1);
   send_message(parent(), bm_buf, BCP_Msg_RequestProcessList);
   bm_buf.clear();
   receive_message(parent(), bm_buf, BCP_Msg_ProcessList);
-  int* pids;
+  int* pids = NULL;
   int pidNum;
   bm_buf.unpack(pids, pidNum);
 
-  if (pidNum >= 2) {
+  if (pidNum >= 1) {
     pidNum = send_data_for_distributed_SB(branchInfo, solver, pids, pidNum);
     // While the others are working, initialize the result array
     clear_SB_results();
+    solve_first_candidate(branchInfo, solver);
     while (pidNum > 0) {
       receive_distributed_SB_result();
       --pidNum;
@@ -523,7 +572,7 @@ BM_lp::bbBranch(OsiBranchingInformation& brInfo,
   OsiBranchingObject* brObj = NULL;
 
 //   static int cnt = 0;
-//   printf("cnt = %i\n", cnt);
+//   print(ifprint, "cnt = %i\n", cnt);
 //   ++cnt;
 
   const int numCols = nlp->getNumCols();
@@ -631,7 +680,7 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       BCP_lp_integer_branching_object o(intBrObj);
       cands.push_back(new BCP_lp_branching_object(o, order));
       if (par.entry(BM_par::PrintBranchingInfo)) {
-	printf("BM_lp: branching on variable %i   value: %f\n",
+	print(ifprint, "BM_lp: branching on variable %i   value: %f\n",
 	       intBrObj->originalObject()->columnNumber(),
 	       intBrObj->value());
       }
@@ -646,7 +695,7 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       BCP_lp_sos_branching_object o(sosBrObj);
       cands.push_back(new BCP_lp_branching_object(nlp, o, order));
       if (par.entry(BM_par::PrintBranchingInfo)) {
-	printf("BM_lp: branching on SOS %i   value: %f\n",
+	print(ifprint, "BM_lp: branching on SOS %i   value: %f\n",
 	       sosBrObj->originalObject()->columnNumber(),
 	       sosBrObj->value());
       }
@@ -717,12 +766,10 @@ BM_lp::process_message(BCP_buffer& buf)
     break;
   }
   nlp.resolve();
-  int status = 0;
-  status |= (nlp.isAbandoned()              ? BCP_Abandoned : 0);
-  status |= (nlp.isProvenOptimal()          ? BCP_ProvenOptimal : 0);
-  status |= (nlp.isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
-  // FIXME: nlp.isProvenDualInfeasible() not needed. assume primal is bounded
-  // status |= (nlp.isProvenDualInfeasible()   ? BCP_ProvenDualInf : 0);
+  int status = 
+    (nlp.isAbandoned()              ? BCP_Abandoned : 0) |
+    (nlp.isProvenOptimal()          ? BCP_ProvenOptimal : 0) |
+    (nlp.isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
   double objval = (status & BCP_ProvenOptimal) != 0 ? nlp.getObjValue() : 0.0;
   int iter = nlp.getIterationCount();
 

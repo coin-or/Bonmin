@@ -125,7 +125,7 @@ public:
     numberSbSolves_++;
   }
   inline void incNumberFixed() {
-    numberFixed_;
+    numberFixed_++;
   }
   inline void updateStrongBrachingInfo(int chosenIndex, int listLength) {
     numberStrongBranching_++;
@@ -385,6 +385,8 @@ public:
     void clear_SB_results();
     void send_one_SB_data(int fix_size, int changeType, int objInd, int colInd,
 			  double solval, double bd, int pid);
+    void solve_first_candidate(OsiBranchingInformation& branchInfo,
+			       OsiSolverInterface* solver);
     int send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
 				     OsiSolverInterface* solver,
 				     const int* pids, const int pidNum);

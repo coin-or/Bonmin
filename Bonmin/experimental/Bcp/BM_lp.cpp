@@ -93,10 +93,6 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
     BM_node* data = dynamic_cast<BM_node*>(get_user_data());
     numNlpFailed_ = data->numNlpFailed_;
 
-    // LACI: Not sure if that is the right place to this process count
-    // solves of node NLPs
-    bm_stats.incNumberNodeSolves();
-
     if (bonmin_.getAlgorithm() != 0) {
       // Not pure BB, so an LP solver will be used. Now we have to...
 
