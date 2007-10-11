@@ -109,7 +109,7 @@ class CouenneProblem {
   CouenneProblem *clone () const;
 
   /// Update value of variables and bounds
-  void update (CouNumber *, CouNumber *, CouNumber *, int = -1);
+  void update (const CouNumber *, const CouNumber *, const CouNumber *, int = -1);
 
   int nObjs     () const {return objectives_.   size ();} ///< Get number of objectives
   int nCons     () const {return constraints_.  size ();} ///< Get number of constraints

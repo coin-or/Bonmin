@@ -26,7 +26,7 @@
 
 /// update value of variables, bounds
 
-void CouenneProblem::update (CouNumber *x, CouNumber *l, CouNumber *u, int n) {
+void CouenneProblem::update (const CouNumber *x, const CouNumber *l, const CouNumber *u, int n) {
 
   register int nvars = nVars ();
 
