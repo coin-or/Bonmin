@@ -1,5 +1,11 @@
 /* inc/config_couenne.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to the debug sanity check level (0 is no test) */
+#undef COIN_COUENNE_CHECKLEVEL
+
+/* Define to the debug verbosity level (0 is no output) */
+#undef COIN_COUENNE_VERBOSITY
+
 /* If defined, the Ampl Solver Library is available. */
 #undef COIN_HAS_ASL
 
