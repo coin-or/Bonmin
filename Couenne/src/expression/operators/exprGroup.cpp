@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: implementation of some methods for exprGroup
  *
- * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CouenneProblem.hpp>

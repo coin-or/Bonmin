@@ -3,8 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: bound tightening for current linear relaxation
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CglCutGenerator.hpp>
@@ -84,14 +84,13 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
 	/*printf ("update lbound %d: %g >= %g\n", 
 	  i+j, ll, lb_ [i+j]);*/
-	/*
-	printf ("propa %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
-		i+j, lb_ [i+j], ub_ [i+j], ll, uu, lb_ [i+j] - ll);
-	Aux (j)             -> print (std::cout); printf (" := ");
-	Aux (j) -> Image () -> print (std::cout); printf ("\n");
-	*/
 
 #ifdef DEBUG
+	printf ("propa %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
+		i, lb_ [i], ub_ [i], ll, uu, lb_ [i] - ll);
+	Var (i)             -> print (std::cout); printf (" := ");
+	Var (i) -> Image () -> print (std::cout); printf ("\n");
+
 	if (optimum_ && 
 	    (optimum_ [i] >= lb_ [i]) && 
 	    (optimum_ [i] <= ll - COUENNE_EPS)) {
@@ -122,7 +121,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	  i+j, uu, ub_ [i+j]);*/
 
 #ifdef DEBUG
-	printf ("propa %2d [(%g),%g] -> [(%g),%g] (%g) ", 
+	printf ("prop %2d [(%g),%g] -> [(%g),%g] (%g) ", 
 		i, lb_ [i], ub_ [i], ll, uu, ub_ [i] - uu);
 	Var (i)             -> print (std::cout); printf (" := ");
 	Var (i) -> Image () -> print (std::cout); printf ("\n");

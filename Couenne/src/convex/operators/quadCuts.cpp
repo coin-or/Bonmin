@@ -3,8 +3,8 @@
  * Author:  Pierre Bonami
  * Purpose: based on upper and lower convexification, add cuts to convexify
  *
- * (C) International Business Machines 2007. This file is licensed
- * under the Common Public License (CPL)
+ * (C) International Business Machines 2007. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <exprQuad.hpp>

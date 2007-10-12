@@ -1,9 +1,10 @@
 /*
- * Name:    CouennePrecisions.h
+ * Name:    CouennePrecisions.hpp
  * Author:  Pietro Belotti
  * Purpose: constants for evaluation procedures
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_PRECISIONS_HPP

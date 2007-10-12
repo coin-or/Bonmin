@@ -3,8 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: a standard cut creator for use with convexification
  *
- * (C) 2006 Pietro Belotti, all rights reserved.
- * This file is distributed under the Common Public License
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <OsiRowCut.hpp>

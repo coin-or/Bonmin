@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the class expression
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_EXPRESSION_HPP
@@ -51,11 +52,11 @@ class expression {
 
   /// Static members to be used "globally" by an expression upon
   /// evaluation with a given value of the variables' or the bounds'
-  /// vectors. 
+  /// vectors.
   ///
   /// stack is used in evaluation as a LIFO structure where all
-  /// arguments of an expression (which are expressions themselves) are
-  /// stored (with a PUSH-like operation) after being evaluated, for
+  /// arguments of an expression (which are expressions themselves)
+  /// are stored (with a PUSH operation) after being evaluated, for
   /// the current node to process them with a POP operation. PUSH and
   /// POP operations are the *++sp and *sp-- instructions,
   /// respectively, on the Stack Pointer variable sp.
@@ -64,16 +65,15 @@ class expression {
   /// the evaluation tree, DEPTH + #ARGUMENTS is at most STACK_SIZE,
   /// where DEPTH is the depth of the evaluation node and #ARGUMENTS is
   /// the number of arguments of the function in the node.
-  ///
-  /// UPDATE (04/12/07): no longer used, keep for possible new
-  /// operators
 
   static CouNumber stack [STACK_SIZE];
 
-  /// stack pointer
+  /// Stack pointer: a cursor on a LIFO structure to hold the recently
+  /// computed argument(s) of an expression
+
   static CouNumber *sp;
 
-  /// these "global" variables, static members of expression, contain
+  /// These "global" variables, static members of expression, contain
   /// the current value of the variables' and bounds' vectors. The
   /// former vector is used to compute the value of the expression, for
   /// instance when using a non-linear solver that requires evaluation

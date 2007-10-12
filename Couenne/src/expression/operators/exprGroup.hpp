@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: definition of mixed sum expressions (constant+linear+nonlinear)
  *
- * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_EXPRGROUP_H

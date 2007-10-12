@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: define the classes used by class CouenneProblem
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

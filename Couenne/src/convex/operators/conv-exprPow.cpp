@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: methods to convexify an expression x^k, k constant
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

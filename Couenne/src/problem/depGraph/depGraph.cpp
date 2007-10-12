@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: methods for manipulating dependencies between variables
  *
+ * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 

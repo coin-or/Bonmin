@@ -5,7 +5,8 @@
  *          Pietro Belotti
  * Purpose: implementation of convexification methods for exprQuad
  *
- * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <OsiRowCut.hpp>

@@ -3,8 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: tighten bounds prior to convexification cuts
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CglCutGenerator.hpp>
@@ -13,7 +13,7 @@
 #include "BonAuxInfos.hpp"
 
 // max # bound tightening iterations
-#define MAX_BT_ITER 10
+#define MAX_BT_ITER 15
 
 //#define DEBUG
 
@@ -28,7 +28,7 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
   int objInd = problem_ -> Obj (0) -> Body () -> Index ();
 
 #ifdef DEBUG
-  printf ("===================== BT\n");
+  printf ("||||||||||||||||||||| BT\n");
     for (int i=0; i < problem_ -> nVars (); i++)
       //if (variables_ [i] -> Multiplicity () > 0)
       printf ("x%d: [%g,%g]\n", i, problem_ -> Lb (i), problem_ -> Ub (i));

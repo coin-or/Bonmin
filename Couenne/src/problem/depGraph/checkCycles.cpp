@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: check for cycles in dependence graph
  *
+ * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 

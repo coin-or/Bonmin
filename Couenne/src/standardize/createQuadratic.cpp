@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: decompose sums and products
  *
+ * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 

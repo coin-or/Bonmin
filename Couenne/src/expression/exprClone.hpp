@@ -4,7 +4,8 @@
  * Purpose: definition of the clone class (different from exprCopy in
  *          that evaluation are propagated)
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_EXPRCLONE_HPP

@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: return branch gain and branch object for exponentials
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <exprExp.hpp>

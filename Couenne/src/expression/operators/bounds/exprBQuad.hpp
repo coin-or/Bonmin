@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: definition of operators to compute lower/upper bounds of quadratic forms
  *
- * (C) Pietro Belotti 2006. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_EXPRBQUAD_H

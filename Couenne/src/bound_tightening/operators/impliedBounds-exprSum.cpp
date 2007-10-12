@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: implied bound enforcing for exprSum and exprGroup
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <exprSum.hpp>

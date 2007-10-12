@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: decompose element of sum if it is of the form cx or x
  *
+ * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 

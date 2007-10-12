@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: write extended formulation
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

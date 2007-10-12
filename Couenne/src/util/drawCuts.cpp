@@ -4,6 +4,7 @@
  * Purpose: print function and cut information to be later displayed
  *          through PlotUtils' graph
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

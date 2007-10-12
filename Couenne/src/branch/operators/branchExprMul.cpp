@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: return branch data for multiplications
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <exprMul.hpp>

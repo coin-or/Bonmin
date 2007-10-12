@@ -1,10 +1,10 @@
 /*
- * Name:    CouenneTypes.h
+ * Name:    CouenneTypes.hpp
  * Author:  Pietro Belotti
  * Purpose: define number types used throughout the code
  *
- * (C) 2006 Pietro Belotti, Carnegie Mellon University.
- * This file is licensed under the Common Public License (CPL).
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_TYPES_H

@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: compute bounds on quadratic form without the contribution of a single variable
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <exprQuad.hpp>

@@ -4,7 +4,8 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for choosing branching auxiliary variable
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNECHOOSEVARIABLE_HPP

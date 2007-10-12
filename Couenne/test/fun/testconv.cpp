@@ -3,8 +3,8 @@
 // Author: Pietro Belotti
 // Purpose: test convexifier and function library
 //
-// (C) Pietro Belotti, 2006, Carnegie Mellon University
-// This file is distributed under the Common Public License (CPL)
+// (C) Carnegie-Mellon University, 2006. 
+// This file is licensed under the Common Public License (CPL)
 //
 
 #include <sys/time.h>

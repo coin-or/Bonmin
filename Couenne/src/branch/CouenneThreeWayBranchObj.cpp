@@ -3,7 +3,8 @@
  * Authors: Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for auxiliary variables
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CoinHelperFunctions.hpp>
@@ -12,7 +13,7 @@
 #include <CouenneThreeWayBranchObj.hpp>
 
 
-#define DEBUG
+//#define DEBUG
 
 /** \brief Constructor. Get a variable as an argument and set value_
            through a call to operator () of that exprAux.
@@ -39,14 +40,6 @@ CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index,
     CouNumber rnd = 3. * CoinDrand48 ();
     firstBranch_ = (rnd < 1.) ? 0 : (rnd < 2.) ? 1: 2;
   }
-
-  /*printf ("=3= x%d will branch on %g ][ %g (now at %g) [%g,%g]\n", 
-	  index_,
-	  lcrop_,
-	  rcrop_,
-	  expression::Variable (index_),
-	  expression::Lbound   (index_),
-	  expression::Ubound   (index_));*/
 }
 
 

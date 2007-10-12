@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: return branch selection for 1/x
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <exprInv.hpp>

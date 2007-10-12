@@ -1,10 +1,10 @@
 /*
- * Name: CouenneCglCutGenerator.hpp
- * Author: Pietro Belotti
- * Purpose: define a class of pools of convexification OsiRowCuts
+ * Name:    CouenneCutGenerator.hpp
+ * Author:  Pietro Belotti
+ * Purpose: a convexification cut generator for MINLP problems
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_CUT_GENERATOR_HPP
@@ -30,10 +30,12 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
  protected:
 
-  /// has generateCuts been called before?
+  /// True if no convexification cuts have been generated yet for this
+  /// problem
   mutable bool firstcall_;
 
-  /// should we add the violated cuts only (true), or all of them (false)?
+  /// True if we should add the violated cuts only, false if all of
+  /// them should be added
   mutable bool addviolated_;
 
   /// what kind of sampling should be performed?

@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: numerically find tangents to power functions
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

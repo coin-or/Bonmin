@@ -3,8 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: the generateCuts() method of the convexification class CouenneCutGenerator
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CglCutGenerator.hpp>
@@ -197,9 +197,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     //////////////////////// GET CHANGED BOUNDS DUE TO BRANCHING ////////////////////////
 
     // transmit solution from OsiSolverInterface to problem
-    problem_ -> update (const_cast <CouNumber *> (si. getColSolution ()), 
-			const_cast <CouNumber *> (si. getColLower    ()),
-			const_cast <CouNumber *> (si. getColUpper    ()));
+    problem_ -> update (si. getColSolution (), 
+			si. getColLower    (),
+			si. getColUpper    ());
 
     if ((info.inTree) && (info.pass==0)) {
 
@@ -277,7 +277,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     genRowCuts (si, cs, nchanged, changed, info, chg_bds, true);  // add cuts
 
     // restore LP point
-    problem_ -> update (const_cast <CouNumber *> (si. getColSolution ()), NULL, NULL);
+    problem_ -> update (si. getColSolution (), NULL, NULL);
 
     addviolated_ = save_av;     // restore previous value
 
@@ -295,7 +295,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 #ifdef  USE_OBBT
 
   // apply OBBT
-  if ((!firstcall_ || (info.pass > 0)) && 
+  //  if ((!firstcall_ || (info.pass > 0)) && 
+  if ((!firstcall_ && (info.pass == 0)) && 
       //  at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
       ((info.level <= COU_OBBT_CUTOFF_LEVEL) ||
        // and then with probability inversely proportional to the level

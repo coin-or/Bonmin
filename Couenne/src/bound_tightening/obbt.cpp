@@ -3,8 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: Optimality-Based Bound Tightening
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CglCutGenerator.hpp>
@@ -64,7 +64,6 @@ int call_iter (const CouenneCutGenerator *cg,
 
 
 /// Optimality based bound tightening
-///
 
 int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
 			       OsiCuts &cs,

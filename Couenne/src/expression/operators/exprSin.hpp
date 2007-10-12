@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the sine of a function
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_EXPRSIN_HPP

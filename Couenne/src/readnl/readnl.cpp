@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: define a reader for .nl files. Adapted from ampl2ev3 by L. Liberti and S. Galli 
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

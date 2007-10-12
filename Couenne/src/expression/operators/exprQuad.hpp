@@ -4,7 +4,8 @@
  * Purpose: definition of quadratic expressions (= exprGroup +
  *          quadratic = constant + linear + [nonlinear] + quadratic)
  *
- * (C) Pietro Belotti 2007. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNE_EXPRQUAD_H

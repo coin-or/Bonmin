@@ -55,8 +55,8 @@ libCouenne_la_SOURCES = \
 	expression/exprVar.cpp \
 	expression/exprAux.cpp \
 	expression/expression.cpp \
-	simplify/simplifiers.cpp \
-	simplify/simplify.cpp \
+	expression/simplify/simplifiers.cpp \
+	expression/simplify/simplify.cpp \
 	convex/checkNLP.cpp \
 	convex/addEnvelope.cpp \
 	convex/createCuts.cpp \
@@ -100,6 +100,7 @@ libCouenne_la_SOURCES = \
 	problem/constraint.cpp \
 	problem/readASLfg.cpp \
 	problem/fillQuadIndices.cpp \
+	problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp \
 	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
@@ -207,6 +208,7 @@ include_HEADERS = \
 	expression/operators/exprSub.hpp \
 	expression/operators/exprGroup.hpp \
 	expression/operators/exprQuad.hpp \
+	expression/operators/exprIf.hpp \
 	expression/operators/bounds/exprBMul.hpp \
 	expression/operators/bounds/exprBDiv.hpp \
 	expression/operators/bounds/exprBSin.hpp \

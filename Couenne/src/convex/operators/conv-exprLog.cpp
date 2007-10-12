@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: convexification and bounding methods for the logarithm operator
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

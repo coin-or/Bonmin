@@ -3,8 +3,8 @@
  * Author: Pietro Belotti, Carnegie Mellon University
  * Purpose: add generic envelope to convex function based on function and its derivative
  *
- * (C) Pietro Belotti, all rights reserved.
- * This code is distributed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 

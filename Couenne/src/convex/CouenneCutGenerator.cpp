@@ -3,8 +3,8 @@
  * Author: Pietro Belotti
  * Purpose: define a class of convexification procedures 
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 

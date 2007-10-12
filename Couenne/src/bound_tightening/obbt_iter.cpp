@@ -3,8 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: Optimality-Based Bound Tightening
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CglCutGenerator.hpp>
@@ -22,9 +22,9 @@
 
 /// reoptimize and change bound of a variable if needed
 bool obbt_updateBound (OsiSolverInterface *csi, /// interface to use as a solver
-		  int sense,               /// 1: minimize, -1: maximize
-		  CouNumber &bound,        /// bound to be updated
-		  bool isint) {            /// is this variable integer
+		       int sense,               /// 1: minimize, -1: maximize
+		       CouNumber &bound,        /// bound to be updated
+		       bool isint) {            /// is this variable integer
 
   csi -> setDblParam (OsiDualObjectiveLimit, COIN_DBL_MAX); 
   csi -> setDblParam (OsiPrimalObjectiveLimit, (sense==1) ? bound : -bound);
@@ -70,6 +70,10 @@ int obbt_iter (const CouenneCutGenerator *cg,
   // if w2 is a unary function of w1, apply bound propagation from w1
   // to w2 and mark it as exact (depending on whether it is
   // non-decreasing or non-increasing
+
+#ifdef DEBUG
+  static int iter = 0;
+#endif
 
   std::set <int> deplist;
   int deplistsize;
@@ -182,8 +186,9 @@ int obbt_iter (const CouenneCutGenerator *cg,
     // m{in,ax}imize xi on csi
 
 #ifdef DEBUG
+
     printf ("m%simizing x%d [%g,%g] %c= %g",
-	    (sense==1) ? "in" : "ax", i, p -> Lb (index), p -> Ub (index),
+	    (sense==1) ? "in" : "ax", index, p -> Lb (index), p -> Ub (index),
 	    (sense==1) ? '>'  : '<',  bound); fflush (stdout);
 
     char fname [20];
@@ -214,11 +219,17 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
       if (sense==1)
 	if (csi -> getColLower () [index] < bound - COUENNE_EPS) {
+#ifdef DEBUG
+	  printf ("l_%d: %g --> %g\n", index, csi -> getColLower () [index], bound);
+#endif 
 	  csi -> setColLower (index, bound); 
 	  chg_bds      [index].lower |= CHANGED | EXACT;
 	} else chg_bds [index].lower |= EXACT;
       else
 	if (csi -> getColUpper () [index] > bound + COUENNE_EPS) {
+#ifdef DEBUG
+	  printf ("u_%d: %g --> %g\n", index, csi -> getColUpper () [index], bound);
+#endif 
 	  csi -> setColUpper (index, bound); 
 	  chg_bds      [index].upper |= CHANGED | EXACT;
 	} else chg_bds [index].upper |= EXACT;
@@ -271,6 +282,12 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
       int psenseI = (psense == MINIMIZE) ? 1 : -1;
 
+#ifdef DEBUG
+      printf ("XXXXXXXXXXXXXXX OBBT: x_%d: [%g, %g]\n", index, 
+	      csi -> getColLower () [index], 
+	      csi -> getColUpper () [index]);
+#endif
+
       if (!(cg -> boundTightening (((objind == index) && (sense == psenseI)) ? csi : NULL, 
 				   cs, chg_bds, babInfo))) {
 #ifdef DEBUG
@@ -289,8 +306,10 @@ int obbt_iter (const CouenneCutGenerator *cg,
     // auxiliary variable (that is, we re-solved the extended
     // problem), it is worth updating the current point (it will be
     // used later to generate new cuts).
+
+    // TODO: is it, really? And shouldn't you check the opt sense too?
     if ((objind == index) && (csi -> isProvenOptimal ()))
-      p -> update (const_cast <CouNumber *> (csi -> getColSolution ()), NULL, NULL);
+      p -> update (csi -> getColSolution (), NULL, NULL);
 
     // restore null obj fun
     objcoe [index] = 0;

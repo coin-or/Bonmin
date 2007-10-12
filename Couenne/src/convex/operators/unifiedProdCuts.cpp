@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: unified convexification of products and divisions
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

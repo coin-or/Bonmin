@@ -104,6 +104,7 @@ Couenne/src/expression/operators/exprExp.cpp -text
 Couenne/src/expression/operators/exprExp.hpp -text
 Couenne/src/expression/operators/exprGroup.cpp -text
 Couenne/src/expression/operators/exprGroup.hpp -text
+Couenne/src/expression/operators/exprIf.hpp -text
 Couenne/src/expression/operators/exprInv.cpp -text
 Couenne/src/expression/operators/exprInv.hpp -text
 Couenne/src/expression/operators/exprLog.cpp -text
@@ -125,9 +126,12 @@ Couenne/src/expression/operators/exprSub.cpp -text
 Couenne/src/expression/operators/exprSub.hpp -text
 Couenne/src/expression/operators/exprSum.cpp -text
 Couenne/src/expression/operators/exprSum.hpp -text
+Couenne/src/expression/simplify/simplifiers.cpp -text
+Couenne/src/expression/simplify/simplify.cpp -text
 Couenne/src/problem/CouenneProblem.cpp -text
 Couenne/src/problem/CouenneProblem.hpp -text
 Couenne/src/problem/CouenneProblemElem.hpp -text
+Couenne/src/problem/CouenneSolverInterface.cpp -text
 Couenne/src/problem/CouenneSolverInterface.hpp -text
 Couenne/src/problem/constraint.cpp -text
 Couenne/src/problem/depGraph/checkCycles.cpp -text
@@ -141,8 +145,6 @@ Couenne/src/problem/readASLfg.cpp -text
 Couenne/src/readnl/invmap.cpp -text
 Couenne/src/readnl/nl2e.cpp -text
 Couenne/src/readnl/readnl.cpp -text
-Couenne/src/simplify/simplifiers.cpp -text
-Couenne/src/simplify/simplify.cpp -text
 Couenne/src/standardize/analyzeSparsity.cpp -text
 Couenne/src/standardize/auxiliarize.cpp -text
 Couenne/src/standardize/constrStandardize.cpp -text

@@ -4,7 +4,8 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Three way branching object for auxiliary variables
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #ifndef COUENNETHREEWAYBRANCHOBJ_HPP

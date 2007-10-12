@@ -3,7 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: find roots of polynomial Q^k(x) (see Liberti and Pantelides, 2003)
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <math.h>

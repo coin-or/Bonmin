@@ -3,7 +3,8 @@
  * Authors: Pietro Belotti, Carnegie Mellon University
  * Purpose: tools for projecting points on lines/planes
  *
- * (C) Pietro Belotti. This file is licensed under the Common Public License (CPL)
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CouennePrecisions.hpp>

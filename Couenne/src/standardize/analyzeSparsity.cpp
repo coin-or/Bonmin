@@ -4,6 +4,7 @@
  * Purpose: return one or more exprGroup/exprQuad based on sparsity of
  *          original one
  *
+ * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 

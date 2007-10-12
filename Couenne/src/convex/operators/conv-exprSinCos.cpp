@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: convexification methods for sines and cosines
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

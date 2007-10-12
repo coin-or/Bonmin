@@ -4,8 +4,8 @@
  * Purpose: create a bijection between ASL's efunc and integer to
  *          inversely map e->op fields into constant operators
  *
- * (C) 2006 Pietro Belotti, all rights reserved.
- * This code is distributed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <stdlib.h>

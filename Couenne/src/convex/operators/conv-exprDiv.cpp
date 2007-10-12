@@ -3,6 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: standardization and convexification methods for divisions
  *
+ * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
  */
 

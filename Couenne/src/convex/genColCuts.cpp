@@ -3,8 +3,8 @@
  * Author:  Pietro Belotti
  * Purpose: generate Column Cuts for improved bounds
  *
- * (C) Pietro Belotti, all rights reserved. 
- * This file is licensed under the Common Public License.
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
  */
 
 #include <CglCutGenerator.hpp>
