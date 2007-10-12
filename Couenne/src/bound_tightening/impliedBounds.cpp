@@ -16,13 +16,18 @@
 int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
   int nchg = 0; //< number of bounds changed for propagation
-  //    nvar = nVars ();
 
 #ifdef DEBUG
   printf ("=====================implied\n");
-    for (int i=0; i < nVars (); i++)
-      //if (variables_ [i] -> Multiplicity () > 0)
-      printf ("x%d: [%g,%g]\n", i, lb_ [i], ub_ [i]);
+  int j=0;
+  for (int i=0; i < nVars (); i++) 
+    if (variables_ [i] -> Multiplicity () > 0) {
+      printf ("x_%03d [%+10g %+10g] ", i, 
+	      expression::Lbound (i),
+	      expression::Ubound (i));
+      if (!(++j % 6)) printf ("\n");
+    }
+  if (j % 6) printf ("\n");
 #endif
 
   for (int ii = nVars (); ii--;) {
@@ -30,9 +35,6 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
     int i = numbering_ [ii];
 
     if (variables_ [i] -> Type () == AUX) {
-
-    //    for (int j=0; j<nAuxs () + nVars (); j++ )
-    //      printf ("--- %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
 
       if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
 #ifdef DEBUG

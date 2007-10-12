@@ -8,8 +8,11 @@
  */
 
 #include <CglCutGenerator.hpp>
+
 #include <CouenneCutGenerator.hpp>
 #include <CouenneProblem.hpp>
+#include <CouenneSolverInterface.hpp>
+
 #include "BonAuxInfos.hpp"
 
 //#define DEBUG
@@ -24,7 +27,7 @@
 #define COU_OBBT_CUTOFF_LEVEL 1
 
 // maximum number of obbt iterations
-#define MAX_OBBT_ITER 5
+#define MAX_OBBT_ITER 4
 
 #define LARGE_TOL (LARGE_BOUND / 1e6)
 
@@ -183,13 +186,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
 
 #ifdef DEBUG
-    printf (":::::::::::::::::::::constraint cuts\n");
-
-    for (int i=0; i<cs.sizeRowCuts (); i++)
-      cs.rowCutPtr (i) -> print ();
-
-    for (int i=0; i<cs.sizeColCuts (); i++)
-      cs.colCutPtr (i) -> print ();
+    if (cs.sizeRowCuts () + cs.sizeColCuts ()) {
+      printf (":::::::::::::::::::::constraint cuts\n");
+      for (int i=0; i<cs.sizeRowCuts (); i++) cs.rowCutPtr (i) -> print ();
+      for (int i=0; i<cs.sizeColCuts (); i++) cs.colCutPtr (i) -> print ();
+    }
 #endif
 
   } else { // equivalent to info.depth > 0 || info.pass > 0
@@ -244,6 +245,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // of BB tree (info.pass == 0) or if first call (creation of RLT,
   // info.pass == -1)
 
+#ifdef DEBUG
+    printf ("#### BT ...................................................\n");
+#endif
+
   if ((info.pass <= 0)
       && (! boundTightening (&si, cs, chg_bds, babInfo))) {
 #ifdef DEBUG
@@ -251,6 +256,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 #endif
     goto end_genCuts;
   }
+
+#ifdef DEBUG
+    printf ("#### ...................................................... BT DONE\n");
+#endif
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
@@ -294,7 +303,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 #define USE_OBBT
 #ifdef  USE_OBBT
 
-  // apply OBBT
+  // OBBT ////////////////////////////////////////////////////////////////////////////////
+
   //  if ((!firstcall_ || (info.pass > 0)) && 
   if ((!firstcall_ && (info.pass == 0)) && 
       //  at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
@@ -302,14 +312,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
        // and then with probability inversely proportional to the level
       (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1)))) {
 
-    OsiSolverInterface *csi = si.clone (true);
+    CouenneSolverInterface *csi = dynamic_cast <CouenneSolverInterface *> (si.clone (true));
 
-    dynamic_cast <OsiClpSolverInterface *> (csi) -> setupForRepeatedUse ();
+    csi -> setupForRepeatedUse ();
 
     int nImprov, nIter = 0;
-    bool repeat = true;
+    //    bool repeat = true;
 
-    while (repeat && 
+    while (//repeat && 
 	   (nIter++ < MAX_OBBT_ITER) &&
 	   ((nImprov = obbt (csi, cs, chg_bds, babInfo)) > 0)) 
 
@@ -323,7 +333,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	int nCurCuts = cs.sizeRowCuts ();
 	genRowCuts (*csi, cs, nchanged, changed, info, chg_bds);
-	repeat = nCurCuts < cs.sizeRowCuts (); // reapply only if new cuts available
+
+	if (nCurCuts == cs.sizeRowCuts ()) 
+	  break; // repeat only if new cuts available
       }
 
     delete csi;

@@ -1,7 +1,7 @@
 /*
  * Name:    CouenneSolverInterface.hpp
  * Authors: Pietro Belotti, Carnegie Mellon University
- * Purpose: OsiSolverInterface with a pointer to a CouenneProblem object
+ * Purpose: OsiSolverInterface with a pointer to a CouenneCutGenerator object
  *
  * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
@@ -65,6 +65,10 @@ public:
 
   /// Resolve an LP relaxation after problem modification
   virtual void resolve ();
+
+  /// Resolve an LP without applying bound tightening beforehand
+  virtual void resolve_nobt ()
+    {OsiClpSolverInterface::resolve ();}
 };
 
 #endif

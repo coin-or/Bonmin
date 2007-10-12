@@ -28,11 +28,15 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
 #ifdef DEBUG
   printf ("tighten========================\n");
+  int j=0;
   for (int i=0; i < nVars (); i++) 
-    if (variables_ [i] -> Multiplicity () > 0)
-      printf ("x_%d [%g, %g]\n", i, 
+    if (variables_ [i] -> Multiplicity () > 0) {
+      printf ("x_%03d [%+10g %+10g] ", i, 
 	      expression::Lbound (i),
 	      expression::Ubound (i));
+      if (!(++j % 6)) printf ("\n");
+    }
+  if (j % 6) printf ("\n");
 #endif
 
   expression::update (NULL, lb_, ub_);

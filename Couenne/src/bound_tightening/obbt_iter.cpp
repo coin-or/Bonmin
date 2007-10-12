@@ -10,6 +10,7 @@
 #include <CglCutGenerator.hpp>
 #include <CouenneCutGenerator.hpp>
 #include <CouenneProblem.hpp>
+#include <CouenneSolverInterface.hpp>
 
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
@@ -21,7 +22,7 @@
 //#define DEBUG
 
 /// reoptimize and change bound of a variable if needed
-bool obbt_updateBound (OsiSolverInterface *csi, /// interface to use as a solver
+bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use as a solver
 		       int sense,               /// 1: minimize, -1: maximize
 		       CouNumber &bound,        /// bound to be updated
 		       bool isint) {            /// is this variable integer
@@ -32,7 +33,7 @@ bool obbt_updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 
   ////////////////////////////////////////////////////////////////////////
 
-  csi -> resolve (); // this is a time-expensive part, be considerate...
+  csi -> resolve_nobt (); // this is a time-expensive part, be considerate...
 
   ////////////////////////////////////////////////////////////////////////
 
@@ -50,10 +51,9 @@ bool obbt_updateBound (OsiSolverInterface *csi, /// interface to use as a solver
 
 
 /// Iteration on one variable
-///
 
 int obbt_iter (const CouenneCutGenerator *cg, 
-	       OsiSolverInterface *csi, 
+	       CouenneSolverInterface *csi, 
 	       OsiCuts &cs, 
 	       t_chg_bounds *chg_bds, 
 	       const CoinWarmStart *warmstart, 
@@ -62,13 +62,11 @@ int obbt_iter (const CouenneCutGenerator *cg,
 	       int sense, 
 	       int index) {
 
-  // TODO
-  //
-  // DO NOT apply OBBT if this is a variable of the form w2 = c * w1,
-  // as it suffices to multiply result. More in general, do not apply
-  // if w2 is a unary monotone function of w1. Even more in general,
-  // if w2 is a unary function of w1, apply bound propagation from w1
-  // to w2 and mark it as exact (depending on whether it is
+  // TODO: do NOT apply OBBT if this is a variable of the form
+  // w2=c*w1, as it suffices to multiply result. More in general, do
+  // not apply if w2 is a unary monotone function of w1. Even more in
+  // general, if w2 is a unary function of w1, apply bound propagation
+  // from w1 to w2 and mark it as exact (depending on whether it is
   // non-decreasing or non-increasing
 
 #ifdef DEBUG

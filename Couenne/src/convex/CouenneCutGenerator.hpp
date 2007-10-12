@@ -21,6 +21,7 @@
 #include <BonCbc.hpp>
 
 class CouenneProblem;
+class CouenneSolverInterface;
 
 struct ASL;
 
@@ -198,7 +199,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 			t_chg_bounds *, Bonmin::BabInfo * = NULL) const;
 
   /// Optimality Based Bound Tightening
-  int obbt (OsiSolverInterface *, OsiCuts &, t_chg_bounds *, Bonmin::BabInfo *) const;
+  int obbt (CouenneSolverInterface *, OsiCuts &, t_chg_bounds *, Bonmin::BabInfo *) const;
 };
 
 #endif

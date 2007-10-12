@@ -18,7 +18,6 @@
 
 
 /// constructor
-
 CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 					  const struct ASL *asl, 
 					  bool addviolated,
@@ -44,13 +43,11 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 
 
 /// destructor
-
 CouenneCutGenerator::~CouenneCutGenerator ()
-{delete problem_;}
+  {delete problem_;}
 
 
 /// copy constructor
-
 CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
 
   OaDecompositionBase (src),
@@ -70,10 +67,9 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
 {}
 
 
-/// add half-space through two points (x1,y1) and (x2,y2)
-
 #define MAX_SLOPE 1e3
 
+/// add half-space through two points (x1,y1) and (x2,y2)
 int CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi, 
 				     CouNumber x1, CouNumber y1, 
 				     CouNumber x2, CouNumber y2, int sign) const { 
@@ -84,8 +80,6 @@ int CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
     else return createCut (cs, y2, (int) 0, wi, 1.);
   }
 
-  //CouNumber oppslope = (y1-y2) / (x2-x1);
-
   CouNumber dx = x2-x1, dy = y2-y1;
 
   //  return createCut (cs, y1 + oppslope * x1, sign, wi, 1., xi, oppslope);
@@ -94,13 +88,10 @@ int CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 
 
 /// add tangent at (x,w) with given slope
-
 int CouenneCutGenerator::addTangent (OsiCuts &cs, int wi, int xi, 
 				     CouNumber x, CouNumber w, 
-				     CouNumber slope, int sign) const { 
-
-  return createCut (cs, w - slope * x, sign, wi, 1., xi, - slope);
-}
+				     CouNumber slope, int sign) const
+  {return createCut (cs, w - slope * x, sign, wi, 1., xi, - slope);}
 
 
 /// total number of variables (original + auxiliary) of the problem

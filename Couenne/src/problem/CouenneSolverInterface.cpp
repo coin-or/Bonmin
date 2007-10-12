@@ -19,15 +19,12 @@ void CouenneSolverInterface::initialSolve ()
   {OsiClpSolverInterface::initialSolve ();}
 
 
-/// defined in Couenne/src/convex/generateCuts.cpp
+/// Defined in Couenne/src/convex/generateCuts.cpp
 void sparse2dense (int, t_chg_bounds *, int *&, int &);
 
 
 /// Resolve an LP relaxation after problem modification
 void CouenneSolverInterface::resolve () {
-
-  OsiClpSolverInterface::resolve ();
-  return;
 
   int ncols = cutgen_ -> Problem () -> nVars ();
 
@@ -51,7 +48,7 @@ void CouenneSolverInterface::resolve () {
     printf ("#### BT says infeasible before re-solve\n");
 #endif
 
-    // how do we return infeasibility? TODO
+    // how do we (more quickly) return infeasibility? TODO
   }
 
   int *changed = NULL, nchanged;

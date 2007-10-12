@@ -10,16 +10,18 @@
 #include <CglCutGenerator.hpp>
 #include <CouenneCutGenerator.hpp>
 #include <CouenneProblem.hpp>
+#include <CouenneSolverInterface.hpp>
 
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
+//#define DEBUG
 
 ///
 ///
 
 int obbt_iter (const CouenneCutGenerator *cg, 
-	       OsiSolverInterface *csi, 
+	       CouenneSolverInterface *csi, 
 	       OsiCuts &cs, 
 	       t_chg_bounds *chg_bds, 
 	       const CoinWarmStart *warmstart, 
@@ -33,7 +35,7 @@ int obbt_iter (const CouenneCutGenerator *cg,
 ///
 
 int call_iter (const CouenneCutGenerator *cg, 
-	       OsiSolverInterface *csi, 
+	       CouenneSolverInterface *csi, 
 	       OsiCuts &cs, 
 	       t_chg_bounds *chg_bds, 
 	       const CoinWarmStart *warmstart, 
@@ -65,7 +67,7 @@ int call_iter (const CouenneCutGenerator *cg,
 
 /// Optimality based bound tightening
 
-int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
+int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
 			       OsiCuts &cs,
 			       t_chg_bounds *chg_bds,
 			       Bonmin::BabInfo * babInfo) const {
@@ -106,6 +108,10 @@ int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
   csi -> setObjSense (1);        // minimization
 
   int nimprov = 0, ni;
+ 
+#ifdef DEBUG
+  printf (":::::: OBBT on originals ----------------\n");
+#endif
 
   if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR,  1)) < 0) return ni;
   nimprov += ni;
@@ -113,10 +119,18 @@ int CouenneCutGenerator::obbt (OsiSolverInterface *csi,
   if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR, -1)) < 0) return ni;
   nimprov += ni;
 
+#ifdef DEBUG
+  printf (":::::: OBBT on auxiliaries --------------\n");
+#endif
+
   if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX,  1)) < 0) return ni;
   nimprov += ni;
 
   if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX, -1)) < 0) return ni;
+
+#ifdef DEBUG
+  printf (":::::: ---------------------------------\n");
+#endif
 
   return (nimprov + ni);
 }
