@@ -13,6 +13,7 @@
 
 #include "CouenneObject.hpp"
 #include "CouenneChooseVariable.hpp"
+#include "CouenneSolverInterface.hpp"
 #include "BonAuxInfos.hpp"
 #include "BonCbcNode.hpp"
 
@@ -60,7 +61,7 @@ namespace Bonmin{
 
     gatherParametersValues(options_);
 
-    continuousSolver_ = new OsiClpSolverInterface;
+    continuousSolver_ = new CouenneSolverInterface;
     CouenneInterface * ci = new CouenneInterface;
     nonlinearSolver_ = ci;
     /* Read the model in various places. */
@@ -163,6 +164,9 @@ namespace Bonmin{
       cg.cgl = couenneCg;
       cg.id = "Couenne convexifier cuts";
       cutGenerators().push_back(cg);
+
+      // set cut gen pointer
+      dynamic_cast <CouenneSolverInterface *> (continuousSolver_) -> setCutGenPtr (couenneCg);
     }
 
     /*Setup heuristic to solve nlp problems.*/

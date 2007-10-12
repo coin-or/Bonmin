@@ -166,7 +166,7 @@ CouenneInterface::extractLinearRelaxation
    }
  
    //si.writeMpsNative("toto",NULL,NULL,1);
-   //si.writeLp("toto");
+   si.writeLp ("toto");
    app_ -> enableWarmStart();
 
    //   if (problem () -> x_sol ()) {
