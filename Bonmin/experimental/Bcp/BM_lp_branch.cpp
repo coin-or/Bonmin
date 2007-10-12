@@ -17,8 +17,8 @@
 #include "BonOsiTMINLPInterface.hpp"
 
 static bool ifprint = true;
-
 static bool ifprint2 = true;
+#define BM_PRINT_DATA
 
 //#############################################################################
 
@@ -180,8 +180,19 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
   infNum_ = 0;
   feasNum_ = 0;
 
+  const bool isRoot = (current_index() == 0);
+  int way;
+
+  printf("DisregardPriorities: %i\n",
+	 par.entry(BM_par::DisregardPriorities) ? 1 : 0);
+  printf("DecreasingSortInSetupList: %i\n",
+	 par.entry(BM_par::DecreasingSortInSetupList) ? 1 : 0);
+  printf("PreferHighCombinationInBranching: %i\n",
+	 par.entry(BM_par::PreferHighCombinationInBranching) ? 1 : 0);
+  printf("UsePseudoCosts: %i\n",
+	 par.entry(BM_par::UsePseudoCosts) ? 1 : 0);
+
   for (int i = 0; i < objNum_; ++i) {
-    int way;
     const int ind = objInd_[i];
     const OsiObject* object = objects[ind];
     double value = object->infeasibility(&branchInfo, way);
@@ -192,17 +203,29 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
       int priorityLevel = object->priority();
       if (lastPriority < priorityLevel) {
 	// sort the entries based on their usefulness
-	if (infBlockStart < infNum_) {
-	  CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
-		     infInd_ + infBlockStart);
+	if (infBlockStart < infNum_ &&
+	    ! par.entry(BM_par::DisregardPriorities)) {
+	  if (par.entry(BM_par::DecreasingSortInSetupList)) {
+	    CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
+		       infInd_ + infBlockStart,
+		       CoinFirstGreater_2<double,int>());
+	  } else {
+	    CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
+		       infInd_ + infBlockStart);
+	  }
 	}
 	lastPriority = priorityLevel;
       }
       double dummy;
       infInd_[infNum_] = ind;
-      infUseful_[infNum_] = choose->computeUsefulness(MAXMIN,
-						      upMult, downMult, value,
-						      object, ind, dummy);
+      if (par.entry(BM_par::UsePseudoCosts)) {
+	infUseful_[infNum_] = isRoot ?
+	  value : choose->computeUsefulness(MAXMIN, upMult, downMult, value,
+					    object, ind, dummy);
+      } else {
+	infUseful_[infNum_] = value;
+      }
+
       ++infNum_;
       branchNum += 2;
 
@@ -229,8 +252,15 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
       if (lastPriority < priorityLevel) {
 	// sort the entries based on their usefulness
 	if (feasBlockStart < feasNum_) {
-	  CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
-		     feasInd_ + feasBlockStart);
+	  if (par.entry(BM_par::DecreasingSortInSetupList) &&
+	      ! par.entry(BM_par::DisregardPriorities)) {
+	    CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
+		       feasInd_ + feasBlockStart,
+		       CoinFirstGreater_2<double,int>());
+	  } else {
+	    CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
+		       feasInd_ + feasBlockStart);
+	  }
 	}
 	lastPriority = priorityLevel;
       }
@@ -243,13 +273,41 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
     }
   }
   if (infBlockStart < infNum_) {
-    CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
-	       infInd_ + infBlockStart);
+    if (par.entry(BM_par::DecreasingSortInSetupList)) {
+      CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
+		 infInd_ + infBlockStart,
+		 CoinFirstGreater_2<double,int>());
+    } else {
+      CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
+		 infInd_ + infBlockStart);
+    }
   }
   if (feasBlockStart < feasNum_) {
-    CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
-	       feasInd_ + feasBlockStart);
+    if (par.entry(BM_par::DecreasingSortInSetupList)) {
+      CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
+		 feasInd_ + feasBlockStart,
+		 CoinFirstGreater_2<double,int>());
+    } else {
+      CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
+		 feasInd_ + feasBlockStart);
+    }
   }
+#ifdef BM_PRINT_DATA
+  print(ifprint, "Before SB Infeas\n");
+  for (int i = 0; i < infNum_; ++i) {
+    const OsiObject* object = objects[infInd_[i]];
+    print(ifprint, "col: %i,  obj: %i,  val: %lf,  useful: %lf\n",
+	  object->columnNumber(), infInd_[i],
+	  object->infeasibility(&branchInfo, way), infUseful_[i]);
+  }
+  print(ifprint, "Before SB Feas\n");
+  for (int i = 0; i < feasNum_; ++i) {
+    const OsiObject* object = objects[feasInd_[i]];
+    print(ifprint, "colInd: %i,  objInd: %i,  val: %lf,  useful: %lf\n",
+	  object->columnNumber(), feasInd_[i],
+	  object->infeasibility(&branchInfo, way), feasUseful_[i]);
+  }
+#endif  
   
   return infNum_;
 }
@@ -278,15 +336,12 @@ BM_lp::send_one_SB_data(int fixed_size, int changeType, int objInd, int colInd,
   bm_buf.pack(bd);
   send_message(pid, bm_buf);
   BM_SB_result& sbres = sbResult_[objInd];
+  sbres.objInd = objInd;
   if (changeType == BM_Var_DownBranch) {
     sbres.varChange[0] = solval - bd;
   } else {
     sbres.varChange[1] = bd - solval;
   }
-  
-  // LACI: not sure if that is the best place to count number of NLP
-  // solves for strng branching
-  bm_stats.incNumberSbSolves();
 }
 
 //-----------------------------------------------------------------------------
@@ -311,11 +366,6 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
   int pidCnt = 0;
   print(ifprint2, "pidNum: %i,  infNum_: %i,  feasNum_: %i\n",
 	pidNum, infNum_, feasNum_);
-  for (int j = 0; j < feasNum_; ++j) {
-    const int ind =  solver->object(feasInd_[j])->columnNumber();
-    print(ifprint2, "feasInd_[%i]: %i    lb: %lf   ub: %lf\n",
-	  j, ind, branchInfo.lower_[ind], branchInfo.upper_[ind]);
-  }
   /* For the 0-th object just send out the up-branch, the down branch will be
      processed locally. */
   {
@@ -369,6 +419,7 @@ BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
 			     OsiSolverInterface* solver)
 {
   BM_SB_result& sbres = sbResult_[infInd_[0]];
+  sbres.objInd = infInd_[0];
   const int ind = solver->object(infInd_[0])->columnNumber();
   const double val = branchInfo.solution_[ind];
   const double old_bd = solver->getColUpper()[ind];
@@ -429,9 +480,8 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
 			  OsiBranchingObject*& branchObject)
 {
   int i;
-#define BM_PRINT_DATA
 #ifdef BM_PRINT_DATA
-  print(ifprint, "Infeas\n");
+  print(ifprint, "SB results Infeas\n");
   for (i = 0; i < infNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[infInd_[i]];
     if (sbres.branchEval == 0) {
@@ -441,7 +491,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
 	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
 	   sbres.objval[0], sbres.objval[1]);
   }
-  print(ifprint, "Feas\n");
+  print(ifprint, "SB results Feas\n");
   for (i = 0; i < feasNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[feasInd_[i]];
     if (sbres.branchEval == 0) {
@@ -518,9 +568,10 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   // Try to choose something where both sides have finished properly.
   // Note: at this point all stati of the inf pieces is either abandoned,
   // optimal (if primal infeas then we fixed and lost feasibility)
+  const bool preferHigh = par.entry(BM_par::PreferHighCombinationInBranching);
   int best = -1;
   int bestWhichWay = 1;
-  double bestTrusted = -COIN_DBL_MAX;
+  double bestTrusted = preferHigh ? -COIN_DBL_MAX : COIN_DBL_MAX;
   const double MAXMIN = choose->maxminCrit(&branchInfo);
 
   for (i = 0; i < infNum_; ++i) {
@@ -530,14 +581,16 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
       // FIXME: Check the pseudocost
       continue;
     }
-    if ((sbres.status[0] & BCP_Abandoned) || (sbres.status[1] & BCP_Abandoned)){
+    if ((sbres.status[0]&BCP_Abandoned) || (sbres.status[1]&BCP_Abandoned)){
       continue;
     }
     double upEst = sbres.objval[1] - branchInfo.objectiveValue_;
     double downEst = sbres.objval[0] - branchInfo.objectiveValue_;
     double value =
       MAXMIN*CoinMin(upEst,downEst) + (1.0-MAXMIN)*CoinMax(upEst,downEst);
-    if (value > bestTrusted) {
+    const bool better = ( (  preferHigh && (value > bestTrusted)) ||
+			  ( !preferHigh && (value < bestTrusted)) );
+    if (better) {
       bestTrusted = value;
       best = i;
       bestWhichWay = upEst > downEst ? 0 : 1;
@@ -879,4 +932,6 @@ BM_lp::process_message(BCP_buffer& buf)
 
   delete[] clb;
   delete[] cub;
+
+  bm_stats.incNumberSbSolves();
 }

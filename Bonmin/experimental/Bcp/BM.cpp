@@ -27,6 +27,9 @@ int main(int argc, char* argv[])
     CoinError::printErrors_ = true;
     BM_init user_init;
     int retcode = -1;
+#if 1
+    retcode = bcp_main(argc, argv, &user_init);
+#else
     try {
       retcode = bcp_main(argc, argv, &user_init);
     }
@@ -52,6 +55,7 @@ int main(int argc, char* argv[])
      std::cerr<<" unrecognized exception"<<std::endl;
      throw;
    }
+#endif
 
     return retcode;
 }
@@ -61,13 +65,23 @@ int main(int argc, char* argv[])
 template <>
 void BCP_parameter_set<BM_par>::create_keyword_list() {
     // Create the list of keywords for parameter file reading
-    keys.push_back(make_pair(BCP_string("PrintBranchingInfo"),
+    keys.push_back(make_pair(BCP_string("BM_DisregardPriorities"),
+			     BCP_parameter(BCP_CharPar, DisregardPriorities)));
+    keys.push_back(make_pair(BCP_string("BM_NoStrongBranching"),
+			     BCP_parameter(BCP_CharPar, NoStrongBranching)));
+    keys.push_back(make_pair(BCP_string("BM_PrintBranchingInfo"),
 			     BCP_parameter(BCP_CharPar, PrintBranchingInfo)));
-    keys.push_back(make_pair(BCP_string("NumNlpFailureMax"),
+    keys.push_back(make_pair(BCP_string("BM_UsePseudoCosts"),
+			     BCP_parameter(BCP_IntPar, UsePseudoCosts)));
+    keys.push_back(make_pair(BCP_string("BM_DecreasingSortInSetupList"),
+			     BCP_parameter(BCP_IntPar, DecreasingSortInSetupList)));
+    keys.push_back(make_pair(BCP_string("BM_PreferHighCombinationInBranching"),
+			     BCP_parameter(BCP_IntPar, PreferHighCombinationInBranching)));
+    keys.push_back(make_pair(BCP_string("BM_NumNlpFailureMax"),
 			     BCP_parameter(BCP_IntPar, NumNlpFailureMax)));
-    keys.push_back(make_pair(BCP_string("NL_filename"),
+    keys.push_back(make_pair(BCP_string("BM_NL_filename"),
 			     BCP_parameter(BCP_StringPar, NL_filename)));
-    keys.push_back(make_pair(BCP_string("IpoptParamfile"),
+    keys.push_back(make_pair(BCP_string("BM_IpoptParamfile"),
 			     BCP_parameter(BCP_StringPar, IpoptParamfile)));
 }
 
@@ -75,7 +89,12 @@ void BCP_parameter_set<BM_par>::create_keyword_list() {
 
 template <>
 void BCP_parameter_set<BM_par>::set_default_entries() {
+    set_entry(DisregardPriorities, false);
+    set_entry(NoStrongBranching, false);
     set_entry(PrintBranchingInfo, true);
+    set_entry(UsePseudoCosts, 1);
+    set_entry(DecreasingSortInSetupList, 1);
+    set_entry(PreferHighCombinationInBranching, 0);
     set_entry(NumNlpFailureMax, 5);
     set_entry(NL_filename, "");
     set_entry(IpoptParamfile, "");

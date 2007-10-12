@@ -59,11 +59,16 @@ class BM_par {
 public:
     enum chr_params {
         //
+        NoStrongBranching,
+	DisregardPriorities,
 	PrintBranchingInfo,
         end_of_chr_params
     };
     enum int_params {
         //
+        UsePseudoCosts,
+        DecreasingSortInSetupList,
+        PreferHighCombinationInBranching,
         NumNlpFailureMax,
         end_of_int_params
     };
