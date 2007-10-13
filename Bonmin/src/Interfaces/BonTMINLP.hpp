@@ -322,30 +322,6 @@ namespace Bonmin
     
     virtual const BranchingInfo * branchingInfo() const = 0;
 
-    /** \name Cuts management. */
-    //@{
-    /** Add some linear cuts to the problem formulation */
-    void addCuts(int numberCuts, const OsiRowCut ** cuts);
-  
-    /** Remove some cuts to the formulation */
-    void removeCuts(int number ,const int * toRemove);
-
-    /** remove the last number cuts.*/
-    void removeLastCuts(int number);
-
-    /** Facilitators to pointers storing the cuts */
-    void getCutStorage(int& numCuts, 
-                       const double * & cutsLower, const double * &cutsUpper, 
-                       int & numNnz, const int * & cutsjCol, const int * & cutsiRow,
-                       const double * & cutsElem) const{
-      numCuts = nLinearCuts_;
-      cutsLower = cutsLower_;
-      cutsUpper = cutsUpper_;
-      numNnz = linearCutsNnz_;
-      cutsjCol = cutsjCol_;
-      cutsiRow = cutsiRow_;
-   }
-    //@}
     virtual const SosInfo * sosConstraints() const = 0;
 
     virtual const PerturbInfo* perturbInfo() const
@@ -411,14 +387,9 @@ namespace Bonmin
 
   /** Say if problem has a linear objective (for OA) */
   virtual bool hasLinearObjective(){return false;}
-  private:
-    /**@name Default Compiler Generated Methods
-     * (Hidden to avoid implicit creation/calling).
-     * These methods are not implemented and
-     * we do not want the compiler to implement
-     * them for us, so we declare them private
-     * and do not define them. This ensures that
-     * they will not be implicitly created/called. */
+
+  protected:
+    /** Copy constructor */
     //@{
     /** Copy Constructor */
     TMINLP(const TMINLP&);
@@ -427,26 +398,7 @@ namespace Bonmin
     void operator=(const TMINLP&);
     //@}
 
-  /** resize arrays for linear cuts */
-  void resizeLinearCuts(int newNumberCuts, int newNnz);
-  /** columnindices of linear cuts. */
-   int * cutsjCol_;
-  /** rows indices of linear cuts. */
-   int * cutsiRow_;
-  /** elements of linear cuts.*/
-  double * cutsElems_;
-  /** lower bounds for linear cuts. */
-  double * cutsLower_;
-  /** upper bounds for linear cuts. */
-  double * cutsUpper_;
-  /** number of linear cuts.*/
-  int nLinearCuts_;
-  /** number of non-zeroes in linear cuts*/
-  int linearCutsNnz_;
-  /** storage size for linear cuts number of cuts.*/
-  int linearCutsCapacity_;
-  /** storage size for linear cuts number of nnz.*/
-  int linearCutsNnzCapacity_;
+  private:
   };
 
 } // namespace Ipopt

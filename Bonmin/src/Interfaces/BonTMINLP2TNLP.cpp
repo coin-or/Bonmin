@@ -34,6 +34,9 @@ namespace Bonmin
       tminlp_(tminlp),
       n_(0),
       m_(0),
+      nnz_jac_g_(0),
+      nnz_h_lag_(0),
+      index_style_(TNLP::FORTRAN_STYLE),
       var_types_(NULL),
       x_l_(NULL),
       x_u_(NULL),
@@ -42,20 +45,32 @@ namespace Bonmin
       g_l_(NULL),
       g_u_(NULL),
       x_init_(NULL),
+      duals_init_(NULL),
       capacity_x_init_(0),
       x_init_user_(NULL),
       x_sol_(NULL),
       g_sol_(NULL),
       duals_sol_(NULL),
-//      return_status_(NOT_SOLVED),
       obj_value_(1e100),
       curr_warm_starter_(NULL),
-      need_new_warm_starter_(true)
+      nlp_lower_bound_inf_(-DBL_MAX),
+      nlp_upper_bound_inf_(DBL_MAX),
+      warm_start_entire_iterate_(true),
+      need_new_warm_starter_(true),
+      cutsjCol_(NULL),
+      cutsiRow_(NULL),
+      cutsElems_(NULL),
+      cutsLower_(NULL),
+      cutsUpper_(NULL),
+      nLinearCuts_(0),
+      linearCutsNnz_(0),
+      linearCutsCapacity_(0),
+      linearCutsNnzCapacity_(0) 
   {
     // read the nlp size and bounds information from
     // the TMINLP and keep an internal copy. This way the
     // caller can modify the bounds that are sent to Ipopt;
-    DBG_ASSERT(IsValid(tminlp_));
+    assert(IsValid(tminlp_));
 
     bool retval =
       tminlp_->get_nlp_info(n_, m_, nnz_jac_g_, nnz_h_lag_, index_style_);
@@ -116,39 +131,77 @@ namespace Bonmin
     nnz_jac_g_(other.nnz_jac_g_),
     nnz_h_lag_(other.nnz_h_lag_),
     index_style_(other.index_style_),
+    var_types_(NULL),
+    x_l_(NULL),
+    x_u_(NULL),
+    orig_x_l_(NULL),
+    orig_x_u_(NULL),
+    g_l_(NULL),
+    g_u_(NULL),
+    x_init_(NULL),
     duals_init_(NULL),
     capacity_x_init_(other.capacity_x_init_),
+    x_init_user_(NULL),
     x_sol_(NULL),
     g_sol_(NULL),
-    duals_sol_(NULL)
+    duals_sol_(NULL),
+    return_status_(other.return_status_),
+    obj_value_(other.obj_value_),
+    curr_warm_starter_(other.curr_warm_starter_),
+    nlp_lower_bound_inf_(other.nlp_lower_bound_inf_),
+    nlp_upper_bound_inf_(other.nlp_upper_bound_inf_),
+    warm_start_entire_iterate_(other.warm_start_entire_iterate_),
+    need_new_warm_starter_(other.need_new_warm_starter_),
+    cutsjCol_(NULL),
+    cutsiRow_(NULL),
+    cutsElems_(NULL),
+    cutsLower_(NULL),
+    cutsUpper_(NULL),
+    nLinearCuts_(other.nLinearCuts_),
+    linearCutsNnz_(other.linearCutsNnz_),
+    linearCutsCapacity_(other.linearCutsCapacity_),
+    linearCutsNnzCapacity_(other.linearCutsNnzCapacity_) 
   {
-    var_types_ = new TMINLP::VariableType[n_];
-    for (Index i=0; i<n_; i++) {
-      var_types_[i] = other.var_types_[i];
+    gutsOfCopy(other);
+  }
+
+  /** Overloaded Equals Operator */
+  TMINLP2TNLP &
+  TMINLP2TNLP::operator=(const TMINLP2TNLP& rhs){
+    if(this != &rhs){
+      tminlp_ = rhs.tminlp_;
+      n_ = rhs.n_;
+      m_ = rhs.m_;
+      nnz_jac_g_ = rhs.nnz_jac_g_;
+      nnz_h_lag_ = rhs.nnz_h_lag_;
+      index_style_ = rhs.index_style_;
+      capacity_x_init_ = rhs.capacity_x_init_;
+      return_status_ = rhs.return_status_;
+      obj_value_ = rhs.obj_value_;
+      curr_warm_starter_ = rhs.curr_warm_starter_;
+      nlp_lower_bound_inf_ = rhs.nlp_lower_bound_inf_;
+      nlp_upper_bound_inf_ = rhs.nlp_upper_bound_inf_;
+      warm_start_entire_iterate_ = rhs.warm_start_entire_iterate_;
+      need_new_warm_starter_ = rhs.need_new_warm_starter_;
+      nLinearCuts_ = rhs.nLinearCuts_;
+      linearCutsNnz_ = rhs.linearCutsNnz_;
+      linearCutsCapacity_ = rhs.linearCutsCapacity_;
+      linearCutsNnzCapacity_ = rhs.linearCutsNnzCapacity_;
+  
+      gutsOfDelete(); 
+      gutsOfCopy(rhs);
+
     }
-
-    x_l_ = new Number[n_];
-    x_u_ = new Number[n_]; // Those are copied in copyUserModification
-
-    orig_x_l_ = new Number[n_];
-    orig_x_u_ = new Number[n_];
-    IpBlasDcopy(n_, other.orig_x_l_, 1, orig_x_l_, 1);
-    IpBlasDcopy(n_, other.orig_x_u_, 1, orig_x_u_, 1);
-
-    g_l_ = new Number[m_];
-    g_u_ = new Number[m_];
-    IpBlasDcopy(m_, other.g_l_, 1, g_l_, 1);
-    IpBlasDcopy(m_, other.g_u_, 1, g_u_, 1);
-
-    x_init_ = new Number[capacity_x_init_];
-    x_init_user_ = new Number[n_];
-    IpBlasDcopy(n_, other.x_init_user_, 1, x_init_user_, 1);
-
-    copyUserModification(other);
+    return (*this);
   }
 
   TMINLP2TNLP::~TMINLP2TNLP()
   {
+    gutsOfDelete();
+  }
+
+  void
+  TMINLP2TNLP::gutsOfDelete(){
     delete [] var_types_;
     var_types_ = NULL;
     delete [] x_l_;
@@ -173,68 +226,108 @@ namespace Bonmin
     g_sol_ = NULL;
     delete [] duals_sol_;
     duals_sol_ = NULL;
+    delete [] cutsElems_;
+    cutsElems_ = NULL;
+    delete [] cutsiRow_;
+    cutsiRow_ = NULL;
+    delete [] cutsjCol_;
+    cutsjCol_ = NULL;
+    cutsLower_ = NULL;
+    cutsUpper_ = NULL;
   }
 
-  /** Copies the modification made to TNLP by the user (modifications
-      such as changing bound changing starting point,...).
-      this and other should be two instances of the same problem
-      I am trying to mimic a copy construction for Cbc
+  /** Copies all the arrays. 
+      \warning this and other should be two instances of the same problem
+      \warning AW: I am trying to mimic a copy construction for Cbc
       use with great care not safe.
   */
   void
-  TMINLP2TNLP::copyUserModification(const TMINLP2TNLP& other)
+  TMINLP2TNLP::gutsOfCopy(const TMINLP2TNLP& other)
   {
-    DBG_ASSERT(x_l_);
-    DBG_ASSERT(x_u_);
-    DBG_ASSERT(other.x_l_);
-    DBG_ASSERT(other.x_u_);
-    DBG_ASSERT(n_ == other.n_);
-    DBG_ASSERT(m_ == other.m_);
+    assert(n_ == other.n_);
+    assert(m_ == other.m_);
 
-    IpBlasDcopy(n_, other.x_l_, 1, x_l_, 1);
-    IpBlasDcopy(n_, other.x_u_, 1, x_u_, 1);
+    if(n_ > 0){//Copies all the arrays in n_
+      var_types_ = new TMINLP::VariableType[n_];
+      for (Index i=0; i<n_; i++) {
+        var_types_[i] = other.var_types_[i];
+      }
 
-    if(other.duals_init_) {
-      duals_init_ = &x_init_[n_];
-      IpBlasDcopy(capacity_x_init_, other.x_init_, 1, x_init_, 1);
+      x_l_ = new Number[n_];
+      x_u_ = new Number[n_]; // Those are copied in copyUserModification
+      IpBlasDcopy(n_, other.x_l_, 1, x_l_, 1);
+      IpBlasDcopy(n_, other.x_u_, 1, x_u_, 1);
+
+      orig_x_l_ = new Number[n_];
+      orig_x_u_ = new Number[n_];
+      IpBlasDcopy(n_, other.orig_x_l_, 1, orig_x_l_, 1);
+      IpBlasDcopy(n_, other.orig_x_u_, 1, orig_x_u_, 1);
+      x_init_user_ = new Number[n_];
+      IpBlasDcopy(n_, other.x_init_user_, 1, x_init_user_, 1);
+      if(other.x_sol_ !=NULL) {
+        Set_x_sol(n_,other.x_sol_);
+      }
+   }
+
+  if(m_ + linearCutsCapacity_ > 0){
+      int size = m_ + linearCutsCapacity_;
+      g_l_ = new Number[size];
+      g_u_ = new Number[size];
+      cutsLower_ = g_l_ + m_;
+      cutsUpper_ = g_u_ + m_;
+   }
+
+   if(m_ > 0){//Copies all the arrays in m_
+      IpBlasDcopy(m_, other.g_l_, 1, g_l_, 1);
+      IpBlasDcopy(m_, other.g_u_, 1, g_u_, 1);
+      if(other.g_sol_!=NULL) {
+        g_sol_ = new Number [m_];
+        IpBlasDcopy(m_, other.g_sol_, 1, g_sol_, 1);
+      }
     }
-    else
-      IpBlasDcopy(n_, other.x_init_, 1, x_init_, 1);
-    return_status_ = other.return_status_;
 
-    if(other.x_sol_ !=NULL) {
-      //DBG_ASSERT(return_status_ != NOT_SOLVED);
-      Set_x_sol(n_,other.x_sol_);
+
+    if(capacity_x_init_ > 0){
+      x_init_ = new Number[capacity_x_init_];
+
+      if(other.duals_init_) {
+        duals_init_ = &x_init_[n_];
+        IpBlasDcopy(capacity_x_init_, other.x_init_, 1, x_init_, 1);
+      }
+      else
+        IpBlasDcopy(n_, other.x_init_, 1, x_init_, 1);
     }
 
-    if(other.g_sol_!=NULL) {
-//	DBG_ASSERT(return_status_ != NOT_SOLVED);
-      g_sol_ = new Number [m_];
-      IpBlasDcopy(m_, other.g_sol_, 1, g_sol_, 1);
-    }
 
+   if(m_ > 0 || n_ > 0){
     if(other.duals_sol_!=NULL) {
-//	DBG_ASSERT(return_status_ != NOT_SOLVED);
       duals_sol_ = new Number[m_ + 2*n_];
       IpBlasDcopy(2*n_+ m_, other.duals_sol_, 1, duals_sol_, 1);
     }
+   }
 
-    obj_value_ = other.obj_value_;
-
-    curr_warm_starter_ = other.curr_warm_starter_;
-
-    nlp_lower_bound_inf_ = other.nlp_lower_bound_inf_;
-
-    nlp_upper_bound_inf_ = other.nlp_upper_bound_inf_;
-
-    need_new_warm_starter_ = other.need_new_warm_starter_;
+   if(linearCutsNnzCapacity_){
+    cutsjCol_ = new int[linearCutsNnzCapacity_];
+    cutsiRow_ = new int[linearCutsNnzCapacity_];
+    cutsElems_ = new double[linearCutsNnzCapacity_];
+    if(linearCutsNnz_ > 0){
+      CoinCopyN(other.cutsjCol_, linearCutsNnz_, cutsjCol_);
+      CoinCopyN(other.cutsiRow_, linearCutsNnz_, cutsiRow_);
+      IpBlasDcopy(linearCutsNnz_, other.cutsElems_, 1, cutsElems_, 1);
+    }
   }
+
+  if(nLinearCuts_ > 0){
+      IpBlasDcopy(nLinearCuts_, other.cutsLower_, 1, cutsLower_, 1);
+      IpBlasDcopy(nLinearCuts_, other.cutsUpper_, 1, cutsUpper_, 1);
+  }
+}
 
   void TMINLP2TNLP::SetVariablesBounds(Index n,
                                        const Number * x_l,
                                        const Number * x_u)
   {
-    DBG_ASSERT(n==n_);
+    assert(n==n_);
     IpBlasDcopy(n_, x_l, 1, x_l_, 1);
     IpBlasDcopy(n_, x_u, 1, x_u_, 1);
   }
@@ -242,20 +335,20 @@ namespace Bonmin
    void TMINLP2TNLP::SetVariablesLowerBounds(Index n,
                                        const Number * x_l)
   {
-    DBG_ASSERT(n==n_);
+    assert(n==n_);
     IpBlasDcopy(n_, x_l, 1, x_l_, 1);
   }
 
    void TMINLP2TNLP::SetVariablesUpperBounds(Index n,
                                        const Number * x_u)
   {
-    DBG_ASSERT(n==n_);
+    assert(n==n_);
     IpBlasDcopy(n_, x_u, 1, x_u_, 1);
   }
 
   void TMINLP2TNLP::SetVariableBounds(Index var_no, Number x_l, Number x_u)
   {
-    DBG_ASSERT(var_no >= 0 && var_no < n_);
+    assert(var_no >= 0 && var_no < n_);
     x_l_[var_no] = x_l;
     x_u_[var_no] = x_u;
     //    throw_exception_on_bad_variable_bound(var_no);
@@ -263,21 +356,21 @@ namespace Bonmin
 
   void TMINLP2TNLP::SetVariableLowerBound(Index var_no, Number x_l)
   {
-    DBG_ASSERT(var_no >= 0 && var_no < n_);
+    assert(var_no >= 0 && var_no < n_);
     x_l_[var_no] = x_l;
     //    throw_exception_on_bad_variable_bound(var_no);
   }
 
   void TMINLP2TNLP::SetVariableUpperBound(Index var_no, Number x_u)
   {
-    DBG_ASSERT(var_no >= 0 && var_no < n_);
+    assert(var_no >= 0 && var_no < n_);
     x_u_[var_no] = x_u;
     //    throw_exception_on_bad_variable_bound(var_no);
   }
 
   void TMINLP2TNLP::SetStartingPoint(Index n,const Number* x_init)
   {
-    DBG_ASSERT(n == n_);
+    assert(n == n_);
     IpBlasDcopy(n_, x_init, 1, x_init_, 1);
   }
 
@@ -294,7 +387,7 @@ namespace Bonmin
 
   void TMINLP2TNLP::setxInit(Index n,const Number* x_init)
   {
-    DBG_ASSERT(n == n_);
+    assert(n == n_);
     IpBlasDcopy(n_, x_init, 1, x_init_, 1);
   }
 
@@ -307,7 +400,7 @@ namespace Bonmin
 
   void TMINLP2TNLP::setDualsInit(Index m, const Number* duals_init)
   {
-    DBG_ASSERT(m == m_ + 2*n_ );
+    assert(m == m_ + 2*n_ );
 
     if(!duals_init_)
       duals_init_ = x_init_ + n_;
@@ -319,7 +412,7 @@ namespace Bonmin
   /** Set the contiuous solution */
   void TMINLP2TNLP::Set_x_sol(Index n, const Number* x_sol)
   {
-    DBG_ASSERT(n == n_);
+    assert(n == n_);
     if (!x_sol_) {
       x_sol_ = new Number[n];
     }
@@ -329,7 +422,7 @@ namespace Bonmin
   /** Change the type of the variable */
   void TMINLP2TNLP::SetVariableType(Index n, TMINLP::VariableType type)
   {
-    DBG_ASSERT(n >= 0 && n < n_);
+    assert(n >= 0 && n < n_);
     var_types_[n] = type;
   }
 
@@ -337,8 +430,8 @@ namespace Bonmin
       Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
   {
     n = n_;
-    m = m_ + tminlp_->nLinearCuts_;
-    nnz_jac_g = nnz_jac_g_ + tminlp_->linearCutsNnz_;
+    m = m_ + nLinearCuts_;
+    nnz_jac_g = nnz_jac_g_ + linearCutsNnz_;
     nnz_h_lag = nnz_h_lag_;
     index_style = index_style_;
     return true;
@@ -347,14 +440,14 @@ namespace Bonmin
   bool TMINLP2TNLP::get_bounds_info(Index n, Number* x_l, Number* x_u,
       Index m, Number* g_l, Number* g_u)
   {
-    DBG_ASSERT(n==n_);
-    DBG_ASSERT(m==m_);
+    assert(n==n_);
+    assert(m==(m_ + (int) nLinearCuts_));
     IpBlasDcopy(n_, x_l_, 1, x_l, 1);
     IpBlasDcopy(n_, x_u_, 1, x_u, 1);
     IpBlasDcopy(m_, g_l_, 1, g_l, 1);
     IpBlasDcopy(m_, g_u_, 1, g_u, 1);
-    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->cutsLower_, 1, &g_l[m_],1); 
-    IpBlasDcopy(tminlp_->nLinearCuts_, tminlp_->cutsUpper_, 1, &g_u[m_],1); 
+    IpBlasDcopy(nLinearCuts_, cutsLower_, 1, &g_l[m_],1); 
+    IpBlasDcopy(nLinearCuts_, cutsUpper_, 1, &g_u[m_],1); 
     return true;
   }
 
@@ -363,7 +456,8 @@ namespace Bonmin
       Index m, bool init_lambda,
       Number* lambda)
   {
-    assert(m==m_ + tminlp_->nLinearCuts_);
+    assert((int) nLinearCuts_ >= 0);
+    assert(m==m_ + (int) nLinearCuts_);
     assert(n==n_);
     if (init_x == true) {
       if(x_init_==NULL)
@@ -380,10 +474,10 @@ namespace Bonmin
     if(init_lambda == true) {
       if(duals_init_ == NULL)
         return false;
-      int size= 3*n + m_ + tminlp_->nLinearCuts_;
+      int size= 3*n + m_ + nLinearCuts_;
       if(size > capacity_x_init_)
-        resizeStartingPoint();
-      IpBlasDcopy(m_ + tminlp_->nLinearCuts_ , duals_init_ + 2*n , 1, lambda, 1);
+        resizeStartingPoint(0);
+      IpBlasDcopy(m_ + nLinearCuts_ , duals_init_ + 2*n , 1, lambda, 1);
     }
 
     need_new_warm_starter_ = true;
@@ -418,12 +512,12 @@ namespace Bonmin
 
   void TMINLP2TNLP::eval_g_add_linear_cuts(Index n, const Number *x, Index nCuts, Number* g)
   {
-    DBG_ASSERT(nCuts == nCuts);
-    DBG_ASSERT(n == n_);
+    assert(nCuts == nCuts);
+    assert(n == n_);
     // Add the linear cuts
-    CoinZeroN(g , tminlp_->nLinearCuts_);
-    for(int nnz = 0 ; nnz < tminlp_->linearCutsNnz_ ; nnz++){
-      g[tminlp_->cutsiRow_[nnz]] += tminlp_->cutsElems_[nnz] * x[tminlp_->cutsjCol_[nnz]];
+    CoinZeroN(g , nLinearCuts_);
+    for(unsigned int nnz = 0 ; nnz < linearCutsNnz_ ; nnz++){
+      g[cutsiRow_[nnz]] += cutsElems_[nnz] * x[cutsjCol_[nnz]];
     }
 
   }
@@ -431,9 +525,10 @@ namespace Bonmin
   bool TMINLP2TNLP::eval_g(Index n, const Number* x, bool new_x,
       Index m, Number* g)
   {
+    assert(m = m_ + nLinearCuts_);
     int return_code = tminlp_->eval_g(n, x, new_x, m_, g);
     if (return_code) {
-      eval_g_add_linear_cuts(n, x, tminlp_->nLinearCuts_, 
+      eval_g_add_linear_cuts(n, x, nLinearCuts_, 
                              g + m_);
     }
     return return_code;
@@ -442,21 +537,22 @@ namespace Bonmin
   void TMINLP2TNLP::eval_jac_g_add_linear_cuts(Index nele_cuts_jac, Index* iRow,
 					       Index* jCol, Number* values)
   {
-    DBG_ASSERT(nele_cuts_jac == tminlp_->linearCutsNnz_);
+    assert((int) linearCutsNnz_ >= 0);
+    assert(nele_cuts_jac == (int) linearCutsNnz_);
     if(iRow != NULL) {
-      DBG_ASSERT(jCol != NULL);
-      DBG_ASSERT(values == NULL);
+      assert(jCol != NULL);
+      assert(values == NULL);
 
-      int offset = (index_style_ == TNLP::FORTRAN_STYLE);
+      int offset = (index_style_ == Ipopt::TNLP::FORTRAN_STYLE);
 	for(int i = 0; i < nele_cuts_jac; i++ ) {
-	  iRow[i] = tminlp_->cutsiRow_[i] + m_ + offset; 
-	  jCol[i] = tminlp_->cutsjCol_[i] + offset;
+	  iRow[i] = cutsiRow_[i] + m_ + offset; 
+	  jCol[i] = cutsjCol_[i] + offset;
 	}
     }
     else {
-      DBG_ASSERT(jCol == NULL);
-      DBG_ASSERT(values != NULL);
-      IpBlasDcopy(nele_cuts_jac, tminlp_->cutsElems_, 1,
+      assert(jCol == NULL);
+      assert(values != NULL);
+      IpBlasDcopy(nele_cuts_jac, cutsElems_, 1,
 		  values,1);
     }
   }
@@ -466,14 +562,14 @@ namespace Bonmin
       Index *jCol, Number* values)
   {
     bool return_code =
-      tminlp_->eval_jac_g(n, x, new_x, m_, nele_jac - tminlp_->linearCutsNnz_,
+      tminlp_->eval_jac_g(n, x, new_x, m_, nele_jac - linearCutsNnz_,
 			  iRow, jCol, values);
     if (return_code) {
-      int start = nele_jac - tminlp_->linearCutsNnz_ ;
+      int start = nele_jac - linearCutsNnz_ ;
       if(iRow != NULL) iRow += start;
       if(jCol != NULL) jCol += start;
       if(values != NULL) values += start;
-      eval_jac_g_add_linear_cuts(tminlp_->linearCutsNnz_ , iRow, jCol, 
+      eval_jac_g_add_linear_cuts(linearCutsNnz_ , iRow, jCol, 
                                  values);
     }
     return return_code;
@@ -497,7 +593,7 @@ namespace Bonmin
       IpoptCalculatedQuantities* ip_cq)
   {
     assert(n==n_);
-    assert(m==m_ + tminlp_->nLinearCuts_);
+    assert(m==m_ + (int) nLinearCuts_);
     if (!x_sol_) {
       x_sol_ = new Number[n];
     }
@@ -534,7 +630,7 @@ namespace Bonmin
 
   void TMINLP2TNLP::throw_exception_on_bad_variable_bound(Index i)
   {
-    DBG_ASSERT(i >= 0 && i < n_);
+    assert(i >= 0 && i < n_);
 
     if (var_types_[i] == TMINLP::BINARY) {
       ASSERT_EXCEPTION(x_l_[i] == 0 && x_u_[i] == 1,
@@ -714,9 +810,9 @@ namespace Bonmin
   /** Resizes the starting point array in case cuts have been added or removed.
       Puts zeroes for eventually added cuts*/
   void 
-  TMINLP2TNLP::resizeStartingPoint(){
+  TMINLP2TNLP::resizeStartingPoint(int extra){
     //Always resize to have the capacity to hold twice the current number of constraints
-    int newCapacity = 3 * n_ + 2 * (m_ + tminlp_->nLinearCuts_);
+    int newCapacity = 3 * n_ + 2 * (m_ + nLinearCuts_ + extra);
     double * new_x_init= new double [newCapacity];
     int end = min(capacity_x_init_, newCapacity);
     CoinCopyN(x_init_, end , new_x_init);
@@ -728,5 +824,150 @@ namespace Bonmin
     duals_init_ = x_init_ + n_;
     capacity_x_init_ = newCapacity;
   }
-}// namespace Ipopt
+
+/** Add some cuts to the problem formulaiton (handles Quadratics).*/
+void 
+TMINLP2TNLP::addCuts(const OsiCuts &cuts){
+   const OsiRowCut * first = cuts.rowCutPtr(0);
+   addCuts(cuts.sizeRowCuts(), &first );
+}
+void
+TMINLP2TNLP::addCuts(unsigned int numberCuts, const OsiRowCut ** cuts){
+
+ int n,m,nnz_lag,nnz_hess;
+ Ipopt::TNLP::IndexStyleEnum fort;
+ get_nlp_info(n,m,nnz_lag,nnz_hess,fort);
+
+ //count the number of non-zeroes
+ //Cuts have to be added by rows for removeCuts to work
+ unsigned int nnz = linearCutsNnz_;
+ for(unsigned int i = 0 ; i < numberCuts ; i++)
+ {
+   nnz += cuts[i]->row().getNumElements();
+ }
+ int resizeNnz = nnz > linearCutsNnzCapacity_;
+ int resizeCuts = nLinearCuts_ + numberCuts > linearCutsCapacity_;
+ resizeLinearCuts(max((1+ resizeCuts) * linearCutsCapacity_, resizeCuts * numberCuts + linearCutsCapacity_), 
+                  max((1 + resizeNnz) * linearCutsNnzCapacity_, resizeNnz * nnz + linearCutsNnzCapacity_));
+
+ /* reinit nnz */
+ nnz = linearCutsNnz_; 
+
+ double * newCutsLowers = cutsLower_ + nLinearCuts_;
+ double * newCutsUppers = cutsUpper_ + nLinearCuts_;
+
+ for(unsigned int i = 0 ; i < numberCuts ; i++)
+ {
+   const int * ind = cuts[i]->row().getIndices();
+   const double * values = cuts[i]->row().getElements();
+   int size = cuts[i]->row().getNumElements();
+   unsigned int iplusn = i + nLinearCuts_;
+   for(int j = 0; j < size ; j++)
+   {
+    assert(ind[j] < n);
+    cutsjCol_[nnz] = ind[j];
+    cutsiRow_[nnz] = iplusn;
+    cutsElems_[nnz++] = values[j];
+   }
+   newCutsLowers[i] = cuts[i]->lb();
+   newCutsUppers[i] = cuts[i]->ub();
+  }
+ nLinearCuts_+=numberCuts;
+ linearCutsNnz_=nnz;
+}
+
+void
+TMINLP2TNLP::resizeLinearCuts(unsigned int newNumberCuts, unsigned int newNnz)
+{
+  if(newNumberCuts > linearCutsCapacity_)
+  {
+     double * newLower = new double[m_ + newNumberCuts];
+     double * newUpper = new double[m_ + newNumberCuts];
+     if(m_ + linearCutsCapacity_)
+     {
+       IpBlasDcopy(m_ + nLinearCuts_, g_l_, 1, newLower, 1);
+       IpBlasDcopy(m_ + nLinearCuts_, g_u_, 1, newUpper, 1);
+       delete [] g_l_;
+       delete [] g_u_;
+     }
+     g_l_ = newLower;
+     g_u_ = newUpper;
+     cutsLower_ = newLower + m_;
+     cutsUpper_ = newUpper + m_;
+     linearCutsCapacity_ = newNumberCuts;
+  }
+  if(newNnz > linearCutsNnzCapacity_)
+  {
+    double * newElems = new double [newNnz];
+    int * newiRow = new int [newNnz];
+    int * newjCol = new int [newNnz];
+    if(linearCutsNnzCapacity_)
+    {
+      IpBlasDcopy(linearCutsNnz_, cutsElems_, 1, newElems, 1);
+      CoinCopyN(cutsiRow_, linearCutsNnz_, newiRow);
+      CoinCopyN(cutsjCol_, linearCutsNnz_, newjCol);
+      delete [] cutsElems_;
+      delete [] cutsiRow_;
+      delete [] cutsjCol_;
+    }
+    cutsElems_ = newElems;
+    cutsiRow_ = newiRow;
+    cutsjCol_ = newjCol;
+    linearCutsNnzCapacity_ = newNnz;
+  }
+}
+void
+TMINLP2TNLP::removeCuts(unsigned int number, const int * toRemove){
+   if(number==0) return;
+    int n,m,nnz_lag,nnz_hess;
+   Ipopt::TNLP::IndexStyleEnum fort;
+   get_nlp_info(n,m,nnz_lag,nnz_hess,fort);
+
+   int * sorted = new int[number];
+   for(unsigned int i = 0 ; i < number ; i++) sorted[i] = toRemove[i] - m;
+   std::sort(sorted, sorted + number);  
+   int iNew = 0;
+   int k = 0;
+   for(unsigned int i = 0 ; i < linearCutsNnz_ ; i++)
+   {
+     if(sorted[k] < cutsiRow_[i]) k++;
+     if(sorted[k] < cutsiRow_[i]) throw -1;
+     if(sorted[k] == cutsiRow_[i]) continue;
+     cutsiRow_[iNew] = cutsiRow_[i] - k;
+     cutsjCol_[iNew] = cutsjCol_[i];
+     cutsElems_[iNew++] = cutsElems_[i];
+   }
+ k=0;
+ assert((int) nLinearCuts_ >= 0);
+ for(int i = sorted[k] ; i < (int) nLinearCuts_ ; i++){
+    if(sorted[k] < i) k++;
+    if(sorted[k] < i) throw -1;
+    if(sorted[k] == i) continue;
+    cutsLower_[i - k] = cutsLower_[i];
+    cutsUpper_[i - k] = cutsUpper_[i];
+ }
+ linearCutsNnz_ = iNew;
+ nLinearCuts_ -= number;
+ delete [] sorted;
+}
+void
+TMINLP2TNLP::removeLastCuts(unsigned int number){
+ number = nLinearCuts_ - number;
+ assert((int) number >= 0);
+ int iNew = 0;
+   for(unsigned int i = 0 ; i < linearCutsNnz_ ; i++)
+   {
+     if(cutsiRow_[i] >= (int) number) {
+     continue;}
+     cutsiRow_[iNew] = cutsiRow_[i];
+     cutsjCol_[iNew] = cutsjCol_[i];
+     cutsElems_[iNew++] = cutsElems_[i];
+   }
+ linearCutsNnz_ = iNew;
+ nLinearCuts_ = number;
+ std::cout<<"Number of cuts remaining "<<nLinearCuts_<<std::endl;
+ }
+
+
+}// namespace Bonmin
 

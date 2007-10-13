@@ -116,6 +116,8 @@ public:
     void use(const OsiTMINLPInterface& nlp);
     /** Read options (if not done before) and create interface using tminlp.*/
     void use(Ipopt::SmartPtr<TMINLP> tminlp );
+    /** use specific instanciation of a TMINLP2TNLP.*/
+    void use(Ipopt::SmartPtr<TMINLP2TNLP> prob);
     /** Set the non-linear solver used */
     void setNonlinearSolver(OsiTMINLPInterface * s){
       nonlinearSolver_ = s;}

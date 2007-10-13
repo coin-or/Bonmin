@@ -14,9 +14,9 @@ AUTOMAKE_OPTIONS = foreign
 
 # Here list all subdirectories into which to recurse
 SUBDIRS = src/Interfaces \
-	src/Algorithms \
-	src/CbcBonmin \
-	src/Apps 
+	  src/Algorithms \
+	  src/CbcBonmin \
+	  src/Apps 
 
 if BUILD_FP 
 SUBDIRS += experimental/FP

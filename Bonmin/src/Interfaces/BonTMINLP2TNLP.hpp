@@ -22,6 +22,7 @@
 namespace Bonmin
 {
   class IpoptInteriorWarmStarter;
+
   /** This is an adapter class that converts a TMINLP to
    *  a TNLP to be solved by Ipopt. It allows an external
    *  caller to modify the bounds of variables, allowing
@@ -40,21 +41,14 @@ namespace Bonmin
 #endif
         );
 
-    /** Copy Constructor */
+    /** Copy Constructor 
+      * \warning source and copy point to the same tminlp_.
+      */
     TMINLP2TNLP(const TMINLP2TNLP&);
 
     /** Default destructor */
     virtual ~TMINLP2TNLP();
     //@}
-
-    /** Copies the modification made to TNLP by the user (modifications
-    such as changing bound changing starting point,...).
-    this and other should be two instances of the same problem
-    I am trying to mimic a copy construction for Cbc
-    use with great care not safe.
-    */
-    void copyUserModification(const TMINLP2TNLP& other);
-
 
     /**@name Methods to modify the MINLP and form the NLP */
     //@{
@@ -369,6 +363,39 @@ namespace Bonmin
 				    Index *jCol, Number* values);
     //@}
 
+    /** \name Cuts management. */
+    //@{
+
+
+    /** Add some linear cuts to the problem formulation
+        if some of the cuts are quadratic they will be well understood as long as QUADRATIC_SAFE is defined */
+   void addCuts(unsigned int numberCuts, const OsiRowCut ** cuts);
+
+  /** Add some cuts to the problem formulaiton (handles Quadratics).*/
+  virtual void addCuts(const OsiCuts &cuts);
+
+  /** Remove some cuts to the formulation */
+  virtual void removeCuts(unsigned int number ,const int * toRemove);
+
+    /** remove the last number cuts.*/
+    void removeLastCuts(unsigned int number);
+
+    /** Facilitators to pointers storing the cuts */
+    void getCutStorage(int& numCuts, 
+                       const double * & cutsLower, const double * &cutsUpper, 
+                       int & numNnz, const int * & cutsjCol, const int * & cutsiRow,
+                       const double * & cutsElem) const{
+      numCuts = nLinearCuts_;
+      cutsLower = cutsLower_;
+      cutsUpper = cutsUpper_;
+      numNnz = linearCutsNnz_;
+      cutsjCol = cutsjCol_;
+      cutsiRow = cutsiRow_;
+      cutsElem = cutsElems_;
+      //cutsQuads = cutsQuads_;
+   }
+    //@}
+
   protected:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -382,7 +409,7 @@ namespace Bonmin
     TMINLP2TNLP();
 
     /** Overloaded Equals Operator */
-    void operator=(const TMINLP2TNLP&);
+    TMINLP2TNLP& operator=(const TMINLP2TNLP&);
     //@}
 
     /** pointer to the tminlp that is being adapted */
@@ -410,6 +437,8 @@ namespace Bonmin
     Number* orig_x_l_;
     /// Original upper bounds on variables
     Number* orig_x_u_;
+    /// Store capacity of g_ (resized when adding constraints)
+    Index capacity_g_;
     /// Lower bounds on constraints values
     Number* g_l_; // These are not modified, but a copy is kept for consistency
     /// Upper bounds on constraints values
@@ -455,9 +484,42 @@ namespace Bonmin
     /** Private method that throws an exception if the variable bounds
      * are not consistent with the variable type */
     void throw_exception_on_bad_variable_bound(Index i);
-
+    
+    /** \name Cuts storage.*/
+    // @{
+    /** resize arrays for linear cuts */
+    void resizeLinearCuts(unsigned int newNumberCuts, unsigned int newNnz);
+    /** Resize the starting point when cuts have been added.*/
+    void resizeStartingPoint(int extraStorage);
+    /** columnindices of linear cuts. */
+     int * cutsjCol_;
+    /** rows indices of linear cuts. */
+     int * cutsiRow_;
+    /** elements of linear cuts.*/
+    double * cutsElems_;
+    /** lower bounds for linear cuts. */
+    double * cutsLower_;
+    /** upper bounds for linear cuts. */
+    double * cutsUpper_;
+    /** number of linear cuts.*/
+    unsigned int nLinearCuts_;
+    /** number of non-zeroes in linear cuts*/
+    unsigned int linearCutsNnz_;
+    /** storage size for linear cuts number of cuts.*/
+    unsigned int linearCutsCapacity_;
+    /** storage size for linear cuts number of nnz.*/
+    unsigned int linearCutsNnzCapacity_;
+    //@}
     private:
-    void resizeStartingPoint();
+    // Delete all arrays
+    void gutsOfDelete();
+    
+  /** Copies all the arrays. 
+      \warning this and other should be two instances of the same problem
+      \warning AW: I am trying to mimic a copy construction for Cbc
+      use with great care not safe.
+  */
+    void gutsOfCopy(const TMINLP2TNLP &source);
   };
 
 } // namespace Ipopt

@@ -504,8 +504,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     passInMessageHandler(source.messageHandler());
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
-    problem_ = new TMINLP2TNLP(tminlp_);
-    problem_->copyUserModification(*source.problem_);
+    problem_ = new TMINLP2TNLP(*source.problem_);
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
 
     setAuxiliaryInfo(source.getAuxiliaryInfo());
@@ -1951,14 +1950,11 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
 
 static bool WarnedForNonConvexOa=false;
 
-
+static int nTimesCalled = 0;
 void
-OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
-                                            bool solveNlp)
+OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, 
+                                            const double * x, bool getObj)
 {
-  if(solveNlp)
-    initialSolve();
-
   double * rowLow = NULL;
   double * rowUp = NULL;
 
@@ -1974,7 +1970,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   const int * cutsiRow = NULL, * cutsjCol = NULL;
   const double * cutsElem = NULL, * cutsLow = NULL, * cutsUp = NULL;
 
-  tminlp_->getCutStorage(nCuts, cutsLow, cutsUp, cutsNnz, 
+  problem_->getCutStorage(nCuts, cutsLow, cutsUp, cutsNnz, 
                          cutsjCol, cutsiRow, cutsElem);
 
   //if not allocated allocate spaced for stroring jacobian
@@ -1982,11 +1978,11 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
     initializeJacobianArrays();
 
   //get Jacobian
-  tminlp_->eval_jac_g(n, getColSolution(), 1, m, nnz_jac_g, NULL, NULL, jValues_);
+  tminlp_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
 
 
   double *g = new double[m];
-  tminlp_->eval_g(n, getColSolution(),1,m,g);
+  tminlp_->eval_g(n, x, 1, m, g);
 
   rowLow = new double[m + nCuts];
   rowUp = new double[m + nCuts];
@@ -2048,7 +2044,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
        if(//For other clean tinys
        cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
                 rowLower[jRow_[i]], rowUpper[jRow_[i]],
-                getColSolution()[jCol_[i]],
+                x[jCol_[i]],
                 rowLow[jRow_[i]],
                 rowUp[jRow_[i]], tiny_, veryTiny_)) {      
           rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
@@ -2059,10 +2055,20 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
   mat.setDimensions(m,n); // In case matrix was empty, this should be enough
   
-
   //remove non-bindings equality constraints
   mat.deleteRows(numNonBindings, nonBindings);
+  if(nCuts){
+    std::cout<<"non linear problem has "<<nCuts<<" cuts."<<std::endl;
   
+    // Now treat linear cuts
+    CoinPackedMatrix mat2(true, cutsiRow, cutsjCol, cutsElem, cutsNnz);
+    mat2.setDimensions(nCuts, n); // In case some variables are not in the support
+                                  // of any cut.
+    CoinCopyN(cutsLow, nCuts, rowLow + m);
+    CoinCopyN(cutsUp, nCuts, rowUp + m);
+    mat.minorAppendSameOrdered(mat2);
+  }
+
   int numcols=getNumCols();
   double *obj = new double[numcols];
   for(int i = 0 ; i < numcols ; i++)
@@ -2092,7 +2098,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
          //addObjVar = true;
        //else { 
          //Copy the linear objective and don't create a dummy variable.
-         tminlp_->eval_grad_f(n, getColSolution(), 1,obj);
+         tminlp_->eval_grad_f(n, x, 1,obj);
          si.setObjective(obj);
        //}
     }
@@ -2108,9 +2114,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
   
       // Now get the objective cuts
       // get the gradient, pack it and add the cut
-      tminlp_->eval_grad_f(n, getColSolution(), 1,obj);
+      tminlp_->eval_grad_f(n, x, 1,obj);
       double ub;
-      tminlp_->eval_f(n, getColSolution(), 1, ub);
+      tminlp_->eval_f(n, x, 1, ub);
       ub*=-1;
       double lb = -1e300;
       CoinPackedVector objCut;
@@ -2121,24 +2127,24 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
        {
         if(cleanNnz(obj[i],colLower[i], colUpper[i],
             -getInfinity(), 0,
-            getColSolution()[i],
+            x[i],
             lb,
             ub, tiny_, veryTiny_)) {
           v->insert(i,obj[i]);
-          lb += obj[i] * getColSolution()[i];
-          ub += obj[i] * getColSolution()[i];
+          lb += obj[i] * x[i];
+          ub += obj[i] * x[i];
         }
        }
        else //Unconstrained problem can not put clean coefficient
        {
            if(cleanNnz(obj[i],colLower[i], colUpper[i],
             -getInfinity(), 0,
-            getColSolution()[i],
+            x[i],
             lb,
             ub, 1e-03, 1e-08)) {
           v->insert(i,obj[i]);
-          lb += obj[i] * getColSolution()[i];
-          ub += obj[i] * getColSolution()[i];
+          lb += obj[i] * x[i];
+          ub += obj[i] * x[i];
            }
        }
       }
@@ -2146,25 +2152,26 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, bool getObj,
     si.addRow(objCut, lb, ub);
     }
   }
+  std::ostringstream os;
+  os<<"OA_"<<nTimesCalled;
+  std::string f_name = os.str();
+  si.writeMps(f_name.c_str());
   delete [] obj;
   
-  if(solveNlp){
-   app_->enableWarmStart();
-   setColSolution(problem()->x_sol());
-   setRowPrice(problem()->duals_sol());}
-
 }
 
 /** Add a collection of linear cuts to problem formulation.*/
 void 
 OsiTMINLPInterface::applyRowCuts(int numberCuts, const OsiRowCut * cuts)
-{
+{ 
+  if(numberCuts)
+    freeCachedRowRim();
   const OsiRowCut ** cutsPtrs = new const OsiRowCut*[numberCuts];
   for(int i = 0 ; i < numberCuts ; i++)
   {
     cutsPtrs[i] = &cuts[i];
   }
-  tminlp_->addCuts(numberCuts, cutsPtrs);
+  problem_->addCuts(numberCuts, cutsPtrs);
   delete [] cutsPtrs;
 }
 
