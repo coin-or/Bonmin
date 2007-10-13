@@ -99,10 +99,7 @@ namespace Bonmin{
     // value from the initialSolve as cutoff
     // TODO: In case there are integer variables, check if all feasible
     if (ci->getNumIntegers() == 0) {
-      cutoff_ = ci->getObjValue();
-    }
-    else {
-      cutoff_ = COIN_DBL_MAX;
+      doubleParam_[Cutoff] = ci->getObjValue();
     }
 
     if(extraStuff->infeasibleNode()){

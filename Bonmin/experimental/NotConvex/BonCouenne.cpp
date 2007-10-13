@@ -52,9 +52,6 @@ int main (int argc, char *argv[])
     bonmin.InitializeCouenne(argv);
     Bab bb;
 
-    // Set the cutoff
-    bb.model().setCutoff(bonmin.getCutOff());
-
     //////////////////////////////////
 
     bb (bonmin); // do branch and bound

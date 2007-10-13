@@ -57,15 +57,8 @@ public:
       if(readOptions_) return;
       BabSetupBase::readOptionsFile("couenne.opt");}
 
-    /** Get the cutoff value from the initial solve */
-    double getCutOff() const {
-      return cutoff_;
-    }
 private:
       SmartPtr<SmartAsl> aslfg_;
-
-    // Cutoff value after initialSolve
-    double cutoff_;
   };
   
 }

@@ -76,10 +76,6 @@ public:
     return model_;
   }
 
-  /** Get cbc model used to solve. */
-  CbcModel&  model(){
-    return model_;
-  }
  /** Say that algorithm is using Couenne.*/
  void setUsingCouenne(bool v){
    usingCouenne_ = v;}
