@@ -20,5 +20,5 @@ BCP_TmVerb_BestFeasibleSolution         0  // 1: display best sol at the end
 
 BCP_TreeSearchStrategy 			0  // 0: Best Bound 
 
-NL_filename batch.nl
-IpoptParamfile bonmin.opt
+BM_NL_filename batch.nl
+BM_IpoptParamfile bonmin.opt
