@@ -77,7 +77,7 @@ public:
   }
 
   /** Get cbc model used to solve. */
-  const CbcModel&  model(){
+  CbcModel&  model(){
     return model_;
   }
  /** Say that algorithm is using Couenne.*/

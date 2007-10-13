@@ -30,9 +30,9 @@
 #include "BonFilterSolver.hpp"
 #endif
 
-#include <CbcCutGenerator.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CbcCutGenerator.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 using namespace Bonmin;
 
@@ -49,8 +49,11 @@ int main (int argc, char *argv[])
   try {
 
     CouenneSetup bonmin;
-    bonmin.InitializeBonmin(argv);
+    bonmin.InitializeCouenne(argv);
     Bab bb;
+
+    // Set the cutoff
+    bb.model().setCutoff(bonmin.getCutOff());
 
     //////////////////////////////////
 

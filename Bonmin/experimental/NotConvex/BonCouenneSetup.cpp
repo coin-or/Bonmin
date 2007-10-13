@@ -17,7 +17,6 @@
 #include "BonAuxInfos.hpp"
 #include "BonCbcNode.hpp"
 
-
 #include "asl.h"
 #include "getstub.h"
 
@@ -52,7 +51,7 @@ namespace Bonmin{
   CouenneSetup::~CouenneSetup(){
   }
   
-  void CouenneSetup::InitializeBonmin(char **& argv){
+  void CouenneSetup::InitializeCouenne(char **& argv){
     /* Get the basic options. */
     readOptionsFile();
     
@@ -95,6 +94,16 @@ namespace Bonmin{
     continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
 
     ci->extractLinearRelaxation(*continuousSolver_, *couenneCg);
+
+    // In case there are no discrete variables, we can set the optimal
+    // value from the initialSolve as cutoff
+    // TODO: In case there are integer variables, check if all feasible
+    if (ci->getNumIntegers() == 0) {
+      cutoff_ = ci->getObjValue();
+    }
+    else {
+      cutoff_ = COIN_DBL_MAX;
+    }
 
     if(extraStuff->infeasibleNode()){
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
@@ -183,7 +192,7 @@ namespace Bonmin{
       nlpHeuristic->setNumberSolvePerLevel(numSolve);
       heuristics_.push_back(nlpHeuristic);
     }
-    
+
     branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
                                   const_cast<CouenneProblem *> (couenneProb));
 

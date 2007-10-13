@@ -8,7 +8,8 @@
 // Date : 04/18/2007
 #ifndef BonCouenneSetup_H
 #define BonCouenneSetup_H
-#include "BonBabSetupBase.hpp"
+//AW #include "BonBabSetupBase.hpp"
+#include "BonBonminSetup.hpp"
 
 struct ASL;
 
@@ -26,16 +27,16 @@ public:
     virtual ~SmartAsl();
   };
   
-  class CouenneSetup : public BabSetupBase{
+  class CouenneSetup : public BonminSetup{
 public:
     /** Default constructor*/
     CouenneSetup():
-    BabSetupBase(),
+    BonminSetup(),
     aslfg_(NULL){}
     
     /** Copy constructor.*/
     CouenneSetup(const CouenneSetup& other):
-      BabSetupBase(other),
+      BonminSetup(other),
       aslfg_(NULL){}
     
     /** virtual copy constructor.*/
@@ -45,7 +46,7 @@ public:
     
     virtual ~CouenneSetup();
     /** Initialize from command line arguments.*/
-    void InitializeBonmin(char **& argv);
+    void InitializeCouenne(char **& argv);
     /** register the options */
     virtual void registerOptions();
     /** Register all Couenne options.*/
@@ -55,8 +56,16 @@ public:
     virtual void readOptionsFile(){
       if(readOptions_) return;
       BabSetupBase::readOptionsFile("couenne.opt");}
+
+    /** Get the cutoff value from the initial solve */
+    double getCutOff() const {
+      return cutoff_;
+    }
 private:
       SmartPtr<SmartAsl> aslfg_;
+
+    // Cutoff value after initialSolve
+    double cutoff_;
   };
   
 }
