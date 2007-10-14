@@ -552,10 +552,22 @@ BabSetupBase::mayPrintDoc(){
                          print_options_documentation, "");
   if (print_options_documentation) {
     std::list<std::string> categories;
-    categories.push_back("bonmin branch-and-bound options");
+    categories.push_back("Bonmin algorithm choice");
+		categories.push_back("bonmin output options");
     categories.push_back("bonmin options for robustness");
     categories.push_back("bonmin options for non-convex problems");
+    categories.push_back("bonmin branch-and-bound options");
+		categories.push_back("Diving options");
     categories.push_back("bonmin options : B-Hyb specific options");
+    categories.push_back("bonmin options : Options for OA decomposition");
+		categories.push_back("bonmin options : Outer Approximation cuts");
+    categories.push_back("bonmin options : Options for MILP subsolver in OA decomposition");
+		categories.push_back("bonmin options for MILP cutting planes");
+    categories.push_back("bonmin options : Options for ecp cuts generation");
+		categories.push_back("Bonmin ecp based strong branching");
+		categories.push_back("bonmin options : Nlp solve options");
+		categories.push_back("bonmin nlp interface option");
+		categories.push_back("bonmin experimental options");
 #ifdef COIN_HAS_FILTERSQP
     categories.push_back("FilterSQP options");
 #endif
