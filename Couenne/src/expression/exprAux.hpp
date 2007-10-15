@@ -131,8 +131,10 @@ class exprAux: public exprVar {
     {return rank_;} 
 
   /// is this expression integer?
-  virtual inline bool isInteger () 
-    {return (integer_) || (image_ -> isInteger ());}
+  virtual inline bool isInteger () {
+    return ((integer_ == AUX_INTEGER) || 
+	    (integer_ == AUX_UNSET) && ((integer_ = image_ -> isInteger ()) == AUX_INTEGER));
+  }
 
   /// Tell this variable appears once more
   inline void increaseMult () {++multiplicity_;}

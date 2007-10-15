@@ -8,7 +8,8 @@
  */
 
 #include <math.h>
-#include <CouenneTypes.hpp>
+#include "CouenneTypes.hpp"
+#include "funtriplets.hpp"
 
 #define MAX_ITER 10
 #define COU_POW_TOLERANCE 1e-12
@@ -48,6 +49,45 @@ CouNumber powNewton (CouNumber xc, CouNumber yc,
     F   = xk - xc + fpk * fk;
     if (fabs (F) > COU_POW_TOLERANCE) break;
     Fp  = 1 + fpp (xk) * fk + fpk * fpk;
+  }
+
+  return xk;
+}
+
+
+///
+CouNumber powNewton (CouNumber xc, CouNumber yc, funtriplet *tri) {
+
+  // Find a zero to the function
+  //
+  // F(x) = x - xc + f'(x) (f(x) - yc)
+  //
+  // where f(x) is either x^k, exp(x), or log(x).
+  // The derivative of F(x) is
+  //
+  // F'(x) = 1 + f''(x) (f(x) - yc) + (f'(x))^2
+  //
+  // Apply usual update:
+  //
+  // x(k+1) = x(k) - f(x(k))/f'(x(k))
+
+  register CouNumber xk = xc;
+
+  CouNumber fk  = tri -> F (xk) - yc,
+            fpk = tri -> Fp (xk),
+            F   = fpk * fk,
+            Fp  = 1 + tri -> Fpp (xk) * fk + fpk * fpk;
+
+  // Newton loop. Tolerance is set above
+  for (int k = MAX_ITER; k--;) {
+
+    xk -= F / Fp;
+
+    fk  = tri -> F (xk) - yc;
+    fpk = tri -> Fp (xk);
+    F   = xk - xc + fpk * fk;
+    if (fabs (F) > COU_POW_TOLERANCE) break;
+    Fp  = 1 + tri -> Fpp (xk) * fk + fpk * fpk;
   }
 
   return xk;

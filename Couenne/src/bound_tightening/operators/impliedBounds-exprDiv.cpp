@@ -7,9 +7,9 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprDiv.hpp>
-
-#include <CouennePrecisions.hpp>
+#include "exprDiv.hpp"
+#include "CouennePrecisions.hpp"
+#include "CoinHelperFunctions.hpp"
 
 
 /// implied bound processing for expression w = x/y, upon change in
@@ -140,13 +140,13 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
       //
 
-      resyL = (*yl<0) && (*yl < *xl/wl) && updateBound (-1, yl, mymin (*xl/wl, 0)) || resyL;
-      resxL = (*yl>0) && (*yl > *xl/wl) && updateBound (-1, xl, *yl*wl)            || resxL;
+      resyL = (*yl<0) && (*yl < *xl/wl) && updateBound (-1, yl, CoinMin (*xl/wl, 0.)) || resyL;
+      resxL = (*yl>0) && (*yl > *xl/wl) && updateBound (-1, xl, *yl*wl)               || resxL;
 
       //
 
-      resxU = (*yu<0) && (*yu < *xu/wl) && updateBound (+1, xu, *yu*wl)            || resxU;
-      resyU = (*yu>0) && (*yu > *xu/wl) && updateBound (+1, yu, mymax (*xu/wl, 0)) || resyU;
+      resxU = (*yu<0) && (*yu < *xu/wl) && updateBound (+1, xu, *yu*wl)               || resxU;
+      resyU = (*yu>0) && (*yu > *xu/wl) && updateBound (+1, yu, CoinMax (*xu/wl, 0.)) || resyU;
     }
 
     //////////// deal with upper bound of w=x/y /////////////////////////////////////////////
@@ -175,13 +175,13 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
       //
 
-      resyL = (*yl<0) && (*yl < *xu/wu) && updateBound (-1, yl, mymin (*xu/wu,0))  || resyL;//
-      resxL = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, xl, *yu*wu)            || resxL;
+      resyL = (*yl<0) && (*yl < *xu/wu) && updateBound (-1, yl, CoinMin (*xu/wu,0.))  || resyL;//
+      resxL = (*yu<0) && (*yu < *xl/wu) && updateBound (-1, xl, *yu*wu)               || resxL;
 
       //
 
-      resxU = (*yl>0) && (*yl > *xu/wu) && updateBound (+1, xu, *yl*wu)            || resxU;
-      resyU = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, yu, mymax (*xl/wu,0))  || resyU;
+      resxU = (*yl>0) && (*yl > *xu/wu) && updateBound (+1, xu, *yl*wu)               || resxU;
+      resyU = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, yu, CoinMax (*xl/wu,0.))  || resyU;
     }
 
     if (resxL) chg [xi].lower = CHANGED;

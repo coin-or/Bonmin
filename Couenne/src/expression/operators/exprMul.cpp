@@ -168,3 +168,34 @@ expression *getFixVarBinFun (expression *, expression *);
 // in a branching rule for solving a nonconvexity gap
 expression *exprMul::getFixVar () 
 {return getFixVarBinFun (arglist_ [0], arglist_ [1]);}
+
+
+/// is this expression integer?
+bool exprMul::isInteger () {
+
+  // if all operands are integer, return true
+
+  if (exprOp::isInteger ()) 
+    return true;
+
+  // otherwise, check if they are constant and their product is integer
+
+  expression *al, *au, *bl, *bu;
+
+  arglist_ [0] -> getBounds (al, au);
+  arglist_ [1] -> getBounds (bl, bu);
+
+  register CouNumber 
+    alv = (*al) (), 
+    blv = (*bl) ();
+
+  bool ac = (fabs (alv - (*au) ()) < COUENNE_EPS), // first  is constant
+       bc = (fabs (blv - (*bu) ()) < COUENNE_EPS); // second is constant
+
+  return ((ac && (fabs (alv) < COUENNE_EPS))   ||
+	  (bc && (fabs (blv) < COUENNE_EPS))   ||
+	  (ac && bc && (fabs (COUENNE_round (alv * blv) - alv * blv) < COUENNE_EPS)) ||
+	  (ac && arglist_ [1] -> isInteger ()) ||
+	  (bc && arglist_ [0] -> isInteger ()));
+}
+

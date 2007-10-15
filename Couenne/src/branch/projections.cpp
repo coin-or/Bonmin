@@ -13,6 +13,9 @@
 #include <CouenneTypes.hpp>
 #include <CouennePrecisions.hpp>
 
+//#define DEBUG
+
+
 /*  compute projection of point (x0, y0) on the segment defined by
  *  line ax + by + c <>= 0 (sign provided by parameter sign) and
  *  bounds [lb, ub] on x. Return distance from segment, 0 if satisfied
@@ -69,18 +72,27 @@ CouNumber project (CouNumber a, CouNumber b, CouNumber c,
 }
 
 
-/*  Compute best branching point (within interval [lb,ub]) given
- *  function f, its derivative fp and the current optimum (x0,y0)
+/** Compute projection of point (x0, y0) on the segment defined by two
+ *  points (x1,y1), (x2, y2) -- sign provided by parameter
+ *  sign. Return distance from segment, 0 if on it.
  */
-/*
-CouNumber bestBranchPoint (CouNumber lb, CouNumber ub, 
-			   CouNumber x0, CouNumber y0, 
-			   unary_function f,
-			   unary_function fp) {
 
-  return 0;
+CouNumber projectSeg (CouNumber x0,  CouNumber y0, 
+		      CouNumber x1,  CouNumber y1, 
+		      CouNumber x2,  CouNumber y2,
+		      int sign, 
+		      CouNumber *xp, CouNumber *yp) {
+
+  CouNumber 
+    dx = x2-x1,
+    dy = y2-y1,
+    a =  dy, 
+    b = -dx,
+    c = y1*dx - x1*dy;
+
+  return project (a, b, c, x0, y0, x1, x2, sign, xp, yp);
 }
-*/
+
 /*
 int main (int argc, char **argv) {
 

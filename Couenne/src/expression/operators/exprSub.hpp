@@ -70,9 +70,7 @@ class exprSub: public exprOp {
 			     CouNumber =  COUENNE_INFINITY);
 
   /// is this expression integer?
-  virtual bool isInteger () 
-  {return ((arglist_ [0] -> isInteger ()) && 
-	   (arglist_ [1] -> isInteger ()));}
+  virtual bool isInteger ();
 
   /// Code for comparisons
   virtual enum expr_type code () {return COU_EXPRSUB;}

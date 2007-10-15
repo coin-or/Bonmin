@@ -177,7 +177,7 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
       qii [qi] = coe; // quadratic term
 
       CouNumber
-	maxbUb = mymax (fabs (li), fabs (ui)),
+	maxbUb = CoinMax (fabs (li), fabs (ui)),
 	maxbLb = (li >= 0) ? (li) : (ui <= 0) ? (ui) : 0;
 
       if (maxbUb > COUENNE_INFINITY) maxbUb = 0;
@@ -214,10 +214,10 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
       linCoeMax [qj] += coe * b2 [qi];
 
       CouNumber
-	addLo = mymin (mymin (li*lj, ui*uj),
-		       mymin (ui*lj, li*uj)),
-	addUp = mymax (mymax (li*lj, ui*uj), 
-		       mymax (ui*lj, li*uj));
+	addLo = CoinMin (CoinMin (li*lj, ui*uj),
+		         CoinMin (ui*lj, li*uj)),
+	addUp = CoinMax (CoinMax (li*lj, ui*uj), 
+  	  	         CoinMax (ui*lj, li*uj));
 
       if (addLo < -COUENNE_INFINITY) addLo = 0;
       if (addUp >  COUENNE_INFINITY) addUp = 0;

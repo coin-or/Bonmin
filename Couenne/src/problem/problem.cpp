@@ -95,12 +95,12 @@ void CouenneProblem::initAuxs (CouNumber *x,
       exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
 
       // set bounds 
-      if ((lb_[ord] = mymax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord] = -DBL_MAX;
-      if ((ub_[ord] = mymin (ub_[ord], (*(aux -> Ub()))())) >=  COUENNE_INFINITY) ub_[ord] =  DBL_MAX;
+      if ((lb_[ord] = CoinMax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord]=-DBL_MAX;
+      if ((ub_[ord] = CoinMin (ub_[ord], (*(aux -> Ub()))())) >=  COUENNE_INFINITY) ub_[ord]= DBL_MAX;
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
-      x_ [ord] = mymax (lb_ [ord], mymin (ub_ [ord], (*(aux -> Image ())) ()));
+      x_ [ord] = CoinMax (lb_ [ord], CoinMin (ub_ [ord], (*(aux -> Image ())) ()));
     }
   }
 }

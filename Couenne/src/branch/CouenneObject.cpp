@@ -32,7 +32,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   if (reference_ -> Image () -> Linearity () <= LINEAR) {
       //(reference_ -> Multiplicity () <= 0))
 #ifdef DEBUG
-    printf ("a linear CouenneObject... "); 
+    printf ("infeasibility of a linear CouenneObject? "); 
     reference_ -> print (); printf (" := ");
     reference_ -> Image () -> print (); printf ("\n");
 #endif
@@ -43,82 +43,54 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 		      const_cast <CouNumber *> (info -> lower_),
 		      const_cast <CouNumber *> (info -> upper_));
 
-  /*if (index < 0) {
-    printf ("CouenneObject::infeasibility: Warning, fixvar has no index\n");
-    return 0.;
-    }*/
-
-  /*for (int i=0; i<16; i++)
-      printf ("%4d: %10g [%10g, %10g]\n", i,
-	      info -> solution_ [i], 
-	      info -> lower_ [i], 
-	      info -> upper_ [i]);*/
-
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
 
   const double expr = (*(reference_ -> Image ())) (), 
                var  = (*reference_) ();
 
-  /*printf ("in infeas [%g,%g] ", expr, var); 
-  reference_ -> print (); printf (" := ");
-  reference_ -> Image () -> print (); printf ("\n");*/
-
   CouNumber delta = fabs (var - expr);
 
-  /// avoid branching on (relatively) small deltas
+  /// avoid branching on (relatively and absolutely) small deltas
+
   if ((delta                           < COUENNE_EPS) || 
       (delta / (1 + fabs (var + expr)) < COUENNE_EPS))
-    delta = 0.;
 
-  else {
+    return 0.;
 
-    // a nonlinear constraint w = f(x) is violated. The infeasibility
-    // is given by something more elaborate than |w-f(x)|, that is, it
-    // is the minimum, among the two branching nodes, of the distance
-    // from the current optimum (w,x) and the optimum obtained after
-    // convexifying the two subproblems. We call selectBranch for the
-    // purpose, and save the output parameter into the branching point
-    // that should be used later in createBranch.
+  // a nonlinear constraint w = f(x) is violated. The infeasibility
+  // is given by something more elaborate than |w-f(x)|, that is, it
+  // is the minimum, among the two branching nodes, of the distance
+  // from the current optimum (w,x) and the optimum obtained after
+  // convexifying the two subproblems. We call selectBranch for the
+  // purpose, and save the output parameter into the branching point
+  // that should be used later in createBranch.
 
-    // TODO: how to avoid this part of the code when called from
-    // CbcModel::setSolution() ?
+  // TODO: how to avoid this part of the code when called from
+  // CbcModel::setSolution() ?
 
-    CouNumber improv = reference_ -> Image () -> selectBranch 
-      (reference_, info,             // input parameters
-       brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
+  CouNumber improv = reference_ -> Image () -> selectBranch 
+    (reference_, info,             // input parameters
+     brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
 
-    if (brVarInd_ >= 0) {
+  if (brVarInd_ >= 0) {
 
-      delta = improv;
-      //      expression *fixvar = reference_ -> Image () -> getFixVar ();
-
-      /*
-      if (fixvar) 
-	brVarInd_ = fixvar -> Index ();
-
-      assert (brVarInd_ >= 0);
-      */
-      whichWay_ = whichWay;
+    if (improv <= COUENNE_EPS) {
+      printf ("### warning, infeas = %g for ");
+      reference_ -> print (); printf (":=");
+      reference_ -> Image () -> print (); printf ("\n");
     }
 
-    /*
-    if (improv >= 0)
-      delta = improv;
+    delta = improv;
+    whichWay_ = whichWay;
 
-    if (fabs (improv) < COUENNE_EPS)
-      delta = 0.;
-    */
-
-    // This should make getFixVar() useless if used in exprMul or
-    // exprDiv, i.e., the only non-unary operators.
-
-    // make delta a function of the variable's rank and multiplicity
-
-    /*delta =   WEI_INF  * (1. - exp (-delta))
-            + WEI_RANK / (1. + fixvar -> rank ())
-            + WEI_MULT * (1. - 1. / fixvar -> Multiplicity ());*/
+    if (info -> lower_ [brVarInd_] >= 
+	info -> upper_ [brVarInd_] - COUENNE_EPS) 
+      delta = 0;
   }
+
+  // This should make getFixVar() useless if used in exprMul or
+  // exprDiv, i.e., the only non-unary operators.
 
 #ifdef DEBUG
   printf ("Inf |%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
@@ -126,7 +98,6 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 	  //	    expression::Lbound (reference_ -> Index ()),
 	  //	    expression::Ubound (reference_ -> Index ()),
 	  fabs (var - expr), delta, whichWay, brVarInd_);
-
   reference_             -> print (std::cout); std::cout << " = ";
   reference_ -> Image () -> print (std::cout); printf ("\n");
 #endif
@@ -148,9 +119,12 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   solver -> setColLower (index, val);
   solver -> setColUpper (index, val);
 
-  expression * expr = reference_ -> Image ();
+  expression *expr = reference_ -> Image ();
 
   // fix all variables upon which this auxiliary depends
+
+  // expr is surely nonlinear, so it's useless to check if it is an
+  // exprAux, w1:=w0
 
   if (expr -> Type () == UNARY) { // unary function
 
@@ -196,6 +170,7 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
     if (expr -> code () == COU_EXPRQUAD) {
 
       exprQuad *e = dynamic_cast <exprQuad *> (expr);
+
       int *qi = e -> getQIndexI (),
 	  *qj = e -> getQIndexJ ();
 
@@ -254,15 +229,11 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     }
 
   // if selectBranch returned -1, apply default branching rule
-
 #ifdef DEBUG
   printf ("CO::createBranch: ");
-  reference_ -> print (std::cout);
-  printf (" = ");
-  reference_ -> Image () -> print (std::cout);
-  printf (" --> branch on ");
-  reference_ -> Image () -> getFixVar () -> print (std::cout);
-  printf ("\n");
+  reference_ -> print (std::cout);                              printf (" = ");
+  reference_ -> Image () -> print (std::cout);                  printf (" --> branch on ");
+  reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
 #endif
 
   // constructor uses actual values of variables and bounds, update them
@@ -280,7 +251,6 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   // function that we want to maximize.
 
   expression *depvar = reference_ -> Image () -> getFixVar ();
-  int index;
 
   // Create a two-way branching object according to finiteness of the
   // intervals. For now only check if argument bounds are finite.
@@ -291,7 +261,9 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
             lr = info -> lower_    [ref_ind],
             ur = info -> upper_    [ref_ind];
 
-  if (depvar && ((index = depvar -> Index ()) >= 0)) {
+  int index = depvar ? (depvar -> Index ()) : -1;
+
+  if (index >= 0) {
 
     CouNumber x  = info -> solution_ [index],
               l  = info -> lower_    [index],
@@ -313,8 +285,9 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-      return new CouenneBranchingObject (index, TWO_RAND, x, depvar -> isInteger ());
+
+      return new CouenneBranchingObject (index, way, x, depvar -> isInteger ());
   }
 
-  return new CouenneBranchingObject (ref_ind, TWO_RAND, xr, reference_ -> isInteger ());
+  return new CouenneBranchingObject (ref_ind, way, xr, reference_ -> isInteger ());
 }

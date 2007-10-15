@@ -94,8 +94,8 @@ void draw_cuts (OsiCuts &cs, const CouenneCutGenerator *cg, int j, expression *w
 	double  rhs = cs.rowCutPtr (jj) -> rhs ();
 
 	if (fabs (el [1]) > COUENNE_EPS) {
-	  lb0 = mymax (lb, mymin ((rhs - el [0] * minY) / el [1], (rhs - el [0] * maxY) / el [1]));
-	  ub0 = mymin (ub, mymax ((rhs - el [0] * minY) / el [1], (rhs - el [0] * maxY) / el [1]));
+	  lb0 = CoinMax (lb, CoinMin ((rhs - el[0] * minY) / el [1], (rhs - el[0] * maxY) / el [1]));
+	  ub0 = CoinMin (ub, CoinMax ((rhs - el[0] * minY) / el [1], (rhs - el[0] * maxY) / el [1]));
 	}
 
 	fprintf (stderr, "#m=2,S=%d\n", (cs.rowCutPtr (jj) -> sense () == 'L') ? 10:11);

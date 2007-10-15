@@ -211,8 +211,15 @@ class CouenneProblem {
   /// is written with auxiliary variables written with their
   /// associated expression, i.e. \f$w_i = h_i(x,y,w)\f$ and bounds
   /// \f$l_i \le w_i \le u_i\f$, while if false these constraints are
-  /// written in the form \f$l_i \le h_i (x,y) \le u_i\f$
-  void writeMod (const std::string &fname, bool aux);
+  /// written in the form \f$l_i \le h_i (x,y) \le u_i\f$.
+  ///
+  /// Note: if used before standardization, writes original AMPL formulation
+  void writeAMPL (const std::string &fname, bool aux);
+
+  /// Write nonlinear problem to a .gms file
+  /// 
+  /// @param fname Name of the .gams file to be written.
+  void writeGAMS (const std::string &fname);
 
   /// Initialize auxiliary variables and their bounds from original
   /// variables

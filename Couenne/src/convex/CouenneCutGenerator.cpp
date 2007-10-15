@@ -8,13 +8,13 @@
  */
 
 
-#include <OsiRowCut.hpp>
-#include <BonOaDecBase.hpp>
-#include <CglCutGenerator.hpp>
+#include "OsiRowCut.hpp"
+#include "BonOaDecBase.hpp"
+#include "CglCutGenerator.hpp"
 
-#include <CouennePrecisions.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouennePrecisions.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 
 /// constructor

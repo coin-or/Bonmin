@@ -24,7 +24,6 @@
 
 
 // print unary expression
-
 void exprUnary::print (std::ostream &out, 
 		       bool descend, 
 		       CouenneProblem *p) const {
@@ -55,7 +54,6 @@ int exprUnary::compare (exprUnary  &e1) {
 // - creating auxiliary w variables and corresponding expressions
 // - returning linear counterpart as new constraint (to replace 
 //   current one)
-
 exprAux *exprUnary::standardize (CouenneProblem *p, bool addAux) {
 
   exprAux *subst;
@@ -86,12 +84,13 @@ bool exprUnary::isInteger () {
   // constant -- due to branching rules, for instance. If so, check if
   // the corresponding evaluated expression is integer.
 
-  expression *al, *au;
+  register expression *al, *au;
 
   argument_ -> getBounds (al, au);
   CouNumber val = (*al) ();
 
-  if (fabs (val - (*au) ()) < COUENNE_EPS) { // argument is constant
+  if (fabs (val - (*au) ()) < COUENNE_EPS) { 
+    // argument is constant
 
     register CouNumber fval = (F ()) (val); 
 
@@ -99,5 +98,6 @@ bool exprUnary::isInteger () {
     if (fabs (COUENNE_round (fval) - fval) < COUENNE_EPS)
       return true;
   }
+
   return false;
 }

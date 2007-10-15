@@ -7,9 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprQuad.hpp>
-#include <CouenneObject.hpp>
-#include <CouenneBranchingObject.hpp>
+#include "CoinHelperFunctions.hpp"
+
+#include "exprQuad.hpp"
+#include "CouenneObject.hpp"
+#include "CouenneBranchingObject.hpp"
 
 
 //#define DEBUG
@@ -53,7 +55,7 @@ CouNumber exprQuad::selectBranch (expression *w,
 	printf ("[%10g %10g %10g] %4d %10g\n", x [ind], l [ind], u [ind], bestVar, maxcontr);
 #endif
 
-	//if ((diff = mymin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
+	//if ((diff = CoinMin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
 	if ((diff = u [ind] - l [ind])                  > maxcontr) {bestVar = ind; maxcontr = diff;}
       }
     } else
@@ -69,8 +71,8 @@ CouNumber exprQuad::selectBranch (expression *w,
 	  xi = x [qi], 
 	  xj = x [qj], diff;
 
-	if ((diff = mymin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
-	if ((diff = mymin (xj - l [qj], u [qj] - xj)) > maxcontr) {bestVar = qj; maxcontr = diff;}
+	if ((diff = CoinMin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
+	if ((diff = CoinMin (xj - l [qj], u [qj] - xj)) > maxcontr) {bestVar = qj; maxcontr = diff;}
       }
 
     ind = bestVar;
@@ -111,15 +113,12 @@ CouNumber exprQuad::selectBranch (expression *w,
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
-  CouNumber lb = l [bestVar], 
-            ub = u [bestVar];
+  *brpts = midInterval (x [bestVar], l [bestVar], u [bestVar]);
 
-  *brpts = x [bestVar];
-
-  if ((*brpts > ub - COUENNE_NEAR_BOUND) ||
+  /*  if ((*brpts > ub - COUENNE_NEAR_BOUND) ||
       (*brpts < lb + COUENNE_NEAR_BOUND)) 
 
-    *brpts = 0.5 * (lb + ub);
+      *brpts = 0.5 * (lb + ub);*/
 
 #ifdef DEBUG
   printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",

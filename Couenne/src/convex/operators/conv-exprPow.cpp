@@ -239,8 +239,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 	|| (fabs (k-0.5) < 0.5 - COUENNE_EPS))                       // k in [0,1]
       sign = -1;
 
-    CouNumber powThres = mymin (COUENNE_INFINITY, 
-				pow (COU_MAX_COEFF, 1./k)), // don't want big coefficients
+    CouNumber powThres = CoinMin (COUENNE_INFINITY, 
+				  pow (COU_MAX_COEFF, 1./k)), // don't want big coefficients
               powStep  = 1;
 
     // upper envelope
@@ -262,8 +262,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
     if (k > COUENNE_EPS) {
 
-      if (u >   powThres) u = mymax (x,l) + powStep;
-      if (l < - powThres) l = mymin (x,u) - powStep;
+      if (u >   powThres) u = CoinMax (x,l) + powStep;
+      if (l < - powThres) l = CoinMin (x,u) - powStep;
     }
     else {
 

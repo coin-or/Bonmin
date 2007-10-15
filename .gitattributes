@@ -142,6 +142,7 @@ Couenne/src/problem/fillQuadIndices.cpp -text
 Couenne/src/problem/problem.cpp -text
 Couenne/src/problem/problemIO.cpp -text
 Couenne/src/problem/readASLfg.cpp -text
+Couenne/src/problem/writeGAMS.cpp -text
 Couenne/src/readnl/invmap.cpp -text
 Couenne/src/readnl/nl2e.cpp -text
 Couenne/src/readnl/readnl.cpp -text
@@ -154,6 +155,7 @@ Couenne/src/standardize/splitAux.cpp -text
 Couenne/src/standardize/standardize.cpp -text
 Couenne/src/standardize/sumStandardize.cpp -text
 Couenne/src/util/drawCuts.cpp -text
+Couenne/src/util/funtriplets.hpp -text
 Couenne/src/util/rootQ.cpp -text
 Couenne/src/util/rootQ.hpp -text
 Couenne/test/Makefile.am -text

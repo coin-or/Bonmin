@@ -7,21 +7,21 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
+#include "CouenneTypes.hpp"
 
-#include <exprAbs.hpp>
-#include <exprSum.hpp>
-#include <exprSub.hpp>
-#include <exprMul.hpp>
-#include <exprDiv.hpp>
-#include <exprInv.hpp>
-#include <exprSin.hpp>
-#include <exprPow.hpp>
-#include <exprClone.hpp>
-#include <exprLog.hpp>
-#include <exprOpp.hpp>
-#include <exprCos.hpp>
-#include <exprExp.hpp>
+#include "exprAbs.hpp"
+#include "exprSum.hpp"
+#include "exprSub.hpp"
+#include "exprMul.hpp"
+#include "exprDiv.hpp"
+#include "exprInv.hpp"
+#include "exprSin.hpp"
+#include "exprPow.hpp"
+#include "exprClone.hpp"
+#include "exprLog.hpp"
+#include "exprOpp.hpp"
+#include "exprCos.hpp"
+#include "exprExp.hpp"
 
 #include <asl.h>
 #include <nlp.h>
@@ -29,17 +29,15 @@
 
 
 // get ASL op. code relative to function pointer passed as parameter 
-
-//extern "C" {
-  int getOperator (efunc *);
-//}
+int getOperator (efunc *);
 
 
 // warning for non-implemented functions -- return 0 constant expression
-
-expression *notimpl (const std::string &fname) {
-  std::cerr << "*** Warning: " << fname << " not implemented" << std::endl;
-  return new exprConst (0);
+//expression *notimpl (const std::string &fname) {
+void notimpl (const std::string &fname) {
+  std::cerr << "*** Error: " << fname << " not implemented" << std::endl;
+  exit (-1);
+  //  return new exprConst (0);
 }
 
 
@@ -53,18 +51,22 @@ expression *CouenneProblem::nl2e (expr *e) {
   case OPMINUS: return new exprSub (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPMULT:  return new exprMul (nl2e (e -> L.e), nl2e (e -> R.e));
   case OPDIV:   return new exprDiv (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPREM:   return notimpl ("remainder");
+  case OPREM:   notimpl ("remainder");
   case OPPOW:   return new exprPow (nl2e (e -> L.e), nl2e (e -> R.e));
-  case OPLESS:  return notimpl ("less");
-  case MINLIST: return notimpl ("min");
-  case MAXLIST: return notimpl ("max");
-  case FLOOR:   return notimpl ("floor");
-  case CEIL:    return notimpl ("ceil");
+  case OPLESS:  notimpl ("less");
+  case MINLIST: notimpl ("min");
+  case MAXLIST: notimpl ("max");
+  case FLOOR:   notimpl ("floor");
+  case CEIL:    notimpl ("ceil");
   case ABS:     return new exprAbs (nl2e (e -> L.e));
     //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
   case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
-  case OPIFnl:  return notimpl ("ifnl");
-  case OP_tanh: return notimpl ("tanh");
+  case OPIFnl:  { notimpl ("ifnl");
+
+  // see ASL/solvers/rops.c, IfNL
+  }
+
+  case OP_tanh: notimpl ("tanh");
   case OP_tan: {
     expression *arg;
     arg = nl2e (e -> L.e);
@@ -84,13 +86,14 @@ expression *CouenneProblem::nl2e (expr *e) {
 						    new exprExp (new exprOpp (nl2e (e -> L.e)))));
 
   case OP_cos:   return new exprCos (nl2e (e -> L.e));
-  case OP_atanh: return notimpl ("atanh");
-  case OP_atan2: return notimpl ("atan2");
-  case OP_atan:  return notimpl ("atan");
-  case OP_asinh: return notimpl ("asinh");
-  case OP_asin:  return notimpl ("asin");
-  case OP_acosh: return notimpl ("acosh");
-  case OP_acos:  return notimpl ("acos");
+  case OP_atanh: notimpl ("atanh");
+  case OP_atan2: notimpl ("atan2");
+  case OP_atan:  notimpl ("atan");
+  case OP_asinh: notimpl ("asinh");
+  case OP_asin:  notimpl ("asin");
+  case OP_acosh: notimpl ("acosh");
+  case OP_acos:  notimpl ("acos");
+
   case OPSUMLIST: {
     register int i=0;
     expression **al = new expression * [(e->R.ep - e->L.ep)];
@@ -98,10 +101,10 @@ expression *CouenneProblem::nl2e (expr *e) {
       al [i++] = nl2e (*ep);
     return new exprSum (al, i);
   }
-  case OPintDIV: return notimpl ("intdiv");
-  case OPprecision: return notimpl ("precision");
-  case OPround:  return notimpl ("round");
-  case OPtrunc:  return notimpl ("trunc");
+  case OPintDIV: notimpl ("intdiv");
+  case OPprecision: notimpl ("precision");
+  case OPround:  notimpl ("round");
+  case OPtrunc:  notimpl ("trunc");
 
   case OP1POW: return new exprPow (nl2e (e -> L.e), 
 				   new exprConst (((expr_n *)e->R.e)->v));
@@ -109,13 +112,13 @@ expression *CouenneProblem::nl2e (expr *e) {
 				   new exprConst (2));
   case OPCPOW: return new exprPow (new exprConst (((expr_n *)e->L.e)->v),
 				   nl2e (e -> R.e));
-  case OPFUNCALL: return notimpl ("function call");
+  case OPFUNCALL: notimpl ("function call");
   case OPNUM:     return new exprConst (((expr_n *)e)->v);
-  case OPPLTERM:  return notimpl ("plterm");
-  case OPIFSYM:   return notimpl ("ifsym");
-  case OPHOL:     return notimpl ("hol");
-  case OPVARVAL:
-    {
+  case OPPLTERM:  notimpl ("plterm");
+  case OPIFSYM:   notimpl ("ifsym");
+  case OPHOL:     notimpl ("hol");
+  case OPVARVAL:  {
+
       int j = ((expr_v *) e) -> a, 
 	  d = nVars () - j;
       // is index above number of variables?
@@ -132,7 +135,7 @@ expression *CouenneProblem::nl2e (expr *e) {
       //printf ("indexV = %d\n", j);
       return new exprClone (variables_ [j]);
     }
-    //  case -1:
+
   default: 
     printf ("ERROR: unknown operator (address %x), aborting.\n", (long int) e -> op); 
     exit (-1);

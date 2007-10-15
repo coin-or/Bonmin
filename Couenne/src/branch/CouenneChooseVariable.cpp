@@ -45,9 +45,9 @@ CouenneChooseVariable::~CouenneChooseVariable () {
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
   /// LEAVE THIS HERE. Need update of current point to evaluate infeasibility
-  problem_ -> update ((CouNumber *) (info -> solution_), 
-		      (CouNumber *) (info -> lower_), 
-		      (CouNumber *) (info -> upper_));
+  problem_ -> update (info -> solution_, 
+		      info -> lower_, 
+		      info -> upper_);
 
   // Make it stable, in OsiChooseVariable::setupList() numberObjects must be 0.
   return (solver_ -> numberObjects ()) ? 

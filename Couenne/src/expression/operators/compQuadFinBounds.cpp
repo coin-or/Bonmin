@@ -7,7 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprQuad.hpp>
+#include "exprQuad.hpp"
+#include "CoinHelperFunctions.hpp"
 
 
 void updateInf (CouNumber, CouNumber, CouNumber, int &, int &, int );
@@ -84,7 +85,7 @@ void computeQuadFiniteBound (const exprQuad *e,
 
       CouNumber
 	tmin = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0,
-	tmax = mymax (lbi*lbi, ubi*ubi);
+	tmax = CoinMax (lbi*lbi, ubi*ubi);
 
       if (coe < 0) { // negative coefficient, q_{ii} < 0
 	qMax += coe * tmin;
@@ -121,8 +122,8 @@ void computeQuadFiniteBound (const exprQuad *e,
 	b3 = coe * ubi * lbj,
 	b4 = coe * ubi * ubj;
 
-      if ((term = mymin (mymin (b1, b2), mymin (b3, b4))) > -COUENNE_INFINITY) qMin += term;
-      if ((term = mymax (mymax (b1, b2), mymax (b3, b4))) <  COUENNE_INFINITY) qMax += term;
+      if ((term = CoinMin (CoinMin (b1, b2), CoinMin (b3, b4))) > -COUENNE_INFINITY) qMin += term;
+      if ((term = CoinMax (CoinMax (b1, b2), CoinMax (b3, b4))) <  COUENNE_INFINITY) qMax += term;
     }
   }
 }

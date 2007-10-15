@@ -123,3 +123,26 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   return res;
 }
+
+
+/// is this expression integer?
+bool exprSub::isInteger () {
+
+  // yes, if both arguments are integer
+  if (exprOp::isInteger ()) 
+    return true;
+
+  // or both are constant and their difference is integer
+  expression *al, *au, *bl, *bu;
+
+  arglist_ [0] -> getBounds (al, au);
+  arglist_ [1] -> getBounds (bl, bu);
+
+  register CouNumber 
+    alv = (*al) (), 
+    blv = (*bl) ();
+
+  return ((fabs (alv - (*au) ()) < COUENNE_EPS) && // first  is constant
+	  (fabs (blv - (*bu) ()) < COUENNE_EPS) && // second is constant
+	  (fabs (COUENNE_round (alv - blv) - (alv - blv)) < COUENNE_EPS)); // null difference
+}

@@ -21,6 +21,29 @@
 CouNumber CouenneBranchingObject::alpha_ = 0.25;
 
 
+/// computes a not-too-bad point where to branch, in the "middle" of an interval
+CouNumber midInterval (CouNumber curr, CouNumber l, CouNumber u) {
+
+  CouNumber x = curr;
+
+  if      (x<l) x = l;
+  else if (x>u) x = u;
+
+  CouNumber alpha = CouenneBranchingObject::Alpha (), retval;
+ 
+  if ((x-l < COUENNE_NEAR_BOUND) ||
+      (u-x < COUENNE_NEAR_BOUND))
+    if      (u <   COUENNE_INFINITY)
+      if    (l > - COUENNE_INFINITY) retval = alpha * x + (1. - alpha) * (l + u) / 2.;
+      else                           retval = -1 + (u<0) ? u*2 : u/2;
+    else if (l > - COUENNE_INFINITY) retval = +1 + (l>0) ? l*2 : l/2;
+    else                             retval = 0;
+  else retval = x;//alpha * x + (1. - alpha) * (l + u) / 2.;
+
+  return retval;
+}
+
+
 /** \brief Constructor. 
  *
  * Get a variable as an argument and set value_ through a call to
@@ -36,22 +59,15 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
                  ((way == TWO_RIGHT)     ? 1 : 
                  ((CoinDrand48 () < 0.5) ? 0 : 1));
 
-  if (index_ < 0) {
-    printf ("Couenne: CouenneBranchingObject has negative reference's index\n");
-    exit (-1);
-  }
+  assert (index_ >= 0);
 
   CouNumber
     x = expression::Variable (index_),   // current solution
     l = expression::Lbound   (index_),   //         lower bound
-    u = expression::Ubound   (index_),   //         upper
-    alpha = CouenneBranchingObject::Alpha ();
+    u = expression::Ubound   (index_);   //         upper
 
   if (fabs (brpoint) < COUENNE_INFINITY) 
     x = brpoint;
-
-  if      (x<l) x = l;
-  else if (x>u) x = u;
 
   // This two-way branching rule is only applied when both lower and
   // upper bound are finite. Otherwise, a CouenneThreeWayBranchObj is
@@ -69,19 +85,9 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
   // TODO: consider branching value that maximizes distance from
   // current point (how?)
 
-#ifdef DEBUG
-  if (fabs (u-l) < COUENNE_EPS)
-    printf ("#### Warning, interval is really tiny\n");
-#endif
+  assert (fabs (u-l) > COUENNE_EPS);
 
-  if ((x-l < COUENNE_NEAR_BOUND) ||
-      (u-x < COUENNE_NEAR_BOUND))
-    if (u < COUENNE_INFINITY)
-      if (l > - COUENNE_INFINITY)    value_ = alpha * x + (1. - alpha) * (l + u) / 2.;
-      else                           value_ = (u<0) ? (u-1) : u/2;
-    else if (l > - COUENNE_INFINITY) value_ = (l>0) ? (l+1) : l/2;
-    else                             value_ = 0;
-  else value_ = x;
+  value_ = midInterval (x, l, u);
 
 #ifdef DEBUG
   printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 
@@ -112,7 +118,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     brpt = value_;
 
 #ifdef DEBUG
-
   if (way) {
     if      (value_ < l)             printf ("Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
     else if (value_ < l+COUENNE_EPS) printf ("## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
@@ -129,8 +134,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   else      solver -> setColLower (index_, integer_ ? ceil  (brpt) : brpt); // up   branch
 
   // TODO: apply bound tightening to evaluate change in dual bound
-
-  //    printf (" --> [%.6e,%.6e]\n", l, u);
 
 #ifdef DEBUG
   printf ("### Branch: x%d %c= %g\n", 

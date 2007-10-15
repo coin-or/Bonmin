@@ -22,6 +22,7 @@
 
 class CouenneProblem;
 class CouenneSolverInterface;
+class funtriplet;
 
 struct ASL;
 
@@ -144,6 +145,17 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   void addEnvelope (OsiCuts &,
 		    int,
 		    unary_function, unary_function, 
+		    int, int, 
+		    CouNumber, CouNumber, CouNumber,
+		    t_chg_bounds * = NULL,
+		    bool = false) const;
+
+  /// Add general linear envelope to convex function, given its
+  /// variables' indices, the (univariate) function and its first
+  /// derivative
+  void addEnvelope (OsiCuts &,
+		    int,
+		    funtriplet *,
 		    int, int, 
 		    CouNumber, CouNumber, CouNumber,
 		    t_chg_bounds * = NULL,

@@ -54,6 +54,9 @@ enum convexity {UNSET, NONCONVEX, CONVEX, CONCAVE, AFFINE};
 /** type of digging when filling the dependence list */
 enum dig_type {ORIG_ONLY, STOP_AT_AUX, TAG_AND_RECURSIVE, COUNT};
 
+/** integrality type of an auxiliary variable: unset, continuous, integer */
+enum integer_type {AUX_UNSET=-1, AUX_CONTINUOUS, AUX_INTEGER};
+
 /** (un)changed bounds */
 
 #define UNCHANGED 0

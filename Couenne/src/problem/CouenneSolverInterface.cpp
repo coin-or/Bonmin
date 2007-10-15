@@ -26,6 +26,9 @@ void sparse2dense (int, t_chg_bounds *, int *&, int &);
 /// Resolve an LP relaxation after problem modification
 void CouenneSolverInterface::resolve () {
 
+  OsiClpSolverInterface::resolve ();
+  return;
+
   int ncols = cutgen_ -> Problem () -> nVars ();
 
   cutgen_ -> Problem () -> update (getColSolution (),

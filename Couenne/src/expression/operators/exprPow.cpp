@@ -9,13 +9,13 @@
 
 #include <math.h>
 
-#include <CouennePrecisions.hpp>
-#include <exprPow.hpp>
-#include <exprSum.hpp>
-#include <exprMul.hpp>
-#include <exprDiv.hpp>
-#include <exprLog.hpp>
-#include <exprConst.hpp>
+#include "CouennePrecisions.hpp"
+#include "exprPow.hpp"
+#include "exprSum.hpp"
+#include "exprMul.hpp"
+#include "exprDiv.hpp"
+#include "exprLog.hpp"
+#include "exprConst.hpp"
 
 
 /// simplify power f(x) ^ g(x)
@@ -46,15 +46,29 @@ expression *exprPow::simplify () {
   else // only need to check if g(x) == 0
 
     if (arglist_ [1] -> Type () == CONST) {
-      if (fabs (arglist_ [1] -> Value ()) < COUENNE_EPS_SIMPL) // expr = x ^ 0 = 1
+
+      CouNumber expon = arglist_ [1] -> Value ();
+
+      if (fabs (expon) < COUENNE_EPS_SIMPL) // expr = x ^ 0 = 1
 	return new exprConst (1);
-      else if (fabs (arglist_ [1] -> Value () - 1) < COUENNE_EPS_SIMPL) { // expr = x ^ 1 = x
+
+      else if (fabs (expon - 1) < COUENNE_EPS_SIMPL) { // expr = x ^ 1 = x
+
 	delete arglist_ [1];
 	expression *ret = arglist_ [0];
 	arglist_ [0] = arglist_ [1] = NULL;
 	return ret;
       }
+
+      else if (fabs (expon + 1) < COUENNE_EPS_SIMPL) { // expr = x ^ -1 = 1/x
+
+	delete arglist_ [1];
+	expression *ret = new exprInv (arglist_ [0]);
+	arglist_ [0] = arglist_ [1] = NULL;
+	return ret;
+      }
     }
+
   return NULL;
 }
 
@@ -166,17 +180,10 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   bool resL, resU = resL = false;
 
-  if (arglist_ [0] -> Type () <= CONST)   // base is constant or zero, nothing to do
+  if (arglist_ [0] -> Type () == CONST)   // base is constant or zero, nothing to do
     return false;
 
-  if (arglist_ [1] -> Type () >  CONST) { // exponent is nonconstant, no good
-
-    printf ("Couenne: Warning, power expression has nonconstant exponent: ");
-    print (std::cout);
-    printf ("\n");
-
-    return false;
-  }
+  assert (arglist_ [1] -> Type () == CONST);
 
   int index = arglist_ [0] -> Index ();
 

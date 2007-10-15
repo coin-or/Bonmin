@@ -207,7 +207,7 @@ int obbt_iter (const CouenneCutGenerator *cg,
 		    index, p -> Lb (index), p -> bestSol () [index], bound);
 	} else {
 	  if ((p -> Ub (index) > p -> bestSol () [index]) && 
-	      (bound       < COUENNE_EPS + p -> bestSol () [index]))
+	      (bound       < -COUENNE_EPS + p -> bestSol () [index]))
 	    printf ("#### OBBT error on x%d: ub = %g, opt = %g, new ub = %g\n", 
 		    index, p -> Ub (index), p -> bestSol () [index], bound);
 	}

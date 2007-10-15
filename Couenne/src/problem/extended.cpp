@@ -1,7 +1,7 @@
 /*
  * Name:    extended.cpp
  * Author:  Pietro Belotti
- * Purpose: write extended formulation
+ * Purpose: save problem in AMPL format
  *
  * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)
@@ -10,13 +10,13 @@
 #include <fstream>
 #include <iomanip> // to use the setprecision manipulator
 
-#include <CouenneProblem.hpp>
+#include "CouenneProblem.hpp"
 
 
 // store problem in a .mod file (AMPL)
 
-void CouenneProblem::writeMod (const std::string &fname,  /// name of the mod file
-			       bool aux) {                /// with or without auxiliaries?
+void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod file
+				bool aux) {                /// with or without auxiliaries?
 
   std::ofstream f (fname.c_str ());
 

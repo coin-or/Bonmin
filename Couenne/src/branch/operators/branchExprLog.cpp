@@ -7,14 +7,16 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprLog.hpp>
-#include <exprPow.hpp>
+#include "exprLog.hpp"
+#include "exprPow.hpp"
 
-#include <CouennePrecisions.hpp>
-#include <CouenneTypes.hpp>
-#include <CouenneObject.hpp>
-#include <CouenneBranchingObject.hpp>
-#include <projections.hpp>
+#include "CoinHelperFunctions.hpp"
+
+#include "CouennePrecisions.hpp"
+#include "CouenneTypes.hpp"
+#include "CouenneObject.hpp"
+#include "CouenneBranchingObject.hpp"
+#include "projections.hpp"
 
 
 #define SQ_COUENNE_EPS COUENNE_EPS * COUENNE_EPS
@@ -68,18 +70,18 @@ CouNumber exprLog::selectBranch (expression *w,
     // Outside
 
     brpts = (double *) realloc (brpts, sizeof (double));
+    *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u);
 
-    *brpts = powNewton (x0, y0, log, inv, oppInvSqr);
-
-    if      (*brpts < l) if (u <   COUENNE_INFINITY) *brpts = (l+u)/2;
+    /*    if      (*brpts < l) if (u <   COUENNE_INFINITY) *brpts = (l+u)/2;
                          else                        *brpts = 10*l + 1;
     else if (*brpts > u) if (l < - COUENNE_INFINITY) *brpts = u/2;
-                         else                        *brpts = (l+u)/2;
+                         else                        *brpts = (l+u)/2; */
 
     way = TWO_LEFT;
     CouNumber dy = y0 - log (*brpts);
     x0 -= *brpts;
-    return sqrt (x0*x0 + dy*dy);
+
+    return sqrt (x0*x0 + dy*dy); // exact distance
   } 
 
   // Inside. Two cases:
@@ -99,7 +101,7 @@ CouNumber exprLog::selectBranch (expression *w,
               b = log (x0) - y0, // as one of the vertices
               c = a * cos (atan (a/b));
 
-    return mymin (a, mymin (b, c));
+    return CoinMin (a, CoinMin (b, c)); // exact distance
   } 
 
   // 2) at least one of them is finite --> two way branching
@@ -108,31 +110,40 @@ CouNumber exprLog::selectBranch (expression *w,
 
   if (l <= SQ_COUENNE_EPS) { // u is finite
 
-    *brpts = exp (y0);
-    if ((*brpts > u - COUENNE_NEAR_BOUND) ||
+    *brpts = midInterval (exp (y0), l, u);
+
+    /*if ((*brpts > u - COUENNE_NEAR_BOUND) ||
 	(*brpts < l + COUENNE_NEAR_BOUND)) 
-      *brpts = (l+u) / 2;
+	*brpts = (l+u) / 2;*/
 
     way = TWO_RIGHT;
-    return mymin (x0 - exp (y0), log (x0) - y0);
+    return projectSeg (x0, y0, *brpts, log (*brpts), x0, log (x0), +1); // exact distance
+
+    //    return CoinMin (x0 - exp (y0), log (x0) - y0);
   }
  
   if (u > COUENNE_INFINITY) { // l is far from zero
 
-    *brpts = x0;
-    if (*brpts < l + COUENNE_NEAR_BOUND)
-      *brpts = l+1;
+    *brpts = midInterval (x0, l, u);
     way = TWO_LEFT;
-    return log (x0) - y0;
+
+    /*if (*brpts < l + COUENNE_NEAR_BOUND)
+     *brpts = l+1;*/
+
+    return projectSeg (x0, y0, *brpts, log (*brpts), x0, log (x0), +1); // exact distance
+    //return log (x0) - y0;
   } 
 
   // both are finite
 
-  *brpts = powNewton (x0, y0, log, inv, oppInvSqr);
+  //  *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u); 
+  // WRONG! Local minima may be at bounds
 
-  if ((*brpts > u - COUENNE_NEAR_BOUND) ||
+  *brpts = midInterval (x0, l, u); 
+
+  /*if ((*brpts > u - COUENNE_NEAR_BOUND) ||
       (*brpts < l + COUENNE_NEAR_BOUND))
-    *brpts = (l+u) / 2;
+      *brpts = (l+u) / 2;*/
 
   way = TWO_RAND;
 
@@ -140,5 +151,5 @@ CouNumber exprLog::selectBranch (expression *w,
     dx = x0 - *brpts,
     dy = y0 - log (*brpts);
 
-  return sqrt (dx*dx + dy*dy);
+  return sqrt (dx*dx + dy*dy); // exact distance
 }

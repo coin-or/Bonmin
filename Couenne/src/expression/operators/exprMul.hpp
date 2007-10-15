@@ -68,6 +68,9 @@ class exprMul: public exprOp {
   /// code for comparison
   virtual enum expr_type code () {return COU_EXPRMUL;}
 
+  /// is this expression integer?
+  bool isInteger ();
+
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 

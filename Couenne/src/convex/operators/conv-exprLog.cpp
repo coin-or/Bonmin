@@ -7,14 +7,14 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <exprLog.hpp>
-#include <exprInv.hpp>
-#include <exprPow.hpp>
-#include <exprConst.hpp>
+#include "CouenneTypes.hpp"
+#include "exprLog.hpp"
+#include "exprInv.hpp"
+#include "exprPow.hpp"
+#include "exprConst.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 
 #define LOG_STEP 10

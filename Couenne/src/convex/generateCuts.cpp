@@ -180,8 +180,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	          u = con -> Ub () -> Value ();
 
 	// tighten bounds in Couenne's problem representation
-	problem_ -> Lb (index) = mymax (l, problem_ -> Lb (index));
-	problem_ -> Ub (index) = mymin (u, problem_ -> Ub (index));
+	problem_ -> Lb (index) = CoinMax (l, problem_ -> Lb (index));
+	problem_ -> Ub (index) = CoinMin (u, problem_ -> Ub (index));
       }
     }
 

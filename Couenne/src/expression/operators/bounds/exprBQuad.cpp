@@ -7,13 +7,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprBQuad.hpp>
+#include "CoinHelperFunctions.hpp"
+#include "exprBQuad.hpp"
 
 //#define DEBUG
 
 CouNumber computeQBound (int sign, exprQuad *e) {
-
-  //  return (sign > 0) ? COUENNE_INFINITY : -COUENNE_INFINITY;
 
   // compute lower (if sign == -1) or upper (sign == +1) bound of an
   // exprQuad based on the information obtained through
@@ -86,7 +85,7 @@ CouNumber computeQBound (int sign, exprQuad *e) {
       if (i==j) {
 
 	if (coe > 0) term = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0;
-	else if ((term = mymax (lbi*lbi, ubi*ubi)) > COUENNE_INFINITY) 
+	else if ((term = CoinMax (lbi*lbi, ubi*ubi)) > COUENNE_INFINITY) 
 	  return -COUENNE_INFINITY;
 
 	term *= coe;
@@ -110,7 +109,7 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 	if (fabs (ubi) == 0) b3 = b4 = 0;
 	if (fabs (ubj) == 0) b2 = b4 = 0;
 
-	if ((term = mymin (mymin (b1, b2), mymin (b3, b4))) < -COUENNE_INFINITY) 
+	if ((term = CoinMin (CoinMin (b1, b2), CoinMin (b3, b4))) < -COUENNE_INFINITY) 
 	  return -COUENNE_INFINITY; 
 
 #ifdef DEBUG
@@ -147,7 +146,7 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 
       if (i==j) {
 
-	if (coe > 0) term = mymax (lbi * lbi, ubi * ubi);
+	if (coe > 0) term = CoinMax (lbi * lbi, ubi * ubi);
 	else         term = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0;
 
 	if (term > COUENNE_INFINITY) 
@@ -172,8 +171,8 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 
 	// I hate this... but when you see 
 	//
-	//   mymax (mymax (-0, nan), mymax (nan, -inf)) =
-	// = mymax (nan, -inf) = -inf
+	//   CoinMax (CoinMax (-0, nan), CoinMax (nan, -inf)) =
+	// = CoinMax (nan, -inf) = -inf
 	//
 	// you feel changed.
 
@@ -182,7 +181,7 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 	if (fabs (ubi) == 0) b3 = b4 = 0;
 	if (fabs (ubj) == 0) b2 = b4 = 0;
 
-	if ((term = mymax (mymax (b1, b2), mymax (b3, b4))) > COUENNE_INFINITY)
+	if ((term = CoinMax (CoinMax (b1, b2), CoinMax (b3, b4))) > COUENNE_INFINITY)
 	  return COUENNE_INFINITY;
 
 #ifdef DEBUG
@@ -190,8 +189,8 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 		i, j, coe, term, bound + term,
 		lbi, ubi, lbj, ubj, 
 		b1, b2, b3, b4,
-		mymax (b1, b2), mymax (b3, b4),
-		mymax (mymax (b1, b2), mymax (b3, b4)));
+		CoinMax (b1, b2), CoinMax (b3, b4),
+		CoinMax (CoinMax (b1, b2), CoinMax (b3, b4)));
 #endif
       }
 

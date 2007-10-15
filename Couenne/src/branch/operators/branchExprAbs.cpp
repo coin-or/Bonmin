@@ -8,11 +8,14 @@
  */
 
 #include <exprAbs.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneTypes.hpp>
-#include <CouenneBranchingObject.hpp>
-#include <CouenneObject.hpp>
-#include <projections.hpp>
+
+#include "CoinHelperFunctions.hpp"
+
+#include "CouennePrecisions.hpp"
+#include "CouenneTypes.hpp"
+#include "CouenneBranchingObject.hpp"
+#include "CouenneObject.hpp"
+#include "projections.hpp"
 
 
 /// set up branching object by evaluating many branching points for
@@ -25,7 +28,6 @@ CouNumber exprAbs::selectBranch (expression *w,
 				 double * &brpts, 
 				 int &way) {
   ind = argument_ -> Index ();
-
   assert (ind >= 0);
 
   CouNumber x0 = info -> solution_ [ind],
@@ -41,6 +43,6 @@ CouNumber exprAbs::selectBranch (expression *w,
 
   // exact distance between current point and the two subsequent
   // convexifications
-  return mymin (project (1., -1., 0., x0, y0, 0., COUENNE_INFINITY,  0, NULL, NULL),
-		project (1., +1., 0., x0, y0, -COUENNE_INFINITY, 0., 0, NULL, NULL));
+  return CoinMin (project (1., -1., 0., x0, y0, 0., COUENNE_INFINITY,  0, NULL, NULL),
+		  project (1., +1., 0., x0, y0, -COUENNE_INFINITY, 0., 0, NULL, NULL));
 }

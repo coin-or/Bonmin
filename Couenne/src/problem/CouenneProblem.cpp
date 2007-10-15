@@ -72,7 +72,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   if ((now = (CoinCpuTime () - now)) > 10.)
     printf ("Couenne: standardization time %.3fs\n", now);
 
-  //  readOptimum ("alkyl.txt", optimum_, bestObj_, this);
+  readOptimum ("nc.txt", optimum_, bestObj_, this);
 
 #ifdef DEBUG
   print (std::cout);

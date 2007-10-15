@@ -226,7 +226,7 @@ class exprQuad: public exprGroup {
   /// Used in rank-based branching variable choice
   virtual int rank (CouenneProblem *);
 
-  /// is this expression integer?
+  /// is this expression integer? TODO: see exprGroup...
   virtual inline bool isInteger ()
     {return false;}
 

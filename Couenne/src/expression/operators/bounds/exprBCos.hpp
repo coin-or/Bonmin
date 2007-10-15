@@ -10,7 +10,8 @@
 #ifndef COUENNE_EXPRBCOS_HPP
 #define COUENNE_EXPRBCOS_HPP
 
-#include <exprOp.hpp>
+#include "exprOp.hpp"
+#include "CoinHelperFunctions.hpp"
 
 #include <math.h>
 #ifndef M_PI
@@ -65,7 +66,7 @@ inline CouNumber exprLBCos::operator () () {
        floor (u/pi2 - 0.5))) 
     return -1;
 
-  return mymin (sin (l), sin (u));
+  return CoinMin (sin (l), sin (u));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,7 +118,7 @@ inline CouNumber exprUBCos::operator () () {
        floor (u/pi2))) 
     return 1;
 
-  return mymax (sin (l), sin (u));
+  return CoinMax (sin (l), sin (u));
 }
 
 #endif

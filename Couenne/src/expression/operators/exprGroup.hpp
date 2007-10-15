@@ -84,7 +84,8 @@ class exprGroup: public exprSum {
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRGROUP;}
 
-  /// is this expression integer?
+  /// is this expression integer?  TODO: find a way to get integrality
+  /// of linear terms, as for now we have to return false
   virtual inline bool isInteger ()
     {return false;}
 

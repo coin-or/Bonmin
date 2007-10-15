@@ -97,6 +97,7 @@ libCouenne_la_SOURCES = \
 	problem/CouenneProblem.cpp \
 	problem/problemIO.cpp \
 	problem/extended.cpp \
+	problem/writeGAMS.cpp \
 	problem/constraint.cpp \
 	problem/readASLfg.cpp \
 	problem/fillQuadIndices.cpp \
@@ -230,6 +231,7 @@ include_HEADERS = \
 	problem/CouenneSolverInterface.hpp \
 	expression/CouenneTypes.hpp \
 	util/rootQ.hpp \
+	util/funtriplets.hpp \
 	convex/CouenneCutGenerator.hpp
 
 #############################################################################

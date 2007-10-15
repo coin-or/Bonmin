@@ -10,21 +10,22 @@
 
 #include <map>
 
-#include <CouenneTypes.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneTypes.hpp"
+#include "CouenneProblem.hpp"
 
-#include <exprQuad.hpp>
-#include <exprMul.hpp>
-#include <exprPow.hpp>
+#include "exprQuad.hpp"
+#include "exprMul.hpp"
+#include "exprPow.hpp"
 
 /// analyze sparsity of potential exprQuad/exprGroup and change
 /// linear/quadratic maps accordingly, if necessary by adding new
 /// auxiliary variables and including them in the linear map
-void analyzeSparsity (CouenneProblem *p, CouNumber c0, 
+void analyzeSparsity (CouenneProblem *p, 
+		      CouNumber c0, 
 		      std::map <int,                 CouNumber> &lmap,
 		      std::map <std::pair <int,int>, CouNumber> &qmap) {
 
-  return; // comment this if you don't want exprQuad's around
+  //  return; // comment this if you don't want exprQuad's around
 
   // flatten exprQuad to a sum of terms (disaggregate). This is while
   // we are testing exprQuad's

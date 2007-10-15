@@ -7,11 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprDiv.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneTypes.hpp>
-#include <CouenneBranchingObject.hpp>
-#include <CouenneObject.hpp>
+#include "exprDiv.hpp"
+#include "CouennePrecisions.hpp"
+#include "CouenneTypes.hpp"
+#include "CouenneBranchingObject.hpp"
+#include "CouenneObject.hpp"
 
 
 /// set up branching object by evaluating many branching points for
@@ -57,7 +57,7 @@ CouNumber exprDiv::selectBranch (expression *w,
 	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [w -> Index ()]));
   }
 
-  // From now on, [yl,yu] can only be unlimited in one sense, and
+  // From now on, [yl,yu] may be unlimited in one sense only, and
   // interval does not contain 0.
   //
   // As convexification is still carried out by applying McCormick

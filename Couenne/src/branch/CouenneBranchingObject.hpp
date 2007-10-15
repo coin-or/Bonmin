@@ -72,4 +72,7 @@ protected:
   static CouNumber alpha_;
 };
 
+/// returns a point "inside enough" a given interval, or x if it is already
+CouNumber midInterval (CouNumber x, CouNumber l, CouNumber u);
+
 #endif

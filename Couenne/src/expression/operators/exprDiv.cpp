@@ -137,10 +137,11 @@ expression *exprDiv::getFixVar ()
 /// is this expression integer?
 bool exprDiv::isInteger () {
 
-  // only check if arguments are, *at this point in the algorithm*,
-  // constant -- due to branching rules, for instance. If so, check if
-  // the corresponding evaluated expression is integer. Otherwise,
-  // check if denominator is +1 or -1.
+  // only check if arguments (specifically, the denominator) are, *at
+  // this point in the algorithm*, constant -- due to branching rules,
+  // for instance. If so, check if the corresponding evaluated
+  // expression is integer. Otherwise, check if denominator is +1 or
+  // -1.
 
   expression *dl, *du, *nl, *nu;
 
@@ -156,8 +157,9 @@ bool exprDiv::isInteger () {
     numconst = (fabs (num - (*nu) ()) < COUENNE_EPS);
 
   if ((fabs (num) < COUENNE_EPS)  && // numerator is zero
-      !denzero                    && // denominator is nonzero
-      numconst)                      // and constant
+      numconst                    && // constant
+      !denzero)                      // and denominator is nonzero
+
     return true;
 
   // otherwise...
@@ -178,5 +180,6 @@ bool exprDiv::isInteger () {
 	return true;
     }
   }
+
   return false;
 }

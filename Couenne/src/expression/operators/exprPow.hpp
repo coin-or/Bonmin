@@ -12,10 +12,13 @@
 
 #include <math.h>
 
-#include <exprOp.hpp>
-#include <exprMul.hpp>
-#include <exprClone.hpp>
-#include <exprConst.hpp>
+#include "exprOp.hpp"
+#include "exprMul.hpp"
+#include "exprClone.hpp"
+#include "exprConst.hpp"
+//#include "funtriplets.hpp"
+
+class funtriplet;
 
 
 /// Power of an expression (binary operator)
@@ -25,7 +28,7 @@ class exprPow: public exprOp {
  public:
 
   /// Constructor
-  exprPow  (expression **al, int n = 2): 
+  exprPow (expression **al, int n = 2): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   /// Constructor with only two arguments
@@ -120,11 +123,6 @@ inline CouNumber safe_pow (register CouNumber base,
 /// compute power
 inline CouNumber exprPow::operator () () {
 
-  //  exprOp:: operator () ();
-
-  //  register CouNumber exponent = *sp--;
-  //  register CouNumber base     = *sp--;
-
   //  return (currValue_ = safe_pow (base, exponent));
   return (currValue_ = safe_pow ((**arglist_) (), (*(arglist_ [1])) ()));
 }
@@ -137,5 +135,8 @@ void addPowEnvelope (const CouenneCutGenerator *, OsiCuts &, int, int,
 
 /// find proper tangent point to add deepest tangent cut
 CouNumber powNewton (CouNumber, CouNumber, unary_function, unary_function, unary_function);
+
+/// find proper tangent point to add deepest tangent cut
+CouNumber powNewton (CouNumber, CouNumber, funtriplet *);
 
 #endif

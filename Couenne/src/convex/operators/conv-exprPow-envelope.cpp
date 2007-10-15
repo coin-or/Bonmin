@@ -9,33 +9,13 @@
 
 #include <math.h>
 
-#include <CouenneTypes.hpp>
-#include <rootQ.hpp>
-#include <exprPow.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
-
-#define COUENNE_POW_CONST 1
-#define POW_FACTOR 2
-
-// A unary function to be given to addEnvelope with a local exponent,
-// given here as a static variable
-static CouNumber exponent;
-
-// function x^k
-inline static CouNumber power_k (CouNumber x) 
-{return safe_pow (x, exponent);}
-
-
-// function k*x^(k-1)
-inline static CouNumber power_k_prime (CouNumber x) 
-{return exponent * safe_pow (x, exponent-1);}
-
-
-// function k*(k-1)*x^(k-2)
-inline static CouNumber power_k_dblprime (CouNumber x) 
-{return exponent * (exponent-1) * pow (x, exponent-2);}
+#include "CouenneTypes.hpp"
+#include "rootQ.hpp"
+#include "exprPow.hpp"
+#include "CouennePrecisions.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "funtriplets.hpp"
 
 
 // adds convex (upper/lower) envelope to a power function
@@ -46,13 +26,15 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
 		     CouNumber k, 
 		     CouNumber l, CouNumber u,
 		     int sign) {
-  exponent = k;
 
   // set x to get a deeper cut (so that we get a tangent which is
   // orthogonal with line through current- and tangent point)
 
-  if (!(cg -> isFirst ()))
-    x = powNewton (x, y, power_k, power_k_prime, power_k_dblprime);
+  if (!(cg -> isFirst ())) {
+
+    powertriplet pt (k);
+    x = powNewton (x, y, &pt);
+  }
 
   if      (x<l) x=l;
   else if (x>u) x=u;
@@ -70,7 +52,9 @@ void addPowEnvelope (const CouenneCutGenerator *cg, OsiCuts &cs,
     if (u > powThres - 1) 
       u = x + step;
 
+  powertriplet pt (k);
+
   // convex envelope
-  cg -> addEnvelope (cs, sign, power_k, power_k_prime, 
+  cg -> addEnvelope (cs, sign, &pt, 
 		     wi, xi, x, l, u);
 }

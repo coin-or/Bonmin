@@ -7,12 +7,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprMul.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneTypes.hpp>
-#include <CouenneObject.hpp>
-#include <CouenneBranchingObject.hpp>
-#include <projections.hpp>
+#include "exprMul.hpp"
+#include "CouennePrecisions.hpp"
+#include "CouenneTypes.hpp"
+#include "CouenneObject.hpp"
+#include "CouenneBranchingObject.hpp"
+#include "projections.hpp"
 
 
 #define LARGE_BOUND 9.9e12

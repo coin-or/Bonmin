@@ -44,7 +44,8 @@ class exprSin: public exprUnary {
     {return new exprSin (argument_ -> clone ());}
 
   //// the operator's function
-  inline unary_function F () {return sin;}
+  inline unary_function F () 
+    {return sin;}
 
   /// print operator
   std::string printOp () const
@@ -64,13 +65,14 @@ class exprSin: public exprUnary {
 		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
-  virtual enum expr_type code () {return COU_EXPRSIN;}
+  virtual enum expr_type code () 
+    {return COU_EXPRSIN;}
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
   CouNumber selectBranch (expression *w, const OsiBranchingInformation *info,
 			  int &ind, double * &brpts, int &way)
-  {return trigSelBranch (w, info, ind, brpts, way, COU_SINE);}
+    {return trigSelBranch (w, info, ind, brpts, way, COU_SINE);}
 };
 
 #endif

@@ -177,8 +177,20 @@ void exprOp::replace (exprVar *x, exprVar *w) {
 bool exprOp::isInteger () {
 
   for (int i = nargs_; i--;)
-    if (!(arglist_ [i] -> isInteger ())) 
+
+    if (!(arglist_ [i] -> isInteger ())) { // this argument is not integer
+
+      // last chance: check  if constant and integer
+
+      expression *lb, *ub;
+
+      arglist_ [i] -> getBounds (lb, ub);
+      CouNumber lv = (*lb) ();
+
+      if ((fabs (lv - (*ub) ()) > COUENNE_EPS) ||
+	  (fabs (COUENNE_round (lv) - lv) < COUENNE_EPS))
       return false;
+    }
 
   return true;
 }

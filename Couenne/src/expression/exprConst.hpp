@@ -80,7 +80,8 @@ class exprConst: public expression {
 		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
-  virtual enum expr_type code () {return COU_EXPRCONST;}
+  virtual enum expr_type code () 
+  {return COU_EXPRCONST;}
 
   /// is this expression integer?
   virtual bool isInteger () 

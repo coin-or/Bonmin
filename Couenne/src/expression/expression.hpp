@@ -320,12 +320,4 @@ inline int compareExpr (const void *e0, const void *e1) {
   return ((*(expression **) e0) -> compare (**(expression **)e1));
 }
 
-/// maximum
-inline CouNumber mymin (register CouNumber a, register CouNumber b) 
-{return ((a<b) ? a : b);} 
-
-/// minimum
-inline CouNumber mymax (register CouNumber a, register CouNumber b) 
-{return ((a>b) ? a : b);} 
-
 #endif
