@@ -40,7 +40,9 @@ namespace Bonmin
   sos_(),
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
+  numberNonConvex_(0),
   nonConvexConstraintsAndRelaxations_(NULL),
+  numberSimpleConcave_(0),
   simpleConcaves_(NULL),
   hasLinearObjective_(false)
   {}
@@ -61,8 +63,10 @@ namespace Bonmin
   sos_(),
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
+  numberNonConvex_(0),
   nonConvexConstraintsAndRelaxations_(NULL),
   simpleConcaves_(NULL),
+  numberSimpleConcave_(0),
   hasLinearObjective_(false)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
@@ -302,6 +306,7 @@ namespace Bonmin
    const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
    const Index * id = suffix_handler->GetIntegerSuffixValues("id", AmplSuffixHandler::AmplSuffixHandler::Variable_Source);
    const Index * primary_var = suffix_handler->GetIntegerSuffixValues("primary_var", AmplSuffixHandler::AmplSuffixHandler::Constraint_Source);
+
 
    if(primary_var!= NULL)
    {
