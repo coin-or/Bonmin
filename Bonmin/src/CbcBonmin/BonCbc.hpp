@@ -76,6 +76,11 @@ public:
     return model_;
   }
 
+  /** Get cbc model used to solve as non-const, in case we want to
+      change options before things happen */
+  CbcModel&  model() {
+    return model_;
+  }
  /** Say that algorithm is using Couenne.*/
  void setUsingCouenne(bool v){
    usingCouenne_ = v;}

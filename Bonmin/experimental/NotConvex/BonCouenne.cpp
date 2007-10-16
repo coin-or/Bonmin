@@ -52,6 +52,10 @@ int main (int argc, char *argv[])
     bonmin.InitializeCouenne(argv);
     Bab bb;
 
+#if 0
+    CouenneFeasibility feasibility;
+    bb.model().setProblemFeasibility(feasibility);
+#endif
     //////////////////////////////////
 
     bb (bonmin); // do branch and bound

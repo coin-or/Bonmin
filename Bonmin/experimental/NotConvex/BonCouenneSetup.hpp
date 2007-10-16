@@ -8,8 +8,8 @@
 // Date : 04/18/2007
 #ifndef BonCouenneSetup_H
 #define BonCouenneSetup_H
-//AW #include "BonBabSetupBase.hpp"
-#include "BonBonminSetup.hpp"
+#include "BonBabSetupBase.hpp"
+#include "CbcFeasibilityBase.hpp"
 
 struct ASL;
 
@@ -27,16 +27,16 @@ public:
     virtual ~SmartAsl();
   };
   
-  class CouenneSetup : public BonminSetup{
+  class CouenneSetup : public BabSetupBase{
 public:
     /** Default constructor*/
     CouenneSetup():
-    BonminSetup(),
+    BabSetupBase(),
     aslfg_(NULL){}
     
     /** Copy constructor.*/
     CouenneSetup(const CouenneSetup& other):
-      BonminSetup(other),
+      BabSetupBase(other),
       aslfg_(NULL){}
     
     /** virtual copy constructor.*/
@@ -62,4 +62,5 @@ private:
   };
   
 }
+
 #endif

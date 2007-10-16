@@ -35,7 +35,6 @@ BonChooseVariable::BonChooseVariable(BabSetupBase &b):
   pseudoCosts_.setNumberBeforeTrusted(numberBeforeTrusted);
 
   setNumberStrong(b.getIntParameter(BabSetupBase::NumberStrong));
-  pseudoCosts_.setNumberBeforeTrusted(numberBeforeTrusted);
 
   /** Get values of options specific to BonChooseVariable.*/
   if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, "bonmin.")) {
@@ -637,57 +636,5 @@ BonChooseVariable::updateInformation(const OsiBranchingInformation *info,
     }
   }  
 }
-#if 0
-// Given a branch fill in useful information e.g. estimates
-void 
-BonChooseVariable::updateInformation( int index, int branch, 
-				      double changeInObjective, double changeInValue,
-				      int status)
-{
-  assert (index<solver_->numberObjects());
-  assert (branch<2);
-  assert (changeInValue>0.0);
-  assert (branch<2);
-  double* upTotalChange = pseudoCosts_.upTotalChange();
-  double* downTotalChange = pseudoCosts_.downTotalChange();
-  int* upNumber = pseudoCosts_.upNumber();
-  int* downNumber = pseudoCosts_.downNumber();
-  //printf("update %3d %3d %e %e %3d\n",index, branch, changeInObjective,changeInValue,status);
-  if (branch) {
-    if (status!=1) {
-      assert (status>=0);
-      upTotalChange[index] += changeInObjective/changeInValue;
-      upNumber[index]++;
-    } else {
-      // infeasible - just say expensive
-      upNumber[index]++;
-      assert(cbc_model_); // Later, we need to get this information in a different way...
-      double cutoff = cbc_model_->getCutoff();
-      double objectiveValue = cbc_model_->getCurrentObjValue();
-      double cutoff = 
-      if (cutoff<1.0e50)
-	upTotalChange[index] += 2.0*(cutoff-objectiveValue)/changeInValue;
-      else
-	upTotalChange[index] += 2.0*fabs(objectiveValue)/changeInValue;
-    }
-  } else {
-    if (status!=1) {
-      assert (status>=0);
-      downTotalChange[index] += changeInObjective/changeInValue;
-      downNumber[index]++;
-    } else {
-      assert(cbc_model_);
-      // infeasible - just say expensive
-      downNumber[index]++;
-      double cutoff = cbc_model_->getCutoff();
-      double objectiveValue = cbc_model_->getCurrentObjValue();
-      if (cutoff<1.0e50)
-	downTotalChange[index] += 2.0*(cutoff-objectiveValue)/changeInValue;
-      else
-	downTotalChange[index] += 2.0*fabs(objectiveValue)/changeInValue;
-    }
-  }  
-}
-#endif
 
 }/* Ends Bonmin's namespace.*/

@@ -190,8 +190,25 @@ namespace Bonmin{
       heuristics_.push_back(nlpHeuristic);
     }
 
-    branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
-                                  const_cast<CouenneProblem *> (couenneProb));
+    int varSelection;
+    options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
+    switch (varSelection) {
+    case OsiTMINLPInterface::OSI_SIMPLE:
+      branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
+						   couenneProb);
+      break;
+    case OsiTMINLPInterface::OSI_STRONG: {
+	CouenneChooseStrong * chooseVariable = new CouenneChooseStrong(*this, couenneProb);
+	chooseVariable->setTrustStrongForSolution(false);
+	chooseVariable->setTrustStrongForBound(false);
+	chooseVariable->setOnlyPseudoWhenTrusted(true);
+	branchingMethod_ = chooseVariable;
+	break;
+    }
+    default:
+      assert(false && "Invalid varselect_stra");
+      break;
+    }
 
     if(intParam_[NumCutPasses] < 2)
     intParam_[NumCutPasses] = 2;
