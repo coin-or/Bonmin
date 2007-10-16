@@ -79,6 +79,8 @@ Bonmin/src/Algorithms/OaGenerators/BonOaNlpOptim.cpp -text
 Bonmin/src/Algorithms/OaGenerators/BonOaNlpOptim.hpp -text
 Bonmin/src/Algorithms/OaGenerators/Makefile.am -text
 Bonmin/src/Algorithms/OaGenerators/Makefile.in -text
+Bonmin/src/CbcBonmin/BonBabInfos.cpp -text
+Bonmin/src/CbcBonmin/BonBabInfos.hpp -text
 Bonmin/src/CbcBonmin/BonCbc.cpp -text
 Bonmin/src/CbcBonmin/BonCbc.hpp -text
 Bonmin/src/CbcBonmin/BonDiver.cpp -text
