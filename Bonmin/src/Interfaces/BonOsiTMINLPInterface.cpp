@@ -1503,7 +1503,6 @@ OsiTMINLPInterface::randomStartingPoint()
     //printf("%f in [%f,%f]\n",sol[i],lower,upper);
     //  std::cout<<interval<<"\t";
   }
-  //std::cout<<std::endl;
   app_->disableWarmStart();
   setColSolution(sol);
   delete [] sol;
@@ -2304,9 +2303,26 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
       }
     }
     if(integerSol){
-      problem_->evaluateUpperBoundingFunction(sol);
-      messageHandler()->message(ALTERNATE_OBJECTIVE, messages_)
-      <<getObjValue()<<CoinMessageEol;
+      double help= problem_->evaluateUpperBoundingFunction(sol);
+     
+
+      OsiAuxInfo * auxInfo = getAuxiliaryInfo();
+      Bonmin::AuxInfo * bonInfo = dynamic_cast<Bonmin::AuxInfo *>(auxInfo);
+      if(bonInfo!=0)
+      {
+	
+        if(help<bonInfo->bestObj2())
+        {
+          bonInfo->setBestObj2(help);
+          bonInfo->setBestSolution2(getNumCols(), const_cast<double *>(getColSolution()));
+
+           messageHandler()->message(ALTERNATE_OBJECTIVE, messages_)
+           <<help<<CoinMessageEol;
+        }
+      }
+      else {
+        printf("\nWARNING: the algorithm selected does not consider the second objective function\n");
+      }
     }
   }
   messageHandler()->message(IPOPT_SUMMARY, messages_)

@@ -346,7 +346,7 @@ namespace Bonmin
         return tminlp_->hasUpperBoundingObjective();}
 
       /** Evaluate the upper bounding function at given point and store the result.*/
-    void evaluateUpperBoundingFunction(const double * x);
+    double evaluateUpperBoundingFunction(const double * x);
     
     /** @name Methods for evaluation the linear cuts. */
     //@{

@@ -150,7 +150,6 @@ namespace Bonmin
                                   n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
                                   n_binaries, n_integers);
     if(n_non_linear_b == 0 && n_non_linear_o == 0){
-        std::cout<<"Problem has a linear objective"<<std::endl;
         hasLinearObjective_ = true;}
   }
   
@@ -223,6 +222,9 @@ namespace Bonmin
     
     sos_.num = suf_sos(i, &sos_.numNz, &types, p_sospri, copri,
                        &starts, &indices, &weights);
+
+    std::cout<<"sos points to : "<<&sos_<<std::endl<<"sos.num is "<<sos_.num<<std::endl;
+
     if (sos_.num) {
       //Copy sos information
       sos_.priorities = CoinCopyOfArray(priorities,sos_.num);

@@ -26,6 +26,7 @@ noinst_LTLIBRARIES = libbonmininterfaces.la
 # List all source files, including headers
 libbonmininterfaces_la_SOURCES = \
 	BonBoundsReader.cpp BonBoundsReader.hpp \
+        BonAuxInfos.cpp BonAuxInfos.hpp \
 	BonColReader.cpp BonColReader.hpp \
 	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
 	BonCutStrengthener.cpp BonCutStrengthener.hpp \
@@ -37,7 +38,7 @@ libbonmininterfaces_la_SOURCES = \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
 	BonBranchingTQP.cpp BonBranchingTQP.hpp \
 	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp \
-     BonRegisteredOption.hpp BonRegisteredOptions.cpp
+        BonRegisteredOption.hpp BonRegisteredOptions.cpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
@@ -87,7 +88,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` 
+	-I`$(CYGPATH_W) $(CLPSRCDIR)/src`
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
@@ -101,6 +102,7 @@ include_HEADERS = \
      ../../inc/config_bonmin.h \
      BonOsiTMINLPInterface.hpp \
      BonTMINLP2TNLP.hpp \
+     BonAuxInfos.hpp \
      BonTMINLP.hpp \
      BonTNLP2FPNLP.hpp \
      BonCutStrengthener.hpp \
@@ -140,6 +142,7 @@ ASTYLE_FILES = \
 	BonTMINLP.cppbak BonTMINLP.hppbak \
 	BonTNLPSolver.hppbak BonTNLPSolver.cppbak \
 	BonTNLP2FPNLP.cppbak BonTNLP2FPNLP.hppbak \
+        BonAuxInfos.cppbak BonAuxInfos.hppbak \
 	BonBranchingTQP.cppbak BonBranchingTQP.hppbak \
 	BonStrongBranchingSolver.cppbak BonStrongBranchingSolver.hppbak
 

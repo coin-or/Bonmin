@@ -9,36 +9,51 @@
 
 #ifndef BonAuxInfos_H
 #define BonAuxInfos_H
-#include <stdlib.h>
+#include <cstdlib>
+#include <vector>
 #include "OsiAuxInfo.hpp"
-#include "BonCbc.hpp"
+#include "CoinSmartPtr.hpp"
+
 
 namespace Bonmin {
+
+  //structure to store an object of class X in a Coin::ReferencedObject
+  template<class X>
+  struct SimpleReferenced : public Coin::ReferencedObject {
+   /** The object.*/
+   X object;
+   const X& operator()() const{
+     return object;}
+
+   X& operator()() {
+     return object;}
+
+  };
+
+   template <class X>
+   SimpleReferenced<X>* make_referenced(const X& other){
+     SimpleReferenced<X> * ret_val = new SimpleReferenced<X>;
+     ret_val->object = other;
+     return ret_val;
+    }
+
   /** Bonmin class for passing info between components of branch-and-cuts.*/
-class BabInfo : public OsiBabSolver {
+class AuxInfo : public OsiBabSolver {
 public:
   /** Default constructor.*/
-  BabInfo(int type);
+  AuxInfo(int type);
 
   /** Constructor from OsiBabSolver.*/
-  BabInfo(const OsiBabSolver &other);
+  AuxInfo(const OsiBabSolver &other);
 
   /** Copy constructor.*/
-  BabInfo(const BabInfo &other);
+  AuxInfo(const AuxInfo &other);
   
   /** Destructor.*/
-  virtual ~BabInfo();
+  virtual ~AuxInfo();
   
   /** Virtual copy constructor.*/
   virtual OsiAuxInfo * clone() const;
-  
-  /** Set pointer to the branch-and-bound algorithm (to access CbcModel).*/
-  void setBabPtr(Bab * babPtr){
-    babPtr_ = babPtr;}
-  
-  /** Pointer to the branch-and-bound algorithm (to access CbcModel).*/
-  Bab * babPtr(){
-    return babPtr_;}
   
   /** Declare the node to be feasible.*/
   void setFeasibleNode(){
@@ -66,9 +81,28 @@ public:
   /** Say if has an nlp solution*/
   void setHasNlpSolution(bool b){
     hasNlpSolution_ = b;}
+  /** get the best solution computed with alternative objective function.*/
+  const std::vector<double>& bestSolution2() const
+  {
+    return (*bestSolution2_)();
+  }
+  /** return objective value of the best solution computed with alternative
+      objective function.*/
+  double bestObj2() const
+  {
+    return (*bestObj2_)();
+  }
+  /** Set an alternate objective value.*/
+  void setBestObj2(double o)
+  {
+    (*bestObj2_)() = o;
+  }
+  void setBestSolution2(int n, double * d)
+  {
+    (*bestSolution2_)().clear();
+    (*bestSolution2_)().insert((*bestSolution2_)().end(),d, d+n);
+  }
 protected: 
-  /** Pointer to branch-and-bound algorithm.*/
-  Bab * babPtr_;
   /** Say if current node was found infeasible during cut generation*/
   bool infeasibleNode_;
   /** nlp solution found by heuristic if any.*/
@@ -77,6 +111,10 @@ protected:
   int numcols_;
   /** say if has a solution.*/
   bool hasNlpSolution_;
+  /** Stores the solution with alternate objective.*/
+  Coin::SmartPtr< SimpleReferenced<std::vector<double> > > bestSolution2_;
+  /** Alternate solution objective value.*/
+  Coin::SmartPtr< SimpleReferenced<double> > bestObj2_;
   };
 }/* End namespace.*/
 

@@ -70,7 +70,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 am_libbonmin_la_OBJECTS = BonCbc.lo BonCbcNlpStrategy.lo BonCbcNode.lo \
-	BonAuxInfos.lo BonGuessHeuristic.lo BonDiver.lo
+	BonBabInfos.lo BonGuessHeuristic.lo BonDiver.lo
 libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS)
 am_libbonminampl_la_OBJECTS =
 libbonminampl_la_OBJECTS = $(am_libbonminampl_la_OBJECTS)
@@ -332,7 +332,7 @@ libbonmin_la_SOURCES = \
 	BonCbc.cpp BonCbc.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
-        BonAuxInfos.cpp BonAuxInfos.hpp \
+        BonBabInfos.cpp BonBabInfos.hpp \
 	BonGuessHeuristic.cpp BonGuessHeuristic.hpp \
 	BonDiver.cpp BonDiver.hpp
 
@@ -417,7 +417,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 include_HEADERS = \
      BonCbcNlpStrategy.hpp \
      BonCbc.hpp \
-     BonAuxInfos.hpp \
+     BonBabInfos.hpp \
      BonCbcNode.hpp \
      BonDiver.hpp \
      BonGuessHeuristic.hpp
@@ -511,7 +511,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonAuxInfos.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBabInfos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNlpStrategy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@

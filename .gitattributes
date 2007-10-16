@@ -79,8 +79,6 @@ Bonmin/src/Algorithms/OaGenerators/BonOaNlpOptim.cpp -text
 Bonmin/src/Algorithms/OaGenerators/BonOaNlpOptim.hpp -text
 Bonmin/src/Algorithms/OaGenerators/Makefile.am -text
 Bonmin/src/Algorithms/OaGenerators/Makefile.in -text
-Bonmin/src/CbcBonmin/BonAuxInfos.cpp -text
-Bonmin/src/CbcBonmin/BonAuxInfos.hpp -text
 Bonmin/src/CbcBonmin/BonCbc.cpp -text
 Bonmin/src/CbcBonmin/BonCbc.hpp -text
 Bonmin/src/CbcBonmin/BonDiver.cpp -text
@@ -88,6 +86,8 @@ Bonmin/src/CbcBonmin/BonDiver.hpp -text
 Bonmin/src/CbcBonmin/BonGuessHeuristic.cpp -text
 Bonmin/src/CbcBonmin/BonGuessHeuristic.hpp -text
 Bonmin/src/Interfaces/Ampl/Makefile.in -text
+Bonmin/src/Interfaces/BonAuxInfos.cpp -text
+Bonmin/src/Interfaces/BonAuxInfos.hpp -text
 Bonmin/src/Interfaces/BonExitCodes.hpp -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.cpp -text
 Bonmin/src/Interfaces/BonOsiTMINLPInterface.hpp -text

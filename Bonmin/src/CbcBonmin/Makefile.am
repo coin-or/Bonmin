@@ -22,7 +22,7 @@ libbonmin_la_SOURCES = \
 	BonCbc.cpp BonCbc.hpp \
 	BonCbcNlpStrategy.cpp BonCbcNlpStrategy.hpp \
 	BonCbcNode.cpp BonCbcNode.hpp \
-        BonAuxInfos.cpp BonAuxInfos.hpp \
+        BonBabInfos.cpp BonBabInfos.hpp \
 	BonGuessHeuristic.cpp BonGuessHeuristic.hpp \
 	BonDiver.cpp BonDiver.hpp
 
@@ -120,7 +120,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 include_HEADERS = \
      BonCbcNlpStrategy.hpp \
      BonCbc.hpp \
-     BonAuxInfos.hpp \
+     BonBabInfos.hpp \
      BonCbcNode.hpp \
      BonDiver.hpp \
      BonGuessHeuristic.hpp

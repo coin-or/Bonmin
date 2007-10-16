@@ -8,36 +8,40 @@
 // Date : 04/23/2007
 
 #include "BonAuxInfos.hpp"
+#include "CoinHelperFunctions.hpp"
 
 namespace Bonmin{
   /** Default constructor.*/
-  BabInfo::BabInfo(int type):
+  AuxInfo::AuxInfo(int type):
   OsiBabSolver(type),
-  babPtr_(NULL),
   infeasibleNode_(false),
   nlpSolution_(NULL),
   numcols_(0),
-  hasNlpSolution_(false){
+  hasNlpSolution_(false),
+  bestSolution2_(make_referenced(std::vector<double>())),
+  bestObj2_(make_referenced(0.)){
   }
   
   /** Constructor from OsiBabSolver.*/
-  BabInfo::BabInfo(const OsiBabSolver &other):
+  AuxInfo::AuxInfo(const OsiBabSolver &other):
   OsiBabSolver(other),
-  babPtr_(NULL),
   infeasibleNode_(false),
   nlpSolution_(NULL),
   numcols_(0),
-  hasNlpSolution_(false){
+  hasNlpSolution_(false),
+  bestSolution2_(make_referenced(std::vector<double>())),
+  bestObj2_(make_referenced(0.)){
   }
   
   /** Copy constructor.*/
-  BabInfo::BabInfo(const BabInfo &other):
+  AuxInfo::AuxInfo(const AuxInfo &other):
   OsiBabSolver(other),
-  babPtr_(other.babPtr_),
   infeasibleNode_(other.infeasibleNode_),
   nlpSolution_(NULL),
   numcols_(other.numcols_),
-  hasNlpSolution_(other.hasNlpSolution_){
+  hasNlpSolution_(other.hasNlpSolution_),
+  bestSolution2_(other.bestSolution2_),
+  bestObj2_(other.bestObj2_){
     if(other.nlpSolution_!=NULL){
       assert(numcols_ > 0);
       nlpSolution_ = new double[numcols_ + 1];
@@ -46,19 +50,19 @@ namespace Bonmin{
   }
   
   /** Destructor.*/
-  BabInfo::~BabInfo(){
+  AuxInfo::~AuxInfo(){
     if(nlpSolution_ != NULL)
       delete [] nlpSolution_;
   }
   
 /** Virtual copy constructor.*/
 OsiAuxInfo * 
-  BabInfo::clone() const{
-  return new BabInfo(*this);}
+  AuxInfo::clone() const{
+  return new AuxInfo(*this);}
   
   /** Pass a solution found by an nlp solver.*/
   void 
-  BabInfo::setNlpSolution(const double * sol, int numcols, double objValue){
+  AuxInfo::setNlpSolution(const double * sol, int numcols, double objValue){
     if(numcols_ < numcols){
       delete [] nlpSolution_;
       nlpSolution_ = NULL;}

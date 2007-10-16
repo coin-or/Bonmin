@@ -803,9 +803,11 @@ namespace Bonmin
 
 
   /** Evaluate the upper bounding function at given point and store the result.*/
-  void 
+  double 
   TMINLP2TNLP::evaluateUpperBoundingFunction(const double * x){
-    tminlp_->eval_upper_bound_f(n_, x, obj_value_);
+    Number help;
+    tminlp_->eval_upper_bound_f(n_, x, help);
+    return help;
   }
   /** Resizes the starting point array in case cuts have been added or removed.
       Puts zeroes for eventually added cuts*/
