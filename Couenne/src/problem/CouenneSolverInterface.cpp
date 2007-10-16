@@ -3,21 +3,56 @@
  * Authors: Pietro Belotti, Carnegie Mellon University
  * Purpose: Implementation of the OsiSolverInterface::resolve () method 
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <OsiClpSolverInterface.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneSolverInterface.hpp>
+#include "OsiClpSolverInterface.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneSolverInterface.hpp"
+#include "CglTreeInfo.hpp"
 
 //#define DEBUG
 
+CouenneSolverInterface::CouenneSolverInterface (CouenneCutGenerator *cg /*= NULL*/)
+  :
+  OsiClpSolverInterface(),
+  cutgen_ (cg),
+  knowInfeasible_(false),
+  knowOptimal_(false)
+{}
+
+CouenneSolverInterface::CouenneSolverInterface (const CouenneSolverInterface &src)
+  :
+  OsiClpSolverInterface (src),
+  cutgen_ (src.cutgen_),
+  knowInfeasible_ (src.knowInfeasible_),
+  knowOptimal_ (src.knowOptimal_)
+{}
 
 /// Solve initial LP relaxation 
 void CouenneSolverInterface::initialSolve () 
-  {OsiClpSolverInterface::initialSolve ();}
+{
+  knowInfeasible_ = false;
+  knowOptimal_ = false;
+  OsiClpSolverInterface::initialSolve ();
+}
 
+bool CouenneSolverInterface::isProvenPrimalInfeasible() const
+{
+  if (knowInfeasible_) {
+    return true;
+  }
+  return OsiClpSolverInterface::isProvenPrimalInfeasible();
+}
+
+bool CouenneSolverInterface::isProvenOptimal() const
+{
+  if (knowOptimal_) {
+    return true;
+  }
+  return OsiClpSolverInterface::isProvenOptimal();
+}
 
 /// Defined in Couenne/src/convex/generateCuts.cpp
 void sparse2dense (int, t_chg_bounds *, int *&, int &);
@@ -25,11 +60,31 @@ void sparse2dense (int, t_chg_bounds *, int *&, int &);
 
 /// Resolve an LP relaxation after problem modification
 void CouenneSolverInterface::resolve () {
-
+  // TODO: if NLP point available, add new cuts BEFORE resolving --
+  // and decrease number of cutting plane iterations by one, to
+  // balance it
+  //printf("NumRows in resolve = %d\n", getNumRows());
+  knowInfeasible_ = false;
+  knowOptimal_ = false;
   OsiClpSolverInterface::resolve ();
-  return;
+  //printf("obj value in resolve = %e\n",getObjValue());
+}
 
-  int ncols = cutgen_ -> Problem () -> nVars ();
+/// Create a hot start snapshot of the optimization process.
+void CouenneSolverInterface::markHotStart () {
+  //printf(">>>> markHotStart\n");
+  // Using OsiClpSolverInterface doesn't work yet...
+  OsiSolverInterface::markHotStart ();
+}
+
+/// Optimize starting from the hot start snapshot.
+void CouenneSolverInterface::solveFromHotStart() {
+
+  OsiSolverInterface::solveFromHotStart();
+
+  knowInfeasible_ = false;
+  knowOptimal_ = false;
+  const int ncols = cutgen_ -> Problem () -> nVars ();
 
   cutgen_ -> Problem () -> update (getColSolution (),
 				   getColLower    (),
@@ -50,8 +105,8 @@ void CouenneSolverInterface::resolve () {
 #ifdef DEBUG
     printf ("#### BT says infeasible before re-solve\n");
 #endif
-
-    // how do we (more quickly) return infeasibility? TODO
+    knowInfeasible_ = true;
+    return;
   }
 
   int *changed = NULL, nchanged;
@@ -61,11 +116,69 @@ void CouenneSolverInterface::resolve () {
   if (nchanged)
     cutgen_ -> genColCuts (*this, cs, nchanged, changed);
 
+  const int nRowsBeforeRowCuts = getNumRows();
+  //printf("NumRows before getRowCuts = %d\n", getNumRows());
+  cutgen_ -> genRowCuts (*this, cs, nchanged, changed, CglTreeInfo(),
+			 chg_bds, false);
+
+  // Now go through the list of cuts and apply the column cuts
+  // directly as changes on bounds
+  while(cs.sizeColCuts()) {
+    const OsiColCut& ccut = cs.colCut(0);
+    const CoinPackedVector& lbs = ccut.lbs();
+    int nele = lbs.getNumElements();
+    const int* idxs = lbs.getIndices();
+    const double* eles = lbs.getElements();
+    const double* bnds = getColLower();
+    for (int i=0; i<nele; i++) {
+      if (bnds[*idxs] < *eles) {
+	setColLower(*idxs,*eles);
+      }
+      idxs++;
+      eles++;
+    }
+    const CoinPackedVector& ubs = ccut.ubs();
+    nele = ubs.getNumElements();
+    idxs = ubs.getIndices();
+    eles = ubs.getElements();
+    bnds = getColUpper();
+    for (int i=0; i<nele; i++) {
+      if (bnds[*idxs] > *eles) {
+	setColUpper(*idxs,*eles);
+      }
+      idxs++;
+      eles++;
+    }
+    cs.eraseColCut(0); 
+  }
+
   applyCuts (cs);
 
-  // TODO: if NLP point available, add new cuts BEFORE resolving --
-  // and decrease number of cutting plane iterations by one, to
-  // balance it
+  const int nRowsAfterRowCuts = getNumRows();
+  //printf("NumRows after applyCuts = %d\n", getNumRows());
 
-  OsiClpSolverInterface::resolve ();
+  resolve();
+  if (isProvenPrimalInfeasible()) {
+    knowInfeasible_ = true;
+  }
+  if (isProvenOptimal()) {
+    knowOptimal_ = true;
+  }
+  //printf("obj value = %e\n",getObjValue());
+
+  // now undo the row cuts
+  int nrowsdel = nRowsAfterRowCuts-nRowsBeforeRowCuts;
+  int* rowsdel = new int[nrowsdel];
+  for(int i=0; i<nrowsdel; i++) {
+    rowsdel[i] = nRowsBeforeRowCuts+i;
+  }
+  deleteRows(nrowsdel, rowsdel);
+  delete [] rowsdel;
+  //printf("NumRows after deleting = %d\n", getNumRows());
+}
+
+/// Delete the hot start snapshot.
+void CouenneSolverInterface::unmarkHotStart() {
+  //printf("<<<< unmarkHotStart\n");
+  OsiSolverInterface::unmarkHotStart();
 }

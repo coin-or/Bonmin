@@ -95,6 +95,7 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
 	  expression::Variable (index_),
 	  expression::Lbound   (index_),
 	  expression::Ubound   (index_));
+  printf ("  with firstBranch_ = %d\n", firstBranch_);
 #endif
 }
 

@@ -91,9 +91,9 @@ void unifiedProdCuts (const CouenneCutGenerator *cg, OsiCuts &cs,
        cLX = cRX = cLY = cRY = cLW = true;
 
   if (!(cg -> isFirst ()) && chg) {
-    cLX = chg [xi].lower != UNCHANGED;  cRX = chg [xi].upper != UNCHANGED;
-    cLY = chg [yi].lower != UNCHANGED;  cRY = chg [yi].upper != UNCHANGED;
-    cLW = chg [wi].lower != UNCHANGED;  cRW = chg [wi].upper != UNCHANGED;
+    cLX = chg [xi].lower() != t_chg_bounds::UNCHANGED;  cRX = chg [xi].upper() != t_chg_bounds::UNCHANGED;
+    cLY = chg [yi].lower() != t_chg_bounds::UNCHANGED;  cRY = chg [yi].upper() != t_chg_bounds::UNCHANGED;
+    cLW = chg [wi].lower() != t_chg_bounds::UNCHANGED;  cRW = chg [wi].upper() != t_chg_bounds::UNCHANGED;
   }
 
   // Add McCormick convexification cuts:

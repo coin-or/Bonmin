@@ -272,8 +272,8 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       } //else                  resU = updateBound (+1, u + index, COUENNE_INFINITY);
     }
 
-  if (resL) chg [index].lower = CHANGED;
-  if (resU) chg [index].upper = CHANGED;
+  if (resL) chg [index].setLower(t_chg_bounds::CHANGED);
+  if (resU) chg [index].setUpper(t_chg_bounds::CHANGED);
 
   return (resL || resU);
 }

@@ -43,8 +43,8 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
 bool exprVar::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   bool res = false;
-  if (updateBound (-1, l + varIndex_, l [wind])) {res = true; chg [varIndex_].lower = CHANGED;}
-  if (updateBound (+1, u + varIndex_, u [wind])) {res = true; chg [varIndex_].upper = CHANGED;}
+  if (updateBound (-1, l + varIndex_, l [wind])) {res = true; chg [varIndex_].setLower(t_chg_bounds::CHANGED);}
+  if (updateBound (+1, u + varIndex_, u [wind])) {res = true; chg [varIndex_].setUpper(t_chg_bounds::CHANGED);}
   return res;
 }
 

@@ -110,15 +110,15 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   // w >= l
 
   if (wl > -COUENNE_INFINITY) {
-    if ((xi >= 0) && (updateBound (-1, l + xi, yl + wl))) {res = true; chg [xi].lower = CHANGED;}
-    if ((yi >= 0) && (updateBound (+1, u + yi, xu - wl))) {res = true; chg [yi].upper = CHANGED;}
+    if ((xi >= 0) && (updateBound (-1, l + xi, yl + wl))) {res = true; chg [xi].setLower(t_chg_bounds::CHANGED);}
+    if ((yi >= 0) && (updateBound (+1, u + yi, xu - wl))) {res = true; chg [yi].setUpper(t_chg_bounds::CHANGED);}
   }
 
   // w <= u
 
   if (wu < COUENNE_INFINITY) {
-    if ((xi >= 0) && (updateBound (+1, u + xi, yu + wu))) {res = true; chg [xi].upper = CHANGED;}
-    if ((yi >= 0) && (updateBound (-1, l + yi, xl - wu))) {res = true; chg [yi].lower = CHANGED;}
+    if ((xi >= 0) && (updateBound (+1, u + xi, yu + wu))) {res = true; chg [xi].setUpper(t_chg_bounds::CHANGED);}
+    if ((yi >= 0) && (updateBound (-1, l + yi, xl - wu))) {res = true; chg [yi].setLower(t_chg_bounds::CHANGED);}
   }
 
   return res;

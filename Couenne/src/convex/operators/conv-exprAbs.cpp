@@ -33,8 +33,8 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
   delete lbe;
   delete ube;
 
-  bool cLeft  = !chg || (chg [x_ind].lower != UNCHANGED) || cg -> isFirst (),
-       cRight = !chg || (chg [x_ind].upper != UNCHANGED) || cg -> isFirst ();
+  bool cLeft  = !chg || (chg [x_ind].lower() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
+  bool cRight = !chg || (chg [x_ind].upper() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
 
   // if l, u have the same sign, then w = x (l > 0) or w = -x (u < 0)
 

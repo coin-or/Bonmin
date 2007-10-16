@@ -164,7 +164,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
       // propagate lower bound to w
       if (updateBound (-1, l + wind, lower)) {
-	chg [wind].lower = CHANGED;
+	chg [wind].setLower(t_chg_bounds::CHANGED);
 	tighter = true;
       }
 
@@ -174,7 +174,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
 	// propagate upper bound to w
 	if (updateBound (+1, u + wind, upper)) {
-	  chg [wind].upper = CHANGED;
+	  chg [wind].setUpper(t_chg_bounds::CHANGED);
 	}
 
 	return false; // both bounds were weak, no implications possible
@@ -187,7 +187,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       // propagate upper bound to w
       if (updateBound (+1, u + wind, upper)) {
 	tighter = true;
-	chg [wind].upper = CHANGED;
+	chg [wind].setUpper(t_chg_bounds::CHANGED);
       }
     }
   }
@@ -221,27 +221,27 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
       if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [i] + lc [ind]) || tighter)
-	chg [ind].upper = CHANGED;
+	chg [ind].setUpper(t_chg_bounds::CHANGED);
     }
 
     // tighten lower bound of variables in I2
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
       if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [i] + uc [ind]) || tighter)
-	chg [ind].lower = CHANGED;
+	chg [ind].setLower(t_chg_bounds::CHANGED);
     }
   } else
 
     if ((infLo1 >= 0) && (infUp2 == -1)) {    // There is one infinite lower bound in I1
       int ind = I1 [infLo1];
       if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [infLo1]) || tighter)
-	chg [ind].upper = CHANGED;
+	chg [ind].setUpper(t_chg_bounds::CHANGED);
     }
     else 
       if ((infLo1 == -1) && (infUp2 >= 0)) {  // There is one infinite upper bound in I2
 	int ind = I2 [infUp2];
 	if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [infUp2]) || tighter)
-	  chg [ind].lower = CHANGED;
+	  chg [ind].setLower(t_chg_bounds::CHANGED);
       }
 
   // Update uppers in I1 and lowers in I2
@@ -251,26 +251,26 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
       if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + uc [ind]) || tighter)
-	chg [ind].lower = CHANGED;
+	chg [ind].setLower(t_chg_bounds::CHANGED);
     }
 
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
       if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + lc [ind]) || tighter)
-	chg [ind].upper = CHANGED;
+	chg [ind].setUpper(t_chg_bounds::CHANGED);
     }
   } else 
 
     if ((infUp1 >= 0) && (infLo2 == -1)) { // There is one infinite lower bound in I2
       int ind = I1 [infUp1];
       if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [infUp1]) || tighter)
-	chg [ind].lower = CHANGED;
+	chg [ind].setLower(t_chg_bounds::CHANGED);
     }
     else 
       if ((infUp1 == -1) && (infLo2 >= 0)) {  // There is one infinite upper bound in I1
 	int ind = I2 [infLo2];
 	if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [infLo2]) || tighter)
-	  chg [ind].upper = CHANGED;
+	  chg [ind].setUpper(t_chg_bounds::CHANGED);
       }
 
   // ...phew!

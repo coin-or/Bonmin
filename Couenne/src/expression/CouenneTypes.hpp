@@ -57,18 +57,37 @@ enum dig_type {ORIG_ONLY, STOP_AT_AUX, TAG_AND_RECURSIVE, COUNT};
 /** integrality type of an auxiliary variable: unset, continuous, integer */
 enum integer_type {AUX_UNSET=-1, AUX_CONTINUOUS, AUX_INTEGER};
 
-/** (un)changed bounds */
-
-#define UNCHANGED 0
-#define CHANGED   1
-#define EXACT     2
-
 /** status of lower/upper bound of a variable, to be checked/modified
     in bound tightening */
-typedef struct chg_bounds {
-  char lower;
-  char upper;
-} t_chg_bounds;
+class t_chg_bounds
+{
+public:
+  enum ChangeStatus {
+    UNCHANGED=0,
+    CHANGED=1,
+    EXACT=2
+  };
+
+  t_chg_bounds():
+    lower_(UNCHANGED),
+    upper_(UNCHANGED)
+  {}
+  t_chg_bounds(const t_chg_bounds& src):
+    lower_(src.lower_),
+    upper_(src.upper_)
+  {}
+  inline const char& lower() const {return lower_;}
+  inline const char& upper() const {return upper_;}
+  inline void setLower(ChangeStatus lower) {lower_ = lower;}
+  inline void setUpper(ChangeStatus upper) {upper_ = upper;}
+  inline void setLowerBits(char lower) {lower_ |= lower;}
+  inline void setUpperBits(char upper) {upper_ |= upper;}
+private:
+  // prohibit = operator
+  void operator=(const t_chg_bounds&);
+  char lower_;
+  char upper_;
+};
 
 /** main number type in Couenne */
 typedef double CouNumber;

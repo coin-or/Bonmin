@@ -53,13 +53,13 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
 
       //      printf ("updating upper %g <-- %g\n", primal0, primal);
       problem_ -> Ub (objInd) = UB;
-      chg_bds [objInd]. upper = CHANGED;
+      chg_bds [objInd].setUpper(t_chg_bounds::CHANGED);
     }
 
     if ((LB   > - COUENNE_INFINITY) && 
 	(LB   > dual0 + COUENNE_EPS)) { // update dual bound
       problem_ -> Lb (objInd) = LB;
-      chg_bds [objInd]. lower = CHANGED;
+      chg_bds [objInd].setLower(t_chg_bounds::CHANGED);
     }
 
     //////////////////////// Reduced cost bound tightening //////////////////////
@@ -81,7 +81,7 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
 	  if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
 	    // can improve bound on variable w_i
 	    problem_ -> Ub (i) = x + (UB-LB) / rc;
-	    chg_bds [i].upper = CHANGED;
+	    chg_bds [i].setUpper(t_chg_bounds::CHANGED);
 	  }
 	}
       }

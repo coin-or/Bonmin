@@ -71,15 +71,15 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   bool tighter = false;
 
   if (wl > 0) {
-    if      (*xl > 0) {if (updateBound (-1, xl,  wl)) {tighter = true; chg [index].lower = CHANGED;}}
-    else if (*xu < 0) {if (updateBound (+1, xu, -wl)) {tighter = true; chg [index].upper = CHANGED;}}
+    if      (*xl > 0) {if (updateBound (-1, xl,  wl)) {tighter = true; chg [index].setLower(t_chg_bounds::CHANGED);}}
+    else if (*xu < 0) {if (updateBound (+1, xu, -wl)) {tighter = true; chg [index].setUpper(t_chg_bounds::CHANGED);}}
   }
 
   // w <= u (if u < 0 the problem is infeasible)
 
   if (wu < COUENNE_INFINITY) {
-    if (updateBound (-1, xl, -wu)) {tighter = true; chg [index].lower = CHANGED;}
-    if (updateBound (+1, xu,  wu)) {tighter = true; chg [index].upper = CHANGED;}
+    if (updateBound (-1, xl, -wu)) {tighter = true; chg [index].setLower(t_chg_bounds::CHANGED);}
+    if (updateBound (+1, xu,  wu)) {tighter = true; chg [index].setUpper(t_chg_bounds::CHANGED);}
   }
 
   return tighter;

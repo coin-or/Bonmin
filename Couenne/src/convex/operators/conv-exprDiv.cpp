@@ -51,8 +51,10 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
        cLW = cRW = cLY = true;
 
   if (!(cg -> isFirst ()) && chg) {
-    cLW = chg [wi].lower != UNCHANGED;  cRW = chg [wi].upper != UNCHANGED;
-    cLY = chg [yi].lower != UNCHANGED;  cRY = chg [yi].upper != UNCHANGED;
+    cLW = chg [wi].lower() != t_chg_bounds::UNCHANGED;
+    cRW = chg [wi].upper() != t_chg_bounds::UNCHANGED;
+    cLY = chg [yi].lower() != t_chg_bounds::UNCHANGED;
+    cRY = chg [yi].upper() != t_chg_bounds::UNCHANGED;
   }
 
   // if the denominator's bound interval has 0 as internal point,

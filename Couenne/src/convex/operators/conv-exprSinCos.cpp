@@ -47,8 +47,8 @@ void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int wi = w -> Index ();
 
   if (chg && !(cg -> isFirst ()) && 
-      (chg [wi].lower == UNCHANGED) && 
-      (chg [wi].upper == UNCHANGED))
+      (chg [wi].lower() == t_chg_bounds::UNCHANGED) && 
+      (chg [wi].upper() == t_chg_bounds::UNCHANGED))
     return;
 
 #ifdef NEW_TRIG
@@ -72,8 +72,8 @@ void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int wi = w -> Index ();
 
   if (chg && !(cg -> isFirst ()) && 
-      (chg [wi].lower == UNCHANGED) && 
-      (chg [wi].upper == UNCHANGED))
+      (chg [wi].lower() == t_chg_bounds::UNCHANGED) && 
+      (chg [wi].upper() == t_chg_bounds::UNCHANGED))
     return;
 
 #ifdef NEW_TRIG

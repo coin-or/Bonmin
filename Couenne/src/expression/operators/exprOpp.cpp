@@ -36,8 +36,8 @@ bool exprOpp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   int ind = argument_ -> Index ();
   bool res = false;
 
-  if (updateBound (-1, l + ind, - u [wind])) {res = true; chg [ind].lower = CHANGED;}
-  if (updateBound ( 1, u + ind, - l [wind])) {res = true; chg [ind].upper = CHANGED;}
+  if (updateBound (-1, l + ind, - u [wind])) {res = true; chg [ind].setLower(t_chg_bounds::CHANGED);}
+  if (updateBound ( 1, u + ind, - l [wind])) {res = true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
   return res;
 }
 

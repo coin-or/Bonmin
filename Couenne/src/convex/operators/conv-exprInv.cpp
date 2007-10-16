@@ -83,8 +83,8 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int wi = aux       -> Index (), 
       xi = argument_ -> Index ();
 
-  bool cL = !chg || (cg -> isFirst ()) || (chg [xi].lower != UNCHANGED),
-       cR = !chg || (cg -> isFirst ()) || (chg [xi].upper != UNCHANGED);
+  bool cL = !chg || (cg -> isFirst ()) || (chg [xi].lower() != t_chg_bounds::UNCHANGED);
+  bool cR = !chg || (cg -> isFirst ()) || (chg [xi].upper() != t_chg_bounds::UNCHANGED);
 
   // special case: l and u are very close, replace function with
   // linear term

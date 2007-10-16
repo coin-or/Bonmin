@@ -49,8 +49,8 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       resU = (l [wind] > - COUENNE_INFINITY) && updateBound ( 1, u + ind, l [wind] / c);
     } 
 
-    if (resL) chg [ind].lower = CHANGED;
-    if (resU) chg [ind].upper = CHANGED;
+    if (resL) chg [ind].setLower(t_chg_bounds::CHANGED);
+    if (resU) chg [ind].setUpper(t_chg_bounds::CHANGED);
 
       /*printf ("w_%d [%g,%g] -------> x_%d in [%g,%g] ", 
 	      wind, l [wind], u [wind], 
@@ -135,10 +135,10 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       }
     }
 
-    if (resxL) chg [xi].lower = CHANGED;
-    if (resxU) chg [xi].upper = CHANGED;
-    if (resyL) chg [yi].lower = CHANGED;
-    if (resyU) chg [yi].upper = CHANGED;
+    if (resxL) chg [xi].setLower(t_chg_bounds::CHANGED);
+    if (resxU) chg [xi].setUpper(t_chg_bounds::CHANGED);
+    if (resyL) chg [yi].setLower(t_chg_bounds::CHANGED);
+    if (resyU) chg [yi].setUpper(t_chg_bounds::CHANGED);
 
     resL = resxL || resyL;
     resU = resxU || resyU;

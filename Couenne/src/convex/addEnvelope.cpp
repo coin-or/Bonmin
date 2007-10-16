@@ -40,8 +40,8 @@ void CouenneCutGenerator::addEnvelope (OsiCuts &cs, int sign,
 
   // if bounds are very close, convexify with a single line
 
-  bool cLeft  = !chg || (chg [x_ind].lower != UNCHANGED) || firstcall_,
-       cRight = !chg || (chg [x_ind].upper != UNCHANGED) || firstcall_;
+  bool cLeft  = !chg || (chg [x_ind].lower() != t_chg_bounds::UNCHANGED) || firstcall_;
+  bool cRight = !chg || (chg [x_ind].upper() != t_chg_bounds::UNCHANGED) || firstcall_;
 
   if (fabs (u - l) < COUENNE_EPS) {
 

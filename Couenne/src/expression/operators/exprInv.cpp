@@ -89,8 +89,8 @@ bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   invPowImplBounds (wind, index, l, u, -1., resL, resU);
 
-  if (resL) chg [index].lower = CHANGED;
-  if (resU) chg [index].upper = CHANGED;
+  if (resL) chg [index].setLower(t_chg_bounds::CHANGED);
+  if (resU) chg [index].setUpper(t_chg_bounds::CHANGED);
 
   return (resL || resU);
 }

@@ -107,7 +107,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 #endif
 
 	lb_ [i] = ll;
-	chg_bds [i].lower = CHANGED;
+	chg_bds [i].setLower(t_chg_bounds::CHANGED);
 	nchg++;
       }
 
@@ -142,7 +142,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 #endif
 
 	ub_ [i] = uu;
-	chg_bds [i].upper = CHANGED;
+	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
 	nchg++;
       }
 

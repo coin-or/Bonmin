@@ -51,8 +51,8 @@ bool exprExp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     resL = updateBound (-1, l + ind,  1) || resL;
   }
 
-  if (resL) chg [ind].lower = CHANGED;
-  if (resU) chg [ind].upper = CHANGED;
+  if (resL) chg [ind].setLower(t_chg_bounds::CHANGED);
+  if (resU) chg [ind].setUpper(t_chg_bounds::CHANGED);
 
   return (resL || resU);
 }

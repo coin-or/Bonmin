@@ -3,13 +3,13 @@
  * Author:  Pietro Belotti
  * Purpose: generate Row Cuts for current convexification
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CglCutGenerator.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <CouenneProblem.hpp>
+#include "CglCutGenerator.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
 
 
 /// generate OsiRowCuts for current convexification

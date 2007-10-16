@@ -67,7 +67,8 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
   nchanged = 0;
 
   for (register int i=ncols, j=0; i--; j++, chg_bds++)
-    if (chg_bds -> lower || chg_bds -> upper) {
+    if (chg_bds -> lower() != t_chg_bounds::UNCHANGED ||
+	chg_bds -> upper() != t_chg_bounds::UNCHANGED ) {
       *changed++ = j;
       nchanged++;
     }
@@ -108,11 +109,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // used with malloc/realloc/free
 
   t_chg_bounds *chg_bds = new t_chg_bounds [ncols];
-
-  // fill it with zeros
-  for (register int i = ncols; i--; chg_bds++) 
-    chg_bds -> lower = chg_bds -> upper = UNCHANGED;
-  chg_bds -= ncols;
 
 #ifdef DEBUG
   printf ("=============================\n");
@@ -225,9 +221,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  for (register int i=0; i < ncols; i++) {
 
 	    if (beforeLower && (nowLower [i] >= beforeLower [i] + COUENNE_EPS))
-	      chg_bds [i].lower = CHANGED;
+	      chg_bds [i].setLower(t_chg_bounds::CHANGED);
 	    if (beforeUpper && (nowUpper [i] <= beforeUpper [i] - COUENNE_EPS))
-	      chg_bds [i].upper = CHANGED;
+	      chg_bds [i].setUpper(t_chg_bounds::CHANGED);
 	  }
 
 	} else printf ("WARNING: could not access parent's bounds\n");

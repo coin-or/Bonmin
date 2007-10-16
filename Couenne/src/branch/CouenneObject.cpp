@@ -26,7 +26,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   // whichWay should be set to which branch first (for two-way branching?)
   // if selectBranch not called, choose one at random
-  whichWay_ = whichWay = TWO_RAND;
+  whichWay_ = whichWay = TWO_LEFT;
 
   // infeasibility is always null for linear expressions
   if (reference_ -> Image () -> Linearity () <= LINEAR) {
@@ -201,8 +201,9 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   // way has suggestion from CouenneObject::infeasibility(), but not
   // as set in infeasibility, so we use the one stored in member
   // whichWay_
+  // AW: We can't do that, way must be used!
 
-  way = whichWay_;
+  // way = whichWay_;
 
   if (brVarInd_ >= 0) // if applied latest selectBranching
 
@@ -285,9 +286,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-
-      return new CouenneBranchingObject (index, way, x, depvar -> isInteger ());
-  }
+      return new CouenneBranchingObject (index, way, x, depvar -> isInteger ());  }
 
   return new CouenneBranchingObject (ref_ind, way, xr, reference_ -> isInteger ());
 }

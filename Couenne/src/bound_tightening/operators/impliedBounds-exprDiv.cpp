@@ -40,13 +40,13 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     if (c > COUENNE_EPS) {
 
-      if (updateBound (-1, l + ind, l [wind] * c)) {resx = true; chg [ind].lower = CHANGED;}
-      if (updateBound ( 1, u + ind, u [wind] * c)) {resx = true; chg [ind].upper = CHANGED;}
+      if (updateBound (-1, l + ind, l [wind] * c)) {resx = true; chg [ind].setLower(t_chg_bounds::CHANGED);}
+      if (updateBound ( 1, u + ind, u [wind] * c)) {resx = true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
     } 
     else if (c < - COUENNE_EPS) {
 
-      if (updateBound (-1, l + ind, u [wind] * c)) {resx = true; chg [ind].lower = CHANGED;}
-      if (updateBound ( 1, u + ind, l [wind] * c)) {resx = true; chg [ind].upper = CHANGED;}
+      if (updateBound (-1, l + ind, u [wind] * c)) {resx = true; chg [ind].setLower(t_chg_bounds::CHANGED);}
+      if (updateBound ( 1, u + ind, l [wind] * c)) {resx = true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
     } 
   } else {
 
@@ -184,10 +184,10 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       resyU = (*yu>0) && (*yu > *xl/wu) && updateBound (+1, yu, CoinMax (*xl/wu,0.))  || resyU;
     }
 
-    if (resxL) chg [xi].lower = CHANGED;
-    if (resxU) chg [xi].upper = CHANGED;
-    if (resyL) chg [yi].lower = CHANGED;
-    if (resyU) chg [yi].upper = CHANGED;
+    if (resxL) chg [xi].setLower(t_chg_bounds::CHANGED);
+    if (resxU) chg [xi].setUpper(t_chg_bounds::CHANGED);
+    if (resyL) chg [yi].setLower(t_chg_bounds::CHANGED);
+    if (resyU) chg [yi].setUpper(t_chg_bounds::CHANGED);
 
     /*if (resx || resy) 
       printf ("                 \ntightened division: w[%d] [%e %e], x%d [%e %e] / y%d [%e %e]\n",

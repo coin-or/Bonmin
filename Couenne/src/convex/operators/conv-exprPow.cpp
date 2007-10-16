@@ -87,8 +87,8 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
 
-  bool cL = !chg || (chg [x_ind].lower != UNCHANGED) || cg -> isFirst (),
-       cR = !chg || (chg [x_ind].upper != UNCHANGED) || cg -> isFirst ();
+  bool cL = !chg || (chg [x_ind].lower() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
+  bool cR = !chg || (chg [x_ind].upper() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
 
   CouNumber w = (*aux) (), 
             x = (*xe)  (),

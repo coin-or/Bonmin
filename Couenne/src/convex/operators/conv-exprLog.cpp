@@ -39,8 +39,8 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   int w_ind = aux       -> Index ();
   int x_ind = argument_ -> Index ();
 
-  bool cL = !chg || (cg -> isFirst ()) || (chg [x_ind].lower != UNCHANGED),
-       cR = !chg || (cg -> isFirst ()) || (chg [x_ind].upper != UNCHANGED);
+  bool cL = !chg || (cg -> isFirst ()) || (chg [x_ind].lower() != t_chg_bounds::UNCHANGED);
+  bool cR = !chg || (cg -> isFirst ()) || (chg [x_ind].upper() != t_chg_bounds::UNCHANGED);
 
   // if bounds are very close, convexify with a single line
 

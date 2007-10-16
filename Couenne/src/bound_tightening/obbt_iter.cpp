@@ -97,15 +97,15 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
       if (csi -> getColLower () [index] < value - COUENNE_EPS) {
 	csi -> setColLower (index, value); 
-	chg_bds    [index].lower |= CHANGED | EXACT;
+	chg_bds    [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
       }
-      else chg_bds [index].lower |= EXACT;
+      else chg_bds [index].setLowerBits(t_chg_bounds::EXACT);
 
       if (csi -> getColUpper () [index] > value + COUENNE_EPS) {
 	csi -> setColUpper (index, value); 
-	chg_bds    [index].lower |= CHANGED | EXACT;
+	chg_bds    [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
       }
-      else chg_bds [index].upper |= EXACT;
+      else chg_bds [index].setUpperBits(t_chg_bounds::EXACT);
 
       issimple = true;
 
@@ -118,8 +118,8 @@ int obbt_iter (const CouenneCutGenerator *cg,
       // TODO: write code for monotone functions...
 
       if // independent variable is exactly bounded in both ways
-	((chg_bds [indInd].lower & EXACT) && 
-	 (chg_bds [indInd].upper & EXACT) ||
+	((chg_bds [indInd].lower() & t_chg_bounds::EXACT) && 
+	 (chg_bds [indInd].upper() & t_chg_bounds::EXACT) ||
 	 // or if this expression is of the form w=cx+d, that is, it
 	 // depends on one variable only and it is linear
 	 (var -> Image () -> Linearity () <= LINEAR)) {
@@ -139,13 +139,13 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
 	if (csi -> getColLower () [index] < lb - COUENNE_EPS) {
 	  csi -> setColLower (index, lb); 
-	  chg_bds      [index].lower |= CHANGED | EXACT;
-	} else chg_bds [index].lower |= EXACT;
+	  chg_bds      [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
+	} else chg_bds [index].setLowerBits(t_chg_bounds::EXACT);
 
 	if (csi -> getColUpper () [index] > ub + COUENNE_EPS) {
 	  csi -> setColUpper (index, ub); 
-	  chg_bds      [index].upper |= CHANGED | EXACT;
-	} else chg_bds [index].upper |= EXACT;
+	  chg_bds      [index].setUpperBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
+	} else chg_bds [index].setUpperBits(t_chg_bounds::EXACT);
       }
     }
   }
@@ -159,8 +159,8 @@ int obbt_iter (const CouenneCutGenerator *cg,
       ((index != objind) || // this is not the objective
 
        // or it is, so we use it for re-solving
-       ((sense ==  1) && (psense == MINIMIZE) && !(chg_bds [index].lower & EXACT)) ||
-       ((sense == -1) && (psense == MAXIMIZE) && !(chg_bds [index].upper & EXACT)))) {
+       ((sense ==  1) && (psense == MINIMIZE) && !(chg_bds [index].lower() & t_chg_bounds::EXACT)) ||
+       ((sense == -1) && (psense == MAXIMIZE) && !(chg_bds [index].upper() & t_chg_bounds::EXACT)))) {
 
     bool isInt = (p -> Var (index) -> isInteger ());
 
@@ -221,16 +221,16 @@ int obbt_iter (const CouenneCutGenerator *cg,
 	  printf ("l_%d: %g --> %g\n", index, csi -> getColLower () [index], bound);
 #endif 
 	  csi -> setColLower (index, bound); 
-	  chg_bds      [index].lower |= CHANGED | EXACT;
-	} else chg_bds [index].lower |= EXACT;
+	  chg_bds      [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
+	} else chg_bds [index].setLowerBits(t_chg_bounds::EXACT);
       else
 	if (csi -> getColUpper () [index] > bound + COUENNE_EPS) {
 #ifdef DEBUG
 	  printf ("u_%d: %g --> %g\n", index, csi -> getColUpper () [index], bound);
 #endif 
 	  csi -> setColUpper (index, bound); 
-	  chg_bds      [index].upper |= CHANGED | EXACT;
-	} else chg_bds [index].upper |= EXACT;
+	  chg_bds      [index].setUpperBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
+	} else chg_bds [index].setUpperBits(t_chg_bounds::EXACT);
 
       /*
       if (sense==1) {csi -> setColLower (index, bound); chg_bds [index].lower |= CHANGED | EXACT;}
@@ -244,8 +244,8 @@ int obbt_iter (const CouenneCutGenerator *cg,
       for (int j=0; j<ncols; j++) 
 	if ((j!=index) && (j!=objind)) {
 
-	  if (sol [j] <= p -> Lb (j) + COUENNE_EPS) chg_bds [j].lower |= EXACT;
-	  if (sol [j] >= p -> Ub (j) - COUENNE_EPS) chg_bds [j].upper |= EXACT;
+	  if (sol [j] <= p -> Lb (j) + COUENNE_EPS) chg_bds [j].setLowerBits(t_chg_bounds::EXACT);
+	  if (sol [j] >= p -> Ub (j) - COUENNE_EPS) chg_bds [j].setUpperBits(t_chg_bounds::EXACT);
 	}
 
 #if 0
