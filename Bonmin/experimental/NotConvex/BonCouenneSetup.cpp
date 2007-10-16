@@ -109,9 +109,6 @@ namespace Bonmin{
 
     continuousSolver_->findIntegersAndSOS(false);
 
-    // [Pietro: Never used]
-    //    int numberIntegerObjects = continuousSolver_->numberObjects() > 0; 
-
     {
 
       int nAuxs = 0, nobj = 0,
@@ -152,16 +149,16 @@ namespace Bonmin{
       }
 
       continuousSolver_ -> addObjects (nobj, objects);
+
       for(int i = 0 ; i < nobj ; i++){
        	delete objects[i];
       }
+
       delete [] objects;
     }
     
     //Setup Convexifier generators
 
-    // [Pietro: never used]
-    //    int numGen = 0;
     int freq;
     options()->GetIntegerValue("convexification_cuts",freq,"couenne.");
     if (freq != 0) {
@@ -191,12 +188,11 @@ namespace Bonmin{
     }
 
     int varSelection;
-    options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
+    options_->GetEnumValue("varselect_stra",varSelection,"couenne.");
     switch (varSelection) {
-    case OsiTMINLPInterface::OSI_SIMPLE:
-      branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
-						   couenneProb);
-      break;
+
+      // strong branching choosevariable
+
     case OsiTMINLPInterface::OSI_STRONG: {
 	CouenneChooseStrong * chooseVariable = new CouenneChooseStrong(*this, couenneProb);
 	chooseVariable->setTrustStrongForSolution(false);
@@ -205,9 +201,16 @@ namespace Bonmin{
 	branchingMethod_ = chooseVariable;
 	break;
     }
+
+    case OsiTMINLPInterface::OSI_SIMPLE: // default choice
+
     default:
-      assert(false && "Invalid varselect_stra");
+
+      branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
+						   couenneProb);
       break;
+      //      assert(false && "Invalid varselect_stra");
+      //      break;
     }
 
     if(intParam_[NumCutPasses] < 2)
