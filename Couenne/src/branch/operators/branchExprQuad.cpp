@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch data for quadratic forms
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 

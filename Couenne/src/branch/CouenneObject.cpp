@@ -4,7 +4,7 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Base object for variables (to be used in branching)
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -77,11 +77,13 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   if (brVarInd_ >= 0) {
 
+#ifdef DEBUG
     if (improv <= COUENNE_EPS) {
       printf ("### warning, infeas = %g for ", improv);
       reference_ -> print (); printf (":=");
       reference_ -> Image () -> print (); printf ("\n");
     }
+#endif
 
     delta = improv;
     whichWay_ = whichWay;

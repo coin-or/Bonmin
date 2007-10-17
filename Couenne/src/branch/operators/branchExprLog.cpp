@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch gain and branch object for logarithms
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -72,11 +72,6 @@ CouNumber exprLog::selectBranch (expression *w,
     brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u);
 
-    /*    if      (*brpts < l) if (u <   COUENNE_INFINITY) *brpts = (l+u)/2;
-                         else                        *brpts = 10*l + 1;
-    else if (*brpts > u) if (l < - COUENNE_INFINITY) *brpts = u/2;
-                         else                        *brpts = (l+u)/2; */
-
     way = TWO_LEFT;
     CouNumber dy = y0 - log (*brpts);
     x0 -= *brpts;
@@ -112,10 +107,6 @@ CouNumber exprLog::selectBranch (expression *w,
 
     *brpts = midInterval (exp (y0), l, u);
 
-    /*if ((*brpts > u - COUENNE_NEAR_BOUND) ||
-	(*brpts < l + COUENNE_NEAR_BOUND)) 
-	*brpts = (l+u) / 2;*/
-
     way = TWO_RIGHT;
     return projectSeg (x0, y0, *brpts, log (*brpts), x0, log (x0), +1); // exact distance
 
@@ -127,23 +118,20 @@ CouNumber exprLog::selectBranch (expression *w,
     *brpts = midInterval (x0, l, u);
     way = TWO_LEFT;
 
-    /*if (*brpts < l + COUENNE_NEAR_BOUND)
-     *brpts = l+1;*/
-
     return projectSeg (x0, y0, *brpts, log (*brpts), x0, log (x0), +1); // exact distance
     //return log (x0) - y0;
   } 
 
   // both are finite
 
+  // apply minarea
+
+  *brpts = (u > l + COUENNE_EPS) ? 
+    midInterval ((u-l) / log (u/l), l, u) :
+    midInterval (x0,                l, u); 
+
   //  *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u); 
   // WRONG! Local minima may be at bounds
-
-  *brpts = midInterval (x0, l, u); 
-
-  /*if ((*brpts > u - COUENNE_NEAR_BOUND) ||
-      (*brpts < l + COUENNE_NEAR_BOUND))
-      *brpts = (l+u) / 2;*/
 
   way = TWO_RAND;
 

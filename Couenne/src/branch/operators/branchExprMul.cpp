@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch data for multiplications
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -28,8 +28,6 @@ CouNumber exprMul::selectBranch (expression *w,
   int xi = arglist_ [0] -> Index (),
       yi = arglist_ [1] -> Index (),
       wi = w            -> Index ();
-
-  printf ("branching on mul "); print (); printf ("\n");
 
   assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 

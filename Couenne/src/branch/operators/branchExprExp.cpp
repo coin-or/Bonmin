@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch gain and branch object for exponentials
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -60,9 +60,6 @@ CouNumber exprExp::selectBranch (expression *w,
     brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = midInterval (powNewton (x0, y0, exp, exp, exp), l, u);
 
-    //    if      (*brpts < l) *brpts = (u <   COUENNE_INFINITY) ? ((l+u)/2) : +1 + (l>0) ? l*2 : l/2;
-    //    else if (*brpts > u) *brpts = (l > - COUENNE_INFINITY) ? ((l+u)/2) : -1 + (u<0) ? u*2 : u/2;
-
     way = TWO_RAND;
 
     y0 -= exp (*brpts);
@@ -99,8 +96,6 @@ CouNumber exprExp::selectBranch (expression *w,
   if (l < -COUENNE_INFINITY) { // 2) unbounded from below
 
     *brpts = midInterval (x0, l, u);
-    /*    if (*brpts > u - COUENNE_NEAR_BOUND) 
-     *brpts = u-1;*/
 
     way = TWO_RIGHT;
     return CoinMin (y0 - exp (x0), projectSeg (x0, y0, x0, exp (x0), u, exp (u), -1));
@@ -110,28 +105,21 @@ CouNumber exprExp::selectBranch (expression *w,
 
     *brpts = midInterval (log (y0), l, u);
 
-    /*    if (*brpts < l + COUENNE_NEAR_BOUND) 
-     *brpts = l+1;*/
-
     way = TWO_LEFT;
     return CoinMin (x0 - log (y0), projectSeg (x0, y0, l, exp (l), log (y0), y0, -1));
   }
 
-  // 4) both are finite
+  // 4) both are finite: apply minarea
 
   // find closest point on curve
-  *brpts = midInterval (powNewton (x0, y0, exp, exp, exp), l, u);
-
-  /*
-    if ((*brpts > u - COUENNE_NEAR_BOUND) ||
-        (*brpts < l + COUENNE_NEAR_BOUND))
-    *brpts = (l+u) / 2;
-    */
+  *brpts = //midInterval (powNewton (x0, y0, exp, exp, exp), l, u);
+  // apply minarea
+  midInterval (log ((exp (u) - exp (l)) / (u-l)) , l, u);
 
   way = TWO_RAND;
 
-  CouNumber dx = x0 - *brpts,
-    dy = y0 - exp (*brpts);
+  x0 -= *brpts;
+  y0 -= exp (*brpts);
 
-  return sqrt (dx*dx + dy*dy);
+  return sqrt (x0*x0 + y0*y0);
 }

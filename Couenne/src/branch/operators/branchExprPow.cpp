@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch gain and branch object for powers
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
