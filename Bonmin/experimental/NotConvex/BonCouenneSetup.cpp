@@ -75,7 +75,7 @@ namespace Bonmin{
     options()->GetIntegerValue("convexification_points",num_points,"bonmin.");
     
     CouenneCutGenerator * couenneCg = 
-      new CouenneCutGenerator(ci, aslfg_->asl, true, convtype,num_points);
+      new CouenneCutGenerator(ci, aslfg_->asl, true, convtype, num_points);
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
@@ -86,7 +86,7 @@ namespace Bonmin{
     continuousSolver_ -> setAuxiliaryInfo (extraStuff);
     delete extraStuff;
     
-    extraStuff = dynamic_cast<Bonmin::BabInfo *>(continuousSolver_ -> getAuxiliaryInfo());
+    extraStuff = dynamic_cast <Bonmin::BabInfo *> (continuousSolver_ -> getAuxiliaryInfo ());
     
     /* Setup log level*/
     int lpLogLevel;
@@ -98,8 +98,9 @@ namespace Bonmin{
     // In case there are no discrete variables, we can set the optimal
     // value from the initialSolve as cutoff
     // TODO: In case there are integer variables, check if all feasible
-    if (ci->getNumIntegers() == 0) {
-      doubleParam_[Cutoff] = ci->getObjValue();
+
+    if (ci -> getNumIntegers() == 0) {
+      doubleParam_[Cutoff] = ci->getObjValue() + 1e-4;
     }
 
     if(extraStuff->infeasibleNode()){
@@ -109,8 +110,9 @@ namespace Bonmin{
 
     continuousSolver_->findIntegersAndSOS(false);
 
-    {
+    // add CouenneObjects for branching /////////////////////////////////////////////
 
+    {
       int nAuxs = 0, nobj = 0,
 	  nVars = couenneProb -> nVars ();
 
@@ -157,7 +159,7 @@ namespace Bonmin{
       delete [] objects;
     }
     
-    //Setup Convexifier generators
+    // Setup Convexifier generators ////////////////////////////////////////////////
 
     int freq;
     options()->GetIntegerValue("convexification_cuts",freq,"couenne.");
@@ -188,7 +190,7 @@ namespace Bonmin{
     }
 
     int varSelection;
-    options_->GetEnumValue("varselect_stra",varSelection,"couenne.");
+    options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     switch (varSelection) {
 
       // strong branching choosevariable
@@ -203,14 +205,9 @@ namespace Bonmin{
     }
 
     case OsiTMINLPInterface::OSI_SIMPLE: // default choice
-
     default:
-
-      branchingMethod_ = new CouenneChooseVariable(continuousSolver_, 
-						   couenneProb);
+      branchingMethod_ = new CouenneChooseVariable (continuousSolver_, couenneProb);
       break;
-      //      assert(false && "Invalid varselect_stra");
-      //      break;
     }
 
     if(intParam_[NumCutPasses] < 2)

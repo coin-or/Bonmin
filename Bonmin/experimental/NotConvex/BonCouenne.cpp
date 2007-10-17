@@ -56,6 +56,7 @@ int main (int argc, char *argv[])
     CouenneFeasibility feasibility;
     bb.model().setProblemFeasibility(feasibility);
 #endif
+
     //////////////////////////////////
 
     bb (bonmin); // do branch and bound

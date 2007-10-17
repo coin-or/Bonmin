@@ -63,11 +63,17 @@ CouenneInterface::extractLinearRelaxation
   if (solveNlp)
     initialSolve ();
 
-   int numcols     = getNumCols ();         // # original               variables
-   int numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
+  // set cutoff immediately, to take advantage of bound tightening
 
-   const double *lb = getColLower ();
-   const double *ub = getColUpper ();
+  if (getNumIntegers () == 0) // only if no integer variables
+    couenneCg. Problem () -> setCutOff (getObjValue ());
+
+   int numcols     = getNumCols (),         // # original               variables
+       numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
+
+   const double
+     *lb = getColLower (),
+     *ub = getColUpper ();
 
    // add original variables to the new problem
    for (register int i=0; i<numcols; i++)
