@@ -7,12 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-
-#include <CouenneTypes.hpp>
-#include <CouenneProblem.hpp>
-#include <exprMul.hpp>
-#include <exprPow.hpp>
-#include <exprQuad.hpp>
+#include "CouenneTypes.hpp"
+#include "CouenneProblem.hpp"
+#include "exprMul.hpp"
+#include "exprPow.hpp"
+#include "exprQuad.hpp"
 
 
 /// re-organizes multiplication and stores indices (and exponents) of its variables

@@ -29,6 +29,8 @@ CouNumber exprMul::selectBranch (expression *w,
       yi = arglist_ [1] -> Index (),
       wi = w            -> Index ();
 
+  printf ("branching on mul "); print (); printf ("\n");
+
   assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 
   CouNumber 

@@ -7,9 +7,9 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprOp.hpp>
-#include <exprConst.hpp>
-#include <CouennePrecisions.hpp>
+#include "exprOp.hpp"
+#include "exprConst.hpp"
+#include "CouennePrecisions.hpp"
 
 
 //
@@ -78,8 +78,6 @@ int exprOp::shrink_arglist (CouNumber c, CouNumber null_element) {
     arglist_ [i++] = new exprConst (c);
 
   j = i;
-
-  //  printf ("////////////////////////////// j=%d\n", j);
 
   // now shift back all operands to compress argument list
   while (i < nargs_) {

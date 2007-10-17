@@ -47,8 +47,6 @@ CouNumber exprDiv::selectBranch (expression *w,
     way = TWO_RAND;
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
-    // TODO: is it better to use TWO_RAND?
-
     brpts [0] = 0;
     //    brpts [0] = (yl >= -BR_NEXT_ZERO - COUENNE_EPS) ? (yl * BR_MULT) : -BR_NEXT_ZERO;
     //    brpts [1] = (yu <=  BR_NEXT_ZERO + COUENNE_EPS) ? (yu * BR_MULT) :  BR_NEXT_ZERO;

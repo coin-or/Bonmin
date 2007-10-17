@@ -18,9 +18,9 @@
 expression *exprOp:: simplify () {
 
   //  Simplify arguments g_1(x), g_2(x)... g_n(x) first
-  for (register int i=0; i<nargs_; i++) {
+  for (int i=0; i<nargs_; i++) {
 
-    register expression *subst;
+    expression *subst;
 
     if ((subst = (arglist_ [i]) -> simplify ())) {
 

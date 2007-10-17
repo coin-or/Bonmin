@@ -3,13 +3,13 @@
  * Author:  Pietro Belotti
  * Purpose: definition of sum expressions
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprSum.hpp>
-#include <exprCopy.hpp>
-#include <exprConst.hpp>
+#include "exprSum.hpp"
+#include "exprCopy.hpp"
+#include "exprConst.hpp"
 
 
 /// Constructor
@@ -25,7 +25,13 @@ exprSum::exprSum  (expression **al, int n):
 exprSum::exprSum (expression *arg0, expression *arg1):
   exprOp (arg0, arg1) {
 
-  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
+  //  qsort (arglist_, nargs_, sizeof (expression*), compareExpr); // useless...
+
+  if (arg0 -> compare (*arg1) > 0) { // swap elements
+    expression *swap = arglist_ [0];
+    arglist_ [0] = arglist_ [1];
+    arglist_ [1] = swap;
+  }
 }
 
 

@@ -7,11 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblemElem.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneProblemElem.hpp"
+#include "CouenneProblem.hpp"
 
-#include <exprSum.hpp>
-#include <exprGroup.hpp>
+#include "exprSum.hpp"
+#include "exprGroup.hpp"
 
 
 /// given an element of a sum, check if it is a variable (possibly

@@ -7,11 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblemElem.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneProblemElem.hpp"
+#include "CouenneProblem.hpp"
 
-#include <exprAux.hpp>
-#include <depGraph.hpp>
+#include "exprAux.hpp"
+#include "depGraph.hpp"
 
 //#define DEBUG
 

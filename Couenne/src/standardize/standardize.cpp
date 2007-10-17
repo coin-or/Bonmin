@@ -9,17 +9,17 @@
 
 #include <vector>
 
-#include <CoinHelperFunctions.hpp>
-#include <CoinTime.hpp>
+#include "CoinHelperFunctions.hpp"
+#include "CoinTime.hpp"
 
-#include <CouenneTypes.hpp>
+#include "CouenneTypes.hpp"
 
-#include <expression.hpp>
-#include <exprClone.hpp>
+#include "expression.hpp"
+#include "exprClone.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneProblemElem.hpp>
-#include <depGraph.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneProblemElem.hpp"
+#include "depGraph.hpp"
 
 
 //#define DEBUG

@@ -9,19 +9,19 @@
 
 #include <vector>
 
-#include <CoinHelperFunctions.hpp>
-#include <CoinTime.hpp>
+#include "CoinHelperFunctions.hpp"
+#include "CoinTime.hpp"
 
-#include <CouenneTypes.hpp>
+#include "CouenneTypes.hpp"
 
-#include <expression.hpp>
-#include <exprConst.hpp>
-#include <exprGroup.hpp>
-#include <exprClone.hpp>
-#include <exprAux.hpp>
+#include "expression.hpp"
+#include "exprConst.hpp"
+#include "exprGroup.hpp"
+#include "exprClone.hpp"
+#include "exprAux.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneProblemElem.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneProblemElem.hpp"
 
 //#define DEBUG
 
@@ -86,7 +86,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
   // only one loop is sufficient here, since auxiliary variable are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
 
-  for (register int j = 0, i = nVars (); i--; j++) {
+  for (int j=0, i=nVars (); i--; j++) {
 
     int ord = numbering_ [j];
 

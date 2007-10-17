@@ -7,15 +7,15 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblemElem.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneProblemElem.hpp"
+#include "CouenneProblem.hpp"
 
-#include <CoinHelperFunctions.hpp>
+#include "CoinHelperFunctions.hpp"
 
-#include <exprSum.hpp>
-#include <exprMul.hpp>
-#include <exprGroup.hpp>
-#include <exprQuad.hpp>
+#include "exprSum.hpp"
+#include "exprMul.hpp"
+#include "exprGroup.hpp"
+#include "exprQuad.hpp"
 
 //#define DEBUG
 
@@ -92,9 +92,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
   ////////////////////////////////////////////////////////////////////////////
 
-  case COU_EXPRQUAD: // TODO -- no need, check in quad is equal to the
-		     // check in group as we don't check the quadratic
-		     // terms
+  case COU_EXPRQUAD:
   case COU_EXPRGROUP:
   case COU_EXPRSUM: {
 
@@ -386,32 +384,6 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
   printf ("standardize rest (2nd level) "); fflush (stdout);
   rest -> print ();
 #endif
-
-  /*
-
-  enum nodeType rtype = rest -> Type ();
-
-  if (rtype == UNARY) { //////////////////////////////////////////
-
-    exprAux *aux = rest -> Argument () -> standardize (p);
-
-    if (aux) {
-      //delete rest -> Argument ();
-      *(rest -> ArgPtr ()) = new exprClone (aux);
-    }
-
-  } else if (rtype == N_ARY) ///////////////////////////////////////////
-
-    for (int nargs = rest -> nArgs (), i=0; i < nargs; i++) {
-
-      exprAux *aux = rest -> ArgList () [i] -> standardize (p);
-
-      if (aux) {
-	//delete rest -> ArgList () [i];
-	rest -> ArgList () [i] = new exprClone (aux);
-      }
-    }
-  */
 
   exprAux *aux = rest -> standardize (p, false);
 

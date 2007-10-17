@@ -64,10 +64,11 @@ CouNumber exprExp::selectBranch (expression *w,
     //    else if (*brpts > u) *brpts = (l > - COUENNE_INFINITY) ? ((l+u)/2) : -1 + (u<0) ? u*2 : u/2;
 
     way = TWO_RAND;
-    CouNumber dy = y0 - exp (*brpts);
+
+    y0 -= exp (*brpts);
     x0 -= *brpts;
 
-    return sqrt (x0*x0 + dy*dy); // exact distance
+    return sqrt (x0*x0 + y0*y0); // exact distance
   }
 
   // Inside. Four cases: ///////////////////////////////////////////////////////

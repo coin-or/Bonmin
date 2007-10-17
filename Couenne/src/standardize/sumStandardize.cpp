@@ -8,15 +8,15 @@
  */
 
 
-#include <CouenneTypes.hpp>
-#include <CouenneProblem.hpp>
-#include <exprSum.hpp>
-#include <exprSub.hpp>
-#include <exprOpp.hpp>
-#include <exprMul.hpp>
-#include <exprPow.hpp>
-#include <exprGroup.hpp>
-#include <exprQuad.hpp>
+#include "CouenneTypes.hpp"
+#include "CouenneProblem.hpp"
+#include "exprSum.hpp"
+#include "exprSub.hpp"
+#include "exprOpp.hpp"
+#include "exprMul.hpp"
+#include "exprPow.hpp"
+#include "exprGroup.hpp"
+#include "exprQuad.hpp"
 
 //#define DEBUG
 
@@ -77,7 +77,7 @@ exprAux *exprSum::standardize (CouenneProblem *p, bool addAux) {
 
   int cod = code ();
 
-  CouNumber c0 = 0;   // final constant term
+  CouNumber c0 = 0; // final constant term
 
   ////////////////////////////////////////////////////////////////////////////////
 
@@ -85,7 +85,7 @@ exprAux *exprSum::standardize (CouenneProblem *p, bool addAux) {
   // the linear part
 
   if ((cod == COU_EXPRGROUP) ||
-      (cod == COU_EXPRQUAD)) {
+      (cod == COU_EXPRQUAD)) {  // fill linear structure
 
     exprGroup *eg = dynamic_cast <exprGroup *> (this);
 
@@ -97,7 +97,7 @@ exprAux *exprSum::standardize (CouenneProblem *p, bool addAux) {
     for (int i = eg -> getnLTerms (); i--;)
       lmap.insert (std::pair <int, CouNumber> (olind [i], olcoe [i]));
 
-    if (cod == COU_EXPRQUAD) {
+    if (cod == COU_EXPRQUAD) { // fill quadratic structure
 
       exprQuad *eq = dynamic_cast <exprQuad *> (this);
 
@@ -120,6 +120,7 @@ exprAux *exprSum::standardize (CouenneProblem *p, bool addAux) {
   for (int i=0; i<nargs_; i++)
     decomposeTerm (p, arglist_ [i], 1, c0, lmap, qmap);
 
+
   ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG
@@ -129,7 +130,7 @@ exprAux *exprSum::standardize (CouenneProblem *p, bool addAux) {
   printf ("] -- [");
   for (std::map <std::pair <int, int>, CouNumber>::iterator i = qmap.begin (); i != qmap.end (); ++i)
     printf ("<%d,%d,%g>", i -> first.first, i -> first.second, i -> second);
-  printf ("]\n");
+  printf ("] (%g)\n", c0);
 #endif
 
   return linStandardize (p, addAux, c0, lmap, qmap);
@@ -239,9 +240,11 @@ exprAux *linStandardize (CouenneProblem *p,
   expression *ret;
 
   // a constant
-  if ((nq==0) && (nl==0)) ret = p -> addAuxiliary (new exprConst (c0));
+  if ((nq==0) && (nl==0)) 
 
-  else if ((nq==0) && (fabs (c0) < COUENNE_EPS) && (nl==1)) {   // a linear monomial, cx
+    ret = p -> addAuxiliary (new exprConst (c0)); // a constant auxiliary? FIX!
+
+  else if ((nq==0) && (fabs (c0) < COUENNE_EPS) && (nl==1)) { // a linear monomial, cx
 
     if (fabs (*lc - 1) < COUENNE_EPS) 
       ret    = new exprClone (p -> Var (*li));
@@ -259,7 +262,10 @@ exprAux *linStandardize (CouenneProblem *p,
 
     if (fabs (*qc - 1) < COUENNE_EPS) 
       ret    = quad;
-    else ret = new exprMul (new exprConst (*qc), quad);
+    else {
+      quad = p -> addAuxiliary (quad);
+      ret  = new exprMul (new exprConst (*qc), new exprClone (quad));
+    }
 
   } else {
 

@@ -7,8 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblemElem.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneProblemElem.hpp"
+#include "CouenneProblem.hpp"
 
 
 /// replace, in all expressions of the problem (auxiliaries,

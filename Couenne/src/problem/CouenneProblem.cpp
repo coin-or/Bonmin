@@ -9,20 +9,20 @@
 
 #include <vector>
 
-#include <CoinHelperFunctions.hpp>
-#include <CoinTime.hpp>
+#include "CoinHelperFunctions.hpp"
+#include "CoinTime.hpp"
 
-#include <CouenneTypes.hpp>
+#include "CouenneTypes.hpp"
 
-#include <expression.hpp>
-#include <exprConst.hpp>
-#include <exprClone.hpp>
-#include <exprIVar.hpp>
-#include <exprAux.hpp>
+#include "expression.hpp"
+#include "exprConst.hpp"
+#include "exprClone.hpp"
+#include "exprIVar.hpp"
+#include "exprAux.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneProblemElem.hpp>
-#include <depGraph.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneProblemElem.hpp"
+#include "depGraph.hpp"
 
 //#define DEBUG
 
@@ -104,7 +104,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   numbering_ (NULL),
   ndefined_  (p.ndefined_),
   graph_     (NULL),
-  nOrig_     (p.nOrig_) { // needed only in standardize (), unnecessary to update it
+  nOrig_     (p.nOrig_),
+  cutoff_    (p.cutoff_) { // needed only in standardize (), unnecessary to update it
 
   // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
 
