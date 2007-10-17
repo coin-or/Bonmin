@@ -85,6 +85,7 @@ libCouenne_la_SOURCES = \
 	convex/genRowCuts.cpp \
 	convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp \
+	convex/updateBranchInfo.cpp \
 	standardize/createQuadratic.cpp \
 	standardize/sumStandardize.cpp \
 	standardize/analyzeSparsity.cpp \
@@ -96,7 +97,7 @@ libCouenne_la_SOURCES = \
 	problem/problem.cpp \
 	problem/CouenneProblem.cpp \
 	problem/problemIO.cpp \
-	problem/extended.cpp \
+	problem/writeAMPL.cpp \
 	problem/writeGAMS.cpp \
 	problem/constraint.cpp \
 	problem/readASLfg.cpp \

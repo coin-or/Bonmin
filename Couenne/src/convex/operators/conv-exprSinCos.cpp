@@ -15,12 +15,12 @@
 # define M_PI_2 1.57079632679489661923
 #endif
 
-#include <OsiSolverInterface.hpp>
-#include <CouenneTypes.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <exprSin.hpp>
-#include <exprCos.hpp>
-#include <exprAux.hpp>
+#include "OsiSolverInterface.hpp"
+#include "CouenneTypes.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "exprSin.hpp"
+#include "exprCos.hpp"
+#include "exprAux.hpp"
 
 #define NEW_TRIG
 
@@ -100,14 +100,8 @@ int addHexagon (const CouenneCutGenerator *cg, // cut generator that has called 
   //unary_function fn = (tt == COU_SINE) ? sin : cos;
 
   // retrieve argument bounds
-  expression *lbe, *ube;
-  arg -> getBounds (lbe, ube);
-
-  CouNumber lb = (*lbe) (), 
-            ub = (*ube) ();
-
-  delete lbe;
-  delete ube;
+  CouNumber lb, ub;
+  arg -> getBounds (lb, ub);
 
   int ncuts = 0,
     x_ind = arg -> Index (),
@@ -129,24 +123,24 @@ int addHexagon (const CouenneCutGenerator *cg, // cut generator that has called 
   // left
   if (lb > -COUENNE_INFINITY) { // if not unbounded
     if (tt == COU_SINE) {
-      ncuts += cg -> createCut (cs, sin (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w-x <= f lb - lb 
-      ncuts += cg -> createCut (cs, sin (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w+x >= f lb + lb 
+      ncuts += cg -> createCut (cs, sin (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up: w-x <= f lb - lb
+      ncuts += cg -> createCut (cs, sin (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn: w+x >= f lb + lb
     }
     else {
-      ncuts += cg -> createCut (cs, cos (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up:  w-x <= f lb - lb 
-      ncuts += cg -> createCut (cs, cos (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn:  w+x >= f lb + lb 
+      ncuts += cg -> createCut (cs, cos (lb) - lb, -1, w_ind, 1., x_ind, -1.); // up: w-x <= f lb - lb
+      ncuts += cg -> createCut (cs, cos (lb) + lb, +1, w_ind, 1., x_ind,  1.); // dn: w+x >= f lb + lb
     }
   }
 
   // right
   if (ub <  COUENNE_INFINITY) { // if not unbounded
     if (tt == COU_SINE) {
-      ncuts += cg -> createCut (cs, sin (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
-      ncuts += cg -> createCut (cs, sin (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
+      ncuts += cg -> createCut (cs, sin (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w-x >= f ub - ub
+      ncuts += cg -> createCut (cs, sin (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w+x <= f ub + ub
     }
     else {
-      ncuts += cg -> createCut (cs, cos (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w - x >= f ub - ub 
-      ncuts += cg -> createCut (cs, cos (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w + x <= f ub + ub 
+      ncuts += cg -> createCut (cs, cos (ub) - ub, +1, w_ind, 1., x_ind, -1.); // dn: w-x >= f ub - ub
+      ncuts += cg -> createCut (cs, cos (ub) + ub, -1, w_ind, 1., x_ind,  1.); // up: w+x <= f ub + ub
     }
   }
 
@@ -172,17 +166,11 @@ int trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has calle
 		   expression *arg,
 		   enum cou_trig which_trig) {
 
-  expression *lbe, *ube;
+  CouNumber lb, ub;
+  arg -> getBounds (lb, ub);
 
-  arg -> getBounds (lbe, ube);
-
-  CouNumber lb = (*lbe) (), 
-            ub = (*ube) (),
-            // if cosine, scale variables to pretend this is a sine problem
-            displ = (which_trig == COU_COSINE) ? M_PI_2 : 0.;
-
-  delete lbe;
-  delete ube;
+  // if cosine, scale variables to pretend this is a sine problem
+  CouNumber displ = (which_trig == COU_COSINE) ? M_PI_2 : 0.;
 
   int ncuts = 0,
     xi = arg -> Index (),

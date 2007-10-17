@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <exprSub.hpp>
-#include <exprOpp.hpp>
+#include "CouenneTypes.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "exprSub.hpp"
+#include "exprOpp.hpp"
 
 // generate equality between *this and *w
 void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si, 
@@ -46,21 +46,4 @@ void exprSub::generateCuts (exprAux *w, const OsiSolverInterface &si,
   }
 
   cg -> createCut (cs, lb, ub, wi, -1., xi, 1., yi, -1., true);
-
-  /*
-  if (wind < 0)
-    if (x->Type () == CONST) // (c - y) or (c - d)
-      if (y->Type() == CONST) cg->createCut (cs, x->Value()-y->Value(), 0, wi, 1, -1, 0, -1, 0, true);
-      else                    cg->createCut (cs, x->Value(),            0, wi, 1, yi, 1, -1, 0, true);
-    else // (x - y) or (x - d)
-      if (y->Type() == CONST) cg->createCut (cs, y->Value(),  0, wi, -1., xi, 1., -1,  0., true);
-      else                    cg->createCut (cs, 0.,          0, wi, -1., xi, 1., yi, -1., true);
-  else     // linear constraint, insert it as it is and not disguised as its auxiliary variable
-    if   (x->Type() == CONST) // (c - y) or (c - d)
-      if (y->Type() == CONST) ;
-      else                    cg->createCut (cs, lb - x->Value(),     0, wi, 1, yi, 1, -1, 0, true);
-    else // (x - y) or (x - d)
-      if (y->Type() == CONST) cg->createCut (cs, y->Value(),  0, wi, -1., xi, 1., -1,  0., true);
-      else                    cg->createCut (cs, 0.,          0, wi, -1., xi, 1., yi, -1., true);
-  */
 }

@@ -128,13 +128,14 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/operators/alphaConvexify.cpp \
-	convex/operators/quadCuts.cpp standardize/createQuadratic.cpp \
-	standardize/sumStandardize.cpp standardize/analyzeSparsity.cpp \
+	convex/operators/quadCuts.cpp convex/updateBranchInfo.cpp \
+	standardize/createQuadratic.cpp standardize/sumStandardize.cpp \
+	standardize/analyzeSparsity.cpp \
 	standardize/constrStandardize.cpp standardize/elementBreak.cpp \
 	standardize/splitAux.cpp standardize/auxiliarize.cpp \
 	standardize/standardize.cpp problem/problem.cpp \
 	problem/CouenneProblem.cpp problem/problemIO.cpp \
-	problem/extended.cpp problem/writeGAMS.cpp \
+	problem/writeAMPL.cpp problem/writeGAMS.cpp \
 	problem/constraint.cpp problem/readASLfg.cpp \
 	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
@@ -168,11 +169,12 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	conv-exprSinCos.lo conv-exprExp.lo conv-exprLog.lo \
 	conv-exprGroup.lo conv-exprQuad.lo trigNewton.lo \
 	CouenneCutGenerator.lo generateCuts.lo genColCuts.lo \
-	genRowCuts.lo alphaConvexify.lo quadCuts.lo createQuadratic.lo \
-	sumStandardize.lo analyzeSparsity.lo constrStandardize.lo \
-	elementBreak.lo splitAux.lo auxiliarize.lo standardize.lo \
-	problem.lo CouenneProblem.lo problemIO.lo extended.lo \
-	writeGAMS.lo constraint.lo readASLfg.lo fillQuadIndices.lo \
+	genRowCuts.lo alphaConvexify.lo quadCuts.lo \
+	updateBranchInfo.lo createQuadratic.lo sumStandardize.lo \
+	analyzeSparsity.lo constrStandardize.lo elementBreak.lo \
+	splitAux.lo auxiliarize.lo standardize.lo problem.lo \
+	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
+	constraint.lo readASLfg.lo fillQuadIndices.lo \
 	CouenneSolverInterface.lo depGraph.lo checkCycles.lo \
 	boundTightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
 	impliedBounds.lo impliedBounds-exprSum.lo \
@@ -434,13 +436,14 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/operators/trigNewton.cpp convex/CouenneCutGenerator.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/operators/alphaConvexify.cpp \
-	convex/operators/quadCuts.cpp standardize/createQuadratic.cpp \
-	standardize/sumStandardize.cpp standardize/analyzeSparsity.cpp \
+	convex/operators/quadCuts.cpp convex/updateBranchInfo.cpp \
+	standardize/createQuadratic.cpp standardize/sumStandardize.cpp \
+	standardize/analyzeSparsity.cpp \
 	standardize/constrStandardize.cpp standardize/elementBreak.cpp \
 	standardize/splitAux.cpp standardize/auxiliarize.cpp \
 	standardize/standardize.cpp problem/problem.cpp \
 	problem/CouenneProblem.cpp problem/problemIO.cpp \
-	problem/extended.cpp problem/writeGAMS.cpp \
+	problem/writeAMPL.cpp problem/writeGAMS.cpp \
 	problem/constraint.cpp problem/readASLfg.cpp \
 	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
@@ -699,7 +702,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprUnary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/extended.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fillQuadIndices.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genColCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genRowCuts.Plo@am__quote@
@@ -730,6 +732,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trigNewton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unifiedProdCuts.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/updateBranchInfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writeAMPL.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writeGAMS.Plo@am__quote@
 
 .cpp.o:
@@ -1222,6 +1226,13 @@ quadCuts.lo: convex/operators/quadCuts.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o quadCuts.lo `test -f 'convex/operators/quadCuts.cpp' || echo '$(srcdir)/'`convex/operators/quadCuts.cpp
 
+updateBranchInfo.lo: convex/updateBranchInfo.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT updateBranchInfo.lo -MD -MP -MF "$(DEPDIR)/updateBranchInfo.Tpo" -c -o updateBranchInfo.lo `test -f 'convex/updateBranchInfo.cpp' || echo '$(srcdir)/'`convex/updateBranchInfo.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/updateBranchInfo.Tpo" "$(DEPDIR)/updateBranchInfo.Plo"; else rm -f "$(DEPDIR)/updateBranchInfo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/updateBranchInfo.cpp' object='updateBranchInfo.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o updateBranchInfo.lo `test -f 'convex/updateBranchInfo.cpp' || echo '$(srcdir)/'`convex/updateBranchInfo.cpp
+
 createQuadratic.lo: standardize/createQuadratic.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT createQuadratic.lo -MD -MP -MF "$(DEPDIR)/createQuadratic.Tpo" -c -o createQuadratic.lo `test -f 'standardize/createQuadratic.cpp' || echo '$(srcdir)/'`standardize/createQuadratic.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/createQuadratic.Tpo" "$(DEPDIR)/createQuadratic.Plo"; else rm -f "$(DEPDIR)/createQuadratic.Tpo"; exit 1; fi
@@ -1299,12 +1310,12 @@ problemIO.lo: problem/problemIO.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o problemIO.lo `test -f 'problem/problemIO.cpp' || echo '$(srcdir)/'`problem/problemIO.cpp
 
-extended.lo: problem/extended.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT extended.lo -MD -MP -MF "$(DEPDIR)/extended.Tpo" -c -o extended.lo `test -f 'problem/extended.cpp' || echo '$(srcdir)/'`problem/extended.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/extended.Tpo" "$(DEPDIR)/extended.Plo"; else rm -f "$(DEPDIR)/extended.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/extended.cpp' object='extended.lo' libtool=yes @AMDEPBACKSLASH@
+writeAMPL.lo: problem/writeAMPL.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT writeAMPL.lo -MD -MP -MF "$(DEPDIR)/writeAMPL.Tpo" -c -o writeAMPL.lo `test -f 'problem/writeAMPL.cpp' || echo '$(srcdir)/'`problem/writeAMPL.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/writeAMPL.Tpo" "$(DEPDIR)/writeAMPL.Plo"; else rm -f "$(DEPDIR)/writeAMPL.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/writeAMPL.cpp' object='writeAMPL.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o extended.lo `test -f 'problem/extended.cpp' || echo '$(srcdir)/'`problem/extended.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o writeAMPL.lo `test -f 'problem/writeAMPL.cpp' || echo '$(srcdir)/'`problem/writeAMPL.cpp
 
 writeGAMS.lo: problem/writeGAMS.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT writeGAMS.lo -MD -MP -MF "$(DEPDIR)/writeGAMS.Tpo" -c -o writeGAMS.lo `test -f 'problem/writeGAMS.cpp' || echo '$(srcdir)/'`problem/writeGAMS.cpp; \

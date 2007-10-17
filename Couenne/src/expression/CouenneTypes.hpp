@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: define number types used throughout the code
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07
  * This file is licensed under the Common Public License (CPL)
  */
 

@@ -20,7 +20,8 @@
 void fill_dCoeff (CouNumber * &, CouNumber, CouNumber *, int);
 
 
-/** Computes alpha coefficients for an alpha under- and overestimator of the quadratic term.
+/** Computes alpha coefficients for an alpha under- and overestimator
+ *  of the quadratic term.
  *
  * For the underestimator, dCoeffLo_ is computed such that
  *

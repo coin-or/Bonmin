@@ -10,15 +10,14 @@
 #ifndef COUENNE_CUT_GENERATOR_HPP
 #define COUENNE_CUT_GENERATOR_HPP
 
-#include <BonOaDecBase.hpp>
-#include <OsiRowCut.hpp>
-#include <CouenneTypes.hpp>
+#include "BonOaDecBase.hpp"
+#include "OsiRowCut.hpp"
 #include "BonAuxInfos.hpp"
+#include "BonBabInfos.hpp"
+#include "OsiSolverInterface.hpp"
+#include "BonCbc.hpp"
 
-#include <OsiSolverInterface.hpp>
-#include <OsiClpSolverInterface.hpp>
-
-#include <BonCbc.hpp>
+#include "CouenneTypes.hpp"
 
 class CouenneProblem;
 class CouenneSolverInterface;

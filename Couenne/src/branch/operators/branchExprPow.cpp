@@ -60,15 +60,45 @@ CouNumber exprPow::selectBranch (expression *w,
   bool isInt    =            fabs (k    - (double) (intk = COUENNE_round (k)))    < COUENNE_EPS,
        isInvInt = !isInt && (fabs (1./k - (double) (intk = COUENNE_round (1./k))) < COUENNE_EPS);
 
-  // case 2: k is positive and even ///////////////////////////////////////////
+  // case 2: k is positive and even /////////////////////////////////////////////////////////
 
   if (isInt && !(intk % 2)) {
 
     if ((l < - COUENNE_INFINITY) && 
 	(u >   COUENNE_INFINITY)) {
 
-      // no bounds on x
+      if (y0 < pow (x0, k)) { // good side
 
+	brpts = (double *) realloc (brpts, sizeof (double));
+	powertriplet pt (k);
+	*brpts = powNewton (x0, y0, &pt);
+
+	way = (x0 < 0) ? TWO_RIGHT : TWO_LEFT;	
+
+	x0 -= *brpts;
+	y0 -= pow (*brpts, k);
+
+	return sqrt (x0*x0 + y0 * y0);
+
+      } else { // on the bad side
+
+	double xp = pow (y0, 1./k);
+
+	brpts = (double *) realloc (brpts, 2 * sizeof (double));
+	brpts [0] = 0.5 * (x0 - xp);
+	brpts [1] = 0.5 * (x0 + xp);
+
+	way = THREE_CENTER;
+
+	return CoinMin (x0 - brpts [0], 
+			CoinMin (brpts [1] - x0, 
+				 projectSeg (x0, y0, 
+					     brpts [0], pow (brpts [0], k),
+					     brpts [1], pow (brpts [1], k), -1)));
+      }
+
+      // no bounds on x
+      /*
       double alpha = pow ((y0 + pow (x0, k))/2, 1./k),
              yroot = pow (y0, 1./k);
 
@@ -89,7 +119,17 @@ CouNumber exprPow::selectBranch (expression *w,
 
       return CoinMin (projectSeg (x0, y0, b0, pow (b0, k), b1, pow (b1, k), -1), 
 		      CoinMin (x0 - b0, b1 - x0));
-    } 
+      */
+    } else {
+
+      brpts = (double *) realloc (brpts, sizeof (double));
+      *brpts = midInterval (x0, l, u);
+      way = 
+	(l < - COUENNE_INFINITY) ? TWO_RIGHT : 
+	(u >   COUENNE_INFINITY) ? TWO_LEFT  : TWO_RAND;
+
+      return fabs (y0 - pow (x0, k)); // not an exact measure
+    }
   }
 
   // from here on, we use two-way branch

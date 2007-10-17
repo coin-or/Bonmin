@@ -77,12 +77,10 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 
   // get bounds of base
 
-  expression *xle, *xue, 
-    *wle, *wue, 
-    *xe = arglist_ [0];
+  expression *xe = arglist_ [0];
 
-  xe  -> getBounds (xle, xue);
-  aux -> getBounds (wle, wue);
+  CouNumber l, u;
+  xe -> getBounds (l, u);
 
   int w_ind = aux -> Index ();
   int x_ind = xe  -> Index ();
@@ -90,13 +88,9 @@ void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si,
   bool cL = !chg || (chg [x_ind].lower() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
   bool cR = !chg || (chg [x_ind].upper() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
 
-  CouNumber w = (*aux) (), 
-            x = (*xe)  (),
-            l = (*xle) (), 
-            u = (*xue) ();
-
-  delete xle; delete xue;
-  delete wle; delete wue;
+  CouNumber 
+    w = (*aux) (), 
+    x = (*xe)  ();
 
   // if xl and xu are too close, approximate it as a line: sum the
   // segment through the two extreme points (l,l^k) and (u,u^k), and

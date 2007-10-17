@@ -98,8 +98,6 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   CouNumber *coeff = new CouNumber [nargs_ + nterms + displacement];
   int       *index = new int       [nargs_ + nterms + displacement];
 
-  //  CouNumber rhs = - c0_;
-
   if (wind < 0) {
     // first, make room for aux variable
     coeff [0] = -1.; 
@@ -140,10 +138,7 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   if (lb > -COUENNE_INFINITY) cut -> setLb (lb);
   if (ub <  COUENNE_INFINITY) cut -> setUb (ub);
 
-  // added only once, it is global
-  cut -> setGloballyValid ();
-
+  cut -> setGloballyValid (); // added only once, it is global
   cs.insert (cut);
-
   delete cut;
 }

@@ -94,22 +94,6 @@ CouNumber powNewton (CouNumber xc, CouNumber yc, funtriplet *tri) {
 }
 
 /*
-CouNumber expon = 4;
-
-inline CouNumber f (CouNumber x) {
-  return pow (x, expon);
-}
-
-inline CouNumber fp (CouNumber x) {
-  return expon * pow (x, expon-1);
-}
-
-inline CouNumber fpp (CouNumber x) {
-  return expon * (expon-1) * pow (x, expon-2);
-}
-*/
-
-/*
 int main (int argc, char **argv) {
 
   CouNumber r, 

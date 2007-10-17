@@ -11,6 +11,7 @@
 #define FUNTRIPLETS_HPP
 
 #include <math.h>
+
 #include "exprPow.hpp"
 
 
@@ -34,7 +35,7 @@ public:
 ///
 class simpletriplet: public funtriplet {
 
-private:
+protected:
 
   unary_function f_;   //< the function 
   unary_function fp_;  //< the first-order derivative of the function
@@ -60,7 +61,7 @@ public:
 ///
 class powertriplet: public funtriplet {
 
-private:
+protected:
 
   CouNumber exponent_; //< exponent defining the power function triplet
 
@@ -81,6 +82,34 @@ public:
 
   virtual CouNumber Fpp (CouNumber x) 
   {return exponent_ * (exponent_ - 1) * safe_pow (x, exponent_ - 2);} //< second-order derivative 
+};
+
+
+///
+class kpowertriplet: public powertriplet {
+
+protected:
+
+  CouNumber mult_; //< pre-multiplier
+
+public:
+
+  /// Basic constructor
+  kpowertriplet (CouNumber exponent, CouNumber k):
+    powertriplet (exponent),
+    mult_ (k) {}
+
+  /// Destructor
+  virtual ~kpowertriplet () {}
+
+  virtual CouNumber F   (CouNumber x)  //< main funtion
+  {return mult_ * safe_pow (x, exponent_);}
+
+  virtual CouNumber Fp  (CouNumber x)  //< first-order derivative 
+  {return mult_ * exponent_ * safe_pow (x, exponent_ - 1);}
+
+  virtual CouNumber Fpp (CouNumber x)  //< second-order derivative 
+  {return mult_ * exponent_ * (exponent_ - 1) * safe_pow (x, exponent_ - 2);}
 };
 
 #endif

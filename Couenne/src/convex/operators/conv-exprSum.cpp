@@ -7,13 +7,13 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
+#include "CouenneTypes.hpp"
 
-#include <exprSum.hpp>
-#include <exprConst.hpp>
+#include "exprSum.hpp"
+#include "exprConst.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 
 // generate equality between *this and *w
@@ -27,8 +27,6 @@ void exprSum::generateCuts (exprAux *w, const OsiSolverInterface &si,
   CouNumber *coeff = new CouNumber [nargs_ + 1];
   int       *index = new int       [nargs_ + 1];
   OsiRowCut *cut   = new OsiRowCut;
-
-  //  CouNumber rhs = 0;
 
   /// first, make room for aux variable
 

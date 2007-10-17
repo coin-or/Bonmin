@@ -100,6 +100,9 @@ class CouenneProblem {
   /// into auxiliary variable definition)
   int nOrigConstraints_;
 
+  /// Cut off: known value of best integer feasible solution
+  mutable CouNumber cutoff_;
+
  public:
 
   CouenneProblem  (const ASL * = NULL);     ///< Constructor
@@ -244,6 +247,12 @@ class CouenneProblem {
   /// Replace all occurrences of original variable with new aux given
   /// as argument
   void auxiliarize (exprAux *);
+
+  /// Set cutoff
+  void setCutOff (CouNumber cutoff);
+
+  /// Make cutoff known to the problem
+  void installCutOff ();
 };
 
 

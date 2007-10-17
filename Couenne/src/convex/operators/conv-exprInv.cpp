@@ -54,31 +54,11 @@ void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {
+  CouNumber l, u;
+  argument_ -> getBounds (l, u);
 
-  // get bounds of numerator and denominator
-
-  expression *xle, *xue;
-
-  argument_ -> getBounds (xle, xue);
-
-  CouNumber l = (*xle) (), 
-            u = (*xue) ();
-
-  delete xle; 
-  delete xue;
-
-  // if the denominator's bound interval has 0 as internal point,
-  // there is no convexification
-
-  if ((l < - COUENNE_EPS) && 
-      (u >   COUENNE_EPS)) 
+  if ((l < - COUENNE_EPS) && (u > COUENNE_EPS)) // there is no convexification
     return;
-
-  expression *wle, *wue;
-
-  aux -> getBounds (wle, wue);
-
-  //  CouNumber x;
 
   int wi = aux       -> Index (), 
       xi = argument_ -> Index ();

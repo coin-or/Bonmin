@@ -53,17 +53,17 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
     // from above) or -1 (from below)
 
     if (l > - COUENNE_INFINITY) {
-
       if (u < COUENNE_INFINITY) { // the upper approximation has slope other than -1, 1
 
-	  CouNumber slope = (u+l) / (u-l);
-	  // add an upper segment, which depends on the lower/upper bounds
-	  if (cLeft || cRight) cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
-	}
-	else // slope = 1
-	  if (cLeft) cg -> createCut (cs, -2*l, -1, w_ind, 1., x_ind, -1.);
+	CouNumber slope = (u+l) / (u-l); // should be stable, l < 0 < u
+
+	// add an upper segment, which depends on the lower/upper bounds
+	if (cLeft || cRight) cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
       }
-      else if (u < COUENNE_INFINITY) // slope = -1
-	if (cRight) cg -> createCut (cs, 2*u, -1, w_ind, 1., x_ind, 1.);
+      else // slope = 1
+	if (cLeft) cg -> createCut (cs, -2*l, -1, w_ind, 1., x_ind, -1.);
     }
+    else if (u < COUENNE_INFINITY) // slope = -1
+      if (cRight) cg -> createCut (cs, 2*u, -1, w_ind, 1., x_ind, 1.);
+  }
 }

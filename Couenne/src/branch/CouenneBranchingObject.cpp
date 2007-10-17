@@ -61,10 +61,7 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
 
   assert (index_ >= 0);
 
-  CouNumber
-    x = expression::Variable (index_),   // current solution
-    l = expression::Lbound   (index_),   //         lower bound
-    u = expression::Ubound   (index_);   //         upper
+  CouNumber x = expression::Variable (index_); // current solution
 
   if (fabs (brpoint) < COUENNE_INFINITY) 
     x = brpoint;
@@ -85,9 +82,9 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
   // TODO: consider branching value that maximizes distance from
   // current point (how?)
 
-  assert (fabs (u-l) > COUENNE_EPS);
+  //  assert (fabs (u-l) > COUENNE_EPS);
 
-  value_ = midInterval (x, l, u);
+  value_ = x;//midInterval (x, expression::Lbound (index_), expression::Ubound (index_));
 
 #ifdef DEBUG
   printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 

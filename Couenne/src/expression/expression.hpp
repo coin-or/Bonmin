@@ -208,6 +208,9 @@ class expression {
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
+  /// Get lower and upper bound of an expression (if any) -- real values
+  virtual void getBounds (CouNumber &, CouNumber &);
+
   /// Create standard form of this expression, by:
   ///
   /// - creating auxiliary w variables and corresponding expressions

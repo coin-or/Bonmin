@@ -26,15 +26,8 @@ void exprLog::generateCuts (exprAux *aux, const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {
-  expression *le, *ue;
-
-  argument_ -> getBounds (le, ue);
-
-  CouNumber l = (*le) (),
-            u = (*ue) ();
-
-  delete le;
-  delete ue;
+  CouNumber l, u;
+  argument_ -> getBounds (l, u);
 
   int w_ind = aux       -> Index ();
   int x_ind = argument_ -> Index ();

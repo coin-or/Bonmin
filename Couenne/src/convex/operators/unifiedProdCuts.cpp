@@ -7,24 +7,13 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <exprDiv.hpp>
-#include <exprMul.hpp>
-#include <exprPow.hpp>
-
-/// used below to specify k in curve y=k/x
-static CouNumber multInv;
-
-inline CouNumber kinv   (register CouNumber x)
-{return multInv / x;}
-
-inline CouNumber kinvp  (register CouNumber x)
-{return -multInv / (x*x);}
-
-inline CouNumber kinvpp (register CouNumber x)
-{return 2*multInv / (x*x*x);}
+#include "CouenneTypes.hpp"
+#include "CouennePrecisions.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "exprDiv.hpp"
+#include "exprMul.hpp"
+#include "exprPow.hpp"
+#include "funtriplets.hpp"
 
 
 /// Add cut around curve x*y=k 
@@ -60,11 +49,11 @@ void contourCut (const CouenneCutGenerator *cg,
     else                                            {xp = sqrt (fabs(wb/yp)); if (xsign<0) xp=-xp;}//y
   else if (((ysign > 0) ? yp : -yp) <= COUENNE_EPS) {yp = sqrt (fabs(wb/xp)); if (ysign<0) yp=-yp;}//x
 
-  multInv = wb;
+  kpowertriplet pt (-1, wb);
 
   CouNumber 
     // tangent point closest to current point
-    xt    = powNewton (xp, yp, kinv, kinvp, kinvpp),
+    xt    = powNewton (xp, yp, &pt),
     // coefficient of w in the lifted cut
     alpha = ((fabs (x1) < COUENNE_INFINITY) && 
 	     (fabs (y1) < COUENNE_INFINITY)) ? 
@@ -91,9 +80,9 @@ void unifiedProdCuts (const CouenneCutGenerator *cg, OsiCuts &cs,
        cLX = cRX = cLY = cRY = cLW = true;
 
   if (!(cg -> isFirst ()) && chg) {
-    cLX = chg [xi].lower() != t_chg_bounds::UNCHANGED;  cRX = chg [xi].upper() != t_chg_bounds::UNCHANGED;
-    cLY = chg [yi].lower() != t_chg_bounds::UNCHANGED;  cRY = chg [yi].upper() != t_chg_bounds::UNCHANGED;
-    cLW = chg [wi].lower() != t_chg_bounds::UNCHANGED;  cRW = chg [wi].upper() != t_chg_bounds::UNCHANGED;
+    cLX= chg[xi].lower() != t_chg_bounds::UNCHANGED; cRX= chg[xi].upper() != t_chg_bounds::UNCHANGED;
+    cLY= chg[yi].lower() != t_chg_bounds::UNCHANGED; cRY= chg[yi].upper() != t_chg_bounds::UNCHANGED;
+    cLW= chg[wi].lower() != t_chg_bounds::UNCHANGED; cRW= chg[wi].upper() != t_chg_bounds::UNCHANGED;
   }
 
   // Add McCormick convexification cuts:

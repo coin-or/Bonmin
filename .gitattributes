@@ -69,6 +69,7 @@ Couenne/src/convex/operators/powNewton.cpp -text
 Couenne/src/convex/operators/quadCuts.cpp -text
 Couenne/src/convex/operators/trigNewton.cpp -text
 Couenne/src/convex/operators/unifiedProdCuts.cpp -text
+Couenne/src/convex/updateBranchInfo.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/CouennePrecisions.hpp -text
 Couenne/src/expression/CouenneTypes.hpp -text
@@ -137,11 +138,11 @@ Couenne/src/problem/constraint.cpp -text
 Couenne/src/problem/depGraph/checkCycles.cpp -text
 Couenne/src/problem/depGraph/depGraph.cpp -text
 Couenne/src/problem/depGraph/depGraph.hpp -text
-Couenne/src/problem/extended.cpp -text
 Couenne/src/problem/fillQuadIndices.cpp -text
 Couenne/src/problem/problem.cpp -text
 Couenne/src/problem/problemIO.cpp -text
 Couenne/src/problem/readASLfg.cpp -text
+Couenne/src/problem/writeAMPL.cpp -text
 Couenne/src/problem/writeGAMS.cpp -text
 Couenne/src/readnl/invmap.cpp -text
 Couenne/src/readnl/nl2e.cpp -text

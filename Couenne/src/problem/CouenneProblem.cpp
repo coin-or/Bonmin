@@ -39,7 +39,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   numbering_ (NULL),
   ndefined_  (0),
   graph_     (NULL),
-  nOrig_     (0) {
+  nOrig_     (0),
+  cutoff_    (COIN_DBL_MAX) {
 
   x_ = lb_ = ub_ = NULL; 
 
@@ -72,7 +73,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   if ((now = (CoinCpuTime () - now)) > 10.)
     printf ("Couenne: standardization time %.3fs\n", now);
 
-  readOptimum ("nc.txt", optimum_, bestObj_, this);
+  //  readOptimum ("nc.txt", optimum_, bestObj_, this);
 
 #ifdef DEBUG
   print (std::cout);

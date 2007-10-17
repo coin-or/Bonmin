@@ -15,10 +15,8 @@
 
 //#define DEBUG
 
-/** \brief Constructor. Get a variable as an argument and set value_
-           through a call to operator () of that exprAux.
-*/
-
+/// Constructor. Get a variable as an argument and set value_ through
+/// a call to operator () of that exprAux.
 CouenneThreeWayBranchObj::CouenneThreeWayBranchObj (int index, 
 						    CouNumber lcrop, 
 						    CouNumber rcrop,

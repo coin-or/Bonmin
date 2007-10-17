@@ -36,6 +36,19 @@ void expression::getBounds (expression *&lb, expression *&ub) {
   ub = new exprConst (  COUENNE_INFINITY);
 }
 
+/// Get lower and upper bound of an expression (if any) -- real values
+void expression::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  expression *le, *ue;
+  getBounds (le, ue);
+
+  lb = (*le) ();
+  ub = (*ue) ();
+
+  delete le; 
+  delete ue;
+}
+
 
 // generate one cut for a constant
 

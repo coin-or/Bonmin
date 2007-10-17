@@ -7,11 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CglCutGenerator.hpp>
+#include "CglCutGenerator.hpp"
 
-#include <CouenneCutGenerator.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneSolverInterface.hpp>
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneSolverInterface.hpp"
 
 #include "BonAuxInfos.hpp"
 
@@ -40,21 +40,19 @@ void fictitiousBound (OsiCuts &cs,
   // set trivial dual bound to objective function, if there is none
 
   int ind_obj = p -> Obj (0) -> Body () -> Index ();
-  if (ind_obj < 0) 
-    return;
+
+  if (ind_obj < 0) return;
 
   // we have a single variable objective function
 
   int sense = (p -> Obj (0) -> Sense () == MINIMIZE) ? -1 : 1;
 
-  if (action) {
-
-    if (sense < 0) {if (p -> Lb (ind_obj) < - LARGE_BOUND) p -> Lb (ind_obj) = - LARGE_BOUND;}
-    else            if (p -> Ub (ind_obj) >   LARGE_BOUND) p -> Ub (ind_obj) =   LARGE_BOUND;
-  }
+  if (action)
+    if (sense<0) {if (p -> Lb (ind_obj) < - LARGE_BOUND) p -> Lb (ind_obj) = - LARGE_BOUND;}
+    else         {if (p -> Ub (ind_obj) >   LARGE_BOUND) p -> Ub (ind_obj) =   LARGE_BOUND;}
   else
     if (sense>0) {if (fabs (p->Ub(ind_obj)-LARGE_BOUND)<LARGE_TOL) p->Ub(ind_obj) = COUENNE_INFINITY;}
-    else          if (fabs (p->Lb(ind_obj)+LARGE_BOUND)<LARGE_TOL) p->Lb(ind_obj) =-COUENNE_INFINITY;
+    else         {if (fabs (p->Lb(ind_obj)+LARGE_BOUND)<LARGE_TOL) p->Lb(ind_obj) =-COUENNE_INFINITY;}
 }
 
 
@@ -77,6 +75,11 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
 }
 
 
+/// get new bounds from parents' bounds + branching rules
+
+void updateBranchInfo (const OsiSolverInterface &si, CouenneProblem *p, 
+		       t_chg_bounds *chg, const CglTreeInfo &info);
+
 /// a convexifier cut generator
 
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
@@ -85,10 +88,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   int nInitCuts = cs.sizeRowCuts ();
 
   /*  static int count = 0;
-
   char fname [20];
   sprintf (fname, "relax_%d", count++);
-
   si.writeLp (fname);*/
 
 #ifdef DEBUG
@@ -189,47 +190,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
 #endif
 
-  } else { // equivalent to info.depth > 0 || info.pass > 0
-
-    //////////////////////// GET CHANGED BOUNDS DUE TO BRANCHING ////////////////////////
-
-    // transmit solution from OsiSolverInterface to problem
-    problem_ -> update (si. getColSolution (), 
-			si. getColLower    (),
-			si. getColUpper    ());
-
-    if ((info.inTree) && (info.pass==0)) {
-
-      // we are anywhere in the B&B tree but at the root node. Check,
-      // through the auxiliary information, which bounds have changed
-      // from the parent node.
-
-      OsiBabSolver *auxinfo = dynamic_cast <OsiBabSolver *> (si.getAuxiliaryInfo ());
-
-      if (auxinfo && (auxinfo -> extraCharacteristics () & 2)) {
-
-	// get previous bounds
-	const double * beforeLower = auxinfo -> beforeLower ();
-	const double * beforeUpper = auxinfo -> beforeUpper ();
-
-	if (beforeLower || beforeUpper) {
-
-	  // get currentbounds
-	  const double * nowLower = si.getColLower();
-	  const double * nowUpper = si.getColUpper();
-
-	  for (register int i=0; i < ncols; i++) {
-
-	    if (beforeLower && (nowLower [i] >= beforeLower [i] + COUENNE_EPS))
-	      chg_bds [i].setLower(t_chg_bounds::CHANGED);
-	    if (beforeUpper && (nowUpper [i] <= beforeUpper [i] - COUENNE_EPS))
-	      chg_bds [i].setUpper(t_chg_bounds::CHANGED);
-	  }
-
-	} else printf ("WARNING: could not access parent's bounds\n");
-      }
-    }
-  }
+  } else updateBranchInfo (si, problem_, chg_bds, info); // info.depth >= 0 || info.pass >= 0
 
   fictitiousBound (cs, problem_, false);
 
@@ -241,8 +202,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // of BB tree (info.pass == 0) or if first call (creation of RLT,
   // info.pass == -1)
 
+  problem_ -> installCutOff ();
+
 #ifdef DEBUG
-    printf ("#### BT ...................................................\n");
+  printf ("#### BT ...................................................\n");
 #endif
 
   if ((info.pass <= 0)
@@ -254,7 +217,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 
 #ifdef DEBUG
-    printf ("#### ...................................................... BT DONE\n");
+  printf ("#### ...................................................... BT DONE\n");
 #endif
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
@@ -313,10 +276,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     csi -> setupForRepeatedUse ();
 
     int nImprov, nIter = 0;
-    //    bool repeat = true;
 
-    while (//repeat && 
-	   (nIter++ < MAX_OBBT_ITER) &&
+    while ((nIter++ < MAX_OBBT_ITER) &&
 	   ((nImprov = obbt (csi, cs, chg_bds, babInfo)) > 0)) 
 
       if (nImprov >= THRES_NBD_CHANGED) {
@@ -350,24 +311,21 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if (firstcall_ && (ncuts >= 1)) {
       if (ncuts == 1)
-	printf    ("Couenne: one initial cut\n");
-      else printf ("Couenne: %d initial cuts\n", ncuts);
+	printf    ("Couenne: one initial row cut\n");
+      else printf ("Couenne: %d initial row cuts\n", ncuts);
     }
   }
 
-  // end of the procedure /////////////////////////////////////////////////////////////
+  // end of OBBT //////////////////////////////////////////////////////////////////////
 
 end_genCuts:
 
   delete [] chg_bds;
-
-  // clean up
   free (changed);
 
-  if (firstcall_)
-    fictitiousBound (cs, problem_, true);
-
   if (firstcall_) {
+
+    fictitiousBound (cs, problem_, true);
     firstcall_  = false;
     ntotalcuts_ = nrootcuts_ = cs.sizeRowCuts ();
   }

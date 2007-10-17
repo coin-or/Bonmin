@@ -113,7 +113,11 @@ class exprAux: public exprVar {
     /*return image_ -> Linearity ();*/
 
   /// Get lower and upper bound of an expression (if any)
-  void getBounds (expression *&lb, expression *&ub);
+  virtual void getBounds (expression *&lb, expression *&ub);
+
+  /// Get lower and upper bound of an expression (if any) -- real values
+  void getBounds (CouNumber &lb, CouNumber &ub) 
+    {expression::getBounds (lb, ub);}
 
   /// set bounds depending on both branching rules and propagated
   /// bounds. To be used after standardization

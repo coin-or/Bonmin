@@ -12,7 +12,6 @@
 #include "CouenneTypes.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
-#include "projections.hpp"
 
 
 #define LARGE_BOUND 9.9e12
@@ -27,64 +26,63 @@ CouNumber exprMul::selectBranch (expression *w,
 				 int &way) {
 
   int xi = arglist_ [0] -> Index (),
-      yi = arglist_ [1] -> Index ();
+      yi = arglist_ [1] -> Index (),
+      wi = w            -> Index ();
 
-  if ((xi < 0) || (yi < 0)) {
-    printf ("Couenne, exprMul::selectBranch: arguments of exprMul have negative index\n");
-    exit (-1);
-  }
+  assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 
-  CouNumber x0 = expression::Variable (xi),  y0 = expression::Variable (yi), 
-            xl = expression::Lbound   (xi),  yl = expression::Lbound   (yi),  
-            xu = expression::Ubound   (xi),  yu = expression::Ubound   (yi);  
+  CouNumber 
+    x0 = expression::Variable (xi), y0 = expression::Variable (yi), 
+    xl = expression::Lbound   (xi), yl = expression::Lbound   (yi),
+    xu = expression::Ubound   (xi), yu = expression::Ubound   (yi),
+    w0 = expression::Variable (wi);
 
   // First, try to avoid infinite bounds for multiplications, which
   // make them pretty hard to deal with
 
-  if ((xl < - COUENNE_INFINITY) && 
-      (xu >   COUENNE_INFINITY)) { // first
-
-    ind = xi;
+  if (((ind = xi) >= 0) && (xl < - COUENNE_INFINITY) && (xu > COUENNE_INFINITY) ||
+      ((ind = yi) >= 0) && (yl < - COUENNE_INFINITY) && (yu > COUENNE_INFINITY)) {
 
     // branch around current point. If it is also at a crazy value,
     // reset it close to zero.
 
     brpts = (double *) malloc (2 * sizeof (double));
-    CouNumber curr = x0;
+    CouNumber curr = expression::Variable (ind);
 
     if (fabs (curr) >= LARGE_BOUND) curr = 0;
 
-    brpts [0] = - fabs (curr) - BOUND_WING;
-    brpts [1] =   fabs (curr) + BOUND_WING;
+    //brpts [0] = - fabs (curr) - BOUND_WING;
+    //brpts [1] =   fabs (curr) + BOUND_WING;
+    brpts [0] = curr - BOUND_WING;
+    brpts [1] = curr + BOUND_WING;
 
     way = THREE_CENTER;
 
-    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this
+    return fabs (w0 - x0*y0);
+    //    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this
   }
 
-  if ((yl < - COUENNE_INFINITY) && 
-      (yu >   COUENNE_INFINITY)) { // and second factor
+  // at least one bound is infinite
 
-    ind = yi;
+  brpts = (double *) malloc (sizeof (double));
 
-    // branch around current point. If it is also at a crazy value,
-    // reset it close to zero.
+  if (xl<-COUENNE_INFINITY) {*brpts = midInterval (((x0<0) ? 2 : 0.5) * x0, xl, xu); way = TWO_RIGHT;}
+  if (xu> COUENNE_INFINITY) {*brpts = midInterval (((x0>0) ? 2 : 0.5) * x0, xl, xu); way = TWO_LEFT;}
+  if (yl<-COUENNE_INFINITY) {*brpts = midInterval (((y0<0) ? 2 : 0.5) * y0, yl, yu); way = TWO_RIGHT;}
+  if (yu> COUENNE_INFINITY) {*brpts = midInterval (((y0>0) ? 2 : 0.5) * y0, yl, yu); way = TWO_LEFT;}
 
-    brpts = (double *) malloc (2 * sizeof (double));
-    CouNumber curr = y0;
+  // all bounds are finite
 
-    if (fabs (curr) >= LARGE_BOUND) curr = 0;
+  if (yu-yl > xu-xl) {
 
-    brpts [0] = - fabs (curr) - BOUND_WING;
-    brpts [1] =   fabs (curr) + BOUND_WING;
+    *brpts = midInterval (y0, yl, yu);
+    way = TWO_RAND;
 
-    way = THREE_CENTER;
+  } else {
 
-    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this
+    *brpts = midInterval (x0, xl, xu);
+    way = TWO_RAND;
   }
 
-  // there is at least one finite corner of the bounding box
-
-  ind = -1;
-  return 0.;
+  return fabs (w0 - x0*y0);
 }

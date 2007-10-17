@@ -10,12 +10,12 @@
 
 #include <stdlib.h>
 
-#include <CouenneObject.hpp>
-#include <CouenneBranchingObject.hpp>
-#include <CouenneThreeWayBranchObj.hpp>
+#include "CouenneObject.hpp"
+#include "CouenneBranchingObject.hpp"
+#include "CouenneThreeWayBranchObj.hpp"
 
-#include <exprGroup.hpp>
-#include <exprQuad.hpp>
+#include "exprGroup.hpp"
+#include "exprQuad.hpp"
 
 
 //#define DEBUG
@@ -27,17 +27,19 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   // whichWay should be set to which branch first (for two-way branching?)
   // if selectBranch not called, choose one at random
   whichWay_ = whichWay = TWO_LEFT;
+  brVarInd_ = -1;
 
   // infeasibility is always null for linear expressions
-  if (reference_ -> Image () -> Linearity () <= LINEAR) {
+  assert (reference_ -> Image () -> Linearity () > LINEAR);
       //(reference_ -> Multiplicity () <= 0))
-#ifdef DEBUG
+
+  /*#ifdef DEBUG
     printf ("infeasibility of a linear CouenneObject? "); 
     reference_ -> print (); printf (" := ");
     reference_ -> Image () -> print (); printf ("\n");
 #endif
     return 0.;
-  }
+    }*/
 
   expression::update (const_cast <CouNumber *> (info -> solution_),
 		      const_cast <CouNumber *> (info -> lower_),
@@ -69,14 +71,14 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   // TODO: how to avoid this part of the code when called from
   // CbcModel::setSolution() ?
 
-  CouNumber improv = reference_ -> Image () -> selectBranch 
-    (reference_, info,             // input parameters
-     brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
+  CouNumber improv = reference_ -> Image () -> 
+    selectBranch (reference_, info,             // input parameters
+		  brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
 
   if (brVarInd_ >= 0) {
 
     if (improv <= COUENNE_EPS) {
-      printf ("### warning, infeas = %g for ");
+      printf ("### warning, infeas = %g for ", improv);
       reference_ -> print (); printf (":=");
       reference_ -> Image () -> print (); printf ("\n");
     }
@@ -85,8 +87,16 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     whichWay_ = whichWay;
 
     if (info -> lower_ [brVarInd_] >= 
-	info -> upper_ [brVarInd_] - COUENNE_EPS) 
+	info -> upper_ [brVarInd_] - COUENNE_EPS) {
+
+#ifdef DEBUG
+      printf ("### warning, tiny bounding box [%g,%g] for x_%d\n", 
+	      info -> lower_ [brVarInd_],
+	      info -> upper_ [brVarInd_], brVarInd_);
+#endif
+
       delta = 0;
+    }
   }
 
   // This should make getFixVar() useless if used in exprMul or
@@ -230,6 +240,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     }
 
   // if selectBranch returned -1, apply default branching rule
+
 #ifdef DEBUG
   printf ("CO::createBranch: ");
   reference_ -> print (std::cout);                              printf (" = ");
@@ -286,7 +297,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-      return new CouenneBranchingObject (index, way, x, depvar -> isInteger ());  }
+      return new CouenneBranchingObject (index, way, x, depvar -> isInteger ());  
+  }
 
   return new CouenneBranchingObject (ref_ind, way, xr, reference_ -> isInteger ());
 }

@@ -7,13 +7,14 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <exprOp.hpp>
-#include <exprDiv.hpp>
-#include <exprClone.hpp>
-#include <exprMul.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneTypes.hpp"
+#include "exprOp.hpp"
+#include "exprDiv.hpp"
+#include "exprClone.hpp"
+#include "exprMul.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
+
 
 // Create standard formulation of this expression
 exprAux *exprDiv::standardize (CouenneProblem *p, bool addAux) {
@@ -24,28 +25,18 @@ exprAux *exprDiv::standardize (CouenneProblem *p, bool addAux) {
 
 
 // generate convexification cut for constraint w = x/y
-
 void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {
-
-  // TODO: Use method on Tawarmalani-Sahinidis
-  // PS: is it equivalent to unified approach?
-
   // compute y bounds
 
-  expression *yle, *yue, *ye = arglist_ [1];
-  ye -> getBounds (yle, yue);
-
-  CouNumber yl = (*yle) (), 
-            yu = (*yue) (), k;
-
-  delete yle; delete yue;
+  CouNumber yl, yu;
+  arglist_ [1] -> getBounds (yl, yu);
 
   int xi = arglist_ [0] -> Index (),
-      wi = w            -> Index (),
-      yi = ye           -> Index ();
+      yi = arglist_ [1] -> Index (),
+      wi = w            -> Index ();
 
   bool cLW,  cRW,  cLY,  cRY = 
        cLW = cRW = cLY = true;
@@ -57,29 +48,22 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
     cRY = chg [yi].upper() != t_chg_bounds::UNCHANGED;
   }
 
-  // if the denominator's bound interval has 0 as internal point,
-  // there is no convexification
-
-  if ((yl < -0) && (yu >  0)) return;
+  if ((yl < -0) && (yu > 0)) return;   // no convexification
 
   // special case #1: y is almost constant (nonzero) --> y = k. We
   // only need a single plane w = x/k.
 
+  CouNumber k;
+
   if ((fabs (yl-yu) < COUENNE_EPS) && 
-      ((k = fabs (yl+yu) / 2) > COUENNE_EPS)) {
-    if (cLY || cRY) cg -> createCut (cs, 0., 0, wi, -1, xi, 1/k);
+      ((fabs (k = yl+yu) / 2) > COUENNE_EPS)) {
+    if (cLY || cRY)
+      cg -> createCut (cs, 0., 0, wi, -1, xi, 1/k);
     return;
   }
 
-  // compute w bounds
-
-  expression *wle, *wue;
-  w -> getBounds (wle, wue);
-
-  CouNumber wl = (*wle) (), 
-            wu = (*wue) ();
-
-  delete wle; delete wue;
+  CouNumber wl, wu;
+  w -> getBounds (wl, wu);
 
   if (lbw > wl) wl = lbw;
   if (ubw < wu) wu = ubw;
@@ -89,37 +73,18 @@ void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   if ((fabs (wl-wu) < COUENNE_EPS) &&
       ((k = fabs (wl+wu) / 2) > COUENNE_EPS)) {
-    if (cLW || cRW) cg -> createCut (cs, 0., 0, yi, k, xi, -1.);
+    if (cLW || cRW)
+      cg -> createCut (cs, 0., 0, yi, k, xi, -1.);
     return;
   }
 
-  expression *xle, *xue;
-  arglist_ [0] -> getBounds (xle, xue);
+  CouNumber xl, xu;
+  arglist_ [0] -> getBounds (xl, xu);
 
-  CouNumber xl = (*xle) (),
-            xu = (*xue) ();
-
-  delete xle;
-  delete xue;
+  // same as product, just a change in coordinates
 
   unifiedProdCuts (cg, cs,
 		   wi, expression::Variable (wi), wl, wu,
 		   yi, expression::Variable (yi), yl, yu,
 		   xi, expression::Variable (xi), xl, xu, chg);
-
-
-
-  // Add McCormick convexification cuts. Reduce w = x/y to x = wy and
-  // apply the same rule as for multiplications:
-  //
-  // 1) x >= yl w + wl y - yl wl
-  // 2) x >= yu w + wu y - yu wu
-  //
-  // 3) x <= yl w + wu y - yl wu
-  // 4) x <= yu w + wl y - yu wl
-
-  //if ((cLY || cLW) && (is_boundbox_regular (yl,wl))) cg->createCut (cs,yl*wl,-1,xi,-1.,wi,yl,yi,wl);
-  //if ((cRY || cRW) && (is_boundbox_regular (yu,wu))) cg->createCut (cs,yu*wu,-1,xi,-1.,wi,yu,yi,wu);
-  //if ((cLY || cRW) && (is_boundbox_regular (yl,wu))) cg->createCut (cs,yl*wu,+1,xi,-1.,wi,yl,yi,wu);
-  //if ((cRY || cLW) && (is_boundbox_regular (yu,wl))) cg->createCut (cs,yu*wl,+1,xi,-1.,wi,yu,yi,wl);
 }

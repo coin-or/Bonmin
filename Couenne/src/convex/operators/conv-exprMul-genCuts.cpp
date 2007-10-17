@@ -22,12 +22,6 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {
 
-  // get bounds of numerator and denominator
-
-  expression *xle, *xue, 
-             *yle, *yue, 
-             *wle, *wue;
-
   expression *xe = arglist_ [0];
   expression *ye = arglist_ [1];
 
@@ -53,17 +47,11 @@ void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
   // compute bounds
 
-  xe -> getBounds (xle, xue);
-  ye -> getBounds (yle, yue);
-  w  -> getBounds (wle, wue);
+  CouNumber xl, xu, yl, yu, wl, wu;
 
-  CouNumber xl = (*xle) (), xu = (*xue) (), 
-            yl = (*yle) (), yu = (*yue) (),
-            wl = (*wle) (), wu = (*wue) ();
-
-  delete xle; delete xue;
-  delete yle; delete yue;
-  delete wle; delete wue;
+  xe -> getBounds (xl, xu);
+  ye -> getBounds (yl, yu);
+  w  -> getBounds (wl, wu);
 
   if (lbw > wl) wl = lbw;
   if (ubw < wu) wu = ubw;
