@@ -99,9 +99,11 @@ namespace Bonmin{
     // value from the initialSolve as cutoff
     // TODO: In case there are integer variables, check if all feasible
 
-    if (ci -> getNumIntegers() == 0) {
-      doubleParam_[Cutoff] = ci->getObjValue() + 1e-4;
-    }
+    // pbelotti: don't set it here, it gives numerical problems
+
+    //    if (ci -> getNumIntegers() == 0) {
+    //      doubleParam_[Cutoff] = ci->getObjValue() + 1e-4;
+    //}
 
     if(extraStuff->infeasibleNode()){
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
