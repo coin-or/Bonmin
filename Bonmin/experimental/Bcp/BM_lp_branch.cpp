@@ -18,7 +18,7 @@
 
 static bool ifprint = true;
 static bool ifprint2 = true;
-#define BM_PRINT_DATA
+// #define BM_PRINT_DATA
 
 //#############################################################################
 
@@ -109,6 +109,19 @@ BM_lp::unpack_pseudo_costs(BCP_buffer& buf)
   buf.unpack(upNumber, numObj, false);
   buf.unpack(downTotalChange, numObj, false);
   buf.unpack(downNumber, numObj, false);
+
+#ifdef BM_PRINT_DATA
+  if (current_level() < 4) {
+    print(ifprint, "Received pseudocosts:\n");
+    for (int i = 0; i < numObj; ++i) {
+	const OsiObject* object = bonmin_.nonlinearSolver()->objects()[i];
+	print(ifprint, "col: %i,  obj: %i, dTot: %lf, dNum: %i, uTot: %lf, uNum: %i\n",
+	      object->columnNumber(), i,
+	      downTotalChange[i], downNumber[i],
+	      upTotalChange[i], upNumber[i]);
+    }
+  }
+#endif  
 }
 
 
@@ -182,15 +195,6 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
 
   const bool isRoot = (current_index() == 0);
   int way;
-
-  printf("DisregardPriorities: %i\n",
-	 par.entry(BM_par::DisregardPriorities) ? 1 : 0);
-  printf("DecreasingSortInSetupList: %i\n",
-	 par.entry(BM_par::DecreasingSortInSetupList) ? 1 : 0);
-  printf("PreferHighCombinationInBranching: %i\n",
-	 par.entry(BM_par::PreferHighCombinationInBranching) ? 1 : 0);
-  printf("UsePseudoCosts: %i\n",
-	 par.entry(BM_par::UsePseudoCosts) ? 1 : 0);
 
   for (int i = 0; i < objNum_; ++i) {
     const int ind = objInd_[i];
@@ -293,19 +297,35 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
     }
   }
 #ifdef BM_PRINT_DATA
-  print(ifprint, "Before SB Infeas\n");
-  for (int i = 0; i < infNum_; ++i) {
-    const OsiObject* object = objects[infInd_[i]];
-    print(ifprint, "col: %i,  obj: %i,  val: %lf,  useful: %lf\n",
-	  object->columnNumber(), infInd_[i],
-	  object->infeasibility(&branchInfo, way), infUseful_[i]);
-  }
-  print(ifprint, "Before SB Feas\n");
-  for (int i = 0; i < feasNum_; ++i) {
-    const OsiObject* object = objects[feasInd_[i]];
-    print(ifprint, "colInd: %i,  objInd: %i,  val: %lf,  useful: %lf\n",
-	  object->columnNumber(), feasInd_[i],
-	  object->infeasibility(&branchInfo, way), feasUseful_[i]);
+  if (current_level() < 4) {
+    OsiPseudoCosts& pseudoCosts = choose->pseudoCosts();
+    double* upTotalChange = pseudoCosts.upTotalChange();
+    int* upNumber = pseudoCosts.upNumber();
+    double* downTotalChange = pseudoCosts.downTotalChange();
+    int* downNumber = pseudoCosts.downNumber();
+    
+    print(ifprint, "Before SB Infeas\n");
+    for (int i = 0; i < infNum_; ++i) {
+      const int ind = infInd_[i];
+      const OsiObject* object = objects[ind];
+      print(ifprint, "col: %i,  obj: %i,  val: %lf,  useful: %lf\n",
+    	  object->columnNumber(), infInd_[i],
+    	  object->infeasibility(&branchInfo, way), infUseful_[i]);
+      print(ifprint, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
+    	  downTotalChange[ind], downNumber[ind],
+    	  upTotalChange[ind], upNumber[ind]);
+    }
+    print(ifprint, "Before SB Feas\n");
+    for (int i = 0; i < feasNum_; ++i) {
+      const int ind = feasInd_[i];
+      const OsiObject* object = objects[ind];
+      print(ifprint, "colInd: %i,  objInd: %i,  val: %lf,  useful: %lf\n",
+    	  object->columnNumber(), feasInd_[i],
+    	  object->infeasibility(&branchInfo, way), feasUseful_[i]);
+      print(ifprint, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
+    	  downTotalChange[ind], downNumber[ind],
+    	  upTotalChange[ind], upNumber[ind]);
+    }
   }
 #endif  
   
