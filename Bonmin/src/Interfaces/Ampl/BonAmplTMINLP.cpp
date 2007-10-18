@@ -227,7 +227,6 @@ namespace Bonmin
     sos_.num = suf_sos(i, &sos_.numNz, &types, p_sospri, copri,
                        &starts, &indices, &weights);
 
-    std::cout<<"sos points to : "<<&sos_<<std::endl<<"sos.num is "<<sos_.num<<std::endl;
 
     if (sos_.num) {
       //Copy sos information
@@ -314,7 +313,7 @@ namespace Bonmin
        delete [] constraintsConvexities_;}
      constraintsConvexities_ = new TMINLP::Convexity[n_con];
      if(id == NULL){
-        std::cout<<"Incorrect suffixes description in ampl model. id's are not declared "<<std::endl;
+        std::cerr<<"Incorrect suffixes description in ampl model. id's are not declared "<<std::endl;
       exit(ERROR_IN_AMPL_SUFFIXES);
 	}
      int numberSimpleConcave = 0; 
@@ -348,7 +347,7 @@ namespace Bonmin
 	   int & xIdx = simpleConcaves_[numberSimpleConcave].xIdx;
         eval_grad_gi(n_var, NULL, false, i, nnz, jCol, NULL);
         if(nnz != 2){//Error in ampl model
-        std::cout<<"Incorrect suffixes description in ampl model. Constraint with id "
+        std::cerr<<"Incorrect suffixes description in ampl model. Constraint with id "
                  <<id<<" is simple concave and should have only two nonzero elements"<<std::endl;
          exit(ERROR_IN_AMPL_SUFFIXES);
         }
@@ -357,7 +356,7 @@ namespace Bonmin
         }
         else{
              if(jCol[1] != yIdx){//Error in ampl model
-               std::cout<<"Incorrect suffixes description in ampl model. Constraint with id "
+               std::cerr<<"Incorrect suffixes description in ampl model. Constraint with id "
                         <<id<<" : variable marked as y does not appear in the constraint."<<std::endl;
                exit(ERROR_IN_AMPL_SUFFIXES);
              }       
