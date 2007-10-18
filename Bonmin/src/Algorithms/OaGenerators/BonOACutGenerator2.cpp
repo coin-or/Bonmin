@@ -50,7 +50,7 @@ namespace Bonmin
     }
     else if (ivalue == 1){
       int nodeS, nStrong, nTrust, mig, mir, probe, cover, logLevel;
-      b.options()->GetEnumValue("nodeselect_stra",nodeS,"milp_sub.");
+      b.options()->GetEnumValue("node_comparison",nodeS,"milp_sub.");
       b.options()->GetIntegerValue("number_strong_branch",nStrong,"milp_sub.");
       b.options()->GetIntegerValue("number_before_trust", nTrust,"milp_sub.");
       b.options()->GetIntegerValue("Gomory_cuts", mig,"milp_sub.");

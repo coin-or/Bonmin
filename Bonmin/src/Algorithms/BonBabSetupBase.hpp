@@ -209,6 +209,11 @@ public:
     Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions(){return roptions_;}
     
 protected:
+    /** Set the priorities into OsiTMINLPInterface when needed.*/
+    void setPriorities();
+    /** Add SOS constraints to OsiTMINLPInterface when needed.*/
+    void addSos();
+
     /** storage of integer parameters.*/
     int intParam_[NumberIntParam];
     /** default values for int parameters.*/

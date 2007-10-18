@@ -114,9 +114,9 @@ namespace Bonmin
   //  s.continuousSolver() = model_.solver();
     
     
-    if(s.continuousSolver()->objects()!=NULL){
-      model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
-    }
+ //   if(s.continuousSolver()->objects()!=NULL){
+ //     model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
+ //   }
     
     
     
@@ -200,7 +200,6 @@ namespace Bonmin
           }
         }
       }
-    }
     
     // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
     const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
@@ -255,7 +254,7 @@ namespace Bonmin
     }
     
     replaceIntegers(model_.objects(), model_.numberObjects());
-    
+   } 
     
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
     

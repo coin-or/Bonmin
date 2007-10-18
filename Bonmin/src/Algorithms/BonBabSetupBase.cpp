@@ -576,6 +576,102 @@ BabSetupBase::mayPrintDoc(){
   }
 }
 
+void 
+BabSetupBase::setPriorities(){
+   const int * priorities = nonlinearSolver()->getPriorities();
+   const double * upPsCosts = nonlinearSolver()->getUpPsCosts();
+   const int * directions = nonlinearSolver()->getBranchingDirections();
+   bool hasPseudo = (upPsCosts!=NULL);
+   if(priorities == NULL && directions && NULL && hasPseudo)
+     return;
+   int n = nonlinearSolver()->numberObjects();
+   OsiObject ** objects = nonlinearSolver()->objects();
+    for (int i = 0 ; i < n; i++)
+    {
+      OsiObject2 * object = dynamic_cast<OsiObject2 *>(objects[i]);
+      int iCol = objects[i]->columnNumber();
+      if(iCol < 0){
+        throw CoinError("BabSetupBase","setPriorities",
+                        "Don't know how to set priority for non-column object.");
+      }
+      if (priorities){
+        objects[i]->setPriority(priorities[iCol]);
+      }
+      if (directions){
+        if(object == NULL){
+          throw CoinError("BabSetupBase","setPriorities",
+                          "Don't know how to set preferred way for object.");
+        }
+        object->setPreferredWay(directions[iCol]);
+      }
+      if (upPsCosts) {
+        throw CoinError("BabSetupBase","setPriorities",
+                         "Can not handle user set pseudo-costs with OsiObjects\n"
+                         "You should use one of the Cbc branching rules:\n"
+                         "most-fractionnal or strong-branching.");
+      }
+    }
+}
+
+void
+BabSetupBase::addSos(){
+
+    // pass user set Sos constraints (code inspired from CoinSolve.cpp)
+    const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
+    if (!getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
+    {
+      const int & numSos = sos->num;
+      OsiObject ** objects = new OsiObject*[numSos];
+      const int * starts = sos->starts;
+      const int * indices = sos->indices;
+      const char * types = sos->types;
+      const double * weights = sos->weights;
+      bool hasPriorities = false;
+      const int * varPriorities = nonlinearSolver()->getPriorities();
+      int numberObjects =  nonlinearSolver()->numberObjects();
+      if (varPriorities)
+      {
+        for (int i = 0 ; i < numberObjects ; i++) {
+          if (varPriorities[i]) {
+            hasPriorities = true;
+            break;
+          }
+        }
+      }
+      const int * sosPriorities = sos->priorities;
+      if (sosPriorities)
+      {
+        for (int i = 0 ; i < numSos ; i++) {
+          if (sosPriorities[i]) {
+            hasPriorities = true;
+            break;
+          }
+        }
+      }
+      for (int i = 0 ; i < numSos ; i++)
+      {
+        int start = starts[i];
+        int length = starts[i + 1] - start;
+        objects[i] = new OsiSOS(nonlinearSolver(), length, &indices[start],
+                                &weights[start], (int) types[i]);
+        
+        objects[i]->setPriority(10);
+        if (hasPriorities && sosPriorities && sosPriorities[i]) {
+          objects[i]->setPriority(sosPriorities[i]);
+        }
+      }
+      int n = nonlinearSolver()->numberObjects();
+      //std::cout<<"Number objects "<<n<<std::endl;
+      nonlinearSolver()->addObjects(numSos, objects);
+      assert(nonlinearSolver()->numberObjects() == n + numSos);
+      //std::cout<<"Added "<<numSos<<" SOS constraints.";
+      //std::cout<<"Number objects "<<nonlinearSolver()->numberObjects()<<std::endl;
+      for (int i = 0 ; i < numSos ; i++)
+        delete objects[i];
+      delete [] objects;
+    }
+}
+
 
 }/* End namespace Bonmin.*/
 

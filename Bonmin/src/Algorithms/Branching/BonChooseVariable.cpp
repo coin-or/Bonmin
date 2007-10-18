@@ -30,6 +30,7 @@ BonChooseVariable::BonChooseVariable(BabSetupBase &b):
 
   /** Set values of standard branching options.*/
   int numberObjects = solver_->numberObjects();
+  //std::cout<<"Number objects "<<numberObjects<<std::endl;
   pseudoCosts_.initialize(numberObjects);
   int numberBeforeTrusted = b.getIntParameter(BabSetupBase::MinReliability);
   pseudoCosts_.setNumberBeforeTrusted(numberBeforeTrusted);
@@ -174,6 +175,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   int numberObjects = solver_->numberObjects();
   assert (numberObjects);
   if (numberObjects>pseudoCosts_.numberObjects()) {
+  //std::cout<<"Number objects "<<numberObjects<<std::endl;
     //AW : How could that ever happen?  Right now, all old content is deleted!
     assert(false && "Right now, all old content is deleted!");
     // redo useful arrays

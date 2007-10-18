@@ -2046,8 +2046,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
                 x[jCol_[i]],
                 rowLow[jRow_[i]],
                 rowUp[jRow_[i]], tiny_, veryTiny_)) {      
-          rowLow[jRow_[i]] += jValues_[i] * getColSolution()[jCol_ [i]];
-          rowUp[jRow_[i]] += jValues_[i] *getColSolution()[jCol_[i]];
+          rowLow[jRow_[i]] += jValues_[i] * x[jCol_ [i]];
+          rowUp[jRow_[i]] += jValues_[i] *x[jCol_[i]];
        }
     }
   }
