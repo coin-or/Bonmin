@@ -255,6 +255,10 @@ namespace Bonmin
     
     replaceIntegers(model_.objects(), model_.numberObjects());
    } 
+   else{//Pass in objects to Cbc
+     model_.addObjects(s.continuousSolver()->numberObjects(),
+                       s.continuousSolver()->objects());
+   }
     
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
     
