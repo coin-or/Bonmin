@@ -166,8 +166,8 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
     OsiClpSolverInterface lp;
     si.extractLinearRelaxation(lp);
     lp.writeMps("toy");
-     assert(lp.getNumCols()==5);
-      assert(lp.getNumRows()==4);
+     assert(lp.getNumCols()==4);
+      assert(lp.getNumRows()==3);
       //Check bounds on columns
       const double * colLow = lp.getColLower();
       assert(eq(colLow[0],0.));
@@ -210,9 +210,9 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
     
        //Now check the full matrix
        const CoinPackedMatrix * mat = lp.getMatrixByCol();
-       int  inds[11] = {0, 1, 3, 0, 2, 3, 1, 2, 3, 2, 3};
-       double vals[11] = {2. / sqrt(5.) , -1., -1., 1./sqrt(5.), 1. , -1. , 1. , 1., -1.,1.,-1.};
-       assert(mat->getNumElements()==11);
+       int  inds[7] = {0, 1, 0, 2, 1, 2, 2};
+       double vals[7] = {2. / sqrt(5.) , -1., 1./sqrt(5.), 1. , 1. , 1., 1.};
+       assert(mat->getNumElements()==7);
        int k=0;
        for(int i = 0 ; i < si.getNumCols() ; i++)
        {
