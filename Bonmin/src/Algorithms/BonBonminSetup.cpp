@@ -309,11 +309,15 @@ algo_(other.algo_){
     int varSelection;
     bool val = options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     if(!val){
+    const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
+   if(sos->num){//Set branching strategy to Cbc's most fractionnal
+      options_->SetStringValue("varselect_stra", "most-fractionnal","bonmin.");
+      varSelection = OsiTMINLPInterface::MOST_FRACTIONAL;
+   }
+   else{
       options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
       varSelection = OsiTMINLPInterface::NLP_STRONG_BRANCHING;
-#ifndef DISALLOW_PRINTING
-      std::cout<<"Change varSelection"<<std::endl;
-#endif
+     }
     }
     switch (varSelection) {
     case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
