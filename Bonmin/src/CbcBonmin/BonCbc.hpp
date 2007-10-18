@@ -44,6 +44,7 @@ public:
   {
     return bestObj_;
   }
+
   /** return Mip Status */
   MipStatuses mipStatus() const
   {
@@ -76,8 +77,9 @@ public:
     return model_;
   }
 
-  /** Get cbc model used to solve. */
-  const CbcModel&  model(){
+  /** Get cbc model used to solve as non-const, in case we want to
+      change options before things happen */
+  CbcModel&  model() {
     return model_;
   }
  /** Say that algorithm is using Couenne.*/
@@ -88,16 +90,10 @@ public:
  bool getUsingCouenne(){
    return usingCouenne_;} 
 protected:
-  template<class T> struct deleter 
-  //       :public unary_function<T, void>
-  {
-    void operator()(T x) {delete x;}
-  };
-  static deleter<OsiObject *> del;
+  /** Stores the solution of MIP. */
+  double * bestSolution_;
 
-    /** Stores the solution of MIP. */
-    double * bestSolution_;
-  /** Status of the mixed integer program. */
+  /** Status of the mip solved*/
   MipStatuses mipStatus_;
   /** objValue of MIP */
   double bestObj_;

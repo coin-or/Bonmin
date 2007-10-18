@@ -322,6 +322,8 @@ algo_(other.algo_){
     case OsiTMINLPInterface::NLP_STRONG_BRANCHING:
       {
 	continuousSolver_->findIntegersAndSOS(false);
+        setPriorities();
+        addSos();
 	SmartPtr<StrongBranchingSolver> strong_solver = NULL;
 	BonChooseVariable * chooseVariable = new BonChooseVariable(*this);
 	switch(varSelection) {
@@ -349,10 +351,14 @@ algo_(other.algo_){
       break;
     case OsiTMINLPInterface::OSI_SIMPLE:
       continuousSolver_->findIntegersAndSOS(false);
+      setPriorities();
+      addSos();
       branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
       break;
     case OsiTMINLPInterface::OSI_STRONG:
       continuousSolver_->findIntegersAndSOS(false);
+      setPriorities();
+      addSos();
       branchingMethod_ = new OsiChooseStrong(nonlinearSolver_);
       break;
     //default:

@@ -552,16 +552,124 @@ BabSetupBase::mayPrintDoc(){
                          print_options_documentation, "");
   if (print_options_documentation) {
     std::list<std::string> categories;
-    categories.push_back("bonmin branch-and-bound options");
+    categories.push_back("Bonmin algorithm choice");
+		categories.push_back("bonmin output options");
     categories.push_back("bonmin options for robustness");
     categories.push_back("bonmin options for non-convex problems");
+    categories.push_back("bonmin branch-and-bound options");
+		categories.push_back("Diving options");
     categories.push_back("bonmin options : B-Hyb specific options");
+    categories.push_back("bonmin options : Options for OA decomposition");
+		categories.push_back("bonmin options : Outer Approximation cuts");
+    categories.push_back("bonmin options : Options for MILP subsolver in OA decomposition");
+		categories.push_back("bonmin options for MILP cutting planes");
+    categories.push_back("bonmin options : Options for ecp cuts generation");
+		categories.push_back("Bonmin ecp based strong branching");
+		categories.push_back("bonmin options : Nlp solve options");
+		categories.push_back("bonmin nlp interface option");
+		categories.push_back("bonmin experimental options");
 #ifdef COIN_HAS_FILTERSQP
     categories.push_back("FilterSQP options");
 #endif
     //    roptions->OutputLatexOptionDocumentation2(*app_->Jnlst(),categories);
     roptions_->OutputOptionDocumentation(*(journalist_),categories);
   }
+}
+
+void 
+BabSetupBase::setPriorities(){
+   const int * priorities = nonlinearSolver()->getPriorities();
+   const double * upPsCosts = nonlinearSolver()->getUpPsCosts();
+   const int * directions = nonlinearSolver()->getBranchingDirections();
+   bool hasPseudo = (upPsCosts!=NULL);
+   if(priorities == NULL && directions && NULL && hasPseudo)
+     return;
+   int n = nonlinearSolver()->numberObjects();
+   OsiObject ** objects = nonlinearSolver()->objects();
+    for (int i = 0 ; i < n; i++)
+    {
+      OsiObject2 * object = dynamic_cast<OsiObject2 *>(objects[i]);
+      int iCol = objects[i]->columnNumber();
+      if(iCol < 0){
+        throw CoinError("BabSetupBase","setPriorities",
+                        "Don't know how to set priority for non-column object.");
+      }
+      if (priorities){
+        objects[i]->setPriority(priorities[iCol]);
+      }
+      if (directions){
+        if(object == NULL){
+          throw CoinError("BabSetupBase","setPriorities",
+                          "Don't know how to set preferred way for object.");
+        }
+        object->setPreferredWay(directions[iCol]);
+      }
+      if (upPsCosts) {
+        throw CoinError("BabSetupBase","setPriorities",
+                         "Can not handle user set pseudo-costs with OsiObjects\n"
+                         "You should use one of the Cbc branching rules:\n"
+                         "most-fractionnal or strong-branching.");
+      }
+    }
+}
+
+void
+BabSetupBase::addSos(){
+
+    // pass user set Sos constraints (code inspired from CoinSolve.cpp)
+    const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
+    if (!getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
+    {
+      const int & numSos = sos->num;
+      OsiObject ** objects = new OsiObject*[numSos];
+      const int * starts = sos->starts;
+      const int * indices = sos->indices;
+      const char * types = sos->types;
+      const double * weights = sos->weights;
+      bool hasPriorities = false;
+      const int * varPriorities = nonlinearSolver()->getPriorities();
+      int numberObjects =  nonlinearSolver()->numberObjects();
+      if (varPriorities)
+      {
+        for (int i = 0 ; i < numberObjects ; i++) {
+          if (varPriorities[i]) {
+            hasPriorities = true;
+            break;
+          }
+        }
+      }
+      const int * sosPriorities = sos->priorities;
+      if (sosPriorities)
+      {
+        for (int i = 0 ; i < numSos ; i++) {
+          if (sosPriorities[i]) {
+            hasPriorities = true;
+            break;
+          }
+        }
+      }
+      for (int i = 0 ; i < numSos ; i++)
+      {
+        int start = starts[i];
+        int length = starts[i + 1] - start;
+        objects[i] = new OsiSOS(nonlinearSolver(), length, &indices[start],
+                                &weights[start], (int) types[i]);
+        
+        objects[i]->setPriority(10);
+        if (hasPriorities && sosPriorities && sosPriorities[i]) {
+          objects[i]->setPriority(sosPriorities[i]);
+        }
+      }
+      int n = nonlinearSolver()->numberObjects();
+      //std::cout<<"Number objects "<<n<<std::endl;
+      nonlinearSolver()->addObjects(numSos, objects);
+      assert(nonlinearSolver()->numberObjects() == n + numSos);
+      //std::cout<<"Added "<<numSos<<" SOS constraints.";
+      //std::cout<<"Number objects "<<nonlinearSolver()->numberObjects()<<std::endl;
+      for (int i = 0 ; i < numSos ; i++)
+        delete objects[i];
+      delete [] objects;
+    }
 }
 
 

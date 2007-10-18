@@ -116,6 +116,8 @@ public:
     void use(const OsiTMINLPInterface& nlp);
     /** Read options (if not done before) and create interface using tminlp.*/
     void use(Ipopt::SmartPtr<TMINLP> tminlp );
+    /** use specific instanciation of a TMINLP2TNLP.*/
+    void use(Ipopt::SmartPtr<TMINLP2TNLP> prob);
     /** Set the non-linear solver used */
     void setNonlinearSolver(OsiTMINLPInterface * s){
       nonlinearSolver_ = s;}
@@ -207,6 +209,11 @@ public:
     Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions(){return roptions_;}
     
 protected:
+    /** Set the priorities into OsiTMINLPInterface when needed.*/
+    void setPriorities();
+    /** Add SOS constraints to OsiTMINLPInterface when needed.*/
+    void addSos();
+
     /** storage of integer parameters.*/
     int intParam_[NumberIntParam];
     /** default values for int parameters.*/

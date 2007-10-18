@@ -36,7 +36,6 @@ BonChooseVariable::BonChooseVariable(BabSetupBase &b):
   pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
 
   setNumberStrong(b.getIntParameter(BabSetupBase::NumberStrong));
-  pseudoCosts_->setNumberBeforeTrusted(numberBeforeTrusted);
 
   /** Get values of options specific to BonChooseVariable.*/
   if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, "bonmin.")) {
@@ -119,6 +118,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   int numberObjects = solver_->numberObjects();
   assert (numberObjects);
   if (numberObjects>pseudoCosts_->numberObjects()) {
+  //std::cout<<"Number objects "<<numberObjects<<std::endl;
     //AW : How could that ever happen?  Right now, all old content is deleted!
     assert(false && "Right now, all old content is deleted!");
     // redo useful arrays

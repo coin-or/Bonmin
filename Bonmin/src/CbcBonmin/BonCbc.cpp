@@ -11,7 +11,7 @@
 #include "BonCbc.hpp"
 #include "BonOACutGenerator2.hpp"
 #include "BonCbcNlpStrategy.hpp"
-#include "BonAuxInfos.hpp"
+#include "BonBabInfos.hpp"
 #include "CbcModel.hpp"
 #include "CbcBranchActual.hpp"
 #include "CbcCutGenerator.hpp"
@@ -114,9 +114,9 @@ namespace Bonmin
   //  s.continuousSolver() = model_.solver();
     
     
-    if(s.continuousSolver()->objects()!=NULL){
-      model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
-    }
+ //   if(s.continuousSolver()->objects()!=NULL){
+ //     model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
+ //   }
     
     
     
@@ -200,7 +200,6 @@ namespace Bonmin
           }
         }
       }
-    }
     
     // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
     const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
@@ -255,7 +254,7 @@ namespace Bonmin
     }
     
     replaceIntegers(model_.objects(), model_.numberObjects());
-    
+   } 
     
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
     
@@ -452,7 +451,17 @@ namespace Bonmin
       bestObj_ = bestBound_ = s.nonlinearSolver()->getObjValue();
     }
     
-    if (model_.bestSolution()) {
+    if(bonBabInfo.bestSolution2().size() > 0){
+      assert((int) bonBabInfo.bestSolution2().size() == s.nonlinearSolver()->getNumCols());
+      if (bestSolution_)
+        delete [] bestSolution_;
+      bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
+       std::copy(bonBabInfo.bestSolution2().begin(), bonBabInfo.bestSolution2().end(),
+                 bestSolution_);
+       bestObj_ = (bonBabInfo.bestObj2());
+       printf("\nReal objective function: %.2f\n", bestObj_);
+    }
+    else if (model_.bestSolution()) {
       if (bestSolution_)
         delete [] bestSolution_;
       bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
@@ -480,8 +489,10 @@ namespace Bonmin
     else if(model_.status()==2){
       status = TMINLP::MINLP_ERROR;
     }
-    s.nonlinearSolver()->model()->finalize_solution(status, s.nonlinearSolver()->getNumCols(), bestSolution_,
-                                          bestObj_);
+    s.nonlinearSolver()->model()->finalize_solution(status, 
+                                                    s.nonlinearSolver()->getNumCols(), 
+                                                    bestSolution_,
+                                                    bestObj_);
   }
   
   
