@@ -139,7 +139,9 @@ class Messages : public CoinMessages
   void setModel(Ipopt::SmartPtr<TMINLP> tminlp);
   /** Set the solver to be used by interface.*/
   void setSolver(Ipopt::SmartPtr<TNLPSolver> app);
-
+  /** Sets the TMINLP2TNLP to be used by the interface.*/
+  void use(Ipopt::SmartPtr<TMINLP2TNLP> tminlp2tnlp){
+     problem_ = tminlp2tnlp;}
   /** Copy constructor
   */
   OsiTMINLPInterface (const OsiTMINLPInterface &);
@@ -645,11 +647,15 @@ class Messages : public CoinMessages
   */
   virtual void deleteRows(const int num, const int * rowIndices)
   {
-     tminlp_->removeCuts(num, rowIndices);
+    if(num)
+      freeCachedRowRim();
+     problem_->removeCuts(num, rowIndices);
   }
 
   void deleteLastRows(int number){
-  tminlp_->removeLastCuts(number);
+    if(number)
+      freeCachedRowRim();
+  problem_->removeLastCuts(number);
   }
 
   /** We have to keep this but it will throw an error
@@ -815,12 +821,30 @@ class Messages : public CoinMessages
   } 
   /** \name Methods to build outer approximations */
   //@{
+  /** \name Methods to build outer approximations */
+  //@{
+  /** \brief Extract a linear relaxation of the MINLP.
+   * Use user-provided point to build first-order outer-approximation constraints at the optimum.
+   * And put it in an OsiSolverInterface.
+   */
+  virtual void extractLinearRelaxation(OsiSolverInterface &si, const double *x, 
+                                       bool getObj = 1);
+
   /** \brief Extract a linear relaxation of the MINLP.
    * Solve the continuous relaxation and takes first-order outer-approximation constraints at the optimum.
    * The put everything in an OsiSolverInterface.
    */
   virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1,
-                                       bool solveNlp = 1);
+                                       bool solveNlp = 1){
+     if(solveNlp)
+       initialSolve();
+     extractLinearRelaxation(si, getColSolution(), getObj); 
+     if(solveNlp){
+        app_->enableWarmStart();
+        setColSolution(problem()->x_sol());
+        setRowPrice(problem()->duals_sol());
+     }
+   }
 
   /** Get the outer approximation constraints at the current optimal point.
       If x2 is different from NULL only add cuts violated by x2.
@@ -915,6 +939,14 @@ class Messages : public CoinMessages
   }
   //@}
 
+    //-----------------------------------------------------------------------
+    /** Apply a collection of cuts.
+    */
+    virtual ApplyCutsReturnCode applyCuts(const OsiCuts & cs,
+					  double effectivenessLb = 0.0){
+      problem_->addCuts(cs);
+      ApplyCutsReturnCode rc;
+      return rc;}
 
    /** Add a collection of linear cuts to problem formulation.*/
   virtual void applyRowCuts(int numberCuts, const OsiRowCut * cuts);
@@ -923,7 +955,9 @@ class Messages : public CoinMessages
   /** Add a collection of linear cuts to the problem formulation */
   virtual void applyRowCuts(int numberCuts, const OsiRowCut ** cuts)
   {
-    tminlp_->addCuts(numberCuts, cuts);
+    if(numberCuts)
+      freeCachedRowRim();
+    problem_->addCuts(numberCuts, cuts);
   }
 
  /** Get infinity norm of constraint violation for x. Put into
@@ -997,7 +1031,7 @@ protected:
   virtual void applyRowCut( const OsiRowCut & rc )
   {
     const OsiRowCut * cut = &rc;
-    tminlp_->addCuts(1, &cut);
+    problem_->addCuts(1, &cut);
   }
   /** We have to keep this but it will throw an error.
   */

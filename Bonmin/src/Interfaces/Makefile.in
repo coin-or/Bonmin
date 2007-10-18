@@ -61,8 +61,8 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 @COIN_HAS_FILTERSQP_TRUE@am__DEPENDENCIES_1 =  \
 @COIN_HAS_FILTERSQP_TRUE@	Filter/libfilterinterface.la
-am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonColReader.lo \
-	BonCurvatureEstimator.lo BonCutStrengthener.lo \
+am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonAuxInfos.lo \
+	BonColReader.lo BonCurvatureEstimator.lo BonCutStrengthener.lo \
 	BonStartPointReader.lo BonOsiTMINLPInterface.lo \
 	BonTMINLP2TNLP.lo BonTMINLP.lo BonTNLPSolver.lo \
 	BonTNLP2FPNLP.lo BonBranchingTQP.lo \
@@ -340,6 +340,7 @@ noinst_LTLIBRARIES = libbonmininterfaces.la
 # List all source files, including headers
 libbonmininterfaces_la_SOURCES = \
 	BonBoundsReader.cpp BonBoundsReader.hpp \
+        BonAuxInfos.cpp BonAuxInfos.hpp \
 	BonColReader.cpp BonColReader.hpp \
 	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
 	BonCutStrengthener.cpp BonCutStrengthener.hpp \
@@ -351,7 +352,7 @@ libbonmininterfaces_la_SOURCES = \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
 	BonBranchingTQP.cpp BonBranchingTQP.hpp \
 	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp \
-     BonRegisteredOption.hpp BonRegisteredOptions.cpp
+        BonRegisteredOption.hpp BonRegisteredOptions.cpp
 
 
 #sublibraries for various installed solvers
@@ -397,7 +398,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` 
+	-I`$(CYGPATH_W) $(CLPSRCDIR)/src`
 
 
 # This line is necessary to allow VPATH compilation with MS compilers
@@ -411,6 +412,7 @@ include_HEADERS = \
      ../../inc/config_bonmin.h \
      BonOsiTMINLPInterface.hpp \
      BonTMINLP2TNLP.hpp \
+     BonAuxInfos.hpp \
      BonTMINLP.hpp \
      BonTNLP2FPNLP.hpp \
      BonCutStrengthener.hpp \
@@ -440,6 +442,7 @@ ASTYLE_FILES = \
 	BonTMINLP.cppbak BonTMINLP.hppbak \
 	BonTNLPSolver.hppbak BonTNLPSolver.cppbak \
 	BonTNLP2FPNLP.cppbak BonTNLP2FPNLP.hppbak \
+        BonAuxInfos.cppbak BonAuxInfos.hppbak \
 	BonBranchingTQP.cppbak BonBranchingTQP.hppbak \
 	BonStrongBranchingSolver.cppbak BonStrongBranchingSolver.hppbak
 
@@ -496,6 +499,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonAuxInfos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBoundsReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBranchingTQP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonColReader.Plo@am__quote@

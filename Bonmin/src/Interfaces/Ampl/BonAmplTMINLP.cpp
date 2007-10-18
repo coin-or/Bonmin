@@ -40,7 +40,9 @@ namespace Bonmin
   sos_(),
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
+  numberNonConvex_(0),
   nonConvexConstraintsAndRelaxations_(NULL),
+  numberSimpleConcave_(0),
   simpleConcaves_(NULL),
   hasLinearObjective_(false)
   {}
@@ -61,8 +63,10 @@ namespace Bonmin
   sos_(),
   suffix_handler_(NULL),
   constraintsConvexities_(NULL),
+  numberNonConvex_(0),
   nonConvexConstraintsAndRelaxations_(NULL),
   simpleConcaves_(NULL),
+  numberSimpleConcave_(0),
   hasLinearObjective_(false)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
@@ -150,7 +154,6 @@ namespace Bonmin
                                   n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
                                   n_binaries, n_integers);
     if(n_non_linear_b == 0 && n_non_linear_o == 0){
-        std::cout<<"Problem has a linear objective"<<std::endl;
         hasLinearObjective_ = true;}
   }
   
@@ -223,6 +226,9 @@ namespace Bonmin
     
     sos_.num = suf_sos(i, &sos_.numNz, &types, p_sospri, copri,
                        &starts, &indices, &weights);
+
+    std::cout<<"sos points to : "<<&sos_<<std::endl<<"sos.num is "<<sos_.num<<std::endl;
+
     if (sos_.num) {
       //Copy sos information
       sos_.priorities = CoinCopyOfArray(priorities,sos_.num);
@@ -300,6 +306,7 @@ namespace Bonmin
    const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
    const Index * id = suffix_handler->GetIntegerSuffixValues("id", AmplSuffixHandler::AmplSuffixHandler::Variable_Source);
    const Index * primary_var = suffix_handler->GetIntegerSuffixValues("primary_var", AmplSuffixHandler::AmplSuffixHandler::Constraint_Source);
+
 
    if(primary_var!= NULL)
    {

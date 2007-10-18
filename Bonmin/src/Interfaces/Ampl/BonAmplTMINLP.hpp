@@ -211,7 +211,12 @@ namespace Bonmin
 
     /** Get accest to constraint convexities.*/
     virtual bool get_constraint_convexities(int m, TMINLP::Convexity * constraints_convexities)const {
+      if(constraintsConvexities_ != NULL){
       CoinCopyN(constraintsConvexities_, m, constraints_convexities);
+      }
+      else {
+       CoinFillN(constraints_convexities, m, TMINLP::Convex);
+      }
       return true;}
   /** Get dimension information on nonconvex constraints.*/
   virtual bool get_number_nonconvex(int & number_non_conv, int & number_concave) const{
