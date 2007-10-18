@@ -17,7 +17,7 @@
 #include "BonOsiTMINLPInterface.hpp"
 
 static bool ifprint = true;
-static bool ifprint2 = true;
+static bool ifprint2 = false;
 // #define BM_PRINT_DATA
 
 //#############################################################################
@@ -112,10 +112,10 @@ BM_lp::unpack_pseudo_costs(BCP_buffer& buf)
 
 #ifdef BM_PRINT_DATA
   if (current_level() < 4) {
-    print(ifprint, "Received pseudocosts:\n");
+    print(ifprint2, "Received pseudocosts:\n");
     for (int i = 0; i < numObj; ++i) {
 	const OsiObject* object = bonmin_.nonlinearSolver()->objects()[i];
-	print(ifprint, "col: %i,  obj: %i, dTot: %lf, dNum: %i, uTot: %lf, uNum: %i\n",
+	print(ifprint2, "col: %i,  obj: %i, dTot: %lf, dNum: %i, uTot: %lf, uNum: %i\n",
 	      object->columnNumber(), i,
 	      downTotalChange[i], downNumber[i],
 	      upTotalChange[i], upNumber[i]);
@@ -304,25 +304,25 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
     double* downTotalChange = pseudoCosts.downTotalChange();
     int* downNumber = pseudoCosts.downNumber();
     
-    print(ifprint, "Before SB Infeas\n");
+    print(ifprint2, "Before SB Infeas\n");
     for (int i = 0; i < infNum_; ++i) {
       const int ind = infInd_[i];
       const OsiObject* object = objects[ind];
-      print(ifprint, "col: %i,  obj: %i,  val: %lf,  useful: %lf\n",
+      print(ifprint2, "col: %i,  obj: %i,  val: %lf,  useful: %lf\n",
     	  object->columnNumber(), infInd_[i],
     	  object->infeasibility(&branchInfo, way), infUseful_[i]);
-      print(ifprint, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
+      print(ifprint2, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
     	  downTotalChange[ind], downNumber[ind],
     	  upTotalChange[ind], upNumber[ind]);
     }
-    print(ifprint, "Before SB Feas\n");
+    print(ifprint2, "Before SB Feas\n");
     for (int i = 0; i < feasNum_; ++i) {
       const int ind = feasInd_[i];
       const OsiObject* object = objects[ind];
-      print(ifprint, "colInd: %i,  objInd: %i,  val: %lf,  useful: %lf\n",
+      print(ifprint2, "colInd: %i,  objInd: %i,  val: %lf,  useful: %lf\n",
     	  object->columnNumber(), feasInd_[i],
     	  object->infeasibility(&branchInfo, way), feasUseful_[i]);
-      print(ifprint, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
+      print(ifprint2, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
     	  downTotalChange[ind], downNumber[ind],
     	  upTotalChange[ind], upNumber[ind]);
     }
@@ -384,8 +384,10 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
   const int fixed_size = bm_buf.size();
   // We got a few procs to work with, so do distributed strong branching
   int pidCnt = 0;
+#ifdef BM_PRINT_DATA
   print(ifprint2, "pidNum: %i,  infNum_: %i,  feasNum_: %i\n",
 	pidNum, infNum_, feasNum_);
+#endif
   /* For the 0-th object just send out the up-branch, the down branch will be
      processed locally. */
   {
@@ -501,23 +503,23 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
 {
   int i;
 #ifdef BM_PRINT_DATA
-  print(ifprint, "SB results Infeas\n");
+  print(ifprint2, "SB results Infeas\n");
   for (i = 0; i < infNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[infInd_[i]];
     if (sbres.branchEval == 0) {
       continue;
     }
-    print(ifprint, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
+    print(ifprint2, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
 	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
 	   sbres.objval[0], sbres.objval[1]);
   }
-  print(ifprint, "SB results Feas\n");
+  print(ifprint2, "SB results Feas\n");
   for (i = 0; i < feasNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[feasInd_[i]];
     if (sbres.branchEval == 0) {
       continue;
     }
-    print(ifprint, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
+    print(ifprint2, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
 	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
 	   sbres.objval[0], sbres.objval[1]);
   }
@@ -652,7 +654,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   // At this point best is not -1, create the branching object
   const OsiObject * object = solver->object(infInd_[best]);
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
-  print(ifprint, "Branched on variable %i, bestWhichWay: %i\n",
+  print(ifprint2, "Branched on variable %i, bestWhichWay: %i\n",
 	 object->columnNumber(), bestWhichWay);
 
   return (fixedStat & 1) != 0 ? -1 : 0;
@@ -833,7 +835,7 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       BCP_lp_integer_branching_object o(intBrObj);
       cands.push_back(new BCP_lp_branching_object(o, order));
       if (par.entry(BM_par::PrintBranchingInfo)) {
-	print(ifprint, "BM_lp: branching on variable %i   value: %f\n",
+	print(ifprint2, "BM_lp: branching on variable %i   value: %f\n",
 	       intBrObj->originalObject()->columnNumber(),
 	       intBrObj->value());
       }
@@ -848,7 +850,7 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       BCP_lp_sos_branching_object o(sosBrObj);
       cands.push_back(new BCP_lp_branching_object(nlp, o, order));
       if (par.entry(BM_par::PrintBranchingInfo)) {
-	print(ifprint, "BM_lp: branching on SOS %i   value: %f\n",
+	print(ifprint2, "BM_lp: branching on SOS %i   value: %f\n",
 	       sosBrObj->originalObject()->columnNumber(),
 	       sosBrObj->value());
       }
