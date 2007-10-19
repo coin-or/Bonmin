@@ -1949,7 +1949,6 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
 
 static bool WarnedForNonConvexOa=false;
 
-static int nTimesCalled = 0;
 void
 OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, 
                                             const double * x, bool getObj)
@@ -2151,12 +2150,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     si.addRow(objCut, lb, ub);
     }
   }
-  std::ostringstream os;
-  os<<"OA_"<<nTimesCalled;
-  std::string f_name = os.str();
-  si.writeMps(f_name.c_str());
   delete [] obj;
-  
 }
 
 /** Add a collection of linear cuts to problem formulation.*/

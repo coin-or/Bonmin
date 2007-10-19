@@ -247,6 +247,9 @@ namespace Bonmin
     {
       return tminlp_->get_constraints_linearity(m, const_types);
     }
+
+    /** returns true if objective is linear.*/
+    virtual bool hasLinearObjective(){return tminlp_->hasLinearObjective();}
     /** Method called by Ipopt to get the starting point. The bools
      *  init_x and init_lambda are both inputs and outputs. As inputs,
      *  they indicate whether or not the algorithm wants you to
