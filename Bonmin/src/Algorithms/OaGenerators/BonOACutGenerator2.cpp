@@ -310,7 +310,7 @@ OACutGenerator2::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
   
   roptions->SetRegisteringCategory("bonmin options : Options for MILP subsolver in OA decomposition", RegisteredOptions::BonminCategory);
   roptions->AddStringOption3("milp_subsolver",
-                             "Choose the subsolver to solve MILPs sub-problems in OA decompositions.",
+                             "Choose the subsolver to solve MILP sub-problems in OA decompositions.",
                              "Cbc_D",
                              "Cbc_D","Coin Branch and Cut with its default",
                              "Cbc_Par", "Coin Branch and Cut with passed parameters",

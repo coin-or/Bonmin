@@ -65,7 +65,7 @@ register_general_options
       "none","No warm start",
       "optimum","Warm start with direct parent optimum",
       "interior_point","Warm start with an interior point of direct parent",
-      "This will affect the function getWarmStart(), and as a consequence the wam starting in the various algorithms.");
+      "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
   roptions->setOptionExtraInfo("warm_start",8);
 
   roptions->SetRegisteringCategory("bonmin options for robustness", RegisteredOptions::BonminCategory);
@@ -80,7 +80,7 @@ register_general_options
   roptions->AddStringOption3("random_point_type","method to choose a random starting point",
 			     "Jon",
 			     "Jon", "Choose random point uniformly between the bounds",
-			     "Andreas", "perturb the starting point of the problem within a prescriped interval",
+			     "Andreas", "perturb the starting point of the problem within a prescribed interval",
 			     "Claudia", "perturb the starting point using the perturbation radius suffix information",
 			     "");
   roptions->setOptionExtraInfo("random_point_type",8);
@@ -191,10 +191,10 @@ static void register_OA_options
   roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
                                          "level of log when generating OA cuts.",
                                          0, 0,
-                                         "0: ouputs nothings,\n"
+                                         "0: outputs nothing,\n"
                                          "1: when a cut is generated, its violation and index of row from which it originates,\n"
                                          "2: always output violation of the cut.\n"
-                                         "3: ouput generated cuts incidence vectors.");
+                                         "3: output generated cuts incidence vectors.");
   roptions->setOptionExtraInfo("oa_cuts_log_level",7);
 
 }

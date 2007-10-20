@@ -291,7 +291,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
   roptions->setOptionExtraInfo("node_limit", 31);
   
   roptions->AddLowerBoundedIntegerOption("iteration_limit",
-                                         "Set the cummulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
+                                         "Set the cumulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
                                          0,COIN_INT_MAX,
                                          "value 0 deactivates option.");
   roptions->setOptionExtraInfo("iteration_limit", 31);
@@ -336,14 +336,14 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
                                    -1e10,0,1e10,0,1e-05,
                                    "Specify the amount by which cutoff is decremented below "
                                    "a new best upper-bound"
-                                   " (usually a small postive value but in non-convex problems it may be a negative value).");
+                                   " (usually a small positive value but in non-convex problems it may be a negative value).");
   roptions->setOptionExtraInfo("cutoff_decr", 31);
   
   
   roptions->AddStringOption5("node_comparison",
                              "Choose the node selection strategy.",
                              "dynamic",
-                             "best-bound", "choose node whith the smallest bound,",
+                             "best-bound", "choose node with the smallest bound,",
                              "depth-first", "Perform depth first search,",
                              "breadth-first", "Perform breadth first search,",
                              "dynamic", "Cbc dynamic strategy (starts with a depth first search and turn to best bound after 3 "
@@ -608,7 +608,7 @@ BabSetupBase::setPriorities(){
         throw CoinError("BabSetupBase","setPriorities",
                          "Can not handle user set pseudo-costs with OsiObjects\n"
                          "You should use one of the Cbc branching rules:\n"
-                         "most-fractionnal or strong-branching.");
+                         "most-fractional or strong-branching.");
       }
     }
 }

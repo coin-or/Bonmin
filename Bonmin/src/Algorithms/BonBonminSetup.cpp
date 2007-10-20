@@ -71,7 +71,7 @@ algo_(other.algo_){
                                "B-BB","simple branch-and-bound algorithm,",
                                "B-OA","OA Decomposition algorithm,",
                                "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
-                               "B-Hyb","hybrid outer approximation based branch-and-cut.",
+                               "B-Hyb","hybrid outer approximation based branch-and-cut,",
                                "B-Ecp","ecp cuts based branch-and-cut a la FilMINT.",
                                "This will preset some of the options of bonmin depending on the algorithm choice."
                                );
