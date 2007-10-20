@@ -502,7 +502,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     passInMessageHandler(source.messageHandler());
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
-    problem_ = new TMINLP2TNLP(*source.problem_);
+    problem_ = source.problem_->clone();
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
 
     setAuxiliaryInfo(source.getAuxiliaryInfo());
@@ -525,24 +525,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     throw SimpleError("Don't know how to copy an empty IpoptOAInterface.",
         "copy constructor");
 
-
-  if(source.jValues_!=NULL && source.jRow_ != NULL && source.jCol_ != NULL && nnz_jac>0) {
-    jValues_ = new double [nnz_jac];
-    jCol_    = new Index [nnz_jac];
-    jRow_    = new Index [nnz_jac];
-    CoinCopyN(source.jValues_ , nnz_jac,jValues_ );
-    CoinCopyN(source.jCol_    , nnz_jac,jCol_    );
-    CoinCopyN(source.jRow_    , nnz_jac,jRow_    );
-
-    if(source.constTypes_ != NULL) {
-      constTypes_ = new TNLP::LinearityType [getNumRows()];
-      CoinCopyN(source.constTypes_, getNumRows(), constTypes_);
-    }
-  }
-  else if(nnz_jac > 0) {
-    throw SimpleError("Arrays for storing jacobian are inconsistant.",
-        "copy constructor");
-  }
 
 
    oaHandler_ = new OaMessageHandler(*source.oaHandler_);;

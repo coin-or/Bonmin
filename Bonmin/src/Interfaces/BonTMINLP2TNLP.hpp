@@ -46,6 +46,10 @@ namespace Bonmin
       */
     TMINLP2TNLP(const TMINLP2TNLP&);
 
+    /** virtual copy .*/
+    virtual TMINLP2TNLP * clone() const{
+       return new TMINLP2TNLP(*this);}
+
     /** Default destructor */
     virtual ~TMINLP2TNLP();
     //@}
