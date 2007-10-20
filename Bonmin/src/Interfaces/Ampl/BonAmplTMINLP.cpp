@@ -227,8 +227,6 @@ namespace Bonmin
     sos_.num = suf_sos(i, &sos_.numNz, &types, p_sospri, copri,
                        &starts, &indices, &weights);
 
-    std::cout<<"sos points to : "<<&sos_<<std::endl<<"sos.num is "<<sos_.num<<std::endl;
-
     if (sos_.num) {
       //Copy sos information
       sos_.priorities = CoinCopyOfArray(priorities,sos_.num);

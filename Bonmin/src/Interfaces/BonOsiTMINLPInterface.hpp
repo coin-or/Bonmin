@@ -652,11 +652,6 @@ class Messages : public CoinMessages
      problem_->removeCuts(num, rowIndices);
   }
 
-  void deleteLastRows(int number){
-    if(number)
-      freeCachedRowRim();
-  problem_->removeLastCuts(number);
-  }
 
   /** We have to keep this but it will throw an error
   */
@@ -1145,12 +1140,6 @@ protected:
 
   ///Store the types of the constraints (linear and nonlinear).
   Ipopt::TNLP::LinearityType * constTypes_;
-  /* Numerotation of linear/nonlinear constraints
-   * Perform independent numerotation of linear (resp. nonlinear constraints)
-   * so that constraints of each type are numeroted consecutively */
- // int * constTypesNum_;
-  /** Number of linear constraints */
-  int nLinear_;
   /** Number of nonlinear constraint
    */
   int nNonLinear_;
@@ -1190,9 +1179,6 @@ private:
   SmartPtr<StrongBranchingSolver> strong_branching_solver_;
   /** status of last optimization before hot start was marked. */
   TNLPSolver::ReturnStatus optimizationStatusBeforeHotStart_;
-
-  // DELETEME
-  SmartPtr<StrongBranchingSolver> strong_branching_solver_compare_;
 };
 }
 #endif

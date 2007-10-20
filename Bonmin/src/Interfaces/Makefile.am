@@ -108,6 +108,7 @@ include_HEADERS = \
      BonCutStrengthener.hpp \
      BonTNLPSolver.hpp \
      BonBranchingTQP.hpp \
+     BonTypes.hpp \
      BonRegisteredOptions.hpp
 
 #############################################################################

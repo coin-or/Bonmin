@@ -359,7 +359,6 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     jValues_(NULL),
     nnz_jac(0),
     constTypes_(NULL),
-    nLinear_(0),
     nNonLinear_(0),
     tiny_(1e-8),
     veryTiny_(1e-20),
@@ -486,7 +485,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     nnz_jac(source.nnz_jac),
     constTypes_(NULL),
 //    constTypesNum_(NULL),
-    nLinear_(0),
     nNonLinear_(0),
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_),
@@ -733,15 +731,14 @@ static const char * INFEAS_SYMB="INFEAS";
 void
 OsiTMINLPInterface::resolveForCost(int numsolve)
 {
-
   /** Save current optimum. */
-  double * point = new double[getNumCols()*3+ getNumRows()];
+  vector<double> point(getNumCols()*3+ getNumRows());
   double bestBound = getObjValue();
   CoinCopyN(getColSolution(),
-      getNumCols(), point);
+      getNumCols(), point());
   CoinCopyN(getRowPrice(),
       2*getNumCols()+ getNumRows(),
-      &point[getNumCols()]);
+      point() + getNumCols());
 
   if(isProvenOptimal())
     messageHandler()->message(SOLUTION_FOUND,
@@ -776,10 +773,10 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
       c='*';
       messageHandler()->message(BETTER_SOL, messages_)<<getObjValue()<<f+1<< CoinMessageEol;
       CoinCopyN(getColSolution(),
-          getNumCols(), point);
+          getNumCols(), point());
       CoinCopyN(getRowPrice(),
           2*getNumCols()+ getNumRows(),
-          &point[getNumCols()]);
+          point() + getNumCols());
       bestBound = getObjValue();
     }
 
@@ -803,10 +800,9 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
       <<f+2
       <<CoinMessageEol;
   }
-  setColSolution(point);
-  setRowPrice(&point[getNumCols()]);
+  setColSolution(point());
+  setRowPrice(point() + getNumCols());
   app_->enableWarmStart();
-  delete [] point;
 
   optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
   hasBeenOptimized_ = true;
@@ -1540,11 +1536,7 @@ int OsiTMINLPInterface::initializeJacobianArrays()
   tminlp_->get_constraints_linearity(getNumRows(), constTypes_);
 //  constTypesNum_ = new int[getNumRows()];
   for(int i = 0; i < getNumRows() ; i++) {
-    if(constTypes_[i]==TNLP::LINEAR) {
-      //constTypesNum_[i] =
-      nLinear_++;
-    }
-    else if(constTypes_[i]==TNLP::NON_LINEAR) {
+    if(constTypes_[i]==TNLP::NON_LINEAR) {
       //constTypesNum_[i] = 
       nNonLinear_++;
     }
@@ -1964,13 +1956,6 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   //Get problem information
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
 
-  int nCuts = 0, cutsNnz = 0;
-  const int * cutsiRow = NULL, * cutsjCol = NULL;
-  const double * cutsElem = NULL, * cutsLow = NULL, * cutsUp = NULL;
-
-  problem_->getCutStorage(nCuts, cutsLow, cutsUp, cutsNnz, 
-                         cutsjCol, cutsiRow, cutsElem);
-
   //if not allocated allocate spaced for stroring jacobian
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
@@ -1982,8 +1967,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   double *g = new double[m];
   tminlp_->eval_g(n, x, 1, m, g);
 
-  rowLow = new double[m + nCuts];
-  rowUp = new double[m + nCuts];
+  rowLow = new double[m];
+  rowUp = new double[m];
   int * nonBindings = new int[m];//store non binding constraints (which are to be removed from OA)
   int numNonBindings = 0;
   const double * rowLower = getRowLower();
@@ -2055,17 +2040,6 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   
   //remove non-bindings equality constraints
   mat.deleteRows(numNonBindings, nonBindings);
-  if(nCuts){
-    std::cout<<"non linear problem has "<<nCuts<<" cuts."<<std::endl;
-  
-    // Now treat linear cuts
-    CoinPackedMatrix mat2(true, cutsiRow, cutsjCol, cutsElem, cutsNnz);
-    mat2.setDimensions(nCuts, n); // In case some variables are not in the support
-                                  // of any cut.
-    CoinCopyN(cutsLow, nCuts, rowLow + m);
-    CoinCopyN(cutsUp, nCuts, rowUp + m);
-    mat.minorAppendSameOrdered(mat2);
-  }
 
   int numcols=getNumCols();
   double *obj = new double[numcols];
