@@ -100,6 +100,7 @@ Bonmin/src/Interfaces/BonStrongBranchingSolver.hpp -text
 Bonmin/src/Interfaces/BonTMINLP.cpp -text
 Bonmin/src/Interfaces/BonTNLPSolver.cpp -text
 Bonmin/src/Interfaces/BonTNLPSolver.hpp -text
+Bonmin/src/Interfaces/BonTypes.hpp -text
 Bonmin/src/Interfaces/Filter/BonBqpdSolver.cpp -text
 Bonmin/src/Interfaces/Filter/BonBqpdSolver.hpp -text
 Bonmin/src/Interfaces/Filter/BonBqpdWarmStart.cpp -text
