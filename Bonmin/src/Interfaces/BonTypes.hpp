@@ -2,7 +2,7 @@
 #define __BonTypes_H_
 #include<vector>
 
-
+namespace Bonmin {
 /** A small wrap around std::vector to give easy access to array for interfacing with fortran code.*/
 template<typename T>
 class vector : public std::vector<T>{
@@ -29,4 +29,7 @@ inline T* operator()(){return &std::vector<T>::front();}
 /** Access pointer to first element of storage.*/
 inline const T* operator()() const {return &std::vector<T>::front();}
 };
+
+}
 #endif
+
