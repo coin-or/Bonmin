@@ -315,6 +315,7 @@ algo_(other.algo_){
       std::cout<<"Change varSelection"<<std::endl;
 #endif
     }
+
     switch (varSelection) {
     case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
     case OsiTMINLPInterface::QP_STRONG_BRANCHING:
@@ -354,6 +355,7 @@ algo_(other.algo_){
       setPriorities();
       addSos();
       branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
+      
       break;
     case OsiTMINLPInterface::OSI_STRONG:
       continuousSolver_->findIntegersAndSOS(false);
@@ -364,8 +366,9 @@ algo_(other.algo_){
     //default:
       //abort();
     }
-    if(branchingMethod_ != NULL)
+    if(branchingMethod_ != NULL){
       branchingMethod_->setNumberStrong(intParam_[NumberStrong]);
+    }
   }  
   
   void 

@@ -15,6 +15,8 @@
 
 namespace Bonmin {
 
+const std::string BonChooseVariable::CNAME = "BonChooseVariable";
+
 BonChooseVariable::BonChooseVariable(BabSetupBase &b):
   OsiChooseStrong(const_cast<OsiTMINLPInterface *>(b.nonlinearSolver())),
   cbc_model_(NULL),
@@ -27,7 +29,9 @@ BonChooseVariable::BonChooseVariable(BabSetupBase &b):
   options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
   options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
   options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
-
+  int sortCrit;
+  options->GetEnumValue("candidate_sort_criterion", sortCrit, "bonmin.");
+  sortCrit_ = (CandidateSortCriterion) sortCrit;
   /** Set values of standard branching options.*/
   int numberObjects = solver_->numberObjects();
   //std::cout<<"Number objects "<<numberObjects<<std::endl;
@@ -43,6 +47,7 @@ BonChooseVariable::BonChooseVariable(BabSetupBase &b):
     numberBeforeTrustedList_ = numberBeforeTrusted;
   }
   options->GetIntegerValue("number_strong_branch_root", numberStrongRoot_, "bonmin.");
+  options->GetIntegerValue("min_number_strong_branch", minNumberStrongBranch_, "bonmin.");
 
 }
 
@@ -54,7 +59,9 @@ BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
   maxmin_crit_have_sol_(rhs.maxmin_crit_have_sol_),
   setup_pseudo_frac_(rhs.setup_pseudo_frac_),
   numberBeforeTrustedList_(rhs.numberBeforeTrustedList_),
-  numberStrongRoot_(rhs.numberStrongRoot_)
+  numberStrongRoot_(rhs.numberStrongRoot_),
+  sortCrit_(rhs.sortCrit_),
+  minNumberStrongBranch_(rhs.minNumberStrongBranch_)
 {
   jnlst_ = rhs.jnlst_;
   bb_log_level_ = rhs.bb_log_level_;
@@ -75,6 +82,8 @@ BonChooseVariable::operator=(const BonChooseVariable & rhs)
     setup_pseudo_frac_ = rhs.setup_pseudo_frac_;
     numberBeforeTrustedList_ = rhs.numberBeforeTrustedList_;
     numberStrongRoot_ = rhs.numberStrongRoot_;
+    sortCrit_ = rhs.sortCrit_;
+    minNumberStrongBranch_ = rhs.minNumberStrongBranch_;
   }
   return *this;
 }
@@ -89,6 +98,42 @@ BonChooseVariable::~BonChooseVariable ()
 {
 }
 
+void
+BonChooseVariable::registerOptions(
+            Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+   roptions->SetRegisteringCategory("Strong branching setup", RegisteredOptions::BonminCategory);
+   roptions->AddStringOption4("candidate_sort_criterion",
+                               "Choice of the criterion to choose candidates in strong-branching",
+                               "best-ps-cost",
+                               "best-ps-cost","Sort by decreasing pseudo-cost",
+                               "worst-ps-cost", "Sort by increasing pseudo-cost",
+                               "most-fractionnal", "Sort by decreasing integer infeasibility",
+                               "least-fractionnal", "Sort by increasing integer infeasibility","");
+
+  roptions->setOptionExtraInfo("candidate_sort_criterion",31); 
+
+  roptions->AddBoundedNumberOption("setup_pseudo_frac", "Proportion of strong branching list that has to be taken from most-integer-infeasible list.",
+				   0., false, 1., false, 0.5);
+  roptions->setOptionExtraInfo("setup_pseudo_frac",31); 
+  roptions->AddBoundedNumberOption("maxmin_crit_no_sol", "Weight towards minimum in of lower and upper branching estimates when no solution has been found yet.",
+				   0., false, 1., false, 0.7);
+  roptions->setOptionExtraInfo("maxmin_crit_no_sol",31); 
+  roptions->AddBoundedNumberOption("maxmin_crit_have_sol", "Weight towards minimum in of lower and upper branching estimates when a solution has been found.",
+				   0., false, 1., false, 0.1);
+  roptions->setOptionExtraInfo("maxmin_crit_have_sol",31); 
+  roptions->AddLowerBoundedIntegerOption("number_before_trust_list",
+					 "Set the number of branches on a variable before its pseudo costs are to be believed during setup of strong branching candidate list.",
+					 -1, 0, "The default value is that of \"number_before_trust\"");
+  roptions->setOptionExtraInfo("number_before_trust_list",31); 
+  roptions->AddLowerBoundedIntegerOption("number_strong_branch_root",
+					 "Maximum number of variables considered for strong branching in root node.",
+					 0, COIN_INT_MAX, "");
+  roptions->setOptionExtraInfo("number_strong_branch_root",31); 
+  
+  roptions->AddLowerBoundedIntegerOption("min_number_strong_branch", "Sets minimum number of variables for strong branching (overriding trust)",
+                                         0, 0,"");
+  roptions->setOptionExtraInfo("min_number_strong_branch",31); 
+}
 void
 BonChooseVariable::computeMultipliers(double& upMult, double& downMult) const
 {
@@ -124,10 +169,12 @@ BonChooseVariable::computeUsefulness(const double MAXMIN_CRITERION,
 				     const OsiObject* object, int i,
 				     double& value2) const
 {
-  double sumUp = pseudoCosts_.upTotalChange()[i]+1.0e-30;
+  // FIXME: Hanlding initialization correctly
   int numberUp = pseudoCosts_.upNumber()[i];
-  double sumDown = pseudoCosts_.downTotalChange()[i]+1.0e-30;
   int numberDown = pseudoCosts_.downNumber()[i];
+  if(sortCrit_ >= DecrPs && sortCrit_ <= IncrPs){//Using pseudo costs
+  double sumUp = pseudoCosts_.upTotalChange()[i]+1.0e-30;
+  double sumDown = pseudoCosts_.downTotalChange()[i]+1.0e-30;
   double upEst = object->upEstimate();
   double downEst = object->downEstimate();
   upEst = numberUp ? ((upEst*sumUp)/numberUp) : (upEst*upMult);
@@ -138,6 +185,14 @@ BonChooseVariable::computeUsefulness(const double MAXMIN_CRITERION,
   //  downEst *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
   double useful = ( MAXMIN_CRITERION*CoinMin(upEst,downEst) +
 		    (1.0-MAXMIN_CRITERION)*CoinMax(upEst,downEst) );
+  if(numberUp == 0 || numberDown == 0){
+    if(value == 0.) useful = 0;
+    else if(MAXMIN_CRITERION >= 0.5)//Sort on max infeasibility
+      useful =  CoinMin(upEst, downEst);
+    else {//Do min infeasibility
+      useful = CoinMax(upEst, downEst);
+    }
+  }
   value2 = -COIN_DBL_MAX;
   if (numberUp   < numberBeforeTrustedList_ ||
       numberDown < numberBeforeTrustedList_) {
@@ -147,6 +202,17 @@ BonChooseVariable::computeUsefulness(const double MAXMIN_CRITERION,
     printf("%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n", i,useful,upEst,downEst,value,value2);
   }
   return useful;
+  }
+  else if(sortCrit_ >= DecrInfeas && sortCrit_ <= IncrInfeas){//Just return infeasibility
+    double usefull = value;
+    value2 = value;
+    return usefull;
+  }
+  else{
+    throw CoinError("BonChooseVariable", "computeUsefullnee", 
+                  "Unknown criterion for soring candidates");
+    return COIN_DBL_MAX;
+  }
 }
 
 int
@@ -168,7 +234,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
     number_not_trusted_=0;
   }
   else {
-    throw -1;
+    throw CoinError(CNAME,"setupList","Should not be called with initialize==false");
   }
   numberOnList_=0;
   numberUnsatisfied_=0;
@@ -330,7 +396,10 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
     for (i=0;i<maximumStrong;i++) {
       if (list_[i]>=0) {
 	list_[numberOnList_]=list_[i];
-	useful_[numberOnList_++]=-useful_[i];
+        if((sortCrit_ & 1) == 0){
+	  useful_[numberOnList_++]=-useful_[i];
+        }
+        else useful_[numberOnList_++] = useful_[i];
 	if (bb_log_level_>4) {
 	  printf("list_[%3d] = %3d useful_[%3d] = %e\n",numberOnList_-1,list_[numberOnList_-1],numberOnList_-1,useful_[numberOnList_-1]);
 	}
@@ -428,8 +497,9 @@ BonChooseVariable::chooseVariable(
   // beginning with fixVariables set to true.  This is then the root
   // node.
   bool isRoot = isRootNode(info);
-  if (!isRoot) {
-    numberStrongRoot_ = numberStrong_;
+  int numberStrong = numberStrong_;
+  if (isRoot) {
+    numberStrong = CoinMax(numberStrong_, numberStrongRoot_);
   }
   if (numberUnsatisfied_) {
     const double* upTotalChange = pseudoCosts_.upTotalChange();
@@ -437,7 +507,7 @@ BonChooseVariable::chooseVariable(
     const int* upNumber = pseudoCosts_.upNumber();
     const int* downNumber = pseudoCosts_.downNumber();
     int numberBeforeTrusted = pseudoCosts_.numberBeforeTrusted();
-    int numberLeft = CoinMin(numberStrongRoot_-numberStrongDone_,numberUnsatisfied_);
+    int numberLeft = CoinMin(numberStrong -numberStrongDone_,numberUnsatisfied_);
     int numberToDo=0;
     resetResults(numberLeft);
     int returnCode=0;
@@ -449,6 +519,7 @@ BonChooseVariable::chooseVariable(
     for (int i=0;i<numberLeft;i++) {
       int iObject = list_[i];
       if (numberBeforeTrusted<0||
+          i < minNumberStrongBranch_ ||
 	  (only_pseudo_when_trusted_ && number_not_trusted_>0) ||
 	  !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
 		      downNumber[iObject]<numberBeforeTrusted )||
@@ -562,6 +633,8 @@ BonChooseVariable::chooseVariable(
     if ( bestObjectIndex_ >=0 ) {
       OsiObject * obj = solver->objects()[bestObjectIndex_];
       obj->setWhichWay(	bestWhichWay_);
+      printf("Branched on variable %i, bestWhichWay: %i\n",
+              obj->columnNumber(), bestWhichWay_); 
     }
     if (bb_log_level_>4) {
       printf("           Choosing %d\n", bestObjectIndex_);

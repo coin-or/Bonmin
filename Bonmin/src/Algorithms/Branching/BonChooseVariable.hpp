@@ -22,6 +22,14 @@ namespace Bonmin {
 */
 
 class BonChooseVariable : public OsiChooseStrong  {
+  protected:
+  /** Criterion applied to sort candidates.*/
+  enum CandidateSortCriterion {
+    DecrPs = 0,
+    IncrPs,
+    DecrInfeas,
+    IncrInfeas};
+
   /** Statuses for strong branching candidates.*/
   enum StrongStatus{
     NotDone=-1,
@@ -59,6 +67,8 @@ public:
 
   /// Destructor
   virtual ~BonChooseVariable ();
+
+  static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
   /** Helper functions for setupList and chooseVariable */
   double maxminCrit(const OsiBranchingInformation* info) const;
@@ -163,10 +173,17 @@ private:
   int numberStrongRoot_;
   /** backup of numberStrong_ before Root node solve */
   int numberStrongBackup_;
+  /** Criterion to use in setup list.*/
+  CandidateSortCriterion sortCrit_;
+  /** Always strong branch that many first candidate in the list regardless of numberTrusted.*/
+  int minNumberStrongBranch_; 
   //@}
 
   /** detecting if this is root node */
   bool isRootNode(const OsiBranchingInformation *info) const;
+
+   /** Stores the class name for throwing errors.*/
+   static const std::string CNAME;
 };
 
 }

@@ -59,6 +59,10 @@ namespace Bonmin{
     /** Access number objects.*/
     inline int numberObjects() const{
       return numberObjects_;}
+   
+    /** Add a pseudo cost information.*/
+    void addInfo(int way, double originalObj, double originalInfeas,
+                 double newObj, double newInfeas, int status); 
 
   };
 

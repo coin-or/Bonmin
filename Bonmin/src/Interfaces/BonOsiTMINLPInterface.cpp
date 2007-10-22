@@ -1995,8 +1995,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
       }
     }
     else {
-      rowLow[i] = (rowLower[i]);
-      rowUp[i] =  (rowUpper[i]);
+      rowLow[i] = (rowLower[i] - g[i]);
+      rowUp[i] =  (rowUpper[i] - g[i]);
     }
   }
 
@@ -2016,6 +2016,11 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
           rowUp[jRow_[i]] += jValues_[i] *x[jCol_[i]];
        }
     }
+    else {
+      double value = jValues_[i] * getColSolution()[jCol_[i]];
+      rowLow[jRow_[i]] += value;
+      rowUp[jRow_[i]] += value;
+    } 
   }
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
   mat.setDimensions(m,n); // In case matrix was empty, this should be enough

@@ -203,7 +203,6 @@ namespace Bonmin {
                                                    maxDiveDepth_(rhs.maxDiveDepth_),
                                                    mode_(rhs.mode_){
   }
-
     /// Assignment operator.
   CbcDfsDiver & 
   CbcDfsDiver::operator=(const CbcDfsDiver &rhs){
