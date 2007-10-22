@@ -107,8 +107,8 @@ BonChooseVariable::registerOptions(
                                "best-ps-cost",
                                "best-ps-cost","Sort by decreasing pseudo-cost",
                                "worst-ps-cost", "Sort by increasing pseudo-cost",
-                               "most-fractionnal", "Sort by decreasing integer infeasibility",
-                               "least-fractionnal", "Sort by increasing integer infeasibility","");
+                               "most-fractional", "Sort by decreasing integer infeasibility",
+                               "least-fractional", "Sort by increasing integer infeasibility","");
 
   roptions->setOptionExtraInfo("candidate_sort_criterion",31); 
 
