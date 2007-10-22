@@ -383,7 +383,7 @@ public:
     void send_one_SB_data(int fix_size, int changeType, int objInd, int colInd,
 			  double solval, double bd, int pid);
     void solve_first_candidate(OsiBranchingInformation& branchInfo,
-			       OsiSolverInterface* solver);
+			       OsiSolverInterface* solver, int downUp);
     int send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
 				     OsiSolverInterface* solver,
 				     const int* pids, const int pidNum);

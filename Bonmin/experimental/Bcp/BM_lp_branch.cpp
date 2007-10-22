@@ -439,25 +439,41 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
    the nlp solver in BM_lp */
 void
 BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
-			     OsiSolverInterface* solver)
+			     OsiSolverInterface* solver, int downUp)
 {
   BM_SB_result& sbres = sbResult_[infInd_[0]];
   sbres.objInd = infInd_[0];
   const int ind = solver->object(infInd_[0])->columnNumber();
   const double val = branchInfo.solution_[ind];
-  const double old_bd = solver->getColUpper()[ind];
-  solver->setColUpper(ind, floor(val));
-  solver->resolve();
-  sbres.branchEval |= 1;
-  sbres.status[0] =
-    (solver->isAbandoned()           ? BCP_Abandoned : 0) |
-    (solver->isProvenOptimal()       ? BCP_ProvenOptimal : 0) |
-    (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
-  sbres.objval[0] =
-    (sbres.status[0] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
-  sbres.iter[0] = solver->getIterationCount();
-  sbres.varChange[0] = val - floor(val);
-  solver->setColUpper(ind, old_bd);
+  if (downUp == 0) {
+    const double old_bd = solver->getColUpper()[ind];
+    solver->setColUpper(ind, floor(val));
+    solver->resolve();
+    sbres.branchEval |= 1;
+    sbres.status[0] =
+      (solver->isAbandoned()           ? BCP_Abandoned : 0) |
+      (solver->isProvenOptimal()       ? BCP_ProvenOptimal : 0) |
+      (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
+    sbres.objval[0] =
+      (sbres.status[0] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
+    sbres.iter[0] = solver->getIterationCount();
+    sbres.varChange[0] = val - floor(val);
+    solver->setColUpper(ind, old_bd);
+  } else {
+    const double old_bd = solver->getColLower()[ind];
+    solver->setColLower(ind, ceil(val));
+    solver->resolve();
+    sbres.branchEval |= 2;
+    sbres.status[1] =
+      (solver->isAbandoned()           ? BCP_Abandoned : 0) |
+      (solver->isProvenOptimal()       ? BCP_ProvenOptimal : 0) |
+      (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
+    sbres.objval[1] =
+      (sbres.status[1] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
+    sbres.iter[1] = solver->getIterationCount();
+    sbres.varChange[1] = ceil(val) - val;
+    solver->setColLower(ind, old_bd);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -693,10 +709,14 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
   bm_buf.unpack(pids, pidNum);
 
   clear_SB_results();
-  if (pidNum >= 1) {
+  // FIXME: This test will have to be changed to >= 1
+  if (pidNum >= 0) {
     pidNum = send_data_for_distributed_SB(branchInfo, solver, pids, pidNum);
     // While the others are working, initialize the result array
-    solve_first_candidate(branchInfo, solver);
+    solve_first_candidate(branchInfo, solver, 0);
+    if (pidNum == 0) {
+      solve_first_candidate(branchInfo, solver, 1);
+    }
     while (pidNum > 0) {
       receive_distributed_SB_result();
       --pidNum;
