@@ -18,6 +18,7 @@
 
 static bool ifprint = true;
 static bool ifprint2 = false;
+static bool ifprint3 = false;
 // #define BM_PRINT_DATA
 
 //#############################################################################
@@ -673,7 +674,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
   const int ind = object->columnNumber();
   bestSbResult_ = sbResult_ + infInd_[best];
-  print(true,
+  print(ifprint3,
 	"LP: Branch var: %i, val: %lf, obj0: %lf, obj1: %lf, way: %i\n",
 	ind, branchInfo.solution_[ind], bestSbResult_->objval[0],
 	bestSbResult_->objval[1], bestWhichWay);
