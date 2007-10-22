@@ -673,7 +673,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
   const int ind = object->columnNumber();
   bestSbResult_ = sbResult_ + infInd_[best];
-  print(ifprint2,
+  print(true,
 	"LP: Branch var: %i, val: %lf, obj0: %lf, obj1: %lf, way: %i\n",
 	ind, branchInfo.solution_[ind], bestSbResult_->objval[0],
 	bestSbResult_->objval[1], bestWhichWay);
@@ -711,7 +711,9 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
   clear_SB_results();
   // FIXME: This test will have to be changed to >= 1
   if (pidNum >= 0) {
-    pidNum = send_data_for_distributed_SB(branchInfo, solver, pids, pidNum);
+    if (pidNum > 0) {
+      pidNum = send_data_for_distributed_SB(branchInfo, solver, pids, pidNum);
+    }
     // While the others are working, initialize the result array
     solve_first_candidate(branchInfo, solver, 0);
     if (pidNum == 0) {
