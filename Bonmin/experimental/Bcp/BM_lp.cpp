@@ -35,7 +35,8 @@ BM_lp::BM_lp() :
     feasInd_(NULL),
     feasUseful_(NULL),
     feasNum_(0),
-    sbResult_(NULL)
+    sbResult_(NULL),
+    bestSbResult_(NULL)
 {
 }
 

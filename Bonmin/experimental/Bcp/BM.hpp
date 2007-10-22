@@ -290,6 +290,8 @@ class BM_lp : public BCP_lp_user
   /** This is where we keep the results in case of distributed strong
       branching. The length of the array is objNum_ */
   BM_SB_result* sbResult_;
+  /** A pointer to the entry that got selected */
+  BM_SB_result* bestSbResult_;
       
   /** Class for collecting statistics */
   BM_stats bm_stats;

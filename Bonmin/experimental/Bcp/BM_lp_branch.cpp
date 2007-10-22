@@ -654,8 +654,12 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   // At this point best is not -1, create the branching object
   const OsiObject * object = solver->object(infInd_[best]);
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
-  print(ifprint2, "Branched on variable %i, bestWhichWay: %i\n",
-	 object->columnNumber(), bestWhichWay);
+  const int ind = object->columnNumber();
+  bestSbResult_ = sbResult_ + infInd_[best];
+  print(ifprint2,
+	"LP: Branch var: %i, val: %lf, obj0: %lf, obj1: %lf, way: %i\n",
+	ind, branchInfo.solution_[ind], bestSbResult_->objval[0],
+	bestSbResult_->objval[1], bestWhichWay);
 
   return (fixedStat & 1) != 0 ? -1 : 0;
 }
@@ -834,6 +838,13 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       }
       BCP_lp_integer_branching_object o(intBrObj);
       cands.push_back(new BCP_lp_branching_object(o, order));
+      BCP_vec<double> lb(2, 0.0);
+      lb[0] = bestSbResult_->objval[order[0]];
+      lb[1] = bestSbResult_->objval[order[1]];
+      BCP_vec<int> tc(2, 0);
+      tc[0] = bestSbResult_->status[order[0]];
+      tc[1] = bestSbResult_->status[order[1]];
+      cands.back()->set_presolve_result(lb, tc);
       if (par.entry(BM_par::PrintBranchingInfo)) {
 	print(ifprint2, "BM_lp: branching on variable %i   value: %f\n",
 	       intBrObj->originalObject()->columnNumber(),
@@ -849,6 +860,13 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       }
       BCP_lp_sos_branching_object o(sosBrObj);
       cands.push_back(new BCP_lp_branching_object(nlp, o, order));
+      BCP_vec<double> lb(2, 0.0);
+      lb[0] = bestSbResult_->objval[order[0]];
+      lb[1] = bestSbResult_->objval[order[1]];
+      BCP_vec<int> tc(2, 0);
+      tc[0] = bestSbResult_->status[order[0]];
+      tc[1] = bestSbResult_->status[order[1]];
+      cands.back()->set_presolve_result(lb, tc);
       if (par.entry(BM_par::PrintBranchingInfo)) {
 	print(ifprint2, "BM_lp: branching on SOS %i   value: %f\n",
 	       sosBrObj->originalObject()->columnNumber(),
