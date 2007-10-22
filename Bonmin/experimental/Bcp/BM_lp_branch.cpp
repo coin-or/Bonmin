@@ -340,6 +340,7 @@ BM_lp::clear_SB_results()
   for (int i = 0; i < objNum_; ++i) {
     sbResult_[i].branchEval = 0;
   }
+  bestSbResult_ = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -691,10 +692,10 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
   int pidNum;
   bm_buf.unpack(pids, pidNum);
 
+  clear_SB_results();
   if (pidNum >= 1) {
     pidNum = send_data_for_distributed_SB(branchInfo, solver, pids, pidNum);
     // While the others are working, initialize the result array
-    clear_SB_results();
     solve_first_candidate(branchInfo, solver);
     while (pidNum > 0) {
       receive_distributed_SB_result();
@@ -838,13 +839,15 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       }
       BCP_lp_integer_branching_object o(intBrObj);
       cands.push_back(new BCP_lp_branching_object(o, order));
-      BCP_vec<double> lb(2, 0.0);
-      lb[0] = bestSbResult_->objval[order[0]];
-      lb[1] = bestSbResult_->objval[order[1]];
-      BCP_vec<int> tc(2, 0);
-      tc[0] = bestSbResult_->status[order[0]];
-      tc[1] = bestSbResult_->status[order[1]];
-      cands.back()->set_presolve_result(lb, tc);
+      if (bestSbResult_) {
+	BCP_vec<double> lb(2, 0.0);
+	lb[0] = bestSbResult_->objval[order[0]];
+	lb[1] = bestSbResult_->objval[order[1]];
+	BCP_vec<int> tc(2, 0);
+	tc[0] = bestSbResult_->status[order[0]];
+	tc[1] = bestSbResult_->status[order[1]];
+	cands.back()->set_presolve_result(lb, tc);
+      }
       if (par.entry(BM_par::PrintBranchingInfo)) {
 	print(ifprint2, "BM_lp: branching on variable %i   value: %f\n",
 	       intBrObj->originalObject()->columnNumber(),
@@ -860,13 +863,15 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
       }
       BCP_lp_sos_branching_object o(sosBrObj);
       cands.push_back(new BCP_lp_branching_object(nlp, o, order));
-      BCP_vec<double> lb(2, 0.0);
-      lb[0] = bestSbResult_->objval[order[0]];
-      lb[1] = bestSbResult_->objval[order[1]];
-      BCP_vec<int> tc(2, 0);
-      tc[0] = bestSbResult_->status[order[0]];
-      tc[1] = bestSbResult_->status[order[1]];
-      cands.back()->set_presolve_result(lb, tc);
+      if (bestSbResult_) {
+	BCP_vec<double> lb(2, 0.0);
+	lb[0] = bestSbResult_->objval[order[0]];
+	lb[1] = bestSbResult_->objval[order[1]];
+	BCP_vec<int> tc(2, 0);
+	tc[0] = bestSbResult_->status[order[0]];
+	tc[1] = bestSbResult_->status[order[1]];
+	cands.back()->set_presolve_result(lb, tc);
+      }
       if (par.entry(BM_par::PrintBranchingInfo)) {
 	print(ifprint2, "BM_lp: branching on SOS %i   value: %f\n",
 	       sosBrObj->originalObject()->columnNumber(),
