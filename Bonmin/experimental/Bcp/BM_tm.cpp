@@ -285,6 +285,9 @@ BM_tm::init_new_phase(int phase,
   case BCP_DepthFirstSearch:
     candidates = new CoinSearchTree<CoinSearchTreeCompareDepth>;
     break;
+  case BCP_PreferredFirstSearch:
+    candidates = new CoinSearchTree<CoinSearchTreeComparePreferred>;
+    break;
   }
 }
 
