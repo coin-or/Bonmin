@@ -303,6 +303,15 @@ namespace Bonmin
         Index m, Index nele_jac, Index* iRow,
         Index *jCol, Number* values);
 
+    /** compute the value of a single constraint */
+    virtual bool eval_gi(Index n, const Number* x, bool new_x,
+			 Index i, Number& gi);
+    /** compute the structure or values of the gradient for one
+	constraint */
+    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
+			      Index i, Index& nele_grad_gi, Index* jCol,
+			      Number* values);
+
     /** Return the hessian of the
      *  lagrangian. The vectors iRow and jCol only need to be set once
      *  (during the first call). The first call is used to set the

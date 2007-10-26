@@ -439,6 +439,20 @@ namespace Bonmin
         iRow, jCol, values);
   }
 
+
+  bool TMINLP2TNLP::eval_gi(Index n, const Number* x, bool new_x,
+                           Index i, Number& gi)
+  {
+    return tminlp_->eval_gi(n, x, new_x, i, gi);
+  }
+  
+  bool TMINLP2TNLP::eval_grad_gi(Index n, const Number* x, bool new_x,
+                                Index i, Index& nele_grad_gi, Index* jCol,
+                                Number* values)
+  {
+    return tminlp_->eval_grad_gi(n, x, new_x, i, nele_grad_gi, jCol, values);
+  }
+
   void TMINLP2TNLP::finalize_solution(SolverReturn status,
       Index n, const Number* x, const Number* z_L, const Number* z_U,
       Index m, const Number* g, const Number* lambda,
