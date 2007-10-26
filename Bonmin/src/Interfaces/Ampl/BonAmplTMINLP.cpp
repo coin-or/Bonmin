@@ -349,16 +349,16 @@ namespace Bonmin
                  <<id<<" is simple concave and should have only two nonzero elements"<<std::endl;
          exit(ERROR_IN_AMPL_SUFFIXES);
         }
-        if(jCol[0] == yIdx){
-          xIdx = jCol[1];
+        if(jCol[0] - 1== yIdx){
+          xIdx = jCol[1] - 1;
         }
         else{
-             if(jCol[1] != yIdx){//Error in ampl model
+             if(jCol[1] - 1!= yIdx){//Error in ampl model
                std::cout<<"Incorrect suffixes description in ampl model. Constraint with id "
                         <<id<<" : variable marked as y does not appear in the constraint."<<std::endl;
                exit(ERROR_IN_AMPL_SUFFIXES);
              }       
-          xIdx = jCol[0];
+          xIdx = jCol[0] - 1;
         }
 	   numberSimpleConcave++;
      }
