@@ -557,7 +557,7 @@ namespace Bonmin
       DBG_ASSERT(!values);
       nele_grad_gi = 0;
       for (cgrad* cg=Cgrad[i]; cg; cg = cg->next) {
-        jCol[nele_grad_gi++] = cg->varno;
+        jCol[nele_grad_gi++] = cg->varno + 1;
       }
       return true;
     }
