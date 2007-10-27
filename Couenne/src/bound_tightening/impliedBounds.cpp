@@ -7,7 +7,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblem.hpp>
+#include "CouenneProblem.hpp"
 
 //#define DEBUG
 

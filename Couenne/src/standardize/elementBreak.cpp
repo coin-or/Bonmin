@@ -7,12 +7,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneProblemElem.hpp"
-#include "CouenneProblem.hpp"
-
-#include "exprSum.hpp"
-#include "exprGroup.hpp"
-
+#include "expression.hpp"
 
 /// given an element of a sum, check if it is a variable (possibly
 /// with a coefficient) and return its index (and the coefficient) if
@@ -21,9 +16,7 @@
 void elementBreak (expression *arg, int &index, CouNumber &coeff) {
 
   CouNumber oppMulCoe = 1.;
-
   bool isMul = false;
-
   index = -1;
 
   if (arg -> Linearity () <= LINEAR) { 
@@ -33,7 +26,8 @@ void elementBreak (expression *arg, int &index, CouNumber &coeff) {
 
     switch (arg -> code ()) { // check element of sum
 
-    case COU_EXPRCONST: break; // it is a constant, nevermind
+    case COU_EXPRCONST: // it is a constant, nevermind
+      break; 
 
     case COU_EXPRVAR: // it is a simple variable, w
       index = arg -> Index ();
@@ -77,7 +71,9 @@ void elementBreak (expression *arg, int &index, CouNumber &coeff) {
 	index = -1;
 
       break;
-    } // no break outside, there could be some residue from case COU_EXPROPP
+    } 
+      // no break outside, there could be some residue from case
+      // COU_EXPROPP
 
     case COU_EXPRDIV: { // if linear, it must be of the form w/c
 

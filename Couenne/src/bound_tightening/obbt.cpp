@@ -132,5 +132,6 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
   printf (":::::: ---------------------------------\n");
 #endif
 
+  delete warmstart;
   return (nimprov + ni);
 }

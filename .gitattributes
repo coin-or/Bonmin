@@ -20,8 +20,11 @@ Couenne/src/bound_tightening/operators/impliedBounds-exprMul.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprQuad.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprSum.cpp -text
 Couenne/src/bound_tightening/tightenBounds.cpp -text
+Couenne/src/branch/CouObjStats.hpp -text
 Couenne/src/branch/CouenneBranchingObject.cpp -text
 Couenne/src/branch/CouenneBranchingObject.hpp -text
+Couenne/src/branch/CouenneChooseStrong.cpp -text
+Couenne/src/branch/CouenneChooseStrong.hpp -text
 Couenne/src/branch/CouenneChooseVariable.cpp -text
 Couenne/src/branch/CouenneChooseVariable.hpp -text
 Couenne/src/branch/CouenneObject.cpp -text
@@ -38,6 +41,7 @@ Couenne/src/branch/operators/branchExprMul.cpp -text
 Couenne/src/branch/operators/branchExprPow.cpp -text
 Couenne/src/branch/operators/branchExprQuad.cpp -text
 Couenne/src/branch/operators/branchExprSinCos.cpp -text
+Couenne/src/branch/operators/minMaxDelta.cpp -text
 Couenne/src/branch/projections.cpp -text
 Couenne/src/branch/projections.hpp -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
@@ -150,8 +154,10 @@ Couenne/src/readnl/readnl.cpp -text
 Couenne/src/standardize/analyzeSparsity.cpp -text
 Couenne/src/standardize/auxiliarize.cpp -text
 Couenne/src/standardize/constrStandardize.cpp -text
-Couenne/src/standardize/createQuadratic.cpp -text
+Couenne/src/standardize/decomposeTerm.cpp -text
 Couenne/src/standardize/elementBreak.cpp -text
+Couenne/src/standardize/flattenMul.cpp -text
+Couenne/src/standardize/linStandardize.cpp -text
 Couenne/src/standardize/splitAux.cpp -text
 Couenne/src/standardize/standardize.cpp -text
 Couenne/src/standardize/sumStandardize.cpp -text

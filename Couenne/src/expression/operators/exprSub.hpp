@@ -10,9 +10,9 @@
 #ifndef COUENNE_EXPRSUB_HPP
 #define COUENNE_EXPRSUB_HPP
 
-#include <exprOp.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneProblem.hpp>
+#include "exprOp.hpp"
+#include "CouennePrecisions.hpp"
+#include "CouenneProblem.hpp"
 
 /// class for subtraction
 

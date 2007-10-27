@@ -27,7 +27,7 @@
 #define COU_OBBT_CUTOFF_LEVEL 1
 
 // maximum number of obbt iterations
-#define MAX_OBBT_ITER 4
+#define MAX_OBBT_ITER 1
 
 #define LARGE_TOL (LARGE_BOUND / 1e6)
 
@@ -179,6 +179,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	// tighten bounds in Couenne's problem representation
 	problem_ -> Lb (index) = CoinMax (l, problem_ -> Lb (index));
 	problem_ -> Ub (index) = CoinMin (u, problem_ -> Ub (index));
+
+      } else { // body is more than just a variable, but it should be
+	       // linear. If so, generate equivalent linear cut
+
+	// TODO
+
       }
     }
 
@@ -269,7 +275,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       //  at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
       ((info.level <= COU_OBBT_CUTOFF_LEVEL) ||
        // and then with probability inversely proportional to the level
-      (CoinDrand48 () < (double) COU_OBBT_CUTOFF_LEVEL / (info.level + 1)))) {
+      (CoinDrand48 () < pow (2., (double) COU_OBBT_CUTOFF_LEVEL - (info.level + 1))))) {
 
     CouenneSolverInterface *csi = dynamic_cast <CouenneSolverInterface *> (si.clone (true));
 
@@ -307,13 +313,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 #endif
   
   {
-    int ncuts = cs.sizeRowCuts ();
+    int ncuts;
 
-    if (firstcall_ && (ncuts >= 1)) {
-      if (ncuts == 1)
-	printf    ("Couenne: one initial row cut\n");
-      else printf ("Couenne: %d initial row cuts\n", ncuts);
-    }
+    if (firstcall_ && ((ncuts = cs.sizeRowCuts ()) >= 1))
+      printf ("Couenne: %d initial row cuts\n", ncuts);
   }
 
   // end of OBBT //////////////////////////////////////////////////////////////////////

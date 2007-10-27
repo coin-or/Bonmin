@@ -4,12 +4,11 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Base object for variables (to be used in branching)
  *
- * (C) Carnegie-Mellon University, 2006-07. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <stdlib.h>
-
+#include "CoinHelperFunctions.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 #include "CouenneThreeWayBranchObj.hpp"
@@ -17,8 +16,37 @@
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
 
-
 //#define DEBUG
+
+/// global index for CouenneObjects
+//int CouObjStats::Index_;
+
+
+/// Constructor with information for branching point selection strategy
+CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base):
+
+  reference_ (ref),
+  brVarInd_  (-1), 
+  brPts_     (NULL),
+  whichWay_  (BRANCH_NONE),
+  strategy_  (MID_INTERVAL) {
+
+  if (ref -> Type () == VAR) {
+    printf ("Couenne error: CouenneObject cannot be defined on original variables\n");
+    exit (-1);
+  }
+
+  if (base) {
+
+    std::string brtype;
+    base -> options () -> GetStringValue ("branch_pt_select", brtype, "couenne.");
+
+    if      (brtype == "balanced")  strategy_ = BALANCED;
+    else if (brtype == "min-area")  strategy_ = MIN_AREA;
+    else if (brtype == "mid-point") strategy_ = MID_INTERVAL;
+  }
+}
+
 
 /// return difference between current value
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, 
@@ -30,16 +58,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   brVarInd_ = -1;
 
   // infeasibility is always null for linear expressions
-  assert (reference_ -> Image () -> Linearity () > LINEAR);
-      //(reference_ -> Multiplicity () <= 0))
-
-  /*#ifdef DEBUG
-    printf ("infeasibility of a linear CouenneObject? "); 
-    reference_ -> print (); printf (" := ");
-    reference_ -> Image () -> print (); printf ("\n");
-#endif
-    return 0.;
-    }*/
+  assert ((reference_ -> Image () -> Linearity () > LINEAR) && 
+	  (reference_ -> Multiplicity () > 0));
 
   expression::update (const_cast <CouNumber *> (info -> solution_),
 		      const_cast <CouNumber *> (info -> lower_),
@@ -57,8 +77,19 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   if ((delta                           < COUENNE_EPS) || 
       (delta / (1 + fabs (var + expr)) < COUENNE_EPS))
-
+#if BR_TEST_LOG >= 0
+    {
+      if (reference_ -> Image () -> code () == COU_EXPRLOG) {
+	printf ("---- found feasible point on curve: ");
+	reference_ -> print (); printf (" := ");
+	reference_ -> Image () -> print ();
+	printf ("\n");
+      }
+      return 0.;
+    }
+#else
     return 0.;
+#endif
 
   // a nonlinear constraint w = f(x) is violated. The infeasibility
   // is given by something more elaborate than |w-f(x)|, that is, it
@@ -71,8 +102,27 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   // TODO: how to avoid this part of the code when called from
   // CbcModel::setSolution() ?
 
+#if (BR_TEST_LOG >= 0) && BR_TEST_GRAPH
+  {
+    static bool brStats = true;
+    const int NPTS = 300;
+    if (brStats) {
+      brStats = false;
+      double 
+	l = info -> lower_ [BR_TEST_LOG],
+	u = info -> upper_ [BR_TEST_LOG];
+      // draw function on initial (largest) interval
+      for (int i=0; i <= NPTS; i++) {
+	double x = l + (u-l) * (double) i / (double) NPTS;
+	printf ("%10g %10g # brtest\n", x, log (x));
+      }
+      printf (" # brtest\n#m=0,S=0 # brtest\n\n");
+    }
+  }
+#endif
+
   CouNumber improv = reference_ -> Image () -> 
-    selectBranch (reference_, info,             // input parameters
+    selectBranch (this, info,             // input parameters
 		  brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
 
   if (brVarInd_ >= 0) {
@@ -105,11 +155,20 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   // exprDiv, i.e., the only non-unary operators.
 
 #ifdef DEBUG
+#if BR_TEST_LOG >= 0
+  printf ("Inf |%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. [%.10g,%.10g]",
+#else
   printf ("Inf |%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
+#endif
 	  var, expr, 
 	  //	    expression::Lbound (reference_ -> Index ()),
 	  //	    expression::Ubound (reference_ -> Index ()),
-	  fabs (var - expr), delta, whichWay, brVarInd_);
+	  fabs (var - expr), delta, whichWay, brVarInd_
+#if BR_TEST_LOG >= 0
+	  , info -> lower_ [BR_TEST_LOG]
+	  , info -> upper_ [BR_TEST_LOG]
+#endif
+);
   reference_             -> print (std::cout); std::cout << " = ";
   reference_ -> Image () -> print (std::cout); printf ("\n");
 #endif
@@ -216,6 +275,40 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   // AW: We can't do that, way must be used!
 
   // way = whichWay_;
+
+#if (BR_TEST_LOG >= 0) && BR_TEST_GRAPH
+
+  //#define OPT_X0 1.7873085033688871
+    {
+      static bool first = true;
+
+      if (first) {
+	first = false;
+      }
+
+      double 
+	l = info -> lower_ [BR_TEST_LOG],
+	u = info -> upper_ [BR_TEST_LOG];
+      if (//(l <= OPT_X0) && (u >= OPT_X0) &&
+	  (reference_ -> Image () -> code () == COU_EXPRLOG))
+	printf ("#m=1,S=0 # brtest\n\
+%10g %10g # brtest\n\
+%10g %10g # brtest\n\
+%10g %10g # brtest\n\
+%10g %10g # brtest\n\
+%10g %10g # brtest\n\
+ # brtest\n\
+#m=-1,S=0 # brtest\n\
+ # brtest\n",
+		l, log (l), 
+		//		*brPts_, log (*brPts_), 
+		*brPts_, log (*brPts_)-CoinMin(u-*brPts_, *brPts_-l)/2, 
+		*brPts_, log (*brPts_), 
+		*brPts_, log (*brPts_)-CoinMin(u-*brPts_, *brPts_-l)/2, 
+		u, log (u));
+    }
+#endif
+
 
   if (brVarInd_ >= 0) // if applied latest selectBranching
 

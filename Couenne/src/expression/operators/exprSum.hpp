@@ -10,7 +10,7 @@
 #ifndef COUENNE_EXPRSUM_H
 #define COUENNE_EXPRSUM_H
 
-#include <exprOp.hpp>
+#include "exprOp.hpp"
 
 
 /// class sum 

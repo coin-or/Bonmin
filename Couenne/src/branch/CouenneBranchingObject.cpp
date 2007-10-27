@@ -8,10 +8,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CoinHelperFunctions.hpp>
+#include "CoinHelperFunctions.hpp"
 
-#include <CouenneObject.hpp>
-#include <CouenneBranchingObject.hpp>
+#include "CouenneObject.hpp"
+#include "CouenneBranchingObject.hpp"
 
 //#define DEBUG
 
@@ -26,13 +26,16 @@ CouNumber midInterval (CouNumber curr, CouNumber l, CouNumber u) {
 
   CouNumber x = curr;
 
+  if (u < l + COUENNE_EPS)
+    return (0.5 * (l + u));
+
   if      (x<l) x = l;
   else if (x>u) x = u;
 
   CouNumber alpha = CouenneBranchingObject::Alpha (), retval;
  
-  if ((x-l < COUENNE_NEAR_BOUND) ||
-      (u-x < COUENNE_NEAR_BOUND))
+  if ((l > -COUENNE_INFINITY) && ((x-l) / (u-l) < COUENNE_NEAR_BOUND) ||
+      (u <  COUENNE_INFINITY) && ((u-x) / (u-l) < COUENNE_NEAR_BOUND))
     if      (u <   COUENNE_INFINITY)
       if    (l > - COUENNE_INFINITY) retval = alpha * x + (1. - alpha) * (l + u) / 2.;
       else                           retval = -1 + (u<0) ? u*2 : u/2;

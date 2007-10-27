@@ -3,17 +3,13 @@
  * Author:  Pietro Belotti
  * Purpose: return branch selection for 1/x
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include "CoinHelperFunctions.hpp"
 
 #include "exprInv.hpp"
-#include "exprDiv.hpp"
-#include "exprPow.hpp"
-#include "CouennePrecisions.hpp"
-#include "CouenneTypes.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 #include "projections.hpp"
@@ -21,7 +17,7 @@
 
 
 /// generic approach for negative powers (commom with exprInv::selectBranch
-CouNumber negPowSelectBranch (int wi, int ind, 
+CouNumber negPowSelectBranch (const CouenneObject *obj, int ind, 
 			      double * &brpts, 
 			      int &way,
 			      CouNumber k,
@@ -48,6 +44,8 @@ CouNumber negPowSelectBranch (int wi, int ind,
   // 1) bounds include 0: three way branch to exclude 0 (refer to branchExprDiv.cpp)
   // 2) otherwise         two   way branch
 
+  //  int wi = obj -> Reference () -> Index ();
+
   if ((l < 0) && (u > 0)) {
 
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
@@ -71,7 +69,10 @@ CouNumber negPowSelectBranch (int wi, int ind,
     }
 
     powertriplet pt (exponent);
-    xp = (xx0 >= 0) ? powNewton (xx0, yy0, &pt) : -powNewton (-xx0, -yy0, &pt);
+
+    xp = (xx0 >= 0) ? 
+       powNewton (xx0, yy0, &pt) : 
+      -powNewton (-xx0, -yy0, &pt);
 
     x0 -= xp;
     y0 -= safe_pow (xp, 1. / k);
@@ -130,7 +131,7 @@ CouNumber negPowSelectBranch (int wi, int ind,
     return CoinMin (y0 - safe_pow (*brpts, 1. / k), 
 		    projectSeg (x0, y0, l, safe_pow (l, k), 
 				*brpts, safe_pow (*brpts, k), -1)); // distance is exact
-  } 
+  }
 
   if (u > COUENNE_INFINITY) { // l >> +0
 
@@ -144,12 +145,36 @@ CouNumber negPowSelectBranch (int wi, int ind,
 
   // last case: nice finite interval and limited curve
 
-  *brpts = midInterval (x0, l, u);
-  way = TWO_RAND;
-  CouNumber dx = x0 - *brpts,
-            dy = y0 - safe_pow (*brpts, 1. / k);
+  powertriplet ft (k);
 
-  return sqrt (dx*dx + dy*dy); // distance is exact
+  switch (obj -> Strategy ()) {
+
+  case CouenneObject::MIN_AREA:     *brpts = maxHeight   (&ft, x0, y0, l, u); break;
+  case CouenneObject::BALANCED:     *brpts = minMaxDelta (&ft, x0, y0, l, u); break;
+  case CouenneObject::MID_INTERVAL: 
+  default:                          *brpts = midInterval (     x0,     l, u); break;
+  }
+
+  /*
+  // TODO: check if it works with all exponents
+  if (u > l + COUENNE_EPS) {
+
+    powertriplet ft (k);
+    *brpts = maxHeight (&ft, l, u); // min area
+
+    // *brpts = safe_pow ((safe_pow (u,k) - safe_pow (l,k)) / (k * (u-l)), 1/(k-1));
+    // if (u < 0)
+    // *brpts = - *brpts;
+  }
+  else *brpts = midInterval (x0, l, u);
+  */
+
+  way = TWO_RAND;
+
+  x0 -= *brpts;
+  y0 -= safe_pow (*brpts, k);
+
+  return sqrt (x0*x0 + y0*y0); // distance is exact
 }
 
 
@@ -157,14 +182,14 @@ CouNumber negPowSelectBranch (int wi, int ind,
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 
-CouNumber exprInv::selectBranch (expression *w, 
+CouNumber exprInv::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
 				 int &ind, 
 				 double * &brpts, 
 				 int &way) {
 
-  ind    = argument_ -> Index ();
-  int wi = w         -> Index ();
+  ind    = argument_           -> Index ();
+  int wi = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0));
 
@@ -173,5 +198,5 @@ CouNumber exprInv::selectBranch (expression *w,
             l  = info -> lower_    [ind],
             u  = info -> upper_    [ind];
 
-  return negPowSelectBranch (wi, ind, brpts, way, -1, x0, y0, l,  u);
+  return negPowSelectBranch (obj, ind, brpts, way, -1, x0, y0, l,  u);
 }

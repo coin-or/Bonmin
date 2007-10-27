@@ -19,7 +19,7 @@
 
 
 /// generalized procedure for both sine and cosine
-CouNumber trigSelBranch (expression *w, 
+CouNumber trigSelBranch (CouenneObject *obj, 
 			 const OsiBranchingInformation *info,
 			 int &ind, 
 			 double * &brpts, 
@@ -65,9 +65,9 @@ class exprCos: public exprUnary {
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (expression *w, const OsiBranchingInformation *info,
+  CouNumber selectBranch (const CouenneObject *obj, const OsiBranchingInformation *info,
 			  int &ind, double * &brpts, int &way)
-  {return trigSelBranch (w, info, ind, brpts, way, COU_COSINE);}
+  {return trigSelBranch (obj, info, ind, brpts, way, COU_COSINE);}
 };
 
 

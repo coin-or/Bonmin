@@ -80,6 +80,12 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
 	p -> AuxSet      () -> insert (w); // 1) beware of useless copies
 	p -> getDepGraph () -> insert (w); // 2) introduce it in acyclic structure
 
+#ifdef DEBUG
+	printf ("now replacing x [%d] with ", wind);
+	w -> print (); printf (" := ");
+	w -> Image () -> print (); printf ("\n");
+#endif
+
 	// replace ALL occurrences of original variable (with index
 	// wind) with newly created auxiliary
 	p -> auxiliarize (w);

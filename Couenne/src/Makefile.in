@@ -75,7 +75,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libCouenne_la_LIBADD =
 am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
-	branch/CouenneChooseVariable.cpp branch/getFixVarBinFun.cpp \
+	branch/CouenneChooseVariable.cpp \
+	branch/CouenneChooseStrong.cpp branch/getFixVarBinFun.cpp \
 	branch/projections.cpp branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
@@ -85,6 +86,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	branch/operators/branchExprPow.cpp \
 	branch/operators/branchExprQuad.cpp \
 	branch/operators/branchExprSinCos.cpp \
+	branch/operators/minMaxDelta.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -129,15 +131,16 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp convex/updateBranchInfo.cpp \
-	standardize/createQuadratic.cpp standardize/sumStandardize.cpp \
-	standardize/analyzeSparsity.cpp \
+	standardize/decomposeTerm.cpp standardize/linStandardize.cpp \
+	standardize/sumStandardize.cpp standardize/analyzeSparsity.cpp \
 	standardize/constrStandardize.cpp standardize/elementBreak.cpp \
 	standardize/splitAux.cpp standardize/auxiliarize.cpp \
-	standardize/standardize.cpp problem/problem.cpp \
-	problem/CouenneProblem.cpp problem/problemIO.cpp \
-	problem/writeAMPL.cpp problem/writeGAMS.cpp \
-	problem/constraint.cpp problem/readASLfg.cpp \
-	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
+	standardize/standardize.cpp standardize/flattenMul.cpp \
+	problem/problem.cpp problem/CouenneProblem.cpp \
+	problem/problemIO.cpp problem/writeAMPL.cpp \
+	problem/writeGAMS.cpp problem/constraint.cpp \
+	problem/readASLfg.cpp problem/fillQuadIndices.cpp \
+	problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp bound_tightening/obbt.cpp \
 	bound_tightening/obbt_iter.cpp \
@@ -152,10 +155,11 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo
 am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneBranchingObject.lo CouenneObject.lo \
-	CouenneChooseVariable.lo getFixVarBinFun.lo projections.lo \
-	branchExprAbs.lo branchExprExp.lo branchExprDiv.lo \
-	branchExprInv.lo branchExprLog.lo branchExprMul.lo \
-	branchExprPow.lo branchExprQuad.lo branchExprSinCos.lo \
+	CouenneChooseVariable.lo CouenneChooseStrong.lo \
+	getFixVarBinFun.lo projections.lo branchExprAbs.lo \
+	branchExprExp.lo branchExprDiv.lo branchExprInv.lo \
+	branchExprLog.lo branchExprMul.lo branchExprPow.lo \
+	branchExprQuad.lo branchExprSinCos.lo minMaxDelta.lo \
 	exprAbs.lo exprDiv.lo exprExp.lo exprInv.lo exprLog.lo \
 	exprMul.lo exprOpp.lo exprPow.lo exprSin.lo exprCos.lo \
 	exprSub.lo exprSum.lo exprMinMax.lo exprGroup.lo exprQuad.lo \
@@ -170,14 +174,14 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	conv-exprGroup.lo conv-exprQuad.lo trigNewton.lo \
 	CouenneCutGenerator.lo generateCuts.lo genColCuts.lo \
 	genRowCuts.lo alphaConvexify.lo quadCuts.lo \
-	updateBranchInfo.lo createQuadratic.lo sumStandardize.lo \
-	analyzeSparsity.lo constrStandardize.lo elementBreak.lo \
-	splitAux.lo auxiliarize.lo standardize.lo problem.lo \
-	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
-	constraint.lo readASLfg.lo fillQuadIndices.lo \
-	CouenneSolverInterface.lo depGraph.lo checkCycles.lo \
-	boundTightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
-	impliedBounds.lo impliedBounds-exprSum.lo \
+	updateBranchInfo.lo decomposeTerm.lo linStandardize.lo \
+	sumStandardize.lo analyzeSparsity.lo constrStandardize.lo \
+	elementBreak.lo splitAux.lo auxiliarize.lo standardize.lo \
+	flattenMul.lo problem.lo CouenneProblem.lo problemIO.lo \
+	writeAMPL.lo writeGAMS.lo constraint.lo readASLfg.lo \
+	fillQuadIndices.lo CouenneSolverInterface.lo depGraph.lo \
+	checkCycles.lo boundTightening.lo obbt.lo obbt_iter.lo \
+	tightenBounds.lo impliedBounds.lo impliedBounds-exprSum.lo \
 	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo \
 	impliedBounds-exprQuad.lo drawCuts.lo rootQ.lo \
 	$(am__objects_1)
@@ -368,6 +372,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
@@ -383,7 +388,8 @@ lib_LTLIBRARIES = libCouenne.la
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
-	branch/CouenneChooseVariable.cpp branch/getFixVarBinFun.cpp \
+	branch/CouenneChooseVariable.cpp \
+	branch/CouenneChooseStrong.cpp branch/getFixVarBinFun.cpp \
 	branch/projections.cpp branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
@@ -393,6 +399,7 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	branch/operators/branchExprPow.cpp \
 	branch/operators/branchExprQuad.cpp \
 	branch/operators/branchExprSinCos.cpp \
+	branch/operators/minMaxDelta.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -437,15 +444,16 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp convex/updateBranchInfo.cpp \
-	standardize/createQuadratic.cpp standardize/sumStandardize.cpp \
-	standardize/analyzeSparsity.cpp \
+	standardize/decomposeTerm.cpp standardize/linStandardize.cpp \
+	standardize/sumStandardize.cpp standardize/analyzeSparsity.cpp \
 	standardize/constrStandardize.cpp standardize/elementBreak.cpp \
 	standardize/splitAux.cpp standardize/auxiliarize.cpp \
-	standardize/standardize.cpp problem/problem.cpp \
-	problem/CouenneProblem.cpp problem/problemIO.cpp \
-	problem/writeAMPL.cpp problem/writeGAMS.cpp \
-	problem/constraint.cpp problem/readASLfg.cpp \
-	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
+	standardize/standardize.cpp standardize/flattenMul.cpp \
+	problem/problem.cpp problem/CouenneProblem.cpp \
+	problem/problemIO.cpp problem/writeAMPL.cpp \
+	problem/writeGAMS.cpp problem/constraint.cpp \
+	problem/readASLfg.cpp problem/fillQuadIndices.cpp \
+	problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp bound_tightening/obbt.cpp \
 	bound_tightening/obbt_iter.cpp \
@@ -516,7 +524,9 @@ include_HEADERS = \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
+	branch/CouenneChooseStrong.hpp \
 	branch/projections.hpp \
+	branch/CouObjStats.hpp \
 	expression/operators/exprAbs.hpp \
 	expression/operators/exprExp.hpp \
 	expression/operators/exprInv.hpp \
@@ -635,6 +645,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneBranchingObject.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseStrong.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneObject.Plo@am__quote@
@@ -677,7 +688,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSub.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createQuadratic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/decomposeTerm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depGraph.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elementBreak.Plo@am__quote@
@@ -703,6 +714,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fillQuadIndices.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flattenMul.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genColCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genRowCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
@@ -713,6 +725,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprSum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linStandardize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minMaxDelta.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nl2e.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obbt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obbt_iter.Plo@am__quote@
@@ -784,6 +798,13 @@ CouenneChooseVariable.lo: branch/CouenneChooseVariable.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/CouenneChooseVariable.cpp' object='CouenneChooseVariable.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneChooseVariable.lo `test -f 'branch/CouenneChooseVariable.cpp' || echo '$(srcdir)/'`branch/CouenneChooseVariable.cpp
+
+CouenneChooseStrong.lo: branch/CouenneChooseStrong.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneChooseStrong.lo -MD -MP -MF "$(DEPDIR)/CouenneChooseStrong.Tpo" -c -o CouenneChooseStrong.lo `test -f 'branch/CouenneChooseStrong.cpp' || echo '$(srcdir)/'`branch/CouenneChooseStrong.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CouenneChooseStrong.Tpo" "$(DEPDIR)/CouenneChooseStrong.Plo"; else rm -f "$(DEPDIR)/CouenneChooseStrong.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/CouenneChooseStrong.cpp' object='CouenneChooseStrong.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneChooseStrong.lo `test -f 'branch/CouenneChooseStrong.cpp' || echo '$(srcdir)/'`branch/CouenneChooseStrong.cpp
 
 getFixVarBinFun.lo: branch/getFixVarBinFun.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT getFixVarBinFun.lo -MD -MP -MF "$(DEPDIR)/getFixVarBinFun.Tpo" -c -o getFixVarBinFun.lo `test -f 'branch/getFixVarBinFun.cpp' || echo '$(srcdir)/'`branch/getFixVarBinFun.cpp; \
@@ -861,6 +882,13 @@ branchExprSinCos.lo: branch/operators/branchExprSinCos.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/operators/branchExprSinCos.cpp' object='branchExprSinCos.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o branchExprSinCos.lo `test -f 'branch/operators/branchExprSinCos.cpp' || echo '$(srcdir)/'`branch/operators/branchExprSinCos.cpp
+
+minMaxDelta.lo: branch/operators/minMaxDelta.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT minMaxDelta.lo -MD -MP -MF "$(DEPDIR)/minMaxDelta.Tpo" -c -o minMaxDelta.lo `test -f 'branch/operators/minMaxDelta.cpp' || echo '$(srcdir)/'`branch/operators/minMaxDelta.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/minMaxDelta.Tpo" "$(DEPDIR)/minMaxDelta.Plo"; else rm -f "$(DEPDIR)/minMaxDelta.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/operators/minMaxDelta.cpp' object='minMaxDelta.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o minMaxDelta.lo `test -f 'branch/operators/minMaxDelta.cpp' || echo '$(srcdir)/'`branch/operators/minMaxDelta.cpp
 
 exprAbs.lo: expression/operators/exprAbs.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprAbs.lo -MD -MP -MF "$(DEPDIR)/exprAbs.Tpo" -c -o exprAbs.lo `test -f 'expression/operators/exprAbs.cpp' || echo '$(srcdir)/'`expression/operators/exprAbs.cpp; \
@@ -1233,12 +1261,19 @@ updateBranchInfo.lo: convex/updateBranchInfo.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o updateBranchInfo.lo `test -f 'convex/updateBranchInfo.cpp' || echo '$(srcdir)/'`convex/updateBranchInfo.cpp
 
-createQuadratic.lo: standardize/createQuadratic.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT createQuadratic.lo -MD -MP -MF "$(DEPDIR)/createQuadratic.Tpo" -c -o createQuadratic.lo `test -f 'standardize/createQuadratic.cpp' || echo '$(srcdir)/'`standardize/createQuadratic.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/createQuadratic.Tpo" "$(DEPDIR)/createQuadratic.Plo"; else rm -f "$(DEPDIR)/createQuadratic.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='standardize/createQuadratic.cpp' object='createQuadratic.lo' libtool=yes @AMDEPBACKSLASH@
+decomposeTerm.lo: standardize/decomposeTerm.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT decomposeTerm.lo -MD -MP -MF "$(DEPDIR)/decomposeTerm.Tpo" -c -o decomposeTerm.lo `test -f 'standardize/decomposeTerm.cpp' || echo '$(srcdir)/'`standardize/decomposeTerm.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/decomposeTerm.Tpo" "$(DEPDIR)/decomposeTerm.Plo"; else rm -f "$(DEPDIR)/decomposeTerm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='standardize/decomposeTerm.cpp' object='decomposeTerm.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o createQuadratic.lo `test -f 'standardize/createQuadratic.cpp' || echo '$(srcdir)/'`standardize/createQuadratic.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o decomposeTerm.lo `test -f 'standardize/decomposeTerm.cpp' || echo '$(srcdir)/'`standardize/decomposeTerm.cpp
+
+linStandardize.lo: standardize/linStandardize.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT linStandardize.lo -MD -MP -MF "$(DEPDIR)/linStandardize.Tpo" -c -o linStandardize.lo `test -f 'standardize/linStandardize.cpp' || echo '$(srcdir)/'`standardize/linStandardize.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/linStandardize.Tpo" "$(DEPDIR)/linStandardize.Plo"; else rm -f "$(DEPDIR)/linStandardize.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='standardize/linStandardize.cpp' object='linStandardize.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o linStandardize.lo `test -f 'standardize/linStandardize.cpp' || echo '$(srcdir)/'`standardize/linStandardize.cpp
 
 sumStandardize.lo: standardize/sumStandardize.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT sumStandardize.lo -MD -MP -MF "$(DEPDIR)/sumStandardize.Tpo" -c -o sumStandardize.lo `test -f 'standardize/sumStandardize.cpp' || echo '$(srcdir)/'`standardize/sumStandardize.cpp; \
@@ -1288,6 +1323,13 @@ standardize.lo: standardize/standardize.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='standardize/standardize.cpp' object='standardize.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o standardize.lo `test -f 'standardize/standardize.cpp' || echo '$(srcdir)/'`standardize/standardize.cpp
+
+flattenMul.lo: standardize/flattenMul.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT flattenMul.lo -MD -MP -MF "$(DEPDIR)/flattenMul.Tpo" -c -o flattenMul.lo `test -f 'standardize/flattenMul.cpp' || echo '$(srcdir)/'`standardize/flattenMul.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/flattenMul.Tpo" "$(DEPDIR)/flattenMul.Plo"; else rm -f "$(DEPDIR)/flattenMul.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='standardize/flattenMul.cpp' object='flattenMul.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o flattenMul.lo `test -f 'standardize/flattenMul.cpp' || echo '$(srcdir)/'`standardize/flattenMul.cpp
 
 problem.lo: problem/problem.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT problem.lo -MD -MP -MF "$(DEPDIR)/problem.Tpo" -c -o problem.lo `test -f 'problem/problem.cpp' || echo '$(srcdir)/'`problem/problem.cpp; \

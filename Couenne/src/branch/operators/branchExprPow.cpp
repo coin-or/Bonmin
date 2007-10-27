@@ -10,16 +10,15 @@
 #include "CoinHelperFunctions.hpp"
 
 #include "exprPow.hpp"
-#include "CouennePrecisions.hpp"
-#include "CouenneTypes.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 
 #include "projections.hpp"
 #include "funtriplets.hpp"
 
+
 /// generic approach for negative powers (commom with exprInv::selectBranch
-CouNumber negPowSelectBranch (int wi, int ind, 
+CouNumber negPowSelectBranch (const CouenneObject *obj, int ind, 
 			      double * &brpts, 
 			      int &way,
 			      CouNumber k,
@@ -29,7 +28,7 @@ CouNumber negPowSelectBranch (int wi, int ind,
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
-CouNumber exprPow::selectBranch (expression *w, 
+CouNumber exprPow::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 int &ind, 
 				 double * &brpts, 
@@ -38,8 +37,8 @@ CouNumber exprPow::selectBranch (expression *w,
   // return branching point and branching policies for an expression
   // of the form x^k
 
-  ind    = arglist_ [0] -> Index ();
-  int wi = w            -> Index ();
+  ind    = arglist_ [0]        -> Index ();
+  int wi = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0) && (arglist_ [1] -> Type () == CONST));
 
@@ -53,7 +52,7 @@ CouNumber exprPow::selectBranch (expression *w,
   // case 1: k negative, resort to method similar to exprInv:: ///////////////////////////////
 
   if (k<0)
-    return negPowSelectBranch (wi, ind, brpts, way, k, x0, y0, l, u);
+    return negPowSelectBranch (obj, ind, brpts, way, k, x0, y0, l, u);
 
   int intk = 0;
 
@@ -65,7 +64,7 @@ CouNumber exprPow::selectBranch (expression *w,
   if (isInt && !(intk % 2)) {
 
     if ((l < - COUENNE_INFINITY) && 
-	(u >   COUENNE_INFINITY)) {
+	(u >   COUENNE_INFINITY)) { // infinite bounds
 
       if (y0 < pow (x0, k)) { // good side
 
@@ -73,63 +72,96 @@ CouNumber exprPow::selectBranch (expression *w,
 	powertriplet pt (k);
 	*brpts = powNewton (x0, y0, &pt);
 
-	way = (x0 < 0) ? TWO_RIGHT : TWO_LEFT;	
+	way = (x0 > 0) ? TWO_RIGHT : TWO_LEFT; // priority to same side as x0
 
 	x0 -= *brpts;
 	y0 -= pow (*brpts, k);
 
-	return sqrt (x0*x0 + y0 * y0);
+	return sqrt (x0*x0 + y0 * y0); // exact distance
 
-      } else { // on the bad side
-
-	double xp = pow (y0, 1./k);
-
-	brpts = (double *) realloc (brpts, 2 * sizeof (double));
-	brpts [0] = 0.5 * (x0 - xp);
-	brpts [1] = 0.5 * (x0 + xp);
-
-	way = THREE_CENTER;
-
-	return CoinMin (x0 - brpts [0], 
-			CoinMin (brpts [1] - x0, 
-				 projectSeg (x0, y0, 
-					     brpts [0], pow (brpts [0], k),
-					     brpts [1], pow (brpts [1], k), -1)));
       }
 
-      // no bounds on x
-      /*
-      double alpha = pow ((y0 + pow (x0, k))/2, 1./k),
-             yroot = pow (y0, 1./k);
+      // on the bad side
+
+      double xp = pow (y0, 1./k);
 
       brpts = (double *) realloc (brpts, 2 * sizeof (double));
+      brpts [0] = 0.5 * (x0 - xp);
+      brpts [1] = 0.5 * (x0 + xp);
 
+      way = THREE_CENTER;
+
+      return CoinMin (x0 - brpts [0], 
+		      CoinMin (brpts [1] - x0, 
+			       projectSeg (x0, y0, 
+					   brpts [0], pow (brpts [0], k),
+					   brpts [1], pow (brpts [1], k), -1)));
+      // no bounds on x
+      /*      double alpha = pow ((y0 + pow (x0, k))/2, 1./k),
+             yroot = pow (y0, 1./k);
+      brpts = (double *) realloc (brpts, 2 * sizeof (double));
       double lambdaL = (-x0 / yroot), lambdaR = 0;
-
       if (lambdaL < 0) {
 	lambdaR = -lambdaL;
 	lambdaL = 0;
       }
-
       CouNumber // approx distance
 	b0 = brpts [0] = -alpha + lambdaL * (alpha - yroot),
 	b1 = brpts [1] =  alpha + lambdaR * (yroot - alpha);
-
       way = THREE_CENTER;
-
       return CoinMin (projectSeg (x0, y0, b0, pow (b0, k), b1, pow (b1, k), -1), 
-		      CoinMin (x0 - b0, b1 - x0));
-      */
-    } else {
-
-      brpts = (double *) realloc (brpts, sizeof (double));
-      *brpts = midInterval (x0, l, u);
-      way = 
-	(l < - COUENNE_INFINITY) ? TWO_RIGHT : 
-	(u >   COUENNE_INFINITY) ? TWO_LEFT  : TWO_RAND;
-
-      return fabs (y0 - pow (x0, k)); // not an exact measure
+		      CoinMin (x0 - b0, b1 - x0));      */
     }
+
+    // at least one bound is finite //////////////////////////////////////////////
+
+    brpts = (double *) realloc (brpts, sizeof (double));
+
+    if (l < -COUENNE_INFINITY) {
+
+      *brpts = - safe_pow (y0, 1. / k);
+      way = TWO_RIGHT;
+      return CoinMin (x0 - *brpts, 
+		      projectSeg (x0,     y0, 
+				  *brpts, safe_pow (*brpts, k), 
+				  u,      safe_pow (u, k), -1));
+    }
+
+    if (u >  COUENNE_INFINITY) {
+
+      *brpts = safe_pow (y0, 1. / k);
+      way = TWO_LEFT;
+      return CoinMin (*brpts - x0,
+		      projectSeg (x0,     y0, 
+				  l,      safe_pow (l, k),
+				  *brpts, safe_pow (*brpts, k), -1));
+    } 
+
+    powertriplet ft (k);
+    *brpts = maxHeight (&ft, x0, y0, l, u);
+
+    way = (x0 < *brpts) ? TWO_LEFT : TWO_RIGHT;
+
+    /*
+    w -> print (); printf (" := "); dynamic_cast <exprAux *> (w) -> Image () -> print ();
+    printf (" (%g,%g) [%g,%g] --> %g, distances = %g,%g\n",
+	    x0, y0, l, u, *brpts,
+	    projectSeg (x0, y0, l,      safe_pow (l,k), *brpts, safe_pow (*brpts,k), 0),
+	    projectSeg (x0, y0, *brpts, safe_pow (*brpts,k),      u, safe_pow (u,k), 0));
+    */
+
+    // Min area  -- exact distance
+    return CoinMin (projectSeg (x0, y0, l,      safe_pow (l,k), *brpts, safe_pow (*brpts,k), 0),
+		    projectSeg (x0, y0, *brpts, safe_pow (*brpts,k),      u, safe_pow (u,k), 0));
+
+    /*      brpts = (double *) realloc (brpts, sizeof (double));
+     *brpts = midInterval (x0, l, u);
+     way = 
+     (l < - COUENNE_INFINITY) ? TWO_RIGHT : 
+     (u >   COUENNE_INFINITY) ? TWO_LEFT  : TWO_RAND;
+
+     return fabs (y0 - pow (x0, k)); // not an exact measure
+    */
   }
 
   // from here on, we use two-way branch
@@ -165,9 +197,13 @@ CouNumber exprPow::selectBranch (expression *w,
 
     // otherwise, the convexification is surely bounded. 
     //
-    // Here the right branching point may make a difference,
-    // for instance in minimizing the areas of the convexifications
-    // after branching
+    // apply minarea
+
+    if (u > l + COUENNE_EPS) {
+      *brpts = safe_pow ((safe_pow (u, k) - safe_pow (l,k)) / (k* (u-l)), 1./(k-1.));
+      if (u<0) 
+	*brpts = -*brpts;
+    }
   }
 
 
@@ -177,7 +213,7 @@ CouNumber exprPow::selectBranch (expression *w,
 
     way = (x0 > 0) ? TWO_RIGHT : TWO_LEFT;
 
-    if ((l < - COUENNE_INFINITY) && (u > COUENNE_INFINITY) || // [-inf,+inf[
+    if ((l < - COUENNE_INFINITY) && (u > COUENNE_INFINITY) || // ]-inf,+inf[
 	(l < - COUENNE_INFINITY) && (y0 < pow0)            ||
 	(u >   COUENNE_INFINITY) && (y0 > pow0)){ 
 
@@ -199,9 +235,13 @@ CouNumber exprPow::selectBranch (expression *w,
 
     // otherwise, the convexification is bounded.
     //
-    // Here is where the right branching point may make a difference,
-    // for instance in minimizing the areas of the convexifications
-    // after branching
+    // Apply min-area convexification
+
+    if (u > l + COUENNE_EPS) {
+      *brpts = safe_pow ((safe_pow (u, k) - safe_pow (l,k)) / (k* (u-l)), 1./(k-1.));
+      if (u<0) 
+	*brpts = -*brpts;
+    }
   }
 
   if (k>1) { // case 5: k>1 /////////////////////////////////////////////////////////////////
@@ -273,8 +313,8 @@ CouNumber exprPow::selectBranch (expression *w,
     }
   }
 
-  // failsafe: return null index, so that CouenneObject::infeasibility
-  // () picks the default variable/branchingpoint for the expression
+  // failsafe: return null index, so that CouenneObject::infeasibility()
+  // picks the default variable/branchingpoint for the expression
 
   ind = -1;
   return 0.;

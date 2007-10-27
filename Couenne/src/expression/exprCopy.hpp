@@ -15,6 +15,7 @@
 #include <CouenneTypes.hpp>
 #include <expression.hpp>
 
+class CouenneObject;
 
 // expression copy (points to VALUE of another expression) 
 
@@ -161,12 +162,12 @@ class exprCopy: public expression {
 
   /// Set up branching object by evaluating many branching points for each expression's arguments.
   /// Return estimated improvement in objective function 
-  virtual CouNumber selectBranch (expression *w,
+  virtual CouNumber selectBranch (const CouenneObject *obj,
 				  const OsiBranchingInformation *info,
 				  int     &ind,
 				  double *&brpts,
 				  int     &way) 
-  {return copy_ -> selectBranch (w, info, ind, brpts, way);}
+  {return copy_ -> selectBranch (obj, info, ind, brpts, way);}
 
   /// replace occurrence of a variable with another variable
   void replace (exprVar *, exprVar *);

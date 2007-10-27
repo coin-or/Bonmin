@@ -8,9 +8,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CoinHelperFunctions.hpp>
-#include <exprQuad.hpp>
 #include <set>
+
+#include "CoinHelperFunctions.hpp"
+#include "exprQuad.hpp"
 
 //#define DEBUG
 

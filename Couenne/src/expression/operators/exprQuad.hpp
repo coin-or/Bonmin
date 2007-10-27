@@ -244,7 +244,7 @@ class exprQuad: public exprGroup {
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
-  virtual CouNumber selectBranch (expression *, const OsiBranchingInformation *,
+  virtual CouNumber selectBranch (const CouenneObject *, const OsiBranchingInformation *,
 				  int &, double * &, int &);
 
   /// Fill dependence set of the expression associated with this

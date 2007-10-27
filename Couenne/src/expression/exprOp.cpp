@@ -7,16 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <string>
-#include <string.h>
-
 #include <CouenneProblem.hpp>
 
-#include <CouenneTypes.hpp>
 #include <expression.hpp>
 #include <exprAux.hpp>
 #include <exprOp.hpp>
-#include <exprUnary.hpp>
 #include <exprGroup.hpp>
 #include <exprQuad.hpp>
 
@@ -156,20 +151,28 @@ exprAux *exprOp::standardize (register CouenneProblem *p, bool addAux) {
 /// replace variable x with new (aux) w
 void exprOp::replace (exprVar *x, exprVar *w) {
 
-  /*printf ("replacing "); fflush (stdout);
-  x -> print (); printf (" with "); fflush (stdout);
-  w -> print (); printf (" in "); fflush (stdout);
-  print (); fflush (stdout); printf ("\n");*/
+  expression **al = arglist_;
+  int index = x -> Index ();
 
-  register expression **al = arglist_;
+  for (register int i = nargs_; i--; al++)
 
-  for (register int i=nargs_; i--; al++)
-    if ((*al) -> Type () == VAR) {
-      if ((*al) -> Index () == x -> Index ()) {
+    switch ((*al) -> Type () == VAR) {
+
+    case VAR:
+      if ((*al) -> Index () == index) {
 	delete *al;
 	*al = new exprClone (w);
       }
-    } else (*al) -> replace (x, w);
+      break;
+
+    case UNARY:
+    case N_ARY:
+      (*al) -> replace (x, w);
+      break;
+
+    default:
+      break;
+    }
 }
 
 

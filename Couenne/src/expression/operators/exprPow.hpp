@@ -83,7 +83,7 @@ class exprPow: public exprOp {
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (expression *, const OsiBranchingInformation *,
+  CouNumber selectBranch (const CouenneObject *, const OsiBranchingInformation *,
 			  int &, double * &, int &);
 };
 

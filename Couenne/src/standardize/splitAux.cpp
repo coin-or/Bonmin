@@ -7,7 +7,6 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneProblemElem.hpp"
 #include "CouenneProblem.hpp"
 
 #include "CoinHelperFunctions.hpp"
@@ -69,8 +68,6 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	  (alist [0] -> dependsOn (&auxInd, 1, p, TAG_AND_RECURSIVE) >= 1)) 
 	                        // or, variable depends upon itself
 	return -1;
-
-      //      printf ("no dependence0 %d\n", auxInd);
 
       pos = 1;
     }
@@ -167,7 +164,6 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	alist [i] = new exprConst (0);
 
 	// not enough... check now linear (and quadratic!) terms 
-	//	printf ("no dependence2 %d\n", index);
 
 	if (body -> dependsOn (&index, 1, p, TAG_AND_RECURSIVE) == 0) {
 
@@ -206,8 +202,8 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
       newarglist = new expression * [nargs + 1];
 
-      for (j=0; j<mid;   j++) newarglist [j]   = alist [j];// newarglist [j]->  print ();printf(",");}
-      for (j++; j<nargs; j++) newarglist [j-1] = alist [j];// newarglist [j-1]->print ();printf(";");}
+      for (j=0; j<mid;   j++) newarglist [j]   = alist [j] -> clone ();
+      for (j++; j<nargs; j++) newarglist [j-1] = alist [j] -> clone ();
 
       // nl arglist is done, later decide whether to incorporate it as
       // it is or with a coefficient
@@ -288,8 +284,6 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     printf ("\n::: rhs %g, lin %d, nl %d\n", rhs, nlin, nargs);
 #endif
 
-    ///////////////////////////////////////////////////////////////////////////
-    //
     // all is ready to take the independent stuff to the other side of
     // the inequality.
 
@@ -304,9 +298,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       // 2)  f(x) + c0 + aw = rhs   =====>   w = -1/a (f(x) + c0 - rhs), a != -1
 
       if    (fabs (auxcoe + 1) < COUENNE_EPS)
-	if (code == COU_EXPRGROUP) rest = new exprGroup (c0-rhs, linind2, lincoe2, newarglist, nargs);
-	else                       rest = new exprQuad  (c0-rhs, linind2, lincoe2, 
-							 qindI, qindJ, qcoe, newarglist, nargs);
+	if (code == COU_EXPRGROUP) 
+	  rest    = new exprGroup (c0-rhs, linind2, lincoe2,                     newarglist, nargs);
+	else rest = new exprQuad  (c0-rhs, linind2, lincoe2, qindI, qindJ, qcoe, newarglist, nargs);
       else {
 
 	expression **mullist = new expression * [1];
@@ -383,9 +377,20 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 #ifdef DEBUG
   printf ("standardize rest (2nd level) "); fflush (stdout);
   rest -> print ();
+  printf (" [body = ");
+  body -> print ();
+  printf ("]");
 #endif
 
+  // second argument is false to tell standardize not to create new
+  // auxiliary variable (we just found it, it's  w)
   exprAux *aux = rest -> standardize (p, false);
+
+#ifdef DEBUG
+  printf (" {body = ");
+  body -> print ();
+  printf ("} ");
+#endif
 
   if (aux) {
     rest = aux -> Image () -> clone ();
@@ -395,42 +400,8 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 #ifdef DEBUG
   printf (" ==> ");
   rest -> print ();
-  printf ("\n");
-#endif
-
-
-#if 0
-  printf ("... done, auxind %d\n", auxInd);
-
-  if (aux) {
-
-//    rest = aux -> Image () -> clone ();
-
-//    aux -> decreaseMult ();
-    printf ("... fictitious "); fflush (stdout); aux -> print (); 
-    printf (" := "); aux -> Image () -> print (); 
-
-    // find aux in vector and delete it (otherwise LP relaxation will
-    // count those variables)
-    for (std::vector <exprVar *>:: iterator i = p -> Variables ().begin (); 
-	 i != p -> Variables ().end(); ++i)
-
-      if ((*i) -> Index() == aux -> Index ()) {
-	printf (" fictitious %d to be erased: ", p -> Variables ().size ());
-	(*i)             -> print (); printf (" := ");
-	(*i) -> Image () -> print (); printf ("\n");
-	//	p -> Variables () . erase (i);
-	break;
-      }
-  }
-#endif
-  
-  //  rest = aux -> Image ();
-
-#ifdef DEBUG
   printf (" and "); fflush (stdout);
   rest -> print (); 
-  //printf (", "); fflush (stdout); body -> print (); 
   printf ("\n");
 #endif
 

@@ -62,7 +62,7 @@ class exprAbs: public exprUnary {
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (expression *, const OsiBranchingInformation *,
+  CouNumber selectBranch (const CouenneObject *obj, const OsiBranchingInformation *,
 			  int &, double * &, int &);
 };
 

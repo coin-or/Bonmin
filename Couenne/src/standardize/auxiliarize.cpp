@@ -1,15 +1,16 @@
 /*
  * Name:    constrStandardize.cpp
  * Author:  Pietro Belotti
- * Purpose: standardization of constraints
+ * Purpose: standardization of objective, constraints, defined
+ *          variables, and auxiliary variables
  *
  * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneProblemElem.hpp"
 #include "CouenneProblem.hpp"
 
+//#define DEBUG
 
 /// replace, in all expressions of the problem (auxiliaries,
 /// objectives and constraints) link to an original variable that has
@@ -21,23 +22,26 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
 
   int index = aux -> Index ();
 
-  if (index < 0) {
-    printf ("CouenneProblem::auxiliarize (-1)\n");
-    return;
-  }
+  assert (index >= 0);
 
   std::vector <exprVar *>::iterator orig;
 
   for (orig  = variables_.begin ();
        orig != variables_.end (); orig++)
 
-    if ((*orig) -> Index () == index) // found it!
+    if (((*orig) -> Type  () == VAR) && 
+	((*orig) -> Index () == index)) // found it
+
       break;
 
   if (orig == variables_ . end ()) {
     printf ("CouenneProblem::auxiliarize: no original variable\n");
     return;
   }
+
+#ifdef DEBUG
+  printf ("found var to replace: "); (*orig) -> print (); printf ("\n");
+#endif
 
   // all objectives
 

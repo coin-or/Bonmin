@@ -7,30 +7,27 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "exprLog.hpp"
-#include "exprPow.hpp"
-
 #include "CoinHelperFunctions.hpp"
 
-#include "CouennePrecisions.hpp"
-#include "CouenneTypes.hpp"
+#include "exprLog.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 #include "projections.hpp"
+#include "funtriplets.hpp"
 
 
 #define SQ_COUENNE_EPS COUENNE_EPS * COUENNE_EPS
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
-CouNumber exprLog::selectBranch (expression *w, 
+CouNumber exprLog::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
 				 int &ind, 
 				 double * &brpts, 
 				 int &way) {
 
   // quite similar to exprExp::selectBranch() (see branchExprExp.cpp)
-
+  //
   // two cases: inside or outside the belly. 
   //
   // Inside: the distance depends on the projection of the current
@@ -47,7 +44,7 @@ CouNumber exprLog::selectBranch (expression *w,
   // propagated bounds will do the rest.
 
   ind    = argument_ -> Index ();
-  int wi = w         -> Index ();
+  int wi = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0));
 
@@ -67,7 +64,7 @@ CouNumber exprLog::selectBranch (expression *w,
 
   if (y0 > log (x0)) { 
 
-    // Outside
+    // Outside -> branch on closest point on curve
 
     brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u);
@@ -76,6 +73,9 @@ CouNumber exprLog::selectBranch (expression *w,
     CouNumber dy = y0 - log (*brpts);
     x0 -= *brpts;
 
+#if BR_TEST_LOG >= 0
+  return 100;
+#endif
     return sqrt (x0*x0 + dy*dy); // exact distance
   } 
 
@@ -93,10 +93,12 @@ CouNumber exprLog::selectBranch (expression *w,
     brpts [1] = x0;       //      vertical                north
 
     CouNumber a = x0 - exp (y0), // sides of a triangle with (x0,y0)
-              b = log (x0) - y0, // as one of the vertices
-              c = a * cos (atan (a/b));
+              b = log (x0) - y0; // as one of the vertices
 
-    return CoinMin (a, CoinMin (b, c)); // exact distance
+#if BR_TEST >= 0
+  return 100;
+#endif
+    return a * cos (atan (a/b)); // exact distance
   } 
 
   // 2) at least one of them is finite --> two way branching
@@ -106,10 +108,12 @@ CouNumber exprLog::selectBranch (expression *w,
   if (l <= SQ_COUENNE_EPS) { // u is finite
 
     *brpts = midInterval (exp (y0), l, u);
-
     way = TWO_RIGHT;
-    return projectSeg (x0, y0, *brpts, log (*brpts), x0, log (x0), +1); // exact distance
 
+#if BR_TEST_LOG >= 0
+  return 100;
+#endif
+  return projectSeg (x0, y0, *brpts, log (*brpts), u, log (u), +1); // exact distance
     //    return CoinMin (x0 - exp (y0), log (x0) - y0);
   }
  
@@ -118,26 +122,37 @@ CouNumber exprLog::selectBranch (expression *w,
     *brpts = midInterval (x0, l, u);
     way = TWO_LEFT;
 
-    return projectSeg (x0, y0, *brpts, log (*brpts), x0, log (x0), +1); // exact distance
+#if BR_TEST_LOG >= 0
+  return 100;
+#endif
+    return projectSeg (x0, y0, l, log (l), *brpts, log (*brpts), +1); // exact distance
     //return log (x0) - y0;
   } 
 
   // both are finite
+ 
+  simpletriplet ft (log, inv, oppInvSqr, inv);
 
-  // apply minarea
+  switch (obj -> Strategy ()) {
 
-  *brpts = (u > l + COUENNE_EPS) ? 
-    midInterval ((u-l) / log (u/l), l, u) :
-    midInterval (x0,                l, u); 
+  case CouenneObject::MIN_AREA:     *brpts = maxHeight   (&ft, x0, y0, l, u); break;
+  case CouenneObject::BALANCED:     *brpts = minMaxDelta (&ft, x0, y0, l, u); break;
+  case CouenneObject::MID_INTERVAL: 
+  default:                          *brpts = midInterval (     x0,     l, u); break;
+  }
 
   //  *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u); 
   // WRONG! Local minima may be at bounds
 
+  // compute distance from current point to new convexification(s) and
+  // to curve. If closer to curve, branch on current point
+
   way = TWO_RAND;
 
-  CouNumber 
-    dx = x0 - *brpts,
-    dy = y0 - log (*brpts);
-
-  return sqrt (dx*dx + dy*dy); // exact distance
+#if BR_TEST_LOG >= 0
+  return 100;
+#endif
+  // exact distance
+  return CoinMin (projectSeg (x0, y0, l, log (l), *brpts, log (*brpts),             +1),
+		  projectSeg (x0, y0,             *brpts, log (*brpts), u, log (u), +1));
 }

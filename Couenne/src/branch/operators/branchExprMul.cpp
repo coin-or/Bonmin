@@ -19,7 +19,7 @@
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
-CouNumber exprMul::selectBranch (expression *w, 
+CouNumber exprMul::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 int &ind, 
 				 double * &brpts, 
@@ -27,7 +27,7 @@ CouNumber exprMul::selectBranch (expression *w,
 
   int xi = arglist_ [0] -> Index (),
       yi = arglist_ [1] -> Index (),
-      wi = w            -> Index ();
+      wi = obj -> Reference () -> Index ();
 
   assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 
@@ -64,25 +64,16 @@ CouNumber exprMul::selectBranch (expression *w,
 
   // at least one bound is infinite
 
-  brpts = (double *) malloc (sizeof (double));
+  brpts = (double *) malloc (sizeof (double)); // only one branch point
 
-  if (xl<-COUENNE_INFINITY) {*brpts = midInterval (((x0<0) ? 2 : 0.5) * x0, xl, xu); way = TWO_RIGHT;}
-  if (xu> COUENNE_INFINITY) {*brpts = midInterval (((x0>0) ? 2 : 0.5) * x0, xl, xu); way = TWO_LEFT;}
-  if (yl<-COUENNE_INFINITY) {*brpts = midInterval (((y0<0) ? 2 : 0.5) * y0, yl, yu); way = TWO_RIGHT;}
-  if (yu> COUENNE_INFINITY) {*brpts = midInterval (((y0>0) ? 2 : 0.5) * y0, yl, yu); way = TWO_LEFT;}
+  // don't privilege xi over yi
 
-  // all bounds are finite
-
-  if (yu-yl > xu-xl) {
-
-    *brpts = midInterval (y0, yl, yu);
-    way = TWO_RAND;
-
-  } else {
-
-    *brpts = midInterval (x0, xl, xu);
-    way = TWO_RAND;
-  }
+  if (xl<-COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0<0)?2:0.5)*x0,xl,xu); way=TWO_RIGHT;} else
+  if (xu> COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0>0)?2:0.5)*x0,xl,xu); way=TWO_LEFT;}  else
+  if (yl<-COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0<0)?2:0.5)*y0,yl,yu); way=TWO_RIGHT;} else
+  if (yu> COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0>0)?2:0.5)*y0,yl,yu); way=TWO_LEFT;}  else
+  if (yu-yl > xu-xl)        {ind=yi; *brpts=midInterval(y0, yl, yu);              way=TWO_RAND;}  else
+                            {ind=xi; *brpts=midInterval(x0, xl, xu);              way=TWO_RAND;}
 
   return fabs (w0 - x0*y0);
 }

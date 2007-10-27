@@ -18,7 +18,7 @@
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
-CouNumber exprQuad::selectBranch (expression *w, 
+CouNumber exprQuad::selectBranch (const CouenneObject *obj, 
 				  const OsiBranchingInformation *info,
 				  int &ind, 
 				  double * &brpts, 
@@ -28,7 +28,7 @@ CouNumber exprQuad::selectBranch (expression *w,
                   *l = info -> lower_,
                   *u = info -> upper_; 
 
-  CouNumber delta    = (*w) () - (*this) (), 
+  CouNumber delta    = (*(obj -> Reference ())) () - (*this) (), 
            *alpha    = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
             maxcontr = -COUENNE_INFINITY;
 

@@ -22,6 +22,7 @@ libCouenne_la_SOURCES = \
 	branch/CouenneBranchingObject.cpp \
 	branch/CouenneObject.cpp \
 	branch/CouenneChooseVariable.cpp \
+	branch/CouenneChooseStrong.cpp \
 	branch/getFixVarBinFun.cpp \
 	branch/projections.cpp \
 	branch/operators/branchExprAbs.cpp \
@@ -33,6 +34,7 @@ libCouenne_la_SOURCES = \
 	branch/operators/branchExprPow.cpp \
 	branch/operators/branchExprQuad.cpp \
 	branch/operators/branchExprSinCos.cpp \
+	branch/operators/minMaxDelta.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -86,7 +88,8 @@ libCouenne_la_SOURCES = \
 	convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp \
 	convex/updateBranchInfo.cpp \
-	standardize/createQuadratic.cpp \
+	standardize/decomposeTerm.cpp \
+	standardize/linStandardize.cpp \
 	standardize/sumStandardize.cpp \
 	standardize/analyzeSparsity.cpp \
 	standardize/constrStandardize.cpp \
@@ -94,6 +97,7 @@ libCouenne_la_SOURCES = \
 	standardize/splitAux.cpp \
 	standardize/auxiliarize.cpp \
 	standardize/standardize.cpp \
+	standardize/flattenMul.cpp \
 	problem/problem.cpp \
 	problem/CouenneProblem.cpp \
 	problem/problemIO.cpp \
@@ -193,7 +197,9 @@ include_HEADERS = \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
+	branch/CouenneChooseStrong.hpp \
 	branch/projections.hpp \
+	branch/CouObjStats.hpp \
 	expression/operators/exprAbs.hpp \
 	expression/operators/exprExp.hpp \
 	expression/operators/exprInv.hpp \

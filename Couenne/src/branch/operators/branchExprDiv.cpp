@@ -3,30 +3,28 @@
  * Author:  Pietro Belotti
  * Purpose: select branch for divisions
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include "exprDiv.hpp"
-#include "CouennePrecisions.hpp"
-#include "CouenneTypes.hpp"
 #include "CouenneBranchingObject.hpp"
 #include "CouenneObject.hpp"
 
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
-CouNumber exprDiv::selectBranch (expression *w, 
+CouNumber exprDiv::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
 				 int &ind, 
 				 double * &brpts, 
 				 int &way) {
 
-  int xi = arglist_ [0] -> Index (),
-      yi = arglist_ [1] -> Index (),
-      wi = w            -> Index ();
+  int xi = arglist_ [0]        -> Index (),
+      yi = arglist_ [1]        -> Index (),
+      wi = obj -> Reference () -> Index ();
 
-  assert ((xi >= 0) && (yi >= 0));
+  assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 
   // choosing branching variable and -point is difficult, use
   // proportion in bound intervals
@@ -42,17 +40,15 @@ CouNumber exprDiv::selectBranch (expression *w,
   if ((yl < 0) && (yu > 0)) {
 
     ind = yi;
-    //    brpts = (double *) realloc (brpts, 2 * sizeof (CouNumber));
-    //    way = THREE_RIGHT;
+
     way = TWO_RAND;
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
-    brpts [0] = 0;
-    //    brpts [0] = (yl >= -BR_NEXT_ZERO - COUENNE_EPS) ? (yl * BR_MULT) : -BR_NEXT_ZERO;
-    //    brpts [1] = (yu <=  BR_NEXT_ZERO + COUENNE_EPS) ? (yu * BR_MULT) :  BR_NEXT_ZERO;
+    *brpts = 0;
 
-    return ((fabs (y0) < COUENNE_EPS) ? 1. : 
-	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [w -> Index ()]));
+    return ((fabs (y0) < COUENNE_EPS) ? 1. :
+	    fabs (info -> solution_ [xi] / y0 - 
+		  info -> solution_ [wi]));
   }
 
   // From now on, [yl,yu] may be unlimited in one sense only, and
@@ -80,7 +76,7 @@ CouNumber exprDiv::selectBranch (expression *w,
     way = (y0 > 0) ? TWO_LEFT : TWO_RIGHT;
 
     return ((fabs (y0) < COUENNE_EPS) ? 1. : 
-	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [w -> Index ()]));
+	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [wi]));
   }
 
   // y is bounded, and y0 should not be 0; if w is unbounded, it is

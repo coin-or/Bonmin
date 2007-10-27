@@ -28,6 +28,7 @@ class OsiCuts;
 
 class CouenneProblem;
 class CouenneCutGenerator;
+class CouenneObject;
 
 class exprAux;
 class exprUnary;
@@ -275,7 +276,7 @@ class expression {
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments. Return estimated improvement in
   /// objective function
-  virtual CouNumber selectBranch (expression *w, 
+  virtual CouNumber selectBranch (const CouenneObject *obj, 
 				  const OsiBranchingInformation *info,
 				  int &ind, 
 				  double * &brpts, 

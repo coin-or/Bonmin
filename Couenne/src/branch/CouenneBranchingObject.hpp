@@ -11,9 +11,9 @@
 #ifndef COUENNEBRANCHINGOBJECT_HPP
 #define COUENNEBRANCHINGOBJECT_HPP
 
-#include <CoinFinite.hpp>
-#include <OsiBranchingObject.hpp>
-#include <exprAux.hpp>
+#include "CoinFinite.hpp"
+#include "OsiBranchingObject.hpp"
+#include "exprAux.hpp"
 
 #define COUENNE_CROP 1
 #define COUENNE_LCROP (1e2*COUENNE_CROP)
@@ -21,6 +21,10 @@
 #define COUENNE_LARGE_INTERVAL 1e4
 #define COUENNE_NEAR_BOUND 1e-2
 
+// use to test how branching point moves. Define as index of
+// independent variable in log expression
+#define BR_TEST_LOG -1
+#define BR_TEST_GRAPH 0
 
 /* "Spatial" branching object. 
  *

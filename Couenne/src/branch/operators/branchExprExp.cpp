@@ -7,21 +7,18 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "exprExp.hpp"
-#include "exprPow.hpp"
-
 #include "CoinHelperFunctions.hpp"
 
-#include "CouennePrecisions.hpp"
-#include "CouenneTypes.hpp"
+#include "exprExp.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 #include "projections.hpp"
+#include "funtriplets.hpp"
 
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
-CouNumber exprExp::selectBranch (expression *w, 
+CouNumber exprExp::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
 				 int &ind, 
 				 double * &brpts, 
@@ -38,12 +35,12 @@ CouNumber exprExp::selectBranch (expression *w,
   // (i.e. to get the closest point on the line) to get the maxi-min
   // displacement.
   //
-  // As for all monotonous functions, after choosing *brpts it is
+  // As for all monotone functions, after choosing *brpts it is
   // equivalent to choose w's or x's index as ind, as the implied- and
   // propagated bounds will do the rest.
 
-  ind    = argument_ -> Index ();
-  int wi = w         -> Index ();
+  ind    = argument_           -> Index ();
+  int wi = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0));
 
@@ -82,44 +79,60 @@ CouNumber exprExp::selectBranch (expression *w,
     brpts [1] = log (y0); //      horizontal              east
 
     CouNumber 
-      a = y0 - exp (x0),        // sides of a triangle with (x0,y0)
-      b = x0 - log (y0),        // as one of the vertices
-      c = a * cos (atan (a/b)); // all three quantities are nonnegative
+      a = y0 - exp (x0),  // sides of a triangle with (x0,y0)
+      b = log (y0) - x0;  // as one of the vertices
 
-    return CoinMin (a, CoinMin (b, c)); // exact distance
+    // exact distance from central interval, from others it's a and b
+    return (a * cos (atan (a/b))); 
   }
 
   // 2,3,4) at least one of them is finite --> two way branching
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
-  if (l < -COUENNE_INFINITY) { // 2) unbounded from below
+  if (l < - COUENNE_INFINITY) { // 2) unbounded from below --> break vertically
 
     *brpts = midInterval (x0, l, u);
 
     way = TWO_RIGHT;
-    return CoinMin (y0 - exp (x0), projectSeg (x0, y0, x0, exp (x0), u, exp (u), -1));
+    return CoinMin (y0 - exp (x0), projectSeg (x0, y0, *brpts, exp (*brpts), u, exp (u), -1));
   } 
 
-  if (u > COUENNE_INFINITY) { // 3) unbounded from above
+  if (u > COUENNE_INFINITY) { // 3) unbounded from above -- break horizontally
 
     *brpts = midInterval (log (y0), l, u);
 
     way = TWO_LEFT;
-    return CoinMin (x0 - log (y0), projectSeg (x0, y0, l, exp (l), log (y0), y0, -1));
+    return CoinMin (log (y0) - x0, projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts), -1));
   }
 
-  // 4) both are finite: apply minarea
+  // 4) both are finite
 
-  // find closest point on curve
-  *brpts = //midInterval (powNewton (x0, y0, exp, exp, exp), l, u);
-  // apply minarea
-  midInterval (log ((exp (u) - exp (l)) / (u-l)) , l, u);
+  simpletriplet ft (exp, exp, exp, log);
+
+  switch (obj -> Strategy ()) {
+
+  case CouenneObject::MIN_AREA:     *brpts = maxHeight   (&ft, x0, y0, l, u); break;
+  case CouenneObject::BALANCED:     *brpts = minMaxDelta (&ft, x0, y0, l, u); break;
+  case CouenneObject::MID_INTERVAL: 
+  default:                          *brpts = midInterval (     x0,     l, u); break;
+  }
+
+  /*  simpletriplet ft (exp, exp, exp, log);
+
+  *brpts = (u < l + COUENNE_EPS) ? 
+    midInterval (powNewton (x0, y0, exp, exp, exp), l, u) : // find closest point on curve
+    maxHeight (&ft, l, u); // apply minarea
+  // minmaxdistance:  minMaxDelta (&ft, x0, l, u);
+  */
 
   way = TWO_RAND;
 
-  x0 -= *brpts;
-  y0 -= exp (*brpts);
+  // exact distance
+  return CoinMin (projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts),             -1),
+		  projectSeg (x0, y0,             *brpts, exp (*brpts), u, exp (u), -1));
 
-  return sqrt (x0*x0 + y0*y0);
+  /*  x0 -= *brpts;
+  y0 -= exp (*brpts);
+  return sqrt (x0*x0 + y0*y0);*/
 }

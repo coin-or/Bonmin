@@ -58,14 +58,15 @@ class exprLog: public exprUnary {
 		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
-  virtual enum expr_type code () {return COU_EXPRINV;}
+  virtual enum expr_type code () 
+  {return COU_EXPRLOG;}
 
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (expression *, const OsiBranchingInformation *,
+  CouNumber selectBranch (const CouenneObject *, const OsiBranchingInformation *,
 			  int &, double * &, int &);
 };
 

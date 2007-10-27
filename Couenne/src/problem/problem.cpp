@@ -211,7 +211,7 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 
 /// set cutoff from NLP solution
 void CouenneProblem::setCutOff (CouNumber cutoff) 
-{cutoff_ = cutoff + 1e-1;} // tolerance needed to retain feasibility
+{cutoff_ = cutoff + 1e-4 * fabs (cutoff);} // tolerance needed to retain feasibility
 
 
 /// Tell problem that auxiliary related to obj has a cutoff, to be
@@ -221,7 +221,14 @@ void CouenneProblem::installCutOff () {
   int indobj = objectives_ [0] -> Body () -> Index ();
 
   if (indobj >= 0) {
-    if (objectives_ [0] -> Sense () == MINIMIZE) {if (cutoff_ < ub_ [indobj]) ub_ [indobj] = cutoff_;}
-    else                                         {if (cutoff_ > lb_ [indobj]) lb_ [indobj] = cutoff_;}
+
+    //if (objectives_ [0] -> Sense () == MINIMIZE) 
+    //{if (cutoff_ < ub_ [indobj]) ub_ [indobj] = cutoff_;}
+    //else
+    //{if (cutoff_ > lb_ [indobj]) lb_ [indobj] = cutoff_;}
+
+    // all problem are assumed to be minimization
+    if (cutoff_ < ub_ [indobj])
+      ub_ [indobj] = cutoff_;
   }
 }

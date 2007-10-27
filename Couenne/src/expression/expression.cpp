@@ -7,14 +7,14 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneCutGenerator.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
 
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprAux.hpp>
-#include <exprOp.hpp>
-#include <exprUnary.hpp>
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprAux.hpp"
+#include "exprOp.hpp"
+#include "exprUnary.hpp"
 
 
 // static vectors for evaluation, see their description in
@@ -56,7 +56,6 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			      OsiCuts &cs, const CouenneCutGenerator *cg, 
 			      t_chg_bounds *chg, int,
 			      CouNumber, CouNumber) {
-
   if (cg -> isFirst ())
     cg -> createCut (cs, currValue_, 0, w -> Index (), 1.);
 }
@@ -115,13 +114,14 @@ int expression::compare (exprCopy &c)
 
 /// replace occurrence of a variable with another variable
 void exprCopy::replace (exprVar *orig, exprVar *aux) {
-
+  copy_ -> replace (orig, aux);
+  /*
   if ((copy_ -> Index () == orig -> Index ()) &&
       (copy_ -> Type  () != AUX)) {
 
     delete copy_;
     copy_ = new exprClone (aux);
-  }
+    }*/
 }
 
 

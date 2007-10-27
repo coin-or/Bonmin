@@ -1,3 +1,4 @@
+- interval Hessian can be better than checkConvexity and usual convexification (e.g. exp (log (x)))
 - analyzeSparsity()
 - writeGAMS()
 - implied bounds in exprQuad: treat all a_ij x_i x_j as single variables w_ij, infer bounds on w_ij from bounds on 

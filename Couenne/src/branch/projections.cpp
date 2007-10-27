@@ -3,18 +3,14 @@
  * Authors: Pietro Belotti, Carnegie Mellon University
  * Purpose: tools for projecting points on lines/planes
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <CouenneTypes.hpp>
-#include <CouennePrecisions.hpp>
+#include "CouenneTypes.hpp"
+#include "CouennePrecisions.hpp"
 
 //#define DEBUG
-
 
 /*  compute projection of point (x0, y0) on the segment defined by
  *  line ax + by + c <>= 0 (sign provided by parameter sign) and
@@ -82,13 +78,12 @@ CouNumber projectSeg (CouNumber x0,  CouNumber y0,
 		      CouNumber x2,  CouNumber y2,
 		      int sign, 
 		      CouNumber *xp, CouNumber *yp) {
-
   CouNumber 
     dx = x2-x1,
     dy = y2-y1,
-    a =  dy, 
-    b = -dx,
-    c = y1*dx - x1*dy;
+    a =  -dy, 
+    b =  dx,
+    c = x1*dy - y1*dx;
 
   return project (a, b, c, x0, y0, x1, x2, sign, xp, yp);
 }

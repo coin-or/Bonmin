@@ -3,24 +3,20 @@
  * Author:  Pietro Belotti
  * Purpose: standardize all expressions in a problem
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include <vector>
 
 #include "CoinHelperFunctions.hpp"
-#include "CoinTime.hpp"
 
 #include "CouenneTypes.hpp"
-
 #include "expression.hpp"
 #include "exprClone.hpp"
-
 #include "CouenneProblem.hpp"
 #include "CouenneProblemElem.hpp"
 #include "depGraph.hpp"
-
 
 //#define DEBUG
 
@@ -123,7 +119,9 @@ void CouenneProblem::standardize () {
     *commuted_++ = false;
   commuted_ -= nVars ();
 
-  std::vector <CouenneConstraint *> con2;
+  //  std::vector <CouenneConstraint *> con2;
+  std::vector <std::vector <CouenneConstraint *>::iterator> iters2erase;
+
 
   // CONSTRAINTS /////////////////////////////////////////////////////////////////////////////
 
@@ -144,8 +142,9 @@ void CouenneProblem::standardize () {
 
     if (aux) { // save if standardized
       (*i) -> Body (new exprClone (aux));
-      con2.push_back (*i);
+      //      con2.push_back (*i);
     }
+    else iters2erase.push_back (i);
 
 #ifdef DEBUG
     printf (" --> ");
@@ -158,13 +157,15 @@ void CouenneProblem::standardize () {
     aux -> Image () -> print (); printf ("\n");*/
   }
 
-  //  constraints_. erase (constraints_.begin (), constraints_.end ());
+  for (unsigned int i = iters2erase.size (); i--;)
+    constraints_. erase (iters2erase [i]);
 
-  constraints_ = con2;
+  //  constraints_ = con2;
 
 #ifdef DEBUG
   printf ("done with standardization:\n");
-  print ();
+  print (); // Use with caution. Bounds on auxs are not defined yet,
+	    // so valgrind complains
 #endif
 
   // CREATE EVALUATION ORDER /////////////////////////////////////////////////////////////////
@@ -193,6 +194,7 @@ void CouenneProblem::standardize () {
 
   for (std::set <DepNode *, compNode>::iterator i = vertices.begin ();
        i != vertices.end (); ++i)
+
     numbering_ [(*i) -> Order ()] = (*i) -> Index (); 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -223,6 +225,25 @@ void CouenneProblem::standardize () {
       variables_ [ord] -> Lb () -> print (); printf (",");
       variables_ [ord] -> Ub () -> print (); printf ("]\n");
 #endif
+    }
+  }
+
+  // post processing of constraints /////////////////////////////////////
+
+  // if a constraint is linear, it has been replaced by a useless aux,
+  // unless that aux has multiplicity more than one. If it is one,
+  // replace expression in body and change generateCuts.cpp to
+  // generate the original linear constraint
+
+
+  for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin (); 
+       i != constraints_.end (); ++i) {
+
+    expression *body = (*i) -> Body ();
+
+    if (//(body -> Index () >= 0) &&      // it's a variable...
+	(body -> Type  () == AUX) &&      // it's an aux
+	(body -> Multiplicity () <= 1)) {  // only used once, if ever
     }
   }
 
