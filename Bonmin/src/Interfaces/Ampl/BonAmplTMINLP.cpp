@@ -748,11 +748,11 @@ namespace Bonmin
     amplOptList->AddAmplOption("bonmin.varselect_stra","bonmin.varselect_stra",
                                AmplOptionsList::String_Option,
                                "Choose the variable selection strategy");
-    
-    amplOptList->AddAmplOption("bonmin.varselect_stra","bonmin.varselect_stra",
+
+    amplOptList->AddAmplOption("bonmin.branch_pt_select","bonmin.branch_pt_select",
                                AmplOptionsList::String_Option,
-                               "Choose the variable selection strategy");
-    
+                               "Choose policy to select branching point");
+
     amplOptList->AddAmplOption("bonmin.number_strong_branch", "bonmin.number_strong_branch",
                                AmplOptionsList::Integer_Option,
                                "Chooes number of variable for strong branching");

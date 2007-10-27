@@ -13,6 +13,7 @@
 
 #include "CouenneObject.hpp"
 #include "CouenneChooseVariable.hpp"
+#include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
 #include "BonAuxInfos.hpp"
 #include "BonCbcNode.hpp"
@@ -97,13 +98,18 @@ namespace Bonmin{
 
     // In case there are no discrete variables, we can set the optimal
     // value from the initialSolve as cutoff
+
     // TODO: In case there are integer variables, check if all feasible
 
-    // pbelotti: don't set it here, it gives numerical problems
+    // pbelotti: don't set it here, it gives numerical and, with
+    // Anstreicher's maximization problems, sign (!) troubles
 
-    //    if (ci -> getNumIntegers() == 0) {
-    //      doubleParam_[Cutoff] = ci->getObjValue() + 1e-4;
-    //}
+    /*
+    if (ci -> getNumIntegers() == 0) {
+      // add small portion in abs. value (assume minimization problem)
+      doubleParam_[Cutoff] = ci->getObjValue() + 1e-4 * fabs (ci -> getObjValue ());
+    }
+    */
 
     if(extraStuff->infeasibleNode()){
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
@@ -137,8 +143,9 @@ namespace Bonmin{
 	exprVar *var = couenneProb -> Var (i);
 
         // if this variable is associated with a nonlinear function
-	if ((var -> Type () == AUX) && 
-	    (var -> Image () -> Linearity () > LINEAR)) {
+	if ((var -> Type  () == AUX) && 
+	    (var -> Image () -> Linearity () > LINEAR) &&
+	    (var -> Multiplicity () > 0)) {
 
 	  exprAux *aux = dynamic_cast <exprAux *> (var);
 
@@ -147,7 +154,7 @@ namespace Bonmin{
 	  aux -> Image () -> print (std::cout); printf ("\n");*/
 
 	  // then we may have to branch on it
-	  objects [nobj] = new CouenneObject (aux);
+	  objects [nobj] = new CouenneObject (aux, this);
 	  objects [nobj++] -> setPriority (1);
 	}
       }
@@ -160,7 +167,7 @@ namespace Bonmin{
 
       delete [] objects;
     }
-    
+
     // Setup Convexifier generators ////////////////////////////////////////////////
 
     int freq;
