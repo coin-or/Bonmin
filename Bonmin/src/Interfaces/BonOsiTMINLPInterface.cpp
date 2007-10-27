@@ -402,14 +402,16 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
 #ifdef COIN_HAS_FILTERSQP
     app_ = new Bonmin::FilterSolver(roptions, options, journalist);
 #else
+   throw SimpleError("createApplication",
+                     "Bonmin not configured to run with FilterSQP.");
 #endif    
   }
   else if(s == EIpopt){
 #ifdef COIN_HAS_IPOPT
     app_ = new IpoptSolver(roptions, options, journalist);
 #else
-    std::cerr<<"Bonmin not configured to run with Ipopt"<<std::endl;
-    throw -1;
+   throw SimpleError("createApplication",
+                     "Bonmin not configured to run with Ipopt.");
 #endif
   }
   if (!app_->Initialize("")) {
