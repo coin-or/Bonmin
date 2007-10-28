@@ -7,6 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <math.h>
+
 #include "CoinHelperFunctions.hpp"
 #include "exprAbs.hpp"
 #include "CouenneObject.hpp"
@@ -38,5 +40,5 @@ CouNumber exprAbs::selectBranch (const CouenneObject *obj,
 
   // exact distance between current point and the two subsequent
   // convexifications
-  return (CoinMin (x0+y0, y0-x0) / sqrt (2));
+  return (CoinMin (x0+y0, y0-x0) / 1.414213562373);
 }

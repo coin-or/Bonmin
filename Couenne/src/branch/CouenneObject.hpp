@@ -42,23 +42,8 @@ public:
   /// strategy names
   enum brSelStrat {MID_INTERVAL, MIN_AREA, BALANCED};
 
-  /// Constructor
-  /*  CouenneObject (exprAux *ref):
-    reference_ (ref),
-    brVarInd_  (-1), 
-    brPts_     (NULL),
-    whichWay_  (BRANCH_NONE) {}*/
-
   /// Constructor with information for branching point selection strategy
   CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base = NULL);
-
-  /// Trap constructor
-  /*  CouenneObject (exprVar *ref):
-    reference_ (NULL),
-    brVarInd_  (-1), 
-    brPts_     (NULL),
-    whichWay_  (BRANCH_NONE) 
-    {printf ("invalid CouenneObject: original variable %d\n", ref -> Index ()); exit (-1);}*/
 
   /// Destructor
   ~CouenneObject () 
