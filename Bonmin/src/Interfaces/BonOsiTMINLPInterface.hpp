@@ -939,6 +939,7 @@ class Messages : public CoinMessages
     */
     virtual ApplyCutsReturnCode applyCuts(const OsiCuts & cs,
 					  double effectivenessLb = 0.0){
+       freeCachedRowRim();
       problem_->addCuts(cs);
       ApplyCutsReturnCode rc;
       return rc;}

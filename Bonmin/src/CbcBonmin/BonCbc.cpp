@@ -102,9 +102,16 @@ namespace Bonmin
   {
     /* Put a link to this into solver.*/
     OsiBabSolver *  babInfo = dynamic_cast<OsiBabSolver *>(s.continuousSolver()->getAuxiliaryInfo());
-    Bonmin::BabInfo bonBabInfo(*babInfo);
-    bonBabInfo.setBabPtr(this);
-    s.continuousSolver()->setAuxiliaryInfo(&bonBabInfo);
+    assert(babInfo);
+    Bonmin::BabInfo *  bonBabInfoPtr = dynamic_cast<Bonmin::BabInfo*>(babInfo);
+    if(bonBabInfoPtr == NULL) {//Replace with a Bonmin::babInfo
+       bonBabInfoPtr = new Bonmin::BabInfo(*babInfo);
+       s.continuousSolver()->setAuxiliaryInfo(bonBabInfoPtr);
+       delete bonBabInfoPtr;
+       bonBabInfoPtr = dynamic_cast<Bonmin::BabInfo*>(s.continuousSolver()->getAuxiliaryInfo());
+    }
+     bonBabInfoPtr->setBabPtr(this);
+
     OsiSolverInterface * solver = s.continuousSolver()->clone();
     delete modelHandler_;
     modelHandler_ = s.continuousSolver()->messageHandler()->clone();
@@ -252,6 +259,19 @@ namespace Bonmin
         delete objects[i];
       delete [] objects;
     }
+
+    //If Setup contains more objects add them to Cbc
+    {
+      CbcObject ** objects = new CbcObject *[s.objects().size()];
+      for(unsigned int i = 0 ; i < s.objects().size() ; i++){
+         objects[i] = dynamic_cast<CbcObject *> (s.objects()[i]);
+         assert(objects[i]);
+         std::cout<<"Adding user CbcObject "<<i<<std::endl;
+         objects[i]->setModel(&model_);
+       }
+      model_.addObjects(s.objects().size(), objects);
+      delete [] objects;
+    }
     
     replaceIntegers(model_.objects(), model_.numberObjects());
    } 
@@ -355,7 +375,7 @@ namespace Bonmin
     //Get objects from model_ if it is not null means there are some sos constraints or non-integer branching object
     // pass them to cut generators. 
     OsiObject ** objects = model_.objects();
-    if(objects){
+    if(specOpt!=16 && objects){
       int numberObjects = model_.numberObjects();
       if(objects_ != NULL){
          for(int i = 0 ; i < nObjects_; i++)
@@ -455,14 +475,14 @@ namespace Bonmin
       bestObj_ = bestBound_ = s.nonlinearSolver()->getObjValue();
     }
     
-    if(bonBabInfo.bestSolution2().size() > 0){
-      assert((int) bonBabInfo.bestSolution2().size() == s.nonlinearSolver()->getNumCols());
+    if(bonBabInfoPtr->bestSolution2().size() > 0){
+      assert((int) bonBabInfoPtr->bestSolution2().size() == s.nonlinearSolver()->getNumCols());
       if (bestSolution_)
         delete [] bestSolution_;
       bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
-       std::copy(bonBabInfo.bestSolution2().begin(), bonBabInfo.bestSolution2().end(),
+       std::copy(bonBabInfoPtr->bestSolution2().begin(), bonBabInfoPtr->bestSolution2().end(),
                  bestSolution_);
-       bestObj_ = (bonBabInfo.bestObj2());
+       bestObj_ = (bonBabInfoPtr->bestObj2());
        printf("\nReal objective function: %.2f\n", bestObj_);
     }
     else if (model_.bestSolution()) {
@@ -497,6 +517,8 @@ namespace Bonmin
                                                     s.nonlinearSolver()->getNumCols(), 
                                                     bestSolution_,
                                                     bestObj_);
+
+     if(babInfo != bonBabInfoPtr) delete bonBabInfoPtr;
   }
   
   

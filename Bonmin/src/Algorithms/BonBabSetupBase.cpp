@@ -61,7 +61,8 @@ double BabSetupBase::defaultDoubleParam_[BabSetupBase::NumberDoubleParam] = {
   options_(NULL),
   roptions_(NULL),
   readOptions_(false),
-  lpMessageHandler_(NULL)
+  lpMessageHandler_(NULL),
+  objects_(0)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -79,7 +80,8 @@ treeTraversalMethod_(other.treeTraversalMethod_),
 journalist_(other.journalist_),
 options_(NULL),
 roptions_(other.roptions_),
-readOptions_(other.readOptions_)
+readOptions_(other.readOptions_),
+objects_(other.objects_)
 {
   if(other.nonlinearSolver_){
     nonlinearSolver_ = static_cast<OsiTMINLPInterface *>(other.nonlinearSolver_->clone());}
@@ -103,6 +105,8 @@ readOptions_(other.readOptions_)
   }
   CoinCopyN(other.intParam_, NumberIntParam, intParam_);
   CoinCopyN(other.doubleParam_, NumberDoubleParam, doubleParam_);
+  for(unsigned int i = 0 ; i < objects_.size() ; i++){
+    objects_[i]->clone();}
 }
 
 BabSetupBase::BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp):
@@ -114,7 +118,8 @@ branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
 readOptions_(false),
-lpMessageHandler_(NULL)
+lpMessageHandler_(NULL),
+objects_(0)
 { 
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -144,7 +149,8 @@ journalist_(NULL),
 options_(NULL),
 roptions_(NULL),
 readOptions_(false),
-lpMessageHandler_(NULL)
+lpMessageHandler_(NULL),
+objects_(0)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -171,7 +177,8 @@ treeTraversalMethod_(),
 journalist_(app->journalist()),
 options_(app->options()),
 roptions_(app->roptions()),
-readOptions_(true)
+readOptions_(true),
+objects_(0)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -193,6 +200,10 @@ BabSetupBase::~BabSetupBase(){
   for(HeuristicMethods::iterator i = heuristics_.begin() ; i != heuristics_.end() ; i++){
     delete *i;
   }
+
+  for(unsigned int i = 0 ; i < objects_.size() ; i++){
+    delete objects_[i];}
+
   delete lpMessageHandler_;
 }
 
@@ -303,9 +314,9 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
                                          "value 0 deactivates option");
   roptions->setOptionExtraInfo("solution_limit", 31);
  
-  roptions->AddBoundedNumberOption("integer_tolerance",
+  roptions->AddLowerBoundedNumberOption("integer_tolerance",
                                    "Set integer tolerance.",
-                                   0.,1,.5,1,1e-06,
+                                   0.,1,1e-06,
                                    "Any number within that value of an integer is considered integer.");
   roptions->setOptionExtraInfo("integer_tolerance", 31);
   

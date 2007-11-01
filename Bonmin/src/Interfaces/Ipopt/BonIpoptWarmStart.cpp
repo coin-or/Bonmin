@@ -38,13 +38,13 @@ IpoptWarmStart::IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
     warm_starter_(warm_starter),
     empty_(false)
 {
-
   int numcols = tnlp->num_variables();
   int numrows = tnlp->num_constraints();
   setSize(numcols,numrows);
-  values_.reserve(numcols+numrows); //AW: Factor 2 is missing?
+  values_.reserve(numcols+numrows); //AW: Factor 2 is missing? 
+                                    //PB: I don't think so (but it is not obvious)
 
-  double epsilon = 1e-05;//ipopt.getPushFact();
+  double epsilon = 1e-08;//ipopt.getPushFact();
   const double * primals = tnlp->x_sol();
   const double * duals = tnlp->duals_sol();
   const double * colLo = tnlp->x_l();
@@ -88,12 +88,12 @@ IpoptWarmStart::IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
 
   // int i2 = 2*numcols;
   for(int i = 0 ; i < numrows ; i++) {
-    if(fabs(duals[i + 2*numcols])> epsilon) {
+    if(fabs(duals[i + 2*numcols])> 0.01) {
       values_.insert(i + 3 * numcols,duals[i + 2*numcols]);
-      setArtifStatus(i, basic);
+      setArtifStatus(i, atLowerBound);
     }
     else {
-      setArtifStatus(i, atLowerBound);
+      setArtifStatus(i, basic);
     }
 
   }

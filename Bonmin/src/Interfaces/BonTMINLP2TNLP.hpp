@@ -372,7 +372,7 @@ namespace Bonmin
 
 
     /** Add some linear cuts to the problem formulation (not implemented yet in base class).*/
-   void addCuts(unsigned int numberCuts, const OsiRowCut ** cuts){
+   virtual void addCuts(unsigned int numberCuts, const OsiRowCut ** cuts){
     if(numberCuts > 0)
     throw CoinError("BonTMINLP2TNLP", "addCuts", "Not implemented");}
 

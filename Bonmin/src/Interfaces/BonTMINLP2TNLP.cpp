@@ -297,7 +297,7 @@ namespace Bonmin
 
   void TMINLP2TNLP::setDualInit(Index ind, const Number val)
   {
-    assert((int) x_init_.size() == num_variables() * 3 + num_constraints());
+    x_init_.resize(num_variables() * 3 + num_constraints(), 0.);
     if(!duals_init_)
       duals_init_ = &x_init_[num_variables()];
     duals_init_[ind] = val;
@@ -306,7 +306,7 @@ namespace Bonmin
   void TMINLP2TNLP::setDualsInit(Index m, const Number* duals_init)
   {
     assert(m == num_variables() * 2 + num_constraints() );
-    assert((int) x_init_.size() == num_variables() * 3 + num_constraints());
+    x_init_.resize(num_variables() * 3 + num_constraints(), 0.);
     if(!duals_init_)
       duals_init_ = x_init_() + num_variables();
 

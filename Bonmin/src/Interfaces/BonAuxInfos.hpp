@@ -13,29 +13,11 @@
 #include <vector>
 #include "OsiAuxInfo.hpp"
 #include "CoinSmartPtr.hpp"
+#include "BonTypes.hpp"
 
 
 namespace Bonmin {
 
-  //structure to store an object of class X in a Coin::ReferencedObject
-  template<class X>
-  struct SimpleReferenced : public Coin::ReferencedObject {
-   /** The object.*/
-   X object;
-   const X& operator()() const{
-     return object;}
-
-   X& operator()() {
-     return object;}
-
-  };
-
-   template <class X>
-   SimpleReferenced<X>* make_referenced(const X& other){
-     SimpleReferenced<X> * ret_val = new SimpleReferenced<X>;
-     ret_val->object = other;
-     return ret_val;
-    }
 
   /** Bonmin class for passing info between components of branch-and-cuts.*/
 class AuxInfo : public OsiBabSolver {
