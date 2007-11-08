@@ -517,8 +517,6 @@ namespace Bonmin
                                                     s.nonlinearSolver()->getNumCols(), 
                                                     bestSolution_,
                                                     bestObj_);
-
-     if(babInfo != bonBabInfoPtr) delete bonBabInfoPtr;
   }
   
   
