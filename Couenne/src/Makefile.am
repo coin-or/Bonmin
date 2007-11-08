@@ -104,7 +104,6 @@ libCouenne_la_SOURCES = \
 	problem/writeAMPL.cpp \
 	problem/writeGAMS.cpp \
 	problem/constraint.cpp \
-	problem/readASLfg.cpp \
 	problem/fillQuadIndices.cpp \
 	problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp \
@@ -136,7 +135,8 @@ libCouenne_la_LDFLAGS = $(LT_LDFLAGS)
 if COIN_HAS_ASL
 libCouenne_la_SOURCES += readnl/readnl.cpp \
 			 readnl/nl2e.cpp \
-			 readnl/invmap.cpp
+			 readnl/invmap.cpp \
+			 problem/readASLfg.cpp
 endif
 
 ########################################################################
