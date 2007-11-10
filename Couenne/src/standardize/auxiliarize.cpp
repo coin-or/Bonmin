@@ -1,8 +1,8 @@
 /*
- * Name:    constrStandardize.cpp
+ * Name:    auxiliarize.cpp
  * Author:  Pietro Belotti
- * Purpose: standardization of objective, constraints, defined
- *          variables, and auxiliary variables
+ * Purpose: replace occurrences of original variable in a problem with
+ *          auxiliary with the same index
  *
  * (C) Carnegie-Mellon University, 2007. 
  * This file is licensed under the Common Public License (CPL)

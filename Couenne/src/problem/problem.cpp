@@ -94,11 +94,15 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
       exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
 
+      //      printf ("w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
+
       // set bounds 
       if ((lb_[ord] = CoinMax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord]=-DBL_MAX;
       if ((ub_[ord] = CoinMin (ub_[ord], (*(aux -> Ub()))())) >=  COUENNE_INFINITY) ub_[ord]= DBL_MAX;
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
+
+      //      printf (" --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
 
       x_ [ord] = CoinMax (lb_ [ord], CoinMin (ub_ [ord], (*(aux -> Image ())) ()));
     }

@@ -12,6 +12,8 @@
 #include "exprPow.hpp"
 #include "exprQuad.hpp"
 
+//#define DEBUG
+
 /// re-organizes multiplication and stores indices (and exponents) of
 /// its variables
 void flattenMul (expression *mul, CouNumber &coe, 
@@ -101,6 +103,16 @@ void decomposeTerm (CouenneProblem *p, expression *term,
     // return list of variables (some of which auxiliary)
     flattenMul (term, coe, indices, p);
 
+#ifdef DEBUG
+    printf ("from flattenmul: [%g] ", coe);
+    for (std::map <int, CouNumber>::iterator itt = indices.begin ();
+	 itt != indices.end(); ++itt)
+      printf (" %d,%g",
+	      itt -> first,
+	      itt -> second);
+    printf ("\n");
+#endif
+
     // based on number of factors, decide what to return
     switch (indices.size ()) {
 
@@ -121,7 +133,9 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 	  (new exprPow (new exprClone (p -> Var (index)),
 			new exprConst (expon)));
 
-	linsert (lmap, aux -> Index (), initCoe);
+	//linsert (lmap, aux -> Index (), initCoe); // which of these three is correct?
+	//linsert (lmap, aux -> Index (), initCoe * coe);
+	linsert (lmap, aux -> Index (), coe);
       }
     } break;
 

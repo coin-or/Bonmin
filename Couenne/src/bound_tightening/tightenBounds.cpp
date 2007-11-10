@@ -48,22 +48,18 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
     if ((Var (i) -> Multiplicity () > 0) &&
 	(Var (i) -> Type         () == AUX)) {
 
-      //    for (int j=0; j<nAuxs () + nVars (); j++ )
-      //      printf ("+++ %d: [%.4f %.4f]\n", j, lb_ [j], ub_ [j]);
-
-      /*    printf ("w_%d [%g, %g] ", i+j,
-	    expression::Lbound (i+j),
-	    expression::Ubound (i+j));*/
+      /*printf ("w_%d [%g, %g] ", i,
+	      expression::Lbound (i),
+	      expression::Ubound (i));*/
 
       CouNumber ll = (*(Var (i) -> Lb ())) (),
   	        uu = (*(Var (i) -> Ub ())) ();
 
-      //    printf (" ---> [%g, %g]\n ", ll, uu);
-
-      /*auxiliaries_ [j] -> print (std::cout);
-	printf (" := ");
-	auxiliaries_ [j] -> Image () -> print (std::cout); fflush (stdout);
-	printf ("\n");*/
+      /*printf (" ---> [%g, %g] ", ll, uu);
+      variables_ [i] -> print (std::cout);
+      printf (" := ");
+      variables_ [i] -> Image () -> print (std::cout); fflush (stdout);
+      printf ("\n");*/
 
       if (ll > uu + COUENNE_EPS) {
 #ifdef DEBUG
