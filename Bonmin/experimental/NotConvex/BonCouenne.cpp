@@ -61,6 +61,15 @@ int main (int argc, char *argv[])
 
     bb (bonmin); // do branch and bound
 
+    //    double opt_x0 = bb.model () . bestSolution () [0];
+
+    /*    printf ("#m=1,S=0 # brtest\n\
+%10g %10g # brtest\n\
+%10g %10g # brtest\n\
+ # brtest\n\
+#m=-1,S=0 # brtest\n\
+# brtest\n", opt_x0, log (opt_x0) - 1, opt_x0, log (opt_x0) + 1);*/
+
     //////////////////////////////////
 
     std::cout.precision(10);
@@ -90,8 +99,10 @@ int main (int argc, char *argv[])
       int nr=-1, nt=-1;
       double st=-1;
 
+      // CAUTION: assuming first cut generator is our CouenneCutGenerator
+
       CouenneCutGenerator *cg = dynamic_cast <CouenneCutGenerator *> 
-	(bonmin.cutGenerators (). begin () -> cgl);
+	(bb.model(). cutGenerators () [0] -> generator ());
 
       if (cg)
 	cg -> getStats (nr, nt, st);
@@ -104,10 +115,10 @@ int main (int argc, char *argv[])
 
       printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & ", 
 	      basename,
-	      (cg) ? cp -> nOrig     () : -1, 
-	      (cg) ? cp -> nIntVars  () : -1, 
-	      (cg) ? cp -> nOrigCons () : -1,
-	      (cg) ? (cp -> nVars   () - 
+	      (cp) ? cp -> nOrig     () : -1, 
+	      (cp) ? cp -> nIntVars  () : -1, 
+	      (cp) ? cp -> nOrigCons () : -1,
+	      (cp) ? (cp -> nVars   () - 
 		      cp -> nOrig   ()): -1,
 	      nr, nt, st);
 
@@ -137,7 +148,7 @@ int main (int argc, char *argv[])
 	else printf (" %8s       &", "inf_dual");
       }
 
-      printf ("%7d & %7d \\\\\n ",
+      printf ("%7d & %7d \\\\\n",
 	      bb.numNodes(),
 	      bb.iterationCount());
 	      //	      nlp_and_solver->totalNlpSolveTime(),
