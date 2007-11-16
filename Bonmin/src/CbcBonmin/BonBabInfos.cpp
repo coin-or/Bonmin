@@ -35,7 +35,6 @@ namespace Bonmin{
 /** Virtual copy constructor.*/
 OsiAuxInfo * 
   BabInfo::clone() const{
-  std::cout<<"Cloning BabInfo::clone()"<<std::endl;
   return new BabInfo(*this);}
 }/* end namespace Bonmin*/
 
