@@ -19,6 +19,7 @@
 #include "BonDiver.hpp"
 #include "BonQpBranchingSolver.hpp"
 #include "BonLpBranchingSolver.hpp"
+#include "BonChooseVariable.hpp"
 
 namespace Bonmin{
   int BabSetupBase::defaultIntParam_[BabSetupBase::NumberIntParam] = {
@@ -56,6 +57,7 @@ double BabSetupBase::defaultDoubleParam_[BabSetupBase::NumberDoubleParam] = {
   branchingMethod_(NULL),
   nodeComparisonMethod_(),
   treeTraversalMethod_(),
+  objects_(0),
   journalist_(NULL),
   options_(NULL),
   roptions_(NULL),
@@ -75,6 +77,7 @@ heuristics_(),
 branchingMethod_(),
 nodeComparisonMethod_(other.nodeComparisonMethod_),
 treeTraversalMethod_(other.treeTraversalMethod_),
+objects_(other.objects_),
 journalist_(other.journalist_),
 options_(NULL),
 roptions_(other.roptions_),
@@ -102,6 +105,8 @@ readOptions_(other.readOptions_)
   }
   CoinCopyN(other.intParam_, NumberIntParam, intParam_);
   CoinCopyN(other.doubleParam_, NumberDoubleParam, doubleParam_);
+  for(unsigned int i = 0 ; i < objects_.size() ; i++){
+    objects_[i]->clone();}
 }
 
 BabSetupBase::BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp):
@@ -112,6 +117,7 @@ heuristics_(),
 branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
+objects_(0),
 readOptions_(false),
 lpMessageHandler_(NULL)
 { 
@@ -139,6 +145,7 @@ heuristics_(),
 branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
+objects_(0),
 journalist_(NULL),
 options_(NULL),
 roptions_(NULL),
@@ -167,6 +174,7 @@ heuristics_(),
 branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
+objects_(0),
 journalist_(app->journalist()),
 options_(app->options()),
 roptions_(app->roptions()),
@@ -192,6 +200,10 @@ BabSetupBase::~BabSetupBase(){
   for(HeuristicMethods::iterator i = heuristics_.begin() ; i != heuristics_.end() ; i++){
     delete *i;
   }
+
+  for(unsigned int i = 0 ; i < objects_.size() ; i++){
+    delete objects_[i];}
+
   delete lpMessageHandler_;
 }
 
@@ -291,7 +303,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
   roptions->setOptionExtraInfo("node_limit", 31);
   
   roptions->AddLowerBoundedIntegerOption("iteration_limit",
-                                         "Set the cummulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
+                                         "Set the cumulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.",
                                          0,COIN_INT_MAX,
                                          "value 0 deactivates option.");
   roptions->setOptionExtraInfo("iteration_limit", 31);
@@ -302,9 +314,9 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
                                          "value 0 deactivates option");
   roptions->setOptionExtraInfo("solution_limit", 31);
  
-  roptions->AddBoundedNumberOption("integer_tolerance",
+  roptions->AddLowerBoundedNumberOption("integer_tolerance",
                                    "Set integer tolerance.",
-                                   0.,1,.5,1,1e-06,
+                                   0.,1,1e-06,
                                    "Any number within that value of an integer is considered integer.");
   roptions->setOptionExtraInfo("integer_tolerance", 31);
   
@@ -336,14 +348,14 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
                                    -1e10,0,1e10,0,1e-05,
                                    "Specify the amount by which cutoff is decremented below "
                                    "a new best upper-bound"
-                                   " (usually a small postive value but in non-convex problems it may be a negative value).");
+                                   " (usually a small positive value but in non-convex problems it may be a negative value).");
   roptions->setOptionExtraInfo("cutoff_decr", 31);
   
   
   roptions->AddStringOption5("node_comparison",
                              "Choose the node selection strategy.",
                              "dynamic",
-                             "best-bound", "choose node whith the smallest bound,",
+                             "best-bound", "choose node with the smallest bound,",
                              "depth-first", "Perform depth first search,",
                              "breadth-first", "Perform breadth first search,",
                              "dynamic", "Cbc dynamic strategy (starts with a depth first search and turn to best bound after 3 "
@@ -417,6 +429,17 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
                              "osi-strong", "Osi method to do strong branching","");
   roptions->setOptionExtraInfo("varselect_stra", 15);
   
+  roptions->AddStringOption3
+    ("branch_pt_select",
+     "Chooses branching point selection strategy",
+     "mid-point",
+     "balanced", "minimizes max distance from curve to convexification",
+     "min-area", "minimizes total area of the two convexifications",
+     "mid-point", "convex combination of current point and mid point", 
+     "");
+
+  roptions->setOptionExtraInfo("branch_pt_select", 15); // Why 15? TODO
+
   roptions->AddLowerBoundedIntegerOption("num_cut_passes",
                                          "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
                                          0,1,
@@ -429,23 +452,6 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
                                          "");
   roptions->setOptionExtraInfo("num_cut_passes_at_root", 7);
 
-  roptions->SetRegisteringCategory("bonmin experimental options",  RegisteredOptions::BonminCategory);
-  // Some options for the strong branching and pseudo-costs that we
-  // still expored
-  roptions->AddBoundedNumberOption("setup_pseudo_frac", "Proportion of strong branching list that has to be taken from most-integer-infeasible list.",
-				   0., false, 1., false, 0.5);
-  roptions->AddBoundedNumberOption("maxmin_crit_no_sol", "Weight towards minimum in of lower and upper branching estimates when no solution has been found yet.",
-				   0., false, 1., false, 0.7);
-  roptions->AddBoundedNumberOption("maxmin_crit_have_sol", "Weight towards minimum in of lower and upper branching estimates when a solution has been found.",
-				   0., false, 1., false, 0.1);
-  roptions->AddLowerBoundedIntegerOption("number_before_trust_list",
-					 "Set the number of branches on a variable before its pseudo costs are to be believed during setup of strong branching candidate list.",
-					 -1, 0, "The default value is that of \"number_before_trust\"");
-  roptions->AddLowerBoundedIntegerOption("number_strong_branch_root",
-					 "Maximum number of variables considered for strong branching in root node.",
-					 0, COIN_INT_MAX, "");
-  
-
 
     /* Branching options.*/
     LpBranchingSolver::registerOptions(roptions);
@@ -455,6 +461,7 @@ BabSetupBase::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> ropt
 #endif
     CbcDiver::registerOptions(roptions);
     CbcDfsDiver::registerOptions(roptions);
+    BonChooseVariable::registerOptions(roptions);
 }
 
 
@@ -608,7 +615,7 @@ BabSetupBase::setPriorities(){
         throw CoinError("BabSetupBase","setPriorities",
                          "Can not handle user set pseudo-costs with OsiObjects\n"
                          "You should use one of the Cbc branching rules:\n"
-                         "most-fractionnal or strong-branching.");
+                         "most-fractional or strong-branching.");
       }
     }
 }
@@ -660,12 +667,8 @@ BabSetupBase::addSos(){
           objects[i]->setPriority(sosPriorities[i]);
         }
       }
-      int n = nonlinearSolver()->numberObjects();
-      //std::cout<<"Number objects "<<n<<std::endl;
       nonlinearSolver()->addObjects(numSos, objects);
       assert(nonlinearSolver()->numberObjects() == n + numSos);
-      //std::cout<<"Added "<<numSos<<" SOS constraints.";
-      //std::cout<<"Number objects "<<nonlinearSolver()->numberObjects()<<std::endl;
       for (int i = 0 ; i < numSos ; i++)
         delete objects[i];
       delete [] objects;

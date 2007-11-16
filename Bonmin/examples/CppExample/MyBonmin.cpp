@@ -70,7 +70,6 @@ int main (int argc, char *argv[])
 
 
   //Set up done, now let's branch and bound
-  double time1 = CoinCpuTime();
   try {
     Bab bb;
     bb(bonmin);//process parameter file using Ipopt and do branch and bound using Cbc

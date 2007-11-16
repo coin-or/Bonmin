@@ -51,6 +51,9 @@ printSol_(other.printSol_){}
   */
   virtual bool get_variables_types(Index n, VariableType* var_types);
  
+  /** Pass info about linear and nonlinear variables.*/
+  virtual bool get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types);
+
   /** Pass the type of the constraints (LINEAR, NON_LINEAR) to the optimizer.
   \param m size of const_types (has to be equal to the number of constraints in the problem)
   \param const_types types of the constraints (has to be filled by function).

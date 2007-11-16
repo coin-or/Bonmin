@@ -65,8 +65,8 @@ namespace Bonmin
   constraintsConvexities_(NULL),
   numberNonConvex_(0),
   nonConvexConstraintsAndRelaxations_(NULL),
-  simpleConcaves_(NULL),
   numberSimpleConcave_(0),
+  simpleConcaves_(NULL),
   hasLinearObjective_(false)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
@@ -226,8 +226,6 @@ namespace Bonmin
     
     sos_.num = suf_sos(i, &sos_.numNz, &types, p_sospri, copri,
                        &starts, &indices, &weights);
-
-
     if (sos_.num) {
       //Copy sos information
       sos_.priorities = CoinCopyOfArray(priorities,sos_.num);
@@ -351,16 +349,16 @@ namespace Bonmin
                  <<id<<" is simple concave and should have only two nonzero elements"<<std::endl;
          exit(ERROR_IN_AMPL_SUFFIXES);
         }
-        if(jCol[0] == yIdx){
-          xIdx = jCol[1];
+        if(jCol[0] - 1== yIdx){
+          xIdx = jCol[1] - 1;
         }
         else{
-             if(jCol[1] != yIdx){//Error in ampl model
+             if(jCol[1] - 1!= yIdx){//Error in ampl model
                std::cerr<<"Incorrect suffixes description in ampl model. Constraint with id "
                         <<id<<" : variable marked as y does not appear in the constraint."<<std::endl;
                exit(ERROR_IN_AMPL_SUFFIXES);
              }       
-          xIdx = jCol[0];
+          xIdx = jCol[0] - 1;
         }
 	   numberSimpleConcave++;
      }
@@ -471,7 +469,42 @@ namespace Bonmin
     return true;
   }
   
-  
+   bool AmplTMINLP::get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types){
+    // The variables are sorted by type in AMPL, so all we need to
+    // know are the counts of each type.
+    
+      
+    Index n_non_linear_b= 0;
+    Index n_non_linear_bi= 0;
+    Index n_non_linear_c= 0;
+    Index n_non_linear_ci = 0; 
+    Index n_non_linear_o= 0;
+    Index n_non_linear_oi = 0;
+    Index n_binaries = 0;
+    Index n_integers = 0;
+    ampl_tnlp_->get_discrete_info(n_non_linear_b, n_non_linear_bi, n_non_linear_c,
+        n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
+        n_binaries, n_integers);
+    
+    //Compute the number of non linear variables:
+    int n_non_linear = n_non_linear_c + n_non_linear_o - n_non_linear_b;
+      
+    int start = 0;
+    int end = n_non_linear;
+    for (int i=start; i<end; i++) {
+      var_types[i] = Ipopt::TNLP::NON_LINEAR;
+    }
+    
+    //At last the linear variables
+    // The first ones are continuous
+    start = end;
+    end = n;
+    for (int i=start; i<end; i++) {
+      var_types[i] = Ipopt::TNLP::LINEAR;
+    }
+    return true;
+  }
+ 
   /** Returns the constraint linearity.
   * array should be alocated with length at least n.*/
   bool 
@@ -559,7 +592,7 @@ namespace Bonmin
       DBG_ASSERT(!values);
       nele_grad_gi = 0;
       for (cgrad* cg=Cgrad[i]; cg; cg = cg->next) {
-        jCol[nele_grad_gi++] = cg->varno;
+        jCol[nele_grad_gi++] = cg->varno + 1;
       }
       return true;
     }
@@ -750,11 +783,11 @@ namespace Bonmin
     amplOptList->AddAmplOption("bonmin.varselect_stra","bonmin.varselect_stra",
                                AmplOptionsList::String_Option,
                                "Choose the variable selection strategy");
-    
-    amplOptList->AddAmplOption("bonmin.varselect_stra","bonmin.varselect_stra",
+
+    amplOptList->AddAmplOption("bonmin.branch_pt_select","bonmin.branch_pt_select",
                                AmplOptionsList::String_Option,
-                               "Choose the variable selection strategy");
-    
+                               "Choose policy to select branching point");
+
     amplOptList->AddAmplOption("bonmin.number_strong_branch", "bonmin.number_strong_branch",
                                AmplOptionsList::Integer_Option,
                                "Chooes number of variable for strong branching");

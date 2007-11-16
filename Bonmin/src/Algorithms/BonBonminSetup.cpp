@@ -71,7 +71,7 @@ algo_(other.algo_){
                                "B-BB","simple branch-and-bound algorithm,",
                                "B-OA","OA Decomposition algorithm,",
                                "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
-                               "B-Hyb","hybrid outer approximation based branch-and-cut.",
+                               "B-Hyb","hybrid outer approximation based branch-and-cut,",
                                "B-Ecp","ecp cuts based branch-and-cut a la FilMINT.",
                                "This will preset some of the options of bonmin depending on the algorithm choice."
                                );
@@ -309,16 +309,17 @@ algo_(other.algo_){
     int varSelection;
     bool val = options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     if(!val){
-    const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
-   if(sos && sos->num){//Set branching strategy to Cbc's most fractionnal
-      options_->SetStringValue("varselect_stra", "most-fractionnal","bonmin.");
-      varSelection = OsiTMINLPInterface::MOST_FRACTIONAL;
-   }
-   else{
-      options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
-      varSelection = OsiTMINLPInterface::NLP_STRONG_BRANCHING;
-     }
+      const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
+      if(sos && sos->num){//Set branching strategy to Cbc's most fractionnal
+         options_->SetStringValue("varselect_stra", "most-fractionnal","bonmin.");
+         varSelection = OsiTMINLPInterface::MOST_FRACTIONAL;
+      }
+      else{
+         options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
+         varSelection = OsiTMINLPInterface::NLP_STRONG_BRANCHING;
+      }
     }
+
     switch (varSelection) {
     case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
     case OsiTMINLPInterface::QP_STRONG_BRANCHING:
@@ -358,6 +359,7 @@ algo_(other.algo_){
       setPriorities();
       addSos();
       branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
+      
       break;
     case OsiTMINLPInterface::OSI_STRONG:
       continuousSolver_->findIntegersAndSOS(false);
@@ -365,16 +367,24 @@ algo_(other.algo_){
       addSos();
       branchingMethod_ = new OsiChooseStrong(nonlinearSolver_);
       break;
+    case OsiTMINLPInterface::MOST_FRACTIONAL:
+       intParam_[NumberStrong] = 0;
+       options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin."); 
+    case OsiTMINLPInterface::STRONG_BRANCHING:
+       intParam_[BabSetupBase::MinReliability] = 0;
+       options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
+       break;
     //default:
       //abort();
     }
-    if(branchingMethod_ != NULL)
+    if(branchingMethod_ != NULL){
       branchingMethod_->setNumberStrong(intParam_[NumberStrong]);
+    }
   }  
   
   void 
   BonminSetup::initializeBHyb(bool createContinuousSolver /*= false*/)
-{
+  {
     if(createContinuousSolver){
     /* Create linear solver */
     continuousSolver_ = new OsiClpSolverInterface;

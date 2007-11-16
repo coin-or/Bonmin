@@ -23,6 +23,14 @@ namespace Bonmin {
 */
 
 class BonChooseVariable : public OsiChooseVariable  {
+  protected:
+  /** Criterion applied to sort candidates.*/
+  enum CandidateSortCriterion {
+    DecrPs = 0,
+    IncrPs,
+    DecrInfeas,
+    IncrInfeas};
+
   /** Statuses for strong branching candidates.*/
   enum StrongStatus{
     NotDone=-1,
@@ -60,6 +68,17 @@ public:
 
   /// Destructor
   virtual ~BonChooseVariable ();
+
+  static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
+
+  /** Helper functions for setupList and chooseVariable */
+  double maxminCrit(const OsiBranchingInformation* info) const;
+  void computeMultipliers(double& upMult, double& downMult) const;
+  double computeUsefulness(const double MAXMIN_CRITERION,
+			   const double upMult, const double dowMult,
+			   const double value,
+			   const OsiObject* object, int i,
+			   double& value2) const;
 
   /** Sets up strong list and clears all if initialize is true.
       Returns number of infeasibilities. */
@@ -173,6 +192,10 @@ private:
   int numberStrongRoot_;
   /** backup of numberStrong_ before Root node solve */
   int numberStrongBackup_;
+  /** Criterion to use in setup list.*/
+  CandidateSortCriterion sortCrit_;
+  /** Always strong branch that many first candidate in the list regardless of numberTrusted.*/
+  int minNumberStrongBranch_; 
   //@}
 
   double maxminCrit() const;
@@ -181,6 +204,9 @@ private:
   bool isRootNode(const OsiBranchingInformation *info) const;
 
   PseudoCosts* pseudoCosts_;
+
+   /** Stores the class name for throwing errors.*/
+   static const std::string CNAME;
 };
 
 }

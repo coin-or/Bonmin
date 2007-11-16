@@ -14,55 +14,44 @@ namespace Bonmin
 {
   TNLP2FPNLP::TNLP2FPNLP(const SmartPtr<TNLP> tnlp, double objectiveScalingFactor):
       tnlp_(tnlp),
-      n_(-1),
-      nMax_(-1),
-      inds_(NULL),
-      vals_(NULL),
+      inds_(),
+      vals_(),
+      lambda_(1.),
+      sigma_(1.),
+      norm_(2),
       objectiveScalingFactor_(objectiveScalingFactor)
   {}
 
   TNLP2FPNLP::~TNLP2FPNLP()
   {
-    if(inds_!=NULL)
-      delete [] inds_;
-    inds_=NULL;
-    if(vals_!=NULL)
-      delete [] vals_;
-    vals_=NULL;
-    nMax_ = -1;
-
   }
 
 
   void
   TNLP2FPNLP::set_dist2point_obj(int n, const Number * vals, const Index * inds)
   {
-    if(n > nMax_)//resize tables
-    {
-      if(inds_!=NULL)
-        delete [] inds_;
-      if(vals_!=NULL)
-        delete [] vals_;
-      inds_ = new int[n];
-      vals_ = new double[n];
-      nMax_ = n;
-    }
-    //copy data
-    n_ = n;
-    IpBlasDcopy(n_, vals, 1, vals_, 1);
-    for(int i = 0 ; i < n_ ; i++)
-      inds_[i] = inds[i];
+    inds_.resize(n);
+    vals_.resize(n);
+    IpBlasDcopy(n, vals, 1, vals_(), 1);
+    CoinCopyN(inds, n, inds_());
   }
 
-  /** Compute the norm-2 distance to the current point to which distance is minimized. */
+  /** Compute the distance to the current point to which distance is minimized. */
   double
   TNLP2FPNLP::dist2point(const Number *x)
   {
     double ret_val = 0;
-    for(int i = 0; i < n_ ; i++) {
-      ret_val += ( x[inds_[i]] - vals_[i] ) * ( x[inds_[i]] - vals_[i] );
+    assert(vals_.size() == inds_.size());
+    if(norm_ == 2){
+      for(unsigned int i = 0; i < vals_.size() ; i++) {
+        ret_val += ( x[inds_[i]] - vals_[i] ) * ( x[inds_[i]] - vals_[i] );
+      }
     }
-
+    else if(norm_ == 1){
+      for(unsigned int i = 0 ; i < vals_.size() ; i++) {
+        ret_val += fabs(x[inds_[i]] - vals_[i]);
+      }
+    }
     return ret_val;
   }
 
@@ -73,7 +62,8 @@ namespace Bonmin
   {
     bool ret_code = tnlp_->get_nlp_info(n, m , nnz_jac_g, nnz_h_lag,
         index_style);
-    nnz_h_lag += n_;
+    if(norm_ == 2)
+      nnz_h_lag += vals_.size();
     return ret_code;
   }
 
@@ -82,7 +72,8 @@ namespace Bonmin
       Number& obj_value)
   {
     bool ret_code = tnlp_->eval_f(n, x, new_x, obj_value);//for new_x
-    obj_value = objectiveScalingFactor_*dist2point(x);
+    obj_value *= (1 - lambda_) * sigma_;
+    obj_value += objectiveScalingFactor_*lambda_*dist2point(x);
     return ret_code;
   }
 
@@ -90,17 +81,25 @@ namespace Bonmin
   TNLP2FPNLP::eval_grad_f(Index n, const Number* x, bool new_x,
       Number* grad_f)
   {
-    int n1,m,d1,d2;
-    TNLP::IndexStyleEnum index_style;
-    get_nlp_info(n1,m,d1,d2,index_style);
-    assert(n==n1);
     bool ret_code = tnlp_->eval_grad_f(n, x, new_x, grad_f);
     for(int i = 0 ; i < n ; i++) {
-      grad_f[i] = 0.;
+      grad_f[i] *= (1-lambda_) * sigma_;
     }
-    for(int i = 0 ; i < n_ ; i++) {
-      grad_f[inds_[i]] = objectiveScalingFactor_*2 *( x[inds_[i]] - vals_[i] );
+    if(norm_ ==2){
+      for(unsigned int i = 0 ; i < inds_.size() ; i++) {
+        grad_f[inds_[i]] += objectiveScalingFactor_*2*lambda_*( x[inds_[i]] - vals_[i] );
+      }
     }
+    else{
+      for(unsigned int i = 0 ; i < inds_.size() ; i++) {
+        if(x[inds_[i]] - vals_[i] >= 0.)
+          grad_f[inds_[i]] += objectiveScalingFactor_*lambda_;
+        else
+          grad_f[inds_[i]] -= objectiveScalingFactor_*lambda_;
+      }
+    }
+    
+   
     return ret_code;
   }
 
@@ -111,34 +110,39 @@ namespace Bonmin
       Index* iRow, Index* jCol, Number* values)
   {
 
-    int  nnz_obj_h = n_;
+    int  nnz_obj_h = (norm_ == 2) ? inds_.size() : 0;;
     //Call the function for the Hessian of the original constraint system
-    bool ret_code = tnlp_->eval_h(n, x, new_x, 0., m, lambda, new_lambda, nele_hess - nnz_obj_h, iRow, jCol, values);
+    bool ret_code = tnlp_->eval_h(n, x, new_x, obj_factor*(1-lambda_)*sigma_, 
+                                  m, lambda, new_lambda, nele_hess - nnz_obj_h, 
+                                  iRow, jCol, values);
     //Now add extra elements corresponding to the hessian of the distance
-    if (iRow && jCol && !values) //Initialization phase
-    {
-      int k = nele_hess - nnz_obj_h;
-      for(int i = 0; i < n_ ; i++)
+    if(norm_ == 2){
+      if (iRow && jCol && !values) //Initialization phase
       {
-        iRow[k] = inds_[i] + 1;
-        jCol[k] = inds_[i] + 1;
-        k++;
+        int k = nele_hess - nnz_obj_h;
+        iRow += k;
+        jCol += k;
+        for(unsigned int i = 0; i < inds_.size() ; i++)
+        {
+          iRow[i] = inds_[i] + 1;
+          jCol[i] = inds_[i] + 1;
+        }
+        DBG_ASSERT(k==nele_hess);
       }
-      DBG_ASSERT(k==nele_hess);
-    }
-    else if (!iRow & !jCol && values) //computation phase
-    {
-      int k = nele_hess - nnz_obj_h;
-      for(int i = 0; i < n_ ; i++)
+      else if (!iRow & !jCol && values) //computation phase
       {
-        values[k] = 2* objectiveScalingFactor_* obj_factor;
-        k++;
+        int k = nele_hess - nnz_obj_h;
+        values += k;
+        for(unsigned int i = 0; i < inds_.size() ; i++)
+        {
+          values[i] = 2* objectiveScalingFactor_* lambda_* obj_factor;
+        }
+        DBG_ASSERT(k==nele_hess);
       }
-      DBG_ASSERT(k==nele_hess);
-    }
-    else //error phase
-    {
-      DBG_ASSERT(false && "Invalid combination of iRow, jCol, and values pointers");
+      else //error phase
+      {
+        DBG_ASSERT(false && "Invalid combination of iRow, jCol, and values pointers");
+      }
     }
     return ret_code;
   }

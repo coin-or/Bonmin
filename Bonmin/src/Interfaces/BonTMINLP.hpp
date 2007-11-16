@@ -234,6 +234,11 @@ namespace Bonmin
 
     /** overload this method to provide the constraint linearity.
      * array should be alocated with length at least m.*/
+    virtual bool get_variables_linearity(Index m, 
+					   Ipopt::TNLP::LinearityType* const_types) = 0;
+
+    /** overload this method to provide the constraint linearity.
+     * array should be alocated with length at least m.*/
     virtual bool get_constraints_linearity(Index m, 
 					   Ipopt::TNLP::LinearityType* const_types) = 0;
 

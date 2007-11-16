@@ -19,6 +19,18 @@ MyTMINLP::get_variables_types(Index n, VariableType* var_types)
   return true;
 }
 
+
+bool 
+MyTMINLP::get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types)
+{
+  var_types[0] = Ipopt::TNLP::LINEAR;
+  var_types[1] = Ipopt::TNLP::NON_LINEAR;
+  var_types[2] = Ipopt::TNLP::NON_LINEAR;
+  var_types[3] = Ipopt::TNLP::LINEAR;
+  return true;
+}
+
+
 bool 
 MyTMINLP::get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types)
 {

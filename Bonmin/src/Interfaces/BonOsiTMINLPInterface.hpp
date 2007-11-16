@@ -652,11 +652,6 @@ class Messages : public CoinMessages
      problem_->removeCuts(num, rowIndices);
   }
 
-  void deleteLastRows(int number){
-    if(number)
-      freeCachedRowRim();
-  problem_->removeLastCuts(number);
-  }
 
   /** We have to keep this but it will throw an error
   */
@@ -888,6 +883,17 @@ class Messages : public CoinMessages
    * \param n number of element in arrays x and ind
    * \param ind indices of the coordinate*/
   double getFeasibilityOuterApproximation(int n, const double * x_bar,const int *ind, OsiCuts &cs, bool addOnlyViolated, bool global);
+
+  /** Given a point x_bar this solves the problem of finding the point which minimize a convex 
+    *combination between the distance to  x_bar and the original objective function f(x):
+   * \f$ min a * (\sum\limits_{i=1}^n  ||x_{ind[i]} -\overline{x}_i)||_L) + (1 - a)* s *f(x) \f$
+   * \return Distance between feasibility set a x_bar on components in ind
+   * \param n number of elements in array x_bar and ind
+   * \param s scaling of the original objective.
+   * \param a Combination to take between feasibility and original objective (must be between 0 and 1).
+   * \param L L-norm to use (can be either 1 or 2).
+   */
+  double solveFeasibilityProblem(int n, const double * x_bar, const int* ind, double a, double s, int L);
   //@}
 
   /** \name output for OA cut generation
@@ -944,6 +950,7 @@ class Messages : public CoinMessages
     */
     virtual ApplyCutsReturnCode applyCuts(const OsiCuts & cs,
 					  double effectivenessLb = 0.0){
+       freeCachedRowRim();
       problem_->addCuts(cs);
       ApplyCutsReturnCode rc;
       return rc;}
@@ -1145,12 +1152,6 @@ protected:
 
   ///Store the types of the constraints (linear and nonlinear).
   Ipopt::TNLP::LinearityType * constTypes_;
-  /* Numerotation of linear/nonlinear constraints
-   * Perform independent numerotation of linear (resp. nonlinear constraints)
-   * so that constraints of each type are numeroted consecutively */
- // int * constTypesNum_;
-  /** Number of linear constraints */
-  int nLinear_;
   /** Number of nonlinear constraint
    */
   int nNonLinear_;
@@ -1190,9 +1191,6 @@ private:
   SmartPtr<StrongBranchingSolver> strong_branching_solver_;
   /** status of last optimization before hot start was marked. */
   TNLPSolver::ReturnStatus optimizationStatusBeforeHotStart_;
-
-  // DELETEME
-  SmartPtr<StrongBranchingSolver> strong_branching_solver_compare_;
 };
 }
 #endif

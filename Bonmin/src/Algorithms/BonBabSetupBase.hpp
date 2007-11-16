@@ -207,6 +207,14 @@ public:
     
     /** Access registered Options */
     Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions(){return roptions_;}
+
+    /** Access to extra objects.*/
+    const vector<OsiObject *>& objects() const{
+       return objects_;}
+
+    /** Access to extra objects.*/
+    vector<OsiObject *>& objects() {
+       return objects_;}
     
 protected:
     /** Set the priorities into OsiTMINLPInterface when needed.*/
@@ -236,6 +244,8 @@ protected:
     NodeComparison nodeComparisonMethod_;
     /** Tree traversal method.*/
     TreeTraversal treeTraversalMethod_;
+    /** Extra object to add to Cbc (not OsiObjects).*/
+    vector<OsiObject *> objects_;
 
 
     /** Storage of Journalist for output */

@@ -19,7 +19,7 @@ namespace Bonmin{
   numcols_(0),
   hasNlpSolution_(false),
   bestSolution2_(make_referenced(std::vector<double>())),
-  bestObj2_(make_referenced(0.)){
+  bestObj2_(make_referenced(DBL_MAX)){
   }
   
   /** Constructor from OsiBabSolver.*/
@@ -30,7 +30,7 @@ namespace Bonmin{
   numcols_(0),
   hasNlpSolution_(false),
   bestSolution2_(make_referenced(std::vector<double>())),
-  bestObj2_(make_referenced(0.)){
+  bestObj2_(make_referenced(DBL_MAX)){
   }
   
   /** Copy constructor.*/

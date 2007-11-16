@@ -21,10 +21,22 @@
 #include "BonFilterSolver.hpp"
 #endif
 
-
+#include <string>
 #include <cmath>
-
 using namespace Bonmin;
+
+void MyAssertFunc(bool c, const std::string &s, const std::string&  file, unsigned int line){
+   if(c != true){
+      fprintf(stderr, "Failed MyAssertion: %s in %s line %i.\n", s.c_str(), file.c_str(), line);
+      exit(1);
+   }
+}
+
+#define MAKE_STRING(exp) std::string("exp")
+#define MyAssert(exp)  MyAssertFunc(exp, MAKE_STRING(exp), __FILE__, __LINE__);
+
+
+
 /** Test function for the Osi interface to Ipopt (or any nlp solver). <br>
     If Solver passes all the test then it should have everything needed to be integrated into bonmin. */
 
@@ -33,62 +45,62 @@ void testGetMethods(OsiTMINLPInterface &si)
     CoinRelFltEq eq;// to test equality of doubles    
     std::cout<<"Checking get functions"<<std::endl;
       // Problem size
-      assert(si.getNumCols()==4);
-      assert(si.getNumRows()==3);
+      MyAssert(si.getNumCols()==4);
+      MyAssert(si.getNumRows()==3);
       
       //Check bounds on columns
       const double * colLow = si.getColLower();
-      assert(eq(colLow[0],0.));
-      assert(eq(colLow[1],0.));
-      assert(eq(colLow[2],0.));
-      assert(eq(colLow[3],0.));
+      MyAssert(eq(colLow[0],0.));
+      MyAssert(eq(colLow[1],0.));
+      MyAssert(eq(colLow[2],0.));
+      MyAssert(eq(colLow[3],0.));
       
       const double * colUp = si.getColUpper();
-      assert(colUp[0]>si.getInfinity());
-      assert(colUp[1]>si.getInfinity());
-      assert(eq(colUp[2],1.));
-      assert(eq(colUp[3],5.));      
+      MyAssert(colUp[0]>si.getInfinity());
+      MyAssert(colUp[1]>si.getInfinity());
+      MyAssert(eq(colUp[2],1.));
+      MyAssert(eq(colUp[3],5.));      
       //Check bounds on rows
       const double * rowLow = si.getRowLower();
-      assert(rowLow[0]<= -si.getInfinity());
-      assert(rowLow[1]<= -si.getInfinity());
-      assert(rowLow[2]<= -si.getInfinity());
+      MyAssert(rowLow[0]<= -si.getInfinity());
+      MyAssert(rowLow[1]<= -si.getInfinity());
+      MyAssert(rowLow[2]<= -si.getInfinity());
                   
       const double * rowUp = si.getRowUpper();
-      assert(eq(rowUp[0], 1./4.));
-      assert(eq(rowUp[1], 0.));
-      assert(eq(rowUp[2], 2.));
+      MyAssert(eq(rowUp[0], 1./4.));
+      MyAssert(eq(rowUp[1], 0.));
+      MyAssert(eq(rowUp[2], 2.));
 
       //check objective sense
-      assert(si.getObjSense()==1);
+      MyAssert(si.getObjSense()==1);
       
       // check variables types
-      assert(si.isInteger(0)==0);
-      assert(si.isInteger(1)==0);
-      assert(si.isInteger(2)==1);
-      assert(si.isInteger(3)==1);
+      MyAssert(si.isInteger(0)==0);
+      MyAssert(si.isInteger(1)==0);
+      MyAssert(si.isInteger(2)==1);
+      MyAssert(si.isInteger(3)==1);
       
-      assert(si.isContinuous(0)==1);
-      assert(si.isContinuous(1)==1);
-      assert(si.isContinuous(2)==0);
-      assert(si.isContinuous(3)==0);
+      MyAssert(si.isContinuous(0)==1);
+      MyAssert(si.isContinuous(1)==1);
+      MyAssert(si.isContinuous(2)==0);
+      MyAssert(si.isContinuous(3)==0);
       
-      assert(si.isBinary(0)==0);
-      assert(si.isBinary(1)==0);
-      assert(si.isBinary(2)==1);
-      assert(si.isBinary(3)==0);
+      MyAssert(si.isBinary(0)==0);
+      MyAssert(si.isBinary(1)==0);
+      MyAssert(si.isBinary(2)==1);
+      MyAssert(si.isBinary(3)==0);
       
-      assert(si.isIntegerNonBinary(0)==0);
-      assert(si.isIntegerNonBinary(1)==0);
-      assert(si.isIntegerNonBinary(2)==0);
-      assert(si.isIntegerNonBinary(3)==1);
+      MyAssert(si.isIntegerNonBinary(0)==0);
+      MyAssert(si.isIntegerNonBinary(1)==0);
+      MyAssert(si.isIntegerNonBinary(2)==0);
+      MyAssert(si.isIntegerNonBinary(3)==1);
       
-      assert(si.isFreeBinary(2)==1);
+      MyAssert(si.isFreeBinary(2)==1);
       si.setColLower(2,1.);
-      assert(si.isFreeBinary(2)==0);
+      MyAssert(si.isFreeBinary(2)==0);
       si.setColLower(2,0.);
       
-      //assert(si.getInfinity()>1e50);
+      //MyAssert(si.getInfinity()>1e50);
       std::cout<<"Test passed"<<std::endl;                  
 }
 void testOptimAndSolutionQuery(OsiTMINLPInterface & si)
@@ -97,9 +109,9 @@ void testOptimAndSolutionQuery(OsiTMINLPInterface & si)
     std::cout<<"Testing optimization methods and solution query"<<std::endl;
     si.initialSolve();
     
-    assert(si.isProvenOptimal());
-//    assert(si.nCallOptimizeTNLP()==1);
-    assert(si.getIterationCount()>0);
+    MyAssert(si.isProvenOptimal());
+//    MyAssert(si.nCallOptimizeTNLP()==1);
+    MyAssert(si.getIterationCount()>0);
     // Optimum of the problem is -( 3/2 + sqrt(5)/2)
     // with x = (1/2 + sqrt(5) y[1]=x and y[2] = 1/2 + sqrt(5)/2
     // (can easily be computed since constraint x-y[1]<=0 imply x = y[1] and the resulting problem has dimension 2
@@ -138,10 +150,10 @@ void testSetMethods(OsiTMINLPInterface &si)
 {
     CoinRelFltEq eq(1e-07);// to test equality of doubles    
     si.setColLower(2,1.);
-    assert(si.getColLower()[2]==1.);
+    MyAssert(si.getColLower()[2]==1.);
     si.initialSolve();    
-    assert(si.isProvenOptimal());
-    assert(eq(si.getColSolution()[2],1));
+    MyAssert(si.isProvenOptimal());
+    MyAssert(eq(si.getColSolution()[2],1));
 
     CoinWarmStart * ws = si.getWarmStart();
     
@@ -149,12 +161,12 @@ void testSetMethods(OsiTMINLPInterface &si)
     si.setColLower(2,0.);
     
     si.setColUpper(2,0.);
-    assert(si.getColUpper()[2]==0.);
+    MyAssert(si.getColUpper()[2]==0.);
     si.setWarmStart(ws);
 
     si.resolve();
-    assert(si.isProvenOptimal());
-    assert(eq(si.getColSolution()[2],0.));
+    MyAssert(si.isProvenOptimal());
+    MyAssert(eq(si.getColSolution()[2],0.));
     
     si.setColUpper(2,1.);
     delete ws;
@@ -166,26 +178,26 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
     OsiClpSolverInterface lp;
     si.extractLinearRelaxation(lp);
     lp.writeMps("toy");
-     assert(lp.getNumCols()==4);
-      assert(lp.getNumRows()==3);
+     MyAssert(lp.getNumCols()==4);
+      MyAssert(lp.getNumRows()==3);
       //Check bounds on columns
       const double * colLow = lp.getColLower();
-      assert(eq(colLow[0],0.));
-      assert(eq(colLow[1],0.));
-      assert(eq(colLow[2],0.));
-      assert(eq(colLow[3],0.));
+      MyAssert(eq(colLow[0],0.));
+      MyAssert(eq(colLow[1],0.));
+      MyAssert(eq(colLow[2],0.));
+      MyAssert(eq(colLow[3],0.));
       
       const double * colUp = lp.getColUpper();
-      assert(colUp[0]>=lp.getInfinity());
-      assert(colUp[1]>=lp.getInfinity());
-      assert(eq(colUp[2],1.));
-      assert(eq(colUp[3],5.));      
+      MyAssert(colUp[0]>=lp.getInfinity());
+      MyAssert(colUp[1]>=lp.getInfinity());
+      MyAssert(eq(colUp[2],1.));
+      MyAssert(eq(colUp[3],5.));      
       //Check bounds on rows
       const double * rowLow = lp.getRowLower();
       std::cout<<rowLow[0]<<"\t"<<lp.getInfinity()<<std::endl;
-      assert(rowLow[0]<= -lp.getInfinity());
-      assert(rowLow[1]<= -lp.getInfinity());
-      assert(rowLow[2]<= -lp.getInfinity());
+      MyAssert(rowLow[0]<= -lp.getInfinity());
+      MyAssert(rowLow[1]<= -lp.getInfinity());
+      MyAssert(rowLow[2]<= -lp.getInfinity());
                   
       const double * rowUp = lp.getRowUpper();
       double sqrt5 = sqrt(5.);
@@ -194,31 +206,31 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
 	std::cout<<"Error in OA for rowUp[0]: "
 		 <<error<<std::endl;
       }
-      assert(eq(rowUp[1], 0.));
-      assert(eq(rowUp[2], 2.));
-      assert(eq(rowUp[3], 0.));
+      MyAssert(eq(rowUp[1], 0.));
+      MyAssert(eq(rowUp[2], 2.));
+      MyAssert(eq(rowUp[3], 0.));
       
 
       //check objective sense
-      assert(si.getObjSense()==1);
+      MyAssert(si.getObjSense()==1);
       
       // check variables types
-      assert(si.isInteger(0)==0);
-      assert(si.isInteger(1)==0);
-      assert(si.isInteger(2)==1);
-      assert(si.isInteger(3)==1);
+      MyAssert(si.isInteger(0)==0);
+      MyAssert(si.isInteger(1)==0);
+      MyAssert(si.isInteger(2)==1);
+      MyAssert(si.isInteger(3)==1);
     
        //Now check the full matrix
        const CoinPackedMatrix * mat = lp.getMatrixByCol();
        int  inds[7] = {0, 1, 0, 2, 1, 2,  2};
        double vals[7] = {2. / sqrt(5.) , -1., 1./sqrt(5.), 1. ,  1. , 1., 1.};
-       assert(mat->getNumElements()==7);
+       MyAssert(mat->getNumElements()==7);
        int k=0;
        for(int i = 0 ; i < si.getNumCols() ; i++)
        {
         for(int j = mat->getVectorStarts()[i] ; j < mat->getVectorStarts()[i] + mat->getVectorLengths()[i] ; j++)
         {
-        assert(inds[k]==mat->getIndices()[j]);
+        MyAssert(inds[k]==mat->getIndices()[j]);
         if(!eq(vals[k],mat->getElements()[j])){
 	double error = fabs(vals[k] - mat->getElements()[j]);
 	std::cout<<"Error in OA for element of constraint matrix "<<k<<": "
@@ -239,7 +251,7 @@ void testFp(Bonmin::AmplInterface &si)
         si.getFeasibilityOuterApproximation(1,x,ind,cuts, 0, 1);
         std::cout<<si.getColSolution()[0]<<std::endl;
          std::cout<<si.getColSolution()[1]<<std::endl;
-       assert(eq(si.getColSolution()[1],(1./2.)));
+       MyAssert(eq(si.getColSolution()[1],(1./2.)));
 }
 void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 {

@@ -103,7 +103,10 @@ markHotStart(OsiTMINLPInterface* tminlp_interface)
   g_l_orig_ = new Number[numRows_];
   g_u_orig_ = new Number[numRows_];
 
-  bool retval = tminlp_interface->problem()->
+#ifndef NDEBUG
+  bool retval = 
+#endif
+       tminlp_interface->problem()->
     get_bounds_info(numCols_, x_l_orig_, x_u_orig_,
 		    numRows_, g_l_orig_, g_u_orig_);
   assert(retval);

@@ -57,6 +57,7 @@ namespace Bonmin{
    return ret_val;
   }
 
+#if 0
   static std::string makeLatex(double value){
     std::string ret_val = "$";
     std::stringstream s_val;
@@ -73,6 +74,8 @@ namespace Bonmin{
     ret_val += '$';
     return ret_val;
   }
+#endif
+
   static std::string makeString(int value){
     std::string ret_val;
     if(value >= INT_MAX){
@@ -100,6 +103,8 @@ namespace Bonmin{
     }
     return ret_val;
   }
+
+#if 0
   static std::string makeLatex(int value){
     std::string ret_val = "$";
     std::stringstream s_val;
@@ -108,6 +113,7 @@ namespace Bonmin{
     ret_val += "$";
     return ret_val;
   }
+#endif
 
   static char OptionType2Char(const Ipopt::RegisteredOptionType &T){
     switch(T){

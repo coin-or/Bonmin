@@ -65,7 +65,7 @@ register_general_options
       "none","No warm start",
       "optimum","Warm start with direct parent optimum",
       "interior_point","Warm start with an interior point of direct parent",
-      "This will affect the function getWarmStart(), and as a consequence the wam starting in the various algorithms.");
+      "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
   roptions->setOptionExtraInfo("warm_start",8);
 
   roptions->SetRegisteringCategory("bonmin options for robustness", RegisteredOptions::BonminCategory);
@@ -80,7 +80,7 @@ register_general_options
   roptions->AddStringOption3("random_point_type","method to choose a random starting point",
 			     "Jon",
 			     "Jon", "Choose random point uniformly between the bounds",
-			     "Andreas", "perturb the starting point of the problem within a prescriped interval",
+			     "Andreas", "perturb the starting point of the problem within a prescribed interval",
 			     "Claudia", "perturb the starting point using the perturbation radius suffix information",
 			     "");
   roptions->setOptionExtraInfo("random_point_type",8);
@@ -191,10 +191,10 @@ static void register_OA_options
   roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
                                          "level of log when generating OA cuts.",
                                          0, 0,
-                                         "0: ouputs nothings,\n"
+                                         "0: outputs nothing,\n"
                                          "1: when a cut is generated, its violation and index of row from which it originates,\n"
                                          "2: always output violation of the cut.\n"
-                                         "3: ouput generated cuts incidence vectors.");
+                                         "3: output generated cuts incidence vectors.");
   roptions->setOptionExtraInfo("oa_cuts_log_level",7);
 
 }
@@ -359,7 +359,6 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     jValues_(NULL),
     nnz_jac(0),
     constTypes_(NULL),
-    nLinear_(0),
     nNonLinear_(0),
     tiny_(1e-8),
     veryTiny_(1e-20),
@@ -403,14 +402,16 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
 #ifdef COIN_HAS_FILTERSQP
     app_ = new Bonmin::FilterSolver(roptions, options, journalist);
 #else
+   throw SimpleError("createApplication",
+                     "Bonmin not configured to run with FilterSQP.");
 #endif    
   }
   else if(s == EIpopt){
 #ifdef COIN_HAS_IPOPT
     app_ = new IpoptSolver(roptions, options, journalist);
 #else
-    std::cerr<<"Bonmin not configured to run with Ipopt"<<std::endl;
-    throw -1;
+   throw SimpleError("createApplication",
+                     "Bonmin not configured to run with Ipopt.");
 #endif
   }
   if (!app_->Initialize("")) {
@@ -428,6 +429,8 @@ OsiTMINLPInterface::setModel(SmartPtr<TMINLP> tminlp)
   assert(IsValid(tminlp));
   tminlp_ = tminlp;
   problem_ = new TMINLP2TNLP(tminlp_);
+  feasibilityProblem_ = new TNLP2FPNLP
+        (SmartPtr<TNLP>(GetRawPtr(problem_)));
 }
 
 
@@ -486,7 +489,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     nnz_jac(source.nnz_jac),
     constTypes_(NULL),
 //    constTypesNum_(NULL),
-    nLinear_(0),
     nNonLinear_(0),
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_),
@@ -504,7 +506,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     passInMessageHandler(source.messageHandler());
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
-    problem_ = new TMINLP2TNLP(*source.problem_);
+    problem_ = source.problem_->clone();
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
 
     setAuxiliaryInfo(source.getAuxiliaryInfo());
@@ -527,24 +529,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     throw SimpleError("Don't know how to copy an empty IpoptOAInterface.",
         "copy constructor");
 
-
-  if(source.jValues_!=NULL && source.jRow_ != NULL && source.jCol_ != NULL && nnz_jac>0) {
-    jValues_ = new double [nnz_jac];
-    jCol_    = new Index [nnz_jac];
-    jRow_    = new Index [nnz_jac];
-    CoinCopyN(source.jValues_ , nnz_jac,jValues_ );
-    CoinCopyN(source.jCol_    , nnz_jac,jCol_    );
-    CoinCopyN(source.jRow_    , nnz_jac,jRow_    );
-
-    if(source.constTypes_ != NULL) {
-      constTypes_ = new TNLP::LinearityType [getNumRows()];
-      CoinCopyN(source.constTypes_, getNumRows(), constTypes_);
-    }
-  }
-  else if(nnz_jac > 0) {
-    throw SimpleError("Arrays for storing jacobian are inconsistant.",
-        "copy constructor");
-  }
 
 
    oaHandler_ = new OaMessageHandler(*source.oaHandler_);;
@@ -733,15 +717,14 @@ static const char * INFEAS_SYMB="INFEAS";
 void
 OsiTMINLPInterface::resolveForCost(int numsolve)
 {
-
   /** Save current optimum. */
-  double * point = new double[getNumCols()*3+ getNumRows()];
+  vector<double> point(getNumCols()*3+ getNumRows());
   double bestBound = getObjValue();
   CoinCopyN(getColSolution(),
-      getNumCols(), point);
+      getNumCols(), point());
   CoinCopyN(getRowPrice(),
       2*getNumCols()+ getNumRows(),
-      &point[getNumCols()]);
+      point() + getNumCols());
 
   if(isProvenOptimal())
     messageHandler()->message(SOLUTION_FOUND,
@@ -776,10 +759,10 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
       c='*';
       messageHandler()->message(BETTER_SOL, messages_)<<getObjValue()<<f+1<< CoinMessageEol;
       CoinCopyN(getColSolution(),
-          getNumCols(), point);
+          getNumCols(), point());
       CoinCopyN(getRowPrice(),
           2*getNumCols()+ getNumRows(),
-          &point[getNumCols()]);
+          point() + getNumCols());
       bestBound = getObjValue();
     }
 
@@ -803,10 +786,9 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
       <<f+2
       <<CoinMessageEol;
   }
-  setColSolution(point);
-  setRowPrice(&point[getNumCols()]);
+  setColSolution(point());
+  setRowPrice(point() + getNumCols());
   app_->enableWarmStart();
-  delete [] point;
 
   optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
   hasBeenOptimized_ = true;
@@ -1540,11 +1522,7 @@ int OsiTMINLPInterface::initializeJacobianArrays()
   tminlp_->get_constraints_linearity(getNumRows(), constTypes_);
 //  constTypesNum_ = new int[getNumRows()];
   for(int i = 0; i < getNumRows() ; i++) {
-    if(constTypes_[i]==TNLP::LINEAR) {
-      //constTypesNum_[i] =
-      nLinear_++;
-    }
-    else if(constTypes_[i]==TNLP::NON_LINEAR) {
+    if(constTypes_[i]==TNLP::NON_LINEAR) {
       //constTypesNum_[i] = 
       nNonLinear_++;
     }
@@ -1926,30 +1904,39 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   delete [] values;
 }
 
-
 double
-OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs, bool addOnlyViolated, bool global)
+OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+                                            double a, double s, int L)
 {
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
   feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->setLambda(a);
+  feasibilityProblem_->setSigma(s);
+  feasibilityProblem_->setNorm(L);
   nCallOptimizeTNLP_++;
   totalNlpSolveTime_-=CoinCpuTime();
   SmartPtr<TNLPSolver> app2 = app_->clone();
   app2->options()->SetIntegerValue("print_level", (Index) 0);
   optimizationStatus_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
-  getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
-			, global);
   hasBeenOptimized_=true;
   return getObjValue();
+}
+
+double
+OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs, bool addOnlyViolated, bool global)
+{
+  double ret_val = solveFeasibilityProblem(n, x_bar, inds, 1, 0, 2);
+  getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
+			, global);
+  return ret_val;
 }
 
 
 static bool WarnedForNonConvexOa=false;
 
-static int nTimesCalled = 0;
 void
 OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, 
                                             const double * x, bool getObj)
@@ -1965,13 +1952,6 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   //Get problem information
   tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
 
-  int nCuts = 0, cutsNnz = 0;
-  const int * cutsiRow = NULL, * cutsjCol = NULL;
-  const double * cutsElem = NULL, * cutsLow = NULL, * cutsUp = NULL;
-
-  problem_->getCutStorage(nCuts, cutsLow, cutsUp, cutsNnz, 
-                         cutsjCol, cutsiRow, cutsElem);
-
   //if not allocated allocate spaced for stroring jacobian
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
@@ -1983,8 +1963,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   double *g = new double[m];
   tminlp_->eval_g(n, x, 1, m, g);
 
-  rowLow = new double[m + nCuts];
-  rowUp = new double[m + nCuts];
+  rowLow = new double[m];
+  rowUp = new double[m];
   int * nonBindings = new int[m];//store non binding constraints (which are to be removed from OA)
   int numNonBindings = 0;
   const double * rowLower = getRowLower();
@@ -2039,9 +2019,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   //Then convert everything to a CoinPackedMatrix
   //Go through values, clean coefficients and fix bounds
   for(int i = 0 ; i < nnz_jac_g ; i++) {
-    if(constTypes_[jRow_[i]] != TNLP::LINEAR ||//For linear just copy is fine.
+    if(constTypes_[jRow_[i]] != TNLP::LINEAR){ //For linear just copy is fine.
        //For other clean tinys
-       cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
+       if(cleanNnz(jValues_[i],colLower[jCol_[i]], colUpper[jCol_[i]],
                 rowLower[jRow_[i]], rowUpper[jRow_[i]],
                 x[jCol_[i]],
                 rowLow[jRow_[i]],
@@ -2050,21 +2030,17 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
           rowUp[jRow_[i]] += jValues_[i] *x[jCol_[i]];
        }
     }
+    else {
+      double value = jValues_[i] * getColSolution()[jCol_[i]];
+      rowLow[jRow_[i]] += value;
+      rowUp[jRow_[i]] += value;
+    } 
+  }
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
   mat.setDimensions(m,n); // In case matrix was empty, this should be enough
   
   //remove non-bindings equality constraints
   mat.deleteRows(numNonBindings, nonBindings);
-  if(nCuts){
-  
-    // Now treat linear cuts
-    CoinPackedMatrix mat2(true, cutsiRow, cutsjCol, cutsElem, cutsNnz);
-    mat2.setDimensions(nCuts, n); // In case some variables are not in the support
-                                  // of any cut.
-    CoinCopyN(cutsLow, nCuts, rowLow + m);
-    CoinCopyN(cutsUp, nCuts, rowUp + m);
-    mat.minorAppendSameOrdered(mat2);
-  }
 
   int numcols=getNumCols();
   double *obj = new double[numcols];
@@ -2149,12 +2125,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     si.addRow(objCut, lb, ub);
     }
   }
-  std::ostringstream os;
-  os<<"OA_"<<nTimesCalled;
-  std::string f_name = os.str();
-  si.writeMps(f_name.c_str());
   delete [] obj;
-  
 }
 
 /** Add a collection of linear cuts to problem formulation.*/
@@ -2559,12 +2530,6 @@ OsiTMINLPInterface::markHotStart()
 void
 OsiTMINLPInterface::solveFromHotStart()
 {
-#if 0
-  printf("========= 1111111111111 ==============\n");
-  for (int i=0; i<getNumCols(); i++) {
-    printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, getColLower()[i], i, getColUpper()[i]);
-  }
-#endif
   if (IsValid(strong_branching_solver_)) {
 #ifdef STRONG_COMPARE
     // AWDEBUG

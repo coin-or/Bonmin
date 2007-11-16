@@ -17,7 +17,7 @@
 #include "IpSmartPtr.hpp"
 #include "IpIpoptApplication.hpp"
 #include "IpOptionsList.hpp"
-
+#include "BonTypes.hpp"
 
 namespace Bonmin
 {
@@ -46,6 +46,10 @@ namespace Bonmin
       */
     TMINLP2TNLP(const TMINLP2TNLP&);
 
+    /** virtual copy .*/
+    virtual TMINLP2TNLP * clone() const{
+       return new TMINLP2TNLP(*this);}
+
     /** Default destructor */
     virtual ~TMINLP2TNLP();
     //@}
@@ -54,15 +58,17 @@ namespace Bonmin
     //@{
 
     /** Get the number of variables */
-    Index num_variables()
+    inline Index num_variables() const
     {
-      return n_;
+      assert(x_l_.size() == x_u_.size());
+      return x_l_.size();
     }
 
     /** Get the number of constraints */
-    Index num_constraints()
+    inline Index num_constraints() const
     {
-      return m_;
+      assert(g_l_.size() == g_u_.size());
+      return g_l_.size();
     }
     /** Get the nomber of nz in hessian */
     Index nnz_h_lag()
@@ -72,7 +78,7 @@ namespace Bonmin
     /** Get the variable types */
     const TMINLP::VariableType* var_types()
     {
-      return var_types_;
+      return &var_types_[0];
     }
 
     //Print variable types to screen
@@ -87,46 +93,46 @@ namespace Bonmin
     /** Get the current values for the lower bounds */
     const Number* x_l()
     {
-      return x_l_;
+      return &x_l_[0];
     }
     /** Get the current values for the upper bounds */
     const Number* x_u()
     {
-      return x_u_;
+      return &x_u_[0];
     }
 
     /** Get the original values for the lower bounds */
     const Number* orig_x_l() const
     {
-      return orig_x_l_;
+      return &orig_x_l_[0];
     }
     /** Get the original values for the upper bounds */
     const Number* orig_x_u() const
     {
-      return orig_x_u_;
+      return orig_x_u_();
     }
 
     /** Get the current values for constraints lower bounds */
     const Number* g_l()
     {
-      return g_l_;
+      return g_l_();
     }
     /** Get the current values for constraints upper bounds */
     const Number* g_u()
     {
-      return g_u_;
+      return g_u_();
     }
 
     /** get the starting primal point */
     const Number * x_init() const
     {
-      return x_init_;
+      return x_init_();
     }
 
     /** get the user provided starting primal point */
     const Number * x_init_user() const
     {
-      return x_init_user_;
+      return x_init_user_();
     }
 
     /** get the starting dual point */
@@ -138,19 +144,19 @@ namespace Bonmin
     /** get the solution values */
     const Number* x_sol() const
     {
-      return x_sol_;
+      return x_sol_();
     }
 
     /** get the g solution (activities) */
     const Number* g_sol() const
     {
-      return g_sol_;
+      return g_sol_();
     }
 
     /** get the dual values */
     const Number* duals_sol() const
     {
-      return duals_sol_;
+      return duals_sol_();
     }
 
     /** Get Optimization status */
@@ -247,6 +253,9 @@ namespace Bonmin
     {
       return tminlp_->get_constraints_linearity(m, const_types);
     }
+
+    /** returns true if objective is linear.*/
+    virtual bool hasLinearObjective(){return tminlp_->hasLinearObjective();}
     /** Method called by Ipopt to get the starting point. The bools
      *  init_x and init_lambda are both inputs and outputs. As inputs,
      *  they indicate whether or not the algorithm wants you to
@@ -293,6 +302,15 @@ namespace Bonmin
     virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
         Index m, Index nele_jac, Index* iRow,
         Index *jCol, Number* values);
+
+    /** compute the value of a single constraint */
+    virtual bool eval_gi(Index n, const Number* x, bool new_x,
+			 Index i, Number& gi);
+    /** compute the structure or values of the gradient for one
+	constraint */
+    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
+			      Index i, Index& nele_grad_gi, Index* jCol,
+			      Number* values);
 
     /** Return the hessian of the
      *  lagrangian. The vectors iRow and jCol only need to be set once
@@ -348,55 +366,73 @@ namespace Bonmin
       /** Evaluate the upper bounding function at given point and store the result.*/
     double evaluateUpperBoundingFunction(const double * x);
     
-    /** @name Methods for evaluation the linear cuts. */
-    //@{
-    /** Evaluate g for the linear cuts.
-        \param n number of variables in the problem
-        \param x points at which to evaluate
-        \param nCuts number of cuts
-        \param g where to put the results (array of size at least nCuts).
-      */
-    void eval_g_add_linear_cuts(Index n, const Number * x,
-                                Index nCuts, Number* g);
-    /** Evaluate the gradients of the cuts.*/
-    void eval_jac_g_add_linear_cuts(Index nele_jac, Index* iRow,
-				    Index *jCol, Number* values);
-    //@}
-
     /** \name Cuts management. */
+    /** Methods are not implemented at this point. But I need the interface.*/
     //@{
 
 
-    /** Add some linear cuts to the problem formulation
-        if some of the cuts are quadratic they will be well understood as long as QUADRATIC_SAFE is defined */
-   void addCuts(unsigned int numberCuts, const OsiRowCut ** cuts);
+    /** Add some linear cuts to the problem formulation (not implemented yet in base class).*/
+   virtual void addCuts(unsigned int numberCuts, const OsiRowCut ** cuts){
+    if(numberCuts > 0)
+    throw CoinError("BonTMINLP2TNLP", "addCuts", "Not implemented");}
+
 
   /** Add some cuts to the problem formulaiton (handles Quadratics).*/
-  virtual void addCuts(const OsiCuts &cuts);
+  virtual void addCuts(const OsiCuts &cuts){
+    if(cuts.sizeRowCuts() > 0 || cuts.sizeColCuts() > 0)
+    throw CoinError("BonTMINLP2TNLP", "addCuts", "Not implemented");}
 
   /** Remove some cuts to the formulation */
-  virtual void removeCuts(unsigned int number ,const int * toRemove);
+  virtual void removeCuts(unsigned int number ,const int * toRemove){
+    if(number > 0)
+    throw CoinError("BonTMINLP2TNLP", "removeCuts", "Not implemented");}
 
-    /** remove the last number cuts.*/
-    void removeLastCuts(unsigned int number);
-
-    /** Facilitators to pointers storing the cuts */
-    void getCutStorage(int& numCuts, 
-                       const double * & cutsLower, const double * &cutsUpper, 
-                       int & numNnz, const int * & cutsjCol, const int * & cutsiRow,
-                       const double * & cutsElem) const{
-      numCuts = nLinearCuts_;
-      cutsLower = cutsLower_;
-      cutsUpper = cutsUpper_;
-      numNnz = linearCutsNnz_;
-      cutsjCol = cutsjCol_;
-      cutsiRow = cutsiRow_;
-      cutsElem = cutsElems_;
-      //cutsQuads = cutsQuads_;
-   }
     //@}
 
-  protected:
+   protected:
+   /** \name These should be modified in derived class to always maintain there corecteness.
+             They are directly queried by OsiTMINLPInterface without virtual function for 
+             speed.*/
+    /** @{ */
+    /// Types of the variable (TMINLP::CONTINUOUS, TMINLP::INTEGER, TMINLP::BINARY).
+    vector<TMINLP::VariableType> var_types_;
+    /// Current lower bounds on variables
+    vector<Number> x_l_;
+    /// Current upper bounds on variables
+    vector<Number> x_u_;
+    /// Original lower bounds on variables
+    vector<Number> orig_x_l_;
+    /// Original upper bounds on variables
+    vector<Number> orig_x_u_;
+    /// Lower bounds on constraints values
+    vector<Number> g_l_; 
+    /// Upper bounds on constraints values
+    vector<Number> g_u_;
+    /// Initial primal point
+    vector<Number> x_init_;
+    /** Initial values for all dual multipliers (constraints then lower bounds then upper bounds) */
+    Number * duals_init_;
+    /// User-provideed initial prmal point
+    vector<Number> x_init_user_;
+    /// Optimal solution
+    vector<Number> x_sol_;
+    /// Activities of constraint g( x_sol_)
+    vector<Number> g_sol_;
+    /** Dual multipliers of constraints and bounds*/
+    vector<Number> duals_sol_;
+    /** @} */
+
+    /** Access number of entries in tminlp_ hessian*/
+    Index nnz_h_lag() const{
+     return nnz_h_lag_;}
+    /** Access number of entries in tminlp_ hessian*/
+    Index nnz_jac_g() const{
+     return nnz_jac_g_;}
+
+    /** Acces index_style.*/
+     TNLP::IndexStyleEnum index_style() const{
+       return index_style_;}
+  private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
      * These methods are not implemented and
@@ -417,46 +453,12 @@ namespace Bonmin
 
     /** @name Internal copies of data allowing caller to modify the MINLP */
     //@{
-    /// Number of variables
-    Index n_;
-    /// Number of constraints
-    Index m_;
     /// Number of non-zeroes in the constraints jacobian.
     Index nnz_jac_g_;
     /// Number of non-zeroes in the lagrangian hessian
     Index nnz_h_lag_;
     /**index style (fortran or C)*/
     TNLP::IndexStyleEnum index_style_;
-    /// Types of the variable (TMINLP::CONTINUOUS, TMINLP::INTEGER, TMINLP::BINARY).
-    TMINLP::VariableType* var_types_;
-    /// Current lower bounds on variables
-    Number* x_l_;
-    /// Current upper bounds on variables
-    Number* x_u_;
-    /// Original lower bounds on variables
-    Number* orig_x_l_;
-    /// Original upper bounds on variables
-    Number* orig_x_u_;
-    /// Store capacity of g_ (resized when adding constraints)
-    Index capacity_g_;
-    /// Lower bounds on constraints values
-    Number* g_l_; // These are not modified, but a copy is kept for consistency
-    /// Upper bounds on constraints values
-    Number* g_u_;
-    /// Initial primal point
-    Number* x_init_;
-    /** Initial values for all dual multipliers (constraints then lower bounds then upper bounds) */
-    Number * duals_init_;
-    /** storage capacity for starting point.*/
-    Index capacity_x_init_;
-    /// User-provideed initial prmal point
-    Number* x_init_user_;
-    /// Optimal solution
-    Number* x_sol_;
-    /// Activities of constraint g( x_sol_)
-    Number * g_sol_;
-    /** Dual multipliers of constraints and bounds*/
-    Number* duals_sol_;
 
     /** Return status of the optimization process*/
     SolverReturn return_status_;
@@ -485,31 +487,6 @@ namespace Bonmin
      * are not consistent with the variable type */
     void throw_exception_on_bad_variable_bound(Index i);
     
-    /** \name Cuts storage.*/
-    // @{
-    /** resize arrays for linear cuts */
-    void resizeLinearCuts(unsigned int newNumberCuts, unsigned int newNnz);
-    /** Resize the starting point when cuts have been added.*/
-    void resizeStartingPoint(int extraStorage);
-    /** columnindices of linear cuts. */
-     int * cutsjCol_;
-    /** rows indices of linear cuts. */
-     int * cutsiRow_;
-    /** elements of linear cuts.*/
-    double * cutsElems_;
-    /** lower bounds for linear cuts. */
-    double * cutsLower_;
-    /** upper bounds for linear cuts. */
-    double * cutsUpper_;
-    /** number of linear cuts.*/
-    unsigned int nLinearCuts_;
-    /** number of non-zeroes in linear cuts*/
-    unsigned int linearCutsNnz_;
-    /** storage size for linear cuts number of cuts.*/
-    unsigned int linearCutsCapacity_;
-    /** storage size for linear cuts number of nnz.*/
-    unsigned int linearCutsNnzCapacity_;
-    //@}
     private:
     // Delete all arrays
     void gutsOfDelete();
