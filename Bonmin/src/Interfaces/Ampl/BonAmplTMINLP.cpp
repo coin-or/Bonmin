@@ -469,7 +469,42 @@ namespace Bonmin
     return true;
   }
   
-  
+   bool AmplTMINLP::get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types){
+    // The variables are sorted by type in AMPL, so all we need to
+    // know are the counts of each type.
+    
+      
+    Index n_non_linear_b= 0;
+    Index n_non_linear_bi= 0;
+    Index n_non_linear_c= 0;
+    Index n_non_linear_ci = 0; 
+    Index n_non_linear_o= 0;
+    Index n_non_linear_oi = 0;
+    Index n_binaries = 0;
+    Index n_integers = 0;
+    ampl_tnlp_->get_discrete_info(n_non_linear_b, n_non_linear_bi, n_non_linear_c,
+        n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
+        n_binaries, n_integers);
+    
+    //Compute the number of non linear variables:
+    int n_non_linear = n_non_linear_c + n_non_linear_o - n_non_linear_b;
+      
+    int start = 0;
+    int end = n_non_linear;
+    for (int i=start; i<end; i++) {
+      var_types[i] = Ipopt::TNLP::NON_LINEAR;
+    }
+    
+    //At last the linear variables
+    // The first ones are continuous
+    start = end;
+    end = n;
+    for (int i=start; i<end; i++) {
+      var_types[i] = Ipopt::TNLP::LINEAR;
+    }
+    return true;
+  }
+ 
   /** Returns the constraint linearity.
   * array should be alocated with length at least n.*/
   bool 

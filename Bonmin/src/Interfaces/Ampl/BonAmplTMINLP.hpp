@@ -102,6 +102,9 @@ namespace Bonmin
     /** returns the vector of variable types */
     virtual bool get_variables_types(Index n, VariableType* var_types);
 
+    /** return the variables linearity (linear or not)*/
+    virtual bool get_variables_linearity(Index n, Ipopt::TNLP::LinearityType * var_types);
+
     /** Returns the constraint linearity.
      * array should be alocated with length at least n.*/
     virtual bool get_constraints_linearity(Index m, 
