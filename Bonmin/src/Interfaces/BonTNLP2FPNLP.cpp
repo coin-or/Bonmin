@@ -41,7 +41,6 @@ namespace Bonmin
   TNLP2FPNLP::dist2point(const Number *x)
   {
     double ret_val = 0;
-    assert(norm_ > 0 && norm < 3);
     assert(vals_.size() == inds_.size());
     if(norm_ == 2){
       for(unsigned int i = 0; i < vals_.size() ; i++) {
@@ -74,7 +73,7 @@ namespace Bonmin
   {
     bool ret_code = tnlp_->eval_f(n, x, new_x, obj_value);//for new_x
     obj_value *= (1 - lambda_) * sigma_;
-    obj_value = objectiveScalingFactor_*lambda_*dist2point(x);
+    obj_value += objectiveScalingFactor_*lambda_*dist2point(x);
     return ret_code;
   }
 
@@ -111,7 +110,7 @@ namespace Bonmin
       Index* iRow, Index* jCol, Number* values)
   {
 
-    int  nnz_obj_h = inds_.size();
+    int  nnz_obj_h = (norm_ == 2) ? inds_.size() : 0;;
     //Call the function for the Hessian of the original constraint system
     bool ret_code = tnlp_->eval_h(n, x, new_x, obj_factor*(1-lambda_)*sigma_, 
                                   m, lambda, new_lambda, nele_hess - nnz_obj_h, 

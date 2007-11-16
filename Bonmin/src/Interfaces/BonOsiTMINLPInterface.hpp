@@ -886,7 +886,7 @@ class Messages : public CoinMessages
 
   /** Given a point x_bar this solves the problem of finding the point which minimize a convex 
     *combination between the distance to  x_bar and the original objective function f(x):
-   * \f$ min \lambda (\sum\limits_{i=1}^n a* ||x_{ind[i]} -\overline{x}_i)||_L) + (1 - a)* s *f(x) \f$
+   * \f$ min a * (\sum\limits_{i=1}^n  ||x_{ind[i]} -\overline{x}_i)||_L) + (1 - a)* s *f(x) \f$
    * \return Distance between feasibility set a x_bar on components in ind
    * \param n number of elements in array x_bar and ind
    * \param s scaling of the original objective.
