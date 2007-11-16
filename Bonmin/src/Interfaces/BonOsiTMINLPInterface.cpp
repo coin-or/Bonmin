@@ -1904,24 +1904,34 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   delete [] values;
 }
 
-
 double
-OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs, bool addOnlyViolated, bool global)
+OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+                                            double a, double s, int L)
 {
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
   feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->setLambda(a);
+  feasibilityProblem_->setSigma(s);
+  feasibilityProblem_->setNorm(L);
   nCallOptimizeTNLP_++;
   totalNlpSolveTime_-=CoinCpuTime();
   SmartPtr<TNLPSolver> app2 = app_->clone();
   app2->options()->SetIntegerValue("print_level", (Index) 0);
   optimizationStatus_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
   totalNlpSolveTime_+=CoinCpuTime();
-  getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
-			, global);
   hasBeenOptimized_=true;
   return getObjValue();
+}
+
+double
+OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs, bool addOnlyViolated, bool global)
+{
+  double ret_val = solveFeasibilityProblem(n, x_bar, inds, 1, 0, 2);
+  getOuterApproximation(cs, getColSolution(), 0, (addOnlyViolated? x_bar:NULL)
+			, global);
+  return ret_val;
 }
 
 
@@ -2520,12 +2530,6 @@ OsiTMINLPInterface::markHotStart()
 void
 OsiTMINLPInterface::solveFromHotStart()
 {
-#if 0
-  printf("========= 1111111111111 ==============\n");
-  for (int i=0; i<getNumCols(); i++) {
-    printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, getColLower()[i], i, getColUpper()[i]);
-  }
-#endif
   if (IsValid(strong_branching_solver_)) {
 #ifdef STRONG_COMPARE
     // AWDEBUG

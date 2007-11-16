@@ -11,6 +11,7 @@
 #include "IpTNLP.hpp"
 #include "BonTMINLP.hpp"
 #include "IpSmartPtr.hpp"
+#include "BonTypes.hpp"
 
 namespace Bonmin
 {
@@ -38,6 +39,19 @@ namespace Bonmin
      * \param vals values of the point for coordinates in ind
      */
     void set_dist2point_obj(int n, const Number * vals, const Index * inds);
+
+     /** Set the value for simgma */
+     void setSigma(double sigma){
+       assert(sigma >= 0.);
+       sigma_ = sigma;}
+     /** Set the value for lambda*/
+     void setLambda(double lambda){
+       assert(lambda >= 0. && lambda <= 1.);
+       lambda_ = lambda;}
+     /** Set the value for simgma */
+     void setNorm(int norm){
+       assert(norm >0 && norm < 3);
+       norm_ = norm;}
     //@}
 
     /**@name methods to gather information about the NLP */
@@ -147,14 +161,17 @@ namespace Bonmin
 
     /** @name Data for storing the point the distance to which is minimized */
     //@{
-    /// Number of variables in inds_ and vals_
-    Index n_;
-    /// Size of inds_ and vals_ arrays
-    Index nMax_;
     /// Indices of the variables for which distance is minimized (i.e. indices of integer variables in a feasibility pump setting)
-    Index * inds_;
+    vector<Index> inds_;
     /// Values of the point to which we separate (if x is the point vals_[i] should be x[inds_[i]] )
-    Number * vals_;
+    vector<Number> vals_;
+    /** value for the convex combination to take between original objective and distance function.
+      * ( take lambda_ * distance + (1-lambda) sigma f(x).*/
+    double lambda_;
+    /** Scaling for the original objective.*/
+    double sigma_;
+   /** Norm to use (L_1 or L_2).*/
+   int norm_;
     //@}
 
     /// Scaling factor for the objective
