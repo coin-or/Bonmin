@@ -65,8 +65,8 @@ namespace Bonmin
   constraintsConvexities_(NULL),
   numberNonConvex_(0),
   nonConvexConstraintsAndRelaxations_(NULL),
-  simpleConcaves_(NULL),
   numberSimpleConcave_(0),
+  simpleConcaves_(NULL),
   hasLinearObjective_(false)
   {
     Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);

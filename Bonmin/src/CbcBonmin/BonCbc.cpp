@@ -214,6 +214,7 @@ namespace Bonmin
     {
       const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
       const int & numSos = sos->num;
+      printf("Adding %i sos constraints.\n", sos->num);
       CbcObject ** objects = new CbcObject*[numSos];
       const int * starts = sos->starts;
       const int * indices = sos->indices;
@@ -261,6 +262,7 @@ namespace Bonmin
     }
 
     //If Setup contains more objects add them to Cbc
+    if(s.objects().size())
     {
       CbcObject ** objects = new CbcObject *[s.objects().size()];
       for(unsigned int i = 0 ; i < s.objects().size() ; i++){

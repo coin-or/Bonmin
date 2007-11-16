@@ -20,7 +20,7 @@ namespace Bonmin{
     nlp_(NULL),
     hasCloned_(false),
     maxNlpInf_(1e-04),
-  numberSolvePerLevel_(-1),
+    numberSolvePerLevel_(-1),
     couenne_(NULL){
   }
   

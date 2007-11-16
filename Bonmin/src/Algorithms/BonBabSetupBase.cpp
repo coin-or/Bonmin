@@ -57,12 +57,12 @@ double BabSetupBase::defaultDoubleParam_[BabSetupBase::NumberDoubleParam] = {
   branchingMethod_(NULL),
   nodeComparisonMethod_(),
   treeTraversalMethod_(),
+  objects_(0),
   journalist_(NULL),
   options_(NULL),
   roptions_(NULL),
   readOptions_(false),
-  lpMessageHandler_(NULL),
-  objects_(0)
+  lpMessageHandler_(NULL)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -77,11 +77,11 @@ heuristics_(),
 branchingMethod_(),
 nodeComparisonMethod_(other.nodeComparisonMethod_),
 treeTraversalMethod_(other.treeTraversalMethod_),
+objects_(other.objects_),
 journalist_(other.journalist_),
 options_(NULL),
 roptions_(other.roptions_),
-readOptions_(other.readOptions_),
-objects_(other.objects_)
+readOptions_(other.readOptions_)
 {
   if(other.nonlinearSolver_){
     nonlinearSolver_ = static_cast<OsiTMINLPInterface *>(other.nonlinearSolver_->clone());}
@@ -117,9 +117,9 @@ heuristics_(),
 branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
+objects_(0),
 readOptions_(false),
-lpMessageHandler_(NULL),
-objects_(0)
+lpMessageHandler_(NULL)
 { 
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -145,12 +145,12 @@ heuristics_(),
 branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
+objects_(0),
 journalist_(NULL),
 options_(NULL),
 roptions_(NULL),
 readOptions_(false),
-lpMessageHandler_(NULL),
-objects_(0)
+lpMessageHandler_(NULL)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -174,11 +174,11 @@ heuristics_(),
 branchingMethod_(NULL),
 nodeComparisonMethod_(),
 treeTraversalMethod_(),
+objects_(0),
 journalist_(app->journalist()),
 options_(app->options()),
 roptions_(app->roptions()),
-readOptions_(true),
-objects_(0)
+readOptions_(true)
 {
   CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
   CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
