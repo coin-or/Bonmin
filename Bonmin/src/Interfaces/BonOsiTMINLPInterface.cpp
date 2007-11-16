@@ -429,6 +429,8 @@ OsiTMINLPInterface::setModel(SmartPtr<TMINLP> tminlp)
   assert(IsValid(tminlp));
   tminlp_ = tminlp;
   problem_ = new TMINLP2TNLP(tminlp_);
+  feasibilityProblem_ = new TNLP2FPNLP
+        (SmartPtr<TNLP>(GetRawPtr(problem_)));
 }
 
 
