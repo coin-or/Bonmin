@@ -32,8 +32,19 @@ void MyAssertFunc(bool c, const std::string &s, const std::string&  file, unsign
    }
 }
 
-#define MAKE_STRING(exp) std::string("exp")
+void DblEqAssertFunc(const double& a, const std::string &a_s, const double&b, const std::string& b_s,
+                  const std::string&  file, unsigned int line){
+   CoinRelFltEq eq;
+   if(!eq(a,b)){
+      fprintf(stderr, "Failed comparison: %s = %f != %s =%f in  %s line %i.\n", a_s.c_str(),
+              a, b_s.c_str(), b, file.c_str(), line);
+      exit(1);
+   }
+}
+
+#define MAKE_STRING(exp) std::string(#exp)
 #define MyAssert(exp)  MyAssertFunc(exp, MAKE_STRING(exp), __FILE__, __LINE__);
+#define DblEqAssert(a,b)  DblEqAssertFunc(a,MAKE_STRING(a),b,MAKE_STRING(b), __FILE__, __LINE__);
 
 
 
@@ -50,16 +61,16 @@ void testGetMethods(OsiTMINLPInterface &si)
       
       //Check bounds on columns
       const double * colLow = si.getColLower();
-      MyAssert(eq(colLow[0],0.));
-      MyAssert(eq(colLow[1],0.));
-      MyAssert(eq(colLow[2],0.));
-      MyAssert(eq(colLow[3],0.));
+      DblEqAssert(colLow[0],0.);
+      DblEqAssert(colLow[1],0.);
+      DblEqAssert(colLow[2],0.);
+      DblEqAssert(colLow[3],0.);
       
       const double * colUp = si.getColUpper();
       MyAssert(colUp[0]>si.getInfinity());
       MyAssert(colUp[1]>si.getInfinity());
-      MyAssert(eq(colUp[2],1.));
-      MyAssert(eq(colUp[3],5.));      
+      DblEqAssert(colUp[2],1.);
+      DblEqAssert(colUp[3],5.);
       //Check bounds on rows
       const double * rowLow = si.getRowLower();
       MyAssert(rowLow[0]<= -si.getInfinity());
@@ -67,9 +78,9 @@ void testGetMethods(OsiTMINLPInterface &si)
       MyAssert(rowLow[2]<= -si.getInfinity());
                   
       const double * rowUp = si.getRowUpper();
-      MyAssert(eq(rowUp[0], 1./4.));
-      MyAssert(eq(rowUp[1], 0.));
-      MyAssert(eq(rowUp[2], 2.));
+      DblEqAssert(rowUp[0], 1./4.);
+      DblEqAssert(rowUp[1], 0.);
+      DblEqAssert(rowUp[2], 2.);
 
       //check objective sense
       MyAssert(si.getObjSense()==1);
@@ -150,10 +161,10 @@ void testSetMethods(OsiTMINLPInterface &si)
 {
     CoinRelFltEq eq(1e-07);// to test equality of doubles    
     si.setColLower(2,1.);
-    MyAssert(si.getColLower()[2]==1.);
+    DblEqAssert(si.getColLower()[2],1.);
     si.initialSolve();    
     MyAssert(si.isProvenOptimal());
-    MyAssert(eq(si.getColSolution()[2],1));
+    DblEqAssert(si.getColSolution()[2],1.);
 
     CoinWarmStart * ws = si.getWarmStart();
     
@@ -161,12 +172,12 @@ void testSetMethods(OsiTMINLPInterface &si)
     si.setColLower(2,0.);
     
     si.setColUpper(2,0.);
-    MyAssert(si.getColUpper()[2]==0.);
+    DblEqAssert(si.getColUpper()[2],0.);
     si.setWarmStart(ws);
 
     si.resolve();
     MyAssert(si.isProvenOptimal());
-    MyAssert(eq(si.getColSolution()[2],0.));
+    DblEqAssert(si.getColSolution()[2],0.);
     
     si.setColUpper(2,1.);
     delete ws;
@@ -182,16 +193,16 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
       MyAssert(lp.getNumRows()==3);
       //Check bounds on columns
       const double * colLow = lp.getColLower();
-      MyAssert(eq(colLow[0],0.));
-      MyAssert(eq(colLow[1],0.));
-      MyAssert(eq(colLow[2],0.));
-      MyAssert(eq(colLow[3],0.));
+      DblEqAssert(colLow[0],0.);
+      DblEqAssert(colLow[1],0.);
+      DblEqAssert(colLow[2],0.);
+      DblEqAssert(colLow[3],0.);
       
       const double * colUp = lp.getColUpper();
       MyAssert(colUp[0]>=lp.getInfinity());
       MyAssert(colUp[1]>=lp.getInfinity());
-      MyAssert(eq(colUp[2],1.));
-      MyAssert(eq(colUp[3],5.));      
+      DblEqAssert(colUp[2],1.);
+      DblEqAssert(colUp[3],5.);
       //Check bounds on rows
       const double * rowLow = lp.getRowLower();
       std::cout<<rowLow[0]<<"\t"<<lp.getInfinity()<<std::endl;
@@ -206,9 +217,9 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
 	std::cout<<"Error in OA for rowUp[0]: "
 		 <<error<<std::endl;
       }
-      MyAssert(eq(rowUp[1], 0.));
-      MyAssert(eq(rowUp[2], 2.));
-      MyAssert(eq(rowUp[3], 0.));
+      DblEqAssert(rowUp[1], 0.);
+      DblEqAssert(rowUp[2], 2.);
+      DblEqAssert(rowUp[3], 0.);
       
 
       //check objective sense
@@ -251,7 +262,7 @@ void testFp(Bonmin::AmplInterface &si)
         si.getFeasibilityOuterApproximation(1,x,ind,cuts, 0, 1);
         std::cout<<si.getColSolution()[0]<<std::endl;
          std::cout<<si.getColSolution()[1]<<std::endl;
-       MyAssert(eq(si.getColSolution()[1],(1./2.)));
+       DblEqAssert(si.getColSolution()[1],(1./2.));
 }
 void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 {
