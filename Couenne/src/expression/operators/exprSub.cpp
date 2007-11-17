@@ -64,7 +64,7 @@ expression *exprSub::differentiate (int index) {
   for (int i = 0; i < nargs_; i++)
     if (arglist_ [i] -> dependsOn (&index, 1))
          arglist [i] = arglist_ [i] -> differentiate (index);
-    else arglist [i] = new exprConst (0);
+    else arglist [i] = new exprConst (0.);
 
   return new exprSub (arglist, nargs_);
 }

@@ -46,7 +46,10 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
     int i = numbering_ [ii];
 
     if ((Var (i) -> Multiplicity () > 0) &&
-	(Var (i) -> Type         () == AUX)) {
+	(Var (i) -> Type         () == AUX) 
+	// TODO: also test if any indep variable of this expression
+	// have changed. If not, skip
+	) {
 
       /*printf ("w_%d [%g, %g] ", i,
 	      expression::Lbound (i),

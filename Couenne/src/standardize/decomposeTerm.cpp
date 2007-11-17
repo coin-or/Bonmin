@@ -171,7 +171,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
       expression **al = new expression * [indices.size ()];
       std::map <int, CouNumber>::iterator one = indices.begin ();
 
-      for (int i=0; one != indices.end (); one++, i++) 
+      for (int i=0; one != indices.end (); ++one, i++) 
 	if (fabs (one -> second - 1) > COUENNE_EPS) {
 	  exprAux *aux = p -> addAuxiliary (new exprPow (new exprClone (p -> Var (one -> first)),
 							 new exprConst (one -> second)));
@@ -183,7 +183,6 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
       exprMul *mul = new exprMul (al, indices.size ());
       exprAux *aux = mul -> standardize (p);
-
       linsert (lmap, aux -> Index (), coe);
 
     } break;

@@ -62,7 +62,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   // save -- for statistics purposes -- number of original
   // constraints. Some of them will be deleted as definition of
   // auxiliary variables.
-  nOrigConstraints_ = constraints_. size ();
+  nOrigCons_ = constraints_. size ();
 
   // reformulation
   standardize ();
@@ -79,8 +79,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   print (std::cout);
 #endif
 
-  //writeMod ("extended-aw.mod", true);
-  //writeMod ("extended-pb.mod", false);
+  //writeAMPL ("extended-aw.mod", true);
+  //writeAMPL ("extended-pb.mod", false);
 }
 
 
@@ -105,6 +105,7 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   ndefined_  (p.ndefined_),
   graph_     (NULL),
   nOrig_     (p.nOrig_),
+  nOrigCons_ (p.nOrigCons_),
   cutoff_    (p.cutoff_) { // needed only in standardize (), unnecessary to update it
 
   // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
@@ -182,28 +183,28 @@ void CouenneProblem::addObjective (expression *newobj, const std::string &sense 
 /// equality constraint
 void CouenneProblem::addEQConstraint (expression *body, expression *rhs = NULL) {
 
-  if (!rhs) rhs = new exprConst (0);
+  if (!rhs) rhs = new exprConst (0.);
   constraints_ . push_back (new CouenneConstraint (body, rhs, new exprClone (rhs)));
 }
 
 /// "greater than" constraint
 void CouenneProblem::addGEConstraint (expression *body, expression *rhs = NULL) {
-  if (!rhs) rhs = new exprConst (0);
+  if (!rhs) rhs = new exprConst (0.);
   constraints_ . push_back (new CouenneConstraint 
-			    (body, rhs, new exprConst (1 + COUENNE_INFINITY)));
+			    (body, rhs, new exprConst (COUENNE_INFINITY)));
 }
 
 /// "smaller than" constraint
 void CouenneProblem::addLEConstraint (expression *body, expression *rhs = NULL) {
-  if (!rhs) rhs = new exprConst (0);
+  if (!rhs) rhs = new exprConst (0.);
   constraints_ . push_back (new CouenneConstraint 
-			    (body, new exprConst (- (1 + COUENNE_INFINITY)), rhs));
+			    (body, new exprConst (- (COUENNE_INFINITY)), rhs));
 }
 
 /// range constraint
 void CouenneProblem::addRNGConstraint (expression *body, expression *lb=NULL, expression *ub=NULL) {
-  if (!lb) lb = new exprConst (0);
-  if (!ub) ub = new exprConst (0);
+  if (!lb) lb = new exprConst (0.);
+  if (!ub) ub = new exprConst (0.);
   constraints_ . push_back (new CouenneConstraint (body, lb, ub));
 }
 
@@ -246,12 +247,11 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
     auxSet_ -> insert (w); // insert into repetition checking structure
     graph_  -> insert (w); // insert into acyclic structure
 
-  } else {
+  } else {  // otherwise, just return the entry's pointer
 
-    // otherwise, just return the entry's pointer
     delete w;
     w = *i;
-    w -> increaseMult ();
+    (*i) -> increaseMult ();
   }
 
   return w;

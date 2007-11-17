@@ -82,9 +82,12 @@ public:
   inline void setUpper(ChangeStatus upper) {upper_ = upper;}
   inline void setLowerBits(char lower) {lower_ |= lower;}
   inline void setUpperBits(char upper) {upper_ |= upper;}
+  t_chg_bounds operator=(const t_chg_bounds&src) {
+    lower_ = src.lower_;
+    upper_ = src.upper_;
+    return *this;
+  }
 private:
-  // prohibit = operator
-  void operator=(const t_chg_bounds&);
   char lower_;
   char upper_;
 };

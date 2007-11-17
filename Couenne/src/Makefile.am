@@ -25,6 +25,7 @@ libCouenne_la_SOURCES = \
 	branch/CouenneChooseStrong.cpp \
 	branch/getFixVarBinFun.cpp \
 	branch/projections.cpp \
+	branch/infeasibility.cpp \
 	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
@@ -109,6 +110,7 @@ libCouenne_la_SOURCES = \
 	problem/depGraph/depGraph.cpp \
 	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
+	bound_tightening/aggressiveBT.cpp \
 	bound_tightening/obbt.cpp \
 	bound_tightening/obbt_iter.cpp \
 	bound_tightening/tightenBounds.cpp \

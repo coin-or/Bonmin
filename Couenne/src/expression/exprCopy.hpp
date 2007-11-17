@@ -32,16 +32,16 @@ class exprCopy: public expression {
   inline enum nodeType Type () 
     {return copy_ -> Type ();}
 
-  /// Constructor, destructor
+  /// Constructor
   exprCopy  (expression *copy):
     copy_ (copy) {}
 
-  /// copy constructor
+  /// Copy constructor
   exprCopy (const exprCopy &e) {
     copy_ = e.Original () -> clone ();
   }
 
-  /// cloning method
+  /// Cloning method
   virtual exprCopy *clone () const
     {return new exprCopy (*this);}
 
@@ -51,11 +51,11 @@ class exprCopy: public expression {
   inline const expression *Original () const
     {return copy_ -> Original ();}
 
-  /// get variable index in problem
+  /// Get variable index in problem
   inline int Index () const
     {return copy_ -> Index ();}
 
-  /// return number of arguments (when applicable, that is, with N-ary functions)
+  /// Return number of arguments (when applicable, that is, with N-ary functions)
   virtual inline int nArgs () const
     {return copy_ -> nArgs ();}
 

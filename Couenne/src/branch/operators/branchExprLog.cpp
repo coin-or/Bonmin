@@ -150,7 +150,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
   way = TWO_RAND;
 
 #if BR_TEST_LOG >= 0
-  return 100;
+  return 1000;
 #endif
   // exact distance
   return CoinMin (projectSeg (x0, y0, l, log (l), *brpts, log (*brpts),             +1),

@@ -24,11 +24,11 @@ CouenneSolverInterface::CouenneSolverInterface (CouenneCutGenerator *cg /*= NULL
 
 CouenneSolverInterface::CouenneSolverInterface (const CouenneSolverInterface &src)
   :
+  OsiSolverInterface (src),
   OsiClpSolverInterface (src),
   cutgen_ (src.cutgen_),
   knowInfeasible_ (src.knowInfeasible_),
-  knowOptimal_ (src.knowOptimal_)
-{}
+  knowOptimal_ (src.knowOptimal_) {}
 
 /// Solve initial LP relaxation 
 void CouenneSolverInterface::initialSolve () 

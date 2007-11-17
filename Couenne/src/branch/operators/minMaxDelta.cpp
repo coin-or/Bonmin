@@ -141,7 +141,6 @@ public:
 
 
 const int maxIter = 20;
-//const double phi     =  1.6;
 
 
 void choosePoint (CouNumber x0, CouNumber y0, 

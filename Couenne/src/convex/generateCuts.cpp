@@ -24,7 +24,7 @@
 #define THRES_NBD_CHANGED 1
 
 // depth of the BB tree until which obbt is applied at all nodes
-#define COU_OBBT_CUTOFF_LEVEL 1
+#define COU_OBBT_CUTOFF_LEVEL 3
 
 // maximum number of obbt iterations
 #define MAX_OBBT_ITER 1
@@ -100,7 +100,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
   if (babInfo)
-    babInfo -> setFeasibleNode ();    
+    babInfo -> setFeasibleNode ();
+  //  else printf ("but not always... %p [%p]\n", &si, si.getAuxiliaryInfo ());
 
   double now   = CoinCpuTime ();
   int    ncols = problem_ -> nVars ();
@@ -189,9 +190,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     }
 
 #ifdef DEBUG
-    if (cs.sizeRowCuts () + cs.sizeColCuts ()) {
-      printf (":::::::::::::::::::::constraint cuts\n");
+    if (cs.sizeRowCuts ()) {
+      printf (":::::::::::::::::::::constraint row cuts\n");
       for (int i=0; i<cs.sizeRowCuts (); i++) cs.rowCutPtr (i) -> print ();
+    }
+    if (cs.sizeColCuts ()) {
+      printf (":::::::::::::::::::::constraint col cuts\n");
       for (int i=0; i<cs.sizeColCuts (); i++) cs.colCutPtr (i) -> print ();
     }
 #endif
@@ -210,21 +214,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   problem_ -> installCutOff ();
 
-#ifdef DEBUG
-  printf ("#### BT ...................................................\n");
-#endif
-
   if ((info.pass <= 0)
       && (! boundTightening (&si, cs, chg_bds, babInfo))) {
-#ifdef DEBUG
-    printf ("#### infeasible node at first BT\n");
-#endif
     goto end_genCuts;
   }
-
-#ifdef DEBUG
-  printf ("#### ...................................................... BT DONE\n");
-#endif
 
   //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
@@ -235,6 +228,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   //--------------------------------------------
 
   if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
+
+    if (info.pass <= 0) {
+      if (! aggressiveBT (&si, cs, chg_bds, babInfo))
+	goto end_genCuts;
+      sparse2dense (ncols, chg_bds, changed, nchanged);
+    }
 
     // obtain solution just found by nlp solver
 
@@ -314,7 +313,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   
   {
     int ncuts;
-
     if (firstcall_ && ((ncuts = cs.sizeRowCuts ()) >= 1))
       printf ("Couenne: %d initial row cuts\n", ncuts);
   }

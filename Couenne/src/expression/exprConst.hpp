@@ -54,7 +54,7 @@ class exprConst: public expression {
 
   /// differentiation
   inline expression *differentiate (int) 
-    {return new exprConst (0);}
+    {return new exprConst (0.);}
 
   /// dependence on variable set
   int dependsOn (int *ind, int n, 

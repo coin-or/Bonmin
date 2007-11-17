@@ -26,7 +26,7 @@ void exprAbs::getBounds (expression *&lb, expression *&ub) {
   // lower bound = max (0, lb, -ub)
 
   expression **all = new expression * [6];
-  all [0] = new exprConst (0);   all [1] = new exprConst (0);
+  all [0] = new exprConst (0.);  all [1] = new exprConst (0.);
   all [2] = new exprOpp (uba);   all [3] = new exprOpp (new exprClone (uba));
   all [4] = lba;                 all [5] = new exprClone (lba);
 
@@ -46,7 +46,7 @@ expression *exprAbs::differentiate (int index) {
   expression **arglist = new expression * [4];
   expression  *diffarg = argument_ -> differentiate (index);
 
-  arglist [0] = new exprConst (0);
+  arglist [0] = new exprConst (0.);
   arglist [1] = new exprClone (diffarg);
   arglist [2] = new exprOpp (new exprClone (argument_));
   arglist [3] = new exprOpp (diffarg);

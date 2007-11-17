@@ -70,8 +70,8 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	  printf ("\n");
       }*/
 
-      /*variables_ [i] -> print (std::cout); printf (" := ");
-	variables_ [i] -> Image () -> print (std::cout); printf (" [implied bd]\n");*/
+      // TODO: also test if this expression, or any of its indep
+      // variables, have changed. If not, skip
 
       if (variables_ [i] -> Image () -> impliedBound 
 	  (variables_ [i] -> Index (), lb_, ub_, chg_bds)) {

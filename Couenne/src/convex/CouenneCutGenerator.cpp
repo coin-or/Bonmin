@@ -63,8 +63,7 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   objValue_    (src. objValue_),
   nlp_         (src. nlp_),
   BabPtr_      (src. BabPtr_),
-  infeasNode_  (src. infeasNode_)
-{}
+  infeasNode_  (src. infeasNode_)  {}
 
 
 #define MAX_SLOPE 1e3

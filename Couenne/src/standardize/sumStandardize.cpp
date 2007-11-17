@@ -15,11 +15,6 @@
 
 //#define DEBUG
 
-/// re-organizes multiplication and stores indices (and exponents) of its variables
-void flattenMul (expression *mul, CouNumber &, 
-		 std::map <int, CouNumber> &, 
-		 CouenneProblem *);
-
 
 /// given (expression *) element of sum, returns (coe,ind0,ind1)
 /// depending on element:

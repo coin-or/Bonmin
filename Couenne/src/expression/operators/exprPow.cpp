@@ -41,7 +41,7 @@ expression *exprPow::simplify () {
     }
     else 
       if (fabs (c0) < COUENNE_EPS_SIMPL) 
-	return new exprConst (0);
+	return new exprConst (0.);
   }
   else // only need to check if g(x) == 0
 
@@ -50,7 +50,7 @@ expression *exprPow::simplify () {
       CouNumber expon = arglist_ [1] -> Value ();
 
       if (fabs (expon) < COUENNE_EPS_SIMPL) // expr = x ^ 0 = 1
-	return new exprConst (1);
+	return new exprConst (1.);
 
       else if (fabs (expon - 1) < COUENNE_EPS_SIMPL) { // expr = x ^ 1 = x
 
@@ -79,7 +79,7 @@ expression *exprPow::differentiate (int index) {
 
   if (!(arglist_ [0] -> dependsOn (&index, 1))  &&
       !(arglist_ [1] -> dependsOn (&index, 1)))
-    return new exprConst (0);
+    return new exprConst (0.);
 
   // TODO: two cases
 

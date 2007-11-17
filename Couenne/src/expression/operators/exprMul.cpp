@@ -73,7 +73,7 @@ expression *exprMul::simplify () {
 	    arglist_ [j] = NULL;
 	  }
 
-	return new exprConst (0);
+	return new exprConst (0.);
       }
 
       // check for nonzero constants in multiplications
@@ -121,7 +121,7 @@ expression *exprMul::differentiate (int index) {
     return new exprSum (als, nonconst);
   else {
     delete [] als;
-    return new exprConst (0);
+    return new exprConst (0.);
   }
 }
 

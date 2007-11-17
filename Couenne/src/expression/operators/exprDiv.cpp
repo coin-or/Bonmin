@@ -40,7 +40,7 @@ expression *exprDiv::simplify () {
     }
     else {
       if (fabs (c0) < COUENNE_EPS_SIMPL) // expr = 0/y
-	return new exprConst (0);
+	return new exprConst (0.);
 
       // otherwise, expression = k/y, return k*inv(y)
 
@@ -62,7 +62,7 @@ expression *exprDiv::simplify () {
     if (arglist_ [1] -> Type () == CONST) { // expression = x/h,
 					    // transform into (1/h)*x
 
-      expression *ret = new exprMul (new exprConst (1 / (arglist_ [1] -> Value ())), 
+      expression *ret = new exprMul (new exprConst (1. / (arglist_ [1] -> Value ())), 
 				     arglist_ [0]);
       delete arglist_ [1];
       arglist_ = NULL;
@@ -79,7 +79,7 @@ expression *exprDiv::differentiate (int index) {
 
   if (!(arglist_ [0] -> dependsOn (&index, 1))  &&
       !(arglist_ [1] -> dependsOn (&index, 1)))
-    return new exprConst (0);
+    return new exprConst (0.);
 
   expression **alm  = new expression * [2];
   expression **als  = new expression * [2];

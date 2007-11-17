@@ -177,6 +177,9 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	  chg [wind].setUpper(t_chg_bounds::CHANGED);
 	}
 
+	free (I1); free (I2);
+	free (C1); free (C2);
+
 	return false; // both bounds were weak, no implications possible
       }
     }

@@ -33,7 +33,7 @@ exprAux *exprMul::standardize (CouenneProblem *p, bool addAux) {
 
   exprOp::standardize (p);
 
-  if (nargs_ == 1)  // TODO: what really happens?
+  if (nargs_ == 1)  // TODO: what happens really?
     return NULL;
   /* {
      exprAux *aux = arglist_ [0];
@@ -45,12 +45,12 @@ exprAux *exprMul::standardize (CouenneProblem *p, bool addAux) {
 
   for (int i = 1; i < nargs_ - 1; i++)
     aux = (areSameVariables (aux, arglist_ [i])) ? 
-      (p -> addAuxiliary (new exprPow (aux, new exprConst (2)))) : 
-      (p -> addAuxiliary (new exprMul (aux, new exprClone (arglist_ [i]))));
+      (p -> addAuxiliary (new exprPow (new exprClone (aux), new exprConst (2.)))) : 
+      (p -> addAuxiliary (new exprMul (new exprClone (aux), new exprClone (arglist_ [i]))));
 
   if (areSameVariables (aux, arglist_ [nargs_ - 1])) 
-    aux    = new exprPow (aux, new exprConst (2));
-  else aux = new exprMul (aux, new exprClone (arglist_ [nargs_ - 1]));
+    aux    = new exprPow (new exprClone (aux), new exprConst (2.));
+  else aux = new exprMul (new exprClone (aux), new exprClone (arglist_ [nargs_ - 1]));
 
   return (addAux ? (p -> addAuxiliary (aux)) : new exprAux (this));
 }

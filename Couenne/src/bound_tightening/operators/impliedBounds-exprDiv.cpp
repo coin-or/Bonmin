@@ -25,15 +25,15 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     int ind = arglist_ [0] -> Index ();
 
     if (ind < 0) {
-      printf ("exprDiv::impliedBound: Warning, w=c/d constants\n");
-      return false;
+      printf ("exprDiv::impliedBound: Error, w=c/d constants\n");
+      exit (-1);
     }
 
     CouNumber c = arglist_ [1] -> Value ();
 
     if (fabs (c) < COUENNE_EPS) {
-      printf ("exprDiv::impliedBound: Warning, division by zero\n");
-      return false;
+      printf ("exprDiv::impliedBound: Error, division by zero\n");
+      exit (-1);
     }
 
     // a copy of exprMul::impliedBound for the case where y is a constant

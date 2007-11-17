@@ -13,8 +13,8 @@
 
 #include <iostream>
 
-#include <CouenneTypes.hpp>
-#include <exprCopy.hpp>
+#include "CouenneTypes.hpp"
+#include "exprCopy.hpp"
 
 
 /// expression clone (points to another expression) 

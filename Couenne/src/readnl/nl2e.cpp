@@ -109,7 +109,7 @@ expression *CouenneProblem::nl2e (expr *e) {
   case OP1POW: return new exprPow (nl2e (e -> L.e), 
 				   new exprConst (((expr_n *)e->R.e)->v));
   case OP2POW: return new exprPow (nl2e (e -> L.e), 
-				   new exprConst (2));
+				   new exprConst (2.));
   case OPCPOW: return new exprPow (new exprConst (((expr_n *)e->L.e)->v),
 				   nl2e (e -> R.e));
   case OPFUNCALL: notimpl ("function call");
@@ -142,5 +142,5 @@ expression *CouenneProblem::nl2e (expr *e) {
     //return new exprConst (0);
   }
 
-  return new exprConst (0);
+  return new exprConst (0.);
 }

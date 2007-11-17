@@ -46,7 +46,7 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
     // branch around current point. If it is also at a crazy value,
     // reset it close to zero.
 
-    brpts = (double *) malloc (2 * sizeof (double));
+    brpts = (double *) realloc (brpts, 2 * sizeof (double));
     CouNumber curr = expression::Variable (ind);
 
     if (fabs (curr) >= LARGE_BOUND) curr = 0;
@@ -64,7 +64,7 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 
   // at least one bound is infinite
 
-  brpts = (double *) malloc (sizeof (double)); // only one branch point
+  brpts = (double *) realloc (brpts, sizeof (double)); // only one branch point
 
   // don't privilege xi over yi
 

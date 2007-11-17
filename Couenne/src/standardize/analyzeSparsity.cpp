@@ -20,6 +20,8 @@
 
 #define MIN_DENSITY 0.5
 
+//#define DEBUG
+
 /// analyze sparsity of potential exprQuad/exprGroup and change
 /// linear/quadratic maps accordingly, if necessary by adding new
 /// auxiliary variables and including them in the linear map
@@ -27,8 +29,6 @@ void analyzeSparsity (CouenneProblem *p,
 		      CouNumber c0, 
 		      std::map <int,                 CouNumber> &lmap,
 		      std::map <std::pair <int,int>, CouNumber> &qmap) {
-
-  //  return; // comment this if you don't want exprQuad's around
 
   // simple technique: if number of elements in quadratic map is more
   // than a given fraction of n^2, then turn it into an exprQuad,
@@ -47,16 +47,15 @@ void analyzeSparsity (CouenneProblem *p,
       occur.insert (i -> first.second);
   }
 
-  /*
+#ifdef DEBUG
   printf ("qmap has %d element, occur has %d, md*s*(s+1)/2 = %g\n", 
 	  qmap.size (), 
 	  occur.size (),
 	  MIN_DENSITY * occur.size () * (occur.size () + 1) / 2);
-  */
+#endif
 
   if ((qmap.size () > MIN_DENSITY * occur.size () * (occur.size () + 1) / 2) &&
       (occur.size () > 4))
-
     return;
 
   // flatten exprQuad to a sum of terms (disaggregate). This is while
@@ -74,7 +73,7 @@ void analyzeSparsity (CouenneProblem *p,
 		    new exprClone (p -> Var (indJ)))) : 
       p -> addAuxiliary 
       (new exprPow (new exprClone (p -> Var (indI)),
-		    new exprConst (2)));
+		    new exprConst (2.)));
 
     //    aux -> print (); printf (" := "); aux -> Image () -> print (); printf ("\n");
 

@@ -147,7 +147,7 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
 
       if (qi == qj) 
 	prod    = (new exprPow (new exprClone (p -> Var (qi)), 
-				new exprConst (2)));
+				new exprConst (2.)));
       else prod = (new exprMul (new exprClone (p -> Var (qi)),
 				new exprClone (p -> Var (qj))));
       prod -> print (out, descend, p); out << ' ';

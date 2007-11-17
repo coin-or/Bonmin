@@ -167,8 +167,8 @@ class expression {
     {return this;}
 
   /// print expression to iostream
-  virtual void print (std::ostream &s = std::cout,    /// output stream
-		      bool = false,                   /// descend into auxiliaries' image?
+  virtual void print (std::ostream &s  = std::cout,   /// output stream
+		      bool             = false,       /// descend into auxiliaries' image?
 		      CouenneProblem * = NULL) const  /// problem pointer (in exprGroup)
     {s << '?';}
 

@@ -43,7 +43,7 @@ void exprLog::getBounds (expression *&lb, expression *&ub) {
   alum [3] = new exprLog (uba);
 
   alu [0] = new exprClone (uba); alu [1] = new exprMin (alum, 4);
-  alu [2] = new exprConst (0);   alu [3] = new exprConst (- COUENNE_INFINITY);
+  alu [2] = new exprConst (0.);  alu [3] = new exprConst (- COUENNE_INFINITY);
   ub = new exprMax (alu, 4);
 }
 

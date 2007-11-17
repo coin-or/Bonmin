@@ -97,7 +97,7 @@ expression *exprSum:: differentiate (int index) {
 
   if (!nonconst) {
     delete [] arglist;
-    return new exprConst (0);
+    return new exprConst (0.);
   }
   else return new exprSum (arglist, nonconst);
 }

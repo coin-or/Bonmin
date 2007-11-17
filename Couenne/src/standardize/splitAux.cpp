@@ -161,7 +161,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	// fake a cut in the arglist and check
 
 	expression *cut = alist [i];
-	alist [i] = new exprConst (0);
+	alist [i] = new exprConst (0.);
 
 	// not enough... check now linear (and quadratic!) terms 
 
@@ -212,7 +212,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
       nargs++; // !!!!!!!!!!!!!!!!!!!!!!!!!
       newarglist  = new expression *;
-      *newarglist = new exprConst (0);
+      *newarglist = new exprConst (0.);
     }
 
     // form rhs linear part ////////////////////////////////////////////////////

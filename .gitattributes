@@ -11,6 +11,7 @@ Couenne/inc/config_couenne.h.in -text
 Couenne/src/CouenneConfig.h -text
 Couenne/src/Makefile.am -text
 Couenne/src/Makefile.in -text
+Couenne/src/bound_tightening/aggressiveBT.cpp -text
 Couenne/src/bound_tightening/boundTightening.cpp -text
 Couenne/src/bound_tightening/impliedBounds.cpp -text
 Couenne/src/bound_tightening/obbt.cpp -text
@@ -32,6 +33,7 @@ Couenne/src/branch/CouenneObject.hpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.cpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.hpp -text
 Couenne/src/branch/getFixVarBinFun.cpp -text
+Couenne/src/branch/infeasibility.cpp -text
 Couenne/src/branch/operators/branchExprAbs.cpp -text
 Couenne/src/branch/operators/branchExprDiv.cpp -text
 Couenne/src/branch/operators/branchExprExp.cpp -text

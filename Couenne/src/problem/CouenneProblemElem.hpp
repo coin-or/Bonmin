@@ -31,7 +31,7 @@
  *
  *  new exprExp (new exprSum (new exprVar (1), new exprVar (2))
  *
- *  while lb_ = new exprConst (2) and ub_ = new exprConst (4).
+ *  while lb_ = new exprConst (2.) and ub_ = new exprConst (4.).
  */
 
 class CouenneConstraint {
@@ -55,8 +55,8 @@ class CouenneConstraint {
 
     if (!lb_) 
       if (!ub_) {
-	lb_ = new exprConst (0);
-	ub_ = new exprConst (0);
+	lb_ = new exprConst (0.);
+	ub_ = new exprConst (0.);
       } 
       else         lb_ = new exprConst (- COUENNE_INFINITY);
     else if (!ub_) ub_ = new exprConst   (COUENNE_INFINITY);

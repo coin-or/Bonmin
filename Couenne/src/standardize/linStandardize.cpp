@@ -33,7 +33,7 @@ exprAux *linStandardize (CouenneProblem *p,
 			 std::map <int,                 CouNumber> &lmap,
  			 std::map <std::pair <int,int>, CouNumber> &qmap) {
 
-  ////////////////////////////////////////////////////////////////////////////////////////
+  // check if quadratic forms are dense enough ///////////////////////////////////////////
 
   analyzeSparsity (p, c0, lmap, qmap);
 
@@ -93,7 +93,7 @@ exprAux *linStandardize (CouenneProblem *p,
 
     expression *quad;
 
-    if (*qi == *qj) quad = new exprPow (new exprClone (p -> Var (*qi)), new exprConst (2));
+    if (*qi == *qj) quad = new exprPow (new exprClone (p -> Var (*qi)), new exprConst (2.));
     else            quad = new exprMul (new exprClone (p -> Var (*qi)), 
 					new exprClone (p -> Var (*qj)));
 

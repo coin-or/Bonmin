@@ -62,7 +62,7 @@ class exprLowerBound: public exprVar {
 
   /// differentiation
   inline expression *differentiate (int) 
-    {return new exprConst (0);}
+    {return new exprConst (0.);}
 
   /// dependence on variable set
   inline int dependsOn (int *, int) 
@@ -111,7 +111,7 @@ class exprUpperBound: public exprVar {
 
   /// differentiation
   inline expression *differentiate (int) 
-    {return new exprConst (0);}
+    {return new exprConst (0.);}
 
   /// dependence on variable set
   inline int dependsOn (int *, int) 

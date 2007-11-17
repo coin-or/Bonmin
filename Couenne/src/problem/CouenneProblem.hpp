@@ -98,7 +98,7 @@ class CouenneProblem {
 
   /// Number of original constraints (disregarding those that turned
   /// into auxiliary variable definition)
-  int nOrigConstraints_;
+  int nOrigCons_;
 
   /// Cut off: known value of best integer feasible solution
   mutable CouNumber cutoff_;
@@ -117,7 +117,7 @@ class CouenneProblem {
 
   int nObjs     () const {return objectives_.   size ();} ///< Get number of objectives
   int nCons     () const {return constraints_.  size ();} ///< Get number of constraints
-  int nOrigCons () const {return nOrigConstraints_;}      ///< Get number of original constraints
+  int nOrigCons () const {return nOrigCons_;}             ///< Get number of original constraints
 
   int nOrig    () const {return nOrig_;}              ///< Number of original (independent) variables
   int nIntVars () const {return nIntVars_;}           ///< Number of original integer variables
@@ -132,8 +132,8 @@ class CouenneProblem {
   {return numbering_;}
 
   // get elements from vectors
-  CouenneConstraint *Con (int i) const {return constraints_  [i];} ///< Pointer to i-th constraint
-  CouenneObjective  *Obj (int i) const {return objectives_   [i];} ///< Pointer to i-th objective
+  CouenneConstraint *Con (int i) const {return constraints_ [i];} ///< Pointer to i-th constraint
+  CouenneObjective  *Obj (int i) const {return objectives_  [i];} ///< Pointer to i-th objective
 
   /// Return pointer to i-th variable
   exprVar *Var   (int i) const 
@@ -250,6 +250,9 @@ class CouenneProblem {
 
   /// Set cutoff
   void setCutOff (CouNumber cutoff);
+
+  /// Set cutoff
+  CouNumber getCutOff () {return cutoff_;}
 
   /// Make cutoff known to the problem
   void installCutOff ();

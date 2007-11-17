@@ -209,6 +209,12 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   bool boundTightening (const OsiSolverInterface *, OsiCuts &, 
 			t_chg_bounds *, Bonmin::BabInfo * = NULL) const;
 
+  /// aggressive bound tightening. Fake bounds in order to cut
+  /// portions of the solution space by fathoming on
+  /// bounds/infeasibility
+  bool aggressiveBT (const OsiSolverInterface *, OsiCuts &, 
+		     t_chg_bounds *, Bonmin::BabInfo * = NULL) const;
+
   /// Optimality Based Bound Tightening
   int obbt (CouenneSolverInterface *, OsiCuts &, t_chg_bounds *, Bonmin::BabInfo *) const;
 };

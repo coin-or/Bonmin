@@ -49,10 +49,15 @@ void flattenMul (expression *mul, CouNumber &coe,
     case COU_EXPROPP: // equivalent to multiplying by -1
 
       coe = -coe;
-      flattenMul (arg -> Argument (), coe, indices, p);
-      break;
 
-    case COU_EXPRPOW: { // power
+      if (arg -> Argument () -> Type () == N_ARY) {
+	flattenMul (arg -> Argument (), coe, indices, p);
+	break;
+      } else arg = arg -> Argument ();
+
+    case COU_EXPRPOW: 
+
+      if (arg -> code () == COU_EXPRPOW) { // re-check as it could come from above
 
       expression *base     = arg -> ArgList () [0],
 	         *exponent = arg -> ArgList () [1];
@@ -79,10 +84,13 @@ void flattenMul (expression *mul, CouNumber &coe,
 
     case COU_EXPRSUM: // well, only if there is one element
 
-      if (arg -> nArgs () == 1) {
+      if ((arg -> code  () == COU_EXPRSUM) && // re-check as it could come from above
+	  (arg -> nArgs () == 1)) {
+
 	flattenMul (arg, coe, indices, p);
 	break;
-      }
+
+      } // otherwise, continue into default case
 
     default: { // for all other expression, add associated new auxiliary
 

@@ -50,23 +50,7 @@ public:
   {if (brPts_) free (brPts_);}
 
   /// Copy constructor
-  CouenneObject (const CouenneObject &src):
-    reference_ (src.reference_),
-    brVarInd_  (src.brVarInd_),
-    brPts_     (NULL),
-    strategy_  (src.strategy_) {
-
-    if (src.brPts_) {
-      register int i=0;
-      while (src.brPts_ [i] > -COIN_DBL_MAX) i++;
-
-      if (i) {
-	brPts_ = (CouNumber *) malloc (i * sizeof (CouNumber));
-	while (i--) 
-	  brPts_ [i] = src.brPts_ [i];
-      }
-    }
-  }
+  CouenneObject (const CouenneObject &src);
 
   /// Cloning method
   virtual OsiObject * clone () const

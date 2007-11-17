@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CglCutGenerator.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneSolverInterface.hpp>
+#include "CglCutGenerator.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneSolverInterface.hpp"
 
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
@@ -132,6 +132,8 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
   printf (":::::: ---------------------------------\n");
 #endif
 
+  free (objcoe);
   delete warmstart;
+
   return (nimprov + ni);
 }

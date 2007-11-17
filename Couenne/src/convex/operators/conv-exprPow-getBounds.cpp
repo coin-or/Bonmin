@@ -75,7 +75,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
       expression **all = new expression * [6];
 
       all [0] = new exprOpp   (lbbase);
-      all [2] = new exprConst (0);
+      all [2] = new exprConst (0.);
       all [4] = ubbase;
 
       if (expon > 0) 
@@ -84,7 +84,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 
       // all [3] is lower bound when lbbase <= 0 <= ubbase
 
-      if (expon > COUENNE_EPS) all [3] = new exprConst (0);
+      if (expon > COUENNE_EPS) all [3] = new exprConst (0.);
       else if (isInt || isInvInt) {
 	if (rndexp % 2) 
 	  all [3] = new exprConst (-COUENNE_INFINITY);
@@ -99,7 +99,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
       if (expon > COUENNE_EPS) {
 	if (isInt && !(rndexp % 2))
 	  all [5] = new exprPow (new exprClone (ubbase), new exprConst (expon));
-	else all [5] = new exprConst (0);
+	else all [5] = new exprConst (0.);
       }
       else {
 	if (isInt || isInvInt) {
@@ -107,7 +107,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	    all [5] = new exprPow (new exprClone (ubbase), new exprConst (expon));
 	  else all [5] = new exprPow (new exprClone (lbbase), new exprConst (expon));
 	}
-	else all [5] = new exprConst (0);
+	else all [5] = new exprConst (0.);
       }
 
       lb = new exprMin (all, 6);
@@ -126,7 +126,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 	expression **alu = new expression * [6];
 
 	alu [0] = new exprClone (all [0]);
-	alu [2] = new exprConst (0);
+	alu [2] = new exprConst (0.);
 	alu [4] = new exprClone (ubbase);
 
 	if ((expon > 0) || ((isInt || isInvInt) && !(rndexp % 2)))
@@ -148,7 +148,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
 
 	  if (isInt && !(rndexp % 2)) 
 	    alu [5] = new exprPow (new exprClone(ubbase), new exprConst(expon));
-	  else alu [5] = new exprConst (0);
+	  else alu [5] = new exprConst (0.);
 	}
 	else {
 	  if (isInt || isInvInt) 
