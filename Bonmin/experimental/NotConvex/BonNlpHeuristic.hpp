@@ -15,6 +15,9 @@
 namespace Bonmin{
   /** An heuristic to call an NlpSolver if all CouenneObjects are close to be satisfied (for other integer objects, rounding is performed, is SOS are not satisfied does not run).
   */
+
+  const double maxNlpInf_0 = 1e-5;
+
   class NlpSolveHeuristic : public CbcHeuristic{
 public:
     /** Default constructor.*/

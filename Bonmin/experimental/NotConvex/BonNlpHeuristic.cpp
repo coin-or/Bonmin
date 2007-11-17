@@ -19,13 +19,13 @@ namespace Bonmin{
     CbcHeuristic(),
     nlp_(NULL),
     hasCloned_(false),
-    maxNlpInf_(1e-04),
+    maxNlpInf_(maxNlpInf_0),
     numberSolvePerLevel_(-1),
     couenne_(NULL){
   }
   
   NlpSolveHeuristic::NlpSolveHeuristic(CbcModel & model, OsiSolverInterface &nlp, bool cloneNlp, CouenneProblem * couenne):
-  CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp),maxNlpInf_(1e-04),
+  CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp),maxNlpInf_(maxNlpInf_0),
   numberSolvePerLevel_(-1),
   couenne_(couenne){
     if(cloneNlp)
@@ -91,7 +91,7 @@ namespace Bonmin{
   int
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();
-    
+
     OsiAuxInfo * auxInfo = solver->getAuxiliaryInfo();
     BabInfo * babInfo = dynamic_cast<BabInfo *> (auxInfo);
     if(babInfo){
@@ -101,15 +101,21 @@ namespace Bonmin{
     }
     }
 
+    // if too deep in the BB tree, only run NLP heuristic if
+    // feasibility is low
+    bool too_deep = false;
+
+    // check depth
     if(numberSolvePerLevel_ > -1){
-      if(numberSolvePerLevel_ == 0) return 0 ;
-    double num=CoinDrand48();
-    const int depth = (model_->currentNode()) ? model_->currentNode()->depth() : 0;
-    double beta=pow(2.,numberSolvePerLevel_);
-    if(num> beta*pow(2.,-depth))
-      return 0 ;
+      if(numberSolvePerLevel_ == 0) 
+	return 0;
+      double num=CoinDrand48();
+      const int depth = (model_->currentNode()) ? model_->currentNode()->depth() : 0;
+      double beta=pow(2.,numberSolvePerLevel_);
+      if(num> beta*pow(2.,-depth))
+	too_deep = true;
     }
-    
+
     double * lower = CoinCopyOfArray(solver->getColLower(), nlp_->getNumCols());
     double * upper = CoinCopyOfArray(solver->getColUpper(), nlp_->getNumCols());
     const double * solution = solver->getColSolution();
@@ -118,16 +124,18 @@ namespace Bonmin{
     OsiObject ** objects = model_->objects();
     double maxInfeasibility = 0;
     for(int i = 0 ; i < numberObjects ; i++){
-      CouenneObject * couObj = dynamic_cast<CouenneObject *> (objects[i]);
-      if(couObj)
-      {
-        int dummy;
-        maxInfeasibility = max ( maxInfeasibility, couObj->infeasibility(&info, dummy));
-         if(maxInfeasibility > maxNlpInf_){
-          delete [] lower;
-          delete [] upper;
-          return 0;
-        }
+      CouenneObject * couObj = dynamic_cast <CouenneObject *> (objects [i]);
+      if (couObj) {
+	if (too_deep) { // only test infeasibility if BB level is high
+	  int dummy;
+	  double infeas;
+	  maxInfeasibility = max ( maxInfeasibility, infeas = couObj->infeasibility(&info, dummy));
+	  if(maxInfeasibility > maxNlpInf_){
+	    delete [] lower;
+	    delete [] upper;
+	    return 0;
+	  }
+	}
       }
       else{
         OsiSimpleInteger * intObj = dynamic_cast<OsiSimpleInteger *>(objects[i]);
@@ -148,7 +156,8 @@ namespace Bonmin{
         }
       }
     }
-    
+
+
     // Now set column bounds and solve the NLP with starting point
     double * saveColLower = CoinCopyOfArray(nlp_->getColLower(), nlp_->getNumCols());
     double * saveColUpper = CoinCopyOfArray(nlp_->getColUpper(), nlp_->getNumCols());
@@ -157,6 +166,7 @@ namespace Bonmin{
     nlp_->setColSolution(solution);
     nlp_->initialSolve();
     double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
+
     bool foundSolution = obj < objectiveValue;
 //    if(foundSolution)//Better solution found update
     {
