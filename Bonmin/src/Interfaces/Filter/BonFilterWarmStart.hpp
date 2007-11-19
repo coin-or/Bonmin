@@ -18,7 +18,8 @@
 
 #include <vector>
 
-namespace Bonmin{
+namespace Bonmin
+{
 
   /** Warm start for filter interface.
   Warm start for filter constists of a (possibly huge) array of integers.
@@ -28,45 +29,48 @@ namespace Bonmin{
   {
     typedef FilterSolver::fint fint;
     typedef FilterSolver::real real;
-    
+
   public:
     /** Default values for istat */
     static fint def_istat[14];
     /** Constructor */
     FilterWarmStart(const fint xSize = 0,
-		    const real* xArray = NULL,
-		    const fint lamSize = 0,
-		    const real* lamArray = NULL,
-		    const fint lwsSize = 0,
-		    const fint *lwsArray = NULL,
-		    const fint istat[14] = def_istat);
+        const real* xArray = NULL,
+        const fint lamSize = 0,
+        const real* lamArray = NULL,
+        const fint lwsSize = 0,
+        const fint *lwsArray = NULL,
+        const fint istat[14] = def_istat);
 
     /** Copy constructor */
     FilterWarmStart(const FilterWarmStart & other);
 
     /** virtual copy */
     virtual CoinWarmStart * clone() const
-    { return new FilterWarmStart(*this);}
+    {
+      return new FilterWarmStart(*this);
+    }
 
 #ifdef AWDoesntseemnecessary
     /**Set size of the array. */
-    void setInfo(const fint size = 0, const fint * warmArray = NULL, const fint istat[14] = def_istat){
-      if(size != size_){
-	size_ = size;
-	if(warmArray_) delete [] warmArray_;
-	warmArray_ = NULL;
-	if(size > 0)
-	  warmArray_ = new fint[size];
+    void setInfo(const fint size = 0, const fint * warmArray = NULL, const fint istat[14] = def_istat)
+    {
+      if (size != size_) {
+        size_ = size;
+        if (warmArray_) delete [] warmArray_;
+        warmArray_ = NULL;
+        if (size > 0)
+          warmArray_ = new fint[size];
       }
-      else if(size > 0){
-	assert(warmArray_);
+      else if (size > 0) {
+        assert(warmArray_);
       }
-      if(size <= 0 && warmArray)
-	throw CoinError("Array passed but size is 0","setInfo(const fint, const fint *)","FilterWarmStart");	  
+      if (size <= 0 && warmArray)
+        throw CoinError("Array passed but size is 0","setInfo(const fint, const fint *)","FilterWarmStart");
       CoinCopyN(warmArray, size_, warmArray_);
-      
-      for(int i = 0 ; i < 14 ; i ++)
-	istat_[i] = istat[i];
+
+      for (int i = 0 ; i < 14 ; i ++)
+        istat_[i] = istat[i];
     }
 #endif
 
@@ -80,42 +84,53 @@ namespace Bonmin{
     virtual void applyDiff(const CoinWarmStartDiff * const cswDiff);
 
     /** Access to x Array */
-    const real *xArray() const {
+    const real *xArray() const
+    {
       if (tempxArray_) {
-	return tempxArray_;
+        return tempxArray_;
       }
       else {
-	return xArray_;
+        return xArray_;
       }
     }
 
     /** Array to x size */
-    fint xSize() const {
-      return xSize_;}
+    fint xSize() const
+    {
+      return xSize_;
+    }
 
     /** Access to lam Array */
-    const real *lamArray() const {
+    const real *lamArray() const
+    {
       if (templamArray_)
-	return templamArray_;
+        return templamArray_;
       else
-	return lamArray_;
+        return lamArray_;
     }
 
     /** Array to lam size */
-    fint lamSize() const {
-      return lamSize_;}
+    fint lamSize() const
+    {
+      return lamSize_;
+    }
 
     /** Access to lws array */
-    const fint *lwsArray() const{
+    const fint *lwsArray() const
+    {
       return lwsArray_;
     }
 
     /** Access to lws size. */
-    fint lwsSize() const {
-      return lwsSize_;}
+    fint lwsSize() const
+    {
+      return lwsSize_;
+    }
 
-    const fint* istat()const {
-      return istat_;}
+    const fint* istat()const
+    {
+      return istat_;
+    }
 
     void flushPoint();
   private:
@@ -156,8 +171,8 @@ namespace Bonmin{
 
   public:
     FilterWarmStartDiff(fint xSize, real* xArray,
-			fint lamSize, real* lamArray,
-			fint capacity);
+        fint lamSize, real* lamArray,
+        fint capacity);
 
     virtual ~FilterWarmStartDiff();
 
@@ -165,10 +180,10 @@ namespace Bonmin{
     {
       int size = differences.size();
       FilterWarmStartDiff * return_value =
-	new FilterWarmStartDiff(xSize_, xArray_, lamSize_, lamArray_, size);
+            new FilterWarmStartDiff(xSize_, xArray_, lamSize_, lamArray_, size);
       return_value->differences = differences;
-      for(int i = 0 ; i < 14 ; i++) {
-	return_value->istat_[i] = istat_[i];
+      for (int i = 0 ; i < 14 ; i++) {
+        return_value->istat_[i] = istat_[i];
       }
       return return_value;
     }

@@ -406,14 +406,21 @@ nodeSolver_LDADD = \
 nodeSolver_LDFLAGS = -rpath $(libdir)
 
 ########################################################################
-#                         make distclean stuff                         #
+#                            Astyle stuff                              #
 ########################################################################
-CLEANFILES = 
+
+# Here repeat all source files, with "bak" appended
+ASTYLE_FILES = \
+             BonMin.cpp \
+             BonNodeSolver.cpp
+
+CLEANFILES = $(ASTYLE_FILES)
 DISTCLEANFILES = 
+SUFFIXES = .cppbak .hppbak
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .lo .o .obj
+.SUFFIXES: .cppbak .hppbak .cpp .hpp .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -688,6 +695,18 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-info-am
 
+
+astyle: $(ASTYLE_FILES)
+
+.hpp.hppbak:
+	mv $< $@
+	$(ASTYLE) $(ASTYLEFLAGS) < $@ > $<
+	touch $@
+
+.cpp.cppbak:
+	mv $< $@
+	$(ASTYLE) $(ASTYLEFLAGS) < $@ > $<
+	touch $@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

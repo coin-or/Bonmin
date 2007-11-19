@@ -11,10 +11,12 @@
 #define BonPseudoCosts_H
 
 #include "OsiChooseVariable.hpp"
-namespace Bonmin{
+namespace Bonmin
+{
 
-  class PseudoCosts: public OsiPseudoCosts {
-    public:
+  class PseudoCosts: public OsiPseudoCosts
+  {
+  public:
     /** Default constructor.*/
     PseudoCosts();
 
@@ -23,46 +25,64 @@ namespace Bonmin{
 
     /** Assignment operator const version.*/
     PseudoCosts & operator=(const PseudoCosts&rhs);
-    
-    /** Acces upTotalChange.*/
-    inline double * upTotalChange(){
-      return upTotalChange_;}
-
-    /** Acces downTotalChange.*/
-    inline double * downTotalChange(){
-      return downTotalChange_;}
-
-    /** Acces upNumber.*/
-    inline int * upNumber(){
-      return upNumber_;}
-
-    /** Acces downNumber.*/
-    inline int * downNumber(){
-      return downNumber_;}
 
     /** Acces upTotalChange.*/
-    inline const double * upTotalChange() const{
-      return upTotalChange_;}
+    inline double * upTotalChange()
+    {
+      return upTotalChange_;
+    }
 
     /** Acces downTotalChange.*/
-    inline const double * downTotalChange() const{
-      return downTotalChange_;}
+    inline double * downTotalChange()
+    {
+      return downTotalChange_;
+    }
 
     /** Acces upNumber.*/
-    inline const int * upNumber() const{
-      return upNumber_;}
+    inline int * upNumber()
+    {
+      return upNumber_;
+    }
 
     /** Acces downNumber.*/
-    inline const int * downNumber() const{
-      return downNumber_;}
+    inline int * downNumber()
+    {
+      return downNumber_;
+    }
+
+    /** Acces upTotalChange.*/
+    inline const double * upTotalChange() const
+    {
+      return upTotalChange_;
+    }
+
+    /** Acces downTotalChange.*/
+    inline const double * downTotalChange() const
+    {
+      return downTotalChange_;
+    }
+
+    /** Acces upNumber.*/
+    inline const int * upNumber() const
+    {
+      return upNumber_;
+    }
+
+    /** Acces downNumber.*/
+    inline const int * downNumber() const
+    {
+      return downNumber_;
+    }
 
     /** Access number objects.*/
-    inline int numberObjects() const{
-      return numberObjects_;}
-   
+    inline int numberObjects() const
+    {
+      return numberObjects_;
+    }
+
     /** Add a pseudo cost information.*/
     void addInfo(int way, double originalObj, double originalInfeas,
-                 double newObj, double newInfeas, int status); 
+        double newObj, double newInfeas, int status);
 
   };
 

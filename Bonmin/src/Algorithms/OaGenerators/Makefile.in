@@ -392,9 +392,13 @@ include_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonDummyHeuristic.cppbak BonDummyHeuristic.hppbak \
-	BonOACutGenerator.cppbak BonOACutGenerator.hppbak \
+	BonOaNlpOptim.cppbak BonOaNlpOptim.hppbak \
 	BonOACutGenerator2.cppbak BonOACutGenerator2.hppbak \
-        BonOaFeasChecker.hppbak BonOaFeasChecker.cppbak
+        BonOaFeasChecker.cppbak BonOaFeasChecker.hppbak \
+	BonOaDecBase.cppbak BonOaDecBase.hppbak \
+        BonEcpCuts.cppbak BonEcpCuts.hppbak \
+        BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
+	BonOAMessages.cppbak BonOAMessages.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -677,8 +681,6 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am
 	tags uninstall uninstall-am uninstall-includeHEADERS \
 	uninstall-info-am
 
-	BonOaMessages.cppbak BonOaMessages.hppbak BonEcpCuts.hppbak \
-        BonEcpCuts.cppbak
 
 astyle: $(ASTYLE_FILES)
 

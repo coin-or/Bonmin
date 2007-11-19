@@ -1,4 +1,4 @@
- // (C) Copyright International Business Machines (IBM) 2006, 2007
+// (C) Copyright International Business Machines (IBM) 2006, 2007
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -12,77 +12,86 @@
 
 #include "BonOaDecBase.hpp"
 #include "CglCutGenerator.hpp"
-namespace Bonmin {
-  class EcpCuts: public OaDecompositionBase {
-    public:
+namespace Bonmin
+{
+  class EcpCuts: public OaDecompositionBase
+  {
+  public:
     EcpCuts(OsiTMINLPInterface *nlp = NULL,
-            int numRounds = 1,
-	    double abs_violation_tol = 1e-6,
-	    double rel_violation_tol = 1000.,
-	    double beta = -1.
-	    ):
-      OaDecompositionBase(nlp,NULL, NULL,0,0,0),
-      objValue_(-COIN_DBL_MAX),
-      numRounds_(numRounds),
-      abs_violation_tol_(abs_violation_tol),
-      rel_violation_tol_(rel_violation_tol),
-      beta_(beta)
-    {
-    }
+        int numRounds = 1,
+        double abs_violation_tol = 1e-6,
+        double rel_violation_tol = 1000.,
+        double beta = -1.
+           ):
+        OaDecompositionBase(nlp,NULL, NULL,0,0,0),
+        objValue_(-COIN_DBL_MAX),
+        numRounds_(numRounds),
+        abs_violation_tol_(abs_violation_tol),
+        rel_violation_tol_(rel_violation_tol),
+        beta_(beta)
+    {}
     EcpCuts(BabSetupBase & b);
-    
+
     /// Copy constructor
     EcpCuts(const EcpCuts & copy):
-      OaDecompositionBase(copy),
-      objValue_(copy.objValue_),
-      numRounds_(copy.numRounds_),
-      abs_violation_tol_(copy.abs_violation_tol_),
-      rel_violation_tol_(copy.rel_violation_tol_),
-      beta_(copy.beta_)
-    {
-    }
-    
+        OaDecompositionBase(copy),
+        objValue_(copy.objValue_),
+        numRounds_(copy.numRounds_),
+        abs_violation_tol_(copy.abs_violation_tol_),
+        rel_violation_tol_(copy.rel_violation_tol_),
+        beta_(copy.beta_)
+    {}
+
     /// clone
-    CglCutGenerator * clone() const{
+    CglCutGenerator * clone() const
+    {
       return new EcpCuts(*this);
     }
- 
+
     /// Destructor
-    virtual ~EcpCuts(){
-    }
+    virtual ~EcpCuts()
+    {}
     /** Standard cut generation methods. */
     virtual void generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
-                              const CglTreeInfo info = CglTreeInfo()) const;
+        const CglTreeInfo info = CglTreeInfo()) const;
     double doEcpRounds(OsiSolverInterface &si,
-		       bool leaveSiUnchanged,
-		       double* violation = NULL);
+        bool leaveSiUnchanged,
+        double* violation = NULL);
 
-    void setNumRounds(int value){
-      numRounds_ = value;}
+    void setNumRounds(int value)
+    {
+      numRounds_ = value;
+    }
 
-    void setPropabilityFactor(double value){
+    void setPropabilityFactor(double value)
+    {
       beta_ = value;
     }
 
-    void setAbsViolationTolerance(double value){
+    void setAbsViolationTolerance(double value)
+    {
       abs_violation_tol_ = value;
     }
-    void setRelViolationTolerance(double value){
+    void setRelViolationTolerance(double value)
+    {
       rel_violation_tol_ = value;
     }
 
     /** Register ecp cuts options.*/
     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
-protected:
+  protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
-    virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
-                           SubMipSolver *& subMip, OsiBabSolver * babInfo, double &cutoff) const{
-    throw -1;
+    virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip,
+        SubMipSolver *& subMip, OsiBabSolver * babInfo, double &cutoff) const
+    {
+      throw -1;
     }
     /// virutal method to decide if local search is performed
-    virtual bool doLocalSearch() const{
-      return 0;}
+    virtual bool doLocalSearch() const
+    {
+      return 0;
+    }
   private:
     /** Record obj value at final point of Ecp. */
     mutable double objValue_;

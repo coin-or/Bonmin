@@ -9,32 +9,35 @@
 
 #include "BonBabInfos.hpp"
 
-namespace Bonmin{
+namespace Bonmin
+{
   /** Default constructor.*/
   BabInfo::BabInfo(int type):
-  AuxInfo(type),
-  babPtr_(NULL){
-  }
-  
+      AuxInfo(type),
+      babPtr_(NULL)
+  {}
+
   /** Constructor from OsiBabSolver.*/
   BabInfo::BabInfo(const OsiBabSolver &other):
-  AuxInfo(other),
-  babPtr_(NULL){
-  }
-  
+      AuxInfo(other),
+      babPtr_(NULL)
+  {}
+
   /** Copy constructor.*/
   BabInfo::BabInfo(const BabInfo &other):
-  AuxInfo(other),
-  babPtr_(other.babPtr_){
-  }
-  
+      AuxInfo(other),
+      babPtr_(other.babPtr_)
+  {}
+
   /** Destructor.*/
-  BabInfo::~BabInfo(){
+  BabInfo::~BabInfo()
+  {}
+
+  /** Virtual copy constructor.*/
+  OsiAuxInfo *
+  BabInfo::clone() const
+  {
+    return new BabInfo(*this);
   }
-  
-/** Virtual copy constructor.*/
-OsiAuxInfo * 
-  BabInfo::clone() const{
-  return new BabInfo(*this);}
 }/* end namespace Bonmin*/
 

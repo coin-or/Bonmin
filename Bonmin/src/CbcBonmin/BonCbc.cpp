@@ -39,11 +39,10 @@ bool BonminAbortAll;
 
 extern "C"
 {
-  
+
   static bool BonminInteruptedOnce =false;
   static void signal_handler(int whichSignal) {
-    if(BonminInteruptedOnce)
-    {
+    if (BonminInteruptedOnce) {
       std::cerr<<"User forced interuption"<<std::endl;
       exit(0);
     }
@@ -65,37 +64,38 @@ namespace Bonmin
 
   /** Constructor.*/
   Bab::Bab():
-  bestSolution_(NULL),
-  mipStatus_(),
-  bestObj_(1e200),
-  bestBound_(-1e200),
-  continuousRelaxation_(-COIN_DBL_MAX),
-  numNodes_(0),
-  mipIterationCount_(0),
-  model_(),
-  modelHandler_(NULL),
-  objects_(0),
-  nObjects_(0)
+      bestSolution_(NULL),
+      mipStatus_(),
+      bestObj_(1e200),
+      bestBound_(-1e200),
+      continuousRelaxation_(-COIN_DBL_MAX),
+      numNodes_(0),
+      mipIterationCount_(0),
+      model_(),
+      modelHandler_(NULL),
+      objects_(0),
+      nObjects_(0)
   {}
-  
+
   /** Destructor.*/
   Bab::~Bab()
   {
     if (bestSolution_) delete [] bestSolution_;
     bestSolution_ = NULL;
-    for ( int i = 0 ; i < nObjects_ ; i++){
-      delete objects_[i];}
+    for ( int i = 0 ; i < nObjects_ ; i++) {
+      delete objects_[i];
+    }
     delete [] objects_;
     delete modelHandler_;
   }
-  
+
   /**operator() performs the branchAndBound*/
-  void 
+  void
   Bab::operator()(BabSetupBase & s)
   {
     branchAndBound(s);
   }
-  
+
   /** Perform a branch-and-bound on given setup.*/
   void
   Bab::branchAndBound(BabSetupBase & s)
@@ -104,13 +104,13 @@ namespace Bonmin
     OsiBabSolver *  babInfo = dynamic_cast<OsiBabSolver *>(s.continuousSolver()->getAuxiliaryInfo());
     assert(babInfo);
     Bonmin::BabInfo *  bonBabInfoPtr = dynamic_cast<Bonmin::BabInfo*>(babInfo);
-    if(bonBabInfoPtr == NULL) {//Replace with a Bonmin::babInfo
-       bonBabInfoPtr = new Bonmin::BabInfo(*babInfo);
-       s.continuousSolver()->setAuxiliaryInfo(bonBabInfoPtr);
-       delete bonBabInfoPtr;
-       bonBabInfoPtr = dynamic_cast<Bonmin::BabInfo*>(s.continuousSolver()->getAuxiliaryInfo());
+    if (bonBabInfoPtr == NULL) {//Replace with a Bonmin::babInfo
+      bonBabInfoPtr = new Bonmin::BabInfo(*babInfo);
+      s.continuousSolver()->setAuxiliaryInfo(bonBabInfoPtr);
+      delete bonBabInfoPtr;
+      bonBabInfoPtr = dynamic_cast<Bonmin::BabInfo*>(s.continuousSolver()->getAuxiliaryInfo());
     }
-     bonBabInfoPtr->setBabPtr(this);
+    bonBabInfoPtr->setBabPtr(this);
 
     OsiSolverInterface * solver = s.continuousSolver()->clone();
     delete modelHandler_;
@@ -118,65 +118,64 @@ namespace Bonmin
     model_.passInMessageHandler(modelHandler_);
     model_.assignSolver(solver, true);
 
-  //  s.continuousSolver() = model_.solver();
-    
-    
- //   if(s.continuousSolver()->objects()!=NULL){
- //     model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
- //   }
-    
-    
-    
+    //  s.continuousSolver() = model_.solver();
+
+
+//   if(s.continuousSolver()->objects()!=NULL){
+//     model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
+//   }
+
+
+
     int specOpt = s.getIntParameter(BabSetupBase::SpecialOption);
-    if(specOpt){
+    if (specOpt) {
       model_.setSpecialOptions(specOpt);
-      if(specOpt==16){
+      if (specOpt==16) {
         CbcNlpStrategy strat(s.getIntParameter(BabSetupBase::MaxFailures), s.getIntParameter(BabSetupBase::MaxInfeasible), s.getIntParameter(BabSetupBase::FailureBehavior));
         model_.setStrategy(strat);
       }
     }
-    
-  
-  
+
+
+
     model_.setMaximumCutPasses(s.getIntParameter(BabSetupBase::NumCutPasses));
     model_.setMaximumCutPassesAtRoot(s.getIntParameter(BabSetupBase::NumCutPassesAtRoot));
-   
+
     //Setup cutting plane methods
-    for(BabSetupBase::CuttingMethods::iterator i = s.cutGenerators().begin() ;
-        i != s.cutGenerators().end() ; i++){
+    for (BabSetupBase::CuttingMethods::iterator i = s.cutGenerators().begin() ;
+        i != s.cutGenerators().end() ; i++) {
 
       OaDecompositionBase * oa = dynamic_cast<OaDecompositionBase *>(i->cgl);
       if (oa && oa->reassignLpsolver())
         oa->assignLpInterface(model_.solver());
-      if(i->atSolution)
+      if (i->atSolution)
         model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str(), false, true);
       else
         model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str());
     }
-    
-    for(BabSetupBase::HeuristicMethods::iterator i = s.heuristics().begin() ; 
-        i != s.heuristics().end() ; i++){
+
+    for (BabSetupBase::HeuristicMethods::iterator i = s.heuristics().begin() ;
+        i != s.heuristics().end() ; i++) {
       CbcHeuristic * heu = *i;
       heu->setModel(&model_);
       model_.addHeuristic(*i);
     }
-    
-    
+
+
     //need to record solver logLevel here
     int logLevel = s.continuousSolver()->messageHandler()->logLevel();
-    
+
     //Set true branch-and-bound parameters
-    model_.setLogLevel(s.getIntParameter(BabSetupBase::BabLogLevel));    
-    
+    model_.setLogLevel(s.getIntParameter(BabSetupBase::BabLogLevel));
+
     // Put back solver logLevel
     model_.solver()->messageHandler()->setLogLevel(logLevel);
-    
+
     model_.setPrintFrequency(s.getIntParameter(BabSetupBase::BabLogInterval));
-        
+
     bool ChangedObject = false;
     //Pass over user set branching priorities to Cbc
-    if(s.continuousSolver()->objects()==NULL)
-    {
+    if (s.continuousSolver()->objects()==NULL) {
       const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
       //set priorities, prefered directions...
       const int * priorities = nlpSolver->getPriorities();
@@ -187,13 +186,11 @@ namespace Bonmin
       model_.findIntegers(true,hasPseudo);
       OsiObject ** simpleIntegerObjects = model_.objects();
       int numberObjects = model_.numberObjects();
-      if(priorities != NULL || directions != NULL || hasPseudo)
-      {
+      if (priorities != NULL || directions != NULL || hasPseudo) {
         ChangedObject = true;
-        for (int i = 0 ; i < numberObjects ; i++)
-        {
+        for (int i = 0 ; i < numberObjects ; i++) {
           CbcObject * object = dynamic_cast<CbcObject *>
-          (simpleIntegerObjects[i]);
+              (simpleIntegerObjects[i]);
           int iCol = object->columnNumber();
           if (priorities)
             object->setPriority(priorities[iCol]);
@@ -201,94 +198,93 @@ namespace Bonmin
             object->setPreferredWay(directions[iCol]);
           if (upPsCosts) {
             CbcSimpleIntegerPseudoCost * pscObject =
-            dynamic_cast<CbcSimpleIntegerPseudoCost*> (object);
+              dynamic_cast<CbcSimpleIntegerPseudoCost*> (object);
             pscObject->setUpPseudoCost(upPsCosts[iCol]);
             pscObject->setDownPseudoCost(downPsCosts[iCol]);
           }
         }
       }
-    
-    // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
-    const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
-    if (!s.getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
-    {
-      const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
-      const int & numSos = sos->num;
-      printf("Adding %i sos constraints.\n", sos->num);
-      CbcObject ** objects = new CbcObject*[numSos];
-      const int * starts = sos->starts;
-      const int * indices = sos->indices;
-      const char * types = sos->types;
-      const double * weights = sos->weights;
-      //verify if model has user set priorities
-      bool hasPriorities = false;
-      const int * varPriorities = nlpSolver->getPriorities();
-      int numberObjects = model_.numberObjects();
-      if (varPriorities)
+
+      // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
+      const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
+      if (!s.getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
       {
-        for (int i = 0 ; i < numberObjects ; i++) {
-          if (varPriorities[i]) {
-            hasPriorities = true;
-            break;
+        const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
+        const int & numSos = sos->num;
+        printf("Adding %i sos constraints.\n", sos->num);
+        CbcObject ** objects = new CbcObject*[numSos];
+        const int * starts = sos->starts;
+        const int * indices = sos->indices;
+        const char * types = sos->types;
+        const double * weights = sos->weights;
+        //verify if model has user set priorities
+        bool hasPriorities = false;
+        const int * varPriorities = nlpSolver->getPriorities();
+        int numberObjects = model_.numberObjects();
+        if (varPriorities)
+        {
+          for (int i = 0 ; i < numberObjects ; i++) {
+            if (varPriorities[i]) {
+              hasPriorities = true;
+              break;
+            }
           }
         }
-      }
-      const int * sosPriorities = sos->priorities;
-      if (sosPriorities)
-      {
-        for (int i = 0 ; i < numSos ; i++) {
-          if (sosPriorities[i]) {
-            hasPriorities = true;
-            break;
+        const int * sosPriorities = sos->priorities;
+        if (sosPriorities)
+        {
+          for (int i = 0 ; i < numSos ; i++) {
+            if (sosPriorities[i]) {
+              hasPriorities = true;
+              break;
+            }
           }
         }
-      }
-      for (int i = 0 ; i < numSos ; i++)
-      {
-        int start = starts[i];
-        int length = starts[i + 1] - start;
-        objects[i] = new CbcSOS(&model_, length, &indices[start],
-                                &weights[start], i, types[i]);
-        
-        objects[i]->setPriority(10);
-        if (hasPriorities && sosPriorities && sosPriorities[i]) {
-          objects[i]->setPriority(sosPriorities[i]);
+        for (int i = 0 ; i < numSos ; i++)
+        {
+          int start = starts[i];
+          int length = starts[i + 1] - start;
+          objects[i] = new CbcSOS(&model_, length, &indices[start],
+              &weights[start], i, types[i]);
+
+          objects[i]->setPriority(10);
+          if (hasPriorities && sosPriorities && sosPriorities[i]) {
+            objects[i]->setPriority(sosPriorities[i]);
+          }
         }
+        model_.addObjects(numSos, objects);
+        for (int i = 0 ; i < numSos ; i++)
+          delete objects[i];
+        delete [] objects;
       }
-      model_.addObjects(numSos, objects);
-      for (int i = 0 ; i < numSos ; i++)
-        delete objects[i];
-      delete [] objects;
+
+      //If Setup contains more objects add them to Cbc
+      if (s.objects().size()) {
+        CbcObject ** objects = new CbcObject *[s.objects().size()];
+        for (unsigned int i = 0 ; i < s.objects().size() ; i++) {
+          objects[i] = dynamic_cast<CbcObject *> (s.objects()[i]);
+          assert(objects[i]);
+          std::cout<<"Adding user CbcObject "<<i<<std::endl;
+          objects[i]->setModel(&model_);
+        }
+        model_.addObjects(s.objects().size(), objects);
+        delete [] objects;
+      }
+
+      replaceIntegers(model_.objects(), model_.numberObjects());
+    }
+    else {//Pass in objects to Cbc
+      model_.addObjects(s.continuousSolver()->numberObjects(),
+          s.continuousSolver()->objects());
     }
 
-    //If Setup contains more objects add them to Cbc
-    if(s.objects().size())
-    {
-      CbcObject ** objects = new CbcObject *[s.objects().size()];
-      for(unsigned int i = 0 ; i < s.objects().size() ; i++){
-         objects[i] = dynamic_cast<CbcObject *> (s.objects()[i]);
-         assert(objects[i]);
-         std::cout<<"Adding user CbcObject "<<i<<std::endl;
-         objects[i]->setModel(&model_);
-       }
-      model_.addObjects(s.objects().size(), objects);
-      delete [] objects;
-    }
-    
-    replaceIntegers(model_.objects(), model_.numberObjects());
-   } 
-   else{//Pass in objects to Cbc
-     model_.addObjects(s.continuousSolver()->numberObjects(),
-                       s.continuousSolver()->objects());
-   }
-    
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
-    
+
     model_.setCutoff(s.getDoubleParameter(BabSetupBase::Cutoff) + CUTOFF_TOL);
-    
+
     model_.setDblParam(CbcModel::CbcAllowableGap, s.getDoubleParameter(BabSetupBase::AllowableGap));
     model_.setDblParam(CbcModel::CbcAllowableFractionGap, s.getDoubleParameter(BabSetupBase::AllowableFractionGap));
-    
+
     // Definition of node selection strategy
 
     if (s.nodeComparisonMethod()==BabSetupBase::bestBound) {
@@ -318,20 +314,25 @@ namespace Bonmin
       delete guessHeu;
     }
 
-    if(s.treeTraversalMethod() == BabSetupBase::HeapOnly){
+    if (s.treeTraversalMethod() == BabSetupBase::HeapOnly) {
       //Do nothing this is the default of Cbc.
     }
-    else if(s.treeTraversalMethod() == BabSetupBase::DiveFromBest){
+    else if (s.treeTraversalMethod() == BabSetupBase::DiveFromBest) {
       CbcDiver treeTraversal;
       treeTraversal.initialize(s.options());
       model_.passInTreeHandler(treeTraversal);
     }
-    else if(s.treeTraversalMethod() == BabSetupBase::DfsDiveFromBest){
+    else if (s.treeTraversalMethod() == BabSetupBase::ProbedDive) {
+      CbcProbedDiver treeTraversal;
+      treeTraversal.initialize(s.options());
+      model_.passInTreeHandler(treeTraversal);
+    }
+    else if (s.treeTraversalMethod() == BabSetupBase::DfsDiveFromBest) {
       CbcDfsDiver treeTraversal;
       treeTraversal.initialize(s.options());
       model_.passInTreeHandler(treeTraversal);
     }
-    else if(s.treeTraversalMethod() == BabSetupBase::DfsDiveDynamic){
+    else if (s.treeTraversalMethod() == BabSetupBase::DfsDiveDynamic) {
       CbcDfsDiver treeTraversal;
       treeTraversal.initialize(s.options());
       model_.passInTreeHandler(treeTraversal);
@@ -344,108 +345,108 @@ namespace Bonmin
       compare.setDiver(dfs);
       model_.setNodeComparison(compare);
     }
-    
+
     model_.setNumberStrong(s.getIntParameter(BabSetupBase::NumberStrong));
-    
+
     model_.setNumberBeforeTrust(s.getIntParameter(BabSetupBase::MinReliability));
-    
+
     model_.setNumberPenalties(8);
-    
+
     model_.setDblParam(CbcModel::CbcMaximumSeconds, s.getDoubleParameter(BabSetupBase::MaxTime));
-    
+
     model_.setMaximumNodes(s.getIntParameter(BabSetupBase::MaxNodes));
-    
+
     model_.setMaximumSolutions(s.getIntParameter(BabSetupBase::MaxSolutions));
-    
+
     model_.setIntegerTolerance(s.getDoubleParameter(BabSetupBase::IntTol));
-    
-    
+
+
     // Redundant definition of default branching (as Default == User)
     CbcBranchDefaultDecision branch;
-    if(s.branchingMethod() != NULL){
+    if (s.branchingMethod() != NULL) {
       s.branchingMethod()->setSolver(model_.solver());
       s.branchingMethod()->setNumberStrong(model_.numberStrong());
       OsiChooseStrong * strong = dynamic_cast<OsiChooseStrong *>(s.branchingMethod());
-      if(strong)
+      if (strong)
         strong->setNumberBeforeTrusted(model_.numberBeforeTrust());
       BonChooseVariable * strong2 = dynamic_cast<BonChooseVariable *>(s.branchingMethod());
       if (strong2)
-	strong2->setCbcModel(&model_);
+        strong2->setCbcModel(&model_);
       branch.setChooseMethod(*s.branchingMethod());
     }
-   
+
     //Get objects from model_ if it is not null means there are some sos constraints or non-integer branching object
-    // pass them to cut generators. 
+    // pass them to cut generators.
     OsiObject ** objects = model_.objects();
-    if(specOpt!=16 && objects){
+    if (specOpt!=16 && objects) {
       int numberObjects = model_.numberObjects();
-      if(objects_ != NULL){
-         for(int i = 0 ; i < nObjects_; i++)
-           delete objects_[i];
+      if (objects_ != NULL) {
+        for (int i = 0 ; i < nObjects_; i++)
+          delete objects_[i];
       }
       delete [] objects_;
       objects_ = new OsiObject*[numberObjects];
       nObjects_ = numberObjects;
-      for(int i = 0 ; i < numberObjects; i++){
+      for (int i = 0 ; i < numberObjects; i++) {
         OsiObject * obj = objects[i];
         CbcSimpleInteger * intObj = dynamic_cast<CbcSimpleInteger *> (obj);
-        if(intObj){
+        if (intObj) {
           objects_[i] = intObj->osiObject();
         }
-        else{
+        else {
           CbcSOS * sosObj = dynamic_cast<CbcSOS *>(obj);
-          if(sosObj) objects_[i] = sosObj->osiObject(model_.solver());
-          else{//Maybe an unsupported CbcObject
+          if (sosObj) objects_[i] = sosObj->osiObject(model_.solver());
+          else {//Maybe an unsupported CbcObject
             CbcObject * cbcObj = dynamic_cast<CbcObject *>(obj);
-            if(cbcObj){
-               std::cerr<<"Unsupported CbcObject appears in the code"<<std::endl;
-               throw UNSUPPORTED_CBC_OBJECT;
+            if (cbcObj) {
+              std::cerr<<"Unsupported CbcObject appears in the code"<<std::endl;
+              throw UNSUPPORTED_CBC_OBJECT;
             }
-            else{//It has to be an OsiObject.
+            else {//It has to be an OsiObject.
               objects_[i]=obj->clone();
             }
           }
-        } 
+        }
       }
       CbcCutGenerator ** gen = model_.cutGenerators();
       int numGen = model_.numberCutGenerators();
-      for(int i = 0 ; i < numGen ; i++){
+      for (int i = 0 ; i < numGen ; i++) {
         OaDecompositionBase * oa = dynamic_cast<OaDecompositionBase * >(gen[i]->generator());
-        if(oa)//pass objects
+        if (oa)//pass objects
           oa->setObjects(objects_,nObjects_);
       }
     }
     model_.setBranchingMethod(&branch);
-    
+
     //Get the time and start.
     model_.initialSolve();
-    
+
     continuousRelaxation_ =model_.solver()->getObjValue();
-    if(specOpt==16)//Set warm start point for Ipopt
+    if (specOpt==16)//Set warm start point for Ipopt
     {
       const double * colsol = model_.solver()->getColSolution();
       const double * duals = model_.solver()->getRowPrice();
       model_.solver()->setColSolution(colsol);
       model_.solver()->setRowPrice(duals);
     }
-    
+
 #ifdef SIGNAL
     CoinSighandler_t saveSignal=SIG_DFL;
     // register signal handler
     saveSignal = signal(SIGINT,signal_handler);
 #endif
-    
+
     currentBranchModel = &model_;
     model_.branchAndBound();
-    
-    
+
+
     numNodes_ = model_.getNodeCount();
     bestObj_ = model_.getObjValue();
     bestBound_ = model_.getBestPossibleObjValue();
     mipIterationCount_ = model_.getIterationCount();
-    
+
     bool hasFailed = false;
-    if(specOpt==16)//Did we continue branching on a failure
+    if (specOpt==16)//Did we continue branching on a failure
     {
       CbcNlpStrategy * nlpStrategy = dynamic_cast<CbcNlpStrategy *>(model_.strategy());
       if (nlpStrategy)
@@ -455,8 +456,8 @@ namespace Bonmin
     }
     else
       hasFailed = s.nonlinearSolver()->hasContinuedOnAFailure();
-    
-    
+
+
     if (hasFailed) {
       std::cout<<"************************************************************"<<std::endl
       <<"WARNING : Optimization failed on an NLP during optimization"
@@ -467,25 +468,25 @@ namespace Bonmin
       <<"************************************************************"<<std::endl;
     }
     TMINLP::SolverReturn status = TMINLP::MINLP_ERROR;
-    
-    if(model_.numberObjects()==0){
-      if(bestSolution_)
+
+    if (model_.numberObjects()==0) {
+      if (bestSolution_)
         delete [] bestSolution_;
       bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
       CoinCopyN(s.nonlinearSolver()->getColSolution(), s.nonlinearSolver()->getNumCols(),
-                bestSolution_);
+          bestSolution_);
       bestObj_ = bestBound_ = s.nonlinearSolver()->getObjValue();
     }
-    
-    if(bonBabInfoPtr->bestSolution2().size() > 0){
+
+    if (bonBabInfoPtr->bestSolution2().size() > 0) {
       assert((int) bonBabInfoPtr->bestSolution2().size() == s.nonlinearSolver()->getNumCols());
       if (bestSolution_)
         delete [] bestSolution_;
       bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
-       std::copy(bonBabInfoPtr->bestSolution2().begin(), bonBabInfoPtr->bestSolution2().end(),
-                 bestSolution_);
-       bestObj_ = (bonBabInfoPtr->bestObj2());
-       printf("\nReal objective function: %.2f\n", bestObj_);
+      std::copy(bonBabInfoPtr->bestSolution2().begin(), bonBabInfoPtr->bestSolution2().end(),
+          bestSolution_);
+      bestObj_ = (bonBabInfoPtr->bestObj2());
+      printf("\nReal objective function: %.2f\n", bestObj_);
     }
     else if (model_.bestSolution()) {
       if (bestSolution_)
@@ -494,7 +495,7 @@ namespace Bonmin
       CoinCopyN(model_.bestSolution(), s.nonlinearSolver()->getNumCols(), bestSolution_);
     }
     if (model_.status() == 0) {
-      if (bestSolution_){
+      if (bestSolution_) {
         status = TMINLP::SUCCESS;
         mipStatus_ = FeasibleOptimal;
       }
@@ -503,25 +504,25 @@ namespace Bonmin
         mipStatus_ = ProvenInfeasible;
       }
     }
-    else if(model_.status() == 1){
+    else if (model_.status() == 1) {
       status = TMINLP::LIMIT_EXCEEDED;
-      if (bestSolution_){
+      if (bestSolution_) {
         mipStatus_ = Feasible;
       }
       else {
         mipStatus_ = NoSolutionKnown;
       }
     }
-    else if(model_.status()==2){
+    else if (model_.status()==2) {
       status = TMINLP::MINLP_ERROR;
     }
-    s.nonlinearSolver()->model()->finalize_solution(status, 
-                                                    s.nonlinearSolver()->getNumCols(), 
-                                                    bestSolution_,
-                                                    bestObj_);
+    s.nonlinearSolver()->model()->finalize_solution(status,
+        s.nonlinearSolver()->getNumCols(),
+        bestSolution_,
+        bestObj_);
   }
-  
-  
+
+
   /** return the best known lower bound on the objective value*/
   double
   Bab::bestBound()

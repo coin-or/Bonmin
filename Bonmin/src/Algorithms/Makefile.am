@@ -101,7 +101,11 @@ include_HEADERS = \
 ########################################################################
 
 # Here repeat all source files, with "bak" appended
-ASTYLE_FILES = 
+ASTYLE_FILES = \
+               BonBabSetupBase.cppbak \
+               BonBabSetupBase.hppbak \
+               BonBonminSetup.cppbak \
+               BonBonminSetup.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

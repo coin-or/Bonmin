@@ -20,7 +20,7 @@ namespace Bonmin
     GuessHeuristic(CbcModel &model);
     ///Copy constructor
     GuessHeuristic( const GuessHeuristic &copy):
-      CbcHeuristic(copy)
+        CbcHeuristic(copy)
     {}
 
     /// heuristic method providing guess, based on pseudo costs
@@ -38,8 +38,8 @@ namespace Bonmin
   private:
     /// Default constructor
     GuessHeuristic();
-    
-    /// Assignment operator 
+
+    /// Assignment operator
     GuessHeuristic & operator=(const GuessHeuristic& rhs);
   };
 }

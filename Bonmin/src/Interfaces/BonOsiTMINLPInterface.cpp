@@ -42,14 +42,15 @@ register_general_options
                              "Choice of the solver for local optima of continuous nlp's",
                              "Ipopt",
                              "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
-                             "filterSQP", "Sequential quadratic programming trust region algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
+                             "filterSQP", "Sequential quadratic programming trust region "
+                                          "algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
                              "");
   roptions->setOptionExtraInfo("nlp_solver",15);
   roptions->AddBoundedIntegerOption("nlp_log_level",
-      "specify NLP solver interface log level (independent from ipopt print_level).",
-      0,2,1,
-      "Set the level of output of the OsiTMINLPInterface : "
-      "0 - none, 1 - normal, 2 - verbose"
+                                    "specify NLP solver interface log level (independent from ipopt print_level).",
+                                     0,2,1,
+                                    "Set the level of output of the OsiTMINLPInterface : "
+                                    "0 - none, 1 - normal, 2 - verbose"
                                    );
   roptions->setOptionExtraInfo("nlp_log_level",15);
 

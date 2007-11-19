@@ -18,73 +18,83 @@
 typedef Bonmin::BqpdSolver::fint fint;
 typedef Bonmin::BqpdSolver::real real;
 
-extern "C" {
+extern "C"
+{
   void F77_FUNC(bqpd,BQPD)(fint* n, fint* m, fint* k, fint* kmax,
-			   real* a, fint* la, real* x, real* bl, real* bu,
-			   real* f, real* fmin, real* g, real* r, real* w,
-			   real* e, fint* ls, real* alp, fint* lp, fint* mlp,
-			   fint* peq, real* ws, fint* lws, fint* m0de,
-			   fint* ifail, fint* info, fint* iprint, fint* nout);
+      real* a, fint* la, real* x, real* bl, real* bu,
+      real* f, real* fmin, real* g, real* r, real* w,
+      real* e, fint* ls, real* alp, fint* lp, fint* mlp,
+      fint* peq, real* ws, fint* lws, fint* m0de,
+      fint* ifail, fint* info, fint* iprint, fint* nout);
 
   //Access to filter common blocks
   extern struct {
-    fint kk,ll,kkk,lll,mxws,mxlws;
-  } F77_FUNC(wsc,WSC);
+      fint kk,ll,kkk,lll,mxws,mxlws;
+    }
+  F77_FUNC(wsc,WSC);
 
   extern struct {
-    real eps,tol,emin;
-  } F77_FUNC(epsc,EPSC);
+      real eps,tol,emin;
+    }
+  F77_FUNC(epsc,EPSC);
 
   extern struct {
-    real sgnf;
-    fint nrep,npiv,nres;
-  } F77_FUNC(repc,REPC);
+      real sgnf;
+      fint nrep,npiv,nres;
+    }
+  F77_FUNC(repc,REPC);
 
   extern struct {
-    fint nup,nfreq;
-  } F77_FUNC(refactorc,REFACTORC);
+      fint nup,nfreq;
+    }
+  F77_FUNC(refactorc,REFACTORC);
 
   extern struct {
-    real vstep;
-  } F77_FUNC(vstepc,VSTEPC);
+      real vstep;
+    }
+  F77_FUNC(vstepc,VSTEPC);
 
   extern struct {
-    fint phl, phr, phc;
-  } F77_FUNC(hessc,HESSC);
+      fint phl, phr, phc;
+    }
+  F77_FUNC(hessc,HESSC);
 
   extern struct {
-    fint scale_mode, phe;
-  } F77_FUNC(scalec,SCALEC);
+      fint scale_mode, phe;
+    }
+  F77_FUNC(scalec,SCALEC);
 }
 
-namespace Bonmin{
+namespace Bonmin
+{
 
   std::string BqpdSolver::solverName_ = "Bqpd QP";
 
   void BqpdSolver::
-  registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+  registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
+  {
     roptions->SetRegisteringCategory("Bqpd options",RegisteredOptions::BqpdCategory);
   }
 
   BqpdSolver::BqpdSolver(bool createEmpty /* = false */)
-    :
-    TNLPSolver(),
-    cached_(NULL)
+      :
+      TNLPSolver(),
+      cached_(NULL)
   {
     if (createEmpty) return;
   }
 
   BqpdSolver::BqpdSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
-			 Ipopt::SmartPtr<Ipopt::OptionsList> options,
-			 Ipopt::SmartPtr<Ipopt::Journalist> journalist)
-    :
-    TNLPSolver(roptions, options, journalist),
-    cached_(NULL)
-  {
-  }
-                        
+      Ipopt::SmartPtr<Ipopt::OptionsList> options,
+      Ipopt::SmartPtr<Ipopt::Journalist> journalist)
+      :
+      TNLPSolver(roptions, options, journalist),
+      cached_(NULL)
+{}
+
   Ipopt::SmartPtr <TNLPSolver>
-  BqpdSolver::clone(){
+  BqpdSolver::clone()
+  {
     Ipopt::SmartPtr<BqpdSolver> retval = new BqpdSolver(true);
     *retval->options_ = *options_; // Copy the options
     retval->roptions_ = roptions_; // only copy pointers of registered options
@@ -92,21 +102,22 @@ namespace Bonmin{
     return GetRawPtr(retval);
   }
 
-  BqpdSolver::~BqpdSolver(){
-  }
+  BqpdSolver::~BqpdSolver()
+  {}
 
   bool
-  BqpdSolver::Initialize(std::string optFile){
+  BqpdSolver::Initialize(std::string optFile)
+  {
     std::ifstream is;
     if (optFile != "") {
       try {
         is.open(optFile.c_str());
       }
-      catch(std::bad_alloc) {
+      catch (std::bad_alloc) {
         journalist_->Printf(Ipopt::J_SUMMARY, Ipopt::J_MAIN, "\nEXIT: Not enough memory.\n");
         return false;
       }
-      catch(...) {
+      catch (...) {
         Ipopt::IpoptException E("Unknown Exception caught in ipopt", "Unknown File", -1);
         E.ReportException(*journalist_);
         return false;
@@ -120,21 +131,22 @@ namespace Bonmin{
   }
 
   bool
-  BqpdSolver::Initialize(std::istream &is){
-    if(is.good()){
+  BqpdSolver::Initialize(std::istream &is)
+  {
+    if (is.good()) {
       options_->ReadFromStream(*journalist_, is);
     }
     return true;
   }
 
   /// Solves a problem expressed as a TQP
-  TNLPSolver::ReturnStatus 
+  TNLPSolver::ReturnStatus
   BqpdSolver::OptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP>& tnlp)
   {
     BranchingTQP* tqp = dynamic_cast<BranchingTQP*>(GetRawPtr(tnlp));
     if (!tqp) {
       Ipopt::IpoptException E("BqpdSolver called with object other than a BranchingTQP",
-			      "BonBqpdSolver.cpp",-1);
+          "BonBqpdSolver.cpp",-1);
       throw E;
     }
     if (IsNull(cached_) || !cached_->use_warm_start_in_cache_) {
@@ -143,8 +155,8 @@ namespace Bonmin{
     return callOptimizer();
   }
 
-/// Solves a problem expresses as a TNLP 
-  TNLPSolver::ReturnStatus 
+/// Solves a problem expresses as a TNLP
+  TNLPSolver::ReturnStatus
   BqpdSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
   {
 #ifndef NDEBUG
@@ -153,8 +165,8 @@ namespace Bonmin{
 #endif
     int n = cached_->n;
     int m = cached_->m;
-    tnlp->get_bounds_info(n, cached_->bl, cached_->bu, 
-			  m, cached_->bl+n, cached_->bu+n);
+    tnlp->get_bounds_info(n, cached_->bl, cached_->bu,
+        m, cached_->bl+n, cached_->bu+n);
 
     cached_->use_warm_start_in_cache_ = true;  // Trying...
     return callOptimizer();
@@ -162,289 +174,294 @@ namespace Bonmin{
 
 
 
-void
-BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
-				   Ipopt::SmartPtr<Ipopt::OptionsList>& options)
-{
-  // In case BQPD's BLOCK DATA doesn't work, we initialize the COMMON
-  // BLOCKs explicitly here
-  F77_FUNC(epsc,EPSC).eps = 1111e-19;
-  F77_FUNC(epsc,EPSC).tol = 1e-12;
-  F77_FUNC(epsc,EPSC).emin = 1.;
-  F77_FUNC(repc,REPC).sgnf = 1e-4;
-  F77_FUNC(repc,REPC).nrep = 2;
-  F77_FUNC(repc,REPC).npiv = 3;
-  F77_FUNC(repc,REPC).nres = 2;
-  F77_FUNC(refactorc,REFACTORC).nfreq = 500;
+  void
+  BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
+      Ipopt::SmartPtr<Ipopt::OptionsList>& options)
+  {
+    // In case BQPD's BLOCK DATA doesn't work, we initialize the COMMON
+    // BLOCKs explicitly here
+    F77_FUNC(epsc,EPSC).eps = 1111e-19;
+    F77_FUNC(epsc,EPSC).tol = 1e-12;
+    F77_FUNC(epsc,EPSC).emin = 1.;
+    F77_FUNC(repc,REPC).sgnf = 1e-4;
+    F77_FUNC(repc,REPC).nrep = 2;
+    F77_FUNC(repc,REPC).npiv = 3;
+    F77_FUNC(repc,REPC).nres = 2;
+    F77_FUNC(refactorc,REFACTORC).nfreq = 500;
 
-  Ipopt::TNLP::IndexStyleEnum index_style;
-  Index nv, nc, nnz_jac_g, nnz_hess;
-  tqp->get_nlp_info(nv, nc, nnz_jac_g, nnz_hess, index_style);
-  n = nv;
-  m = nc;
+    Ipopt::TNLP::IndexStyleEnum index_style;
+    Index nv, nc, nnz_jac_g, nnz_hess;
+    tqp->get_nlp_info(nv, nc, nnz_jac_g, nnz_hess, index_style);
+    n = nv;
+    m = nc;
 
-  Index kmax_ipt;
-  options->GetIntegerValue("kmax", kmax_ipt, "bqpd.");
-  if (kmax_ipt == -1) {
-    kmax = n;
-  }
-  else {
-    kmax = kmax_ipt;
-    kmax = min(kmax,n);
-  }
-  Index mlp_ipt;
-  options->GetIntegerValue("mlp", mlp_ipt,"bqpd.");
-  mlp = mlp_ipt;
+    Index kmax_ipt;
+    options->GetIntegerValue("kmax", kmax_ipt, "bqpd.");
+    if (kmax_ipt == -1) {
+      kmax = n;
+    }
+    else {
+      kmax = kmax_ipt;
+      kmax = min(kmax,n);
+    }
+    Index mlp_ipt;
+    options->GetIntegerValue("mlp", mlp_ipt,"bqpd.");
+    mlp = mlp_ipt;
 
-  Index mxws_ipt;
-  options->GetIntegerValue("mxws", mxws_ipt, "bqpd.");
-  mxws = mxws_ipt;
+    Index mxws_ipt;
+    options->GetIntegerValue("mxws", mxws_ipt, "bqpd.");
+    mxws = mxws_ipt;
 
-  Ipopt::Index mxlws_ipt;
-  options->GetIntegerValue("mxlws",  mxlws_ipt, "bqpd.");
-  mxlws = mxlws_ipt;
+    Ipopt::Index mxlws_ipt;
+    options->GetIntegerValue("mxlws",  mxlws_ipt, "bqpd.");
+    mxlws = mxlws_ipt;
 
-  use_warm_start_in_cache_ = false;
+    use_warm_start_in_cache_ = false;
 
-  // Get space for arrays
-  x = new real[n];
-  bl = new real[n+m];
-  bu = new real[n+m];
-  g = new real[n];
-  r = new real[n+m];
-  w = new real[n+m];
-  e = new real[n+m];
-  ls = new fint[n+m];
-  alp = new real[mlp];
-  lp = new fint[mlp];
-  ws = new real[mxws];
-  lws = new fint[mxlws];
+    // Get space for arrays
+    x = new real[n];
+    bl = new real[n+m];
+    bu = new real[n+m];
+    g = new real[n];
+    r = new real[n+m];
+    w = new real[n+m];
+    e = new real[n+m];
+    ls = new fint[n+m];
+    alp = new real[mlp];
+    lp = new fint[mlp];
+    ws = new real[mxws];
+    lws = new fint[mxlws];
 
 #define InitializeAll
 #ifdef InitializeAll
-  for (int i=0; i<mxws; i++) {
-    ws[i] = 42.;
-  }
-  for (int i=0; i<mxlws; i++) {
-    lws[i] = 55;
-  }
+    for (int i=0; i<mxws; i++) {
+      ws[i] = 42.;
+    }
+    for (int i=0; i<mxlws; i++) {
+      lws[i] = 55;
+    }
 #endif
 
-  // Getting the bounds
-  tqp->get_bounds_info(n, bl, bu, m, bl+n, bu+n);
+    // Getting the bounds
+    tqp->get_bounds_info(n, bl, bu, m, bl+n, bu+n);
 
-  // Set up sparse matrix with objective gradient and constraint Jacobian
+    // Set up sparse matrix with objective gradient and constraint Jacobian
 
-  const Number* obj_grad = tqp->ObjGrad();
-  int amax = nnz_jac_g;
-  for(int i = 0; i<n; i++) {
-    if (obj_grad[i]!=0.) {
-      amax++;
+    const Number* obj_grad = tqp->ObjGrad();
+    int amax = nnz_jac_g;
+    for (int i = 0; i<n; i++) {
+      if (obj_grad[i]!=0.) {
+        amax++;
+      }
     }
-  }
-  int lamax = amax+m+2;
-  a = new real[amax];
-  la = new fint [1+lamax];
+    int lamax = amax+m+2;
+    a = new real[amax];
+    la = new fint [1+lamax];
 
-  // Objective function gradient
-  int nnz_grad = 0;
-  for(int i = 0; i < n ; i++) {
-    if (obj_grad[i]!=0.) {
-      a[nnz_grad] = obj_grad[i];
-      la[++nnz_grad] = i+1;
+    // Objective function gradient
+    int nnz_grad = 0;
+    for (int i = 0; i < n ; i++) {
+      if (obj_grad[i]!=0.) {
+        a[nnz_grad] = obj_grad[i];
+        la[++nnz_grad] = i+1;
+      }
     }
-  }
-  la[amax+1] = 1;
+    la[amax+1] = 1;
 
-  // Constraint Jacobian
-  const Number* JacVals = tqp->ConstrJacVals();
-  const Index* RowJac = tqp->ConstrJacIRow();
-  const Index* ColJac = tqp->ConstrJacJCol();
+    // Constraint Jacobian
+    const Number* JacVals = tqp->ConstrJacVals();
+    const Index* RowJac = tqp->ConstrJacIRow();
+    const Index* ColJac = tqp->ConstrJacJCol();
 
-  int* permutationJac = new int [nnz_jac_g];
-  FilterSolver::TMat2RowPMat(false, n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
-			     la, nnz_grad, 1, TNLP::C_STYLE);
-  for(int i=0; i<nnz_jac_g; i++) {
-    const int& indice = permutationJac[i];
-    a[nnz_grad+i] = JacVals[indice];
-  }
-  delete [] permutationJac;
+    int* permutationJac = new int [nnz_jac_g];
+    FilterSolver::TMat2RowPMat(false, n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
+        la, nnz_grad, 1, TNLP::C_STYLE);
+    for (int i=0; i<nnz_jac_g; i++) {
+      const int& indice = permutationJac[i];
+      a[nnz_grad+i] = JacVals[indice];
+    }
+    delete [] permutationJac;
 #if 0
 //deleteme
-printf("nnz_grad = %d nnz_jac = %d\n", nnz_grad, nnz_jac_g);
-	for (int i=0; i<1+lamax; i++) printf("la[%2d] = %d\n", i,la[i]);
-	for (int i=0; i<amax; i++) printf("a[%3d] = %e\n",i,a[i]);
+    printf("nnz_grad = %d nnz_jac = %d\n", nnz_grad, nnz_jac_g);
+    for (int i=0; i<1+lamax; i++) printf("la[%2d] = %d\n", i,la[i]);
+    for (int i=0; i<amax; i++) printf("a[%3d] = %e\n",i,a[i]);
 #endif
-  
-  // Now setup Hessian
-  const Number* HessVals = tqp->ObjHessVals();
-  const Index* RowHess = tqp->ObjHessIRow();
-  const Index* ColHess = tqp->ObjHessJCol();
 
-  kk = nnz_hess;
-  ll = nnz_hess + n + 2;
-  int* permutationHess = new int[nnz_hess];
+    // Now setup Hessian
+    const Number* HessVals = tqp->ObjHessVals();
+    const Index* RowHess = tqp->ObjHessIRow();
+    const Index* ColHess = tqp->ObjHessJCol();
 
-  FilterSolver::TMat2RowPMat(true, n, n, nnz_hess, RowHess, ColHess,
-			     permutationHess, lws, 0, 0, TNLP::C_STYLE);
-  for(int i=0; i<nnz_hess; i++) {
-    ws[i] = HessVals[permutationHess[i]];
-  }
-  delete [] permutationHess;
+    kk = nnz_hess;
+    ll = nnz_hess + n + 2;
+    int* permutationHess = new int[nnz_hess];
+
+    FilterSolver::TMat2RowPMat(true, n, n, nnz_hess, RowHess, ColHess,
+        permutationHess, lws, 0, 0, TNLP::C_STYLE);
+    for (int i=0; i<nnz_hess; i++) {
+      ws[i] = HessVals[permutationHess[i]];
+    }
+    delete [] permutationHess;
 #if 0
 //deleteme
-printf("nnz_hess = %d\n", nnz_hess);
-	for (int i=0; i<ll; i++) printf("lws[%2d] = %d\n", i,lws[i]);
-	for (int i=0; i<kk; i++) printf("ws[%3d] = %e\n",i,ws[i]);
+    printf("nnz_hess = %d\n", nnz_hess);
+    for (int i=0; i<ll; i++) printf("lws[%2d] = %d\n", i,lws[i]);
+    for (int i=0; i<kk; i++) printf("ws[%3d] = %e\n",i,ws[i]);
 #endif
 
-  Index bufy;
-  options->GetIntegerValue("iprint",bufy, "bqpd.");
-  iprint = bufy;
-  nout = 6;
+    Index bufy;
+    options->GetIntegerValue("iprint",bufy, "bqpd.");
+    iprint = bufy;
+    nout = 6;
 
-  tqp_ = tqp;
-}
-
-/// Solves a problem expresses as a TNLP 
-TNLPSolver::ReturnStatus 
-BqpdSolver::callOptimizer()
-{
-  cached_->optimize();
-
-  TNLPSolver::ReturnStatus optimizationStatus = TNLPSolver::exception;
-  Ipopt::SolverReturn status = Ipopt::INTERNAL_ERROR;
-  fint ifail = cached_->ifail;
-  switch(ifail){
-  case 0:
-    optimizationStatus = TNLPSolver::solvedOptimal;
-    status = Ipopt::SUCCESS;
-    break;
-  case 1:
-    optimizationStatus = TNLPSolver::unbounded;
-    status = Ipopt::DIVERGING_ITERATES;
-  case 2:
-  case 3:
-    optimizationStatus = TNLPSolver::provenInfeasible;
-    status = Ipopt::LOCAL_INFEASIBILITY;
-    break;
+    tqp_ = tqp;
   }
 
-  Index dummy_len = Ipopt::Max(cached_->n,cached_->m);
-  Number* dummy = new Number[dummy_len];
-  for(int i=0; i<dummy_len; i++) {
-    dummy[i] = 0.;
+/// Solves a problem expresses as a TNLP
+  TNLPSolver::ReturnStatus
+  BqpdSolver::callOptimizer()
+  {
+    cached_->optimize();
+
+    TNLPSolver::ReturnStatus optimizationStatus = TNLPSolver::exception;
+    Ipopt::SolverReturn status = Ipopt::INTERNAL_ERROR;
+    fint ifail = cached_->ifail;
+    switch (ifail) {
+    case 0:
+      optimizationStatus = TNLPSolver::solvedOptimal;
+      status = Ipopt::SUCCESS;
+      break;
+    case 1:
+      optimizationStatus = TNLPSolver::unbounded;
+      status = Ipopt::DIVERGING_ITERATES;
+    case 2:
+    case 3:
+      optimizationStatus = TNLPSolver::provenInfeasible;
+      status = Ipopt::LOCAL_INFEASIBILITY;
+      break;
+    }
+
+    Index dummy_len = Ipopt::Max(cached_->n,cached_->m);
+    Number* dummy = new Number[dummy_len];
+    for (int i=0; i<dummy_len; i++) {
+      dummy[i] = 0.;
+    }
+
+    cached_->tqp_->finalize_solution(status, cached_->n,
+        cached_->x, dummy, dummy,
+        cached_->m, dummy, dummy,
+        cached_->f, NULL, NULL);
+    delete [] dummy;
+    return optimizationStatus;
   }
 
-  cached_->tqp_->finalize_solution(status, cached_->n, 
-				   cached_->x, dummy, dummy, 
-				   cached_->m, dummy, dummy, 
-				   cached_->f, NULL, NULL);
-  delete [] dummy;
-  return optimizationStatus;
-}
+  /** Optimize problem described by cache with filter.*/
+  void
+  BqpdSolver::cachedInfo::optimize()
+  {
+    if (use_warm_start_in_cache_) {
+      m0de = 6;
+      use_warm_start_in_cache_ = false;
+    }
+    else {
+      m0de = 0;
+      tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
+      ifail = 0;
+    }
+    //m0de = 0;
 
-/** Optimize problem described by cache with filter.*/
-void 
-BqpdSolver::cachedInfo::optimize()
-{
-  if (use_warm_start_in_cache_) {
-    m0de = 6;
-    use_warm_start_in_cache_ = false;
-  }
-  else {
-    m0de = 0;
-    tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
-    ifail = 0;
-  }
-  //m0de = 0;
-
-  // Set up some common block stuff
-  F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
-  F77_FUNC(scalec,SCALEC).phe = 0;  // No scaling
-  F77_FUNC(hessc,HESSC).phl = 1; // This is to tell gdotx to do the right thing
-  F77_FUNC(wsc,WSC).kk = kk;
-  F77_FUNC(wsc,WSC).ll = ll;
-  F77_FUNC(wsc,WSC).mxws = mxws;
-  F77_FUNC(wsc,WSC).mxlws = mxlws;
+    // Set up some common block stuff
+    F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
+    F77_FUNC(scalec,SCALEC).phe = 0;  // No scaling
+    F77_FUNC(hessc,HESSC).phl = 1; // This is to tell gdotx to do the right thing
+    F77_FUNC(wsc,WSC).kk = kk;
+    F77_FUNC(wsc,WSC).ll = ll;
+    F77_FUNC(wsc,WSC).mxws = mxws;
+    F77_FUNC(wsc,WSC).mxlws = mxlws;
 
 #if 0
-  printf("========= 222222222222 =============\n");
-  for (int i=0; i<n; i++) {
-    printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, bl[i], i, bu[i]);
-  }
+    printf("========= 222222222222 =============\n");
+    for (int i=0; i<n; i++) {
+      printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, bl[i], i, bu[i]);
+    }
 #endif
-  cpuTime_ = - CoinCpuTime();
-  real fmin = -1e100;
-  F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
-		      g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
-		      &m0de, &ifail, info, &iprint, &nout);
-  cpuTime_ += CoinCpuTime();
-}
+    cpuTime_ = - CoinCpuTime();
+    real fmin = -1e100;
+    F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+        g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
+        &m0de, &ifail, info, &iprint, &nout);
+    cpuTime_ += CoinCpuTime();
+  }
 
-std::string
-BqpdSolver::UnsolvedBqpdError::errorNames_[1] =
-{"Internal error in Filter SQP."};
+  std::string
+  BqpdSolver::UnsolvedBqpdError::errorNames_[1] =
+    {"Internal error in Filter SQP."};
 
-std::string
-BqpdSolver::UnsolvedBqpdError::solverName_ = 
-          "filterSqp";
+  std::string
+  BqpdSolver::UnsolvedBqpdError::solverName_ =
+    "filterSqp";
 
-const std::string& 
-BqpdSolver::UnsolvedBqpdError::errorName() const
-{ return errorNames_[0];}
+  const std::string&
+  BqpdSolver::UnsolvedBqpdError::errorName() const
+  {
+    return errorNames_[0];
+  }
 
-const std::string& 
-BqpdSolver::UnsolvedBqpdError::solverName() const
-{ return solverName_;}
+  const std::string&
+  BqpdSolver::UnsolvedBqpdError::solverName() const
+  {
+    return solverName_;
+  }
 
-bool
-BqpdSolver::setWarmStart(const CoinWarmStart * warm, 
-			   Ipopt::SmartPtr<TMINLP2TNLP> tnlp)
-{
+  bool
+  BqpdSolver::setWarmStart(const CoinWarmStart * warm,
+      Ipopt::SmartPtr<TMINLP2TNLP> tnlp)
+  {
 #if 0
-  if (IsNull(cached_)) {
-    cached_ = new cachedInfo(GetRawPtr(tnlp), options_);
-  }
+    if (IsNull(cached_)) {
+      cached_ = new cachedInfo(GetRawPtr(tnlp), options_);
+    }
 
-  const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
-  //CoinCopyN(warmF->xArray(), warmF->xSize(), cached_->x);
-  const fint xsize = warmF->xSize();
-  real* x = cached_->x;
-  const real* xarray = warmF->xArray();
-  for (int i = 0; i<xsize; i++) {
-    x[i] = xarray[i];
-  }
-  CoinCopyN(warmF->lamArray(), warmF->lamSize(), cached_->lam);
-  CoinCopyN(warmF->lwsArray(), warmF->lwsSize(), cached_->lws);
-  for(int i = 0 ; i < 14 ; i ++) {
-    cached_->istat[i] = warmF->istat()[i];
-  }
-  cached_->use_warm_start_in_cache_ = true;
+    const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
+    //CoinCopyN(warmF->xArray(), warmF->xSize(), cached_->x);
+    const fint xsize = warmF->xSize();
+    real* x = cached_->x;
+    const real* xarray = warmF->xArray();
+    for (int i = 0; i<xsize; i++) {
+      x[i] = xarray[i];
+    }
+    CoinCopyN(warmF->lamArray(), warmF->lamSize(), cached_->lam);
+    CoinCopyN(warmF->lwsArray(), warmF->lwsSize(), cached_->lws);
+    for (int i = 0 ; i < 14 ; i ++) {
+      cached_->istat[i] = warmF->istat()[i];
+    }
+    cached_->use_warm_start_in_cache_ = true;
 #endif
-  printf("BqpdSolver::setWarmStart called!\n");
-  return true;
-}
+    printf("BqpdSolver::setWarmStart called!\n");
+    return true;
+  }
 
-CoinWarmStart *
-BqpdSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
-{
+  CoinWarmStart *
+  BqpdSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
+  {
 #if 0
-  return new FilterWarmStart(cached_->n, cached_->x,
-			     cached_->n+cached_->m, cached_->lam,
-			     cached_->maxiWk, cached_->lws, cached_->istat);
+    return new FilterWarmStart(cached_->n, cached_->x,
+        cached_->n+cached_->m, cached_->lam,
+        cached_->maxiWk, cached_->lws, cached_->istat);
 #endif
-  printf("BqpdSolver::getWarmStart called!\n");
-  return NULL;
-}
+    printf("BqpdSolver::getWarmStart called!\n");
+    return NULL;
+  }
 
-CoinWarmStart * 
-BqpdSolver::getEmptyWarmStart() const {
+  CoinWarmStart *
+  BqpdSolver::getEmptyWarmStart() const
+  {
 #if 0
-  return new FilterWarmStart;
+    return new FilterWarmStart;
 #endif
-  printf("BqpdSolver::getEmptyWarmStart called \n");
-  return NULL;
-}
+    printf("BqpdSolver::getEmptyWarmStart called \n");
+    return NULL;
+  }
 
 }//end namespace Bonmin

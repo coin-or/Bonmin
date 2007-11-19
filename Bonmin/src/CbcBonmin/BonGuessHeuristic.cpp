@@ -16,7 +16,7 @@ namespace Bonmin
 /// Default constructor
   GuessHeuristic::GuessHeuristic(CbcModel &model)
       :
-    CbcHeuristic(model)
+      CbcHeuristic(model)
   {}
 
   /// heuristic method
@@ -31,13 +31,13 @@ namespace Bonmin
       solutionValue = model_->getCurrentMinimizationObjValue();
       return -1;
     }
-    const OsiPseudoCosts* pseudoCosts = & chooseMethod->pseudoCosts();
-    int numberObjects = pseudoCosts->numberObjects();
+    const OsiPseudoCosts& pseudoCosts = chooseMethod->pseudoCosts();
+    int numberObjects = pseudoCosts.numberObjects();
     assert(numberObjects == model_->numberObjects());
-    const double* upTotalChange = pseudoCosts->upTotalChange();
-    const double* downTotalChange = pseudoCosts->downTotalChange();
-    const int* upNumber = pseudoCosts->upNumber();
-    const int* downNumber = pseudoCosts->downNumber();
+    const double* upTotalChange = pseudoCosts.upTotalChange();
+    const double* downTotalChange = pseudoCosts.downTotalChange();
+    const int* upNumber = pseudoCosts.upNumber();
+    const int* downNumber = pseudoCosts.downNumber();
 
     double sumUpTot = 0.;
     int numberUpTot = 0;
@@ -62,7 +62,7 @@ namespace Bonmin
     solutionValue = model_->getCurrentMinimizationObjValue();
     for (int iObj = 0; iObj < numberObjects; iObj++) {
       //printf("%3d upest=%e uptot=%e upnum=%d downest=%e downtot=%e downnum=%d  ", iObj, object[iObj]->upEstimate(), upTotalChange[iObj], upNumber[iObj], object[iObj]->downEstimate(), downTotalChange[iObj], downNumber[iObj]);
-	
+
       double upEstimate = upNumber[iObj] ? object[iObj]->upEstimate()*upTotalChange[iObj]/upNumber[iObj] : object[iObj]->upEstimate()*upAvrg;
       double downEstimate = downNumber[iObj] ? object[iObj]->downEstimate()*downTotalChange[iObj]/downNumber[iObj] : object[iObj]->downEstimate()*downAvrg;
       //printf("up=%e down=%e\n", upEstimate, downEstimate);

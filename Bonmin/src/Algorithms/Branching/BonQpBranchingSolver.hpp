@@ -6,50 +6,52 @@
 #include "BonStrongBranchingSolver.hpp"
 #include "BonBranchingTQP.hpp"
 
-namespace Bonmin {
+namespace Bonmin
+{
 
-/** This class chooses a variable to branch on
+  /** This class chooses a variable to branch on
 
-    This implementation solves the Qp model for different branches
-    (strong branching).
-*/
+      This implementation solves the Qp model for different branches
+      (strong branching).
+  */
 
-class QpBranchingSolver : public StrongBranchingSolver {
- 
-public:
+  class QpBranchingSolver : public StrongBranchingSolver
+  {
 
-  /// Constructor from solver (so we can set up arrays etc)
-  QpBranchingSolver (OsiTMINLPInterface * solver);
+  public:
 
-  /// Copy constructor 
-  QpBranchingSolver (const QpBranchingSolver &);
-   
-  /// Assignment operator 
-  QpBranchingSolver & operator= (const QpBranchingSolver& rhs);
+    /// Constructor from solver (so we can set up arrays etc)
+    QpBranchingSolver (OsiTMINLPInterface * solver);
 
-  /// Destructor
-  virtual ~QpBranchingSolver ();
+    /// Copy constructor
+    QpBranchingSolver (const QpBranchingSolver &);
 
-  /// Called to initialize solver before a bunch of strong branching
-  /// solves
-  virtual void markHotStart(OsiTMINLPInterface* tminlp_interface);
+    /// Assignment operator
+    QpBranchingSolver & operator= (const QpBranchingSolver& rhs);
 
-  /// Called to solve the current TMINLP (with changed bound information)
-  virtual TNLPSolver::ReturnStatus solveFromHotStart(OsiTMINLPInterface* tminlp_interface);
+    /// Destructor
+    virtual ~QpBranchingSolver ();
 
-  /// Called after all strong branching solves in a node
-  virtual void unmarkHotStart(OsiTMINLPInterface* tminlp_interface);
+    /// Called to initialize solver before a bunch of strong branching
+    /// solves
+    virtual void markHotStart(OsiTMINLPInterface* tminlp_interface);
 
-private:
-  /// Default Constructor 
-  QpBranchingSolver ();
+    /// Called to solve the current TMINLP (with changed bound information)
+    virtual TNLPSolver::ReturnStatus solveFromHotStart(OsiTMINLPInterface* tminlp_interface);
 
-  SmartPtr<BranchingTQP> branching_tqp_;
+    /// Called after all strong branching solves in a node
+    virtual void unmarkHotStart(OsiTMINLPInterface* tminlp_interface);
 
-  SmartPtr<TNLPSolver> tqp_solver_;
+  private:
+    /// Default Constructor
+    QpBranchingSolver ();
 
-  bool first_solve_;
-};
+    SmartPtr<BranchingTQP> branching_tqp_;
+
+    SmartPtr<TNLPSolver> tqp_solver_;
+
+    bool first_solve_;
+  };
 
 }
 

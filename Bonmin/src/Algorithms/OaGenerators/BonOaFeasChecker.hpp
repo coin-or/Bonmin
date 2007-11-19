@@ -24,7 +24,7 @@ namespace Bonmin
         double cbcCutoffIncrement_=1e-07,
         double cbcIntegerTolerance = 1e-05,
         bool leaveSiUnchanged = 0
-                   );
+                        );
 
     /// New usefull constructor
     OaFeasibilityChecker(BabSetupBase &b);
@@ -32,8 +32,7 @@ namespace Bonmin
     OaFeasibilityChecker(const OaFeasibilityChecker &copy)
         :
         OaDecompositionBase(copy)
-    {
-    }
+    {}
     /// Destructor
     ~OaFeasibilityChecker();
 
@@ -48,11 +47,13 @@ namespace Bonmin
     }
   protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
-    virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip, 
-                           SubMipSolver * &subMip, OsiBabSolver * babInfo, double &cutoff) const;
+    virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip,
+        SubMipSolver * &subMip, OsiBabSolver * babInfo, double &cutoff) const;
     /// virutal method to decide if local search is performed
-    virtual bool doLocalSearch() const{
-      return 0;} 
+    virtual bool doLocalSearch() const
+    {
+      return 0;
+    }
   };
 }
 #endif

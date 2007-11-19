@@ -22,25 +22,26 @@ namespace Bonmin
     /// Default constructor
     OaNlpOptim(OsiTMINLPInterface * si = NULL,
         int maxDepth = 10, bool addOnlyViolated = false,
-	       bool globalCuts = true);
-    
+        bool globalCuts = true);
+
     /// Constructor with basic setup
     OaNlpOptim(BabSetupBase &b);
     /// Copy constructor
     OaNlpOptim(const OaNlpOptim &copy)
         :
-      CglCutGenerator(copy),
+        CglCutGenerator(copy),
         nlp_(copy.nlp_),
         maxDepth_(copy.maxDepth_),
-	nSolve_(0),
-	addOnlyViolated_(copy.addOnlyViolated_),
-      global_(copy.global_)
+        nSolve_(0),
+        addOnlyViolated_(copy.addOnlyViolated_),
+        global_(copy.global_)
     {
       handler_ = new CoinMessageHandler();
       handler_ -> setLogLevel(copy.handler_->logLevel());
       messages_ = OaMessages();
     }
-    void passInMessageHandler(const CoinMessageHandler * handler){
+    void passInMessageHandler(const CoinMessageHandler * handler)
+    {
       delete handler_;
       handler_ = handler->clone();
     }
@@ -53,7 +54,7 @@ namespace Bonmin
     /** Desctructor */
     virtual ~OaNlpOptim()
     {
-      if(handler_)
+      if (handler_)
         delete handler_;
     }
 

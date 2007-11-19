@@ -84,25 +84,25 @@ namespace Bonmin
   {
 
 #if 0
-    if(whereFrom == 1){
-       std::cerr<<"Node "<<parent<<" same as ? "<<model->currentNode()->nodeInfo()<<std::endl;
-       CbcNodeInfo * current = parent;
-       CbcNodeInfo * father = current->parent();
-       int fatherNumber = -1;
-       int nodeNumber = current->nodeNumber();
-       std::string way;
-       int branch_var;
-       if(father != NULL){
-          fatherNumber = father->nodeNumber();
-          way = (model->currentNode()->way()==1) ? "Down": "Up";
-          //branch_var = model->currentNode()->variable();
-       }
-       std::cout<<"node: "<<model->getNodeCount2()
-                <<"father: "<<nodeNumber
-                <<" , grand-father "<<fatherNumber
-                <<". Branched  way "<<way
-                //<<" on variable "
-                <<std::endl;
+    if (whereFrom == 1) {
+      std::cerr<<"Node "<<parent<<" same as ? "<<model->currentNode()->nodeInfo()<<std::endl;
+      CbcNodeInfo * current = parent;
+      CbcNodeInfo * father = current->parent();
+      int fatherNumber = -1;
+      int nodeNumber = current->nodeNumber();
+      std::string way;
+      int branch_var;
+      if (father != NULL) {
+        fatherNumber = father->nodeNumber();
+        way = (model->currentNode()->way()==1) ? "Down": "Up";
+        //branch_var = model->currentNode()->variable();
+      }
+      std::cout<<"node: "<<model->getNodeCount2()
+      <<"father: "<<nodeNumber
+      <<" , grand-father "<<fatherNumber
+      <<". Branched  way "<<way
+      //<<" on variable "
+      <<std::endl;
     }
 #endif
     OsiSolverInterface * solver = model->solver();//get solver
@@ -171,8 +171,8 @@ namespace Bonmin
         returnStatus = 2;
       }
       else {
-	std::string probName;
-	osiMinlp->getStrParam(OsiProbName,probName);
+        std::string probName;
+        osiMinlp->getStrParam(OsiProbName,probName);
         throw osiMinlp->newUnsolvedError(0, osiMinlp->problem(), probName);
       }
     }
@@ -181,7 +181,7 @@ namespace Bonmin
 
   void
   CbcNlpStrategy::setupCutGenerators(CbcModel &model)
-{}
+  {}
 
   void
   CbcNlpStrategy::setupHeuristics(CbcModel &model)

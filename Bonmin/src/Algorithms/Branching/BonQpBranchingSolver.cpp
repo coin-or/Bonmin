@@ -16,83 +16,81 @@
 #include "BonBqpdSolver.hpp"
 #endif
 
-namespace Bonmin {
-
-QpBranchingSolver::QpBranchingSolver(OsiTMINLPInterface * solver)
-  :
-  StrongBranchingSolver(solver)
+namespace Bonmin
 {
-}
 
-QpBranchingSolver::QpBranchingSolver(const QpBranchingSolver & rhs) :
-  StrongBranchingSolver(rhs)
-{
-}
+  QpBranchingSolver::QpBranchingSolver(OsiTMINLPInterface * solver)
+      :
+      StrongBranchingSolver(solver)
+  {}
 
-QpBranchingSolver &
-QpBranchingSolver::operator=(const QpBranchingSolver & rhs)
-{
-  if (this != &rhs) {
-    StrongBranchingSolver::operator=(rhs);
+  QpBranchingSolver::QpBranchingSolver(const QpBranchingSolver & rhs) :
+      StrongBranchingSolver(rhs)
+  {}
+
+  QpBranchingSolver &
+  QpBranchingSolver::operator=(const QpBranchingSolver & rhs)
+  {
+    if (this != &rhs) {
+      StrongBranchingSolver::operator=(rhs);
+    }
+    return *this;
   }
-  return *this;
-}
 
-QpBranchingSolver::~QpBranchingSolver ()
-{
-}
+  QpBranchingSolver::~QpBranchingSolver ()
+  {}
 
-void QpBranchingSolver::
-markHotStart(OsiTMINLPInterface* tminlp_interface)
-{
-  TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
-  branching_tqp_ = new BranchingTQP(tminlp2tnlp);
+  void QpBranchingSolver::
+  markHotStart(OsiTMINLPInterface* tminlp_interface)
+  {
+    TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
+    branching_tqp_ = new BranchingTQP(tminlp2tnlp);
 
 #ifdef COIN_HAS_FILTERSQP
-  FilterSolver* filter_solver =
-    dynamic_cast<FilterSolver*> (tminlp_interface->solver());
-  if (filter_solver) {
-    // The following doesn't seem to work - it returns some QPs as
-    // infeasible, while FilterSQP doesn't
-    //tqp_solver_ = new BqpdSolver(RegOptions(), Options(), Jnlst());
-    tqp_solver_ = new FilterSolver(RegOptions(), Options(), Jnlst());
-  }
+    FilterSolver* filter_solver =
+      dynamic_cast<FilterSolver*> (tminlp_interface->solver());
+    if (filter_solver) {
+      // The following doesn't seem to work - it returns some QPs as
+      // infeasible, while FilterSQP doesn't
+      //tqp_solver_ = new BqpdSolver(RegOptions(), Options(), Jnlst());
+      tqp_solver_ = new FilterSolver(RegOptions(), Options(), Jnlst());
+    }
 #endif
-  if (IsNull(tqp_solver_)) {
-    tqp_solver_ = tminlp_interface->solver()->clone();
-  }
-  tqp_solver_->enableWarmStart();
-  first_solve_ = true;
-}
-
-void QpBranchingSolver::
-unmarkHotStart(OsiTMINLPInterface* tminlp_interface)
-{
-  // Free memory
-  branching_tqp_ = NULL;
-  tqp_solver_ = NULL;
-}
-
-TNLPSolver::ReturnStatus QpBranchingSolver::
-solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
-{
-  TNLPSolver::ReturnStatus retstatus;
-  if (first_solve_) {
-    retstatus = tqp_solver_->OptimizeTNLP(GetRawPtr(branching_tqp_));
-  }
-  else {
-    retstatus = tqp_solver_->ReOptimizeTNLP(GetRawPtr(branching_tqp_));
+    if (IsNull(tqp_solver_)) {
+      tqp_solver_ = tminlp_interface->solver()->clone();
+    }
+    tqp_solver_->enableWarmStart();
+    first_solve_ = true;
   }
 
-  if (retstatus == TNLPSolver::solvedOptimal ||
-      retstatus == TNLPSolver::solvedOptimalTol) {
-    // don't way we solve the problem, since otherwise the pseudo costs
-    // are updated and that is maybe not so good???
+  void QpBranchingSolver::
+  unmarkHotStart(OsiTMINLPInterface* tminlp_interface)
+  {
+    // Free memory
+    branching_tqp_ = NULL;
+    tqp_solver_ = NULL;
+  }
+
+  TNLPSolver::ReturnStatus QpBranchingSolver::
+  solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
+  {
+    TNLPSolver::ReturnStatus retstatus;
+    if (first_solve_) {
+      retstatus = tqp_solver_->OptimizeTNLP(GetRawPtr(branching_tqp_));
+    }
+    else {
+      retstatus = tqp_solver_->ReOptimizeTNLP(GetRawPtr(branching_tqp_));
+    }
+
+    if (retstatus == TNLPSolver::solvedOptimal ||
+        retstatus == TNLPSolver::solvedOptimalTol) {
+      // don't way we solve the problem, since otherwise the pseudo costs
+      // are updated and that is maybe not so good???
+      //retstatus = TNLPSolver::iterationLimit;
+      first_solve_ = false;
+    }
     //retstatus = TNLPSolver::iterationLimit;
-    first_solve_ = false;
+    return retstatus;
   }
-  //retstatus = TNLPSolver::iterationLimit;
-  return retstatus;
-}
 
 }

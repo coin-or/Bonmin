@@ -120,10 +120,28 @@ nodeSolver_LDFLAGS = -rpath $(libdir)
 
 
 ########################################################################
-#                         make distclean stuff                         #
+#                            Astyle stuff                              #
 ########################################################################
 
-CLEANFILES =
+# Here repeat all source files, with "bak" appended
+ASTYLE_FILES = \
+             BonMin.cpp \
+             BonNodeSolver.cpp
+
+CLEANFILES = $(ASTYLE_FILES)
 
 DISTCLEANFILES =
 
+SUFFIXES = .cppbak .hppbak
+
+astyle: $(ASTYLE_FILES)
+
+.hpp.hppbak:
+	mv $< $@
+	$(ASTYLE) $(ASTYLEFLAGS) < $@ > $<
+	touch $@
+
+.cpp.cppbak:
+	mv $< $@
+	$(ASTYLE) $(ASTYLEFLAGS) < $@ > $<
+	touch $@

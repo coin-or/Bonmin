@@ -42,149 +42,157 @@
 #include "CglLandP.hpp"
 #include "CglRedSplit.hpp"
 
-namespace Bonmin{
-  BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy){
-  }
-    
+namespace Bonmin
+{
+  BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy)
+  {}
+
   BonminSetup::BonminSetup(const BonminSetup &other):BabSetupBase(other),
-algo_(other.algo_){
-  }
-  
-  void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+      algo_(other.algo_)
+  {}
+
+  void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
+  {
     BabSetupBase::registerAllOptions(roptions);
-    
+
     /* Outer Approximation options.*/
     OACutGenerator2::registerOptions(roptions);
     EcpCuts::registerOptions(roptions);
     OaNlpOptim::registerOptions(roptions);
 
-    
+
     BonCbcFullNodeInfo::registerOptions(roptions);
-   
- 
+
+
     registerMilpCutGenerators(roptions);
-    
+
     roptions->SetRegisteringCategory("Bonmin algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
-                               "Choice of the algorithm.",
-                               "B-Hyb",
-                               "B-BB","simple branch-and-bound algorithm,",
-                               "B-OA","OA Decomposition algorithm,",
-                               "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
-                               "B-Hyb","hybrid outer approximation based branch-and-cut,",
-                               "B-Ecp","ecp cuts based branch-and-cut a la FilMINT.",
-                               "This will preset some of the options of bonmin depending on the algorithm choice."
-                               );
+        "Choice of the algorithm.",
+        "B-Hyb",
+        "B-BB","simple branch-and-bound algorithm,",
+        "B-OA","OA Decomposition algorithm,",
+        "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
+        "B-Hyb","hybrid outer approximation based branch-and-cut,",
+        "B-Ecp","ecp cuts based branch-and-cut a la FilMINT.",
+        "This will preset some of the options of bonmin depending on the algorithm choice."
+                              );
     roptions->setOptionExtraInfo("algorithm",31);
   }
-  
+
   /** Register all the Bonmin options.*/
-  void 
-  BonminSetup::registerOptions(){
+  void
+  BonminSetup::registerOptions()
+  {
     registerAllOptions(roptions_);
   }
-    
+
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
-  void 
-  BonminSetup::initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/){
+  void
+  BonminSetup::initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/)
+  {
 
     use(tminlp);
     BabSetupBase::gatherParametersValues(options_);
     Algorithm algo = getAlgorithm();
-    if(algo == B_BB)
-      initializeBBB();
-    else
-      initializeBHyb(createContinuousSolver);}
-  
-  /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
-  void 
-  BonminSetup::initialize(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/){
-    use(nlpSi);
-    BabSetupBase::gatherParametersValues(options_);
-    Algorithm algo = getAlgorithm();
-    if(algo == B_BB)
+    if (algo == B_BB)
       initializeBBB();
     else
       initializeBHyb(createContinuousSolver);
   }
-  
+
+  /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
+  void
+  BonminSetup::initialize(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/)
+  {
+    use(nlpSi);
+    BabSetupBase::gatherParametersValues(options_);
+    Algorithm algo = getAlgorithm();
+    if (algo == B_BB)
+      initializeBBB();
+    else
+      initializeBHyb(createContinuousSolver);
+  }
+
   /** Register standard MILP cut generators. */
-  void 
-  BonminSetup::registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+  void
+  BonminSetup::registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
+  {
     roptions->SetRegisteringCategory("bonmin options for MILP cutting planes", RegisteredOptions::BonminCategory);
-    
+
     roptions->AddLowerBoundedIntegerOption("Gomory_cuts",
-                                           "Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.",
-                                           -100,-5,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.",
+        -100,-5,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("Gomory_cuts",5);
     roptions->AddLowerBoundedIntegerOption("probing_cuts",
-                                           "Frequency (in terms of nodes) for generating probing cuts in branch-and-cut",
-                                           -100,-5,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating probing cuts in branch-and-cut",
+        -100,-5,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("probing_cuts",5);
-    
+
     roptions->AddLowerBoundedIntegerOption("cover_cuts",
-                                           "Frequency (in terms of nodes) for generating cover cuts in branch-and-cut",
-                                           -100,-5,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating cover cuts in branch-and-cut",
+        -100,-5,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("cover_cuts",5);
-    
+
     roptions->AddLowerBoundedIntegerOption("mir_cuts",
-                                           "Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut",
-                                           -100,-5,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut",
+        -100,-5,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("mir_cuts",5);
     roptions->AddLowerBoundedIntegerOption("2mir_cuts",
-                                           "Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut",
-                                           -100,0,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut",
+        -100,0,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("2mir_cuts",5);
     roptions->AddLowerBoundedIntegerOption("flow_covers_cuts",
-                                           "Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut",
-                                           -100,-5,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut",
+        -100,-5,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("flow_covers_cuts",5);
     roptions->AddLowerBoundedIntegerOption("lift_and_project_cuts",
-                                           "Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut",
-                                           -100,0,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut",
+        -100,0,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("lift_and_project_cuts",5);
     roptions->AddLowerBoundedIntegerOption("reduce_and_split_cuts",
-                                           "Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut",
-                                           -100,0,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut",
+        -100,0,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("reduce_and_split_cuts",5);
     roptions->AddLowerBoundedIntegerOption("clique_cuts",
-                                           "Frequency (in terms of nodes) for generating clique cuts in branch-and-cut",
-                                           -100,-5,
-                                           "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
-                                           "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-                                           "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "Frequency (in terms of nodes) for generating clique cuts in branch-and-cut",
+        -100,-5,
+        "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
+        "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
+        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("clique_cuts",5);
   }
   /** Add milp cut generators according to options.*/
-  void 
-  BonminSetup::addMilpCutGenerators(){
+  void
+  BonminSetup::addMilpCutGenerators()
+  {
     int freq;
     options_->GetIntegerValue("Gomory_cuts", freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglGomory * gom = new CglGomory;
@@ -195,7 +203,7 @@ algo_(other.algo_){
       cutGenerators_.push_back(cg);
     }
     options_->GetIntegerValue("probing_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglProbing * probe = new CglProbing;
@@ -217,27 +225,27 @@ algo_(other.algo_){
       cutGenerators_.push_back(cg);
     }
     options_->GetIntegerValue("mir_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglMixedIntegerRounding2 * mir = new CglMixedIntegerRounding2;
       cg.cgl = mir;
       cg.id = "Mixed Integer Rounding";
       cutGenerators_.push_back(cg);
-      
-      
+
+
     }
     options_->GetIntegerValue("2mir_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglTwomir * mir2 = new CglTwomir;
       cg.cgl = mir2;
       cg.id = "2-MIR";
       cutGenerators_.push_back(cg);
-    }      
+    }
     options_->GetIntegerValue("cover_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglKnapsackCover * cover = new CglKnapsackCover;
@@ -245,22 +253,22 @@ algo_(other.algo_){
       cg.id = "Cover";
       cutGenerators_.push_back(cg);
     }
-    
+
     options_->GetIntegerValue("clique_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglClique * clique = new CglClique;
       clique->setStarCliqueReport(false);
       clique->setRowCliqueReport(false);
       clique->setMinViolation(0.1);
-      
+
       cg.cgl = clique;
       cg.id = "Clique";
-      cutGenerators_.push_back(cg);      
+      cutGenerators_.push_back(cg);
     }
     options_->GetIntegerValue("flow_covers_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglFlowCover * flow = new CglFlowCover;
@@ -269,7 +277,7 @@ algo_(other.algo_){
       cutGenerators_.push_back(cg);
     }
     options_->GetIntegerValue("lift_and_project_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglLandP * landp = new CglLandP;
@@ -278,7 +286,7 @@ algo_(other.algo_){
       cutGenerators_.push_back(cg);
     }
     options_->GetIntegerValue("reduce_and_split_cuts",freq,"bonmin.");
-    if(freq){
+    if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglRedSplit * rands = new CglRedSplit;
@@ -287,28 +295,29 @@ algo_(other.algo_){
       cutGenerators_.push_back(cg);
     }
   }
-  
-  
-  void 
-  BonminSetup::initializeBBB(){
+
+
+  void
+  BonminSetup::initializeBBB()
+  {
     continuousSolver_ = nonlinearSolver_;
     nonlinearSolver_->ignoreFailures();
     OsiBabSolver extraStuff(2);
     continuousSolver_->setAuxiliaryInfo(&extraStuff);
-    
+
     intParam_[BabSetupBase::SpecialOption] = 16;
     //AW: Took this out: intParam_[BabSetupBase::MinReliability] = 0;
-    if(!options_->GetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.")){
+    if (!options_->GetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.")) {
       intParam_[BabSetupBase::MinReliability] = 1;
       options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
     }
-    if(!options_->GetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.")){
+    if (!options_->GetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.")) {
       intParam_[BabSetupBase::NumberStrong] = 1000;
-      options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin."); 
+      options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
     }
     int varSelection;
     bool val = options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
-    if(!val){
+    if (!val) {
       options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
       varSelection = OsiTMINLPInterface::NLP_STRONG_BRANCHING;
     }
@@ -317,34 +326,33 @@ algo_(other.algo_){
     case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
     case OsiTMINLPInterface::QP_STRONG_BRANCHING:
     case OsiTMINLPInterface::LP_STRONG_BRANCHING:
-    case OsiTMINLPInterface::NLP_STRONG_BRANCHING:
-      {
-	continuousSolver_->findIntegersAndSOS(false);
+    case OsiTMINLPInterface::NLP_STRONG_BRANCHING: {
+        continuousSolver_->findIntegersAndSOS(false);
         setPriorities();
         addSos();
-	SmartPtr<StrongBranchingSolver> strong_solver = NULL;
-	BonChooseVariable * chooseVariable = new BonChooseVariable(*this);
-	switch(varSelection) {
-	case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
-	  strong_solver = new CurvBranchingSolver(nonlinearSolver_);
-	  chooseVariable->setTrustStrongForSolution(false);
-	  chooseVariable->setTrustStrongForBound(false);
-	  chooseVariable->setOnlyPseudoWhenTrusted(true);
-	  break;
-	case OsiTMINLPInterface::QP_STRONG_BRANCHING:
-	  strong_solver = new QpBranchingSolver(nonlinearSolver_);
-	  // The bound returned from the QP can be wrong, since the
-	  // objective is not guaranteed to be an underestimator:
-	  chooseVariable->setTrustStrongForBound(false);
-	  chooseVariable->setOnlyPseudoWhenTrusted(true);
-	  break;
-	case OsiTMINLPInterface::LP_STRONG_BRANCHING:
-	  strong_solver = new LpBranchingSolver(nonlinearSolver_);
-	  chooseVariable->setOnlyPseudoWhenTrusted(true);
-	  break;
-	}
-	nonlinearSolver_->SetStrongBrachingSolver(strong_solver);
-	branchingMethod_ = chooseVariable;
+        SmartPtr<StrongBranchingSolver> strong_solver = NULL;
+        BonChooseVariable * chooseVariable = new BonChooseVariable(*this);
+        switch (varSelection) {
+        case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
+          strong_solver = new CurvBranchingSolver(nonlinearSolver_);
+          chooseVariable->setTrustStrongForSolution(false);
+          chooseVariable->setTrustStrongForBound(false);
+          chooseVariable->setOnlyPseudoWhenTrusted(true);
+          break;
+        case OsiTMINLPInterface::QP_STRONG_BRANCHING:
+          strong_solver = new QpBranchingSolver(nonlinearSolver_);
+          // The bound returned from the QP can be wrong, since the
+          // objective is not guaranteed to be an underestimator:
+          chooseVariable->setTrustStrongForBound(false);
+          chooseVariable->setOnlyPseudoWhenTrusted(true);
+          break;
+        case OsiTMINLPInterface::LP_STRONG_BRANCHING:
+          strong_solver = new LpBranchingSolver(nonlinearSolver_);
+          chooseVariable->setOnlyPseudoWhenTrusted(true);
+          break;
+        }
+        nonlinearSolver_->SetStrongBrachingSolver(strong_solver);
+        branchingMethod_ = chooseVariable;
       }
       break;
     case OsiTMINLPInterface::OSI_SIMPLE:
@@ -352,7 +360,7 @@ algo_(other.algo_){
       setPriorities();
       addSos();
       branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
-      
+
       break;
     case OsiTMINLPInterface::OSI_STRONG:
       continuousSolver_->findIntegersAndSOS(false);
@@ -361,39 +369,40 @@ algo_(other.algo_){
       branchingMethod_ = new OsiChooseStrong(nonlinearSolver_);
       break;
     case OsiTMINLPInterface::MOST_FRACTIONAL:
-       intParam_[NumberStrong] = 0;
-       options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin."); 
+      intParam_[NumberStrong] = 0;
+      options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
+      break;
     case OsiTMINLPInterface::STRONG_BRANCHING:
-       intParam_[BabSetupBase::MinReliability] = 0;
-       options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
-       break;
-    //default:
+      intParam_[BabSetupBase::MinReliability] = 0;
+      options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
+      break;
+      //default:
       //abort();
     }
-    if(branchingMethod_ != NULL){
+    if (branchingMethod_ != NULL) {
       branchingMethod_->setNumberStrong(intParam_[NumberStrong]);
     }
-  }  
-  
-  void 
+  }
+
+  void
   BonminSetup::initializeBHyb(bool createContinuousSolver /*= false*/)
-{
-    if(createContinuousSolver){
-    /* Create linear solver */
-    continuousSolver_ = new OsiClpSolverInterface;
-    int lpLogLevel;
-    options_->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
-    lpMessageHandler_ = nonlinearSolver_->messageHandler()->clone();
-    continuousSolver_->passInMessageHandler(lpMessageHandler_);
-    continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
-    nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
-    // say bound dubious, does cuts at solution
-    OsiBabSolver * extraStuff = new OsiBabSolver(3);
-    continuousSolver_->setAuxiliaryInfo(extraStuff);
-    delete extraStuff;
+  {
+    if (createContinuousSolver) {
+      /* Create linear solver */
+      continuousSolver_ = new OsiClpSolverInterface;
+      int lpLogLevel;
+      options_->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
+      lpMessageHandler_ = nonlinearSolver_->messageHandler()->clone();
+      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+      continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+      nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
+      // say bound dubious, does cuts at solution
+      OsiBabSolver * extraStuff = new OsiBabSolver(3);
+      continuousSolver_->setAuxiliaryInfo(extraStuff);
+      delete extraStuff;
     }
     Algorithm algo = getAlgorithm();
-    if(algo == B_OA){
+    if (algo == B_OA) {
       options_->SetNumericValue("oa_dec_time_limit",COIN_DBL_MAX, true, true);
       options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
       intParam_[BabLogLevel] = 0;
@@ -402,7 +411,7 @@ algo_(other.algo_){
       options_->SetNumericValue("oa_dec_time_limit",0, true, true);
       options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
     }
-    else if(algo==B_Ecp){
+    else if (algo==B_Ecp) {
       options_->SetNumericValue("oa_dec_time_limit",0, true, true);
       options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
       options_->SetIntegerValue("filmint_ecp_cuts", 1, true, true);
@@ -416,16 +425,16 @@ algo_(other.algo_){
     continuousSolver_->applyCuts(cuts);
 #endif
 
-    
+
     int varSelection;
     options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
-    if(varSelection > OsiTMINLPInterface::RELIABILITY_BRANCHING){
+    if (varSelection > OsiTMINLPInterface::RELIABILITY_BRANCHING) {
       std::cout<<"Variable selection stragey not available with oa branch-and-cut."<<std::endl;
     }
     /* Populate cut generation and heuristic procedures.*/
     int ival;
     options_->GetIntegerValue("nlp_solve_frequency",ival,"bonmin.");
-    if(ival != 0){
+    if (ival != 0) {
       CuttingMethod cg;
       cg.frequency = ival;
       OaNlpOptim * nlpsol = new OaNlpOptim(*this);
@@ -434,9 +443,9 @@ algo_(other.algo_){
       cg.id="NLP solution based oa cuts";
       cutGenerators_.push_back(cg);
     }
-    
+
     options_->GetIntegerValue("filmint_ecp_cuts",ival, "bonmin.");
-    if(ival != 0){
+    if (ival != 0) {
       CuttingMethod cg;
       cg.frequency = ival;
       EcpCuts * ecp = new EcpCuts(*this);
@@ -445,14 +454,13 @@ algo_(other.algo_){
       cg.id = "Ecp cuts";
       cutGenerators_.push_back(cg);
     }
-    
+
     if (algo!=B_QG)
       addMilpCutGenerators();
-    
+
     double oaTime;
     options_->GetNumericValue("oa_dec_time_limit",oaTime,"bonmin.");
-    if(oaTime > 0.)
-    {
+    if (oaTime > 0.) {
       CuttingMethod cg;
       cg.frequency = ival;
       OACutGenerator2 * oa = new OACutGenerator2(*this);
@@ -460,9 +468,9 @@ algo_(other.algo_){
       cg.cgl = oa;
       cg.id = "Outer Approximation decomposition.";
       cutGenerators_.push_back(cg);
-      
+
     }
-    
+
     {
       CuttingMethod cg;
       cg.frequency = 1;
@@ -473,22 +481,23 @@ algo_(other.algo_){
       cg.atSolution = 1;
       cutGenerators_.push_back(cg);
     }
-    
+
     DummyHeuristic * oaHeu = new DummyHeuristic;
     oaHeu->setNlp(nonlinearSolver_);
     heuristics_.push_back(oaHeu);
-}
-
-Algorithm BonminSetup::getAlgorithm(){
-  if(algo_ != Dummy)
-    return algo_;
-  if(IsValid(options_)){
-    int ival;
-    options_->GetEnumValue("algorithm", ival,"bonmin.");
-    return Algorithm(ival);
   }
-  else return Algorithm(3);
-}
+
+  Algorithm BonminSetup::getAlgorithm()
+  {
+    if (algo_ != Dummy)
+      return algo_;
+    if (IsValid(options_)) {
+      int ival;
+      options_->GetEnumValue("algorithm", ival,"bonmin.");
+      return Algorithm(ival);
+    }
+    else return Algorithm(3);
+  }
 
 }/* end namespace Bonmin*/
 

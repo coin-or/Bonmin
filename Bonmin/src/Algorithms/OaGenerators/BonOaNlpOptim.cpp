@@ -27,24 +27,24 @@ namespace Bonmin
     handler_ -> setLogLevel(1);
     messages_ = OaMessages();
   }
-  
-  OaNlpOptim::OaNlpOptim(BabSetupBase &b):
-  CglCutGenerator(),
-  nlp_(b.nonlinearSolver()),
-  maxDepth_(1000),
-  nSolve_(0)
-{
-  int ivalue;
-  b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
-  addOnlyViolated_ = ivalue;
-  b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
 
-  b.options()->GetIntegerValue("nlp_solve_max_depth", maxDepth_,"bonmin.");
-  global_ = ivalue;
-  handler_ = new CoinMessageHandler();
-  handler_ -> setLogLevel(1);
-  messages_ = OaMessages();
-}
+  OaNlpOptim::OaNlpOptim(BabSetupBase &b):
+      CglCutGenerator(),
+      nlp_(b.nonlinearSolver()),
+      maxDepth_(1000),
+      nSolve_(0)
+  {
+    int ivalue;
+    b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
+    addOnlyViolated_ = ivalue;
+    b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
+
+    b.options()->GetIntegerValue("nlp_solve_max_depth", maxDepth_,"bonmin.");
+    global_ = ivalue;
+    handler_ = new CoinMessageHandler();
+    handler_ -> setLogLevel(1);
+    messages_ = OaMessages();
+  }
 /// Assign an OsiTMINLPInterface
   void
   OaNlpOptim::assignInterface(OsiTMINLPInterface * si)
@@ -131,7 +131,7 @@ namespace Bonmin
     nSolve_++;
     nlp_->resolve();
     const double * violatedPoint = (addOnlyViolated_)? si.getColSolution():
-      NULL;
+        NULL;
     nlp_->getOuterApproximation(cs, 1, violatedPoint,global_);
     if (nlp_->isProvenOptimal()) {
       handler_->message(LP_ERROR,messages_)
@@ -201,22 +201,22 @@ namespace Bonmin
     delete [] saveColLb;
     delete [] saveColUb;
   }
-  
-  void 
-    OaNlpOptim::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
+
+  void
+  OaNlpOptim::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-      roptions->SetRegisteringCategory("bonmin options : Nlp solve options", RegisteredOptions::BonminCategory);
-      roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
-                                             "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
-                                             0,10,
-                                             "A frequency of 0 amounts to to never solve the NLP relaxation.");
-      roptions->setOptionExtraInfo("nlp_solve_frequency",1);
-      roptions->AddLowerBoundedIntegerOption("nlp_solve_max_depth",
-                                             "Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.",
-                                             0,10,
-                                             "A depth of 0 amounts to to never solve the NLP relaxation.");
-      roptions->setOptionExtraInfo("nlp_solve_max_depth",1);
+    roptions->SetRegisteringCategory("bonmin options : Nlp solve options", RegisteredOptions::BonminCategory);
+    roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
+        "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
+        0,10,
+        "A frequency of 0 amounts to to never solve the NLP relaxation.");
+    roptions->setOptionExtraInfo("nlp_solve_frequency",1);
+    roptions->AddLowerBoundedIntegerOption("nlp_solve_max_depth",
+        "Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.",
+        0,10,
+        "A depth of 0 amounts to to never solve the NLP relaxation.");
+    roptions->setOptionExtraInfo("nlp_solve_max_depth",1);
   }
 
-      
+
 }/* End namespace Bonmin. */

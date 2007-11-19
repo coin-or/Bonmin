@@ -49,7 +49,11 @@ namespace Bonmin
     }
     else if(norm_ == 1){
       for(unsigned int i = 0 ; i < vals_.size() ; i++) {
-        ret_val += fabs(x[inds_[i]] - vals_[i]);
+        if(vals_[i] <= 0.1)
+         ret_val += x[inds_[i]];
+        else{
+         ret_val -= x[inds_[i]];
+        }
       }
     }
     return ret_val;
@@ -92,7 +96,7 @@ namespace Bonmin
     }
     else{
       for(unsigned int i = 0 ; i < inds_.size() ; i++) {
-        if(x[inds_[i]] - vals_[i] >= 0.)
+        if(vals_[i] <= 0.1)
           grad_f[inds_[i]] += objectiveScalingFactor_*lambda_;
         else
           grad_f[inds_[i]] -= objectiveScalingFactor_*lambda_;

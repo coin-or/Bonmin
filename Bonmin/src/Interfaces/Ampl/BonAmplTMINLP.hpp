@@ -72,7 +72,7 @@ namespace Bonmin
 
     /** Read suffixes on objective functions for upper bounding*/
     void read_obj_suffixes();
-    
+
     /** Default constructor.*/
     AmplTMINLP();
 
@@ -107,8 +107,8 @@ namespace Bonmin
 
     /** Returns the constraint linearity.
      * array should be alocated with length at least n.*/
-    virtual bool get_constraints_linearity(Index m, 
-					   Ipopt::TNLP::LinearityType* const_types);
+    virtual bool get_constraints_linearity(Index m,
+        Ipopt::TNLP::LinearityType* const_types);
 
     /** returns bounds of the nlp. Overloaded from TMINLP */
     virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
@@ -150,18 +150,18 @@ namespace Bonmin
 
     /** compute the value of a single constraint */
     virtual bool eval_gi(Index n, const Number* x, bool new_x,
-			 Index i, Number& gi);
+        Index i, Number& gi);
     /** compute the structure or values of the gradient for one
-	constraint */
+    constraint */
     virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
-			      Index i, Index& nele_grad_gi, Index* jCol,
-			      Number* values);
+        Index i, Index& nele_grad_gi, Index* jCol,
+        Number* values);
     //@}
 
     /** @name Solution Methods */
     //@{
     virtual void finalize_solution(TMINLP::SolverReturn status,
-                                   Index n, const Number* x, Number obj_value);
+        Index n, const Number* x, Number obj_value);
 
     void write_solution(const std::string & message, const Number *x_sol);
     //@}
@@ -204,42 +204,55 @@ namespace Bonmin
     void fillAmplOptionList(AmplOptionsList* amplOptList);
 
     /** Do we have an alternate objective for upper bounding?*/
-    virtual bool hasUpperBoundingObjective(){
-      return upperBoundingObj_ != -1;}
-    
+    virtual bool hasUpperBoundingObjective()
+    {
+      return upperBoundingObj_ != -1;
+    }
+
     /** This method to returns the value of an alternative objective function for
       upper bounding (if one has been declared by using the prefix UBObj).*/
     virtual bool eval_upper_bound_f(Index n, const Number* x,
-                                    Number& obj_value);
+        Number& obj_value);
 
     /** Get accest to constraint convexities.*/
-    virtual bool get_constraint_convexities(int m, TMINLP::Convexity * constraints_convexities)const {
-      if(constraintsConvexities_ != NULL){
-      CoinCopyN(constraintsConvexities_, m, constraints_convexities);
+    virtual bool get_constraint_convexities(int m, TMINLP::Convexity * constraints_convexities)const
+    {
+      if (constraintsConvexities_ != NULL) {
+        CoinCopyN(constraintsConvexities_, m, constraints_convexities);
       }
       else {
-       CoinFillN(constraints_convexities, m, TMINLP::Convex);
+        CoinFillN(constraints_convexities, m, TMINLP::Convex);
       }
-      return true;}
-  /** Get dimension information on nonconvex constraints.*/
-  virtual bool get_number_nonconvex(int & number_non_conv, int & number_concave) const{
-    number_non_conv = numberNonConvex_;
-    number_concave = numberSimpleConcave_;
-    return true;} 
-  /** Get array describing the constraints marked nonconvex in the model.*/
-  virtual bool get_constraint_convexities(int number_non_conv, MarkedNonConvex * non_convexes) const{
-    assert(number_non_conv == numberNonConvex_);
-    CoinCopyN( nonConvexConstraintsAndRelaxations_, number_non_conv, non_convexes);
-    return true;}
-  /** Fill array containing indices of simple concave constraints.*/ 
-  virtual bool get_simple_concave_constraints(int number_concave, SimpleConcaveConstraint * simple_concave) const{
-    assert(number_concave == numberSimpleConcave_);
-    CoinCopyN(simpleConcaves_, numberSimpleConcave_, simple_concave);
-    return true;}
-  
-  /** Say if problem has a linear objective (for OA) */
-  virtual bool hasLinearObjective(){return hasLinearObjective_;}
-private:
+      return true;
+    }
+    /** Get dimension information on nonconvex constraints.*/
+    virtual bool get_number_nonconvex(int & number_non_conv, int & number_concave) const
+    {
+      number_non_conv = numberNonConvex_;
+      number_concave = numberSimpleConcave_;
+      return true;
+    }
+    /** Get array describing the constraints marked nonconvex in the model.*/
+    virtual bool get_constraint_convexities(int number_non_conv, MarkedNonConvex * non_convexes) const
+    {
+      assert(number_non_conv == numberNonConvex_);
+      CoinCopyN( nonConvexConstraintsAndRelaxations_, number_non_conv, non_convexes);
+      return true;
+    }
+    /** Fill array containing indices of simple concave constraints.*/
+    virtual bool get_simple_concave_constraints(int number_concave, SimpleConcaveConstraint * simple_concave) const
+    {
+      assert(number_concave == numberSimpleConcave_);
+      CoinCopyN(simpleConcaves_, numberSimpleConcave_, simple_concave);
+      return true;
+    }
+
+    /** Say if problem has a linear objective (for OA) */
+    virtual bool hasLinearObjective()
+    {
+      return hasLinearObjective_;
+    }
+  private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
      * These methods are not implemented and
@@ -275,20 +288,20 @@ private:
     /** Store constraints types.*/
     TMINLP::Convexity * constraintsConvexities_;
 
-   /** Number of nonConvex constraints.*/
-   int numberNonConvex_;
-   /** Store marked non-convex constraints and their relaxations.*/
-   MarkedNonConvex * nonConvexConstraintsAndRelaxations_;
-   /** Number of simpleConcave constraints.*/
-   int numberSimpleConcave_;
-   /** Store simple concave constraints descriptions.*/
-   SimpleConcaveConstraint * simpleConcaves_;
+    /** Number of nonConvex constraints.*/
+    int numberNonConvex_;
+    /** Store marked non-convex constraints and their relaxations.*/
+    MarkedNonConvex * nonConvexConstraintsAndRelaxations_;
+    /** Number of simpleConcave constraints.*/
+    int numberSimpleConcave_;
+    /** Store simple concave constraints descriptions.*/
+    SimpleConcaveConstraint * simpleConcaves_;
 
-   /** Flag to indicate if objective function is linear */
-   bool hasLinearObjective_;
-  
-   /** Flag to say if AMPL solution file should be written.*/
-   int writeAmplSolFile_;
+    /** Flag to indicate if objective function is linear */
+    bool hasLinearObjective_;
+
+    /** Flag to say if AMPL solution file should be written.*/
+    int writeAmplSolFile_;
   };
 } // namespace Ipopt
 

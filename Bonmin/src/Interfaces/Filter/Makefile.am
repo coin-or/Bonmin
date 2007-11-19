@@ -71,7 +71,9 @@ ASTYLE_FILES = \
          BonFilterSolver.cppbak \
          BonFilterSolver.hppbak \
          BonFilterWarmStart.cppbak \
-         BonFilterWarmStart.hppbak
+         BonFilterWarmStart.hppbak \
+         BonBqpdSolver.hppbak \
+         BonBqpdSolver.cppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

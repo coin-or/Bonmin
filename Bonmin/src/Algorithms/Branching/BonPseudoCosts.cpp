@@ -10,7 +10,8 @@
 #include "BonPseudoCosts.hpp"
 
 
-namespace Bonmin{
+namespace Bonmin
+{
 
   PseudoCosts::PseudoCosts()
   {
@@ -23,27 +24,28 @@ namespace Bonmin{
   }
 
   /** Copy constructor.*/
-  PseudoCosts::PseudoCosts(const PseudoCosts & rhs){
+  PseudoCosts::PseudoCosts(const PseudoCosts & rhs)
+  {
     upTotalChange_ = NULL;
     downTotalChange_ = NULL;
     upNumber_ = NULL;
     downNumber_ = NULL;
     numberObjects_ = rhs.numberObjects_;
     numberBeforeTrusted_ = rhs.numberBeforeTrusted_;
-     if (numberObjects_ > 0) {
-       upTotalChange_ = CoinCopyOfArray(rhs.upTotalChange_,numberObjects_);
-       downTotalChange_ = CoinCopyOfArray(rhs.downTotalChange_,numberObjects_);
-       upNumber_ = CoinCopyOfArray(rhs.upNumber_,numberObjects_);
-       downNumber_ = CoinCopyOfArray(rhs.downNumber_,numberObjects_);
-     }
+    if (numberObjects_ > 0) {
+      upTotalChange_ = CoinCopyOfArray(rhs.upTotalChange_,numberObjects_);
+      downTotalChange_ = CoinCopyOfArray(rhs.downTotalChange_,numberObjects_);
+      upNumber_ = CoinCopyOfArray(rhs.upNumber_,numberObjects_);
+      downNumber_ = CoinCopyOfArray(rhs.downNumber_,numberObjects_);
+    }
   }
-    
+
 
   /** Assignment operator const version.*/
   PseudoCosts &
   PseudoCosts::operator=(const PseudoCosts&rhs)
   {
-    if(this != &rhs){
+    if (this != &rhs) {
       delete [] upTotalChange_;
       delete [] downTotalChange_;
       delete [] upNumber_;

@@ -370,7 +370,9 @@ ASTYLE_FILES = \
          BonFilterSolver.cppbak \
          BonFilterSolver.hppbak \
          BonFilterWarmStart.cppbak \
-         BonFilterWarmStart.hppbak
+         BonFilterWarmStart.hppbak \
+         BonBqpdSolver.hppbak \
+         BonBqpdSolver.cppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak

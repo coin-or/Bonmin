@@ -26,12 +26,12 @@ namespace Bonmin
     /** Default constructor only available for Bonmin's friends and child classes.*/
     AmplInterface();
     /**@name Methods to input a problem */
-    //@{    
-        virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
-                                    Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                                    Ipopt::SmartPtr<Ipopt::Journalist> journalist,
-                                    std::string* nl_file_content  = NULL);
-    //@}    
+    //@{
+    virtual void readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
+        Ipopt::SmartPtr<Ipopt::OptionsList> options,
+        Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+        std::string* nl_file_content  = NULL);
+    //@}
     /** Copy constructor */
     AmplInterface(const AmplInterface &other);
     /// Clone
@@ -52,13 +52,13 @@ namespace Bonmin
   protected:
     /** Read variables and row names in .col and .row files.*/
     void readNames() ;
-    
+
     /** TMINLP problem (the original problem usually an AmplTMINLP).*/
     Ipopt::SmartPtr<Bonmin::AmplTMINLP> amplTminlp_;
 
   private:
-   /** Write the ampl solution file or write a bonmin one?*/
-   int writeAmplSolFile_;
-};
+    /** Write the ampl solution file or write a bonmin one?*/
+    int writeAmplSolFile_;
+  };
 }
 #endif

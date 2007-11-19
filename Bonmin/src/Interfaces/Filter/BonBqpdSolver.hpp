@@ -14,23 +14,26 @@
 #include "BonTNLPSolver.hpp"
 #include "BonBranchingTQP.hpp"
 
-namespace Bonmin{
-  class BqpdSolver : public TNLPSolver{
+namespace Bonmin
+{
+  class BqpdSolver : public TNLPSolver
+  {
   public:
     friend class FilterSolver;
 
-    class UnsolvedBqpdError: public TNLPSolver::UnsolvedError
+  class UnsolvedBqpdError: public TNLPSolver::UnsolvedError
     {
     public:
-      UnsolvedBqpdError(int errorNum, 
-			Ipopt::SmartPtr<TMINLP2TNLP> model,
-			const std::string &name):
-	TNLPSolver::UnsolvedError(errorNum, model, name)
+      UnsolvedBqpdError(int errorNum,
+          Ipopt::SmartPtr<TMINLP2TNLP> model,
+          const std::string &name):
+          TNLPSolver::UnsolvedError(errorNum, model, name)
       {}
       virtual const std::string& errorName() const;
-    
-      virtual const std::string& solverName() const; 
-      virtual ~UnsolvedBqpdError(){}
+
+      virtual const std::string& solverName() const;
+      virtual ~UnsolvedBqpdError()
+      {}
 
     private:
       static std::string errorNames_[1];
@@ -44,8 +47,9 @@ namespace Bonmin{
 
     virtual UnsolvedError*
     newUnsolvedError(int num,
-		     Ipopt::SmartPtr<TMINLP2TNLP> problem,
-		     std::string name){
+        Ipopt::SmartPtr<TMINLP2TNLP> problem,
+        std::string name)
+    {
       return new UnsolvedBqpdError(num, problem, name);
     }
 
@@ -54,9 +58,9 @@ namespace Bonmin{
 
     /// Constructor with passed journalist, roptions, options.
     BqpdSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
-	       Ipopt::SmartPtr<Ipopt::OptionsList> options,
-	       Ipopt::SmartPtr<Ipopt::Journalist> journalist
-               );
+        Ipopt::SmartPtr<Ipopt::OptionsList> options,
+        Ipopt::SmartPtr<Ipopt::Journalist> journalist
+              );
 
     ///destructor
     virtual ~BqpdSolver();
@@ -71,15 +75,15 @@ namespace Bonmin{
 
     /** @name Solve methods */
     //@{
-    /// Solves a problem expresses as a TNLP 
+    /// Solves a problem expresses as a TNLP
     virtual ReturnStatus OptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp);
 
-    /// Resolves a problem expresses as a TNLP 
+    /// Resolves a problem expresses as a TNLP
     virtual ReturnStatus ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp);
 
     /// Set the warm start in the solver
-    virtual bool setWarmStart(const CoinWarmStart * warm, 
-			      Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
+    virtual bool setWarmStart(const CoinWarmStart * warm,
+        Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
 
     /// Get the warm start form the solver
     virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const;
@@ -98,31 +102,45 @@ namespace Bonmin{
     virtual SmartPtr<TNLPSolver> clone();
 
     /// Get the CpuTime of the last optimization.
-    virtual double CPUTime(){
-      return (Ipopt::IsValid(cached_)) ? cached_->cpuTime_: 0.;}
+    virtual double CPUTime()
+    {
+      return (Ipopt::IsValid(cached_)) ? cached_->cpuTime_: 0.;
+    }
 
     /// Get the iteration count of the last optimization.
-    virtual int IterationCount(){
-      return 0;}
+    virtual int IterationCount()
+    {
+      return 0;
+    }
 
-    /// turn off all output from the solver 
+    /// turn off all output from the solver
     virtual void turnOffOutput()
-    {if(Ipopt::IsValid(cached_)) cached_->iprint = 0;}
+    {
+      if (Ipopt::IsValid(cached_)) cached_->iprint = 0;
+    }
     /// turn on all output from the solver
     virtual void turnOnOutput()
-    {if(Ipopt::IsValid(cached_)) cached_->iprint = 3;}
+    {
+      if (Ipopt::IsValid(cached_)) cached_->iprint = 3;
+    }
 
     /// Get the solver name
-    virtual std::string & solverName(){
-      return solverName_;}
+    virtual std::string & solverName()
+    {
+      return solverName_;
+    }
 
     /// Register this solver options into passed roptions
-    void registerOptions(){
-      registerOptions(roptions_);}
+    void registerOptions()
+    {
+      registerOptions(roptions_);
+    }
 
     /** Error code (solver specific).*/
-    virtual int errorCode() const{
-      return -1;}
+    virtual int errorCode() const
+    {
+      return -1;
+    }
     /// Register this solver options into passed roptions
     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
   private:
@@ -133,7 +151,8 @@ namespace Bonmin{
     /** @} */
 
     /** Cached information for reoptimizing. */
-    struct cachedInfo : public Ipopt::ReferencedObject {
+  struct cachedInfo : public Ipopt::ReferencedObject
+    {
       fint n;
       fint m;
       fint k;
@@ -161,82 +180,83 @@ namespace Bonmin{
       fint iprint;
       fint nout;
 
-      fint kk,ll,kkk,lll,mxws,mxlws; 
+      fint kk,ll,kkk,lll,mxws,mxlws;
 
       Ipopt::SmartPtr<BranchingTQP> tqp_;
       /** Elapsed CPU time in last optimization. */
       double cpuTime_;
       /** flag remembering if warm start information has been put into
-	  cache */
+      cache */
       bool use_warm_start_in_cache_;
 
       /** Constructor.*/
       cachedInfo()
-	:
-	a(NULL),
-	la(NULL),
-	x(NULL),
-	bl(NULL),
-	bu(NULL),
-	g(NULL),
-	r(NULL),
-	w(NULL),
-	e(NULL),
-	ls(NULL),
-	alp(NULL),
-	lp(NULL),
-	ws(NULL),
-	lws(NULL),
-	cpuTime_(0),
-	use_warm_start_in_cache_(false)
+          :
+          a(NULL),
+          la(NULL),
+          x(NULL),
+          bl(NULL),
+          bu(NULL),
+          g(NULL),
+          r(NULL),
+          w(NULL),
+          e(NULL),
+          ls(NULL),
+          alp(NULL),
+          lp(NULL),
+          ws(NULL),
+          lws(NULL),
+          cpuTime_(0),
+          use_warm_start_in_cache_(false)
       {}
 
       cachedInfo(const Ipopt::SmartPtr<BranchingTQP> &tqp,
-		 Ipopt::SmartPtr<Ipopt::OptionsList>& options):
-	a(NULL),
-	la(NULL),
-	x(NULL),
-	bl(NULL),
-	bu(NULL),
-	g(NULL),
-	r(NULL),
-	w(NULL),
-	e(NULL),
-	ls(NULL),
-	alp(NULL),
-	lp(NULL),
-	ws(NULL),
-	lws(NULL),
-	tqp_(tqp),
-	cpuTime_(0),
-	use_warm_start_in_cache_(false)	
+          Ipopt::SmartPtr<Ipopt::OptionsList>& options):
+          a(NULL),
+          la(NULL),
+          x(NULL),
+          bl(NULL),
+          bu(NULL),
+          g(NULL),
+          r(NULL),
+          w(NULL),
+          e(NULL),
+          ls(NULL),
+          alp(NULL),
+          lp(NULL),
+          ws(NULL),
+          lws(NULL),
+          tqp_(tqp),
+          cpuTime_(0),
+          use_warm_start_in_cache_(false)
       {
-	initialize(tqp, options);
+        initialize(tqp, options);
       }
 
       /** Fill data structures for filter with info from tnlp. */
       void initialize(const Ipopt::SmartPtr<BranchingTQP> &tqp,
-		      Ipopt::SmartPtr<Ipopt::OptionsList>& options);
+          Ipopt::SmartPtr<Ipopt::OptionsList>& options);
 
       /** Optimize problem described by cache with filter.*/
       void optimize();
 
       /** Destructor. */
-      ~cachedInfo(){
-	delete [] a;
-	delete [] la;
-	delete [] x;
-	delete [] bl;
-	delete [] bu;
-	delete [] g;
-	delete [] r;
-	delete [] w;
-	delete [] e;
-	delete [] ls;
-	delete [] alp;
-	delete [] lp;
-	delete [] ws;
-	delete [] lws;
+      ~cachedInfo()
+      {
+        delete [] a;
+        delete [] la;
+        delete [] x;
+        delete [] bl;
+        delete [] bu;
+        delete [] g;
+        delete [] r;
+        delete [] w;
+        delete [] e;
+        delete [] ls;
+        delete [] alp;
+        delete [] lp;
+        delete [] ws;
+        delete [] lws;
       }
     };
 
@@ -244,7 +264,7 @@ namespace Bonmin{
     Ipopt::SmartPtr<cachedInfo> cached_;
 
     //name of solver (Bqpd)
-    static std::string  solverName_;  
+    static std::string  solverName_;
   };
 
 }// end namespace Bonmin
