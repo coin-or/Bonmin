@@ -54,8 +54,8 @@ int main (int argc, char *argv[])
   bonmin.readOptionsFile("Mybonmin.opt");
   bonmin.readOptionsFile();// This reads the default file "bonmin.opt"
   
-    // Options can also be set by using a string with a format similar to the bonmin.opt file
-    bonmin.readOptionsString("bonmin.algorithm B-BB\n");
+  // Options can also be set by using a string with a format similar to the bonmin.opt file
+  bonmin.readOptionsString("bonmin.algorithm B-BB\n");
   
   // Now we can obtain the value of the new option
   int printSolution;
