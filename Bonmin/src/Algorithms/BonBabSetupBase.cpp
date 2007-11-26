@@ -75,7 +75,7 @@ namespace Bonmin
       continuousSolver_(NULL),
       cutGenerators_(),
       heuristics_(),
-      branchingMethod_(),
+      branchingMethod_(NULL),
       nodeComparisonMethod_(other.nodeComparisonMethod_),
       treeTraversalMethod_(other.treeTraversalMethod_),
       objects_(other.objects_),
@@ -102,7 +102,9 @@ namespace Bonmin
     for (HeuristicMethods::iterator i = heuristics_.begin() ; i != heuristics_.end() ; i++) {
       heuristics_.push_back((*i)->clone());
     }
-    branchingMethod_ = other.branchingMethod_->clone();
+  
+    if(other.branchingMethod_ != NULL)
+      branchingMethod_ = other.branchingMethod_->clone();
     if (IsValid(other.options_)) {
       options_ = new OptionsList;
       *options_ = *other.options_;

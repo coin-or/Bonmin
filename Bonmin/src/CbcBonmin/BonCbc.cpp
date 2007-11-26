@@ -362,17 +362,15 @@ namespace Bonmin
 
 
     // Redundant definition of default branching (as Default == User)
-    CbcBranchDefaultDecision branch;
     if (s.branchingMethod() != NULL) {
+      CbcBranchDefaultDecision branch;
       s.branchingMethod()->setSolver(model_.solver());
-      s.branchingMethod()->setNumberStrong(model_.numberStrong());
-      OsiChooseStrong * strong = dynamic_cast<OsiChooseStrong *>(s.branchingMethod());
-      if (strong)
-        strong->setNumberBeforeTrusted(model_.numberBeforeTrust());
       BonChooseVariable * strong2 = dynamic_cast<BonChooseVariable *>(s.branchingMethod());
       if (strong2)
         strong2->setCbcModel(&model_);
       branch.setChooseMethod(*s.branchingMethod());
+
+      model_.setBranchingMethod(&branch);
     }
 
     //Get objects from model_ if it is not null means there are some sos constraints or non-integer branching object
@@ -416,7 +414,6 @@ namespace Bonmin
           oa->setObjects(objects_,nObjects_);
       }
     }
-    model_.setBranchingMethod(&branch);
 
     //Get the time and start.
     model_.initialSolve();

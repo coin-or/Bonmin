@@ -118,7 +118,7 @@ namespace Bonmin
   void
   BonminSetup::registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->sETregisteringCategory("MILP cutting planes in hybrid", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("MILP cutting planes in hybrid", RegisteredOptions::BonminCategory);
 
     roptions->AddLowerBoundedIntegerOption("Gomory_cuts",
         "Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.",

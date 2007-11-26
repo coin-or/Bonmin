@@ -10,6 +10,7 @@
 
 #include "BonOAMessages.hpp"
 #include <cstring>
+#include "BonMsgUtils.hpp"
 
 namespace Bonmin
 {
@@ -18,16 +19,16 @@ namespace Bonmin
       CoinMessages(DUMMY_END)
   {
     strcpy(source_,"OA");
-    addMessage(FEASIBLE_NLP,CoinOneMessage( 1, 2,"Solved NLP in %d iterations, found a feasible solution of value %f."));
-    addMessage(INFEASIBLE_NLP, CoinOneMessage(2,2,"Solved NLP in %d iterations, problem is infeasible in subspace."));
-    addMessage(UPDATE_UB, CoinOneMessage(3,1,"New best feasible of %g found after %g sec."));
-    addMessage(SOLVED_LOCAL_SEARCH, CoinOneMessage(4,2,"Local search solved to optimality in %d nodes and %d lp iterations."));
-    addMessage(LOCAL_SEARCH_ABORT, CoinOneMessage(5,2,"Local search aborted : %d nodes and %d lp iterations."));
-    addMessage(UPDATE_LB, CoinOneMessage(6,2,"Updating lower bound to %g elapsed time %g sec"));
-    addMessage(ABORT,CoinOneMessage(7,1,"Oa aborted on %s limit, time spent %g"));
-    addMessage(OASUCCESS, CoinOneMessage(8,1,"Oa converged in %g seconds"));
-    addMessage(LP_ERROR,CoinOneMessage(9,2,"Error of LP approximation %g"));
-    addMessage(PERIODIC_MSG, CoinOneMessage(10,1,"After %7.1f seconds, upper bound %10g, lower bound %10g"));
+    ADD_MSG(FEASIBLE_NLP, std_m, 2,"Solved NLP in %d iterations, found a feasible solution of value %f.");
+    ADD_MSG(INFEASIBLE_NLP, std_m,2,"Solved NLP in %d iterations, problem is infeasible in subspace.");
+    ADD_MSG(UPDATE_UB, ,1,"New best feasible of %g found after %g sec.");
+    ADD_MSG(SOLVED_LOCAL_SEARCH, std_m,2,"Local search solved to optimality in %d nodes and %d lp iterations.");
+    ADD_MSG(LOCAL_SEARCH_ABORT, std_m,2,"Local search aborted : %d nodes and %d lp iterations.");
+    ADD_MSG(UPDATE_LB, std_m ,2,"Updating lower bound to %g elapsed time %g sec");
+    ADD_MSG(ABORT,std_m,1,"Oa aborted on %s limit, time spent %g");
+    ADD_MSG(OASUCCESS, std_m,1,"Oa converged in %g seconds");
+    ADD_MSG(LP_ERROR,std_m,2,"Error of LP approximation %g");
+    ADD_MSG(PERIODIC_MSG, std_m,1,"After %7.1f seconds, upper bound %10g, lower bound %10g");
   }
 
 }//end namespace Bonmin
