@@ -11,7 +11,7 @@
 #include "CoinFinite.hpp"
 #include "CbcModel.hpp"
 #include "CbcConfig.h"
-#define DIVE_DEBUG
+//#define DIVE_DEBUG
 namespace Bonmin
 {
 
