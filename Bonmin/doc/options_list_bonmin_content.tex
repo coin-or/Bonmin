@@ -338,6 +338,15 @@
 <tr>   <th colspan=7> <a href="#sec:Nlp_solution_robustness">Nlp solution robustness</a> </th>
 </tr>
 <tr>
+<td> <a href="#sec:max_consecutive_failures">max_consecutive_failures</a> </td>
+<td>I</td>
+<td>10</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
 <td> <a href="#sec:max_random_point_radius">max_random_point_radius</a> </td>
 <td>F</td>
 <td>100000</td>
@@ -499,6 +508,15 @@
 <td>+</td>
 </tr>
 <tr>   <th colspan=7> <a href="#sec:Options_for_non-convex_problems">Options for non-convex problems</a> </th>
+</tr>
+<tr>
+<td> <a href="#sec:max_consecutive_infeasible">max_consecutive_infeasible</a> </td>
+<td>I</td>
+<td>0</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
 </tr>
 <tr>
 <td> <a href="#sec:num_resolve_at_infeasibles">num_resolve_at_infeasibles</a> </td>
@@ -681,28 +699,6 @@
 <td> <a href="#sec:setup_pseudo_frac">setup_pseudo_frac</a> </td>
 <td>F</td>
 <td>0.5</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>   <th colspan=7> <a href="#sec:bonmin_options_for_non-convex_problems">bonmin options for non-convex problems</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:max_consecutive_infeasible">max_consecutive_infeasible</a> </td>
-<td>I</td>
-<td>0</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>   <th colspan=7> <a href="#sec:bonmin_options_for_robustness">bonmin options for robustness</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:max_consecutive_failures">max_consecutive_failures</a> </td>
-<td>I</td>
-<td>10</td>
 <td> +</td>
 <td>+</td>
 <td>+</td>
@@ -1110,6 +1106,16 @@ and its default value is $0$.
 
 \subsection{Nlp solution robustness}
 \label{sec:Nlp_solution_robustness}
+\paragraph{max\_consecutive\_failures:} (temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree. $\;$ \\
+ When $n > 0$, continue exploring a branch of the
+tree until $n$ consecutive problems in the branch
+are unsolved (we call unsolved a problem for
+which Ipopt can not guarantee optimality within
+the specified tolerances). The valid range for this integer option is
+$0 \le {\tt max\_consecutive\_failures } <  {\tt +inf}$
+and its default value is $10$.
+
+
 \paragraph{max\_random\_point\_radius:} Set max value r for coordinate of a random point. $\;$ \\
  When picking a random point coordinate i will be
 in the interval [min(max(l,-r),u-r),
@@ -1252,6 +1258,14 @@ and its default value is $0$.
 
 \subsection{Options for non-convex problems}
 \label{sec:Options_for_non-convex_problems}
+\paragraph{max\_consecutive\_infeasible:} Number of consecutive infeasible subproblems before aborting a branch. $\;$ \\
+ Will continue exploring a branch of the tree
+until "max\_consecutive\_infeasible"consecutive
+problems are infeasibles by the NLP sub-solver. The valid range for this integer option is
+$0 \le {\tt max\_consecutive\_infeasible } <  {\tt +inf}$
+and its default value is $0$.
+
+
 \paragraph{num\_resolve\_at\_infeasibles:} Number $k$ of tries to resolve an infeasible node (other than the root) of the tree with different starting point. $\;$ \\
  The algorithm will solve all the infeasible nodes
 with $k$ different random starting points and
@@ -1424,28 +1438,6 @@ and its default value is $2147483647$.
  The valid range for this real option is 
 $0 \le {\tt setup\_pseudo\_frac } \le 1$
 and its default value is $0.5$.
-
-
-\subsection{bonmin options for non-convex problems}
-\label{sec:bonmin_options_for_non-convex_problems}
-\paragraph{max\_consecutive\_infeasible:} Number of consecutive infeasible subproblems before aborting a branch. $\;$ \\
- Will continue exploring a branch of the tree
-until "max\_consecutive\_infeasible"consecutive
-problems are infeasibles by the NLP sub-solver. The valid range for this integer option is
-$0 \le {\tt max\_consecutive\_infeasible } <  {\tt +inf}$
-and its default value is $0$.
-
-
-\subsection{bonmin options for robustness}
-\label{sec:bonmin_options_for_robustness}
-\paragraph{max\_consecutive\_failures:} (temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree. $\;$ \\
- When $n > 0$, continue exploring a branch of the
-tree until $n$ consecutive problems in the branch
-are unsolved (we call unsolved a problem for
-which Ipopt can not guarantee optimality within
-the specified tolerances). The valid range for this integer option is
-$0 \le {\tt max\_consecutive\_failures } <  {\tt +inf}$
-and its default value is $10$.
 
 
 \subsection{nlp interface option}
