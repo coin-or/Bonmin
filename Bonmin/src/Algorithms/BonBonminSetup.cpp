@@ -66,7 +66,7 @@ namespace Bonmin
 
     registerMilpCutGenerators(roptions);
 
-    roptions->SetRegisteringCategory("Bonmin algorithm choice", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
         "Choice of the algorithm.",
         "B-Hyb",
@@ -118,7 +118,7 @@ namespace Bonmin
   void
   BonminSetup::registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("bonmin options for MILP cutting planes", RegisteredOptions::BonminCategory);
+    roptions->sETregisteringCategory("MILP cutting planes in hybrid", RegisteredOptions::BonminCategory);
 
     roptions->AddLowerBoundedIntegerOption("Gomory_cuts",
         "Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.",

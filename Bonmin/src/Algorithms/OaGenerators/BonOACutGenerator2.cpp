@@ -289,7 +289,7 @@ namespace Bonmin
   void
   OACutGenerator2::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("bonmin options : Options for OA decomposition", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Options for OA decomposition", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
         "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
         0.,0,30.,
@@ -307,7 +307,7 @@ namespace Bonmin
         0.,1.,100.,
         "");
 
-    roptions->SetRegisteringCategory("bonmin options : Options for MILP subsolver in OA decomposition", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Options for MILP subsolver in OA decomposition", RegisteredOptions::BonminCategory);
     roptions->AddStringOption3("milp_subsolver",
         "Choose the subsolver to solve MILP sub-problems in OA decompositions.",
         "Cbc_D",

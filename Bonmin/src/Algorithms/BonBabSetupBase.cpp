@@ -274,7 +274,7 @@ namespace Bonmin
   {
     OsiTMINLPInterface::registerOptions(roptions);
     /* BabSetup options.*/
-    roptions->SetRegisteringCategory("bonmin output options", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Output ond log-levels ptions", RegisteredOptions::BonminCategory);
 
     roptions->AddBoundedIntegerOption("bb_log_level",
         "specify main branch-and-bound log level.",
@@ -299,7 +299,7 @@ namespace Bonmin
                                      );
     roptions->setOptionExtraInfo("lp_log_level", 3);
 
-    roptions->SetRegisteringCategory("bonmin branch-and-bound options", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Branch-and-bound options", RegisteredOptions::BonminCategory);
 
     roptions->AddLowerBoundedNumberOption("time_limit",
         "Set the global maximum computation time (in secs) for the algorithm.",

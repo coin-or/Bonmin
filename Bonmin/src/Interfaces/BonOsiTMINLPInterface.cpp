@@ -37,7 +37,7 @@ static void
 register_general_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("bonmin nlp interface option", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("nlp interface option", RegisteredOptions::BonminCategory);
   roptions->AddStringOption2("nlp_solver",
                              "Choice of the solver for local optima of continuous nlp's",
                              "Ipopt",
@@ -69,7 +69,7 @@ register_general_options
       "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
   roptions->setOptionExtraInfo("warm_start",8);
 
-  roptions->SetRegisteringCategory("bonmin options for robustness", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("Nlp solution robustness", RegisteredOptions::BonminCategory);
 
   roptions->AddLowerBoundedNumberOption("max_random_point_radius",
       "Set max value r for coordinate of a random point.",
@@ -114,7 +114,7 @@ register_general_options
   roptions->setOptionExtraInfo("num_retry_unsolved_random_point",15);
 
 
-  roptions->SetRegisteringCategory("bonmin options for non-convex problems", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("Options for non-convex problems", RegisteredOptions::BonminCategory);
 
 
   roptions->AddLowerBoundedIntegerOption("num_resolve_at_root",
@@ -145,7 +145,7 @@ register_general_options
 static void register_OA_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("bonmin options : Outer Approximation cuts", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("Outer Approximation cuts generation", RegisteredOptions::BonminCategory);
   
   roptions->AddStringOption2("disjunctive_cut_type",
       "Determine if and what kind of disjunctive cuts should be computed.",
