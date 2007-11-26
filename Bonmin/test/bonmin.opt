@@ -51,6 +51,7 @@ bonmin.reduce_and_split_cuts                0         	#Frequency (in terms of n
 
 # registering category: Nlp solution robustness
 
+bonmin.max_consecutive_failures             10        	#(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.
 bonmin.max_random_point_radius              100000    	#Set max value r for coordinate of a random point.
 bonmin.num_iterations_suspect               -1        	#Number of iterations over which a node is considered "suspect" (for debugging purposes only, see detailed documentation).
 bonmin.num_retry_unsolved_random_point      0         	#Number $k$ of times that the algorithm will try to resolve an unsolved NLP with a random starting point (we call unsolved an NLP for which Ipopt is not able to guarantee optimality within the specified tolerances).
@@ -83,6 +84,7 @@ bonmin.filmint_ecp_cuts                     0         	#Specify the frequency (i
 
 # registering category: Options for non-convex problems
 
+bonmin.max_consecutive_infeasible           0         	#Number of consecutive infeasible subproblems before aborting a branch.
 bonmin.num_resolve_at_infeasibles           0         	#Number $k$ of tries to resolve an infeasible node (other than the root) of the tree with different starting point.
 bonmin.num_resolve_at_node                  0         	#Number $k$ of tries to resolve a node (other than the root) of the tree with different starting point.
 bonmin.num_resolve_at_root                  0         	#Number $k$ of tries to resolve the root node with different starting points.
@@ -112,14 +114,6 @@ bonmin.min_number_strong_branch             0         	#Sets minimum number of v
 bonmin.number_before_trust_list             0         	#Set the number of branches on a variable before its pseudo costs are to be believed during setup of strong branching candidate list.
 bonmin.number_strong_branch_root            2147483647	#Maximum number of variables considered for strong branching in root node.
 bonmin.setup_pseudo_frac                    0.5       	#Proportion of strong branching list that has to be taken from most-integer-infeasible list.
-
-# registering category: bonmin options for non-convex problems
-
-bonmin.max_consecutive_infeasible           0         	#Number of consecutive infeasible subproblems before aborting a branch.
-
-# registering category: bonmin options for robustness
-
-bonmin.max_consecutive_failures             10        	#(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.
 
 # registering category: nlp interface option
 
