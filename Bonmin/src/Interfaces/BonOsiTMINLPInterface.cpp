@@ -28,6 +28,9 @@
 #include "OsiBranchingObject.hpp"
 #include "BonStrongBranchingSolver.hpp"
 
+//Macros to try and make messages definition less heavy
+#include "BonMsgUtils.hpp"
+
 using namespace Ipopt;
 
 
@@ -234,63 +237,42 @@ OsiTMINLPInterface::Messages::Messages
 ():CoinMessages((int)OSITMINLPINTERFACE_DUMMY_END)
 {
   strcpy(source_ ,"NLP");
-  addMessage(SOLUTION_FOUND, CoinOneMessage
-      (SOLUTION_FOUND + 1,2,"After %d tries found a solution of %g "
-       "(previous best %g)."));
+  ADD_MSG(SOLUTION_FOUND, std_m, 2,
+          "After %d tries found a solution of %g (previous best %g).");
 
-  addMessage(INFEASIBLE_SOLUTION_FOUND, CoinOneMessage
-      (INFEASIBLE_SOLUTION_FOUND + 1 ,2,"After %d tries found an solution of %g "
-       "infeasible problem."));
+  ADD_MSG(INFEASIBLE_SOLUTION_FOUND, std_m, 2,
+          "After %d tries found an solution of %g infeasible problem.");
 
-  addMessage(UNSOLVED_PROBLEM_FOUND, CoinOneMessage
-      (UNSOLVED_PROBLEM_FOUND + 1,2,"After %d tries found an solution of %g "
-       "unsolved problem."));
-  addMessage(WARN_SUCCESS_WS,CoinOneMessage
-      (WARN_SUCCESS_WS + 3001,2,
-       "Problem not solved with warm start but "
-       "solved without"));
+  ADD_MSG(UNSOLVED_PROBLEM_FOUND, std_m, 2,
+          "After %d tries found an solution of %g unsolved problem.");
+  ADD_MSG(WARN_SUCCESS_WS, warn_m, 2,
+       "Problem not solved with warm start but solved without");
 
-  addMessage(WARNING_RESOLVING,CoinOneMessage
-      (WARNING_RESOLVING + 3001,2,
-       "Trying to resolve NLP with different starting "
-       "point (%d attempts)."));
-  addMessage(WARN_SUCCESS_RANDOM, CoinOneMessage
-      (WARN_SUCCESS_RANDOM + 3001,1,
-       "Problem initially not solved but solved with "
-       "a random starting point (success on %d attempt)"));
-  addMessage(WARN_CONTINUING_ON_FAILURE, CoinOneMessage
-      (WARN_CONTINUING_ON_FAILURE + 3001, 1,
-       "Warning : continuing branching, while there are "
-       "unrecovered failures at nodes"));
+  ADD_MSG(WARNING_RESOLVING, warn_m,2,
+       "Trying to resolve NLP with different starting point (%d attempts).");
+  ADD_MSG(WARN_SUCCESS_RANDOM, warn_m, 1,
+       "Problem initially not solved but solved with a random starting point (success on %d attempt)");
+  ADD_MSG(WARN_CONTINUING_ON_FAILURE, warn_m, 1,
+       "Warning : continuing branching, while there are unrecovered failures at nodes");
 
-  addMessage(SUSPECT_PROBLEM, CoinOneMessage
-      (SUSPECT_PROBLEM + 1,2,"NLP number %d is suspect (see bounds and start file)"));
-  addMessage(IPOPT_SUMMARY, CoinOneMessage
-      (IPOPT_SUMMARY + 1,2,"Ipopt return (for %s): status %2d, iter count %4d, time %g"));
-  addMessage(BETTER_SOL, CoinOneMessage
-      (BETTER_SOL + 1,2,"Solution of value %g found on %d'th attempt"));
+  ADD_MSG(SUSPECT_PROBLEM, std_m, 2, "NLP number %d is suspect (see bounds and start file)");
+  ADD_MSG(IPOPT_SUMMARY, std_m, 2, "Ipopt return (for %s): status %2d, iter count %4d, time %g");
+  ADD_MSG(BETTER_SOL, std_m, 2, "Solution of value %g found on %d'th attempt");
 
-  addMessage(LOG_HEAD, CoinOneMessage
-      (LOG_HEAD + 1,1,"\n          "
-       "    Num      Status      Obj             It       time"));
-  addMessage(LOG_FIRST_LINE, CoinOneMessage
-      (LOG_FIRST_LINE + 1,1,
-       "    %-8d %-11s %-14g %-8d %-3g"));
-  addMessage(LOG_LINE, CoinOneMessage
-      (LOG_LINE + 1,1,
-       " %c  r%-7d %-11s %-14g %-8d %-3g"));
+  ADD_MSG(LOG_HEAD, std_m, 1,
+          "\n          "
+          "    Num      Status      Obj             It       time");
+  ADD_MSG(LOG_FIRST_LINE, std_m, 1, 
+          "    %-8d %-11s %-14g %-8d %-3g");
+  ADD_MSG(LOG_LINE, std_m, 1, " %c  r%-7d %-11s %-14g %-8d %-3g");
 
-  addMessage(ALTERNATE_OBJECTIVE, CoinOneMessage
-             (ALTERNATE_OBJECTIVE + 1,1,"Objective value recomputed with alternate objective: %g."));
+  ADD_MSG(ALTERNATE_OBJECTIVE, std_m, 1, "Objective value recomputed with alternate objective: %g.");
   
-  addMessage(WARN_RESOLVE_BEFORE_INITIAL_SOLVE, CoinOneMessage
-      (WARN_RESOLVE_BEFORE_INITIAL_SOLVE + 3001,1,"resolve called before any call to initialSolve"
-       " can not use warm starts."));
-  addMessage(ERROR_NO_TNLPSOLVER, CoinOneMessage
-             (ERROR_NO_TNLPSOLVER + 6001,1,"Can not parse options when no IpApplication has been created"));
-  addMessage(WARNING_NON_CONVEX_OA, CoinOneMessage
-             (WARNING_NON_CONVEX_OA + 3001, 1,
-              "OA on non-convex constraint is very experimental."));                                          
+  ADD_MSG(WARN_RESOLVE_BEFORE_INITIAL_SOLVE, warn_m, 1, 
+         "resolve called before any call to initialSol  can not use warm starts.");
+  ADD_MSG(ERROR_NO_TNLPSOLVER, warn_m, 1,"Can not parse options when no IpApplication has been created");
+  ADD_MSG(WARNING_NON_CONVEX_OA, warn_m, 1,
+          "OA on non-convex constraint is very experimental.");                          
 
 }
 
@@ -311,14 +293,11 @@ OsiTMINLPInterface::OaMessageHandler::print(OsiRowCut &row){
 
 OsiTMINLPInterface::OaMessages::OaMessages(): CoinMessages((int) OA_MESSAGES_DUMMY_END){
    strcpy(source_,"OaCg");
-   addMessage(VIOLATED_OA_CUT_GENERATED, CoinOneMessage(
-              VIOLATED_OA_CUT_GENERATED + 1, 1,"Row %d, cut violation is %g: Outer approximation cut generated."));
+   ADD_MSG(VIOLATED_OA_CUT_GENERATED, std_m, 1,"Row %d, cut violation is %g: Outer approximation cut generated.");
 
-   addMessage(CUT_NOT_VIOLATED_ENOUGH, CoinOneMessage(
-              CUT_NOT_VIOLATED_ENOUGH + 1, 2,"Row %d, cut violation is %g: Outer approximation cut not generated."));
+   ADD_MSG(CUT_NOT_VIOLATED_ENOUGH, std_m, 2,"Row %d, cut violation is %g: Outer approximation cut not generated.");
 
-   addMessage(OA_CUT_GENERATED, CoinOneMessage(
-              OA_CUT_GENERATED + 1, 1,"Row %d: Outer approximation cut not generated."));
+   ADD_MSG(OA_CUT_GENERATED, std_m, 1,"Row %d: Outer approximation cut not generated.");
 }
 bool OsiTMINLPInterface::hasPrintedOptions=0;
 

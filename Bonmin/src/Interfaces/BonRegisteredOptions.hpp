@@ -129,6 +129,8 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
 
    /** Output Latex/Html ooptions documentation.*/
    void writeLatexHtmlDoc(std::ostream &of, ExtraCategoriesInfo which);
+  /** Ouptut a bonmin.opt file with options default values and short descritpions.*/
+  void writeBonminOpt(std::ostream &os, ExtraCategoriesInfo which);
    private:
    /** Output Latex table of options.*/
    void chooseOptions(ExtraCategoriesInfo which, std::list<Ipopt::RegisteredOption *> &options);

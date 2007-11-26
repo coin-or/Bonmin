@@ -104,6 +104,29 @@ namespace Bonmin{
     return ret_val;
   }
 
+ static std::string makeNumber(std::string value){
+   if(value == "DBL_MAX") {
+     std::stringstream s_val;
+     s_val<<DBL_MAX;
+     return s_val.str();
+   }
+   if(value == "-DBL_MAX") {
+     std::stringstream s_val;
+     s_val<<-DBL_MAX;
+     return s_val.str();
+   }
+   if(value == "INT_MAX") {
+     std::stringstream s_val;
+     s_val<<INT_MAX;
+     return s_val.str();
+   }
+   if(value == "-INT_MAX") {
+     std::stringstream s_val;
+     s_val<<-INT_MAX;
+     return s_val.str();
+   }
+   return value;
+ }
 #if 0
   static std::string makeLatex(int value){
     std::string ret_val = "$";
@@ -295,5 +318,38 @@ namespace Bonmin{
            (*i)->OutputLatexDescription(jnlst);
        }
     }
+
+  /** Ouptut a bonmin.opt file with options default values and short descritpions.*/
+  void
+  RegisteredOptions::writeBonminOpt(std::ostream &os, ExtraCategoriesInfo which){
+      std::list< Ipopt::RegisteredOption * > options;
+      chooseOptions(which, options);
+
+      //Create journalist to write to os
+      Ipopt::Journalist jnlst;
+      Ipopt::SmartPtr<Ipopt::StreamJournal> J = new Ipopt::StreamJournal("options_journal", Ipopt::J_ALL);
+      J->SetOutputStream(&os);
+      J->SetPrintLevel(Ipopt::J_DOCUMENTATION, Ipopt::J_SUMMARY);
+      jnlst.AddJournal(GetRawPtr(J));
+
+      std::string registeringCategory = "";
+      for(std::list< Ipopt::RegisteredOption * >::iterator i = options.begin();
+           i != options.end() ; i++)
+       {
+          if((*i)->RegisteringCategory() != registeringCategory){
+           registeringCategory = (*i)->RegisteringCategory();
+             os<<std::endl<<"# registering category: "<<registeringCategory<<std::endl<<std::endl;
+           }
+           os<<"bonmin.";
+           os.setf(std::ios::left);
+           os.width(37);
+           os<<(*i)->Name();
+           os.width(10);
+           os<<makeNumber(defaultAsString(*i))<<"\t#";
+           os<<(*i)->ShortDescription();
+           os<<std::endl;            
+       }
+    }
+
 
 }/*Ends bonmin namespace.*/
