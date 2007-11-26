@@ -816,7 +816,7 @@ namespace Bonmin
       }
     }
     if(iDo < numberToDo) iDo++;
-    assert(iDo < (int) results_.size());
+    assert(iDo <= (int) results_.size());
     results_.resize(iDo);
     delete [] saveLower;
     delete [] saveUpper;
