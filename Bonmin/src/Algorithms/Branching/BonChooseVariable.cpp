@@ -537,9 +537,9 @@ namespace Bonmin
       double bestTrusted=-COIN_DBL_MAX;
       for (int i=0;i<numberLeft;i++) {
         int iObject = list_[i];
-        if (numberBeforeTrusted<0||
+        if (numberBeforeTrusted == 0||
             i < minNumberStrongBranch_ ||
-            ( numberBeforeTrusted == 0 ||
+            (
               only_pseudo_when_trusted_ && number_not_trusted_>0 ) ||
               !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
                           downNumber[iObject]<numberBeforeTrusted )||
