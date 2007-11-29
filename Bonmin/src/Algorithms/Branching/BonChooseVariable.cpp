@@ -539,12 +539,14 @@ namespace Bonmin
         int iObject = list_[i];
         if (numberBeforeTrusted<0||
             i < minNumberStrongBranch_ ||
-            (only_pseudo_when_trusted_ && number_not_trusted_>0) ||
-            !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
-                downNumber[iObject]<numberBeforeTrusted )||
-            isRoot && (!upNumber[iObject] && !downNumber[iObject]) ) {
-            results_.push_back(HotInfo(solver, info,
-                            solver->objects(), iObject));
+            ( numberBeforeTrusted == 0 ||
+              only_pseudo_when_trusted_ && number_not_trusted_>0 ) ||
+              !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
+                          downNumber[iObject]<numberBeforeTrusted )||
+              isRoot && (!upNumber[iObject] && !downNumber[iObject]) ) {
+         
+             results_.push_back(HotInfo(solver, info,
+                                solver->objects(), iObject));
         }
         else {
           const OsiObject * obj = solver->object(iObject);

@@ -254,14 +254,16 @@ namespace Bonmin
     options->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     // Set branching strategy
     if (varSelection == OsiTMINLPInterface::MOST_FRACTIONAL) {
-      intParam_[MinReliability] = 0;
       intParam_[NumberStrong] = 0;
+      options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
     }
     else if (varSelection == OsiTMINLPInterface::STRONG_BRANCHING) {
       intParam_[MinReliability] = 0;
+      options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
     }
     else if (varSelection == OsiTMINLPInterface::RELIABILITY_BRANCHING) {
       intParam_[MinReliability] = 10;
+      options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
     }
   }
 
@@ -406,8 +408,8 @@ namespace Bonmin
     ("number_before_trust",
      "Set the number of branches on a variable before its pseudo costs are to be believed "
      "in dynamic strong branching.",
-     -1,8,
-     "A value of -1 disables pseudo costs.");
+     0,8,
+     "A value of 0 disables pseudo costs.");
     roptions->setOptionExtraInfo("number_before_trust", 31);
 
     roptions->AddStringOption2("nlp_failure_behavior",
