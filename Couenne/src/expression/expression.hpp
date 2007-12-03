@@ -90,12 +90,6 @@ class expression {
   static CouNumber *lbounds_;   ///< vector of lower bounds
   static CouNumber *ubounds_;   ///< vector of upper bounds
 
-  /// current value of the expression, used when accessing a copy of
-  /// the expression created for a node that is evaluated after the
-  /// original (saves some time).
-
-  //  CouNumber currValue_;
-
  public:
 
   /// update the value of "external" vectors (if the addresses have not

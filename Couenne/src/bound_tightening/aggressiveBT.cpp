@@ -115,6 +115,8 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 	break;
       }
 
+      second = 0;
+
 #ifdef DEBUG
       printf ("  ### tighten right\n");
 #endif
