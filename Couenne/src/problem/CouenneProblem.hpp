@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: define the class CouenneProblem
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -12,12 +12,12 @@
 
 #include <vector>
 
-#include <OsiRowCut.hpp>
+#include "OsiRowCut.hpp"
 
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprAux.hpp>
-#include <CouenneProblemElem.hpp>
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprAux.hpp"
+#include "CouenneProblemElem.hpp"
 
 struct ASL;
 struct expr;
@@ -229,7 +229,7 @@ class CouenneProblem {
   void initAuxs (CouNumber *, CouNumber *, CouNumber *);
 
   /// Get auxiliary variables from original variables
-  void getAuxs (CouNumber *);
+  void getAuxs (CouNumber * &);
 
   /// "Forward" bound tightening, that is, propagate bound of variable
   /// \f$x\f$ in an expression \f$w = f(x)\f$ to the bounds of \f$w\f$.
@@ -252,7 +252,8 @@ class CouenneProblem {
   void setCutOff (CouNumber cutoff);
 
   /// Set cutoff
-  CouNumber getCutOff () {return cutoff_;}
+  CouNumber getCutOff () 
+  {return cutoff_;}
 
   /// Make cutoff known to the problem
   void installCutOff ();
@@ -261,5 +262,8 @@ class CouenneProblem {
 
 /// Read best known solution from file given in argument
 bool readOptimum (const std::string &, CouNumber *&, CouNumber &, CouenneProblem *);
+
+/// Check feasibility of current solution against MINLP problem
+bool checkNLP (CglCutGenerator *g, const double *solution2, double &obj);
 
 #endif

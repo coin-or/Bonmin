@@ -48,7 +48,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   if ((delta                           < COUENNE_EPS) || 
       (delta / (1 + fabs (var + expr)) < COUENNE_EPS))
-#if BR_TEST_LOG >= 0
+#if BR_TEST_LOG >= 0 || defined DEBUG
     {
       if (reference_ -> Image () -> code () == COU_EXPRLOG) {
 	printf ("---- found feasible point on curve: ");
@@ -93,7 +93,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 #endif
 
   CouNumber improv = reference_ -> Image () -> 
-    selectBranch (this, info,             // input parameters
+    selectBranch (this, info,                   // input parameters
 		  brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
 
   if (brVarInd_ >= 0) {
@@ -108,6 +108,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
     delta = improv;
     whichWay_ = whichWay;
+
+    // TODO: test this, if commented gives A LOT of problems in nvs24
 
     if (info -> lower_ [brVarInd_] >= 
 	info -> upper_ [brVarInd_] - COUENNE_EPS) {

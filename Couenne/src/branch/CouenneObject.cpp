@@ -53,6 +53,7 @@ CouenneObject::CouenneObject (const CouenneObject &src):
   reference_ (src.reference_),
   brVarInd_  (src.brVarInd_),
   brPts_     (NULL),
+  whichWay_  (src.whichWay_),
   strategy_  (src.strategy_) {
 
   if (src.brPts_) {

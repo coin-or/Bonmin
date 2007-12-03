@@ -7,12 +7,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprQuad.hpp>
+#include "exprQuad.hpp"
 
-#include <CoinHelperFunctions.hpp>
+#include "CoinHelperFunctions.hpp"
 
-#include <OsiSolverInterface.hpp>
-#include <IpLapack.hpp>
+#include "OsiSolverInterface.hpp"
+#include "IpLapack.hpp"
 
 //#define DEBUG
 

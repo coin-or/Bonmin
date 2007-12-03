@@ -74,7 +74,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     x0 -= *brpts;
 
 #if BR_TEST_LOG >= 0
-  return 100;
+  return 1000;
 #endif
     return sqrt (x0*x0 + dy*dy); // exact distance
   } 
@@ -96,7 +96,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
               b = log (x0) - y0; // as one of the vertices
 
 #if BR_TEST >= 0
-  return 100;
+  return 1000;
 #endif
     return a * cos (atan (a/b)); // exact distance
   } 
@@ -111,7 +111,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     way = TWO_RIGHT;
 
 #if BR_TEST_LOG >= 0
-  return 100;
+  return 1000;
 #endif
   return projectSeg (x0, y0, *brpts, log (*brpts), u, log (u), +1); // exact distance
     //    return CoinMin (x0 - exp (y0), log (x0) - y0);
@@ -123,7 +123,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     way = TWO_LEFT;
 
 #if BR_TEST_LOG >= 0
-  return 100;
+  return 1000;
 #endif
     return projectSeg (x0, y0, l, log (l), *brpts, log (*brpts), +1); // exact distance
     //return log (x0) - y0;

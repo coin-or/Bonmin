@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CoinHelperFunctions.hpp>
-#include <CouenneObject.hpp>
-#include <CouenneBranchingObject.hpp>
-#include <CouenneThreeWayBranchObj.hpp>
+#include "CoinHelperFunctions.hpp"
+#include "CouenneObject.hpp"
+#include "CouenneBranchingObject.hpp"
+#include "CouenneThreeWayBranchObj.hpp"
 
 
 //#define DEBUG

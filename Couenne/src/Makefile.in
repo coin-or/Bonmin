@@ -144,7 +144,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
-	bound_tightening/aggressiveBT.cpp bound_tightening/obbt.cpp \
+	bound_tightening/aggressiveBT.cpp \
+	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
 	bound_tightening/obbt_iter.cpp \
 	bound_tightening/tightenBounds.cpp \
 	bound_tightening/impliedBounds.cpp \
@@ -184,10 +185,11 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
 	constraint.lo fillQuadIndices.lo CouenneSolverInterface.lo \
 	depGraph.lo checkCycles.lo boundTightening.lo aggressiveBT.lo \
-	obbt.lo obbt_iter.lo tightenBounds.lo impliedBounds.lo \
-	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
-	impliedBounds-exprMul.lo impliedBounds-exprQuad.lo drawCuts.lo \
-	rootQ.lo $(am__objects_1)
+	fake_tightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
+	impliedBounds.lo impliedBounds-exprSum.lo \
+	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo \
+	impliedBounds-exprQuad.lo drawCuts.lo rootQ.lo \
+	$(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -459,7 +461,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
-	bound_tightening/aggressiveBT.cpp bound_tightening/obbt.cpp \
+	bound_tightening/aggressiveBT.cpp \
+	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
 	bound_tightening/obbt_iter.cpp \
 	bound_tightening/tightenBounds.cpp \
 	bound_tightening/impliedBounds.cpp \
@@ -561,6 +564,7 @@ include_HEADERS = \
 	expression/exprClone.hpp \
 	expression/exprBound.hpp \
 	expression/exprCopy.hpp \
+	expression/exprStore.hpp \
 	expression/exprOp.hpp \
 	expression/CouennePrecisions.hpp \
 	problem/depGraph/depGraph.hpp \
@@ -718,6 +722,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprUnary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fake_tightening.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fillQuadIndices.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flattenMul.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genColCuts.Plo@am__quote@
@@ -1427,6 +1432,13 @@ aggressiveBT.lo: bound_tightening/aggressiveBT.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='bound_tightening/aggressiveBT.cpp' object='aggressiveBT.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o aggressiveBT.lo `test -f 'bound_tightening/aggressiveBT.cpp' || echo '$(srcdir)/'`bound_tightening/aggressiveBT.cpp
+
+fake_tightening.lo: bound_tightening/fake_tightening.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fake_tightening.lo -MD -MP -MF "$(DEPDIR)/fake_tightening.Tpo" -c -o fake_tightening.lo `test -f 'bound_tightening/fake_tightening.cpp' || echo '$(srcdir)/'`bound_tightening/fake_tightening.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/fake_tightening.Tpo" "$(DEPDIR)/fake_tightening.Plo"; else rm -f "$(DEPDIR)/fake_tightening.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='bound_tightening/fake_tightening.cpp' object='fake_tightening.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o fake_tightening.lo `test -f 'bound_tightening/fake_tightening.cpp' || echo '$(srcdir)/'`bound_tightening/fake_tightening.cpp
 
 obbt.lo: bound_tightening/obbt.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT obbt.lo -MD -MP -MF "$(DEPDIR)/obbt.Tpo" -c -o obbt.lo `test -f 'bound_tightening/obbt.cpp' || echo '$(srcdir)/'`bound_tightening/obbt.cpp; \

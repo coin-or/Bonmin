@@ -49,10 +49,18 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
             l  = info -> lower_    [ind],
             u  = info -> upper_    [ind];
 
-  // case 1: k negative, resort to method similar to exprInv:: ///////////////////////////////
+  if      (x0 < l) x0 = l;
+  else if (x0 > u) x0 = u;
 
-  if (k<0)
-    return negPowSelectBranch (obj, ind, brpts, way, k, x0, y0, l, u);
+  // bounds coincinde (happens within setupList)
+  if (fabs (u-l) < COUENNE_EPS) {
+    brpts = (CouNumber *) realloc (brpts, sizeof (CouNumber));
+    way = TWO_RAND;
+    return (y0 - pow (x0, k));
+  }
+
+  // case 1: k negative, resort to method similar to exprInv:: ///////////////////////////////
+  if (k<0) return negPowSelectBranch (obj, ind, brpts, way, k, x0, y0, l, u);
 
   int intk = 0;
 
@@ -78,7 +86,6 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 	y0 -= pow (*brpts, k);
 
 	return sqrt (x0*x0 + y0 * y0); // exact distance
-
       }
 
       // on the bad side

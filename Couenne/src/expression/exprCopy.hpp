@@ -12,8 +12,8 @@
 
 #include <iostream>
 
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
 
 class CouenneObject;
 

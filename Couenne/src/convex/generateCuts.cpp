@@ -246,12 +246,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     addviolated_ = false;
 
     // update problem current point with NLP solution
-    problem_ -> update (nlpSol, NULL, NULL);
+    problem_ -> update (nlpSol, NULL, NULL, problem_ -> nOrig ());
     genRowCuts (si, cs, nchanged, changed, info, chg_bds, true);  // add cuts
 
     // restore LP point
     problem_ -> update (si. getColSolution (), NULL, NULL);
-
     addviolated_ = save_av;     // restore previous value
 
     babInfo -> setHasNlpSolution (false); // reset it after use 

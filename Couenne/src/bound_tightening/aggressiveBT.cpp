@@ -5,32 +5,21 @@
  *          exclude parts of the solution space through fathoming on
  *          bounds/infeasibility
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2007.
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include "CoinHelperFunctions.hpp"
+#include "BonBabInfos.hpp"
 
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
-#include "BonBabInfos.hpp"
-
-// max # bound tightening iterations
-#define MAX_BT_ITER 8
-#define THRES_IMPROVED 0
 
 //#define DEBUG
 
-// the larger, the more conservative. Must be > 0
-#define AGGR_MUL 2
-
-// the smaller, the more conservative. Must be > 1
-#define AGGR_DIV 20
-
-//#define DEBUG
+#define MAX_ABT_ITER 8  // max # aggressive BT iterations
 
 // core of the bound tightening procedure
-
 bool btCore (const CouenneCutGenerator *cg,
 	     const OsiSolverInterface *psi,
 	     OsiCuts &cs, 
@@ -39,169 +28,111 @@ bool btCore (const CouenneCutGenerator *cg,
 	     bool serious);
 
 
-void fictBounds (CouNumber  x,
-		 CouNumber  lb,   CouNumber  ub, 
-		 CouNumber &left, CouNumber &right) {
-
-  if (lb < -COUENNE_INFINITY) {
-    if (ub >  COUENNE_INFINITY) { // ]-inf,+inf[
-
-      if (fabs (x) < COUENNE_EPS) left = - (right = AGGR_MUL);
-      else                        left = - (right = AGGR_MUL * fabs (x));
-
-    } else { // ]-inf,u]
-
-      if      (x < -COUENNE_EPS) {left = AGGR_MUL * x;  right = CoinMin (0., (x+ub)/2);}
-      else if (x >  COUENNE_EPS) {left = 0;             right = x + (ub-x)/AGGR_DIV;}
-      else                       {left = -AGGR_MUL;     right =         ub/AGGR_DIV;}
-    }
-  }
-  else {
-    if (ub >  COUENNE_INFINITY) { // [l,+inf[
-
-      if      (x < -COUENNE_EPS) {left = x - (x-lb)/AGGR_DIV;   right = 0;}
-      else if (x >  COUENNE_EPS) {left = CoinMax (0.,(x+lb)/2); right = AGGR_MUL * x;}
-      else                       {left = lb/AGGR_DIV;           right = AGGR_MUL;}
-    } else { // [l,u]
-
-      left  = x - (x-lb)/AGGR_DIV;
-      right = x + (ub-x)/AGGR_DIV;
-    }
-  }
-}
-
-
-// Aggressive Bound Tightening
+// single fake tightening. Return
 //
-// For each variable, fake new bounds [l,b] or [b,u] and apply bound
-// tightening. If the interval is fathomed on bounds or on
-// infeasibility, the complementary bound interval is a valid
-// tightening.
+// -1   if infeasible
+//  0   if no improvement
+// +1   if improved
+int fake_tighten (const CouenneCutGenerator *cg,
+		  const OsiSolverInterface *psi,
+		  OsiCuts &cs,
+		  Bonmin::BabInfo * babInfo,
+
+		  char direction,  // 0: left, 1: right
+		  int index,       // index of the variable tested
+		  CouNumber *olb,  // cur. lower bound
+		  CouNumber *oub,  //      upper
+		  t_chg_bounds *chg_bds,
+		  t_chg_bounds *f_chg);
+
+
+// Aggressive Bound Tightening: for each variable, fake new bounds
+// [l,b] or [b,u] and apply bound tightening. If the interval is
+// fathomed on bounds or on infeasibility, the complementary bound
+// interval is a valid tightening.
 
 bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 					OsiCuts &cs, 
 					t_chg_bounds *chg_bds, 
 					Bonmin::BabInfo * babInfo) const {
-  int ncols = psi -> getNumCols ();
-
-  bool retval = false;
-
-  // save current bounds
+  int  ncols  = problem_ -> nVars ();
+  bool retval = true;
 
   CouNumber
     *olb = new CouNumber [ncols],
     *oub = new CouNumber [ncols],
     *lb  = problem_ -> Lb (),
-    *ub  = problem_ -> Ub (),
-    cutoff = problem_ -> getCutOff ();
+    *ub  = problem_ -> Ub ();
 
   const double *X = psi -> getColSolution ();
 
+  // save current bounds
   CoinCopyN (lb, ncols, olb);
   CoinCopyN (ub, ncols, oub);
 
-  int 
-    objsense = problem_ -> Obj (0) -> Sense (),
-    objind   = problem_ -> Obj (0) -> Body  () -> Index ();
-
-  assert (objind >= 0);
-
-  // create new bounds
-
+  // create new, fictitious, bounds
   t_chg_bounds *f_chg = new t_chg_bounds [ncols];
 
 #ifdef DEBUG
+  CouNumber cutoff = problem_ -> getCutOff ();
+  int       objind = problem_ -> Obj (0) -> Body  () -> Index ();
   for (int i=0; i<ncols; i++)
     printf ("   %2d %+20g %+20g  | %+20g\n", i, lb [i], ub [i], X [i]);
-  printf ("-------------\nAggressive BT. Current bound = %g, cutoff = %g\n", lb [objind], cutoff);
+  printf ("-------------\nAggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
+	  lb [objind], cutoff, ncols);
 #endif
 
-  for (int i=0; i<ncols; i++) 
+  int improved = 0, second, iter = 0;
 
-    if (i != objind) { // don't do it on objective function
+  // Repeatedly fake tightening bounds on both sides of every variable
+  // to concentrate around current NLP point.
+  //
+  // MAX_ABT_ITER is the maximum # of outer cycles. Each call to
+  // fake_tighten in turn has an iterative algorithm for a
+  // derivative-free, uni-dimensional optimization problem on a
+  // monotone function.
 
-      CouNumber flb, fub;
-      bool 
-	feasLeft  = true, 
-	feasRight = true,
-	betterbds = false;
+  do {
 
-      fictBounds (X [i], olb [i], oub [i], flb, fub);
+    // scan all variables
+    for (int i=0; i<ncols; i++) {
+
+      int index = problem_ -> evalOrder (i);
+
+      // if (index == objind) continue; // don't do it on objective function
+
+      improved = 0;
 
 #ifdef DEBUG
-      printf ("fake bounds %d: [%g | %g %g | %g], x = %g\n", 
-	      i, olb [i], flb, fub, oub [i], X [i]);
+      printf ("x_%03d:-----------------------------\n  ### tighten left\n", index);
 #endif
 
-      if (flb > lb [i] + COUENNE_EPS) {
-
-	// fake left interval
-	ub [i] = flb;
-	feasLeft = btCore (this, psi, cs, f_chg, babInfo, false);
-	betterbds = (objsense == MINIMIZE) && (lb [objind] > cutoff) || 
-                    (objsense == MAXIMIZE) && (ub [objind] < cutoff);
-	CoinCopyN (chg_bds, ncols, f_chg);
-	CoinCopyN (olb, ncols, lb);
-	CoinCopyN (oub, ncols, ub);
-
-	if (!feasLeft || betterbds) { // left interval is feasible, check 
-
-#ifdef DEBUG
-	  printf ("[%2d] prune left  [%g --> %g, %g] <%d> -- %g %g\n", 
-		  i, olb [i], flb, oub [i], feasLeft, lb [objind], cutoff);
-#endif
-
-	  // left interval can be left out
-	  feasLeft = false;
-	  olb [i] = lb [i] = flb;
-	  chg_bds [i].setLower (t_chg_bounds::CHANGED);
-	  if (!(btCore (this, psi, cs, chg_bds, babInfo, true)))
-	    goto end_procedure;
-	}
+      // tighten on left
+      if ((X [index] >= lb [index] + COUENNE_EPS)
+	  && ((improved = fake_tighten (this, psi, cs, babInfo, 
+					0, index, olb, oub, chg_bds, f_chg)) < 0)) {
+	retval = false;
+	break;
       }
 
-      if (fub < ub [i] - COUENNE_EPS) {
-
-	// fake right interval
-	lb [i] = fub;
-	feasRight = btCore (this, psi, cs, f_chg, babInfo, false);
-	betterbds = (objsense == MINIMIZE) && (lb [objind] > cutoff) || 
-                    (objsense == MAXIMIZE) && (ub [objind] < cutoff);
-	CoinCopyN (chg_bds, ncols, f_chg);
-	CoinCopyN (olb, ncols, lb);
-	CoinCopyN (oub, ncols, ub);
-
-	if (!feasRight || betterbds) { // left interval is feasible, check 
-
 #ifdef DEBUG
-	  printf ("[%2d] prune right [%g, %g <-- %g] <%d> -- %g %g\n", 
-		  i, olb [i], fub, oub [i], feasRight, lb [objind], cutoff);
+      printf ("  ### tighten right\n");
 #endif
 
-	  // left interval can be left out
-	  feasRight = false;
-	  oub [i] = ub [i] = fub;
-	  chg_bds [i].setUpper (t_chg_bounds::CHANGED);
-	  if (!(btCore (this, psi, cs, chg_bds, babInfo, true)))
-	    goto end_procedure;
-	}
+      // tighten on right
+      if ((X [index] <= ub [index] - COUENNE_EPS)
+	  && ((second = fake_tighten (this, psi, cs, babInfo, 
+				      1, index, olb, oub, chg_bds, f_chg) < 0))) {
+	retval = false;
+	break;
       }
 
-      // if both infeasible, fathom node
-      if (!feasLeft && !feasRight && (fub < flb + COUENNE_EPS)) {
-#ifdef DEBUG
-	printf ("### prune all on infeasibility\n----------------------\n");
-	for (int i=0; i<ncols; i++) printf ("   %2d %+20g %+20g  | %+20g\n",i,lb [i], ub [i], X [i]);
-#endif
-	goto end_procedure;
-      }
+      improved += second;
     }
 
-  retval = true;
+  } while (retval && improved && (iter < MAX_ABT_ITER));
 
-end_procedure:
-
-  // re-initialize to forget bound changes from previous tests
+  // store new valid bounds into problem, or restore old ones if none changed
   CoinCopyN (olb, ncols, lb);
   CoinCopyN (oub, ncols, ub);
 

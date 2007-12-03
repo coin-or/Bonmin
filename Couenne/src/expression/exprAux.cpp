@@ -7,15 +7,14 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneCutGenerator.hpp>
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprAux.hpp>
-#include <exprVar.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneCutGenerator.hpp"
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprAux.hpp"
+#include "exprVar.hpp"
+#include "CouenneProblem.hpp"
 
 //#define DEBUG
-
 
 // auxiliary expression Constructor
 exprAux::exprAux (expression *image, int index, int rank, bool integer): 

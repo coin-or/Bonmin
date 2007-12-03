@@ -111,6 +111,7 @@ libCouenne_la_SOURCES = \
 	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
 	bound_tightening/aggressiveBT.cpp \
+	bound_tightening/fake_tightening.cpp \
 	bound_tightening/obbt.cpp \
 	bound_tightening/obbt_iter.cpp \
 	bound_tightening/tightenBounds.cpp \
@@ -232,6 +233,7 @@ include_HEADERS = \
 	expression/exprClone.hpp \
 	expression/exprBound.hpp \
 	expression/exprCopy.hpp \
+	expression/exprStore.hpp \
 	expression/exprOp.hpp \
 	expression/CouennePrecisions.hpp \
 	problem/depGraph/depGraph.hpp \

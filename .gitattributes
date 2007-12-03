@@ -13,6 +13,7 @@ Couenne/src/Makefile.am -text
 Couenne/src/Makefile.in -text
 Couenne/src/bound_tightening/aggressiveBT.cpp -text
 Couenne/src/bound_tightening/boundTightening.cpp -text
+Couenne/src/bound_tightening/fake_tightening.cpp -text
 Couenne/src/bound_tightening/impliedBounds.cpp -text
 Couenne/src/bound_tightening/obbt.cpp -text
 Couenne/src/bound_tightening/obbt_iter.cpp -text
@@ -88,6 +89,7 @@ Couenne/src/expression/exprCopy.hpp -text
 Couenne/src/expression/exprIVar.hpp -text
 Couenne/src/expression/exprOp.cpp -text
 Couenne/src/expression/exprOp.hpp -text
+Couenne/src/expression/exprStore.hpp -text
 Couenne/src/expression/exprUnary.cpp -text
 Couenne/src/expression/exprUnary.hpp -text
 Couenne/src/expression/exprVar.cpp -text

@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: methods of the class CouenneProblem
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -43,7 +43,7 @@ void CouenneProblem::update (const CouNumber *x, const CouNumber *l, const CouNu
 
   // copy arrays (do not simply make x_ point to x)
 
-  if (n < 0) 
+  if (n < 0)
     n = nvars;
 
   {
@@ -74,8 +74,8 @@ void CouenneProblem::initAuxs (CouNumber *x,
   for (register std::vector <exprVar *>::iterator i = variables_ . begin ();
        i != variables_ . end (); ++i)
 
-    if (((*i) -> Type  () == AUX) &&   // this is an auxiliary
-	((*i) -> Index () >= nOrig_)) { // and one that was not an original before
+    if (((*i) -> Type  () == AUX) &&    // this is an auxiliary
+	((*i) -> Index () >= nOrig_)) { // and one that was not an original, originally...
 
       int index = (*i) -> Index ();
       lb_ [index] = - (ub_ [index] = COUENNE_INFINITY);
@@ -94,7 +94,9 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
       exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
 
-      //      printf ("w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
+#ifdef DEBUG
+      printf ("w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
+#endif
 
       // set bounds 
       if ((lb_[ord] = CoinMax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord]=-DBL_MAX;
@@ -102,7 +104,9 @@ void CouenneProblem::initAuxs (CouNumber *x,
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
-      //      printf (" --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
+#ifdef DEBUG
+      printf (" --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
+#endif
 
       x_ [ord] = CoinMax (lb_ [ord], CoinMin (ub_ [ord], (*(aux -> Image ())) ()));
     }
@@ -113,7 +117,10 @@ void CouenneProblem::initAuxs (CouNumber *x,
 /// get auxiliary variables from original variables in the nonlinear
 /// problem
 
-void CouenneProblem::getAuxs (CouNumber *x) {
+void CouenneProblem::getAuxs (CouNumber * &x) {
+
+  // resize x to hold information on auxiliary variables
+  x = (CouNumber *) realloc (x, nVars () * sizeof (CouNumber));
 
   // save current addresses
   CouNumber 
@@ -133,7 +140,11 @@ void CouenneProblem::getAuxs (CouNumber *x) {
 
     exprVar *var = variables_ [numbering_ [j]];
     if (var -> Type () == AUX)
-      x [var -> Index ()] = (*(var -> Image ())) ();
+      x [var -> Index ()] = 
+	(var -> Type () == AUX) ? 
+	  (*(var -> Image ())) () :
+	  (*var) ();
+
   }
 
   // get the x and the bound vectors back to their previous state

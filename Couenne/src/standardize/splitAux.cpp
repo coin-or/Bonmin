@@ -36,6 +36,10 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
   expression **alist = body -> ArgList ();
 
+#ifdef DEBUG
+  printf ("|||||||||| Splitting "); body -> print (); printf ("\n");
+#endif
+
   switch (code) { // constraint h(x) = 0 may be in different forms:
 		  // subtraction, sum, linear group
 
@@ -281,7 +285,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     else            --nlin;  // ...the linear part
 
 #ifdef DEBUG
-    printf ("\n::: rhs %g, lin %d, nl %d\n", rhs, nlin, nargs);
+    printf ("\n::: auxcoe %g, rhs %g, lin %d, nl %d\n", auxcoe, rhs, nlin, nargs);
 #endif
 
     // all is ready to take the independent stuff to the other side of
@@ -311,15 +315,19 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	  //delete *newarglist;
 	  delete [] newarglist;
 	}
-	else // multiple nonlinear terms, multiply them by -1/auxcoe
+	else if ((nargs <= 1) && 
+		 ((*newarglist) -> code () == COU_EXPROPP) &&
+		 (fabs (auxcoe - 1) < COUENNE_EPS))
+	  //*mullist = new exprSum (newarglist, nargs);
+	  *mullist = (*newarglist) -> Argument ();//, nargs);
+	else  // multiple nonlinear terms, multiply them by -1/auxcoe
 	  *mullist = new exprMul (new exprConst (-1. / auxcoe), 
 				  new exprSum (newarglist, nargs));
 
 	// final outcome: -1/a (f(x) + c0 - rhs)
 	if (code == COU_EXPRGROUP) 
-	  rest    = new exprGroup (-1. / auxcoe * (c0-rhs), linind2, lincoe2, mullist, 1);
-	else rest = new exprQuad  (-1. / auxcoe * (c0-rhs), linind2, lincoe2, 
-				   qindI, qindJ, qcoe, mullist, 1);
+	  rest    = new exprGroup (-1./auxcoe*(c0-rhs), linind2,lincoe2,                   mullist,1);
+	else rest = new exprQuad  (-1./auxcoe*(c0-rhs), linind2,lincoe2, qindI,qindJ,qcoe, mullist,1);
       }
     }
     else { // simple exprSum

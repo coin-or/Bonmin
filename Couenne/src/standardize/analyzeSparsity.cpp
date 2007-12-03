@@ -35,16 +35,22 @@ void analyzeSparsity (CouenneProblem *p,
   // otherwise break it down. Count n first.
 
   std::set <int> occur;
+  int nsquares = 0;
 
   for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.begin ();
        i != qmap.end (); ++i) {
 
-    if (occur.find (i -> first.first) == occur.end ()) 
-      occur.insert (i -> first.first);
+    int
+      first  = i -> first.first,
+      second = i -> first.second;
 
-    if ((i -> first.first != i -> first.second) &&
-	(occur.find (i -> first.second) == occur.end ()))
-      occur.insert (i -> first.second);
+    if (occur.find (first) == occur.end ()) 
+      occur.insert (first);
+
+    if (first != second) {
+      if  (occur.find (second) == occur.end ())
+	occur.insert (second);
+    } else nsquares++;
   }
 
 #ifdef DEBUG
@@ -54,9 +60,13 @@ void analyzeSparsity (CouenneProblem *p,
 	  MIN_DENSITY * occur.size () * (occur.size () + 1) / 2);
 #endif
 
-  if ((qmap.size () > MIN_DENSITY * occur.size () * (occur.size () + 1) / 2) &&
-      (occur.size () > 4))
-    return;
+  int nterms = occur.size ();
+
+  //  if (0)
+  if ((qmap.size () > MIN_DENSITY * nterms * (nterms+1) / 2) && (nterms > 2)
+      //|| (nsquares > nterms/2)
+      )
+    return; // keep current exprQuad structure
 
   // flatten exprQuad to a sum of terms (disaggregate). This is while
   // we are testing exprQuad's

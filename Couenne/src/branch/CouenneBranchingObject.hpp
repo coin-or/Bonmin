@@ -4,7 +4,7 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for auxiliary variables
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -26,7 +26,7 @@
 #define BR_TEST_LOG -1
 #define BR_TEST_GRAPH 0
 
-/* "Spatial" branching object. 
+/** "Spatial" branching object. 
  *
  *  Branching can also be performed on continuous variables.
  */

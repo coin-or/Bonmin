@@ -7,8 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprSum.hpp>
-#include <exprGroup.hpp>
+#include "exprSum.hpp"
+#include "exprGroup.hpp"
 
 
 /// vector operation to find bound to variable in a sum
@@ -78,9 +78,9 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // classify terms as positive or constant for the exprSum
 
-  for (register int i=nargs_; i--;) {
+  for (int i = nargs_; i--;) {
 
-    int index = arglist_ [i] -> Index ();
+    register int index = arglist_ [i] -> Index ();
 
     if (index == -1)
       a0 += arglist_ [i] -> Value ();
