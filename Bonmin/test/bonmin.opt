@@ -13,7 +13,7 @@ bonmin.ecp_rel_tol_strong                   0.1       	#Set the relative termina
 
 bonmin.allowable_fraction_gap               0         	#Specify the value of relative gap under which the algorithm stops.
 bonmin.allowable_gap                        0         	#Specify the value of absolute gap under which the algorithm stops.
-bonmin.branch_pt_select                     mid-point 	#Chooses branching point selection strategy
+#AW: THIS IS NON-CONVEX OPTION! REMOVED FOR NOW, AW. bonmin.branch_pt_select                     mid-point 	#Chooses branching point selection strategy
 bonmin.cutoff                               1e+100    	#Specify cutoff value.
 bonmin.cutoff_decr                          1e-05     	#Specify cutoff decrement.
 bonmin.integer_tolerance                    1e-06     	#Set integer tolerance.
