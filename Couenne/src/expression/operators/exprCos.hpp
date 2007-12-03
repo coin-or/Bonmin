@@ -10,12 +10,12 @@
 #ifndef COUENNE_EXPRCOS_HPP
 #define COUENNE_EXPRCOS_HPP
 
-#include <exprUnary.hpp>
-#include <exprSin.hpp>
-#include <exprConst.hpp>
-#include <CouennePrecisions.hpp>
-
 #include <math.h>
+
+#include "exprUnary.hpp"
+#include "exprSin.hpp"
+#include "exprConst.hpp"
+#include "CouennePrecisions.hpp"
 
 
 /// generalized procedure for both sine and cosine

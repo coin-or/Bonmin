@@ -12,8 +12,8 @@
 
 #include <math.h>
 
-#include <exprUnary.hpp>
-#include <exprConst.hpp>
+#include "exprUnary.hpp"
+#include "exprConst.hpp"
 
 
 /// class for \f$w=|f(x)|\f$

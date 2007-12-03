@@ -57,14 +57,14 @@ void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si,
 			      t_chg_bounds *chg, int,
 			      CouNumber, CouNumber) {
   if (cg -> isFirst ())
-    cg -> createCut (cs, currValue_, 0, w -> Index (), 1.);
+    cg -> createCut (cs, value_, 0, w -> Index (), 1.);
 }
 
 
 /// compare generic expression with other expression
 int expression::compare (expression &e1) {
 
-  register int c0 = code (),
+  register int c0 =     code (),
                c1 = e1. code ();
 
   if      (c0 < c1) return -1;
@@ -90,18 +90,25 @@ int expression::compare (expression &e1) {
 
   // expressions are both variables or constants
 
-  register int i0 =     Index (),
-               i1 = e1. Index ();
+  {
+    register int 
+      i0 =     Index (),
+      i1 = e1. Index ();
 
-  if (i0 < i1) return -1;
-  if (i0 > i1) return  1;
-  if (i0 >= 0) return  0; // same variables
+    if (i0 < i1) return -1;
+    if (i0 > i1) return  1;
+    if (i0 >= 0) return  0; // same variables
+  }
 
   // both are numbers
-  register CouNumber v1 = e1. Value ();
+  {
+    register CouNumber 
+      v0 =     Value (), 
+      v1 = e1. Value ();
 
-  if (currValue_ < v1) return -1;
-  if (currValue_ > v1) return  1;
+    if (v0 < v1) return -1;
+    if (v0 > v1) return  1;
+  }
 
   return  0;
 }

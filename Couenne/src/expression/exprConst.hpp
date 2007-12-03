@@ -12,16 +12,21 @@
 
 #include <iostream>
 
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprClone.hpp>
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprClone.hpp"
 
 
 /// constant-type operator
 
 class exprConst: public expression {
 
- public:
+private: 
+
+  /// the value of this constant
+  CouNumber value_;
+
+public:
 
   /// node type
   inline enum nodeType Type () 
@@ -29,28 +34,28 @@ class exprConst: public expression {
 
   /// value of expression
   inline CouNumber Value () const 
-    {return currValue_;}
+    {return value_;}
 
   /// Constructor
   exprConst (CouNumber value)
-    {currValue_ = value;}
+    {value_ = value;}
 
   /// Copy constructor
   exprConst (const exprConst &e)
-    {currValue_ = e.currValue_;}
+    {value_ = e.value_;}
 
   /// Cloning method
   virtual exprConst *clone () const
-    {return new exprConst (currValue_);}
+    {return new exprConst (value_);}
 
   /// I/O
   void print (std::ostream &out = std::cout, 
 	      bool = false, CouenneProblem * = NULL) const
-    {out << currValue_;}
+    {out << value_;}
 
   /// return constant's value
   inline CouNumber operator() () 
-    {return currValue_;}
+    {return value_;}
 
   /// differentiation
   inline expression *differentiate (int) 
@@ -64,7 +69,7 @@ class exprConst: public expression {
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
-    {return ((fabs (currValue_) < COUENNE_EPS) ? ZERO: CONSTANT);}
+    {return ((fabs (value_) < COUENNE_EPS) ? ZERO: CONSTANT);}
 
   /// Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lower, expression *&upper) {
@@ -85,7 +90,7 @@ class exprConst: public expression {
 
   /// is this expression integer?
   virtual bool isInteger () 
-  {return (fabs (currValue_ - COUENNE_round (currValue_)) < COUENNE_EPS);}
+  {return (fabs (value_ - COUENNE_round (value_)) < COUENNE_EPS);}
 
   /// used in rank-based branching variable choice
   virtual int rank (CouenneProblem *p)

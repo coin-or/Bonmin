@@ -58,7 +58,7 @@ class exprLowerBound: public exprVar {
 
   /// return the value of the variable
   inline CouNumber operator () () 
-    {return (currValue_ = expression::lbounds_ [varIndex_]);}
+    {return expression::lbounds_ [varIndex_];}
 
   /// differentiation
   inline expression *differentiate (int) 
@@ -107,7 +107,7 @@ class exprUpperBound: public exprVar {
 
   /// return the value of the variable
   inline CouNumber operator () () 
-    {return (currValue_ = expression::ubounds_ [varIndex_]);}
+    {return expression::ubounds_ [varIndex_];}
 
   /// differentiation
   inline expression *differentiate (int) 

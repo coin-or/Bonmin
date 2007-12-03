@@ -47,7 +47,7 @@ class exprClone: public exprCopy {
 
   /// null function for evaluating the expression
   inline CouNumber operator () () 
-    {return (currValue_ = (*copy_) ());}
+    {return ((*copy_) ());}
 };
 
 #endif

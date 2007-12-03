@@ -7,15 +7,15 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprDiv.hpp>
-#include <exprConst.hpp>
-#include <exprClone.hpp>
-#include <exprMul.hpp>
-#include <exprInv.hpp>
-#include <exprSub.hpp>
-#include <exprBDiv.hpp>
+#include "exprDiv.hpp"
+#include "exprConst.hpp"
+#include "exprClone.hpp"
+#include "exprMul.hpp"
+#include "exprInv.hpp"
+#include "exprSub.hpp"
+#include "exprBDiv.hpp"
 
-#include <CouennePrecisions.hpp>
+#include "CouennePrecisions.hpp"
 
 
 // simplify division

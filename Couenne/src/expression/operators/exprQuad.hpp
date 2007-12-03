@@ -278,7 +278,7 @@ inline CouNumber exprQuad::operator () () {
     ret += (*qi == *qj) ? term : 2 * term;
   }
 
-  return (currValue_ = ret);
+  return ret;
 }
 
 

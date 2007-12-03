@@ -93,7 +93,7 @@ class exprDiv: public exprOp {
 /// Compute division
 
 inline CouNumber exprDiv::operator () ()
-  {return (currValue_ = (*(*arglist_)) () / (*(arglist_ [1])) ());}
+  {return ((*(*arglist_)) () / (*(arglist_ [1])) ());}
 
 
 #define SAFE_COEFFICIENT 1e9

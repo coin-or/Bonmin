@@ -10,8 +10,9 @@
 #ifndef COUENNE_EXPREXP_HPP
 #define COUENNE_EXPREXP_HPP
 
-#include <exprUnary.hpp>
 #include <math.h>
+
+#include "exprUnary.hpp"
 
 /// class for the exponential
 

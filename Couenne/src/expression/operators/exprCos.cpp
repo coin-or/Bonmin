@@ -7,14 +7,14 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprCos.hpp>
-#include <exprSin.hpp>
-#include <exprBCos.hpp>
-#include <exprOpp.hpp>
-#include <exprMul.hpp>
-#include <exprClone.hpp>
-
 #include <math.h>
+
+#include "exprCos.hpp"
+#include "exprSin.hpp"
+#include "exprBCos.hpp"
+#include "exprOpp.hpp"
+#include "exprMul.hpp"
+#include "exprClone.hpp"
 
 
 // return an expression -sin (argument), the derivative of cos (argument)

@@ -10,7 +10,7 @@
 #ifndef COUENNE_EXPRBDIV_H
 #define COUENNE_EXPRBDIV_H
 
-#include <exprOp.hpp>
+#include "exprOp.hpp"
 
 
 /// division that avoids NaN's and considers a sign when returning infinity

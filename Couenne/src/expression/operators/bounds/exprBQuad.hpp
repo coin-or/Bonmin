@@ -10,8 +10,8 @@
 #ifndef COUENNE_EXPRBQUAD_H
 #define COUENNE_EXPRBQUAD_H
 
-#include <exprOp.hpp>
-#include <exprQuad.hpp>
+#include "exprOp.hpp"
+#include "exprQuad.hpp"
 
 
 /// method to actually compute the bound

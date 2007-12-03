@@ -71,11 +71,11 @@ class exprVar: public expression {
 
   /// return the value of the variable
   virtual inline CouNumber operator () () 
-    {return (currValue_ = expression::variables_ [varIndex_]);}
+    {return expression::variables_ [varIndex_];}
 
   /// return the value of the variable
-  inline CouNumber Value ()
-    {return currValue_;}
+  //  inline CouNumber Value ()
+  //    {return currValue_;}
 
   /// differentiation
   virtual inline expression *differentiate (int index) 

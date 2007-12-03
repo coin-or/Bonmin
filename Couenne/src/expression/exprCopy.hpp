@@ -26,6 +26,9 @@ class exprCopy: public expression {
   /// the expression this object is a (reference) copy of
   expression *copy_;
 
+  /// saved valuem to be used by exprStore expressions
+  CouNumber value_;
+
  public:
 
   /// node type
@@ -38,7 +41,8 @@ class exprCopy: public expression {
 
   /// Copy constructor
   exprCopy (const exprCopy &e) {
-    copy_ = e.Original () -> clone ();
+    copy_  = e.Original () -> clone ();
+    value_ = e.value_;
   }
 
   /// Cloning method
@@ -77,10 +81,10 @@ class exprCopy: public expression {
 		      CouenneProblem *p = NULL) const
     {copy_ -> Original () -> print (out, descend, p);}
 
-  /// value (empty)
+  /// value
   virtual inline CouNumber Value () const 
-    //    {return currValue_;}
-    {return copy_ -> Value ();} // *** Check this! Should be the commented one 
+    {return value_;}
+  //    {return copy_ -> Value ();} // *** Check this! Should be the commented one 
 
   // TODO: FIX ME! a copy should just return an already evaluated
   // number, that's why it is very important that exprCopy should only
@@ -88,8 +92,9 @@ class exprCopy: public expression {
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
-    {return (currValue_ = (*copy_) ());}
-  //    {return (currValue_ = copy_ -> Value ());}
+    {return (value_ = (*copy_) ());}
+    //    {return (*copy_) ();}
+    //    {return (copy_ -> Value ());}
 
   /// differentiation
   inline expression *differentiate (int index) 

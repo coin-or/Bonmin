@@ -19,26 +19,26 @@
 #endif
 
 
-//  class to compute lower bound of a cosine based on the bounds of
-//  its arguments
+///  class to compute lower bound of a cosine based on the bounds of
+///  its arguments
 
 class exprLBCos: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprLBCos (expression *lb, expression *ub): 
     exprOp (new expression * [2], 2) {
     arglist_ [0] = lb;
     arglist_ [1] = ub;
   } //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprLBCos (arglist_ [0] -> clone (), 
 			   arglist_ [1] -> clone ());}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
   /// print position (PRE, INSIDE, POST)
@@ -51,7 +51,7 @@ class exprLBCos: public exprOp {
 };
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprLBCos::operator () () {
 
@@ -71,14 +71,14 @@ inline CouNumber exprLBCos::operator () () {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//  class to compute lower bound of a cosine based on the bounds of
-//  its arguments
+///  class to compute lower bound of a cosine based on the bounds of
+///  its arguments
 
 class exprUBCos: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprUBCos (expression *lb, expression *ub): 
     exprOp (new expression * [2], 2) {
     arglist_ [0] = lb;
@@ -90,7 +90,7 @@ class exprUBCos: public exprOp {
     {return new exprUBCos (arglist_ [0] -> clone (), 
 			   arglist_ [1] -> clone ());}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
   /// print position (PRE, INSIDE, POST)
@@ -103,7 +103,7 @@ class exprUBCos: public exprOp {
 };
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprUBCos::operator () () {
 

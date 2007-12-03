@@ -10,8 +10,9 @@
 #ifndef COUENNE_EXPRMAX_H
 #define COUENNE_EXPRMAX_H
 
-#include <exprOp.hpp>
-#include <exprClone.hpp>
+#include "exprOp.hpp"
+#include "exprCopy.hpp"
+#include "exprStore.hpp"
 
 
 ///  class max
@@ -27,8 +28,8 @@ class exprMax: public exprOp {
   /// Constructor with only two arguments
   exprMax  (expression *el0, expression *el1):
     exprOp (new expression * [4], 4) {
-    arglist_ [0] = el0; arglist_ [1] = new exprClone (el0);
-    arglist_ [2] = el1; arglist_ [3] = new exprClone (el1);
+    arglist_ [0] = new exprCopy (el0); arglist_ [1] = new exprStore (arglist_ [0]);
+    arglist_ [2] = new exprCopy (el1); arglist_ [3] = new exprStore (arglist_ [2]);
   }
 
   /// cloning method
@@ -96,9 +97,7 @@ inline CouNumber exprMax::operator () () {
     }
   }
 
-  best_val = (*(arglist_ [best_ind + 1])) ();
-
-  return (currValue_ = best_val);
+  return (*(arglist_ [best_ind + 1])) ();
 }
 
 #endif

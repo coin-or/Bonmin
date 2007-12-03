@@ -85,7 +85,7 @@ class exprUnary: public expression {
 
   /// compute value of unary operator
   virtual inline CouNumber operator () ()
-    {return (currValue_ = (F ()) ((*argument_) ()));}
+    {return (F ()) ((*argument_) ());}
 
   /// fill in the set with all indices of variables appearing in the
   /// expression

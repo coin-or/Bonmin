@@ -18,26 +18,26 @@
 # define M_PI 3.14159265358979323846
 #endif
 
-//  class to compute lower bound of a sine based on the bounds on its
-//  arguments
+///  class to compute lower bound of a sine based on the bounds on its
+///  arguments
 
 class exprLBSin: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprLBSin (expression *lb, expression *ub): 
     exprOp (new expression * [2], 2) {
     arglist_ [0] = lb;
     arglist_ [1] = ub;
   } //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprLBSin  (arglist_ [0] -> clone (), 
 			    arglist_ [1] -> clone ());}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
   /// print operator
@@ -50,7 +50,7 @@ class exprLBSin: public exprOp {
 };
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprLBSin::operator () () {
 
@@ -71,26 +71,26 @@ inline CouNumber exprLBSin::operator () () {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//  class to compute lower bound of a sine based on the bounds on its
-//  arguments
+///  class to compute lower bound of a sine based on the bounds on its
+///  arguments
 
 class exprUBSin: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprUBSin (expression *lb, expression *ub): 
     exprOp (new expression * [2], 2) {
     arglist_ [0] = lb;
     arglist_ [1] = ub;
   } //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprUBSin  (arglist_ [0] -> clone (), 
 			    arglist_ [1] -> clone ());}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
   /// print operator
@@ -103,7 +103,7 @@ class exprUBSin: public exprOp {
 };
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprUBSin::operator () () {
 

@@ -110,7 +110,7 @@ inline CouNumber exprGroup::operator () () {
   for (register int n = nlterms_, *ind = index_; n--;)
     ret += *coe++ * vars [*ind++];
 
-  return (currValue_ = ret);
+  return ret;
 }
 
 

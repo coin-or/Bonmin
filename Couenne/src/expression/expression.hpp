@@ -94,7 +94,7 @@ class expression {
   /// the expression created for a node that is evaluated after the
   /// original (saves some time).
 
-  CouNumber currValue_;
+  //  CouNumber currValue_;
 
  public:
 
@@ -158,7 +158,7 @@ class expression {
 
   /// value (empty)
   virtual inline CouNumber Value () const 
-    {return currValue_;}
+    {return 0;}
 
   /// If this is an exprClone of a exprClone of an expr???, point to
   /// the original expr??? instead of an exprClone -- improve computing

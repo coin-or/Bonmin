@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblem.hpp>
-#include <exprConst.hpp>
-#include <exprGroup.hpp>
-#include <depGraph.hpp>
+#include "CouenneProblem.hpp"
+#include "exprConst.hpp"
+#include "exprGroup.hpp"
+#include "depGraph.hpp"
 
 
 /// Constructor

@@ -13,7 +13,7 @@
 #include <exprOp.hpp>
 
 
-// product that avoids NaN's 
+/// product that avoids NaN's 
 inline CouNumber safeProd (register CouNumber a, register CouNumber b) {
 
   if ((fabs (a) < 1e-10) || (fabs (b) < 1e-10)) 
@@ -22,22 +22,22 @@ inline CouNumber safeProd (register CouNumber a, register CouNumber b) {
 }
 
 
-// class to compute lower bound of a product based on the bounds of
-// both factors
+/// class to compute lower bound of a product based on the bounds of
+/// both factors
 
 class exprLBMul: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprLBMul  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprLBMul (clonearglist (), nargs_);}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
   /// print position (PRE, INSIDE, POST)
@@ -50,7 +50,7 @@ class exprLBMul: public exprOp {
 };
 
 
-// compute sum
+/// compute sum
 
 inline CouNumber exprLBMul::operator () () {
 
@@ -75,22 +75,22 @@ inline CouNumber exprLBMul::operator () () {
 }
 
 
-// class to compute upper bound of a product based on the bounds of
-// both factors
+/// class to compute upper bound of a product based on the bounds of
+/// both factors
 
 class exprUBMul: public exprOp {
 
  public:
 
-  // Constructors, destructor
+  /// Constructors, destructor
   exprUBMul  (expression **al, int n): 
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprUBMul (clonearglist (), nargs_);}
 
-  // function for the evaluation of the expression
+  /// function for the evaluation of the expression
   CouNumber operator () ();
 
   /// print position (PRE, INSIDE, POST)
@@ -103,8 +103,7 @@ class exprUBMul: public exprOp {
 };
 
 
-
-// compute sum
+/// compute sum
 
 inline CouNumber exprUBMul::operator () () {
 

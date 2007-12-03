@@ -7,9 +7,9 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprExp.hpp>
-#include <exprClone.hpp>
-#include <exprMul.hpp>
+#include "exprExp.hpp"
+#include "exprClone.hpp"
+#include "exprMul.hpp"
 
 
 // differentiation

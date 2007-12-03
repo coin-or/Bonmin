@@ -83,6 +83,6 @@ class exprSub: public exprOp {
 /// Compute difference
 
 inline CouNumber exprSub::operator () ()
-{return (currValue_ = (*(*arglist_)) () - (*(arglist_ [1])) ());}
+{return ((*(*arglist_)) () - (*(arglist_ [1])) ());}
 
 #endif

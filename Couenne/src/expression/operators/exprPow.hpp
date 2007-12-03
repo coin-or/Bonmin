@@ -124,7 +124,7 @@ inline CouNumber safe_pow (register CouNumber base,
 inline CouNumber exprPow::operator () () {
 
   //  return (currValue_ = safe_pow (base, exponent));
-  return (currValue_ = safe_pow ((**arglist_) (), (*(arglist_ [1])) ()));
+  return (safe_pow ((**arglist_) (), (*(arglist_ [1])) ()));
 }
 
 

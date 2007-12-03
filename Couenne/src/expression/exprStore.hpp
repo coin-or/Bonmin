@@ -29,12 +29,12 @@ class exprStore: public exprCopy {
 
   /// Constructor
   exprStore (expression *copy):
-    copy_ (copy) {}
+    exprCopy (copy) {}
 
   /// Store constructor
-  exprStore (const exprStore &e) {
-    copy_  = e.Original () -> clone ();
-    value_ = e.value_;
+  exprStore (const exprStore &e):
+    exprCopy (e) {
+    //copy_  = e.Original () -> clone ();
   }
 
   /// Cloning method
@@ -42,15 +42,12 @@ class exprStore: public exprCopy {
     {return new exprStore (*this);}
 
   /// value (the saved one)
-  virtual inline CouNumber Value () const 
-    {return value_;}
+  //  virtual inline CouNumber Value () const 
+  //    {return value_;}
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
-    {return (value_ = (*copy_) ());}
-
-  /// replace occurrence of a variable with another variable
-  //  void replace (exprVar *, exprVar *);
+    {return (copy_ -> Value ());}
 };
 
 #endif

@@ -87,7 +87,7 @@ inline CouNumber exprSum::operator () () {
   for (register int n = nargs_; n--;)
     ret += (**al++) ();
 
-  return (currValue_ = ret);
+  return ret;
 }
 
 #endif
