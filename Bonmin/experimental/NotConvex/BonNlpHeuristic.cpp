@@ -11,8 +11,12 @@
 #include "BonCouenneInterface.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneProblem.hpp"
+#include "CbcCutGenerator.hpp"
 #include "CbcBranchActual.hpp"
 #include "BonAuxInfos.hpp"
+
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
 
 namespace Bonmin{
   NlpSolveHeuristic::NlpSolveHeuristic():
@@ -88,6 +92,8 @@ namespace Bonmin{
   void
   NlpSolveHeuristic::setCouenneProblem(CouenneProblem * couenne){
     couenne_ = couenne;}
+
+
   int
   NlpSolveHeuristic::solution( double & objectiveValue, double * newSolution){
     OsiSolverInterface * solver = model_->solver();
@@ -138,16 +144,37 @@ namespace Bonmin{
 	}
       }
       else{
+
+	// TODO: a more sophisticated rounding procedure
+	//
+	// Call aggressive tightening for all integer variables,
+	// setting each first at floor(x_i) and then at ceil(x_i):
+	//
+	// 1) if at least one is infeasible, set x_i to other
+	//
+	// 2) if both are infeasible, apply normal aggressive BT:
+	//    2a) if both infeasible, node is infeasible
+	//    2b) if both feasible, store index in free++ variables
+	//    2c) if only one feasible, set rounded +/- 2
+	//
+	// 3) if both feasible, store index in free variables
+	//
+	// with free and free++ variables, look for integer point
+	// closest to xcurrent.
+
         OsiSimpleInteger * intObj = dynamic_cast<OsiSimpleInteger *>(objects[i]);
-        if(intObj){
-          const int & i = intObj->columnNumber();
+
+        if (intObj) {
+          const int & i = intObj -> columnNumber ();
           // Round the variable in the solver
-          double value = solution[i];
-          if(value < lower[i])
-            value = lower[i];
+          double value = solution [i];
+          if (value < lower[i])
+	    value = lower[i];
           else if(value > upper[i])
             value = upper[i];
+
           value = floor(value + 0.5);
+
           lower[i] = upper[i] = value;
         }
         else{
@@ -157,18 +184,24 @@ namespace Bonmin{
       }
     }
 
-
     // Now set column bounds and solve the NLP with starting point
     double * saveColLower = CoinCopyOfArray(nlp_->getColLower(), nlp_->getNumCols());
     double * saveColUpper = CoinCopyOfArray(nlp_->getColUpper(), nlp_->getNumCols());
     nlp_->setColLower(lower);
     nlp_->setColUpper(upper);
     nlp_->setColSolution(solution);
-    nlp_->initialSolve();
+
+    // apply NLP solver /////////////////////////////////
+    nlp_ -> initialSolve();
+
     double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
 
-    bool foundSolution = obj < objectiveValue;
-//    if(foundSolution)//Better solution found update
+    bool foundSolution = true
+      // && (obj < objectiveValue)
+      // && checkNLP (model_ -> cutGenerators () [0] -> generator (), nlp_ -> getColSolution (), obj)
+    ;
+
+    if (foundSolution) //Better solution found update
     {
   //    newSolution = new double [solver->getNumCols()];
       CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), newSolution);
@@ -176,21 +209,24 @@ namespace Bonmin{
       //Get correct values for all auxiliary variables
       CouenneInterface * couenne = dynamic_cast<CouenneInterface *>
         (nlp_);
-      if(couenne){
-       couenne_->getAuxs(newSolution);
-    }
-      if(babInfo){
-      babInfo->setNlpSolution(newSolution,model_->solver()->getNumCols(), obj);
-        babInfo->setHasNlpSolution(true);
+
+      if (couenne){
+	couenne_ -> getAuxs (newSolution);
+      }
+
+      if (babInfo){
+	babInfo->setNlpSolution (newSolution, model_->solver () -> getNumCols (), obj);
+        babInfo->setHasNlpSolution (true);
       }
       objectiveValue = obj;
-  }
-  nlp_->setColLower(saveColLower);
-  nlp_->setColUpper(saveColUpper);
-  delete [] lower;
-  delete [] upper;
-  delete [] saveColLower;
-  delete [] saveColUpper;
-  return foundSolution;
+    }
+    nlp_->setColLower(saveColLower);
+    nlp_->setColUpper(saveColUpper);
+    delete [] lower;
+    delete [] upper;
+    delete [] saveColLower;
+    delete [] saveColUpper;
+
+    return foundSolution;
   }
 }/** Ends namespace Bonmin.*/

@@ -101,8 +101,11 @@ int main (int argc, char *argv[])
 
       // CAUTION: assuming first cut generator is our CouenneCutGenerator
 
-      CouenneCutGenerator *cg = dynamic_cast <CouenneCutGenerator *> 
-	(bb.model(). cutGenerators () [0] -> generator ());
+      CouenneCutGenerator *cg = NULL;
+
+      if (bb.model (). cutGenerators ())
+	cg = dynamic_cast <CouenneCutGenerator *> 
+	  (bb.model (). cutGenerators () [0] -> generator ());
 
       if (cg)
 	cg -> getStats (nr, nt, st);
@@ -129,18 +132,18 @@ int main (int argc, char *argv[])
 	// time limit reached, print upper and (in brackets) lower
 
 	if (fabs (bb.bestObj()) < 9e12) 
-	  printf    (" %12.3f &", bb.bestObj ());
+	  printf    (" %18.9f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_prim");
 
 	if (fabs (bb.bestBound()) < 9e12) 
-	  printf    (" (%12.3f) &", bb.bestBound ());
+	  printf    (" (%18.9f) &", bb.bestBound ());
 	else printf (" %8s       &", "inf_dual");
       }
       else {
 	// time limit not reached, print upper and time
 
 	if (fabs (bb.bestObj()) < 9e12) 
-	  printf    (" %12.3f &", bb.bestObj ());
+	  printf    (" %18.9f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_prim");
 	  
 	if (fabs (bb.bestBound()) < 9e12) 

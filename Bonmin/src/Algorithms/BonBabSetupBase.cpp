@@ -445,17 +445,6 @@ namespace Bonmin
         "osi-strong", "Osi method to do strong branching","");
     roptions->setOptionExtraInfo("varselect_stra", 15);
 
-    roptions->AddStringOption3
-    ("branch_pt_select",
-     "Chooses branching point selection strategy",
-     "mid-point",
-     "balanced", "minimizes max distance from curve to convexification",
-     "min-area", "minimizes total area of the two convexifications",
-     "mid-point", "convex combination of current point and mid point",
-     "");
-
-    roptions->setOptionExtraInfo("branch_pt_select", 15); // Why 15? TODO
-
     roptions->AddLowerBoundedIntegerOption("num_cut_passes",
         "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",
         0,1,

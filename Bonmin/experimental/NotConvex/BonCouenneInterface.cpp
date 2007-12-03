@@ -60,13 +60,32 @@ void
 CouenneInterface::extractLinearRelaxation 
 (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 
-  if (solveNlp)
-    initialSolve ();
+   if (solveNlp) {
 
-  // set cutoff immediately, to take advantage of bound tightening
+     initialSolve ();
 
-  if (getNumIntegers () == 0) // only if no integer variables
-    couenneCg. Problem () -> setCutOff (getObjValue ());
+     // TODO: solve nlp, round as in BonNlpHeuristic, and re-solve
+     // TODO: better test is checkNLP
+
+     if (getNumIntegers () == 0) { // only if no integer variables
+
+       const CouNumber 
+	  obj      = getObjValue (),
+	 *solution = getColSolution ();
+
+       // set cutoff to take advantage of bound tightening
+       couenneCg. Problem () -> setCutOff (obj);
+       /*
+       OsiAuxInfo * auxInfo = si. getAuxiliaryInfo ();
+       BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
+
+       if (babInfo) {
+	 babInfo -> setNlpSolution (solution, getNumCols (), obj);
+	 babInfo -> setHasNlpSolution (true);
+       }
+       */
+     }
+   }
 
    int numcols     = getNumCols (),         // # original               variables
        numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables

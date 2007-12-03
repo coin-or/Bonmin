@@ -239,7 +239,7 @@ void
     roptions->AddLowerBoundedIntegerOption("convexification_cuts",
                                            "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
                                            0,1,
-                                           "A frequency of 0 amounts to to never solve the NLP relaxation.");
+                                           "A frequency of 0 amounts to never solve the NLP relaxation.");
     
     roptions->AddStringOption2("local_optimization_heuristic",
                                "Do we search for local solutions of NLP's",
@@ -268,10 +268,46 @@ void
                                            "is uniform-grid or arround-current-point.",
                                            0,1,
                                            "");
-    
-    
+
+
+    roptions->AddStringOption2 
+      ("feasibility_bt",
+       "Feasibility-based (cheap) bound tightening",
+       "yes",
+       "no","",
+       "yes","");
+
+    roptions->AddStringOption2 
+      ("optimality_bt",
+       "optimality-based (expensive) bound tightening",
+       "no",
+       "no","",
+       "yes","");
+
+   roptions->AddLowerBoundedIntegerOption
+     ("log_num_obbt_per_level",
+      "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
+      -1,5,
+      "If -1, apply at every node (expensive!). If 0, never apply.");
+
+    roptions->AddStringOption2 
+      ("aggressive_fbbt",
+       "Aggressive feasibility-based bound tightening (to use with NLP points)",
+       "yes",
+       "no","",
+       "yes","");
+
+    roptions->AddStringOption3
+    ("branch_pt_select",
+     "Chooses branching point selection strategy",
+     "mid-point",
+     "balanced", "minimizes max distance from curve to convexification",
+     "min-area", "minimizes total area of the two convexifications",
+     "mid-point", "convex combination of current point and mid point",
+     "");
+
+    roptions->setOptionExtraInfo("branch_pt_select", 15); // Why 15? TODO
   }
   //  OsiTMINLPInterface * BonminAmplSetup::createOsiInterface{
-  //}
-  
+  //}  
 }
