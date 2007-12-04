@@ -132,7 +132,7 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
       improved += second;
     }
 
-  } while (retval && improved && (iter < MAX_ABT_ITER));
+  } while (retval && improved && (iter++ < MAX_ABT_ITER));
 
   // store new valid bounds into problem, or restore old ones if none changed
   CoinCopyN (olb, ncols, lb);
