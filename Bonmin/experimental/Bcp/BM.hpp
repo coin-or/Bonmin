@@ -17,6 +17,8 @@
 
 #include "BB_cut.hpp"
 
+#include "BonIpoptWarmStart.hpp"
+
 #define BM_DISREGARD_SOS
 
 //#############################################################################
@@ -221,6 +223,7 @@ struct BM_SB_result
   int iter[2];
   double objval[2];
   double varChange[2];
+  double time[2];
 };
 
 //#############################################################################
@@ -292,6 +295,9 @@ class BM_lp : public BCP_lp_user
   BM_SB_result* sbResult_;
   /** A pointer to the entry that got selected */
   BM_SB_result* bestSbResult_;
+
+  /** The time when we started to process the node */
+  double node_start_time;
       
   /** Class for collecting statistics */
   BM_stats bm_stats;
@@ -383,9 +389,12 @@ public:
     void send_one_SB_data(int fix_size, int changeType, int objInd, int colInd,
 			  double solval, double bd, int pid);
     void solve_first_candidate(OsiBranchingInformation& branchInfo,
-			       OsiSolverInterface* solver, int downUp);
+			       OsiSolverInterface* solver,
+			       const CoinWarmStart* ws,
+			       int downUp);
     int send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
 				     OsiSolverInterface* solver,
+				     const BCP_warmstart* ws,
 				     const int* pids, const int pidNum);
     void receive_distributed_SB_result();
     bool isBranchFathomable(int status, double obj);

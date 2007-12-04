@@ -256,6 +256,8 @@ BM_tm::display_feasible_solution(const BCP_solution* sol)
 }
 
 struct BMSearchTreeCompareBest {
+  static const std::string compName;
+  static inline const char* name() { return "BMSearchTreeCompareBest"; }
   inline bool operator()(const CoinTreeSiblings* x,
 			 const CoinTreeSiblings* y) const {
     double allowable_gap = 1e-8;
@@ -265,8 +267,11 @@ struct BMSearchTreeCompareBest {
     const int yd = y->currentNode()->getDepth();
     return ((xq < yq-allowable_gap) ||
 	    (xq <= yq+allowable_gap && xd > yd));
-    }
+  }
 };
+
+const std::string
+BMSearchTreeCompareBest::compName("BMSearchTreeCompareBest");
 
 void
 BM_tm::init_new_phase(int phase,
@@ -278,15 +283,19 @@ BM_tm::init_new_phase(int phase,
   switch (p->param(BCP_tm_par::TreeSearchStrategy)) {
   case BCP_BestFirstSearch:
     candidates = new CoinSearchTree<BMSearchTreeCompareBest>;
+    printf("Creating candidate list with BMSearchTreeCompareBest\n");
     break;
   case BCP_BreadthFirstSearch:
     candidates = new CoinSearchTree<CoinSearchTreeCompareBreadth>;
+    printf("Creating candidate list with CoinSearchTreeCompareBreadth\n");
     break;
   case BCP_DepthFirstSearch:
     candidates = new CoinSearchTree<CoinSearchTreeCompareDepth>;
+    printf("Creating candidate list with CoinSearchTreeCompareDepth\n");
     break;
   case BCP_PreferredFirstSearch:
     candidates = new CoinSearchTree<CoinSearchTreeComparePreferred>;
+    printf("Creating candidate list with CoinSearchTreeComparePreferred\n");
     break;
   }
 }

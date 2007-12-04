@@ -9,6 +9,7 @@
 #include "CoinHelperFunctions.hpp"
 #include "BCP_lp_node.hpp"
 #include "BCP_lp.hpp"
+#include "BCP_lp_functions.hpp"
 #include "BM.hpp"
 #include "BonChooseVariable.hpp"
 #include "BonCurvBranchingSolver.hpp"
@@ -16,10 +17,10 @@
 #include "BonLpBranchingSolver.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 
+#define DEBUG_PRINT
+
 static bool ifprint = true;
 static bool ifprint2 = false;
-static bool ifprint3 = false;
-// #define BM_PRINT_DATA
 
 //#############################################################################
 
@@ -110,19 +111,6 @@ BM_lp::unpack_pseudo_costs(BCP_buffer& buf)
   buf.unpack(upNumber, numObj, false);
   buf.unpack(downTotalChange, numObj, false);
   buf.unpack(downNumber, numObj, false);
-
-#ifdef BM_PRINT_DATA
-  if (current_level() < 4) {
-    print(ifprint2, "Received pseudocosts:\n");
-    for (int i = 0; i < numObj; ++i) {
-	const OsiObject* object = bonmin_.nonlinearSolver()->objects()[i];
-	print(ifprint2, "col: %i,  obj: %i, dTot: %lf, dNum: %i, uTot: %lf, uNum: %i\n",
-	      object->columnNumber(), i,
-	      downTotalChange[i], downNumber[i],
-	      upTotalChange[i], upNumber[i]);
-    }
-  }
-#endif  
 }
 
 
@@ -297,38 +285,15 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
 		 feasInd_ + feasBlockStart);
     }
   }
-#ifdef BM_PRINT_DATA
-  if (current_level() < 4) {
-    OsiPseudoCosts& pseudoCosts = choose->pseudoCosts();
-    double* upTotalChange = pseudoCosts.upTotalChange();
-    int* upNumber = pseudoCosts.upNumber();
-    double* downTotalChange = pseudoCosts.downTotalChange();
-    int* downNumber = pseudoCosts.downNumber();
-    
-    print(ifprint2, "Before SB Infeas\n");
-    for (int i = 0; i < infNum_; ++i) {
-      const int ind = infInd_[i];
-      const OsiObject* object = objects[ind];
-      print(ifprint2, "col: %i,  obj: %i,  val: %lf,  useful: %lf\n",
-    	  object->columnNumber(), infInd_[i],
-    	  object->infeasibility(&branchInfo, way), infUseful_[i]);
-      print(ifprint2, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
-    	  downTotalChange[ind], downNumber[ind],
-    	  upTotalChange[ind], upNumber[ind]);
-    }
-    print(ifprint2, "Before SB Feas\n");
-    for (int i = 0; i < feasNum_; ++i) {
-      const int ind = feasInd_[i];
-      const OsiObject* object = objects[ind];
-      print(ifprint2, "colInd: %i,  objInd: %i,  val: %lf,  useful: %lf\n",
-    	  object->columnNumber(), feasInd_[i],
-    	  object->infeasibility(&branchInfo, way), feasUseful_[i]);
-      print(ifprint2, "    downTot: %lf, downNum: %i, upTot: %lf, upNum: %i\n",
-    	  downTotalChange[ind], downNumber[ind],
-    	  upTotalChange[ind], upNumber[ind]);
-    }
-  }
-#endif  
+
+#ifdef DEBUG_PRINT
+  double t = CoinWallclockTime();
+  printf("LP %.3f: node: %i  depth: %i  obj: %f  infNum: %i  feasNum: %i  soltime: %.3f\n",
+	 t-start_time(), current_index(), current_level(),
+	 branchInfo.objectiveValue_, 
+	 infNum_, feasNum_, t-node_start_time);
+  node_start_time = t;
+#endif
   
   return infNum_;
 }
@@ -371,6 +336,7 @@ BM_lp::send_one_SB_data(int fixed_size, int changeType, int objInd, int colInd,
 int
 BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
 				    OsiSolverInterface* solver,
+				    const BCP_warmstart* ws,
 				    const int* pids, const int pidNum)
 {
   const double * clb = solver->getColLower();
@@ -383,13 +349,12 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
   bm_buf.pack(cub, numCols);
   bm_buf.pack(branchInfo.objectiveValue_);
   bm_buf.pack(branchInfo.cutoff_);
+  BCP_pack_warmstart(ws, bm_buf);
+  
   const int fixed_size = bm_buf.size();
   // We got a few procs to work with, so do distributed strong branching
   int pidCnt = 0;
-#ifdef BM_PRINT_DATA
-  print(ifprint2, "pidNum: %i,  infNum_: %i,  feasNum_: %i\n",
-	pidNum, infNum_, feasNum_);
-#endif
+
   /* For the 0-th object just send out the up-branch, the down branch will be
      processed locally. */
   {
@@ -440,15 +405,18 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
    the nlp solver in BM_lp */
 void
 BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
-			     OsiSolverInterface* solver, int downUp)
+			     OsiSolverInterface* solver,
+			     const CoinWarmStart* cws, int downUp)
 {
   BM_SB_result& sbres = sbResult_[infInd_[0]];
   sbres.objInd = infInd_[0];
   const int ind = solver->object(infInd_[0])->columnNumber();
   const double val = branchInfo.solution_[ind];
   if (downUp == 0) {
+    double t = CoinWallclockTime();
     const double old_bd = solver->getColUpper()[ind];
     solver->setColUpper(ind, floor(val));
+    solver->setWarmStart(cws);
     solver->resolve();
     sbres.branchEval |= 1;
     sbres.status[0] =
@@ -460,9 +428,12 @@ BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
     sbres.iter[0] = solver->getIterationCount();
     sbres.varChange[0] = val - floor(val);
     solver->setColUpper(ind, old_bd);
+    sbres.time[0] = CoinWallclockTime() - t;
   } else {
+    double t = CoinWallclockTime();
     const double old_bd = solver->getColLower()[ind];
     solver->setColLower(ind, ceil(val));
+    solver->setWarmStart(cws);
     solver->resolve();
     sbres.branchEval |= 2;
     sbres.status[1] =
@@ -474,6 +445,7 @@ BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
     sbres.iter[1] = solver->getIterationCount();
     sbres.varChange[1] = ceil(val) - val;
     solver->setColLower(ind, old_bd);
+    sbres.time[1] = CoinWallclockTime() - t;
   }
 }
 
@@ -500,6 +472,7 @@ BM_lp::receive_distributed_SB_result()
   bm_buf.unpack(sbres.status[field]);
   bm_buf.unpack(sbres.iter[field]);
   bm_buf.unpack(sbres.objval[field]);
+  bm_buf.unpack(sbres.time[field]);
 }
 
 //-----------------------------------------------------------------------------
@@ -519,27 +492,33 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
 			  Bonmin::BonChooseVariable* choose,
 			  OsiBranchingObject*& branchObject)
 {
+  int evaluated = 0;
   int i;
-#ifdef BM_PRINT_DATA
-  print(ifprint2, "SB results Infeas\n");
+#if defined(DEBUG_PRINT)
+  const double t = CoinWallclockTime()-start_time();
+#endif
+
+#if 0 // defined(DEBUG_PRINT)
+  const double t = CoinWallclockTime()-start_time();
   for (i = 0; i < infNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[infInd_[i]];
     if (sbres.branchEval == 0) {
       continue;
     }
-    print(ifprint2, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
-	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
-	   sbres.objval[0], sbres.objval[1]);
+    printf("LP %.3f: SB: node: %i  inf col: %i  stati: %i %i,  obj: %f %f  time: %.3f %.3f\n",
+	   t, current_index(), sbres.colInd, 
+	   sbres.status[0], sbres.status[1],
+	   sbres.objval[0], sbres.objval[1], sbres.time[0], sbres.time[1]);
   }
-  print(ifprint2, "SB results Feas\n");
   for (i = 0; i < feasNum_; ++i) {
     const BM_SB_result& sbres = sbResult_[feasInd_[i]];
     if (sbres.branchEval == 0) {
       continue;
     }
-    print(ifprint2, "eval: %i  col: %i  stati: %i %i,  obj: %f %f\n",
-	   sbres.branchEval, sbres.colInd, sbres.status[0], sbres.status[1],
-	   sbres.objval[0], sbres.objval[1]);
+    printf("LP %.3f: SB: node: %i  feas col: %i  stati: %i %i,  obj: %f %f  time: %.3f %.3f\n",
+	   t, current_index(), sbres.colInd, 
+	   sbres.status[0], sbres.status[1],
+	   sbres.objval[0], sbres.objval[1], sbres.time[0], sbres.time[1]);
   }
 #endif
   // First check if we can fathom the node
@@ -552,6 +531,19 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
     assert(sbres.branchEval == 3);
     if (isBranchFathomable(sbres.status[0], sbres.objval[0]) &&
 	isBranchFathomable(sbres.status[1], sbres.objval[1])) {
+#ifdef DEBUG_PRINT
+      const double wallclock = CoinWallclockTime();
+#if 0
+      printf("LP %.3f: SBres: node: %i  FATHOM  inf/eval/cand: time: %.3f\n",
+	     wallclock-start_time(), current_index(),
+	     infNum_, 
+	     wallclock-node_start_time);
+#else 
+      printf("LP %.3f: SBres: node: %i  FATHOM  time: %.3f\n",
+	     wallclock-start_time(), current_index(),
+	     wallclock-node_start_time);
+#endif
+#endif
       return -2;
     }
     ++listLen;
@@ -565,6 +557,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
     if (sbres.branchEval == 0) {
       continue;
     }
+    ++evaluated;
     if (isBranchFathomable(sbres.status[0], sbres.objval[0])) {
       const int colInd = sbres.colInd;
       solver->setColLower(colInd, ceil(branchInfo.solution_[colInd]));
@@ -583,6 +576,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
     if (sbres.branchEval == 0) {
       continue;
     }
+    ++evaluated;
     if ( (sbres.branchEval & 1) &&
 	 isBranchFathomable(sbres.status[0], sbres.objval[0]) ) {
       // Down branch evaluated and fathomable
@@ -601,6 +595,11 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
     }
   }
   if ((fixedStat & 2) != 0) {
+#ifdef DEBUG_PRINT
+    printf("LP %.3f: SBres: node: %i  RESOLVE  time: %.3f\n",
+	   t - start_time(), current_index(), t-node_start_time);
+    node_start_time = t;
+#endif
     return -1;
   }
 
@@ -674,10 +673,13 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
   const int ind = object->columnNumber();
   bestSbResult_ = sbResult_ + infInd_[best];
-  print(ifprint3,
-	"LP: Branch var: %i, val: %lf, obj0: %lf, obj1: %lf, way: %i\n",
-	ind, branchInfo.solution_[ind], bestSbResult_->objval[0],
-	bestSbResult_->objval[1], bestWhichWay);
+#ifdef DEBUG_PRINT
+  printf("LP %.3f: SBres: node: %i  depth: %i  BRANCH  time: %.3f  evaluated: %i  bvar: %i  val: %f  obj0: %f  obj1: %f  way: %i\n",
+	 t-start_time(), current_index(), current_level(), t-node_start_time, 
+	 evaluated, ind, branchInfo.solution_[ind], 
+	 bestSbResult_->objval[0], bestSbResult_->objval[1], bestWhichWay);
+  node_start_time = t;
+#endif
 
   return (fixedStat & 1) != 0 ? -1 : 0;
 }
@@ -710,15 +712,22 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
   bm_buf.unpack(pids, pidNum);
 
   clear_SB_results();
+
+  BCP_lp_prob* p = getLpProblemPointer();
+  CoinWarmStart* cws = solver->getWarmStart();
+  BCP_warmstart* ws = BCP_lp_convert_CoinWarmStart(*p, cws);
+
+
   // FIXME: This test will have to be changed to >= 1
   if (pidNum >= 0) {
     if (pidNum > 0) {
-      pidNum = send_data_for_distributed_SB(branchInfo, solver, pids, pidNum);
+      pidNum = send_data_for_distributed_SB(branchInfo, solver, ws,
+					    pids, pidNum);
     }
     // While the others are working, initialize the result array
-    solve_first_candidate(branchInfo, solver, 0);
+    solve_first_candidate(branchInfo, solver, cws, 0);
     if (pidNum == 0) {
-      solve_first_candidate(branchInfo, solver, 1);
+      solve_first_candidate(branchInfo, solver, cws, 1);
     }
     while (pidNum > 0) {
       receive_distributed_SB_result();
@@ -735,6 +744,9 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
 
   delete[] pids;
 
+  delete cws;
+  delete ws;
+
   return returnStatus;
 }
 
@@ -744,7 +756,8 @@ BCP_branching_decision
 BM_lp::bbBranch(OsiBranchingInformation& brInfo,
 		BCP_vec<BCP_lp_branching_object*>& cands)
 {
-  OsiSolverInterface* osi = getLpProblemPointer()->lp_solver;
+  BCP_lp_prob* p = getLpProblemPointer();
+  OsiSolverInterface* osi = p->lp_solver;
   Bonmin::OsiTMINLPInterface* nlp =
     dynamic_cast<Bonmin::OsiTMINLPInterface*>(osi);
   assert(nlp);
@@ -753,10 +766,6 @@ BM_lp::bbBranch(OsiBranchingInformation& brInfo,
     
   BCP_branching_decision retCode;
   OsiBranchingObject* brObj = NULL;
-
-//   static int cnt = 0;
-//   print(ifprint, "cnt = %i\n", cnt);
-//   ++cnt;
 
   const int numCols = nlp->getNumCols();
   double* clb_old = new double[numCols];
@@ -906,6 +915,7 @@ BM: BCP_lp_user::try_to_branch returned with unknown return code.\n");
   delete brObj;
   delete[] clb_old;
   delete[] cub_old;
+
   return retCode;
 }
 
@@ -935,6 +945,7 @@ BM_lp::process_message(BCP_buffer& buf)
 
   Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
 
+  double t = CoinWallclockTime();
   int numCols;
   double* clb;
   double* cub;
@@ -946,6 +957,7 @@ BM_lp::process_message(BCP_buffer& buf)
   assert(numCols == nlp.getNumCols());
   buf.unpack(objvalOrig);
   buf.unpack(cutoff);
+  BCP_warmstart* ws = BCP_unpack_warmstart(buf);
   int changeType;
   int objInd;
   int colInd;
@@ -956,6 +968,7 @@ BM_lp::process_message(BCP_buffer& buf)
   buf.unpack(colInd);
   buf.unpack(solval);
   buf.unpack(bd);
+
   nlp.setColLower(clb);
   nlp.setColUpper(cub);
   switch (changeType) {
@@ -966,7 +979,12 @@ BM_lp::process_message(BCP_buffer& buf)
     nlp.setColLower(colInd, bd);
     break;
   }
+
+  CoinWarmStart* cws = ws->convert_to_CoinWarmStart();
+  nlp.setWarmStart(cws);
+  
   nlp.resolve();
+  
   int status = 
     (nlp.isAbandoned()              ? BCP_Abandoned : 0) |
     (nlp.isProvenOptimal()          ? BCP_ProvenOptimal : 0) |
@@ -983,6 +1001,7 @@ BM_lp::process_message(BCP_buffer& buf)
   bm_buf.pack(status);
   bm_buf.pack(iter);
   bm_buf.pack(objval);
+  bm_buf.pack(CoinWallclockTime() - t);
   send_message(buf.sender(), bm_buf, BCP_Msg_User);
 
   bm_buf.clear();
@@ -1000,6 +1019,9 @@ BM_lp::process_message(BCP_buffer& buf)
 
   delete[] clb;
   delete[] cub;
+
+  delete cws;
+  delete ws;
 
   bm_stats.incNumberSbSolves();
 }
