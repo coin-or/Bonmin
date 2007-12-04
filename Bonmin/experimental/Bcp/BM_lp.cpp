@@ -19,6 +19,8 @@
 // The following is included for "min"
 #include "CoinFinite.hpp"
 
+#define DEBUG_PRINT
+
 static char prefix[100];
 
 //#############################################################################
@@ -91,6 +93,7 @@ BM_lp::initialize_new_search_tree_node(const BCP_vec<BCP_var*>& vars,
 				       BCP_vec<int>& cut_changed_pos,
 				       BCP_vec<double>& cut_new_bd)
 {
+    node_start_time = CoinWallclockTime();
     BM_node* data = dynamic_cast<BM_node*>(get_user_data());
     numNlpFailed_ = data->numNlpFailed_;
 
@@ -181,6 +184,11 @@ BM_lp::test_feasibility_BB(const BCP_lp_result& lpres,
   BCP_solution_generic* sol = test_full(lpres, vars, integerTolerance_);
   if (sol) {
     sol->set_objective_value(lpres.objval());
+#ifdef DEBUG_PRINT
+    printf("LP %.3f: Solution found. node: %i  depth: %i  value: %f\n",
+	   CoinWallclockTime() - start_time(),
+	   current_index(), current_level(), lpres.objval());
+#endif
   }
   return sol;
 }
