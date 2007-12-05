@@ -70,8 +70,8 @@ CouenneInterface::extractLinearRelaxation
      if (getNumIntegers () == 0) { // only if no integer variables
 
        const CouNumber 
-	  obj      = getObjValue (),
-	 *solution = getColSolution ();
+	 obj      = getObjValue ();
+	 //	 *solution = getColSolution ();
 
        // set cutoff to take advantage of bound tightening
        couenneCg. Problem () -> setCutOff (obj);

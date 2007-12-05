@@ -15,6 +15,7 @@
 #include "CouenneChooseVariable.hpp"
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
+#include "CouenneCutGenerator.hpp"
 #include "BonAuxInfos.hpp"
 #include "BonCbcNode.hpp"
 
@@ -83,19 +84,17 @@ namespace Bonmin{
     journalist()->GetJournal("console")->
       SetPrintLevel(J_CONVEXIFYING, (EJournalLevel)i);
     options()->GetIntegerValue("problem_print_level", i, "bonmin.");
-    printf(" i = %d\n", i);
     journalist()->GetJournal("console")->
       SetPrintLevel(J_PROBLEM, (EJournalLevel)i);
 
     /* Initialize Couenne cut generator.*/
     int ivalue, num_points;
     options()->GetEnumValue("convexification_type", ivalue,"bonmin.");
-    enum conv_type convtype((enum conv_type) ivalue);
     options()->GetIntegerValue("convexification_points",num_points,"bonmin.");
     
     CouenneCutGenerator * couenneCg = 
-      new CouenneCutGenerator(ci, aslfg_->asl, true, convtype, num_points,
-			      journalist());
+      new CouenneCutGenerator(ci, this, aslfg_->asl, journalist());
+
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
@@ -252,80 +251,7 @@ void
   CouenneSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
-
-    roptions->SetRegisteringCategory("Couenne options", RegisteredOptions::CouenneCategory);
-    
-    roptions->AddLowerBoundedIntegerOption("convexification_cuts",
-                                           "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
-                                           0,1,
-                                           "A frequency of 0 amounts to never solve the NLP relaxation.");
-    
-    roptions->AddStringOption2("local_optimization_heuristic",
-                               "Do we search for local solutions of NLP's",
-                               "yes",
-                               "no","",
-                               "yes","");
-    
-    roptions->AddLowerBoundedIntegerOption("log_num_local_optimization_per_level",
-                               "Specify the logarithm of the number of local optimization to perform on average for each level of given depth of the tree.",
-                               -1,-1,"Solve as many nlp's at the nodes for each level of the tree. Nodes are randomly selected. If for a"
-                                           "given level there are less nodes than this number nlp are solved for every nodes."
-                                           "For example if parameter is 8, nlp's are solved for all node untill level 8, then for half the node at level 9, 1/4 at level 10...."
-                                           "Value -1 specify to perform at all nodes."
-                                           );
-    
-    
-    roptions->AddStringOption3("convexification_type",
-                               "Deterimnes in which point the linear over/under-estimator are generated",
-                               "current-point-only",
-                               "current-point-only","Only at current optimum of relaxation",
-                               "uniform-grid","Points chosen in a unform grid between the bounds of the problem",
-                               "around-current-point","At points around current optimum of relaxation");
-    
-    roptions->AddLowerBoundedIntegerOption("convexification_points",
-                                           "Specify the number of points at which to convexify when convexification type"
-                                           "is uniform-grid or arround-current-point.",
-                                           0,1,
-                                           "");
-
-
-    roptions->AddStringOption2 
-      ("feasibility_bt",
-       "Feasibility-based (cheap) bound tightening",
-       "yes",
-       "no","",
-       "yes","");
-
-    roptions->AddStringOption2 
-      ("optimality_bt",
-       "optimality-based (expensive) bound tightening",
-       "no",
-       "no","",
-       "yes","");
-
-   roptions->AddLowerBoundedIntegerOption
-     ("log_num_obbt_per_level",
-      "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
-      -1,5,
-      "If -1, apply at every node (expensive!). If 0, never apply.");
-
-    roptions->AddStringOption2 
-      ("aggressive_fbbt",
-       "Aggressive feasibility-based bound tightening (to use with NLP points)",
-       "yes",
-       "no","",
-       "yes","");
-
-    roptions->AddStringOption3
-    ("branch_pt_select",
-     "Chooses branching point selection strategy",
-     "mid-point",
-     "balanced", "minimizes max distance from curve to convexification",
-     "min-area", "minimizes total area of the two convexifications",
-     "mid-point", "convex combination of current point and mid point",
-     "");
-
-    roptions->setOptionExtraInfo("branch_pt_select", 15); // Why 15? TODO
+    CouenneCutGenerator::registerOptions (roptions);
 
     roptions->AddBoundedIntegerOption(
       "branching_print_level",
