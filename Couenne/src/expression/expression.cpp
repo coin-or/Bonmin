@@ -20,9 +20,6 @@
 // static vectors for evaluation, see their description in
 // expression.hpp
 
-CouNumber  expression::stack [STACK_SIZE];
-CouNumber *expression::sp = stack;
-
 CouNumber *expression::variables_ = NULL;
 CouNumber *expression::lbounds_   = NULL;
 CouNumber *expression::ubounds_   = NULL;

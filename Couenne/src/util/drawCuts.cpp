@@ -8,9 +8,9 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneCutGenerator.hpp>
-#include <exprAux.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
+#include "exprAux.hpp"
 
 
 // [cool!] print graph-readable output for displaying inequalities
@@ -52,7 +52,7 @@ void draw_cuts (OsiCuts &cs, const CouenneCutGenerator *cg, int j, expression *w
 
     if (xi >= 0) {
 
-      CouNumber curx = expression::Variable (xi);
+      CouNumber curx = cg -> Problem () -> X (xi);
 
 #define N_STEPS 100
 

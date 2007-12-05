@@ -10,6 +10,8 @@
 #ifndef COUENNE_CUT_GENERATOR_HPP
 #define COUENNE_CUT_GENERATOR_HPP
 
+#include "BonRegisteredOptions.hpp"
+
 #include "BonOaDecBase.hpp"
 #include "OsiRowCut.hpp"
 #include "BonAuxInfos.hpp"
@@ -72,6 +74,18 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// signal infeasibility of current node (found through bound tightening)
   mutable bool infeasNode_;
 
+  /// do Feasibility-based bound tightening
+  bool doFBBT_;
+
+  /// do Optimality-based bound tightening
+  bool doOBBT_;
+
+  /// do aggressive bound tightening
+  bool doABT_;
+
+  /// frequency of Optimality-based bound tightening
+  int logObbtLev_;
+
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 
@@ -79,10 +93,8 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// constructor
   CouenneCutGenerator  (Bonmin::OsiTMINLPInterface * = NULL,
+			Bonmin::BabSetupBase *base = NULL,
 			const struct ASL * = NULL, 
-			bool = false, 
-			enum conv_type = UNIFORM_GRID, 
-			int = 2,
 			JnlstPtr journalist = NULL);
 
   /// copy constructor
@@ -222,6 +234,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// Optimality Based Bound Tightening
   int obbt (CouenneSolverInterface *, OsiCuts &, t_chg_bounds *, Bonmin::BabInfo *) const;
+
+  /// Add list of options to be read from file
+  static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
 };
 
 #endif

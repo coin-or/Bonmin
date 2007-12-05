@@ -10,19 +10,13 @@
 #ifndef COUENNE_EXPRESSION_HPP
 #define COUENNE_EXPRESSION_HPP
 
-#define STACK_SIZE 10000
-
 #include <iostream>
 #include <set>
-#include <cmath>
-#include <algorithm>
-#include <iterator>
 
-#include <CouennePrecisions.hpp>
-#include <CouenneTypes.hpp>
+#include "CouennePrecisions.hpp"
+#include "CouenneTypes.hpp"
 
 class OsiBranchingInformation;
-class OsiBranchingObject;
 class OsiSolverInterface;
 class OsiCuts;
 
@@ -31,8 +25,6 @@ class CouenneCutGenerator;
 class CouenneObject;
 
 class exprAux;
-class exprUnary;
-class exprOp;
 class exprCopy;
 class exprVar;
 
@@ -50,29 +42,6 @@ struct compNode;
 class expression {
 
  protected:
-
-  /// Static members to be used "globally" by an expression upon
-  /// evaluation with a given value of the variables' or the bounds'
-  /// vectors.
-  ///
-  /// stack is used in evaluation as a LIFO structure where all
-  /// arguments of an expression (which are expressions themselves)
-  /// are stored (with a PUSH operation) after being evaluated, for
-  /// the current node to process them with a POP operation. PUSH and
-  /// POP operations are the *++sp and *sp-- instructions,
-  /// respectively, on the Stack Pointer variable sp.
-  /// 
-  /// STACK_SIZE should be enough for expressions where at each node of
-  /// the evaluation tree, DEPTH + #ARGUMENTS is at most STACK_SIZE,
-  /// where DEPTH is the depth of the evaluation node and #ARGUMENTS is
-  /// the number of arguments of the function in the node.
-
-  static CouNumber stack [STACK_SIZE];
-
-  /// Stack pointer: a cursor on a LIFO structure to hold the recently
-  /// computed argument(s) of an expression
-
-  static CouNumber *sp;
 
   /// These "global" variables, static members of expression, contain
   /// the current value of the variables' and bounds' vectors. The

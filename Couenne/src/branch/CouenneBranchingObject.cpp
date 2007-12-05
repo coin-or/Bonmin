@@ -86,15 +86,16 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, int index, int w
 
   //  assert (fabs (u-l) > COUENNE_EPS);
 
-  value_ = x;//midInterval (x, expression::Lbound (index_), expression::Ubound (index_));
   value_ = midInterval (x, expression::Lbound (index_), expression::Ubound (index_));
+  //  value_ = midInterval (x, expression::Lbound (index_), expression::Ubound (index_));
 
-  jnlst_->Printf(J_DETAILED, J_BRANCHING, "=== x%d will branch on %g (at %g) [%g,%g]\n  with firstBranch_ = %d\n", 
-		 index_, value_, 
-		 expression::Variable (index_),
-		 expression::Lbound   (index_),
-		 expression::Ubound   (index_),
-		 firstBranch_);
+  jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 
+		    "=== x%d will branch on %g (at %g) [%g,%g]\n  with firstBranch_ = %d\n", 
+		    index_, value_, 
+		    expression::Variable (index_),
+		    expression::Lbound   (index_),
+		    expression::Ubound   (index_),
+		    firstBranch_);
 }
 
 

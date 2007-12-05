@@ -12,9 +12,9 @@
 
 #include <iostream>
 
-#include <expression.hpp>
-#include <CouenneTypes.hpp>
-#include <exprUnary.hpp>
+#include "expression.hpp"
+#include "CouenneTypes.hpp"
+#include "exprUnary.hpp"
 
 
 /// general n-ary operator-type expression: requires argument
@@ -81,7 +81,7 @@ class exprOp: public expression {
     {return "??";}
 
   /// function for the evaluation of the expression
-  virtual inline CouNumber operator () ();
+  //  virtual inline CouNumber operator () ();
 
   /// dependence on variable set
   //  virtual int dependsOn (int * = NULL, int = 1);
@@ -152,6 +152,7 @@ class exprOp: public expression {
 
 /// expression evaluation -- n-ary operator (non-variable, non-constant)
 
+/*
 inline CouNumber exprOp::operator () () {
 
   /// Fetch argument list and compute it "recursively" (the operator()
@@ -165,5 +166,6 @@ inline CouNumber exprOp::operator () () {
 
   return 0;
 }
+*/
 
 #endif

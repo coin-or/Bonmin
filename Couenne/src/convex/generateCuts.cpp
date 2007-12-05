@@ -7,22 +7,18 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include "BonAuxInfos.hpp"
 #include "CglCutGenerator.hpp"
 
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 #include "CouenneSolverInterface.hpp"
 
-#include "BonAuxInfos.hpp"
-
 // fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 9.999e12
 
 // minimum #bound changed in obbt to generate further cuts
 #define THRES_NBD_CHANGED 1
-
-// depth of the BB tree until which obbt is applied at all nodes
-#define COU_OBBT_CUTOFF_LEVEL 3
 
 // maximum number of obbt iterations
 #define MAX_OBBT_ITER 1
@@ -90,8 +86,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   sprintf (fname, "relax_%d", count++);
   si.writeLp (fname);*/
 
-  jnlst_->Printf(J_DETAILED, J_CONVEXIFYING,":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
-    info.level, info.pass, info.inTree);
+  jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,
+		    ":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
+		    info.level, info.pass, info.inTree);
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
@@ -210,8 +207,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   problem_ -> installCutOff ();
 
-  if ((info.pass <= 0)
-      && (! boundTightening (&si, cs, chg_bds, babInfo))) {
+  if (doFBBT_ &&
+      (info.pass <= 0) &&
+      (! boundTightening (&si, cs, chg_bds, babInfo))) {
     goto end_genCuts;
   }
 
@@ -225,7 +223,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
 
-    if (info.pass <= 0) {
+    if (doABT_ && (info.pass <= 0)) {
       if (! aggressiveBT (&si, cs, chg_bds, babInfo))
 	goto end_genCuts;
       sparse2dense (ncols, chg_bds, changed, nchanged);
@@ -259,17 +257,18 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (nchanged)
     genColCuts (si, cs, nchanged, changed);
 
-#define USE_OBBT
-#ifdef  USE_OBBT
-
   // OBBT ////////////////////////////////////////////////////////////////////////////////
 
-  //  if ((!firstcall_ || (info.pass > 0)) && 
-  if ((!firstcall_ && (info.pass == 0)) && 
-      //  at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
-      ((info.level <= COU_OBBT_CUTOFF_LEVEL) ||
+  // to be carried out if
+
+  if (doOBBT_ &&                      // relative flag is checked
+      (logObbtLev_ != 0) &&           // relative frequency parameter is nonzero
+      !firstcall_ &&                  // not first call (there is no LP to work with)
+      (info.pass == 0) &&             // first round of cuts
+      ((logObbtLev_ < 0) ||           // always if logObbtLev_ = -1
+       (info.level <= logObbtLev_) || // at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
        // and then with probability inversely proportional to the level
-      (CoinDrand48 () < pow (2., (double) COU_OBBT_CUTOFF_LEVEL - (info.level + 1))))) {
+      (CoinDrand48 () < pow (2., (double) logObbtLev_ - (info.level + 1))))) {
 
     CouenneSolverInterface *csi = dynamic_cast <CouenneSolverInterface *> (si.clone (true));
 
@@ -304,7 +303,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     if (nImprov < 0)
       goto end_genCuts;
   }
-#endif
   
   {
     int ncuts;

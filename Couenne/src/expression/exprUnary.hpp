@@ -12,9 +12,9 @@
 
 #include <iostream>
 
-#include <expression.hpp>
-#include <CouenneTypes.hpp>
-#include <exprOp.hpp>
+#include "expression.hpp"
+#include "CouenneTypes.hpp"
+#include "exprOp.hpp"
 
 
 /// zero function (used by default by exprUnary)
