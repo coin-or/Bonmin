@@ -237,6 +237,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
+
+  /// Provide Journalist
+  ConstJnlstPtr Jnlst() const {return ConstPtr(jnlst_);}
 };
 
 #endif

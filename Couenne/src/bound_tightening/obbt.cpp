@@ -15,8 +15,6 @@
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
-//#define DEBUG
-
 ///
 ///
 
@@ -109,9 +107,8 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
 
   int nimprov = 0, ni;
  
-#ifdef DEBUG
-  printf (":::::: OBBT on originals ----------------\n");
-#endif
+  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+		  ":::::: OBBT on originals ----------------\n");
 
   if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR,  1)) < 0) {
     free (objcoe);
@@ -129,9 +126,8 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
 
   nimprov += ni;
 
-#ifdef DEBUG
-  printf (":::::: OBBT on auxiliaries --------------\n");
-#endif
+  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+		  ":::::: OBBT on auxiliaries --------------\n");
 
   if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX,  1)) < 0) {
     free (objcoe);
@@ -147,9 +143,8 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
     return ni;
   }
 
-#ifdef DEBUG
-  printf (":::::: ---------------------------------\n");
-#endif
+  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+		  ":::::: ---------------------------------\n");
 
   free (objcoe);
   delete warmstart;

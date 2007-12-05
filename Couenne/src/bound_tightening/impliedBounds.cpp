@@ -9,26 +9,25 @@
 
 #include "CouenneProblem.hpp"
 
-//#define DEBUG
-
 /// Bound tightening for auxiliary variables
 
 int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
   int nchg = 0; //< number of bounds changed for propagation
 
-#ifdef DEBUG
-  printf ("=====================implied\n");
-  int j=0;
-  for (int i=0; i < nVars (); i++) 
-    if (variables_ [i] -> Multiplicity () > 0) {
-      printf ("x_%03d [%+10g %+10g] ", i, 
-	      expression::Lbound (i),
-	      expression::Ubound (i));
-      if (!(++j % 6)) printf ("\n");
-    }
-  if (j % 6) printf ("\n");
-#endif
+  if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {  
+    Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"=====================implied\n");
+    int j=0;
+    for (int i=0; i < nVars (); i++) 
+      if (variables_ [i] -> Multiplicity () > 0) {
+	Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
+			"x_%03d [%+10g %+10g] ", i, 
+			expression::Lbound (i),
+			expression::Ubound (i));
+	if (!(++j % 6)) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
+      }
+    if (j % 6) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
+  }
 
   for (int ii = nVars (); ii--;) {
 
@@ -37,21 +36,14 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
     if (variables_ [i] -> Type () == AUX) {
 
       if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
-#ifdef DEBUG
-	printf ("#### w_%d has infeasible bounds [%g,%g]\n", 
-	i, lb_ [i], ub_ [i]);
-#endif
+	Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
+			"#### w_%d has infeasible bounds [%g,%g]\n", 
+			i, lb_ [i], ub_ [i]);
 	return -1;
       }
 
       //    if ((auxiliaries_ [i] -> Image () -> code () == COU_EXPRSUM) ||
       //	(auxiliaries_ [i] -> Image () -> code () == COU_EXPRGROUP))
-
-#ifdef DEBUG
-      CouNumber 
-	l0 = lb_ [i], 
-	u0 = ub_ [i];
-#endif
 
       /*if (auxiliaries_ [i] -> Image () -> Argument () || 
 	  auxiliaries_ [i] -> Image () -> ArgList  ()) {
@@ -76,12 +68,20 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       if (variables_ [i] -> Image () -> impliedBound 
 	  (variables_ [i] -> Index (), lb_, ub_, chg_bds)) {
 
-#ifdef DEBUG
-	printf ("impli %2d [%g,%g] -> [%g,%g]: ", i, l0, u0, lb_ [i], ub_ [i]);
+	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
+	  // todo: send all output through journalist
+	  CouNumber 
+	    l0 = lb_ [i], 
+	    u0 = ub_ [i];
+	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
+			  "impli %2d [%g,%g] -> [%g,%g]: ",
+			  i, l0, u0, lb_ [i], ub_ [i]);
 
-	variables_ [i]             -> print (std::cout); printf (" := ");
-	variables_ [i] -> Image () -> print (std::cout); printf ("\n");
-#endif
+	  variables_ [i]             -> print (std::cout);
+	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING," := ");
+	  variables_ [i] -> Image () -> print (std::cout);
+	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
+	}
 
 	/*
 	if (optimum_ && 

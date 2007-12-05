@@ -15,8 +15,6 @@
 #define MAX_BT_ITER 8
 #define THRES_IMPROVED 0
 
-//#define DEBUG
-
 
 // core of the bound tightening procedure
 
@@ -77,9 +75,8 @@ bool btCore (const CouenneCutGenerator *cg,
 	  babInfo -> setInfeasibleNode ();
       }
 
-#ifdef DEBUG
-    printf ("#### infeasible node at BT\n");
-#endif
+      cg->Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+			  "#### infeasible node at BT\n");
 
       return false;
     }

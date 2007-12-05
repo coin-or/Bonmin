@@ -15,8 +15,6 @@
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 
-//#define DEBUG
-
 #define MAX_ABT_ITER 8  // max # aggressive BT iterations
 
 // core of the bound tightening procedure
@@ -73,14 +71,17 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
   // create new, fictitious, bounds
   t_chg_bounds *f_chg = new t_chg_bounds [ncols];
 
-#ifdef DEBUG
-  CouNumber cutoff = problem_ -> getCutOff ();
-  int       objind = problem_ -> Obj (0) -> Body  () -> Index ();
-  for (int i=0; i<ncols; i++)
-    printf ("   %2d %+20g %+20g  | %+20g\n", i, lb [i], ub [i], X [i]);
-  printf ("-------------\nAggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
-	  lb [objind], cutoff, ncols);
-#endif
+  if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+    CouNumber cutoff = problem_ -> getCutOff ();
+    int       objind = problem_ -> Obj (0) -> Body  () -> Index ();
+    for (int i=0; i<ncols; i++)
+      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+		      "   %2d %+20g %+20g  | %+20g\n",
+		      i, lb [i], ub [i], X [i]);
+    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+		    "-------------\nAggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
+		    lb [objind], cutoff, ncols);
+  }
 
   int improved = 0, second, iter = 0;
 
@@ -103,9 +104,8 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 
       improved = 0;
 
-#ifdef DEBUG
-      printf ("x_%03d:-----------------------------\n  ### tighten left\n", index);
-#endif
+      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+		      "x_%03d:-----------------------------\n  ### tighten left\n", index);
 
       // tighten on left
       if ((X [index] >= lb [index] + COUENNE_EPS)
@@ -117,9 +117,7 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 
       second = 0;
 
-#ifdef DEBUG
-      printf ("  ### tighten right\n");
-#endif
+      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
 
       // tighten on right
       if ((X [index] <= ub [index] - COUENNE_EPS)
@@ -138,12 +136,12 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
   CoinCopyN (olb, ncols, lb);
   CoinCopyN (oub, ncols, ub);
 
-#ifdef DEBUG
-  printf ("------------------\n");
-  for (int i=0; i<ncols; i++)
-    printf ("   %2d %+20g %+20g  | %+20g\n", i, lb [i], ub [i], X [i]);
-  if (!retval) printf ("#### infeasible node from aggressive BT\n");
-#endif
+  if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"------------------\n");
+    for (int i=0; i<ncols; i++)
+      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"   %2d %+20g %+20g  | %+20g\n", i, lb [i], ub [i], X [i]);
+    if (!retval) Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"#### infeasible node from aggressive BT\n");
+  }
 
   delete [] f_chg;
   delete [] olb;
