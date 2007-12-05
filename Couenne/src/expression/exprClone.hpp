@@ -31,6 +31,10 @@ class exprClone: public exprCopy {
   exprClone (const exprClone &e):
     exprCopy (e) {}
 
+  /// Destructor
+  virtual ~exprClone () 
+  {copy_ = NULL;}
+
   /// cloning method
   exprClone *clone () const
   {return new exprClone (*this);}

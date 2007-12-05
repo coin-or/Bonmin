@@ -126,16 +126,8 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
 	issimple = true;
 
-	expression *vl, *vu;
-
-	var -> Image () -> getBounds (vl, vu);
-
-	CouNumber 
-	  lb = (*vl) (), 
-	  ub = (*vu) ();
-
-	delete vl;
-	delete vu;
+	CouNumber lb, ub;
+	var -> Image () -> getBounds (lb, ub);
 
 	if (csi -> getColLower () [index] < lb - COUENNE_EPS) {
 	  csi -> setColLower (index, lb); 

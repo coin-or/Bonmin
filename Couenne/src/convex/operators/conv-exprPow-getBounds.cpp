@@ -12,7 +12,6 @@
 #include "CouenneTypes.hpp"
 #include "exprPow.hpp"
 #include "exprConst.hpp"
-#include "exprCopy.hpp"
 #include "exprClone.hpp"
 #include "exprMax.hpp"
 #include "exprMin.hpp"
@@ -104,7 +103,7 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
       else {
 	if (isInt || isInvInt) {
 	  if (rndexp % 2)
-	    all [5] = new exprPow (new exprClone (ubbase), new exprConst (expon));
+	    all    [5] = new exprPow (new exprClone (ubbase), new exprConst (expon));
 	  else all [5] = new exprPow (new exprClone (lbbase), new exprConst (expon));
 	}
 	else all [5] = new exprConst (0.);

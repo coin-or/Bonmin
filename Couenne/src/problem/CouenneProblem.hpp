@@ -233,7 +233,7 @@ class CouenneProblem {
   void initAuxs (CouNumber *, CouNumber *, CouNumber *);
 
   /// Get auxiliary variables from original variables
-  void getAuxs (CouNumber * &);
+  void getAuxs (CouNumber *);
 
   /// "Forward" bound tightening, that is, propagate bound of variable
   /// \f$x\f$ in an expression \f$w = f(x)\f$ to the bounds of \f$w\f$.

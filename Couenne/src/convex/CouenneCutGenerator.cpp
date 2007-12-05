@@ -50,6 +50,9 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   base -> options () -> GetStringValue ("optimality_bt",   s, "couenne."); doOBBT_ = (s == "yes");
   base -> options () -> GetStringValue ("aggressive_fbbt", s, "couenne."); doABT_  = (s == "yes");
 
+  base -> options () -> GetStringValue ("violated_cuts_only", s, "couenne."); 
+  addviolated_ = (s == "yes");
+
   problem_ = new CouenneProblem (asl, jnlst_);
 }
 
@@ -195,6 +198,14 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "min-area", "minimizes total area of the two convexifications",
      "mid-point", "convex combination of current point and mid point",
      "");
+
+  roptions -> AddStringOption2 
+    ("violated_cuts_only",
+     "Yes if only violated convexification cuts should be added",
+     "yes",
+     "no","",
+     "yes","");
+
 
   roptions -> setOptionExtraInfo ("branch_pt_select", 15); // Why 15? TODO
 }

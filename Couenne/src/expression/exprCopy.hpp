@@ -45,6 +45,13 @@ class exprCopy: public expression {
     value_ = e.value_;
   }
 
+  /// Destructor -- CAUTION: this is the only destructive destructor,
+  /// exprClone and exprStore do not destroy anything
+  virtual ~exprCopy () {
+    if (copy_) 
+      delete copy_;
+  }
+
   /// Cloning method
   virtual exprCopy *clone () const
     {return new exprCopy (*this);}

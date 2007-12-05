@@ -113,20 +113,39 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
   printf (":::::: OBBT on originals ----------------\n");
 #endif
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR,  1)) < 0) return ni;
+  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR,  1)) < 0) {
+    free (objcoe);
+    delete warmstart;
+    return ni;
+  }
+
   nimprov += ni;
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR, -1)) < 0) return ni;
+  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR, -1)) < 0) {
+    free (objcoe);
+    delete warmstart;
+    return ni;
+  }
+
   nimprov += ni;
 
 #ifdef DEBUG
   printf (":::::: OBBT on auxiliaries --------------\n");
 #endif
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX,  1)) < 0) return ni;
+  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX,  1)) < 0) {
+    free (objcoe);
+    delete warmstart;
+    return ni;
+  }
+
   nimprov += ni;
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX, -1)) < 0) return ni;
+  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX, -1)) < 0) {
+    free (objcoe);
+    delete warmstart;
+    return ni;
+  }
 
 #ifdef DEBUG
   printf (":::::: ---------------------------------\n");

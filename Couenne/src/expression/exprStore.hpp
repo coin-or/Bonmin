@@ -37,6 +37,9 @@ class exprStore: public exprCopy {
     //copy_  = e.Original () -> clone ();
   }
 
+  /// Destructor
+  virtual ~exprStore () {copy_ = NULL;}
+
   /// Cloning method
   virtual exprStore *clone () const
     {return new exprStore (*this);}

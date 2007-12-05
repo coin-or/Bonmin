@@ -117,10 +117,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
 /// get auxiliary variables from original variables in the nonlinear
 /// problem
 
-void CouenneProblem::getAuxs (CouNumber * &x) {
-
-  // resize x to hold information on auxiliary variables
-  x = (CouNumber *) realloc (x, nVars () * sizeof (CouNumber));
+void CouenneProblem::getAuxs (CouNumber * x) {
 
   // save current addresses
   CouNumber 

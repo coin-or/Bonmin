@@ -30,6 +30,14 @@ CouenneSolverInterface::CouenneSolverInterface (const CouenneSolverInterface &sr
   knowInfeasible_ (src.knowInfeasible_),
   knowOptimal_ (src.knowOptimal_) {}
 
+
+/// Destructor
+CouenneSolverInterface::~CouenneSolverInterface () {
+  //  if (cutgen_)
+  //    delete cutgen_;
+}
+
+
 /// Solve initial LP relaxation 
 void CouenneSolverInterface::initialSolve () 
 {

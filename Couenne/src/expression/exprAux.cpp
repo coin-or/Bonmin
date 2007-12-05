@@ -76,7 +76,7 @@ exprAux::exprAux (const exprAux &e):
 exprAux::~exprAux () {
   if (image_) 
     delete image_; 
-  delete lb_; 
+  delete lb_;
   delete ub_;
 }
 

@@ -51,8 +51,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   readnl (asl);
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-    jnlst_->Printf (Ipopt::J_WARNING, J_PROBLEM,
-		    "Couenne: reading time %.3fs\n", now);
+    jnlst_ -> Printf (Ipopt::J_WARNING, J_PROBLEM,
+		      "Couenne: reading time %.3fs\n", now);
 
   now = CoinCpuTime ();
 
@@ -61,7 +61,6 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     print (std::cout);
     printf ("======================================\n");
   }
-
 
   // save -- for statistics purposes -- number of original
   // constraints. Some of them will be deleted as definition of
@@ -75,7 +74,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   fillQuadIndices ();
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-    jnlst_->Printf(Ipopt::J_WARNING, J_CONVEXIFYING,
+    jnlst_->Printf(Ipopt::J_WARNING, J_PROBLEM,
 		   "Couenne: standardization time %.3fs\n", now);
 
   //  readOptimum ("nc.txt", optimum_, bestObj_, this);

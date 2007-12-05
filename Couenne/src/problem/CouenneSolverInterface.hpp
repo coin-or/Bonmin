@@ -33,7 +33,7 @@ public:
   CouenneSolverInterface (const CouenneSolverInterface &src);
 
   /// Destructor
-  ~CouenneSolverInterface () {}
+  ~CouenneSolverInterface ();
 
   /// Clone
   virtual OsiSolverInterface * clone (bool copyData = true) const

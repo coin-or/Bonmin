@@ -3,13 +3,13 @@
  * Author:  Pietro Belotti
  * Purpose: generate Column Cuts for improved bounds
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CglCutGenerator.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <CouenneProblem.hpp>
+#include "CglCutGenerator.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
 
 /// generate OsiColCuts for improved (implied and propagated) bounds
 void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
@@ -38,7 +38,7 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
 
     register int index = changed [i];
 
-    if (index == ind_obj) 
+    if (index == ind_obj)
       continue;
 
     if (newLow [index] > newUpp [index])

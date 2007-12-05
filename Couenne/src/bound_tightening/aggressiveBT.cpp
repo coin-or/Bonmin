@@ -146,6 +146,9 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 #endif
 
   delete [] f_chg;
+  delete [] olb;
+  delete [] oub;
+
   return retval;// && btCore (this, psi, cs, chg_bds, babInfo, true); // !!!
   //return retval && btCore (this, psi, cs, chg_bds, babInfo, true);
 }

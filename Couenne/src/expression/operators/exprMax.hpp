@@ -15,7 +15,7 @@
 #include "exprStore.hpp"
 
 
-///  class max
+/// class for maxima
 
 class exprMax: public exprOp {
 

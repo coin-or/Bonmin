@@ -42,7 +42,7 @@ void expression::getBounds (CouNumber &lb, CouNumber &ub) {
   lb = (*le) ();
   ub = (*ue) ();
 
-  delete le; 
+  delete le;
   delete ue;
 }
 
