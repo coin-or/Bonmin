@@ -78,7 +78,7 @@ namespace Bonmin{
     int i;
     options()->GetIntegerValue("boundtightening_print_level", i, "bonmin.");
     journalist()->GetJournal("console")->
-      SetPrintLevel(J_BOUNDTIGHENING, (EJournalLevel)i);
+      SetPrintLevel(J_BOUNDTIGHTENING, (EJournalLevel)i);
     options()->GetIntegerValue("branching_print_level", i, "bonmin.");
     journalist()->GetJournal("console")->
       SetPrintLevel(J_BRANCHING, (EJournalLevel)i);
