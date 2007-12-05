@@ -7,15 +7,15 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <OsiRowCut.hpp>
-#include <OsiCuts.hpp>
+#include "OsiRowCut.hpp"
+#include "OsiCuts.hpp"
 
-#include <exprGroup.hpp>
-#include <exprBound.hpp>
-#include <exprMul.hpp>
+#include "exprGroup.hpp"
+#include "exprBound.hpp"
+#include "exprMul.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 /// Get lower and upper bound of an expression (if any)
 void exprGroup::getBounds (expression *&lb, expression *&ub) {

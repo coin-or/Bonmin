@@ -105,8 +105,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   t_chg_bounds *chg_bds = new t_chg_bounds [ncols];
 
-  if (jnlst_->ProduceOutput(J_VECTOR, J_CONVEXIFYING)) {
-    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
+  if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
+    jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
     for (int i = 0; i < problem_ -> nVars (); i++)
       jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+10g [%+10g,%+10g]\n", i,
 		     problem_ -> X  (i),
@@ -182,14 +182,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
 
-    if (jnlst_->ProduceOutput(J_VECTOR, J_CONVEXIFYING)) {
+    if (jnlst_ -> ProduceOutput (J_DETAILED, J_CONVEXIFYING)) {
       if (cs.sizeRowCuts ()) {
-	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,":::::::::::::::::::::constraint row cuts\n");
-	for (int i=0; i<cs.sizeRowCuts (); i++) cs.rowCutPtr (i) -> print ();
+	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,":::::::::::::::::::::constraint row cuts\n");
+	for (int i=0; i<cs.sizeRowCuts (); i++) 
+	  cs.rowCutPtr (i) -> print ();
       }
       if (cs.sizeColCuts ()) {
-	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,":::::::::::::::::::::constraint col cuts\n");
-	for (int i=0; i<cs.sizeColCuts (); i++) cs.colCutPtr (i) -> print ();
+	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,":::::::::::::::::::::constraint col cuts\n");
+	for (int i=0; i<cs.sizeColCuts (); i++) 
+	  cs.colCutPtr (i) -> print ();
       }
     }
 

@@ -50,7 +50,6 @@ Couenne/src/branch/projections.hpp -text
 Couenne/src/convex/CouenneCutGenerator.cpp -text
 Couenne/src/convex/CouenneCutGenerator.hpp -text
 Couenne/src/convex/addEnvelope.cpp -text
-Couenne/src/convex/checkNLP.cpp -text
 Couenne/src/convex/createCuts.cpp -text
 Couenne/src/convex/genColCuts.cpp -text
 Couenne/src/convex/genRowCuts.cpp -text
@@ -143,6 +142,7 @@ Couenne/src/problem/CouenneProblem.hpp -text
 Couenne/src/problem/CouenneProblemElem.hpp -text
 Couenne/src/problem/CouenneSolverInterface.cpp -text
 Couenne/src/problem/CouenneSolverInterface.hpp -text
+Couenne/src/problem/checkNLP.cpp -text
 Couenne/src/problem/constraint.cpp -text
 Couenne/src/problem/depGraph/checkCycles.cpp -text
 Couenne/src/problem/depGraph/depGraph.cpp -text

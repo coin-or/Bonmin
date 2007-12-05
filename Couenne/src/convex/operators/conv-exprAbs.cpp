@@ -7,11 +7,11 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <OsiSolverInterface.hpp>
-#include <CouenneTypes.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <exprAbs.hpp>
-#include <exprAux.hpp>
+#include "OsiSolverInterface.hpp"
+#include "CouenneTypes.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "exprAbs.hpp"
+#include "exprAux.hpp"
 
 
 // generate convexification cut for constraint w = |x|
@@ -24,17 +24,13 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
   int w_ind = w         -> Index (),
       x_ind = argument_ -> Index ();
 
-  expression *lbe, *ube;
-  argument_ -> getBounds (lbe, ube);
+  CouNumber l, u;
+  argument_ -> getBounds (l, u);
 
-  CouNumber l = (*lbe) (),
-            u = (*ube) ();
-
-  delete lbe;
-  delete ube;
-
-  bool cLeft  = !chg || (chg [x_ind].lower() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
-  bool cRight = !chg || (chg [x_ind].upper() != t_chg_bounds::UNCHANGED) || cg -> isFirst ();
+  bool
+    cbase  = !chg || cg -> isFirst (),
+    cLeft  = cbase || (chg [x_ind].lower() != t_chg_bounds::UNCHANGED),
+    cRight = cbase || (chg [x_ind].upper() != t_chg_bounds::UNCHANGED);
 
   // if l, u have the same sign, then w = x (l > 0) or w = -x (u < 0)
 
@@ -58,7 +54,8 @@ void exprAbs::generateCuts (exprAux *w, const OsiSolverInterface &si,
 	CouNumber slope = (u+l) / (u-l); // should be stable, l < 0 < u
 
 	// add an upper segment, which depends on the lower/upper bounds
-	if (cLeft || cRight) cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
+	if (cLeft || cRight) 
+	  cg -> createCut (cs, -l*(slope+1.), -1, w_ind, 1., x_ind, -slope);
       }
       else // slope = 1
 	if (cLeft) cg -> createCut (cs, -2*l, -1, w_ind, 1., x_ind, -1.);

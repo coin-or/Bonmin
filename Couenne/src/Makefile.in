@@ -109,9 +109,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
 	expression/exprVar.cpp expression/exprAux.cpp \
 	expression/expression.cpp expression/simplify/simplifiers.cpp \
-	expression/simplify/simplify.cpp convex/checkNLP.cpp \
-	convex/addEnvelope.cpp convex/createCuts.cpp \
-	convex/operators/conv-exprAbs.cpp \
+	expression/simplify/simplify.cpp convex/addEnvelope.cpp \
+	convex/createCuts.cpp convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprMul-genCuts.cpp \
@@ -142,7 +141,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	problem/problemIO.cpp problem/writeAMPL.cpp \
 	problem/writeGAMS.cpp problem/constraint.cpp \
 	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
-	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
+	problem/checkNLP.cpp problem/depGraph/depGraph.cpp \
+	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
 	bound_tightening/aggressiveBT.cpp \
 	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
@@ -169,8 +169,8 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	exprCos.lo exprSub.lo exprSum.lo exprMinMax.lo exprGroup.lo \
 	exprQuad.lo exprBQuad.lo compQuadFinBounds.lo exprOp.lo \
 	exprUnary.lo exprVar.lo exprAux.lo expression.lo \
-	simplifiers.lo simplify.lo checkNLP.lo addEnvelope.lo \
-	createCuts.lo conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
+	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
+	conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
 	conv-exprMul-genCuts.lo unifiedProdCuts.lo conv-exprOpp.lo \
 	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo powNewton.lo conv-exprSub.lo \
@@ -184,9 +184,9 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	auxiliarize.lo standardize.lo flattenMul.lo problem.lo \
 	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
 	constraint.lo fillQuadIndices.lo CouenneSolverInterface.lo \
-	depGraph.lo checkCycles.lo boundTightening.lo aggressiveBT.lo \
-	fake_tightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
-	impliedBounds.lo impliedBounds-exprSum.lo \
+	checkNLP.lo depGraph.lo checkCycles.lo boundTightening.lo \
+	aggressiveBT.lo fake_tightening.lo obbt.lo obbt_iter.lo \
+	tightenBounds.lo impliedBounds.lo impliedBounds-exprSum.lo \
 	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo \
 	impliedBounds-exprQuad.lo drawCuts.lo rootQ.lo \
 	$(am__objects_1)
@@ -426,9 +426,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	expression/exprOp.cpp expression/exprUnary.cpp \
 	expression/exprVar.cpp expression/exprAux.cpp \
 	expression/expression.cpp expression/simplify/simplifiers.cpp \
-	expression/simplify/simplify.cpp convex/checkNLP.cpp \
-	convex/addEnvelope.cpp convex/createCuts.cpp \
-	convex/operators/conv-exprAbs.cpp \
+	expression/simplify/simplify.cpp convex/addEnvelope.cpp \
+	convex/createCuts.cpp convex/operators/conv-exprAbs.cpp \
 	convex/operators/conv-exprDiv.cpp \
 	convex/operators/conv-exprMul.cpp \
 	convex/operators/conv-exprMul-genCuts.cpp \
@@ -459,7 +458,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	problem/problemIO.cpp problem/writeAMPL.cpp \
 	problem/writeGAMS.cpp problem/constraint.cpp \
 	problem/fillQuadIndices.cpp problem/CouenneSolverInterface.cpp \
-	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
+	problem/checkNLP.cpp problem/depGraph/depGraph.cpp \
+	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
 	bound_tightening/aggressiveBT.cpp \
 	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
@@ -1076,13 +1076,6 @@ simplify.lo: expression/simplify/simplify.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o simplify.lo `test -f 'expression/simplify/simplify.cpp' || echo '$(srcdir)/'`expression/simplify/simplify.cpp
 
-checkNLP.lo: convex/checkNLP.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT checkNLP.lo -MD -MP -MF "$(DEPDIR)/checkNLP.Tpo" -c -o checkNLP.lo `test -f 'convex/checkNLP.cpp' || echo '$(srcdir)/'`convex/checkNLP.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/checkNLP.Tpo" "$(DEPDIR)/checkNLP.Plo"; else rm -f "$(DEPDIR)/checkNLP.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/checkNLP.cpp' object='checkNLP.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o checkNLP.lo `test -f 'convex/checkNLP.cpp' || echo '$(srcdir)/'`convex/checkNLP.cpp
-
 addEnvelope.lo: convex/addEnvelope.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT addEnvelope.lo -MD -MP -MF "$(DEPDIR)/addEnvelope.Tpo" -c -o addEnvelope.lo `test -f 'convex/addEnvelope.cpp' || echo '$(srcdir)/'`convex/addEnvelope.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/addEnvelope.Tpo" "$(DEPDIR)/addEnvelope.Plo"; else rm -f "$(DEPDIR)/addEnvelope.Tpo"; exit 1; fi
@@ -1404,6 +1397,13 @@ CouenneSolverInterface.lo: problem/CouenneSolverInterface.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/CouenneSolverInterface.cpp' object='CouenneSolverInterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneSolverInterface.lo `test -f 'problem/CouenneSolverInterface.cpp' || echo '$(srcdir)/'`problem/CouenneSolverInterface.cpp
+
+checkNLP.lo: problem/checkNLP.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT checkNLP.lo -MD -MP -MF "$(DEPDIR)/checkNLP.Tpo" -c -o checkNLP.lo `test -f 'problem/checkNLP.cpp' || echo '$(srcdir)/'`problem/checkNLP.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/checkNLP.Tpo" "$(DEPDIR)/checkNLP.Plo"; else rm -f "$(DEPDIR)/checkNLP.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/checkNLP.cpp' object='checkNLP.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o checkNLP.lo `test -f 'problem/checkNLP.cpp' || echo '$(srcdir)/'`problem/checkNLP.cpp
 
 depGraph.lo: problem/depGraph/depGraph.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT depGraph.lo -MD -MP -MF "$(DEPDIR)/depGraph.Tpo" -c -o depGraph.lo `test -f 'problem/depGraph/depGraph.cpp' || echo '$(srcdir)/'`problem/depGraph/depGraph.cpp; \

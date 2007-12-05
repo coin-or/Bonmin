@@ -60,7 +60,6 @@ libCouenne_la_SOURCES = \
 	expression/expression.cpp \
 	expression/simplify/simplifiers.cpp \
 	expression/simplify/simplify.cpp \
-	convex/checkNLP.cpp \
 	convex/addEnvelope.cpp \
 	convex/createCuts.cpp \
 	convex/operators/conv-exprAbs.cpp \
@@ -107,6 +106,7 @@ libCouenne_la_SOURCES = \
 	problem/constraint.cpp \
 	problem/fillQuadIndices.cpp \
 	problem/CouenneSolverInterface.cpp \
+	problem/checkNLP.cpp \
 	problem/depGraph/depGraph.cpp \
 	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \

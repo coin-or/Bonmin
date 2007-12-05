@@ -262,8 +262,8 @@ class CouenneProblem {
   /// Make cutoff known to the problem
   void installCutOff ();
 
-  /// Provide Journalist
-  JnlstPtr Jnlst() {return jnlst_;}
+  /// Check if solution is MINLP feasible
+  bool checkNLP (const double *solution, const double obj, bool extended = true);
 };
 
 
