@@ -14,6 +14,7 @@
 #include "CoinFinite.hpp"
 #include "OsiBranchingObject.hpp"
 #include "exprAux.hpp"
+#include "CouenneJournalist.hpp"
 
 #define COUENNE_CROP 1
 #define COUENNE_LCROP (1e2*COUENNE_CROP)
@@ -41,13 +42,14 @@ public:
   {return alpha_;}
 
   /// Constructor
-  CouenneBranchingObject (int, int, CouNumber = - COIN_DBL_MAX, bool = false);
+  CouenneBranchingObject (JnlstPtr jnlst, int, int, CouNumber = - COIN_DBL_MAX, bool = false);
 
   /// Copy constructor
   CouenneBranchingObject (const CouenneBranchingObject &src):
     OsiTwoWayBranchingObject (src),
     index_   (src.index_),
-    integer_ (src.integer_) {}
+    integer_ (src.integer_),
+    jnlst_   (src.jnlst_) {}
 
   /// Cloning method
   virtual OsiBranchingObject * clone () const
@@ -74,6 +76,9 @@ protected:
   /// Global value for convex combination between current point and
   /// midpoint
   static CouNumber alpha_;
+
+  /// SmartPointer to the Journalist
+  JnlstPtr jnlst_;
 };
 
 /// returns a point "inside enough" a given interval, or x if it is already

@@ -137,6 +137,7 @@ Couenne/src/expression/operators/exprSum.cpp -text
 Couenne/src/expression/operators/exprSum.hpp -text
 Couenne/src/expression/simplify/simplifiers.cpp -text
 Couenne/src/expression/simplify/simplify.cpp -text
+Couenne/src/problem/CouenneJournalist.hpp -text
 Couenne/src/problem/CouenneProblem.cpp -text
 Couenne/src/problem/CouenneProblem.hpp -text
 Couenne/src/problem/CouenneProblemElem.hpp -text

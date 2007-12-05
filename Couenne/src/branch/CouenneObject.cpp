@@ -16,20 +16,20 @@
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
 
-//#define DEBUG
-
 /// global index for CouenneObjects
 //int CouObjStats::Index_;
 
 
 /// Constructor with information for branching point selection strategy
-CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base):
+CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
+			      JnlstPtr jnlst):
 
   reference_ (ref),
   brVarInd_  (-1), 
   brPts_     (NULL),
   whichWay_  (BRANCH_NONE),
-  strategy_  (MID_INTERVAL) {
+  strategy_  (MID_INTERVAL),
+  jnlst_     (jnlst) {
 
   if (ref -> Type () == VAR) {
     printf ("Couenne error: CouenneObject cannot be defined on original variables\n");
@@ -54,7 +54,8 @@ CouenneObject::CouenneObject (const CouenneObject &src):
   brVarInd_  (src.brVarInd_),
   brPts_     (NULL),
   whichWay_  (src.whichWay_),
-  strategy_  (src.strategy_) {
+  strategy_  (src.strategy_),
+  jnlst_     (src.jnlst_) {
 
   if (src.brPts_) {
 
@@ -211,18 +212,14 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     case TWO_LEFT:
     case TWO_RIGHT:
     case TWO_RAND:
-#ifdef DEBUG
-      printf ("2way Branch x%d at %g [%d] (%d)\n", brVarInd_, *brPts_, way, isint);
-#endif
-      return new CouenneBranchingObject (brVarInd_, way, *brPts_, isint);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "2way Branch x%d at %g [%d] (%d)\n", brVarInd_, *brPts_, way, isint);
+      return new CouenneBranchingObject (jnlst_, brVarInd_, way, *brPts_, isint);
     case THREE_LEFT:
     case THREE_CENTER:
     case THREE_RIGHT:
     case THREE_RAND:
-#ifdef DEBUG
-      printf ("3Way Branch x%d @ %g ][ %g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
-#endif
-      return new CouenneThreeWayBranchObj (brVarInd_, brPts_ [0], brPts_ [1], way, isint);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "3Way Branch x%d @ %g ][ %g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
+      return new CouenneThreeWayBranchObj (jnlst_, brVarInd_, brPts_ [0], brPts_ [1], way, isint);
     default: 
       printf ("CouenneObject::createBranch(): way=%d has no sense\n", way);
       exit (-1);
@@ -230,12 +227,13 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
   // if selectBranch returned -1, apply default branching rule
 
-#ifdef DEBUG
-  printf ("CO::createBranch: ");
-  reference_ -> print (std::cout);                              printf (" = ");
-  reference_ -> Image () -> print (std::cout);                  printf (" --> branch on ");
-  reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
-#endif
+  if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
+    // we should pipe all output through journalist
+    jnlst_->Printf(J_DETAILED, J_BRANCHING, "CO::createBranch: ");
+    reference_ -> print (std::cout);                              printf (" = ");
+    reference_ -> Image () -> print (std::cout);                  printf (" --> branch on ");
+    reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
+  }
 
   // constructor uses actual values of variables and bounds, update them
   expression::update (const_cast <CouNumber *> (info -> solution_),
@@ -286,8 +284,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-      return new CouenneBranchingObject (index, way, x, depvar -> isInteger ());  
+      return new CouenneBranchingObject (jnlst_, index, way, x, depvar -> isInteger ());  
   }
 
-  return new CouenneBranchingObject (ref_ind, way, xr, reference_ -> isInteger ());
+  return new CouenneBranchingObject (jnlst_, ref_ind, way, xr, reference_ -> isInteger ());
 }

@@ -11,11 +11,11 @@
 #ifndef COUENNETHREEWAYBRANCHOBJ_HPP
 #define COUENNETHREEWAYBRANCHOBJ_HPP
 
-#include <CoinFinite.hpp>
-#include <OsiBranchingObject.hpp>
+#include "CoinFinite.hpp"
+#include "OsiBranchingObject.hpp"
 
-#include <exprAux.hpp>
-#include <CouenneObject.hpp>
+#include "exprAux.hpp"
+#include "CouenneObject.hpp"
 
 
 /// \brief Spatial, three-way branching object. 
@@ -29,7 +29,8 @@ class CouenneThreeWayBranchObj: public OsiBranchingObject {
 public:
 
   /// Constructor
-  CouenneThreeWayBranchObj (int, 
+  CouenneThreeWayBranchObj (JnlstPtr jnlst,
+			    int, 
 			    CouNumber,
 			    CouNumber, 
 			    int  = THREE_CENTER,
@@ -42,7 +43,8 @@ public:
     lcrop_ (src.lcrop_),
     rcrop_ (src.rcrop_),
     firstBranch_ (src.firstBranch_),
-    integer_     (src.integer_) {}
+    integer_     (src.integer_),
+    jnlst_ (src.jnlst_){}
 
   /// Cloning method
   virtual OsiBranchingObject * clone () const
@@ -71,6 +73,9 @@ protected:
 
   /// True if the associated variable is integer
   bool integer_;
+
+  /// SmartPointer to the Journalist
+  JnlstPtr jnlst_;
 };
 
 #endif

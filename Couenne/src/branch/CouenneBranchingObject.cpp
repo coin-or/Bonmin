@@ -13,8 +13,6 @@
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 
-//#define DEBUG
-
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
 
@@ -53,10 +51,11 @@ CouNumber midInterval (CouNumber curr, CouNumber l, CouNumber u) {
  * operator () of that exprAux.
 */
 
-CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber brpoint, bool isint): 
+CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, int index, int way, CouNumber brpoint, bool isint): 
 
   index_   (index),
-  integer_ (isint) {
+  integer_ (isint),
+  jnlst_   (jnlst) {
 
   firstBranch_ =  (way == TWO_LEFT)      ? 0 : 
                  ((way == TWO_RIGHT)     ? 1 : 
@@ -88,15 +87,14 @@ CouenneBranchingObject::CouenneBranchingObject (int index, int way, CouNumber br
   //  assert (fabs (u-l) > COUENNE_EPS);
 
   value_ = x;//midInterval (x, expression::Lbound (index_), expression::Ubound (index_));
+  value_ = midInterval (x, expression::Lbound (index_), expression::Ubound (index_));
 
-#ifdef DEBUG
-  printf ("=== x%d will branch on %g (at %g) [%g,%g]\n", 
-	  index_, value_, 
-	  expression::Variable (index_),
-	  expression::Lbound   (index_),
-	  expression::Ubound   (index_));
-  printf ("  with firstBranch_ = %d\n", firstBranch_);
-#endif
+  jnlst_->Printf(J_DETAILED, J_BRANCHING, "=== x%d will branch on %g (at %g) [%g,%g]\n  with firstBranch_ = %d\n", 
+		 index_, value_, 
+		 expression::Variable (index_),
+		 expression::Lbound   (index_),
+		 expression::Ubound   (index_),
+		 firstBranch_);
 }
 
 
@@ -118,15 +116,15 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     u    = solver -> getColUpper () [index_],
     brpt = value_;
 
-#ifdef DEBUG
-  if (way) {
-    if      (value_ < l)             printf ("Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
-    else if (value_ < l+COUENNE_EPS) printf ("## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
-  } else {
-    if      (value_ > u)             printf ("Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
-    else if (value_ > u+COUENNE_EPS) printf ("## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
+  if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
+    if (way) {
+      if      (value_ < l)             jnlst_->Printf(J_DETAILED, J_BRANCHING, "Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
+      else if (value_ < l+COUENNE_EPS) jnlst_->Printf(J_DETAILED, J_BRANCHING, "## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
+    } else {
+      if      (value_ > u)             jnlst_->Printf(J_DETAILED, J_BRANCHING, "Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
+      else if (value_ > u+COUENNE_EPS) jnlst_->Printf(J_DETAILED, J_BRANCHING, "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
+    }
   }
-#endif
 
   if (brpt < l) brpt = l;
   if (brpt > u) brpt = u;
@@ -136,10 +134,8 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   // TODO: apply bound tightening to evaluate change in dual bound
 
-#ifdef DEBUG
-  printf ("### Branch: x%d %c= %g\n", 
+  jnlst_->Printf(J_DETAILED, J_BRANCHING, "### Branch: x%d %c= %g\n", 
   	  index_, way ? '>' : '<', integer_ ? (way ? ceil : floor) (brpt) : brpt);
-#endif
 
   branchIndex_++;
   return 0.; // estimated change in objective function

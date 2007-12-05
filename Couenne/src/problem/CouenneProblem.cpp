@@ -24,10 +24,9 @@
 #include "CouenneProblemElem.hpp"
 #include "depGraph.hpp"
 
-//#define DEBUG
-
 /// constructor
-CouenneProblem::CouenneProblem (const struct ASL *asl):
+CouenneProblem::CouenneProblem (const struct ASL *asl,
+				JnlstPtr jnlst):
 
   auxSet_    (NULL), 
   curnvars_  (-1),
@@ -40,7 +39,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   ndefined_  (0),
   graph_     (NULL),
   nOrig_     (0),
-  cutoff_    (COIN_DBL_MAX) {
+  cutoff_    (COIN_DBL_MAX),
+  jnlst_(jnlst) {
 
   x_ = lb_ = ub_ = NULL; 
 
@@ -51,13 +51,17 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   readnl (asl);
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-    printf ("Couenne: reading time %.3fs\n", now);
+    jnlst_->Printf (Ipopt::J_WARNING, J_PROBLEM,
+		    "Couenne: reading time %.3fs\n", now);
 
   now = CoinCpuTime ();
-#ifdef DEBUG
-  print (std::cout);
-  printf ("======================================\n");
-#endif
+
+  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+    // we should put that also through the journalist
+    print (std::cout);
+    printf ("======================================\n");
+  }
+
 
   // save -- for statistics purposes -- number of original
   // constraints. Some of them will be deleted as definition of
@@ -71,13 +75,15 @@ CouenneProblem::CouenneProblem (const struct ASL *asl):
   fillQuadIndices ();
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-    printf ("Couenne: standardization time %.3fs\n", now);
+    jnlst_->Printf(Ipopt::J_WARNING, J_CONVEXIFYING,
+		   "Couenne: standardization time %.3fs\n", now);
 
   //  readOptimum ("nc.txt", optimum_, bestObj_, this);
 
-#ifdef DEBUG
-  print (std::cout);
-#endif
+  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+    // We should route that also through the journalist
+    print (std::cout);
+  }
 
   //writeAMPL ("extended-aw.mod", true);
   //writeAMPL ("extended-pb.mod", false);
@@ -106,7 +112,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   graph_     (NULL),
   nOrig_     (p.nOrig_),
   nOrigCons_ (p.nOrigCons_),
-  cutoff_    (p.cutoff_) { // needed only in standardize (), unnecessary to update it
+  cutoff_    (p.cutoff_),
+  jnlst_     (p.jnlst_) { // needed only in standardize (), unnecessary to update it
 
   // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
 

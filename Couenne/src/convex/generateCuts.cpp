@@ -15,8 +15,6 @@
 
 #include "BonAuxInfos.hpp"
 
-//#define DEBUG
-
 // fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 9.999e12
 
@@ -92,10 +90,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   sprintf (fname, "relax_%d", count++);
   si.writeLp (fname);*/
 
-#ifdef DEBUG
-  printf (":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
+  jnlst_->Printf(J_DETAILED, J_CONVEXIFYING,":::::::::: level = %d, pass = %d, intree=%d\n",// Bounds:\n", 
     info.level, info.pass, info.inTree);
-#endif
 
   Bonmin::BabInfo * babInfo = dynamic_cast <Bonmin::BabInfo *> (si.getAuxiliaryInfo ());
 
@@ -112,15 +108,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   t_chg_bounds *chg_bds = new t_chg_bounds [ncols];
 
-#ifdef DEBUG
-  printf ("=============================\n");
-  for (int i = 0; i < problem_ -> nVars (); i++)
-    printf ("%4d %+10g [%+10g,%+10g]\n", i,
-	    problem_ -> X  (i),
-	    problem_ -> Lb (i),
-	    problem_ -> Ub (i));
-  printf ("=============================\n");
-#endif
+  if (jnlst_->ProduceOutput(J_VECTOR, J_CONVEXIFYING)) {
+    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
+    for (int i = 0; i < problem_ -> nVars (); i++)
+      jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+10g [%+10g,%+10g]\n", i,
+		     problem_ -> X  (i),
+		     problem_ -> Lb (i),
+		     problem_ -> Ub (i));
+    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
+  }
 
   if (firstcall_) {
 
@@ -189,16 +185,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
 
-#ifdef DEBUG
-    if (cs.sizeRowCuts ()) {
-      printf (":::::::::::::::::::::constraint row cuts\n");
-      for (int i=0; i<cs.sizeRowCuts (); i++) cs.rowCutPtr (i) -> print ();
+    if (jnlst_->ProduceOutput(J_VECTOR, J_CONVEXIFYING)) {
+      if (cs.sizeRowCuts ()) {
+	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,":::::::::::::::::::::constraint row cuts\n");
+	for (int i=0; i<cs.sizeRowCuts (); i++) cs.rowCutPtr (i) -> print ();
+      }
+      if (cs.sizeColCuts ()) {
+	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,":::::::::::::::::::::constraint col cuts\n");
+	for (int i=0; i<cs.sizeColCuts (); i++) cs.colCutPtr (i) -> print ();
+      }
     }
-    if (cs.sizeColCuts ()) {
-      printf (":::::::::::::::::::::constraint col cuts\n");
-      for (int i=0; i<cs.sizeColCuts (); i++) cs.colCutPtr (i) -> print ();
-    }
-#endif
 
   } else updateBranchInfo (si, problem_, chg_bds, info); // info.depth >= 0 || info.pass >= 0
 
@@ -301,9 +297,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     delete csi;
 
-#ifdef DEBUG
-    if (nImprov < 0) printf ("### infeasible node after OBBT\n");
-#endif
+    if (nImprov < 0)
+      jnlst_->Printf(J_DETAILED, J_CONVEXIFYING,
+		     "### infeasible node after OBBT\n");
 
     if (nImprov < 0)
       goto end_genCuts;
@@ -313,7 +309,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   {
     int ncuts;
     if (firstcall_ && ((ncuts = cs.sizeRowCuts ()) >= 1))
-      printf ("Couenne: %d initial row cuts\n", ncuts);
+      jnlst_->Printf(J_SUMMARY, J_CONVEXIFYING,
+		     "Couenne: %d initial row cuts\n", ncuts);
   }
 
   // end of OBBT //////////////////////////////////////////////////////////////////////

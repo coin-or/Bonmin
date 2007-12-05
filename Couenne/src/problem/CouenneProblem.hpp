@@ -18,6 +18,7 @@
 #include "expression.hpp"
 #include "exprAux.hpp"
 #include "CouenneProblemElem.hpp"
+#include "CouenneJournalist.hpp"
 
 struct ASL;
 struct expr;
@@ -103,9 +104,12 @@ class CouenneProblem {
   /// Cut off: known value of best integer feasible solution
   mutable CouNumber cutoff_;
 
+  /// SmartPointer to the Journalist
+  JnlstPtr jnlst_;
+
  public:
 
-  CouenneProblem  (const ASL * = NULL);     ///< Constructor
+  CouenneProblem  (const ASL * = NULL, JnlstPtr jnlst = NULL);     ///< Constructor
   CouenneProblem  (const CouenneProblem &); ///< Copy constructor
   ~CouenneProblem ();                       ///< Destructor
 
@@ -257,6 +261,9 @@ class CouenneProblem {
 
   /// Make cutoff known to the problem
   void installCutOff ();
+
+  /// Provide Journalist
+  JnlstPtr Jnlst() {return jnlst_;}
 };
 
 

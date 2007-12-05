@@ -21,7 +21,8 @@
 CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 					  const struct ASL *asl, 
 					  bool addviolated,
-					  enum conv_type convtype, int nSamples):
+					  enum conv_type convtype, int nSamples,
+					  JnlstPtr jnlst):
 
   OaDecompositionBase (nlp, NULL, NULL, 0,0,0),
 
@@ -36,9 +37,10 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   objValue_       (- DBL_MAX),
   nlp_            (nlp),
   BabPtr_         (NULL),
-  infeasNode_     (false) {
+  infeasNode_     (false),
+  jnlst_          (jnlst) {
 
-  problem_ = new CouenneProblem (asl);
+  problem_ = new CouenneProblem (asl, jnlst_);
 }
 
 
@@ -63,7 +65,8 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   objValue_    (src. objValue_),
   nlp_         (src. nlp_),
   BabPtr_      (src. BabPtr_),
-  infeasNode_  (src. infeasNode_)  {}
+  infeasNode_  (src. infeasNode_),
+  jnlst_       (src. jnlst_)  {}
 
 
 #define MAX_SLOPE 1e3
@@ -75,7 +78,8 @@ int CouenneCutGenerator::addSegment (OsiCuts &cs, int wi, int xi,
 
   if (fabs (x2-x1) < COUENNE_EPS) {
     if (fabs (y2-y1) > MAX_SLOPE * COUENNE_EPS)
-      printf ("warning, discontinuity of %e over an interval of %e\n", y2-y1, x2-x1);
+      jnlst_->Printf(J_WARNING, J_CONVEXIFYING,
+		     "warning, discontinuity of %e over an interval of %e\n", y2-y1, x2-x1);
     else return createCut (cs, y2, (int) 0, wi, 1.);
   }
 

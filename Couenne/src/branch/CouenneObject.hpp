@@ -16,6 +16,9 @@
 #include "OsiBranchingObject.hpp"
 
 #include "exprVar.hpp"
+
+#include "CouenneJournalist.hpp"
+
 //#include "CouObjStats.hpp"
 
 //class CouObjStats;
@@ -43,7 +46,8 @@ public:
   enum brSelStrat {MID_INTERVAL, MIN_AREA, BALANCED};
 
   /// Constructor with information for branching point selection strategy
-  CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base = NULL);
+  CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
+		 JnlstPtr jnlst);
 
   /// Destructor
   ~CouenneObject () 
@@ -103,6 +107,9 @@ protected:
 
   /// Branching point selection strategy
   enum brSelStrat strategy_;
+
+  /// SmartPointer to the Journalist
+  JnlstPtr jnlst_;
 };
 
 //

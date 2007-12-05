@@ -45,8 +45,9 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
       || ((fabs (lb) > COU_MAX_COEFF) &&
 	  (fabs (ub) > COU_MAX_COEFF))) {
     if (!warned_large_coeff) {
-      printf ("### Discarding cut, large coeff/rhs: %g (%d), %g (%d), %g (%d); [%g,%g]\n", 
-	      c1, i1, c2, i2, c3, i3, lb, ub);
+      jnlst_->Printf(J_WARNING, J_CONVEXIFYING,
+		     "### Discarding cut, large coeff/rhs: %g (%d), %g (%d), %g (%d); [%g,%g]\n", 
+		     c1, i1, c2, i2, c3, i3, lb, ub);
       warned_large_coeff = true;
     }
     return 0;
@@ -86,12 +87,12 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
     if (i3 >= 0) lhs += c3 * best [i3];
 
     if (lhs > ub + COUENNE_EPS)
-      {printf ("### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g >= %g [%g]\n", 
-	       i1,i2,i3, c1,c2,c3, lhs, ub, lhs - ub); print = true;}
+      {jnlst_->Printf(J_WARNING, J_CONVEXIFYING,"### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g >= %g [%g]\n", 
+		      i1,i2,i3, c1,c2,c3, lhs, ub, lhs - ub); print = true;}
 
     if (lhs < lb - COUENNE_EPS)
-      {printf ("### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g <= %g [%g]\n", 
-	       i1,i2,i3, c1,c2,c3, lhs, lb, lb - lhs); print = true;}
+      {jnlst_->Printf(J_WARNING, J_CONVEXIFYING,"### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g <= %g [%g]\n", 
+		      i1,i2,i3, c1,c2,c3, lhs, lb, lb - lhs); print = true;}
   }
 
   // You are here if:
@@ -110,7 +111,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 	&& (fabs (lb) > COU_MAX_COEFF * COUENNE_EPS)
 	&& (fabs (ub) > COU_MAX_COEFF * COUENNE_EPS)) {
 
-      printf ("#### nonsense column cut: %e <= %e w_%d <= %e\n", lb, c1, i1, ub);
+      jnlst_->Printf(J_WARNING, J_CONVEXIFYING,"#### nonsense column cut: %e <= %e w_%d <= %e\n", lb, c1, i1, ub);
       return 0;
     }
 

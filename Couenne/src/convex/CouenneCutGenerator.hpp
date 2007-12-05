@@ -18,6 +18,7 @@
 #include "BonCbc.hpp"
 
 #include "CouenneTypes.hpp"
+#include "CouenneJournalist.hpp"
 
 class CouenneProblem;
 class CouenneSolverInterface;
@@ -71,6 +72,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// signal infeasibility of current node (found through bound tightening)
   mutable bool infeasNode_;
 
+  /// SmartPointer to the Journalist
+  JnlstPtr jnlst_;
+
  public:
 
   /// constructor
@@ -78,7 +82,8 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 			const struct ASL * = NULL, 
 			bool = false, 
 			enum conv_type = UNIFORM_GRID, 
-			int = 2);
+			int = 2,
+			JnlstPtr journalist = NULL);
 
   /// copy constructor
   CouenneCutGenerator  (const CouenneCutGenerator &);
