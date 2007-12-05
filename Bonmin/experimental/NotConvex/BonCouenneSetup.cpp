@@ -69,6 +69,24 @@ namespace Bonmin{
     aslfg_ = new SmartAsl;
     aslfg_->asl = readASLfg (argv);
 
+    /** Set the output level for the journalist for all Couenne
+     categories.  We probably want to make that a bit more flexible
+     later. */
+    int i;
+    options()->GetIntegerValue("boundtightening_print_level", i, "bonmin.");
+    journalist()->GetJournal("console")->
+      SetPrintLevel(J_BOUNDTIGHENING, (EJournalLevel)i);
+    options()->GetIntegerValue("branching_print_level", i, "bonmin.");
+    journalist()->GetJournal("console")->
+      SetPrintLevel(J_BRANCHING, (EJournalLevel)i);
+    options()->GetIntegerValue("convexifying_print_level", i, "bonmin.");
+    journalist()->GetJournal("console")->
+      SetPrintLevel(J_CONVEXIFYING, (EJournalLevel)i);
+    options()->GetIntegerValue("problem_print_level", i, "bonmin.");
+    printf(" i = %d\n", i);
+    journalist()->GetJournal("console")->
+      SetPrintLevel(J_PROBLEM, (EJournalLevel)i);
+
     /* Initialize Couenne cut generator.*/
     int ivalue, num_points;
     options()->GetEnumValue("convexification_type", ivalue,"bonmin.");
@@ -76,7 +94,8 @@ namespace Bonmin{
     options()->GetIntegerValue("convexification_points",num_points,"bonmin.");
     
     CouenneCutGenerator * couenneCg = 
-      new CouenneCutGenerator(ci, aslfg_->asl, true, convtype, num_points);
+      new CouenneCutGenerator(ci, aslfg_->asl, true, convtype, num_points,
+			      journalist());
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
@@ -154,7 +173,7 @@ namespace Bonmin{
 	  aux -> Image () -> print (std::cout); printf ("\n");*/
 
 	  // then we may have to branch on it
-	  objects [nobj] = new CouenneObject (aux, this);
+	  objects [nobj] = new CouenneObject (aux, this, journalist());
 	  objects [nobj++] -> setPriority (1);
 	}
       }
@@ -307,6 +326,27 @@ void
      "");
 
     roptions->setOptionExtraInfo("branch_pt_select", 15); // Why 15? TODO
+
+    roptions->AddBoundedIntegerOption(
+      "branching_print_level",
+      "Output level for braching code in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING,
+      "");
+    roptions->AddBoundedIntegerOption(
+      "boundtightening_print_level",
+      "Output level for bound tightening code in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING,
+      "");
+    roptions->AddBoundedIntegerOption(
+      "convexifying_print_level",
+      "Output level for convexifying code in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING,
+      "");
+    roptions->AddBoundedIntegerOption(
+      "problem_print_level",
+      "Output level for problem manipulation code in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING,
+      "");
   }
   //  OsiTMINLPInterface * BonminAmplSetup::createOsiInterface{
   //}  
