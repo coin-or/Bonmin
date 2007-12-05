@@ -98,6 +98,10 @@ CouenneInterface::extractLinearRelaxation
    for (register int i=0; i<numcols; i++)
      si.addCol (0, NULL, NULL, lb [i], ub [i], 0);
 
+   // add auxiliary variables (unbounded for now)
+   for (register int i=numcols; i<numcolsconv; i++)
+     si.addCol (0, NULL, NULL, -COIN_DBL_MAX, COIN_DBL_MAX, 0);
+
    // get initial relaxation
    OsiCuts cs;
    couenneCg.generateCuts (si, cs);

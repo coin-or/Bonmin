@@ -10,9 +10,11 @@
 #define BonCouenneSetup_H
 #include "BonBabSetupBase.hpp"
 #include "CbcFeasibilityBase.hpp"
+//#include "CouenneCutGenerator.hpp"
 
 struct ASL;
 
+class CouenneCutGenerator;
 
 
 namespace Bonmin{
@@ -32,8 +34,9 @@ public:
     /** Default constructor*/
     CouenneSetup():
     BabSetupBase(),
-    aslfg_(NULL){}
-    
+    aslfg_(NULL),
+    CouennePtr_ (NULL) {}
+
     /** Copy constructor.*/
     CouenneSetup(const CouenneSetup& other):
       BabSetupBase(other),
@@ -59,6 +62,12 @@ public:
 
 private:
       SmartPtr<SmartAsl> aslfg_;
+
+    /// hold a reference to Couenne cut generator to delete it at
+    /// last. The alternative would be to clone it every time the
+    /// CouenneSolverInterface is cloned (that is, at each call of
+    /// Optimality-based bound tightening).
+    CouenneCutGenerator *CouennePtr_;
   };
   
 }

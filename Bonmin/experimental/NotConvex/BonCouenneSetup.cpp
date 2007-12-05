@@ -51,6 +51,8 @@ namespace Bonmin{
   }
   
   CouenneSetup::~CouenneSetup(){
+    //    if (CouennePtr_)
+    //      delete CouennePtr_;
   }
   
   void CouenneSetup::InitializeCouenne(char **& argv){
@@ -200,6 +202,8 @@ namespace Bonmin{
       // set cut gen pointer
       dynamic_cast <CouenneSolverInterface *> (continuousSolver_) -> setCutGenPtr (couenneCg);
     }
+
+    CouennePtr_ = couenneCg;
 
     /*Setup heuristic to solve nlp problems.*/
     int doNlpHeurisitic = 0;
