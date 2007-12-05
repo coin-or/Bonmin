@@ -790,9 +790,9 @@ namespace Bonmin
         AmplOptionsList::String_Option,
         "Choose the variable selection strategy");
 
-    amplOptList->AddAmplOption("bonmin.branch_pt_select","bonmin.branch_pt_select",
+    /*amplOptList->AddAmplOption("couenne.branch_pt_select","couenne.branch_pt_select",
         AmplOptionsList::String_Option,
-        "Choose policy to select branching point");
+        "Choose policy to select branching point");*/
 
     amplOptList->AddAmplOption("bonmin.number_strong_branch", "bonmin.number_strong_branch",
         AmplOptionsList::Integer_Option,

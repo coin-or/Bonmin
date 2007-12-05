@@ -11,7 +11,7 @@
 
 #include "BonCouenneInterface.hpp"
 #include "CoinHelperFunctions.hpp"
-#include <CouenneProblem.hpp>
+#include "CouenneProblem.hpp"
 
 namespace Bonmin {
 
@@ -65,17 +65,16 @@ CouenneInterface::extractLinearRelaxation
      initialSolve ();
 
      // TODO: solve nlp, round as in BonNlpHeuristic, and re-solve
-     // TODO: better test is checkNLP
 
-     if (getNumIntegers () == 0) { // only if no integer variables
+     const CouNumber 
+       obj      = getObjValue (),
+      *solution = getColSolution ();
 
-       const CouNumber 
-	 obj      = getObjValue ();
-	 //	 *solution = getColSolution ();
+     if (couenneCg.Problem () -> checkNLP (solution, obj, false)) {
 
        // set cutoff to take advantage of bound tightening
        couenneCg. Problem () -> setCutOff (obj);
-       /*
+
        OsiAuxInfo * auxInfo = si. getAuxiliaryInfo ();
        BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
 
@@ -83,7 +82,6 @@ CouenneInterface::extractLinearRelaxation
 	 babInfo -> setNlpSolution (solution, getNumCols (), obj);
 	 babInfo -> setHasNlpSolution (true);
        }
-       */
      }
    }
 
@@ -94,13 +92,9 @@ CouenneInterface::extractLinearRelaxation
      *lb = getColLower (),
      *ub = getColUpper ();
 
-   // add original variables to the new problem
-   for (register int i=0; i<numcols; i++)
-     si.addCol (0, NULL, NULL, lb [i], ub [i], 0);
-
-   // add auxiliary variables (unbounded for now)
-   for (register int i=numcols; i<numcolsconv; i++)
-     si.addCol (0, NULL, NULL, -COIN_DBL_MAX, COIN_DBL_MAX, 0);
+   // add original and auxiliary variables to the new problem
+   for (int i=0;       i<numcols;     i++) si.addCol (0, NULL, NULL, lb [i],        ub [i],       0);
+   for (int i=numcols; i<numcolsconv; i++) si.addCol (0, NULL, NULL, -COIN_DBL_MAX, COIN_DBL_MAX, 0);
 
    // get initial relaxation
    OsiCuts cs;
