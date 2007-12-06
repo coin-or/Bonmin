@@ -51,6 +51,10 @@ class exprCos: public exprUnary {
   virtual enum expr_type code ()
   {return COU_EXPRCOS;}
 
+  /// implied bound processing
+  bool impliedBound (int index, CouNumber *l, CouNumber *u, t_chg_bounds *chg)
+  {return trigImpliedBound (COU_COSINE, index, argument_ -> Index (), l, u, chg);}
+
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
   CouNumber selectBranch (const CouenneObject *obj, const OsiBranchingInformation *info,

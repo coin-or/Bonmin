@@ -20,6 +20,11 @@
 enum cou_trig {COU_SINE, COU_COSINE};
 
 
+/// normalize angle within [0,b] (typically, pi or 2pi)
+inline CouNumber modulo (register CouNumber a, register CouNumber b)
+  {return a - b * floor (a/b);}
+
+
 /// generalized procedure for both sine and cosine
 CouNumber trigSelBranch (const CouenneObject *obj, 
 			 const OsiBranchingInformation *info,
@@ -27,6 +32,11 @@ CouNumber trigSelBranch (const CouenneObject *obj,
 			 double * &brpts, 
 			 int &way,
 			 enum cou_trig type);
+
+
+/// generalized implied bound procedure for sine/cosine
+bool trigImpliedBound (enum cou_trig, int, int, CouNumber *, CouNumber *, t_chg_bounds *);
+
 
 /// class for sin f(x)
 
@@ -66,6 +76,10 @@ class exprSin: public exprUnary {
   /// code for comparisons
   virtual enum expr_type code () 
   {return COU_EXPRSIN;}
+
+  /// implied bound processing
+  bool impliedBound (int index, CouNumber *l, CouNumber *u, t_chg_bounds *chg)
+  {return trigImpliedBound (COU_SINE, index, argument_ -> Index (), l, u, chg);}
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments

@@ -79,11 +79,6 @@ void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si,
 }
 
 
-/// normalize angle within [0,b] (typically, pi or 2pi)
-inline CouNumber modulo (register CouNumber a, register CouNumber b)
-  {return a - b * floor (a/b);}
-
-
 /// restrict to quarter of the interval [0,2pi]
 int bayEnvelope (const CouenneCutGenerator *, OsiCuts &, int, int, 
 		 CouNumber, CouNumber, CouNumber, bool &, bool &);
