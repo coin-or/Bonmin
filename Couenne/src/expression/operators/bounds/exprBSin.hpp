@@ -18,6 +18,7 @@
 # define M_PI 3.14159265358979323846
 #endif
 
+
 ///  class to compute lower bound of a sine based on the bounds on its
 ///  arguments
 
@@ -34,19 +35,19 @@ class exprLBSin: public exprOp {
 
   /// cloning method
   expression *clone () const
-    {return new exprLBSin  (arglist_ [0] -> clone (), 
-			    arglist_ [1] -> clone ());}
+    {return new exprLBSin (arglist_ [0] -> clone (), 
+			   arglist_ [1] -> clone ());}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// print position (PRE, INSIDE, POST)
+  enum pos printPos () const
+    {return PRE;}
+
   /// print operator
   std::string printOp () const
     {return "LB_Sin";}
-
-  /// print position
-  enum pos printPos () const
-    {return PRE;}
 };
 
 
@@ -61,7 +62,7 @@ inline CouNumber exprLBSin::operator () () {
   CouNumber pi2 = 2 * M_PI;
  
   if ((u - l > pi2) ||        // 1) interval spans whole cycle
-      (floor (l/pi2 - 0.75) < // 2) there is a 3/2 pi + 2k pi in between
+      (floor (l/pi2 - 0.75) < // 2) there is a 3/2 pi + 2k pi between l and u
        floor (u/pi2 - 0.75))) 
     return -1.;
 
@@ -87,8 +88,8 @@ class exprUBSin: public exprOp {
 
   /// cloning method
   expression *clone () const
-    {return new exprUBSin  (arglist_ [0] -> clone (), 
-			    arglist_ [1] -> clone ());}
+    {return new exprUBSin (arglist_ [0] -> clone (), 
+			   arglist_ [1] -> clone ());}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();
@@ -97,7 +98,7 @@ class exprUBSin: public exprOp {
   std::string printOp () const
     {return "UB_Sin";}
 
-  /// print position
+  /// print position (PRE, INSIDE, POST)
   enum pos printPos () const
     {return PRE;}
 };
@@ -114,7 +115,7 @@ inline CouNumber exprUBSin::operator () () {
   CouNumber pi2 = 2 * M_PI;
 
   if ((u - l > pi2) ||        // 1) interval spans whole cycle
-      (floor (l/pi2 - 0.25) < // 2) there is a pi/2 + 2k pi in between
+      (floor (l/pi2 - 0.25) < // 2) there is a pi/2 + 2k pi between l and u
        floor (u/pi2 - 0.25))) 
     return 1.;
 

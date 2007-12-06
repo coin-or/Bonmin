@@ -229,20 +229,20 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       print (std::cout);  printf (" := ");
       image_ -> print (std::cout); 
 
-      printf (" [%.3e,%.3e] <--- ", 
+      printf (" [%.7e,%.7e] <--- ", 
 	      expression::Lbound (varIndex_), 
 	      expression::Ubound (varIndex_));
 
       int index;
       if ((image_ -> Argument ()) && 
 	  ((index = image_ -> Argument () -> Index ()) >= 0))
-	printf ("[%.3e,%.3e] ", 
+	printf ("[%.7e,%.7e] ", 
 		expression::Lbound (index), 
 		expression::Ubound (index));
       else if (image_ -> ArgList ())
 	for (int i=0; i<image_ -> nArgs (); i++)
 	  if ((index = image_ -> ArgList () [i] -> Index ()) >= 0)
-	printf ("[%.3e,%.3e] ", 
+	printf ("[%.7e,%.7e] ", 
 		expression::Lbound (index), 
 		expression::Ubound (index));
 	

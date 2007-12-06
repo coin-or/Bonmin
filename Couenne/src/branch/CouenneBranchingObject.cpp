@@ -30,18 +30,18 @@ CouNumber midInterval (CouNumber curr, CouNumber l, CouNumber u) {
   if      (x<l) x = l;
   else if (x>u) x = u;
 
-  CouNumber alpha = CouenneBranchingObject::Alpha (), retval;
+  CouNumber alpha = CouenneBranchingObject::Alpha ();
  
   if ((l > -COUENNE_INFINITY) && ((x-l) / (u-l) < COUENNE_NEAR_BOUND) ||
       (u <  COUENNE_INFINITY) && ((u-x) / (u-l) < COUENNE_NEAR_BOUND))
     if      (u <   COUENNE_INFINITY)
-      if    (l > - COUENNE_INFINITY) retval = alpha * x + (1. - alpha) * (l + u) / 2.;
-      else                           retval = -1 + (u<0) ? u*2 : u/2;
-    else if (l > - COUENNE_INFINITY) retval = +1 + (l>0) ? l*2 : l/2;
-    else                             retval = 0;
-  else retval = x;//alpha * x + (1. - alpha) * (l + u) / 2.;
+      if    (l > - COUENNE_INFINITY) x = alpha * x + (1. - alpha) * (l + u) / 2.;
+      else                           x = -1 + (u<0) ? u*2 : u/2;
+    else if (l > - COUENNE_INFINITY) x = +1 + (l>0) ? l*2 : l/2;
+    else                             x = 0;
+  //  else retval = x;//alpha * x + (1. - alpha) * (l + u) / 2.;
 
-  return retval;
+  return x;
 }
 
 
@@ -51,7 +51,8 @@ CouNumber midInterval (CouNumber curr, CouNumber l, CouNumber u) {
  * operator () of that exprAux.
 */
 
-CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, int index, int way, CouNumber brpoint, bool isint): 
+CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, int index, int way, 
+						CouNumber brpoint, bool isint): 
 
   index_   (index),
   integer_ (isint),

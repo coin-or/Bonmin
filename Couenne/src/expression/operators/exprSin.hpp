@@ -28,7 +28,6 @@ CouNumber trigSelBranch (const CouenneObject *obj,
 			 int &way,
 			 enum cou_trig type);
 
-
 /// class for sin f(x)
 
 class exprSin: public exprUnary {
@@ -36,20 +35,20 @@ class exprSin: public exprUnary {
  public:
 
   /// Constructors, destructor
-  exprSin  (expression *al): 
+  exprSin (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
   /// cloning method
   expression *clone () const
-    {return new exprSin (argument_ -> clone ());}
+  {return new exprSin (argument_ -> clone ());}
 
   //// the operator's function
   inline unary_function F () 
-    {return sin;}
+  {return sin;}
 
   /// print operator
   std::string printOp () const
-    {return "sin";}
+  {return "sin";}
 
   /// differentiation
   expression *differentiate (int index); 
@@ -66,13 +65,13 @@ class exprSin: public exprUnary {
 
   /// code for comparisons
   virtual enum expr_type code () 
-    {return COU_EXPRSIN;}
+  {return COU_EXPRSIN;}
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
   CouNumber selectBranch (const CouenneObject *obj, const OsiBranchingInformation *info,
 			  int &ind, double * &brpts, int &way)
-    {return trigSelBranch (obj, info, ind, brpts, way, COU_SINE);}
+  {return trigSelBranch (obj, info, ind, brpts, way, COU_SINE);}
 };
 
 #endif

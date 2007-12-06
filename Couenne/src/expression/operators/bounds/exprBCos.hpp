@@ -62,12 +62,13 @@ inline CouNumber exprLBCos::operator () () {
   CouNumber pi2 = 2 * M_PI;
  
   if ((u - l > pi2) ||       // 1) interval spans whole cycle
-      (floor (l/pi2 - 0.5) < // 2) there is a pi + 2k pi in between
+      (floor (l/pi2 - 0.5) < // 2) there is a pi + 2k pi between l and u
        floor (u/pi2 - 0.5))) 
-    return -1;
+    return -1.;
 
-  return CoinMin (sin (l), sin (u));
+  return CoinMin (cos (l), cos (u));
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -85,7 +86,7 @@ class exprUBCos: public exprOp {
     arglist_ [1] = ub;
   } //< non-leaf expression, with argument list
 
-  // cloning method
+  /// cloning method
   expression *clone () const
     {return new exprUBCos (arglist_ [0] -> clone (), 
 			   arglist_ [1] -> clone ());}
@@ -93,13 +94,13 @@ class exprUBCos: public exprOp {
   /// function for the evaluation of the expression
   CouNumber operator () ();
 
-  /// print position (PRE, INSIDE, POST)
-  enum pos printPos () const
-    {return PRE;}
-
   /// print operator
   std::string printOp () const
     {return "UB_Cos";}
+
+  /// print position (PRE, INSIDE, POST)
+  enum pos printPos () const
+    {return PRE;}
 };
 
 
@@ -114,11 +115,11 @@ inline CouNumber exprUBCos::operator () () {
   CouNumber pi2 = 2 * M_PI;
 
   if ((u - l > pi2) || // 1) interval spans whole cycle
-      (floor (l/pi2) < // 2) there is a 3/2 pi + 2k pi in between
+      (floor (l/pi2) < // 2) there is a 3/2 pi + 2k pi between l and u
        floor (u/pi2))) 
-    return 1;
+    return 1.;
 
-  return CoinMax (sin (l), sin (u));
+  return CoinMax (cos (l), cos (u));
 }
 
 #endif
