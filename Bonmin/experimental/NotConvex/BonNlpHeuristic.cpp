@@ -115,10 +115,10 @@ namespace Bonmin{
     if(numberSolvePerLevel_ > -1){
       if(numberSolvePerLevel_ == 0) 
 	return 0;
-      double num=CoinDrand48();
+
       const int depth = (model_->currentNode()) ? model_->currentNode()->depth() : 0;
-      double beta=pow(2.,numberSolvePerLevel_);
-      if(num> beta*pow(2.,-depth))
+
+      if (CoinDrand48() > pow (2., numberSolvePerLevel_ - depth))
 	too_deep = true;
     }
 
