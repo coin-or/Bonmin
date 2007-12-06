@@ -198,7 +198,7 @@ namespace Bonmin{
 
     bool foundSolution = true
       // && (obj < objectiveValue)
-      // && checkNLP (model_ -> cutGenerators () [0] -> generator (), nlp_ -> getColSolution (), obj)
+      && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
     ;
 
     if (foundSolution) //Better solution found update
