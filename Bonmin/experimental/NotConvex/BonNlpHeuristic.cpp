@@ -197,8 +197,9 @@ namespace Bonmin{
     double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
 
     bool foundSolution = true
+      && nlp_->isProvenOptimal()
       // && (obj < objectiveValue)
-      && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
+      // && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
     ;
 
     if (foundSolution) //Better solution found update
