@@ -70,7 +70,7 @@ CouenneInterface::extractLinearRelaxation
        obj      = getObjValue (),
       *solution = getColSolution ();
 
-     if (couenneCg.Problem () -> checkNLP (solution, obj, false)) {
+     if (couenneCg.Problem () -> checkNLP (solution, obj)) {
 
        // set cutoff to take advantage of bound tightening
        couenneCg. Problem () -> setCutOff (obj);
