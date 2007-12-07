@@ -135,7 +135,7 @@ uninstall-local:
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonAuxInfos.cppbak
+	BonAuxInfos.cppbak \
 	BonAuxInfos.hppbak \
 	BonBoundsReader.cppbak \
 	BonBoundsReader.hppbak \
