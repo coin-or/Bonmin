@@ -11,15 +11,34 @@
 #include "CouenneProblem.hpp"
 
 // check if solution is MINLP feasible
-bool CouenneProblem::checkNLP (const double *solution, const double obj, bool extended) {
+bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 
   // update variable array in evaluation structure
   //  expression::update (const_cast <double *> (solution), NULL, NULL);
 
-  double *sol = new double [nVars ()];
+  //  int nvars = extended ? nVars () : nOrig_;
+
+  /*printf ("original NLP solution:\n");
+  for (int i=0; i<nOrig_; i++)
+    printf ("%4d: %10g\n", i, solution [i]);
+    printf ("\n");*/
+
+  CouNumber *sol = new CouNumber [nVars ()];
   CoinCopyN (solution, nOrig_, sol);
+
+  /*printf ("copied NLP solution:\n");
+  for (int i=0; i<nOrig_; i++)
+    printf ("%4d: %10g\n", i, sol [i]);
+    printf ("\n");*/
+
   getAuxs (sol);
   expression::update (sol, NULL, NULL);
+
+  /*printf ("LP solution:\n");
+  for (int i=0; i<nVars(); i++)
+    printf ("%4d: %10g\n", i, sol [i]);
+    printf ("\n");*/
+
 
   /*  CouNumber realobj = (*(p -> Obj (0) -> Body ())) ();
   if (fabs (realobj - obj) > COUENNE_EPS) {
@@ -40,6 +59,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
     }
 
   // check constraints
+  if (0)
   for (int i=0; i < nCons (); i++) {
 
     CouenneConstraint *c = Con (i);
@@ -48,6 +68,10 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
       body = (*(c -> Body ())) (),
       lhs  = (*(c -> Lb   ())) (),
       rhs  = (*(c -> Ub   ())) ();
+
+    printf ("??? %.20f < %.20f < %.20f ---", lhs, body, rhs);
+      c -> print ();
+
     if ((body > rhs + COUENNE_EPS) || 
 	(body < lhs - COUENNE_EPS)) {
       if (Jnlst()->ProduceOutput(Ipopt::J_MOREDETAILED, J_PROBLEM)) {
@@ -60,7 +84,8 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
   }
 
   // check auxiliary variables
-  //  if (extended)
+  //if (extended)
+  /*
   if (0)
     for (int n = nVars (), i=0; i<n; i++) {
 
@@ -86,6 +111,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
 	}
       }
     }
+  */
 
   return true;
 }

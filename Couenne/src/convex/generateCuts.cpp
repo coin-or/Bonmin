@@ -177,8 +177,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       } else { // body is more than just a variable, but it should be
 	       // linear. If so, generate equivalent linear cut
 
-	// TODO
-
+	assert (false);	// TODO
       }
     }
 

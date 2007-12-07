@@ -266,7 +266,7 @@ class CouenneProblem {
   ConstJnlstPtr Jnlst() const {return ConstPtr(jnlst_);}
 
   /// Check if solution is MINLP feasible
-  bool checkNLP (const double *solution, const double obj, bool extended = true);
+  bool checkNLP (const double *solution, const double obj);
 };
 
 

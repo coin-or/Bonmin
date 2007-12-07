@@ -134,9 +134,10 @@ void CouenneProblem::getAuxs (CouNumber * x) {
     exprVar *var = variables_ [numbering_ [j]];
     if (var -> Type () == AUX)
       x [var -> Index ()] = 
-	(var -> Type () == AUX) ? 
-	  (*(var -> Image ())) () :
-	  (*var) ();
+	//	(var -> Type () == AUX) ? 
+	  (*(var -> Image ())) () 
+	//	  (*var) ()
+	;
   }
 
   // get the x and the bound vectors back to their previous state
