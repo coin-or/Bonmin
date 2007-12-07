@@ -175,14 +175,15 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
     if (cg->Jnlst()->ProduceOutput(J_MOREVECTOR, J_BOUNDTIGHTENING)) {
       cg->Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,
-		      "m%simizing x%d [%g,%g] %c= %g",
+		      "m%simizing x%d [%g,%g] %c= %g\n",
 	    (sense==1) ? "in" : "ax", index, p -> Lb (index), p -> Ub (index),
 	    (sense==1) ? '>'  : '<',  bound); fflush (stdout);
-
-      char fname [20];
-      sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", index, iter);
-      cg->Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,"\nwriting %s\n", fname);
-      csi -> writeLp (fname);
+      if (cg->Jnlst()->ProduceOutput(J_MOREMATRIX, J_BOUNDTIGHTENING)) {
+	char fname [20];
+	sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", index, iter);
+	cg->Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,"writing %s\n", fname);
+	csi -> writeLp (fname);
+      }
     }
 
     csi -> setWarmStart (warmstart);

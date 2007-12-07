@@ -23,8 +23,6 @@
 #include "CouenneProblem.hpp"
 #include "CouenneProblemElem.hpp"
 
-//#define DEBUG
-
 /// update value of variables, bounds
 
 void CouenneProblem::update (const CouNumber *x, const CouNumber *l, const CouNumber *u, int n) {
@@ -86,6 +84,8 @@ void CouenneProblem::initAuxs (CouNumber *x,
   // only one loop is sufficient here, since auxiliary variable are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
 
+  Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "Initial bounds for aux (initAuxs):\n");
+
   for (int j=0, i=nVars (); i--; j++) {
 
     int ord = numbering_ [j];
@@ -94,9 +94,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
       exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
 
-#ifdef DEBUG
-      printf ("w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
-#endif
+      Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
 
       // set bounds 
       if ((lb_[ord] = CoinMax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord]=-DBL_MAX;
@@ -104,9 +102,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
-#ifdef DEBUG
-      printf (" --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
-#endif
+      Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, " --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
 
       x_ [ord] = CoinMax (lb_ [ord], CoinMin (ub_ [ord], (*(aux -> Image ())) ()));
     }
@@ -209,12 +205,15 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
       }	break;
 
       default: 
-	printf ("Couenne: invalid element of sum\nAborting\n");
+	Jnlst()->Printf(Ipopt::J_ERROR, J_PROBLEM,
+			"Couenne: invalid element of sum\nAborting\n");
 	exit (-1);
       }
   } break;
 
-  default: printf ("### objective function not recognized\n");
+  default:
+    Jnlst()->Printf(Ipopt::J_WARNING, J_PROBLEM,
+		    "### objective function not recognized\n");
     break;
   }
 }
@@ -240,6 +239,9 @@ void CouenneProblem::installCutOff () {
 
     // all problem are assumed to be minimization
     if (cutoff_ < ub_ [indobj])
+      Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
+		      "Installing cutoff %e for optimization variable index %d\n",
+		      cutoff_, indobj);
       ub_ [indobj] = cutoff_;
   }
 }

@@ -32,8 +32,9 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
     if (variables_ [i] -> isInteger ()) {
       CouNumber val = expression::Variable (i);
       if (fabs (val - COUENNE_round (val)) > COUENNE_EPS) {
-	//	printf ("integrality %d violated: %g [%g,%g]\n", 
-	//		i, val, expression::Lbound (i), expression::Ubound (i));
+	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+			"checkNLP: integrality %d violated: %g [%g,%g]\n", 
+			i, val, expression::Lbound (i), expression::Ubound (i));
 	return false;
       }
     }
@@ -47,11 +48,13 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
       body = (*(c -> Body ())) (),
       lhs  = (*(c -> Lb   ())) (),
       rhs  = (*(c -> Ub   ())) ();
-
     if ((body > rhs + COUENNE_EPS) || 
 	(body < lhs - COUENNE_EPS)) {
-      //      printf ("constraint %d violated: ", i);
-      //      c -> print ();
+      if (Jnlst()->ProduceOutput(Ipopt::J_MOREDETAILED, J_PROBLEM)) {
+	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+			"constraint %d violated: ", i);
+	c -> print ();
+      }
       return false;
     }
   }
@@ -71,10 +74,14 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
 	  img = (*(w -> Image ())) ();
 
 	if (fabs (aux - img) > COUENNE_EPS) {
-
-	  /*printf ("auxiliary %d infeasible: ", order);
-	  w -> print (); printf (" := ");
-	  w -> Image () -> print (); printf ("\n");*/
+	  if (Jnlst()->ProduceOutput(Ipopt::J_MOREDETAILED, J_PROBLEM)) {
+	    Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+			    "auxiliary %d infeasible: ", order);
+	    w -> print ();
+	    Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM," := ");
+	    w -> Image () -> print ();
+	    Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,"\n");
+	  }
 	  return false;
 	}
       }
