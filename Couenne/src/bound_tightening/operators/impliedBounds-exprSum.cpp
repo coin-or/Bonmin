@@ -12,14 +12,11 @@
 
 
 /// vector operation to find bound to variable in a sum
-
-static CouNumber scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
+static long double scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
 
 
 /// implied bound processing for expression w = x+y+t+..., upon change
 /// in lower- and/or upper bound of w, whose index is wind
-
-#define MALLOC_STEP 1000
 
 bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
@@ -52,7 +49,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   int nterms = nargs_; // # nonconstant terms
   int nlin   = 0;      // # linear terms
 
-  CouNumber a0 = 0.;   // constant term in the sum
+  long double a0 = 0.;   // constant term in the sum
 
   if (code () == COU_EXPRGROUP) { // if exprGroup, compute no. linear terms
 
@@ -127,7 +124,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   // upper = $a0 + \sum_{i in I_1: a_i <  \infinity} a_i u_i
   //             + \sum_{i in I_2: a_i > -\infinity} a_i l_i$
 
-  CouNumber
+  long double
 
     lower = a0 + scanBounds (ipos, -1, I1, C1, l, &infLo1)
                + scanBounds (ineg, +1, I2, C2, u, &infUp2),
@@ -288,12 +285,12 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
 /// sum bounds depending on coefficients
 
-static CouNumber scanBounds (int        num,      /// cardinality of the set (I1 or I2)
-			     int        sign,     /// +1: check for +inf, -1: check for -inf
-			     int       *indices,  /// indices in the set, $i\in I_k$
-			     CouNumber *coeff,    /// coefficients in the set
-			     CouNumber *bounds,   /// variable bounds to check 
-			     int       *infnum) { /// return value: index of variable with infinite
+static long double scanBounds (int        num,      /// cardinality of the set (I1 or I2)
+			       int        sign,     /// +1: check for +inf, -1: check for -inf
+			       int       *indices,  /// indices in the set, $i\in I_k$
+			       CouNumber *coeff,    /// coefficients in the set
+			       CouNumber *bounds,   /// variable bounds to check 
+			       int       *infnum) { /// return value: index of variable with infinite
                                                   /// bound, or -2 if more than one exist
   CouNumber bound = 0.;
 

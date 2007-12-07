@@ -141,7 +141,6 @@ void CouenneProblem::getAuxs (CouNumber * x) {
 	(var -> Type () == AUX) ? 
 	  (*(var -> Image ())) () :
 	  (*var) ();
-
   }
 
   // get the x and the bound vectors back to their previous state

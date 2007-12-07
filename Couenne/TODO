@@ -1,10 +1,10 @@
+- unify exprQuad and exprMul::impliedBounds
 - interval Hessian can be better than checkConvexity and usual convexification (e.g. exp (log (x)))
 - analyzeSparsity()
 - writeGAMS()
 - implied bounds in exprQuad: treat all a_ij x_i x_j as single variables w_ij, infer bounds on w_ij from bounds on 
   quad form and use it to derive bounds for x_i, x_j
 - use interval arithmetic and (generalized) alpha-convexification
-- fill in CouenneSolverInterface class
 - check if z_nlp=z_lp ==> fathom and return x_nlp as feas solution of node
 - implied/propagated bounds to follow graph and not enumerated for all variables (for huge instances)
 - implied bounds, branching rule, getfixvar and sparsity graph for exprQuad
@@ -20,7 +20,6 @@
 - quadratic approximation of expression subtree (see Nowak's approximation with lb/ub of Hessian)
 - Bilinear cuts
 - variable lhs/rhs of bounds containing expression defining aux vars
-- cut currValue_ from expressions
 - documentation
 - add integrality to bound check
 - decomposition approach

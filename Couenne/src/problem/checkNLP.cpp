@@ -7,13 +7,19 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include "CoinHelperFunctions.hpp"
 #include "CouenneProblem.hpp"
 
 // check if solution is MINLP feasible
 bool CouenneProblem::checkNLP (const double *solution, const double obj, bool extended) {
 
   // update variable array in evaluation structure
-  expression::update (const_cast <double *> (solution), NULL, NULL);
+  //  expression::update (const_cast <double *> (solution), NULL, NULL);
+
+  double *sol = new double [nVars ()];
+  CoinCopyN (solution, nOrig_, sol);
+  getAuxs (sol);
+  expression::update (sol, NULL, NULL);
 
   /*  CouNumber realobj = (*(p -> Obj (0) -> Body ())) ();
   if (fabs (realobj - obj) > COUENNE_EPS) {
@@ -51,8 +57,8 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj, bool ex
   }
 
   // check auxiliary variables
-  if (extended)
-
+  //  if (extended)
+  if (0)
     for (int n = nVars (), i=0; i<n; i++) {
 
       int order = evalOrder (i);
