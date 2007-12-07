@@ -15,6 +15,10 @@
 #include "exprBSin.hpp"
 #include "exprMul.hpp"
 
+static const CouNumber 
+  pi  = M_PI,
+  pi2 = M_PI * 2.,
+  pih = M_PI / 2.;
 
 // differentiation
 
@@ -47,80 +51,70 @@ bool trigImpliedBound (enum cou_trig type, int wind, int xind,
 
   bool tighter = false;
 
-  /*
-  //xl = new CouNumber;
-  //xu = new CouNumber;
-  for (int i = 0; i < 20; i++) {
-  *xl = M_PI / 4. * (1. + i/5.);
-  *xu = M_PI / 4. * (13. - i/3.);
-  wl = -0.3;
-  wu =  0.2;
-  type = COU_COSINE;
-  */
-
   CouNumber fl, fu, iwl, iwu, displacement;
 
-  if (type == COU_SINE) {fl = sin (*xl); fu = sin (*xu); displacement = M_PI / 2.;} 
-  else                  {fl = cos (*xl); fu = cos (*xu); displacement = 0;        }
+  if (type == COU_SINE) {fl = sin (*xl); fu = sin (*xu); displacement = pih;} 
+  else                  {fl = cos (*xl); fu = cos (*xu); displacement = 0.;       }
 
   iwl = acos (wl);
   iwu = acos (wu);
 
-  /*printf ("old bounds: [%g pi,%g pi] -> [%g,%g]  ---  w = [%g,%g] -8-> [%g pi, %g pi]\n", 
-	  *xl / M_PI, *xu / M_PI, fl, fu, 
-	  wl, wu, iwl / M_PI, iwu / M_PI);*/
+  /*printf ("### [%s] old bd: [%g pi,%g pi] -> [%g,%g]  ---  w = [%g,%g] -8-> [%g pi, %g pi]\n", 
+	  type==COU_SINE ? "sin" : "cos", 
+	   *xl / pi, *xu / pi, fl, fu, 
+	   wl, wu, iwl/pi, iwu/pi);*/
 
-  if (wu < fl) {
+  ////////////////////////////////////////////////////////////////////
 
-    CouNumber base = 2. * M_PI * floor ((*xl + M_PI/2) / (2.*M_PI)) + displacement;
+  if (wu < fl - COUENNE_EPS) {
 
-    //printf ("wu, fl: base = %g pi\n", base / M_PI);
+    CouNumber base = displacement + pi2 * floor ((*xl + pi - displacement) / pi2);
 
-    if (updateBound (-1, xl, base + CoinMin (iwu, M_PI - iwu))) {
+    //printf ("### wu, fl: base = %g pi\n", base / pi);
+
+    if (updateBound (-1, xl, base + iwu)) {
       tighter = true; 
       chg [xind]. setLower (t_chg_bounds::CHANGED);
     }
   }
 
-  if (wu < fu) {
+  if (wu < fu - COUENNE_EPS) {
 
-    CouNumber base = 2. * M_PI * floor ((*xu + M_PI/2)/ (2.*M_PI)) + displacement;
+    CouNumber base = displacement + pi2 * floor ((*xu + pi - displacement) / pi2);
 
-    //printf ("wu, fu: base = %g pi\n", base / M_PI);
+    //printf ("### wu, fu: base = %g pi\n", base / pi);
 
-    if (updateBound (+1, xu, base - CoinMin (iwu, M_PI - iwu))) {
+    if (updateBound (+1, xu, base - iwu)) {
       tighter = true; 
       chg [xind]. setUpper (t_chg_bounds::CHANGED);
     }
   }
 
-  if (wl > fl) {
+  if (wl > fl + COUENNE_EPS) {
 
-    CouNumber base = 2. * M_PI * floor ((*xl - M_PI/2) / (2.*M_PI)) + displacement + M_PI;
+    CouNumber base = displacement + pi2 * floor ((*xl - displacement) / pi2) + pi;
 
-    //printf ("wl, fl: base = %g pi\n", base / M_PI);
+    //printf ("### wl, fl: base = %g pi\n", base / pi);
 
-    if (updateBound (-1, xl, base + CoinMin (iwl, M_PI - iwl))) {
+    if (updateBound (-1, xl, base + pi - iwl)) {
       tighter = true; 
       chg [xind]. setLower (t_chg_bounds::CHANGED);
     }
   }
 
-  if (wl > fu) {
+  if (wl > fu + COUENNE_EPS) {
 
-    CouNumber base = 2. * M_PI * floor ((*xu - M_PI/2) / (2.*M_PI)) + displacement + M_PI;
+    CouNumber base = displacement + pi2 * floor ((*xu - displacement) / pi2) + pi;
 
-    //printf ("wl, fu: base = %g pi\n", base / M_PI);
+    //printf ("### wl, fu: base = %g pi\n", base / pi);
 
-    if (updateBound (+1, xu, base - CoinMin (iwl, M_PI - iwl))) {
+    if (updateBound (+1, xu, base - pi + iwl)) {
       tighter = true; 
       chg [xind]. setUpper (t_chg_bounds::CHANGED);
     }
   }
 
-  //printf ("new bounds: [%g pi, %g pi]\n------------------------------\n", *xl / M_PI, *xu / M_PI);
-  //}
-  //exit (0);
+  //printf ("### new bounds: [%g pi, %g pi]------------------------------\n", *xl/pi, *xu/pi);
 
   return tighter;
 }
