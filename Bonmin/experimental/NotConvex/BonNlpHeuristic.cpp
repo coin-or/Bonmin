@@ -101,10 +101,10 @@ namespace Bonmin{
     OsiAuxInfo * auxInfo = solver->getAuxiliaryInfo();
     BabInfo * babInfo = dynamic_cast<BabInfo *> (auxInfo);
     if(babInfo){
-    babInfo->setHasNlpSolution(false);
-    if(babInfo && babInfo->infeasibleNode()){
-      return 0;
-    }
+      babInfo->setHasNlpSolution(false);
+      if(babInfo && babInfo->infeasibleNode()){
+	return 0;
+      }
     }
 
     // if too deep in the BB tree, only run NLP heuristic if

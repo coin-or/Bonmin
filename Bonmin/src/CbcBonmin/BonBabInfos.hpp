@@ -55,4 +55,3 @@ namespace Bonmin
 }/* End namespace.*/
 
 #endif
-

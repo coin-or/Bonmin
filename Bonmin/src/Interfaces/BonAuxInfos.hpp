@@ -51,12 +51,17 @@ public:
   
   /** Get solution found by nlp solver (or NULL if none found).*/
   const double * nlpSolution(){
+
     if(hasNlpSolution_)
       return nlpSolution_;
     else
       return NULL;
   }
-    
+
+  /** Get objective value of nlp solution found, or +infinity if none exists */
+  const double nlpObjValue ()
+  {return hasNlpSolution_ ? objValue_ : 1.e300;}
+
   /** Pass a solution found by an nlp solver.*/
   void setNlpSolution(const double * sol, int numcols, double objValue);
   
@@ -87,6 +92,8 @@ public:
 protected: 
   /** Say if current node was found infeasible during cut generation*/
   bool infeasibleNode_;
+  /** value of the objective function of this nlp solution */
+  double objValue_;
   /** nlp solution found by heuristic if any.*/
   double * nlpSolution_;
   /** numcols_ gives the size of nlpSolution_.*/

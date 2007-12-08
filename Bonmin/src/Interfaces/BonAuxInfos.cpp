@@ -16,6 +16,7 @@ namespace Bonmin
   AuxInfo::AuxInfo(int type):
       OsiBabSolver(type),
       infeasibleNode_(false),
+      objValue_ (DBL_MAX),
       nlpSolution_(NULL),
       numcols_(0),
       hasNlpSolution_(false),
@@ -27,6 +28,7 @@ namespace Bonmin
   AuxInfo::AuxInfo(const OsiBabSolver &other):
       OsiBabSolver(other),
       infeasibleNode_(false),
+      objValue_ (DBL_MAX),
       nlpSolution_(NULL),
       numcols_(0),
       hasNlpSolution_(false),
@@ -38,6 +40,7 @@ namespace Bonmin
   AuxInfo::AuxInfo(const AuxInfo &other):
       OsiBabSolver(other),
       infeasibleNode_(other.infeasibleNode_),
+      objValue_ (other.objValue_),
       nlpSolution_(NULL),
       numcols_(other.numcols_),
       hasNlpSolution_(other.hasNlpSolution_),
@@ -79,6 +82,7 @@ namespace Bonmin
     }
     CoinCopyN(sol,  numcols, nlpSolution_);
     nlpSolution_[numcols] = objValue;
+    objValue_ = objValue;
   }
 
 }/* end namespace Bonmin*/

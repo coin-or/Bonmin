@@ -114,7 +114,9 @@ namespace Bonmin{
     options()->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
     continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
 
-    ci->extractLinearRelaxation(*continuousSolver_, *couenneCg);
+    //////////////////////////////////////////////////////////////
+
+    ci -> extractLinearRelaxation (*continuousSolver_, *couenneCg);
 
     // In case there are no discrete variables, we can set the optimal
     // value from the initialSolve as cutoff

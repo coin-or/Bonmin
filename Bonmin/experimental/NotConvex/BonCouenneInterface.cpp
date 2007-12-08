@@ -60,31 +60,34 @@ void
 CouenneInterface::extractLinearRelaxation 
 (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 
-   if (solveNlp) {
+  if (solveNlp) { // this is true in below call
 
-     initialSolve ();
+    initialSolve ();
 
-     // TODO: solve nlp, round as in BonNlpHeuristic, and re-solve
+    // TODO: solve nlp, round as in BonNlpHeuristic, and re-solve
 
-     const CouNumber 
-       obj      = getObjValue (),
-      *solution = getColSolution ();
+    if (isProvenOptimal ()) {
 
-     if (couenneCg.Problem () -> checkNLP (solution, obj)) {
+      const CouNumber 
+	obj       = getObjValue (),
+	*solution = getColSolution ();
 
-       // set cutoff to take advantage of bound tightening
-       couenneCg. Problem () -> setCutOff (obj);
+      if (couenneCg. Problem () -> checkNLP (solution, obj)) {
 
-       OsiAuxInfo * auxInfo = si. getAuxiliaryInfo ();
-       BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
+	// set cutoff to take advantage of bound tightening
+	couenneCg. Problem () -> setCutOff (obj);
 
-       if (babInfo) {
-	 babInfo -> setNlpSolution (solution, getNumCols (), obj);
-	 babInfo -> setHasNlpSolution (true);
-       }
-     }
-   }
+	OsiAuxInfo * auxInfo = si.getAuxiliaryInfo ();
+	BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
 
+	if (babInfo) {
+	  babInfo -> setNlpSolution (solution, getNumCols (), obj);
+	  babInfo -> setHasNlpSolution (true);
+	}
+      }
+    }
+  }
+  
    int numcols     = getNumCols (),         // # original               variables
        numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
 
