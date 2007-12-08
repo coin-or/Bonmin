@@ -12,18 +12,18 @@
 # define M_E  2.7182818284590452354
 #endif
 
-#include <CouenneTypes.hpp>
-#include <rootQ.hpp>
-#include <exprPow.hpp>
-#include <exprExp.hpp>
-#include <exprConst.hpp>
-#include <exprClone.hpp>
-#include <exprMul.hpp>
-#include <exprSum.hpp>
-#include <exprLog.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneTypes.hpp"
+#include "rootQ.hpp"
+#include "exprPow.hpp"
+#include "exprExp.hpp"
+#include "exprConst.hpp"
+#include "exprClone.hpp"
+#include "exprMul.hpp"
+#include "exprSum.hpp"
+#include "exprLog.hpp"
+#include "CouennePrecisions.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 
 std::map <int, CouNumber> Qroot::Qmap;

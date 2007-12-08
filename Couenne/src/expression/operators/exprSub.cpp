@@ -7,9 +7,9 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprSub.hpp>
-#include <exprOpp.hpp>
-#include <CouennePrecisions.hpp>
+#include "exprSub.hpp"
+#include "exprOpp.hpp"
+#include "CouennePrecisions.hpp"
 
 
 // simplify subtractions

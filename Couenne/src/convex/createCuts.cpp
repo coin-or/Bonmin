@@ -7,12 +7,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <OsiRowCut.hpp>
+#include "OsiRowCut.hpp"
 
-#include <CouenneTypes.hpp>
-#include <CouennePrecisions.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneTypes.hpp"
+#include "CouennePrecisions.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
 
 
 /// general procedure for inserting a linear cut with up to three

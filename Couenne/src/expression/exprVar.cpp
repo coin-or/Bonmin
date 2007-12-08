@@ -7,17 +7,17 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneCutGenerator.hpp>
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprAux.hpp>
-#include <exprOp.hpp>
-#include <exprUnary.hpp>
-#include <exprVar.hpp>
-#include <exprBound.hpp>
+#include "CouenneCutGenerator.hpp"
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprAux.hpp"
+#include "exprOp.hpp"
+#include "exprUnary.hpp"
+#include "exprVar.hpp"
+#include "exprBound.hpp"
 
-#include <CouenneProblem.hpp>
-#include <depGraph.hpp>
+#include "CouenneProblem.hpp"
+#include "depGraph.hpp"
 
 
 // Get lower and upper bound of a variable expression (if any)

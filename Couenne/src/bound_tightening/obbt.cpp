@@ -15,44 +15,28 @@
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
 
-///
-///
 
-int obbt_iter (const CouenneCutGenerator *cg, 
-	       CouenneSolverInterface *csi, 
-	       OsiCuts &cs, 
-	       t_chg_bounds *chg_bds, 
-	       const CoinWarmStart *warmstart, 
-	       Bonmin::BabInfo *babInfo,
-	       double *objcoe,
-	       int sense, 
-	       int index);
-
-
-///
-///
-
-int call_iter (const CouenneCutGenerator *cg, 
-	       CouenneSolverInterface *csi, 
-	       OsiCuts &cs, 
-	       t_chg_bounds *chg_bds, 
-	       const CoinWarmStart *warmstart, 
-	       Bonmin::BabInfo *babInfo,
-	       double *objcoe,
-	       enum nodeType type,
-	       int sense) {
+int CouenneCutGenerator::
+call_iter (CouenneSolverInterface *csi, 
+	   OsiCuts &cs, 
+	   t_chg_bounds *chg_bds, 
+	   const CoinWarmStart *warmstart, 
+	   Bonmin::BabInfo *babInfo,
+	   double *objcoe,
+	   enum nodeType type,
+	   int sense) const {
 
   int ncols   = csi -> getNumCols (),
       nimprov = 0;
 
-  CouenneProblem *p = cg -> Problem ();
+  CouenneProblem *p = Problem ();
 
   for (int ii=0; ii<ncols; ii++) {
     int i = p -> evalOrder (ii);
 
     if (p -> Var (i) -> Type () == type) {
 
-      int ni = obbt_iter (cg, csi, cs, chg_bds, warmstart, babInfo, objcoe, sense, i);
+      int ni = obbt_iter (csi, cs, chg_bds, warmstart, babInfo, objcoe, sense, i);
 
       if (ni < 0) return ni;
       nimprov += ni;
@@ -110,7 +94,7 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
   Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 		  ":::::: OBBT on originals ----------------\n");
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR,  1)) < 0) {
+  if ((ni = call_iter (csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR,  1)) < 0) {
     free (objcoe);
     delete warmstart;
     return ni;
@@ -118,7 +102,7 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
 
   nimprov += ni;
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR, -1)) < 0) {
+  if ((ni = call_iter (csi, cs, chg_bds, warmstart, babInfo, objcoe, VAR, -1)) < 0) {
     free (objcoe);
     delete warmstart;
     return ni;
@@ -129,7 +113,7 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
   Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 		  ":::::: OBBT on auxiliaries --------------\n");
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX,  1)) < 0) {
+  if ((ni = call_iter (csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX,  1)) < 0) {
     free (objcoe);
     delete warmstart;
     return ni;
@@ -137,7 +121,7 @@ int CouenneCutGenerator::obbt (CouenneSolverInterface *csi,
 
   nimprov += ni;
 
-  if ((ni = call_iter (this, csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX, -1)) < 0) {
+  if ((ni = call_iter (csi, cs, chg_bds, warmstart, babInfo, objcoe, AUX, -1)) < 0) {
     free (objcoe);
     delete warmstart;
     return ni;

@@ -10,7 +10,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <CouenneTypes.hpp>
+#include "CouenneTypes.hpp"
 
 #define MAX_ITER 1000
 #define COU_TRIG_TOLERANCE 1e-12

@@ -9,7 +9,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <expression.hpp>
+#include "expression.hpp"
 
 // return an index to the variable's argument that is better fixed
 // in a branching rule for solving a nonconvexity gap

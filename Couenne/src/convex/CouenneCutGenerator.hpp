@@ -240,6 +240,50 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// Provide Journalist
   ConstJnlstPtr Jnlst() const {return ConstPtr(jnlst_);}
+
+private:
+  /// single fake tightening. Return
+  ///
+  /// -1   if infeasible
+  ///  0   if no improvement
+  /// +1   if improved
+  int fake_tighten (const OsiSolverInterface *psi,
+		    OsiCuts &cs,
+		    Bonmin::BabInfo * babInfo,
+
+		    char direction,  // 0: left, 1: right
+		    int index,       // index of the variable tested
+		    const double *X, // point round which tightening is done
+		    CouNumber *olb,  // cur. lower bound
+		    CouNumber *oub,  //      upper
+		    t_chg_bounds *chg_bds,
+		    t_chg_bounds *f_chg) const;
+
+  // core of the bound tightening procedure
+  bool btCore (const OsiSolverInterface *psi,
+	       OsiCuts &cs, 
+	       t_chg_bounds *chg_bds, 
+	       Bonmin::BabInfo * babInfo,
+	       bool serious) const;
+
+  int obbt_iter (CouenneSolverInterface *csi, 
+		 OsiCuts &cs, 
+		 t_chg_bounds *chg_bds, 
+		 const CoinWarmStart *warmstart, 
+		 Bonmin::BabInfo *babInfo,
+		 double *objcoe,
+		 int sense, 
+		 int index) const;
+
+  int call_iter (CouenneSolverInterface *csi, 
+		 OsiCuts &cs, 
+		 t_chg_bounds *chg_bds, 
+		 const CoinWarmStart *warmstart, 
+		 Bonmin::BabInfo *babInfo,
+		 double *objcoe,
+		 enum nodeType type,
+		 int sense) const;
+
 };
 
 #endif

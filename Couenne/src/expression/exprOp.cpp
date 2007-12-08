@@ -7,13 +7,13 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblem.hpp>
+#include "CouenneProblem.hpp"
 
-#include <expression.hpp>
-#include <exprAux.hpp>
-#include <exprOp.hpp>
-#include <exprGroup.hpp>
-#include <exprQuad.hpp>
+#include "expression.hpp"
+#include "exprAux.hpp"
+#include "exprOp.hpp"
+#include "exprGroup.hpp"
+#include "exprQuad.hpp"
 
 
 // General N-ary function destructor

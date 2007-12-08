@@ -7,8 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprMul.hpp>
-#include <CouennePrecisions.hpp>
+#include "exprMul.hpp"
+#include "CouennePrecisions.hpp"
 
 
 /// implied bound processing for expression w = x*y, upon change in

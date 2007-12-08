@@ -23,9 +23,9 @@
 #include "exprCos.hpp"
 #include "exprExp.hpp"
 
-#include <asl.h>
-#include <nlp.h>
-#include <opcode.hd>
+#include "asl.h"
+#include "nlp.h"
+#include "opcode.hd"
 
 
 // get ASL op. code relative to function pointer passed as parameter 

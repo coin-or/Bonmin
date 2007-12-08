@@ -12,10 +12,10 @@
 
 #include <iostream>
 
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprConst.hpp>
-#include <exprVar.hpp>
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprConst.hpp"
+#include "exprVar.hpp"
 
 class CouenneProblem;
 

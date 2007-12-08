@@ -7,12 +7,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <OsiSolverInterface.hpp>
+#include "OsiSolverInterface.hpp"
 
-#include <CouenneCutGenerator.hpp>
-#include <CouenneTypes.hpp>
-#include <exprMax.hpp>
-#include <exprMin.hpp>
+#include "CouenneCutGenerator.hpp"
+#include "CouenneTypes.hpp"
+#include "exprMax.hpp"
+#include "exprMin.hpp"
 
 void exprMin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,

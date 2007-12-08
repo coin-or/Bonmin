@@ -7,7 +7,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <depGraph.hpp>
+#include "depGraph.hpp"
 
 
 // Methods of the class DepNode ///////////////////////////////////////////////////////////

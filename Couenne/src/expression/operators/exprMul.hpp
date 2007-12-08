@@ -10,9 +10,9 @@
 #ifndef COUENNE_EXPRMUL_H
 #define COUENNE_EXPRMUL_H
 
-#include <exprOp.hpp>
-#include <exprAux.hpp>
-#include <CouenneProblem.hpp>
+#include "exprOp.hpp"
+#include "exprAux.hpp"
+#include "CouenneProblem.hpp"
 
 
 /// class for multiplications

@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneProblem.hpp>
-#include <CouenneTypes.hpp>
-#include <exprUnary.hpp>
-#include <exprVar.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneTypes.hpp"
+#include "exprUnary.hpp"
+#include "exprVar.hpp"
 
 
 // print unary expression

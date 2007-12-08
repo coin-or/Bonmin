@@ -18,12 +18,12 @@
 
 // core of the bound tightening procedure
 
-bool btCore (const CouenneCutGenerator *cg,
-	     const OsiSolverInterface *psi,
-	     OsiCuts &cs, 
-	     t_chg_bounds *chg_bds, 
-	     Bonmin::BabInfo * babInfo,
-	     bool serious) {
+bool CouenneCutGenerator::
+btCore (const OsiSolverInterface *psi,
+	OsiCuts &cs, 
+	t_chg_bounds *chg_bds, 
+	Bonmin::BabInfo * babInfo,
+	bool serious) const {
 
   //////////////////////// Bound propagation and implied bounds ////////////////////
 
@@ -32,7 +32,7 @@ bool btCore (const CouenneCutGenerator *cg,
       niter = 0;
 
   bool first = true;
-  CouenneProblem *p = cg -> Problem ();
+  CouenneProblem *p = Problem ();
 
   do {
 
@@ -57,7 +57,7 @@ bool btCore (const CouenneCutGenerator *cg,
 
       if (serious) {
 
-	if (!(cg -> isFirst ())) {
+	if (!(isFirst ())) {
 
 	  OsiColCut *infeascut = new OsiColCut;
 
@@ -75,7 +75,7 @@ bool btCore (const CouenneCutGenerator *cg,
 	  babInfo -> setInfeasibleNode ();
       }
 
-      cg->Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+      Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			  "#### infeasible node at BT\n");
 
       return false;
@@ -169,5 +169,5 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
     }
   }
 
-  return btCore (this, psi, cs, chg_bds, babInfo, true);
+  return btCore (psi, cs, chg_bds, babInfo, true);
 }

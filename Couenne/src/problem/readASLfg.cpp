@@ -7,8 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <asl.h>
-#include <nlp.h>
+#include "asl.h"
+#include "nlp.h"
 #include "getstub.h"
 #include "r_opn.hd" /* for N_OPS */
 

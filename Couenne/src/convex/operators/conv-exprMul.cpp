@@ -7,13 +7,13 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <exprMul.hpp>
-#include <exprBMul.hpp>
-#include <exprConst.hpp>
-#include <exprPow.hpp>
-#include <exprClone.hpp>
-#include <CouenneProblem.hpp>
+#include "CouenneTypes.hpp"
+#include "exprMul.hpp"
+#include "exprBMul.hpp"
+#include "exprConst.hpp"
+#include "exprPow.hpp"
+#include "exprClone.hpp"
+#include "CouenneProblem.hpp"
 
 
 /// check if two arguments point to the same variable

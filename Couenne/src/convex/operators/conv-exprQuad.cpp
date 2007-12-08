@@ -9,12 +9,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <OsiRowCut.hpp>
-#include <OsiCuts.hpp>
+#include "OsiRowCut.hpp"
+#include "OsiCuts.hpp"
 
-#include <exprAux.hpp>
-#include <exprQuad.hpp>
-#include <exprBQuad.hpp>
+#include "exprAux.hpp"
+#include "exprQuad.hpp"
+#include "exprBQuad.hpp"
 
 
 /// Get lower and upper bound of an expression (if any)

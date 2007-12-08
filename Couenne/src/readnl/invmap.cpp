@@ -10,10 +10,10 @@
 
 #include <stdlib.h>
 
-#include <asl.h>
-#include <opcode.hd>
-#include <nlp.h>
-#include <r_opn.hd>
+#include "asl.h"
+#include "opcode.hd"
+#include "nlp.h"
+#include "r_opn.hd"
 
 
 /* couples an ASL function pointer with the relative operator constant */

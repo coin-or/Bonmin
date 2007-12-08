@@ -7,8 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <CouenneProblemElem.hpp>
+#include "CouenneTypes.hpp"
+#include "CouenneProblemElem.hpp"
 
 
 // output nonlinear constraint

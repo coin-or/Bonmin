@@ -7,12 +7,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <exprOpp.hpp>
-#include <exprConst.hpp>
+#include "CouenneTypes.hpp"
+#include "exprOpp.hpp"
+#include "exprConst.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 
 // generate equality between *this and *w

@@ -10,7 +10,7 @@
 #ifndef COUENNE_EXPRGROUP_H
 #define COUENNE_EXPRGROUP_H
 
-#include <exprSum.hpp>
+#include "exprSum.hpp"
 
 
 /// class Group, with constant, linear and nonlinear terms

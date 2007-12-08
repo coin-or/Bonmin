@@ -19,14 +19,6 @@
 
 const CouNumber phi = 0.5 * (1. + sqrt (5.));
 
-// core of the bound tightening procedure
-bool btCore (const CouenneCutGenerator *cg,
-	     const OsiSolverInterface *psi,
-	     OsiCuts &cs, 
-	     t_chg_bounds *chg_bds, 
-	     Bonmin::BabInfo * babInfo,
-	     bool serious);
-
 
 // create fictitious bounds to tighten current interval
 CouNumber fictBounds (char direction,
@@ -64,29 +56,29 @@ CouNumber fictBounds (char direction,
 // -1   if infeasible
 //  0   if no improvement
 // +1   if improved
-int fake_tighten (const CouenneCutGenerator *cg,
-		  const OsiSolverInterface  *psi,
-		  OsiCuts &cs, 
-		  Bonmin::BabInfo * babInfo,
-
-		  char direction,  // 0: left, 1: right
-		  int index,       // index of the variable tested
-		  const double *X, // point round which tightening is done
-		  CouNumber *olb,  // cur. lower bound
-		  CouNumber *oub,  //      upper
-		  t_chg_bounds *chg_bds,
-		  t_chg_bounds *f_chg) {
-  int 
-    ncols    = cg -> Problem () -> nVars (),
-    objsense = cg -> Problem () -> Obj (0) -> Sense (),
-    objind   = cg -> Problem () -> Obj (0) -> Body  () -> Index ();
+int CouenneCutGenerator::
+fake_tighten (const OsiSolverInterface  *psi,
+	      OsiCuts &cs, 
+	      Bonmin::BabInfo * babInfo,
+	      
+	      char direction,  // 0: left, 1: right
+	      int index,       // index of the variable tested
+	      const double *X, // point round which tightening is done
+	      CouNumber *olb,  // cur. lower bound
+	      CouNumber *oub,  //      upper
+	      t_chg_bounds *chg_bds,
+	      t_chg_bounds *f_chg) const {
+  int
+    ncols    = Problem () -> nVars (),
+    objsense = Problem () -> Obj (0) -> Sense (),
+    objind   = Problem () -> Obj (0) -> Body  () -> Index ();
 
   assert (objind >= 0);
 
   CouNumber 
-    *lb       = cg -> Problem () -> Lb (),
-    *ub       = cg -> Problem () -> Ub (),
-    cutoff    = cg -> Problem () -> getCutOff (),
+    *lb       = Problem () -> Lb (),
+    *ub       = Problem () -> Ub (),
+    cutoff    = Problem () -> getCutOff (),
     xcur      = X [index],
     inner     = xcur,                                                 // point closest to current x
     //innerZ    = ((objsense == MINIMIZE) ? lb : ub) [objind],          // and associated dual bound
@@ -116,7 +108,7 @@ int fake_tighten (const CouenneCutGenerator *cg,
 #endif
 
     bool
-      feasible  = btCore (cg, psi, cs, f_chg, babInfo, false), // true if feasible with fake bound
+      feasible  = btCore (psi, cs, f_chg, babInfo, false), // true if feasible with fake bound
       betterbds = (objsense == MINIMIZE) ?                     // true if over cutoff
         (lb [objind] > cutoff) : 
         (ub [objind] < cutoff);
@@ -158,7 +150,7 @@ int fake_tighten (const CouenneCutGenerator *cg,
 
       //#if BR_TEST_LOG < 0 // for fair testing
       // check tightened problem for feasibility
-      if (!(btCore (cg, psi, cs, chg_bds, babInfo, true))) {
+      if (!(btCore (psi, cs, chg_bds, babInfo, true))) {
 #ifdef DEBUG
 	printf ("\n    pruned by aggressive BT\n");
 #endif

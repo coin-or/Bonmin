@@ -13,9 +13,9 @@
 #include <iostream>
 #include <set>
 
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprConst.hpp>
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprConst.hpp"
 
 class CouenneProblem;
 

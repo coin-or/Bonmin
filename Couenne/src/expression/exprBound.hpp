@@ -12,8 +12,8 @@
 
 #include <iostream>
 
-#include <CouenneTypes.hpp>
-#include <exprVar.hpp>
+#include "CouenneTypes.hpp"
+#include "exprVar.hpp"
 
 /// These are bound expression classes. They are used in the parametric
 /// convexification part to obtain lower/upper bounds of an expression

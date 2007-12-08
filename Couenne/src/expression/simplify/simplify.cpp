@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <expression.hpp>
-#include <exprOp.hpp>
-#include <exprUnary.hpp>
-#include <exprConst.hpp>
+#include "expression.hpp"
+#include "exprOp.hpp"
+#include "exprUnary.hpp"
+#include "exprConst.hpp"
 
 
 // simplify n-ary expression f (g_1(x), g_2(x)... g_n(x))

@@ -17,33 +17,6 @@
 
 #define MAX_ABT_ITER 8  // max # aggressive BT iterations
 
-// core of the bound tightening procedure
-bool btCore (const CouenneCutGenerator *cg,
-	     const OsiSolverInterface *psi,
-	     OsiCuts &cs, 
-	     t_chg_bounds *chg_bds, 
-	     Bonmin::BabInfo * babInfo,
-	     bool serious);
-
-
-// single fake tightening. Return
-//
-// -1   if infeasible
-//  0   if no improvement
-// +1   if improved
-int fake_tighten (const CouenneCutGenerator *cg,
-		  const OsiSolverInterface *psi,
-		  OsiCuts &cs,
-		  Bonmin::BabInfo * babInfo,
-
-		  char direction,  // 0: left, 1: right
-		  int index,       // index of the variable tested
-		  const double *X, // point round which tightening is done
-		  CouNumber *olb,  // cur. lower bound
-		  CouNumber *oub,  //      upper
-		  t_chg_bounds *chg_bds,
-		  t_chg_bounds *f_chg);
-
 
 // Aggressive Bound Tightening: for each variable, fake new bounds
 // [l,b] or [b,u] and apply bound tightening. If the interval is
@@ -96,42 +69,45 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 
   do {
 
+    improved = 0;  // Pietro: This statement was inside for loop - correct here?
+
     // scan all variables
-    // AW: We only want to do the loop that temporarily changes bounds
-    // around the NLP solution only for those points from the NLP
-    // solution (no auxiliary vars)?
-    for (int i=0; i<problem_ -> nOrig(); i++) {
+    for (int i=0; i<ncols; i++) {
 
       int index = problem_ -> evalOrder (i);
 
-      // if (index == objind) continue; // don't do it on objective function
+      // AW: We only want to do the loop that temporarily changes bounds
+      // around the NLP solution only for those points from the NLP
+      // solution (no auxiliary vars)?
+      if (index < problem_ -> nOrig()) {
 
-      improved = 0;
+	// if (index == objind) continue; // don't do it on objective function
 
-      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-		      "x_%03d:-----------------------------\n  ### tighten left\n", index);
+	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+			"x_%03d:-----------------------------\n  ### tighten left\n", index);
 
-      // tighten on left
-      if ((X [index] >= lb [index] + COUENNE_EPS)
-	  && ((improved = fake_tighten (this, psi, cs, babInfo, 
-					0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
-	retval = false;
-	break;
-      }
+	// tighten on left
+	if ((X [index] >= lb [index] + COUENNE_EPS)
+	    && ((improved = fake_tighten (psi, cs, babInfo, 
+					  0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
+	  retval = false;
+	  break;
+	}
 
-      second = 0;
+	second = 0;
 
-      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
+	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
 
-      // tighten on right
-      if ((X [index] <= ub [index] - COUENNE_EPS)
-	  && ((second = fake_tighten (this, psi, cs, babInfo, 
+	// tighten on right
+	if ((X [index] <= ub [index] - COUENNE_EPS)
+	    && ((second = fake_tighten (psi, cs, babInfo, 
 				      1, index, X, olb, oub, chg_bds, f_chg) < 0))) {
-	retval = false;
-	break;
-      }
+	  retval = false;
+	  break;
+	}
 
-      improved += second;
+	improved += second;
+      }
     }
 
   } while (retval && improved && (iter++ < MAX_ABT_ITER));
@@ -151,6 +127,6 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
   delete [] olb;
   delete [] oub;
 
-  return retval;// && btCore (this, psi, cs, chg_bds, babInfo, true); // !!!
-  //return retval && btCore (this, psi, cs, chg_bds, babInfo, true);
+  return retval;// && btCore (psi, cs, chg_bds, babInfo, true); // !!!
+  //return retval && btCore (psi, cs, chg_bds, babInfo, true);
 }

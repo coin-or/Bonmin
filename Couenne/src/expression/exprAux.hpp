@@ -12,12 +12,12 @@
 #define COUENNE_EXPRAUX_HPP
 
 #include <iostream>
-#include <exprVar.hpp>
-#include <exprBound.hpp>
-#include <exprMax.hpp>
-#include <exprMin.hpp>
-#include <CouenneTypes.hpp>
-#include <CglCutGenerator.hpp>
+#include "exprVar.hpp"
+#include "exprBound.hpp"
+#include "exprMax.hpp"
+#include "exprMin.hpp"
+#include "CouenneTypes.hpp"
+#include "CglCutGenerator.hpp"
 
 
 /** Auxiliary variable

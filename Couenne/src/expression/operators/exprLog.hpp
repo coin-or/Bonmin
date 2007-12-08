@@ -10,9 +10,8 @@
 #ifndef COUENNE_EXPRLOG_HPP
 #define COUENNE_EXPRLOG_HPP
 
-#include <exprInv.hpp>
-#include <expression.hpp>
-#include <math.h>
+#include "exprInv.hpp"
+#include "expression.hpp"
 
 
 /// class logarithm

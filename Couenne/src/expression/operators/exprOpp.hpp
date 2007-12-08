@@ -10,8 +10,8 @@
 #ifndef COUENNE_EXPROPP_HPP
 #define COUENNE_EXPROPP_HPP
 
-#include <CouennePrecisions.hpp>
-#include <exprUnary.hpp>
+#include "CouennePrecisions.hpp"
+#include "exprUnary.hpp"
 
 
 /// operator opp: returns the opposite of a number

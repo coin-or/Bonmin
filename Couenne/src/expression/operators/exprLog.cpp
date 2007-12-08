@@ -9,12 +9,12 @@
 
 #include <math.h>
 
-#include <exprLog.hpp>
-#include <exprConst.hpp>
-#include <exprClone.hpp>
-#include <exprMax.hpp>
-#include <exprMin.hpp>
-#include <exprDiv.hpp>
+#include "exprLog.hpp"
+#include "exprConst.hpp"
+#include "exprClone.hpp"
+#include "exprMax.hpp"
+#include "exprMin.hpp"
+#include "exprDiv.hpp"
 
 
 /// get bounds of log (x) based on bounds of x

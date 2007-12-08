@@ -7,12 +7,12 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CouenneTypes.hpp>
-#include <exprMul.hpp>
-#include <exprPow.hpp>
-#include <exprDiv.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneTypes.hpp"
+#include "exprMul.hpp"
+#include "exprPow.hpp"
+#include "exprDiv.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 
 /// generate convexification cut for constraint w = x*y

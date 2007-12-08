@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <exprQuad.hpp>
+#include "exprQuad.hpp"
 
-#include <CouenneProblem.hpp>
-#include <CouenneCutGenerator.hpp>
+#include "CouenneProblem.hpp"
+#include "CouenneCutGenerator.hpp"
 
 #include "CoinHelperFunctions.hpp"
 

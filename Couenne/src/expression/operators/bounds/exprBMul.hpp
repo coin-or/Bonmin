@@ -10,7 +10,7 @@
 #ifndef COUENNE_EXPRBMUL_H
 #define COUENNE_EXPRBMUL_H
 
-#include <exprOp.hpp>
+#include "exprOp.hpp"
 
 
 /// product that avoids NaN's 

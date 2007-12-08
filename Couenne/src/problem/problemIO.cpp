@@ -11,10 +11,10 @@
 #include <fstream>
 #include <iomanip> // to use the setprecision manipulator
 
-#include <expression.hpp>
-#include <exprAux.hpp>
+#include "expression.hpp"
+#include "exprAux.hpp"
 
-#include <CouenneProblem.hpp>
+#include "CouenneProblem.hpp"
 
 
 // output content of the problem

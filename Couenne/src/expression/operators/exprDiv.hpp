@@ -10,8 +10,8 @@
 #ifndef COUENNE_EXPRDIV_HPP
 #define COUENNE_EXPRDIV_HPP
 
-#include <exprOp.hpp>
-#include <CouennePrecisions.hpp>
+#include "exprOp.hpp"
+#include "CouennePrecisions.hpp"
 
 #define BR_NEXT_ZERO 1e-3
 #define BR_MULT      1e-3

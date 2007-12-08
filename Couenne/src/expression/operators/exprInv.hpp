@@ -10,7 +10,7 @@
 #ifndef COUENNE_EXPRINV_H
 #define COUENNE_EXPRINV_H
 
-#include <exprUnary.hpp>
+#include "exprUnary.hpp"
 
 
 /// the operator itself

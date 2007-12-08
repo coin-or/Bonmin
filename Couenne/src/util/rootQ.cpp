@@ -10,8 +10,8 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <CouenneTypes.hpp>
-#include <CouennePrecisions.hpp>
+#include "CouenneTypes.hpp"
+#include "CouennePrecisions.hpp"
 
 
 /* compute Q(x)*/

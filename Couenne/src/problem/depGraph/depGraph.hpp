@@ -13,10 +13,10 @@
 #include <vector>
 #include <set>
 
-#include <CouenneTypes.hpp>
-#include <expression.hpp>
-#include <exprAux.hpp>
-#include <CouenneProblemElem.hpp>
+#include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprAux.hpp"
+#include "CouenneProblemElem.hpp"
 
 
 /// structure for comparing nodes in the dependence graph

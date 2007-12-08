@@ -13,7 +13,7 @@
 
 #include <map>
 
-#include <exprGroup.hpp>
+#include "exprGroup.hpp"
 
 
 /**  class exprQuad, with constant, linear and quadratic terms

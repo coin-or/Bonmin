@@ -7,10 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CglCutGenerator.hpp>
-#include <CouenneCutGenerator.hpp>
-#include <CouenneProblem.hpp>
-#include <CouenneSolverInterface.hpp>
+#include "CglCutGenerator.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
+#include "CouenneSolverInterface.hpp"
 
 #define OBBT_EPS 1e-3
 #define MAX_OBBT_LP_ITERATION 100
@@ -20,7 +20,7 @@
 // bounds around 1e14. Fix.
 
 /// reoptimize and change bound of a variable if needed
-bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use as a solver
+static bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use as a solver
 		       int sense,               /// 1: minimize, -1: maximize
 		       CouNumber &bound,        /// bound to be updated
 		       bool isint) {            /// is this variable integer
@@ -50,15 +50,15 @@ bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use as a so
 
 /// Iteration on one variable
 
-int obbt_iter (const CouenneCutGenerator *cg, 
-	       CouenneSolverInterface *csi, 
-	       OsiCuts &cs, 
-	       t_chg_bounds *chg_bds, 
-	       const CoinWarmStart *warmstart, 
-	       Bonmin::BabInfo *babInfo,
-	       double *objcoe,
-	       int sense, 
-	       int index) {
+int CouenneCutGenerator::
+obbt_iter (CouenneSolverInterface *csi, 
+	   OsiCuts &cs, 
+	   t_chg_bounds *chg_bds, 
+	   const CoinWarmStart *warmstart, 
+	   Bonmin::BabInfo *babInfo,
+	   double *objcoe,
+	   int sense, 
+	   int index) const {
 
   // TODO: do NOT apply OBBT if this is a variable of the form
   // w2=c*w1, as it suffices to multiply result. More in general, do
@@ -76,7 +76,7 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
   bool issimple = false;
 
-  CouenneProblem *p = cg -> Problem ();
+  CouenneProblem *p = Problem ();
 
   exprVar *var = p -> Var (index);
 
@@ -173,15 +173,15 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
     // m{in,ax}imize xi on csi
 
-    if (cg->Jnlst()->ProduceOutput(J_MOREVECTOR, J_BOUNDTIGHTENING)) {
-      cg->Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,
+    if (Jnlst()->ProduceOutput(J_MOREVECTOR, J_BOUNDTIGHTENING)) {
+      Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,
 		      "m%simizing x%d [%g,%g] %c= %g\n",
 	    (sense==1) ? "in" : "ax", index, p -> Lb (index), p -> Ub (index),
 	    (sense==1) ? '>'  : '<',  bound); fflush (stdout);
-      if (cg->Jnlst()->ProduceOutput(J_MOREMATRIX, J_BOUNDTIGHTENING)) {
+      if (Jnlst()->ProduceOutput(J_MOREMATRIX, J_BOUNDTIGHTENING)) {
 	char fname [20];
 	sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", index, iter);
-	cg->Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,"writing %s\n", fname);
+	Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,"writing %s\n", fname);
 	csi -> writeLp (fname);
       }
     }
@@ -194,13 +194,13 @@ int obbt_iter (const CouenneCutGenerator *cg,
 	if (sense == 1) {
 	  if ((p -> Lb (index) < p -> bestSol () [index]) && 
 	      (bound       > COUENNE_EPS + p -> bestSol () [index]))
-	    cg->Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
+	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: lb = %g, opt = %g, new lb = %g\n", 
 			    index, p -> Lb (index), p -> bestSol () [index], bound);
 	} else {
 	  if ((p -> Ub (index) > p -> bestSol () [index]) && 
 	      (bound       < -COUENNE_EPS + p -> bestSol () [index]))
-	    cg->Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
+	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: ub = %g, opt = %g, new ub = %g\n", 
 			    index, p -> Ub (index), p -> bestSol () [index], bound);
 	}
@@ -210,13 +210,13 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
       if (sense==1)
 	if (csi -> getColLower () [index] < bound - COUENNE_EPS) {
-	  cg->Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"l_%d: %g --> %g\n", index, csi -> getColLower () [index], bound);
+	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"l_%d: %g --> %g\n", index, csi -> getColLower () [index], bound);
 	  csi -> setColLower (index, bound); 
 	  chg_bds      [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
 	} else chg_bds [index].setLowerBits(t_chg_bounds::EXACT);
       else
 	if (csi -> getColUpper () [index] > bound + COUENNE_EPS) {
-	  cg->Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"u_%d: %g --> %g\n", index, csi -> getColUpper () [index], bound);
+	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"u_%d: %g --> %g\n", index, csi -> getColUpper () [index], bound);
 	  csi -> setColUpper (index, bound); 
 	  chg_bds      [index].setUpperBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
 	} else chg_bds [index].setUpperBits(t_chg_bounds::EXACT);
@@ -269,21 +269,21 @@ int obbt_iter (const CouenneCutGenerator *cg,
 
       int psenseI = (psense == MINIMIZE) ? 1 : -1;
 
-      cg->Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 		      "XXXXXXXXXXXXXXX OBBT: x_%d: [%g, %g]\n", index, 
 		      csi -> getColLower () [index], 
 		      csi -> getColUpper () [index]);
 
-      if (!(cg -> boundTightening (((objind == index) && (sense == psenseI)) ? csi : NULL, 
+      if (!(boundTightening (((objind == index) && (sense == psenseI)) ? csi : NULL, 
 				   cs, chg_bds, babInfo))) {
-	cg->Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			"##### infeasible, bound tightening after OBBT\n");
 	return -1; // tell caller this is infeasible
       }
 
       nImprov++;
     }
-    cg->Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
 
     // if we solved the problem on the objective function's
     // auxiliary variable (that is, we re-solved the extended

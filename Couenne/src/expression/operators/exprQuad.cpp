@@ -7,13 +7,13 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include <CoinHelperFunctions.hpp>
-#include <CouenneProblem.hpp>
-#include <exprConst.hpp>
-#include <exprQuad.hpp>
-#include <exprPow.hpp>
-#include <exprMul.hpp>
-#include <depGraph.hpp>
+#include "CoinHelperFunctions.hpp"
+#include "CouenneProblem.hpp"
+#include "exprConst.hpp"
+#include "exprQuad.hpp"
+#include "exprPow.hpp"
+#include "exprMul.hpp"
+#include "depGraph.hpp"
 
 //#define DEBUG
 
