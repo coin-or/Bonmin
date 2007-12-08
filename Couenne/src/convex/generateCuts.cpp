@@ -51,7 +51,6 @@ void fictitiousBound (OsiCuts &cs,
 
 
 // translate changed bound sparse array into a dense one
-
 void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged) {
 
   // convert sparse chg_bds in something handier
@@ -70,7 +69,6 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
 
 
 /// get new bounds from parents' bounds + branching rules
-
 void updateBranchInfo (const OsiSolverInterface &si, CouenneProblem *p, 
 		       t_chg_bounds *chg, const CglTreeInfo &info);
 
@@ -94,7 +92,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   if (babInfo)
     babInfo -> setFeasibleNode ();
-  //  else printf ("but not always... %p [%p]\n", &si, si.getAuxiliaryInfo ());
 
   double now   = CoinCpuTime ();
   int    ncols = problem_ -> nVars ();
@@ -248,6 +245,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     problem_ -> update (si. getColSolution (), NULL, NULL);
     addviolated_ = save_av;     // restore previous value
 
+    //    if (!firstcall_) // keep solution if called from extractLinearRelaxation()
     babInfo -> setHasNlpSolution (false); // reset it after use 
   }
   else genRowCuts (si, cs, nchanged, changed, info, chg_bds);

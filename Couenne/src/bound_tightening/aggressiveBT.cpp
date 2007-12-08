@@ -36,13 +36,19 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
     *lb  = problem_ -> Lb (),
     *ub  = problem_ -> Ub ();
 
-  const double *X = babInfo->nlpSolution(); // length nOrig()
+  // PBe: X is now the NLP solution, but in a low-dimensional
+  // space. We have to get the corresponding point in higher
+  // dimensional space through getAuxs()
+
+  double *X = new double [ncols];
+  CoinCopyN (babInfo -> nlpSolution (), problem_ -> nOrig (), X); 
+  problem_ -> getAuxs (X);
 
   // save current bounds
   CoinCopyN (lb, ncols, olb);
   CoinCopyN (ub, ncols, oub);
 
-  // create new, fictitious, bounds
+  // create a new, fictitious, bound bookkeeping structure
   t_chg_bounds *f_chg = new t_chg_bounds [ncols];
 
   if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
@@ -57,7 +63,7 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 		    lb [objind], cutoff, ncols);
   }
 
-  int improved = 0, second, iter = 0;
+  int improved, second, iter = 0;
 
   // Repeatedly fake tightening bounds on both sides of every variable
   // to concentrate around current NLP point.
@@ -76,9 +82,13 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 
       int index = problem_ -> evalOrder (i);
 
-      // AW: We only want to do the loop that temporarily changes bounds
-      // around the NLP solution only for those points from the NLP
-      // solution (no auxiliary vars)?
+      // AW: We only want to do the loop that temporarily changes
+      // bounds around the NLP solution only for those points from the
+      // NLP solution (no auxiliary vars)?
+
+      // PBe: if we do want that, index should be initialized as i, as
+      // evalOrder gives a variable index out of an array index.
+
       if (index < problem_ -> nOrig()) {
 
 	// if (index == objind) continue; // don't do it on objective function
@@ -109,7 +119,6 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
 	improved += second;
       }
     }
-
   } while (retval && improved && (iter++ < MAX_ABT_ITER));
 
   // store new valid bounds into problem, or restore old ones if none changed
