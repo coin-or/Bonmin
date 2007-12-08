@@ -71,6 +71,7 @@ int fake_tighten (const CouenneCutGenerator *cg,
 
 		  char direction,  // 0: left, 1: right
 		  int index,       // index of the variable tested
+		  const double *X, // point round which tightening is done
 		  CouNumber *olb,  // cur. lower bound
 		  CouNumber *oub,  //      upper
 		  t_chg_bounds *chg_bds,
@@ -86,7 +87,7 @@ int fake_tighten (const CouenneCutGenerator *cg,
     *lb       = cg -> Problem () -> Lb (),
     *ub       = cg -> Problem () -> Ub (),
     cutoff    = cg -> Problem () -> getCutOff (),
-    xcur      = psi -> getColSolution () [index],
+    xcur      = X [index],
     inner     = xcur,                                                 // point closest to current x
     //innerZ    = ((objsense == MINIMIZE) ? lb : ub) [objind],          // and associated dual bound
     outer     = (direction ? oub : olb) [index],                      // point closest to bound

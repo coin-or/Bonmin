@@ -59,27 +59,25 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
     }
 
   // check constraints
-  if (0)
-  for (int i=0; i < nCons (); i++) {
+  if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
+    for (int i=0; i < nCons (); i++) {
 
-    CouenneConstraint *c = Con (i);
+      CouenneConstraint *c = Con (i);
 
-    CouNumber
-      body = (*(c -> Body ())) (),
-      lhs  = (*(c -> Lb   ())) (),
-      rhs  = (*(c -> Ub   ())) ();
+      CouNumber
+	body = (*(c -> Body ())) (),
+	lhs  = (*(c -> Lb   ())) (),
+	rhs  = (*(c -> Ub   ())) ();
 
-    printf ("??? %.20f < %.20f < %.20f ---", lhs, body, rhs);
-      c -> print ();
-
-    if ((body > rhs + COUENNE_EPS) || 
-	(body < lhs - COUENNE_EPS)) {
-      if (Jnlst()->ProduceOutput(Ipopt::J_MOREDETAILED, J_PROBLEM)) {
-	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
-			"constraint %d violated: ", i);
-	c -> print ();
+      if ((body > rhs + COUENNE_EPS) || 
+	  (body < lhs - COUENNE_EPS)) {
+	if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
+	  Jnlst()->Printf(Ipopt::J_WARNING, J_PROBLEM,
+			  "Warning in checkNLP: constraint %d violated (lhs = %e body = %e rhs = %e): ", i, lhs, body, rhs);
+	  c -> print ();
+	}
+	// We dont return anymore (return false;)
       }
-      return false;
     }
   }
 

@@ -38,6 +38,7 @@ int fake_tighten (const CouenneCutGenerator *cg,
 
 		  char direction,  // 0: left, 1: right
 		  int index,       // index of the variable tested
+		  const double *X, // point round which tightening is done
 		  CouNumber *olb,  // cur. lower bound
 		  CouNumber *oub,  //      upper
 		  t_chg_bounds *chg_bds,
@@ -62,7 +63,7 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
     *lb  = problem_ -> Lb (),
     *ub  = problem_ -> Ub ();
 
-  const double *X = psi -> getColSolution ();
+  const double *X = babInfo->nlpSolution(); // length nOrig()
 
   // save current bounds
   CoinCopyN (lb, ncols, olb);
@@ -74,7 +75,7 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
   if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
     CouNumber cutoff = problem_ -> getCutOff ();
     int       objind = problem_ -> Obj (0) -> Body  () -> Index ();
-    for (int i=0; i<ncols; i++)
+    for (int i=0; i<problem_ -> nOrig(); i++)
       Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 		      "   %2d %+20g %+20g  | %+20g\n",
 		      i, lb [i], ub [i], X [i]);
@@ -96,7 +97,10 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
   do {
 
     // scan all variables
-    for (int i=0; i<ncols; i++) {
+    // AW: We only want to do the loop that temporarily changes bounds
+    // around the NLP solution only for those points from the NLP
+    // solution (no auxiliary vars)?
+    for (int i=0; i<problem_ -> nOrig(); i++) {
 
       int index = problem_ -> evalOrder (i);
 
@@ -110,7 +114,7 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
       // tighten on left
       if ((X [index] >= lb [index] + COUENNE_EPS)
 	  && ((improved = fake_tighten (this, psi, cs, babInfo, 
-					0, index, olb, oub, chg_bds, f_chg)) < 0)) {
+					0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
 	retval = false;
 	break;
       }
@@ -122,7 +126,7 @@ bool CouenneCutGenerator::aggressiveBT (const OsiSolverInterface *psi,
       // tighten on right
       if ((X [index] <= ub [index] - COUENNE_EPS)
 	  && ((second = fake_tighten (this, psi, cs, babInfo, 
-				      1, index, olb, oub, chg_bds, f_chg) < 0))) {
+				      1, index, X, olb, oub, chg_bds, f_chg) < 0))) {
 	retval = false;
 	break;
       }

@@ -67,6 +67,10 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   // auxiliary variables.
   nOrigCons_ = constraints_. size ();
 
+  Jnlst()->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
+		  "Problem size before standarization: %d variables (%d integer) %d constraints.\n",
+		  nOrig(), nIntVars(), nOrigCons());
+
   // reformulation
   standardize ();
 
@@ -76,6 +80,10 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   if ((now = (CoinCpuTime () - now)) > 10.)
     jnlst_->Printf(Ipopt::J_WARNING, J_PROBLEM,
 		   "Couenne: standardization time %.3fs\n", now);
+
+  Jnlst()->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
+		  "Problem size after standarization: %d variables (%d integer) %d constraints.\n",
+		  nVars(), nIntVars(), nCons());
 
   //  readOptimum ("nc.txt", optimum_, bestObj_, this);
 

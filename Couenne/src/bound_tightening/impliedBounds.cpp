@@ -65,14 +65,15 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       // TODO: also test if this expression, or any of its indep
       // variables, have changed. If not, skip
 
+      CouNumber 
+	l0 = lb_ [i], 
+	u0 = ub_ [i];
+
       if (variables_ [i] -> Image () -> impliedBound 
 	  (variables_ [i] -> Index (), lb_, ub_, chg_bds)) {
 
 	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
 	  // todo: send all output through journalist
-	  CouNumber 
-	    l0 = lb_ [i], 
-	    u0 = ub_ [i];
 	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
 			  "impli %2d [%g,%g] -> [%g,%g]: ",
 			  i, l0, u0, lb_ [i], ub_ [i]);
