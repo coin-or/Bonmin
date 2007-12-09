@@ -16,24 +16,24 @@ namespace Bonmin
   AuxInfo::AuxInfo(int type):
       OsiBabSolver(type),
       infeasibleNode_(false),
-      objValue_ (DBL_MAX),
+      objValue_ (COIN_DBL_MAX),
       nlpSolution_(NULL),
       numcols_(0),
       hasNlpSolution_(false),
       bestSolution2_(make_referenced(std::vector<double>())),
-      bestObj2_(make_referenced(DBL_MAX))
+      bestObj2_(make_referenced(COIN_DBL_MAX))
   {}
 
   /** Constructor from OsiBabSolver.*/
   AuxInfo::AuxInfo(const OsiBabSolver &other):
       OsiBabSolver(other),
       infeasibleNode_(false),
-      objValue_ (DBL_MAX),
+      objValue_ (COIN_DBL_MAX),
       nlpSolution_(NULL),
       numcols_(0),
       hasNlpSolution_(false),
       bestSolution2_(make_referenced(std::vector<double>())),
-      bestObj2_(make_referenced(DBL_MAX))
+      bestObj2_(make_referenced(COIN_DBL_MAX))
   {}
 
   /** Copy constructor.*/

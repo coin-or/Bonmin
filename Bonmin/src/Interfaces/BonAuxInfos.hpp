@@ -14,6 +14,7 @@
 #include "OsiAuxInfo.hpp"
 #include "CoinSmartPtr.hpp"
 #include "BonTypes.hpp"
+#include "CoinFinite.hpp"
 
 
 namespace Bonmin {
@@ -60,7 +61,7 @@ public:
 
   /** Get objective value of nlp solution found, or +infinity if none exists */
   const double nlpObjValue ()
-  {return hasNlpSolution_ ? objValue_ : 1.e300;}
+  {return hasNlpSolution_ ? objValue_ : COIN_DBL_MAX;}
 
   /** Pass a solution found by an nlp solver.*/
   void setNlpSolution(const double * sol, int numcols, double objValue);
