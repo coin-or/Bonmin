@@ -201,25 +201,28 @@ namespace Bonmin{
     bool foundSolution = false;
     if (nlp_->isProvenOptimal()) // store solution in Aux info
     {
-  //    newSolution = new double [solver->getNumCols()];
-      CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), newSolution);
+      const int nVars = solver->getNumCols();
+      double* tmpSolution = new double [nVars];
+      CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), tmpSolution);
 
       //Get correct values for all auxiliary variables
       CouenneInterface * couenne = dynamic_cast<CouenneInterface *>
         (nlp_);
 
       if (couenne){
-	couenne_ -> getAuxs (newSolution);
+	couenne_ -> getAuxs (tmpSolution);
       }
 
       if (babInfo){
-	babInfo->setNlpSolution (newSolution, model_->solver () -> getNumCols (), obj);
+	babInfo->setNlpSolution (tmpSolution, nVars, obj);
         babInfo->setHasNlpSolution (true);
       }
       if (obj < objectiveValue) { // found better solution?
 	foundSolution = true;
 	objectiveValue = obj;
+	CoinCopyN(tmpSolution, nVars, newSolution);
       }
+      delete [] tmpSolution;
     }
     nlp_->setColLower(saveColLower);
     nlp_->setColUpper(saveColUpper);
