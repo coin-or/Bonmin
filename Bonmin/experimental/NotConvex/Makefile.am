@@ -105,13 +105,10 @@ if COIN_HAS_COUENNE
 endif
 
 boncouenne_SOURCES = BonCouenne.cpp \
-              BonCouenneSetup.cpp \
-              BonCouenneSetup.hpp \
-              BonCouenneInterface.hpp \
-              BonNlpHeuristic.hpp \
-              BonNlpHeuristic.cpp \
-              BonCouenneTMINLP.hpp \
-              BonCouenneInterface.cpp
+              BonCouenneSetup.cpp BonCouenneSetup.hpp \
+              BonCouenneInterface.cpp BonCouenneInterface.hpp \
+              BonNlpHeuristic.cpp BonNlpHeuristic.hpp \
+              BonInitHeuristic.cpp BonInitHeuristic.hpp
 
 boncouenne_LDADD = \
         ../../src/CbcBonmin/libbonminampl.la \

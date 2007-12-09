@@ -75,7 +75,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_boncouenne_OBJECTS = BonCouenne.$(OBJEXT) BonCouenneSetup.$(OBJEXT) \
-	BonNlpHeuristic.$(OBJEXT) BonCouenneInterface.$(OBJEXT)
+	BonCouenneInterface.$(OBJEXT) BonNlpHeuristic.$(OBJEXT) \
+	BonInitHeuristic.$(OBJEXT)
 boncouenne_OBJECTS = $(am_boncouenne_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 @COIN_HAS_COUENNE_TRUE@am__DEPENDENCIES_2 =  \
@@ -383,13 +384,10 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	$(CGLSRCDIR)/src` $(am__append_4) $(ASL_CPPFLAGS) \
 	$(am__append_5) $(am__append_6)
 boncouenne_SOURCES = BonCouenne.cpp \
-              BonCouenneSetup.cpp \
-              BonCouenneSetup.hpp \
-              BonCouenneInterface.hpp \
-              BonNlpHeuristic.hpp \
-              BonNlpHeuristic.cpp \
-              BonCouenneTMINLP.hpp \
-              BonCouenneInterface.cpp
+              BonCouenneSetup.cpp BonCouenneSetup.hpp \
+              BonCouenneInterface.cpp BonCouenneInterface.hpp \
+              BonNlpHeuristic.cpp BonNlpHeuristic.hpp \
+              BonInitHeuristic.cpp BonInitHeuristic.hpp
 
 boncouenne_LDADD = \
         ../../src/CbcBonmin/libbonminampl.la \
@@ -480,6 +478,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenne.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneInterface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneSetup.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonInitHeuristic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonNlpHeuristic.Po@am__quote@
 
 .cpp.o:

@@ -32,6 +32,8 @@ Bonmin/experimental/NotConvex/BonCouenneInterface.cpp -text
 Bonmin/experimental/NotConvex/BonCouenneInterface.hpp -text
 Bonmin/experimental/NotConvex/BonCouenneSetup.cpp -text
 Bonmin/experimental/NotConvex/BonCouenneSetup.hpp -text
+Bonmin/experimental/NotConvex/BonInitHeuristic.cpp -text
+Bonmin/experimental/NotConvex/BonInitHeuristic.hpp -text
 Bonmin/experimental/NotConvex/BonNlpHeuristic.cpp -text
 Bonmin/experimental/NotConvex/BonNlpHeuristic.hpp -text
 Bonmin/experimental/NotConvex/Makefile.am -text

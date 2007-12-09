@@ -9,6 +9,7 @@
 
 #include "BonCouenneSetup.hpp"
 #include "BonNlpHeuristic.hpp"
+#include "BonInitHeuristic.hpp"
 #include "BonCouenneInterface.hpp"
 
 #include "CouenneObject.hpp"
@@ -118,20 +119,14 @@ namespace Bonmin{
 
     ci -> extractLinearRelaxation (*continuousSolver_, *couenneCg);
 
-    // In case there are no discrete variables, we can set the optimal
-    // value from the initialSolve as cutoff
-
-    // TODO: In case there are integer variables, check if all feasible
-
-    // pbelotti: don't set it here, it gives numerical and, with
-    // Anstreicher's maximization problems, sign (!) troubles
-
-    /*
-    if (ci -> getNumIntegers() == 0) {
-      // add small portion in abs. value (assume minimization problem)
-      doubleParam_[Cutoff] = ci->getObjValue() + 1e-4 * fabs (ci -> getObjValue ());
+    // In case there are no discrete variables, we have already a
+    // heuristic solution for which create a initialization heuristic
+    if (ci->getNumIntegers() == 0 && ci->isProvenOptimal()) {
+      InitHeuristic* initHeuristic =
+        new InitHeuristic(ci->getObjValue(), ci->getColSolution(),
+                          *couenneProb);
+      heuristics_.push_back(initHeuristic);
     }
-    */
 
     if(extraStuff->infeasibleNode()){
       std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
