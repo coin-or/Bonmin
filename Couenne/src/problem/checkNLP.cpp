@@ -54,6 +54,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
 			"checkNLP: integrality %d violated: %g [%g,%g]\n", 
 			i, val, expression::Lbound (i), expression::Ubound (i));
+	delete [] sol;
 	return false;
       }
     }
@@ -110,6 +111,8 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
       }
     }
   */
+
+  delete [] sol;
 
   return true;
 }

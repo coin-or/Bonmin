@@ -54,7 +54,9 @@ void fictitiousBound (OsiCuts &cs,
 void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged) {
 
   // convert sparse chg_bds in something handier
-  changed  = (int *) malloc (ncols * sizeof (int));
+  // AW: replacd "malloc" here by "realloc"; otherwise this is a memory leak
+  //     In general, I don't think it is worth to do a realloc here, it is probably more expensive than not using it.  The memory is free anyway when generateCuts is left
+  changed  = (int *) realloc (changed, ncols * sizeof (int));
   nchanged = 0;
 
   for (register int i=ncols, j=0; i--; j++, chg_bds++)
