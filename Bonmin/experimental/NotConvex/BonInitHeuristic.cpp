@@ -18,6 +18,7 @@ namespace Bonmin{
     objValue_(objValue),
     sol_(NULL)
   {
+    setHeuristicName("InitHeuristic");
     nVars_ = cp.nVars();
     sol_ = new double[nVars_];
 
@@ -27,7 +28,7 @@ namespace Bonmin{
 
   InitHeuristic::InitHeuristic(const InitHeuristic & other)
     :
-    CbcHeuristic(),
+    CbcHeuristic(other),
     objValue_(other.objValue_),
     nVars_(other.nVars_)
   {

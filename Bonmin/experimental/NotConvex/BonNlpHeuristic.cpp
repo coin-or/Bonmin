@@ -26,12 +26,14 @@ namespace Bonmin{
     maxNlpInf_(maxNlpInf_0),
     numberSolvePerLevel_(-1),
     couenne_(NULL){
+    setHeuristicName("NlpSolveHeuristic");
   }
   
   NlpSolveHeuristic::NlpSolveHeuristic(CbcModel & model, OsiSolverInterface &nlp, bool cloneNlp, CouenneProblem * couenne):
   CbcHeuristic(model), nlp_(&nlp), hasCloned_(cloneNlp),maxNlpInf_(maxNlpInf_0),
   numberSolvePerLevel_(-1),
   couenne_(couenne){
+    setHeuristicName("NlpSolveHeuristic");
     if(cloneNlp)
       nlp_ = nlp.clone();
   }
