@@ -196,13 +196,8 @@ namespace Bonmin{
 
     double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
 
-    bool foundSolution = true
-      && nlp_->isProvenOptimal()
-      // && (obj < objectiveValue)
-      // && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
-    ;
-
-    if (foundSolution) //Better solution found update
+    bool foundSolution = false;
+    if (nlp_->isProvenOptimal()) // store solution in Aux info
     {
   //    newSolution = new double [solver->getNumCols()];
       CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), newSolution);
@@ -219,7 +214,10 @@ namespace Bonmin{
 	babInfo->setNlpSolution (newSolution, model_->solver () -> getNumCols (), obj);
         babInfo->setHasNlpSolution (true);
       }
-      objectiveValue = obj;
+      if (obj < objectiveValue) { // found better solution?
+	foundSolution = true;
+	objectiveValue = obj;
+      }
     }
     nlp_->setColLower(saveColLower);
     nlp_->setColUpper(saveColUpper);
