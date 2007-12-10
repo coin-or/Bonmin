@@ -2251,7 +2251,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
         }
       }
     }
-    if(integerSol){
+    if(integerSol&&isProvenOptimal()){
       double help= problem_->evaluateUpperBoundingFunction(sol);
      
 
