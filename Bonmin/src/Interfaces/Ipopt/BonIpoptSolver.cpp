@@ -216,8 +216,8 @@ namespace Bonmin
     switch (optimization_status) {
     case Ipopt::Maximum_Iterations_Exceeded:
     case Ipopt::User_Requested_Stop:
-      return iterationLimit;
     case Ipopt::Restoration_Failed:
+      return iterationLimit;
     case Ipopt::Error_In_Step_Computation:
     case Ipopt::Unrecoverable_Exception:
     case Ipopt::Insufficient_Memory:
