@@ -60,11 +60,9 @@ void
 CouenneInterface::extractLinearRelaxation 
 (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 
-  if (solveNlp) { // this is true in below call
+  if (solveNlp) {
 
     initialSolve ();
-
-    // TODO: solve nlp, round as in BonNlpHeuristic, and re-solve
 
     if (isProvenOptimal ()) {
 
@@ -72,17 +70,80 @@ CouenneInterface::extractLinearRelaxation
 	obj       = getObjValue (),
 	*solution = getColSolution ();
 
-      if (couenneCg. Problem () -> checkNLP (solution, obj)) {
+      CouenneProblem *p = couenneCg.Problem ();
 
-	// set cutoff to take advantage of bound tightening
-	couenneCg. Problem () -> setCutOff (obj);
+      if (getNumIntegers () > 0) {
 
-	OsiAuxInfo * auxInfo = si.getAuxiliaryInfo ();
-	BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
+	int norig = p -> nOrig ();
+	bool fractional = false;
 
-	if (babInfo) {
-	  babInfo -> setNlpSolution (solution, getNumCols (), obj);
-	  babInfo -> setHasNlpSolution (true);
+	// if problem is integer, check if any integral variable is
+	// fractional. If so, round them and re-optimize
+
+	for (int i=0; i<norig; i++)
+	  if (p -> Var (i) -> isInteger () &&
+	      (fabs (floor (solution [i] + 0.5) - solution [i]) >  COUENNE_EPS)) {
+	    fractional = true;
+	    break;
+	  }
+
+	if (fractional) {
+
+	  double 
+	    *lbSave = new double [norig],
+	    *ubSave = new double [norig],
+
+	    *lbCur  = new double [norig],
+	    *ubCur  = new double [norig],
+
+	    *Y      = new double [norig];
+
+	  CoinCopyN (getColLower (), norig, lbSave);
+	  CoinCopyN (getColUpper (), norig, ubSave);
+
+	  CoinCopyN (getColLower (), norig, lbCur);
+	  CoinCopyN (getColUpper (), norig, ubCur);
+
+	  if (p -> getIntegerCandidate (solution, Y, lbCur, ubCur) >= 0) {
+
+	    for (int i=0; i<norig; i++)
+	      if (p -> Var (i) -> isInteger ()) {
+		setColLower (i, lbCur [i]);
+		setColUpper (i, ubCur [i]);
+	      }
+
+	    setColSolution (Y); // use initial solution given 
+
+	    resolve (); // solve with integer variables fixed
+
+	    for (int i=0; i<norig; i++)
+	      if (p -> Var (i) -> isInteger ()) {
+		setColLower (i, lbSave [i]);
+		setColUpper (i, ubSave [i]);
+	      }
+	  }
+
+	  delete [] Y;
+	  delete [] lbSave;
+	  delete [] ubSave;
+	} 
+      }
+
+      // re-check optimality in case resolve () was called
+      if (isProvenOptimal ()) {
+
+	if (p -> checkNLP (solution, obj)) {
+
+	  // set cutoff to take advantage of bound tightening
+	  p -> setCutOff (obj);
+
+	  OsiAuxInfo * auxInfo = si.getAuxiliaryInfo ();
+	  BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
+
+	  if (babInfo) {
+	    babInfo -> setNlpSolution (solution, getNumCols (), obj);
+	    babInfo -> setHasNlpSolution (true);
+	  }
 	}
       }
     }

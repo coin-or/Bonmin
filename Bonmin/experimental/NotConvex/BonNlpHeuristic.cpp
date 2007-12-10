@@ -120,7 +120,7 @@ namespace Bonmin{
 
       const int depth = (model_->currentNode()) ? model_->currentNode()->depth() : 0;
 
-      if (CoinDrand48() > pow (2., numberSolvePerLevel_ - depth))
+      if (CoinDrand48 () > pow (2., numberSolvePerLevel_ - depth))
 	too_deep = true;
     }
 
@@ -131,6 +131,9 @@ namespace Bonmin{
     const int & numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
     double maxInfeasibility = 0;
+
+    bool haveRoundedIntVars = false;
+
     for(int i = 0 ; i < numberObjects ; i++){
       CouenneObject * couObj = dynamic_cast <CouenneObject *> (objects [i]);
       if (couObj) {
@@ -144,25 +147,7 @@ namespace Bonmin{
 	    return 0;
 	  }
 	}
-      }
-      else{
-
-	// TODO: a more sophisticated rounding procedure
-	//
-	// Call aggressive tightening for all integer variables,
-	// setting each first at floor(x_i) and then at ceil(x_i):
-	//
-	// 1) if at least one is infeasible, set x_i to other
-	//
-	// 2) if both are infeasible, apply normal aggressive BT:
-	//    2a) if both infeasible, node is infeasible
-	//    2b) if both feasible, store index in free++ variables
-	//    2c) if only one feasible, set rounded +/- 2
-	//
-	// 3) if both feasible, store index in free variables
-	//
-	// with free and free++ variables, look for integer point
-	// closest to xcurrent.
+      } else {
 
         OsiSimpleInteger * intObj = dynamic_cast<OsiSimpleInteger *>(objects[i]);
 
@@ -175,8 +160,15 @@ namespace Bonmin{
           else if(value > upper[i])
             value = upper[i];
 
-          value = floor(value + 0.5);
+	  double rounded = floor (value + 0.5);
 
+	  if (fabs (value - rounded) > COUENNE_EPS) {
+	    haveRoundedIntVars = true;
+	    value = rounded;
+	  }
+
+	  // fix bounds anyway, if a better candidate is not found
+	  // below at least we have an integer point
           lower[i] = upper[i] = value;
         }
         else{
@@ -186,46 +178,71 @@ namespace Bonmin{
       }
     }
 
+    // if here, it means the infeasibility is not too high. Generate a
+    // better integer point as there are rounded integer variables
+
+    bool skipOnInfeasibility = false;
+    double *Y = CoinCopyOfArray (solution, nlp_ -> getNumCols ());
+
+    if (haveRoundedIntVars) {
+
+      skipOnInfeasibility = (couenne_ -> getIntegerCandidate (solution, Y, lower, upper) < 0);
+    }
+
     // Now set column bounds and solve the NLP with starting point
-    double * saveColLower = CoinCopyOfArray(nlp_->getColLower(), nlp_->getNumCols());
-    double * saveColUpper = CoinCopyOfArray(nlp_->getColUpper(), nlp_->getNumCols());
-    nlp_->setColLower(lower);
-    nlp_->setColUpper(upper);
-    nlp_->setColSolution(solution);
-
-    // apply NLP solver /////////////////////////////////
-    nlp_ -> initialSolve();
-
-    double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
+    double * saveColLower = CoinCopyOfArray (nlp_ -> getColLower (), nlp_ -> getNumCols ());
+    double * saveColUpper = CoinCopyOfArray (nlp_ -> getColUpper (), nlp_ -> getNumCols ());
 
     bool foundSolution = false;
-    if (nlp_->isProvenOptimal()) // store solution in Aux info
-    {
-      const int nVars = solver->getNumCols();
-      double* tmpSolution = new double [nVars];
-      CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), tmpSolution);
 
-      //Get correct values for all auxiliary variables
-      CouenneInterface * couenne = dynamic_cast<CouenneInterface *>
-        (nlp_);
+    if (!skipOnInfeasibility) { // if true, the integral neighbourhood
+				// of our fractional point is infeasible.
 
-      if (couenne){
-	couenne_ -> getAuxs (tmpSolution);
-      }
+      nlp_ -> setColLower    (lower);
+      nlp_ -> setColUpper    (upper);
+      nlp_ -> setColSolution (Y);
 
-      if (babInfo){
-	babInfo->setNlpSolution (tmpSolution, nVars, obj);
-        babInfo->setHasNlpSolution (true);
+      // apply NLP solver /////////////////////////////////
+      nlp_ -> initialSolve ();
+
+      double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
+
+      if (nlp_ -> isProvenOptimal () // store solution in Aux info
+	  // && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
+	  ) {
+
+	const int nVars = solver->getNumCols();
+	double* tmpSolution = new double [nVars];
+	CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), tmpSolution);
+
+	//Get correct values for all auxiliary variables
+	CouenneInterface * couenne = dynamic_cast <CouenneInterface *>
+	  (nlp_);
+
+	if (couenne){
+	  couenne_ -> getAuxs (tmpSolution);
+	}
+
+	if (babInfo){
+	  babInfo->setNlpSolution (tmpSolution, nVars, obj);
+	  babInfo->setHasNlpSolution (true);
+	}
+
+	if (obj < objectiveValue) { // found better solution?
+	  couenne_ -> setCutOff (obj);
+	  foundSolution = true;
+	  objectiveValue = obj;
+	  CoinCopyN(tmpSolution, nVars, newSolution);
+	}
+	delete [] tmpSolution;
       }
-      if (obj < objectiveValue) { // found better solution?
-	foundSolution = true;
-	objectiveValue = obj;
-	CoinCopyN(tmpSolution, nVars, newSolution);
-      }
-      delete [] tmpSolution;
     }
+
     nlp_->setColLower(saveColLower);
     nlp_->setColUpper(saveColUpper);
+
+    delete [] Y;
+
     delete [] lower;
     delete [] upper;
     delete [] saveColLower;
