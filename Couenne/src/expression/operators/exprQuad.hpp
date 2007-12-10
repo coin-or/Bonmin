@@ -234,7 +234,7 @@ class exprQuad: public exprGroup {
   /// expression
   virtual int DepList (std::set <int> &deplist, 
 		       enum dig_type type = ORIG_ONLY,
-		       CouenneProblem *p = NULL);
+		       const CouenneProblem *p = NULL);
 
   /// Return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap. For this

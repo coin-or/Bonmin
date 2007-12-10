@@ -223,7 +223,7 @@ void exprGroup::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
 
 
 /// scan expression for single index
-int scanIndex (int index, std::set <int> &deplist, CouenneProblem *p, enum dig_type type) {
+int scanIndex (int index, std::set <int> &deplist, const CouenneProblem *p, enum dig_type type) {
 
   if (deplist.find (index) != deplist.end ()) 
     return 0;
@@ -258,7 +258,7 @@ int scanIndex (int index, std::set <int> &deplist, CouenneProblem *p, enum dig_t
 /// expression
 int exprGroup::DepList (std::set <int> &deplist,
 			enum dig_type type,
-			CouenneProblem *p) {
+			const CouenneProblem *p) {
 
   int deps = exprOp::DepList (deplist, type, p);
 

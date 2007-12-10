@@ -182,9 +182,10 @@ void CouenneProblem::standardize () {
   // make expression library point to new vectors
   expression::update (x_, lb_, ub_);
 
-  //  graph_ -> print ();
+  //graph_ -> print ();
   graph_ -> createOrder ();
-  //  graph_ -> print ();
+  //if (graph_ -> checkCycles ()) printf ("dependency graph cycle!\n");
+  //graph_ -> print ();
 
   // fill numbering structure /////////////////////////////////////////////////
 

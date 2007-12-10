@@ -91,7 +91,7 @@ class exprUnary: public expression {
   /// expression
   virtual inline int DepList (std::set <int> &deplist, 
 			      enum dig_type type = ORIG_ONLY,
-			      CouenneProblem *p = NULL)
+			      const CouenneProblem *p = NULL)
     {return argument_ -> DepList (deplist, type, p);}
 
   /// simplification

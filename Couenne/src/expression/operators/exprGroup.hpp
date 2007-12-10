@@ -56,7 +56,7 @@ class exprGroup: public exprSum {
   /// expression
   virtual int DepList (std::set <int> &deplist, 
 		       enum dig_type type = ORIG_ONLY,
-		       CouenneProblem *p = NULL);
+		       const CouenneProblem *p = NULL);
 
   /// differentiation
   virtual expression *differentiate (int index); 
@@ -115,6 +115,6 @@ inline CouNumber exprGroup::operator () () {
 
 
 /// scan subexpression for single index
-int scanIndex (int index, std::set <int> &deplist, CouenneProblem *p, enum dig_type type);
+int scanIndex (int index, std::set <int> &deplist, const CouenneProblem *p, enum dig_type type);
 
 #endif

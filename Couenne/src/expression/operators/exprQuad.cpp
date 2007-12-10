@@ -379,7 +379,7 @@ void exprQuad::make_dIndex (int numcols, int *indexmap) {
 /// expression
 int exprQuad::DepList (std::set <int> &deplist, 
 		       enum dig_type type,
-		       CouenneProblem *p) {
+		       const CouenneProblem *p) {
 
   int deps = exprGroup::DepList (deplist, type, p);
 

@@ -111,7 +111,7 @@ class exprCopy: public expression {
   /// expression
   inline int DepList (std::set <int> &deplist, 
 		      enum dig_type   type = ORIG_ONLY,
-		      CouenneProblem *p    = NULL)
+		      const CouenneProblem *p    = NULL)
     {return copy_ -> DepList (deplist, type, p);}
 
   /// simplify expression (useful for derivatives)

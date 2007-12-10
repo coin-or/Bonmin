@@ -85,7 +85,7 @@ class exprVar: public expression {
   /// expression
   virtual inline int DepList (std::set <int> &deplist, 
 			      enum dig_type type = ORIG_ONLY,
-			      CouenneProblem * = NULL) {
+			      const CouenneProblem * = NULL) {
 
     if (deplist.find (varIndex_) == deplist.end ()) {
       deplist.insert (varIndex_); 

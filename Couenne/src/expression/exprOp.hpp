@@ -90,7 +90,7 @@ class exprOp: public expression {
   /// expression
   virtual inline int DepList (std::set <int> &deplist, 
 			      enum dig_type type = ORIG_ONLY,
-			      CouenneProblem *p = NULL) {
+			      const CouenneProblem *p = NULL) {
     int tot = 0;
     for (int i = nargs_; i--;)
       tot += arglist_ [i] -> DepList (deplist, type, p);

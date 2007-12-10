@@ -136,7 +136,7 @@ void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 /// expression
 int exprAux::DepList (std::set <int> &deplist, 
 		      enum dig_type type,
-		      CouenneProblem *p) {
+		      const CouenneProblem *p) {
 
   if (type == ORIG_ONLY)   
     return image_ -> DepList (deplist, type, p);

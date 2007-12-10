@@ -102,7 +102,7 @@ class exprAux: public exprVar {
   /// expression
   int DepList (std::set <int> &deplist, 
 	       enum dig_type type = ORIG_ONLY,
-	       CouenneProblem *p = NULL);
+	       const CouenneProblem *p = NULL);
 
   /// simplify
   expression *simplify ();
