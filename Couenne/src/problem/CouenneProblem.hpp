@@ -47,6 +47,19 @@ struct compExpr {
 
 class CouenneProblem {
 
+  /// Class for storing a global cutoff for a CouenneProblem and all
+  /// its clones
+  class GlobalCutOff {
+  private:
+    GlobalCutOff(const GlobalCutOff&);
+    double cutoff_;
+  public:
+    GlobalCutOff() : cutoff_(1e50) {}
+    ~GlobalCutOff() {}
+    inline void setCutOff(double cutoff) {cutoff_ = cutoff;}
+    inline double getCutOff() const {return cutoff_;}
+  };
+
  protected:
 
   std::vector <CouenneObjective  *> objectives_;  ///< Objectives
@@ -101,8 +114,11 @@ class CouenneProblem {
   /// into auxiliary variable definition)
   int nOrigCons_;
 
-  /// Cut off: known value of best integer feasible solution
-  mutable CouNumber cutoff_;
+  /// Pointer to a global cutoff object
+  GlobalCutOff* pcutoff_;
+
+  /// flag indicating if this class is creator of global cutoff object
+  bool created_pcutoff_;
 
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
@@ -256,8 +272,8 @@ class CouenneProblem {
   void setCutOff (CouNumber cutoff);
 
   /// Set cutoff
-  CouNumber getCutOff () 
-  {return cutoff_;}
+  CouNumber getCutOff () const
+  {return pcutoff_->getCutOff();}
 
   /// Make cutoff known to the problem
   void installCutOff ();

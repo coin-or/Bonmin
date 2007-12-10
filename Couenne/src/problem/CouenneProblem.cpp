@@ -39,7 +39,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   ndefined_  (0),
   graph_     (NULL),
   nOrig_     (0),
-  cutoff_    (COIN_DBL_MAX),
+  pcutoff_   (new GlobalCutOff),
+  created_pcutoff_ (true),
   jnlst_(jnlst) {
 
   x_ = lb_ = ub_ = NULL; 
@@ -119,7 +120,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   graph_     (NULL),
   nOrig_     (p.nOrig_),
   nOrigCons_ (p.nOrigCons_),
-  cutoff_    (p.cutoff_),
+  pcutoff_   (p.pcutoff_),
+  created_pcutoff_ (false),
   jnlst_     (p.jnlst_) { // needed only in standardize (), unnecessary to update it
 
   // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
@@ -181,6 +183,8 @@ CouenneProblem::~CouenneProblem () {
   if (graph_)     delete    graph_;
   if (commuted_)  delete [] commuted_;
   if (numbering_) delete [] numbering_;
+
+  if (created_pcutoff_) delete pcutoff_;
 }
 
 
