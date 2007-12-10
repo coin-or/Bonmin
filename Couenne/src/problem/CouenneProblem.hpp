@@ -14,6 +14,8 @@
 
 #include "OsiRowCut.hpp"
 
+#include "BonAuxInfos.hpp"
+#include "BonBabInfos.hpp"
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
 #include "exprAux.hpp"
@@ -24,7 +26,8 @@ struct ASL;
 struct expr;
 
 class DepGraph;
-
+class CouenneCutGenerator;
+class CouenneSolverInterface;
 
 /** Structure for comparing expressions
  *
@@ -69,15 +72,15 @@ class CouenneProblem {
   /// AMPL's common expressions (read from AMPL through structures cexps and cexps1)
   std::vector <expression *> commonexprs_; 
 
-  CouNumber *x_;  ///< Current value of all variables
-  CouNumber *lb_; ///< Current lower bound on all variables
-  CouNumber *ub_; ///< Current upper bound on all variables
+  mutable CouNumber *x_;  ///< Current value of all variables
+  mutable CouNumber *lb_; ///< Current lower bound on all variables
+  mutable CouNumber *ub_; ///< Current upper bound on all variables
 
   /// Expression map for comparison in standardization
   std::set <exprAux *, compExpr> *auxSet_; // int to count occurrences
 
   /// Number of elements in the x_, lb_, ub_ arrays
-  int curnvars_;
+  mutable int curnvars_;
 
   /// Number of discrete variables
   int nIntVars_;
@@ -133,7 +136,7 @@ class CouenneProblem {
   CouenneProblem *clone () const;
 
   /// Update value of variables and bounds
-  void update (const CouNumber *, const CouNumber *, const CouNumber *, int = -1);
+  void update (const CouNumber *, const CouNumber *, const CouNumber *, int = -1) const;
 
   int nObjs     () const {return objectives_.   size ();} ///< Get number of objectives
   int nCons     () const {return constraints_.  size ();} ///< Get number of constraints
@@ -144,7 +147,7 @@ class CouenneProblem {
   int nVars    () const {return variables_. size ();} ///< Total number of variables
 
   /// get evaluation order index 
-  inline int evalOrder (int i)
+  inline int evalOrder (int i) const
   {return numbering_ [i];}
 
   /// get evaluation order vector (numbering_)
@@ -217,10 +220,6 @@ class CouenneProblem {
 
   /// Read problem from .nl file using the Ampl Solver Library (ASL)
   int readnl      (const struct ASL *);
-  int readCon     (const struct ASL *) {return 0;}
-  int readDefVar  (const struct ASL *) {return 0;}
-  int readObj     (const struct ASL *) {return 0;}
-  int readLinPart (const struct ASL *) {return 0;}
 
   /// Generate a Couenne expression from an ASL expression
   expression *nl2e (struct expr *);
@@ -249,7 +248,29 @@ class CouenneProblem {
   void initAuxs (CouNumber *, CouNumber *, CouNumber *);
 
   /// Get auxiliary variables from original variables
-  void getAuxs (CouNumber *);
+  void getAuxs (CouNumber *) const;
+
+  /// tighten bounds using propagation, implied bounds and reduced costs
+  bool boundTightening (t_chg_bounds *, 
+			Bonmin::BabInfo * = NULL) const;
+
+  /// Optimality Based Bound Tightening
+  int obbt (CouenneSolverInterface *, 
+	    OsiCuts &,
+	    t_chg_bounds *, 
+	    Bonmin::BabInfo *) const;
+
+  /// aggressive bound tightening. Fake bounds in order to cut
+  /// portions of the solution space by fathoming on
+  /// bounds/infeasibility
+  bool aggressiveBT (t_chg_bounds *, 
+		     Bonmin::BabInfo * = NULL) const;
+
+  /// procedure to strengthen variable bounds. Return false if problem
+  /// turns out to be infeasible with given bounds, true otherwise.
+  int redCostBT (const OsiSolverInterface *psi,
+		 t_chg_bounds *chg_bds, 
+		 Bonmin::BabInfo * babInfo) const;
 
   /// "Forward" bound tightening, that is, propagate bound of variable
   /// \f$x\f$ in an expression \f$w = f(x)\f$ to the bounds of \f$w\f$.
@@ -283,13 +304,47 @@ class CouenneProblem {
 
   /// Check if solution is MINLP feasible
   bool checkNLP (const double *solution, const double obj);
+
+  /// generate integer NLP point Y starting from fractional solution
+  /// using bound tightening
+  int getIntegerCandidate (const double *xFrac, double *xInt, double *lb, double *ub);
+
+  /// Read best known solution from file given in argument
+  bool readOptimum (const std::string &, CouNumber *&, CouNumber &);
+
+private:
+
+  /// single fake tightening. Return
+  ///
+  /// -1   if infeasible
+  ///  0   if no improvement
+  /// +1   if improved
+  int fake_tighten (char direction,  // 0: left, 1: right
+		    int index,       // index of the variable tested
+		    const double *X, // point round which tightening is done
+		    CouNumber *olb,  // cur. lower bound
+		    CouNumber *oub,  //      upper
+		    t_chg_bounds *chg_bds,
+		    t_chg_bounds *f_chg) const;
+
+  // core of the bound tightening procedure
+  bool btCore (t_chg_bounds *chg_bds) const;
+
+  int obbt_iter (CouenneSolverInterface *csi, 
+		 t_chg_bounds *chg_bds, 
+		 const CoinWarmStart *warmstart, 
+		 Bonmin::BabInfo *babInfo,
+		 double *objcoe,
+		 int sense, 
+		 int index) const;
+
+  int call_iter (CouenneSolverInterface *csi, 
+		 t_chg_bounds *chg_bds, 
+		 const CoinWarmStart *warmstart, 
+		 Bonmin::BabInfo *babInfo,
+		 double *objcoe,
+		 enum nodeType type,
+		 int sense) const;
 };
-
-
-/// Read best known solution from file given in argument
-bool readOptimum (const std::string &, CouNumber *&, CouNumber &, CouenneProblem *);
-
-/// Check feasibility of current solution against MINLP problem
-bool checkNLP (CglCutGenerator *g, const double *solution2, double &obj);
 
 #endif

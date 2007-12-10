@@ -7,7 +7,6 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 #include "BonBabInfos.hpp"
 
@@ -17,6 +16,7 @@
 #define AGGR_MUL  2 // the larger,  the more conservative. Must be > 0
 #define AGGR_DIV  2 // the smaller, the more conservative. Must be > 1
 
+// golden ratio, used to find the ideal bound
 const CouNumber phi = 0.5 * (1. + sqrt (5.));
 
 
@@ -56,12 +56,8 @@ CouNumber fictBounds (char direction,
 // -1   if infeasible
 //  0   if no improvement
 // +1   if improved
-int CouenneCutGenerator::
-fake_tighten (const OsiSolverInterface  *psi,
-	      OsiCuts &cs, 
-	      Bonmin::BabInfo * babInfo,
-	      
-	      char direction,  // 0: left, 1: right
+int CouenneProblem::
+fake_tighten (char direction,  // 0: left, 1: right
 	      int index,       // index of the variable tested
 	      const double *X, // point round which tightening is done
 	      CouNumber *olb,  // cur. lower bound
@@ -69,22 +65,22 @@ fake_tighten (const OsiSolverInterface  *psi,
 	      t_chg_bounds *chg_bds,
 	      t_chg_bounds *f_chg) const {
   int
-    ncols    = Problem () -> nVars (),
-    objsense = Problem () -> Obj (0) -> Sense (),
-    objind   = Problem () -> Obj (0) -> Body  () -> Index ();
+    ncols    = nVars (),
+    objsense = Obj (0) -> Sense (),
+    objind   = Obj (0) -> Body  () -> Index ();
 
   assert (objind >= 0);
 
   CouNumber 
-    *lb       = Problem () -> Lb (),
-    *ub       = Problem () -> Ub (),
-    cutoff    = Problem () -> getCutOff (),
+    //    *lb       = Problem () -> Lb (),
+    //    *ub       = Problem () -> Ub (),
+    //    cutoff    = getCutOff (),
     xcur      = X [index],
     inner     = xcur,                                                 // point closest to current x
     //innerZ    = ((objsense == MINIMIZE) ? lb : ub) [objind],          // and associated dual bound
     outer     = (direction ? oub : olb) [index],                      // point closest to bound
     //outerZ    = COUENNE_INFINITY,                                     // ditto
-    fb        = fictBounds (direction, xcur, lb [index], ub [index]); // starting point
+    fb        = fictBounds (direction, xcur, lb_ [index], ub_ [index]); // starting point
 
   bool tightened = false;
 
@@ -93,28 +89,32 @@ fake_tighten (const OsiSolverInterface  *psi,
   // (with relative expense) but not the derivative.
 
 #ifdef DEBUG
-  CouNumber curdb     = ((objsense == MINIMIZE) ? lb : ub) [objind];  // current dual bound
-  printf ("  x_%d.  x = %10g, lb = %g, cutoff = %g-----------------\n", index, xcur, curdb, cutoff);
+  CouNumber curdb     = ((objsense == MINIMIZE) ? lb_ : ub_) [objind];  // current dual bound
+  printf ("  x_%d.  x = %10g, lb = %g, cutoff = %g-----------------\n", index,xcur,curdb,getCutOff());
 #endif
 
   for (int iter = 0; iter < MAX_ITER; iter++) {
 
-    (direction ? lb : ub) [index] = fb; 
+    if (direction) {lb_ [index] = fb; f_chg [index].setLower (t_chg_bounds::CHANGED);} 
+    else           {ub_ [index] = fb; f_chg [index].setUpper (t_chg_bounds::CHANGED);}
+
+    //    (direction ? lb_ : ub_) [index] = fb; 
 
 #ifdef DEBUG
     char c1 = direction ? '-' : '>', c2 = direction ? '<' : '-';
     printf ("    #%3d: [%+10g -%c %+10g %c- %+10g] /\\/\\ ",iter,olb[index],c1,fb,c2, oub [index]);
-    printf (" [%10g,%10g] <%g,%g>==> ",lb[index],ub[index],CoinMin(inner,outer),CoinMax(inner,outer));
+    printf (" [%10g,%10g]<%g,%g>=> ",lb_[index],ub_[index],CoinMin(inner,outer),CoinMax(inner,outer));
 #endif
 
     bool
-      feasible  = btCore (psi, cs, f_chg, babInfo, false), // true if feasible with fake bound
+      feasible  = btCore (f_chg), // true if feasible with fake bound
       betterbds = (objsense == MINIMIZE) ?                     // true if over cutoff
-        (lb [objind] > cutoff) : 
-        (ub [objind] < cutoff);
+        (lb_ [objind] > getCutOff ()) : 
+        (ub_ [objind] < getCutOff ());
 
 #ifdef DEBUG
-    printf(" [%10g,%10g] lb = %g {fea=%d,btr=%d} ",lb[index],ub[index],lb[objind],feasible,betterbds);
+    printf(" [%10g,%10g] lb = %g {fea=%d,btr=%d} ",
+	   lb_[index],ub_[index],lb_[objind],feasible,betterbds);
 #endif
 
     if (feasible && !betterbds) {
@@ -124,8 +124,8 @@ fake_tighten (const OsiSolverInterface  *psi,
 
       // restore initial bound
       CoinCopyN (chg_bds, ncols, f_chg);
-      CoinCopyN (olb, ncols, lb);
-      CoinCopyN (oub, ncols, ub);
+      CoinCopyN (olb, ncols, lb_);
+      CoinCopyN (oub, ncols, ub_);
 
     } else {
 
@@ -136,8 +136,8 @@ fake_tighten (const OsiSolverInterface  *psi,
 #endif
 
       // apply bound
-      if (direction) {oub[index] = ub[index] = fb; chg_bds [index].setUpper (t_chg_bounds::CHANGED);}
-      else           {olb[index] = lb[index] = fb; chg_bds [index].setLower (t_chg_bounds::CHANGED);}
+      if (direction) {oub[index] = ub_[index] = fb; chg_bds [index].setUpper (t_chg_bounds::CHANGED);}
+      else           {olb[index] = lb_[index] = fb; chg_bds [index].setLower (t_chg_bounds::CHANGED);}
 
       outer = fb; // we have at least a tightened bound, save it 
 
@@ -145,12 +145,12 @@ fake_tighten (const OsiSolverInterface  *psi,
 
       // restore initial bound
       CoinCopyN (chg_bds, ncols, f_chg);
-      CoinCopyN (olb, ncols, lb);
-      CoinCopyN (oub, ncols, ub);
+      CoinCopyN (olb, ncols, lb_);
+      CoinCopyN (oub, ncols, ub_);
 
       //#if BR_TEST_LOG < 0 // for fair testing
       // check tightened problem for feasibility
-      if (!(btCore (psi, cs, chg_bds, babInfo, true))) {
+      if (!(btCore (chg_bds))) {
 #ifdef DEBUG
 	printf ("\n    pruned by aggressive BT\n");
 #endif
@@ -179,7 +179,8 @@ fake_tighten (const OsiSolverInterface  *psi,
 #ifdef DEBUG
   printf ("\n");
   if (tightened) printf ("  [x%2d] pruned %s [%g, %g] -- lb = %g cutoff = %g\n", 
-			 index,direction?"right":"left",olb[index], oub [index], lb [objind], cutoff);
+			 index,direction?"right":"left",
+			 olb[index],oub[index], lb_[objind], getCutOff ());
 #endif
 
   return tightened ? 1 : 0;

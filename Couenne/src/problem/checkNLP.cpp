@@ -74,7 +74,8 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 	  (body < lhs - COUENNE_EPS)) {
 	if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
 	  Jnlst()->Printf(Ipopt::J_WARNING, J_PROBLEM,
-			  "Warning in checkNLP: constraint %d violated (lhs = %e body = %e rhs = %e): ", i, lhs, body, rhs);
+			  "Warning in checkNLP: constraint %d violated (lhs = %e body = %e rhs = %e): ",
+			  i, lhs, body, rhs);
 	  c -> print ();
 	}
 	// We dont return anymore (return false;)

@@ -18,12 +18,7 @@
 
 // core of the bound tightening procedure
 
-bool CouenneCutGenerator::
-btCore (const OsiSolverInterface *psi,
-	OsiCuts &cs, 
-	t_chg_bounds *chg_bds, 
-	Bonmin::BabInfo * babInfo,
-	bool serious) const {
+bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
 
   //////////////////////// Bound propagation and implied bounds ////////////////////
 
@@ -32,7 +27,6 @@ btCore (const OsiSolverInterface *psi,
       niter = 0;
 
   bool first = true;
-  CouenneProblem *p = Problem ();
 
   do {
 
@@ -40,13 +34,13 @@ btCore (const OsiSolverInterface *psi,
 
     //    if ((nbwtightened > 0) || (ntightened > 0))
     ntightened = ((nbwtightened > 0) || first) ? 
-      p -> tightenBounds (chg_bds) : 0;
+      tightenBounds (chg_bds) : 0;
 
     // implied bounds. Call also at the beginning, as some common
     // expression may have non-propagated bounds
 
     // if last call didn't signal infeasibility
-    nbwtightened = ((ntightened > 0) || first) ? p -> impliedBounds (chg_bds) : 0;
+    nbwtightened = ((ntightened > 0) || first) ? impliedBounds (chg_bds) : 0;
 
     if (first)
       first = false;
@@ -54,27 +48,6 @@ btCore (const OsiSolverInterface *psi,
     if ((ntightened < 0) || (nbwtightened < 0)) {
 
       // set infeasibility through a cut 1 <= x0 <= -1
-
-      if (serious) {
-
-	if (!(isFirst ())) {
-
-	  OsiColCut *infeascut = new OsiColCut;
-
-	  if (infeascut) {
-	    int i=0;
-	    double upper = -1., lower = +1.;
-	    infeascut -> setLbs (1, &i, &lower);
-	    infeascut -> setUbs (1, &i, &upper);
-	    cs.insert (infeascut);
-	    delete infeascut;
-	  }
-	}
-
-	if (babInfo) // set infeasibility to true in order to skip NLP heuristic
-	  babInfo -> setInfeasibleNode ();
-      }
-
       Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			  "#### infeasible node at BT\n");
 
@@ -105,21 +78,19 @@ btCore (const OsiSolverInterface *psi,
 /// procedure to strengthen variable bounds. Return false if problem
 /// turns out to be infeasible with given bounds, true otherwise.
 
-bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
-					   OsiCuts &cs, 
-					   t_chg_bounds *chg_bds, 
-					   Bonmin::BabInfo * babInfo) const {
+bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds, 
+				      Bonmin::BabInfo * babInfo) const {
 
-  int objInd = problem_ -> Obj (0) -> Body () -> Index ();
+  int objInd = Obj (0) -> Body () -> Index ();
 
   /////////////////////// MIP bound management /////////////////////////////////
 
-  if ((psi) && (objInd >= 0) && babInfo && (babInfo -> babPtr ())) {
+  if ((objInd >= 0) && babInfo && (babInfo -> babPtr ())) {
 
     CouNumber UB      = babInfo  -> babPtr () -> model (). getObjValue(),
               LB      = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
-              primal0 = problem_ -> Ub (objInd), 
-              dual0   = problem_ -> Lb (objInd);
+              primal0 = ub_ [objInd], 
+              dual0   = lb_ [objInd];
 
     // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
     // (LOWER) bound.
@@ -128,46 +99,58 @@ bool CouenneCutGenerator::boundTightening (const OsiSolverInterface *psi,
 	(UB < primal0 - COUENNE_EPS)) { // update primal bound (MIP)
 
       //      printf ("updating upper %g <-- %g\n", primal0, primal);
-      problem_ -> Ub (objInd) = UB;
+      ub_ [objInd] = UB;
       chg_bds [objInd].setUpper(t_chg_bounds::CHANGED);
     }
 
     if ((LB   > - COUENNE_INFINITY) && 
 	(LB   > dual0 + COUENNE_EPS)) { // update dual bound
-      problem_ -> Lb (objInd) = LB;
+      lb_ [objInd] = LB;
       chg_bds [objInd].setLower(t_chg_bounds::CHANGED);
     }
+  }
 
-    //////////////////////// Reduced cost bound tightening //////////////////////
+  return btCore (chg_bds);
+}
 
-    // do it only if a linear convexification is in place already
 
-    if (!firstcall_) {
+/// procedure to strengthen variable bounds. Return false if problem
+/// turns out to be infeasible with given bounds, true otherwise.
+int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
+			       t_chg_bounds *chg_bds, 
+			       Bonmin::BabInfo * babInfo) const {
 
-      if ((LB > -COUENNE_INFINITY) && (UB < COUENNE_INFINITY)) {
+  int nchanges = 0;
 
-	const double 
-	  *X  = psi -> getColSolution (),
-	  *RC = psi -> getReducedCost ();
+  CouNumber
+    UB = babInfo -> babPtr () -> model (). getObjValue(),
+    LB = babInfo -> babPtr () -> model (). getBestPossibleObjValue ();
 
-	int ncols = psi -> getNumCols ();
+  //////////////////////// Reduced cost bound tightening //////////////////////
 
-	for (int i=0; i<ncols; i++) {
+  if ((LB > -COUENNE_INFINITY) && (UB < COUENNE_INFINITY)) {
 
-	  CouNumber
-	    x  = X  [i],
-	    rc = RC [i],
-	    dx = problem_ -> Ub (i) - x;
+    const double 
+      *X  = psi -> getColSolution (),
+      *RC = psi -> getReducedCost ();
 
-	  if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
-	    // can improve bound on variable w_i
-	    problem_ -> Ub (i) = x + (UB-LB) / rc;
-	    chg_bds [i].setUpper(t_chg_bounds::CHANGED);
-	  }
-	}
+    int ncols = psi -> getNumCols ();
+
+    for (int i=0; i<ncols; i++) {
+
+      CouNumber
+	x  = X  [i],
+	rc = RC [i],
+	dx = ub_ [i] - x;
+
+      if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
+	// can improve bound on variable w_i
+	ub_ [i] = x + (UB-LB) / rc;
+	nchanges++;
+	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
       }
     }
   }
 
-  return btCore (psi, cs, chg_bds, babInfo, true);
+  return nchanges;
 }

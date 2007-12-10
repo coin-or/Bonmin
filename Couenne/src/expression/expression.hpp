@@ -154,7 +154,7 @@ class expression {
   /// pointers (exprGroup, exprQuad)
   virtual inline int DepList (std::set <int> &deplist, 
 			      enum dig_type   type = ORIG_ONLY,
-			      CouenneProblem *p    = NULL)
+			      const CouenneProblem *p    = NULL)
     {return 0;}
 
   /// simplify expression (useful for derivatives)

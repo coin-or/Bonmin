@@ -72,6 +72,8 @@ CouenneObject::CouenneObject (const CouenneObject &src):
 }
 
 
+#define TOL 0
+
 /// fix integer coordinates of current integer feasible solution
 double CouenneObject::feasibleRegion (OsiSolverInterface *solver, 
 				      const OsiBranchingInformation *info) const {
@@ -82,8 +84,8 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
   double val = info -> solution_ [index];
 
   // fix that variable to its current value
-  solver -> setColLower (index, val);
-  solver -> setColUpper (index, val);
+  solver -> setColLower (index, val-TOL);
+  solver -> setColUpper (index, val+TOL);
 
   expression *expr = reference_ -> Image ();
 
@@ -98,8 +100,8 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
     if (index >= 0) {
       val = info -> solution_ [index];
-      solver -> setColLower (index, val);
-      solver -> setColUpper (index, val);
+      solver -> setColLower (index, val-TOL);
+      solver -> setColUpper (index, val+TOL);
     }
   }
   else // n-ary function
@@ -113,8 +115,8 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
 	if ((index = args [i] -> Index()) >= 0) {
 	  val = info -> solution_ [index];
-	  solver -> setColLower (index, val);
-	  solver -> setColUpper (index, val);
+	  solver -> setColLower (index, val-TOL);
+	  solver -> setColUpper (index, val+TOL);
 	}
       }
     }
@@ -128,8 +130,8 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
     for (int n = e -> getnLTerms (); n--; indices++) {
       val = info -> solution_ [*indices];
-      solver -> setColLower (*indices, val);
-      solver -> setColUpper (*indices, val);
+      solver -> setColLower (*indices, val-TOL);
+      solver -> setColUpper (*indices, val+TOL);
     }
 
     // take care of quadratic terms
@@ -143,12 +145,12 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
       for (int n = e -> getnQTerms (); n--; qi++, qj++) {
 
 	val = info -> solution_ [*qi];
-	solver -> setColLower (*qi, val);
-	solver -> setColUpper (*qi, val);
+	solver -> setColLower (*qi, val-TOL);
+	solver -> setColUpper (*qi, val+TOL);
 
 	val = info -> solution_ [*qj];
-	solver -> setColLower (*qj, val);
-	solver -> setColUpper (*qj, val);
+	solver -> setColLower (*qj, val-TOL);
+	solver -> setColUpper (*qj, val+TOL);
       }
     }
   }

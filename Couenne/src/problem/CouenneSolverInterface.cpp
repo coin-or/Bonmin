@@ -108,7 +108,7 @@ void CouenneSolverInterface::solveFromHotStart() {
 
   Bonmin::BabInfo *babInfo = dynamic_cast <Bonmin::BabInfo *> (getAuxiliaryInfo ());
 
-  if (! (cutgen_ -> boundTightening (this, cs, chg_bds, babInfo))) {
+  if (! (cutgen_ -> Problem () -> boundTightening (chg_bds, babInfo))) {
 
 #ifdef DEBUG
     printf ("#### BT says infeasible before re-solve\n");

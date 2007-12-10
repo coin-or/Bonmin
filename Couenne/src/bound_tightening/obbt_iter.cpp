@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: Optimality-Based Bound Tightening
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -21,9 +21,9 @@
 
 /// reoptimize and change bound of a variable if needed
 static bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use as a solver
-		       int sense,               /// 1: minimize, -1: maximize
-		       CouNumber &bound,        /// bound to be updated
-		       bool isint) {            /// is this variable integer
+			      int sense,                   /// 1: minimize, -1: maximize
+			      CouNumber &bound,            /// bound to be updated
+			      bool isint) {                /// is this variable integer
 
   csi -> setDblParam (OsiDualObjectiveLimit, COIN_DBL_MAX); 
   csi -> setDblParam (OsiPrimalObjectiveLimit, (sense==1) ? bound : -bound);
@@ -50,9 +50,8 @@ static bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use 
 
 /// Iteration on one variable
 
-int CouenneCutGenerator::
+int CouenneProblem::
 obbt_iter (CouenneSolverInterface *csi, 
-	   OsiCuts &cs, 
 	   t_chg_bounds *chg_bds, 
 	   const CoinWarmStart *warmstart, 
 	   Bonmin::BabInfo *babInfo,
@@ -76,18 +75,18 @@ obbt_iter (CouenneSolverInterface *csi,
 
   bool issimple = false;
 
-  CouenneProblem *p = Problem ();
+  //  CouenneProblem *p = Problem ();
 
-  exprVar *var = p -> Var (index);
+  exprVar *var = Var (index);
 
-  int psense  = p   -> Obj (0) -> Sense (),
-      objind  = p   -> Obj (0) -> Body () -> Index (),
+  int psense  = Obj (0) -> Sense (),
+      objind  = Obj (0) -> Body () -> Index (),
       ncols   = csi -> getNumCols (),
       nImprov = 0;
 
 
   if ((var -> Type  () == AUX) &&
-      ((deplistsize = var -> Image () -> DepList (deplist, STOP_AT_AUX, p)) <= 1)) {
+      ((deplistsize = var -> Image () -> DepList (deplist, STOP_AT_AUX, this)) <= 1)) {
 
     if (!deplistsize) { // funny, the expression is constant...
 
@@ -142,9 +141,9 @@ obbt_iter (CouenneSolverInterface *csi,
 
   // only improve bounds if
   if (!issimple &&
-      ((p -> Var (index) -> Type () == VAR) ||             // it is an original variable 
-       (p -> Var (index) -> Multiplicity () > 0)) &&       // or its multiplicity is at least 1
-      (p -> Lb (index) < p -> Ub (index) - COUENNE_EPS) && // in any case, bounds are not equal
+      ((Var (index) -> Type () == VAR) ||             // it is an original variable 
+       (Var (index) -> Multiplicity () > 0)) &&       // or its multiplicity is at least 1
+      (lb_ [index] < ub_ [index] - COUENNE_EPS) && // in any case, bounds are not equal
 
       ((index != objind) || // this is not the objective
 
@@ -152,7 +151,7 @@ obbt_iter (CouenneSolverInterface *csi,
        ((sense ==  1) && (psense == MINIMIZE) && !(chg_bds [index].lower() & t_chg_bounds::EXACT)) ||
        ((sense == -1) && (psense == MAXIMIZE) && !(chg_bds [index].upper() & t_chg_bounds::EXACT)))) {
 
-    bool isInt = (p -> Var (index) -> isInteger ());
+    bool isInt = (Var (index) -> isInteger ());
 
     objcoe [index] = sense;
     csi -> setObjective (objcoe);
@@ -168,15 +167,15 @@ obbt_iter (CouenneSolverInterface *csi,
 
     CouNumber &bound = 
       (sense == 1) ? 
-      (p -> Lb (index)) : 
-      (p -> Ub (index)); 
+      (lb_ [index]) : 
+      (ub_ [index]); 
 
     // m{in,ax}imize xi on csi
 
     if (Jnlst()->ProduceOutput(J_MOREVECTOR, J_BOUNDTIGHTENING)) {
       Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,
 		      "m%simizing x%d [%g,%g] %c= %g\n",
-	    (sense==1) ? "in" : "ax", index, p -> Lb (index), p -> Ub (index),
+	    (sense==1) ? "in" : "ax", index, lb_ [index], ub_ [index],
 	    (sense==1) ? '>'  : '<',  bound); fflush (stdout);
       if (Jnlst()->ProduceOutput(J_MOREMATRIX, J_BOUNDTIGHTENING)) {
 	char fname [20];
@@ -190,19 +189,19 @@ obbt_iter (CouenneSolverInterface *csi,
 
     if (obbt_updateBound (csi, sense, bound, isInt)) {
 
-      if (p -> bestSol ()) {
+      if (bestSol ()) {
 	if (sense == 1) {
-	  if ((p -> Lb (index) < p -> bestSol () [index]) && 
-	      (bound       > COUENNE_EPS + p -> bestSol () [index]))
+	  if ((lb_ [index] < bestSol () [index]) && 
+	      (bound       > COUENNE_EPS + bestSol () [index]))
 	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: lb = %g, opt = %g, new lb = %g\n", 
-			    index, p -> Lb (index), p -> bestSol () [index], bound);
+			    index, lb_ [index], bestSol () [index], bound);
 	} else {
-	  if ((p -> Ub (index) > p -> bestSol () [index]) && 
-	      (bound       < -COUENNE_EPS + p -> bestSol () [index]))
+	  if ((ub_ [index] > bestSol () [index]) && 
+	      (bound       < -COUENNE_EPS + bestSol () [index]))
 	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: ub = %g, opt = %g, new ub = %g\n", 
-			    index, p -> Ub (index), p -> bestSol () [index], bound);
+			    index, ub_ [index], bestSol () [index], bound);
 	}
       }
 
@@ -233,8 +232,8 @@ obbt_iter (CouenneSolverInterface *csi,
       for (int j=0; j<ncols; j++) 
 	if ((j!=index) && (j!=objind)) {
 
-	  if (sol [j] <= p -> Lb (j) + COUENNE_EPS) chg_bds [j].setLowerBits(t_chg_bounds::EXACT);
-	  if (sol [j] >= p -> Ub (j) - COUENNE_EPS) chg_bds [j].setUpperBits(t_chg_bounds::EXACT);
+	  if (sol [j] <= lb_ [j] + COUENNE_EPS) chg_bds [j].setLowerBits(t_chg_bounds::EXACT);
+	  if (sol [j] >= ub_ [j] - COUENNE_EPS) chg_bds [j].setUpperBits(t_chg_bounds::EXACT);
 	}
 
 #if 0
@@ -267,15 +266,14 @@ obbt_iter (CouenneSolverInterface *csi,
       // (first argument =NULL is pointer to solverInterface) as csi
       // is not our problem
 
-      int psenseI = (psense == MINIMIZE) ? 1 : -1;
+      //      int psenseI = (psense == MINIMIZE) ? 1 : -1;
 
       Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 		      "XXXXXXXXXXXXXXX OBBT: x_%d: [%g, %g]\n", index, 
 		      csi -> getColLower () [index], 
 		      csi -> getColUpper () [index]);
 
-      if (!(boundTightening (((objind == index) && (sense == psenseI)) ? csi : NULL, 
-				   cs, chg_bds, babInfo))) {
+      if (!(boundTightening (chg_bds, babInfo))) {
 	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			"##### infeasible, bound tightening after OBBT\n");
 	return -1; // tell caller this is infeasible
@@ -292,7 +290,7 @@ obbt_iter (CouenneSolverInterface *csi,
 
     // TODO: is it, really? And shouldn't you check the opt sense too?
     if ((objind == index) && (csi -> isProvenOptimal ()))
-      p -> update (csi -> getColSolution (), NULL, NULL);
+      update (csi -> getColSolution (), NULL, NULL);
 
     // restore null obj fun
     objcoe [index] = 0;

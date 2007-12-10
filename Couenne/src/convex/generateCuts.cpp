@@ -14,6 +14,9 @@
 #include "CouenneProblem.hpp"
 #include "CouenneSolverInterface.hpp"
 
+// exception
+#define INFEASIBLE 1
+
 // fictitious bound for initial unbounded lp relaxations
 #define LARGE_BOUND 9.999e12
 
@@ -192,7 +195,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  cs.colCutPtr (i) -> print ();
       }
     }
-
   } else updateBranchInfo (si, problem_, chg_bds, info); // info.depth >= 0 || info.pass >= 0
 
   fictitiousBound (cs, problem_, false);
@@ -207,114 +209,139 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   problem_ -> installCutOff ();
 
-  if (doFBBT_ &&
-      (info.pass <= 0) &&
-      (! boundTightening (&si, cs, chg_bds, babInfo))) {
-    goto end_genCuts;
-  }
+  try {
 
-  //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
+    if (doFBBT_ &&
+	(info.pass <= 0) &&
+	(! (problem_ -> boundTightening (chg_bds, babInfo))))
 
-  sparse2dense (ncols, chg_bds, changed, nchanged);
+      throw INFEASIBLE;
 
-  double *nlpSol;
+    // Reduced Cost BT
+    if (doFBBT_ && !firstcall_)
+      problem_ -> redCostBT (&si, chg_bds, babInfo);
 
-  //--------------------------------------------
+    //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
 
-  if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
+    sparse2dense (ncols, chg_bds, changed, nchanged);
 
-    if (doABT_ && (info.pass <= 0)) {
-      if (! aggressiveBT (&si, cs, chg_bds, babInfo))
-	goto end_genCuts;
-      sparse2dense (ncols, chg_bds, changed, nchanged);
-    }
+    double *nlpSol;
 
-    // obtain solution just found by nlp solver
+    //--------------------------------------------
 
-    // Auxiliaries should be correct. solution should be the one found
-    // at the node even if it is not as good as the best known.
+    if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
 
-    // save violation flag and disregard it while adding cut at NLP
-    // point (which are not violated by the current, NLP, solution)
-    bool save_av = addviolated_;
-    addviolated_ = false;
-
-    // update problem current point with NLP solution
-    problem_ -> update (nlpSol, NULL, NULL, problem_ -> nOrig ());
-    genRowCuts (si, cs, nchanged, changed, info, chg_bds, true);  // add cuts
-
-    // restore LP point
-    problem_ -> update (si. getColSolution (), NULL, NULL);
-    addviolated_ = save_av;     // restore previous value
-
-    //    if (!firstcall_) // keep solution if called from extractLinearRelaxation()
-    babInfo -> setHasNlpSolution (false); // reset it after use 
-  }
-  else genRowCuts (si, cs, nchanged, changed, info, chg_bds);
-
-  //---------------------------------------------
-
-  // change tightened bounds through OsiCuts
-  if (nchanged)
-    genColCuts (si, cs, nchanged, changed);
-
-  // OBBT ////////////////////////////////////////////////////////////////////////////////
-
-  // to be carried out if
-
-  if (doOBBT_ &&                      // relative flag is checked
-      (logObbtLev_ != 0) &&           // relative frequency parameter is nonzero
-      !firstcall_ &&                  // not first call (there is no LP to work with)
-      (info.pass == 0) &&             // first round of cuts
-      ((logObbtLev_ < 0) ||           // always if logObbtLev_ = -1
-       (info.level <= logObbtLev_) || // at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
-       // and then with probability inversely proportional to the level
-      (CoinDrand48 () < pow (2., (double) logObbtLev_ - (info.level + 1))))) {
-
-    CouenneSolverInterface *csi = dynamic_cast <CouenneSolverInterface *> (si.clone (true));
-
-    csi -> setupForRepeatedUse ();
-
-    int nImprov, nIter = 0;
-
-    while ((nIter++ < MAX_OBBT_ITER) &&
-	   ((nImprov = obbt (csi, cs, chg_bds, babInfo)) > 0)) 
-
-      if (nImprov >= THRES_NBD_CHANGED) {
-
-	/// OBBT has given good results, add convexification with
-	/// improved bounds
+      if (doABT_ && (info.pass <= 0)) {
+	if (! (problem_ -> aggressiveBT (chg_bds, babInfo)))
+	  throw INFEASIBLE;
 
 	sparse2dense (ncols, chg_bds, changed, nchanged);
-	genColCuts (*csi, cs, nchanged, changed);
-
-	int nCurCuts = cs.sizeRowCuts ();
-	genRowCuts (*csi, cs, nchanged, changed, info, chg_bds);
-
-	if (nCurCuts == cs.sizeRowCuts ()) 
-	  break; // repeat only if new cuts available
       }
 
-    delete csi;
+      // obtain solution just found by nlp solver
 
-    if (nImprov < 0)
-      jnlst_->Printf(J_DETAILED, J_CONVEXIFYING,
-		     "### infeasible node after OBBT\n");
+      // Auxiliaries should be correct. solution should be the one found
+      // at the node even if it is not as good as the best known.
 
-    if (nImprov < 0)
-      goto end_genCuts;
-  }
+      // save violation flag and disregard it while adding cut at NLP
+      // point (which are not violated by the current, NLP, solution)
+      bool save_av = addviolated_;
+      addviolated_ = false;
+
+      // update problem current point with NLP solution
+      problem_ -> update (nlpSol, NULL, NULL, problem_ -> nOrig ());
+      genRowCuts (si, cs, nchanged, changed, info, chg_bds, true);  // add cuts
+
+      // restore LP point
+      problem_ -> update (si. getColSolution (), NULL, NULL);
+      addviolated_ = save_av;     // restore previous value
+
+      //    if (!firstcall_) // keep solution if called from extractLinearRelaxation()
+      babInfo -> setHasNlpSolution (false); // reset it after use 
+    }
+    else genRowCuts (si, cs, nchanged, changed, info, chg_bds);
+
+    //---------------------------------------------
+
+    // change tightened bounds through OsiCuts
+    if (nchanged)
+      genColCuts (si, cs, nchanged, changed);
+
+    // OBBT ////////////////////////////////////////////////////////////////////////////////
+
+    // to be carried out if:
+    if (doOBBT_ &&                      // relative flag is checked
+	(logObbtLev_ != 0) &&           // relative frequency parameter is nonzero
+	!firstcall_ &&                  // not first call (there is no LP to work with)
+	(info.pass == 0) &&             // at first round of cuts
+	((logObbtLev_ < 0) ||           // always if logObbtLev_ = -1
+	 (info.level <= logObbtLev_) || // at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
+	 // and then with probability inversely proportional to the level
+	 (CoinDrand48 () < pow (2., (double) logObbtLev_ - (info.level + 1))))) {
+
+      CouenneSolverInterface *csi = dynamic_cast <CouenneSolverInterface *> (si.clone (true));
+
+      csi -> setupForRepeatedUse ();
+
+      int nImprov, nIter = 0;
+
+      while ((nIter++ < MAX_OBBT_ITER) &&
+	     ((nImprov = problem_ -> obbt (csi, cs, chg_bds, babInfo)) > 0)) 
+
+	if (nImprov >= THRES_NBD_CHANGED) {
+
+	  /// OBBT has given good results, add convexification with
+	  /// improved bounds
+
+	  sparse2dense (ncols, chg_bds, changed, nchanged);
+	  genColCuts (*csi, cs, nchanged, changed);
+
+	  int nCurCuts = cs.sizeRowCuts ();
+	  genRowCuts (*csi, cs, nchanged, changed, info, chg_bds);
+
+	  if (nCurCuts == cs.sizeRowCuts ()) 
+	    break; // repeat only if new cuts available
+	}
+
+      delete csi;
+
+      if (nImprov < 0)
+	jnlst_->Printf(J_DETAILED, J_CONVEXIFYING,
+		       "### infeasible node after OBBT\n");
+
+      if (nImprov < 0)
+	throw INFEASIBLE;
+    }
   
-  {
-    int ncuts;
-    if (firstcall_ && ((ncuts = cs.sizeRowCuts ()) >= 1))
-      jnlst_->Printf(J_SUMMARY, J_CONVEXIFYING,
-		     "Couenne: %d initial row cuts\n", ncuts);
+    {
+      int ncuts;
+      if (firstcall_ && ((ncuts = cs.sizeRowCuts ()) >= 1))
+	jnlst_->Printf(J_SUMMARY, J_CONVEXIFYING,
+		       "Couenne: %d initial row cuts\n", ncuts);
+    }
   }
 
   // end of OBBT //////////////////////////////////////////////////////////////////////
 
-end_genCuts:
+  catch (int exception) {
+
+    if ((exception == INFEASIBLE) && (!firstcall_)) {
+
+      OsiColCut *infeascut = new OsiColCut;
+
+      if (infeascut) {
+	int i=0;
+	double upper = -1., lower = +1.;
+	infeascut -> setLbs (1, &i, &lower);
+	infeascut -> setUbs (1, &i, &upper);
+	cs.insert (infeascut);
+	delete infeascut;
+      }
+    }
+
+    if (babInfo) // set infeasibility to true in order to skip NLP heuristic
+      babInfo -> setInfeasibleNode ();
+  }
 
   delete [] chg_bds;
   free (changed);

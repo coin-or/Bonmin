@@ -148,6 +148,7 @@ Couenne/src/problem/depGraph/checkCycles.cpp -text
 Couenne/src/problem/depGraph/depGraph.cpp -text
 Couenne/src/problem/depGraph/depGraph.hpp -text
 Couenne/src/problem/fillQuadIndices.cpp -text
+Couenne/src/problem/getIntegerCandidate.cpp -text
 Couenne/src/problem/problem.cpp -text
 Couenne/src/problem/problemIO.cpp -text
 Couenne/src/problem/readASLfg.cpp -text
