@@ -241,6 +241,10 @@ namespace Bonmin{
 
     if(intParam_[NumCutPasses] < 2)
     intParam_[NumCutPasses] = 2;
+
+    // Tell Cbc not to check again if a solution returned from
+    // heuristic is indeed feasible
+    intParam_[BabSetupBase::SpecialOption] = 16 | 4;
 }
  
 void CouenneSetup::registerOptions(){

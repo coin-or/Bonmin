@@ -185,7 +185,6 @@ namespace Bonmin{
     double *Y = CoinCopyOfArray (solution, nlp_ -> getNumCols ());
 
     if (haveRoundedIntVars) {
-
       skipOnInfeasibility = (couenne_ -> getIntegerCandidate (solution, Y, lower, upper) < 0);
     }
 
@@ -205,7 +204,7 @@ namespace Bonmin{
       // apply NLP solver /////////////////////////////////
       nlp_ -> initialSolve ();
 
-      double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): DBL_MAX;
+      double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): COIN_DBL_MAX;
 
       if (nlp_ -> isProvenOptimal () // store solution in Aux info
 	  // && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
