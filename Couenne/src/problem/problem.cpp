@@ -24,8 +24,10 @@
 #include "CouenneProblemElem.hpp"
 
 /// update value of variables, bounds
-
-void CouenneProblem::update (const CouNumber *x, const CouNumber *l, const CouNumber *u, int n) {
+void CouenneProblem::update (const CouNumber *x, 
+			     const CouNumber *l, 
+			     const CouNumber *u, 
+			     int n) const {
 
   register int nvars = nVars ();
 
@@ -113,7 +115,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
 /// get auxiliary variables from original variables in the nonlinear
 /// problem
 
-void CouenneProblem::getAuxs (CouNumber * x) {
+void CouenneProblem::getAuxs (CouNumber * x) const {
 
   // save current addresses
   CouNumber 
@@ -223,9 +225,10 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 /// set cutoff from NLP solution
 void CouenneProblem::setCutOff (CouNumber cutoff) 
 {
-  // AW: Should we use the value of the objecgive variable computed by 
+
+  // AW: Should we use the value of the objective variable computed by 
   //     Couenne here?
-  pcutoff_->setCutOff(cutoff + 1e-8 * fabs (cutoff));
+  pcutoff_->setCutOff(cutoff + 1e-4 * fabs (cutoff));
   //  cutoff_ = cutoff + 1e-4 * fabs (cutoff);
 } // tolerance needed to retain feasibility
 
@@ -245,10 +248,11 @@ void CouenneProblem::installCutOff () {
 
     // all problem are assumed to be minimization
     double cutoff = pcutoff_->getCutOff();
-    if (cutoff < ub_ [indobj])
+    if (cutoff < ub_ [indobj]) {
       Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
 		      "Installing cutoff %e for optimization variable index %d val = %e\n",
 		      cutoff, indobj, ub_ [indobj]);
       ub_ [indobj] = cutoff;
+    }
   }
 }
