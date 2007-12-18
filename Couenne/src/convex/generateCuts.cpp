@@ -110,7 +110,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
     jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
     for (int i = 0; i < problem_ -> nVars (); i++)
-      jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+10g [%+10g,%+10g]\n", i,
+      jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8f [%+20.8f,%+20.8f]\n", i,
 		     problem_ -> X  (i),
 		     problem_ -> Lb (i),
 		     problem_ -> Ub (i));
@@ -211,14 +211,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   try {
 
-    if (doFBBT_ &&
+    if (problem_ -> doFBBT () &&
 	(info.pass <= 0) &&
 	(! (problem_ -> boundTightening (chg_bds, babInfo))))
-
       throw INFEASIBLE;
 
     // Reduced Cost BT
-    if (doFBBT_ && !firstcall_)
+    if (problem_ -> doFBBT () && !firstcall_)
       problem_ -> redCostBT (&si, chg_bds, babInfo);
 
     //////////////////////// GENERATE CONVEXIFICATION CUTS //////////////////////////////
@@ -231,7 +230,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
 
-      if (doABT_ && (info.pass <= 0)) {
+      if (problem_ -> doABT () && (info.pass <= 0)) {
 	if (! (problem_ -> aggressiveBT (chg_bds, babInfo)))
 	  throw INFEASIBLE;
 
@@ -269,15 +268,17 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // OBBT ////////////////////////////////////////////////////////////////////////////////
 
+    int logObbtLev = problem_ -> logObbtLev ();
+
     // to be carried out if:
-    if (doOBBT_ &&                      // relative flag is checked
-	(logObbtLev_ != 0) &&           // relative frequency parameter is nonzero
+    if (problem_ -> doOBBT () &&        // relative flag is checked
+	(logObbtLev != 0) &&            // relative frequency parameter is nonzero
 	!firstcall_ &&                  // not first call (there is no LP to work with)
 	(info.pass == 0) &&             // at first round of cuts
-	((logObbtLev_ < 0) ||           // always if logObbtLev_ = -1
-	 (info.level <= logObbtLev_) || // at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
+	((logObbtLev < 0) ||            // always if logObbtLev = -1
+	 (info.level <= logObbtLev) ||  // at all levels up to the COU_OBBT_CUTOFF_LEVEL-th,
 	 // and then with probability inversely proportional to the level
-	 (CoinDrand48 () < pow (2., (double) logObbtLev_ - (info.level + 1))))) {
+	 (CoinDrand48 () < pow (2., (double) logObbtLev - (info.level + 1))))) {
 
       CouenneSolverInterface *csi = dynamic_cast <CouenneSolverInterface *> (si.clone (true));
 

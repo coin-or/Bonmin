@@ -26,6 +26,7 @@
 
 /// constructor
 CouenneProblem::CouenneProblem (const struct ASL *asl,
+				Bonmin::BabSetupBase *base,
 				JnlstPtr jnlst):
 
   auxSet_    (NULL), 
@@ -41,6 +42,10 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   nOrig_     (0),
   pcutoff_   (new GlobalCutOff),
   created_pcutoff_ (true),
+  doFBBT_    (false),
+  doOBBT_    (false),
+  doABT_     (false),
+  logObbtLev_(0),
   jnlst_(jnlst) {
 
   x_ = lb_ = ub_ = NULL; 
@@ -68,7 +73,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   // auxiliary variables.
   nOrigCons_ = constraints_. size ();
 
-  Jnlst()->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
+  jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
 		  "Problem size before standarization: %d variables (%d integer) %d constraints.\n",
 		  nOrig(), nIntVars(), nOrigCons());
 
@@ -82,15 +87,23 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     jnlst_->Printf(Ipopt::J_WARNING, J_PROBLEM,
 		   "Couenne: standardization time %.3fs\n", now);
 
-  Jnlst()->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
+  jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
 		  "Problem size after standarization: %d variables (%d integer) %d constraints.\n",
 		  nVars(), nIntVars(), nCons());
 
-  //  readOptimum ("nc.txt", optimum_, bestObj_);
+  //  readOptimum ("ex2_1_2.txt");
 
   if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
     // We should route that also through the journalist
     print (std::cout);
+  }
+
+  if (base) {
+    std::string s;
+    base -> options() -> GetStringValue("feasibility_bt",     s, "couenne."); doFBBT_ = (s == "yes");
+    base -> options() -> GetStringValue("optimality_bt",      s, "couenne."); doOBBT_ = (s == "yes");
+    base -> options() -> GetStringValue("aggressive_fbbt",    s, "couenne."); doABT_  = (s == "yes");
+    base -> options() -> GetIntegerValue ("log_num_obbt_per_level", logObbtLev_, "couenne.");
   }
 
   //writeAMPL ("extended-aw.mod", true);
@@ -122,6 +135,10 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   nOrigCons_ (p.nOrigCons_),
   pcutoff_   (p.pcutoff_),
   created_pcutoff_ (false),
+  doFBBT_    (p. doFBBT_),
+  doOBBT_    (p. doOBBT_),
+  doABT_     (p. doABT_),
+  logObbtLev_(p. logObbtLev_),
   jnlst_     (p.jnlst_) { // needed only in standardize (), unnecessary to update it
 
   // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
@@ -273,4 +290,37 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
   }
 
   return w;
+}
+
+/// Add list of options to be read from file
+void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {
+
+  roptions -> SetRegisteringCategory ("Couenne options", Bonmin::RegisteredOptions::CouenneCategory);
+
+  roptions -> AddStringOption2 
+    ("feasibility_bt",
+     "Feasibility-based (cheap) bound tightening",
+     "yes",
+     "no","",
+     "yes","");
+
+  roptions -> AddStringOption2 
+    ("optimality_bt",
+     "optimality-based (expensive) bound tightening",
+     "no",
+     "no","",
+     "yes","");
+
+  roptions -> AddLowerBoundedIntegerOption
+    ("log_num_obbt_per_level",
+     "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
+     -1,5,
+     "If -1, apply at every node (expensive!). If 0, never apply.");
+
+  roptions -> AddStringOption2 
+    ("aggressive_fbbt",
+     "Aggressive feasibility-based bound tightening (to use with NLP points)",
+     "yes",
+     "no","",
+     "yes","");
 }

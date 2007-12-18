@@ -11,6 +11,9 @@
 #include "CoinHelperFunctions.hpp"
 #include "CouenneProblem.hpp"
 
+// lose patience after this many iterations of non-improving valid
+// tightening (step 1)
+#define VALID_ONLY_THRESHOLD 5 
 
 /// generate integer NLP point Y starting from fractional solution
 /// using bound tightening
@@ -76,9 +79,15 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	    i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
 	    xFrac [i], lb_ [i], ub_ [i]);*/
 
+  int validNonImproving = 0;
+
   do {
 
     changed = false;
+
+    // TODO: use explicit checkNLP for solutions
+
+    //printf ("=================================================== %d %d\n", iter, nOrig_);
 
     for (int i = 0; i < nOrig_; i++)
 
@@ -157,6 +166,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	    fixed [i] = FIXED;
 	    lb_ [i] = ub_ [i] = xInt [i] = ceil (xFrac [i]); 
 	    changed = true;
+	    //printf ("+++ 1 %d\n", i);
 
 	    // tighten bounds using r[lu]b
 	    for (int j=0; j<ncols; j++) if (i != j) {
@@ -177,6 +187,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	  fixed [i] = FIXED;
 	  lb_ [i] = ub_ [i] = xInt [i] = floor (xFrac [i]); 
 	  changed = true;
+	  //printf ("+++ 2 %d\n", i);
 
 	  // tighten bounds using l[lu]b
 	  for (int j=0; j<ncols; j++) if (i != j) {
@@ -207,7 +218,10 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
     if (retval == -1) break;
 
-    if (!changed)
+    if (!changed) {
+
+      validNonImproving++;
+
       for (int i=0; i<nOrig_; i++) 
 	if (fixed [i] == UNFIXED) {
 
@@ -224,12 +238,15 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	  if (fix) {
 	    fixed [i] = FIXED;
+	    //printf ("+++ 3 --- %d %d %d\n", i, validNonImproving, VALID_ONLY_THRESHOLD);
 	    changed = true;
-	    break;
+	    if (validNonImproving < VALID_ONLY_THRESHOLD) break;
+	    //else printf ("fix more... ");
 	  }
 	}
+    }
 
-  } while ((iter++ < nOrig_) && changed);
+  } while ((iter++ < nOrig_) && changed && (validNonImproving < 2 * VALID_ONLY_THRESHOLD));
 
   // phase 2: the fixable has been fixed, now the unfixed integer
   // variables have to be fixed too, e.g. according to dual bound
@@ -268,6 +285,8 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   delete [] rub;
 
   delete [] fixed;
+
+  //printf (" done getintCand ------------------------------\n\n\n");
 
   return retval;
 }

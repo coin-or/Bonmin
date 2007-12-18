@@ -48,6 +48,22 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
     int i = numbering_ [ii];
 
+    // early test to avoid a loop
+
+    if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
+      //#ifdef DEBUG
+      if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+			"pre-check, w_%d has infeasible bounds [%g,%g]: ", i, lb_ [i], ub_ [i]);
+	Var (i) -> Lb () -> print (std::cout);
+	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING," --- ");
+	Var (i) -> Ub () -> print (std::cout);
+	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+      }
+      //#endif
+      return -1; // declare this node infeasible
+    }
+
     if ((Var (i) -> Multiplicity () > 0) &&
 	(Var (i) -> Type         () == AUX) 
 	// TODO: also test if any indep variable of this expression

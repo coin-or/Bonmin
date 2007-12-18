@@ -75,10 +75,7 @@ void CouenneProblem::print (std::ostream &out) {
 
 
 /// read optimal solution into member optimum
-bool readOptimum (const std::string &fname, 
-		  CouNumber *& optimum, 
-		  CouNumber &bestObj, 
-		  CouenneProblem *problem) {
+bool CouenneProblem::readOptimum (const std::string &fname) {
 
   // TODO: this procedure is crippled by the new auxiliary handling
   // which replaces original variables with auxiliaries. The problem
@@ -89,20 +86,18 @@ bool readOptimum (const std::string &fname,
   // formulations, whose original variables are either original or
   // auxiliary in the original problem.
 
-  int nvars = problem -> nVars (),
-      nOrig = problem -> nOrig ();
-  //      nauxs = problem -> nAuxs ();
+  int nvars = nVars ();
 
   FILE *f = fopen (fname.c_str (), "r");
   if (!f) return false;
 
-  optimum = (CouNumber *) realloc (optimum, nvars * sizeof (CouNumber));
+  optimum_ = (CouNumber *) realloc (optimum_, nvars * sizeof (CouNumber));
 
-  if (fscanf (f, "%lf", &bestObj) < 1) 
+  if (fscanf (f, "%lf", &bestObj_) < 1) 
     return false;
 
-  for (int i = 0; i < nOrig; i++)
-    if (fscanf (f, "%lf", optimum + i) < 1) 
+  for (int i = 0; i < nOrig_; i++)
+    if (fscanf (f, "%lf", optimum_ + i) < 1) 
       return false;
 
   // save current expression vectors
@@ -112,15 +107,15 @@ bool readOptimum (const std::string &fname,
     *uS = expression::Ubounds   ();
 
   // now propagate value to aux variables
-  expression::update (optimum, NULL, NULL);
+  expression::update (optimum_, NULL, NULL);
 
   // only one loop is sufficient here, since auxiliary variables are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
 
-  for (register int i = 0, j = problem -> nVars (); j--; i++) {
-    exprVar *var = problem -> Var (problem -> evalOrder (i));
+  for (register int i = 0, j = nVars (); j--; i++) {
+    exprVar *var = variables_ [numbering_ [i]];
     if (var -> Type () == AUX)
-      optimum [var -> Index ()] = (*(var -> Image ())) ();
+      optimum_ [var -> Index ()] = (*(var -> Image ())) ();
   }
 
   // restore previous value/bound vectors

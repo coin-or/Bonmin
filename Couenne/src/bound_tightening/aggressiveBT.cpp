@@ -130,6 +130,19 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
   delete [] olb;
   delete [] oub;
 
+  if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+    //    CouNumber cutoff = getCutOff ();
+    int       objind = Obj (0) -> Body  () -> Index ();
+    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+		    "-------------\ndone Aggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
+		    lb_ [objind], getCutOff (), ncols);
+    for (int i=0; i<nOrig_; i++)
+      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+		      "   %2d %+20g %+20g  | %+20g\n",
+		      i, lb_ [i], ub_ [i], X [i]);
+  }
+
+
   return retval;// && btCore (psi, cs, chg_bds, babInfo, true); // !!!
   //return retval && btCore (psi, cs, chg_bds, babInfo, true);
 }

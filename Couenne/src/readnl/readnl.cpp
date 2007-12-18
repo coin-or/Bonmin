@@ -27,6 +27,8 @@
 #define OBJ_sense ((const ASL_fg *) asl) -> i.objtype_
 
 
+//#define DEBUG
+
 // check if an expression is a null pointer or equals zero
 inline bool is_expr_zero (expr* e)
   {return ((e==NULL) || (((((long int) e->op) == OPNUM) && 
@@ -72,13 +74,16 @@ int CouenneProblem::readnl (const ASL *asl) {
 
   // common expressions (or defined variables) ///////////////////////////////////////
 
-  /*printf ("c_vars_ = %d\n", ((const ASL_fg *) asl) -> i.c_vars_ );
+#ifdef DEBUG
+  printf ("tot var = %d\n", variables_ . size ());
+  printf ("c_vars_ = %d\n", ((const ASL_fg *) asl) -> i.c_vars_ );
   printf ("comb_ = %d\n",   ((const ASL_fg *) asl) -> i.comb_  );
   printf ("combc_ = %d\n",  ((const ASL_fg *) asl) -> i.combc_ );
   printf ("comc1_ = %d\n",  ((const ASL_fg *) asl) -> i.comc1_ );
   printf ("comc_ = %d\n",   ((const ASL_fg *) asl) -> i.comc_  );
   printf ("como1_ = %d\n",  ((const ASL_fg *) asl) -> i.como1_ );
-  printf ("como_ = %d\n",   ((const ASL_fg *) asl) -> i.como_  );*/
+  printf ("como_ = %d\n",   ((const ASL_fg *) asl) -> i.como_  );
+#endif
 
   // Each has a linear and a nonlinear part (credit to Dominique
   // Orban: http://www.gerad.ca/~orban/drampl/def-vars.html)
@@ -88,7 +93,9 @@ int CouenneProblem::readnl (const ASL *asl) {
     struct cexp *common = ((const ASL_fg *) asl) -> I.cexps_ + i;
     expression *nle = nl2e (common -> e);
 
-    //    printf ("cexp  %d: ", i); nle -> print ();  printf (" ||| ");
+#ifdef DEBUG
+    printf ("cexp  %d [%d]: ", i, variables_ . size ()); nle -> print ();  printf (" ||| ");
+#endif
 
     int nlin = common -> nlin;  // Number of linear terms
 
@@ -99,15 +106,17 @@ int CouenneProblem::readnl (const ASL *asl) {
 
       linpart *L = common -> L;
 
-      for (int j = 0; j < nlin; j++ ) {
-	//	vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
-	//	Printf( " %-g x[%-d]", L->fac, (int)(vp - VAR_E) );	
+      for (int j = 0; j < nlin; j++) {
+	//vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
+	//Printf( " %-g x[%-d]", L->fac, (int)(vp - VAR_E) );	
 	coeff [j] = L [j]. fac;
 	index [j] = (expr_v *) (L [j].v.rp) - VAR_E;
-	/*	Printf( " %-g x[%-d]", L [j]. fac, 
+#ifdef DEBUG
+	Printf( " %+g x_%-3d", L [j]. fac, 
 		(expr_v *) (L [j].v.rp) - VAR_E //((const ASL_fg *) asl) -> I.cexps_
 		//L [j]. v.i
-		);*/
+		);
+#endif
       }
 
       index [nlin] = -1;
@@ -119,7 +128,9 @@ int CouenneProblem::readnl (const ASL *asl) {
       commonexprs_ . push_back (eg);
     } 
     else commonexprs_ . push_back (nle);
-    //    printf ("\n");
+#ifdef DEBUG
+    printf ("\n");
+#endif
   }
 
   for (int i = 0; i < como1 + comc1; i++) {
@@ -127,7 +138,9 @@ int CouenneProblem::readnl (const ASL *asl) {
     struct cexp1 *common = ((const ASL_fg *) asl) -> I.cexps1_ + i;
     expression *nle = nl2e (common -> e);
 
-    //    printf ("cexp1 %d: ", i); nle -> print ();  printf (" ||| ");
+#ifdef DEBUG
+    printf ("cexp1 %d [%d]: ", i, variables_ . size ()); nle -> print ();  printf (" ||| ");
+#endif
 
     int nlin = common -> nlin;  // Number of linear terms
 
@@ -138,14 +151,16 @@ int CouenneProblem::readnl (const ASL *asl) {
 
       linpart *L = common -> L;
 
-      for (int j = 0; j < nlin; j++ ) {
-	//	vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
+      for (int j = 0; j < nlin; j++) {
+	//vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
 	coeff [j] = L [j]. fac;
 	index [j] = (expr_v *) (L [j].v.rp) - VAR_E;
-	/*	Printf( " %-g x[%-d]", L [j]. fac, 
+#ifdef DEBUG
+	Printf( " %+g x_%-3d", L [j]. fac, 
 		(expr_v *) (L [j].v.rp) - VAR_E //((const ASL_fg *) asl) -> I.cexps_
 		//L [j]. v.i
-		);*/
+		);
+#endif
       }
 
       index [nlin] = -1;
@@ -157,7 +172,9 @@ int CouenneProblem::readnl (const ASL *asl) {
       commonexprs_ . push_back (eg);
     } 
     else commonexprs_ . push_back (nle);
-    //    printf ("\n");
+#ifdef DEBUG
+    printf ("\n");
+#endif
     //    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e));
   }
 
@@ -176,11 +193,11 @@ int CouenneProblem::readnl (const ASL *asl) {
       if (fabs (objgrad -> coef) > COUENNE_EPS)
 	nterms++;
 
-    expression *body;
+    expression 
+      *body,
+      *nl = nl2e (OBJ_DE [i] . e);
 
-    expression *nl = nl2e (OBJ_DE [i] . e);
-
-    if (nterms) {
+    if (nterms) { // have linear terms
 
       int       *index = new int       [nterms+1];
       CouNumber *coeff = new CouNumber [nterms];
@@ -232,7 +249,6 @@ int CouenneProblem::readnl (const ASL *asl) {
     // ThirdParty/ASL/solvers/asl.h, line 336: 0 is minimization, 1 is maximization
     addObjective (body, (OBJ_sense [i] == 0) ? "min" : "max");
   }
-
 
   // constraints ///////////////////////////////////////////////////////////////////
 

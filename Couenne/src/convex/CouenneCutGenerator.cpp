@@ -11,6 +11,7 @@
 #include "OsiRowCut.hpp"
 #include "BonOaDecBase.hpp"
 #include "CglCutGenerator.hpp"
+#include "BonBabInfos.hpp"
 
 #include "CouennePrecisions.hpp"
 #include "CouenneProblem.hpp"
@@ -37,7 +38,6 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   jnlst_          (jnlst) {
 
   base -> options () -> GetIntegerValue ("convexification_points", nSamples_, "couenne.");
-  base -> options () -> GetIntegerValue ("log_num_obbt_per_level", logObbtLev_, "couenne.");
 
   std::string s;
 
@@ -46,14 +46,9 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   else if (s == "uniform-grid")       convtype_ = UNIFORM_GRID;
   else                                convtype_ = AROUND_CURPOINT;
 
-  base -> options () -> GetStringValue ("feasibility_bt",  s, "couenne."); doFBBT_ = (s == "yes");
-  base -> options () -> GetStringValue ("optimality_bt",   s, "couenne."); doOBBT_ = (s == "yes");
-  base -> options () -> GetStringValue ("aggressive_fbbt", s, "couenne."); doABT_  = (s == "yes");
+  base -> options() -> GetStringValue("violated_cuts_only", s, "couenne."); addviolated_ = (s=="yes");
 
-  base -> options () -> GetStringValue ("violated_cuts_only", s, "couenne."); 
-  addviolated_ = (s == "yes");
-
-  problem_ = new CouenneProblem (asl, jnlst_);
+  problem_ = new CouenneProblem (asl, base, jnlst_);
 }
 
 
@@ -79,10 +74,6 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   nlp_         (src. nlp_),
   BabPtr_      (src. BabPtr_),
   infeasNode_  (src. infeasNode_),
-  doFBBT_      (src. doFBBT_),
-  doOBBT_      (src. doOBBT_),
-  doABT_       (src. doABT_),
-  logObbtLev_  (src. logObbtLev_),
   jnlst_       (src. jnlst_)  {}
 
 
@@ -163,33 +154,6 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      0,1,
      "");
 
-  roptions -> AddStringOption2 
-    ("feasibility_bt",
-     "Feasibility-based (cheap) bound tightening",
-     "yes",
-     "no","",
-     "yes","");
-
-  roptions -> AddStringOption2 
-    ("optimality_bt",
-     "optimality-based (expensive) bound tightening",
-     "no",
-     "no","",
-     "yes","");
-
-  roptions -> AddLowerBoundedIntegerOption
-    ("log_num_obbt_per_level",
-     "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
-     -1,5,
-     "If -1, apply at every node (expensive!). If 0, never apply.");
-
-  roptions -> AddStringOption2 
-    ("aggressive_fbbt",
-     "Aggressive feasibility-based bound tightening (to use with NLP points)",
-     "yes",
-     "no","",
-     "yes","");
-
   roptions -> AddStringOption3
     ("branch_pt_select",
      "Chooses branching point selection strategy",
@@ -206,6 +170,7 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "no","",
      "yes","");
 
-
   roptions -> setOptionExtraInfo ("branch_pt_select", 15); // Why 15? TODO
+
+  CouenneProblem::registerOptions (roptions);
 }

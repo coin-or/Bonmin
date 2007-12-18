@@ -75,7 +75,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
 	  // todo: send all output through journalist
 	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
-			  "impli %2d [%g,%g] -> [%g,%g]: ",
+			  "impli %2d [%15.8g, %15.8g] -> [%15.8g, %15.8g]: ",
 			  i, l0, u0, lb_ [i], ub_ [i]);
 
 	  variables_ [i]             -> print (std::cout);
@@ -83,6 +83,11 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	  variables_ [i] -> Image () -> print (std::cout);
 	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
 	}
+
+	/*for (int i=0; i<nVars (); i++) 
+	  printf ("%4d. [%20.8f, %20.8f]\n", i,
+		  expression::Lbound (i),
+		  expression::Ubound (i));*/
 
 	/*
 	if (optimum_ && 
@@ -129,13 +134,8 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       }
     }
   }
-  /*
-    for (int i=0; i<nvar; i++) 
-    printf (" [%g, %g]\n", 
-    expression::Lbound (i),
-    expression::Ubound (i));
 
-    for (int i=0; i < nAuxs (); i++) {
+  /*for (int i=0; i < nAuxs (); i++) {
 
     printf (" [%g, %g]", 
     expression::Lbound (i+nvar),
@@ -145,7 +145,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
     printf (" := ");
     auxiliaries_ [i] -> Image () -> print (std::cout); fflush (stdout);
     printf ("\n");
-    }
-  */
+  }*/
+
   return nchg;
 }

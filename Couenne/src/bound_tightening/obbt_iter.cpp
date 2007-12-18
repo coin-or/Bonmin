@@ -266,14 +266,12 @@ obbt_iter (CouenneSolverInterface *csi,
       // (first argument =NULL is pointer to solverInterface) as csi
       // is not our problem
 
-      //      int psenseI = (psense == MINIMIZE) ? 1 : -1;
-
       Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-		      "XXXXXXXXXXXXXXX OBBT: x_%d: [%g, %g]\n", index, 
+		      "  OBBT: x_%d: [%g, %g]\n", index, 
 		      csi -> getColLower () [index], 
 		      csi -> getColUpper () [index]);
 
-      if (!(boundTightening (chg_bds, babInfo))) {
+      if (doFBBT_ && !(boundTightening (chg_bds, babInfo))) {
 	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			"##### infeasible, bound tightening after OBBT\n");
 	return -1; // tell caller this is infeasible

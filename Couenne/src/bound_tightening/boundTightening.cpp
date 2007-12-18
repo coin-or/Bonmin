@@ -50,7 +50,6 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
       // set infeasibility through a cut 1 <= x0 <= -1
       Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			  "#### infeasible node at BT\n");
-
       return false;
     }
 

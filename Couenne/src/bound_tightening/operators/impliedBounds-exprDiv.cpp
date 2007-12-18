@@ -40,13 +40,13 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     if (c > COUENNE_EPS) {
 
-      if (updateBound (-1, l + ind, l [wind] * c)) {resx = true; chg [ind].setLower(t_chg_bounds::CHANGED);}
-      if (updateBound ( 1, u + ind, u [wind] * c)) {resx = true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
+      if (updateBound (-1, l+ind, l[wind]*c)) {resx=true; chg [ind].setLower(t_chg_bounds::CHANGED);}
+      if (updateBound ( 1, u+ind, u[wind]*c)) {resx=true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
     } 
     else if (c < - COUENNE_EPS) {
 
-      if (updateBound (-1, l + ind, u [wind] * c)) {resx = true; chg [ind].setLower(t_chg_bounds::CHANGED);}
-      if (updateBound ( 1, u + ind, l [wind] * c)) {resx = true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
+      if (updateBound (-1, l+ind, u[wind]*c)) {resx=true; chg [ind].setLower(t_chg_bounds::CHANGED);}
+      if (updateBound ( 1, u+ind, l[wind]*c)) {resx=true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
     } 
   } else {
 

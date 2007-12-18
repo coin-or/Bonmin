@@ -37,7 +37,6 @@ int getOperator (efunc *);
 void notimpl (const std::string &fname) {
   std::cerr << "*** Error: " << fname << " not implemented" << std::endl;
   exit (-1);
-  //  return new exprConst (0);
 }
 
 
@@ -59,8 +58,8 @@ expression *CouenneProblem::nl2e (expr *e) {
   case FLOOR:   notimpl ("floor");
   case CEIL:    notimpl ("ceil");
   case ABS:     return new exprAbs (nl2e (e -> L.e));
-    //  case OPUMINUS:return new exprOpp (nl2e (e -> L.e -> L.e));
   case OPUMINUS:return new exprOpp (nl2e (e -> L.e));
+    //  return new exprOpp (nl2e (e -> L.e -> L.e));
   case OPIFnl:  { notimpl ("ifnl");
 
   // see ASL/solvers/rops.c, IfNL
@@ -119,22 +118,27 @@ expression *CouenneProblem::nl2e (expr *e) {
   case OPHOL:     notimpl ("hol");
   case OPVARVAL:  {
 
-      int j = ((expr_v *) e) -> a, 
-	  d = nVars () - j;
-      // is index above number of variables?
-      //if (j >= nvars)
-      while (d++ <= 0)
-	addVariable (false);
-	//printf ("indexD = %d\n", j);
-	//printf ("Couenne, warning: unknown variable x%d (>%d+%d=%d), returning new variable.\n",
-	//	j, nvars, nAuxs (), nvars + nAuxs ());
-	//	exit (-1);
-	// TODO: aux_ [...] may not be filled yet
-	//return new exprClone (variables_ [j]);
+    int j = ((expr_v *) e) -> a, 
+        d = nVars () - j;
 
-      //printf ("indexV = %d\n", j);
-      return new exprClone (variables_ [j]);
-    }
+    if (j >= nOrig_) j--; // CHECK! 
+
+    d = nVars () - j;
+
+    // is index above number of variables?
+    //if (j >= nvars)
+
+    while (d++ <= 0)
+      addVariable (false);
+
+    //printf ("indexD = %d\n", j);
+    //printf ("Couenne, warning: unknown variable x%d (>%d+%d=%d), returning new variable.\n",
+    //	j, nvars, nAuxs (), nvars + nAuxs ());
+    //	exit (-1);
+    // TODO: aux_ [...] may not be filled yet
+
+    return new exprClone (variables_ [j]);
+  }
 
   default: 
     printf ("ERROR: unknown operator (address %x), aborting.\n", (long int) e -> op); 

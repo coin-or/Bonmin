@@ -123,12 +123,27 @@ class CouenneProblem {
   /// flag indicating if this class is creator of global cutoff object
   bool created_pcutoff_;
 
+  /// do Feasibility-based bound tightening
+  bool doFBBT_;
+
+  /// do Optimality-based bound tightening
+  bool doOBBT_;
+
+  /// do aggressive bound tightening
+  bool doABT_;
+
+  /// frequency of Optimality-based bound tightening
+  int logObbtLev_;
+
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 
  public:
 
-  CouenneProblem  (const ASL * = NULL, JnlstPtr jnlst = NULL);     ///< Constructor
+  CouenneProblem  (const ASL * = NULL,
+		   Bonmin::BabSetupBase *base = NULL,
+		   JnlstPtr jnlst = NULL);  ///< Constructor
+
   CouenneProblem  (const CouenneProblem &); ///< Copy constructor
   ~CouenneProblem ();                       ///< Destructor
 
@@ -224,6 +239,12 @@ class CouenneProblem {
   /// Generate a Couenne expression from an ASL expression
   expression *nl2e (struct expr *);
 
+  // return parameters
+  bool doFBBT () const {return doFBBT_;} ///< shall we do Feasibility Based Bound Tightening?
+  bool doOBBT () const {return doOBBT_;} ///< shall we do Optimality  Based Bound Tightening?
+  bool doABT  () const {return doABT_;}  ///< shall we do Aggressive        Bound Tightening?
+  int  logObbtLev () const {return logObbtLev_;} ///< How often shall we do OBBT?
+
   /// Write nonlinear problem to a .mod file (with lots of defined
   /// variables)
   /// 
@@ -310,7 +331,10 @@ class CouenneProblem {
   int getIntegerCandidate (const double *xFrac, double *xInt, double *lb, double *ub);
 
   /// Read best known solution from file given in argument
-  bool readOptimum (const std::string &, CouNumber *&, CouNumber &);
+  bool readOptimum (const std::string &);
+
+  /// Add list of options to be read from file
+  static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
 
 private:
 

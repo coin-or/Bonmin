@@ -225,10 +225,9 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 /// set cutoff from NLP solution
 void CouenneProblem::setCutOff (CouNumber cutoff) 
 {
-
   // AW: Should we use the value of the objective variable computed by 
   //     Couenne here?
-  pcutoff_->setCutOff(cutoff + 1e-4 * fabs (cutoff));
+  pcutoff_ -> setCutOff (cutoff + 1e-8 * fabs (cutoff));
   //  cutoff_ = cutoff + 1e-4 * fabs (cutoff);
 } // tolerance needed to retain feasibility
 
@@ -248,6 +247,7 @@ void CouenneProblem::installCutOff () {
 
     // all problem are assumed to be minimization
     double cutoff = pcutoff_->getCutOff();
+
     if (cutoff < ub_ [indobj]) {
       Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
 		      "Installing cutoff %e for optimization variable index %d val = %e\n",

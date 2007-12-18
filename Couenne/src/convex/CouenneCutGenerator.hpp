@@ -74,18 +74,6 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// signal infeasibility of current node (found through bound tightening)
   mutable bool infeasNode_;
 
-  /// do Feasibility-based bound tightening
-  bool doFBBT_;
-
-  /// do Optimality-based bound tightening
-  bool doOBBT_;
-
-  /// do aggressive bound tightening
-  bool doABT_;
-
-  /// frequency of Optimality-based bound tightening
-  int logObbtLev_;
-
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 

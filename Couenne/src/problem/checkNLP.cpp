@@ -10,13 +10,13 @@
 #include "CoinHelperFunctions.hpp"
 #include "CouenneProblem.hpp"
 
+#define FEAS_TOL 1e-9
+
 // check if solution is MINLP feasible
 bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 
   // update variable array in evaluation structure
   //  expression::update (const_cast <double *> (solution), NULL, NULL);
-
-  //  int nvars = extended ? nVars () : nOrig_;
 
   /*printf ("original NLP solution:\n");
   for (int i=0; i<nOrig_; i++)
@@ -39,18 +39,30 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
     printf ("%4d: %10g\n", i, sol [i]);
     printf ("\n");*/
 
+  /*exprAux *objaux = 
+    dynamic_cast <exprAux *> 
+    (const_cast <expression *> 
+     (Obj (0) -> Body () -> Original ()));
 
-  /*  CouNumber realobj = (*(p -> Obj (0) -> Body ())) ();
-  if (fabs (realobj - obj) > COUENNE_EPS) {
-    printf ("checkNLP: false objective function. %.3f != %.3f\n", realobj, obj);
-    }*/
+     CouNumber objImg  = objaux ? (*objaux) () : 0;
+
+     Obj (0) -> Body () -> print ();*/
+
+  CouNumber realobj = (*(Obj (0) -> Body ())) ();
+
+  if (fabs (realobj - obj) > FEAS_TOL) {
+    Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+		    "checkNLP: false objective function. %.3f != %.3f\n", realobj, obj);
+    delete [] sol;
+    return false;
+  }
 
   // check (original and auxiliary) variables' integrality
   for (int i=0; i < nOrig_; i++) 
 
     if (variables_ [i] -> isInteger ()) {
       CouNumber val = expression::Variable (i);
-      if (fabs (val - COUENNE_round (val)) > COUENNE_EPS) {
+      if (fabs (val - COUENNE_round (val)) > FEAS_TOL) {
 	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
 			"checkNLP: integrality %d violated: %g [%g,%g]\n", 
 			i, val, expression::Lbound (i), expression::Ubound (i));
@@ -70,12 +82,13 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 	lhs  = (*(c -> Lb   ())) (),
 	rhs  = (*(c -> Ub   ())) ();
 
-      if ((body > rhs + COUENNE_EPS) || 
-	  (body < lhs - COUENNE_EPS)) {
+      if ((body > rhs + FEAS_TOL) || 
+	  (body < lhs - FEAS_TOL)) {
 	if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
-	  Jnlst()->Printf(Ipopt::J_WARNING, J_PROBLEM,
-			  "Warning in checkNLP: constraint %d violated (lhs = %e body = %e rhs = %e): ",
-			  i, lhs, body, rhs);
+	  Jnlst()->Printf
+	    (Ipopt::J_WARNING, J_PROBLEM,
+	     "Warning in checkNLP: constraint %d violated (lhs = %e body = %e rhs = %e): ",
+	     i, lhs, body, rhs);
 	  c -> print ();
 	}
 	// We dont return anymore (return false;)
@@ -85,32 +98,32 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 
   // check auxiliary variables
   //if (extended)
+
   /*
-  if (0)
-    for (int n = nVars (), i=0; i<n; i++) {
+  for (int n = nVars (), i=0; i<n; i++) {
 
-      int order = evalOrder (i);
+    int order = evalOrder (i);
 
-      if (Var (order) -> Type () == AUX) {
+    if (Var (order) -> Type () == AUX) {
 
-	exprAux   *w   = dynamic_cast <exprAux *> (Var (order));
-	CouNumber  
-	  aux = expression::Variable (order),
-	  img = (*(w -> Image ())) ();
+      exprAux   *w   = dynamic_cast <exprAux *> (Var (order));
+      CouNumber  
+	aux = expression::Variable (order),
+	img = (*(w -> Image ())) ();
 
-	if (fabs (aux - img) > COUENNE_EPS) {
-	  if (Jnlst()->ProduceOutput(Ipopt::J_MOREDETAILED, J_PROBLEM)) {
-	    Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
-			    "auxiliary %d infeasible: ", order);
-	    w -> print ();
-	    Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM," := ");
-	    w -> Image () -> print ();
-	    Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,"\n");
-	  }
-	  return false;
+      if (fabs (aux - img) > FEAS_TOL) {
+	if (Jnlst()->ProduceOutput(Ipopt::J_MOREDETAILED, J_PROBLEM)) {
+	  Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+			  "auxiliary %d infeasible: ", order);
+	  w -> print ();
+	  Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM," := ");
+	  w -> Image () -> print ();
+	  Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,"\n");
 	}
+	return false;
       }
     }
+  }
   */
 
   delete [] sol;

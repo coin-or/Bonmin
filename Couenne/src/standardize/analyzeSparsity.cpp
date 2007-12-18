@@ -30,6 +30,8 @@ void analyzeSparsity (CouenneProblem *p,
 		      std::map <int,                 CouNumber> &lmap,
 		      std::map <std::pair <int,int>, CouNumber> &qmap) {
 
+  if (qmap.size () == 0) return;
+
   // simple technique: if number of elements in quadratic map is more
   // than a given fraction of n^2, then turn it into an exprQuad,
   // otherwise break it down. Count n first.
@@ -62,7 +64,6 @@ void analyzeSparsity (CouenneProblem *p,
 
   int nterms = occur.size ();
 
-  //  if (0)
   if ((qmap.size () > MIN_DENSITY * nterms * (nterms+1) / 2) && (nterms > 2)
       //|| (nsquares > nterms/2)
       )

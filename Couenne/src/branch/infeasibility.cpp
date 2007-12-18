@@ -16,7 +16,7 @@
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
 
-//#define DEBUG
+#define DEBUG
 
 
 /// return difference between current value
@@ -59,7 +59,16 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
       return 0.;
     }
 #else
-    return 0.;
+ {
+   printf ("----|%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
+	   var, expr, 
+	   //	    expression::Lbound (reference_ -> Index ()),
+	   //	    expression::Ubound (reference_ -> Index ()),
+	   fabs (var - expr), delta, whichWay, brVarInd_);
+   reference_             -> print (std::cout); std::cout << " = ";
+   reference_ -> Image () -> print (std::cout); printf ("\n");
+   return 0.;
+ }
 #endif
 
   // a nonlinear constraint w = f(x) is violated. The infeasibility

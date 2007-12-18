@@ -260,11 +260,6 @@ class expression {
 
 inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
 
-  register CouNumber delta = src - *dst;
-
-  if (sign > 0) 
-    delta = - delta;
-
   // meaning: 
   //
   // if (*dst > src) && (sign > 0) --> dst down to src
@@ -273,7 +268,7 @@ inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
   // that is, sign > 0 means we are tightening an UPPER bound
   //          sign < 0                            LOWER
 
-  if (delta > COUENNE_EPS) {
+  if (((sign > 0) ? (*dst - src) : (src - *dst)) > COUENNE_EPS) {
     //printf ("%.12g --> %.12g\n", *dst, src);
     *dst = src; // tighten
     return true;

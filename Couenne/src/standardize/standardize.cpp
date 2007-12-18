@@ -41,16 +41,20 @@ void CouenneProblem::standardize () {
   // standardize initial aux variables (aka defined variables, aka
   // common expression)
 
-  for (int nc = commonexprs_ . size (), i=0; i<nc; i++) {
+#ifdef DEBUG
+  if (commonexprs_.size ()) printf ("%d common exprs, initVar = %d = %d - %d\n", 
+				    commonexprs_.size (), initVar, 
+				    variables_ . size (), commonexprs_ . size ());
+#endif
 
-    expression *aux = commonexprs_ [i];
+  for (std::vector <expression *>::iterator i = commonexprs_ . begin ();
+       i != commonexprs_ . end (); ++i) {
+
+    expression *aux = (*i);
 
 #ifdef DEBUG
-    printf ("////////////// now attempting to standardize defVar "); fflush (stdout);
-    aux -> print ();
-    //    printf (" := "); fflush (stdout);
-    //    aux -> print (); 
-    printf ("\n ----> "); fflush (stdout);
+    printf ("////////////// stdz common expr [%d] :=", initVar); fflush (stdout);
+    aux -> print (); printf ("\n"); fflush (stdout);
 #endif
 
     exprAux *naux = aux -> standardize (this);
@@ -61,8 +65,6 @@ void CouenneProblem::standardize () {
     variables_ [initVar] = newvar;
 
     graph_ -> insert (newvar);
-
-    initVar++;
 
     graph_ -> erase (naux);
 
@@ -81,6 +83,8 @@ void CouenneProblem::standardize () {
       printf ("\n");
     } else printf ("[n]aux NULL!\n");
 #endif
+
+    initVar++;
   }
 
   // OBJECTIVES //////////////////////////////////////////////////////////////////////////////
@@ -89,24 +93,20 @@ void CouenneProblem::standardize () {
        i != objectives_.end (); ++i) {
 
 #ifdef DEBUG
-    printf ("Objective ");
-    (*i) -> print ();
+    printf ("Objective "); (*i) -> print ();
 #endif
 
     exprAux *aux = (*i) -> standardize (this);
 
 #ifdef DEBUG
-    printf ("      --> ");
-      (*i) -> print ();
+    printf ("      --> "); (*i) -> print ();
 #endif
 
     if (aux) 
       (*i) -> Body (new exprClone (aux));
 
 #ifdef DEBUG
-    printf ("      --> ");
-    (*i) -> print ();
-    printf ("...................\n");
+    printf ("      --> "); (*i) -> print (); printf ("...................\n");
 #endif
   }
 
@@ -235,8 +235,10 @@ void CouenneProblem::standardize () {
   // unless that aux has multiplicity more than one. If it is one,
   // replace expression in body and change generateCuts.cpp to
   // generate the original linear constraint
+  //
+  // ... done already in first call to generateCuts
 
-
+  /*
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin (); 
        i != constraints_.end (); ++i) {
 
@@ -247,6 +249,7 @@ void CouenneProblem::standardize () {
 	(body -> Multiplicity () <= 1)) {  // only used once, if ever
     }
   }
+  */
 
   //for (int i=0; i<n; i++)
   //printf ("[%4d %4d]\n", i, numbering_ [i]);

@@ -3,7 +3,6 @@ Couenne/AUTHORS -text
 Couenne/COPYING -text
 Couenne/Makefile.am -text
 Couenne/Makefile.in -text
-Couenne/TODO -text
 Couenne/configure -text
 Couenne/configure.ac -text
 Couenne/couenne_addlibs.txt.in -text
