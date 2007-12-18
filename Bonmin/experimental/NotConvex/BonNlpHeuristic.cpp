@@ -204,10 +204,10 @@ namespace Bonmin{
       // apply NLP solver /////////////////////////////////
       nlp_ -> initialSolve ();
 
-      double obj = (nlp_->isProvenOptimal()) ? nlp_->getObjValue(): COIN_DBL_MAX;
+      double obj = (nlp_ -> isProvenOptimal()) ? nlp_ -> getObjValue (): COIN_DBL_MAX;
 
       if (nlp_ -> isProvenOptimal () // store solution in Aux info
-	  // && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
+	  //	  && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
 	  ) {
 
 	const int nVars = solver->getNumCols();

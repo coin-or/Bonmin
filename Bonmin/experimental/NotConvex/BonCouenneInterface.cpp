@@ -66,9 +66,8 @@ CouenneInterface::extractLinearRelaxation
 
     if (isProvenOptimal ()) {
 
-      const CouNumber 
-	obj       = getObjValue (),
-	*solution = getColSolution ();
+      CouNumber obj             = getObjValue    ();
+      const CouNumber *solution = getColSolution ();
 
       CouenneProblem *p = couenneCg.Problem ();
 
@@ -116,6 +115,9 @@ CouenneInterface::extractLinearRelaxation
 
 	    resolve (); // solve with integer variables fixed
 
+	    obj      = getObjValue ();
+	    solution = getColSolution ();
+
 	    for (int i=0; i<norig; i++)
 	      if (p -> Var (i) -> isInteger ()) {
 		setColLower (i, lbSave [i]);
@@ -130,20 +132,19 @@ CouenneInterface::extractLinearRelaxation
       }
 
       // re-check optimality in case resolve () was called
-      if (isProvenOptimal ()) {
+      if (isProvenOptimal ()
+	  //	  && p -> checkNLP (solution, obj)
+	  ) {
 
-	if (p -> checkNLP (solution, obj)) {
+	// set cutoff to take advantage of bound tightening
+	p -> setCutOff (obj);
 
-	  // set cutoff to take advantage of bound tightening
-	  p -> setCutOff (obj);
+	OsiAuxInfo * auxInfo = si.getAuxiliaryInfo ();
+	BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
 
-	  OsiAuxInfo * auxInfo = si.getAuxiliaryInfo ();
-	  BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
-
-	  if (babInfo) {
-	    babInfo -> setNlpSolution (solution, getNumCols (), obj);
-	    babInfo -> setHasNlpSolution (true);
-	  }
+	if (babInfo) {
+	  babInfo -> setNlpSolution (solution, getNumCols (), obj);
+	  babInfo -> setHasNlpSolution (true);
 	}
       }
     }
