@@ -48,18 +48,15 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 
   if ((delta                           < COUENNE_EPS) || 
       (delta / (1 + fabs (var + expr)) < COUENNE_EPS))
-#if BR_TEST_LOG >= 0 || defined DEBUG
     {
+#if BR_TEST_LOG >= 0 && defined DEBUG
       if (reference_ -> Image () -> code () == COU_EXPRLOG) {
 	printf ("---- found feasible point on curve: ");
 	reference_ -> print (); printf (" := ");
 	reference_ -> Image () -> print ();
 	printf ("\n");
       }
-      return 0.;
-    }
-#else
- {
+#elif defined DEBUG
    printf ("----|%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
 	   var, expr, 
 	   //	    expression::Lbound (reference_ -> Index ()),
@@ -68,8 +65,9 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
    reference_             -> print (std::cout); std::cout << " = ";
    reference_ -> Image () -> print (std::cout); printf ("\n");
    return 0.;
- }
 #endif
+      return 0.;
+    }
 
   // a nonlinear constraint w = f(x) is violated. The infeasibility
   // is given by something more elaborate than |w-f(x)|, that is, it
