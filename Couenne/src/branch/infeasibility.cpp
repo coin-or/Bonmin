@@ -16,7 +16,7 @@
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
 
-#define DEBUG
+//#define DEBUG
 
 
 /// return difference between current value
