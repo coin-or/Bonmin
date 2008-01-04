@@ -51,14 +51,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@BUILD_FP_TRUE@am__append_1 = experimental/FP
-@COIN_HAS_BCP_TRUE@am__append_2 = experimental/Bcp
-@COIN_HAS_COUENNE_TRUE@am__append_3 = experimental/NotConvex
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball
-@ALWAYS_FALSE@am__append_4 = test
+@ALWAYS_FALSE@am__append_1 = test
 DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/../BuildTools/Makemain.inc $(srcdir)/../config.guess \
 	$(srcdir)/../config.sub $(srcdir)/../install-sh \
@@ -70,12 +67,9 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.hpp \
 	$(top_srcdir)/examples/OptionDocGen/Makefile.in \
-	$(top_srcdir)/experimental/Bcp/Makefile.in \
-	$(top_srcdir)/experimental/FP/Makefile.in \
-	$(top_srcdir)/experimental/NotConvex/Makefile.in \
 	$(top_srcdir)/inc/config_bonmin.h.in AUTHORS INSTALL
-@HAVE_EXTERNALS_TRUE@am__append_5 = Externals
-@HAVE_EXTERNALS_TRUE@am__append_6 = .Externals-stamp
+@HAVE_EXTERNALS_TRUE@am__append_2 = Externals
+@HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -86,9 +80,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
-CONFIG_CLEAN_FILES = experimental/Bcp/Makefile \
-	experimental/FP/Makefile experimental/NotConvex/Makefile \
-	examples/OptionDocGen/Makefile examples/CppExample/Makefile
+CONFIG_CLEAN_FILES = examples/OptionDocGen/Makefile \
+	examples/CppExample/Makefile
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -100,7 +93,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
-	experimental/FP experimental/Bcp experimental/NotConvex test
+	test
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -339,8 +332,7 @@ AUTOMAKE_OPTIONS = foreign
 
 # Here list all subdirectories into which to recurse
 SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
-	$(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4)
+	$(am__append_1)
 
 ########################################################################
 #             Additional files to be included in tarball               #
@@ -351,7 +343,7 @@ EXTRA_DIST = doc/Bonmin_ReferenceManual.hpp \
 	doc/Bonm-Min_UsersManual.pdf doc/Bonm-Min_UsersManual.tex \
 	doc/BOUM_Intro.tex doc/options.tex test/InterfaceTest.cpp \
 	test/CppExample/MyTMINLP.hpp test/CppExample/MyTMINLP.cpp \
-	test/CppExample/MyBonmin.cpp test/mytoy.nl $(am__append_5)
+	test/CppExample/MyBonmin.cpp test/mytoy.nl $(am__append_2)
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -361,7 +353,7 @@ EXTRA_DIST = doc/Bonmin_ReferenceManual.hpp \
 DISTCLEANFILES = Test/*.$(OBJEXT) Test/unitTest$(EXEEXT) \
 	Test/CppExample/*.$(OBJEXT) \
 	Test/CppExample/CppExample$(EXEEXT) Test/testtoy.nl \
-	$(am__append_6) $(VPATH_DISTCLEANFILES)
+	$(am__append_3) $(VPATH_DISTCLEANFILES)
 all: all-recursive
 
 .SUFFIXES:
@@ -415,12 +407,6 @@ $(top_srcdir)/inc/config_bonmin.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_dep
 
 distclean-hdr:
 	-rm -f inc/config_bonmin.h inc/stamp-h1
-experimental/Bcp/Makefile: $(top_builddir)/config.status $(top_srcdir)/experimental/Bcp/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-experimental/FP/Makefile: $(top_builddir)/config.status $(top_srcdir)/experimental/FP/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-experimental/NotConvex/Makefile: $(top_builddir)/config.status $(top_srcdir)/experimental/NotConvex/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/OptionDocGen/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/OptionDocGen/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/CppExample/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/CppExample/Makefile.in
@@ -571,7 +557,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/experimental/Bcp $(distdir)/experimental/FP $(distdir)/experimental/NotConvex $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

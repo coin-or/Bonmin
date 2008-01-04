@@ -14,21 +14,9 @@ AUTOMAKE_OPTIONS = foreign
 
 # Here list all subdirectories into which to recurse
 SUBDIRS = src/Interfaces \
-	src/Algorithms \
-	src/CbcBonmin \
-	src/Apps 
-
-if BUILD_FP 
-SUBDIRS += experimental/FP
-endif
-
-if COIN_HAS_BCP
-SUBDIRS += experimental/Bcp
-endif
-
-if COIN_HAS_COUENNE
-SUBDIRS += experimental/NotConvex
-endif
+	  src/Algorithms \
+	  src/CbcBonmin \
+	  src/Apps 
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
