@@ -668,7 +668,6 @@ BabSetupBase::addSos(){
         }
       }
       nonlinearSolver()->addObjects(numSos, objects);
-      assert(nonlinearSolver()->numberObjects() == n + numSos);
       for (int i = 0 ; i < numSos ; i++)
         delete objects[i];
       delete [] objects;
