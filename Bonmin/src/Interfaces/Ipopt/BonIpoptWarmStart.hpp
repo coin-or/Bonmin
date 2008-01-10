@@ -12,6 +12,7 @@
 #ifndef IpoptWarmStart_HPP
 #define IpoptWarmStart_HPP
 #include "CoinWarmStartBasis.hpp"
+#include "CoinWarmStartPrimalDual.hpp"
 #include "CoinPackedVector.hpp"
 #include "BonIpoptInteriorWarmStarter.hpp"
 
@@ -21,11 +22,30 @@ namespace Bonmin
   class TMINLP2TNLP;
 
   /** \brief Class for storing warm start informations for Ipopt.<br>
-   * For practical reason (integration in Cbc) this class inherits from
+   * This class inherits from CoinWarmStartPrimalDual, because that's what
+   * this warmstart really is. <br>
+   * For practical reason (integration in Cbc) this class also inherits from
    * CoinWarmStartBasis. <br>
    * This class stores a starting point (primal and dual values) for Ipopt.
+   * <br>
+   * <p>
+   * The primal part of the base class contains the value of each primal
+   * variable.
+   * <p>
+   * The dual part of the base class consists of three sections (the number of
+   * values is 2*numcols+numrows):
+     <UL>
+     <li> First, values for dual variables associated with the lower bound
+          constraints on structurals, i.e., primal variables (constraints
+	  \f$ l \leq x \f$); 
+     <li> Then values for dual variables associated with upper bound
+           constraints on structurals (constraints \f$ x \leq u\f$).
+     <li> the values for dual variables associated with regular constraints
+          (constraints \f$ g(x) \leq 0 \f$) 
+     </UL>
    */
-  class IpoptWarmStart : public CoinWarmStartBasis
+  class IpoptWarmStart :
+    public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis
   {
   public:
 
@@ -36,6 +56,8 @@ namespace Bonmin
         SmartPtr<IpoptInteriorWarmStarter> warm_starter);
     /// Copy constructor
     IpoptWarmStart( const IpoptWarmStart &other, bool ownValues = 1);
+    /// A constructor from a CoinWarmStartPrimalDual
+    IpoptWarmStart(const CoinWarmStartPrimalDual& pdws);
     /// Abstract destructor
     virtual ~IpoptWarmStart();
 
@@ -53,14 +75,7 @@ namespace Bonmin
      in IpoptWarmStartDiff.*/
     virtual void
     applyDiff (const CoinWarmStartDiff *const cwsdDiff);
-    /** Access to values_ vector. */
-    const CoinPackedVector * values() const
-    {
-      if (tempValues_)
-        return tempValues_;
-      else
-        return &values_;
-    }
+
     /** Accessor to warm start information obecjt */
     SmartPtr<IpoptInteriorWarmStarter> warm_starter() const
     {
@@ -76,57 +91,38 @@ namespace Bonmin
       return empty_;
     }
   private:
-    /** Non zero values of the starting point. Primal and dual values are stored in the following order <p>
-        <UL>
-        <li> From 1 to CoinWarmStartBasis::numStrtucturals_ : values for primal variables (\f$ x \f$ ),
-        <li> From numStructurals_+1 to  2 * numStructurals_ : values for dual variables associated to lower bound constraints on structurals (constraints \f$ l \leq x \f$).
-        <li> From 2 numStructurals_+1 to  3 * numStructurals_ : values for dual variables associated to upper bound constraints on structurals (constraints \f$ x \leq u\f$).
-        <li> From 3 numStructurals_+1 to  3 * numStructurals_ + numArtificials_ : values for dual variables associated with regular constraints (constraints \f$ g(x) \leq 0 \f$).
-        </UL>
-    */
-    mutable CoinPackedVector values_;
-    /** Temporary values not owned by this. */
-    mutable CoinPackedVector * tempValues_;
     /** warm start information object */
     mutable SmartPtr<IpoptInteriorWarmStarter> warm_starter_;
     ///Say if warm start is empty
     bool empty_;
   };
 
+  //###########################################################################
+
   /** \brief Diff class for IpoptWarmStart.
    * Actually get the differences from CoinWarmStartBasis and stores the
    whole vector of values.
    \todo Find a way to free unused values.
   */
-  class IpoptWarmStartDiff : public CoinWarmStartBasisDiff
+  class IpoptWarmStartDiff : public CoinWarmStartPrimalDualDiff
   {
   public:
     friend class IpoptWarmStart;
-    /** Usefull constructor*/
-    IpoptWarmStartDiff(CoinWarmStartBasisDiff * diff, const CoinPackedVector &values,
-        SmartPtr<IpoptInteriorWarmStarter> warm_starter):
-        CoinWarmStartBasisDiff(*diff),
-        diffValues_(NULL),
-        warm_starter_(NULL)//(warm_starter)
+    /** Useful constructor; takes over the data in \c diff */
+    IpoptWarmStartDiff(CoinWarmStartPrimalDualDiff * diff,
+		       SmartPtr<IpoptInteriorWarmStarter> warm_starter):
+      CoinWarmStartPrimalDualDiff(),
+      warm_starter_(NULL)//(warm_starter)
     {
-      if (values.getNumElements()>0)
-        diffValues_ = new CoinPackedVector(values);
+      CoinWarmStartPrimalDualDiff::swap(*diff);
     }
     /** Copy constructor. */
     IpoptWarmStartDiff(const IpoptWarmStartDiff &other):
-        CoinWarmStartBasisDiff(other),
-        diffValues_(NULL),
-        warm_starter_(NULL)//other.warm_starter_)
-    {
-      if (other.diffValues_)
-        diffValues_ = new CoinPackedVector(*other.diffValues_);
-    }
+        CoinWarmStartPrimalDualDiff(other),
+        warm_starter_(NULL /*other.warm_starter_*/) {}
 
     /// Abstract destructor
-    virtual ~IpoptWarmStartDiff()
-    {
-      delete diffValues_;
-    }
+    virtual ~IpoptWarmStartDiff() {}
 
     /// `Virtual constructor'
     virtual CoinWarmStartDiff *clone() const
@@ -141,8 +137,6 @@ namespace Bonmin
     }
     void flushPoint();
   private:
-    /** Values of the vector. */
-    CoinPackedVector * diffValues_;
 
     /** warm start information object */
     SmartPtr<IpoptInteriorWarmStarter> warm_starter_;

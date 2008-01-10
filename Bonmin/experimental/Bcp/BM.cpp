@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     CoinError::printErrors_ = true;
     BM_init user_init;
     int retcode = -1;
-#if 0
+#if 1
     retcode = bcp_main(argc, argv, &user_init);
 #else
     try {

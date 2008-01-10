@@ -34,8 +34,7 @@ namespace Bonmin {
 
   /** Solvers for solving nonlinear programs.*/
   enum Solver{
-    EIpopt=0 /** <a href="http://projects.coin-or.org/Ipopt">
-    Ipopt </a> interior point algorithm.*/,
+    EIpopt=0 /** <a href="http://projects.coin-or.org/Ipopt"> Ipopt </a> interior point algorithm.*/,
     EFilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/
   };
 /**
@@ -169,12 +168,14 @@ class Messages : public CoinMessages
   virtual void initialSolve();
 
   /** Resolve the continuous relaxation after problem modification.
-      Have to call initialSolve before calling this
+      initialSolve may or may not have been called before this is called. In
+      any case, this must solve the problem, and speed the process up if it
+      can reuse any remnants of data that might exist from a previous solve.
    */
   virtual void resolve();
 
-  /** Resolve the problem with different random starting points
-      to try to find a better solution (only makes sense for a non-convex problem.*/
+  /** Resolve the problem with different random starting points to try to find
+      a better solution (only makes sense for a non-convex problem.*/
   virtual void resolveForCost(int numretry);
 
   /** Method to be called when a problem has failed to be solved. Will try
@@ -1062,6 +1063,9 @@ protected:
   /** Solver for a TMINLP. */
   Ipopt::SmartPtr<TNLPSolver> app_;
   //@}
+
+  /** Warmstart information for reoptimization */
+  CoinWarmStart* warmstart_;
 
   /**@name Cached information on the problem */
   //@{

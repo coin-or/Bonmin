@@ -280,39 +280,15 @@ namespace Bonmin
     enableWarmStart();
     int numcols = tnlp->num_variables();
     int numrows = tnlp->num_constraints();
-    const double * colLow = tnlp->x_l();
-    const double * colUp = tnlp->x_u();
-    for (int i = 0; i < numcols ; i++) {
-      CoinWarmStartBasis::Status status = ws->getStructStatus(i);
-      if (status == CoinWarmStartBasis::atLowerBound) {
-        tnlp->setxInit(i,colLow[i]);
-        tnlp->setDualInit(i + numcols,0.);
-      }
-      else if (status == CoinWarmStartBasis::atUpperBound) {
-        tnlp->setxInit(i,colUp[i]);
-        tnlp->setDualInit(i ,0.);
-      }
-      else {
-        tnlp->setDualInit(i ,0.);
-        tnlp->setDualInit(i + numcols , 0.);
-      }
-    }
-    for (int i = 0; i < numrows ; i++) {
-      CoinWarmStartBasis::Status status = ws->getArtifStatus(i);
-      if (status == CoinWarmStartBasis::atLowerBound) {
-        tnlp->setDualInit(i + 2*numcols , 0.);
-      }
-    }
-    int nElem = ws->values()->getNumElements();
-    const int * inds = ws->values()->getIndices();
-    const double * elems = ws->values()->getElements();
 
-    for (int i = 0 ; i < nElem ; i++) {
-      tnlp->setxInit(inds[i],elems[i]);
-    }
+    assert(numcols == ws->primalSize());
+    assert(2*numcols + numrows == ws->dualSize());
+    tnlp->setxInit(ws->primalSize(), ws->primal());
+    tnlp->setDualsInit(ws->dualSize(), ws->dual());
 
     if (IsValid(ws->warm_starter()))
       tnlp->SetWarmStarter(ws->warm_starter());
+
     return 1;
   }
 

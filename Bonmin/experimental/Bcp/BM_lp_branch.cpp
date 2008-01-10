@@ -16,6 +16,7 @@
 #include "BonQpBranchingSolver.hpp"
 #include "BonLpBranchingSolver.hpp"
 #include "BonOsiTMINLPInterface.hpp"
+#include "BonIpoptWarmStart.hpp"
 
 #define DEBUG_PRINT
 
@@ -160,7 +161,6 @@ BM_lp::send_pseudo_cost_update(OsiBranchingInformation& branchInfo)
   itmp = -1;
   bm_buf.pack(itmp);
   send_message(parent(), bm_buf);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -287,7 +287,7 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
   }
 
 #ifdef DEBUG_PRINT
-  double t = CoinWallclockTime();
+  const double t = CoinWallclockTime();
   printf("LP %.3f: node: %i  depth: %i  obj: %f  infNum: %i  feasNum: %i  soltime: %.3f\n",
 	 t-start_time(), current_index(), current_level(),
 	 branchInfo.objectiveValue_, 
@@ -349,7 +349,11 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
   bm_buf.pack(cub, numCols);
   bm_buf.pack(branchInfo.objectiveValue_);
   bm_buf.pack(branchInfo.cutoff_);
-  BCP_pack_warmstart(ws, bm_buf);
+  bool has_ws = ws != NULL;
+  bm_buf.pack(has_ws);
+  if (has_ws) {
+    BCP_pack_warmstart(ws, bm_buf);
+  }
   
   const int fixed_size = bm_buf.size();
   // We got a few procs to work with, so do distributed strong branching
@@ -416,7 +420,9 @@ BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
     double t = CoinWallclockTime();
     const double old_bd = solver->getColUpper()[ind];
     solver->setColUpper(ind, floor(val));
-    solver->setWarmStart(cws);
+    if (cws) {
+      solver->setWarmStart(cws);
+    }
     solver->resolve();
     sbres.branchEval |= 1;
     sbres.status[0] =
@@ -433,12 +439,14 @@ BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
     double t = CoinWallclockTime();
     const double old_bd = solver->getColLower()[ind];
     solver->setColLower(ind, ceil(val));
-    solver->setWarmStart(cws);
+    if (cws) {
+      solver->setWarmStart(cws);
+    }
     solver->resolve();
     sbres.branchEval |= 2;
     sbres.status[1] =
-      (solver->isAbandoned()           ? BCP_Abandoned : 0) |
-      (solver->isProvenOptimal()       ? BCP_ProvenOptimal : 0) |
+      (solver->isAbandoned()              ? BCP_Abandoned : 0) |
+      (solver->isProvenOptimal()          ? BCP_ProvenOptimal : 0) |
       (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
     sbres.objval[1] =
       (sbres.status[1] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
@@ -713,12 +721,16 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
 
   clear_SB_results();
 
-  BCP_lp_prob* p = getLpProblemPointer();
   CoinWarmStart* cws = solver->getWarmStart();
-  BCP_warmstart* ws = BCP_lp_convert_CoinWarmStart(*p, cws);
+  Bonmin::IpoptWarmStart* iws = dynamic_cast<Bonmin::IpoptWarmStart*>(cws);
+  if (iws && iws->empty()) {
+    delete cws;
+    cws = NULL;
+  }
+  BCP_lp_prob* p = getLpProblemPointer();
+  CoinWarmStart* cws_tmp = cws->clone(); // the next call destroys it
+  BCP_warmstart* ws = cws ? BCP_lp_convert_CoinWarmStart(*p, cws_tmp) : NULL;
 
-
-  // FIXME: This test will have to be changed to >= 1
   if (pidNum >= 0) {
     if (pidNum > 0) {
       pidNum = send_data_for_distributed_SB(branchInfo, solver, ws,
@@ -957,7 +969,9 @@ BM_lp::process_message(BCP_buffer& buf)
   assert(numCols == nlp.getNumCols());
   buf.unpack(objvalOrig);
   buf.unpack(cutoff);
-  BCP_warmstart* ws = BCP_unpack_warmstart(buf);
+  bool has_ws;
+  buf.unpack(has_ws);
+  BCP_warmstart* ws = has_ws ? BCP_unpack_warmstart(buf) : NULL;
   int changeType;
   int objInd;
   int colInd;
@@ -980,11 +994,16 @@ BM_lp::process_message(BCP_buffer& buf)
     break;
   }
 
-  CoinWarmStart* cws = ws->convert_to_CoinWarmStart();
-  nlp.setWarmStart(cws);
-  
-  nlp.resolve();
-  
+  if (ws) {
+    CoinWarmStart* cws = ws->convert_to_CoinWarmStart();
+    nlp.setWarmStart(cws);
+    nlp.resolve();
+    delete cws;
+    delete ws;
+  } else {
+    nlp.initialSolve();
+  }
+
   int status = 
     (nlp.isAbandoned()              ? BCP_Abandoned : 0) |
     (nlp.isProvenOptimal()          ? BCP_ProvenOptimal : 0) |
@@ -1019,9 +1038,6 @@ BM_lp::process_message(BCP_buffer& buf)
 
   delete[] clb;
   delete[] cub;
-
-  delete cws;
-  delete ws;
 
   bm_stats.incNumberSbSolves();
 }

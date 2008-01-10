@@ -21,8 +21,11 @@
 #include "BonAuxInfos.hpp"
 
 #include "Ipopt/BonIpoptSolver.hpp"
+#include "Ipopt/BonIpoptWarmStart.hpp"
 #ifdef COIN_HAS_FILTERSQP
 #include "Filter/BonFilterSolver.hpp"
+#include "Filter/BonFilterWarmStart.hpp"
+#include "Filter/BonBqpdWarmStart.hpp"
 #endif
 
 #include "OsiBranchingObject.hpp"
@@ -310,6 +313,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     tminlp_(NULL),
     problem_(NULL),
     app_(NULL),
+    warmstart_(NULL),
     rowsense_(NULL),
     rhs_(NULL),
     rowrange_(NULL),
@@ -498,6 +502,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
         "copy constructor");
   }
 
+  warmstart_ = source.warmstart_ ? source.warmstart_->clone() : NULL;
+
   if(source.obj_) {
     obj_ = new double[source.getNumCols()];
     CoinCopyN(source.obj_, source.getNumCols(), obj_);
@@ -536,11 +542,16 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
     hasVarNamesFile_ = rhs.hasVarNamesFile_;
     pushValue_ = rhs.pushValue_;
 
+    delete warmstart_;
+    warmstart_ = NULL;
+
     if(IsValid(rhs.tminlp_)) {
 
       tminlp_ = rhs.tminlp_;
       problem_ = new TMINLP2TNLP(tminlp_);
       app_ = rhs.app_->clone();
+
+      warmstart_ = rhs.warmstart_ ? rhs.warmstart_->clone() : NULL;
 
       feasibilityProblem_ = new TNLP2FPNLP
           (SmartPtr<TNLP>(GetRawPtr(problem_)));
@@ -586,7 +597,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
     else {
       tminlp_ =NULL;
       problem_ = NULL;
-app_ = NULL;
+      app_ = NULL;
       feasibilityProblem_ = NULL;
     }
 
@@ -646,6 +657,7 @@ OsiTMINLPInterface::~OsiTMINLPInterface ()
   delete [] constTypes_;
   delete [] obj_;
   delete oaHandler_;
+  delete warmstart_;
 }
 
 void
@@ -697,6 +709,12 @@ static const char * INFEAS_SYMB="INFEAS";
 void
 OsiTMINLPInterface::resolveForCost(int numsolve)
 {
+  // This method assumes that a problem has just been solved and we try for a
+  // different solution. So disregard (in fact, clear out) any warmstart info
+  // we might have, and acquire a new one before returning.
+  delete warmstart_;
+  warmstart_ = NULL;
+  
   /** Save current optimum. */
   vector<double> point(getNumCols()*3+ getNumRows());
   double bestBound = getObjValue();
@@ -772,11 +790,21 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
 
   optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
   hasBeenOptimized_ = true;
+
+  if (exposeWarmStart_) {
+    warmstart_ = app_->getWarmStart(problem_);
+  }
 }
 
 void
 OsiTMINLPInterface::resolveForRobustness(int numsolve)
 {
+  // This method assumes that a problem has just been solved and we try for a
+  // different solution. So disregard (in fact, clear out) any warmstart info
+  // we might have, and acquire a new one before returning.
+  delete warmstart_;
+  warmstart_ = NULL;
+  
   //std::cerr<<"Resolving the problem for robustness"<<std::endl;
   //First remove warm start point and resolve
   app_->disableWarmStart();
@@ -800,9 +828,12 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
 
 
   if(!isAbandoned()) {
-    messageHandler()->message(WARN_SUCCESS_WS,
-        messages_)
-    << CoinMessageEol ;
+    messageHandler()->message(WARN_SUCCESS_WS, messages_) << CoinMessageEol ;
+    // re-enable warmstart and get it
+    app_->enableWarmStart();
+    if (exposeWarmStart_) {
+      warmstart_ = app_->getWarmStart(problem_);
+    }
     return; //we won go on
   }
 
@@ -833,10 +864,13 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
 
 
     if(!isAbandoned()) {
-      messageHandler()->message(WARN_SUCCESS_RANDOM,
-          messages_)
-      <<f+2
-      << CoinMessageEol ;
+      messageHandler()->message(WARN_SUCCESS_RANDOM, messages_)
+	<< f+2 << CoinMessageEol ;
+      // re-enable warmstart and get it
+      app_->enableWarmStart();
+      if (exposeWarmStart_) {
+	warmstart_ = app_->getWarmStart(problem_);
+      }
       return; //we have found a solution and continue
     }
   }
@@ -855,6 +889,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     throw newUnsolvedError(app_->errorCode(), problem_,
                            probName);
   }
+  // Do NOT get warmstart in other cases
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1202,8 +1237,8 @@ OsiTMINLPInterface::getEmptyWarmStart () const
 CoinWarmStart* 
 OsiTMINLPInterface::getWarmStart() const
 {
-  if (exposeWarmStart_) {
-    return app_->getWarmStart(problem_);
+  if (exposeWarmStart_ && warmstart_) {
+    return warmstart_->clone();
   }
   else {
     return getEmptyWarmStart();
@@ -1212,11 +1247,45 @@ OsiTMINLPInterface::getWarmStart() const
   /** Set warmstarting information. Return true/false depending on whether
       the warmstart information was accepted or not. */
 bool 
-OsiTMINLPInterface::setWarmStart(const CoinWarmStart* warmstart)
+OsiTMINLPInterface::setWarmStart(const CoinWarmStart* ws)
 {
+  delete warmstart_;
+  warmstart_ = NULL;
   hasBeenOptimized_ = false;
   if (exposeWarmStart_) {
-    return app_->setWarmStart(warmstart, problem_);
+    if (ws == NULL) {
+      return true;
+    }
+    // Let's look at the warmstart...
+    const IpoptWarmStart* iws = dynamic_cast<const IpoptWarmStart*>(ws);
+    if (iws) {
+      warmstart_ = ws->clone();
+      return true;
+    }
+#ifdef COIN_HAS_FILTERSQP
+    const FilterWarmStart* fws = dynamic_cast<const FilterWarmStart*>(ws);
+    if (fws) {
+      warmstart_ = ws->clone();
+      return true;
+    }
+    const BqpdWarmStart* bws = dynamic_cast<const BqpdWarmStart*>(ws);
+    if (bws) {
+      warmstart_ = ws->clone();
+      return true;
+    }
+#endif
+    // See if it is anything else than the CoinWarmStartBasis that all others
+    // derive from
+    const CoinWarmStartPrimalDual* pdws =
+      dynamic_cast<const CoinWarmStartPrimalDual*>(ws);
+    if (pdws) {
+      // Must be an IpoptWarmStart, since the others do not derive from this.
+      // Accept it.
+      warmstart_ = new IpoptWarmStart(*pdws);
+      return true;
+    }
+    return false;
+    // return app_->setWarmStart(warmstart, problem_);
   }
   else {
     return true;
@@ -2303,6 +2372,10 @@ void OsiTMINLPInterface::initialSolve()
   assert(IsValid(app_));
   assert(IsValid(problem_));
 
+  // Discard warmstart_ if we had one
+  delete warmstart_;
+  warmstart_ = NULL;
+  
   if(!hasPrintedOptions) {
     int printOptions;
     app_->options()->GetEnumValue("print_user_options",printOptions,"bonmin.");
@@ -2337,6 +2410,14 @@ void OsiTMINLPInterface::initialSolve()
       numRetryInitial_ = 0;
     }
   firstSolve_ = false;
+
+  // if warmstart_ is not empty then had to use resolveFor... and that created
+  // the warmstart at the end, and we have nothing to do here. Otherwise...
+  if (! warmstart_ && ! isAbandoned()) {
+    if (exposeWarmStart_) {
+      warmstart_ = app_->getWarmStart(problem_);
+    }
+  }
 }
 
 /** Resolve the continuous relaxation after problem modification.
@@ -2346,6 +2427,39 @@ OsiTMINLPInterface::resolve()
 {
   assert(IsValid(app_));
   assert(IsValid(problem_));
+  
+  int has_warmstart = warmstart_ == NULL ? 0 : 1;
+  // Let's look at the warmstart...
+  if (has_warmstart == 1) {
+    const IpoptWarmStart* iws = dynamic_cast<const IpoptWarmStart*>(warmstart_);
+    if (iws) {
+      has_warmstart = iws->empty() ? 0 : 2;
+    }
+  }
+#ifdef COIN_HAS_FILTERSQP
+  if (has_warmstart == 1) {
+    const FilterWarmStart* fws=dynamic_cast<const FilterWarmStart*>(warmstart_);
+    if (fws) {
+      has_warmstart = fws->empty() ? 0 : 2;
+    }
+  }
+  if (has_warmstart == 1) {
+    const BqpdWarmStart* bws = dynamic_cast<const BqpdWarmStart*>(warmstart_);
+    if (bws) {
+      has_warmstart = bws->empty() ? 0 : 2;
+    }
+  }
+#endif
+  assert(has_warmstart != 1); // FIXME LL: this should be removed.
+  if (has_warmstart < 2) {
+    // empty (or unrecognized) warmstart
+    initialSolve();
+    return;
+  }
+  app_->setWarmStart(warmstart_, problem_);
+  delete warmstart_;
+  warmstart_ = NULL;
+
   if (INT_BIAS > 0.) {
     app_->options()->SetStringValue("warm_start_same_structure", "yes");
   }
@@ -2370,8 +2484,15 @@ OsiTMINLPInterface::resolve()
   }
   else if(numRetryResolve_ ||
 	  (numRetryInfeasibles_ && isProvenPrimalInfeasible() ))
-	  resolveForCost(max(numRetryResolve_, numRetryInfeasibles_));
-  
+    resolveForCost(max(numRetryResolve_, numRetryInfeasibles_));
+
+  // if warmstart_ is not empty then had to use resolveFor... and that created
+  // the warmstart at the end, and we have nothing to do here. Otherwise...
+  if (! warmstart_ && ! isAbandoned()) {
+    if (exposeWarmStart_) {
+      warmstart_ = app_->getWarmStart(problem_);
+    }
+  }
 }
 
 
