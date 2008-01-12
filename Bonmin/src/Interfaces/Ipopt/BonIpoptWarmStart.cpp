@@ -65,9 +65,9 @@ namespace Bonmin
   CoinWarmStartDiff*
   IpoptWarmStart::generateDiff(const CoinWarmStart *const oldCWS) const
   {
-    IpoptWarmStart const * const ws =
-      dynamic_cast<IpoptWarmStart const * const > (oldCWS);
-    assert(ws);
+    const IpoptWarmStart * const ws =
+      dynamic_cast< const IpoptWarmStart * const > (oldCWS);
+    DBG_ASSERT(ws);
 
     CoinWarmStartDiff * diff = CoinWarmStartPrimalDual::generateDiff(ws);
 
@@ -87,7 +87,7 @@ namespace Bonmin
   {
     IpoptWarmStartDiff const * const ipoptDiff =
       dynamic_cast<IpoptWarmStartDiff const * const > (cwsdDiff);
-    assert(ipoptDiff);
+    DBG_ASSERT(ipoptDiff);
     CoinWarmStartPrimalDual::applyDiff(ipoptDiff);
     warm_starter_ = ipoptDiff->warm_starter();
   }

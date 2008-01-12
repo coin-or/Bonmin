@@ -13,7 +13,6 @@
 #define IpoptWarmStart_HPP
 #include "CoinWarmStartBasis.hpp"
 #include "CoinWarmStartPrimalDual.hpp"
-#include "CoinPackedVector.hpp"
 #include "BonIpoptInteriorWarmStarter.hpp"
 
 

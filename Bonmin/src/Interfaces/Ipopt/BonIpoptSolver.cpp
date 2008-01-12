@@ -281,8 +281,8 @@ namespace Bonmin
     int numcols = tnlp->num_variables();
     int numrows = tnlp->num_constraints();
 
-    assert(numcols == ws->primalSize());
-    assert(2*numcols + numrows == ws->dualSize());
+    DBG_ASSERT(numcols == ws->primalSize());
+    DBG_ASSERT(2*numcols + numrows == ws->dualSize());
     tnlp->setxInit(ws->primalSize(), ws->primal());
     tnlp->setDualsInit(ws->dualSize(), ws->dual());
 

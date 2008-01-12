@@ -23,6 +23,7 @@ noinst_LTLIBRARIES = libfilterinterface.la
 # List all source files, including headers
 libfilterinterface_la_SOURCES = \
 	BonBqpdSolver.cpp BonBqpdSolver.hpp \
+	BonBqpdWarmStart.cpp BonBqpdWarmStart.hpp \
         BonFilterSolver.cpp BonFilterSolver.hpp \
         BonFilterWarmStart.cpp BonFilterWarmStart.hpp
 
@@ -73,7 +74,9 @@ ASTYLE_FILES = \
          BonFilterWarmStart.cppbak \
          BonFilterWarmStart.hppbak \
          BonBqpdSolver.hppbak \
-         BonBqpdSolver.cppbak
+         BonBqpdSolver.cppbak \
+         BonBqpdWarmStart.hppbak \
+         BonBqpdWarmStart.cppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

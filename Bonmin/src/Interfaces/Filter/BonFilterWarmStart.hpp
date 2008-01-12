@@ -14,6 +14,7 @@
 #define BonFilterWarmStart_H
 
 #include "CoinWarmStartBasis.hpp"
+#include "CoinWarmStartPrimalDual.hpp"
 #include "BonFilterSolver.hpp" /* for types */
 
 #include <vector>
@@ -22,10 +23,14 @@ namespace Bonmin
 {
 
   /** Warm start for filter interface.
-  Warm start for filter constists of a (possibly huge) array of integers.
-  \bug Inheritance from CoinWarmStartBasis is only for compatibility with Cbc
+   * Warm start for filter constists of a (possibly huge) array of integers.
+   * This class inherits from CoinWarmStartPrimalDual, because that's what
+   * this warmstart really is. <br>
+   * For practical reason (integration in Cbc) this class also inherits from
+   * CoinWarmStartBasis. <br>
   */
-  class FilterWarmStart : public CoinWarmStartBasis
+  class FilterWarmStart :
+    public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis
   {
     typedef FilterSolver::fint fint;
     typedef FilterSolver::real real;
@@ -51,29 +56,6 @@ namespace Bonmin
       return new FilterWarmStart(*this);
     }
 
-#ifdef AWDoesntseemnecessary
-    /**Set size of the array. */
-    void setInfo(const fint size = 0, const fint * warmArray = NULL, const fint istat[14] = def_istat)
-    {
-      if (size != size_) {
-        size_ = size;
-        if (warmArray_) delete [] warmArray_;
-        warmArray_ = NULL;
-        if (size > 0)
-          warmArray_ = new fint[size];
-      }
-      else if (size > 0) {
-        assert(warmArray_);
-      }
-      if (size <= 0 && warmArray)
-        throw CoinError("Array passed but size is 0","setInfo(const fint, const fint *)","FilterWarmStart");
-      CoinCopyN(warmArray, size_, warmArray_);
-
-      for (int i = 0 ; i < 14 ; i ++)
-        istat_[i] = istat[i];
-    }
-#endif
-
     /** Destructor. */
     virtual ~FilterWarmStart();
 
@@ -82,38 +64,6 @@ namespace Bonmin
 
     /** Apply differences. */
     virtual void applyDiff(const CoinWarmStartDiff * const cswDiff);
-
-    /** Access to x Array */
-    const real *xArray() const
-    {
-      if (tempxArray_) {
-        return tempxArray_;
-      }
-      else {
-        return xArray_;
-      }
-    }
-
-    /** Array to x size */
-    fint xSize() const
-    {
-      return xSize_;
-    }
-
-    /** Access to lam Array */
-    const real *lamArray() const
-    {
-      if (templamArray_)
-        return templamArray_;
-      else
-        return lamArray_;
-    }
-
-    /** Array to lam size */
-    fint lamSize() const
-    {
-      return lamSize_;
-    }
 
     /** Access to lws array */
     const fint *lwsArray() const
@@ -132,26 +82,15 @@ namespace Bonmin
       return istat_;
     }
 
+    /// flush the starting point
     void flushPoint();
+
+    ///Is this an empty warm start?
+    bool empty() const
+    {
+      return empty_;
+    }
   private:
-    /** Size of real x array store. */
-    fint xSize_;
-
-    /** Real x array to store */
-    real* xArray_;
-
-    /** Real x array not owned by this */
-    real* tempxArray_;
-
-    /** Size of real lam array store. */
-    fint lamSize_;
-
-    /** Real lam array to store */
-    real* lamArray_;
-
-    /** Real lam array not owned by this */
-    real* templamArray_;
-
     /** Size of fint lws array store. */
     fint lwsSize_;
 
@@ -160,9 +99,12 @@ namespace Bonmin
 
     /** Filter's istat (AW: I think we only need first entry) */
     fint istat_[14];
+
+    ///Say if warm start is empty
+    bool empty_;
   };
 
-  class FilterWarmStartDiff : public CoinWarmStartBasisDiff
+  class FilterWarmStartDiff : public CoinWarmStartPrimalDualDiff
   {
     typedef FilterSolver::fint fint;
     typedef FilterSolver::real real;
@@ -170,22 +112,14 @@ namespace Bonmin
     friend class FilterWarmStart;
 
   public:
-    FilterWarmStartDiff(fint xSize, real* xArray,
-        fint lamSize, real* lamArray,
-        fint capacity);
+    FilterWarmStartDiff(CoinWarmStartPrimalDualDiff * diff,
+			fint capacity);
 
-    virtual ~FilterWarmStartDiff();
+    virtual ~FilterWarmStartDiff() {}
 
     virtual CoinWarmStartDiff * clone() const
     {
-      int size = differences.size();
-      FilterWarmStartDiff * return_value =
-            new FilterWarmStartDiff(xSize_, xArray_, lamSize_, lamArray_, size);
-      return_value->differences = differences;
-      for (int i = 0 ; i < 14 ; i++) {
-        return_value->istat_[i] = istat_[i];
-      }
-      return return_value;
+      return new FilterWarmStartDiff(*this);
     }
 
     void flushPoint();
@@ -194,22 +128,8 @@ namespace Bonmin
     typedef std::pair<fint, fint> OneDiff;
     /** Vector of all the differences.*/
     std::vector<OneDiff> differences;
-
-    /** Size of real x array store. */
-    fint xSize_;
-
-    /** Real x array to store */
-    real* xArray_;
-
-    /** Size of real lam array store. */
-    fint lamSize_;
-
-    /** Real lam array to store */
-    real* lamArray_;
-
     /** istat */
     fint istat_[14];
-
   };
 
 } /* end namespace Bonmin */

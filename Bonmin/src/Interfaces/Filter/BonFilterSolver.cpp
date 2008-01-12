@@ -769,14 +769,21 @@ namespace Bonmin
     }
 
     const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
+    if (warmF->empty())//reset initial point and leave
+    {
+      disableWarmStart();
+      return 1;
+    }
+    enableWarmStart();
+
     //CoinCopyN(warmF->xArray(), warmF->xSize(), cached_->x);
-    const fint xsize = warmF->xSize();
+    const fint xsize = warmF->primalSize();
     real* x = cached_->x;
-    const real* xarray = warmF->xArray();
+    const real* xarray = warmF->primal();
     for (int i = 0; i<xsize; i++) {
       x[i] = xarray[i];
     }
-    CoinCopyN(warmF->lamArray(), warmF->lamSize(), cached_->lam);
+    CoinCopyN(warmF->dual(), warmF->dualSize(), cached_->lam);
     CoinCopyN(warmF->lwsArray(), warmF->lwsSize(), cached_->lws);
     for (int i = 0 ; i < 14 ; i ++) {
       cached_->istat[i] = warmF->istat()[i];

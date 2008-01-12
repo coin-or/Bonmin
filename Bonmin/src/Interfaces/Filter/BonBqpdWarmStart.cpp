@@ -21,26 +21,12 @@ namespace Bonmin{
 				const fint *lwsArray /*= NULL*/,
 				const fint istat[14] /*= def_istat*/)
     :
+    CoinWarmStartPrimalDual(xSize, lamSize, xArray, lamArray),
     CoinWarmStartBasis(),
-    xSize_(xSize),
-    xArray_(NULL),
-    lamSize_(lamSize),
-    lamArray_(NULL),
     lwsSize_(lwsSize),
-    lwsArray_(NULL)
+    lwsArray_(NULL),
+    empty_(false)
   {
-    DBG_ASSERT(xSize > 0 || !xArray);
-    if (xSize_ > 0){
-      xArray_ = new real[xSize];
-      DBG_ASSERT(xArray);
-      CoinCopyN(xArray, xSize, xArray_);
-    }
-    DBG_ASSERT(lamSize > 0 || !lamArray);
-    if (lamSize_ > 0){
-      lamArray_ = new real[lamSize];
-      DBG_ASSERT(lamArray);
-      CoinCopyN(lamArray, lamSize, lamArray_);
-    }
     DBG_ASSERT(lwsSize > 0 || !lwsArray);
     if (lwsSize_ > 0){
       lwsArray_ = new fint[lwsSize];
@@ -55,26 +41,12 @@ namespace Bonmin{
   /* Copy constructor */
   BqpdWarmStart::BqpdWarmStart(const BqpdWarmStart & other)
     :
+    CoinWarmStartPrimalDual(other),
     CoinWarmStartBasis(other),
-    xSize_(other.xSize_),
-    xArray_(NULL),
-    lamSize_(other.lamSize_),
-    lamArray_(NULL),
     lwsSize_(other.lwsSize_),
-    lwsArray_(NULL)
+    lwsArray_(NULL),
+    empty_(other.empty_)
   {
-    DBG_ASSERT(other.xSize_ > 0 || !other.xArray_);
-    if (xSize_ > 0){
-      xArray_ = new real[xSize_];
-      DBG_ASSERT(other.xArray_);
-      CoinCopyN(other.xArray_, xSize_, xArray_);
-    }
-    DBG_ASSERT(lamSize_ > 0 || !lamArray_);
-    if (lamSize_ > 0){
-      lamArray_ = new real[lamSize_];
-      DBG_ASSERT(other.lamArray_);
-      CoinCopyN(other.lamArray_, lamSize_, lamArray_);
-    }
     DBG_ASSERT(lwsSize_ > 0 || !lwsArray_);
     if (lwsSize_ > 0){
       lwsArray_ = new fint[lwsSize_];
@@ -88,8 +60,6 @@ namespace Bonmin{
 
   BqpdWarmStart::~BqpdWarmStart()
   {
-    delete [] xArray_;
-    delete [] lamArray_;
     delete [] lwsArray_;
   }
 
@@ -114,12 +84,9 @@ namespace Bonmin{
 void
 BqpdWarmStart::flushPoint()
 {
-  delete [] xArray_;
-  delete [] lamArray_;
+  CoinWarmStartPrimalDual::clear();
   delete [] lwsArray_;
 
-  xArray_ = NULL;
-  lamArray_ = NULL;
   lwsArray_ = NULL;
 }
 
