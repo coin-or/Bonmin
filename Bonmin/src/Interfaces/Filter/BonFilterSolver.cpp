@@ -716,7 +716,6 @@ namespace Bonmin
       tnlp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;
     }
-    printf("ifail = %d\n", ifail);
     cpuTime_ = - CoinCpuTime();
     fint cstype_len = 1;
     rho = 10;
