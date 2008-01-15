@@ -117,7 +117,10 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 
-include_HEADERS = \
+# Here list all the header files that are required by a user of the library,
+# and that therefore should be installed in 'install/coin'
+includecoindir = $(includedir)/coin
+includecoin_HEADERS = \
      BonCbcNlpStrategy.hpp \
      BonCbc.hpp \
      BonBabInfos.hpp \

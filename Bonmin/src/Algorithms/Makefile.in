@@ -49,7 +49,7 @@ host_triplet = @host@
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
 subdir = src/Algorithms
-DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -94,9 +94,9 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(includedir)"
-includeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(include_HEADERS)
+am__installdirs = "$(DESTDIR)$(includecoindir)"
+includecoinHEADERS_INSTALL = $(INSTALL_HEADER)
+HEADERS = $(includecoin_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = OaGenerators Branching Ampl
@@ -386,7 +386,11 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
-include_HEADERS = \
+
+# Here list all the header files that are required by a user of the library,
+# and that therefore should be installed in 'install/coin'
+includecoindir = $(includedir)/coin
+includecoin_HEADERS = \
           BonBabSetupBase.hpp \
           BonBonminSetup.hpp 
 
@@ -488,22 +492,22 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-includeHEADERS: $(include_HEADERS)
+install-includecoinHEADERS: $(includecoin_HEADERS)
 	@$(NORMAL_INSTALL)
-	test -z "$(includedir)" || $(mkdir_p) "$(DESTDIR)$(includedir)"
-	@list='$(include_HEADERS)'; for p in $$list; do \
+	test -z "$(includecoindir)" || $(mkdir_p) "$(DESTDIR)$(includecoindir)"
+	@list='$(includecoin_HEADERS)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f=$(am__strip_dir) \
-	  echo " $(includeHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(includedir)/$$f'"; \
-	  $(includeHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(includedir)/$$f"; \
+	  echo " $(includecoinHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(includecoindir)/$$f'"; \
+	  $(includecoinHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(includecoindir)/$$f"; \
 	done
 
-uninstall-includeHEADERS:
+uninstall-includecoinHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(include_HEADERS)'; for p in $$list; do \
+	@list='$(includecoin_HEADERS)'; for p in $$list; do \
 	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(includedir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(includedir)/$$f"; \
+	  echo " rm -f '$(DESTDIR)$(includecoindir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(includecoindir)/$$f"; \
 	done
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -685,7 +689,7 @@ check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(includecoindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -734,7 +738,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am: install-includecoinHEADERS
 
 install-exec-am:
 
@@ -762,7 +766,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS uninstall-info-am
+uninstall-am: uninstall-includecoinHEADERS uninstall-info-am
 
 uninstall-info: uninstall-info-recursive
 
@@ -773,14 +777,14 @@ uninstall-info: uninstall-info-recursive
 	distclean-recursive distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-exec install-exec-am \
-	install-includeHEADERS install-info install-info-am \
+	install-includecoinHEADERS install-info install-info-am \
 	install-man install-strip installcheck installcheck-am \
 	installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic maintainer-clean-recursive \
 	mostlyclean mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am \
-	uninstall-includeHEADERS uninstall-info-am
+	uninstall-includecoinHEADERS uninstall-info-am
 
 
 astyle: $(ASTYLE_FILES)

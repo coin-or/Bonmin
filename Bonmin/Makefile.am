@@ -75,6 +75,10 @@ doc:	userman
 userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
 	cd $(top_srcdir)/doc && pdflatex BONMIN_UsersManual.tex
 
+install-exec-local: install-doc
+
+uninstall-local: uninstall-doc
+
 astyle:
 	cd src/Algorithms; $(MAKE) astyle
 	cd src/Algorithms/Ampl; $(MAKE) astyle

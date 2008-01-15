@@ -54,9 +54,13 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                Headers that need to be installed                     #
 ########################################################################
 
-include_HEADERS = BonIpoptInteriorWarmStarter.hpp \
-                  BonIpoptSolver.hpp \
-                  BonIpoptWarmStart.hpp
+# Here list all the header files that are required by a user of the library,
+# and that therefore should be installed in 'install/coin'
+includecoindir = $(includedir)/coin
+includecoin_HEADERS = \
+	BonIpoptInteriorWarmStarter.hpp \
+	BonIpoptSolver.hpp \
+	BonIpoptWarmStart.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
