@@ -102,7 +102,7 @@ namespace Bonmin
       bool changed = true;//if lp is infeasible we don't have to check anything
       isInteger = 0;
       //	  if(!fixed)//fathom on bounds
-      milpBound = 1e200;
+      //           milpBound = 1e200;
       if (feasible) {
         changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
       }
@@ -113,7 +113,7 @@ namespace Bonmin
       else {
         isInteger = 0;
         //	  if(!fixed)//fathom on bounds
-        milpBound = 1e200;
+         milpBound = 1e200;
       }
 #ifdef OA_DEBUG
       printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
