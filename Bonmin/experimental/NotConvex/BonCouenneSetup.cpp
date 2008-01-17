@@ -96,7 +96,7 @@ namespace Bonmin{
     options()->GetIntegerValue("convexification_points",num_points,"bonmin.");
     
     CouenneCutGenerator * couenneCg = 
-      new CouenneCutGenerator(ci, this, aslfg_->asl, journalist());
+      new CouenneCutGenerator (ci, this, aslfg_->asl, journalist());
 
     CouenneProblem * couenneProb = couenneCg -> Problem();
 

@@ -49,7 +49,7 @@ int main (int argc, char *argv[])
   try {
 
     CouenneSetup bonmin;
-    bonmin.InitializeCouenne(argv);
+    bonmin.InitializeCouenne (argv);
     Bab bb;
 
 #if 0
@@ -107,14 +107,16 @@ int main (int argc, char *argv[])
 	cg = dynamic_cast <CouenneCutGenerator *> 
 	  (bb.model (). cutGenerators () [0] -> generator ());
 
-      if (cg)
-	cg -> getStats (nr, nt, st);
+      if (cg) cg -> getStats (nr, nt, st);
+      else printf ("Warning, could not get pointer to CouenneCutGenerator\n");
 
       char *basename = strrchr (pbName, '/');
       if (!basename) basename = pbName;
       else basename++;
 
       CouenneProblem *cp = cg ? cg -> Problem () : NULL;
+
+      if (cg && !cp) printf ("Warning, could not get pointer to problem\n");
 
       printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & ", 
 	      basename,
@@ -127,11 +129,16 @@ int main (int argc, char *argv[])
 
       /////////////////////////////////
 
-      if (CoinCpuTime () - time1 > 3600) {
+      double timeLimit = 0, obj = bb.model (). getObjValue ();
+      bonmin.options() -> GetNumericValue ("time_limit", timeLimit, "bonmin.");
+
+      if (CoinCpuTime () - time1 > timeLimit) {
 
 	// time limit reached, print upper and (in brackets) lower
 
-	if (fabs (bb.bestObj()) < 9e12) 
+	double obj = bb.model (). getObjValue ();
+
+	if (fabs (obj) < 9e12) 
 	  printf    (" %18.9f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_prim");
 
@@ -142,7 +149,7 @@ int main (int argc, char *argv[])
       else {
 	// time limit not reached, print upper and time
 
-	if (fabs (bb.bestObj()) < 9e12) 
+	if (fabs (obj) < 9e12) 
 	  printf    (" %18.9f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_prim");
 	  

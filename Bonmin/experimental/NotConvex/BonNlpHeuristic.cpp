@@ -188,6 +188,19 @@ namespace Bonmin{
       skipOnInfeasibility = (couenne_ -> getIntegerCandidate (solution, Y, lower, upper) < 0);
     }
 
+    for (int i = couenne_ -> nOrig (); i--;) 
+      if (lower [i] > upper [i] - 1e-20)
+	lower [i] = (upper [i] += .5e-20) - .5e-20;
+
+    //	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
+
+    /*printf ("int candidate: ");
+    for (int i=0; i<couenne_ -> nOrig (); i++) 
+      if (couenne_ -> Var (i) -> isInteger ())
+	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
+      else printf ("%g ", Y [i]);
+      printf ("\n");*/
+
     // Now set column bounds and solve the NLP with starting point
     double * saveColLower = CoinCopyOfArray (nlp_ -> getColLower (), nlp_ -> getNumCols ());
     double * saveColUpper = CoinCopyOfArray (nlp_ -> getColUpper (), nlp_ -> getNumCols ());
@@ -207,7 +220,7 @@ namespace Bonmin{
       double obj = (nlp_ -> isProvenOptimal()) ? nlp_ -> getObjValue (): COIN_DBL_MAX;
 
       if (nlp_ -> isProvenOptimal () // store solution in Aux info
-	  //	  && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
+	  //&& couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)
 	  ) {
 
 	const int nVars = solver->getNumCols();

@@ -36,7 +36,6 @@ CouenneInterface::~CouenneInterface(){
 }
 
 
-
 void 
 CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                  Ipopt::SmartPtr<Ipopt::OptionsList> options,
@@ -133,7 +132,7 @@ CouenneInterface::extractLinearRelaxation
 
       // re-check optimality in case resolve () was called
       if (isProvenOptimal ()
-	  //	  && p -> checkNLP (solution, obj)
+	  //&& p -> checkNLP (solution, obj)
 	  ) {
 
 	// set cutoff to take advantage of bound tightening
