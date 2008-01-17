@@ -10,11 +10,33 @@
 
 #include "CouenneProblem.hpp"
 
+//#define DEBUG
+
 /// re-organizes multiplication and stores indices (and exponents) of
 /// its variables
-void flattenMul (expression *mul, CouNumber &coe, 
-		 std::map <int, CouNumber> &indices, 
-		 CouenneProblem *p) {
+void CouenneProblem::flattenMul (expression *mul, CouNumber &coe, 
+				 std::map <int, CouNumber> &indices) {
+
+#ifdef DEBUG
+  printf ("flatten %d ---> ", mul -> code ()); mul -> print ();
+  printf ("\n");
+#endif
+
+  if (mul -> code () != COU_EXPRMUL) {
+
+    exprAux *aux = mul -> standardize (this);
+
+    int ind = (aux) ? aux -> Index () : mul -> Index ();
+
+    std::map <int, CouNumber>::iterator 
+      where = indices.find (ind);
+
+    if (where == indices.end ()) 
+      indices.insert (std::pair <int, CouNumber> (ind, 1));
+    else ++ (where -> second);
+
+    return;
+  }
 
   int nargs = mul -> nArgs ();
   expression **al = mul -> ArgList ();
@@ -23,6 +45,11 @@ void flattenMul (expression *mul, CouNumber &coe,
   for (int i=0; i < nargs; i++) { 
 
     expression *arg = al [i];
+
+#ifdef DEBUG
+    printf ("  flatten arg %d ---> ", arg -> code ()); arg -> print ();
+    printf ("\n");
+#endif
 
     switch (arg -> code ()) {
 
@@ -33,7 +60,7 @@ void flattenMul (expression *mul, CouNumber &coe,
 
     case COU_EXPRMUL:  // apply recursively
 
-      flattenMul (arg, coe, indices, p);
+      flattenMul (arg, coe, indices);
       break;
 
     case COU_EXPRVAR: { // insert index or increment 
@@ -51,7 +78,7 @@ void flattenMul (expression *mul, CouNumber &coe,
       coe = -coe;
 
       if (arg -> Argument () -> Type () == N_ARY) {
-	flattenMul (arg -> Argument (), coe, indices, p);
+	flattenMul (arg -> Argument (), coe, indices);
 	break;
       } else arg = arg -> Argument ();
 
@@ -66,7 +93,7 @@ void flattenMul (expression *mul, CouNumber &coe,
 
 	double expnum = exponent -> Value ();
 
-	expression *aux = base -> standardize (p);
+	expression *aux = base -> standardize (this);
 
 	if (!aux)
 	  aux = base;
@@ -87,14 +114,14 @@ void flattenMul (expression *mul, CouNumber &coe,
       if ((arg -> code  () == COU_EXPRSUM) && // re-check as it could come from above
 	  (arg -> nArgs () == 1)) {
 
-	flattenMul (arg, coe, indices, p);
+	flattenMul (arg, coe, indices);
 	break;
 
       } // otherwise, continue into default case
 
     default: { // for all other expression, add associated new auxiliary
 
-      exprAux *aux = arg -> standardize (p);
+      exprAux *aux = arg -> standardize (this);
 
       int ind = (aux) ? aux -> Index () : arg -> Index ();
 

@@ -15,8 +15,8 @@
 // tightening (step 1)
 #define VALID_ONLY_THRESHOLD 5 
 
-/// generate integer NLP point Y starting from fractional solution
-/// using bound tightening
+/// generate integer NLP point xInt starting from fractional solution
+/// xFrac, using (feasibility-based, i.e. cheap) bound tightening
 ///
 /// return -1 if the problem is infeasible
 
@@ -47,14 +47,26 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     iter     = 0;
 
   double
-    *olb   = new double [ncols],   *oub   = new double [ncols],  // saved bounds
-    *llb   = new double [ncols],   *lub   = new double [ncols],  // bounds when rounding down
-    *rlb   = new double [ncols],   *rub   = new double [ncols],  //                      up
+    *slb   = new double [ncols],   *sub   = new double [ncols],  // saved bounds
+    *olb   = new double [ncols],   *oub   = new double [ncols],  // outer bounds
+    *llb   = new double [ncols],   *lub   = new double [ncols],  // new bounds when rounding down
+    *rlb   = new double [ncols],   *rub   = new double [ncols],  // new                      up
     *dualL = new double [nOrig_],  *dualR = new double [nOrig_]; // lb[objind] per fix index/direction
 
-  // save old bounds
+  // save current bounds
+  CoinCopyN (lb_, ncols, slb);
+  CoinCopyN (ub_, ncols, sub);
+
+  // copy in current bounds
   CoinCopyN (lb_, ncols, olb);
   CoinCopyN (ub_, ncols, oub);
+
+  // start restricting around current integer box
+  for (int i=0; i<nOrig_; i++) 
+    if (Var (i) -> isInteger ()) {
+      lb [i] = lb_ [i] = floor (xFrac [i]); 
+      ub [i] = ub_ [i] = ceil  (xFrac [i]);
+    }
 
   // for now save fractional point into integer point
   CoinCopyN (xFrac, nOrig_, xInt);
@@ -62,26 +74,29 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   // translate current NLP point+bounds into higher-dimensional space
   initAuxs (xInt, lb, ub);
 
+  // TODO: re-copy first nOrig_ variables into xInt?
+  //CoinCopyN (xFrac, nOrig_, xInt);
+
   // create fictitious change structure -- all initialized at UNCHANGED by constructor
   t_chg_bounds *f_chg = new t_chg_bounds [ncols];
 
   // structure to record fixed, non-fixed, and continuous variables
   typedef enum {UNFIXED, FIXED, CONTINUOUS} fixType;
   fixType *fixed = new fixType [nOrig_]; // integer variables that were fixed
-  for (int i=0; i<nOrig_; i++) fixed [i] = (Var (i) -> isInteger ()) ? UNFIXED : CONTINUOUS;
+  for (int i=0; i<nOrig_; i++) 
+    fixed [i] = (Var (i) -> isInteger ()) ? UNFIXED : CONTINUOUS;
 
   bool changed;
-
-  /*printf ("========================================================================\n");
-  printf ("========================================================================\n");
-  for (int i=0; i<nOrig_; i++)
-    printf ("#### %4d: %d %c frac %20g                          [%20g,%20g]\n", 
-	    i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
-	    xFrac [i], lb_ [i], ub_ [i]);*/
 
   int validNonImproving = 0;
 
   do {
+
+    /*printf ("========================================================================\n");
+    for (int i=0; i<nOrig_; i++)
+      printf ("#### %4d: %d %c frac %20g                          [%20g,%20g]\n", 
+	      i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
+	      xFrac [i], lb_ [i], ub_ [i]);*/
 
     changed = false;
 
@@ -150,8 +165,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	//    2b) if both feasible, store index in free++ variables
 	//    2c) if only one feasible, set rounded +/- 2
 	//    ...
-	//    2z) or probably simpler if return -1 to tell our hero not to
-	//    call Ipopt
+	//    2z) or probably simpler if return -1 to avoid calling Ipopt
 	//
 	// 3) if both feasible, choose one based on dual bound
 
@@ -164,15 +178,16 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	    // ceil is feasible, floor is not.
 	    fixed [i] = FIXED;
-	    lb_ [i] = ub_ [i] = xInt [i] = ceil (xFrac [i]); 
+	    lb_ [i] = ub_ [i] = olb [i] = oub [i] = xInt [i] = ceil (xFrac [i]); 
+	    //printf ("0 fixed %d [%g,%g,%g]\n", i, lb_ [i], ub_ [i], xInt [i]);
 	    changed = true;
 	    //printf ("+++ 1 %d\n", i);
 
 	    // tighten bounds using r[lu]b
 	    for (int j=0; j<ncols; j++) if (i != j) {
 
-	      lb_ [j] = CoinMax (lb_ [j], rlb [j]);
-	      ub_ [j] = CoinMin (ub_ [j], rub [j]);
+	      olb [j] = lb_ [j] = CoinMax (lb_ [j], rlb [j]);
+	      oub [j] = ub_ [j] = CoinMin (ub_ [j], rub [j]);
 
 	      if (lb_ [j] > ub_ [j] + COUENNE_EPS) {
 		retval = -1;
@@ -185,15 +200,16 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	  // floor is feasible, ceil is not.
 
 	  fixed [i] = FIXED;
-	  lb_ [i] = ub_ [i] = xInt [i] = floor (xFrac [i]); 
+	  lb_ [i] = ub_ [i] = olb [i] = oub [i] = xInt [i] = floor (xFrac [i]); 
+	  //printf ("1 fixed %d [%g,%g,%g]\n", i, lb_ [i], ub_ [i], xInt [i]);
 	  changed = true;
 	  //printf ("+++ 2 %d\n", i);
 
 	  // tighten bounds using l[lu]b
 	  for (int j=0; j<ncols; j++) if (i != j) {
 
-	    lb_ [j] = CoinMax (lb_ [j], llb [j]);
-	    ub_ [j] = CoinMin (ub_ [j], lub [j]);
+	    olb [j] = lb_ [j] = CoinMax (lb_ [j], llb [j]);
+	    oub [j] = ub_ [j] = CoinMin (ub_ [j], lub [j]);
 
 	    if (lb_ [j] > ub_ [j] + COUENNE_EPS) {
 	      retval = -1;
@@ -205,8 +221,8 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	  // tighten bounds using l[lu]b
 	  for (int j=0; j<ncols; j++) {
 
-	    lb_ [j] = CoinMax (lb_ [j], CoinMin (llb [j], rlb [j]));
-	    ub_ [j] = CoinMin (ub_ [j], CoinMax (lub [j], rub [j]));
+	    olb [j] = lb_ [j] = CoinMax (lb_ [j], CoinMin (llb [j], rlb [j]));
+	    oub [j] = ub_ [j] = CoinMin (ub_ [j], CoinMax (lub [j], rub [j]));
 
 	    if (lb_ [j] > ub_ [j] + COUENNE_EPS) {
 	      retval = -1;
@@ -228,16 +244,17 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	  bool fix = false;
 
 	  if      (dualL [i] < dualR [i] - COUENNE_EPS) {
-	    lb_[i] = ub_[i] = xInt[i] = floor (xFrac [i]);
+	    lb_[i] = ub_[i] = olb [i] = oub [i] = xInt[i] = floor (xFrac [i]);
 	    fix = true;
 	  }
 	  else if (dualL [i] > dualR [i] + COUENNE_EPS) {
-	    lb_[i] = ub_[i] = xInt[i] = ceil  (xFrac [i]);
+	    lb_[i] = ub_[i] = olb [i] = oub [i] = xInt[i] = ceil  (xFrac [i]);
 	    fix = true;
 	  }
 
 	  if (fix) {
 	    fixed [i] = FIXED;
+	    //printf ("2 fixed %d [%g,%g,%g]\n", i, lb_ [i], ub_ [i], xInt [i]);
 	    //printf ("+++ 3 --- %d %d %d\n", i, validNonImproving, VALID_ONLY_THRESHOLD);
 	    changed = true;
 	    if (validNonImproving < VALID_ONLY_THRESHOLD) break;
@@ -252,11 +269,14 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   // variables have to be fixed too, e.g. according to dual bound
 
   for (int i=0; i<nOrig_; i++) 
-    if (fixed [i] == UNFIXED)
+    if (fixed [i] == UNFIXED) {
       lb_ [i] = ub_ [i] = xInt [i] = 
 	((dualL [i] < dualR [i] - COUENNE_EPS) ? floor :
 	 (dualL [i] > dualR [i] + COUENNE_EPS) ? ceil  :
 	 ((CoinDrand48 () < 0.5) ? floor : ceil)) (xFrac [i]);
+
+      //printf ("3 fixed %d [%g,%g,%g]\n", i, lb_ [i], ub_ [i], xInt [i]);
+    }
 
   // save tightened bounds in NLP space
   CoinCopyN (lb_, nOrig_, lb);
@@ -266,23 +286,28 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   CoinCopyN (olb, ncols, lb_);
   CoinCopyN (oub, ncols, ub_);
 
-  /*printf ("------------------------------------------------------------------------\n");
+  /*printf ("- %d -----------------------------------------------------------------------\n", retval);
   for (int i=0; i<nOrig_; i++)
     printf ("#### %4d: %d %c frac %20g int %20g [%20g,%20g]\n", 
 	    i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
-	    xFrac [i], xInt [i], lb_ [i], ub_ [i]);
+	    xFrac [i], xInt [i], lb [i], ub [i]);
 	    printf ("========================================================================\n");*/
 
-  delete [] olb;
-  delete [] oub;
+  for (int i=0; i<nOrig_; i++)
+    if (fixed [i] == FIXED)
+      lb [i] = ub [i] = xInt [i];
+
+  // restore saved bounds
+  CoinCopyN (slb, ncols, lb_);
+  CoinCopyN (sub, ncols, ub_);
+
   delete [] f_chg;
 
-  delete [] dualL;
-  delete [] dualR;
-  delete [] llb;
-  delete [] lub;
-  delete [] rlb;
-  delete [] rub;
+  delete [] slb;   delete [] sub;
+  delete [] olb;   delete [] oub;
+  delete [] dualL; delete [] dualR;
+  delete [] llb;   delete [] lub;
+  delete [] rlb;   delete [] rub;
 
   delete [] fixed;
 

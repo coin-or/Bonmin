@@ -9,7 +9,6 @@
 
 #include <vector>
 #include <fstream>
-#include <iomanip> // to use the setprecision manipulator
 
 #include "expression.hpp"
 #include "exprAux.hpp"
@@ -33,31 +32,41 @@ void CouenneProblem::print (std::ostream &out) {
 
   printf ("variables:\n");
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
-       i != variables_.end (); ++i) 
-    if ((*i) -> Type () == AUX) {
-      if ((*i) -> Multiplicity () > 0) {
+       i != variables_.end (); ++i)
 
-	(*i) -> print (out);
-	out << " [" << (*i) -> rank (NULL) 
-	    << ","  << (*i) -> Multiplicity () << "] := ";
+    if (((*i) -> Type () != AUX) || ((*i) -> Multiplicity () > 0)) {
+
+      (*i) -> print (out);
+
+      if (((*i) -> Type () == AUX) && ((*i) -> Multiplicity () > 0)) {
+
+	out << " (r:" << (*i) -> rank () 
+	    << ", m:"  << (*i) -> Multiplicity () << ") := ";
 	if ((*i) -> Image ())
-	  (*i) -> Image () -> print (out, false, this); 
+	  (*i) -> Image () -> print (out, false); 
+      }
+
+      if ((fabs ((*((*i) -> Lb ())) ())     < COUENNE_EPS) &&
+	  (fabs ((*((*i) -> Ub ())) () - 1) < COUENNE_EPS) &&
+	  (*i) -> isInteger ()) out << " binary";
+      else {
+
 	out << " [ " << (*((*i) -> Lb ())) ();
 	out << " , " << (*((*i) -> Ub ())) ();
-	out << " ] " << std::endl;
+	out << " ]";
 	/*
-	expression *lb, *ub;
-	(*i) -> getBounds (lb, ub);
-	out << " {";  lb -> print (out);
-	out << " , "; ub -> print (out);
-	out << "}\n"; 
+	if ((*i) -> Image ()) {
+	  expression *lb, *ub;
+	  (*i) -> Image () -> getBounds (lb, ub);
+	  out << " {";  lb -> print (out);
+	  out << " , "; ub -> print (out);
+	  out << "} "; 
+	}
 	*/
+	if ((*i) -> isInteger ()) out << " integer";
       }
-    } else {
-      (*i) -> print (out);
-      out << " in [" 
-	  << lb_ [(*i) -> Index ()] << ',' 
-	  << ub_ [(*i) -> Index ()] << "]\n";
+
+      out << std::endl;
     }
 
   if (optimum_) {
@@ -79,7 +88,7 @@ bool CouenneProblem::readOptimum (const std::string &fname) {
 
   // TODO: this procedure is crippled by the new auxiliary handling
   // which replaces original variables with auxiliaries. The problem
-  // could be that some originally auxiliary variables (er) do not
+  // could be that some originally auxiliary variables (er...) do not
   // have an optimal value but are evaluated as independent.
 
   // Actually, forget the above. It can only happen in extended
@@ -92,6 +101,8 @@ bool CouenneProblem::readOptimum (const std::string &fname) {
   if (!f) return false;
 
   optimum_ = (CouNumber *) realloc (optimum_, nvars * sizeof (CouNumber));
+
+  CoinFillN (optimum_, nvars, 0.);
 
   if (fscanf (f, "%lf", &bestObj_) < 1) 
     return false;
@@ -112,7 +123,7 @@ bool CouenneProblem::readOptimum (const std::string &fname) {
   // only one loop is sufficient here, since auxiliary variables are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
 
-  for (register int i = 0, j = nVars (); j--; i++) {
+  for (int i = 0, j = nVars (); j--; i++) {
     exprVar *var = variables_ [numbering_ [i]];
     if (var -> Type () == AUX)
       optimum_ [var -> Index ()] = (*(var -> Image ())) ();

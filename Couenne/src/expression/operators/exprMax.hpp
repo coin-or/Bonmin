@@ -68,7 +68,7 @@ class exprMax: public exprOp {
     {return NULL;}
 
   /// generate equality between *this and *w
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  void generateCuts (expression *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 

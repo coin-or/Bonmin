@@ -48,7 +48,7 @@ host_triplet = @host@
 @COIN_HAS_ASL_TRUE@am__append_1 = readnl/readnl.cpp \
 @COIN_HAS_ASL_TRUE@			 readnl/nl2e.cpp \
 @COIN_HAS_ASL_TRUE@			 readnl/invmap.cpp \
-@COIN_HAS_ASL_TRUE@			 problem/readASLfg.cpp
+@COIN_HAS_ASL_TRUE@			 readnl/readASLfg.cpp
 
 
 # If we have the Ampl solver library, we need to add additional things
@@ -149,12 +149,15 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	bound_tightening/obbt_iter.cpp \
 	bound_tightening/tightenBounds.cpp \
 	bound_tightening/impliedBounds.cpp \
+	bound_tightening/operators/impliedBounds-mul.cpp \
+	bound_tightening/operators/impliedBounds-sum.cpp \
 	bound_tightening/operators/impliedBounds-exprSum.cpp \
 	bound_tightening/operators/impliedBounds-exprDiv.cpp \
 	bound_tightening/operators/impliedBounds-exprMul.cpp \
 	bound_tightening/operators/impliedBounds-exprQuad.cpp \
+	bound_tightening/operators/impliedBounds-exprPow.cpp \
 	util/drawCuts.cpp util/rootQ.cpp readnl/readnl.cpp \
-	readnl/nl2e.cpp readnl/invmap.cpp problem/readASLfg.cpp
+	readnl/nl2e.cpp readnl/invmap.cpp readnl/readASLfg.cpp
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
 @COIN_HAS_ASL_TRUE@	readASLfg.lo
 am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
@@ -187,9 +190,10 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	checkNLP.lo getIntegerCandidate.lo depGraph.lo checkCycles.lo \
 	boundTightening.lo aggressiveBT.lo fake_tightening.lo obbt.lo \
 	obbt_iter.lo tightenBounds.lo impliedBounds.lo \
+	impliedBounds-mul.lo impliedBounds-sum.lo \
 	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
-	impliedBounds-exprMul.lo impliedBounds-exprQuad.lo drawCuts.lo \
-	rootQ.lo $(am__objects_1)
+	impliedBounds-exprMul.lo impliedBounds-exprQuad.lo \
+	impliedBounds-exprPow.lo drawCuts.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -466,10 +470,13 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	bound_tightening/obbt_iter.cpp \
 	bound_tightening/tightenBounds.cpp \
 	bound_tightening/impliedBounds.cpp \
+	bound_tightening/operators/impliedBounds-mul.cpp \
+	bound_tightening/operators/impliedBounds-sum.cpp \
 	bound_tightening/operators/impliedBounds-exprSum.cpp \
 	bound_tightening/operators/impliedBounds-exprDiv.cpp \
 	bound_tightening/operators/impliedBounds-exprMul.cpp \
 	bound_tightening/operators/impliedBounds-exprQuad.cpp \
+	bound_tightening/operators/impliedBounds-exprPow.cpp \
 	util/drawCuts.cpp util/rootQ.cpp $(am__append_1)
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
@@ -495,7 +502,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/util` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/convex` -I`$(CYGPATH_W) \
-	$(COUENNESRCDIR)/src/convex/sdpcuts` -I`$(CYGPATH_W) \
+	$(COUENNESRCDIR)/src/standardize` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/problem` -I`$(CYGPATH_W) \
 	$(COUENNESRCDIR)/src/problem/depGraph` -I`$(CYGPATH_W) \
 	$(OSISRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
@@ -534,6 +541,7 @@ include_HEADERS = \
 	branch/CouenneChooseStrong.hpp \
 	branch/projections.hpp \
 	branch/CouObjStats.hpp \
+	standardize/lqelems.hpp \
 	expression/operators/exprAbs.hpp \
 	expression/operators/exprExp.hpp \
 	expression/operators/exprInv.hpp \
@@ -732,8 +740,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getIntegerCandidate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprMul.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprPow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprQuad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprSum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-mul.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-sum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/infeasibility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
@@ -1476,6 +1487,20 @@ impliedBounds.lo: bound_tightening/impliedBounds.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds.lo `test -f 'bound_tightening/impliedBounds.cpp' || echo '$(srcdir)/'`bound_tightening/impliedBounds.cpp
 
+impliedBounds-mul.lo: bound_tightening/operators/impliedBounds-mul.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-mul.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-mul.Tpo" -c -o impliedBounds-mul.lo `test -f 'bound_tightening/operators/impliedBounds-mul.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-mul.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-mul.Tpo" "$(DEPDIR)/impliedBounds-mul.Plo"; else rm -f "$(DEPDIR)/impliedBounds-mul.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='bound_tightening/operators/impliedBounds-mul.cpp' object='impliedBounds-mul.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-mul.lo `test -f 'bound_tightening/operators/impliedBounds-mul.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-mul.cpp
+
+impliedBounds-sum.lo: bound_tightening/operators/impliedBounds-sum.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-sum.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-sum.Tpo" -c -o impliedBounds-sum.lo `test -f 'bound_tightening/operators/impliedBounds-sum.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-sum.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-sum.Tpo" "$(DEPDIR)/impliedBounds-sum.Plo"; else rm -f "$(DEPDIR)/impliedBounds-sum.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='bound_tightening/operators/impliedBounds-sum.cpp' object='impliedBounds-sum.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-sum.lo `test -f 'bound_tightening/operators/impliedBounds-sum.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-sum.cpp
+
 impliedBounds-exprSum.lo: bound_tightening/operators/impliedBounds-exprSum.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-exprSum.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-exprSum.Tpo" -c -o impliedBounds-exprSum.lo `test -f 'bound_tightening/operators/impliedBounds-exprSum.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-exprSum.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-exprSum.Tpo" "$(DEPDIR)/impliedBounds-exprSum.Plo"; else rm -f "$(DEPDIR)/impliedBounds-exprSum.Tpo"; exit 1; fi
@@ -1503,6 +1528,13 @@ impliedBounds-exprQuad.lo: bound_tightening/operators/impliedBounds-exprQuad.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='bound_tightening/operators/impliedBounds-exprQuad.cpp' object='impliedBounds-exprQuad.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprQuad.lo `test -f 'bound_tightening/operators/impliedBounds-exprQuad.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-exprQuad.cpp
+
+impliedBounds-exprPow.lo: bound_tightening/operators/impliedBounds-exprPow.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT impliedBounds-exprPow.lo -MD -MP -MF "$(DEPDIR)/impliedBounds-exprPow.Tpo" -c -o impliedBounds-exprPow.lo `test -f 'bound_tightening/operators/impliedBounds-exprPow.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-exprPow.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/impliedBounds-exprPow.Tpo" "$(DEPDIR)/impliedBounds-exprPow.Plo"; else rm -f "$(DEPDIR)/impliedBounds-exprPow.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='bound_tightening/operators/impliedBounds-exprPow.cpp' object='impliedBounds-exprPow.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o impliedBounds-exprPow.lo `test -f 'bound_tightening/operators/impliedBounds-exprPow.cpp' || echo '$(srcdir)/'`bound_tightening/operators/impliedBounds-exprPow.cpp
 
 drawCuts.lo: util/drawCuts.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT drawCuts.lo -MD -MP -MF "$(DEPDIR)/drawCuts.Tpo" -c -o drawCuts.lo `test -f 'util/drawCuts.cpp' || echo '$(srcdir)/'`util/drawCuts.cpp; \
@@ -1539,12 +1571,12 @@ invmap.lo: readnl/invmap.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o invmap.lo `test -f 'readnl/invmap.cpp' || echo '$(srcdir)/'`readnl/invmap.cpp
 
-readASLfg.lo: problem/readASLfg.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readASLfg.lo -MD -MP -MF "$(DEPDIR)/readASLfg.Tpo" -c -o readASLfg.lo `test -f 'problem/readASLfg.cpp' || echo '$(srcdir)/'`problem/readASLfg.cpp; \
+readASLfg.lo: readnl/readASLfg.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT readASLfg.lo -MD -MP -MF "$(DEPDIR)/readASLfg.Tpo" -c -o readASLfg.lo `test -f 'readnl/readASLfg.cpp' || echo '$(srcdir)/'`readnl/readASLfg.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/readASLfg.Tpo" "$(DEPDIR)/readASLfg.Plo"; else rm -f "$(DEPDIR)/readASLfg.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/readASLfg.cpp' object='readASLfg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='readnl/readASLfg.cpp' object='readASLfg.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o readASLfg.lo `test -f 'problem/readASLfg.cpp' || echo '$(srcdir)/'`problem/readASLfg.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o readASLfg.lo `test -f 'readnl/readASLfg.cpp' || echo '$(srcdir)/'`readnl/readASLfg.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1622,7 +1654,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../inc $(distdir)/branch $(distdir)/convex $(distdir)/expression $(distdir)/expression/operators $(distdir)/expression/operators/bounds $(distdir)/problem $(distdir)/problem/depGraph $(distdir)/util
+	$(mkdir_p) $(distdir)/../inc $(distdir)/branch $(distdir)/convex $(distdir)/expression $(distdir)/expression/operators $(distdir)/expression/operators/bounds $(distdir)/problem $(distdir)/problem/depGraph $(distdir)/standardize $(distdir)/util
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

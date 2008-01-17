@@ -15,7 +15,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
   int nchg = 0; //< number of bounds changed for propagation
 
-  if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {  
+  /*if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {  
     Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"=====================implied\n");
     int j=0;
     for (int i=0; i < nVars (); i++) 
@@ -27,7 +27,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	if (!(++j % 6)) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
       }
     if (j % 6) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
-  }
+    }*/
 
   for (int ii = nVars (); ii--;) {
 
@@ -37,7 +37,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
       if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
 	Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
-			"#### w_%d has infeasible bounds [%g,%g]\n", 
+			"implied bounds: w_%d has infeasible bounds [%g,%g]\n", 
 			i, lb_ [i], ub_ [i]);
 	return -1;
       }
@@ -65,14 +65,14 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       // TODO: also test if this expression, or any of its indep
       // variables, have changed. If not, skip
 
-      CouNumber 
+      /*CouNumber 
 	l0 = lb_ [i], 
-	u0 = ub_ [i];
+	u0 = ub_ [i];*/
 
       if (variables_ [i] -> Image () -> impliedBound 
 	  (variables_ [i] -> Index (), lb_, ub_, chg_bds)) {
 
-	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
+	/*if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
 	  // todo: send all output through journalist
 	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
 			  "impli %2d [%15.8g, %15.8g] -> [%15.8g, %15.8g]: ",
@@ -82,7 +82,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING," := ");
 	  variables_ [i] -> Image () -> print (std::cout);
 	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
-	}
+	  }*/
 
 	/*for (int i=0; i<nVars (); i++) 
 	  printf ("%4d. [%20.8f, %20.8f]\n", i,

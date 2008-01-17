@@ -43,9 +43,19 @@ CouenneChooseVariable::~CouenneChooseVariable () {}
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
   /// LEAVE THIS HERE. Need update of current point to evaluate infeasibility
-  problem_ -> update (info -> solution_, 
-		      info -> lower_, 
-		      info -> upper_);
+  problem_ -> initAuxs (info -> solution_, 
+			info -> lower_, 
+			info -> upper_);
+
+  problem_ -> update (info -> solution_, NULL, NULL);
+
+  /*for (int i = problem_ -> nVars (); i--;) {
+    info -> lower_ [i] = problem_ -> Lb (i);
+    info -> upper_ [i] = problem_ -> Ub (i);
+    }*/
+
+  //CoinCopyN ((double *) (problem_ -> Lb ()), problem_ -> nVars (), info -> lower_);
+  //CoinCopyN ((double *) (problem_ -> Ub ()), problem_ -> nVars (), info -> upper_);
 
   // Make it stable, in OsiChooseVariable::setupList() numberObjects must be 0.
   return (solver_ -> numberObjects ()) ? 

@@ -15,19 +15,17 @@
 
 //#define DEBUG
 
-// Compute bounds of exprQuad taking into account the unbounded variables
-void computeQuadFiniteBound (const exprQuad *,
-			     CouNumber &, CouNumber &, 
-			     CouNumber *, CouNumber *,
-			     int &, int &);
-
 
 /// implied bound processing for quadratic form upon change in lower-
 /// and/or upper bound of w, whose index is wind
 
 bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
-  // return false;
+  //return false; // !!!
+
+  // three implied bound computations, of increasing complexity. The
+  // first reduces this sum to a sum of aux and tries, after
+  // tightening bounds of each aux, to infer new bounds
 
 #ifdef DEBUG
   printf ("################ implied bounds: [%g,%g], ", l [wind], u [wind]);
@@ -37,16 +35,31 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   // Nevermind about the nonlinear part stored in arglist_...
 
   // get all variables 
-
+  /*
   std::set <int> 
     lin (index_,   index_   + nlterms_),
     qui (qindexI_, qindexI_ + nqterms_),
     quj (qindexJ_, qindexJ_ + nqterms_),
     indUnion;
+  */
+
+  std::set <int> indexSet;
+
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    indexSet.insert (el -> first -> Index ());
+
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
+
+    indexSet.insert (row -> first -> Index ());
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
+      indexSet.insert (col -> first -> Index ());
+  }
+
 
   // CAUTION: this relies on the first version of bound expressions
   // for quadratic form, i.e. the sum of bounds of independent terms
-
+  /*
   // find all indices appearing in the expression
   std::set_union (qui .begin (), qui .end (), 
 		  quj .begin (), quj .end (),
@@ -55,20 +68,18 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   std::set_union (indUnion .begin (), indUnion .end (), 
 		  lin      .begin (), lin      .end (),
 		  std::inserter (indUnion, indUnion.begin ()));
+  */
 
   CouNumber qMin, qMax;
 
   int indInfLo = -1, indInfUp = -1;
 
   // get bounds for nonlinear part of the sum
-  expression *lb, *ub;
-  exprSum::getBounds (lb, ub);
-
-  qMin = (*lb) ();
-  qMax = (*ub) ();
-
-  delete lb;
-  delete ub;
+  expression *qlb, *qub;
+  exprSum::getBounds (qlb, qub);
+  qMin = (*qlb) (); delete qlb;
+  qMax = (*qub) (); delete qub;
+  //exprSum::getBounds (qMin, qMax);
 
   if (qMin < -COUENNE_INFINITY) indInfLo = -2;
   if (qMax >  COUENNE_INFINITY) indInfUp = -2;
@@ -79,14 +90,14 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   
 #ifdef DEBUG
   printf ("1st phase... inf=(%d,%d) q=[%g,%g].\n", indInfLo, indInfUp, qMin, qMax);
-  for (std::set <int>:: iterator iter = indUnion.begin ();
-       iter != indUnion.end (); ++iter) 
+  for (std::set <int>:: iterator iter = indexSet.begin ();
+       iter != indexSet.end (); ++iter) 
     printf ("%4d [%+6g %+6g]\n", *iter, l [*iter], u [*iter]);
 #endif
 
   // compute bound on expression using only finite variable bounds
 
-  computeQuadFiniteBound (this, qMin, qMax, l, u, indInfLo, indInfUp);
+  computeQuadFiniteBound (qMin, qMax, l, u, indInfLo, indInfUp);
 
   // similar to impliedBounds-exprGroup. indInf* are -1 if no
   // variables are unbounded, i>0 if variable x_i is unbounded and -2
@@ -110,8 +121,8 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
   // prepare data structure for scanning all variables
   int
-    minindex = *(indUnion.begin  ()), // minimum index
-    maxindex = *(indUnion.rbegin ()), // maximum index
+    minindex = *(indexSet.begin  ()), // minimum index
+    maxindex = *(indexSet.rbegin ()), // maximum index
     nvars = maxindex - minindex + 1;  // upper bound on # variables involved
 
   CouNumber 
@@ -129,12 +140,13 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   CoinFillN (bCutUb,    nvars, 0.);
 
   // assume all coefficients are finite
-  for (int i=0; i<nlterms_; i++) {
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
+    //  for (int i=0; i<nlterms_; i++) {
 
-    int ind = index_ [i];
+    int ind = el -> first -> Index ();//index_ [i];
 
     CouNumber
-      coe = coeff_ [i], 
+      coe = el -> second, //coeff_ [i], 
       li  = l [ind], 
       ui  = u [ind];
 
@@ -154,104 +166,108 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
 #ifdef DEBUG
   printf ("linear filling (%d,%d): -----------------------\n", minindex, maxindex);
-  for (std::set <int>:: iterator iter = indUnion.begin ();
-       iter != indUnion.end (); ++iter) 
+  for (std::set <int>:: iterator iter = indexSet.begin ();
+       iter != indexSet.end (); ++iter) 
     printf ("%4d [%+6g %+6g] [%+6g %+6g]\n", *iter, 
 	    linCoeMin [*iter - minindex], linCoeMax [*iter - minindex],
 	    bCutLb    [*iter - minindex], bCutUb    [*iter - minindex]);
 #endif
 
   // fill in remaining linear coefficients and quadratic ones
-  for (int i=0; i<nqterms_; i++) {
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    int qi = qindexI_ [i],
-        qj = qindexJ_ [i];
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
-    CouNumber coe = qcoeff_ [i],
-      li = l [qi], lj = l [qj], 
-      ui = u [qi], uj = u [qj];
+      int
+	qi = row -> first -> Index (),
+        qj = col -> first -> Index (); //qindexJ_ [i];
 
-    if (qi == qj) { // quadratic term
+      CouNumber coe = col -> second, //qcoeff_ [i],
+	li = l [qi], lj = l [qj], 
+	ui = u [qi], uj = u [qj];
 
-      qi -= minindex;
+      if (qi == qj) { // quadratic term
 
-      qii [qi] = coe; // quadratic term
+	qi -= minindex;
 
-      CouNumber
-	maxbUb = CoinMax (fabs (li), fabs (ui)),
-	maxbLb = (li >= 0) ? (li) : (ui <= 0) ? (ui) : 0;
+	qii [qi] = coe; // quadratic term
 
-      if (maxbUb > COUENNE_INFINITY) maxbUb = 0;
+	CouNumber
+	  maxbUb = CoinMax (fabs (li), fabs (ui)),
+	  maxbLb = (li >= 0) ? (li) : (ui <= 0) ? (ui) : 0;
 
-      maxbUb *= maxbUb * coe;
-      maxbLb *= maxbLb * coe;
+	if (maxbUb > COUENNE_INFINITY) maxbUb = 0;
 
-      if (coe > 0) {
-	bCutUb [qi] += maxbUb;
-	bCutLb [qi] += maxbLb;
-      } else {
-	bCutUb [qi] += maxbLb;
-	bCutLb [qi] += maxbUb;
-      }
-    } else { // product term
+	maxbUb *= maxbUb * coe;
+	maxbLb *= maxbLb * coe;
 
-      coe *= 2;
+	if (coe > 0) {
+	  bCutUb [qi] += maxbUb;
+	  bCutLb [qi] += maxbLb;
+	} else {
+	  bCutUb [qi] += maxbLb;
+	  bCutLb [qi] += maxbUb;
+	}
+      } else { // product term
 
-      CouNumber *b1, *b2;
+	coe *= 2;
 
-      if (coe > 0) {b1 = l; b2 = u;} 
-      else         {b1 = u; b2 = l;}
+	CouNumber *b1, *b2;
 
-      b1 += minindex;
-      b2 += minindex;
+	if (coe > 0) {b1 = l; b2 = u;} 
+	else         {b1 = u; b2 = l;}
 
-      qi -= minindex;
-      qj -= minindex;
+	b1 += minindex;
+	b2 += minindex;
 
-      linCoeMin [qi] += coe * b1 [qj];
-      linCoeMin [qj] += coe * b1 [qi];
+	qi -= minindex;
+	qj -= minindex;
 
-      linCoeMax [qi] += coe * b2 [qj];
-      linCoeMax [qj] += coe * b2 [qi];
+	linCoeMin [qi] += coe * b1 [qj];
+	linCoeMin [qj] += coe * b1 [qi];
 
-      CouNumber
-	addLo = CoinMin (CoinMin (li*lj, ui*uj),
-		         CoinMin (ui*lj, li*uj)),
-	addUp = CoinMax (CoinMax (li*lj, ui*uj), 
-  	  	         CoinMax (ui*lj, li*uj));
+	linCoeMax [qi] += coe * b2 [qj];
+	linCoeMax [qj] += coe * b2 [qi];
 
-      if (addLo < -COUENNE_INFINITY) addLo = 0;
-      if (addUp >  COUENNE_INFINITY) addUp = 0;
+	CouNumber
+	  addLo = CoinMin (CoinMin (li*lj, ui*uj),
+			   CoinMin (ui*lj, li*uj)),
+	  addUp = CoinMax (CoinMax (li*lj, ui*uj), 
+			   CoinMax (ui*lj, li*uj));
 
-      addLo *= coe;
-      addUp *= coe;
+	if (addLo < -COUENNE_INFINITY) addLo = 0;
+	if (addUp >  COUENNE_INFINITY) addUp = 0;
 
-      if (coe > 0) {
-	bCutLb [qi] += addLo; bCutUb [qi] += addUp;
-	bCutLb [qj] += addLo; bCutUb [qj] += addUp;
-      } else {
-	bCutLb [qi] += addUp; bCutUb [qi] += addLo;
-	bCutLb [qj] += addUp; bCutUb [qj] += addLo;
+	addLo *= coe;
+	addUp *= coe;
+
+	if (coe > 0) {
+	  bCutLb [qi] += addLo; bCutUb [qi] += addUp;
+	  bCutLb [qj] += addLo; bCutUb [qj] += addUp;
+	} else {
+	  bCutLb [qi] += addUp; bCutUb [qi] += addLo;
+	  bCutLb [qj] += addUp; bCutUb [qj] += addLo;
+	}
       }
     }
   }
 
 #ifdef DEBUG
   printf ("quad filling: -----------------------\n");
-  for (std::set <int>:: iterator iter = indUnion.begin ();
-       iter != indUnion.end (); ++iter) 
+  for (std::set <int>:: iterator iter = indexSet.begin ();
+       iter != indexSet.end (); ++iter) 
     printf ("%4d [%+6g %+6g] [%+6g %+6g]\n", *iter, 
 	    linCoeMin [*iter - minindex], linCoeMax [*iter - minindex],
 	    bCutLb    [*iter - minindex], bCutUb    [*iter - minindex]);
 #endif
 
   // Done filling vectors /////////////////////////////////////////////////////////////
-  // Now improve each independent variable in the set indUnion
+  // Now improve each independent variable in the set indexSet
 
   bool updated = false;
 
-  for (std::set <int>:: iterator iter = indUnion.begin ();
-       iter != indUnion.end (); ++iter) {
+  for (std::set <int>:: iterator iter = indexSet.begin ();
+       iter != indexSet.end (); ++iter) {
 
     int ind  = *iter, 
         indn = ind - minindex;

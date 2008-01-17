@@ -13,7 +13,6 @@
 
 #include "OsiChooseVariable.hpp"
 #include "CouenneProblem.hpp"
-//#include "BonBabSetupBase.hpp"
 
 // Forward declaration
 class CbcModel;

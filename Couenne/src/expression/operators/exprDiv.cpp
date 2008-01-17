@@ -77,8 +77,8 @@ expression *exprDiv::simplify () {
 
 expression *exprDiv::differentiate (int index) {
 
-  if (!(arglist_ [0] -> dependsOn (&index, 1))  &&
-      !(arglist_ [1] -> dependsOn (&index, 1)))
+  if (!(arglist_ [0] -> dependsOn (index))  &&
+      !(arglist_ [1] -> dependsOn (index)))
     return new exprConst (0.);
 
   expression **alm  = new expression * [2];

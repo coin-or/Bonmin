@@ -16,6 +16,7 @@
 
 #include "expression.hpp"
 #include "exprConst.hpp"
+#include "exprQuad.hpp"
 #include "exprClone.hpp"
 #include "exprIVar.hpp"
 #include "exprAux.hpp"
@@ -23,6 +24,7 @@
 #include "CouenneProblem.hpp"
 #include "CouenneProblemElem.hpp"
 #include "depGraph.hpp"
+#include "lqelems.hpp"
 
 /// constructor
 CouenneProblem::CouenneProblem (const struct ASL *asl,
@@ -62,18 +64,15 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
   now = CoinCpuTime ();
 
-  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
-    // we should put that also through the journalist
+  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM))
     print (std::cout);
-    printf ("======================================\n");
-  }
 
-  // save -- for statistics purposes -- number of original
+  // save -- for statistic purposes -- number of original
   // constraints. Some of them will be deleted as definition of
   // auxiliary variables.
   nOrigCons_ = constraints_. size ();
 
-  jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
+  jnlst_->Printf (Ipopt::J_SUMMARY, J_PROBLEM,
 		  "Problem size before standarization: %d variables (%d integer) %d constraints.\n",
 		  nOrig(), nIntVars(), nOrigCons());
 
@@ -91,7 +90,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 		  "Problem size after standarization: %d variables (%d integer) %d constraints.\n",
 		  nVars(), nIntVars(), nCons());
 
-  //  readOptimum ("ex2_1_2.txt");
+  //readOptimum ("nvs06.txt");
 
   if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
     // We should route that also through the journalist
@@ -100,9 +99,9 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
   if (base) {
     std::string s;
-    base -> options() -> GetStringValue("feasibility_bt",     s, "couenne."); doFBBT_ = (s == "yes");
-    base -> options() -> GetStringValue("optimality_bt",      s, "couenne."); doOBBT_ = (s == "yes");
-    base -> options() -> GetStringValue("aggressive_fbbt",    s, "couenne."); doABT_  = (s == "yes");
+    base -> options() -> GetStringValue ("feasibility_bt",     s, "couenne."); doFBBT_ = (s == "yes");
+    base -> options() -> GetStringValue ("optimality_bt",      s, "couenne."); doOBBT_ = (s == "yes");
+    base -> options() -> GetStringValue ("aggressive_fbbt",    s, "couenne."); doABT_  = (s == "yes");
     base -> options() -> GetIntegerValue ("log_num_obbt_per_level", logObbtLev_, "couenne.");
   }
 
@@ -272,7 +271,8 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
   // create new aux associated with that expression
   exprAux *w = new exprAux (symbolic,
 			    variables_ . size (), 
-			    1 + symbolic -> rank (this));
+			    1 + symbolic -> rank ());
+  //symbolic -> isInteger () ? exprAux::Integer : exprAux::Continuous);
 
   // seek expression in the set
   if ((i = auxSet_ -> find (w)) == auxSet_ -> end ()) {
@@ -323,4 +323,23 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
      "yes",
      "no","",
      "yes","");
+}
+
+
+/// translates pair (indices, coefficients) into vector with pointers to variables
+void CouenneProblem::indcoe2vector (int *index, 
+				    CouNumber *coeff,
+				    std::vector <std::pair <exprVar *, CouNumber> > &lcoeff) {
+  while (*index >= 0)
+    lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (*index++), *coeff++));
+}
+
+
+/// translates triplet (indicesI, indicesJ, coefficients) into vector with pointers to variables
+void CouenneProblem::indcoe2vector (int *indexI,
+				    int *indexJ,
+				    CouNumber *coeff,
+				    std::vector <quadElem> &qcoeff) {
+  while (*indexI >= 0)
+    qcoeff.push_back (quadElem (Var (*indexI++), Var (*indexJ++), *coeff++));
 }

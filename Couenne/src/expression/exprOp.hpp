@@ -14,8 +14,8 @@
 
 #include "expression.hpp"
 #include "CouenneTypes.hpp"
-#include "exprUnary.hpp"
 
+class CouenneProblem;
 
 /// general n-ary operator-type expression: requires argument
 /// list. All non-unary and non-leaf operators, i.e., sum,
@@ -26,8 +26,8 @@ class exprOp: public expression {
 
  protected:
 
-  expression **arglist_; //< argument list is an array of pointers to other expressions
-  int          nargs_;   //< number of arguments (cardinality of arglist)
+  expression **arglist_; ///< argument list is an array of pointers to other expressions
+  int          nargs_;   ///< number of arguments (cardinality of arglist)
 
  public:
 
@@ -70,7 +70,7 @@ class exprOp: public expression {
 
   /// I/O
   virtual void print (std::ostream &out = std::cout,
-		      bool = false, CouenneProblem * = NULL) const;
+		      bool = false) const;
 
   /// print position (PRE, INSIDE, POST)
   virtual enum pos printPos () const
@@ -80,20 +80,13 @@ class exprOp: public expression {
   virtual std::string printOp () const
     {return "??";}
 
-  /// function for the evaluation of the expression
-  //  virtual inline CouNumber operator () ();
-
-  /// dependence on variable set
-  //  virtual int dependsOn (int * = NULL, int = 1);
-
   /// fill in the set with all indices of variables appearing in the
   /// expression
   virtual inline int DepList (std::set <int> &deplist, 
-			      enum dig_type type = ORIG_ONLY,
-			      const CouenneProblem *p = NULL) {
+			      enum dig_type type = ORIG_ONLY) {
     int tot = 0;
     for (int i = nargs_; i--;)
-      tot += arglist_ [i] -> DepList (deplist, type, p);
+      tot += arglist_ [i] -> DepList (deplist, type);
     return tot;
   }
 
@@ -136,7 +129,7 @@ class exprOp: public expression {
   virtual int compare (exprOp &);
 
   /// used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *);
+  virtual int rank ();
 
   /// fill in dependence structure
   /// update dependence set with index of this variable
@@ -148,24 +141,5 @@ class exprOp: public expression {
   /// replace variable with other
   virtual void replace (exprVar *, exprVar *);
 };
-
-
-/// expression evaluation -- n-ary operator (non-variable, non-constant)
-
-/*
-inline CouNumber exprOp::operator () () {
-
-  /// Fetch argument list and compute it "recursively" (the operator()
-  /// of the elements in the list is called) to fill in the vector
-  /// containing the numerical value of the argument list.
-
-  register expression **al = arglist_;
-
-  for (register int i = nargs_; i--;) 
-    *++sp = (**al++) ();
-
-  return 0;
-}
-*/
 
 #endif

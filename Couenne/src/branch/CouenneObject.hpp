@@ -19,18 +19,22 @@
 
 #include "CouenneJournalist.hpp"
 
-//#include "CouObjStats.hpp"
-
-//class CouObjStats;
 
 /// Define what kind of branching (two- or three-way) and where to
-/// start from: left, (center,) or right. The last is to help diversify
-/// branching through randomization, which may help when the same
-/// variable is branched upon in several points of the BB tree.
+/// start from: left, (center,) or right. The last is to help
+/// diversify branching through randomization, which may help when the
+/// same variable is branched upon in several points of the BB tree.
 
 enum {TWO_LEFT,                 TWO_RIGHT,   TWO_RAND,
       THREE_LEFT, THREE_CENTER, THREE_RIGHT, THREE_RAND, BRANCH_NONE};
 
+//
+class funtriplet;
+CouNumber minMaxDelta (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
+CouNumber maxHeight   (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
+
+/// returns a point "inside enough" a given interval, or x if it is already
+CouNumber midInterval (CouNumber x, CouNumber l, CouNumber u);
 
 /// OsiObject for auxiliary variables $w=f(x)$. 
 ///
@@ -81,15 +85,27 @@ public:
   enum brSelStrat Strategy ()  const
   {return strategy_;}
 
+  /// pick branching point based on current strategy
+  CouNumber getBrPoint (funtriplet *ft, CouNumber x0, CouNumber y0, CouNumber l, CouNumber u) const {
+
+    switch (strategy_) {
+
+    case CouenneObject::MIN_AREA:     return maxHeight   (ft, x0, y0, l, u); break;
+    case CouenneObject::BALANCED:     return minMaxDelta (ft, x0, y0, l, u); break;
+    case CouenneObject::MID_INTERVAL: 
+    default:                          return midInterval (    x0,     l, u); break;
+    }
+  }
+
 protected:
 
-  /// The (auxiliary) variable which this branching object refers
-  /// to. If the expression is w=f(x,y), this is w, as opposed to
+  /// The (auxiliary) variable this branching object refers to. If the
+  /// expression is w=f(x,y), this is w, as opposed to
   /// CouenneBranchingObject, where it would be either x or y.
   exprVar *reference_;
 
   /// index on the branching variable
-  mutable int brVarInd_;
+  mutable expression *brVar_;
 
   /// where to branch. It is a vector in the event we want to use a
   /// ThreeWayBranching. Ends with a -COIN_DBL_MAX (not considered...)
@@ -102,19 +118,11 @@ protected:
   /// between the two methods.
   mutable int whichWay_;
 
-  /// statistics on use of this objects
-  //  mutable CouObjStats *stats_;
-
   /// Branching point selection strategy
   enum brSelStrat strategy_;
 
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 };
-
-//
-class funtriplet;
-CouNumber minMaxDelta (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
-CouNumber maxHeight   (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
 
 #endif

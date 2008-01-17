@@ -41,9 +41,8 @@ class exprClone: public exprCopy {
 
   /// I/O
   void print (std::ostream &out = std::cout, 
-	      bool descend      = false, 
-	      CouenneProblem *p = NULL) const
-    {copy_ -> Original () -> print (out, descend, p);}
+	      bool descend      = false) const
+    {copy_ -> Original () -> print (out, descend);}
 
   /// value
   inline CouNumber Value () const 

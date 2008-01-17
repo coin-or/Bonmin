@@ -8,16 +8,18 @@
  */
 
 #include "CouenneTypes.hpp"
+//#include "expression.hpp"
+//#include "exprAux.hpp"
 #include "exprMul.hpp"
-#include "exprPow.hpp"
-#include "exprDiv.hpp"
-#include "CouenneProblem.hpp"
+//#include "exprPow.hpp"
+//#include "exprDiv.hpp"
+//#include "CouenneProblem.hpp"
 #include "CouenneCutGenerator.hpp"
 
 
 /// generate convexification cut for constraint w = x*y
 
-void exprMul::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprMul::generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {

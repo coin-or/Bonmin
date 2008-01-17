@@ -7,23 +7,24 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneCutGenerator.hpp"
-#include "CouenneTypes.hpp"
-#include "expression.hpp"
 #include "exprAux.hpp"
-#include "exprVar.hpp"
-#include "CouenneProblem.hpp"
+#include "exprBound.hpp"
+#include "exprMax.hpp"
+#include "exprMin.hpp"
+#include "CglCutGenerator.hpp"
+
+class CouenneCutGenerator;
 
 //#define DEBUG
 
 // auxiliary expression Constructor
-exprAux::exprAux (expression *image, int index, int rank, bool integer): 
+exprAux::exprAux (expression *image, int index, int rank, enum intType isInteger): 
 
   exprVar       (index),
   image_        (image),
   rank_         (rank),
   multiplicity_ (1),
-  integer_      (integer) {
+  integer_      (isInteger) {
 
   // do this later, in standardize()
   //  image_ -> getBounds (lb_, ub_);
@@ -49,8 +50,8 @@ exprAux::exprAux (expression *image):
   ub_           (NULL),
   rank_         (-1),
   multiplicity_ (0),
-  integer_      (false) {}
-
+  integer_      (Unset) {}
+//(image -> isInteger () ? Integer : Continuous)
 
 /// Copy constructor
 exprAux::exprAux (const exprAux &e):
@@ -118,10 +119,10 @@ void exprAux::crossBounds () {
 
 
 /// I/O
-void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
+void exprAux::print (std::ostream &out, bool descend) const {
 
   if (descend) 
-    image_ -> print (out, descend, p);
+    image_ -> print (out, descend);
   else {
     if (integer_) out << "u_"; // TODO: should be isInteger instead of
 			       // integer_. Change all "isInteger()"
@@ -135,11 +136,10 @@ void exprAux::print (std::ostream &out, bool descend, CouenneProblem *p) const {
 /// fill in the set with all indices of variables appearing in the
 /// expression
 int exprAux::DepList (std::set <int> &deplist, 
-		      enum dig_type type,
-		      const CouenneProblem *p) {
+		      enum dig_type type) {
 
   if (type == ORIG_ONLY)   
-    return image_ -> DepList (deplist, type, p);
+    return image_ -> DepList (deplist, type);
 
   if (deplist.find (varIndex_) == deplist.end ())
     deplist.insert (varIndex_); 
@@ -148,7 +148,7 @@ int exprAux::DepList (std::set <int> &deplist,
   if (type == STOP_AT_AUX) 
     return 1;
 
-  return 1 + image_ -> DepList (deplist, type, p);
+  return 1 + image_ -> DepList (deplist, type);
 }
 
 
@@ -206,14 +206,14 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
       while (n--) {
 	if (fabs (el [n]) > COU_MAX_COEFF)  {
-	  printf ("### Warning: coefficient too large: %g x%d [", el [n], ind [n]);
+	  printf ("Couenne, warning: coefficient too large %g x%d: ", el [n], ind [n]);
 	  cut -> print (); 
 	  warned_large_coeff = true;
 	  break;
 	}
 
 	if (fabs (rhs) > COU_MAX_COEFF) {
-	  printf ("rhs too large %g: ", rhs);
+	  printf ("Couenne, warning: rhs too large (%g): ", rhs);
 	  cut -> print ();
 	  warned_large_coeff = true;
 	  break;
@@ -225,7 +225,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
   if ((nrc < cs.sizeRowCuts ()) || 
       (ncc < cs.sizeColCuts ()))
     {
-      printf ("----------------Generated cut for "); 
+      printf ("---------------- ConvCut:  "); 
       print (std::cout);  printf (" := ");
       image_ -> print (std::cout); 
 

@@ -22,13 +22,15 @@ void exprGroup::getBounds (expression *&lb, expression *&ub) {
 
   expression *lbnl, *ubnl;
 
+  // TODO: do not aggregate members of exprSum
+
   // compute lower/upper bound of nonlinear part
   exprSum::getBounds (lbnl, ubnl);
 
   // count linear and constant terms
-  int nlin = 0;
+  int nlin = lcoeff_.size();
   if (fabs (c0_) > COUENNE_EPS) nlin++;
-  for (register int *ind = index_; *ind++>=0; nlin++);
+  //  for (register int *ind = index_; *ind++>=0; nlin++);
 
   expression 
     **linall = new expression * [nlin + 1], // linear arglist for lower bound
@@ -40,12 +42,25 @@ void exprGroup::getBounds (expression *&lb, expression *&ub) {
     *linalu++ = new exprConst (c0_);
   }
 
-  for (register int *ind = index_, i=0; *ind>=0;) {
+  // derive linear part (obtain constant)
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
+    //    c0 += el -> second;
 
-    CouNumber coeff = coeff_ [i++];
+  /*  // derive quadratic part (obtain linear part)
+  for (sparseQ::iterator row = q_.begin (); row != q_.end (); ++row) {
 
-    expression *l = new exprLowerBound (*ind),
-               *u = new exprUpperBound (*ind++);
+    int xind = row -> first -> Index ();
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
+  */
+
+    //  for (register int *ind = index_, i=0; *ind>=0;) {
+
+    CouNumber coeff = el -> second;//coeff_ [i++];
+    int         ind = el -> first -> Index ();
+
+    expression *l = new exprLowerBound (ind),
+               *u = new exprUpperBound (ind);
 
     if (fabs (coeff - 1.) < COUENNE_EPS) {
       *linall++ = l;
@@ -74,7 +89,7 @@ void exprGroup::getBounds (expression *&lb, expression *&ub) {
 
 
 // generate equality between *this and *w
-void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprGroup::generateCuts (expression *w, const OsiSolverInterface &si, 
 			      OsiCuts &cs, const CouenneCutGenerator *cg,
 			      t_chg_bounds *chg, 
 			      int wind, CouNumber lb, CouNumber ub) {
@@ -86,12 +101,12 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
     return;
 
   // there is one linear term so far: -w
-  int nterms = 0;
+  int nterms = lcoeff_.size ();
 
   OsiRowCut *cut = new OsiRowCut;
 
   // count terms in linear part
-  for (register int *ind = index_; *ind++ >= 0; nterms++);
+  //  for (register int *ind = index_; *ind++ >= 0; nterms++);
 
   int displacement = (wind < 0) ? 1: 0;
 
@@ -109,14 +124,16 @@ void exprGroup::generateCuts (exprAux *w, const OsiSolverInterface &si,
   ub -= c0_;
 
   // now add linear terms
-  for (register int i=0; i<nterms; i++) {
+  lincoeff::iterator el = lcoeff_.begin ();
+  for (int i=0; el != lcoeff_.end (); ++el) {
+    //  for (register int i=0; i<nterms; i++) {
 
-    coeff [i + displacement] = coeff_ [i]; 
-    index [i + displacement] = index_ [i];
+    coeff [i   + displacement] = el -> second; 
+    index [i++ + displacement] = el -> first -> Index ();
   }
 
   // scan arglist for (aux) variables and constants
-  for (register int i=0; i<nargs_; i++) {
+  for (int i=0; i<nargs_; i++) {
 
     expression *curr = arglist_ [i];
 

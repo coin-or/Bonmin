@@ -19,9 +19,10 @@
 #include "exprGroup.hpp"
 #include "exprClone.hpp"
 #include "exprAux.hpp"
-
+#include "lqelems.hpp"
 #include "CouenneProblem.hpp"
 #include "CouenneProblemElem.hpp"
+#include "lqelems.hpp"
 
 /// update value of variables, bounds
 void CouenneProblem::update (const CouNumber *x, 
@@ -60,9 +61,9 @@ void CouenneProblem::update (const CouNumber *x,
 /// initialize auxiliary variables from original variables in the
 /// nonlinear problem
 
-void CouenneProblem::initAuxs (CouNumber *x, 
-			       CouNumber *l, 
-			       CouNumber *u) {
+void CouenneProblem::initAuxs (const CouNumber *x, 
+			       const CouNumber *l, 
+			       const CouNumber *u) {
 
   // update original variables only, that is, the first nVars ()
   // variables, as no auxiliaries exist yet
@@ -86,7 +87,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
   // only one loop is sufficient here, since auxiliary variable are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
 
-  Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "Initial bounds for aux (initAuxs):\n");
+  //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "Initial bounds for aux (initAuxs):\n");
 
   for (int j=0, i=nVars (); i--; j++) {
 
@@ -96,7 +97,7 @@ void CouenneProblem::initAuxs (CouNumber *x,
 
       exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
 
-      Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
+      //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
 
       // set bounds 
       if ((lb_[ord] = CoinMax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord]=-DBL_MAX;
@@ -104,9 +105,16 @@ void CouenneProblem::initAuxs (CouNumber *x,
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
-      Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, " --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
+      //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, " --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
 
       x_ [ord] = CoinMax (lb_ [ord], CoinMin (ub_ [ord], (*(aux -> Image ())) ()));
+
+      bool integer = variables_ [ord] -> isInteger ();
+
+      if (integer) {
+	lb_ [ord] = ceil  (lb_ [ord] - COUENNE_EPS);
+	ub_ [ord] = floor (ub_ [ord] + COUENNE_EPS);
+      }
     }
   }
 }
@@ -134,12 +142,10 @@ void CouenneProblem::getAuxs (CouNumber * x) const {
   for (register int j = 0, i = nVars (); i--; j++) {
 
     exprVar *var = variables_ [numbering_ [j]];
+
     if (var -> Type () == AUX)
       x [var -> Index ()] = 
-	//	(var -> Type () == AUX) ? 
-	  (*(var -> Image ())) () 
-	//	  (*var) ()
-	;
+	(*(var -> Image ())) ();
   }
 
   // get the x and the bound vectors back to their previous state
@@ -177,11 +183,23 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
   case COU_EXPRGROUP: { // 
 
     exprGroup *eg    = dynamic_cast <exprGroup *> (body);
-    int       *index = eg -> getIndices ();
-    CouNumber *coeff = eg -> getCoeffs  ();
+    //    int       *index = eg -> getIndices ();
+    //    CouNumber *coeff = eg -> getCoeffs  ();
 
-    if (sense == MINIMIZE) while (*index >= 0) obj [*index++] =  *coeff++;
-    else                   while (*index >= 0) obj [*index++] = -*coeff++;      
+    const exprGroup::lincoeff &lcoe = eg -> lcoeff ();
+
+    //    if (sense == MINIMIZE) while (*index >= 0) obj [*index++] =  *coeff++;
+    //    else                   while (*index >= 0) obj [*index++] = -*coeff++;      
+
+    for (int n = lcoe.size (), i=0; n--; i++)
+      //exprGroup::lincoeff::iterator el = lcoe.begin (); el != lcoe.end (); ++el)
+      obj [lcoe [i]. first -> Index ()] = 
+	(sense == MINIMIZE) ? 
+	 (lcoe [i]. second) : 
+	-(lcoe [i]. second);
+
+    //    deps += el -> first -> DepList (deplist, type, p);
+
   } // no break, as exprGroup is derived from exprSum
 
   case COU_EXPRSUM: { // 
@@ -225,10 +243,19 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 /// set cutoff from NLP solution
 void CouenneProblem::setCutOff (CouNumber cutoff) 
 {
+
+  int indobj = objectives_ [0] -> Body () -> Index ();
+
   // AW: Should we use the value of the objective variable computed by 
   //     Couenne here?
-  pcutoff_ -> setCutOff (cutoff + 1e-8 * fabs (cutoff));
-  //  cutoff_ = cutoff + 1e-4 * fabs (cutoff);
+  if (cutoff < pcutoff_ -> getCutOff () - COUENNE_EPS) {
+
+    Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
+		    "Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",
+		    cutoff, indobj, ub_ [indobj]);
+
+    pcutoff_ -> setCutOff (cutoff + 1e-7 * fabs (1 + cutoff));
+  }
 } // tolerance needed to retain feasibility
 
 
@@ -240,19 +267,13 @@ void CouenneProblem::installCutOff () {
 
   if (indobj >= 0) {
 
-    //if (objectives_ [0] -> Sense () == MINIMIZE) 
-    //{if (cutoff_ < ub_ [indobj]) ub_ [indobj] = cutoff_;}
-    //else
-    //{if (cutoff_ > lb_ [indobj]) lb_ [indobj] = cutoff_;}
+    //if (objectives_ [0] -> Sense () == MINIMIZE){if (cutoff_<ub_ [indobj]) ub_ [indobj] = cutoff_;}
+    //else                                        {if (cutoff_>lb_ [indobj]) lb_ [indobj] = cutoff_;}
 
     // all problem are assumed to be minimization
     double cutoff = pcutoff_->getCutOff();
 
-    if (cutoff < ub_ [indobj]) {
-      Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
-		      "Installing cutoff %e for optimization variable index %d val = %e\n",
-		      cutoff, indobj, ub_ [indobj]);
+    if (cutoff < ub_ [indobj])
       ub_ [indobj] = cutoff;
-    }
   }
 }

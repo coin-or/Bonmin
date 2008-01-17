@@ -12,93 +12,94 @@
 
 //#define DEBUG
 
-CouNumber computeQBound (int sign, exprQuad *e) {
+CouNumber exprQuad::computeQBound (int sign) {
 
-  // compute lower (if sign == -1) or upper (sign == +1) bound of an
+  // 1) loose: disaggregated bound
+  // 2) tighter: aggregate coefficient per variable
+  // 3) tightest: solve (convex) QP on available alpha-convexification
+
+  // 1) loose bound
+  //
+  // w = a0 + a'x + x'Qx means that its lower bound is
+  //
+  // w_l = a0 + a'_+ x_l + a'_- x_u + \sum_
+
+
+  // 2) tighter bound -- TODO
+  //
+  // Compute lower (if sign == -1) or upper (sign == +1) bound of an
   // exprQuad based on the information obtained through
   // alpha-convexification, if any, or as follows:
   //
   // w = a0 + a'x + x'Qx = 
-  //   = a0 + sum{i} [(a_i + sum {j} q_ij * x_j) * x_i] =
-  //   = a0 + sum{i} [                       z_i * x_i]
+  //   = a0 + sum{i} [(a_i + sum {j>=i} q_ij * x_j) * x_i] =
+  //   = a0 + sum{i} [                          z_i * x_i]
   // 
-  // So some bound on z_i can be computed and a bound on the whole
+  // Thus, some bound on z_i can be computed and a bound on the whole
   // expression should be better than what can be obtained by summing
   // all bounds separately.
   //
   // Notice that the above computation is fast and may be better than
   // the convexification after some updates in the variable bounds
   // without updating the convexification. Notice also that the
-  // direction can also be vertical, not only horizontal
-
-  int 
-    nlt = e -> getnLTerms (),
-    *li = e -> getIndices (),
-
-    nqt = e -> getnQTerms (),
-    *qi = e -> getQIndexI (),
-    *qj = e -> getQIndexJ ();
+  // direction can also be vertical, not only horizontal.
 
   CouNumber
-    *lc = e -> getCoeffs  (),
-    *qc = e -> getQCoeffs (),
+    bound = c0_,
     *lb = expression::Lbounds (),
     *ub = expression::Ubounds (),
-    bound = e -> getc0 (),
     term;
 
-#ifdef DEBUG
-  printf ("\n");
-  for (int i=0; i<12; i++) printf ("%3d [%g,%g]\n",i, lb [i], ub [i]);
-  e -> print ();
-  printf ("\n (%g)\n ", bound);
-#endif
+  // derive linear part (obtain constant)
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
 
-  if (sign < 0) { // compute lower bound ////////////////////////////////////////////////
+    CouNumber coe = el -> second, term = 0.;
+    int ind = el -> first -> Index ();
 
-    while (nlt--) {
+    if ((coe < 0.) && (sign < 0) || 
+	(coe > 0.) && (sign > 0)) 
+      {if    ((term=ub[ind]) > COUENNE_INFINITY) return (sign<0)? -COUENNE_INFINITY:COUENNE_INFINITY;}
+    else {if ((term=lb[ind]) <-COUENNE_INFINITY) return (sign<0)? -COUENNE_INFINITY:COUENNE_INFINITY;}
 
-#ifdef DEBUG
-      printf ("lin %d %g %g ", *li, *lc, (*lc < 0) ? ub [*li] : lb [*li]);
-#endif
+    bound += coe * term;
+  }
 
-      if (*lc < 0) {if ((term = ub [*li++]) >  COUENNE_INFINITY) return -COUENNE_INFINITY;} 
-      else         {if ((term = lb [*li++]) < -COUENNE_INFINITY) return -COUENNE_INFINITY;}
+  // derive quadratic part (obtain linear part)
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-      bound += *lc++ * term;
-
-#ifdef DEBUG
-      printf (" --> %g\n", bound);
-#endif
-    }
-
-    while (nqt--) {
-
-      int i = *qi++,
-          j = *qj++;
+    int xind = row -> first -> Index ();
 
       CouNumber 
-	coe = *qc++,
-	lbi = lb [i],
-	ubi = ub [i];
+	lbi = lb [xind],
+	ubi = ub [xind];
 
-      if (i==j) {
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
-	if (coe > 0) term = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0;
-	else if ((term = CoinMax (lbi*lbi, ubi*ubi)) > COUENNE_INFINITY) 
-	  return -COUENNE_INFINITY;
+      int yind = col -> first -> Index ();
+
+      CouNumber coe = col -> second;
+
+      if (xind == yind) { // term of the form q_ii x_i^2
+
+	if ((coe > 0.) && (sign < 0) ||
+	    (coe < 0.) && (sign > 0)) 
+	  term = (ubi < 0) ? (ubi * ubi) : (lbi > 0) ? (lbi * lbi) : 0.; //min{xi^2: xi in [lbi,ubi]
+	else 
+	  if ((term = CoinMax (lbi*lbi, ubi*ubi)) > COUENNE_INFINITY) 
+	    return (sign < 0) ? -COUENNE_INFINITY : COUENNE_INFINITY;
 
 	term *= coe;
 
 #ifdef DEBUG
-	printf ("Qii %d %g %g -> %g\n", i, coe, term, bound + term);
+	printf ("Qii %d %g %g -> %g\n", xind, coe, term, bound + term);
 #endif
       } else {
 
 	coe *= 2;
 
 	CouNumber
-	  lbj = lb [j], ubj = ub [j],
+	  lbj = lb [yind], 
+	  ubj = ub [yind],
 	  b1 = coe * lbi * lbj, 
 	  b2 = coe * lbi * ubj,
 	  b3 = coe * ubi * lbj, 
@@ -109,91 +110,19 @@ CouNumber computeQBound (int sign, exprQuad *e) {
 	if (fabs (ubi) == 0) b3 = b4 = 0;
 	if (fabs (ubj) == 0) b2 = b4 = 0;
 
-	if ((term = CoinMin (CoinMin (b1, b2), CoinMin (b3, b4))) < -COUENNE_INFINITY) 
-	  return -COUENNE_INFINITY; 
+	if (sign < 0) {
+	  if ((term = CoinMin (CoinMin (b1, b2), CoinMin (b3, b4))) < -COUENNE_INFINITY) 
+	    return -COUENNE_INFINITY; 
+	} else
+	  if ((term = CoinMax (CoinMax (b1, b2), CoinMax (b3, b4))) >  COUENNE_INFINITY)
+	    return  COUENNE_INFINITY;
 
 #ifdef DEBUG
-	printf ("Qij %d %d %g %g -> %g\n", i, j, coe, term, bound + term);
+	printf ("Qij %d %d %g %g -> %g\n", xind, yind, coe, term, bound + term);
 #endif
       }
 
       //      if ((i!=j) || (lbi >= 0) || (ubi <= 0))
-      bound += term;
-    }
-  } else { // compute upper bound /////////////////////////////////////////////////////////////
-
-    while (nlt--) { // linear part
-
-#ifdef DEBUG
-      printf ("lin %d %g %g %g\n", *li, *lc, (*lc < 0) ? ub [*li] : lb [*li], bound);
-#endif
-
-      if (*lc > 0) {if ((term = ub [*li++]) >  COUENNE_INFINITY) return COUENNE_INFINITY;}
-      else         {if ((term = lb [*li++]) < -COUENNE_INFINITY) return COUENNE_INFINITY;}
-
-      bound += *lc++ * term;
-    }
-
-    while (nqt--) { // quadratic part
-
-      int i = *qi++,
-          j = *qj++;
-
-      CouNumber 
-	coe = *qc++,
-	lbi = lb [i], 
-	ubi = ub [i];
-
-      if (i==j) {
-
-	if (coe > 0) term = CoinMax (lbi * lbi, ubi * ubi);
-	else         term = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0;
-
-	if (term > COUENNE_INFINITY) 
-	  return COUENNE_INFINITY;
-
-	term *= coe;
-
-#ifdef DEBUG
-	printf ("Qii %d %g %g --> %g ", i, coe, term, bound + term);
-#endif
-      } else {
-
-	coe *= 2;
-
-	CouNumber 
-	  lbj = lb [j], 
-	  ubj = ub [j],
-	  b1 = coe * lbi * lbj,
-	  b2 = coe * lbi * ubj,
-	  b3 = coe * ubi * lbj,
-	  b4 = coe * ubi * ubj;
-
-	// I hate this... but when you see 
-	//
-	//   CoinMax (CoinMax (-0, nan), CoinMax (nan, -inf)) =
-	// = CoinMax (nan, -inf) = -inf
-	//
-	// you feel changed.
-
-	if (fabs (lbi) == 0) b1 = b2 = 0;
-	if (fabs (lbj) == 0) b1 = b3 = 0;
-	if (fabs (ubi) == 0) b3 = b4 = 0;
-	if (fabs (ubj) == 0) b2 = b4 = 0;
-
-	if ((term = CoinMax (CoinMax (b1, b2), CoinMax (b3, b4))) > COUENNE_INFINITY)
-	  return COUENNE_INFINITY;
-
-#ifdef DEBUG
-	printf ("Qij %d %d %g %g -> %g [%g,%g,%g,%g] (%g,%g,%g,%g) {%g,%g,%g}\n", 
-		i, j, coe, term, bound + term,
-		lbi, ubi, lbj, ubj, 
-		b1, b2, b3, b4,
-		CoinMax (b1, b2), CoinMax (b3, b4),
-		CoinMax (CoinMax (b1, b2), CoinMax (b3, b4)));
-#endif
-      }
-
       bound += term;
     }
   }

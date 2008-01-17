@@ -17,7 +17,7 @@
 
 
 /// generic approach for negative powers (commom with exprInv::selectBranch
-CouNumber negPowSelectBranch (const CouenneObject *obj, int ind, 
+CouNumber negPowSelectBranch (const CouenneObject *obj, 
 			      double * &brpts, 
 			      int &way,
 			      CouNumber k,
@@ -146,14 +146,15 @@ CouNumber negPowSelectBranch (const CouenneObject *obj, int ind,
   // last case: nice finite interval and limited curve
 
   powertriplet ft (k);
+  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
 
-  switch (obj -> Strategy ()) {
+  /*switch (obj -> Strategy ()) {
 
   case CouenneObject::MIN_AREA:     *brpts = maxHeight   (&ft, x0, y0, l, u); break;
   case CouenneObject::BALANCED:     *brpts = minMaxDelta (&ft, x0, y0, l, u); break;
   case CouenneObject::MID_INTERVAL: 
   default:                          *brpts = midInterval (     x0,     l, u); break;
-  }
+  }*/
 
   /*
   // TODO: check if it works with all exponents
@@ -184,12 +185,15 @@ CouNumber negPowSelectBranch (const CouenneObject *obj, int ind,
 
 CouNumber exprInv::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
-				 int &ind, 
+				 expression *&var,
 				 double * &brpts, 
 				 int &way) {
 
-  ind    = argument_           -> Index ();
-  int wi = obj -> Reference () -> Index ();
+  var = argument_;
+
+  int
+    ind = argument_           -> Index (),
+    wi  = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0));
 
@@ -198,5 +202,5 @@ CouNumber exprInv::selectBranch (const CouenneObject *obj,
             l  = info -> lower_    [ind],
             u  = info -> upper_    [ind];
 
-  return negPowSelectBranch (obj, ind, brpts, way, -1, x0, y0, l,  u);
+  return negPowSelectBranch (obj, brpts, way, -1, x0, y0, l,  u);
 }

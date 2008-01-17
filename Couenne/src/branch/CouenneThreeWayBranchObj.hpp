@@ -30,20 +30,20 @@ public:
 
   /// Constructor
   CouenneThreeWayBranchObj (JnlstPtr jnlst,
-			    int, 
+			    expression *, 
 			    CouNumber,
 			    CouNumber, 
-			    int  = THREE_CENTER,
-			    bool = false);
+			    int  = THREE_CENTER
+			    //bool = false
+			    );
 
   /// Copy constructor
   CouenneThreeWayBranchObj (const CouenneThreeWayBranchObj &src):
     OsiBranchingObject (src),
-    index_ (src.index_),
+    brVar_ (src.brVar_),
     lcrop_ (src.lcrop_),
     rcrop_ (src.rcrop_),
     firstBranch_ (src.firstBranch_),
-    integer_     (src.integer_),
     jnlst_ (src.jnlst_){}
 
   /// Cloning method
@@ -63,7 +63,7 @@ protected:
   /// The variable this branching object refers to. If the
   /// corresponding CouenneObject was created on w=f(x,y), it is
   /// either x or y.
-  int index_;
+  expression *brVar_;
 
   CouNumber lcrop_;  ///< left divider
   CouNumber rcrop_;  ///< right divider
@@ -72,7 +72,7 @@ protected:
   int firstBranch_;
 
   /// True if the associated variable is integer
-  bool integer_;
+  //  bool integer_;
 
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;

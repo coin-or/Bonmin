@@ -13,11 +13,7 @@
 #include "CouenneBranchingObject.hpp"
 #include "CouenneThreeWayBranchObj.hpp"
 
-#include "exprGroup.hpp"
-#include "exprQuad.hpp"
-
 //#define DEBUG
-
 
 /// return difference between current value
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, 
@@ -26,7 +22,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   // whichWay should be set to which branch first (for two-way branching?)
   // if selectBranch not called, choose one at random
   whichWay_ = whichWay = TWO_LEFT;
-  brVarInd_ = -1;
+  brVar_ = NULL;
 
   // infeasibility is always null for linear expressions
   assert ((reference_ -> Image () -> Linearity () > LINEAR) && 
@@ -47,27 +43,26 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   /// avoid branching on (relatively and absolutely) small deltas
 
   if ((delta                           < COUENNE_EPS) || 
-      (delta / (1 + fabs (var + expr)) < COUENNE_EPS))
-    {
+      (delta / (1 + fabs (var + expr)) < COUENNE_EPS)) {
+
 #if BR_TEST_LOG >= 0 && defined DEBUG
-      if (reference_ -> Image () -> code () == COU_EXPRLOG) {
-	printf ("---- found feasible point on curve: ");
-	reference_ -> print (); printf (" := ");
-	reference_ -> Image () -> print ();
-	printf ("\n");
-      }
-#elif defined DEBUG
-   printf ("----|%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
-	   var, expr, 
-	   //	    expression::Lbound (reference_ -> Index ()),
-	   //	    expression::Ubound (reference_ -> Index ()),
-	   fabs (var - expr), delta, whichWay, brVarInd_);
-   reference_             -> print (std::cout); std::cout << " = ";
-   reference_ -> Image () -> print (std::cout); printf ("\n");
-   return 0.;
-#endif
-      return 0.;
+    if (reference_ -> Image () -> code () == COU_EXPRLOG) {
+      printf ("---- found feasible point on curve: ");
+      reference_ -> print (); printf (" := ");
+      reference_ -> Image () -> print ();
+      printf ("\n");
     }
+#elif defined DEBUG
+    printf ("----|%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
+	    var, expr, 
+	    //	    expression::Lbound (reference_ -> Index ()),
+	    //	    expression::Ubound (reference_ -> Index ()),
+	    fabs (var - expr), delta, whichWay, reference_ -> Index ());
+    reference_             -> print (std::cout); std::cout << " = ";
+    reference_ -> Image () -> print (std::cout); printf ("\n");
+#endif
+    return 0.;
+  }
 
   // a nonlinear constraint w = f(x) is violated. The infeasibility
   // is given by something more elaborate than |w-f(x)|, that is, it
@@ -100,10 +95,10 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 #endif
 
   CouNumber improv = reference_ -> Image () -> 
-    selectBranch (this, info,                   // input parameters
-		  brVarInd_, brPts_, whichWay); // result: who, where, and how to branch
+    selectBranch (this, info,                // input parameters
+		  brVar_, brPts_, whichWay); // result: who, where, and how to branch
 
-  if (brVarInd_ >= 0) {
+  if (brVar_) {
 
 #ifdef DEBUG
     if (improv <= COUENNE_EPS) {
@@ -113,21 +108,23 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     }
 #endif
 
-    delta = improv;
+    if (improv > COUENNE_EPS) delta = improv;
     whichWay_ = whichWay;
 
     // TODO: test this, if commented gives A LOT of problems in nvs24
 
-    if (info -> lower_ [brVarInd_] >= 
-	info -> upper_ [brVarInd_] - COUENNE_EPS) {
+    int index = brVar_ -> Index ();
+
+    if (info -> lower_ [index] >= 
+	info -> upper_ [index] - COUENNE_EPS) {
 
 #ifdef DEBUG
       printf ("### warning, tiny bounding box [%g,%g] for x_%d\n", 
-	      info -> lower_ [brVarInd_],
-	      info -> upper_ [brVarInd_], brVarInd_);
+	      info -> lower_ [index],
+	      info -> upper_ [index], index);
 #endif
 
-      delta = 0;
+      delta = 0.;
     }
   }
 
@@ -141,9 +138,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   printf ("Inf |%+g - %+g| = %+g  (delta=%+g) way %d, ind %d. ",  ////[%.2f,%.2f]
 #endif
 	  var, expr, 
-	  //	    expression::Lbound (reference_ -> Index ()),
-	  //	    expression::Ubound (reference_ -> Index ()),
-	  fabs (var - expr), delta, whichWay, brVarInd_
+	  fabs (var - expr), delta, whichWay, brVar_ -> Index ()
 #if BR_TEST_LOG >= 0
 	  , info -> lower_ [BR_TEST_LOG]
 	  , info -> upper_ [BR_TEST_LOG]

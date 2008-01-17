@@ -29,11 +29,9 @@ expression *exprInv::differentiate (int index) {
 // printing
 
 void exprInv::print (std::ostream &out, 
-		     bool descend, 
-		     CouenneProblem *p) const {
-//void exprInv::print (std::ostream& out) const 
+		     bool descend) const {
   out << "(1/(";
-  argument_ -> print (out, descend, p);
+  argument_ -> print (out, descend);
   out << "))";
 }
 //  exprUnary::print (out, "1/", PRE);}

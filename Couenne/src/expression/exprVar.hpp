@@ -17,8 +17,6 @@
 #include "expression.hpp"
 #include "exprConst.hpp"
 
-class CouenneProblem;
-
 
 /// variable-type operator
 ///
@@ -57,25 +55,25 @@ class exprVar: public expression {
     {return varIndex_;}
 
   /// for compatibility with exprAux
-  virtual inline expression *Image () const
-    {return NULL;}
+  //virtual inline expression *Image () const
+  //{return NULL;}
 
-  // Bound get
+  // Bounds
   virtual expression *Lb (); ///< get lower bound expression
   virtual expression *Ub (); ///< get upper bound expression
 
+  // Bounds
+  virtual CouNumber lb () {return expression::lbounds_ [varIndex_];} ///< lower bound
+  virtual CouNumber ub () {return expression::ubounds_ [varIndex_];} ///< upper bound
+
   /// print
   virtual void print (std::ostream &out = std::cout,
-		      bool = false, CouenneProblem * = NULL) const
+		      bool = false) const
     {out << "x_" << varIndex_;}
 
   /// return the value of the variable
   virtual inline CouNumber operator () () 
     {return expression::variables_ [varIndex_];}
-
-  /// return the value of the variable
-  //  inline CouNumber Value ()
-  //    {return currValue_;}
 
   /// differentiation
   virtual inline expression *differentiate (int index) 
@@ -84,8 +82,7 @@ class exprVar: public expression {
   /// fill in the set with all indices of variables appearing in the
   /// expression
   virtual inline int DepList (std::set <int> &deplist, 
-			      enum dig_type type = ORIG_ONLY,
-			      const CouenneProblem * = NULL) {
+			      enum dig_type type = ORIG_ONLY) {
 
     if (deplist.find (varIndex_) == deplist.end ()) {
       deplist.insert (varIndex_); 
@@ -106,9 +103,11 @@ class exprVar: public expression {
   virtual inline int Linearity ()
     {return LINEAR;}
 
-  /// is this expression integer?
-  virtual inline bool isInteger ()
-    {return false;}
+  /// is this variable integer?
+  virtual inline bool isInteger () {
+    CouNumber lb = (*(Lb ())) (); 
+    return ((fabs (lb - (*(Ub ())) ()) < COUENNE_EPS) && (::isInteger (lb)));
+  }
 
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
@@ -121,7 +120,8 @@ class exprVar: public expression {
 			     CouNumber =  COUENNE_INFINITY) {}
 
   /// generate convexification cut for constraint w = this
-  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  virtual void generateCuts (expression *w, 
+			     const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg, 
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
@@ -138,11 +138,15 @@ class exprVar: public expression {
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// rank of an original variable is always one
-  virtual int rank (CouenneProblem *p) 
+  virtual int rank () 
     {return 1;}
 
   /// update dependence set with index of this variable
   virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *);
+
+  /// is this variable fixed?
+  virtual inline bool isFixed ()
+  {return (fabs ((*(Lb ())) () - (*(Ub ())) ()) < COUENNE_EPS);}
 };
 
 #endif

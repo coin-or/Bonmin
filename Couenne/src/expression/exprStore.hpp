@@ -44,10 +44,6 @@ class exprStore: public exprCopy {
   virtual exprStore *clone () const
     {return new exprStore (*this);}
 
-  /// value (the saved one)
-  //  virtual inline CouNumber Value () const 
-  //    {return value_;}
-
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
     {return (copy_ -> Value ());}

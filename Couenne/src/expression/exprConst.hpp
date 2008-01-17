@@ -50,7 +50,7 @@ public:
 
   /// I/O
   void print (std::ostream &out = std::cout, 
-	      bool = false, CouenneProblem * = NULL) const
+	      bool = false) const
     {out << value_;}
 
   /// return constant's value
@@ -62,9 +62,7 @@ public:
     {return new exprConst (0.);}
 
   /// dependence on variable set
-  int dependsOn (int *ind, int n, 
-		 CouenneProblem *p = NULL, 
-		 enum dig_type   type = STOP_AT_AUX)
+  int dependsOn (int *ind, int n, enum dig_type type = STOP_AT_AUX)
     {return 0;}
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
@@ -78,7 +76,7 @@ public:
   }
 
   /// generate convexification cut for constraint w = this
-  void generateCuts (exprAux *, const OsiSolverInterface &, 
+  void generateCuts (expression *, const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 
@@ -90,10 +88,10 @@ public:
 
   /// is this expression integer?
   virtual bool isInteger () 
-  {return (fabs (value_ - COUENNE_round (value_)) < COUENNE_EPS);}
+  {return ::isInteger (value_);}
 
   /// used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *p)
+  virtual int rank ()
     {return 0;} 
 };
 

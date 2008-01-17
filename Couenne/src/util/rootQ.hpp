@@ -10,12 +10,10 @@
 #include "CouenneTypes.hpp"
 #include <map>
 
-/// Find roots of polynomial $Q^k(x) = \sum_{i=1}^{2k} i x^{i-1}$. Used
+/// Find roots of polynomial $Q^k(x) = \f$\sum_{i=1}^{2k} i x^{i-1}\f$. Used
 /// in convexification of powers with odd exponent
+CouNumber rootQ (int k);
 
-//extern "C" {
-  CouNumber rootQ (int k);
-//}
 
 /// class that stores result of previous calls to rootQ into a map for
 /// faster access

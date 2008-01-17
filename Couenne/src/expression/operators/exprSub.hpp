@@ -63,14 +63,14 @@ class exprSub: public exprOp {
   virtual exprAux *standardize (CouenneProblem *p, bool addAux = true);
 
   /// Special version for linear constraints
-  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+  virtual void generateCuts (expression *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,
 			     t_chg_bounds * = NULL, int = -1,
 			     CouNumber = -COUENNE_INFINITY, 
 			     CouNumber =  COUENNE_INFINITY);
 
   /// is this expression integer?
-  virtual bool isInteger ();
+  //virtual bool isInteger ();
 
   /// Code for comparisons
   virtual enum expr_type code () {return COU_EXPRSUB;}

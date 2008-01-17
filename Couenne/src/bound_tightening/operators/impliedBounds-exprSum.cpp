@@ -7,18 +7,20 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include "CoinHelperFunctions.hpp"
 #include "exprSum.hpp"
 #include "exprGroup.hpp"
 
-
 /// vector operation to find bound to variable in a sum
-static long double scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
+static CouNumber scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
 
 
 /// implied bound processing for expression w = x+y+t+..., upon change
 /// in lower- and/or upper bound of w, whose index is wind
 
 bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
+
+  //return false; // !!!
 
   /**
    *  An expression 
@@ -46,18 +48,22 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // compute number of pos/neg coefficients and sum up constants
 
-  int nterms = nargs_; // # nonconstant terms
-  int nlin   = 0;      // # linear terms
+  int 
+    nterms = nargs_, // # nonconstant terms
+    nlin   = 0;      // # linear terms
 
-  long double a0 = 0.;   // constant term in the sum
+  CouNumber a0 = 0.;   // constant term in the sum
 
-  if (code () == COU_EXPRGROUP) { // if exprGroup, compute no. linear terms
+  exprGroup *eg = NULL;
 
-    a0 +=      dynamic_cast <exprGroup *> (this) -> getc0      ();
-    int *ind = dynamic_cast <exprGroup *> (this) -> getIndices ();
+  bool isExprGroup = (code () == COU_EXPRGROUP);
 
-    while (*ind++ >= 0) // count linear terms 
-      nlin++;
+  if (isExprGroup) { // if exprGroup, compute no. linear terms
+
+    eg = dynamic_cast <exprGroup *> (this);
+
+    a0   += eg -> getc0 ();
+    nlin += eg -> lcoeff (). size ();
   }
 
   nterms += nlin;
@@ -71,15 +77,21 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   int       *I1 = (int       *) malloc (nterms * sizeof (int)),
             *I2 = (int       *) malloc (nlin   * sizeof (int));
 
+  /*CoinFillN (C1, nterms, 0.);
+  CoinFillN (C2, nlin,   0.);
+
+  CoinFillN (I1, nterms, 0);
+  CoinFillN (I2, nlin,   0);*/
+
   int ipos, ineg = ipos = 0; // #pos and #neg terms
 
   // classify terms as positive or constant for the exprSum
 
   for (int i = nargs_; i--;) {
 
-    register int index = arglist_ [i] -> Index ();
+    int index = arglist_ [i] -> Index ();
 
-    if (index == -1)
+    if (index < 0) // assume a non variable is a constant
       a0 += arglist_ [i] -> Value ();
     else {
       I1 [ipos]   = index;
@@ -89,23 +101,32 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // classify terms as pos/neg or constant for the remaining of exprGroup
 
-  if (code () == COU_EXPRGROUP) {
+  if (isExprGroup) {
 
-    int       *ind = dynamic_cast <exprGroup *> (this) -> getIndices ();
-    CouNumber *coe = dynamic_cast <exprGroup *> (this) -> getCoeffs  ();
+    exprGroup::lincoeff &lcoe = eg -> lcoeff ();
 
-    for (;*ind >= 0; ind++, coe++)
-      if      (*coe >   COUENNE_EPS) {I1 [ipos] = *ind; C1 [ipos++] = *coe;}
-      else if (*coe < - COUENNE_EPS) {I2 [ineg] = *ind; C2 [ineg++] = *coe;}
+    for (exprGroup::lincoeff::iterator el = lcoe.begin ();
+	 el != lcoe.end (); ++el) {
+
+      CouNumber coe = el -> second;
+      int       ind = el -> first -> Index ();
+
+      if      (coe >  0.) {I1 [ipos] = ind; C1 [ipos++] = coe;}
+      else if (coe < -0.) {I2 [ineg] = ind; C2 [ineg++] = coe;}
+    }
   }
 
   // realloc to save some memory
 
-  I1 = (int *) realloc (I1, ipos * sizeof (int));
+  /*I1 = (int *) realloc (I1, ipos * sizeof (int));
   I2 = (int *) realloc (I2, ineg * sizeof (int));
 
   C1 = (CouNumber *) realloc (C1, ipos * sizeof (CouNumber));
-  C2 = (CouNumber *) realloc (C2, ineg * sizeof (CouNumber));
+  C2 = (CouNumber *) realloc (C2, ineg * sizeof (CouNumber));*/
+
+  /*printf ("  a0 = %g\n", a0);
+  printf ("  pos: "); for (int i=0; i<ipos; i++) printf ("%g x%d [%g,%g] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]); printf ("\n");
+  printf ("  neg: "); for (int i=0; i<ineg; i++) printf ("%g x%d [%g,%g] ", C2 [i], I2 [i], l [I2 [i]], u [I2 [i]]); printf ("\n");*/
 
   // now we have correct  I1, I2, C1, C2, ipos, ineg, and a0
 
@@ -124,14 +145,14 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   // upper = $a0 + \sum_{i in I_1: a_i <  \infinity} a_i u_i
   //             + \sum_{i in I_2: a_i > -\infinity} a_i l_i$
 
-  long double
+  CouNumber
 
     lower = a0 + scanBounds (ipos, -1, I1, C1, l, &infLo1)
                + scanBounds (ineg, +1, I2, C2, u, &infUp2),
 
     upper = a0 + scanBounds (ipos, +1, I1, C1, u, &infUp1)
                + scanBounds (ineg, -1, I2, C2, l, &infLo2);
-  
+
   // Now compute lower bound for all or for some of the variables:
   // There is a bound for all variables only if both infUp1 and infLo2
   // are -1, otherwise there is a bound only for one variable if one
@@ -172,6 +193,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	// propagate upper bound to w
 	if (updateBound (+1, u + wind, upper)) {
 	  chg [wind].setUpper(t_chg_bounds::CHANGED);
+	  tighter = true;
 	}
 
 	free (I1); free (I2);
@@ -285,12 +307,12 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
 /// sum bounds depending on coefficients
 
-static long double scanBounds (int        num,      /// cardinality of the set (I1 or I2)
-			       int        sign,     /// +1: check for +inf, -1: check for -inf
-			       int       *indices,  /// indices in the set, $i\in I_k$
-			       CouNumber *coeff,    /// coefficients in the set
-			       CouNumber *bounds,   /// variable bounds to check 
-			       int       *infnum) { /// return value: index of variable with infinite
+static CouNumber scanBounds (int        num,      /// cardinality of the set (I1 or I2)
+			     int        sign,     /// +1: check for +inf, -1: check for -inf
+			     int       *indices,  /// indices in the set, $i\in I_k$
+			     CouNumber *coeff,    /// coefficients in the set
+			     CouNumber *bounds,   /// variable bounds to check 
+			     int       *infnum) { /// return value: index of variable with infinite
                                                   /// bound, or -2 if more than one exist
   CouNumber bound = 0.;
 
@@ -300,9 +322,10 @@ static long double scanBounds (int        num,      /// cardinality of the set (
 
     // be sensitive here, check for bounds a little within the finite realm
 
-    if (((sign > 0) ? bd : -bd) > COUENNE_INFINITY / 1e10 - 1) {
+    if (((sign > 0) ? bd : -bd) > COUENNE_INFINITY / 1e10) {
 
-      bounds [indices [i]] = (sign > 0) ? 1e300 : -1e300;
+      bounds [indices [i]] = (sign > 0) ? COIN_DBL_MAX : -COIN_DBL_MAX;
+      //bounds [indices [i]] = (sign > 0) ? 1e300 : -1e300;
 
       // this variable has an infinite bound, mark it
       if      (*infnum == -1) *infnum =  i; // first variable with infinite bound, so far

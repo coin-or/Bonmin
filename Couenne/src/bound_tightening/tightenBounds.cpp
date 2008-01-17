@@ -51,7 +51,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
     // early test to avoid a loop
 
     if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
-      //#ifdef DEBUG
+
       if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
 	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			"pre-check, w_%d has infeasible bounds [%g,%g]: ", i, lb_ [i], ub_ [i]);
@@ -60,7 +60,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	Var (i) -> Ub () -> print (std::cout);
 	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
       }
-      //#endif
+
       return -1; // declare this node infeasible
     }
 
@@ -84,7 +84,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
       printf ("\n");*/
 
       if (ll > uu + COUENNE_EPS) {
-	//#ifdef DEBUG
+
 	if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
 	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			  "w_%d has infeasible bounds [%g,%g]: ", i, ll, uu);
@@ -93,11 +93,10 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	  Var (i) -> Ub () -> print (std::cout);
 	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
 	}
-	//#endif
+
 	return -1; // declare this node infeasible
       }
 
-      //      bool chg = false;
 
       // check if lower bound got higher
       if ((ll > - COUENNE_INFINITY) && 
@@ -106,14 +105,8 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	   (fabs (lb_ [i]) < COUENNE_EPS) ||
 	   (fabs (ll / (lb_ [i]) - 1) > COUENNE_EPS)) ) {
 
-	/*printf ("update lbound %d: %.10e >= %.10e + %.12e\n", 
-	  i+j, ll, lb_ [i+j], COUENNE_EPS);*/
+	/*if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
 
-	/*printf ("update lbound %d: %g >= %g\n", 
-	  i+j, ll, lb_ [i+j]);*/
-
-	if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
-	  // ToDo: Pipe all output through journalist
 	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			  "propa %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
 			  i, lb_ [i], ub_ [i], ll, uu, lb_ [i] - ll);
@@ -134,7 +127,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	    Var (i) -> Ub () -> print (std::cout);
 	    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
 	  }
-	}
+	  }*/
 
 	lb_ [i] = ll;
 	chg_bds [i].setLower(t_chg_bounds::CHANGED);
@@ -155,13 +148,13 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	  i+j, uu, ub_ [i+j]);*/
 
 	if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	  /*Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			  "prop %2d [(%g),%g] -> [(%g),%g] (%g) ", 
 			  i, lb_ [i], ub_ [i], ll, uu, ub_ [i] - uu);
 	  Var (i)             -> print (std::cout);
 	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING," := ");
 	  Var (i) -> Image () -> print (std::cout);
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");*/
 
 	  if (optimum_ && 
 	      (optimum_ [i] <= ub_ [i]) && 

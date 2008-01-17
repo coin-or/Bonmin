@@ -10,9 +10,9 @@
 #ifndef COUENNE_EXPRMUL_H
 #define COUENNE_EXPRMUL_H
 
+#include <vector>
+
 #include "exprOp.hpp"
-#include "exprAux.hpp"
-#include "CouenneProblem.hpp"
 
 
 /// class for multiplications
@@ -55,7 +55,7 @@ class exprMul: public exprOp {
   virtual exprAux *standardize (CouenneProblem *p, bool addAux = true);
 
   /// generate equality between *this and *w
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  void generateCuts (expression *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 
@@ -66,18 +66,32 @@ class exprMul: public exprOp {
   expression *getFixVar ();
 
   /// code for comparison
-  virtual enum expr_type code () {return COU_EXPRMUL;}
+  virtual enum expr_type code () 
+  {return COU_EXPRMUL;}
 
   /// is this expression integer?
-  bool isInteger ();
+  //bool isInteger ();
 
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (const CouenneObject *, const OsiBranchingInformation *,
-			  int &, double * &, int &);
+  virtual CouNumber selectBranch (const CouenneObject *obj, 
+				  const OsiBranchingInformation *info,
+				  expression * &var, 
+				  double * &brpts, 
+				  int &way);
+
+protected:
+
+  /// inferring bounds on factors of a product
+  int impliedBoundMul (CouNumber wl, 
+		       CouNumber wu, 
+		       std::vector <CouNumber> &xl,
+		       std::vector <CouNumber> &xu,
+		       std::vector <std::pair <int, CouNumber> > &nl,
+		       std::vector <std::pair <int, CouNumber> > &nu);
 };
 
 

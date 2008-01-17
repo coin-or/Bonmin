@@ -12,13 +12,12 @@
 #include "exprPow.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
-
 #include "projections.hpp"
 #include "funtriplets.hpp"
 
 
 /// generic approach for negative powers (commom with exprInv::selectBranch
-CouNumber negPowSelectBranch (const CouenneObject *obj, int ind, 
+CouNumber negPowSelectBranch (const CouenneObject *obj,
 			      double * &brpts, 
 			      int &way,
 			      CouNumber k,
@@ -30,15 +29,18 @@ CouNumber negPowSelectBranch (const CouenneObject *obj, int ind,
 /// each expression's arguments
 CouNumber exprPow::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
-				 int &ind, 
+				 expression *&var,
 				 double * &brpts, 
 				 int &way) {
 
   // return branching point and branching policies for an expression
   // of the form x^k
 
-  ind    = arglist_ [0]        -> Index ();
-  int wi = obj -> Reference () -> Index ();
+  var = arglist_ [0];
+
+  int 
+    ind = arglist_ [0]        -> Index (),
+    wi  = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0) && (arglist_ [1] -> Type () == CONST));
 
@@ -48,6 +50,12 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
             x0 = info -> solution_ [ind],
             l  = info -> lower_    [ind],
             u  = info -> upper_    [ind];
+
+  /*printf ("selbra for "); print ();
+  printf ("%g [%g,%g] -> %g [%g,%g]\n", 
+	  x0, l, u, y0, 
+	  info -> lower_    [wi],
+	  info -> upper_    [wi]);*/
 
   if      (x0 < l) x0 = l;
   else if (x0 > u) x0 = u;
@@ -60,7 +68,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
   }
 
   // case 1: k negative, resort to method similar to exprInv:: ///////////////////////////////
-  if (k<0) return negPowSelectBranch (obj, ind, brpts, way, k, x0, y0, l, u);
+  if (k<0) return negPowSelectBranch (obj, brpts, way, k, x0, y0, l, u);
 
   int intk = 0;
 
@@ -85,7 +93,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 	x0 -= *brpts;
 	y0 -= pow (*brpts, k);
 
-	return sqrt (x0*x0 + y0 * y0); // exact distance
+	return sqrt (x0*x0 + y0*y0); // exact distance
       }
 
       // on the bad side
@@ -145,21 +153,26 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
     } 
 
     powertriplet ft (k);
-    *brpts = maxHeight (&ft, x0, y0, l, u);
+    //*brpts = maxHeight (&ft, x0, y0, l, u);
+    *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
 
     way = (x0 < *brpts) ? TWO_LEFT : TWO_RIGHT;
 
-    /*
-    w -> print (); printf (" := "); dynamic_cast <exprAux *> (w) -> Image () -> print ();
+    //    w -> print (); printf (" := "); dynamic_cast <exprAux *> (w) -> Image () -> print ();
+    /*print ();
     printf (" (%g,%g) [%g,%g] --> %g, distances = %g,%g\n",
 	    x0, y0, l, u, *brpts,
 	    projectSeg (x0, y0, l,      safe_pow (l,k), *brpts, safe_pow (*brpts,k), 0),
-	    projectSeg (x0, y0, *brpts, safe_pow (*brpts,k),      u, safe_pow (u,k), 0));
-    */
+	    projectSeg (x0, y0, *brpts, safe_pow (*brpts,k),      u, safe_pow (u,k), 0));*/
 
     // Min area  -- exact distance
-    return CoinMin (projectSeg (x0, y0, l,      safe_pow (l,k), *brpts, safe_pow (*brpts,k), 0),
-		    projectSeg (x0, y0, *brpts, safe_pow (*brpts,k),      u, safe_pow (u,k), 0));
+    CouNumber retval = 
+      CoinMin (projectSeg (x0, y0, l,      safe_pow (l,k), *brpts, safe_pow (*brpts,k), 0),
+	       projectSeg (x0, y0, *brpts, safe_pow (*brpts,k),      u, safe_pow (u,k), 0));
+
+    //printf ("returning %.10e\n", retval);
+
+    return retval;
 
     /*      brpts = (double *) realloc (brpts, sizeof (double));
      *brpts = midInterval (x0, l, u);
@@ -323,6 +336,6 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
   // failsafe: return null index, so that CouenneObject::infeasibility()
   // picks the default variable/branchingpoint for the expression
 
-  ind = -1;
+  var = NULL;
   return 0.;
 }

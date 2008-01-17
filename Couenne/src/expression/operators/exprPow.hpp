@@ -16,7 +16,6 @@
 #include "exprMul.hpp"
 #include "exprClone.hpp"
 #include "exprConst.hpp"
-//#include "funtriplets.hpp"
 
 class funtriplet;
 
@@ -63,7 +62,7 @@ class exprPow: public exprOp {
   exprAux *standardize (CouenneProblem *p, bool addAux = true);
 
   /// generate equality between *this and *w
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  void generateCuts (expression *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 
@@ -83,8 +82,11 @@ class exprPow: public exprOp {
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (const CouenneObject *, const OsiBranchingInformation *,
-			  int &, double * &, int &);
+  virtual CouNumber selectBranch (const CouenneObject *obj, 
+				  const OsiBranchingInformation *info,
+				  expression * &var, 
+				  double * &brpts, 
+				  int &way);
 };
 
 
@@ -122,7 +124,6 @@ inline CouNumber safe_pow (register CouNumber base,
 
 /// compute power
 inline CouNumber exprPow::operator () () {
-
   //  return (currValue_ = safe_pow (base, exponent));
   return (safe_pow ((**arglist_) (), (*(arglist_ [1])) ()));
 }

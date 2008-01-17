@@ -21,7 +21,7 @@
 /// each expression's arguments
 CouNumber exprMul::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
-				 int &ind, 
+				 expression *&var,
 				 double * &brpts, 
 				 int &way) {
 
@@ -40,14 +40,14 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
   // First, try to avoid infinite bounds for multiplications, which
   // make them pretty hard to deal with
 
-  if (((ind = xi) >= 0) && (xl < - COUENNE_INFINITY) && (xu > COUENNE_INFINITY) ||
-      ((ind = yi) >= 0) && (yl < - COUENNE_INFINITY) && (yu > COUENNE_INFINITY)) {
+  if (((var = arglist_ [0]) -> Index() >= 0) && (xl < -COUENNE_INFINITY) && (xu > COUENNE_INFINITY) ||
+      ((var = arglist_ [1]) -> Index() >= 0) && (yl < -COUENNE_INFINITY) && (yu > COUENNE_INFINITY)) {
 
     // branch around current point. If it is also at a crazy value,
     // reset it close to zero.
 
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
-    CouNumber curr = expression::Variable (ind);
+    CouNumber curr = (*var) ();//expression::Variable (ind);
 
     if (fabs (curr) >= LARGE_BOUND) curr = 0;
 
@@ -68,12 +68,16 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 
   // don't privilege xi over yi
 
+  int ind;
+
   if (xl<-COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0<0)?2:0.5)*x0,xl,xu); way=TWO_RIGHT;} else
   if (xu> COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0>0)?2:0.5)*x0,xl,xu); way=TWO_LEFT;}  else
   if (yl<-COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0<0)?2:0.5)*y0,yl,yu); way=TWO_RIGHT;} else
   if (yu> COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0>0)?2:0.5)*y0,yl,yu); way=TWO_LEFT;}  else
   if (yu-yl > xu-xl)        {ind=yi; *brpts=midInterval(y0, yl, yu);              way=TWO_RAND;}  else
                             {ind=xi; *brpts=midInterval(x0, xl, xu);              way=TWO_RAND;}
+
+  var = arglist_ [(ind == xi) ? 0 : 1];
 
   return fabs (w0 - x0*y0);
 }

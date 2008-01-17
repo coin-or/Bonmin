@@ -119,6 +119,10 @@ class expression {
   virtual inline enum nodeType Type ()
     {return EMPTY;}
 
+  /// return pointer to self
+  virtual inline expression *Image () const
+    {return NULL;}
+
   /// value (empty)
   virtual inline CouNumber Value () const 
     {return 0;}
@@ -131,8 +135,7 @@ class expression {
 
   /// print expression to iostream
   virtual void print (std::ostream &s  = std::cout,   /// output stream
-		      bool             = false,       /// descend into auxiliaries' image?
-		      CouenneProblem * = NULL) const  /// problem pointer (in exprGroup)
+		      bool             = false) const /// descend into auxiliaries' image?
     {s << '?';}
 
   /// null function for evaluating the expression
@@ -146,15 +149,18 @@ class expression {
   /// dependence on variable set: return cardinality of subset of the
   /// set of indices in first argument which occur in expression. 
   virtual int dependsOn (int *ind, int n, 
-			 CouenneProblem *p = NULL, 
-			 enum dig_type   type = STOP_AT_AUX);
+			 enum dig_type type = STOP_AT_AUX);
+
+  /// version with one index only
+  inline int dependsOn (int singleton, 
+			 enum dig_type type = STOP_AT_AUX)
+  {return dependsOn (&singleton, 1, type);}
 
   /// fill std::set with indices of variables on which this expression
   /// depends. Also deal with expressions that have no variable
   /// pointers (exprGroup, exprQuad)
   virtual inline int DepList (std::set <int> &deplist, 
-			      enum dig_type   type = ORIG_ONLY,
-			      const CouenneProblem *p    = NULL)
+			      enum dig_type   type = ORIG_ONLY)
     {return 0;}
 
   /// simplify expression (useful for derivatives)
@@ -191,7 +197,7 @@ class expression {
     {return NULL;}
 
   /// generate convexification cut for constraint w = this
-  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  virtual void generateCuts (expression *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg,
 			     t_chg_bounds *chg = NULL, int wind = -1, 
 			     CouNumber lb = -COUENNE_INFINITY, 
@@ -220,8 +226,8 @@ class expression {
   /// used in rank-based branching variable choice: original variables
   /// have rank 1; auxiliary w=f(x) has rank r(w) = r(x)+1; finally,
   /// auxiliary w=f(x1,x2...,xk) has rank r(w) = 1+max{r(xi):i=1..k}.
-  virtual int rank (CouenneProblem *p = NULL)
-    {return -1;} // return null rank
+  virtual int rank ()
+  {return -1;} // return null rank
 
   /// does a backward implied bound processing on every expression,
   /// including exprSums although already done by Clp (useful when
@@ -230,21 +236,21 @@ class expression {
   /// bound. The method returns true if there has been a change on any
   /// bound on the variables on which the expression depends.
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *)
-    {return false;}
+  {return false;}
 
   /// multiplicity of a variable
   virtual int Multiplicity () 
-    {return 1;}
+  {return 1;}
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments. Return estimated improvement in
   /// objective function
   virtual CouNumber selectBranch (const CouenneObject *obj, 
 				  const OsiBranchingInformation *info,
-				  int &ind, 
+				  expression * &var, 
 				  double * &brpts, 
 				  int &way)
-    {ind = -1; return 0.;}
+  {var = NULL; return 0.;}
 
   /// replace expression with another
   virtual void replace (exprVar *, exprVar *) {}
@@ -281,5 +287,9 @@ inline bool updateBound (int sign, CouNumber *dst, CouNumber src) {
 inline int compareExpr (const void *e0, const void *e1) {
   return ((*(expression **) e0) -> compare (**(expression **)e1));
 }
+
+/// is this number integer?
+inline bool isInteger (CouNumber x)
+{return (fabs (COUENNE_round (x) - x) < COUENNE_EPS);}
 
 #endif

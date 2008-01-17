@@ -26,12 +26,12 @@
 
 /// convex cuts for sine or cosine
 int trigEnvelope (const CouenneCutGenerator *, OsiCuts &,
-		   exprAux *, expression *, enum cou_trig);
+		   expression *, expression *, enum cou_trig);
 
 
 /// generate convexification cut for constraint w = sin (this)
 
-void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprSin::generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {
@@ -56,7 +56,7 @@ void exprSin::generateCuts (exprAux *w, const OsiSolverInterface &si,
 
 /// generate convexification cut for constraint w = cos (this)
 
-void exprCos::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprCos::generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {
@@ -88,7 +88,7 @@ int bayEnvelope (const CouenneCutGenerator *, OsiCuts &, int, int,
 
 int trigEnvelope (const CouenneCutGenerator *cg, // cut generator that has called us
 		   OsiCuts &cs,                  // cut set to be enriched
-		   exprAux *w,
+		   expression *w,
 		   expression *arg,
 		   enum cou_trig which_trig) {
 

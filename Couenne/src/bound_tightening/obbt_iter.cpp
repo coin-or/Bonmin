@@ -66,16 +66,12 @@ obbt_iter (CouenneSolverInterface *csi,
   // from w1 to w2 and mark it as exact (depending on whether it is
   // non-decreasing or non-increasing
 
-  //#ifdef DEBUG
-  static int iter = 0;
-  //#endif
+  //  static int iter = 0;
 
   std::set <int> deplist;
   int deplistsize;
 
   bool issimple = false;
-
-  //  CouenneProblem *p = Problem ();
 
   exprVar *var = Var (index);
 
@@ -86,7 +82,7 @@ obbt_iter (CouenneSolverInterface *csi,
 
 
   if ((var -> Type  () == AUX) &&
-      ((deplistsize = var -> Image () -> DepList (deplist, STOP_AT_AUX, this)) <= 1)) {
+      ((deplistsize = var -> Image () -> DepList (deplist, STOP_AT_AUX)) <= 1)) {
 
     if (!deplistsize) { // funny, the expression is constant...
 
@@ -172,6 +168,7 @@ obbt_iter (CouenneSolverInterface *csi,
 
     // m{in,ax}imize xi on csi
 
+    /*
     if (Jnlst()->ProduceOutput(J_MOREVECTOR, J_BOUNDTIGHTENING)) {
       Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,
 		      "m%simizing x%d [%g,%g] %c= %g\n",
@@ -180,10 +177,11 @@ obbt_iter (CouenneSolverInterface *csi,
       if (Jnlst()->ProduceOutput(J_MOREMATRIX, J_BOUNDTIGHTENING)) {
 	char fname [20];
 	sprintf (fname, "m%s_w%03d_%03d", (sense == 1) ? "in" : "ax", index, iter);
-	Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,"writing %s\n", fname);
+	//Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,"writing %s\n", fname);
 	csi -> writeLp (fname);
       }
     }
+    */
 
     csi -> setWarmStart (warmstart);
 
@@ -273,13 +271,14 @@ obbt_iter (CouenneSolverInterface *csi,
 
       if (doFBBT_ && !(boundTightening (chg_bds, babInfo))) {
 	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-			"##### infeasible, bound tightening after OBBT\n");
+			"node is infeasible after post-OBBT tightening\n");
 	return -1; // tell caller this is infeasible
       }
 
       nImprov++;
     }
-    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+
+    //    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
 
     // if we solved the problem on the objective function's
     // auxiliary variable (that is, we re-solved the extended

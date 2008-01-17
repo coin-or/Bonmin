@@ -10,8 +10,6 @@
 #include "CouenneTypes.hpp"
 #include "CouennePrecisions.hpp"
 
-//#define DEBUG
-
 /*  compute projection of point (x0, y0) on the segment defined by
  *  line ax + by + c <>= 0 (sign provided by parameter sign) and
  *  bounds [lb, ub] on x. Return distance from segment, 0 if satisfied

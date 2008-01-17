@@ -16,7 +16,7 @@
 
 
 // generate equality between *this and *w
-void exprOpp::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprOpp::generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, 
 			    int wind, CouNumber lb, CouNumber ub) {

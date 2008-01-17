@@ -28,6 +28,9 @@ struct expr;
 class DepGraph;
 class CouenneCutGenerator;
 class CouenneSolverInterface;
+class quadElem;
+class LinMap;
+class QuadMap;
 
 /** Structure for comparing expressions
  *
@@ -266,7 +269,7 @@ class CouenneProblem {
 
   /// Initialize auxiliary variables and their bounds from original
   /// variables
-  void initAuxs (CouNumber *, CouNumber *, CouNumber *);
+  void initAuxs (const CouNumber *, const CouNumber *, const CouNumber *);
 
   /// Get auxiliary variables from original variables
   void getAuxs (CouNumber *) const;
@@ -336,7 +339,44 @@ class CouenneProblem {
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
 
-private:
+  /// standardization of linear exprOp's
+  exprAux *linStandardize (bool addAux, 
+			   CouNumber c0, 
+			   LinMap  &lmap,
+			   QuadMap &qmap);
+
+  /// split a constraint w - f(x) = c into w's index (it is returned)
+  /// and rest = f(x) + c
+  int splitAux (CouNumber, expression *, expression *&, bool *);
+
+  /// translates pair (indices, coefficients) into vector with pointers to variables
+  void indcoe2vector (int *index,
+		      CouNumber *coeff,
+		      std::vector <std::pair <exprVar *, CouNumber> > &lcoeff);
+
+  /// translates triplet (indicesI, indicesJ, coefficients) into vector with pointers to variables
+  void indcoe2vector (int *indexI,
+		      int *indexJ,
+		      CouNumber *coeff,
+		      std::vector <quadElem> &qcoeff);
+
+  /// given (expression *) element of sum, returns (coe,ind0,ind1)
+  /// depending on element:
+  ///
+  /// 1) a * x_i ^ 2   ---> (a,i,?)   return COU_EXPRPOW
+  /// 2) a * x_i       ---> (a,i,?)   return COU_EXPRVAR
+  /// 3) a * x_i * x_j ---> (a,i,j)   return COU_EXPRMUL
+  /// 4) a             ---> (a,?,?)   return COU_EXPRCONST
+  ///
+  /// x_i and/or x_j may come from standardizing other (linear or
+  /// quadratic operator) sub-expressions
+  void decomposeTerm (expression *term,
+		      CouNumber initCoe,
+		      CouNumber &c0,
+		      LinMap  &lmap,
+		      QuadMap &qmap);
+
+protected:
 
   /// single fake tightening. Return
   ///
@@ -369,6 +409,19 @@ private:
 		 double *objcoe,
 		 enum nodeType type,
 		 int sense) const;
+
+  /// analyze sparsity of potential exprQuad/exprGroup and change
+  /// linear/quadratic maps accordingly, if necessary by adding new
+  /// auxiliary variables and including them in the linear map
+  void analyzeSparsity (CouNumber, 
+			LinMap &,
+			QuadMap &);
+
+  /// re-organizes multiplication and stores indices (and exponents) of
+  /// its variables
+  void flattenMul (expression *mul, 
+		   CouNumber &coe, 
+		   std::map <int, CouNumber> &indices);
 };
 
 #endif

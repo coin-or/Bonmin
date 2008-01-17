@@ -17,15 +17,15 @@
 /// generalized procedure for both sine and cosine
 CouNumber trigSelBranch (const CouenneObject *obj, 
 			 const OsiBranchingInformation *info,
-			 int &ind, 
+			 expression *&var,
 			 double * &brpts, 
 			 int &way,
 			 enum cou_trig type) {
 
   // for now, apply default branching rule
 
-  ind = -1;
+  var = NULL;
   return 0.;
 
-  // minarea
+  // TODO: minarea
 }

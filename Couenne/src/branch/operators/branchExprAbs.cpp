@@ -15,12 +15,15 @@
 
 /// set up branching object by evaluating branching points for each
 /// expression's arguments. For an exprAbs, simply branch at zero.
-CouNumber exprAbs::selectBranch (const CouenneObject *obj, 
+CouNumber exprAbs::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
-				 int &ind, 
-				 double * &brpts, 
+				 expression * &var,
+				 double * &brpts,
 				 int &way) {
-  ind = argument_ -> Index ();
+
+  var = argument_;
+
+  int ind = var -> Index ();
 
   assert ((ind >= 0) && (obj -> Reference () -> Index () >= 0));
 

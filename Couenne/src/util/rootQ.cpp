@@ -19,14 +19,13 @@
 CouNumber Q (register int k, CouNumber x) {
 
   register CouNumber xp, Q;
-  register int i;
 
   k *= 2;
 
   xp = x;
   Q = 1;
 
-  for (i=2; i<=k; i++) {
+  for (register int i=2; i<=k; i++) {
 
     Q += (CouNumber) i * xp;
     xp *= x;

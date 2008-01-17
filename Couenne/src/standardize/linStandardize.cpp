@@ -15,43 +15,35 @@
 #include "exprPow.hpp"
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
+#include "lqelems.hpp"
 
 //#define DEBUG
 
-/// analyze sparsity of potential exprQuad/exprGroup and change
-/// linear/quadratic maps accordingly, if necessary by adding new
-/// auxiliary variables and including them in the linear map
-void analyzeSparsity (CouenneProblem *, CouNumber, 
-		      std::map <int,                 CouNumber> &,
-		      std::map <std::pair <int,int>, CouNumber> &);
-
-
 /// standardization of linear exprOp's
-exprAux *linStandardize (CouenneProblem *p, 
-			 bool addAux, 
-			 CouNumber c0, 
-			 std::map <int,                 CouNumber> &lmap,
- 			 std::map <std::pair <int,int>, CouNumber> &qmap) {
+exprAux *CouenneProblem::linStandardize (bool addAux, 
+					 CouNumber c0, 
+					 LinMap  &lmap,
+					 QuadMap &qmap) {
 
   // check if quadratic forms are dense enough ///////////////////////////////////////////
 
-  analyzeSparsity (p, c0, lmap, qmap);
+  analyzeSparsity (c0, lmap, qmap);
 
   ////////////////////////////////////////////////////////////////////////////////////////
 
-  int  nq = qmap.size (),     /// data for exprQuad
+  int  nq = qmap.Map().size (),     /// data for exprQuad
       *qi = new int [nq+1], 
       *qj = new int [nq+1];
   CouNumber *qc = new CouNumber [nq];
 
-  int  nl = lmap.size(),      /// data for exprGroup
+  int  nl = lmap.Map().size(),      /// data for exprGroup
       *li = new int [nl+1];
   CouNumber *lc = new CouNumber [nl];
 
   // terminate arrays with negative index
   qi [nq] = li [nl] = -1; 
 
-  std::map <int, CouNumber>::iterator lit = lmap.begin (); 
+  std::map <int, CouNumber>::iterator lit = lmap.Map().begin (); 
 
   // fill in arrays for linear part
   for (int i=0; i<nl; i++, lit++) {
@@ -60,7 +52,7 @@ exprAux *linStandardize (CouenneProblem *p,
     lc [i] = lit -> second;
   }
 
-  std::map <std::pair <int, int>, CouNumber>::iterator qit = qmap.begin (); 
+  std::map <std::pair <int, int>, CouNumber>::iterator qit = qmap.Map().begin (); 
 
   // fill in arrays for quadratic part
   for (int i=0; i < nq; i++, qit++) {
@@ -69,8 +61,8 @@ exprAux *linStandardize (CouenneProblem *p,
     qc [i] = qit -> second;
   }
 
-  nl = lmap.size ();
-  nq = qmap.size ();
+  nl = lmap.Map().size ();
+  nq = qmap.Map().size ();
 
   // particular cases ///////////////////////////////////////////////////////////
 
@@ -79,13 +71,13 @@ exprAux *linStandardize (CouenneProblem *p,
   // a constant
   if ((nq==0) && (nl==0)) 
 
-    ret = p -> addAuxiliary (new exprConst (c0)); // a constant auxiliary? FIX!
+    ret = addAuxiliary (new exprConst (c0)); // a constant auxiliary? FIX!
 
   else if ((nq==0) && (fabs (c0) < COUENNE_EPS) && (nl==1)) { // a linear monomial, cx
 
     if (fabs (*lc - 1) < COUENNE_EPS) 
-      ret    = new exprClone (p -> Var (*li));
-    else ret = new exprMul (new exprConst (*lc), new exprClone (p -> Var (*li)));
+      ret    = new exprClone (Var (*li));
+    else ret = new exprMul (new exprConst (*lc), new exprClone (Var (*li)));
 
   } else if ((nl==0) && (fabs (c0) < COUENNE_EPS) && (nq==1)) { 
 
@@ -93,14 +85,14 @@ exprAux *linStandardize (CouenneProblem *p,
 
     expression *quad;
 
-    if (*qi == *qj) quad = new exprPow (new exprClone (p -> Var (*qi)), new exprConst (2.));
-    else            quad = new exprMul (new exprClone (p -> Var (*qi)), 
-					new exprClone (p -> Var (*qj)));
+    if (*qi == *qj) quad = new exprPow (new exprClone (Var (*qi)), new exprConst (2.));
+    else            quad = new exprMul (new exprClone (Var (*qi)), 
+					new exprClone (Var (*qj)));
 
     if (fabs (*qc - 1) < COUENNE_EPS) 
       ret    = quad;
     else {
-      quad = p -> addAuxiliary (quad);
+      quad = addAuxiliary (quad);
       ret  = new exprMul (new exprConst (*qc), new exprClone (quad));
     }
 
@@ -111,9 +103,14 @@ exprAux *linStandardize (CouenneProblem *p,
     expression **zero = new expression * [1];
     *zero = new exprConst (0.);
 
-    ret = ((nq==0) ? 
-      (new exprGroup (c0, li, lc,             zero, 1)) :
-      (new exprQuad  (c0, li, lc, qi, qj, qc, zero, 1)));
+    std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+    indcoe2vector (li, lc, lcoeff);
+
+    std::vector <quadElem> qcoeff;
+    indcoe2vector (qi, qj, qc, qcoeff);
+
+    if (!nq) ret = new exprGroup (c0, lcoeff); // create exprGroup
+    else     ret = new exprQuad  (c0, lcoeff, qcoeff); // create exprQuad
   }
 
   delete [] li;
@@ -128,5 +125,5 @@ exprAux *linStandardize (CouenneProblem *p,
   //  ret -> Image () -> print (); printf ("\n");
 #endif
 
-  return (addAux ? (p -> addAuxiliary (ret)) : new exprAux (ret));
+  return (addAux ? addAuxiliary (ret) : new exprAux (ret));
 }

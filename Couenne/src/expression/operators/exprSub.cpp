@@ -62,7 +62,7 @@ expression *exprSub::differentiate (int index) {
   expression **arglist = new expression * [nargs_];
 
   for (int i = 0; i < nargs_; i++)
-    if (arglist_ [i] -> dependsOn (&index, 1))
+    if (arglist_ [i] -> dependsOn (index))
          arglist [i] = arglist_ [i] -> differentiate (index);
     else arglist [i] = new exprConst (0.);
 
@@ -126,7 +126,7 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
 
 /// is this expression integer?
-bool exprSub::isInteger () {
+/*bool exprSub::isInteger () {
 
   // yes, if both arguments are integer
   if (exprOp::isInteger ()) 
@@ -145,4 +145,4 @@ bool exprSub::isInteger () {
   return ((fabs (alv - (*au) ()) < COUENNE_EPS) && // first  is constant
 	  (fabs (blv - (*bu) ()) < COUENNE_EPS) && // second is constant
 	  (fabs (COUENNE_round (alv - blv) - (alv - blv)) < COUENNE_EPS)); // null difference
-}
+	  }*/

@@ -15,21 +15,20 @@
 #include "exprMul.hpp"
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
+#include "lqelems.hpp"
 
 //#define DEBUG
 
 /// given an element of a sum, check if it is a variable (possibly
 /// with a coefficient) and return its index (and the coefficient) if
 /// it has not been spotted as an auxiliary
-
 void elementBreak (expression *, int &, CouNumber &);
 
 
 /// split a constraint w - f(x) = c into w's index (it is returned)
 /// and rest = f(x) + c
 
-int splitAux (CouenneProblem *p, CouNumber rhs, 
-	      expression *body, expression *&rest, bool *wentAux) {
+int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest, bool *wentAux) {
 
   int auxInd = -1,          // index of the auxiliary to be extracted
     code = body -> code (); // type of expression
@@ -59,7 +58,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
     if ((auxInd < 0) || 
 	wentAux [auxInd] || 
-	(alist [1] -> dependsOn (&auxInd, 1, p, TAG_AND_RECURSIVE) >= 1)) {
+	(alist [1] -> dependsOn (auxInd, TAG_AND_RECURSIVE) >= 1)) {
 
       auxInd = (alist [1]) -> Index ();
 
@@ -69,7 +68,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
       if ((auxInd < 0) ||       // no index found
 	  wentAux [auxInd] ||   // or, found but invalid
-	  (alist [0] -> dependsOn (&auxInd, 1, p, TAG_AND_RECURSIVE) >= 1)) 
+	  (alist [0] -> dependsOn (auxInd, TAG_AND_RECURSIVE) >= 1)) 
 	                        // or, variable depends upon itself
 	return -1;
 
@@ -97,15 +96,15 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
   case COU_EXPRGROUP:
   case COU_EXPRSUM: {
 
-    // an exprGroup or exprSum. Decompose the expression and
+    // an expr{Sum,Group,Quad}. Decompose the expression and
     // re-assemble (to look for right variable)
 
     // data structure to be used below if there is a linear term.
     // which specifies position within arrays (negative for linear
     // part of exprGroup, positive for all elements of exprSum)
 
-    int maxindex = -1, *linind = NULL, nlin = 0, which = 1;
-    CouNumber c0 = 0., *lincoe = NULL, auxcoe = 1;
+    int maxindex = -1, nlin = 0, which = 1;
+    CouNumber c0 = 0., auxcoe = 1;
     bool which_was_set = false;
 
     // check indices of linear part /////////////////////////////////
@@ -113,33 +112,38 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     if (code != COU_EXPRSUM) {
 
       exprGroup *egBody = dynamic_cast <exprGroup *> (body);
+      exprGroup::lincoeff &lcoe = egBody -> lcoeff ();
 
       // import exprGroup linear structure
 
-      linind = egBody -> getIndices ();
-      lincoe = egBody -> getCoeffs  ();
-      c0     = egBody -> getc0      ();
+      c0 = egBody -> getc0 ();
 
-      for (int j; (j = linind [nlin]) >= 0; nlin++) {
+      for (int i=0, n = lcoe.size (); n--; i++, nlin++) {
+
+	int j = lcoe [i]. first -> Index ();
+
+	//lincoe [i] = lcoe [i]. second;
 
 	if ((j > maxindex) && 
 	    !(wentAux [j]) && 
-	    (fabs (lincoe [nlin]) > COUENNE_EPS)) {
+	    (fabs (lcoe [i]. second) > COUENNE_EPS)) {
 
 	  // fake cut in linind and check dependence. Only mark if
-	  // dependson gives 0
+	  // dependsOn() gives 0
 
-	  int indInd = linind [nlin];
-	  linind [nlin] = -1; // fictitious index to bypass check
+	  exprVar *saveVar = lcoe [i].first;
+	  lcoe [i].first = new exprVar (nVars ());
 
-	  if (body -> dependsOn (&j, 1, p, TAG_AND_RECURSIVE) == 0) {
+	  if (body -> dependsOn (j, TAG_AND_RECURSIVE) == 0) {
 
-	    which    = - nlin - 1;    // mark which with negative number 
-	    auxcoe   = lincoe [nlin];
+	    // mark which with negative number
+	    which    = - nlin - 1;
+	    auxcoe   = lcoe [i]. second;
 	    maxindex = j;
 	  }
 
-	  linind [nlin] = indInd;
+	  delete lcoe [i].first;
+	  lcoe [i].first = saveVar;
 	}
       }
     }
@@ -169,7 +173,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
 	// not enough... check now linear (and quadratic!) terms 
 
-	if (body -> dependsOn (&index, 1, p, TAG_AND_RECURSIVE) == 0) {
+	if (body -> dependsOn (index, TAG_AND_RECURSIVE) == 0) {
 
 	  maxindex = index;
 	  which    = i;
@@ -231,6 +235,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
     if (nlin > 0) { // there is an element in the linear sum to be drawn
 
+      exprGroup *egBody = dynamic_cast <exprGroup *> (body);
+      exprGroup::lincoeff &lcoe = egBody -> lcoeff ();
+
       int mid = (which >= 0) ? nlin : - which - 1;
 
       linind2 = new int       [nlin + 1];
@@ -239,14 +246,14 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       register int j;
 
 #ifdef DEBUG
-      for (j=0; j<mid;  j++) printf ("{%g x%d} ", lincoe [j], linind [j]);
-      for (j++; j<nlin; j++) printf ("{%g x%d} ", lincoe [j], linind [j]);
+      //for (j=0; j<mid;  j++) printf ("{%g x%d} ", lincoe [j], linind [j]);
+      //for (j++; j<nlin; j++) printf ("{%g x%d} ", lincoe [j], linind [j]);
 #endif
 
       CouNumber divider = -1. / auxcoe;
 
-      for (j=0; j<mid;  j++) {linind2 [j]   = linind [j]; lincoe2 [j]   = divider * lincoe [j];}
-      for (j++; j<nlin; j++) {linind2 [j-1] = linind [j]; lincoe2 [j-1] = divider * lincoe [j];}
+      for (j=0; j<mid;  j++){linind2[j]  =lcoe[j].first->Index();lincoe2[j]  =divider*lcoe[j].second;}
+      for (j++; j<nlin; j++){linind2[j-1]=lcoe[j].first->Index();lincoe2[j-1]=divider*lcoe[j].second;}
 
       linind2 [j-1] = -1; // terminate list of indices
 
@@ -259,13 +266,13 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
 	exprQuad *eq = dynamic_cast <exprQuad *> (body);
 
-	int nqt = eq -> getnQTerms ();
+	int nqt = eq -> getnQTerms (), j=0;
 
 	qindI = new int [nqt];
 	qindJ = new int [nqt];
 	qcoe  = new CouNumber [nqt];
 
-	CoinCopyN (eq -> getQIndexI (), nqt, qindI);
+	/*CoinCopyN (eq -> getQIndexI (), nqt, qindI);
 	CoinCopyN (eq -> getQIndexJ (), nqt, qindJ);
 
 	if (fabs (divider - 1) < COUENNE_EPS)
@@ -273,6 +280,22 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	else {
 	  CouNumber *coe = eq -> getQCoeffs ();
 	  while (nqt--) qcoe [nqt] = divider * coe [nqt];
+	  }*/
+
+	exprQuad::sparseQ &M = eq -> getQ ();
+
+	for (exprQuad::sparseQ::iterator row = M.begin (); 
+	     row != M.end (); ++row) {
+
+	  int xind = row -> first -> Index ();
+
+	  for (exprQuad::sparseQcol::iterator col = row -> second.begin (); 
+	       col != row -> second.end (); ++col, ++j) {
+
+	    qindI [j] = xind;
+	    qindJ [j] = col -> first -> Index ();
+	    qcoe  [j] = divider * col -> second;
+	  }
 	}
       }
 
@@ -301,10 +324,20 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
       // 1)  f(x) + c0 -  w = rhs   =====>   w =       f(x) + c0 - rhs
       // 2)  f(x) + c0 + aw = rhs   =====>   w = -1/a (f(x) + c0 - rhs), a != -1
 
-      if    (fabs (auxcoe + 1) < COUENNE_EPS)
-	if (code == COU_EXPRGROUP) 
-	  rest    = new exprGroup (c0-rhs, linind2, lincoe2,                     newarglist, nargs);
-	else rest = new exprQuad  (c0-rhs, linind2, lincoe2, qindI, qindJ, qcoe, newarglist, nargs);
+      if (fabs (auxcoe + 1) < COUENNE_EPS) {
+
+	std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+	indcoe2vector (linind2, lincoe2, lcoeff);
+
+	if (code == COU_EXPRGROUP)
+	  rest = new exprGroup (c0-rhs, lcoeff, newarglist, nargs);
+
+	else {
+	  std::vector <quadElem> qcoeff;
+	  indcoe2vector (qindI, qindJ, qcoe, qcoeff);
+	  rest = new exprQuad  (c0-rhs, lcoeff, qcoeff, newarglist, nargs);
+	}
+      }
       else {
 
 	expression **mullist = new expression * [1];
@@ -324,10 +357,18 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 	  *mullist = new exprMul (new exprConst (-1. / auxcoe), 
 				  new exprSum (newarglist, nargs));
 
+	std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+	indcoe2vector (linind2, lincoe2, lcoeff);
+
 	// final outcome: -1/a (f(x) + c0 - rhs)
-	if (code == COU_EXPRGROUP) 
-	  rest    = new exprGroup (-1./auxcoe*(c0-rhs), linind2,lincoe2,                   mullist,1);
-	else rest = new exprQuad  (-1./auxcoe*(c0-rhs), linind2,lincoe2, qindI,qindJ,qcoe, mullist,1);
+	if (code == COU_EXPRGROUP)
+	  rest = new exprGroup ((rhs - c0) / auxcoe, lcoeff,        mullist,1);
+
+	else {
+	  std::vector <quadElem> qcoeff;
+	  indcoe2vector (qindI, qindJ, qcoe, qcoeff);
+	  rest = new exprQuad  ((rhs - c0) / auxcoe, lcoeff, qcoeff, mullist,1);
+	}
       }
     }
     else { // simple exprSum
@@ -363,8 +404,7 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
     }
 
 #ifdef DEBUG
-    printf ("gotten ");
-    rest -> print (); printf ("\n");
+    printf ("gotten "); rest -> print (); printf ("\n");
 #endif
 
     auxInd = maxindex;
@@ -384,20 +424,16 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
 
 #ifdef DEBUG
   printf ("standardize rest (2nd level) "); fflush (stdout);
-  rest -> print ();
-  printf (" [body = ");
-  body -> print ();
-  printf ("]");
+  rest -> print (); printf (" [body = ");
+  body -> print (); printf ("]");
 #endif
 
   // second argument is false to tell standardize not to create new
   // auxiliary variable (we just found it, it's  w)
-  exprAux *aux = rest -> standardize (p, false);
+  exprAux *aux = rest -> standardize (this, false);
 
 #ifdef DEBUG
-  printf (" {body = ");
-  body -> print ();
-  printf ("} ");
+  printf (" {body = "); body -> print (); printf ("} ");
 #endif
 
   if (aux) {
@@ -406,11 +442,9 @@ int splitAux (CouenneProblem *p, CouNumber rhs,
   }
 
 #ifdef DEBUG
-  printf (" ==> ");
-  rest -> print ();
+  printf (" ==> "); rest -> print ();
   printf (" and "); fflush (stdout);
-  rest -> print (); 
-  printf ("\n");
+  rest -> print (); printf ("\n");
 #endif
 
   return auxInd;

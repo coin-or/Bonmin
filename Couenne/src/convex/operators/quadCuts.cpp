@@ -16,29 +16,51 @@
 
 //#define DEBUG
 
-void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg){
 
-  assert (dIndex_ != NULL);
+void exprQuad::quadCuts (expression *w, OsiCuts &cs, const CouenneCutGenerator *cg){
 
 #ifdef DEBUG
-  std::cout<<"Expression has "<<nlterms_<<" linear terms and "
-           <<nqterms_<<" quadratic terms. " << std::endl;
+  std::cout<<"Expression has "<< lcoeff_.size () <<" linear terms and "
+           << nqterms_ <<" quadratic terms." << std::endl;
 
-  printf ("Q\n");
-  for (int i=0; i<nqterms_; i++)
-    printf ("<%d,%d,%g>\n",  qindexI_ [i], qindexJ_ [i], qcoeff_ [i]);
+  printf ("Q:");
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
+    int xind = row -> first -> Index ();
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
+      printf (" <%d,%d,%g>",  xind, col -> first -> Index (), col -> second);
+  }
 
-  printf ("b\n");
-  for (int i=0; i < nlterms_; i++)
-    printf ("<%d,%g>\n",  index_ [i], coeff_ [i]);
+  printf ("\nb:");
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    //for (int i=0; i < nlterms_; i++)
+    printf (" <%d,%g>",  el -> first -> Index (), el -> second);//index_ [i], coeff_ [i]);
 
   if (c0_) 
-    printf ("<c0 = %g>\n", c0_);
+    printf ("; <c0 = %g>", c0_);
 
-  if (dCoeffLo_ && dCoeffUp_ && dIndex_) {
-    printf ("alpha\n");
-    for (int i=0; i<nDiag_; i++)
-      printf ("[%d,%g,%g]\n", dIndex_ [i], dCoeffLo_ [i], dCoeffUp_ [i]);
+  printf ("\nBounds:\n");
+
+  int index = 0;
+
+  for (std::map <exprVar *, std::pair <CouNumber, CouNumber> >::iterator i = bounds_.begin ();
+       i != bounds_.end (); ++i, index++) {
+
+    printf ("%3d:\t", index);
+    i -> first -> print (); printf ("\t");
+    printf (" %13g [%13g, %13g]",
+	    (*(i -> first)) (), i -> second.first, i -> second.second);
+
+    CouNumber 
+      lb = cg -> Problem () -> Lb (i -> first -> Index ()),
+      ub = cg -> Problem () -> Ub (i -> first -> Index ());
+
+    if ((eigen_.size () > 0) &&
+	(fabs (ub-lb) > COUENNE_EPS))
+      printf (" --> %20g, scaled %20g", 
+	      eigen_.begin () -> first,// / (ub-lb),
+	      eigen_.begin () -> first / (ub-lb));
+
+    printf ("\n");
   }
 #endif
 
@@ -48,13 +70,15 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
 
   // Get on which side constraint is violated to get the good lambda
 
-  double 
-     varVal  = (*w)    (), 
-     exprVal = (*this) (),
-    *lambda  = (varVal < exprVal) ? 
-      dCoeffLo_ : // Use under-estimator
-      dCoeffUp_,  // Use  over-estimator
-     convVal = 0;
+  CouNumber
+    varVal  = (*w)    (), 
+    exprVal = (*this) (),
+    lambda  =
+    (eigen_.size () == 0) ? 0 :
+    (varVal < exprVal) ?
+      CoinMin (0., eigen_.begin  () -> first) : // Use under-estimator
+      CoinMax (0., eigen_.rbegin () -> first),  // Use  over-estimator
+    convVal = 0;
 
   const CouenneProblem& problem = *(cg -> Problem ());
   const int numcols = problem.nVars ();
@@ -67,29 +91,35 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
   // compute lower or upper convexification and check if it contains
   // the current point
 
-  if (dIndex_) {
+  if (fabs (lambda) > COUENNE_EPS) {
 
     convVal = exprVal;
 
-    if (lambda) { // there is a convexification, check if out of
-		  // current point
+    // there is a convexification, check if out of current point
 
-      for (int i=0; i<nDiag_; i++) {
+    for (std::map <exprVar *, std::pair <CouNumber, CouNumber> >::iterator i = bounds_.begin ();
+	 i != bounds_.end (); ++i) {
 
-	int ind = dIndex_ [i];
-	CouNumber xi = colsol [ind];
-	convVal += lambda [i] * (xi - lower [ind]) * (upper [ind] - xi);
-      }
+      int ind = i -> first -> Index ();
 
-      if (varVal < exprVal) {if (convVal < varVal) return;}
-      else                  {if (convVal > varVal) return;}
+      CouNumber
+	xi = colsol [ind],
+	lb = lower  [ind],
+	ub = upper  [ind],
+	delta = ub-lb;
+
+      if (fabs (delta) > COUENNE_EPS)
+	convVal += lambda * (xi-lb) * (ub-xi) / (delta * delta);
     }
+
+    if (varVal < exprVal) {if (convVal < varVal) return;}
+    else                  {if (convVal > varVal) return;}
   }
 
 #ifdef DEBUG
-  std::cout << "Point to cut: "; for (int i = 0 ; i < numcols ; i++) std::cout << colsol [i] << ", ";
-  printf (" (w,f(x),c) = (%g,%g,%g) -- lambda = [", (*w) (), exprVal, convVal);
-  for (int i=0; i < nDiag_ ; i++) printf ("%g ", lambda [i]); printf ("]\n");
+  std::cout << "Point to cut: "; 
+  for (int i = 0 ; i < numcols ; i++) std::cout << colsol [i] << ", ";
+  printf (" (w,f(x),c) = (%g,%g,%g) -- lambda = %g\n", (*w) (), exprVal, convVal, lambda);
 #endif
 
   // Initialize by copying $a$ into a dense vector and computing Q x^*
@@ -97,19 +127,22 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
   CoinFillN (Qxs, numcols, 0.);
 
   // Compute 2 * Q x^*.
-  for (int k = 0 ; k < nqterms_ ; k++) {
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    int qi = qindexI_ [k],
-        qj = qindexJ_ [k];
+    int qi = row -> first -> Index ();
 
-    CouNumber qc = qcoeff_ [k];
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
-    if (qi != qj) {
-      Qxs [qi] += 2 * qc * colsol [qj]; // contribution of element $q_{ij}$ to (Qx)_i
-      Qxs [qj] += 2 * qc * colsol [qi]; //                         $q_{ij}$    (Qx)_j
+      int qj = col -> first -> Index ();//qindexJ_ [k];
+
+      CouNumber qc = 2 * col -> second;//qcoeff_ [k];
+
+      if (qi != qj) {
+	Qxs [qi] += qc * colsol [qj]; // contribution of element $q_{ij}$ to (Qx)_i
+	Qxs [qj] += qc * colsol [qi]; //                         $q_{ij}$    (Qx)_j
+      }
+      else Qxs [qi] += qc * colsol [qi]; // elements on the diagonal are not halved upon reading
     }
-    // elements on the diagonal are not halved upon reading
-    else Qxs [qi] += 2 * qc * colsol [qi];
   }
 
 #ifdef DEBUG
@@ -117,13 +150,13 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
 #endif
 
   // Add a to it.
-  for (int i = 0 ; i < nlterms_ ; i++)
-    Qxs [index_ [i]] += coeff_ [i];
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    Qxs [el -> first -> Index ()] += el -> second; //coeff_ [i];
 
   // multiply Qx^* by x^*^T again and store the result for the lower
   // bound into constant term
 
-  double a0 = 0;//- c0_; // constant term
+  double a0 = -c0_; // constant term
 
   for (int i = 0; i < numcols; i++){
     a0 += Qxs [i] * colsol [i];
@@ -139,15 +172,22 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
 
   a0 -= exprVal;
 
-  if (lambda != NULL) // Now the part which depends on lambda, if there is one
+  if (fabs (lambda) > COUENNE_EPS) // Now the part which depends on lambda, if there is one
 
-    for (int k = 0 ; k < nDiag_ ; k++) {
+    for (std::map <exprVar *, std::pair <CouNumber, CouNumber> >::iterator i = bounds_.begin ();
+	 i != bounds_.end (); ++i) {
 
-      int ind = dIndex_ [k];
-      CouNumber xi = colsol [ind],
-	coeff = lambda [k] * (lower  [ind] + upper  [ind] - 2 * xi);
+      int ind = i -> first -> Index ();
 
-      a0 += coeff * xi - lambda [k] * (xi - lower [ind]) * (upper [ind] - xi);
+      CouNumber 
+	xi    = colsol [ind],
+	lb    = lower [ind],
+	ub    = upper [ind],
+	delta = ub-lb,
+	coeff = lambda / (delta*delta) * (lb + ub - 2 * xi);
+
+      if (fabs (delta) > COUENNE_EPS)
+	a0 += coeff * xi - lambda / (delta*delta) * (xi - lb) * (ub - xi);
       //      a0 += lambda [k] * lower  [ind] * upper  [ind];
       //      a0 -= lambda [k] * colsol [ind] * colsol [ind];
 
@@ -162,10 +202,7 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
       nnz++;
 
 #ifdef DEBUG
-  printf ("2Qx = (");
-  for(int i = 0; i < numcols; i++)
-    printf ("%g ", Qxs [i]);
-  printf (")[%g], %d nz\n", a0, nnz);
+  printf ("2Qx = (");for(int i=0;i<numcols;i++)printf("%g ",Qxs[i]);printf (")[%g], %d nz\n",a0,nnz);
 #endif
 
   // Pack the vector into a CoinPackedVector and generate the cut.
@@ -197,8 +234,9 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
   cut.setRow (a);
 
   delete [] Qxs;
+    
+  if (varVal < exprVal) { //(lambda == dCoeffLo_) {
 
-  if (lambda == dCoeffLo_) {
      cut.setUb (a0);
 
 #ifdef DEBUG
@@ -214,6 +252,7 @@ void exprQuad::quadCuts (exprAux *w, OsiCuts &cs, const CouenneCutGenerator *cg)
      //     cut.setLb(-COUENNE_INFINITY);
   }
   else {
+
     cut.setLb (a0);
 #ifdef DEBUG
     if (optimum && (lhs - a0 < -COUENNE_EPS)) {

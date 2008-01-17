@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: implementation of some methods for exprQuad
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-07.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -14,149 +14,149 @@
 #include "exprPow.hpp"
 #include "exprMul.hpp"
 #include "depGraph.hpp"
+#include "lqelems.hpp"
 
 //#define DEBUG
 
 /// Constructor
-exprQuad::exprQuad  (CouNumber c0,      // constant term
-		     int *index,        // indices (array terminated by a -1)
-		     CouNumber *coeff,  // coefficient vector
-		     int *qindexI,      // indices I (array terminated by a -1)
-		     int *qindexJ,      // indices J (array terminated by a -1)
-		     CouNumber *qcoeff, // coefficient vector
-		     expression **al,   // vector of nonlinear expressions to be added 
-		     int n):            // number of *nonlinear* expressions in al
+exprQuad::exprQuad  (CouNumber c0,
+		     std::vector <std::pair <exprVar *, CouNumber> > &lcoeff,
+		     std::vector <quadElem> &qcoeff,
+		     expression **al,
+		     int n):
 
-  exprGroup (c0, index, coeff, al, n),
-  nqterms_  (0),
-  dCoeffLo_ (NULL),
-  dCoeffUp_ (NULL),
-  dIndex_   (NULL),
-  nDiag_    (0)     {
+  exprGroup (c0, lcoeff, al, n) {
 
-  // count quadratic terms
-  for (register int *qi = qindexI; *qi++ >= 0; nqterms_++);
+  nqterms_ = 0;
 
-  qindexI_ = new int       [nqterms_];
-  qindexJ_ = new int       [nqterms_];
-  qcoeff_  = new CouNumber [nqterms_];
+  typedef std::map <exprVar *, CouNumber> rowMap;
+  typedef std::map <exprVar *, rowMap>    matrixMap;
 
-  int qi, qj, maxind = -1;
+  matrixMap qMap;
 
-  for (register int i = nqterms_; i--;) {
+  for (std::vector <quadElem>::iterator qel = qcoeff.begin (); qel != qcoeff.end (); ++qel) {
 
-    qindexI_ [i] = qi = qindexI [i];
-    qindexJ_ [i] = qj = qindexJ [i];
-    qcoeff_  [i] = (qi == qj) ? (qcoeff [i]) : (0.5 * qcoeff [i]); // Division
+    CouNumber coe = qel -> coeff ();
 
-    if (qi > maxind) maxind = qi;
-    if (qj > maxind) maxind = qj;
+    exprVar
+      *varI = qel -> varI (),
+      *varJ = qel -> varJ ();
+
+    if (varI -> Index () != varJ -> Index ())
+      coe /= 2.;
+
+    // pick smaller index as row reference
+    if (varI -> Index () > varJ -> Index ()) {
+
+      exprVar *swap = varJ;
+      varJ = varI;
+      varI = swap;
+    }
+
+    matrixMap::iterator rowp = qMap.find (varI);
+
+    if (rowp == qMap.end ()) { // add new row
+
+      std::pair <exprVar *, CouNumber> newcell (varJ, coe);
+      rowMap rmap;
+      rmap.insert (newcell);
+
+      std::pair <exprVar *, rowMap>    newrow  (varI, rmap);
+      qMap.insert (newrow);
+
+    } else { // insert element into row
+
+      rowMap::iterator cell = rowp -> second.find (varJ);
+
+      if (cell == rowp -> second.end ()) { // normal case, add entry
+
+	std::pair <exprVar *, CouNumber> newcell (varJ, coe);
+	rowp -> second.insert (newcell);
+
+      } else { // strange, but add coefficient
+
+	if (fabs (cell -> second += coe) < COUENNE_EPS)
+	  // eliminate element of map if null coefficient
+	  rowp -> second.erase (cell); 
+      }
+    }
   }
 
-  int *indexmap = new int [maxind + 1];
-  make_dIndex (maxind+1, indexmap);
-  delete [] indexmap;
-} 
+  // transform maps into vectors
+
+  for (matrixMap::iterator row = qMap.begin (); row != qMap.end (); ++row) {
+
+    sparseQcol line;
+
+    // insert first element in bound map
+    if (bounds_.find (row -> first) == bounds_.end ()) {
+
+      std::pair <CouNumber, CouNumber> newbound (-DBL_MAX, DBL_MAX);
+      std::pair <exprVar *, std::pair <CouNumber, CouNumber> > newvar (row -> first, newbound);
+      bounds_.insert (newvar);
+    }
+
+    for (rowMap::iterator cell = row -> second.begin (); cell != row -> second.end (); ++cell) {
+
+      line.push_back (std::pair <exprVar *, CouNumber> (*cell));
+
+      // insert second element in bound map
+      if (bounds_.find (cell -> first) == bounds_.end ()) {
+
+	std::pair <CouNumber, CouNumber> newbound (-DBL_MAX, DBL_MAX);
+	std::pair <exprVar *, std::pair <CouNumber, CouNumber> > newvar (cell -> first, newbound);
+	bounds_.insert (newvar);
+      }
+    }
+
+    matrix_.push_back (std::pair <exprVar *, sparseQcol> (row -> first, line));
+    nqterms_ += line.size ();
+  }
+}
 
 
 /// copy constructor
 exprQuad::exprQuad  (const exprQuad &src): 
   exprGroup (src),
+  matrix_   (src.matrix_),
+  eigen_    (src.eigen_),
+  bounds_   (src.bounds_),
+  nqterms_  (src.nqterms_)
 
-  qindexI_  (NULL),
-  qindexJ_  (NULL),
-  qcoeff_   (NULL),
-  nqterms_  (src.nqterms_),
-  dCoeffLo_ (NULL),
-  dCoeffUp_ (NULL),
-  dIndex_   (NULL), 
-  nDiag_    (src.nDiag_) {
-
-  // copy quadratic part (if any)
-
-  if (src.qindexI_) {
-
-    qindexI_ = new int       [nqterms_];
-    qindexJ_ = new int       [nqterms_];
-    qcoeff_  = new CouNumber [nqterms_];
-
-    int *qi = src.qindexI_,
-        *qj = src.qindexJ_;
-
-    CouNumber *qc = src.qcoeff_;
-
-    for (int i = nqterms_; i--;) {
-      qindexI_ [i] = qi [i];
-      qindexJ_ [i] = qj [i];
-      qcoeff_  [i] = qc [i];
-    }
-  }
-
-  // copy convexification part (if any)
-  
-  if (src.dIndex_) {
-    
-    dIndex_                     = new int       [nDiag_];
-    dCoeffLo_ = (src.dCoeffLo_) ? new CouNumber [nDiag_] : NULL; 
-    dCoeffUp_ = (src.dCoeffUp_) ? new CouNumber [nDiag_] : NULL; 
-
-    for                    (int i = nDiag_; i--;) dIndex_   [i] = src.dIndex_   [i];
-    if (src.dCoeffLo_) for (int i = nDiag_; i--;) dCoeffLo_ [i] = src.dCoeffLo_ [i];
-    if (src.dCoeffUp_) for (int i = nDiag_; i--;) dCoeffUp_ [i] = src.dCoeffUp_ [i];
-  }
-} 
-
-
-/// Destructor
-exprQuad::~exprQuad () {
-
-  if (qindexI_) {
-    delete [] qindexI_;
-    delete [] qindexJ_;
-    delete [] qcoeff_;
-  }
-
-  if (dIndex_) {
-    delete [] dIndex_;
-    if (dCoeffLo_) delete [] dCoeffLo_;
-    if (dCoeffUp_) delete [] dCoeffUp_;
-  }
-}
+{} 
 
 
 /// I/O
-void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const {
+void exprQuad::print (std::ostream &out, bool descend) const {
 
   // print linear and nonquadratic part
-  exprGroup::print (out, descend, p);
+  exprGroup::print (out, descend);
 
-  // print bilinear terms
-  for (int i = 0; i < nqterms_; i++) {
+  for (int n = matrix_.size (), i=0; n--; i++) {
+    //sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    int qi = qindexI_ [i], 
-        qj = qindexJ_ [i];
+    int xind = matrix_ [i].first -> Index ();
+    const sparseQcol row = matrix_ [i].second;
 
-    CouNumber coe = (qi == qj) ? (qcoeff_ [i]) : (2 * qcoeff_ [i]);
+    for (int m = row.size (), j=0; m--; j++) {
+      //sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
-    if (coe > 0) out << '+';
-    out << coe << '*';
+      if (fabs (row [j]. second - 1) > COUENNE_EPS) {
+	if (fabs (row [j]. second + 1) < COUENNE_EPS) out << "- ";
+	else {
+	  if (row [j]. second > 0) out << '+';
+	  out << row [j]. second;
+	}
+      } else out << '+';
 
-    if (p) { // have problem pointer, use right names (x,w,y)
-
-      expression *prod;
-
-      if (qi == qj) 
-	prod    = (new exprPow (new exprClone (p -> Var (qi)), 
-				new exprConst (2.)));
-      else prod = (new exprMul (new exprClone (p -> Var (qi)),
-				new exprClone (p -> Var (qj))));
-      prod -> print (out, descend, p); out << ' ';
-      delete prod;
-
-    } else { // there is no problem pointer, use x for all variables
-
-      if (qi == qj) out << "x_" << qi << "^2 ";
-      else          out << "x_" << qi << "*x_" << qj << ' ';
+      if (row [j].first -> Index () == xind) {
+	matrix_ [i]. first -> print (out, descend);
+	out << "^2";
+      } else {
+	matrix_ [i]. first -> print (out, descend);
+	out << '*';
+	row [j]. first -> print (out, descend);
+      }
     }
   }
 }
@@ -165,30 +165,50 @@ void exprQuad::print (std::ostream &out, bool descend, CouenneProblem *p) const 
 /// differentiation
 expression *exprQuad::differentiate (int index) {
 
-  std::map <int, CouNumber> lmap;
+  std::map <exprVar *, CouNumber> lmap;
 
   CouNumber c0 = 0;
 
   // derive linear part (obtain constant)
-  for (register int *ind = index_, i=0; *ind>=0; i++)
-    if (*ind++ == index)
-      c0 += coeff_ [i];
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    c0 += el -> second;
 
   // derive quadratic part (obtain linear part)
-  for (register int *qi = qindexI_, *qj = qindexJ_, i=0; 
-       i < nqterms_; i++, qi++, qj++)
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    if      (*qi == index)
-      if    (*qj == index) linsert (lmap, index, 2 * qcoeff_ [i]);
-      else                 linsert (lmap, *qj,       qcoeff_ [i]);
-    else if (*qj == index) linsert (lmap, *qi,       qcoeff_ [i]);
+    int xind = row -> first -> Index ();
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
+
+      int yind = col -> first -> Index ();
+
+      CouNumber coe = col -> second;
+      exprVar *var = col -> first;
+
+      if      (xind == index)
+	if    (yind == index) {var = col -> first; coe *= 2;}
+	else                   var = col -> first;
+      else if (yind == index)  var = row -> first;
+      else continue;
+
+      std::map <exprVar *, CouNumber>::iterator i = lmap.find (var);
+
+      if (i != lmap.end()) {
+	if (fabs (i -> second += coe) < COUENNE_EPS)
+	  lmap.erase (i);
+      } else {
+	std::pair <exprVar *, CouNumber> npair (var, coe);
+	lmap.insert (npair);
+      }
+    }
+  }
 
   // derive nonlinear sum
   expression **arglist = new expression * [nargs_ + 1];
   int nargs = 0;
 
   for (int i = 0; i < nargs_; i++) 
-    if (arglist_ [i] -> dependsOn (&index, 1))
+    if (arglist_ [i] -> dependsOn (index))
       arglist [nargs++] = arglist_ [i] -> differentiate (index);
 
   // special cases
@@ -208,30 +228,58 @@ expression *exprQuad::differentiate (int index) {
     return new exprSum (arglist, nargs);
   }
 
-  // translate lmap into a vector
+  lincoeff coe;
 
-  int nl = lmap.size(), *linin = new int [1 + nl], j = 0;
-  CouNumber *coeff = new CouNumber [nl];
+  for (std::map <exprVar *, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); ++i)
+    coe.push_back (std::pair <exprVar *, CouNumber> (i -> first, i -> second));
 
-  for (std::map <int, CouNumber>::iterator i = lmap.begin (); i != lmap.end (); ++i) {
-    linin [j]   = i -> first;
-    coeff [j++] = i -> second;
-  }
-
-  linin [j] = -1;
-
-  return new exprGroup (c0, linin, coeff, arglist, nargs);
+  return new exprGroup (c0, coe, arglist, nargs);
 }
 
 
-/// compare affine terms
+/// compare quadratic terms
 
 int exprQuad::compare (exprQuad &e) {
 
-  if (nqterms_ < e.nqterms_) return -1;
-  if (nqterms_ > e.nqterms_) return  1;
+  int sum = exprGroup::compare (e);
 
-  CouNumber *coe0 =   qcoeff_,
+  if (sum != 0) 
+    return sum;
+
+  if (matrix_.size() < e.matrix_.size()) return -1;
+  if (matrix_.size() > e.matrix_.size()) return  1;
+
+  for (sparseQ::iterator 
+	 row1 =   matrix_.begin (),
+	 row2 = e.matrix_.begin ();
+       row1 != matrix_.end (); 
+       ++row1, ++row2) {
+
+    if (row1 -> first -> Index () < row2 -> first -> Index ()) return -1;
+    if (row1 -> first -> Index () > row2 -> first -> Index ()) return  1;
+
+    if (row1 -> second.size () < row2 -> second.size ()) return -1;
+    if (row1 -> second.size () > row2 -> second.size ()) return  1;
+
+    //    if (matrix_.size() > e.matrix_.size()) return  1;
+    //    int xind = row -> first -> Index ();
+    //    CouNumber x = (*(row -> first)) ();
+
+    for (sparseQcol::iterator 
+	   col1 = row1 -> second.begin (),
+	   col2 = row2 -> second.begin ();
+	 col1 != row1 -> second.end (); 
+	 ++col1, ++col2) {
+
+      if (col1 -> first -> Index () < col2 -> first -> Index ()) return -1;
+      if (col1 -> first -> Index () > col2 -> first -> Index ()) return  1;
+
+      if (col1 -> second < col2 -> second - COUENNE_EPS) return -1;
+      if (col1 -> second > col2 -> second + COUENNE_EPS) return  1;
+    }
+  }
+
+  /*  CouNumber *coe0 =   qcoeff_,
             *coe1 = e.qcoeff_;
 
   for (register int *indI0 = qindexI_, 
@@ -248,7 +296,7 @@ int exprQuad::compare (exprQuad &e) {
 
     if (*coe0 < *coe1 - COUENNE_EPS) return -1;
     if (*coe0 > *coe1 + COUENNE_EPS) return  1;
-  }
+    }*/
 
   return 0;
 }
@@ -256,13 +304,24 @@ int exprQuad::compare (exprQuad &e) {
 
 /// used in rank-based branching variable choice
 
-int exprQuad::rank (CouenneProblem *p) {
+int exprQuad::rank () {
 
-  int maxrank = exprGroup::rank (p);
+  int maxrank = exprGroup::rank ();
 
   if (maxrank < 0) 
     maxrank = 0;
 
+  int r;
+
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
+
+    if ((r = row -> first -> rank ()) > maxrank) maxrank = r;
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
+      if ((r = col -> first -> rank ()) > maxrank) maxrank = r;
+  }
+
+  /*
   CouNumber *coe = qcoeff_;
 
   int  n = nqterms_, 
@@ -277,6 +336,7 @@ int exprQuad::rank (CouenneProblem *p) {
       if ((r = p -> Var (*i) -> rank (p)) > maxrank) maxrank = r;
       if ((r = p -> Var (*j) -> rank (p)) > maxrank) maxrank = r;
     }
+  */
 
   return maxrank;
 }
@@ -290,7 +350,7 @@ expression *exprQuad::getFixVar () {
   return NULL;
 
   // TODO: this is quite complicated. It is a nonlinear expression but
-  // we have no access to variable pointers
+  // we have no access to variable pointers, yet...
 
   //if (arglist_ [0] -> Type () == CONST) 
   //  return this;
@@ -303,86 +363,38 @@ void exprQuad::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
 
   exprGroup::fillDepSet (dep, g);
 
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
+
+    dep -> insert (g -> lookup (row -> first -> Index ()));
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
+      dep -> insert (g -> lookup (col -> first -> Index ()));
+  }
+
+  /*
   for (int *qi = qindexI_, *qj = qindexJ_, n = nqterms_; n--;) {
     dep -> insert (g -> lookup (*qi++));
     dep -> insert (g -> lookup (*qj++));
-  }
-}
-
-
-/// insert a pair <int,CouNumber> into a map for linear terms
-void linsert (std::map <int, CouNumber> &lmap, 
-	      int index, CouNumber coe) {
-
-  std::map <int, CouNumber>::iterator i = lmap.find (index);
-
-  if (i != lmap.end()) {
-    if (fabs (i -> second += coe) < COUENNE_EPS)
-      lmap.erase (i);
-  } else {
-    std::pair <int, CouNumber> npair (index, coe);
-    lmap.insert (npair);
-  }
-}
-
-/// insert a pair <<int,int>,CouNumber> into a map for quadratic terms
-void qinsert (std::map <std::pair <int, int>, CouNumber> &map, 
-	      int indI, int indJ, CouNumber coe) {
-
-  std::pair <int, int> nind (indI, indJ);
-  std::pair <std::pair <int, int>, CouNumber> npair (nind, coe);
-  std::map  <std::pair <int, int>, CouNumber>::iterator i = map.find (nind);
-
-  if (i != map.end()) {
-    if (fabs (i -> second += coe) < COUENNE_EPS)
-      map.erase (i);
-  } else map.insert (npair);
-}
-
-
-/// create dIndex_ based on occurrences in qindexI_ and qindexJ_
-void exprQuad::make_dIndex (int numcols, int *indexmap) { 
-
-  CoinFillN (indexmap, numcols, -1);
-
-  int *qindexI = getQIndexI (),
-      *qindexJ = getQIndexJ ();
-
-  nDiag_ = 0; // initialize sparse diagonal index vector
-
-  // fill indexmap
-  for (int i = 0; i < nqterms_; ++i) {
-
-    int qi = qindexI [i], 
-        qj = qindexJ [i];
-
-    if                (indexmap [qi] == -1)  indexmap [qi] = nDiag_++;
-    if ((qi != qj) && (indexmap [qj] == -1)) indexmap [qj] = nDiag_++;
-  }
-
-  dIndex_ = new int [nDiag_];
-
-  for (int i=0; i<numcols; ++i)
-    if (indexmap [i] > -1)
-      dIndex_ [indexmap [i]] = i;
-
-#ifdef DEBUG
-  printf ("make_Index, %d indices: ", nDiag_);
-  for (int i=0; i<nDiag_; i++)
-    printf ("(%d) %d ", indexmap [i], dIndex_ [i]);
-  printf ("\n");
-#endif
+    }*/
 }
 
 
 /// fill in the set with all indices of variables appearing in the
 /// expression
 int exprQuad::DepList (std::set <int> &deplist, 
-		       enum dig_type type,
-		       const CouenneProblem *p) {
+		       enum dig_type type) {
 
-  int deps = exprGroup::DepList (deplist, type, p);
+  int deps = exprGroup::DepList (deplist, type);
 
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
+
+    deps += row -> first -> DepList (deplist, type);
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
+      deps += col -> first -> DepList (deplist, type);
+  }
+
+  /*
   if (!p) // no problem pointer, have to suppose all terms appear
 
     for (int i = nqterms_; i--;) {
@@ -410,6 +422,79 @@ int exprQuad::DepList (std::set <int> &deplist,
       if (qi != qj)
 	deps += scanIndex (qj, deplist, p, type);
     }
+  */
 
   return deps;
 }
+
+
+/// is this quadratic expression integer?
+bool exprQuad::isInteger () {
+
+  if (!exprGroup::isInteger ()) 
+    return false;
+
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
+
+    bool intI = row -> first -> isInteger ();
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
+
+      CouNumber coe = col -> second;
+
+      bool 
+	intCoe = ::isInteger (coe),
+	intJ   = row -> first -> isInteger ();
+
+      if (intI && intJ && intCoe) 
+	continue;
+
+      if (!intCoe  // coefficient fractional, check all is fixed and product is integer
+	  && row -> first -> isFixed ()
+	  && col -> first -> isFixed ()
+	  && ::isInteger (coe * 
+			  (*(row -> first -> Lb ())) () * 
+			  (*(col -> first -> Lb ())) ()))
+	continue;
+
+      if (!intI && (row -> first -> isFixed ()) && ::isInteger ((*(row -> first)) ())) continue;
+      if (!intJ && (col -> first -> isFixed ()) && ::isInteger ((*(col -> first)) ())) continue;
+
+      //if (!intI && !intJ &&  intCoe) ; // check x y fixed int
+      //if (!intI &&  intJ &&  intCoe) ; // check x   fixed int
+      //if ( intI && !intJ &&  intCoe) ; // check   y fixed int
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/// replace variable x with new (aux) w
+void exprQuad::replace (exprVar *x, exprVar *w) {
+
+  exprGroup::replace (x, w);
+
+  int index = x -> Index ();
+
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
+
+    exprVar * &vr = row -> first;
+
+    if ((vr -> Type  () == VAR) &&
+	(vr -> Index () == index))
+      vr = w;
+
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
+
+      exprVar * &vc = col -> first;
+
+      if ((vc -> Type  () == VAR) &&
+	  (vc -> Index () == index))
+	vc = w;
+    }
+  }
+}
+

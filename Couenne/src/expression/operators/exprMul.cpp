@@ -104,7 +104,7 @@ expression *exprMul::differentiate (int index) {
 
   for (int i = 0; i < nargs_; i++) 
 
-    if (arglist_ [i] -> dependsOn (&index, 1)) {
+    if (arglist_ [i] -> dependsOn (index)) {
 
       expression **alm = new expression * [nargs_];
 
@@ -171,7 +171,7 @@ expression *exprMul::getFixVar ()
 
 
 /// is this expression integer?
-bool exprMul::isInteger () {
+/*bool exprMul::isInteger () {
 
   // if all operands are integer, return true
 
@@ -197,5 +197,5 @@ bool exprMul::isInteger () {
 	  (ac && bc && (fabs (COUENNE_round (alv * blv) - alv * blv) < COUENNE_EPS)) ||
 	  (ac && arglist_ [1] -> isInteger ()) ||
 	  (bc && arglist_ [0] -> isInteger ()));
-}
+	  }*/
 

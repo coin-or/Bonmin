@@ -169,13 +169,37 @@ fake_tighten (char direction,  // 0: left, 1: right
       }
 #endif
 
-      // apply bound
-      if (direction) {oub[index] = ub_[index] = fb; chg_bds [index].setUpper (t_chg_bounds::CHANGED);}
-      else           {olb[index] = lb_[index] = fb; chg_bds [index].setLower (t_chg_bounds::CHANGED);}
+      /*bool do_not_tighten = false;
+
+      // check if cut best known solution
+      if (optimum_) {
+	if (direction) {
+	  if ((oub [index] > optimum_ [index]) && 
+	      (fb          < optimum_ [index])) {
+	    printf ("aggressive bt cuts optimum ub %d: %g < %g < %g\n", 
+		    index, fb, optimum_ [index], oub [index]);
+	    do_not_tighten = true;
+	  }
+	} else {
+	  if ((olb [index] < optimum_ [index]) && 
+	      (fb          > optimum_ [index])) {
+	    printf ("aggressive bt cuts optimum lb %d: %g < %g < %g\n", 
+		    index, olb [index], optimum_ [index], fb);
+	    do_not_tighten = true;
+	  }
+	}
+	}*/
+
+      //if (!do_not_tighten) {
+
+	// apply bound
+      if (direction) {oub[index]=ub_[index] = fb; chg_bds [index].setUpper (t_chg_bounds::CHANGED);}
+      else           {olb[index]=lb_[index] = fb; chg_bds [index].setLower (t_chg_bounds::CHANGED);}
 
       outer = fb; // we have at least a tightened bound, save it 
 
       tightened = true;
+	//}
 
       // restore initial bound
       CoinCopyN (chg_bds, ncols, f_chg);

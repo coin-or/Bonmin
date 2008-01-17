@@ -7,90 +7,50 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneProblem.hpp"
 #include "exprConst.hpp"
+#include "exprVar.hpp"
 #include "exprGroup.hpp"
 #include "depGraph.hpp"
 
 
 /// Constructor
-exprGroup::exprGroup  (CouNumber c0,     // constant term
-		       int *index,       // indices (array terminated by a -1)
-		       CouNumber *coeff, // coefficient vector
-		       expression **al,  // vector of nonlinear expressions to be added 
-		       int n):           // number of *nonlinear* expressions in al
+exprGroup::exprGroup  (CouNumber c0,
+		       std::vector <std::pair <exprVar *, CouNumber> > &lcoeff, 
+		       expression **al, 
+		       int n):
   exprSum  (al, n),
-  nlterms_ (0),
-  c0_      (c0) {
-
-  // count linear terms
-  for (register int *ind = index; *ind++ >= 0; nlterms_++);
-
-  index_ = new int       [nlterms_ + 1];
-  coeff_ = new CouNumber [nlterms_];
-
-  index_ [nlterms_] = index [nlterms_]; // assign -1 at end of array
-
-  for (int i=0; i<nlterms_; i++) {
-    index_ [i] = index [i];
-    coeff_ [i] = coeff [i];
-  }
-} 
+  lcoeff_  (lcoeff),
+  c0_      (c0) {}
 
 
 /// copy constructor
 exprGroup::exprGroup  (const exprGroup &src): 
   exprSum   (src.clonearglist (), src.nargs_),
-  nlterms_  (src.nlterms_),
-  index_    (NULL),
-  coeff_    (NULL),
-  c0_       (src.c0_) {
-
-  coeff_ = new CouNumber [nlterms_];
-  index_ = new int       [nlterms_ + 1];
-
-  index_ [nlterms_] = -1;
-
-  for (int i=0; i < nlterms_; i++) {
-
-    index_ [i] = src.index_ [i];
-    coeff_ [i] = src.coeff_ [i];
-  }
-} 
-
-
-/// destructor
-exprGroup::~exprGroup () {
-
-  if (index_) {
-    delete [] index_;
-    delete [] coeff_;
-  }
-}
+  lcoeff_   (src.lcoeff_),
+  c0_       (src.c0_) {} 
 
 
 /// I/O
-void exprGroup::print (std::ostream &out, bool descend, CouenneProblem *p) const {
+void exprGroup::print (std::ostream &out, bool descend) const {
 
   if (nargs_ && ((nargs_ > 1) ||
 		 ((*arglist_) -> Type () != CONST) ||
 		 (fabs ((*arglist_) -> Value ()) > COUENNE_EPS)))
-    exprSum::print (out, descend, p);
+    exprSum::print (out, descend);
 
   if      (c0_ >   COUENNE_EPS) out << '+' << c0_;
   else if (c0_ < - COUENNE_EPS) out        << c0_;
 
-  for (register int *ind=index_, i=0; *ind>=0; ind++) {
+  for (int n = lcoeff_.size (), i=0; n--; i++) {
 
-    CouNumber coeff = coeff_ [i++];
+    CouNumber coeff = lcoeff_ [i]. second;
     out << ' ';
 
     if      (coeff >   COUENNE_EPS) out << '+' << coeff << "*";
     else if (coeff < - COUENNE_EPS) out        << coeff << "*";
     else continue;
 
-    if (!p) out << "x_" << *ind;
-    else p -> Var (*ind) -> print (out, descend, p);
+    lcoeff_ [i]. first -> print (out, descend);
   }
 }
 
@@ -102,9 +62,9 @@ expression *exprGroup::differentiate (int index) {
 
   CouNumber totlin=0;
 
-  for (register int *ind = index_, i=0; *ind>=0; i++)
-    if (*ind++ == index)
-      totlin += coeff_ [i];
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    if (el -> first -> Index () == index)
+      totlin += el -> second;
 
   int nargs = 0;
 
@@ -127,10 +87,9 @@ expression *exprGroup::differentiate (int index) {
 /// get a measure of "how linear" the expression is:
 int exprGroup::Linearity () {
 
-  // compute linearity of nonlinear part
-  int nllin = exprSum::Linearity ();
-
-  int llin  = (nlterms_ == 0) ? 
+  int 
+    nllin = exprSum::Linearity (),    // linearity of nonlinear part
+    llin  = (lcoeff_.size () == 0) ?  //              linear part
     ((fabs (c0_) < COUENNE_EPS) ? ZERO : CONSTANT) : 
     LINEAR;
 
@@ -141,13 +100,39 @@ int exprGroup::Linearity () {
 /// compare affine terms
 int exprGroup::compare (exprGroup &e) {
 
-  CouNumber *coe0 =   coeff_,
-            *coe1 = e.coeff_;
+  //int sum = exprSum::compare (e);
+
+  //if (sum != 0) 
+  //return sum;
 
   if (c0_ < e.c0_ - COUENNE_EPS) return -1;
   if (c0_ > e.c0_ + COUENNE_EPS) return  1;
 
-  for (register int *ind0 = index_, *ind1 = e.index_; 
+  if (lcoeff_.size () < e.lcoeff_.size ()) return -1;
+  if (lcoeff_.size () > e.lcoeff_.size ()) return  1;
+
+  for (lincoeff::iterator 
+	 el1 =   lcoeff_.begin (),
+	 el2 = e.lcoeff_.begin ();
+       el1 != lcoeff_.end (); 
+       ++el1, ++el2) {
+
+    int 
+      ind1 = el1 -> first -> Index (),
+      ind2 = el2 -> first -> Index ();
+
+    CouNumber 
+      coe1 = el1 -> second,
+      coe2 = el2 -> second;
+
+    if (ind1 < ind2) return -1;
+    if (ind1 > ind2) return  1;
+
+    if (coe1 < coe2 - COUENNE_EPS) return -1;
+    if (coe1 > coe2 + COUENNE_EPS) return  1;
+  }
+
+  /*for (register int *ind0 = index_, *ind1 = e.index_; 
        *ind0 >= 0 || *ind1 >= 0; 
        ind0++, ind1++, 
        coe0++, coe1++) {
@@ -156,7 +141,7 @@ int exprGroup::compare (exprGroup &e) {
     if (*ind0 > *ind1) return  1;
     if (*coe0 < *coe1 - COUENNE_EPS) return -1;
     if (*coe0 > *coe1 + COUENNE_EPS) return  1;
-  }
+    }*/
 
   return 0;
 }
@@ -164,16 +149,16 @@ int exprGroup::compare (exprGroup &e) {
 
 /// used in rank-based branching variable choice
 
-int exprGroup::rank (CouenneProblem *p) {
+int exprGroup::rank () {
 
-  int maxrank = exprOp::rank (p);
+  int maxrank = exprOp::rank ();
 
   if (maxrank < 0) 
     maxrank = 0;
 
-  for (register int *ind = index_; *ind>=0; ind++) {
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
 
-    int r = (p -> Var (*ind) -> rank (p));
+    int r = el -> first -> rank ();
     if (r > maxrank)
       maxrank = r;
   }
@@ -182,109 +167,76 @@ int exprGroup::rank (CouenneProblem *p) {
 }
 
 
-/// check if this expression depends on a set of variables specified
-/// in the parameters
-/*int exprGroup::dependsOn (register int *chg, register int nch) {
-
-  int tot = exprOp::dependsOn (chg, nch);
-
-  /// TODO: check if chg and index_ are sorted to improve efficiency
-  for (; nch-- && (*chg >= 0); chg++)
-    for (register int *ind = index_; *ind >= 0;)
-      if (*ind++ == *chg) 
-	tot++;
-
-  return tot;
-  }*/
-
-
 /// update dependence set with index of this variable
 void exprGroup::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
 
   exprOp::fillDepSet (dep, g);
 
-  for (int *index = index_; *index >= 0; index++)
-    dep -> insert (g -> lookup (*index));
-}
-
-
-/// specialized version to check expression of linear term
-/*int exprGroup::dependsOn (CouenneProblem *p, int *chg, int nch) {
-
-  int tot = dependsOn (chg, nch);
-
-  for (int *ind = index_; *ind >= 0; ind++)
-    for (register int i=0; (i < nch) && (chg [i] >= 0); i++)
-      if (p -> Var (*ind) -> Type () == AUX)
-	tot += p -> Var (*ind) -> Image () -> dependsOn (p, chg, nch);
-
-  return tot;
-  }*/
-
-
-/// scan expression for single index
-int scanIndex (int index, std::set <int> &deplist, const CouenneProblem *p, enum dig_type type) {
-
-  if (deplist.find (index) != deplist.end ()) 
-    return 0;
-
-  int deps = 0;
-
-  // this variable not seen before in the expression
-
-  if (p -> Var (index) -> Type () == VAR) { 
-
-    // it's a leaf, stop here
-    deplist.insert (index);
-    deps++;
-
-  } else {
-
-    // it's an aux
-    if (type != ORIG_ONLY) {
-      deps++;
-      deplist.insert (index);
-    }
-
-    if (type != STOP_AT_AUX) 
-      deps += p -> Var (index) -> Image () -> DepList (deplist, type, p);
-  }
-
-  return deps;
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    dep -> insert (g -> lookup (el -> first -> Index ()));
 }
 
 
 /// fill in the set with all indices of variables appearing in the
 /// expression
 int exprGroup::DepList (std::set <int> &deplist,
-			enum dig_type type,
-			const CouenneProblem *p) {
+			enum dig_type type) {
 
-  int deps = exprOp::DepList (deplist, type, p);
+  int deps = exprOp::DepList (deplist, type);
 
-  if (!p)
-    for (int i = nlterms_; i--;) {
-
-      int index = index_ [i];
-
-      if (index < 0) 
-	continue;
-
-      if (deplist.find (index) == deplist.end ()) {
-	deplist.insert (index);
-	deps++;
-      }
-    }
-  else
-    for (int i = nlterms_; i--;) {
-
-      int index = index_ [i];
-
-      if (index < 0) 
-	continue;
-
-      deps += scanIndex (index, deplist, p, type);
-    }
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    deps += el -> first -> DepList (deplist, type);
 
   return deps;
+}
+
+
+/// is this linear term integer?
+bool exprGroup::isInteger () {
+
+  if ((!::isInteger (c0_)) ||
+      (!exprOp::isInteger ()))
+    return false;
+
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
+
+    CouNumber coe = el -> second;
+
+    bool
+      intCoe = ::isInteger (coe),
+      intVar = el -> first -> isInteger ();
+
+    if (intCoe && intVar)
+      continue;
+
+    CouNumber lb = (*(el -> first -> Lb ())) ();
+
+    // check var fixed and product is integer
+    if ((fabs (lb - (*(el -> first -> Ub ())) ()) < COUENNE_EPS) &&
+	(::isInteger (lb * coe) ||
+	 (intCoe && ::isInteger (lb)))) 
+      continue;
+
+    return false;
+  }
+
+  return true;
+}
+
+
+/// replace variable x with new (aux) w
+void exprGroup::replace (exprVar *x, exprVar *w) {
+
+  exprOp::replace (x, w);
+
+  int index = x -> Index ();
+
+  for (lincoeff::iterator el = lcoeff_. begin (); el != lcoeff_. end (); ++el) {
+
+    exprVar * &ve = el -> first;
+
+    if ((ve -> Type  () == VAR) &&
+	(ve -> Index () == index))
+      ve = w;
+  }
 }

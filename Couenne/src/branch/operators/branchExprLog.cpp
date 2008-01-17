@@ -22,7 +22,7 @@
 /// each expression's arguments
 CouNumber exprLog::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
-				 int &ind, 
+				 expression *&var,
 				 double * &brpts, 
 				 int &way) {
 
@@ -43,8 +43,11 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
   // equivalent to choose w's or x's index as ind, as the implied- and
   // propagated bounds will do the rest.
 
-  ind    = argument_ -> Index ();
-  int wi = obj -> Reference () -> Index ();
+  var = argument_;
+
+  int
+    ind = var -> Index (),
+    wi  = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0));
 
@@ -55,8 +58,8 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     u  = info -> upper_    [ind];
 
   if (u < COUENNE_EPS) { // strange case, return default branching rule
-    ind = -1; 
-    return 0;
+    var = NULL; 
+    return 0.;
   }
 
   if (x0 < SQ_COUENNE_EPS) // very unlikely...
@@ -133,13 +136,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
  
   simpletriplet ft (log, inv, oppInvSqr, inv);
 
-  switch (obj -> Strategy ()) {
-
-  case CouenneObject::MIN_AREA:     *brpts = maxHeight   (&ft, x0, y0, l, u); break;
-  case CouenneObject::BALANCED:     *brpts = minMaxDelta (&ft, x0, y0, l, u); break;
-  case CouenneObject::MID_INTERVAL: 
-  default:                          *brpts = midInterval (     x0,     l, u); break;
-  }
+  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
 
   //  *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u); 
   // WRONG! Local minima may be at bounds

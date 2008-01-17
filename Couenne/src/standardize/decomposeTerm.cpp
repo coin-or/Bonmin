@@ -11,14 +11,9 @@
 #include "exprMul.hpp"
 #include "exprPow.hpp"
 #include "exprQuad.hpp"
+#include "lqelems.hpp"
 
 //#define DEBUG
-
-/// re-organizes multiplication and stores indices (and exponents) of
-/// its variables
-void flattenMul (expression *mul, CouNumber &coe, 
-		 std::map <int, CouNumber> &indices, 
-		 CouenneProblem *p);
 
 /// given (expression *) element of sum, returns (coe,ind0,ind1)
 /// depending on element:
@@ -31,11 +26,11 @@ void flattenMul (expression *mul, CouNumber &coe,
 /// x_i and/or x_j may come from standardizing other (linear or
 /// quadratic operator) sub-expressions
 
-void decomposeTerm (CouenneProblem *p, expression *term,
-		    CouNumber initCoe,
-		    CouNumber &c0,
-		    std::map <int,                 CouNumber> &lmap,
-		    std::map <std::pair <int,int>, CouNumber> &qmap) {
+void CouenneProblem::decomposeTerm (expression *term,
+				    CouNumber initCoe,
+				    CouNumber &c0,
+				    LinMap  &lmap,
+				    QuadMap &qmap) {
 
   switch (term -> code ()) {
 
@@ -46,39 +41,58 @@ void decomposeTerm (CouenneProblem *p, expression *term,
     break;
 
   case COU_EXPRVAR:   /// a variable
-    linsert (lmap, term -> Index (), initCoe);
+    lmap.insert (term -> Index (), initCoe);
     break;
 
   case COU_EXPROPP:   /// the opposite of a term
-    decomposeTerm (p, term -> Argument (), -initCoe, c0, lmap, qmap);
+    decomposeTerm (term -> Argument (), -initCoe, c0, lmap, qmap);
     break;
 
   case COU_EXPRSUB:   /// a subtraction
-    decomposeTerm (p, term -> ArgList () [0],  initCoe, c0, lmap, qmap);
-    decomposeTerm (p, term -> ArgList () [1], -initCoe, c0, lmap, qmap);
+    decomposeTerm (term -> ArgList () [0],  initCoe, c0, lmap, qmap);
+    decomposeTerm (term -> ArgList () [1], -initCoe, c0, lmap, qmap);
     break;
 
   case COU_EXPRQUAD: { /// a quadratic form
 
     exprQuad *t = dynamic_cast <exprQuad *> (term);
+    exprQuad::sparseQ &M = t -> getQ ();
 
-    int       *qi = t -> getQIndexI ();
+    for (exprQuad::sparseQ::iterator row = M.begin (); 
+	 row != M.end (); ++row) {
+
+      int xind = row -> first -> Index ();
+
+      for (exprQuad::sparseQcol::iterator col = row -> second.begin (); 
+	   col != row -> second.end (); ++col) {
+	qmap.insert (xind, col -> first -> Index (), initCoe * col -> second);
+      }
+    }
+
+  /*    int       *qi = t -> getQIndexI ();
     int       *qj = t -> getQIndexJ ();
     CouNumber *qc = t -> getQCoeffs ();
 
     for (int i = t -> getnQTerms (); i--;)
-      qinsert (qmap, *qi++, *qj++, initCoe * *qc++);
+    qmap.insert (*qi++, *qj++, initCoe * *qc++);*/
+
   } // NO break here, exprQuad generalizes exprGroup
 
   case COU_EXPRGROUP: { /// a linear term
 
     exprGroup *t = dynamic_cast <exprGroup *> (term);
+    exprGroup::lincoeff &lcoe = t -> lcoeff ();
 
-    int       *ind = t -> getIndices ();
+    //  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    for (int n = lcoe.size (), i=0; n--; i++)
+      lmap.insert (lcoe [i].first -> Index (), initCoe * lcoe [i].second);
+
+
+    /*int       *ind = t -> getIndices ();
     CouNumber *coe = t -> getCoeffs ();
 
     for (int i = t -> getnLTerms (); i--;)
-      linsert (lmap, *ind++, initCoe * *coe++);
+    lmap.insert (*ind++, initCoe * *coe++);*/
 
     c0 += initCoe * t -> getc0 ();
   } // NO break here, exprGroup generalizes exprSum
@@ -87,7 +101,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
     expression **al = term -> ArgList ();
     for (int i = term -> nArgs (); i--;)
-      decomposeTerm (p, *al++, initCoe, c0, lmap, qmap);
+      decomposeTerm (*al++, initCoe, c0, lmap, qmap);
 
   } break;
 
@@ -101,7 +115,7 @@ void decomposeTerm (CouenneProblem *p, expression *term,
     CouNumber coe = initCoe;
 
     // return list of variables (some of which auxiliary)
-    flattenMul (term, coe, indices, p);
+    flattenMul (term, coe, indices);
 
 #ifdef DEBUG
     printf ("from flattenmul: [%g] ", coe);
@@ -126,16 +140,16 @@ void decomposeTerm (CouenneProblem *p, expression *term,
       int       index = one -> first;
       CouNumber expon = one -> second;
 
-      if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, index, coe);
-      else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, index, index, coe);
+      if      (fabs (expon - 1) < COUENNE_EPS) lmap.insert (index, coe);
+      else if (fabs (expon - 2) < COUENNE_EPS) qmap.insert (index, index, coe);
       else {
-	exprAux *aux = p -> addAuxiliary 
-	  (new exprPow (new exprClone (p -> Var (index)),
+	exprAux *aux = addAuxiliary 
+	  (new exprPow (new exprClone (Var (index)),
 			new exprConst (expon)));
 
 	//linsert (lmap, aux -> Index (), initCoe); // which of these three is correct?
 	//linsert (lmap, aux -> Index (), initCoe * coe);
-	linsert (lmap, aux -> Index (), coe);
+	lmap.insert (aux -> Index (), coe);
       }
     } break;
 
@@ -149,19 +163,19 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
       // first variable
       if (fabs (one -> second - 1) > COUENNE_EPS) {
-	exprAux *aux = p -> addAuxiliary (new exprPow (new exprClone (p -> Var (one -> first)),
-						       new exprConst (one -> second)));
+	exprAux *aux = addAuxiliary (new exprPow (new exprClone (Var (one -> first)),
+						  new exprConst (one -> second)));
 	ind0 = aux -> Index ();
       } else ind0 = one -> first;
 
       // second variable
       if (fabs (two -> second - 1) > COUENNE_EPS) {
-	exprAux *aux = p -> addAuxiliary (new exprPow (new exprClone (p -> Var (two -> first)),
-						       new exprConst (two -> second)));
+	exprAux *aux = addAuxiliary (new exprPow (new exprClone (Var (two -> first)),
+						  new exprConst (two -> second)));
 	ind1 = aux -> Index ();
       } else ind1 = two -> first;
 
-      qinsert (qmap, ind0, ind1, coe);
+      qmap.insert (ind0, ind1, coe);
     } break;
 
     default: { 
@@ -173,17 +187,17 @@ void decomposeTerm (CouenneProblem *p, expression *term,
 
       for (int i=0; one != indices.end (); ++one, i++) 
 	if (fabs (one -> second - 1) > COUENNE_EPS) {
-	  exprAux *aux = p -> addAuxiliary (new exprPow (new exprClone (p -> Var (one -> first)),
-							 new exprConst (one -> second)));
+	  exprAux *aux = addAuxiliary (new exprPow (new exprClone (Var (one -> first)),
+						    new exprConst (one -> second)));
 	  al [i] = new exprClone (aux);
-	} else al [i] = new exprClone (p -> Var (one -> first));
+	} else al [i] = new exprClone (Var (one -> first));
 
       // TODO: when we have a convexification for \prod_{i \in I}...
-      //      exprAux *aux = p -> addAuxiliary (new exprMul (al, indices.size ()));
+      //      exprAux *aux = addAuxiliary (new exprMul (al, indices.size ()));
 
       exprMul *mul = new exprMul (al, indices.size ());
-      exprAux *aux = mul -> standardize (p);
-      linsert (lmap, aux -> Index (), coe);
+      exprAux *aux = mul -> standardize (this);
+      lmap.insert (aux -> Index (), coe);
 
     } break;
     }
@@ -199,14 +213,14 @@ void decomposeTerm (CouenneProblem *p, expression *term,
       // non-constant exponent, standardize the whole term and add
       // linear component (single aux)
 
-      expression *aux = term -> standardize (p);
+      expression *aux = term -> standardize (this);
       if (!aux) aux = term;
-      linsert (lmap, aux -> Index (), initCoe);
+      lmap.insert (aux -> Index (), initCoe);
 
     } else { // this is of the form f(x)^k.  If k=2, return square. If
 	     // k=1, return var. Otherwise, generate new auxiliary.
 
-      expression *aux = (*al) -> standardize (p);
+      expression *aux = (*al) -> standardize (this);
 
       if (!aux)
 	aux = *al; // it was a simple variable, and was not standardized.
@@ -214,22 +228,22 @@ void decomposeTerm (CouenneProblem *p, expression *term,
       CouNumber expon = al [1] -> Value ();
       int ind = aux -> Index ();
 
-      if      (fabs (expon - 1) < COUENNE_EPS) linsert (lmap, ind, initCoe);
-      else if (fabs (expon - 2) < COUENNE_EPS) qinsert (qmap, ind, ind, initCoe);
+      if      (fabs (expon - 1) < COUENNE_EPS) lmap.insert (ind, initCoe);
+      else if (fabs (expon - 2) < COUENNE_EPS) qmap.insert (ind, ind, initCoe);
       else {
-	exprAux *aux2 = p -> addAuxiliary 
+	exprAux *aux2 = addAuxiliary 
 	  (new exprPow (new exprClone (aux), new exprConst (expon))); // TODO: FIX!
-	linsert (lmap, aux2 -> Index (), initCoe);
+	lmap.insert (aux2 -> Index (), initCoe);
       }
     }
   } break;
 
   default: { /// otherwise, simply standardize expression 
 
-    expression *aux = term -> standardize (p);
+    expression *aux = term -> standardize (this);
     if (!aux) 
       aux = term;
-    linsert (lmap, aux -> Index (), initCoe);
+    lmap.insert (aux -> Index (), initCoe);
   } break;
   }
 }

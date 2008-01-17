@@ -8,7 +8,6 @@
  */
 
 #include "CouenneCutGenerator.hpp"
-#include "CouenneProblem.hpp"
 
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
@@ -49,7 +48,7 @@ void expression::getBounds (CouNumber &lb, CouNumber &ub) {
 
 // generate one cut for a constant
 
-void exprConst::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprConst::generateCuts (expression *w, const OsiSolverInterface &si, 
 			      OsiCuts &cs, const CouenneCutGenerator *cg, 
 			      t_chg_bounds *chg, int,
 			      CouNumber, CouNumber) {
@@ -131,16 +130,14 @@ void exprCopy::replace (exprVar *orig, exprVar *aux) {
 
 /// dependence on variable set: return cardinality of subset of the
 /// set of indices in first argument which occur in expression. 
-int expression::dependsOn (int *ind, int n, 
-			   CouenneProblem *p, 
-			   enum dig_type type) {
+int expression::dependsOn (int *ind, int n, enum dig_type type) {
 
   std::set <int> 
     indlist (ind, ind + n), 
     deplist,
     intersectn;
 
-  DepList (deplist, type, p);
+  DepList (deplist, type);
 
   std::set_intersection (indlist .begin (), indlist .end (), 
 			 deplist .begin (), deplist .end (),

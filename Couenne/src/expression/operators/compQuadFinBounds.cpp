@@ -11,36 +11,35 @@
 #include "CoinHelperFunctions.hpp"
 
 
-void updateInf (CouNumber, CouNumber, CouNumber, int &, int &, int );
+void updateInf (CouNumber coe, CouNumber lb, CouNumber ub, int &indInf1, int &indInf2, int i) {
 
+  if (coe > 0) {
+    if (lb < 0) indInf1 = (indInf1 == -1) ? i : -2;
+    if (ub > 0) indInf2 = (indInf2 == -1) ? i : -2;
+  } else {
+    if (lb < 0) indInf2 = (indInf2 == -1) ? i : -2;
+    if (ub > 0) indInf1 = (indInf1 == -1) ? i : -2;
+  }
+}
 
-void computeQuadFiniteBound (const exprQuad *e,
-			     CouNumber &qMin, CouNumber &qMax, 
-			     CouNumber *l, CouNumber *u,
-			     int &indInfLo, int &indInfUp) {
+// compute bound of a quadratic expression neglecting the infinite
+// bounds of single variables
 
-  exprQuad *eq = const_cast <exprQuad *> (e);
-
-  int 
-    nlt = eq -> getnLTerms (),
-    *li = eq -> getIndices (),
-
-    nqt = eq -> getnQTerms (),
-    *qi = eq -> getQIndexI (),
-    *qj = eq -> getQIndexJ ();
-
-  CouNumber
-    *lc = eq -> getCoeffs  (),
-    *qc = eq -> getQCoeffs ();
+void exprQuad::computeQuadFiniteBound (CouNumber &qMin, 
+				       CouNumber &qMax, 
+				       CouNumber *l, 
+				       CouNumber *u,
+				       int &indInfLo, 
+				       int &indInfUp) {
 
   // linear terms ///////////////////////////////////////////////////
 
-  while (nlt--) {
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
 
-    int ind = *li++;
+    int ind = el -> first -> Index ();
 
     CouNumber 
-      coe = *lc++, 
+      coe = el -> second,
       li  = l [ind], 
       ui  = u [ind];
 
@@ -69,73 +68,65 @@ void computeQuadFiniteBound (const exprQuad *e,
     }
   }
 
-  // quadratic terms ////////////////////////////////////////////////
+  // quadratic terms ///////////////////////////////////////////////////
 
-  while (nqt--) {
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    int i = *qi++,
-        j = *qj++;
+    int i = row -> first -> Index ();
 
-    CouNumber 
-      coe = *qc++,
-      lbi = l [i],
-      ubi = u [i];
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
-    if (i==j) { // term of the form q_{ii} x_i^2
+      int j = col -> first -> Index ();
 
-      CouNumber
-	tmin = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0,
-	tmax = CoinMax (lbi*lbi, ubi*ubi);
+      CouNumber 
+	coe = col -> second,
+	lbi = l [i],
+	ubi = u [i];
 
-      if (coe < 0) { // negative coefficient, q_{ii} < 0
-	qMax += coe * tmin;
-	if (indInfLo > -2) {
-	  if (tmax > COUENNE_INFINITY) indInfLo = (indInfLo == -1) ? i : -2;
-	  else qMin += coe * tmax;
+      if (i==j) { // term of the form q_{ii} x_i^2
+
+	CouNumber
+	  tmin = (ubi <= 0) ? (ubi * ubi) : (lbi >= 0) ? (lbi * lbi) : 0,
+	  tmax = CoinMax (lbi*lbi, ubi*ubi);
+
+	if (coe < 0) { // negative coefficient, q_{ii} < 0
+	  qMax += coe * tmin;
+	  if (indInfLo > -2) {
+	    if (tmax > COUENNE_INFINITY) indInfLo = (indInfLo == -1) ? i : -2;
+	    else qMin += coe * tmax;
+	  }
+	} else { // positive coefficient
+	  qMin += coe * tmin;
+	  if (indInfUp > -2) {
+	    if (tmax > COUENNE_INFINITY) indInfUp = (indInfUp == -1) ? i : -2;
+	    else qMax += coe * tmax;
+	  }
 	}
-      } else { // positive coefficient
-	qMin += coe * tmin;
-	if (indInfUp > -2) {
-	  if (tmax > COUENNE_INFINITY) indInfUp = (indInfUp == -1) ? i : -2;
-	  else qMax += coe * tmax;
-	}
+      } else { // term of the form q_{ij} x_i x_j, j\neq i
+
+	CouNumber
+	  lbj = l [j],
+	  ubj = u [j];
+
+	coe *= 2;
+
+	// check if index i wrings unbounded value in both directions
+
+	if (lbi < -COUENNE_INFINITY) updateInf (coe, lbj, ubj, indInfUp, indInfLo, i);
+	if (lbj < -COUENNE_INFINITY) updateInf (coe, lbi, ubi, indInfUp, indInfLo, j);
+
+	if (ubi >  COUENNE_INFINITY) updateInf (coe, lbj, ubj, indInfLo, indInfUp, i);
+	if (ubj >  COUENNE_INFINITY) updateInf (coe, lbi, ubi, indInfLo, indInfUp, j);
+
+	CouNumber term, 
+	  b1 = coe * lbi * lbj,
+	  b2 = coe * lbi * ubj,
+	  b3 = coe * ubi * lbj,
+	  b4 = coe * ubi * ubj;
+
+	if ((term = CoinMin (CoinMin (b1, b2), CoinMin (b3, b4))) > -COUENNE_INFINITY) qMin += term;
+	if ((term = CoinMax (CoinMax (b1, b2), CoinMax (b3, b4))) <  COUENNE_INFINITY) qMax += term;
       }
-    } else { // term of the form q_{ij} x_i x_j, j\neq i
-
-      CouNumber
-	lbj = l [j],
-	ubj = u [j];
-
-      coe *= 2;
-
-      // check if index i wrings unbounded value in both directions
-
-      if (lbi < -COUENNE_INFINITY) updateInf (coe, lbj, ubj, indInfUp, indInfLo, i);
-      if (lbj < -COUENNE_INFINITY) updateInf (coe, lbi, ubi, indInfUp, indInfLo, j);
-
-      if (ubi >  COUENNE_INFINITY) updateInf (coe, lbj, ubj, indInfLo, indInfUp, i);
-      if (ubj >  COUENNE_INFINITY) updateInf (coe, lbi, ubi, indInfLo, indInfUp, j);
-
-      CouNumber term, 
-	b1 = coe * lbi * lbj,
-	b2 = coe * lbi * ubj,
-	b3 = coe * ubi * lbj,
-	b4 = coe * ubi * ubj;
-
-      if ((term = CoinMin (CoinMin (b1, b2), CoinMin (b3, b4))) > -COUENNE_INFINITY) qMin += term;
-      if ((term = CoinMax (CoinMax (b1, b2), CoinMax (b3, b4))) <  COUENNE_INFINITY) qMax += term;
     }
-  }
-}
-
-
-void updateInf (CouNumber coe, CouNumber lb, CouNumber ub, int &indInf1, int &indInf2, int i) {
-
-  if (coe > 0) {
-    if (lb < 0) indInf1 = (indInf1 == -1) ? i : -2;
-    if (ub > 0) indInf2 = (indInf2 == -1) ? i : -2;
-  } else {
-    if (lb < 0) indInf2 = (indInf2 == -1) ? i : -2;
-    if (ub > 0) indInf1 = (indInf1 == -1) ? i : -2;
   }
 }

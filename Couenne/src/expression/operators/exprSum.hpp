@@ -10,6 +10,8 @@
 #ifndef COUENNE_EXPRSUM_H
 #define COUENNE_EXPRSUM_H
 
+#include <vector>
+
 #include "exprOp.hpp"
 
 
@@ -20,7 +22,7 @@ class exprSum: public exprOp {
  public:
 
   /// Constructors, destructor
-  exprSum  (expression **, int);
+  exprSum  (expression ** = NULL, int = 0);
 
   /// Constructor with two elements
   exprSum (expression *, expression *);
@@ -56,7 +58,7 @@ class exprSum: public exprOp {
   virtual exprAux *standardize (CouenneProblem *p, bool addAux = true);
 
   /// Special version for linear constraints
-  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+  virtual void generateCuts (expression *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
@@ -73,6 +75,16 @@ class exprSum: public exprOp {
   /// exprQuad if there are enough to create something that can be
   /// convexified
   exprAux *createQuadratic (CouenneProblem *);
+
+protected:
+
+  /// inferring bounds on factors of a product
+  int impliedBoundSum (CouNumber wl, 
+		       CouNumber wu, 
+		       std::vector <CouNumber> &xl,
+		       std::vector <CouNumber> &xu,
+		       std::vector <std::pair <int, CouNumber> > &nl,
+		       std::vector <std::pair <int, CouNumber> > &nu);
 };
 
 

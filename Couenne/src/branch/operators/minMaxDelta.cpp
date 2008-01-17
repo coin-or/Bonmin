@@ -10,7 +10,7 @@
  */
 
 //#define TEST_BRPTS
-#ifdef  TEST_BRPTS
+/*#ifdef  TEST_BRPTS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -134,10 +134,10 @@ public:
 
 
 
-#else 
-#include "CouenneBranchingObject.hpp"
+#else */
+#include "CouenneObject.hpp"
 #include "funtriplets.hpp"
-#endif
+//#endif
 
 
 const int maxIter = 20;
@@ -258,8 +258,7 @@ CouNumber minMaxDelta (funtriplet *ft,
 ///
 CouNumber maxHeight (funtriplet *ft, 
 		     CouNumber x, CouNumber y, 
-		     CouNumber lb, CouNumber ub) 
-{
+		     CouNumber lb, CouNumber ub) {
   /* fprintf (stderr,"slope is (%g - %g) / (%g - %g) = %g / %g = %g ----> inverse is %g\n", 
 	  ft -> F (ub), 
 	  ft -> F (lb), 
@@ -268,13 +267,14 @@ CouNumber maxHeight (funtriplet *ft,
 	  (ub - lb),
 	  (ft -> F (ub) - ft -> F (lb)) / (ub - lb),
 	  ft -> FpInv ((ft -> F (ub) - ft -> F (lb)) / (ub - lb)));*/
-return (ft -> FpInv ((ft -> F (ub) - ft -> F (lb)) / (ub - lb)));}
+  return (ft -> FpInv ((ft -> F (ub) - ft -> F (lb)) / (ub - lb)));
+}
 
 
 
 // testing stuff ////////////////////////////////////////////////////////////////////////
 
-#ifdef TEST_BRPTS
+/*#ifdef TEST_BRPTS
 
 inline CouNumber safe_pow (register CouNumber base, 
 			   register CouNumber exponent) {
@@ -366,4 +366,4 @@ int main (int argc, char **argv) {
 
   fprintf (stderr, "maxHeight = %g\n", b);
 }
-#endif
+#endif*/

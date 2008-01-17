@@ -90,7 +90,7 @@ int CouenneProblem::obbt (CouenneSolverInterface *csi,
 
   int nimprov = 0, ni;
  
-  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, ":::::: OBBT on originals ----------------\n");
+  //  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, ":::::: OBBT on originals ----------------\n");
 
   if ((ni = call_iter (csi, chg_bds, warmstart, babInfo, objcoe, VAR,  1)) < 0) {
     free (objcoe);
@@ -108,7 +108,7 @@ int CouenneProblem::obbt (CouenneSolverInterface *csi,
 
   nimprov += ni;
 
-  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, ":::::: OBBT on auxiliaries --------------\n");
+  //  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, ":::::: OBBT on auxiliaries --------------\n");
 
   if ((ni = call_iter (csi, chg_bds, warmstart, babInfo, objcoe, AUX,  1)) < 0) {
     free (objcoe);
@@ -124,7 +124,7 @@ int CouenneProblem::obbt (CouenneSolverInterface *csi,
     return ni;
   }
 
-  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, ":::::: ---------------------------------\n");
+  //  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, ":::::: ---------------------------------\n");
 
   free (objcoe);
   delete warmstart;

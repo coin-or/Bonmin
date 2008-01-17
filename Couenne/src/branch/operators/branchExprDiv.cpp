@@ -16,7 +16,7 @@
 /// each expression's arguments
 CouNumber exprDiv::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
-				 int &ind, 
+				 expression *&var,
 				 double * &brpts, 
 				 int &way) {
 
@@ -39,7 +39,8 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
 
   if ((yl < 0) && (yu > 0)) {
 
-    ind = yi;
+    var = arglist_ [1];
+    //ind = yi;
 
     way = TWO_RAND;
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
@@ -65,7 +66,7 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   if ((yl < -COUENNE_INFINITY) ||
       (yu >  COUENNE_INFINITY)) {
 
-    ind = yi;
+    var = arglist_ [1];//ind = yi;
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
     // if y0 close to bounds, branch away from it
@@ -90,7 +91,7 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   if ((wl < -COUENNE_INFINITY) || 
       (wu >  COUENNE_INFINITY)) {
 
-    ind = wi;
+    var = obj -> Reference ();//ind = wi;
 
     if ((wl < -COUENNE_INFINITY) &&
 	(wu >  COUENNE_INFINITY)) {
@@ -146,9 +147,9 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   way = TWO_RAND;
 
   if (dx > dy)
-    if (dx > dw) {ind = xi; *brpts = (xl + xu) / 2.; return fabs (x0 - y0*w0);} // dx maximum
-    else         {ind = wi; *brpts = (wl + wu) / 2.; return fabs (w0 - x0/y0);} // dw 
+    if (dx > dw) {var = arglist_[0];      *brpts = (xl+xu)/2.; return fabs (x0-y0*w0);}
+    else         {var = obj->Reference(); *brpts = (wl+wu)/2.; return fabs (w0-x0/y0);}
   else
-    if (dy > dw) {ind = yi; *brpts = (yl + yu) / 2.; return fabs (y0 - x0/w0);} // dy
-    else         {ind = wi; *brpts = (wl + wu) / 2.; return fabs (w0 - x0/y0);} // dw
+    if (dy > dw) {var = arglist_[1];      *brpts = (yl+yu)/2.; return fabs (y0-x0/w0);}
+    else         {var = obj->Reference(); *brpts = (wl+wu)/2.; return fabs (w0-x0/y0);}
 }

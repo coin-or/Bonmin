@@ -15,12 +15,11 @@
 
 // print unary expression
 void exprUnary::print (std::ostream &out, 
-		       bool descend, 
-		       CouenneProblem *p) const {
+		       bool descend) const {
 
   if (printPos () == PRE)  out << printOp ();
   out << "("; 
-  argument_ -> print (out, descend, p); 
+  argument_ -> print (out, descend); 
   out << ")";
   if (printPos () == POST) out << printOp ();
 }
@@ -74,15 +73,12 @@ bool exprUnary::isInteger () {
   // constant -- due to branching rules, for instance. If so, check if
   // the corresponding evaluated expression is integer.
 
-  register expression *al, *au;
-
+  CouNumber al, au;
   argument_ -> getBounds (al, au);
-  CouNumber val = (*al) ();
 
-  if (fabs (val - (*au) ()) < COUENNE_EPS) { 
-    // argument is constant
+  if (fabs (al - au) < COUENNE_EPS) { // argument is constant
 
-    register CouNumber fval = (F ()) (val); 
+    register CouNumber fval = (F ()) (al); 
 
     // check if f(lb=ub) is integer
     if (fabs (COUENNE_round (fval) - fval) < COUENNE_EPS)

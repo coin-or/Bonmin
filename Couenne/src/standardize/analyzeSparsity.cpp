@@ -13,10 +13,10 @@
 
 #include "CouenneTypes.hpp"
 #include "CouenneProblem.hpp"
-
 #include "exprQuad.hpp"
 #include "exprMul.hpp"
 #include "exprPow.hpp"
+#include "lqelems.hpp"
 
 #define MIN_DENSITY 0.5
 
@@ -25,12 +25,11 @@
 /// analyze sparsity of potential exprQuad/exprGroup and change
 /// linear/quadratic maps accordingly, if necessary by adding new
 /// auxiliary variables and including them in the linear map
-void analyzeSparsity (CouenneProblem *p, 
-		      CouNumber c0, 
-		      std::map <int,                 CouNumber> &lmap,
-		      std::map <std::pair <int,int>, CouNumber> &qmap) {
+void CouenneProblem::analyzeSparsity (CouNumber c0, 
+				      LinMap &lmap,
+				      QuadMap &qmap) {
 
-  if (qmap.size () == 0) return;
+  if (qmap.Map().size () == 0) return;
 
   // simple technique: if number of elements in quadratic map is more
   // than a given fraction of n^2, then turn it into an exprQuad,
@@ -39,8 +38,8 @@ void analyzeSparsity (CouenneProblem *p,
   std::set <int> occur;
   int nsquares = 0;
 
-  for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.begin ();
-       i != qmap.end (); ++i) {
+  for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.Map().begin ();
+       i != qmap.Map().end (); ++i) {
 
     int
       first  = i -> first.first,
@@ -57,14 +56,14 @@ void analyzeSparsity (CouenneProblem *p,
 
 #ifdef DEBUG
   printf ("qmap has %d element, occur has %d, md*s*(s+1)/2 = %g\n", 
-	  qmap.size (), 
+	  qmap.Map().size (), 
 	  occur.size (),
 	  MIN_DENSITY * occur.size () * (occur.size () + 1) / 2);
 #endif
 
   int nterms = occur.size ();
 
-  if ((qmap.size () > MIN_DENSITY * nterms * (nterms+1) / 2) && (nterms > 2)
+  if ((qmap.Map().size () >= MIN_DENSITY * nterms * (nterms+1) / 2) && (nterms >= 2)
       //|| (nsquares > nterms/2)
       )
     return; // keep current exprQuad structure
@@ -72,32 +71,32 @@ void analyzeSparsity (CouenneProblem *p,
   // flatten exprQuad to a sum of terms (disaggregate). This is while
   // we are testing exprQuad's
 
-  for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.begin ();
-       i != qmap.end (); ++i) {
+  for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.Map().begin ();
+       i != qmap.Map().end (); ++i) {
 
     int indI = i -> first.first,
         indJ = i -> first.second;
 
     exprAux *aux = (indI != indJ) ? 
-      p -> addAuxiliary 
-      (new exprMul (new exprClone (p -> Var (indI)),
-		    new exprClone (p -> Var (indJ)))) : 
-      p -> addAuxiliary 
-      (new exprPow (new exprClone (p -> Var (indI)),
+      addAuxiliary 
+      (new exprMul (new exprClone (Var (indI)),
+		    new exprClone (Var (indJ)))) : 
+      addAuxiliary 
+      (new exprPow (new exprClone (Var (indI)),
 		    new exprConst (2.)));
 
     //    aux -> print (); printf (" := "); aux -> Image () -> print (); printf ("\n");
 
-    linsert (lmap, aux -> Index (), i -> second);
+    lmap.insert (aux -> Index (), i -> second);
   }
 
-  if (qmap.size () == 1) {
+  if (qmap.Map().size () == 1) {
 
     // very simple case: we have a linear term plus a single bilinear
     // x*y (or square x^2) term. 
   }
 
-  qmap.erase (qmap.begin (), qmap.end ());
+  qmap.Map().erase (qmap.Map().begin (), qmap.Map().end ());
 
   // in general, decompose qmap+lmap into several (qmap+lmap)s so that
   // each corresponds to an exprQuad to be transformed into a single

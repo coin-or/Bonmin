@@ -15,9 +15,7 @@
 
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
-
-/// global index for CouenneObjects
-//int CouObjStats::Index_;
+#include "lqelems.hpp"
 
 
 /// Constructor with information for branching point selection strategy
@@ -25,7 +23,7 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 			      JnlstPtr jnlst):
 
   reference_ (ref),
-  brVarInd_  (-1), 
+  brVar_     (NULL), 
   brPts_     (NULL),
   whichWay_  (BRANCH_NONE),
   strategy_  (MID_INTERVAL),
@@ -51,7 +49,7 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 /// Copy constructor
 CouenneObject::CouenneObject (const CouenneObject &src):
   reference_ (src.reference_),
-  brVarInd_  (src.brVarInd_),
+  brVar_     (src.brVar_),
   brPts_     (NULL),
   whichWay_  (src.whichWay_),
   strategy_  (src.strategy_),
@@ -126,12 +124,15 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
       (expr -> code () == COU_EXPRQUAD)) {
 
     exprGroup *e = dynamic_cast <exprGroup *> (expr);
-    int *indices = e -> getIndices ();
 
-    for (int n = e -> getnLTerms (); n--; indices++) {
-      val = info -> solution_ [*indices];
-      solver -> setColLower (*indices, val-TOL);
-      solver -> setColUpper (*indices, val+TOL);
+    const exprGroup::lincoeff &lcoe = e -> lcoeff ();
+
+    for (int n = lcoe.size(), i=0; n--; i++) {
+      //exprGroup::lincoeff::iterator el = lcoe.begin (); el != lcoe.end (); ++el) {
+      int index = lcoe [i]. first -> Index ();
+      val = info -> solution_ [index];
+      solver -> setColLower (index, val-TOL);
+      solver -> setColUpper (index, val+TOL);
     }
 
     // take care of quadratic terms
@@ -139,21 +140,31 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
       exprQuad *e = dynamic_cast <exprQuad *> (expr);
 
-      int *qi = e -> getQIndexI (),
-	  *qj = e -> getQIndexJ ();
+      exprQuad::sparseQ q = e -> getQ ();
 
-      for (int n = e -> getnQTerms (); n--; qi++, qj++) {
+      for (exprQuad::sparseQ::iterator row = q.begin (); 
+	   row != q.end (); ++row) {
 
-	val = info -> solution_ [*qi];
-	solver -> setColLower (*qi, val-TOL);
-	solver -> setColUpper (*qi, val+TOL);
+	int xind = row -> first -> Index ();
 
-	val = info -> solution_ [*qj];
-	solver -> setColLower (*qj, val-TOL);
-	solver -> setColUpper (*qj, val+TOL);
+	val = info -> solution_ [xind];
+	solver -> setColLower (xind, val-TOL);
+	solver -> setColUpper (xind, val+TOL);
+
+	for (exprQuad::sparseQcol::iterator col = row -> second.begin ();
+	     col != row -> second.end (); ++col) {
+
+	  int yind = col -> first -> Index ();
+
+	  val = info -> solution_ [yind];
+	  solver -> setColLower (yind, val-TOL);
+	  solver -> setColUpper (yind, val+TOL);
+	}
       }
     }
   }
+
+  // TODO: better value through one run of btCore ()
 
   return 0.;
 }
@@ -164,7 +175,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 						 const OsiBranchingInformation *info, 
 						 int way) const {
 
-  bool isint = (brVarInd_ >= 0) && (si -> isInteger (brVarInd_));
+  bool isint = (brVar_) && brVar_ -> isInteger (); 
+  // (brVarInd_ >= 0) && (si -> isInteger (brVarInd_));
 
   // way has suggestion from CouenneObject::infeasibility(), but not
   // as set in infeasibility, so we use the one stored in member
@@ -207,21 +219,25 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 #endif
 
 
-  if (brVarInd_ >= 0) // if applied latest selectBranching
+  if (brVar_) // if applied latest selectBranching
 
     switch (way) {
 
     case TWO_LEFT:
     case TWO_RIGHT:
     case TWO_RAND:
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "2way Branch x%d at %g [%d] (%d)\n", brVarInd_, *brPts_, way, isint);
-      return new CouenneBranchingObject (jnlst_, brVarInd_, way, *brPts_, isint);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
+		     "2way Branch x%d at %g [%d] (%d)\n", 
+		     brVar_ -> Index (), *brPts_, way, isint);
+      return new CouenneBranchingObject (jnlst_, brVar_, way, *brPts_);
     case THREE_LEFT:
     case THREE_CENTER:
     case THREE_RIGHT:
     case THREE_RAND:
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "3Way Branch x%d @ %g ][ %g [%d] (%d)\n", brVarInd_, *brPts_, brPts_ [1], way, isint);
-      return new CouenneThreeWayBranchObj (jnlst_, brVarInd_, brPts_ [0], brPts_ [1], way, isint);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
+		     "3Way Branch x%d @ %g ][ %g [%d] (%d)\n", 
+		     brVar_ -> Index (), *brPts_, brPts_ [1], way, isint);
+      return new CouenneThreeWayBranchObj (jnlst_, brVar_, brPts_ [0], brPts_ [1], way);
     default: 
       printf ("CouenneObject::createBranch(): way=%d has no sense\n", way);
       exit (-1);
@@ -233,7 +249,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     // we should pipe all output through journalist
     jnlst_->Printf(J_DETAILED, J_BRANCHING, "CO::createBranch: ");
     reference_ -> print (std::cout);                              printf (" = ");
-    reference_ -> Image () -> print (std::cout);                  printf (" --> branch on ");
+    reference_ -> Image () -> print (std::cout); fflush (stdout); printf (" --> branch on ");
     reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
   }
 
@@ -286,8 +302,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	|| (fabs (xr-lr) < COUENNE_EPS)
 	|| (fabs (ur-xr) < COUENNE_EPS)
 	|| (fabs (ur-lr) < COUENNE_EPS))
-      return new CouenneBranchingObject (jnlst_, index, way, x, depvar -> isInteger ());  
+      return new CouenneBranchingObject (jnlst_, depvar, way, x);  
   }
 
-  return new CouenneBranchingObject (jnlst_, ref_ind, way, xr, reference_ -> isInteger ());
+  return new CouenneBranchingObject (jnlst_, reference_, way, xr);
 }

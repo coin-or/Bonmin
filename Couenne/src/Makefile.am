@@ -117,10 +117,13 @@ libCouenne_la_SOURCES = \
 	bound_tightening/obbt_iter.cpp \
 	bound_tightening/tightenBounds.cpp \
 	bound_tightening/impliedBounds.cpp \
+	bound_tightening/operators/impliedBounds-mul.cpp \
+	bound_tightening/operators/impliedBounds-sum.cpp \
 	bound_tightening/operators/impliedBounds-exprSum.cpp \
 	bound_tightening/operators/impliedBounds-exprDiv.cpp \
 	bound_tightening/operators/impliedBounds-exprMul.cpp \
 	bound_tightening/operators/impliedBounds-exprQuad.cpp \
+	bound_tightening/operators/impliedBounds-exprPow.cpp \
 	util/drawCuts.cpp \
 	util/rootQ.cpp
 
@@ -140,7 +143,7 @@ if COIN_HAS_ASL
 libCouenne_la_SOURCES += readnl/readnl.cpp \
 			 readnl/nl2e.cpp \
 			 readnl/invmap.cpp \
-			 problem/readASLfg.cpp
+			 readnl/readASLfg.cpp
 endif
 
 ########################################################################
@@ -155,7 +158,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/branch` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/util` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex` \
-	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/convex/sdpcuts` \
+	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/standardize` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem` \
 	-I`$(CYGPATH_W) $(COUENNESRCDIR)/src/problem/depGraph` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
@@ -204,6 +207,7 @@ include_HEADERS = \
 	branch/CouenneChooseStrong.hpp \
 	branch/projections.hpp \
 	branch/CouObjStats.hpp \
+	standardize/lqelems.hpp \
 	expression/operators/exprAbs.hpp \
 	expression/operators/exprExp.hpp \
 	expression/operators/exprInv.hpp \

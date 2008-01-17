@@ -20,7 +20,7 @@
 /// each expression's arguments
 CouNumber exprExp::selectBranch (const CouenneObject *obj, 
 				 const OsiBranchingInformation *info,
-				 int &ind, 
+				 expression *&var, 
 				 double * &brpts, 
 				 int &way) {
 
@@ -39,8 +39,11 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
   // equivalent to choose w's or x's index as ind, as the implied- and
   // propagated bounds will do the rest.
 
-  ind    = argument_           -> Index ();
-  int wi = obj -> Reference () -> Index ();
+  var = argument_;
+
+  int
+    ind = var -> Index (),
+    wi  = obj -> Reference () -> Index ();
 
   assert ((ind >= 0) && (wi >= 0));
 
@@ -109,30 +112,11 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
   // 4) both are finite
 
   simpletriplet ft (exp, exp, exp, log);
-
-  switch (obj -> Strategy ()) {
-
-  case CouenneObject::MIN_AREA:     *brpts = maxHeight   (&ft, x0, y0, l, u); break;
-  case CouenneObject::BALANCED:     *brpts = minMaxDelta (&ft, x0, y0, l, u); break;
-  case CouenneObject::MID_INTERVAL: 
-  default:                          *brpts = midInterval (     x0,     l, u); break;
-  }
-
-  /*  simpletriplet ft (exp, exp, exp, log);
-
-  *brpts = (u < l + COUENNE_EPS) ? 
-    midInterval (powNewton (x0, y0, exp, exp, exp), l, u) : // find closest point on curve
-    maxHeight (&ft, l, u); // apply minarea
-  // minmaxdistance:  minMaxDelta (&ft, x0, l, u);
-  */
+  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
 
   way = TWO_RAND;
 
   // exact distance
   return CoinMin (projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts),             -1),
 		  projectSeg (x0, y0,             *brpts, exp (*brpts), u, exp (u), -1));
-
-  /*  x0 -= *brpts;
-  y0 -= exp (*brpts);
-  return sqrt (x0*x0 + y0*y0);*/
 }

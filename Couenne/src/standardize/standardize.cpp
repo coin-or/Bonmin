@@ -61,11 +61,12 @@ void CouenneProblem::standardize () {
 
     expression *img = naux -> Image ();
 
-    exprAux *newvar = new exprAux (img, initVar, 1 + img -> rank (this));
+    exprAux *newvar = new exprAux (img, initVar, 1 + img -> rank ());
+    //img -> isInteger () ? exprAux::Integer : exprAux::Continuous);
+
     variables_ [initVar] = newvar;
 
     graph_ -> insert (newvar);
-
     graph_ -> erase (naux);
 
     variables_ . erase (variables_ . end () - 1);
@@ -160,12 +161,10 @@ void CouenneProblem::standardize () {
   for (unsigned int i = iters2erase.size (); i--;)
     constraints_. erase (iters2erase [i]);
 
-  //  constraints_ = con2;
-
 #ifdef DEBUG
+  // Use with caution. Bounds on auxs are not defined yet, so valgrind complains
   printf ("done with standardization:\n");
-  print (); // Use with caution. Bounds on auxs are not defined yet,
-	    // so valgrind complains
+  print (); 
 #endif
 
   // CREATE EVALUATION ORDER /////////////////////////////////////////////////////////////////
@@ -180,14 +179,16 @@ void CouenneProblem::standardize () {
   ub_ = (CouNumber *) realloc (ub_, nTotVar * sizeof (CouNumber));
 
   // make expression library point to new vectors
+
   expression::update (x_, lb_, ub_);
 
   //graph_ -> print ();
   graph_ -> createOrder ();
-  //if (graph_ -> checkCycles ()) printf ("dependency graph cycle!\n");
   //graph_ -> print ();
 
-  // fill numbering structure /////////////////////////////////////////////////
+  assert (graph_ -> checkCycles () == false); // printf ("dependency graph cycle!\n");
+
+  // Fill numbering structure /////////////////////////////////////////////////
 
   int n = nVars ();
   numbering_ = new int [n];
@@ -209,8 +210,11 @@ void CouenneProblem::standardize () {
       // initial auxiliary bounds are infinite (they are later changed
       // through branching)
 
-      lb_ [ord] = -COUENNE_INFINITY;
-      ub_ [ord] =  COUENNE_INFINITY;
+      if (variables_ [ord] -> Index () >= nOrig_) { // and one that was not an original, originally...
+
+	lb_ [ord] = -COIN_DBL_MAX;
+	ub_ [ord] =  COIN_DBL_MAX;
+      }
 
       // tighten them with propagated bounds
       variables_ [ord] -> crossBounds ();
@@ -222,10 +226,16 @@ void CouenneProblem::standardize () {
 
 #ifdef DEBUG
       printf (":::: %10g [%10g, %10g] [", x_ [ord], lb_ [ord], ub_ [ord]);
-
       variables_ [ord] -> Lb () -> print (); printf (",");
       variables_ [ord] -> Ub () -> print (); printf ("]\n");
 #endif
+
+      bool integer = variables_ [ord] -> isInteger ();
+
+      if (integer) {
+	lb_ [ord] = ceil  (lb_ [ord] - COUENNE_EPS);
+	ub_ [ord] = floor (ub_ [ord] + COUENNE_EPS);
+      }
     }
   }
 

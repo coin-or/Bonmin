@@ -44,7 +44,7 @@ class exprAbs: public exprUnary {
   void getBounds (expression *&, expression *&);
 
   /// generate equality between *this and *w
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  void generateCuts (expression *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 
@@ -54,7 +54,7 @@ class exprAbs: public exprUnary {
   enum expr_type code () {return COU_EXPRABS;}
 
   /// is this expression integer?
-  bool isInteger ()
+  inline bool isInteger ()
   {return argument_ -> isInteger ();}
 
   /// implied bound processing
@@ -62,8 +62,11 @@ class exprAbs: public exprUnary {
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (const CouenneObject *obj, const OsiBranchingInformation *,
-			  int &, double * &, int &);
+  virtual CouNumber selectBranch (const CouenneObject *obj, 
+				  const OsiBranchingInformation *info,
+				  expression * &var, 
+				  double * &brpts, 
+				  int &way);
 };
 
 #endif

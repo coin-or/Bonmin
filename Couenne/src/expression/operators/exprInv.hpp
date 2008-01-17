@@ -46,7 +46,7 @@ class exprInv: public exprUnary {
   inline unary_function F () {return inv;}
 
   /// output "1/argument"
-  virtual void print (std::ostream &out = std::cout, bool = false, CouenneProblem * = NULL) const;
+  virtual void print (std::ostream &out = std::cout, bool = false) const;
 
   /// differentiation
   expression *differentiate (int index); 
@@ -61,7 +61,7 @@ class exprInv: public exprUnary {
   void getBounds (expression *&, expression *&);
 
   /// generate equality between *this and *w
-  void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  void generateCuts (expression *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 
@@ -75,8 +75,11 @@ class exprInv: public exprUnary {
 
   /// set up branching object by evaluating many branching points for
   /// each expression's arguments
-  CouNumber selectBranch (const CouenneObject *, const OsiBranchingInformation *,
-			  int &, double * &, int &);
+  virtual CouNumber selectBranch (const CouenneObject *obj, 
+				  const OsiBranchingInformation *info,
+				  expression * &var, 
+				  double * &brpts, 
+				  int &way);
 };
 
 #endif

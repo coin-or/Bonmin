@@ -18,8 +18,11 @@ Couenne/src/bound_tightening/obbt.cpp -text
 Couenne/src/bound_tightening/obbt_iter.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprDiv.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprMul.cpp -text
+Couenne/src/bound_tightening/operators/impliedBounds-exprPow.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprQuad.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-exprSum.cpp -text
+Couenne/src/bound_tightening/operators/impliedBounds-mul.cpp -text
+Couenne/src/bound_tightening/operators/impliedBounds-sum.cpp -text
 Couenne/src/bound_tightening/tightenBounds.cpp -text
 Couenne/src/branch/CouObjStats.hpp -text
 Couenne/src/branch/CouenneBranchingObject.cpp -text
@@ -150,11 +153,11 @@ Couenne/src/problem/fillQuadIndices.cpp -text
 Couenne/src/problem/getIntegerCandidate.cpp -text
 Couenne/src/problem/problem.cpp -text
 Couenne/src/problem/problemIO.cpp -text
-Couenne/src/problem/readASLfg.cpp -text
 Couenne/src/problem/writeAMPL.cpp -text
 Couenne/src/problem/writeGAMS.cpp -text
 Couenne/src/readnl/invmap.cpp -text
 Couenne/src/readnl/nl2e.cpp -text
+Couenne/src/readnl/readASLfg.cpp -text
 Couenne/src/readnl/readnl.cpp -text
 Couenne/src/standardize/analyzeSparsity.cpp -text
 Couenne/src/standardize/auxiliarize.cpp -text
@@ -163,6 +166,7 @@ Couenne/src/standardize/decomposeTerm.cpp -text
 Couenne/src/standardize/elementBreak.cpp -text
 Couenne/src/standardize/flattenMul.cpp -text
 Couenne/src/standardize/linStandardize.cpp -text
+Couenne/src/standardize/lqelems.hpp -text
 Couenne/src/standardize/splitAux.cpp -text
 Couenne/src/standardize/standardize.cpp -text
 Couenne/src/standardize/sumStandardize.cpp -text

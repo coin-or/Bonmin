@@ -84,9 +84,8 @@ class exprCopy: public expression {
 
   /// I/O
   virtual void print (std::ostream &out = std::cout, 
-		      bool descend      = false, 
-		      CouenneProblem *p = NULL) const
-    {copy_ -> Original () -> print (out, descend, p);}
+		      bool descend      = false) const
+    {copy_ -> Original () -> print (out, descend);}
 
   /// value
   virtual inline CouNumber Value () const 
@@ -110,9 +109,8 @@ class exprCopy: public expression {
   /// fill in the set with all indices of variables appearing in the
   /// expression
   inline int DepList (std::set <int> &deplist, 
-		      enum dig_type   type = ORIG_ONLY,
-		      const CouenneProblem *p    = NULL)
-    {return copy_ -> DepList (deplist, type, p);}
+		      enum dig_type   type = ORIG_ONLY)
+    {return copy_ -> DepList (deplist, type);}
 
   /// simplify expression (useful for derivatives)
   inline expression *simplify () 
@@ -134,7 +132,7 @@ class exprCopy: public expression {
     {return copy_ -> standardize (p, addAux);}
 
   /// generate convexification cut for constraint w = this
-  inline void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  inline void generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
 			    t_chg_bounds *chg = NULL, int wind= -1, 
 			    CouNumber lb = -COUENNE_INFINITY, 
@@ -160,8 +158,8 @@ class exprCopy: public expression {
     {return copy_ -> compare (e);}
 
   /// used in rank-based branching variable choice
-  int rank (CouenneProblem *p)
-    {return copy_ -> rank (p);} 
+  int rank ()
+    {return copy_ -> rank ();} 
 
   /// implied bound processing
   bool impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg)
@@ -174,15 +172,16 @@ class exprCopy: public expression {
 
   /// Set up branching object by evaluating many branching points for each expression's arguments.
   /// Return estimated improvement in objective function 
-  virtual CouNumber selectBranch (const CouenneObject *obj,
+  virtual CouNumber selectBranch (const CouenneObject *obj, 
 				  const OsiBranchingInformation *info,
-				  int     &ind,
-				  double *&brpts,
-				  int     &way) 
-  {return copy_ -> selectBranch (obj, info, ind, brpts, way);}
+				  expression * &var, 
+				  double * &brpts, 
+				  int &way)
+
+  {return copy_ -> selectBranch (obj, info, var, brpts, way);}
 
   /// replace occurrence of a variable with another variable
-  void replace (exprVar *, exprVar *);
+  virtual void replace (exprVar *, exprVar *);
 
   /// fill in dependence structure
   void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g)

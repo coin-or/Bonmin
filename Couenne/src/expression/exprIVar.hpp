@@ -17,8 +17,6 @@
 #include "exprConst.hpp"
 #include "exprVar.hpp"
 
-class CouenneProblem;
-
 
 /// variable-type operator. All variables of the expression must be
 /// objects of this class
@@ -40,8 +38,7 @@ class exprIVar: public exprVar {
     {return new exprIVar (*this);}
 
   /// print
-  virtual void print (std::ostream &out = std::cout, bool = false, 
-		      CouenneProblem * = NULL) const
+  virtual void print (std::ostream &out = std::cout, bool = false) const
     {out << "y_" << varIndex_;}
 
   /// is this expression integer?

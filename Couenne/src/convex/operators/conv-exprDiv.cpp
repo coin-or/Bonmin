@@ -8,6 +8,8 @@
  */
 
 #include "CouenneTypes.hpp"
+#include "expression.hpp"
+#include "exprAux.hpp"
 #include "exprOp.hpp"
 #include "exprDiv.hpp"
 #include "exprClone.hpp"
@@ -25,7 +27,7 @@ exprAux *exprDiv::standardize (CouenneProblem *p, bool addAux) {
 
 
 // generate convexification cut for constraint w = x/y
-void exprDiv::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprDiv::generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {

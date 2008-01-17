@@ -10,69 +10,77 @@
 #include "CoinHelperFunctions.hpp"
 #include "CouenneProblem.hpp"
 
-#define FEAS_TOL 1e-9
+#define FEAS_TOL 1e-8
 
 // check if solution is MINLP feasible
 bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 
   // update variable array in evaluation structure
-  //  expression::update (const_cast <double *> (solution), NULL, NULL);
-
-  /*printf ("original NLP solution:\n");
-  for (int i=0; i<nOrig_; i++)
-    printf ("%4d: %10g\n", i, solution [i]);
-    printf ("\n");*/
 
   CouNumber *sol = new CouNumber [nVars ()];
   CoinCopyN (solution, nOrig_, sol);
 
-  /*printf ("copied NLP solution:\n");
-  for (int i=0; i<nOrig_; i++)
-    printf ("%4d: %10g\n", i, sol [i]);
-    printf ("\n");*/
-
   getAuxs (sol);
+
+  CoinCopyN (solution, nOrig_, sol);
   expression::update (sol, NULL, NULL);
-
-  /*printf ("LP solution:\n");
-  for (int i=0; i<nVars(); i++)
-    printf ("%4d: %10g\n", i, sol [i]);
-    printf ("\n");*/
-
-  /*exprAux *objaux = 
-    dynamic_cast <exprAux *> 
-    (const_cast <expression *> 
-     (Obj (0) -> Body () -> Original ()));
-
-     CouNumber objImg  = objaux ? (*objaux) () : 0;
-
-     Obj (0) -> Body () -> print ();*/
 
   CouNumber realobj = (*(Obj (0) -> Body ())) ();
 
+  if (Obj (0) -> Sense () == MAXIMIZE)
+    realobj = -realobj;
+
   if (fabs (realobj - obj) > FEAS_TOL) {
     Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
-		    "checkNLP: false objective function. %.3f != %.3f\n", realobj, obj);
-    delete [] sol;
-    return false;
+		    "checkNLP: warning, false objective. %.3f != %.3f (%g)\n", 
+		    realobj, obj, realobj - obj);
+    //delete [] sol;
+    //return false;
   }
 
   // check (original and auxiliary) variables' integrality
-  for (int i=0; i < nOrig_; i++) 
+  for (int i=0; i < nOrig_; i++) {
 
     if (variables_ [i] -> isInteger ()) {
       CouNumber val = expression::Variable (i);
       if (fabs (val - COUENNE_round (val)) > FEAS_TOL) {
 	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
-			"checkNLP: integrality %d violated: %g [%g,%g]\n", 
+			"checkNLP: integrality %d violated: %.6f [%g,%g]\n", 
 			i, val, expression::Lbound (i), expression::Ubound (i));
 	delete [] sol;
 	return false;
       }
     }
 
+    /*if (variables_ [i] -> Type () == AUX) {
+      printf ("checking aux ");
+      variables_ [i] -> print (); printf (" := ");
+      variables_ [i] -> Image () -> print (); 
+      printf (" --- %g = %g [%g]; {", 
+	      (*(variables_ [i])) (), 
+	      (*(variables_ [i] -> Image ())) (),
+	      (*(variables_ [i])) () -
+	      (*(variables_ [i] -> Image ())) ());
+
+      for (int j=0; j<nVars (); j++)
+	printf ("%.6f ", (*(variables_ [j])) ());
+      printf ("}\n");
+      }*/
+
+    CouNumber delta;
+
+    if ((variables_ [i] -> Type () == AUX) && 
+	(fabs (delta = (*(variables_ [i])) () - (*(variables_ [i] -> Image ())) ()) > FEAS_TOL)) {
+      Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+		      "checkNLP: auxiliarized %d violated (%g)\n", i, delta);
+      delete [] sol;
+      return false;
+    }
+  }
+
   // check constraints
-  if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
+  if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM))
+
     for (int i=0; i < nCons (); i++) {
 
       CouenneConstraint *c = Con (i);
@@ -84,17 +92,19 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 
       if ((body > rhs + FEAS_TOL) || 
 	  (body < lhs - FEAS_TOL)) {
+
 	if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
+
 	  Jnlst()->Printf
 	    (Ipopt::J_WARNING, J_PROBLEM,
-	     "Warning in checkNLP: constraint %d violated (lhs = %e body = %e rhs = %e): ",
-	     i, lhs, body, rhs);
+	     "Warning in checkNLP: constraint %d violated (lhs=%+e body=%+e rhs=%+e, violation %g): ",
+	     i, lhs, body, rhs, CoinMax (lhs-body, body-rhs));
+
 	  c -> print ();
 	}
 	// We dont return anymore (return false;)
       }
     }
-  }
 
   // check auxiliary variables
   //if (extended)
@@ -127,6 +137,5 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
   */
 
   delete [] sol;
-
   return true;
 }

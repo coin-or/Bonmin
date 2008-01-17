@@ -42,19 +42,34 @@ inline bool is_expr_zero (expr* e)
 
 int CouenneProblem::readnl (const ASL *asl) {
 
-  // # discrete variables
-  int n_intvar = niv + nbv + nlvbi + nlvci + nlvoi;
-
   // number of defined variables (aka common expressions)
   ndefined_ = como + comc + comb + como1 + comc1; 
 
-  // create continuous variables
-  for (int i = n_var - n_intvar; i--;)
-    addVariable (false);
+  // see "hooking your solver to AMPL", by David M. Gay, tables 3, 4, and 5
 
-  // create integer variables
-  for (int i = n_intvar; i--;)
-    addVariable (true);
+  // nonlinear in both objectives and constraints
+  if (nlvb >= 0) {
+    for (int i = 0; i < nlvb - nlvbi; i++) addVariable (false);
+    for (int i = 0; i < nlvbi;        i++) addVariable (true);
+  }
+
+  // nonlinear in either objectives or constraints
+  if (nlvo > nlvc) {
+    for (int i = 0; i < nlvc - (nlvb + nlvci); i++) addVariable (false);
+    for (int i = 0; i < nlvci;                 i++) addVariable (true);
+    for (int i = 0; i < nlvo - (nlvc + nlvoi); i++) addVariable (false);
+    for (int i = 0; i < nlvoi;                 i++) addVariable (true);
+  } else {
+    for (int i = 0; i < nlvo - (nlvb + nlvoi); i++) addVariable (false);
+    for (int i = 0; i < nlvoi;                 i++) addVariable (true);
+    for (int i = 0; i < nlvc - (nlvo + nlvci); i++) addVariable (false);
+    for (int i = 0; i < nlvci;                 i++) addVariable (true);
+  }
+
+  for (int i = 0; i < nwv; i++)                                        addVariable (false);  // arc
+  for (int i = n_var - (CoinMax (nlvc, nlvo) + niv + nbv + nwv); i--;) addVariable (false);  // other
+  for (int i = 0; i < nbv; i++)                                        addVariable (true);   // binary
+  for (int i = 0; i < niv; i++)                                        addVariable (true);   // int.
 
   nOrig_ = n_var;
 
@@ -124,7 +139,10 @@ int CouenneProblem::readnl (const ASL *asl) {
       expression **al = new expression * [1];
       *al = nle;
 
-      exprGroup *eg = new exprGroup (0, index, coeff, al, 1);
+      std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+      indcoe2vector (index, coeff, lcoeff);
+
+      exprGroup *eg = new exprGroup (0, lcoeff, al, 1);
       commonexprs_ . push_back (eg);
     } 
     else commonexprs_ . push_back (nle);
@@ -168,7 +186,10 @@ int CouenneProblem::readnl (const ASL *asl) {
       expression **al = new expression * [1];
       *al = nle;
 
-      exprGroup *eg = new exprGroup (0, index, coeff, al, 1);
+      std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+      indcoe2vector (index, coeff, lcoeff);
+
+      exprGroup *eg = new exprGroup (0, lcoeff, al, 1);
       commonexprs_ . push_back (eg);
     } 
     else commonexprs_ . push_back (nle);
@@ -214,18 +235,24 @@ int CouenneProblem::readnl (const ASL *asl) {
       index -= nterms;
       coeff -= nterms;
 
+      std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+      indcoe2vector (index, coeff, lcoeff);
+
+      /*std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+      for (int ii=0, *ind = index; *ind >= 0; *ind++, ii++)
+      lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (*ind), coeff [ii]));*/
+
       if (nl -> code () == COU_EXPRSUM)
-	body = new exprGroup (0, index, coeff, nl -> ArgList (), nl -> nArgs ());
+	body = new exprGroup (0, lcoeff, nl -> ArgList (), nl -> nArgs ());
       else {
 
 	expression **nll = new expression * [1];
 
 	*nll = nl;
 
-	//body = new exprGroup (objconst (i), index, coeff, nll, 1);
-
 	// apparently, objconst (i) is included in the obj expression
-	body = new exprGroup (0, index, coeff, nll, 1);
+	body = new exprGroup (0, lcoeff, nll, 1);
+	//body = new exprGroup (objconst (i), index, coeff, nll, 1);
       }
 
       delete [] index;
@@ -370,13 +397,20 @@ int CouenneProblem::readnl (const ASL *asl) {
 
       int code = (*nll) -> code ();
 
+      std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+      indcoe2vector (index [i], coeff [i], lcoeff);
+
+      /*std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+      for (int i=0, *ind = index; *ind >= 0; *ind++, i++)
+      lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (*ind), coeff [i]));*/
+
       if ((code == COU_EXPRSUM) || 
 	  (code == COU_EXPRGROUP)) {
 
-	body    = new exprGroup (0., index [i], coeff [i], (*nll) -> ArgList (), (*nll) -> nArgs ());
+	body    = new exprGroup (0., lcoeff, (*nll) -> ArgList (), (*nll) -> nArgs ());
 	delete [] nll;
       }
-      else body = new exprGroup (0., index [i], coeff [i], nll, 1);
+      else body = new exprGroup (0., lcoeff, nll, 1);
     }
     else {
       body = *nll;

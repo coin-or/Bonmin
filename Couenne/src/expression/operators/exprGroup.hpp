@@ -10,44 +10,48 @@
 #ifndef COUENNE_EXPRGROUP_H
 #define COUENNE_EXPRGROUP_H
 
+#include <vector>
+
 #include "exprSum.hpp"
+#include "exprVar.hpp"
 
 
 /// class Group, with constant, linear and nonlinear terms
 
 class exprGroup: public exprSum {
 
- protected:
+public:
 
-  int        nlterms_; ///< number of linear terms
-  int       *index_;   ///< indices of linear terms (terminated by a -1)
-  CouNumber *coeff_;   ///< coefficient of linear terms
-  CouNumber  c0_;      ///< constant term
+  typedef std::vector <std::pair <exprVar *, CouNumber> > lincoeff;
 
- public:
+protected:
+
+  mutable lincoeff lcoeff_;  ///< coefficients and indices of the linear term
+  CouNumber        c0_;      ///< constant term
+
+public:
 
   /// Constructor
-  exprGroup  (CouNumber, int *, CouNumber *, expression ** = NULL, int = 0);
+  exprGroup  (CouNumber,
+	      lincoeff &, 
+	      expression ** = NULL, 
+	      int = 0);
 
   /// Copy constructor
   exprGroup (const exprGroup &src);
 
-  /// Destructor
-  virtual ~exprGroup ();
-
   // Get constant, indices, and coefficients vectors, and number of linear terms
   CouNumber  getc0      () {return c0_;}      ///< return constant term
-  CouNumber *getCoeffs  () {return coeff_;}   ///< return coefficients of linear part
-  int       *getIndices () {return index_;}   ///< return indices of linear part
-  int        getnLTerms () {return nlterms_;} ///< return number of linear terms
+
+  lincoeff &lcoeff () const {return lcoeff_;} ///< return linear term coefficients
 
   /// Cloning method
   virtual expression *clone () const
     {return new exprGroup (*this);}
 
   /// Print expression to iostream
-  virtual void print (std::ostream & = std::cout, bool = false, 
-		      CouenneProblem * = NULL) const;
+  virtual void print (std::ostream &   = std::cout, 
+		      bool             = false) const;
 
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();
@@ -55,8 +59,7 @@ class exprGroup: public exprSum {
   /// fill in the set with all indices of variables appearing in the
   /// expression
   virtual int DepList (std::set <int> &deplist, 
-		       enum dig_type type = ORIG_ONLY,
-		       const CouenneProblem *p = NULL);
+		       enum dig_type type = ORIG_ONLY);
 
   /// differentiation
   virtual expression *differentiate (int index); 
@@ -72,7 +75,7 @@ class exprGroup: public exprSum {
   virtual void getBounds (expression *&, expression *&);
 
   /// special version for linear constraints
-  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+  virtual void generateCuts (expression *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
@@ -84,16 +87,17 @@ class exprGroup: public exprSum {
   /// code for comparisons
   virtual enum expr_type code () {return COU_EXPRGROUP;}
 
-  /// is this expression integer?  TODO: find a way to get integrality
-  /// of linear terms, as for now we have to return false
-  virtual inline bool isInteger ()
-    {return false;}
+  /// is this expression integer?
+  virtual bool isInteger ();
 
   /// used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *);
+  virtual int rank ();
 
   /// update dependence set with index of this variable
   virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *);
+
+  /// replace variable x with new (aux) w
+  virtual void replace (exprVar *x, exprVar *w);
 };
 
 
@@ -101,20 +105,13 @@ class exprGroup: public exprSum {
 
 inline CouNumber exprGroup::operator () () {
 
-  register CouNumber
-     ret  = c0_ + exprSum::operator () (), // add constant and nonlinear part
-    *coe  = coeff_,
-    *vars = expression::Variables ();
+  CouNumber ret = c0_ + exprSum::operator () (); // add constant and nonlinear part
 
   // add linear part
-  for (register int n = nlterms_, *ind = index_; n--;)
-    ret += *coe++ * vars [*ind++];
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    ret += el -> second * (*(el -> first)) ();
 
-  return ret;
+  return (CouNumber) ret;
 }
-
-
-/// scan subexpression for single index
-int scanIndex (int index, std::set <int> &deplist, const CouenneProblem *p, enum dig_type type);
 
 #endif

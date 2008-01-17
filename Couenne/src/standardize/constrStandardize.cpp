@@ -15,12 +15,6 @@
 
 //#define DEBUG
 
-/// split a constraint w - f(x) = c into w's index (it is returned)
-/// and rest = f(x) + c
-
-int splitAux (CouenneProblem *, CouNumber, expression *, expression *&, bool *);
-
-
 /// decompose body of constraint through auxiliary variables
 
 exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
@@ -57,7 +51,7 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
     expression *rest;
 
     // split w from f(x)
-    int wind = splitAux (p, (*lb_) (), body_, rest, p -> Commuted ());
+    int wind = p -> splitAux ((*lb_) (), body_, rest, p -> Commuted ());
 
     if (wind >= 0) { // this IS the definition of an auxiliary variable w = f(x)
 
@@ -68,9 +62,12 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
       rest -> print (); printf ("\n");
 #endif
 
+      assert (p -> Var (wind) -> Type () == VAR);
+
       // create new variable, it has to be integer if original variable was integer
-      exprAux *w = new exprAux (rest, wind, 1 + rest -> rank (p), 
-				p -> Var (wind) -> isInteger ());
+      exprAux *w = new exprAux (rest, wind, 1 + rest -> rank (),
+				p -> Var (wind) -> isInteger () ? 
+				exprAux::Integer : exprAux::Continuous);
 
       std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> find (w);
 

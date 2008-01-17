@@ -50,7 +50,7 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 
 // generate convexification cut for constraint w = 1/x
 
-void exprInv::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
+void exprInv::generateCuts (expression *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {

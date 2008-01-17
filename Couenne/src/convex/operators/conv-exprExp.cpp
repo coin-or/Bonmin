@@ -19,7 +19,7 @@
 
 // generate convexification cut for constraint w = this
 
-void exprExp::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
+void exprExp::generateCuts (expression *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs,  const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {

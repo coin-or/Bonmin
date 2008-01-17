@@ -7,18 +7,15 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "exprQuad.hpp"
 
 #include "CoinHelperFunctions.hpp"
-
 #include "OsiSolverInterface.hpp"
 #include "IpLapack.hpp"
 
+#include "exprQuad.hpp"
+#include "CouenneProblem.hpp"
+
 //#define DEBUG
-
-// fill in one of the two dCoeff vectors
-void fill_dCoeff (CouNumber * &, CouNumber, CouNumber *, int);
-
 
 /** Computes alpha coefficients for an alpha under- and overestimator
  *  of the quadratic term.
@@ -36,117 +33,170 @@ void fill_dCoeff (CouNumber * &, CouNumber, CouNumber *, int);
  * If the method hasn't been called, dIndex_ will be NULL.
  * If Q is positive semidefinite, then dCoeffLo_ will be NULL.
  * If Q is negative semidefinite, then dCoeffUp_ will be NULL.
-*/
+ *
+ * Return true if a convexification is there, false otherwise.
+ */
 
-void exprQuad::alphaConvexify (const OsiSolverInterface &si) {
+bool exprQuad::alphaConvexify (const CouenneProblem *p,
+			       const OsiSolverInterface &si) {
 
-  if (nqterms_ == 0) {
-    nDiag_ = 0;
-    return;
-  }
+  if (matrix_.size () == 0)
+    return false;
 
-  // inverse of dIndex_ mapping: for each variable tell me the
-  // index that it will have in dIndex_, or -1 if not there
+  // inverse of dIndex_ mapping: for each variable tell me the index
+  // that it will have in dIndex_, or -1 if not there
 
-  int* indexmap = new int [si.getNumCols ()];
+  int k=0,
+     nDiag    = bounds_.size (),
+    *indexmap = new int [si.getNumCols ()],
+    *indices  = new int [nDiag];
+
   CoinFillN (indexmap, si.getNumCols (), -1);
 
-  if (dIndex_ == NULL)
-    make_dIndex (si.getNumCols (), indexmap);
-  else
-    // build indexmap as inverse of dIndex_
-    for (int i=0; i<nDiag_; ++i)
-      indexmap [dIndex_ [i]] = i;
-
   // box diameter
-  double *diam = new double [nDiag_];
+  double *diam = new double [nDiag];
 
-  const double
-    *lower = si.getColLower (),
-    *upper = si.getColUpper ();
+  bool changed_bounds = false;
 
-  for (int i=0; i<nDiag_; ++i) {
+  for (std::map <exprVar *, std::pair <CouNumber, CouNumber> >::iterator i = bounds_.begin ();
+       i != bounds_.end (); ++i, k++) {
 
-    int di = dIndex_ [i];
-    diam [i] = upper [di] - lower [di];
+#ifdef DEBUG
+  printf ("b%04d. [%20g, %20g]\n", i->first->Index(), i->second.first, i->second.second);
+#endif
+
+    int index = i -> first -> Index ();
+    indexmap [index] = k;
+    indices [k] = index;
+
+    CouNumber
+      lb = (*(i -> first -> Lb ())) (),//lower [di],
+      ub = (*(i -> first -> Ub ())) ();//upper [di];
+
+    // if one variable unbounded, bail out
+    if ((lb < -COUENNE_INFINITY) ||
+	(ub >  COUENNE_INFINITY)) {
+
+      delete [] diam;
+      delete [] indexmap;
+      delete [] indices;
+
+      return false;
+    }
+
+    // if no variable has changed bounds, no need to convexify
+    if (fabs (lb - i->second.first)  > COUENNE_EPS) {i -> second.first  = lb; changed_bounds = true;}
+    if (fabs (ub - i->second.second) > COUENNE_EPS) {i -> second.second = ub; changed_bounds = true;}
+
+    diam [k] = ub - lb;
+#ifdef DEBUG
+    printf ("diam %4d - %4d = %g - %g = %g\n", index, k, ub, lb, diam [k]);
+#endif
+  }
+
+  if (!changed_bounds) {
+
+    delete [] diam;
+    delete [] indexmap;
+    delete [] indices;
+
+    return true;
   }
 
   // lower triangular of quadratic term matrix, scaled by box diameter
 
-  double *matrix = new double [nDiag_ * nDiag_];
+  double *matrix = new double [nDiag * nDiag];
 
-  CoinFillN (matrix, nDiag_ * nDiag_, 0.);
+  CoinFillN (matrix, nDiag * nDiag, 0.);
 
-  for (int i=0; i < nqterms_; ++i) {
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    int row = indexmap [qindexI_ [i]];
-    int col = indexmap [qindexJ_ [i]];
+    int 
+      xind = row -> first -> Index (),
+      irow = indexmap [xind];
 
-    // compute value of matrix entry = q_ij * (u_i-l_i) * (u_j-l_j)
-    // I (Stefan) do not understand the Lapack docu; it says it needs
-    // only the lower triangular but it seem to need both parts to
-    // work correct
-    double cell = qcoeff_ [i] * diam [row] * diam [col];
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
-    matrix          [col * nDiag_ + row] = cell;
-    if (row != col) 
-      matrix        [row * nDiag_ + col] = cell;
-    //    printf("row %d, col %d: %f\n", row, col, matrix[col*nDiag_+row]);
+      int 
+	yind = col -> first -> Index (),
+	icol = indexmap [yind];
+
+      double cell = col -> second * diam [irow] * diam [icol];
+
+      matrix          [icol * nDiag + irow] = cell;
+      if (irow != icol) 
+	matrix        [irow * nDiag + icol] = cell;
+    }
   }
+
+  // compute value of matrix entry = q_ij * (u_i-l_i) * (u_j-l_j)
+  // I (Stefan) do not understand the Lapack docu; it says it needs
+  // only the lower triangular but it seem to need both parts to
+  // work correct
 
   delete [] indexmap;
 
   // compute minimum and maximum eigenvalue of matrix
-  double* eigval = new double [nDiag_];
+  double* eigval = new double [nDiag];
   int info;
 
-  Ipopt::IpLapackDsyev (false,  // do not compute eigenvector
-			nDiag_, // dimension
+  /*printf ("nDiag = %d\n", nDiag);
+  for (int i=0; i<nDiag; i++) {
+    for (int j=0; j<nDiag; j++)
+      printf ("%6.2f ", matrix [i*nDiag + j]);
+    printf ("\n");
+    }*/
+
+  Ipopt::IpLapackDsyev (true,   // compute eigenvector
+			nDiag,  // dimension
 			matrix, // matrix
-			nDiag_, // "leading dimension" (number of columns, I think)
+			nDiag,  // "leading dimension" (number of columns, I think)
 			eigval, // output vector to store eigenvalues
 			info);  // output status variable
-  delete [] matrix;
 
   if (info != 0) {
-    printf ("exprQuad::alphaConvexify: problem computing eigenvalue, info=%d\n", info);
-    exit (-1);
+    printf ("exprQuad::alphaConvexify, warning: problem computing eigenvalue, info=%d\n", info);
+    return false;
     //TODO error handling
   }
 
-  // if min. eigenvalue negative, setup dCoeffLo_
-  if (eigval [0] < 0) 
-    fill_dCoeff (dCoeffLo_, eigval [0], diam, nDiag_);
-  else  // quadratic term is convex, no convexification needed
-    if (dCoeffLo_) {
-      delete dCoeffLo_;
-      dCoeffLo_ = NULL;
+  // clean eigenvector structure
+  eigen_.erase (eigen_.begin (), eigen_.end ());
+
+  for (int i=0; i<nDiag; i++) {
+
+    std::pair <CouNumber, std::vector <std::pair <exprVar *, CouNumber> > > eigenCoord;
+
+    eigenCoord. first = eigval [i];
+
+    for (int j=0; j<nDiag; j++) {
+
+      CouNumber elem = matrix [i * nDiag + j];
+
+      if (fabs (elem) > COUENNE_EPS) 
+	eigenCoord. second. push_back (std::pair <exprVar *, CouNumber> 
+				       (p -> Var (indices [j]), elem));
     }
 
-  // if max. eigenvalue is positive, setup dCoeffUp_
-  if (eigval [nDiag_ - 1] > 0)
-    fill_dCoeff (dCoeffUp_, eigval [nDiag_ - 1], diam, nDiag_);
-  else // quadratic term is concave, no "concavification" needed
-    if (dCoeffUp_) {
-      delete dCoeffUp_;
-      dCoeffUp_ = NULL;
-    }
+    eigen_.push_back (eigenCoord);
+  }
 
+#ifdef DEBUG
+  for (std::vector <std::pair <CouNumber, 
+	 std::vector <std::pair <exprVar *, CouNumber> > > >::iterator i = eigen_.begin ();
+       i != eigen_.end (); ++i) {
+    printf (" [%g] -- ", i -> first);
+    for (std::vector <std::pair <exprVar *, CouNumber> >::iterator j = i -> second. begin();
+	 j != i -> second. end (); ++j)
+      printf ("(%d,%g) ", j -> first -> Index (), j -> second);
+    printf ("\n");
+  }
+#endif
+
+  delete [] indices;
+  delete [] matrix;
   delete [] diam;
   delete [] eigval;
-}
 
-
-// fill diagonal vector using eigenvalue passed as parameter 
-void fill_dCoeff (CouNumber * &dCoeff, CouNumber eigval, CouNumber *diam, int n) {
-
-  if (dCoeff == NULL)
-    dCoeff = new CouNumber [n];
-
-  for (int i=n; i--;) {
-    CouNumber di = diam [i];
-    dCoeff [i] = (fabs (di) < COUENNE_EPS) ? 
-      0. : 
-      eigval / (di * di);
-  }
+  return true;
 }

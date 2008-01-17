@@ -13,117 +13,127 @@
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 
-
 //#define DEBUG
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
 CouNumber exprQuad::selectBranch (const CouenneObject *obj, 
 				  const OsiBranchingInformation *info,
-				  int &ind, 
+				  expression *&var, 
 				  double * &brpts, 
 				  int &way) {
 
-  const CouNumber *x = info -> solution_, 
-                  *l = info -> lower_,
-                  *u = info -> upper_; 
+  int ind = -1;
 
-  CouNumber delta    = (*(obj -> Reference ())) () - (*this) (), 
-           *alpha    = (delta < 0) ? dCoeffLo_ : dCoeffUp_,
-            maxcontr = -COUENNE_INFINITY;
+  // use a combination of eigenvectors and bounds
 
-  int bestVar = 
-    nqterms_ ? *qindexI_ : 
-    nlterms_ ? *index_   : -1; // initialize it to something very default
+  CouNumber delta = (*(obj -> Reference ())) () - (*this) ();
 
-  if (!alpha) { // no convexification available,
-                // find the largest interval
+  /*printf ("infeasibility: ");
+  obj -> Reference () -> print (); 
+  printf (" [%g=%g] := ", 
+	  (*(obj -> Reference ())) (), info -> solution_ [obj -> Reference () -> Index ()]);
+	  print (); printf (" [%g]\n", (*this) ());*/
 
-    CouNumber maxcontr = -COUENNE_INFINITY; // maximum contribution to current value
+  brpts = (double *) realloc (brpts, sizeof (double));
+  way = TWO_RAND;
 
-    int bestVar = -1;
+  // depending on where the current point is w.r.t. the curve,
+  // branching is done on the eigenvector corresponding to the minimum
+  // or maximum eigenvalue
 
-    if (dIndex_) { // use indices in dIndex_ -- TODO: dIndex_ should
-		   // be created by constructor
+  std::vector <std::pair <CouNumber, 
+    std::vector <std::pair <exprVar *, CouNumber> > > >::iterator         fi = eigen_.begin ();
 
-      for (int i=nDiag_; i--;) {
+  std::vector <std::pair <CouNumber, 
+    std::vector <std::pair <exprVar *, CouNumber> > > >::reverse_iterator ri = eigen_.rbegin ();
 
-	int ind = dIndex_ [i];
-	CouNumber diff;
+  CouNumber max_span = -COUENNE_INFINITY;
 
-#ifdef DEBUG
-	printf ("[%10g %10g %10g] %4d %10g\n", x [ind], l [ind], u [ind], bestVar, maxcontr);
-#endif
+  bool changed_sign = false;
 
-	//if ((diff = CoinMin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
-	if ((diff = u [ind] - l [ind])                  > maxcontr) {bestVar = ind; maxcontr = diff;}
+  /////////////////////////////////////////////////////////
+
+  for (;
+       ((delta < 0.) && (fi != eigen_. end  ()) || // && (fi -> first < 0.) ||
+	(delta > 0.) && (ri != eigen_. rend ()));  // && (ri -> first > 0.));
+
+       ++fi, ++ri) {
+
+    std::vector <std::pair <exprVar *, CouNumber> > &ev = 
+      (delta < 0.) ? fi -> second : ri -> second;
+
+    for (std::vector <std::pair <exprVar *, CouNumber> >::iterator j = ev.begin ();
+	 j != ev.end (); ++j) {
+
+      int index = j -> first -> Index ();
+
+      CouNumber 
+	lb = info -> lower_ [index],
+	ub = info -> upper_ [index];
+
+      if ((fabs (ub-lb) > COUENNE_EPS) ||
+	  // no variable was found but the eigenvalue is already
+	  // positive (negative)
+	  ((changed_sign = true) &&
+	   ((delta < 0.) && (fi -> first > 0.) ||
+	    (delta > 0.) && (ri -> first < 0.)) &&
+	   (max_span < 0.))) {
+
+	CouNumber span = -1;
+
+	if ((ub-lb > COUENNE_INFINITY) ||
+	    ((span = (ub-lb) * fabs (j -> second)) > max_span + COUENNE_EPS)) {
+
+	  ind = index;
+	  var = j -> first;
+
+	  *brpts = midInterval (info -> solution_ [index], lb, ub);
+
+	  if (changed_sign) 
+	    break;
+
+	  if (span >= 0) max_span = span; // finite, keep searching
+	  else break;                     // span unbounded, stop searching
+	}
       }
-    } else
-      for (int i=nqterms_; i--;) {
-
-	// find largest (in abs. value) coefficient with at least one
-	// index within bounds
-
-	int qi = qindexI_ [i],
-            qj = qindexJ_ [i];
-
-	CouNumber 
-	  xi = x [qi], 
-	  xj = x [qj], diff;
-
-	if ((diff = CoinMin (xi - l [qi], u [qi] - xi)) > maxcontr) {bestVar = qi; maxcontr = diff;}
-	if ((diff = CoinMin (xj - l [qj], u [qj] - xj)) > maxcontr) {bestVar = qj; maxcontr = diff;}
-      }
-
-    ind = bestVar;
-    brpts = (double *) realloc (brpts, sizeof (double));
-    //    *brpts = x [bestVar];
-    *brpts = (l [bestVar] + u [bestVar]) / 2;
-    way = TWO_RAND;
-
-#ifdef DEBUG
-    printf ("brExprQuad (%s): |delta| = %g, brpt = %g (%g), var = x%d, way = %d -- NO alpha\n",
-	    (delta < 0) ? "lower" : "upper",
-	    fabs (delta), *brpts, x [bestVar], bestVar, way);
-#endif
-
-    return fabs (delta);
-  }
-
-  int *indices = dIndex_;
-
-  // there is a convexification already, find i = argmin {alpha_i (x_i
-  // - l_i) (u_i - x_i)}
-
-  for (int i=0; i < nDiag_; i++, indices++) {
-    
-    CouNumber curx = x [*indices],
-      contrib = *alpha++ * 
-      (curx         - l [*indices]) * 
-      (u [*indices] - curx);
-
-    if (fabs (contrib) > maxcontr) {
-      bestVar  = *indices;
-      maxcontr = contrib;
     }
   }
 
-  ind = bestVar;
-  way = TWO_RAND;
+  if ((eigen_.size () == 0) // if no eigenvalue has been computed yet
+      || (ind < 0)) {       // or no index was found, pick largest interval
 
-  brpts = (double *) realloc (brpts, sizeof (double));
+    CouNumber max_span = -COUENNE_INFINITY;
 
-  *brpts = midInterval (x [bestVar], l [bestVar], u [bestVar]);
+    for (std::map <exprVar *, std::pair <CouNumber, CouNumber> >::iterator i = bounds_. begin ();
+	 i != bounds_. end (); ++i) {
 
-  /*  if ((*brpts > ub - COUENNE_NEAR_BOUND) ||
-      (*brpts < lb + COUENNE_NEAR_BOUND)) 
+      CouNumber
+	lb = i -> second.first,
+	ub = i -> second.second,
+	span = ub - lb;
 
-      *brpts = 0.5 * (lb + ub);*/
+      if ((span > COUENNE_EPS) && 
+	  (span > max_span)) {
 
-#ifdef DEBUG
-  printf ("brExprQuad: |delta| = %g, brpt = %g (%g), var = x%d, way = %d\n",
-	  fabs (delta), *brpts, x [bestVar], bestVar, way);
-#endif
+	var = i -> first;
+	ind = var -> Index ();
+	*brpts = midInterval (info -> solution_ [ind], lb, ub);	  
+      }
+    }
+
+    if (ind < 0) {
+
+      var = obj -> Reference ();
+      ind = var -> Index ();
+
+      *brpts = midInterval (info -> solution_ [ind],
+			    info -> lower_ [ind],
+			    info -> upper_ [ind]);
+    }
+
+    return fabs (delta);
+  }
 
   return fabs (delta);
 }

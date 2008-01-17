@@ -80,7 +80,7 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
   else                                         f << "maximize";
 
   f << " obj: ";  
-  objectives_ [0] -> Body () -> print (f, !aux, this); 
+  objectives_ [0] -> Body () -> print (f, !aux); 
   f << ';' << std::endl; 
 
 
@@ -95,10 +95,10 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
       if ((variables_ [i] -> Type () == AUX) && 
 	  (variables_ [i] -> Multiplicity () > 0)) {
 
-	f << "aux" << i << ": "; variables_ [i] -> print (f, false, this);
+	f << "aux" << i << ": "; variables_ [i] -> print (f, false);
 	f << " = ";  
 
-	variables_ [i] -> Image () -> print (f, false, this);
+	variables_ [i] -> Image () -> print (f, false);
 	f << ';' << std::endl;
       }
   }
@@ -120,13 +120,13 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
 
 	if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) {
 	  f << "conAuxLb" << (*i) -> Index () << ": ";
-	  (*i) -> print (f, true, this);
+	  (*i) -> print (f, true);
 	  f << ">= " << bound << ';' << std::endl;
 	}
 
 	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) {
 	  f << "conAuxUb" << (*i) -> Index () << ": ";
-	  (*i) -> print (f, true, this);
+	  (*i) -> print (f, true);
 	  f << "<= " << bound << ';' << std::endl;
 	}
       }
@@ -139,7 +139,7 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
               ub = (constraints_ [i] -> Ub () -> Value ());
 
     f << "con" << i << ": ";
-    constraints_ [i] -> Body () -> print (f, !aux, this);
+    constraints_ [i] -> Body () -> print (f, !aux);
 
     if (lb > - COUENNE_INFINITY + 1) {
       f << ' ';
@@ -156,7 +156,7 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
 	&& (fabs (ub-lb) > COUENNE_EPS)) {
 
       f << "con" << i << "_rng: ";
-      constraints_ [i] -> Body () -> print (f, !aux, this);
+      constraints_ [i] -> Body () -> print (f, !aux);
       f << " <= " << ub << ';' << std::endl;
     }
   }

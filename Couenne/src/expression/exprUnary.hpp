@@ -14,7 +14,6 @@
 
 #include "expression.hpp"
 #include "CouenneTypes.hpp"
-#include "exprOp.hpp"
 
 
 /// zero function (used by default by exprUnary)
@@ -73,7 +72,7 @@ class exprUnary: public expression {
 
   /// print this expression to iostream
   virtual void print (std::ostream &out = std::cout, 
-		      bool = false, CouenneProblem * = NULL) const;
+		      bool = false) const;
 
   /// print position (PRE, INSIDE, POST)
   virtual enum pos printPos () const
@@ -90,9 +89,8 @@ class exprUnary: public expression {
   /// fill in the set with all indices of variables appearing in the
   /// expression
   virtual inline int DepList (std::set <int> &deplist, 
-			      enum dig_type type = ORIG_ONLY,
-			      const CouenneProblem *p = NULL)
-    {return argument_ -> DepList (deplist, type, p);}
+			      enum dig_type type = ORIG_ONLY)
+    {return argument_ -> DepList (deplist, type);}
 
   /// simplification
   expression *simplify ();
@@ -122,8 +120,8 @@ class exprUnary: public expression {
   virtual int compare (exprUnary &); 
 
   /// used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *p)
-    {return (argument_ -> rank (p));} 
+  virtual int rank ()
+    {return (argument_ -> rank ());} 
 
   /// fill in dependence structure
   virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) 

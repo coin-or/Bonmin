@@ -65,7 +65,7 @@ exprAux *exprPow::standardize (CouenneProblem *p, bool addAux) {
 
 // generate convexification cut for constraint w = x^k
 
-void exprPow::generateCuts (exprAux *aux, const OsiSolverInterface &si, 
+void exprPow::generateCuts (expression *aux, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
 			    t_chg_bounds *chg, int wind, 
 			    CouNumber lbw, CouNumber ubw) {

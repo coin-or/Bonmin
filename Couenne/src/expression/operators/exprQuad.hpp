@@ -12,9 +12,13 @@
 #define COUENNE_EXPRQUAD_H
 
 #include <map>
+#include <vector>
 
+#include "CoinPackedVector.hpp"
 #include "exprGroup.hpp"
 
+class quadElem;
+class CouenneProblem;
 
 /**  class exprQuad, with constant, linear and quadratic terms
  *
@@ -35,7 +39,13 @@
 
 class exprQuad: public exprGroup {
 
- protected:
+public:
+
+  /// matrix
+  typedef std::vector <std::pair <exprVar *, CouNumber> >  sparseQcol;
+  typedef std::vector <std::pair <exprVar *, sparseQcol> > sparseQ;
+
+protected:
 
   /** \name Q matrix storage
     * Sparse implementation: given expression of the form \f$\sum_{i \in N,
@@ -44,59 +54,44 @@ class exprQuad: public exprGroup {
     * in \f$q_{ij} x_i x_j\f$: */
   /** @{ */
 
-  int       *qindexI_; ///< the term \f$i\f$
-  int       *qindexJ_; ///< the term \f$j\f$, (must be qindexJ_ [k] <= qindexI_ [k])
-  CouNumber *qcoeff_;  ///< the term \f$a_{ij}\f$
-  int        nqterms_; ///< number of non-zeroes in Q
-  /** @} */
+  mutable sparseQ matrix_;
 
   /** \name Convexification data structures
    *
-   *  These are filled by alphaConvexify through the method described
-   *  in the LaGO paper by Nowak and Vigerske.
+   *  These are filled by alphaConvexify, which implements the
+   *  alpha-convexification methoddescribed in the LaGO paper by Nowak
+   *  and Vigerske -- and also by Adjiman and Floudas.
    */
 
-  /// @{
-  CouNumber *dCoeffLo_;  ///< diagonal coefficients of additional term for under convexfication
-  CouNumber *dCoeffUp_;  ///< diagonal coefficients of additional term for over convexfication
-  int       *dIndex_;    ///< indices of the \f$\alpha_i\f$'s in convexification
-  int        nDiag_;     ///< number of elements in the above sparse vectors
-  /// @}
+  /// eigenvalues and eigenvectors
+  std::vector <std::pair <CouNumber, 
+			  std::vector <std::pair <exprVar *, 
+						  CouNumber> > > > eigen_; 
 
- public:
+  /// current bounds (checked before re-computing eigenvalues/vectors)
+  std::map <exprVar *, std::pair <CouNumber, CouNumber> > bounds_;
 
-  /** Constructor
-   *
-   * @param c0 constant part		     
-   * @param li linear indices		     
-   * @param lc linear coefficients		     
-   * @param qi quadratic index \f$i\f$	     
-   * @param qj quadratic index \f$j\f$	     
-   * @param qc quadratic coefficient \f$a_{ij}\f$
-   * @param al nonlinear arguments		     
-   * @param n number of nonlinear arguments     
-   */
+  /// number of non-zeroes in Q
+  int nqterms_;
 
+public:
+
+  /// Constructor
   exprQuad  (CouNumber c0,
-	     int *li,
-	     CouNumber *lc,
-	     int *qi,
-	     int *qj,
-	     CouNumber *qc,
+	     std::vector <std::pair <exprVar *, CouNumber> > &lcoeff,
+	     std::vector <quadElem> &qcoeff,
 	     expression **al = NULL,
 	     int n = 0);
 
   /// Copy constructor
   exprQuad (const exprQuad &src);
 
-  /// Destructor
-  virtual ~exprQuad ();
-
   // get indices and coefficients vectors of the quadratic part
-  CouNumber *getQCoeffs  () {return qcoeff_;}  ///< Get quadratic coefficients \f$q_{ij}\f$
-  int       *getQIndexI  () {return qindexI_;} ///< Get index \f$i\f$ of the term \f$q_{ij}x_i x_j\f$
-  int       *getQIndexJ  () {return qindexJ_;} ///< Get index \f$j\f$ of the term \f$q_{ij}x_i x_j\f$
-  int        getnQTerms  () {return nqterms_;} ///< Get number of quadratic terms
+  sparseQ &getQ () const 
+  {return matrix_;}
+
+  int getnQTerms  () ///< Get number of quadratic terms
+  {return nqterms_;}
 
   /// cloning method
   virtual expression *clone () const
@@ -104,7 +99,7 @@ class exprQuad: public exprGroup {
 
   /// Print expression to an iostream
   virtual void print (std::ostream & = std::cout, 
-		      bool = false, CouenneProblem * = NULL) const;
+		      bool = false) const;
 
   /// Function for the evaluation of the expression
   virtual CouNumber operator () ();
@@ -120,9 +115,9 @@ class exprQuad: public exprGroup {
   /// Get a measure of "how linear" the expression is
   virtual int Linearity () {
     int 
-      lin  = exprSum::Linearity () >= NONLINEAR,
-      lin2 = (qindexI_)                 ? QUADRATIC :
-             (index_)                   ? LINEAR    :
+      lin  = exprSum::Linearity (), // >= NONLINEAR,
+      lin2 = (matrix_ .size () > 0)     ? QUADRATIC :
+             (lcoeff_ .size () > 0)     ? LINEAR    :
 	     (fabs (c0_) > COUENNE_EPS) ? CONSTANT  : ZERO;
 
     return ((lin > lin2) ? lin : lin2);
@@ -134,7 +129,7 @@ class exprQuad: public exprGroup {
   /// Generate cuts for the quadratic expression, which are supporting
   /// hyperplanes of the concave upper envelope and the convex lower
   /// envelope.
-  virtual void generateCuts (exprAux *w, const OsiSolverInterface &si, 
+  virtual void generateCuts (expression *w, const OsiSolverInterface &si, 
 			     OsiCuts &cs, const CouenneCutGenerator *cg, 
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 
@@ -142,9 +137,9 @@ class exprQuad: public exprGroup {
 
   /// Compute data for \f$\alpha\f$-convexification of a quadratic form
   /// (fills in dCoeff_ and dIndex_ for the convex underestimator)
-  virtual void alphaConvexify (const OsiSolverInterface &);
+  virtual bool alphaConvexify (const CouenneProblem *, const OsiSolverInterface &);
 
-  /** \function exprQuad::quadCuts 
+  /** \method exprQuad::quadCuts 
    *
    * \brief Based on the information (dIndex_, dCoeffLo_, dCoeffUp_)
    * created/modified by alphaConvexify(), create convexification cuts
@@ -165,7 +160,11 @@ class exprQuad: public exprGroup {
    * \f[ x^T Q x + \sum \lambda_{\max, i} (x_i - l_i ) (u_i - x_i )
    * \f] (where \f$ \lambda_{\min, i} = \frac{\lambda_{\min}}{w_i^2}
    * \f$, \f$ \lambda_{\max, i} = \frac{\lambda_{\max}}{w_i^2} \f$,
-   * and \f$w_i = u_i - l_i\f$).
+   * and \f$w_i = u_i - l_i\f$), where \f$\lambda_{\max}\f$
+   * (\f$\lambda_{\max}\f$) is the minimum (maximum) eigenvalue of the
+   * matrix \f$A={\rm Diag}({\bf u} - {\bf l}) Q {\rm Diag}({\bf u} -
+   * {\bf l})\f$, obtained by pre- and post-multiplying \f$ Q \f$ by
+   * the diagonal matrix whose \f$i\f$-th element is \f$u_i - l_i\f$.
    *
    * Let \f$ \tilde a_0(\lambda)\f$, \f$ \tilde a(\lambda) \f$ and
    * \f$ \tilde Q (\lambda) \f$ be
@@ -215,26 +214,25 @@ class exprQuad: public exprGroup {
    * \tilde Q (\lambda_{\max}) x^* )^T x - \eta \f]
    */
 
-  void quadCuts (exprAux *w, OsiCuts & cs, const CouenneCutGenerator * cg);
+  void quadCuts (expression *w, OsiCuts & cs, const CouenneCutGenerator * cg);
 
   /// Compare two exprQuad
   virtual int compare (exprQuad &);
 
   /// Code for comparisons
-  virtual enum expr_type code () {return COU_EXPRQUAD;}
+  virtual enum expr_type code ()
+  {return COU_EXPRQUAD;}
 
   /// Used in rank-based branching variable choice
-  virtual int rank (CouenneProblem *);
+  virtual int rank ();
 
-  /// is this expression integer? TODO: see exprGroup...
-  virtual inline bool isInteger ()
-    {return false;}
+  /// is this expression integer?
+  virtual bool isInteger ();
 
   /// fill in the set with all indices of variables appearing in the
   /// expression
   virtual int DepList (std::set <int> &deplist, 
-		       enum dig_type type = ORIG_ONLY,
-		       const CouenneProblem *p = NULL);
+		       enum dig_type type = ORIG_ONLY);
 
   /// Return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap. For this
@@ -244,18 +242,31 @@ class exprQuad: public exprGroup {
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
-  virtual CouNumber selectBranch (const CouenneObject *, const OsiBranchingInformation *,
-				  int &, double * &, int &);
+  virtual CouNumber selectBranch (const CouenneObject *obj, 
+				  const OsiBranchingInformation *info,
+				  expression * &var, 
+				  double * &brpts, 
+				  int &way);
 
   /// Fill dependence set of the expression associated with this
   /// auxiliary variable
   virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g);
 
+  /// replace variable x with new (aux) w
+  virtual void replace (exprVar *x, exprVar *w);
+
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
-  /// create dIndex_ based on occurrences in qindexI_ and qindexJ_
-  void make_dIndex (int, int *);
+  /// method to compute the bound based on sign: -1 for lower, +1 for
+  /// upper
+  CouNumber computeQBound (int sign);
+
+protected:
+
+  void computeQuadFiniteBound (CouNumber &qMin, CouNumber &qMax, 
+			       CouNumber *l, CouNumber *u,
+			       int &indInfLo, int &indInfUp);
 };
 
 
@@ -263,31 +274,22 @@ class exprQuad: public exprGroup {
 
 inline CouNumber exprQuad::operator () () {
 
-  register CouNumber
-     ret  = exprGroup::operator () (), // compute non-quadratic part (linear+constant)
-    *coe  = qcoeff_, 
-    *vars = expression::Variables ();
+  // compute non-quadratic part (linear+constant)
+  CouNumber ret = exprGroup::operator () ();
 
-  for (register int *qi = qindexI_, 
-	            *qj = qindexJ_, 
-	 i = nqterms_; i--; qi++, qj++) {
+  for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    register double term = 
-      *coe++ * vars [*qi] * vars [*qj];
+    int xind = row -> first -> Index ();
+    CouNumber x = (*(row -> first)) ();
 
-    ret += (*qi == *qj) ? term : 2 * term;
+    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
+
+      CouNumber term = x * (*(col -> first)) () * col -> second;
+      ret += (col -> first -> Index () == xind) ? term : 2. * term;
+    }
   }
 
-  return ret;
+  return (CouNumber) ret;
 }
-
-
-/// Insert a pair <int,CouNumber> into a map for linear terms
-void linsert (std::map <int, CouNumber> &lmap, 
-	      int index, CouNumber coe);
-
-/// Insert a pair <<int,int>,CouNumber> into a map for quadratic terms
-void qinsert (std::map <std::pair <int, int>, CouNumber> &map, 
-	      int indI, int indJ, CouNumber coe);
 
 #endif

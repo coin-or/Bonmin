@@ -7,14 +7,13 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneProblem.hpp"
-
 #include "expression.hpp"
 #include "exprAux.hpp"
 #include "exprOp.hpp"
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
 
+class CouenneProblem;
 
 // General N-ary function destructor
 
@@ -41,8 +40,7 @@ exprOp::~exprOp () {
 // print expression
 
 void exprOp::print (std::ostream &out, 
-		    bool descend, 
-		    CouenneProblem *p) const {
+		    bool descend) const {
   
   if (printPos () == PRE)
     out << printOp ();
@@ -50,7 +48,7 @@ void exprOp::print (std::ostream &out,
   out << "("; fflush (stdout);
   for (int i=0; i<nargs_; i++) {
     if (arglist_ [i])
-      arglist_ [i] -> print (out, descend, p); 
+      arglist_ [i] -> print (out, descend); 
     fflush (stdout);
     if (i < nargs_ - 1) {
       if (printPos () == INSIDE) out << printOp ();
@@ -65,9 +63,9 @@ void exprOp::print (std::ostream &out,
 
 /// compare general n-ary expressions
 
-int exprOp::compare (exprOp  &e1) {
+int exprOp::compare (exprOp &e1) {
 
-  int c0 = code (),
+  int c0 =     code (),
       c1 = e1. code ();
 
   if (c0 < c1) return -1;
@@ -112,13 +110,13 @@ int exprOp::compare (exprOp  &e1) {
 
 /// used in rank-based branching variable choice
 
-int exprOp::rank (CouenneProblem *p) {
+int exprOp::rank () {
 
   int maxrank = -1;
 
   for (register expression **al = arglist_ + nargs_; 
        al-- > arglist_;) {
-    register int r = (*al) -> rank (p);
+    register int r = (*al) -> rank ();
     if (r > maxrank) maxrank = r;
   }
 
@@ -136,7 +134,7 @@ int exprOp::rank (CouenneProblem *p) {
 // list components only), and the calling class (Sum, Sub, Mul, Pow,
 // and the like) will do the part for its own object
 
-exprAux *exprOp::standardize (register CouenneProblem *p, bool addAux) {
+exprAux *exprOp::standardize (CouenneProblem *p, bool addAux) {
 
   register exprVar *subst;
 
@@ -156,7 +154,7 @@ void exprOp::replace (exprVar *x, exprVar *w) {
 
   for (register int i = nargs_; i--; al++)
 
-    switch ((*al) -> Type () == VAR) {
+    switch ((*al) -> Type ()) {
 
     case VAR:
       if ((*al) -> Index () == index) {
@@ -181,18 +179,16 @@ bool exprOp::isInteger () {
 
   for (int i = nargs_; i--;)
 
-    if (!(arglist_ [i] -> isInteger ())) { // this argument is not integer
+    if (!(arglist_ [i] -> isInteger ())) { 
 
-      // last chance: check  if constant and integer
+      // this argument is not integer: check if constant and integer
 
-      expression *lb, *ub;
-
+      CouNumber lb, ub;
       arglist_ [i] -> getBounds (lb, ub);
-      CouNumber lv = (*lb) ();
 
-      if ((fabs (lv - (*ub) ()) > COUENNE_EPS) ||
-	  (fabs (COUENNE_round (lv) - lv) < COUENNE_EPS))
-      return false;
+      if ((fabs (lb - ub) > COUENNE_EPS) ||
+	  !::isInteger (lb))
+	return false;
     }
 
   return true;

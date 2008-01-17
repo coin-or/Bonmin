@@ -56,7 +56,7 @@ class exprOpp: public exprUnary {
   void getBounds (expression *&, expression *&);
 
   /// special version for linear constraints
-  virtual void generateCuts (exprAux *, const OsiSolverInterface &, 
+  virtual void generateCuts (expression *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,
 			     t_chg_bounds * = NULL, int = -1, 
 			     CouNumber = -COUENNE_INFINITY, 

@@ -12,13 +12,11 @@
 #define COUENNE_EXPRAUX_HPP
 
 #include <iostream>
-#include "exprVar.hpp"
-#include "exprBound.hpp"
-#include "exprMax.hpp"
-#include "exprMin.hpp"
-#include "CouenneTypes.hpp"
-#include "CglCutGenerator.hpp"
 
+#include "expression.hpp"
+#include "exprVar.hpp"
+
+class CouenneCutGenerator;
 
 /** Auxiliary variable
  *
@@ -30,6 +28,11 @@
  */
 
 class exprAux: public exprVar {
+
+ public:
+
+  /// integrality type of an auxiliary variable: unset, continuous, integer
+  enum intType {Unset=-1, Continuous, Integer};
 
  protected:
 
@@ -55,7 +58,7 @@ class exprAux: public exprVar {
   int multiplicity_;
 
   /// is this variable integer?
-  bool integer_;
+  enum intType integer_;
 
  public:
 
@@ -64,7 +67,7 @@ class exprAux: public exprVar {
     {return AUX;}
 
   /// Constructor
-  exprAux (expression *, int, int, bool = false);
+  exprAux (expression *, int, int, intType = Unset);
 
   /// Constructor to be used with standardize ([...], false)
   exprAux (expression *);
@@ -84,7 +87,7 @@ class exprAux: public exprVar {
 
   /// Print expression
   virtual void print (std::ostream & = std::cout, 
-		      bool = false, CouenneProblem * = NULL) const;
+		      bool = false) const;
 
   /// The expression associated with this auxiliary variable
   inline expression *Image () const
@@ -101,8 +104,7 @@ class exprAux: public exprVar {
   /// fill in the set with all indices of variables appearing in the
   /// expression
   int DepList (std::set <int> &deplist, 
-	       enum dig_type type = ORIG_ONLY,
-	       const CouenneProblem *p = NULL);
+	       enum dig_type type = ORIG_ONLY);
 
   /// simplify
   expression *simplify ();
@@ -116,8 +118,8 @@ class exprAux: public exprVar {
   virtual void getBounds (expression *&lb, expression *&ub);
 
   /// Get lower and upper bound of an expression (if any) -- real values
-  void getBounds (CouNumber &lb, CouNumber &ub) 
-    {expression::getBounds (lb, ub);}
+  //void getBounds (CouNumber &lb, CouNumber &ub) 
+  //{expression::getBounds (lb, ub);}
 
   /// set bounds depending on both branching rules and propagated
   /// bounds. To be used after standardization
@@ -131,13 +133,20 @@ class exprAux: public exprVar {
 		     CouNumber =  COUENNE_INFINITY);
 
   /// used in rank-based branching variable choice
-  virtual inline int rank (CouenneProblem *p = NULL)
+  virtual inline int rank ()
     {return rank_;} 
 
   /// is this expression integer?
   virtual inline bool isInteger () {
-    return ((integer_ == AUX_INTEGER) || 
-	    (integer_ == AUX_UNSET) && ((integer_ = image_ -> isInteger ()) == AUX_INTEGER));
+
+    if ((integer_ == Integer) || 
+	(integer_ == Unset) && 
+	((integer_ = (image_ -> isInteger ()) ? 
+	  Integer : Continuous) == Integer))
+      return true;
+
+    CouNumber lb = (*(Lb ())) (); 
+    return (::isInteger (lb) && (fabs (lb - (*(Ub ())) ()) < COUENNE_EPS));
   }
 
   /// Tell this variable appears once more

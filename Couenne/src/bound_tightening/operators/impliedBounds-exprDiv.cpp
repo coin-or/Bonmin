@@ -17,15 +17,17 @@
 
 bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
+  //return false; // !!!
+
   bool resx, resy = resx = false;
 
-  // deal with the "y is a constant"
+  // y is a constant
   if (arglist_ [1] -> Type () == CONST) {
 
     int ind = arglist_ [0] -> Index ();
 
     if (ind < 0) {
-      printf ("exprDiv::impliedBound: Error, w=c/d constants\n");
+      printf ("exprDiv::impliedBound: Error, w = c/d constants\n");
       exit (-1);
     }
 

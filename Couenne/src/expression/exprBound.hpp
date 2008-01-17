@@ -53,7 +53,7 @@ class exprLowerBound: public exprVar {
 
   /// Print to iostream
   void print (std::ostream &out = std::cout, 
-	      bool = false, CouenneProblem * = NULL) const
+	      bool = false) const
     {out << "l_" << varIndex_;}
 
   /// return the value of the variable
@@ -65,7 +65,7 @@ class exprLowerBound: public exprVar {
     {return new exprConst (0.);}
 
   /// dependence on variable set
-  inline int dependsOn (int *, int) 
+  inline int dependsOn (int *, int, enum dig_type type = STOP_AT_AUX) 
     {return 0;}
 
   /// get a measure of "how linear" the expression is:
@@ -102,7 +102,7 @@ class exprUpperBound: public exprVar {
 
   /// Print to iostream
   void print (std::ostream &out = std::cout, 
-	      bool = false, CouenneProblem * = NULL) const
+	      bool = false) const
     {out << "u_" << varIndex_;}
 
   /// return the value of the variable
@@ -114,7 +114,7 @@ class exprUpperBound: public exprVar {
     {return new exprConst (0.);}
 
   /// dependence on variable set
-  inline int dependsOn (int *, int) 
+  inline int dependsOn (int *, int, enum dig_type type = STOP_AT_AUX) 
     {return 0;}
 
   /// get a measure of "how linear" the expression is:

@@ -22,8 +22,8 @@ bool DepNode::depends (int xi, bool recursive) const {
     if (((*i) -> Index () == xi) || // check current node
 	(recursive && 
 	 ((*i) -> depends (xi, recursive)))) // check deplist recursively
-
-      return true;
+      { printf ("%d <- ", (*i) -> Index ()); fflush (stdout);
+      return true;}
 
   return false;
 }
@@ -103,6 +103,7 @@ void DepGraph::insert (exprAux *aux) {
     aux      -> Image () -> fillDepSet (el -> DepList (), this);
   } else aux -> Image () -> fillDepSet ((*i) -> DepList (), this);
 }
+
 
 /// erase element from graph
 void DepGraph::erase (exprVar *var) {

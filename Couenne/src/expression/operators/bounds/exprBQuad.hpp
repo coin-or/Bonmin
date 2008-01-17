@@ -14,21 +14,18 @@
 #include "exprQuad.hpp"
 
 
-/// method to actually compute the bound
-CouNumber computeQBound (int, exprQuad *);
-
-
 /// class to compute lower bound of a fraction based on the bounds of
 /// both numerator and denominator
 
 class exprLBQuad: public expression {
 
-  exprQuad *ref_; //< quadratic form, reference expression
+  exprQuad *ref_; ///< quadratic form, reference expression
 
  public:
 
   /// Constructor
-  exprLBQuad (exprQuad *ref): ref_ (ref) {}
+  exprLBQuad (exprQuad *ref): 
+    ref_ (ref) {}
 
   /// copy constructor
   exprLBQuad (const exprLBQuad &src): 
@@ -43,14 +40,13 @@ class exprLBQuad: public expression {
 
   /// function for the evaluation of the expression
   inline CouNumber operator () () 
-  {return computeQBound (-1, ref_);}
+  {return ref_ -> computeQBound (-1);}
 
   /// I/O
   virtual void print (std::ostream &s = std::cout,     //< output stream
-		      bool descend = false,            //< descend into auxiliaries' image?
-		      CouenneProblem *p = NULL) const  //< problem pointer (in exprGroup)
+		      bool descend = false) const      //< descend into auxiliaries' image?
 
-  {s << "quadLower("; ref_ -> print (s, descend, p); s << ')';}
+  {s << "quadLower("; ref_ -> print (s, descend); s << ')';}
 };
 
 
@@ -59,12 +55,13 @@ class exprLBQuad: public expression {
 
 class exprUBQuad: public expression {
 
-  exprQuad *ref_; //< quadratic form, reference expression
+  exprQuad *ref_; ///< quadratic form, reference expression
 
  public:
 
   /// Constructor
-  exprUBQuad (exprQuad *ref): ref_ (ref) {}
+  exprUBQuad (exprQuad *ref): 
+    ref_ (ref) {}
 
   /// copy constructor
   exprUBQuad (const exprUBQuad &src): 
@@ -79,14 +76,13 @@ class exprUBQuad: public expression {
 
   /// function for the evaluation of the expression
   inline CouNumber operator () () 
-  {return computeQBound (1, ref_);}
+  {return ref_ -> computeQBound (1);}
 
   /// I/O
   virtual void print (std::ostream &s = std::cout,     //< output stream
-		      bool descend = false,            //< descend into auxiliaries' image?
-		      CouenneProblem *p = NULL) const  //< problem pointer (in exprGroup)
+		      bool descend = false) const      //< descend into auxiliaries' image?
 
-  {s << "quadUpper("; ref_ -> print (s, descend, p); s << ')';}
+  {s << "quadUpper("; ref_ -> print (s, descend); s << ')';}
 };
 
 #endif

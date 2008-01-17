@@ -8,15 +8,9 @@
  */
 
 #include "CouenneCutGenerator.hpp"
-#include "CouenneTypes.hpp"
-#include "expression.hpp"
 #include "exprAux.hpp"
-#include "exprOp.hpp"
-#include "exprUnary.hpp"
 #include "exprVar.hpp"
 #include "exprBound.hpp"
-
-#include "CouenneProblem.hpp"
 #include "depGraph.hpp"
 
 
@@ -29,7 +23,7 @@ void exprVar::getBounds (expression *&lb, expression *&ub) {
 
 
 // generate convexification cut for constraint w = this
-void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si, 
+void exprVar::generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
 			    t_chg_bounds *chg, int,
 			    CouNumber, CouNumber) {
@@ -43,8 +37,12 @@ void exprVar::generateCuts (exprAux *w, const OsiSolverInterface &si,
 bool exprVar::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   bool res = false;
-  if (updateBound (-1, l + varIndex_, l [wind])) {res = true; chg [varIndex_].setLower(t_chg_bounds::CHANGED);}
-  if (updateBound (+1, u + varIndex_, u [wind])) {res = true; chg [varIndex_].setUpper(t_chg_bounds::CHANGED);}
+
+  if (updateBound (-1, l + varIndex_, l [wind])) 
+    {res = true; chg [varIndex_].setLower(t_chg_bounds::CHANGED);}
+  if (updateBound (+1, u + varIndex_, u [wind])) 
+    {res = true; chg [varIndex_].setUpper(t_chg_bounds::CHANGED);}
+
   return res;
 }
 
@@ -54,6 +52,5 @@ void exprVar::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g)
 {dep -> insert (g -> lookup (varIndex_));}
 
 
-/// Bound get
-expression *exprVar::Lb () {return new exprLowerBound (varIndex_);}
-expression *exprVar::Ub () {return new exprUpperBound (varIndex_);}
+expression *exprVar::Lb () {return new exprLowerBound (varIndex_);}///< lower bound of a variable
+expression *exprVar::Ub () {return new exprUpperBound (varIndex_);}///< upper bound of a variable

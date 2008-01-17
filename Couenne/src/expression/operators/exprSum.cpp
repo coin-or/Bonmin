@@ -16,8 +16,15 @@
 exprSum::exprSum  (expression **al, int n): 
   exprOp (al, n) { //< non-leaf expression, with argument list
 
+  if (al==NULL) {
+    arglist_ = new expression * [1];
+    *arglist_ = new exprConst (0);
+    nargs_ = 1;    
+  }
+
   // commutative operator, sort elements
-  qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
+  if (nargs_ > 1)
+    qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
 }
 
 
@@ -92,7 +99,7 @@ expression *exprSum:: differentiate (int index) {
   register int nonconst = 0;
 
   for (int i = 0; i < nargs_; i++) 
-    if (arglist_ [i] -> dependsOn (&index, 1))
+    if (arglist_ [i] -> dependsOn (index))
       arglist [nonconst++] = arglist_ [i] -> differentiate (index);
 
   if (!nonconst) {

@@ -42,14 +42,14 @@ public:
   {return alpha_;}
 
   /// Constructor
-  CouenneBranchingObject (JnlstPtr jnlst, int, int, CouNumber = - COIN_DBL_MAX, bool = false);
+  CouenneBranchingObject (JnlstPtr jnlst, expression *, int, CouNumber = - COIN_DBL_MAX);
 
   /// Copy constructor
   CouenneBranchingObject (const CouenneBranchingObject &src):
     OsiTwoWayBranchingObject (src),
-    index_   (src.index_),
-    integer_ (src.integer_),
-    jnlst_   (src.jnlst_) {}
+    variable_ (src.variable_),
+    //    integer_  (src.integer_),
+    jnlst_    (src.jnlst_) {}
 
   /// Cloning method
   virtual OsiBranchingObject * clone () const
@@ -68,10 +68,10 @@ protected:
   /// the corresponding CouenneObject was created on w=f(x,y), it is
   /// either x or y, chosen previously with a call to getFixVar()
   /// expression *reference_;
-  int index_;
+  expression *variable_;
 
   /// True if the related variable is integer
-  bool integer_;
+  //  bool integer_;
 
   /// Global value for convex combination between current point and
   /// midpoint
@@ -80,8 +80,5 @@ protected:
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 };
-
-/// returns a point "inside enough" a given interval, or x if it is already
-CouNumber midInterval (CouNumber x, CouNumber l, CouNumber u);
 
 #endif
