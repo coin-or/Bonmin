@@ -185,12 +185,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if (jnlst_ -> ProduceOutput (J_DETAILED, J_CONVEXIFYING)) {
       if (cs.sizeRowCuts ()) {
-	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,":::::::::::::::::::::constraint row cuts\n");
+	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,"Couenne: constraint row cuts\n");
 	for (int i=0; i<cs.sizeRowCuts (); i++) 
 	  cs.rowCutPtr (i) -> print ();
       }
       if (cs.sizeColCuts ()) {
-	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,":::::::::::::::::::::constraint col cuts\n");
+	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,"Couenne: constraint col cuts\n");
 	for (int i=0; i<cs.sizeColCuts (); i++) 
 	  cs.colCutPtr (i) -> print ();
       }

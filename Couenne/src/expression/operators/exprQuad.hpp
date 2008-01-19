@@ -199,18 +199,18 @@ public:
    *
    * \f[ \eta \leq \tilde a_0(\lambda_{\max}) + \tilde
    * a(\lambda_{\max})^T x + {x^*}^T \tilde Q(\lambda_{\max}) (2x -
-   * x^*) \f]
+   * x^*); \f]
    *
    * grouping coefficients, we get:
    *
    * \f[ {x^*}^T \tilde Q(\lambda_{\min}) x^* - \tilde
-   * a_0(\lambda_{\min}) \geq ( a(\lambda_{\min}) + 2
+   * a_0(\lambda_{\min}) \geq (\tilde a(\lambda_{\min}) + 2
    * \tilde Q(\lambda_{\min} ) x^*)^T x - \eta \f]
    *
    * and
    *
    * \f[ {x^*}^T \tilde Q(\lambda_{\max}) x^* - \tilde
-   * a_0(\lambda_{\max}) \leq ( a(\lambda_{\max}) + 2
+   * a_0(\lambda_{\max}) \leq (\tilde a(\lambda_{\max}) + 2
    * \tilde Q (\lambda_{\max}) x^* )^T x - \eta \f]
    */
 

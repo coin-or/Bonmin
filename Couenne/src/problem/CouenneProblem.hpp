@@ -336,6 +336,9 @@ class CouenneProblem {
   /// Read best known solution from file given in argument
   bool readOptimum (const std::string &);
 
+  /// Read cutoff value (for testing purposes)
+  void readCutoff (const std::string &fname);
+
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
 

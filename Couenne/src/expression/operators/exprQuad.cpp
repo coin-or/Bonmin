@@ -18,6 +18,11 @@
 
 //#define DEBUG
 
+struct cmpVar {
+  bool operator() (const exprVar* v1, const exprVar* v2) const
+  {return (v1 -> Index () < v2 -> Index ());}//strcmp(s1, s2) < 0;}
+};
+
 /// Constructor
 exprQuad::exprQuad  (CouNumber c0,
 		     std::vector <std::pair <exprVar *, CouNumber> > &lcoeff,
@@ -29,8 +34,8 @@ exprQuad::exprQuad  (CouNumber c0,
 
   nqterms_ = 0;
 
-  typedef std::map <exprVar *, CouNumber> rowMap;
-  typedef std::map <exprVar *, rowMap>    matrixMap;
+  typedef std::map <exprVar *, CouNumber, cmpVar> rowMap;
+  typedef std::map <exprVar *, rowMap,    cmpVar> matrixMap;
 
   matrixMap qMap;
 

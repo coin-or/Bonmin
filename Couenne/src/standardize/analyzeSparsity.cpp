@@ -65,6 +65,7 @@ void CouenneProblem::analyzeSparsity (CouNumber c0,
 
   if ((qmap.Map().size () >= MIN_DENSITY * nterms * (nterms+1) / 2) && (nterms >= 2)
       //|| (nsquares > nterms/2)
+      || (nsquares >= occur.size ())
       )
     return; // keep current exprQuad structure
 

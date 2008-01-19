@@ -90,7 +90,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 		  "Problem size after standarization: %d variables (%d integer) %d constraints.\n",
 		  nVars(), nIntVars(), nCons());
 
-  //readOptimum ("nvs06.txt");
+  //readOptimum ("ex1223b.txt");
 
   if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
     // We should route that also through the journalist
