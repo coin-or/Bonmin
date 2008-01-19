@@ -100,6 +100,8 @@ namespace Bonmin{
 
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
+    couenneProb -> readCutoff (argv [1]);
+
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
 
     // as per instructions by John Forrest, to get changed bounds

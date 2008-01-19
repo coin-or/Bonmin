@@ -190,7 +190,7 @@ namespace Bonmin{
 
     for (int i = couenne_ -> nOrig (); i--;) 
       if (lower [i] > upper [i] - 1e-20)
-	lower [i] = (upper [i] += .5e-20) - .5e-20;
+	lower [i] = upper [i] = 0.5 * (lower [i] + upper [i]);
 
     //	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
 
