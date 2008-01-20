@@ -19,7 +19,9 @@
 // The following is included for "min"
 #include "CoinFinite.hpp"
 
-#define DEBUG_PRINT
+#ifndef BM_DEBUG_PRINT
+#define BM_DEBUG_PRINT 0
+#endif
 
 static char prefix[100];
 
@@ -184,7 +186,7 @@ BM_lp::test_feasibility_BB(const BCP_lp_result& lpres,
   BCP_solution_generic* sol = test_full(lpres, vars, integerTolerance_);
   if (sol) {
     sol->set_objective_value(lpres.objval());
-#ifdef DEBUG_PRINT
+#if (BM_DEBUG_PRINT != 0)
     printf("LP %.3f: Solution found. node: %i  depth: %i  value: %f\n",
 	   CoinWallclockTime() - start_time(),
 	   current_index(), current_level(), lpres.objval());

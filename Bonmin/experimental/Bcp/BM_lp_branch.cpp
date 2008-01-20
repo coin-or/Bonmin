@@ -18,7 +18,9 @@
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonIpoptWarmStart.hpp"
 
-#define DEBUG_PRINT
+#ifndef BM_DEBUG_PRINT
+#define BM_DEBUG_PRINT 0
+#endif
 
 static bool ifprint = true;
 static bool ifprint2 = false;
@@ -185,6 +187,9 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
   const bool isRoot = (current_index() == 0);
   int way;
 
+  const bool disregardPriorities = par.entry(BM_par::DisregardPriorities);
+  const bool usePseudoCosts = par.entry(BM_par::UsePseudoCosts);
+
   for (int i = 0; i < objNum_; ++i) {
     const int ind = objInd_[i];
     const OsiObject* object = objects[ind];
@@ -193,25 +198,27 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
       if (value >= 1e50) { // infeasible
 	return -1;
       }
-      int priorityLevel = object->priority();
-      if (lastPriority < priorityLevel) {
-	// sort the entries based on their usefulness
-	if (infBlockStart < infNum_ &&
-	    ! par.entry(BM_par::DisregardPriorities)) {
-	  if (par.entry(BM_par::DecreasingSortInSetupList)) {
-	    CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
-		       infInd_ + infBlockStart,
-		       CoinFirstGreater_2<double,int>());
-	  } else {
-	    CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
-		       infInd_ + infBlockStart);
+      if (! disregardPriorities) {
+	int priorityLevel = object->priority();
+	if (lastPriority < priorityLevel) {
+	  // sort the entries based on their usefulness
+	  if (infBlockStart < infNum_) {
+	    if (par.entry(BM_par::DecreasingSortInSetupList)) {
+	      CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
+			 infInd_ + infBlockStart,
+			 CoinFirstGreater_2<double,int>());
+	    } else {
+	      CoinSort_2(infUseful_ + infBlockStart, infUseful_ + infNum_,
+			 infInd_ + infBlockStart);
+	    }
+	    infBlockStart = infNum_;
 	  }
+	  lastPriority = priorityLevel;
 	}
-	lastPriority = priorityLevel;
       }
       double dummy;
       infInd_[infNum_] = ind;
-      if (par.entry(BM_par::UsePseudoCosts)) {
+      if (usePseudoCosts) {
 	infUseful_[infNum_] = isRoot ?
 	  value : choose->computeUsefulness(MAXMIN, upMult, downMult, value,
 					    object, ind, dummy);
@@ -241,21 +248,22 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
 	// bound (the test accounts for tolerances)
 	++branchNum;
       }
-      int priorityLevel = object->priority();
-      if (lastPriority < priorityLevel) {
-	// sort the entries based on their usefulness
-	if (feasBlockStart < feasNum_) {
-	  if (par.entry(BM_par::DecreasingSortInSetupList) &&
-	      ! par.entry(BM_par::DisregardPriorities)) {
-	    CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
-		       feasInd_ + feasBlockStart,
-		       CoinFirstGreater_2<double,int>());
-	  } else {
-	    CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
-		       feasInd_ + feasBlockStart);
+      if (! disregardPriorities) {
+	int priorityLevel = object->priority();
+	if (lastPriority < priorityLevel) {
+	  // sort the entries based on their usefulness
+	  if (feasBlockStart < feasNum_) {
+	    if (par.entry(BM_par::DecreasingSortInSetupList)) {
+	      CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
+			 feasInd_ + feasBlockStart,
+			 CoinFirstGreater_2<double,int>());
+	    } else {
+	      CoinSort_2(feasUseful_ + feasBlockStart, feasUseful_ + feasNum_,
+			 feasInd_ + feasBlockStart);
+	    }
 	  }
+	  lastPriority = priorityLevel;
 	}
-	lastPriority = priorityLevel;
       }
       double dummy;
       feasInd_[feasNum_] = ind;
@@ -286,7 +294,7 @@ BM_lp::sort_objects(OsiBranchingInformation& branchInfo,
     }
   }
 
-#ifdef DEBUG_PRINT
+#if (BM_DEBUG_PRINT != 0)
   const double t = CoinWallclockTime();
   printf("LP %.3f: node: %i  depth: %i  obj: %f  infNum: %i  feasNum: %i  soltime: %.3f\n",
 	 t-start_time(), current_index(), current_level(),
@@ -539,7 +547,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
     assert(sbres.branchEval == 3);
     if (isBranchFathomable(sbres.status[0], sbres.objval[0]) &&
 	isBranchFathomable(sbres.status[1], sbres.objval[1])) {
-#ifdef DEBUG_PRINT
+#if (BM_DEBUG_PRINT != 0)
       const double wallclock = CoinWallclockTime();
 #if 0
       printf("LP %.3f: SBres: node: %i  FATHOM  inf/eval/cand: time: %.3f\n",
@@ -603,7 +611,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
     }
   }
   if ((fixedStat & 2) != 0) {
-#ifdef DEBUG_PRINT
+#if (BM_DEBUG_PRINT != 0)
     printf("LP %.3f: SBres: node: %i  RESOLVE  time: %.3f\n",
 	   t - start_time(), current_index(), t-node_start_time);
     node_start_time = t;
@@ -681,7 +689,7 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
   const int ind = object->columnNumber();
   bestSbResult_ = sbResult_ + infInd_[best];
-#ifdef DEBUG_PRINT
+#if (BM_DEBUG_PRINT != 0)
   printf("LP %.3f: SBres: node: %i  depth: %i  BRANCH  time: %.3f  evaluated: %i  bvar: %i  val: %f  obj0: %f  obj1: %f  way: %i\n",
 	 t-start_time(), current_index(), current_level(), t-node_start_time, 
 	 evaluated, ind, branchInfo.solution_[ind], 

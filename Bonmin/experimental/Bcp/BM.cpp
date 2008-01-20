@@ -67,8 +67,6 @@ void BCP_parameter_set<BM_par>::create_keyword_list() {
     // Create the list of keywords for parameter file reading
     keys.push_back(make_pair(BCP_string("BM_DisregardPriorities"),
 			     BCP_parameter(BCP_CharPar, DisregardPriorities)));
-    keys.push_back(make_pair(BCP_string("BM_NoStrongBranching"),
-			     BCP_parameter(BCP_CharPar, NoStrongBranching)));
     keys.push_back(make_pair(BCP_string("BM_PrintBranchingInfo"),
 			     BCP_parameter(BCP_CharPar, PrintBranchingInfo)));
     keys.push_back(make_pair(BCP_string("BM_UsePseudoCosts"),
@@ -90,7 +88,6 @@ void BCP_parameter_set<BM_par>::create_keyword_list() {
 template <>
 void BCP_parameter_set<BM_par>::set_default_entries() {
     set_entry(DisregardPriorities, false);
-    set_entry(NoStrongBranching, false);
     set_entry(PrintBranchingInfo, true);
     set_entry(UsePseudoCosts, 1);
     set_entry(DecreasingSortInSetupList, 1);

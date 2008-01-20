@@ -61,7 +61,6 @@ class BM_par {
 public:
     enum chr_params {
         //
-        NoStrongBranching,
 	DisregardPriorities,
 	PrintBranchingInfo,
         end_of_chr_params
