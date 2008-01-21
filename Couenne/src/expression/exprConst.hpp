@@ -29,7 +29,7 @@ private:
 public:
 
   /// node type
-  inline enum nodeType Type () 
+  inline enum nodeType Type () const
     {return CONST;}
 
   /// value of expression
@@ -41,11 +41,11 @@ public:
     {value_ = value;}
 
   /// Copy constructor
-  exprConst (const exprConst &e)
+  exprConst (const exprConst &e, const std::vector <exprVar *> *variables = NULL)
     {value_ = e.value_;}
 
   /// Cloning method
-  virtual exprConst *clone () const
+  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
     {return new exprConst (value_);}
 
   /// I/O

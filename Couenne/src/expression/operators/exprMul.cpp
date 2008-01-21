@@ -19,7 +19,6 @@ exprMul::exprMul  (expression **al, int n):
   exprOp (al, n) { //< non-leaf expression, with argument list
 
   // commutative operator, sort elements
-
   qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
 }
 

@@ -193,3 +193,14 @@ bool exprOp::isInteger () {
 
   return true;
 }
+
+
+/// fill in the set with all indices of variables appearing in the
+/// expression
+int exprOp::DepList (std::set <int> &deplist, 
+		     enum dig_type type) {
+  int tot = 0;
+  for (int i = nargs_; i--;)
+    tot += arglist_ [i] -> DepList (deplist, type);
+  return tot;
+}

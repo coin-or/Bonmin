@@ -32,7 +32,7 @@ class exprCopy: public expression {
  public:
 
   /// node type
-  inline enum nodeType Type () 
+  inline enum nodeType Type () const
     {return copy_ -> Type ();}
 
   /// Constructor
@@ -40,10 +40,7 @@ class exprCopy: public expression {
     copy_ (copy) {}
 
   /// Copy constructor
-  exprCopy (const exprCopy &e) {
-    copy_  = e.Original () -> clone ();
-    value_ = e.value_;
-  }
+  exprCopy (const exprCopy &e, const std::vector <exprVar *> *variables = NULL);
 
   /// Destructor -- CAUTION: this is the only destructive destructor,
   /// exprClone and exprStore do not destroy anything
@@ -53,14 +50,18 @@ class exprCopy: public expression {
   }
 
   /// Cloning method
-  virtual exprCopy *clone () const
-    {return new exprCopy (*this);}
+  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return new exprCopy (*this, variables);}
 
   /// If this is an exprClone of a exprClone of an expr???, point to
   /// the original expr??? instead of an exprClone -- improves computing
   /// efficiency
   inline const expression *Original () const
     {return copy_ -> Original ();}
+
+  /// return pointer to corresponding expression (for auxiliary variables only)
+  virtual inline expression *Image () const
+    {return copy_ -> Image ();}
 
   /// Get variable index in problem
   inline int Index () const

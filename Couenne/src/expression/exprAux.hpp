@@ -63,7 +63,7 @@ class exprAux: public exprVar {
  public:
 
   /// Node type
-  inline enum nodeType Type () 
+  inline enum nodeType Type () const
     {return AUX;}
 
   /// Constructor
@@ -76,11 +76,17 @@ class exprAux: public exprVar {
   ~exprAux ();
 
   /// Copy constructor
-  exprAux (const exprAux &);
+  exprAux (const exprAux &, const std::vector <exprVar *> *variables = NULL);
 
   /// Cloning method
-  virtual exprAux *clone () const
-    {return new exprAux (*this);}
+  virtual exprVar *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return ((variables && (*variables) [varIndex_]) ?
+	   (*variables) [varIndex_] :
+	   new exprAux (*this, variables));}
+
+  //{return (variables ? (*variables) [varIndex_] : new exprAux (*this, variables));}
+  //{return (//keep_variables ? new exprClone (this) : 
+  //new exprAux (*this, variables));}
 
   expression *Lb () {return lb_;} ///< get lower bound expression
   expression *Ub () {return ub_;} ///< get upper bound expression
@@ -92,6 +98,10 @@ class exprAux: public exprVar {
   /// The expression associated with this auxiliary variable
   inline expression *Image () const
     {return image_;}
+
+  /// The expression associated with this auxiliary variable
+  void Image (expression *image)
+    {image_ = image;}
 
   /// Null function for evaluating the expression
   inline CouNumber operator () () 

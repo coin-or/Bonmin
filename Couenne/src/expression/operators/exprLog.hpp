@@ -22,11 +22,11 @@ class exprLog: public exprUnary {
 
   /// Constructors, destructor
   exprLog  (expression *al): 
-    exprUnary (al) {} //< non-leaf expression, with argument list
+    exprUnary (al) {} // non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone () const
-    {return new exprLog (argument_ -> clone ());}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprLog (argument_ -> clone (variables));}
 
   /// the operator's function
   inline unary_function F () {return log;}
@@ -40,14 +40,6 @@ class exprLog: public exprUnary {
 
   /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
-
-  /// return expression of this same type with argument arg
-  inline expression *mirror (expression *arg)
-    {return new exprLog (arg);}
-
-  /// return derivative of univariate function of this type
-  inline expression *mirror_d (expression *arg)
-    {return new exprInv (arg);}
 
   /// generate equality between *this and *w
   void generateCuts (expression *w, const OsiSolverInterface &si, 

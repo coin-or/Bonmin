@@ -150,7 +150,8 @@ void CouenneProblem::standardize () {
 #ifdef DEBUG
     printf (" --> ");
     (*i) -> print ();
-    printf ("...................\n");
+    printf ("..............................................................\n");
+    print ();
 #endif
 
     /*printf ("=== "); fflush (stdout); 

@@ -29,8 +29,8 @@ class exprSub: public exprOp {
     exprOp (arg0, arg1) {}
 
   /// Cloning method
-  expression *clone () const
-    {return new exprSub (clonearglist (), nargs_);}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprSub (clonearglist (variables), nargs_);}
 
   //// Print operator
   std::string printOp () const

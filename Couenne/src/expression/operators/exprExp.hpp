@@ -25,8 +25,8 @@ class exprExp: public exprUnary {
     exprUnary (al) {} //< non-leaf expression, with argument list
 
   /// Cloning method
-  expression *clone () const
-    {return new exprExp (argument_ -> clone ());}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprExp (argument_ -> clone (variables));}
 
   /// The operator's function
   inline unary_function F () {return exp;}
@@ -37,14 +37,6 @@ class exprExp: public exprUnary {
 
   /// Differentiation
   expression *differentiate (int index); 
-
-  /// Return expression of this same type with argument arg
-  inline expression *mirror (expression *arg)
-    {return new exprExp (arg);}
-
-  /// Return derivative of univariate function of this type
-  inline expression *mirror_d (expression *arg)
-    {return new exprExp (arg);}
 
   /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);

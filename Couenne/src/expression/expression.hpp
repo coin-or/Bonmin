@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <set>
+#include <vector>
 
 #include "CouennePrecisions.hpp"
 #include "CouenneTypes.hpp"
@@ -85,47 +86,53 @@ class expression {
   /// Constructor
   expression () {}
 
-  /// Copy constructor
-  expression (const expression &e) {}
+  /// Copy constructor. Pass pointer to variable vector when
+  /// generating new problem, whose set of variables is equivalent but
+  /// may be changed or whose value is independent.
+  expression (const expression &e, const std::vector <exprVar *> *variables = NULL) {}
 
   /// Destructor
   virtual ~expression () {}
 
-  /// cloning method
-  virtual expression *clone () const 
-    {return new expression (*this);}
+  /// Cloning method
+  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const 
+  {return NULL;}
 
-  /// return index of variable (only valid for exprVar and exprAux)
+  /// Return index of variable (only valid for exprVar and exprAux)
   virtual inline int Index () const
-    {return -1;}
+  {return -1;}
 
   /// return number of arguments (when applicable, that is, with N-ary functions)
   virtual inline int nArgs () const
-    {return 0;}
+  {return 0;}
 
   /// return arglist (when applicable, that is, with N-ary functions)
   virtual inline expression **ArgList () const
-    {return NULL;}
+  {return NULL;}
 
   /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
-    {return NULL;}
+  {return NULL;}
 
   /// return pointer to argument (when applicable, i.e., with univariate functions)
   virtual inline expression **ArgPtr ()
-    {return NULL;}
+  {return NULL;}
 
   /// node type
-  virtual inline enum nodeType Type ()
-    {return EMPTY;}
+  virtual inline enum nodeType Type () const
+  {return EMPTY;}
 
-  /// return pointer to self
+  /// return pointer to corresponding expression (for auxiliary variables only)
   virtual inline expression *Image () const
-    {return NULL;}
+  {return NULL;}
+
+  /// set expression associated with this auxiliary variable (for
+  /// compatibility with exprAux)
+  void Image (expression *image) {}
 
   /// value (empty)
   virtual inline CouNumber Value () const 
-    {return 0;}
+  {return 0;}
 
   /// If this is an exprClone of a exprClone of an expr???, point to
   /// the original expr??? instead of an exprClone -- improve computing
@@ -140,11 +147,11 @@ class expression {
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
-    {return 0;}
+  {return 0;}
 
   /// differentiation
   virtual inline expression *differentiate (int) 
-    {return NULL;}
+  {return NULL;}
 
   /// dependence on variable set: return cardinality of subset of the
   /// set of indices in first argument which occur in expression. 
@@ -161,19 +168,19 @@ class expression {
   /// pointers (exprGroup, exprQuad)
   virtual inline int DepList (std::set <int> &deplist, 
 			      enum dig_type   type = ORIG_ONLY)
-    {return 0;}
+  {return 0;}
 
   /// simplify expression (useful for derivatives)
   virtual inline expression *simplify () 
-    {return NULL;}
+  {return NULL;}
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity ()
-    {return NONLINEAR;}
+  {return NONLINEAR;}
 
   /// is this expression integer?
   virtual inline bool isInteger ()
-    {return false;}
+  {return false;}
 
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
@@ -194,7 +201,7 @@ class expression {
   /// addAux is true if a new auxiliary variable should be added
   /// associated with the standardized expression
   virtual inline exprAux *standardize (CouenneProblem *p, bool addAux = true) 
-    {return NULL;}
+  {return NULL;}
 
   /// generate convexification cut for constraint w = this
   virtual void generateCuts (expression *w, const OsiSolverInterface &si, 
@@ -206,16 +213,16 @@ class expression {
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar ()
-    {printf ("Warning: expression::getFixIndex()\n"); return NULL;}
+  {printf ("Warning: expression::getFixIndex()\n"); return NULL;}
 
   /// return integer for comparing expressions (used to recognize
   /// common expression)
   virtual enum expr_type code () 
-    {return COU_EXPRESSION;}
+  {return COU_EXPRESSION;}
 
   /// either CONVEX, CONCAVE, AFFINE, or NONCONVEX
   virtual enum convexity convexity () 
-    {return NONCONVEX;}
+  {return NONCONVEX;}
 
   /// compare expressions
   virtual int compare (expression &);

@@ -32,21 +32,22 @@ class exprStore: public exprCopy {
     exprCopy (copy) {}
 
   /// Store constructor
-  exprStore (const exprStore &e):
-    exprCopy (e) {
+  exprStore (const exprStore &e, const std::vector <exprVar *> *variables = NULL):
+    exprCopy (e, variables) {
     //copy_  = e.Original () -> clone ();
   }
 
   /// Destructor
-  virtual ~exprStore () {copy_ = NULL;}
+  virtual ~exprStore () 
+  {copy_ = NULL;}
 
   /// Cloning method
-  virtual exprStore *clone () const
-    {return new exprStore (*this);}
+  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return new exprStore (*this, variables);}
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
-    {return (copy_ -> Value ());}
+  {return (copy_ -> Value ());}
 };
 
 #endif

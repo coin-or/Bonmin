@@ -33,8 +33,8 @@ class exprMax: public exprOp {
   }
 
   /// cloning method
-  exprMax *clone () const
-    {return new exprMax (clonearglist (), nargs_);}
+  exprMax *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprMax (clonearglist (variables), nargs_);}
 
   /// print operator
   std::string printOp () const

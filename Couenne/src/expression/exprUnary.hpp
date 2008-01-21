@@ -38,7 +38,7 @@ class exprUnary: public expression {
  public:
 
   /// node type
-  virtual inline enum nodeType Type () 
+  virtual inline enum nodeType Type () const
     {return UNARY;}
 
   /// Constructor

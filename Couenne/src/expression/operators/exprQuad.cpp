@@ -47,15 +47,17 @@ exprQuad::exprQuad  (CouNumber c0,
       *varI = qel -> varI (),
       *varJ = qel -> varJ ();
 
-    if (varI -> Index () != varJ -> Index ())
+    if (varI -> Index () != varJ -> Index ()) {
+
       coe /= 2.;
 
-    // pick smaller index as row reference
-    if (varI -> Index () > varJ -> Index ()) {
+      // pick smaller index as row reference
+      if (varI -> Index () > varJ -> Index ()) {
 
-      exprVar *swap = varJ;
-      varJ = varI;
-      varI = swap;
+	exprVar *swap = varJ;
+	varJ = varI;
+	varI = swap;
+      }
     }
 
     matrixMap::iterator rowp = qMap.find (varI);
@@ -121,14 +123,44 @@ exprQuad::exprQuad  (CouNumber c0,
 
 
 /// copy constructor
-exprQuad::exprQuad  (const exprQuad &src): 
-  exprGroup (src),
-  matrix_   (src.matrix_),
-  eigen_    (src.eigen_),
+exprQuad::exprQuad (const exprQuad &src, const std::vector <exprVar *> *variables): 
+  exprGroup (src, variables),
   bounds_   (src.bounds_),
-  nqterms_  (src.nqterms_)
+  nqterms_  (src.nqterms_) {
 
-{} 
+  for (sparseQ::iterator row = src.matrix_.begin (); row != src.matrix_ . end (); ++row) {  
+
+    sparseQcol column;
+
+    for (sparseQcol::iterator i = row -> second. begin (); i != row -> second. end (); ++i)
+      column.push_back (std::pair <exprVar *, CouNumber> 
+			(dynamic_cast <exprVar *> (i -> first -> clone (variables)), i -> second));
+
+    matrix_.push_back (std::pair <exprVar *, sparseQcol> 
+		       (dynamic_cast <exprVar *> (row -> first -> clone (variables)), column));
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  std::vector 
+    <std::pair <CouNumber, std::vector 
+    <std::pair <exprVar *, CouNumber> > > >::iterator row;
+
+  for (row = src.eigen_ . begin (); 
+       row != src.eigen_ . end (); ++row) {  
+
+    std::vector <std::pair <exprVar *, CouNumber> > eigVec;
+
+    for (std::vector <std::pair <exprVar *, CouNumber> >::iterator 
+	   i = row -> second. begin (); 
+	 i != row -> second. end (); ++i)
+      eigVec.push_back (std::pair <exprVar *, CouNumber> 
+			(dynamic_cast <exprVar *> (i -> first -> clone (variables)), i -> second));
+
+    eigen_.push_back (std::pair <CouNumber, std::vector 
+		       <std::pair <exprVar *, CouNumber> > > (row -> first, eigVec));
+  }
+}
 
 
 /// I/O
@@ -150,7 +182,7 @@ void exprQuad::print (std::ostream &out, bool descend) const {
 	if (fabs (row [j]. second + 1) < COUENNE_EPS) out << "- ";
 	else {
 	  if (row [j]. second > 0) out << '+';
-	  out << row [j]. second;
+	  out << row [j]. second << "*";
 	}
       } else out << '+';
 
@@ -284,25 +316,6 @@ int exprQuad::compare (exprQuad &e) {
     }
   }
 
-  /*  CouNumber *coe0 =   qcoeff_,
-            *coe1 = e.qcoeff_;
-
-  for (register int *indI0 = qindexI_, 
-	            *indJ0 = qindexJ_, 
-	            *indI1 = e.qindexI_, 
-	            *indJ1 = e.qindexJ_, i = nqterms_; 
-       i--; indI0++, indI0++, indI0++, indI0++) {
- 
-    if (*indI0 < *indI1) return -1;
-    if (*indI0 > *indI1) return  1;
-
-    if (*indJ0 < *indJ1) return -1;
-    if (*indJ0 > *indJ1) return  1;
-
-    if (*coe0 < *coe1 - COUENNE_EPS) return -1;
-    if (*coe0 > *coe1 + COUENNE_EPS) return  1;
-    }*/
-
   return 0;
 }
 
@@ -325,23 +338,6 @@ int exprQuad::rank () {
     for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
       if ((r = col -> first -> rank ()) > maxrank) maxrank = r;
   }
-
-  /*
-  CouNumber *coe = qcoeff_;
-
-  int  n = nqterms_, 
-      *i = qindexI_,
-      *j = qindexJ_;
-
-  while (n--) 
-    if (fabs (*coe++) > COUENNE_EPS) {
-
-      register int r;
-
-      if ((r = p -> Var (*i) -> rank (p)) > maxrank) maxrank = r;
-      if ((r = p -> Var (*j) -> rank (p)) > maxrank) maxrank = r;
-    }
-  */
 
   return maxrank;
 }
@@ -375,12 +371,6 @@ void exprQuad::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
     for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
       dep -> insert (g -> lookup (col -> first -> Index ()));
   }
-
-  /*
-  for (int *qi = qindexI_, *qj = qindexJ_, n = nqterms_; n--;) {
-    dep -> insert (g -> lookup (*qi++));
-    dep -> insert (g -> lookup (*qj++));
-    }*/
 }
 
 
@@ -399,36 +389,6 @@ int exprQuad::DepList (std::set <int> &deplist,
       deps += col -> first -> DepList (deplist, type);
   }
 
-  /*
-  if (!p) // no problem pointer, have to suppose all terms appear
-
-    for (int i = nqterms_; i--;) {
-
-      int qi = qindexI_ [i],
-          qj = qindexJ_ [i];
-
-      if (deplist.find (qi) == deplist.end ()) {
-	deplist.insert (qi);
-	deps++;
-      }
-
-      if ((qi != qj) &&  (deplist.find (qj) == deplist.end ())) {
-	deplist.insert (qj);
-	deps++;
-      }
-    }
-  else
-    for (int i = nqterms_; i--;) {
-
-      int qi = qindexI_ [i],
-          qj = qindexJ_ [i];
-
-      deps += scanIndex   (qi, deplist, p, type);
-      if (qi != qj)
-	deps += scanIndex (qj, deplist, p, type);
-    }
-  */
-
   return deps;
 }
 
@@ -436,7 +396,7 @@ int exprQuad::DepList (std::set <int> &deplist,
 /// is this quadratic expression integer?
 bool exprQuad::isInteger () {
 
-  if (!exprGroup::isInteger ()) 
+  if (!(exprGroup::isInteger ()))
     return false;
 
   for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {

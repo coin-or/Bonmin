@@ -24,10 +24,14 @@ exprGroup::exprGroup  (CouNumber c0,
 
 
 /// copy constructor
-exprGroup::exprGroup  (const exprGroup &src): 
-  exprSum   (src.clonearglist (), src.nargs_),
-  lcoeff_   (src.lcoeff_),
-  c0_       (src.c0_) {} 
+exprGroup::exprGroup  (const exprGroup &src, const std::vector <exprVar *> *variables): 
+  exprSum   (src.clonearglist (variables), src.nargs_),
+  c0_       (src.c0_) {
+
+  for (lincoeff::iterator i = src.lcoeff_.begin (); i != src.lcoeff_.end (); ++i)
+    lcoeff_ . push_back (std::pair <exprVar *, CouNumber> 
+			 (dynamic_cast <exprVar *> (i -> first -> clone (variables)), i -> second));
+}
 
 
 /// I/O
@@ -132,17 +136,6 @@ int exprGroup::compare (exprGroup &e) {
     if (coe1 > coe2 + COUENNE_EPS) return  1;
   }
 
-  /*for (register int *ind0 = index_, *ind1 = e.index_; 
-       *ind0 >= 0 || *ind1 >= 0; 
-       ind0++, ind1++, 
-       coe0++, coe1++) {
- 
-    if (*ind0 < *ind1) return -1;
-    if (*ind0 > *ind1) return  1;
-    if (*coe0 < *coe1 - COUENNE_EPS) return -1;
-    if (*coe0 > *coe1 + COUENNE_EPS) return  1;
-    }*/
-
   return 0;
 }
 
@@ -194,8 +187,8 @@ int exprGroup::DepList (std::set <int> &deplist,
 /// is this linear term integer?
 bool exprGroup::isInteger () {
 
-  if ((!::isInteger (c0_)) ||
-      (!exprOp::isInteger ()))
+  if (!(::isInteger (c0_)) ||
+      !(exprOp::isInteger ()))
     return false;
 
   for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {

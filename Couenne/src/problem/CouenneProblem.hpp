@@ -68,9 +68,9 @@ class CouenneProblem {
 
  protected:
 
+  std::vector <exprVar           *> variables_;   ///< Variables (original, auxiliary, and defined)
   std::vector <CouenneObjective  *> objectives_;  ///< Objectives
   std::vector <CouenneConstraint *> constraints_; ///< Constraints
-  std::vector <exprVar           *> variables_;   ///< Variables (original, auxiliary, and defined)
 
   /// AMPL's common expressions (read from AMPL through structures cexps and cexps1)
   std::vector <expression *> commonexprs_; 
@@ -151,7 +151,8 @@ class CouenneProblem {
   ~CouenneProblem ();                       ///< Destructor
 
   /// Clone method (for use within CouenneCutGenerator::clone)
-  CouenneProblem *clone () const;
+  CouenneProblem *clone () const
+  {return new CouenneProblem (*this);}
 
   /// Update value of variables and bounds
   void update (const CouNumber *, const CouNumber *, const CouNumber *, int = -1) const;

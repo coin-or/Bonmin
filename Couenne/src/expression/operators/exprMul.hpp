@@ -28,8 +28,8 @@ class exprMul: public exprOp {
   exprMul (expression *, expression *);
 
   /// cloning method
-  expression *clone () const
-    {return new exprMul (clonearglist (), nargs_);}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprMul (clonearglist (variables), nargs_);}
 
   /// print operator
   std::string printOp () const

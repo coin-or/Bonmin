@@ -32,7 +32,7 @@ class exprVar: public expression {
  public:
 
   /// node type
-  virtual inline enum nodeType Type () 
+  virtual inline enum nodeType Type () const
     {return VAR;}
 
   /// Constructor
@@ -43,20 +43,18 @@ class exprVar: public expression {
   virtual ~exprVar () {}
 
   /// copy constructor
-  exprVar (const exprVar &e):
+  exprVar (const exprVar &e, const std::vector <exprVar *> *variables = NULL):
     varIndex_ (e.Index ()) {}
 
   /// cloning method
-  virtual exprVar *clone () const
-    {return new exprVar (*this);}
+  virtual exprVar *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return ((variables && (*variables) [varIndex_]) ? 
+	   (*variables) [varIndex_] : 
+	   new exprVar (*this, variables));}
 
   /// get variable index in problem
   inline int Index () const
     {return varIndex_;}
-
-  /// for compatibility with exprAux
-  //virtual inline expression *Image () const
-  //{return NULL;}
 
   // Bounds
   virtual expression *Lb (); ///< get lower bound expression
@@ -69,7 +67,7 @@ class exprVar: public expression {
   /// print
   virtual void print (std::ostream &out = std::cout,
 		      bool = false) const
-    {out << "x_" << varIndex_;}
+  {out << "x_" << varIndex_;}
 
   /// return the value of the variable
   virtual inline CouNumber operator () () 

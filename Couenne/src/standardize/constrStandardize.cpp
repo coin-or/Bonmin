@@ -29,17 +29,14 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
 #ifdef DEBUG
   printf ("################################\nStandardizing constraint: "); print ();
 
-  printf (" ["); fflush (stdout);
-  lb_ -> print ();
-  printf (","); fflush (stdout);
-  ub_ -> print ();
+  printf (" ["); fflush (stdout); lb_ -> print ();
+  printf (","); fflush (stdout);  ub_ -> print ();
   /*  printf ("] {with auxset = ");
   for (std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> begin ();
        i != p -> AuxSet () -> end (); i++) {
     printf ("<"); (*i) -> print (); 
     printf (","); (*i) -> Image () -> print (); printf ("> ");
     }*/
-
   printf ("}\n");
 #endif
 

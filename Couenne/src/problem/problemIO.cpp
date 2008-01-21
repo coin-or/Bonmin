@@ -40,6 +40,7 @@ void CouenneProblem::print (std::ostream &out) {
 
       if (((*i) -> Type () == AUX) && ((*i) -> Multiplicity () > 0)) {
 
+	//printf (" %x", (*i));
 	out << " (r:" << (*i) -> rank () 
 	    << ", m:"  << (*i) -> Multiplicity () << ") := ";
 	if ((*i) -> Image ())

@@ -166,3 +166,45 @@ int exprPow::Linearity () {
     else return NONLINEAR;
   }
 }
+
+
+/// is this expression integer?
+bool exprPow::isInteger () {
+
+  // base
+
+  if (!(arglist_ [0] -> isInteger ())) { 
+    // base not integer: check if constant and integer
+    CouNumber lb, ub;
+    arglist_ [0] -> getBounds (lb, ub);
+
+    if ((fabs (lb - ub) > COUENNE_EPS) ||
+	!::isInteger (lb))
+      return false;
+  }
+
+  // exponent
+
+  if (!(arglist_ [1] -> isInteger ())) { 
+    // exponent not integer: check if constant and integer (and
+    // positive, or base negative integer)
+    CouNumber lb, ub;
+    arglist_ [1] -> getBounds (lb, ub);
+
+    if ((fabs (lb - ub) > COUENNE_EPS) ||
+	!::isInteger (lb))
+      return false;
+
+    if (lb < 0) { // exponent negative, check again base
+
+      arglist_ [0] -> getBounds (lb, ub);
+
+      if ((fabs (lb - ub) > COUENNE_EPS) ||
+	  (fabs (lb) < COUENNE_EPS) ||
+	  !::isInteger (1. / lb))
+	return false;
+    }
+  }
+
+  return true;
+}

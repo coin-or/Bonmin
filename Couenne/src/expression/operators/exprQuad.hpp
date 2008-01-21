@@ -64,9 +64,9 @@ protected:
    */
 
   /// eigenvalues and eigenvectors
-  std::vector <std::pair <CouNumber, 
-			  std::vector <std::pair <exprVar *, 
-						  CouNumber> > > > eigen_; 
+  mutable std::vector <std::pair <CouNumber,
+			  std::vector <std::pair <exprVar *,
+						  CouNumber> > > > eigen_;
 
   /// current bounds (checked before re-computing eigenvalues/vectors)
   std::map <exprVar *, std::pair <CouNumber, CouNumber> > bounds_;
@@ -84,7 +84,7 @@ public:
 	     int n = 0);
 
   /// Copy constructor
-  exprQuad (const exprQuad &src);
+  exprQuad (const exprQuad &src, const std::vector <exprVar *> *variables = NULL);
 
   // get indices and coefficients vectors of the quadratic part
   sparseQ &getQ () const 
@@ -94,8 +94,8 @@ public:
   {return nqterms_;}
 
   /// cloning method
-  virtual expression *clone () const
-    {return new exprQuad (*this);}
+  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprQuad (*this, variables);}
 
   /// Print expression to an iostream
   virtual void print (std::ostream & = std::cout, 

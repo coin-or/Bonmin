@@ -53,10 +53,11 @@ exprAux::exprAux (expression *image):
   integer_      (Unset) {}
 //(image -> isInteger () ? Integer : Continuous)
 
+
 /// Copy constructor
-exprAux::exprAux (const exprAux &e):
+exprAux::exprAux (const exprAux &e, const std::vector<exprVar *> *variables):
   exprVar       (e.varIndex_),
-  image_        (e.image_ -> clone ()),
+  image_        (e.image_ -> clone (variables)),
   //    lb_           (e.lb_    -> clone ()),
   //    ub_           (e.ub_    -> clone ()),
   rank_         (e.rank_),

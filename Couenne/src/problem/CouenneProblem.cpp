@@ -30,7 +30,6 @@
 CouenneProblem::CouenneProblem (const struct ASL *asl,
 				Bonmin::BabSetupBase *base,
 				JnlstPtr jnlst):
-
   auxSet_    (NULL), 
   curnvars_  (-1),
   nIntVars_  (0),
@@ -110,12 +109,6 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 }
 
 
-/// clone problem
-
-CouenneProblem *CouenneProblem::clone () const
-  {return new CouenneProblem (*this);}
-
-
 /// copy constructor
 
 CouenneProblem::CouenneProblem (const CouenneProblem &p):
@@ -140,24 +133,30 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   logObbtLev_(p. logObbtLev_),
   jnlst_     (p.jnlst_) { // needed only in standardize (), unnecessary to update it
 
-  // TODO: rebuild all lb_ and ub_ (needed for exprQuad)
+  for (int i=0; i < p.nVars (); i++)
+    variables_ . push_back (NULL);
 
-  register int i;
+  for (int i=0; i < p.nVars (); i++) {
+    int ind = p.numbering_ [i];
+    variables_ [ind] = p.Var (ind) -> clone (&variables_);
 
-  for (i=0; i < p.nObjs (); i++) objectives_  . push_back (p.Obj (i) -> clone ());
-  for (i=0; i < p.nCons (); i++) constraints_ . push_back (p.Con (i) -> clone ());
-  for (i=0; i < p.nVars (); i++) variables_   . push_back (p.Var (i) -> clone ());
+    if (!(variables_ [ind])) printf ("var %d NULL\n", ind);
+  }
 
   if (p.numbering_) {
+    int i;
     numbering_ = new int [i = nVars ()];
     while (i--)
       numbering_ [i] = p.numbering_ [i];
   }
 
+  for (int i=0; i < p.nObjs (); i++) objectives_  . push_back (p.Obj (i) -> clone (&variables_));
+  for (int i=0; i < p.nCons (); i++) constraints_ . push_back (p.Con (i) -> clone (&variables_));
+
   if (p.optimum_) {
     optimum_ = (CouNumber *) malloc (nVars () * sizeof (CouNumber));
 
-    for (i = nVars (); i--;)
+    for (int i = nVars (); i--;)
       optimum_ [i] = p.optimum_ [i];
   }
 

@@ -25,12 +25,12 @@ CouNumber *expression::ubounds_   = NULL;
 
 
 // Get lower and upper bound of a generic expression
-
 void expression::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprConst (- COUENNE_INFINITY);
   ub = new exprConst (  COUENNE_INFINITY);
 }
+
 
 /// Get lower and upper bound of an expression (if any) -- real values
 void expression::getBounds (CouNumber &lb, CouNumber &ub) {
@@ -47,7 +47,6 @@ void expression::getBounds (CouNumber &lb, CouNumber &ub) {
 
 
 // generate one cut for a constant
-
 void exprConst::generateCuts (expression *w, const OsiSolverInterface &si, 
 			      OsiCuts &cs, const CouenneCutGenerator *cg, 
 			      t_chg_bounds *chg, int,
@@ -110,6 +109,24 @@ int expression::compare (expression &e1) {
 }
 
 
+/// Copy constructor
+exprCopy::exprCopy (const exprCopy &e, const std::vector <exprVar *> *variables) {
+
+  if (variables &&
+      ((e.copy_ -> Type () == AUX) ||
+       (e.copy_ -> Type () == VAR)))
+    copy_ = new exprClone ((*variables) [e.copy_ -> Index ()]);
+  else copy_ = e.Original () -> clone (variables);
+
+  /*copy_ = 
+    (variables) ? 
+    new exprCopy (e.copy_) : //.Original ()) :
+    e.Original () -> clone (variables);*/
+
+  value_ = e.value_;
+}
+
+
 /// compare expressions (used in bsearch within CouenneProblem::standardize)
 int expression::compare (exprCopy &c)
 {return compare (const_cast <expression &> (*(c. Original ())));}
@@ -118,10 +135,8 @@ int expression::compare (exprCopy &c)
 /// replace occurrence of a variable with another variable
 void exprCopy::replace (exprVar *orig, exprVar *aux) {
   copy_ -> replace (orig, aux);
-  /*
-  if ((copy_ -> Index () == orig -> Index ()) &&
-      (copy_ -> Type  () != AUX)) {
 
+  /*if ((copy_ -> Index () == orig -> Index ()) && (copy_ -> Type  () != AUX)) {
     delete copy_;
     copy_ = new exprClone (aux);
     }*/

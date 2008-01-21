@@ -183,8 +183,6 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
   case COU_EXPRGROUP: { // 
 
     exprGroup *eg    = dynamic_cast <exprGroup *> (body);
-    //    int       *index = eg -> getIndices ();
-    //    CouNumber *coeff = eg -> getCoeffs  ();
 
     const exprGroup::lincoeff &lcoe = eg -> lcoeff ();
 
@@ -252,7 +250,10 @@ void CouenneProblem::setCutOff (CouNumber cutoff)
 
     Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
 		    "Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",
-		    cutoff, indobj, ub_ [indobj]);
+		    cutoff, indobj,
+		    (objectives_ [0] -> Sense () == MINIMIZE) ? 
+		    ub_ [indobj] :
+		    lb_ [indobj]);
 
     pcutoff_ -> setCutOff (cutoff + 1e-7 * fabs (1 + cutoff));
   }
@@ -267,13 +268,10 @@ void CouenneProblem::installCutOff () {
 
   if (indobj >= 0) {
 
-    //if (objectives_ [0] -> Sense () == MINIMIZE){if (cutoff_<ub_ [indobj]) ub_ [indobj] = cutoff_;}
-    //else                                        {if (cutoff_>lb_ [indobj]) lb_ [indobj] = cutoff_;}
-
     // all problem are assumed to be minimization
     double cutoff = pcutoff_->getCutOff();
 
-    if (cutoff < ub_ [indobj])
-      ub_ [indobj] = cutoff;
+    if (objectives_ [0] -> Sense () == MINIMIZE) {if (cutoff < ub_ [indobj]) ub_ [indobj] = cutoff;}
+    else                                         {if (cutoff > lb_ [indobj]) lb_ [indobj] = cutoff;}
   }
 }

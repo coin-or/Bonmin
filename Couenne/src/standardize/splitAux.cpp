@@ -77,7 +77,8 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 
     //////////////////////
 
-    expression *clone = alist [1 - pos] -> clone (); // what remains is the "independent" expression
+    // what remains is the "independent" expression
+    expression *clone = alist [1 - pos] -> clone (&variables_); 
 
     expression *auxdef = 
       (fabs (coeff - 1) < COUENNE_EPS) ?          // if coefficient is 1
@@ -210,8 +211,8 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 
       newarglist = new expression * [nargs + 1];
 
-      for (j=0; j<mid;   j++) newarglist [j]   = alist [j] -> clone ();
-      for (j++; j<nargs; j++) newarglist [j-1] = alist [j] -> clone ();
+      for (j=0; j<mid;   j++) newarglist [j]   = alist [j] -> clone (&variables_);
+      for (j++; j<nargs; j++) newarglist [j-1] = alist [j] -> clone (&variables_);
 
       // nl arglist is done, later decide whether to incorporate it as
       // it is or with a coefficient
@@ -326,7 +327,8 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 
       if (fabs (auxcoe + 1) < COUENNE_EPS) {
 
-	std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
+	//std::vector <std::pair <exprVar *, CouNumber> >
+	exprGroup::lincoeff lcoeff;
 	indcoe2vector (linind2, lincoe2, lcoeff);
 
 	if (code == COU_EXPRGROUP)
@@ -437,7 +439,7 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 #endif
 
   if (aux) {
-    rest = aux -> Image () -> clone ();
+    rest = aux -> Image () -> clone (&variables_);
     delete aux;
   }
 

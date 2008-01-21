@@ -36,7 +36,7 @@ class exprLowerBound: public exprVar {
  public:
 
   /// Node type
-  inline enum nodeType Type () 
+  inline enum nodeType Type () const
     {return CONST;}
 
   /// Constructor
@@ -44,12 +44,12 @@ class exprLowerBound: public exprVar {
     exprVar (varIndex) {}
 
   /// Copy constructor
-  exprLowerBound (const exprLowerBound &src): 
+  exprLowerBound (const exprLowerBound &src, const std::vector <exprVar *> *variables = NULL): 
     exprVar (src) {}
 
   /// cloning method
-  exprLowerBound *clone () const
-    {return new exprLowerBound (*this);}
+  exprLowerBound *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprLowerBound (*this, variables);}
 
   /// Print to iostream
   void print (std::ostream &out = std::cout, 
@@ -85,7 +85,7 @@ class exprUpperBound: public exprVar {
  public:
 
   /// Node type
-  inline enum nodeType Type () 
+  inline enum nodeType Type () const
     {return CONST;}
 
   /// Constructor
@@ -93,12 +93,12 @@ class exprUpperBound: public exprVar {
     exprVar (varIndex) {}
 
   /// Copy constructor
-  exprUpperBound (const exprUpperBound &src): 
+  exprUpperBound (const exprUpperBound &src, const std::vector <exprVar *> *variables = NULL): 
     exprVar (src) {}
 
   /// cloning method
-  exprUpperBound *clone () const
-    {return new exprUpperBound (*this);}
+  exprUpperBound *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprUpperBound (*this, variables);}
 
   /// Print to iostream
   void print (std::ostream &out = std::cout, 

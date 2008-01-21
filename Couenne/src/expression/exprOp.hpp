@@ -32,7 +32,7 @@ class exprOp: public expression {
  public:
 
   /// Node type
-  virtual inline enum nodeType Type () 
+  virtual inline enum nodeType Type () const
     {return N_ARY;}
 
   /// Constructor
@@ -52,21 +52,21 @@ class exprOp: public expression {
 
   /// Copy constructor: only allocate space for argument list, which
   /// will be copied with clonearglist()
-  exprOp (const exprOp &e):
+  exprOp (const exprOp &e, const std::vector <exprVar *> *variables = NULL):
     arglist_ (new expression * [e.nArgs ()]),
     nargs_   (e.nArgs ()) {}
 
   /// cloning method
-  virtual expression *clone () const
-    {return new exprOp (*this);}
+  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return new exprOp (*this, variables);}
 
   /// return argument list
   inline expression **ArgList () const 
-    {return arglist_;}
+  {return arglist_;}
 
   /// return number of arguments
   inline int nArgs () const 
-    {return nargs_;}
+  {return nargs_;}
 
   /// I/O
   virtual void print (std::ostream &out = std::cout,
@@ -74,31 +74,25 @@ class exprOp: public expression {
 
   /// print position (PRE, INSIDE, POST)
   virtual enum pos printPos () const
-    {return INSIDE;}
+  {return INSIDE;}
 
   /// print operator
   virtual std::string printOp () const
-    {return "??";}
+  {return "??";}
 
   /// fill in the set with all indices of variables appearing in the
   /// expression
-  virtual inline int DepList (std::set <int> &deplist, 
-			      enum dig_type type = ORIG_ONLY) {
-    int tot = 0;
-    for (int i = nargs_; i--;)
-      tot += arglist_ [i] -> DepList (deplist, type);
-    return tot;
-  }
+  virtual int DepList (std::set <int> &deplist, enum dig_type type = ORIG_ONLY);
 
   /// simplification
   virtual expression *simplify ();
 
   /// clone argument list (for use with clone method
-  expression **clonearglist () const {
+  expression **clonearglist (const std::vector <exprVar *> *variables = NULL) const {
     if (nargs_) {
       expression **al = new expression * [nargs_];
       for (register int i=0; i<nargs_; i++)
-	al [i] = arglist_ [i] -> clone ();
+	al [i] = arglist_ [i] -> clone (variables);
       return al;
     } else return NULL;
   }
@@ -108,7 +102,7 @@ class exprOp: public expression {
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity ()
-    {return NONLINEAR;}
+  {return NONLINEAR;}
 
   /// generate auxiliary variable
   virtual exprAux *standardize (CouenneProblem *, bool addAux = true);
@@ -116,11 +110,11 @@ class exprOp: public expression {
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar ()
-    {printf ("### Warning: called empty exprOp::getFixVar()\n"); return arglist_ [0];}
+  {printf ("### Warning: called empty exprOp::getFixVar()\n"); return arglist_ [0];}
 
   /// return code to classify type of expression
   virtual enum expr_type code ()
-    {return COU_EXPROP;}
+  {return COU_EXPROP;}
 
   /// is this expression integer?
   virtual bool isInteger ();

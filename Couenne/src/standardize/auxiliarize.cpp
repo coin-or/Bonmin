@@ -35,7 +35,7 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
       break;
 
   if (orig == variables_ . end ()) {
-    printf ("CouenneProblem::auxiliarize: no original variable\n");
+    printf ("CouenneProblem::auxiliarize: no original variables\n");
     return;
   }
 
@@ -47,22 +47,48 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
 
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); ++i)
-    (*i) -> Body () -> replace (*orig, aux);
+
+    if ((*i) -> Body ()) {
+      if ((*i) -> Body () -> Type () == VAR) {
+	if ((*i) -> Body () -> Index () == (*orig) -> Index ()) {
+      
+	  delete (*i) -> Body ();
+	  (*i) -> Body (new exprClone (aux));
+	}
+      } else (*i) -> Body () -> replace (*orig, aux);
+    }
 
   // and all constraints
 
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
        i != constraints_.end (); ++i)
-    if ((*i) -> Body ()) 
-      (*i) -> Body () -> replace (*orig, aux);
+
+    if ((*i) -> Body ()) {
+      if ((*i) -> Body () -> Type () == VAR) {
+	if ((*i) -> Body () -> Index () == (*orig) -> Index ()) {
+      
+	  delete (*i) -> Body ();
+	  (*i) -> Body (new exprClone (aux));
+	}
+      } else (*i) -> Body () -> replace (*orig, aux);
+    }
 
   // substitute it with w in all auxiliaries
 
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
        i != variables_.end (); ++i)
-    if (((*i) -> Type () == AUX) && 
-	((*i) -> Index () != (*orig) -> Index ()))
-      (*i) -> Image () -> replace (*orig, aux);
+
+    if (((*i) -> Type () == AUX) &&                  // replace in all aux's image
+	((*i) -> Index () != (*orig) -> Index ())) { // skip same variable
+
+      if ((*i) -> Image () -> Type () == VAR) {
+	if ((*i) -> Image () -> Index () == (*orig) -> Index ()) {
+
+	  delete (*i) -> Image ();
+	  (*i) -> Image (new exprClone (aux));
+	} //else (*i) -> Image () -> replace (*orig, aux);
+      } else (*i) -> Image () -> replace (*orig, aux);
+    }
 
   // replace it with new auxiliary
 

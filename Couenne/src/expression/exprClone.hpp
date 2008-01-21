@@ -28,29 +28,29 @@ class exprClone: public exprCopy {
     exprCopy (copy) {}
 
   /// copy constructor
-  exprClone (const exprClone &e):
-    exprCopy (e) {}
+  exprClone (const exprClone &e, const std::vector <exprVar *> *variables = NULL):
+    exprCopy (e, variables) {}
+
+  /// cloning method
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return new exprClone (*this, variables);}
 
   /// Destructor
   virtual ~exprClone () 
   {copy_ = NULL;}
 
-  /// cloning method
-  exprClone *clone () const
-  {return new exprClone (*this);}
-
   /// I/O
   void print (std::ostream &out = std::cout, 
 	      bool descend      = false) const
-    {copy_ -> Original () -> print (out, descend);}
+  {copy_ -> Original () -> print (out, descend);}
 
   /// value
   inline CouNumber Value () const 
-    {return copy_ -> Value ();}
+  {return copy_ -> Value ();}
 
   /// null function for evaluating the expression
   inline CouNumber operator () () 
-    {return ((*copy_) ());}
+  {return ((*copy_) ());}
 };
 
 #endif

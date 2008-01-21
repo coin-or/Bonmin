@@ -36,7 +36,7 @@ void CouenneProblem::analyzeSparsity (CouNumber c0,
   // otherwise break it down. Count n first.
 
   std::set <int> occur;
-  int nsquares = 0;
+  unsigned int nsquares = 0;
 
   for (std::map <std::pair <int,int>, CouNumber>::iterator i = qmap.Map().begin ();
        i != qmap.Map().end (); ++i) {

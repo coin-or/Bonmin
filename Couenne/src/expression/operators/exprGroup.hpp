@@ -38,16 +38,16 @@ public:
 	      int = 0);
 
   /// Copy constructor
-  exprGroup (const exprGroup &src);
-
-  // Get constant, indices, and coefficients vectors, and number of linear terms
-  CouNumber  getc0      () {return c0_;}      ///< return constant term
-
-  lincoeff &lcoeff () const {return lcoeff_;} ///< return linear term coefficients
+  exprGroup (const exprGroup &src, const std::vector <exprVar *> *variables = NULL);
 
   /// Cloning method
-  virtual expression *clone () const
-    {return new exprGroup (*this);}
+  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return new exprGroup (*this, variables);}
+
+  // Get constant, indices, and coefficients vectors, and number of linear terms
+  CouNumber  getc0 () {return c0_;}      ///< return constant term
+
+  lincoeff &lcoeff () const {return lcoeff_;} ///< return linear term coefficients
 
   /// Print expression to iostream
   virtual void print (std::ostream &   = std::cout, 

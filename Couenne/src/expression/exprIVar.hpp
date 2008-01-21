@@ -14,7 +14,6 @@
 
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
-#include "exprConst.hpp"
 #include "exprVar.hpp"
 
 
@@ -29,19 +28,25 @@ class exprIVar: public exprVar {
   exprIVar (int varIndex):
     exprVar (varIndex) {}
 
-  /// copy constructor
-  exprIVar (const exprIVar &e):
-    exprVar (e.Index ()) {}
+  /// Copy constructor
+  exprIVar (const exprIVar &e, const std::vector <exprVar *> *variables = NULL):
+    exprVar (e, variables) {}
 
-  /// cloning method
-  virtual exprIVar *clone () const
-    {return new exprIVar (*this);}
+  /// Cloning method
+  virtual exprVar *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return ((variables && (*variables) [varIndex_]) ? 
+	   (*variables) [varIndex_] :
+	   new exprIVar (*this, variables));}
 
-  /// print
+  //{return (variables ? (*variables) [varIndex_] : new exprIVar (*this, variables));}
+  //{return (//keep_variables ? new exprClone (this) : 
+  //new exprIVar (*this, variables));}
+
+  /// Print
   virtual void print (std::ostream &out = std::cout, bool = false) const
     {out << "y_" << varIndex_;}
 
-  /// is this expression integer?
+  /// Is this expression integer?
   virtual inline bool isInteger ()
     {return true;}
 };

@@ -110,39 +110,16 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   // w >= l
 
   if (wl > -COUENNE_INFINITY) {
-    if ((xi >= 0) && (updateBound (-1, l + xi, yl + wl))) {res = true; chg [xi].setLower(t_chg_bounds::CHANGED);}
-    if ((yi >= 0) && (updateBound (+1, u + yi, xu - wl))) {res = true; chg [yi].setUpper(t_chg_bounds::CHANGED);}
+    if ((xi>=0) && (updateBound (-1,l+xi, yl+wl))) {res=true;chg[xi].setLower(t_chg_bounds::CHANGED);}
+    if ((yi>=0) && (updateBound (+1,u+yi, xu-wl))) {res=true;chg[yi].setUpper(t_chg_bounds::CHANGED);}
   }
 
   // w <= u
 
   if (wu < COUENNE_INFINITY) {
-    if ((xi >= 0) && (updateBound (+1, u + xi, yu + wu))) {res = true; chg [xi].setUpper(t_chg_bounds::CHANGED);}
-    if ((yi >= 0) && (updateBound (-1, l + yi, xl - wu))) {res = true; chg [yi].setLower(t_chg_bounds::CHANGED);}
+    if ((xi>=0) && (updateBound (+1,u+xi, yu+wu))) {res=true;chg[xi].setUpper(t_chg_bounds::CHANGED);}
+    if ((yi>=0) && (updateBound (-1,l+yi, xl-wu))) {res=true;chg[yi].setLower(t_chg_bounds::CHANGED);}
   }
 
   return res;
 }
-
-
-/// is this expression integer?
-/*bool exprSub::isInteger () {
-
-  // yes, if both arguments are integer
-  if (exprOp::isInteger ()) 
-    return true;
-
-  // or both are constant and their difference is integer
-  expression *al, *au, *bl, *bu;
-
-  arglist_ [0] -> getBounds (al, au);
-  arglist_ [1] -> getBounds (bl, bu);
-
-  register CouNumber 
-    alv = (*al) (), 
-    blv = (*bl) ();
-
-  return ((fabs (alv - (*au) ()) < COUENNE_EPS) && // first  is constant
-	  (fabs (blv - (*bu) ()) < COUENNE_EPS) && // second is constant
-	  (fabs (COUENNE_round (alv - blv) - (alv - blv)) < COUENNE_EPS)); // null difference
-	  }*/

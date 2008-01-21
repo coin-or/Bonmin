@@ -32,26 +32,26 @@ class exprMin: public exprOp {
     arglist_ [2] = new exprCopy (el1); arglist_ [3] = new exprStore (arglist_ [2]);
   }
 
-  /// cloning method
-  exprMin *clone () const
-    {return new exprMin (clonearglist (), nargs_);}
+  /// Cloning method
+  exprMin *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprMin (clonearglist (variables), nargs_);}
 
-  /// print operator
+  /// Print operator
   std::string printOp () const
     {return "min";}
 
-  /// print operator
+  /// Print operator
   enum pos printPos () const
     {return PRE;}
 
-  /// function for the evaluation of the expression
+  /// Function for the evaluation of the expression
   CouNumber operator () ();
 
-  /// differentiation
+  /// Differentiation
   inline expression *differentiate (int) 
     {return NULL;} 
 
-  /// simplification
+  /// Simplification
   inline expression *simplify () 
     {return NULL;}
 
@@ -62,25 +62,25 @@ class exprMin: public exprOp {
   // Get lower and upper bound of an expression (if any)
   //  void getBounds (expression *&, expression *&);
 
-  /// reduce expression in standard form, creating additional aux
+  /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)
   virtual inline exprAux *standardize (CouenneProblem *, bool addAux = true)
     {return NULL;}
 
-  /// generate equality between *this and *w
+  /// Generate equality between *this and *w
   void generateCuts (expression *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 
 		     t_chg_bounds * = NULL, int = -1, 
 		     CouNumber = -COUENNE_INFINITY, 
 		     CouNumber =  COUENNE_INFINITY);
 
-  /// code for comparisons
+  /// Code for comparisons
   virtual enum expr_type code () 
   {return COU_EXPRMIN;}
 };
 
 
-/// compute maximum
+/// Compute minimum
 
 inline CouNumber exprMin::operator () () {
 

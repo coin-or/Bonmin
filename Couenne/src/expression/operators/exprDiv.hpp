@@ -32,8 +32,8 @@ class exprDiv: public exprOp {
     exprOp (arg0, arg1) {}
 
   /// Cloning method
-  expression *clone () const
-    {return new exprDiv (clonearglist (), nargs_);}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprDiv (clonearglist (variables), nargs_);}
 
   /// Print operator
   std::string printOp () const
@@ -52,7 +52,7 @@ class exprDiv: public exprOp {
   inline int Linearity () {
 
     if (arglist_ [1] -> Type () == CONST)
-         return arglist_ [0] -> Linearity ();
+      return arglist_ [0] -> Linearity ();
     else return NONLINEAR;
   }
 

@@ -35,8 +35,8 @@ class exprPow: public exprOp {
     exprOp (arg0, arg1) {}
 
   /// cloning method
-  expression *clone () const
-    {return new exprPow (clonearglist (), nargs_);}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprPow (clonearglist (variables), nargs_);}
 
   /// print operator
   std::string printOp () const
@@ -53,6 +53,9 @@ class exprPow: public exprOp {
 
   /// get a measure of "how linear" the expression is
   int Linearity ();
+
+  /// is this expression integer?
+  bool isInteger ();
 
   /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);

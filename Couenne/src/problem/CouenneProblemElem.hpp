@@ -70,14 +70,14 @@ class CouenneConstraint {
   }
 
   /// copy constructor
-  CouenneConstraint  (const CouenneConstraint &c):
-    body_  (c.Body () -> clone ()), 
-    lb_    (c.Lb   () -> clone ()),
-    ub_    (c.Ub   () -> clone ()) {}
+  CouenneConstraint  (const CouenneConstraint &c, const std::vector <exprVar *> *variables = NULL):
+    body_  (c.Body () -> clone (variables)),
+    lb_    (c.Lb   () -> clone (variables)),
+    ub_    (c.Ub   () -> clone (variables)) {}
 
   /// cloning method
-  inline CouenneConstraint *clone () const
-    {return new CouenneConstraint (*this);}
+  inline CouenneConstraint *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new CouenneConstraint (*this, variables);}
 
   // get constraint's elements
   inline expression *Lb   () const {return lb_;}   ///< expression of lower bound
@@ -124,13 +124,13 @@ class CouenneObjective {
     {delete body_;}
 
   /// copy constructor
-  CouenneObjective  (const CouenneObjective &o):
-    body_  (o.body_ -> clone ()), 
+  CouenneObjective  (const CouenneObjective &o, const std::vector <exprVar *> *variables = NULL):
+    body_  (o.body_ -> clone (variables)), 
     sense_ (o.sense_) {}
 
   /// cloning method
-  inline CouenneObjective *clone () const
-    {return new CouenneObjective (*this);}
+  inline CouenneObjective *clone (const std::vector <exprVar *> *variables = NULL) const
+  {return new CouenneObjective (*this, variables);}
 
   /// get optimization sense
   inline enum opt_sense Sense () const

@@ -28,15 +28,15 @@ class exprLBQuad: public expression {
     ref_ (ref) {}
 
   /// copy constructor
-  exprLBQuad (const exprLBQuad &src): 
-    ref_ (dynamic_cast <exprQuad *> (src.ref_ -> clone ())) {}
+  exprLBQuad (const exprLBQuad &src, const std::vector <exprVar *> *variables = NULL): 
+    ref_ (dynamic_cast <exprQuad *> (src.ref_ -> clone (variables))) {}
 
   /// destructor
   ~exprLBQuad () {}
 
   /// cloning method
-  expression *clone () const
-    {return new exprLBQuad (*this);}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprLBQuad (*this, variables);}
 
   /// function for the evaluation of the expression
   inline CouNumber operator () () 
@@ -64,15 +64,15 @@ class exprUBQuad: public expression {
     ref_ (ref) {}
 
   /// copy constructor
-  exprUBQuad (const exprUBQuad &src): 
-    ref_ (dynamic_cast <exprQuad *> (src.ref_ -> clone ())) {}
+  exprUBQuad (const exprUBQuad &src, const std::vector <exprVar *> *variables = NULL): 
+    ref_ (dynamic_cast <exprQuad *> (src.ref_ -> clone (variables))) {}
 
   /// destructor
   ~exprUBQuad () {}
 
   /// cloning method
-  expression *clone () const
-    {return new exprUBQuad (*this);}
+  expression *clone (const std::vector <exprVar *> *variables = NULL) const
+    {return new exprUBQuad (*this, variables);}
 
   /// function for the evaluation of the expression
   inline CouNumber operator () () 
