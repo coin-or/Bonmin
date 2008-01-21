@@ -7,6 +7,8 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <stdlib.h>
+
 #include "exprMul.hpp"
 #include "exprSum.hpp"
 #include "exprConst.hpp"
