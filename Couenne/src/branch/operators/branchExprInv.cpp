@@ -148,16 +148,7 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
   powertriplet ft (k);
   *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
 
-  /*switch (obj -> Strategy ()) {
-
-  case CouenneObject::MIN_AREA:     *brpts = maxHeight   (&ft, x0, y0, l, u); break;
-  case CouenneObject::BALANCED:     *brpts = minMaxDelta (&ft, x0, y0, l, u); break;
-  case CouenneObject::MID_INTERVAL: 
-  default:                          *brpts = midInterval (     x0,     l, u); break;
-  }*/
-
-  /*
-  // TODO: check if it works with all exponents
+  /*  // TODO: check if it works with all exponents
   if (u > l + COUENNE_EPS) {
 
     powertriplet ft (k);
@@ -167,8 +158,7 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
     // if (u < 0)
     // *brpts = - *brpts;
   }
-  else *brpts = midInterval (x0, l, u);
-  */
+  else *brpts = midInterval (x0, l, u);*/
 
   way = TWO_RAND;
 

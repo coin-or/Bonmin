@@ -90,10 +90,10 @@ public:
 
     switch (strategy_) {
 
-    case CouenneObject::MIN_AREA:     return maxHeight   (ft, x0, y0, l, u); break;
-    case CouenneObject::BALANCED:     return minMaxDelta (ft, x0, y0, l, u); break;
+    case CouenneObject::MIN_AREA:     return maxHeight   (ft, x0, y0, l, u);
+    case CouenneObject::BALANCED:     return minMaxDelta (ft, x0, y0, l, u);
     case CouenneObject::MID_INTERVAL: 
-    default:                          return midInterval (    x0,     l, u); break;
+    default:                          return midInterval (    x0,     l, u);
     }
   }
 

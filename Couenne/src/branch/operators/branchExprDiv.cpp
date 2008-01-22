@@ -40,12 +40,10 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   if ((yl < 0) && (yu > 0)) {
 
     var = arglist_ [1];
-    //ind = yi;
-
     way = TWO_RAND;
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
-    *brpts = 0;
+    *brpts = 0.;
 
     return ((fabs (y0) < COUENNE_EPS) ? 1. :
 	    fabs (info -> solution_ [xi] / y0 - 

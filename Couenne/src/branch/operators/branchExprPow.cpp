@@ -279,15 +279,21 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
       return sqrt (x0*x0 + y0*y0);
 
-    } else { // on the bad (concave) side
+    } else { // on the bad (concave) side, above curve
 
       // as a rule of thumb, take the x coordinate of the midpoint of
       // horizontal segment between current point and curve
 
-      *brpts = 0.5 * (x0 + pow (x0, 1. / k));
+      if (obj -> Strategy () == CouenneObject::MID_INTERVAL)
+	*brpts = 0.5 * (x0 + pow (x0, 1. / k));
+      else {
+	powertriplet pt (k);
+	*brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+      }
+      
       way = TWO_LEFT;
 
-      if (l < 0) l = 0;
+      if (l < 0.) l = 0.;
 
       CouNumber 
 	powbpt = pow (*brpts, k),
@@ -306,7 +312,14 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
       // midpoint of horizontal segment between current point and
       // curve
 
-      *brpts = 0.5 * (x0 + pow (x0, 1. / k));
+      if (obj -> Strategy () == CouenneObject::MID_INTERVAL)
+	*brpts = 0.5 * (x0 + pow (x0, 1. / k));
+      else {
+	powertriplet pt (k);
+	*brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+      }
+
+      //*brpts = 0.5 * (x0 + pow (x0, 1. / k));
       way = TWO_LEFT;
 
       if (l < 0) l = 0;
