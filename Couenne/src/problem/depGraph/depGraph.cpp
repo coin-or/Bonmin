@@ -7,8 +7,10 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include <cstdlib>
 #include "depGraph.hpp"
 
+//#define DEBUG
 
 // Methods of the class DepNode ///////////////////////////////////////////////////////////
 
@@ -22,8 +24,13 @@ bool DepNode::depends (int xi, bool recursive) const {
     if (((*i) -> Index () == xi) || // check current node
 	(recursive && 
 	 ((*i) -> depends (xi, recursive)))) // check deplist recursively
-      { printf ("%d <- ", (*i) -> Index ()); fflush (stdout);
-      return true;}
+      { 
+#ifdef DEBUG
+	printf ("%d <- ", (*i) -> Index ()); 
+	fflush (stdout);
+#endif
+	return true;
+      }
 
   return false;
 }
