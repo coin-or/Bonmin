@@ -54,14 +54,20 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
 
   /////////////////////////////////////////////////////////
 
-  for (;
-       ((delta < 0.) && (fi != eigen_. end  ()) || // && (fi -> first < 0.) ||
-	(delta > 0.) && (ri != eigen_. rend ()));  // && (ri -> first > 0.));
-
+  for (;((delta < 0.) && (fi != eigen_. end  ()) || // && (fi -> first < 0.) ||
+	 (delta > 0.) && (ri != eigen_. rend ()));  // && (ri -> first > 0.));
        ++fi, ++ri) {
 
     std::vector <std::pair <exprVar *, CouNumber> > &ev = 
       (delta < 0.) ? fi -> second : ri -> second;
+
+    if ((delta < 0.) && (fi -> first > 0.) ||
+	(delta > 0.) && (ri -> first < 0.)) {
+
+      if (max_span > 0.) break; // if found a variable already, return
+      changed_sign = true;      // otherwise, keep in mind we are on
+				// the wrong eigenvalues' sign
+    }
 
     for (std::vector <std::pair <exprVar *, CouNumber> >::iterator j = ev.begin ();
 	 j != ev.end (); ++j) {
@@ -72,17 +78,18 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
 	lb = info -> lower_ [index],
 	ub = info -> upper_ [index];
 
-      if ((fabs (ub-lb) > COUENNE_EPS) ||
+      // only accept variable if not fixed
+      if (fabs (ub-lb) > COUENNE_EPS) {
+
 	  // no variable was found but the eigenvalue is already
 	  // positive (negative)
-	  ((changed_sign = true) &&
-	   ((delta < 0.) && (fi -> first > 0.) ||
-	    (delta > 0.) && (ri -> first < 0.)) &&
-	   (max_span < 0.))) {
+	  //	  changed_sign &&
+	  //	  (max_span < 0.))
 
 	CouNumber span = -1;
 
-	if ((ub-lb > COUENNE_INFINITY) ||
+	if ((lb < -COUENNE_INFINITY) ||
+	    (ub >  COUENNE_INFINITY) ||
 	    ((span = (ub-lb) * fabs (j -> second)) > max_span + COUENNE_EPS)) {
 
 	  ind = index;
@@ -118,7 +125,6 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
 
 	var = i -> first;
 	ind = var -> Index ();
-	*brpts = midInterval (info -> solution_ [ind], lb, ub);	  
       }
     }
 
@@ -131,6 +137,9 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
 			    info -> lower_ [ind],
 			    info -> upper_ [ind]);
     }
+    else *brpts = midInterval (info -> solution_ [ind], 
+			       info -> lower_ [ind],
+			       info -> upper_ [ind]);	  
 
     return fabs (delta);
   }

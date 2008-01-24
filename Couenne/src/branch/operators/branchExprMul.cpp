@@ -73,19 +73,23 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
   if (xl<-COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0<0)?2:0.5)*x0,xl,xu); way=TWO_RIGHT;} else
   if (xu> COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0>0)?2:0.5)*x0,xl,xu); way=TWO_LEFT;}  else
   if (yl<-COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0<0)?2:0.5)*y0,yl,yu); way=TWO_RIGHT;} else
-  if (yu> COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0>0)?2:0.5)*y0,yl,yu); way=TWO_LEFT;}  else
-  if (yu-yl > xu-xl) {
-    ind=yi; 
-    *brpts = (obj -> Strategy () == CouenneObject::MID_INTERVAL) ? 
-      (0.5 * (yl+yu)) :
-      midInterval (y0, yl, yu);
-    way=TWO_RAND;
-  } else {
-    ind=xi;
-    *brpts = (obj -> Strategy () == CouenneObject::MID_INTERVAL) ? 
-      (0.5 * (xl+xu)) :
-      midInterval(x0, xl, xu);
-    way=TWO_RAND;
+  if (yu> COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0>0)?2:0.5)*y0,yl,yu); way=TWO_LEFT;} 
+
+  else {
+
+    way = TWO_RAND;
+
+    CouNumber delta = (yu-yl) - (xu-xl);
+
+    if      (delta > +COUENNE_EPS) ind = yi;
+    else if (delta < -COUENNE_EPS) ind = xi;
+    else ind = (CoinDrand48 () < 0.5) ? xi : yi;
+
+    *brpts = (obj -> Strategy () != CouenneObject::MID_INTERVAL) ? 
+      (0.5 * (expression::Lbound (ind) + expression::Ubound (ind))) :
+      midInterval (expression::Variable (ind), 
+		   expression::Lbound   (ind), 
+		   expression::Ubound   (ind));
   }
 
   var = arglist_ [(ind == xi) ? 0 : 1];

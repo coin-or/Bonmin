@@ -13,6 +13,8 @@
 #include "exprAbs.hpp"
 #include "CouenneObject.hpp"
 
+static const double sqrt_2 = sqrt (2.);
+
 /// set up branching object by evaluating branching points for each
 /// expression's arguments. For an exprAbs, simply branch at zero.
 CouNumber exprAbs::selectBranch (const CouenneObject *obj,
@@ -20,7 +22,6 @@ CouNumber exprAbs::selectBranch (const CouenneObject *obj,
 				 expression * &var,
 				 double * &brpts,
 				 int &way) {
-
   var = argument_;
 
   int ind = var -> Index ();
@@ -43,5 +44,5 @@ CouNumber exprAbs::selectBranch (const CouenneObject *obj,
 
   // exact distance between current point and the two subsequent
   // convexifications
-  return (CoinMin (x0+y0, y0-x0) / sqrt (2.));
+  return (CoinMin (x0+y0, y0-x0) / sqrt_2);
 }

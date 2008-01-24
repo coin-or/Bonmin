@@ -10,10 +10,15 @@
 #include "CoinHelperFunctions.hpp"
 #include "CouenneProblem.hpp"
 
-#define FEAS_TOL 1e-8
+#define FEAS_TOL 1e-6
 
 // check if solution is MINLP feasible
 bool CouenneProblem::checkNLP (const double *solution, const double obj) {
+
+  /*printf ("checking solution: [%g] ", obj);
+  for (int i=0; i<nOrig_; i++)
+    printf ("%.5f ", solution [i]);
+  printf ("\n");*/
 
   // update variable array in evaluation structure
 
@@ -84,6 +89,9 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
     for (int i=0; i < nCons (); i++) {
 
       CouenneConstraint *c = Con (i);
+
+      /*printf ("checking constraint ");
+	c -> print ();*/
 
       CouNumber
 	body = (*(c -> Body ())) (),

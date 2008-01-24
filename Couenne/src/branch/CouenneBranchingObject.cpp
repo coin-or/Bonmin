@@ -54,14 +54,11 @@ CouNumber midInterval (CouNumber curr, CouNumber l, CouNumber u) {
 CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var, 
 						int way, CouNumber brpoint): 
   variable_ (var),
-  //  integer_  (isint),
   jnlst_    (jnlst) {
 
   firstBranch_ =  (way == TWO_LEFT)      ? 0 : 
                  ((way == TWO_RIGHT)     ? 1 : 
                  ((CoinDrand48 () < 0.5) ? 0 : 1));
-
-  //  assert (index_ >= 0);
 
   CouNumber x = (*variable_) ();//expression::Variable (index_); // current solution
 

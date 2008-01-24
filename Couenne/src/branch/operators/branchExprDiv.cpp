@@ -55,16 +55,16 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   //
   // As convexification is still carried out by applying McCormick
   // rules to x=w*y (where original operator is w=x/y), try to get
-  // closer to a point where both y and w are bounded, if necessary by
-  // branching on w.
+  // closer to a situation where both y and w are bounded, if
+  // necessary by branching on w.
   //
   // First, branch on y if unbounded, and then on w. As a result of
   // bound tightening, if both y and w are bounded, x is, too.
 
-  if ((yl < -COUENNE_INFINITY) ||
-      (yu >  COUENNE_INFINITY)) {
+  if ((yl < -COUENNE_INFINITY) || // and yu < 0
+      (yu >  COUENNE_INFINITY)) { // and yl > 0
 
-    var = arglist_ [1];//ind = yi;
+    var = arglist_ [1];
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
     // if y0 close to bounds, branch away from it

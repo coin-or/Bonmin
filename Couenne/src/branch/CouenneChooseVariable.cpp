@@ -42,12 +42,14 @@ CouenneChooseVariable::~CouenneChooseVariable () {}
 
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
-  /// LEAVE THIS HERE. Need update of current point to evaluate infeasibility
-  problem_ -> initAuxs (info -> solution_, 
-			info -> lower_, 
-			info -> upper_);
+  if (problem_) {
+    /// LEAVE THIS HERE. Need update of current point to evaluate infeasibility
+    problem_ -> initAuxs (info -> solution_, 
+			  info -> lower_, 
+			  info -> upper_);
 
-  problem_ -> update (info -> solution_, NULL, NULL);
+    problem_ -> update (info -> solution_, NULL, NULL);
+  }
 
   /*for (int i = problem_ -> nVars (); i--;) {
     info -> lower_ [i] = problem_ -> Lb (i);

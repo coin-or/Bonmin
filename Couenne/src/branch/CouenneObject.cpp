@@ -70,7 +70,7 @@ CouenneObject::CouenneObject (const CouenneObject &src):
 }
 
 
-#define TOL 0
+#define TOL 0.
 
 /// fix integer coordinates of current integer feasible solution
 double CouenneObject::feasibleRegion (OsiSolverInterface *solver, 
