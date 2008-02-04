@@ -72,21 +72,27 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 
   int ind;
 
-  if      (xl < -COUENNE_INFINITY)
-    {ind = xi; *brpts = obj -> midInterval (((x0<0.)?2:0.5)*x0, xl, xu); way = TWO_RIGHT;}
+  if      ((xl < -COUENNE_INFINITY) && (xu > COUENNE_INFINITY)) // x unbounded in both directions
+    {ind = xi; *brpts = 0; way = TWO_RAND;}
 
-  else if (xu >  COUENNE_INFINITY)
-    {ind = xi; *brpts = obj -> midInterval (((x0>0.)?2:0.5)*x0, xl, xu); way = TWO_LEFT;} 
+  else if ((yl < -COUENNE_INFINITY) && (yu > COUENNE_INFINITY)) // y unbounded in both directions
+    {ind = yi; *brpts = 0; way = TWO_RAND;}
 
-  else if (yl < -COUENNE_INFINITY)
-    {ind = yi; *brpts = obj -> midInterval (((y0<0.)?2:0.5)*y0, yl, yu); way = TWO_RIGHT;}
+  else if (xl < -COUENNE_INFINITY)                              // x unbounded below
+    {ind = xi; *brpts = obj -> midInterval (((x0 < 0.) ? 2 : 0.5) * x0, xl, xu); way = TWO_RIGHT;}
 
-  else if (yu >  COUENNE_INFINITY)
-    {ind = yi; *brpts = obj -> midInterval (((y0>0.)?2:0.5)*y0, yl, yu) ;way = TWO_LEFT;} 
+  else if (xu >  COUENNE_INFINITY)                              // x unbounded above
+    {ind = xi; *brpts = obj -> midInterval (((x0 > 0.) ? 2 : 0.5) * x0, xl, xu); way = TWO_LEFT;} 
 
-  else {
+  else if (yl < -COUENNE_INFINITY)                              // y unbounded below
+    {ind = yi; *brpts = obj -> midInterval (((y0 < 0.) ? 2 : 0.5) * y0, yl, yu); way = TWO_RIGHT;}
 
-    way = TWO_RAND;
+  else if (yu >  COUENNE_INFINITY)                              // y unbounded above
+    {ind = yi; *brpts = obj -> midInterval (((y0 > 0.) ? 2 : 0.5) * y0, yl, yu) ;way = TWO_LEFT;} 
+
+  else { // both are bounded
+
+    //way = TWO_RAND;
 
     CouNumber delta = (yu-yl) - (xu-xl);
 
@@ -94,11 +100,24 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
     else if (delta < -COUENNE_EPS) ind = xi;
     else ind = (CoinDrand48 () < 0.5) ? xi : yi;
 
-    *brpts = (obj -> Strategy () != CouenneObject::MID_INTERVAL) ? 
-      (0.5 * (domain -> lb (ind) + domain -> ub (ind))) :
-      obj -> midInterval (domain -> x  (ind), 
-			  domain -> lb (ind), 
-			  domain -> ub (ind));
+    CouNumber 
+      pt = domain -> x  (ind),
+      lb = domain -> lb (ind),
+      ub = domain -> ub (ind);
+
+#define THRES_ZERO_SYMM 0.7
+
+    if ((lb < -COUENNE_EPS) && (ub > COUENNE_EPS) && 
+	(-lb/ub >= THRES_ZERO_SYMM) &&
+	(-ub/lb >= THRES_ZERO_SYMM))
+      // interval is fairly symmetric around 0, branch on it
+      *brpts = 0.;
+    else
+      *brpts = (obj -> Strategy () != CouenneObject::MID_INTERVAL) ? 
+	(0.5 * (lb+ub)) :
+	obj -> midInterval (pt, lb, ub);
+
+    way = (pt > *brpts) ? TWO_RIGHT : TWO_LEFT;
   }
 
   var = arglist_ [(ind == xi) ? 0 : 1];
