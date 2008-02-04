@@ -23,9 +23,6 @@
 #include "asl.h"
 #include "getstub.h"
 
-////////////////////////////////////////////////
-//extern double fakeCutOff;
-  
 
 namespace Bonmin{
   
@@ -106,12 +103,6 @@ namespace Bonmin{
 
     //couenneProb -> readCutoff (argv [1]);
     //couenneProb -> setCutOff (atof (argv [1]));
-
-    // !!! cut from here
-    /*if (couenneProb -> Obj (0) -> Sense () == MAXIMIZE)
-      fakeCutOff = -fakeCutOff;
-      couenneProb -> setCutOff (fakeCutOff);*/
-    // !!! to here
 
     Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
 

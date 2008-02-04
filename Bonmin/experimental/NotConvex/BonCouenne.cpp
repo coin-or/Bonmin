@@ -36,9 +36,6 @@
 
 using namespace Bonmin;
 
-// global variable (for testing purposes only!) /////////////
-//double fakeCutOff = +1e50;
-
 int main (int argc, char *argv[])
 {
   using namespace Ipopt;
@@ -49,13 +46,6 @@ int main (int argc, char *argv[])
     pbName = new char[strlen(argv[1])+1];
     strcpy(pbName, argv[1]);
   }
-
-  /*if (argc > 2) {
-    fakeCutOff = atof (argv [2]);
-    printf ("cutoff = %g\n", fakeCutOff);
-    argc = 2;
-    *(argv [2]) = 0;
-    }*/
 
   double time1 = CoinCpuTime();
 

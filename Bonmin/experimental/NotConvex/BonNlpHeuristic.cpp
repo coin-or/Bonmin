@@ -124,8 +124,15 @@ namespace Bonmin{
 	too_deep = true;
     }
 
-    double * lower = CoinCopyOfArray(solver->getColLower(), nlp_->getNumCols());
-    double * upper = CoinCopyOfArray(solver->getColUpper(), nlp_->getNumCols());
+    double *lower = new double [couenne_ -> nVars ()];
+    double *upper = new double [couenne_ -> nVars ()];
+
+    CoinFillN (lower, couenne_ -> nVars (), -COUENNE_INFINITY);
+    CoinFillN (lower, couenne_ -> nVars (),  COUENNE_INFINITY);
+
+    CoinCopyN (solver->getColLower(), nlp_ -> getNumCols (), lower);
+    CoinCopyN (solver->getColUpper(), nlp_ -> getNumCols (), upper);
+
     const double * solution = solver->getColSolution();
     OsiBranchingInformation info(solver, true);
     const int & numberObjects = model_->numberObjects();
@@ -182,33 +189,34 @@ namespace Bonmin{
     // better integer point as there are rounded integer variables
 
     bool skipOnInfeasibility = false;
-    double *Y = CoinCopyOfArray (solution, nlp_ -> getNumCols ());
+    double *Y = new double [couenne_ -> nVars ()];
+    CoinFillN (Y, couenne_ -> nVars (), 0.);
+    CoinCopyN (solution, nlp_ -> getNumCols (), Y);
 
-    if (haveRoundedIntVars) {
+    if (haveRoundedIntVars) // create "good" integer candidate for Ipopt
       skipOnInfeasibility = (couenne_ -> getIntegerCandidate (solution, Y, lower, upper) < 0);
-    }
-
-    for (int i = couenne_ -> nOrig (); i--;) 
-      if (lower [i] > upper [i] - 1e-20)
-	lower [i] = upper [i] = 0.5 * (lower [i] + upper [i]);
-
-    //	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
-
-    /*printf ("int candidate: ");
-    for (int i=0; i<couenne_ -> nOrig (); i++) 
-      if (couenne_ -> Var (i) -> isInteger ())
-	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
-      else printf ("%g ", Y [i]);
-      printf ("\n");*/
-
-    // Now set column bounds and solve the NLP with starting point
-    double * saveColLower = CoinCopyOfArray (nlp_ -> getColLower (), nlp_ -> getNumCols ());
-    double * saveColUpper = CoinCopyOfArray (nlp_ -> getColUpper (), nlp_ -> getNumCols ());
 
     bool foundSolution = false;
 
     if (!skipOnInfeasibility) { // if true, the integral neighbourhood
 				// of our fractional point is infeasible.
+
+      for (int i = couenne_ -> nOrig (); i--;) 
+	if (lower [i] > upper [i] - 1e-20)
+	  lower [i] = upper [i] = 0.5 * (lower [i] + upper [i]);
+
+      //	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
+
+      /*printf ("int candidate: ");
+	for (int i=0; i<couenne_ -> nOrig (); i++) 
+	if (couenne_ -> Var (i) -> isInteger ())
+	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
+	else printf ("%g ", Y [i]);
+	printf ("\n");*/
+
+      // Now set column bounds and solve the NLP with starting point
+      double * saveColLower = CoinCopyOfArray (nlp_ -> getColLower (), nlp_ -> getNumCols ());
+      double * saveColUpper = CoinCopyOfArray (nlp_ -> getColUpper (), nlp_ -> getNumCols ());
 
       nlp_ -> setColLower    (lower);
       nlp_ -> setColUpper    (upper);
@@ -248,17 +256,18 @@ namespace Bonmin{
 	}
 	delete [] tmpSolution;
       }
-    }
 
-    nlp_->setColLower(saveColLower);
-    nlp_->setColUpper(saveColUpper);
+      nlp_->setColLower(saveColLower);
+      nlp_->setColUpper(saveColUpper);
+
+      delete [] saveColLower;
+      delete [] saveColUpper;
+    }
 
     delete [] Y;
 
     delete [] lower;
     delete [] upper;
-    delete [] saveColLower;
-    delete [] saveColUpper;
 
     return foundSolution;
   }

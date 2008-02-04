@@ -91,16 +91,20 @@ CouenneInterface::extractLinearRelaxation
 	    *lbSave = new double [norig],
 	    *ubSave = new double [norig],
 
-	    *lbCur  = new double [norig],
-	    *ubCur  = new double [norig],
+	    *lbCur  = new double [p -> nVars ()],
+	    *ubCur  = new double [p -> nVars ()],
 
-	    *Y      = new double [norig];
+	    *Y      = new double [p -> nVars ()];
 
 	  CoinCopyN (getColLower (), norig, lbSave);
 	  CoinCopyN (getColUpper (), norig, ubSave);
 
 	  CoinCopyN (getColLower (), norig, lbCur);
 	  CoinCopyN (getColUpper (), norig, ubCur);
+
+	  CoinFillN (Y,     p -> nVars (), 0.);
+	  CoinFillN (lbCur, p -> nVars (), -COUENNE_INFINITY);
+	  CoinFillN (ubCur, p -> nVars (),  COUENNE_INFINITY);
 
 	  if (p -> getIntegerCandidate (solution, Y, lbCur, ubCur) >= 0) {
 
@@ -253,7 +257,7 @@ CouenneInterface::extractLinearRelaxation
    }
  
    //si.writeMpsNative("toto",NULL,NULL,1);
-   //si.writeLp ("toto");
+   si.writeLp ("toto");
    app_ -> enableWarmStart();
 
    //   if (problem () -> x_sol ()) {
