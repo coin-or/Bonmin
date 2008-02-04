@@ -70,7 +70,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     // Outside -> branch on closest point on curve
 
     brpts = (double *) realloc (brpts, sizeof (double));
-    *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u);
+    *brpts = obj -> midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u);
 
     way = TWO_LEFT;
     CouNumber dy = y0 - log (*brpts);
@@ -110,7 +110,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
 
   if (l <= SQ_COUENNE_EPS) { // u is finite
 
-    *brpts = midInterval (exp (y0), l, u);
+    *brpts = obj -> midInterval (exp (y0), l, u);
     way = TWO_RIGHT;
 
 #if BR_TEST_LOG >= 0
@@ -122,7 +122,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
  
   if (u > COUENNE_INFINITY) { // l is far from zero
 
-    *brpts = midInterval (x0, l, u);
+    *brpts = obj -> midInterval (x0, l, u);
     way = TWO_LEFT;
 
 #if BR_TEST_LOG >= 0

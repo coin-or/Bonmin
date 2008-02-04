@@ -35,8 +35,8 @@ class exprPow: public exprOp {
     exprOp (arg0, arg1) {}
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprPow (clonearglist (variables), nargs_);}
+  expression *clone (Domain *d = NULL) const
+    {return new exprPow (clonearglist (d), nargs_);}
 
   /// print operator
   std::string printOp () const

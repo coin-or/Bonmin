@@ -151,12 +151,13 @@ CouenneChooseStrong::computeUsefulness(const double MAXMIN_CRITERION,
 int
 CouenneChooseStrong::setupList ( OsiBranchingInformation *info, bool initialize)
 {
-    problem_->update ((const CouNumber *) (info -> solution_), 
-		      (const CouNumber *) (info -> lower_), 
-		      (const CouNumber *) (info -> upper_));
+  problem_ -> domain () -> push 
+    (problem_ -> nVars (), 
+     info -> solution_, info -> lower_, info -> upper_);
 
   if (numberBeforeTrustedList_ < 0) {
     number_not_trusted_ = 1;
+    problem_ -> domain () -> pop ();
     return OsiChooseVariable::setupList(info, initialize);
   }
   if (initialize) {
@@ -404,8 +405,10 @@ CouenneChooseStrong::setupList ( OsiBranchingInformation *info, bool initialize)
     for (int i=0; i<numberOnList_; i++)
       printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e \n", i,list_[i],i,useful_[i],object[list_[i]]->infeasibility(info,way));
   }
-  return numberUnsatisfied_;
 
+  problem_ -> domain () -> pop ();
+
+  return numberUnsatisfied_;
 }
 
 /* Choose a variable

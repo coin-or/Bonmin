@@ -39,7 +39,6 @@ class CouenneConstraint {
  protected:
 
   expression *body_; ///< body of constraint
-
   expression *lb_;   ///< lower bound
   expression *ub_;   ///< upper bound
 
@@ -70,14 +69,14 @@ class CouenneConstraint {
   }
 
   /// copy constructor
-  CouenneConstraint  (const CouenneConstraint &c, const std::vector <exprVar *> *variables = NULL):
-    body_  (c.Body () -> clone (variables)),
-    lb_    (c.Lb   () -> clone (variables)),
-    ub_    (c.Ub   () -> clone (variables)) {}
+  CouenneConstraint  (const CouenneConstraint &c, Domain *d = NULL):
+    body_  (c.Body () -> clone (d)),
+    lb_    (c.Lb   () -> clone (d)),
+    ub_    (c.Ub   () -> clone (d)) {}
 
   /// cloning method
-  inline CouenneConstraint *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new CouenneConstraint (*this, variables);}
+  inline CouenneConstraint *clone (Domain *d = NULL) const
+  {return new CouenneConstraint (*this, d);}
 
   // get constraint's elements
   inline expression *Lb   () const {return lb_;}   ///< expression of lower bound
@@ -86,7 +85,7 @@ class CouenneConstraint {
 
   /// set body of constraint
   inline expression *Body (expression *newBody) 
-    {body_ = newBody; return body_;}
+  {body_ = newBody; return body_;}
 
   /// decompose body of constraint through auxiliary variables
   exprAux *standardize (CouenneProblem *);
@@ -121,32 +120,32 @@ class CouenneObjective {
 
   /// destructor
   ~CouenneObjective () 
-    {delete body_;}
+  {delete body_;}
 
   /// copy constructor
-  CouenneObjective  (const CouenneObjective &o, const std::vector <exprVar *> *variables = NULL):
-    body_  (o.body_ -> clone (variables)), 
+  CouenneObjective  (const CouenneObjective &o, Domain *d = NULL):
+    body_  (o.body_ -> clone (d)), 
     sense_ (o.sense_) {}
 
   /// cloning method
-  inline CouenneObjective *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new CouenneObjective (*this, variables);}
+  inline CouenneObjective *clone (Domain *d = NULL) const
+  {return new CouenneObjective (*this, d);}
 
   /// get optimization sense
   inline enum opt_sense Sense () const
-    {return sense_;}
+  {return sense_;}
 
   /// get body
   inline expression *Body () const
-    {return body_;}
+  {return body_;}
 
   /// Set body
   expression *Body (expression *newBody) 
-    {body_ = newBody; return body_;}
+  {body_ = newBody; return body_;}
 
   /// Get standard form of this objective function
   inline exprAux *standardize (CouenneProblem *p) 
-    {return body_ -> standardize (p);}
+  {return body_ -> standardize (p);}
 
   /// Print to iostream
   void print (std::ostream &out = std::cout) {

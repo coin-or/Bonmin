@@ -31,8 +31,8 @@ class exprSum: public exprOp {
   ~exprSum () {}
  
   /// Cloning method
-  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprSum (clonearglist (variables), nargs_);}
+  virtual expression *clone (Domain *d = NULL) const
+    {return new exprSum (clonearglist (d), nargs_);}
 
   /// Print operator
   std::string printOp () const

@@ -25,8 +25,8 @@ class exprExp: public exprUnary {
     exprUnary (al) {} //< non-leaf expression, with argument list
 
   /// Cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprExp (argument_ -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+    {return new exprExp (argument_ -> clone (d));}
 
   /// The operator's function
   inline unary_function F () {return exp;}

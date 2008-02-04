@@ -106,12 +106,12 @@ class exprUnary: public expression {
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar () 
-    {return argument_;}
+  virtual inline expression *getFixVar () 
+  {return argument_;}
 
   /// type of operator
-  virtual enum expr_type code () 
-    {return COU_EXPRUNARY;}
+  virtual inline enum expr_type code () 
+  {return COU_EXPRUNARY;}
 
   /// is this expression integer?
   virtual bool isInteger ();
@@ -120,15 +120,23 @@ class exprUnary: public expression {
   virtual int compare (exprUnary &); 
 
   /// used in rank-based branching variable choice
-  virtual int rank ()
-    {return (argument_ -> rank ());} 
+  virtual inline int rank ()
+  {return (argument_ -> rank ());} 
 
   /// fill in dependence structure
-  virtual void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) 
-    {argument_ -> fillDepSet (dep, g);}
+  virtual inline void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) 
+  {argument_ -> fillDepSet (dep, g);}
 
   /// replace variable with other
   virtual void replace (exprVar *, exprVar *);
+
+  /// return domain of the expression
+  inline Domain *domain ()
+  {return argument_ -> domain ();}
+
+  /// empty function to redirect variables to proper variable vector
+  virtual inline void realign (const CouenneProblem *p) 
+  {argument_ -> realign (p);}
 };
 
 #endif

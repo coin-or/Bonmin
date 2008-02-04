@@ -44,25 +44,27 @@ CouNumber exprQuad::computeQBound (int sign) {
   // without updating the convexification. Notice also that the
   // direction can also be vertical, not only horizontal.
 
-  CouNumber
-    bound = c0_,
-    *lb = expression::Lbounds (),
-    *ub = expression::Ubounds (),
-    term;
+  CouNumber bound = c0_, term;
 
   // derive linear part (obtain constant)
   for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
 
-    CouNumber coe = el -> second, term = 0.;
-    int ind = el -> first -> Index ();
+    CouNumber 
+      coe = el -> second, term = 0.,
+      lb  = el -> first -> lb (),
+      ub  = el -> first -> ub ();
 
     if ((coe < 0.) && (sign < 0) || 
 	(coe > 0.) && (sign > 0)) 
-      {if    ((term=ub[ind]) > COUENNE_INFINITY) return (sign<0)? -COUENNE_INFINITY:COUENNE_INFINITY;}
-    else {if ((term=lb[ind]) <-COUENNE_INFINITY) return (sign<0)? -COUENNE_INFINITY:COUENNE_INFINITY;}
+      {if    ((term=ub) >  COUENNE_INFINITY) return (sign < 0)? -COUENNE_INFINITY : COUENNE_INFINITY;}
+    else {if ((term=lb) < -COUENNE_INFINITY) return (sign < 0)? -COUENNE_INFINITY : COUENNE_INFINITY;}
 
     bound += coe * term;
   }
+
+#ifdef DEBUG
+  printf ("quadBound --- linear, %cb = %g\n", (sign < 0) ? 'l' : 'u', bound);
+#endif
 
   // derive quadratic part (obtain linear part)
   for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
@@ -70,8 +72,8 @@ CouNumber exprQuad::computeQBound (int sign) {
     int xind = row -> first -> Index ();
 
       CouNumber 
-	lbi = lb [xind],
-	ubi = ub [xind];
+	lbi = row -> first -> lb (),
+	ubi = row -> first -> ub ();
 
     for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
@@ -98,8 +100,8 @@ CouNumber exprQuad::computeQBound (int sign) {
 	coe *= 2;
 
 	CouNumber
-	  lbj = lb [yind], 
-	  ubj = ub [yind],
+	  lbj = col -> first -> lb (),
+	  ubj = col -> first -> ub (),
 	  b1 = coe * lbi * lbj, 
 	  b2 = coe * lbi * ubj,
 	  b3 = coe * ubi * lbj, 

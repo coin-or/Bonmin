@@ -31,16 +31,19 @@ class exprOpp: public exprUnary {
     exprUnary (al) {} //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprOpp (argument_ -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+    {return new exprOpp (argument_ -> clone (d));}
 
   /// the operator's function
   inline unary_function F () 
     {return opp;}
 
+  void print (std::ostream &out, 
+	      bool descend) const;
+
   /// print operator
-  std::string printOp () const
-    {return "-";}
+  //std::string printOp () const
+  //{return "-";}
 
   /// differentiation
   expression *differentiate (int index); 

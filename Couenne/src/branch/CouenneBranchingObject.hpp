@@ -36,11 +36,6 @@ class CouenneBranchingObject: public OsiTwoWayBranchingObject {
 
 public:
 
-  /// Return global value for convex combination between current point
-  /// and midpoint.
-  static CouNumber Alpha () 
-  {return alpha_;}
-
   /// Constructor
   CouenneBranchingObject (JnlstPtr jnlst, expression *, int, CouNumber = - COIN_DBL_MAX);
 
@@ -48,7 +43,6 @@ public:
   CouenneBranchingObject (const CouenneBranchingObject &src):
     OsiTwoWayBranchingObject (src),
     variable_ (src.variable_),
-    //    integer_  (src.integer_),
     jnlst_    (src.jnlst_) {}
 
   /// Cloning method
@@ -69,13 +63,6 @@ protected:
   /// either x or y, chosen previously with a call to getFixVar()
   /// expression *reference_;
   expression *variable_;
-
-  /// True if the related variable is integer
-  //  bool integer_;
-
-  /// Global value for convex combination between current point and
-  /// midpoint
-  static CouNumber alpha_;
 
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;

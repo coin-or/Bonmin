@@ -33,8 +33,8 @@ class exprMin: public exprOp {
   }
 
   /// Cloning method
-  exprMin *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprMin (clonearglist (variables), nargs_);}
+  exprMin *clone (Domain *d = NULL) const
+    {return new exprMin (clonearglist (d), nargs_);}
 
   /// Print operator
   std::string printOp () const

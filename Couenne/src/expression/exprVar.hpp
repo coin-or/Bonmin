@@ -16,6 +16,7 @@
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
 #include "exprConst.hpp"
+#include "domain.hpp"
 
 
 /// variable-type operator
@@ -27,42 +28,43 @@ class exprVar: public expression {
 
  protected:
 
-  int varIndex_; ///< the index of the variable's current value
+  int varIndex_;   ///< the index of the variable's current value
+  Domain *domain_; ///< pointer to a descriptor of the current point/bounds
 
  public:
 
   /// node type
   virtual inline enum nodeType Type () const
-    {return VAR;}
+  {return VAR;}
 
   /// Constructor
-  exprVar (int varIndex):
-    varIndex_ (varIndex) {}
+  exprVar (int varIndex, Domain *d = NULL):
+    varIndex_ (varIndex),
+    domain_   (d) {}
 
   /// destructor
   virtual ~exprVar () {}
 
   /// copy constructor
-  exprVar (const exprVar &e, const std::vector <exprVar *> *variables = NULL):
-    varIndex_ (e.Index ()) {}
+  exprVar (const exprVar &e, Domain *d = NULL):
+    varIndex_ (e.varIndex_),
+    domain_   (d) {}
 
   /// cloning method
-  virtual exprVar *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return ((variables && (*variables) [varIndex_]) ? 
-	   (*variables) [varIndex_] : 
-	   new exprVar (*this, variables));}
+  virtual exprVar *clone (Domain *d = NULL) const
+  {return new exprVar (*this, d);}
 
   /// get variable index in problem
   inline int Index () const
-    {return varIndex_;}
+  {return varIndex_;}
 
   // Bounds
   virtual expression *Lb (); ///< get lower bound expression
   virtual expression *Ub (); ///< get upper bound expression
 
   // Bounds
-  virtual CouNumber lb () {return expression::lbounds_ [varIndex_];} ///< lower bound
-  virtual CouNumber ub () {return expression::ubounds_ [varIndex_];} ///< upper bound
+  virtual inline CouNumber lb () {return domain_ -> lb (varIndex_);} ///< lower bound
+  virtual inline CouNumber ub () {return domain_ -> ub (varIndex_);} ///< upper bound
 
   /// print
   virtual void print (std::ostream &out = std::cout,
@@ -71,7 +73,7 @@ class exprVar: public expression {
 
   /// return the value of the variable
   virtual inline CouNumber operator () () 
-    {return expression::variables_ [varIndex_];}
+  {return domain_ -> x (varIndex_);}
 
   /// differentiation
   virtual inline expression *differentiate (int index) 
@@ -95,16 +97,16 @@ class exprVar: public expression {
 
   /// simplify
   virtual inline expression *simplify () 
-    {return NULL;}
+  {return NULL;}
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   virtual inline int Linearity ()
-    {return LINEAR;}
+  {return LINEAR;}
 
   /// is this variable integer?
   virtual inline bool isInteger () {
-    CouNumber lb = (*(Lb ())) (); 
-    return ((fabs (lb - (*(Ub ())) ()) < COUENNE_EPS) && (::isInteger (lb)));
+    CouNumber lb = domain_ -> lb (varIndex_);
+    return ((fabs (lb - domain_ -> ub (varIndex_)) < COUENNE_EPS) && (::isInteger (lb)));
   }
 
   /// Get lower and upper bound of an expression (if any)
@@ -127,24 +129,34 @@ class exprVar: public expression {
 
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar () {return this;}
+  virtual inline expression *getFixVar () 
+  {return this;}
 
   /// code for comparison
-  virtual enum expr_type code () {return COU_EXPRVAR;}
+  virtual inline enum expr_type code () 
+  {return COU_EXPRVAR;}
 
   /// implied bound processing
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// rank of an original variable is always one
-  virtual int rank () 
-    {return 1;}
+  virtual inline int rank () 
+  {return 1;}
 
   /// update dependence set with index of this variable
   virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *);
 
   /// is this variable fixed?
   virtual inline bool isFixed ()
-  {return (fabs ((*(Lb ())) () - (*(Ub ())) ()) < COUENNE_EPS);}
+  {return (fabs (domain_ -> lb () - domain_ -> ub ()) < COUENNE_EPS);}
+
+  /// link this variable to a domain
+  virtual inline void linkDomain (Domain *d)
+  {domain_ = d;}
+
+  /// return pointer to variable domain
+  virtual inline Domain *domain ()
+  {return domain_;}
 };
 
 #endif

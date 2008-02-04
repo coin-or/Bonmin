@@ -30,9 +30,9 @@ expression *exprInv::differentiate (int index) {
 
 void exprInv::print (std::ostream &out, 
 		     bool descend) const {
-  out << "(1/(";
+  out << "(1/";
   argument_ -> print (out, descend);
-  out << "))";
+  out << ")";
 }
 //  exprUnary::print (out, "1/", PRE);}
 

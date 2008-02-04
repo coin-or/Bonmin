@@ -52,7 +52,7 @@ exprAux *exprMul::standardize (CouenneProblem *p, bool addAux) {
     aux    = new exprPow (new exprClone (aux), new exprConst (2.));
   else aux = new exprMul (new exprClone (aux), new exprClone (arglist_ [nargs_ - 1]));
 
-  return (addAux ? (p -> addAuxiliary (aux)) : new exprAux (this));
+  return (addAux ? (p -> addAuxiliary (aux)) : new exprAux (this, p -> domain ()));
 }
 
 

@@ -88,7 +88,7 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	branch/operators/branchExprPow.cpp \
 	branch/operators/branchExprQuad.cpp \
 	branch/operators/branchExprSinCos.cpp \
-	branch/operators/minMaxDelta.cpp \
+	branch/operators/minMaxDelta.cpp expression/domain.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -167,11 +167,11 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	branchExprAbs.lo branchExprExp.lo branchExprDiv.lo \
 	branchExprInv.lo branchExprLog.lo branchExprMul.lo \
 	branchExprPow.lo branchExprQuad.lo branchExprSinCos.lo \
-	minMaxDelta.lo exprAbs.lo exprDiv.lo exprExp.lo exprInv.lo \
-	exprLog.lo exprMul.lo exprOpp.lo exprPow.lo exprSin.lo \
-	exprCos.lo exprSub.lo exprSum.lo exprMinMax.lo exprGroup.lo \
-	exprQuad.lo exprBQuad.lo compQuadFinBounds.lo exprOp.lo \
-	exprUnary.lo exprVar.lo exprAux.lo expression.lo \
+	minMaxDelta.lo domain.lo exprAbs.lo exprDiv.lo exprExp.lo \
+	exprInv.lo exprLog.lo exprMul.lo exprOpp.lo exprPow.lo \
+	exprSin.lo exprCos.lo exprSub.lo exprSum.lo exprMinMax.lo \
+	exprGroup.lo exprQuad.lo exprBQuad.lo compQuadFinBounds.lo \
+	exprOp.lo exprUnary.lo exprVar.lo exprAux.lo expression.lo \
 	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
 	conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
 	conv-exprMul-genCuts.lo unifiedProdCuts.lo conv-exprOpp.lo \
@@ -409,7 +409,7 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	branch/operators/branchExprPow.cpp \
 	branch/operators/branchExprQuad.cpp \
 	branch/operators/branchExprSinCos.cpp \
-	branch/operators/minMaxDelta.cpp \
+	branch/operators/minMaxDelta.cpp expression/domain.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -542,6 +542,7 @@ include_HEADERS = \
 	branch/projections.hpp \
 	branch/CouObjStats.hpp \
 	standardize/lqelems.hpp \
+	expression/domain.hpp \
 	expression/operators/exprAbs.hpp \
 	expression/operators/exprExp.hpp \
 	expression/operators/exprInv.hpp \
@@ -707,6 +708,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/decomposeTerm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depGraph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/domain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elementBreak.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exprAbs.Plo@am__quote@
@@ -919,6 +921,13 @@ minMaxDelta.lo: branch/operators/minMaxDelta.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/operators/minMaxDelta.cpp' object='minMaxDelta.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o minMaxDelta.lo `test -f 'branch/operators/minMaxDelta.cpp' || echo '$(srcdir)/'`branch/operators/minMaxDelta.cpp
+
+domain.lo: expression/domain.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT domain.lo -MD -MP -MF "$(DEPDIR)/domain.Tpo" -c -o domain.lo `test -f 'expression/domain.cpp' || echo '$(srcdir)/'`expression/domain.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/domain.Tpo" "$(DEPDIR)/domain.Plo"; else rm -f "$(DEPDIR)/domain.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='expression/domain.cpp' object='domain.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o domain.lo `test -f 'expression/domain.cpp' || echo '$(srcdir)/'`expression/domain.cpp
 
 exprAbs.lo: expression/operators/exprAbs.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT exprAbs.lo -MD -MP -MF "$(DEPDIR)/exprAbs.Tpo" -c -o exprAbs.lo `test -f 'expression/operators/exprAbs.cpp' || echo '$(srcdir)/'`expression/operators/exprAbs.cpp; \

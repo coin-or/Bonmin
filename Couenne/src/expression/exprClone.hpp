@@ -28,21 +28,22 @@ class exprClone: public exprCopy {
     exprCopy (copy) {}
 
   /// copy constructor
-  exprClone (const exprClone &e, const std::vector <exprVar *> *variables = NULL):
-    exprCopy (e, variables) {}
+  exprClone (const exprClone &e, Domain *d = NULL):
+    exprCopy (e, d) {}
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprClone (*this, variables);}
+  expression *clone (Domain *d = NULL) const
+  {return new exprClone (*this, d);}
 
   /// Destructor
   virtual ~exprClone () 
   {copy_ = NULL;}
 
   /// I/O
-  void print (std::ostream &out = std::cout, 
-	      bool descend      = false) const
-  {copy_ -> Original () -> print (out, descend);}
+  //void print (std::ostream &out = std::cout, 
+  //bool descend      = false) const
+    //{copy_ -> Original () -> print (out, descend);}
+  //{out << "{"; copy_ -> print (out, descend); out << "}"; } // Must go
 
   /// value
   inline CouNumber Value () const 
@@ -51,6 +52,9 @@ class exprClone: public exprCopy {
   /// null function for evaluating the expression
   inline CouNumber operator () () 
   {return ((*copy_) ());}
+
+  /// empty function to redirect variables to proper variable vector
+  void realign (const CouenneProblem *p);
 };
 
 #endif

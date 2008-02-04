@@ -14,13 +14,14 @@
 #include "CglCutGenerator.hpp"
 
 class CouenneCutGenerator;
+class Domain;
 
 //#define DEBUG
 
 // auxiliary expression Constructor
-exprAux::exprAux (expression *image, int index, int rank, enum intType isInteger): 
+exprAux::exprAux (expression *image, int index, int rank, enum intType isInteger, Domain *d): 
 
-  exprVar       (index),
+  exprVar       (index, d),
   image_        (image),
   rank_         (rank),
   multiplicity_ (1),
@@ -36,15 +37,15 @@ exprAux::exprAux (expression *image, int index, int rank, enum intType isInteger
 
   //  lb_ = new exprMax (new exprLowerBound (varIndex_), lb_);
   //  ub_ = new exprMin (new exprUpperBound (varIndex_), ub_);
-  lb_ = new exprLowerBound (varIndex_);
-  ub_ = new exprUpperBound (varIndex_);
+  lb_ = new exprLowerBound (varIndex_, domain_);
+  ub_ = new exprUpperBound (varIndex_, domain_);
 }
 
 
 /// Constructor to be used with standardize ([...], false)
-exprAux::exprAux (expression *image):
+exprAux::exprAux (expression *image, Domain *d):
 
-  exprVar       (-1),
+  exprVar       (-1, d),
   image_        (image),
   lb_           (NULL),
   ub_           (NULL),
@@ -55,11 +56,9 @@ exprAux::exprAux (expression *image):
 
 
 /// Copy constructor
-exprAux::exprAux (const exprAux &e, const std::vector<exprVar *> *variables):
-  exprVar       (e.varIndex_),
-  image_        (e.image_ -> clone (variables)),
-  //    lb_           (e.lb_    -> clone ()),
-  //    ub_           (e.ub_    -> clone ()),
+exprAux::exprAux (const exprAux &e, Domain *d):
+  exprVar       (e.varIndex_, d), // variables ? (*variables) [0] -> domain () : NULL),
+  image_        (e.image_ -> clone (d)),
   rank_         (e.rank_),
   multiplicity_ (e.multiplicity_),
   integer_      (e.integer_) {
@@ -69,8 +68,8 @@ exprAux::exprAux (const exprAux &e, const std::vector<exprVar *> *variables):
 
   //  lb_ = new exprMax (new exprLowerBound (varIndex_), lb_);
   //  ub_ = new exprMin (new exprUpperBound (varIndex_), ub_);
-  lb_ = new exprLowerBound (varIndex_);
-  ub_ = new exprUpperBound (varIndex_);
+  lb_ = new exprLowerBound (varIndex_, domain_);
+  ub_ = new exprUpperBound (varIndex_, domain_);
 }
 
 
@@ -95,8 +94,8 @@ void exprAux::getBounds (expression *&lb, expression *&ub) {
 
   //  lb = lb_ -> clone ();//new exprLowerBound (varIndex_);
   //  ub = ub_ -> clone ();//new exprUpperBound (varIndex_);
-  lb = new exprLowerBound (varIndex_);
-  ub = new exprUpperBound (varIndex_);
+  lb = new exprLowerBound (varIndex_, domain_);
+  ub = new exprUpperBound (varIndex_, domain_);
 }
 
 
@@ -112,10 +111,6 @@ void exprAux::crossBounds () {
 
   lb_ = new exprMax (lb_, l0);
   ub_ = new exprMin (ub_, u0);
-
-  /*printf ("lower: ");   lb_ -> print ();
-    printf (", upper: "); ub_ -> print ();
-    printf ("\n");*/
 }
 
 
@@ -183,8 +178,8 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   /*
   if ((!(cg -> isFirst ())) && 
-      ((l = expression::Lbound (varIndex_)) > -COUENNE_INFINITY) &&
-      ((u = expression::Lbound (varIndex_)) <  COUENNE_INFINITY) &&
+      ((l = domain_ -> lb (varIndex_)) > -COUENNE_INFINITY) &&
+      ((u = domain_ -> ub (varIndex_)) <  COUENNE_INFINITY) &&
       (fabs (u-l) < COUENNE_EPS))
     cg -> createCut (cs, (l+u)/2., 0, varIndex_, 1.);
   else 
@@ -231,23 +226,23 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       image_ -> print (std::cout); 
 
       printf (" [%.7e,%.7e] <--- ", 
-	      expression::Lbound (varIndex_), 
-	      expression::Ubound (varIndex_));
+	      domain_ -> lb (varIndex_), 
+	      domain_ -> ub (varIndex_));
 
       int index;
       if ((image_ -> Argument ()) && 
 	  ((index = image_ -> Argument () -> Index ()) >= 0))
-	printf ("[%.7e,%.7e] ", 
-		expression::Lbound (index), 
-		expression::Ubound (index));
+	printf ("[%.7e,%.7e] ",
+		domain_ -> lb (index),
+		domain_ -> ub (index));
       else if (image_ -> ArgList ())
 	for (int i=0; i<image_ -> nArgs (); i++)
 	  if ((index = image_ -> ArgList () [i] -> Index ()) >= 0)
 	printf ("[%.7e,%.7e] ", 
-		expression::Lbound (index), 
-		expression::Ubound (index));
-	
-      printf("\n");
+		domain_ -> lb (index), 
+		domain_ -> ub (index));
+      printf ("\n");
+
       for (int jj = nrc; jj < cs.sizeRowCuts (); jj++) cs.rowCutPtr (jj) -> print ();
       for (int jj = ncc; jj < cs.sizeColCuts (); jj++) cs.colCutPtr (jj) -> print ();
     }

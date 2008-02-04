@@ -30,8 +30,8 @@ class exprAbs: public exprUnary {
   inline unary_function F () {return fabs;}
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprAbs (argument_ -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+    {return new exprAbs (argument_ -> clone (d));}
 
   /// output
   std::string printOp () const

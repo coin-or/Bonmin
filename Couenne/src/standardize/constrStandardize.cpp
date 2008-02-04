@@ -64,7 +64,8 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
       // create new variable, it has to be integer if original variable was integer
       exprAux *w = new exprAux (rest, wind, 1 + rest -> rank (),
 				p -> Var (wind) -> isInteger () ? 
-				exprAux::Integer : exprAux::Continuous);
+				exprAux::Integer : exprAux::Continuous,
+				p -> domain ());
 
       std::set <exprAux *, compExpr>::iterator i = p -> AuxSet () -> find (w);
 

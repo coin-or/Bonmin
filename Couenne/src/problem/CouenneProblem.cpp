@@ -30,6 +30,7 @@
 CouenneProblem::CouenneProblem (const struct ASL *asl,
 				Bonmin::BabSetupBase *base,
 				JnlstPtr jnlst):
+  problemName_ (""),
   auxSet_    (NULL), 
   curnvars_  (-1),
   nIntVars_  (0),
@@ -49,12 +50,11 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   logObbtLev_(0),
   jnlst_(jnlst) {
 
-  x_ = lb_ = ub_ = NULL; 
-
   if (!asl) return;
 
   double now = CoinCpuTime ();
 
+  // read problem from AMPL structure
   readnl (asl);
 
   if ((now = (CoinCpuTime () - now)) > 10.)
@@ -62,6 +62,11 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 		      "Couenne: reading time %.3fs\n", now);
 
   now = CoinCpuTime ();
+
+  // link initial variables to problem's domain
+  for (std::vector <exprVar *>::iterator i = variables_.begin ();
+       i != variables_.end (); ++i)
+    (*i) -> linkDomain (&domain_);
 
   if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM))
     print (std::cout);
@@ -73,10 +78,13 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
   jnlst_->Printf (Ipopt::J_SUMMARY, J_PROBLEM,
 		  "Problem size before standarization: %d variables (%d integer) %d constraints.\n",
-		  nOrig(), nIntVars(), nOrigCons());
+		  nOrig_, nIntVars (), nOrigCons_);
 
   // reformulation
   standardize ();
+
+  // clear all spurious variables pointers not referring to the variables_ vector
+  realign ();
 
   // quadratic handling
   fillQuadIndices ();
@@ -89,7 +97,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 		  "Problem size after standarization: %d variables (%d integer) %d constraints.\n",
 		  nVars(), nIntVars(), nCons());
 
-  //readOptimum ("dispatch.txt");
+  // check if optimal solution is available (for debug purposes)
+  readOptimum ();
 
   if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
     // We should route that also through the journalist
@@ -97,11 +106,29 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   }
 
   if (base) {
+
     std::string s;
+
     base -> options() -> GetStringValue ("feasibility_bt",     s, "couenne."); doFBBT_ = (s == "yes");
     base -> options() -> GetStringValue ("optimality_bt",      s, "couenne."); doOBBT_ = (s == "yes");
     base -> options() -> GetStringValue ("aggressive_fbbt",    s, "couenne."); doABT_  = (s == "yes");
+
     base -> options() -> GetIntegerValue ("log_num_obbt_per_level", logObbtLev_, "couenne.");
+    base -> options() -> GetIntegerValue ("log_num_abt_per_level",  logAbtLev_,  "couenne.");
+
+    CouNumber 
+      art_cutoff =  1e50,
+      art_lower  = -1e50;
+
+    base -> options() -> GetNumericValue ("art_cutoff",  art_cutoff,  "couenne.");
+    base -> options() -> GetNumericValue ("art_lower",   art_lower,   "couenne.");
+
+    if (art_cutoff <  1e50) setCutOff (art_cutoff);
+    if (art_lower  > -1e50) {
+      int indobj = objectives_ [0] -> Body () -> Index ();
+      if (indobj >= 0)
+	domain_.lb (indobj) = art_lower;
+    }
   }
 
   //writeAMPL ("extended-aw.mod", true);
@@ -112,9 +139,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 /// copy constructor
 
 CouenneProblem::CouenneProblem (const CouenneProblem &p):
-  x_         (NULL),
-  lb_        (NULL),
-  ub_        (NULL),
+  problemName_ (p.problemName_),
+  domain_    (p.domain_),
   curnvars_  (-1),
   nIntVars_  (p.nIntVars_),
   optimum_   (NULL),
@@ -136,11 +162,14 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   for (int i=0; i < p.nVars (); i++)
     variables_ . push_back (NULL);
 
+  //variables_ [0] = new exprVar (0, &domain_);
+
   for (int i=0; i < p.nVars (); i++) {
     int ind = p.numbering_ [i];
-    variables_ [ind] = p.Var (ind) -> clone (&variables_);
+    //if (ind==0) delete variables_ [0];
+    variables_ [ind] = p.Var (ind) -> clone (&domain_);
 
-    if (!(variables_ [ind])) printf ("var %d NULL\n", ind);
+    //if (!(variables_ [ind])) printf ("var %d NULL\n", ind);
   }
 
   if (p.numbering_) {
@@ -150,8 +179,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
       numbering_ [i] = p.numbering_ [i];
   }
 
-  for (int i=0; i < p.nObjs (); i++) objectives_  . push_back (p.Obj (i) -> clone (&variables_));
-  for (int i=0; i < p.nCons (); i++) constraints_ . push_back (p.Con (i) -> clone (&variables_));
+  for (int i=0; i < p.nObjs (); i++) objectives_  . push_back (p.Obj (i) -> clone (&domain_));
+  for (int i=0; i < p.nCons (); i++) constraints_ . push_back (p.Con (i) -> clone (&domain_));
 
   if (p.optimum_) {
     optimum_ = (CouNumber *) malloc (nVars () * sizeof (CouNumber));
@@ -160,20 +189,14 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
       optimum_ [i] = p.optimum_ [i];
   }
 
-  update (p.X (), p.Lb (), p.Ub ());
+  // clear all spurious variables pointers not referring to the variables_ vector
+  realign ();
 }
 
 
-/// destroy problem components
+/// Destructor
 
 CouenneProblem::~CouenneProblem () {
-
-  // free variables/bounds
-  if (x_) {
-    free (x_);
-    free (lb_);
-    free (ub_);
-  }
 
   // delete optimal solution (if any)
   if (optimum_)
@@ -244,11 +267,11 @@ void CouenneProblem::addRNGConstraint (expression *body, expression *lb=NULL, ex
 
 /// add variable to the problem -- check whether it is integer (isDiscrete)
 
-expression *CouenneProblem::addVariable (bool isDiscrete) {
+expression *CouenneProblem::addVariable (bool isDiscrete, Domain *d) {
 
   exprVar *var = (isDiscrete) ? 
-    (new exprIVar (variables_ . size ())) :
-    (new exprVar  (variables_ . size ()));
+    (new exprIVar (variables_ . size (), d)) :
+    (new exprVar  (variables_ . size (), d));
 
   variables_ . push_back (var);
 
@@ -270,8 +293,12 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
   // create new aux associated with that expression
   exprAux *w = new exprAux (symbolic,
 			    variables_ . size (), 
-			    1 + symbolic -> rank ());
+			    1 + symbolic -> rank (), 
+			    exprAux::Unset, 
+			    &domain_);
   //symbolic -> isInteger () ? exprAux::Integer : exprAux::Continuous);
+
+  //  w -> linkDomain (&domain_);
 
   // seek expression in the set
   if ((i = auxSet_ -> find (w)) == auxSet_ -> end ()) {
@@ -313,8 +340,11 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
   roptions -> AddLowerBoundedIntegerOption
     ("log_num_obbt_per_level",
      "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
-     -1,5,
-     "If -1, apply at every node (expensive!). If 0, never apply.");
+     -1,2,
+     "\
+If -1, apply at every node (expensive!). \
+If 0, apply at root node only. \
+If k>=0, apply with probability 2^(k - level), level being the current depth of the B&B tree.");
 
   roptions -> AddStringOption2 
     ("aggressive_fbbt",
@@ -322,6 +352,27 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
      "yes",
      "no","",
      "yes","");
+
+  roptions -> AddLowerBoundedIntegerOption
+    ("log_num_abt_per_level",
+     "Specify the frequency (in terms of nodes) for aggressive bound tightening.",
+     -1,2,
+     "\
+If -1, apply at every node (expensive!). \
+If 0, apply at root node only. \
+If k>=0, apply with probability 2^(k - level), level being the current depth of the B&B tree.");
+
+  roptions -> AddNumberOption
+    ("art_cutoff",
+     "artificial cutoff",
+     1.e50,
+     "Default value is 1.e50.");
+
+  roptions -> AddNumberOption
+    ("art_lower",
+     "artificial lower bound",
+     -1.e50,
+     "Default value is -1.e50.");
 }
 
 

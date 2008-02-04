@@ -58,7 +58,7 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
     // current (x0,y0), branch at x1
 
     brpts = (double *) realloc (brpts, sizeof (double));
-    *brpts = midInterval (powNewton (x0, y0, exp, exp, exp), l, u);
+    *brpts = obj -> midInterval (powNewton (x0, y0, exp, exp, exp), l, u);
 
     way = TWO_RAND;
 
@@ -95,7 +95,7 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
 
   if (l < - COUENNE_INFINITY) { // 2) unbounded from below --> break vertically
 
-    *brpts = midInterval (x0, l, u);
+    *brpts = obj -> midInterval (x0, l, u);
 
     way = TWO_RIGHT;
     return CoinMin (y0 - exp (x0), projectSeg (x0, y0, *brpts, exp (*brpts), u, exp (u), -1));
@@ -103,7 +103,7 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
 
   if (u > COUENNE_INFINITY) { // 3) unbounded from above -- break horizontally
 
-    *brpts = midInterval (log (y0), l, u);
+    *brpts = obj -> midInterval (log (y0), l, u);
 
     way = TWO_LEFT;
     return CoinMin (log (y0) - x0, projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts), -1));

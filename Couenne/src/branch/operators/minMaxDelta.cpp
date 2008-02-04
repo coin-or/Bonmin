@@ -142,7 +142,7 @@ public:
 
 const int maxIter = 20;
 
-
+/*
 void choosePoint (CouNumber x0, CouNumber y0, 
 		  CouNumber l, CouNumber u, 
 		  CouNumber &brpt)   {
@@ -171,7 +171,7 @@ void choosePoint (CouNumber x0, CouNumber y0,
   if (distcurve < distslope)
     brpt = midInterval (x0, l, u); 
 }
-
+*/
 
 ///
 CouNumber curvDistance (funtriplet *ft, CouNumber lb, CouNumber ub) {
@@ -251,7 +251,8 @@ CouNumber minMaxDelta (funtriplet *ft,
     else           lbm = oldb; // and viceversa
   }
 
-  return midInterval (b, lb, ub);
+  return b;
+  //return obj -> midInterval (b, lb, ub);
 }
 
 

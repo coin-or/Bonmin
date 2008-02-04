@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the class exprIVar for integer variables 
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -25,22 +25,16 @@ class exprIVar: public exprVar {
  public:
 
   /// Constructor
-  exprIVar (int varIndex):
-    exprVar (varIndex) {}
+  exprIVar (int varIndex, Domain *d = NULL):
+    exprVar (varIndex, d) {}
 
-  /// Copy constructor
-  exprIVar (const exprIVar &e, const std::vector <exprVar *> *variables = NULL):
-    exprVar (e, variables) {}
+  /// Copy constructor -- must go
+  exprIVar (const exprIVar &e, Domain *d = NULL):
+    exprVar (e, d) {}
 
   /// Cloning method
-  virtual exprVar *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return ((variables && (*variables) [varIndex_]) ? 
-	   (*variables) [varIndex_] :
-	   new exprIVar (*this, variables));}
-
-  //{return (variables ? (*variables) [varIndex_] : new exprIVar (*this, variables));}
-  //{return (//keep_variables ? new exprClone (this) : 
-  //new exprIVar (*this, variables));}
+  virtual exprVar *clone (Domain *d = NULL) const
+  {return new exprIVar (*this, d);}
 
   /// Print
   virtual void print (std::ostream &out = std::cout, bool = false) const

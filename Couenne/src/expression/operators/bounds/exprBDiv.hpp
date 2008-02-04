@@ -41,8 +41,8 @@ class exprLBDiv: public exprOp {
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprLBDiv (clonearglist (variables), nargs_);}
+  expression *clone (Domain *d = NULL) const
+    {return new exprLBDiv (clonearglist (d), nargs_);}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();
@@ -89,8 +89,8 @@ class exprUBDiv: public exprOp {
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprUBDiv (clonearglist (variables), nargs_);}
+  expression *clone (Domain *d = NULL) const
+  {return new exprUBDiv (clonearglist (d), nargs_);}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();

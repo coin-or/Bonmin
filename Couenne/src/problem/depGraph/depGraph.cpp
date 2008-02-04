@@ -49,8 +49,6 @@ void DepNode::createOrder (DepGraph *g) {
 
   order_ = -2;
 
-  //  printf ("[%d ", index_); fflush (stdout);
-
   for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin();
        i != depList_ -> end (); ++i)
     if ((*i) -> Order () == -1)
@@ -58,8 +56,6 @@ void DepNode::createOrder (DepGraph *g) {
 
   if (order_ == -2)
     order_ = g -> Counter () ++;
-
-  //  printf ("->%d] ", order_); fflush (stdout);
 }
 
 
@@ -148,13 +144,12 @@ void DepGraph::createOrder () {
 /// debugging procedure
 void DepGraph::print () {
 
-  printf ("------------------------------ dependence graph\n");
+  printf ("Dependence graph: \n");
   for (std::set <DepNode *, compNode>::iterator i = vertices_. begin();
        i != vertices_. end (); ++i) {
     (*i) -> print ();
     printf ("\n");
   }
-  printf ("------------------------------\n");
 }
 
 

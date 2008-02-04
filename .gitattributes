@@ -81,6 +81,8 @@ Couenne/src/convex/updateBranchInfo.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/CouennePrecisions.hpp -text
 Couenne/src/expression/CouenneTypes.hpp -text
+Couenne/src/expression/domain.cpp -text
+Couenne/src/expression/domain.hpp -text
 Couenne/src/expression/exprAux.cpp -text
 Couenne/src/expression/exprAux.hpp -text
 Couenne/src/expression/exprBound.hpp -text

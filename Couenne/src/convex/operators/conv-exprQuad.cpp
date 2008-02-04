@@ -22,6 +22,10 @@ void exprQuad::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprLBQuad (this);
   ub = new exprUBQuad (this);
+
+  /*printf ("generated quad bounds:\n  ");
+  lb -> print (); printf (" [%g]\n  ", (*lb) ());
+  ub -> print (); printf (" [%g]\n", (*ub) ());*/
 }
 
 
@@ -36,7 +40,22 @@ void exprQuad::generateCuts (expression *w, const OsiSolverInterface &si,
       || !alphaConvexify (cg -> Problem (), si))  // ... or a new alpha-convexification?
     return;
 
+  /*int 
+    nrc = cs.sizeRowCuts (),
+    ncc = cs.sizeColCuts ();*/
+
   // generate linear cuts for convex quadratic [upper|lower]-envelope
   // of this expression
   quadCuts (w, cs, cg);
+
+  /*if (cs.sizeRowCuts () > nrc) {
+    printf ("------------------ constraint row cuts\n");
+    for (int i=nrc; i<cs.sizeRowCuts (); i++) 
+      cs.rowCutPtr (i) -> print ();
+  }
+  if (cs.sizeColCuts () > nrc) {
+    printf ("================== constraint col cuts\n");
+    for (int i=ncc; i<cs.sizeColCuts (); i++) 
+      cs.colCutPtr (i) -> print ();
+      }*/
 }

@@ -12,6 +12,7 @@
 #include "exprGroup.hpp"
 #include "depGraph.hpp"
 
+class Domain;
 
 /// Constructor
 exprGroup::exprGroup  (CouNumber c0,
@@ -24,13 +25,13 @@ exprGroup::exprGroup  (CouNumber c0,
 
 
 /// copy constructor
-exprGroup::exprGroup  (const exprGroup &src, const std::vector <exprVar *> *variables): 
-  exprSum   (src.clonearglist (variables), src.nargs_),
+exprGroup::exprGroup  (const exprGroup &src, Domain *d): 
+  exprSum   (src.clonearglist (d), src.nargs_),
   c0_       (src.c0_) {
 
   for (lincoeff::iterator i = src.lcoeff_.begin (); i != src.lcoeff_.end (); ++i)
     lcoeff_ . push_back (std::pair <exprVar *, CouNumber> 
-			 (dynamic_cast <exprVar *> (i -> first -> clone (variables)), i -> second));
+			 (dynamic_cast <exprVar *> (i -> first -> clone (d)), i -> second));
 }
 
 
@@ -42,17 +43,17 @@ void exprGroup::print (std::ostream &out, bool descend) const {
 		 (fabs ((*arglist_) -> Value ()) > COUENNE_EPS)))
     exprSum::print (out, descend);
 
-  if      (c0_ >   COUENNE_EPS) out << '+' << c0_;
-  else if (c0_ < - COUENNE_EPS) out        << c0_;
+  if      (c0_ >   0.) out << '+' << c0_;
+  else if (c0_ < - 0.) out        << c0_;
 
   for (int n = lcoeff_.size (), i=0; n--; i++) {
 
     CouNumber coeff = lcoeff_ [i]. second;
     out << ' ';
 
-    if      (coeff >   COUENNE_EPS) out << '+' << coeff << "*";
-    else if (coeff < - COUENNE_EPS) out        << coeff << "*";
-    else continue;
+    if      (coeff >   0.) out << '+' << coeff << "*";
+    else if (coeff < - 0.) out        << coeff << "*";
+    //else continue;
 
     lcoeff_ [i]. first -> print (out, descend);
   }
@@ -232,4 +233,12 @@ void exprGroup::replace (exprVar *x, exprVar *w) {
 	(ve -> Index () == index))
       ve = w;
   }
+}
+
+
+/// return pointer to variable domain
+Domain *exprGroup::domain () {
+  if (lcoeff_.size () > 0)
+    return lcoeff_ [0]. first -> domain ();
+  return exprOp::domain ();
 }

@@ -12,7 +12,7 @@
 #include "CouenneTypes.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
-
+#include "domain.hpp"
 
 #define LARGE_BOUND 9.9e12
 #define BOUND_WING 1
@@ -25,6 +25,8 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 				 double * &brpts, 
 				 int &way) {
 
+  Domain *domain = arglist_ [0] -> domain ();
+
   int xi = arglist_ [0] -> Index (),
       yi = arglist_ [1] -> Index (),
       wi = obj -> Reference () -> Index ();
@@ -32,10 +34,10 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
   assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 
   CouNumber 
-    x0 = expression::Variable (xi), y0 = expression::Variable (yi), 
-    xl = expression::Lbound   (xi), yl = expression::Lbound   (yi),
-    xu = expression::Ubound   (xi), yu = expression::Ubound   (yi),
-    w0 = expression::Variable (wi);
+    x0 = domain -> x  (xi), y0 = domain -> x  (yi),
+    xl = domain -> lb (xi), yl = domain -> lb (yi),
+    xu = domain -> ub (xi), yu = domain -> ub (yi),
+    w0 = domain -> x (wi);
 
   // First, try to avoid infinite bounds for multiplications, which
   // make them pretty hard to deal with
@@ -70,10 +72,17 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 
   int ind;
 
-  if (xl<-COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0<0)?2:0.5)*x0,xl,xu); way=TWO_RIGHT;} else
-  if (xu> COUENNE_INFINITY) {ind=xi; *brpts=midInterval(((x0>0)?2:0.5)*x0,xl,xu); way=TWO_LEFT;}  else
-  if (yl<-COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0<0)?2:0.5)*y0,yl,yu); way=TWO_RIGHT;} else
-  if (yu> COUENNE_INFINITY) {ind=yi; *brpts=midInterval(((y0>0)?2:0.5)*y0,yl,yu); way=TWO_LEFT;} 
+  if      (xl < -COUENNE_INFINITY)
+    {ind = xi; *brpts = obj -> midInterval (((x0<0.)?2:0.5)*x0, xl, xu); way = TWO_RIGHT;}
+
+  else if (xu >  COUENNE_INFINITY)
+    {ind = xi; *brpts = obj -> midInterval (((x0>0.)?2:0.5)*x0, xl, xu); way = TWO_LEFT;} 
+
+  else if (yl < -COUENNE_INFINITY)
+    {ind = yi; *brpts = obj -> midInterval (((y0<0.)?2:0.5)*y0, yl, yu); way = TWO_RIGHT;}
+
+  else if (yu >  COUENNE_INFINITY)
+    {ind = yi; *brpts = obj -> midInterval (((y0>0.)?2:0.5)*y0, yl, yu) ;way = TWO_LEFT;} 
 
   else {
 
@@ -86,10 +95,10 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
     else ind = (CoinDrand48 () < 0.5) ? xi : yi;
 
     *brpts = (obj -> Strategy () != CouenneObject::MID_INTERVAL) ? 
-      (0.5 * (expression::Lbound (ind) + expression::Ubound (ind))) :
-      midInterval (expression::Variable (ind), 
-		   expression::Lbound   (ind), 
-		   expression::Ubound   (ind));
+      (0.5 * (domain -> lb (ind) + domain -> ub (ind))) :
+      obj -> midInterval (domain -> x  (ind), 
+			  domain -> lb (ind), 
+			  domain -> ub (ind));
   }
 
   var = arglist_ [(ind == xi) ? 0 : 1];

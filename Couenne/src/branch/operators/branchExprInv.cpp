@@ -89,7 +89,7 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
 
     powertriplet pt (k); // TODO: there may (will) be a problem with negative x0
     brpts = (double *) realloc (brpts, sizeof (double));
-    *brpts = midInterval ((x0 >= 0) ? 
+    *brpts = obj -> midInterval ((x0 >= 0) ? 
 			   powNewton ( x0,  y0, &pt) : 
 			  -powNewton (-x0, -y0, &pt), l, u);
 
@@ -126,7 +126,7 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
   if (l < - COUENNE_INFINITY) { // u << -0
 
     way = TWO_RIGHT;
-    *brpts = midInterval (x0, l, u);
+    *brpts = obj -> midInterval (x0, l, u);
 
     return CoinMin (y0 - safe_pow (*brpts, 1. / k), 
 		    projectSeg (x0, y0, l, safe_pow (l, k), 
@@ -136,7 +136,7 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
   if (u > COUENNE_INFINITY) { // l >> +0
 
     way = TWO_LEFT;
-    *brpts = midInterval (x0, l, u);
+    *brpts = obj -> midInterval (x0, l, u);
 
     return CoinMin (y0 - safe_pow (*brpts, 1. / k), 
 		    projectSeg (x0, y0, l, safe_pow (l, k), 

@@ -15,6 +15,7 @@
 #include "exprSum.hpp"
 #include "exprVar.hpp"
 
+class Domain;
 
 /// class Group, with constant, linear and nonlinear terms
 
@@ -38,11 +39,11 @@ public:
 	      int = 0);
 
   /// Copy constructor
-  exprGroup (const exprGroup &src, const std::vector <exprVar *> *variables = NULL);
+  exprGroup (const exprGroup &src, Domain *d = NULL);
 
   /// Cloning method
-  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprGroup (*this, variables);}
+  virtual expression *clone (Domain *d = NULL) const
+  {return new exprGroup (*this, d);}
 
   // Get constant, indices, and coefficients vectors, and number of linear terms
   CouNumber  getc0 () {return c0_;}      ///< return constant term
@@ -98,6 +99,9 @@ public:
 
   /// replace variable x with new (aux) w
   virtual void replace (exprVar *x, exprVar *w);
+
+  /// return pointer to variable domain
+  Domain *domain ();
 };
 
 

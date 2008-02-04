@@ -9,6 +9,7 @@
  */
 
 #include "CouenneProblem.hpp"
+#include "exprClone.hpp"
 
 //#define DEBUG
 

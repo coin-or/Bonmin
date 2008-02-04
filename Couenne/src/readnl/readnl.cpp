@@ -42,6 +42,8 @@ inline bool is_expr_zero (expr* e)
 
 int CouenneProblem::readnl (const ASL *asl) {
 
+  problemName_ = filename;
+
   // number of defined variables (aka common expressions)
   ndefined_ = como + comc + comb + como1 + comc1; 
 
@@ -49,27 +51,27 @@ int CouenneProblem::readnl (const ASL *asl) {
 
   // nonlinear in both objectives and constraints
   if (nlvb >= 0) {
-    for (int i = 0; i < nlvb - nlvbi; i++) addVariable (false);
-    for (int i = 0; i < nlvbi;        i++) addVariable (true);
+    for (int i = 0; i < nlvb - nlvbi; i++) addVariable (false, &domain_);
+    for (int i = 0; i < nlvbi;        i++) addVariable (true,  &domain_);
   }
 
   // nonlinear in either objectives or constraints
   if (nlvo > nlvc) {
-    for (int i = 0; i < nlvc - (nlvb + nlvci); i++) addVariable (false);
-    for (int i = 0; i < nlvci;                 i++) addVariable (true);
-    for (int i = 0; i < nlvo - (nlvc + nlvoi); i++) addVariable (false);
-    for (int i = 0; i < nlvoi;                 i++) addVariable (true);
+    for (int i = 0; i < nlvc - (nlvb + nlvci); i++) addVariable (false, &domain_);
+    for (int i = 0; i < nlvci;                 i++) addVariable (true,  &domain_);
+    for (int i = 0; i < nlvo - (nlvc + nlvoi); i++) addVariable (false, &domain_);
+    for (int i = 0; i < nlvoi;                 i++) addVariable (true,  &domain_);
   } else {
-    for (int i = 0; i < nlvo - (nlvb + nlvoi); i++) addVariable (false);
-    for (int i = 0; i < nlvoi;                 i++) addVariable (true);
-    for (int i = 0; i < nlvc - (nlvo + nlvci); i++) addVariable (false);
-    for (int i = 0; i < nlvci;                 i++) addVariable (true);
+    for (int i = 0; i < nlvo - (nlvb + nlvoi); i++) addVariable (false, &domain_);
+    for (int i = 0; i < nlvoi;                 i++) addVariable (true,  &domain_);
+    for (int i = 0; i < nlvc - (nlvo + nlvci); i++) addVariable (false, &domain_);
+    for (int i = 0; i < nlvci;                 i++) addVariable (true,  &domain_);
   }
 
-  for (int i = 0; i < nwv; i++)                                        addVariable (false);  // arc
-  for (int i = n_var - (CoinMax (nlvc, nlvo) + niv + nbv + nwv); i--;) addVariable (false);  // other
-  for (int i = 0; i < nbv; i++)                                        addVariable (true);   // binary
-  for (int i = 0; i < niv; i++)                                        addVariable (true);   // int.
+  for (int i = 0; i < nwv; i++)                                  addVariable(false, &domain_);//arc
+  for (int i = n_var - (CoinMax (nlvc,nlvo) +niv+nbv+nwv); i--;) addVariable(false, &domain_);//other
+  for (int i = 0; i < nbv; i++)                                  addVariable(true, &domain_); //binary
+  for (int i = 0; i < niv; i++)                                  addVariable(true, &domain_); //int.
 
   nOrig_ = n_var;
 
@@ -77,15 +79,20 @@ int CouenneProblem::readnl (const ASL *asl) {
   auxSet_ = new std::set <exprAux *, compExpr>;
 
   // create room for problem's variables and bounds
-  x_  = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber));
-  lb_ = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber));
-  ub_ = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber));
+  CouNumber 
+    *x  = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber)),
+    *lb = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber)),
+    *ub = (CouNumber *) malloc ((n_var + ndefined_) * sizeof (CouNumber));
 
   for (int i = n_var + ndefined_; i--;) {
-    x_  [i] =  0;
-    lb_ [i] = -COUENNE_INFINITY;
-    ub_ [i] =  COUENNE_INFINITY;
+    x  [i] =  0.;
+    lb [i] = -COUENNE_INFINITY;
+    ub [i] =  COUENNE_INFINITY;
   }
+
+  domain_.push (n_var + ndefined_, x, lb, ub);
+
+  free (x); free (lb); free (ub);
 
   // common expressions (or defined variables) ///////////////////////////////////////
 
@@ -100,7 +107,7 @@ int CouenneProblem::readnl (const ASL *asl) {
   printf ("como_ = %d\n",   ((const ASL_fg *) asl) -> i.como_  );
 #endif
 
-  // Each has a linear and a nonlinear part (credit to Dominique
+  // Each has a linear and a nonlinear part (thanks to Dominique
   // Orban: http://www.gerad.ca/~orban/drampl/def-vars.html)
 
   for (int i = 0; i < como + comc + comb; i++) {
@@ -238,12 +245,8 @@ int CouenneProblem::readnl (const ASL *asl) {
       std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
       indcoe2vector (index, coeff, lcoeff);
 
-      /*std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
-      for (int ii=0, *ind = index; *ind >= 0; *ind++, ii++)
-      lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (*ind), coeff [ii]));*/
-
       if (nl -> code () == COU_EXPRSUM)
-	body = new exprGroup (0, lcoeff, nl -> ArgList (), nl -> nArgs ());
+	body = new exprGroup (0., lcoeff, nl -> ArgList (), nl -> nArgs ());
       else {
 
 	expression **nll = new expression * [1];
@@ -251,7 +254,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 	*nll = nl;
 
 	// apparently, objconst (i) is included in the obj expression
-	body = new exprGroup (0, lcoeff, nll, 1);
+	body = new exprGroup (0., lcoeff, nll, 1);
 	//body = new exprGroup (objconst (i), index, coeff, nll, 1);
       }
 
@@ -452,42 +455,46 @@ int CouenneProblem::readnl (const ASL *asl) {
 
 	register int j = 2*i;
 
-	lb_ [i] = LUv [j];
-	ub_ [i] = LUv [j+1];
+	Lb (i) = LUv [j];
+	Ub (i) = LUv [j+1];
       }
     else
       for (register int i=n_var; i--;) {
-	lb_ [i] = LUv [i];
-	ub_ [i] = Uvx_copy [i];
+	Lb (i) = LUv [i];
+	Ub (i) = Uvx_copy [i];
       }
 
   } else
     for (register int i=n_var; i--;) {
-      lb_ [i] = - COUENNE_INFINITY;
-      ub_ [i] =   COUENNE_INFINITY;
+      Lb (i) = - COUENNE_INFINITY;
+      Ub (i) =   COUENNE_INFINITY;
     }
 
   // initial x ////////////////////////////////////////////////////////////////////
 
   for (register int i=n_var; i--;) 
-    if (X0 && havex0 [i])
-      x_ [i] = X0 [i]; 
+
+    if (X0 && havex0 [i]) X (i) = X0 [i]; 
+
     else {
 
-      CouNumber x, l = lb_ [i], u = ub_ [i];
+      CouNumber x, l = Lb (i), u = Ub (i);
 
-      if      (l < - COUENNE_INFINITY + 1)
-	if    (u >   COUENNE_INFINITY - 1)  x = 0;
-	else                                x = u;
-      else if (u >   COUENNE_INFINITY - 1)  x = l;
-      else                                  x = 0.5 * (l+u);
+      if      (l < - COUENNE_INFINITY)
+	if    (u >   COUENNE_INFINITY)  x = 0.;
+	else                            x = u;
+      else if (u >   COUENNE_INFINITY)  x = l;
+      else                              x = 0.5 * (l+u);
 
-      x_ [i] = x;
+      X (i) = x;
     }
 
-  // update expression internal data
+  for (register int i=n_var; i<ndefined_; i++) {
 
-  expression::update (x_, lb_, ub_);
+    X  (i) =  0.;
+    Lb (i) = -COUENNE_INFINITY;
+    Ub (i) =  COUENNE_INFINITY;
+  }
 
   delete [] nterms;
 

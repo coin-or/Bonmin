@@ -64,11 +64,12 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
   // bound transmission should be documented and the cycle should stop
   // as soon as no new constraint subgraph has benefited from bound
   // transmission. 
-  // In other words, BT should be more of a graph spanning procedure
-  // that moves from one vertex to another when either tightening
-  // procedure has given some result. This should save some time
-  // especially w.r.t. applying implied bounds to ALL expressions just
-  // because one single propagation was found.
+  //
+  // BT should be more of a graph spanning procedure that moves from
+  // one vertex to another when either tightening procedure has given
+  // some result. This should save some time especially
+  // w.r.t. applying implied bounds to ALL expressions just because
+  // one single propagation was found.
 
   return true;
 }
@@ -88,8 +89,8 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
 
     CouNumber UB      = babInfo  -> babPtr () -> model (). getObjValue(),
               LB      = babInfo  -> babPtr () -> model (). getBestPossibleObjValue (),
-              primal0 = ub_ [objInd], 
-              dual0   = lb_ [objInd];
+              primal0 = Ub (objInd), 
+              dual0   = Lb (objInd);
 
     // Bonmin assumes minimization. Hence, primal (dual) is an UPPER
     // (LOWER) bound.
@@ -98,13 +99,13 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
 	(UB < primal0 - COUENNE_EPS)) { // update primal bound (MIP)
 
       //      printf ("updating upper %g <-- %g\n", primal0, primal);
-      ub_ [objInd] = UB;
+      Ub (objInd) = UB;
       chg_bds [objInd].setUpper(t_chg_bounds::CHANGED);
     }
 
     if ((LB   > - COUENNE_INFINITY) && 
 	(LB   > dual0 + COUENNE_EPS)) { // update dual bound
-      lb_ [objInd] = LB;
+      Lb (objInd) = LB;
       chg_bds [objInd].setLower(t_chg_bounds::CHANGED);
     }
   }
@@ -140,11 +141,11 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
       CouNumber
 	x  = X  [i],
 	rc = RC [i],
-	dx = ub_ [i] - x;
+	dx = Ub (i) - x;
 
       if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
 	// can improve bound on variable w_i
-	ub_ [i] = x + (UB-LB) / rc;
+	Ub (i) = x + (UB-LB) / rc;
 	nchanges++;
 	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
       }

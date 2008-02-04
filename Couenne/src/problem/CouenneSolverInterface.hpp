@@ -37,7 +37,7 @@ public:
 
   /// Clone
   virtual OsiSolverInterface * clone (bool copyData = true) const
-    {return new CouenneSolverInterface (*this);}
+  {return new CouenneSolverInterface (*this);}
 
   /// we need to overwrite this since we might have internal knowledge
   virtual bool isProvenPrimalInfeasible() const;
@@ -47,13 +47,13 @@ public:
 
   /// Return cut generator pointer
   CouenneCutGenerator *CutGen ()
-    {return cutgen_;}
+  {return cutgen_;}
 
   /// Set cut generator pointer after setup, to avoid changes in the
   /// pointer due to cut generator cloning (it happens twice in the
   /// algorithm)
   void setCutGenPtr (CouenneCutGenerator *cg)
-    {cutgen_ = cg;}
+  {cutgen_ = cg;}
 
   /// Solve initial LP relaxation 
   virtual void initialSolve (); 
@@ -63,7 +63,7 @@ public:
 
   /// Resolve an LP without applying bound tightening beforehand
   virtual void resolve_nobt ()
-    {OsiClpSolverInterface::resolve ();}
+  {OsiClpSolverInterface::resolve ();}
 
   /** @name Methods for strong branching.
    */

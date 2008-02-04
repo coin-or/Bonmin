@@ -8,25 +8,18 @@
  */
 
 #include "CouenneCutGenerator.hpp"
+#include "CouenneProblem.hpp"
 
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
+#include "exprClone.hpp"
 #include "exprAux.hpp"
 #include "exprOp.hpp"
 #include "exprUnary.hpp"
-
-
-// static vectors for evaluation, see their description in
-// expression.hpp
-
-CouNumber *expression::variables_ = NULL;
-CouNumber *expression::lbounds_   = NULL;
-CouNumber *expression::ubounds_   = NULL;
-
+#include "exprStore.hpp"
 
 // Get lower and upper bound of a generic expression
 void expression::getBounds (expression *&lb, expression *&ub) {
-
   lb = new exprConst (- COUENNE_INFINITY);
   ub = new exprConst (  COUENNE_INFINITY);
 }
@@ -110,19 +103,9 @@ int expression::compare (expression &e1) {
 
 
 /// Copy constructor
-exprCopy::exprCopy (const exprCopy &e, const std::vector <exprVar *> *variables) {
+exprCopy::exprCopy (const exprCopy &e, Domain *d) {
 
-  if (variables &&
-      ((e.copy_ -> Type () == AUX) ||
-       (e.copy_ -> Type () == VAR)))
-    copy_ = new exprClone ((*variables) [e.copy_ -> Index ()]);
-  else copy_ = e.Original () -> clone (variables);
-
-  /*copy_ = 
-    (variables) ? 
-    new exprCopy (e.copy_) : //.Original ()) :
-    e.Original () -> clone (variables);*/
-
+  copy_ = e.copy_ -> clone (d);
   value_ = e.value_;
 }
 
@@ -152,11 +135,54 @@ int expression::dependsOn (int *ind, int n, enum dig_type type) {
     deplist,
     intersectn;
 
+  /*printf (":::::: indlist = {");
+  for (std::set <int>::iterator i=indlist.begin (); i != indlist.end(); ++i)
+    printf ("%d ", *i);
+    printf ("} -- deplist = {");*/
+
   DepList (deplist, type);
+
+  /*for (std::set <int>::iterator i=deplist.begin (); i != deplist.end(); ++i)
+    printf ("%d ", *i);
+    printf ("} -- intersection = {");*/
 
   std::set_intersection (indlist .begin (), indlist .end (), 
 			 deplist .begin (), deplist .end (),
 			 std::inserter (intersectn, intersectn.begin ()));
 
+  /*for (std::set <int>::iterator i=intersectn.begin (); i != intersectn.end(); ++i)
+    printf ("%d ", *i);
+    printf ("}\n");*/
+
   return intersectn.size();
+}
+
+
+/// empty function to redirect variables to proper variable vector
+void exprStore::realign (const CouenneProblem *p) {
+
+  if (((copy_ -> Type () == VAR) ||  
+       (copy_ -> Type () == AUX)) &&
+      (copy_ -> Original () != p -> Var (copy_ -> Index ()))) {
+
+    expression *trash = copy_;
+
+    copy_ = p -> Var (copy_ -> Index ());
+    delete trash;
+  }
+}
+
+
+/// empty function to redirect variables to proper variable vector
+void exprClone::realign (const CouenneProblem *p) {
+
+  if (((copy_ -> Type () == VAR) ||  
+       (copy_ -> Type () == AUX)) &&
+      (copy_ -> Original () != p -> Var (copy_ -> Index ()))) {
+
+    expression *trash = copy_;
+
+    copy_ = p -> Var (copy_ -> Index ());
+    delete trash;
+  }
 }

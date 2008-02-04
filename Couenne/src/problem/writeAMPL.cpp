@@ -31,11 +31,11 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
 
     f << "var ";
     variables_ [i] -> print (f);
-    if (lb_ [i] > - COUENNE_INFINITY + 1) f << " >= " << lb_ [i];
-    if (ub_ [i] < + COUENNE_INFINITY - 1) f << " <= " << ub_ [i];
+    if (Lb (i) > - COUENNE_INFINITY + 1) f << " >= " << Lb (i);
+    if (Ub (i) < + COUENNE_INFINITY - 1) f << " <= " << Ub (i);
     if (variables_ [i] -> isInteger ())   f << " integer";
-    if (fabs (x_ [i]) < COUENNE_INFINITY)    
-      f << " default " << x_ [i]; 
+    if (fabs (X (i)) < COUENNE_INFINITY)    
+      f << " default " << X (i); 
     f << ';' << std::endl;
   }
 

@@ -13,7 +13,6 @@
 #include "CouenneSolverInterface.hpp"
 
 #define OBBT_EPS 1e-3
-#define MAX_OBBT_LP_ITERATION 100
 
 // TODO: seems like Clp doesn't like large bounds and crashes on
 // explicit bounds around 1e200 or so. For now simply use fictitious
@@ -139,7 +138,7 @@ obbt_iter (CouenneSolverInterface *csi,
   if (!issimple &&
       ((Var (index) -> Type () == VAR) ||             // it is an original variable 
        (Var (index) -> Multiplicity () > 0)) &&       // or its multiplicity is at least 1
-      (lb_ [index] < ub_ [index] - COUENNE_EPS) && // in any case, bounds are not equal
+      (Lb (index) < Ub (index) - COUENNE_EPS) && // in any case, bounds are not equal
 
       ((index != objind) || // this is not the objective
 
@@ -163,8 +162,8 @@ obbt_iter (CouenneSolverInterface *csi,
 
     CouNumber &bound = 
       (sense == 1) ? 
-      (lb_ [index]) : 
-      (ub_ [index]); 
+      (Lb (index)) : 
+      (Ub (index)); 
 
     // m{in,ax}imize xi on csi
 
@@ -172,7 +171,7 @@ obbt_iter (CouenneSolverInterface *csi,
     if (Jnlst()->ProduceOutput(J_MOREVECTOR, J_BOUNDTIGHTENING)) {
       Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,
 		      "m%simizing x%d [%g,%g] %c= %g\n",
-	    (sense==1) ? "in" : "ax", index, lb_ [index], ub_ [index],
+	    (sense==1) ? "in" : "ax", index, Lb (index), Ub (index),
 	    (sense==1) ? '>'  : '<',  bound); fflush (stdout);
       if (Jnlst()->ProduceOutput(J_MOREMATRIX, J_BOUNDTIGHTENING)) {
 	char fname [20];
@@ -189,17 +188,17 @@ obbt_iter (CouenneSolverInterface *csi,
 
       if (bestSol ()) {
 	if (sense == 1) {
-	  if ((lb_ [index] < bestSol () [index]) && 
+	  if ((Lb (index) < bestSol () [index]) && 
 	      (bound       > COUENNE_EPS + bestSol () [index]))
 	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: lb = %g, opt = %g, new lb = %g\n", 
-			    index, lb_ [index], bestSol () [index], bound);
+			    index, Lb (index), bestSol () [index], bound);
 	} else {
-	  if ((ub_ [index] > bestSol () [index]) && 
+	  if ((Ub (index) > bestSol () [index]) && 
 	      (bound       < -COUENNE_EPS + bestSol () [index]))
 	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: ub = %g, opt = %g, new ub = %g\n", 
-			    index, ub_ [index], bestSol () [index], bound);
+			    index, Ub (index), bestSol () [index], bound);
 	}
       }
 
@@ -230,8 +229,8 @@ obbt_iter (CouenneSolverInterface *csi,
       for (int j=0; j<ncols; j++) 
 	if ((j!=index) && (j!=objind)) {
 
-	  if (sol [j] <= lb_ [j] + COUENNE_EPS) chg_bds [j].setLowerBits(t_chg_bounds::EXACT);
-	  if (sol [j] >= ub_ [j] - COUENNE_EPS) chg_bds [j].setUpperBits(t_chg_bounds::EXACT);
+	  if (sol [j] <= Lb (j) + COUENNE_EPS) chg_bds [j].setLowerBits(t_chg_bounds::EXACT);
+	  if (sol [j] >= Ub (j) - COUENNE_EPS) chg_bds [j].setUpperBits(t_chg_bounds::EXACT);
 	}
 
 #if 0
@@ -278,17 +277,16 @@ obbt_iter (CouenneSolverInterface *csi,
       nImprov++;
     }
 
-    //    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
-
     // if we solved the problem on the objective function's
     // auxiliary variable (that is, we re-solved the extended
     // problem), it is worth updating the current point (it will be
     // used later to generate new cuts).
 
     // TODO: is it, really? And shouldn't you check the opt sense too?
-    if ((objind == index) && (csi -> isProvenOptimal ()))
+    /*
+    if ((objind == index) && (csi -> isProvenOptimal ()) && (sense == 1))
       update (csi -> getColSolution (), NULL, NULL);
-
+    */
     // restore null obj fun
     objcoe [index] = 0;
   }

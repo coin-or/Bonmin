@@ -11,6 +11,7 @@
 
 #include "CoinHelperFunctions.hpp"
 
+#include "exprClone.hpp"
 #include "exprSum.hpp"
 #include "exprMul.hpp"
 #include "exprGroup.hpp"
@@ -78,7 +79,7 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
     //////////////////////
 
     // what remains is the "independent" expression
-    expression *clone = alist [1 - pos] -> clone (&variables_); 
+    expression *clone = alist [1 - pos] -> clone (&domain_); 
 
     expression *auxdef = 
       (fabs (coeff - 1) < COUENNE_EPS) ?          // if coefficient is 1
@@ -133,10 +134,14 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 	  // dependsOn() gives 0
 
 	  exprVar *saveVar = lcoe [i].first;
-	  lcoe [i].first = new exprVar (nVars ());
+	  //lcoe [i].first = new exprVar (nVars ());
+	  lcoe [i].first = new exprVar (-1);
 
 	  if (body -> dependsOn (j, TAG_AND_RECURSIVE) == 0) {
 
+#ifdef DEBUG
+	    printf ("body does not depend on x%d\n", j);
+#endif
 	    // mark which with negative number
 	    which    = - nlin - 1;
 	    auxcoe   = lcoe [i]. second;
@@ -211,8 +216,8 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 
       newarglist = new expression * [nargs + 1];
 
-      for (j=0; j<mid;   j++) newarglist [j]   = alist [j] -> clone (&variables_);
-      for (j++; j<nargs; j++) newarglist [j-1] = alist [j] -> clone (&variables_);
+      for (j=0; j<mid;   j++) newarglist [j]   = alist [j] -> clone (&domain_);
+      for (j++; j<nargs; j++) newarglist [j-1] = alist [j] -> clone (&domain_);
 
       // nl arglist is done, later decide whether to incorporate it as
       // it is or with a coefficient
@@ -430,16 +435,24 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
   body -> print (); printf ("]");
 #endif
 
-  // second argument is false to tell standardize not to create new
-  // auxiliary variable (we just found it, it's  w)
+  // second argument is false to tell standardize not to create a new
+  // auxiliary variable (we just found it, it's w)
   exprAux *aux = rest -> standardize (this, false);
 
 #ifdef DEBUG
   printf (" {body = "); body -> print (); printf ("} ");
+  if (aux) {
+    printf (" --- aux = "); 
+    aux -> print ();
+    printf (" := ");
+    aux -> Image () -> print ();
+  }
 #endif
 
   if (aux) {
-    rest = aux -> Image () -> clone (&variables_);
+    //rest = aux -> Image () -> clone (&domain_);
+    rest = aux -> Image ();// -> clone (&domain_);
+    aux -> Image (NULL);
     delete aux;
   }
 

@@ -67,29 +67,23 @@ class exprAux: public exprVar {
     {return AUX;}
 
   /// Constructor
-  exprAux (expression *, int, int, intType = Unset);
+  exprAux (expression *, int, int, intType = Unset, Domain * = NULL);
 
   /// Constructor to be used with standardize ([...], false)
-  exprAux (expression *);
+  exprAux (expression *, Domain * = NULL);
 
   /// Destructor
   ~exprAux ();
 
   /// Copy constructor
-  exprAux (const exprAux &, const std::vector <exprVar *> *variables = NULL);
+  exprAux (const exprAux &, Domain *d = NULL);
 
   /// Cloning method
-  virtual exprVar *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return ((variables && (*variables) [varIndex_]) ?
-	   (*variables) [varIndex_] :
-	   new exprAux (*this, variables));}
+  virtual inline exprVar *clone (Domain *d = NULL) const
+  {return new exprAux (*this, d);}
 
-  //{return (variables ? (*variables) [varIndex_] : new exprAux (*this, variables));}
-  //{return (//keep_variables ? new exprClone (this) : 
-  //new exprAux (*this, variables));}
-
-  expression *Lb () {return lb_;} ///< get lower bound expression
-  expression *Ub () {return ub_;} ///< get upper bound expression
+  inline expression *Lb () {return lb_;} ///< get lower bound expression
+  inline expression *Ub () {return ub_;} ///< get upper bound expression
 
   /// Print expression
   virtual void print (std::ostream & = std::cout, 
@@ -100,12 +94,12 @@ class exprAux: public exprVar {
     {return image_;}
 
   /// The expression associated with this auxiliary variable
-  void Image (expression *image)
+  inline void Image (expression *image)
     {image_ = image;}
 
   /// Null function for evaluating the expression
   inline CouNumber operator () () 
-    {return expression::Variable (varIndex_);}
+    {return domain_ -> x (varIndex_);}
 
   /// Differentiation
   inline expression *differentiate (int index) 
@@ -126,10 +120,6 @@ class exprAux: public exprVar {
 
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&lb, expression *&ub);
-
-  /// Get lower and upper bound of an expression (if any) -- real values
-  //void getBounds (CouNumber &lb, CouNumber &ub) 
-  //{expression::getBounds (lb, ub);}
 
   /// set bounds depending on both branching rules and propagated
   /// bounds. To be used after standardization
@@ -168,6 +158,13 @@ class exprAux: public exprVar {
 
   /// How many times this variable appears 
   inline int Multiplicity () {return multiplicity_;}
+
+  /// link this variable to a domain
+  inline void linkDomain (Domain *d) {
+    domain_ = d; 
+    if (lb_) lb_ -> linkDomain (d);
+    if (ub_) ub_ -> linkDomain (d);
+  }
 };
 
 /// allow to draw function within intervals and cuts introduced

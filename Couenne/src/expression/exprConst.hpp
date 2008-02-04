@@ -14,7 +14,6 @@
 
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
-#include "exprClone.hpp"
 
 
 /// constant-type operator
@@ -30,49 +29,49 @@ public:
 
   /// node type
   inline enum nodeType Type () const
-    {return CONST;}
+  {return CONST;}
 
   /// value of expression
   inline CouNumber Value () const 
-    {return value_;}
+  {return value_;}
 
   /// Constructor
-  exprConst (CouNumber value)
-    {value_ = value;}
+  exprConst (CouNumber value): 
+    value_ (value) {}
 
   /// Copy constructor
-  exprConst (const exprConst &e, const std::vector <exprVar *> *variables = NULL)
-    {value_ = e.value_;}
+  exprConst (const exprConst &e, Domain *d = NULL)
+  {value_ = e.value_;}
 
   /// Cloning method
-  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprConst (value_);}
+  virtual inline expression *clone (Domain *d = NULL) const
+  {return new exprConst (value_);}
 
   /// I/O
   void print (std::ostream &out = std::cout, 
 	      bool = false) const
-    {out << value_;}
+  {out << value_;}
 
   /// return constant's value
   inline CouNumber operator() () 
-    {return value_;}
+  {return value_;}
 
   /// differentiation
   inline expression *differentiate (int) 
-    {return new exprConst (0.);}
+  {return new exprConst (0.);}
 
   /// dependence on variable set
-  int dependsOn (int *ind, int n, enum dig_type type = STOP_AT_AUX)
-    {return 0;}
+  inline int dependsOn (int *ind, int n, enum dig_type type = STOP_AT_AUX)
+  {return 0;}
 
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   inline int Linearity ()
-    {return ((fabs (value_) < COUENNE_EPS) ? ZERO: CONSTANT);}
+  {return ((fabs (value_) < COUENNE_EPS) ? ZERO: CONSTANT);}
 
   /// Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lower, expression *&upper) {
-    lower = new exprClone (this);
-    upper = new exprClone (this);
+    lower = new exprConst (value_);
+    upper = new exprConst (value_);
   }
 
   /// generate convexification cut for constraint w = this
@@ -83,16 +82,16 @@ public:
 		     CouNumber =  COUENNE_INFINITY);
 
   /// code for comparisons
-  virtual enum expr_type code () 
+  virtual inline enum expr_type code () 
   {return COU_EXPRCONST;}
 
   /// is this expression integer?
-  virtual bool isInteger () 
+  virtual inline bool isInteger () 
   {return ::isInteger (value_);}
 
   /// used in rank-based branching variable choice
-  virtual int rank ()
-    {return 0;} 
+  virtual inline int rank ()
+  {return 0;} 
 };
 
 #endif

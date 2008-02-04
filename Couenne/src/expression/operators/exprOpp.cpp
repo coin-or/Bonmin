@@ -57,3 +57,14 @@ expression *exprOpp::simplify () {
 
   return NULL;
 }
+
+// print 
+void exprOpp::print (std::ostream &out, 
+		       bool descend) const {
+
+  //if (printPos () == PRE)  out << printOp ();
+  out << "(-"; 
+  argument_ -> print (out, descend); 
+  out << ")";
+  //if (printPos () == POST) out << printOp ();
+}

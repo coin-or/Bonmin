@@ -15,7 +15,7 @@
 
 /// the operator itself
 inline CouNumber inv (register CouNumber arg) 
-{return 1.0 / arg;}
+{return 1. / arg;}
 
 
 /// derivative of inv (x)
@@ -35,12 +35,12 @@ class exprInv: public exprUnary {
  public:
 
   /// Constructors, destructor
-  exprInv  (expression *al): 
+  exprInv (expression *al): 
     exprUnary (al) {} //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprInv (argument_ -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+    {return new exprInv (argument_ -> clone (d));}
 
   /// the operator's function
   inline unary_function F () {return inv;}

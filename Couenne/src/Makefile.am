@@ -36,6 +36,7 @@ libCouenne_la_SOURCES = \
 	branch/operators/branchExprQuad.cpp \
 	branch/operators/branchExprSinCos.cpp \
 	branch/operators/minMaxDelta.cpp \
+	expression/domain.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \
 	expression/operators/exprExp.cpp \
@@ -208,6 +209,7 @@ include_HEADERS = \
 	branch/projections.hpp \
 	branch/CouObjStats.hpp \
 	standardize/lqelems.hpp \
+	expression/domain.hpp \
 	expression/operators/exprAbs.hpp \
 	expression/operators/exprExp.hpp \
 	expression/operators/exprInv.hpp \

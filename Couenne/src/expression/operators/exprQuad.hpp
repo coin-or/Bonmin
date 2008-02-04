@@ -19,6 +19,7 @@
 
 class quadElem;
 class CouenneProblem;
+class Domain;
 
 /**  class exprQuad, with constant, linear and quadratic terms
  *
@@ -59,8 +60,8 @@ protected:
   /** \name Convexification data structures
    *
    *  These are filled by alphaConvexify, which implements the
-   *  alpha-convexification methoddescribed in the LaGO paper by Nowak
-   *  and Vigerske -- and also by Adjiman and Floudas.
+   *  alpha-convexification method described in the LaGO paper by
+   *  Nowak and Vigerske -- and also by Adjiman and Floudas.
    */
 
   /// eigenvalues and eigenvectors
@@ -84,7 +85,7 @@ public:
 	     int n = 0);
 
   /// Copy constructor
-  exprQuad (const exprQuad &src, const std::vector <exprVar *> *variables = NULL);
+  exprQuad (const exprQuad &src, Domain *d = NULL);
 
   // get indices and coefficients vectors of the quadratic part
   sparseQ &getQ () const 
@@ -94,12 +95,11 @@ public:
   {return nqterms_;}
 
   /// cloning method
-  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprQuad (*this, variables);}
+  virtual expression *clone (Domain *d = NULL) const
+  {return new exprQuad (*this, d);}
 
   /// Print expression to an iostream
-  virtual void print (std::ostream & = std::cout, 
-		      bool = false) const;
+  virtual void print (std::ostream & = std::cout, bool = false) const;
 
   /// Function for the evaluation of the expression
   virtual CouNumber operator () ();
@@ -110,7 +110,7 @@ public:
 
   /// Simplify expression
   virtual expression *simplify ()
-    {exprOp::simplify (); return NULL;}
+  {exprOp::simplify (); return NULL;}
 
   /// Get a measure of "how linear" the expression is
   virtual int Linearity () {
@@ -261,6 +261,9 @@ public:
   /// method to compute the bound based on sign: -1 for lower, +1 for
   /// upper
   CouNumber computeQBound (int sign);
+
+  /// return pointer to variable domain
+  Domain *domain ();
 
 protected:
 

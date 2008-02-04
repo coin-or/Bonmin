@@ -9,11 +9,13 @@
 
 #include "expression.hpp"
 #include "exprAux.hpp"
+#include "exprClone.hpp"
 #include "exprOp.hpp"
 #include "exprGroup.hpp"
 #include "exprQuad.hpp"
 
 class CouenneProblem;
+class Domain;
 
 // General N-ary function destructor
 
@@ -45,7 +47,8 @@ void exprOp::print (std::ostream &out,
   if (printPos () == PRE)
     out << printOp ();
 
-  out << "("; fflush (stdout);
+  if (nargs_ > 1)
+    {out << "("; fflush (stdout);}
   for (int i=0; i<nargs_; i++) {
     if (arglist_ [i])
       arglist_ [i] -> print (out, descend); 
@@ -56,8 +59,10 @@ void exprOp::print (std::ostream &out,
     }
     fflush (stdout);
   }
-  out << ")";
-  fflush (stdout);
+  if (nargs_ > 1) {
+    out << ")";
+    fflush (stdout);
+  }
 }
 
 
@@ -200,7 +205,40 @@ bool exprOp::isInteger () {
 int exprOp::DepList (std::set <int> &deplist, 
 		     enum dig_type type) {
   int tot = 0;
-  for (int i = nargs_; i--;)
+
+  //printf ("  exprop::deplist of "); print (); printf ("\n");
+
+  for (int i = nargs_; i--;) {
+
+    /*printf ("  ");
+    arglist_ [i] -> print (); printf (": {");
+    for (std::set <int>::iterator j=deplist.begin(); j != deplist.end(); ++j)
+      printf ("%d ", *j);
+      printf ("} -> {");*/
+
     tot += arglist_ [i] -> DepList (deplist, type);
+
+    /*for (std::set <int>::iterator j=deplist.begin(); j != deplist.end(); ++j)
+      printf ("%d ", *j);
+      printf ("}\n");*/
+  }
   return tot;
+}
+
+/// return domain of expression
+Domain *exprOp::domain () {
+
+  for (int i=0; i<nargs_; i++) {
+    Domain *d = arglist_ [i] -> domain ();
+    if (d) return d;
+  }
+
+  return NULL;
+}
+
+/// empty function to redirect variables to proper variable vector
+void exprOp::realign (const CouenneProblem *p) {
+
+  for (int i=0; i<nargs_; i++)
+    arglist_ [i] -> realign (p);
 }

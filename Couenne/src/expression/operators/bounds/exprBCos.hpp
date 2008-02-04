@@ -34,9 +34,9 @@ class exprLBCos: public exprOp {
   } //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprLBCos (arglist_ [0] -> clone (variables), 
-			 arglist_ [1] -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+  {return new exprLBCos (arglist_ [0] -> clone (d), 
+			 arglist_ [1] -> clone (d));}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();
@@ -87,9 +87,9 @@ class exprUBCos: public exprOp {
   } //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprUBCos (arglist_ [0] -> clone (variables), 
-			   arglist_ [1] -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+  {return new exprUBCos (arglist_ [0] -> clone (d), 
+			 arglist_ [1] -> clone (d));}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();

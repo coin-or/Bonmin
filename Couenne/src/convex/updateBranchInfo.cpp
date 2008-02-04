@@ -18,11 +18,6 @@
 void updateBranchInfo (const OsiSolverInterface &si, CouenneProblem *p, 
 		       t_chg_bounds *chg_bds, const CglTreeInfo &info) {
 
-  // transmit solution from OsiSolverInterface to problem
-  p -> update (si. getColSolution (), 
-	       si. getColLower    (),
-	       si. getColUpper    ());
-
   int ncols = p -> nVars ();
 
   if ((info.inTree) && (info.pass==0)) {
@@ -87,4 +82,6 @@ void updateBranchInfo (const OsiSolverInterface &si, CouenneProblem *p,
 	  chg_bds [i].setUpper (t_chg_bounds::CHANGED);
     }
   }
+
+  //p -> domain () -> pop ();
 }

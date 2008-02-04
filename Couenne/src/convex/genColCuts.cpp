@@ -11,15 +11,21 @@
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 
+//#define DEBUG
+
 /// generate OsiColCuts for improved (implied and propagated) bounds
 void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
 				      OsiCuts &cs,
 				      int nchanged,
 				      int *changed) const {
 
+#ifdef DEBUG
+  int nrc = cs.sizeRowCuts ();// Must go
+#endif
+
   int  ncols  = problem_ -> nVars (),
       *indLow = new int [ncols], // indices for OsiColCut
-      *indUpp = new int [ncols],
+      *indUpp = new int [ncols], //
        nLow, nUpp = nLow = 0,
        ind_obj = problem_ -> Obj (0) -> Body () -> Index ();
 
@@ -32,6 +38,14 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
     *oldUpp = si.getColUpper (),
     *newLow = problem_ -> Lb (), // changed bounds
     *newUpp = problem_ -> Ub ();
+
+#ifdef DEBUG
+  for (int i=0; i < problem_ -> nVars (); i++)
+    if ((newLow [i] > oldLow [i] + COUENNE_EPS) ||
+	(newUpp [i] < oldUpp [i] - COUENNE_EPS))
+      printf ("x%-3d. [%-10g , %10g] ---> [%-10g , %10g]\n",
+      i, oldLow [i], oldUpp [i], newLow [i], newUpp [i]);*/
+#endif
 
   // check all changed bounds
   for (int i = 0; i < nchanged; i++) {
@@ -48,6 +62,7 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
 
     if (((bd = newLow [index]) > oldLow [index] + COUENNE_EPS) || firstcall_) { // lower
 
+      //printf ("chging low %d %g -> %g\n", index, oldLow [index], newLow [index]);
       if (problem_ -> Var (index) -> isInteger ()) 
 	bd = ceil (bd);
       indLow [nLow]   = index;
@@ -56,6 +71,7 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
 
     if (((bd = newUpp [index]) < oldUpp [index] - COUENNE_EPS) || firstcall_) { // upper
 
+      //printf ("chging upp %d %g -> %g\n", index, oldUpp [index], newUpp [index]);
       if (problem_ -> Var (index) -> isInteger ()) 
 	bd = floor (bd);
       indUpp [nUpp]   = index;
@@ -77,6 +93,11 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
       delete cut;
     }
   }
+
+#ifdef DEBUG
+  printf ("column cuts\n");
+  for (int jj = nrc; jj < cs.sizeRowCuts (); jj++) cs.rowCutPtr (jj) -> print ();
+#endif
 
   delete [] bndLow; delete [] indLow;
   delete [] bndUpp; delete [] indUpp;

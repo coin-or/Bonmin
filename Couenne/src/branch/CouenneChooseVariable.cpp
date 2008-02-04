@@ -10,6 +10,8 @@
 
 #include "CouenneChooseVariable.hpp"
 
+//#define DEBUG
+
 /// Default Constructor 
 CouenneChooseVariable::CouenneChooseVariable (): 
   problem_ (NULL) {}
@@ -42,26 +44,32 @@ CouenneChooseVariable::~CouenneChooseVariable () {}
 
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
-  if (problem_) {
-    /// LEAVE THIS HERE. Need update of current point to evaluate infeasibility
-    problem_ -> initAuxs (info -> solution_, 
-			  info -> lower_, 
-			  info -> upper_);
+  // TODO: apply strong branching using bound tightening
 
-    problem_ -> update (info -> solution_, NULL, NULL);
-  }
+  problem_ -> domain () -> push 
+    (problem_ -> nVars (),
+     info -> solution_, 
+     info -> lower_, 
+     info -> upper_);
 
-  /*for (int i = problem_ -> nVars (); i--;) {
-    info -> lower_ [i] = problem_ -> Lb (i);
-    info -> upper_ [i] = problem_ -> Ub (i);
-    }*/
+#ifdef DEBUG
+  printf ("CouenneChooseVariable -------------------\n");
+  for (int i=0; i<problem_ -> domain () -> current () -> Dimension (); i++)
+    printf ("%4d %20.4g [%20.4g %20.4g]\n", i,
+     info -> solution_ [i],
+     info -> lower_ [i],
+     info -> upper_ [i]);
+#endif
 
-  //CoinCopyN ((double *) (problem_ -> Lb ()), problem_ -> nVars (), info -> lower_);
-  //CoinCopyN ((double *) (problem_ -> Ub ()), problem_ -> nVars (), info -> upper_);
+  //  problem_ -> initAuxs ();
 
   // Make it stable, in OsiChooseVariable::setupList() numberObjects must be 0.
-  return (solver_ -> numberObjects ()) ? 
+  int retval = (solver_ -> numberObjects ()) ? 
     OsiChooseVariable::setupList (info, initialize) : 0;
+
+  problem_ -> domain () -> pop ();
+
+  return retval;
 }
 
 

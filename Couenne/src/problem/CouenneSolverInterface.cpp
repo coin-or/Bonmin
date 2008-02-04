@@ -28,8 +28,8 @@ CouenneSolverInterface::CouenneSolverInterface (const CouenneSolverInterface &sr
   OsiClpSolverInterface (src),
   cutgen_ (src.cutgen_),
   knowInfeasible_ (src.knowInfeasible_),
-  knowOptimal_ (src.knowOptimal_) {}
-
+  knowOptimal_ (src.knowOptimal_) 
+{}
 
 /// Destructor
 CouenneSolverInterface::~CouenneSolverInterface () {
@@ -39,8 +39,8 @@ CouenneSolverInterface::~CouenneSolverInterface () {
 
 
 /// Solve initial LP relaxation 
-void CouenneSolverInterface::initialSolve () 
-{
+void CouenneSolverInterface::initialSolve () {
+
   knowInfeasible_ = false;
   knowOptimal_ = false;
   OsiClpSolverInterface::initialSolve ();
@@ -68,6 +68,10 @@ void sparse2dense (int, t_chg_bounds *, int *&, int &);
 
 /// Resolve an LP relaxation after problem modification
 void CouenneSolverInterface::resolve () {
+  //setColUpper (5,0.);
+  /*printf ("before resolve, %p --> [%g,%g]\n", this,
+	  getColLower () [getNumCols () - 1],
+	  getColUpper () [getNumCols () - 1]);*/
   // TODO: if NLP point available, add new cuts BEFORE resolving --
   // and decrease number of cutting plane iterations by one, to
   // balance it
@@ -76,6 +80,9 @@ void CouenneSolverInterface::resolve () {
   knowOptimal_ = false;
   OsiClpSolverInterface::resolve ();
   //printf("obj value in resolve = %e\n",getObjValue());
+  /*printf ("after resolve, %p --> [%g,%g]\n", this,
+	  getColLower () [getNumCols () - 1],
+	  getColUpper () [getNumCols () - 1]);*/
 }
 
 /// Create a hot start snapshot of the optimization process.
@@ -88,15 +95,15 @@ void CouenneSolverInterface::markHotStart () {
 /// Optimize starting from the hot start snapshot.
 void CouenneSolverInterface::solveFromHotStart() {
 
-  OsiSolverInterface::solveFromHotStart();
-
   knowInfeasible_ = false;
   knowOptimal_ = false;
   const int ncols = cutgen_ -> Problem () -> nVars ();
 
-  cutgen_ -> Problem () -> update (getColSolution (),
-				   getColLower    (),
-				   getColUpper    ());
+  cutgen_ -> Problem () -> domain () -> push
+    (cutgen_ -> Problem () -> nVars (),
+     getColSolution (),
+     getColLower    (),
+     getColUpper    ());
 
   // This vector contains variables whose bounds have changed due to
   // branching, reduced cost fixing, or bound tightening below. To be
@@ -115,6 +122,7 @@ void CouenneSolverInterface::solveFromHotStart() {
     printf ("#### BT says infeasible before re-solve\n");
 #endif
     knowInfeasible_ = true;
+    cutgen_ -> Problem () -> domain () -> pop ();
     return;
   }
 
@@ -141,6 +149,7 @@ void CouenneSolverInterface::solveFromHotStart() {
     const double* bnds = getColLower();
     for (int i=0; i<nele; i++) {
       if (bnds[*idxs] < *eles) {
+	//printf ("setcolLower %d %g\n", *idxs, *eles);
 	setColLower(*idxs,*eles);
       }
       idxs++;
@@ -153,6 +162,7 @@ void CouenneSolverInterface::solveFromHotStart() {
     bnds = getColUpper();
     for (int i=0; i<nele; i++) {
       if (bnds[*idxs] > *eles) {
+	//printf ("setcolUpper %d %g\n", *idxs, *eles);
 	setColUpper(*idxs,*eles);
       }
       idxs++;
@@ -184,6 +194,8 @@ void CouenneSolverInterface::solveFromHotStart() {
   deleteRows(nrowsdel, rowsdel);
   delete [] rowsdel;
   //printf("NumRows after deleting = %d\n", getNumRows());
+
+  cutgen_ -> Problem () -> domain () -> pop ();
 }
 
 /// Delete the hot start snapshot.

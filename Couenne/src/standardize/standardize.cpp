@@ -24,6 +24,10 @@
 
 void CouenneProblem::standardize () {
 
+  /*printf ("current point: %d vars -------------------\n", domain_.current () -> Dimension ());
+  for (int i=0; i<domain_.current () -> Dimension (); i++)
+  printf ("%20g [%20g %20g]\n", domain_.x (i), domain_.lb (i), domain_.ub (i));*/
+
   // create dependence graph to assign an order to the evaluation (and
   // bound propagation, and -- in reverse direction -- implied bounds)
   graph_ = new DepGraph;
@@ -36,7 +40,7 @@ void CouenneProblem::standardize () {
 
   int initVar = variables_ . size () - commonexprs_ . size ();
 
-  // DEFINED VARIABLES ///////////////////////////////////////////////////////////////////////
+  // Defined variables ///////////////////////////////////////////
 
   // standardize initial aux variables (aka defined variables, aka
   // common expression)
@@ -61,7 +65,7 @@ void CouenneProblem::standardize () {
 
     expression *img = naux -> Image ();
 
-    exprAux *newvar = new exprAux (img, initVar, 1 + img -> rank ());
+    exprAux *newvar = new exprAux (img, initVar, 1 + img -> rank (), exprAux::Unset, &domain_);
     //img -> isInteger () ? exprAux::Integer : exprAux::Continuous);
 
     variables_ [initVar] = newvar;
@@ -130,15 +134,15 @@ void CouenneProblem::standardize () {
        i != constraints_.end (); ++i) {
 
 #ifdef DEBUG
-    printf ("############# Constraint ");
-      (*i) -> print ();
+    printf ("############# Constraint "); 
+    (*i) -> print ();
 #endif
 
     exprAux *aux = (*i) -> standardize (this);
 
 #ifdef DEBUG
-    printf (" ==> [%d] ", aux ? (aux -> Index ()) : -1);
-      (*i) -> print ();
+    printf (" ==> [%d] ", aux ? (aux -> Index ()) : -1); 
+    (*i) -> print ();
 #endif
 
     if (aux) { // save if standardized
@@ -146,6 +150,8 @@ void CouenneProblem::standardize () {
       //      con2.push_back (*i);
     }
     else iters2erase.push_back (i);
+
+    //(*i) -> Body () -> realign (this);
 
 #ifdef DEBUG
     printf (" --> ");
@@ -168,26 +174,18 @@ void CouenneProblem::standardize () {
   print (); 
 #endif
 
-  // CREATE EVALUATION ORDER /////////////////////////////////////////////////////////////////
+  // Create evaluation order ////////////////////////////////////////////////////
 
   delete auxSet_;
 
-  int nTotVar = nVars ();
-
   // reallocate space for enlarged set of variables
-  x_  = (CouNumber *) realloc (x_,  nTotVar * sizeof (CouNumber));
-  lb_ = (CouNumber *) realloc (lb_, nTotVar * sizeof (CouNumber));
-  ub_ = (CouNumber *) realloc (ub_, nTotVar * sizeof (CouNumber));
-
-  // make expression library point to new vectors
-
-  expression::update (x_, lb_, ub_);
+  domain_.current () -> resize (nVars ());
 
   //graph_ -> print ();
   graph_ -> createOrder ();
   //graph_ -> print ();
 
-  assert (graph_ -> checkCycles () == false); // printf ("dependency graph cycle!\n");
+  assert (graph_ -> checkCycles () == false);
 
   // Fill numbering structure /////////////////////////////////////////////////
 
@@ -213,20 +211,24 @@ void CouenneProblem::standardize () {
 
       if (variables_ [ord] -> Index () >= nOrig_) { // and one that was not an original, originally...
 
-	lb_ [ord] = -COIN_DBL_MAX;
-	ub_ [ord] =  COIN_DBL_MAX;
+	domain_.lb (ord) = -COIN_DBL_MAX;
+	domain_.ub (ord) =  COIN_DBL_MAX;
       }
+
+      //printf ("from "); variables_ [ord] -> Lb    () -> print (); 
 
       // tighten them with propagated bounds
       variables_ [ord] -> crossBounds ();
 
+      //printf ("to "); variables_ [ord] -> Lb    () -> print (); printf (", now eval\n");
+
       // and evaluate them
-      x_  [ord] = (*(variables_ [ord] -> Image ())) ();
-      lb_ [ord] = (*(variables_ [ord] -> Lb    ())) ();
-      ub_ [ord] = (*(variables_ [ord] -> Ub    ())) ();
+      domain_.x  (ord) = (*(variables_ [ord] -> Image ())) ();
+      domain_.lb (ord) = (*(variables_ [ord] -> Lb    ())) ();
+      domain_.ub (ord) = (*(variables_ [ord] -> Ub    ())) ();
 
 #ifdef DEBUG
-      printf (":::: %10g [%10g, %10g] [", x_ [ord], lb_ [ord], ub_ [ord]);
+      printf (":::: %10g [%10g, %10g] [", domain_.x (ord), domain_.lb (ord), domain_.ub (ord));
       variables_ [ord] -> Lb () -> print (); printf (",");
       variables_ [ord] -> Ub () -> print (); printf ("]\n");
 #endif
@@ -234,8 +236,8 @@ void CouenneProblem::standardize () {
       bool integer = variables_ [ord] -> isInteger ();
 
       if (integer) {
-	lb_ [ord] = ceil  (lb_ [ord] - COUENNE_EPS);
-	ub_ [ord] = floor (ub_ [ord] + COUENNE_EPS);
+	domain_.lb (ord) = ceil  (domain_.lb (ord) - COUENNE_EPS);
+	domain_.ub (ord) = floor (domain_.ub (ord) + COUENNE_EPS);
       }
     }
   }
@@ -265,6 +267,13 @@ void CouenneProblem::standardize () {
   //for (int i=0; i<n; i++)
   //printf ("[%4d %4d]\n", i, numbering_ [i]);
 
+  //printf ("current point: %d vars -------------------\n", domain_.current () -> Dimension ());
+
+  /*for (int i=0; i<domain_.current () -> Dimension (); i++)
+    printf ("%20g [%20g %20g]\n", domain_.x (i), domain_.lb (i), domain_.ub (i));*/
+
+  delete [] commuted_;
+  commuted_ = NULL;
   delete graph_;
   graph_ = NULL;
 }

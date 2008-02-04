@@ -22,7 +22,7 @@
 exprAux *exprDiv::standardize (CouenneProblem *p, bool addAux) {
 
   exprOp::standardize (p);
-  return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this));
+  return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this, p -> domain ()));
 }
 
 
@@ -85,8 +85,10 @@ void exprDiv::generateCuts (expression *w, const OsiSolverInterface &si,
 
   // same as product, just a change in coordinates
 
+  CouNumber *x = w -> domain () -> x ();
+
   unifiedProdCuts (cg, cs,
-		   wi, expression::Variable (wi), wl, wu,
-		   yi, expression::Variable (yi), yl, yu,
-		   xi, expression::Variable (xi), xl, xu, chg);
+		   wi, x [wi], wl, wu,
+		   yi, x [yi], yl, yu,
+		   xi, x [xi], xl, xu, chg);
 }

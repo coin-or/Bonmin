@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: methods of the class CouenneProblem
  *
- * (C) Carnegie-Mellon University, 2006-07. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -24,50 +24,16 @@
 #include "CouenneProblemElem.hpp"
 #include "lqelems.hpp"
 
-/// update value of variables, bounds
-void CouenneProblem::update (const CouNumber *x, 
-			     const CouNumber *l, 
-			     const CouNumber *u, 
-			     int n) const {
-
-  register int nvars = nVars ();
-
-  // expand arrays if needed
-
-  if (curnvars_ < nvars) {
-    x_   = (CouNumber *) realloc (x_,  nvars * sizeof (CouNumber));
-    lb_  = (CouNumber *) realloc (lb_, nvars * sizeof (CouNumber));
-    ub_  = (CouNumber *) realloc (ub_, nvars * sizeof (CouNumber));
-
-    curnvars_ = nvars;
-  }
-
-  // copy arrays (do not simply make x_ point to x)
-
-  if (n < 0)
-    n = nvars;
-
-  {
-    register int i;
-    if (x) for (i=n; i--;) x_  [i] = x [i];
-    if (l) for (i=n; i--;) lb_ [i] = l [i];
-    if (u) for (i=n; i--;) ub_ [i] = u [i];
-  }
-
-  expression::update (x_, lb_, ub_);
-}
-
-
 /// initialize auxiliary variables from original variables in the
 /// nonlinear problem
 
-void CouenneProblem::initAuxs (const CouNumber *x, 
-			       const CouNumber *l, 
-			       const CouNumber *u) {
+void CouenneProblem::initAuxs () {
 
   // update original variables only, that is, the first nVars ()
   // variables, as no auxiliaries exist yet
-  update (x, l, u, nOrig_);
+  //update (x, l, u, nOrig_);
+
+  domain_.current () -> resize (nVars ());
 
   // initially, auxiliary variables are unbounded, their bounds only
   // depending on their function
@@ -79,10 +45,8 @@ void CouenneProblem::initAuxs (const CouNumber *x,
 	((*i) -> Index () >= nOrig_)) { // and one that was not an original, originally...
 
       int index = (*i) -> Index ();
-      lb_ [index] = - (ub_ [index] = COUENNE_INFINITY);
+      Lb (index) = - (Ub (index) = COUENNE_INFINITY);
     }
-
-  expression::update (x_, lb_, ub_);
 
   // only one loop is sufficient here, since auxiliary variable are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
@@ -100,20 +64,20 @@ void CouenneProblem::initAuxs (const CouNumber *x,
       //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
 
       // set bounds 
-      if ((lb_[ord] = CoinMax (lb_[ord], (*(aux -> Lb()))())) <= -COUENNE_INFINITY) lb_[ord]=-DBL_MAX;
-      if ((ub_[ord] = CoinMin (ub_[ord], (*(aux -> Ub()))())) >=  COUENNE_INFINITY) ub_[ord]= DBL_MAX;
+      if ((Lb (ord) = CoinMax (Lb (ord), (*(aux -> Lb()))())) <= -COUENNE_INFINITY) Lb (ord)=-DBL_MAX;
+      if ((Ub (ord) = CoinMin (Ub (ord), (*(aux -> Ub()))())) >=  COUENNE_INFINITY) Ub (ord)= DBL_MAX;
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
       //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, " --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
 
-      x_ [ord] = CoinMax (lb_ [ord], CoinMin (ub_ [ord], (*(aux -> Image ())) ()));
+      X (ord) = CoinMax (Lb (ord), CoinMin (Ub (ord), (*(aux -> Image ())) ()));
 
       bool integer = variables_ [ord] -> isInteger ();
 
       if (integer) {
-	lb_ [ord] = ceil  (lb_ [ord] - COUENNE_EPS);
-	ub_ [ord] = floor (ub_ [ord] + COUENNE_EPS);
+	Lb (ord) = ceil  (Lb (ord) - COUENNE_EPS);
+	Ub (ord) = floor (Ub (ord) + COUENNE_EPS);
       }
     }
   }
@@ -125,31 +89,23 @@ void CouenneProblem::initAuxs (const CouNumber *x,
 
 void CouenneProblem::getAuxs (CouNumber * x) const {
 
-  // save current addresses
-  CouNumber 
-    *xS = expression::Variables (),
-    *lS = expression::Lbounds (),
-    *uS = expression::Ubounds ();
-
-  // temporarily make the expression arrays point to x (restore them
-  // at the end of this function)
-  expression::update (x, NULL, NULL);
+  domain_.push (nVars (), x, NULL, NULL);
 
   // set auxiliary w to f(x). This procedure is exact even though the
   // auxiliary variables have an incomplete image, i.e. they have been
   // decomposed previously, since they are updated with increasing
   // index.
-  for (register int j = 0, i = nVars (); i--; j++) {
+  for (int j=0, i=nVars (); i--; j++) {
 
-    exprVar *var = variables_ [numbering_ [j]];
+    int index = numbering_ [j];
+    exprVar *var = variables_ [index];
 
     if (var -> Type () == AUX)
-      x [var -> Index ()] = 
+      x [index] = X (index) =
 	(*(var -> Image ())) ();
   }
 
-  // get the x and the bound vectors back to their previous state
-  expression::update (xS, lS, uS);
+  domain_.pop ();
 }
 
 
@@ -239,8 +195,7 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 
 
 /// set cutoff from NLP solution
-void CouenneProblem::setCutOff (CouNumber cutoff) 
-{
+void CouenneProblem::setCutOff (CouNumber cutoff) {
 
   int indobj = objectives_ [0] -> Body () -> Index ();
 
@@ -252,8 +207,8 @@ void CouenneProblem::setCutOff (CouNumber cutoff)
 		    "Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",
 		    cutoff, indobj,
 		    (objectives_ [0] -> Sense () == MINIMIZE) ? 
-		    ub_ [indobj] :
-		    lb_ [indobj]);
+		    Ub (indobj) :
+		    Lb (indobj));
 
     pcutoff_ -> setCutOff (cutoff + 1e-7 * fabs (1 + cutoff));
   }
@@ -269,9 +224,34 @@ void CouenneProblem::installCutOff () {
   if (indobj >= 0) {
 
     // all problem are assumed to be minimization
-    double cutoff = pcutoff_->getCutOff();
+    double cutoff = pcutoff_ -> getCutOff();
 
-    if (objectives_ [0] -> Sense () == MINIMIZE) {if (cutoff < ub_ [indobj]) ub_ [indobj] = cutoff;}
-    else                                         {if (cutoff > lb_ [indobj]) lb_ [indobj] = cutoff;}
+    if (objectives_ [0] -> Sense () == MINIMIZE) 
+         {if (cutoff < Ub (indobj)) Ub (indobj) = cutoff;}
+    else {if (cutoff > Lb (indobj)) Lb (indobj) = cutoff;}
   }
+}
+
+
+// clear all spurious variables pointers not referring to the variables_ vector
+void CouenneProblem::realign () {
+
+  // link variables to problem's domain
+  for (std::vector <exprVar *>::iterator i = variables_.begin ();
+       i != variables_.end (); ++i) {
+
+    (*i) -> linkDomain (&domain_);
+    (*i) -> realign (this);
+  }
+
+  // link variables to problem's domain
+  for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
+       i != objectives_.end (); ++i) 
+    (*i) -> Body () -> realign (this);
+
+
+  // link variables to problem's domain
+  for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
+       i != constraints_.end (); ++i)
+    (*i) -> Body () -> realign (this);
 }

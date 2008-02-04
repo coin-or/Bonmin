@@ -23,8 +23,8 @@ class exprCos: public exprUnary {
     exprUnary (al) {}
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprCos (argument_ -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+  {return new exprCos (argument_ -> clone (d));}
 
   //// the operator's function
   inline unary_function F () 
@@ -32,7 +32,7 @@ class exprCos: public exprUnary {
 
   /// print operator
   std::string printOp () const
-    {return "cos";}
+  {return "cos";}
 
   /// obtain derivative of expression
   expression *differentiate (int index); 

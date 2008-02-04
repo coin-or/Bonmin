@@ -10,9 +10,10 @@
 #include <vector>
 #include <fstream>
 
+#include "CoinHelperFunctions.hpp"
+
 #include "expression.hpp"
 #include "exprAux.hpp"
-
 #include "CouenneProblem.hpp"
 
 
@@ -20,17 +21,17 @@
 
 void CouenneProblem::print (std::ostream &out) {
 
-  printf ("objectives:\n");
+  out << "objectives:" << std::endl;
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
        i != objectives_.end (); ++i)
     (*i) -> print (out);
 
-  printf ("constraints:\n");
+  out << "constraints:" << std::endl;
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
        i != constraints_.end (); ++i)
     (*i) -> print (out);
 
-  printf ("variables:\n");
+  out << "variables:" << std::endl;
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
        i != variables_.end (); ++i)
 
@@ -42,28 +43,30 @@ void CouenneProblem::print (std::ostream &out) {
 
 	//printf (" %x", (*i));
 	out << " (r:" << (*i) -> rank () 
-	    << ", m:"  << (*i) -> Multiplicity () << ") := ";
+	    << ", m:" << (*i) -> Multiplicity () << ") := ";
 	if ((*i) -> Image ())
 	  (*i) -> Image () -> print (out, false); 
       }
 
-      if ((fabs ((*((*i) -> Lb ())) ())     < COUENNE_EPS) &&
-	  (fabs ((*((*i) -> Ub ())) () - 1) < COUENNE_EPS) &&
+      CouNumber 
+	lb = domain_.lb ((*i) -> Index ()),
+	ub = domain_.ub ((*i) -> Index ());
+
+      if ((fabs (lb)     < COUENNE_EPS) &&
+	  (fabs (ub - 1) < COUENNE_EPS) &&
 	  (*i) -> isInteger ()) out << " binary";
       else {
 
-	out << " [ " << (*((*i) -> Lb ())) ();
-	out << " , " << (*((*i) -> Ub ())) ();
-	out << " ]";
-	/*
-	if ((*i) -> Image ()) {
+	out << " [ " << lb << " , " << ub << " ]";
+
+	/*if ((*i) -> Image ()) {
 	  expression *lb, *ub;
 	  (*i) -> Image () -> getBounds (lb, ub);
 	  out << " {";  lb -> print (out);
 	  out << " , "; ub -> print (out);
 	  out << "} "; 
-	}
-	*/
+	  }*/
+
 	if ((*i) -> isInteger ()) out << " integer";
       }
 
@@ -71,67 +74,58 @@ void CouenneProblem::print (std::ostream &out) {
     }
 
   if (optimum_) {
-    printf ("best known solution: (%g", *optimum_);
+    out << "best known solution: (" << *optimum_;
     for (int i=1; i < nVars (); i++)
-      printf (",%g", optimum_ [i]);
-    printf (")\n");
+      out << ' ' << optimum_ [i];
+    out << ')' << std::endl;
   }
 
   if (fabs (bestObj_) < COUENNE_INFINITY)
-    printf ("best known objective: %g\n", bestObj_);
+    out << "best known objective: " << bestObj_ << std::endl;
 
-  printf ("end\n");
+  out << "end" << std::endl;
 } 
 
 
 /// read optimal solution into member optimum
-bool CouenneProblem::readOptimum (const std::string &fname) {
+bool CouenneProblem::readOptimum (char *name) {
 
-  // TODO: this procedure is crippled by the new auxiliary handling
-  // which replaces original variables with auxiliaries. The problem
-  // could be that some originally auxiliary variables (er...) do not
-  // have an optimal value but are evaluated as independent.
+  std::string fname (name);
+  FILE *f;
 
-  // Actually, forget the above. It can only happen in extended
-  // formulations, whose original variables are either original or
-  // auxiliary in the original problem.
+  if (fname == "") {
 
-  int nvars = nVars ();
+    fname = problemName_;
 
-  FILE *f = fopen (fname.c_str (), "r");
+    int 
+      base = fname.rfind ('/'),
+      size = fname.find  ('.', base) - base;
+
+    char *filename = new char [size+4];
+    CoinFillN (filename, size+4, (char) 0);
+    fname.copy (filename, size, base+1);
+    strcat (filename, "txt");
+    f = fopen (filename, "r");
+    delete [] filename;
+  } else f = fopen (fname.c_str (), "r");
+
   if (!f) return false;
 
-  optimum_ = (CouNumber *) realloc (optimum_, nvars * sizeof (CouNumber));
+  optimum_ = (CouNumber *) realloc (optimum_, nVars () * sizeof (CouNumber));
 
-  CoinFillN (optimum_, nvars, 0.);
+  CoinFillN (optimum_, nVars (), 0.);
 
+  // read optimal objective function first
   if (fscanf (f, "%lf", &bestObj_) < 1) 
     return false;
 
+  // read optimal values of variables
   for (int i = 0; i < nOrig_; i++)
     if (fscanf (f, "%lf", optimum_ + i) < 1) 
       return false;
 
-  // save current expression vectors
-  CouNumber
-    *xS = expression::Variables (),
-    *lS = expression::Lbounds   (),
-    *uS = expression::Ubounds   ();
-
-  // now propagate value to aux variables
-  expression::update (optimum_, NULL, NULL);
-
-  // only one loop is sufficient here, since auxiliary variables are
-  // defined in such a way that w_i does NOT depend on w_j if i<j.
-
-  for (int i = 0, j = nVars (); j--; i++) {
-    exprVar *var = variables_ [numbering_ [i]];
-    if (var -> Type () == AUX)
-      optimum_ [var -> Index ()] = (*(var -> Image ())) ();
-  }
-
-  // restore previous value/bound vectors
-  expression::update (xS, lS, uS);
+  // expand solution to auxiliary space
+  getAuxs (optimum_);
 
   return true;
 }

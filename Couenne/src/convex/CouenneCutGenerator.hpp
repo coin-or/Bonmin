@@ -96,26 +96,26 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   {return new CouenneCutGenerator (*this);}
 
   /// return pointer to symbolic problem
-  CouenneProblem *Problem () const
+  inline CouenneProblem *Problem () const
     {return problem_;}
 
   /// total number of variables (original + auxiliary)
   const int getnvars () const;
 
   /// has generateCuts been called yet?
-  bool isFirst () const 
+  inline bool isFirst () const 
     {return firstcall_;}
 
   /// should we add the violated cuts only (true), or all of them (false)?
-  bool addViolated () const
+  inline bool addViolated () const
     {return addviolated_;}
 
   /// get convexification type (see CouenneTypes.h)
-  enum conv_type ConvType () const
+  inline enum conv_type ConvType () const
     {return convtype_;}
 
   /// get number of convexification samples
-  int nSamples () const
+  inline int nSamples () const
     {return nSamples_;}
 
   /// the main CglCutGenerator
@@ -185,11 +185,12 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// (for compatibility with base class)
   /// virtual method to decide if local search is performed
-  virtual bool doLocalSearch () const {return 0;}
+  virtual bool doLocalSearch () const 
+  {return 0;}
 
   /// Method to set the Bab pointer
   void setBabPtr (Bonmin::Bab *p)
-    {BabPtr_ = p;}
+  {BabPtr_ = p;}
 
   /// Get statistics
   void getStats (int &nrc, int &ntc, double &st) {
@@ -200,7 +201,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// Allow to get and set the infeasNode_ flag (used only in generateCuts())
   bool &infeasNode () const
-    {return infeasNode_;}
+  {return infeasNode_;}
 
   /// generate OsiRowCuts for current convexification
   void genRowCuts (const OsiSolverInterface &, OsiCuts &cs, 
@@ -214,7 +215,8 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
 
   /// Provide Journalist
-  ConstJnlstPtr Jnlst() const {return ConstPtr(jnlst_);}
+  inline ConstJnlstPtr Jnlst() const 
+  {return ConstPtr (jnlst_);}
 };
 
 #endif

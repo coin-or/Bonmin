@@ -107,7 +107,7 @@ exprAux *exprOpp::standardize (CouenneProblem *p, bool addAux) {
 
   CouNumber c0 = 0;   // final constant term
 
-  p -> decomposeTerm (argument_, -1, c0, lmap, qmap);
+  p -> decomposeTerm (argument_, -1., c0, lmap, qmap);
 
   return p -> linStandardize (addAux, c0, lmap, qmap);
 }

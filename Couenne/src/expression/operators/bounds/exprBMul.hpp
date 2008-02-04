@@ -34,8 +34,8 @@ class exprLBMul: public exprOp {
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprLBMul (clonearglist (variables), nargs_);}
+  expression *clone (Domain *d = NULL) const
+    {return new exprLBMul (clonearglist (d), nargs_);}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();
@@ -87,8 +87,8 @@ class exprUBMul: public exprOp {
     exprOp (al, n) {} //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprUBMul (clonearglist (variables), nargs_);}
+  expression *clone (Domain *d = NULL) const
+    {return new exprUBMul (clonearglist (d), nargs_);}
 
   /// function for the evaluation of the expression
   CouNumber operator () ();

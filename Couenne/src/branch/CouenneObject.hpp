@@ -19,6 +19,9 @@
 
 #include "CouenneJournalist.hpp"
 
+#define AGGR_MUL 2
+const CouNumber closeToBounds = .01;
+
 
 /// Define what kind of branching (two- or three-way) and where to
 /// start from: left, (center,) or right. The last is to help
@@ -32,9 +35,6 @@ enum {TWO_LEFT,                 TWO_RIGHT,   TWO_RAND,
 class funtriplet;
 CouNumber minMaxDelta (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
 CouNumber maxHeight   (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
-
-/// returns a point "inside enough" a given interval, or x if it is already
-CouNumber midInterval (CouNumber x, CouNumber l, CouNumber u);
 
 /// OsiObject for auxiliary variables $w=f(x)$. 
 ///
@@ -97,6 +97,10 @@ public:
     }
   }
 
+  /// returns a point "inside enough" a given interval, or x if it is
+  /// already
+  CouNumber midInterval (CouNumber x, CouNumber l, CouNumber u) const;
+
 protected:
 
   /// The (auxiliary) variable this branching object refers to. If the
@@ -123,6 +127,10 @@ protected:
 
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
+
+  /// Combination parameter for the mid-point branching point
+  /// selection strategy
+  CouNumber alpha_;
 };
 
 #endif

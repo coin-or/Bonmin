@@ -32,6 +32,8 @@ class exprVar;
 class DepNode;
 class DepGraph;
 
+class Domain;
+
 struct compNode;
 
 /// Expression base class
@@ -42,46 +44,7 @@ struct compNode;
 
 class expression {
 
- protected:
-
-  /// These "global" variables, static members of expression, contain
-  /// the current value of the variables' and bounds' vectors. The
-  /// former vector is used to compute the value of the expression, for
-  /// instance when using a non-linear solver that requires evaluation
-  /// of all expressions in the problem. The latter is used when
-  /// updating the problem after a change in the variables' bounds.
-  ///
-  /// CAUTION: every time an expression (or a set) is evaluated, the
-  /// user can (SHOULD) tell the program to synchronize with her/his
-  /// own vectors by calling the method expression::update (myvars,
-  /// mylbounds, myubounds) below.
-
-  static CouNumber *variables_;
-  static CouNumber *lbounds_;   ///< vector of lower bounds
-  static CouNumber *ubounds_;   ///< vector of upper bounds
-
  public:
-
-  /// update the value of "external" vectors (if the addresses have not
-  /// changed, it is not needed)
-  static inline void update (CouNumber *variables = NULL, 
-			     CouNumber *lbounds   = NULL, 
-			     CouNumber *ubounds   = NULL) {
-
-    if (variables) variables_ = variables;
-    if (lbounds)   lbounds_   = lbounds;
-    if (ubounds)   ubounds_   = ubounds;
-  }
-
-  // return current values of variables and bounds
-  static CouNumber Lbound   (int i) {return lbounds_   [i];} ///< return \f$l_i\f$
-  static CouNumber Ubound   (int i) {return ubounds_   [i];} ///< return \f$u_i\f$
-  static CouNumber Variable (int i) {return variables_ [i];} ///< return \f$x_i\f$
-
-  // return whole vectors
-  static CouNumber *Lbounds   () {return lbounds_;}   ///< return vector of lower bounds
-  static CouNumber *Ubounds   () {return ubounds_;}   ///< return vector of upper bounds
-  static CouNumber *Variables () {return variables_;} ///< return vector of variables
 
   /// Constructor
   expression () {}
@@ -89,13 +52,13 @@ class expression {
   /// Copy constructor. Pass pointer to variable vector when
   /// generating new problem, whose set of variables is equivalent but
   /// may be changed or whose value is independent.
-  expression (const expression &e, const std::vector <exprVar *> *variables = NULL) {}
+  expression (const expression &e, Domain *d = NULL) {}
 
   /// Destructor
   virtual ~expression () {}
 
   /// Cloning method
-  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const 
+  virtual expression *clone (Domain *d = NULL) const 
   {return NULL;}
 
   /// Return index of variable (only valid for exprVar and exprAux)
@@ -132,7 +95,7 @@ class expression {
 
   /// value (empty)
   virtual inline CouNumber Value () const 
-  {return 0;}
+  {return 0.;}
 
   /// If this is an exprClone of a exprClone of an expr???, point to
   /// the original expr??? instead of an exprClone -- improve computing
@@ -213,7 +176,7 @@ class expression {
   /// return an index to the variable's argument that is better fixed
   /// in a branching rule for solving a nonconvexity gap
   virtual expression *getFixVar ()
-  {printf ("Warning: expression::getFixIndex()\n"); return NULL;}
+  {return NULL;}
 
   /// return integer for comparing expressions (used to recognize
   /// common expression)
@@ -246,7 +209,7 @@ class expression {
   {return false;}
 
   /// multiplicity of a variable
-  virtual int Multiplicity () 
+  virtual inline int Multiplicity ()
   {return 1;}
 
   /// set up branching object by evaluating many branching points for
@@ -265,6 +228,16 @@ class expression {
   /// update dependence set with index of variables on which this
   /// expression depends
   virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *) {}
+
+  /// return pointer to variable domain
+  virtual Domain *domain () 
+  {return NULL;}
+
+  /// empty function to update domain pointer
+  virtual void linkDomain (Domain *d) {}
+
+  /// empty function to redirect variables to proper variable vector
+  virtual void realign (const CouenneProblem *p) {}
 };
 
 

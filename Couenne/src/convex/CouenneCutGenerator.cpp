@@ -164,12 +164,42 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "mid-point", "convex combination of current point and mid point",
      "");
 
+  std::string br_ops [] = {"prod", "div", "exp", "log", "sin", "cos", 
+			   "pow",  "negpow", "sqr", "cube", ""};
+
+  for (int i=0; br_ops [i] != ""; i++) {
+
+    char optname [40], description [90];
+    sprintf (optname, "branch_pt_select_%s", br_ops [i].c_str ());
+    sprintf (description, "Chooses branching point selection strategy for operator %s", 
+	     br_ops [i].c_str ());
+
+    roptions -> AddStringOption4
+      (optname,
+       description,
+       "common",
+       "common",    "use strategy defined for generic operators",
+       "balanced",  "minimizes max distance from curve to convexification",
+       "min-area",  "minimizes total area of the two convexifications",
+       "mid-point", "convex combination of current point and mid point",
+       "");
+  }
+
+
   roptions -> AddStringOption2 
     ("violated_cuts_only",
      "Yes if only violated convexification cuts should be added",
      "yes",
      "no","",
      "yes","");
+
+  roptions -> AddBoundedNumberOption
+    ("branch_midpoint_alpha",
+     "Defines convex combination of mid point and current LP point: b = alpha x_lp + (1-alpha) (lb+ub)/2.",
+     0.,false,
+     1.,false,
+     0.25,
+     "Default value is 0.25.");
 
   roptions -> setOptionExtraInfo ("branch_pt_select", 15); // Why 15? TODO
 

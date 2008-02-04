@@ -17,8 +17,8 @@
 // Get lower and upper bound of a variable expression (if any)
 void exprVar::getBounds (expression *&lb, expression *&ub) {
 
-  lb = new exprLowerBound (varIndex_); 
-  ub = new exprUpperBound (varIndex_);
+  lb = new exprLowerBound (varIndex_, domain_); 
+  ub = new exprUpperBound (varIndex_, domain_);
 }
 
 
@@ -52,5 +52,5 @@ void exprVar::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g)
 {dep -> insert (g -> lookup (varIndex_));}
 
 
-expression *exprVar::Lb () {return new exprLowerBound (varIndex_);}///< lower bound of a variable
-expression *exprVar::Ub () {return new exprUpperBound (varIndex_);}///< upper bound of a variable
+expression *exprVar::Lb () {return new exprLowerBound (varIndex_, domain_);}///< lower bound
+expression *exprVar::Ub () {return new exprUpperBound (varIndex_, domain_);}///< upper bound

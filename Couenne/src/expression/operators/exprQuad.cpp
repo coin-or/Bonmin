@@ -16,6 +16,8 @@
 #include "depGraph.hpp"
 #include "lqelems.hpp"
 
+class Domain;
+
 //#define DEBUG
 
 struct cmpVar {
@@ -123,8 +125,8 @@ exprQuad::exprQuad  (CouNumber c0,
 
 
 /// copy constructor
-exprQuad::exprQuad (const exprQuad &src, const std::vector <exprVar *> *variables): 
-  exprGroup (src, variables),
+exprQuad::exprQuad (const exprQuad &src, Domain *d): 
+  exprGroup (src, d),
   bounds_   (src.bounds_),
   nqterms_  (src.nqterms_) {
 
@@ -134,10 +136,10 @@ exprQuad::exprQuad (const exprQuad &src, const std::vector <exprVar *> *variable
 
     for (sparseQcol::iterator i = row -> second. begin (); i != row -> second. end (); ++i)
       column.push_back (std::pair <exprVar *, CouNumber> 
-			(dynamic_cast <exprVar *> (i -> first -> clone (variables)), i -> second));
+			(dynamic_cast <exprVar *> (i -> first -> clone (d)), i -> second));
 
     matrix_.push_back (std::pair <exprVar *, sparseQcol> 
-		       (dynamic_cast <exprVar *> (row -> first -> clone (variables)), column));
+		       (dynamic_cast <exprVar *> (row -> first -> clone (d)), column));
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -155,7 +157,7 @@ exprQuad::exprQuad (const exprQuad &src, const std::vector <exprVar *> *variable
 	   i = row -> second. begin (); 
 	 i != row -> second. end (); ++i)
       eigVec.push_back (std::pair <exprVar *, CouNumber> 
-			(dynamic_cast <exprVar *> (i -> first -> clone (variables)), i -> second));
+			(dynamic_cast <exprVar *> (i -> first -> clone (d)), i -> second));
 
     eigen_.push_back (std::pair <CouNumber, std::vector 
 		       <std::pair <exprVar *, CouNumber> > > (row -> first, eigVec));
@@ -178,10 +180,10 @@ void exprQuad::print (std::ostream &out, bool descend) const {
     for (int m = row.size (), j=0; m--; j++) {
       //sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
-      if (fabs (row [j]. second - 1) > COUENNE_EPS) {
-	if (fabs (row [j]. second + 1) < COUENNE_EPS) out << "- ";
+      if (fabs (row [j]. second - 1.) > COUENNE_EPS) {
+	if (fabs (row [j]. second + 1.) < COUENNE_EPS) out << "- ";
 	else {
-	  if (row [j]. second > 0) out << '+';
+	  if (row [j]. second > 0.) out << '+';
 	  out << row [j]. second << "*";
 	}
       } else out << '+';
@@ -463,3 +465,9 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
   }
 }
 
+/// return pointer to variable domain
+Domain *exprQuad::domain () {
+  if (matrix_.size () > 0)
+    return matrix_ [0]. first -> domain ();
+  return exprGroup::domain ();
+}

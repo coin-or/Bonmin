@@ -95,7 +95,7 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
 	  ind = index;
 	  var = j -> first;
 
-	  *brpts = midInterval (info -> solution_ [index], lb, ub);
+	  *brpts = obj -> midInterval (info -> solution_ [index], lb, ub);
 
 	  if (changed_sign) 
 	    break;
@@ -133,13 +133,13 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
       var = obj -> Reference ();
       ind = var -> Index ();
 
-      *brpts = midInterval (info -> solution_ [ind],
-			    info -> lower_ [ind],
-			    info -> upper_ [ind]);
+      *brpts = obj -> midInterval (info -> solution_ [ind],
+				   info -> lower_ [ind],
+				   info -> upper_ [ind]);
     }
-    else *brpts = midInterval (info -> solution_ [ind], 
-			       info -> lower_ [ind],
-			       info -> upper_ [ind]);	  
+    else *brpts = obj -> midInterval (info -> solution_ [ind], 
+				      info -> lower_ [ind],
+				      info -> upper_ [ind]);	  
 
     return fabs (delta);
   }

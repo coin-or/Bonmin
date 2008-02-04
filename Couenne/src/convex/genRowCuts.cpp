@@ -24,8 +24,10 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
   // For each auxiliary variable, create convexification cut (or set
   // of cuts) and add it to cs
 
+  // do NOT project current point into new bounding box! it prevents
+  // convexification cuts that are violated by current point
 
-  for (int i=0, j = problem_ -> nVars (); j--; i++) {
+  /*for (int i=0, j = problem_ -> nVars (); j--; i++) {
 
     CouNumber &x = problem_ -> X (i),
       lb = problem_ -> Lb (i),
@@ -33,7 +35,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 
     if (x < lb) x = lb;
     else if (x > ub) x = ub;
-  }
+    }*/
 
   if (firstcall_)
     for (int i=0, j = problem_ -> nVars (); j--; i++) {

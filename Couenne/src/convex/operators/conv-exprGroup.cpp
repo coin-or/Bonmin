@@ -42,25 +42,18 @@ void exprGroup::getBounds (expression *&lb, expression *&ub) {
     *linalu++ = new exprConst (c0_);
   }
 
+  // TODO: make it another exprGroup!
+
   // derive linear part (obtain constant)
   for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
+
     //    c0 += el -> second;
 
-  /*  // derive quadratic part (obtain linear part)
-  for (sparseQ::iterator row = q_.begin (); row != q_.end (); ++row) {
-
-    int xind = row -> first -> Index ();
-
-    for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
-  */
-
-    //  for (register int *ind = index_, i=0; *ind>=0;) {
-
-    CouNumber coeff = el -> second;//coeff_ [i++];
+    CouNumber coeff = el -> second;
     int         ind = el -> first -> Index ();
 
-    expression *l = new exprLowerBound (ind),
-               *u = new exprUpperBound (ind);
+    expression *l = new exprLowerBound (ind, el -> first -> domain ()),
+               *u = new exprUpperBound (ind, el -> first -> domain ());
 
     if (fabs (coeff - 1.) < COUENNE_EPS) {
       *linall++ = l;

@@ -11,6 +11,7 @@
 #define COUENNE_EXPRBOUND_HPP
 
 #include <iostream>
+#include <assert.h>
 
 #include "CouenneTypes.hpp"
 #include "exprVar.hpp"
@@ -37,44 +38,44 @@ class exprLowerBound: public exprVar {
 
   /// Node type
   inline enum nodeType Type () const
-    {return CONST;}
+  {return CONST;}
 
   /// Constructor
-  exprLowerBound (int varIndex): 
-    exprVar (varIndex) {}
+  exprLowerBound (int varIndex, Domain *d = NULL):
+    exprVar (varIndex, d) {}
 
   /// Copy constructor
-  exprLowerBound (const exprLowerBound &src, const std::vector <exprVar *> *variables = NULL): 
-    exprVar (src) {}
+  exprLowerBound (const exprLowerBound &src, Domain *d = NULL): 
+    exprVar (src, d) {}
 
   /// cloning method
-  exprLowerBound *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprLowerBound (*this, variables);}
+  inline exprLowerBound *clone (Domain *d = NULL) const
+  {return new exprLowerBound (*this, d);}
 
   /// Print to iostream
   void print (std::ostream &out = std::cout, 
 	      bool = false) const
-    {out << "l_" << varIndex_;}
+  {out << "l_" << varIndex_;}
 
   /// return the value of the variable
   inline CouNumber operator () () 
-    {return expression::lbounds_ [varIndex_];}
+  {assert (domain_); return domain_ -> lb (varIndex_);}
 
   /// differentiation
   inline expression *differentiate (int) 
-    {return new exprConst (0.);}
+  {return new exprConst (0.);}
 
   /// dependence on variable set
   inline int dependsOn (int *, int, enum dig_type type = STOP_AT_AUX) 
-    {return 0;}
+  {return 0;}
 
   /// get a measure of "how linear" the expression is:
   virtual inline int Linearity () 
-    {return CONST;}
+  {return CONST;}
 
   /// code for comparisons
-  virtual enum expr_type code ()
-    {return COU_EXPRLBOUND;}
+  virtual inline enum expr_type code ()
+  {return COU_EXPRLBOUND;}
 };
 
 
@@ -86,44 +87,44 @@ class exprUpperBound: public exprVar {
 
   /// Node type
   inline enum nodeType Type () const
-    {return CONST;}
+  {return CONST;}
 
   /// Constructor
-  exprUpperBound (int varIndex): 
-    exprVar (varIndex) {}
+  exprUpperBound (int varIndex, Domain *d = NULL):
+    exprVar (varIndex, d) {}
 
   /// Copy constructor
-  exprUpperBound (const exprUpperBound &src, const std::vector <exprVar *> *variables = NULL): 
-    exprVar (src) {}
+  exprUpperBound (const exprUpperBound &src, Domain *d = NULL): 
+    exprVar (src, d) {}
 
   /// cloning method
-  exprUpperBound *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprUpperBound (*this, variables);}
+  inline exprUpperBound *clone (Domain *d = NULL) const
+  {return new exprUpperBound (*this, d);}
 
   /// Print to iostream
   void print (std::ostream &out = std::cout, 
 	      bool = false) const
-    {out << "u_" << varIndex_;}
+  {out << "u_" << varIndex_;}
 
   /// return the value of the variable
   inline CouNumber operator () () 
-    {return expression::ubounds_ [varIndex_];}
+  {assert (domain_); return domain_ -> ub (varIndex_);}
 
   /// differentiation
   inline expression *differentiate (int) 
-    {return new exprConst (0.);}
+  {return new exprConst (0.);}
 
   /// dependence on variable set
   inline int dependsOn (int *, int, enum dig_type type = STOP_AT_AUX) 
-    {return 0;}
+  {return 0;}
 
   /// get a measure of "how linear" the expression is:
   virtual inline int Linearity () 
-    {return CONST;}
+  {return CONST;}
 
   /// code for comparisons
-  virtual enum expr_type code ()
-    {return COU_EXPRUBOUND;}
+  virtual inline enum expr_type code ()
+  {return COU_EXPRUBOUND;}
 };
 
 #endif

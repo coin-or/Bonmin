@@ -32,17 +32,17 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
     *olb = new CouNumber [ncols],
     *oub = new CouNumber [ncols];
 
-  // PBe: X is now the NLP solution, but in a low-dimensional
-  // space. We have to get the corresponding point in higher
-  // dimensional space through getAuxs()
+  // X is now the NLP solution, but in a low-dimensional space. We
+  // have to get the corresponding point in higher dimensional space
+  // through getAuxs()
 
   double *X = new double [ncols];
-  CoinCopyN (babInfo -> nlpSolution (), nOrig_, X); 
+  CoinCopyN (babInfo -> nlpSolution (), nOrig_, X);
   getAuxs (X);
 
   // save current bounds
-  CoinCopyN (lb_, ncols, olb);
-  CoinCopyN (ub_, ncols, oub);
+  CoinCopyN (Lb (), ncols, olb);
+  CoinCopyN (Ub (), ncols, oub);
 
   // create a new, fictitious, bound bookkeeping structure
   t_chg_bounds *f_chg = new t_chg_bounds [ncols];
@@ -52,11 +52,11 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
     int       objind = Obj (0) -> Body  () -> Index ();
     for (int i=0; i<nOrig_; i++)
       Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-		      "   %2d %+20g %+20g  | %+20g\n",
-		      i, lb_ [i], ub_ [i], X [i]);
+		      "   %2d %+20g [%+20g %+20g]\n",
+		      i, X [i], Lb (i), Ub (i));
     Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 		    "-------------\nAggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
-		    lb_ [objind], getCutOff (), ncols);
+		    Lb (objind), getCutOff (), ncols);
   }
 
   int improved, second, iter = 0;
@@ -71,7 +71,7 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
 
   do {
 
-    improved = 0;  // Pietro: This statement was inside for loop - correct here?
+    improved = 0;
 
     // scan all variables
     for (int i=0; i<ncols; i++) {
@@ -90,10 +90,10 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
 	// if (index == objind) continue; // don't do it on objective function
 
 	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-			"x_%03d:-----------------------------\n  ### tighten left\n", index);
+			"------------- tighten left x%d\n", index);
 
 	// tighten on left
-	if ((X [index] >= lb_ [index] + COUENNE_EPS)
+	if ((X [index] >= Lb (index) + COUENNE_EPS)
 	    && ((improved = fake_tighten (0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
 	  retval = false;
 	  break;
@@ -101,10 +101,13 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
 
 	second = 0;
 
-	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
+	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+			"------------- tighten right x%d\n", index);
+
+	//Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
 
 	// tighten on right
-	if ((X [index] <= ub_ [index] - COUENNE_EPS)
+	if ((X [index] <= Ub (index) - COUENNE_EPS)
 	    && ((second = fake_tighten (1, index, X, olb, oub, chg_bds, f_chg) < 0))) {
 	  retval = false;
 	  break;
@@ -115,17 +118,20 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
     }
   } while (retval && improved && (iter++ < MAX_ABT_ITER));
 
-  // store new valid bounds into problem, or restore old ones if none changed
-  CoinCopyN (olb, ncols, lb_);
-  CoinCopyN (oub, ncols, ub_);
+  // store new valid bounds, or restore old ones if none changed
+  CoinCopyN (olb, ncols, Lb ());
+  CoinCopyN (oub, ncols, Ub ());
 
   if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
     Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"------------------\n");
     for (int i=0; i<ncols; i++)
-      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"   %2d %+20g %+20g  | %+20g\n", i, lb_ [i], ub_ [i], X [i]);
-    if (!retval) Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"#### infeasible node from aggressive BT\n");
+      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+		      "   %2d %+20g %+20g  | %+20g\n", i, Lb (i), Ub (i), X [i]);
+    if (!retval) Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+				 "Couenne infeasible node from aggressive BT\n");
   }
 
+  delete [] X;
   delete [] f_chg;
   delete [] olb;
   delete [] oub;
@@ -135,13 +141,12 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
     int       objind = Obj (0) -> Body  () -> Index ();
     Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 		    "-------------\ndone Aggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
-		    lb_ [objind], getCutOff (), ncols);
+		    Lb (objind), getCutOff (), ncols);
     for (int i=0; i<nOrig_; i++)
       Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 		      "   %2d %+20g %+20g  | %+20g\n",
-		      i, lb_ [i], ub_ [i], X [i]);
+		      i, Lb (i), Ub (i), X [i]);
   }
-
 
   return retval;// && btCore (psi, cs, chg_bds, babInfo, true); // !!!
   //return retval && btCore (psi, cs, chg_bds, babInfo, true);

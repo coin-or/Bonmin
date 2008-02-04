@@ -24,18 +24,18 @@ class exprMul: public exprOp {
   /// Constructor
   exprMul (expression **, int);
 
-  /// constructor with two arguments
+  /// Constructor with two arguments
   exprMul (expression *, expression *);
 
-  /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-    {return new exprMul (clonearglist (variables), nargs_);}
+  /// Cloning method
+  expression *clone (Domain *d = NULL) const
+  {return new exprMul (clonearglist (d), nargs_);}
 
-  /// print operator
+  /// Print operator
   std::string printOp () const
-    {return "*";}
+  {return "*";}
 
-  /// method to evaluate the expression
+  /// Method to evaluate the expression
   inline CouNumber operator () ();
 
   /// differentiation

@@ -16,35 +16,6 @@
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
 
-CouNumber CouenneBranchingObject::alpha_ = 0.25;
-
-#define AGGR_MUL 2
-
-
-/// computes a not-too-bad point where to branch, in the "middle" of an interval
-CouNumber midInterval (CouNumber curr, CouNumber l, CouNumber u) {
-
-  CouNumber x = curr;
-
-  if (u < l + COUENNE_EPS)
-    return (0.5 * (l + u));
-
-  if      (x<l) x = l;
-  else if (x>u) x = u;
-
-  CouNumber alpha = CouenneBranchingObject::Alpha ();
-
-  if   (l < -COUENNE_INFINITY / 10)
-    if (u >  COUENNE_INFINITY / 10) return x; // 0.                                    // ]-inf,+inf[
-    else                            return ((x < -COUENNE_EPS) ? (AGGR_MUL * (-1+x)) : // ]-inf,u]
-					    (x >  COUENNE_EPS) ? 0. : -AGGR_MUL);
-  else
-    if (u >  COUENNE_INFINITY / 10) return ((x >  COUENNE_EPS) ? (AGGR_MUL *  (1+x)) : // [l,+inf[
-					    (x < -COUENNE_EPS) ? 0. :  AGGR_MUL);
-    else                            return alpha * x + (1. - alpha) * (l + u) / 2.;    // [l,u]
-}
-
-
 /** \brief Constructor. 
  *
  * Get a variable as an argument and set value_ through a call to
@@ -60,7 +31,7 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
                  ((way == TWO_RIGHT)     ? 1 : 
                  ((CoinDrand48 () < 0.5) ? 0 : 1));
 
-  CouNumber x = (*variable_) ();//expression::Variable (index_); // current solution
+  CouNumber x = (*variable_) ();
 
   if (fabs (brpoint) < COUENNE_INFINITY) 
     x = brpoint;
@@ -84,11 +55,13 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
   //  assert (fabs (u-l) > COUENNE_EPS);
 
   CouNumber lb, ub;
-
   var -> getBounds (lb, ub);
 
-  value_ = midInterval (x, lb, ub);//(*(var -> Lb ())) (), (*(var -> Ub ())) ());
-  //  value_ = midInterval (x, expression::Lbound (index_), expression::Ubound (index_));
+  value_ = x;
+
+  // normalize w.r.t. interval (i.e. do not branch too close to bounds)
+  if      ((value_ - lb) / (ub-lb) < closeToBounds) value_ = lb + (ub-lb) * closeToBounds;
+  else if ((ub - value_) / (ub-lb) < closeToBounds) value_ = ub + (lb-ub) * closeToBounds;
 
   //  if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
   jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 
@@ -96,9 +69,6 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
 		    variable_ -> Index (),
 		    value_,
 		    x, lb, ub,
-		    //expression::Variable (index_),
-		    //expression::Lbound   (index_),
-		    //expression::Ubound   (index_),
 		    firstBranch_);
 }
 
@@ -126,22 +96,20 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     u    = solver -> getColUpper () [index],
     brpt = value_;
 
-  if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
-    if (way) {
-      if      (value_ < l)             
-	jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		       "Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
-      else if (value_ < l+COUENNE_EPS) 
-	jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		       "## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
-    } else {
-      if      (value_ > u)             
-	jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		       "Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
-      else if (value_ > u+COUENNE_EPS) 
-	jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		       "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
-    }
+  if (way) {
+    if      (value_ < l)             
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
+		     "Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
+    else if (value_ < l+COUENNE_EPS) 
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
+		     "## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
+  } else {
+    if      (value_ > u)             
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
+		     "Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
+    else if (value_ > u+COUENNE_EPS) 
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
+		     "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
   }
 
   if (brpt < l) brpt = l;

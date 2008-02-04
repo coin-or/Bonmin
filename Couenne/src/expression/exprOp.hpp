@@ -16,6 +16,7 @@
 #include "CouenneTypes.hpp"
 
 class CouenneProblem;
+class Domain;
 
 /// general n-ary operator-type expression: requires argument
 /// list. All non-unary and non-leaf operators, i.e., sum,
@@ -52,13 +53,13 @@ class exprOp: public expression {
 
   /// Copy constructor: only allocate space for argument list, which
   /// will be copied with clonearglist()
-  exprOp (const exprOp &e, const std::vector <exprVar *> *variables = NULL):
+  exprOp (const exprOp &e, Domain *d = NULL):
     arglist_ (new expression * [e.nArgs ()]),
     nargs_   (e.nArgs ()) {}
 
-  /// cloning method
-  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprOp (*this, variables);}
+  /// cloning method -- must go
+  virtual expression *clone (Domain *d = NULL) const
+  {return new exprOp (*this, d);}
 
   /// return argument list
   inline expression **ArgList () const 
@@ -88,11 +89,11 @@ class exprOp: public expression {
   virtual expression *simplify ();
 
   /// clone argument list (for use with clone method
-  expression **clonearglist (const std::vector <exprVar *> *variables = NULL) const {
+  expression **clonearglist (Domain *d = NULL) const {
     if (nargs_) {
       expression **al = new expression * [nargs_];
       for (register int i=0; i<nargs_; i++)
-	al [i] = arglist_ [i] -> clone (variables);
+	al [i] = arglist_ [i] -> clone (d);
       return al;
     } else return NULL;
   }
@@ -113,7 +114,7 @@ class exprOp: public expression {
   {printf ("### Warning: called empty exprOp::getFixVar()\n"); return arglist_ [0];}
 
   /// return code to classify type of expression
-  virtual enum expr_type code ()
+  virtual inline enum expr_type code ()
   {return COU_EXPROP;}
 
   /// is this expression integer?
@@ -134,6 +135,12 @@ class exprOp: public expression {
 
   /// replace variable with other
   virtual void replace (exprVar *, exprVar *);
+
+  /// return domain of expression
+  Domain *domain ();
+
+  /// empty function to redirect variables to proper variable vector
+  virtual void realign (const CouenneProblem *p);
 };
 
 #endif

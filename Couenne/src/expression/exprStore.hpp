@@ -31,9 +31,9 @@ class exprStore: public exprCopy {
   exprStore (expression *copy):
     exprCopy (copy) {}
 
-  /// Store constructor
-  exprStore (const exprStore &e, const std::vector <exprVar *> *variables = NULL):
-    exprCopy (e, variables) {
+  /// Store constructor -- Must go
+  exprStore (const exprStore &e, Domain *d = NULL):
+    exprCopy (e, d) {
     //copy_  = e.Original () -> clone ();
   }
 
@@ -41,13 +41,21 @@ class exprStore: public exprCopy {
   virtual ~exprStore () 
   {copy_ = NULL;}
 
+  /// I/O -- Must go
+  //virtual void print (std::ostream &out = std::cout, 
+  //bool descend      = false) const
+  //{out << "<"; copy_ -> print (out, descend); out << ">"; }
+
   /// Cloning method
-  virtual expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprStore (*this, variables);}
+  virtual inline expression *clone (Domain *d = NULL) const
+  {return new exprStore (*this, d);}
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
   {return (copy_ -> Value ());}
+
+  /// empty function to redirect variables to proper variable vector
+  virtual void realign (const CouenneProblem *p);
 };
 
 #endif

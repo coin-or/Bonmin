@@ -15,30 +15,31 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
   int nchg = 0; //< number of bounds changed for propagation
 
-  /*if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {  
-    Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"=====================implied\n");
+  if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {  
+    Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"  implied=====================\n  ");
     int j=0;
     for (int i=0; i < nVars (); i++) 
       if (variables_ [i] -> Multiplicity () > 0) {
 	Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
 			"x_%03d [%+10g %+10g] ", i, 
-			expression::Lbound (i),
-			expression::Ubound (i));
-	if (!(++j % 6)) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
+			domain_.lb (i),
+			domain_.ub (i));
+	if (!(++j % 6)) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n  ");
       }
     if (j % 6) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
-    }*/
+    }
 
   for (int ii = nVars (); ii--;) {
 
     int i = numbering_ [ii];
 
-    if (variables_ [i] -> Type () == AUX) {
+    if ((variables_ [i] -> Type () == AUX) &&
+	(variables_ [i] -> Multiplicity () > 0)) {
 
-      if (lb_ [i] > ub_ [i] + COUENNE_EPS) {
+      if (Lb (i) > Ub (i) + COUENNE_EPS) {
 	Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
 			"implied bounds: w_%d has infeasible bounds [%g,%g]\n", 
-			i, lb_ [i], ub_ [i]);
+			i, Lb (i), Ub (i));
 	return -1;
       }
 
@@ -70,7 +71,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 	u0 = ub_ [i];*/
 
       if (variables_ [i] -> Image () -> impliedBound 
-	  (variables_ [i] -> Index (), lb_, ub_, chg_bds)) {
+	  (variables_ [i] -> Index (), Lb (), Ub (), chg_bds)) {
 
 	/*if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
 	  // todo: send all output through journalist
@@ -146,6 +147,10 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
     auxiliaries_ [i] -> Image () -> print (std::cout); fflush (stdout);
     printf ("\n");
   }*/
+
+  if (nchg)
+    Jnlst () -> Printf (J_VECTOR, J_BOUNDTIGHTENING,
+			"  implied bounds: %d changes\n", nchg);
 
   return nchg;
 }

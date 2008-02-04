@@ -17,6 +17,9 @@
 #include "exprQuad.hpp"
 #include "lqelems.hpp"
 
+//#define DEBUG
+
+const CouNumber default_alpha = 0.2;
 
 /// Constructor with information for branching point selection strategy
 CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
@@ -27,12 +30,10 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
   brPts_     (NULL),
   whichWay_  (BRANCH_NONE),
   strategy_  (MID_INTERVAL),
-  jnlst_     (jnlst) {
+  jnlst_     (jnlst),
+  alpha_     (default_alpha) {
 
-  if (ref -> Type () == VAR) {
-    printf ("Couenne error: CouenneObject cannot be defined on original variables\n");
-    exit (-1);
-  }
+  assert (ref -> Type () == AUX);
 
   if (base) {
 
@@ -41,8 +42,64 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 
     if      (brtype == "balanced")  strategy_ = BALANCED;
     else if (brtype == "min-area")  strategy_ = MIN_AREA;
-    else if (brtype == "mid-point") strategy_ = MID_INTERVAL;
+    else if (brtype == "mid-point") {
+      strategy_ = MID_INTERVAL;
+      base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
+    }
+
+    // accept options for branching rules specific to each operator
+
+    std::string br_operator = "";
+
+    switch (ref -> Image () -> code ()) {
+
+    case COU_EXPRPOW: {
+
+      // begin with default value in case specific exponent are not given
+      base -> options () -> GetStringValue ("branch_pt_select_pow", brtype, "couenne.");
+
+      CouNumber expon = ref -> Image () -> ArgList () [1] -> Value ();
+
+      if      (fabs (expon - 2.) < COUENNE_EPS) br_operator = "sqr";
+      else if (fabs (expon - 3.) < COUENNE_EPS) br_operator = "cube";
+      else if (expon             < 0.)          br_operator = "negpow";
+      else                                      br_operator = "pow";
+    } break;
+
+    case COU_EXPRMUL: 
+      br_operator = (ref -> Image () -> ArgList () [0] -> Index () !=
+		     ref -> Image () -> ArgList () [1] -> Index ()) ?
+	"prod" : "sqr";
+      break;
+    case COU_EXPRINV: br_operator = "negpow"; break;
+    case COU_EXPRDIV: br_operator = "div"; break;
+    case COU_EXPRLOG: br_operator = "log"; break;
+    case COU_EXPREXP: br_operator = "exp"; break;
+    case COU_EXPRSIN: br_operator = "sin"; break;
+    case COU_EXPRCOS: br_operator = "cos"; break;
+    default:;
+    }
+
+    if (br_operator != "") {
+      // read option
+      char select [40];
+      sprintf (select, "branch_pt_select_%s", br_operator.c_str ());
+      base -> options () -> GetStringValue (select, brtype, "couenne.");
+
+      if      (brtype == "balanced")  strategy_ = BALANCED;
+      else if (brtype == "min-area")  strategy_ = MIN_AREA;
+      else if (brtype == "mid-point") {
+	strategy_ = MID_INTERVAL;
+	base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
+      }
+    }
   }
+
+  /*printf ("created object: "); reference_ -> print (); 
+  printf (" := "); reference_ -> Image () -> print ();
+  printf (" with %s strategy\n", 
+	  (strategy_ == BALANCED) ? "balanced" : 
+	  (strategy_ == MIN_AREA) ? "min-area" : "mid-point");*/
 }
 
 
@@ -53,7 +110,8 @@ CouenneObject::CouenneObject (const CouenneObject &src):
   brPts_     (NULL),
   whichWay_  (src.whichWay_),
   strategy_  (src.strategy_),
-  jnlst_     (src.jnlst_) {
+  jnlst_     (src.jnlst_),
+  alpha_     (src.alpha_) {
 
   if (src.brPts_) {
 
@@ -125,11 +183,10 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
 
     exprGroup *e = dynamic_cast <exprGroup *> (expr);
 
-    const exprGroup::lincoeff &lcoe = e -> lcoeff ();
+    exprGroup::lincoeff &lcoe = e -> lcoeff ();
 
-    for (int n = lcoe.size(), i=0; n--; i++) {
-      //exprGroup::lincoeff::iterator el = lcoe.begin (); el != lcoe.end (); ++el) {
-      int index = lcoe [i]. first -> Index ();
+    for (exprGroup::lincoeff::iterator el = lcoe.begin (); el != lcoe.end (); ++el) {
+      int index = el -> first -> Index ();
       val = info -> solution_ [index];
       solver -> setColLower (index, val-TOL);
       solver -> setColUpper (index, val+TOL);
@@ -175,8 +232,28 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 						 const OsiBranchingInformation *info, 
 						 int way) const {
 
+  OsiBranchingObject *brObj = NULL;
+
   bool isint = (brVar_) && brVar_ -> isInteger (); 
   // (brVarInd_ >= 0) && (si -> isInteger (brVarInd_));
+
+#ifdef DEBUG
+  printf ("  createBranch -------------------\n");
+  for (int i=0; i<reference_ -> domain () -> current () -> Dimension (); i++)
+    printf ("  %4d %20.4g [%20.4g %20.4g] ---> %20.4g [%20.4g %20.4g]\n", i,
+	    reference_ -> domain () -> x  (i),
+	    reference_ -> domain () -> lb (i),
+	    reference_ -> domain () -> ub (i),
+	    info -> solution_ [i],
+	    info -> lower_    [i],
+	    info -> upper_    [i]);
+#endif
+
+  reference_ -> domain () -> push 
+    (reference_ -> domain () -> current () -> Dimension (),
+     info -> solution_,
+     info -> lower_,
+     info -> upper_);
 
   // way has suggestion from CouenneObject::infeasibility(), but not
   // as set in infeasibility, so we use the one stored in member
@@ -218,7 +295,6 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
     }
 #endif
 
-
   if (brVar_) // if applied latest selectBranching
 
     switch (way) {
@@ -229,7 +305,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
       jnlst_->Printf(J_DETAILED, J_BRANCHING, 
 		     "2way Branch x%d at %g [%d] (%d)\n", 
 		     brVar_ -> Index (), *brPts_, way, isint);
-      return new CouenneBranchingObject (jnlst_, brVar_, way, *brPts_);
+      brObj = new CouenneBranchingObject (jnlst_, brVar_, way, *brPts_);
+      break;
     case THREE_LEFT:
     case THREE_CENTER:
     case THREE_RIGHT:
@@ -237,73 +314,104 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
       jnlst_->Printf(J_DETAILED, J_BRANCHING, 
 		     "3Way Branch x%d @ %g ][ %g [%d] (%d)\n", 
 		     brVar_ -> Index (), *brPts_, brPts_ [1], way, isint);
-      return new CouenneThreeWayBranchObj (jnlst_, brVar_, brPts_ [0], brPts_ [1], way);
+      brObj = new CouenneThreeWayBranchObj (jnlst_, brVar_, brPts_ [0], brPts_ [1], way);
+      break;
     default: 
       printf ("CouenneObject::createBranch(): way=%d has no sense\n", way);
       exit (-1);
     }
 
-  // if selectBranch returned -1, apply default branching rule
+  if (!brObj) {
 
-  if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
-    // we should pipe all output through journalist
-    jnlst_->Printf(J_DETAILED, J_BRANCHING, "CO::createBranch: ");
-    reference_ -> print (std::cout);                              printf (" = ");
-    reference_ -> Image () -> print (std::cout); fflush (stdout); printf (" --> branch on ");
-    reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
-  }
+    // if selectBranch returned -1, apply default branching rule
 
-  // constructor uses actual values of variables and bounds, update them
-  expression::update (const_cast <CouNumber *> (info -> solution_),
-		      const_cast <CouNumber *> (info -> lower_),
-		      const_cast <CouNumber *> (info -> upper_));
+    if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
+      // we should pipe all output through journalist
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "CO::createBranch: ");
+      reference_ -> print (std::cout);                              printf (" = ");
+      reference_ -> Image () -> print (std::cout); fflush (stdout); printf (" --> branch on ");
+      reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
+    }
 
-  // change the value of delta to reflect the branching operations
-  // that will take place. This implies repeatedly faking generation
-  // of convexification cuts for different branching points until we
-  // have a good branching point. 
-  //
-  // The infeasibility returned is the minimum of the distances from
-  // the current point to the two new convexifications, which is the
-  // function that we want to maximize.
+    // change the value of delta to reflect the branching operations
+    // that will take place. This implies repeatedly faking generation
+    // of convexification cuts for different branching points until we
+    // have a good branching point. 
+    //
+    // The infeasibility returned is the minimum of the distances from
+    // the current point to the two new convexifications, which is the
+    // function that we want to maximize.
 
-  expression *depvar = reference_ -> Image () -> getFixVar ();
+    expression *depvar = reference_ -> Image () -> getFixVar ();
 
-  // Create a two-way branching object according to finiteness of the
-  // intervals. For now only check if argument bounds are finite.
+    // Create a two-way branching object according to finiteness of the
+    // intervals. For now only check if argument bounds are finite.
 
-  int ref_ind = reference_ -> Index ();
+    int ref_ind = reference_ -> Index ();
 
-  CouNumber xr = info -> solution_ [ref_ind],
-            lr = info -> lower_    [ref_ind],
-            ur = info -> upper_    [ref_ind];
+    CouNumber 
+      xr = info -> solution_ [ref_ind],
+      lr = info -> lower_    [ref_ind],
+      ur = info -> upper_    [ref_ind];
 
-  int index = depvar ? (depvar -> Index ()) : -1;
+    int index = depvar ? (depvar -> Index ()) : -1;
 
-  if (index >= 0) {
+    if (index >= 0) {
 
-    CouNumber x  = info -> solution_ [index],
-              l  = info -> lower_    [index],
-              u  = info -> upper_    [index];
-    /*
-    if (((x-l > COUENNE_LARGE_INTERVAL) &&
-	 (u-x > COUENNE_LARGE_INTERVAL)) 
+      CouNumber 
+	x  = info -> solution_ [index],
+	l  = info -> lower_    [index],
+	u  = info -> upper_    [index];
+      /*
+	if (((x-l > COUENNE_LARGE_INTERVAL) &&
+	(u-x > COUENNE_LARGE_INTERVAL)) 
 	|| 
 	(((x-l > COUENNE_LARGE_INTERVAL) ||
-	  (u-x > COUENNE_LARGE_INTERVAL)) && 
-	 ((x-l < COUENNE_NEAR_BOUND) ||
-	  (u-x < COUENNE_NEAR_BOUND))))
-      return new CouenneThreeWayBranchObj (depvar, x, l, u);
-    */
+	(u-x > COUENNE_LARGE_INTERVAL)) && 
+	((x-l < COUENNE_NEAR_BOUND) ||
+	(u-x < COUENNE_NEAR_BOUND))))
+	return new CouenneThreeWayBranchObj (depvar, x, l, u);
+      */
 
-    if (((fabs (x-l) > COUENNE_EPS) &&
-	 (fabs (u-x) > COUENNE_EPS) &&
-	 (fabs (u-l) > COUENNE_EPS))
-	|| (fabs (xr-lr) < COUENNE_EPS)
-	|| (fabs (ur-xr) < COUENNE_EPS)
-	|| (fabs (ur-lr) < COUENNE_EPS))
-      return new CouenneBranchingObject (jnlst_, depvar, way, x);  
+      if (((fabs (x-l) > COUENNE_EPS) &&
+	   (fabs (u-x) > COUENNE_EPS) &&
+	   (fabs (u-l) > COUENNE_EPS))
+	  || (fabs (xr-lr) < COUENNE_EPS)
+	  || (fabs (ur-xr) < COUENNE_EPS)
+	  || (fabs (ur-lr) < COUENNE_EPS))
+	brObj = new CouenneBranchingObject (jnlst_, depvar, way, x);  
+    }
+
+    brObj = new CouenneBranchingObject (jnlst_, reference_, way, xr);
   }
 
-  return new CouenneBranchingObject (jnlst_, reference_, way, xr);
+  reference_ -> domain () -> pop ();
+  return brObj;
+}
+
+
+/// computes a not-too-bad point where to branch, in the "middle" of an interval
+CouNumber CouenneObject::midInterval (CouNumber curr, CouNumber l, CouNumber u) const {
+
+  CouNumber x = curr;
+
+  if (u < l + COUENNE_EPS)
+    return (0.5 * (l + u));
+
+  if      (x<l) x = l;
+  else if (x>u) x = u;
+
+  if   (l < -COUENNE_INFINITY / 10)
+    if (u >  COUENNE_INFINITY / 10) return x; // 0.                                    // ]-inf,+inf[
+    else                            return ((x < -COUENNE_EPS) ? (AGGR_MUL * (-1+x)) : // ]-inf,u]
+					    (x >  COUENNE_EPS) ? 0. : -AGGR_MUL);
+  else
+    if (u >  COUENNE_INFINITY / 10) return ((x >  COUENNE_EPS) ? (AGGR_MUL *  (1+x)) : // [l,+inf[
+					    (x < -COUENNE_EPS) ? 0. :  AGGR_MUL);
+    else {                                                                             // [l,u]
+      CouNumber point = alpha_ * x + (1. - alpha_) * (l + u) / 2.;
+      if      ((point-l) / (u-l) < closeToBounds) point = l + (u-l) * closeToBounds;
+      else if ((u-point) / (u-l) < closeToBounds) point = u + (l-u) * closeToBounds;
+      return point;
+    }
 }

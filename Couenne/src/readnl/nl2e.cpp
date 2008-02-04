@@ -129,7 +129,7 @@ expression *CouenneProblem::nl2e (expr *e) {
     //if (j >= nvars)
 
     while (d++ <= 0)
-      addVariable (false);
+      addVariable (false, &domain_);
 
     //printf ("indexD = %d\n", j);
     //printf ("Couenne, warning: unknown variable x%d (>%d+%d=%d), returning new variable.\n",

@@ -57,9 +57,9 @@ exprAux *exprPow::standardize (CouenneProblem *p, bool addAux) {
 					   (new exprLog (new exprClone (arglist_ [0]))))))));
 
     else // expression is x^k, return as it is
-      return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this));
+      return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this, p -> domain ()));
 
-  return (addAux ? (p -> addAuxiliary (ret)) : new exprAux (ret));
+  return (addAux ? (p -> addAuxiliary (ret)) : new exprAux (ret, p -> domain ()));
 }
 
 

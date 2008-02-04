@@ -47,8 +47,8 @@ class exprSin: public exprUnary {
     exprUnary (al) {} //< non-leaf expression, with argument list
 
   /// cloning method
-  expression *clone (const std::vector <exprVar *> *variables = NULL) const
-  {return new exprSin (argument_ -> clone (variables));}
+  expression *clone (Domain *d = NULL) const
+  {return new exprSin (argument_ -> clone (d));}
 
   //// the operator's function
   inline unary_function F () 

@@ -68,14 +68,6 @@ void CouenneProblem::decomposeTerm (expression *term,
 	qmap.insert (xind, col -> first -> Index (), initCoe * col -> second);
       }
     }
-
-  /*    int       *qi = t -> getQIndexI ();
-    int       *qj = t -> getQIndexJ ();
-    CouNumber *qc = t -> getQCoeffs ();
-
-    for (int i = t -> getnQTerms (); i--;)
-    qmap.insert (*qi++, *qj++, initCoe * *qc++);*/
-
   } // NO break here, exprQuad generalizes exprGroup
 
   case COU_EXPRGROUP: { /// a linear term
@@ -86,13 +78,6 @@ void CouenneProblem::decomposeTerm (expression *term,
     //  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
     for (int n = lcoe.size (), i=0; n--; i++)
       lmap.insert (lcoe [i].first -> Index (), initCoe * lcoe [i].second);
-
-
-    /*int       *ind = t -> getIndices ();
-    CouNumber *coe = t -> getCoeffs ();
-
-    for (int i = t -> getnLTerms (); i--;)
-    lmap.insert (*ind++, initCoe * *coe++);*/
 
     c0 += initCoe * t -> getc0 ();
   } // NO break here, exprGroup generalizes exprSum

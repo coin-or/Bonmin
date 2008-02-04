@@ -28,9 +28,23 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
   assert ((reference_ -> Image () -> Linearity () > LINEAR) && 
 	  (reference_ -> Multiplicity () > 0));
 
-  expression::update (const_cast <CouNumber *> (info -> solution_),
-		      const_cast <CouNumber *> (info -> lower_),
-		      const_cast <CouNumber *> (info -> upper_));
+#ifdef DEBUG
+  /*printf ("  infeasibility -------------------\n");
+  for (int i=0; i<reference_ -> domain () -> current () -> Dimension (); i++)
+    printf ("  %4d %20.4g [%20.4g %20.4g] ---> %20.4g [%20.4g %20.4g]\n", i,
+	    reference_ -> domain () -> x  (i),
+	    reference_ -> domain () -> lb (i),
+	    reference_ -> domain () -> ub (i),
+	    info -> solution_ [i],
+	    info -> lower_    [i],
+	    info -> upper_    [i]);*/
+#endif
+
+  reference_ -> domain () -> push 
+    (reference_ -> domain () -> current () -> Dimension (),
+     info -> solution_,
+     info -> lower_,
+     info -> upper_);
 
   // if branched-upon variable has a narrow interval, it is not worth
   // to branch on it
@@ -61,6 +75,9 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
     reference_             -> print (std::cout); std::cout << " = ";
     reference_ -> Image () -> print (std::cout); printf ("\n");
 #endif
+
+    reference_ -> domain () -> pop ();
+
     return 0.;
   }
 
@@ -143,10 +160,13 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info,
 	  , info -> lower_ [BR_TEST_LOG]
 	  , info -> upper_ [BR_TEST_LOG]
 #endif
-);
+	  );
+
   reference_             -> print (std::cout); std::cout << " = ";
   reference_ -> Image () -> print (std::cout); printf ("\n");
 #endif
+
+  reference_ -> domain () -> pop ();
 
   return fabs (delta);
 }

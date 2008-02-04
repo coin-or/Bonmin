@@ -77,16 +77,16 @@ fake_tighten (char direction,  // 0: left, 1: right
 
   CouNumber 
     xcur      = X [index],
-    inner     = xcur,                                                   // point closest to current x
-    outer     = (direction ? oub : olb) [index],                        // point closest to bound
-    fb        = fictBounds (direction, xcur, lb_ [index], ub_ [index]); // starting point
+    inner     = xcur,                                                 // point closest to current x
+    outer     = (direction ? oub : olb) [index],                      // point closest to bound
+    fb        = fictBounds (direction, xcur, Lb (index), Ub (index)); // starting point
 
   // This is a one-dimensional optimization problem between inner and
   // outer, on a monotone function of which we can compute the value
   // (with relative expense) but not the derivative.
 
 #ifdef DEBUG
-  CouNumber curdb     = ((objsense == MINIMIZE) ? lb_ : ub_) [objind];  // current dual bound
+  CouNumber curdb     = ((objsense == MINIMIZE) ? Lb (objind) : Ub (objind));  // current dual bound
   printf ("  x_%d.  x = %10g, lb = %g, cutoff = %g-----------------\n", index,xcur,curdb,getCutOff());
 #endif
 
@@ -101,15 +101,15 @@ fake_tighten (char direction,  // 0: left, 1: right
 	  !direction && (inner < outer)) {
 
 	// apply bound
-	if (direction) {oub[index] = ub_[index] = fb; chg_bds[index].setUpper(t_chg_bounds::CHANGED);}
-	else           {olb[index] = lb_[index] = fb; chg_bds[index].setLower(t_chg_bounds::CHANGED);}
+	if (direction) {oub[index] = Ub (index) = fb; chg_bds[index].setUpper(t_chg_bounds::CHANGED);}
+	else           {olb[index] = Lb (index) = fb; chg_bds[index].setLower(t_chg_bounds::CHANGED);}
 
 	tightened = true;
 
 	// restore initial bound
 	CoinCopyN (chg_bds, ncols, f_chg);
-	CoinCopyN (olb, ncols, lb_);
-	CoinCopyN (oub, ncols, ub_);
+	CoinCopyN (olb, ncols, Lb ());
+	CoinCopyN (oub, ncols, Ub ());
 
 	break;
       }
@@ -119,26 +119,26 @@ fake_tighten (char direction,  // 0: left, 1: right
 	fb = 0.5 * (inner + outer);
     }
 
-    if (direction) {lb_ [index] = fb; f_chg [index].setLower (t_chg_bounds::CHANGED);} 
-    else           {ub_ [index] = fb; f_chg [index].setUpper (t_chg_bounds::CHANGED);}
+    if (direction) {Lb (index) = fb; f_chg [index].setLower (t_chg_bounds::CHANGED);} 
+    else           {Ub (index) = fb; f_chg [index].setUpper (t_chg_bounds::CHANGED);}
 
     //    (direction ? lb_ : ub_) [index] = fb; 
 
 #ifdef DEBUG
     char c1 = direction ? '-' : '>', c2 = direction ? '<' : '-';
     printf ("    #%3d: [%+10g -%c %+10g %c- %+10g] /\\/\\ ",iter,olb[index],c1,fb,c2, oub [index]);
-    printf (" [%10g,%10g]<%g,%g>=> ",lb_[index],ub_[index],CoinMin(inner,outer),CoinMax(inner,outer));
+    printf (" [%10g,%10g]<%g,%g>=> ",Lb (index),Ub (index),CoinMin(inner,outer),CoinMax(inner,outer));
 #endif
 
     bool
       feasible  = btCore (f_chg),            // true if feasible with fake bound
       betterbds = (objsense == MINIMIZE) ?   // true if over cutoff
-        (lb_ [objind] > getCutOff ()) : 
-        (ub_ [objind] < getCutOff ());
+        (Lb (objind) > getCutOff ()) : 
+        (Ub (objind) < getCutOff ());
 
 #ifdef DEBUG
     printf(" [%10g,%10g] lb = %g {fea=%d,btr=%d} ",
-	   lb_[index],ub_[index],lb_[objind],feasible,betterbds);
+	   Lb (index), Ub (index), Lb (objind),feasible,betterbds);
 #endif
 
     if (feasible && !betterbds) {
@@ -148,8 +148,8 @@ fake_tighten (char direction,  // 0: left, 1: right
 
       // restore initial bound
       CoinCopyN (chg_bds, ncols, f_chg);
-      CoinCopyN (olb, ncols, lb_);
-      CoinCopyN (oub, ncols, ub_);
+      CoinCopyN (olb, ncols, Lb ());
+      CoinCopyN (oub, ncols, Ub ());
 
     } else {
 
@@ -160,12 +160,12 @@ fake_tighten (char direction,  // 0: left, 1: right
       if (optimum_ && 
 	  ((!direction &&
 	    (optimum_ [index] >= olb [index]) && 
-	    (optimum_ [index] <= lb_ [index] - COUENNE_EPS)) ||
+	    (optimum_ [index] <= Lb (index) - COUENNE_EPS)) ||
 	   (direction &&
 	    (optimum_ [index] <= oub [index]) && 
-	    (optimum_ [index] >= ub_ [index] + COUENNE_EPS)))) {
+	    (optimum_ [index] >= Ub (index) + COUENNE_EPS)))) {
 	printf ("fake tightening cuts out optimum: x%d=%g in [%g,%g] but not in [%g,%g]\n",
-		index, olb [index], oub [index], lb_ [index], ub_ [index]);
+		index, olb [index], oub [index], Lb (index), Ub (index));
       }
 #endif
 
@@ -193,8 +193,8 @@ fake_tighten (char direction,  // 0: left, 1: right
       //if (!do_not_tighten) {
 
 	// apply bound
-      if (direction) {oub[index]=ub_[index] = fb; chg_bds [index].setUpper (t_chg_bounds::CHANGED);}
-      else           {olb[index]=lb_[index] = fb; chg_bds [index].setLower (t_chg_bounds::CHANGED);}
+      if (direction) {oub[index]=Ub (index) = fb; chg_bds [index].setUpper (t_chg_bounds::CHANGED);}
+      else           {olb[index]=Lb (index) = fb; chg_bds [index].setLower (t_chg_bounds::CHANGED);}
 
       outer = fb; // we have at least a tightened bound, save it 
 
@@ -203,8 +203,8 @@ fake_tighten (char direction,  // 0: left, 1: right
 
       // restore initial bound
       CoinCopyN (chg_bds, ncols, f_chg);
-      CoinCopyN (olb, ncols, lb_);
-      CoinCopyN (oub, ncols, ub_);
+      CoinCopyN (olb, ncols, Lb ());
+      CoinCopyN (oub, ncols, Ub ());
 
       //#if BR_TEST_LOG < 0 // for fair testing
       // check tightened problem for feasibility
@@ -238,7 +238,7 @@ fake_tighten (char direction,  // 0: left, 1: right
   printf ("\n");
   if (tightened) printf ("  [x%2d] pruned %s [%g, %g] -- lb = %g cutoff = %g\n", 
 			 index,direction?"right":"left",
-			 olb[index],oub[index], lb_[objind], getCutOff ());
+			 olb[index],oub[index], Lb (objind), getCutOff ());
 #endif
 
   return tightened ? 1 : 0;
