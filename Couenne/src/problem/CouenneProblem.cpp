@@ -157,6 +157,7 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   doOBBT_    (p. doOBBT_),
   doABT_     (p. doABT_),
   logObbtLev_(p. logObbtLev_),
+  logAbtLev_ (p. logAbtLev_),
   jnlst_     (p.jnlst_) { // needed only in standardize (), unnecessary to update it
 
   for (int i=0; i < p.nVars (); i++)
