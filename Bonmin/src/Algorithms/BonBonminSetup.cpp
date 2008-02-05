@@ -331,7 +331,7 @@ namespace Bonmin
         setPriorities();
         addSos();
         SmartPtr<StrongBranchingSolver> strong_solver = NULL;
-        BonChooseVariable * chooseVariable = new BonChooseVariable(*this);
+        BonChooseVariable * chooseVariable = new BonChooseVariable(*this, nonlinearSolver_);
         switch (varSelection) {
         case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
           strong_solver = new CurvBranchingSolver(nonlinearSolver_);

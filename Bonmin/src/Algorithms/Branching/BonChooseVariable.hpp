@@ -90,9 +90,9 @@ namespace Bonmin
        3 - returning because max time
        
   */
-  int doStrongBranching( OsiSolverInterface * solver, 
-			 OsiBranchingInformation *info,
-			 int numberToDo, int returnCriterion);
+  virtual int doStrongBranching( OsiSolverInterface * solver, 
+				 OsiBranchingInformation *info,
+				 int numberToDo, int returnCriterion);
     /** Criterion applied to sort candidates.*/
     enum CandidateSortCriterion {
       DecrPs = 0,
@@ -124,7 +124,7 @@ namespace Bonmin
       canFixNoCandidate /** Can fix variables but does not have strong branching candidates.*/
     };
     /// Constructor from solver (so we can set up arrays etc)
-    BonChooseVariable (BabSetupBase& b);
+    BonChooseVariable (BabSetupBase& b, const OsiSolverInterface* solver);
 
     /// Copy constructor
     BonChooseVariable (const BonChooseVariable &);
@@ -217,6 +217,8 @@ namespace Bonmin
     /// verbosity level
     int bb_log_level_;
 
+    /** Stores strong branching results.*/
+    vector<HotInfo> results_;
   private:
     /** Default Constructor, forbiden for some reason.*/
     BonChooseVariable ();
@@ -257,8 +259,6 @@ namespace Bonmin
     int minNumberStrongBranch_;
     /** Stores the pseudo costs. */
     OsiPseudoCosts pseudoCosts_;
-    /** Stores strong branching results.*/
-    vector<HotInfo> results_;
    
     //@}
 

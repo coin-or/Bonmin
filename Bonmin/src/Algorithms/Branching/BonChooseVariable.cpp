@@ -18,12 +18,12 @@ namespace Bonmin
 
   const std::string BonChooseVariable::CNAME = "BonChooseVariable";
 
-  BonChooseVariable::BonChooseVariable(BabSetupBase &b):
-      OsiChooseVariable(const_cast<OsiTMINLPInterface *>(b.nonlinearSolver())),
+  BonChooseVariable::BonChooseVariable(BabSetupBase &b, const OsiSolverInterface* solver):
+      OsiChooseVariable(solver),
+      results_(),
       cbc_model_(NULL),
       only_pseudo_when_trusted_(false),
-      pseudoCosts_(),
-      results_()
+      pseudoCosts_()
   {
     jnlst_ = b.journalist();
     SmartPtr<OptionsList> options = b.options();
@@ -56,6 +56,7 @@ namespace Bonmin
 
   BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
       OsiChooseVariable(rhs),
+      results_(rhs.results_),
       cbc_model_(rhs.cbc_model_),
       only_pseudo_when_trusted_(rhs.only_pseudo_when_trusted_),
       maxmin_crit_no_sol_(rhs.maxmin_crit_no_sol_),
@@ -65,8 +66,7 @@ namespace Bonmin
       numberStrongRoot_(rhs.numberStrongRoot_),
       sortCrit_(rhs.sortCrit_),
       minNumberStrongBranch_(rhs.minNumberStrongBranch_),
-      pseudoCosts_(rhs.pseudoCosts_),
-      results_(rhs.results_)
+      pseudoCosts_(rhs.pseudoCosts_)
   {
     jnlst_ = rhs.jnlst_;
     bb_log_level_ = rhs.bb_log_level_;
@@ -252,7 +252,7 @@ namespace Bonmin
     if (numberObjects>pseudoCosts_.numberObjects()) {
       //std::cout<<"Number objects "<<numberObjects<<std::endl;
       //AW : How could that ever happen?  Right now, all old content is deleted!
-      assert(false && "Right now, all old content is deleted!");
+      //   assert(false && "Right now, all old content is deleted!");
       // redo useful arrays
       pseudoCosts_.initialize(numberObjects);
     }
