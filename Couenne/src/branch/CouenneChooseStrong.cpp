@@ -47,9 +47,6 @@ namespace Bonmin {
 					  OsiBranchingInformation *info,
 					  int numberToDo, int returnCriterion)
   {
-  
-    printf("GOT HERE!!!!\n");
-
     // Might be faster to extend branch() to return bounds changed
     double * saveLower = NULL;
     double * saveUpper = NULL;
