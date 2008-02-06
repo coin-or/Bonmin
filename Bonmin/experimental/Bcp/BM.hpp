@@ -71,6 +71,17 @@ public:
         DecreasingSortInSetupList,
         PreferHighCombinationInBranching,
         NumNlpFailureMax,
+
+	// twice the number of candidates if all candidates have 2 children.
+	// We want to do SB on at least this many (if there are this many)
+	SBNumBranchesInRoot,
+	
+	SBNumBranchesInTree,
+	// The level where (and below) there are no min number of branches to
+	// be considered and SB need not be done (we can use pseudo costs
+	// instead) 
+	SBMaxLevel,
+
         end_of_int_params
     };
     enum dbl_params {
@@ -109,8 +120,8 @@ public:
   inline void incNumberNodeSolves() {
     numberNodeSolves_++;
   }
-  inline void incNumberSbSolves() {
-    numberSbSolves_++;
+  inline void incNumberSbSolves(int cnt) {
+    numberSbSolves_ += cnt;
   }
   inline void incNumberFixed() {
     numberFixed_++;
@@ -136,6 +147,23 @@ private:
   double sumStrongBranchingListPositions_;
 };
 
+//#############################################################################
+
+// Data needed to be sent off to do strong branching
+
+struct BM_BranchData {
+  // These are the input for doing the branching
+  int changeType;
+  int objInd;
+  int colInd;
+  double solval;
+  double bd;
+  // These are the results of doing the branching
+  int status;
+  double objval;
+  int iter;
+  double time;
+};
 
 //#############################################################################
 
@@ -385,17 +413,15 @@ public:
     int sort_objects(OsiBranchingInformation& branchInfo,
 		     Bonmin::BonChooseVariable* choose, int& branchNum);
     void clear_SB_results();
-    void send_one_SB_data(int fix_size, int changeType, int objInd, int colInd,
-			  double solval, double bd, int pid);
-    void solve_first_candidate(OsiBranchingInformation& branchInfo,
-			       OsiSolverInterface* solver,
-			       const CoinWarmStart* ws,
-			       int downUp);
-    int send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
-				     OsiSolverInterface* solver,
-				     const BCP_warmstart* ws,
-				     const int* pids, const int pidNum);
-    void receive_distributed_SB_result();
+    void collect_branch_data(OsiBranchingInformation& branchInfo,
+			     OsiSolverInterface* solver,
+			     const int branchNum,
+			     BM_BranchData* branchData);
+    void do_distributed_SB(OsiBranchingInformation& branchInfo,
+			   OsiSolverInterface* solver,
+			   const CoinWarmStart* cws,
+			   const int branchNum,
+			   const int* pids, const int pidNum);
     bool isBranchFathomable(int status, double obj);
     int process_SB_results(OsiBranchingInformation& branchInfo,
 			   OsiSolverInterface* solver,

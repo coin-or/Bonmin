@@ -320,32 +320,133 @@ BM_lp::clear_SB_results()
 //-----------------------------------------------------------------------------
 
 void
-BM_lp::send_one_SB_data(int fixed_size, int changeType, int objInd, int colInd,
-			double solval, double bd, int pid)
+BM_lp::collect_branch_data(OsiBranchingInformation& branchInfo,
+			   OsiSolverInterface* solver,
+			   const int branchNum,
+			   BM_BranchData* branchData)
 {
-  bm_buf.set_size(fixed_size);
-  bm_buf.pack(changeType);
-  bm_buf.pack(objInd);
-  bm_buf.pack(colInd);
-  bm_buf.pack(solval);
-  bm_buf.pack(bd);
-  send_message(pid, bm_buf);
-  BM_SB_result& sbres = sbResult_[objInd];
-  sbres.objInd = objInd;
-  if (changeType == BM_Var_DownBranch) {
-    sbres.varChange[0] = solval - bd;
-  } else {
-    sbres.varChange[1] = bd - solval;
+  int i;
+  int b = 0;
+  for (i = 0; i < infNum_; ++i) {
+    /* FIXME: think about SOS */
+    const int objInd = infInd_[i];
+    const int colInd = solver->object(objInd)->columnNumber();
+    const double val = branchInfo.solution_[colInd];
+    branchData[b].changeType = BM_Var_DownBranch;
+    branchData[b].objInd = objInd;
+    branchData[b].colInd = colInd;
+    branchData[b].solval = val;
+    branchData[b].bd = floor(val);
+    BM_SB_result& sbres = sbResult_[objInd];
+    sbres.objInd = objInd;
+    sbres.varChange[0] = val - floor(val);
+    ++b;
+    if (b == branchNum) {
+      return;
+    }
+    branchData[b].changeType = BM_Var_UpBranch;
+    branchData[b].objInd = objInd;
+    branchData[b].colInd = colInd;
+    branchData[b].solval = val;
+    branchData[b].bd = ceil(val);
+    sbres.varChange[1] = ceil(val) - val;
+    ++b;
+    if (b == branchNum) {
+      return;
+    }
+  }
+  for (i = 0; i < feasNum_; ++i) {
+    const int objInd = feasInd_[i];
+    const int colInd = solver->object(objInd)->columnNumber();
+    const double val = branchInfo.solution_[colInd];
+    const double lb = branchInfo.lower_[colInd];
+    const double ub = branchInfo.upper_[colInd];
+    if (floor(val+0.5) > lb) { // not at its lb
+      branchData[b].changeType = BM_Var_DownBranch;
+      branchData[b].objInd = objInd;
+      branchData[b].colInd = colInd;
+      branchData[b].solval = val;
+      branchData[b].bd = floor(val - 0.5);
+      ++b;
+      if (b == branchNum) {
+	return;
+      }
+    }
+    if (ceil(val-0.5) < ub) { // not at its ub
+      branchData[b].changeType = BM_Var_UpBranch;
+      branchData[b].objInd = objInd;
+      branchData[b].colInd = colInd;
+      branchData[b].solval = val;
+      branchData[b].bd = ceil(val + 0.5);
+      ++b;
+      if (b == branchNum) {
+	return;
+      }
+    }
   }
 }
 
 //-----------------------------------------------------------------------------
 
-int
-BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
-				    OsiSolverInterface* solver,
-				    const BCP_warmstart* ws,
-				    const int* pids, const int pidNum)
+void
+BM_solve_branches(OsiSolverInterface* solver, const CoinWarmStart* cws,
+		  const int numBranch, BM_BranchData* bD)
+{
+  for (int i = 0; i < numBranch; ++i) {
+    double t = CoinWallclockTime();
+    const int ind = bD[i].colInd;
+    const int field = bD[i].changeType == BM_Var_UpBranch ? 1 : 0;
+    const double old_lb = solver->getColLower()[ind];
+    const double old_ub = solver->getColUpper()[ind];
+    if (field == 0) {
+      solver->setColUpper(ind, bD[i].bd);
+    } else {
+      solver->setColLower(ind, bD[i].bd);
+    }
+    if (cws) {
+      solver->setWarmStart(cws);
+      solver->resolve();
+    } else {
+      solver->initialSolve();
+    }
+    bD[i].status =
+      (solver->isAbandoned()              ? BCP_Abandoned : 0) |
+      (solver->isProvenOptimal()          ? BCP_ProvenOptimal : 0) |
+      (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
+    bD[i].objval =
+      (bD[i].status & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
+    bD[i].iter = solver->getIterationCount();
+    solver->setColBounds(ind, old_lb, old_ub);
+    bD[i].time = CoinWallclockTime() - t;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void
+BM_register_branch_results(const int numBranch, const BM_BranchData* bD,
+			   BM_SB_result* sbResults)
+{
+  for (int i = 0; i < numBranch; ++i) {
+    const int field = bD[i].changeType == BM_Var_UpBranch ? 1 : 0;
+    BM_SB_result& sbres = sbResults[bD[i].objInd];
+    sbres.objInd           = bD[i].objInd;
+    sbres.branchEval      |= field == 0 ? 1 : 2;
+    sbres.status[field]    = bD[i].status;
+    sbres.objval[field]    = bD[i].objval;
+    sbres.iter[field]      = bD[i].iter;
+    sbres.varChange[field] = fabs(bD[i].solval - bD[i].bd);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void
+BM_lp::do_distributed_SB(OsiBranchingInformation& branchInfo,
+			 OsiSolverInterface* solver,
+			 const CoinWarmStart* cws,
+			 const int branchNum,
+			 const int* pids, const int pidNum)
 {
   const double * clb = solver->getColLower();
   const double * cub = solver->getColUpper();
@@ -357,138 +458,77 @@ BM_lp::send_data_for_distributed_SB(OsiBranchingInformation& branchInfo,
   bm_buf.pack(cub, numCols);
   bm_buf.pack(branchInfo.objectiveValue_);
   bm_buf.pack(branchInfo.cutoff_);
-  bool has_ws = ws != NULL;
+  bool has_ws = cws != NULL;
   bm_buf.pack(has_ws);
   if (has_ws) {
+    BCP_lp_prob* p = getLpProblemPointer();
+    CoinWarmStart* cws_tmp = cws->clone(); // the next call destroys it
+    BCP_warmstart* ws = cws ? BCP_lp_convert_CoinWarmStart(*p, cws_tmp) : NULL;
     BCP_pack_warmstart(ws, bm_buf);
+    delete ws;
   }
   
   const int fixed_size = bm_buf.size();
-  // We got a few procs to work with, so do distributed strong branching
-  int pidCnt = 0;
 
-  /* For the 0-th object just send out the up-branch, the down branch will be
-     processed locally. */
-  {
-    const int ind = solver->object(infInd_[0])->columnNumber();
-    const double val = branchInfo.solution_[ind];
-    send_one_SB_data(fixed_size, BM_Var_UpBranch, infInd_[0], ind,
-		     val, ceil(val), pids[pidCnt++]);
-  }
-  int i;
-  for (i = 1; i < infNum_ && pidCnt < pidNum; ++i) {
-    /* FIXME: think about SOS */
-    const int ind = solver->object(infInd_[i])->columnNumber();
-    const double val = branchInfo.solution_[ind];
-    send_one_SB_data(fixed_size, BM_Var_DownBranch, infInd_[i], ind,
-		     val, floor(val), pids[pidCnt++]);
-    assert(pidCnt < pidNum);
-    send_one_SB_data(fixed_size, BM_Var_UpBranch, infInd_[i], ind,
-		     val, ceil(val), pids[pidCnt++]);
-  }
-  i = 0;
-  while (pidCnt < pidNum) {
-    print(ifprint2, "running through feas: i: %i   feasInd_[i]: %i\n",
-	  i, feasInd_[i]);
-    const int ind = solver->object(feasInd_[i])->columnNumber();
-    const double lb = branchInfo.lower_[ind];
-    const double ub = branchInfo.upper_[ind];
-    const double val = branchInfo.solution_[ind];
-    if (floor(val+0.5) > lb) { // not at its lb
-      send_one_SB_data(fixed_size, BM_Var_DownBranch, feasInd_[i], ind,
-		       val, floor(val - 0.5), pids[pidCnt++]);
-      if (pidCnt == pidNum) {
-	break;
-      }
+  // collect what we'll need to send off data
+  BM_BranchData* branchData = new BM_BranchData[branchNum];
+  collect_branch_data(branchInfo, solver, branchNum, branchData);
+
+  // We have branchNum branches to process on pidNum+1 (the last is the local
+  // process) processes.
+  int branchLeft = branchNum;
+  BM_BranchData* bD = branchData;
+  for (int pidLeft = pidNum; pidLeft > 0; --pidLeft) {
+    int numSend = branchLeft / pidLeft;
+    if (numSend * pidLeft < branchLeft) {
+      ++numSend;
     }
-    if (ceil(val-0.5) < ub) { // not at its ub
-      send_one_SB_data(fixed_size, BM_Var_UpBranch, feasInd_[i], ind,
-		       val, ceil(val + 0.5), pids[pidCnt++]);
+    bm_buf.set_size(fixed_size);
+    // Now pack where we are in branchData and pack numSend branches
+    int location = bD - branchData;
+    bm_buf.pack(location);
+    bm_buf.pack(numSend);
+    for (int s = 0; s < numSend; ++s) {
+      bm_buf.pack(bD[s].changeType);
+      bm_buf.pack(bD[s].objInd);
+      bm_buf.pack(bD[s].colInd);
+      bm_buf.pack(bD[s].solval);
+      bm_buf.pack(bD[s].bd);
     }
-    ++i;
+    send_message(pids[pidLeft-1], bm_buf);
+    bD += numSend;
+    branchLeft -= numSend;
   }
-  bm_buf.clear();
-  return pidCnt;
-}
+  assert(branchNum/(pidNum+1) == branchLeft);
 
-//-----------------------------------------------------------------------------
+  // Process the leftover branches locally
+  /* FIXME: this assumes that the solver is the NLP solver. Maybe we should use
+     the nlp solver in BM_lp */
+  BM_solve_branches(solver, cws, branchLeft, bD);
+  bm_stats.incNumberSbSolves(branchLeft);
+  BM_register_branch_results(branchLeft, bD, sbResult_);
 
-/* FIXME: this assumes that the solver is the NLP solver. Maybe we should use
-   the nlp solver in BM_lp */
-void
-BM_lp::solve_first_candidate(OsiBranchingInformation& branchInfo,
-			     OsiSolverInterface* solver,
-			     const CoinWarmStart* cws, int downUp)
-{
-  BM_SB_result& sbres = sbResult_[infInd_[0]];
-  sbres.objInd = infInd_[0];
-  const int ind = solver->object(infInd_[0])->columnNumber();
-  const double val = branchInfo.solution_[ind];
-  if (downUp == 0) {
-    double t = CoinWallclockTime();
-    const double old_bd = solver->getColUpper()[ind];
-    solver->setColUpper(ind, floor(val));
-    if (cws) {
-      solver->setWarmStart(cws);
+  // Receive the results from the other processes
+  int numResults = branchLeft;
+  while (numResults < branchNum) {
+    bm_buf.clear();
+    receive_message(BCP_AnyProcess, bm_buf, BCP_Msg_User);
+    bm_buf.unpack(tag);
+    assert(tag == BM_StrongBranchResult);
+    int location;
+    int numRes;
+    bm_buf.unpack(location);
+    bm_buf.unpack(numRes);
+    BM_BranchData* bD = branchData + location;
+    for (int i = 0; i < numRes; ++i) {
+      bm_buf.unpack(bD[i].status);
+      bm_buf.unpack(bD[i].objval);
+      bm_buf.unpack(bD[i].iter);
+      bm_buf.unpack(bD[i].time);
     }
-    solver->resolve();
-    sbres.branchEval |= 1;
-    sbres.status[0] =
-      (solver->isAbandoned()           ? BCP_Abandoned : 0) |
-      (solver->isProvenOptimal()       ? BCP_ProvenOptimal : 0) |
-      (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
-    sbres.objval[0] =
-      (sbres.status[0] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
-    sbres.iter[0] = solver->getIterationCount();
-    sbres.varChange[0] = val - floor(val);
-    solver->setColUpper(ind, old_bd);
-    sbres.time[0] = CoinWallclockTime() - t;
-  } else {
-    double t = CoinWallclockTime();
-    const double old_bd = solver->getColLower()[ind];
-    solver->setColLower(ind, ceil(val));
-    if (cws) {
-      solver->setWarmStart(cws);
-    }
-    solver->resolve();
-    sbres.branchEval |= 2;
-    sbres.status[1] =
-      (solver->isAbandoned()              ? BCP_Abandoned : 0) |
-      (solver->isProvenOptimal()          ? BCP_ProvenOptimal : 0) |
-      (solver->isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
-    sbres.objval[1] =
-      (sbres.status[1] & BCP_ProvenOptimal) != 0 ? solver->getObjValue() : 0.0;
-    sbres.iter[1] = solver->getIterationCount();
-    sbres.varChange[1] = ceil(val) - val;
-    solver->setColLower(ind, old_bd);
-    sbres.time[1] = CoinWallclockTime() - t;
+    BM_register_branch_results(numRes, bD, sbResult_);
+    numResults += numRes;
   }
-}
-
-//-----------------------------------------------------------------------------
-
-void
-BM_lp::receive_distributed_SB_result()
-{
-  int changeType;
-  int objInd;
-  int colInd;
-  int tag;
-  bm_buf.clear();
-  receive_message(BCP_AnyProcess, bm_buf, BCP_Msg_User);
-  bm_buf.unpack(tag);
-  assert(tag == BM_StrongBranchResult);
-  bm_buf.unpack(changeType);
-  bm_buf.unpack(objInd);
-  BM_SB_result& sbres = sbResult_[objInd];
-  const int field = changeType == BM_Var_UpBranch ? 1 : 0;
-  bm_buf.unpack(colInd);
-  assert(colInd == sbres.colInd);
-  sbres.branchEval |= (changeType == BM_Var_UpBranch ? 2 : 1);
-  bm_buf.unpack(sbres.status[field]);
-  bm_buf.unpack(sbres.iter[field]);
-  bm_buf.unpack(sbres.objval[field]);
-  bm_buf.unpack(sbres.time[field]);
 }
 
 //-----------------------------------------------------------------------------
@@ -687,9 +727,9 @@ BM_lp::process_SB_results(OsiBranchingInformation& branchInfo,
   // At this point best is not -1, create the branching object
   const OsiObject * object = solver->object(infInd_[best]);
   branchObject = object->createBranch(solver, &branchInfo, bestWhichWay);
-  const int ind = object->columnNumber();
   bestSbResult_ = sbResult_ + infInd_[best];
 #if (BM_DEBUG_PRINT != 0)
+  const int ind = object->columnNumber();
   printf("LP %.3f: SBres: node: %i  depth: %i  BRANCH  time: %.3f  evaluated: %i  bvar: %i  val: %f  obj0: %f  obj1: %f  way: %i\n",
 	 t-start_time(), current_index(), current_level(), t-node_start_time, 
 	 evaluated, ind, branchInfo.solution_[ind], 
@@ -718,54 +758,62 @@ BM_lp::try_to_branch(OsiBranchingInformation& branchInfo,
     return 0;
   }
 
-  bm_buf.clear();
-  bm_buf.pack(branchNum-1);
-  send_message(parent(), bm_buf, BCP_Msg_RequestProcessList);
-  bm_buf.clear();
-  receive_message(parent(), bm_buf, BCP_Msg_ProcessList);
-  int* pids = NULL;
-  int pidNum;
-  bm_buf.unpack(pids, pidNum);
+  const bool do_distributed_branching = true;
 
-  clear_SB_results();
+  if (do_distributed_branching) {
 
-  CoinWarmStart* cws = solver->getWarmStart();
-  Bonmin::IpoptWarmStart* iws = dynamic_cast<Bonmin::IpoptWarmStart*>(cws);
-  if (iws && iws->empty()) {
+    bm_buf.clear();
+    bm_buf.pack(branchNum-1);
+    send_message(parent(), bm_buf, BCP_Msg_RequestProcessList);
+    bm_buf.clear();
+    receive_message(parent(), bm_buf, BCP_Msg_ProcessList);
+    int* pids = NULL;
+    int pidNum;
+    bm_buf.unpack(pids, pidNum);
+
+    clear_SB_results();
+
+    // Get the warmstart information
+    CoinWarmStart* cws = solver->getWarmStart();
+    Bonmin::IpoptWarmStart* iws = dynamic_cast<Bonmin::IpoptWarmStart*>(cws);
+    if (iws && iws->empty()) {
+      delete cws;
+      cws = NULL;
+    }
+
+    const int nodeIndex = current_index();
+    if (nodeIndex == 0) {
+      // we are in the root. We want to process all possible branches upto the
+      // parameter value.
+      branchNum = CoinMin(branchNum, par.entry(BM_par::SBNumBranchesInRoot));
+    } else {
+      if (nodeIndex < par.entry(BM_par::SBMaxLevel)) {
+	branchNum = CoinMin(branchNum,
+			    CoinMax(pidNum + 1,
+				    par.entry(BM_par::SBNumBranchesInTree)));
+      } else {
+	branchNum = pidNum > 0 ? pidNum + 1 : 0;
+      }
+    }
+
+    if (branchNum > 0) {
+      do_distributed_SB(branchInfo, solver, cws, branchNum, pids, pidNum);
+      returnStatus = process_SB_results(branchInfo, solver, choose,
+					branchObject);
+      send_pseudo_cost_update(branchInfo);
+    } else {
+      // We are too deep in the tree, just do something locally (like
+      // pseudocosts...)
+      returnStatus = BCP_lp_user::try_to_branch(branchInfo, solver, choose,
+						branchObject, allowVarFix);
+    }
+
+    delete[] pids;
     delete cws;
-    cws = NULL;
-  }
-  BCP_lp_prob* p = getLpProblemPointer();
-  CoinWarmStart* cws_tmp = cws->clone(); // the next call destroys it
-  BCP_warmstart* ws = cws ? BCP_lp_convert_CoinWarmStart(*p, cws_tmp) : NULL;
 
-  if (pidNum >= 0) {
-    if (pidNum > 0) {
-      pidNum = send_data_for_distributed_SB(branchInfo, solver, ws,
-					    pids, pidNum);
-    }
-    // While the others are working, initialize the result array
-    solve_first_candidate(branchInfo, solver, cws, 0);
-    if (pidNum == 0) {
-      solve_first_candidate(branchInfo, solver, cws, 1);
-    }
-    while (pidNum > 0) {
-      receive_distributed_SB_result();
-      --pidNum;
-    }
-    returnStatus = process_SB_results(branchInfo, solver, choose, branchObject);
-    send_pseudo_cost_update(branchInfo);
+  } else { /* ! do_distributed_branching  ===> Do something locally */
     
-  } else { /* Do something locally */
-
-    returnStatus = BCP_lp_user::try_to_branch(branchInfo, solver, choose,
-					      branchObject, allowVarFix);
   }
-
-  delete[] pids;
-
-  delete cws;
-  delete ws;
 
   return returnStatus;
 }
@@ -963,89 +1011,64 @@ BM_lp::process_message(BCP_buffer& buf)
   buf.unpack(msgtag);
   assert(msgtag == BM_StrongBranchRequest);
 
-  Bonmin::OsiTMINLPInterface& nlp = *bonmin_.nonlinearSolver();
+  Bonmin::OsiTMINLPInterface* nlp = bonmin_.nonlinearSolver();
 
-  double t = CoinWallclockTime();
   int numCols;
   double* clb;
   double* cub;
   double objvalOrig;
   double cutoff;
   buf.unpack(clb, numCols);
-  assert(numCols == nlp.getNumCols());
+  assert(numCols == nlp->getNumCols());
   buf.unpack(cub, numCols);
-  assert(numCols == nlp.getNumCols());
+  assert(numCols == nlp->getNumCols());
   buf.unpack(objvalOrig);
   buf.unpack(cutoff);
   bool has_ws;
   buf.unpack(has_ws);
   BCP_warmstart* ws = has_ws ? BCP_unpack_warmstart(buf) : NULL;
-  int changeType;
-  int objInd;
-  int colInd;
-  double solval;
-  double bd;
-  buf.unpack(changeType);
-  buf.unpack(objInd);
-  buf.unpack(colInd);
-  buf.unpack(solval);
-  buf.unpack(bd);
+  CoinWarmStart* cws = ws  ? ws->convert_to_CoinWarmStart() : NULL;
+  int location; // just a marker that we'll send back
+  int numBranch;
+  buf.unpack(location);
+  buf.unpack(numBranch);
 
-  nlp.setColLower(clb);
-  nlp.setColUpper(cub);
-  switch (changeType) {
-  case BM_Var_DownBranch:
-    nlp.setColUpper(colInd, bd);
-    break;
-  case BM_Var_UpBranch:
-    nlp.setColLower(colInd, bd);
-    break;
+  int i;
+  BM_BranchData* branchData = new BM_BranchData[numBranch];
+  for (i = 0; i < numBranch; ++i) {
+    buf.unpack(branchData[i].changeType);
+    buf.unpack(branchData[i].objInd);
+    buf.unpack(branchData[i].colInd);
+    buf.unpack(branchData[i].solval);
+    buf.unpack(branchData[i].bd);
   }
 
-  if (ws) {
-    CoinWarmStart* cws = ws->convert_to_CoinWarmStart();
-    nlp.setWarmStart(cws);
-    nlp.resolve();
-    delete cws;
-    delete ws;
-  } else {
-    nlp.initialSolve();
-  }
-
-  int status = 
-    (nlp.isAbandoned()              ? BCP_Abandoned : 0) |
-    (nlp.isProvenOptimal()          ? BCP_ProvenOptimal : 0) |
-    (nlp.isProvenPrimalInfeasible() ? BCP_ProvenPrimalInf : 0);
-  double objval = (status & BCP_ProvenOptimal) != 0 ? nlp.getObjValue() : 0.0;
-  int iter = nlp.getIterationCount();
+  nlp->setColLower(clb);
+  nlp->setColUpper(cub);
+  BM_solve_branches(nlp, cws, numBranch, branchData);
 
   bm_buf.clear();
   msgtag = BM_StrongBranchResult;
   bm_buf.pack(msgtag);
-  bm_buf.pack(changeType);
-  bm_buf.pack(objInd);
-  bm_buf.pack(colInd);
-  bm_buf.pack(status);
-  bm_buf.pack(iter);
-  bm_buf.pack(objval);
-  bm_buf.pack(CoinWallclockTime() - t);
+  bm_buf.pack(location);
+  bm_buf.pack(numBranch);
+  for (i = 0; i < numBranch; ++i) {
+    const BM_BranchData& bD = branchData[i];
+    bm_buf.pack(bD.status);
+    bm_buf.pack(bD.objval);
+    bm_buf.pack(bD.iter);
+    bm_buf.pack(bD.time);
+  }
   send_message(buf.sender(), bm_buf, BCP_Msg_User);
 
   bm_buf.clear();
-  bm_buf.pack(changeType);
-  bm_buf.pack(objvalOrig);
-  bm_buf.pack(cutoff);
-  bm_buf.pack(objInd);
-  bm_buf.pack(colInd);
-  bm_buf.pack(solval);
-  bm_buf.pack(bd);
-  bm_buf.pack(status);
-  bm_buf.pack(iter);
-  bm_buf.pack(objval);
   send_message(parent(), bm_buf, BCP_Msg_SBnodeFinished);
 
+  delete[] branchData;
+  delete cws;
+  delete ws;
   delete[] clb;
   delete[] cub;
 
-  bm_stats.incNumberSbSolves();
+  bm_stats.incNumberSbSolves(numBranch);
 }
