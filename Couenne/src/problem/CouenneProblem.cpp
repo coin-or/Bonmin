@@ -117,14 +117,14 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     base -> options() -> GetIntegerValue ("log_num_abt_per_level",  logAbtLev_,  "couenne.");
 
     CouNumber 
-      art_cutoff =  1e50,
-      art_lower  = -1e50;
+      art_cutoff =  2.e50,
+      art_lower  = -2.e50;
 
     base -> options() -> GetNumericValue ("art_cutoff",  art_cutoff,  "couenne.");
     base -> options() -> GetNumericValue ("art_lower",   art_lower,   "couenne.");
 
-    if (art_cutoff <  1e50) setCutOff (art_cutoff);
-    if (art_lower  > -1e50) {
+    if (art_cutoff <  1.e50) setCutOff (art_cutoff);
+    if (art_lower  > -1.e50) {
       int indobj = objectives_ [0] -> Body () -> Index ();
       if (indobj >= 0)
 	domain_.lb (indobj) = art_lower;
@@ -132,7 +132,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   }
 
   //writeAMPL ("extended-aw.mod", true);
-  //writeAMPL ("extended-pb.mod", false);
+  //writeAMPL ("original.mod", false);
 }
 
 

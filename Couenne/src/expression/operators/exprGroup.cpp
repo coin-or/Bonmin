@@ -38,6 +38,9 @@ exprGroup::exprGroup  (const exprGroup &src, Domain *d):
 /// I/O
 void exprGroup::print (std::ostream &out, bool descend) const {
 
+  //if (code () == COU_EXPRGROUP)
+    out << '(';
+
   if (nargs_ && ((nargs_ > 1) ||
 		 ((*arglist_) -> Type () != CONST) ||
 		 (fabs ((*arglist_) -> Value ()) > COUENNE_EPS)))
@@ -57,6 +60,9 @@ void exprGroup::print (std::ostream &out, bool descend) const {
 
     lcoeff_ [i]. first -> print (out, descend);
   }
+
+  //if (code () == COU_EXPRGROUP)
+    out << ')';
 }
 
 

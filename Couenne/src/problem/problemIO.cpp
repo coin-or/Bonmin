@@ -88,26 +88,26 @@ void CouenneProblem::print (std::ostream &out) {
 
 
 /// read optimal solution into member optimum
-bool CouenneProblem::readOptimum (char *name) {
+bool CouenneProblem::readOptimum (std::string *fname) {
 
-  std::string fname (name);
+  //std::string fname (name);
   FILE *f;
 
-  if (fname == "") {
+  if (fname == NULL) {
 
-    fname = problemName_;
+    fname = &problemName_;
 
     int 
-      base = fname.rfind ('/'),
-      size = fname.find  ('.', base) - base;
+      base = fname -> rfind ('/'),
+      size = fname -> find  ('.', base) - base;
 
     char *filename = new char [size+4];
     CoinFillN (filename, size+4, (char) 0);
-    fname.copy (filename, size, base+1);
+    fname -> copy (filename, size, base+1);
     strcat (filename, "txt");
     f = fopen (filename, "r");
     delete [] filename;
-  } else f = fopen (fname.c_str (), "r");
+  } else f = fopen (fname -> c_str (), "r");
 
   if (!f) return false;
 

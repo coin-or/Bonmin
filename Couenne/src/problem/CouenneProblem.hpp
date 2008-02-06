@@ -345,7 +345,7 @@ class CouenneProblem {
   int getIntegerCandidate (const double *xFrac, double *xInt, double *lb, double *ub);
 
   /// Read best known solution from file given in argument
-  bool readOptimum (char *fname = (const char *) (""));
+  bool readOptimum (std::string *fname = NULL);
 
   /// Read cutoff value (for testing purposes)
   void readCutoff (const std::string &fname);
