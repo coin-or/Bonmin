@@ -223,7 +223,10 @@ namespace Bonmin{
     }
 
     int varSelection;
-    options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
+    if (!options_->GetEnumValue("varselect_stra",varSelection,"bonmin.")) {
+      // change the default for Couenne
+      varSelection = OsiTMINLPInterface::OSI_SIMPLE;
+    }
     switch (varSelection) {
 
       // strong branching choosevariable
@@ -238,9 +241,21 @@ namespace Bonmin{
     }
 
     case OsiTMINLPInterface::OSI_SIMPLE: // default choice
-    default:
       branchingMethod_ = new CouenneChooseVariable (continuousSolver_, couenneProb);
       break;
+    default:
+      std::cerr << "Unknown varselect_stra for Couenne\n" << std::endl;
+      throw;
+      break;
+    }
+
+    int ival;
+    if (!options_->GetEnumValue("node_comparison",ival,"bonmin.")) {
+      // change default for Couenne
+      nodeComparisonMethod_ = bestBound;
+    }
+    else {
+      nodeComparisonMethod_ = NodeComparison(ival);
     }
 
     if(intParam_[NumCutPasses] < 2)
