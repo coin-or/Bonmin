@@ -120,6 +120,9 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 			       t_chg_bounds *chg_bds, 
 			       Bonmin::BabInfo * babInfo) const {
 
+  if (!babInfo) 
+    return 0;
+
   int nchanges = 0;
 
   CouNumber

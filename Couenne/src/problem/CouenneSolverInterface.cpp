@@ -40,6 +40,14 @@ CouenneSolverInterface::~CouenneSolverInterface () {
 
 /// Solve initial LP relaxation 
 void CouenneSolverInterface::initialSolve () {
+  /*printf ("------------------------------------- INITIAL SOLVE\n");
+  for (int i=0; i<getNumCols(); i++)
+    printf ("%4d. %20.5g [%20.5g %20.5g]\n", 
+	    i, getColSolution () [i],
+	    getColLower () [i],
+	    getColUpper () [i]);
+
+	    cutgen_ -> Problem () -> print ();*/
 
   knowInfeasible_ = false;
   knowOptimal_ = false;
@@ -68,19 +76,44 @@ void sparse2dense (int, t_chg_bounds *, int *&, int &);
 
 /// Resolve an LP relaxation after problem modification
 void CouenneSolverInterface::resolve () {
-  //setColUpper (5,0.);
-  /*printf ("before resolve, %p --> [%g,%g]\n", this,
-	  getColLower () [getNumCols () - 1],
-	  getColUpper () [getNumCols () - 1]);*/
+  /*printf ("------------------------------------- RESOLVE\n");
+  for (int i=0; i<getNumCols(); i++) 
+    printf ("%4d. %20.5g [%20.5g %20.5g]\n", 
+	    i, getColSolution () [i],
+	    getColLower () [i],
+	    getColUpper () [i]);*/
+
+  // CUT THIS! Some about-to-be-resolved problems have variables with
+  // lower +inf. That is, between CbcModel::initialSolve() and
+  // CbcModel::resolve(). I couldn't spot where in Couenne this
+  // happens.
+
+  ////////////////////////////////////// Cut {
+  /*const double 
+    *lb = getColLower (),
+    *ub = getColUpper ();
+
+  for (int i=getNumCols(); i--;) {
+    if (lb [i] >  COUENNE_INFINITY)
+      setColLower (i, cutgen_ -> Problem () -> Lb (i));
+    //setColLower (i, -COIN_DBL_MAX);//cutgen_ -> Problem () -> Lb (i));
+    if (ub [i] < -COUENNE_INFINITY)
+      setColUpper (i, cutgen_ -> Problem () -> Ub (i));
+    //setColUpper (i,  COIN_DBL_MAX);//cutgen_ -> Problem () -> Ub (i));
+    }*/
+  ////////////////////////////////////// Cut }
+
   // TODO: if NLP point available, add new cuts BEFORE resolving --
   // and decrease number of cutting plane iterations by one, to
   // balance it
   //printf("NumRows in resolve = %d\n", getNumRows());
+
   knowInfeasible_ = false;
   knowOptimal_ = false;
   OsiClpSolverInterface::resolve ();
-  //printf("obj value in resolve = %e\n",getObjValue());
-  /*printf ("after resolve, %p --> [%g,%g]\n", this,
+
+  /*printf("obj value in resolve = %e\n",getObjValue());
+  printf ("after resolve, %p --> [%g,%g]\n", this,
 	  getColLower () [getNumCols () - 1],
 	  getColUpper () [getNumCols () - 1]);*/
 }

@@ -393,6 +393,10 @@ class CouenneProblem {
 		      LinMap  &lmap,
 		      QuadMap &qmap);
 
+  /// return problem name
+  const std::string &problemName ()
+  {return problemName_;}
+
 protected:
 
   /// single fake tightening. Return
