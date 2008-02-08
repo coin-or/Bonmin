@@ -53,8 +53,8 @@ namespace Bonmin{
   }
   
   CouenneSetup::~CouenneSetup(){
-    //    if (CouennePtr_)
-    //      delete CouennePtr_;
+    //if (CouennePtr_)
+    //delete CouennePtr_;
   }
 
   void CouenneSetup::InitializeCouenne(char **& argv){

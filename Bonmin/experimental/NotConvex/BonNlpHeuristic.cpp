@@ -128,7 +128,7 @@ namespace Bonmin{
     double *upper = new double [couenne_ -> nVars ()];
 
     CoinFillN (lower, couenne_ -> nVars (), -COUENNE_INFINITY);
-    CoinFillN (lower, couenne_ -> nVars (),  COUENNE_INFINITY);
+    CoinFillN (upper, couenne_ -> nVars (),  COUENNE_INFINITY);
 
     CoinCopyN (solver->getColLower(), nlp_ -> getNumCols (), lower);
     CoinCopyN (solver->getColUpper(), nlp_ -> getNumCols (), upper);
@@ -189,6 +189,7 @@ namespace Bonmin{
     // better integer point as there are rounded integer variables
 
     bool skipOnInfeasibility = false;
+
     double *Y = new double [couenne_ -> nVars ()];
     CoinFillN (Y, couenne_ -> nVars (), 0.);
     CoinCopyN (solution, nlp_ -> getNumCols (), Y);

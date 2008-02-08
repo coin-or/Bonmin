@@ -99,12 +99,12 @@ CouenneInterface::extractLinearRelaxation
 	  CoinCopyN (getColLower (), norig, lbSave);
 	  CoinCopyN (getColUpper (), norig, ubSave);
 
-	  CoinCopyN (getColLower (), norig, lbCur);
-	  CoinCopyN (getColUpper (), norig, ubCur);
-
 	  CoinFillN (Y,     p -> nVars (), 0.);
 	  CoinFillN (lbCur, p -> nVars (), -COUENNE_INFINITY);
 	  CoinFillN (ubCur, p -> nVars (),  COUENNE_INFINITY);
+
+	  CoinCopyN (getColLower (), norig, lbCur);
+	  CoinCopyN (getColUpper (), norig, ubCur);
 
 	  if (p -> getIntegerCandidate (solution, Y, lbCur, ubCur) >= 0) {
 
