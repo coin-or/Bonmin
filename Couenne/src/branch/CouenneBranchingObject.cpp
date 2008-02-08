@@ -60,8 +60,10 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
   value_ = x;
 
   // normalize w.r.t. interval (i.e. do not branch too close to bounds)
-  if      ((value_ - lb) / (ub-lb) < closeToBounds) value_ = lb + (ub-lb) * closeToBounds;
-  else if ((ub - value_) / (ub-lb) < closeToBounds) value_ = ub + (lb-ub) * closeToBounds;
+  // if both are finite...
+  if ((lb > -COUENNE_INFINITY) && (ub < COUENNE_INFINITY))
+    if      ((value_ - lb) / (ub-lb) < closeToBounds) value_ = lb + (ub-lb) * closeToBounds;
+    else if ((ub - value_) / (ub-lb) < closeToBounds) value_ = ub + (lb-ub) * closeToBounds;
 
   //  if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
   jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 

@@ -103,6 +103,9 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     print (std::cout);
   }
 
+  // give a value to all auxiliary variables
+  initAuxs ();
+
   if (base) {
 
     std::string s;

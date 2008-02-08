@@ -59,19 +59,20 @@ void CouenneProblem::initAuxs () {
 
     if (variables_ [ord] -> Type () == AUX) {
 
-      exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
+      //exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
 
       //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
 
+      CouNumber l, u;
+      variables_ [ord] -> Image () -> getBounds (l, u);
+
       // set bounds 
-      if ((Lb (ord) = CoinMax (Lb (ord), (*(aux -> Lb()))())) <= -COUENNE_INFINITY) Lb (ord)=-DBL_MAX;
-      if ((Ub (ord) = CoinMin (Ub (ord), (*(aux -> Ub()))())) >=  COUENNE_INFINITY) Ub (ord)= DBL_MAX;
+      if ((Lb (ord) = CoinMax (Lb (ord), l)) <= -COUENNE_INFINITY) Lb (ord) = -COIN_DBL_MAX;
+      if ((Ub (ord) = CoinMin (Ub (ord), u)) >=  COUENNE_INFINITY) Ub (ord) =  COIN_DBL_MAX;
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
       //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, " --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
-
-      X (ord) = CoinMax (Lb (ord), CoinMin (Ub (ord), (*(aux -> Image ())) ()));
 
       bool integer = variables_ [ord] -> isInteger ();
 
@@ -79,6 +80,8 @@ void CouenneProblem::initAuxs () {
 	Lb (ord) = ceil  (Lb (ord) - COUENNE_EPS);
 	Ub (ord) = floor (Ub (ord) + COUENNE_EPS);
       }
+
+      X (ord) = CoinMax (Lb (ord), CoinMin (Ub (ord), (*(variables_ [ord] -> Image ())) ()));
     }
   }
 }
@@ -89,7 +92,7 @@ void CouenneProblem::initAuxs () {
 
 void CouenneProblem::getAuxs (CouNumber * x) const {
 
-  domain_.push (nVars (), x, NULL, NULL);
+  domain_.push (nVars (), x, domain_.lb(), domain_.ub());
 
   // set auxiliary w to f(x). This procedure is exact even though the
   // auxiliary variables have an incomplete image, i.e. they have been
@@ -100,9 +103,18 @@ void CouenneProblem::getAuxs (CouNumber * x) const {
     int index = numbering_ [j];
     exprVar *var = variables_ [index];
 
+    CouNumber l, u;
+
     if (var -> Type () == AUX)
-      x [index] = X (index) =
-	(*(var -> Image ())) ();
+      var -> Image () -> getBounds (l,u);
+    else {
+      l = Lb (index);
+      u = Ub (index);
+    }
+
+    if (var -> Type () == AUX)
+      x [index] = X (index) = 
+	CoinMax (l, CoinMin (u, (*(var -> Image ())) ()));
   }
 
   domain_.pop ();

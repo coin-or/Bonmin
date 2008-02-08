@@ -10,7 +10,9 @@
 #ifndef COUENNE_DOMAIN_HPP
 #define COUENNE_DOMAIN_HPP
 
+#include <stdlib.h>
 #include <stack>
+
 #include "CouenneTypes.hpp"
 
 /// Define a point in the solution space and the bounds around it.

@@ -11,13 +11,20 @@
 #define COUENNE_EXPRBMUL_H
 
 #include "exprOp.hpp"
+#include "CoinHelperFunctions.hpp"
 
+#define MUL_ZERO 1e-20
+#define MUL_INF  1e+20
 
 /// product that avoids NaN's 
 inline CouNumber safeProd (register CouNumber a, register CouNumber b) {
 
-  if ((fabs (a) < 1e-10) || (fabs (b) < 1e-10)) 
-    return 0.;
+  if (a >  MUL_INF) return (b < -MUL_ZERO) ? -COIN_DBL_MAX : (b > MUL_ZERO) ?  COIN_DBL_MAX : 0.;
+  if (a < -MUL_INF) return (b < -MUL_ZERO) ?  COIN_DBL_MAX : (b > MUL_ZERO) ? -COIN_DBL_MAX : 0.;
+
+  if (b >  MUL_INF) return (a < -MUL_ZERO) ? -COIN_DBL_MAX : (a > MUL_ZERO) ?  COIN_DBL_MAX : 0.;
+  if (b < -MUL_INF) return (a < -MUL_ZERO) ?  COIN_DBL_MAX : (a > MUL_ZERO) ? -COIN_DBL_MAX : 0.;
+
   return a*b;
 }
 

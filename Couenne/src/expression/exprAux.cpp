@@ -218,7 +218,8 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
     }
 
   //  if (!(cg -> isFirst ())) 
-  if ((nrc < cs.sizeRowCuts ()) || 
+  if (1 ||
+      (nrc < cs.sizeRowCuts ()) || 
       (ncc < cs.sizeColCuts ()))
     {
       printf ("---------------- ConvCut:  "); 

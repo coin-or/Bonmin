@@ -242,7 +242,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     for (int i = 0; i < problem_ -> nVars (); i++)
       if (problem_ -> Var (i) -> Multiplicity () > 0)
 	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,
-		       "%4d %+20.8f [%+20.8f,%+20.8f] --- %+20.8f [%+20.8f,%+20.8f] (%+20.8f)\n", i,
+		       "%4d %+20.8g [%+20.8g,%+20.8g] --- %+20.8g [%+20.8g,%+20.8g] (%+20.8g)\n", i,
 		       problem_ -> X  (i),
 		       problem_ -> Lb (i),
 		       problem_ -> Ub (i),
@@ -281,11 +281,14 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     if (problem_ -> doFBBT () && !firstcall_)
       problem_ -> redCostBT (&si, chg_bds, babInfo);
 
-    if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
+    if ((problem_ -> doFBBT () ||
+	 problem_ -> doOBBT () ||
+	 problem_ -> doABT  ()) &&
+	(jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING))) {
       jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== after bt =============\n");
       for (int i = 0; i < problem_ -> nVars (); i++)
 	if (problem_ -> Var (i) -> Multiplicity () > 0)
-	  jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8f [%+20.8f,%+20.8f]\n", i,
+	  jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8g [%+20.8g,%+20.8g]\n", i,
 			 problem_ -> X  (i),
 			 problem_ -> Lb (i),
 			 problem_ -> Ub (i));
@@ -344,7 +347,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== genrowcuts on NLP =============\n");
 	for (int i = 0; i < problem_ -> nVars (); i++)
 	  if (problem_ -> Var (i) -> Multiplicity () > 0)
-	    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8f [%+20.8f,%+20.8f]\n", i,
+	    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8g [%+20.8g,%+20.8g]\n", i,
 			   problem_ -> X  (i),
 			   problem_ -> Lb (i),
 			   problem_ -> Ub (i));
@@ -365,7 +368,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== genrowcuts on LP =============\n");
 	for (int i = 0; i < problem_ -> nVars (); i++)
 	  if (problem_ -> Var (i) -> Multiplicity () > 0)
-	    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8f [%+20.8f,%+20.8f]\n", i,
+	    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8g [%+20.8g,%+20.8g]\n", i,
 			   problem_ -> X  (i),
 			   problem_ -> Lb (i),
 			   problem_ -> Ub (i));
@@ -423,13 +426,24 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   septime_ += CoinCpuTime () - now;
 
   if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
+
+    if (cs.sizeColCuts ()) {
+      jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,"Couenne col cuts:\n");
+      for (int i=0; i<cs.sizeColCuts (); i++) 
+	cs.colCutPtr (i) -> print ();
+    }
+
     jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== on my way out of generateCuts =============\n");
     for (int i = 0; i < problem_ -> nVars (); i++)
       if (problem_ -> Var (i) -> Multiplicity () > 0)
-	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8f [%+20.8f,%+20.8f]\n", i,
+	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,
+		       "%4d %+20.8g [%+20.8g,%+20.8g] %+20.8g [%+20.8g,%+20.8g]\n", i,
 		       problem_ -> X  (i),
 		       problem_ -> Lb (i),
-		       problem_ -> Ub (i));
+		       problem_ -> Ub (i),
+		       si.getColSolution () [i],
+		       si.getColLower    () [i],
+		       si.getColUpper    () [i]);
     jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
   }
 }

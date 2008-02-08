@@ -11,6 +11,8 @@
 #include "CoinHelperFunctions.hpp"
 #include "CouenneProblem.hpp"
 
+//#define DEBUG
+
 // lose patience after this many iterations of non-improving valid
 // tightening (step 1)
 #define VALID_ONLY_THRESHOLD 5 
@@ -54,7 +56,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
   // copy in current bounds
   CoinCopyN (Lb (), ncols, olb);
-  CoinCopyN (Lb (), ncols, oub);
+  CoinCopyN (Ub (), ncols, oub);
 
   // start restricting around current integer box
   for (int i=0; i<nOrig_; i++) 
@@ -83,7 +85,9 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
   // structure to record fixed, non-fixed, and continuous variables
   typedef enum {UNFIXED, FIXED, CONTINUOUS} fixType;
+
   fixType *fixed = new fixType [nOrig_]; // integer variables that were fixed
+
   for (int i=0; i<nOrig_; i++) 
     fixed [i] = (Var (i) -> isInteger ()) ? UNFIXED : CONTINUOUS;
 
@@ -93,17 +97,26 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
   do {
 
-    /*printf ("========================================================================\n");
+#ifdef DEBUG
+    printf ("========================================================================\n");
     for (int i=0; i<nOrig_; i++)
       printf ("#### %4d: %d %c frac %20g                          [%20g,%20g]\n", 
 	      i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
-	      xFrac [i], Lb (i), Ub (i));*/
+	      xFrac [i], Lb (i), Ub (i));
+    printf ("---\n");
+    for (int i=nOrig_; i<nVars (); i++)
+      printf ("#### %4d:   %c frac %20g                          [%20g,%20g]\n", 
+	      i, variables_ [i] -> isInteger () ? 'I' : ' ',
+	      X (i), Lb (i), Ub (i));
+#endif
 
     changed = false;
 
     // TODO: use explicit checkNLP for solutions
 
-    //printf ("=================================================== %d %d\n", iter, nOrig_);
+#ifdef DEBUG
+    printf ("=================================================== %d %d\n", iter, nOrig_);
+#endif
 
     for (int i = 0; i < nOrig_; i++)
 
@@ -293,13 +306,15 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     if (fixed [i] == FIXED)
       lb [i] = ub [i] = xInt [i];
 
-  /*if (retval >= 0) {
+#ifdef DEBUG
+  if (retval >= 0) {
     printf ("- %d -----------------------------------------------------------------------\n", retval);
     for (int i=0; i<nOrig_; i++)
       printf ("#### %4d: %d %c frac %20g int %20g [%20g,%20g]\n", 
 	      i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
 	      xFrac [i], xInt [i], lb [i], ub [i]);
-	      } else printf ("no good point was found\n");*/
+  } else printf ("no good point was found\n");
+#endif
 
   delete [] f_chg;
   delete [] fixed;
