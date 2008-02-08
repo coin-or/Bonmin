@@ -90,7 +90,6 @@ void CouenneProblem::print (std::ostream &out) {
 /// read optimal solution into member optimum
 bool CouenneProblem::readOptimum (std::string *fname) {
 
-  //std::string fname (name);
   FILE *f;
 
   if (fname == NULL) {
@@ -123,6 +122,12 @@ bool CouenneProblem::readOptimum (std::string *fname) {
   for (int i = 0; i < nOrig_; i++)
     if (fscanf (f, "%lf", optimum_ + i) < 1) 
       return false;
+
+  if (opt_window_ < 1e50) // restrict solution space around known optimum
+    for (int i = 0; i < nOrig_; i++) {
+      Lb (i) = CoinMax (Lb (i), optimum_ [i] - opt_window_ * (1 + fabs (optimum_ [i])));
+      Ub (i) = CoinMin (Ub (i), optimum_ [i] + opt_window_ * (1 + fabs (optimum_ [i])));
+    }
 
   // expand solution to auxiliary space
   getAuxs (optimum_);

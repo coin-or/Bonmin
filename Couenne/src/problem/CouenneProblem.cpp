@@ -48,7 +48,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   doOBBT_    (false),
   doABT_     (false),
   logObbtLev_(0),
-  jnlst_(jnlst) {
+  jnlst_(jnlst),
+  opt_window_ (1e50) {
 
   if (!asl) return;
 
@@ -97,9 +98,6 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 		  "Problem size after standarization: %d variables (%d integer) %d constraints.\n",
 		  nVars(), nIntVars(), nCons());
 
-  // check if optimal solution is available (for debug purposes)
-  readOptimum ();
-
   if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
     // We should route that also through the journalist
     print (std::cout);
@@ -120,6 +118,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
       art_cutoff =  2.e50,
       art_lower  = -2.e50;
 
+    base -> options() -> GetNumericValue ("opt_window",  opt_window_, "couenne.");
     base -> options() -> GetNumericValue ("art_cutoff",  art_cutoff,  "couenne.");
     base -> options() -> GetNumericValue ("art_lower",   art_lower,   "couenne.");
 
@@ -130,6 +129,9 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 	domain_.lb (indobj) = art_lower;
     }
   }
+
+  // check if optimal solution is available (for debug purposes)
+  readOptimum ();
 
   //writeAMPL ("extended-aw.mod", true);
   //writeAMPL ("original.mod", false);
@@ -158,7 +160,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   doABT_     (p. doABT_),
   logObbtLev_(p. logObbtLev_),
   logAbtLev_ (p. logAbtLev_),
-  jnlst_     (p.jnlst_) { // needed only in standardize (), unnecessary to update it
+  jnlst_     (p.jnlst_),
+  opt_window_ (p.opt_window_) { // needed only in standardize (), unnecessary to update it
 
   for (int i=0; i < p.nVars (); i++)
     variables_ . push_back (NULL);
@@ -324,6 +327,18 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
 
   roptions -> SetRegisteringCategory ("Couenne options", Bonmin::RegisteredOptions::CouenneCategory);
 
+  roptions -> AddNumberOption
+    ("art_cutoff",
+     "artificial cutoff",
+     1.e50,
+     "Default value is 1.e50.");
+
+  roptions -> AddNumberOption
+    ("opt_window",
+     "window around known optimum",
+     1.e5,
+     "Default value is infinity.");
+
   roptions -> AddStringOption2 
     ("feasibility_bt",
      "Feasibility-based (cheap) bound tightening",
@@ -362,12 +377,6 @@ If k>=0, apply with probability 2^(k - level), level being the current depth of 
 If -1, apply at every node (expensive!). \
 If 0, apply at root node only. \
 If k>=0, apply with probability 2^(k - level), level being the current depth of the B&B tree.");
-
-  roptions -> AddNumberOption
-    ("art_cutoff",
-     "artificial cutoff",
-     1.e50,
-     "Default value is 1.e50.");
 
   roptions -> AddNumberOption
     ("art_lower",

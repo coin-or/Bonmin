@@ -140,6 +140,9 @@ class CouenneProblem {
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 
+  /// window around known optimum (for testing purposes)
+  CouNumber opt_window_;
+
  public:
 
   CouenneProblem  (const ASL * = NULL,

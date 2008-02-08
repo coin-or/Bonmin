@@ -450,6 +450,7 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 #endif
 
   if (aux) {
+    //delete rest;
     //rest = aux -> Image () -> clone (&domain_);
     rest = aux -> Image ();// -> clone (&domain_);
     aux -> Image (NULL);

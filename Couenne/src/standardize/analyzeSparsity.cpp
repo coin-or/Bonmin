@@ -62,8 +62,8 @@ void CouenneProblem::analyzeSparsity (CouNumber c0,
 #endif
 
   int nterms = occur.size ();
-
-  //if (0)
+  
+  if (0) // disabled temporarily to fix problem (solve ex2_1_1)
   if ((qmap.Map().size () >= MIN_DENSITY * nterms * (nterms+1) / 2) && (nterms >= 2)
       //|| (nsquares > nterms/2)
       || (nsquares >= occur.size ())

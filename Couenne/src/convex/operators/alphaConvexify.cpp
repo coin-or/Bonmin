@@ -140,12 +140,14 @@ bool exprQuad::alphaConvexify (const CouenneProblem *p,
   double* eigval = new double [nDiag];
   int info;
 
-  /*printf ("nDiag = %d\n", nDiag);
+#ifdef DEBUG
+  printf ("nDiag = %d\n", nDiag);
   for (int i=0; i<nDiag; i++) {
     for (int j=0; j<nDiag; j++)
       printf ("%6.2f ", matrix [i*nDiag + j]);
     printf ("\n");
-    }*/
+  }
+#endif 
 
   Ipopt::IpLapackDsyev (true,   // compute eigenvector
 			nDiag,  // dimension
