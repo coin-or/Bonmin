@@ -41,12 +41,6 @@ int main (int argc, char *argv[])
   using namespace Ipopt;
 
   char * pbName = NULL;
-  if(argc > 1)
-  {
-    pbName = new char[strlen(argv[1])+1];
-    strcpy(pbName, argv[1]);
-  }
-
   double time1 = CoinCpuTime();
 
   try {
@@ -112,16 +106,12 @@ int main (int argc, char *argv[])
       if (cg) cg -> getStats (nr, nt, st);
       else printf ("Warning, could not get pointer to CouenneCutGenerator\n");
 
-      char *basename = strrchr (pbName, '/');
-      if (!basename) basename = pbName;
-      else basename++;
-
       CouenneProblem *cp = cg ? cg -> Problem () : NULL;
 
       if (cg && !cp) printf ("Warning, could not get pointer to problem\n");
 
       printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & ", 
-	      basename,
+	      cp ? cp -> problemName ().c_str () : "unknown",
 	      (cp) ? cp -> nOrig     () : -1, 
 	      (cp) ? cp -> nIntVars  () : -1, 
 	      (cp) ? cp -> nOrigCons () : -1,

@@ -61,14 +61,42 @@ CouenneInterface::extractLinearRelaxation
 
   if (solveNlp) {
 
+    CouenneProblem *p = couenneCg.Problem ();
+
+    int nvars = p -> nVars();
+
+    if (1) {// (p -> doFBBT ()) {
+
+      t_chg_bounds *chg_bds = new t_chg_bounds [nvars];
+
+      for (int i=0; i<nvars; i++) {
+	chg_bds [i].setLower(t_chg_bounds::CHANGED);
+	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
+      }
+
+      if (!(p -> boundTightening (chg_bds, NULL)))
+	printf ("warning, tightened NLP is infeasible\n");
+
+      delete [] chg_bds;
+
+      const double 
+	*nlb = getColLower (),
+	*nub = getColUpper ();
+
+      for (int i=0; i < p -> nOrig (); i++) {
+	if (nlb [i] < p -> Lb (i) - COUENNE_EPS)
+	  setColLower (i, p -> Lb (i));
+	if (nub [i] > p -> Ub (i) + COUENNE_EPS)
+	  setColUpper (i, p -> Ub (i));
+      }
+    }
+
     initialSolve ();
 
     if (isProvenOptimal ()) {
 
       CouNumber obj             = getObjValue    ();
       const CouNumber *solution = getColSolution ();
-
-      CouenneProblem *p = couenneCg.Problem ();
 
       if (getNumIntegers () > 0) {
 
@@ -80,7 +108,7 @@ CouenneInterface::extractLinearRelaxation
 
 	for (int i=0; i<norig; i++)
 	  if (p -> Var (i) -> isInteger () &&
-	      (fabs (floor (solution [i] + 0.5) - solution [i]) >  COUENNE_EPS)) {
+	      (!::isInteger (solution [i]))) {
 	    fractional = true;
 	    break;
 	  }
