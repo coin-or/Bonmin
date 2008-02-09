@@ -206,13 +206,15 @@ obbt_iter (CouenneSolverInterface *csi,
 
       if (sense==1)
 	if (csi -> getColLower () [index] < bound - COUENNE_EPS) {
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"l_%d: %g --> %g\n", index, csi -> getColLower () [index], bound);
+	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"l_%d: %g --> %g\n", 
+			  index, csi -> getColLower () [index], bound);
 	  csi -> setColLower (index, bound); 
 	  chg_bds      [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
 	} else chg_bds [index].setLowerBits(t_chg_bounds::EXACT);
       else
 	if (csi -> getColUpper () [index] > bound + COUENNE_EPS) {
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"u_%d: %g --> %g\n", index, csi -> getColUpper () [index], bound);
+	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"u_%d: %g --> %g\n", 
+			  index, csi -> getColUpper () [index], bound);
 	  csi -> setColUpper (index, bound); 
 	  chg_bds      [index].setUpperBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
 	} else chg_bds [index].setUpperBits(t_chg_bounds::EXACT);

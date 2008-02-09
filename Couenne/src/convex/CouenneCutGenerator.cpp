@@ -155,13 +155,14 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      0,1,
      "");
 
-  roptions -> AddStringOption3
+  roptions -> AddStringOption4
     ("branch_pt_select",
      "Chooses branching point selection strategy",
      "mid-point",
      "balanced", "minimizes max distance from curve to convexification",
      "min-area", "minimizes total area of the two convexifications",
      "mid-point", "convex combination of current point and mid point",
+     "no-branch", "do not branch, return null infeasibility; for testing purposes only",
      "");
 
   std::string br_ops [] = {"prod", "div", "exp", "log", "sin", "cos", 
@@ -174,7 +175,7 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
     sprintf (description, "Chooses branching point selection strategy for operator %s", 
 	     br_ops [i].c_str ());
 
-    roptions -> AddStringOption4
+    roptions -> AddStringOption5
       (optname,
        description,
        "common",
@@ -182,6 +183,7 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
        "balanced",  "minimizes max distance from curve to convexification",
        "min-area",  "minimizes total area of the two convexifications",
        "mid-point", "convex combination of current point and mid point",
+       "no-branch", "do not branch, return null infeasibility; for testing purposes only",
        "");
   }
 

@@ -146,7 +146,7 @@ namespace Bonmin {
   	solver->setColUpper(j,saveUpper[j]);
       }
       /*
-        End of evaluation for this candidate variable. Possibilities are:
+        End of evaluation for this candidate object. Possibilities are:
         * Both sides below cutoff; this variable is a candidate for branching.
         * Both sides infeasible or above the objective cutoff: no further action
         here. Break from the evaluation loop and assume the node will be purged

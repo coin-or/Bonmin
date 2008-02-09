@@ -19,6 +19,9 @@
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, 
 				     int &whichWay) const {
 
+  if (strategy_ == NO_BRANCH)
+    return 0.;
+
   // whichWay should be set to which branch first (for two-way branching?)
   // if selectBranch not called, choose one at random
   whichWay_ = whichWay = TWO_LEFT;

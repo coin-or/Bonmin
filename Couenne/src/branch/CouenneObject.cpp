@@ -42,6 +42,7 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 
     if      (brtype == "balanced")  strategy_ = BALANCED;
     else if (brtype == "min-area")  strategy_ = MIN_AREA;
+    else if (brtype == "no-branch") strategy_ = NO_BRANCH;
     else if (brtype == "mid-point") {
       strategy_ = MID_INTERVAL;
       base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");

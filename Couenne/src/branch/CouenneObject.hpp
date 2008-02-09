@@ -47,7 +47,7 @@ class CouenneObject: public OsiObject {
 public:
 
   /// strategy names
-  enum brSelStrat {MID_INTERVAL, MIN_AREA, BALANCED};
+  enum brSelStrat {NO_BRANCH, MID_INTERVAL, MIN_AREA, BALANCED};
 
   /// Constructor with information for branching point selection strategy
   CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
