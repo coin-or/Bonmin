@@ -102,9 +102,10 @@ namespace Bonmin{
 
     OsiAuxInfo * auxInfo = solver->getAuxiliaryInfo();
     BabInfo * babInfo = dynamic_cast<BabInfo *> (auxInfo);
+
     if(babInfo){
       babInfo->setHasNlpSolution(false);
-      if(babInfo && babInfo->infeasibleNode()){
+      if(babInfo->infeasibleNode()){
 	return 0;
       }
     }

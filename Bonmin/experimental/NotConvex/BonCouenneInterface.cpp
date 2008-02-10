@@ -100,7 +100,10 @@ CouenneInterface::extractLinearRelaxation
 
       if (getNumIntegers () > 0) {
 
-	int norig = p -> nOrig ();
+	int
+	  norig = p -> nOrig (),
+	  nvars = p -> nVars ();
+
 	bool fractional = false;
 
 	// if problem is integer, check if any integral variable is
@@ -119,17 +122,17 @@ CouenneInterface::extractLinearRelaxation
 	    *lbSave = new double [norig],
 	    *ubSave = new double [norig],
 
-	    *lbCur  = new double [p -> nVars ()],
-	    *ubCur  = new double [p -> nVars ()],
+	    *lbCur  = new double [nvars],
+	    *ubCur  = new double [nvars],
 
-	    *Y      = new double [p -> nVars ()];
+	    *Y      = new double [nvars];
 
 	  CoinCopyN (getColLower (), norig, lbSave);
 	  CoinCopyN (getColUpper (), norig, ubSave);
 
-	  CoinFillN (Y,     p -> nVars (), 0.);
-	  CoinFillN (lbCur, p -> nVars (), -COUENNE_INFINITY);
-	  CoinFillN (ubCur, p -> nVars (),  COUENNE_INFINITY);
+	  CoinFillN (Y,     nvars, 0.);
+	  CoinFillN (lbCur, nvars, -COUENNE_INFINITY);
+	  CoinFillN (ubCur, nvars,  COUENNE_INFINITY);
 
 	  CoinCopyN (getColLower (), norig, lbCur);
 	  CoinCopyN (getColUpper (), norig, ubCur);
@@ -181,12 +184,12 @@ CouenneInterface::extractLinearRelaxation
     }
   }
   
-   int numcols     = getNumCols (),         // # original               variables
-       numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
+  int numcols     = getNumCols (),         // # original               variables
+    numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
 
-   const double
-     *lb = getColLower (),
-     *ub = getColUpper ();
+  const double
+    *lb = getColLower (),
+    *ub = getColUpper ();
 
    // add original and auxiliary variables to the new problem
    for (int i=0;       i<numcols;     i++) si.addCol (0, NULL, NULL, lb [i],        ub [i],       0);
@@ -285,7 +288,7 @@ CouenneInterface::extractLinearRelaxation
    }
  
    //si.writeMpsNative("toto",NULL,NULL,1);
-   si.writeLp ("toto");
+   //si.writeLp ("toto");
    app_ -> enableWarmStart();
 
    //   if (problem () -> x_sol ()) {
