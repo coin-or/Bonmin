@@ -54,8 +54,7 @@ public:
 		 JnlstPtr jnlst);
 
   /// Destructor
-  ~CouenneObject () 
-  {if (brPts_) free (brPts_);}
+  ~CouenneObject () {}
 
   /// Copy constructor
   CouenneObject (const CouenneObject &src);
@@ -66,7 +65,17 @@ public:
 
   /// compute infeasibility of this variable, |w - f(x)| (where w is
   /// the auxiliary variable defined as w = f(x)
-  virtual double infeasibility (const OsiBranchingInformation*, int &) const;
+  /// TODO: suggest way
+  virtual inline double infeasibility (const OsiBranchingInformation *info, int &way) const {  
+    if (strategy_ == NO_BRANCH) return 0.;
+
+    CouNumber delta = 
+      fabs (info -> solution_ [reference_ -> Index ()] - 
+	    (*(reference_ -> Image ())) ());
+
+    if (delta < COUENNE_EPS) return 0.;
+    return delta;
+  }
 
   /// fix (one of the) arguments of reference auxiliary variable 
   virtual double feasibleRegion (OsiSolverInterface*, 
@@ -107,20 +116,6 @@ protected:
   /// expression is w=f(x,y), this is w, as opposed to
   /// CouenneBranchingObject, where it would be either x or y.
   exprVar *reference_;
-
-  /// index on the branching variable
-  mutable expression *brVar_;
-
-  /// where to branch. It is a vector in the event we want to use a
-  /// ThreeWayBranching. Ends with a -COIN_DBL_MAX (not considered...)
-  mutable CouNumber *brPts_;
-
-  /// How to branch. This should be done automatically from
-  /// ::infeasibility() and ::createBranch(), but for some reason
-  /// obj->whichWay() in the last 20 lines of CbcNode.cpp returns 0,
-  /// therefore we set our own whichWay_ within this object and use it
-  /// between the two methods.
-  mutable int whichWay_;
 
   /// Branching point selection strategy
   enum brSelStrat strategy_;

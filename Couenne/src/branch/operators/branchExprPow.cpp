@@ -60,9 +60,10 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
   if      (x0 < l) x0 = l;
   else if (x0 > u) x0 = u;
 
-  // bounds coincinde (happens within setupList)
+  // bounds coincide (happens within setupList)
   if (fabs (u-l) < COUENNE_EPS) {
     brpts = (CouNumber *) realloc (brpts, sizeof (CouNumber));
+    *brpts = 0.5*(l+u);
     way = TWO_RAND;
     return (y0 - pow (x0, k));
   }
@@ -98,6 +99,9 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
       // on the bad side
 
+#if 0
+      // TODO: restore when we can do three-way branching
+
       double xp = pow (y0, 1./k);
 
       brpts = (double *) realloc (brpts, 2 * sizeof (double));
@@ -111,6 +115,16 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 			       projectSeg (x0, y0, 
 					   brpts [0], pow (brpts [0], k),
 					   brpts [1], pow (brpts [1], k), -1)));
+#endif
+
+      // in the meantime, branch on current point (next branch won't
+      // have unbounded x)
+
+      brpts = (double *) realloc (brpts, sizeof (double));
+      *brpts = x0;
+      way = TWO_RAND;
+      return (y0 - pow (x0,k));
+
       // no bounds on x
       /*      double alpha = pow ((y0 + pow (x0, k))/2, 1./k),
              yroot = pow (y0, 1./k);
@@ -152,6 +166,8 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 				  *brpts, safe_pow (*brpts, k), -1));
     } 
 
+    // both bounds are finite ///////////////////////////////////////////////
+
     powertriplet ft (k);
     //*brpts = maxHeight (&ft, x0, y0, l, u);
     *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
@@ -187,13 +203,14 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
   // from here on, we use two-way branch
 
   brpts = (double *) realloc (brpts, sizeof (double));
+  *brpts = x0; // just in case none of the ifs below is satisfied...
   CouNumber pow0 = pow (x0, k);
 
   // case 3: k>1 and odd ////////////////////////////////////////////////////////////
 
   if (isInt && (intk % 2)) {
 
-    way = (x0 > 0) ? TWO_RIGHT : TWO_LEFT;
+    way = (x0 > 0.) ? TWO_RIGHT : TWO_LEFT;
 
     if ((l < - COUENNE_INFINITY) && (u > COUENNE_INFINITY) || // [-inf,+inf[
 	(l < - COUENNE_INFINITY) && (y0 < pow0)            ||
@@ -215,15 +232,28 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 	}
     }
 
-    // otherwise, the convexification is surely bounded. 
+
+    // otherwise, on the side of the current point the convexification
+    // is bounded.
+
+    powertriplet pt (k);
+    *brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+
+    // in min-area and balanced strategy, point returned is
+    // positive. Put the right sign
+
+    if (y0 < pow0)
+      *brpts = -*brpts;
+
+    // otherwise, the convexification is surely bounded.
     //
     // apply minarea
 
-    if (u > l + COUENNE_EPS) {
+    /*if (u > l + COUENNE_EPS) {
       *brpts = safe_pow ((safe_pow (u, k) - safe_pow (l,k)) / (k* (u-l)), 1./(k-1.));
       if (u<0) 
 	*brpts = -*brpts;
-    }
+	}*/
   }
 
 
@@ -231,16 +261,16 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
   if (isInvInt && (intk % 2)) {
 
-    way = (x0 > 0) ? TWO_RIGHT : TWO_LEFT;
+    way = (x0 > 0.) ? TWO_RIGHT : TWO_LEFT;
 
     if ((l < - COUENNE_INFINITY) && (u > COUENNE_INFINITY) || // ]-inf,+inf[
 	(l < - COUENNE_INFINITY) && (y0 < pow0)            ||
 	(u >   COUENNE_INFINITY) && (y0 > pow0)){ 
 
-      if ((x0 > 0) && (y0 > pow0) ||  
-	  (x0 < 0) && (y0 < pow0)) { // in orthant
+      if ((x0 > 0.) && (y0 > pow0) ||  
+	  (x0 < 0.) && (y0 < pow0)) { // in orthant with curve (first or third)
 
-	*brpts = 0;
+	*brpts = 0.;
 	return fabs (pow0 - y0);
 
       } else {
@@ -253,15 +283,23 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
       }
     }
 
-    // otherwise, the convexification is bounded.
-    //
-    // Apply min-area convexification
+    // otherwise, on the side of the current point the convexification
+    // is bounded.
 
-    if (u > l + COUENNE_EPS) {
+    powertriplet pt (k);
+    *brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+
+    // in min-area and balanced strategy, point returned is
+    // positive. Put the right sign
+
+    if (y0 > pow0)
+      *brpts = -*brpts;
+
+    /*if (u > l + COUENNE_EPS) {
       *brpts = safe_pow ((safe_pow (u, k) - safe_pow (l,k)) / (k* (u-l)), 1./(k-1.));
       if (u<0) 
 	*brpts = -*brpts;
-    }
+    } else *brpts = 0.5*(l+u);*/
   }
 
   if (k>1) { // case 5: k>1 /////////////////////////////////////////////////////////////////
@@ -272,7 +310,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
       powertriplet pt (k);
       *brpts = powNewton (x0, y0, &pt);
 
-      way = TWO_LEFT;	
+      way = TWO_LEFT;
 
       x0 -= *brpts;
       y0 -= pow (*brpts, k);
@@ -332,7 +370,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 	CoinMin (projL, powbpt - y0) : 
 	CoinMin (projL, projectSeg (x0, y0, *brpts, powbpt, u, pow (u,k), +1));
 
-    } else { // on the convex side. We don't care if u is infinity
+    } else { // on the convex side. We don't care if u is infinite
 
       powertriplet pt (k);
       *brpts = powNewton (x0, y0, &pt);
@@ -346,8 +384,8 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
     }
   }
 
-  // failsafe: return null index, so that CouenneObject::infeasibility()
-  // picks the default variable/branchingpoint for the expression
+  // failsafe: return null, so that CouenneObject picks the default
+  // variable/branchingpoint for the expression
 
   var = NULL;
   return 0.;

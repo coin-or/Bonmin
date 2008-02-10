@@ -4,11 +4,14 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Base object for variables (to be used in branching)
  *
- * (C) Carnegie-Mellon University, 2006-07.
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include "CoinHelperFunctions.hpp"
+
+#include "CouenneSolverInterface.hpp"
+#include "CouenneProblem.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 #include "CouenneThreeWayBranchObj.hpp"
@@ -26,9 +29,6 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 			      JnlstPtr jnlst):
 
   reference_ (ref),
-  brVar_     (NULL), 
-  brPts_     (NULL),
-  whichWay_  (BRANCH_NONE),
   strategy_  (MID_INTERVAL),
   jnlst_     (jnlst),
   alpha_     (default_alpha) {
@@ -89,6 +89,7 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 
       if      (brtype == "balanced")  strategy_ = BALANCED;
       else if (brtype == "min-area")  strategy_ = MIN_AREA;
+      else if (brtype == "no-branch") strategy_ = NO_BRANCH;
       else if (brtype == "mid-point") {
 	strategy_ = MID_INTERVAL;
 	base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
@@ -107,26 +108,9 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 /// Copy constructor
 CouenneObject::CouenneObject (const CouenneObject &src):
   reference_ (src.reference_),
-  brVar_     (src.brVar_),
-  brPts_     (NULL),
-  whichWay_  (src.whichWay_),
   strategy_  (src.strategy_),
   jnlst_     (src.jnlst_),
-  alpha_     (src.alpha_) {
-
-  if (src.brPts_) {
-
-    int nbrpts = 
-      ((whichWay_ == TWO_RAND) ||
-       (whichWay_ == TWO_LEFT) ||
-       (whichWay_ == TWO_RIGHT)) ? 1 : 2;
-
-    brPts_ = (CouNumber *) malloc (nbrpts * sizeof (CouNumber));
-
-    while (nbrpts--) 
-      brPts_ [nbrpts] = src.brPts_ [nbrpts];
-  }
-}
+  alpha_     (src.alpha_) {}
 
 
 #define TOL 0.
@@ -222,8 +206,6 @@ double CouenneObject::feasibleRegion (OsiSolverInterface *solver,
     }
   }
 
-  // TODO: better value through one run of btCore ()
-
   return 0.;
 }
 
@@ -233,102 +215,73 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 						 const OsiBranchingInformation *info, 
 						 int way) const {
 
-  OsiBranchingObject *brObj = NULL;
+  // a nonlinear constraint w = f(x) is violated. The infeasibility is
+  // given by something more elaborate than |w-f(x)|, that is, it is
+  // the minimum, among the two branching nodes, of the distance from
+  // the current optimum (w,x) and the optimum obtained after
+  // convexifying the two subproblems. We call selectBranch for the
+  // purpose, and save the output parameter into the branching point
+  // that should be used later in createBranch.
 
-  bool isint = (brVar_) && brVar_ -> isInteger (); 
-  // (brVarInd_ >= 0) && (si -> isInteger (brVarInd_));
+  CouenneProblem *p = dynamic_cast <CouenneSolverInterface *> (si) -> CutGen () -> Problem ();
 
-#ifdef DEBUG
-  printf ("  createBranch -------------------\n");
-  for (int i=0; i<reference_ -> domain () -> current () -> Dimension (); i++)
-    printf ("  %4d %20.4g [%20.4g %20.4g] ---> %20.4g [%20.4g %20.4g]\n", i,
-	    reference_ -> domain () -> x  (i),
-	    reference_ -> domain () -> lb (i),
-	    reference_ -> domain () -> ub (i),
-	    info -> solution_ [i],
-	    info -> lower_    [i],
-	    info -> upper_    [i]);
-#endif
-
-  reference_ -> domain () -> push 
-    (reference_ -> domain () -> current () -> Dimension (),
+  p -> domain () -> push 
+    (p -> nVars (),
      info -> solution_,
      info -> lower_,
      info -> upper_);
 
-  // way has suggestion from CouenneObject::infeasibility(), but not
-  // as set in infeasibility, so we use the one stored in member
-  // whichWay_
-  // AW: We can't do that, way must be used!
+  CouNumber  *brPts = NULL; // branching point(s)
+  expression *brVar = NULL; // branching variable
+  int whichWay = 0;
 
-  // way = whichWay_;
+  CouNumber improv = reference_ -> Image () -> 
+    selectBranch (this, info,              // input parameters
+		  brVar, brPts, whichWay); // result: who, where, and how to branch
 
-#if (BR_TEST_LOG >= 0) && BR_TEST_GRAPH
-
-  //#define OPT_X0 1.7873085033688871
-    {
-      static bool first = true;
-
-      if (first) {
-	first = false;
-      }
-
-      double 
-	l = info -> lower_ [BR_TEST_LOG],
-	u = info -> upper_ [BR_TEST_LOG];
-      if (//(l <= OPT_X0) && (u >= OPT_X0) &&
-	  (reference_ -> Image () -> code () == COU_EXPRLOG))
-	printf ("#m=1,S=0 # brtest\n\
-%10g %10g # brtest\n\
-%10g %10g # brtest\n\
-%10g %10g # brtest\n\
-%10g %10g # brtest\n\
-%10g %10g # brtest\n\
- # brtest\n\
-#m=-1,S=0 # brtest\n\
- # brtest\n",
-		l, log (l), 
-		//		*brPts_, log (*brPts_), 
-		*brPts_, log (*brPts_)-CoinMin(u-*brPts_, *brPts_-l)/2, 
-		*brPts_, log (*brPts_), 
-		*brPts_, log (*brPts_)-CoinMin(u-*brPts_, *brPts_-l)/2, 
-		u, log (u));
-    }
+#ifdef DEBUG
+  printf ("brpts for "); reference_ -> print (); printf (" := ");
+  reference_ -> Image () -> print (); printf (" is on "); brVar -> print ();
+  printf (" @ %.12g [%.12g,%.12g]\n", *brPts, 
+	  p -> Lb (brVar -> Index ()), 
+	  p -> Ub (brVar -> Index ()));
 #endif
 
-  if (brVar_) // if applied latest selectBranching
+  // whichWay is IGNORED
 
-    switch (way) {
+#ifdef DEBUG
+  if (brVar) {
 
-    case TWO_LEFT:
-    case TWO_RIGHT:
-    case TWO_RAND:
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		     "2way Branch x%d at %g [%d] (%d)\n", 
-		     brVar_ -> Index (), *brPts_, way, isint);
-      brObj = new CouenneBranchingObject (jnlst_, brVar_, way, *brPts_);
-      break;
-    case THREE_LEFT:
-    case THREE_CENTER:
-    case THREE_RIGHT:
-    case THREE_RAND:
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		     "3Way Branch x%d @ %g ][ %g [%d] (%d)\n", 
-		     brVar_ -> Index (), *brPts_, brPts_ [1], way, isint);
-      brObj = new CouenneThreeWayBranchObj (jnlst_, brVar_, brPts_ [0], brPts_ [1], way);
-      break;
-    default: 
-      printf ("CouenneObject::createBranch(): way=%d has no sense\n", way);
-      exit (-1);
+    if (improv <= COUENNE_EPS) {
+      printf ("### warning, infeas = %g for ", improv);
+      reference_ -> print (); printf (":=");
+      reference_ -> Image () -> print (); printf ("\n");
     }
 
-  if (!brObj) {
+    int index = brVar -> Index ();
+    if (info -> lower_ [index] >= 
+	info -> upper_ [index] - COUENNE_EPS) {
+      printf ("### warning, tiny bounding box [%g,%g] for x_%d\n", 
+	      info -> lower_ [index],
+	      info -> upper_ [index], index);
+    }
+  }
+#endif
 
-    // if selectBranch returned -1, apply default branching rule
+  // This should make getFixVar() useless if used in exprMul or
+  // exprDiv, i.e., the only non-unary operators.
+
+  OsiBranchingObject *brObj = NULL;
+
+  if (brVar) // if applied latest selectBranching
+
+    brObj = new CouenneBranchingObject (jnlst_, brVar, way ? TWO_RIGHT : TWO_LEFT, *brPts);
+
+  else {     // apply default branching rule
 
     if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
       // we should pipe all output through journalist
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "CO::createBranch: ");
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "failsafe branch: ");
       reference_ -> print (std::cout);                              printf (" = ");
       reference_ -> Image () -> print (std::cout); fflush (stdout); printf (" --> branch on ");
       reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
@@ -380,13 +333,14 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	  || (fabs (xr-lr) < COUENNE_EPS)
 	  || (fabs (ur-xr) < COUENNE_EPS)
 	  || (fabs (ur-lr) < COUENNE_EPS))
-	brObj = new CouenneBranchingObject (jnlst_, depvar, way, x);  
+	brObj = new CouenneBranchingObject (jnlst_, depvar, way ? TWO_RIGHT : TWO_LEFT, x);  
     }
 
-    brObj = new CouenneBranchingObject (jnlst_, reference_, way, xr);
+    brObj = new CouenneBranchingObject (jnlst_, reference_, way ? TWO_RIGHT : TWO_LEFT, xr);
   }
 
-  reference_ -> domain () -> pop ();
+  p -> domain () -> pop ();
+
   return brObj;
 }
 

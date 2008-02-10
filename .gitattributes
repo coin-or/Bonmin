@@ -24,7 +24,6 @@ Couenne/src/bound_tightening/operators/impliedBounds-exprSum.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-mul.cpp -text
 Couenne/src/bound_tightening/operators/impliedBounds-sum.cpp -text
 Couenne/src/bound_tightening/tightenBounds.cpp -text
-Couenne/src/branch/CouObjStats.hpp -text
 Couenne/src/branch/CouenneBranchingObject.cpp -text
 Couenne/src/branch/CouenneBranchingObject.hpp -text
 Couenne/src/branch/CouenneChooseStrong.cpp -text
@@ -36,7 +35,6 @@ Couenne/src/branch/CouenneObject.hpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.cpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.hpp -text
 Couenne/src/branch/getFixVarBinFun.cpp -text
-Couenne/src/branch/infeasibility.cpp -text
 Couenne/src/branch/operators/branchExprAbs.cpp -text
 Couenne/src/branch/operators/branchExprDiv.cpp -text
 Couenne/src/branch/operators/branchExprExp.cpp -text

@@ -33,11 +33,9 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
             yu = info -> upper_    [yi],
             y0 = info -> solution_ [yi];
 
-  // if [yl,yu] contains 0, create three nodes, with a small central
-  // one tight around zero -- it has a bad convexification and will be
-  // explored last
+  // if [yl,yu] contains 0, create two nodes
 
-  if ((yl < 0) && (yu > 0)) {
+  if ((yl < -COUENNE_EPS) && (yu > COUENNE_EPS)) {
 
     var = arglist_ [1];
     way = TWO_RAND;
@@ -58,8 +56,8 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   // closer to a situation where both y and w are bounded, if
   // necessary by branching on w.
   //
-  // First, branch on y if unbounded, and then on w. As a result of
-  // bound tightening, if both y and w are bounded, x is, too.
+  // Branch first on y if unbounded, and then on w. As a result of
+  // bound tightening, if both y and w are bounded, x will be, too.
 
   if ((yl < -COUENNE_INFINITY) || // and yu < 0
       (yu >  COUENNE_INFINITY)) { // and yl > 0
@@ -68,18 +66,18 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
     // if y0 close to bounds, branch away from it
-    if      (fabs (y0-yl) < COUENNE_NEAR_BOUND) *brpts = y0 + 1 + yl*10;
-    else if (fabs (y0-yu) < COUENNE_NEAR_BOUND) *brpts = y0 - 1 + yu*10;
+    if      (fabs (y0-yl) < COUENNE_NEAR_BOUND) *brpts = y0 + 1. + yl*10.;
+    else if (fabs (y0-yu) < COUENNE_NEAR_BOUND) *brpts = y0 - 1. + yu*10.;
     else                                        *brpts = y0;
 
-    way = (y0 > 0) ? TWO_LEFT : TWO_RIGHT;
+    way = (y0 > 0.) ? TWO_LEFT : TWO_RIGHT;
 
     return ((fabs (y0) < COUENNE_EPS) ? 1. : 
 	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [wi]));
   }
 
-  // y is bounded, and y0 should not be 0; if w is unbounded, it is
-  // better to bound w first as x will be too.
+  // y is bounded, and y0 should not be 0; if w is unbounded, bound w
+  // first as x will be too.
 
   CouNumber wl = info -> lower_    [wi], 
             wu = info -> upper_    [wi],
@@ -89,26 +87,39 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   if ((wl < -COUENNE_INFINITY) || 
       (wu >  COUENNE_INFINITY)) {
 
-    var = obj -> Reference ();//ind = wi;
+    var = obj -> Reference ();
 
     if ((wl < -COUENNE_INFINITY) &&
 	(wu >  COUENNE_INFINITY)) {
 
       // unbounded in two directions
 
-      CouNumber wreal = x0 / y0, 
-	wmin = w0, wmax = wreal; // (x0,y0,w0) is below surface
+      CouNumber 
+	wreal = x0 / y0, 
+	wmin  = w0, 
+	wmax  = wreal; // assume (x0,y0,w0) is below w=x/y
 
-      if (wreal < w0) { // (x0,y0,w0) is above surface
+      if (wreal < w0) { // but swap if (x0,y0,w0) is above w=x/y
 	wmin = wreal;
 	wmax = w0;
       }
 
+      // TODO: restore when we can do three-way-branching. Well, not
+      // that necessary after all
+
+#if 0 
       // unbounded in both directions: three way branching 
       brpts = (double *) realloc (brpts, 2 * sizeof (CouNumber));
       brpts [0] = wmin;
       brpts [1] = wmax;
       way = THREE_CENTER;
+#endif
+
+      // for now, use two-way
+
+      brpts = (double *) realloc (brpts, sizeof (CouNumber));
+      *brpts = wreal;
+      way = (w0 < wreal) ? TWO_LEFT : TWO_RIGHT;
 
     } else {
 

@@ -354,7 +354,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
       }
 
-      genRowCuts (si, cs, nchanged, changed, info, chg_bds, true);  // add cuts
+      genRowCuts (si, cs, nchanged, changed, //info, 
+		  chg_bds, true);  // add cuts
 
       problem_ -> domain () -> pop (); // restore point
 
@@ -375,7 +376,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
       }
 
-      genRowCuts (si, cs, nchanged, changed, info, chg_bds);
+      genRowCuts (si, cs, nchanged, changed, //info, 
+		  chg_bds);
     }
 
     // change tightened bounds through OsiCuts

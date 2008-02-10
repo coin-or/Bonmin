@@ -17,7 +17,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 				      OsiCuts &cs,
 				      int nchanged, 
 				      int *changed,
-				      const CglTreeInfo &info,
+				      //const CglTreeInfo &info,
 				      t_chg_bounds *chg,
 				      bool have_NLP) const {
 

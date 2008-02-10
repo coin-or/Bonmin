@@ -25,7 +25,6 @@ libCouenne_la_SOURCES = \
 	branch/CouenneChooseStrong.cpp \
 	branch/getFixVarBinFun.cpp \
 	branch/projections.cpp \
-	branch/infeasibility.cpp \
 	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
@@ -207,7 +206,6 @@ include_HEADERS = \
 	branch/CouenneChooseVariable.hpp \
 	branch/CouenneChooseStrong.hpp \
 	branch/projections.hpp \
-	branch/CouObjStats.hpp \
 	standardize/lqelems.hpp \
 	expression/domain.hpp \
 	expression/operators/exprAbs.hpp \

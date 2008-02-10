@@ -76,9 +76,6 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     CouNumber dy = y0 - log (*brpts);
     x0 -= *brpts;
 
-#if BR_TEST_LOG >= 0
-  return 1000;
-#endif
     return sqrt (x0*x0 + dy*dy); // exact distance
   } 
 
@@ -89,6 +86,9 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
 
     // 1) curve is unlimited in both senses --> three way branching
 
+    // restore when we can do three-way branching
+
+#if 0
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
     way = THREE_CENTER; // focus on central convexification first
 
@@ -98,10 +98,16 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     CouNumber a = x0 - exp (y0), // sides of a triangle with (x0,y0)
               b = log (x0) - y0; // as one of the vertices
 
-#if BR_TEST >= 0
-  return 1000;
-#endif
     return a * cos (atan (a/b)); // exact distance
+#endif
+
+    // follow South-East diagonal to find point on curve
+    // so that current point is surely cut 
+    brpts = (double *) realloc (brpts, sizeof (double));
+    *brpts = 0.5 * (x0 + exp (y0));
+    way = TWO_RAND;
+
+    return CoinMin (fabs (x0 - exp(y0)), fabs (y0 - log (x0)));
   } 
 
   // 2) at least one of them is finite --> two way branching
@@ -113,9 +119,6 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     *brpts = obj -> midInterval (exp (y0), l, u);
     way = TWO_RIGHT;
 
-#if BR_TEST_LOG >= 0
-  return 1000;
-#endif
   return projectSeg (x0, y0, *brpts, log (*brpts), u, log (u), +1); // exact distance
     //    return CoinMin (x0 - exp (y0), log (x0) - y0);
   }
@@ -125,9 +128,6 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     *brpts = obj -> midInterval (x0, l, u);
     way = TWO_LEFT;
 
-#if BR_TEST_LOG >= 0
-  return 1000;
-#endif
     return projectSeg (x0, y0, l, log (l), *brpts, log (*brpts), +1); // exact distance
     //return log (x0) - y0;
   } 
@@ -146,9 +146,6 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
 
   way = TWO_RAND;
 
-#if BR_TEST_LOG >= 0
-  return 1000;
-#endif
   // exact distance
   return CoinMin (projectSeg (x0, y0, l, log (l), *brpts, log (*brpts),             +1),
 		  projectSeg (x0, y0,             *brpts, log (*brpts), u, log (u), +1));

@@ -39,24 +39,17 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
   // equivalent to choose w's or x's index as ind, as the implied- and
   // propagated bounds will do the rest.
 
-  // two cases: 
-  // 
-  // 1) bounds include 0: three way branch to exclude 0 (refer to branchExprDiv.cpp)
-  // 2) otherwise         two   way branch
-
-  //  int wi = obj -> Reference () -> Index ();
-
-  if ((l < 0) && (u > 0)) {
+  if ((l < -COUENNE_EPS) && (u > COUENNE_EPS)) {
 
     brpts = (double *) realloc (brpts, sizeof (CouNumber));
-    *brpts = 0;
+    *brpts = 0.;
     way = TWO_RAND;
 
     // Closest branch of the hyperbola is on the same side of y+x=0 as
     // (x0,y0) => need only one powNewton
 
     if (fabs (x0) < COUENNE_EPS)
-      x0 = (x0 < 0) ? -COUENNE_EPS : COUENNE_EPS;
+      x0 = (x0 < 0.) ? -COUENNE_EPS : COUENNE_EPS;
 
     CouNumber xp, xx0 = x0, yy0 = y0, exponent = k;
 
@@ -80,32 +73,43 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
     return sqrt (x0*x0 + y0*y0); // exact distance
   }
 
-  // case 2: look if inside or outside of belly (refer to branchExprExp.cpp)
+  int intk = 0;
 
-  if ((x0 >= 0) && (y0 <  safe_pow  (x0,k)) ||
-      (x0 <  0) && (y0 > -safe_pow (-x0,k))) { // outside bellies 
+  bool isInt    =            fabs (k    - (double) (intk = COUENNE_round (k)))    < COUENNE_EPS,
+       isInvInt = !isInt && (fabs (1./k - (double) (intk = COUENNE_round (1./k))) < COUENNE_EPS);
 
-    way = (u < 0) ? TWO_RIGHT : TWO_LEFT; // explore finite interval first
+  // case 2: bound interval does not contain zero. Look if inside or
+  // outside of belly (refer to branchExprExp.cpp)
+
+  if ((x0 >= 0.) &&               (y0 <  safe_pow  (x0,k)) ||   // x0>0, any power, outside belly
+      (x0 <  0.) &&                                             // x0<0,
+      (((!intk && !(intk % 2)) && (y0 <  safe_pow  (x0,k))) ||  // integer even power, outside belly
+       ((intk  ||  (intk % 2)) && (y0 > -safe_pow (-x0,k))))) { // any other power, outside belly
+
+    way = (u < 0.) ? TWO_RIGHT : TWO_LEFT; // explore finite interval first
 
     powertriplet pt (k); // TODO: there may (will) be a problem with negative x0
     brpts = (double *) realloc (brpts, sizeof (double));
-    *brpts = obj -> midInterval ((x0 >= 0) ? 
-			   powNewton ( x0,  y0, &pt) : 
-			  -powNewton (-x0, -y0, &pt), l, u);
+    *brpts = obj -> midInterval ((x0 >= 0.) ? 
+ 	 			  powNewton ( x0,  y0, &pt) : 
+				 -powNewton (-x0, -y0, &pt), l, u);
 
     CouNumber dy = y0 - safe_pow (*brpts >= 0 ? *brpts : - *brpts, 1. / k);
     x0 -= *brpts;
     return sqrt (x0*x0 + dy*dy); // distance is exact
   }
 
-  // Inside, x0*y0 >= 1. Two cases: /////////////////////////////////////////////////
+  // Inside, (x0^k)*y0 >= 1. Two cases: /////////////////////////////////////////////////
  
   // 1) bounds are infinite both horizontally and vertically
-  //    (i.e. [-inf,0] or [0,inf]) --> three way branching
+  // (i.e. [-inf,0] or [0,inf]) --> as for exprExp, pick point on
+  // diagonal from current to curve, to be sure current will be cut by
+  // branching rule
 
   if ((l <   COUENNE_EPS) && (u >   COUENNE_INFINITY) || 
       (u > - COUENNE_EPS) && (l < - COUENNE_INFINITY)) {
 
+    /*
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
     way = THREE_CENTER; // focus on central convexification first
 
@@ -115,8 +119,22 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
     CouNumber a = fabs (y0 - 1 / x0), // sides of a triangle with (x0,y0)
               b = fabs (x0 - 1 / y0), // as one of the vertices
               c = a * cos (atan (a/b));
+    */
 
-    return CoinMin (a, CoinMin (b, c)); // distance is exact
+    brpts = (double *) realloc (brpts, sizeof (double));
+
+    //if (x0 > COUENNE_EPS) 
+    *brpts = 0.5 * (x0 + pow (fabs (y0), 1./k));
+      //else 
+      //*brpts = 0.5 * (x0 + pow (y0, 1./k));
+
+    // follow South-East diagonal to find point on curve
+    // so that current point is surely cut 
+    //*brpts = 0.5 * (x0 + log (y0)); 
+    way = TWO_RAND;
+    return CoinMin (x0 - pow (fabs (y0), 1./k), y0 - pow (x0,k));
+
+    //return CoinMin (a, CoinMin (b, c)); // distance is exact
   }
 
   // 2) at least one of them is finite --> two way branching

@@ -10,8 +10,14 @@
 
 #include "CoinHelperFunctions.hpp"
 
+#include "CouenneSolverInterface.hpp"
+#include "CouenneProblem.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
+
+// translate changed bound sparse array into a dense one
+void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged);
+
 
 /// make branching point $\alpha$ away from current point:
 /// bp = alpha * current + (1-alpha) * midpoint
@@ -24,8 +30,12 @@
 
 CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var, 
 						int way, CouNumber brpoint): 
-  variable_ (var),
-  jnlst_    (jnlst) {
+  variable_     (var),
+  jnlst_        (jnlst),
+  doFBBT_       (false),
+  doConvCuts_   (false),
+  downEstimate_ (0.),
+  upEstimate_   (0.) {
 
   firstBranch_ =  (way == TWO_LEFT)      ? 0 : 
                  ((way == TWO_RIGHT)     ? 1 : 
@@ -120,11 +130,68 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   if (!way) solver -> setColUpper (index, integer ? floor (brpt) : brpt); // down branch
   else      solver -> setColLower (index, integer ? ceil  (brpt) : brpt); // up   branch
 
+  CouenneSolverInterface *couenneSolver = dynamic_cast <CouenneSolverInterface *> (solver);
+
+  CouenneProblem *p = couenneSolver -> CutGen () -> Problem ();
+
+  int 
+    nvars  = p -> nVars (),
+    objind = p -> Obj (0) -> Body () -> Index ();
+
+  p -> domain () -> push (nvars,
+			  solver -> getColSolution (), 
+			  solver -> getColLower    (), 
+			  solver -> getColUpper    ());
+
+  CouNumber &estimate = way ? upEstimate_ : downEstimate_;
+
+  t_chg_bounds *chg_bds = new t_chg_bounds [nvars];
+
+  for (int i=0; i<nvars; i++) {
+    chg_bds [i].setLower (t_chg_bounds::CHANGED);
+    chg_bds [i].setUpper (t_chg_bounds::CHANGED);
+  }
+
+  if (doFBBT_ &&                                // this branching object should do FBBT
+      p -> doFBBT () &&                         // problem allowed to do FBBT
+      (!p -> boundTightening (chg_bds, NULL)))  // done FBBT and this branch is infeasible
+    return COIN_DBL_MAX;                        // ==> report it
+  else {
+
+    const double
+      *lb = solver -> getColLower (),
+      *ub = solver -> getColUpper ();
+
+    CouNumber newEst = p -> Lb (objind) - lb [objind];
+    if (newEst > estimate) 
+      estimate = newEst;
+
+    for (int i=0; i<nvars; i++) {
+      if (p -> Lb (i) > lb [i] + COUENNE_EPS) solver -> setColLower (i, p -> Lb (i));
+      if (p -> Ub (i) < ub [i] - COUENNE_EPS) solver -> setColUpper (i, p -> Ub (i));
+    }
+  }
+
+  if (doConvCuts_) {
+
+    int nchanged, *changed = NULL;
+    OsiCuts cs;
+
+    sparse2dense (nvars, chg_bds, changed, nchanged);
+    couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, //info, 
+					      chg_bds);  // add convexification cuts
+    solver -> applyCuts (cs);
+  }
+
+  p -> domain () -> pop ();
+
   // TODO: apply bound tightening to evaluate change in dual bound
 
   jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
   	  index, way ? '>' : '<', integer ? (way ? ceil : floor) (brpt) : brpt);
 
+  // next time do other branching
   branchIndex_++;
-  return 0.; // estimated change in objective function
+
+  return estimate; // estimated change in objective function
 }

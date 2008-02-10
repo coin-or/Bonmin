@@ -9,6 +9,7 @@
 
 #include "CouenneChooseStrong.hpp"
 #include "CoinTime.hpp"
+#include "CouenneProblem.hpp"
 
 namespace Bonmin {
 
@@ -47,6 +48,14 @@ namespace Bonmin {
 					  OsiBranchingInformation *info,
 					  int numberToDo, int returnCriterion)
   {
+
+    // update problem with point/bounds contained in info
+    problem_ -> domain () -> push 
+      (problem_ -> nVars (),
+       info -> solution_, 
+       info -> lower_, 
+       info -> upper_);
+
     // Might be faster to extend branch() to return bounds changed
     double * saveLower = NULL;
     double * saveUpper = NULL;
@@ -69,26 +78,39 @@ namespace Bonmin {
         specified branch and advances the branch object state to the next branch
         alternative.)
       */
+
+      int 
+	status0 = -1, 
+	status1 = -1;
+
       OsiSolverInterface * thisSolver = solver; 
       if (branch->boundBranch()) {
         // ordinary
-        branch->branch(solver);
+        if (branch->branch(solver) > COUENNE_INFINITY)
+	  status0 = 1;
         // maybe we should check bounds for stupidities here?
         solver->solveFromHotStart() ;
       } else {
         // adding cuts or something 
         thisSolver = solver->clone();
-        branch->branch(thisSolver);
-        // set hot start iterations
-        int limit;
-        thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
-        thisSolver->setIntParam(OsiMaxNumIteration,limit); 
-        thisSolver->resolve();
+        if (branch->branch(thisSolver) > COUENNE_INFINITY)
+	  status0 = 1;
+	else {
+	  // set hot start iterations
+	  int limit;
+	  thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
+	  thisSolver->setIntParam(OsiMaxNumIteration,limit); 
+	  thisSolver->resolve();
+	}
       }
       // can check if we got solution
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
-      int status0 = result->updateInformation(thisSolver,info,this);
-      numberStrongIterations_ += thisSolver->getIterationCount();
+
+      if (status0 < 0) {
+	status0 = result->updateInformation(thisSolver,info,this);
+	numberStrongIterations_ += thisSolver->getIterationCount();
+      }
+
       if (status0==3) {
         // new solution already saved
         if (trustStrongForSolution_) {
@@ -111,23 +133,32 @@ namespace Bonmin {
       thisSolver = solver; 
       if (branch->boundBranch()) {
         // ordinary
-        branch->branch(solver);
-        // maybe we should check bounds for stupidities here?
-        solver->solveFromHotStart() ;
+        if (branch->branch(solver) > COUENNE_INFINITY)
+	  status1 = 1;
+        else solver->solveFromHotStart();  // maybe we should check bounds for stupidities here?
       } else {
         // adding cuts or something 
         thisSolver = solver->clone();
-        branch->branch(thisSolver);
+        if (branch->branch(thisSolver) > COUENNE_INFINITY)
+	  status1 = 1;
+	else {
         // set hot start iterations
-        int limit;
-        thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
-        thisSolver->setIntParam(OsiMaxNumIteration,limit); 
-        thisSolver->resolve();
+	  int limit;
+	  thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
+	  thisSolver->setIntParam(OsiMaxNumIteration,limit); 
+	  thisSolver->resolve();
+	}
       }
       // can check if we got solution
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
-      int status1 = result->updateInformation(thisSolver,info,this);
-      numberStrongDone_++;
+
+      if (status1 < 0) {
+	status1 = result->updateInformation(thisSolver,info,this);
+	numberStrongDone_++;
+      }
+
+      //printf ("statuses = %d,%d\n", status0, status1);
+
       numberStrongIterations_ += thisSolver->getIterationCount();
       if (status1==3) {
         // new solution already saved
@@ -181,7 +212,12 @@ namespace Bonmin {
     delete [] saveUpper;
     // Delete the snapshot
     solver->unmarkHotStart();
+
+    // discard current point/bounds from problem
+    problem_ -> domain () -> pop ();
+
+    //printf ("retcode = %d\n", returnCode);
+
     return returnCode;
   }
-
 }

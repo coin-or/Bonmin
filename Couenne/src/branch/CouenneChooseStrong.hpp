@@ -3,7 +3,7 @@
  * Authors: Andreas Waechter, IBM Corp.
  * Purpose: Strong branching object for Couenne
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -54,7 +54,7 @@ namespace Bonmin {
 				   int numberToDo, int returnCriterion);
 
   private:
-    /** Default Constructor, forbiden for some reason.*/
+    /** Default Constructor, forbidden for some reason.*/
     CouenneChooseStrong ();
     
     /// Pointer to the associated MINLP problem

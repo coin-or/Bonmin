@@ -45,11 +45,14 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
   if (((var = arglist_ [0]) -> Index() >= 0) && (xl < -COUENNE_INFINITY) && (xu > COUENNE_INFINITY) ||
       ((var = arglist_ [1]) -> Index() >= 0) && (yl < -COUENNE_INFINITY) && (yu > COUENNE_INFINITY)) {
 
+    // restore it when we have three-way branching
+
+#if 0
     // branch around current point. If it is also at a crazy value,
     // reset it close to zero.
 
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
-    CouNumber curr = (*var) ();//expression::Variable (ind);
+    CouNumber curr = (*var) ();
 
     if (fabs (curr) >= LARGE_BOUND) curr = 0;
 
@@ -59,6 +62,10 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
     brpts [1] = curr + BOUND_WING;
 
     way = THREE_CENTER;
+#endif
+
+    brpts = (double *) realloc (brpts, sizeof (double));
+    *brpts = 0.;
 
     return fabs (w0 - x0*y0);
     //    return - COUENNE_INFINITY; // tell caller not to set infeasibility to this

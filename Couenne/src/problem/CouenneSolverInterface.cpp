@@ -130,6 +130,7 @@ void CouenneSolverInterface::solveFromHotStart() {
 
   knowInfeasible_ = false;
   knowOptimal_ = false;
+  /*
   const int ncols = cutgen_ -> Problem () -> nVars ();
 
   cutgen_ -> Problem () -> domain () -> push
@@ -168,7 +169,7 @@ void CouenneSolverInterface::solveFromHotStart() {
 
   const int nRowsBeforeRowCuts = getNumRows();
   //printf("NumRows before getRowCuts = %d\n", getNumRows());
-  cutgen_ -> genRowCuts (*this, cs, nchanged, changed, CglTreeInfo(),
+  cutgen_ -> genRowCuts (*this, cs, nchanged, changed, //CglTreeInfo(),
 			 chg_bds, false);
 
   // Now go through the list of cuts and apply the column cuts
@@ -208,6 +209,7 @@ void CouenneSolverInterface::solveFromHotStart() {
 
   const int nRowsAfterRowCuts = getNumRows();
   //printf("NumRows after applyCuts = %d\n", getNumRows());
+  */
 
   resolve();
   if (isProvenPrimalInfeasible()) {
@@ -219,6 +221,7 @@ void CouenneSolverInterface::solveFromHotStart() {
   //printf("obj value = %e\n",getObjValue());
 
   // now undo the row cuts
+  /*
   int nrowsdel = nRowsAfterRowCuts-nRowsBeforeRowCuts;
   int* rowsdel = new int[nrowsdel];
   for(int i=0; i<nrowsdel; i++) {
@@ -229,6 +232,7 @@ void CouenneSolverInterface::solveFromHotStart() {
   //printf("NumRows after deleting = %d\n", getNumRows());
 
   cutgen_ -> Problem () -> domain () -> pop ();
+  */
 }
 
 /// Delete the hot start snapshot.

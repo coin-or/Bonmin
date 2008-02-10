@@ -75,6 +75,9 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
   if ((l < -COUENNE_INFINITY) && 
       (u >  COUENNE_INFINITY)) {
 
+    // TODO: restore when we can do three-way branching
+
+#if 0
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
     way = THREE_CENTER; // focus on central convexification first
 
@@ -87,9 +90,18 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
 
     // exact distance from central interval, from others it's a and b
     return (a * cos (atan (a/b))); 
+#endif
+
+    // follow South-East diagonal to find point on curve
+    // so that current point is surely cut 
+    brpts = (double *) realloc (brpts, sizeof (double));
+    *brpts = 0.5 * (x0 + log (y0)); 
+    way = TWO_RAND;
+
+    return CoinMin (fabs (x0 - log(y0)), fabs (y0 - exp (x0)));
   }
 
-  // 2,3,4) at least one of them is finite --> two way branching
+  // 2,3) at least one of them is finite
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
@@ -112,7 +124,7 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
   // 4) both are finite
 
   simpletriplet ft (exp, exp, exp, log);
-  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
+  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u); // select based on strategy
 
   way = TWO_RAND;
 

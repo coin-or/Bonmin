@@ -170,7 +170,8 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
 
 	// only generate new row cuts if improvents are enough
 	int nCurCuts = cs.sizeRowCuts ();
-	cg -> genRowCuts (*csi, cs, nchanged, changed, info, chg_bds);
+	cg -> genRowCuts (*csi, cs, nchanged, changed, //info, 
+			  chg_bds);
 
 	if (nCurCuts == cs.sizeRowCuts ())
 	  break; // repeat only if new cuts available
