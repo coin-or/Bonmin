@@ -26,7 +26,6 @@
 #define CON_DE    ((const ASL_fg *) asl) -> I.con_de_
 #define OBJ_sense ((const ASL_fg *) asl) -> i.objtype_
 
-
 //#define DEBUG
 
 // check if an expression is a null pointer or equals zero
@@ -72,6 +71,9 @@ int CouenneProblem::readnl (const ASL *asl) {
   for (int i = n_var - (CoinMax (nlvc,nlvo) +niv+nbv+nwv); i--;) addVariable(false, &domain_);//other
   for (int i = 0; i < nbv; i++)                                  addVariable(true, &domain_); //binary
   for (int i = 0; i < niv; i++)                                  addVariable(true, &domain_); //int.
+
+  // add space for common expressions
+  for (int i = ndefined_; i--;)                                  addVariable(false, &domain_);
 
   nOrig_ = n_var;
 

@@ -47,33 +47,33 @@ void CouenneProblem::standardize () {
 
 #ifdef DEBUG
   if (commonexprs_.size ()) printf ("%d common exprs, initVar = %d = %d - %d\n", 
-				    commonexprs_.size (), initVar, 
-				    variables_ . size (), commonexprs_ . size ());
+				    commonexprs_.size (), 
+				    initVar, 
+				    variables_ . size (), 
+				    commonexprs_ . size ());
 #endif
 
   for (std::vector <expression *>::iterator i = commonexprs_ . begin ();
        i != commonexprs_ . end (); ++i) {
 
-    expression *aux = (*i);
-
 #ifdef DEBUG
-    printf ("////////////// stdz common expr [%d] :=", initVar); fflush (stdout);
-    aux -> print (); printf ("\n"); fflush (stdout);
+    printf ("-- stdz common expr [%d] :=", initVar); fflush (stdout);
+    (*i) -> print (); printf ("\n"); fflush (stdout);
 #endif
 
-    exprAux *naux = aux -> standardize (this);
+    exprAux *naux = (*i) -> standardize (this, false);
 
     expression *img = naux -> Image ();
 
     exprAux *newvar = new exprAux (img, initVar, 1 + img -> rank (), exprAux::Unset, &domain_);
     //img -> isInteger () ? exprAux::Integer : exprAux::Continuous);
 
-    variables_ [initVar] = newvar;
+    auxiliarize (newvar); // takes care of putting newvar at right position in variables_
 
     graph_ -> insert (newvar);
     graph_ -> erase (naux);
 
-    variables_ . erase (variables_ . end () - 1);
+    //variables_ . erase (variables_ . end () - 1);
 
 #ifdef DEBUG
     if (naux) {
@@ -81,8 +81,8 @@ void CouenneProblem::standardize () {
       naux -> print (); printf ("\n");
       printf (" := "); fflush (stdout);
       naux -> Image () -> print (); printf ("\n..."); fflush (stdout);
-    } else if (aux) {
-      aux -> print ();
+    } else if (*i) {
+      (*i) -> print ();
       //printf (" := "); fflush (stdout);
       //aux -> Image () -> print (); 
       printf ("\n");
@@ -157,7 +157,7 @@ void CouenneProblem::standardize () {
     printf (" --> ");
     (*i) -> print ();
     printf ("..............................................................\n");
-    print ();
+    //print ();
 #endif
 
     /*printf ("=== "); fflush (stdout); 
@@ -171,7 +171,7 @@ void CouenneProblem::standardize () {
 #ifdef DEBUG
   // Use with caution. Bounds on auxs are not defined yet, so valgrind complains
   printf ("done with standardization:\n");
-  print (); 
+  //print (); 
 #endif
 
   // Create evaluation order ////////////////////////////////////////////////////

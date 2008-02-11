@@ -303,7 +303,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     //--------------------------------------------
 
-    if (babInfo) { // OLD: && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
+    if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
 
       // Aggressive Bound Tightening ////////////////////////////////
 

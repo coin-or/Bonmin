@@ -22,9 +22,14 @@ bool DepGraph::checkCycles () {
     std::set <DepNode *, compNode> *gen2 = (*i) -> DepList ();
 
     for (std::set <DepNode *, compNode>::iterator j = gen2 -> begin (); 
-	 j != gen2 -> end (); ++j)
-      if ((*j) -> depends (xi, true))
+	 j != gen2 -> end (); ++j) {
+
+      std::set <DepNode *, compNode> already_visited;
+
+      if ((*j) -> depends (xi, true, &already_visited))
 	return true;
+      else already_visited.insert (*j);
+    }
   }
 
   return false;

@@ -152,25 +152,25 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     chg_bds [i].setUpper (t_chg_bounds::CHANGED);
   }
 
-  if (doFBBT_ &&                                // this branching object should do FBBT
-      p -> doFBBT () &&                         // problem allowed to do FBBT
-      (!p -> boundTightening (chg_bds, NULL)))  // done FBBT and this branch is infeasible
-    return COIN_DBL_MAX;                        // ==> report it
-  else {
+  if (doFBBT_ &&                               // this branching object should do FBBT
+      p -> doFBBT ())                          // problem allowed to do FBBT
+    if (!p -> boundTightening (chg_bds, NULL)) // done FBBT and this branch is infeasible
+      return COIN_DBL_MAX;                     // ==> report it
+    else {
 
-    const double
-      *lb = solver -> getColLower (),
-      *ub = solver -> getColUpper ();
+      const double
+	*lb = solver -> getColLower (),
+	*ub = solver -> getColUpper ();
 
-    CouNumber newEst = p -> Lb (objind) - lb [objind];
-    if (newEst > estimate) 
-      estimate = newEst;
+      CouNumber newEst = p -> Lb (objind) - lb [objind];
+      if (newEst > estimate) 
+	estimate = newEst;
 
-    for (int i=0; i<nvars; i++) {
-      if (p -> Lb (i) > lb [i] + COUENNE_EPS) solver -> setColLower (i, p -> Lb (i));
-      if (p -> Ub (i) < ub [i] - COUENNE_EPS) solver -> setColUpper (i, p -> Ub (i));
+      for (int i=0; i<nvars; i++) {
+	if (p -> Lb (i) > lb [i] + COUENNE_EPS) solver -> setColLower (i, p -> Lb (i));
+	if (p -> Ub (i) < ub [i] - COUENNE_EPS) solver -> setColUpper (i, p -> Ub (i));
+      }
     }
-  }
 
   if (doConvCuts_) {
 

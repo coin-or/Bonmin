@@ -68,13 +68,14 @@ public:
   {return depList_;}
 
   /// does this variable depend on variable with index xi?
-  bool depends (int , bool = false) const;
+  bool depends (int xi, bool = false, 
+		std::set <DepNode *, compNode> *already_visited = NULL) const;
 
   /// assign numbering to all nodes of graph
   void createOrder (DepGraph *);
 
   /// debugging procedure
-  void print (int = 0) const;
+  void print (int = 0, bool descend = false) const;
 };
 
 
@@ -133,7 +134,7 @@ public:
   void createOrder ();
 
   /// debugging procedure
-  void print ();
+  void print (bool descend = false);
 
   /// search for node in vertex set
   DepNode *lookup (int index);

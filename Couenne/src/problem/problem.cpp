@@ -164,8 +164,6 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 	 (lcoe [i]. second) : 
 	-(lcoe [i]. second);
 
-    //    deps += el -> first -> DepList (deplist, type, p);
-
   } // no break, as exprGroup is derived from exprSum
 
   case COU_EXPRSUM: { // 
@@ -198,9 +196,11 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
       }
   } break;
 
+  case COU_EXPRCONST: break; // a constant objective
+
   default:
     Jnlst()->Printf(Ipopt::J_WARNING, J_PROBLEM,
-		    "### objective function not recognized\n");
+		    "Couenne: warning, objective function not recognized\n");
     break;
   }
 }
@@ -213,7 +213,8 @@ void CouenneProblem::setCutOff (CouNumber cutoff) {
 
   // AW: Should we use the value of the objective variable computed by 
   //     Couenne here?
-  if (cutoff < pcutoff_ -> getCutOff () - COUENNE_EPS) {
+  if ((indobj >= 0) &&
+      (cutoff < pcutoff_ -> getCutOff () - COUENNE_EPS)) {
 
     Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
 		    "Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",

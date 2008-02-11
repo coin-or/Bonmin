@@ -118,8 +118,9 @@ expression *CouenneProblem::nl2e (expr *e) {
   case OPHOL:     notimpl ("hol");
   case OPVARVAL:  {
 
-    int j = ((expr_v *) e) -> a, 
-        d = nVars () - j;
+    int j = ((expr_v *) e) -> a;
+
+    /*        d = nVars () - j;
 
     if (j >= nOrig_) j--; // CHECK! 
 
@@ -129,13 +130,18 @@ expression *CouenneProblem::nl2e (expr *e) {
     //if (j >= nvars)
 
     while (d++ <= 0)
-      addVariable (false, &domain_);
+    addVariable (false, &domain_);*/
 
     //printf ("indexD = %d\n", j);
     //printf ("Couenne, warning: unknown variable x%d (>%d+%d=%d), returning new variable.\n",
     //	j, nvars, nAuxs (), nvars + nAuxs ());
     //	exit (-1);
     // TODO: aux_ [...] may not be filled yet
+
+    if (j >= nOrig_ + ndefined_) {
+      printf ("error: unknown variable x_%d\n", j);
+      exit (-1);
+    }
 
     return new exprClone (variables_ [j]);
   }

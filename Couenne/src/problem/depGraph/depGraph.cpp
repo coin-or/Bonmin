@@ -15,22 +15,37 @@
 // Methods of the class DepNode ///////////////////////////////////////////////////////////
 
 /// does this variable depend on variable with index xi?
-bool DepNode::depends (int xi, bool recursive) const {
+bool DepNode::depends (int xi, bool recursive, 
+		       std::set <DepNode *, compNode> *already_visited) const {
 
   // check if any node of the forward star has index xi
   for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin (); 
-       i != depList_ -> end (); ++i)
+       i != depList_ -> end (); ++i) {
 
-    if (((*i) -> Index () == xi) || // check current node
+    if (!already_visited || 
+	(already_visited -> find (*i) == already_visited -> end ())) {
+
+      if (((*i) -> Index () == xi) || // check current node
 	(recursive && 
-	 ((*i) -> depends (xi, recursive)))) // check deplist recursively
+	 ((*i) -> depends (xi, recursive, already_visited)))) // check deplist recursively
       { 
 #ifdef DEBUG
 	printf ("%d <- ", (*i) -> Index ()); 
 	fflush (stdout);
 #endif
 	return true;
+      } else {
+	if (already_visited) {
+	  already_visited -> insert (*i);
+	  /*printf ("checked [%d]: ", (*i) -> Index ()); 
+	  for (std::set <DepNode *, compNode>::iterator j = already_visited -> begin ();
+	       j != already_visited -> end (); ++j)
+	    printf ("%d ", (*j) -> Index ());
+	    printf ("\n");*/
+	}
       }
+    }
+  }
 
   return false;
 }
@@ -60,7 +75,7 @@ void DepNode::createOrder (DepGraph *g) {
 
 
 /// debugging procedure
-void DepNode::print (int indent) const {
+void DepNode::print (int indent, bool descend) const {
 
   printf ("%d ", index_); 
   if (order_ >= 0) printf ("[%d]", order_); 
@@ -71,7 +86,9 @@ void DepNode::print (int indent) const {
 
     for (std::set <DepNode *, compNode>::iterator i = depList_ -> begin();
 	 i != depList_ -> end (); ++i)
-      (*i) -> print (indent + 1);
+      if (descend)
+	(*i) -> print (indent + 1, descend);
+      else printf ("%d ", (*i) -> Index ());
 
     printf (") "); fflush (stdout);
   }
@@ -126,8 +143,10 @@ bool DepGraph::depends (int wi, int xi, bool recursive) {
   std::set <DepNode *, compNode>::iterator i = vertices_. find (el);
   delete el;
 
+  std::set <DepNode *, compNode> already_visited;
+
   if (i != vertices_. end ())               // if such element is in the set
-    return (*i) -> depends (xi, recursive); // then search it
+    return (*i) -> depends (xi, recursive, &already_visited); // then search it
   else return false;
 }
 
@@ -142,12 +161,12 @@ void DepGraph::createOrder () {
 
 
 /// debugging procedure
-void DepGraph::print () {
+void DepGraph::print (bool descend) {
 
   printf ("Dependence graph: \n");
   for (std::set <DepNode *, compNode>::iterator i = vertices_. begin();
        i != vertices_. end (); ++i) {
-    (*i) -> print ();
+    (*i) -> print (0, descend);
     printf ("\n");
   }
 }
