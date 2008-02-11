@@ -71,7 +71,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
     }
   }
 
-  jnlst_ -> Printf(J_DETAILED, J_CONVEXIFYING, "best dist = %e\n", dist);
+  jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "best dist = %e\n", dist);
 
   // If this solution is not sufficiently inside the bounds, we solve the NLP now
   if (dist > 0.1) { // TODO: Find tolerance
@@ -87,13 +87,13 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
       dist = 0.;
     }
     else {
-      jnlst_ -> Printf(J_DETAILED, J_CONVEXIFYING, "TODO: NLP solve in ABT failed\n");
+      jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "TODO: NLP solve in ABT failed\n");
       return true;
     }
   }
 
   if (dist>1e10) {
-    jnlst_ -> Printf(J_DETAILED, J_CONVEXIFYING, "TODO: Don't have point for ABT\n");
+    jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "TODO: Don't have point for ABT\n");
     return true;
   }
 
