@@ -300,7 +300,8 @@ class CouenneProblem {
   /// aggressive bound tightening. Fake bounds in order to cut
   /// portions of the solution space by fathoming on
   /// bounds/infeasibility
-  bool aggressiveBT (t_chg_bounds *, 
+  bool aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
+		     t_chg_bounds *, 
 		     Bonmin::BabInfo * = NULL) const;
 
   /// procedure to strengthen variable bounds. Return false if problem

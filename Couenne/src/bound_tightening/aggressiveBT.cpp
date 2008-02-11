@@ -10,21 +10,40 @@
  */
 
 #include "CoinHelperFunctions.hpp"
-#include "BonBabInfos.hpp"
+#include "BonCouenneInfo.hpp"
 
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 
 #define MAX_ABT_ITER 8  // max # aggressive BT iterations
 
+static double distanceToBound(int n, const double* xOrig,
+			      const double* lower, const double* upper)
+{
+  double Xdist = 0.;
+  for (int i=0; i<n; i++) {
+    if (lower[i] > xOrig[i]) {
+      Xdist += lower[i] - xOrig[i];
+    }
+    if (upper[i] < xOrig[i]) {
+      Xdist += xOrig[i] - upper[i];
+    }
+  }
+  return Xdist;
+}
 
 // Aggressive Bound Tightening: for each variable, fake new bounds
 // [l,b] or [b,u] and apply bound tightening. If the interval is
 // fathomed on bounds or on infeasibility, the complementary bound
 // interval is a valid tightening.
 
-bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds, 
+bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
+				   t_chg_bounds *chg_bds, 
 				   Bonmin::BabInfo * babInfo) const {
+
+  Bonmin::CouenneInfo* couInfo =
+    dynamic_cast<Bonmin::CouenneInfo*>(babInfo);
+
   int  ncols  = nVars ();
   bool retval = true;
 
@@ -32,17 +51,57 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
     *olb = new CouNumber [ncols],
     *oub = new CouNumber [ncols];
 
+  // save current bounds
+  CoinCopyN (Lb (), ncols, olb);
+  CoinCopyN (Ub (), ncols, oub);
+
+  // Find the solution that is closest to the current bounds
+  // TODO: Also check obj value
+  SmartPtr<const Bonmin::CouenneInfo::NlpSolution> closestSol;
+  double dist = 1e50;
+  const std::list<SmartPtr<const Bonmin::CouenneInfo::NlpSolution> >& solList =
+    couInfo->NlpSolutions();
+  for (std::list<SmartPtr<const Bonmin::CouenneInfo::NlpSolution> >::const_iterator i = solList.begin();
+       i != solList.end(); i++) {
+    assert(nOrig_ == (*i)->nVars());
+    const double thisDist = distanceToBound(nOrig_, (*i)->solution(), olb, oub);
+    if (thisDist < dist) {
+      closestSol = *i;
+      dist = thisDist;
+    }
+  }
+  printf("best dist = %e\n", dist);
+
+  // If this solution is not sufficiently inside the bounds, we solve the NLP now
+  if (dist > 0.1) { // TODO: Find tolerance
+    nlp->setColLower(olb);
+    nlp->setColUpper(oub);
+    nlp->setColSolution(X());
+
+    nlp->initialSolve ();
+    if (nlp->isProvenOptimal()) {
+      closestSol = new Bonmin::CouenneInfo::NlpSolution(nOrig_, nlp->getColSolution(), nlp->getObjValue());
+      couInfo->addSolution(closestSol);
+      dist = 0.;
+    }
+    else {
+      printf("TODO: NLP solve in ABT failed\n");
+      return true;
+    }
+  }
+
+  if (dist>1e10) {
+    printf("TODO: Don't have point for ABT\n");
+    return true;
+  }
+
   // X is now the NLP solution, but in a low-dimensional space. We
   // have to get the corresponding point in higher dimensional space
   // through getAuxs()
 
   double *X = new double [ncols];
-  CoinCopyN (babInfo -> nlpSolution (), nOrig_, X);
+  CoinCopyN (closestSol->solution(), nOrig_, X);
   getAuxs (X);
-
-  // save current bounds
-  CoinCopyN (Lb (), ncols, olb);
-  CoinCopyN (Ub (), ncols, oub);
 
   // create a new, fictitious, bound bookkeeping structure
   t_chg_bounds *f_chg = new t_chg_bounds [ncols];
@@ -131,11 +190,6 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
 				 "Couenne infeasible node from aggressive BT\n");
   }
 
-  delete [] X;
-  delete [] f_chg;
-  delete [] olb;
-  delete [] oub;
-
   if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
     //    CouNumber cutoff = getCutOff ();
     int       objind = Obj (0) -> Body  () -> Index ();
@@ -147,6 +201,11 @@ bool CouenneProblem::aggressiveBT (t_chg_bounds *chg_bds,
 		      "   %2d %+20g %+20g  | %+20g\n",
 		      i, Lb (i), Ub (i), X [i]);
   }
+
+  delete [] X;
+  delete [] f_chg;
+  delete [] olb;
+  delete [] oub;
 
   return retval;// && btCore (psi, cs, chg_bds, babInfo, true); // !!!
   //return retval && btCore (psi, cs, chg_bds, babInfo, true);

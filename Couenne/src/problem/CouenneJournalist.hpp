@@ -23,5 +23,6 @@ const Ipopt::EJournalCategory J_BRANCHING(Ipopt::J_USER1);
 const Ipopt::EJournalCategory J_BOUNDTIGHTENING(Ipopt::J_USER2);
 const Ipopt::EJournalCategory J_CONVEXIFYING(Ipopt::J_USER3);
 const Ipopt::EJournalCategory J_PROBLEM(Ipopt::J_USER4);
+const Ipopt::EJournalCategory J_NLPHEURISTIC(Ipopt::J_USER5);
 
 #endif

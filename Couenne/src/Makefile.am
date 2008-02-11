@@ -179,6 +179,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(COUENNESRCDIR)/src/expression` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/Interfaces` \
 	-I`$(CYGPATH_W) $(BONMINSRCDIR)/src/CbcBonmin` \
+	-I`$(CYGPATH_W) $(BONMINSRCDIR)/experimental/NotConvex` \
 	-I`$(CYGPATH_W) $(objdir)/inc` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc`

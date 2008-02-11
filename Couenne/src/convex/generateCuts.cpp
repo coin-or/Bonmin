@@ -303,7 +303,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     //--------------------------------------------
 
-    if (babInfo && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
+    if (babInfo) { // OLD: && ((nlpSol = const_cast <double *> (babInfo -> nlpSolution ())))) {
 
       // Aggressive Bound Tightening ////////////////////////////////
 
@@ -313,12 +313,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  ((logAbtLev != 0) ||                // (parameter is nonzero OR
 	   (info.level == 0)) &&              //  we are at root node), AND
 	  (info.pass == 0) &&               // at first round of cuts, AND 
-	  ((logAbtLev < 0) ||                 // (logObbtLev = -1, OR
+	  ((logAbtLev < 0) ||                 // (logAbtLev = -1, OR
 	   (info.level <= logAbtLev) ||       //  depth is lower than COU_OBBT_CUTOFF_LEVEL, OR
 	   (CoinDrand48 () <                  //  probability inversely proportional to the level)
 	    pow (2., (double) logAbtLev - (info.level + 1))))) {
 
-	if (! (problem_ -> aggressiveBT (chg_bds, babInfo)))
+	jnlst_ -> Printf(J_DETAILED, J_CONVEXIFYING,"  performing ABT\n");
+	if (! (problem_ -> aggressiveBT (nlp_, chg_bds, babInfo)))
 	  throw INFEASIBLE;
 
 	sparse2dense (ncols, chg_bds, changed, nchanged);
@@ -362,7 +363,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       addviolated_ = save_av;     // restore previous value
 
       //    if (!firstcall_) // keep solution if called from extractLinearRelaxation()
-      babInfo -> setHasNlpSolution (false); // reset it after use 
+      babInfo -> setHasNlpSolution (false); // reset it after use //AW HERE
     } else {
 
       if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
@@ -394,6 +395,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   catch (int exception) {
 
     if ((exception == INFEASIBLE) && (!firstcall_)) {
+
+      jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,
+			"generateCuts: Infeasible node detected\n");
 
       OsiColCut *infeascut = new OsiColCut;
 
