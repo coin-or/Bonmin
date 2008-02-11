@@ -17,7 +17,7 @@
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
 #include "CouenneCutGenerator.hpp"
-#include "BonAuxInfos.hpp"
+#include "BonCouenneInfo.hpp"
 #include "BonCbcNode.hpp"
 
 #include "asl.h"
@@ -104,7 +104,7 @@ namespace Bonmin{
     //couenneProb -> readCutoff (argv [1]);
     //couenneProb -> setCutOff (atof (argv [1]));
 
-    Bonmin::BabInfo * extraStuff = new Bonmin::BabInfo(0);
+    Bonmin::BabInfo * extraStuff = new Bonmin::CouenneInfo(0);
 
     // as per instructions by John Forrest, to get changed bounds
     extraStuff -> setExtraCharacteristics (extraStuff -> extraCharacteristics () | 2);
