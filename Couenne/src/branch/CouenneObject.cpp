@@ -76,8 +76,8 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
     case COU_EXPRDIV: br_operator = "div"; break;
     case COU_EXPRLOG: br_operator = "log"; break;
     case COU_EXPREXP: br_operator = "exp"; break;
-    case COU_EXPRSIN: br_operator = "sin"; break;
-    case COU_EXPRCOS: br_operator = "cos"; break;
+    case COU_EXPRSIN:
+    case COU_EXPRCOS: br_operator = "trig"; break;
     default:;
     }
 

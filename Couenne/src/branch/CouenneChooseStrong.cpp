@@ -73,11 +73,14 @@ namespace Bonmin {
       // For now just 2 way
       OsiBranchingObject * branch = result->branchingObject();
       assert (branch->numberBranches()==2);
+
       /*
         Try the first direction.  Each subsequent call to branch() performs the
         specified branch and advances the branch object state to the next branch
         alternative.)
       */
+
+      // DOWN DIRECTION ///////////////////////////////////////////////////////
 
       int 
 	status0 = -1, 
@@ -86,15 +89,19 @@ namespace Bonmin {
       OsiSolverInterface * thisSolver = solver; 
       if (branch->boundBranch()) {
         // ordinary
-        if (branch->branch(solver) > COUENNE_INFINITY)
+        if (branch->branch(solver) > COUENNE_INFINITY) {
 	  status0 = 1;
+	  result -> setDownStatus (1);
+	}
         // maybe we should check bounds for stupidities here?
         solver->solveFromHotStart() ;
       } else {
         // adding cuts or something 
         thisSolver = solver->clone();
-        if (branch->branch(thisSolver) > COUENNE_INFINITY)
+        if (branch->branch(thisSolver) > COUENNE_INFINITY) {
 	  status0 = 1;
+	  result -> setDownStatus (1);
+	}
 	else {
 	  // set hot start iterations
 	  int limit;
@@ -127,20 +134,24 @@ namespace Bonmin {
         if (saveUpper[j] != upper[j])
   	solver->setColUpper(j,saveUpper[j]);
       }
-      /*
-        Try the next direction
-      */
+
+      // UP DIRECTION ///////////////////////////////////////////////////////
+
       thisSolver = solver; 
       if (branch->boundBranch()) {
         // ordinary
-        if (branch->branch(solver) > COUENNE_INFINITY)
+        if (branch->branch(solver) > COUENNE_INFINITY) {
 	  status1 = 1;
+	  result -> setUpStatus (1);
+	}
         else solver->solveFromHotStart();  // maybe we should check bounds for stupidities here?
       } else {
         // adding cuts or something 
         thisSolver = solver->clone();
-        if (branch->branch(thisSolver) > COUENNE_INFINITY)
+        if (branch->branch(thisSolver) > COUENNE_INFINITY) {
 	  status1 = 1;
+	  result -> setUpStatus (1);
+	}
 	else {
         // set hot start iterations
 	  int limit;

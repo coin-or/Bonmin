@@ -246,7 +246,7 @@ class CouenneProblem {
   int readnl (const struct ASL *);
 
   /// Generate a Couenne expression from an ASL expression
-  expression *nl2e (struct expr *);
+  expression *nl2e (struct expr *, const ASL *asl);
 
   // bound tightening parameters
   bool doFBBT () const {return doFBBT_;} ///< shall we do Feasibility Based Bound Tightening?

@@ -165,7 +165,7 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "no-branch", "do not branch, return null infeasibility; for testing purposes only",
      "");
 
-  std::string br_ops [] = {"prod", "div", "exp", "log", "sin", "cos", 
+  std::string br_ops [] = {"prod", "div", "exp", "log", "trig", 
 			   "pow",  "negpow", "sqr", "cube", ""};
 
   for (int i=0; br_ops [i] != ""; i++) {

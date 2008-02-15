@@ -36,9 +36,7 @@ inline bool is_expr_zero (expr* e)
 			  // *** CHECK THIS! dL is the derivative
 			  )));} 
 
-
 // Reads a MINLP from an AMPL .nl file through the ASL methods
-
 int CouenneProblem::readnl (const ASL *asl) {
 
   problemName_ = filename;
@@ -69,8 +67,8 @@ int CouenneProblem::readnl (const ASL *asl) {
 
   for (int i = 0; i < nwv; i++)                                  addVariable(false, &domain_);//arc
   for (int i = n_var - (CoinMax (nlvc,nlvo) +niv+nbv+nwv); i--;) addVariable(false, &domain_);//other
-  for (int i = 0; i < nbv; i++)                                  addVariable(true, &domain_); //binary
-  for (int i = 0; i < niv; i++)                                  addVariable(true, &domain_); //int.
+  for (int i = 0; i < nbv; i++)                                  addVariable(true,  &domain_);//binary
+  for (int i = 0; i < niv; i++)                                  addVariable(true,  &domain_);//int.
 
   // add space for common expressions
   for (int i = ndefined_; i--;)                                  addVariable(false, &domain_);
@@ -115,7 +113,7 @@ int CouenneProblem::readnl (const ASL *asl) {
   for (int i = 0; i < como + comc + comb; i++) {
 
     struct cexp *common = ((const ASL_fg *) asl) -> I.cexps_ + i;
-    expression *nle = nl2e (common -> e);
+    expression *nle = nl2e (common -> e, asl);
 
 #ifdef DEBUG
     printf ("cexp  %d [%d]: ", i, variables_ . size ()); nle -> print ();  printf (" ||| ");
@@ -163,7 +161,7 @@ int CouenneProblem::readnl (const ASL *asl) {
   for (int i = 0; i < como1 + comc1; i++) {
 
     struct cexp1 *common = ((const ASL_fg *) asl) -> I.cexps1_ + i;
-    expression *nle = nl2e (common -> e);
+    expression *nle = nl2e (common -> e, asl);
 
 #ifdef DEBUG
     printf ("cexp1 %d [%d]: ", i, variables_ . size ()); nle -> print ();  printf (" ||| ");
@@ -205,7 +203,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 #ifdef DEBUG
     printf ("\n");
 #endif
-    //    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e));
+    //    addAuxiliary (nl2e (((const ASL_fg *) asl) -> I.cexps1_ [i] . e, asl));
   }
 
   // objective functions /////////////////////////////////////////////////////////////
@@ -225,7 +223,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 
     expression 
       *body,
-      *nl = nl2e (OBJ_DE [i] . e);
+      *nl = nl2e (OBJ_DE [i] . e, asl);
 
     if (nterms) { // have linear terms
 
@@ -396,7 +394,7 @@ int CouenneProblem::readnl (const ASL *asl) {
     expression *body;
 
     expression **nll = new expression * [1];
-    *nll = nl2e (CON_DE [i] . e);
+    *nll = nl2e (CON_DE [i] . e, asl);
 
     if (index [i] && (*(index [i]) >= 0)) {
 
