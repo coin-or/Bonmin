@@ -42,9 +42,6 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
     if (j % 6) Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
   }
 
-  // Must go -- but change it first!
-  //expression::update (NULL, Lb (), Ub ());
-
   for (register int ii = 0, j = nVars (); j--; ii++) {
 
     int i = numbering_ [ii];
@@ -81,15 +78,16 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
       variables_ [i] -> Image () -> getBounds (ll, uu);
 
+      if (variables_ [i] -> isInteger ()) {
+	ll = ceil  (ll - COUENNE_EPS);
+	uu = floor (uu + COUENNE_EPS);
+      }
+
       /*printf (" ---> [%g, %g] ", ll, uu);
-      variables_ [i] -> print (std::cout);
-      printf (" := ");
-      variables_ [i] -> Image () -> print (std::cout); fflush (stdout);
-      printf (" [");
-      variables_ [i] -> Lb () -> print (std::cout); fflush (stdout);
-      printf (" , ");
-      variables_ [i] -> Ub () -> print (std::cout); fflush (stdout);
-      printf ("]\n");*/
+      variables_ [i] -> print (std::cout);      printf (" := ");
+      variables_ [i] -> Image () -> print (std::cout); fflush (stdout);   printf (" [");
+      variables_ [i] -> Lb () -> print (std::cout); fflush (stdout);      printf (" , ");
+      variables_ [i] -> Ub () -> print (std::cout); fflush (stdout);      printf ("]\n");*/
 
       if (ll > uu + COUENNE_EPS) {
 

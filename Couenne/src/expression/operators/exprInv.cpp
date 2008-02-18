@@ -87,8 +87,17 @@ bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   invPowImplBounds (wind, index, l, u, -1., resL, resU);
 
-  if (resL) chg [index].setLower(t_chg_bounds::CHANGED);
-  if (resU) chg [index].setUpper(t_chg_bounds::CHANGED);
+  bool argInt = argument_ -> isInteger ();
+
+  if (resL) {
+    chg [index].setLower(t_chg_bounds::CHANGED);
+    if (argInt) l [index] = ceil  (l [index] - COUENNE_EPS);
+  }
+
+  if (resU) {
+    chg [index].setUpper(t_chg_bounds::CHANGED);
+    if (argInt) u [index] = floor (u [index] + COUENNE_EPS);
+  }
 
   return (resL || resU);
 }

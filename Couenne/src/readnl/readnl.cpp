@@ -123,8 +123,8 @@ int CouenneProblem::readnl (const ASL *asl) {
 
     if (nlin > 0) {
 
-      int       *index = new int       [nlin+1];
-      CouNumber *coeff = new CouNumber [nlin];
+      int       *indexL = new int       [nlin+1];
+      CouNumber *coeff  = new CouNumber [nlin];
 
       linpart *L = common -> L;
 
@@ -132,7 +132,7 @@ int CouenneProblem::readnl (const ASL *asl) {
 	//vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
 	//Printf( " %-g x[%-d]", L->fac, (int)(vp - VAR_E) );	
 	coeff [j] = L [j]. fac;
-	index [j] = (expr_v *) (L [j].v.rp) - VAR_E;
+	indexL [j] = ((uintptr_t) (L [j].v.rp) - (uintptr_t) VAR_E) / sizeof (expr_v);
 #ifdef DEBUG
 	Printf( " %+g x_%-3d", L [j]. fac, 
 		(expr_v *) (L [j].v.rp) - VAR_E //((const ASL_fg *) asl) -> I.cexps_
@@ -141,13 +141,13 @@ int CouenneProblem::readnl (const ASL *asl) {
 #endif
       }
 
-      index [nlin] = -1;
+      indexL [nlin] = -1;
 
       expression **al = new expression * [1];
       *al = nle;
 
       std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
-      indcoe2vector (index, coeff, lcoeff);
+      indcoe2vector (indexL, coeff, lcoeff);
 
       exprGroup *eg = new exprGroup (0, lcoeff, al, 1);
       commonexprs_ . push_back (eg);
@@ -171,15 +171,15 @@ int CouenneProblem::readnl (const ASL *asl) {
 
     if (nlin > 0) {
 
-      int       *index = new int       [nlin+1];
-      CouNumber *coeff = new CouNumber [nlin];
+      int       *indexL = new int       [nlin+1];
+      CouNumber *coeff  = new CouNumber [nlin];
 
       linpart *L = common -> L;
 
       for (int j = 0; j < nlin; j++) {
 	//vp = (expr_v *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
-	coeff [j] = L [j]. fac;
-	index [j] = (expr_v *) (L [j].v.rp) - VAR_E;
+	coeff  [j] = L [j]. fac;
+	indexL [j] = ((uintptr_t) (L [j].v.rp) - (uintptr_t) VAR_E) / sizeof (expr_v);
 #ifdef DEBUG
 	Printf( " %+g x_%-3d", L [j]. fac, 
 		(expr_v *) (L [j].v.rp) - VAR_E //((const ASL_fg *) asl) -> I.cexps_
@@ -188,13 +188,13 @@ int CouenneProblem::readnl (const ASL *asl) {
 #endif
       }
 
-      index [nlin] = -1;
+      indexL [nlin] = -1;
 
       expression **al = new expression * [1];
       *al = nle;
 
       std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
-      indcoe2vector (index, coeff, lcoeff);
+      indcoe2vector (indexL, coeff, lcoeff);
 
       exprGroup *eg = new exprGroup (0, lcoeff, al, 1);
       commonexprs_ . push_back (eg);
@@ -227,23 +227,23 @@ int CouenneProblem::readnl (const ASL *asl) {
 
     if (nterms) { // have linear terms
 
-      int       *index = new int       [nterms+1];
-      CouNumber *coeff = new CouNumber [nterms];
+      int       *indexL = new int       [nterms+1];
+      CouNumber *coeff  = new CouNumber [nterms];
 
       for (ograd *objgrad = Ograd [i]; objgrad; objgrad = objgrad -> next)
 	if (fabs (objgrad -> coef) > COUENNE_EPS) {
 
-	  *index++ = objgrad -> varno;
-	  *coeff++ = objgrad -> coef;
+	  *indexL++ = objgrad -> varno;
+	  *coeff++  = objgrad -> coef;
 	}
 
-      *index = -1;
+      *indexL = -1;
 
-      index -= nterms;
-      coeff -= nterms;
+      indexL -= nterms;
+      coeff  -= nterms;
 
       std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
-      indcoe2vector (index, coeff, lcoeff);
+      indcoe2vector (indexL, coeff, lcoeff);
 
       if (nl -> code () == COU_EXPRSUM)
 	body = new exprGroup (0., lcoeff, nl -> ArgList (), nl -> nArgs ());
@@ -255,10 +255,10 @@ int CouenneProblem::readnl (const ASL *asl) {
 
 	// apparently, objconst (i) is included in the obj expression
 	body = new exprGroup (0., lcoeff, nll, 1);
-	//body = new exprGroup (objconst (i), index, coeff, nll, 1);
+	//body = new exprGroup (objconst (i), indexL, coeff, nll, 1);
       }
 
-      delete [] index;
+      delete [] indexL;
       delete [] coeff;
 
     } else
@@ -314,13 +314,13 @@ int CouenneProblem::readnl (const ASL *asl) {
 
 
   // vectors of the linear part
-  CouNumber **coeff = new CouNumber * [n_con];
-  int       **index = new int       * [n_con];
+  CouNumber **coeff  = new CouNumber * [n_con];
+  int       **indexL = new int       * [n_con];
 
   for (register int i = n_con; i--;) 
-    *index++ = NULL;
+    *indexL++ = NULL;
 
-  index -= n_con;
+  indexL -= n_con;
 
 
   // set linear terms
@@ -332,8 +332,8 @@ int CouenneProblem::readnl (const ASL *asl) {
 	int rowno = A_rownos [i],
 	    nt    = nterms [rowno] --;
 
-	CouNumber **cline = coeff + rowno;
-	int       **iline = index + rowno;
+	CouNumber **cline = coeff  + rowno;
+	int       **iline = indexL + rowno;
 
 	if (*iline==NULL) {
 	  *cline = new CouNumber [nt];
@@ -351,7 +351,7 @@ int CouenneProblem::readnl (const ASL *asl) {
       int nt = nterms [i];
 
       CouNumber **cline = coeff + i;
-      int       **iline = index + i;
+      int       **iline = indexL + i;
 
       *cline = new CouNumber [nt];
       *iline = new int       [nt+1];
@@ -396,15 +396,15 @@ int CouenneProblem::readnl (const ASL *asl) {
     expression **nll = new expression * [1];
     *nll = nl2e (CON_DE [i] . e, asl);
 
-    if (index [i] && (*(index [i]) >= 0)) {
+    if (indexL [i] && (*(indexL [i]) >= 0)) {
 
       int code = (*nll) -> code ();
 
       std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
-      indcoe2vector (index [i], coeff [i], lcoeff);
+      indcoe2vector (indexL [i], coeff [i], lcoeff);
 
       /*std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
-      for (int i=0, *ind = index; *ind >= 0; *ind++, i++)
+      for (int i=0, *ind = indexL; *ind >= 0; *ind++, i++)
       lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (*ind), coeff [i]));*/
 
       if ((code == COU_EXPRSUM) || 
@@ -437,11 +437,11 @@ int CouenneProblem::readnl (const ASL *asl) {
     default: printf ("could not recognize constraint\n"); return -1;
     }
 
-    delete [] index [i];
-    delete [] coeff [i];
+    delete [] indexL [i];
+    delete [] coeff  [i];
   }
 
-  delete [] index;
+  delete [] indexL;
   delete [] coeff;
 
   // lower and upper bounds ///////////////////////////////////////////////////////////////

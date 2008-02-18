@@ -390,11 +390,11 @@ If k>=0, apply with probability 2^(k - level), level being the current depth of 
 
 
 /// translates pair (indices, coefficients) into vector with pointers to variables
-void CouenneProblem::indcoe2vector (int *index, 
+void CouenneProblem::indcoe2vector (int *indexL, 
 				    CouNumber *coeff,
 				    std::vector <std::pair <exprVar *, CouNumber> > &lcoeff) {
-  while (*index >= 0)
-    lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (*index++), *coeff++));
+  for (int i=0; indexL [i] >= 0; i++)
+    lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (indexL [i]), coeff [i]));
 }
 
 
@@ -403,6 +403,6 @@ void CouenneProblem::indcoe2vector (int *indexI,
 				    int *indexJ,
 				    CouNumber *coeff,
 				    std::vector <quadElem> &qcoeff) {
-  while (*indexI >= 0)
-    qcoeff.push_back (quadElem (Var (*indexI++), Var (*indexJ++), *coeff++));
+  for (int i=0; indexI [i] >= 0; i++)
+    qcoeff.push_back (quadElem (Var (indexI [i]), Var (indexJ [i]), coeff [i]));
 }

@@ -27,7 +27,6 @@ const CouNumber default_alpha = 0.2;
 /// Constructor with information for branching point selection strategy
 CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 			      JnlstPtr jnlst):
-
   reference_ (ref),
   strategy_  (MID_INTERVAL),
   jnlst_     (jnlst),
@@ -97,11 +96,14 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
     }
   }
 
-  /*printf ("created object: "); reference_ -> print (); 
-  printf (" := "); reference_ -> Image () -> print ();
-  printf (" with %s strategy\n", 
-	  (strategy_ == BALANCED) ? "balanced" : 
-	  (strategy_ == MIN_AREA) ? "min-area" : "mid-point");*/
+  if (jnlst_->ProduceOutput(J_SUMMARY, J_BRANCHING)) {
+
+    printf ("created object: "); reference_ -> print (); 
+    printf (" := "); reference_ -> Image () -> print ();
+    printf (" with %s strategy\n", 
+	    (strategy_ == BALANCED) ? "balanced" : 
+	    (strategy_ == MIN_AREA) ? "min-area" : "mid-point");
+  }
 }
 
 

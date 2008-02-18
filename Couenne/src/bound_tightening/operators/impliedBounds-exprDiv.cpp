@@ -40,15 +40,31 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     // a copy of exprMul::impliedBound for the case where y is a constant
 
+    bool xInt = arglist_ [0] -> isInteger ();
+
     if (c > COUENNE_EPS) {
 
-      if (updateBound (-1, l+ind, l[wind]*c)) {resx=true; chg [ind].setLower(t_chg_bounds::CHANGED);}
-      if (updateBound ( 1, u+ind, u[wind]*c)) {resx=true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
+      if (updateBound (-1, l+ind, xInt ? ceil (l[wind]*c - COUENNE_EPS) : (l[wind]*c))) {
+	resx = true; 
+	chg [ind].setLower (t_chg_bounds::CHANGED);
+      }
+
+      if (updateBound (+1, u+ind, xInt ? floor (u[wind]*c + COUENNE_EPS) : (u[wind]*c))) {
+	resx = true; 
+	chg [ind].setUpper (t_chg_bounds::CHANGED);
+      }
     } 
     else if (c < - COUENNE_EPS) {
 
-      if (updateBound (-1, l+ind, u[wind]*c)) {resx=true; chg [ind].setLower(t_chg_bounds::CHANGED);}
-      if (updateBound ( 1, u+ind, l[wind]*c)) {resx=true; chg [ind].setUpper(t_chg_bounds::CHANGED);}
+      if (updateBound (-1, l+ind, xInt ? ceil  (u[wind]*c - COUENNE_EPS) : (u[wind]*c))) {
+	resx = true; 
+	chg [ind].setLower (t_chg_bounds::CHANGED);
+      }
+
+      if (updateBound (+1, u+ind, xInt ? floor (l[wind]*c + COUENNE_EPS) : (l[wind]*c))) {
+	resx = true; 
+	chg [ind].setUpper (t_chg_bounds::CHANGED);
+      }
     } 
   } else {
 
@@ -198,6 +214,24 @@ bool exprDiv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     resx = resxL || resxU;
     resy = resyL || resyU;
+  }
+
+  bool 
+    xInt = arglist_ [0] -> isInteger (),
+    yInt = arglist_ [1] -> isInteger ();
+
+  if (resx && xInt) {
+    int xi = arglist_ [0] -> Index ();
+    assert (xi >= 0);
+    u [xi] = floor (u [xi] + COUENNE_EPS);
+    l [xi] = ceil  (l [xi] - COUENNE_EPS);
+  }
+
+  if (resy && yInt) {
+    int yi = arglist_ [1] -> Index ();
+    assert (yi >= 0);
+    u [yi] = floor (u [yi] + COUENNE_EPS);
+    l [yi] = ceil  (l [yi] - COUENNE_EPS);
   }
 
   return (resx || resy);

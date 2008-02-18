@@ -34,17 +34,6 @@ class quadElem;
 class LinMap;
 class QuadMap;
 
-/** Structure for comparing expressions
- *
- *  Used in compare() method for same-class expressions
- */
-
-struct compExpr {
-  inline bool operator () (exprAux* e0, exprAux* e1) const
-  {return (e0 -> Image () -> compare (*(e1 -> Image ())) < 0);}
-};
-
-
 /** Class for MINLP problems with symbolic information
  *
  *  It is read from an AMPL .nl file and contains variables, AMPL's
@@ -368,7 +357,7 @@ class CouenneProblem {
   int splitAux (CouNumber, expression *, expression *&, bool *);
 
   /// translates pair (indices, coefficients) into vector with pointers to variables
-  void indcoe2vector (int *index,
+  void indcoe2vector (int *indexL,
 		      CouNumber *coeff,
 		      std::vector <std::pair <exprVar *, CouNumber> > &lcoeff);
 

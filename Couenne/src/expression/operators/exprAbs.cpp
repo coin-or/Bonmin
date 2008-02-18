@@ -71,15 +71,31 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   bool tighter = false;
 
   if (wl > 0) {
-    if      (*xl > 0) {if (updateBound (-1, xl,  wl)) {tighter = true; chg [index].setLower(t_chg_bounds::CHANGED);}}
-    else if (*xu < 0) {if (updateBound (+1, xu, -wl)) {tighter = true; chg [index].setUpper(t_chg_bounds::CHANGED);}}
+    if      (*xl > 0) {
+      if (updateBound (-1, xl, argument_ -> isInteger () ? ceil   (wl - COUENNE_EPS) :  wl)) {
+	tighter = true; 
+	chg [index].setLower(t_chg_bounds::CHANGED);
+      }
+    }
+    else if (*xu < 0) {
+      if (updateBound (+1, xu, argument_ -> isInteger () ? floor (-wl + COUENNE_EPS) : -wl)) {
+	tighter = true; 
+	chg [index].setUpper(t_chg_bounds::CHANGED);
+      }
+    }
   }
 
   // w <= u (if u < 0 the problem is infeasible)
 
   if (wu < COUENNE_INFINITY) {
-    if (updateBound (-1, xl, -wu)) {tighter = true; chg [index].setLower(t_chg_bounds::CHANGED);}
-    if (updateBound (+1, xu,  wu)) {tighter = true; chg [index].setUpper(t_chg_bounds::CHANGED);}
+    if (updateBound (-1, xl, argument_ -> isInteger () ? ceil (-wu - COUENNE_EPS) : -wu)) {
+      tighter = true; 
+      chg [index].setLower(t_chg_bounds::CHANGED);
+    }
+    if (updateBound (+1, xu, argument_ -> isInteger () ? floor (wu + COUENNE_EPS) :  wu)) {
+      tighter = true; 
+      chg [index].setUpper(t_chg_bounds::CHANGED);
+    }
   }
 
   return tighter;

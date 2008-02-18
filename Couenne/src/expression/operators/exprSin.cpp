@@ -54,7 +54,7 @@ bool trigImpliedBound (enum cou_trig type, int wind, int xind,
   CouNumber fl, fu, iwl, iwu, displacement;
 
   if (type == COU_SINE) {fl = sin (*xl); fu = sin (*xu); displacement = pih;} 
-  else                  {fl = cos (*xl); fu = cos (*xu); displacement = 0.;       }
+  else                  {fl = cos (*xl); fu = cos (*xu); displacement = 0.;}
 
   iwl = acos (wl);
   iwu = acos (wu);

@@ -11,9 +11,23 @@
 #include <set>
 
 #include "CoinHelperFunctions.hpp"
+//#include "exprAux.hpp"
 #include "exprQuad.hpp"
 
 //#define DEBUG
+
+//struct compExpr;
+
+/** Structure for comparing variables
+ *
+ *  Used below to store sorted set of variables
+ */
+
+struct compVar {
+  inline bool operator () (exprVar* e0, exprVar* e1) const
+  {return (e0 -> Index () < e1 -> Index ());}
+};
+
 
 
 /// implied bound processing for quadratic form upon change in lower-
@@ -34,41 +48,24 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
   // Nevermind about the nonlinear part stored in arglist_...
 
-  // get all variables 
-  /*
-  std::set <int> 
-    lin (index_,   index_   + nlterms_),
-    qui (qindexI_, qindexI_ + nqterms_),
-    quj (qindexJ_, qindexJ_ + nqterms_),
-    indUnion;
-  */
+  //std::set <int> indexSet;
+  std::set <exprVar *, compVar> indexSet;
 
-  std::set <int> indexSet;
-
+  // insert indices of linear part
   for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
-    indexSet.insert (el -> first -> Index ());
+    indexSet.insert (el -> first);
 
+  // insert indices of quadratic part
   for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
-    indexSet.insert (row -> first -> Index ());
+    indexSet.insert (row -> first);
 
     for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
-      indexSet.insert (col -> first -> Index ());
+      indexSet.insert (col -> first);
   }
-
 
   // CAUTION: this relies on the first version of bound expressions
   // for quadratic form, i.e. the sum of bounds of independent terms
-  /*
-  // find all indices appearing in the expression
-  std::set_union (qui .begin (), qui .end (), 
-		  quj .begin (), quj .end (),
-		  std::inserter (indUnion, indUnion.begin ()));
-
-  std::set_union (indUnion .begin (), indUnion .end (), 
-		  lin      .begin (), lin      .end (),
-		  std::inserter (indUnion, indUnion.begin ()));
-  */
 
   CouNumber qMin, qMax;
 
@@ -92,7 +89,7 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   printf ("1st phase... inf=(%d,%d) q=[%g,%g].\n", indInfLo, indInfUp, qMin, qMax);
   for (std::set <int>:: iterator iter = indexSet.begin ();
        iter != indexSet.end (); ++iter) 
-    printf ("%4d [%+6g %+6g]\n", *iter, l [*iter], u [*iter]);
+    printf ("%4d [%+6g %+6g]\n", *iter, l [iter -> Index ()], u [iter -> Index ()]);
 #endif
 
   // compute bound on expression using only finite variable bounds
@@ -121,9 +118,9 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
   // prepare data structure for scanning all variables
   int
-    minindex = *(indexSet.begin  ()), // minimum index
-    maxindex = *(indexSet.rbegin ()), // maximum index
-    nvars = maxindex - minindex + 1;  // upper bound on # variables involved
+    minindex = (*(indexSet.begin  ())) -> Index (), // minimum index
+    maxindex = (*(indexSet.rbegin ())) -> Index (), // maximum index
+    nvars = maxindex - minindex + 1;           // upper bound on # variables involved
 
   CouNumber 
     *linCoeMin = new CouNumber [nvars], // min coeff of var x_i
@@ -168,9 +165,9 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   printf ("linear filling (%d,%d): -----------------------\n", minindex, maxindex);
   for (std::set <int>:: iterator iter = indexSet.begin ();
        iter != indexSet.end (); ++iter) 
-    printf ("%4d [%+6g %+6g] [%+6g %+6g]\n", *iter, 
-	    linCoeMin [*iter - minindex], linCoeMax [*iter - minindex],
-	    bCutLb    [*iter - minindex], bCutUb    [*iter - minindex]);
+    printf ("%4d [%+6g %+6g] [%+6g %+6g]\n", iter -> Index (), 
+	    linCoeMin [iter -> Index () - minindex], linCoeMax [iter -> Index () - minindex],
+	    bCutLb    [iter -> Index () - minindex], bCutUb    [iter -> Index () - minindex]);
 #endif
 
   // fill in remaining linear coefficients and quadratic ones
@@ -257,19 +254,23 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   for (std::set <int>:: iterator iter = indexSet.begin ();
        iter != indexSet.end (); ++iter) 
     printf ("%4d [%+6g %+6g] [%+6g %+6g]\n", *iter, 
-	    linCoeMin [*iter - minindex], linCoeMax [*iter - minindex],
-	    bCutLb    [*iter - minindex], bCutUb    [*iter - minindex]);
+	    linCoeMin [iter -> Index () - minindex], linCoeMax [iter -> Index () - minindex],
+	    bCutLb    [iter -> Index () - minindex], bCutUb    [iter -> Index () - minindex]);
 #endif
 
   // Done filling vectors /////////////////////////////////////////////////////////////
   // Now improve each independent variable in the set indexSet
 
-  bool updated = false;
+  bool one_updated = false;
 
-  for (std::set <int>:: iterator iter = indexSet.begin ();
+  for (std::set <exprVar *, compVar>:: iterator iter = indexSet.begin ();
        iter != indexSet.end (); ++iter) {
 
-    int ind  = *iter, 
+    bool
+      updatedL = false,
+      updatedU = false;
+
+    int ind  = (*iter) -> Index (), 
         indn = ind - minindex;
 
     CouNumber 
@@ -301,9 +302,9 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 	if (al > 0) { // care about min -- see outer if, it means 0 < al < au
 
 	  if ((indInfUp == -1) || (indInfUp == ind))
-	    updated = updateBound (-1, l + ind, (l_b) / ((l_b < 0) ? al : au)) || updated;
+	    updatedL = updateBound (-1, l + ind, (l_b) / ((l_b < 0) ? al : au)) || updatedL;
 	  if ((indInfLo == -1) || (indInfLo == ind)) 
-	    updated = updateBound (+1, u + ind, (u_b) / ((u_b < 0) ? au : al)) || updated;
+	    updatedU = updateBound (+1, u + ind, (u_b) / ((u_b < 0) ? au : al)) || updatedU;
 
 #ifdef DEBUG
 	  if (l [ind] > ol) printf ("0. l%d: %g --> %g\n", ind, ol, l [ind]);
@@ -312,9 +313,9 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 	} else { // only look at max, as al < au < 0
 
 	  if ((indInfLo == -1) || (indInfLo == ind)) 
-	    updated = updateBound (-1, l + ind, (u_b) / ((u_b < 0) ? al : au)) || updated;
+	    updatedL = updateBound (-1, l + ind, (u_b) / ((u_b < 0) ? al : au)) || updatedL;
 	  if ((indInfUp == -1) || (indInfUp == ind)) 
-	    updated = updateBound (+1, u + ind, (l_b) / ((l_b < 0) ? au : al)) || updated;
+	    updatedU = updateBound (+1, u + ind, (l_b) / ((l_b < 0) ? au : al)) || updatedU;
 
 #ifdef DEBUG
 	  if (l [ind] > ol) printf ("1. l%d: %g --> %g\n", ind, ol, l [ind]);
@@ -355,8 +356,8 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
       if ((deltaUp >= 0) && 
 	  (deltaLo >= 0)) {
 
-	updated = updateBound (-1, l + ind, (- au - sqrt (deltaUp)) / (2*q)) || updated;
-	updated = updateBound (+1, u + ind, (- al + sqrt (deltaLo)) / (2*q)) || updated;
+	updatedL = updateBound (-1, l + ind, (- au - sqrt (deltaUp)) / (2*q)) || updatedL;
+	updatedU = updateBound (+1, u + ind, (- al + sqrt (deltaLo)) / (2*q)) || updatedU;
 
 #ifdef DEBUG
 	if (l [ind] > ol) printf ("2. l%d: %g --> %g\n", ind, ol, l [ind]);
@@ -365,8 +366,8 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
       } else if (deltaUp >= 0) { // only  left-leaning parabola does
 
-	updated = updateBound (-1, l + ind, (- au - sqrt (deltaUp)) / (2*q)) || updated;
-	updated = updateBound (+1, u + ind, (- au + sqrt (deltaUp)) / (2*q)) || updated;
+	updatedL = updateBound (-1, l + ind, (- au - sqrt (deltaUp)) / (2*q)) || updatedL;
+	updatedU = updateBound (+1, u + ind, (- au + sqrt (deltaUp)) / (2*q)) || updatedU;
 	//	addCoeffCut ();
 
 #ifdef DEBUG
@@ -376,8 +377,8 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
       } else if (deltaLo >= 0) { // only right-leaning parabola does
 
-	updated = updateBound (-1, l + ind, (- al - sqrt (deltaLo)) / (2*q)) || updated;
-	updated = updateBound (+1, u + ind, (- al + sqrt (deltaLo)) / (2*q)) || updated;
+	updatedL = updateBound (-1, l + ind, (- al - sqrt (deltaLo)) / (2*q)) || updatedL;
+	updatedU = updateBound (+1, u + ind, (- al + sqrt (deltaLo)) / (2*q)) || updatedU;
 	//	addCoeffCut ();
 
 #ifdef DEBUG
@@ -387,8 +388,8 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
       } else { // none of them does, the problem is infeasible
 
-	updated = updateBound (-1, l+ind, +1) || updated;
-	updated = updateBound (+1, u+ind, -1) || updated;
+	updatedL = updateBound (-1, l+ind, +1) || updatedL;
+	updatedU = updateBound (+1, u+ind, -1) || updatedU;
 
 #ifdef DEBUG
 	printf ("5. infeasible!\n");
@@ -425,18 +426,17 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
       if ((deltaUp >= 0) && 
 	  (deltaLo >= 0)) {
 
-	updated = updateBound (-1, l + ind, (al - sqrt (deltaLo)) / (-2*q)) || updated;
-	updated = updateBound (+1, u + ind, (au + sqrt (deltaUp)) / (-2*q)) || updated;
+	updatedL = updateBound (-1, l + ind, (al - sqrt (deltaLo)) / (-2*q)) || updatedL;
+	updatedU = updateBound (+1, u + ind, (au + sqrt (deltaUp)) / (-2*q)) || updatedU;
 
 #ifdef DEBUG
 	if (l [ind] > ol) printf ("6. l%d: %g --> %g\n", ind, ol, l [ind]);
 	if (u [ind] < ou) printf ("6. u%d: %g --> %g\n", ind, ou, u [ind]);
 #endif
-
       } else if (deltaUp >= 0) { // only  left-leaning parabola does
 
-	updated = updateBound (-1, l + ind, (au - sqrt (deltaUp)) / (-2*q)) || updated;
-	updated = updateBound (+1, u + ind, (au + sqrt (deltaUp)) / (-2*q)) || updated;
+	updatedL = updateBound (-1, l + ind, (au - sqrt (deltaUp)) / (-2*q)) || updatedU;
+	updatedU = updateBound (+1, u + ind, (au + sqrt (deltaUp)) / (-2*q)) || updatedL;
 	//	addCoeffCut ();
 
 #ifdef DEBUG
@@ -446,8 +446,8 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
       } else if (deltaLo >= 0) { // only right-leaning parabola does
 
-	updated = updateBound (-1, l + ind, (al - sqrt (deltaLo)) / (-2*q)) || updated;
-	updated = updateBound (+1, u + ind, (al + sqrt (deltaLo)) / (-2*q)) || updated;
+	updatedL = updateBound (-1, l + ind, (al - sqrt (deltaLo)) / (-2*q)) || updatedL;
+	updatedU = updateBound (+1, u + ind, (al + sqrt (deltaLo)) / (-2*q)) || updatedU;
 	//	addCoeffCut ();
 #ifdef DEBUG
 	if (l [ind] > ol) printf ("8. l%d: %g --> %g\n", ind, ol, l [ind]);
@@ -456,13 +456,29 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
 
       } else { // none of them does, the problem is infeasible
 
-	updated = updateBound (-1, l+ind, +1) || updated;
-	updated = updateBound (+1, u+ind, -1) || updated;
+	updatedL = updateBound (-1, l+ind, +1) || updatedL;
+	updatedU = updateBound (+1, u+ind, -1) || updatedU;
 
 #ifdef DEBUG
 	printf ("9. infeasible\n");
 #endif
       }
+    }
+
+    // 
+
+    if (updatedL) {
+      one_updated = true;
+      chg [ind].setLower(t_chg_bounds::CHANGED);
+      if ((*iter) -> isInteger ())
+	l [ind] = ceil (l [ind] - COUENNE_EPS);
+    }
+
+    if (updatedU) {
+      one_updated = true;
+      chg [ind].setUpper(t_chg_bounds::CHANGED);
+      if ((*iter) -> isInteger ())
+	u [ind] = floor (u [ind] + COUENNE_EPS);
     }
   }
 
@@ -472,5 +488,5 @@ bool exprQuad::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds 
   delete [] bCutLb;
   delete [] bCutUb;
 
-  return updated;
+  return one_updated;
 }

@@ -167,6 +167,18 @@ class exprAux: public exprVar {
   }
 };
 
+
+/** Structure for comparing expressions
+ *
+ *  Used in compare() method for same-class expressions
+ */
+
+struct compExpr {
+  inline bool operator () (exprAux* e0, exprAux* e1) const
+  {return (e0 -> Image () -> compare (*(e1 -> Image ())) < 0);}
+};
+
+
 /// allow to draw function within intervals and cuts introduced
 void draw_cuts (OsiCuts &, const CouenneCutGenerator *, 
 		int, expression *, expression *);

@@ -49,8 +49,6 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
       Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
 		      "checkNLP: warning, false objective. %.3f != %.3f (%g)\n", 
 		      realobj, obj, realobj - obj);
-      //delete [] sol;
-      //return false;
     }
 
     // check (original and auxiliary) variables' integrality
@@ -66,7 +64,6 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 			i, val, domain_.lb (i), domain_.ub (i),
 			CoinMax (fabs (val - domain_.lb (i)), 
 				 fabs (val - domain_.ub (i))));
-	//expression::Lbound (i), expression::Ubound (i));
 	throw INFEASIBLE;
       }
 
@@ -75,7 +72,6 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
 	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
 			"checkNLP: integrality %d violated: %.6f [%g,%g]\n", 
 			i, val, domain_.lb (i), domain_.ub (i));
-	//expression::Lbound (i), expression::Ubound (i));
 	throw INFEASIBLE;
       }
 

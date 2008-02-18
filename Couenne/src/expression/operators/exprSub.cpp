@@ -109,16 +109,36 @@ bool exprSub::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // w >= l
 
+  bool 
+    xInt = arglist_ [0] -> isInteger (),
+    yInt = arglist_ [1] -> isInteger ();
+
   if (wl > -COUENNE_INFINITY) {
-    if ((xi>=0) && (updateBound (-1,l+xi, yl+wl))) {res=true;chg[xi].setLower(t_chg_bounds::CHANGED);}
-    if ((yi>=0) && (updateBound (+1,u+yi, xu-wl))) {res=true;chg[yi].setUpper(t_chg_bounds::CHANGED);}
+
+    if ((xi>=0) && (updateBound (-1, l + xi, xInt ? ceil  (yl + wl - COUENNE_EPS) : (yl + wl)))) {
+      res = true;
+      chg [xi].setLower(t_chg_bounds::CHANGED);
+    }
+
+    if ((yi>=0) && (updateBound (+1, u + yi, yInt ? floor (xu - wl + COUENNE_EPS) : (xu - wl)))) {
+      res = true;
+      chg [yi].setUpper(t_chg_bounds::CHANGED);
+    }
   }
 
   // w <= u
 
   if (wu < COUENNE_INFINITY) {
-    if ((xi>=0) && (updateBound (+1,u+xi, yu+wu))) {res=true;chg[xi].setUpper(t_chg_bounds::CHANGED);}
-    if ((yi>=0) && (updateBound (-1,l+yi, xl-wu))) {res=true;chg[yi].setLower(t_chg_bounds::CHANGED);}
+
+    if ((xi>=0) && (updateBound (+1, u + xi, xInt ? floor (yu + wu + COUENNE_EPS) : (yu + wu)))) {
+      res = true;
+      chg [xi].setUpper(t_chg_bounds::CHANGED);
+    }
+
+    if ((yi>=0) && (updateBound (-1, l + yi, yInt ? ceil (xl - wu - COUENNE_EPS) : (xl - wu)))) {
+      res = true;
+      chg [yi].setLower(t_chg_bounds::CHANGED);
+    }
   }
 
   return res;

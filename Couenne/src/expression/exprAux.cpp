@@ -11,7 +11,8 @@
 #include "exprBound.hpp"
 #include "exprMax.hpp"
 #include "exprMin.hpp"
-#include "CglCutGenerator.hpp"
+#include "CouenneCutGenerator.hpp"
+#include "CouenneJournalist.hpp"
 
 class CouenneCutGenerator;
 class Domain;
@@ -120,7 +121,7 @@ void exprAux::print (std::ostream &out, bool descend) const {
   if (descend) 
     image_ -> print (out, descend);
   else {
-    if (integer_) out << "u_"; // TODO: should be isInteger instead of
+    if (integer_) out << "z_"; // TODO: should be isInteger instead of
 			       // integer_. Change all "isInteger()"
 			       // to "isInteger() const"
     else          out << "w_";
@@ -170,11 +171,10 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 			    OsiCuts &cs, const CouenneCutGenerator *cg, 
 			    t_chg_bounds *chg, int,
 			    CouNumber, CouNumber) {
-#ifdef DEBUG
+  //#ifdef DEBUG
   static bool warned_large_coeff = false;
-
   int nrc = cs.sizeRowCuts (), ncc = cs.sizeColCuts ();
-#endif
+  //#endif
 
   /*
   if ((!(cg -> isFirst ())) && 
@@ -188,66 +188,69 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   // check if cuts have coefficients, rhs too large or too small
 
-#ifdef DEBUG
-  if (warned_large_coeff)
-    for (int jj=nrc; jj < cs.sizeRowCuts (); jj++) {
+  //#ifdef DEBUG
 
-      OsiRowCut        *cut = cs.rowCutPtr (jj);
-      CoinPackedVector  row = cut -> row ();
+  if (cg -> Jnlst () -> ProduceOutput (Ipopt::J_MATRIX, J_CONVEXIFYING)) {
+    if (warned_large_coeff)
+      for (int jj=nrc; jj < cs.sizeRowCuts (); jj++) {
 
-      int           n   = cut -> row (). getNumElements();
-      const double *el  = row. getElements ();
-      const int    *ind = row. getIndices ();
-      double        rhs = cut -> rhs ();
+	OsiRowCut        *cut = cs.rowCutPtr (jj);
+	CoinPackedVector  row = cut -> row ();
 
-      while (n--) {
-	if (fabs (el [n]) > COU_MAX_COEFF)  {
-	  printf ("Couenne, warning: coefficient too large %g x%d: ", el [n], ind [n]);
-	  cut -> print (); 
-	  warned_large_coeff = true;
-	  break;
-	}
+	int           n   = cut -> row (). getNumElements();
+	const double *el  = row. getElements ();
+	const int    *ind = row. getIndices ();
+	double        rhs = cut -> rhs ();
 
-	if (fabs (rhs) > COU_MAX_COEFF) {
-	  printf ("Couenne, warning: rhs too large (%g): ", rhs);
-	  cut -> print ();
-	  warned_large_coeff = true;
-	  break;
+	while (n--) {
+	  if (fabs (el [n]) > COU_MAX_COEFF)  {
+	    printf ("Couenne, warning: coefficient too large %g x%d: ", el [n], ind [n]);
+	    cut -> print (); 
+	    warned_large_coeff = true;
+	    break;
+	  }
+
+	  if (fabs (rhs) > COU_MAX_COEFF) {
+	    printf ("Couenne, warning: rhs too large (%g): ", rhs);
+	    cut -> print ();
+	    warned_large_coeff = true;
+	    break;
+	  }
 	}
       }
-    }
 
-  //  if (!(cg -> isFirst ())) 
-  if (1 ||
-      (nrc < cs.sizeRowCuts ()) || 
-      (ncc < cs.sizeColCuts ()))
-    {
-      printf ("---------------- ConvCut:  "); 
-      print (std::cout);  printf (" := ");
-      image_ -> print (std::cout); 
+    //  if (!(cg -> isFirst ())) 
+    if (1 ||
+	(nrc < cs.sizeRowCuts ()) || 
+	(ncc < cs.sizeColCuts ()))
+      {
+	printf ("---------------- ConvCut:  "); 
+	print (std::cout);  printf (" := ");
+	image_ -> print (std::cout); 
 
-      printf (" [%.7e,%.7e] <--- ", 
-	      domain_ -> lb (varIndex_), 
-	      domain_ -> ub (varIndex_));
+	printf (" [%.7e,%.7e] <--- ", 
+		domain_ -> lb (varIndex_), 
+		domain_ -> ub (varIndex_));
 
-      int index;
-      if ((image_ -> Argument ()) && 
-	  ((index = image_ -> Argument () -> Index ()) >= 0))
-	printf ("[%.7e,%.7e] ",
-		domain_ -> lb (index),
-		domain_ -> ub (index));
-      else if (image_ -> ArgList ())
-	for (int i=0; i<image_ -> nArgs (); i++)
-	  if ((index = image_ -> ArgList () [i] -> Index ()) >= 0)
-	printf ("[%.7e,%.7e] ", 
-		domain_ -> lb (index), 
-		domain_ -> ub (index));
-      printf ("\n");
+	int index;
+	if ((image_ -> Argument ()) && 
+	    ((index = image_ -> Argument () -> Index ()) >= 0))
+	  printf ("[%.7e,%.7e] ",
+		  domain_ -> lb (index),
+		  domain_ -> ub (index));
+	else if (image_ -> ArgList ())
+	  for (int i=0; i<image_ -> nArgs (); i++)
+	    if ((index = image_ -> ArgList () [i] -> Index ()) >= 0)
+	      printf ("[%.7e,%.7e] ", 
+		      domain_ -> lb (index), 
+		      domain_ -> ub (index));
+	printf ("\n");
 
-      for (int jj = nrc; jj < cs.sizeRowCuts (); jj++) cs.rowCutPtr (jj) -> print ();
-      for (int jj = ncc; jj < cs.sizeColCuts (); jj++) cs.colCutPtr (jj) -> print ();
-    }
-#endif
+	for (int jj = nrc; jj < cs.sizeRowCuts (); jj++) cs.rowCutPtr (jj) -> print ();
+	for (int jj = ncc; jj < cs.sizeColCuts (); jj++) cs.colCutPtr (jj) -> print ();
+      }
+  }
+    //#endif
 
   //////////////////////////////////////////////////////////////
 

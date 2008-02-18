@@ -169,6 +169,7 @@ exprQuad::exprQuad (const exprQuad &src, Domain *d):
 void exprQuad::print (std::ostream &out, bool descend) const {
 
   //if (code () == COU_EXPRQUAD)
+  if (matrix_.size () > 0)
     out << '(';
 
   // print linear and nonquadratic part
@@ -203,6 +204,7 @@ void exprQuad::print (std::ostream &out, bool descend) const {
   }
 
   //if (code () == COU_EXPRGROUP)
+  if (matrix_.size () > 0)
     out << ')';
 }
 

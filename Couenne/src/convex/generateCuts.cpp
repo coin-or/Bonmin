@@ -152,6 +152,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	  // DO NOT decrease multiplicity. Even if it is a linear
 	  // term, its bounds can still be used in implied bounds
 	  //
+	  // Are we sure? That will happen only if its multiplicity is
+	  // nonzero, for otherwise this aux is only used here, and is
+	  // useless elsewhere
+	  //
 	  //conaux -> decreaseMult (); // !!!
 	}
 
@@ -160,8 +164,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	// if there exists violation, add constraint
 	CouNumber l = con -> Lb () -> Value (),	
 	          u = con -> Ub () -> Value ();
-
-	//printf ("constraint %d: [%g,%g]", i, l, u); con -> print ();
 
 	// tighten bounds in Couenne's problem representation
 	problem_ -> Lb (index) = CoinMax (l, problem_ -> Lb (index));
@@ -434,7 +436,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
 
     if (cs.sizeColCuts ()) {
-      jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,"Couenne col cuts:\n");
+      jnlst_ -> Printf (J_VECTOR, J_CONVEXIFYING,"Couenne col cuts:\n");
       for (int i=0; i<cs.sizeColCuts (); i++) 
 	cs.colCutPtr (i) -> print ();
     }

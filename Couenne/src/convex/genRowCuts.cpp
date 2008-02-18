@@ -85,7 +85,8 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
       exprVar *var = problem_ -> Var (problem_ -> evalOrder (i));
 
       if ((var -> Type () == AUX) &&
-	  (var -> Multiplicity () > 0))
+	  (var -> Multiplicity () > 0) &&
+	  (var -> Image () -> Linearity () > LINEAR))
 	var -> generateCuts (si, cs, this, chg);
     }
   }

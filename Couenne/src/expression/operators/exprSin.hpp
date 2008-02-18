@@ -11,6 +11,7 @@
 #define COUENNE_EXPRSIN_HPP
 
 #include <math.h>
+#include <assert.h>
 
 #include "exprUnary.hpp"
 #include "exprConst.hpp"
@@ -76,8 +77,20 @@ class exprSin: public exprUnary {
   {return COU_EXPRSIN;}
 
   /// implied bound processing
-  bool impliedBound (int index, CouNumber *l, CouNumber *u, t_chg_bounds *chg)
-  {return trigImpliedBound (COU_SINE, index, argument_ -> Index (), l, u, chg);}
+  bool impliedBound (int index, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
+
+    bool impl = trigImpliedBound (COU_SINE, index, argument_ -> Index (), l, u, chg);
+
+    if (impl && argument_ -> isInteger ()) {
+
+      int ind = argument_ -> Index ();
+      assert (ind >= 0);
+      l [ind] = ceil  (l [ind] - COUENNE_EPS);
+      u [ind] = floor (u [ind] + COUENNE_EPS);
+    }
+
+    return impl;
+  }
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments

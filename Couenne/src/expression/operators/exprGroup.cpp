@@ -39,6 +39,7 @@ exprGroup::exprGroup  (const exprGroup &src, Domain *d):
 void exprGroup::print (std::ostream &out, bool descend) const {
 
   //if (code () == COU_EXPRGROUP)
+  if (lcoeff_.size () > 0)
     out << '(';
 
   if (nargs_ && ((nargs_ > 1) ||
@@ -62,6 +63,7 @@ void exprGroup::print (std::ostream &out, bool descend) const {
   }
 
   //if (code () == COU_EXPRGROUP)
+  if (lcoeff_.size () > 0)
     out << ')';
 }
 

@@ -77,13 +77,9 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   int       *I1 = (int       *) malloc (nterms * sizeof (int)),
             *I2 = (int       *) malloc (nlin   * sizeof (int));
 
-  /*CoinFillN (C1, nterms, 0.);
-  CoinFillN (C2, nlin,   0.);
-
-  CoinFillN (I1, nterms, 0);
-  CoinFillN (I2, nlin,   0);*/
-
   int ipos, ineg = ipos = 0; // #pos and #neg terms
+
+  std::set <int> intSet; // contains indices of integer variables
 
   // classify terms as positive or constant for the exprSum
 
@@ -96,6 +92,10 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     else {
       I1 [ipos]   = index;
       C1 [ipos++] = 1.;
+
+      // add entry to integer variable
+      if (arglist_ [i] -> isInteger ())
+	intSet.insert (index);
     }
   }
 
@@ -117,12 +117,6 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   }
 
   // realloc to save some memory
-
-  /*I1 = (int *) realloc (I1, ipos * sizeof (int));
-  I2 = (int *) realloc (I2, ineg * sizeof (int));
-
-  C1 = (CouNumber *) realloc (C1, ipos * sizeof (CouNumber));
-  C2 = (CouNumber *) realloc (C2, ineg * sizeof (CouNumber));*/
 
   /*printf ("  a0 = %g\n", a0);
   printf ("  pos: "); for (int i=0; i<ipos; i++) printf ("%g x%d [%g,%g] ", C1 [i], I1 [i], l [I1 [i]], u [I1 [i]]); printf ("\n");
@@ -184,6 +178,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       if (updateBound (-1, l + wind, lower)) {
 	chg [wind].setLower(t_chg_bounds::CHANGED);
 	tighter = true;
+	if (intSet.find (wind)!= intSet.end ()) 
+	  l [wind] = ceil (l [wind] - COUENNE_EPS);
       }
 
       if ((slackU > -COUENNE_EPS)  && 
@@ -194,6 +190,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	if (updateBound (+1, u + wind, upper)) {
 	  chg [wind].setUpper(t_chg_bounds::CHANGED);
 	  tighter = true;
+	  if (intSet.find (wind)!= intSet.end ()) 
+	    u [wind] = floor (u [wind] + COUENNE_EPS);
 	}
 
 	free (I1); free (I2);
@@ -210,6 +208,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       if (updateBound (+1, u + wind, upper)) {
 	tighter = true;
 	chg [wind].setUpper(t_chg_bounds::CHANGED);
+	if (intSet.find (wind)!= intSet.end ()) 
+	  u [wind] = floor (u [wind] + COUENNE_EPS);
       }
     }
   }
@@ -242,28 +242,40 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     // tighten upper bound of variables in I1
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
-      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [i] + lc [ind]) || tighter)
+      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [i] + lc [ind]) || tighter) {
 	chg [ind].setUpper(t_chg_bounds::CHANGED);
+	if (intSet.find (ind)!= intSet.end ()) 
+	  u [ind] = floor (u [ind] + COUENNE_EPS);
+      }
     }
 
     // tighten lower bound of variables in I2
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
-      if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [i] + uc [ind]) || tighter)
+      if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [i] + uc [ind]) || tighter) {
 	chg [ind].setLower(t_chg_bounds::CHANGED);
+	if (intSet.find (ind)!= intSet.end ()) 
+	  l [ind] = ceil (l [ind] - COUENNE_EPS);
+      }
     }
   } else
 
     if ((infLo1 >= 0) && (infUp2 == -1)) {    // There is one infinite lower bound in I1
       int ind = I1 [infLo1];
-      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [infLo1]) || tighter)
+      if (tighter = updateBound (+1, u + ind, (wu - lower) / C1 [infLo1]) || tighter) {
 	chg [ind].setUpper(t_chg_bounds::CHANGED);
+	if (intSet.find (ind)!= intSet.end ()) 
+	  u [ind] = floor (u [ind] + COUENNE_EPS);
+      }
     }
     else 
       if ((infLo1 == -1) && (infUp2 >= 0)) {  // There is one infinite upper bound in I2
 	int ind = I2 [infUp2];
-	if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [infUp2]) || tighter)
+	if (tighter = updateBound (-1, l + ind, (wu - lower) / C2 [infUp2]) || tighter) {
 	  chg [ind].setLower(t_chg_bounds::CHANGED);
+	  if (intSet.find (ind)!= intSet.end ()) 
+	    l [ind] = ceil (l [ind] - COUENNE_EPS);
+	}
       }
 
   // Update uppers in I1 and lowers in I2
@@ -272,27 +284,39 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     for (register int i=ipos; i--;) {
       int ind = I1 [i];
-      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + uc [ind]) || tighter)
-	chg [ind].setLower(t_chg_bounds::CHANGED);
+      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + uc [ind]) || tighter) {
+	chg [ind].setLower(t_chg_bounds::CHANGED); 
+	if (intSet.find (ind)!= intSet.end ()) 
+	  l [ind] = ceil (l [ind] - COUENNE_EPS);
+      }
     }
 
     for (register int i=ineg; i--;) {
       int ind = I2 [i];
-      if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + lc [ind]) || tighter)
+      if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + lc [ind]) || tighter) {
 	chg [ind].setUpper(t_chg_bounds::CHANGED);
+	if (intSet.find (ind)!= intSet.end ()) 
+	  u [ind] = floor (u [ind] + COUENNE_EPS);
+      }
     }
   } else 
 
     if ((infUp1 >= 0) && (infLo2 == -1)) { // There is one infinite lower bound in I2
       int ind = I1 [infUp1];
-      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [infUp1]) || tighter)
+      if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [infUp1]) || tighter) {
 	chg [ind].setLower(t_chg_bounds::CHANGED);
+	if (intSet.find (ind)!= intSet.end ()) 
+	  l [ind] = ceil (l [ind] - COUENNE_EPS);
+      }
     }
     else 
       if ((infUp1 == -1) && (infLo2 >= 0)) {  // There is one infinite upper bound in I1
 	int ind = I2 [infLo2];
-	if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [infLo2]) || tighter)
+	if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [infLo2]) || tighter) {
 	  chg [ind].setUpper(t_chg_bounds::CHANGED);
+	  if (intSet.find (ind)!= intSet.end ()) 
+	    u [ind] = floor (u [ind] + COUENNE_EPS);
+	}
       }
 
   // ...phew!

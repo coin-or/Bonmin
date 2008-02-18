@@ -40,7 +40,7 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
     // expression may have non-propagated bounds
 
     // if last call didn't signal infeasibility
-    nbwtightened = ((ntightened > 0) || first) ? impliedBounds (chg_bds) : 0;
+    nbwtightened = ((ntightened > 0) || ((ntightened==0) && first)) ? impliedBounds (chg_bds) : 0;
 
     if (first)
       first = false;
@@ -80,6 +80,9 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
 
 bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds, 
 				      Bonmin::BabInfo * babInfo) const {
+
+  Jnlst()->Printf (J_DETAILED, J_BOUNDTIGHTENING,
+		   "Feasibility-based Bound Tightening\n");
 
   int objInd = Obj (0) -> Body () -> Index ();
 

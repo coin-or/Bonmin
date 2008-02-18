@@ -31,6 +31,8 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     CouNumber c = arglist_ [ind] -> Value ();
 
+    bool argInt = arglist_ [1-ind] -> isInteger ();
+
     // get the index of the nonconstant part
     ind = arglist_ [1-ind] -> Index ();
 
@@ -39,16 +41,20 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
     if (c > COUENNE_EPS) {
 
-      resL = (l [wind] > - COUENNE_INFINITY) && updateBound (-1, l + ind, l [wind] / c);
-      resU = (u [wind] <   COUENNE_INFINITY) && updateBound ( 1, u + ind, u [wind] / c);
+      resL = (l [wind] > - COUENNE_INFINITY) && 
+	updateBound (-1, l + ind, argInt ? ceil  (l [wind] / c - COUENNE_EPS) : (l [wind] / c));
+      resU = (u [wind] <   COUENNE_INFINITY) && 
+	updateBound ( 1, u + ind, argInt ? floor (u [wind] / c + COUENNE_EPS) : (u [wind] / c));
     } 
     else if (c < - COUENNE_EPS) {
 
       //      printf ("w_%d [%g,%g] = %g x_%d [%g,%g]\n", 
       //	      wind, l [wind], u [wind], c, ind, l [ind], u [ind]);
 
-      resL = (u [wind] <   COUENNE_INFINITY) && updateBound (-1, l + ind, u [wind] / c);
-      resU = (l [wind] > - COUENNE_INFINITY) && updateBound ( 1, u + ind, l [wind] / c);
+      resL = (u [wind] <   COUENNE_INFINITY) && 
+	updateBound (-1, l + ind, argInt ? ceil  (u [wind] / c - COUENNE_EPS) : (u [wind] / c));
+      resU = (l [wind] > - COUENNE_INFINITY) && 
+	updateBound ( 1, u + ind, argInt ? floor (l [wind] / c + COUENNE_EPS) : (l [wind] / c));
     } 
 
     if (resL) chg [ind].setLower(t_chg_bounds::CHANGED);
@@ -137,10 +143,14 @@ bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       }
     }
 
-    if (resxL) chg [xi].setLower(t_chg_bounds::CHANGED);
-    if (resxU) chg [xi].setUpper(t_chg_bounds::CHANGED);
-    if (resyL) chg [yi].setLower(t_chg_bounds::CHANGED);
-    if (resyU) chg [yi].setUpper(t_chg_bounds::CHANGED);
+    bool
+      xInt = arglist_ [0] -> isInteger (),
+      yInt = arglist_ [1] -> isInteger ();
+
+    if (resxL) {chg [xi].setLower(t_chg_bounds::CHANGED); if (xInt) *xl = ceil  (*xl - COUENNE_EPS);}
+    if (resxU) {chg [xi].setUpper(t_chg_bounds::CHANGED); if (xInt) *xu = floor (*xu + COUENNE_EPS);}
+    if (resyL) {chg [yi].setLower(t_chg_bounds::CHANGED); if (yInt) *yl = ceil  (*yl - COUENNE_EPS);}
+    if (resyU) {chg [yi].setUpper(t_chg_bounds::CHANGED); if (yInt) *yu = floor (*yu + COUENNE_EPS);}
 
     resL = resxL || resyL;
     resU = resxU || resyU;

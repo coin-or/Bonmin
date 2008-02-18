@@ -41,10 +41,6 @@ class exprOpp: public exprUnary {
   void print (std::ostream &out, 
 	      bool descend) const;
 
-  /// print operator
-  //std::string printOp () const
-  //{return "-";}
-
   /// differentiation
   expression *differentiate (int index); 
 

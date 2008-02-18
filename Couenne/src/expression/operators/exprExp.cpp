@@ -41,14 +41,14 @@ bool exprExp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   CouNumber b;
 
   if ((b = l [wind]) >= COUENNE_EPS) // lower bound
-    resL = updateBound (-1, l + ind, log (b));
+    resL = updateBound (-1, l + ind, argument_->isInteger () ? ceil  (log (b)-COUENNE_EPS) : log (b));
 
   if ((b = u [wind]) >= COUENNE_EPS) // upper bound
-    resU = updateBound ( 1, u + ind, log (b));
+    resU = updateBound ( 1, u + ind, argument_->isInteger () ? floor (log (b)+COUENNE_EPS) : log (b));
   else if (b < - COUENNE_EPS) {
     // make it infeasible
-    resU = updateBound ( 1, u + ind, -1) || resU;
-    resL = updateBound (-1, l + ind,  1) || resL;
+    resU = updateBound ( 1, u + ind, -1.) || true;
+    resL = updateBound (-1, l + ind,  1.) || true;
   }
 
   if (resL) chg [ind].setLower(t_chg_bounds::CHANGED);

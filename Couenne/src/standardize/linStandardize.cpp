@@ -34,10 +34,13 @@ exprAux *CouenneProblem::linStandardize (bool addAux,
   int  nq = qmap.Map().size (),     /// data for exprQuad
       *qi = new int [nq+1], 
       *qj = new int [nq+1];
+
   CouNumber *qc = new CouNumber [nq];
 
-  int  nl = lmap.Map().size(),      /// data for exprGroup
-      *li = new int [nl+1];
+  int  
+     nl = lmap.Map().size(),      /// data for exprGroup
+    *li = new int [nl+1];
+
   CouNumber *lc = new CouNumber [nl];
 
   // terminate arrays with negative index

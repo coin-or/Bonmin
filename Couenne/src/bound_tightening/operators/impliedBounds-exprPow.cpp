@@ -119,5 +119,14 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   if (resL) chg [index].setLower(t_chg_bounds::CHANGED);
   if (resU) chg [index].setUpper(t_chg_bounds::CHANGED);
 
+  bool xInt = arglist_ [0] -> isInteger ();
+
+  if ((resL || resU) && xInt) {
+    int xi = arglist_ [0] -> Index ();
+    assert (xi >= 0);
+    l [xi] = ceil  (l [xi] - COUENNE_EPS);
+    u [xi] = floor (u [xi] + COUENNE_EPS);
+  }
+
   return (resL || resU);
 }

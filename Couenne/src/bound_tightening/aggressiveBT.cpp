@@ -15,7 +15,7 @@
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 
-#define MAX_ABT_ITER 8  // max # aggressive BT iterations
+#define MAX_ABT_ITER 3  // max # aggressive BT iterations
 
 static double distanceToBound(int n, const double* xOrig,
 			      const double* lower, const double* upper)
@@ -40,6 +40,9 @@ static double distanceToBound(int n, const double* xOrig,
 bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 				   t_chg_bounds *chg_bds, 
 				   Bonmin::BabInfo * babInfo) const {
+
+  Jnlst()->Printf (J_DETAILED, J_BOUNDTIGHTENING,
+		   "Aggressive FBBT\n");
 
   Bonmin::CouenneInfo* couInfo =
     dynamic_cast<Bonmin::CouenneInfo*>(babInfo);
