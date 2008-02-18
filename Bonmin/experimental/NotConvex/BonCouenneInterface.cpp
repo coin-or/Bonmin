@@ -65,7 +65,31 @@ CouenneInterface::extractLinearRelaxation
 
     int nvars = p -> nVars();
 
-    if (1) {// (p -> doFBBT ()) {
+    if (p -> doFBBT ()) {
+
+      // include the rhs of auxiliary-based constraints into the FBBT
+      // (should be useful with Vielma's problems, for example)
+
+      for (int i=0; i<p -> nCons (); i++) {
+
+	// for each constraint
+	CouenneConstraint *con = p -> Con (i);
+
+	// (which has an aux as its body)
+	int index = con -> Body () -> Index ();
+
+	if ((index >= 0) && (con -> Body () -> Type () == AUX)) {
+
+	  // if there exists violation, add constraint
+	  CouNumber 
+	    l = con -> Lb () -> Value (),	
+	    u = con -> Ub () -> Value ();
+
+	  // tighten bounds in Couenne's problem representation
+	  p -> Lb (index) = CoinMax (l, p -> Lb (index));
+	  p -> Ub (index) = CoinMin (u, p -> Ub (index));
+	}
+      }
 
       t_chg_bounds *chg_bds = new t_chg_bounds [nvars];
 
@@ -167,7 +191,7 @@ CouenneInterface::extractLinearRelaxation
 
       // re-check optimality in case resolve () was called
       if (isProvenOptimal ()
-	  //&& p -> checkNLP (solution, obj)
+	  && p -> checkNLP (solution, obj)
 	  ) {
 
 	// set cutoff to take advantage of bound tightening
@@ -184,7 +208,7 @@ CouenneInterface::extractLinearRelaxation
     }
   }
   
-  int numcols     = getNumCols (),         // # original               variables
+  int numcols   = getNumCols (),         // # original               variables
     numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
 
   const double
@@ -278,14 +302,10 @@ CouenneInterface::extractLinearRelaxation
    delete [] colLower;
    delete [] colUpper;
    delete [] obj;
-   //   delete [] x0;
 
-   for(int i = 0 ; i < numcols ; i++)
-   {
-     if(isInteger(i)){
-       si.setInteger(i);
-     }
-   }
+   for (int i = 0 ; i < numcols ; i++)
+     if (isInteger (i))
+       si.setInteger (i);
  
    //si.writeMpsNative("toto",NULL,NULL,1);
    //si.writeLp ("toto");
