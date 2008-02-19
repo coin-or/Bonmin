@@ -186,6 +186,8 @@ CouenneInterface::extractLinearRelaxation
 	  delete [] Y;
 	  delete [] lbSave;
 	  delete [] ubSave;
+	  delete [] lbCur;
+	  delete [] ubCur;
 	} 
       }
 
