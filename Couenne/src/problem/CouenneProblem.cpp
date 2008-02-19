@@ -78,7 +78,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   nOrigCons_ = constraints_. size ();
 
   jnlst_->Printf (Ipopt::J_SUMMARY, J_PROBLEM,
-		  "Problem size before standarization: %d variables (%d integer) %d constraints.\n",
+		  "Problem size before standarization: %d variables (%d integer), %d constraints.\n",
 		  nOrig_, nIntVars (), nOrigCons_);
 
   // reformulation
@@ -94,17 +94,18 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     jnlst_->Printf(Ipopt::J_WARNING, J_PROBLEM,
 		   "Couenne: standardization time %.3fs\n", now);
 
-  jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
-		  "Problem size after standarization: %d variables (%d integer) %d constraints.\n",
-		  nVars(), nIntVars(), nCons());
-
-  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
-    // We should route that also through the journalist
-    print (std::cout);
-  }
-
   // give a value to all auxiliary variables
   initAuxs ();
+
+  // check how many integer variables we have now (including aux)
+  for (int i=nOrig_; i<nVars(); i++)
+    if ((variables_ [i] -> isInteger ()) &&
+	(variables_ [i] -> Multiplicity () > 0))
+      nIntVars_++;
+
+  jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
+		  "Problem size after standarization: %d variables (%d integer), %d constraints.\n",
+		  nVars(), nIntVars_, nCons());
 
   if (base) {
 
@@ -135,6 +136,11 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
   // check if optimal solution is available (for debug purposes)
   readOptimum ();
+
+  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+    // We should route that also through the journalist
+    print (std::cout);
+  }
 
   //writeAMPL ("extended-aw.mod", true);
   //writeAMPL ("original.mod", false);
@@ -261,7 +267,7 @@ void CouenneProblem::addGEConstraint (expression *body, expression *rhs = NULL) 
 void CouenneProblem::addLEConstraint (expression *body, expression *rhs = NULL) {
   if (!rhs) rhs = new exprConst (0.);
   constraints_ . push_back (new CouenneConstraint 
-			    (body, new exprConst (- (COUENNE_INFINITY)), rhs));
+			    (body, new exprConst (-COUENNE_INFINITY), rhs));
 }
 
 /// range constraint

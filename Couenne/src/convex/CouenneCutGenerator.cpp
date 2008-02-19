@@ -55,7 +55,7 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 
 /// destructor
 CouenneCutGenerator::~CouenneCutGenerator ()
-  {delete problem_;}
+  {if (problem_) delete problem_;}
 
 
 /// copy constructor

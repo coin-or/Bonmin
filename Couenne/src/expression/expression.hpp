@@ -73,6 +73,10 @@ class expression {
   virtual inline expression **ArgList () const
   {return NULL;}
 
+  /// set arglist (used in deleting nodes without deleting children)
+  virtual inline void ArgList (expression **al)
+  {}
+
   /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
   {return NULL;}

@@ -255,6 +255,8 @@ void CouenneProblem::realign () {
 
     (*i) -> linkDomain (&domain_);
     (*i) -> realign (this);
+    if ((*i) -> Type () == AUX)
+      (*i) -> Image () -> realign (this);
   }
 
   // link variables to problem's domain

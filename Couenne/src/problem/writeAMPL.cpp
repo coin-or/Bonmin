@@ -118,13 +118,13 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
 	
 	CouNumber bound;
 
-	if ((bound = (*((*i) -> Lb ())) ()) > - COUENNE_INFINITY) {
+	if ((bound = (*i) -> lb ()) > - COUENNE_INFINITY) {
 	  f << "conAuxLb" << (*i) -> Index () << ": ";
 	  (*i) -> print (f, true);
 	  f << ">= " << bound << ';' << std::endl;
 	}
 
-	if ((bound = (*((*i) -> Ub ())) ()) <   COUENNE_INFINITY) {
+	if ((bound = (*i) -> ub ()) <   COUENNE_INFINITY) {
 	  f << "conAuxUb" << (*i) -> Index () << ": ";
 	  (*i) -> print (f, true);
 	  f << "<= " << bound << ';' << std::endl;

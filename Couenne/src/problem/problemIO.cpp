@@ -115,13 +115,19 @@ bool CouenneProblem::readOptimum (std::string *fname) {
   CoinFillN (optimum_, nVars (), 0.);
 
   // read optimal objective function first
-  if (fscanf (f, "%lf", &bestObj_) < 1) 
+  if (fscanf (f, "%lf", &bestObj_) < 1) {
+    fclose (f);
+    printf ("could not read objective from file \"%s\"\n", fname -> c_str ());
     return false;
+  }
 
   // read optimal values of variables
   for (int i = 0; i < nOrig_; i++)
-    if (fscanf (f, "%lf", optimum_ + i) < 1) 
+    if (fscanf (f, "%lf", optimum_ + i) < 1) {
+      fclose (f);
+      printf ("could not read optimal value of x_%d from file \"%s\"\n", i, fname -> c_str ());
       return false;
+    }
 
   if (opt_window_ < 1e50) // restrict solution space around known optimum
     for (int i = 0; i < nOrig_; i++) {
@@ -132,6 +138,7 @@ bool CouenneProblem::readOptimum (std::string *fname) {
   // expand solution to auxiliary space
   getAuxs (optimum_);
 
+  fclose (f);
   return true;
 }
 

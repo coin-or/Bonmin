@@ -245,8 +245,12 @@ int CouenneProblem::readnl (const ASL *asl) {
       std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
       indcoe2vector (indexL, coeff, lcoeff);
 
-      if (nl -> code () == COU_EXPRSUM)
+      if (nl -> code () == COU_EXPRSUM) {
 	body = new exprGroup (0., lcoeff, nl -> ArgList (), nl -> nArgs ());
+	// delete node without deleting children (they are now in body)
+	nl -> ArgList (NULL);
+	delete nl;
+      }
       else {
 
 	expression **nll = new expression * [1];
@@ -411,6 +415,9 @@ int CouenneProblem::readnl (const ASL *asl) {
 	  (code == COU_EXPRGROUP)) {
 
 	body    = new exprGroup (0., lcoeff, (*nll) -> ArgList (), (*nll) -> nArgs ());
+	// delete node without deleting children (they are now in body)
+	(*nll) -> ArgList (NULL);
+	delete *nll;
 	delete [] nll;
       }
       else body = new exprGroup (0., lcoeff, nll, 1);

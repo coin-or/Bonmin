@@ -92,7 +92,7 @@ expression *CouenneProblem::nl2e (expr *e, const ASL *asl) {
   case OP_acos:  notimpl ("acos");
 
   case OPSUMLIST: {
-    register int i=0;
+    int i=0;
     expression **al = new expression * [(e->R.ep - e->L.ep)];
     for (expr **ep = e->L.ep; ep < e->R.ep; ep++)
       al [i++] = nl2e (*ep, asl);

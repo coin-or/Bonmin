@@ -407,7 +407,9 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 	rest = auxDef -> Argument ();
       else // TODO: check if auxdef is an exprOpp or an exprMul
 	   // (k*f(x)) and -1/auxcoe simplifies
-	rest = new exprMul (new exprConst (-1./auxcoe), new exprClone (auxDef));
+	rest = new exprMul (new exprConst (-1./auxcoe), 
+			    ((auxDef -> Type () == AUX) ||
+			     (auxDef -> Type () == VAR)) ? new exprClone (auxDef) : auxDef);
     }
 
 #ifdef DEBUG

@@ -65,6 +65,10 @@ class exprOp: public expression {
   inline expression **ArgList () const 
   {return arglist_;}
 
+  /// set arglist (used in deleting nodes without deleting children)
+  virtual inline void ArgList (expression **al) 
+  {arglist_ = al;}
+
   /// return number of arguments
   inline int nArgs () const 
   {return nargs_;}

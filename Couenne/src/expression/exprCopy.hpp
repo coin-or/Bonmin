@@ -76,6 +76,10 @@ class exprCopy: public expression {
   virtual inline expression **ArgList () const
   {return copy_ -> ArgList ();}
 
+  /// set arglist (used in deleting nodes without deleting children)
+  virtual inline void ArgList (expression **al)
+  {copy_ -> ArgList (al);}
+
   /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
   {return copy_ -> Argument ();}
@@ -188,6 +192,10 @@ class exprCopy: public expression {
   /// return pointer to variable domain
   inline Domain *domain () 
   {return copy_ -> domain ();}
+
+  /// redirect variables to proper variable vector
+  void realign (const CouenneProblem *p)
+  {copy_ -> realign (p);}
 };
 
 #endif

@@ -36,8 +36,11 @@ class exprClone: public exprCopy {
   {return new exprClone (*this, d);}
 
   /// Destructor
-  virtual ~exprClone () 
-  {copy_ = NULL;}
+  virtual ~exprClone () {
+    //if (copy_ != Original ())
+    //delete copy_;
+    copy_ = NULL;
+  }
 
   /// I/O
   //void print (std::ostream &out = std::cout, 
@@ -53,7 +56,7 @@ class exprClone: public exprCopy {
   inline CouNumber operator () () 
   {return ((*copy_) ());}
 
-  /// empty function to redirect variables to proper variable vector
+  /// redirect variables to proper variable vector
   void realign (const CouenneProblem *p);
 };
 

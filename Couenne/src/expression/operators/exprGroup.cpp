@@ -211,10 +211,12 @@ bool exprGroup::isInteger () {
     if (intCoe && intVar)
       continue;
 
-    CouNumber lb = (*(el -> first -> Lb ())) ();
+    CouNumber 
+      lb = el -> first -> lb (), 
+      ub = el -> first -> ub ();
 
     // check var fixed and product is integer
-    if ((fabs (lb - (*(el -> first -> Ub ())) ()) < COUENNE_EPS) &&
+    if ((fabs (lb - ub) < COUENNE_EPS) &&
 	(::isInteger (lb * coe) ||
 	 (intCoe && ::isInteger (lb)))) 
       continue;

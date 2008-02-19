@@ -145,8 +145,10 @@ class exprAux: public exprVar {
 	  Integer : Continuous) == Integer))
       return true;
 
-    CouNumber lb = (*(Lb ())) (); 
-    return (::isInteger (lb) && (fabs (lb - (*(Ub ())) ()) < COUENNE_EPS));
+    CouNumber l = lb ();
+    return (::isInteger (l) && (fabs (l - ub ()) < COUENNE_EPS));
+    //CouNumber l = (*(Lb ())) ();
+    //return (::isInteger (l) && (fabs (l - (*(Ub ())) ()) < COUENNE_EPS));
   }
 
   /// Tell this variable appears once more

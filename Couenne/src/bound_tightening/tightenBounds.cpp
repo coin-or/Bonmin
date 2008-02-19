@@ -50,7 +50,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
     if (Lb (i) > Ub (i) + COUENNE_EPS) {
 
-      if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+      if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
 	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			"pre-check: w_%d has infeasible bounds [%g,%g]. ", i, Lb (i), Ub (i));
 	Var (i) -> Lb () -> print (std::cout);
@@ -91,13 +91,13 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
       if (ll > uu + COUENNE_EPS) {
 
-	if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			  "w_%d has infeasible bounds [%g,%g]: ", i, ll, uu);
 	  Var (i) -> Lb () -> print (std::cout);
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING," --- ");
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING," --- ");
 	  Var (i) -> Ub () -> print (std::cout);
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"\n");
 	}
 
 	return -1; // declare this node infeasible
@@ -110,29 +110,29 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	   (fabs (Lb (i)) < COUENNE_EPS) ||
 	   (fabs (ll / (Lb (i)) - 1) > COUENNE_EPS)) ) {
 
-	/*if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+	if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
 
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-			  "propa %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+			  "  prop L %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
 			  i, Lb (i), Ub (i), ll, uu, Lb (i) - ll);
 	  Var (i)             -> print (std::cout);
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING," := ");
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING," := ");
 	  Var (i) -> Image () -> print (std::cout);
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"\n");
 
 	  if (optimum_ && 
 	      (optimum_ [i] >= Lb (i)) && 
 	      (optimum_ [i] <= ll - COUENNE_EPS)) {
 
-	    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			    "#### propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
 			    i+j, Lb (i), optimum_ [i], ll);
 	    Var (i) -> Lb () -> print (std::cout);
-	    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING," --- ");
+	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING," --- ");
 	    Var (i) -> Ub () -> print (std::cout);
-	    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"\n");
 	  }
-	  }*/
+	  }
 
 	Lb (i) = ll;
 	chg_bds [i].setLower(t_chg_bounds::CHANGED);
@@ -152,26 +152,26 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	/*printf ("update ubound %d: %g >= %g\n", 
 	  i+j, uu, ub_ [i+j]);*/
 
-	if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
-	  /*Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-			  "prop %2d [(%g),%g] -> [(%g),%g] (%g) ", 
+	if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+			  "  prop U %2d [(%g),%g] -> [(%g),%g] (%g) ", 
 			  i, Lb (i), Ub (i), ll, uu, Ub (i) - uu);
 	  Var (i)             -> print (std::cout);
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING," := ");
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING," := ");
 	  Var (i) -> Image () -> print (std::cout);
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");*/
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"\n");
 
 	  if (optimum_ && 
 	      (optimum_ [i] <= Ub (i)) && 
 	      (optimum_ [i] >= uu + COUENNE_EPS)) {
 
-	    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			    "Couenne: propagating u_%d cuts optimum: [%g <-X- %g <-- %g] :: ", 
 			    i, uu, optimum_ [i], Ub (i));
 	    Var (i) -> Lb () -> print (std::cout);
-	    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING," --- ");
+	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING," --- ");
 	    Var (i) -> Ub () -> print (std::cout);
-	    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"\n");
+	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"\n");
 	  }
 	}
 
@@ -186,7 +186,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
   }
 
   if (nchg)
-    Jnlst () -> Printf (J_VECTOR, J_BOUNDTIGHTENING,
+    Jnlst () -> Printf (J_DETAILED, J_BOUNDTIGHTENING,
 			"  forward tightening %d changes\n", nchg);
 
   return nchg;

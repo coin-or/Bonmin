@@ -32,7 +32,7 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
 						int way, CouNumber brpoint): 
   variable_     (var),
   jnlst_        (jnlst),
-  doFBBT_       (false),
+  doFBBT_       (true),
   doConvCuts_   (false),
   downEstimate_ (0.),
   upEstimate_   (0.) {
@@ -80,7 +80,7 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
 		    "Branch: x%-3d will branch on %g (at %g) [%g,%g]; firstBranch_ = %d\n", 
 		    variable_ -> Index (),
 		    value_,
-		    x, lb, ub,
+		    (*variable_) (), lb, ub,
 		    firstBranch_);
 }
 
@@ -172,20 +172,19 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
       }
     }
 
-  if (doConvCuts_) {
+  if (doConvCuts_) { // generate convexification cuts before solving new node's LP
 
     int nchanged, *changed = NULL;
     OsiCuts cs;
 
     sparse2dense (nvars, chg_bds, changed, nchanged);
-    couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, //info, 
-					      chg_bds);  // add convexification cuts
+
+    // add convexification cuts
+    couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, chg_bds);  
     solver -> applyCuts (cs);
   }
 
   p -> domain () -> pop ();
-
-  // TODO: apply bound tightening to evaluate change in dual bound
 
   jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
   	  index, way ? '>' : '<', integer ? (way ? ceil : floor) (brpt) : brpt);

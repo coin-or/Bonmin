@@ -15,7 +15,7 @@
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 
-#define MAX_ABT_ITER 3  // max # aggressive BT iterations
+#define MAX_ABT_ITER 1  // max # aggressive BT iterations
 
 static double distanceToBound(int n, const double* xOrig,
 			      const double* lower, const double* upper)

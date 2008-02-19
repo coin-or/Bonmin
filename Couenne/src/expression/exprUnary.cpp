@@ -47,8 +47,12 @@ exprAux *exprUnary::standardize (CouenneProblem *p, bool addAux) {
 
   exprAux *subst;
 
-  if ((subst = argument_ -> standardize (p)))
-    argument_ = new exprClone (subst);
+  if ((subst = argument_ -> standardize (p))) {
+    //if ((subst -> Type () == AUX) ||
+    //(subst -> Type () == VAR)) 
+      argument_ = new exprClone (subst);
+      //else argument_ = subst;
+  }
 
   return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this, p -> domain ()));
 }

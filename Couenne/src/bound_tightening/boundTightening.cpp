@@ -12,7 +12,7 @@
 #include "BonBabInfos.hpp"
 
 // max # bound tightening iterations
-#define MAX_BT_ITER 8
+#define MAX_BT_ITER 3
 #define THRES_IMPROVED 0
 
 
@@ -46,10 +46,7 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
       first = false;
 
     if ((ntightened < 0) || (nbwtightened < 0)) {
-
-      // set infeasibility through a cut 1 <= x0 <= -1
-      Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
-			  "infeasible node at BT\n");
+      Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, "infeasible BT\n");
       return false;
     }
 
@@ -101,7 +98,6 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
     if ((UB < COUENNE_INFINITY) && 
 	(UB < primal0 - COUENNE_EPS)) { // update primal bound (MIP)
 
-      //      printf ("updating upper %g <-- %g\n", primal0, primal);
       Ub (objInd) = UB;
       chg_bds [objInd].setUpper(t_chg_bounds::CHANGED);
     }
@@ -122,11 +118,11 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
 int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 			       t_chg_bounds *chg_bds, 
 			       Bonmin::BabInfo * babInfo) const {
-
   if (!babInfo) 
     return 0;
 
-  int nchanges = 0;
+  int nchanges = 0,
+    objind = Obj (0) -> Body () -> Index ();
 
   CouNumber
     UB = babInfo -> babPtr () -> model (). getObjValue(),
@@ -142,7 +138,8 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 
     int ncols = psi -> getNumCols ();
 
-    for (int i=0; i<ncols; i++) {
+    for (int i=0; i<ncols; i++)
+      if (i != objind) {
 
       CouNumber
 	x  = X  [i],

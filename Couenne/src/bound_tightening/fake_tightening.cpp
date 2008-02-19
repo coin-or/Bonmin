@@ -12,7 +12,7 @@
 
 //#define DEBUG
 
-#define MAX_ITER 10 // max # fake tightening (inner) iterations 
+#define MAX_ITER  2 // max # fake tightening (inner) iterations 
 #define AGGR_MUL  2 // the larger,  the more conservative. Must be > 0
 #define AGGR_DIV  2 // the smaller, the more conservative. Must be > 1
 

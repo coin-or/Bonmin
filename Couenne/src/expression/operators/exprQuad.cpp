@@ -428,8 +428,8 @@ bool exprQuad::isInteger () {
 	  && row -> first -> isFixed ()
 	  && col -> first -> isFixed ()
 	  && ::isInteger (coe * 
-			  (*(row -> first -> Lb ())) () * 
-			  (*(col -> first -> Lb ())) ()))
+			  row -> first -> lb () * 
+			  col -> first -> lb ()))
 	continue;
 
       if (!intI && (row -> first -> isFixed ()) && ::isInteger ((*(row -> first)) ())) continue;

@@ -70,8 +70,8 @@ bool exprQuad::alphaConvexify (const CouenneProblem *p,
     indices [k] = index;
 
     CouNumber
-      lb = (*(i -> first -> Lb ())) (),//lower [di],
-      ub = (*(i -> first -> Ub ())) ();//upper [di];
+      lb = i -> first -> lb (),
+      ub = i -> first -> ub ();
 
     // if one variable unbounded, bail out
     if ((lb < -COUENNE_INFINITY) ||

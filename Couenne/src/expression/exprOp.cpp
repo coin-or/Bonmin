@@ -144,9 +144,12 @@ exprAux *exprOp::standardize (CouenneProblem *p, bool addAux) {
   register exprVar *subst;
 
   for (register int i = nargs_; i--;)
-    if ((subst = arglist_ [i] -> standardize (p)))
-      arglist_ [i] = new exprClone (subst);
-
+    if ((subst = arglist_ [i] -> standardize (p))) {
+      if ((subst -> Type () == VAR) ||
+	  (subst -> Type () == AUX))
+	arglist_ [i]    = new exprClone (subst);
+      else arglist_ [i] = subst;
+    }
   return NULL;
 }
 

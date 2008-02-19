@@ -99,7 +99,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   double now   = CoinCpuTime ();
   int    ncols = problem_ -> nVars ();
 
-  problem_ -> installCutOff ();
+  //problem_ -> installCutOff ();
 
   // This vector contains variables whose bounds have changed due to
   // branching, reduced cost fixing, or bound tightening below. To be
@@ -237,9 +237,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   fictitiousBound (cs, problem_, false);
 
-  problem_ -> installCutOff ();
+  //problem_ -> installCutOff ();
 
-  if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
+  /*if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
     jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== generateCuts: point to cut =============\n");
     for (int i = 0; i < problem_ -> nVars (); i++)
       if (problem_ -> Var (i) -> Multiplicity () > 0)
@@ -253,7 +253,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 		       si.getColUpper  () [i],
 		       problem_ -> bestSol () ? problem_ -> bestSol () [i] : 0.);
     jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
-  }
+    }*/
 
   int *changed = NULL, nchanged;
 
@@ -270,7 +270,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // Bound tightening ////////////////////////////////////
 
     // FBBT
-    if (problem_ -> doFBBT () && (info.pass <= 0) &&
+    if (problem_ -> doFBBT () && //(info.pass <= 0) && // do it in subsequent rounds too
 	(! (problem_ -> boundTightening (chg_bds, babInfo))))
       throw INFEASIBLE;
 
@@ -441,7 +441,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	cs.colCutPtr (i) -> print ();
     }
 
-    jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== on my way out of generateCuts =============\n");
+    /*jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== on my way out of generateCuts =============\n");
     for (int i = 0; i < problem_ -> nVars (); i++)
       if (problem_ -> Var (i) -> Multiplicity () > 0)
 	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,
@@ -452,6 +452,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 		       si.getColSolution () [i],
 		       si.getColLower    () [i],
 		       si.getColUpper    () [i]);
-    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
+		       jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");*/
   }
 }

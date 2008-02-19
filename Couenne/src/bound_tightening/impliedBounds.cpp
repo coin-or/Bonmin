@@ -38,7 +38,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
       if (Lb (i) > Ub (i) + COUENNE_EPS) {
 	Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
-			"implied bounds: w_%d has infeasible bounds [%g,%g]\n", 
+			"  implied bounds: w_%d has infeasible bounds [%g,%g]\n", 
 			i, Lb (i), Ub (i));
 	return -1;
       }
@@ -66,90 +66,73 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       // TODO: also test if this expression, or any of its indep
       // variables, have changed. If not, skip
 
-      /*CouNumber 
-	l0 = lb_ [i], 
-	u0 = ub_ [i];*/
+      CouNumber 
+	l0 = Lb (i), 
+	u0 = Ub (i);
 
       if (variables_ [i] -> Image () -> impliedBound 
 	  (variables_ [i] -> Index (), Lb (), Ub (), chg_bds)) {
 
-	/*if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
+	if (Jnlst()->ProduceOutput(Ipopt::J_DETAILED, J_BOUNDTIGHTENING)) {
 	  // todo: send all output through journalist
-	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
-			  "impli %2d [%15.8g, %15.8g] -> [%15.8g, %15.8g]: ",
-			  i, l0, u0, lb_ [i], ub_ [i]);
+	  Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
+			  "  impli %2d [%15.8g, %15.8g] -> [%15.8g, %15.8g]: ",
+			  i, l0, u0, Lb (i), Ub (i));
 
 	  variables_ [i]             -> print (std::cout);
-	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING," := ");
+	  Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING," := ");
 	  variables_ [i] -> Image () -> print (std::cout);
-	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
-	  }*/
+	  Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,"\n");
+	}
 
-	/*for (int i=0; i<nVars (); i++) 
-	  printf ("%4d. [%20.8f, %20.8f]\n", i,
-		  expression::Lbound (i),
-		  expression::Ubound (i));*/
-
-	/*
-	if (optimum_ && 
-	    ((optimum_ [i+nvar] < lb_ [i+nvar] - COUENNE_EPS) ||
-	     (optimum_ [i+nvar] > ub_ [i+nvar] + COUENNE_EPS)))
-	  printf ("#### implied b_%d [%g,%g] cuts optimum %g: [%g --> %g, %g <-- %g]\n", 
-		  i+nvar, expression::Lbound (i+nvar), expression::Ubound (i+nvar), 
-		  optimum_ [i+nvar], l0, lb_ [i+nvar], ub_ [i+nvar], u0);
+	/*if (optimum_ && 
+	    ((optimum_ [i] < Lb (i) - COUENNE_EPS) ||
+	     (optimum_ [i] > Ub (i) + COUENNE_EPS)))
+	  Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
+			  "#### implied b_%d [%g,%g] cuts optimum %g: [%g --> %g, %g <-- %g]\n", 
+			  i+nvar, expression::Lbound (i+nvar), expression::Ubound (i+nvar), 
+			  optimum_ [i+nvar], l0, lb_ [i+nvar], ub_ [i+nvar], u0);*/
 
 	//printf ("impli %2d ", nvar+i);
 
-	if (auxiliaries_ [i] -> Image () -> Argument () || 
-	    auxiliaries_ [i] -> Image () -> ArgList ()) {
+	/*if (variables_ [i] -> Image () -> Argument () || 
+	    variables_ [i] -> Image () -> ArgList ()) {
 
-	  expression *arg = auxiliaries_ [i] -> Image () -> Argument ();
+	  expression *arg = variables_ [i] -> Image () -> Argument ();
 
 	  if (!arg) {
-	    for (int k=0; k < auxiliaries_ [i] -> Image () -> nArgs (); k++) {
-	      arg =  auxiliaries_ [i] -> Image () -> ArgList () [k];
-	      printf (" ");
+	    for (int k=0; k < variables_ [i] -> Image () -> nArgs (); k++) {
+	      arg =  variables_ [i] -> Image () -> ArgList () [k];
+	      Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING," ");
 	      arg -> print (std::cout);
 	      if (arg -> Index () >= 0) {
 		int ind = arg -> Index ();
-		printf (" in [%g,%g]", 
-			expression::Lbound (ind), 
-			expression::Ubound (ind));
+		Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
+				" in [%g,%g]", 
+				expression::Lbound (ind), 
+				expression::Ubound (ind));
 	      }	    
 	    }
 	  } else {
-	    printf (" ");
+	    Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING," ");
 	    arg -> print (std::cout);
 	    if (arg -> Index () >= 0) {
 	      int ind = arg -> Index ();
-	      printf (" in [%g,%g]", 
+	      Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING," in [%g,%g]", 
 		      expression::Lbound (ind), 
 		      expression::Ubound (ind));
 	    }
 	  }
-	} else printf (" [no args]");
-	printf ("\n");
-	*/
+	} else Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING," [no args]");
+	Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,"\n");*/
 
 	nchg++;
       }
     }
   }
 
-  /*for (int i=0; i < nAuxs (); i++) {
-
-    printf (" [%g, %g]", 
-    expression::Lbound (i+nvar),
-    expression::Ubound (i+nvar));
-
-    auxiliaries_ [i] -> print (std::cout);
-    printf (" := ");
-    auxiliaries_ [i] -> Image () -> print (std::cout); fflush (stdout);
-    printf ("\n");
-  }*/
-
   if (nchg)
-    Jnlst () -> Printf (J_VECTOR, J_BOUNDTIGHTENING,
+    Jnlst () -> Printf (J_DETAILED, J_BOUNDTIGHTENING,
 			"  implied bounds: %d changes\n", nchg);
 
   return nchg;
