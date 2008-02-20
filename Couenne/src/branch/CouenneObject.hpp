@@ -33,8 +33,10 @@ enum {TWO_LEFT,                 TWO_RIGHT,   TWO_RAND,
 
 //
 class funtriplet;
-CouNumber minMaxDelta (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
-CouNumber maxHeight   (funtriplet *ft, CouNumber x, CouNumber y, CouNumber lb, CouNumber ub);
+CouNumber minMaxDelta (funtriplet *ft, //CouNumber x, CouNumber y, 
+		       CouNumber lb, CouNumber ub);
+CouNumber maxHeight   (funtriplet *ft, //CouNumber x, CouNumber y, 
+		       CouNumber lb, CouNumber ub);
 
 /// OsiObject for auxiliary variables $w=f(x)$. 
 ///
@@ -99,10 +101,10 @@ public:
 
     switch (strategy_) {
 
-    case CouenneObject::MIN_AREA:     return maxHeight   (ft, x0, y0, l, u);
-    case CouenneObject::BALANCED:     return minMaxDelta (ft, x0, y0, l, u);
+    case CouenneObject::MIN_AREA:     return maxHeight   (ft, l, u);
+    case CouenneObject::BALANCED:     return minMaxDelta (ft, l, u);
     case CouenneObject::MID_INTERVAL: 
-    default:                          return midInterval (    x0,     l, u);
+    default:                          return midInterval (x0, l, u);
     }
   }
 

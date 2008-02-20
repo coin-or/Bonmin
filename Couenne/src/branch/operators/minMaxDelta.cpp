@@ -203,7 +203,7 @@ CouNumber curvDistance (funtriplet *ft, CouNumber lb, CouNumber ub) {
 
 ///
 CouNumber minMaxDelta (funtriplet *ft, 
-		       CouNumber x, CouNumber y, 
+		       //CouNumber x, CouNumber y, 
 		       CouNumber lb, CouNumber ub) {
 
   CouNumber 
@@ -258,7 +258,7 @@ CouNumber minMaxDelta (funtriplet *ft,
 
 ///
 CouNumber maxHeight (funtriplet *ft, 
-		     CouNumber x, CouNumber y, 
+		     //CouNumber x, CouNumber y, 
 		     CouNumber lb, CouNumber ub) {
   /* fprintf (stderr,"slope is (%g - %g) / (%g - %g) = %g / %g = %g ----> inverse is %g\n", 
 	  ft -> F (ub), 
@@ -353,7 +353,7 @@ int main (int argc, char **argv) {
 
   printf ("%g %g\n", lb, ft. F (lb));
 
-  b = minMaxDelta (&ft, b, 0, lb, ub);
+  b = minMaxDelta (&ft, lb, ub);
   printf ("%g %g\n", b, ft. F (b));
   printf ("%g %g\n", ub, ft. F (ub));
 

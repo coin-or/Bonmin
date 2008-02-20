@@ -223,7 +223,12 @@ void CouenneProblem::setCutOff (CouNumber cutoff) {
 		    Ub (indobj) :
 		    Lb (indobj));
 
-    pcutoff_ -> setCutOff (cutoff + 1e-7 * fabs (1 + cutoff));
+    CouNumber 
+      safe       = 1e-6,
+      safesigned = (objectives_ [0] -> Sense () == MINIMIZE) ? safe : -safe;
+
+    pcutoff_ -> setCutOff 
+      (cutoff + safesigned * fabs (1 + cutoff));
   }
 } // tolerance needed to retain feasibility
 

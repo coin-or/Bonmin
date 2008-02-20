@@ -92,6 +92,9 @@ protected:
 		       std::vector <CouNumber> &xu,
 		       std::vector <std::pair <int, CouNumber> > &nl,
 		       std::vector <std::pair <int, CouNumber> > &nu);
+
+  /// balanced strategy for branching point selection in products
+  CouNumber balancedMul (const OsiBranchingInformation *info, int index, int wind);
 };
 
 

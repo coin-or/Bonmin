@@ -91,4 +91,6 @@ void exprDiv::generateCuts (expression *w, const OsiSolverInterface &si,
 		   wi, x [wi], wl, wu,
 		   yi, x [yi], yl, yu,
 		   xi, x [xi], xl, xu, chg);
+
+  // TODO: put real convexification...
 }
