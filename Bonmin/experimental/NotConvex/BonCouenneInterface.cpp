@@ -192,9 +192,7 @@ CouenneInterface::extractLinearRelaxation
       }
 
       // re-check optimality in case resolve () was called
-      if (isProvenOptimal ()
-	  && p -> checkNLP (solution, obj)
-	  ) {
+      if (isProvenOptimal () && p -> checkNLP (solution, obj)) {
 
 	// set cutoff to take advantage of bound tightening
 	p -> setCutOff (obj);

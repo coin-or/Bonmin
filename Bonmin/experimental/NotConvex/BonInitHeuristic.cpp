@@ -15,15 +15,21 @@ namespace Bonmin{
   InitHeuristic::InitHeuristic(double objValue, const double* sol,
 			       CouenneProblem& cp):
     CbcHeuristic(),
-    objValue_(objValue),
+    objValue_(COIN_DBL_MAX),
     sol_(NULL)
   {
     setHeuristicName("InitHeuristic");
     nVars_ = cp.nVars();
-    sol_ = new double[nVars_];
 
-    CoinCopyN(sol, cp.nOrig(), sol_);
-    cp.getAuxs(sol_);
+    if (cp.checkNLP (sol, objValue)) {
+
+      objValue_ = objValue;
+
+      sol_ = new double[nVars_];
+
+      CoinCopyN(sol, cp.nOrig(), sol_);
+      cp.getAuxs(sol_);
+    }
   }
 
   InitHeuristic::InitHeuristic(const InitHeuristic & other)
