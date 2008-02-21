@@ -15,6 +15,9 @@
 /* keep it at least 1e-7, or strange things happen */
 #define COUENNE_EPS           1e-7
 
+// for integrality check
+#define COUENNE_EPS_INT       1e-9
+
 #define COUENNE_EPS_SIMPL     1e-20
 
 #define COUENNE_INFINITY      1.0e+50

@@ -75,8 +75,8 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
 
   int intk = 0;
 
-  bool isInt    =            fabs (k    - (double) (intk = COUENNE_round (k)))    < COUENNE_EPS,
-       isInvInt = !isInt && (fabs (1./k - (double) (intk = COUENNE_round (1./k))) < COUENNE_EPS);
+  /*bool isInt    =            fabs (k    - (double) (intk = COUENNE_round (k)))    < COUENNE_EPS,
+    isInvInt = !isInt && (fabs (1./k - (double) (intk = COUENNE_round (1./k))) < COUENNE_EPS);*/
 
   // case 2: bound interval does not contain zero. Look if inside or
   // outside of belly (refer to branchExprExp.cpp)

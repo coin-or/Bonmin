@@ -151,12 +151,19 @@ class exprAux: public exprVar {
     //return (::isInteger (l) && (fabs (l - (*(Ub ())) ()) < COUENNE_EPS));
   }
 
+  /// Set this variable as integer
+  virtual inline void setInteger (bool value)
+  {integer_ = value ? Integer : Continuous;}
+
   /// Tell this variable appears once more
   inline void increaseMult () {++multiplicity_;}
 
   /// Tell this variable appears once less (standardized within
   /// exprSum, for instance)
   inline void decreaseMult () {--multiplicity_;}
+
+  /// Disable this auxiliary variable
+  inline void zeroMult () {multiplicity_ = 0;}
 
   /// How many times this variable appears 
   inline int Multiplicity () {return multiplicity_;}

@@ -4,7 +4,7 @@
  * Purpose: replace occurrences of original variable in a problem with
  *          auxiliary with the same index
  *
- * (C) Carnegie-Mellon University, 2007. 
+ * (C) Carnegie-Mellon University, 2007-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -17,7 +17,12 @@
 /// objectives and constraints) link to an original variable that has
 /// gone auxiliary
 
-void CouenneProblem::auxiliarize (exprAux *aux) {
+void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
+
+  bool same_var = (subst == NULL);
+
+  if (!subst) 
+    subst = aux;
 
   // find original variable with index = w -> Index ()
 
@@ -28,15 +33,15 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
   std::vector <exprVar *>::iterator orig;
 
   for (orig  = variables_.begin ();
-       orig != variables_.end (); orig++)
+       orig != variables_.end (); ++orig)
 
-    if (((*orig) -> Type  () == VAR) && 
+    if ((((*orig) -> Type () == VAR) || !same_var) && 
 	((*orig) -> Index () == index)) // found it
 
       break;
 
   if (orig == variables_ . end ()) {
-    printf ("CouenneProblem::auxiliarize: no original variables\n");
+    printf ("CouenneProblem::auxiliarize: no original variables correspond\n");
     return;
   }
 
@@ -47,32 +52,38 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
   // all objectives
 
   for (std::vector <CouenneObjective *>::iterator i = objectives_.begin ();
-       i != objectives_.end (); ++i)
+       i != objectives_.end (); ++i) {
 
-    if ((*i) -> Body ()) {
-      if ((*i) -> Body () -> Type () == VAR) {
-	if ((*i) -> Body () -> Index () == (*orig) -> Index ()) {
+    expression *body = (*i) -> Body ();
+
+    if (body) {
+      if (body -> Type () == VAR) {
+	if (body -> Index () == (*orig) -> Index ()) {
       
-	  delete (*i) -> Body ();
-	  (*i) -> Body (new exprClone (aux));
+	  delete body;//(*i) -> Body ();
+	  (*i) -> Body (new exprClone (subst));
 	}
-      } else (*i) -> Body () -> replace (*orig, aux);
+      } else body -> replace (*orig, subst);
     }
+  }
 
   // and all constraints
 
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
-       i != constraints_.end (); ++i)
+       i != constraints_.end (); ++i) {
 
-    if ((*i) -> Body ()) {
-      if ((*i) -> Body () -> Type () == VAR) {
-	if ((*i) -> Body () -> Index () == (*orig) -> Index ()) {
+    expression *body = (*i) -> Body ();
+
+    if (body) {
+      if (body -> Type () == VAR) {
+	if (body -> Index () == (*orig) -> Index ()) {
       
-	  delete (*i) -> Body ();
-	  (*i) -> Body (new exprClone (aux));
+	  delete body;//(*i) -> Body ();
+	  (*i) -> Body (new exprClone (subst));
 	}
-      } else (*i) -> Body () -> replace (*orig, aux);
+      } else body -> replace (*orig, subst);
     }
+  }
 
   // substitute it with w in all auxiliaries
 
@@ -82,16 +93,20 @@ void CouenneProblem::auxiliarize (exprAux *aux) {
     if (((*i) -> Type () == AUX) &&                  // replace in all aux's image
 	((*i) -> Index () != (*orig) -> Index ())) { // skip same variable
 
-      if ((*i) -> Image () -> Type () == VAR) {
-	if ((*i) -> Image () -> Index () == (*orig) -> Index ()) {
+      expression *image = (*i) -> Image ();
 
-	  delete (*i) -> Image ();
-	  (*i) -> Image (new exprClone (aux));
+      if ((image -> Type () == VAR) || 
+	  (image -> Type () == AUX)) {
+	if (image -> Index () == (*orig) -> Index ()) {
+
+	  delete image;//(*i) -> Image ();
+	  (*i) -> Image (new exprClone (subst));
 	} //else (*i) -> Image () -> replace (*orig, aux);
-      } else (*i) -> Image () -> replace (*orig, aux);
+      } else image  -> replace (*orig, subst);
     }
 
   // replace it with new auxiliary
 
-  *orig = aux;
+  if (same_var)
+    *orig = aux;
 }

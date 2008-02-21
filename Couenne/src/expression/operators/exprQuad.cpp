@@ -458,7 +458,7 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
 
     exprVar * &vr = row -> first;
 
-    if ((vr -> Type  () == VAR) &&
+    if (//(vr -> Type  () == VAR) &&
 	(vr -> Index () == index))
       vr = w;
 
@@ -466,7 +466,7 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
 
       exprVar * &vc = col -> first;
 
-      if ((vc -> Type  () == VAR) &&
+      if (//(vc -> Type  () == VAR) &&
 	  (vc -> Index () == index))
 	vc = w;
     }

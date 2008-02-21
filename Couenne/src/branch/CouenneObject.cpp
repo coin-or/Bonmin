@@ -27,14 +27,17 @@ const CouNumber default_alpha = 0.2;
 /// Constructor with information for branching point selection strategy
 CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 			      JnlstPtr jnlst):
-  reference_ (ref),
-  strategy_  (MID_INTERVAL),
-  jnlst_     (jnlst),
-  alpha_     (default_alpha) {
+  reference_      (ref),
+  strategy_       (MID_INTERVAL),
+  jnlst_          (jnlst),
+  alpha_          (default_alpha),
+  feas_tolerance_ (feas_tolerance_default) {
 
   assert (ref -> Type () == AUX);
 
   if (base) {
+
+    base -> options () -> GetNumericValue ("feas_tolerance", feas_tolerance_, "couenne.");
 
     std::string brtype;
     base -> options () -> GetStringValue ("branch_pt_select", brtype, "couenne.");
@@ -112,7 +115,8 @@ CouenneObject::CouenneObject (const CouenneObject &src):
   reference_ (src.reference_),
   strategy_  (src.strategy_),
   jnlst_     (src.jnlst_),
-  alpha_     (src.alpha_) {}
+  alpha_     (src.alpha_),
+  feas_tolerance_ (src.feas_tolerance_) {}
 
 
 #define TOL 0.
@@ -237,7 +241,11 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   expression *brVar = NULL; // branching variable
   int whichWay = 0;
 
-  CouNumber improv = reference_ -> Image () -> 
+#ifdef DEBUG
+  CouNumber improv =  // not used out of debug
+#endif
+
+    reference_ -> Image () -> 
     selectBranch (this, info,              // input parameters
 		  brVar, brPts, whichWay); // result: who, where, and how to branch
 

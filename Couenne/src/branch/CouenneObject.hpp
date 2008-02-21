@@ -69,13 +69,16 @@ public:
   /// the auxiliary variable defined as w = f(x)
   /// TODO: suggest way
   virtual inline double infeasibility (const OsiBranchingInformation *info, int &way) const {  
+
     if (strategy_ == NO_BRANCH) return 0.;
 
     CouNumber delta = 
       fabs (info -> solution_ [reference_ -> Index ()] - 
 	    (*(reference_ -> Image ())) ());
 
-    if (delta < COUENNE_EPS) return 0.;
+    if (delta < CoinMin (COUENNE_EPS, feas_tolerance_))
+      return 0.;
+
     return delta;
   }
 
@@ -128,6 +131,9 @@ protected:
   /// Combination parameter for the mid-point branching point
   /// selection strategy
   CouNumber alpha_;
+
+  /// feasibility tolerance (equal to that of CouenneProblem)
+  CouNumber feas_tolerance_;
 };
 
 #endif

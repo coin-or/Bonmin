@@ -46,8 +46,7 @@ public:
   {return new exprGroup (*this, d);}
 
   // Get constant, indices, and coefficients vectors, and number of linear terms
-  CouNumber  getc0 () {return c0_;}      ///< return constant term
-
+  CouNumber  getc0 () {return c0_;}           ///< return constant term
   lincoeff &lcoeff () const {return lcoeff_;} ///< return linear term coefficients
 
   /// Print expression to iostream

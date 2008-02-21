@@ -274,6 +274,6 @@ inline int compareExpr (const void *e0, const void *e1) {
 
 /// is this number integer?
 inline bool isInteger (CouNumber x)
-{return (fabs (COUENNE_round (x) - x) < COUENNE_EPS);}
+{return (fabs (COUENNE_round (x) - x) < COUENNE_EPS_INT);}
 
 #endif

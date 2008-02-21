@@ -239,7 +239,7 @@ void exprGroup::replace (exprVar *x, exprVar *w) {
 
     exprVar * &ve = el -> first;
 
-    if ((ve -> Type  () == VAR) &&
+    if (//(ve -> Type  () == VAR) &&
 	(ve -> Index () == index))
       ve = w;
   }

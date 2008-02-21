@@ -125,7 +125,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	      (optimum_ [i] <= ll - COUENNE_EPS)) {
 
 	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
-			    "#### propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
+			    "Couenne: propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
 			    i+j, Lb (i), optimum_ [i], ll);
 	    Var (i) -> Lb () -> print (std::cout);
 	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING," --- ");

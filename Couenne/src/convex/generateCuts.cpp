@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: the generateCuts() method of the convexification class CouenneCutGenerator
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -14,19 +14,16 @@
 #include "CouenneProblem.hpp"
 #include "CouenneSolverInterface.hpp"
 
-// exception
-#define INFEASIBLE 1
-
-// fictitious bound for initial unbounded lp relaxations
-#define LARGE_BOUND 9.999e12
-
-#define LARGE_TOL (LARGE_BOUND / 1e6)
 
 // set and lift bound for auxiliary variable associated with objective
 // function
 void fictitiousBound (OsiCuts &cs,
 		      CouenneProblem *p, 
 		      bool action) {     // true before convexifying, false afterwards
+
+  // fictitious bound for initial unbounded lp relaxations
+  const CouNumber large_bound =  9.999e12;
+  const CouNumber large_tol = (large_bound / 1e6);
 
   // set trivial dual bound to objective function, if there is none
 
@@ -39,11 +36,11 @@ void fictitiousBound (OsiCuts &cs,
   int sense = (p -> Obj (0) -> Sense () == MINIMIZE) ? -1 : 1;
 
   if (action)
-    if (sense<0) {if (p -> Lb (ind_obj) < - LARGE_BOUND) p -> Lb (ind_obj) = - LARGE_BOUND;}
-    else         {if (p -> Ub (ind_obj) >   LARGE_BOUND) p -> Ub (ind_obj) =   LARGE_BOUND;}
+    if (sense<0) {if (p -> Lb (ind_obj) < - large_bound) p -> Lb (ind_obj) = - large_bound;}
+    else         {if (p -> Ub (ind_obj) >   large_bound) p -> Ub (ind_obj) =   large_bound;}
   else
-    if (sense>0) {if (fabs (p->Ub(ind_obj)-LARGE_BOUND)<LARGE_TOL) p->Ub(ind_obj) = COUENNE_INFINITY;}
-    else         {if (fabs (p->Lb(ind_obj)+LARGE_BOUND)<LARGE_TOL) p->Lb(ind_obj) =-COUENNE_INFINITY;}
+    if (sense>0) {if (fabs (p->Ub(ind_obj)-large_bound)<large_tol) p->Ub(ind_obj) = COUENNE_INFINITY;}
+    else         {if (fabs (p->Lb(ind_obj)+large_bound)<large_tol) p->Lb(ind_obj) =-COUENNE_INFINITY;}
 }
 
 
@@ -79,6 +76,9 @@ void updateBranchInfo (const OsiSolverInterface &si, CouenneProblem *p,
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
+
+  const int infeasible = 1;
+
   int nInitCuts = cs.sizeRowCuts ();
 
   /*static int count = 0;
@@ -239,22 +239,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   //problem_ -> installCutOff ();
 
-  /*if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
-    jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== generateCuts: point to cut =============\n");
-    for (int i = 0; i < problem_ -> nVars (); i++)
-      if (problem_ -> Var (i) -> Multiplicity () > 0)
-	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,
-		       "%4d %+20.8g [%+20.8g,%+20.8g] --- %+20.8g [%+20.8g,%+20.8g] (%+20.8g)\n", i,
-		       problem_ -> X  (i),
-		       problem_ -> Lb (i),
-		       problem_ -> Ub (i),
-		       si.getColSolution  () [i],
-		       si.getColLower  () [i],
-		       si.getColUpper  () [i],
-		       problem_ -> bestSol () ? problem_ -> bestSol () [i] : 0.);
-    jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
-    }*/
-
   int *changed = NULL, nchanged;
 
   // Bound tightening ///////////////////////////////////////////
@@ -272,12 +256,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // FBBT
     if (problem_ -> doFBBT () && //(info.pass <= 0) && // do it in subsequent rounds too
 	(! (problem_ -> boundTightening (chg_bds, babInfo))))
-      throw INFEASIBLE;
+      throw infeasible;
 
     // OBBT
     if (!firstcall_ && // no obbt if first call (there is no LP to work with)
 	problem_ -> obbt (this, si, cs, info, babInfo, nchanged, changed, chg_bds) < 0)
-      throw INFEASIBLE;
+      throw infeasible;
 
     // Reduced Cost BT
     if (problem_ -> doFBBT () && !firstcall_)
@@ -322,7 +306,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	jnlst_ -> Printf(J_DETAILED, J_CONVEXIFYING,"  performing ABT\n");
 	if (! (problem_ -> aggressiveBT (nlp_, chg_bds, babInfo)))
-	  throw INFEASIBLE;
+	  throw infeasible;
 
 	sparse2dense (ncols, chg_bds, changed, nchanged);
       }
@@ -396,7 +380,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   catch (int exception) {
 
-    if ((exception == INFEASIBLE) && (!firstcall_)) {
+    if ((exception == infeasible) && (!firstcall_)) {
 
       jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,
 			"generateCuts: Infeasible node detected\n");
@@ -440,18 +424,5 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       for (int i=0; i<cs.sizeColCuts (); i++) 
 	cs.colCutPtr (i) -> print ();
     }
-
-    /*jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== on my way out of generateCuts =============\n");
-    for (int i = 0; i < problem_ -> nVars (); i++)
-      if (problem_ -> Var (i) -> Multiplicity () > 0)
-	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,
-		       "%4d %+20.8g [%+20.8g,%+20.8g] %+20.8g [%+20.8g,%+20.8g]\n", i,
-		       problem_ -> X  (i),
-		       problem_ -> Lb (i),
-		       problem_ -> Ub (i),
-		       si.getColSolution () [i],
-		       si.getColLower    () [i],
-		       si.getColUpper    () [i]);
-		       jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");*/
   }
 }

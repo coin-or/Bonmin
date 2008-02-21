@@ -13,6 +13,7 @@
 
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
+#include "exprIVar.hpp"
 #include "exprClone.hpp"
 #include "CouenneProblem.hpp"
 #include "CouenneProblemElem.hpp"
@@ -168,6 +169,52 @@ void CouenneProblem::standardize () {
   for (unsigned int i = iters2erase.size (); i--;)
     constraints_. erase (iters2erase [i]);
 
+  // Look for auxiliaries of the form w:=x and replace each occurrence of w with x
+
+  if (0)
+  for (std::vector <exprVar *>::iterator i = variables_.begin (); 
+       i != variables_.end (); ++i)
+
+    if ((*i) -> Type () == AUX) {
+
+      int type = (*i) -> Image () -> Type ();
+
+      if ((type == VAR) || (type == AUX)) {
+
+	// use the info on the variable to be discarded: tighter
+	// bounds and integrality that the replacement might not have.
+
+	int indV = (*i) -> Image () -> Index ();
+
+	exprVar *realVar = variables_ [indV];
+
+	if (((*i) -> isInteger ()) && !(realVar -> isInteger ())) {
+
+	  if (realVar -> Type () == AUX)
+	    realVar -> setInteger (true);
+	  else {
+
+	    delete realVar;
+	    variables_ [indV] = realVar = new exprIVar (indV, &domain_);
+	    auxiliarize (realVar);
+	  }
+	}
+
+	if ((*i) -> lb () > realVar -> lb () + COUENNE_EPS) realVar -> lb () = (*i) -> lb ();
+	if ((*i) -> ub () < realVar -> ub () - COUENNE_EPS) realVar -> ub () = (*i) -> ub ();
+
+	auxiliarize (*i, realVar);
+	if ((*i) -> Index () >= nOrig_)
+	  (*i) -> zeroMult ();
+
+	//printf ("found redundancy: "); (*i) -> print (); 
+	//printf (" := "); (*i) -> Image () -> print (); printf ("\n");
+      }
+    }
+
+
+  // TODO: re-compute ranks
+
 #ifdef DEBUG
   // Use with caution. Bounds on auxs are not defined yet, so valgrind complains
   printf ("done with standardization:\n");
@@ -242,38 +289,6 @@ void CouenneProblem::standardize () {
     }
   }
 
-  // post processing of constraints /////////////////////////////////////
-
-  // if a constraint is linear, it has been replaced by a useless aux,
-  // unless that aux has multiplicity more than one. If it is one,
-  // replace expression in body and change generateCuts.cpp to
-  // generate the original linear constraint
-  //
-  // ... done already in first call to generateCuts
-
-  /*
-  for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin (); 
-       i != constraints_.end (); ++i) {
-
-    expression *body = (*i) -> Body ();
-
-    if (//(body -> Index () >= 0) &&      // it's a variable...
-	(body -> Type  () == AUX) &&      // it's an aux
-	(body -> Multiplicity () <= 1)) {  // only used once, if ever
-    }
-  }
-  */
-
-  //for (int i=0; i<n; i++)
-  //printf ("[%4d %4d]\n", i, numbering_ [i]);
-
-  //printf ("current point: %d vars -------------------\n", domain_.current () -> Dimension ());
-
-  /*for (int i=0; i<domain_.current () -> Dimension (); i++)
-    printf ("%20g [%20g %20g]\n", domain_.x (i), domain_.lb (i), domain_.ub (i));*/
-
-  delete [] commuted_;
-  commuted_ = NULL;
-  delete graph_;
-  graph_ = NULL;
+  delete [] commuted_;  commuted_ = NULL;
+  delete    graph_;     graph_    = NULL;
 }

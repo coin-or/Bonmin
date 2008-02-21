@@ -34,6 +34,10 @@ class quadElem;
 class LinMap;
 class QuadMap;
 
+// default tolerance for checking feasibility (and integrality) of NLP solutions
+const CouNumber feas_tolerance_default = 1e-5;
+
+
 /** Class for MINLP problems with symbolic information
  *
  *  It is read from an AMPL .nl file and contains variables, AMPL's
@@ -131,6 +135,12 @@ class CouenneProblem {
 
   /// window around known optimum (for testing purposes)
   CouNumber opt_window_;
+
+  /// Use quadratic expressions?
+  bool useQuadratic_;
+
+  /// feasibility tolerance (to be used in checkNLP)
+  CouNumber feas_tolerance_;
 
  public:
 
@@ -314,14 +324,14 @@ class CouenneProblem {
 
   /// Replace all occurrences of original variable with new aux given
   /// as argument
-  void auxiliarize (exprAux *);
+  void auxiliarize (exprVar *, exprVar * = NULL);
 
   /// Set cutoff
   void setCutOff (CouNumber cutoff);
 
   /// Set cutoff
   CouNumber getCutOff () const
-  {return pcutoff_->getCutOff();}
+  {return pcutoff_ -> getCutOff();}
 
   /// Make cutoff known to the problem
   void installCutOff ();

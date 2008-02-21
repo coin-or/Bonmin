@@ -44,12 +44,15 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   nOrig_     (0),
   pcutoff_   (new GlobalCutOff),
   created_pcutoff_ (true),
-  doFBBT_    (false),
+  doFBBT_    (true),
   doOBBT_    (false),
-  doABT_     (false),
+  doABT_     (true),
   logObbtLev_(0),
+  logAbtLev_ (0),
   jnlst_(jnlst),
-  opt_window_ (1e50) {
+  opt_window_ (1e50),
+  useQuadratic_ (false),
+  feas_tolerance_ (feas_tolerance_default) {
 
   if (!asl) return;
 
@@ -81,6 +84,12 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 		  "Problem size before standarization: %d variables (%d integer), %d constraints.\n",
 		  nOrig_, nIntVars (), nOrigCons_);
 
+  if (base) {
+    std::string s;
+    base -> options() -> GetStringValue ("use_quadratic", s, "couenne."); 
+    useQuadratic_ = (s == "yes");
+  }
+
   // reformulation
   standardize ();
 
@@ -111,9 +120,9 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
     std::string s;
 
-    base -> options() -> GetStringValue ("feasibility_bt",     s, "couenne."); doFBBT_ = (s == "yes");
-    base -> options() -> GetStringValue ("optimality_bt",      s, "couenne."); doOBBT_ = (s == "yes");
-    base -> options() -> GetStringValue ("aggressive_fbbt",    s, "couenne."); doABT_  = (s == "yes");
+    base -> options() -> GetStringValue ("feasibility_bt",  s, "couenne."); doFBBT_ = (s == "yes");
+    base -> options() -> GetStringValue ("optimality_bt",   s, "couenne."); doOBBT_ = (s == "yes");
+    base -> options() -> GetStringValue ("aggressive_fbbt", s, "couenne."); doABT_  = (s == "yes");
 
     base -> options() -> GetIntegerValue ("log_num_obbt_per_level", logObbtLev_, "couenne.");
     base -> options() -> GetIntegerValue ("log_num_abt_per_level",  logAbtLev_,  "couenne.");
@@ -122,9 +131,10 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
       art_cutoff =  2.e50,
       art_lower  = -2.e50;
 
-    base -> options() -> GetNumericValue ("opt_window",  opt_window_, "couenne.");
-    base -> options() -> GetNumericValue ("art_cutoff",  art_cutoff,  "couenne.");
-    base -> options() -> GetNumericValue ("art_lower",   art_lower,   "couenne.");
+    base -> options() -> GetNumericValue ("feas_tolerance",  feas_tolerance_, "couenne.");
+    base -> options() -> GetNumericValue ("opt_window",      opt_window_,     "couenne.");
+    base -> options() -> GetNumericValue ("art_cutoff",      art_cutoff,      "couenne.");
+    base -> options() -> GetNumericValue ("art_lower",       art_lower,       "couenne.");
 
     if (art_cutoff <  1.e50) setCutOff (art_cutoff);
     if (art_lower  > -1.e50) {
@@ -150,27 +160,29 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 /// copy constructor
 
 CouenneProblem::CouenneProblem (const CouenneProblem &p):
-  problemName_ (p.problemName_),
-  domain_    (p.domain_),
-  curnvars_  (-1),
-  nIntVars_  (p.nIntVars_),
-  optimum_   (NULL),
-  bestObj_   (p.bestObj_),
-  commuted_  (NULL),
-  numbering_ (NULL),
-  ndefined_  (p.ndefined_),
-  graph_     (NULL),
-  nOrig_     (p.nOrig_),
-  nOrigCons_ (p.nOrigCons_),
-  pcutoff_   (p.pcutoff_),
+  problemName_  (p.problemName_),
+  domain_       (p.domain_),
+  curnvars_     (-1),
+  nIntVars_     (p.nIntVars_),
+  optimum_      (NULL),
+  bestObj_      (p.bestObj_),
+  commuted_     (NULL),
+  numbering_    (NULL),
+  ndefined_     (p.ndefined_),
+  graph_        (NULL),
+  nOrig_        (p.nOrig_),
+  nOrigCons_    (p.nOrigCons_),
+  pcutoff_      (p.pcutoff_),
   created_pcutoff_ (false),
-  doFBBT_    (p. doFBBT_),
-  doOBBT_    (p. doOBBT_),
-  doABT_     (p. doABT_),
-  logObbtLev_(p. logObbtLev_),
-  logAbtLev_ (p. logAbtLev_),
-  jnlst_     (p.jnlst_),
-  opt_window_ (p.opt_window_) { // needed only in standardize (), unnecessary to update it
+  doFBBT_       (p. doFBBT_),
+  doOBBT_       (p. doOBBT_),
+  doABT_        (p. doABT_),
+  logObbtLev_   (p. logObbtLev_),
+  logAbtLev_    (p. logAbtLev_),
+  jnlst_        (p.jnlst_),
+  opt_window_   (p.opt_window_),    // needed only in standardize (), unnecessary to update it
+  useQuadratic_ (p.useQuadratic_),  // ditto
+  feas_tolerance_ (p.feas_tolerance_) {
 
   for (int i=0; i < p.nVars (); i++)
     variables_ . push_back (NULL);
@@ -338,15 +350,21 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
 
   roptions -> AddNumberOption
     ("art_cutoff",
-     "artificial cutoff",
+     "Artificial cutoff",
      1.e50,
      "Default value is 1.e50.");
 
   roptions -> AddNumberOption
     ("opt_window",
-     "window around known optimum",
+     "Window around known optimum",
      1.e5,
      "Default value is infinity.");
+
+  roptions -> AddNumberOption
+    ("feas_tolerance",
+     "Tolerance for constraints/auxiliary variables",
+     feas_tolerance_default,
+     "Default value is zero.");
 
   roptions -> AddStringOption2 
     ("feasibility_bt",
@@ -356,8 +374,15 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
      "yes","");
 
   roptions -> AddStringOption2 
+    ("use_quadratic",
+     "Use quadratic expressions and related exprQuad class",
+     "no",
+     "no","Use an auxiliary for each bilinear term",
+     "yes","Create one only auxiliary for a quadrati expression");
+
+  roptions -> AddStringOption2 
     ("optimality_bt",
-     "optimality-based (expensive) bound tightening",
+     "Optimality-based (expensive) bound tightening",
      "no",
      "no","",
      "yes","");
@@ -365,7 +390,7 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
   roptions -> AddLowerBoundedIntegerOption
     ("log_num_obbt_per_level",
      "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
-     -1,2,
+     -1,0,
      "\
 If -1, apply at every node (expensive!). \
 If 0, apply at root node only. \
@@ -381,7 +406,7 @@ If k>=0, apply with probability 2^(k - level), level being the current depth of 
   roptions -> AddLowerBoundedIntegerOption
     ("log_num_abt_per_level",
      "Specify the frequency (in terms of nodes) for aggressive bound tightening.",
-     -1,2,
+     -1,0,
      "\
 If -1, apply at every node (expensive!). \
 If 0, apply at root node only. \
@@ -389,7 +414,7 @@ If k>=0, apply with probability 2^(k - level), level being the current depth of 
 
   roptions -> AddNumberOption
     ("art_lower",
-     "artificial lower bound",
+     "Artificial lower bound",
      -1.e50,
      "Default value is -1.e50.");
 }

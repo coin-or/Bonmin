@@ -63,8 +63,8 @@ class exprVar: public expression {
   virtual expression *Ub (); ///< get upper bound expression
 
   // Bounds
-  virtual inline CouNumber lb () {return domain_ -> lb (varIndex_);} ///< lower bound
-  virtual inline CouNumber ub () {return domain_ -> ub (varIndex_);} ///< upper bound
+  virtual inline CouNumber &lb () {return domain_ -> lb (varIndex_);} ///< lower bound
+  virtual inline CouNumber &ub () {return domain_ -> ub (varIndex_);} ///< upper bound
 
   /// print
   virtual void print (std::ostream &out = std::cout,
@@ -157,6 +157,15 @@ class exprVar: public expression {
   /// return pointer to variable domain
   virtual inline Domain *domain ()
   {return domain_;}
+
+  // empty for compatibility
+  virtual inline void decreaseMult () {}
+
+  /// Disable variable (empty for compatibility with exprAux)
+  virtual inline void zeroMult () {}
+
+  /// Set this variable as integer (empty for compatibility with exprAux)
+  virtual inline void setInteger (bool value) {}
 };
 
 #endif
