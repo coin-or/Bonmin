@@ -105,7 +105,8 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
     printf (" := "); reference_ -> Image () -> print ();
     printf (" with %s strategy\n", 
 	    (strategy_ == BALANCED) ? "balanced" : 
-	    (strategy_ == MIN_AREA) ? "min-area" : "mid-point");
+	    (strategy_ == MIN_AREA) ? "min-area" : 
+	    (strategy_ == MID_INTERVAL) ? "mid-point" : "no-branching (null infeasibility)");
   }
 }
 
