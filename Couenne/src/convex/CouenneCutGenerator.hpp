@@ -77,6 +77,9 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 
+  /// Time spent at the root node
+  mutable double rootTime_;
+
  public:
 
   /// constructor
@@ -217,6 +220,10 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// Provide Journalist
   inline ConstJnlstPtr Jnlst() const 
   {return ConstPtr (jnlst_);}
+
+  /// Time spent at root node
+  double &rootTime ()
+  {return rootTime_;}
 };
 
 #endif

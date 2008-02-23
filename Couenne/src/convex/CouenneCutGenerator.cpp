@@ -35,7 +35,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   nlp_            (nlp),
   BabPtr_         (NULL),
   infeasNode_     (false),
-  jnlst_          (jnlst) {
+  jnlst_          (jnlst),
+  rootTime_       (-1.) {
 
   base -> options () -> GetIntegerValue ("convexification_points", nSamples_, "couenne.");
 
@@ -75,7 +76,8 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   nlp_         (src. nlp_),
   BabPtr_      (src. BabPtr_),
   infeasNode_  (src. infeasNode_),
-  jnlst_       (src. jnlst_)  {}
+  jnlst_       (src. jnlst_),
+  rootTime_    (src. rootTime_) {}
 
 
 #define MAX_SLOPE 1e3

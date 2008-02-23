@@ -425,4 +425,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	cs.colCutPtr (i) -> print ();
     }
   }
+
+  if (!(info.inTree)) 
+    rootTime_ = CoinCpuTime ();
 }

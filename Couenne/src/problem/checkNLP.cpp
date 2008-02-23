@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: check NLP feasibility of incumbent integer solution
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
