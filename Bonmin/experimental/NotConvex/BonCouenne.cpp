@@ -110,14 +110,14 @@ int main (int argc, char *argv[])
 
       if (cg && !cp) printf ("Warning, could not get pointer to problem\n");
 
-      printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & ", 
+      printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & r%8.3f &",
 	      cp ? cp -> problemName ().c_str () : "unknown",
 	      (cp) ? cp -> nOrig     () : -1, 
 	      (cp) ? cp -> nIntVars  () : -1, 
 	      (cp) ? cp -> nOrigCons () : -1,
 	      (cp) ? (cp -> nVars   () - 
 		      cp -> nOrig   ()): -1,
-	      nr, nt, st);
+	      nr, nt, st, cg ? (CoinCpuTime () - cg -> rootTime ()) : - CoinCpuTime ());
 
       /////////////////////////////////
 
