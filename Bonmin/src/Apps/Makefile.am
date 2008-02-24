@@ -11,8 +11,10 @@ AUTOMAKE_OPTIONS = foreign
 # What is done in this directory:
 
 if COIN_HAS_ASL
-  bin_PROGRAMS = bonmin nodeSolver 
+  bin_PROGRAMS = bonmin 
 endif
+
+#  bin_PROGRAMS += nodeSolver
 
 COINLIBS = \
 	$(CBCOBJDIR)/src/libCbc.la \
@@ -102,21 +104,21 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                              nodeSolver                              #
 ########################################################################
 
-nodeSolver_SOURCES = BonNodeSolver.cpp
-
-nodeSolver_LDADD = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(IPOPTLIBS) \
-	$(COINLIBS) \
-	$(ASLLIB) \
-	$(ADDLIBS)
-
-# Finally, the -rpath flag is used by libtool to make sure that the shared
-# library is found (in the lib install directory) when we are using dynamic
-# libraries.
-nodeSolver_LDFLAGS = -rpath $(libdir)
+# nodeSolver_SOURCES = BonNodeSolver.cpp
+# 
+# nodeSolver_LDADD = \
+# 	../CbcBonmin/libbonminampl.la \
+# 	../CbcBonmin/libbonmin.la \
+# 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
+# 	$(IPOPTLIBS) \
+# 	$(COINLIBS) \
+# 	$(ASLLIB) \
+# 	$(ADDLIBS)
+# 
+# # Finally, the -rpath flag is used by libtool to make sure that the shared
+# # library is found (in the lib install directory) when we are using dynamic
+# # libraries.
+# nodeSolver_LDFLAGS = -rpath $(libdir)
 
 
 ########################################################################

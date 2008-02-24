@@ -42,7 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COIN_HAS_ASL_TRUE@bin_PROGRAMS = bonmin$(EXEEXT) nodeSolver$(EXEEXT)
+@COIN_HAS_ASL_TRUE@bin_PROGRAMS = bonmin$(EXEEXT)
 @COIN_HAS_CPX_TRUE@am__append_1 = \
 @COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 @COIN_HAS_CPX_TRUE@	$(CPXLIB)
@@ -90,13 +90,6 @@ bonmin_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
-am_nodeSolver_OBJECTS = BonNodeSolver.$(OBJEXT)
-nodeSolver_OBJECTS = $(am_nodeSolver_OBJECTS)
-nodeSolver_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
-	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -107,8 +100,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(bonmin_SOURCES) $(nodeSolver_SOURCES)
-DIST_SOURCES = $(bonmin_SOURCES) $(nodeSolver_SOURCES)
+SOURCES = $(bonmin_SOURCES)
+DIST_SOURCES = $(bonmin_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -335,6 +328,8 @@ sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
+
+#  bin_PROGRAMS += nodeSolver
 COINLIBS = $(CBCOBJDIR)/src/libCbc.la $(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la $(am__append_1) \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
@@ -389,21 +384,22 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 #                              nodeSolver                              #
 ########################################################################
-nodeSolver_SOURCES = BonNodeSolver.cpp
-nodeSolver_LDADD = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(IPOPTLIBS) \
-	$(COINLIBS) \
-	$(ASLLIB) \
-	$(ADDLIBS)
 
-
-# Finally, the -rpath flag is used by libtool to make sure that the shared
-# library is found (in the lib install directory) when we are using dynamic
-# libraries.
-nodeSolver_LDFLAGS = -rpath $(libdir)
+# nodeSolver_SOURCES = BonNodeSolver.cpp
+# 
+# nodeSolver_LDADD = \
+# 	../CbcBonmin/libbonminampl.la \
+# 	../CbcBonmin/libbonmin.la \
+# 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
+# 	$(IPOPTLIBS) \
+# 	$(COINLIBS) \
+# 	$(ASLLIB) \
+# 	$(ADDLIBS)
+# 
+# # Finally, the -rpath flag is used by libtool to make sure that the shared
+# # library is found (in the lib install directory) when we are using dynamic
+# # libraries.
+# nodeSolver_LDFLAGS = -rpath $(libdir)
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -481,9 +477,6 @@ clean-binPROGRAMS:
 bonmin$(EXEEXT): $(bonmin_OBJECTS) $(bonmin_DEPENDENCIES) 
 	@rm -f bonmin$(EXEEXT)
 	$(CXXLINK) $(bonmin_LDFLAGS) $(bonmin_OBJECTS) $(bonmin_LDADD) $(LIBS)
-nodeSolver$(EXEEXT): $(nodeSolver_OBJECTS) $(nodeSolver_DEPENDENCIES) 
-	@rm -f nodeSolver$(EXEEXT)
-	$(CXXLINK) $(nodeSolver_LDFLAGS) $(nodeSolver_OBJECTS) $(nodeSolver_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -492,7 +485,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonMin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonNodeSolver.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
