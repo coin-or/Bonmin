@@ -31,11 +31,18 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
   strategy_       (MID_INTERVAL),
   jnlst_          (jnlst),
   alpha_          (default_alpha),
-  feas_tolerance_ (feas_tolerance_default) {
+  feas_tolerance_ (feas_tolerance_default),
+  doFBBT_         (true),
+  doConvCuts_     (true) {
 
   assert (ref -> Type () == AUX);
 
   if (base) {
+
+    std::string s;
+
+    base -> options() -> GetStringValue ("branch_fbbt",      s,"couenne."); doFBBT_    =(s=="yes");
+    base -> options() -> GetStringValue ("branch_conv_cuts", s,"couenne."); doConvCuts_=(s=="yes");
 
     base -> options () -> GetNumericValue ("feas_tolerance", feas_tolerance_, "couenne.");
 
@@ -113,11 +120,13 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 
 /// Copy constructor
 CouenneObject::CouenneObject (const CouenneObject &src):
-  reference_ (src.reference_),
-  strategy_  (src.strategy_),
-  jnlst_     (src.jnlst_),
-  alpha_     (src.alpha_),
-  feas_tolerance_ (src.feas_tolerance_) {}
+  reference_  (src.reference_),
+  strategy_   (src.strategy_),
+  jnlst_      (src.jnlst_),
+  alpha_      (src.alpha_),
+  feas_tolerance_ (src.feas_tolerance_),
+  doFBBT_     (src.doFBBT_),
+  doConvCuts_ (src.doConvCuts_) {}
 
 
 #define TOL 0.
@@ -286,7 +295,10 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
   if (brVar) // if applied latest selectBranching
 
-    brObj = new CouenneBranchingObject (jnlst_, brVar, way ? TWO_RIGHT : TWO_LEFT, *brPts);
+    brObj = new CouenneBranchingObject (jnlst_, brVar, 
+					way ? TWO_RIGHT : TWO_LEFT, 
+					*brPts, 
+					doFBBT_, doConvCuts_);
 
   else {     // apply default branching rule
 
@@ -344,13 +356,18 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	  || (fabs (xr-lr) < COUENNE_EPS)
 	  || (fabs (ur-xr) < COUENNE_EPS)
 	  || (fabs (ur-lr) < COUENNE_EPS))
-	brObj = new CouenneBranchingObject (jnlst_, depvar, way ? TWO_RIGHT : TWO_LEFT, x);  
+	brObj = new CouenneBranchingObject (jnlst_, depvar, way ? TWO_RIGHT : TWO_LEFT, x,
+					    doFBBT_, doConvCuts_);  
     }
 
-    brObj = new CouenneBranchingObject (jnlst_, reference_, way ? TWO_RIGHT : TWO_LEFT, xr);
+    brObj = new CouenneBranchingObject (jnlst_, reference_, way ? TWO_RIGHT : TWO_LEFT, xr, 
+					doFBBT_, doConvCuts_);
   }
 
   p -> domain () -> pop ();
+
+  if (brPts)
+    free (brPts);
 
   return brObj;
 }

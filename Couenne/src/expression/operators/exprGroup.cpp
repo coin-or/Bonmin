@@ -31,7 +31,8 @@ exprGroup::exprGroup  (const exprGroup &src, Domain *d):
 
   for (lincoeff::iterator i = src.lcoeff_.begin (); i != src.lcoeff_.end (); ++i)
     lcoeff_ . push_back (std::pair <exprVar *, CouNumber> 
-			 (dynamic_cast <exprVar *> (i -> first -> clone (d)), i -> second));
+			 //(dynamic_cast <exprVar *> (i -> first -> clone (d)), i -> second));
+			 (new exprVar (i -> first -> Index (), d), i -> second));
 }
 
 

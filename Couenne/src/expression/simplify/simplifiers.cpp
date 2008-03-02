@@ -72,7 +72,7 @@ int exprOp::shrink_arglist (CouNumber c, CouNumber null_element) {
       break;
     }
 
-  // add constant term if c is not null w.r.t the operation or if it
+  // add constant term if c is not null w.r.t. the operation or if it
   // would be an empty operand list otherwise
   if ((fabs (c - null_element) > COUENNE_EPS) || !one_fun)
     arglist_ [i++] = new exprConst (c);

@@ -26,7 +26,7 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
 
   assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 
-  // choosing branching variable and -point is difficult, use
+  // choosing branching variable and point is difficult, use
   // proportion in bound intervals
 
   CouNumber yl = info -> lower_    [yi], 

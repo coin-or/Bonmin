@@ -123,14 +123,28 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
      0,1,
      "A frequency of 0 amounts to never solve the NLP relaxation.");
-    
+
   roptions -> AddStringOption2
     ("local_optimization_heuristic",
      "Do we search for local solutions of NLP's",
      "yes",
      "no","",
      "yes","");
-    
+
+  roptions -> AddStringOption2
+    ("branch_fbbt",
+     "Apply bound tightening before branching",
+     "yes",
+     "no","",
+     "yes","");
+
+  roptions -> AddStringOption2
+    ("branch_conv_cuts",
+     "Apply convexification cuts before branching",
+     "no",
+     "no","",
+     "yes","");
+
   roptions -> AddLowerBoundedIntegerOption
     ("log_num_local_optimization_per_level",
      "Specify the logarithm of the number of local optimizations to perform" 

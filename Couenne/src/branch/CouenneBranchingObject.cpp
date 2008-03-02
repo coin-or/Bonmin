@@ -10,6 +10,9 @@
 
 #include "CoinHelperFunctions.hpp"
 
+#include "OsiRowCut.hpp"
+#include "CbcCountRowCut.hpp"
+
 #include "CouenneSolverInterface.hpp"
 #include "CouenneProblem.hpp"
 #include "CouenneObject.hpp"
@@ -19,9 +22,6 @@
 void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged);
 
 
-/// make branching point $\alpha$ away from current point:
-/// bp = alpha * current + (1-alpha) * midpoint
-
 /** \brief Constructor. 
  *
  * Get a variable as an argument and set value_ through a call to
@@ -29,11 +29,13 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
 */
 
 CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var, 
-						int way, CouNumber brpoint): 
+						int way, CouNumber brpoint, 
+						bool doFBBT, 
+						bool doConvCuts): 
   variable_     (var),
   jnlst_        (jnlst),
-  doFBBT_       (true),
-  doConvCuts_   (false),
+  doFBBT_       (doFBBT),
+  doConvCuts_   (doConvCuts),
   downEstimate_ (0.),
   upEstimate_   (0.) {
 
@@ -152,8 +154,8 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     chg_bds [i].setUpper (t_chg_bounds::CHANGED);
   }
 
-  if (doFBBT_ &&                               // this branching object should do FBBT
-      p -> doFBBT ())                          // problem allowed to do FBBT
+  if (     doFBBT_ &&                          // this branching object should do FBBT
+      p -> doFBBT ()) {                        // problem allowed to do FBBT
     if (!p -> boundTightening (chg_bds, NULL)) // done FBBT and this branch is infeasible
       return COIN_DBL_MAX;                     // ==> report it
     else {
@@ -171,6 +173,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 	if (p -> Ub (i) < ub [i] - COUENNE_EPS) solver -> setColUpper (i, p -> Ub (i));
       }
     }
+  }
 
   if (doConvCuts_) { // generate convexification cuts before solving new node's LP
 
@@ -181,8 +184,32 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
     // add convexification cuts
     couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, chg_bds);  
-    solver -> applyCuts (cs);
+
+    //OsiCuts ccrcs;
+#if 0
+    int ncuts = cs.sizeRowCuts ();
+
+    const CbcCountRowCut **ccrc = new CbcCountRowCut * [ncuts];
+
+    // convert all cuts into CbcCountRowCuts (TODO: how to check we're
+    // using Cbc and not Bcp?)
+    for (int i=0; i<ncuts; i++) {
+      ccrc [i] = new CbcCountRowCut (cs.rowCut (i));
+      //ccrcs.insert (ccrc);
+      cs.eraseRowCut (i);
+    }
+
+    solver -> applyRowCuts (ncuts, ccrc);
+
+    for (int i=0; i<ncuts; i++)
+      delete ccrc [i];
+
+    delete [] ccrc;
+#endif
+    //solver -> applyCuts (cs);
   }
+
+  delete [] chg_bds;
 
   p -> domain () -> pop ();
 

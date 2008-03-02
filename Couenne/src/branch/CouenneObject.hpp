@@ -33,10 +33,8 @@ enum {TWO_LEFT,                 TWO_RIGHT,   TWO_RAND,
 
 //
 class funtriplet;
-CouNumber minMaxDelta (funtriplet *ft, //CouNumber x, CouNumber y, 
-		       CouNumber lb, CouNumber ub);
-CouNumber maxHeight   (funtriplet *ft, //CouNumber x, CouNumber y, 
-		       CouNumber lb, CouNumber ub);
+CouNumber minMaxDelta (funtriplet *ft, CouNumber lb, CouNumber ub);
+CouNumber maxHeight   (funtriplet *ft, CouNumber lb, CouNumber ub);
 
 /// OsiObject for auxiliary variables $w=f(x)$. 
 ///
@@ -76,10 +74,7 @@ public:
       fabs (info -> solution_ [reference_ -> Index ()] - 
 	    (*(reference_ -> Image ())) ());
 
-    if (delta < CoinMin (COUENNE_EPS, feas_tolerance_))
-      return 0.;
-
-    return delta;
+    return (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta;
   }
 
   /// fix (one of the) arguments of reference auxiliary variable 
@@ -134,6 +129,12 @@ protected:
 
   /// feasibility tolerance (equal to that of CouenneProblem)
   CouNumber feas_tolerance_;
+
+  /// shall we do Feasibility based Bound Tightening (FBBT) at branching?
+  bool doFBBT_;
+
+  /// shall we add convexification cuts at branching?
+  bool doConvCuts_;
 };
 
 #endif

@@ -24,6 +24,8 @@
 #include "CouenneProblemElem.hpp"
 #include "lqelems.hpp"
 
+const CouNumber SafeCutoff = COUENNE_EPS;
+
 /// initialize auxiliary variables from original variables in the
 /// nonlinear problem
 
@@ -224,7 +226,7 @@ void CouenneProblem::setCutOff (CouNumber cutoff) {
 		    Lb (indobj));
 
     CouNumber 
-      safe       = 1e-6,
+      safe       = SafeCutoff,
       safesigned = (objectives_ [0] -> Sense () == MINIMIZE) ? safe : -safe;
 
     pcutoff_ -> setCutOff 

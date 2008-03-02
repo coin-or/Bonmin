@@ -26,11 +26,11 @@ struct cmpVar {
 };
 
 /// Constructor
-exprQuad::exprQuad  (CouNumber c0,
-		     std::vector <std::pair <exprVar *, CouNumber> > &lcoeff,
-		     std::vector <quadElem> &qcoeff,
-		     expression **al,
-		     int n):
+exprQuad::exprQuad (CouNumber c0,
+		    std::vector <std::pair <exprVar *, CouNumber> > &lcoeff,
+		    std::vector <quadElem> &qcoeff,
+		    expression **al,
+		    int n):
 
   exprGroup (c0, lcoeff, al, n) {
 
@@ -136,10 +136,12 @@ exprQuad::exprQuad (const exprQuad &src, Domain *d):
 
     for (sparseQcol::iterator i = row -> second. begin (); i != row -> second. end (); ++i)
       column.push_back (std::pair <exprVar *, CouNumber> 
-			(dynamic_cast <exprVar *> (i -> first -> clone (d)), i -> second));
+			//(dynamic_cast <exprVar *> (i -> first -> clone (d)), i -> second));
+			(new exprVar (i -> first -> Index (), d), i -> second));
 
     matrix_.push_back (std::pair <exprVar *, sparseQcol> 
-		       (dynamic_cast <exprVar *> (row -> first -> clone (d)), column));
+		       //dynamic_cast <exprVar *> (row -> first -> clone (d)), column));
+		       (new exprVar (row -> first -> Index (), d), column));
   }
 
   //////////////////////////////////////////////////////////////////////////////

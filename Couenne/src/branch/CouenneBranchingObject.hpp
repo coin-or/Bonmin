@@ -37,7 +37,9 @@ class CouenneBranchingObject: public OsiTwoWayBranchingObject {
 public:
 
   /// Constructor
-  CouenneBranchingObject (JnlstPtr jnlst, expression *, int, CouNumber = - COIN_DBL_MAX);
+  CouenneBranchingObject (JnlstPtr jnlst, expression *, int, 
+			  CouNumber, 
+			  bool, bool);
 
   /// Copy constructor
   CouenneBranchingObject (const CouenneBranchingObject &src):
@@ -48,6 +50,7 @@ public:
     doConvCuts_   (src.doConvCuts_),
     downEstimate_ (src.downEstimate_),
     upEstimate_   (src.upEstimate_) {}
+
 
   /// Cloning method
   virtual OsiBranchingObject * clone () const
