@@ -22,9 +22,8 @@ CouenneInterface::CouenneInterface():
 
 /** Copy constructor. */
 CouenneInterface::CouenneInterface(const CouenneInterface &other):
-  AmplInterface(other)
-  {
-  }
+  AmplInterface(other) 
+{}
 
 /** virutal copy constructor. */
 CouenneInterface * CouenneInterface::clone(bool CopyData){
@@ -59,9 +58,9 @@ void
 CouenneInterface::extractLinearRelaxation 
 (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 
-  if (solveNlp) {
+  CouenneProblem *p = couenneCg.Problem ();
 
-    CouenneProblem *p = couenneCg.Problem ();
+  if (solveNlp) {
 
     int nvars = p -> nVars();
 
@@ -108,10 +107,8 @@ CouenneInterface::extractLinearRelaxation
 	*nub = getColUpper ();
 
       for (int i=0; i < p -> nOrig (); i++) {
-	if (nlb [i] < p -> Lb (i) - COUENNE_EPS)
-	  setColLower (i, p -> Lb (i));
-	if (nub [i] > p -> Ub (i) + COUENNE_EPS)
-	  setColUpper (i, p -> Ub (i));
+	if (nlb [i] < p -> Lb (i) - COUENNE_EPS) setColLower (i, p -> Lb (i));
+	if (nub [i] > p -> Ub (i) + COUENNE_EPS) setColUpper (i, p -> Ub (i));
       }
     }
 
@@ -303,8 +300,11 @@ CouenneInterface::extractLinearRelaxation
    delete [] colUpper;
    delete [] obj;
 
-   for (int i = 0 ; i < numcols ; i++)
-     if (isInteger (i))
+   //for (int i = 0 ; i < numcols ; i++)
+   //  if (isInteger (i))
+
+   for (int i=0; i<numcolsconv; i++)
+     if (p -> Var (i) -> isInteger ())
        si.setInteger (i);
  
    //si.writeMpsNative("toto",NULL,NULL,1);
