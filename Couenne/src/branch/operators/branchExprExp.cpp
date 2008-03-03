@@ -124,7 +124,7 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
   // 4) both are finite
 
   simpletriplet ft (exp, exp, exp, log);
-  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u); // select based on strategy
+  *brpts = obj -> getBrPoint (&ft, x0, l, u); // select based on strategy
 
   way = TWO_RAND;
 

@@ -23,6 +23,7 @@
 //#define DEBUG
 
 const CouNumber default_alpha = 0.2;
+const CouNumber default_clamp = 0.2;
 
 /// Constructor with information for branching point selection strategy
 CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
@@ -31,6 +32,7 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
   strategy_       (MID_INTERVAL),
   jnlst_          (jnlst),
   alpha_          (default_alpha),
+  lp_clamp_       (default_clamp),
   feas_tolerance_ (feas_tolerance_default),
   doFBBT_         (true),
   doConvCuts_     (true) {
@@ -92,13 +94,17 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 
     if (br_operator != "") {
       // read option
-      char select [40];
-      sprintf (select, "branch_pt_select_%s", br_operator.c_str ());
+      char select [40], sel_clamp [40];
+      sprintf (select,    "branch_pt_select_%s", br_operator.c_str ());
+      sprintf (sel_clamp, "branch_lp_clamp_%s",  br_operator.c_str ());
       base -> options () -> GetStringValue (select, brtype, "couenne.");
+      base -> options () -> GetNumericValue (sel_clamp, lp_clamp_, "couenne.");
 
-      if      (brtype == "balanced")  strategy_ = BALANCED;
-      else if (brtype == "min-area")  strategy_ = MIN_AREA;
-      else if (brtype == "no-branch") strategy_ = NO_BRANCH;
+      if      (brtype == "balanced")    strategy_ = BALANCED;
+      else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
+      else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
+      else if (brtype == "min-area")    strategy_ = MIN_AREA;
+      else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
       else if (brtype == "mid-point") {
 	strategy_ = MID_INTERVAL;
 	base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
@@ -110,10 +116,13 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 
     printf ("created object: "); reference_ -> print (); 
     printf (" := "); reference_ -> Image () -> print ();
-    printf (" with %s strategy\n", 
-	    (strategy_ == BALANCED) ? "balanced" : 
-	    (strategy_ == MIN_AREA) ? "min-area" : 
-	    (strategy_ == MID_INTERVAL) ? "mid-point" : "no-branching (null infeasibility)");
+    printf (" with %s strategy [clamp=%g, alpha=%g]\n", 
+	    (strategy_ == LP_CLAMPED)   ? "lp-clamped" : 
+	    (strategy_ == LP_CENTRAL)   ? "lp-central" : 
+	    (strategy_ == BALANCED)     ? "balanced"   : 
+	    (strategy_ == MIN_AREA)     ? "min-area"   : 
+	    (strategy_ == MID_INTERVAL) ? "mid-point"  : "no-branching (null infeasibility)",
+	    lp_clamp_, alpha_);
   }
 }
 
@@ -124,6 +133,7 @@ CouenneObject::CouenneObject (const CouenneObject &src):
   strategy_   (src.strategy_),
   jnlst_      (src.jnlst_),
   alpha_      (src.alpha_),
+  lp_clamp_   (src.lp_clamp_),
   feas_tolerance_ (src.feas_tolerance_),
   doFBBT_     (src.doFBBT_),
   doConvCuts_ (src.doConvCuts_) {}
@@ -374,9 +384,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
 
 /// computes a not-too-bad point where to branch, in the "middle" of an interval
-CouNumber CouenneObject::midInterval (CouNumber curr, CouNumber l, CouNumber u) const {
-
-  CouNumber x = curr;
+CouNumber CouenneObject::midInterval (CouNumber x, CouNumber l, CouNumber u) const {
 
   if (u < l + COUENNE_EPS)
     return (0.5 * (l + u));
@@ -397,4 +405,24 @@ CouNumber CouenneObject::midInterval (CouNumber curr, CouNumber l, CouNumber u) 
       else if ((u-point) / (u-l) < closeToBounds) point = u + (l-u) * closeToBounds;
       return point;
     }
+}
+
+/// pick branching point based on current strategy
+CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, CouNumber u) const {
+
+  switch (strategy_) {
+
+  case CouenneObject::MIN_AREA:     return maxHeight   (ft, l, u);
+  case CouenneObject::BALANCED:     return minMaxDelta (ft, l, u);
+  case CouenneObject::LP_CLAMPED: {
+    CouNumber width = lp_clamp_ * (u-l);
+    return CoinMax (l + width, CoinMin (x0, u - width));
+  }
+  case CouenneObject::LP_CENTRAL: {
+      CouNumber width = lp_clamp_ * (u-l);
+      return ((x0 < l + width) || (x0 > u - width)) ? (l+u)/2 : x0;
+  }
+  case CouenneObject::MID_INTERVAL: 
+  default:                          return midInterval (x0, l, u);
+  }
 }

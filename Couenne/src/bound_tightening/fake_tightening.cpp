@@ -19,6 +19,9 @@
 // golden ratio, used to find the ideal bound
 const CouNumber phi = 0.5 * (1. + sqrt (5.));
 
+//	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
+//	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
+
 
 // create fictitious bounds to tighten current interval
 CouNumber fictBounds (char direction,
@@ -234,12 +237,13 @@ fake_tighten (char direction,  // 0: left, 1: right
 #endif
   }
 
-#ifdef DEBUG
-  printf ("\n");
-  if (tightened) printf ("  [x%2d] pruned %s [%g, %g] -- lb = %g cutoff = %g\n", 
-			 index,direction?"right":"left",
-			 olb[index],oub[index], Lb (objind), getCutOff ());
-#endif
+
+  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING, "\n");
+  if (tightened) 
+    Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING, 
+		    "  [x%2d] pruned %s [%g, %g] -- lb = %g cutoff = %g\n", 
+		    index,direction?"right":"left",
+		    olb[index],oub[index], Lb (objind), getCutOff ());
 
   return tightened ? 1 : 0;
 }

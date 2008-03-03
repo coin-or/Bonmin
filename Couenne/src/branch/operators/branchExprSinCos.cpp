@@ -48,7 +48,7 @@ CouNumber trigSelBranch (const CouenneObject *obj,
 		    (type == COU_SINE) ? acos   : oppasin);
 
   brpts = (double *) realloc (brpts, sizeof (double));
-  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
+  *brpts = obj -> getBrPoint (&ft, x0, l, u);
 
   return (y0 - ((type == COU_SINE) ? sin : cos) (x0));
 }

@@ -171,10 +171,13 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      0,1,
      "");
 
-  roptions -> AddStringOption4
+  roptions -> AddStringOption6
     ("branch_pt_select",
      "Chooses branching point selection strategy",
      "mid-point",
+     "lp-clamped", "LP point clamped in [k,1-k] of the bound intervals (k defined by lp_clamp)",
+     "lp-central", "LP point if within [k,1-k] of the bound intervals, middle point otherwise" 
+     "(k defined by branch_lp_clamp)",
      "balanced", "minimizes max distance from curve to convexification",
      "min-area", "minimizes total area of the two convexifications",
      "mid-point", "convex combination of current point and mid point",
@@ -186,23 +189,35 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
 
   for (int i=0; br_ops [i] != ""; i++) {
 
-    char optname [40], description [90];
-    sprintf (optname, "branch_pt_select_%s", br_ops [i].c_str ());
+    char optname [40], optname2 [40], description [90];
+    sprintf (optname,  "branch_pt_select_%s", br_ops [i].c_str ());
+    sprintf (optname2, "branch_lp_clamp_%s",  br_ops [i].c_str ());
     sprintf (description, "Chooses branching point selection strategy for operator %s", 
 	     br_ops [i].c_str ());
 
-    roptions -> AddStringOption5
+    roptions -> AddStringOption7
       (optname,
        description,
        "common",
        "common",    "use strategy defined for generic operators",
+       "lp-clamped", "LP point clamped in [k,1-k] of the bound intervals "
+       "(k defined by lp_clamp_${this operator})",
+       "lp-central", "LP point if within [k,1-k] of the bound intervals, middle point otherwise" 
+       "(k defined by branch_lp_clamp_${this operator})",
        "balanced",  "minimizes max distance from curve to convexification",
        "min-area",  "minimizes total area of the two convexifications",
        "mid-point", "convex combination of current point and mid point",
        "no-branch", "do not branch, return null infeasibility; for testing purposes only",
        "");
-  }
 
+    roptions -> AddBoundedNumberOption
+      (optname2,
+       "Defines safe interval percentage [0,0.5] for using LP point as a branching point",
+       0.,false,
+       0.5,false,
+       0.2,
+       "Default value is 0.2.");
+  }
 
   roptions -> AddStringOption2 
     ("violated_cuts_only",
@@ -213,11 +228,20 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
 
   roptions -> AddBoundedNumberOption
     ("branch_midpoint_alpha",
-     "Defines convex combination of mid point and current LP point: b = alpha x_lp + (1-alpha) (lb+ub)/2.",
+     "Defines convex combination of mid point and current LP point: "
+     "b = alpha x_lp + (1-alpha) (lb+ub)/2.",
      0.,false,
      1.,false,
      0.25,
      "Default value is 0.25.");
+
+  roptions -> AddBoundedNumberOption
+    ("branch_lp_clamp",
+     "Defines safe interval percentage for using LP point as a branching point",
+     0.,false,
+     1.,false,
+     0.2,
+     "Default value is 0.2.");
 
   roptions -> setOptionExtraInfo ("branch_pt_select", 15); // Why 15? TODO
 

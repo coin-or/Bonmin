@@ -136,7 +136,7 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
  
   simpletriplet ft (log, inv, oppInvSqr, inv);
 
-  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
+  *brpts = obj -> getBrPoint (&ft, x0, l, u);
 
   //  *brpts = midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u); 
   // WRONG! Local minima may be at bounds

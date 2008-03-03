@@ -15,18 +15,18 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
 
   int nchg = 0; //< number of bounds changed for propagation
 
-  if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {  
-    Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"  implied=====================\n  ");
+  if (Jnlst()->ProduceOutput(Ipopt::J_MATRIX, J_BOUNDTIGHTENING)) {  
+    Jnlst()->Printf(Ipopt::J_MATRIX, J_BOUNDTIGHTENING,"  implied=====================\n  ");
     int j=0;
     for (int i=0; i < nVars (); i++) 
       if (variables_ [i] -> Multiplicity () > 0) {
-	Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
+	Jnlst()->Printf(Ipopt::J_MATRIX, J_BOUNDTIGHTENING,
 			"x_%03d [%+10g %+10g] ", i, 
 			domain_.lb (i),
 			domain_.ub (i));
-	if (!(++j % 6)) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n  ");
+	if (!(++j % 6)) Jnlst()->Printf(Ipopt::J_MATRIX, J_BOUNDTIGHTENING,"\n  ");
       }
-    if (j % 6) Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
+    if (j % 6) Jnlst()->Printf(Ipopt::J_MATRIX, J_BOUNDTIGHTENING,"\n");
     }
 
   for (int ii = nVars (); ii--;) {
@@ -73,16 +73,20 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
       if (variables_ [i] -> Image () -> impliedBound 
 	  (variables_ [i] -> Index (), Lb (), Ub (), chg_bds)) {
 
-	if (Jnlst()->ProduceOutput(Ipopt::J_DETAILED, J_BOUNDTIGHTENING)) {
+	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
 	  // todo: send all output through journalist
-	  Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,
+	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
 			  "  impli %2d [%15.8g, %15.8g] -> [%15.8g, %15.8g]: ",
 			  i, l0, u0, Lb (i), Ub (i));
 
 	  variables_ [i]             -> print (std::cout);
-	  Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING," := ");
-	  variables_ [i] -> Image () -> print (std::cout);
-	  Jnlst()->Printf(Ipopt::J_DETAILED, J_BOUNDTIGHTENING,"\n");
+
+	  if (Jnlst()->ProduceOutput(Ipopt::J_MATRIX, J_BOUNDTIGHTENING)) {
+	    Jnlst()->Printf(Ipopt::J_MATRIX, J_BOUNDTIGHTENING," := ");
+	    variables_ [i] -> Image () -> print (std::cout);
+	  }
+
+	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,"\n");
 	}
 
 	/*if (optimum_ && 
@@ -132,7 +136,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
   }
 
   if (nchg)
-    Jnlst () -> Printf (J_DETAILED, J_BOUNDTIGHTENING,
+    Jnlst () -> Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING,
 			"  implied bounds: %d changes\n", nchg);
 
   return nchg;

@@ -115,7 +115,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
     //    CouNumber cutoff = getCutOff ();
     int       objind = Obj (0) -> Body  () -> Index ();
     for (int i=0; i<nOrig_; i++)
-      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 		      "   %2d %+20g [%+20g %+20g]\n",
 		      i, X [i], Lb (i), Ub (i));
     Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
@@ -153,7 +153,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
 	// if (index == objind) continue; // don't do it on objective function
 
-	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 			"------------- tighten left x%d\n", index);
 
 	// tighten on left
@@ -165,7 +165,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
 	second = 0;
 
-	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 			"------------- tighten right x%d\n", index);
 
 	//Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
@@ -187,9 +187,9 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   CoinCopyN (oub, ncols, Ub ());
 
   if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
-    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"------------------\n");
+    Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,"------------------\n");
     for (int i=0; i<ncols; i++)
-      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 		      "   %2d %+20g %+20g  | %+20g\n", i, Lb (i), Ub (i), X [i]);
     if (!retval) Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 				 "Couenne infeasible node from aggressive BT\n");
@@ -202,7 +202,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 		    "-------------\ndone Aggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
 		    Lb (objind), getCutOff (), ncols);
     for (int i=0; i<nOrig_; i++)
-      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 		      "   %2d %+20g %+20g  | %+20g\n",
 		      i, Lb (i), Ub (i), X [i]);
   }

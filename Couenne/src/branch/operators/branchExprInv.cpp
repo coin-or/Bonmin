@@ -164,7 +164,7 @@ CouNumber negPowSelectBranch (const CouenneObject *obj,
   // last case: nice finite interval and limited curve
 
   powertriplet ft (k);
-  *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
+  *brpts = obj -> getBrPoint (&ft, x0, l, u);
 
   /*  // TODO: check if it works with all exponents
   if (u > l + COUENNE_EPS) {

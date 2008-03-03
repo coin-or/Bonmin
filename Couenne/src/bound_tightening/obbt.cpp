@@ -183,7 +183,7 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
 
     if (nImprov < 0)
       jnlst_->Printf(J_DETAILED, J_CONVEXIFYING,
-		     "### infeasible node after OBBT\n");
+		     "  Couenne: infeasible node after OBBT\n");
 
     if (nImprov < 0)
       return -1;

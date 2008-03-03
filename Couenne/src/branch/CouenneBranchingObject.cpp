@@ -103,12 +103,13 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     way   = (!branchIndex_) ? firstBranch_ : !firstBranch_,
     index = variable_ -> Index ();
 
-  bool integer = variable_ -> isInteger ();
+  bool integer = variable_ -> isInteger (),
+    infeasible = false;
 
   CouNumber
-    l    = solver -> getColLower () [index],
-    u    = solver -> getColUpper () [index],
-    brpt = value_;
+    l      = solver -> getColLower () [index],
+    u      = solver -> getColUpper () [index],
+    brpt   = value_;
 
   if (way) {
     if      (value_ < l)             
@@ -126,8 +127,21 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 		     "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
   }
 
-  if (brpt < l) brpt = l;
-  if (brpt > u) brpt = u;
+  /*if (brpt < l) brpt = l;
+    if (brpt > u) brpt = u;*/
+
+  if ((brpt < l) || (brpt > u))
+    brpt = 0.5 * (l+u);
+
+  double time = CoinCpuTime ();
+  jnlst_ -> Printf (J_VECTOR, J_BRANCHING,"[vbctool] %02d:%02d:%02d.%02d_I x%d%c=%g_[%g,%g]\n",
+		    (int) (floor(time) / 3600), 
+		    (int) (floor(time) / 60) %60, 
+		    (int) floor(time) % 60, 
+		    (int) ((time - floor (time)) * 100),
+		    index, way ? '>' : '<', integer ? (way ? ceil : floor) (brpt) : brpt,
+		    solver -> getColLower () [index],
+		    solver -> getColUpper () [index]);
 
   if (!way) solver -> setColUpper (index, integer ? floor (brpt) : brpt); // down branch
   else      solver -> setColLower (index, integer ? ceil  (brpt) : brpt); // up   branch
@@ -149,15 +163,18 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   t_chg_bounds *chg_bds = new t_chg_bounds [nvars];
 
-  for (int i=0; i<nvars; i++) {
+  if (!way) chg_bds [index].setUpper (t_chg_bounds::CHANGED);
+  else      chg_bds [index].setLower (t_chg_bounds::CHANGED);
+
+  /*for (int i=0; i<nvars; i++) {
     chg_bds [i].setLower (t_chg_bounds::CHANGED);
     chg_bds [i].setUpper (t_chg_bounds::CHANGED);
-  }
+    }*/
 
   if (     doFBBT_ &&                          // this branching object should do FBBT
       p -> doFBBT ()) {                        // problem allowed to do FBBT
     if (!p -> boundTightening (chg_bds, NULL)) // done FBBT and this branch is infeasible
-      return COIN_DBL_MAX;                     // ==> report it
+      infeasible = true;                       // ==> report it
     else {
 
       const double
@@ -175,7 +192,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     }
   }
 
-  if (doConvCuts_) { // generate convexification cuts before solving new node's LP
+  if (!infeasible && doConvCuts_) { // generate convexification cuts before solving new node's LP
 
     int nchanged, *changed = NULL;
     OsiCuts cs;
@@ -219,5 +236,5 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   // next time do other branching
   branchIndex_++;
 
-  return estimate; // estimated change in objective function
+  return (infeasible ? COIN_DBL_MAX : estimate); // estimated change in objective function
 }

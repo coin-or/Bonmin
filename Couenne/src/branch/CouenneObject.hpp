@@ -47,7 +47,7 @@ class CouenneObject: public OsiObject {
 public:
 
   /// strategy names
-  enum brSelStrat {NO_BRANCH, MID_INTERVAL, MIN_AREA, BALANCED};
+  enum brSelStrat {NO_BRANCH, MID_INTERVAL, MIN_AREA, BALANCED, LP_CENTRAL, LP_CLAMPED};
 
   /// Constructor with information for branching point selection strategy
   CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
@@ -95,16 +95,7 @@ public:
   {return strategy_;}
 
   /// pick branching point based on current strategy
-  CouNumber getBrPoint (funtriplet *ft, CouNumber x0, CouNumber y0, CouNumber l, CouNumber u) const {
-
-    switch (strategy_) {
-
-    case CouenneObject::MIN_AREA:     return maxHeight   (ft, l, u);
-    case CouenneObject::BALANCED:     return minMaxDelta (ft, l, u);
-    case CouenneObject::MID_INTERVAL: 
-    default:                          return midInterval (x0, l, u);
-    }
-  }
+  CouNumber getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, CouNumber u) const;
 
   /// returns a point "inside enough" a given interval, or x if it is
   /// already
@@ -126,6 +117,9 @@ protected:
   /// Combination parameter for the mid-point branching point
   /// selection strategy
   CouNumber alpha_;
+
+  /// Defines safe interval percentage for using LP point as a branching point
+  CouNumber lp_clamp_;
 
   /// feasibility tolerance (equal to that of CouenneProblem)
   CouNumber feas_tolerance_;

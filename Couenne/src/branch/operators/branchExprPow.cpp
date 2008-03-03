@@ -170,7 +170,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
     powertriplet ft (k);
     //*brpts = maxHeight (&ft, x0, y0, l, u);
-    *brpts = obj -> getBrPoint (&ft, x0, y0, l, u);
+    *brpts = obj -> getBrPoint (&ft, x0, l, u);
 
     way = (x0 < *brpts) ? TWO_LEFT : TWO_RIGHT;
 
@@ -237,7 +237,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
     // is bounded.
 
     powertriplet pt (k);
-    *brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+    *brpts = obj -> getBrPoint (&pt, x0, l, u);
 
     // in min-area and balanced strategy, point returned is
     // positive. Put the right sign
@@ -287,7 +287,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
     // is bounded.
 
     powertriplet pt (k);
-    *brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+    *brpts = obj -> getBrPoint (&pt, x0, l, u);
 
     // in min-area and balanced strategy, point returned is
     // positive. Put the right sign
@@ -326,7 +326,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 	*brpts = 0.5 * (x0 + pow (x0, 1. / k));
       else {
 	powertriplet pt (k);
-	*brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+	*brpts = obj -> getBrPoint (&pt, x0, l, u);
       }
       
       way = TWO_LEFT;
@@ -354,7 +354,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 	*brpts = 0.5 * (x0 + pow (x0, 1. / k));
       else {
 	powertriplet pt (k);
-	*brpts = obj -> getBrPoint (&pt, x0, y0, l, u);
+	*brpts = obj -> getBrPoint (&pt, x0, l, u);
       }
 
       //*brpts = 0.5 * (x0 + pow (x0, 1. / k));
