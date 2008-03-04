@@ -23,19 +23,20 @@ noinst_PROGRAMS += CppExample
 unitTest_SOURCES = \
 	InterfaceTest.cpp 
 
-# List libraries of COIN projects
-unitTest_LDADD = \
+# List libraries of COIN projects; libs with AMPL interface have to come before ASLLIB
+unitTest_LDADD =
+if COIN_HAS_ASL
+unitTest_LDADD += \
+        ../src/CbcBonmin/libbonminampl.la \
+	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la
+endif
+unitTest_LDADD += \
         ../src/CbcBonmin/libbonmin.la \
 	$(IPOPTLIBS) \
 	$(COINLIBS) \
 	$(ASLLIB) \
 	$(ADDLIBS)
 
-if COIN_HAS_ASL
-unitTest_LDADD += \
-        ../src/CbcBonmin/libbonminampl.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la
-endif
 
 #########################################################################
 ##                      Example C++ program                             #

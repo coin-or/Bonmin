@@ -86,10 +86,10 @@ unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 @COIN_HAS_ASL_TRUE@am__DEPENDENCIES_5 =  \
 @COIN_HAS_ASL_TRUE@	../src/CbcBonmin/libbonminampl.la \
 @COIN_HAS_ASL_TRUE@	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la
-unitTest_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) \
-	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_5)
+unitTest_DEPENDENCIES = $(am__DEPENDENCIES_5) \
+	../src/CbcBonmin/libbonmin.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_2) \
+	$(am__DEPENDENCIES_2)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -352,9 +352,9 @@ unitTest_SOURCES = \
 	InterfaceTest.cpp 
 
 
-# List libraries of COIN projects
-unitTest_LDADD = ../src/CbcBonmin/libbonmin.la $(IPOPTLIBS) \
-	$(COINLIBS) $(ASLLIB) $(ADDLIBS) $(am__append_2)
+# List libraries of COIN projects; libs with AMPL interface have to come before ASLLIB
+unitTest_LDADD = $(am__append_2) ../src/CbcBonmin/libbonmin.la \
+	$(IPOPTLIBS) $(COINLIBS) $(ASLLIB) $(ADDLIBS)
 
 #########################################################################
 #########################################################################
