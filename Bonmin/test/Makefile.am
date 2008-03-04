@@ -25,13 +25,17 @@ unitTest_SOURCES = \
 
 # List libraries of COIN projects
 unitTest_LDADD = \
-        ../src/CbcBonmin/libbonminampl.la \
         ../src/CbcBonmin/libbonmin.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(IPOPTLIBS) \
 	$(COINLIBS) \
 	$(ASLLIB) \
 	$(ADDLIBS)
+
+if COIN_HAS_ASL
+unitTest_LDADD += \
+        ../src/CbcBonmin/libbonminampl.la \
+	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la
+endif
 
 #########################################################################
 ##                      Example C++ program                             #
