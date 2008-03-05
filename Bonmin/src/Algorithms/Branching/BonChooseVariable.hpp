@@ -7,7 +7,7 @@
 #include "BonCurvatureEstimator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonPseudoCosts.hpp"
-
+#include "CoinMessageHandler.hpp"
 #include "BonBabSetupBase.hpp"
 // Forward declaration
 class CbcModel;
@@ -37,8 +37,45 @@ class BonChooseVariable : public OsiChooseVariable  {
     Feasible/** Child is proven feasible.*/,
     Infeasible /** Child is proven infeasible.*/,
     NotFinished /** Child is not finished.*/};
+
 public:
-  enum DoStrongReturnStatuses{
+
+/** \name Message handling.*/
+/** @{ */
+  enum Messages_Types{
+ PS_COST_HISTORY = 0, 
+ PS_COST_MULT,
+ PS_COST_ESTIMATES,
+ CANDIDATE_LIST,
+ CANDIDATE_LIST2, 
+ CANDIDATE_LIST3, 
+ SB_HEADER,
+ SB_RES,
+ BRANCH_VAR,
+ CHOSEN_VAR, 
+ UPDATE_PS_COST,
+ BON_CHOOSE_MESSAGES_DUMMY_END};
+
+ class Messages : public CoinMessages{
+   public:
+   Messages();
+ };
+
+ void passInMessageHandler(CoinMessageHandler * handler){
+   int logLevel = handler_->logLevel();
+   delete handler_;
+   handler_ = handler->clone();
+   handler_->setLogLevel(logLevel);
+}
+
+ CoinMessageHandler& message(Messages_Types type) const{
+    return handler_->message(type, messages_);
+ }
+/** @} */
+
+
+
+ enum DoStrongReturnStatuses{
   provenInfeasible = -1 /** One branch has two infeasible childs.*/,
   doneNoFixing /** All done no variable can be fixed.*/,
   doneCanFix /** Several variable can be fixed.*/,
@@ -174,6 +211,11 @@ private:
    *  trusted */
   int number_not_trusted_;
 
+  /** Message handler.*/
+  CoinMessageHandler * handler_;
+  
+  /** Messages.*/
+  Messages messages_;
   // ToDo: Make this options
   /** @name Algoirithmic options */
   //@{

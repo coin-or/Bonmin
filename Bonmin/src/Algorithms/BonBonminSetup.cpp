@@ -311,7 +311,7 @@ algo_(other.algo_){
     if(!val){
       const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
       if(sos && sos->num){//Set branching strategy to Cbc's most fractionnal
-         options_->SetStringValue("varselect_stra", "most-fractionnal","bonmin.");
+         options_->SetStringValue("varselect_stra", "most-fractional","bonmin.");
          varSelection = OsiTMINLPInterface::MOST_FRACTIONAL;
       }
       else{
@@ -331,6 +331,7 @@ algo_(other.algo_){
         addSos();
 	SmartPtr<StrongBranchingSolver> strong_solver = NULL;
 	BonChooseVariable * chooseVariable = new BonChooseVariable(*this);
+        chooseVariable->passInMessageHandler(nonlinearSolver_->messageHandler());
 	switch(varSelection) {
 	case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
 	  strong_solver = new CurvBranchingSolver(nonlinearSolver_);
