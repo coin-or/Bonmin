@@ -269,7 +269,6 @@ namespace Bonmin
       for(unsigned int i = 0 ; i < s.objects().size() ; i++){
          objects[i] = dynamic_cast<CbcObject *> (s.objects()[i]);
          assert(objects[i]);
-         std::cout<<"Adding user CbcObject "<<i<<std::endl;
          objects[i]->setModel(&model_);
        }
       model_.addObjects(s.objects().size(), objects);
