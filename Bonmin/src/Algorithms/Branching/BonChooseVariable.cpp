@@ -153,16 +153,20 @@ BonChooseVariable::computeMultipliers(double& upMult, double& downMult) const
     numberUp += upNumber[i];
     sumDown += downTotalChange[i];
     numberDown += downNumber[i];
+#ifdef BRANCH_DEBUG
     if (bb_log_level_>4) {
       printf("%3d up %3d  %15.8e  down %3d  %15.8e\n",i, upNumber[i], upTotalChange[i], downNumber[i], downTotalChange[i]);
     }
+#endif
   }
   upMult=(1.0+sumUp)/(1.0+numberUp);
   downMult=(1.0+sumDown)/(1.0+numberDown);
 
+#ifdef BRANCH_DEBUG
   if (bb_log_level_>4) {
     printf("upMultiplier = %e downMultiplier = %e\n", upMult, downMult);
   }
+#endif
 }
 
 double
@@ -201,9 +205,11 @@ BonChooseVariable::computeUsefulness(const double MAXMIN_CRITERION,
       numberDown < numberBeforeTrustedList_) {
     value2 = value;
   }
+#ifdef BRANCH_DEBUG
   if (bb_log_level_>4) {
     printf("%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n", i,useful,upEst,downEst,value,value2);
   }
+#endif
   return useful;
   }
   else if(sortCrit_ >= DecrInfeas && sortCrit_ <= IncrInfeas){//Just return infeasibility
@@ -293,15 +299,19 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
     numberUp += upNumber[i];
     sumDown += downTotalChange[i];
     numberDown += downNumber[i];
+#ifdef BRANCH_DEBUG
     if (bb_log_level_>4) {
       printf("%3d up %3d  %15.8e  down %3d  %15.8e\n",i, upNumber[i], upTotalChange[i], downNumber[i], downTotalChange[i]);
     }
+#endif
   }
   double upMultiplier=(1.0+sumUp)/(1.0+numberUp);
   double downMultiplier=(1.0+sumDown)/(1.0+numberDown);
+#ifdef BRANCH_DEBUG
   if (bb_log_level_>4) {
     printf("upMultiplier = %e downMultiplier = %e\n",upMultiplier,downMultiplier);
   }
+#endif
   // Say feasible
   bool feasible = true;
   for ( i=0;i<numberObjects;i++) {
@@ -360,9 +370,11 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 	}
 	double MAXMIN_CRITERION = maxminCrit();
 	value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
+#ifdef BRANCH_DEBUG
 	if (bb_log_level_>4) {
 	  printf("%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n", i,value,upEstimate,downEstimate,object[i]->infeasibility(info,way),value2);
 	}
+#endif
 	if (value>check) {
 	  //add to list
 	  int iObject = list_[checkIndex];
@@ -423,7 +435,7 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
       }
     }
   }
-#if 0
+#ifdef BRANCH_DEBUG
   for (int i=0; i<maximumStrong; i++) { int way;
       printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e \n", i,list_[i],i,useful_[i],object[list_[i]]->infeasibility(info,way));
   }
@@ -439,9 +451,11 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 	  useful_[numberOnList_++]=-useful_[i];
         }
         else useful_[numberOnList_++] = useful_[i];
+#ifdef BRANCH_DEBUG
 	if (bb_log_level_>4) {
 	  printf("list_[%3d] = %3d useful_[%3d] = %e\n",numberOnList_-1,list_[numberOnList_-1],numberOnList_-1,useful_[numberOnList_-1]);
 	}
+#endif
       }
     }
     if (numberOnList_) {
@@ -454,9 +468,11 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
 	  if (list2[i]>=0) {
 	    list2[number_not_trusted_] = list2[i];
 	    useful2[number_not_trusted_++] = useful2[i];
+#ifdef BRANCH_DEBUG
 	    if (bb_log_level_>4) {
 	      printf("list2[%3d] = %3d useful2[%3d] = %e\n",number_not_trusted_-1,list2[number_not_trusted_-1],number_not_trusted_-1,useful2[number_not_trusted_-1]);
 	    }
+#endif
 	  }
 	}
 	if (number_not_trusted_) {
@@ -505,11 +521,13 @@ BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
   delete [] list2;
   delete [] useful2;
   int way;
+#ifdef BRANCH_DEBUG
   if (bb_log_level_>3) {
     //for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
     for (int i=0; i<numberOnList_; i++)
       printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e \n", i,list_[i],i,useful_[i],object[list_[i]]->infeasibility(info,way));
   }
+#endif
   return numberUnsatisfied_;
 
 }
@@ -583,6 +601,7 @@ BonChooseVariable::chooseVariable(
     if (numberToDo) {
       int numberDone=0;
       returnCode = doBonStrongBranching(solver,info,numberToDo,results,1,numberDone);
+#ifdef BRANCH_DEBUG
       if (bb_log_level_>=3) {
 	const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"};
 	printf("BON0001I           DownStat    DownChange     UpStat      UpChange\n");
@@ -595,6 +614,7 @@ BonChooseVariable::chooseVariable(
 		 i, stat_msg[down_status+1], down_change, stat_msg[up_status+1], up_change);
 	}
       }
+#endif
       if (returnCode>=0&&returnCode<=2) {
 	if (returnCode) {
 	  if (returnCode==2)
@@ -677,12 +697,18 @@ BonChooseVariable::chooseVariable(
     if ( bestObjectIndex_ >=0 ) {
       OsiObject * obj = solver->objects()[bestObjectIndex_];
       obj->setWhichWay(	bestWhichWay_);
+#ifdef BRANCH_DEBUG
+    if (bb_log_level_>4) {
       printf("Branched on variable %i, bestWhichWay: %i\n",
-              obj->columnNumber(), bestWhichWay_); 
+              obj->columnNumber(), bestWhichWay_);
+      } 
+#endif
     }
+#ifdef BRANCH_DEBUG
     if (bb_log_level_>4) {
       printf("           Choosing %d\n", bestObjectIndex_);
     }
+#endif
     if (numberFixed==numberUnsatisfied_&&numberFixed)
       returnCode=4;
     return returnCode;
