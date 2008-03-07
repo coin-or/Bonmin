@@ -95,10 +95,10 @@ class exprPow: public exprOp {
 
 /// compute power and check for integer-and-odd inverse exponent
 
-inline CouNumber safe_pow (register CouNumber base, 
-			   register CouNumber exponent) {
+inline CouNumber safe_pow (CouNumber base, 
+			   CouNumber exponent) {
 
-  if (base < 0) {
+  if (base < 0.) {
 
     register int rndexp;
 
@@ -107,6 +107,7 @@ inline CouNumber safe_pow (register CouNumber base,
 	  (fabs (1. / exponent - (rndexp = COUENNE_round (1. / exponent))) < COUENNE_EPS)))
 	&& (rndexp % 2))
       return (- pow (- base, exponent));
+    else return 0.; // this is incorrect but avoids nan's
   }
 
   if (fabs (base) >= COUENNE_INFINITY) {
@@ -116,9 +117,9 @@ inline CouNumber safe_pow (register CouNumber base,
       register int intk = COUENNE_round (exponent);
 
       if ((fabs (exponent - intk) < COUENNE_EPS) && (intk % 2))
-	return (exponent < 0) ? 0 : -COUENNE_INFINITY;
+	return (exponent < 0.) ? 0. : -COUENNE_INFINITY;
     }
-    else return (exponent < 0) ? 0 : COUENNE_INFINITY;
+    else return (exponent < 0.) ? 0. : COUENNE_INFINITY;
   }
 
   return (pow (base, exponent));

@@ -426,3 +426,23 @@ CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, 
   default:                          return midInterval (x0, l, u);
   }
 }
+
+/// compute infeasibility of this variable, |w - f(x)| (where w is
+/// the auxiliary variable defined as w = f(x)
+/// TODO: suggest way
+double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &way) const {  
+
+  if (strategy_ == NO_BRANCH) return 0.;
+
+  CouNumber delta = 
+    fabs (info -> solution_ [reference_ -> Index ()] - 
+	  (*(reference_ -> Image ())) ());
+
+  if (jnlst_->ProduceOutput(J_MATRIX, J_BRANCHING)) {
+    printf ("infeas %g: ", (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta); 
+    reference_ -> print (); printf (" := ");
+    reference_ -> Image () -> print (); printf ("\n");
+  }
+
+  return (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta;
+}

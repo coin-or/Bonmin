@@ -44,8 +44,6 @@ CouenneChooseVariable::~CouenneChooseVariable () {}
 
 int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initialize) {
 
-  // TODO: apply strong branching using bound tightening
-
   problem_ -> domain () -> push 
     (problem_ -> nVars (),
      info -> solution_, 

@@ -37,6 +37,10 @@ namespace Bonmin {
     /// Destructor
     virtual ~CouenneChooseStrong ();
 
+    // Sets up strong list and clears all if initialize is true.
+    // Returns number of infeasibilities.
+    virtual int setupList (OsiBranchingInformation *info, bool initialize);
+
     /**  This is a utility function which does strong branching on
 	 a list of objects and stores the results in OsiHotInfo.objects.
 	 On entry the object sequence is stored in the OsiHotInfo object

@@ -68,6 +68,9 @@ namespace Bonmin {
     int returnCode=0;
     double timeStart = CoinCpuTime();
     int iDo = 0;
+
+    //printf ("----------------------trying branching objects:\n");
+
     for (;iDo<numberToDo;iDo++) {
       HotInfo * result = results_() + iDo;
       // For now just 2 way
@@ -94,7 +97,7 @@ namespace Bonmin {
 	  result -> setDownStatus (1);
 	}
         // maybe we should check bounds for stupidities here?
-        solver->solveFromHotStart() ;
+        else solver->solveFromHotStart() ;
       } else {
         // adding cuts or something 
         thisSolver = solver->clone();
@@ -216,6 +219,7 @@ namespace Bonmin {
         break;
       }
     }
+    //printf ("----------------------done\n");
     if(iDo < numberToDo) iDo++;
     assert(iDo <= (int) results_.size());
     results_.resize(iDo);
@@ -230,5 +234,22 @@ namespace Bonmin {
     //printf ("retcode = %d\n", returnCode);
 
     return returnCode;
+  }
+
+  // Sets up strong list and clears all if initialize is true.
+  // Returns number of infeasibilities.
+  int CouenneChooseStrong::setupList (OsiBranchingInformation *info, bool initialize) {
+
+    problem_ -> domain () -> push 
+      (problem_ -> nVars (),
+       info -> solution_, 
+       info -> lower_, 
+       info -> upper_);
+
+    int retval = BonChooseVariable::setupList (info, initialize);
+
+    problem_ -> domain () -> pop ();
+
+    return retval;
   }
 }

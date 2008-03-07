@@ -66,16 +66,7 @@ public:
   /// compute infeasibility of this variable, |w - f(x)| (where w is
   /// the auxiliary variable defined as w = f(x)
   /// TODO: suggest way
-  virtual inline double infeasibility (const OsiBranchingInformation *info, int &way) const {  
-
-    if (strategy_ == NO_BRANCH) return 0.;
-
-    CouNumber delta = 
-      fabs (info -> solution_ [reference_ -> Index ()] - 
-	    (*(reference_ -> Image ())) ());
-
-    return (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta;
-  }
+  virtual inline double infeasibility (const OsiBranchingInformation *info, int &way) const;
 
   /// fix (one of the) arguments of reference auxiliary variable 
   virtual double feasibleRegion (OsiSolverInterface*, 
