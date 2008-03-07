@@ -60,11 +60,11 @@ LIBS = -L$(COINLIBDIR) \
 	-lbonmin -lipopt \
        -lCbc -lCgl -lOsiClp -lOsi -lClp -lCoinUtils \
         $(ASLLIB) @ADDLIBS@ \
-	`cat $(COINLIBDIR)/ipopt_addlibs_cpp.txt` \
-	`cat $(COINLIBDIR)/cgl_addlibs.txt` \
-	`cat $(COINLIBDIR)/osi_addlibs.txt` \
-	`cat $(COINLIBDIR)/clp_addlibs.txt` \
-	`cat $(COINLIBDIR)/coinutils_addlibs.txt` 
+	`cat @IPOPTDOCDIR@/ipopt_addlibs_cpp.txt` \
+	`cat @CGLDOCDIR@/cgl_addlibs.txt` \
+	`cat @OSIDOCDIR@/osi_addlibs.txt` \
+	`cat @CLPDOCDIR@/clp_addlibs.txt` \
+	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` 
 
 # Necessary Include dirs
 INCL = -I`$(CYGPATH_W) $(COININCDIR)` \
