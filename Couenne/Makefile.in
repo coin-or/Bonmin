@@ -297,6 +297,7 @@ EXTRA_DIST = $(am__append_2)
 #                  Installation of the addlibs file                    #
 ########################################################################
 addlibsfile = couenne_addlibs.txt
+addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)/
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -763,11 +764,11 @@ distclean-local:
 
 .PHONY: test unitTest
 
-install-exec-local:
-	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(libdir)/$(addlibsfile)
+install-exec-local: install-doc
+	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(addlibsdir)/$(addlibsfile)
 
-uninstall-local:
-	rm -f $(DESTDIR)$(libdir)/$(addlibsfile)
+uninstall-local: uninstall-doc
+	rm -f $(DESTDIR)$(addlibsdir)/$(addlibsfile)
 
 install-doc: $(DocFiles)
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"

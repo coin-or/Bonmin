@@ -1,8 +1,10 @@
 * text=auto !eol
 Couenne/AUTHORS -text
-Couenne/COPYING -text
+Couenne/INSTALL -text
+Couenne/LICENSE -text
 Couenne/Makefile.am -text
 Couenne/Makefile.in -text
+Couenne/README -text
 Couenne/configure -text
 Couenne/configure.ac -text
 Couenne/couenne_addlibs.txt.in -text
