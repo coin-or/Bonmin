@@ -135,8 +135,6 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
       lb = domain -> lb (ind),
       ub = domain -> ub (ind);
 
-#define THRES_ZERO_SYMM 0.7
-
     if ((lb < -COUENNE_EPS) && (ub > COUENNE_EPS) && 
 	(-lb/ub >= THRES_ZERO_SYMM) &&
 	(-ub/lb >= THRES_ZERO_SYMM))

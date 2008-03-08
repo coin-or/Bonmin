@@ -410,6 +410,11 @@ CouNumber CouenneObject::midInterval (CouNumber x, CouNumber l, CouNumber u) con
 /// pick branching point based on current strategy
 CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, CouNumber u) const {
 
+  if ((l < -COUENNE_EPS) && (u > COUENNE_EPS) && 
+      (-l/u >= THRES_ZERO_SYMM) &&
+      (-u/l >= THRES_ZERO_SYMM))
+    return 0.;
+
   switch (strategy_) {
 
   case CouenneObject::MIN_AREA:     return maxHeight   (ft, l, u);

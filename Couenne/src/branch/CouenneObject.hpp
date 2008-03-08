@@ -20,8 +20,9 @@
 #include "CouenneJournalist.hpp"
 
 #define AGGR_MUL 2
-const CouNumber closeToBounds = .01;
+#define THRES_ZERO_SYMM 0.8
 
+const CouNumber closeToBounds = .01;
 
 /// Define what kind of branching (two- or three-way) and where to
 /// start from: left, (center,) or right. The last is to help
