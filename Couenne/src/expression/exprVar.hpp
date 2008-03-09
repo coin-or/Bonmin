@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the class exprVar for variables 
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -148,7 +148,7 @@ class exprVar: public expression {
 
   /// is this variable fixed?
   virtual inline bool isFixed ()
-  {return (fabs (domain_ -> lb () - domain_ -> ub ()) < COUENNE_EPS);}
+  {return (fabs (lb () - ub ()) < COUENNE_EPS);}
 
   /// link this variable to a domain
   virtual inline void linkDomain (Domain *d)
