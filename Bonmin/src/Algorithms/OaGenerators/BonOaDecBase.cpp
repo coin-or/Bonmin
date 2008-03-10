@@ -7,6 +7,8 @@
 //
 // Date :  12/07/2006
 
+#include <sstream>
+
 #include "BonOaDecBase.hpp"
 
 
@@ -412,8 +414,8 @@ OaDecompositionBase::solverManip::integerFeasible(const OsiBranchingInformation&
   return true;
 }
 
-/** Fix integer variables in si to their values in colsol
-\todo Handle SOS type 2.*/
+/** Fix integer variables in si to their values in colsol.
+*/
 void 
 OaDecompositionBase::solverManip::fixIntegers(const OsiBranchingInformation& info) {
   if(objects_){
@@ -427,17 +429,20 @@ OaDecompositionBase::solverManip::fixIntegers(const OsiBranchingInformation& inf
       if (si_->isInteger(i)) {
         double  value =  colsol[i];
         if(fabs(value - floor(value+0.5)) > integerTolerance_){
-  	std::cerr<<"Error not integer valued solution"<<std::endl;
-  	std::cerr<<"---------------- x["<<i<<"] = "<<value<<std::endl;
+          std::stringstream stream;
+          stream<<"Error not integer valued solution"<<std::endl;
+          stream<<"---------------- x["<<i<<"] = "<<value<<std::endl;          
+          throw CoinError(stream.str(),"fixIntegers","OaDecompositionBase::solverManip");
         }
         value = floor(value+0.5);
         value = max(colLower_[i],value);
         value = min(value, colUpper_[i]);
   
         if (fabs(value) > 1e10) {
-          std::cerr<<"ERROR: Can not fix variable in nlp because it has too big a value ("<<value
+          std::stringstream stream;
+          stream<<"Can not fix variable in nlp because it has too big a value ("<<value
           <<") at optimium of LP relaxation. You should try running the problem with B-BB"<<std::endl;
-       throw CoinError("LP solution has too big values.",
+       throw CoinError(stream.str(),
                 "fixIntegers","OaDecompositionBase::solverManip") ;
         }
 #ifdef OA_DEBUG
@@ -528,7 +533,8 @@ OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si){
   }
   else if (numberCutsToAdd < 0)//Oups some error
   {
-    std::cerr<<"Internal error in OACutGenerator2 : number of cuts wrong"<<std::endl;
+    throw CoinError("Internal error number of cuts wrong",
+                    "generateCuts","OACutGenerator2");
   }
 
   si_->setColLower(si.getColLower());
@@ -600,7 +606,7 @@ void
 OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
                           const CglTreeInfo info) const{
     if (nlp_ == NULL) {
-      std::cerr<<"Error in cut generator for outer approximation no NLP ipopt assigned"<<std::endl;
+      throw CoinError("Error in cut generator for outer approximation no NLP ipopt assigned", "generateCuts", "OaDecompositionBase");
     }
 
     // babInfo is used to communicate with the b-and-b solver (Cbc or Bcp).
@@ -738,7 +744,7 @@ OaDecompositionBase::solveNlp(OsiBabSolver * babInfo, double cutoff) const{
         }
       }
       else if (nlp_->isAbandoned() || nlp_->isIterationLimitReached()) {
-        std::cerr<<"Unsolved NLP... exit"<<std::endl;
+        (*handler_)<<"Unsolved NLP... exit"<<CoinMessageEol;
       }
       else {
         handler_->message(INFEASIBLE_NLP, messages_)

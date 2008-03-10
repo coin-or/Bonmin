@@ -81,15 +81,6 @@ namespace Bonmin
       return &var_types_[0];
     }
 
-    //Print variable types to screen
-    void printVarTypes()
-    {
-      //       for (int i = 0 ; i < n_ ; i++)
-      // 	{
-      // 	  std::cout<<i<<"\t"<<var_types_[i]<<std::endl;
-      // 	}
-    }
-
     /** Get the current values for the lower bounds */
     const Number* x_l()
     {

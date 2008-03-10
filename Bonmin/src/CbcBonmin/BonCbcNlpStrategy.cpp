@@ -83,28 +83,6 @@ namespace Bonmin
   CbcNlpStrategy::status(CbcModel * model, CbcNodeInfo * parent,int whereFrom)
   {
 
-#if 0
-    if(whereFrom == 1){
-       std::cerr<<"Node "<<parent<<" same as ? "<<model->currentNode()->nodeInfo()<<std::endl;
-       CbcNodeInfo * current = parent;
-       CbcNodeInfo * father = current->parent();
-       int fatherNumber = -1;
-       int nodeNumber = current->nodeNumber();
-       std::string way;
-       int branch_var;
-       if(father != NULL){
-          fatherNumber = father->nodeNumber();
-          way = (model->currentNode()->way()==1) ? "Down": "Up";
-          //branch_var = model->currentNode()->variable();
-       }
-       std::cout<<"node: "<<model->getNodeCount2()
-                <<"father: "<<nodeNumber
-                <<" , grand-father "<<fatherNumber
-                <<". Branched  way "<<way
-                //<<" on variable "
-                <<std::endl;
-    }
-#endif
     OsiSolverInterface * solver = model->solver();//get solver
     int feasible = 1;
     bool solved = true;
@@ -130,19 +108,19 @@ namespace Bonmin
         (maxInfeasible_== 0) || (seqOfInfeasiblesSize==0))
 
       if (feasible && seqOfInfeasiblesSize > 1) {
-        std::cerr<<"Feasible node while father was infeasible."
-        <<std::endl;
+        (*model->messageHandler())<<"Feasible node while father was infeasible."
+        <<CoinMessageEol;
       }
 
     if (solved && seqOfUnsolvedSize > 1) {
-      std::cerr<<"Solved node while father was unsolved."
-      <<std::endl;
+      (*model->messageHandler())<<"Solved node while father was unsolved."
+      <<CoinMessageEol;
     }
 
     if (seqOfInfeasiblesSize < maxInfeasible_ &&
         solved && !feasible) {
-      std::cerr<<"Branching on infeasible node, sequence of infeasibles size "
-      <<seqOfInfeasiblesSize<<std::endl;
+      (*model->messageHandler())<<"Branching on infeasible node, sequence of infeasibles size "
+      <<seqOfInfeasiblesSize<<CoinMessageEol;
       // Have to make sure that we will branch
       OsiTMINLPInterface * ipopt = dynamic_cast<OsiTMINLPInterface *>(solver);
       ipopt->forceBranchable();
@@ -153,7 +131,7 @@ namespace Bonmin
 
     if (!solved && parent != NULL &&
         seqOfUnsolvedSize <= maxFailure_) {
-      std::cout<<"Branching on unsolved node, sequence of unsolved size "<<seqOfUnsolvedSize<<std::endl;
+      (*model->messageHandler())<<"Branching on unsolved node, sequence of unsolved size "<<seqOfUnsolvedSize<<CoinMessageEol;
       // Have to make sure that we will branch
       OsiTMINLPInterface * osiMinlp = dynamic_cast<OsiTMINLPInterface *>(solver);
       osiMinlp->forceBranchable();     //      feasible=1;

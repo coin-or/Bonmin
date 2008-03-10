@@ -37,7 +37,7 @@ void MyAssertFunc(bool c, const std::string &s, const std::string&  file, unsign
 
 void DblEqAssertFunc(const double& a, const std::string &a_s, const double&b, const std::string& b_s,
                   const std::string&  file, unsigned int line){
-   CoinRelFltEq eq;
+   CoinRelFltEq eq(1e-07);
    if(!eq(a,b)){
       fprintf(stderr, "Failed comparison: %s = %f != %s =%f in  %s line %i.\n", a_s.c_str(),
               a, b_s.c_str(), b, file.c_str(), line);
@@ -126,32 +126,24 @@ void testOptimAndSolutionQuery(OsiTMINLPInterface & si)
     // Optimum of the problem is -( 3/2 + sqrt(5)/2)
     // with x = (1/2 + sqrt(5) y[1]=x and y[2] = 1/2 + sqrt(5)/2
     // (can easily be computed since constraint x-y[1]<=0 imply x = y[1] and the resulting problem has dimension 2
-    if(!eq(si.getObjValue(),-( (3./2.) + sqrt(5.)/2.)))
-        std::cout<<"Error in objective : "<<fabs(si.getObjValue()+( (3./2.) + sqrt(5.0)/2.))<<std::endl;
+    DblEqAssert(si.getObjValue(),-( (3./2.) + sqrt(5.)/2.));
     
     //Test validity of primal solution
     const double * colsol = si.getColSolution();
-    if(!eq(colsol[0],( (1./2.) + 1/sqrt(5.0))))
-        std::cout<<"Error for y[1]  : "<<fabs(colsol[0]-( (1./2.) + 1/sqrt(5.0)))<<std::endl;
-    if(!eq(colsol[1],( (1./2.) + 1/(2.*sqrt(5.0)))))
-        std::cout<<"Error for y[2]  : "<<fabs(colsol[1]-( (1./2.) + 1/(2*sqrt(5.0))))<<std::endl;
-    if(!eq(colsol[2],( (1./2.) + 1/sqrt(5.))))
-        std::cout<<"Error for x  : "<<fabs(colsol[2]-( (1./2.) + 1/sqrt(5.0)))<<std::endl;
-    //value of z is not tested
+    DblEqAssert(colsol[0],( (1./2.) + 1/sqrt(5.0)));
+    DblEqAssert(colsol[1],( (1./2.) + 1/(2.*sqrt(5.0))));
+    DblEqAssert(colsol[2],( (1./2.) + 1/sqrt(5.)));
 
     //Test for row activity
     const double * rowAct = si.getRowActivity();
-    if(!eq(rowAct[0],1./4.))
-        std::cout<<"Error for row activity of c1 : "<<fabs(rowAct[0]-1./4.)<<std::endl;
-    if(!eq(rowAct[1],0.))
-        std::cout<<"Error for row activity of c2 : "<<fabs(rowAct[1])<<std::endl;
+    DblEqAssert(rowAct[0],1./4.);
+    DblEqAssert(rowAct[1],0.);
         
      //Check dual values dual for c1 = sqrt(5) c2=1 c3 not tested
      const double * duals = si.getRowPrice();
-     if(!eq(duals[0],sqrt(5.0)))
-             std::cout<<"Error dual of c1 : "<<fabs(duals[0]-sqrt(5.))<<std::endl;
-     if(!eq(duals[1],1.))
-             std::cout<<"Error dual of c2 : "<<fabs(duals[0]-1.)<<std::endl;
+     DblEqAssert(duals[8],sqrt(5.));
+     DblEqAssert(duals[9],1.);
+     DblEqAssert(duals[10],0.);
              
      std::cout<<"Test passed successfully"<<std::endl;
 }
@@ -212,11 +204,7 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
                   
       const double * rowUp = lp.getRowUpper();
       double sqrt5 = sqrt(5.);
-      if(!eq(rowUp[0], 1./2. + 3./(2 * sqrt5))){
-	double error = fabs(rowUp[0] - 1./2. - 3./(2 * sqrt5));
-	std::cout<<"Error in OA for rowUp[0]: "
-		 <<error<<std::endl;
-      }
+      DblEqAssert(rowUp[0], 1./2. + 3./(2 * sqrt5));
       DblEqAssert(rowUp[1], 0.);
       DblEqAssert(rowUp[2], 2.);
       //DblEqAssert(rowUp[3], 0.);
@@ -241,13 +229,8 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
        {
         for(int j = mat->getVectorStarts()[i] ; j < mat->getVectorStarts()[i] + mat->getVectorLengths()[i] ; j++)
         {
-        MyAssert(inds[k]==mat->getIndices()[j]);
-        if(!eq(vals[k],mat->getElements()[j])){
-	double error = fabs(vals[k] - mat->getElements()[j]);
-	std::cout<<"Error in OA for element of constraint matrix "<<k<<": "
-		 <<error<<std::endl;
-	if(error > 1e-06) throw -1;
-      }
+          MyAssert(inds[k]==mat->getIndices()[j]);
+          DblEqAssert(vals[k],mat->getElements()[j])
           k++;
         }
        }
@@ -261,8 +244,8 @@ void testFp(Bonmin::AmplInterface &si)
         int ind[1]={1};
         si.getFeasibilityOuterApproximation(1,x,ind,cuts, 0, 1);
         std::cout<<si.getColSolution()[0]<<std::endl;
-         std::cout<<si.getColSolution()[1]<<std::endl;
-       DblEqAssert(si.getColSolution()[1],(1./2.));
+        std::cout<<si.getColSolution()[1]<<std::endl;
+        DblEqAssert(si.getColSolution()[1],(1./2.));
 }
 void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 {

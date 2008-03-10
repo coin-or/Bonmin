@@ -465,7 +465,6 @@ namespace Bonmin
       var_types[i] = INTEGER;
       totalNumberOfNonContinuous++;
     }
-    //    std::cout<<"Number of integer and binaries : "<<totalNumberOfNonContinuous<<std::endl;
     return true;
   }
   
