@@ -139,7 +139,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 		    (int) (floor(time) / 60) %60, 
 		    (int) floor(time) % 60, 
 		    (int) ((time - floor (time)) * 100),
-		    index, way ? '>' : '<', integer ? (way ? ceil : floor) (brpt) : brpt,
+		    index, way ? '>' : '<', integer ? ((way ? ceil (brpt): floor (brpt))) : brpt,
 		    solver -> getColLower () [index],
 		    solver -> getColUpper () [index]);
 
@@ -231,7 +231,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   p -> domain () -> pop ();
 
   jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
-  	  index, way ? '>' : '<', integer ? (way ? ceil : floor) (brpt) : brpt);
+		    index, way ? '>' : '<', integer ? (way ? ceil (brpt) : floor (brpt)) : brpt);
 
   // next time do other branching
   branchIndex_++;

@@ -287,9 +287,9 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     for (int i=0; i<nOrig_; i++) 
       if (fixed [i] == UNFIXED) {
 	Lb (i) = Ub (i) = xInt [i] = 
-	  ((dualL [i] < dualR [i] - COUENNE_EPS) ? floor :
-	   (dualL [i] > dualR [i] + COUENNE_EPS) ? ceil  :
-	   ((CoinDrand48 () < 0.5) ? floor : ceil)) (xFrac [i]);
+	  ((dualL [i] < dualR [i] - COUENNE_EPS) ? floor (xFrac [i]) :
+	   (dualL [i] > dualR [i] + COUENNE_EPS) ? ceil  (xFrac [i]) :
+	   ((CoinDrand48 () < 0.5) ? floor (xFrac [i]) : ceil (xFrac [i])));
 
 	//printf ("3 fixed %d [%g,%g,%g]\n", i, Lb (i), Ub (i), xInt [i]);
       }
