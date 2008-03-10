@@ -27,6 +27,7 @@ class TNLPSolver: public Ipopt::ReferencedObject{
 
   enum ReturnStatus /** Standard return statuses for a solver*/{
     iterationLimit = -3/** Solver reached iteration limit. */,
+    doesNotConverge = -8/** Algorithm does not converge.*/,
     computationError = -2/** Some error was made in the computations. */,
     notEnoughFreedom = -1/** not enough degrees of freedom.*/,
     illDefinedProblem = -4/** The solver finds that the problem is not well defined. */,
