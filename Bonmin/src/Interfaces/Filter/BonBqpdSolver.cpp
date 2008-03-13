@@ -376,7 +376,6 @@ namespace Bonmin
       tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;
     }
-    printf("m0de = %d\n", m0de);
 
     // Set up some common block stuff
     F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
