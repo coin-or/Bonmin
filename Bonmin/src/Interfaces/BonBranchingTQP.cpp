@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2007
+// (C) Copyright International Business Machines Corporation and Carnegie Mellon University 2006, 2008
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -83,9 +83,6 @@ namespace Bonmin
     ASSERT_EXCEPTION(retval, TMINLP_INVALID,
 		     "Can't evaluate constraint Jacobian values in BranchingTQP");
 
-    // Get room for "displacement" and copy of x_sol
-    d_ = new Number[n_];
-
     // Keep copy of original x_sol and duals_sol values
     x_sol_copy_ = new Number[n_];
     IpBlasDcopy(n_, x_sol, 1, x_sol_copy_, 1);
@@ -117,7 +114,6 @@ namespace Bonmin
     delete [] g_jac_;
     delete [] g_jac_irow_;
     delete [] g_jac_jcol_;
-    delete [] d_;
     delete [] x_sol_copy_;
     delete [] duals_sol_copy_;
   }
@@ -137,9 +133,19 @@ namespace Bonmin
   bool BranchingTQP::get_bounds_info(Index n, Number* x_l, Number* x_u,
 				     Index m, Number* g_l, Number* g_u)
   {
-    bool retval = tminlp2tnlp_->get_bounds_info(n, x_l, x_u, m, g_l, g_u);
     DBG_ASSERT(n == n_);
     DBG_ASSERT(m == m_);
+    bool retval = tminlp2tnlp_->get_bounds_info(n, x_l, x_u, m, g_l, g_u);
+    // correct for displacement
+    for (int i=0; i<n; i++) {
+      x_l[i] -= x_sol_copy_[i];
+      x_u[i] -= x_sol_copy_[i];
+    }
+    // include the right hand side of the constraint
+    for (int i=0; i<m; i++) {
+      g_l[i] -= g_vals_[i];
+      g_u[i] -= g_vals_[i];
+    }
     return retval;
   }
 
@@ -150,7 +156,8 @@ namespace Bonmin
   {
     DBG_ASSERT(n==n_);
     if (init_x == true) {
-      IpBlasDcopy(n, x_sol_copy_, 1, x, 1);
+      const double zero = 0.;
+      IpBlasDcopy(n, &zero, 0, x, 1);
     }
     if (init_z == true) {
       DBG_ASSERT(duals_sol_copy_);
@@ -170,23 +177,29 @@ namespace Bonmin
     return true;
   }
 
+  bool
+  BranchingTQP::get_constraints_linearity(Index m, LinearityType* const_types)
+  {
+    for (int i=0; i<m; i++) {
+      const_types[i] = LINEAR;
+    }
+    return true;
+  }
+
   bool BranchingTQP::eval_f(Index n, const Number* x, bool new_x,
       Number& obj_value)
   {
     DBG_ASSERT(n == n_);
-    if (new_x) {
-      update_displacement(x);
-    }
 
-    obj_value = obj_val_ + IpBlasDdot(n, d_, 1, obj_grad_, 1);
+    obj_value = IpBlasDdot(n, x, 1, obj_grad_, 1);
     for (int i=0; i<nnz_h_lag_; i++) {
       Index& irow = obj_hess_irow_[i];
       Index& jcol = obj_hess_jcol_[i];
       if (irow!=jcol) {
-	obj_value += obj_hess_[i]*d_[irow]*d_[jcol];
+	obj_value += obj_hess_[i]*x[irow]*x[jcol];
       }
       else {
-	obj_value += 0.5*obj_hess_[i]*d_[irow]*d_[irow];
+	obj_value += 0.5*obj_hess_[i]*x[irow]*x[irow];
       }
     }
 
@@ -197,17 +210,14 @@ namespace Bonmin
 				 Number* grad_f)
   {
     DBG_ASSERT(n == n_);
-    if (new_x) {
-      update_displacement(x);
-    }
 
     IpBlasDcopy(n_, obj_grad_, 1, grad_f, 1);
     for (int i=0; i<nnz_h_lag_; i++) {
       Index& irow = obj_hess_irow_[i];
       Index& jcol = obj_hess_jcol_[i];
-      grad_f[irow] += obj_hess_[i]*d_[jcol];
+      grad_f[irow] += obj_hess_[i]*x[jcol];
       if (irow!=jcol) {
-	grad_f[jcol] += obj_hess_[i]*d_[irow];
+	grad_f[jcol] += obj_hess_[i]*x[irow];
       }
     }
 
@@ -218,21 +228,15 @@ namespace Bonmin
 			    Index m, Number* g)
   {
     DBG_ASSERT(n == n_);
-    if (new_x) {
-      update_displacement(x);
-    }
 
-    IpBlasDcopy(m_, g_vals_, 1, g, 1);
+    const double zero = 0.;
+    IpBlasDcopy(m_, &zero, 0, g, 1);
     for (Index i=0; i<nnz_jac_g_; i++) {
       Index& irow = g_jac_irow_[i];
       Index& jcol = g_jac_jcol_[i];
-      g[irow] += g_jac_[i]*d_[jcol];
+      g[irow] += g_jac_[i]*x[jcol];
     }
 
-#if 0
-    //This should (and is) already done at construction use here is innapropriate.
-    tminlp2tnlp_->eval_g_add_linear_cuts(n, x, tminlp);
-#endif
     return true;
   }
 
@@ -240,10 +244,6 @@ namespace Bonmin
 				Index m, Index nele_jac, Index* iRow,
 				Index *jCol, Number* values)
   {
-    if (new_x) {
-      update_displacement(x);
-    }
-
     if (iRow != NULL) {
       DBG_ASSERT(jCol != NULL);
       DBG_ASSERT(values == NULL);
@@ -264,10 +264,6 @@ namespace Bonmin
       IpBlasDcopy(nnz_jac_g_, g_jac_, 1, values, 1);
     }
 
-#if 0
-    //This should (and is) already done at construction use here is innapropriate.
-    tminlp2tnlp_->eval_jac_g_add_linear_cuts(nele_jac, iRow, jCol, values);
-#endif
     return true;
   }
 
@@ -276,9 +272,6 @@ namespace Bonmin
       bool new_lambda, Index nele_hess,
       Index* iRow, Index* jCol, Number* values)
   {
-    if (new_x) {
-      update_displacement(x);
-    }
     DBG_ASSERT(nele_hess == nnz_h_lag_);
 
     if (iRow != NULL) {
@@ -314,21 +307,23 @@ namespace Bonmin
   }
 
   void BranchingTQP::finalize_solution(SolverReturn status,
-				       Index n, const Number* x, const Number* z_L, const Number* z_U,
-				       Index m, const Number* g, const Number* lambda,
-				       Number obj_value,
+				       Index n, const Number* x,
+				       const Number* z_L, const Number* z_U,
+				       Index m, const Number* g,
+				       const Number* lambda, Number obj_value,
 				       const IpoptData* ip_data,
 				       IpoptCalculatedQuantities* ip_cq)
   {
-    tminlp2tnlp_->finalize_solution(status, n, x, z_L, z_U, m, g, lambda,
-				    obj_value, ip_data, ip_cq);
-  }
-
-  void BranchingTQP::update_displacement(const Number* x)
-  {
-    for (Index i=0; i<n_; i++) {
-      d_[i] = x[i] - x_sol_copy_[i];
+    // Translate displacement solution back to a solution in the real
+    // variables
+    double* xx = new double[n];
+    for (int i=0; i<n; i++) {
+      xx[i] = x_sol_copy_[i] + x[i];
     }
+
+    tminlp2tnlp_->finalize_solution(status, n, xx, z_L, z_U, m, g, lambda,
+				    obj_value+obj_val_, ip_data, ip_cq);
+    delete [] xx;
   }
 
 }

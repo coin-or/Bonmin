@@ -1,4 +1,4 @@
-// Copyright (C) 2007 International Business Machines
+// Copyright (C) 2007, 2008 International Business Machines
 // Corporation and others.  All Rights Reserved.
 //
 // Author:  Andreas Waechter      2007-08-20    IBM

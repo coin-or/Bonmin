@@ -1,5 +1,5 @@
 // (C) Copyright International Business Machines Corporation and
-// Carnegie Mellon University 2006, 2007
+// Carnegie Mellon University 2006, 2008
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -19,7 +19,8 @@ namespace Bonmin
    *  of the TNLP at the optimal point.  The purpose of the
    *  BranchingTQP is that it is used in a strong-branching framework,
    *  strong branching is only done for the QP approximation of the
-   *  TNLP, not on the TNLP itself.
+   *  TNLP, not on the TNLP itself.  The variables of the QP are the
+   *  displacement from the reference point.
    */
   class BranchingTQP : public TNLP
   {
@@ -39,6 +40,10 @@ namespace Bonmin
                               Index& nnz_h_lag, IndexStyleEnum& index_style);
     virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
                                  Index m, Number* g_l, Number* g_u);
+    /** Returns the constraint linearity.  array should be alocated
+     * with length at least n. Since this is a QP, all constraints are
+     * linear.*/
+    virtual bool get_constraints_linearity(Index m, LinearityType* const_types);
     /** Method called by Ipopt to get the starting point. The bools
      *  init_x and init_lambda are both inputs and outputs. As inputs,
      *  they indicate whether or not the algorithm wants you to
@@ -174,9 +179,6 @@ namespace Bonmin
     IndexStyleEnum index_style_;
     //@}
 
-    /** Displacement with respect to x_sol_copy_ */
-    Number* d_;
-
     /** Copy of original x_sol_.  x_sol_ is changed after the first QP
      *  has been solved once. */
     Number* x_sol_copy_;
@@ -184,9 +186,6 @@ namespace Bonmin
     /** Copy of original duals_sol_.  duals_sol_ is changed after the
      *  first QP has been solved once. */
     Number* duals_sol_copy_;
-
-    /** Method for updating the displacement */
-    void update_displacement(const Number* x);
 
     /** Pointer to the TMINLP2TNLP model which stores the bounds
      *  information */

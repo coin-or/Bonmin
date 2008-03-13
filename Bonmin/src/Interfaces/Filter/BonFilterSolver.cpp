@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation, Carnegie Mellon University 2006, 2007
+// (C) Copyright International Business Machines Corporation, Carnegie Mellon University 2006, 2008
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -19,6 +19,7 @@
 typedef Bonmin::FilterSolver::fint fint;
 typedef Bonmin::FilterSolver::real real;
 
+//#define InitializeAll
 
 
 typedef long ftnlen;
@@ -511,7 +512,6 @@ namespace Bonmin
     use_warm_start_in_cache_ = false;
     //for(int i = 0 ; i < n ; i++) x[i] = 0;
     lam = new real [n+m];
-    //#define InitializeAll
 #ifdef InitializeAll
     for (int i = 0 ; i < n+m ; i++) lam[i] = 0.;
 #endif
@@ -726,6 +726,14 @@ namespace Bonmin
     for (int i=0; i<n; i++) {
       printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, bounds[i], i, bounds[m+n+i]);
     }
+    for (int i=0; i<m; i++) {
+      printf("gL[%3d] = %15.8e  gU[%3d] = %15.8e\n", i, bounds[n+i], i, bounds[m+2*n+i]);
+    }
+#endif
+#if 0
+    for (int i=0; i<n; i++) {
+      printf("fxstart[%2d] = %23.16e\n", i, x[i]);
+    }
 #endif
     F77_FUNC(filtersqp,FILTERSQP)(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk,
         &maxiWk, &iprint, &nout, &ifail, &rho, x,
@@ -736,6 +744,13 @@ namespace Bonmin
         NULL, NULL,
         &maxiter, istat, rstat,
         cstype_len);
+#if 0
+    for (int i=0; i<n; i++) {
+      printf("fxsol[%2d] = %23.16e\n", i, x[i]);
+    }
+    printf("final f = %e\n", f);
+    printf("ifail = %d\n", ifail);
+#endif
     cpuTime_ += CoinCpuTime();
   }
 

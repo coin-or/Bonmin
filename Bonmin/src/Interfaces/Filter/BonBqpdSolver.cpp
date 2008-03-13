@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines Corporation 2007
+// (C) Copyright International Business Machines Corporation 2007, 2008
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -14,6 +14,8 @@
 #include "BonFilterWarmStart.hpp"
 
 #include "CoinTime.hpp"
+
+//#define InitializeAll
 
 typedef Bonmin::BqpdSolver::fint fint;
 typedef Bonmin::BqpdSolver::real real;
@@ -172,8 +174,6 @@ namespace Bonmin
     return callOptimizer();
   }
 
-
-
   void
   BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
       Ipopt::SmartPtr<Ipopt::OptionsList>& options)
@@ -232,7 +232,6 @@ namespace Bonmin
     ws = new real[mxws];
     lws = new fint[mxlws];
 
-#define InitializeAll
 #ifdef InitializeAll
     for (int i=0; i<mxws; i++) {
       ws[i] = 42.;
@@ -244,6 +243,12 @@ namespace Bonmin
 
     // Getting the bounds
     tqp->get_bounds_info(n, bl, bu, m, bl+n, bu+n);
+
+    // Make sure bounds are not infinity
+    for (int i=0; i<n+m; i++) {
+      bl[i] = Max(bl[i], -1e20);
+      bu[i] = Min(bu[i], 1e20);
+    }
 
     // Set up sparse matrix with objective gradient and constraint Jacobian
 
@@ -360,6 +365,8 @@ namespace Bonmin
   void
   BqpdSolver::cachedInfo::optimize()
   {
+    //DELETEME
+    //use_warm_start_in_cache_ = false;
     if (use_warm_start_in_cache_) {
       m0de = 6;
       use_warm_start_in_cache_ = false;
@@ -369,7 +376,7 @@ namespace Bonmin
       tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;
     }
-    //m0de = 0;
+    printf("m0de = %d\n", m0de);
 
     // Set up some common block stuff
     F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
@@ -382,15 +389,32 @@ namespace Bonmin
 
 #if 0
     printf("========= 222222222222 =============\n");
+    printf("kk = %d ll = %d mxws = %d mxlws = %d\n", kk, ll, mxws, mxlws);
     for (int i=0; i<n; i++) {
       printf("xL[%3d] = %15.8e  xU[%3d] = %15.8e\n", i, bl[i], i, bu[i]);
+    }
+    for (int i=0; i<m; i++) {
+      printf("gL[%3d] = %15.8e  gU[%3d] = %15.8e\n", i, bl[n+i], i, bu[n+i]);
     }
 #endif
     cpuTime_ = - CoinCpuTime();
     real fmin = -1e100;
+#if 0
+    for (int i=0; i<n; i++) {
+      printf("qxstart[%2d] = %23.16e\n", i, x[i]);
+    }
+#endif
     F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
         g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
         &m0de, &ifail, info, &iprint, &nout);
+#if 0
+    for (int i=0; i<n; i++) {
+      printf("qxsol[%2d] = %23.16e\n", i, x[i]);
+    }
+    printf("ifail = %d\n", ifail);
+    printf("final f = %e\n", f);
+    printf("final f + obj_val = %e\n", f+tqp_->ObjVal());
+#endif
     cpuTime_ += CoinCpuTime();
   }
 
