@@ -41,14 +41,14 @@ CouNumber trigSelBranch (const CouenneObject *obj,
     y0 = info -> solution_ [ref -> Index ()];
 
   var -> getBounds (l,u);
-
-  simpletriplet ft ((type == COU_SINE) ? sin    : cos, 
-		    (type == COU_SINE) ? cos    : oppsin, 
+				 
+  simpletriplet ft ((type == COU_SINE) ? (unary_function)sin : (unary_function)cos, 
+		    (type == COU_SINE) ? (unary_function)cos    : oppsin, 
 		    (type == COU_SINE) ? oppsin : oppcos, 
-		    (type == COU_SINE) ? acos   : oppasin);
+		    (type == COU_SINE) ? (unary_function)acos   : oppasin);
 
   brpts = (double *) realloc (brpts, sizeof (double));
   *brpts = obj -> getBrPoint (&ft, x0, l, u);
 
-  return (y0 - ((type == COU_SINE) ? sin : cos) (x0));
+  return (y0 - ((type == COU_SINE) ? sin(x0) : cos(x0)));
 }
