@@ -306,8 +306,8 @@ namespace Bonmin
     DBG_ASSERT(asl);
 
     const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
-    const Index * id = suffix_handler->GetIntegerSuffixValues("id", AmplSuffixHandler::AmplSuffixHandler::Variable_Source);
-    const Index * primary_var = suffix_handler->GetIntegerSuffixValues("primary_var", AmplSuffixHandler::AmplSuffixHandler::Constraint_Source);
+    const Index * id = suffix_handler->GetIntegerSuffixValues("id", AmplSuffixHandler::Variable_Source);
+    const Index * primary_var = suffix_handler->GetIntegerSuffixValues("primary_var", AmplSuffixHandler::Constraint_Source);
 
 
     if (primary_var!= NULL) {
