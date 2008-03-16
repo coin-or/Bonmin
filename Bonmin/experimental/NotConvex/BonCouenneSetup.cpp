@@ -225,13 +225,13 @@ namespace Bonmin{
     int varSelection;
     if (!options_->GetEnumValue("varselect_stra",varSelection,"bonmin.")) {
       // change the default for Couenne
-      varSelection = OsiTMINLPInterface::OSI_SIMPLE;
+      varSelection = OSI_SIMPLE;
     }
     switch (varSelection) {
 
       // strong branching choosevariable
 
-    case OsiTMINLPInterface::OSI_STRONG: {
+    case OSI_STRONG: {
 	CouenneChooseStrong * chooseVariable = new CouenneChooseStrong(*this, couenneProb);
 	chooseVariable->setTrustStrongForSolution(false);
 	chooseVariable->setTrustStrongForBound(false);
@@ -240,7 +240,7 @@ namespace Bonmin{
 	break;
     }
 
-    case OsiTMINLPInterface::OSI_SIMPLE: // default choice
+    case OSI_SIMPLE: // default choice
       branchingMethod_ = new CouenneChooseVariable (continuousSolver_, couenneProb);
       break;
     default:
