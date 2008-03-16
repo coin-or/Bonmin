@@ -25,7 +25,7 @@
 #ifdef COIN_HAS_FILTERSQP
 #include "Filter/BonFilterSolver.hpp"
 #include "Filter/BonFilterWarmStart.hpp"
-#include "Filter/BonBqpdWarmStart.hpp"
+//#include "Filter/BonBqpdWarmStart.hpp"
 #endif
 
 #include "OsiBranchingObject.hpp"
@@ -1268,11 +1268,13 @@ OsiTMINLPInterface::setWarmStart(const CoinWarmStart* ws)
       warmstart_ = ws->clone();
       return true;
     }
+#if 0
     const BqpdWarmStart* bws = dynamic_cast<const BqpdWarmStart*>(ws);
     if (bws) {
       warmstart_ = ws->clone();
       return true;
     }
+#endif
 #endif
     // See if it is anything else than the CoinWarmStartBasis that all others
     // derive from
@@ -2436,7 +2438,8 @@ OsiTMINLPInterface::resolve()
       has_warmstart = iws->empty() ? 0 : 2;
     }
   }
-#ifdef COIN_HAS_FILTERSQP
+#if 0
+//#ifdef COIN_HAS_FILTERSQP
   if (has_warmstart == 1) {
     const FilterWarmStart* fws=dynamic_cast<const FilterWarmStart*>(warmstart_);
     if (fws) {

@@ -253,15 +253,15 @@ namespace Bonmin
     int varSelection;
     options->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     // Set branching strategy
-    if (varSelection == OsiTMINLPInterface::MOST_FRACTIONAL) {
+    if (varSelection == MOST_FRACTIONAL) {
       intParam_[NumberStrong] = 0;
       options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
     }
-    else if (varSelection == OsiTMINLPInterface::STRONG_BRANCHING) {
+    else if (varSelection == STRONG_BRANCHING) {
       intParam_[MinReliability] = 0;
       options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
     }
-    else if (varSelection == OsiTMINLPInterface::RELIABILITY_BRANCHING) {
+    else if (varSelection == RELIABILITY_BRANCHING) {
       intParam_[MinReliability] = 10;
       options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
     }
@@ -431,7 +431,7 @@ namespace Bonmin
         "(only type 1 SOS are supported at the moment)");
     roptions->setOptionExtraInfo("sos_constraints", 11);
 
-    roptions->AddStringOption9("varselect_stra",
+    roptions->AddStringOption10("varselect_stra",
         "Chooses variable selection strategy",
         "strong-branching",
         "most-fractional", "Choose most fractional variable",
@@ -442,7 +442,9 @@ namespace Bonmin
         "lp-strong-branching", "Perform strong branching with LP approximation",
         "nlp-strong-branching", "Perform strong branching with NLP approximation",
         "osi-simple", "Osi method to do simple branching",
-        "osi-strong", "Osi method to do strong branching","");
+        "osi-strong", "Osi method to do strong branching",
+        "random", "Method to choose branching variable randomly");
+
     roptions->setOptionExtraInfo("varselect_stra", 15);
 
     roptions->AddLowerBoundedIntegerOption("num_cut_passes",

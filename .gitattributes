@@ -59,6 +59,8 @@ Bonmin/src/Algorithms/Branching/BonPseudoCosts.cpp -text
 Bonmin/src/Algorithms/Branching/BonPseudoCosts.hpp -text
 Bonmin/src/Algorithms/Branching/BonQpBranchingSolver.cpp -text
 Bonmin/src/Algorithms/Branching/BonQpBranchingSolver.hpp -text
+Bonmin/src/Algorithms/Branching/BonRandomChoice.cpp -text
+Bonmin/src/Algorithms/Branching/BonRandomChoice.hpp -text
 Bonmin/src/Algorithms/Branching/Makefile.am -text
 Bonmin/src/Algorithms/Branching/Makefile.in -text
 Bonmin/src/Algorithms/Makefile.am -text

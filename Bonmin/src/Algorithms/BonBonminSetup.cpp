@@ -13,6 +13,7 @@
 #include "BonBonminSetup.hpp"
 #include "BonCurvBranchingSolver.hpp"
 #include "BonChooseVariable.hpp"
+#include "BonRandomChoice.hpp"
 #include "BonDiver.hpp"
 #include "BonQpBranchingSolver.hpp"
 #include "BonLpBranchingSolver.hpp"
@@ -319,34 +320,34 @@ namespace Bonmin
     bool val = options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
     if (!val) {
       options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
-      varSelection = OsiTMINLPInterface::NLP_STRONG_BRANCHING;
+      varSelection = NLP_STRONG_BRANCHING;
     }
 
     switch (varSelection) {
-    case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
-    case OsiTMINLPInterface::QP_STRONG_BRANCHING:
-    case OsiTMINLPInterface::LP_STRONG_BRANCHING:
-    case OsiTMINLPInterface::NLP_STRONG_BRANCHING: {
+    case CURVATURE_ESTIMATOR:
+    case QP_STRONG_BRANCHING:
+    case LP_STRONG_BRANCHING:
+    case NLP_STRONG_BRANCHING: {
         continuousSolver_->findIntegersAndSOS(false);
         setPriorities();
         addSos();
         SmartPtr<StrongBranchingSolver> strong_solver = NULL;
         BonChooseVariable * chooseVariable = new BonChooseVariable(*this, nonlinearSolver_);
         switch (varSelection) {
-        case OsiTMINLPInterface::CURVATURE_ESTIMATOR:
+        case CURVATURE_ESTIMATOR:
           strong_solver = new CurvBranchingSolver(nonlinearSolver_);
           chooseVariable->setTrustStrongForSolution(false);
           chooseVariable->setTrustStrongForBound(false);
           chooseVariable->setOnlyPseudoWhenTrusted(true);
           break;
-        case OsiTMINLPInterface::QP_STRONG_BRANCHING:
+        case QP_STRONG_BRANCHING:
           strong_solver = new QpBranchingSolver(nonlinearSolver_);
           // The bound returned from the QP can be wrong, since the
           // objective is not guaranteed to be an underestimator:
           chooseVariable->setTrustStrongForBound(false);
           chooseVariable->setOnlyPseudoWhenTrusted(true);
           break;
-        case OsiTMINLPInterface::LP_STRONG_BRANCHING:
+        case LP_STRONG_BRANCHING:
           strong_solver = new LpBranchingSolver(nonlinearSolver_);
           chooseVariable->setOnlyPseudoWhenTrusted(true);
           break;
@@ -355,18 +356,24 @@ namespace Bonmin
         branchingMethod_ = chooseVariable;
       }
       break;
-    case OsiTMINLPInterface::OSI_SIMPLE:
+    case OSI_SIMPLE:
       continuousSolver_->findIntegersAndSOS(false);
       setPriorities();
       addSos();
       branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
 
       break;
-    case OsiTMINLPInterface::OSI_STRONG:
+    case OSI_STRONG:
       continuousSolver_->findIntegersAndSOS(false);
       setPriorities();
       addSos();
       branchingMethod_ = new OsiChooseStrong(nonlinearSolver_);
+      break;
+    case RANDOM:
+      continuousSolver_->findIntegersAndSOS(false);
+      setPriorities();
+      addSos();
+      branchingMethod_ = new BonRandomChoice(nonlinearSolver_);
       break;
       //default:
       //abort();
@@ -420,7 +427,7 @@ namespace Bonmin
 
     int varSelection;
     options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
-    if (varSelection > OsiTMINLPInterface::RELIABILITY_BRANCHING) {
+    if (varSelection > RELIABILITY_BRANCHING) {
       std::cout<<"Variable selection stragey not available with oa branch-and-cut."<<std::endl;
     }
     /* Populate cut generation and heuristic procedures.*/

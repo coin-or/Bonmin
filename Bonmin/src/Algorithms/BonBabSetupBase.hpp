@@ -62,6 +62,20 @@ namespace Bonmin
     };
 
 
+    /** @name Enums for optionslist parameters */
+    enum VarSelectStra_Enum {
+      MOST_FRACTIONAL=0,
+      STRONG_BRANCHING,
+      RELIABILITY_BRANCHING,
+      CURVATURE_ESTIMATOR,
+      QP_STRONG_BRANCHING,
+      LP_STRONG_BRANCHING,
+      NLP_STRONG_BRANCHING,
+      OSI_SIMPLE,
+      OSI_STRONG,
+      RANDOM
+    };
+
     /** Parameters represented by an integer. */
     enum IntParameter{
       BabLogLevel = 0 /** Log level of main branch-and-bound*/,
