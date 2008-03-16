@@ -61,7 +61,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonbranching_la_LIBADD =
 am_libbonbranching_la_OBJECTS = BonChooseVariable.lo \
-	BonCurvBranchingSolver.lo BonPseudoCosts.lo \
+	BonRandomChoice.lo BonCurvBranchingSolver.lo BonPseudoCosts.lo \
 	BonLpBranchingSolver.lo BonQpBranchingSolver.lo
 libbonbranching_la_OBJECTS = $(am_libbonbranching_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -339,6 +339,7 @@ noinst_LTLIBRARIES = libbonbranching.la
 # List all source files, including headers
 libbonbranching_la_SOURCES = \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
+        BonRandomChoice.cpp BonRandomChoice.hpp \
 	BonCurvBranchingSolver.cpp BonCurvBranchingSolver.hpp \
         BonPseudoCosts.cpp BonPseudoCosts.hpp \
         BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
@@ -472,6 +473,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLpBranchingSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonPseudoCosts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQpBranchingSolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonRandomChoice.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

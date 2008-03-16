@@ -18,6 +18,7 @@ noinst_LTLIBRARIES = libbonbranching.la
 # List all source files, including headers
 libbonbranching_la_SOURCES = \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
+        BonRandomChoice.cpp BonRandomChoice.hpp \
 	BonCurvBranchingSolver.cpp BonCurvBranchingSolver.hpp \
         BonPseudoCosts.cpp BonPseudoCosts.hpp \
         BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
