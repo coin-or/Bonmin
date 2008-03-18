@@ -70,7 +70,7 @@ namespace Bonmin
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
         "Choice of the algorithm.",
-        "B-Hyb",
+        "B-BB",
         "B-BB","simple branch-and-bound algorithm,",
         "B-OA","OA Decomposition algorithm,",
         "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
