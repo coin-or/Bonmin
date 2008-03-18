@@ -21,8 +21,6 @@
 #include "getstub.h"
 #include "opcode.hd"
 
-#include <stdint.h>
-
 #define OBJ_DE    ((const ASL_fg *) asl) -> I.obj_de_
 #define VAR_E     ((const ASL_fg *) asl) -> I.var_e_
 #define CON_DE    ((const ASL_fg *) asl) -> I.con_de_
