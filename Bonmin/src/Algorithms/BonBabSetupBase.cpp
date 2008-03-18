@@ -257,10 +257,6 @@ namespace Bonmin
       intParam_[NumberStrong] = 0;
       options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
     }
-    else if (varSelection == STRONG_BRANCHING) {
-      intParam_[MinReliability] = 0;
-      options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
-    }
     else if (varSelection == RELIABILITY_BRANCHING) {
       intParam_[MinReliability] = 10;
       options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
