@@ -223,7 +223,7 @@ namespace Bonmin{
     }
 
     int varSelection;
-    if (!options_->GetEnumValue("varselect_stra",varSelection,"bonmin.")) {
+    if (!options_->GetEnumValue("variable_selection",varSelection,"bonmin.")) {
       // change the default for Couenne
       varSelection = OSI_SIMPLE;
     }
@@ -244,7 +244,7 @@ namespace Bonmin{
       branchingMethod_ = new CouenneChooseVariable (continuousSolver_, couenneProb);
       break;
     default:
-      std::cerr << "Unknown varselect_stra for Couenne\n" << std::endl;
+      std::cerr << "Unknown variable_selection for Couenne\n" << std::endl;
       throw;
       break;
     }

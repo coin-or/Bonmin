@@ -251,7 +251,7 @@ namespace Bonmin
     treeTraversalMethod_ = TreeTraversal(ival);
 
     int varSelection;
-    options->GetEnumValue("varselect_stra",varSelection,"bonmin.");
+    options->GetEnumValue("variable_selection",varSelection,"bonmin.");
     // Set branching strategy
     if (varSelection == MOST_FRACTIONAL) {
       intParam_[NumberStrong] = 0;
@@ -400,6 +400,7 @@ namespace Bonmin
         "Set the number of variables on which to do strong branching.");
     roptions->setOptionExtraInfo("number_strong_branch", 31);
 
+ 
     roptions->AddLowerBoundedIntegerOption
     ("number_before_trust",
      "Set the number of branches on a variable before its pseudo costs are to be believed "
@@ -427,7 +428,7 @@ namespace Bonmin
         "(only type 1 SOS are supported at the moment)");
     roptions->setOptionExtraInfo("sos_constraints", 11);
 
-    roptions->AddStringOption10("varselect_stra",
+    roptions->AddStringOption10("variable_selection",
         "Chooses variable selection strategy",
         "strong-branching",
         "most-fractional", "Choose most fractional variable",
@@ -441,7 +442,7 @@ namespace Bonmin
         "osi-strong", "Osi method to do strong branching",
         "random", "Method to choose branching variable randomly");
 
-    roptions->setOptionExtraInfo("varselect_stra", 15);
+    roptions->setOptionExtraInfo("variable_selection", 15);
 
     roptions->AddLowerBoundedIntegerOption("num_cut_passes",
         "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",

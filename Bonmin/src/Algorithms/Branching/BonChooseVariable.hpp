@@ -219,6 +219,18 @@ namespace Bonmin
 
     /** Stores strong branching results.*/
     vector<HotInfo> results_;
+
+    /** Determine status of strong branching solution.*/
+    int determineStatus(OsiSolverInterface * solver) const {
+      if (solver->isProvenOptimal())
+        return 0; // optimal
+      else if (solver->isIterationLimitReached()
+               &&!solver->isDualObjectiveLimitReached())
+        return 2; // unknown 
+      else
+        return 1; // infeasible
+    }
+
   private:
     /** Default Constructor, forbiden for some reason.*/
     BonChooseVariable ();
@@ -259,6 +271,8 @@ namespace Bonmin
     int minNumberStrongBranch_;
     /** Stores the pseudo costs. */
     OsiPseudoCosts pseudoCosts_;
+    /** Wether or not to trust strong branchiong results for updating pseudo costs.*/
+    int trustStrongForPseudoCosts_;
    
     //@}
 

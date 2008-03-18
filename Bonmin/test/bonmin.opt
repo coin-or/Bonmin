@@ -29,7 +29,7 @@ bonmin.solution_limit                       2147483647	#Abort after that much in
 bonmin.sos_constraints                      enable    	#Wether or not to activate SOS constraints.
 bonmin.time_limit                           1e+10     	#Set the global maximum computation time (in secs) for the algorithm.
 bonmin.tree_search_strategy                 top-node  	#Pick a strategy for traversing the tree
-bonmin.varselect_stra                       strong-branching	#Chooses variable selection strategy
+bonmin.variable_selection                       strong-branching	#Chooses variable selection strategy
 
 # registering category: Diving options
 

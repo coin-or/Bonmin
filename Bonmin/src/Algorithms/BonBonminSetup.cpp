@@ -317,9 +317,9 @@ namespace Bonmin
       options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
     }
     int varSelection;
-    bool val = options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
+    bool val = options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
     if (!val) {
-      options_->SetStringValue("varselect_stra", "nlp-strong-branching","bonmin.");
+      options_->SetStringValue("variable_selection", "nlp-strong-branching","bonmin.");
       varSelection = NLP_STRONG_BRANCHING;
     }
 
@@ -426,7 +426,7 @@ namespace Bonmin
 
 
     int varSelection;
-    options_->GetEnumValue("varselect_stra",varSelection,"bonmin.");
+    options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
     if (varSelection > RELIABILITY_BRANCHING) {
       std::cout<<"Variable selection stragey not available with oa branch-and-cut."<<std::endl;
     }

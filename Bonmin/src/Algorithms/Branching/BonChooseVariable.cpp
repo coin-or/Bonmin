@@ -32,6 +32,7 @@ namespace Bonmin
     options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
     options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
     options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
+    options->GetEnumValue("trust_strong_branching_for_pseudo_cost",trustStrongForPseudoCosts_ , "bonmin.");
     int sortCrit;
     options->GetEnumValue("candidate_sort_criterion", sortCrit, "bonmin.");
     sortCrit_ = (CandidateSortCriterion) sortCrit;
@@ -66,7 +67,8 @@ namespace Bonmin
       numberStrongRoot_(rhs.numberStrongRoot_),
       sortCrit_(rhs.sortCrit_),
       minNumberStrongBranch_(rhs.minNumberStrongBranch_),
-      pseudoCosts_(rhs.pseudoCosts_)
+      pseudoCosts_(rhs.pseudoCosts_),
+      trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_)
   {
     jnlst_ = rhs.jnlst_;
     bb_log_level_ = rhs.bb_log_level_;
@@ -90,6 +92,7 @@ namespace Bonmin
       sortCrit_ = rhs.sortCrit_;
       minNumberStrongBranch_ = rhs.minNumberStrongBranch_;
       pseudoCosts_ = rhs.pseudoCosts_;
+      trustStrongForPseudoCosts_ = rhs.trustStrongForPseudoCosts_;
       results_ = rhs.results_;
     }
     return *this;
@@ -140,6 +143,15 @@ namespace Bonmin
     roptions->AddLowerBoundedIntegerOption("min_number_strong_branch", "Sets minimum number of variables for strong branching (overriding trust)",
         0, 0,"");
     roptions->setOptionExtraInfo("min_number_strong_branch",31);
+    roptions->AddStringOption2("trust_strong_branching_for_pseudo_cost",
+                               "Wether or not to trust strong branching results for updating pseudo costs.",
+                               "yes",
+                               "no","",
+                               "yes","",
+                               ""
+                               );
+     roptions->setOptionExtraInfo("trust_strong_branching_for_pseudo_cost", 31);
+
   }
 
 
@@ -731,14 +743,14 @@ namespace Bonmin
       // can check if we got solution
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
       int status0 = result->updateInformation(thisSolver,info,this);
-      numberStrongIterations_ += thisSolver->getIterationCount();
       if (status0==3) {
         // new solution already saved
         if (trustStrongForSolution_) {
-  	info->cutoff_ = goodObjectiveValue_;
-  	status0=0;
+        info->cutoff_ = goodObjectiveValue_;
+        status0=0;
         }
       }
+      numberStrongIterations_ += thisSolver->getIterationCount();
       if (solver!=thisSolver)
         delete thisSolver;
       // Restore bounds
@@ -771,14 +783,14 @@ namespace Bonmin
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
       int status1 = result->updateInformation(thisSolver,info,this);
       numberStrongDone_++;
-      numberStrongIterations_ += thisSolver->getIterationCount();
       if (status1==3) {
         // new solution already saved
         if (trustStrongForSolution_) {
-  	info->cutoff_ = goodObjectiveValue_;
-  	status1=0;
+        info->cutoff_ = goodObjectiveValue_;
+        status1=0;
         }
       }
+      numberStrongIterations_ += thisSolver->getIterationCount();
       if (solver!=thisSolver)
         delete thisSolver;
       // Restore bounds
@@ -852,6 +864,7 @@ namespace Bonmin
   BonChooseVariable::updateInformation(const OsiBranchingInformation *info,
       int branch, OsiHotInfo * hotInfo)
   {
+    if(!trustStrongForPseudoCosts_) return;
     int index = hotInfo->whichObject();
     assert (index<solver_->numberObjects());
     const OsiObject * object = info->solver_->object(index);

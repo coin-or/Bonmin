@@ -786,7 +786,7 @@ namespace Bonmin
         AmplOptionsList::String_Option,
         "Choose the node selection strategy");
 
-    amplOptList->AddAmplOption("bonmin.varselect_stra","bonmin.varselect_stra",
+    amplOptList->AddAmplOption("bonmin.variable_selection","bonmin.variable_selection",
         AmplOptionsList::String_Option,
         "Choose the variable selection strategy");
 
