@@ -67,7 +67,10 @@ namespace Bonmin
   {
     lin_ = new OsiClpSolverInterface();
     tminlp_interface->extractLinearRelaxation(*lin_, true, false);
-    // ???lin_->setDblParam(OsiDualObjectiveLimit, info->cutoff_);
+    double cutoff = -DBL_MAX;
+    tminlp_interface->getDblParam(OsiDualObjectiveLimit, cutoff);
+    lin_->setDblParam(OsiDualObjectiveLimit, cutoff);
+    printf("Cutoff %g # ecp iteration %i\n",cutoff, maxCuttingPlaneIterations_);
     lin_->messageHandler()->setLogLevel(0);
     lin_->resolve();
     warm_ = lin_->getWarmStart();
@@ -181,7 +184,7 @@ namespace Bonmin
     roptions->AddLowerBoundedIntegerOption
     ("ecp_max_rounds_strong",
      "Set the maximal number of rounds of ECP cuts in strong branching.",
-     0,5,
+     0,0,
      "");
     roptions->setOptionExtraInfo("ecp_max_rounds_strong",15);
     roptions->AddLowerBoundedNumberOption
