@@ -135,17 +135,36 @@ uninstall-local:
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonBoundsReader.cppbak BonBoundsReader.hppbak \
-	BonColReader.cppbak BonColReader.hppbak \
-	BonStartPointReader.cppbak BonStartPointReader.hppbak \
-	BonOsiTMINLPInterface.cppbak BonOsiTMINLPInterface.hppbak \
-	BonTMINLP2TNLP.cppbak BonTMINLP2TNLP.hppbak \
-	BonTMINLP.cppbak BonTMINLP.hppbak \
-	BonTNLPSolver.hppbak BonTNLPSolver.cppbak \
-	BonTNLP2FPNLP.cppbak BonTNLP2FPNLP.hppbak \
-        BonAuxInfos.cppbak BonAuxInfos.hppbak \
-	BonBranchingTQP.cppbak BonBranchingTQP.hppbak \
-	BonStrongBranchingSolver.cppbak BonStrongBranchingSolver.hppbak
+	BonAuxInfos.cppbak \
+	BonAuxInfos.hppbak \
+	BonBoundsReader.cppbak \
+	BonBoundsReader.hppbak \
+	BonBranchingTQP.cppbak \
+	BonBranchingTQP.hppbak \
+	BonColReader.cppbak \
+	BonColReader.hppbak \
+	BonCurvatureEstimator.cppbak \
+	BonCurvatureEstimator.hppbak \
+	BonCutStrengthener.cppbak \
+	BonCutStrengthener.hppbak \
+	BonExitCodes.hppbak \
+	BonOsiTMINLPInterface.cppbak \
+	BonOsiTMINLPInterface.hppbak \
+	BonRegisteredOptions.cppbak \
+	BonRegisteredOptions.hppbak \
+	BonStartPointReader.cppbak \
+	BonStartPointReader.hppbak \
+	BonStrongBranchingSolver.cppbak \
+	BonStrongBranchingSolver.hppbak \
+	BonTMINLP2TNLP.cppbak \
+	BonTMINLP2TNLP.hppbak \
+	BonTMINLP.cppbak \
+	BonTMINLP.hppbak \
+	BonTNLP2FPNLP.cppbak \
+	BonTNLP2FPNLP.hppbak \
+	BonTNLPSolver.cppbak \
+	BonTNLPSolver.hppbak \
+	BonTypes.hppbak
 
 
 ASTYLE = @ASTYLE@

@@ -91,11 +91,13 @@ include_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonDummyHeuristic.cppbak BonDummyHeuristic.hppbak \
-	BonOACutGenerator.cppbak BonOACutGenerator.hppbak \
+	BonOaNlpOptim.cppbak BonOaNlpOptim.hppbak \
 	BonOACutGenerator2.cppbak BonOACutGenerator2.hppbak \
-        BonOaFeasChecker.hppbak BonOaFeasChecker.cppbak
-	BonOaMessages.cppbak BonOaMessages.hppbak BonEcpCuts.hppbak \
-        BonEcpCuts.cppbak
+        BonOaFeasChecker.cppbak BonOaFeasChecker.hppbak \
+	BonOaDecBase.cppbak BonOaDecBase.hppbak \
+        BonEcpCuts.cppbak BonEcpCuts.hppbak \
+        BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
+	BonOAMessages.cppbak BonOAMessages.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

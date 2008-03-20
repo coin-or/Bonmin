@@ -64,10 +64,16 @@ userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
 	cd $(top_srcdir)/doc && pdflatex BONMIN_UsersManual.tex
 
 astyle:
-	cd src/IpoptInterface; $(MAKE) astyle
-	cd src/CbcBonmin; $(MAKE) astyle
-	cd src/OaInterface; $(MAKE) astyle
+	cd src/Algorithms; $(MAKE) astyle
+	cd src/Algorithms/Ampl; $(MAKE) astyle
+	cd src/Algorithms/Branching; $(MAKE) astyle
+	cd src/Algorithms/OaGenerators; $(MAKE) astyle
 	cd src/Apps; $(MAKE) astyle
+	cd src/CbcBonmin; $(MAKE) astyle
+	cd src/Interfaces; $(MAKE) astyle
+	cd src/Interfaces/Ampl; $(MAKE) astyle
+	cd src/Interfaces/Filter; $(MAKE) astyle
+	cd src/Interfaces/Ipopt; $(MAKE) astyle
 
 ########################################################################
 #                         Maintainer Stuff                             #
