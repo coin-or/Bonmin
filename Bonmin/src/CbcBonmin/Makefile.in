@@ -441,9 +441,10 @@ include_HEADERS = \
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-	BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
+	BonCbc.cppbak BonCbc.hppbak \
 	BonCbcNlpStrategy.cppbak BonCbcNlpStrategy.hppbak \
-	BonCbcNode.cppbak BonCbcNode.hppbak  \
+	BonCbcNode.cppbak BonCbcNode.hppbak \
+        BonBabInfos.cppbak BonBabInfos.hppbak \
 	BonGuessHeuristic.cppbak BonGuessHeuristic.hppbak \
 	BonDiver.cppbak BonDiver.hppbak
 

@@ -407,7 +407,12 @@ include_HEADERS = \
 ########################################################################
 
 # Here repeat all source files, with "bak" appended
-ASTYLE_FILES = 
+ASTYLE_FILES = \
+               BonBabSetupBase.cppbak \
+               BonBabSetupBase.hppbak \
+               BonBonminSetup.cppbak \
+               BonBonminSetup.hppbak
+
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
 all: all-recursive
