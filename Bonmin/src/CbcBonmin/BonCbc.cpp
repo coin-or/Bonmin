@@ -223,7 +223,9 @@ namespace Bonmin
       {
         const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
         const int & numSos = sos->num;
-        printf("Adding %i sos constraints.\n", sos->num);
+       (*nlpSolver->messageHandler())<<"Adding "<<sos->num<<" sos constraints."
+                                     <<CoinMessageEol;
+
         CbcObject ** objects = new CbcObject*[numSos];
         const int * starts = sos->starts;
         const int * indices = sos->indices;
@@ -276,7 +278,6 @@ namespace Bonmin
         for (unsigned int i = 0 ; i < s.objects().size() ; i++) {
           objects[i] = dynamic_cast<CbcObject *> (s.objects()[i]);
           assert(objects[i]);
-          std::cout<<"Adding user CbcObject "<<i<<std::endl;
           objects[i]->setModel(&model_);
         }
         model_.addObjects(s.objects().size(), objects);
@@ -495,7 +496,8 @@ namespace Bonmin
       std::copy(bonBabInfoPtr->bestSolution2().begin(), bonBabInfoPtr->bestSolution2().end(),
           bestSolution_);
       bestObj_ = (bonBabInfoPtr->bestObj2());
-      printf("\nReal objective function: %.2f\n", bestObj_);
+       (*s.nonlinearSolver()->messageHandler())<<"\nReal objective function: "
+                                            <<bestObj_<<CoinMessageEol;
     }
     else if (model_.bestSolution()) {
       if (bestSolution_)

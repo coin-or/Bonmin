@@ -61,13 +61,6 @@ namespace Bonmin
 
       //Fix the variable which have to be fixed, after having saved the bounds
       double * colsol = const_cast<double *>(lp->getColSolution());
-#if 0
-      for (int i = 0 ; i < numcols ; i++) {
-        std::cerr<<"x["<<i<<"] = "<<colsol[i]<<"\t";
-      }
-      std::cerr<<std::endl;
-      lp->writeLp("toto");
-#endif
       info.solution_ = colsol;
       nlpManip.fixIntegers(info);
 

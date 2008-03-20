@@ -59,8 +59,7 @@ namespace Bonmin
       const CglTreeInfo info) const
   {
     if (nlp_ == NULL) {
-      std::cerr<<"Error in cut generator for outer approximation no ipopt NLP assigned"<<std::endl;
-      throw -1;
+      CoinError("Error in cut generator for outer approximation no ipopt NLP assigned", "generateCuts", "OaNlpOptim");
     }
 
     int numcols = nlp_->getNumCols();
@@ -105,19 +104,12 @@ namespace Bonmin
           char sign = (elements[k]>0.)?'+':'-';
           char type='<';
           if (rowLower[i]>-1e20) type='>';
-#ifdef OA_DEBUG
-          std::cout<<"Non zero with sign: "<<sign<<", type: "<<type<<std::endl;
-#endif
         }
       }
       if (nnzExists) {
         numberCuts--;
         continue;
       }
-#ifdef OA_DEBUG
-      else
-        std::cout<<"No nonzero element"<<std::endl;
-#endif
       int * indsCopy = CoinCopyOfArray(&indices[starts[i]], lengths[i]);
       double * elemsCopy = CoinCopyOfArray(&elements[starts[i]], lengths[i]);
       cuts[numberCuts] = new OsiRowCut(rowLower[i], rowUpper[i], lengths[i], lengths[i],
@@ -163,13 +155,9 @@ namespace Bonmin
       }
     }
     else if (nlp_->isAbandoned() || nlp_->isIterationLimitReached()) {
-      std::cerr<<"Unsolved NLP ... exit"<<std::endl;
-      //    nlp_->turnOnIpoptOutput();
-      nlp_->resolve();
-      throw -1;
+      throw CoinError("Unsolved NLP ... exit", "generateCuts", "OaNlpOptim");
     }
     else {
-      //   std::cout<<"Infeasible NLP => Infeasible node"<<std::endl;
       //       //Add an infeasibility local constraint
       //       CoinPackedVector v;
       //       double rhs = 1.;

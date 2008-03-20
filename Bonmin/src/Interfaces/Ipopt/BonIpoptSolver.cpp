@@ -236,7 +236,7 @@ namespace Bonmin
     case Ipopt::Solve_Succeeded:
       return solvedOptimal;
     case Ipopt::Search_Direction_Becomes_Too_Small:
-      std::cerr<<"Warning : need to verify that Search_Direction_Becomes_Too_Small is indeed Ok"<<std::endl;
+      return doesNotConverge;
     case Ipopt::Solved_To_Acceptable_Level:
       return solvedOptimalTol;
     case Ipopt::Infeasible_Problem_Detected:

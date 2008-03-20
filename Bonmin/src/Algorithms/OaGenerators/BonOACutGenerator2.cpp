@@ -236,7 +236,6 @@ namespace Bonmin
             parameters_.localSearchNodeLimit_);
 
         milpBound = subMip->lowBound();
-//     std::cout<<"MILP bound "<<milpBound<<std::endl;
 
         if (subMip->optimal())
           handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;

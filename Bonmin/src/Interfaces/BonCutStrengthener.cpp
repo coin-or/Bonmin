@@ -26,8 +26,7 @@ namespace Bonmin
 
     tnlp_solver_->options()->clear();
     if (!tnlp_solver_->Initialize("strength.opt")) {
-      std::cerr<<"CutStrengthener: Error during initialization of tnlp_solver_"<<std::endl;
-      throw -1;
+      throw CoinError("CutStrengthener","CutStrengthener","Error during initialization of tnlp_solver_");
     }
     tnlp_solver_->options()->SetStringValue("hessian_approximation","limited-memory");
     tnlp_solver_->options()->SetStringValue("mu_strategy", "adaptive");

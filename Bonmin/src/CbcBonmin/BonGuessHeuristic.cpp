@@ -27,7 +27,7 @@ namespace Bonmin
     const BonChooseVariable* chooseMethod = dynamic_cast<BonChooseVariable*>(model_->branchingMethod()->chooseMethod());
 
     if (!chooseMethod) {
-      std::cerr << "Can't get pseudo costs!!!\n";
+      (*model_->messageHandler()) << "Can't get pseudo costs!!!\n";
       solutionValue = model_->getCurrentMinimizationObjValue();
       return -1;
     }

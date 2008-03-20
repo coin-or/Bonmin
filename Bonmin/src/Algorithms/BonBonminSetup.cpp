@@ -333,6 +333,7 @@ namespace Bonmin
         addSos();
         SmartPtr<StrongBranchingSolver> strong_solver = NULL;
         BonChooseVariable * chooseVariable = new BonChooseVariable(*this, nonlinearSolver_);
+        chooseVariable->passInMessageHandler(nonlinearSolver_->messageHandler());
         switch (varSelection) {
         case CURVATURE_ESTIMATOR:
           strong_solver = new CurvBranchingSolver(nonlinearSolver_);

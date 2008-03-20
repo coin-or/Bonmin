@@ -399,8 +399,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
 #endif
   }
   if (!app_->Initialize("")) {
-    std::cerr<<"OsiTMINLPInterface: Error during initialization of app_"<<std::endl;
-    throw -1;
+    throw CoinError("Error during initialization of app_","createApplication", "OsiTMINLPInterface");
   }
   extractInterfaceParams();
   
@@ -429,8 +428,7 @@ OsiTMINLPInterface::readOptionFile(const std::string & fileName)
       is.open(fileName.c_str());
     }
     catch(std::bad_alloc) {
-      std::cerr<<"Not enough memory to open option file.\n";
-      throw -1;
+      throw CoinError("Not enough memory to open option file.\n", "readOptionFile", "OsiTMINLPInterface");
     }
   }
   options()->ReadFromStream(*app_->journalist(), is);
@@ -1082,7 +1080,7 @@ OsiTMINLPInterface::getRowPrice() const
 const double *
 OsiTMINLPInterface::getReducedCost() const
 {
-  std::cerr<<"WARNING : trying to access reduced cost in Ipopt always retrun 0"<<std::endl;
+  (*handler_)<<"WARNING : trying to access reduced cost in Ipopt always retrun 0"<<CoinMessageEol;
   if(reducedCosts_==NULL) {
     reducedCosts_ = new double [getNumCols()];
     CoinFillN(reducedCosts_,getNumCols(),0.);
@@ -1342,7 +1340,7 @@ OsiTMINLPInterface::setIntParam(OsiIntParam key, int value)
     break;
   default:
     retval = false;
-    std::cerr << "Unhandled case in setIntParam\n";
+    (*handler_)<< "Unhandled case in setIntParam\n"<<CoinMessageEol;
     break;
   }
   return retval;
@@ -1362,15 +1360,15 @@ OsiTMINLPInterface::setDblParam(OsiDblParam key, double value)
     retval = true;
     break;
   case OsiPrimalObjectiveLimit:
-    std::cerr<<"Can not set primal objective limit parameter"<<std::endl;
+    (*handler_)<<"Can not set primal objective limit parameter"<<CoinMessageEol;
     retval = false;
     break;
   case OsiDualTolerance:
-    std::cerr<<"Can not set dual tolerance parameter"<<std::endl;
+    (*handler_)<<"Can not set dual tolerance parameter"<<CoinMessageEol;
     retval = false;
     break;
   case OsiPrimalTolerance:
-    std::cerr<<"Can not set primal tolerance parameter"<<std::endl;
+    (*handler_)<<"Can not set primal tolerance parameter"<<CoinMessageEol;
     retval = false;
   case OsiObjOffset:
     retval = OsiSolverInterface::setDblParam(key,value);
@@ -1380,7 +1378,7 @@ OsiTMINLPInterface::setDblParam(OsiDblParam key, double value)
     break;
   default:
     retval = false;
-    std::cerr << "Unhandled case in setDblParam\n";
+    (*handler_) << "Unhandled case in setDblParam"<<CoinMessageEol;
     break;
   }
   return retval;
@@ -1428,7 +1426,7 @@ OsiTMINLPInterface::getIntParam(OsiIntParam key, int& value) const
     break;
   default:
     retval = false;
-    std::cerr << "Unhandled case in setIntParam\n";
+    (*handler_) << "Unhandled case in setIntParam"<<CoinMessageEol;
   }
   return retval;
 }
@@ -1533,8 +1531,6 @@ OsiTMINLPInterface::randomStartingPoint()
       const double interval = upper - lower;
       sol[i]  = lower + CoinDrand48()*(interval);
     }
-    //printf("%f in [%f,%f]\n",sol[i],lower,upper);
-    //  std::cout<<interval<<"\t";
   }
   app_->disableWarmStart();
   setColSolution(sol);
@@ -1706,7 +1702,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       {
         row2cutIdx[rowIdx] = -1;
 #ifdef NDEBUG
-        std::cerr<<"non binding constraint"<<std::endl;
+        (*handler_)<<"non binding constraint"<<CoinMessageEol;
 #endif
         continue;
       }
@@ -1857,7 +1853,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 					 ub[nNonLinear_], -infty, 0.,
 					 n, x, infty);
 	if (!retval) {
-	  std::cerr << "error in cutStrengthener_->ComputeCuts\n";
+    (*handler_)<< "error in cutStrengthener_->ComputeCuts"<<CoinMessageEol;
 	  //exit(-2);
 	}
       }
@@ -2534,13 +2530,13 @@ bool OsiTMINLPInterface::isProvenDualInfeasible() const
 /// Is the given primal objective limit reached?
 bool OsiTMINLPInterface::isPrimalObjectiveLimitReached() const
 {
-  std::cerr<<"Warning : isPrimalObjectiveLimitReached not implemented yet"<<std::endl;
+  (*handler_)<<"Warning : isPrimalObjectiveLimitReached not implemented yet"<<CoinMessageEol;
   return 0;
 }
 /// Is the given dual objective limit reached?
 bool OsiTMINLPInterface::isDualObjectiveLimitReached() const
 {
-  //  std::cerr<<"Warning : isDualObjectiveLimitReached not implemented yet"<<std::endl;
+  //  (*messageHandler_)<<"Warning : isDualObjectiveLimitReached not implemented yet"<<CoinMessageEol;
   return (optimizationStatus_==TNLPSolver::unbounded);
 
 }

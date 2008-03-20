@@ -304,7 +304,7 @@ namespace Bonmin
 			 Index i, Number& gi)
     {
       std::cerr << "Method eval_gi not overloaded from TMINLP\n";
-      return false;
+      throw -1;
     }
     /** Compute the structure or values of the gradient for one
      *  constraint. The constraint * number is i (starting counting
@@ -314,7 +314,7 @@ namespace Bonmin
 			      Number* values)
     {
       std::cerr << "Method eval_grad_gi not overloaded from TMINLP\n";
-      return false;
+      throw -1;
     }
     //@}
 

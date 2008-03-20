@@ -9,6 +9,7 @@
 #include "BonChooseVariable.hpp"
 #include "CoinTime.hpp"
 #include "IpBlas.hpp"
+#include "BonMsgUtils.hpp"
 
 // This couples Cbc code into Bonmin code...
 #include "CbcModel.hpp"
@@ -16,6 +17,27 @@
 namespace Bonmin
 {
 
+  BonChooseVariable::Messages::Messages():
+      CoinMessages((int) BON_CHOOSE_MESSAGES_DUMMY_END)
+  {
+    strcpy(source_,"BON");
+    ADD_MSG(PS_COST_HISTORY,std_m,4,"%3d up %3d  %15.8e  down %3d  %15.8e\n");
+    ADD_MSG(PS_COST_MULT,std_m, 4, "upMultiplier = %e downMultiplier = %e\n");
+    ADD_MSG(PS_COST_ESTIMATES, std_m, 4, "%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n");
+    ADD_MSG(CANDIDATE_LIST,std_m,4,
+        "list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e \n");
+    ADD_MSG(CANDIDATE_LIST2, std_m, 4,
+        "list_[%3d] = %3d useful_[%3d] = %e\n");
+    ADD_MSG(CANDIDATE_LIST3, std_m, 4,
+        "list2[%3d] = %3d useful2[%3d] = %e\n");
+    ADD_MSG(SB_HEADER, std_m,4,
+        "           DownStat    DownChange     UpStat      UpChange\n");
+    ADD_MSG(SB_RES, std_m, 4,
+        "    %3d    %6s    %13.6e   %6s    %13.6e\n");
+    ADD_MSG(BRANCH_VAR, std_m, 5, "Branched on variable %i, bestWhichWay: %i\n");
+    ADD_MSG(CHOSEN_VAR, std_m, 4,"           Choosing %d\n");
+    ADD_MSG(UPDATE_PS_COST, std_m, 5,"update %3d %3d %e %e %3d\n");
+  }
   const std::string BonChooseVariable::CNAME = "BonChooseVariable";
 
   BonChooseVariable::BonChooseVariable(BabSetupBase &b, const OsiSolverInterface* solver):
@@ -27,6 +49,8 @@ namespace Bonmin
   {
     jnlst_ = b.journalist();
     SmartPtr<OptionsList> options = b.options();
+
+    handler_ = new CoinMessageHandler;
 
     options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
     options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
@@ -71,6 +95,7 @@ namespace Bonmin
       trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_)
   {
     jnlst_ = rhs.jnlst_;
+    handler_ = rhs.handler_->clone();
     bb_log_level_ = rhs.bb_log_level_;
     DBG_ASSERT(IsValid(jnlst_));
   }
@@ -80,6 +105,8 @@ namespace Bonmin
   {
     if (this != &rhs) {
       OsiChooseVariable::operator=(rhs);
+      delete handler_;
+      handler_ = rhs.handler_->clone();
       jnlst_ = rhs.jnlst_;
       bb_log_level_ = rhs.bb_log_level_;
       cbc_model_ = rhs.cbc_model_;
@@ -105,7 +132,9 @@ namespace Bonmin
   }
 
   BonChooseVariable::~BonChooseVariable ()
-  {}
+  {
+    delete handler_;
+  }
 
   void
   BonChooseVariable::registerOptions(
@@ -171,16 +200,15 @@ namespace Bonmin
       numberUp += upNumber[i];
       sumDown += downTotalChange[i];
       numberDown += downNumber[i];
-      if (bb_log_level_>4) {
-        printf("%3d up %3d  %15.8e  down %3d  %15.8e\n",i, upNumber[i], upTotalChange[i], downNumber[i], downTotalChange[i]);
-      }
+      message(PS_COST_HISTORY)
+      <<i<< upNumber[i]<< upTotalChange[i]
+      << downNumber[i]<< downTotalChange[i]<<CoinMessageEol;
     }
     upMult=(1.0+sumUp)/(1.0+numberUp);
     downMult=(1.0+sumDown)/(1.0+numberDown);
 
-    if (bb_log_level_>4) {
-      printf("upMultiplier = %e downMultiplier = %e\n", upMult, downMult);
-    }
+    message(PS_COST_MULT)
+    <<upMult<< downMult<<CoinMessageEol;
   }
 
   double
@@ -219,9 +247,8 @@ namespace Bonmin
           numberDown < numberBeforeTrustedList_) {
         value2 = value;
       }
-      if (bb_log_level_>4) {
-        printf("%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n", i,useful,upEst,downEst,value,value2);
-      }
+      message(PS_COST_ESTIMATES)
+      <<i<< useful<< upEst<< downEst<< value<< value2<< CoinMessageEol;
       return useful;
     }
     else if (sortCrit_ >= DecrInfeas && sortCrit_ <= IncrInfeas) {//Just return infeasibility
@@ -412,7 +439,9 @@ namespace Bonmin
 #if 0
     for (int i=0; i<maximumStrong; i++) {
       int way;
-      printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e \n", i,list_[i],i,useful_[i],object[list_[i]]->infeasibility(info,way));
+      message(CANDIDATE_LIST)<<i
+      <<list_[i]<<i<<useful_[i]<<object[list_[i]]->infeasibility(info,way)
+      <<CoinMessageEol;
     }
 #endif
     // Get list
@@ -426,9 +455,9 @@ namespace Bonmin
             useful_[numberOnList_++]=-useful_[i];
           }
           else useful_[numberOnList_++] = useful_[i];
-          if (bb_log_level_>4) {
-            printf("list_[%3d] = %3d useful_[%3d] = %e\n",numberOnList_-1,list_[numberOnList_-1],numberOnList_-1,useful_[numberOnList_-1]);
-          }
+          message(CANDIDATE_LIST2)<<numberOnList_-1
+          <<list_[numberOnList_-1]<<numberOnList_-1<<useful_[numberOnList_-1]
+          <<CoinMessageEol;
         }
       }
       if (numberOnList_) {
@@ -441,9 +470,9 @@ namespace Bonmin
             if (list2[i]>=0) {
               list2[number_not_trusted_] = list2[i];
               useful2[number_not_trusted_++] = useful2[i];
-              if (bb_log_level_>4) {
-                printf("list2[%3d] = %3d useful2[%3d] = %e\n",number_not_trusted_-1,list2[number_not_trusted_-1],number_not_trusted_-1,useful2[number_not_trusted_-1]);
-              }
+              message(CANDIDATE_LIST3)<<number_not_trusted_-1
+              <<list2[number_not_trusted_-1]<<number_not_trusted_-1
+              <<useful2[number_not_trusted_-1]<<CoinMessageEol;
             }
           }
           if (number_not_trusted_) {
@@ -496,7 +525,9 @@ namespace Bonmin
     if (bb_log_level_>3) {
       //for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
       for (int i=0; i<numberOnList_; i++)
-        printf("list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e \n", i,list_[i],i,useful_[i],object[list_[i]]->infeasibility(info,way));
+        message(CANDIDATE_LIST)<<i<< list_[i]<< i<< useful_[i]
+        <<object[list_[i]]->infeasibility(info,way)
+        <<CoinMessageEol;
     }
     return numberUnsatisfied_;
 
@@ -520,11 +551,6 @@ namespace Bonmin
     OsiBranchingInformation *info,
     bool fixVariables)
   {
-#if 0
-    printf("in BonChooseVariable::chooseVariable, numberStrong_ = %i, numberUnsatisfied = %i\n",
-            numberStrong_, numberUnsatisfied_);
-    printf("fixVariables = %i\n", fixVariables);
-#endif
     // We assume here that chooseVariable is called once at the very
     // beginning with fixVariables set to true.  This is then the root
     // node.
@@ -577,16 +603,15 @@ namespace Bonmin
       if (results_.size() > 0) {
         returnCode = doStrongBranching(solver, info, results_.size(), 1);
         if (bb_log_level_>=3) {
-          const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"
-                                   };
-          printf("BON0001I           DownStat    DownChange     UpStat      UpChange\n");
-          for (unsigned int i = 0; i<results_.size(); i++) {
+          const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"};
+          message(SB_HEADER)<<CoinMessageEol;
+          for (int i = 0; i< results_.size(); i++) {
             double up_change = results_[i].upChange();
             double down_change = results_[i].downChange();
             int up_status = results_[i].upStatus();
             int down_status = results_[i].downStatus();
-            printf("BON0002I    %3d    %6s    %13.6e   %6s    %13.6e\n",
-                i, stat_msg[down_status+1], down_change, stat_msg[up_status+1], up_change);
+            message(SB_RES)<<i<<stat_msg[down_status+1]<<down_change
+            <<stat_msg[up_status+1]<< up_change<< CoinMessageEol;
           }
         }
         if (returnCode>=0&&returnCode<=2) {
@@ -672,10 +697,10 @@ namespace Bonmin
       if ( bestObjectIndex_ >=0 ) {
         OsiObject * obj = solver->objects()[bestObjectIndex_];
         obj->setWhichWay(	bestWhichWay_);
+        message(BRANCH_VAR)<<obj->columnNumber()<< bestWhichWay_
+        <<CoinMessageEol;
       }
-      if (bb_log_level_>4) {
-        printf("           Choosing %d\n", bestObjectIndex_);
-      }
+      message(CHOSEN_VAR)<<bestObjectIndex_<<CoinMessageEol;
       if (numberFixed==numberUnsatisfied_&&numberFixed)
         returnCode=4;
       return returnCode;
@@ -924,7 +949,10 @@ BonChooseVariable::updateInformation( int index, int branch,
   double* downTotalChange = pseudoCosts_.downTotalChange(); 
   int* upNumber = pseudoCosts_.upNumber(); 
   int* downNumber = pseudoCosts_.downNumber(); 
-  //printf("update %3d %3d %e %e %3d\n",index, branch, changeInObjective,changeInValue,status); 
+    message(UPDATE_PS_COST)<<index<< branch
+    <<changeInObjective<<changeInValue<<status
+    <<CoinMessageEol;
+
   if (branch) { 
     if (status!=1) { 
       assert (status>=0); 

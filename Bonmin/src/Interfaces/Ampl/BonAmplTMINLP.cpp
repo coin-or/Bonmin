@@ -316,7 +316,7 @@ namespace Bonmin
       }
       constraintsConvexities_ = new TMINLP::Convexity[n_con];
       if (id == NULL) {
-        std::cout<<"Incorrect suffixes description in ampl model. id's are not declared "<<std::endl;
+        std::cerr<<"Incorrect suffixes description in ampl model. id's are not declared "<<std::endl;
         exit(ERROR_IN_AMPL_SUFFIXES);
       }
       int numberSimpleConcave = 0;
@@ -471,7 +471,6 @@ namespace Bonmin
       var_types[i] = INTEGER;
       totalNumberOfNonContinuous++;
     }
-    //    std::cout<<"Number of integer and binaries : "<<totalNumberOfNonContinuous<<std::endl;
     return true;
   }
 

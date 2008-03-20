@@ -13,6 +13,7 @@
 
 #include "IpRegOptions.hpp"
 #include "IpException.hpp"
+#include "CoinError.hpp"
 #include "IpTypes.hpp"
 #include <iostream>
 namespace Bonmin {
@@ -56,9 +57,7 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
      if(!IsValid(GetOption(option))){
        std::string msg = "Try to access option: "+option;
        msg += "\n Option is not registered.\n";
-       std::cerr<<msg<<std::endl;
-       throw -1;
-    //   THROW_EXCEPTION(OPTION_NOT_REGISTERED, msg);
+       throw CoinError("Bonmin::RegisteredOption","optionExists",msg);
      }
    }
 
