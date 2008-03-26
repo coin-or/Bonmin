@@ -13,6 +13,7 @@
 #include "BonCouenneInterface.hpp"
 
 #include "CouenneObject.hpp"
+#include "CouenneVarObject.hpp"
 #include "CouenneChooseVariable.hpp"
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
@@ -61,8 +62,10 @@ namespace Bonmin{
     /* Get the basic options. */
     readOptionsFile();
     
-    /** Change default value for failure behavior so that code doesn't crash when Ipopt does not solve a sub-problem.*/
-    options_->SetStringValue("nlp_failure_behavior","fathom","bonmin.");
+    /** Change default value for failure behavior so that code doesn't crash 
+	when Ipopt does not solve a sub-problem.*/
+
+    options_->SetStringValue("nlp_failure_behavior", "fathom", "bonmin.");
 
     gatherParametersValues(options_);
 
@@ -139,23 +142,13 @@ namespace Bonmin{
 
     continuousSolver_->findIntegersAndSOS(false);
 
-    // add CouenneObjects for branching /////////////////////////////////////////////
+    // add CouenneVarObjects for branching /////////////////////////////////////////////
 
     {
       int nAuxs = 0, nobj = 0,
 	  nVars = couenneProb -> nVars ();
 
-      // Count # auxiliary variables
-
-      for (int i = 0; i < nVars; i++) { // for each aux variable
-
-	exprVar *var = couenneProb -> Var (i);
-
-        // if this variable is associated with a nonlinear function
-	if ((var -> Type () == AUX) && 
-	    (var -> Image () -> Linearity () > LINEAR)) 
-	  nAuxs++;
-      }
+      nAuxs = couenneProb -> nVars ();
 
       OsiObject ** objects = new OsiObject* [nAuxs];
 
@@ -163,28 +156,33 @@ namespace Bonmin{
 
 	exprVar *var = couenneProb -> Var (i);
 
+#if 0
         // if this variable is associated with a nonlinear function
 	if ((var -> Type  () == AUX) && 
 	    (var -> Image () -> Linearity () > LINEAR) &&
 	    (var -> Multiplicity () > 0)) {
 
-	  exprAux *aux = dynamic_cast <exprAux *> (var);
-
-	  /*printf ("creating CouenneObject for ");
-	  aux ->             print (std::cout); printf (" := ");
-	  aux -> Image () -> print (std::cout); printf ("\n");*/
-
-	  // then we may have to branch on it
-	  objects [nobj] = new CouenneObject (aux, this, journalist());
+	  objects [nobj] = new CouenneObject (var, this, journalist());
 	  objects [nobj++] -> setPriority (1);
 	}
+#else
+        // branching objects on variables
+	if (// comment three lines below for linear variables too
+	    ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) || // has indep
+	     ((var -> Type () == AUX) &&                      // or, aux 
+	      (var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
+	    (var -> Multiplicity () > 0)) {
+
+	  objects [nobj] = new CouenneVarObject (var, couenneProb, this, journalist ());
+	  objects [nobj++] -> setPriority (1);
+	}
+#endif
       }
 
       continuousSolver_ -> addObjects (nobj, objects);
 
-      for(int i = 0 ; i < nobj ; i++){
+      for (int i = 0 ; i < nobj ; i++)
        	delete objects[i];
-      }
 
       delete [] objects;
     }

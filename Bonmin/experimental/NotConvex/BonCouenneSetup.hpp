@@ -60,6 +60,10 @@ public:
       if(readOptions_) return;
       BabSetupBase::readOptionsFile("couenne.opt");}
 
+    /// return pointer to cut generator (used to get pointer to problem)
+    CouenneCutGenerator *couennePtr () const
+    {return CouennePtr_;}
+
 private:
       SmartPtr<SmartAsl> aslfg_;
 
@@ -69,7 +73,6 @@ private:
     /// Optimality-based bound tightening).
     CouenneCutGenerator *CouennePtr_;
   };
-  
 }
 
 #endif

@@ -53,18 +53,11 @@ int main (int argc, char *argv[])
     bb.model().setProblemFeasibility (feasibility);
 #endif
 
+    bb.setUsingCouenne (true);
+
     //////////////////////////////////
 
     bb (bonmin); // do branch and bound
-
-    //    double opt_x0 = bb.model () . bestSolution () [0];
-
-    /*    printf ("#m=1,S=0 # brtest\n\
-%10g %10g # brtest\n\
-%10g %10g # brtest\n\
- # brtest\n\
-#m=-1,S=0 # brtest\n\
-# brtest\n", opt_x0, log (opt_x0) - 1, opt_x0, log (opt_x0) + 1);*/
 
     //////////////////////////////////
 

@@ -200,7 +200,7 @@ namespace Bonmin{
 
     bool foundSolution = false;
 
-    if (!skipOnInfeasibility) { // if true, the integral neighbourhood
+    if (!skipOnInfeasibility) { // otherwise, the integral neighbourhood
 				// of our fractional point is infeasible.
 
       for (int i = couenne_ -> nOrig (); i--;) 
