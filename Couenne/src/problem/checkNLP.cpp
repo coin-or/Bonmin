@@ -29,7 +29,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) {
   CoinCopyN (solution, nOrig_, sol);
 
   // install NL solution candidate in evaluation structure
-  domain_.push (nVars (), sol, domain_.lb (), domain_.ub ());
+  domain_.push (nVars (), sol, domain_.lb (), domain_.ub (), false);
 
   /*printf ("checknlp: %d vars -------------------\n", domain_.current () -> Dimension ());
   for (int i=0; i<domain_.current () -> Dimension (); i++)

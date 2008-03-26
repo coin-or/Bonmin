@@ -13,15 +13,18 @@
 
 /// constructor
 DomainPoint::DomainPoint (int dim, 
-			  const CouNumber *x, 
-			  const CouNumber *lb, 
-			  const CouNumber *ub):
+			  CouNumber *x, 
+			  CouNumber *lb, 
+			  CouNumber *ub,
+			  bool copy):
   dimension_ (dim),
-  x_  (NULL),
-  lb_ (NULL),
-  ub_ (NULL) {
+  x_         (x),
+  lb_        (lb),
+  ub_        (ub),
+  copied_    (copy) {
 
-  if (dim > 0) {
+  if ((dimension_ > 0) && copied_) {
+
     x_  = (CouNumber *) malloc (dim * sizeof (CouNumber)); 
     lb_ = (CouNumber *) malloc (dim * sizeof (CouNumber)); 
     ub_ = (CouNumber *) malloc (dim * sizeof (CouNumber)); 
@@ -29,41 +32,61 @@ DomainPoint::DomainPoint (int dim,
     if (x)  CoinCopyN (x,  dim, x_);  else CoinFillN (x_,  dim, 0.);
     if (lb) CoinCopyN (lb, dim, lb_); else CoinFillN (lb_, dim, -COUENNE_INFINITY);
     if (ub) CoinCopyN (ub, dim, ub_); else CoinFillN (ub_, dim,  COUENNE_INFINITY);
+  }
+}
 
-    /*for (register int i = dim; i--;) {
-      x_  [i] = x  ? x  [i] : 0.;
-      lb_ [i] = lb ? lb [i] : -COUENNE_INFINITY;
-      ub_ [i] = ub ? ub [i] :  COUENNE_INFINITY;
-      }*/
+
+/// constructor
+DomainPoint::DomainPoint (int dim, 
+			  const CouNumber *x, 
+			  const CouNumber *lb, 
+			  const CouNumber *ub):
+  dimension_ (dim),
+  x_         (NULL),
+  lb_        (NULL),
+  ub_        (NULL),
+  copied_    (true) {
+
+  if (dimension_ > 0) {
+
+    x_  = (CouNumber *) malloc (dim * sizeof (CouNumber)); 
+    lb_ = (CouNumber *) malloc (dim * sizeof (CouNumber)); 
+    ub_ = (CouNumber *) malloc (dim * sizeof (CouNumber)); 
+
+    if (x)  CoinCopyN (x,  dim, x_);  else CoinFillN (x_,  dim, 0.);
+    if (lb) CoinCopyN (lb, dim, lb_); else CoinFillN (lb_, dim, -COUENNE_INFINITY);
+    if (ub) CoinCopyN (ub, dim, ub_); else CoinFillN (ub_, dim,  COUENNE_INFINITY);
   }
 }
 
 
 /// copy constructor
-DomainPoint::DomainPoint (const DomainPoint &src) {
+DomainPoint::DomainPoint (const DomainPoint &src):
+  dimension_ (src.dimension_),
+  x_         (src.x_),
+  lb_        (src.lb_),
+  ub_        (src.ub_),
+  copied_    (src.copied_) {
 
-  if (src.dimension_) {
-    x_  = (CouNumber *) malloc (src.dimension_ * sizeof (CouNumber));
-    lb_ = (CouNumber *) malloc (src.dimension_ * sizeof (CouNumber));
-    ub_ = (CouNumber *) malloc (src.dimension_ * sizeof (CouNumber));
+  if ((dimension_ > 0) && copied_) {
+
+    x_  = (CouNumber *) malloc (dimension_ * sizeof (CouNumber));
+    lb_ = (CouNumber *) malloc (dimension_ * sizeof (CouNumber));
+    ub_ = (CouNumber *) malloc (dimension_ * sizeof (CouNumber));
+
+    CoinCopyN (src.x_,  dimension_, x_);
+    CoinCopyN (src.lb_, dimension_, lb_);
+    CoinCopyN (src.ub_, dimension_, ub_);
   }
-
-  dimension_ = src.dimension_;
-
-  CoinCopyN (src.x_,  dimension_, x_);
-  CoinCopyN (src.lb_, dimension_, lb_);
-  CoinCopyN (src.ub_, dimension_, ub_);
-
-  /*for (int i = dimension_; i--;) {
-    x_  [i] = src.x_  [i];
-    lb_ [i] = src.lb_ [i];
-    ub_ [i] = src.ub_ [i];
-    }*/
 }
 
 
 /// resize domain point (for extending into higher space)
 void DomainPoint::resize (int newdim) {
+
+  if (newdim == dimension_) return;
+
+  assert (copied_); // cannot resize domain point as it was not copied
 
   if (newdim==0) {
 
@@ -83,7 +106,9 @@ void DomainPoint::resize (int newdim) {
 
 
 /// assignment operator
-DomainPoint &DomainPoint::operator= (DomainPoint &src) {
+DomainPoint &DomainPoint::operator= (const DomainPoint &src) {
+
+  copied_ = src.copied_;
 
   if (src.dimension_ != dimension_) {
     if (x_)  free (x_);  x_  = (CouNumber *) malloc (src.dimension_ * sizeof (CouNumber));
@@ -95,12 +120,6 @@ DomainPoint &DomainPoint::operator= (DomainPoint &src) {
   CoinCopyN (src.x_,  dimension_, x_);
   CoinCopyN (src.lb_, dimension_, lb_);
   CoinCopyN (src.ub_, dimension_, ub_);
-
-  /*for (int i=dimension_; i--;) {
-    x_  [i] = src.x_  [i];
-    lb_ [i] = src.lb_ [i];
-    ub_ [i] = src.ub_ [i];
-    }*/
 
   return *this;
 }
@@ -120,7 +139,7 @@ Domain::~Domain () {
 
 
 /// save current point and start using another
-void Domain::push (int dim, CouNumber *x, CouNumber *lb, CouNumber *ub) {
+void Domain::push (int dim, CouNumber *x, CouNumber *lb, CouNumber *ub, bool copy) {
 
   if (!x)  x  = point_ -> x  ();
   if (!lb) lb = point_ -> lb ();
@@ -128,12 +147,15 @@ void Domain::push (int dim, CouNumber *x, CouNumber *lb, CouNumber *ub) {
 
   if (point_) 
     domStack_.push (point_);
-  point_ = new DomainPoint (dim, x, lb, ub);
+  point_ = new DomainPoint (dim, x, lb, ub, copy);
 }
 
 
 /// save current point and start using another
-void Domain::push (int dim, const CouNumber *x, const CouNumber *lb, const CouNumber *ub) {
+void Domain::push (int dim, 
+		   const CouNumber *x, 
+		   const CouNumber *lb, 
+		   const CouNumber *ub) {
 
   if (point_) 
     domStack_.push (point_);
@@ -142,7 +164,7 @@ void Domain::push (int dim, const CouNumber *x, const CouNumber *lb, const CouNu
 
 
 /// save current point and start using another
-void Domain::push (const DomainPoint &dp) {
+void Domain::push (const DomainPoint &dp, bool copy) {
 
   if (point_)
     domStack_.push (point_);

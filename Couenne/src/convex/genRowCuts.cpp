@@ -21,6 +21,8 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 				      t_chg_bounds *chg,
 				      bool have_NLP) const {
 
+  // TODO: pass have_NLP to all
+
   // For each auxiliary variable, create convexification cut (or set
   // of cuts) and add it to cs
 
@@ -79,7 +81,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
       /*if (   (image -> Linearity () > LINEAR)    // 1) expression is non linear
 	&& (image -> dependsOn (changed, nchanged) // 2) it depends on changed variables
 	|| have_NLP
-	|| info.pass > 0)) 
+	|| info.pass > 0)) {
       */
 
       exprVar *var = problem_ -> Var (problem_ -> evalOrder (i));

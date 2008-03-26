@@ -36,9 +36,6 @@ expression *getFixVarBinFun (expression *arg0, expression *arg1) {
     l0 = point -> lb (index0), l1 = point -> lb (index1), 
     u0 = point -> ub (index0), u1 = point -> ub (index1), 
     x0 = point -> x  (index0), x1 = point -> x (index1), 
-    //l0 = expression::Lbound   (index0), l1 = expression::Lbound   (index1), 
-    //u0 = expression::Ubound   (index0), u1 = expression::Ubound   (index1),
-    //x0 = expression::Variable (index0), x1 = expression::Variable (index1),
 
     delta0 = u0-l0, 
     delta1 = u1-l1;

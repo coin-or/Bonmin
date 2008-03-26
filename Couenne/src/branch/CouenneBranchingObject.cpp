@@ -4,7 +4,7 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for auxiliary variables
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -157,7 +157,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   p -> domain () -> push (nvars,
 			  solver -> getColSolution (), 
 			  solver -> getColLower    (), 
-			  solver -> getColUpper    ());
+			  solver -> getColUpper    ()); // have to alloc+copy
 
   CouNumber &estimate = way ? upEstimate_ : downEstimate_;
 
@@ -192,6 +192,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     }
   }
 
+#if 0
   if (!infeasible && doConvCuts_) { // generate convexification cuts before solving new node's LP
 
     int nchanged, *changed = NULL;
@@ -203,7 +204,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, chg_bds);  
 
     //OsiCuts ccrcs;
-#if 0
     int ncuts = cs.sizeRowCuts ();
 
     const CbcCountRowCut **ccrc = new CbcCountRowCut * [ncuts];
@@ -222,9 +222,9 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
       delete ccrc [i];
 
     delete [] ccrc;
-#endif
     //solver -> applyCuts (cs);
   }
+#endif
 
   delete [] chg_bds;
 

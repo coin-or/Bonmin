@@ -123,7 +123,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
       brpts = (double *) realloc (brpts, sizeof (double));
       *brpts = x0;
       way = TWO_RAND;
-      return (y0 - pow (x0,k));
+      return fabs (y0 - pow (x0,k));
 
       // no bounds on x
       /*      double alpha = pow ((y0 + pow (x0, k))/2, 1./k),

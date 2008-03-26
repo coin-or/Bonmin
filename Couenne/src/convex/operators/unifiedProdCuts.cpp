@@ -27,6 +27,8 @@ void contourCut (const CouenneCutGenerator *cg,
 		 CouNumber x1, CouNumber y1, //             inside
 		 int xi, int yi, int wi) {   // indices of the variables
 
+  // TODO: generalize to two bounds [l,u] for w
+
   // Upper right corner of the bounding box of (x,y) is feasible,
   // the opposite corner is not, hence there is a cut violated by
   // (x0,y0).

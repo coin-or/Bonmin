@@ -62,9 +62,12 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   // TODO: Also check obj value
   SmartPtr<const Bonmin::CouenneInfo::NlpSolution> closestSol;
   double dist = 1e50;
+
   const std::list<SmartPtr<const Bonmin::CouenneInfo::NlpSolution> >& solList =
     couInfo->NlpSolutions();
-  for (std::list<SmartPtr<const Bonmin::CouenneInfo::NlpSolution> >::const_iterator i = solList.begin();
+
+  for (std::list<SmartPtr<const Bonmin::CouenneInfo::NlpSolution> >::const_iterator 
+	 i = solList.begin();
        i != solList.end(); i++) {
     assert(nOrig_ == (*i)->nVars());
     const double thisDist = distanceToBound(nOrig_, (*i)->solution(), olb, oub);
@@ -78,11 +81,44 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
   // If this solution is not sufficiently inside the bounds, we solve the NLP now
   if (dist > 0.1) { // TODO: Find tolerance
-    nlp->setColLower(olb);
-    nlp->setColUpper(oub);
-    nlp->setColSolution(X());
 
-    nlp->initialSolve ();
+    // find integer initial point /////////////////////////
+
+    int nvars = nVars ();
+
+    double *lower = new double [nvars];
+    double *upper = new double [nvars];
+
+    CoinFillN (lower, nvars, -COUENNE_INFINITY);
+    CoinFillN (upper, nvars,  COUENNE_INFINITY);
+
+    CoinCopyN (nlp -> getColLower (), nOrig_, lower);
+    CoinCopyN (nlp -> getColUpper (), nOrig_, upper);
+
+    double *Y = new double [nvars];
+    CoinFillN (Y, nvars, 0.);
+    CoinCopyN (X (), nOrig_, Y);
+
+    if (getIntegerCandidate (nlp -> getColSolution (), Y, lower, upper) < 0) {
+      jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "TODO: find NLP point in ABT failed\n");
+      delete [] Y;
+      delete [] lower;
+      delete [] upper;
+      return true;
+    }
+
+    //////////////////////////////////////////////////////
+
+    nlp -> setColLower    (lower);
+    nlp -> setColUpper    (upper);
+    nlp -> setColSolution (Y);
+
+    nlp -> initialSolve ();
+
+    delete [] Y;
+    delete [] lower;
+    delete [] upper;
+
     if (nlp->isProvenOptimal()) {
       closestSol = new Bonmin::CouenneInfo::NlpSolution 
 	(nOrig_, nlp->getColSolution(), nlp->getObjValue());

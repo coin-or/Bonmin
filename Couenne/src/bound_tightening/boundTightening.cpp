@@ -20,7 +20,7 @@
 
 bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
 
-  //////////////////////// Bound propagation and implied bounds ////////////////////
+  // Bound propagation and implied bounds ////////////////////
 
   int   ntightened = 0,
       nbwtightened = 0,

@@ -27,7 +27,16 @@ protected:
   CouNumber *lb_; ///< lower bound
   CouNumber *ub_; ///< upper bound
 
+  bool copied_;   ///< true if data has been copied (so we own it, and
+		  ///< have to delete it upon destruction)
 public:
+
+  /// constructor
+  DomainPoint (int dim = 0, 
+	       CouNumber *x   = NULL, 
+	       CouNumber *lb  = NULL, 
+	       CouNumber *ub  = NULL,
+	       bool copy = true);
 
   /// constructor
   DomainPoint (int dim = 0, 
@@ -37,9 +46,11 @@ public:
 
   /// destructor
   ~DomainPoint () {
-    if (x_)  free (x_);
-    if (lb_) free (lb_);
-    if (ub_) free (ub_);
+    if (copied_) {
+      if (x_)  free (x_);
+      if (lb_) free (lb_);
+      if (ub_) free (ub_);
+    }
   }
 
   /// copy constructor
@@ -59,7 +70,7 @@ public:
   inline CouNumber *ub () {return ub_;} ///< return current upper bound vector
 
   /// assignment operator
-  DomainPoint &operator= (DomainPoint &src);
+  DomainPoint &operator= (const DomainPoint &src);
 };
 
 
@@ -91,18 +102,25 @@ public:
   ~Domain ();
 
   /// save current point and start using another
-  void push (int dim, CouNumber *x, CouNumber *lb, CouNumber *ub);
+  void push (int dim, 
+	     CouNumber *x, 
+	     CouNumber *lb, 
+	     CouNumber *ub, 
+	     bool copy = true);
 
   /// save current point and start using another
-  void push (int dim, const CouNumber *x, const CouNumber *lb, const CouNumber *ub);
+  void push (int dim, 
+	     const CouNumber *x, 
+	     const CouNumber *lb, 
+	     const CouNumber *ub);
 
   /// save current point and start using another
-  void push (const DomainPoint &dp);
+  void push (const DomainPoint &dp, bool copy = true);
 
   /// restore previous point
   void pop ();
 
-  inline DomainPoint *current () {return point_;}                  ///< return current point
+  inline DomainPoint *current ()   {return point_;}                 ///< return current point
 
   inline CouNumber &x  (int index) {return point_ -> x  (index);}   ///< return current variable
   inline CouNumber &lb (int index) {return point_ -> lb (index);}   ///< return current lower bound

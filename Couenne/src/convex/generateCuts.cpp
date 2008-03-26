@@ -193,12 +193,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // use new optimum as lower bound for variable associated w/objective
     int indobj = problem_ -> Obj (0) -> Body () -> Index ();
 
-    //assert (indobj >= 0);
-
-    /*CouNumber save_obj_primal = 
-      (problem_ -> Obj (0) -> Sense () == MINIMIZE) ? 
-      problem_ -> Ub (indobj) : 
-      problem_ -> Lb (indobj);*/
+    assert (indobj >= 0);
 
     // transmit solution from OsiSolverInterface to problem
     problem_ -> domain () -> push 
@@ -207,21 +202,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
        si. getColLower    (),
        si. getColUpper    ());
 
-    /*    ((problem_ -> Obj (0) -> Sense () == MINIMIZE) ? 
-     problem_ -> Ub (indobj) : 
-     problem_ -> Lb (indobj)) = save_obj_primal;*/
-
     if (indobj >= 0) {
-
-      /*if (problem_ -> Obj (0) -> Sense () == MINIMIZE) {
-	const_cast <OsiSolverInterface *> (&si) ->
-	  setColUpper (indobj, problem_ -> getCutOff ());
-	problem_ -> domain () -> ub (indobj) = problem_ -> getCutOff ();
-      } else {
-	const_cast <OsiSolverInterface *> (&si) ->
-	  setColLower (indobj, problem_ -> getCutOff ());
-	problem_ -> domain () -> lb (indobj) = problem_ -> getCutOff ();
-	}*/
 
       // Use current value of objvalue's x as a lower bound for bound
       // tightening
@@ -271,6 +252,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	 problem_ -> doOBBT () ||
 	 problem_ -> doABT  ()) &&
 	(jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING))) {
+
       jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== after bt =============\n");
       for (int i = 0; i < problem_ -> nVars (); i++)
 	if (problem_ -> Var (i) -> Multiplicity () > 0)
@@ -321,11 +303,13 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       bool save_av = addviolated_;
       addviolated_ = false;
 
+      // save values
       problem_ -> domain () -> push 
 	(problem_ -> nVars (), 
 	 problem_ -> domain () -> x  (), 
 	 problem_ -> domain () -> lb (), 
-	 problem_ -> domain () -> ub ());
+	 problem_ -> domain () -> ub (), false);
+
       // fill originals with nlp values
       CoinCopyN (nlpSol, problem_ -> nOrig (), problem_ -> domain () -> x ());
       problem_ -> initAuxs ();
@@ -341,8 +325,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
       }
 
-      genRowCuts (si, cs, nchanged, changed, //info, 
-		  chg_bds, true);  // add cuts
+      genRowCuts (si, cs, nchanged, changed, chg_bds, true);  // add cuts
 
       problem_ -> domain () -> pop (); // restore point
 
@@ -363,8 +346,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
       }
 
-      genRowCuts (si, cs, nchanged, changed, //info, 
-		  chg_bds);
+      genRowCuts (si, cs, nchanged, changed, chg_bds);
     }
 
     // change tightened bounds through OsiCuts

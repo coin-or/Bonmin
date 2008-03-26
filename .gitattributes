@@ -35,7 +35,11 @@ Couenne/src/branch/CouenneObject.cpp -text
 Couenne/src/branch/CouenneObject.hpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.cpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.hpp -text
+Couenne/src/branch/CouenneVarObject.cpp -text
+Couenne/src/branch/CouenneVarObject.hpp -text
+Couenne/src/branch/feasibleRegion.cpp -text
 Couenne/src/branch/getFixVarBinFun.cpp -text
+Couenne/src/branch/infeasibility.cpp -text
 Couenne/src/branch/operators/branchExprAbs.cpp -text
 Couenne/src/branch/operators/branchExprDiv.cpp -text
 Couenne/src/branch/operators/branchExprExp.cpp -text
@@ -150,6 +154,7 @@ Couenne/src/problem/constraint.cpp -text
 Couenne/src/problem/depGraph/checkCycles.cpp -text
 Couenne/src/problem/depGraph/depGraph.cpp -text
 Couenne/src/problem/depGraph/depGraph.hpp -text
+Couenne/src/problem/fillDependence.cpp -text
 Couenne/src/problem/fillQuadIndices.cpp -text
 Couenne/src/problem/getIntegerCandidate.cpp -text
 Couenne/src/problem/problem.cpp -text

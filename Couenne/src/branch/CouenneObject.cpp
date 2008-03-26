@@ -25,6 +25,19 @@
 const CouNumber default_alpha = 0.2;
 const CouNumber default_clamp = 0.2;
 
+
+/// Empty constructor
+CouenneObject::CouenneObject ():
+  reference_      (NULL),
+  strategy_       (MID_INTERVAL),
+  jnlst_          (NULL),
+  alpha_          (default_alpha),
+  lp_clamp_       (default_clamp),
+  feas_tolerance_ (feas_tolerance_default),
+  doFBBT_         (true),
+  doConvCuts_     (true) {}
+
+
 /// Constructor with information for branching point selection strategy
 CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 			      JnlstPtr jnlst):
@@ -37,23 +50,25 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
   doFBBT_         (true),
   doConvCuts_     (true) {
 
-  assert (ref -> Type () == AUX);
+  //  assert (ref -> Type () == AUX);
 
   if (base) {
 
     std::string s;
 
-    base -> options() -> GetStringValue ("branch_fbbt",      s,"couenne."); doFBBT_    =(s=="yes");
-    base -> options() -> GetStringValue ("branch_conv_cuts", s,"couenne."); doConvCuts_=(s=="yes");
+    base -> options() -> GetStringValue ("branch_fbbt",      s, "couenne."); doFBBT_     = (s=="yes");
+    base -> options() -> GetStringValue ("branch_conv_cuts", s, "couenne."); doConvCuts_ = (s=="yes");
 
-    base -> options () -> GetNumericValue ("feas_tolerance", feas_tolerance_, "couenne.");
+    base -> options() -> GetNumericValue ("feas_tolerance", feas_tolerance_, "couenne.");
 
     std::string brtype;
     base -> options () -> GetStringValue ("branch_pt_select", brtype, "couenne.");
 
-    if      (brtype == "balanced")  strategy_ = BALANCED;
-    else if (brtype == "min-area")  strategy_ = MIN_AREA;
-    else if (brtype == "no-branch") strategy_ = NO_BRANCH;
+    if      (brtype == "balanced")    strategy_ = BALANCED;
+    else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
+    else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
+    else if (brtype == "min-area")    strategy_ = MIN_AREA;
+    else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
     else if (brtype == "mid-point") {
       strategy_ = MID_INTERVAL;
       base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
@@ -63,65 +78,76 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 
     std::string br_operator = "";
 
-    switch (ref -> Image () -> code ()) {
+    if (ref && (ref -> Image ())) {
 
-    case COU_EXPRPOW: {
+      switch (ref -> Image () -> code ()) {
 
-      // begin with default value in case specific exponent are not given
-      base -> options () -> GetStringValue ("branch_pt_select_pow", brtype, "couenne.");
+      case COU_EXPRPOW: {
 
-      CouNumber expon = ref -> Image () -> ArgList () [1] -> Value ();
+	// begin with default value in case specific exponent are not given
+	base -> options () -> GetStringValue ("branch_pt_select_pow", brtype, "couenne.");
 
-      if      (fabs (expon - 2.) < COUENNE_EPS) br_operator = "sqr";
-      else if (fabs (expon - 3.) < COUENNE_EPS) br_operator = "cube";
-      else if (expon             < 0.)          br_operator = "negpow";
-      else                                      br_operator = "pow";
-    } break;
+	CouNumber expon = ref -> Image () -> ArgList () [1] -> Value ();
 
-    case COU_EXPRMUL: 
-      br_operator = (ref -> Image () -> ArgList () [0] -> Index () !=
-		     ref -> Image () -> ArgList () [1] -> Index ()) ?
-	"prod" : "sqr";
-      break;
-    case COU_EXPRINV: br_operator = "negpow"; break;
-    case COU_EXPRDIV: br_operator = "div"; break;
-    case COU_EXPRLOG: br_operator = "log"; break;
-    case COU_EXPREXP: br_operator = "exp"; break;
-    case COU_EXPRSIN:
-    case COU_EXPRCOS: br_operator = "trig"; break;
-    default:;
-    }
+	if      (fabs (expon - 2.) < COUENNE_EPS) br_operator = "sqr";
+	else if (fabs (expon - 3.) < COUENNE_EPS) br_operator = "cube";
+	else if (expon             < 0.)          br_operator = "negpow";
+	else                                      br_operator = "pow";
+      } break;
 
-    if (br_operator != "") {
-      // read option
-      char select [40], sel_clamp [40];
-      sprintf (select,    "branch_pt_select_%s", br_operator.c_str ());
-      sprintf (sel_clamp, "branch_lp_clamp_%s",  br_operator.c_str ());
-      base -> options () -> GetStringValue (select, brtype, "couenne.");
-      base -> options () -> GetNumericValue (sel_clamp, lp_clamp_, "couenne.");
+      case COU_EXPRMUL: 
+	br_operator = (ref -> Image () -> ArgList () [0] -> Index () !=
+		       ref -> Image () -> ArgList () [1] -> Index ()) ?
+	  "prod" : "sqr";
+	break;
+      case COU_EXPRINV: br_operator = "negpow"; break;
+      case COU_EXPRDIV: br_operator = "div"; break;
+      case COU_EXPRLOG: br_operator = "log"; break;
+      case COU_EXPREXP: br_operator = "exp"; break;
+      case COU_EXPRSIN:
+      case COU_EXPRCOS: br_operator = "trig"; break;
+      default:;
+      }
 
-      if      (brtype == "balanced")    strategy_ = BALANCED;
-      else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
-      else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
-      else if (brtype == "min-area")    strategy_ = MIN_AREA;
-      else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
-      else if (brtype == "mid-point") {
-	strategy_ = MID_INTERVAL;
-	base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
+      if (br_operator != "") {
+	// read option
+	char select [40], sel_clamp [40];
+	sprintf (select,    "branch_pt_select_%s", br_operator.c_str ());
+	sprintf (sel_clamp, "branch_lp_clamp_%s",  br_operator.c_str ());
+	base -> options () -> GetStringValue (select, brtype, "couenne.");
+	base -> options () -> GetNumericValue (sel_clamp, lp_clamp_, "couenne.");
+
+	if      (brtype == "balanced")    strategy_ = BALANCED;
+	else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
+	else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
+	else if (brtype == "min-area")    strategy_ = MIN_AREA;
+	else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
+	else if (brtype == "mid-point") {
+	  strategy_ = MID_INTERVAL;
+	  base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
+	}
       }
     }
   }
 
-  if (jnlst_->ProduceOutput(J_SUMMARY, J_BRANCHING)) {
+  if (reference_ && jnlst_ -> ProduceOutput (J_SUMMARY, J_BRANCHING)) {
 
-    printf ("created object: "); reference_ -> print (); 
-    printf (" := "); reference_ -> Image () -> print ();
+    printf ("created Expression Object: "); 
+    reference_ -> print (); 
+
+    if (reference_ -> Image ()) {
+      printf (" := "); 
+      reference_ -> Image () -> print ();
+    }
+
     printf (" with %s strategy [clamp=%g, alpha=%g]\n", 
 	    (strategy_ == LP_CLAMPED)   ? "lp-clamped" : 
 	    (strategy_ == LP_CENTRAL)   ? "lp-central" : 
 	    (strategy_ == BALANCED)     ? "balanced"   : 
 	    (strategy_ == MIN_AREA)     ? "min-area"   : 
-	    (strategy_ == MID_INTERVAL) ? "mid-point"  : "no-branching (null infeasibility)",
+	    (strategy_ == MID_INTERVAL) ? "mid-point"  : 
+	    (strategy_ == NO_BRANCH)    ? "no-branching (null infeasibility)" : 
+	                                  "no strategy",
 	    lp_clamp_, alpha_);
   }
 }
@@ -139,103 +165,6 @@ CouenneObject::CouenneObject (const CouenneObject &src):
   doConvCuts_ (src.doConvCuts_) {}
 
 
-#define TOL 0.
-
-/// fix integer coordinates of current integer feasible solution
-double CouenneObject::feasibleRegion (OsiSolverInterface *solver, 
-				      const OsiBranchingInformation *info) const {
-  int index = reference_ -> Index ();
-
-  assert (index >= 0);
-
-  double val = info -> solution_ [index];
-
-  // fix that variable to its current value
-  solver -> setColLower (index, val-TOL);
-  solver -> setColUpper (index, val+TOL);
-
-  expression *expr = reference_ -> Image ();
-
-  // fix all variables upon which this auxiliary depends
-
-  // expr is surely nonlinear, so it's useless to check if it is an
-  // exprAux, w1:=w0
-
-  if (expr -> Type () == UNARY) { // unary function
-
-    index = expr -> Argument () -> Index ();
-
-    if (index >= 0) {
-      val = info -> solution_ [index];
-      solver -> setColLower (index, val-TOL);
-      solver -> setColUpper (index, val+TOL);
-    }
-  }
-  else // n-ary function
-
-    if (expr -> Type () == N_ARY) {
-
-      expression ** args = expr -> ArgList ();
-      int nargs = expr -> nArgs ();
-
-      for (register int i=0; i < nargs; i++) {
-
-	if ((index = args [i] -> Index()) >= 0) {
-	  val = info -> solution_ [index];
-	  solver -> setColLower (index, val-TOL);
-	  solver -> setColUpper (index, val+TOL);
-	}
-      }
-    }
-
-  // last cases: exprGroup/Quad, must handle the linear/quadratic terms
-  if ((expr -> code () == COU_EXPRGROUP) ||
-      (expr -> code () == COU_EXPRQUAD)) {
-
-    exprGroup *e = dynamic_cast <exprGroup *> (expr);
-
-    exprGroup::lincoeff &lcoe = e -> lcoeff ();
-
-    for (exprGroup::lincoeff::iterator el = lcoe.begin (); el != lcoe.end (); ++el) {
-      int index = el -> first -> Index ();
-      val = info -> solution_ [index];
-      solver -> setColLower (index, val-TOL);
-      solver -> setColUpper (index, val+TOL);
-    }
-
-    // take care of quadratic terms
-    if (expr -> code () == COU_EXPRQUAD) {
-
-      exprQuad *e = dynamic_cast <exprQuad *> (expr);
-
-      exprQuad::sparseQ q = e -> getQ ();
-
-      for (exprQuad::sparseQ::iterator row = q.begin (); 
-	   row != q.end (); ++row) {
-
-	int xind = row -> first -> Index ();
-
-	val = info -> solution_ [xind];
-	solver -> setColLower (xind, val-TOL);
-	solver -> setColUpper (xind, val+TOL);
-
-	for (exprQuad::sparseQcol::iterator col = row -> second.begin ();
-	     col != row -> second.end (); ++col) {
-
-	  int yind = col -> first -> Index ();
-
-	  val = info -> solution_ [yind];
-	  solver -> setColLower (yind, val-TOL);
-	  solver -> setColUpper (yind, val+TOL);
-	}
-      }
-    }
-  }
-
-  return 0.;
-}
-
-
 /// apply the branching rule
 OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si, 
 						 const OsiBranchingInformation *info, 
@@ -248,6 +177,14 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   // convexifying the two subproblems. We call selectBranch for the
   // purpose, and save the output parameter into the branching point
   // that should be used later in createBranch.
+
+  //throw -1;
+  
+#ifdef DEBUG
+  printf ("CouObj::createBranch on ");
+  reference_ -> print ();
+  printf ("\n");
+#endif
 
   CouenneProblem *p = dynamic_cast <CouenneSolverInterface *> (si) -> CutGen () -> Problem ();
 
@@ -368,9 +305,8 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	  || (fabs (ur-lr) < COUENNE_EPS))
 	brObj = new CouenneBranchingObject (jnlst_, depvar, way ? TWO_RIGHT : TWO_LEFT, x,
 					    doFBBT_, doConvCuts_);  
-    }
-
-    brObj = new CouenneBranchingObject (jnlst_, reference_, way ? TWO_RIGHT : TWO_LEFT, xr, 
+    } else
+      brObj = new CouenneBranchingObject (jnlst_, reference_, way ? TWO_RIGHT : TWO_LEFT, xr, 
 					doFBBT_, doConvCuts_);
   }
 
@@ -407,10 +343,12 @@ CouNumber CouenneObject::midInterval (CouNumber x, CouNumber l, CouNumber u) con
     }
 }
 
+
 /// pick branching point based on current strategy
 CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, CouNumber u) const {
 
-  if ((l < -COUENNE_EPS) && (u > COUENNE_EPS) && 
+  if ((l < -COUENNE_EPS) && 
+      (u >  COUENNE_EPS) && 
       (-l/u >= THRES_ZERO_SYMM) &&
       (-u/l >= THRES_ZERO_SYMM))
     return 0.;
@@ -432,9 +370,8 @@ CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, 
   }
 }
 
-/// compute infeasibility of this variable, |w - f(x)| (where w is
-/// the auxiliary variable defined as w = f(x)
-/// TODO: suggest way
+
+/// non-linear infeasibility
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &way) const {  
 
   if (strategy_ == NO_BRANCH) return 0.;
@@ -445,7 +382,7 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
 
   if (jnlst_->ProduceOutput(J_MATRIX, J_BRANCHING)) {
     printf ("infeas %g: ", (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta); 
-    reference_ -> print (); printf (" := ");
+    reference_             -> print (); printf (" := ");
     reference_ -> Image () -> print (); printf ("\n");
   }
 

@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch data for multiplications
  *
- * (C) Carnegie-Mellon University, 2006-07. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -88,13 +88,10 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
     way = THREE_CENTER;
 #endif
 
-    //brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = 0.;
 
     return fabs (w0 - x0*y0);
   }
-
-  //brpts = (double *) realloc (brpts, sizeof (double)); // only one branch point
 
   // don't privilege xi over yi
 
@@ -160,10 +157,6 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 // branching point for multiplication according to the balanced strategy
 CouNumber exprMul::balancedMul (const OsiBranchingInformation *info, int index, int wind) {
 
-  /*CouNumber lb, ub;
-  arglist_ [index] -> getBounds (lb, ub);
-  return (0.5 * (lb+ub));*/
-
   // first of all, make sure both arguments are variables
 
   int other;
@@ -226,9 +219,9 @@ CouNumber exprMul::balancedMul (const OsiBranchingInformation *info, int index, 
   //
   // if and only if
   //
-  // (above) ((yu-yl)*(xu-xl)) * m^2 =  1  |
+  // (above) ((yu-yl)*(xu-xl)) * m^2 =  1   )
   //                                        } <====>  m = 1 / sqrt ((yu-yl)*(xu-xl))
-  // (below) ((yu-yl)*(xl-xu)) * m^2 = -1  |
+  // (below) ((yu-yl)*(xl-xu)) * m^2 = -1   )
   //
   // (above)  2qm*(yu-yl)*(xu-xl) + m[yl(xu-xl)-xl(yu-yl)] = 0   <====>
   //          q = -[yl(xu-xl)-xl(yu-yl)] / (2(yu-yl)*(xu-xl))

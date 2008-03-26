@@ -21,10 +21,13 @@ libCouenne_la_SOURCES = \
 	branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp \
 	branch/CouenneObject.cpp \
+	branch/CouenneVarObject.cpp \
 	branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp \
 	branch/getFixVarBinFun.cpp \
 	branch/projections.cpp \
+	branch/infeasibility.cpp \
+	branch/feasibleRegion.cpp \
 	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
@@ -105,6 +108,7 @@ libCouenne_la_SOURCES = \
 	problem/writeGAMS.cpp \
 	problem/constraint.cpp \
 	problem/fillQuadIndices.cpp \
+	problem/fillDependence.cpp \
 	problem/CouenneSolverInterface.cpp \
 	problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp \
@@ -202,6 +206,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 include_HEADERS = \
 	../inc/config_couenne.h \
 	branch/CouenneObject.hpp \
+	branch/CouenneVarObject.hpp \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \

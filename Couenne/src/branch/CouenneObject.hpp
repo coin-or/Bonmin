@@ -16,7 +16,6 @@
 #include "OsiBranchingObject.hpp"
 
 #include "exprVar.hpp"
-
 #include "CouenneJournalist.hpp"
 
 #define AGGR_MUL 2
@@ -48,11 +47,13 @@ class CouenneObject: public OsiObject {
 public:
 
   /// strategy names
-  enum brSelStrat {NO_BRANCH, MID_INTERVAL, MIN_AREA, BALANCED, LP_CENTRAL, LP_CLAMPED};
+  enum brSelStrat {NO_STRATEGY, NO_BRANCH, MID_INTERVAL, MIN_AREA, BALANCED, LP_CENTRAL, LP_CLAMPED};
+
+  /// empty constructor (for unused objects)
+  CouenneObject ();
 
   /// Constructor with information for branching point selection strategy
-  CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
-		 JnlstPtr jnlst);
+  CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst);
 
   /// Destructor
   ~CouenneObject () {}
@@ -70,8 +71,7 @@ public:
   virtual double infeasibility (const OsiBranchingInformation *info, int &way) const;
 
   /// fix (one of the) arguments of reference auxiliary variable 
-  virtual double feasibleRegion (OsiSolverInterface*, 
-				 const OsiBranchingInformation*) const;
+  virtual double feasibleRegion (OsiSolverInterface*, const OsiBranchingInformation*) const;
 
   /// create CouenneBranchingObject or CouenneThreeWayBranchObj based
   /// on this object
@@ -89,8 +89,8 @@ public:
   /// pick branching point based on current strategy
   CouNumber getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, CouNumber u) const;
 
-  /// returns a point "inside enough" a given interval, or x if it is
-  /// already
+  /// returns a point "inside enough" a given interval, or x if it
+  /// already is
   CouNumber midInterval (CouNumber x, CouNumber l, CouNumber u) const;
 
 protected:

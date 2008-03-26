@@ -11,6 +11,8 @@
 #include "CoinTime.hpp"
 #include "CouenneProblem.hpp"
 
+//#define DEBUG
+
 namespace Bonmin {
 
   CouenneChooseStrong::CouenneChooseStrong(BabSetupBase &b, CouenneProblem* p) :
@@ -69,7 +71,9 @@ namespace Bonmin {
     double timeStart = CoinCpuTime();
     int iDo = 0;
 
-    //printf ("----------------------trying branching objects:\n");
+#ifdef DEBUG
+    printf ("----------------------trying %d branching objects:\n", numberToDo);
+#endif
 
     for (;iDo<numberToDo;iDo++) {
       HotInfo * result = results_() + iDo;
@@ -82,6 +86,10 @@ namespace Bonmin {
         specified branch and advances the branch object state to the next branch
         alternative.)
       */
+
+      // TODO: The smallest bounding box that includes both new
+      // bounding boxes (resulting from BT) is a valid BT for the
+      // current node and should be used.
 
       // DOWN DIRECTION ///////////////////////////////////////////////////////
 
@@ -204,13 +212,13 @@ namespace Bonmin {
         // infeasible
         returnCode=-1;
         break; // exit loop
-      } else if (status0==1||status1==1) {
+      } else if (status0==1 || status1==1) {
         numberStrongFixed_++;
         if (!returnCriterion) {
-  	returnCode=1;
+	  returnCode=1;
         } else {
-  	returnCode=2;
-  	break;
+	  returnCode=2;
+	  break;
         }
       }
       bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_);
@@ -219,7 +227,11 @@ namespace Bonmin {
         break;
       }
     }
-    //printf ("----------------------done\n");
+
+#ifdef DEBUG
+    printf ("----------------------done\n");
+#endif
+
     if(iDo < numberToDo) iDo++;
     assert(iDo <= (int) results_.size());
     results_.resize(iDo);
@@ -236,6 +248,7 @@ namespace Bonmin {
     return returnCode;
   }
 
+
   // Sets up strong list and clears all if initialize is true.
   // Returns number of infeasibilities.
   int CouenneChooseStrong::setupList (OsiBranchingInformation *info, bool initialize) {
@@ -244,11 +257,24 @@ namespace Bonmin {
       (problem_ -> nVars (),
        info -> solution_, 
        info -> lower_, 
-       info -> upper_);
+       info -> upper_); // have to alloc+copy
+
+#ifdef DEBUG
+    printf ("----------------- (strong) setup list\n");
+    for (int i=0; i<problem_ -> domain () -> current () -> Dimension (); i++)
+      printf ("%4d %20.4g [%20.4g %20.4g]\n", i,
+	      info -> solution_ [i],
+	      info -> lower_ [i],
+	      info -> upper_ [i]);
+#endif
 
     int retval = BonChooseVariable::setupList (info, initialize);
 
     problem_ -> domain () -> pop ();
+
+#ifdef DEBUG
+    printf ("----------------- (strong) setup list done\n");
+#endif
 
     return retval;
   }

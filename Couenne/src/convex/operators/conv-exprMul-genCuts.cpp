@@ -8,12 +8,7 @@
  */
 
 #include "CouenneTypes.hpp"
-//#include "expression.hpp"
-//#include "exprAux.hpp"
 #include "exprMul.hpp"
-//#include "exprPow.hpp"
-//#include "exprDiv.hpp"
-//#include "CouenneProblem.hpp"
 #include "CouenneCutGenerator.hpp"
 
 

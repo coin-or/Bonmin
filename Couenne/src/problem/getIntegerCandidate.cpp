@@ -4,14 +4,12 @@
  * Purpose: generate integer NLP point Y starting from fractional 
  *          solution using bound tightening
  *
- * (C) Carnegie-Mellon University, 2007.
+ * (C) Carnegie-Mellon University, 2007-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include "CoinHelperFunctions.hpp"
 #include "CouenneProblem.hpp"
-
-//#define DEBUG
 
 // lose patience after this many iterations of non-improving valid
 // tightening (step 1)
@@ -23,7 +21,11 @@
 /// return -1 if the problem is infeasible
 
 int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt, 
-					 double *lb, double *ub) {
+					 double *lb, double *ub) const {
+
+  // return -1;
+
+  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, "GetIntegerCandidate:---\n");
 
   // A more sophisticated rounding procedure
   //
@@ -43,7 +45,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   // xcurrent.
 
   int
-    objind   = Obj (0) -> Body  () -> Index (),
+    objind   = Obj (0) -> Body () -> Index (),
     ncols    = nVars (), 
     retval   = 0,
     iter     = 0;
@@ -58,11 +60,18 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   CoinCopyN (Lb (), ncols, olb);
   CoinCopyN (Ub (), ncols, oub);
 
+  //fillFreeIntegers ();
+
   // start restricting around current integer box
+  //for (int i=0; i<nVars(); i++) 
   for (int i=0; i<nOrig_; i++) 
-    if (Var (i) -> isInteger ()) {
-      lb [i] = floor (xFrac [i]); 
-      ub [i] = ceil  (xFrac [i]);
+    if ((Var (i) -> isInteger ()) &&    // integer, may fix if not dependent on other integers
+	(true ||                        // TODO: remove and implement wave freeIntegers
+	 (Var (i) -> Type () == VAR) || // if not aux
+	 (freeIntegers_ [i]))) {        // 
+
+      lb [i] = CoinMax (lb [i], floor (xFrac [i])); 
+      ub [i] = CoinMin (ub [i], ceil  (xFrac [i]));
     }
 
   // for now save fractional point into integer point
@@ -74,7 +83,6 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   CoinCopyN (ub, nVars (), Ub ());
 
   // translate current NLP point+bounds into higher-dimensional space
-  //initAuxs (xInt, lb, ub);
   initAuxs ();
 
   // TODO: re-copy first nOrig_ variables into xInt?
@@ -95,28 +103,34 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
   int validNonImproving = 0;
 
+  // check if initAuxs() closed any bound; if so, fix variable
+  for (int i=0; i<nOrig_; i++) 
+    if (Var (i) -> isInteger () && (Lb (i) == Ub (i))) {
+      X (i) = Lb (i);
+      fixed [i] = FIXED;
+    }
+
   do {
 
-#ifdef DEBUG
-    printf ("========================================================================\n");
-    for (int i=0; i<nOrig_; i++)
-      printf ("#### %4d: %d %c frac %20g                          [%20g,%20g]\n", 
-	      i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
-	      xFrac [i], Lb (i), Ub (i));
-    printf ("---\n");
-    for (int i=nOrig_; i<nVars (); i++)
-      printf ("#### %4d:   %c frac %20g                          [%20g,%20g]\n", 
-	      i, variables_ [i] -> isInteger () ? 'I' : ' ',
-	      X (i), Lb (i), Ub (i));
-#endif
+    if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+
+      printf ("===================================================\n");
+      for (int i=0; i<nOrig_; i++)
+	printf ("#### %4d: %d %c%c frac %20g  [%20g,%20g]\n", 
+		i, fixed [i], 
+		variables_ [i] -> isInteger () ? 'I' : ' ',
+		(freeIntegers_ && freeIntegers_ [i]) ? 'F' : ' ',
+		xFrac [i], Lb (i), Ub (i));
+      printf ("---\n");
+      for (int i=nOrig_; i<nVars (); i++)
+	printf ("#### %4d:   %c%c frac %20g   [%20g,%20g]\n", 
+		i, variables_ [i] -> isInteger () ? 'I' : ' ',
+		(freeIntegers_ && freeIntegers_ [i]) ? 'F' : ' ',
+		X (i), Lb (i), Ub (i));
+      printf ("=================================================== %d %d\n", iter, nOrig_);
+    }
 
     changed = false;
-
-    // TODO: use explicit checkNLP for solutions
-
-#ifdef DEBUG
-    printf ("=================================================== %d %d\n", iter, nOrig_);
-#endif
 
     for (int i = 0; i < nOrig_; i++)
 
@@ -169,6 +183,8 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	// restore initial situation
 	CoinCopyN (olb, ncols, Lb ());
 	CoinCopyN (oub, ncols, Ub ());
+
+	//////////////////////////////////////////////////////////////////////////////////////////
 
 	// Three cases:
 	//
@@ -306,15 +322,16 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     if (fixed [i] == FIXED)
       lb [i] = ub [i] = xInt [i];
 
-#ifdef DEBUG
-  if (retval >= 0) {
-    printf ("- %d -----------------------------------------------------------------------\n", retval);
-    for (int i=0; i<nOrig_; i++)
-      printf ("#### %4d: %d %c frac %20g int %20g [%20g,%20g]\n", 
-	      i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
-	      xFrac [i], xInt [i], lb [i], ub [i]);
-  } else printf ("no good point was found\n");
-#endif
+  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+    if (retval >= 0) {
+      printf ("- retval %d ----------------------------------------------------------------\n", 
+	      retval);
+      for (int i=0; i<nOrig_; i++)
+	printf ("#### %4d: %d %c frac %20g int %20g [%20g,%20g]\n", 
+		i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
+		xFrac [i], xInt [i], lb [i], ub [i]);
+    } else printf ("no good point was found\n");
+  }
 
   delete [] f_chg;
   delete [] fixed;
@@ -327,6 +344,8 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   //printf (" done getintCand ------------------------------\n");
 
   domain_.pop ();
+
+  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, "Done with GetIntegerCandidate\n");
 
   return retval;
 }

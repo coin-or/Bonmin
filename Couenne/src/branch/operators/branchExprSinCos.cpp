@@ -27,8 +27,6 @@ CouNumber trigSelBranch (const CouenneObject *obj,
 			 int &way,
 			 enum cou_trig type) {
 
-  // for now, apply default branching rule
-
   exprVar *ref = obj -> Reference ();
 
   var = ref -> Image () -> Argument ();
@@ -42,10 +40,10 @@ CouNumber trigSelBranch (const CouenneObject *obj,
 
   var -> getBounds (l,u);
 				 
-  simpletriplet ft ((type == COU_SINE) ? (unary_function)sin : (unary_function)cos, 
-		    (type == COU_SINE) ? (unary_function)cos    : oppsin, 
-		    (type == COU_SINE) ? oppsin : oppcos, 
-		    (type == COU_SINE) ? (unary_function)acos   : oppasin);
+  simpletriplet ft ((type == COU_SINE) ? (unary_function) sin    : (unary_function) cos, 
+		    (type == COU_SINE) ? (unary_function) cos    : oppsin, 
+		    (type == COU_SINE) ?                  oppsin : oppcos, 
+		    (type == COU_SINE) ? (unary_function) acos   : oppasin);
 
   brpts = (double *) realloc (brpts, sizeof (double));
   *brpts = obj -> getBrPoint (&ft, x0, l, u);

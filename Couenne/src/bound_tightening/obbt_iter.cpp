@@ -293,8 +293,11 @@ obbt_iter (CouenneSolverInterface *csi,
     objcoe [index] = 0;
   }
 
-  Jnlst()->Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING,
-		  "OBBT: %d tightenings\n", nImprov);
+  if (nImprov) {
+    Jnlst () -> Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING, "OBBT: tightened ", nImprov);
+    if (jnlst_ -> ProduceOutput (J_ITERSUMMARY, J_BOUNDTIGHTENING)) Var (index) -> print ();
+    Jnlst () -> Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING, "\n");
+  }
 
   return nImprov;
 }

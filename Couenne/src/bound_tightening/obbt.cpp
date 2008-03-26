@@ -166,12 +166,12 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
       sparse2dense (nVars(), chg_bds, changed, nchanged);
       cg -> genColCuts (*csi, cs, nchanged, changed);
 
-      if (nImprov >= THRES_NBD_CHANGED) {
+      if ((nIter < MAX_OBBT_ITER) && 
+	  (nImprov >= THRES_NBD_CHANGED)) {
 
 	// only generate new row cuts if improvents are enough
 	int nCurCuts = cs.sizeRowCuts ();
-	cg -> genRowCuts (*csi, cs, nchanged, changed, //info, 
-			  chg_bds);
+	cg -> genRowCuts (*csi, cs, nchanged, changed, chg_bds);
 
 	if (nCurCuts == cs.sizeRowCuts ())
 	  break; // repeat only if new cuts available
@@ -181,12 +181,10 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
 
     delete csi;
 
-    if (nImprov < 0)
-      jnlst_->Printf(J_DETAILED, J_CONVEXIFYING,
-		     "  Couenne: infeasible node after OBBT\n");
-
-    if (nImprov < 0)
+    if (nImprov < 0) {
+      jnlst_->Printf(J_DETAILED, J_CONVEXIFYING, "  Couenne: infeasible node after OBBT\n");
       return -1;
+    }
   }
 
   return 0;

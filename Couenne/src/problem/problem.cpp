@@ -29,26 +29,24 @@ const CouNumber SafeCutoff = COUENNE_EPS;
 /// initialize auxiliary variables from original variables in the
 /// nonlinear problem
 
-void CouenneProblem::initAuxs () {
-
-  // update original variables only, that is, the first nVars ()
-  // variables, as no auxiliaries exist yet
-  //update (x, l, u, nOrig_);
+void CouenneProblem::initAuxs () const {
 
   domain_.current () -> resize (nVars ());
 
   // initially, auxiliary variables are unbounded, their bounds only
   // depending on their function
 
-  for (register std::vector <exprVar *>::iterator i = variables_ . begin ();
-       i != variables_ . end (); ++i)
+  int nvars = nVars ();
 
-    if (((*i) -> Type  () == AUX) &&    // this is an auxiliary
-	((*i) -> Index () >= nOrig_)) { // and one that was not an original, originally...
+  for (int i = 0; i < nvars; i++) {
 
-      int index = (*i) -> Index ();
+    int index;
+
+    if ((variables_ [i] -> Type  () == AUX) &&            // this is an auxiliary
+	((index = variables_ [i] -> Index ()) >= nOrig_)) // and not an original, originally...
+      //int index = variables_ [i] -> Index ();
       Lb (index) = - (Ub (index) = COUENNE_INFINITY);
-    }
+  }
 
   // only one loop is sufficient here, since auxiliary variable are
   // defined in such a way that w_i does NOT depend on w_j if i<j.
@@ -61,9 +59,7 @@ void CouenneProblem::initAuxs () {
 
     if (variables_ [ord] -> Type () == AUX) {
 
-      //exprAux *aux = dynamic_cast <exprAux *> (variables_ [ord]);
-
-      //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, lb_ [ord], ub_ [ord]);
+      Jnlst () -> Printf (Ipopt::J_ALL, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, Lb (ord), Ub (ord));
 
       CouNumber l, u;
       variables_ [ord] -> Image () -> getBounds (l, u);
@@ -74,7 +70,7 @@ void CouenneProblem::initAuxs () {
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
-      //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, " --> [%10g,%10g]\n", lb_ [ord], ub_ [ord]);
+      Jnlst () -> Printf (Ipopt::J_ALL, J_PROBLEM, " --> [%10g,%10g]\n", Lb (ord), Ub (ord));
 
       bool integer = variables_ [ord] -> isInteger ();
 

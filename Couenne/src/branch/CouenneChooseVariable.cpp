@@ -51,7 +51,7 @@ int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initia
      info -> upper_);
 
 #ifdef DEBUG
-  printf ("CouenneChooseVariable -------------------\n");
+  printf ("----------------- setup list\n");
   for (int i=0; i<problem_ -> domain () -> current () -> Dimension (); i++)
     printf ("%4d %20.4g [%20.4g %20.4g]\n", i,
      info -> solution_ [i],
@@ -66,6 +66,10 @@ int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initia
     OsiChooseVariable::setupList (info, initialize) : 0;
 
   problem_ -> domain () -> pop ();
+
+#ifdef DEBUG
+  printf ("----------------- setup list done\n");
+#endif
 
   return retval;
 }

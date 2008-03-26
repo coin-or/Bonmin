@@ -20,6 +20,7 @@
 #include "expression.hpp"
 #include "exprAux.hpp"
 #include "CouenneProblemElem.hpp"
+#include "CouenneObject.hpp"
 #include "CouenneJournalist.hpp"
 
 #include "domain.hpp"
@@ -124,11 +125,11 @@ class CouenneProblem {
   bool created_pcutoff_;
 
   bool doFBBT_;  ///< do Feasibility-based bound tightening
-  bool doOBBT_;  ///< do Optimality-based bound tightening
-  bool doABT_;   ///< do aggressive bound tightening
+  bool doOBBT_;  ///< do Optimality-based  bound tightening
+  bool doABT_;   ///< do Aggressive        bound tightening
 
   int logObbtLev_;   ///< frequency of Optimality-based bound tightening
-  int logAbtLev_;    ///< frequency of Aggressive bound tightening
+  int logAbtLev_;    ///< frequency of Aggressive       bound tightening
 
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
@@ -142,12 +143,25 @@ class CouenneProblem {
   /// feasibility tolerance (to be used in checkNLP)
   CouNumber feas_tolerance_;
 
+  /// inverse dependence structure: for each variable x give set of
+  /// auxiliary variables (or better, their indices) whose expression
+  /// depends on x
+  std::vector <std::set <int> > dependence_;
+
+  /// vector of pointer to CouenneObjects. Used by CouenneVarObjects
+  /// when finding all objects related to (having as argument) a
+  /// single variable
+  std::vector <CouenneObject> objects_;
+
+  /// each element is true if variable is integer and, if auxiliary,
+  /// depends on no integer
+  int *freeIntegers_;
+
  public:
 
   CouenneProblem  (const ASL * = NULL,
 		   Bonmin::BabSetupBase *base = NULL,
 		   JnlstPtr jnlst = NULL);  ///< Constructor
-
   CouenneProblem  (const CouenneProblem &); ///< Copy constructor
   ~CouenneProblem ();                       ///< Destructor
 
@@ -277,7 +291,7 @@ class CouenneProblem {
   /// Initialize auxiliary variables and their bounds from original
   /// variables
   //void initAuxs (const CouNumber *, const CouNumber *, const CouNumber *);
-  void initAuxs ();
+  void initAuxs () const;
 
   /// Get auxiliary variables from original variables
   void getAuxs (CouNumber *) const;
@@ -345,7 +359,7 @@ class CouenneProblem {
 
   /// generate integer NLP point Y starting from fractional solution
   /// using bound tightening
-  int getIntegerCandidate (const double *xFrac, double *xInt, double *lb, double *ub);
+  int getIntegerCandidate (const double *xFrac, double *xInt, double *lb, double *ub) const;
 
   /// Read best known solution from file given in argument
   bool readOptimum (std::string *fname = NULL);
@@ -394,8 +408,16 @@ class CouenneProblem {
 		      QuadMap &qmap);
 
   /// return problem name
-  const std::string &problemName ()
+  const std::string &problemName () const
   {return problemName_;}
+
+  /// return inverse dependence structure
+  const std::vector <std::set <int> > &Dependence () const
+  {return dependence_;}
+
+  /// return object vector
+  const std::vector <CouenneObject> &Objects () const
+  {return objects_;}
 
 protected:
 
@@ -412,7 +434,7 @@ protected:
 		    t_chg_bounds *chg_bds,
 		    t_chg_bounds *f_chg) const;
 
-  // core of the bound tightening procedure
+  /// core of the bound tightening procedure
   bool btCore (t_chg_bounds *chg_bds) const;
 
   /// Optimality Based Bound Tightening -- inner loop
@@ -450,8 +472,14 @@ protected:
 		   CouNumber &coe, 
 		   std::map <int, CouNumber> &indices);
 
-  // clear all spurious variables pointers not referring to the variables_ vector
+  /// clear all spurious variables pointers not referring to the variables_ vector
   void realign ();
+
+  /// fill dependence_ structure
+  void fillDependence (Bonmin::BabSetupBase *base);
+
+  /// fill freeIntegers_ array
+  void fillFreeIntegers ();
 };
 
 #endif

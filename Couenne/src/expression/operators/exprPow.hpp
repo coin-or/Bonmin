@@ -104,9 +104,11 @@ inline CouNumber safe_pow (CouNumber base,
 
     if (((fabs (exponent - (rndexp = COUENNE_round (exponent))) < COUENNE_EPS) ||
 	 ((fabs (exponent) > COUENNE_EPS) && 
-	  (fabs (1. / exponent - (rndexp = COUENNE_round (1. / exponent))) < COUENNE_EPS)))
-	&& (rndexp % 2))
-      return (- pow (- base, exponent));
+	  (fabs (1. / exponent - (rndexp = COUENNE_round (1. / exponent))) < COUENNE_EPS)))) {
+      if (rndexp % 2)
+	return (- pow (- base, exponent)); // x^k, x negative, k odd
+      else return pow (-base, exponent);   // x^k, x negative, k even
+    }
     else return 0.; // this is incorrect but avoids nan's
   }
 

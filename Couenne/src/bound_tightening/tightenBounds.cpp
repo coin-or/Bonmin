@@ -130,13 +130,13 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
 	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			    "Couenne: propagating l_%d cuts optimum: [%g --> %g -X-> %g] :: ", 
-			    i+j, Lb (i), optimum_ [i], ll);
+			    i, Lb (i), optimum_ [i], ll);
 	    Var (i) -> Lb () -> print (std::cout);
 	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING," --- ");
 	    Var (i) -> Ub () -> print (std::cout);
 	    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"\n");
 	  }
-	  }
+	}
 
 	Lb (i) = ll;
 	chg_bds [i].setLower(t_chg_bounds::CHANGED);

@@ -55,8 +55,8 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
     int rndexp;
 
     bool isInt    =  fabs (expon - (rndexp = COUENNE_round (expon))) < COUENNE_EPS,
-      isInvInt = !isInt &&  
-      ((fabs (expon) > COUENNE_EPS) && 
+      isInvInt = !isInt &&
+      ((fabs (expon) > COUENNE_EPS) &&
        (fabs (1/expon - (rndexp = COUENNE_round (1/expon))) < COUENNE_EPS));
 
     if ((isInt || isInvInt) && (rndexp % 2) && (rndexp > 0)) { 
@@ -161,5 +161,11 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
   }
   else // should NOT happen, exponent is not constant...
     printf ("exprPow::getBounds(): Warning, exponent not constant\n");
-}
 
+  /*CouNumber l, u;
+  arglist_ [0] -> getBounds (l,u);
+
+  printf ("pow::bound: ["); 
+  lb -> print (); printf ("=%g, ", (*lb) ());
+  ub -> print (); printf ("=%g [%g,%g]\n", (*ub) (), l, u);*/
+}

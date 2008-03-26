@@ -52,7 +52,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   jnlst_(jnlst),
   opt_window_ (1e50),
   useQuadratic_ (false),
-  feas_tolerance_ (feas_tolerance_default) {
+  feas_tolerance_ (feas_tolerance_default),
+  freeIntegers_ (NULL) {
 
   if (!asl) return;
 
@@ -95,6 +96,9 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
   // clear all spurious variables pointers not referring to the variables_ vector
   realign ();
+
+  // fill dependence_ structure
+  fillDependence (base);
 
   // quadratic handling
   fillQuadIndices ();
@@ -182,7 +186,10 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   jnlst_        (p.jnlst_),
   opt_window_   (p.opt_window_),    // needed only in standardize (), unnecessary to update it
   useQuadratic_ (p.useQuadratic_),  // ditto
-  feas_tolerance_ (p.feas_tolerance_) {
+  feas_tolerance_ (p.feas_tolerance_),
+  dependence_   (p.dependence_),
+  objects_      (p.objects_),
+  freeIntegers_ (NULL) {
 
   for (int i=0; i < p.nVars (); i++)
     variables_ . push_back (NULL);
@@ -216,6 +223,12 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
 
   // clear all spurious variables pointers not referring to the variables_ vector
   realign ();
+
+  if (p.freeIntegers_) {
+
+    freeIntegers_ = new int [nVars ()];
+    CoinCopyN (p.freeIntegers_, nVars (), freeIntegers_);
+  }
 }
 
 
@@ -248,6 +261,8 @@ CouenneProblem::~CouenneProblem () {
   if (numbering_) delete [] numbering_;
 
   if (created_pcutoff_) delete pcutoff_;
+
+  if (freeIntegers_) delete [] freeIntegers_;
 }
 
 
@@ -436,4 +451,49 @@ void CouenneProblem::indcoe2vector (int *indexI,
 				    std::vector <quadElem> &qcoeff) {
   for (int i=0; indexI [i] >= 0; i++)
     qcoeff.push_back (quadElem (Var (indexI [i]), Var (indexJ [i]), coeff [i]));
+}
+
+
+/// fill in the freeIntegers_ array
+void CouenneProblem::fillFreeIntegers () {
+
+  if (freeIntegers_) 
+    return;
+
+  int nvars = nVars ();
+
+  freeIntegers_ = new int [nvars];
+
+  //char *fixed = new char [nvars];
+
+  // 0: fractional
+  // 1: integer
+  // k: depending on at least one integer with associated value k-1
+
+  //CoinFillN (fixed, nvars, (char) 0); // fill with unset, for now.
+
+  for (int ii = 0; ii < nvars; ii++) {
+
+    int index = numbering_ [ii];
+    bool isInt = Var (index) -> isInteger ();
+
+    freeIntegers_ [index] = (isInt) ? 1 : 0;
+
+    if (Var (index) -> Type () == AUX) {
+
+      std::set <int> deplist;
+
+      if (Var (index) -> Image () -> DepList (deplist, STOP_AT_AUX) != 0) // depends on something
+	for (std::set <int>::iterator i = deplist.begin (); i != deplist.end (); ++i) {
+
+	  int token = freeIntegers_ [*i];
+	  if (isInt) token++;
+
+	  if (token > freeIntegers_ [index]) // there's a free integer below us, 
+	    freeIntegers_ [index] = token;
+	}
+    }
+  }
+
+  //delete [] fixed;
 }
