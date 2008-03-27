@@ -280,15 +280,16 @@ namespace Bonmin
           assert(objects[i]);
           objects[i]->setModel(&model_);
         }
-        model_.addObjects(s.objects().size(), objects);
+	model_.addObjects(s.objects().size(), objects);
         delete [] objects;
       }
 
       replaceIntegers(model_.objects(), model_.numberObjects());
     }
     else {//Pass in objects to Cbc
-      model_.addObjects(s.continuousSolver()->numberObjects(),
-          s.continuousSolver()->objects());
+      if (!usingCouenne_)
+	model_.addObjects(s.continuousSolver()->numberObjects(),
+			  s.continuousSolver()->objects());
     }
 
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
@@ -447,8 +448,10 @@ namespace Bonmin
 #endif
 
     currentBranchModel = &model_;
-    model_.branchAndBound();
 
+    // to get node parent info in Cbc, pass parameter 3.
+    //model_.branchAndBound(3);
+    model_.branchAndBound();
 
     numNodes_ = model_.getNodeCount();
     bestObj_ = model_.getObjValue();

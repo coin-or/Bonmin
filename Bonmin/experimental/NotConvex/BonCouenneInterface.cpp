@@ -304,7 +304,7 @@ CouenneInterface::extractLinearRelaxation
    //  if (isInteger (i))
 
    for (int i=0; i<numcolsconv; i++)
-     if (p -> Var (i) -> isInteger ())
+     if (p -> Var (i) -> isDefinedInteger ())
        si.setInteger (i);
  
    //si.writeMpsNative("toto",NULL,NULL,1);
