@@ -136,13 +136,20 @@ class exprAux: public exprVar {
   virtual inline int rank ()
     {return rank_;} 
 
-  /// is this expression integer?
-  virtual inline bool isInteger () {
+  /// is this expression defined as integer?
+  virtual inline bool isDefinedInteger () {
 
     if ((integer_ == Integer) || 
 	(integer_ == Unset) && 
 	((integer_ = (image_ -> isInteger ()) ? 
 	  Integer : Continuous) == Integer))
+      return true;
+  }
+
+  /// is this expression integer?
+  virtual inline bool isInteger () {
+
+    if (isDefinedInteger ()) 
       return true;
 
     CouNumber l = lb ();

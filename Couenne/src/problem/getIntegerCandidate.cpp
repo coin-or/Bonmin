@@ -60,7 +60,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   CoinCopyN (Lb (), ncols, olb);
   CoinCopyN (Ub (), ncols, oub);
 
-  //fillFreeIntegers ();
+  fillIntegerRank ();
 
   // start restricting around current integer box
   //for (int i=0; i<nVars(); i++) 
@@ -68,7 +68,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     if ((Var (i) -> isInteger ()) &&    // integer, may fix if not dependent on other integers
 	(true ||                        // TODO: remove and implement wave freeIntegers
 	 (Var (i) -> Type () == VAR) || // if not aux
-	 (freeIntegers_ [i]))) {        // 
+	 (integerRank_ [i]))) {        // 
 
       lb [i] = CoinMax (lb [i], floor (xFrac [i])); 
       ub [i] = CoinMin (ub [i], ceil  (xFrac [i]));
@@ -113,19 +113,18 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   do {
 
     if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
-
       printf ("===================================================\n");
       for (int i=0; i<nOrig_; i++)
 	printf ("#### %4d: %d %c%c frac %20g  [%20g,%20g]\n", 
 		i, fixed [i], 
 		variables_ [i] -> isInteger () ? 'I' : ' ',
-		(freeIntegers_ && freeIntegers_ [i]) ? 'F' : ' ',
+		(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
 		xFrac [i], Lb (i), Ub (i));
       printf ("---\n");
       for (int i=nOrig_; i<nVars (); i++)
 	printf ("#### %4d:   %c%c frac %20g   [%20g,%20g]\n", 
 		i, variables_ [i] -> isInteger () ? 'I' : ' ',
-		(freeIntegers_ && freeIntegers_ [i]) ? 'F' : ' ',
+		(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
 		X (i), Lb (i), Ub (i));
       printf ("=================================================== %d %d\n", iter, nOrig_);
     }
@@ -314,10 +313,6 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   CoinCopyN (Lb (), nOrig_, lb);
   CoinCopyN (Ub (), nOrig_, ub);
 
-  // restore old bounds 
-  //CoinCopyN (olb, ncols, Lb ());
-  //CoinCopyN (oub, ncols, Ub ());
-
   for (int i=0; i<nOrig_; i++)
     if (fixed [i] == FIXED)
       lb [i] = ub [i] = xInt [i];
@@ -340,8 +335,6 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   delete [] dualL; delete [] dualR;
   delete [] llb;   delete [] lub;
   delete [] rlb;   delete [] rub;
-
-  //printf (" done getintCand ------------------------------\n");
 
   domain_.pop ();
 

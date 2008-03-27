@@ -129,8 +129,10 @@ Couenne/src/expression/operators/exprMin.hpp -text
 Couenne/src/expression/operators/exprMinMax.cpp -text
 Couenne/src/expression/operators/exprMul.cpp -text
 Couenne/src/expression/operators/exprMul.hpp -text
+Couenne/src/expression/operators/exprNorm.hpp -text
 Couenne/src/expression/operators/exprOpp.cpp -text
 Couenne/src/expression/operators/exprOpp.hpp -text
+Couenne/src/expression/operators/exprPWLinear.hpp -text
 Couenne/src/expression/operators/exprPow.cpp -text
 Couenne/src/expression/operators/exprPow.hpp -text
 Couenne/src/expression/operators/exprQuad.cpp -text

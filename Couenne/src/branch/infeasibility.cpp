@@ -42,7 +42,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
       infmax = 0.,
       infmin = COIN_DBL_MAX;
 
-    for (std::set <int>::iterator i = dependence.begin ();
+    for (std::set <int>::const_iterator i = dependence.begin ();
 	 i != dependence.end (); ++i) {
 
       // *i is the index of an auxiliary that depends on reference_

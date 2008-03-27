@@ -231,6 +231,8 @@ include_HEADERS = \
 	expression/operators/exprGroup.hpp \
 	expression/operators/exprQuad.hpp \
 	expression/operators/exprIf.hpp \
+	expression/operators/exprNorm.hpp \
+	expression/operators/exprPWLinear.hpp \
 	expression/operators/bounds/exprBMul.hpp \
 	expression/operators/bounds/exprBDiv.hpp \
 	expression/operators/bounds/exprBSin.hpp \

@@ -103,6 +103,10 @@ class exprVar: public expression {
   virtual inline int Linearity ()
   {return LINEAR;}
 
+  /// is this expression defined as an integer?
+  virtual inline bool isDefinedInteger ()
+  {return false;}
+
   /// is this variable integer?
   virtual inline bool isInteger () {
     CouNumber lb = domain_ -> lb (varIndex_);

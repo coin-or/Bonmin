@@ -171,7 +171,7 @@ void CouenneProblem::standardize () {
 
   // Look for auxiliaries of the form w:=x and replace each occurrence of w with x
 
-  if (0)
+  //if (0)
   for (std::vector <exprVar *>::iterator i = variables_.begin (); 
        i != variables_.end (); ++i)
 
@@ -181,37 +181,61 @@ void CouenneProblem::standardize () {
 
       if ((type == VAR) || (type == AUX)) {
 
+	// found w_k = x_h. 
+	// 
+	// Check if either is integer, the survivor will be integer too
+	// Replace all occurrences of w_k with x_h
+
+	/*printf ("redundancy: "); 
+	(*i)             -> print (); printf (" := "); 
+	(*i) -> Image () -> print (); printf ("\n");*/
+
 	// use the info on the variable to be discarded: tighter
 	// bounds and integrality that the replacement might not have.
 
-	int indV = (*i) -> Image () -> Index ();
+	int 
+	  indStays  = (*i) -> Image () -> Index (), // index h
+	  indLeaves = (*i)             -> Index (); // index k
 
-	exprVar *realVar = variables_ [indV];
+	if (indStays == indLeaves)  // very strange case, w_h = x_h
+	  continue;
 
-	if (((*i) -> isInteger ()) && !(realVar -> isInteger ())) {
+	// do not swap! x_h could be in turn an auxiliary...
+	//
+	//if (indStays > indLeaves) 
+	//{int swap = indStays; indStays = indLeaves; indLeaves = swap;} // swap
 
-	  if (realVar -> Type () == AUX)
-	    realVar -> setInteger (true);
+	exprVar 
+	  *varStays  = variables_ [indStays],
+	  *varLeaves = variables_ [indLeaves];
+
+	// intersect features of the two variables (integrality, bounds)
+
+	varStays -> lb () = varLeaves -> lb () = CoinMax (varStays -> lb (), varLeaves -> lb ());
+	varStays -> ub () = varLeaves -> ub () = CoinMin (varStays -> ub (), varLeaves -> ub ());
+
+	if (varStays  -> isInteger () ||
+	    varLeaves -> isInteger ()) {
+
+	  varStays -> lb () = ceil  (varStays -> lb ());
+	  varStays -> ub () = floor (varStays -> ub ());
+
+	  if (varStays -> Type () == AUX)
+	    varStays -> setInteger (true);
 	  else {
-
-	    delete realVar;
-	    variables_ [indV] = realVar = new exprIVar (indV, &domain_);
-	    auxiliarize (realVar);
+	    //expression *old = varStays; // !!! leak
+	    variables_ [indStays] = varStays = new exprIVar (indStays, &domain_);
+	    auxiliarize (varStays); // replace it everywhere in the problem
+	    //delete old;
 	  }
 	}
 
-	if ((*i) -> lb () > realVar -> lb () + COUENNE_EPS) realVar -> lb () = (*i) -> lb ();
-	if ((*i) -> ub () < realVar -> ub () - COUENNE_EPS) realVar -> ub () = (*i) -> ub ();
+	auxiliarize (varLeaves, varStays); // now replace occurrences of w_k with x_h
 
-	auxiliarize (*i, realVar);
-	if ((*i) -> Index () >= nOrig_)
-	  (*i) -> zeroMult ();
-
-	//printf ("found redundancy: "); (*i) -> print (); 
-	//printf (" := "); (*i) -> Image () -> print (); printf ("\n");
+	//if (varLeaves -> Index () >= nOrig_) // why check? It's not there anymore.
+	varLeaves -> zeroMult ();
       }
     }
-
 
   // TODO: re-compute ranks
 

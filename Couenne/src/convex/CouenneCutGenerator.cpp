@@ -1,9 +1,9 @@
 /*
- * Name: CouenneCglCutGenerator.cpp
+ * Name: CouenneCutGenerator.cpp
  * Author: Pietro Belotti
  * Purpose: define a class of convexification procedures 
  *
- * (C) Carnegie-Mellon University, 2006-07. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -150,7 +150,7 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "Specify the logarithm of the number of local optimizations to perform" 
      " on average for each level of given depth of the tree.",
      -1,
-     -1, "Solve as many nlp's at the nodes for each level of the tree. "
+     3, "Solve as many nlp's at the nodes for each level of the tree. "
      "Nodes are randomly selected. If for a"
      "given level there are less nodes than this number nlp are solved for every nodes."
      "For example if parameter is 8, nlp's are solved for all node until level 8," 
@@ -169,7 +169,7 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
     ("convexification_points",
      "Specify the number of points at which to convexify when convexification type"
      "is uniform-grid or arround-current-point.",
-     0,1,
+     0,4,
      "");
 
   roptions -> AddStringOption6

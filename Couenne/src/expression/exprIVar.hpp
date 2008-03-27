@@ -38,11 +38,15 @@ class exprIVar: public exprVar {
 
   /// Print
   virtual void print (std::ostream &out = std::cout, bool = false) const
-    {out << "y_" << varIndex_;}
+  {out << "y_" << varIndex_;}
+
+  /// is this expression defined as an integer?
+  virtual inline bool isDefinedInteger ()
+  {return true;}
 
   /// Is this expression integer?
   virtual inline bool isInteger ()
-    {return true;}
+  {return true;}
 };
 
 #endif

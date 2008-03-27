@@ -155,7 +155,10 @@ class CouenneProblem {
 
   /// each element is true if variable is integer and, if auxiliary,
   /// depends on no integer
-  int *freeIntegers_;
+  mutable int *integerRank_;
+
+  /// numberInRank_ [i] is the number of integer variables in rank i
+  mutable std::vector <int> numberInRank_;
 
  public:
 
@@ -479,7 +482,7 @@ protected:
   void fillDependence (Bonmin::BabSetupBase *base);
 
   /// fill freeIntegers_ array
-  void fillFreeIntegers ();
+  void fillIntegerRank () const;
 };
 
 #endif

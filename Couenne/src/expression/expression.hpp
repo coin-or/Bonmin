@@ -145,6 +145,10 @@ class expression {
   virtual inline int Linearity ()
   {return NONLINEAR;}
 
+  /// is this expression defined as an integer?
+  virtual inline bool isDefinedInteger ()
+  {return isInteger ();}
+
   /// is this expression integer?
   virtual inline bool isInteger ()
   {return false;}

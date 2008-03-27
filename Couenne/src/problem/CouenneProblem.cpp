@@ -1,9 +1,9 @@
 /*
  * Name:    CouenneProblem.cpp
  * Author:  Pietro Belotti
- * Purpose: main methods of the class CouenneProblem
+ * Purpose: methods of the class CouenneProblem
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -53,7 +53,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   opt_window_ (1e50),
   useQuadratic_ (false),
   feas_tolerance_ (feas_tolerance_default),
-  freeIntegers_ (NULL) {
+  integerRank_ (NULL) {
 
   if (!asl) return;
 
@@ -73,7 +73,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
        i != variables_.end (); ++i)
     (*i) -> linkDomain (&domain_);
 
-  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM))
+  if (jnlst_->ProduceOutput(Ipopt::J_SUMMARY, J_PROBLEM))
     print (std::cout);
 
   // save -- for statistic purposes -- number of original
@@ -110,15 +110,20 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   // give a value to all auxiliary variables
   initAuxs ();
 
+  int nActualVars = nIntVars_ = 0;
+
   // check how many integer variables we have now (including aux)
-  for (int i=nOrig_; i<nVars(); i++)
-    if ((variables_ [i] -> isInteger ()) &&
-	(variables_ [i] -> Multiplicity () > 0))
-      nIntVars_++;
+  for (int i=0; i<nVars(); i++)
+    if (variables_ [i] -> Multiplicity () > 0) {
+
+      nActualVars++;
+      if (variables_ [i] -> isDefinedInteger ())
+	nIntVars_++;
+    }
 
   jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
 		  "Problem size after standarization: %d variables (%d integer), %d constraints.\n",
-		  nVars(), nIntVars_, nCons());
+		  nActualVars, nIntVars_, nCons());
 
   if (base) {
 
@@ -151,7 +156,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   // check if optimal solution is available (for debug purposes)
   readOptimum ();
 
-  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+  if (jnlst_->ProduceOutput(Ipopt::J_DETAILED, J_PROBLEM)) {
     // We should route that also through the journalist
     print (std::cout);
   }
@@ -189,7 +194,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   feas_tolerance_ (p.feas_tolerance_),
   dependence_   (p.dependence_),
   objects_      (p.objects_),
-  freeIntegers_ (NULL) {
+  integerRank_  (NULL),
+  numberInRank_ (p.numberInRank_) {
 
   for (int i=0; i < p.nVars (); i++)
     variables_ . push_back (NULL);
@@ -224,10 +230,10 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   // clear all spurious variables pointers not referring to the variables_ vector
   realign ();
 
-  if (p.freeIntegers_) {
+  if (p.integerRank_) {
 
-    freeIntegers_ = new int [nVars ()];
-    CoinCopyN (p.freeIntegers_, nVars (), freeIntegers_);
+    integerRank_ = new int [nVars ()];
+    CoinCopyN (p.integerRank_, nVars (), integerRank_);
   }
 }
 
@@ -262,7 +268,7 @@ CouenneProblem::~CouenneProblem () {
 
   if (created_pcutoff_) delete pcutoff_;
 
-  if (freeIntegers_) delete [] freeIntegers_;
+  if (integerRank_) delete [] integerRank_;
 }
 
 
@@ -366,13 +372,13 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
   roptions -> AddNumberOption
     ("art_cutoff",
      "Artificial cutoff",
-     1.e50,
-     "Default value is 1.e50.");
+     COIN_DBL_MAX,
+     "Default value is infinity.");
 
   roptions -> AddNumberOption
     ("opt_window",
      "Window around known optimum",
-     1.e5,
+     COIN_DBL_MAX,
      "Default value is infinity.");
 
   roptions -> AddNumberOption
@@ -398,7 +404,7 @@ void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions
   roptions -> AddStringOption2 
     ("optimality_bt",
      "Optimality-based (expensive) bound tightening",
-     "no",
+     "yes",
      "no","",
      "yes","");
 
@@ -421,7 +427,7 @@ If k>=0, apply with probability 2^(k - level), level being the current depth of 
   roptions -> AddLowerBoundedIntegerOption
     ("log_num_abt_per_level",
      "Specify the frequency (in terms of nodes) for aggressive bound tightening.",
-     -1,0,
+     -1,2,
      "\
 If -1, apply at every node (expensive!). \
 If 0, apply at root node only. \
@@ -430,7 +436,7 @@ If k>=0, apply with probability 2^(k - level), level being the current depth of 
   roptions -> AddNumberOption
     ("art_lower",
      "Artificial lower bound",
-     -1.e50,
+     -COIN_DBL_MAX,
      "Default value is -1.e50.");
 }
 
@@ -454,30 +460,26 @@ void CouenneProblem::indcoe2vector (int *indexI,
 }
 
 
-/// fill in the freeIntegers_ array
-void CouenneProblem::fillFreeIntegers () {
+/// fill in the integerRank_ array
+void CouenneProblem::fillIntegerRank () const {
 
-  if (freeIntegers_) 
+  if (integerRank_)
     return;
 
   int nvars = nVars ();
 
-  freeIntegers_ = new int [nvars];
-
-  //char *fixed = new char [nvars];
+  integerRank_ = new int [nvars];
 
   // 0: fractional
   // 1: integer
   // k: depending on at least one integer with associated value k-1
 
-  //CoinFillN (fixed, nvars, (char) 0); // fill with unset, for now.
-
   for (int ii = 0; ii < nvars; ii++) {
 
     int index = numbering_ [ii];
-    bool isInt = Var (index) -> isInteger ();
+    bool isInt = Var (index) -> isDefinedInteger ();
 
-    freeIntegers_ [index] = (isInt) ? 1 : 0;
+    integerRank_ [index] = (isInt) ? 1 : 0;
 
     if (Var (index) -> Type () == AUX) {
 
@@ -486,14 +488,34 @@ void CouenneProblem::fillFreeIntegers () {
       if (Var (index) -> Image () -> DepList (deplist, STOP_AT_AUX) != 0) // depends on something
 	for (std::set <int>::iterator i = deplist.begin (); i != deplist.end (); ++i) {
 
-	  int token = freeIntegers_ [*i];
+	  int token = integerRank_ [*i];
 	  if (isInt) token++;
 
-	  if (token > freeIntegers_ [index]) // there's a free integer below us, 
-	    freeIntegers_ [index] = token;
+	  if (token > integerRank_ [index]) // there's a free integer below us
+	    integerRank_ [index] = token;
 	}
     }
   }
 
-  //delete [] fixed;
+  jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "Free Integers\n");
+  for (int i=0; i<nvars; i++)
+    jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "%d: %d\n", i, integerRank_ [i]);
+
+  // fill in numberInRank_
+  for (int i=0; i<nvars; i++) {
+
+    int rank = integerRank_ [i];
+
+    if (numberInRank_.size () <= (unsigned int) rank)
+      for (int j=numberInRank_.size (); j<=rank; j++)
+	numberInRank_ .push_back (0);
+
+    numberInRank_ [rank] ++;
+  }
+
+  numberInRank_ .push_back (-1); // put a tag at the end
+
+  jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "numInteger\n");
+  for (unsigned int i=0; i<numberInRank_.size(); i++)
+    jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "%d: %d\n", i, numberInRank_ [i]);
 }
