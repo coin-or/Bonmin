@@ -55,10 +55,15 @@ IPOPTLIBDIR = @IPOPTLIBDIR@
 #Librairies for ASL (needed by Cbc)
 ASLLIB = @ASLLIB@
 
+@COIN_HAS_CPX_TRUE@append_cpx_lib = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
+@COIN_HAS_CPX_TRUE@ $(CPXLIB)
+
+@COIN_HAS_CPX_TRUE@append_cpx_dir = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
+@COIN_HAS_CPX_TRUE@ -I`$(CYGPATH_W) $(CPXINCDIR)`
 
 LIBS = -L$(COINLIBDIR) \
 	-lbonmin -lipopt \
-       -lCbc -lCgl -lOsiClp -lOsi -lClp -lCoinUtils \
+       -lCbc -lCgl -lOsiClp $(append_cpx_lib) -lOsi -lClp -lCoinUtils \
         $(ASLLIB) @ADDLIBS@ \
 	`cat @IPOPTDOCDIR@/ipopt_addlibs_cpp.txt` \
 	`cat @CGLDOCDIR@/cgl_addlibs.txt` \
@@ -69,6 +74,7 @@ LIBS = -L$(COINLIBDIR) \
 # Necessary Include dirs
 INCL = -I`$(CYGPATH_W) $(COININCDIR)` \
 	-I`$(CYGPATH_W) $(COININCDIR)/ipopt` \
+	$(append_cpx_dir)
         $(ADDINCFLAGS)
 
 # The following is necessary under cygwin, if native compilers are used
