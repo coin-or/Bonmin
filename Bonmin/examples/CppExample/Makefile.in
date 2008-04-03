@@ -58,7 +58,7 @@ ASLLIB = @ASLLIB@
 CPXLIB = @CPXLIB@
 CPXINCDIR = @CPXINCDIR@
 
-@COIN_HAS_CPX_TRUE@append_cpx_lib = -lOsiCpx.la $(CPXLIB)
+@COIN_HAS_CPX_TRUE@append_cpx_lib = -lOsiCpx $(CPXLIB)
 
 @COIN_HAS_CPX_TRUE@append_cpx_dir = -I`$(CYGPATH_W) $(CPXINCDIR)`
 
