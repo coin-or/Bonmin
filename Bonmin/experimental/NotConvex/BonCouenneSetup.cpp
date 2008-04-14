@@ -14,6 +14,7 @@
 
 #include "CouenneObject.hpp"
 #include "CouenneVarObject.hpp"
+#include "CouenneVTObject.hpp"
 #include "CouenneChooseVariable.hpp"
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
