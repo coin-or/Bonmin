@@ -338,7 +338,7 @@ namespace Bonmin
     roptions->AddLowerBoundedIntegerOption("mxlws", "FINTEGER workspace increment", 0, 500000);
     roptions->AddLowerBoundedIntegerOption("mxws", "REAL workspace increment",
         0,2000000);
-    roptions->AddLowerBoundedNumberOption("rho", "Initial trust region size",0,1,10.);
+    roptions->AddLowerBoundedNumberOption("rho_init", "Initial trust region size",0,1,10.);
     //  roption->AddLowerBoundedIntegerOption("timing", "whether to time evaluations (1 = yes)");
     roptions->AddLowerBoundedNumberOption("tt", "Parameter for upper bound on filter",0,1, 125e-2);
     roptions->AddLowerBoundedNumberOption("ubd", "Parameter for upper bound on filter", 0 , 1,1e2);
@@ -588,7 +588,7 @@ namespace Bonmin
     rho = 10.;
     maxiter = 1000;
     options->GetIntegerValue("maxiter", (Ipopt::Index &) maxiter, "filter.");
-    options->GetNumericValue("rho",rho,"filter.");
+    options->GetNumericValue("rho_init",rho,"filter.");
 
 
     // Set up scaling
@@ -748,6 +748,8 @@ namespace Bonmin
     for (int i=0; i<n; i++) {
       printf("fxsol[%2d] = %23.16e\n", i, x[i]);
     }
+#endif
+#if 0
     printf("final f = %e\n", f);
     printf("ifail = %d\n", ifail);
 #endif
