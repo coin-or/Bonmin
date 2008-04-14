@@ -20,9 +20,11 @@
 /// specify which trigonometric function is dealt with in trigEnvelope
 enum cou_trig {COU_SINE, COU_COSINE};
 
+
 /// normalize angle within [0,b] (typically, pi or 2pi)
 inline CouNumber modulo (register CouNumber a, register CouNumber b)
   {return a - b * floor (a/b);}
+
 
 /// generalized procedure for both sine and cosine
 CouNumber trigSelBranch (const CouenneObject *obj, 
@@ -38,7 +40,6 @@ bool trigImpliedBound (enum cou_trig, int, int, CouNumber *, CouNumber *, t_chg_
 
 
 /// class for sin f(x)
-
 class exprSin: public exprUnary {
 
  public:
@@ -103,8 +104,7 @@ class exprSin: public exprUnary {
 
   /// closest feasible points in function in both directions
   virtual void closestFeasible (expression *varind, expression *vardep,
-				CouNumber& left, CouNumber& right);
-
+				CouNumber& left, CouNumber& right) const;
 };
 
 #endif

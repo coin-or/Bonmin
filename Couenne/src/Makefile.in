@@ -142,8 +142,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	problem/writeGAMS.cpp problem/constraint.cpp \
 	problem/fillQuadIndices.cpp problem/fillDependence.cpp \
 	problem/CouenneSolverInterface.cpp problem/checkNLP.cpp \
-	problem/getIntegerCandidate.cpp problem/depGraph/depGraph.cpp \
-	problem/depGraph/checkCycles.cpp \
+	problem/getIntegerCandidate.cpp problem/testIntFix.cpp \
+	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
 	bound_tightening/aggressiveBT.cpp \
 	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
@@ -189,12 +189,13 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
 	constraint.lo fillQuadIndices.lo fillDependence.lo \
 	CouenneSolverInterface.lo checkNLP.lo getIntegerCandidate.lo \
-	depGraph.lo checkCycles.lo boundTightening.lo aggressiveBT.lo \
-	fake_tightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
-	impliedBounds.lo impliedBounds-mul.lo impliedBounds-sum.lo \
-	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
-	impliedBounds-exprMul.lo impliedBounds-exprQuad.lo \
-	impliedBounds-exprPow.lo drawCuts.lo rootQ.lo $(am__objects_1)
+	testIntFix.lo depGraph.lo checkCycles.lo boundTightening.lo \
+	aggressiveBT.lo fake_tightening.lo obbt.lo obbt_iter.lo \
+	tightenBounds.lo impliedBounds.lo impliedBounds-mul.lo \
+	impliedBounds-sum.lo impliedBounds-exprSum.lo \
+	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo \
+	impliedBounds-exprQuad.lo impliedBounds-exprPow.lo drawCuts.lo \
+	rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -473,8 +474,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	problem/writeGAMS.cpp problem/constraint.cpp \
 	problem/fillQuadIndices.cpp problem/fillDependence.cpp \
 	problem/CouenneSolverInterface.cpp problem/checkNLP.cpp \
-	problem/getIntegerCandidate.cpp problem/depGraph/depGraph.cpp \
-	problem/depGraph/checkCycles.cpp \
+	problem/getIntegerCandidate.cpp problem/testIntFix.cpp \
+	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
 	bound_tightening/aggressiveBT.cpp \
 	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
@@ -548,6 +549,7 @@ include_HEADERS = \
 	../inc/config_couenne.h \
 	branch/CouenneObject.hpp \
 	branch/CouenneVarObject.hpp \
+	branch/CouenneVTObject.hpp \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
@@ -597,6 +599,7 @@ include_HEADERS = \
 	expression/CouenneTypes.hpp \
 	util/rootQ.hpp \
 	util/funtriplets.hpp \
+	disjunctive/CouenneDisjCuts.hpp \
 	convex/CouenneCutGenerator.hpp
 
 
@@ -785,6 +788,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splitAux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/standardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sumStandardize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testIntFix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trigNewton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unifiedProdCuts.Plo@am__quote@
@@ -1471,6 +1475,13 @@ getIntegerCandidate.lo: problem/getIntegerCandidate.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o getIntegerCandidate.lo `test -f 'problem/getIntegerCandidate.cpp' || echo '$(srcdir)/'`problem/getIntegerCandidate.cpp
 
+testIntFix.lo: problem/testIntFix.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT testIntFix.lo -MD -MP -MF "$(DEPDIR)/testIntFix.Tpo" -c -o testIntFix.lo `test -f 'problem/testIntFix.cpp' || echo '$(srcdir)/'`problem/testIntFix.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/testIntFix.Tpo" "$(DEPDIR)/testIntFix.Plo"; else rm -f "$(DEPDIR)/testIntFix.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/testIntFix.cpp' object='testIntFix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o testIntFix.lo `test -f 'problem/testIntFix.cpp' || echo '$(srcdir)/'`problem/testIntFix.cpp
+
 depGraph.lo: problem/depGraph/depGraph.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT depGraph.lo -MD -MP -MF "$(DEPDIR)/depGraph.Tpo" -c -o depGraph.lo `test -f 'problem/depGraph/depGraph.cpp' || echo '$(srcdir)/'`problem/depGraph/depGraph.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/depGraph.Tpo" "$(DEPDIR)/depGraph.Plo"; else rm -f "$(DEPDIR)/depGraph.Tpo"; exit 1; fi
@@ -1701,7 +1712,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../inc $(distdir)/branch $(distdir)/convex $(distdir)/expression $(distdir)/expression/operators $(distdir)/expression/operators/bounds $(distdir)/problem $(distdir)/problem/depGraph $(distdir)/standardize $(distdir)/util
+	$(mkdir_p) $(distdir)/../inc $(distdir)/branch $(distdir)/convex $(distdir)/disjunctive $(distdir)/expression $(distdir)/expression/operators $(distdir)/expression/operators/bounds $(distdir)/problem $(distdir)/problem/depGraph $(distdir)/standardize $(distdir)/util
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

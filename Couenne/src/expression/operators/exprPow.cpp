@@ -3,12 +3,14 @@
  * Author:  Pietro Belotti
  * Purpose: definition of powers
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include <math.h>
 #include <assert.h>
+
+#include "CoinHelperFunctions.hpp"
 
 #include "CouennePrecisions.hpp"
 #include "exprPow.hpp"
@@ -209,32 +211,65 @@ bool exprPow::isInteger () {
   return true;
 }
 
-/// left distance to closest feasible point in function
-CouNumber exprPow::leftClosestFeasible (expression *w, expression *x) {
 
-  //arglist_ [0] = exprVar *base;
-  //arglist_ [1] = exprConst *exponent;
+/// compute $y^{lv}$ and  $y^{uv}$ for Violation Transfer algorithm
+void exprPow::closestFeasible (expression *varind,
+			       expression *vardep, 
+			       CouNumber &left,
+			       CouNumber &right) const {
+  CouNumber
+    x  = (*varind) (), //info -> solution_ [indep     -> Index ()],
+    y  = (*vardep) (), //info -> solution_ [dependent -> Index ()],
+    k  = arglist_ [1] -> Value (),
+    xk = safe_pow (x, k),
+    yk = safe_pow (y, 1./k);
 
-  exprVar *base = arglist_ [0];
-  CouNumber k = (*(arglist_ [1])) ();
+  int intk = 0;
 
-  assert(var->Index() == base->Index());
+  bool isInt    =            fabs (k    - (double) (intk = COUENNE_round (k)))    < COUENNE_EPS,
+       isInvInt = !isInt && (fabs (1./k - (double) (intk = COUENNE_round (1./k))) < COUENNE_EPS);
 
-  if (   (isInt || isInvInt)
-	 && (intk % 2) 
-	 && (k > COUENNE_EPS)) {
+  // three cases: 
+  // 1) k or  1/k odd,        => have either left or right
+  // 2) k or  1/k even,       => may have both
+  // 3) k and 1/k fractional  => have either left or right
 
-    if 
+  if (isInt || isInvInt)
 
-    return COIN_DBL_MAX;
-  }
+    if (intk % 2) // case 1
 
-  if () 
-    // monotone: k odd, 1/k integer and odd
-    //           k not integer
-}
+      if (k > 0) 
+	((y < xk) ? left : right) = yk; // easy, x^k is continuous
 
-/// right distance to closest feasible point in function
-CouNumber exprPow::rightClosestFeasible (expression *var) {
+      else
 
+	if      (y < 0.)          // third, fourth orthant
+	  if (y < xk) right = yk; // in convex region y < 1/x within third orthant
+	  else        left  = yk; // remaining non-convex area
+
+	else                      // first, second orthant
+	  if (y > xk) left  = yk; // in convex region y > 1/x within first orthant
+	  else        right = yk; // remaining non-convex area
+
+    else // case 2
+
+      if (y <= 0.) // third, fourth orthant => no solution
+	left = - (right = COIN_DBL_MAX);
+
+      else
+
+	if (k > 0) 
+	  left = - (right = yk);
+
+	else // k negative
+	  if (y < xk) // between asymptotes
+	    left = - (right = yk);
+	  else  // in one of the two convex areas
+	    if (x > 0) left  =  yk;
+	    else       right = -yk;
+
+  else // case 3: assume x bounded from below by 0
+
+    if (k > 0) ((y < xk) ? left : right) = yk;
+    else       ((y > xk) ? left : right) = yk;
 }

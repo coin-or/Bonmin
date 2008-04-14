@@ -8,6 +8,7 @@
  */
 
 #include <stdlib.h>
+#include <assert.h>
 
 #include "exprMul.hpp"
 #include "exprSum.hpp"
@@ -169,3 +170,30 @@ expression *getFixVarBinFun (expression *, expression *);
 // in a branching rule for solving a nonconvexity gap
 expression *exprMul::getFixVar () 
 {return getFixVarBinFun (arglist_ [0], arglist_ [1]);}
+
+
+/// compute $y^{lv}$ and  $y^{uv}$ for Violation Transfer algorithm
+void exprMul::closestFeasible (expression *varind,
+			       expression *vardep,
+			       CouNumber &left,
+			       CouNumber &right) const {
+
+  expression *varoth = arglist_ [0];; // suppose $w = cy$;
+
+  if (varoth -> Index () == varind -> Index ())
+    varoth = arglist_ [1]; // actually no, it's $w = x*c$
+
+  assert (varoth -> Index () >= 0);
+
+  CouNumber
+    x = (*varind) (),
+    y = (*vardep) (),
+    c = (*varoth) ();
+
+  if (c < 0)
+    if (y < c*x) right = y/c;
+    else         left  = y/c;
+  else 
+    if (y < c*x) left  = y/c;
+    else         right = y/c;
+}

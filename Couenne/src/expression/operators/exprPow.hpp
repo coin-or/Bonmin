@@ -91,11 +91,11 @@ class exprPow: public exprOp {
 				  double * &brpts, 
 				  int &way);
 
-  /// left distance to closest feasible point in function
-  virtual CouNumber leftClosestFeasible (expression *var);
-
-  /// right distance to closest feasible point in function
-  virtual CouNumber rightClosestFeasible (expression *var);
+  /// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm
+  virtual void closestFeasible (expression *varind,
+				expression *vardep, 
+				CouNumber &left,
+				CouNumber &right) const;
 };
 
 

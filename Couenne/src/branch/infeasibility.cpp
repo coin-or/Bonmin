@@ -12,9 +12,9 @@
 #include "CouenneProblem.hpp"
 #include "CouenneVarObject.hpp"
 
-const CouNumber weiMin = 0.8;
-const CouNumber weiMax = 0.3;
-const CouNumber weiSum = 1.0; // at least 1 so top level aux are avoided
+const CouNumber weiMin = 0.3;
+const CouNumber weiMax = 1.3;
+const CouNumber weiSum = 1.1; // at least 1 so top level aux are avoided
 const CouNumber weiAvg = 0.0;
 
 
@@ -25,15 +25,17 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 
   assert (reference_);
 
-  const std::set <int> &dependence = problem_ -> Dependence () [reference_ -> Index ()];
+  int index = reference_ -> Index ();
+
+  const std::set <int> &dependence = problem_ -> Dependence () [index];
 
   CouNumber retval;
 
-  if (dependence.size () == 0) { // this is a top level auxiliary, not appearing as independent
+  if (dependence.size () == 0) { // this is a top level auxiliary,
+				 // nowhere an independent
 
-    //retval = fabs ((*reference_) () - (*(reference_ -> Image ())) ());
     const CouenneObject &obj = problem_ -> Objects () [reference_ -> Index ()];
-    retval =  (obj. Reference ()) ? obj.infeasibility (info, way) : 0.;
+    retval = (obj. Reference ()) ? obj.infeasibility (info, way) : 0.;
   }
   else {
 
@@ -62,8 +64,12 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
       weiMax * infmax;
   }
 
-  if (jnlst_->ProduceOutput(J_MATRIX, J_BRANCHING)) {
-    printf ("infeasVar %-10g [", retval); 
+  if ((retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
+      (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
+
+    printf ("infeasVar %-10g [", retval + (1 - exp (info -> lower_ [index] - 
+						    info -> upper_ [index]))); 
+
     reference_             -> print (); 
     if (dependence.size () == 0) { // if no list, print image
       printf (" := ");
@@ -72,5 +78,9 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
     printf ("]\n");
   }
 
-  return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : retval);
+  // add term to stop branching on very tiny intervals
+
+  return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 
+	  0. : (retval + (1 - exp (info -> lower_ [index] - 
+				   info -> upper_ [index]))));
 }

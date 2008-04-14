@@ -62,8 +62,10 @@ class exprExp: public exprUnary {
 				  double * &brpts, 
 				  int &way);
 
+  /// return true if bijective
   virtual bool isBijective() const {return true;}
 
+  /// inverse of exponential
   virtual CouNumber inverse(expression *vardep) const
   {
     return log((*vardep)());

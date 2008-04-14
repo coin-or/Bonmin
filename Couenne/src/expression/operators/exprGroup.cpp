@@ -114,6 +114,8 @@ int exprGroup::Linearity () {
 /// compare affine terms
 int exprGroup::compare (exprGroup &e) {
 
+  // !!! why?
+
   //int sum = exprSum::compare (e);
 
   //if (sum != 0) 
@@ -234,15 +236,42 @@ void exprGroup::replace (exprVar *x, exprVar *w) {
 
   exprOp::replace (x, w);
 
-  int index = x -> Index ();
+  int 
+    xind = x -> Index (),
+    wind = w -> Index ();
 
-  for (lincoeff::iterator el = lcoeff_. begin (); el != lcoeff_. end (); ++el) {
+  // find occurrences of x and w in vector of variabls
 
-    exprVar * &ve = el -> first;
+  lincoeff::iterator x_occur = lcoeff_.begin ();
 
-    if (//(ve -> Type  () == VAR) &&
-	(ve -> Index () == index))
-      ve = w;
+  // Do not assume index vector is sorted in ascending order
+  // w.r.t. (*iterator) -> first () -> Index()
+  while ((x_occur != lcoeff_.end ()) && 
+	 (x_occur -> first -> Index () != xind))
+    ++x_occur;
+
+  if (x_occur == lcoeff_ .end ()) // not found, bail out
+    return;
+
+  if (xind == wind)
+    x_occur -> first = w;
+  else { // replacing two variables, not the features of one
+
+    lincoeff::iterator w_occur = lcoeff_.begin ();
+
+    // Do not assume index vector is sorted in ascending order
+    // w.r.t. (*iterator) -> first () -> Index()
+    while ((w_occur != lcoeff_.end ()) &&
+	   (w_occur -> first -> Index () != wind))
+      ++w_occur;
+
+    if (w_occur == lcoeff_ . end ()) // not found w, simply substitute 
+      x_occur -> first = w;
+    else {
+      if ((w_occur -> second += x_occur -> second) == 0.) // add coefficients
+	lcoeff_.erase (w_occur);                // if they cancel out, delete w as well
+      lcoeff_.erase   (x_occur);                // delete entry of x
+    }
   }
 }
 

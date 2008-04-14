@@ -81,11 +81,14 @@ class exprInv: public exprUnary {
 				  double * &brpts, 
 				  int &way);
 
+  /// return true if bijective
   virtual bool isBijective() const {return true;}
 
+  /// return inverse of y=f(x)=1/x, i.e., x=1/y
   virtual CouNumber inverse(expression *vardep) const
   {
     return 1./((*vardep)());
-  }};
+  }
+};
 
 #endif

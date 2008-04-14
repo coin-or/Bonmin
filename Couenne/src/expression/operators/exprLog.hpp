@@ -63,8 +63,10 @@ class exprLog: public exprUnary {
 				  double * &brpts, 
 				  int &way);
 
+  /// return true if feasible
   virtual bool isBijective() const {return true;}
 
+  /// inverse of this operator
   virtual CouNumber inverse(expression *vardep) const
   {
     return exp((*vardep)());

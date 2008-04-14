@@ -265,6 +265,11 @@ public:
   /// return pointer to variable domain
   Domain *domain ();
 
+  /// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm
+  virtual void closestFeasible (expression *varind,
+				expression *vardep, 
+				CouNumber &left,
+				CouNumber &right) const;
 protected:
 
   void computeQuadFiniteBound (CouNumber &qMin, CouNumber &qMax, 

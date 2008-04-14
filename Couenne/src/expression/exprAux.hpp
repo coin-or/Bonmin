@@ -139,11 +139,10 @@ class exprAux: public exprVar {
   /// is this expression defined as integer?
   virtual inline bool isDefinedInteger () {
 
-    if ((integer_ == Integer) || 
-	(integer_ == Unset) && 
-	((integer_ = (image_ -> isInteger ()) ? 
-	  Integer : Continuous) == Integer))
-      return true;
+    return ((integer_ == Integer) || 
+	    (integer_ == Unset) && 
+	    ((integer_ = (image_ -> isInteger ()) ? 
+	      Integer : Continuous) == Integer));
   }
 
   /// is this expression integer?

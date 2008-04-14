@@ -51,7 +51,9 @@ void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
     expression *body = (*i) -> Body ();
 
     if (body) {
-      if (body -> Type () == VAR) {
+      if ((body -> Type () == VAR) || 
+	  (body -> Type () == AUX)) {
+
 	if (body -> Index () == (*orig) -> Index ()) {
       
 	  delete body;//(*i) -> Body ();
@@ -69,7 +71,9 @@ void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
     expression *body = (*i) -> Body ();
 
     if (body) {
-      if (body -> Type () == VAR) {
+      if ((body -> Type () == VAR) ||
+	  (body -> Type () == AUX)) {
+
 	if (body -> Index () == (*orig) -> Index ()) {
       
 	  delete body;//(*i) -> Body ();

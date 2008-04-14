@@ -1,9 +1,9 @@
 /*
  * Name:    exprCos.cpp
  * Author:  Pietro Belotti
- * Purpose: methods for of cosine 
+ * Purpose: methods for cosines
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -16,10 +16,12 @@
 #include "exprMul.hpp"
 #include "exprClone.hpp"
 
+
 static const CouNumber 
   pi  = M_PI,
   pi2 = M_PI * 2.,
   pih = M_PI / 2.;
+
 
 // return an expression -sin (argument), the derivative of cos (argument)
 expression *exprCos::differentiate (int index) {
@@ -39,8 +41,10 @@ void exprCos::getBounds (expression *&lb, expression *&ub) {
   ub = new exprUBCos (new exprClone (xl), new exprClone (xu));
 }
 
+
+/// closest feasible points in function in both directions
 void exprCos::closestFeasible (expression *varind, expression *vardep,
-			       CouNumber& left, CouNumber& right)
+			       CouNumber& left, CouNumber& right) const
 {
   CouNumber curr = (*varind)();
   int period = (int)(curr/pi2);

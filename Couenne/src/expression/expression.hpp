@@ -248,7 +248,7 @@ class expression {
   virtual void realign (const CouenneProblem *p) {}
 
   /// indicating if function is monotonotically increasing
-  virtual bool isBijective() const {return false};
+  virtual bool isBijective() const {return false;}
 
   /// compute the inverse function
   virtual CouNumber inverse(expression *vardep) const {
@@ -257,21 +257,7 @@ class expression {
 
   /// closest feasible points in function in both directions
   virtual void closestFeasible (expression *varind, expression *vardep,
-				CouNumber& left, CouNumber& right)
-  {
-    assert(isBijective());
-    CouNumber inv = inverse(vardep);
-    CouNumber curr = (*varind) ();
-    if (curr > inv) {
-      left  = inv;
-      right = curr;
-    }
-    else {
-      left  = curr;
-      right = inv;
-    }
-  }
-
+				CouNumber& left, CouNumber& right) const;
 };
 
 

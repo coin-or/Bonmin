@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the sine of a function
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -120,7 +120,7 @@ bool trigImpliedBound (enum cou_trig type, int wind, int xind,
 }
 
 void exprSin::closestFeasible (expression *varind, expression *vardep,
-			       CouNumber& left, CouNumber& right)
+			       CouNumber& left, CouNumber& right) const
 {
   CouNumber curr = (*varind)() - pih;
   int period = (int)(curr/pi2);

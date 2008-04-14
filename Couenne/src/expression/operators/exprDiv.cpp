@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of divisions
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -182,4 +182,44 @@ bool exprDiv::isInteger () {
   }
 
   return false;
+}
+
+
+/// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm
+void exprDiv::closestFeasible (expression *varind,
+			       expression *vardep, 
+			       CouNumber &left,
+			       CouNumber &right) const {
+
+  expression *varoth = arglist_ [0]; // assume w = c/x
+
+  bool numerator = false;
+
+  if (varoth -> Index () == varind -> Index ()) { // actually w = x/c
+    varoth = arglist_ [1];
+    numerator = true;
+  } else assert (arglist_ [0] -> Index () == varind -> Index ());
+
+  CouNumber 
+    x = (*varind) (),
+    y = (*vardep) (),
+    c = (*varoth) ();
+
+  if (numerator) // checking y = x/c
+
+    if (c < 0.)
+      if (y < x/c) right = c*y;
+      else         left  = c*y;
+    else 
+      if (y < x/c) left  = c*y;
+      else         right = c*y;
+
+  else           // checking y = c/x
+
+    if      (y < 0.) 
+      if (x*y > c) right = c/y; // convex area in third orthant
+      else         left  = c/y; // remaining of third+fourth orthant
+    else if (y > 0.) 
+      if (x*y > c) left  = c/y; // convex area in first orthant
+      else         right = c/y; // remaining of first+second orthant
 }

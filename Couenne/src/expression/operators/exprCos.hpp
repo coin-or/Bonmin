@@ -66,7 +66,6 @@ class exprCos: public exprUnary {
 
     return impl;
   }
-  //{return trigImpliedBound (COU_COSINE, index, argument_ -> Index (), l, u, chg);}
 
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
@@ -79,8 +78,7 @@ class exprCos: public exprUnary {
 
   /// closest feasible points in function in both directions
   virtual void closestFeasible (expression *varind, expression *vardep,
-				CouNumber& left, CouNumber& right);
-
+				CouNumber& left, CouNumber& right) const;
 };
 
 

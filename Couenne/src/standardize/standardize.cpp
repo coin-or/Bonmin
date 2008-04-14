@@ -25,9 +25,12 @@
 
 void CouenneProblem::standardize () {
 
-  /*printf ("current point: %d vars -------------------\n", domain_.current () -> Dimension ());
+#ifdef DEBUG
+  printf ("START: current point: %d vars -------------------\n", 
+	  domain_.current () -> Dimension ());
   for (int i=0; i<domain_.current () -> Dimension (); i++)
-  printf ("%20g [%20g %20g]\n", domain_.x (i), domain_.lb (i), domain_.ub (i));*/
+    printf ("%3d %20g [%20g %20g]\n", i, domain_.x (i), domain_.lb (i), domain_.ub (i));
+#endif
 
   // create dependence graph to assign an order to the evaluation (and
   // bound propagation, and -- in reverse direction -- implied bounds)
@@ -169,7 +172,89 @@ void CouenneProblem::standardize () {
   for (unsigned int i = iters2erase.size (); i--;)
     constraints_. erase (iters2erase [i]);
 
+#ifdef DEBUG
+  // Use with caution. Bounds on auxs are not defined yet, so valgrind complains
+  printf ("done with standardization: (careful, bounds below can be nonsense)\n");
+  print (); 
+#endif
+
+  // Create evaluation order ////////////////////////////////////////////////////
+
+  delete auxSet_;
+
+  // reallocate space for enlarged set of variables
+  domain_.current () -> resize (nVars ());
+
+  //graph_ -> print ();
+  graph_ -> createOrder ();
+  //graph_ -> print ();
+
+  assert (graph_ -> checkCycles () == false);
+
+  // Fill numbering structure /////////////////////////////////////////////////
+
+  int n = nVars ();
+  numbering_ = new int [n];
+  std::set <DepNode *, compNode> vertices = graph_ -> Vertices ();
+
+  for (std::set <DepNode *, compNode>::iterator i = vertices.begin ();
+       i != vertices.end (); ++i)
+
+    numbering_ [(*i) -> Order ()] = (*i) -> Index (); 
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  for (int i = 0; i < nVars (); i++) {
+
+    int ord = numbering_ [i];
+
+    if (variables_ [ord] -> Type () == AUX) {
+
+      // initial auxiliary bounds are infinite (they are later changed
+      // through branching)
+
+      if (variables_ [ord] -> Index () >= nOrig_) { // and one that was not an original, originally...
+
+	domain_.lb (ord) = -COIN_DBL_MAX;
+	domain_.ub (ord) =  COIN_DBL_MAX;
+      }
+
+      //printf ("from "); variables_ [ord] -> Lb    () -> print (); 
+
+      // tighten them with propagated bounds
+      variables_ [ord] -> crossBounds ();
+
+      //printf ("to "); variables_ [ord] -> Lb    () -> print (); printf (", now eval\n");
+
+#ifdef DEBUG
+      printf (":::: %3d %10g [%10g, %10g]", 
+	      ord, domain_.x (ord), domain_.lb (ord), domain_.ub (ord));
+#endif
+
+      // and evaluate them
+      domain_.x  (ord) = (*(variables_ [ord] -> Image ())) ();
+      domain_.lb (ord) = (*(variables_ [ord] -> Lb    ())) ();
+      domain_.ub (ord) = (*(variables_ [ord] -> Ub    ())) ();
+
+#ifdef DEBUG
+      printf (" --> %10g [%10g, %10g] [", 
+	      domain_.x (ord), domain_.lb (ord), domain_.ub (ord));
+      variables_ [ord] -> Lb () -> print (); printf (",");
+      variables_ [ord] -> Ub () -> print (); printf ("]\n");
+#endif
+
+      bool integer = variables_ [ord] -> isInteger ();
+
+      if (integer) {
+	domain_.lb (ord) = ceil  (domain_.lb (ord) - COUENNE_EPS);
+	domain_.ub (ord) = floor (domain_.ub (ord) + COUENNE_EPS);
+      }
+    }
+  }
+
   // Look for auxiliaries of the form w:=x and replace each occurrence of w with x
+
+  // TODO: resolve duplicate index in exprQuad before restoring this
 
   //if (0)
   for (std::vector <exprVar *>::iterator i = variables_.begin (); 
@@ -238,80 +323,6 @@ void CouenneProblem::standardize () {
     }
 
   // TODO: re-compute ranks
-
-#ifdef DEBUG
-  // Use with caution. Bounds on auxs are not defined yet, so valgrind complains
-  printf ("done with standardization:\n");
-  //print (); 
-#endif
-
-  // Create evaluation order ////////////////////////////////////////////////////
-
-  delete auxSet_;
-
-  // reallocate space for enlarged set of variables
-  domain_.current () -> resize (nVars ());
-
-  //graph_ -> print ();
-  graph_ -> createOrder ();
-  //graph_ -> print ();
-
-  assert (graph_ -> checkCycles () == false);
-
-  // Fill numbering structure /////////////////////////////////////////////////
-
-  int n = nVars ();
-  numbering_ = new int [n];
-  std::set <DepNode *, compNode> vertices = graph_ -> Vertices ();
-
-  for (std::set <DepNode *, compNode>::iterator i = vertices.begin ();
-       i != vertices.end (); ++i)
-
-    numbering_ [(*i) -> Order ()] = (*i) -> Index (); 
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  for (int i = 0; i < nVars (); i++) {
-
-    int ord = numbering_ [i];
-
-    if (variables_ [ord] -> Type () == AUX) {
-
-      // initial auxiliary bounds are infinite (they are later changed
-      // through branching)
-
-      if (variables_ [ord] -> Index () >= nOrig_) { // and one that was not an original, originally...
-
-	domain_.lb (ord) = -COIN_DBL_MAX;
-	domain_.ub (ord) =  COIN_DBL_MAX;
-      }
-
-      //printf ("from "); variables_ [ord] -> Lb    () -> print (); 
-
-      // tighten them with propagated bounds
-      variables_ [ord] -> crossBounds ();
-
-      //printf ("to "); variables_ [ord] -> Lb    () -> print (); printf (", now eval\n");
-
-      // and evaluate them
-      domain_.x  (ord) = (*(variables_ [ord] -> Image ())) ();
-      domain_.lb (ord) = (*(variables_ [ord] -> Lb    ())) ();
-      domain_.ub (ord) = (*(variables_ [ord] -> Ub    ())) ();
-
-#ifdef DEBUG
-      printf (":::: %10g [%10g, %10g] [", domain_.x (ord), domain_.lb (ord), domain_.ub (ord));
-      variables_ [ord] -> Lb () -> print (); printf (",");
-      variables_ [ord] -> Ub () -> print (); printf ("]\n");
-#endif
-
-      bool integer = variables_ [ord] -> isInteger ();
-
-      if (integer) {
-	domain_.lb (ord) = ceil  (domain_.lb (ord) - COUENNE_EPS);
-	domain_.ub (ord) = floor (domain_.ub (ord) + COUENNE_EPS);
-      }
-    }
-  }
 
   delete [] commuted_;  commuted_ = NULL;
   delete    graph_;     graph_    = NULL;

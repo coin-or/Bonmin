@@ -13,7 +13,6 @@
 
 
 // differentiation
-
 expression *exprInv::differentiate (int index) {
 
   expression **alm = new expression * [3];
@@ -27,7 +26,6 @@ expression *exprInv::differentiate (int index) {
 
 
 // printing
-
 void exprInv::print (std::ostream &out, 
 		     bool descend) const {
   out << "(1/";

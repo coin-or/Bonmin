@@ -18,7 +18,6 @@
 
 
 // output content of the problem
-
 void CouenneProblem::print (std::ostream &out) {
 
   out << "objectives:" << std::endl;
@@ -35,13 +34,13 @@ void CouenneProblem::print (std::ostream &out) {
   for (std::vector <exprVar *>::iterator i = variables_.begin ();
        i != variables_.end (); ++i)
 
-    if (((*i) -> Type () != AUX) || ((*i) -> Multiplicity () > 0)) {
+    if (((*i) -> Type () != AUX) || 
+	((*i) -> Multiplicity () > 0)) {
 
       (*i) -> print (out);
 
       if (((*i) -> Type () == AUX) && ((*i) -> Multiplicity () > 0)) {
 
-	//printf (" %x", (*i));
 	out << " (r:" << (*i) -> rank () 
 	    << ", m:" << (*i) -> Multiplicity () << ") := ";
 	if ((*i) -> Image ())
@@ -58,15 +57,6 @@ void CouenneProblem::print (std::ostream &out) {
       else {
 
 	out << " [ " << lb << " , " << ub << " ]";
-
-	/*if ((*i) -> Image ()) {
-	  expression *lb, *ub;
-	  (*i) -> Image () -> getBounds (lb, ub);
-	  out << " {";  lb -> print (out);
-	  out << " , "; ub -> print (out);
-	  out << "} "; 
-	  }*/
-
 	if ((*i) -> isInteger ()) out << " integer";
       }
 

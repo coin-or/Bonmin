@@ -118,15 +118,14 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
 int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 			       t_chg_bounds *chg_bds, 
 			       Bonmin::BabInfo * babInfo) const {
-  if (!babInfo) 
-    return 0;
-
   int nchanges = 0,
     objind = Obj (0) -> Body () -> Index ();
 
+  assert (objind >= 0);
+
   CouNumber
-    UB = babInfo -> babPtr () -> model (). getObjValue(),
-    LB = babInfo -> babPtr () -> model (). getBestPossibleObjValue ();
+    UB = getCutOff (), //babInfo -> babPtr () -> model (). getObjValue(), // todo: get cutoff
+    LB = Lb (objind);  //babInfo -> babPtr () -> model (). getBestPossibleObjValue (); // todo:  w_0^l
 
   //////////////////////// Reduced cost bound tightening //////////////////////
 
@@ -134,6 +133,8 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 
     const double 
       *X  = psi -> getColSolution (),
+      *L  = psi -> getColLower    (),
+      *U  = psi -> getColUpper    (),
       *RC = psi -> getReducedCost ();
 
     int ncols = psi -> getNumCols ();
@@ -141,18 +142,37 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
     for (int i=0; i<ncols; i++)
       if (i != objind) {
 
-      CouNumber
-	x  = X  [i],
-	rc = RC [i],
-	dx = Ub (i) - x;
+	CouNumber
+	  x  = X  [i],
+	  l  = L  [i],
+	  u  = U  [i],
+	  rc = RC [i];
 
-      if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
+	if (rc < COUENNE_EPS) 
+	  continue;
+
+	if (x == l) {
+	  if (LB + (u-l)*rc > UB) {
+	    Ub (i) = l + (UB-LB) / rc;
+	    nchanges++;
+	    chg_bds [i].setLower(t_chg_bounds::CHANGED);
+	  }
+	} else if (x == u) {
+	  if (LB + (u-l) * rc > UB) {
+	    Lb (i) = u - (UB-LB) / rc;
+	    nchanges++;
+	    chg_bds [i].setUpper(t_chg_bounds::CHANGED);
+	  }
+	}
+      }
+
+      /*      if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
 	// can improve bound on variable w_i
 	Ub (i) = x + (UB-LB) / rc;
 	nchanges++;
 	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
-      }
-    }
+	}*/
+
   }
 
   return nchanges;

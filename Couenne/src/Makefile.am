@@ -112,6 +112,7 @@ libCouenne_la_SOURCES = \
 	problem/CouenneSolverInterface.cpp \
 	problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp \
+	problem/testIntFix.cpp \
 	problem/depGraph/depGraph.cpp \
 	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
@@ -207,6 +208,7 @@ include_HEADERS = \
 	../inc/config_couenne.h \
 	branch/CouenneObject.hpp \
 	branch/CouenneVarObject.hpp \
+	branch/CouenneVTObject.hpp \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
@@ -256,6 +258,7 @@ include_HEADERS = \
 	expression/CouenneTypes.hpp \
 	util/rootQ.hpp \
 	util/funtriplets.hpp \
+	disjunctive/CouenneDisjCuts.hpp \
 	convex/CouenneCutGenerator.hpp
 
 #############################################################################

@@ -380,7 +380,9 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
     fabs (info -> solution_ [reference_ -> Index ()] - 
 	  (*(reference_ -> Image ())) ());
 
-  if (jnlst_->ProduceOutput(J_MATRIX, J_BRANCHING)) {
+  if ((delta > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
+      (jnlst_->ProduceOutput(J_MOREMATRIX, J_BRANCHING))) {
+
     printf ("infeas %g: ", (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta); 
     reference_             -> print (); printf (" := ");
     reference_ -> Image () -> print (); printf ("\n");

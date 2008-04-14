@@ -17,9 +17,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 				      OsiCuts &cs,
 				      int nchanged, 
 				      int *changed,
-				      //const CglTreeInfo &info,
-				      t_chg_bounds *chg,
-				      bool have_NLP) const {
+				      t_chg_bounds *chg) const {
 
   // TODO: pass have_NLP to all
 
@@ -45,8 +43,10 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
       exprVar *var = problem_ -> Var (i);
 
       if ((var -> Multiplicity () > 0) && 
-	  (var -> Type () == AUX))
+	  (var -> Type () == AUX)) {
+
 	var -> generateCuts (si, cs, this, chg);
+      }
     }
   else { // chg_bds contains the indices of the variables whose bounds
 	 // have changes (a -1 follows the last element)

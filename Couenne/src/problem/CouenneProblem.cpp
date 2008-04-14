@@ -364,87 +364,13 @@ exprAux *CouenneProblem::addAuxiliary (expression *symbolic) {
   return w;
 }
 
-/// Add list of options to be read from file
-void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {
-
-  roptions -> SetRegisteringCategory ("Couenne options", Bonmin::RegisteredOptions::CouenneCategory);
-
-  roptions -> AddNumberOption
-    ("art_cutoff",
-     "Artificial cutoff",
-     COIN_DBL_MAX,
-     "Default value is infinity.");
-
-  roptions -> AddNumberOption
-    ("opt_window",
-     "Window around known optimum",
-     COIN_DBL_MAX,
-     "Default value is infinity.");
-
-  roptions -> AddNumberOption
-    ("feas_tolerance",
-     "Tolerance for constraints/auxiliary variables",
-     feas_tolerance_default,
-     "Default value is zero.");
-
-  roptions -> AddStringOption2 
-    ("feasibility_bt",
-     "Feasibility-based (cheap) bound tightening",
-     "yes",
-     "no","",
-     "yes","");
-
-  roptions -> AddStringOption2 
-    ("use_quadratic",
-     "Use quadratic expressions and related exprQuad class",
-     "no",
-     "no","Use an auxiliary for each bilinear term",
-     "yes","Create one only auxiliary for a quadrati expression");
-
-  roptions -> AddStringOption2 
-    ("optimality_bt",
-     "Optimality-based (expensive) bound tightening",
-     "yes",
-     "no","",
-     "yes","");
-
-  roptions -> AddLowerBoundedIntegerOption
-    ("log_num_obbt_per_level",
-     "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
-     -1,0,
-     "\
-If -1, apply at every node (expensive!). \
-If 0, apply at root node only. \
-If k>=0, apply with probability 2^(k - level), level being the current depth of the B&B tree.");
-
-  roptions -> AddStringOption2 
-    ("aggressive_fbbt",
-     "Aggressive feasibility-based bound tightening (to use with NLP points)",
-     "yes",
-     "no","",
-     "yes","");
-
-  roptions -> AddLowerBoundedIntegerOption
-    ("log_num_abt_per_level",
-     "Specify the frequency (in terms of nodes) for aggressive bound tightening.",
-     -1,2,
-     "\
-If -1, apply at every node (expensive!). \
-If 0, apply at root node only. \
-If k>=0, apply with probability 2^(k - level), level being the current depth of the B&B tree.");
-
-  roptions -> AddNumberOption
-    ("art_lower",
-     "Artificial lower bound",
-     -COIN_DBL_MAX,
-     "Default value is -1.e50.");
-}
-
 
 /// translates pair (indices, coefficients) into vector with pointers to variables
 void CouenneProblem::indcoe2vector (int *indexL, 
 				    CouNumber *coeff,
 				    std::vector <std::pair <exprVar *, CouNumber> > &lcoeff) {
+  // TODO: sort
+
   for (int i=0; indexL [i] >= 0; i++)
     lcoeff.push_back (std::pair <exprVar *, CouNumber> (Var (indexL [i]), coeff [i]));
 }
@@ -455,6 +381,8 @@ void CouenneProblem::indcoe2vector (int *indexI,
 				    int *indexJ,
 				    CouNumber *coeff,
 				    std::vector <quadElem> &qcoeff) {
+  // TODO: sort
+
   for (int i=0; indexI [i] >= 0; i++)
     qcoeff.push_back (quadElem (Var (indexI [i]), Var (indexJ [i]), coeff [i]));
 }
@@ -472,7 +400,8 @@ void CouenneProblem::fillIntegerRank () const {
 
   // 0: fractional
   // 1: integer
-  // k: depending on at least one integer with associated value k-1
+  // k: integer,    depending on at least one integer with associated value k-1, or
+  // k: fractional, depending on at least one integer with associated value k
 
   for (int ii = 0; ii < nvars; ii++) {
 
@@ -497,23 +426,23 @@ void CouenneProblem::fillIntegerRank () const {
     }
   }
 
-  jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "Free Integers\n");
-  for (int i=0; i<nvars; i++)
+  jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "Free (original) integers\n");
+  for (int i=0; i<nOrig_; i++)
     jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "%d: %d\n", i, integerRank_ [i]);
 
   // fill in numberInRank_
-  for (int i=0; i<nvars; i++) {
+  for (int i=0; i<nOrig_; i++)
+    if ((variables_ [i] -> isDefinedInteger ()) &&
+	(variables_ [i] -> Multiplicity () > 0)) {
 
     int rank = integerRank_ [i];
 
     if (numberInRank_.size () <= (unsigned int) rank)
-      for (int j=numberInRank_.size (); j<=rank; j++)
+      for (int j=numberInRank_.size (); j <= rank; j++)
 	numberInRank_ .push_back (0);
 
     numberInRank_ [rank] ++;
   }
-
-  numberInRank_ .push_back (-1); // put a tag at the end
 
   jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "numInteger\n");
   for (unsigned int i=0; i<numberInRank_.size(); i++)

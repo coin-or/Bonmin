@@ -90,6 +90,12 @@ class exprDiv: public exprOp {
 				  expression * &var, 
 				  double * &brpts, 
 				  int &way);
+
+  /// compute $y^{lv}$ and  $y^{uv}$ for Violation Transfer algorithm
+  virtual void closestFeasible (expression *varind,
+				expression *vardep, 
+				CouNumber &left,
+				CouNumber &right) const;
 };
 
 
@@ -106,9 +112,10 @@ inline CouNumber exprDiv::operator () ()
 
 inline bool is_boundbox_regular (register CouNumber b1, register CouNumber b2) {
 
-  // Why SAFE_COEFFICIENT and not COUENNE_INFINITY? Because OsiRowCut::set[LU]b do
-  // not work for values more than SAFE_COEFFICIENT and apparently makes the
-  // convexification infeasible.
+  // Why SAFE_COEFFICIENT and not COUENNE_INFINITY? Because
+  // OsiRowCut::set[LU]b do not work for values more than
+  // SAFE_COEFFICIENT and apparently makes the convexification
+  // infeasible.
   return 
     (fabs (b1)    < SAFE_COEFFICIENT) && 
     (fabs (b2)    < SAFE_COEFFICIENT) && 

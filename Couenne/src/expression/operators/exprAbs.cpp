@@ -101,8 +101,10 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   return tighter;
 }
 
+
+/// closest feasible points in function in both directions
 void exprAbs::closestFeasible (expression *varind, expression *vardep,
-			       CouNumber& left, CouNumber& right)
+			       CouNumber& left, CouNumber& right) const
 {
   CouNumber valdep = (*vardep)();
   CouNumber curr = (*varind)();

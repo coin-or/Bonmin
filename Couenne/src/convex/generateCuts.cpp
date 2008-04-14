@@ -325,7 +325,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
       }
 
-      genRowCuts (si, cs, nchanged, changed, chg_bds, true);  // add cuts
+      problem_ -> domain () -> current () -> isNlp () = true;
+      genRowCuts (si, cs, nchanged, changed, chg_bds);  // add cuts
 
       problem_ -> domain () -> pop (); // restore point
 

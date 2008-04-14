@@ -28,7 +28,10 @@ protected:
   CouNumber *ub_; ///< upper bound
 
   bool copied_;   ///< true if data has been copied (so we own it, and
-		  ///< have to delete it upon destruction)
+		  ///  have to delete it upon destruction)
+
+  bool isNlp_;    ///< true if this point comes from an NLP solver
+		  ///  (and is thus nlp feasible)
 public:
 
   /// constructor
@@ -71,6 +74,10 @@ public:
 
   /// assignment operator
   DomainPoint &operator= (const DomainPoint &src);
+
+  /// true if this point is the nlp solution
+  bool &isNlp () 
+  {return isNlp_;}
 };
 
 

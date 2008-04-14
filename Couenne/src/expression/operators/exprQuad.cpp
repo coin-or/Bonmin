@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: implementation of some methods for exprQuad
  *
- * (C) Carnegie-Mellon University, 2006-07.
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -22,7 +22,7 @@ class Domain;
 
 struct cmpVar {
   bool operator() (const exprVar* v1, const exprVar* v2) const
-  {return (v1 -> Index () < v2 -> Index ());}//strcmp(s1, s2) < 0;}
+  {return (v1 -> Index () < v2 -> Index ());}
 };
 
 /// Constructor
@@ -461,23 +461,41 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
     exprVar * &vr = row -> first;
 
     if (//(vr -> Type  () == VAR) &&
-	(vr -> Index () == index))
+	(vr -> Index () == index)) {
+
+      assert ("I would like to use quadratic expressions" == 
+	      "I didn't fix exprQuad::replace() yet");
       vr = w;
+    }
 
     for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
       exprVar * &vc = col -> first;
 
       if (//(vc -> Type  () == VAR) &&
-	  (vc -> Index () == index))
+	  (vc -> Index () == index)) {
+
+	assert ("I would like to use quadratic expressions" == 
+		"I didn't fix exprQuad::replace() yet");
 	vc = w;
+      }
     }
   }
 }
+
 
 /// return pointer to variable domain
 Domain *exprQuad::domain () {
   if (matrix_.size () > 0)
     return matrix_ [0]. first -> domain ();
   return exprGroup::domain ();
+}
+
+
+/// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm
+void exprQuad::closestFeasible (expression *varind,
+				expression *vardep, 
+				CouNumber &left,
+				CouNumber &right) const {
+  assert (false);
 }

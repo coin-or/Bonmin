@@ -69,9 +69,6 @@ class exprMul: public exprOp {
   virtual enum expr_type code () 
   {return COU_EXPRMUL;}
 
-  /// is this expression integer?
-  //bool isInteger ();
-
   /// implied bound processing
   bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
@@ -83,6 +80,11 @@ class exprMul: public exprOp {
 				  double * &brpts, 
 				  int &way);
 
+  /// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm
+  virtual void closestFeasible (expression *varind,
+				expression *vardep,
+				CouNumber &left,
+				CouNumber &right) const;
 protected:
 
   /// inferring bounds on factors of a product
@@ -102,8 +104,7 @@ protected:
 
 inline CouNumber exprMul:: operator () () {
 
-  register CouNumber ret = 1;
-
+  register CouNumber ret = 1.;
   expression **al = arglist_;
 
   for (register int n = nargs_; n--;)

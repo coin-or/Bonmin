@@ -70,7 +70,7 @@ class exprAbs: public exprUnary {
 
   /// closest feasible points in function in both directions
   virtual void closestFeasible (expression *varind, expression *vardep,
-				CouNumber& left, CouNumber& right);
+				CouNumber& left, CouNumber& right) const;
 };
 
 #endif

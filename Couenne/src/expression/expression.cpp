@@ -18,6 +18,7 @@
 #include "exprUnary.hpp"
 #include "exprStore.hpp"
 
+
 // Get lower and upper bound of a generic expression
 void expression::getBounds (expression *&lb, expression *&ub) {
   lb = new exprConst (- COUENNE_INFINITY);
@@ -184,5 +185,23 @@ void exprClone::realign (const CouenneProblem *p) {
 
     copy_ = p -> Var (copy_ -> Index ());
     delete trash;
+  }
+}
+
+
+/// closest feasible points in function in both directions
+void expression::closestFeasible (expression *varind, expression *vardep,
+				  CouNumber& left, CouNumber& right) const
+{
+  assert(isBijective());
+  CouNumber inv = inverse(vardep);
+  CouNumber curr = (*varind) ();
+  if (curr > inv) {
+    left  = inv;
+    right = curr;
+  }
+  else {
+    left  = curr;
+    right = inv;
   }
 }

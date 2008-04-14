@@ -62,6 +62,9 @@ class CouenneProblem {
     inline double getCutOff() const {return cutoff_;}
   };
 
+  // structure to record fixed, non-fixed, and continuous variables
+  enum fixType {UNFIXED, FIXED, CONTINUOUS};
+
  protected:
 
   /// problem name
@@ -119,10 +122,10 @@ class CouenneProblem {
   int nOrigCons_;
 
   /// Pointer to a global cutoff object
-  GlobalCutOff* pcutoff_;
+  mutable GlobalCutOff* pcutoff_;
 
   /// flag indicating if this class is creator of global cutoff object
-  bool created_pcutoff_;
+  mutable bool created_pcutoff_;
 
   bool doFBBT_;  ///< do Feasibility-based bound tightening
   bool doOBBT_;  ///< do Optimality-based  bound tightening
@@ -344,7 +347,7 @@ class CouenneProblem {
   void auxiliarize (exprVar *, exprVar * = NULL);
 
   /// Set cutoff
-  void setCutOff (CouNumber cutoff);
+  void setCutOff (CouNumber cutoff) const;
 
   /// Set cutoff
   CouNumber getCutOff () const
@@ -483,6 +486,15 @@ protected:
 
   /// fill freeIntegers_ array
   void fillIntegerRank () const;
+
+  //
+  int testIntFix (int index, 
+		  CouNumber xFrac, 
+		  enum fixType *fixed,
+		  CouNumber *xInt,
+		  CouNumber *dualL, CouNumber *dualR,
+		  CouNumber *olb,   CouNumber *oub,
+		  bool patient) const;
 };
 
 #endif

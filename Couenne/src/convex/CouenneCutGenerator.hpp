@@ -208,8 +208,7 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
 
   /// generate OsiRowCuts for current convexification
   void genRowCuts (const OsiSolverInterface &, OsiCuts &cs, 
-		   int, int *, //const CglTreeInfo &, 
-		   t_chg_bounds * = NULL, bool = false) const;
+		   int, int *, t_chg_bounds * = NULL) const;
 
   /// generate OsiColCuts for improved (implied and propagated) bounds
   void genColCuts (const OsiSolverInterface &, OsiCuts &, int, int *) const;

@@ -205,7 +205,7 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 
 
 /// set cutoff from NLP solution
-void CouenneProblem::setCutOff (CouNumber cutoff) {
+void CouenneProblem::setCutOff (CouNumber cutoff) const {
 
   int indobj = objectives_ [0] -> Body () -> Index ();
 
@@ -272,4 +272,80 @@ void CouenneProblem::realign () {
   for (std::vector <CouenneConstraint *>::iterator i = constraints_.begin ();
        i != constraints_.end (); ++i)
     (*i) -> Body () -> realign (this);
+}
+
+/// Add list of options to be read from file
+void CouenneProblem::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {
+
+  roptions -> SetRegisteringCategory ("Couenne options", Bonmin::RegisteredOptions::CouenneCategory);
+
+  roptions -> AddNumberOption
+    ("art_cutoff",
+     "Artificial cutoff",
+     COIN_DBL_MAX,
+     "Default value is infinity.");
+
+  roptions -> AddNumberOption
+    ("opt_window",
+     "Window around known optimum",
+     COIN_DBL_MAX,
+     "Default value is infinity.");
+
+  roptions -> AddNumberOption
+    ("feas_tolerance",
+     "Tolerance for constraints/auxiliary variables",
+     feas_tolerance_default,
+     "Default value is zero.");
+
+  roptions -> AddStringOption2 
+    ("feasibility_bt",
+     "Feasibility-based (cheap) bound tightening",
+     "yes",
+     "no","",
+     "yes","");
+
+  roptions -> AddStringOption2 
+    ("use_quadratic",
+     "Use quadratic expressions and related exprQuad class",
+     "no",
+     "no","Use an auxiliary for each bilinear term",
+     "yes","Create one only auxiliary for a quadrati expression");
+
+  roptions -> AddStringOption2 
+    ("optimality_bt",
+     "Optimality-based (expensive) bound tightening",
+     "yes",
+     "no","",
+     "yes","");
+
+  roptions -> AddLowerBoundedIntegerOption
+    ("log_num_obbt_per_level",
+     "Specify the frequency (in terms of nodes) for optimality-based bound tightening.",
+     -1,0,
+     "\
+If -1, apply at every node (expensive!). \
+If 0, apply at root node only. \
+If k>=0, apply with probability 2^(k - level), level being the current depth of the B&B tree.");
+
+  roptions -> AddStringOption2 
+    ("aggressive_fbbt",
+     "Aggressive feasibility-based bound tightening (to use with NLP points)",
+     "yes",
+     "no","",
+     "yes","");
+
+  roptions -> AddLowerBoundedIntegerOption
+    ("log_num_abt_per_level",
+     "Specify the frequency (in terms of nodes) for aggressive bound tightening.",
+     -1,2,
+     "\
+If -1, apply at every node (expensive!). \
+If 0, apply at root node only. \
+If k>=0, apply with probability 2^(k - level), level being the current depth of the B&B tree.");
+
+  roptions -> AddNumberOption
+    ("art_lower",
+     "Artificial lower bound",
+     -COIN_DBL_MAX,
+     "Default value is -1.e50.");
 }
