@@ -26,7 +26,8 @@ public:
     CouenneVarObject (ref, p, base, jnlst) {}
 
   /// Copy constructor
-  CouenneVTObject (const CouenneVTObject &src) {}
+  CouenneVTObject (const CouenneVTObject &src):
+    CouenneVarObject (src) {}
 
   /// Destructor
   ~CouenneVTObject () {}

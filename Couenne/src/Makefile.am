@@ -27,6 +27,7 @@ libCouenne_la_SOURCES = \
 	branch/getFixVarBinFun.cpp \
 	branch/projections.cpp \
 	branch/infeasibility.cpp \
+	branch/infeasibilityVT.cpp \
 	branch/feasibleRegion.cpp \
 	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \

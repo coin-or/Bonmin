@@ -59,10 +59,12 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
       const CouenneObject &obj = problem_ -> Objects () [*i];
       if (obj. Reference () && (retval >= CoinMin (COUENNE_EPS, feas_tolerance_))) {
 
-	obj.Reference () -> extendInterval (info, reference_, left, right);
+	obj.Reference () -> closestFeasible (reference_,
+					     problem_ -> Objects () [*i]. Reference (), 
+					     left, right);
 
-	if (left  < lFeas)  lFeas  = left;
-	if (right > lRight) lRight = right;
+	if (left  < lFeas) lFeas = left;
+	if (right > rFeas) rFeas = right;
       }
     }
 
@@ -71,7 +73,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
     retval = rFeas - lFeas;
 
-    const threshold = .2;
+    const CouNumber threshold = .2;
 
     if (retval > COUENNE_EPS) {
 
@@ -97,12 +99,31 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   if (reference_ -> Index () == problem_ -> Obj (0) -> Body () -> Index ())
     vt_delta += 1;
 
-  int 
-    nRows = info -> solver () -> getNumRows (),
-    nCols = info -> numberColumns_;
+  int nRows = info -> solver_ -> getNumRows ();
+
+  //   const double * elementByColumn_;
+  //   /// Column starts
+  //   const CoinBigIndex * columnStart_;
+  //   /// Column lengths
+  //   const int * columnLength_;
+  //   /// Row indices
+  //   const int * row_;
+
+  CouNumber *coefficients = new CouNumber [nRows];
+  CoinFillN (coefficients, nRows, 0.);
+
+  for (int i=0, n_el = info -> columnLength_ [index]; i < n_el; i++)
+    coefficients [info -> row_ [info -> columnStart_ [index] + i]] 
+      = info -> elementByColumn_ [info -> columnStart_ [index] + i];
 
   for (int i=0; i<nRows; i++)
-    vt_delta += 0;
+    vt_delta += info -> pi_ [i] * coefficients [i];
+
+  delete [] coefficients;
+
+  const CouNumber 
+    alpha = 1.,
+    beta  = 0.;
 
   retval = alpha * vt_delta + beta * retval;
 

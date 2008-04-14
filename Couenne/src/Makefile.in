@@ -79,7 +79,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneVarObject.cpp branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp branch/getFixVarBinFun.cpp \
 	branch/projections.cpp branch/infeasibility.cpp \
-	branch/feasibleRegion.cpp branch/operators/branchExprAbs.cpp \
+	branch/infeasibilityVT.cpp branch/feasibleRegion.cpp \
+	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
 	branch/operators/branchExprInv.cpp \
@@ -165,15 +166,15 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneBranchingObject.lo CouenneObject.lo CouenneVarObject.lo \
 	CouenneChooseVariable.lo CouenneChooseStrong.lo \
 	getFixVarBinFun.lo projections.lo infeasibility.lo \
-	feasibleRegion.lo branchExprAbs.lo branchExprExp.lo \
-	branchExprDiv.lo branchExprInv.lo branchExprLog.lo \
-	branchExprMul.lo branchExprPow.lo branchExprQuad.lo \
-	branchExprSinCos.lo minMaxDelta.lo domain.lo exprAbs.lo \
-	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
-	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
-	exprSum.lo exprMinMax.lo exprGroup.lo exprQuad.lo exprBQuad.lo \
-	compQuadFinBounds.lo exprOp.lo exprUnary.lo exprVar.lo \
-	exprAux.lo expression.lo simplifiers.lo simplify.lo \
+	infeasibilityVT.lo feasibleRegion.lo branchExprAbs.lo \
+	branchExprExp.lo branchExprDiv.lo branchExprInv.lo \
+	branchExprLog.lo branchExprMul.lo branchExprPow.lo \
+	branchExprQuad.lo branchExprSinCos.lo minMaxDelta.lo domain.lo \
+	exprAbs.lo exprDiv.lo exprExp.lo exprInv.lo exprLog.lo \
+	exprMul.lo exprOpp.lo exprPow.lo exprSin.lo exprCos.lo \
+	exprSub.lo exprSum.lo exprMinMax.lo exprGroup.lo exprQuad.lo \
+	exprBQuad.lo compQuadFinBounds.lo exprOp.lo exprUnary.lo \
+	exprVar.lo exprAux.lo expression.lo simplifiers.lo simplify.lo \
 	addEnvelope.lo createCuts.lo conv-exprAbs.lo conv-exprDiv.lo \
 	conv-exprMul.lo conv-exprMul-genCuts.lo unifiedProdCuts.lo \
 	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
@@ -411,7 +412,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneVarObject.cpp branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp branch/getFixVarBinFun.cpp \
 	branch/projections.cpp branch/infeasibility.cpp \
-	branch/feasibleRegion.cpp branch/operators/branchExprAbs.cpp \
+	branch/infeasibilityVT.cpp branch/feasibleRegion.cpp \
+	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
 	branch/operators/branchExprInv.cpp \
@@ -769,6 +771,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-sum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/infeasibility.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/infeasibilityVT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linStandardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minMaxDelta.Plo@am__quote@
@@ -879,6 +882,13 @@ infeasibility.lo: branch/infeasibility.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/infeasibility.cpp' object='infeasibility.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o infeasibility.lo `test -f 'branch/infeasibility.cpp' || echo '$(srcdir)/'`branch/infeasibility.cpp
+
+infeasibilityVT.lo: branch/infeasibilityVT.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT infeasibilityVT.lo -MD -MP -MF "$(DEPDIR)/infeasibilityVT.Tpo" -c -o infeasibilityVT.lo `test -f 'branch/infeasibilityVT.cpp' || echo '$(srcdir)/'`branch/infeasibilityVT.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/infeasibilityVT.Tpo" "$(DEPDIR)/infeasibilityVT.Plo"; else rm -f "$(DEPDIR)/infeasibilityVT.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/infeasibilityVT.cpp' object='infeasibilityVT.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o infeasibilityVT.lo `test -f 'branch/infeasibilityVT.cpp' || echo '$(srcdir)/'`branch/infeasibilityVT.cpp
 
 feasibleRegion.lo: branch/feasibleRegion.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT feasibleRegion.lo -MD -MP -MF "$(DEPDIR)/feasibleRegion.Tpo" -c -o feasibleRegion.lo `test -f 'branch/feasibleRegion.cpp' || echo '$(srcdir)/'`branch/feasibleRegion.cpp; \
