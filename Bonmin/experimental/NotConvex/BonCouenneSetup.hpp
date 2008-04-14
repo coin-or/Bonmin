@@ -10,7 +10,6 @@
 #define BonCouenneSetup_H
 #include "BonBabSetupBase.hpp"
 #include "CbcFeasibilityBase.hpp"
-//#include "CouenneCutGenerator.hpp"
 
 struct ASL;
 

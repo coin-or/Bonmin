@@ -179,10 +179,12 @@ namespace Bonmin{
 #endif
       }
 
+      // Add objects /////////////////////////////////
       continuousSolver_ -> addObjects (nobj, objects);
+      ////////////////////////////////////////////////
 
       for (int i = 0 ; i < nobj ; i++)
-       	delete objects[i];
+       	delete objects [i];
 
       delete [] objects;
     }

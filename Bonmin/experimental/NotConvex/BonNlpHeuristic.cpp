@@ -134,8 +134,13 @@ namespace Bonmin{
     CoinCopyN (solver->getColLower(), nlp_ -> getNumCols (), lower);
     CoinCopyN (solver->getColUpper(), nlp_ -> getNumCols (), upper);
 
+    /*printf ("-- int candidate, before: ");
+    for (int i=0; i<couenne_ -> nOrig (); i++) 
+      printf ("[%g %g] ", lower [i], upper [i]);
+      printf ("\n");*/
+
     const double * solution = solver->getColSolution();
-    OsiBranchingInformation info(solver, true);
+    OsiBranchingInformation info (solver, true);
     const int & numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
     double maxInfeasibility = 0;
@@ -172,12 +177,12 @@ namespace Bonmin{
 
 	  if (fabs (value - rounded) > COUENNE_EPS) {
 	    haveRoundedIntVars = true;
-	    value = rounded;
+	    //value = rounded;
 	  }
 
 	  // fix bounds anyway, if a better candidate is not found
 	  // below at least we have an integer point
-          lower[i] = upper[i] = value;
+          //lower[i] = upper[i] = value;
         }
         else{
            throw CoinError("Bonmin::NlpSolveHeuristic","solution",
@@ -195,14 +200,40 @@ namespace Bonmin{
     CoinFillN (Y, couenne_ -> nVars (), 0.);
     CoinCopyN (solution, nlp_ -> getNumCols (), Y);
 
+    /*printf ("-- int candidate, upon call: ");
+    for (int i=0; i<couenne_ -> nOrig (); i++) 
+      if (couenne_ -> Var (i) -> isInteger ())
+	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
+      else printf ("%g ", Y [i]);
+      printf ("\n");*/
+
     if (haveRoundedIntVars) // create "good" integer candidate for Ipopt
       skipOnInfeasibility = (couenne_ -> getIntegerCandidate (solution, Y, lower, upper) < 0);
 
+    /*printf ("-- int candidate, after: ");
+    for (int i=0; i<couenne_ -> nOrig (); i++) 
+      if (couenne_ -> Var (i) -> isInteger ())
+	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
+      else printf ("%g ", Y [i]);
+      printf ("\n");*/
+
+
     bool foundSolution = false;
 
-    if (!skipOnInfeasibility) { // otherwise, the integral neighbourhood
-				// of our fractional point is infeasible.
+    if (skipOnInfeasibility) { // make up some random rounding
 
+      for (int i = couenne_ -> nOrig (); i--;) 
+	if (couenne_ -> Var (i) -> isDefinedInteger ())
+	  lower [i] = upper [i] = Y [i] = 
+	    (CoinDrand48 () < 0.5) ? 
+	    floor (Y [i] + COUENNE_EPS) : 
+	    ceil  (Y [i] - COUENNE_EPS);
+    }
+
+    //if (!skipOnInfeasibility) { // otherwise, the integral neighbourhood
+    //// of our fractional point is infeasible.
+
+    {
       for (int i = couenne_ -> nOrig (); i--;) 
 	if (lower [i] > upper [i] - 1e-20)
 	  lower [i] = upper [i] = 0.5 * (lower [i] + upper [i]);
