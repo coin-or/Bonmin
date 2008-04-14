@@ -143,7 +143,9 @@ namespace Bonmin
     if (specOpt) {
       model_.setSpecialOptions(specOpt);
       if (specOpt==16) {
-        CbcNlpStrategy strat(s.getIntParameter(BabSetupBase::MaxFailures), s.getIntParameter(BabSetupBase::MaxInfeasible), s.getIntParameter(BabSetupBase::FailureBehavior));
+        CbcNlpStrategy strat(s.getIntParameter(BabSetupBase::MaxFailures), 
+			     s.getIntParameter(BabSetupBase::MaxInfeasible), 
+			     s.getIntParameter(BabSetupBase::FailureBehavior));
         model_.setStrategy(strat);
       }
     }
@@ -219,7 +221,8 @@ namespace Bonmin
 
       // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
       const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
-      if (!s.getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
+      if (!s.getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) 
+	//we have some sos constraints
       {
         const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
         const int & numSos = sos->num;
@@ -287,7 +290,7 @@ namespace Bonmin
       replaceIntegers(model_.objects(), model_.numberObjects());
     }
     else {//Pass in objects to Cbc
-      if (!usingCouenne_)
+      //if (!usingCouenne_)
 	model_.addObjects(s.continuousSolver()->numberObjects(),
 			  s.continuousSolver()->objects());
     }
