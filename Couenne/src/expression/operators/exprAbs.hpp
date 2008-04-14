@@ -67,6 +67,10 @@ class exprAbs: public exprUnary {
 				  expression * &var, 
 				  double * &brpts, 
 				  int &way);
+
+  /// closest feasible points in function in both directions
+  virtual void closestFeasible (expression *varind, expression *vardep,
+				CouNumber& left, CouNumber& right);
 };
 
 #endif

@@ -61,6 +61,13 @@ class exprExp: public exprUnary {
 				  expression * &var, 
 				  double * &brpts, 
 				  int &way);
+
+  virtual bool isBijective() const {return true;}
+
+  virtual CouNumber inverse(expression *vardep) const
+  {
+    return log((*vardep)());
+  }
 };
 
 #endif

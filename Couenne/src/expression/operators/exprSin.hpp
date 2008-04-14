@@ -100,6 +100,11 @@ class exprSin: public exprUnary {
 				  double * &brpts, 
 				  int &way)
   {return trigSelBranch (obj, info, var, brpts, way, COU_SINE);}
+
+  /// closest feasible points in function in both directions
+  virtual void closestFeasible (expression *varind, expression *vardep,
+				CouNumber& left, CouNumber& right);
+
 };
 
 #endif

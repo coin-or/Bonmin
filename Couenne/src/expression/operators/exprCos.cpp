@@ -16,6 +16,10 @@
 #include "exprMul.hpp"
 #include "exprClone.hpp"
 
+static const CouNumber 
+  pi  = M_PI,
+  pi2 = M_PI * 2.,
+  pih = M_PI / 2.;
 
 // return an expression -sin (argument), the derivative of cos (argument)
 expression *exprCos::differentiate (int index) {
@@ -33,4 +37,26 @@ void exprCos::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprLBCos (xl, xu);
   ub = new exprUBCos (new exprClone (xl), new exprClone (xu));
+}
+
+void exprCos::closestFeasible (expression *varind, expression *vardep,
+			       CouNumber& left, CouNumber& right)
+{
+  CouNumber curr = (*varind)();
+  int period = (int)(curr/pi2);
+  CouNumber curr_noperiod = curr - pi2*period;
+  CouNumber inv = acos((*vardep)());
+
+  if (curr_noperiod < inv) {
+    left = pi2*period - inv;
+    right = pi2*period + inv;
+  }
+  else if (curr_noperiod < pi2-inv) {
+    left = pi2*period + inv;
+    right = pi2*(period+1) - inv;
+  }
+  else {
+    left = pi2*(period+1) - inv;
+    right = pi2*(period+1) + inv;
+  }
 }

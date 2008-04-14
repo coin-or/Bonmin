@@ -100,3 +100,29 @@ bool exprAbs::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   return tighter;
 }
+
+void exprAbs::closestFeasible (expression *varind, expression *vardep,
+			       CouNumber& left, CouNumber& right)
+{
+  CouNumber valdep = (*vardep)();
+  CouNumber curr = (*varind)();
+
+  if (valdep < 0.) {
+    left = -COUENNE_INFINITY;
+    right = COUENNE_INFINITY;
+  }
+  else {
+    if (curr < -valdep) {
+      left = curr;
+      right = -valdep;
+    }
+    else if (curr > valdep) {
+      left = valdep;
+      right = curr;
+    }
+    else {
+      left = -valdep;
+      right = valdep;
+    }
+  }
+}

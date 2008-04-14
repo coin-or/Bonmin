@@ -90,6 +90,12 @@ class exprPow: public exprOp {
 				  expression * &var, 
 				  double * &brpts, 
 				  int &way);
+
+  /// left distance to closest feasible point in function
+  virtual CouNumber leftClosestFeasible (expression *var);
+
+  /// right distance to closest feasible point in function
+  virtual CouNumber rightClosestFeasible (expression *var);
 };
 
 

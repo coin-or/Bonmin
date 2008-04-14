@@ -208,3 +208,33 @@ bool exprPow::isInteger () {
 
   return true;
 }
+
+/// left distance to closest feasible point in function
+CouNumber exprPow::leftClosestFeasible (expression *w, expression *x) {
+
+  //arglist_ [0] = exprVar *base;
+  //arglist_ [1] = exprConst *exponent;
+
+  exprVar *base = arglist_ [0];
+  CouNumber k = (*(arglist_ [1])) ();
+
+  assert(var->Index() == base->Index());
+
+  if (   (isInt || isInvInt)
+	 && (intk % 2) 
+	 && (k > COUENNE_EPS)) {
+
+    if 
+
+    return COIN_DBL_MAX;
+  }
+
+  if () 
+    // monotone: k odd, 1/k integer and odd
+    //           k not integer
+}
+
+/// right distance to closest feasible point in function
+CouNumber exprPow::rightClosestFeasible (expression *var) {
+
+}

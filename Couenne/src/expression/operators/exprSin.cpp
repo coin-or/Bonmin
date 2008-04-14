@@ -118,3 +118,27 @@ bool trigImpliedBound (enum cou_trig type, int wind, int xind,
 
   return tighter;
 }
+
+void exprSin::closestFeasible (expression *varind, expression *vardep,
+			       CouNumber& left, CouNumber& right)
+{
+  CouNumber curr = (*varind)() - pih;
+  int period = (int)(curr/pi2);
+  CouNumber curr_noperiod = curr - pi2*period;
+  CouNumber inv = acos((*vardep)());
+
+  if (curr_noperiod < inv) {
+    left = pi2*period - inv;
+    right = pi2*period + inv;
+  }
+  else if (curr_noperiod < pi2-inv) {
+    left = pi2*period + inv;
+    right = pi2*(period+1) - inv;
+  }
+  else {
+    left = pi2*(period+1) - inv;
+    right = pi2*(period+1) + inv;
+  }
+  left += pih;
+  right += pih;
+}
