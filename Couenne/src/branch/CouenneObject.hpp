@@ -46,6 +46,9 @@ class CouenneObject: public OsiObject {
 
 public:
 
+  /// type of object (for branching variable selection)
+  enum branch_obj {expr_obj, var_obj, vt_obj};
+
   /// strategy names
   enum brSelStrat {NO_STRATEGY, NO_BRANCH, MID_INTERVAL, MIN_AREA, BALANCED, LP_CENTRAL, LP_CLAMPED};
 

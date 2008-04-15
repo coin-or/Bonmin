@@ -348,4 +348,12 @@ If k>=0, apply with probability 2^(k - level), level being the current depth of 
      "Artificial lower bound",
      -COIN_DBL_MAX,
      "Default value is -1.e50.");
+
+  roptions -> AddStringOption3
+    ("branching_object",
+     "type of branching object for variable selection",
+     "var_obj",
+     "vt_obj",   "use Violation Transfer from Tawarmalani and Sahinidis",
+     "var_obj",  "use one object for each variable",
+     "expr_obj", "use one object for each nonlinear expression (deprecated)");
 }

@@ -36,8 +36,8 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 
     const CouenneObject &obj = problem_ -> Objects () [reference_ -> Index ()];
     retval = (obj. Reference ()) ? obj.infeasibility (info, way) : 0.;
-  }
-  else {
+
+  } else {
 
     CouNumber 
       infsum = 0.,

@@ -12,24 +12,23 @@
 #include "CouenneProblem.hpp"
 #include "CouenneVTObject.hpp"
 
-const CouNumber weiMin = 0.3;
-const CouNumber weiMax = 1.3;
-const CouNumber weiSum = 1.1; // at least 1 so top level aux are avoided
-const CouNumber weiAvg = 0.0;
 
-
-/// compute infeasibility of this variable, |w - f(x)| (where w is
-/// the auxiliary variable defined as w = f(x))
+/// compute infeasibility of this variable, |w - f(x)| (where w is the
+/// auxiliary variable defined as w = f(x))
 double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int &way) const {
 
-  assert (reference_);
   int index = reference_ -> Index ();
-
   assert (index >= 0);
+
+  // get set of variable indices that depend on reference_
   const std::set <int> &dependence = problem_ -> Dependence () [index];
 
-  assert (reference_ -> Image ());
-  CouNumber retval = fabs (((*reference_ -> Image ())) () - (*reference_) ());
+  CouNumber
+    xcurr    = info -> solution_ [index],
+    retval   = 0.,
+    lFeas    = xcurr,
+    rFeas    = xcurr,
+    leanLeft = 0.;
 
   if (dependence.size () == 0) { // this is a top level auxiliary,
 				 // nowhere an independent
@@ -38,16 +37,22 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     // else constant we return the difference between current value
     // and value of function at this point
 
-    if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) 
-      retval = 0;
+    if (reference_ -> Image ()) {
 
-  } else { // this appears as an independent in all auxs of the
-	   // "dependence" list
+      CouNumber
+	w  = lFeas = rFeas = (*reference_) (),
+	fx = ((*reference_ -> Image ())) ();
 
-    CouNumber 
-      xcurr = info -> solution_ [index],
-      lFeas = xcurr, 
-      rFeas = xcurr;
+      retval = fabs (fx - w); // check if this w=f(x) is used nowhere and is feasible
+
+      if      (lFeas > fx) lFeas = fx;
+      else if (rFeas < fx) rFeas = fx;
+    }
+
+  } else {
+
+    // this appears as independent in all auxs of the "dependence" list
+    // check all non-linear objects containing this variable
 
     for (std::set <int>::const_iterator i = dependence.begin ();
 	 i != dependence.end (); ++i) {
@@ -57,32 +62,49 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 	right = xcurr;
 
       const CouenneObject &obj = problem_ -> Objects () [*i];
-      if (obj. Reference () && (retval >= CoinMin (COUENNE_EPS, feas_tolerance_))) {
 
-	obj.Reference () -> closestFeasible (reference_,
-					     problem_ -> Objects () [*i]. Reference (), 
-					     left, right);
+      // check feasibility of nonlinear object
+      if (obj. Reference () && 
+	  (fabs ((*(obj. Reference () -> Image ())) () -
+		 (*(obj. Reference ())) ())
+	   >= CoinMin (COUENNE_EPS, feas_tolerance_))) {
+
+	// measure how far have to go, left and right, to restore
+	// feasibility
+	obj. Reference () -> Image () -> closestFeasible 
+	  (reference_, obj. Reference (), left, right);
 
 	if (left  < lFeas) lFeas = left;
 	if (right > rFeas) rFeas = right;
       }
     }
 
+    retval = rFeas - lFeas;
+
     if (lFeas < info -> lower_ [index]) lFeas = info -> lower_ [index];
     if (rFeas > info -> upper_ [index]) rFeas = info -> upper_ [index];
 
-    retval = rFeas - lFeas;
+    if (rFeas - lFeas > COUENNE_EPS) 
+      retval = rFeas - lFeas;
+  }
 
-    const CouNumber threshold = .2;
+  // if delta is null, return 0, this object is feasible
+  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_))
+    return 0.;
 
-    if (retval > COUENNE_EPS) {
+  //////////////////////////////////////////////////////////////////////
 
-      CouNumber
-	leanLeft  = (xcurr - lFeas) / retval;
+  // object is infeasible. 
+  // check how in the middle of the interval we are
 
-      if      (leanLeft <     threshold) way = 0;
-      else if (leanLeft > 1 - threshold) way = 1;
-    }
+  const CouNumber threshold = .2;
+
+  if (retval > COUENNE_EPS) {
+
+    leanLeft  = (xcurr - lFeas) / retval;
+
+    if      (leanLeft <     threshold) way = 0;
+    else if (leanLeft > 1 - threshold) way = 1;
   }
 
   // done computing delta. Now transfer violation on LP relaxation
@@ -94,12 +116,10 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   // info -> solver () -> getNumRows()   # rows
   // info -> numberColumns_              # cols
 
-  CouNumber vt_delta = 0;
-
-  if (reference_ -> Index () == problem_ -> Obj (0) -> Body () -> Index ())
-    vt_delta += 1;
-
-  int nRows = info -> solver_ -> getNumRows ();
+  // coefficient in objective is in {0,1} and there is only one
+  // variable with coefficient 1
+  CouNumber vt_delta =
+    (reference_ -> Index () == problem_ -> Obj (0) -> Body () -> Index ()) ? 1. : 0.;
 
   //   const double * elementByColumn_;
   //   /// Column starts
@@ -109,23 +129,34 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   //   /// Row indices
   //   const int * row_;
 
-  CouNumber *coefficients = new CouNumber [nRows];
-  CoinFillN (coefficients, nRows, 0.);
+  //printf ("------------------ vt_delta [%d] = %g +\n", index, vt_delta);
 
-  for (int i=0, n_el = info -> columnLength_ [index]; i < n_el; i++)
-    coefficients [info -> row_ [info -> columnStart_ [index] + i]] 
-      = info -> elementByColumn_ [info -> columnStart_ [index] + i];
+  for (int i=0, n_el = info -> columnLength_ [index]; i < n_el; i++) {
 
-  for (int i=0; i<nRows; i++)
-    vt_delta += info -> pi_ [i] * coefficients [i];
+    int indRow = info -> columnStart_ [index] + i;
 
-  delete [] coefficients;
+    vt_delta += 
+      fabs (info -> pi_ [info -> row_ [indRow]] * 
+	    info -> elementByColumn_  [indRow]);
+
+    /*printf ("+ (pi[%d]=%g) * (el[%d]=%g) [=%g] --> vtd = %g\n",
+	    info -> row_ [indRow],
+	    info -> pi_ [info -> row_ [indRow]], 
+	    indRow,
+	    info -> elementByColumn_  [indRow],
+	    info -> pi_ [info -> row_ [indRow]] * 
+	    info -> elementByColumn_  [indRow],
+	    vt_delta);*/
+  }
 
   const CouNumber 
-    alpha = 1.,
-    beta  = 0.;
+    alpha = 0.7,
+    beta  = 0.1;
 
-  retval = alpha * vt_delta + beta * retval;
+  retval = 
+    alpha          * fabs (retval*vt_delta) +  // violation transfer itself
+    beta           * retval +                  // width of feasibility interval
+    (1-alpha-beta) * leanLeft * (1-leanLeft);  // how in the middle of the interval x is
 
   if ((retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
       (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
@@ -140,8 +171,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     printf ("]\n");
   }
 
-  // add term to stop branching on very tiny intervals
-
+  // TODO: add term to prefer branching on larger intervals
   return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 
 	  0. : retval);
 }
