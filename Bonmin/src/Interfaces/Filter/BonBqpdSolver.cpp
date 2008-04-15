@@ -169,6 +169,11 @@ namespace Bonmin
     int m = cached_->m;
     tnlp->get_bounds_info(n, cached_->bl, cached_->bu,
         m, cached_->bl+n, cached_->bu+n);
+    // Make sure bounds are not infinity
+    for (int i=0; i<n+m; i++) {
+      cached_->bl[i] = Max(cached_->bl[i], -1e50);
+      cached_->bu[i] = Min(cached_->bu[i], 1e50);
+    }
 
     cached_->use_warm_start_in_cache_ = true;  // Trying...
     return callOptimizer();
@@ -246,8 +251,8 @@ namespace Bonmin
 
     // Make sure bounds are not infinity
     for (int i=0; i<n+m; i++) {
-      bl[i] = Max(bl[i], -1e20);
-      bu[i] = Min(bu[i], 1e20);
+      bl[i] = Max(bl[i], -1e50);
+      bu[i] = Min(bu[i], 1e50);
     }
 
     // Set up sparse matrix with objective gradient and constraint Jacobian

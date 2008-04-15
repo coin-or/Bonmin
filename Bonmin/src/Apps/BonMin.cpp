@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
     strcpy(pbName, argv[1]);
   }
   
-#if 0
+#if 1
   try
 #endif 
   {
@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
     bb(bonmin);//do branch and bound
 
   }
-  #if 0
+#if 1
   catch(TNLPSolver::UnsolvedError *E) {
     E->writeDiffFiles();
     E->printError(std::cerr);
@@ -63,6 +63,10 @@ int main (int argc, char *argv[])
     <<E.message()<<std::endl;
   }
   catch (Ipopt::OPTION_INVALID &E)
+  {
+    std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
+  }
+  catch (Ipopt::IpoptException &E)
   {
     std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
   }
