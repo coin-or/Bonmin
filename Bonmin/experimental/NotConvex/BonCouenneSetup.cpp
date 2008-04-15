@@ -82,6 +82,7 @@ namespace Bonmin{
      categories.  We probably want to make that a bit more flexible
      later. */
     int i;
+
     options()->GetIntegerValue("boundtightening_print_level", i, "bonmin.");
     journalist()->GetJournal("console")->
       SetPrintLevel(J_BOUNDTIGHTENING, (EJournalLevel)i);
@@ -146,6 +147,17 @@ namespace Bonmin{
     // add CouenneVarObjects for branching /////////////////////////////////////////////
 
     {
+      std::string s;
+
+      options () -> GetStringValue ("branching_object", s, "couenne.");
+
+      enum CouenneObject::branch_obj objType;
+
+      if      (s == "vt_obj")   objType = CouenneObject::vt_obj;
+      else if (s == "var_obj")  objType = CouenneObject::var_obj;
+      else if (s == "expr_obj") objType = CouenneObject::expr_obj;
+      else                      assert (false);
+
       int nAuxs = 0, nobj = 0,
 	  nVars = couenneProb -> nVars ();
 
@@ -153,31 +165,55 @@ namespace Bonmin{
 
       OsiObject ** objects = new OsiObject* [nAuxs];
 
-      for (int i = 0; i < nVars; i++) { // for each aux variable
+      for (int i = 0; i < nVars; i++) { // for each variable
 
 	exprVar *var = couenneProb -> Var (i);
 
-#if 0
-        // if this variable is associated with a nonlinear function
-	if ((var -> Type  () == AUX) && 
-	    (var -> Image () -> Linearity () > LINEAR) &&
-	    (var -> Multiplicity () > 0)) {
+	switch (objType) {
 
-	  objects [nobj] = new CouenneObject (var, this, journalist());
-	  objects [nobj++] -> setPriority (1);
-	}
-#else
-        // branching objects on variables
-	if (// comment three lines below for linear variables too
-	    ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) || // has indep
-	     ((var -> Type () == AUX) &&                      // or, aux 
-	      (var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
-	    (var -> Multiplicity () > 0)) {
+	case CouenneObject::expr_obj:
 
-	  objects [nobj] = new CouenneVarObject (var, couenneProb, this, journalist ());
-	  objects [nobj++] -> setPriority (1);
+	  // if this variable is associated with a nonlinear function
+	  if ((var -> Type  () == AUX) && 
+	      (var -> Image () -> Linearity () > LINEAR) &&
+	      (var -> Multiplicity () > 0)) {
+
+	    objects [nobj] = new CouenneObject (var, this, journalist());
+	    objects [nobj++] -> setPriority (1);
+	  }
+
+	  break;
+
+	case CouenneObject::var_obj:
+
+	  // branching objects on variables
+	  if (// comment three lines below for linear variables too
+	      ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) || // has indep
+	       ((var -> Type () == AUX) &&                      // or, aux 
+		(var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
+	      (var -> Multiplicity () > 0)) {
+
+	    objects [nobj] = new CouenneVarObject (var, couenneProb, this, journalist ());
+	    objects [nobj++] -> setPriority (1);
+	  }
+
+	  break;
+
+	case CouenneObject::vt_obj:
+
+	  // branching objects on variables
+	  if (// comment three lines below for linear variables too
+	      //((couenneProb -> Dependence () [var -> Index ()] . size () > 0) || // has indep
+	      // ((var -> Type () == AUX) &&                      // or, aux 
+	      //  (var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
+	      (var -> Multiplicity () > 0)) {
+
+	    objects [nobj] = new CouenneVTObject (var, couenneProb, this, journalist ());
+	    objects [nobj++] -> setPriority (1);
+	  }
+
+	  break;
 	}
-#endif
       }
 
       // Add objects /////////////////////////////////
@@ -228,22 +264,22 @@ namespace Bonmin{
       // change the default for Couenne
       varSelection = OSI_SIMPLE;
     }
+
     switch (varSelection) {
 
-      // strong branching choosevariable
-
-    case OSI_STRONG: {
-	CouenneChooseStrong * chooseVariable = new CouenneChooseStrong(*this, couenneProb);
-	chooseVariable->setTrustStrongForSolution(false);
-	chooseVariable->setTrustStrongForBound(false);
-	chooseVariable->setOnlyPseudoWhenTrusted(true);
-	branchingMethod_ = chooseVariable;
-	break;
+    case OSI_STRONG: { // strong branching
+      CouenneChooseStrong * chooseVariable = new CouenneChooseStrong(*this, couenneProb);
+      chooseVariable->setTrustStrongForSolution(false);
+      chooseVariable->setTrustStrongForBound(false);
+      chooseVariable->setOnlyPseudoWhenTrusted(true);
+      branchingMethod_ = chooseVariable;
+      break;
     }
 
     case OSI_SIMPLE: // default choice
       branchingMethod_ = new CouenneChooseVariable (continuousSolver_, couenneProb);
       break;
+
     default:
       std::cerr << "Unknown variable_selection for Couenne\n" << std::endl;
       throw;
