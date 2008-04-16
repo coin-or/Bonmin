@@ -823,5 +823,15 @@ namespace Bonmin
   }
 
 
+  /** Check that warm start object is valid.*/
+  bool 
+  FilterSolver::warmStartIsValid(const CoinWarmStart * ws) const{
+    const FilterWarmStart* fws = dynamic_cast<const FilterWarmStart*>(ws);
+    if (fws && ! fws->empty()) {
+      return true;
+    }
+    return false;
+  }
+
 
 }//end namespace Bonmin

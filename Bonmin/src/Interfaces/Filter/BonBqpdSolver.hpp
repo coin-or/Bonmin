@@ -90,6 +90,9 @@ namespace Bonmin
 
     virtual CoinWarmStart * getEmptyWarmStart() const;
 
+    /** Check that warm start object is valid.*/
+    virtual bool warmStartIsValid(const CoinWarmStart * ws) const;
+
     virtual void enableWarmStart()
     {//No options to be set
     }

@@ -135,6 +135,9 @@ TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
 
   virtual CoinWarmStart * getEmptyWarmStart() const = 0;
 
+  /** Check that warm start object is valid.*/
+  virtual bool warmStartIsValid(const CoinWarmStart * ws) const = 0;  
+
   /// Enable the warm start options in the solver
   virtual void enableWarmStart() = 0;
 

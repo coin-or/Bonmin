@@ -252,16 +252,12 @@ namespace Bonmin
   CoinWarmStart*
   IpoptSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
   {
-    if (warmStartStrategy_) {
       if (warmStartStrategy_==2) {
         Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter =
           Ipopt::SmartPtr<IpoptInteriorWarmStarter>(tnlp->GetWarmStarter());
         return new IpoptWarmStart(tnlp, warm_starter);
       }
       else  return new IpoptWarmStart(tnlp, NULL);
-    }
-    else
-      return new IpoptWarmStart(tnlp->num_variables(), tnlp->num_constraints());
   }
 
 
@@ -277,14 +273,20 @@ namespace Bonmin
       disableWarmStart();
       return 1;
     }
-    enableWarmStart();
+    if(ws->dualSize() > 0){
+      tnlp->setDualsInit(ws->dualSize(), ws->dual());
+      enableWarmStart();
+    }
+    else
+      disableWarmStart();
+#ifndef NDEBUG
     int numcols = tnlp->num_variables();
     int numrows = tnlp->num_constraints();
+#endif
 
-    DBG_ASSERT(numcols == ws->primalSize());
-    DBG_ASSERT(2*numcols + numrows == ws->dualSize());
+    assert(numcols == ws->primalSize());
+    //assert(2*numcols + numrows == ws->dualSize());
     tnlp->setxInit(ws->primalSize(), ws->primal());
-    tnlp->setDualsInit(ws->dualSize(), ws->dual());
 
     if (IsValid(ws->warm_starter()))
       tnlp->SetWarmStarter(ws->warm_starter());
@@ -292,6 +294,14 @@ namespace Bonmin
     return 1;
   }
 
+  bool 
+  IpoptSolver::warmStartIsValid(const CoinWarmStart * ws) const{
+    const IpoptWarmStart* iws = dynamic_cast<const IpoptWarmStart*>(ws);
+    if (iws && !iws->empty()) {
+      return true;
+    }
+    return false;
+  }
 
   CoinWarmStart *
   IpoptSolver::getEmptyWarmStart() const

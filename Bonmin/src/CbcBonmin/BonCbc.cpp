@@ -440,8 +440,14 @@ namespace Bonmin
     {
       const double * colsol = model_.solver()->getColSolution();
       const double * duals = model_.solver()->getRowPrice();
-      model_.solver()->setColSolution(colsol);
-      model_.solver()->setRowPrice(duals);
+
+      OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
+      //int saveExposeWarmStart = tnlpSolver->getExposeWarmStart();
+      //tnlpSolver->setExposeWarmStart(true);
+      CoinWarmStart * warm = tnlpSolver->solver()->getWarmStart(tnlpSolver->problem());
+      tnlpSolver->solver()->setWarmStart(warm, tnlpSolver->problem());
+      delete warm;
+      //tnlpSolver->setExposeWarmStart(saveExposeWarmStart);
     }
 
 #ifdef SIGNAL

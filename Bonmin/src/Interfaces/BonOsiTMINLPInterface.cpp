@@ -713,6 +713,8 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
   delete warmstart_;
   warmstart_ = NULL;
   
+  app_->disableWarmStart();
+  solveAndCheckErrors(0,0,"resolveForCost");
   /** Save current optimum. */
   vector<double> point(getNumCols()*3+ getNumRows());
   double bestBound = getObjValue();
@@ -806,6 +808,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   //std::cerr<<"Resolving the problem for robustness"<<std::endl;
   //First remove warm start point and resolve
   app_->disableWarmStart();
+  problem()->resetStartingPoint();
   messageHandler()->message(WARNING_RESOLVING,
       messages_)
   <<1<< CoinMessageEol ;
@@ -1201,7 +1204,6 @@ OsiTMINLPInterface::setColSolution(const double *colsol)
 {
   problem_->setxInit(getNumCols(), colsol);
   hasBeenOptimized_ = false;
-  //  problem_->SetStartingPoint(getNumCols(), colsol);
 }
 
 /** Set dual solution variable values
@@ -1235,8 +1237,8 @@ OsiTMINLPInterface::getEmptyWarmStart () const
 CoinWarmStart* 
 OsiTMINLPInterface::getWarmStart() const
 {
-  if (exposeWarmStart_ && warmstart_) {
-    return warmstart_->clone();
+  if (exposeWarmStart_) {
+    return internal_getWarmStart();;
   }
   else {
     return getEmptyWarmStart();
@@ -1247,6 +1249,29 @@ OsiTMINLPInterface::getWarmStart() const
 bool 
 OsiTMINLPInterface::setWarmStart(const CoinWarmStart* ws)
 {
+  if (exposeWarmStart_) {
+    return internal_setWarmStart(ws);
+  }
+  else {
+    return true;
+  }
+}
+  /** Get warmstarting information */
+CoinWarmStart* 
+OsiTMINLPInterface::internal_getWarmStart() const
+{
+  if (exposeWarmStart_ && warmstart_) {
+    return warmstart_->clone();
+  }
+  else {
+    return getEmptyWarmStart();
+  }
+}
+  /** Set warmstarting information. Return true/false depending on whether
+      the warmstart information was accepted or not. */
+bool 
+OsiTMINLPInterface::internal_setWarmStart(const CoinWarmStart* ws)
+{
   delete warmstart_;
   warmstart_ = NULL;
   hasBeenOptimized_ = false;
@@ -1254,38 +1279,21 @@ OsiTMINLPInterface::setWarmStart(const CoinWarmStart* ws)
     if (ws == NULL) {
       return true;
     }
-    // Let's look at the warmstart...
-    const IpoptWarmStart* iws = dynamic_cast<const IpoptWarmStart*>(ws);
-    if (iws) {
-      warmstart_ = ws->clone();
-      return true;
-    }
-#ifdef COIN_HAS_FILTERSQP
-    const FilterWarmStart* fws = dynamic_cast<const FilterWarmStart*>(ws);
-    if (fws) {
-      warmstart_ = ws->clone();
-      return true;
-    }
-#if 0
-    const BqpdWarmStart* bws = dynamic_cast<const BqpdWarmStart*>(ws);
-    if (bws) {
-      warmstart_ = ws->clone();
-      return true;
-    }
-#endif
-#endif
-    // See if it is anything else than the CoinWarmStartBasis that all others
-    // derive from
-    const CoinWarmStartPrimalDual* pdws =
-      dynamic_cast<const CoinWarmStartPrimalDual*>(ws);
-    if (pdws) {
-      // Must be an IpoptWarmStart, since the others do not derive from this.
-      // Accept it.
-      warmstart_ = new IpoptWarmStart(*pdws);
-      return true;
-    }
-    return false;
-    // return app_->setWarmStart(warmstart, problem_);
+  if(app_->warmStartIsValid(ws)) {
+    warmstart_ = ws->clone();
+    return true;
+  }
+  // See if it is anything else than the CoinWarmStartBasis that all others
+  // derive from
+  const CoinWarmStartPrimalDual* pdws =
+    dynamic_cast<const CoinWarmStartPrimalDual*>(ws);
+  if (pdws) {
+    // Must be an IpoptWarmStart, since the others do not derive from this.
+    // Accept it.
+    warmstart_ = new IpoptWarmStart(*pdws);
+    return true;
+  }
+  return false;
   }
   else {
     return true;
@@ -2427,29 +2435,9 @@ OsiTMINLPInterface::resolve()
   assert(IsValid(problem_));
   
   int has_warmstart = warmstart_ == NULL ? 0 : 1;
-  // Let's look at the warmstart...
-  if (has_warmstart == 1) {
-    const IpoptWarmStart* iws = dynamic_cast<const IpoptWarmStart*>(warmstart_);
-    if (iws) {
-      has_warmstart = iws->empty() ? 0 : 2;
-    }
-  }
-#if 0
-//#ifdef COIN_HAS_FILTERSQP
-  if (has_warmstart == 1) {
-    const FilterWarmStart* fws=dynamic_cast<const FilterWarmStart*>(warmstart_);
-    if (fws) {
-      has_warmstart = fws->empty() ? 0 : 2;
-    }
-  }
-  if (has_warmstart == 1) {
-    const BqpdWarmStart* bws = dynamic_cast<const BqpdWarmStart*>(warmstart_);
-    if (bws) {
-      has_warmstart = bws->empty() ? 0 : 2;
-    }
-  }
-#endif
-  assert(has_warmstart != 1); // FIXME LL: this should be removed.
+  if(warmstart_ == NULL) has_warmstart = 0;
+  else if(!app_->warmStartIsValid(warmstart_)) has_warmstart = 1;
+  else has_warmstart = 2;
   if (has_warmstart < 2) {
     // empty (or unrecognized) warmstart
     initialSolve();

@@ -526,6 +526,10 @@ class Messages : public CoinMessages
     exposeWarmStart_ = value;
   }
 
+  bool getExposeWarmStart() {
+    return exposeWarmStart_;
+  }
+
   void randomStartingPoint();
 
   //Returns true if a basis is available
@@ -1176,6 +1180,11 @@ protected:
   ///Constructor without model only for derived classes
   OsiTMINLPInterface(Ipopt::SmartPtr<TNLPSolver> app);
 
+  /** Internal set warm start.*/
+  bool internal_setWarmStart(const CoinWarmStart* ws);
+
+  /** internal get warm start.*/
+  CoinWarmStart* internal_getWarmStart() const; 
 private:
   /** solver to be used for all strong branching solves */
   SmartPtr<StrongBranchingSolver> strong_branching_solver_;

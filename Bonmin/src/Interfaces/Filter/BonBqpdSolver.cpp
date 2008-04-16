@@ -11,7 +11,7 @@
 #include "BonminConfig.h"
 
 #include "BonBqpdSolver.hpp"
-#include "BonFilterWarmStart.hpp"
+#include "BonBqpdWarmStart.hpp"
 
 #include "CoinTime.hpp"
 
@@ -490,6 +490,16 @@ namespace Bonmin
 #endif
     printf("BqpdSolver::getEmptyWarmStart called \n");
     return NULL;
+  }
+
+  /** Check that warm start object is valid.*/
+  bool 
+  BqpdSolver::warmStartIsValid(const CoinWarmStart * ws) const{
+    const BqpdWarmStart* bws = dynamic_cast<const BqpdWarmStart*>(ws);
+    if (bws && ! bws->empty()) {
+      return true;
+    }
+    return false;
   }
 
 }//end namespace Bonmin
