@@ -205,8 +205,8 @@ namespace Bonmin
       int maxNodes)
   {
     if (clp_) {
-      //if (!strategy_)
-      //  strategy_ = new CbcStrategyDefault(1,0,0, loglevel);
+      if (!strategy_)
+        strategy_ = new CbcStrategyDefault(1,0,0, loglevel);
 
       OsiBabSolver empty;
       if (cbc_) delete cbc_;
