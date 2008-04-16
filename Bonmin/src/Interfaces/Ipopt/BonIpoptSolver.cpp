@@ -248,6 +248,15 @@ namespace Bonmin
     }
   }
 
+/// Get warm start used in last optimization
+CoinWarmStart *
+IpoptSolver::getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
+{
+  return  new IpoptWarmStart(tnlp->num_variables(),
+                             2*tnlp->num_variables() + 
+                             tnlp->num_constraints(),
+                             tnlp->x_init(), tnlp->duals_init());
+}
 /// Get warmstarting information
   CoinWarmStart*
   IpoptSolver::getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
@@ -285,7 +294,7 @@ namespace Bonmin
 #endif
 
     assert(numcols == ws->primalSize());
-    //assert(2*numcols + numrows == ws->dualSize());
+    assert(2*numcols + numrows == ws->dualSize());
     tnlp->setxInit(ws->primalSize(), ws->primal());
 
     if (IsValid(ws->warm_starter()))

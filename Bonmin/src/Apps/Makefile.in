@@ -48,11 +48,6 @@ host_triplet = @host@
 @COIN_HAS_CPX_TRUE@	$(CPXLIB)
 
 @COIN_HAS_CPX_TRUE@am__append_2 = \
-@COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-@COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-@COIN_HAS_CPX_TRUE@	$(CPXLIB)
-
-@COIN_HAS_CPX_TRUE@am__append_3 = \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
 
@@ -76,19 +71,15 @@ am__DEPENDENCIES_2 =
 @COIN_HAS_CPX_TRUE@am__DEPENDENCIES_3 =  \
 @COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 @COIN_HAS_CPX_TRUE@	$(am__DEPENDENCIES_2)
-@COIN_HAS_CPX_TRUE@am__DEPENDENCIES_4 =  \
-@COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-@COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-@COIN_HAS_CPX_TRUE@	$(am__DEPENDENCIES_2)
-am__DEPENDENCIES_5 = $(CBCOBJDIR)/src/libCbc.la \
+am__DEPENDENCIES_4 = $(CBCOBJDIR)/src/libCbc.la \
 	$(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la $(am__DEPENDENCIES_3) \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_4)
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 bonmin_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_5) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -344,7 +335,7 @@ AUTOMAKE_OPTIONS = foreign
 COINLIBS = $(CBCOBJDIR)/src/libCbc.la $(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la $(am__append_1) \
 	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__append_2)
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 IPOPTLIBS = \
 	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 
@@ -386,7 +377,7 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Algorithms` -I`$(CYGPATH_W) \
 	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(CBCSRCDIR)/src` -I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` $(am__append_3)
+	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` $(am__append_2)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin

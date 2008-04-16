@@ -349,6 +349,7 @@ namespace Bonmin
   FilterSolver::FilterSolver(bool createEmpty /* = false */)
       :
       TNLPSolver(),
+      warmF_(NULL),
       cached_(NULL)
   {}
 
@@ -356,6 +357,7 @@ namespace Bonmin
       Ipopt::SmartPtr<Ipopt::OptionsList> options,
       Ipopt::SmartPtr<Ipopt::Journalist> journalist):
       TNLPSolver(roptions, options, journalist),
+      warmF_(NULL),
       cached_(NULL)
   {}
 
@@ -367,6 +369,7 @@ namespace Bonmin
     *retval->options_ = *options_; // Copy the options
     retval->roptions_ = roptions_; // only copy pointers of registered options
     retval->journalist_ = journalist_; // and journalist
+    retval->warmF_ = (warmF_.IsValid()) ? dynamic_cast<FilterWarmStart *>(warmF_->clone()):NULL;
     return GetRawPtr(retval);
   }
 
@@ -422,7 +425,7 @@ namespace Bonmin
   TNLPSolver::ReturnStatus
   FilterSolver::OptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
   {
-    if (IsNull(cached_) || !cached_->use_warm_start_in_cache_) {
+    if (cached_.IsNull() || !cached_->use_warm_start_in_cache_) {
       cached_ = new cachedInfo(tnlp, options_);
     }
     return callOptimizer();
@@ -433,6 +436,7 @@ namespace Bonmin
   FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
   {
     assert(tnlp == cached_->tnlp_);
+    cached_->load_ws(warmF_);
     //rescan bounds which may have changed
     assert(cached_->bounds);
     int n = cached_->n;
@@ -703,7 +707,23 @@ namespace Bonmin
     delete [] z_U;
     return optimizationStatus;
   }
-
+  /** Load warm-start info into cache with filter.*/
+  void
+  FilterSolver::cachedInfo::load_ws(Coin::SmartPtr<FilterWarmStart> warmF){
+    if(!warmF.IsValid()) return;
+    const fint xsize = warmF->primalSize();
+    real* x = x;
+    const real* xarray = warmF->primal();
+    for (int i = 0; i<xsize; i++) {
+      x[i] = xarray[i];
+    }
+    CoinCopyN(warmF->dual(), warmF->dualSize(), lam);
+    CoinCopyN(warmF->lwsArray(), warmF->lwsSize(), lws);
+    for (int i = 0 ; i < 14 ; i ++) {
+      istat[i] = warmF->istat()[i];
+    }
+    use_warm_start_in_cache_ = true;
+  }
   /** Optimize problem described by cache with filter.*/
   void
   FilterSolver::cachedInfo::optimize()
@@ -780,31 +800,19 @@ namespace Bonmin
   FilterSolver::setWarmStart(const CoinWarmStart * warm,
       Ipopt::SmartPtr<TMINLP2TNLP> tnlp)
   {
-    if (IsNull(cached_)) {
+    if (cached_.IsNull()) {
       cached_ = new cachedInfo(GetRawPtr(tnlp), options_);
     }
 
     const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
     if (warmF->empty())//reset initial point and leave
     {
+      warmF_ = NULL;
       disableWarmStart();
       return 1;
     }
     enableWarmStart();
-
-    //CoinCopyN(warmF->xArray(), warmF->xSize(), cached_->x);
-    const fint xsize = warmF->primalSize();
-    real* x = cached_->x;
-    const real* xarray = warmF->primal();
-    for (int i = 0; i<xsize; i++) {
-      x[i] = xarray[i];
-    }
-    CoinCopyN(warmF->dual(), warmF->dualSize(), cached_->lam);
-    CoinCopyN(warmF->lwsArray(), warmF->lwsSize(), cached_->lws);
-    for (int i = 0 ; i < 14 ; i ++) {
-      cached_->istat[i] = warmF->istat()[i];
-    }
-    cached_->use_warm_start_in_cache_ = true;
+    warmF_ = dynamic_cast<FilterWarmStart *> (warmF->clone());
     return true;
   }
 

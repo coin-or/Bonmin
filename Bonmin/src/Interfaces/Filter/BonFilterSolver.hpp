@@ -11,7 +11,9 @@
 #define FilterSolver_H
 
 #include "BonTNLPSolver.hpp"
+#include "BonFilterTypes.hpp"
 #include "BonBqpdSolver.hpp"
+#include "BonFilterWarmStart.hpp"
 
 namespace Bonmin
 {
@@ -41,9 +43,9 @@ namespace Bonmin
     };
 
     /** Fortran type for integer used in filter. */
-    typedef ipfint fint;
+    typedef FilterTypes::fint fint;
     /** Fortran type for double.used in filter */
-    typedef double real;
+    typedef FilterTypes::real real;
 
 
     virtual UnsolvedError * newUnsolvedError(int num,
@@ -87,6 +89,11 @@ namespace Bonmin
     virtual bool setWarmStart(const CoinWarmStart * warm,
         Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
 
+   /// Get warm start used in last optimization
+   virtual CoinWarmStart * getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
+     return warmF_.GetRawPtr();}
+
+
     /// Get the warm start form the solver
     virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const;
 
@@ -110,24 +117,24 @@ namespace Bonmin
     /// Get the CpuTime of the last optimization.
     virtual double CPUTime()
     {
-      return (Ipopt::IsValid(cached_)) ? cached_->cpuTime_: 0.;
+      return (cached_.IsValid()) ? cached_->cpuTime_: 0.;
     }
 
     /// Get the iteration count of the last optimization.
     virtual int IterationCount()
     {
-      return (Ipopt::IsValid(cached_)) ? cached_->istat[1]:0;
+      return (cached_.IsValid()) ? cached_->istat[1]:0;
     }
 
     /// turn off all output from the solver
     virtual void turnOffOutput()
     {
-      if (Ipopt::IsValid(cached_)) cached_->iprint = 0;
+      if (cached_.IsValid()) cached_->iprint = 0;
     }
     /// turn on all output from the solver
     virtual void turnOnOutput()
     {
-      if (Ipopt::IsValid(cached_)) cached_->iprint = 3;
+      if (cached_.IsValid()) cached_->iprint = 3;
     }
 
     /// Get the solver name
@@ -155,11 +162,10 @@ namespace Bonmin
     /** Perform optimization using data structure in cache. */
     TNLPSolver::ReturnStatus callOptimizer();
     /** @} */
-    /** Register all the options for filter. */
-
+    Coin::SmartPtr<FilterWarmStart> warmF_;
 
     /** Cached information for reoptimizing. */
-  struct cachedInfo : public Ipopt::ReferencedObject
+  struct cachedInfo : public Coin::ReferencedObject
     {
       fint n;
       fint m;
@@ -305,10 +311,12 @@ namespace Bonmin
         delete [] hStruct_;
         tnlp_ = NULL;
       }
+
+      void load_ws(Coin::SmartPtr<FilterWarmStart>);
     };
 
     /** Cached information on last problem optimized for reoptimization. */
-    Ipopt::SmartPtr<cachedInfo> cached_;
+    Coin::SmartPtr<cachedInfo> cached_;
 
     //name of solver (Filter)
     static std::string  solverName_;

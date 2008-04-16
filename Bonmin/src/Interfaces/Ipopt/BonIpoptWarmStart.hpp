@@ -53,6 +53,9 @@ namespace Bonmin
     /// Usefull constructor, stores the current optimum of ipopt
     IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
         SmartPtr<IpoptInteriorWarmStarter> warm_starter);
+    /// Another usefull constructor, stores the passed point
+    IpoptWarmStart(int primal_size, int dual_size,
+                   const double * primal, const double * dual);
     /// Copy constructor
     IpoptWarmStart( const IpoptWarmStart &other, bool ownValues = 1);
     /// A constructor from a CoinWarmStartPrimalDual

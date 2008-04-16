@@ -130,6 +130,9 @@ TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
   virtual bool setWarmStart(const CoinWarmStart * warm, 
                             Ipopt::SmartPtr<TMINLP2TNLP> tnlp) = 0;
 
+/// Get warm start used in last optimization
+  virtual CoinWarmStart * getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const = 0;
+
   /// Get the warm start form the solver
   virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const = 0;
 

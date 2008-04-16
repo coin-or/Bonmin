@@ -27,10 +27,10 @@ namespace Bonmin
     lwsArray_(NULL),
     empty_(false)
   {
-    DBG_ASSERT(lwsSize > 0 || !lwsArray);
+    assert(lwsSize > 0 || !lwsArray);
     if (lwsSize_ > 0) {
       lwsArray_ = new fint[lwsSize];
-      DBG_ASSERT(lwsArray);
+      assert(lwsArray);
       CoinCopyN(lwsArray, lwsSize, lwsArray_);
     }
     for (int i = 0 ; i < 14 ; i ++) {
@@ -47,10 +47,10 @@ namespace Bonmin
     lwsArray_(NULL),
     empty_(other.empty_)
   {
-    DBG_ASSERT(lwsSize_ > 0 || !lwsArray_);
+    assert(lwsSize_ > 0 || !lwsArray_);
     if (lwsSize_ > 0) {
       lwsArray_ = new fint[lwsSize_];
-      DBG_ASSERT(other.lwsArray_);
+      assert(other.lwsArray_);
       CoinCopyN(other.lwsArray_, lwsSize_, lwsArray_);
     }
     for (int i = 0 ; i < 14 ; i ++) {
@@ -99,7 +99,7 @@ namespace Bonmin
   {
     const FilterWarmStartDiff * diffF =
       dynamic_cast<const FilterWarmStartDiff *>(diff);
-    DBG_ASSERT(diffF);
+    assert(diffF);
     CoinWarmStartPrimalDual::applyDiff(diffF);
 
     fint end = diffF->differences.size();
@@ -133,8 +133,9 @@ namespace Bonmin
     differences.clear();
   }
 
-  FilterSolver::fint
+  FilterTypes::fint
   FilterWarmStart::def_istat[14] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 
 } /* End namespace Bonmin */
+

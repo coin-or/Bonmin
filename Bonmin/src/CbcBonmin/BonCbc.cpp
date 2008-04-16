@@ -438,16 +438,11 @@ namespace Bonmin
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
     {
-      const double * colsol = model_.solver()->getColSolution();
-      const double * duals = model_.solver()->getRowPrice();
 
       OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
-      //int saveExposeWarmStart = tnlpSolver->getExposeWarmStart();
-      //tnlpSolver->setExposeWarmStart(true);
       CoinWarmStart * warm = tnlpSolver->solver()->getWarmStart(tnlpSolver->problem());
       tnlpSolver->solver()->setWarmStart(warm, tnlpSolver->problem());
       delete warm;
-      //tnlpSolver->setExposeWarmStart(saveExposeWarmStart);
     }
 
 #ifdef SIGNAL

@@ -176,7 +176,7 @@ class Messages : public CoinMessages
 
   /** Resolve the problem with different random starting points to try to find
       a better solution (only makes sense for a non-convex problem.*/
-  virtual void resolveForCost(int numretry);
+  virtual void resolveForCost(int numretry, bool keepWs);
 
   /** Method to be called when a problem has failed to be solved. Will try
       to resolve it with different settings.

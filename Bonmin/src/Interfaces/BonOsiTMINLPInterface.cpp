@@ -705,16 +705,20 @@ static const char * INFEAS_SYMB="INFEAS";
 
 
 void
-OsiTMINLPInterface::resolveForCost(int numsolve)
+OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
 {
   // This method assumes that a problem has just been solved and we try for a
   // different solution. So disregard (in fact, clear out) any warmstart info
   // we might have, and acquire a new one before returning.
   delete warmstart_;
   warmstart_ = NULL;
-  
-  app_->disableWarmStart();
-  solveAndCheckErrors(0,0,"resolveForCost");
+ 
+  Coin::SmartPtr<SimpleReferencedPtr<CoinWarmStart> > ws_backup = NULL;
+  if(!exposeWarmStart_ && keepWarmStart){
+    //if warm start is not exposed, we need to store the current starting point to
+    //restore it at the end of the method
+    ws_backup = make_referenced(app_->getUsedWarmStart(problem_));
+  }
   /** Save current optimum. */
   vector<double> point(getNumCols()*3+ getNumRows());
   double bestBound = getObjValue();
@@ -791,8 +795,8 @@ OsiTMINLPInterface::resolveForCost(int numsolve)
   optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
   hasBeenOptimized_ = true;
 
-  if (exposeWarmStart_) {
-    warmstart_ = app_->getWarmStart(problem_);
+  if(!exposeWarmStart_ && keepWarmStart) {
+    app_->setWarmStart(ws_backup->ptr(), problem_);
   }
 }
 
@@ -805,6 +809,13 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   delete warmstart_;
   warmstart_ = NULL;
   
+
+  Coin::SmartPtr<SimpleReferencedPtr<CoinWarmStart> > ws_backup;
+  if(!exposeWarmStart_){
+    //if warm start is not exposed, we need to store the current starting point to
+    //restore it at the end of the method
+    ws_backup = make_referenced(app_->getUsedWarmStart(problem_));
+  }
   //std::cerr<<"Resolving the problem for robustness"<<std::endl;
   //First remove warm start point and resolve
   app_->disableWarmStart();
@@ -832,8 +843,8 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     messageHandler()->message(WARN_SUCCESS_WS, messages_) << CoinMessageEol ;
     // re-enable warmstart and get it
     app_->enableWarmStart();
-    if (exposeWarmStart_) {
-      warmstart_ = app_->getWarmStart(problem_);
+    if (!exposeWarmStart_) {
+      app_->setWarmStart(ws_backup->ptr(), problem_);
     }
     return; //we won go on
   }
@@ -869,11 +880,17 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
 	<< f+2 << CoinMessageEol ;
       // re-enable warmstart and get it
       app_->enableWarmStart();
-      if (exposeWarmStart_) {
-	warmstart_ = app_->getWarmStart(problem_);
+      if (!exposeWarmStart_) {
+        app_->setWarmStart(ws_backup->ptr(), problem_);
       }
+        
       return; //we have found a solution and continue
     }
+  }
+
+
+  if(!exposeWarmStart_){
+    app_->setWarmStart(ws_backup->ptr(), problem_);
   }
   if(pretendFailIsInfeasible_) {
     if(pretendFailIsInfeasible_ == 1) {
@@ -2411,7 +2428,7 @@ void OsiTMINLPInterface::initialSolve()
   }
   else if(numRetry)
     {
-      resolveForCost(numRetry);
+      resolveForCost(numRetry, numRetryInitial_ > 0);
       /** Only do it once at the root.*/
       numRetryInitial_ = 0;
     }
@@ -2471,7 +2488,7 @@ OsiTMINLPInterface::resolve()
   }
   else if(numRetryResolve_ ||
 	  (numRetryInfeasibles_ && isProvenPrimalInfeasible() ))
-    resolveForCost(max(numRetryResolve_, numRetryInfeasibles_));
+    resolveForCost(max(numRetryResolve_, numRetryInfeasibles_), 0);
 
   // if warmstart_ is not empty then had to use resolveFor... and that created
   // the warmstart at the end, and we have nothing to do here. Otherwise...

@@ -63,6 +63,11 @@ struct SimpleReferencedPtr : public Coin::ReferencedObject {
  X& operator()() {
    return *object;}
 
+ const X* ptr() const{
+    return object;}
+
+ X* ptr(){
+    return object;}
 };
 
 template <class X>
@@ -73,7 +78,7 @@ SimpleReferenced<X> * make_referenced(X other){
 }
 template <class X>
 SimpleReferencedPtr<X> * make_referenced(X* other){
-  SimpleReferencedPtr <X> * ret_val = new SimpleReferenced<X>;
+  SimpleReferencedPtr <X> * ret_val = new SimpleReferencedPtr<X>;
   ret_val->object = other;
   return ret_val;
 }

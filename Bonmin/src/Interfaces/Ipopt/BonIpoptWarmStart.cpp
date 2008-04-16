@@ -32,7 +32,7 @@ namespace Bonmin
       SmartPtr<IpoptInteriorWarmStarter> warm_starter):
       CoinWarmStartPrimalDual(tnlp->num_variables(),
 			      2*tnlp->num_variables()+tnlp->num_constraints(),
-			      tnlp->x_sol(), tnlp->duals_sol()),
+			      tnlp->x_sol(), tnlp->duals_sol() ),
       CoinWarmStartBasis(),
       warm_starter_(warm_starter),
       empty_(false)
@@ -43,6 +43,16 @@ namespace Bonmin
     setSize(numcols,numrows);
   }
 
+/// Another usefull constructor, stores the passed point
+IpoptWarmStart::IpoptWarmStart(int primal_size, int dual_size,
+                   const double * primal, const double * dual):
+          CoinWarmStartPrimalDual(primal_size, dual_size, primal, dual),
+          CoinWarmStartBasis(),
+          warm_starter_(NULL), 
+          empty_(false)
+{
+   setSize(primal_size, dual_size - 2* primal_size);
+}
 /// Copy constructor
   IpoptWarmStart::IpoptWarmStart( const IpoptWarmStart &other, bool ownValues):
     CoinWarmStartPrimalDual(other),

@@ -85,6 +85,11 @@ namespace Bonmin
     virtual bool setWarmStart(const CoinWarmStart * warm,
         Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
 
+    /// Get warm start used in last optimization
+    virtual CoinWarmStart * getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
+      throw CoinError(__PRETTY_FUNCTION__,"","Not implemented");
+    }
+
     /// Get the warm start form the solver
     virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const;
 

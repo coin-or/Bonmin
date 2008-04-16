@@ -28,7 +28,8 @@ namespace Bonmin{
    * CoinWarmStartBasis. <br>
    */
   class BqpdWarmStart :
-    public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis
+    public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis,
+    public Coin::ReferencedObject
   {
     typedef FilterSolver::fint fint;
     typedef FilterSolver::real real;

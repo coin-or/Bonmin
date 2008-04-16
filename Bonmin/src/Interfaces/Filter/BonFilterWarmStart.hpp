@@ -15,7 +15,8 @@
 
 #include "CoinWarmStartBasis.hpp"
 #include "CoinWarmStartPrimalDual.hpp"
-#include "BonFilterSolver.hpp" /* for types */
+#include "BonFilterTypes.hpp" /* for types */
+#include "CoinSmartPtr.hpp"
 
 #include <vector>
 
@@ -30,10 +31,11 @@ namespace Bonmin
    * CoinWarmStartBasis. <br>
   */
   class FilterWarmStart :
-    public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis
+    public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis,
+    public Coin::ReferencedObject
   {
-    typedef FilterSolver::fint fint;
-    typedef FilterSolver::real real;
+    typedef FilterTypes::fint fint;
+    typedef FilterTypes::real real;
 
   public:
     /** Default values for istat */
@@ -106,8 +108,8 @@ namespace Bonmin
 
   class FilterWarmStartDiff : public CoinWarmStartPrimalDualDiff
   {
-    typedef FilterSolver::fint fint;
-    typedef FilterSolver::real real;
+    typedef FilterTypes::fint fint;
+    typedef FilterTypes::real real;
 
     friend class FilterWarmStart;
 

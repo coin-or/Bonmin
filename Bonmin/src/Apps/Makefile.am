@@ -33,13 +33,6 @@ COINLIBS += \
 	$(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
-if COIN_HAS_CPX
-  COINLIBS += \
-	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(CPXLIB)
-endif
-
 IPOPTLIBS = \
 	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 

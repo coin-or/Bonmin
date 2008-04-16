@@ -80,6 +80,10 @@ namespace Bonmin
     virtual bool setWarmStart(const CoinWarmStart * warm,
         Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
 
+   /// Get warm start used in last optimization
+   virtual CoinWarmStart * getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const;
+
+
     /// Get the warm start form the solver
     virtual CoinWarmStart * getWarmStart(Ipopt::SmartPtr<Bonmin::TMINLP2TNLP> tnlp) const;
 
