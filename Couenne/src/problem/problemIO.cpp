@@ -39,7 +39,8 @@ void CouenneProblem::print (std::ostream &out) {
 
       (*i) -> print (out);
 
-      if (((*i) -> Type () == AUX) && ((*i) -> Multiplicity () > 0)) {
+      if (((*i) -> Type () == AUX) && 
+	  ((*i) -> Multiplicity () > 0)) {
 
 	out << " (r:" << (*i) -> rank () 
 	    << ", m:" << (*i) -> Multiplicity () << ") := ";

@@ -26,8 +26,6 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 				    bool is_global)       const {
   bool numerics = false;
 
-  //static bool warned_large_coeff = false;
-
   // a maximum of three terms are allowed here. If index -1 (default)
   // the term is not considered
 
@@ -44,12 +42,10 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
   if (numerics
       || ((fabs (lb) > COU_MAX_COEFF) &&
 	  (fabs (ub) > COU_MAX_COEFF))) {
-    //if (!warned_large_coeff) {
+
     jnlst_->Printf(J_WARNING, J_CONVEXIFYING,
 		   "### Discarding cut, large coeff/rhs: %g (%d), %g (%d), %g (%d); [%g,%g]\n", 
 		   c1, i1, c2, i2, c3, i3, lb, ub);
-    //warned_large_coeff = true;
-      //}
     return 0;
   }
 

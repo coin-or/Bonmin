@@ -20,6 +20,10 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   int index = reference_ -> Index ();
   assert (index >= 0);
 
+  if (info -> upper_ [index] - 
+      info -> lower_ [index] < COUENNE_EPS)
+    return 0.;
+
   // get set of variable indices that depend on reference_
   const std::set <int> &dependence = problem_ -> Dependence () [index];
 
@@ -77,6 +81,13 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 	if (left  < lFeas) lFeas = left;
 	if (right > rFeas) rFeas = right;
       }
+
+      /*printf ("init retval = %g - %g = %g (diff = %g - %g = %g) ", 
+	      rFeas, lFeas, rFeas - lFeas,
+	      (*(obj. Reference () -> Image ())) (),
+	      (*(obj. Reference ())) (),
+	      (*(obj. Reference () -> Image ())) () -
+	      (*(obj. Reference ())) ());*/
     }
 
     retval = rFeas - lFeas;
@@ -129,7 +140,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   //   /// Row indices
   //   const int * row_;
 
-  //printf ("------------------ vt_delta [%d] = %g +\n", index, vt_delta);
+  //printf ("------------------ vt_delta [%d] [%g,%g] = %g +\n", index, lFeas, rFeas, vt_delta);
 
   for (int i=0, n_el = info -> columnLength_ [index]; i < n_el; i++) {
 
@@ -152,6 +163,11 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   const CouNumber 
     alpha = 0.7,
     beta  = 0.1;
+
+  /*printf ("return %g * %g + %g * %g + %g * %g --> ", 
+	  alpha,        fabs (retval * vt_delta),
+	  beta,         retval,
+	  1-alpha-beta, leanLeft * (1-leanLeft));*/
 
   retval = 
     alpha          * fabs (retval*vt_delta) +  // violation transfer itself

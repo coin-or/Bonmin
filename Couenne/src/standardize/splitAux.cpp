@@ -134,13 +134,15 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 	  // dependsOn() gives 0
 
 	  exprVar *saveVar = lcoe [i].first;
-	  //lcoe [i].first = new exprVar (nVars ());
+	  //lcoe [i].first = new exprVar (nVars ()); // better use index -1
 	  lcoe [i].first = new exprVar (-1);
 
 	  if (body -> dependsOn (j, TAG_AND_RECURSIVE) == 0) {
 
 #ifdef DEBUG
-	    printf ("body does not depend on x%d\n", j);
+	    printf ("body does not depend on x%d: ", j);
+	    body -> print ();
+	    printf ("\n");
 #endif
 	    // mark which with negative number
 	    which    = - nlin - 1;
@@ -277,16 +279,6 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 	qindI = new int [nqt];
 	qindJ = new int [nqt];
 	qcoe  = new CouNumber [nqt];
-
-	/*CoinCopyN (eq -> getQIndexI (), nqt, qindI);
-	CoinCopyN (eq -> getQIndexJ (), nqt, qindJ);
-
-	if (fabs (divider - 1) < COUENNE_EPS)
-	  CoinCopyN (eq -> getQCoeffs (), nqt, qcoe);
-	else {
-	  CouNumber *coe = eq -> getQCoeffs ();
-	  while (nqt--) qcoe [nqt] = divider * coe [nqt];
-	  }*/
 
 	exprQuad::sparseQ &M = eq -> getQ ();
 

@@ -259,7 +259,17 @@ void exprPow::closestFeasible (expression *varind,
       else
 
 	if (k > 0) 
-	  left = - (right = yk);
+
+	  if (k < 1) // roots, have x >= 0
+
+	    if (x > yk) left  = yk;
+	    else        right = yk;
+
+	  else
+
+	    if (x > yk)       left  =  yk;
+	    else if (x < -yk) right = -yk;
+	    else              left  = - (right = yk);
 
 	else // k negative
 	  if (y < xk) // between asymptotes

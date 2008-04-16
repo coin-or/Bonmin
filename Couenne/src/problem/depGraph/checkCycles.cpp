@@ -9,6 +9,8 @@
 
 #include "depGraph.hpp"
 
+//#define DEBUG
+
 /// check for cycles in dependence graph
 
 bool DepGraph::checkCycles () {
@@ -26,8 +28,15 @@ bool DepGraph::checkCycles () {
 
       std::set <DepNode *, compNode> already_visited;
 
-      if ((*j) -> depends (xi, true, &already_visited))
+      if ((*j) -> depends (xi, true, &already_visited)) {
+
+#ifdef DEBUG
+	printf ("(%d -> %d) ", xi, (*j) -> Index ());
+	fflush (stdout);
+#endif
+
 	return true;
+      }
       else already_visited.insert (*j);
     }
   }

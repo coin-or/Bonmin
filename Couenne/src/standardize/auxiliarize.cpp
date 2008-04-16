@@ -11,11 +11,19 @@
 #include "CouenneProblem.hpp"
 #include "exprClone.hpp"
 
+//#define DEBUG
+
 /// replace, in all expressions of the problem (auxiliaries,
 /// objectives and constraints) link to an original variable that has
 /// gone auxiliary
 
 void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
+
+#ifdef DEBUG
+  printf ("replacing  "); if (aux)   aux   -> print (); 
+  printf (" with ");      if (subst) subst -> print (); 
+  printf ("\n");
+#endif
 
   bool same_var = (subst == NULL);
 
@@ -91,16 +99,26 @@ void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
     if (((*i) -> Type () == AUX) &&                  // replace in all aux's image
 	((*i) -> Index () != (*orig) -> Index ())) { // skip same variable
 
+#ifdef DEBUG
+      //printf ("replacing aux "); (*i) -> print (); 
+      //printf (" := "); (*i) -> Image () -> print (); 
+      //printf ("\n");
+#endif
+
       expression *image = (*i) -> Image ();
 
       if ((image -> Type () == VAR) || 
 	  (image -> Type () == AUX)) {
+
 	if (image -> Index () == (*orig) -> Index ()) {
 
-	  //delete image;//(*i) -> Image (); // !!! Possible leak? TODO
+	  delete image;
 	  (*i) -> Image (new exprClone (subst));
+	  //printf (" ---> "); (*i) -> Image () -> print (); 
 	} //else (*i) -> Image () -> replace (*orig, aux);
       } else image  -> replace (*orig, subst);
+
+      //printf ("\n");
     }
 
   // replace it with new auxiliary

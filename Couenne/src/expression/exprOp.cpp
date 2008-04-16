@@ -164,6 +164,7 @@ void exprOp::replace (exprVar *x, exprVar *w) {
 
     switch ((*al) -> Type ()) {
 
+    case AUX:
     case VAR:
       if ((*al) -> Index () == index) {
 	delete *al;

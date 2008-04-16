@@ -198,7 +198,7 @@ void exprDiv::closestFeasible (expression *varind,
   if (varoth -> Index () == varind -> Index ()) { // actually w = x/c
     varoth = arglist_ [1];
     numerator = true;
-  } else assert (arglist_ [0] -> Index () == varind -> Index ());
+  } else assert (arglist_ [1] -> Index () == varind -> Index ()); // right to assume w = c/x
 
   CouNumber 
     x = (*varind) (),

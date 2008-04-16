@@ -118,7 +118,21 @@ int expression::compare (exprCopy &c)
 
 /// replace occurrence of a variable with another variable
 void exprCopy::replace (exprVar *orig, exprVar *aux) {
-  copy_ -> replace (orig, aux);
+
+  if (!aux) 
+    aux = orig;
+
+  enum nodeType copyType = copy_ -> Type ();
+
+  if ((copyType == VAR) || 
+      (copyType == AUX)) {
+
+    if (copy_ -> Index () == orig -> Index ())
+      copy_ = aux;
+
+  } else copy_ -> replace (orig, aux);
+
+  //copy_ -> replace (orig, aux);
 
   /*if ((copy_ -> Index () == orig -> Index ()) && (copy_ -> Type  () != AUX)) {
     delete copy_;

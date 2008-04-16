@@ -42,8 +42,8 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
 
   if (compareExpr (&lb_, &ub_) == 0) {
 
-    // this is an equality constraint, and as such it could be the
-    // definition of an auxiliary
+    // this is an equality constraint, and could be the definition of
+    // an auxiliary
 
     expression *rest;
 

@@ -95,7 +95,7 @@ class expression {
 
   /// set expression associated with this auxiliary variable (for
   /// compatibility with exprAux)
-  void Image (expression *image) {}
+  virtual void Image (expression *image) {}
 
   /// value (empty)
   virtual inline CouNumber Value () const 
@@ -122,12 +122,10 @@ class expression {
 
   /// dependence on variable set: return cardinality of subset of the
   /// set of indices in first argument which occur in expression. 
-  virtual int dependsOn (int *ind, int n, 
-			 enum dig_type type = STOP_AT_AUX);
+  virtual int dependsOn (int *ind, int n, enum dig_type type = STOP_AT_AUX);
 
   /// version with one index only
-  inline int dependsOn (int singleton, 
-			 enum dig_type type = STOP_AT_AUX)
+  inline int dependsOn (int singleton, enum dig_type type = STOP_AT_AUX)
   {return dependsOn (&singleton, 1, type);}
 
   /// fill std::set with indices of variables on which this expression
