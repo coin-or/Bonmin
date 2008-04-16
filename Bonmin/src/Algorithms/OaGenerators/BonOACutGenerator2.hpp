@@ -18,15 +18,6 @@ namespace Bonmin
   class OACutGenerator2 : public OaDecompositionBase
   {
   public:
-    /// Usefull constructor
-    OACutGenerator2(OsiTMINLPInterface * nlp = NULL,
-        OsiSolverInterface * si = NULL,
-        CbcStrategy * strategy = NULL,
-        double cbcCutoffIncrement_=1e-07,
-        double cbcIntegerTolerance = 1e-05,
-        bool leaveSiUnchanged = 0
-                   );
-
     /// Constructor with basic setup
     OACutGenerator2(BabSetupBase & b);
 

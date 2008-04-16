@@ -605,12 +605,12 @@ namespace Bonmin
         if (bb_log_level_>=3) {
           const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"};
           message(SB_HEADER)<<CoinMessageEol;
-          for (int i = 0; i< results_.size(); i++) {
+          for (unsigned int i = 0; i< results_.size(); i++) {
             double up_change = results_[i].upChange();
             double down_change = results_[i].downChange();
             int up_status = results_[i].upStatus();
             int down_status = results_[i].downStatus();
-            message(SB_RES)<<i<<stat_msg[down_status+1]<<down_change
+            message(SB_RES)<<(int) i<<stat_msg[down_status+1]<<down_change
             <<stat_msg[up_status+1]<< up_change<< CoinMessageEol;
           }
         }

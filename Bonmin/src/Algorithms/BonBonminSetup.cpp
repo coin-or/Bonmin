@@ -307,7 +307,6 @@ namespace Bonmin
     continuousSolver_->setAuxiliaryInfo(&extraStuff);
 
     intParam_[BabSetupBase::SpecialOption] = 16;
-    //AW: Took this out: intParam_[BabSetupBase::MinReliability] = 0;
     if (!options_->GetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.")) {
       intParam_[BabSetupBase::MinReliability] = 1;
       options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");

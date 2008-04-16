@@ -25,20 +25,6 @@
 namespace Bonmin
 {
 
-/// Default constructor
-  OACutGenerator2::OACutGenerator2
-  (OsiTMINLPInterface * nlp,
-   OsiSolverInterface * si,
-   CbcStrategy * strategy,
-   double cbcCutoffIncrement,
-   double cbcIntegerTolerance,
-   bool leaveSiUnchanged
-  )
-      :
-      OaDecompositionBase(nlp,si,
-          strategy, cbcCutoffIncrement,
-          cbcIntegerTolerance, leaveSiUnchanged)
-  {}
 /// Constructor with basic setup
   OACutGenerator2::OACutGenerator2(BabSetupBase & b):
       OaDecompositionBase(b, true, false)
@@ -49,7 +35,7 @@ namespace Bonmin
       //nothing to do?
     }
     else if (ivalue == 1) {
-      int nodeS, nStrong, nTrust, mig, mir, probe, cover, logLevel;
+      int nodeS, nStrong, nTrust, mig, mir, probe, cover;
       b.options()->GetEnumValue("node_comparison",nodeS,"milp_sub.");
       b.options()->GetIntegerValue("number_strong_branch",nStrong,"milp_sub.");
       b.options()->GetIntegerValue("number_before_trust", nTrust,"milp_sub.");
@@ -57,10 +43,10 @@ namespace Bonmin
       b.options()->GetIntegerValue("probing_cuts",probe,"milp_sub.");
       b.options()->GetIntegerValue("mir_cuts",mir,"milp_sub.");
       b.options()->GetIntegerValue("cover_cuts",cover,"milp_sub.");
-      b.options()->GetIntegerValue("milp_log_level",logLevel,"bonmin.");
+      
       CbcStrategy * strategy =
         new CbcOaStrategy(mig, probe, mir, cover, nTrust,
-            nStrong, nodeS, parameters_.cbcIntegerTolerance_, logLevel);
+            nStrong, nodeS, parameters_.cbcIntegerTolerance_, parameters_.subMilpLogLevel_);
       setStrategy(*strategy);
       delete strategy;
 

@@ -97,7 +97,6 @@ namespace Bonmin
   void
   CbcOaStrategy::setupPrinting(CbcModel & model,int modelLogLevel)
   {
-    //  throw -1;
     model.messageHandler()->setLogLevel(logLevel_);
     model.solver()->messageHandler()->setLogLevel(0);
     model.setPrintFrequency(100);

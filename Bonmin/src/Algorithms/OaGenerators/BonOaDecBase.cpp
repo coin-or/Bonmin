@@ -83,6 +83,7 @@ namespace Bonmin
 
     messages_ = OaMessages();
     timeBegin_ = CoinCpuTime();
+    b.options()->GetIntegerValue("milp_log_level",parameters_.subMilpLogLevel_,"bonmin.");
     b.options()->GetNumericValue("cutoff_decr",parameters_.cbcCutoffIncrement_,"bonmin.");
     b.options()->GetNumericValue("integer_tolerance",parameters_.cbcIntegerTolerance_,"bonmin.");
     int ivalue;
@@ -204,8 +205,8 @@ namespace Bonmin
       int maxNodes)
   {
     if (clp_) {
-      if (!strategy_)
-        strategy_ = new CbcStrategyDefault(1,0,0, loglevel);
+      //if (!strategy_)
+      //  strategy_ = new CbcStrategyDefault(1,0,0, loglevel);
 
       OsiBabSolver empty;
       if (cbc_) delete cbc_;
@@ -216,9 +217,9 @@ namespace Bonmin
       strcpy(cbc_->messagesPointer()->source_,"OaCbc");
 
       clp_->resolve();
+      cbc_->setStrategy(*strategy_);
       cbc_->setLogLevel(loglevel);
       cbc_->solver()->messageHandler()->setLogLevel(0);
-      cbc_->setStrategy(*strategy_);
       cbc_->setMaximumNodes(maxNodes);
       cbc_->setMaximumSeconds(maxTime);
       cbc_->setCutoff(cutoff);
