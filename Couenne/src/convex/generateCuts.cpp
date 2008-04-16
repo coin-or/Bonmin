@@ -99,7 +99,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   double now   = CoinCpuTime ();
   int    ncols = problem_ -> nVars ();
 
-  //problem_ -> installCutOff ();
+  problem_ -> installCutOff ();
 
   // This vector contains variables whose bounds have changed due to
   // branching, reduced cost fixing, or bound tightening below. To be
@@ -116,6 +116,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // constructor populated *problem_ with variables and bounds. We
     // only need to update the auxiliary variables and bounds with
     // their current value.
+
+    // start with FBBT, should take advantage of cutoff found by NLP
+    // run AFTER initial FBBT...
+    if (problem_ -> doFBBT () &&
+	(! (problem_ -> boundTightening (chg_bds, babInfo))))
+      printf ("Couenne: WARNING, first convexification is infeasible");
 
     // For each auxiliary variable replacing the original (nonlinear)
     // constraints, check if corresponding bounds are violated, and
@@ -217,8 +223,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 
   fictitiousBound (cs, problem_, false);
-
-  //problem_ -> installCutOff ();
 
   int *changed = NULL, nchanged;
 

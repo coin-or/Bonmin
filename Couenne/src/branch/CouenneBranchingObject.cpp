@@ -173,6 +173,9 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   if (     doFBBT_ &&                          // this branching object should do FBBT
       p -> doFBBT ()) {                        // problem allowed to do FBBT
+
+    p -> installCutOff ();
+
     if (!p -> boundTightening (chg_bds, NULL)) // done FBBT and this branch is infeasible
       infeasible = true;                       // ==> report it
     else {
