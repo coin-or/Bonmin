@@ -61,7 +61,7 @@ protected:
    *
    *  These are filled by alphaConvexify, which implements the
    *  alpha-convexification method described in the LaGO paper by
-   *  Nowak and Vigerske -- and also by Adjiman and Floudas.
+   *  Nowak and Vigerske -- see also Adjiman and Floudas.
    */
 
   /// eigenvalues and eigenvectors

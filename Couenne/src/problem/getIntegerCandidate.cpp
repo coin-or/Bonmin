@@ -22,7 +22,6 @@
 
 int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt, 
 					 double *lb, double *ub) const {
-
   fillIntegerRank ();
 
   if (numberInRank_.size () == 0) // there is no original integer to fix

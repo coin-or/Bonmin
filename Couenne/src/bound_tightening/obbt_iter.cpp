@@ -39,8 +39,8 @@ static bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use 
     double opt = csi -> getObjValue ();
 
     if (sense > 0) 
-         {if (opt          > bound + OBBT_EPS) {bound = (isint ? ceil (opt) : opt); return true;}}
-    else {if ((opt = -opt) < bound - OBBT_EPS) {bound = (isint ? floor(opt) : opt); return true;}}
+         {if (opt       >bound+OBBT_EPS) {bound=(isint ? ceil (opt-COUENNE_EPS) : opt); return true;}}
+    else {if ((opt=-opt)<bound-OBBT_EPS) {bound=(isint ? floor(opt+COUENNE_EPS) : opt); return true;}}
   }
 
   return false;

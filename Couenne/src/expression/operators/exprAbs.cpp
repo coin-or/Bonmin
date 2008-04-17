@@ -109,22 +109,21 @@ void exprAbs::closestFeasible (expression *varind, expression *vardep,
   CouNumber valdep = (*vardep)();
   CouNumber curr = (*varind)();
 
-  if (valdep < 0.) {
+  if (valdep < 0.) { // no way to restore feasibility, set infinite interval
     left = -COUENNE_INFINITY;
     right = COUENNE_INFINITY;
   }
-  else {
-    if (curr < -valdep) {
-      left = curr;
-      right = -valdep;
-    }
-    else if (curr > valdep) {
-      left = valdep;
-      right = curr;
-    }
-    else {
-      left = -valdep;
-      right = valdep;
-    }
+  else if (curr < -valdep) { // hence curr negative and behind left part of |x|
+    left = curr;
+    right = -valdep;
   }
+  else if (curr > valdep) { // hence curr positive and after right half-line of |x|
+    left = valdep;
+    right = curr;
+  }
+  else { // between the two half-lines
+    left = -valdep;
+    right = valdep;
+  }
+
 }
