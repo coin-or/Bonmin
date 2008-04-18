@@ -70,6 +70,25 @@ OsiBranchingObject* CouenneVarObject::createBranch (OsiSolverInterface *si,
      info -> lower_,
      info -> upper_); // have to alloc+copy
 
+  int bestWay;
+  CouNumber bestPt = computeBrachingPoint(info, bestWay);
+
+  ///////////////////////////////////////////
+
+  CouenneBranchingObject *brObj = new CouenneBranchingObject 
+  (jnlst_, reference_, bestWay ? TWO_RIGHT : TWO_LEFT, bestPt, doFBBT_, doConvCuts_);
+
+  problem_ -> domain () -> pop ();
+
+  return brObj;
+
+}
+
+CouNumber
+CouenneVarObject::computeBrachingPoint(const OsiBranchingInformation *info,
+				       int& bestWay) const
+{
+
   expression *brVar = NULL; // branching variable
 
   CouNumber 
@@ -78,8 +97,8 @@ OsiBranchingObject* CouenneVarObject::createBranch (OsiSolverInterface *si,
 
   bool chosen = false;
 
+  bestWay = TWO_LEFT;
   int whichWay = TWO_LEFT,
-    bestWay = TWO_LEFT, 
     index = reference_ -> Index ();
 
   std::set <int> deplist = problem_ -> Dependence () [index];
@@ -133,15 +152,8 @@ OsiBranchingObject* CouenneVarObject::createBranch (OsiSolverInterface *si,
     }
   }
 
-  ///////////////////////////////////////////
-
-  CouenneBranchingObject *brObj = new CouenneBranchingObject 
-  (jnlst_, reference_, bestWay ? TWO_RIGHT : TWO_LEFT, bestPt, doFBBT_, doConvCuts_);
-
-  problem_ -> domain () -> pop ();
-
   if (brPts)
     free (brPts);
 
-  return brObj;
+  return bestPt;
 }

@@ -47,15 +47,13 @@ public:
   virtual OsiBranchingObject* createBranch (OsiSolverInterface*, 
 					    const OsiBranchingInformation*, int) const;
 
-#if 0
   /// Return "down" estimate (for non-convex, distance old <--> new LP point)
   virtual double downEstimate () const
-  {return downEstimate_;}
+  {printf("downest = %e\n", downEstimate_); return downEstimate_;}
 
   /// Return "up" estimate (for non-convex, distance old <--> new LP point)
   virtual double upEstimate () const 
-  {return upEstimate_;}
-#endif
+  {printf("upest = %e\n", upEstimate_); return upEstimate_;}
 
   /// set up/down estimate (0 for down, 1 for up). This happens in
   /// CouenneChooseStrong, where a new LP point is available and we
@@ -70,13 +68,17 @@ public:
 protected:
 
   /// up estimate (to be used in pseudocost)
-  double upEstimate_;
+  mutable double upEstimate_;
 
   /// down estimate (to be used in pseudocost)
-  double downEstimate_;
+  mutable double downEstimate_;
 
   /// pointer to problem
   CouenneProblem *problem_;
+
+  /// Method computing the branching point
+  CouNumber computeBrachingPoint(const OsiBranchingInformation *info,
+				 int& bestWay) const;
 };
 
 #endif

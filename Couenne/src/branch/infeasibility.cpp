@@ -80,6 +80,20 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 
   // add term to stop branching on very tiny intervals
 
+
+  // Compute the up and down estimates here
+  // TODO: We probably only have to do that if pseudo costs option has
+  // been chosen
+
+  int bestWay;
+  CouNumber brkPt = computeBrachingPoint(info, bestWay);
+  upEstimate_ = info->upper_[index] - brkPt;
+  downEstimate_ = brkPt - info->lower_[index];
+  printf("index = %d up = %e down = %e bounds [%e,%e] brpt = %e\n", 
+	 index, upEstimate_, downEstimate_, 
+	 info->lower_[index],q
+	 info->upper_[index], brkPt);
+
   return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 
 	  0. : (retval + (1 - exp (info -> lower_ [index] - 
 				   info -> upper_ [index]))));
