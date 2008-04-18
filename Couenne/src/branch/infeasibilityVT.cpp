@@ -24,6 +24,12 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
       info -> lower_ [index] < COUENNE_EPS)
     return 0.;
 
+  problem_ -> domain () -> push 
+    (problem_ -> nVars (),
+     info -> solution_, 
+     info -> lower_, 
+     info -> upper_);
+
   // get set of variable indices that depend on reference_
   const std::set <int> &dependence = problem_ -> Dependence () [index];
 
@@ -100,8 +106,10 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   }
 
   // if delta is null, return 0, this object is feasible
-  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_))
+  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) {
+    problem_ -> domain () -> pop ();
     return 0.;
+  }
 
   //////////////////////////////////////////////////////////////////////
 
@@ -186,6 +194,8 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     }
     printf ("]\n");
   }
+
+  problem_ -> domain () -> pop ();
 
   // TODO: add term to prefer branching on larger intervals
   return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 

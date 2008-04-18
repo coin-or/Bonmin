@@ -262,13 +262,28 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	   (dualL [i] > dualR [i] + COUENNE_EPS) ? ceil  (xFrac [i]) :
 	   ((CoinDrand48 () < 0.5) ? floor (xFrac [i]) : ceil (xFrac [i])));*/
 
-    // save tightened bounds in NLP space
-    CoinCopyN (Lb (), nOrig_, lb);
-    CoinCopyN (Ub (), nOrig_, ub);
+    // save tightened bounds in NLP space. Sanity check
+    for (int i = nOrig_; i--;) {
 
-    for (int i=0; i<nOrig_; i++)
-      if (fixed [i] == FIXED)
+      if (fixed [i] == FIXED)       // integer point, fixed
 	lb [i] = ub [i] = xInt [i];
+
+      else if (Lb (i) > Ub (i))     // non-sense bounds, fix them
+	xInt [i] = lb [i] = ub [i] = 
+	  (fixed [i] == CONTINUOUS) ? 
+  	        (0.5 * (Lb (i) + Ub (i)) + 0.5) :
+	  floor (0.5 * (Lb (i) + Ub (i)) + 0.5);
+
+      else {                        // normal case
+	lb [i] = Lb (i);
+	ub [i] = Ub (i);
+      }
+    }
+
+    //CoinCopyN (Lb (), nOrig_, lb);
+    //CoinCopyN (Ub (), nOrig_, ub);
+
+    //for (int i=0; i<nOrig_; i++)
 
     // all integers are fixed, now compute objective function, set new
     // cutoff if better, and re-run bound-tightening

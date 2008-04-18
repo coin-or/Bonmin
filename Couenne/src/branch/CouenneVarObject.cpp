@@ -148,8 +148,28 @@ CouenneVarObject::computeBrachingPoint(const OsiBranchingInformation *info,
     } break;
     case CouenneObject::MID_INTERVAL: 
     default:                          bestPt = midInterval (bestPt, l, u);
+
+#ifdef DEBUG
+      if (CoinMin (fabs (bestPt - l), fabs (bestPt - u)) < 1e-3) {
+	printf ("computed failsafe [%g,%g] %g for ", 
+		bestPt, info -> lower_ [index], info -> upper_ [index]); 
+	reference_ -> print ();
+	printf ("\n");
+      }
+#endif 
       break;
     }
+  } else {
+
+#ifdef DEBUG
+    if (CoinMin (fabs (bestPt - info -> lower_ [index]), 
+		 fabs (bestPt - info -> upper_ [index])) < 1e-3) {
+      printf ("computed [%g,%g] %g for ", 
+	      bestPt, info -> lower_ [index], info -> upper_ [index]); 
+      reference_ -> print ();
+      printf ("\n");
+    }
+#endif
   }
 
   if (brPts)
