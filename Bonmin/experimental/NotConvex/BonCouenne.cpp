@@ -82,7 +82,7 @@ int main (int argc, char *argv[])
       message = "\n Optimization not finished.";
     }
 
-    if (0) { // print statistics in LaTeX format
+    if (bonmin.displayStats ()) { // print statistics
 
       ////////////////////////////////
       int nr=-1, nt=-1;
@@ -102,16 +102,26 @@ int main (int argc, char *argv[])
       CouenneProblem *cp = cg ? cg -> Problem () : NULL;
 
       if (cg && !cp) printf ("Warning, could not get pointer to problem\n");
+      else
+	printf ("Stats: %-15s %4d [var] %4d [int] %4d [con] %4d [aux] "
+		"%6d [root] %9d [tot] %8.2f [sep] %8.2g [bb] "
+		"%12g [lower] %12g [upper] %12g [time] %7d [nodes] %8d [iter] %s %s\n",
+		cp ? cp -> problemName ().c_str () : "unknown",
+		(cp) ? cp -> nOrig     () : -1, 
+		(cp) ? cp -> nIntVars  () : -1, 
+		(cp) ? cp -> nOrigCons () : -1,
+		(cp) ? (cp -> nVars   () - 
+			cp -> nOrig   ()): -1,
+		nr, nt, st, 
+		cg ? (CoinCpuTime () - cg -> rootTime ()) : - CoinCpuTime (),
+		bb.bestObj (),
+		bb.model (). getObjValue (),
+		CoinCpuTime () - time1,
+		bb.numNodes (),
+		bb.iterationCount (),
+		status.c_str (), message.c_str ());
 
-      printf ("::: %-15s & %6d & %6d & %6d & %6d & %10d & %10d & %8.3f & r%8.3f &",
-	      cp ? cp -> problemName ().c_str () : "unknown",
-	      (cp) ? cp -> nOrig     () : -1, 
-	      (cp) ? cp -> nIntVars  () : -1, 
-	      (cp) ? cp -> nOrigCons () : -1,
-	      (cp) ? (cp -> nVars   () - 
-		      cp -> nOrig   ()): -1,
-	      nr, nt, st, cg ? (CoinCpuTime () - cg -> rootTime ()) : - CoinCpuTime ());
-
+      /*
       /////////////////////////////////
 
       double timeLimit = 0, obj = bb.model (). getObjValue ();
@@ -124,7 +134,7 @@ int main (int argc, char *argv[])
 	double obj = bb.model (). getObjValue ();
 
 	if (fabs (obj) < 9e12) 
-	  printf    (" %18.9f &", bb.bestObj ());
+	  printf    ("%18.9f &", bb.bestObj ());
 	else printf (" %8s     &", "inf_prim");
 
 	if (fabs (bb.bestBound()) < 9e12) 
@@ -143,12 +153,14 @@ int main (int argc, char *argv[])
 	else printf (" %8s       &", "inf_dual");
       }
 
+
       printf ("%7d & %7d \\\\\n",
 	      bb.numNodes(),
 	      bb.iterationCount());
 	      //	      nlp_and_solver->totalNlpSolveTime(),
 	      //	      nlp_and_solver->nCallOptimizeTNLP(),
       //	      status.c_str());
+      */
     }
 
 //    nlp_and_solver -> writeAmplSolFile (message, bb.bestSolution (), NULL);

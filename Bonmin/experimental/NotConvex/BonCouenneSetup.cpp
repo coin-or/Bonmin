@@ -149,6 +149,9 @@ namespace Bonmin{
     {
       std::string s;
 
+      options () -> GetStringValue ("display_stats", s, "couenne.");
+      displayStats_ = (s == "yes");
+
       options () -> GetStringValue ("branching_object", s, "couenne.");
 
       enum CouenneObject::branch_obj objType;
@@ -313,6 +316,13 @@ void
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
     CouenneCutGenerator::registerOptions (roptions);
+
+    roptions -> AddStringOption2 (
+      "display_stats",
+      "display statistics at the end of the run",
+      "no",
+      "yes", "",
+      "no", "");
 
     roptions->AddBoundedIntegerOption(
       "branching_print_level",

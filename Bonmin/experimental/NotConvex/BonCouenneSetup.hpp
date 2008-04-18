@@ -34,12 +34,14 @@ public:
     CouenneSetup():
     BabSetupBase(),
     aslfg_(NULL),
-    CouennePtr_ (NULL) {}
+    CouennePtr_ (NULL),
+    displayStats_ (false) {}
 
     /** Copy constructor.*/
     CouenneSetup(const CouenneSetup& other):
       BabSetupBase(other),
-      aslfg_(NULL){}
+      aslfg_(NULL),
+      displayStats_ (other.displayStats_) {}
     
     /** virtual copy constructor.*/
     virtual BabSetupBase * clone() const{
@@ -63,6 +65,9 @@ public:
     CouenneCutGenerator *couennePtr () const
     {return CouennePtr_;}
 
+    /// true if one wants to display statistics at the end of program
+    bool displayStats () {return displayStats_;}
+
 private:
       SmartPtr<SmartAsl> aslfg_;
 
@@ -71,6 +76,9 @@ private:
     /// CouenneSolverInterface is cloned (that is, at each call of
     /// Optimality-based bound tightening).
     CouenneCutGenerator *CouennePtr_;
+
+    /// true if one wants to display statistics at the end of program
+    bool displayStats_;
   };
 }
 
