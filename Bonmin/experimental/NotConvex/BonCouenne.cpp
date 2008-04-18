@@ -61,10 +61,10 @@ int main (int argc, char *argv[])
 
     //////////////////////////////////
 
-    std::cout.precision(10);
+    std::cout.precision (10);
 
-    std::string message;
-    std::string status;
+    /*std::string message, status;
+
     if(bb.mipStatus()==Bab::FeasibleOptimal) {
       status = "\t\"Finished\"";
       message = "\nbonmin: Optimal";
@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
     else if(bb.mipStatus()==Bab::NoSolutionKnown) {
       status = "\t\"Not finished\"";
       message = "\n Optimization not finished.";
-    }
+      }*/
 
     if (bonmin.displayStats ()) { // print statistics
 
@@ -104,8 +104,8 @@ int main (int argc, char *argv[])
       if (cg && !cp) printf ("Warning, could not get pointer to problem\n");
       else
 	printf ("Stats: %-15s %4d [var] %4d [int] %4d [con] %4d [aux] "
-		"%6d [root] %9d [tot] %8.2f [sep] %8.2g [bb] "
-		"%12g [lower] %12g [upper] %12g [time] %7d [nodes] %8d [iter] %s %s\n",
+		"%6d [root] %8d [tot] %6g [sep] %8g [time] %8g [bb] "
+		"%12g [lower] %12g [upper] %7d [nodes] %8d [iter]\n",// %s %s\n",
 		cp ? cp -> problemName ().c_str () : "unknown",
 		(cp) ? cp -> nOrig     () : -1, 
 		(cp) ? cp -> nIntVars  () : -1, 
@@ -113,13 +113,14 @@ int main (int argc, char *argv[])
 		(cp) ? (cp -> nVars   () - 
 			cp -> nOrig   ()): -1,
 		nr, nt, st, 
-		cg ? (CoinCpuTime () - cg -> rootTime ()) : - CoinCpuTime (),
-		bb.bestObj (),
-		bb.model (). getObjValue (),
 		CoinCpuTime () - time1,
+		cg ? (CoinCpuTime () - cg -> rootTime ()) : - CoinCpuTime (),
+		bb.bestBound (),
+		//bb.bestObj (),
+		bb.model (). getObjValue (),
 		bb.numNodes (),
-		bb.iterationCount (),
-		status.c_str (), message.c_str ());
+		bb.iterationCount ());
+		//status.c_str (), message.c_str ());
 
       /*
       /////////////////////////////////

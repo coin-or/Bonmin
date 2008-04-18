@@ -233,11 +233,9 @@ namespace Bonmin{
     //if (!skipOnInfeasibility) { // otherwise, the integral neighbourhood
     //// of our fractional point is infeasible.
 
-    {
-      for (int i = couenne_ -> nOrig (); i--;) 
-	if (lower [i] > upper [i] - 1e-20)
-	  lower [i] = upper [i] = 0.5 * (lower [i] + upper [i]);
+    //assert (nlp_ -> getNumCols () == couenne_ -> nOrig ());
 
+    {
       //	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
 
       /*printf ("int candidate: ");
