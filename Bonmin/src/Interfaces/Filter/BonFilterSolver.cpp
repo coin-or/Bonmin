@@ -655,10 +655,8 @@ namespace Bonmin
       status = Ipopt::LOCAL_INFEASIBILITY;
       break;
     case 5:
-      optimizationStatus = TNLPSolver::computationError;
-      status = Ipopt::INTERNAL_ERROR;
-      break;
     case 6:
+    case 8:
       optimizationStatus = TNLPSolver::iterationLimit;
       status = Ipopt::MAXITER_EXCEEDED;
       break;
@@ -666,7 +664,6 @@ namespace Bonmin
       optimizationStatus = TNLPSolver::externalException;
       status = Ipopt::INTERNAL_ERROR;
       break;
-    case 8:
     case 9:
     case 10:
       optimizationStatus = TNLPSolver::exception;
