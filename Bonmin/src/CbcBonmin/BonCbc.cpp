@@ -439,10 +439,16 @@ namespace Bonmin
     if (specOpt==16)//Set warm start point for Ipopt
     {
 
+      const double * colsol = model_.solver()->getColSolution();
+      const double * duals = model_.solver()->getRowPrice();
+      model_.solver()->setColSolution(colsol);
+      model_.solver()->setRowPrice(duals);
+#if 0
       OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
       CoinWarmStart * warm = tnlpSolver->solver()->getWarmStart(tnlpSolver->problem());
       tnlpSolver->solver()->setWarmStart(warm, tnlpSolver->problem());
       delete warm;
+#endif
     }
 
 #ifdef SIGNAL
