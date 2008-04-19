@@ -27,8 +27,6 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 				 double * &brpts, 
 				 int &way) {
 
-  Domain *domain = arglist_ [0] -> domain ();
-
   int xi = arglist_ [0] -> Index (),
       yi = arglist_ [1] -> Index (),
       wi = obj -> Reference () -> Index ();
@@ -36,16 +34,22 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
   assert ((xi >= 0) && (yi >= 0) && (wi >= 0));
 
   CouNumber 
-    x0 = domain -> x  (xi), y0 = domain -> x  (yi),
-    xl = domain -> lb (xi), yl = domain -> lb (yi),
-    xu = domain -> ub (xi), yu = domain -> ub (yi),
-    w0 = domain -> x (wi);
+    x0 = info -> solution_  [xi], y0 = info -> solution_  [yi],
+    xl = info -> lower_     [xi], yl = info -> lower_     [yi],
+    xu = info -> upper_     [xi], yu = info -> upper_     [yi],
+    w0 = info -> solution_  [wi];
+
+#ifdef DEBUG
+  printf ("    branch MUL: %g [%g,%g] %g [%g,%g]\n", 
+	  x0, xl, xu, y0, yl, yu);
+#endif
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
   if (fabs (xu-xl) < COUENNE_EPS) { // x almost constant
 
     if (fabs (yu-yl) < COUENNE_EPS) { // both almost constant, return null result
+
       var = NULL;
       return 0.;
 
@@ -128,9 +132,9 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
     else ind = (CoinDrand48 () < 0.5) ? xi : yi;
 
     CouNumber 
-      pt = domain -> x  (ind),
-      lb = domain -> lb (ind),
-      ub = domain -> ub (ind);
+      pt = info -> solution_  [ind],
+      lb = info -> lower_     [ind],
+      ub = info -> upper_     [ind];
 
     if ((lb < -COUENNE_EPS) && (ub > COUENNE_EPS) && 
 	(-lb/ub >= THRES_ZERO_SYMM) &&
@@ -149,6 +153,11 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
   }
 
   var = arglist_ [(ind == xi) ? 0 : 1];
+
+#ifdef DEBUG
+  printf ("    MUL: br on x_%d %g [%g,%g] [%g,%g] (%g,%g)\n", 
+	  ind, *brpts, xl, xu, yl, yu, x0, y0);
+#endif
 
   return fabs (w0 - x0*y0);
 }

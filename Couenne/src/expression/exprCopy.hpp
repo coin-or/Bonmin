@@ -194,7 +194,7 @@ class exprCopy: public expression {
   {return copy_ -> domain ();}
 
   /// redirect variables to proper variable vector
-  void realign (const CouenneProblem *p)
+  virtual void realign (const CouenneProblem *p)
   {copy_ -> realign (p);}
 };
 

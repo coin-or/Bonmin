@@ -49,11 +49,13 @@ public:
 
   /// Return "down" estimate (for non-convex, distance old <--> new LP point)
   virtual double downEstimate () const
-  {printf("downest = %e\n", downEstimate_); return downEstimate_;}
+  {//printf("downest = %e\n", downEstimate_); 
+    return downEstimate_;}
 
   /// Return "up" estimate (for non-convex, distance old <--> new LP point)
   virtual double upEstimate () const 
-  {printf("upest = %e\n", upEstimate_); return upEstimate_;}
+  {//printf("upest = %e\n", upEstimate_); 
+    return upEstimate_;}
 
   /// set up/down estimate (0 for down, 1 for up). This happens in
   /// CouenneChooseStrong, where a new LP point is available and we
@@ -77,7 +79,7 @@ protected:
   CouenneProblem *problem_;
 
   /// Method computing the branching point
-  CouNumber computeBrachingPoint(const OsiBranchingInformation *info,
+  CouNumber computeBranchingPoint(const OsiBranchingInformation *info,
 				 int& bestWay) const;
 };
 

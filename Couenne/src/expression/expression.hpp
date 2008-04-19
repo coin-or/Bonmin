@@ -245,7 +245,7 @@ class expression {
   /// empty function to redirect variables to proper variable vector
   virtual void realign (const CouenneProblem *p) {}
 
-  /// indicating if function is monotonotically increasing
+  /// indicating if function is monotonically increasing
   virtual bool isBijective() const {return false;}
 
   /// compute the inverse function

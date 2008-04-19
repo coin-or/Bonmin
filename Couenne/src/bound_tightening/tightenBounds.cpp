@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: bound tightening for current linear relaxation
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -26,7 +26,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
   // lower bound, depending on the bound changes of the variables
   // they depend on
 
-  if (Jnlst()->ProduceOutput(J_MATRIX, J_BOUNDTIGHTENING)) {
+  if (Jnlst () -> ProduceOutput (J_MATRIX, J_BOUNDTIGHTENING)) {
     // ToDo: Pipe all output through journalist
     Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 		    "  tighten========================\n  ");
@@ -42,13 +42,15 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
     if (j % 6) Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,"\n");
   }
 
-  for (register int ii = 0, j = nVars (); j--; ii++) {
+  for (int ii = 0, j = nVars (); j--; ii++) {
 
     int i = numbering_ [ii];
 
     // early test to avoid a loop
 
-    if (Lb (i) > Ub (i) + COUENNE_EPS) {
+    if ((Lb (i) > Ub (i) + COUENNE_EPS) || 
+	(Ub (i) < - MAX_BOUND) ||
+	(Lb (i) >   MAX_BOUND)) {
 
       if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
 

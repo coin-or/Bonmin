@@ -12,7 +12,7 @@
 
 #include <math.h>
 
-/* keep it at least 1e-7, or strange things happen */
+/* must be >= 1e-7 */
 #define COUENNE_EPS           1e-7
 
 // for integrality check
@@ -25,5 +25,7 @@
 #define COU_MAX_COEFF     1.0e+9
 
 #define COUENNE_round(x) ((int) (floor ((x) + 0.5)))
+
+#define MAX_BOUND 1.e45
 
 #endif

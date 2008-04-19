@@ -71,23 +71,33 @@ OsiBranchingObject* CouenneVarObject::createBranch (OsiSolverInterface *si,
      info -> upper_); // have to alloc+copy
 
   int bestWay;
-  CouNumber bestPt = computeBrachingPoint(info, bestWay);
+  CouNumber bestPt = computeBranchingPoint (info, bestWay);
 
   ///////////////////////////////////////////
 
+#ifdef DEBUG
+  printf (":::: creating branching\n");
+#endif
+
   CouenneBranchingObject *brObj = new CouenneBranchingObject 
-  (jnlst_, reference_, bestWay ? TWO_RIGHT : TWO_LEFT, bestPt, doFBBT_, doConvCuts_);
+    (jnlst_, reference_, bestWay ? TWO_RIGHT : TWO_LEFT, bestPt, doFBBT_, doConvCuts_);
 
   problem_ -> domain () -> pop ();
 
   return brObj;
-
 }
 
 CouNumber
-CouenneVarObject::computeBrachingPoint(const OsiBranchingInformation *info,
-				       int& bestWay) const
+CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation *info,
+					int& bestWay) const
 {
+
+#ifdef DEBUG
+  printf ("---------- computeBRPT for "); reference_ -> print (); 
+  printf (" [%g,%g]\n", 
+	  info -> lower_ [reference_ -> Index ()],
+	  info -> upper_ [reference_ -> Index ()]);
+#endif
 
   expression *brVar = NULL; // branching variable
 
@@ -109,14 +119,30 @@ CouenneVarObject::computeBrachingPoint(const OsiBranchingInformation *info,
 
     CouNumber improv = 0.;
 
+    assert (obj. Reference ());
+
+#ifdef DEBUG
+    printf ("  ** "); 
+    obj. Reference ()             -> print (); printf (" := ");
+    obj. Reference () -> Image () -> print (); printf ("\n");
+#endif
+
     if (obj. Reference ())
       improv = obj. Reference () -> Image ()
 	-> selectBranch (&obj, info,              // input parameters
 			 brVar, brPts, whichWay); // result: who, where, and how to branch
 
-    if (brVar &&    
-	(brVar -> Index () == index) && // it's us!
-	(improv > maxdist)) {
+#ifdef DEBUG
+    printf ("  --> "); 
+    if (brVar) brVar -> print (); 
+    printf (" at %g, improv %g <%g>, indices = %d,%d\n", 
+	    *brPts, improv, maxdist, index, brVar -> Index ());
+#endif
+
+    if (brVar &&
+	(brVar -> Index () == index) &&    // it's us!
+	(fabs (improv) > maxdist) &&       // this branching seems to induce a higher improvement
+	(fabs (*brPts) < COU_MAX_COEFF)) { // and branching pt is limited
 
       chosen = true;
       bestPt = *brPts;
@@ -151,21 +177,33 @@ CouenneVarObject::computeBrachingPoint(const OsiBranchingInformation *info,
 
 #ifdef DEBUG
       if (CoinMin (fabs (bestPt - l), fabs (bestPt - u)) < 1e-3) {
-	printf ("computed failsafe [%g,%g] %g for ", 
-		bestPt, info -> lower_ [index], info -> upper_ [index]); 
+	printf (  "computed failsafe %g [%g,%g] for ", 
+		bestPt, l,u);
 	reference_ -> print ();
 	printf ("\n");
       }
 #endif 
       break;
     }
+
+#ifdef DEBUG
+    printf ("  ::: failsafe:  %g [%g,%g] for ", 
+	    bestPt, 
+	    info -> lower_ [index], 
+	    info -> upper_ [index]); 
+    reference_ -> print ();
+    printf ("\n");
+#endif
+
   } else {
 
 #ifdef DEBUG
     if (CoinMin (fabs (bestPt - info -> lower_ [index]), 
 		 fabs (bestPt - info -> upper_ [index])) < 1e-3) {
-      printf ("computed [%g,%g] %g for ", 
-	      bestPt, info -> lower_ [index], info -> upper_ [index]); 
+      printf ("  computed %g [%g,%g] for ", 
+	      bestPt, 
+	      info -> lower_ [index], 
+	      info -> upper_ [index]); 
       reference_ -> print ();
       printf ("\n");
     }

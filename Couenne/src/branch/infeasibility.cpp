@@ -17,6 +17,7 @@ const CouNumber weiMax = 1.3;
 const CouNumber weiSum = 1.1; // at least 1 so top level aux are avoided
 const CouNumber weiAvg = 0.0;
 
+//#define DEBUG
 
 /// compute infeasibility of this variable, |w - f(x)| (where w is
 /// the auxiliary variable defined as w = f(x))
@@ -24,6 +25,11 @@ const CouNumber weiAvg = 0.0;
 double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int &way) const {
 
   assert (reference_);
+  int index = reference_ -> Index ();
+
+  if (info -> lower_ [index] >= 
+      info -> upper_ [index] - CoinMin (COUENNE_EPS, feas_tolerance_))
+    return 0.;
 
   problem_ -> domain () -> push 
     (problem_ -> nVars (),
@@ -31,7 +37,6 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
      info -> lower_, 
      info -> upper_);
 
-  int index = reference_ -> Index ();
 
   const std::set <int> &dependence = problem_ -> Dependence () [index];
 
@@ -84,8 +89,6 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
     printf ("]\n");
   }
 
-  problem_ -> domain () -> pop ();
-
   // add term to stop branching on very tiny intervals
 
   // Compute the up and down estimates here
@@ -93,7 +96,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   // been chosen
 
   int bestWay;
-  CouNumber brkPt = computeBrachingPoint(info, bestWay);
+  CouNumber brkPt = computeBranchingPoint(info, bestWay);
   upEstimate_ = info->upper_[index] - brkPt;
   downEstimate_ = brkPt - info->lower_[index];
 
@@ -103,6 +106,8 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 	 info->lower_[index],
 	 info->upper_[index], brkPt);
 #endif
+
+  problem_ -> domain () -> pop ();
 
   return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 
 	  0. : (retval + (1 - exp (info -> lower_ [index] - 

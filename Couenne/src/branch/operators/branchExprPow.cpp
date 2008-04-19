@@ -97,7 +97,8 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 	return sqrt (x0*x0 + y0*y0); // exact distance
       }
 
-      // on the bad side
+
+      // on the bad side /////////////////////
 
 #if 0
       // TODO: restore when we can do three-way branching
@@ -123,6 +124,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
       brpts = (double *) realloc (brpts, sizeof (double));
       *brpts = x0;
       way = TWO_RAND;
+
       return fabs (y0 - pow (x0,k));
 
       // no bounds on x
@@ -148,8 +150,12 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
     if (l < -COUENNE_INFINITY) {
 
-      *brpts = - safe_pow (y0, 1. / k);
+      // if y0 is huge, try to make it close to 0
+      *brpts = -safe_pow (y0, 1. / k);
       way = TWO_RIGHT;
+
+      //printf ("  ----> brptPow %g\n", *brpts);
+
       return CoinMin (x0 - *brpts, 
 		      projectSeg (x0,     y0, 
 				  *brpts, safe_pow (*brpts, k), 
@@ -158,8 +164,13 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
     if (u >  COUENNE_INFINITY) {
 
+      // if y0 is huge, try to make it close to 0
+      //*brpts = CoinMin (safe_pow (y0, 1. / k), COU_MAX_COEFF / k);
       *brpts = safe_pow (y0, 1. / k);
       way = TWO_LEFT;
+
+      //printf ("  ----> brptPow %g\n", *brpts);
+
       return CoinMin (*brpts - x0,
 		      projectSeg (x0,     y0, 
 				  l,      safe_pow (l, k),

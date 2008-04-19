@@ -68,6 +68,16 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
   // w.r.t. applying implied bounds to ALL expressions just because
   // one single propagation was found.
 
+  for (int i = 0, j = nVars (); j--; i++)
+    // final test 
+    if ((Lb (i) > Ub (i) + COUENNE_EPS) || 
+	(Ub (i) < - MAX_BOUND) ||
+	(Lb (i) >   MAX_BOUND)) {
+
+      Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, "final test: infeasible BT\n");
+      return false;
+    }
+
   return true;
 }
 
