@@ -39,10 +39,9 @@ class BonRandomChoice : public OsiChooseVariable {
      return new BonRandomChoice(*this);
   }
 
-  // Destructor
-  ~BonRandomChoice(){
+  /// Destructor
+  virtual ~BonRandomChoice(){
   }
-
 
   virtual int chooseVariable( OsiSolverInterface * solver,
                               OsiBranchingInformation * info,

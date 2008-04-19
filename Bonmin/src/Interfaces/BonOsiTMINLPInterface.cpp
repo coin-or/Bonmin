@@ -2642,6 +2642,7 @@ OsiTMINLPInterface::solveFromHotStart()
     double obj_nlp = getObjValue() - objorig;
 #endif
     optimizationStatus_ = strong_branching_solver_->solveFromHotStart(this);
+    hasBeenOptimized_ = true;
 #ifdef STRONG_COMPARE
     double obj_other = getObjValue() - objorig;
     printf("AWDEBUG: Strong Branching results: NLP = %15.8e Other = %15.8e\n",

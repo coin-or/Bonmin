@@ -165,6 +165,7 @@ namespace Bonmin
       }
     }
     tminlp_interface->problem()->set_obj_value(obj);
+    tminlp_interface->problem()->Set_x_sol(numCols, lin_->getColSolution());
 
     //restore the original bounds
     for (unsigned int i = 0; i < diff_low_bnd_index.size(); i++) {
