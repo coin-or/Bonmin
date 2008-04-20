@@ -797,11 +797,12 @@ namespace Bonmin
   FilterSolver::setWarmStart(const CoinWarmStart * warm,
       Ipopt::SmartPtr<TMINLP2TNLP> tnlp)
   {
-    if (cached_.IsNull()) {
+    if (warm == NULL || cached_.IsNull()) {
       cached_ = new cachedInfo(GetRawPtr(tnlp), options_);
     }
-
+    if(warm == NULL) return 1;
     const FilterWarmStart * warmF = dynamic_cast<const FilterWarmStart *> (warm);
+    assert(warmF);
     if (warmF->empty())//reset initial point and leave
     {
       warmF_ = NULL;

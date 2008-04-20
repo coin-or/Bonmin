@@ -810,11 +810,11 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   warmstart_ = NULL;
   
 
-  Coin::SmartPtr<SimpleReferencedPtr<CoinWarmStart> > ws_backup;
+  CoinWarmStart * ws_backup = NULL;
   if(!exposeWarmStart_){
     //if warm start is not exposed, we need to store the current starting point to
     //restore it at the end of the method
-    ws_backup = make_referenced(app_->getUsedWarmStart(problem_));
+    ws_backup = app_->getUsedWarmStart(problem_);
   }
   //std::cerr<<"Resolving the problem for robustness"<<std::endl;
   //First remove warm start point and resolve
@@ -844,7 +844,8 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     // re-enable warmstart and get it
     app_->enableWarmStart();
     if (!exposeWarmStart_) {
-      app_->setWarmStart(ws_backup->ptr(), problem_);
+      app_->setWarmStart(ws_backup, problem_);
+      delete ws_backup;
     }
     return; //we won go on
   }
@@ -881,7 +882,8 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
       // re-enable warmstart and get it
       app_->enableWarmStart();
       if (!exposeWarmStart_) {
-        app_->setWarmStart(ws_backup->ptr(), problem_);
+        app_->setWarmStart(ws_backup, problem_);
+        delete ws_backup;
       }
         
       return; //we have found a solution and continue
@@ -890,7 +892,8 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
 
 
   if(!exposeWarmStart_){
-    app_->setWarmStart(ws_backup->ptr(), problem_);
+    app_->setWarmStart(ws_backup, problem_);
+    delete ws_backup;
   }
   if(pretendFailIsInfeasible_) {
     if(pretendFailIsInfeasible_ == 1) {

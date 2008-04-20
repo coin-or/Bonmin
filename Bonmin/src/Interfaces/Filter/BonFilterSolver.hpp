@@ -91,7 +91,10 @@ namespace Bonmin
 
    /// Get warm start used in last optimization
    virtual CoinWarmStart * getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
-     return warmF_.GetRawPtr();}
+     if(warmF_.IsValid())
+       return new FilterWarmStart(*warmF_);
+     else return NULL;
+   }
 
 
     /// Get the warm start form the solver
@@ -107,7 +110,9 @@ namespace Bonmin
     {//No options to be set
     }
     virtual void disableWarmStart()
-    {//No options to be set
+    {
+      warmF_ = NULL;
+     //No options to be set
     }
     //@}
 
