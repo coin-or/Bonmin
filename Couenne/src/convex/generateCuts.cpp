@@ -99,8 +99,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   double now   = CoinCpuTime ();
   int    ncols = problem_ -> nVars ();
 
-  problem_ -> installCutOff ();
-
   // This vector contains variables whose bounds have changed due to
   // branching, reduced cost fixing, or bound tightening below. To be
   // used with malloc/realloc/free
@@ -137,12 +135,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       // (which has an aux as its body)
       int index = con -> Body () -> Index ();
 
-      if ((index >= 0) && (con -> Body () -> Type () == AUX)) {
+      if ((index >= 0) && 
+	  ((con -> Body () -> Type () == AUX) ||
+	   (con -> Body () -> Type () == VAR))) {
 
 	// get the auxiliary that is at the lhs
-	exprAux *conaux = dynamic_cast <exprAux *> (problem_ -> Var (index));
+	exprVar *conaux = problem_ -> Var (index);
 
 	if (conaux &&
+	    (conaux -> Type () == AUX) &&
 	    (conaux -> Image ()) && 
 	    (conaux -> Image () -> Linearity () <= LINEAR)) {
 
@@ -167,13 +168,15 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
 	// also, add constraint w <= b
 
-	// if there exists violation, add constraint
-	CouNumber l = con -> Lb () -> Value (),	
-	          u = con -> Ub () -> Value ();
+	// not now, do it later
 
-	// tighten bounds in Couenne's problem representation
-	problem_ -> Lb (index) = CoinMax (l, problem_ -> Lb (index));
-	problem_ -> Ub (index) = CoinMin (u, problem_ -> Ub (index));
+// 	// if there exists violation, add constraint
+// 	CouNumber l = con -> Lb () -> Value (),	
+// 	          u = con -> Ub () -> Value ();
+
+// 	// tighten bounds in Couenne's problem representation
+// 	problem_ -> Lb (index) = CoinMax (l, problem_ -> Lb (index));
+// 	problem_ -> Ub (index) = CoinMin (u, problem_ -> Ub (index));
 
       } else { // body is more than just a variable, but it should be
 	       // linear. If so, generate equivalent linear cut
@@ -222,7 +225,32 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     updateBranchInfo (si, problem_, chg_bds, info); // info.depth >= 0 || info.pass >= 0
   }
 
-  fictitiousBound (cs, problem_, false);
+  // restore constraint bounds before tightening and cut generation
+  for (int i = problem_ -> nCons (); i--;) {
+
+    // for each constraint
+    CouenneConstraint *con = problem_ -> Con (i);
+
+    // (which has an aux as its body)
+    int index = con -> Body () -> Index ();
+
+    if ((index >= 0) && 
+	((con -> Body () -> Type () == AUX) ||
+	 (con -> Body () -> Type () == VAR))) {
+
+      // if there exists violation, add constraint
+      CouNumber l = con -> Lb () -> Value (),	
+	u = con -> Ub () -> Value ();
+
+      // tighten bounds in Couenne's problem representation
+      problem_ -> Lb (index) = CoinMax (l, problem_ -> Lb (index));
+      problem_ -> Ub (index) = CoinMin (u, problem_ -> Ub (index));
+    }
+  }
+
+  problem_ -> installCutOff (); // install upper bound
+
+  fictitiousBound (cs, problem_, false); // install finite lower bound, if currently -inf
 
   int *changed = NULL, nchanged;
 
@@ -231,8 +259,6 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   // do bound tightening only at first pass of cutting plane in a node
   // of BB tree (info.pass == 0) or if first call (creation of RLT,
   // info.pass == -1)
-
-  problem_ -> installCutOff ();
 
   try {
 
@@ -251,6 +277,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // Reduced Cost BT
     if (problem_ -> doFBBT () && !firstcall_)
       problem_ -> redCostBT (&si, chg_bds, babInfo);
+
+    // Bound tightening done /////////////////////////////
 
     if ((problem_ -> doFBBT () ||
 	 problem_ -> doOBBT () ||

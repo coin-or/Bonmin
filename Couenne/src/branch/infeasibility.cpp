@@ -12,9 +12,9 @@
 #include "CouenneProblem.hpp"
 #include "CouenneVarObject.hpp"
 
-const CouNumber weiMin = 0.3;
+const CouNumber weiMin = 0.8;
 const CouNumber weiMax = 1.3;
-const CouNumber weiSum = 1.1; // at least 1 so top level aux are avoided
+const CouNumber weiSum = 0.1;
 const CouNumber weiAvg = 0.0;
 
 //#define DEBUG
@@ -46,7 +46,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 				 // nowhere an independent
 
     const CouenneObject &obj = problem_ -> Objects () [reference_ -> Index ()];
-    retval = (obj. Reference ()) ? obj.infeasibility (info, way) : 0.;
+    retval = (obj. Reference ()) ? weiSum * obj.infeasibility (info, way) : 0.;
 
   } else {
 
@@ -78,8 +78,8 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   if ((retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
       (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
 
-    printf ("infeasVar %-10g [", retval + (1 - exp (info -> lower_ [index] - 
-						    info -> upper_ [index]))); 
+    printf ("infeasVar %-10g [", retval); // + (1 - exp (info -> lower_ [index] - 
+    //info -> upper_ [index]))); 
 
     reference_             -> print (); 
     if (dependence.size () == 0) { // if no list, print image
@@ -110,6 +110,6 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   problem_ -> domain () -> pop ();
 
   return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 
-	  0. : (retval + (1 - exp (info -> lower_ [index] - 
-				   info -> upper_ [index]))));
+	  0. : (retval));// + (1 - exp (info -> lower_ [index] - 
+  //   info -> upper_ [index]))));
 }

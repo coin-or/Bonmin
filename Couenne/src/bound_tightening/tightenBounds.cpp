@@ -29,7 +29,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
   if (Jnlst () -> ProduceOutput (J_MATRIX, J_BOUNDTIGHTENING)) {
     // ToDo: Pipe all output through journalist
     Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
-		    "  tighten========================\n  ");
+		    "  forward  =====================\n  ");
     int j=0;
     for (int i=0; i < nVars (); i++) 
       if (variables_ [i] -> Multiplicity () > 0) {

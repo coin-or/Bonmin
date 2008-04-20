@@ -16,7 +16,7 @@ int CouenneProblem::impliedBounds (t_chg_bounds *chg_bds) const {
   int nchg = 0; //< number of bounds changed for propagation
 
   if (Jnlst()->ProduceOutput(Ipopt::J_MATRIX, J_BOUNDTIGHTENING)) {  
-    Jnlst()->Printf(Ipopt::J_MATRIX, J_BOUNDTIGHTENING,"  implied=====================\n  ");
+    Jnlst()->Printf(Ipopt::J_MATRIX, J_BOUNDTIGHTENING,"  backward =====================\n  ");
     int j=0;
     for (int i=0; i < nVars (); i++) 
       if (variables_ [i] -> Multiplicity () > 0) {

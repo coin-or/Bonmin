@@ -41,8 +41,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 				   t_chg_bounds *chg_bds, 
 				   Bonmin::BabInfo * babInfo) const {
 
-  Jnlst()->Printf (J_DETAILED, J_BOUNDTIGHTENING,
-		   "Aggressive FBBT\n");
+  Jnlst()->Printf (J_DETAILED, J_BOUNDTIGHTENING, "Aggressive FBBT\n");
 
   Bonmin::CouenneInfo* couInfo =
     dynamic_cast<Bonmin::CouenneInfo*>(babInfo);
@@ -231,10 +230,10 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 				 "Couenne infeasible node from aggressive BT\n");
   }
 
-  if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+  if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
     //    CouNumber cutoff = getCutOff ();
     int       objind = Obj (0) -> Body  () -> Index ();
-    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 		    "-------------\ndone Aggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
 		    Lb (objind), getCutOff (), ncols);
     for (int i=0; i<nOrig_; i++)
