@@ -26,7 +26,7 @@
 void elementBreak (expression *, int &, CouNumber &);
 
 
-/// split a constraint w - f(x) = c into w's index (it is returned)
+/// split a constraint w - f(x) = c into w's index (returned)
 /// and rest = f(x) + c
 
 int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest, bool *wentAux) {
@@ -402,6 +402,11 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 	rest = new exprMul (new exprConst (-1./auxcoe), 
 			    ((auxDef -> Type () == AUX) ||
 			     (auxDef -> Type () == VAR)) ? new exprClone (auxDef) : auxDef);
+    }
+
+    if (linind2) {
+      delete [] linind2;
+      delete [] lincoe2;
     }
 
 #ifdef DEBUG

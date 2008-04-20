@@ -137,8 +137,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     base -> options() -> GetIntegerValue ("log_num_abt_per_level",  logAbtLev_,  "couenne.");
 
     CouNumber 
-      art_cutoff =  2.e50,
-      art_lower  = -2.e50;
+      art_cutoff =  COIN_DBL_MAX,
+      art_lower  = -COIN_DBL_MAX;
 
     base -> options() -> GetNumericValue ("feas_tolerance",  feas_tolerance_, "couenne.");
     base -> options() -> GetNumericValue ("opt_window",      opt_window_,     "couenne.");

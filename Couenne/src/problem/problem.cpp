@@ -242,9 +242,9 @@ void CouenneProblem::installCutOff () {
     // all problem are assumed to be minimization
     double cutoff = pcutoff_ -> getCutOff();
 
-    if (objectives_ [0] -> Sense () == MINIMIZE) 
-         {if (cutoff < Ub (indobj)) Ub (indobj) = cutoff;}
-    else {if (cutoff > Lb (indobj)) Lb (indobj) = cutoff;}
+    //if (objectives_ [0] -> Sense () == MINIMIZE) 
+    {if (cutoff < Ub (indobj)) Ub (indobj) = cutoff;}
+	 //else {if (cutoff > Lb (indobj)) Lb (indobj) = cutoff;}
   }
 }
 

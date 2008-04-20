@@ -112,8 +112,8 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
       chg_bds [objInd].setUpper(t_chg_bounds::CHANGED);
     }
 
-    if ((LB   > - COUENNE_INFINITY) && 
-	(LB   > dual0 + COUENNE_EPS)) { // update dual bound
+    if ((LB > - COUENNE_INFINITY) && 
+	(LB > dual0 + COUENNE_EPS)) { // update dual bound
       Lb (objInd) = LB;
       chg_bds [objInd].setLower(t_chg_bounds::CHANGED);
     }
