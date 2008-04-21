@@ -37,7 +37,6 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
      info -> lower_, 
      info -> upper_);
 
-
   const std::set <int> &dependence = problem_ -> Dependence () [index];
 
   CouNumber retval;

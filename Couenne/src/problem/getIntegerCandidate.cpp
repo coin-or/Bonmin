@@ -50,7 +50,9 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
   enum fixType *fixed = new enum fixType [nOrig_]; // integer variables that were fixed
 
   for (int i=0; i<nOrig_; i++) 
-    fixed [i] = (Var (i) -> isInteger ()) ? UNFIXED : CONTINUOUS;
+    fixed [i] = (Var (i) -> isInteger () &&        // work on integer variables only
+		 Var (i) -> Multiplicity () > 0) ? // don't care if unused variable
+      UNFIXED : CONTINUOUS;
 
   // A more sophisticated rounding procedure
   //
@@ -166,10 +168,10 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	for (int i=0; i<nOrig_; i++) 
 
-	  if ((Var (i) -> isInteger ()) &&
-	      (Var (i) -> Multiplicity () > 0) && // alive variable
-	      (integerRank_ [i] == rank) && 
-	      (fixed [i] == UNFIXED)) {
+	  if ((Var (i) -> isInteger ()) &&        // integer
+	      (Var (i) -> Multiplicity () > 0) && // alive 
+	      (integerRank_ [i] == rank) &&       // at this rank
+	      (fixed [i] == UNFIXED)) {           // and still to be fixed
 
 	    // check if initAuxs() closed any bound; if so, fix variable
 	    if (Var (i) -> isInteger () && (Lb (i) == Ub (i))) {
@@ -214,16 +216,17 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	  assert (index < nOrig_);
 
 	  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
-			    "none fixed, fix %d from %g [%g,%g] to [L=%g, R=%g]", 
+			    "none fixed, fix %d from %g [%g,%g] [L=%g, R=%g]", 
 			    index, xFrac [index], Lb (index), Ub (index), 
 			    dualL [index], dualR [index]);
 
 	  Lb (index) = Ub (index) = xInt [index] = 
 	    ((dualL [index] < dualR [index] - COUENNE_EPS) ? floor (xFrac [index]) :
 	     (dualL [index] > dualR [index] + COUENNE_EPS) ? ceil  (xFrac [index]) :
-	     ((CoinDrand48 () < 0.5) ? floor (xFrac [index]) : ceil (xFrac [index])));
+	     ((CoinDrand48 () > xFrac [index] - floor (xFrac [index])) ? 
+	      floor (xFrac [index]) : ceil (xFrac [index])));
 
-	  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, "%g\n", xInt [index]);
+	  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, " to %g\n", xInt [index]);
 
 	  fixed [index] = FIXED;
 
@@ -263,22 +266,23 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	   ((CoinDrand48 () < 0.5) ? floor (xFrac [i]) : ceil (xFrac [i])));*/
 
     // save tightened bounds in NLP space. Sanity check
-    for (int i = nOrig_; i--;) {
+    for (int i = nOrig_; i--;) 
+      if (Var (i) -> Multiplicity () > 0) {
 
-      if (fixed [i] == FIXED)       // integer point, fixed
-	lb [i] = ub [i] = xInt [i];
+	if (fixed [i] == FIXED)       // integer point, fixed
+	  lb [i] = ub [i] = xInt [i];
 
-      else if (Lb (i) > Ub (i))     // non-sense bounds, fix them
-	xInt [i] = lb [i] = ub [i] = 
-	  (fixed [i] == CONTINUOUS) ? 
-  	        (0.5 * (Lb (i) + Ub (i)) + 0.5) :
-	  floor (0.5 * (Lb (i) + Ub (i)) + 0.5);
+	else if (Lb (i) > Ub (i))     // non-sense bounds, fix them
+	  xInt [i] = lb [i] = ub [i] = 
+	    (fixed [i] == CONTINUOUS) ?  
+  	          (0.5 * (Lb (i) + Ub (i)) + 0.5) :
+	    floor (0.5 * (Lb (i) + Ub (i)) + 0.5);
 
-      else {                        // normal case
-	lb [i] = Lb (i);
-	ub [i] = Ub (i);
+	else {                        // normal case
+	  lb [i] = Lb (i);
+	  ub [i] = Ub (i);
+	}
       }
-    }
 
     //CoinCopyN (Lb (), nOrig_, lb);
     //CoinCopyN (Ub (), nOrig_, ub);

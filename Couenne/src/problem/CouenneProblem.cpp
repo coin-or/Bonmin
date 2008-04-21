@@ -406,6 +406,12 @@ void CouenneProblem::fillIntegerRank () const {
   for (int ii = 0; ii < nvars; ii++) {
 
     int index = numbering_ [ii];
+
+    if (Var (index) -> Multiplicity () <= 0) {
+      integerRank_ [index] = 0;
+      continue;
+    }
+
     bool isInt = Var (index) -> isDefinedInteger ();
 
     integerRank_ [index] = (isInt) ? 1 : 0;
