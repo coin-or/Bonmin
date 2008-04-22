@@ -263,15 +263,13 @@ namespace Bonmin{
 
 	const int nVars = solver->getNumCols();
 	double* tmpSolution = new double [nVars];
-	CoinCopyN(nlp_->getColSolution(), nlp_->getNumCols(), tmpSolution);
+	CoinCopyN (nlp_ -> getColSolution(), nlp_ -> getNumCols(), tmpSolution);
 
 	//Get correct values for all auxiliary variables
-	CouenneInterface * couenne = dynamic_cast <CouenneInterface *>
-	  (nlp_);
+	CouenneInterface * couenne = dynamic_cast <CouenneInterface *> (nlp_);
 
-	if (couenne){
+	if (couenne)
 	  couenne_ -> getAuxs (tmpSolution);
-	}
 
 	if (babInfo){
 	  babInfo->setNlpSolution (tmpSolution, nVars, obj);
@@ -279,10 +277,24 @@ namespace Bonmin{
 	}
 
 	if (obj < objectiveValue) { // found better solution?
+
+	  const CouNumber 
+	    *lb = solver -> getColLower (),
+	    *ub = solver -> getColUpper ();
+
+	  // check bounds once more after getAux. This avoids false
+	  // asserts in CbcModel.cpp:8305 on integerTolerance violated
+	  for (int i=0; i < nVars; i++, lb++, ub++) {
+
+	    CouNumber &t = tmpSolution [i];
+	    if      (t < *lb) t = *lb;
+	    else if (t > *ub) t = *ub;
+	  }
+
 	  couenne_ -> setCutOff (obj);
 	  foundSolution = true;
 	  objectiveValue = obj;
-	  CoinCopyN(tmpSolution, nVars, newSolution);
+	  CoinCopyN (tmpSolution, nVars, newSolution);
 	}
 	delete [] tmpSolution;
       }

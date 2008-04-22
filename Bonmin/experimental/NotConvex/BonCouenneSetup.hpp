@@ -58,15 +58,17 @@ public:
     
     /** Get the basic options if don't already have them.*/
     virtual void readOptionsFile(){
-      if(readOptions_) return;
-      BabSetupBase::readOptionsFile("couenne.opt");}
+      if (readOptions_) return;
+      BabSetupBase::readOptionsFile("couenne.opt");
+    }
 
     /// return pointer to cut generator (used to get pointer to problem)
     CouenneCutGenerator *couennePtr () const
     {return CouennePtr_;}
 
     /// true if one wants to display statistics at the end of program
-    bool displayStats () {return displayStats_;}
+    bool displayStats () 
+    {return displayStats_;}
 
 private:
       SmartPtr<SmartAsl> aslfg_;
