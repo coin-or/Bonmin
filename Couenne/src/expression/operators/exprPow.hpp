@@ -89,6 +89,8 @@ class exprPow: public exprOp {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+ 				  double * &brDist, // distance of current LP
+					  	    // point to new convexifications
 				  int &way);
 
   /// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm

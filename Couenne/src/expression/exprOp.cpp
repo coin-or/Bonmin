@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: methods for multivariate function class
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -227,17 +227,6 @@ int exprOp::DepList (std::set <int> &deplist,
       printf ("}\n");*/
   }
   return tot;
-}
-
-/// return domain of expression
-Domain *exprOp::domain () {
-
-  for (int i=0; i<nargs_; i++) {
-    Domain *d = arglist_ [i] -> domain ();
-    if (d) return d;
-  }
-
-  return NULL;
 }
 
 /// empty function to redirect variables to proper variable vector

@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the class expression
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -179,11 +179,6 @@ class expression {
 			     CouNumber lb = -COUENNE_INFINITY, 
 			     CouNumber ub =  COUENNE_INFINITY) {}
 
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar ()
-  {return NULL;}
-
   /// return integer for comparing expressions (used to recognize
   /// common expression)
   virtual enum expr_type code () 
@@ -225,6 +220,8 @@ class expression {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+				  double * &brDist, // distance of current LP
+						    // point to new convexifications
 				  int &way)
   {var = NULL; return 0.;}
 
@@ -234,10 +231,6 @@ class expression {
   /// update dependence set with index of variables on which this
   /// expression depends
   virtual void fillDepSet (std::set <DepNode *, compNode> *, DepGraph *) {}
-
-  /// return pointer to variable domain
-  virtual Domain *domain () 
-  {return NULL;}
 
   /// empty function to update domain pointer
   virtual void linkDomain (Domain *d) {}

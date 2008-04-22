@@ -24,7 +24,6 @@ libCouenne_la_SOURCES = \
 	branch/CouenneVarObject.cpp \
 	branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp \
-	branch/getFixVarBinFun.cpp \
 	branch/projections.cpp \
 	branch/infeasibility.cpp \
 	branch/infeasibilityVT.cpp \
@@ -39,6 +38,7 @@ libCouenne_la_SOURCES = \
 	branch/operators/branchExprQuad.cpp \
 	branch/operators/branchExprSinCos.cpp \
 	branch/operators/minMaxDelta.cpp \
+	branch/operators/computeMulBrDist.cpp \
 	expression/domain.cpp \
 	expression/operators/exprAbs.cpp \
 	expression/operators/exprDiv.cpp \

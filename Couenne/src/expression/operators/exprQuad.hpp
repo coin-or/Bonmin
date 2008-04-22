@@ -139,7 +139,7 @@ public:
   /// (fills in dCoeff_ and dIndex_ for the convex underestimator)
   virtual bool alphaConvexify (const CouenneProblem *, const OsiSolverInterface &);
 
-  /** \method exprQuad::quadCuts 
+  /** method exprQuad::quadCuts 
    *
    * \brief Based on the information (dIndex_, dCoeffLo_, dCoeffUp_)
    * created/modified by alphaConvexify(), create convexification cuts
@@ -234,18 +234,14 @@ public:
   virtual int DepList (std::set <int> &deplist, 
 		       enum dig_type type = ORIG_ONLY);
 
-  /// Return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap. For this
-  /// expression, always return NULL as selectBranch() will return the
-  /// correct variable
-  virtual expression *getFixVar ();
-
   /// Set up branching object by evaluating many branching points for
   /// each expression's arguments
   virtual CouNumber selectBranch (const CouenneObject *obj, 
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+ 				  double * &brDist, // distance of current LP
+					  	    // point to new convexifications
 				  int &way);
 
   /// Fill dependence set of the expression associated with this
@@ -262,9 +258,6 @@ public:
   /// upper
   CouNumber computeQBound (int sign);
 
-  /// return pointer to variable domain
-  Domain *domain ();
-
   /// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm
   virtual void closestFeasible (expression *varind,
 				expression *vardep, 
@@ -272,6 +265,7 @@ public:
 				CouNumber &right) const;
 protected:
 
+  /// return lower and upper bound of quadratic expression
   void computeQuadFiniteBound (CouNumber &qMin, CouNumber &qMax, 
 			       CouNumber *l, CouNumber *u,
 			       int &indInfLo, int &indInfUp);

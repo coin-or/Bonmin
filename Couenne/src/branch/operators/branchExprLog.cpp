@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch gain and branch object for logarithms
  *
- * (C) Carnegie-Mellon University, 2006-07. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -24,7 +24,12 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 expression *&var,
 				 double * &brpts, 
+				 double * &brDist, // distance of current LP
+						   // point to new convexifications
 				 int &way) {
+
+  brpts  = (double *) realloc (brpts,    sizeof (double));
+  brDist = (double *) realloc (brDist, 2*sizeof (double));
 
   // quite similar to exprExp::selectBranch() (see branchExprExp.cpp)
   //
@@ -69,37 +74,33 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
 
     // Outside -> branch on closest point on curve
 
-    brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = obj -> midInterval (powNewton (x0, y0, log, inv, oppInvSqr), l, u);
 
     way = TWO_LEFT;
     CouNumber dy = y0 - log (*brpts);
     x0 -= *brpts;
 
-    return sqrt (x0*x0 + dy*dy); // exact distance
+    return (brDist [0] = brDist [1] = sqrt (x0*x0 + dy*dy)); // exact distance
   } 
 
-  // Inside. Two cases:
+  // Inside. Two cases: ////////////////////////////////////////////////////
  
   if ((l <= SQ_COUENNE_EPS) && 
       (u > COUENNE_INFINITY)) {
 
-    // 1) curve is unlimited in both senses --> three way branching
+    // 1) curve is unlimited in both senses
 
-    // restore when we can do three-way branching
+    /*// restore when we can do three-way branching
+      #if 0
+      brpts = (double *) realloc (brpts, 2 * sizeof (double));
+      way = THREE_CENTER; // focus on central convexification first
+      brpts [0] = exp (y0); // draw horizontal from (x0,y0) east  to curve y=log(x)
+      brpts [1] = x0;       //      vertical                north
+      CouNumber a = x0 - exp (y0), // sides of a triangle with (x0,y0)
+      b = log (x0) - y0; // as one of the vertices
 
-#if 0
-    brpts = (double *) realloc (brpts, 2 * sizeof (double));
-    way = THREE_CENTER; // focus on central convexification first
-
-    brpts [0] = exp (y0); // draw horizontal from (x0,y0) east  to curve y=log(x)
-    brpts [1] = x0;       //      vertical                north
-
-    CouNumber a = x0 - exp (y0), // sides of a triangle with (x0,y0)
-              b = log (x0) - y0; // as one of the vertices
-
-    return a * cos (atan (a/b)); // exact distance
-#endif
+      return a * cos (atan (a/b)); // exact distance
+      #endif*/
 
     // follow South-East diagonal to find point on curve
     // so that current point is surely cut 
@@ -107,10 +108,11 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     *brpts = 0.5 * (x0 + exp (y0));
     way = TWO_RAND;
 
-    return CoinMin (fabs (x0 - exp(y0)), fabs (y0 - log (x0)));
+    return CoinMin (brDist [0] = x0 - exp (y0), 
+		    brDist [1] = log (x0) - y0);
   } 
 
-  // 2) at least one of them is finite --> two way branching
+  // 2) at least one of them is finite
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
@@ -119,16 +121,19 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
     *brpts = obj -> midInterval (exp (y0), l, u);
     way = TWO_RIGHT;
 
-  return projectSeg (x0, y0, *brpts, log (*brpts), u, log (u), +1); // exact distance
+    brDist [0] = x0 - *brpts;
+    return (brDist [1] = projectSeg (x0, y0, *brpts, log (*brpts), u, log (u), +1)); // exact distance
     //    return CoinMin (x0 - exp (y0), log (x0) - y0);
   }
  
   if (u > COUENNE_INFINITY) { // l is far from zero
 
-    *brpts = obj -> midInterval (x0, l, u);
+    *brpts = CoinMax (10*x0, obj -> midInterval (x0, l, u));
     way = TWO_LEFT;
 
-    return projectSeg (x0, y0, l, log (l), *brpts, log (*brpts), +1); // exact distance
+    brDist [1] = log (*brpts) - y0;
+
+    return (brDist [0] = projectSeg (x0, y0, l, log (l), *brpts, log (*brpts), +1)); // exact distance
     //return log (x0) - y0;
   } 
 
@@ -147,6 +152,6 @@ CouNumber exprLog::selectBranch (const CouenneObject *obj,
   way = TWO_RAND;
 
   // exact distance
-  return CoinMin (projectSeg (x0, y0, l, log (l), *brpts, log (*brpts),             +1),
-		  projectSeg (x0, y0,             *brpts, log (*brpts), u, log (u), +1));
+  return CoinMin (brDist [0] = projectSeg (x0, y0, l, log (l), *brpts, log (*brpts),             +1),
+		  brDist [1] = projectSeg (x0, y0,             *brpts, log (*brpts), u, log (u), +1));
 }

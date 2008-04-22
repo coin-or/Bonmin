@@ -19,6 +19,8 @@
 /// generic approach for negative powers (commom with exprInv::selectBranch
 CouNumber negPowSelectBranch (const CouenneObject *obj,
 			      double * &brpts, 
+			      double * &brDist, // distance of current LP
+				                // point to new convexifications
 			      int &way,
 			      CouNumber k,
 			      CouNumber x0, CouNumber y0, 
@@ -31,6 +33,8 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 expression *&var,
 				 double * &brpts, 
+				 double * &brDist, // distance of current LP
+						   // point to new convexifications
 				 int &way) {
 
   // return branching point and branching policies for an expression
@@ -69,7 +73,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
   }
 
   // case 1: k negative, resort to method similar to exprInv:: ///////////////////////////////
-  if (k<0) return negPowSelectBranch (obj, brpts, way, k, x0, y0, l, u);
+  if (k<0) return negPowSelectBranch (obj, brpts, brDist, way, k, x0, y0, l, u);
 
   int intk = 0;
 

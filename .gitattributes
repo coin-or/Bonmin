@@ -39,7 +39,6 @@ Couenne/src/branch/CouenneVTObject.hpp -text
 Couenne/src/branch/CouenneVarObject.cpp -text
 Couenne/src/branch/CouenneVarObject.hpp -text
 Couenne/src/branch/feasibleRegion.cpp -text
-Couenne/src/branch/getFixVarBinFun.cpp -text
 Couenne/src/branch/infeasibility.cpp -text
 Couenne/src/branch/infeasibilityVT.cpp -text
 Couenne/src/branch/operators/branchExprAbs.cpp -text
@@ -51,6 +50,7 @@ Couenne/src/branch/operators/branchExprMul.cpp -text
 Couenne/src/branch/operators/branchExprPow.cpp -text
 Couenne/src/branch/operators/branchExprQuad.cpp -text
 Couenne/src/branch/operators/branchExprSinCos.cpp -text
+Couenne/src/branch/operators/computeMulBrDist.cpp -text
 Couenne/src/branch/operators/minMaxDelta.cpp -text
 Couenne/src/branch/projections.cpp -text
 Couenne/src/branch/projections.hpp -text

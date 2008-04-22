@@ -11,7 +11,6 @@
 #include <set>
 
 #include "CoinHelperFunctions.hpp"
-//#include "exprAux.hpp"
 #include "exprQuad.hpp"
 
 //#define DEBUG

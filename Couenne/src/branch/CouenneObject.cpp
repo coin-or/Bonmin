@@ -194,17 +194,24 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
      info -> lower_,
      info -> upper_);
 
-  CouNumber  *brPts = NULL; // branching point(s)
+  CouNumber  
+    *brPts  = NULL,         // branching point(s)
+    *brDist = NULL;         // distances from current LP point to each
+			    // new convexification (usually two)
   expression *brVar = NULL; // branching variable
   int whichWay = 0;
+
+
 
 #ifdef DEBUG
   CouNumber improv =  // not used out of debug
 #endif
 
     reference_ -> Image () -> 
-    selectBranch (this, info,              // input parameters
-		  brVar, brPts, whichWay); // result: who, where, and how to branch
+    selectBranch (this, info,                      // input parameters
+		  brVar, brPts, brDist, whichWay); // result: who, where, distance, and direction
+
+  assert (brVar);
 
 #ifdef DEBUG
   printf ("brpts for "); reference_ -> print (); printf (" := ");
@@ -240,13 +247,13 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 
   OsiBranchingObject *brObj = NULL;
 
-  if (brVar) // if applied latest selectBranching
+  //  if (brVar) // if applied latest selectBranching
 
     brObj = new CouenneBranchingObject (jnlst_, brVar, 
 					way ? TWO_RIGHT : TWO_LEFT, 
 					*brPts, 
 					doFBBT_, doConvCuts_);
-
+    /*
   else {     // apply default branching rule
 
     if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
@@ -286,16 +293,16 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
 	x  = info -> solution_ [index],
 	l  = info -> lower_    [index],
 	u  = info -> upper_    [index];
-      /*
-	if (((x-l > COUENNE_LARGE_INTERVAL) &&
-	(u-x > COUENNE_LARGE_INTERVAL)) 
-	|| 
-	(((x-l > COUENNE_LARGE_INTERVAL) ||
-	(u-x > COUENNE_LARGE_INTERVAL)) && 
-	((x-l < COUENNE_NEAR_BOUND) ||
-	(u-x < COUENNE_NEAR_BOUND))))
-	return new CouenneThreeWayBranchObj (depvar, x, l, u);
-      */
+
+// 	if (((x-l > COUENNE_LARGE_INTERVAL) &&
+// 	(u-x > COUENNE_LARGE_INTERVAL)) 
+// 	|| 
+// 	(((x-l > COUENNE_LARGE_INTERVAL) ||
+// 	(u-x > COUENNE_LARGE_INTERVAL)) && 
+// 	((x-l < COUENNE_NEAR_BOUND) ||
+// 	(u-x < COUENNE_NEAR_BOUND))))
+// 	return new CouenneThreeWayBranchObj (depvar, x, l, u);
+
 
       if (((fabs (x-l) > COUENNE_EPS) &&
 	   (fabs (u-x) > COUENNE_EPS) &&
@@ -309,6 +316,7 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
       brObj = new CouenneBranchingObject (jnlst_, reference_, way ? TWO_RIGHT : TWO_LEFT, xr, 
 					doFBBT_, doConvCuts_);
   }
+    */
 
   p -> domain () -> pop ();
 

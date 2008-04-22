@@ -79,6 +79,8 @@ class exprInv: public exprUnary {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+ 				  double * &brDist, // distance of current LP
+					  	    // point to new convexifications
 				  int &way);
 
   /// return true if bijective

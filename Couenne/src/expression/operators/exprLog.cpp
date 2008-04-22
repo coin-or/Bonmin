@@ -60,14 +60,17 @@ expression *exprLog::differentiate (int index) {
 bool exprLog::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   int ind = argument_ -> Index ();
-  bool res = false;
 
-  if (updateBound (-1,l+ind, argument_->isInteger()? ceil(exp(l[wind])-COUENNE_EPS) : exp(l[wind]))){
+  bool 
+    res   = false,
+    isint = argument_ -> isInteger();
+
+  if (updateBound (-1, l+ind, isint ? ceil (exp (l [wind]) - COUENNE_EPS) : exp (l [wind]))) {
     res = true; 
     chg [ind].setLower (t_chg_bounds::CHANGED);
   }
 
-  if (updateBound (1, u+ind, argument_->isInteger()? floor(exp(u[wind])+COUENNE_EPS) : exp(u[wind]))){
+  if (updateBound ( 1, u+ind, isint? floor (exp (u [wind]) + COUENNE_EPS) : exp (u [wind]))) {
     res = true; 
     chg [ind].setUpper (t_chg_bounds::CHANGED);
   }

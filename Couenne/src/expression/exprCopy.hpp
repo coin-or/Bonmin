@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the class exprCopy
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -142,11 +142,6 @@ class exprCopy: public expression {
 
   {copy_ -> generateCuts (w, si, cs, cg, chg, wind, lb, ub);}
 
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  inline expression *getFixVar () 
-  {return copy_ -> getFixVar ();}
-
   /// code for comparisons
   inline enum expr_type code () 
   {return copy_ -> code ();}
@@ -178,9 +173,11 @@ class exprCopy: public expression {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+				  double * &brDist, // distance of current LP
+						    // point to new convexifications
 				  int &way)
 
-  {return copy_ -> selectBranch (obj, info, var, brpts, way);}
+  {return copy_ -> selectBranch (obj, info, var, brpts, brDist, way);}
 
   /// replace occurrence of a variable with another variable
   virtual void replace (exprVar *, exprVar *);
@@ -189,13 +186,22 @@ class exprCopy: public expression {
   inline void fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g)
   {copy_ -> fillDepSet (dep, g);}
 
-  /// return pointer to variable domain
-  inline Domain *domain () 
-  {return copy_ -> domain ();}
-
   /// redirect variables to proper variable vector
   virtual void realign (const CouenneProblem *p)
   {copy_ -> realign (p);}
+
+  /// indicating if function is monotonically increasing
+  virtual bool isBijective() const 
+  {return copy_ -> isBijective ();}
+
+  /// compute the inverse function
+  virtual CouNumber inverse (expression *vardep) const
+  {return copy_ -> inverse (vardep);}
+
+  /// closest feasible points in function in both directions
+  virtual void closestFeasible (expression *varind, expression *vardep,
+				CouNumber& left, CouNumber& right) const
+  {copy_ -> closestFeasible (varind, vardep, left, right);}
 };
 
 #endif

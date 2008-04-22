@@ -3,11 +3,12 @@
  * Author:  Pietro Belotti
  * Purpose: select branch for divisions
  *
- * (C) Carnegie-Mellon University, 2006-07.
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
 #include "exprDiv.hpp"
+#include "exprMul.hpp"
 #include "CouenneBranchingObject.hpp"
 #include "CouenneObject.hpp"
 
@@ -18,7 +19,11 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 expression *&var,
 				 double * &brpts, 
+				 double * &brDist, // distance of current LP
+						   // point to new convexifications
 				 int &way) {
+
+  if (brDist) {free (brDist); brDist = NULL;} // clear it, computeMulBrDist will fill it
 
   int xi = arglist_ [0]        -> Index (),
       yi = arglist_ [1]        -> Index (),
@@ -35,17 +40,22 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
 
   // if [yl,yu] contains 0, create two nodes
 
-  if ((yl < -COUENNE_EPS) && (yu > COUENNE_EPS)) {
+  if ((yl < -COUENNE_EPS) && 
+      (yu >  COUENNE_EPS)) {
 
     var = arglist_ [1];
-    way = TWO_RAND;
-    brpts = (double *) realloc (brpts, sizeof (CouNumber));
+    brpts  = (double *) realloc (brpts,  sizeof (double));
 
     *brpts = 0.;
 
-    return ((fabs (y0) < COUENNE_EPS) ? 1. :
+    way = (y0 > *brpts) ? TWO_RIGHT : TWO_LEFT;
+
+    brDist = computeMulBrDist (info, wi, yi, xi, yi, brpts);
+
+    return CoinMin (brDist [0], brDist [1]);
+    /*return ((fabs (y0) < COUENNE_EPS) ? 1. :
 	    fabs (info -> solution_ [xi] / y0 - 
-		  info -> solution_ [wi]));
+	    info -> solution_ [wi]));*/
   }
 
   // From now on, [yl,yu] may be unlimited in one sense only, and
@@ -72,17 +82,23 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
 
     way = (y0 > 0.) ? TWO_LEFT : TWO_RIGHT;
 
-    return ((fabs (y0) < COUENNE_EPS) ? 1. : 
-	    fabs (info -> solution_ [xi] / y0 - info -> solution_ [wi]));
+    brDist = computeMulBrDist (info, wi, yi, xi, yi, brpts);
+
+    return CoinMin (brDist [0], brDist [1]);
+
+    //return ((fabs (y0) < COUENNE_EPS) ? 1. : 
+    //fabs (info -> solution_ [xi] / y0 - info -> solution_ [wi]));
   }
 
-  // y is bounded, and y0 should not be 0; if w is unbounded, bound w
-  // first as x will be too.
+  // y is bounded, and y0 nonzero; if w is unbounded, bound w first as
+  // x will be too.
 
   CouNumber wl = info -> lower_    [wi], 
             wu = info -> upper_    [wi],
             w0 = info -> solution_ [wi],
             x0 = info -> solution_ [xi];
+
+  // w unbounded in >= one direction ///////////////////////////////////////
 
   if ((wl < -COUENNE_INFINITY) || 
       (wu >  COUENNE_INFINITY)) {
@@ -90,9 +106,7 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
     var = obj -> Reference ();
 
     if ((wl < -COUENNE_INFINITY) &&
-	(wu >  COUENNE_INFINITY)) {
-
-      // unbounded in two directions
+	(wu >  COUENNE_INFINITY)) { // unbounded in two directions
 
       CouNumber 
 	wreal = x0 / y0, 
@@ -104,22 +118,12 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
 	wmax = w0;
       }
 
-      // TODO: restore when we can do three-way-branching. Well, not
-      // that necessary after all
-
-#if 0 
-      // unbounded in both directions: three way branching 
-      brpts = (double *) realloc (brpts, 2 * sizeof (CouNumber));
-      brpts [0] = wmin;
-      brpts [1] = wmax;
-      way = THREE_CENTER;
-#endif
-
-      // for now, use two-way
-
       brpts = (double *) realloc (brpts, sizeof (CouNumber));
       *brpts = wreal;
       way = (w0 < wreal) ? TWO_LEFT : TWO_RIGHT;
+
+      brDist = computeMulBrDist (info, wi, yi, xi, wi, brpts);
+      return CoinMin (brDist [0], brDist [1]);
 
     } else {
 
@@ -133,19 +137,21 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
       else                                        *brpts = w0;
 
       way = (wl < - COUENNE_INFINITY) ? TWO_RIGHT : TWO_LEFT;
-    }
 
-    return ((fabs (y0) < COUENNE_EPS) ? 1. : fabs (x0/y0 - w0));
+      brDist = computeMulBrDist (info, wi, yi, xi, wi, brpts);
+      return CoinMin (brDist [0], brDist [1]);
+    }
+    //return ((fabs (y0) < COUENNE_EPS) ? 1. : fabs (x0/y0 - w0));
   }
 
   // w and y are bounded (and so is x). Choose between x, y, z
   // depending on intervals first and then to vicinity to midpoint
-  CouNumber xl = info -> lower_ [xi], 
-            xu = info -> upper_ [xi];
-
-  CouNumber dx = xu-xl,
-            dy = yu-yl,
-            dw = wu-wl;
+  CouNumber 
+    xl = info -> lower_ [xi],
+    xu = info -> upper_ [xi],
+    dx = xu-xl,
+    dy = yu-yl,
+    dw = wu-wl;
 
   brpts = (double *) realloc (brpts, sizeof (CouNumber));
 
@@ -156,9 +162,12 @@ CouNumber exprDiv::selectBranch (const CouenneObject *obj,
   way = TWO_RAND;
 
   if (dx > dy)
-    if (dx > dw) {var = arglist_[0];      *brpts = (xl+xu)/2.; return fabs (x0-y0*w0);}
-    else         {var = obj->Reference(); *brpts = (wl+wu)/2.; return fabs (w0-x0/y0);}
+    if (dx > dw) {var = arglist_[0];      *brpts = (xl+xu)/2.; /*return fabs (x0-y0*w0);*/}
+    else         {var = obj->Reference(); *brpts = (wl+wu)/2.; /*return fabs (w0-x0/y0);*/}
   else
-    if (dy > dw) {var = arglist_[1];      *brpts = (yl+yu)/2.; return fabs (y0-x0/w0);}
-    else         {var = obj->Reference(); *brpts = (wl+wu)/2.; return fabs (w0-x0/y0);}
+    if (dy > dw) {var = arglist_[1];      *brpts = (yl+yu)/2.; /*return fabs (y0-x0/w0);*/}
+    else         {var = obj->Reference(); *brpts = (wl+wu)/2.; /*return fabs (w0-x0/y0);*/}
+
+  brDist = computeMulBrDist (info, wi, yi, xi, var -> Index (), brpts);
+  return CoinMin (brDist [0], brDist [1]);
 }

@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: return branch data for quadratic forms
  *
- * (C) Carnegie-Mellon University, 2007. 
+ * (C) Carnegie-Mellon University, 2007-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -21,8 +21,9 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
 				  const OsiBranchingInformation *info,
 				  expression *&var, 
 				  double * &brpts, 
+				  double * &brDist, // distance of current LP
+					 	    // point to new convexifications
 				  int &way) {
-
   int ind = -1;
 
   // use a combination of eigenvectors and bounds
@@ -35,7 +36,9 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
 	  (*(obj -> Reference ())) (), info -> solution_ [obj -> Reference () -> Index ()]);
 	  print (); printf (" [%g]\n", (*this) ());*/
 
-  brpts = (double *) realloc (brpts, sizeof (double));
+  brpts  = (double *) realloc (brpts,    sizeof (double));
+  brDist = (double *) realloc (brDist, 2*sizeof (double));
+
   way = TWO_RAND;
 
   // depending on where the current point is w.r.t. the curve,
@@ -140,9 +143,8 @@ CouNumber exprQuad::selectBranch (const CouenneObject *obj,
     else *brpts = obj -> midInterval (info -> solution_ [ind], 
 				      info -> lower_ [ind],
 				      info -> upper_ [ind]);	  
-
-    return fabs (delta);
+    //return fabs (delta);
   }
 
-  return fabs (delta);
+  return (brDist [0] = brDist [1] = fabs (delta));
 }

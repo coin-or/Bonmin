@@ -98,9 +98,6 @@ public:
 
   /// replace variable x with new (aux) w
   virtual void replace (exprVar *x, exprVar *w);
-
-  /// return pointer to variable domain
-  Domain *domain ();
 };
 
 

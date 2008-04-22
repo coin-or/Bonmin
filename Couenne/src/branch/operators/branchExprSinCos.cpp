@@ -24,6 +24,8 @@ CouNumber trigSelBranch (const CouenneObject *obj,
 			 const OsiBranchingInformation *info,
 			 expression *&var,
 			 double * &brpts, 
+			 double * &brDist, // distance of current LP
+					   // point to new convexifications
 			 int &way,
 			 enum cou_trig type) {
 
@@ -45,8 +47,9 @@ CouNumber trigSelBranch (const CouenneObject *obj,
 		    (type == COU_SINE) ?                  oppsin : oppcos, 
 		    (type == COU_SINE) ? (unary_function) acos   : oppasin);
 
-  brpts = (double *) realloc (brpts, sizeof (double));
+  brpts  = (double *) realloc (brpts,    sizeof (double));
+  brDist = (double *) realloc (brDist, 2*sizeof (double));
   *brpts = obj -> getBrPoint (&ft, x0, l, u);
 
-  return (y0 - ((type == COU_SINE) ? sin(x0) : cos(x0)));
+  return (brDist [0] = brDist [1] = y0 - ((type == COU_SINE) ? sin(x0) : cos(x0)));
 }

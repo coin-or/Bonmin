@@ -355,22 +355,6 @@ int exprQuad::rank () {
 }
 
 
-/// return an index to the variable's argument that is better fixed
-/// in a branching rule for solving a nonconvexity gap
-
-expression *exprQuad::getFixVar () {
-
-  return NULL;
-
-  // TODO: this is quite complicated. It is a nonlinear expression but
-  // we have no access to variable pointers, yet...
-
-  //if (arglist_ [0] -> Type () == CONST) 
-  //  return this;
-  //else return arglist_ [0];
-}
-
-
 /// update dependence set with index of this variable
 void exprQuad::fillDepSet (std::set <DepNode *, compNode> *dep, DepGraph *g) {
 
@@ -394,9 +378,7 @@ int exprQuad::DepList (std::set <int> &deplist,
   int deps = exprGroup::DepList (deplist, type);
 
   for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
-
     deps += row -> first -> DepList (deplist, type);
-
     for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col)
       deps += col -> first -> DepList (deplist, type);
   }
@@ -481,14 +463,6 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
       }
     }
   }
-}
-
-
-/// return pointer to variable domain
-Domain *exprQuad::domain () {
-  if (matrix_.size () > 0)
-    return matrix_ [0]. first -> domain ();
-  return exprGroup::domain ();
 }
 
 

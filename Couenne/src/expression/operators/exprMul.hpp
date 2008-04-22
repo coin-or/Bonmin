@@ -61,10 +61,6 @@ class exprMul: public exprOp {
 		     CouNumber = -COUENNE_INFINITY, 
 		     CouNumber =  COUENNE_INFINITY);
 
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  expression *getFixVar ();
-
   /// code for comparison
   virtual enum expr_type code () 
   {return COU_EXPRMUL;}
@@ -78,6 +74,8 @@ class exprMul: public exprOp {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+ 				  double * &brDist, // distance of current LP
+					  	    // point to new convexifications
 				  int &way);
 
   /// compute $y^{lv}$ and $y^{uv}$ for Violation Transfer algorithm
@@ -101,7 +99,6 @@ protected:
 
 
 /// compute multiplication
-
 inline CouNumber exprMul:: operator () () {
 
   register CouNumber ret = 1.;
@@ -115,11 +112,16 @@ inline CouNumber exprMul:: operator () () {
 
 
 /// unified convexification of products and divisions
-
 void unifiedProdCuts (const CouenneCutGenerator *, OsiCuts &, 
 		      int, CouNumber, CouNumber, CouNumber,
 		      int, CouNumber, CouNumber, CouNumber,
 		      int, CouNumber, CouNumber, CouNumber,
 		      t_chg_bounds *);
+
+
+// compute distance from future convexifications in set \f$\{(x,y,w):
+// w = xy\}\f$ with x,y,w bounded. Unified with exprDiv
+double *computeMulBrDist (const OsiBranchingInformation *info,
+			  int xi, int yi, int wi, int brind, double *brpt, int nPts = 1);
 
 #endif

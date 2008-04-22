@@ -66,6 +66,8 @@ class exprAbs: public exprUnary {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+ 				  double * &brDist, // distance of current LP
+					  	    // point to new convexifications
 				  int &way);
 
   /// closest feasible points in function in both directions

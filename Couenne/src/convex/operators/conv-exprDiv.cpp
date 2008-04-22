@@ -85,7 +85,8 @@ void exprDiv::generateCuts (expression *w, const OsiSolverInterface &si,
 
   // same as product, just a change in coordinates
 
-  CouNumber *x = w -> domain () -> x ();
+  //CouNumber *x = w -> domain () -> x ();
+  CouNumber *x = cg -> Problem () -> X ();
 
   unifiedProdCuts (cg, cs,
 		   wi, x [wi], wl, wu,

@@ -274,11 +274,3 @@ void exprGroup::replace (exprVar *x, exprVar *w) {
     }
   }
 }
-
-
-/// return pointer to variable domain
-Domain *exprGroup::domain () {
-  if (lcoeff_.size () > 0)
-    return lcoeff_ [0]. first -> domain ();
-  return exprOp::domain ();
-}

@@ -35,7 +35,7 @@ void draw_cuts (OsiCuts &cs, const CouenneCutGenerator *cg, int j, expression *w
     expression *indep = img -> Argument ();
 
     if (!indep) 
-      indep = img -> getFixVar ();
+      indep = img -> ArgList () [0];//getFixVar ();
 
     int xi = indep -> Index ();
 

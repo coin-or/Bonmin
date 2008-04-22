@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the n-ary expression class
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -112,11 +112,6 @@ class exprOp: public expression {
   /// generate auxiliary variable
   virtual exprAux *standardize (CouenneProblem *, bool addAux = true);
 
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  virtual expression *getFixVar ()
-  {printf ("### Warning: called empty exprOp::getFixVar()\n"); return arglist_ [0];}
-
   /// return code to classify type of expression
   virtual inline enum expr_type code ()
   {return COU_EXPROP;}
@@ -139,9 +134,6 @@ class exprOp: public expression {
 
   /// replace variable with other
   virtual void replace (exprVar *, exprVar *);
-
-  /// return domain of expression
-  Domain *domain ();
 
   /// empty function to redirect variables to proper variable vector
   virtual void realign (const CouenneProblem *p);

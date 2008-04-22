@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the class for univariate functions
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -18,7 +18,7 @@
 
 /// zero function (used by default by exprUnary)
 inline CouNumber zero_fun (CouNumber x) 
-{return 0;}
+{return 0.;}
 
 
 /// expression class for unary functions (sin, log, etc.)
@@ -39,16 +39,16 @@ class exprUnary: public expression {
 
   /// node type
   virtual inline enum nodeType Type () const
-    {return UNARY;}
+  {return UNARY;}
 
   /// Constructor
   exprUnary  (expression *argument): 
     argument_ (argument)        //< non-leaf expression, with argument list
-   {}
+  {}
 
   /// the operator itself (e.g. sin, log...)
   virtual inline unary_function F () 
-    {return zero_fun;}
+  {return zero_fun;}
 
   /// Destructor
   ~exprUnary () {
@@ -60,37 +60,35 @@ class exprUnary: public expression {
 
   /// return number of arguments
   inline int nArgs () const
-    {return 1;}
+  {return 1;}
 
   /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
-    {return argument_;}
+  {return argument_;}
 
   /// return pointer to argument (when applicable, i.e., with univariate functions)
   virtual inline expression **ArgPtr () 
-    {return &argument_;}
+  {return &argument_;}
 
   /// print this expression to iostream
-  virtual void print (std::ostream &out = std::cout, 
-		      bool = false) const;
+  virtual void print (std::ostream &out = std::cout, bool = false) const;
 
   /// print position (PRE, INSIDE, POST)
   virtual enum pos printPos () const
-    {return PRE;}
+  {return PRE;}
 
   /// print operator
   virtual std::string printOp () const
-    {return "?";}
+  {return "?";}
 
   /// compute value of unary operator
   virtual inline CouNumber operator () ()
-    {return (F ()) ((*argument_) ());}
+  {return (F ()) ((*argument_) ());}
 
   /// fill in the set with all indices of variables appearing in the
   /// expression
-  virtual inline int DepList (std::set <int> &deplist, 
-			      enum dig_type type = ORIG_ONLY)
-    {return argument_ -> DepList (deplist, type);}
+  virtual inline int DepList (std::set <int> &deplist, enum dig_type type = ORIG_ONLY)
+  {return argument_ -> DepList (deplist, type);}
 
   /// simplification
   expression *simplify ();
@@ -98,16 +96,11 @@ class exprUnary: public expression {
   /// get a measure of "how linear" the expression is (see CouenneTypes.h)
   /// for general univariate functions, return nonlinear.
   virtual inline int Linearity ()
-    {return NONLINEAR;}
+  {return NONLINEAR;}
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *, bool addAux = true);
-
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  virtual inline expression *getFixVar () 
-  {return argument_;}
 
   /// type of operator
   virtual inline enum expr_type code () 
@@ -129,10 +122,6 @@ class exprUnary: public expression {
 
   /// replace variable with other
   virtual void replace (exprVar *, exprVar *);
-
-  /// return domain of the expression
-  inline Domain *domain ()
-  {return argument_ -> domain ();}
 
   /// empty function to redirect variables to proper variable vector
   virtual inline void realign (const CouenneProblem *p) 

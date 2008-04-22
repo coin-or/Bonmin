@@ -90,7 +90,8 @@ void CouenneProblem::initAuxs () const {
 
 void CouenneProblem::getAuxs (CouNumber * x) const {
 
-  domain_.push (nVars (), x, domain_.lb(), domain_.ub());
+  // set point at x, don't copy
+  domain_.push (nVars (), x, domain_.lb (), domain_.ub (), false);
 
   // set auxiliary w to f(x). This procedure is exact even though the
   // auxiliary variables have an incomplete image, i.e. they have been
@@ -111,7 +112,8 @@ void CouenneProblem::getAuxs (CouNumber * x) const {
     }
 
     if (var -> Type () == AUX)
-      x [index] = X (index) = 
+      //x [index] = //not necessary, addresses of x and X are equal
+      X (index) = 
 	CoinMax (l, CoinMin (u, (*(var -> Image ())) ()));
   }
 

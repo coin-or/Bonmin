@@ -73,17 +73,14 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
 
   // normalize w.r.t. interval (i.e. do not branch too close to bounds)
   // if both are finite...
-  if ((lb > -COUENNE_INFINITY) && (ub < COUENNE_INFINITY))
+  if ((lb > -COUENNE_INFINITY) && (ub < COUENNE_INFINITY)) {
     if      ((value_ - lb) / (ub-lb) < closeToBounds) value_ = lb + (ub-lb) * closeToBounds;
     else if ((ub - value_) / (ub-lb) < closeToBounds) value_ = ub + (lb-ub) * closeToBounds;
+  }
 
-  //  if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
   jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 
 		    "Branch: x%-3d will branch on %g (at %g) [%g,%g]; firstBranch_ = %d\n", 
-		    variable_ -> Index (),
-		    value_,
-		    (*variable_) (), lb, ub,
-		    firstBranch_);
+		    variable_ -> Index (), value_, (*variable_) (), lb, ub, firstBranch_);
 }
 
 
@@ -113,18 +110,14 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   if (way) {
     if      (value_ < l)             
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		     "Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n",l,u,value_);
     else if (value_ < l+COUENNE_EPS) 
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		     "## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n", l,u,value_);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n",l,u,value_);
   } else {
     if      (value_ > u)             
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		     "Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n",l,u,value_);
     else if (value_ > u+COUENNE_EPS) 
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, 
-		     "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n", l,u,value_);
+      jnlst_->Printf(J_DETAILED, J_BRANCHING, "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n",l,u,value_);
   }
 
   /*if (brpt < l) brpt = l;

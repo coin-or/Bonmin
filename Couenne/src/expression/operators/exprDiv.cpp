@@ -123,17 +123,6 @@ void exprDiv::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// choose which, between x and y, to branch on. Same choice as in
-// exprMul, this function is defined in branch/getFixVarBinFun.cpp
-expression *getFixVarBinFun (expression *, expression *);
-
-
-// return an index to the variable's argument that is better fixed
-// in a branching rule for solving a nonconvexity gap
-expression *exprDiv::getFixVar () 
-{return getFixVarBinFun (arglist_ [0], arglist_ [1]);}
-
-
 /// is this expression integer?
 bool exprDiv::isInteger () {
 

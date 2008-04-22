@@ -22,9 +22,11 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 expression *&var, 
 				 double * &brpts, 
+				 double * &brDist, // distance of current LP
+						   // point to new convexifications
 				 int &way) {
 
-  // two cases: inside or outside the belly. 
+  // two cases: inside and outside the curve. 
   //
   // Inside: the distance depends on the projection of the current
   // point onto the would-be upper envelopes, which forces us to look
@@ -41,6 +43,9 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
 
   var = argument_;
 
+  brDist = (double *) realloc (brDist, 2 * sizeof (double));
+  brpts  = (double *) realloc (brpts, sizeof (double));
+
   int
     ind = var -> Index (),
     wi  = obj -> Reference () -> Index ();
@@ -52,12 +57,13 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
             l  = info -> lower_    [ind],
             u  = info -> upper_    [ind];
 
+  // Outside //////////////////////////////////////////////////////////////////
+
   if (y0 < exp (x0)) {
 
-    // Outside: look for point (x1,y1) on curve y=exp(x) closest to
-    // current (x0,y0), branch at x1
+    // Look for point (x1,y1) on curve y=exp(x) closest to current
+    // (x0,y0), branch at x1
 
-    brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = obj -> midInterval (powNewton (x0, y0, exp, exp, exp), l, u);
 
     way = TWO_RAND;
@@ -65,52 +71,45 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
     y0 -= exp (*brpts);
     x0 -= *brpts;
 
-    return sqrt (x0*x0 + y0*y0); // exact distance
+    return sqrt (brDist [0] = brDist [1] = sqrt (x0*x0 + y0*y0)); // exact distance
   }
 
   // Inside. Four cases: ///////////////////////////////////////////////////////
 
-  // 1) both bounds are infinite --> three way branching
- 
   if ((l < -COUENNE_INFINITY) && 
-      (u >  COUENNE_INFINITY)) {
+      (u >  COUENNE_INFINITY)) { // unbounded in both directions
 
-    // TODO: restore when we can do three-way branching
-
+    /*    // TODO: restore when we can do three-way branching
 #if 0
     brpts = (double *) realloc (brpts, 2 * sizeof (double));
     way = THREE_CENTER; // focus on central convexification first
-
     brpts [0] = x0;       // draw vertical   from (x0,y0) south to curve y=exp(x)
     brpts [1] = log (y0); //      horizontal              east
-
     CouNumber 
       a = y0 - exp (x0),  // sides of a triangle with (x0,y0)
       b = log (y0) - x0;  // as one of the vertices
-
     // exact distance from central interval, from others it's a and b
     return (a * cos (atan (a/b))); 
-#endif
+#endif    */
 
     // follow South-East diagonal to find point on curve
     // so that current point is surely cut 
-    brpts = (double *) realloc (brpts, sizeof (double));
     *brpts = 0.5 * (x0 + log (y0)); 
     way = TWO_RAND;
 
-    return CoinMin (fabs (x0 - log(y0)), fabs (y0 - exp (x0)));
+    return CoinMin (brDist [0] = log (y0) - x0, 
+		    brDist [1] = y0 - exp (x0));
   }
 
   // 2,3) at least one of them is finite
-
-  brpts = (double *) realloc (brpts, sizeof (double));
 
   if (l < - COUENNE_INFINITY) { // 2) unbounded from below --> break vertically
 
     *brpts = obj -> midInterval (x0, l, u);
 
     way = TWO_RIGHT;
-    return CoinMin (y0 - exp (x0), projectSeg (x0, y0, *brpts, exp (*brpts), u, exp (u), -1));
+    return CoinMin (brDist [0] = y0 - exp (x0), 
+		    brDist [1] = projectSeg (x0, y0, *brpts, exp (*brpts), u, exp (u), -1));
   } 
 
   if (u > COUENNE_INFINITY) { // 3) unbounded from above -- break horizontally
@@ -118,7 +117,8 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
     *brpts = obj -> midInterval (log (y0), l, u);
 
     way = TWO_LEFT;
-    return CoinMin (log (y0) - x0, projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts), -1));
+    return CoinMin (brDist [0] = log (y0) - x0, 
+		    brDist [1] = projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts), -1));
   }
 
   // 4) both are finite
@@ -129,6 +129,6 @@ CouNumber exprExp::selectBranch (const CouenneObject *obj,
   way = TWO_RAND;
 
   // exact distance
-  return CoinMin (projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts),             -1),
-		  projectSeg (x0, y0,             *brpts, exp (*brpts), u, exp (u), -1));
+  return CoinMin (brDist [0] = projectSeg (x0, y0, l, exp (l), *brpts, exp (*brpts),             -1),
+		  brDist [1] = projectSeg (x0, y0,             *brpts, exp (*brpts), u, exp (u), -1));
 }

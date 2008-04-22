@@ -21,6 +21,8 @@ CouNumber exprAbs::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 expression * &var,
 				 double * &brpts,
+				 double * &brDist, // distance of current LP
+						   // point to new convexifications
 				 int &way) {
   var = argument_;
 
@@ -42,7 +44,14 @@ CouNumber exprAbs::selectBranch (const CouenneObject *obj,
   // no need to compute two distances for pseudocost, as this object
   // will only branch once...
 
+  brDist = (double *) realloc (brDist, 2 * sizeof (double));
+
+  assert ((y0 >= x0) && (y0 >= -x0));
+
+  brDist [0] = (x0 + y0) / sqrt_2;
+  brDist [1] = (y0 - x0) / sqrt_2;
+
   // exact distance between current point and the two subsequent
   // convexifications
-  return (CoinMin (x0+y0, y0-x0) / sqrt_2);
+  return CoinMin (brDist [0], brDist [1]);
 }

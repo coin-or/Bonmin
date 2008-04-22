@@ -3,7 +3,7 @@
  * Authors: Andreas Waechter, IBM Corp.
  * Purpose: Strong branching objects for Couenne
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -15,26 +15,44 @@
 
 namespace Bonmin {
 
-  CouenneChooseStrong::CouenneChooseStrong(BabSetupBase &b, CouenneProblem* p) :
-    BonChooseVariable(b, b.continuousSolver()),
-    problem_(p)
+  /// constructor
+  CouenneChooseStrong::CouenneChooseStrong (BabSetupBase &b, CouenneProblem* p) :
+
+    BonChooseVariable (b, b.continuousSolver()),
+    problem_(p) {
+
+    std::string s;
+
+    b.options () -> GetStringValue ("pseudocost_mult", s, "couenne.");
+
+    if      (s == "interval")      pseudoMultType_ = interval;
+    else if (s == "infeasibility") pseudoMultType_ = infeasibility;
+    else if (s == "projectDist")   pseudoMultType_ = projectDist;
+
+    b.options () -> GetStringValue ("pseudocost_mult_lp", s, "couenne.");
+    pseudoUpdateLP_ = (s == "yes");      
+  }
+
+  /// copy constructor
+  CouenneChooseStrong::CouenneChooseStrong (const CouenneChooseStrong& rhs) :
+    BonChooseVariable (rhs),
+    problem_          (rhs.problem_),
+    pseudoMultType_   (rhs.pseudoMultType_),
+    pseudoUpdateLP_   (rhs.pseudoUpdateLP_)
   {}
 
-
-  CouenneChooseStrong::CouenneChooseStrong(const CouenneChooseStrong& rhs) :
-    BonChooseVariable(rhs),
-    problem_(rhs.problem_)
-  {}
-
+  /// destructor
   CouenneChooseStrong::~CouenneChooseStrong()
   {}
 
+  /// cloning method
   OsiChooseVariable *
   CouenneChooseStrong::clone() const
   {
     return new CouenneChooseStrong(*this);
   }
 
+  /// assignment operator
   CouenneChooseStrong&
   CouenneChooseStrong::operator=(const CouenneChooseStrong & rhs)
   {
@@ -45,6 +63,7 @@ namespace Bonmin {
     return *this;
   }
 
+  /// Perform strong branching //////////////////////////////////////////////////////////////
   int
   CouenneChooseStrong::doStrongBranching( OsiSolverInterface * solver, 
 					  OsiBranchingInformation *info,
@@ -98,9 +117,9 @@ namespace Bonmin {
 	status1 = -1;
 
       OsiSolverInterface * thisSolver = solver; 
-      if (branch->boundBranch()) {
+      if (branch -> boundBranch ()) {
         // ordinary
-        if (branch->branch(solver) > COUENNE_INFINITY) {
+        if (branch -> branch (solver) > COUENNE_INFINITY) {
 	  status0 = 1;
 	  result -> setDownStatus (1);
 	}
@@ -141,9 +160,9 @@ namespace Bonmin {
       // Restore bounds
       for (int j=0;j<numberColumns;j++) {
         if (saveLower[j] != lower[j])
-  	solver->setColLower(j,saveLower[j]);
+	  solver->setColLower(j,saveLower[j]);
         if (saveUpper[j] != upper[j])
-  	solver->setColUpper(j,saveUpper[j]);
+	  solver->setColUpper(j,saveUpper[j]);
       }
 
       // UP DIRECTION ///////////////////////////////////////////////////////
@@ -194,9 +213,9 @@ namespace Bonmin {
       // Restore bounds
       for (int j=0;j<numberColumns;j++) {
         if (saveLower[j] != lower[j])
-  	solver->setColLower(j,saveLower[j]);
+	  solver->setColLower(j,saveLower[j]);
         if (saveUpper[j] != upper[j])
-  	solver->setColUpper(j,saveUpper[j]);
+	  solver->setColUpper(j,saveUpper[j]);
       }
       /*
         End of evaluation for this candidate object. Possibilities are:
@@ -277,5 +296,25 @@ namespace Bonmin {
 #endif
 
     return retval;
+  }
+
+  /// Add list of options to be read from file ////////////////////////////////////////
+  void CouenneChooseStrong::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {
+
+    roptions -> AddStringOption3
+      ("pseudocost_mult",
+       "Multipliers of pseudocosts for estimating and update estimation of bound",
+       "infeasibility",
+       "infeasibility", "infeasibility returned by object",
+       "interval",      "width of the interval between bound and branching point",
+       "projectDist",   "distance between current LP point and resulting branches' LP points");
+
+    roptions -> AddStringOption2
+      ("pseudocost_mult_lp",
+       "Use distance between LP points to update multipliers of pseudocosts "  
+       "after simulating branching",
+       "no",
+       "yes", "",
+       "no",  "");
   }
 }

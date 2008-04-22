@@ -70,10 +70,6 @@ class exprDiv: public exprOp {
 		     CouNumber = -COUENNE_INFINITY, 
 		     CouNumber =  COUENNE_INFINITY);
 
-  /// Return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  expression *getFixVar ();
-
   /// Code for comparisons
   virtual enum expr_type code () {return COU_EXPRDIV;}
 
@@ -89,6 +85,8 @@ class exprDiv: public exprOp {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+ 				  double * &brDist, // distance of current LP
+					  	    // point to new convexifications
 				  int &way);
 
   /// compute $y^{lv}$ and  $y^{uv}$ for Violation Transfer algorithm

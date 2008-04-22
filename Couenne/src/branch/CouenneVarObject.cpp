@@ -101,8 +101,11 @@ CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation *info,
 
   expression *brVar = NULL; // branching variable
 
-  CouNumber 
-    bestPt, *brPts = NULL, // branching point(s)
+  CouNumber
+    bestPt,
+    *brPts  = NULL, // branching point(s)
+    *brDist = NULL, // distances from current LP point to each
+		    // new convexification (usually two)
     maxdist = - COIN_DBL_MAX;
 
   bool chosen = false;
@@ -129,8 +132,8 @@ CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation *info,
 
     if (obj. Reference ())
       improv = obj. Reference () -> Image ()
-	-> selectBranch (&obj, info,              // input parameters
-			 brVar, brPts, whichWay); // result: who, where, and how to branch
+	-> selectBranch (&obj, info,                      // input parameters
+			 brVar, brPts, brDist, whichWay); // result: who, where, distances, direction
 
 #ifdef DEBUG
     printf ("  --> "); 

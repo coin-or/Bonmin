@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the sine of a function
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -30,7 +30,9 @@ inline CouNumber modulo (register CouNumber a, register CouNumber b)
 CouNumber trigSelBranch (const CouenneObject *obj, 
 			 const OsiBranchingInformation *info,
 			 expression * &var,
-			 double * &brpts, 
+			 double * &brpts,
+			 double * &brDist, // distance of current LP
+				           // point to new convexifications
 			 int &way,
 			 enum cou_trig type);
 
@@ -99,8 +101,11 @@ class exprSin: public exprUnary {
 				  const OsiBranchingInformation *info,
 				  expression * &var, 
 				  double * &brpts, 
+ 				  double * &brDist, // distance of current LP
+					  	    // point to new convexifications
 				  int &way)
-  {return trigSelBranch (obj, info, var, brpts, way, COU_SINE);}
+
+  {return trigSelBranch (obj, info, var, brpts, brDist, way, COU_SINE);}
 
   /// closest feasible points in function in both directions
   virtual void closestFeasible (expression *varind, expression *vardep,

@@ -10,14 +10,11 @@
 #include "CouennePrecisions.hpp"
 #include "CouenneTypes.hpp"
 #include "CouenneObject.hpp"
-#include "CouenneBranchingObject.hpp"
 
 #include "exprMul.hpp"
 #include "funtriplets.hpp"
-#include "domain.hpp"
+#include "projections.hpp"
 
-#define LARGE_BOUND 9.9e12
-#define BOUND_WING 1
 
 /// set up branching object by evaluating many branching points for
 /// each expression's arguments
@@ -25,7 +22,11 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 				 const OsiBranchingInformation *info,
 				 expression *&var,
 				 double * &brpts, 
+				 double * &brDist, // distance of current LP
+						   // point to new convexifications
 				 int &way) {
+
+  if (brDist) {free (brDist); brDist = NULL;} // clear it, computeMulBrDist will fill it
 
   int xi = arglist_ [0] -> Index (),
       yi = arglist_ [1] -> Index (),
@@ -36,8 +37,8 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
   CouNumber 
     x0 = info -> solution_  [xi], y0 = info -> solution_  [yi],
     xl = info -> lower_     [xi], yl = info -> lower_     [yi],
-    xu = info -> upper_     [xi], yu = info -> upper_     [yi],
-    w0 = info -> solution_  [wi];
+    xu = info -> upper_     [xi], yu = info -> upper_     [yi];
+  //w0 = info -> solution_  [wi];
 
 #ifdef DEBUG
   printf ("    branch MUL: %g [%g,%g] %g [%g,%g]\n", 
@@ -46,6 +47,8 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
 
   brpts = (double *) realloc (brpts, sizeof (double));
 
+  // Constant x and/or y //////////////////////////////////////////////////////////
+
   if (fabs (xu-xl) < COUENNE_EPS) { // x almost constant
 
     if (fabs (yu-yl) < COUENNE_EPS) { // both almost constant, return null result
@@ -53,63 +56,51 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
       var = NULL;
       return 0.;
 
-    } else { // x only, branch on y
+    } else { // x constant, branch on y
 
       var = arglist_ [1];
       *brpts = 0.5 * (yl+yu);
-      return fabs (w0 - x0*y0);
+      brDist = (double *) realloc (brDist, 2 * sizeof (double));
+
+      brDist [0] = projectSeg (x0, y0, yl, xl*yl, *brpts, *brpts * xl, 0);
+      brDist [1] = projectSeg (x0, y0, *brpts, *brpts * xl, yu, xl*yu, 0);
+
+      //return fabs (w0 - x0*y0);
+      return CoinMin (brDist [0], brDist [1]);
     }
 
-  } else if (fabs (yu-yl) < COUENNE_EPS) { // y almost constant, branch on x
+  } else if (fabs (yu-yl) < COUENNE_EPS) { // y constant, branch on x
 
     var = arglist_ [0];
     *brpts = 0.5 * (xl+xu);
-    return fabs (w0 - x0*y0);
+    brDist = (double *) realloc (brDist, 2 * sizeof (double));
+
+    brDist [0] = projectSeg (x0, y0, xl, xl*yl, *brpts, *brpts * yl, 0);
+    brDist [1] = projectSeg (x0, y0, *brpts, *brpts * yl, xu, xu*yl, 0);
+
+    //return fabs (w0 - x0*y0);
+    return CoinMin (brDist [0], brDist [1]);
   }
 
-  // First, try to avoid infinite bounds for multiplications, which
-  // make them pretty hard to deal with
+  // Unbounded x and/or y /////////////////////////////////////////////////////////
 
   if (((var = arglist_ [0]) -> Index() >= 0) && (xl < -COUENNE_INFINITY) && (xu > COUENNE_INFINITY) ||
       ((var = arglist_ [1]) -> Index() >= 0) && (yl < -COUENNE_INFINITY) && (yu > COUENNE_INFINITY)) {
 
-    // restore it when we have three-way branching
-
-#if 0
-    // branch around current point. If it is also at a crazy value,
-    // reset it close to zero.
-
-    brpts = (double *) realloc (brpts, 2 * sizeof (double));
-    CouNumber curr = (*var) ();
-
-    if (fabs (curr) >= LARGE_BOUND) curr = 0;
-
-    //brpts [0] = - fabs (curr) - BOUND_WING;
-    //brpts [1] =   fabs (curr) + BOUND_WING;
-    brpts [0] = curr - BOUND_WING;
-    brpts [1] = curr + BOUND_WING;
-
-    way = THREE_CENTER;
-#endif
-
     *brpts = 0.;
+    brDist = computeMulBrDist (info, xi, yi, wi, var -> Index (), brpts);
+    way = (info -> solution_ [var -> Index ()] > *brpts) ? TWO_RIGHT : TWO_LEFT;
 
-    return fabs (w0 - x0*y0);
+    return CoinMin (brDist [0], brDist [1]);
   }
 
-  // don't privilege xi over yi
+  // TODO: don't privilege xi over yi
 
-  int ind;
+  // at most one bound is infinite ///////////////////////////////////////////////
 
-  // at least one bound is infinite
+  int ind = -1;
 
-  if      ((xl < -COUENNE_INFINITY) && (xu > COUENNE_INFINITY)) // x unbounded in both directions
-    {ind = xi; *brpts = 0; way = TWO_RAND;}
-
-  else if ((yl < -COUENNE_INFINITY) && (yu > COUENNE_INFINITY)) // y unbounded in both directions
-    {ind = yi; *brpts = 0; way = TWO_RAND;}
-
-  else if (xl < -COUENNE_INFINITY)                              // x unbounded below
+  if      (xl < -COUENNE_INFINITY)                              // x unbounded below
     {ind = xi; *brpts = obj -> midInterval (((x0 < 0.) ? 2 : 0.5) * x0, xl, xu); way = TWO_RIGHT;}
 
   else if (xu >  COUENNE_INFINITY)                              // x unbounded above
@@ -152,14 +143,19 @@ CouNumber exprMul::selectBranch (const CouenneObject *obj,
     way = (pt > *brpts) ? TWO_RIGHT : TWO_LEFT;
   }
 
+  assert (ind >= 0);
+
   var = arglist_ [(ind == xi) ? 0 : 1];
+
+  brDist = computeMulBrDist (info, xi, yi, wi, ind, brpts);
 
 #ifdef DEBUG
   printf ("    MUL: br on x_%d %g [%g,%g] [%g,%g] (%g,%g)\n", 
 	  ind, *brpts, xl, xu, yl, yu, x0, y0);
 #endif
 
-  return fabs (w0 - x0*y0);
+  return CoinMin (brDist [0], brDist [1]);
+  //return fabs (w0 - x0*y0);
 }
 
 

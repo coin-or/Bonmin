@@ -244,6 +244,17 @@ void exprPow::generateCuts (expression *aux, const OsiSolverInterface &si,
 				  pow (COU_MAX_COEFF, 1./k)), // don't want big coefficients
               powStep  = 1;
 
+    // lower envelope for k negative even
+    if ((k <  COUENNE_EPS) &&
+	isInt && !(intk % 2) &&
+	(l < -COUENNE_EPS) &&       // bounds do not contain 0
+	(u >  COUENNE_EPS) &&
+	(l > - powThres) &&         // and are finite
+	(u <   powThres)) 
+
+      cg -> addSegment (cs, w_ind, x_ind, l, safe_pow (l, k), u, safe_pow (u, k), 1);
+
+
     // upper envelope
     if ((  (k > COUENNE_EPS)        // when k negative, add only if
 	|| (l > COUENNE_EPS)        // bounds do not contain 0

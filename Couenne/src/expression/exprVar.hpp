@@ -131,11 +131,6 @@ class exprVar: public expression {
 			     CouNumber = -COUENNE_INFINITY, 
 			     CouNumber =  COUENNE_INFINITY);
 
-  /// return an index to the variable's argument that is better fixed
-  /// in a branching rule for solving a nonconvexity gap
-  virtual inline expression *getFixVar () 
-  {return this;}
-
   /// code for comparison
   virtual inline enum expr_type code () 
   {return COU_EXPRVAR;}

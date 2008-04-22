@@ -12,7 +12,7 @@
 #include "getstub.h"
 #include "r_opn.hd" /* for N_OPS */
 
-#define CHR (char*)  
+#define CHR (const char*)
 
 fint timing = 0;
 
@@ -33,7 +33,7 @@ ASL *readASLfg (char **argv) {
   // Create the ASL structure
   ASL* asl = (ASL*) ASL_alloc (ASL_read_fg);
   FILE *nl = NULL;
-  stub = getstub   (&argv, &Oinfo);
+  stub = getstub (&argv, &Oinfo);
 
   // Although very intuitive, we shall explain why the second argument
   // is passed with a minus sign: it is to tell the ASL to retrieve

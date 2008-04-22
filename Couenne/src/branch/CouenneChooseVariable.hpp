@@ -72,6 +72,9 @@ public:
   CouenneProblem *Problem () const 
   {return problem_;}
 
+  /// Add list of options to be read from file
+  static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
+
 protected:
 
   /// Pointer to the associated MINLP problem

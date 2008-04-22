@@ -21,6 +21,8 @@ namespace Bonmin {
 
   public:
 
+    enum pseudocostMult {infeasibility, interval, projectDist};
+
     /// Constructor from solver (so we can set up arrays etc)
     CouenneChooseStrong (BabSetupBase& b, CouenneProblem* problem);
 
@@ -32,7 +34,6 @@ namespace Bonmin {
 
     /// Clone
     virtual OsiChooseVariable * clone() const;
-
 
     /// Destructor
     virtual ~CouenneChooseStrong ();
@@ -57,13 +58,24 @@ namespace Bonmin {
 				   OsiBranchingInformation *info,
 				   int numberToDo, int returnCriterion);
 
+    /// Add list of options to be read from file
+    static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
+
   private:
+
     /** Default Constructor, forbidden for some reason.*/
     CouenneChooseStrong ();
     
     /// Pointer to the associated MINLP problem
     CouenneProblem *problem_;
-  };
 
+    /// multiplier type for pseudocost
+    enum pseudocostMult pseudoMultType_;
+
+    /// should we update the pseudocost multiplier with the distance
+    /// between the LP point and the solution of the resulting
+    /// branches' LPs?
+    bool pseudoUpdateLP_;
+  };
 }
 #endif
