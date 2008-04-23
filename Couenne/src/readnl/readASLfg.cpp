@@ -12,7 +12,7 @@
 #include "getstub.h"
 #include "r_opn.hd" /* for N_OPS */
 
-#define CHR (const char*)
+#define CHR (char*)
 
 fint timing = 0;
 
