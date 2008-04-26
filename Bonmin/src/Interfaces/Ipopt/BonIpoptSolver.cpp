@@ -234,6 +234,7 @@ namespace Bonmin
     case Ipopt::Internal_Error:
       return exception;
     case Ipopt::Solve_Succeeded:
+    case Ipopt::Feasible_Point_Found:
       return solvedOptimal;
     case Ipopt::Search_Direction_Becomes_Too_Small:
       return doesNotConverge;

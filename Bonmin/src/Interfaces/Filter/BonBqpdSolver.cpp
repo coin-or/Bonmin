@@ -372,7 +372,7 @@ namespace Bonmin
   {
     //DELETEME
     //use_warm_start_in_cache_ = false;
-    if (use_warm_start_in_cache_) {
+    if (use_warm_start_in_cache_ && !bad_warm_start_info_) {
       m0de = 6;
       use_warm_start_in_cache_ = false;
     }
@@ -380,7 +380,9 @@ namespace Bonmin
       m0de = 0;
       tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;
+      bad_warm_start_info_ = false;
     }
+    //printf("m0de = %d\n", m0de);
 
     // Set up some common block stuff
     F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
@@ -411,6 +413,17 @@ namespace Bonmin
     F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
         g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
         &m0de, &ifail, info, &iprint, &nout);
+    if (ifail == 8 && m0de == 6) {
+      printf("Restarting Bqpd...");
+      m0de = 0;
+      tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
+      ifail = 0;
+      F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+			  g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
+			  &m0de, &ifail, info, &iprint, &nout);
+      printf("new ifail = %d\n", ifail);
+    }
+    if (ifail == 8) bad_warm_start_info_ = true;
 #if 0
     for (int i=0; i<n; i++) {
       printf("qxsol[%2d] = %23.16e\n", i, x[i]);

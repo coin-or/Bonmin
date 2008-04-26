@@ -196,6 +196,7 @@ namespace Bonmin
       /** flag remembering if warm start information has been put into
       cache */
       bool use_warm_start_in_cache_;
+      bool bad_warm_start_info_;
 
       /** Constructor.*/
       cachedInfo()
@@ -215,7 +216,8 @@ namespace Bonmin
           ws(NULL),
           lws(NULL),
           cpuTime_(0),
-          use_warm_start_in_cache_(false)
+          use_warm_start_in_cache_(false),
+	  bad_warm_start_info_(false)
       {}
 
       cachedInfo(const Ipopt::SmartPtr<BranchingTQP> &tqp,
@@ -236,7 +238,8 @@ namespace Bonmin
           lws(NULL),
           tqp_(tqp),
           cpuTime_(0),
-          use_warm_start_in_cache_(false)
+          use_warm_start_in_cache_(false),
+          bad_warm_start_info_(false)
       {
         initialize(tqp, options);
       }
