@@ -217,7 +217,6 @@ namespace Bonmin{
       else printf ("%g ", Y [i]);
       printf ("\n");*/
 
-
     bool foundSolution = false;
 
     if (skipOnInfeasibility) { // make up some random rounding
@@ -258,8 +257,11 @@ namespace Bonmin{
 
       double obj = (nlp_ -> isProvenOptimal()) ? nlp_ -> getObjValue (): COIN_DBL_MAX;
 
-      if (nlp_ -> isProvenOptimal () // store solution in Aux info
-	  && couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)) {
+      if (nlp_ -> isProvenOptimal () &&
+	  (obj < couenne_ -> getCutOff ()) &&
+	  couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)) {
+
+	// store solution in Aux info
 
 	const int nVars = solver->getNumCols();
 	double* tmpSolution = new double [nVars];

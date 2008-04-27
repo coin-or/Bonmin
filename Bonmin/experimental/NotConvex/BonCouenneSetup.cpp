@@ -50,8 +50,8 @@ namespace Bonmin{
         ASL* asl_to_free = (ASL*)asl;
         ASL_free(&asl_to_free);
         asl = NULL;
-      }
-      ASL_free(&asl);
+    }
+    ASL_free(&asl);
   }
   
   CouenneSetup::~CouenneSetup(){
@@ -59,14 +59,14 @@ namespace Bonmin{
     //delete CouennePtr_;
   }
 
-  void CouenneSetup::InitializeCouenne(char **& argv){
+  void CouenneSetup::InitializeCouenne (char **& argv) {
     /* Get the basic options. */
     readOptionsFile();
-    
+ 
     /** Change default value for failure behavior so that code doesn't crash 
 	when Ipopt does not solve a sub-problem.*/
 
-    options_->SetStringValue("nlp_failure_behavior", "fathom", "bonmin.");
+    options_->SetStringValue ("nlp_failure_behavior", "fathom", "bonmin.");
 
     gatherParametersValues(options_);
 
@@ -106,9 +106,6 @@ namespace Bonmin{
 
     CouenneProblem * couenneProb = couenneCg -> Problem();
 
-    //couenneProb -> readCutoff (argv [1]);
-    //couenneProb -> setCutOff (atof (argv [1]));
-
     Bonmin::BabInfo * extraStuff = new Bonmin::CouenneInfo(0);
 
     // as per instructions by John Forrest, to get changed bounds
@@ -142,7 +139,10 @@ namespace Bonmin{
       return;
     }
 
-    continuousSolver_->findIntegersAndSOS(false);
+    continuousSolver_ -> findIntegersAndSOS (false);
+
+    //model -> assignSolver (continuousSolver_, true);
+    //continuousSolver_ = model -> solver();
 
     // add CouenneVarObjects for branching /////////////////////////////////////////////
 
@@ -156,9 +156,9 @@ namespace Bonmin{
 
       enum CouenneObject::branch_obj objType;
 
-      if      (s == "vt_obj")   objType = CouenneObject::vt_obj;
-      else if (s == "var_obj")  objType = CouenneObject::var_obj;
-      else if (s == "expr_obj") objType = CouenneObject::expr_obj;
+      if      (s == "vt_obj")   objType = CouenneObject::VT_OBJ;
+      else if (s == "var_obj")  objType = CouenneObject::VAR_OBJ;
+      else if (s == "expr_obj") objType = CouenneObject::EXPR_OBJ;
       else                      assert (false);
 
       int nAuxs = 0, nobj = 0,
@@ -174,20 +174,20 @@ namespace Bonmin{
 
 	switch (objType) {
 
-	case CouenneObject::expr_obj:
+	case CouenneObject::EXPR_OBJ:
 
 	  // if this variable is associated with a nonlinear function
 	  if ((var -> Type  () == AUX) && 
 	      (var -> Image () -> Linearity () > LINEAR) &&
 	      (var -> Multiplicity () > 0)) {
 
-	    objects [nobj] = new CouenneObject (var, this, journalist());
+	    objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
 	    objects [nobj++] -> setPriority (1);
 	  }
 
 	  break;
 
-	case CouenneObject::var_obj:
+	case CouenneObject::VAR_OBJ:
 
 	  // branching objects on variables
 	  if (// comment three lines below for linear variables too
@@ -196,13 +196,14 @@ namespace Bonmin{
 		(var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
 	      (var -> Multiplicity () > 0)) {
 
-	    objects [nobj] = new CouenneVarObject (var, couenneProb, this, journalist ());
+	    objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
 	    objects [nobj++] -> setPriority (1);
 	  }
 
 	  break;
 
-	case CouenneObject::vt_obj:
+	default:
+	case CouenneObject::VT_OBJ:
 
 	  // branching objects on variables
 	  if (// comment three lines below for linear variables too
@@ -211,7 +212,7 @@ namespace Bonmin{
 	      //  (var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
 	      (var -> Multiplicity () > 0)) {
 
-	    objects [nobj] = new CouenneVTObject (var, couenneProb, this, journalist ());
+	    objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
 	    objects [nobj++] -> setPriority (1);
 	  }
 
@@ -221,13 +222,13 @@ namespace Bonmin{
 
       // Add objects /////////////////////////////////
       continuousSolver_ -> addObjects (nobj, objects);
-      ////////////////////////////////////////////////
 
       for (int i = 0 ; i < nobj ; i++)
        	delete objects [i];
 
       delete [] objects;
     }
+
 
     // Setup Convexifier generators ////////////////////////////////////////////////
 
@@ -241,7 +242,8 @@ namespace Bonmin{
       cutGenerators().push_back(cg);
 
       // set cut gen pointer
-      dynamic_cast <CouenneSolverInterface *> (continuousSolver_) -> setCutGenPtr (couenneCg);
+      dynamic_cast <CouenneSolverInterface *> 
+	(continuousSolver_) -> setCutGenPtr (couenneCg);
     }
 
     CouennePtr_ = couenneCg;
@@ -271,7 +273,8 @@ namespace Bonmin{
     switch (varSelection) {
 
     case OSI_STRONG: { // strong branching
-      CouenneChooseStrong * chooseVariable = new CouenneChooseStrong(*this, couenneProb);
+      CouenneChooseStrong * chooseVariable = new CouenneChooseStrong
+	(*this, couenneProb, journalist ());
       chooseVariable->setTrustStrongForSolution(false);
       chooseVariable->setTrustStrongForBound(false);
       chooseVariable->setOnlyPseudoWhenTrusted(true);
@@ -280,7 +283,8 @@ namespace Bonmin{
     }
 
     case OSI_SIMPLE: // default choice
-      branchingMethod_ = new CouenneChooseVariable (continuousSolver_, couenneProb);
+      branchingMethod_ = new CouenneChooseVariable 
+	(continuousSolver_, couenneProb, journalist ());
       break;
 
     default:

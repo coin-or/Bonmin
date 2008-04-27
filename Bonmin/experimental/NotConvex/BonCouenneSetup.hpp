@@ -48,9 +48,12 @@ public:
       return new CouenneSetup(*this);
     }
     
+    /// destructor
     virtual ~CouenneSetup();
-    /** Initialize from command line arguments.*/
+
+    /** Initialize from command line arguments. */
     void InitializeCouenne(char **& argv);
+
     /** register the options */
     virtual void registerOptions();
     /** Register all Couenne options.*/

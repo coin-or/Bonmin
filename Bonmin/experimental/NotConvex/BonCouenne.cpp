@@ -44,16 +44,17 @@ int main (int argc, char *argv[])
   double time1 = CoinCpuTime();
 
   try {
+
+    Bab bb;
+    bb.setUsingCouenne (true);
+
     CouenneSetup bonmin;
     bonmin.InitializeCouenne (argv);
-    Bab bb;
 
 #if 0
     CouenneFeasibility feasibility;
     bb.model().setProblemFeasibility (feasibility);
 #endif
-
-    bb.setUsingCouenne (true);
 
     //////////////////////////////////
 
