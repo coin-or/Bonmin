@@ -8,7 +8,6 @@
  */
 
 #include "CoinHelperFunctions.hpp"
-
 #include "CouenneProblem.hpp"
 #include "CouenneVTObject.hpp"
 
@@ -22,7 +21,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
   if (info -> upper_ [index] - 
       info -> lower_ [index] < COUENNE_EPS)
-    return 0.;
+    return (upEstimate_ = downEstimate_ = 0.);
 
   problem_ -> domain () -> push 
     (problem_ -> nVars (),
@@ -108,7 +107,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   // if delta is null, return 0, this object is feasible
   if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) {
     problem_ -> domain () -> pop ();
-    return 0.;
+    return (upEstimate_ = downEstimate_ = 0.);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -194,6 +193,11 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     }
     printf ("]\n");
   }
+
+  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_))
+    retval = 0.;
+
+  upEstimate_ = downEstimate_ = retval;
 
   problem_ -> domain () -> pop ();
 

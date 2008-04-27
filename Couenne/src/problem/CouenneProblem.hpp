@@ -13,16 +13,14 @@
 #include <vector>
 
 #include "OsiRowCut.hpp"
-
-#include "BonAuxInfos.hpp"
 #include "BonBabInfos.hpp"
+
 #include "CouenneTypes.hpp"
 #include "expression.hpp"
 #include "exprAux.hpp"
 #include "CouenneProblemElem.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneJournalist.hpp"
-
 #include "domain.hpp"
 
 struct ASL;
@@ -62,7 +60,7 @@ class CouenneProblem {
     inline double getCutOff() const {return cutoff_;}
   };
 
-  // structure to record fixed, non-fixed, and continuous variables
+  /// structure to record fixed, non-fixed, and continuous variables
   enum fixType {UNFIXED, FIXED, CONTINUOUS};
 
  protected:
@@ -101,8 +99,8 @@ class CouenneProblem {
   /// Variables that have commuted to auxiliary
   bool *commuted_;
 
-  // numbering of variables. No variable xi with associated pi(i)
-  // greater than pi(j) should be evaluated before variable xj
+  /// numbering of variables. No variable xi with associated pi(i)
+  /// greater than pi(j) should be evaluated before variable xj
   int *numbering_;
 
   /// Number of "defined variables" (aka "common expressions")
@@ -306,6 +304,9 @@ class CouenneProblem {
   bool boundTightening (t_chg_bounds *, 
 			Bonmin::BabInfo * = NULL) const;
 
+  /// core of the bound tightening procedure
+  bool btCore (t_chg_bounds *chg_bds) const;
+
   /// Optimality Based Bound Tightening
   int obbt (const CouenneCutGenerator *cg,
 	    const OsiSolverInterface &csi,
@@ -432,16 +433,13 @@ protected:
   /// -1   if infeasible
   ///  0   if no improvement
   /// +1   if improved
-  int fake_tighten (char direction,  // 0: left, 1: right
-		    int index,       // index of the variable tested
-		    const double *X, // point round which tightening is done
-		    CouNumber *olb,  // cur. lower bound
-		    CouNumber *oub,  //      upper
+  int fake_tighten (char direction,  ///< 0: left, 1: right
+		    int index,       ///< index of the variable tested
+		    const double *X, ///< point round which tightening is done
+		    CouNumber *olb,  ///< cur. lower bound
+		    CouNumber *oub,  ///< cur. upper bound
 		    t_chg_bounds *chg_bds,
 		    t_chg_bounds *f_chg) const;
-
-  /// core of the bound tightening procedure
-  bool btCore (t_chg_bounds *chg_bds) const;
 
   /// Optimality Based Bound Tightening -- inner loop
   int obbtInner (CouenneSolverInterface *, 
@@ -487,7 +485,7 @@ protected:
   /// fill freeIntegers_ array
   void fillIntegerRank () const;
 
-  //
+  /// Test fixing of an integer variable (used in getIntegerCandidate())
   int testIntFix (int index, 
 		  CouNumber xFrac, 
 		  enum fixType *fixed,

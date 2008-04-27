@@ -95,9 +95,10 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   // been chosen
 
   int bestWay;
-  CouNumber brkPt = computeBranchingPoint(info, bestWay);
-  upEstimate_ = info->upper_[index] - brkPt;
-  downEstimate_ = brkPt - info->lower_[index];
+
+  CouNumber brkPt = computeBranchingPoint (info, bestWay);
+  //upEstimate_ = info->upper_[index] - brkPt;
+  //downEstimate_ = brkPt - info->lower_[index];
 
 #ifdef DEBUG
   printf("index = %d up = %e down = %e bounds [%e,%e] brpt = %e\n", 
@@ -105,6 +106,13 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 	 info->lower_[index],
 	 info->upper_[index], brkPt);
 #endif
+
+  if (pseudoMultType_ != PROJECTDIST)
+    setEstimates (info, &retval, &brkPt);
+
+  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+    printf ("estimates = [%g,%g]\n", downEstimate_, upEstimate_);
+  }
 
   problem_ -> domain () -> pop ();
 

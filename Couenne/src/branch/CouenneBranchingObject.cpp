@@ -11,7 +11,6 @@
 #include "CoinHelperFunctions.hpp"
 
 #include "OsiRowCut.hpp"
-#include "CbcCountRowCut.hpp"
 
 #include "CouenneSolverInterface.hpp"
 #include "CouenneProblem.hpp"
@@ -28,25 +27,27 @@ void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchange
  * operator () of that exprAux.
 */
 
-CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var, 
-						int way, CouNumber brpoint, 
-						bool doFBBT, 
-						bool doConvCuts): 
+CouenneBranchingObject::CouenneBranchingObject (OsiSolverInterface *solver,
+						const OsiObject * originalObject,
+						JnlstPtr jnlst, 
+						expression *var, 
+						int way, 
+						CouNumber brpoint, 
+						bool doFBBT, bool doConvCuts):
+
+  OsiTwoWayBranchingObject (solver, originalObject, way, brpoint),
   variable_     (var),
   jnlst_        (jnlst),
   doFBBT_       (doFBBT),
   doConvCuts_   (doConvCuts),
   downEstimate_ (0.),
-  upEstimate_   (0.) {
+  upEstimate_   (0.),
+  simulate_     (false) {
 
-  firstBranch_ =  (way == TWO_LEFT)      ? 0 : 
-                 ((way == TWO_RIGHT)     ? 1 : 
-                 ((CoinDrand48 () < 0.5) ? 0 : 1));
-
-  CouNumber x = (*variable_) ();
+  value_ = (*variable_) ();
 
   if (fabs (brpoint) < COUENNE_INFINITY) 
-    x = brpoint;
+    value_ = brpoint;
 
   // This two-way branching rule is only applied when both lower and
   // upper bound are finite. Otherwise, a CouenneThreeWayBranchObj is
@@ -64,22 +65,17 @@ CouenneBranchingObject::CouenneBranchingObject (JnlstPtr jnlst, expression *var,
   // TODO: consider branching value that maximizes distance from
   // current point (how?)
 
-  //  assert (fabs (u-l) > COUENNE_EPS);
-
   CouNumber lb, ub;
   var -> getBounds (lb, ub);
 
-  value_ = x;
-
-  // normalize w.r.t. interval (i.e. do not branch too close to bounds)
-  // if both are finite...
+  // do not branch too close to bounds
   if ((lb > -COUENNE_INFINITY) && (ub < COUENNE_INFINITY)) {
     if      ((value_ - lb) / (ub-lb) < closeToBounds) value_ = lb + (ub-lb) * closeToBounds;
     else if ((ub - value_) / (ub-lb) < closeToBounds) value_ = ub + (lb-ub) * closeToBounds;
   }
 
   jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 
-		    "Branch: x%-3d will branch on %g (at %g) [%g,%g]; firstBranch_ = %d\n", 
+		    "Branch: x%-3d will branch on %g (cur. %g) [%g,%g]; firstBranch_ = %d\n", 
 		    variable_ -> Index (), value_, (*variable_) (), lb, ub, firstBranch_);
 }
 
@@ -129,7 +125,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   double time = CoinCpuTime ();
   jnlst_ -> Printf (J_VECTOR, J_BRANCHING,"[vbctool] %02d:%02d:%02d.%02d_I x%d%c=%g_[%g,%g]\n",
 		    (int) (floor(time) / 3600), 
-		    (int) (floor(time) / 60) %60, 
+		    (int) (floor(time) / 60) % 60, 
 		    (int) floor(time) % 60, 
 		    (int) ((time - floor (time)) * 100),
 		    index, way ? '>' : '<', integer ? ((way ? ceil (brpt): floor (brpt))) : brpt,
@@ -140,7 +136,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   else      solver -> setColLower (index, integer ? ceil  (brpt) : brpt); // up   branch
 
   CouenneSolverInterface *couenneSolver = dynamic_cast <CouenneSolverInterface *> (solver);
-
   CouenneProblem *p = couenneSolver -> CutGen () -> Problem ();
 
   int 
@@ -164,13 +159,14 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     chg_bds [i].setUpper (t_chg_bounds::CHANGED);
     }*/
 
-  if (     doFBBT_ &&                          // this branching object should do FBBT
-      p -> doFBBT ()) {                        // problem allowed to do FBBT
+  if (     doFBBT_ &&           // this branching object should do FBBT, and
+      p -> doFBBT ()) {         // problem allowed to do FBBT
 
     p -> installCutOff ();
 
-    if (!p -> boundTightening (chg_bds, NULL)) // done FBBT and this branch is infeasible
-      infeasible = true;                       // ==> report it
+    if (!p -> btCore (chg_bds)) // done FBBT and this branch is infeasible
+      infeasible = true;        // ==> report it
+
     else {
 
       const double
@@ -188,39 +184,18 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     }
   }
 
-#if 0
-  if (!infeasible && doConvCuts_) { // generate convexification cuts before solving new node's LP
+  if (!infeasible && doConvCuts_ && simulate_) { 
+    // generate convexification cuts before solving new node's LP
 
     int nchanged, *changed = NULL;
     OsiCuts cs;
 
+    // sparsify structure with info on changed bounds and get convexification cuts
     sparse2dense (nvars, chg_bds, changed, nchanged);
-
-    // add convexification cuts
     couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, chg_bds);  
 
-    //OsiCuts ccrcs;
-    int ncuts = cs.sizeRowCuts ();
-
-    const CbcCountRowCut **ccrc = new CbcCountRowCut * [ncuts];
-
-    // convert all cuts into CbcCountRowCuts (TODO: how to check we're
-    // using Cbc and not Bcp?)
-    for (int i=0; i<ncuts; i++) {
-      ccrc [i] = new CbcCountRowCut (cs.rowCut (i));
-      //ccrcs.insert (ccrc);
-      cs.eraseRowCut (i);
-    }
-
-    solver -> applyRowCuts (ncuts, ccrc);
-
-    for (int i=0; i<ncuts; i++)
-      delete ccrc [i];
-
-    delete [] ccrc;
-    //solver -> applyCuts (cs);
+    solver -> applyCuts (cs);
   }
-#endif
 
   delete [] chg_bds;
 

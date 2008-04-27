@@ -46,8 +46,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   else if (s == "uniform-grid")       convtype_ = UNIFORM_GRID;
   else                                convtype_ = AROUND_CURPOINT;
 
-  base -> options() -> GetStringValue("violated_cuts_only", s, "couenne."); 
-  addviolated_ = (s=="yes");
+  base -> options () -> GetStringValue ("violated_cuts_only", s, "couenne."); 
+  addviolated_ = (s == "yes");
 
   problem_ = new CouenneProblem (asl, base, jnlst_);
 }
@@ -55,7 +55,7 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 
 /// destructor
 CouenneCutGenerator::~CouenneCutGenerator ()
-  {if (problem_) delete problem_;}
+{if (problem_) delete problem_;}
 
 
 /// copy constructor

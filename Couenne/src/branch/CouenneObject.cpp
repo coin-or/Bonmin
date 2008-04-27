@@ -10,17 +10,9 @@
 
 #include "CoinHelperFunctions.hpp"
 
-#include "CouenneSolverInterface.hpp"
 #include "CouenneProblem.hpp"
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
-#include "CouenneThreeWayBranchObj.hpp"
-
-#include "exprGroup.hpp"
-#include "exprQuad.hpp"
-#include "lqelems.hpp"
-
-//#define DEBUG
 
 const CouNumber default_alpha = 0.2;
 const CouNumber default_clamp = 0.2;
@@ -28,19 +20,29 @@ const CouNumber default_clamp = 0.2;
 
 /// Empty constructor
 CouenneObject::CouenneObject ():
-  reference_      (NULL),
-  strategy_       (MID_INTERVAL),
-  jnlst_          (NULL),
-  alpha_          (default_alpha),
-  lp_clamp_       (default_clamp),
-  feas_tolerance_ (feas_tolerance_default),
-  doFBBT_         (true),
-  doConvCuts_     (true) {}
+
+  OsiObject (),
+  problem_         (NULL),
+  reference_       (NULL),
+  strategy_        (MID_INTERVAL),
+  jnlst_           (NULL),
+  alpha_           (default_alpha),
+  lp_clamp_        (default_clamp),
+  feas_tolerance_  (feas_tolerance_default),
+  doFBBT_          (true),
+  doConvCuts_      (true),
+  downEstimate_    (0.),
+  upEstimate_      (0.),
+  pseudoMultType_  (INFEASIBILITY) {}
 
 
 /// Constructor with information for branching point selection strategy
-CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
+CouenneObject::CouenneObject (CouenneProblem *p, 
+			      exprVar *ref, 
+			      Bonmin::BabSetupBase *base, 
 			      JnlstPtr jnlst):
+  OsiObject (),
+  problem_        (p),  
   reference_      (ref),
   strategy_       (MID_INTERVAL),
   jnlst_          (jnlst),
@@ -48,97 +50,23 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
   lp_clamp_       (default_clamp),
   feas_tolerance_ (feas_tolerance_default),
   doFBBT_         (true),
-  doConvCuts_     (true) {
+  doConvCuts_     (true),
+  downEstimate_   (0.),
+  upEstimate_     (0.),
+  pseudoMultType_ (INFEASIBILITY) {
 
-  //  assert (ref -> Type () == AUX);
+  // read options
+  setParameters (base);
 
-  if (base) {
+  // debug output ////////////////////////////////////////////
 
-    std::string s;
+  if (reference_ &&
+      (reference_ -> Type () == AUX) && 
+      jnlst_ -> ProduceOutput (J_SUMMARY, J_BRANCHING)) {
 
-    base -> options() -> GetStringValue ("branch_fbbt",      s, "couenne."); doFBBT_     = (s=="yes");
-    base -> options() -> GetStringValue ("branch_conv_cuts", s, "couenne."); doConvCuts_ = (s=="yes");
-
-    base -> options() -> GetNumericValue ("feas_tolerance", feas_tolerance_, "couenne.");
-
-    std::string brtype;
-    base -> options () -> GetStringValue ("branch_pt_select", brtype, "couenne.");
-
-    if      (brtype == "balanced")    strategy_ = BALANCED;
-    else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
-    else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
-    else if (brtype == "min-area")    strategy_ = MIN_AREA;
-    else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
-    else if (brtype == "mid-point") {
-      strategy_ = MID_INTERVAL;
-      base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
-    }
-
-    // accept options for branching rules specific to each operator
-
-    std::string br_operator = "";
-
-    if (ref && (ref -> Image ())) {
-
-      switch (ref -> Image () -> code ()) {
-
-      case COU_EXPRPOW: {
-
-	// begin with default value in case specific exponent are not given
-	base -> options () -> GetStringValue ("branch_pt_select_pow", brtype, "couenne.");
-
-	CouNumber expon = ref -> Image () -> ArgList () [1] -> Value ();
-
-	if      (fabs (expon - 2.) < COUENNE_EPS) br_operator = "sqr";
-	else if (fabs (expon - 3.) < COUENNE_EPS) br_operator = "cube";
-	else if (expon             < 0.)          br_operator = "negpow";
-	else                                      br_operator = "pow";
-      } break;
-
-      case COU_EXPRMUL: 
-	br_operator = (ref -> Image () -> ArgList () [0] -> Index () !=
-		       ref -> Image () -> ArgList () [1] -> Index ()) ?
-	  "prod" : "sqr";
-	break;
-      case COU_EXPRINV: br_operator = "negpow"; break;
-      case COU_EXPRDIV: br_operator = "div"; break;
-      case COU_EXPRLOG: br_operator = "log"; break;
-      case COU_EXPREXP: br_operator = "exp"; break;
-      case COU_EXPRSIN:
-      case COU_EXPRCOS: br_operator = "trig"; break;
-      default:;
-      }
-
-      if (br_operator != "") {
-	// read option
-	char select [40], sel_clamp [40];
-	sprintf (select,    "branch_pt_select_%s", br_operator.c_str ());
-	sprintf (sel_clamp, "branch_lp_clamp_%s",  br_operator.c_str ());
-	base -> options () -> GetStringValue (select, brtype, "couenne.");
-	base -> options () -> GetNumericValue (sel_clamp, lp_clamp_, "couenne.");
-
-	if      (brtype == "balanced")    strategy_ = BALANCED;
-	else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
-	else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
-	else if (brtype == "min-area")    strategy_ = MIN_AREA;
-	else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
-	else if (brtype == "mid-point") {
-	  strategy_ = MID_INTERVAL;
-	  base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
-	}
-      }
-    }
-  }
-
-  if (reference_ && jnlst_ -> ProduceOutput (J_SUMMARY, J_BRANCHING)) {
-
-    printf ("created Expression Object: "); 
-    reference_ -> print (); 
-
-    if (reference_ -> Image ()) {
-      printf (" := "); 
-      reference_ -> Image () -> print ();
-    }
+    printf ("created Expression Object: "); reference_ -> print (); 
+    printf (" := "); 
+    reference_ -> Image () -> print ();
 
     printf (" with %s strategy [clamp=%g, alpha=%g]\n", 
 	    (strategy_ == LP_CLAMPED)   ? "lp-clamped" : 
@@ -153,43 +81,66 @@ CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base,
 }
 
 
+/// Constructor with lesser information, used for infeasibility only
+CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst):
+
+  OsiObject (),
+  problem_        (NULL),  
+  reference_      (ref),
+  strategy_       (MID_INTERVAL),
+  jnlst_          (jnlst),
+  alpha_          (default_alpha),
+  lp_clamp_       (default_clamp),
+  feas_tolerance_ (feas_tolerance_default),
+  doFBBT_         (true),
+  doConvCuts_     (true),
+  downEstimate_   (0.),
+  upEstimate_     (0.),
+  pseudoMultType_ (INFEASIBILITY) {
+
+  // read options
+  setParameters (base);
+}
+
+
 /// Copy constructor
 CouenneObject::CouenneObject (const CouenneObject &src):
-  reference_  (src.reference_),
-  strategy_   (src.strategy_),
-  jnlst_      (src.jnlst_),
-  alpha_      (src.alpha_),
-  lp_clamp_   (src.lp_clamp_),
+  OsiObject       (src),
+  problem_        (src.problem_),
+  reference_      (src.reference_),
+  strategy_       (src.strategy_),
+  jnlst_          (src.jnlst_),
+  alpha_          (src.alpha_),
+  lp_clamp_       (src.lp_clamp_),
   feas_tolerance_ (src.feas_tolerance_),
-  doFBBT_     (src.doFBBT_),
-  doConvCuts_ (src.doConvCuts_) {}
+  doFBBT_         (src.doFBBT_),
+  doConvCuts_     (src.doConvCuts_),
+  downEstimate_   (src.downEstimate_),
+  upEstimate_     (src.upEstimate_),
+  pseudoMultType_ (src.pseudoMultType_) {}
 
 
 /// apply the branching rule
-OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si, 
+OsiBranchingObject *CouenneObject::createBranch (OsiSolverInterface *si, 
 						 const OsiBranchingInformation *info, 
 						 int way) const {
 
-  // a nonlinear constraint w = f(x) is violated. The infeasibility is
-  // given by something more elaborate than |w-f(x)|, that is, it is
-  // the minimum, among the two branching nodes, of the distance from
-  // the current optimum (w,x) and the optimum obtained after
-  // convexifying the two subproblems. We call selectBranch for the
-  // purpose, and save the output parameter into the branching point
-  // that should be used later in createBranch.
+  // a nonlinear constraint w = f(x) is violated. The infeasibility
+  // should be given by something more elaborate than |w-f(x)|, that
+  // is, it is the minimum, among the two branching nodes, of the
+  // distance from the current optimum (w,x) and the optimum obtained
+  // after convexifying the two subproblems. We call selectBranch for
+  // the purpose, and save the output parameter into the branching
+  // point that should be used later in createBranch.
 
-  //throw -1;
-  
-#ifdef DEBUG
-  printf ("CouObj::createBranch on ");
-  reference_ -> print ();
-  printf ("\n");
-#endif
+  if (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING)) {
+    printf ("CouObj::createBranch on ");
+    reference_ -> print (); printf ("\n");
+  }
 
-  CouenneProblem *p = dynamic_cast <CouenneSolverInterface *> (si) -> CutGen () -> Problem ();
-
-  p -> domain () -> push 
-    (p -> nVars (),
+  // copy current point into Couenne
+  problem_ -> domain () -> push 
+    (problem_ -> nVars (),
      info -> solution_,
      info -> lower_,
      info -> upper_);
@@ -201,127 +152,63 @@ OsiBranchingObject* CouenneObject::createBranch (OsiSolverInterface *si,
   expression *brVar = NULL; // branching variable
   int whichWay = 0;
 
-
-
-#ifdef DEBUG
   CouNumber improv =  // not used out of debug
-#endif
-
     reference_ -> Image () -> 
     selectBranch (this, info,                      // input parameters
 		  brVar, brPts, brDist, whichWay); // result: who, where, distance, and direction
 
-  assert (brVar);
+  assert (brVar); // MUST have a branching variable
 
-#ifdef DEBUG
-  printf ("brpts for "); reference_ -> print (); printf (" := ");
-  reference_ -> Image () -> print (); printf (" is on "); brVar -> print ();
-  printf (" @ %.12g [%.12g,%.12g]\n", *brPts, 
-	  p -> Lb (brVar -> Index ()), 
-	  p -> Ub (brVar -> Index ()));
-#endif
-
-  // whichWay is IGNORED
-
-#ifdef DEBUG
-  if (brVar) {
-
-    if (improv <= COUENNE_EPS) {
-      printf ("### warning, infeas = %g for ", improv);
-      reference_ -> print (); printf (":=");
-      reference_ -> Image () -> print (); printf ("\n");
-    }
-
+  /*  if        (pseudoMultType_ == INTERVAL) {
     int index = brVar -> Index ();
-    if (info -> lower_ [index] >= 
-	info -> upper_ [index] - COUENNE_EPS) {
-      printf ("### warning, tiny bounding box [%g,%g] for x_%d\n", 
-	      info -> lower_ [index],
-	      info -> upper_ [index], index);
+    downEstimate_ = *brPts - info -> lower_ [index];
+    upEstimate_   =          info -> upper_ [index] - *brPts;
+  } else if (pseudoMultType_ == REV_INTERVAL) {
+    int index = brVar -> Index ();
+    downEstimate_ = *brPts - info -> upper_ [index];          // notice upper&lower inverted
+    upEstimate_   =          info -> lower_ [index] - *brPts;
+  } else 
+  */
+
+  if (pseudoMultType_ == PROJECTDIST) {
+    downEstimate_ = brDist [0];
+    upEstimate_   = brDist [1];
+  } else setEstimates (info, NULL, brPts);
+
+  /// Debug output 
+  if (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING)) {
+    printf ("brpts for "); reference_ -> print (); printf (" := ");
+    reference_ -> Image () -> print (); printf (" is on "); brVar -> print ();
+    printf (" @ %.12g [%.12g,%.12g]\n", *brPts, 
+	    problem_ -> Lb (brVar -> Index ()), 
+	    problem_ -> Ub (brVar -> Index ()));
+
+    if (brVar) {
+
+      if (improv <= COUENNE_EPS) {
+	printf ("### warning, infeas = %g for ", improv);
+	reference_ -> print (); printf (":=");
+	reference_ -> Image () -> print (); printf ("\n");
+      }
+
+      int index = brVar -> Index ();
+      if (info -> lower_ [index] >= 
+	  info -> upper_ [index] - COUENNE_EPS) {
+	printf ("### warning, tiny bounding box [%g,%g] for x_%d\n", 
+		info -> lower_ [index],
+		info -> upper_ [index], index);
+      }
     }
   }
-#endif
 
-  // This should make getFixVar() useless if used in exprMul or
-  // exprDiv, i.e., the only non-unary operators.
+  // create branching object /////////////////////////////////////// 
+  OsiBranchingObject *brObj = new CouenneBranchingObject 
+    (si, this, jnlst_, brVar, way, *brPts, doFBBT_, doConvCuts_);
 
-  OsiBranchingObject *brObj = NULL;
+  problem_ -> domain () -> pop (); // Couenne discards current point
 
-  //  if (brVar) // if applied latest selectBranching
-
-    brObj = new CouenneBranchingObject (jnlst_, brVar, 
-					way ? TWO_RIGHT : TWO_LEFT, 
-					*brPts, 
-					doFBBT_, doConvCuts_);
-    /*
-  else {     // apply default branching rule
-
-    if (jnlst_->ProduceOutput(J_DETAILED, J_BRANCHING)) {
-      // we should pipe all output through journalist
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "failsafe branch: ");
-      reference_ -> print (std::cout);                              printf (" = ");
-      reference_ -> Image () -> print (std::cout); fflush (stdout); printf (" --> branch on ");
-      reference_ -> Image () -> getFixVar () -> print (std::cout);  printf ("\n");
-    }
-
-    // change the value of delta to reflect the branching operations
-    // that will take place. This implies repeatedly faking generation
-    // of convexification cuts for different branching points until we
-    // have a good branching point. 
-    //
-    // The infeasibility returned is the minimum of the distances from
-    // the current point to the two new convexifications, which is the
-    // function that we want to maximize.
-
-    expression *depvar = reference_ -> Image () -> getFixVar ();
-
-    // Create a two-way branching object according to finiteness of the
-    // intervals. For now only check if argument bounds are finite.
-
-    int ref_ind = reference_ -> Index ();
-
-    CouNumber 
-      xr = info -> solution_ [ref_ind],
-      lr = info -> lower_    [ref_ind],
-      ur = info -> upper_    [ref_ind];
-
-    int index = depvar ? (depvar -> Index ()) : -1;
-
-    if (index >= 0) {
-
-      CouNumber 
-	x  = info -> solution_ [index],
-	l  = info -> lower_    [index],
-	u  = info -> upper_    [index];
-
-// 	if (((x-l > COUENNE_LARGE_INTERVAL) &&
-// 	(u-x > COUENNE_LARGE_INTERVAL)) 
-// 	|| 
-// 	(((x-l > COUENNE_LARGE_INTERVAL) ||
-// 	(u-x > COUENNE_LARGE_INTERVAL)) && 
-// 	((x-l < COUENNE_NEAR_BOUND) ||
-// 	(u-x < COUENNE_NEAR_BOUND))))
-// 	return new CouenneThreeWayBranchObj (depvar, x, l, u);
-
-
-      if (((fabs (x-l) > COUENNE_EPS) &&
-	   (fabs (u-x) > COUENNE_EPS) &&
-	   (fabs (u-l) > COUENNE_EPS))
-	  || (fabs (xr-lr) < COUENNE_EPS)
-	  || (fabs (ur-xr) < COUENNE_EPS)
-	  || (fabs (ur-lr) < COUENNE_EPS))
-	brObj = new CouenneBranchingObject (jnlst_, depvar, way ? TWO_RIGHT : TWO_LEFT, x,
-					    doFBBT_, doConvCuts_);  
-    } else
-      brObj = new CouenneBranchingObject (jnlst_, reference_, way ? TWO_RIGHT : TWO_LEFT, xr, 
-					doFBBT_, doConvCuts_);
-  }
-    */
-
-  p -> domain () -> pop ();
-
-  if (brPts)
-    free (brPts);
+  if (brPts)  free (brPts);
+  if (brDist) free (brDist);
 
   return brObj;
 }
@@ -361,40 +248,189 @@ CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, 
       (-u/l >= THRES_ZERO_SYMM))
     return 0.;
 
+  CouNumber width = lp_clamp_ * (u-l);
+
   switch (strategy_) {
 
   case CouenneObject::MIN_AREA:     return maxHeight   (ft, l, u);
   case CouenneObject::BALANCED:     return minMaxDelta (ft, l, u);
-  case CouenneObject::LP_CLAMPED: {
-    CouNumber width = lp_clamp_ * (u-l);
-    return CoinMax (l + width, CoinMin (x0, u - width));
-  }
-  case CouenneObject::LP_CENTRAL: {
-      CouNumber width = lp_clamp_ * (u-l);
-      return ((x0 < l + width) || (x0 > u - width)) ? (l+u)/2 : x0;
-  }
-  case CouenneObject::MID_INTERVAL: 
-  default:                          return midInterval (x0, l, u);
+  case CouenneObject::LP_CLAMPED:   return CoinMax (l + width, CoinMin (x0, u - width));
+  case CouenneObject::LP_CENTRAL:   return ((x0 < l + width) || (x0 > u - width)) ? (l+u)/2 : x0;
+  case CouenneObject::MID_INTERVAL: return midInterval (x0, l, u);
+  default:                          assert (false); break;
   }
 }
 
 
 /// non-linear infeasibility
-double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &way) const {  
+double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &way) const {
 
-  if (strategy_ == NO_BRANCH) return 0.;
+  if (strategy_ == NO_BRANCH) 
+    return (upEstimate_ = downEstimate_ = 0.);
 
-  CouNumber delta = 
-    fabs (info -> solution_ [reference_ -> Index ()] - 
-	  (*(reference_ -> Image ())) ());
+  double
+    delta  = fabs (info -> solution_ [reference_ -> Index ()] - (*(reference_->Image ())) ()),
+    retval = (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta;
 
-  if ((delta > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
-      (jnlst_->ProduceOutput(J_MOREMATRIX, J_BRANCHING))) {
+  if ((retval > 0.) &&
+      (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING))) {
 
-    printf ("  infeas %g: ", (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta); 
+    printf ("  infeas %g: ", retval); 
     reference_             -> print (); printf (" := ");
     reference_ -> Image () -> print (); printf ("\n");
   }
 
-  return (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta;
+  if (pseudoMultType_ == INFEASIBILITY)
+    upEstimate_ = downEstimate_ = retval;
+
+  setEstimates (info, &retval, NULL);
+
+  return retval;
+}
+
+
+/// set parameters by reading command line or parameter file
+void CouenneObject::setParameters (Bonmin::BabSetupBase *base) {
+
+  if (!base) return;
+
+  std::string s;
+
+  base -> options () -> GetStringValue ("pseudocost_mult", s, "couenne.");
+
+  if      (s == "interval_lp")     pseudoMultType_ = INTERVAL_LP;
+  else if (s == "interval_lp_rev") pseudoMultType_ = INTERVAL_LP_REV;
+  else if (s == "interval_br")     pseudoMultType_ = INTERVAL_BR;
+  else if (s == "interval_br_rev") pseudoMultType_ = INTERVAL_BR_REV;
+  else if (s == "infeasibility")   pseudoMultType_ = INFEASIBILITY;
+  else if (s == "projectDist")     pseudoMultType_ = PROJECTDIST;
+
+  base -> options() -> GetStringValue ("branch_fbbt",      s, "couenne."); doFBBT_     = (s=="yes");
+  base -> options() -> GetStringValue ("branch_conv_cuts", s, "couenne."); doConvCuts_ = (s=="yes");
+
+  base -> options() -> GetNumericValue ("feas_tolerance", feas_tolerance_, "couenne.");
+
+  std::string brtype;
+  base -> options () -> GetStringValue ("branch_pt_select", brtype, "couenne.");
+
+  if      (brtype == "balanced")    strategy_ = BALANCED;
+  else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
+  else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
+  else if (brtype == "min-area")    strategy_ = MIN_AREA;
+  else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
+  else if (brtype == "mid-point") {
+    strategy_ = MID_INTERVAL;
+    base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
+  }
+
+  // accept options for branching rules specific to each operator
+  if (reference_ && reference_ -> Type () == AUX) {
+
+    std::string br_operator = "";
+
+    switch (reference_ -> Image () -> code ()) {
+
+    case COU_EXPRPOW: {
+
+      // begin with default value in case specific exponent are not given
+      base -> options () -> GetStringValue ("branch_pt_select_pow", brtype, "couenne.");
+
+      CouNumber expon = reference_ -> Image () -> ArgList () [1] -> Value ();
+
+      if      (fabs (expon - 2.) < COUENNE_EPS) br_operator = "sqr";
+      else if (fabs (expon - 3.) < COUENNE_EPS) br_operator = "cube";
+      else if (expon             < 0.)          br_operator = "negpow";
+      else                                      br_operator = "pow";
+    } break;
+
+    case COU_EXPRMUL: 
+      br_operator = (reference_ -> Image () -> ArgList () [0] -> Index () !=
+		     reference_ -> Image () -> ArgList () [1] -> Index ()) ?
+	"prod" : "sqr";
+      break;
+    case COU_EXPRINV: br_operator = "negpow"; break;
+    case COU_EXPRDIV: br_operator = "div"; break;
+    case COU_EXPRLOG: br_operator = "log"; break;
+    case COU_EXPREXP: br_operator = "exp"; break;
+    case COU_EXPRSIN:
+    case COU_EXPRCOS: br_operator = "trig"; break;
+    default: break;
+    }
+
+    if (br_operator != "") {
+      // read option
+      char select [40], sel_clamp [40];
+      sprintf (select,    "branch_pt_select_%s", br_operator.c_str ());
+      sprintf (sel_clamp, "branch_lp_clamp_%s",  br_operator.c_str ());
+      base -> options () -> GetStringValue (select, brtype, "couenne.");
+      base -> options () -> GetNumericValue (sel_clamp, lp_clamp_, "couenne.");
+
+      if      (brtype == "balanced")    strategy_ = BALANCED;
+      else if (brtype == "lp-clamped")  strategy_ = LP_CLAMPED;
+      else if (brtype == "lp-central")  strategy_ = LP_CENTRAL;
+      else if (brtype == "min-area")    strategy_ = MIN_AREA;
+      else if (brtype == "no-branch")   strategy_ = NO_BRANCH;
+      else if (brtype == "mid-point") {
+	strategy_ = MID_INTERVAL;
+	base -> options () -> GetNumericValue ("branch_midpoint_alpha", alpha_, "couenne.");
+      }
+    }
+  }
+}
+
+
+/// set up/down estimates based on branching information
+void CouenneObject::setEstimates (const OsiBranchingInformation *info,
+				  CouNumber *infeasibility,
+				  CouNumber *brpoint) const {
+
+  int index = reference_ -> Index ();
+
+  CouNumber 
+    *up   = &upEstimate_,
+    *down = &downEstimate_,
+     point;
+
+  ////////////////////////////////////////////////////////////
+  if ((pseudoMultType_ == INTERVAL_LP_REV) ||
+      (pseudoMultType_ == INTERVAL_BR_REV)) {
+
+    up   = &downEstimate_;
+    down = &upEstimate_;
+  }
+
+  ///////////////////////////////////////////////////////////
+  if (info &&
+      ((pseudoMultType_ == INTERVAL_LP) ||
+       (pseudoMultType_ == INTERVAL_LP_REV)))
+
+    point = info -> solution_ [index];
+
+  else if (((pseudoMultType_ == INTERVAL_BR) ||
+	    (pseudoMultType_ == INTERVAL_BR_REV)) &&
+	   brpoint)
+    
+    point = *brpoint;
+
+  ///////////////////////////////////////////////////////////
+  switch (pseudoMultType_) {
+
+  case INFEASIBILITY: 
+    if (infeasibility) 
+      upEstimate_ = downEstimate_ = *infeasibility;
+    break;
+
+  case INTERVAL_LP:
+  case INTERVAL_LP_REV:
+  case INTERVAL_BR:
+  case INTERVAL_BR_REV:
+    *up   =         info -> upper_ [index] - point;
+    *down = point - info -> lower_ [index];
+    break;
+
+  case PROJECTDIST:
+    break;
+
+  default: assert (false);
+  }
 }

@@ -19,11 +19,12 @@ class CouenneVTObject: public CouenneVarObject {
 public:
 
   /// Constructor with information for branching point selection strategy
-  CouenneVTObject (exprVar *ref, 
-		   CouenneProblem *p,
+  CouenneVTObject (CouenneProblem *p,
+		   exprVar *ref, 
 		   Bonmin::BabSetupBase *base, 
 		   JnlstPtr jnlst):
-    CouenneVarObject (ref, p, base, jnlst) {}
+
+    CouenneVarObject (p, ref, base, jnlst) {}
 
   /// Copy constructor
   CouenneVTObject (const CouenneVTObject &src):
@@ -33,7 +34,7 @@ public:
   ~CouenneVTObject () {}
 
   /// Cloning method
-  virtual OsiObject * clone () const
+  virtual OsiObject *clone () const
   {return new CouenneVTObject (*this);}
 
   /// compute infeasibility of this variable x as the sum/min/max of

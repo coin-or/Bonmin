@@ -105,6 +105,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   t_chg_bounds *chg_bds = new t_chg_bounds [ncols];
 
+  problem_ -> installCutOff (); // install upper bound
+
   if (firstcall_) {
 
     // First convexification //////////////////////////////////////

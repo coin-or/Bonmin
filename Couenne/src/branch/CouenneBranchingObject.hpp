@@ -4,7 +4,7 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for auxiliary variables
  *
- * (C) Carnegie-Mellon University, 2006-07. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -12,9 +12,9 @@
 #define COUENNEBRANCHINGOBJECT_HPP
 
 #include "CoinFinite.hpp"
-#include "OsiBranchingObject.hpp"
 #include "exprAux.hpp"
 #include "CouenneJournalist.hpp"
+#include "OsiBranchingObject.hpp"
 
 #define COUENNE_CROP 1
 #define COUENNE_LCROP (1e2*COUENNE_CROP)
@@ -27,6 +27,7 @@
 #define BR_TEST_LOG -1
 #define BR_TEST_GRAPH 0
 
+
 /** "Spatial" branching object. 
  *
  *  Branching can also be performed on continuous variables.
@@ -37,22 +38,28 @@ class CouenneBranchingObject: public OsiTwoWayBranchingObject {
 public:
 
   /// Constructor
-  CouenneBranchingObject (JnlstPtr jnlst, expression *, int, 
+  CouenneBranchingObject (OsiSolverInterface *solver,
+			  const OsiObject *originalObject,
+			  JnlstPtr jnlst, 
+			  expression *, 
+			  int, 
 			  CouNumber, 
 			  bool, bool);
 
   /// Copy constructor
   CouenneBranchingObject (const CouenneBranchingObject &src):
+
     OsiTwoWayBranchingObject (src),
     variable_     (src.variable_),
     jnlst_        (src.jnlst_),
     doFBBT_       (src.doFBBT_),
     doConvCuts_   (src.doConvCuts_),
     downEstimate_ (src.downEstimate_),
-    upEstimate_   (src.upEstimate_) {}
+    upEstimate_   (src.upEstimate_),
+    simulate_     (src.simulate_) {}
 
 
-  /// Cloning method
+  /// cloning method
   virtual OsiBranchingObject * clone () const
   {return new CouenneBranchingObject (*this);}
 
@@ -66,6 +73,10 @@ public:
   /// does this branching object only change variable bounds?
   virtual bool boundBranch () const
   {return !doConvCuts_;} // no, if it adds convexification cuts
+
+  /// set simulate_ field below
+  void setSimulate (bool s)
+  {simulate_ = s;}
 
 protected:
 
@@ -87,8 +98,11 @@ protected:
   /// down branch estimate (done at selectBranch with reduced costs)
   double downEstimate_;
 
-  /// up   branch estimate
+  /// up branch estimate
   double upEstimate_;
+
+  /// are we currently in strong branching?
+  bool simulate_;
 };
 
 #endif

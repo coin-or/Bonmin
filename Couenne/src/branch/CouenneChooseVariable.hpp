@@ -4,7 +4,7 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Branching object for choosing branching auxiliary variable
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -12,10 +12,10 @@
 #define COUENNECHOOSEVARIABLE_HPP
 
 #include "OsiChooseVariable.hpp"
-#include "CouenneProblem.hpp"
+#include "BonBabInfos.hpp"
+#include "CouenneJournalist.hpp"
 
-// Forward declaration
-class CbcModel;
+class CouenneProblem;
 
 /** \brief Choose a variable for branching
  */
@@ -28,7 +28,7 @@ public:
   CouenneChooseVariable ();
 
   /// Constructor from solver (so we can set up arrays etc)
-  CouenneChooseVariable (const OsiSolverInterface *, CouenneProblem *);
+  CouenneChooseVariable (const OsiSolverInterface *, CouenneProblem *, JnlstPtr jnlst);
 
   /// Copy constructor 
   CouenneChooseVariable (const CouenneChooseVariable &);
@@ -44,33 +44,8 @@ public:
 
   /** Sets up strong list and clears all if initialize is true.
       Returns number of infeasibilities. 
-      If returns -1 then has worked out node is infeasible!
-  */
-
+      If returns -1 then has worked out node is infeasible! */
   virtual int setupList (OsiBranchingInformation *, bool);
-
-  /** Choose a variable
-      Returns:
-     -1 Node is infeasible
-     0  Normal termination - we have a candidate
-     1  All looks satisfied - no candidate
-     2  We can change the bound on a variable - but we also have a strong branching candidate
-     3  We can change the bound on a variable - but we have a non-strong branching candidate
-     4  We can change the bound on a variable - no other candidates
-     We can pick up branch from bestObjectIndex() and bestWhichWay()
-     We can pick up a forced branch (can change bound) from firstForcedObjectIndex() 
-     and firstForcedWhichWay()
-     If we have a solution then we can pick up from goodObjectiveValue() and goodSolution()
-     If fixVariables is true then 2,3,4 are all really same as problem changed
-  */
-
-  virtual int chooseVariable (OsiSolverInterface *, 
-			      OsiBranchingInformation *, 
-			      bool);
-
-  /// Return pointer to associated MINLP problem
-  CouenneProblem *Problem () const 
-  {return problem_;}
 
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
@@ -79,6 +54,9 @@ protected:
 
   /// Pointer to the associated MINLP problem
   CouenneProblem *problem_;
+
+  /// journalist for detailed debug information
+  JnlstPtr jnlst_;
 };
 
 #endif

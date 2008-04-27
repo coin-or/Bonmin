@@ -17,7 +17,6 @@
 #include "BonAuxInfos.hpp"
 #include "BonBabInfos.hpp"
 #include "OsiSolverInterface.hpp"
-#include "BonCbc.hpp"
 
 #include "CouenneTypes.hpp"
 #include "CouenneJournalist.hpp"

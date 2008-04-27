@@ -7,28 +7,21 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CouenneChooseStrong.hpp"
 #include "CoinTime.hpp"
+#include "CouenneChooseStrong.hpp"
 #include "CouenneProblem.hpp"
-
-//#define DEBUG
+#include "CouenneBranchingObject.hpp"
 
 namespace Bonmin {
 
   /// constructor
-  CouenneChooseStrong::CouenneChooseStrong (BabSetupBase &b, CouenneProblem* p) :
+  CouenneChooseStrong::CouenneChooseStrong (BabSetupBase &b, CouenneProblem* p, JnlstPtr jnlst) :
 
     BonChooseVariable (b, b.continuousSolver()),
-    problem_(p) {
+    problem_          (p),
+    jnlst_            (jnlst) {
 
     std::string s;
-
-    b.options () -> GetStringValue ("pseudocost_mult", s, "couenne.");
-
-    if      (s == "interval")      pseudoMultType_ = interval;
-    else if (s == "infeasibility") pseudoMultType_ = infeasibility;
-    else if (s == "projectDist")   pseudoMultType_ = projectDist;
-
     b.options () -> GetStringValue ("pseudocost_mult_lp", s, "couenne.");
     pseudoUpdateLP_ = (s == "yes");      
   }
@@ -37,8 +30,8 @@ namespace Bonmin {
   CouenneChooseStrong::CouenneChooseStrong (const CouenneChooseStrong& rhs) :
     BonChooseVariable (rhs),
     problem_          (rhs.problem_),
-    pseudoMultType_   (rhs.pseudoMultType_),
-    pseudoUpdateLP_   (rhs.pseudoUpdateLP_)
+    pseudoUpdateLP_   (rhs.pseudoUpdateLP_),
+    jnlst_            (rhs.jnlst_)
   {}
 
   /// destructor
@@ -63,83 +56,129 @@ namespace Bonmin {
     return *this;
   }
 
-  /// Perform strong branching //////////////////////////////////////////////////////////////
-  int
-  CouenneChooseStrong::doStrongBranching( OsiSolverInterface * solver, 
-					  OsiBranchingInformation *info,
-					  int numberToDo, int returnCriterion)
+  /// compute Euclidean distance between two points (most likely LP solutions)
+  /// l_2 norm by default, but can change it by fourth parameter
+  double distance (const double *p1, const double *p2, register int size, double k=2.) {
+
+    register double 
+      result = 0,
+      element;
+
+    while (size--) {
+      element = *p1++ - *p2++;
+      result += pow (element, k);
+    }
+
+    return pow (element, 1./k);
+  }
+
+  /**  This is a utility function which does strong branching on
+       a list of objects and stores the results in OsiHotInfo.objects.
+       On entry the object sequence is stored in the OsiHotInfo object
+       and maybe more.
+       It returns -
+
+      -1 - one branch was infeasible both ways
+       0 - all inspected - nothing can be fixed
+       1 - all inspected - some can be fixed (returnCriterion==0)
+       2 - may be returning early - one can be fixed (last one done) (returnCriterion==1) 
+       3 - returning because max time
+  */
+  int CouenneChooseStrong::doStrongBranching (OsiSolverInterface * solver, 
+					      OsiBranchingInformation *info,
+					      int numberToDo, int returnCriterion)
   {
 
-    // update problem with point/bounds contained in info
-    problem_ -> domain () -> push 
+    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "\n-\n------- CCS: trying %d objects:\n", numberToDo);
+
+    int numberColumns = solver -> getNumCols ();
+
+    solver -> markHotStart (); // save current LP point
+
+    const double
+      *lower = info -> lower_,
+      *upper = info -> upper_;
+
+    double 
+      *saveLower = CoinCopyOfArray (info -> lower_, numberColumns),
+      *saveUpper = CoinCopyOfArray (info -> upper_, numberColumns),
+      *Lower0    = CoinCopyOfArray (info -> lower_, numberColumns), // delete afterwards
+      *Upper0    = CoinCopyOfArray (info -> upper_, numberColumns),
+      *oldLower  = new double [numberColumns],
+      *oldUpper  = new double [numberColumns],
+      *lpSol     = NULL, 
+       timeStart = CoinCpuTime ();
+
+    // LP solution for distance
+    if (pseudoUpdateLP_) 
+      lpSol = CoinCopyOfArray (info -> solution_, numberColumns);
+
+    // provide Couenne problem with point/bounds contained in info
+    problem_ -> domain () -> push
       (problem_ -> nVars (),
-       info -> solution_, 
-       info -> lower_, 
+       info -> solution_,
+       info -> lower_,
        info -> upper_);
 
-    // Might be faster to extend branch() to return bounds changed
-    double * saveLower = NULL;
-    double * saveUpper = NULL;
-    int numberColumns = solver->getNumCols();
-    solver->markHotStart();
-    const double * lower = info->lower_;
-    const double * upper = info->upper_;
-    saveLower = CoinCopyOfArray(info->lower_,numberColumns);
-    saveUpper = CoinCopyOfArray(info->upper_,numberColumns);
-    int returnCode=0;
-    double timeStart = CoinCpuTime();
-    int iDo = 0;
+    int returnCode = 0, iDo = 0;
 
-#ifdef DEBUG
-    printf ("----------------------trying %d branching objects:\n", numberToDo);
-#endif
+    for (;iDo < numberToDo; iDo++) {
 
-    for (;iDo<numberToDo;iDo++) {
-      HotInfo * result = results_() + iDo;
+      HotInfo * result = results_ () + iDo; // retrieve i-th object to test
+
+      CouenneObject *CouObj = dynamic_cast <CouenneObject *>
+	(solver_ -> objects () [result -> whichObject ()]);
+
       // For now just 2 way
-      OsiBranchingObject * branch = result->branchingObject();
+      OsiBranchingObject * branch = result -> branchingObject ();
       assert (branch->numberBranches()==2);
 
-      /*
-        Try the first direction.  Each subsequent call to branch() performs the
-        specified branch and advances the branch object state to the next branch
-        alternative.)
-      */
+      CouenneBranchingObject *cb = dynamic_cast <CouenneBranchingObject *> (branch);
+      if (cb) cb -> setSimulate (true);
 
-      // TODO: The smallest bounding box that includes both new
-      // bounding boxes (resulting from BT) is a valid BT for the
-      // current node and should be used.
-
-      // DOWN DIRECTION ///////////////////////////////////////////////////////
+      /* Try the first direction.  Each subsequent call to branch()
+	 performs the specified branch and advances the branch object
+	 state to the next branch alternative.) */
 
       int 
 	status0 = -1, 
 	status1 = -1;
 
       OsiSolverInterface * thisSolver = solver; 
-      if (branch -> boundBranch ()) {
-        // ordinary
-        if (branch -> branch (solver) > COUENNE_INFINITY) {
-	  status0 = 1;
-	  result -> setDownStatus (1);
+
+      // DOWN DIRECTION ///////////////////////////////////////////////////////
+
+      if (branch -> boundBranch ()) { // a (variable) bound branch
+
+        if (branch -> branch (solver) > COUENNE_INFINITY) // branch is infeasible
+	  result -> setDownStatus (status0 = 1);
+
+	else { // branch is feasible, solve and compare
+
+	  solver -> solveFromHotStart ();
+
+	  if (pseudoUpdateLP_ && CouObj)
+	    CouObj -> setEstimate (distance (lpSol, solver -> getColSolution (), numberColumns), 0);
 	}
-        // maybe we should check bounds for stupidities here?
-        else solver->solveFromHotStart() ;
-      } else {
+
+      } else {                       // some more complex branch, have to clone solver
+
         // adding cuts or something 
-        thisSolver = solver->clone();
-        if (branch->branch(thisSolver) > COUENNE_INFINITY) {
-	  status0 = 1;
-	  result -> setDownStatus (1);
-	}
-	else {
-	  // set hot start iterations
+        thisSolver = solver -> clone ();
+        if (branch -> branch (thisSolver) > COUENNE_INFINITY)
+	  result -> setDownStatus (status0 = 1);
+
+	else { // set hot start iterations
 	  int limit;
-	  thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
-	  thisSolver->setIntParam(OsiMaxNumIteration,limit); 
-	  thisSolver->resolve();
+	  thisSolver -> getIntParam (OsiMaxNumIterationHotStart, limit);
+	  thisSolver -> setIntParam (OsiMaxNumIteration,         limit); 
+
+	  thisSolver -> resolve ();
+	  if (pseudoUpdateLP_ && CouObj)
+	    CouObj -> setEstimate (distance (lpSol, thisSolver->getColSolution (), numberColumns), 0);
 	}
       }
+
       // can check if we got solution
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
 
@@ -148,48 +187,60 @@ namespace Bonmin {
 	numberStrongIterations_ += thisSolver->getIterationCount();
       }
 
-      if (status0==3) {
+      if ((status0 == 3) && (trustStrongForSolution_)) {
         // new solution already saved
-        if (trustStrongForSolution_) {
-  	info->cutoff_ = goodObjectiveValue_;
-  	status0=0;
-        }
+  	info -> cutoff_ = goodObjectiveValue_;
+	problem_ -> setCutOff (goodObjectiveValue_);
+  	status0 = 0;
       }
-      if (solver!=thisSolver)
+
+      if (solver != thisSolver)
         delete thisSolver;
-      // Restore bounds
-      for (int j=0;j<numberColumns;j++) {
-        if (saveLower[j] != lower[j])
-	  solver->setColLower(j,saveLower[j]);
-        if (saveUpper[j] != upper[j])
-	  solver->setColUpper(j,saveUpper[j]);
+
+      // save current bounds as tightened by the down branch; will be
+      // used below to update global bounding box in solver
+      CoinCopyN (problem_ -> Lb (), numberColumns, oldLower);
+      CoinCopyN (problem_ -> Ub (), numberColumns, oldUpper);
+
+      // Restore pre-left-branch bounds in solver
+      for (int j=0; j<numberColumns; j++) {
+
+        if (saveLower [j] != lower [j]) solver -> setColLower (j, saveLower [j]);
+        if (saveUpper [j] != upper [j]) solver -> setColUpper (j, saveUpper [j]);
       }
 
       // UP DIRECTION ///////////////////////////////////////////////////////
 
       thisSolver = solver; 
-      if (branch->boundBranch()) {
-        // ordinary
-        if (branch->branch(solver) > COUENNE_INFINITY) {
-	  status1 = 1;
-	  result -> setUpStatus (1);
+
+      if (branch -> boundBranch ()) { // (variable) bound branch 
+
+        if (branch -> branch (solver) > COUENNE_INFINITY)
+	  result -> setUpStatus (status1 = 1);
+
+        else {
+	  solver -> solveFromHotStart ();
+	  if (pseudoUpdateLP_ && CouObj) 
+	    CouObj -> setEstimate (distance (lpSol, solver -> getColSolution (), numberColumns), 1);
 	}
-        else solver->solveFromHotStart();  // maybe we should check bounds for stupidities here?
-      } else {
+      } else {                     // some more complex branch, have to clone solver
         // adding cuts or something 
-        thisSolver = solver->clone();
-        if (branch->branch(thisSolver) > COUENNE_INFINITY) {
-	  status1 = 1;
-	  result -> setUpStatus (1);
-	}
+        thisSolver = solver -> clone ();
+        if (branch -> branch (thisSolver) > COUENNE_INFINITY)
+	  result -> setUpStatus (status1 = 1);
+
 	else {
-        // set hot start iterations
+	  // set hot start iterations
 	  int limit;
-	  thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
-	  thisSolver->setIntParam(OsiMaxNumIteration,limit); 
-	  thisSolver->resolve();
+	  thisSolver -> getIntParam (OsiMaxNumIterationHotStart, limit);
+	  thisSolver -> setIntParam (OsiMaxNumIteration,         limit); 
+
+	  thisSolver -> resolve();
+	  if (pseudoUpdateLP_ && CouObj) 
+	    CouObj -> setEstimate (distance (lpSol, thisSolver->getColSolution (), numberColumns), 1);
 	}
       }
+
       // can check if we got solution
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
 
@@ -198,37 +249,82 @@ namespace Bonmin {
 	numberStrongDone_++;
       }
 
-      //printf ("statuses = %d,%d\n", status0, status1);
-
       numberStrongIterations_ += thisSolver->getIterationCount();
-      if (status1==3) {
+
+      if ((status1==3) && (trustStrongForSolution_)) {
         // new solution already saved
-        if (trustStrongForSolution_) {
-  	info->cutoff_ = goodObjectiveValue_;
-  	status1=0;
-        }
+	info -> cutoff_ = goodObjectiveValue_;
+	problem_ -> setCutOff (goodObjectiveValue_);
+	status1 = 0;
       }
-      if (solver!=thisSolver)
+
+      if (cb) cb -> setSimulate (false);
+
+      /////////////////////////////////////////////////////////////////////////////
+
+      if (solver != thisSolver)
         delete thisSolver;
-      // Restore bounds
-      for (int j=0;j<numberColumns;j++) {
-        if (saveLower[j] != lower[j])
-	  solver->setColLower(j,saveLower[j]);
-        if (saveUpper[j] != upper[j])
-	  solver->setColUpper(j,saveUpper[j]);
+
+      bool tightened = false;
+
+      t_chg_bounds *chg_bds = new t_chg_bounds [numberColumns];
+
+      // extend problem_'s bounding box to include downbranch's tightened
+      for (int j=0; j<numberColumns; j++) {
+
+        if (oldLower [j] < problem_ -> Lb (j)) problem_ -> Lb (j) = oldLower [j];
+        if (oldUpper [j] > problem_ -> Ub (j)) problem_ -> Ub (j) = oldUpper [j];
+
+	if (problem_ -> Lb (j) > lower [j] + COUENNE_EPS) {
+	  chg_bds [j].setLower (t_chg_bounds::CHANGED);
+	  tightened = true;
+	}
+
+	if (problem_ -> Ub (j) < upper [j] - COUENNE_EPS) {
+	  chg_bds [j].setUpper (t_chg_bounds::CHANGED);
+	  tightened = true;
+	}
       }
+
+      if (tightened &&                     // have tighter bounds
+	  !(problem_ -> btCore (chg_bds))) // tighten again on root
+
+	status0 = status1 = 1;	           // if returns false, problem is infeasible
+
+      delete [] chg_bds;
+
+      // create union of bounding box from both branching directions
+      for (int j=0; j<numberColumns; j++) {
+
+        if (oldLower [j] < problem_ -> Lb (j)) problem_ -> Lb (j) = oldLower [j];
+        if (oldUpper [j] > problem_ -> Ub (j)) problem_ -> Ub (j) = oldUpper [j];
+      }
+
+      // set new bounding box as the possibly tightened one (a subset
+      // of the initial)
+      for (int j=0; j<numberColumns; j++) {
+
+        solver -> setColLower (j, saveLower [j] = problem_ -> Lb (j));
+        solver -> setColUpper (j, saveUpper [j] = problem_ -> Ub (j));
+      }
+
       /*
         End of evaluation for this candidate object. Possibilities are:
-        * Both sides below cutoff; this variable is a candidate for branching.
-        * Both sides infeasible or above the objective cutoff: no further action
-        here. Break from the evaluation loop and assume the node will be purged
-        by the caller.
-        * One side below cutoff: Install the branch (i.e., fix the variable). Possibly break
-        from the evaluation loop and assume the node will be reoptimised by the
-        caller.
+
+        * Both sides below cutoff; this variable is a candidate for
+          branching.
+
+        * Both sides infeasible or above the objective cutoff: no
+          further action here. Break from the evaluation loop and
+          assume the node will be purged by the caller.
+
+        * One side feasible and below cutoff: Install the branch
+          (i.e., fix the variable). Possibly break from the evaluation
+          loop and assume the node will be reoptimised by the caller.
       */
-      if (status0==1&&status1==1) {
-        // infeasible
+
+      if (status0 == 1 && 
+	  status1 == 1) { // infeasible
         returnCode=-1;
         break; // exit loop
       } else if (status0==1 || status1==1) {
@@ -240,29 +336,42 @@ namespace Bonmin {
 	  break;
         }
       }
+
       bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_);
       if (hitMaxTime) {
         returnCode=3;
         break;
       }
+    } // end loop /***********************************/
+  
+
+    if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
+      printf ("tightened bounds: ");
+      // create union of bounding box from both branching directions
+      for (int j=0; j<numberColumns; j++) {
+      
+	if (problem_ -> Lb (j) > Lower0 [j]) printf ("l%d (%g-->%g) ", j,Lower0[j], problem_->Lb (j));
+	if (problem_ -> Ub (j) < Upper0 [j]) printf ("u%d (%g-->%g) ", j,Upper0[j], problem_->Ub (j));
+      }
     }
 
-#ifdef DEBUG
-    printf ("----------------------done\n");
-#endif
+    delete [] Lower0;
+    delete [] Upper0;
 
-    if(iDo < numberToDo) iDo++;
-    assert(iDo <= (int) results_.size());
-    results_.resize(iDo);
+    problem_ -> domain () -> pop (); // discard current point/bounds from problem
+
+    delete [] lpSol;
+
+    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "----------------------done\n\n\n");
+
+    if (iDo < numberToDo) iDo++; // exited due to infeasibility
+    assert (iDo <= (int) results_.size());
+    results_.resize (iDo);
+
     delete [] saveLower;
     delete [] saveUpper;
-    // Delete the snapshot
-    solver->unmarkHotStart();
 
-    // discard current point/bounds from problem
-    problem_ -> domain () -> pop ();
-
-    //printf ("retcode = %d\n", returnCode);
+    solver -> unmarkHotStart ();     // Delete the snapshot
 
     return returnCode;
   }
@@ -278,36 +387,40 @@ namespace Bonmin {
        info -> lower_, 
        info -> upper_); // have to alloc+copy
 
-#ifdef DEBUG
-    printf ("----------------- (strong) setup list\n");
-    for (int i=0; i<problem_ -> domain () -> current () -> Dimension (); i++)
-      printf ("%4d %20.4g [%20.4g %20.4g]\n", i,
-	      info -> solution_ [i],
-	      info -> lower_ [i],
-	      info -> upper_ [i]);
-#endif
+    if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
+      printf ("----------------- (strong) setup list\n");
+      for (int i=0; i<problem_ -> domain () -> current () -> Dimension (); i++)
+	printf ("%4d %20.4g [%20.4g %20.4g]\n", i,
+		info -> solution_ [i], info -> lower_ [i], info -> upper_ [i]);
+    }
 
+    // call Bonmin's setuplist
     int retval = BonChooseVariable::setupList (info, initialize);
 
+    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "----------------- (strong) setup list done\n");
+
     problem_ -> domain () -> pop ();
-
-#ifdef DEBUG
-    printf ("----------------- (strong) setup list done\n");
-#endif
-
     return retval;
   }
+
 
   /// Add list of options to be read from file ////////////////////////////////////////
   void CouenneChooseStrong::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {
 
-    roptions -> AddStringOption3
+    roptions -> AddStringOption6
       ("pseudocost_mult",
        "Multipliers of pseudocosts for estimating and update estimation of bound",
        "infeasibility",
+
        "infeasibility", "infeasibility returned by object",
-       "interval",      "width of the interval between bound and branching point",
-       "projectDist",   "distance between current LP point and resulting branches' LP points");
+
+       "projectDist",   "distance between current LP point and resulting branches' LP points",
+
+       "interval_lp",   "width of the interval between bound and current lp point",
+       "interval_lp_rev",   "similar to interval_lp, reversed",
+
+       "interval_br",   "width of the interval between bound and branching point",
+       "interval_br_rev",   "similar to interval_br, reversed");
 
     roptions -> AddStringOption2
       ("pseudocost_mult_lp",
