@@ -70,7 +70,7 @@ namespace Bonmin
     double cutoff = -DBL_MAX;
     tminlp_interface->getDblParam(OsiDualObjectiveLimit, cutoff);
     lin_->setDblParam(OsiDualObjectiveLimit, cutoff);
-    printf("Cutoff %g # ecp iteration %i\n",cutoff, maxCuttingPlaneIterations_);
+    //printf("Cutoff %g # ecp iteration %i\n",cutoff, maxCuttingPlaneIterations_);
     lin_->messageHandler()->setLogLevel(0);
     lin_->resolve();
     warm_ = lin_->getWarmStart();
