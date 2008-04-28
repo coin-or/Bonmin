@@ -14,9 +14,9 @@
 #include "CouenneObject.hpp"
 #include "CouenneBranchingObject.hpp"
 
-const CouNumber default_alpha = 0.2;
-const CouNumber default_clamp = 0.2;
-
+const CouNumber default_alpha  = 0.2;
+const CouNumber default_clamp  = 0.2;
+const CouNumber max_pseudocost = 1000.;
 
 /// Empty constructor
 CouenneObject::CouenneObject ():
@@ -424,11 +424,11 @@ void CouenneObject::setEstimates (const OsiBranchingInformation *info,
   case INTERVAL_LP_REV:
   case INTERVAL_BR:
   case INTERVAL_BR_REV:
-    *up   =         info -> upper_ [index] - point;
-    *down = point - info -> lower_ [index];
+    *up   = CoinMin (max_pseudocost,         info -> upper_ [index] - point);
+    *down = CoinMin (max_pseudocost, point - info -> lower_ [index]);
     break;
 
-  case PROJECTDIST:
+  case PROJECTDIST: // taken care of in selectBranch procedure
     break;
 
   default: assert (false);
