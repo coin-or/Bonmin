@@ -94,7 +94,7 @@ namespace Bonmin
   TNLPSolver::ReturnStatus LpBranchingSolver::
   solveFromHotStart(OsiTMINLPInterface* tminlp_interface)
   {
-    TNLPSolver::ReturnStatus retstatus = TNLPSolver::iterationLimit;
+    TNLPSolver::ReturnStatus retstatus = TNLPSolver::solvedOptimal;
 
     // updated the bounds of the linear solver
     std::vector<int> diff_low_bnd_index;
@@ -144,7 +144,8 @@ namespace Bonmin
 
     double obj = lin_->getObjValue();
     bool go_on = true;
-    if (lin_->isProvenPrimalInfeasible()) {
+    if (lin_->isProvenPrimalInfeasible() || 
+        lin_->isDualObjectiveLimitReached()) {
       retstatus = TNLPSolver::provenInfeasible;
       go_on = false;
     }
