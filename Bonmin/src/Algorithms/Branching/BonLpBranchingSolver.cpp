@@ -26,6 +26,9 @@ namespace Bonmin
         maxCuttingPlaneIterations_, "bonmin.");
     options->GetNumericValue("ecp_abs_tol_strong", abs_ecp_tol_,"bonmin.");
     options->GetNumericValue("ecp_rel_tol_strong", rel_ecp_tol_,"bonmin.");
+    int dummy;
+    options->GetEnumValue("lp_strong_warmstart_method", dummy,"bonmin.");
+    warm_start_mode_ = (WarmStartMethod) dummy;
   }
 
   LpBranchingSolver::LpBranchingSolver(const LpBranchingSolver & rhs) :
@@ -33,7 +36,10 @@ namespace Bonmin
       lin_(NULL),
       warm_(NULL),
       ecp_(NULL),
-      maxCuttingPlaneIterations_(rhs.maxCuttingPlaneIterations_)
+      maxCuttingPlaneIterations_(rhs.maxCuttingPlaneIterations_),
+      abs_ecp_tol_(rhs.abs_ecp_tol_),
+      rel_ecp_tol_(rhs.rel_ecp_tol_),
+      warm_start_mode_(rhs.warm_start_mode_)
   {}
 
   LpBranchingSolver &
@@ -45,6 +51,7 @@ namespace Bonmin
     maxCuttingPlaneIterations_ = rhs.maxCuttingPlaneIterations_;
     abs_ecp_tol_ = rhs.abs_ecp_tol_;
     rel_ecp_tol_ = rhs.rel_ecp_tol_;
+    warm_start_mode_ = rhs.warm_start_mode_;
     // I assume that no LP solver information is ever copied
     delete lin_;
     delete warm_;
@@ -115,20 +122,31 @@ namespace Bonmin
     const double* colUp_orig = lin_->getColUpper();
     const double* colLow = tminlp_interface->getColLower();
     const double* colUp = tminlp_interface->getColUpper();
+
+    OsiSolverInterface * lin = lin_;
+    // eventualy clone lin_
+    if(warm_start_mode_ == Clone){
+      lin = lin_->clone();
+//      std::cout<<"Cloning it"<<std::endl;
+    }
     // Set the bounds on the LP solver according to the changes in
     // tminlp_interface
     for (int i=0; i<numCols; i++) {
       const double& lo = colLow[i];
       if (colLow_orig[i] < lo) {
-        diff_low_bnd_value.push_back(colLow_orig[i]);
-        diff_low_bnd_index.push_back(i);
-        lin_->setColLower(i,lo);
+        if(warm_start_mode_ == Basis){
+          diff_low_bnd_value.push_back(colLow_orig[i]);
+          diff_low_bnd_index.push_back(i);
+        }
+        lin->setColLower(i,lo);
       }
       const double& up = colUp[i];
       if (colUp_orig[i] > up) {
-        diff_up_bnd_index.push_back(i);
-        diff_up_bnd_value.push_back(colUp_orig[i]);
-        lin_->setColUpper(i,lo);
+        if(warm_start_mode_ == Basis){
+          diff_up_bnd_index.push_back(i);
+          diff_up_bnd_value.push_back(colUp_orig[i]);
+        }
+        lin->setColUpper(i,lo);
       }
     }
 
@@ -138,25 +156,27 @@ namespace Bonmin
       printf("%3d ol = %e nl = %e   ou = %e nu = %e\n",i,tminlp_interface->getColLower()[i],lin_->getColLower()[i],tminlp_interface->getColUpper()[i],lin_->getColUpper()[i]);
     }
 #endif
+    if(warm_start_mode_ == Basis){
+      lin->setWarmStart(warm_);
+    }
 
-    lin_->setWarmStart(warm_);
-    lin_->resolve();
+    lin->resolve();
 
-    double obj = lin_->getObjValue();
+    double obj = lin->getObjValue();
     bool go_on = true;
-    if (lin_->isProvenPrimalInfeasible() || 
-        lin_->isDualObjectiveLimitReached()) {
+    if (lin->isProvenPrimalInfeasible() || 
+        lin->isDualObjectiveLimitReached()) {
       retstatus = TNLPSolver::provenInfeasible;
       go_on = false;
     }
-    else if (lin_->isIterationLimitReached()) {
+    else if (lin->isIterationLimitReached()) {
       retstatus = TNLPSolver::iterationLimit;
       go_on = false;
     }
     else {
       if (maxCuttingPlaneIterations_ > 0 && go_on) {
         double violation;
-        obj = ecp_->doEcpRounds(*lin_, true, &violation);
+        obj = ecp_->doEcpRounds(*lin, true, &violation);
         if (obj == COIN_DBL_MAX) {
           retstatus = TNLPSolver::provenInfeasible;
         }
@@ -169,13 +189,17 @@ namespace Bonmin
     tminlp_interface->problem()->Set_x_sol(numCols, lin_->getColSolution());
 
     //restore the original bounds
-    for (unsigned int i = 0; i < diff_low_bnd_index.size(); i++) {
-      lin_->setColLower(diff_low_bnd_index[i],diff_low_bnd_value[i]);
+    if(warm_start_mode_ == Basis){
+      for (unsigned int i = 0; i < diff_low_bnd_index.size(); i++) {
+        lin_->setColLower(diff_low_bnd_index[i],diff_low_bnd_value[i]);
+      }
+      for (unsigned int i = 0; i < diff_up_bnd_index.size(); i++) {
+        lin_->setColUpper(diff_up_bnd_index[i],diff_up_bnd_value[i]);
+      }
     }
-    for (unsigned int i = 0; i < diff_up_bnd_index.size(); i++) {
-      lin_->setColUpper(diff_up_bnd_index[i],diff_up_bnd_value[i]);
+    else {
+      delete lin;
     }
-
     return retstatus;
   }
 
@@ -201,6 +225,14 @@ namespace Bonmin
      0,false,1e-1,
      "");
     roptions->setOptionExtraInfo("ecp_rel_tol_strong",15);
+    roptions->AddStringOption2
+    ("lp_strong_warmstart_method",
+     "Choose method to use for warm starting lp in strong branching",
+     "Basis",
+     "Basis", "Use optimal basis of node",
+     "Clone", "Clone optimal problem of node",
+     "(Advanced stuff)");
+    roptions->setOptionExtraInfo("lp_strong_warmstart_method",15);
   }
 
 }

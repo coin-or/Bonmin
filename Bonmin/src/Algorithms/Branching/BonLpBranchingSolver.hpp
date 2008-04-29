@@ -67,6 +67,14 @@ namespace Bonmin
 
     /// relative tolerance for ECP cuts
     double rel_ecp_tol_;
+
+
+   enum WarmStartMethod {
+     Basis=0 /** Use basis*/,
+     Clone /** clone problem*/
+   };
+   /// Way problems are warm started
+   WarmStartMethod warm_start_mode_;
   };
 
 }
