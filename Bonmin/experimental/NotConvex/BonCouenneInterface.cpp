@@ -259,7 +259,8 @@ CouenneInterface::extractLinearRelaxation
      rowLower[i] = cut->lb();
      rowUpper[i] = cut->ub();
    }
-   assert(nnz == start[numrowsconv]);
+
+   assert (nnz == start [numrowsconv]);
    /* Now fill the elements arrays. */
    int * ind = new int[start[numrowsconv]];
    double * elem = new double[start[numrowsconv]];

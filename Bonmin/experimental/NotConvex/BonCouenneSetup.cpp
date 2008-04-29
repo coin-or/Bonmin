@@ -144,7 +144,7 @@ namespace Bonmin{
     //model -> assignSolver (continuousSolver_, true);
     //continuousSolver_ = model -> solver();
 
-    // add CouenneVarObjects for branching /////////////////////////////////////////////
+    // add Couenne objects for branching /////////////////////////////////////////////
 
     {
       std::string s;
@@ -190,11 +190,11 @@ namespace Bonmin{
 	case CouenneObject::VAR_OBJ:
 
 	  // branching objects on variables
-	  if (// comment three lines below for linear variables too
-	      ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) || // has indep
-	       ((var -> Type () == AUX) &&                      // or, aux 
-		(var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
-	      (var -> Multiplicity () > 0)) {
+	  if // comment three lines below for linear variables too
+	    ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) // has indep
+	       //|| ((var -> Type () == AUX) &&                      // or, aux 
+	       //    (var -> Image () -> Linearity () > LINEAR))) // of nonlinear
+	     && (var -> Multiplicity () > 0)) {
 
 	    objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
 	    objects [nobj++] -> setPriority (1);
@@ -206,11 +206,11 @@ namespace Bonmin{
 	case CouenneObject::VT_OBJ:
 
 	  // branching objects on variables
-	  if (// comment three lines below for linear variables too
-	      //((couenneProb -> Dependence () [var -> Index ()] . size () > 0) || // has indep
-	      // ((var -> Type () == AUX) &&                      // or, aux 
-	      //  (var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
-	      (var -> Multiplicity () > 0)) {
+	  if // comment three lines below for linear variables too
+	    ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) // has indep
+	     // || ((var -> Type () == AUX) &&                      // or, aux 
+	     //  (var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
+	     && (var -> Multiplicity () > 0)) {
 
 	    objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
 	    objects [nobj++] -> setPriority (1);
