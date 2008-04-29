@@ -91,7 +91,7 @@ void CouenneChooseVariable::registerOptions (Ipopt::SmartPtr <Bonmin::Registered
   roptions -> AddStringOption2
     ("branch_conv_cuts",
      "Apply convexification cuts before branching",
-     "no",
+     "yes",
      "no","",
      "yes","");
 

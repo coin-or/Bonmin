@@ -245,7 +245,7 @@ void exprQuad::quadCuts (expression *w, OsiCuts &cs, const CouenneCutGenerator *
 
   for (int i=0; i < numcols; i++)
 
-    if (fabs (Qxs [i]) > COUENNE_EPS) {
+    if (fabs (Qxs [i]) > 1.0e-21) { // why 1.0e-21? Look at CoinPackedMatrix.cpp:2188
 
       // compute violation
 #ifdef DEBUG

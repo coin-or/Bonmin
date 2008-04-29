@@ -381,6 +381,8 @@ namespace Bonmin {
   // Returns number of infeasibilities.
   int CouenneChooseStrong::setupList (OsiBranchingInformation *info, bool initialize) {
 
+    initialize = true; // to avoid failed assert in BonChooseVariable::setupList()
+
     problem_ -> domain () -> push 
       (problem_ -> nVars (),
        info -> solution_, 

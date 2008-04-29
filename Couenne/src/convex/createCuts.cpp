@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: a standard cut creator for use with convexification
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -23,13 +23,18 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 				    int i1, CouNumber c1,
 				    int i2, CouNumber c2,
 				    int i3, CouNumber c3,
-				    bool is_global)       const {
+				    bool is_global) const {
   bool numerics = false;
 
-  // a maximum of three terms are allowed here. If index -1 (default)
-  // the term is not considered
+  // a maximum of three terms allowed here. If index -1 (default) the
+  // term is not considered
 
   int nterms = 0;
+
+  if (fabs (c3) <= 1.0e-21) {                                    i3 = -1;} // shift coeff/index to
+  if (fabs (c2) <= 1.0e-21) {                  c2 = c3; i2 = i3; i3 = -1;} // keep consistency
+  if (fabs (c1) <= 1.0e-21) {c1 = c2; i1 = i2; c2 = c3; i2 = i3; i3 = -1;}
+  // why 1.0e-21? Look at CoinPackedMatrix.cpp:2188
 
   if (i1 >= 0) {if (fabs (c1) > COU_MAX_COEFF) numerics = true; nterms++;} else c1 = 0;
   if (i2 >= 0) {if (fabs (c2) > COU_MAX_COEFF) numerics = true; nterms++;} else c2 = 0;
@@ -51,7 +56,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
   if (!firstcall_ && addviolated_) { // need to check violation 
 
-    CouNumber *x = const_cast <CouNumber *> (problem_ -> X ());
+    const CouNumber *x = problem_ -> X ();
 
     // compute violation
     CouNumber violation = 0;
@@ -62,8 +67,8 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
     // return 0 if not violated
 
-    if ((violation < ub + 0*COUENNE_EPS) &&
-	(violation > lb - 0*COUENNE_EPS))
+    if ((violation < ub + 0 * COUENNE_EPS) &&
+	(violation > lb - 0 * COUENNE_EPS))
       return 0;
   }
 
@@ -96,7 +101,7 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
   // You are here if:
   //
   // 1) this is the first call to CouenneCutGenerator::generateCuts()
-  // 2) we also want unviolated cuts
+  // 2) you also want unviolated cuts
   // 3) the cut is violated
 
   // two cases: cut is of the form w1 [<|>]= alpha, hence a column
@@ -123,8 +128,8 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
     if (c1 < 0) {
       CouNumber tmp = ll;
-      ll = -uu;
-      uu = -tmp;
+      ll = uu;
+      uu = tmp;
     }
 
     CouNumber &curL = problem_ -> Lb (i1),

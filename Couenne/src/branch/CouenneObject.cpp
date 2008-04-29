@@ -406,9 +406,9 @@ void CouenneObject::setEstimates (const OsiBranchingInformation *info,
 
     point = info -> solution_ [index];
 
-  else if (((pseudoMultType_ == INTERVAL_BR) ||
-	    (pseudoMultType_ == INTERVAL_BR_REV)) &&
-	   brpoint)
+  else if (brpoint &&
+	   ((pseudoMultType_ == INTERVAL_BR) ||
+	    (pseudoMultType_ == INTERVAL_BR_REV)))
     
     point = *brpoint;
 
@@ -424,6 +424,7 @@ void CouenneObject::setEstimates (const OsiBranchingInformation *info,
   case INTERVAL_LP_REV:
   case INTERVAL_BR:
   case INTERVAL_BR_REV:
+    assert (info);
     *up   = CoinMin (max_pseudocost,         info -> upper_ [index] - point);
     *down = CoinMin (max_pseudocost, point - info -> lower_ [index]);
     break;

@@ -22,11 +22,6 @@
 #define COUENNE_LARGE_INTERVAL 1e4
 #define COUENNE_NEAR_BOUND 1e-2
 
-// use to test how branching point moves. Define as index of
-// independent variable in log expression
-#define BR_TEST_LOG -1
-#define BR_TEST_GRAPH 0
-
 
 /** "Spatial" branching object. 
  *
@@ -41,10 +36,11 @@ public:
   CouenneBranchingObject (OsiSolverInterface *solver,
 			  const OsiObject *originalObject,
 			  JnlstPtr jnlst, 
-			  expression *, 
-			  int, 
-			  CouNumber, 
-			  bool, bool);
+			  expression *var, 
+			  int way, 
+			  CouNumber brpoint, 
+			  bool doFBBT, 
+			  bool doConvCuts);
 
   /// Copy constructor
   CouenneBranchingObject (const CouenneBranchingObject &src):
@@ -57,7 +53,6 @@ public:
     downEstimate_ (src.downEstimate_),
     upEstimate_   (src.upEstimate_),
     simulate_     (src.simulate_) {}
-
 
   /// cloning method
   virtual OsiBranchingObject * clone () const

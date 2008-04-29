@@ -98,9 +98,6 @@ void exprGroup::generateCuts (expression *w, const OsiSolverInterface &si,
 
   OsiRowCut *cut = new OsiRowCut;
 
-  // count terms in linear part
-  //  for (register int *ind = index_; *ind++ >= 0; nterms++);
-
   int displacement = (wind < 0) ? 1: 0;
 
   CouNumber *coeff = new CouNumber [nargs_ + nterms + displacement];
@@ -118,12 +115,15 @@ void exprGroup::generateCuts (expression *w, const OsiSolverInterface &si,
 
   // now add linear terms
   lincoeff::iterator el = lcoeff_.begin ();
-  for (int i=0; el != lcoeff_.end (); ++el) {
-    //  for (register int i=0; i<nterms; i++) {
 
-    coeff [i   + displacement] = el -> second; 
-    index [i++ + displacement] = el -> first -> Index ();
-  }
+  for (int i=0; el != lcoeff_.end (); ++el) 
+
+    if (fabs (el -> second) > 1.0e-21) { 
+      // why 1.0e-21? Look at CoinPackedMatrix.cpp:2188
+
+      coeff [i   + displacement] = el -> second; 
+      index [i++ + displacement] = el -> first -> Index ();
+    }
 
   // scan arglist for (aux) variables and constants
   for (int i=0; i<nargs_; i++) {
