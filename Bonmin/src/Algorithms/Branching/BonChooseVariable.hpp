@@ -272,6 +272,7 @@ namespace Bonmin
     /** Default Constructor, forbiden for some reason.*/
     BonChooseVariable ();
 
+  protected:
     /// CbcModel, used to get status of search
     CbcModel* cbc_model_;
 
@@ -313,7 +314,7 @@ namespace Bonmin
     int minNumberStrongBranch_;
     /** Stores the pseudo costs. */
     OsiPseudoCosts pseudoCosts_;
-    /** Wether or not to trust strong branchiong results for updating pseudo costs.*/
+    /** Wether or not to trust strong branching results for updating pseudo costs.*/
     int trustStrongForPseudoCosts_;
    
     //@}
