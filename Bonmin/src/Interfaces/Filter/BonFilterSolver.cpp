@@ -428,6 +428,7 @@ namespace Bonmin
     if (cached_.IsNull() || !cached_->use_warm_start_in_cache_) {
       cached_ = new cachedInfo(tnlp, options_);
     }
+    cached_->load_ws(warmF_);
     return callOptimizer();
   }
 
@@ -709,7 +710,6 @@ namespace Bonmin
   FilterSolver::cachedInfo::load_ws(Coin::SmartPtr<FilterWarmStart> warmF){
     if(!warmF.IsValid()) return;
     const fint xsize = warmF->primalSize();
-    real* x = x;
     const real* xarray = warmF->primal();
     for (int i = 0; i<xsize; i++) {
       x[i] = xarray[i];

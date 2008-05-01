@@ -2408,7 +2408,8 @@ void OsiTMINLPInterface::initialSolve()
     if(printOptions)
       app_->options()->SetStringValue("print_user_options","yes");
   }
-  app_->disableWarmStart(); 
+  if(exposeWarmStart_)
+    app_->disableWarmStart(); 
   solveAndCheckErrors(0,1,"initialSolve");
   
   //Options should have been printed if not done already turn off Ipopt output
