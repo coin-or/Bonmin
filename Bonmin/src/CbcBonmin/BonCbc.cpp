@@ -438,7 +438,7 @@ namespace Bonmin
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
     {
-#if 1
+#if 0
       const double * colsol = model_.solver()->getColSolution();
       const double * duals = model_.solver()->getRowPrice();
       model_.solver()->setColSolution(colsol);
