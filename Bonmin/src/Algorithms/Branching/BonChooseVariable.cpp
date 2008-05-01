@@ -53,6 +53,7 @@ namespace Bonmin
     handler_ = new CoinMessageHandler;
 
     options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
+    handler_->setLogLevel(bb_log_level_);
     options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
     options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
     options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
