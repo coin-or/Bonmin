@@ -82,7 +82,9 @@ CouenneObject::CouenneObject (CouenneProblem *p,
 
 
 /// Constructor with lesser information, used for infeasibility only
-CouenneObject::CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst):
+CouenneObject::CouenneObject (exprVar *ref, 
+			      Bonmin::BabSetupBase *base, 
+			      JnlstPtr jnlst):
 
   OsiObject (),
   problem_        (NULL),  
@@ -257,7 +259,9 @@ CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, 
   case CouenneObject::LP_CLAMPED:   return CoinMax (l + width, CoinMin (x0, u - width));
   case CouenneObject::LP_CENTRAL:   return ((x0 < l + width) || (x0 > u - width)) ? (l+u)/2 : x0;
   case CouenneObject::MID_INTERVAL: return midInterval (x0, l, u);
-  default:                          assert (false); break;
+  default:
+    printf ("Couenne: unknown branching point selection strategy\n");
+    exit (-1);
   }
 }
 
@@ -268,11 +272,19 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
   if (strategy_ == NO_BRANCH) 
     return (upEstimate_ = downEstimate_ = 0.);
 
-  double
-    delta  = fabs (info -> solution_ [reference_ -> Index ()] - (*(reference_->Image ())) ()),
-    retval = (delta < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : delta;
+  problem_ -> domain () -> push 
+    (problem_ -> nVars (),
+     info -> solution_, 
+     info -> lower_, 
+     info -> upper_);
 
-  if ((retval > 0.) &&
+  double retval = fabs (info -> solution_ [reference_ -> Index ()] - 
+			(*(reference_ -> Image ())) ());
+
+  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) 
+    retval = 0.;
+
+  if (//(retval > 0.) &&
       (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING))) {
 
     printf ("  infeas %g: ", retval); 
@@ -284,6 +296,8 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
     upEstimate_ = downEstimate_ = retval;
 
   setEstimates (info, &retval, NULL);
+
+  problem_ -> domain () -> pop ();
 
   return retval;
 }
@@ -389,7 +403,7 @@ void CouenneObject::setEstimates (const OsiBranchingInformation *info,
   CouNumber 
     *up   = &upEstimate_,
     *down = &downEstimate_,
-     point;
+     point = 0.;
 
   ////////////////////////////////////////////////////////////
   if ((pseudoMultType_ == INTERVAL_LP_REV) ||

@@ -17,6 +17,8 @@
 
 class CouenneProblem;
 
+//#define CCS_EXPERIMENTAL
+
 /** \brief Choose a variable for branching
  */
 
@@ -42,10 +44,23 @@ public:
   /// Destructor 
   virtual ~CouenneChooseVariable ();
 
-  /** Sets up strong list and clears all if initialize is true.
-      Returns number of infeasibilities. 
-      If returns -1 then has worked out node is infeasible! */
+  /// Sets up strong list and clears all if initialize is true.
+  /// Returns number of infeasibilities.  If returns -1 then has
+  /// worked out node is infeasible!
   virtual int setupList (OsiBranchingInformation *, bool);
+
+  /// Returns true if solution looks feasible against given objects
+  virtual bool feasibleSolution (const OsiBranchingInformation * info,
+				 const double * solution,
+				 int numberObjects,
+				 const OsiObject ** objects);
+
+#ifdef EXPERIMENTAL
+  /// choose object to branch based on earlier setup
+  virtual int chooseVariable (OsiSolverInterface * solver, 
+			      OsiBranchingInformation *info, 
+			      bool fixVariables);
+#endif
 
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);

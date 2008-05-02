@@ -64,7 +64,8 @@ public:
   CouenneObject ();
 
   /// Constructor with information for branching point selection strategy
-  CouenneObject (CouenneProblem *p, exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst);
+  CouenneObject (CouenneProblem *p, 
+		 exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst);
 
   /// Constructor with lesser information, used for infeasibility only
   CouenneObject (exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst);

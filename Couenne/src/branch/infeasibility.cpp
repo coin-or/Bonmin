@@ -74,7 +74,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
       weiMax * infmax;
   }
 
-  if ((retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
+  if (//(retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
       (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
 
     printf ("infeasVar %-10g [", retval); // + (1 - exp (info -> lower_ [index] - 

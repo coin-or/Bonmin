@@ -318,9 +318,24 @@ void CouenneProblem::standardize () {
 	auxiliarize (varLeaves, varStays); // now replace occurrences of w_k with x_h
 
 	//if (varLeaves -> Index () >= nOrig_) // why check? It's not there anymore.
-	varLeaves -> zeroMult ();
+	varLeaves -> zeroMult (); // disable this variable
       }
     }
+
+  /// re-check integrality. This is necessary as the initial
+  /// integrality check is done on some continuous variables, which
+  /// may turn out to be identical to other, integer, variables. See
+  /// minlplib/ex1223.nl, where x_29 = x_4^2 and x_4=x_9, with x_4
+  /// declared continuous and x_9 integer
+  for (int ii=0; ii < nVars (); ii++) {
+
+    int i = numbering_ [ii];
+
+    if ((Var (i) -> Multiplicity () > 0) &&
+	(Var (i) -> Type () == AUX) &&
+	(Var (i) -> Image () -> isInteger ()))
+      Var (i) -> setInteger (true);
+  }
 
   // TODO: re-compute ranks
 

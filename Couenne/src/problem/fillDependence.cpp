@@ -34,15 +34,18 @@ void CouenneProblem::fillDependence (Bonmin::BabSetupBase *base) {
 	&& ((*i) -> Image () -> Linearity () > LINEAR)) {  // and nonlinear
 
       // add object for this variable
-      objects_.push_back (CouenneObject (*i, base, jnlst_));
+      objects_.push_back (CouenneObject (this, *i, base, jnlst_));
 
       std::set <int> deplist;
-      
+
+      // fill the set of independent variables on which the expression
+      // associated with *i depends; if empty (should not happen...), skip
       if ((*i) -> Image () -> DepList (deplist, STOP_AT_AUX) == 0)
 	continue;
 
       // build dependence set for this variable
       for (std::set <int>::iterator j = deplist.begin (); j != deplist.end (); ++j) {
+
 	std::set <int> &obj = dependence_ [*j];
 	int ind = (*i) -> Index ();
 	if (obj.find (ind) == obj.end ())

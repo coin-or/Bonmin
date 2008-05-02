@@ -176,6 +176,7 @@ bool exprPow::isInteger () {
   // base
 
   if (!(arglist_ [0] -> isInteger ())) { 
+
     // base not integer: check if constant and integer
     CouNumber lb, ub;
     arglist_ [0] -> getBounds (lb, ub);
@@ -218,8 +219,8 @@ void exprPow::closestFeasible (expression *varind,
 			       CouNumber &left,
 			       CouNumber &right) const {
   CouNumber
-    x  = (*varind) (), //info -> solution_ [indep     -> Index ()],
-    y  = (*vardep) (), //info -> solution_ [dependent -> Index ()],
+    x  = (*varind) (),
+    y  = (*vardep) (),
     k  = arglist_ [1] -> Value (),
     xk = safe_pow (x, k),
     yk = safe_pow (y, 1./k);

@@ -20,8 +20,6 @@ static CouNumber scanBounds (int, int, int *, CouNumber *, CouNumber *, int *);
 
 bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
-  //return false; // !!!
-
   /**
    *  An expression 
    *
@@ -52,7 +50,16 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     nterms = nargs_, // # nonconstant terms
     nlin   = 0;      // # linear terms
 
-  CouNumber a0 = 0.;   // constant term in the sum
+  CouNumber
+    a0 = 0.,   // constant term in the sum
+    wl = l [wind],
+    wu = u [wind];
+
+  // quick check: if both are infinite, nothing is implied...
+
+  if ((wl < -COUENNE_INFINITY) &&
+      (wu >  COUENNE_INFINITY))
+    return false;
 
   exprGroup *eg = NULL;
 
@@ -154,9 +161,6 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   bool tighter = false;
 
-  CouNumber wl = l [wind],
-            wu = u [wind];
-
   // check if there is room for improvement
 
   {
@@ -170,7 +174,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
     //
     // steal some work to bound propagation... 
 
-    if ((slackL >  -COUENNE_EPS) && 
+    if ((slackL >  -COUENNE_EPS) &&
 	(infLo1 == -1) && 
 	(infUp2 == -1)) {   // no implication on lower
 
@@ -182,7 +186,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	  l [wind] = ceil (l [wind] - COUENNE_EPS);
       }
 
-      if ((slackU > -COUENNE_EPS)  && 
+      if ((slackU > -COUENNE_EPS) &&
 	  (infLo2 == -1) && 
 	  (infUp1 == -1)) { // no implication on upper
 
@@ -197,7 +201,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	free (I1); free (I2);
 	free (C1); free (C2);
 
-	return false; // both bounds were weak, no implications possible
+	return false; // both bounds were weak, no implication possible
       }
     }
     else if ((slackU > -COUENNE_EPS) && 
@@ -237,7 +241,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // Update lowers in I1 and uppers in I2
 
-  if ((infLo1 == -1) && (infUp2 == -1)) { // All finite bounds. All var. bounds can be tightened.
+  if ((infLo1 == -1) && (infUp2 == -1) && (wu < COUENNE_INFINITY / 1e10)) { 
+    // All finite bounds. All var. bounds can be tightened.
 
     // tighten upper bound of variables in I1
     for (register int i=ipos; i--;) {
@@ -280,7 +285,8 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   // Update uppers in I1 and lowers in I2
 
-  if ((infUp1 == -1) && (infLo2 == -1)) { // All finite bounds. All var. bounds can be tightened.
+  if ((infUp1 == -1) && (infLo2 == -1) && (wl > -COUENNE_INFINITY / 1e10)) { 
+    // All finite bounds. All var. bounds can be tightened.
 
     for (register int i=ipos; i--;) {
       int ind = I1 [i];

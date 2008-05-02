@@ -219,9 +219,12 @@ void CouenneProblem::setCutOff (CouNumber cutoff) const {
     Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
 		    "Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",
 		    cutoff, indobj,
-		    (objectives_ [0] -> Sense () == MINIMIZE) ? 
-		    Ub (indobj) :
-		    Lb (indobj));
+		    pcutoff_ -> getCutOff ());
+
+    // apparently there is no optimization sense...
+    //(objectives_ [0] -> Sense () == MINIMIZE) ? 
+    //Ub (indobj) :
+    //Lb (indobj));
 
     CouNumber 
       safe       = SafeCutoff,

@@ -32,7 +32,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 		    "  forward  =====================\n  ");
     int j=0;
     for (int i=0; i < nVars (); i++) 
-      if (variables_ [i] -> Multiplicity () > 0) {
+      if (variables_ [i] -> Multiplicity () >= 0) {
 	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 			"x_%03d [%+10g %+10g] ", i, 
 			domain_. lb (i),
