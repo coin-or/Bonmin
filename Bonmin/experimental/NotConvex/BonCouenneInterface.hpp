@@ -55,7 +55,14 @@ class CouenneInterface : public AmplInterface
   /** To set some application specific defaults. */
   virtual void setAppDefaultOptions(Ipopt::SmartPtr<Ipopt::OptionsList> Options);
 
+  /// return value of have_nlp_solution_
+  bool haveNlpSolution ()
+  {return have_nlp_solution_;}
+
 protected:
+
+  /// true if we got an integer feasible solution from initial solve 
+  bool have_nlp_solution_;
 };
 
 } /** end Bonmin namespace. */

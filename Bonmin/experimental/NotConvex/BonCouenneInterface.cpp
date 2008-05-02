@@ -17,15 +17,17 @@ namespace Bonmin {
 
 /** Default constructor. */
 CouenneInterface::CouenneInterface():
-  AmplInterface()
+  AmplInterface(),
+  have_nlp_solution_ (false)
 {}
 
 /** Copy constructor. */
 CouenneInterface::CouenneInterface(const CouenneInterface &other):
-  AmplInterface(other) 
+  AmplInterface(other),
+  have_nlp_solution_ (false)
 {}
 
-/** virutal copy constructor. */
+/** virtual copy constructor. */
 CouenneInterface * CouenneInterface::clone(bool CopyData){
   return new CouenneInterface(*this);
 }
@@ -131,7 +133,8 @@ CouenneInterface::extractLinearRelaxation
 	// fractional. If so, round them and re-optimize
 
 	for (int i=0; i<norig; i++)
-	  if (p -> Var (i) -> isInteger () &&
+	  if (p  -> Var (i) -> isInteger () &&
+	      (p -> Var (i) -> Multiplicity () > 0) &&
 	      (!::isInteger (solution [i]))) {
 	    fractional = true;
 	    break;
@@ -161,7 +164,8 @@ CouenneInterface::extractLinearRelaxation
 	  if (p -> getIntegerCandidate (solution, Y, lbCur, ubCur) >= 0) {
 
 	    for (int i=0; i<norig; i++)
-	      if (p -> Var (i) -> isInteger ()) {
+	      if ((p -> Var (i) -> Multiplicity () > 0) &&
+		  p  -> Var (i) -> isInteger ()) {
 		setColLower (i, lbCur [i]);
 		setColUpper (i, ubCur [i]);
 	      }
@@ -174,7 +178,8 @@ CouenneInterface::extractLinearRelaxation
 	    solution = getColSolution ();
 
 	    for (int i=0; i<norig; i++)
-	      if (p -> Var (i) -> isInteger ()) {
+	      if ((p -> Var (i) -> Multiplicity () > 0) &&
+		  p  -> Var (i) -> isInteger ()) {
 		setColLower (i, lbSave [i]);
 		setColUpper (i, ubSave [i]);
 	      }
@@ -193,6 +198,9 @@ CouenneInterface::extractLinearRelaxation
 	  (obj < p -> getCutOff ()) &&
 	  p -> checkNLP (solution, obj)) {
 
+	// tell caller there is an initial solution to be fed to the initHeuristic
+	have_nlp_solution_ = true;
+
 	// set cutoff to take advantage of bound tightening
 	p -> setCutOff (obj);
 
@@ -206,17 +214,20 @@ CouenneInterface::extractLinearRelaxation
       }
     }
   }
-  
-  int numcols   = getNumCols (),         // # original               variables
-    numcolsconv = couenneCg.getnvars (); // # original + # auxiliary variables
+
+  int 
+    numcols     = getNumCols (), // # original               variables
+    numcolsconv = p -> nVars (); // # original + # auxiliary variables
 
   const double
     *lb = getColLower (),
     *ub = getColUpper ();
 
    // add original and auxiliary variables to the new problem
-   for (int i=0;       i<numcols;     i++) si.addCol (0, NULL, NULL, lb [i],        ub [i],       0);
-   for (int i=numcols; i<numcolsconv; i++) si.addCol (0, NULL, NULL, -COIN_DBL_MAX, COIN_DBL_MAX, 0);
+   for (int i=0; i<numcols; i++) 
+     if (p -> Var (i) -> Multiplicity () > 0) si.addCol (0, NULL,NULL, lb [i],       ub [i],      0);
+     else                                     si.addCol (0, NULL,NULL, -COIN_DBL_MAX,COIN_DBL_MAX,0);
+   for (int i=numcols; i<numcolsconv; i++)    si.addCol (0, NULL,NULL, -COIN_DBL_MAX,COIN_DBL_MAX,0);
 
    // get initial relaxation
    OsiCuts cs;
@@ -226,14 +237,18 @@ CouenneInterface::extractLinearRelaxation
    CouNumber * colLower = new CouNumber [numcolsconv];
    CouNumber * colUpper = new CouNumber [numcolsconv];
 
-   CouNumber *ll = couenneCg.Problem () -> Lb ();
-   CouNumber *uu = couenneCg.Problem () -> Ub ();
+   CouNumber *ll = p -> Lb ();
+   CouNumber *uu = p -> Ub ();
 
    // overwrite original bounds, could be improved within generateCuts
-   for (register int i = numcolsconv; i--;) {
-     colLower [i] = (ll [i] > - COUENNE_INFINITY) ? ll [i] : -COIN_DBL_MAX;
-     colUpper [i] = (uu [i] <   COUENNE_INFINITY) ? uu [i] :  COIN_DBL_MAX;
-   }
+   for (int i = numcolsconv; i--;) 
+     if (p -> Var (i) -> Multiplicity () > 0) {
+       colLower [i] = (ll [i] > - COUENNE_INFINITY) ? ll [i] : -COIN_DBL_MAX;
+       colUpper [i] = (uu [i] <   COUENNE_INFINITY) ? uu [i] :  COIN_DBL_MAX;
+     } else {
+       colLower [i] = -COIN_DBL_MAX;
+       colUpper [i] =  COIN_DBL_MAX;
+     }
 
    int numrowsconv = cs.sizeRowCuts ();
 
@@ -273,8 +288,8 @@ CouenneInterface::extractLinearRelaxation
      if(v.getNumElements() != length[i])
        std::cout<<"Empty row"<<std::endl;
      //     cut->print();
-     CoinCopyN(v.getIndices(), length[i], ind + start[i]);
-     CoinCopyN(v.getElements(), length[i], elem + start[i]);
+     CoinCopyN (v.getIndices(),  length[i], ind  + start[i]);
+     CoinCopyN (v.getElements(), length[i], elem + start[i]);
    }
 
    // Ok everything done now create interface
@@ -291,8 +306,8 @@ CouenneInterface::extractLinearRelaxation
    CoinFillN(obj,numcolsconv,0.);
 
    // some instances have no (or null) objective function, check it here
-   if (couenneCg. Problem () -> nObjs () > 0)
-     couenneCg.Problem() -> fillObjCoeff (obj);
+   if (p -> nObjs () > 0)
+     p -> fillObjCoeff (obj);
 
    // Finally, load interface si with the initial LP relaxation
    si.loadProblem (A, colLower, colUpper, obj, rowLower, rowUpper);
@@ -307,7 +322,8 @@ CouenneInterface::extractLinearRelaxation
    //  if (isInteger (i))
 
    for (int i=0; i<numcolsconv; i++)
-     if (p -> Var (i) -> isDefinedInteger ())
+     if ((p -> Var (i) -> Multiplicity () > 0) &&
+	 (p -> Var (i) -> isDefinedInteger ()))
        si.setInteger (i);
  
    //si.writeMpsNative("toto",NULL,NULL,1);

@@ -18,6 +18,8 @@ namespace Bonmin{
     objValue_(COIN_DBL_MAX),
     sol_(NULL)
   {
+    when_ = 1; // to be run at root
+
     setHeuristicName("InitHeuristic");
     nVars_ = cp.nVars();
 
@@ -78,6 +80,7 @@ namespace Bonmin{
   
   int
   InitHeuristic::solution(double & objectiveValue, double * newSolution){
+
     if (!sol_) return 0;
     int retval = 0;
     if (objValue_ < objectiveValue) {

@@ -118,22 +118,6 @@ namespace Bonmin
     model_.passInMessageHandler(modelHandler_);
     model_.assignSolver(solver, true);
 
-    // If we have an incumbent already, tell Cbc to consider it
-
-    // No... there are problems with solutionAddsCuts at
-    // CbcModel.cpp:8029. 
-    //
-    // If you plan to use this, comment the babInfo ->
-    // setHasNlpSolution (false) instruction in
-    // Couenne/src/convex/generateCuts.cpp
-
-    /*if (bonBabInfoPtr -> nlpSolution ()) {
-      printf ("have incumbent\n");
-      double obj = bonBabInfoPtr -> nlpObjValue ();
-      model_. setBestSolution (CBC_ROOT, obj, bonBabInfoPtr -> nlpSolution (), true);
-    } else printf ("no incumbent\n");
-    */
-
     //  s.continuousSolver() = model_.solver();
     //   if(s.continuousSolver()->objects()!=NULL){
     //     model_.addObjects(s.continuousSolver()->numberObjects(),s.continuousSolver()->objects());
@@ -149,8 +133,6 @@ namespace Bonmin
         model_.setStrategy(strat);
       }
     }
-
-
 
     model_.setMaximumCutPasses(s.getIntParameter(BabSetupBase::NumCutPasses));
     model_.setMaximumCutPassesAtRoot(s.getIntParameter(BabSetupBase::NumCutPassesAtRoot));
@@ -290,9 +272,12 @@ namespace Bonmin
       replaceIntegers(model_.objects(), model_.numberObjects());
     }
     else {//Pass in objects to Cbc
-      //if (!usingCouenne_)
-	model_.addObjects(s.continuousSolver()->numberObjects(),
-			  s.continuousSolver()->objects());
+      model_.addObjects (s.continuousSolver()->numberObjects(),
+			 s.continuousSolver()->objects());
+
+      if (usingCouenne_)// && model_. solver ()) 
+	// prevent duplicating object when copying in CbcModel.cpp
+	model_. solver () -> deleteObjects ();
     }
 
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));

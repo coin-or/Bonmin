@@ -127,10 +127,13 @@ namespace Bonmin{
 
     // In case there are no discrete variables, we have already a
     // heuristic solution for which create a initialization heuristic
-    if (ci->getNumIntegers() == 0 && ci->isProvenOptimal()) {
-      InitHeuristic* initHeuristic =
-        new InitHeuristic(ci->getObjValue(), ci->getColSolution(),
-                          *couenneProb);
+    if (ci -> isProvenOptimal () && 
+	ci -> haveNlpSolution ()) {
+
+      /// setup initial heuristic (in principle it should only run once...)
+      InitHeuristic* initHeuristic = new InitHeuristic 
+	(ci -> getObjValue (), ci -> getColSolution (), *couenneProb);
+
       heuristics_.push_back(initHeuristic);
     }
 
@@ -154,12 +157,15 @@ namespace Bonmin{
 
       options () -> GetStringValue ("branching_object", s, "couenne.");
 
-      enum CouenneObject::branch_obj objType;
+      enum CouenneObject::branch_obj objType = CouenneObject::VAR_OBJ;
 
       if      (s == "vt_obj")   objType = CouenneObject::VT_OBJ;
       else if (s == "var_obj")  objType = CouenneObject::VAR_OBJ;
       else if (s == "expr_obj") objType = CouenneObject::EXPR_OBJ;
-      else                      assert (false);
+      else {
+	printf ("CouenneSetup: Unknown branching object type\n");
+	exit (-1);
+      }
 
       int nAuxs = 0, nobj = 0,
 	  nVars = couenneProb -> nVars ();
