@@ -266,8 +266,8 @@ OsiTMINLPInterface::Messages::Messages
           "\n          "
           "    Num      Status      Obj             It       time");
   ADD_MSG(LOG_FIRST_LINE, std_m, 1, 
-          "    %-8d %-11s %-14g %-8d %-3g");
-  ADD_MSG(LOG_LINE, std_m, 1, " %c  r%-7d %-11s %-14g %-8d %-3g");
+          "    %-8d %-11s %-23.16g %-8d %-3g");
+  ADD_MSG(LOG_LINE, std_m, 1, " %c  r%-7d %-11s %-23.16g %-8d %-3g");
 
   ADD_MSG(ALTERNATE_OBJECTIVE, std_m, 1, "Objective value recomputed with alternate objective: %g.");
   

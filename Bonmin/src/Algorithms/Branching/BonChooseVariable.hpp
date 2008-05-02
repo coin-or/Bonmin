@@ -11,6 +11,7 @@
 // Forward declaration
 class CbcModel;
 
+#define OLD_USEFULLNESS
 
 namespace Bonmin
 {
@@ -93,12 +94,14 @@ namespace Bonmin
   virtual int doStrongBranching( OsiSolverInterface * solver, 
 				 OsiBranchingInformation *info,
 				 int numberToDo, int returnCriterion);
+#ifndef OLD_USEFULLNESS
     /** Criterion applied to sort candidates.*/
     enum CandidateSortCriterion {
       DecrPs = 0,
       IncrPs,
       DecrInfeas,
       IncrInfeas};
+#endif
 
     /** Statuses for strong branching candidates.*/
     enum StrongStatus{
@@ -308,8 +311,10 @@ namespace Bonmin
     int numberStrongRoot_;
     /** backup of numberStrong_ before Root node solve */
     int numberStrongBackup_;
+#ifndef OLD_USEFULLNESS
     /** Criterion to use in setup list.*/
     CandidateSortCriterion sortCrit_;
+#endif
     /** Always strong branch that many first candidate in the list regardless of numberTrusted.*/
     int minNumberStrongBranch_;
     /** Stores the pseudo costs. */

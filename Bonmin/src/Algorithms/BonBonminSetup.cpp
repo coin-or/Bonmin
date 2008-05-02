@@ -353,6 +353,11 @@ namespace Bonmin
           strong_solver = new LpBranchingSolver(nonlinearSolver_);
           chooseVariable->setOnlyPseudoWhenTrusted(true);
           break;
+         case NLP_STRONG_BRANCHING:
+          chooseVariable->setTrustStrongForSolution(false);
+          chooseVariable->setTrustStrongForBound(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
+          break;
         }
         nonlinearSolver_->SetStrongBrachingSolver(strong_solver);
         branchingMethod_ = chooseVariable;

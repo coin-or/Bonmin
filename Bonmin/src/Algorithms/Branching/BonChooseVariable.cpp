@@ -21,22 +21,22 @@ namespace Bonmin
       CoinMessages((int) BON_CHOOSE_MESSAGES_DUMMY_END)
   {
     strcpy(source_,"BON");
-    ADD_MSG(PS_COST_HISTORY,std_m,4,"%3d up %3d  %15.8e  down %3d  %15.8e\n");
-    ADD_MSG(PS_COST_MULT,std_m, 4, "upMultiplier = %e downMultiplier = %e\n");
-    ADD_MSG(PS_COST_ESTIMATES, std_m, 4, "%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e\n");
+    ADD_MSG(PS_COST_HISTORY,std_m,5,"%3d up %3d  %15.8e  down %3d  %15.8e");
+    ADD_MSG(PS_COST_MULT,std_m, 5, "upMultiplier = %e downMultiplier = %e");
+    ADD_MSG(PS_COST_ESTIMATES, std_m, 5, "%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e");
     ADD_MSG(CANDIDATE_LIST,std_m,4,
-        "list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e \n");
-    ADD_MSG(CANDIDATE_LIST2, std_m, 4,
-        "list_[%3d] = %3d useful_[%3d] = %e\n");
-    ADD_MSG(CANDIDATE_LIST3, std_m, 4,
-        "list2[%3d] = %3d useful2[%3d] = %e\n");
-    ADD_MSG(SB_HEADER, std_m,4,
-        "           DownStat    DownChange     UpStat      UpChange\n");
-    ADD_MSG(SB_RES, std_m, 4,
-        "    %3d    %6s    %13.6e   %6s    %13.6e\n");
-    ADD_MSG(BRANCH_VAR, std_m, 5, "Branched on variable %i, bestWhichWay: %i\n");
-    ADD_MSG(CHOSEN_VAR, std_m, 4,"           Choosing %d\n");
-    ADD_MSG(UPDATE_PS_COST, std_m, 5,"update %3d %3d %e %e %3d\n");
+        "list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e");
+    ADD_MSG(CANDIDATE_LIST2, std_m, 5,
+        "list_[%3d] = %3d useful_[%3d] = %e");
+    ADD_MSG(CANDIDATE_LIST3, std_m, 5,
+        "list2[%3d] = %3d useful2[%3d] = %e");
+    ADD_MSG(SB_HEADER, std_m,5,
+        "           DownStat    DownChange     UpStat      UpChange");
+    ADD_MSG(SB_RES, std_m, 5,
+        "    %3d    %6s    %13.6e   %6s    %13.6e");
+    ADD_MSG(BRANCH_VAR, std_m, 4, "Branched on variable %i, bestWhichWay: %i");
+    ADD_MSG(CHOSEN_VAR, std_m, 4,"           Choosing %d");
+    ADD_MSG(UPDATE_PS_COST, std_m, 4,"update %3d %3d %e %e %3d");
   }
   const std::string BonChooseVariable::CNAME = "BonChooseVariable";
 
@@ -60,7 +60,9 @@ namespace Bonmin
     options->GetEnumValue("trust_strong_branching_for_pseudo_cost",trustStrongForPseudoCosts_ , "bonmin.");
     int sortCrit;
     options->GetEnumValue("candidate_sort_criterion", sortCrit, "bonmin.");
+#ifndef OLD_USEFULLNESS
     sortCrit_ = (CandidateSortCriterion) sortCrit;
+#endif
     /** Set values of standard branching options.*/
     int numberObjects = solver_->numberObjects();
     //std::cout<<"Number objects "<<numberObjects<<std::endl;
@@ -90,7 +92,9 @@ namespace Bonmin
       setup_pseudo_frac_(rhs.setup_pseudo_frac_),
       numberBeforeTrustedList_(rhs.numberBeforeTrustedList_),
       numberStrongRoot_(rhs.numberStrongRoot_),
+#ifndef OLD_USEFULLNESS
       sortCrit_(rhs.sortCrit_),
+#endif
       minNumberStrongBranch_(rhs.minNumberStrongBranch_),
       pseudoCosts_(rhs.pseudoCosts_),
       trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_)
@@ -117,7 +121,9 @@ namespace Bonmin
       setup_pseudo_frac_ = rhs.setup_pseudo_frac_;
       numberBeforeTrustedList_ = rhs.numberBeforeTrustedList_;
       numberStrongRoot_ = rhs.numberStrongRoot_;
+#ifndef OLD_USEFULLNESS
       sortCrit_ = rhs.sortCrit_;
+#endif
       minNumberStrongBranch_ = rhs.minNumberStrongBranch_;
       pseudoCosts_ = rhs.pseudoCosts_;
       trustStrongForPseudoCosts_ = rhs.trustStrongForPseudoCosts_;
@@ -219,7 +225,28 @@ namespace Bonmin
       const OsiObject* object, int i,
       double& value2) const
   {
-    // FIXME: Hanlding initialization correctly
+#ifdef OLD_USEFULLNESS
+  double sumUp = pseudoCosts_.upTotalChange()[i]+1.0e-30;
+  int numberUp = pseudoCosts_.upNumber()[i];
+  double sumDown = pseudoCosts_.downTotalChange()[i]+1.0e-30;
+  int numberDown = pseudoCosts_.downNumber()[i];
+  double upEst = object->upEstimate();
+  double downEst = object->downEstimate();
+  upEst = numberUp ? ((upEst*sumUp)/numberUp) : (upEst*upMult);
+  //if (numberUp<numberBeforeTrusted_)
+  //  upEst *= (numberBeforeTrusted_+1.0)/(numberUp+1.0);
+  downEst = numberDown ? ((downEst*sumDown)/numberDown) : (downEst*downMult);
+  //if (numberDown<numberBeforeTrusted_)
+  //  downEst *= (numberBeforeTrusted_+1.0)/(numberDown+1.0);
+  double useful = ( MAXMIN_CRITERION*CoinMin(upEst,downEst) +
+		    (1.0-MAXMIN_CRITERION)*CoinMax(upEst,downEst) );
+  value2 = -COIN_DBL_MAX;
+  if (numberUp   < numberBeforeTrustedList_ ||
+      numberDown < numberBeforeTrustedList_) {
+    value2 = value;
+  }
+#else
+   // FIXME: Hanlding initialization correctly
     int numberUp = pseudoCosts_.upNumber()[i];
     int numberDown = pseudoCosts_.downNumber()[i];
     if (sortCrit_ >= DecrPs && sortCrit_ <= IncrPs) {//Using pseudo costs
@@ -248,10 +275,12 @@ namespace Bonmin
           numberDown < numberBeforeTrustedList_) {
         value2 = value;
       }
+#endif
       message(PS_COST_ESTIMATES)
       <<i<< useful<< upEst<< downEst<< value<< value2<< CoinMessageEol;
       return useful;
     }
+#ifndef OLD_USEFULLNESS
     else if (sortCrit_ >= DecrInfeas && sortCrit_ <= IncrInfeas) {//Just return infeasibility
       double usefull = value;
       value2 = value;
@@ -263,6 +292,7 @@ namespace Bonmin
       return COIN_DBL_MAX;
     }
   }
+#endif
 
   int
   BonChooseVariable::setupList ( OsiBranchingInformation *info, bool initialize)
@@ -450,12 +480,18 @@ namespace Bonmin
     if (feasible) {
       maximumStrong = CoinMin(maximumStrong,putOther);
       for (i=0;i<maximumStrong;i++) {
-        if (list_[i]>=0) {
+      if (list_[i]>=0) {
+#ifdef OLD_USEFULLNESS
+	list_[numberOnList_]=list_[i];
+	useful_[numberOnList_++]=-useful_[i];
+      
+#else
           list_[numberOnList_]=list_[i];
           if ((sortCrit_ & 1) == 0) {
             useful_[numberOnList_++]=-useful_[i];
           }
           else useful_[numberOnList_++] = useful_[i];
+#endif
           message(CANDIDATE_LIST2)<<numberOnList_-1
           <<list_[numberOnList_-1]<<numberOnList_-1<<useful_[numberOnList_-1]
           <<CoinMessageEol;
@@ -525,10 +561,11 @@ namespace Bonmin
     int way;
     if (bb_log_level_>3) {
       //for (int i=0; i<Min(numberUnsatisfied_,numberStrong_); i++)
-      for (int i=0; i<numberOnList_; i++)
+      for (int i=0; i<numberOnList_; i++){
         message(CANDIDATE_LIST)<<i<< list_[i]<< i<< useful_[i]
         <<object[list_[i]]->infeasibility(info,way)
         <<CoinMessageEol;
+        }
     }
     return numberUnsatisfied_;
 
