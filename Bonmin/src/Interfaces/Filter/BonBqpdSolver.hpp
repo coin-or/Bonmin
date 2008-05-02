@@ -85,6 +85,11 @@ namespace Bonmin
     virtual bool setWarmStart(const CoinWarmStart * warm,
         Ipopt::SmartPtr<TMINLP2TNLP> tnlp);
 
+    /// Safe the current state (after most recent solve that must have
+    /// been successful) as hot start information and use that for all
+    /// further solves, until unmakeHotStart is called.
+    virtual bool markHotStart(){return cached_->markHotStart();}
+
     /// Get warm start used in last optimization
     virtual CoinWarmStart * getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const{
       throw CoinError(__PRETTY_FUNCTION__,"","Not implemented");
@@ -188,7 +193,53 @@ namespace Bonmin
       fint iprint;
       fint nout;
 
-      fint kk,ll,kkk,lll,mxws,mxlws;
+      /// wsc common block
+      fint kk,ll,mxws,mxlws;
+
+      /** indicates if we should start from a hotstart **/
+      bool haveHotStart_;
+      /** @name All remaining information from all common blocks for
+	  hot start **/
+      //@{
+      /// bqpdc common block
+      fint irh1,na,na1,nb,nb1,ka1,kb1,kc1,irg1,lu1,lv,lv1,ll1;
+      /// epsc common block
+      real eps,tol,emin;
+      /// vstepc common block
+      real vstep;
+      /// repc common block
+      real sgnf;
+      fint nrep,npiv,nres;
+      /// refactorc common block
+      fint nup,nfreq;
+      /// alphac common block
+      real alpha;
+      /// sparsec common block
+      fint ns,ns1,nt,nt1,nu,nu1,nx,nx1,np,np1,nprof,lc;
+      fint lc1,li,li1,lm,lm1,lp_,lp1,lq,lq1,lr,lr1,ls_,ls1,lt,lt1;
+      /// factorc common block
+      fint m1,m2,mp,mq,lastr,irow;
+      /// mxm1c common block
+      fint mxm1;
+      /// /minorc
+      real c;
+      //@}
+      fint kHot;
+      real* xHot;
+      real fHot;
+      real* gHot;
+      real* rHot;
+      real* wHot;
+      real* eHot;
+      fint* lsHot;
+      real* alpHot;
+      fint* lpHot;
+      fint peqHot;
+      real* wsHot;
+      fint* lwsHot;
+      fint infoHot[1];
+      fint kkkHot;
+      fint lllHot;
 
       Ipopt::SmartPtr<BranchingTQP> tqp_;
       /** Elapsed CPU time in last optimization. */
@@ -215,6 +266,17 @@ namespace Bonmin
           lp(NULL),
           ws(NULL),
           lws(NULL),
+	  haveHotStart_(false),
+	  xHot(NULL),
+	  gHot(NULL),
+	  rHot(NULL),
+	  wHot(NULL),
+	  eHot(NULL),
+	  lsHot(NULL),
+	  alpHot(NULL),
+	  lpHot(NULL),
+	  wsHot(NULL),
+	  lwsHot(NULL),
           cpuTime_(0),
           use_warm_start_in_cache_(false),
 	  bad_warm_start_info_(false)
@@ -236,6 +298,17 @@ namespace Bonmin
           lp(NULL),
           ws(NULL),
           lws(NULL),
+	  haveHotStart_(false),
+	  xHot(NULL),
+	  gHot(NULL),
+	  rHot(NULL),
+	  wHot(NULL),
+	  eHot(NULL),
+	  lsHot(NULL),
+	  alpHot(NULL),
+	  lpHot(NULL),
+	  wsHot(NULL),
+	  lwsHot(NULL),
           tqp_(tqp),
           cpuTime_(0),
           use_warm_start_in_cache_(false),
@@ -250,6 +323,15 @@ namespace Bonmin
 
       /** Optimize problem described by cache with filter.*/
       void optimize();
+
+      /** Store most recent solution as hot start */
+      bool markHotStart();
+
+      /** Forget about the hot start info */
+      bool unmarkHotStart();
+
+      /** Copy current values from hot start info */
+      void copyFromHotStart();
 
       /** Destructor. */
       ~cachedInfo()
@@ -268,6 +350,16 @@ namespace Bonmin
         delete [] lp;
         delete [] ws;
         delete [] lws;
+	delete [] xHot;
+	delete [] gHot;
+	delete [] rHot;
+	delete [] wHot;
+	delete [] eHot;
+	delete [] lsHot;
+	delete [] alpHot;
+	delete [] lpHot;
+	delete [] wsHot;
+	delete [] lwsHot;
       }
     };
 

@@ -46,11 +46,25 @@ namespace Bonmin
     TMINLP2TNLP* tminlp2tnlp = tminlp_interface->problem();
     branching_tqp_ = new BranchingTQP(tminlp2tnlp);
 
+    first_solve_ = true;
 #ifdef COIN_HAS_FILTERSQP
     FilterSolver* filter_solver =
       dynamic_cast<FilterSolver*> (tminlp_interface->solver());
     if (filter_solver) {
-      tqp_solver_ = new BqpdSolver(RegOptions(), Options(), Jnlst());
+      SmartPtr<BqpdSolver> qp_solver_ =
+	new BqpdSolver(RegOptions(), Options(), Jnlst());
+#if 0
+      // Solve the QP with the original bounds and set the hot start
+      // information
+      TNLPSolver::ReturnStatus retstatus;
+      retstatus = qp_solver_->OptimizeTNLP(GetRawPtr(branching_tqp_));
+      if (retstatus == TNLPSolver::solvedOptimal ||
+	  retstatus == TNLPSolver::solvedOptimalTol) {
+	first_solve_ = false;
+	qp_solver_->markHotStart();
+      }
+#endif
+      tqp_solver_ = GetRawPtr(qp_solver_);
       //tqp_solver_ = new FilterSolver(RegOptions(), Options(), Jnlst());
     }
 #endif
@@ -58,7 +72,6 @@ namespace Bonmin
       tqp_solver_ = tminlp_interface->solver()->clone();
     }
     tqp_solver_->enableWarmStart();
-    first_solve_ = true;
   }
 
   void QpBranchingSolver::

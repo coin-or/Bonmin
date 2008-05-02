@@ -15,7 +15,7 @@
 
 #include "CoinTime.hpp"
 
-//#define InitializeAll
+#define InitializeAll
 
 typedef Bonmin::BqpdSolver::fint fint;
 typedef Bonmin::BqpdSolver::real real;
@@ -65,6 +65,37 @@ extern "C"
       fint scale_mode, phe;
     }
   F77_FUNC(scalec,SCALEC);
+
+  extern struct {
+      fint irh1,na,na1,nb,nb1,ka1,kb1,kc1,irg1,lu1,lv,lv1,ll1;
+    }
+  F77_FUNC(bqpdc,BQPDC);
+
+  extern struct {
+      real alpha;
+    }
+  F77_FUNC(alphac,ALPHAC);
+
+  extern struct {
+      fint ns,ns1,nt,nt1,nu,nu1,nx,nx1,np,np1,nprof,lc;
+      fint lc1,li,li1,lm,lm1,lp_,lp1,lq,lq1,lr,lr1,ls_,ls1,lt,lt1;
+    }
+  F77_FUNC(sparsec,SPARSEC);
+
+  extern struct {
+      fint m1,m2,mp,mq,lastr,irow;
+    }
+  F77_FUNC(factorc,FACTORC);
+
+  extern struct {
+      fint mxm1;
+    }
+  F77_FUNC(mxm1c,MXM1C);
+
+  extern struct {
+      real c;
+    }
+  F77_FUNC(minorc,MINORS);
 }
 
 namespace Bonmin
@@ -316,8 +347,8 @@ namespace Bonmin
 #if 0
 //deleteme
     printf("nnz_hess = %d\n", nnz_hess);
-    for (int i=0; i<ll; i++) printf("lws[%2d] = %d\n", i,lws[i]);
-    for (int i=0; i<kk; i++) printf("ws[%3d] = %e\n",i,ws[i]);
+    for (int i=0; i<ll; i++) printf("hess lws[%2d] = %d\n", i,lws[i]);
+    for (int i=0; i<kk; i++) printf("hess ws[%3d] = %e\n",i,ws[i]);
 #endif
 
     Index bufy;
@@ -366,24 +397,186 @@ namespace Bonmin
     return optimizationStatus;
   }
 
-  /** Optimize problem described by cache with filter.*/
+  bool
+  BqpdSolver::cachedInfo::markHotStart()
+  {
+    haveHotStart_ = true;
+    irh1 = F77_FUNC(bqpdc,BQPDC).irh1;
+    na = F77_FUNC(bqpdc,BQPDC).na;
+    na1 = F77_FUNC(bqpdc,BQPDC).na1;
+    nb = F77_FUNC(bqpdc,BQPDC).nb;
+    nb1 = F77_FUNC(bqpdc,BQPDC).nb1;
+    ka1 = F77_FUNC(bqpdc,BQPDC).ka1;
+    kb1 = F77_FUNC(bqpdc,BQPDC).kb1;
+    kc1 = F77_FUNC(bqpdc,BQPDC).kc1;
+    irg1 = F77_FUNC(bqpdc,BQPDC).irg1;
+    lu1 = F77_FUNC(bqpdc,BQPDC).lu1;
+    lv = F77_FUNC(bqpdc,BQPDC).lv;
+    lv1 = F77_FUNC(bqpdc,BQPDC).lv1;
+    ll1 = F77_FUNC(bqpdc,BQPDC).ll1;
+    eps = F77_FUNC(epsc,EPSC).eps;
+    tol = F77_FUNC(epsc,EPSC).tol;
+    emin = F77_FUNC(epsc,EPSC).emin;
+    vstep = F77_FUNC(vstepc,VSTEPC).vstep;
+    sgnf = F77_FUNC(repc,REPC).sgnf;
+    nrep = F77_FUNC(repc,REPC).nrep;
+    npiv = F77_FUNC(repc,REPC).npiv;
+    nres = F77_FUNC(repc,REPC).nres;
+    nup = F77_FUNC(refactorc,REFACTORC).nup;
+    nfreq = F77_FUNC(refactorc,REFACTORC).nfreq;
+    alpha = F77_FUNC(alphac,ALPHAC).alpha;
+
+    ns = F77_FUNC(sparsec,SPARSEC).ns;
+    ns1 = F77_FUNC(sparsec,SPARSEC).ns1;
+    nt = F77_FUNC(sparsec,SPARSEC).nt;
+    nt1 = F77_FUNC(sparsec,SPARSEC).nt1;
+    nu = F77_FUNC(sparsec,SPARSEC).nu;
+    nu1 = F77_FUNC(sparsec,SPARSEC).nu1;
+    nx = F77_FUNC(sparsec,SPARSEC).nx;
+    nx1 = F77_FUNC(sparsec,SPARSEC).nx1;
+    np = F77_FUNC(sparsec,SPARSEC).np;
+    np1 = F77_FUNC(sparsec,SPARSEC).np1;
+    nprof = F77_FUNC(sparsec,SPARSEC).nprof;
+    lc = F77_FUNC(sparsec,SPARSEC).lc;
+    lc1 = F77_FUNC(sparsec,SPARSEC).lc1;
+    li = F77_FUNC(sparsec,SPARSEC).li;
+    li1 = F77_FUNC(sparsec,SPARSEC).li1;
+    lm = F77_FUNC(sparsec,SPARSEC).lm;
+    lm1 = F77_FUNC(sparsec,SPARSEC).lm1;
+    lp_ = F77_FUNC(sparsec,SPARSEC).lp_;
+    lp1 = F77_FUNC(sparsec,SPARSEC).lp1;
+    lq = F77_FUNC(sparsec,SPARSEC).lq;
+    lq1 = F77_FUNC(sparsec,SPARSEC).lq1;
+    lr = F77_FUNC(sparsec,SPARSEC).lr;
+    lr1 = F77_FUNC(sparsec,SPARSEC).lr1;
+    ls_ = F77_FUNC(sparsec,SPARSEC).ls_;
+    ls1 = F77_FUNC(sparsec,SPARSEC).ls1;
+    lt = F77_FUNC(sparsec,SPARSEC).lt;
+    lt1 = F77_FUNC(sparsec,SPARSEC).lt1;
+
+    m1 = F77_FUNC(factorc,FACTORC).m1;
+    m2 = F77_FUNC(factorc,FACTORC).m2;
+    mp = F77_FUNC(factorc,FACTORC).mp;
+    mq = F77_FUNC(factorc,FACTORC).mq;
+    lastr = F77_FUNC(factorc,FACTORC).lastr;
+    irow = F77_FUNC(factorc,FACTORC).irow;
+
+    mxm1 = F77_FUNC(mxm1c,MXM1c).mxm1;
+    c = F77_FUNC(minorc,MINORC).c;
+    kkkHot = F77_FUNC(wsc,WSC).kkk;
+    lllHot = F77_FUNC(wsc,WSC).lll;
+
+    kHot = k;
+    xHot = CoinCopyOfArray(x,n);
+    fHot = f;
+    gHot = CoinCopyOfArray(g,n);
+    rHot = CoinCopyOfArray(r,n+m);
+    wHot = CoinCopyOfArray(w,n+m);
+    eHot = CoinCopyOfArray(e,n+m);
+    lsHot = CoinCopyOfArray(ls,n+m);
+    alpHot = CoinCopyOfArray(alp,mlp);
+    lpHot = CoinCopyOfArray(lp,mlp);
+    peqHot = peq;
+    //wsHot = CoinCopyOfArray(ws,kk+kkkHot);
+    //lwsHot = CoinCopyOfArray(lws,ll+lllHot);
+    wsHot = CoinCopyOfArray(ws,mxws);
+    lwsHot = CoinCopyOfArray(lws,mxlws);
+    infoHot[0] = info[0];
+
+    return true;
+  }
+
+  void
+  BqpdSolver::cachedInfo::copyFromHotStart()
+  {
+    F77_FUNC(bqpdc,BQPDC).irh1 = irh1;
+    F77_FUNC(bqpdc,BQPDC).na = na;
+    F77_FUNC(bqpdc,BQPDC).na1 = na1;
+    F77_FUNC(bqpdc,BQPDC).nb = nb;
+    F77_FUNC(bqpdc,BQPDC).nb1 = nb1;
+    F77_FUNC(bqpdc,BQPDC).ka1 = ka1;
+    F77_FUNC(bqpdc,BQPDC).kb1 = kb1;
+    F77_FUNC(bqpdc,BQPDC).kc1 = kc1;
+    F77_FUNC(bqpdc,BQPDC).irg1 = irg1;
+    F77_FUNC(bqpdc,BQPDC).lu1 = lu1;
+    F77_FUNC(bqpdc,BQPDC).lv = lv;
+    F77_FUNC(bqpdc,BQPDC).lv1 = lv1;
+    F77_FUNC(bqpdc,BQPDC).ll1 = ll1;
+    F77_FUNC(epsc,EPSC).eps = eps;
+    F77_FUNC(epsc,EPSC).tol = tol;
+    F77_FUNC(epsc,EPSC).emin = emin;
+    F77_FUNC(vstepc,VSTEPC).vstep = vstep;
+    F77_FUNC(repc,REPC).sgnf = sgnf;
+    F77_FUNC(repc,REPC).nrep = nrep;
+    F77_FUNC(repc,REPC).npiv = npiv;
+    F77_FUNC(repc,REPC).nres = nres;
+    F77_FUNC(refactorc,REFACTORC).nup = nup;
+    F77_FUNC(refactorc,REFACTORC).nfreq = nfreq;
+    F77_FUNC(alphac,ALPHAC).alpha = alpha;
+
+    F77_FUNC(sparsec,SPARSEC).ns = ns;
+    F77_FUNC(sparsec,SPARSEC).ns1 = ns1;
+    F77_FUNC(sparsec,SPARSEC).nt = nt;
+    F77_FUNC(sparsec,SPARSEC).nt1 = nt1;
+    F77_FUNC(sparsec,SPARSEC).nu = nu;
+    F77_FUNC(sparsec,SPARSEC).nu1 = nu1;
+    F77_FUNC(sparsec,SPARSEC).nx = nx;
+    F77_FUNC(sparsec,SPARSEC).nx1 = nx1;
+    F77_FUNC(sparsec,SPARSEC).np = np;
+    F77_FUNC(sparsec,SPARSEC).np1 = np1;
+    F77_FUNC(sparsec,SPARSEC).nprof = nprof;
+    F77_FUNC(sparsec,SPARSEC).lc = lc;
+    F77_FUNC(sparsec,SPARSEC).lc1 = lc1;
+    F77_FUNC(sparsec,SPARSEC).li = li;
+    F77_FUNC(sparsec,SPARSEC).li1 = li1;
+    F77_FUNC(sparsec,SPARSEC).lm = lm;
+    F77_FUNC(sparsec,SPARSEC).lm1 = lm1;
+    F77_FUNC(sparsec,SPARSEC).lp_ = lp_;
+    F77_FUNC(sparsec,SPARSEC).lp1 = lp1;
+    F77_FUNC(sparsec,SPARSEC).lq = lq;
+    F77_FUNC(sparsec,SPARSEC).lq1 = lq1;
+    F77_FUNC(sparsec,SPARSEC).lr = lr;
+    F77_FUNC(sparsec,SPARSEC).lr1 = lr1;
+    F77_FUNC(sparsec,SPARSEC).ls_ = ls_;
+    F77_FUNC(sparsec,SPARSEC).ls1 = ls1;
+    F77_FUNC(sparsec,SPARSEC).lt = lt;
+    F77_FUNC(sparsec,SPARSEC).lt1 = lt1;
+
+    F77_FUNC(factorc,FACTORC).m1 = m1;
+    F77_FUNC(factorc,FACTORC).m2 = m2;
+    F77_FUNC(factorc,FACTORC).mp = mp;
+    F77_FUNC(factorc,FACTORC).mq = mq;
+    F77_FUNC(factorc,FACTORC).lastr = lastr;
+    F77_FUNC(factorc,FACTORC).irow = irow;
+
+    F77_FUNC(mxm1c,MXM1c).mxm1 = mxm1;
+    F77_FUNC(minorc,MINORC).c = c;
+
+    F77_FUNC(wsc,WSC).kkk = kkkHot;
+    F77_FUNC(wsc,WSC).lll = lllHot;
+
+    k = kHot;
+    CoinCopyN(xHot,n,x);
+    f = fHot;
+    CoinCopyN(gHot,n,g);
+    CoinCopyN(rHot,n+m,r);
+    CoinCopyN(wHot,n+m,w);
+    CoinCopyN(eHot,n+m,e);
+    CoinCopyN(lsHot,n+m,ls);
+    CoinCopyN(alpHot,mlp,alp);
+    CoinCopyN(lpHot,mlp,lp);
+    peq = peqHot;
+    //CoinCopyN(ws,kk+kkkHot,wsHot);
+    //CoinCopyN(lws,ll+lllHot,lwsHot);
+    CoinCopyN(wsHot,mxws,ws);
+    CoinCopyN(lwsHot,mxlws,lws);
+    info[0] = infoHot[0];
+  }
+
+  /** Optimize problem described by cache with Bqpd.*/
   void
   BqpdSolver::cachedInfo::optimize()
   {
-    //DELETEME
-    //use_warm_start_in_cache_ = false;
-    if (use_warm_start_in_cache_ && !bad_warm_start_info_) {
-      m0de = 6;
-      use_warm_start_in_cache_ = false;
-    }
-    else {
-      m0de = 0;
-      tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
-      ifail = 0;
-      bad_warm_start_info_ = false;
-    }
-    //printf("m0de = %d\n", m0de);
-
     // Set up some common block stuff
     F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
     F77_FUNC(scalec,SCALEC).phe = 0;  // No scaling
@@ -392,6 +585,19 @@ namespace Bonmin
     F77_FUNC(wsc,WSC).ll = ll;
     F77_FUNC(wsc,WSC).mxws = mxws;
     F77_FUNC(wsc,WSC).mxlws = mxlws;
+
+    if (use_warm_start_in_cache_ && !bad_warm_start_info_) {
+      m0de = 6;
+      ifail = 0;
+      use_warm_start_in_cache_ = false;
+      if (haveHotStart_) copyFromHotStart();
+    }
+    else {
+      m0de = 0;
+      tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
+      ifail = 0;
+      bad_warm_start_info_ = false;
+    }
 
 #if 0
     printf("========= 222222222222 =============\n");
@@ -423,14 +629,40 @@ namespace Bonmin
 			  &m0de, &ifail, info, &iprint, &nout);
       printf("new ifail = %d\n", ifail);
     }
+    if (ifail == 7) {
+      printf("Not enout memory in Bqpd.  FIXME!\n");
+      throw;
+    }
     if (ifail == 8) bad_warm_start_info_ = true;
 #if 0
     for (int i=0; i<n; i++) {
       printf("qxsol[%2d] = %23.16e\n", i, x[i]);
     }
+#endif
+#if 0
     printf("ifail = %d\n", ifail);
     printf("final f = %e\n", f);
     printf("final f + obj_val = %e\n", f+tqp_->ObjVal());
+#endif
+#if 0
+    int kkk = F77_FUNC(wsc,WSC).kkk;
+    int lll = F77_FUNC(wsc,WSC).lll;
+    printf("========= 3333333333 =============\n");
+    printf("kk = %d ll = %d kkk = %d lll = %d mxws = %d mxlws = %d\n", kk, ll, kkk, lll, mxws, mxlws);
+    for (int i=0; i<kk+kkk; i++) {
+      printf("ws[%3d] = %15.8e\n ", i, ws[i]);
+    }
+    printf("--------\n");
+    for (int i=kk+kkk; i<mxws; i++) {
+      printf("ws[%3d] = %15.8e\n ", i, ws[i]);
+    }
+    for (int i=0; i<ll+lll; i++) {
+      printf("lws[%5d] = %8d\n", i, lws[i]);
+    }
+    printf("------\n");
+    for (int i=ll+lll; i<mxlws; i++) {
+      printf("lws[%5d] = %8d\n", i, lws[i]);
+    }
 #endif
     cpuTime_ += CoinCpuTime();
   }
