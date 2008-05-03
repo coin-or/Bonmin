@@ -225,3 +225,20 @@ CouNumber CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation 
 
   return bestPt;
 }
+
+
+/// fix nonlinear coordinates of current integer-nonlinear feasible solution
+double CouenneVarObject::feasibleRegion (OsiSolverInterface *solver, 
+					 const OsiBranchingInformation *info) const {
+  int index = reference_ -> Index ();
+
+  assert (index >= 0);
+
+  double val = info -> solution_ [index];
+
+  // fix that variable to its current value
+  solver -> setColLower (index, val-TOL);
+  solver -> setColUpper (index, val+TOL);
+
+  return 0.;
+}

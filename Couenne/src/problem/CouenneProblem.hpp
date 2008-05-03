@@ -362,7 +362,7 @@ class CouenneProblem {
   {return ConstPtr(jnlst_);}
 
   /// Check if solution is MINLP feasible
-  bool checkNLP (const double *solution, const double obj);
+  bool checkNLP (const double *solution, const double obj) const;
 
   /// generate integer NLP point Y starting from fractional solution
   /// using bound tightening

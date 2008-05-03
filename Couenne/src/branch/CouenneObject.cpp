@@ -266,7 +266,7 @@ CouNumber CouenneObject::getBrPoint (funtriplet *ft, CouNumber x0, CouNumber l, 
 }
 
 
-/// non-linear infeasibility
+/// non-linear infeasibility -- not called by independent's CouenneVarObject
 double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &way) const {
 
   if (strategy_ == NO_BRANCH) 
@@ -277,6 +277,17 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
      info -> solution_, 
      info -> lower_, 
      info -> upper_);
+
+  double retval = fastInfeasibility (info, way);
+
+  problem_ -> domain () -> pop ();
+
+  return retval;
+}
+
+
+/// non-linear infeasibility
+double CouenneObject::fastInfeasibility (const OsiBranchingInformation *info, int &way) const {
 
   double retval = fabs (info -> solution_ [reference_ -> Index ()] - 
 			(*(reference_ -> Image ())) ());
@@ -296,8 +307,6 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
     upEstimate_ = downEstimate_ = retval;
 
   setEstimates (info, &retval, NULL);
-
-  problem_ -> domain () -> pop ();
 
   return retval;
 }

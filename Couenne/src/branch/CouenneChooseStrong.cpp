@@ -447,12 +447,11 @@ namespace Bonmin {
 
 #ifdef CCS_EXPERIMENTAL
 
-  ///
+  /// copy of BonChooseVariable::setupList()
   int CouenneChooseStrong::setupList (OsiBranchingInformation *info, bool initialize) {
 
     if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
-      printf ("----------------- (strong) setup list on %d objects\n",
-	      solver_ -> numberObjects());
+      printf ("----------------- (strong) setup list on %d objects\n", solver_ -> numberObjects());
       for (int i=0; i<problem_ -> domain () -> current () -> Dimension (); i++)
 	printf ("%4d %20.4g [%20.4g %20.4g]\n", i,
 		info -> solution_ [i], info -> lower_ [i], info -> upper_ [i]);
@@ -462,8 +461,6 @@ namespace Bonmin {
       number_not_trusted_ = 1;
       return OsiChooseVariable::setupList(info, initialize);
     }
-
-    initialize = true; // to avoid failed assert in BonChooseVariable::setupList()
 
     problem_ -> domain () -> push 
       (problem_ -> nVars (),

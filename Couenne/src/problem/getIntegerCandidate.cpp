@@ -158,11 +158,12 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
       //CoinCopyN (xFrac, nOrig_, xInt);// TODO: re-copy first nOrig_ variables into xInt?
 
-      int remaining = *rNum;
+      int 
+	remaining = *rNum,
+	ntrials   = 0, 
+	maxtrials = 3;// rNum / divider;
 
       do {
-
-	int ntrials = 0, maxtrials = 3;// rNum / divider;
 
 	bool one_fixed = false;
 
@@ -292,14 +293,17 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     // all integers are fixed, now compute objective function, set new
     // cutoff if better, and re-run bound-tightening
 
-#if 0
+    //#if 0
     // if initial point is feasible, compute corresponding objective
     // and update if upper bound improves
     initAuxs ();
     int objind = Obj (0) -> Body () -> Index ();
-    if (X (objind) < getCutOff ())
-      setCutOff (X (objind));
-#endif
+    if (X (objind) < getCutOff ()) {
+      const CouNumber *x = X (), xp = x [objind];
+      if (checkNLP (x, xp))
+	setCutOff (X (objind));
+    }
+    //#endif
 
   } // try
 

@@ -45,7 +45,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 				 // nowhere an independent
 
     const CouenneObject &obj = problem_ -> Objects () [reference_ -> Index ()];
-    retval = (obj. Reference ()) ? weiSum * obj.infeasibility (info, way) : 0.;
+    retval = (obj. Reference ()) ? weiSum * obj.fastInfeasibility (info, way) : 0.;
 
   } else {
 
@@ -60,7 +60,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
       // *i is the index of an auxiliary that depends on reference_
 
       const CouenneObject &obj = problem_ -> Objects () [*i];
-      CouNumber infeas = (obj. Reference ()) ? obj.infeasibility (info, way) : 0.;
+      CouNumber infeas = (obj. Reference ()) ? obj.fastInfeasibility (info, way) : 0.;
 
       if (infeas > infmax) infmax = infeas;
       if (infeas < infmin) infmin = infeas;

@@ -48,6 +48,9 @@ public:
   virtual OsiBranchingObject *createBranch (OsiSolverInterface*, 
 					    const OsiBranchingInformation*, int) const;
 
+  /// fix nonlinear coordinates of current integer-nonlinear feasible solution
+  virtual double feasibleRegion (OsiSolverInterface *, const OsiBranchingInformation *) const;
+
 protected:
 
   /// Method computing the branching point

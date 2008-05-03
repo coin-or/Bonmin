@@ -68,7 +68,8 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
   // w.r.t. applying implied bounds to ALL expressions just because
   // one single propagation was found.
 
-  for (int i = 0, j = nVars (); j--; i++)
+  for (int i = 0, j = nVars (); j--; i++) {
+
     // final test 
     if ((Lb (i) > Ub (i) + COUENNE_EPS) || 
 	(Ub (i) < - MAX_BOUND) ||
@@ -77,6 +78,14 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
       Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, "final test: infeasible BT\n");
       return false;
     }
+
+    // sanity check. Ipopt gives an exception when Lb (i) is above Ub (i)
+    if (Lb (i) > Ub (i)) {
+      CouNumber swap = Lb (i);
+      Lb (i) = Ub (i);
+      Ub (i) = swap;
+    }
+  }
 
   return true;
 }

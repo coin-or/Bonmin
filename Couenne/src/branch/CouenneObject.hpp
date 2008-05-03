@@ -20,6 +20,7 @@
 
 #define AGGR_MUL 2
 #define THRES_ZERO_SYMM 0.8
+#define TOL 0.
 
 const CouNumber closeToBounds = .05;
 
@@ -51,7 +52,7 @@ public:
   /// type of up/down estimate to return for pseudocosts
   enum pseudocostMult {INFEASIBILITY, 
 		       INTERVAL_LP, INTERVAL_LP_REV,
-		       INTERVAL_BR, INTERVAL_BR_REV, 
+		       INTERVAL_BR, INTERVAL_BR_REV,
 		       PROJECTDIST};
 
   /// type of object (for branching variable selection)
@@ -85,12 +86,14 @@ public:
 
   /// compute infeasibility of this variable, |w - f(x)| (where w is
   /// the auxiliary variable defined as w = f(x)
-  /// TODO: suggest way
   virtual double infeasibility (const OsiBranchingInformation *info, int &way) const;
+
+  /// compute infeasibility of this variable, |w - f(x)| (where w is
+  /// the auxiliary variable defined as w = f(x)
+  double fastInfeasibility (const OsiBranchingInformation *info, int &way) const;
 
   /// fix (one of the) arguments of reference auxiliary variable 
   virtual double feasibleRegion (OsiSolverInterface*, const OsiBranchingInformation*) const;
-
 
   /// create CouenneBranchingObject or CouenneThreeWayBranchObj based
   /// on this object

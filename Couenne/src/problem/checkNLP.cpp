@@ -11,7 +11,7 @@
 #include "CouenneProblem.hpp"
 
 // check if solution is MINLP feasible
-bool CouenneProblem::checkNLP (const double *solution, const double obj) {
+bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
 
   const int infeasible = 1;
 
