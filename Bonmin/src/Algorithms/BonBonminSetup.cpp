@@ -338,7 +338,8 @@ namespace Bonmin
           strong_solver = new CurvBranchingSolver(nonlinearSolver_);
           chooseVariable->setTrustStrongForSolution(false);
           chooseVariable->setTrustStrongForBound(false);
-          chooseVariable->setOnlyPseudoWhenTrusted(true);
+          //chooseVariable->setOnlyPseudoWhenTrusted(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
           break;
         case QP_STRONG_BRANCHING:
           chooseVariable->setTrustStrongForSolution(false);
@@ -346,12 +347,14 @@ namespace Bonmin
           // The bound returned from the QP can be wrong, since the
           // objective is not guaranteed to be an underestimator:
           chooseVariable->setTrustStrongForBound(false);
-          chooseVariable->setOnlyPseudoWhenTrusted(true);
+          //chooseVariable->setOnlyPseudoWhenTrusted(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
           break;
         case LP_STRONG_BRANCHING:
           chooseVariable->setTrustStrongForSolution(false);
           strong_solver = new LpBranchingSolver(nonlinearSolver_);
-          chooseVariable->setOnlyPseudoWhenTrusted(true);
+          //chooseVariable->setOnlyPseudoWhenTrusted(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
           break;
          case NLP_STRONG_BRANCHING:
           chooseVariable->setTrustStrongForSolution(false);

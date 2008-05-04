@@ -961,7 +961,7 @@ namespace Bonmin
         downTotalChange[index] += hotInfo->downChange()/object->downEstimate();
         downNumber[index]++;
       }
-      else if (hotInfo->upStatus()==1) {
+      else if (hotInfo->downStatus()==1) {
         downNumber[index]++;
         // infeasible - just say expensive
         if (info->cutoff_<1.0e50)
