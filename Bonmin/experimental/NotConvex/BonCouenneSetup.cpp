@@ -149,92 +149,90 @@ namespace Bonmin{
 
     // add Couenne objects for branching /////////////////////////////////////////////
 
-    {
-      std::string s;
+    std::string s;
 
-      options () -> GetStringValue ("display_stats", s, "couenne.");
-      displayStats_ = (s == "yes");
+    options () -> GetStringValue ("display_stats", s, "couenne.");
+    displayStats_ = (s == "yes");
 
-      options () -> GetStringValue ("branching_object", s, "couenne.");
+    options () -> GetStringValue ("branching_object", s, "couenne.");
 
-      enum CouenneObject::branch_obj objType = CouenneObject::VAR_OBJ;
+    enum CouenneObject::branch_obj objType = CouenneObject::VAR_OBJ;
 
-      if      (s == "vt_obj")   objType = CouenneObject::VT_OBJ;
-      else if (s == "var_obj")  objType = CouenneObject::VAR_OBJ;
-      else if (s == "expr_obj") objType = CouenneObject::EXPR_OBJ;
-      else {
-	printf ("CouenneSetup: Unknown branching object type\n");
-	exit (-1);
-      }
-
-      int nAuxs = 0, nobj = 0,
-	  nVars = couenneProb -> nVars ();
-
-      nAuxs = couenneProb -> nVars ();
-
-      OsiObject ** objects = new OsiObject* [nAuxs];
-
-      for (int i = 0; i < nVars; i++) { // for each variable
-
-	exprVar *var = couenneProb -> Var (i);
-
-	switch (objType) {
-
-	case CouenneObject::EXPR_OBJ:
-
-	  // if this variable is associated with a nonlinear function
-	  if ((var -> Type  () == AUX) && 
-	      (var -> Image () -> Linearity () > LINEAR) &&
-	      (var -> Multiplicity () > 0)) {
-
-	    objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
-	    objects [nobj++] -> setPriority (1);
-	  }
-
-	  break;
-
-	case CouenneObject::VAR_OBJ:
-
-	  // branching objects on variables
-	  if // comment three lines below for linear variables too
-	    ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) // has indep
-	       //|| ((var -> Type () == AUX) &&                      // or, aux 
-	       //    (var -> Image () -> Linearity () > LINEAR))) // of nonlinear
-	     && (var -> Multiplicity () > 0)) {
-
-	    objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
-	    objects [nobj++] -> setPriority (1);
-	  }
-
-	  break;
-
-	default:
-	case CouenneObject::VT_OBJ:
-
-	  // branching objects on variables
-	  if // comment three lines below for linear variables too
-	    ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) // has indep
-	     // || ((var -> Type () == AUX) &&                      // or, aux 
-	     //  (var -> Image () -> Linearity () > LINEAR))) && // of nonlinear
-	     && (var -> Multiplicity () > 0)) {
-
-	    objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
-	    objects [nobj++] -> setPriority (1);
-	  }
-
-	  break;
-	}
-      }
-
-      // Add objects /////////////////////////////////
-      continuousSolver_ -> addObjects (nobj, objects);
-
-      for (int i = 0 ; i < nobj ; i++)
-       	delete objects [i];
-
-      delete [] objects;
+    if      (s == "vt_obj")   objType = CouenneObject::VT_OBJ;
+    else if (s == "var_obj")  objType = CouenneObject::VAR_OBJ;
+    else if (s == "expr_obj") objType = CouenneObject::EXPR_OBJ;
+    else {
+      printf ("CouenneSetup: Unknown branching object type\n");
+      exit (-1);
     }
 
+    int nAuxs = 0, nobj = 0,
+      nVars = couenneProb -> nVars ();
+
+    nAuxs = couenneProb -> nVars ();
+
+    OsiObject ** objects = new OsiObject* [nAuxs];
+
+    for (int i = 0; i < nVars; i++) { // for each variable
+
+      exprVar *var = couenneProb -> Var (i);
+
+      // we only want enabled variables
+      if (var -> Multiplicity () == 0) 
+	continue;
+
+      switch (objType) {
+
+      case CouenneObject::EXPR_OBJ:
+
+	// if this variable is associated with a nonlinear function
+	if ((var -> Type  () == AUX) && 
+	    (var -> Image () -> Linearity () > LINEAR)) {
+
+	  objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
+	  objects [nobj++] -> setPriority (1);
+	}
+
+	break;
+
+      case CouenneObject::VAR_OBJ:
+
+	// branching objects on variables
+	if // comment three lines below for linear variables too
+	  ((couenneProb -> Dependence () [var -> Index ()] . size () > 0)  // has indep
+	   || ((var -> Type () == AUX) &&                                  // or, aux 
+	       (var -> Image () -> Linearity () > LINEAR))) {              // of nonlinear
+
+	  objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
+	  objects [nobj++] -> setPriority (1);
+	}
+
+	break;
+
+      default:
+      case CouenneObject::VT_OBJ:
+
+	// branching objects on variables
+	if // comment three lines below for linear variables too
+	  ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) // has indep
+	  || ((var -> Type () == AUX) &&                      // or, aux 
+	      (var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
+
+	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
+	  objects [nobj++] -> setPriority (1);
+	}
+
+	break;
+      }
+    }
+
+    // Add objects /////////////////////////////////
+    continuousSolver_ -> addObjects (nobj, objects);
+
+    for (int i = 0 ; i < nobj ; i++)
+      delete objects [i];
+
+    delete [] objects;
 
     // Setup Convexifier generators ////////////////////////////////////////////////
 
@@ -273,6 +271,13 @@ namespace Bonmin{
     int varSelection;
     if (!options_->GetEnumValue("variable_selection",varSelection,"bonmin.")) {
       // change the default for Couenne
+      varSelection = OSI_SIMPLE;
+    }
+
+    if ((varSelection == OSI_STRONG) && 
+	(objType == CouenneObject::VT_OBJ)) {
+      printf ("Couenne: warning, strong branching is incompatible with Violation Transfer\n"
+	      "Resetting variable selection to simple branching");
       varSelection = OSI_SIMPLE;
     }
 
