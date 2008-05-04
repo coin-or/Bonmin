@@ -16,12 +16,37 @@
 /// auxiliary variable defined as w = f(x))
 double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int &way) const {
 
+  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+
+    printf ("VT infeas on ");
+    reference_ -> print ();
+
+    if (reference_ -> Image ()) { // if no list, print image
+      printf (" := ");
+      reference_ -> Image () -> print ();
+    }
+
+    const std::set <int> &dependence = problem_ -> Dependence () [reference_ -> Index ()];
+
+    if (dependence.size () > 0) {
+
+      printf (" -- ");
+
+      for (std::set <int>::iterator i = dependence.begin (); 
+	   i != dependence.end (); ++i) {
+	problem_ -> Var (*i) -> print ();
+	printf (" ");
+      }
+    }
+    printf ("\n");
+  }
+
   int index = reference_ -> Index ();
   assert (index >= 0);
 
-  if (info -> upper_ [index] - 
-      info -> lower_ [index] < COUENNE_EPS)
-    return (upEstimate_ = downEstimate_ = 0.);
+  /*if (info -> upper_ [index] - 
+    info -> lower_ [index] < CoinMin (COUENNE_EPS, feas_tolerance_))
+    return (upEstimate_ = downEstimate_ = 0.);*/
 
   problem_ -> domain () -> push 
     (problem_ -> nVars (),
@@ -37,7 +62,12 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     retval   = 0.,
     lFeas    = xcurr,
     rFeas    = xcurr,
-    leanLeft = 0.;
+    leanLeft = 0.,
+    w        = (*reference_) (),
+    fx       = w;
+
+  if (reference_ -> Type () == AUX)
+    fx = (*(reference_ -> Image ())) ();
 
   if (dependence.size () == 0) { // this is a top level auxiliary,
 				 // nowhere an independent
@@ -46,17 +76,15 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     // else constant we return the difference between current value
     // and value of function at this point
 
-    if (reference_ -> Image ()) {
+    if (reference_ -> Type () == AUX) {
 
-      CouNumber
-	w  = lFeas = rFeas = (*reference_) (),
-	fx = ((*reference_ -> Image ())) ();
+      lFeas = rFeas = w;
 
-      retval = fabs (fx - w); // check if this w=f(x) is used nowhere and is feasible
+      //retval = fabs (fx - w); // check if this w=f(x) is used nowhere and is feasible
 
       if      (lFeas > fx) lFeas = fx;
       else if (rFeas < fx) rFeas = fx;
-    }
+    } // otherwise, this is an isolated variable
 
   } else {
 
@@ -87,28 +115,34 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 	if (right > rFeas) rFeas = right;
       }
 
-      /*printf ("init retval = %g - %g = %g (diff = %g - %g = %g) ", 
-	      rFeas, lFeas, rFeas - lFeas,
-	      (*(obj. Reference () -> Image ())) (),
-	      (*(obj. Reference ())) (),
-	      (*(obj. Reference () -> Image ())) () -
-	      (*(obj. Reference ())) ());*/
+      if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+
+	jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "[%g,%g] --> %g - %g = %g (diff = %g - %g = %g): ", 
+			  left, right, rFeas, lFeas, rFeas - lFeas,
+			  (*(obj. Reference () -> Image ())) (), (*(obj. Reference ())) (),
+			  (*(obj. Reference () -> Image ())) () - (*(obj. Reference ())) ());
+
+	obj.Reference () -> print (); printf (" := ");
+	obj.Reference () -> Image () -> print (); printf ("\n");
+      }
     }
 
-    retval = rFeas - lFeas;
+    //retval = rFeas - lFeas;
 
     if (lFeas < info -> lower_ [index]) lFeas = info -> lower_ [index];
     if (rFeas > info -> upper_ [index]) rFeas = info -> upper_ [index];
 
-    if (rFeas - lFeas > COUENNE_EPS) 
-      retval = rFeas - lFeas;
+    //if (rFeas - lFeas > COUENNE_EPS) 
+    retval = rFeas - lFeas;
   }
 
   // if delta is null, return 0, this object is feasible
-  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) {
-    problem_ -> domain () -> pop ();
-    return (upEstimate_ = downEstimate_ = 0.);
-  }
+  //if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) {
+
+  //jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "2nd step, infeas = 0\n");
+  //problem_ -> domain () -> pop ();
+  //return (upEstimate_ = downEstimate_ = 0.);
+  //}
 
   //////////////////////////////////////////////////////////////////////
 
@@ -157,51 +191,78 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
       fabs (info -> pi_ [info -> row_ [indRow]] * 
 	    info -> elementByColumn_  [indRow]);
 
-    /*printf ("+ (pi[%d]=%g) * (el[%d]=%g) [=%g] --> vtd = %g\n",
-	    info -> row_ [indRow],
-	    info -> pi_ [info -> row_ [indRow]], 
-	    indRow,
-	    info -> elementByColumn_  [indRow],
-	    info -> pi_ [info -> row_ [indRow]] * 
-	    info -> elementByColumn_  [indRow],
-	    vt_delta);*/
+    jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "+ (pi[%d]=%g) * (el[%d]=%g) [=%g] --> vtd = %g\n",
+		      info -> row_ [indRow],
+		      info -> pi_ [info -> row_ [indRow]], 
+		      indRow,
+		      info -> elementByColumn_  [indRow],
+		      info -> pi_ [info -> row_ [indRow]] * 
+		      info -> elementByColumn_  [indRow],
+		      vt_delta);
   }
 
   const CouNumber 
-    alpha = 0.7,
-    beta  = 0.1;
+    alpha = 1.0,
+    beta  = 0.0;
 
-  /*printf ("return %g * %g + %g * %g + %g * %g --> ", 
-	  alpha,        fabs (retval * vt_delta),
-	  beta,         retval,
-	  1-alpha-beta, leanLeft * (1-leanLeft));*/
+  jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "return %g * %g + %g * %g + %g * %g --> ", 
+		    alpha,        fabs (retval * vt_delta),
+		    beta,         retval,
+		    1-alpha-beta, leanLeft * (1-leanLeft));
 
   retval = 
     alpha          * fabs (retval*vt_delta) +  // violation transfer itself
     beta           * retval +                  // width of feasibility interval
     (1-alpha-beta) * leanLeft * (1-leanLeft);  // how in the middle of the interval x is
 
-  if ((retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
-      (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
+  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
 
-    printf ("vt-delta is %-10g [", retval); 
+    if (retval > CoinMin (COUENNE_EPS, feas_tolerance_)) {
 
-    reference_ -> print (); 
-    if (dependence.size () == 0) { // if no list, print image
-      printf (" := ");
-      reference_ -> Image () -> print ();
+      printf ("vt-delta is %-10g [", retval); 
+
+      reference_ -> print (); 
+
+      if (reference_ -> Image ()) { // if no list, print image
+	printf (" := ");
+	reference_ -> Image () -> print ();
+      }
+
+      if (dependence.size () > 0) {
+
+	printf (" -- ");
+
+	for (std::set <int>::iterator i = dependence.begin (); 
+	     i != dependence.end (); ++i) {
+	  problem_ -> Var (*i) -> print ();
+	  printf (" ");
+	}
+      }
+
+      printf ("]\n");
+    } else {
+      printf ("feasible...\n");
     }
-    printf ("]\n");
   }
 
   if (retval < CoinMin (COUENNE_EPS, feas_tolerance_))
     retval = 0.;
 
-  upEstimate_ = downEstimate_ = retval;
+  //upEstimate_ = downEstimate_ = retval;
 
   problem_ -> domain () -> pop ();
 
-  // TODO: add term to prefer branching on larger intervals
-  return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 
-	  0. : retval);
+  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) {
+
+    // apparently no improvement with this variable, but need to
+    // return nonzero if this is an auxiliary whose value is different from 
+
+    if (fabs (fx - w) > CoinMin (COUENNE_EPS, feas_tolerance_))
+      retval = .5; // ensure this variable will have lesser priority
+		   // than those with nonzero VT infeasibility --
+		   // these will be added 1, see below
+  } else retval += 1.;
+
+  upEstimate_ = downEstimate_ = retval;
+  return retval;
 }

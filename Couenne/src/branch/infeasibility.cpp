@@ -12,12 +12,12 @@
 #include "CouenneProblem.hpp"
 #include "CouenneVarObject.hpp"
 
-const CouNumber weiMin = 0.8;
-const CouNumber weiMax = 1.3;
-const CouNumber weiSum = 0.1;
-const CouNumber weiAvg = 0.0;
+/// weights for computing infeasibility
+const CouNumber weiMin = 0.8; // for minimum of infeasibilities of nonlinear objects
+const CouNumber weiMax = 1.3; //     maximum
+const CouNumber weiSum = 0.1; //     sum
+const CouNumber weiAvg = 0.0; //     average
 
-//#define DEBUG
 
 /// compute infeasibility of this variable, |w - f(x)| (where w is
 /// the auxiliary variable defined as w = f(x))
@@ -45,7 +45,8 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 				 // nowhere an independent
 
     const CouenneObject &obj = problem_ -> Objects () [reference_ -> Index ()];
-    retval = (obj. Reference ()) ? weiSum * obj.fastInfeasibility (info, way) : 0.;
+
+    retval = (obj. Reference ()) ? weiSum * obj.checkInfeasibility (info) : 0.;
 
   } else {
 
@@ -60,7 +61,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
       // *i is the index of an auxiliary that depends on reference_
 
       const CouenneObject &obj = problem_ -> Objects () [*i];
-      CouNumber infeas = (obj. Reference ()) ? obj.fastInfeasibility (info, way) : 0.;
+      CouNumber infeas = (obj. Reference ()) ? obj.checkInfeasibility (info) : 0.;
 
       if (infeas > infmax) infmax = infeas;
       if (infeas < infmin) infmin = infeas;
@@ -77,8 +78,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   if (//(retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
       (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
 
-    printf ("infeasVar %-10g [", retval); // + (1 - exp (info -> lower_ [index] - 
-    //info -> upper_ [index]))); 
+    printf ("infeasVar %-10g [", retval);
 
     reference_             -> print (); 
     if (dependence.size () == 0) { // if no list, print image
@@ -97,26 +97,18 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   int bestWay;
 
   CouNumber brkPt = computeBranchingPoint (info, bestWay);
-  //upEstimate_ = info->upper_[index] - brkPt;
-  //downEstimate_ = brkPt - info->lower_[index];
-
-#ifdef DEBUG
-  printf("index = %d up = %e down = %e bounds [%e,%e] brpt = %e\n", 
-	 index, upEstimate_, downEstimate_, 
-	 info->lower_[index],
-	 info->upper_[index], brkPt);
-#endif
 
   if (pseudoMultType_ != PROJECTDIST)
     setEstimates (info, &retval, &brkPt);
 
   if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
-    printf ("estimates = [%g,%g]\n", downEstimate_, upEstimate_);
+    printf("index = %d up = %e down = %e bounds [%e,%e] brpt = %e\n", 
+	   index, upEstimate_, downEstimate_, 
+	   info -> lower_ [index],
+	   info -> upper_ [index], brkPt);
   }
 
   problem_ -> domain () -> pop ();
 
-  return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 
-	  0. : (retval));// + (1 - exp (info -> lower_ [index] - 
-  //   info -> upper_ [index]))));
+  return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : (retval));
 }

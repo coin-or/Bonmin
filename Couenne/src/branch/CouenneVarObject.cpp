@@ -40,11 +40,6 @@ CouenneVarObject::CouenneVarObject (CouenneProblem *p,
 }
 
 
-/// Copy constructor
-CouenneVarObject::CouenneVarObject (const CouenneVarObject &src):
-  CouenneObject (src) {}
-
-
 /// apply the branching rule 
 OsiBranchingObject *CouenneVarObject::createBranch (OsiSolverInterface *si, 
 						    const OsiBranchingInformation *info, 

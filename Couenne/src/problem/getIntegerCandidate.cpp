@@ -221,7 +221,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 			    index, xFrac [index], Lb (index), Ub (index), 
 			    dualL [index], dualR [index]);
 
-	  Lb (index) = Ub (index) = xInt [index] = 
+	  Lb (index) = Ub (index) = X (index) = xInt [index] = 
 	    ((dualL [index] < dualR [index] - COUENNE_EPS) ? floor (xFrac [index]) :
 	     (dualL [index] > dualR [index] + COUENNE_EPS) ? ceil  (xFrac [index]) :
 	     ((CoinDrand48 () > xFrac [index] - floor (xFrac [index])) ? 
@@ -245,65 +245,44 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 		    integerRank_ ? integerRank_ [i] : -1,
 		    xFrac [i], xInt [i], Lb (i), Ub (i));
 	  printf ("---------------------------\n");
-	  /*for (int i=nOrig_; i<nVars (); i++)
-	    printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
-		    i, variables_ [i] -> isInteger () ? 'I' : ' ',
-		    //(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
-		    X (i), Lb (i), Ub (i));
-		    printf ("======= %d %d\n", iter, nOrig_);*/
-      }
 
-
+	}
       } while (remaining > 0);
     } // for
-
-    // fix the remaining unfixed // TODO: there should be none
-
-    /*for (int i=0; i<nOrig_; i++) 
-      if (fixed [i] == UNFIXED)
-	Lb (i) = Ub (i) = xInt [i] = 
-	  ((dualL [i] < dualR [i] - COUENNE_EPS) ? floor (xFrac [i]) :
-	   (dualL [i] > dualR [i] + COUENNE_EPS) ? ceil  (xFrac [i]) :
-	   ((CoinDrand48 () < 0.5) ? floor (xFrac [i]) : ceil (xFrac [i])));*/
 
     // save tightened bounds in NLP space. Sanity check
     for (int i = nOrig_; i--;) 
       if (Var (i) -> Multiplicity () > 0) {
 
 	if (fixed [i] == FIXED)       // integer point, fixed
-	  lb [i] = ub [i] = xInt [i];
+	  lb [i] = ub [i] = X (i) = xInt [i];
 
 	else if (Lb (i) > Ub (i))     // non-sense bounds, fix them
-	  xInt [i] = lb [i] = ub [i] = 
-	    (fixed [i] == CONTINUOUS) ?  
+	  xInt [i] = X (i) = lb [i] = ub [i] = 
+	    (fixed [i] == CONTINUOUS) ?
   	          (0.5 * (Lb (i) + Ub (i)) + 0.5) :
 	    floor (0.5 * (Lb (i) + Ub (i)) + 0.5);
 
 	else {                        // normal case
 	  lb [i] = Lb (i);
 	  ub [i] = Ub (i);
+	  if      (xInt [i] < lb [i]) X (i) = xInt [i] = lb [i];
+	  else if (xInt [i] > ub [i]) X (i) = xInt [i] = ub [i];
 	}
       }
 
-    //CoinCopyN (Lb (), nOrig_, lb);
-    //CoinCopyN (Ub (), nOrig_, ub);
-
-    //for (int i=0; i<nOrig_; i++)
-
-    // all integers are fixed, now compute objective function, set new
-    // cutoff if better, and re-run bound-tightening
-
-    //#if 0
     // if initial point is feasible, compute corresponding objective
     // and update if upper bound improves
     initAuxs ();
     int objind = Obj (0) -> Body () -> Index ();
+
     if (X (objind) < getCutOff ()) {
+
       const CouNumber *x = X (), xp = x [objind];
+
       if (checkNLP (x, xp))
 	setCutOff (X (objind));
     }
-    //#endif
 
   } // try
 

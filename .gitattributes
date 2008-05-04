@@ -38,6 +38,7 @@ Couenne/src/branch/CouenneThreeWayBranchObj.hpp -text
 Couenne/src/branch/CouenneVTObject.hpp -text
 Couenne/src/branch/CouenneVarObject.cpp -text
 Couenne/src/branch/CouenneVarObject.hpp -text
+Couenne/src/branch/doStrongBranching.cpp -text
 Couenne/src/branch/feasibleRegion.cpp -text
 Couenne/src/branch/infeasibility.cpp -text
 Couenne/src/branch/infeasibilityVT.cpp -text

@@ -278,7 +278,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // Reduced Cost BT
     if (problem_ -> doFBBT () && !firstcall_)
-      problem_ -> redCostBT (&si, chg_bds, babInfo);
+      problem_ -> redCostBT (&si, chg_bds);
 
     // Bound tightening done /////////////////////////////
 

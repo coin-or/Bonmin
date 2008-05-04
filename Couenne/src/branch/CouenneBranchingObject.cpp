@@ -44,11 +44,6 @@ CouenneBranchingObject::CouenneBranchingObject (OsiSolverInterface *solver,
   upEstimate_   (0.),
   simulate_     (false) {
 
-  value_ = (*variable_) ();
-
-  if (fabs (brpoint) < COUENNE_INFINITY) 
-    value_ = brpoint;
-
   // This two-way branching rule is only applied when both lower and
   // upper bound are finite. Otherwise, a CouenneThreeWayBranchObj is
   // used (see CouenneThreeWayBranchObj.hpp).
@@ -64,6 +59,11 @@ CouenneBranchingObject::CouenneBranchingObject (OsiSolverInterface *solver,
   //
   // TODO: consider branching value that maximizes distance from
   // current point (how?)
+
+  value_ = (*variable_) ();
+
+  if (fabs (brpoint) < COUENNE_INFINITY) 
+    value_ = brpoint;
 
   CouNumber lb, ub;
   var -> getBounds (lb, ub);
@@ -96,7 +96,8 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     way   = (!branchIndex_) ? firstBranch_ : !firstBranch_,
     index = variable_ -> Index ();
 
-  bool integer = variable_ -> isInteger (),
+  bool 
+    integer    = variable_ -> isInteger (),
     infeasible = false;
 
   CouNumber
@@ -116,12 +117,13 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
       jnlst_->Printf(J_DETAILED, J_BRANCHING, "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n",l,u,value_);
   }
 
-  /*if (brpt < l) brpt = l;
-    if (brpt > u) brpt = u;*/
-
   if ((brpt < l) || (brpt > u))
     brpt = 0.5 * (l+u);
 
+  jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
+		    index, way ? '>' : '<', integer ? (way ? ceil (brpt) : floor (brpt)) : brpt);
+
+  /*
   double time = CoinCpuTime ();
   jnlst_ -> Printf (J_VECTOR, J_BRANCHING,"[vbctool] %02d:%02d:%02d.%02d_I x%d%c=%g_[%g,%g]\n",
 		    (int) (floor(time) / 3600), 
@@ -131,6 +133,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 		    index, way ? '>' : '<', integer ? ((way ? ceil (brpt): floor (brpt))) : brpt,
 		    solver -> getColLower () [index],
 		    solver -> getColUpper () [index]);
+  */
 
   if (!way) solver -> setColUpper (index, integer ? floor (brpt) : brpt); // down branch
   else      solver -> setColLower (index, integer ? ceil  (brpt) : brpt); // up   branch
@@ -147,7 +150,8 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 			  solver -> getColLower    (), 
 			  solver -> getColUpper    ()); // have to alloc+copy
 
-  CouNumber &estimate = way ? upEstimate_ : downEstimate_;
+  //CouNumber &estimate = way ? upEstimate_ : downEstimate_;
+  CouNumber estimate = 0.;//way ? upEstimate_ : downEstimate_;
 
   t_chg_bounds *chg_bds = new t_chg_bounds [nvars];
 
@@ -166,20 +170,21 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
     if (!p -> btCore (chg_bds)) // done FBBT and this branch is infeasible
       infeasible = true;        // ==> report it
-
     else {
 
       const double
 	*lb = solver -> getColLower (),
 	*ub = solver -> getColUpper ();
 
-      CouNumber newEst = p -> Lb (objind) - lb [objind];
-      if (newEst > estimate) 
-	estimate = newEst;
+      //CouNumber newEst = p -> Lb (objind) - lb [objind];
+      estimate = CoinMax (0., p -> Lb (objind) - lb [objind]);
+
+      //if (newEst > estimate) 
+      //estimate = newEst;
 
       for (int i=0; i<nvars; i++) {
-	if (p -> Lb (i) > lb [i] + COUENNE_EPS) solver -> setColLower (i, p -> Lb (i));
-	if (p -> Ub (i) < ub [i] - COUENNE_EPS) solver -> setColUpper (i, p -> Ub (i));
+	if (p -> Lb (i) > lb [i]) solver -> setColLower (i, p -> Lb (i));
+	if (p -> Ub (i) < ub [i]) solver -> setColUpper (i, p -> Ub (i));
       }
     }
   }
@@ -192,7 +197,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
     // sparsify structure with info on changed bounds and get convexification cuts
     sparse2dense (nvars, chg_bds, changed, nchanged);
-    couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, chg_bds);  
+    couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, chg_bds);
 
     solver -> applyCuts (cs);
   }
@@ -200,9 +205,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   delete [] chg_bds;
 
   p -> domain () -> pop ();
-
-  jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
-		    index, way ? '>' : '<', integer ? (way ? ceil (brpt) : floor (brpt)) : brpt);
 
   // next time do other branching
   branchIndex_++;

@@ -77,9 +77,10 @@ libCouenne_la_LIBADD =
 am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
 	branch/CouenneVarObject.cpp branch/CouenneChooseVariable.cpp \
-	branch/CouenneChooseStrong.cpp branch/projections.cpp \
-	branch/infeasibility.cpp branch/infeasibilityVT.cpp \
-	branch/feasibleRegion.cpp branch/operators/branchExprAbs.cpp \
+	branch/CouenneChooseStrong.cpp branch/doStrongBranching.cpp \
+	branch/projections.cpp branch/infeasibility.cpp \
+	branch/infeasibilityVT.cpp branch/feasibleRegion.cpp \
+	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
 	branch/operators/branchExprInv.cpp \
@@ -164,20 +165,21 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 @COIN_HAS_ASL_TRUE@	readASLfg.lo
 am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneBranchingObject.lo CouenneObject.lo CouenneVarObject.lo \
-	CouenneChooseVariable.lo CouenneChooseStrong.lo projections.lo \
-	infeasibility.lo infeasibilityVT.lo feasibleRegion.lo \
-	branchExprAbs.lo branchExprExp.lo branchExprDiv.lo \
-	branchExprInv.lo branchExprLog.lo branchExprMul.lo \
-	branchExprPow.lo branchExprQuad.lo branchExprSinCos.lo \
-	minMaxDelta.lo computeMulBrDist.lo domain.lo exprAbs.lo \
-	exprDiv.lo exprExp.lo exprInv.lo exprLog.lo exprMul.lo \
-	exprOpp.lo exprPow.lo exprSin.lo exprCos.lo exprSub.lo \
-	exprSum.lo exprMinMax.lo exprGroup.lo exprQuad.lo exprBQuad.lo \
-	compQuadFinBounds.lo exprOp.lo exprUnary.lo exprVar.lo \
-	exprAux.lo expression.lo simplifiers.lo simplify.lo \
-	addEnvelope.lo createCuts.lo conv-exprAbs.lo conv-exprDiv.lo \
-	conv-exprMul.lo conv-exprMul-genCuts.lo unifiedProdCuts.lo \
-	conv-exprOpp.lo conv-exprPow.lo conv-exprPow-getBounds.lo \
+	CouenneChooseVariable.lo CouenneChooseStrong.lo \
+	doStrongBranching.lo projections.lo infeasibility.lo \
+	infeasibilityVT.lo feasibleRegion.lo branchExprAbs.lo \
+	branchExprExp.lo branchExprDiv.lo branchExprInv.lo \
+	branchExprLog.lo branchExprMul.lo branchExprPow.lo \
+	branchExprQuad.lo branchExprSinCos.lo minMaxDelta.lo \
+	computeMulBrDist.lo domain.lo exprAbs.lo exprDiv.lo exprExp.lo \
+	exprInv.lo exprLog.lo exprMul.lo exprOpp.lo exprPow.lo \
+	exprSin.lo exprCos.lo exprSub.lo exprSum.lo exprMinMax.lo \
+	exprGroup.lo exprQuad.lo exprBQuad.lo compQuadFinBounds.lo \
+	exprOp.lo exprUnary.lo exprVar.lo exprAux.lo expression.lo \
+	simplifiers.lo simplify.lo addEnvelope.lo createCuts.lo \
+	conv-exprAbs.lo conv-exprDiv.lo conv-exprMul.lo \
+	conv-exprMul-genCuts.lo unifiedProdCuts.lo conv-exprOpp.lo \
+	conv-exprPow.lo conv-exprPow-getBounds.lo \
 	conv-exprPow-envelope.lo powNewton.lo conv-exprSub.lo \
 	conv-exprSum.lo conv-exprInv.lo conv-exprSinCos.lo \
 	conv-exprExp.lo conv-exprLog.lo conv-exprGroup.lo \
@@ -410,9 +412,10 @@ lib_LTLIBRARIES = libCouenne.la
 libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
 	branch/CouenneVarObject.cpp branch/CouenneChooseVariable.cpp \
-	branch/CouenneChooseStrong.cpp branch/projections.cpp \
-	branch/infeasibility.cpp branch/infeasibilityVT.cpp \
-	branch/feasibleRegion.cpp branch/operators/branchExprAbs.cpp \
+	branch/CouenneChooseStrong.cpp branch/doStrongBranching.cpp \
+	branch/projections.cpp branch/infeasibility.cpp \
+	branch/infeasibilityVT.cpp branch/feasibleRegion.cpp \
+	branch/operators/branchExprAbs.cpp \
 	branch/operators/branchExprExp.cpp \
 	branch/operators/branchExprDiv.cpp \
 	branch/operators/branchExprInv.cpp \
@@ -729,6 +732,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/decomposeTerm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depGraph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/doStrongBranching.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/domain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elementBreak.Plo@am__quote@
@@ -861,6 +865,13 @@ CouenneChooseStrong.lo: branch/CouenneChooseStrong.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/CouenneChooseStrong.cpp' object='CouenneChooseStrong.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneChooseStrong.lo `test -f 'branch/CouenneChooseStrong.cpp' || echo '$(srcdir)/'`branch/CouenneChooseStrong.cpp
+
+doStrongBranching.lo: branch/doStrongBranching.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT doStrongBranching.lo -MD -MP -MF "$(DEPDIR)/doStrongBranching.Tpo" -c -o doStrongBranching.lo `test -f 'branch/doStrongBranching.cpp' || echo '$(srcdir)/'`branch/doStrongBranching.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/doStrongBranching.Tpo" "$(DEPDIR)/doStrongBranching.Plo"; else rm -f "$(DEPDIR)/doStrongBranching.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/doStrongBranching.cpp' object='doStrongBranching.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o doStrongBranching.lo `test -f 'branch/doStrongBranching.cpp' || echo '$(srcdir)/'`branch/doStrongBranching.cpp
 
 projections.lo: branch/projections.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT projections.lo -MD -MP -MF "$(DEPDIR)/projections.Tpo" -c -o projections.lo `test -f 'branch/projections.cpp' || echo '$(srcdir)/'`branch/projections.cpp; \

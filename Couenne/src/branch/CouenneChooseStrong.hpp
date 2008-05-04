@@ -12,7 +12,7 @@
 
 #include "BonChooseVariable.hpp"
 #include "CouenneJournalist.hpp"
-#include "CouenneChooseVariable.hpp"
+
 
 // Forward declaration
 class CouenneProblem;
@@ -63,19 +63,10 @@ namespace Bonmin {
 				   int numberObjects,
 				   const OsiObject ** objects);
 
-#ifdef CCS_EXPERIMENTAL
-    int chooseVariable (OsiSolverInterface * solver,
-			OsiBranchingInformation *info,
-			bool fixVariables);
-
-    void updateInformation (const OsiBranchingInformation *info,
-			    int branch, OsiHotInfo * hotInfo);
-
-    // Given a branch fill in useful information e.g. estimates 
-    void updateInformation (int index, int branch,  
-			    double changeInObjective, double changeInValue, 
-			    int status);
-#endif
+    /// choose object to branch based on earlier setup
+    virtual int chooseVariable (OsiSolverInterface * solver,
+				OsiBranchingInformation *info,
+				bool fixVariables);
 
     /// Add list of options to be read from file
     static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
@@ -85,6 +76,8 @@ namespace Bonmin {
     /** Default Constructor, forbidden for some reason.*/
     CouenneChooseStrong ();
     
+  protected:
+
     /// Pointer to the associated MINLP problem
     CouenneProblem *problem_;
 

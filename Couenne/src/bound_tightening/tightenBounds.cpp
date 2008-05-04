@@ -46,6 +46,9 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
     int i = numbering_ [ii];
 
+    if (Var (i) -> Multiplicity () == 0) 
+      continue;
+
     // early test to avoid a loop
 
     if ((Lb (i) > Ub (i) + COUENNE_EPS) || 
@@ -69,11 +72,9 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
       return -1; // declare this node infeasible
     }
 
-    if ((Var (i) -> Multiplicity () > 0) &&
-	(Var (i) -> Type         () == AUX) 
+    if (Var (i) -> Type         () == AUX) {
 	// TODO: also test if any indep variable of this expression
 	// have changed. If not, skip
-	) {
 
       CouNumber ll, uu; 
       //ll = (*(variables_ [i] -> Lb ())) (),
@@ -117,7 +118,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
 			  "  prop L %2d [%g,(%g)] -> [%g,(%g)] (%g) ", 
 			  i, Lb (i), Ub (i), ll, uu, Lb (i) - ll);
-	  Var (i)             -> print (std::cout);
+	  Var (i) -> print (std::cout);
 
 	  if (Jnlst()->ProduceOutput(J_MATRIX, J_BOUNDTIGHTENING)) {
 	    Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING," := ");
@@ -141,6 +142,13 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	}
 
 	Lb (i) = ll;
+
+	if (ll > Ub (i) + COUENNE_EPS) {
+	  Jnlst () -> Printf (J_DETAILED, J_BOUNDTIGHTENING,
+			      "just-check: w_%d has infeasible bounds [%g,%g]. ", i, Lb (i), Ub (i));
+	  return -1;
+	}
+
 	chg_bds [i].setLower(t_chg_bounds::CHANGED);
 	nchg++;
       }
@@ -187,6 +195,13 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 	}
 
 	Ub (i) = uu;
+
+	if (uu < Lb (i) - COUENNE_EPS) {
+	  Jnlst () -> Printf (J_DETAILED, J_BOUNDTIGHTENING,
+			      "just-check: w_%d has infeasible bounds [%g,%g]. ", i, Lb (i), Ub (i));
+	  return -1;
+	}
+
 	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
 	nchg++;
       }

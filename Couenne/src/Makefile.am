@@ -24,6 +24,7 @@ libCouenne_la_SOURCES = \
 	branch/CouenneVarObject.cpp \
 	branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp \
+	branch/doStrongBranching.cpp \
 	branch/projections.cpp \
 	branch/infeasibility.cpp \
 	branch/infeasibilityVT.cpp \

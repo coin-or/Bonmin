@@ -62,6 +62,7 @@ public:
   /// resize domain point (for extending into higher space)
   void resize (int newdim);
 
+  /// return dimension_
   inline int Dimension () {return dimension_;}
 
   inline CouNumber &x  (int index) {return x_  [index];} ///< return current variable

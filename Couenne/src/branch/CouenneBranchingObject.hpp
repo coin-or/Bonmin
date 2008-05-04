@@ -67,7 +67,7 @@ public:
 
   /// does this branching object only change variable bounds?
   virtual bool boundBranch () const
-  {return !doConvCuts_;} // no, if it adds convexification cuts
+  {return !doConvCuts_;} // iff it does not add convexification cuts
 
   /// set simulate_ field below
   void setSimulate (bool s)

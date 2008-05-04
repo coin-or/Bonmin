@@ -68,24 +68,25 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
   // w.r.t. applying implied bounds to ALL expressions just because
   // one single propagation was found.
 
-  for (int i = 0, j = nVars (); j--; i++) {
+  for (int i = 0, j = nVars (); j--; i++) 
+    if (Var (i) -> Multiplicity () > 0) {
 
-    // final test 
-    if ((Lb (i) > Ub (i) + COUENNE_EPS) || 
-	(Ub (i) < - MAX_BOUND) ||
-	(Lb (i) >   MAX_BOUND)) {
+      // final test 
+      if ((Lb (i) > Ub (i) + COUENNE_EPS) || 
+	  (Ub (i) < - MAX_BOUND) ||
+	  (Lb (i) >   MAX_BOUND)) {
 
-      Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, "final test: infeasible BT\n");
-      return false;
+	Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING, "final test: infeasible BT\n");
+	return false;
+      }
+
+      // sanity check. Ipopt gives an exception when Lb (i) is above Ub (i)
+      if (Lb (i) > Ub (i)) {
+	CouNumber swap = Lb (i);
+	Lb (i) = Ub (i);
+	Ub (i) = swap;
+      }
     }
-
-    // sanity check. Ipopt gives an exception when Lb (i) is above Ub (i)
-    if (Lb (i) > Ub (i)) {
-      CouNumber swap = Lb (i);
-      Lb (i) = Ub (i);
-      Ub (i) = swap;
-    }
-  }
 
   return true;
 }
@@ -132,11 +133,10 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
 }
 
 
-/// procedure to strengthen variable bounds. Return false if problem
-/// turns out to be infeasible with given bounds, true otherwise.
+/// reduced cost bound tightening
 int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
-			       t_chg_bounds *chg_bds, 
-			       Bonmin::BabInfo * babInfo) const {
+			       t_chg_bounds *chg_bds) const {
+
   int nchanges = 0,
     objind = Obj (0) -> Body () -> Index ();
 
@@ -191,7 +191,6 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 	nchanges++;
 	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
 	}*/
-
   }
 
   return nchanges;

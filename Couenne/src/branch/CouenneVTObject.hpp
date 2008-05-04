@@ -12,7 +12,6 @@
 
 #include "CouenneVarObject.hpp"
 
-
 /// OsiObject for violation transfer on variables in a MINLP
 class CouenneVTObject: public CouenneVarObject {
 

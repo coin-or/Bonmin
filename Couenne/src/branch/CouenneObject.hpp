@@ -90,7 +90,7 @@ public:
 
   /// compute infeasibility of this variable, |w - f(x)| (where w is
   /// the auxiliary variable defined as w = f(x)
-  double fastInfeasibility (const OsiBranchingInformation *info, int &way) const;
+  virtual double checkInfeasibility(const OsiBranchingInformation * info) const;
 
   /// fix (one of the) arguments of reference auxiliary variable 
   virtual double feasibleRegion (OsiSolverInterface*, const OsiBranchingInformation*) const;

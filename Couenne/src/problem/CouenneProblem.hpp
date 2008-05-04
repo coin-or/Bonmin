@@ -327,8 +327,7 @@ class CouenneProblem {
   /// procedure to strengthen variable bounds. Return false if problem
   /// turns out to be infeasible with given bounds, true otherwise.
   int redCostBT (const OsiSolverInterface *psi,
-		 t_chg_bounds *chg_bds, 
-		 Bonmin::BabInfo * babInfo) const;
+		 t_chg_bounds *chg_bds) const;
 
   /// "Forward" bound tightening, that is, propagate bound of variable
   /// \f$x\f$ in an expression \f$w = f(x)\f$ to the bounds of \f$w\f$.

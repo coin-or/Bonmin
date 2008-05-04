@@ -145,8 +145,9 @@ void Domain::push (int dim, CouNumber *x, CouNumber *lb, CouNumber *ub, bool cop
   if (!lb) lb = point_ -> lb ();
   if (!ub) ub = point_ -> ub ();
 
-  if (point_) 
+  if (point_)
     domStack_.push (point_);
+
   point_ = new DomainPoint (dim, x, lb, ub, copy);
 }
 
@@ -159,6 +160,7 @@ void Domain::push (int dim,
 
   if (point_) 
     domStack_.push (point_);
+
   point_ = new DomainPoint (dim, x, lb, ub);
 }
 

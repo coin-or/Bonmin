@@ -17,8 +17,6 @@
 
 class CouenneProblem;
 
-//#define CCS_EXPERIMENTAL
-
 /** \brief Choose a variable for branching
  */
 
@@ -26,7 +24,7 @@ class CouenneChooseVariable: public OsiChooseVariable {
 
 public:
 
-  /// Default Constructor 
+  /// Default Constructor
   CouenneChooseVariable ();
 
   /// Constructor from solver (so we can set up arrays etc)
@@ -39,10 +37,11 @@ public:
   CouenneChooseVariable &operator= (const CouenneChooseVariable &);
 
   /// Clone
-  virtual OsiChooseVariable *clone() const;
+  virtual OsiChooseVariable *clone() const
+  {return new CouenneChooseVariable (*this);}
 
   /// Destructor 
-  virtual ~CouenneChooseVariable ();
+  virtual ~CouenneChooseVariable () {}
 
   /// Sets up strong list and clears all if initialize is true.
   /// Returns number of infeasibilities.  If returns -1 then has
@@ -55,12 +54,10 @@ public:
 				 int numberObjects,
 				 const OsiObject ** objects);
 
-#ifdef EXPERIMENTAL
   /// choose object to branch based on earlier setup
   virtual int chooseVariable (OsiSolverInterface * solver, 
 			      OsiBranchingInformation *info, 
 			      bool fixVariables);
-#endif
 
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);

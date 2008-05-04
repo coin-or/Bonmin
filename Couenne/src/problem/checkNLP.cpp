@@ -115,34 +115,32 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
 
     // check constraints
 
-    if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM))
+    for (int i=0; i < nCons (); i++) {
 
-      for (int i=0; i < nCons (); i++) {
+      CouenneConstraint *c = Con (i);
 
-	CouenneConstraint *c = Con (i);
+      CouNumber
+	body = (*(c -> Body ())) (),
+	lhs  = (*(c -> Lb   ())) (),
+	rhs  = (*(c -> Ub   ())) ();
 
-	CouNumber
-	  body = (*(c -> Body ())) (),
-	  lhs  = (*(c -> Lb   ())) (),
-	  rhs  = (*(c -> Ub   ())) ();
+      if ((body > rhs + feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs)))) || 
+	  (body < lhs - feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs))))) {
 
-	if ((body > rhs + feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs)))) || 
-	    (body < lhs - feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs))))) {
+	if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
 
-	  if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
+	  Jnlst()->Printf
+	    (Ipopt::J_WARNING, J_PROBLEM,
+	     "checkNLP: constraint %d violated (lhs=%+e body=%+e rhs=%+e, violation %g): ",
+	     i, lhs, body, rhs, CoinMax (lhs-body, body-rhs));
 
-	    Jnlst()->Printf
-	      (Ipopt::J_WARNING, J_PROBLEM,
-	       "checkNLP: constraint %d violated (lhs=%+e body=%+e rhs=%+e, violation %g): ",
-	       i, lhs, body, rhs, CoinMax (lhs-body, body-rhs));
-
-	    c -> print ();
-	  }
-
-	  throw infeasible;
-	  // We dont return anymore (return false;)
+	  c -> print ();
 	}
+
+	throw infeasible;
+	// We dont return anymore (return false;)
       }
+    }
   }
 
   catch (int exception) {

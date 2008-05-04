@@ -278,16 +278,25 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
      info -> lower_, 
      info -> upper_);
 
-  double retval = fastInfeasibility (info, way);
+  double retval = checkInfeasibility (info);
 
   problem_ -> domain () -> pop ();
+
+  if (pseudoMultType_ == INFEASIBILITY)
+    upEstimate_ = downEstimate_ = retval;
+  else setEstimates (info, &retval, NULL);
 
   return retval;
 }
 
 
-/// non-linear infeasibility
-double CouenneObject::fastInfeasibility (const OsiBranchingInformation *info, int &way) const {
+/// non-linear infeasibility -- no need for the domain's push
+/// instruction as this is called from
+/// CouenneVarObject::infeasibility()
+double CouenneObject::checkInfeasibility (const OsiBranchingInformation *info) const {
+
+  if (reference_ -> Type () == VAR)
+    return 0.;
 
   double retval = fabs (info -> solution_ [reference_ -> Index ()] - 
 			(*(reference_ -> Image ())) ());
@@ -302,11 +311,6 @@ double CouenneObject::fastInfeasibility (const OsiBranchingInformation *info, in
     reference_             -> print (); printf (" := ");
     reference_ -> Image () -> print (); printf ("\n");
   }
-
-  if (pseudoMultType_ == INFEASIBILITY)
-    upEstimate_ = downEstimate_ = retval;
-
-  setEstimates (info, &retval, NULL);
 
   return retval;
 }
@@ -455,6 +459,8 @@ void CouenneObject::setEstimates (const OsiBranchingInformation *info,
   case PROJECTDIST: // taken care of in selectBranch procedure
     break;
 
-  default: assert (false);
+  default: 
+    printf ("Couenne: invalid estimate setting procedure\n");
+    exit (-1);
   }
 }

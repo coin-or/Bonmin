@@ -27,7 +27,8 @@ public:
 		    JnlstPtr jnlst);
 
   /// Copy constructor
-  CouenneVarObject (const CouenneVarObject &src);
+  CouenneVarObject (const CouenneVarObject &src):
+  CouenneObject (src) {}
 
   /// Destructor
   ~CouenneVarObject () {}
