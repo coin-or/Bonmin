@@ -44,6 +44,10 @@ public:
   /// TODO: suggest way
   virtual double infeasibility (const OsiBranchingInformation *info, int &way) const;
 
+  /// compute infeasibility of this variable, |w - f(x)|, where w is
+  /// the auxiliary variable defined as w = f(x)
+  virtual double checkInfeasibility (const OsiBranchingInformation * info) const;
+
   /// create CouenneBranchingObject or CouenneThreeWayBranchObj based
   /// on this object
   virtual OsiBranchingObject *createBranch (OsiSolverInterface*, 

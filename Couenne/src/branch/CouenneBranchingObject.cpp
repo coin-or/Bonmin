@@ -158,11 +158,6 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
   if (!way) chg_bds [index].setUpper (t_chg_bounds::CHANGED);
   else      chg_bds [index].setLower (t_chg_bounds::CHANGED);
 
-  /*for (int i=0; i<nvars; i++) {
-    chg_bds [i].setLower (t_chg_bounds::CHANGED);
-    chg_bds [i].setUpper (t_chg_bounds::CHANGED);
-    }*/
-
   if (     doFBBT_ &&           // this branching object should do FBBT, and
       p -> doFBBT ()) {         // problem allowed to do FBBT
 

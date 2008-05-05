@@ -39,14 +39,61 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
 
   const std::set <int> &dependence = problem_ -> Dependence () [index];
 
-  CouNumber retval;
+  //////////////////////////////////////////////
+  CouNumber retval = checkInfeasibility (info);
+  //////////////////////////////////////////////
+
+  if (//(retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
+      (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
+
+    printf ("infeasVar %-10g [", retval);
+
+    reference_             -> print (); 
+    if (dependence.size () == 0) { // if no list, print image
+      printf (" := ");
+      reference_ -> Image () -> print ();
+    }
+    printf ("]\n");
+  }
+
+  // add term to stop branching on very tiny intervals
+
+  // Compute the up and down estimates here
+  // TODO: We probably only have to do that if pseudo costs option has
+  // been chosen
+
+  CouNumber brkPt = computeBranchingPoint (info, way);
+
+  if (pseudoMultType_ != PROJECTDIST)
+    setEstimates (info, &retval, &brkPt);
+
+  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+    printf("index = %d up = %e down = %e bounds [%e,%e] brpt = %e\n", 
+	   index, upEstimate_, downEstimate_, 
+	   info -> lower_ [index],
+	   info -> upper_ [index], brkPt);
+  }
+
+  problem_ -> domain () -> pop ();
+
+  return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : (retval));
+}
+
+
+/// compute infeasibility of this variable, |w - f(x)|, where w is
+/// the auxiliary variable defined as w = f(x)
+double CouenneVarObject::checkInfeasibility (const OsiBranchingInformation * info) const {
+
+  int index = reference_ -> Index ();
+
+  const std::set <int> &dependence = problem_ -> Dependence () [index];
 
   if (dependence.size () == 0) { // this is a top level auxiliary,
 				 // nowhere an independent
 
     const CouenneObject &obj = problem_ -> Objects () [reference_ -> Index ()];
 
-    retval = (obj. Reference ()) ? weiSum * obj.checkInfeasibility (info) : 0.;
+    return (obj. Reference ()) ? weiSum * obj.checkInfeasibility (info) : 0.;
 
   } else {
 
@@ -68,47 +115,10 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
       infsum += infeas;
     }
 
-    retval = 
+    return
       weiSum * infsum + 
       weiAvg * (infsum / CoinMax (1., (CouNumber) dependence.size ())) + 
       weiMin * infmin + 
       weiMax * infmax;
   }
-
-  if (//(retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
-      (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
-
-    printf ("infeasVar %-10g [", retval);
-
-    reference_             -> print (); 
-    if (dependence.size () == 0) { // if no list, print image
-      printf (" := ");
-      reference_ -> Image () -> print ();
-    }
-    printf ("]\n");
-  }
-
-  // add term to stop branching on very tiny intervals
-
-  // Compute the up and down estimates here
-  // TODO: We probably only have to do that if pseudo costs option has
-  // been chosen
-
-  int bestWay;
-
-  CouNumber brkPt = computeBranchingPoint (info, bestWay);
-
-  if (pseudoMultType_ != PROJECTDIST)
-    setEstimates (info, &retval, &brkPt);
-
-  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
-    printf("index = %d up = %e down = %e bounds [%e,%e] brpt = %e\n", 
-	   index, upEstimate_, downEstimate_, 
-	   info -> lower_ [index],
-	   info -> upper_ [index], brkPt);
-  }
-
-  problem_ -> domain () -> pop ();
-
-  return ((retval < CoinMin (COUENNE_EPS, feas_tolerance_)) ? 0. : (retval));
 }

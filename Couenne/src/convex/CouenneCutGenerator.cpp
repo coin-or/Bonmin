@@ -136,10 +136,10 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      " on average for each level of given depth of the tree.",
      -1,
      3, "Solve as many nlp's at the nodes for each level of the tree. "
-     "Nodes are randomly selected. If for a"
-     "given level there are less nodes than this number nlp are solved for every nodes."
-     "For example if parameter is 8, nlp's are solved for all node until level 8," 
-     "then for half the node at level 9, 1/4 at level 10...."
+     "Nodes are randomly selected. If for a "
+     "given level there are less nodes than this number nlp are solved for every nodes. "
+     "For example if parameter is 8, nlp's are solved for all node until level 8, " 
+     "then for half the node at level 9, 1/4 at level 10.... "
      "Value -1 specify to perform at all nodes.");
 
   roptions -> AddStringOption3
@@ -163,8 +163,6 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "yes",
      "no","",
      "yes","");
-
-  //roptions -> setOptionExtraInfo ("branch_pt_select", 15); // Why 15? TODO
 
   CouenneProblem                :: registerOptions (roptions);
   Bonmin::CouenneChooseStrong   :: registerOptions (roptions);

@@ -58,7 +58,7 @@ void exprDiv::generateCuts (expression *w, const OsiSolverInterface &si,
   CouNumber k;
 
   if ((fabs (yl-yu) < COUENNE_EPS) && 
-      ((fabs (k = yl+yu) / 2) > COUENNE_EPS)) {
+      ((fabs (k = ((yl+yu) / 2)) > COUENNE_EPS))) {
     if (cLY || cRY)
       cg -> createCut (cs, 0., 0, wi, -1, xi, 1/k);
     return;

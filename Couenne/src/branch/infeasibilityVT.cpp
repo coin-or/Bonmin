@@ -32,7 +32,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
       printf (" -- ");
 
-      for (std::set <int>::iterator i = dependence.begin (); 
+      for (std::set <int>::const_iterator i = dependence.begin (); 
 	   i != dependence.end (); ++i) {
 	problem_ -> Var (*i) -> print ();
 	printf (" ");
@@ -183,6 +183,8 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
   //printf ("------------------ vt_delta [%d] [%g,%g] = %g +\n", index, lFeas, rFeas, vt_delta);
 
+  bool allzero = true;
+
   for (int i=0, n_el = info -> columnLength_ [index]; i < n_el; i++) {
 
     int indRow = info -> columnStart_ [index] + i;
@@ -190,6 +192,9 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     vt_delta += 
       fabs (info -> pi_ [info -> row_ [indRow]] * 
 	    info -> elementByColumn_  [indRow]);
+
+    if (fabs (info -> pi_ [info -> row_ [indRow]]) > 1e-9)
+      allzero = false;
 
     jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "+ (pi[%d]=%g) * (el[%d]=%g) [=%g] --> vtd = %g\n",
 		      info -> row_ [indRow],
@@ -232,7 +237,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
 	printf (" -- ");
 
-	for (std::set <int>::iterator i = dependence.begin (); 
+	for (std::set <int>::const_iterator i = dependence.begin (); 
 	     i != dependence.end (); ++i) {
 	  problem_ -> Var (*i) -> print ();
 	  printf (" ");
@@ -240,9 +245,8 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
       }
 
       printf ("]\n");
-    } else {
+    } else
       printf ("feasible...\n");
-    }
   }
 
   if (retval < CoinMin (COUENNE_EPS, feas_tolerance_))

@@ -335,6 +335,9 @@ void CouenneProblem::standardize () {
 	(Var (i) -> Type () == AUX) &&
 	(Var (i) -> Image () -> isInteger ()))
       Var (i) -> setInteger (true);
+
+    if (Var (i) -> Multiplicity () == 0)
+      Lb (i) = Ub (i) = 0.;
   }
 
   // TODO: re-compute ranks
