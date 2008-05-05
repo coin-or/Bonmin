@@ -462,6 +462,7 @@ namespace Bonmin
 
 #ifdef COIN_HAS_FILTERSQP
     FilterSolver::registerOptions(roptions);
+    BqpdSolver::registerOptions(roptions);
 #endif
     CbcDiver::registerOptions(roptions);
     CbcDfsDiver::registerOptions(roptions);

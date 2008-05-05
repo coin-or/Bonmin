@@ -87,7 +87,7 @@ namespace Bonmin
 
     /// Safe the current state (after most recent solve that must have
     /// been successful) as hot start information and use that for all
-    /// further solves, until unmakeHotStart is called.
+    /// further solves, until unmarkHotStart is called.
     virtual bool markHotStart(){return cached_->markHotStart();}
 
     /// Get warm start used in last optimization
@@ -162,6 +162,14 @@ namespace Bonmin
     /** Perform optimization using data structure in cache. */
     TNLPSolver::ReturnStatus callOptimizer();
     /** @} */
+
+    /** @name User options */
+    //@{
+    /** Fill-in factor for QP factorization */
+    double fillin_factor_;
+    int kmax_ipt_;
+    int mlp_ipt_;
+    //@}
 
     /** Cached information for reoptimizing. */
   struct cachedInfo : public Ipopt::ReferencedObject
@@ -249,6 +257,15 @@ namespace Bonmin
       bool use_warm_start_in_cache_;
       bool bad_warm_start_info_;
 
+      /** Number of nonzeros in Jacobian and gradient */
+      int amax_;
+
+      /** Fill-in factor for QP factorization.  This is a pointer to
+	  the corresponding value in the BqpdSolver object, so that an
+	  increase is not forgotten. */
+      double* fillin_factor_;
+      //@}
+
       /** Constructor.*/
       cachedInfo()
           :
@@ -283,7 +300,8 @@ namespace Bonmin
       {}
 
       cachedInfo(const Ipopt::SmartPtr<BranchingTQP> &tqp,
-          Ipopt::SmartPtr<Ipopt::OptionsList>& options):
+		 Ipopt::SmartPtr<Ipopt::OptionsList>& options,
+		 int kmax_ipt, int mlp_ipt, double* fillin_factor):
           a(NULL),
           la(NULL),
           x(NULL),
@@ -314,12 +332,13 @@ namespace Bonmin
           use_warm_start_in_cache_(false),
           bad_warm_start_info_(false)
       {
-        initialize(tqp, options);
+        initialize(tqp, options, kmax_ipt, mlp_ipt, fillin_factor);
       }
 
       /** Fill data structures for filter with info from tnlp. */
       void initialize(const Ipopt::SmartPtr<BranchingTQP> &tqp,
-          Ipopt::SmartPtr<Ipopt::OptionsList>& options);
+		      Ipopt::SmartPtr<Ipopt::OptionsList>& options,
+		      int kmax_ipt, int mlp_ipt, double* fillin_factor);
 
       /** Optimize problem described by cache with filter.*/
       void optimize();
@@ -328,39 +347,13 @@ namespace Bonmin
       bool markHotStart();
 
       /** Forget about the hot start info */
-      bool unmarkHotStart();
+      void unmarkHotStart();
 
       /** Copy current values from hot start info */
       void copyFromHotStart();
 
       /** Destructor. */
-      ~cachedInfo()
-      {
-        delete [] a;
-        delete [] la;
-        delete [] x;
-        delete [] bl;
-        delete [] bu;
-        delete [] g;
-        delete [] r;
-        delete [] w;
-        delete [] e;
-        delete [] ls;
-        delete [] alp;
-        delete [] lp;
-        delete [] ws;
-        delete [] lws;
-	delete [] xHot;
-	delete [] gHot;
-	delete [] rHot;
-	delete [] wHot;
-	delete [] eHot;
-	delete [] lsHot;
-	delete [] alpHot;
-	delete [] lpHot;
-	delete [] wsHot;
-	delete [] lwsHot;
-      }
+      ~cachedInfo();
     };
 
     /** Cached information on last problem optimized for reoptimization. */

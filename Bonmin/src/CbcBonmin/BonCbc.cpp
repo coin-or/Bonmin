@@ -72,6 +72,7 @@ namespace Bonmin
       numNodes_(0),
       mipIterationCount_(0),
       model_(),
+      usingCouenne_(false),
       modelHandler_(NULL),
       objects_(0),
       nObjects_(0)

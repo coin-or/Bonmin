@@ -107,6 +107,7 @@ namespace Bonmin
   registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
     roptions->SetRegisteringCategory("Bqpd options",RegisteredOptions::BqpdCategory);
+    roptions->AddLowerBoundedNumberOption("qp_fillin_factor", "Factor for estimating fill-in for factorization method in Bqpd", 0., true, 4.);
   }
 
   BqpdSolver::BqpdSolver(bool createEmpty /* = false */)
@@ -123,7 +124,11 @@ namespace Bonmin
       :
       TNLPSolver(roptions, options, journalist),
       cached_(NULL)
-{}
+  {
+    options->GetNumericValue("qp_fillin_factor", fillin_factor_, "bqpd.");
+    options->GetIntegerValue("kmax", kmax_ipt_, "bqpd.");
+    options->GetIntegerValue("mlp", mlp_ipt_,"bqpd.");
+  }
 
   Ipopt::SmartPtr <TNLPSolver>
   BqpdSolver::clone()
@@ -132,6 +137,9 @@ namespace Bonmin
     *retval->options_ = *options_; // Copy the options
     retval->roptions_ = roptions_; // only copy pointers of registered options
     retval->journalist_ = journalist_; // and journalist
+    retval->fillin_factor_ = fillin_factor_;
+    retval->kmax_ipt_ = kmax_ipt_;
+    retval->mlp_ipt_ = mlp_ipt_;
     return GetRawPtr(retval);
   }
 
@@ -183,7 +191,8 @@ namespace Bonmin
       throw E;
     }
     if (IsNull(cached_) || !cached_->use_warm_start_in_cache_) {
-      cached_ = new cachedInfo(tqp, options_);
+      cached_ = new cachedInfo(tqp, options_, kmax_ipt_, mlp_ipt_,
+			       &fillin_factor_);
     }
     return callOptimizer();
   }
@@ -212,8 +221,14 @@ namespace Bonmin
 
   void
   BqpdSolver::cachedInfo::initialize(const Ipopt::SmartPtr<BranchingTQP> & tqp,
-      Ipopt::SmartPtr<Ipopt::OptionsList>& options)
+				     Ipopt::SmartPtr<Ipopt::OptionsList>& options,
+				     int kmax_ipt,
+				     int mlp_ipt,
+				     double* fillin_factor)
   {
+    // Maybe a dirty trick?  We want to change fillin_factor in calling object
+    fillin_factor_ = fillin_factor;
+
     // In case BQPD's BLOCK DATA doesn't work, we initialize the COMMON
     // BLOCKs explicitly here
     F77_FUNC(epsc,EPSC).eps = 1111e-19;
@@ -231,8 +246,6 @@ namespace Bonmin
     n = nv;
     m = nc;
 
-    Index kmax_ipt;
-    options->GetIntegerValue("kmax", kmax_ipt, "bqpd.");
     if (kmax_ipt == -1) {
       kmax = n;
     }
@@ -240,17 +253,7 @@ namespace Bonmin
       kmax = kmax_ipt;
       kmax = min(kmax,n);
     }
-    Index mlp_ipt;
-    options->GetIntegerValue("mlp", mlp_ipt,"bqpd.");
     mlp = mlp_ipt;
-
-    Index mxws_ipt;
-    options->GetIntegerValue("mxws", mxws_ipt, "bqpd.");
-    mxws = mxws_ipt;
-
-    Ipopt::Index mxlws_ipt;
-    options->GetIntegerValue("mxlws",  mxlws_ipt, "bqpd.");
-    mxlws = mxlws_ipt;
 
     use_warm_start_in_cache_ = false;
 
@@ -265,17 +268,6 @@ namespace Bonmin
     ls = new fint[n+m];
     alp = new real[mlp];
     lp = new fint[mlp];
-    ws = new real[mxws];
-    lws = new fint[mxlws];
-
-#ifdef InitializeAll
-    for (int i=0; i<mxws; i++) {
-      ws[i] = 42.;
-    }
-    for (int i=0; i<mxlws; i++) {
-      lws[i] = 55;
-    }
-#endif
 
     // Getting the bounds
     tqp->get_bounds_info(n, bl, bu, m, bl+n, bu+n);
@@ -289,14 +281,14 @@ namespace Bonmin
     // Set up sparse matrix with objective gradient and constraint Jacobian
 
     const Number* obj_grad = tqp->ObjGrad();
-    int amax = nnz_jac_g;
+    amax_ = nnz_jac_g;
     for (int i = 0; i<n; i++) {
       if (obj_grad[i]!=0.) {
-        amax++;
+        amax_++;
       }
     }
-    int lamax = amax+m+2;
-    a = new real[amax];
+    int lamax = amax_+m+2;
+    a = new real[amax_];
     la = new fint [1+lamax];
 
     // Objective function gradient
@@ -307,7 +299,7 @@ namespace Bonmin
         la[++nnz_grad] = i+1;
       }
     }
-    la[amax+1] = 1;
+    la[amax_+1] = 1;
 
     // Constraint Jacobian
     const Number* JacVals = tqp->ConstrJacVals();
@@ -326,7 +318,23 @@ namespace Bonmin
 //deleteme
     printf("nnz_grad = %d nnz_jac = %d\n", nnz_grad, nnz_jac_g);
     for (int i=0; i<1+lamax; i++) printf("la[%2d] = %d\n", i,la[i]);
-    for (int i=0; i<amax; i++) printf("a[%3d] = %e\n",i,a[i]);
+    for (int i=0; i<amax_; i++) printf("a[%3d] = %e\n",i,a[i]);
+#endif
+
+    // Setup workspaces
+    mxws = nnz_hess + ((kmax*(kmax+9))/2 + 2*n + m) + (5*n + (int)(*fillin_factor_*(double)amax_));
+    mxlws = (nnz_hess + n + 2) + kmax + (9*n + m);
+
+    ws = new real[mxws];
+    lws = new fint[mxlws];
+
+#ifdef InitializeAll
+    for (int i=0; i<mxws; i++) {
+      ws[i] = 42.;
+    }
+    for (int i=0; i<mxlws; i++) {
+      lws[i] = 55;
+    }
 #endif
 
     // Now setup Hessian
@@ -395,6 +403,27 @@ namespace Bonmin
         cached_->f, NULL, NULL);
     delete [] dummy;
     return optimizationStatus;
+  }
+
+  BqpdSolver::cachedInfo::~cachedInfo()
+  {
+    if (haveHotStart_) {
+      unmarkHotStart();
+    }
+    delete [] a;
+    delete [] la;
+    delete [] x;
+    delete [] bl;
+    delete [] bu;
+    delete [] g;
+    delete [] r;
+    delete [] w;
+    delete [] e;
+    delete [] ls;
+    delete [] alp;
+    delete [] lp;
+    delete [] ws;
+    delete [] lws;
   }
 
   bool
@@ -477,8 +506,6 @@ namespace Bonmin
     alpHot = CoinCopyOfArray(alp,mlp);
     lpHot = CoinCopyOfArray(lp,mlp);
     peqHot = peq;
-    //wsHot = CoinCopyOfArray(ws,kk+kkkHot);
-    //lwsHot = CoinCopyOfArray(lws,ll+lllHot);
     wsHot = CoinCopyOfArray(ws,mxws);
     lwsHot = CoinCopyOfArray(lws,mxlws);
     infoHot[0] = info[0];
@@ -566,11 +593,25 @@ namespace Bonmin
     CoinCopyN(alpHot,mlp,alp);
     CoinCopyN(lpHot,mlp,lp);
     peq = peqHot;
-    //CoinCopyN(ws,kk+kkkHot,wsHot);
-    //CoinCopyN(lws,ll+lllHot,lwsHot);
     CoinCopyN(wsHot,mxws,ws);
     CoinCopyN(lwsHot,mxlws,lws);
     info[0] = infoHot[0];
+  }
+
+  void
+  BqpdSolver::cachedInfo::unmarkHotStart()
+  {
+    delete [] xHot;
+    delete [] gHot;
+    delete [] rHot;
+    delete [] wHot;
+    delete [] eHot;
+    delete [] lsHot;
+    delete [] alpHot;
+    delete [] lpHot;
+    delete [] wsHot;
+    delete [] lwsHot;
+    haveHotStart_ = false;
   }
 
   /** Optimize problem described by cache with Bqpd.*/
@@ -629,9 +670,32 @@ namespace Bonmin
 			  &m0de, &ifail, info, &iprint, &nout);
       printf("new ifail = %d\n", ifail);
     }
-    if (ifail == 7) {
-      printf("Not enout memory in Bqpd.  FIXME!\n");
-      throw;
+    while (ifail == 7) {
+      // FIXME: For now, we just disable hot starts in case they were active
+      if (haveHotStart_) unmarkHotStart();
+
+      printf("Increasing fillin_factor from %e ", *fillin_factor_);
+      *fillin_factor_ *= 2.;
+      printf("to %e\n", *fillin_factor_);
+      int mxws_new = kk + F77_FUNC(wsc,WSC).kkk + (5*n + (int)(*fillin_factor_*(double)amax_));
+      real* ws_new = new real[mxws_new];
+#ifdef InitializeAll
+      for (int i=0; i<mxws_new; i++) {
+	ws_new[i] = 42.;
+      }
+#endif
+      CoinCopyN(ws, kk, ws_new);
+      delete [] ws;
+      ws = ws_new;
+      mxws = mxws_new;
+      F77_FUNC(wsc,WSC).mxws = mxws;
+
+      m0de = 0;
+      tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
+      ifail = 0;
+      F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+			  g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
+			  &m0de, &ifail, info, &iprint, &nout);
     }
     if (ifail == 8) bad_warm_start_info_ = true;
 #if 0

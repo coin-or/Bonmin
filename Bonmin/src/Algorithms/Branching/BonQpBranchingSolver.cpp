@@ -53,7 +53,7 @@ namespace Bonmin
     if (filter_solver) {
       SmartPtr<BqpdSolver> qp_solver_ =
 	new BqpdSolver(RegOptions(), Options(), Jnlst());
-#if 0
+#if 1
       // Solve the QP with the original bounds and set the hot start
       // information
       TNLPSolver::ReturnStatus retstatus;
