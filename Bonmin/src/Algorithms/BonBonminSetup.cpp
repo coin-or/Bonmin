@@ -414,7 +414,7 @@ namespace Bonmin
     if (algo == B_OA) {
       options_->SetNumericValue("oa_dec_time_limit",COIN_DBL_MAX, true, true);
       options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
-      intParam_[BabLogLevel] = 0;
+      //intParam_[BabLogLevel] = 0;
     }
     else if (algo==B_QG) {
       options_->SetNumericValue("oa_dec_time_limit",0, true, true);
