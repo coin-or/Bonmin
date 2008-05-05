@@ -71,7 +71,7 @@ CouenneInterface::extractLinearRelaxation
       // include the rhs of auxiliary-based constraints into the FBBT
       // (should be useful with Vielma's problems, for example)
 
-      for (int i=0; i<p -> nCons (); i++) {
+      for (int i=0; i < p -> nCons (); i++) {
 
 	// for each constraint
 	CouenneConstraint *con = p -> Con (i);
@@ -108,10 +108,15 @@ CouenneInterface::extractLinearRelaxation
 	*nlb = getColLower (),
 	*nub = getColUpper ();
 
-      for (int i=0; i < p -> nOrig (); i++) {
-	if (nlb [i] < p -> Lb (i) - COUENNE_EPS) setColLower (i, p -> Lb (i));
-	if (nub [i] > p -> Ub (i) + COUENNE_EPS) setColUpper (i, p -> Ub (i));
-      }
+      for (int i=0; i < p -> nOrig (); i++) 
+	if (p -> Var (i) -> Multiplicity () > 0) {
+	  if (nlb [i] < p -> Lb (i) - COUENNE_EPS) setColLower (i, p -> Lb (i));
+	  if (nub [i] > p -> Ub (i) + COUENNE_EPS) setColUpper (i, p -> Ub (i));
+	} else { 
+	  // if not enabled, fix them in the NLP solver
+	  setColLower (i, 0.);
+	  setColUpper (i, 0.);
+	}
     }
 
     initialSolve ();
@@ -226,7 +231,7 @@ CouenneInterface::extractLinearRelaxation
    // add original and auxiliary variables to the new problem
    for (int i=0; i<numcols; i++) 
      if (p -> Var (i) -> Multiplicity () > 0) si.addCol (0, NULL,NULL, lb [i],       ub [i],      0);
-     else                                     si.addCol (0, NULL,NULL, -COIN_DBL_MAX,COIN_DBL_MAX,0);
+     else                                     si.addCol (0, NULL,NULL, 0.,           0.,          0);
    for (int i=numcols; i<numcolsconv; i++)    si.addCol (0, NULL,NULL, -COIN_DBL_MAX,COIN_DBL_MAX,0);
 
    // get initial relaxation
@@ -240,14 +245,14 @@ CouenneInterface::extractLinearRelaxation
    CouNumber *ll = p -> Lb ();
    CouNumber *uu = p -> Ub ();
 
-   // overwrite original bounds, could be improved within generateCuts
+   // overwrite original bounds, could have improved within generateCuts
    for (int i = numcolsconv; i--;) 
      if (p -> Var (i) -> Multiplicity () > 0) {
        colLower [i] = (ll [i] > - COUENNE_INFINITY) ? ll [i] : -COIN_DBL_MAX;
        colUpper [i] = (uu [i] <   COUENNE_INFINITY) ? uu [i] :  COIN_DBL_MAX;
      } else {
-       colLower [i] = -COIN_DBL_MAX;
-       colUpper [i] =  COIN_DBL_MAX;
+       colLower [i] = 0.;
+       colUpper [i] = 0.;
      }
 
    int numrowsconv = cs.sizeRowCuts ();
@@ -317,9 +322,6 @@ CouenneInterface::extractLinearRelaxation
    delete [] colLower;
    delete [] colUpper;
    delete [] obj;
-
-   //for (int i = 0 ; i < numcols ; i++)
-   //  if (isInteger (i))
 
    for (int i=0; i<numcolsconv; i++)
      if ((p -> Var (i) -> Multiplicity () > 0) &&

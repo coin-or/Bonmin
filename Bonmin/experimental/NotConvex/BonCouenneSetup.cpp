@@ -199,9 +199,9 @@ namespace Bonmin{
 
 	// branching objects on variables
 	if // comment three lines below for linear variables too
-	  ((couenneProb -> Dependence () [var -> Index ()] . size () > 0)  // has indep
-	   || ((var -> Type () == AUX) &&                                  // or, aux 
-	       (var -> Image () -> Linearity () > LINEAR))) {              // of nonlinear
+	  (couenneProb -> Dependence () [var -> Index ()] . size () > 0) {  // has indep
+	   //|| ((var -> Type () == AUX) &&                                  // or, aux 
+	   //    (var -> Image () -> Linearity () > LINEAR))) {              // of nonlinear
 
 	  objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
 	  objects [nobj++] -> setPriority (1);
@@ -214,9 +214,9 @@ namespace Bonmin{
 
 	// branching objects on variables
 	if // comment three lines below for linear variables too
-	  ((couenneProb -> Dependence () [var -> Index ()] . size () > 0) // has indep
-	  || ((var -> Type () == AUX) &&                      // or, aux 
-	      (var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
+	  (couenneProb -> Dependence () [var -> Index ()] . size () > 0) { // has indep
+	  //|| ((var -> Type () == AUX) &&                      // or, aux 
+	  //(var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
 
 	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
 	  objects [nobj++] -> setPriority (1);
