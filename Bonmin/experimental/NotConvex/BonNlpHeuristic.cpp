@@ -219,20 +219,13 @@ namespace Bonmin{
 
     bool foundSolution = false;
 
-    if (skipOnInfeasibility) { // make up some random rounding
-
+    if (skipOnInfeasibility) // make up some random rounding
       for (int i = couenne_ -> nOrig (); i--;) 
 	if (couenne_ -> Var (i) -> isDefinedInteger ())
 	  lower [i] = upper [i] = Y [i] = 
 	    (CoinDrand48 () < 0.5) ? 
 	    floor (Y [i] + COUENNE_EPS) : 
 	    ceil  (Y [i] - COUENNE_EPS);
-    }
-
-    //if (!skipOnInfeasibility) { // otherwise, the integral neighbourhood
-    //// of our fractional point is infeasible.
-
-    //assert (nlp_ -> getNumCols () == couenne_ -> nOrig ());
 
     {
       //	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
