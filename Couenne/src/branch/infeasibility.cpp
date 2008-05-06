@@ -115,10 +115,13 @@ double CouenneVarObject::checkInfeasibility (const OsiBranchingInformation * inf
       infsum += infeas;
     }
 
-    return
-      weiSum * infsum + 
-      weiAvg * (infsum / CoinMax (1., (CouNumber) dependence.size ())) + 
-      weiMin * infmin + 
-      weiMax * infmax;
+    return 
+      // to avoid very small intervals
+      (1. - exp (info -> lower_ [index] - info -> upper_ [index])) *
+      // to consider maximum, minimum, and sum/avg of the infeasibilities
+      (weiSum * infsum + 
+       weiAvg * (infsum / CoinMax (1., (CouNumber) dependence.size ())) + 
+       weiMin * infmin + 
+       weiMax * infmax);
   }
 }

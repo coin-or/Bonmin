@@ -26,9 +26,6 @@ enum pos            {PRE=0, POST, INSIDE, NONE};
 /** sign of constraint */
 enum con_sign       {COUENNE_EQ, COUENNE_LE, COUENNE_GE, COUENNE_RNG};
 
-/** optimization sense of an objective function */
-enum opt_sense      {MAXIMIZE, MINIMIZE};
-
 /** position and number of convexification cuts added for a lower
     convex (upper concave) envelope */
 enum conv_type      {CURRENT_ONLY, UNIFORM_GRID, AROUND_CURPOINT};

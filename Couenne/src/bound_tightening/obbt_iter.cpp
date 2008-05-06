@@ -74,7 +74,7 @@ obbt_iter (CouenneSolverInterface *csi,
 
   exprVar *var = Var (index);
 
-  int psense  = Obj (0) -> Sense (),
+  int //psense  = Obj (0) -> Sense (),
       objind  = Obj (0) -> Body () -> Index (),
       ncols   = csi -> getNumCols (),
       nImprov = 0;
@@ -143,8 +143,8 @@ obbt_iter (CouenneSolverInterface *csi,
       ((index != objind) || // this is not the objective
 
        // or it is, so we use it for re-solving
-       ((sense ==  1) && (psense == MINIMIZE) && !(chg_bds [index].lower() & t_chg_bounds::EXACT)) ||
-       ((sense == -1) && (psense == MAXIMIZE) && !(chg_bds [index].upper() & t_chg_bounds::EXACT)))) {
+       ((sense ==  1) && !(chg_bds [index].lower() & t_chg_bounds::EXACT)))) {
+       //((sense==-1) && (psense == MAXIMIZE) && !(chg_bds [index].upper() & t_chg_bounds::EXACT)))) {
 
     bool isInt = (Var (index) -> isInteger ());
 

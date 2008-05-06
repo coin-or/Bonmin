@@ -33,14 +33,16 @@ void fictitiousBound (OsiCuts &cs,
 
   // we have a single variable objective function
 
-  int sense = (p -> Obj (0) -> Sense () == MINIMIZE) ? -1 : 1;
+  //int sense = -1; //(p -> Obj (0) -> Sense () == MINIMIZE) ? -1 : 1;
 
   if (action)
-    if (sense<0) {if (p -> Lb (ind_obj) < - large_bound) p -> Lb (ind_obj) = - large_bound;}
-    else         {if (p -> Ub (ind_obj) >   large_bound) p -> Ub (ind_obj) =   large_bound;}
+    //if (sense<0) 
+      {if (p -> Lb (ind_obj) < - large_bound) p -> Lb (ind_obj) = - large_bound;}
+  //else         {if (p -> Ub (ind_obj) >   large_bound) p -> Ub (ind_obj) =   large_bound;}
   else
-    if (sense>0) {if (fabs (p->Ub(ind_obj)-large_bound)<large_tol) p->Ub(ind_obj) = COUENNE_INFINITY;}
-    else         {if (fabs (p->Lb(ind_obj)+large_bound)<large_tol) p->Lb(ind_obj) =-COUENNE_INFINITY;}
+    //if (sense>0) {if (fabs (p->Ub(ind_obj)-large_bound)<large_tol) p->Ub(ind_obj)=COUENNE_INFINITY;}
+    //else         
+      {if (fabs (p->Lb(ind_obj)+large_bound)<large_tol) p->Lb(ind_obj) =-COUENNE_INFINITY;}
 }
 
 
@@ -219,9 +221,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       // tightening
       double lp_bound = problem_ -> domain () -> x (indobj);
 
-      if (problem_ -> Obj (0) -> Sense () == MINIMIZE) 
-	   {if (lp_bound > problem_ -> Lb (indobj)) problem_ -> Lb (indobj) = lp_bound;}
-      else {if (lp_bound < problem_ -> Ub (indobj)) problem_ -> Ub (indobj) = lp_bound;}
+      //if (problem_ -> Obj (0) -> Sense () == MINIMIZE) 
+      {if (lp_bound > problem_ -> Lb (indobj)) problem_ -> Lb (indobj) = lp_bound;}
+	   //else {if (lp_bound < problem_ -> Ub (indobj)) problem_ -> Ub (indobj) = lp_bound;}
     }
 
     updateBranchInfo (si, problem_, chg_bds, info); // info.depth >= 0 || info.pass >= 0

@@ -283,7 +283,6 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
       if (checkNLP (x, xp))
 	setCutOff (X (objind));
     }
-
   } // try
 
   catch (int i) {

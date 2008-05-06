@@ -20,6 +20,7 @@
 #include "exprClone.hpp"
 #include "exprIVar.hpp"
 #include "exprAux.hpp"
+#include "exprOpp.hpp"
 
 #include "CouenneProblem.hpp"
 #include "CouenneProblemElem.hpp"
@@ -42,7 +43,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   ndefined_  (0),
   graph_     (NULL),
   nOrig_     (0),
-  pcutoff_   (new GlobalCutOff),
+  pcutoff_   (new GlobalCutOff (COIN_DBL_MAX)),
   created_pcutoff_ (true),
   doFBBT_    (true),
   doOBBT_    (false),
@@ -274,11 +275,11 @@ CouenneProblem::~CouenneProblem () {
 }
 
 
-/// methods to add objective function
+/// methods to add objective function. 
 
 void CouenneProblem::addObjective (expression *newobj, const std::string &sense = "min") {
-  objectives_ . push_back 
-    (new CouenneObjective (newobj, (sense == "min") ? MINIMIZE : MAXIMIZE));
+  objectives_ . push_back
+    (new CouenneObjective ((sense == "min") ? newobj : new exprOpp (newobj)));//, MINIMIZE));
 }
 
 

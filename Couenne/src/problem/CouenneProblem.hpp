@@ -54,9 +54,10 @@ class CouenneProblem {
     GlobalCutOff(const GlobalCutOff&);
     double cutoff_;
   public:
-    GlobalCutOff() : cutoff_ (COUENNE_INFINITY) {}
+    GlobalCutOff ()         : cutoff_ (COIN_DBL_MAX) {}
+    GlobalCutOff (double c) : cutoff_ (c) {}
     ~GlobalCutOff() {}
-    inline void setCutOff(double cutoff) {cutoff_ = cutoff;}
+    inline void setCutOff (double cutoff) {cutoff_ = cutoff;}
     inline double getCutOff() const {return cutoff_;}
   };
 
@@ -351,7 +352,7 @@ class CouenneProblem {
 
   /// Set cutoff
   CouNumber getCutOff () const
-  {return pcutoff_ -> getCutOff();}
+  {return pcutoff_ -> getCutOff ();}
 
   /// Make cutoff known to the problem
   void installCutOff ();

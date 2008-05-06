@@ -33,12 +33,10 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
 
   /*printf ("checknlp: %d vars -------------------\n", domain_.current () -> Dimension ());
   for (int i=0; i<domain_.current () -> Dimension (); i++)
-  printf ("%20g [%20g %20g]\n", domain_.x (i), domain_.lb (i), domain_.ub (i));*/
+    printf ("%4d %20g [%20g %20g]\n", 
+    i, domain_.x (i), domain_.lb (i), domain_.ub (i));*/
 
   CouNumber realobj = (*(Obj (0) -> Body ())) ();
-
-  if (Obj (0) -> Sense () == MAXIMIZE)
-    realobj = -realobj;
 
   bool retval = true;
 
@@ -138,7 +136,6 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
 	}
 
 	throw infeasible;
-	// We dont return anymore (return false;)
       }
     }
   }

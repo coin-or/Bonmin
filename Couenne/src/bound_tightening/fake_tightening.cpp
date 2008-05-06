@@ -69,7 +69,7 @@ fake_tighten (char direction,  // 0: left, 1: right
 	      t_chg_bounds *f_chg) const {
   int
     ncols    = nVars (),
-    objsense = Obj (0) -> Sense (),
+    //objsense = Obj (0) -> Sense (),
     objind   = Obj (0) -> Body  () -> Index ();
 
   assert (objind >= 0);
@@ -89,7 +89,7 @@ fake_tighten (char direction,  // 0: left, 1: right
   // (with relative expense) but not the derivative.
 
 #ifdef DEBUG
-  CouNumber curdb     = ((objsense == MINIMIZE) ? Lb (objind) : Ub (objind));  // current dual bound
+  CouNumber curdb     = Lb (objind);// : Ub (objind);  // current dual bound
   printf ("  x_%d.  x = %10g, lb = %g, cutoff = %g-----------------\n", index,xcur,curdb,getCutOff());
 #endif
 
@@ -134,10 +134,9 @@ fake_tighten (char direction,  // 0: left, 1: right
 #endif
 
     bool
-      feasible  = btCore (f_chg),            // true if feasible with fake bound
-      betterbds = (objsense == MINIMIZE) ?   // true if over cutoff
-        (Lb (objind) > getCutOff ()) : 
-        (Ub (objind) < getCutOff ());
+      feasible  = btCore (f_chg),             // true if feasible with fake bound
+      betterbds = Lb (objind) > getCutOff (); // true if over cutoff
+      
 
 #ifdef DEBUG
     printf(" [%10g,%10g] lb = %g {fea=%d,btr=%d} ",

@@ -131,20 +131,20 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
   // variables or constants
 
   expression *body = objectives_ [0] -> Body ();
-  int sense = objectives_ [0] -> Sense ();
+  //int sense = objectives_ [0] -> Sense ();
 
   switch (body -> code ()) {
 
   case COU_EXPRVAR:   //
-    obj [body -> Index ()] = (sense == MINIMIZE) ? 1 : -1;
+    obj [body -> Index ()] = 1; //(sense == MINIMIZE) ? 1 : -1;
     break;
 
   case COU_EXPRSUB: { // 
 
     expression **arglist = body -> ArgList ();
 
-    obj [arglist [0] -> Index ()] = (sense == MINIMIZE) ?  1 : -1;
-    obj [arglist [1] -> Index ()] = (sense == MINIMIZE) ? -1 :  1;
+    obj [arglist [0] -> Index ()] =  1; //(sense == MINIMIZE) ?  1 : -1;
+    obj [arglist [1] -> Index ()] = -1; //(sense == MINIMIZE) ? -1 :  1;
 
   } break;
 
@@ -159,10 +159,10 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 
     for (int n = lcoe.size (), i=0; n--; i++)
       //exprGroup::lincoeff::iterator el = lcoe.begin (); el != lcoe.end (); ++el)
-      obj [lcoe [i]. first -> Index ()] = 
-	(sense == MINIMIZE) ? 
-	 (lcoe [i]. second) : 
-	-(lcoe [i]. second);
+      obj [lcoe [i]. first -> Index ()] = lcoe [i]. second;
+    //(sense == MINIMIZE) ? 
+    //(lcoe [i]. second) : 
+    //-(lcoe [i]. second);
 
   } // no break, as exprGroup is derived from exprSum
 
@@ -177,7 +177,7 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
 	break;
 
       case COU_EXPRVAR: 
-	obj [arglist [i] -> Index ()] = (sense == MINIMIZE) ? 1 : -1;
+	obj [arglist [i] -> Index ()] = 1; //(sense == MINIMIZE) ? 1 : -1;
 	break;
 
       case COU_EXPRMUL: {
@@ -213,25 +213,14 @@ void CouenneProblem::setCutOff (CouNumber cutoff) const {
 
   // AW: Should we use the value of the objective variable computed by 
   //     Couenne here?
-  if ((indobj >= 0) &&
-      (cutoff < pcutoff_ -> getCutOff () - COUENNE_EPS)) {
+  if ((indobj >= 0) && (cutoff < pcutoff_ -> getCutOff () - COUENNE_EPS)) {
 
-    Jnlst()->Printf(Ipopt::J_DETAILED, J_PROBLEM,
-		    "Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",
-		    cutoff, indobj,
-		    pcutoff_ -> getCutOff ());
+    Jnlst () -> Printf (Ipopt::J_DETAILED, J_PROBLEM,
+			"Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",
+			cutoff, indobj,
+			pcutoff_ -> getCutOff ());
 
-    // apparently there is no optimization sense...
-    //(objectives_ [0] -> Sense () == MINIMIZE) ? 
-    //Ub (indobj) :
-    //Lb (indobj));
-
-    CouNumber 
-      safe       = SafeCutoff,
-      safesigned = (objectives_ [0] -> Sense () == MINIMIZE) ? safe : -safe;
-
-    pcutoff_ -> setCutOff 
-      (cutoff + safesigned * fabs (1 + cutoff));
+    pcutoff_ -> setCutOff (cutoff + SafeCutoff * fabs (1 + cutoff));
   }
 } // tolerance needed to retain feasibility
 
@@ -247,10 +236,11 @@ void CouenneProblem::installCutOff () {
     // all problem are assumed to be minimization
     double cutoff = pcutoff_ -> getCutOff();
 
-    //if (objectives_ [0] -> Sense () == MINIMIZE) 
-    {if (cutoff < Ub (indobj)) Ub (indobj) = cutoff;}
-	 //else {if (cutoff > Lb (indobj)) Lb (indobj) = cutoff;}
-  }
+    if (cutoff < Ub (indobj))
+      Ub (indobj) = cutoff;
+
+  } else jnlst_ -> Printf (J_SUMMARY, J_PROBLEM, 
+			   "Warning, could not install cutoff - negative objective index\n");
 }
 
 

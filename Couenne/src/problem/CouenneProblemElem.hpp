@@ -109,14 +109,11 @@ class CouenneObjective {
   /// expression to optimize
   expression *body_;
 
-  /// can be MAXIMIZE or MINIMIZE
-  enum opt_sense sense_;
-
  public:
 
   /// constructor
-  CouenneObjective  (expression *body, enum opt_sense sense):
-    body_ (body), sense_ (sense) {}
+  CouenneObjective (expression *body):
+    body_ (body) {}
 
   /// destructor
   ~CouenneObjective () 
@@ -124,16 +121,11 @@ class CouenneObjective {
 
   /// copy constructor
   CouenneObjective  (const CouenneObjective &o, Domain *d = NULL):
-    body_  (o.body_ -> clone (d)), 
-    sense_ (o.sense_) {}
+    body_  (o.body_ -> clone (d)) {}
 
   /// cloning method
   inline CouenneObjective *clone (Domain *d = NULL) const
   {return new CouenneObjective (*this, d);}
-
-  /// get optimization sense
-  inline enum opt_sense Sense () const
-  {return sense_;}
 
   /// get body
   inline expression *Body () const
@@ -149,7 +141,7 @@ class CouenneObjective {
 
   /// Print to iostream
   void print (std::ostream &out = std::cout) {
-    out << (sense_ == MAXIMIZE ? "max " : "min ");
+    out << "min ";
     body_ -> print (out);
     out << std::endl;
   }

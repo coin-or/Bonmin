@@ -76,8 +76,9 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
 
   f << std::endl << "# objective" << std::endl << std::endl;
 
-  if (objectives_ [0] -> Sense () == MINIMIZE) f << "minimize";
-  else                                         f << "maximize";
+  //if (objectives_ [0] -> Sense () == MINIMIZE) 
+  f << "minimize";
+  //else                                         f << "maximize";
 
   f << " obj: ";  
   objectives_ [0] -> Body () -> print (f, !aux); 
