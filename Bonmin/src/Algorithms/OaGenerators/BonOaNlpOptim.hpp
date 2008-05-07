@@ -34,7 +34,8 @@ namespace Bonmin
         maxDepth_(copy.maxDepth_),
         nSolve_(0),
         addOnlyViolated_(copy.addOnlyViolated_),
-        global_(copy.global_)
+        global_(copy.global_),
+	solves_per_level_(copy.solves_per_level_)
     {
       handler_ = new CoinMessageHandler();
       handler_ -> setLogLevel(copy.handler_->logLevel());
@@ -108,6 +109,8 @@ namespace Bonmin
     bool addOnlyViolated_;
     /** Add cuts as global?*/
     bool global_;
+    /** Average number of nodes per level in tree */
+    double solves_per_level_;
   };
 }
 #endif

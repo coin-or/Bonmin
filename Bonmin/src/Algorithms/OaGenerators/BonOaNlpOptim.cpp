@@ -38,9 +38,10 @@ namespace Bonmin
     b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
     addOnlyViolated_ = ivalue;
     b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
+    global_ = ivalue;
 
     b.options()->GetIntegerValue("nlp_solve_max_depth", maxDepth_,"bonmin.");
-    global_ = ivalue;
+    b.options()->GetNumericValue("nlp_solves_per_depth", solves_per_level_,"bonmin.");
     handler_ = new CoinMessageHandler();
     handler_ -> setLogLevel(1);
     messages_ = OaMessages();
@@ -68,7 +69,9 @@ namespace Bonmin
     //const double *colsol = si.getColSolution();
     //Check for integer feasibility
     nCalls++;
-    if (info.level > maxDepth_ || info.pass > 0 || !info.inTree  )
+    double rand = CoinDrand48();
+    if (info.level > maxDepth_ || info.pass > 0 || !info.inTree  ||
+        pow(2.,-info.level)*solves_per_level_ <= rand)
       return;
     //Fix the variable which have to be fixed, after having saved the bounds
     double * saveColLb = new double[numcols];
@@ -204,6 +207,10 @@ namespace Bonmin
         0,10,
         "A depth of 0 amounts to to never solve the NLP relaxation.");
     roptions->setOptionExtraInfo("nlp_solve_max_depth",1);
+    roptions->AddLowerBoundedNumberOption("nlp_solves_per_depth",
+        "Set average number of nodes in the tree at which NLP relaxations are solved in B-Hyb for each depth.",
+        0.,false,10.);
+    roptions->setOptionExtraInfo("nlp_solves_per_depth",1);
   }
 
 
