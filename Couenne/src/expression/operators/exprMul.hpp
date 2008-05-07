@@ -38,6 +38,9 @@ class exprMul: public exprOp {
   /// Method to evaluate the expression
   inline CouNumber operator () ();
 
+  /// return l-2 norm of gradient at given point
+  CouNumber gradientNorm (const double *x);
+
   /// differentiation
   expression *differentiate (int index); 
 

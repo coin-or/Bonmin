@@ -75,6 +75,10 @@ class exprVar: public expression {
   virtual inline CouNumber operator () () 
   {return domain_ -> x (varIndex_);}
 
+  /// return l-2 norm of gradient at given point
+  virtual inline CouNumber gradientNorm (const double *x)
+  {return 1.;}
+
   /// differentiation
   virtual inline expression *differentiate (int index) 
     {return new exprConst ((index == varIndex_) ? 1. : 0.);}

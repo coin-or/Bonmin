@@ -104,6 +104,10 @@ class exprCopy: public expression {
     //    {return (*copy_) ();}
     //    {return (copy_ -> Value ());}
 
+  /// return l-2 norm of gradient at given point
+  virtual inline CouNumber gradientNorm (const double *x)
+  {return copy_ -> gradientNorm (x);}
+
   /// differentiation
   inline expression *differentiate (int index) 
   {return copy_ -> differentiate (index);}

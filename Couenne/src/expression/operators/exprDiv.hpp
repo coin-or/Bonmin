@@ -42,6 +42,9 @@ class exprDiv: public exprOp {
   /// Function for the evaluation of the expression
   inline CouNumber operator () ();
 
+  /// return l-2 norm of gradient at given point
+  CouNumber gradientNorm (const double *x);
+
   /// Differentiation
   expression *differentiate (int index); 
 

@@ -114,7 +114,11 @@ class expression {
 
   /// null function for evaluating the expression
   virtual inline CouNumber operator () () 
-  {return 0;}
+  {return 0.;}
+
+  /// return l-2 norm of gradient at given point
+  virtual inline CouNumber gradientNorm (const double *x)
+  {return 0.;}
 
   /// differentiation
   virtual inline expression *differentiate (int) 

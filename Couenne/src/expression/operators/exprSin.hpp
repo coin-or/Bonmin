@@ -62,6 +62,12 @@ class exprSin: public exprUnary {
   std::string printOp () const
   {return "sin";}
 
+  /// return l-2 norm of gradient at given point
+  inline CouNumber gradientNorm (const double *x) {
+    return (argument_ -> Index () < 0) ? 
+      0. : fabs (cos (x [argument_ -> Index ()]));
+  }
+
   /// differentiation
   expression *differentiate (int index); 
 

@@ -104,6 +104,9 @@ public:
   /// Function for the evaluation of the expression
   virtual CouNumber operator () ();
 
+  /// return l-2 norm of gradient at given point
+  CouNumber gradientNorm (const double *x);
+
   /// Compute derivative of this expression with respect to variable
   /// whose index is passed as argument
   virtual expression *differentiate (int index);

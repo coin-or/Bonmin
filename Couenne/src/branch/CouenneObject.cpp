@@ -298,8 +298,9 @@ double CouenneObject::checkInfeasibility (const OsiBranchingInformation *info) c
   if (reference_ -> Type () == VAR)
     return 0.;
 
-  double retval = fabs (info -> solution_ [reference_ -> Index ()] - 
-			(*(reference_ -> Image ())) ());
+  double retval = 
+    fabs (info -> solution_ [reference_ -> Index ()] - (*(reference_ -> Image ())) ()) / 
+    CoinMax (1., reference_ -> Image () -> gradientNorm (info -> solution_));
 
   if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) 
     retval = 0.;

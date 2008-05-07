@@ -46,7 +46,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
 
     if (fabs (realobj - obj) / (1 + fabs (realobj)) > feas_tolerance_) {
 
-      Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+      Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
 		      "checkNLP: false objective. %g != %g (diff. %g)\n", 
 		      realobj, obj, realobj - obj);
 
@@ -62,7 +62,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
       if ((val > domain_.ub (i) + feas_tolerance_) ||
 	  (val < domain_.lb (i) - feas_tolerance_)) {
 
-	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+	Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
 			"checkNLP: variable %d out of bounds: %.6f [%g,%g] (diff %g)\n", 
 			i, val, domain_.lb (i), domain_.ub (i),
 			CoinMax (fabs (val - domain_.lb (i)), 
@@ -75,7 +75,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
       if (variables_ [i] -> isInteger () &&
 	  (fabs (val - COUENNE_round (val)) > feas_tolerance_)) {
 
-	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+	Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
 			"checkNLP: integrality %d violated: %.6f [%g,%g]\n", 
 			i, val, domain_.lb (i), domain_.ub (i));
 
@@ -104,7 +104,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
 	  (fabs (delta = (*(variables_ [i])) () - 
 		 (*(variables_ [i] -> Image ())) ()) > feas_tolerance_)) {
 
-	Jnlst()->Printf(Ipopt::J_MOREDETAILED, J_PROBLEM,
+	Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
 			"checkNLP: auxiliarized %d violated (%g)\n", i, delta);
 
 	throw infeasible;
@@ -125,7 +125,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
       if ((body > rhs + feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs)))) || 
 	  (body < lhs - feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs))))) {
 
-	if (Jnlst()->ProduceOutput(Ipopt::J_WARNING, J_PROBLEM)) {
+	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_PROBLEM)) {
 
 	  Jnlst()->Printf
 	    (Ipopt::J_WARNING, J_PROBLEM,

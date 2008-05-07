@@ -212,3 +212,31 @@ void exprDiv::closestFeasible (expression *varind,
       if (x*y > c) left  = c/y; // convex area in first orthant
       else         right = c/y; // remaining of first+second orthant
 }
+
+
+/// return l-2 norm of gradient at given point
+CouNumber exprDiv::gradientNorm (const double *x) {
+
+  int 
+    ind0 = arglist_ [0] -> Index (),
+    ind1 = arglist_ [1] -> Index ();
+
+  CouNumber
+    x0 = (ind0 < 0) ? fabs (arglist_ [0] -> Value ()) : fabs (x [ind0]),
+    x1 = (ind1 < 0) ? fabs (arglist_ [1] -> Value ()) : fabs (x [ind1]),
+    x1sq = x1 * x1;
+
+  if (x1sq < 1/COUENNE_INFINITY) {
+    x1sq = 1/COUENNE_INFINITY;
+    if (x1 < 1/COUENNE_INFINITY) // implied
+      x1 = 1/COUENNE_INFINITY;
+  }
+
+  if (ind0 < 0)
+    if (ind1 < 0) return 0.;                // c/d
+    else          return fabs (x0/(x1sq)); // c/y
+  else 
+    if (ind1 < 0) return 1. / x1;                                // x/d
+    else          return sqrt (1. / x1sq + x0*x0 / (x1sq * x1sq)); // x/y
+}
+

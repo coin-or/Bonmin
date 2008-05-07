@@ -284,3 +284,13 @@ void exprPow::closestFeasible (expression *varind,
     if (k > 0) ((y < xk) ? left : right) = yk;
     else       ((y > xk) ? left : right) = yk;
 }
+
+
+/// return l-2 norm of gradient at given point
+CouNumber exprPow::gradientNorm (const double *x) {
+
+  int ind0 = arglist_ [0] -> Index ();
+  CouNumber exponent = arglist_ [1] -> Value ();
+  return (ind0 < 0) ? 0. : fabs (exponent * pow (x [ind0], exponent - 1));
+}
+

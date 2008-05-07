@@ -37,6 +37,10 @@ class exprAbs: public exprUnary {
   std::string printOp () const
     {return "abs";}
 
+  /// return l_2 norm of gradient at given point
+  inline CouNumber gradientNorm (const double *x)
+  {return ((argument_ -> Index () < 0) ? 0. : 1.);}
+
   /// differentiation
   expression *differentiate (int index); 
 

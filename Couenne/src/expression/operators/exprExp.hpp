@@ -33,7 +33,11 @@ class exprExp: public exprUnary {
 
   /// Print operator
   std::string printOp () const
-    {return "exp";}
+  {return "exp";}
+
+  /// return l-2 norm of gradient at given point
+  inline CouNumber gradientNorm (const double *x)
+  {return (argument_ -> Index () < 0) ? 0. : exp (x [argument_ -> Index ()]);}
 
   /// Differentiation
   expression *differentiate (int index); 

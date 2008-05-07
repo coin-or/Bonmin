@@ -186,3 +186,23 @@ void exprMul::closestFeasible (expression *varind,
     if (y < c*x) left  = y/c;
     else         right = y/c;
 }
+
+
+/// return l-2 norm of gradient at given point
+CouNumber exprMul::gradientNorm (const double *x) {
+
+  int 
+    ind0 = arglist_ [0] -> Index (),
+    ind1 = arglist_ [1] -> Index ();
+
+  CouNumber 
+    x0 = (ind0 < 0) ? arglist_ [0] -> Value () : x [ind0],
+    x1 = (ind1 < 0) ? arglist_ [1] -> Value () : x [ind1];
+
+  if (ind0 < 0)
+    if (ind1 < 0) return 0.;                   // c*d
+    else          return fabs (x0);            // c*y
+  else 
+    if (ind1 < 0) return fabs (x1);            // x*d
+    else          return sqrt (x0*x0 + x1*x1); // x*y
+}

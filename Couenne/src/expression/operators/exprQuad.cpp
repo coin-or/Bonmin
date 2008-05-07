@@ -435,15 +435,12 @@ bool exprQuad::isInteger () {
 void exprQuad::replace (exprVar *x, exprVar *w) {
 
   exprGroup::replace (x, w);
-
   int index = x -> Index ();
 
   for (sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
     exprVar * &vr = row -> first;
-
-    if (//(vr -> Type  () == VAR) &&
-	(vr -> Index () == index)) {
+    if ((vr -> Index () == index)) {
 
       assert ("I would like to use quadratic expressions" == 
 	      "I didn't fix exprQuad::replace() yet");
@@ -453,9 +450,7 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
     for (sparseQcol::iterator col = row -> second.begin (); col != row -> second.end (); ++col) {
 
       exprVar * &vc = col -> first;
-
-      if (//(vc -> Type  () == VAR) &&
-	  (vc -> Index () == index)) {
+      if ((vc -> Index () == index)) {
 
 	assert ("I would like to use quadratic expressions" == 
 		"I didn't fix exprQuad::replace() yet");
@@ -472,4 +467,12 @@ void exprQuad::closestFeasible (expression *varind,
 				CouNumber &left,
 				CouNumber &right) const {
   assert (false);
+}
+
+
+/// return l-2 norm of gradient at given point
+CouNumber exprQuad::gradientNorm (const double *x) {
+
+  assert (false);
+  return 0.;
 }

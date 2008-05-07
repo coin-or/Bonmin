@@ -35,6 +35,9 @@ class exprLog: public exprUnary {
   std::string printOp () const
     {return "log";}
 
+  /// return l-2 norm of gradient at given point
+  CouNumber gradientNorm (const double *x);
+
   /// differentiation
   expression *differentiate (int index); 
 

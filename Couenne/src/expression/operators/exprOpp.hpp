@@ -38,8 +38,13 @@ class exprOpp: public exprUnary {
   inline unary_function F () 
     {return opp;}
 
+  /// Output
   void print (std::ostream &out, 
 	      bool descend) const;
+
+  /// return l-2 norm of gradient at given point
+  inline CouNumber gradientNorm (const double *x)
+  {return (argument_ -> Index () < 0) ? 0. : 1.;}
 
   /// differentiation
   expression *differentiate (int index); 

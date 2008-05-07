@@ -45,6 +45,9 @@ class exprPow: public exprOp {
   /// function for the evaluation of the expression
   CouNumber operator () ();
 
+  /// return l-2 norm of gradient at given point
+  CouNumber gradientNorm (const double *x);
+
   /// differentiation
   expression *differentiate (int index); 
 

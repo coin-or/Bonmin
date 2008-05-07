@@ -116,8 +116,8 @@ double CouenneVarObject::checkInfeasibility (const OsiBranchingInformation * inf
     }
 
     return 
-      // to avoid very small intervals
-      (1. - exp (info -> lower_ [index] - info -> upper_ [index])) *
+      // to avoid very small intervals -- removed as now scale w/ norm of gradient
+      //(1. - exp (info -> lower_ [index] - info -> upper_ [index])) *
       // to consider maximum, minimum, and sum/avg of the infeasibilities
       (weiSum * infsum + 
        weiAvg * (infsum / CoinMax (1., (CouNumber) dependence.size ())) + 

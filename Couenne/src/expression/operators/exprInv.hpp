@@ -48,6 +48,9 @@ class exprInv: public exprUnary {
   /// output "1/argument"
   virtual void print (std::ostream &out = std::cout, bool = false) const;
 
+  /// return l-2 norm of gradient at given point
+  CouNumber gradientNorm (const double *x);
+
   /// differentiation
   expression *differentiate (int index); 
 

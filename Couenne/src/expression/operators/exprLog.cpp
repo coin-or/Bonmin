@@ -9,6 +9,8 @@
 
 #include <math.h>
 
+#include "CoinHelperFunctions.hpp"
+
 #include "exprLog.hpp"
 #include "exprConst.hpp"
 #include "exprClone.hpp"
@@ -77,3 +79,11 @@ bool exprLog::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   return res;
 }
+
+
+/// return l-2 norm of gradient at given point
+CouNumber exprLog::gradientNorm (const double *x) {
+  return (argument_ -> Index () < 0) ? 0. : 
+    1. / (CoinMin (1 / COUENNE_INFINITY, x [argument_ -> Index ()]));
+}
+

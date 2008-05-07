@@ -56,6 +56,9 @@ public:
   /// function for the evaluation of the expression
   virtual CouNumber operator () ();
 
+  /// return l-2 norm of gradient at given point
+  virtual CouNumber gradientNorm (const double *x);
+
   /// fill in the set with all indices of variables appearing in the
   /// expression
   virtual int DepList (std::set <int> &deplist, 

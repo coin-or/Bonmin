@@ -274,3 +274,16 @@ void exprGroup::replace (exprVar *x, exprVar *w) {
     }
   }
 }
+
+
+/// return l-2 norm of gradient at given point. Not needed for now, as
+/// we only use it with nonlinear operators
+CouNumber exprGroup::gradientNorm (const double *x) {
+
+  CouNumber retval = 0;
+
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el)
+    retval += el -> second * el -> second;
+
+  return sqrt (retval);
+}

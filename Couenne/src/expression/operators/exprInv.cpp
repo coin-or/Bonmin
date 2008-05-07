@@ -37,7 +37,6 @@ void exprInv::print (std::ostream &out,
 
 /// general function to tighten implied bounds of a function w = x^k,
 /// k negative, integer or inverse integer, and odd
-
 void invPowImplBounds (int wind, int index, 
 		       CouNumber *l, CouNumber *u, CouNumber k,
 		       bool &resL, bool &resU) {
@@ -69,7 +68,6 @@ void invPowImplBounds (int wind, int index,
 
 /// implied bound processing for expression w = 1/x, upon change in
 /// lower- and/or upper bound of w, whose index is wind
-
 bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   // Expression w = 1/x: we can only improve the bounds if 
@@ -99,3 +97,16 @@ bool exprInv::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
   return (resL || resU);
 }
+
+
+/// return l-2 norm of gradient at given point
+CouNumber exprInv::gradientNorm (const double *x) {
+  int ind = argument_ -> Index ();
+  CouNumber xx;
+  if (ind < 0) return 0.;
+  else {
+    xx = x [argument_ -> Index ()];
+    return 1. / (xx*xx);
+  }
+}
+
