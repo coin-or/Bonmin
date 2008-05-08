@@ -72,10 +72,10 @@ namespace Bonmin
       numNodes_(0),
       mipIterationCount_(0),
       model_(),
-      usingCouenne_(false),
       modelHandler_(NULL),
       objects_(0),
-      nObjects_(0)
+      nObjects_(0),
+      usingCouenne_(false)
   {}
 
   /** Destructor.*/
@@ -466,6 +466,27 @@ namespace Bonmin
     else
       hasFailed = s.nonlinearSolver()->hasContinuedOnAFailure();
 
+    // Output summarizing cut generators (taken from CbcSolver.cpp)
+    // ToDo put into proper print level
+    int numberGenerators = model_.numberCutGenerators();
+    for (int iGenerator=0;iGenerator<numberGenerators;iGenerator++) {
+      CbcCutGenerator * generator = model_.cutGenerator(iGenerator);
+      //CglStored * stored = dynamic_cast<CglStored*>(generator->generator());
+       if (true&&!generator->numberCutsInTotal())
+	continue;
+      printf("%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
+	      generator->cutGeneratorName(),
+	      generator->numberTimesEntered(),
+	      generator->numberCutsInTotal()+
+	      generator->numberColumnCuts(),
+	      generator->numberCutsActive());
+      if (generator->timing()) {
+	printf(" (%.3f seconds)\n",generator->timeInCutGenerator());
+      }
+      else {
+	printf("\n");
+      }
+    }
 
     if (hasFailed) {
       std::cout<<"************************************************************"<<std::endl
