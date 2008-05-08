@@ -209,7 +209,7 @@ namespace Bonmin
     roptions->setOptionExtraInfo("nlp_solve_max_depth",1);
     roptions->AddLowerBoundedNumberOption("nlp_solves_per_depth",
         "Set average number of nodes in the tree at which NLP relaxations are solved in B-Hyb for each depth.",
-        0.,false,10.);
+        0.,false,1e30.);
     roptions->setOptionExtraInfo("nlp_solves_per_depth",1);
   }
 
