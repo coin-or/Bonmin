@@ -14,6 +14,7 @@
 #include "CbcCutGenerator.hpp"
 #include "CbcBranchActual.hpp"
 #include "BonAuxInfos.hpp"
+#include "CoinHelperFunctions.hpp"
 
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
@@ -115,15 +116,20 @@ namespace Bonmin{
     bool too_deep = false;
 
     // check depth
-    if(numberSolvePerLevel_ > -1){
-      if(numberSolvePerLevel_ == 0) 
+    if (numberSolvePerLevel_ > -1){
+      if (numberSolvePerLevel_ == 0) 
 	return 0;
 
-      const int depth = (model_->currentNode()) ? model_->currentNode()->depth() : 0;
+      const int depth = (model_ -> currentNode ()) ? model_ -> currentNode () -> depth () : 0;
 
-      if (CoinDrand48 () > pow (2., numberSolvePerLevel_ - depth))
+      //if (CoinDrand48 () > pow (2., numberSolvePerLevel_ - depth))
+      if (CoinDrand48 () > 1. / CoinMax 
+	  (1., (double) ((depth - numberSolvePerLevel_) * (depth - numberSolvePerLevel_))))
 	too_deep = true;
     }
+
+    if (too_deep)
+      return 0;
 
     double *lower = new double [couenne_ -> nVars ()];
     double *upper = new double [couenne_ -> nVars ()];

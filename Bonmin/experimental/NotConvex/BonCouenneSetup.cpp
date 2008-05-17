@@ -274,12 +274,14 @@ namespace Bonmin{
       varSelection = OSI_SIMPLE;
     }
 
+    /*
     if ((varSelection == OSI_STRONG) && 
 	(objType == CouenneObject::VT_OBJ)) {
       printf ("Couenne: warning, strong branching is incompatible with Violation Transfer\n"
 	      "Resetting variable selection to simple branching");
       varSelection = OSI_SIMPLE;
     }
+    */
 
     switch (varSelection) {
 
