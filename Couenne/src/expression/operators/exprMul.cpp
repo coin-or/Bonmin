@@ -167,7 +167,7 @@ void exprMul::closestFeasible (expression *varind,
 			       CouNumber &left,
 			       CouNumber &right) const {
 
-  expression *varoth = arglist_ [0];; // suppose $w = cy$;
+  expression *varoth = arglist_ [0]; // suppose $w = cy$;
 
   if (varoth -> Index () == varind -> Index ())
     varoth = arglist_ [1]; // actually no, it's $w = x*c$
@@ -180,11 +180,11 @@ void exprMul::closestFeasible (expression *varind,
     c = (*varoth) ();
 
   if (c < 0)
-    if (y < c*x) right = y/c;
-    else         left  = y/c;
+    if (y < c*x) {assert (y/c >= right); right = y/c;}
+    else         {assert (y/c <= left);  left  = y/c;}
   else 
-    if (y < c*x) left  = y/c;
-    else         right = y/c;
+    if (y < c*x) {assert (y/c >= left);  left  = y/c;}
+    else         {assert (y/c <= right); right = y/c;}
 }
 
 

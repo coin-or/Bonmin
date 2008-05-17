@@ -87,9 +87,9 @@ inline CouNumber exprMax::operator () () {
   CouNumber best_val = (*(arglist_ [0])) ();
   int best_ind = 0;
 
-  for (register int ind = 2; ind < nargs_; ind += 2) {
+  for (int ind = 2; ind < nargs_; ind += 2) {
 
-    register CouNumber val = (*(arglist_ [ind])) ();
+    CouNumber val = (*(arglist_ [ind])) ();
 
     if (val > best_val) {
       best_ind = ind;

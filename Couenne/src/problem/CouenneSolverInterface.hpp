@@ -70,8 +70,10 @@ public:
   //@{
   /// Create a hot start snapshot of the optimization process.
   virtual void markHotStart();
+
   /// Optimize starting from the hot start snapshot.
   virtual void solveFromHotStart();
+
   /// Delete the hot start snapshot.
   virtual void unmarkHotStart();
   //@}

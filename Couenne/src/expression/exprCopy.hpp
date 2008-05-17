@@ -26,7 +26,7 @@ class exprCopy: public expression {
   /// the expression this object is a (reference) copy of
   expression *copy_;
 
-  /// saved valuem to be used by exprStore expressions
+  /// saved value to be used by exprStore expressions
   CouNumber value_;
 
  public:

@@ -2,7 +2,7 @@
  * Name:    exprClone.hpp
  * Author:  Pietro Belotti
  * Purpose: definition of the clone class (different from exprCopy in
- *          that evaluation are propagated)
+ *          that evaluation is propagated)
  *
  * (C) Carnegie-Mellon University, 2006. 
  * This file is licensed under the Common Public License (CPL)

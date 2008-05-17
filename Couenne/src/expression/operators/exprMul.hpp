@@ -104,10 +104,10 @@ protected:
 /// compute multiplication
 inline CouNumber exprMul:: operator () () {
 
-  register CouNumber ret = 1.;
+  CouNumber ret = 1.;
   expression **al = arglist_;
 
-  for (register int n = nargs_; n--;)
+  for (int n = nargs_; n--;)
     ret *= (**al++) ();
 
   return ret;

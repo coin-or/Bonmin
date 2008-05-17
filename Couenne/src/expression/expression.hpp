@@ -113,7 +113,7 @@ class expression {
     {s << '?';}
 
   /// null function for evaluating the expression
-  virtual inline CouNumber operator () () 
+  virtual inline CouNumber operator () ()
   {return 0.;}
 
   /// return l-2 norm of gradient at given point

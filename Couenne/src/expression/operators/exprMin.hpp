@@ -89,7 +89,7 @@ inline CouNumber exprMin::operator () () {
 
   for (int ind = 2; ind < nargs_; ind += 2) {
 
-    register CouNumber val = (*(arglist_ [ind])) ();
+    CouNumber val = (*(arglist_ [ind])) ();
 
     if (val < best_val) {
       best_ind = ind;

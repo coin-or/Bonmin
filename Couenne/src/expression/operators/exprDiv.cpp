@@ -197,20 +197,20 @@ void exprDiv::closestFeasible (expression *varind,
   if (numerator) // checking y = x/c
 
     if (c < 0.)
-      if (y < x/c) right = c*y;
-      else         left  = c*y;
+      if (y < x/c) {assert (c*y > right); right = c*y;}
+      else         {assert (c*y < left);  left  = c*y;}
     else 
-      if (y < x/c) left  = c*y;
-      else         right = c*y;
+      if (y < x/c) {assert (c*y < left);  left  = c*y;}
+      else         {assert (c*y > right); right = c*y;}
 
   else           // checking y = c/x
 
-    if      (y < 0.) 
-      if (x*y > c) right = c/y; // convex area in third orthant
-      else         left  = c/y; // remaining of third+fourth orthant
+    if      (y < 0.)
+      if (x*y > c) {assert (c/y > right); right = c/y;} // convex area in third orthant
+      else         {assert (c/y < left);  left  = c/y;} // remaining of third+fourth orthant
     else if (y > 0.) 
-      if (x*y > c) left  = c/y; // convex area in first orthant
-      else         right = c/y; // remaining of first+second orthant
+      if (x*y > c) {assert (c/y < left);  left  = c/y;} // convex area in first orthant
+      else         {assert (c/y > right); right = c/y;} // remaining of first+second orthant
 }
 
 

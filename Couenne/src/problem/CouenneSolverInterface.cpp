@@ -51,7 +51,9 @@ void CouenneSolverInterface::initialSolve () {
 
   knowInfeasible_ = false;
   knowOptimal_ = false;
+
   OsiClpSolverInterface::initialSolve ();
+  //writeLp ("initialLP");
 }
 
 bool CouenneSolverInterface::isProvenPrimalInfeasible() const
@@ -108,9 +110,18 @@ void CouenneSolverInterface::resolve () {
   // balance it
   //printf("NumRows in resolve = %d\n", getNumRows());
 
+  //static int count = 0;
+  //char filename [30];
+  //sprintf (filename, "presol_%d", count);
+  //writeLp (filename);
+
   knowInfeasible_ = false;
   knowOptimal_ = false;
+
   OsiClpSolverInterface::resolve ();
+
+  //sprintf (filename, "postsol_%d", count++);
+  //writeLp (filename);
 
   /*printf("obj value in resolve = %e\n",getObjValue());
   printf ("after resolve, %p --> [%g,%g]\n", this,
@@ -118,12 +129,22 @@ void CouenneSolverInterface::resolve () {
 	  getColUpper () [getNumCols () - 1]);*/
 }
 
+
 /// Create a hot start snapshot of the optimization process.
 void CouenneSolverInterface::markHotStart () {
   //printf(">>>> markHotStart\n");
   // Using OsiClpSolverInterface doesn't work yet...
   OsiSolverInterface::markHotStart ();
 }
+
+
+/// Delete the hot start snapshot.
+void CouenneSolverInterface::unmarkHotStart() {
+  //printf("<<<< unmarkHotStart\n");
+  OsiSolverInterface::unmarkHotStart();
+}
+
+
 
 /// Optimize starting from the hot start snapshot.
 void CouenneSolverInterface::solveFromHotStart() {
@@ -212,12 +233,10 @@ void CouenneSolverInterface::solveFromHotStart() {
   */
 
   resolve();
-  if (isProvenPrimalInfeasible()) {
-    knowInfeasible_ = true;
-  }
-  if (isProvenOptimal()) {
-    knowOptimal_ = true;
-  }
+
+  if (isProvenPrimalInfeasible ()) knowInfeasible_ = true;
+  if (isProvenOptimal ())          knowOptimal_    = true;
+
   //printf("obj value = %e\n",getObjValue());
 
   // now undo the row cuts
@@ -233,10 +252,4 @@ void CouenneSolverInterface::solveFromHotStart() {
 
   cutgen_ -> Problem () -> domain () -> pop ();
   */
-}
-
-/// Delete the hot start snapshot.
-void CouenneSolverInterface::unmarkHotStart() {
-  //printf("<<<< unmarkHotStart\n");
-  OsiSolverInterface::unmarkHotStart();
 }

@@ -92,11 +92,11 @@ protected:
 
 inline CouNumber exprSum::operator () () {
 
-  register CouNumber ret = 0;
+  CouNumber ret = 0;
 
   expression **al = arglist_;
 
-  for (register int n = nargs_; n--;)
+  for (int n = nargs_; n--;)
     ret += (**al++) ();
 
   return ret;

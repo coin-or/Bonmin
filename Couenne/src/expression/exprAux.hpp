@@ -98,7 +98,7 @@ class exprAux: public exprVar {
     {image_ = image;}
 
   /// Null function for evaluating the expression
-  inline CouNumber operator () () 
+  inline CouNumber operator () ()
     {return domain_ -> x (varIndex_);}
 
   /// Differentiation

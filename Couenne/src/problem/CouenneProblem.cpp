@@ -453,7 +453,7 @@ void CouenneProblem::fillIntegerRank () const {
     numberInRank_ [rank] ++;
   }
 
-  jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "numInteger\n");
+  jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "numInteger [neglect non-originals]\n");
   for (unsigned int i=0; i<numberInRank_.size(); i++)
     jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "%d: %d\n", i, numberInRank_ [i]);
 }

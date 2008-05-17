@@ -83,7 +83,7 @@ namespace Bonmin {
 
     /// should we update the pseudocost multiplier with the distance
     /// between the LP point and the solution of the resulting
-    /// branches' LPs?
+    /// branches' LPs? If so, this only happens in strong branching
     bool pseudoUpdateLP_;
 
     /// pointer to journalist for detailed information

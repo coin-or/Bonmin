@@ -116,7 +116,6 @@ namespace Bonmin {
 	else { // branch is feasible, solve and compare
 
 	  solver -> solveFromHotStart ();
-
 	  if (pseudoUpdateLP_ && CouObj)
 	    CouObj -> setEstimate (distance (lpSol, solver -> getColSolution (), numberColumns), 0);
 	}
@@ -125,6 +124,7 @@ namespace Bonmin {
 
         // adding cuts or something 
         thisSolver = solver -> clone ();
+
         if (branch -> branch (thisSolver) > COUENNE_INFINITY)
 	  result -> setDownStatus (status0 = 1);
 
@@ -142,10 +142,11 @@ namespace Bonmin {
       // can check if we got solution
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
 
-      if (status0 < 0) {
+      // only update information if this branch is feasible
+      if (status0 < 0)
 	status0 = result -> updateInformation (thisSolver, info, this);
-	numberStrongIterations_ += thisSolver->getIterationCount();
-      }
+
+      numberStrongIterations_ += thisSolver -> getIterationCount();
 
       if ((status0 == 3) && (trustStrongForSolution_)) {
         // new solution already saved
@@ -186,6 +187,7 @@ namespace Bonmin {
       } else {                     // some more complex branch, have to clone solver
         // adding cuts or something 
         thisSolver = solver -> clone ();
+
         if (branch -> branch (thisSolver) > COUENNE_INFINITY)
 	  result -> setUpStatus (status1 = 1);
 
@@ -204,14 +206,14 @@ namespace Bonmin {
       // can check if we got solution
       // status is 0 finished, 1 infeasible and 2 unfinished and 3 is solution
 
-      if (status1 < 0) {
-	status1 = result->updateInformation(thisSolver,info,this);
-	numberStrongDone_++;
-      }
+      // only update information if this branch is feasible
+      if (status1 < 0)
+	status1 = result -> updateInformation (thisSolver, info, this);
 
+      numberStrongDone_++;
       numberStrongIterations_ += thisSolver->getIterationCount();
 
-      if ((status1==3) && (trustStrongForSolution_)) {
+      if ((status1 == 3) && (trustStrongForSolution_)) {
         // new solution already saved
 	info -> cutoff_ = goodObjectiveValue_;
 	problem_ -> setCutOff (goodObjectiveValue_);
