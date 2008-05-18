@@ -19,10 +19,16 @@
 #include "exprStore.hpp"
 
 
+// empty differentiation method
+expression *expression::differentiate (int)
+{return new exprConst (0.);}
+
+
 // Get lower and upper bound of a generic expression
 void expression::getBounds (expression *&lb, expression *&ub) {
-  lb = new exprConst (- COUENNE_INFINITY);
-  ub = new exprConst (  COUENNE_INFINITY);
+
+  lb = new exprConst (- COIN_DBL_MAX);
+  ub = new exprConst (  COIN_DBL_MAX);
 }
 
 

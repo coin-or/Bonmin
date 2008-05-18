@@ -42,8 +42,8 @@ class exprVar: public expression {
     varIndex_ (varIndex),
     domain_   (d) {}
 
-  /// destructor
-  virtual ~exprVar () {}
+  // destructor
+  //virtual ~exprVar () {}
 
   /// copy constructor
   exprVar (const exprVar &e, Domain *d = NULL):

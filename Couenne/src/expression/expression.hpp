@@ -113,16 +113,14 @@ class expression {
     {s << '?';}
 
   /// null function for evaluating the expression
-  virtual inline CouNumber operator () ()
-  {return 0.;}
+  virtual CouNumber operator () () = 0;
 
   /// return l-2 norm of gradient at given point
   virtual inline CouNumber gradientNorm (const double *x)
   {return 0.;}
 
   /// differentiation
-  virtual inline expression *differentiate (int) 
-  {return NULL;}
+  virtual expression *differentiate (int);
 
   /// dependence on variable set: return cardinality of subset of the
   /// set of indices in first argument which occur in expression. 
@@ -243,12 +241,12 @@ class expression {
   virtual void realign (const CouenneProblem *p) {}
 
   /// indicating if function is monotonically increasing
-  virtual bool isBijective() const {return false;}
+  virtual bool isBijective() const 
+  {return false;}
 
   /// compute the inverse function
-  virtual CouNumber inverse(expression *vardep) const {
-    return -COUENNE_INFINITY;
-  }
+  virtual CouNumber inverse (expression *vardep) const
+  {return -COUENNE_INFINITY;}
 
   /// closest feasible points in function in both directions
   virtual void closestFeasible (expression *varind, expression *vardep,

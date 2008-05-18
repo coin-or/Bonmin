@@ -76,10 +76,9 @@ exprAux::exprAux (const exprAux &e, Domain *d):
 
 /// Destructor
 exprAux::~exprAux () {
-  if (image_) 
-    delete image_; 
-  delete lb_;
-  delete ub_;
+  if (image_) delete image_; 
+  if (lb_)    delete lb_;
+  if (ub_)    delete ub_;
 }
 
 

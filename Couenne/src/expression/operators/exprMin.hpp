@@ -60,7 +60,7 @@ class exprMin: public exprOp {
     {return NONLINEAR;}
 
   // Get lower and upper bound of an expression (if any)
-  //  void getBounds (expression *&, expression *&);
+  void getBounds (expression *&, expression *&);
 
   /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)

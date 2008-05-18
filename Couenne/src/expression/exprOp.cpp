@@ -23,18 +23,12 @@ exprOp::~exprOp () {
 
   if (arglist_) {
 
-    for (int i = nargs_; i--;) {
+    expression **alist = arglist_;
 
-      expression *&arg = arglist_ [i];
-
-      if (arg) {
-	delete arg;
-	arg = NULL;
-      }
-    }
+    while (nargs_--) 
+      delete (*alist++);
 
     delete [] arglist_;
-    arglist_ = NULL;
   }
 }
 

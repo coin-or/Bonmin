@@ -57,10 +57,6 @@ class exprOp: public expression {
     arglist_ (new expression * [e.nArgs ()]),
     nargs_   (e.nArgs ()) {}
 
-  /// cloning method -- must go
-  virtual expression *clone (Domain *d = NULL) const
-  {return new exprOp (*this, d);}
-
   /// return argument list
   inline expression **ArgList () const 
   {return arglist_;}

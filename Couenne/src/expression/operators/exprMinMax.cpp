@@ -13,6 +13,22 @@
 #include "CouenneTypes.hpp"
 #include "exprMax.hpp"
 #include "exprMin.hpp"
+#include "exprConst.hpp"
+
+
+// Get lower and upper bound of an expression (if any)
+void exprMin::getBounds (expression *&lower, expression *&upper) {
+  lower = new exprConst (-COIN_DBL_MAX);
+  upper = new exprConst ( COIN_DBL_MAX);
+}
+
+
+// Get lower and upper bound of an expression (if any)
+void exprMax::getBounds (expression *&lower, expression *&upper) {
+  lower = new exprConst (-COIN_DBL_MAX);
+  upper = new exprConst ( COIN_DBL_MAX);
+}
+
 
 void exprMin::generateCuts (expression *w, const OsiSolverInterface &si, 
 			    OsiCuts &cs, const CouenneCutGenerator *cg,
