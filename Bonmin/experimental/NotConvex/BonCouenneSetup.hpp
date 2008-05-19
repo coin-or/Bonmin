@@ -73,6 +73,9 @@ public:
     bool displayStats () 
     {return displayStats_;}
 
+    /// add cut generators
+    void addMilpCutGenerators ();
+
 private:
       SmartPtr<SmartAsl> aslfg_;
 

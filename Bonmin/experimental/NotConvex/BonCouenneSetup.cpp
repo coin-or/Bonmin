@@ -22,6 +22,20 @@
 #include "BonCouenneInfo.hpp"
 #include "BonCbcNode.hpp"
 
+// MILP cuts
+#include "CglGomory.hpp"
+#include "CglProbing.hpp"
+#include "CglKnapsackCover.hpp"
+#include "CglOddHole.hpp"
+#include "CglClique.hpp"
+#include "CglFlowCover.hpp"
+#include "CglMixedIntegerRounding2.hpp"
+#include "CglTwomir.hpp"
+#include "CglPreProcess.hpp"
+#include "CglLandP.hpp"
+#include "CglRedSplit.hpp"
+
+// Ampl includes
 #include "asl.h"
 #include "getstub.h"
 
@@ -95,6 +109,10 @@ namespace Bonmin{
     options()->GetIntegerValue("problem_print_level", i, "bonmin.");
     journalist()->GetJournal("console")->
       SetPrintLevel(J_PROBLEM, (EJournalLevel)i);
+
+    // add other cut generators -- should test for integer variables first
+    // and also register options
+    //addMilpCutGenerators ();
 
     /* Initialize Couenne cut generator.*/
     //int ivalue, num_points;
@@ -321,14 +339,14 @@ namespace Bonmin{
     // Tell Cbc not to check again if a solution returned from
     // heuristic is indeed feasible
     intParam_[BabSetupBase::SpecialOption] = 16 | 4;
-}
+  }
  
-void CouenneSetup::registerOptions(){
-  registerAllOptions(roptions());
-}
+  void CouenneSetup::registerOptions(){
+    registerAllOptions(roptions());
+  }
 
 
-void
+  void
   CouenneSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
@@ -363,5 +381,198 @@ void
       "");
   }
   //  OsiTMINLPInterface * BonminAmplSetup::createOsiInterface{
-  //}  
+  //} 
+
+
+  /** Add milp cut generators according to options.*/
+  void CouenneSetup::addMilpCutGenerators () {
+
+    enum extraInfo_ {CUTINFO_NONE, CUTINFO_MIG, CUTINFO_PROBING, CUTINFO_CLIQUE};
+
+    struct cutInfo {
+
+      const char      *optname;
+      CglCutGenerator *cglptr;
+      const char      *cglId;
+      enum extraInfo_  extraInfo;
+
+    } cutList [] = {
+      {(const char*)"Gomory_cuts",new CglGomory,      (const char*)"Mixed Integer Gomory",CUTINFO_MIG},
+      {(const char*)"probing_cuts",new CglProbing,        (const char*) "Probing",  CUTINFO_PROBING},
+      {(const char*)"mir_cuts",new CglMixedIntegerRounding2, (const char*) "Mixed Integer Rounding", 
+       CUTINFO_NONE},
+      {(const char*)"2mir_cuts",    new CglTwomir,         (const char*) "2-MIR",    CUTINFO_NONE},
+      {(const char*)"cover_cuts",   new CglKnapsackCover,  (const char*) "Cover",    CUTINFO_NONE},
+      {(const char*)"clique_cuts",  new CglClique,         (const char*) "Clique",   CUTINFO_CLIQUE},
+      {(const char*)"lift_and_project_cuts",new CglLandP,(const char*)"Lift and Project",CUTINFO_NONE},
+      {(const char*)"reduce_split_cuts",new CglRedSplit,(const char*) "Reduce and Split",CUTINFO_NONE},
+      {(const char*)"flow_covers_cuts",new CglFlowCover,(const char*) "Flow cover cuts", CUTINFO_NONE},
+      {NULL, NULL, NULL, CUTINFO_NONE}};
+
+    int freq;
+
+    for (int i=0; cutList [i]. optname; i++) {
+
+      options_ -> GetIntegerValue (std::string (cutList [i]. optname), freq, "bonmin.");
+
+      if (freq) {
+
+	CuttingMethod cg;
+	cg.frequency = freq;
+	cg.cgl       = cutList [i].cglptr;
+	cg.id        = std::string (cutList [i]. cglId);
+	cutGenerators_.push_back (cg);
+
+      } else delete cutList [i].cglptr;
+
+      switch (cutList [i].extraInfo) {
+
+      case CUTINFO_MIG: {
+	CglGomory *gc = dynamic_cast <CglGomory *> (cutList [i].cglptr);
+	gc -> setLimitAtRoot(512);
+	gc -> setLimit(50);
+      }
+	break;
+
+      case CUTINFO_PROBING: {
+	CglProbing *pc = dynamic_cast <CglProbing *> (cutList [i].cglptr);
+
+	pc->setUsingObjective(1);
+	pc->setMaxPass(3);
+	pc->setMaxPassRoot(3);
+	// Number of unsatisfied variables to look at
+	pc->setMaxProbe(10);
+	pc->setMaxProbeRoot(50);
+	// How far to follow the consequences
+	pc->setMaxLook(10);
+	pc->setMaxLookRoot(50);
+	pc->setMaxLookRoot(10);
+	// Only look at rows with fewer than this number of elements
+	pc->setMaxElements(200);
+	pc->setRowCuts(3);
+      }
+	break;
+
+      case CUTINFO_CLIQUE: {
+	CglClique *clique = dynamic_cast <CglClique *> (cutList [i].cglptr);
+	clique -> setStarCliqueReport(false);
+	clique -> setRowCliqueReport(false);
+	clique -> setMinViolation(0.1);
+      }
+	break;
+
+	//case CUTINFO_NONE:
+      default:
+	break;
+    }
+
+      /*
+    options_ -> GetIntegerValue ("Gomory_cuts", freq, "bonmin.");
+
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglGomory * gom = new CglGomory;
+      cg.cgl = gom;
+      gom->setLimitAtRoot(512);
+      gom->setLimit(50);
+      cg.id = "Mixed Integer Gomory";
+      cutGenerators_.push_back(cg);
+    }
+
+    options_->GetIntegerValue("probing_cuts",freq,"bonmin.");
+
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglProbing * probe = new CglProbing;
+      cg.cgl = probe;
+      probe->setUsingObjective(1);
+      probe->setMaxPass(3);
+      probe->setMaxPassRoot(3);
+      // Number of unsatisfied variables to look at
+      probe->setMaxProbe(10);
+      probe->setMaxProbeRoot(50);
+      // How far to follow the consequences
+      probe->setMaxLook(10);
+      probe->setMaxLookRoot(50);
+      probe->setMaxLookRoot(10);
+      // Only look at rows with fewer than this number of elements
+      probe->setMaxElements(200);
+      probe->setRowCuts(3);
+      cg.id = "Probing";
+      cutGenerators_.push_back(cg);
+    }
+    options_->GetIntegerValue("mir_cuts",freq,"bonmin.");
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglMixedIntegerRounding2 * mir = new CglMixedIntegerRounding2;
+      cg.cgl = mir;
+      cg.id = "Mixed Integer Rounding";
+      cutGenerators_.push_back(cg);
+
+
+    }
+    options_->GetIntegerValue("2mir_cuts",freq,"bonmin.");
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglTwomir * mir2 = new CglTwomir;
+      cg.cgl = mir2;
+      cg.id = "2-MIR";
+      cutGenerators_.push_back(cg);
+    }
+    options_->GetIntegerValue("cover_cuts",freq,"bonmin.");
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglKnapsackCover * cover = new CglKnapsackCover;
+      cg.cgl = cover;
+      cg.id = "Cover";
+      cutGenerators_.push_back(cg);
+    }
+
+    options_->GetIntegerValue("clique_cuts",freq,"bonmin.");
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglClique * clique = new CglClique;
+      clique->setStarCliqueReport(false);
+      clique->setRowCliqueReport(false);
+      clique->setMinViolation(0.1);
+
+      cg.cgl = clique;
+      cg.id = "Clique";
+      cutGenerators_.push_back(cg);
+    }
+    options_->GetIntegerValue("flow_covers_cuts",freq,"bonmin.");
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglFlowCover * flow = new CglFlowCover;
+      cg.cgl = flow;
+      cg.id = "Flow Covers";
+      cutGenerators_.push_back(cg);
+    }
+    options_->GetIntegerValue("lift_and_project_cuts",freq,"bonmin.");
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglLandP * landp = new CglLandP;
+      cg.cgl = landp;
+      cg.id = "Lift-and-Project";
+      cutGenerators_.push_back(cg);
+    }
+    options_->GetIntegerValue("reduce_and_split_cuts",freq,"bonmin.");
+    if (freq) {
+      CuttingMethod cg;
+      cg.frequency = freq;
+      CglRedSplit * rands = new CglRedSplit;
+      cg.cgl = rands;
+      cg.id = "Reduce-and-Split";
+      cutGenerators_.push_back(cg);
+      }*/
+    }
+  }
 }
