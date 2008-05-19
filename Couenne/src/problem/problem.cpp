@@ -220,7 +220,9 @@ void CouenneProblem::setCutOff (CouNumber cutoff) const {
 			cutoff, indobj,
 			pcutoff_ -> getCutOff ());
 
-    pcutoff_ -> setCutOff (cutoff + SafeCutoff * fabs (1 + cutoff));
+    if (Var (indobj) -> isInteger ())
+      pcutoff_    -> setCutOff (floor (cutoff + COUENNE_EPS));
+    else pcutoff_ -> setCutOff (cutoff + SafeCutoff * fabs (1 + cutoff));
   }
 } // tolerance needed to retain feasibility
 

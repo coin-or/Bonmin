@@ -136,9 +136,9 @@ bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds,
 /// reduced cost bound tightening
 int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 			       t_chg_bounds *chg_bds) const {
-
-  int nchanges = 0,
-    objind = Obj (0) -> Body () -> Index ();
+  int 
+    nchanges = 0,
+    objind   = Obj (0) -> Body () -> Index ();
 
   assert (objind >= 0);
 
@@ -161,6 +161,8 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
     for (int i=0; i<ncols; i++)
       if (i != objind) {
 
+	bool isInt = Var (i) -> isInteger ();
+
 	CouNumber
 	  x  = X  [i],
 	  l  = L  [i],
@@ -173,12 +175,16 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 	if (x == l) {
 	  if (LB + (u-l)*rc > UB) {
 	    Ub (i) = l + (UB-LB) / rc;
+	    if (isInt) 
+	      Ub (i) = floor (Ub (i));
 	    nchanges++;
 	    chg_bds [i].setLower(t_chg_bounds::CHANGED);
 	  }
 	} else if (x == u) {
 	  if (LB + (u-l) * rc > UB) {
 	    Lb (i) = u - (UB-LB) / rc;
+	    if (isInt) 
+	      Lb (i) = ceil (Lb (i));
 	    nchanges++;
 	    chg_bds [i].setUpper(t_chg_bounds::CHANGED);
 	  }

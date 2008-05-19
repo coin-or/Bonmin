@@ -19,10 +19,6 @@
 // golden ratio, used to find the ideal bound
 const CouNumber phi = 0.5 * (1. + sqrt (5.));
 
-//	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_BOUNDTIGHTENING)) {
-//	  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING,
-
-
 // create fictitious bounds to tighten current interval
 CouNumber fictBounds (char direction,
 		      CouNumber  x,
@@ -69,7 +65,6 @@ fake_tighten (char direction,  // 0: left, 1: right
 	      t_chg_bounds *f_chg) const {
   int
     ncols    = nVars (),
-    //objsense = Obj (0) -> Sense (),
     objind   = Obj (0) -> Body  () -> Index ();
 
   assert (objind >= 0);
@@ -122,8 +117,13 @@ fake_tighten (char direction,  // 0: left, 1: right
 	fb = 0.5 * (inner + outer);
     }
 
-    if (direction) {Lb (index) = fb; f_chg [index].setLower (t_chg_bounds::CHANGED);} 
-    else           {Ub (index) = fb; f_chg [index].setUpper (t_chg_bounds::CHANGED);}
+    if (direction) {
+      Lb (index) = intvar ? ceil (fb) : fb; 
+      f_chg [index].setLower (t_chg_bounds::CHANGED);
+    } else {
+      Ub (index) = intvar ? floor (fb) : fb; 
+      f_chg [index].setUpper (t_chg_bounds::CHANGED);
+    }
 
     //    (direction ? lb_ : ub_) [index] = fb; 
 
@@ -195,8 +195,14 @@ fake_tighten (char direction,  // 0: left, 1: right
       //if (!do_not_tighten) {
 
 	// apply bound
-      if (direction) {oub[index]=Ub (index) = fb; chg_bds [index].setUpper (t_chg_bounds::CHANGED);}
-      else           {olb[index]=Lb (index) = fb; chg_bds [index].setLower (t_chg_bounds::CHANGED);}
+      if (direction) {
+	oub [index] = Ub (index) = intvar ? floor (fb) : fb; 
+	chg_bds [index]. setUpper (t_chg_bounds::CHANGED);
+      }
+      else {
+	olb [index] = Lb (index) = intvar ? ceil (fb) : fb; 
+	chg_bds [index].setLower (t_chg_bounds::CHANGED);
+      }
 
       outer = fb; // we have at least a tightened bound, save it 
 

@@ -273,29 +273,27 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	(! (problem_ -> boundTightening (chg_bds, babInfo))))
       throw infeasible;
 
+    // Reduced Cost BT
+    if (!firstcall_  &&                         // have a linearization already
+	problem_ -> redCostBT (&si, chg_bds) && // some variables were tightened with reduced cost
+	!(problem_ -> btCore (chg_bds)))        // in this case, do another round of FBBT
+      throw infeasible;
+
     // OBBT
     if (!firstcall_ && // no obbt if first call (there is no LP to work with)
 	problem_ -> obbt (this, si, cs, info, babInfo, nchanged, changed, chg_bds) < 0)
       throw infeasible;
 
-    // Reduced Cost BT
-    if (problem_ -> doFBBT () && !firstcall_)
-      problem_ -> redCostBT (&si, chg_bds);
-
     // Bound tightening done /////////////////////////////
 
-    if ((problem_ -> doFBBT () ||
-	 problem_ -> doOBBT () ||
-	 problem_ -> doABT  ()) &&
+    if ((problem_ -> doFBBT () || problem_ -> doOBBT () || problem_ -> doABT  ()) &&
 	(jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING))) {
 
       jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== after bt =============\n");
       for (int i = 0; i < problem_ -> nVars (); i++)
 	if (problem_ -> Var (i) -> Multiplicity () > 0)
 	  jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"%4d %+20.8g [%+20.8g,%+20.8g]\n", i,
-			 problem_ -> X  (i),
-			 problem_ -> Lb (i),
-			 problem_ -> Ub (i));
+			 problem_ -> X  (i), problem_ -> Lb (i), problem_ -> Ub (i));
       jnlst_->Printf(J_VECTOR, J_CONVEXIFYING,"=============================\n");
     }
 
