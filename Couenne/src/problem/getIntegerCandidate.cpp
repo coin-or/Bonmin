@@ -175,9 +175,10 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	      (fixed [i] == UNFIXED)) {           // and still to be fixed
 
 	    // check if initAuxs() closed any bound; if so, fix variable
-	    if (Var (i) -> isInteger () && (Lb (i) == Ub (i))) {
+	    //if (Lb (i) == Ub (i)) { // doesn't work
+	    if (ceil (Lb (i) - COUENNE_EPS) + COUENNE_EPS >= floor (Ub (i) + COUENNE_EPS)) {
 
-	      X (i) = xInt [i] = Lb (i);
+	      X (i) = xInt [i] = ceil (Lb (i) - COUENNE_EPS);
 	      fixed [i] = FIXED;
 	      one_fixed = true;
 	      --remaining;
@@ -192,12 +193,9 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 			      "testing %d [%g -> %g], res = %d\n", i, xFrac [i], xInt [i], result);
 
 	    if (result > 0) {
-
 	      one_fixed = true;
 	      --remaining;
-	    }
-
-	    else if (result < 0) 
+	    } else if (result < 0) 
 	      throw infeasible;
 	  }
 
