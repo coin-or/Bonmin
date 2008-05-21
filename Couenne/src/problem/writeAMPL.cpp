@@ -161,4 +161,6 @@ void CouenneProblem::writeAMPL (const std::string &fname,  /// name of the mod f
       f << " <= " << ub << ';' << std::endl;
     }
   }
+
+  f.close ();
 }
