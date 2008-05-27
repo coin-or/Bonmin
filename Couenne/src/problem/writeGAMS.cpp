@@ -157,11 +157,14 @@ void CouenneProblem::writeGAMS (const std::string &fname) {
 
   int i=0, j=0;
 
+  bool no_eqns = true;
+
   for (; i < nCons (); i++) {
 
     if (j) f << ','; 
     if (!(++j % nline)) f << std::endl << "                  ";
     f << 'e' << j;
+    no_eqns = false;
   }
 
   for (; i < nVars (); i++) 
@@ -171,9 +174,11 @@ void CouenneProblem::writeGAMS (const std::string &fname) {
       if (j) f << ','; 
       if (!(++j % nline)) f << std::endl << "                ";
       f << 'e' << j;
+      no_eqns = false;
     }
 
-  f << ",objdef;" << std::endl << std::endl;
+  if (!no_eqns) f << ',';
+  f << "objdef;" << std::endl << std::endl;
 
   // equations ///////////////////////////////////////////////////////////
 
