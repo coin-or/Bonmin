@@ -148,10 +148,9 @@ namespace Bonmin
       OaDecompositionBase * oa = dynamic_cast<OaDecompositionBase *>(i->cgl);
       if (oa && oa->reassignLpsolver())
         oa->assignLpInterface(model_.solver());
-      if(i->atSolution)
-        model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str(), false, true);
-      else
-        model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str());
+      model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str(),
+                             i->normal, i->atSolution);
+
     }
     
     for(BabSetupBase::HeuristicMethods::iterator i = s.heuristics().begin() ; 
