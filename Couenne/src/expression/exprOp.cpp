@@ -51,6 +51,8 @@ void exprOp::print (std::ostream &out,
       if (printPos () == INSIDE) out << printOp ();
       else                       out << ",";
     }
+    if (!((i + 1) % MAX_ARG_LINE))
+      out << std::endl;
     fflush (stdout);
   }
   if (nargs_ > 1) {

@@ -177,6 +177,8 @@ void exprQuad::print (std::ostream &out, bool descend) const {
   // print linear and nonquadratic part
   exprGroup::print (out, descend);
 
+  int noperands = 0;
+
   for (int n = matrix_.size (), i=0; n--; i++) {
     //sparseQ::iterator row = matrix_.begin (); row != matrix_.end (); ++row) {
 
@@ -202,6 +204,9 @@ void exprQuad::print (std::ostream &out, bool descend) const {
 	out << '*';
 	row [j]. first -> print (out, descend);
       }
+
+      if (!((noperands + 1) % MAX_ARG_LINE))
+	out << std::endl;
     }
   }
 

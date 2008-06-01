@@ -15,6 +15,8 @@
 #include "expression.hpp"
 #include "CouenneTypes.hpp"
 
+#define MAX_ARG_LINE 10
+
 class CouenneProblem;
 class Domain;
 

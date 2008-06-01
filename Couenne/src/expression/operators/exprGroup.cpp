@@ -61,6 +61,8 @@ void exprGroup::print (std::ostream &out, bool descend) const {
     //else continue;
 
     lcoeff_ [i]. first -> print (out, descend);
+    if (!((i + 1) % MAX_ARG_LINE))
+	out << std::endl;
   }
 
   //if (code () == COU_EXPRGROUP)

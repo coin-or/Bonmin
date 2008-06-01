@@ -27,6 +27,7 @@ void CouenneProblem::writeGAMS (const std::string &fname) {
   // header //////////////////////////////////////////////////////////////
 
   f << "* MINLP Written by Couenne (https://projects.coin-or.org/Bonmin/wiki/BonCouenne)" << std::endl
+    << "* problem name: " << problemName_ << std::endl
     << "* " << nVars () << " variables, " << nCons () << " constraints" << std::endl << std::endl;
 
   // preamble ////////////////////////////////////////////////////////////
@@ -61,8 +62,8 @@ void CouenneProblem::writeGAMS (const std::string &fname) {
   for (int i=0; i < nVars (); i++)
     if ((Var (i) -> Multiplicity () > 0) &&
 	(fabs (Var (i) -> lb ()) < COUENNE_EPS)  &&
-	!(Var (i) -> isInteger () &&
-	  (fabs (Var (i) -> ub () - 1) < COUENNE_EPS))) {
+	!(Var (i) -> isInteger ())) {
+      //(fabs (Var (i) -> ub () - 1) < COUENNE_EPS))) {
 
       have_positive = true;
       break;
@@ -99,8 +100,8 @@ void CouenneProblem::writeGAMS (const std::string &fname) {
     for (int i=0, j=0; i < nVars (); i++) 
       if ((Var (i) -> Multiplicity () > 0) && 
 	  (fabs (Var (i) -> lb ()) < COUENNE_EPS)  &&
-	  !(Var (i) -> isInteger () &&
-	    (fabs (Var (i) -> ub () - 1) < COUENNE_EPS))) {
+	  !(Var (i) -> isInteger ())) {
+	  //(fabs (Var (i) -> ub () - 1) < COUENNE_EPS))) {
 
 	if (j) f << ','; 
 	if (!(++j % nline)) f << std::endl << "             ";
