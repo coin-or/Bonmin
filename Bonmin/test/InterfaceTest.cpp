@@ -23,6 +23,8 @@
 #include "BonFilterSolver.hpp"
 #endif
 
+#include "CoinError.hpp"
+
 #include <string>
 #include <cmath>
 using namespace Bonmin;
@@ -382,6 +384,8 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 
 int main()
 {
+  WindowsErrorPopupBlocker();
+
   Ipopt::SmartPtr<IpoptSolver> ipopt_solver = new IpoptSolver;
   interfaceTest(GetRawPtr(ipopt_solver));
 

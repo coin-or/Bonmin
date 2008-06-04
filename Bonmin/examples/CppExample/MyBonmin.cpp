@@ -16,6 +16,7 @@
 #include <fstream>
 
 #include "CoinTime.hpp"
+#include "CoinError.hpp"
 
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonIpoptSolver.hpp"
@@ -30,6 +31,8 @@
 
 int main (int argc, char *argv[])
 {
+  WindowsErrorPopupBlocker();
+
   using namespace Ipopt;
   using namespace Bonmin;
   SmartPtr<MyTMINLP> tminlp = new MyTMINLP;
