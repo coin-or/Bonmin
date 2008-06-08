@@ -106,7 +106,7 @@ int main (int argc, char *argv[])
       else
 	printf ("Stats: %-15s %4d [var] %4d [int] %4d [con] %4d [aux] "
 		"%6d [root] %8d [tot] %6g [sep] %8g [time] %8g [bb] "
-		"%12g [lower] %12g [upper] %7d [nodes]\n",// %s %s\n",
+		"%20e [lower] %20e [upper] %7d [nodes]\n",// %s %s\n",
 		cp ? cp -> problemName ().c_str () : "unknown",
 		(cp) ? cp -> nOrig     () : -1, 
 		(cp) ? cp -> nIntVars  () : -1, 
