@@ -103,9 +103,6 @@ exprAux *CouenneProblem::linStandardize (bool addAux,
 
     // general case ///////////////////////////////////////////////////////////////
 
-    //expression **zero = new expression * [1];
-    //*zero = new exprConst (0.);
-
     std::vector <std::pair <exprVar *, CouNumber> > lcoeff;
     indcoe2vector (li, lc, lcoeff);
 

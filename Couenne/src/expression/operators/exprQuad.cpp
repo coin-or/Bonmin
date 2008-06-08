@@ -447,8 +447,8 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
     exprVar * &vr = row -> first;
     if ((vr -> Index () == index)) {
 
-      assert ("I would like to use quadratic expressions" == 
-	      "I didn't fix exprQuad::replace() yet");
+      fprintf (stderr, "Didn't fix exprQuad::replace() yet");
+      exit (-1);
       vr = w;
     }
 
@@ -457,8 +457,8 @@ void exprQuad::replace (exprVar *x, exprVar *w) {
       exprVar * &vc = col -> first;
       if ((vc -> Index () == index)) {
 
-	assert ("I would like to use quadratic expressions" == 
-		"I didn't fix exprQuad::replace() yet");
+	fprintf (stderr, "Didn't fix exprQuad::replace() yet");
+	exit (-1);
 	vc = w;
       }
     }
