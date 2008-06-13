@@ -124,7 +124,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     }
 
   jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
-		  "Problem size after standarization: %d variables (%d integer), %d constraints.\n",
+		  "Problem size after  standarization: %d variables (%d integer), %d constraints.\n",
 		  nActualVars, nIntVars_, nCons());
 
   if (base) {
