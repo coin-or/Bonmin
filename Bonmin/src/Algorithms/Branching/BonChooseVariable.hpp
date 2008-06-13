@@ -1,4 +1,4 @@
-// Copyright (C) 2006, 2007 International Business Machines
+// Copyright (C) 2006, 2008 International Business Machines
 // Corporation and others.  All Rights Reserved.
 #ifndef BonChooseVariable_H
 #define BonChooseVariable_H
@@ -311,6 +311,8 @@ namespace Bonmin
     int numberStrongRoot_;
     /** backup of numberStrong_ before Root node solve */
     int numberStrongBackup_;
+    /** number of look-ahead strong-branching steps */
+    int numberLookAhead_;
 #ifndef OLD_USEFULLNESS
     /** Criterion to use in setup list.*/
     CandidateSortCriterion sortCrit_;

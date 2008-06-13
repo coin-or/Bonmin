@@ -1,4 +1,4 @@
-// Copyright (C) 2006, 2007 International Business Machines
+// Copyright (C) 2006, 2008 International Business Machines
 // Corporation and others.  All Rights Reserved.
 #if defined(_MSC_VER)
 // Turn off compiler warning about long names
@@ -79,6 +79,7 @@ namespace Bonmin
     }
     options->GetIntegerValue("number_strong_branch_root", numberStrongRoot_, "bonmin.");
     options->GetIntegerValue("min_number_strong_branch", minNumberStrongBranch_, "bonmin.");
+    options->GetIntegerValue("number_look_ahead", numberLookAhead_, "bonmin.");
 
   }
 
@@ -97,7 +98,8 @@ namespace Bonmin
 #endif
       minNumberStrongBranch_(rhs.minNumberStrongBranch_),
       pseudoCosts_(rhs.pseudoCosts_),
-      trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_)
+      trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_),
+      numberLookAhead_(rhs.numberLookAhead_)
   {
     jnlst_ = rhs.jnlst_;
     handler_ = rhs.handler_->clone();
@@ -127,6 +129,7 @@ namespace Bonmin
       minNumberStrongBranch_ = rhs.minNumberStrongBranch_;
       pseudoCosts_ = rhs.pseudoCosts_;
       trustStrongForPseudoCosts_ = rhs.trustStrongForPseudoCosts_;
+      numberLookAhead_ = rhs.numberLookAhead_;
       results_ = rhs.results_;
     }
     return *this;
@@ -186,8 +189,10 @@ namespace Bonmin
                                "yes","",
                                ""
                                );
-     roptions->setOptionExtraInfo("trust_strong_branching_for_pseudo_cost", 31);
+    roptions->setOptionExtraInfo("trust_strong_branching_for_pseudo_cost", 31);
 
+    roptions->AddLowerBoundedIntegerOption("number_look_ahead", "Sets limit of look-ahead strong-branching trials",
+        0, 0,"");
   }
 
 
@@ -764,7 +769,10 @@ namespace Bonmin
   				    OsiBranchingInformation *info,
   				    int numberToDo, int returnCriterion)
   {
-  
+    // Prepare stuff for look-ahead heuristic
+    double bestLookAhead_ = -COIN_DBL_MAX;
+    int trialsSinceBest_ = 0;
+    bool isRoot = isRootNode(info);
     // Might be faster to extend branch() to return bounds changed
     double * saveLower = NULL;
     double * saveUpper = NULL;
@@ -890,6 +898,24 @@ namespace Bonmin
       if (hitMaxTime) {
         returnCode=3;
         break;
+      }
+      // stop if look ahead heuristic tells us so
+      if (!isRoot && numberLookAhead_) {
+	assert(status0==0 && status1==0);
+	double upEstimate = result->upChange();
+	double downEstimate = result->downChange();
+	double MAXMIN_CRITERION = maxminCrit(info);
+	double value = MAXMIN_CRITERION*CoinMin(upEstimate,downEstimate) + (1.0-MAXMIN_CRITERION)*CoinMax(upEstimate,downEstimate);
+	if (value > bestLookAhead_) {
+	  bestLookAhead_ = value;
+	  trialsSinceBest_ = 0;
+	}
+	else {
+	  trialsSinceBest_++;
+	  if (trialsSinceBest_ >= numberLookAhead_) {
+	    break;
+	  }
+	}
       }
     }
     if(iDo < numberToDo) iDo++;
