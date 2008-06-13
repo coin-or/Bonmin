@@ -41,7 +41,7 @@ int main (int argc, char *argv[])
   using namespace Ipopt;
 
   char * pbName = NULL;
-  double time1 = CoinCpuTime();
+  double time_start = CoinCpuTime();
 
   try {
 
@@ -55,6 +55,12 @@ int main (int argc, char *argv[])
     CouenneFeasibility feasibility;
     bb.model().setProblemFeasibility (feasibility);
 #endif
+
+    /// update time limit (read/preprocessing might have taken some)
+    double timeLimit = 0;
+    bonmin.options () -> GetNumericValue ("time_limit", timeLimit, "bonmin.");
+    bonmin.setDoubleParameter (BabSetupBase::MaxTime, 
+			       timeLimit - (time_start = (CoinCpuTime () - time_start)));
 
     //////////////////////////////////
 
@@ -114,11 +120,12 @@ int main (int argc, char *argv[])
 		(cp) ? (cp -> nVars   () - 
 			cp -> nOrig   ()): -1,
 		nr, nt, st, 
-		CoinCpuTime () - time1,
-		cg ? (CoinCpuTime () - cg -> rootTime ()) : - CoinCpuTime (),
-		bb.bestBound (),
-		//bb.bestObj (),
+		CoinCpuTime () - time_start,
+		cg ? (CoinCpuTime () - cg -> rootTime ()) : CoinCpuTime (),
+		bb.model (). getBestPossibleObjValue (),
 		bb.model (). getObjValue (),
+		//bb.bestBound (),
+		//bb.bestObj (),
 		bb.numNodes ());
 		//bb.iterationCount ());
 		//status.c_str (), message.c_str ());
@@ -129,7 +136,7 @@ int main (int argc, char *argv[])
       double timeLimit = 0, obj = bb.model (). getObjValue ();
       bonmin.options() -> GetNumericValue ("time_limit", timeLimit, "bonmin.");
 
-      if (CoinCpuTime () - time1 > timeLimit) {
+      if (CoinCpuTime () - time_start > timeLimit) {
 
 	// time limit reached, print upper and (in brackets) lower
 
@@ -151,7 +158,7 @@ int main (int argc, char *argv[])
 	else printf (" %8s     &", "inf_prim");
 	  
 	if (fabs (bb.bestBound()) < 9e12) 
-	  printf    (" %12.3f   &", CoinCpuTime () - time1);
+	  printf    (" %12.3f   &", CoinCpuTime () - time_start);
 	else printf (" %8s       &", "inf_dual");
       }
 

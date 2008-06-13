@@ -264,8 +264,9 @@ namespace Bonmin{
 	(continuousSolver_) -> setCutGenPtr (couenneCg);
     }
 
-    // add other cut generators -- should test for integer variables first
-    addMilpCutGenerators ();
+    // add other cut generators -- test for integer variables first
+    if (couenneCg -> Problem () -> nIntVars () > 0)
+      addMilpCutGenerators ();
 
     CouennePtr_ = couenneCg;
 
