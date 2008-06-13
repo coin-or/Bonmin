@@ -225,13 +225,27 @@ namespace Bonmin{
 
     bool foundSolution = false;
 
-    if (skipOnInfeasibility) // make up some random rounding
+    if (haveRoundedIntVars && skipOnInfeasibility) 
+      // no integer initial point could be found, make up some random rounding
+
       for (int i = couenne_ -> nOrig (); i--;) 
+
 	if (couenne_ -> Var (i) -> isDefinedInteger ())
 	  lower [i] = upper [i] = Y [i] = 
 	    (CoinDrand48 () < 0.5) ? 
 	    floor (Y [i] + COUENNE_EPS) : 
 	    ceil  (Y [i] - COUENNE_EPS);
+
+	else if (lower [i] > upper [i]) { 
+
+	  // sanity check (should avoid problems in ex1263 with
+	  // couenne.opt.obbt)
+
+	  double swap = lower [i];
+	  lower [i] = upper [i];
+	  upper [i] = swap;
+	}
+
 
     {
       //	printf ("[%g <%g> %g] ", lower [i], Y [i], upper [i]);
