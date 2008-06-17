@@ -332,6 +332,9 @@ namespace Bonmin {
     assert (iDo <= (int) results_.size());
     results_.resize (iDo);
 
+    delete [] oldLower;
+    delete [] oldUpper;
+
     delete [] saveLower;
     delete [] saveUpper;
 
