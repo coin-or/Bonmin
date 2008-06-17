@@ -29,14 +29,18 @@ namespace Bonmin
       std::string id;
       CglCutGenerator * cgl;
       bool atSolution;
+      bool normal;
       CuttingMethod():
-          atSolution(false)
+          atSolution(false),
+          normal(true)
       {}
+
       CuttingMethod(const CuttingMethod & other):
           frequency(other.frequency),
           id(other.id),
           cgl(other.cgl),
-          atSolution(other.atSolution)
+          atSolution(other.atSolution),
+          normal(other.normal)
       {}
     };
     typedef std::list<CuttingMethod> CuttingMethods;

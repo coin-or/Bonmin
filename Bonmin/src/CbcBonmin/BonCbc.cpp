@@ -145,10 +145,8 @@ namespace Bonmin
       OaDecompositionBase * oa = dynamic_cast<OaDecompositionBase *>(i->cgl);
       if (oa && oa->reassignLpsolver())
         oa->assignLpInterface(model_.solver());
-      if (i->atSolution)
-        model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str(), false, true);
-      else
-        model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str());
+        model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str(), i->normal,
+                               i->atSolution);
     }
 
     for (BabSetupBase::HeuristicMethods::iterator i = s.heuristics().begin() ;
@@ -420,7 +418,8 @@ namespace Bonmin
 
     //Get the time and start.
     model_.initialSolve();
-
+    model_.solver()->resolve();
+    model_.resolve(NULL, 1);
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
     {
@@ -468,34 +467,48 @@ namespace Bonmin
 
     // Output summarizing cut generators (taken from CbcSolver.cpp)
     // ToDo put into proper print level
+
+    
+
     int numberGenerators = model_.numberCutGenerators();
     for (int iGenerator=0;iGenerator<numberGenerators;iGenerator++) {
       CbcCutGenerator * generator = model_.cutGenerator(iGenerator);
       //CglStored * stored = dynamic_cast<CglStored*>(generator->generator());
        if (true&&!generator->numberCutsInTotal())
 	continue;
-      printf("%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
-	      generator->cutGeneratorName(),
-	      generator->numberTimesEntered(),
-	      generator->numberCutsInTotal()+
-	      generator->numberColumnCuts(),
-	      generator->numberCutsActive());
-      if (generator->timing()) {
-	printf(" (%.3f seconds)\n",generator->timeInCutGenerator());
-      }
-      else {
-	printf("\n");
+      CoinMessageHandler * cbc_handler = model_.messageHandler();
+      const CoinMessages & cbc_messages = model_.messages();
+      int cbc_log_level = model_.logLevel();
+      FILE * fp = cbc_handler->filePointer();
+      if(cbc_log_level >= 1) {
+        fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
+                generator->cutGeneratorName(),
+                generator->numberTimesEntered(),
+                generator->numberCutsInTotal()+
+                generator->numberColumnCuts(),
+                generator->numberCutsActive());
+        if (generator->timing()) {
+          fprintf(fp, " (%.3f seconds)\n",generator->timeInCutGenerator());
+        }
+        else {
+          fprintf(fp, "\n");
+        }
       }
     }
 
     if (hasFailed) {
-      std::cout<<"************************************************************"<<std::endl
-      <<"WARNING : Optimization failed on an NLP during optimization"
-      <<"\n (no optimal value found within tolerances)."<<std::endl
-      <<"Optimization was not stopped because option \n"
-      <<"\"nlp_failure_behavior\" has been set to fathom but"
-      <<" beware that reported solution may not be optimal"<<std::endl
-      <<"************************************************************"<<std::endl;
+      CoinMessageHandler * cbc_handler = model_.messageHandler();
+      const CoinMessages & cbc_messages = model_.messages();
+      int cbc_log_level = model_.logLevel();
+      FILE * fp = cbc_handler->filePointer();
+      fprintf(fp,
+     "************************************************************\n"
+     "WARNING : Optimization failed on an NLP during optimization\n"
+     "\n (no optimal value found within tolerances).\n"
+     "Optimization was not stopped because option \n"
+     "\"nlp_failure_behavior\" has been set to fathom but\n"
+     " beware that reported solution may not be optimal\n"
+     "************************************************************\n");
     }
     TMINLP::SolverReturn status = TMINLP::MINLP_ERROR;
 

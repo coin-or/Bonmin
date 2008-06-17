@@ -2048,7 +2048,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   const double * colUpper = getColUpper();
   const double * duals = getRowPrice() + 2*n;
   assert(m==getNumRows());
-  double infty = getInfinity();
+  double infty = si.getInfinity();
   double nlp_infty = infty_;
   
   for(int i = 0 ; i < m ; i++) {
@@ -2084,8 +2084,18 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
       }
     }
     else {
-      rowLow[i] = (rowLower[i] - g[i]);
-      rowUp[i] =  (rowUpper[i] - g[i]);
+      if(rowLower[i] > -nlp_infty){
+      //   printf("Lower %g ", rowLower[i]);
+         rowLow[i] = (rowLower[i] - g[i]);
+      }
+      else
+        rowLow[i] = - infty;
+      if(rowUpper[i] < nlp_infty){
+      //   printf("Upper %g ", rowUpper[i]);
+         rowUp[i] =  (rowUpper[i] - g[i]);
+      }
+      else
+        rowUp[i] = infty;
     }
   }
 
@@ -2200,6 +2210,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     si.addRow(objCut, lb, ub);
     }
   }
+//  si.writeMpsNative("OA.mps",NULL, NULL, 1);
   delete [] obj;
 }
 

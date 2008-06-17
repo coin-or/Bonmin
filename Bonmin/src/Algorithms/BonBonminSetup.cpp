@@ -487,7 +487,8 @@ namespace Bonmin
       oa->passInMessageHandler(nonlinearSolver_->messageHandler());
       cg.cgl = oa;
       cg.id = "Outer Approximation feasibility check.";
-      cg.atSolution = 1;
+      cg.atSolution = true;
+      cg.normal = false;
       cutGenerators_.push_back(cg);
     }
 
