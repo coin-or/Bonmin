@@ -226,5 +226,8 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     retval = maxInf; 
   }
 
+  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) 
+    retval = 0.;
+
   return retval;
 }

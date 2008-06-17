@@ -96,7 +96,8 @@ namespace Bonmin {
     // call Bonmin's setuplist
     int retval = BonChooseVariable::setupList (info, initialize);
 
-    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "----------------- (strong) setup list done\n");
+    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 
+		      "----------------- (strong) setup list done - %d infeasibilities\n", retval);
 
     problem_ -> domain () -> pop ();
     return retval;
