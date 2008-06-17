@@ -314,8 +314,6 @@ class CouenneProblem {
 	    OsiCuts &cs,
 	    const CglTreeInfo &info,
 	    Bonmin::BabInfo * babInfo,
-	    int nchanged,
-	    int *changed,
 	    t_chg_bounds *chg_bds);
 
   /// aggressive bound tightening. Fake bounds in order to cut

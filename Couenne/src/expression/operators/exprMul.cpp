@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "CoinHelperFunctions.hpp"
 #include "exprMul.hpp"
 #include "exprSum.hpp"
 #include "exprConst.hpp"
@@ -179,12 +180,13 @@ void exprMul::closestFeasible (expression *varind,
     y = (*vardep) (),
     c = (*varoth) ();
 
-  if (c < 0)
+  if (c < 0.)
     if (y < c*x) {assert (y/c >= right); right = y/c;}
     else         {assert (y/c <= left);  left  = y/c;}
-  else 
-    if (y < c*x) {assert (y/c >= left);  left  = y/c;}
-    else         {assert (y/c <= right); right = y/c;}
+  else if (c > 0.)
+    if (y < c*x) {assert (y/c <= left);  left  = y/c;}
+    else         {assert (y/c >= right); right = y/c;}
+  else left = - (right = COIN_DBL_MAX);
 }
 
 

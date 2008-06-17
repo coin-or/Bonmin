@@ -46,7 +46,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
 
     int i = numbering_ [ii];
 
-    if (Var (i) -> Multiplicity () == 0) 
+    if (Var (i) -> Multiplicity () <= 0) 
       continue;
 
     // early test to avoid a loop

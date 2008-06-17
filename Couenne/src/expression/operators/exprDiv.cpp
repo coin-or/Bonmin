@@ -180,14 +180,14 @@ void exprDiv::closestFeasible (expression *varind,
 			       CouNumber &left,
 			       CouNumber &right) const {
 
-  expression *varoth = arglist_ [0]; // assume w = c/x
+  expression *varoth = arglist_ [0]; // assume y = c/x
 
   bool numerator = false;
 
-  if (varoth -> Index () == varind -> Index ()) { // actually w = x/c
+  if (varoth -> Index () == varind -> Index ()) { // actually y = x/c
     varoth = arglist_ [1];
     numerator = true;
-  } else assert (arglist_ [1] -> Index () == varind -> Index ()); // right to assume w = c/x
+  } else assert (arglist_ [1] -> Index () == varind -> Index ()); // right to assume y = c/x
 
   CouNumber 
     x = (*varind) (),
@@ -197,11 +197,12 @@ void exprDiv::closestFeasible (expression *varind,
   if (numerator) // checking y = x/c
 
     if (c < 0.)
-      if (y < x/c) {assert (c*y > right); right = c*y;}
+      if (c*y > x) {assert (c*y > right); right = c*y;}
       else         {assert (c*y < left);  left  = c*y;}
-    else 
-      if (y < x/c) {assert (c*y < left);  left  = c*y;}
+    else if (c > 0.)
+      if (c*y < x) {assert (c*y < left);  left  = c*y;}
       else         {assert (c*y > right); right = c*y;}
+    else left = - (right = COIN_DBL_MAX);
 
   else           // checking y = c/x
 
@@ -211,6 +212,7 @@ void exprDiv::closestFeasible (expression *varind,
     else if (y > 0.) 
       if (x*y > c) {assert (c/y < left);  left  = c/y;} // convex area in first orthant
       else         {assert (c/y > right); right = c/y;} // remaining of first+second orthant
+    else left = - (right = COIN_DBL_MAX);
 }
 
 

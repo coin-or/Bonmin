@@ -148,7 +148,8 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 
   //////////////////////// Reduced cost bound tightening //////////////////////
 
-  if ((LB > -COUENNE_INFINITY) && (UB < COUENNE_INFINITY)) {
+  if ((LB > -COUENNE_INFINITY) && 
+      (UB <  COUENNE_INFINITY)) {
 
     const double 
       *X  = psi -> getColSolution (),
@@ -159,7 +160,8 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
     int ncols = psi -> getNumCols ();
 
     for (int i=0; i<ncols; i++)
-      if (i != objind) {
+      if ((i != objind) && 
+	  (Var (i) -> Multiplicity () > 0)) {
 
 	bool isInt = Var (i) -> isInteger ();
 

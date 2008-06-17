@@ -50,10 +50,7 @@ void fictitiousBound (OsiCuts &cs,
 void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged) {
 
   // convert sparse chg_bds in something handier
-  // AW: replacd "malloc" here by "realloc"; otherwise this is a memory leak
-  //     In general, I don't think it is worth to do a realloc here,
-  //     it is probably more expensive than not using it.  The memory
-  //     is free anyway when generateCuts is left
+
   changed  = (int *) realloc (changed, ncols * sizeof (int));
   nchanged = 0;
 
@@ -107,6 +104,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   t_chg_bounds *chg_bds = new t_chg_bounds [ncols];
 
+  for (int i=0; i < ncols; i++) 
+    if (problem_ -> Var (i) -> Multiplicity () <= 0) {
+      chg_bds [i].setLower (t_chg_bounds::UNCHANGED);
+      chg_bds [i].setUpper (t_chg_bounds::UNCHANGED);
+    }
+
   problem_ -> installCutOff (); // install upper bound
 
   if (firstcall_) {
@@ -118,6 +121,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // constructor populated *problem_ with variables and bounds. We
     // only need to update the auxiliary variables and bounds with
     // their current value.
+
+    for (int i=0; i < ncols; i++) 
+      if (problem_ -> Var (i) -> Multiplicity () > 0) {
+	chg_bds [i].setLower (t_chg_bounds::CHANGED);
+	chg_bds [i].setUpper (t_chg_bounds::CHANGED);
+      }
 
     // start with FBBT, should take advantage of cutoff found by NLP
     // run AFTER initial FBBT...
@@ -281,7 +290,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // OBBT
     if (!firstcall_ && // no obbt if first call (there is no LP to work with)
-	problem_ -> obbt (this, si, cs, info, babInfo, nchanged, changed, chg_bds) < 0)
+	problem_ -> obbt (this, si, cs, info, babInfo, chg_bds) < 0)
       throw infeasible;
 
     // Bound tightening done /////////////////////////////
@@ -419,7 +428,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   }
 
   delete [] chg_bds;
-  free (changed);
+
+  if (changed) 
+    free (changed);
 
   if (!firstcall_)
     problem_ -> domain () -> pop ();

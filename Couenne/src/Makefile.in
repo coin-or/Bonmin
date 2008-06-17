@@ -143,7 +143,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	problem/problemIO.cpp problem/writeAMPL.cpp \
 	problem/writeGAMS.cpp problem/constraint.cpp \
 	problem/fillQuadIndices.cpp problem/fillDependence.cpp \
-	problem/CouenneSolverInterface.cpp problem/checkNLP.cpp \
+	problem/CouenneSolverInterface.cpp \
+	problem/CouenneLPtightenBounds.cpp problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp problem/testIntFix.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
@@ -191,14 +192,14 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	auxiliarize.lo standardize.lo flattenMul.lo problem.lo \
 	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
 	constraint.lo fillQuadIndices.lo fillDependence.lo \
-	CouenneSolverInterface.lo checkNLP.lo getIntegerCandidate.lo \
-	testIntFix.lo depGraph.lo checkCycles.lo boundTightening.lo \
-	aggressiveBT.lo fake_tightening.lo obbt.lo obbt_iter.lo \
-	tightenBounds.lo impliedBounds.lo impliedBounds-mul.lo \
-	impliedBounds-sum.lo impliedBounds-exprSum.lo \
-	impliedBounds-exprDiv.lo impliedBounds-exprMul.lo \
-	impliedBounds-exprQuad.lo impliedBounds-exprPow.lo drawCuts.lo \
-	rootQ.lo $(am__objects_1)
+	CouenneSolverInterface.lo CouenneLPtightenBounds.lo \
+	checkNLP.lo getIntegerCandidate.lo testIntFix.lo depGraph.lo \
+	checkCycles.lo boundTightening.lo aggressiveBT.lo \
+	fake_tightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
+	impliedBounds.lo impliedBounds-mul.lo impliedBounds-sum.lo \
+	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
+	impliedBounds-exprMul.lo impliedBounds-exprQuad.lo \
+	impliedBounds-exprPow.lo drawCuts.lo rootQ.lo $(am__objects_1)
 libCouenne_la_OBJECTS = $(am_libCouenne_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -478,7 +479,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	problem/problemIO.cpp problem/writeAMPL.cpp \
 	problem/writeGAMS.cpp problem/constraint.cpp \
 	problem/fillQuadIndices.cpp problem/fillDependence.cpp \
-	problem/CouenneSolverInterface.cpp problem/checkNLP.cpp \
+	problem/CouenneSolverInterface.cpp \
+	problem/CouenneLPtightenBounds.cpp problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp problem/testIntFix.cpp \
 	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
@@ -687,6 +689,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseStrong.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneLPtightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneProblem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneSolverInterface.Plo@am__quote@
@@ -1481,6 +1484,13 @@ CouenneSolverInterface.lo: problem/CouenneSolverInterface.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/CouenneSolverInterface.cpp' object='CouenneSolverInterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneSolverInterface.lo `test -f 'problem/CouenneSolverInterface.cpp' || echo '$(srcdir)/'`problem/CouenneSolverInterface.cpp
+
+CouenneLPtightenBounds.lo: problem/CouenneLPtightenBounds.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneLPtightenBounds.lo -MD -MP -MF "$(DEPDIR)/CouenneLPtightenBounds.Tpo" -c -o CouenneLPtightenBounds.lo `test -f 'problem/CouenneLPtightenBounds.cpp' || echo '$(srcdir)/'`problem/CouenneLPtightenBounds.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CouenneLPtightenBounds.Tpo" "$(DEPDIR)/CouenneLPtightenBounds.Plo"; else rm -f "$(DEPDIR)/CouenneLPtightenBounds.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/CouenneLPtightenBounds.cpp' object='CouenneLPtightenBounds.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneLPtightenBounds.lo `test -f 'problem/CouenneLPtightenBounds.cpp' || echo '$(srcdir)/'`problem/CouenneLPtightenBounds.cpp
 
 checkNLP.lo: problem/checkNLP.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT checkNLP.lo -MD -MP -MF "$(DEPDIR)/checkNLP.Tpo" -c -o checkNLP.lo `test -f 'problem/checkNLP.cpp' || echo '$(srcdir)/'`problem/checkNLP.cpp; \

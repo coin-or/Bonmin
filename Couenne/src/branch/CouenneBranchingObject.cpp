@@ -193,6 +193,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     // sparsify structure with info on changed bounds and get convexification cuts
     sparse2dense (nvars, chg_bds, changed, nchanged);
     couenneSolver -> CutGen () -> genRowCuts (*solver, cs, nchanged, changed, chg_bds);
+    free (changed);
 
     solver -> applyCuts (cs);
   }

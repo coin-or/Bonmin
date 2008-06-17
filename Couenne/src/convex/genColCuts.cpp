@@ -50,9 +50,13 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
   // check all changed bounds
   for (int i = 0; i < nchanged; i++) {
 
-    register int index = changed [i];
+    int index = changed [i];
 
-    if (index == ind_obj)
+    // fails with spectra2 with (abt=2,obbt=0) for variable x70
+    //assert (problem_ -> Var (index) -> Multiplicity () > 0);
+
+    if ((index == ind_obj) || 
+	(problem_ -> Var (index) -> Multiplicity () <= 0))
       continue;
 
     if (newLow [index] > newUpp [index])

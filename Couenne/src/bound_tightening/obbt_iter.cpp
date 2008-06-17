@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: Optimality-Based Bound Tightening
  *
- * (C) Carnegie-Mellon University, 2006-07.
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -74,11 +74,10 @@ obbt_iter (CouenneSolverInterface *csi,
 
   exprVar *var = Var (index);
 
-  int //psense  = Obj (0) -> Sense (),
-      objind  = Obj (0) -> Body () -> Index (),
-      ncols   = csi -> getNumCols (),
-      nImprov = 0;
-
+  int
+    objind  = Obj (0) -> Body () -> Index (),
+    ncols   = csi -> getNumCols (),
+    nImprov = 0;
 
   if ((var -> Type  () == AUX) &&
       ((deplistsize = var -> Image () -> DepList (deplist, STOP_AT_AUX)) <= 1)) {
@@ -95,7 +94,7 @@ obbt_iter (CouenneSolverInterface *csi,
 
       if (csi -> getColUpper () [index] > value + COUENNE_EPS) {
 	csi -> setColUpper (index, value); 
-	chg_bds    [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
+	chg_bds    [index].setUpperBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
       }
       else chg_bds [index].setUpperBits(t_chg_bounds::EXACT);
 
@@ -140,10 +139,10 @@ obbt_iter (CouenneSolverInterface *csi,
        (Var (index) -> Multiplicity () > 0)) &&       // or its multiplicity is at least 1
       (Lb (index) < Ub (index) - COUENNE_EPS) && // in any case, bounds are not equal
 
-      ((index != objind) || // this is not the objective
-
-       // or it is, so we use it for re-solving
-       ((sense ==  1) && !(chg_bds [index].lower() & t_chg_bounds::EXACT)))) {
+      ((index != objind) // this is not the objective
+       // or it is, so we use it for re-solving // TODO: check!
+       || ((sense ==  1) && !(chg_bds [index].lower() & t_chg_bounds::EXACT))
+       )) {
        //((sense==-1) && (psense == MAXIMIZE) && !(chg_bds [index].upper() & t_chg_bounds::EXACT)))) {
 
     bool isInt = (Var (index) -> isInteger ());
@@ -284,7 +283,7 @@ obbt_iter (CouenneSolverInterface *csi,
     // problem), it is worth updating the current point (it will be
     // used later to generate new cuts).
 
-    // TODO: is it, really? And shouldn't you check the opt sense too?
+    // TODO: is it, really? And shouldn't we check the opt sense too?
     /*
     if ((objind == index) && (csi -> isProvenOptimal ()) && (sense == 1))
       update (csi -> getColSolution (), NULL, NULL);
@@ -293,7 +292,7 @@ obbt_iter (CouenneSolverInterface *csi,
     objcoe [index] = 0;
   }
 
-  if (nImprov) {
+  if (nImprov && jnlst_ -> ProduceOutput (J_ITERSUMMARY, J_BOUNDTIGHTENING)) {
     Jnlst () -> Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING, "OBBT: tightened ", nImprov);
     if (jnlst_ -> ProduceOutput (J_ITERSUMMARY, J_BOUNDTIGHTENING)) Var (index) -> print ();
     Jnlst () -> Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING, "\n");

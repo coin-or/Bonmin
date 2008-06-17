@@ -3,7 +3,7 @@
  * Authors: Pietro Belotti, Carnegie Mellon University
  * Purpose: OsiSolverInterface with a pointer to a CouenneCutGenerator object
  *
- * (C) Carnegie-Mellon University, 2007. 
+ * (C) Carnegie-Mellon University, 2007-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -77,6 +77,9 @@ public:
   /// Delete the hot start snapshot.
   virtual void unmarkHotStart();
   //@}
+
+  /// tighten bounds on all variables (including continuous)
+  virtual int tightenBounds (int lightweight);
 
 private:
   /// The pointer to the Couenne cut generator. Gives us a lot of

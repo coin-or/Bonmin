@@ -138,8 +138,6 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
 			  OsiCuts &cs,
 			  const CglTreeInfo &info,
 			  Bonmin::BabInfo * babInfo,
-			  int nchanged,
-			  int *changed,
 			  t_chg_bounds *chg_bds) {
 
   // Do OBBT if:
@@ -165,11 +163,16 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
 
     int nImprov, nIter = 0;
 
-    while ((nIter++ < MAX_OBBT_ITER) &&
+    bool notImproved = false;
+
+    while (!notImproved && 
+	   (nIter++ < MAX_OBBT_ITER) &&
 	   ((nImprov = obbtInner (csi, cs, chg_bds, babInfo)) > 0)) {
 
+      int nchanged, *changed = NULL;
+
       /// OBBT has tightened, add improved bounds
-      sparse2dense (nVars(), chg_bds, changed, nchanged);
+      sparse2dense (nVars (), chg_bds, changed, nchanged);
       cg -> genColCuts (*csi, cs, nchanged, changed);
 
       if ((nIter < MAX_OBBT_ITER) && 
@@ -180,9 +183,12 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
 	cg -> genRowCuts (*csi, cs, nchanged, changed, chg_bds);
 
 	if (nCurCuts == cs.sizeRowCuts ())
-	  break; // repeat only if new cuts available
+	  notImproved = true; // repeat only if new cuts available
 
-      } else break;
+      } else notImproved = true;
+
+      if (changed) 
+	free (changed);
     }
 
     delete csi;

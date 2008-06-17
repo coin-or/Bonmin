@@ -112,6 +112,7 @@ libCouenne_la_SOURCES = \
 	problem/fillQuadIndices.cpp \
 	problem/fillDependence.cpp \
 	problem/CouenneSolverInterface.cpp \
+	problem/CouenneLPtightenBounds.cpp \
 	problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp \
 	problem/testIntFix.cpp \
