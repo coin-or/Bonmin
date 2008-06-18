@@ -12,10 +12,10 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Bonmin],[0.9],[coin-bonmin@list.coin-or.org])
+AC_INIT([Bonmin],[1.0],[coin-bonmin@list.coin-or.org])
 
 AC_COPYRIGHT([
-Copyright 2006, 2007 International Business Machines and others.
+Copyright 2006, 2008 International Business Machines and others.
 All Rights Reserved.
 This file is part of the open source package BONMIN which is distributed
 under the Common Public License.])

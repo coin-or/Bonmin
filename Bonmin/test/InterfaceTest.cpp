@@ -384,7 +384,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 
 int main()
 {
-  WindowsErrorPopupBlocker();
+  //WindowsErrorPopupBlocker();
 
   Ipopt::SmartPtr<IpoptSolver> ipopt_solver = new IpoptSolver;
   interfaceTest(GetRawPtr(ipopt_solver));

@@ -31,7 +31,7 @@
 
 int main (int argc, char *argv[])
 {
-  WindowsErrorPopupBlocker();
+//  WindowsErrorPopupBlocker();
 
   using namespace Ipopt;
   using namespace Bonmin;
