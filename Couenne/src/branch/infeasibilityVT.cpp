@@ -119,7 +119,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
       if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) { // debug output
 	jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "[%g,%g] --> %g - %g = %g (diff = %g - %g = %g): ", 
 			  left, right, rFeas, lFeas, rFeas - lFeas,
-			  (*(obj. Reference () -> Image ())) (), (*(obj. Reference ())) (),
+			  (*(obj. Reference () -> Image ())) (),  (*(obj. Reference ())) (),
 			  (*(obj. Reference () -> Image ())) () - (*(obj. Reference ())) ());
 	obj.Reference () -> print (); printf (" := ");
 	obj.Reference () -> Image () -> print (); printf ("\n");
@@ -137,8 +137,8 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
     // need a nonzero value for the estimate. Although maxInf is
     // related to the expressions that depend on this variable, it is
     // still an estimate of how the point will change
-    if (upEstimate_   == 0.) upEstimate_   = maxInf;
-    if (downEstimate_ == 0.) downEstimate_ = maxInf;
+    if (upEstimate_   <= tol) upEstimate_   = maxInf;
+    if (downEstimate_ <= tol) downEstimate_ = maxInf;
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -228,6 +228,11 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
   if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) 
     retval = 0.;
+
+#define ALMOST_ZERO 1e-8
+
+  assert ((retval < ALMOST_ZERO && upEstimate_ < ALMOST_ZERO && downEstimate_ < ALMOST_ZERO) ||
+	  (retval > ALMOST_ZERO && upEstimate_ > ALMOST_ZERO && downEstimate_ > ALMOST_ZERO));
 
   return retval;
 }

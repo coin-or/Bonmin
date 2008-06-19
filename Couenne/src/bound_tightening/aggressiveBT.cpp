@@ -16,6 +16,7 @@
 #include "CouenneProblem.hpp"
 
 #define MAX_ABT_ITER 1  // max # aggressive BT iterations
+#define THRES_ABT_IMPROVED 0
 
 static double distanceToBound(int n, const double* xOrig,
 			      const double* lower, const double* upper)
@@ -177,6 +178,9 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
       int index = evalOrder (i);
 
+      if (Var (index) -> Multiplicity () <= 0) 
+	continue;
+
       // AW: We only want to do the loop that temporarily changes
       // bounds around the NLP solution only for those points from the
       // NLP solution (no auxiliary vars)?
@@ -188,34 +192,34 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
 	// if (index == objind) continue; // don't do it on objective function
 
-	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
-			"------------- tighten left x%d\n", index);
+      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
+		      "------------- tighten left x%d\n", index);
 
-	// tighten on left
-	if ((X [index] >= Lb (index) + COUENNE_EPS)
-	    && ((improved = fake_tighten (0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
-	  retval = false;
-	  break;
-	}
+      // tighten on left
+      if ((X [index] >= Lb (index) + COUENNE_EPS)
+	  && ((improved = fake_tighten (0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
+	retval = false;
+	break;
+      }
 
-	second = 0;
+      second = 0;
 
-	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
-			"------------- tighten right x%d\n", index);
+      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
+		      "------------- tighten right x%d\n", index);
 
-	//Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
+      //Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
 
-	// tighten on right
-	if ((X [index] <= Ub (index) - COUENNE_EPS)
-	    && ((second = fake_tighten (1, index, X, olb, oub, chg_bds, f_chg) < 0))) {
-	  retval = false;
-	  break;
-	}
+      // tighten on right
+      if ((X [index] <= Ub (index) - COUENNE_EPS)
+	  && ((second = fake_tighten (1, index, X, olb, oub, chg_bds, f_chg) < 0))) {
+	retval = false;
+	break;
+      }
 
-	improved += second;
-	//      }
+      improved += second;
+      //      }
     }
-  } while (retval && improved && (iter++ < MAX_ABT_ITER));
+  } while (retval && (improved > THRES_ABT_IMPROVED) && (iter++ < MAX_ABT_ITER));
 
   // store new valid bounds, or restore old ones if none changed
   CoinCopyN (olb, ncols, Lb ());
@@ -231,7 +235,6 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   }
 
   if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
-    //    CouNumber cutoff = getCutOff ();
     int       objind = Obj (0) -> Body  () -> Index ();
     Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 		    "-------------\ndone Aggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 

@@ -111,8 +111,10 @@ void CouenneProblem::standardize () {
     printf ("      --> "); (*i) -> print ();
 #endif
 
-    if (aux) 
+    if (aux) {
+      //delete ((*i) -> Body ());
       (*i) -> Body (new exprClone (aux));
+    }
 
 #ifdef DEBUG
     printf ("      --> "); (*i) -> print (); printf ("...................\n");
@@ -150,6 +152,7 @@ void CouenneProblem::standardize () {
 #endif
 
     if (aux) { // save if standardized
+      //delete ((*i) -> Body ());
       (*i) -> Body (new exprClone (aux));
       //      con2.push_back (*i);
     }

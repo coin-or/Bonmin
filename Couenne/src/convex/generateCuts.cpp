@@ -278,7 +278,8 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     // Bound tightening ////////////////////////////////////
 
     // FBBT
-    if (problem_ -> doFBBT () && //(info.pass <= 0) && // do it in subsequent rounds too
+    if (problem_ -> doFBBT () && 
+	//(info.pass <= 0) && // do it in subsequent rounds too
 	(! (problem_ -> boundTightening (chg_bds, babInfo))))
       throw infeasible;
 
@@ -409,7 +410,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
     if ((exception == infeasible) && (!firstcall_)) {
 
       jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,
-			"generateCuts: Infeasible node detected\n");
+			"Couenne: Infeasible node\n");
 
       OsiColCut *infeascut = new OsiColCut;
 

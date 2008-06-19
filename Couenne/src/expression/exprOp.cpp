@@ -17,17 +17,13 @@
 class CouenneProblem;
 class Domain;
 
-// General N-ary function destructor
 
+// General N-ary function destructor
 exprOp::~exprOp () {
 
   if (arglist_) {
-
-    expression **alist = arglist_;
-
-    while (nargs_--) 
-      delete (*alist++);
-
+    for (expression **alist = arglist_; nargs_--; alist++)
+      if (*alist) delete (*alist);
     delete [] arglist_;
   }
 }
@@ -137,9 +133,9 @@ int exprOp::rank () {
 
 exprAux *exprOp::standardize (CouenneProblem *p, bool addAux) {
 
-  register exprVar *subst;
+  exprVar *subst;
 
-  for (register int i = nargs_; i--;)
+  for (int i = nargs_; i--;)
     if ((subst = arglist_ [i] -> standardize (p))) {
       if ((subst -> Type () == VAR) ||
 	  (subst -> Type () == AUX))

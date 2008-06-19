@@ -117,20 +117,20 @@ public:
 
   /// Return "down" estimate (for non-convex, distance old <--> new LP point)
   virtual double downEstimate () const
-  {if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
-    printf ("DOWN EST = %g for ", downEstimate_); 
-    reference_ -> print (); 
-    printf ("\n");
-  }
+  {//if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+    //printf ("DOWN EST = %g for ", downEstimate_); 
+    //reference_ -> print (); 
+    //printf ("\n");
+    //}
   return downEstimate_;}
 
   /// Return "up" estimate (for non-convex, distance old <--> new LP point)
   virtual double upEstimate () const
-  {if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
-    printf ("UP EST = %g for ", upEstimate_); 
-    reference_ -> print (); 
-    printf ("\n");
-  }
+  {//if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+    //printf ("UP EST = %g for ", upEstimate_); 
+    //reference_ -> print (); 
+    //printf ("\n");
+    //}
   return upEstimate_;}
 
   /// set up/down estimate (0 for down, 1 for up). This happens in

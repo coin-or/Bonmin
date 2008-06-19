@@ -435,7 +435,7 @@ int CouenneProblem::splitAux (CouNumber rhs, expression *body, expression *&rest
 #endif
 
   // second argument is false to tell standardize not to create a new
-  // auxiliary variable (we just found it, it's w)
+  // auxiliary variable (we are creating it ourselves, it's aux)
   exprAux *aux = rest -> standardize (this, false);
 
 #ifdef DEBUG
