@@ -1,0 +1,141 @@
+\topcaption{\label{tab:options} 
+List of options and compatibility with the different algorithms.
+}
+\tablehead{\hline Option & type &  default & {\tt B-BB} & {\tt B-OA} & {\tt B-QG} & {\tt B-Hyb} \\ \hline \hline}
+
+\tabletail{\hline \multicolumn{7}{|c|}{continued on next page} \\ \hline}
+\tablelasttail{ \hline}
+\begin{xtabular}{|l|r|r|r|r|r|r|}
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Algorithm choice}\\
+\hline
+algorithm& S& B\-BB& +& +& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Bonmin ecp based strong branching}\\
+\hline
+ecp\_abs\_tol\_strong& F& 1e\-06& +& +& +& +\\
+ecp\_max\_rounds\_strong& I& 0& +& +& +& +\\
+ecp\_rel\_tol\_strong& F& 0.1& +& +& +& +\\
+lp\_strong\_warmstart\_method& S& Basis& +& +& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Branch-and-bound options}\\
+\hline
+allowable\_fraction\_gap& F& 0& +& +& +& +\\
+allowable\_gap& F& 0& +& +& +& +\\
+cutoff& F& 1e+100& +& +& +& +\\
+cutoff\_decr& F& 1e\-05& +& +& +& +\\
+integer\_tolerance& F& 1e\-06& +& +& +& +\\
+iteration\_limit& I& INT\_MAX& +& +& +& +\\
+nlp\_failure\_behavior& S& stop& +& +& +& +\\
+node\_comparison& S& dynamic& +& +& +& +\\
+node\_limit& I& INT\_MAX& +& +& +& +\\
+num\_cut\_passes& I& 1& -& +& +& +\\
+num\_cut\_passes\_at\_root& I& 20& -& +& +& +\\
+number\_before\_trust& I& 8& +& +& +& +\\
+number\_strong\_branch& I& 20& +& +& +& +\\
+solution\_limit& I& INT\_MAX& +& +& +& +\\
+sos\_constraints& S& enable& +& -& +& +\\
+time\_limit& F& 1e+10& +& +& +& +\\
+tree\_search\_strategy& S& top\-node& +& +& +& +\\
+variable\_selection& S& strong\-branching& +& +& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Diving options}\\
+\hline
+max\_backtracks\_in\_dive& I& 5& +& +& +& +\\
+max\_dive\_depth& I& INT\_MAX& +& +& +& +\\
+stop\_diving\_on\_cutoff& S& no& +& +& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{MILP cutting planes in hybrid}\\
+\hline
+2mir\_cuts& I& 0& -& +& -& +\\
+Gomory\_cuts& I& \-5& -& +& -& +\\
+clique\_cuts& I& \-5& -& +& -& +\\
+cover\_cuts& I& \-5& -& +& -& +\\
+flow\_covers\_cuts& I& \-5& -& +& -& +\\
+lift\_and\_project\_cuts& I& 0& -& +& -& +\\
+mir\_cuts& I& \-5& -& +& -& +\\
+probing\_cuts& I& \-5& -& +& -& +\\
+reduce\_and\_split\_cuts& I& 0& -& +& -& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Nlp solution robustness}\\
+\hline
+max\_consecutive\_failures& I& 10& +& +& +& +\\
+max\_random\_point\_radius& F& 100000& +& -& -& -\\
+num\_iterations\_suspect& I& \-1& +& +& +& +\\
+num\_retry\_unsolved\_random\_point& I& 0& +& +& +& +\\
+random\_point\_perturbation\_interval& F& 1& +& -& -& -\\
+random\_point\_type& S& Jon& +& -& -& -\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Nlp solve options in B-Hyb}\\
+\hline
+nlp\_solve\_frequency& I& 10& -& -& -& +\\
+nlp\_solve\_max\_depth& I& 10& -& -& -& +\\
+nlp\_solves\_per\_depth& F& 1e+30& -& -& -& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Options for MILP subsolver in OA decomposition}\\
+\hline
+milp\_log\_level& I& 0& -& +& -& +\\
+milp\_subsolver& S& Cbc\_D& -& +& -& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Options for OA decomposition}\\
+\hline
+oa\_dec\_time\_limit& F& 30& +& +& +& +\\
+oa\_log\_frequency& F& 100& +& +& +& +\\
+oa\_log\_level& I& 1& +& +& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Options for ecp cuts generation}\\
+\hline
+ecp\_abs\_tol& F& 1e\-06& -& -& -& +\\
+ecp\_max\_rounds& I& 5& -& -& -& +\\
+ecp\_propability\_factor& F& 1000& -& -& -& +\\
+ecp\_rel\_tol& F& 0& -& -& -& +\\
+filmint\_ecp\_cuts& I& 0& -& -& -& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Options for non-convex problems}\\
+\hline
+max\_consecutive\_infeasible& I& 0& +& +& +& +\\
+num\_resolve\_at\_infeasibles& I& 0& +& -& -& -\\
+num\_resolve\_at\_node& I& 0& +& -& -& -\\
+num\_resolve\_at\_root& I& 0& +& -& -& -\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Outer Approximation cuts generation}\\
+\hline
+add\_only\_violated\_oa& S& no& -& +& +& +\\
+cut\_strengthening\_type& S& none& -& +& +& +\\
+disjunctive\_cut\_type& S& none& -& +& +& +\\
+oa\_cuts\_log\_level& I& 0& -& +& +& +\\
+oa\_cuts\_scope& S& global& -& +& +& +\\
+tiny\_element& F& 1e\-08& -& +& +& +\\
+very\_tiny\_element& F& 1e\-17& -& +& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Output ond log-levels ptions}\\
+\hline
+bb\_log\_interval& I& 100& +& -& +& +\\
+bb\_log\_level& I& 1& +& -& +& +\\
+lp\_log\_level& I& 0& -& -& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{Strong branching setup}\\
+\hline
+candidate\_sort\_criterion& S& best\-ps\-cost& +& +& +& +\\
+maxmin\_crit\_have\_sol& F& 0.1& +& +& +& +\\
+maxmin\_crit\_no\_sol& F& 0.7& +& +& +& +\\
+min\_number\_strong\_branch& I& 0& +& +& +& +\\
+number\_before\_trust\_list& I& 0& +& +& +& +\\
+number\_look\_ahead& I& 0& +& +& +& +\\
+number\_strong\_branch\_root& I& INT\_MAX& +& +& +& +\\
+setup\_pseudo\_frac& F& 0.5& +& +& +& +\\
+trust\_strong\_branching\_for\_pseudo\_cost& S& yes& +& +& +& +\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{6}{l|}{nlp interface option}\\
+\hline
+file\_solution& S& no& +& +& +& +\\
+nlp\_log\_level& I& 1& +& +& +& +\\
+nlp\_solver& S& Ipopt& +& +& +& +\\
+warm\_start& S& none& +& -& -& -\\
+\hline
+\end{xtabular}
+%\begin{tablenotes}
+%\item $\strut^*$ option is available
+%        for MILP subsolver (it is only passed if the {\tt milp\_subsolver} optio
+%        see Subsection \ref{sec:milp_opt}).
+%       \item $\strut^1$ disabled for stability reasons.
+%\end{tablenotes}
