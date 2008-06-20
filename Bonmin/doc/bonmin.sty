@@ -1,0 +1,248 @@
+%Some frequently used html addresses
+
+%Documentation Pages
+\newcommand{\BonPrefix}{../}
+\newcommand{\BibPage}{\BonPrefix bib/index.html}
+\newcommand{\OptSetPage}{\BonPrefix options_set/index.html}
+\newcommand{\OptListPage}{\BonPrefix options_list/index.html}
+
+% references
+\newcommand{\BetalLink}{http://domino.research.ibm.com/library/cyberdig.nsf/1e4115aea78b6e7c85256b360066f0d4/fdb4630e33bd2876852570b20062af37?OpenDocument}
+\newcommand{\DGLink}{\BibPage \#DG}
+\newcommand{\GuptaLink}{\BibPage \#Gupta80Nonlinear}
+\newcommand{\FLLink}{http://dx.doi.org/10.1007/BF01581153}
+\newcommand{\QGLink}{http://dx.doi.org/10.1016/0098-1354(92)80028-8}
+\newcommand{\AMPL}{\BibPage \#Fourrer2003}
+
+%Some third party softwares
+\newcommand{\Cplex}{\link{http://www.ilog.com/products/cplex/product/mip.cfm}{\tt Cplex}}
+\newcommand{\LapackAddr}{http://www.netlib.org/lapack/}
+\newcommand{\BlasAddr}{http://www.netlib.org/blas/}
+\newcommand{\AslAddr}{http://www.cse.clrc.ac.uk/nag/hsl/contents.shtml}
+
+%for coin projects
+\newcommand{\linkCoin}{https://projects.coin-or.org/}
+
+%Some frequently used name with strange typesetting
+\newcommand{\Bonmin}{{\tt BONMIN}}
+\newcommand{\Ipopt}{\link{\linkCoin Ipopt}{\tt Ipopt}}
+\newcommand{\CoinUtils}{\link{\linkCoin CoinUtils}{\tt CoinUtils}}
+\newcommand{\BuildTools}{\link{\linkCoin BuildTools}{\tt BuildTools}}
+\newcommand{\Cbc}{\link{\linkCoin Cbc}{\tt Cbc}} 
+\newcommand{\Cgl}{\link{\linkCoin Cgl}{\tt Cgl}}
+\newcommand{\Clp}{\link{\linkCoin Clp}{\tt Clp}}
+\newcommand{\Osi}{\link{\linkCoin Osi}{\tt Osi}}
+\newcommand{\COINOR}{\link{http://www.coin-or.org}{COIN-OR}}
+
+\newcommand{\IpoptDoc}[1]{http://www.coin-or.org/Ipopt/documentation/node#1.html}
+
+
+
+%disclaimer to add at beginning of each page
+\newcommand{\Disclaimer}{
+\html{
+%\begin{rawhtml}
+%<h1> This is a beta of the html Bonmin User's Manual. Content may not be accurate. </h1>
+%\end{rawhtml}
+}}
+
+
+% Some wrapper to packages function (links, ...) so that we can alternatively use
+% html.sty or others and do links, citation, ...
+
+\newcommand{\link}[2]{\latexhtml{\href{#1}{#2}}{\htmladdnormallink{#2}{#1}}}
+
+\newcommand{\mycite}[2]{\latexhtml{
+\cite{#1}}
+{
+\begin{rawhtml}<a href= \end{rawhtml}"../bib/index.html\##1"
+\begin{rawhtml}> \end{rawhtml}[#2]\begin{rawhtml}</a>\end{rawhtml}}}
+
+\newcommand{\footlink}[2]{\link{#1}{#2}\latex{\footnote{#1}}}
+
+
+
+%Put into a colored background for verbatim
+\newenvironment{colorverb}{\latexhtml{}{ \begin{rawhtml} <div id="verbatim"> \end{rawhtml}}}{\latexhtml{}{ \begin{rawhtml} </div> \end{rawhtml}}}
+
+\newcommand{\PageTitle}[2]{
+\latexhtml{
+\section{#1}
+\label{#2}
+}
+{
+\Disclaimer
+\begin{rawhtml}
+</div>
+<div id="content">
+  <div class="feature">
+  <h3>
+  \end{rawhtml} #1 \begin{rawhtml}</h3>\end{rawhtml}} 
+}
+
+\newcommand{\myHTMLsections}[3]{
+\latexhtml{
+#3{#1}
+\label{#2}
+}
+{
+\begin{rawhtml}
+ </div>
+  <div class="story">
+    <h3><a name=
+\end{rawhtml} "#2" \begin{rawhtml}></a>\end{rawhtml} #1 \begin{rawhtml} </h3>
+\end{rawhtml}
+}
+}
+
+\newcommand{\subsectionH}[2]{
+\myHTMLsections{#1}{#2}{\subsection}}
+
+\newcommand{\subsubsectionH}[2]{
+\myHTMLsections{#1}{#2}{\subsubsection}}
+
+\newcommand{\subsectionHs}[2]{
+\myHTMLsections{#1}{#2}{\subsection*}}
+
+\newcommand{\citeH}[3]{\latexhtml{ \cite{#1} }{
+\begin{rawhtml}
+<A
+ HREF=\end{rawhtml} "#2" \begin{rawhtml} >\end{rawhtml}[#3]\begin{rawhtml}</A>
+\end{rawhtml}
+}
+}
+
+%Header of the page
+\newcommand{\PageHead}[1]{
+\latexhtml{}{
+\begin{rawhtml}
+<div id="masthead"> 
+  <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1> 
+  <div id="globalNav"> 
+	<a href="../Intro/index.html">Introduction</a> | 
+	<a href="../Obtain/index.html">Download</a> |
+	<a href="../Install/index.html">Install</a> | 
+	<a href="../use/index.html">Use</a> | 
+	<a href="../options_set/index.html">Setting Options</a> | 
+	<a href="../options_list/index.html">Options List</a> | 
+	<a href="../bib/index.html">Bibliography</a> |
+  </div> 
+  <h2 id="pageName"> \end{rawhtml} #1 \begin{rawhtml} </h2> 
+  \end{rawhtml}}
+  }
+  
+  \newcommand{\StartPageSummary}{
+  \latexhtml{}{
+  \begin{rawhtml}
+  <div id="breadCrumb"> 
+  \end{rawhtml}}
+  }
+  
+  \newcommand{\PageName}[1]{\latexhtml{}{
+\begin{rawhtml}
+ <h2 id="pageName"> \end{rawhtml} #1 \begin{rawhtml} </h2> 
+\end{rawhtml}}}
+
+  \newcommand{\PageSection}[2]{\latexhtml{}{\begin{rawhtml} <a href="\end{rawhtml}\##2 \begin{rawhtml}" > \end{rawhtml} #1 \begin{rawhtml} </a>  / \end{rawhtml}}}
+ 
+ \newcommand{\EndPageSummary}{
+ \latexhtml{}{\begin{rawhtml}
+</div> 
+</div>
+\end{rawhtml}
+}
+}
+
+%Left panel for links
+\newcommand{\NavigationPanel}{
+\latexhtml{}{
+\begin{rawhtml}
+<div id="leftPanel">
+<div id="navBar"> 
+  <div id="sectionLinks"> 
+   <h4>BONMIN links </h4> 
+	<ul> 
+	  <li><a href="https://projects.coin-or.org/Bonmin">Project Wiki</a></li> 
+	  	  <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS Interface </a> </li>
+	  <li><a href="http://list.coin-or.org/mailman/listinfo/Bonmin"> Mailing list </a> </li>
+	  <li><a href="http://projects.coin-or.org/Bonmin/report"> Bug reports</a></li>
+	  <li><a href="https://projects.coin-or.org/Bonmin/browser/trunk>Browse source</a></li> 
+	  <li><a href="" >Doxygen Manual</a></li> 
+		 <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU Open Source MINLP </a></li>
+	  <li><a href="http://www.coin-or.org">COIN-OR</a></li>
+	</ul> 
+   </div>
+</div>
+	<div class="relatedLinks"> 
+	<h4>COIN-OR links </h4> 
+	<ul> 
+	  <li><a href="http://www.coin-or.org/Cbc/index.html">Cbc</a></li> 
+	  <li><a href="http://www.coin-or.org/Clp/index.html">Clp</a></li> 
+	  <li><a href="http://projects.coin-or.org/Ipopt">Ipopt</a></li> 
+	</ul> 
+  </div> 
+  <div class="relatedLinks"> 
+	<h4>Problems libraries</h4> 
+	<ul> 
+	  <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU MINLP library </a></li>
+	  <li><a href="http://www.gamsworld.org/minlp/index.htm">GAMS MINLPLib </a></li> 
+	  <li><a href="http://www-unix.mcs.anl.gov/Eleyffer/macminlp/index.html">MacMinlp</a></li> 
+	</ul> 
+  </div> 
+  <div class="relatedLinks"> 
+	<h4>Other MINLP software</h4> 
+	<ul> 
+	  <li><a href="http://www.abo.fi/~Tapio.Westerlund/">alpha-CP</a></li>
+	  <li><a href="http://archimedes.scs.uiuc.edu/baron/baron.html">Baron</a></li>
+	  <li><a href="http://www.gamsworld.org/">GAMS</a></li> 
+	  <li><a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html">MINLPBB</a></li> 
+	  <li><a href="http://titan.princeton.edu/MINOPT/">MINOPT</a></li>
+	  <li><a href="http://www-neos.mcs.anl.gov/neos/solvers/index.html">NEOS</a></li>
+	</ul> 
+  </div> 
+</div>
+
+
+<!--end navBar div --> 
+
+
+<br>
+\end{rawhtml}
+}}
+
+
+\newenvironment{PageSummary}{\StartPageSummary}{\EndPageSummary \NavigationPanel}
+
+\newcounter{refnum}
+
+\newenvironment{quickref}
+{
+\html{ 
+\setcounter{refnum}{0}
+\begin{rawhtml}
+<div id="rightPanel">
+<div id="headlines">
+  <h4>References </h4>
+\end{rawhtml} }}
+{
+\html{\begin{rawhtml}
+</div>
+</div>
+</div>
+\end{rawhtml}
+} }
+
+\newcommand{\quickcitation}[2]{
+\html{
+\addtocounter{refnum}{1}
+\begin{rawhtml}
+  <div id="refer">
+  <p> 
+\end{rawhtml}
+\arabic{refnum} #1 \link{#2}{full reference}
+\begin{rawhtml}
+</p>
+</div>
+\end{rawhtml}}}
+
+

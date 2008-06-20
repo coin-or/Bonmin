@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{html}
+\usepackage{lscape}
+\usepackage{amsmath,amssymb}
+\usepackage{threeparttable}
+
+\usepackage{bonmin}
+
+
+\title{\Bonmin\ Users' Manual}
+\author{Pierre Bonami and Jon Lee}
+
+
+\begin{document}
+\maketitle
+
+\input{Intro}
+
+\input{Obtain}
+
+\input{Install}
+
+\input{use}
+
+\input{options_set}
+%\section{{\Bonmin} output}
+%\Bonmin uses a number of optimization tools ({\
+%tt Ipopt}, {\tt Cbc}, {\tt Clp}, \ldots) which all have there own output.
+%As a consequence the output is very diverse and may be a little difficult to read.\\
+%
+%The output level for each of the building blocks of \Bonmin can be set through options (see Appendix \ref{app:opt_loglevel})
+%Here we briefly describes the output given at the different log level for each of those building blocks.
+%\subsection{BB\_log_level}
+%This corresponds to the output from the main branch-and-bound process in B-BB, B-QG, B-Hyb
+%(this is not available in the B-OA).
+%The output here comes from {\tt Cbc}, and each line of output has the prefix {\tt Cbc} and is followed by a number indicating the message type.
+%
+%\subsection{
+\input{bib}
+\appendix
+\latexhtml{\section{List of \Bonmin\ options}
+\label{sec:optList}
+\input{options_list}}
+
+
+\end{document}
