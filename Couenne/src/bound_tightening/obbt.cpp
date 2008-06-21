@@ -25,6 +25,7 @@
 void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged);
 
 
+// OBBT for one sense (max/min) and one class of variables (orig/aux)
 int CouenneProblem::call_iter (CouenneSolverInterface *csi, 
 			       t_chg_bounds *chg_bds, 
 			       const CoinWarmStart *warmstart, 
@@ -118,11 +119,8 @@ int CouenneProblem::obbtInner (CouenneSolverInterface *csi,
 
   catch (int exception) {
 
-    if (exception == Infeasible) {
-      free (objcoe);
-      delete warmstart;
-      return -1;
-    }
+    if (exception == Infeasible)
+      nimprov = -1;
   }
 
   free (objcoe);
@@ -160,6 +158,7 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
     CouenneSolverInterface *csi = dynamic_cast <CouenneSolverInterface *> (si.clone (true));
 
     csi -> setupForRepeatedUse ();
+    //csi -> setHintParam (OsiDoDualInResolve, false);
 
     int nImprov, nIter = 0;
 

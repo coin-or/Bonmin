@@ -40,10 +40,10 @@ public:
   {return new CouenneSolverInterface (*this);}
 
   /// we need to overwrite this since we might have internal knowledge
-  virtual bool isProvenPrimalInfeasible() const;
+  virtual bool isProvenPrimalInfeasible () const;
 
   /// we need to overwrite this since we might have internal knowledge
-  virtual bool isProvenOptimal() const;
+  virtual bool isProvenOptimal () const;
 
   /// Return cut generator pointer
   CouenneCutGenerator *CutGen ()

@@ -30,7 +30,8 @@ static bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use 
 
   ////////////////////////////////////////////////////////////////////////
 
-  csi -> resolve_nobt (); // this is a time-expensive part, be considerate...
+  //csi -> resolve_nobt (); // this is a time-expensive part, be considerate...
+  csi -> resolve (); // this is a time-expensive part, be considerate...
 
   ////////////////////////////////////////////////////////////////////////
 
@@ -148,6 +149,7 @@ obbt_iter (CouenneSolverInterface *csi,
     bool isInt = (Var (index) -> isInteger ());
 
     objcoe [index] = sense;
+
     csi -> setObjective (objcoe);
     csi -> setObjSense (1); // minimization
 
@@ -181,7 +183,16 @@ obbt_iter (CouenneSolverInterface *csi,
     }
     */
 
+    // create scaled solution (ideally should be feasible but
+    // shouldn't be extreme of bounding box)
+
+    //csi -> createInteriorWS (warmstart);
+
     csi -> setWarmStart (warmstart);
+
+    //Jnlst () -> Printf (J_MATRIX, J_BOUNDTIGHTENING,
+    //"obbt___ index = %d [sen=%d,bd=%g,int=%d]\n", 
+    //index, sense, bound, isInt);
 
     if (obbt_updateBound (csi, sense, bound, isInt)) {
 

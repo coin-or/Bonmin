@@ -15,8 +15,9 @@
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 
-#define MAX_ABT_ITER 1  // max # aggressive BT iterations
-#define THRES_ABT_IMPROVED 0
+#define MAX_ABT_ITER           1  // max # aggressive BT iterations
+#define THRES_ABT_IMPROVED     0  // only continue ABT if at least these bounds have improved
+#define THRES_ABT_ORIG      1000  // only do ABT on originals if they are more than this 
 
 static double distanceToBound(int n, const double* xOrig,
 			      const double* lower, const double* upper)
@@ -188,36 +189,37 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
       // PBe: if we do want that, index should be initialized as i, as
       // evalOrder gives a variable index out of an array index.
 
-      //      if (index < nOrig_) {
+      // PBe: That makes a lot of sense when problems are really
+      // big. Instances arki000[24].nl spend a lot of time here
+
+      if ((nOrig_ < THRES_ABT_ORIG) || (index < nOrig_)) {
 
 	// if (index == objind) continue; // don't do it on objective function
 
-      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
-		      "------------- tighten left x%d\n", index);
+	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
+			"------------- tighten left x%d\n", index);
 
-      // tighten on left
-      if ((X [index] >= Lb (index) + COUENNE_EPS)
-	  && ((improved = fake_tighten (0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
-	retval = false;
-	break;
+	// tighten on left
+	if ((X [index] >= Lb (index) + COUENNE_EPS)
+	    && ((improved = fake_tighten (0, index, X, olb, oub, chg_bds, f_chg)) < 0)) {
+	  retval = false;
+	  break;
+	}
+
+	second = 0;
+
+	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
+			"------------- tighten right x%d\n", index);
+
+	// tighten on right
+	if ((X [index] <= Ub (index) - COUENNE_EPS)
+	    && ((second = fake_tighten (1, index, X, olb, oub, chg_bds, f_chg) < 0))) {
+	  retval = false;
+	  break;
+	}
+
+	improved += second;
       }
-
-      second = 0;
-
-      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
-		      "------------- tighten right x%d\n", index);
-
-      //Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"  ### tighten right\n");
-
-      // tighten on right
-      if ((X [index] <= Ub (index) - COUENNE_EPS)
-	  && ((second = fake_tighten (1, index, X, olb, oub, chg_bds, f_chg) < 0))) {
-	retval = false;
-	break;
-      }
-
-      improved += second;
-      //      }
     }
   } while (retval && (improved > THRES_ABT_IMPROVED) && (iter++ < MAX_ABT_ITER));
 

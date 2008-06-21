@@ -46,6 +46,8 @@ void exprSin::getBounds (expression *&lb, expression *&ub) {
 bool trigImpliedBound (enum cou_trig type, int wind, int xind,
 		       CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
+  //return false; // !!!
+
   CouNumber *xl = l + xind, wl = l [wind],
             *xu = u + xind, wu = u [wind];
 
@@ -119,6 +121,8 @@ bool trigImpliedBound (enum cou_trig type, int wind, int xind,
   return tighter;
 }
 
+
+/// For use with Violation Transfer (See Tawarmalani and Sahinidis 2004)
 void exprSin::closestFeasible (expression *varind, expression *vardep,
 			       CouNumber& left, CouNumber& right) const
 {

@@ -22,11 +22,20 @@
 #include "exprCos.hpp"
 #include "exprAux.hpp"
 
-//#define NEW_TRIG
+#define NEW_TRIG
+
+#ifndef NEW_TRIG
+/// add four cuts with slope 1 and -1
+int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
+		 OsiCuts &,      // cut set to be enriched
+		 enum cou_trig,  // sine or cosine
+		 expression *,      // auxiliary variable
+		 expression *);  // argument of cos/sin (should be a variable)
+#endif
 
 /// convex cuts for sine or cosine
 int trigEnvelope (const CouenneCutGenerator *, OsiCuts &,
-		   expression *, expression *, enum cou_trig);
+		  expression *, expression *, enum cou_trig);
 
 
 /// generate convexification cut for constraint w = sin (this)
@@ -43,11 +52,11 @@ void exprSin::generateCuts (expression *w, const OsiSolverInterface &si,
       (chg [wi].upper() == t_chg_bounds::UNCHANGED))
       return;*/
 
-  //#ifdef NEW_TRIG
+#ifdef NEW_TRIG
   if (trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_SINE) == 0)
-    //#else
-    //  if (addHexagon (cg, cs, COU_SINE, w, w -> Image () -> Argument()) == 0)
-    //#endif
+#else
+    if (addHexagon (cg, cs, COU_SINE, w, w -> Image () -> Argument()) == 0)
+#endif
     {
 
     }
@@ -68,11 +77,11 @@ void exprCos::generateCuts (expression *w, const OsiSolverInterface &si,
       (chg [wi].upper() == t_chg_bounds::UNCHANGED))
       return;*/
 
-  //#ifdef NEW_TRIG
+#ifdef NEW_TRIG
   if (trigEnvelope (cg, cs, w, w -> Image () -> Argument (), COU_COSINE) == 0) 
-    //#else
-    //  if (addHexagon (cg, cs, COU_COSINE, w, w -> Image () -> Argument()) == 0)
-    //#endif
+#else
+    if (addHexagon (cg, cs, COU_COSINE, w, w -> Image () -> Argument()) == 0)
+#endif
     {
 
     }
@@ -214,13 +223,7 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
 }
 
 
-#if 0
-/// add four cuts with slope 1 and -1
-int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
-		 OsiCuts &,      // cut set to be enriched
-		 enum cou_trig,  // sine or cosine
-		 exprAux *,      // auxiliary variable
-		 expression *);  // argument of cos/sin (should be a variable)
+#ifndef NEW_TRIG
 
 
 /// add lateral edges of the hexagon providing 
@@ -228,12 +231,8 @@ int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
 int addHexagon (const CouenneCutGenerator *cg, // cut generator that has called us
 		 OsiCuts &cs,       // cut set to be enriched
 		 enum cou_trig tt,  // sine or cosine
-		 exprAux *aux,      // auxiliary variable
+		 expression *aux,      // auxiliary variable
 		 expression *arg) { // argument of cos/sin (should be a variable)
-
-  // AW 2007-06-11: The following doesn't compile with MSVC++ because
-  // sin and cos are ambiguous
-  //unary_function fn = (tt == COU_SINE) ? sin : cos;
 
   // retrieve argument bounds
   CouNumber lb, ub;

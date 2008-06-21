@@ -115,8 +115,10 @@ void CouenneSolverInterface::resolve () {
   //sprintf (filename, "presol_%d", count);
   //writeLp (filename);
 
+  //printf ("----------------------------- count = %d [%s]\n", count, filename);
+
   knowInfeasible_ = false;
-  knowOptimal_ = false;
+  knowOptimal_    = false;
 
   OsiClpSolverInterface::resolve ();
 
@@ -149,8 +151,12 @@ void CouenneSolverInterface::unmarkHotStart() {
 /// Optimize starting from the hot start snapshot.
 void CouenneSolverInterface::solveFromHotStart() {
 
+  //OsiClpSolverInterface::solveFromHotStart ();
+
+  //#if 0
   knowInfeasible_ = false;
   knowOptimal_ = false;
+
   /*
   const int ncols = cutgen_ -> Problem () -> nVars ();
 
@@ -252,4 +258,5 @@ void CouenneSolverInterface::solveFromHotStart() {
 
   cutgen_ -> Problem () -> domain () -> pop ();
   */
+  //#endif
 }
