@@ -362,17 +362,17 @@ namespace Bonmin{
     roptions->AddBoundedIntegerOption(
       "branching_print_level",
       "Output level for braching code in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
+      -2, J_LAST_LEVEL-1, J_NONE,
       "");
     roptions->AddBoundedIntegerOption(
       "boundtightening_print_level",
       "Output level for bound tightening code in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
+      -2, J_LAST_LEVEL-1, J_NONE,
       "");
     roptions->AddBoundedIntegerOption(
       "convexifying_print_level",
       "Output level for convexifying code in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
+      -2, J_LAST_LEVEL-1, J_NONE,
       "");
     roptions->AddBoundedIntegerOption(
       "problem_print_level",
