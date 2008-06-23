@@ -1,0 +1,47 @@
+README file for Couenne
+
+Couenne (Convex Over- and Under ENvelopes for Nonlinear Estimation) is
+a library for bound reduction, branching, and linearization cuts for
+Mixed-integer, non-convex Programming problems. It comprises:
+
+1) an expression library;
+2) separation of linearization cuts;
+3) branching rules;
+4) bound tightening methods.
+
+
+It is distributed on Coin-OR (http://www.coin-or.org) under the CPL
+(Common Public License). The CPL is a license approved by the OSI
+(Open Source Initiative), thus Couenne is OSI Certified Open Source
+Software.
+
+
+To use Couenne, run
+
+$ Bonmin/experimental/NotConvex/boncouenne <instance.nl>
+
+specifying a stub (.nl) as an input.
+
+
+Couenne is maintained by Pietro Belotti (belotti@cmu.edu).
+
+Web page: https://projects.coin-or.org/Bonmin/wiki/BonCouenne
+
+This project was initiated in 2004 by IBM and Carnegie Mellon
+University as part of a joint effort to develop algorithms for MINLP.
+You may find additional info (a publicly available library of test
+instances of Convex MINLPs and papers on MINLP) at
+
+http://egon.cheme.cmu.edu/ibm/page.htm
+
+For contributing code you should either contact the project maintainer
+or write to the mailing list. You can find legal requirement at
+
+http://www.coin-or.org/contributions.html#contributions
+
+
+Dependencies: CoinUtils, Cbc, Cgl, Clp, Ipopt, Osi (from Coin-OR),
+ASL (Ampl Solver Library, see http://www.ampl.com).
+
+External resources: Coin-OR (http://www.coin-or.org), Common Public
+License (http://www.opensource.org/licenses/cpl.php)

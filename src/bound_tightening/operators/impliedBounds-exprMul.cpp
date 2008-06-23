@@ -1,0 +1,160 @@
+/*
+ * Name:    impliedBounds-exprMul.cpp
+ * Author:  Pietro Belotti
+ * Purpose: implied bounds for multiplications
+ *
+ * (C) Carnegie-Mellon University, 2006. 
+ * This file is licensed under the Common Public License (CPL)
+ */
+
+#include "exprMul.hpp"
+#include "CouennePrecisions.hpp"
+
+
+/// implied bound processing for expression w = x*y, upon change in
+/// lower- and/or upper bound of w, whose index is wind
+
+bool exprMul::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
+
+  //return false; // !!!
+
+  bool resL, resU = resL = false;
+  int ind;
+
+  if ((arglist_ [ind=0] -> Type () <= CONST) || 
+      (arglist_ [ind=1] -> Type () <= CONST)) {
+
+    // at least one constant in product w=cx:
+    //
+    // wl/c <= x <= wu/c, if c is positive
+    // wu/c <= x <= wl/c, if c is negative
+
+    CouNumber c = arglist_ [ind] -> Value ();
+
+    bool argInt = arglist_ [1-ind] -> isInteger ();
+
+    // get the index of the nonconstant part
+    ind = arglist_ [1-ind] -> Index ();
+
+    if (ind==-1) // should not happen, it is a product of constants
+      return false;
+
+    if (c > COUENNE_EPS) {
+
+      resL = (l [wind] > - COUENNE_INFINITY) && 
+	updateBound (-1, l + ind, argInt ? ceil  (l [wind] / c - COUENNE_EPS) : (l [wind] / c));
+      resU = (u [wind] <   COUENNE_INFINITY) && 
+	updateBound ( 1, u + ind, argInt ? floor (u [wind] / c + COUENNE_EPS) : (u [wind] / c));
+    } 
+    else if (c < - COUENNE_EPS) {
+
+      //      printf ("w_%d [%g,%g] = %g x_%d [%g,%g]\n", 
+      //	      wind, l [wind], u [wind], c, ind, l [ind], u [ind]);
+
+      resL = (u [wind] <   COUENNE_INFINITY) && 
+	updateBound (-1, l + ind, argInt ? ceil  (u [wind] / c - COUENNE_EPS) : (u [wind] / c));
+      resU = (l [wind] > - COUENNE_INFINITY) && 
+	updateBound ( 1, u + ind, argInt ? floor (l [wind] / c + COUENNE_EPS) : (l [wind] / c));
+    } 
+
+    if (resL) chg [ind].setLower(t_chg_bounds::CHANGED);
+    if (resU) chg [ind].setUpper(t_chg_bounds::CHANGED);
+
+      /*printf ("w_%d [%g,%g] -------> x_%d in [%g,%g] ", 
+	      wind, l [wind], u [wind], 
+	      ind,  l [ind],  u [ind]);*/
+  } else {
+
+    // these bounds would be implied by McCormick's convexification,
+    // however we write them explicitly for internal use within bound
+    // tightening, as otherwise they would only be known by Clp only.
+
+    int xi = arglist_ [0] -> Index (),
+        yi = arglist_ [1] -> Index ();
+
+    CouNumber *xl = l + xi, *yl = l + yi, wl = l [wind],
+              *xu = u + xi, *yu = u + yi, wu = u [wind];
+
+
+    // w's lower bound ///////////////////////////////////////////
+
+    bool resxL,  resxU,  resyL, resyU = 
+         resxL = resxU = resyL = false;
+
+    if (wl >= 0.) {
+
+      // point B in central infeasible area
+
+      if (*xu * *yu < wl) {
+	resxU = (*xu * *yl < wl) && updateBound (+1, xu, wl / *yl);
+	resyU = (*xl * *yu < wl) && updateBound (+1, yu, wl / *xl);
+      }
+
+      // point C in central infeasible area
+
+      if (*xl * *yl < wl) {
+	resxL = (*xl * *yu < wl) && updateBound (-1, xl, wl / *yu);
+	resyL = (*xu * *yl < wl) && updateBound (-1, yl, wl / *xu);
+      }
+    } else if (wl > -COUENNE_INFINITY) {
+
+      // the infeasible set is a hyperbola with two branches
+
+      // upper left
+      resxL = (*xl * *yl < wl) && (*yl > 0.) && updateBound (-1, xl, wl / *yl); // point C
+      resyU = (*xu * *yu < wl) && (*yu > 0.) && updateBound (+1, yu, wl / *xu); // point B
+
+      // lower right
+      resyL = (*xl * *yl < wl) && (*yl < 0.) && updateBound (-1, yl, wl / *xl); // point C
+      resxU = (*xu * *yu < wl) && (*yu < 0.) && updateBound (+1, xu, wl / *yu); // point B
+    }
+
+
+    // w's upper bound ///////////////////////////////////////////
+
+    if (wu >= 0.) {
+
+      if (wu < COUENNE_INFINITY) {
+	// the infeasible set is a hyperbola with two branches
+
+	// upper right
+	resxU = (*xu * *yl > wu) && (*yl > 0.) && updateBound (+1, xu, wu / *yl) || resxU; // point D
+	resyU = (*xl * *yu > wu) && (*yu > 0.) && updateBound (+1, yu, wu / *xl) || resyU; // point A
+
+	// lower left
+	resxL = (*xl * *yu > wu) && (*yu < 0.) && updateBound (-1, xl, wu / *yu) || resxL; // point A
+	resyL = (*xu * *yl > wu) && (*yl < 0.) && updateBound (-1, yl, wu / *xu) || resyL; // point D
+      }
+
+    } else {
+
+      // point D in central infeasible area
+
+      if (*xu * *yl > wu) {
+	resxU = (*xu * *yu > wu) && updateBound (+1, xu, wu / *yu) || resxU;
+	resyL = (*xl * *yl > wu) && updateBound (-1, yl, wu / *xl) || resyL;
+      }
+
+      // point A in central infeasible area
+
+      if (*xl * *yu > wu) {
+	resxL = (*xl * *yl > wu) && updateBound (-1, xl, wu / *yl) || resxL;
+	resyU = (*xu * *yu > wu) && updateBound (+1, yu, wu / *xu) || resyU;
+      }
+    }
+
+    bool
+      xInt = arglist_ [0] -> isInteger (),
+      yInt = arglist_ [1] -> isInteger ();
+
+    if (resxL) {chg [xi].setLower(t_chg_bounds::CHANGED); if (xInt) *xl = ceil  (*xl - COUENNE_EPS);}
+    if (resxU) {chg [xi].setUpper(t_chg_bounds::CHANGED); if (xInt) *xu = floor (*xu + COUENNE_EPS);}
+    if (resyL) {chg [yi].setLower(t_chg_bounds::CHANGED); if (yInt) *yl = ceil  (*yl - COUENNE_EPS);}
+    if (resyU) {chg [yi].setUpper(t_chg_bounds::CHANGED); if (yInt) *yu = floor (*yu + COUENNE_EPS);}
+
+    resL = resxL || resyL;
+    resU = resxU || resyU;
+  }
+
+  return (resL || resU);
+}
