@@ -200,6 +200,7 @@ namespace Bonmin
         }
       }
 
+#if 0
       // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
       const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
       if (!s.getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) 
@@ -255,7 +256,7 @@ namespace Bonmin
           delete objects[i];
         delete [] objects;
       }
-
+#endif
       //If Setup contains more objects add them to Cbc
       if (s.objects().size()) {
         CbcObject ** objects = new CbcObject *[s.objects().size()];
@@ -274,9 +275,8 @@ namespace Bonmin
       model_.addObjects (s.continuousSolver()->numberObjects(),
 			 s.continuousSolver()->objects());
 
-      if (usingCouenne_)// && model_. solver ()) 
-	// prevent duplicating object when copying in CbcModel.cpp
-	model_. solver () -> deleteObjects ();
+      // prevent duplicating object when copying in CbcModel.cpp
+      model_.solver()->deleteObjects();
     }
 
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
