@@ -96,10 +96,10 @@ namespace Bonmin
 #ifndef OLD_USEFULLNESS
       sortCrit_(rhs.sortCrit_),
 #endif
+      numberLookAhead_(rhs.numberLookAhead_),
       minNumberStrongBranch_(rhs.minNumberStrongBranch_),
       pseudoCosts_(rhs.pseudoCosts_),
-      trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_),
-      numberLookAhead_(rhs.numberLookAhead_)
+      trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_)
   {
     jnlst_ = rhs.jnlst_;
     handler_ = rhs.handler_->clone();
@@ -329,7 +329,9 @@ namespace Bonmin
       //AW : How could that ever happen?  Right now, all old content is deleted!
       //   assert(false && "Right now, all old content is deleted!");
       // redo useful arrays
+      int saveNumberBeforeTrusted = pseudoCosts_.numberBeforeTrusted();
       pseudoCosts_.initialize(numberObjects);
+      pseudoCosts_.setNumberBeforeTrusted(saveNumberBeforeTrusted);
     }
     double check = -COIN_DBL_MAX;
     int checkIndex=0;

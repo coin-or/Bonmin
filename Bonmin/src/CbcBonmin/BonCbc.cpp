@@ -350,7 +350,6 @@ namespace Bonmin
     model_.setNumberStrong(s.getIntParameter(BabSetupBase::NumberStrong));
 
     model_.setNumberBeforeTrust(s.getIntParameter(BabSetupBase::MinReliability));
-
     model_.setNumberPenalties(8);
 
     model_.setDblParam(CbcModel::CbcMaximumSeconds, s.getDoubleParameter(BabSetupBase::MaxTime));

@@ -25,7 +25,7 @@ namespace Bonmin
 
     /** Assignment operator const version.*/
     PseudoCosts & operator=(const PseudoCosts&rhs);
-
+#if 0
     /** Acces upTotalChange.*/
     inline double * upTotalChange()
     {
@@ -79,7 +79,7 @@ namespace Bonmin
     {
       return numberObjects_;
     }
-
+#endif
     /** Add a pseudo cost information.*/
     void addInfo(int way, double originalObj, double originalInfeas,
         double newObj, double newInfeas, int status);
