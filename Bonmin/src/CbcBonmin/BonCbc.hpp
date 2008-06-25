@@ -28,7 +28,7 @@ namespace Bonmin
     Bab();
     /** destructor.*/
     virtual ~Bab();
-    /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
+    /** Perform a branch-and-bound using given setup.*/
     virtual void branchAndBound(BabSetupBase & s);
 
     /**operator() performs the branchAndBound*/

@@ -635,6 +635,16 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
   return *this;
 }
 
+const SmartPtr<OptionsList> OsiTMINLPInterface::options() const
+{
+  if(!IsValid(app_)) {
+    messageHandler()->message(ERROR_NO_TNLPSOLVER, messages_)<<CoinMessageEol;
+    return NULL;
+  }
+  else
+    return app_->options();
+}
+
 SmartPtr<OptionsList> OsiTMINLPInterface::options()
 {
   if(!IsValid(app_)) {
@@ -1480,7 +1490,9 @@ OsiTMINLPInterface::getDblParam(OsiDblParam key, double& value) const
     retval = false;
     break;
   case OsiPrimalTolerance:
-    retval = false;
+    options()->GetNumericValue("tol", value,"");
+    value = 1e-07;
+    retval = true;
     break;
   case OsiObjOffset:
     retval = OsiSolverInterface::getDblParam(key, value);

@@ -96,10 +96,10 @@ namespace Bonmin
 #ifndef OLD_USEFULLNESS
       sortCrit_(rhs.sortCrit_),
 #endif
+      numberLookAhead_(rhs.numberLookAhead_),
       minNumberStrongBranch_(rhs.minNumberStrongBranch_),
       pseudoCosts_(rhs.pseudoCosts_),
-      trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_),
-      numberLookAhead_(rhs.numberLookAhead_)
+      trustStrongForPseudoCosts_(rhs.trustStrongForPseudoCosts_)
   {
     jnlst_ = rhs.jnlst_;
     handler_ = rhs.handler_->clone();

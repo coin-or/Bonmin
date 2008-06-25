@@ -13,31 +13,15 @@
 namespace Bonmin
 {
 
-  PseudoCosts::PseudoCosts()
+  PseudoCosts::PseudoCosts():
+    OsiPseudoCosts()
   {
-    upTotalChange_ = NULL;
-    downTotalChange_ = NULL;
-    upNumber_ = NULL;
-    downNumber_ = NULL;
-    numberObjects_ = 0;
-    numberBeforeTrusted_ = 0;
   }
 
   /** Copy constructor.*/
-  PseudoCosts::PseudoCosts(const PseudoCosts & rhs)
+  PseudoCosts::PseudoCosts(const PseudoCosts & rhs):
+   OsiPseudoCosts(rhs)
   {
-    upTotalChange_ = NULL;
-    downTotalChange_ = NULL;
-    upNumber_ = NULL;
-    downNumber_ = NULL;
-    numberObjects_ = rhs.numberObjects_;
-    numberBeforeTrusted_ = rhs.numberBeforeTrusted_;
-    if (numberObjects_ > 0) {
-      upTotalChange_ = CoinCopyOfArray(rhs.upTotalChange_,numberObjects_);
-      downTotalChange_ = CoinCopyOfArray(rhs.downTotalChange_,numberObjects_);
-      upNumber_ = CoinCopyOfArray(rhs.upNumber_,numberObjects_);
-      downNumber_ = CoinCopyOfArray(rhs.downNumber_,numberObjects_);
-    }
   }
 
 
@@ -46,18 +30,7 @@ namespace Bonmin
   PseudoCosts::operator=(const PseudoCosts&rhs)
   {
     if (this != &rhs) {
-      delete [] upTotalChange_;
-      delete [] downTotalChange_;
-      delete [] upNumber_;
-      delete [] downNumber_;
-      numberObjects_ = rhs.numberObjects_;
-      numberBeforeTrusted_ = rhs.numberBeforeTrusted_;
-      if (numberObjects_ > 0) {
-        upTotalChange_ = CoinCopyOfArray(rhs.upTotalChange_,numberObjects_);
-        downTotalChange_ = CoinCopyOfArray(rhs.downTotalChange_,numberObjects_);
-        upNumber_ = CoinCopyOfArray(rhs.upNumber_,numberObjects_);
-        downNumber_ = CoinCopyOfArray(rhs.downNumber_,numberObjects_);
-      }
+        OsiPseudoCosts::operator=(rhs);
     }
     return *this;
   }
