@@ -1480,6 +1480,7 @@ OsiTMINLPInterface::getDblParam(OsiDblParam key, double& value) const
     retval = false;
     break;
   case OsiPrimalTolerance:
+    value = 1e-07;
     retval = false;
     break;
   case OsiObjOffset:
