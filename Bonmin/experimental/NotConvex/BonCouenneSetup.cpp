@@ -156,14 +156,34 @@ namespace Bonmin{
       return;
     }
 
+    //int nSOS = couenneProb -> findSOS (ob);
+
     continuousSolver_ -> findIntegersAndSOS (false);
+    addSos (); // only adds embedded SOS objects
+
+    // Add Couenne SOS ///////////////////////////////////////////////////////////////
+
+    std::string s;
+
+    options () -> GetStringValue ("enable_sos", s, "couenne.");
+
+    if (s == "yes") {
+
+      int nSOS = 0;
+      OsiObject ** objects = new OsiObject* [couenneProb -> nVars ()];
+
+      nSOS = couenneProb -> findSOS (nonlinearSolver (), objects);
+      nonlinearSolver () -> addObjects (nSOS, objects);
+
+      for (int i=0; i<nSOS ; i++)
+	delete objects [i];
+      delete [] objects;
+    }
 
     //model -> assignSolver (continuousSolver_, true);
     //continuousSolver_ = model -> solver();
 
-    // add Couenne objects for branching /////////////////////////////////////////////
-
-    std::string s;
+    // Add Couenne objects for branching /////////////////////////////////////////////
 
     options () -> GetStringValue ("display_stats", s, "couenne.");
     displayStats_ = (s == "yes");
@@ -183,9 +203,12 @@ namespace Bonmin{
     int nAuxs = 0, nobj = 0,
       nVars = couenneProb -> nVars ();
 
+    OsiObject ** objects;
+
     nAuxs = couenneProb -> nVars ();
 
-    OsiObject ** objects = new OsiObject* [nAuxs];
+    //OsiObject ** 
+    objects = new OsiObject* [nAuxs];
 
     for (int i = 0; i < nVars; i++) { // for each variable
 
