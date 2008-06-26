@@ -154,6 +154,7 @@ Couenne/src/problem/CouenneLPtightenBounds.cpp -text
 Couenne/src/problem/CouenneProblem.cpp -text
 Couenne/src/problem/CouenneProblem.hpp -text
 Couenne/src/problem/CouenneProblemElem.hpp -text
+Couenne/src/problem/CouenneSOS.cpp -text
 Couenne/src/problem/CouenneSolverInterface.cpp -text
 Couenne/src/problem/CouenneSolverInterface.hpp -text
 Couenne/src/problem/checkNLP.cpp -text

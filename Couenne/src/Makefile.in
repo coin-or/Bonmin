@@ -146,7 +146,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	problem/CouenneSolverInterface.cpp \
 	problem/CouenneLPtightenBounds.cpp problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp problem/testIntFix.cpp \
-	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
+	problem/CouenneSOS.cpp problem/depGraph/depGraph.cpp \
+	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
 	bound_tightening/aggressiveBT.cpp \
 	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
@@ -193,8 +194,8 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
 	constraint.lo fillQuadIndices.lo fillDependence.lo \
 	CouenneSolverInterface.lo CouenneLPtightenBounds.lo \
-	checkNLP.lo getIntegerCandidate.lo testIntFix.lo depGraph.lo \
-	checkCycles.lo boundTightening.lo aggressiveBT.lo \
+	checkNLP.lo getIntegerCandidate.lo testIntFix.lo CouenneSOS.lo \
+	depGraph.lo checkCycles.lo boundTightening.lo aggressiveBT.lo \
 	fake_tightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
 	impliedBounds.lo impliedBounds-mul.lo impliedBounds-sum.lo \
 	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
@@ -482,7 +483,8 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	problem/CouenneSolverInterface.cpp \
 	problem/CouenneLPtightenBounds.cpp problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp problem/testIntFix.cpp \
-	problem/depGraph/depGraph.cpp problem/depGraph/checkCycles.cpp \
+	problem/CouenneSOS.cpp problem/depGraph/depGraph.cpp \
+	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \
 	bound_tightening/aggressiveBT.cpp \
 	bound_tightening/fake_tightening.cpp bound_tightening/obbt.cpp \
@@ -692,6 +694,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneLPtightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneProblem.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneSOS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneSolverInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneThreeWayBranchObj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneVarObject.Plo@am__quote@
@@ -1512,6 +1515,13 @@ testIntFix.lo: problem/testIntFix.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/testIntFix.cpp' object='testIntFix.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o testIntFix.lo `test -f 'problem/testIntFix.cpp' || echo '$(srcdir)/'`problem/testIntFix.cpp
+
+CouenneSOS.lo: problem/CouenneSOS.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneSOS.lo -MD -MP -MF "$(DEPDIR)/CouenneSOS.Tpo" -c -o CouenneSOS.lo `test -f 'problem/CouenneSOS.cpp' || echo '$(srcdir)/'`problem/CouenneSOS.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CouenneSOS.Tpo" "$(DEPDIR)/CouenneSOS.Plo"; else rm -f "$(DEPDIR)/CouenneSOS.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='problem/CouenneSOS.cpp' object='CouenneSOS.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneSOS.lo `test -f 'problem/CouenneSOS.cpp' || echo '$(srcdir)/'`problem/CouenneSOS.cpp
 
 depGraph.lo: problem/depGraph/depGraph.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT depGraph.lo -MD -MP -MF "$(DEPDIR)/depGraph.Tpo" -c -o depGraph.lo `test -f 'problem/depGraph/depGraph.cpp' || echo '$(srcdir)/'`problem/depGraph/depGraph.cpp; \

@@ -424,6 +424,9 @@ class CouenneProblem {
   const std::vector <CouenneObject> &Objects () const
   {return objects_;}
 
+  /// find SOS constraints in problem
+  int findSOS (OsiSolverInterface *solver, OsiObject ** objects);
+
 protected:
 
   /// single fake tightening. Return
