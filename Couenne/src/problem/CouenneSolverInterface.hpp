@@ -14,6 +14,7 @@
 #include "OsiClpSolverInterface.hpp"
 #include "CouenneCutGenerator.hpp"
 
+class ClpSimplex;
 
 /// Solver interface class with a pointer to a Couenne cut
 /// generator. Its main purposes are:
@@ -81,7 +82,12 @@ public:
   /// tighten bounds on all variables (including continuous)
   virtual int tightenBounds (int lightweight);
 
+  /// Returns pointer to CLP structure
+  ClpSimplex *continuousModel ()
+  {return continuousModel_;}
+
 private:
+
   /// The pointer to the Couenne cut generator. Gives us a lot of
   /// information, for instance the nlp solver pointer, and the chance
   /// to do bound tightening before resolve ().

@@ -28,9 +28,6 @@ int CouenneProblem::findSOS (OsiSolverInterface *solver,
 	((*v) -> Type         () == AUX) &&
 	((*v) -> Image () -> code () == COU_EXPRGROUP)) {
 
-      //(*v) -> print (); printf (" ..... ");
-      //(*v) -> Image () -> print (); printf ("\n");
-
       exprGroup *group = dynamic_cast <exprGroup *> ((*v) -> Image ());
 
       if (!group)
@@ -86,10 +83,8 @@ int CouenneProblem::findSOS (OsiSolverInterface *solver,
 	continue;
 
       /*printf ("----- found SOS: ");
-      (*v) -> print ();
-      printf (" := ");
-      (*v) -> Image () -> print ();
-      printf ("\n");*/
+      (*v) -> print (); printf (" := ");
+      (*v) -> Image () -> print (); printf ("\n");*/
 
       // it a SOS -- if intSOS==true, it's also integer
 
@@ -106,6 +101,8 @@ int CouenneProblem::findSOS (OsiSolverInterface *solver,
 
       OsiSOS *newsos = new OsiSOS (solver, nelem, indices, NULL, 1);
       objects [nSOS] = newsos;
+      // as in BonBabSetupBase.cpp:675
+      newsos -> setPriority (10);
       newsos -> setIntegerValued (intSOS);
 
       nSOS++;

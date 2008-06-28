@@ -79,6 +79,10 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// Time spent at the root node
   mutable double rootTime_;
 
+  /// Check all generated LPs through an independent call to
+  /// OsiClpSolverInterface::initialSolve()
+  bool check_lp_;
+
  public:
 
   /// constructor
@@ -222,6 +226,10 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// Time spent at root node
   double &rootTime ()
   {return rootTime_;}
+
+  /// return check_lp flag (used in CouenneSolverInterface)
+  bool check_lp ()
+  {return check_lp_;}
 };
 
 #endif
