@@ -28,10 +28,19 @@ namespace Bonmin
     BonminSetup();
     /** Copy constructor. */
     BonminSetup(const BonminSetup & other);
+
+    /** Copy but uses an other nlp.*/
+    BonminSetup(const BonminSetup &setup,
+                OsiTMINLPInterface &nlp);
+
     /** virtual copy constructor. */
     virtual BabSetupBase * clone() const
     {
       return new BonminSetup(*this);
+    }
+    /** Make a copy with solver replace by one passed .*/
+    virtual BabSetupBase *clone(OsiTMINLPInterface&nlp)const{
+      return new BonminSetup(*this, nlp);
     }
     virtual ~BonminSetup()
     {}

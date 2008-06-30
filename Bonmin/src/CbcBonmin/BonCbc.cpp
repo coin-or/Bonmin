@@ -151,9 +151,9 @@ namespace Bonmin
 
     for (BabSetupBase::HeuristicMethods::iterator i = s.heuristics().begin() ;
         i != s.heuristics().end() ; i++) {
-      CbcHeuristic * heu = *i;
+      CbcHeuristic * heu = i->heuristic;
       heu->setModel(&model_);
-      model_.addHeuristic(*i);
+      model_.addHeuristic(heu, i->id.c_str());
     }
 
 
@@ -272,11 +272,11 @@ namespace Bonmin
       replaceIntegers(model_.objects(), model_.numberObjects());
     }
     else {//Pass in objects to Cbc
-      model_.addObjects (s.continuousSolver()->numberObjects(),
-			 s.continuousSolver()->objects());
+      //model_.addObjects (s.continuousSolver()->numberObjects(),
+      //                   s.continuousSolver()->objects());
 
       // prevent duplicating object when copying in CbcModel.cpp
-      model_.solver()->deleteObjects();
+      //model_.solver()->deleteObjects();
     }
 
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
@@ -476,7 +476,6 @@ namespace Bonmin
        if (true&&!generator->numberCutsInTotal())
 	continue;
       CoinMessageHandler * cbc_handler = model_.messageHandler();
-      const CoinMessages & cbc_messages = model_.messages();
       int cbc_log_level = model_.logLevel();
       FILE * fp = cbc_handler->filePointer();
       if(cbc_log_level >= 1) {
@@ -497,8 +496,6 @@ namespace Bonmin
 
     if (hasFailed) {
       CoinMessageHandler * cbc_handler = model_.messageHandler();
-      const CoinMessages & cbc_messages = model_.messages();
-      int cbc_log_level = model_.logLevel();
       FILE * fp = cbc_handler->filePointer();
       fprintf(fp,
      "************************************************************\n"
