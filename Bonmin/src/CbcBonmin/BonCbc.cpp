@@ -171,6 +171,7 @@ namespace Bonmin
     bool ChangedObject = false;
     //Pass over user set branching priorities to Cbc
     if (s.continuousSolver()->objects()==NULL) {
+      assert (s.branchingMethod() == NULL);
       const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
       //set priorities, prefered directions...
       const int * priorities = nlpSolver->getPriorities();
@@ -200,7 +201,7 @@ namespace Bonmin
         }
       }
 
-#if 0
+#if 1
       // Now pass user set Sos constraints (code inspired from CoinSolve.cpp)
       const TMINLP::SosInfo * sos = s.nonlinearSolver()->model()->sosConstraints();
       if (!s.getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) 
@@ -272,13 +273,21 @@ namespace Bonmin
       replaceIntegers(model_.objects(), model_.numberObjects());
     }
     else {//Pass in objects to Cbc
-      if (usingCouenne_) {
-	model_.addObjects (s.continuousSolver()->numberObjects(),
+    // Redundant definition of default branching (as Default == User)
+    assert (s.branchingMethod() != NULL);
+    model_.addObjects (s.continuousSolver()->numberObjects(),
 			   s.continuousSolver()->objects());
 
+    CbcBranchDefaultDecision branch;
+    s.branchingMethod()->setSolver(model_.solver());
+    BonChooseVariable * strong2 = dynamic_cast<BonChooseVariable *>(s.branchingMethod());
+    if (strong2)
+      strong2->setCbcModel(&model_);
+    branch.setChooseMethod(*s.branchingMethod());
+
+    model_.setBranchingMethod(&branch);
 	// prevent duplicating object when copying in CbcModel.cpp
 	model_.solver()->deleteObjects();
-      }
     }
 
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
@@ -363,17 +372,6 @@ namespace Bonmin
     model_.setIntegerTolerance(s.getDoubleParameter(BabSetupBase::IntTol));
 
 
-    // Redundant definition of default branching (as Default == User)
-    if (s.branchingMethod() != NULL) {
-      CbcBranchDefaultDecision branch;
-      s.branchingMethod()->setSolver(model_.solver());
-      BonChooseVariable * strong2 = dynamic_cast<BonChooseVariable *>(s.branchingMethod());
-      if (strong2)
-        strong2->setCbcModel(&model_);
-      branch.setChooseMethod(*s.branchingMethod());
-
-      model_.setBranchingMethod(&branch);
-    }
 
     //Get objects from model_ if it is not null means there are some sos constraints or non-integer branching object
     // pass them to cut generators.
@@ -482,11 +480,11 @@ namespace Bonmin
       FILE * fp = cbc_handler->filePointer();
       if(cbc_log_level >= 1) {
 	fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
-		generator->cutGeneratorName(),
-		generator->numberTimesEntered(),
-		generator->numberCutsInTotal()+
-		generator->numberColumnCuts(),
-		generator->numberCutsActive());
+               generator->cutGeneratorName(),
+               generator->numberTimesEntered(),
+               generator->numberCutsInTotal()+
+               generator->numberColumnCuts(),
+               generator->numberCutsActive());
         if (generator->timing()) {
           fprintf(fp, " (%.3f seconds)\n",generator->timeInCutGenerator());
         }
