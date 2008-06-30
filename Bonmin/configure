@@ -23938,7 +23938,7 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile experimental/FP/Makefile experimental/NotConvex/Makefile examples/OptionDocGen/Makefile test/Makefile examples/CppExample/Makefile"
+                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile src/CbcBonmin/Heuristics/Makefile experimental/FP/Makefile experimental/NotConvex/Makefile examples/OptionDocGen/Makefile test/Makefile examples/CppExample/Makefile"
 
 
           ac_config_headers="$ac_config_headers inc/config_bonmin.h"
@@ -24740,6 +24740,7 @@ do
   "src/Algorithms/Ampl/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Algorithms/Ampl/Makefile" ;;
   "src/Algorithms/Branching/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Algorithms/Branching/Makefile" ;;
   "src/Algorithms/OaGenerators/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Algorithms/OaGenerators/Makefile" ;;
+  "src/CbcBonmin/Heuristics/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/CbcBonmin/Heuristics/Makefile" ;;
   "experimental/FP/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/FP/Makefile" ;;
   "experimental/NotConvex/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/NotConvex/Makefile" ;;
   "examples/OptionDocGen/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/OptionDocGen/Makefile" ;;

@@ -49,6 +49,11 @@ int main (int argc, char *argv[])
   of.open("options_list_filter_content.tex");
   bonmin.roptions()->writeLatexHtmlDoc(of, Bonmin::RegisteredOptions::FilterCategory);
   of.close();
+
+  of.open("latex_table.tex");
+  bonmin.roptions()->writeLatexOptionsTable(of, Bonmin::RegisteredOptions::BonminCategory);
+  of.close();
+
   of.open("bonmin.opt");
   bonmin.roptions()->writeBonminOpt(of, Bonmin::RegisteredOptions::BonminCategory);
   return 0;

@@ -147,8 +147,10 @@ namespace Bonmin{
       /// setup initial heuristic (in principle it should only run once...)
       InitHeuristic* initHeuristic = new InitHeuristic 
 	(ci -> getObjValue (), ci -> getColSolution (), *couenneProb);
-
-      heuristics_.push_back(initHeuristic);
+      HeuristicMethod h;
+      h.id = "Initial nlp";
+      h.heuristic = initHeuristic;
+      heuristics_.push_back(h);
     }
 
     if(extraStuff->infeasibleNode()){
@@ -306,7 +308,10 @@ namespace Bonmin{
       //nlpHeuristic->setMaxNlpInf(1e-4);
       nlpHeuristic->setMaxNlpInf(maxNlpInf_0);
       nlpHeuristic->setNumberSolvePerLevel(numSolve);
-      heuristics_.push_back(nlpHeuristic);
+      HeuristicMethod h;
+      h.id = "nlp solve";
+      h.heuristic = nlpHeuristic;
+      heuristics_.push_back(h);
     }
 
     int varSelection;

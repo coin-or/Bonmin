@@ -195,6 +195,7 @@ AC_CONFIG_FILES([Makefile
                  src/Algorithms/Ampl/Makefile
                  src/Algorithms/Branching/Makefile
                  src/Algorithms/OaGenerators/Makefile
+                 src/CbcBonmin/Heuristics/Makefile
                  experimental/FP/Makefile
                  experimental/NotConvex/Makefile
                  examples/OptionDocGen/Makefile

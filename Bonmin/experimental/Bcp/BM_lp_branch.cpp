@@ -843,7 +843,7 @@ BM_lp::bbBranch(OsiBranchingInformation& brInfo,
 
   Ipopt::SmartPtr<Ipopt::OptionsList> options = bonmin_.options();
   int numSB = 0;
-  const bool sbIsSet =
+  //const bool sbIsSet =
     options->GetIntegerValue("number_strong_branch",numSB,"bonmin.");
   int numSBroot = 0;
   const bool sbRootIsSet =
