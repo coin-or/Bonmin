@@ -158,8 +158,6 @@ namespace Bonmin{
       return;
     }
 
-    //int nSOS = couenneProb -> findSOS (ob);
-
     continuousSolver_ -> findIntegersAndSOS (false);
     addSos (); // only adds embedded SOS objects
 

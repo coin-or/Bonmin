@@ -272,11 +272,13 @@ namespace Bonmin
       replaceIntegers(model_.objects(), model_.numberObjects());
     }
     else {//Pass in objects to Cbc
-      //model_.addObjects (s.continuousSolver()->numberObjects(),
-      //                   s.continuousSolver()->objects());
+      if (usingCouenne_) {
+	model_.addObjects (s.continuousSolver()->numberObjects(),
+			   s.continuousSolver()->objects());
 
-      // prevent duplicating object when copying in CbcModel.cpp
-      //model_.solver()->deleteObjects();
+	// prevent duplicating object when copying in CbcModel.cpp
+	model_.solver()->deleteObjects();
+      }
     }
 
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
@@ -446,7 +448,7 @@ namespace Bonmin
     // to get node parent info in Cbc, pass parameter 3.
     //model_.branchAndBound(3);
     model_.branchAndBound();
-
+    
     numNodes_ = model_.getNodeCount();
     bestObj_ = model_.getObjValue();
     bestBound_ = model_.getBestPossibleObjValue();
@@ -479,12 +481,12 @@ namespace Bonmin
       int cbc_log_level = model_.logLevel();
       FILE * fp = cbc_handler->filePointer();
       if(cbc_log_level >= 1) {
-        fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
-                generator->cutGeneratorName(),
-                generator->numberTimesEntered(),
-                generator->numberCutsInTotal()+
-                generator->numberColumnCuts(),
-                generator->numberCutsActive());
+	fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
+		generator->cutGeneratorName(),
+		generator->numberTimesEntered(),
+		generator->numberCutsInTotal()+
+		generator->numberColumnCuts(),
+		generator->numberCutsActive());
         if (generator->timing()) {
           fprintf(fp, " (%.3f seconds)\n",generator->timeInCutGenerator());
         }
