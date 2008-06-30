@@ -34,7 +34,9 @@ namespace Bonmin {
   int
   FixAndSolveHeuristic::solution(double & objectiveValue,
                                  double * newSolution){
-    if(model_->getNodeCount() || model_->getCurrentPassNumber()) return 0;
+    printf("I am here\n");
+    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    printf("I went there\n");
     int numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
@@ -61,8 +63,8 @@ namespace Bonmin {
       "fix_and_solve_heuristic",
       "if yes runs a heuristic at root where fixes all variables integer in the continuous solution",
       "no",
-      "yes", "runs the heuristic",
       "no", "don't run it",
+      "yes", "runs the heuristic",
       "");
    }
 

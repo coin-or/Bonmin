@@ -418,6 +418,7 @@ namespace Bonmin
     Index doFixAndSolve = false;
     options()->GetEnumValue("fix_and_solve_heuristic",doFixAndSolve,"bonmin.");
     if(doFixAndSolve){
+     printf("Adding heuristic\n");
       FixAndSolveHeuristic* fix_and_solve = new FixAndSolveHeuristic(this);
       HeuristicMethod h;
       h.heuristic = fix_and_solve;
