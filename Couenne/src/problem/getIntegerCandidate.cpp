@@ -8,7 +8,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
-#include "CoinHelperFunctions.hpp"
+#include "CoinTime.hpp"
 #include "CouenneProblem.hpp"
 
 // lose patience after this many iterations of non-improving valid
