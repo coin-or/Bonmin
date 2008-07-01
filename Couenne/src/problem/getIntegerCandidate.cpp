@@ -128,6 +128,9 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
       if (*rNum > 0) {
 
+	if (CoinCpuTime () > maxCpuTime_)
+	  break;
+
 	// *rNum is the number of variable with integer rank equal to rank
 
 	// start restricting around current integer box
@@ -179,6 +182,9 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 		(integerRank_ [i] == rank)       && // at this rank
 		(fixed [i] == UNFIXED)           && // still to be fixed
 		Var (i) -> isInteger ()) {          // and integer
+
+	      if (CoinCpuTime () > maxCpuTime_)
+		break;
 
 	      // check if initAuxs() closed any bound; if so, fix variable
 	      //if (Lb (i) == Ub (i)) { // doesn't work
