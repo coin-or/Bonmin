@@ -34,11 +34,11 @@ int CouenneProblem::findSOS (OsiSolverInterface *solver,
 	continue;
 
       int wind = (*v) -> Index ();
-      CouNumber cterm = group ? group -> getc0 () : 0.;
+      CouNumber cterm = group -> getc0 ();
       bool defVar = true;
 
-      if (fabs (cterm - 1.) < COUENNE_EPS) defVar = false;
-      else if (fabs (cterm) > COUENNE_EPS) continue; // and defVar is true
+      if      (fabs (cterm - 1.) < COUENNE_EPS) defVar = false;
+      else if (fabs (cterm)      > COUENNE_EPS) continue; // and defVar is true
 
       if (defVar &&
 	  ((fabs (Lb (wind) - 1.) > COUENNE_EPS) ||
@@ -51,7 +51,7 @@ int CouenneProblem::findSOS (OsiSolverInterface *solver,
 
       int lsz = group -> lcoeff (). size ();
 
-      if (((lsz <= 2) && defVar) ||
+      if (((lsz <= 2) &&  defVar) ||
 	  ((lsz <= 1) && !defVar))
 	continue;
 
@@ -79,14 +79,14 @@ int CouenneProblem::findSOS (OsiSolverInterface *solver,
 	  if (!(l -> first -> isInteger ()))
 	    intSOS = false;
 
-      if (!isSOS) 
+      if (!isSOS || !intSOS) 
 	continue;
 
       /*printf ("----- found SOS: ");
       (*v) -> print (); printf (" := ");
       (*v) -> Image () -> print (); printf ("\n");*/
 
-      // it a SOS -- if intSOS==true, it's also integer
+      // it is a SOS -- if intSOS==true, it's also integer
 
       int
 	indStart = defVar ? 0 : 1,
@@ -96,8 +96,8 @@ int CouenneProblem::findSOS (OsiSolverInterface *solver,
       if (!defVar)
 	indices [0] = (*v) -> Index ();
 
-      for (int i=indStart; i<nelem; i++)
-	indices [i] = lcoe [i-indStart]. first -> Index ();
+      for (int i=indStart, j=0; i<nelem; i++)
+	indices [i] = lcoe [j++]. first -> Index ();
 
       OsiSOS *newsos = new OsiSOS (solver, nelem, indices, NULL, 1);
       objects [nSOS] = newsos;

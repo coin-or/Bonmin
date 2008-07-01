@@ -64,7 +64,8 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
 
     CouNumber bd;
 
-    if (((bd = newLow [index]) > oldLow [index] + COUENNE_EPS) || firstcall_) { // lower
+    if ((((bd = newLow [index]) > oldLow [index] + COUENNE_EPS) || firstcall_) // better lb?
+	&& (bd > -COUENNE_INFINITY / 10)) {                                    // finite?
 
       //printf ("chging low %d %g -> %g\n", index, oldLow [index], newLow [index]);
       if (problem_ -> Var (index) -> isInteger ()) 
@@ -73,7 +74,8 @@ void CouenneCutGenerator::genColCuts (const OsiSolverInterface &si,
       bndLow [nLow++] = bd;
     }
 
-    if (((bd = newUpp [index]) < oldUpp [index] - COUENNE_EPS) || firstcall_) { // upper
+    if ((((bd = newUpp [index]) < oldUpp [index] - COUENNE_EPS) || firstcall_) // better ub?
+	&& (bd < COUENNE_INFINITY / 10)) {                                     // finite?
 
       //printf ("chging upp %d %g -> %g\n", index, oldUpp [index], newUpp [index]);
       if (problem_ -> Var (index) -> isInteger ()) 

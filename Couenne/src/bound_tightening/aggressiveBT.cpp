@@ -5,7 +5,7 @@
  *          exclude parts of the solution space through fathoming on
  *          bounds/infeasibility
  *
- * (C) Carnegie-Mellon University, 2007.
+ * (C) Carnegie-Mellon University, 2007-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -176,6 +176,9 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
     // scan all variables
     for (int i=0; i<ncols; i++) {
+
+      if (CoinCpuTime () > maxCpuTime_)
+	break;
 
       int index = evalOrder (i);
 

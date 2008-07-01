@@ -7,6 +7,7 @@
  * This file is licensed under the Common Public License (CPL)
  */
 
+#include "CoinHelperFunctions.hpp"
 #include "CglCutGenerator.hpp"
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
@@ -38,6 +39,10 @@ int CouenneProblem::call_iter (CouenneSolverInterface *csi,
       nimprov = 0;
 
   for (int ii=0; ii<ncols; ii++) {
+
+    if (CoinCpuTime () > maxCpuTime_)
+      break;
+
     int i = evalOrder (ii);
 
     if ((Var (i) -> Type () == type) &&
@@ -167,6 +172,9 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
     while (!notImproved && 
 	   (nIter++ < MAX_OBBT_ITER) &&
 	   ((nImprov = obbtInner (csi, cs, chg_bds, babInfo)) > 0)) {
+
+      if (CoinCpuTime () > maxCpuTime_)
+	break;
 
       int nchanged, *changed = NULL;
 

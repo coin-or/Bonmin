@@ -15,7 +15,9 @@
 // tightening (step 1)
 #define VALID_ONLY_THRESHOLD 5 
 
-/// generate integer NLP point xInt starting from fractional solution
+/// GRASP for finding integer feasible solutions
+///
+/// Generate integer NLP point xInt starting from fractional solution
 /// xFrac, using (feasibility-based, i.e. cheap) bound tightening
 ///
 /// return -1 if the problem is infeasible
@@ -103,150 +105,155 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
       printf ("= BEGIN ===========================================\n");
       printf ("=       ===========================================\n");
       for (int i=0; i<nOrig_; i++)
-	printf ("#### %4d: %d %c %2d frac %20g  [%20g,%20g]\n", 
-		i, fixed [i], 
-		variables_ [i] -> isInteger () ? 'I' : ' ',
-		integerRank_ ? integerRank_ [i] : -1,
-		xFrac [i], Lb (i), Ub (i));
+	if (variables_ [i] -> Multiplicity () > 0)
+	  printf ("#### %4d: %d %c %2d frac %20g  [%20g,%20g]\n", 
+		  i, fixed [i], 
+		  variables_ [i] -> isInteger () ? 'I' : ' ',
+		  integerRank_ ? integerRank_ [i] : -1,
+		  xFrac [i], Lb (i), Ub (i));
       printf ("---\n");
       for (int i=nOrig_; i<nVars (); i++)
-	printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
-		i, variables_ [i] -> isInteger () ? 'I' : ' ',
-		//(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
-		X (i), Lb (i), Ub (i));
+	if (variables_ [i] -> Multiplicity () > 0)
+	  printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
+		  i, variables_ [i] -> isInteger () ? 'I' : ' ',
+		  //(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
+		  X (i), Lb (i), Ub (i));
       printf ("===================================================\n");
       printf ("===================================================\n");
       printf ("===================================================\n");
     }
 
     for (std::vector <int>::iterator rNum = numberInRank_.begin(); 
-	 ++rNum != numberInRank_.end(); rank++) {
+	 ++rNum != numberInRank_.end(); rank++) 
 
-      // *rNum is the number of variable with integer rank equal to rank
+      if (*rNum > 0) {
 
-      // start restricting around current integer box
-      for (int i=0; i<nOrig_; i++) 
-	if ((Var (i) -> isInteger    ())     && // integer, may fix if not dependent on other integers
-	    (Var (i) -> Multiplicity () > 0) && // alive variable
-	    (integerRank_ [i] == rank)) {
+	// *rNum is the number of variable with integer rank equal to rank
 
-	  Lb (i) = CoinMax (Lb (i), floor (xFrac [i])); 
-	  Ub (i) = CoinMin (Ub (i), ceil  (xFrac [i]));
-	}
-
-      // translate current NLP point+bounds into higher-dimensional space
-      initAuxs ();
-
-      if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
-	printf ("= RANK LEVEL = %d [%d] ==================================\n", rank, *rNum);
-	for (int i=0; i<nOrig_; i++)
-	  if (Var (i) -> Multiplicity () > 0) // alive variable
-	    printf ("#### %4d: %d %c %2d frac %20g -> int %20g [%20g,%20g]\n", 
-		    i, fixed [i], 
-		    variables_ [i] -> isInteger () ? 'I' : ' ',
-		    integerRank_ ? integerRank_ [i] : -1,
-		    xFrac [i], xInt [i], Lb (i), Ub (i));
-	printf ("--------------------\n");
-	for (int i=nOrig_; i<nVars (); i++)
-	  if (Var (i) -> Multiplicity () > 0) // alive variable
-	    printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
-		    i, variables_ [i] -> isInteger () ? 'I' : ' ',
-		    //(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
-		    X (i), Lb (i), Ub (i));
-	printf ("=================================================\n");
-      }
-
-      //CoinCopyN (xFrac, nOrig_, xInt);// TODO: re-copy first nOrig_ variables into xInt?
-
-      int 
-	remaining = *rNum,
-	ntrials   = 0, 
-	maxtrials = 3;// rNum / divider;
-
-      do {
-
-	bool one_fixed = false;
-
+	// start restricting around current integer box
 	for (int i=0; i<nOrig_; i++) 
+	  if ((Var (i) -> Multiplicity () > 0) && // alive variable
+	      (Var (i) -> isInteger    ())     && // integer, may fix if independent of other integers
+	      (integerRank_ [i] == rank)) {
 
-	  if ((Var (i) -> isInteger ()) &&        // integer
-	      (Var (i) -> Multiplicity () > 0) && // alive 
-	      (integerRank_ [i] == rank) &&       // at this rank
-	      (fixed [i] == UNFIXED)) {           // and still to be fixed
-
-	    // check if initAuxs() closed any bound; if so, fix variable
-	    //if (Lb (i) == Ub (i)) { // doesn't work
-	    if (ceil (Lb (i) - COUENNE_EPS) + COUENNE_EPS >= floor (Ub (i) + COUENNE_EPS)) {
-
-	      X (i) = xInt [i] = ceil (Lb (i) - COUENNE_EPS);
-	      fixed [i] = FIXED;
-	      one_fixed = true;
-	      --remaining;
-	      continue;
-	    }
-
-	    // otherwise, test rounding up and down
-	    int result = testIntFix (i, xFrac [i], fixed, xInt,
-				     dualL, dualR, olb, oub, ntrials < maxtrials);
-
-	    jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
-			      "testing %d [%g -> %g], res = %d\n", i, xFrac [i], xInt [i], result);
-
-	    if (result > 0) {
-	      one_fixed = true;
-	      --remaining;
-	    } else if (result < 0) 
-	      throw infeasible;
+	    Lb (i) = CoinMax (Lb (i), floor (xFrac [i])); 
+	    Ub (i) = CoinMin (Ub (i), ceil  (xFrac [i]));
 	  }
 
-	// if none fixed, fix first unfixed variable with this rank
-
-	if (!one_fixed) {
-
-	  int index = 0;
-
-	  // find first unfixed integer at this rank
-	  while ((index < nOrig_) && 
-		 (!(Var (index) -> isInteger ()) ||
-		  (integerRank_ [index] != rank) ||
-		  (fixed [index] != UNFIXED)))
-	    index++;
-
-	  assert (index < nOrig_);
-
-	  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
-			    "none fixed, fix %d from %g [%g,%g] [L=%g, R=%g]", 
-			    index, xFrac [index], Lb (index), Ub (index), 
-			    dualL [index], dualR [index]);
-
-	  Lb (index) = Ub (index) = X (index) = xInt [index] = 
-	    ((dualL [index] < dualR [index] - COUENNE_EPS) ? floor (xFrac [index]) :
-	     (dualL [index] > dualR [index] + COUENNE_EPS) ? ceil  (xFrac [index]) :
-	     ((CoinDrand48 () > xFrac [index] - floor (xFrac [index])) ? 
-	      floor (xFrac [index]) : ceil (xFrac [index])));
-
-	  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, " to %g\n", xInt [index]);
-
-	  fixed [index] = FIXED;
-
-	  --remaining;
-	}
-
-	ntrials++;
+	// translate current NLP point+bounds into higher-dimensional space
+	initAuxs ();
 
 	if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
-	  printf ("--- remaining = %d --------------------------- \n", remaining);
+	  printf ("= RANK LEVEL = %d [%d] ==================================\n", rank, *rNum);
 	  for (int i=0; i<nOrig_; i++)
-	    printf ("#### %4d: %d %c %2d frac %20g -> int %20g  [%20g,%20g]\n", 
-		    i, fixed [i], 
-		    variables_ [i] -> isInteger () ? 'I' : ' ',
-		    integerRank_ ? integerRank_ [i] : -1,
-		    xFrac [i], xInt [i], Lb (i), Ub (i));
-	  printf ("---------------------------\n");
-
+	    if (Var (i) -> Multiplicity () > 0) // alive variable
+	      printf ("#### %4d: %d %c %2d frac %20g -> int %20g [%20g,%20g]\n", 
+		      i, fixed [i], 
+		      variables_ [i] -> isInteger () ? 'I' : ' ',
+		      integerRank_ ? integerRank_ [i] : -1,
+		      xFrac [i], xInt [i], Lb (i), Ub (i));
+	  printf ("--------------------\n");
+	  for (int i=nOrig_; i<nVars (); i++)
+	    if (Var (i) -> Multiplicity () > 0) // alive variable
+	      printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
+		      i, variables_ [i] -> isInteger () ? 'I' : ' ',
+		      //(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
+		      X (i), Lb (i), Ub (i));
+	  printf ("=================================================\n");
 	}
-      } while (remaining > 0);
-    } // for
+
+	//CoinCopyN (xFrac, nOrig_, xInt);// TODO: re-copy first nOrig_ variables into xInt?
+
+	int 
+	  remaining = *rNum,
+	  ntrials   = 0, 
+	  maxtrials = 3;// rNum / divider;
+
+	do {
+
+	  bool one_fixed = false;
+
+	  for (int i=0; i<nOrig_; i++) 
+
+	    if ((Var (i) -> Multiplicity () > 0) && // alive 
+		(integerRank_ [i] == rank)       && // at this rank
+		(fixed [i] == UNFIXED)           && // still to be fixed
+		Var (i) -> isInteger ()) {          // and integer
+
+	      // check if initAuxs() closed any bound; if so, fix variable
+	      //if (Lb (i) == Ub (i)) { // doesn't work
+	      if (ceil (Lb (i) - COUENNE_EPS) + COUENNE_EPS >= floor (Ub (i) + COUENNE_EPS)) {
+
+		X (i) = xInt [i] = ceil (Lb (i) - COUENNE_EPS);
+		fixed [i] = FIXED;
+		one_fixed = true;
+		--remaining;
+		continue;
+	      }
+
+	      // otherwise, test rounding up and down
+	      int result = testIntFix (i, xFrac [i], fixed, xInt,
+				       dualL, dualR, olb, oub, ntrials < maxtrials);
+
+	      jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
+				"testing %d [%g -> %g], res = %d\n", i, xFrac [i], xInt [i], result);
+
+	      if (result > 0) {
+		one_fixed = true;
+		--remaining;
+	      } else if (result < 0) 
+		throw infeasible;
+	    }
+
+	  // if none fixed, fix first unfixed variable with this rank
+
+	  if (!one_fixed) {
+
+	    int index = 0;
+
+	    // find first unfixed integer at this rank
+	    while ((index < nOrig_) && 
+		   (!(Var (index) -> isInteger ()) ||
+		    (integerRank_ [index] != rank) ||
+		    (fixed [index] != UNFIXED)))
+	      index++;
+
+	    assert (index < nOrig_);
+
+	    jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
+			      "none fixed, fix %d from %g [%g,%g] [L=%g, R=%g]", 
+			      index, xFrac [index], Lb (index), Ub (index), 
+			      dualL [index], dualR [index]);
+
+	    Lb (index) = Ub (index) = X (index) = xInt [index] = 
+	      ((dualL [index] < dualR [index] - COUENNE_EPS) ? floor (xFrac [index]) :
+	       (dualL [index] > dualR [index] + COUENNE_EPS) ? ceil  (xFrac [index]) :
+	       ((CoinDrand48 () > xFrac [index] - floor (xFrac [index])) ? 
+		floor (xFrac [index]) : ceil (xFrac [index])));
+
+	    jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, " to %g\n", xInt [index]);
+
+	    fixed [index] = FIXED;
+
+	    --remaining;
+	  }
+
+	  ntrials++;
+
+	  if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+	    printf ("--- remaining = %d --------------------------- \n", remaining);
+	    for (int i=0; i<nOrig_; i++)
+	      if (variables_ [i] -> Multiplicity () > 0)
+		printf ("#### %4d: %d %c %2d frac %20g -> int %20g  [%20g,%20g]\n", 
+			i, fixed [i], 
+			variables_ [i] -> isInteger () ? 'I' : ' ',
+			integerRank_ ? integerRank_ [i] : -1,
+			xFrac [i], xInt [i], Lb (i), Ub (i));
+	    printf ("---------------------------\n");
+
+	  }
+	} while (remaining > 0);
+      } // for
 
     // save tightened bounds in NLP space. Sanity check
     for (int i = nOrig_; i--;) 
@@ -258,8 +265,8 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	else if (Lb (i) > Ub (i))     // non-sense bounds, fix them
 	  xInt [i] = X (i) = lb [i] = ub [i] = 
 	    (fixed [i] == CONTINUOUS) ?
-  	          (0.5 * (Lb (i) + Ub (i)) + 0.5) :
-	    floor (0.5 * (Lb (i) + Ub (i)) + 0.5);
+	                  (0.5 * (Lb (i) + Ub (i)) + 0.5) :
+	    COUENNE_round (0.5 * (Lb (i) + Ub (i)) + 0.5);
 
 	else {                        // normal case
 	  lb [i] = Lb (i);
@@ -296,9 +303,10 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
       printf ("- retval %d ----------------------------------------------------------------\n", 
 	      retval);
       for (int i=0; i<nOrig_; i++)
-	printf ("#### %4d: %d %c frac %20g -> int %20g [%20g,%20g]\n", 
-		i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
-		xFrac [i], xInt [i], lb [i], ub [i]);
+	if (variables_ [i] -> Multiplicity () > 0)
+	  printf ("#### %4d: %d %c frac %20g -> int %20g [%20g,%20g]\n", 
+		  i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
+		  xFrac [i], xInt [i], lb [i], ub [i]);
     } else printf ("no good point was found\n");
   }
 

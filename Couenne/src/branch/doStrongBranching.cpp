@@ -18,15 +18,24 @@
 double distance (const double *p1, const double *p2, int size, double k=2.) {
 
   double 
-    result = 0,
+    result = 0.,
     element;
 
-  while (size--) {
-    element = *p1++ - *p2++;
-    result += pow (element, k);
-  }
+  if (k == 2.) // a bit faster, probably
 
-  return pow (result, 1./k);
+    while (size--) {
+      element = *p1++ - *p2++;
+      result += element * element;
+    }
+
+  else
+
+    while (size--) {
+      element = *p1++ - *p2++;
+      result += pow (element, k);
+    }
+
+  return pow (result, 1. / k);
 }
 
 
@@ -116,8 +125,11 @@ namespace Bonmin {
 	else { // branch is feasible, solve and compare
 
 	  solver -> solveFromHotStart ();
-	  if (pseudoUpdateLP_ && CouObj)
-	    CouObj -> setEstimate (distance (lpSol, solver -> getColSolution (), numberColumns), 0);
+	  if (pseudoUpdateLP_ && CouObj && solver -> isProvenOptimal ()) {
+	    CouNumber dist = distance (lpSol, solver -> getColSolution (), numberColumns);
+	    if (dist > COUENNE_EPS)
+	      CouObj -> setEstimate (dist, 0);
+	  }
 	}
 
       } else {                       // some more complex branch, have to clone solver
@@ -134,8 +146,12 @@ namespace Bonmin {
 	  thisSolver -> setIntParam (OsiMaxNumIteration,         limit); 
 
 	  thisSolver -> resolve ();
-	  if (pseudoUpdateLP_ && CouObj)
-	    CouObj -> setEstimate (distance (lpSol, thisSolver->getColSolution (), numberColumns), 0);
+	  if (pseudoUpdateLP_ && CouObj && thisSolver -> isProvenOptimal ()) {
+	    CouNumber dist = distance (lpSol, thisSolver -> getColSolution (), numberColumns);
+	    if (dist > COUENNE_EPS)
+	      CouObj -> setEstimate (dist, 0);
+	    //CouObj -> setEstimate (distance (lpSol, thisSolver->getColSolution (),numberColumns), 0);
+	  }
 	}
       }
 
@@ -181,8 +197,12 @@ namespace Bonmin {
 
         else {
 	  solver -> solveFromHotStart ();
-	  if (pseudoUpdateLP_ && CouObj) 
-	    CouObj -> setEstimate (distance (lpSol, solver -> getColSolution (), numberColumns), 1);
+	  if (pseudoUpdateLP_ && CouObj && solver -> isProvenOptimal ()) {
+	    CouNumber dist = distance (lpSol, solver -> getColSolution (), numberColumns);
+	    if (dist > COUENNE_EPS)
+	      CouObj -> setEstimate (dist, 0);
+	    //CouObj -> setEstimate (distance (lpSol, solver -> getColSolution (), numberColumns), 1);
+	  }
 	}
       } else {                     // some more complex branch, have to clone solver
         // adding cuts or something 
@@ -198,8 +218,12 @@ namespace Bonmin {
 	  thisSolver -> setIntParam (OsiMaxNumIteration,         limit); 
 
 	  thisSolver -> resolve();
-	  if (pseudoUpdateLP_ && CouObj) 
-	    CouObj -> setEstimate (distance (lpSol, thisSolver->getColSolution (), numberColumns), 1);
+	  if (pseudoUpdateLP_ && CouObj && thisSolver -> isProvenOptimal ()) {
+	    CouNumber dist = distance (lpSol, thisSolver -> getColSolution (), numberColumns);
+	    if (dist > COUENNE_EPS)
+	      CouObj -> setEstimate (dist, 0);
+	    //CouObj -> setEstimate (distance (lpSol, thisSolver->getColSolution (),numberColumns), 1);
+	  }
 	}
       }
 

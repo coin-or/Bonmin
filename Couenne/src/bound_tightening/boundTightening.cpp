@@ -30,6 +30,9 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
 
   do {
 
+    if (CoinCpuTime () > maxCpuTime_)
+      break;
+
     // propagate bounds to auxiliary variables
 
     //    if ((nbwtightened > 0) || (ntightened > 0))
