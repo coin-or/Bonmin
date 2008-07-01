@@ -137,6 +137,8 @@ namespace Bonmin{
 
     //////////////////////////////////////////////////////////////
 
+    couenneCg -> Problem () -> setMaxCpuTime (getDoubleParameter (BabSetupBase::MaxTime));
+
     ci -> extractLinearRelaxation (*continuousSolver_, *couenneCg);
 
     // In case there are no discrete variables, we have already a
@@ -148,7 +150,7 @@ namespace Bonmin{
       InitHeuristic* initHeuristic = new InitHeuristic 
 	(ci -> getObjValue (), ci -> getColSolution (), *couenneProb);
       HeuristicMethod h;
-      h.id = "Initial nlp";
+      h.id = "Init Rounding NLP";
       h.heuristic = initHeuristic;
       heuristics_.push_back(h);
     }
@@ -164,18 +166,20 @@ namespace Bonmin{
     // Add Couenne SOS ///////////////////////////////////////////////////////////////
 
     std::string s;
+    int nSOS = 0;
+
+    // allocate sufficient space for both nonlinear variables and SOS's
+    OsiObject ** objects = new OsiObject* [couenneProb -> nVars ()];
 
     options () -> GetStringValue ("enable_sos", s, "couenne.");
-
     if (s == "yes") {
 
-      int nSOS = 0;
-      OsiObject ** objects = new OsiObject* [couenneProb -> nVars ()];
-
       nSOS = couenneProb -> findSOS (nonlinearSolver (), objects);
-      nonlinearSolver () -> addObjects (nSOS, objects);
+      //printf ("==================== found %d SOS\n", nSOS);
+      //nonlinearSolver () -> addObjects (nSOS, objects);
+      continuousSolver () -> addObjects (nSOS, objects);
 
-      for (int i=0; i<nSOS ; i++)
+      for (int i=0; i<nSOS; i++)
 	delete objects [i];
       delete [] objects;
     }
@@ -200,15 +204,11 @@ namespace Bonmin{
       exit (-1);
     }
 
-    int nAuxs = 0, nobj = 0,
+    int 
+      nobj  = 0, // if no SOS then objects is empty
       nVars = couenneProb -> nVars ();
 
-    OsiObject ** objects;
-
-    nAuxs = couenneProb -> nVars ();
-
-    //OsiObject ** 
-    objects = new OsiObject* [nAuxs];
+    objects = new OsiObject* [couenneProb -> nVars ()];
 
     for (int i = 0; i < nVars; i++) { // for each variable
 
@@ -307,7 +307,7 @@ namespace Bonmin{
       nlpHeuristic->setMaxNlpInf(maxNlpInf_0);
       nlpHeuristic->setNumberSolvePerLevel(numSolve);
       HeuristicMethod h;
-      h.id = "nlp solve";
+      h.id = "Couenne Rounding NLP";
       h.heuristic = nlpHeuristic;
       heuristics_.push_back(h);
     }

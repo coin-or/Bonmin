@@ -77,8 +77,12 @@ public:
     void addMilpCutGenerators ();
 
     /// modify parameter (used for MaxTime)
-    void setDoubleParameter (const DoubleParameter &p, double val)
+    inline void setDoubleParameter (const DoubleParameter &p, const double val)
     {doubleParam_ [p] = val;}
+
+    /// modify parameter (used for MaxTime)
+    inline double getDoubleParameter (const DoubleParameter &p) const
+    {return doubleParam_ [p];}
 
 private:
       SmartPtr<SmartAsl> aslfg_;

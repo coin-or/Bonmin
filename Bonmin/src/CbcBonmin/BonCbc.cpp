@@ -275,8 +275,18 @@ namespace Bonmin
     else {//Pass in objects to Cbc
     // Redundant definition of default branching (as Default == User)
     assert (s.branchingMethod() != NULL);
-    model_.addObjects (s.continuousSolver()->numberObjects(),
-			   s.continuousSolver()->objects());
+
+    if (!usingCouenne_)
+      model_.addObjects (s.continuousSolver()->numberObjects(),
+			 s.continuousSolver()->objects());
+    else {
+      // add nonlinear and integer objects (need to add OsiSOS)
+      int nco = s.continuousSolver () -> numberObjects ();
+      OsiObject **objs = new OsiObject * [nco];
+      for (int i=0; i<nco; i++) 
+	objs [i] = s.continuousSolver () -> objects () [i];
+      model_.addObjects (nco, objs);
+    }
 
     CbcBranchDefaultDecision branch;
     s.branchingMethod()->setSolver(model_.solver());
@@ -486,7 +496,7 @@ namespace Bonmin
                generator->numberColumnCuts(),
                generator->numberCutsActive());
         if (generator->timing()) {
-          fprintf(fp, " (%.3f seconds)\n",generator->timeInCutGenerator());
+          fprintf(fp, " (%.3fs)\n",generator->timeInCutGenerator());
         }
         else {
           fprintf(fp, "\n");
