@@ -482,7 +482,9 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     oaHandler_(NULL),
     strong_branching_solver_(source.strong_branching_solver_)
 {
-      messageHandler()->setLogLevel(source.messageHandler()->logLevel());
+   if(defaultHandler()){
+     messageHandler()->setLogLevel(source.messageHandler()->logLevel());
+   }
   //Pass in message handler
   if(source.messageHandler())
     passInMessageHandler(source.messageHandler());
@@ -2241,7 +2243,8 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   totalNlpSolveTime_+=CoinCpuTime();
   nCallOptimizeTNLP_++;
   hasBeenOptimized_ = true;
-  
+ 
+ 
   //Options should have been printed if not done already turn off Ipopt output
   if(!hasPrintedOptions) {
     hasPrintedOptions = 1;

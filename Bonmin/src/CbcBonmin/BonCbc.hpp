@@ -34,6 +34,10 @@ namespace Bonmin
     /**operator() performs the branchAndBound*/
     virtual void operator()(BabSetupBase & s);
 
+    /**operator() performs the branchAndBound*/
+    virtual void operator()(BabSetupBase * s){
+       operator()(*s);}
+
     /** get the best solution known to the problem (is optimal if MipStatus is FeasibleOptimal).
       if no solution is known returns NULL.*/
     const double * bestSolution() const

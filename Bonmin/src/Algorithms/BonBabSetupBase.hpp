@@ -43,8 +43,21 @@ namespace Bonmin
           normal(other.normal)
       {}
     };
+    /** Type for heuristic method with its string identification. */
+    struct HeuristicMethod
+    {
+      std::string id;
+      CbcHeuristic* heuristic;
+      HeuristicMethod()
+      {}
+
+      HeuristicMethod(const HeuristicMethod & other):
+          id(other.id),
+          heuristic(other.heuristic)
+      {}
+    };
     typedef std::list<CuttingMethod> CuttingMethods;
-    typedef std::list<CbcHeuristic * > HeuristicMethods;
+    typedef std::list<HeuristicMethod  > HeuristicMethods;
 
     /** Strategies for comparing the nodes on the heap. */
     enum NodeComparison {
@@ -121,7 +134,9 @@ namespace Bonmin
     BabSetupBase(Ipopt::SmartPtr<TNLPSolver> app);
     /** Construct from existing TMINLP interface.*/
     BabSetupBase(const OsiTMINLPInterface& nlp);
-
+    /** Copy but uses an other nlp.*/
+    BabSetupBase(const BabSetupBase &setup,
+                 OsiTMINLPInterface &nlp);
 
     /** Copy constructor. */
     BabSetupBase(const BabSetupBase & other);
@@ -129,6 +144,10 @@ namespace Bonmin
     /** virtual copy constructor. */
     virtual BabSetupBase * clone() const = 0;
 
+    /** Make a copy with solver replace by one passed .*/
+    virtual BabSetupBase *clone(OsiTMINLPInterface&nlp)const {
+       throw(CoinError("BabSetupBase", "CloneWithOtherNlp","Not implemented"));
+    }
     /** Virtual destructor. */
     virtual ~BabSetupBase();
 
@@ -229,14 +248,24 @@ namespace Bonmin
       return treeTraversalMethod_;
     }
     /** Return value of integer parameter. */
-    int getIntParameter(const IntParameter &p)
+    int getIntParameter(const IntParameter &p) const
     {
       return intParam_[p];
     }
     /** Return value of double parameter.*/
-    double getDoubleParameter(const DoubleParameter &p)
+    double getDoubleParameter(const DoubleParameter &p) const
     {
       return doubleParam_[p];
+    }
+    /** Return value of integer parameter. */
+    void setIntParameter(const IntParameter &p, const int v)
+    {
+      intParam_[p] = v;
+    }
+    /** Return value of double parameter.*/
+    void setDoubleParameter(const DoubleParameter &p, const double v)
+    {
+      doubleParam_[p] = v;
     }
     /** @} */
 

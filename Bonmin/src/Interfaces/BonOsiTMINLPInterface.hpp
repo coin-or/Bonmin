@@ -159,6 +159,8 @@ class Messages : public CoinMessages
   void readOptionFile(const std::string & fileName);
 
   /// Retrieve OsiTMINLPApplication option list
+  const Ipopt::SmartPtr<Ipopt::OptionsList> options() const;
+  /// Retrieve OsiTMINLPApplication option list
   Ipopt::SmartPtr<Ipopt::OptionsList> options();
 
   //---------------------------------------------------------------------------

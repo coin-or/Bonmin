@@ -8,6 +8,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+
+SUBDIRS = Heuristics
 # Name of the library in this directory
 lib_LTLIBRARIES = libbonmin.la
 if COIN_HAS_ASL
@@ -32,6 +34,7 @@ libbonmin_la_SOURCES = \
 libbonmin_la_LIBADD = \
 	../Algorithms/libbonalgorithms.la \
 	../Interfaces/libbonmininterfaces.la \
+         Heuristics/libbonheuristics.la \
 	$(FILTERSQPLIBADD)
 
 libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)

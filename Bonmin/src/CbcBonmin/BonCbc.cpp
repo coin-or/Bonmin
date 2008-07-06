@@ -151,9 +151,9 @@ namespace Bonmin
 
     for (BabSetupBase::HeuristicMethods::iterator i = s.heuristics().begin() ;
         i != s.heuristics().end() ; i++) {
-      CbcHeuristic * heu = *i;
+      CbcHeuristic * heu = i->heuristic;
       heu->setModel(&model_);
-      model_.addHeuristic(*i);
+      model_.addHeuristic(heu, i->id.c_str());
     }
 
 
@@ -171,6 +171,7 @@ namespace Bonmin
     bool ChangedObject = false;
     //Pass over user set branching priorities to Cbc
     if (s.continuousSolver()->objects()==NULL) {
+      assert (s.branchingMethod() == NULL);
       const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
       //set priorities, prefered directions...
       const int * priorities = nlpSolver->getPriorities();
@@ -271,12 +272,32 @@ namespace Bonmin
       replaceIntegers(model_.objects(), model_.numberObjects());
     }
     else {//Pass in objects to Cbc
+    // Redundant definition of default branching (as Default == User)
+    assert (s.branchingMethod() != NULL);
+
+    if (!usingCouenne_)
       model_.addObjects (s.continuousSolver()->numberObjects(),
 			 s.continuousSolver()->objects());
+    else {
+      // add nonlinear and integer objects (need to add OsiSOS)
+      int nco = s.continuousSolver () -> numberObjects ();
+      OsiObject **objs = new OsiObject * [nco];
+      for (int i=0; i<nco; i++) 
+	objs [i] = s.continuousSolver () -> objects () [i];
+      model_.addObjects (nco, objs);
+    }
 
-      if (usingCouenne_)// && model_. solver ()) 
+    CbcBranchDefaultDecision branch;
+    s.branchingMethod()->setSolver(model_.solver());
+    BonChooseVariable * strong2 = dynamic_cast<BonChooseVariable *>(s.branchingMethod());
+    if (strong2)
+      strong2->setCbcModel(&model_);
+    branch.setChooseMethod(*s.branchingMethod());
+
+    model_.setBranchingMethod(&branch);
 	// prevent duplicating object when copying in CbcModel.cpp
-	model_. solver () -> deleteObjects ();
+	model_.solver()->deleteObjects();
+
     }
 
     model_.setDblParam(CbcModel::CbcCutoffIncrement, s.getDoubleParameter(BabSetupBase::CutoffDecr));
@@ -362,17 +383,6 @@ namespace Bonmin
     model_.setIntegerTolerance(s.getDoubleParameter(BabSetupBase::IntTol));
 
 
-    // Redundant definition of default branching (as Default == User)
-    if (s.branchingMethod() != NULL) {
-      CbcBranchDefaultDecision branch;
-      s.branchingMethod()->setSolver(model_.solver());
-      BonChooseVariable * strong2 = dynamic_cast<BonChooseVariable *>(s.branchingMethod());
-      if (strong2)
-        strong2->setCbcModel(&model_);
-      branch.setChooseMethod(*s.branchingMethod());
-
-      model_.setBranchingMethod(&branch);
-    }
 
     //Get objects from model_ if it is not null means there are some sos constraints or non-integer branching object
     // pass them to cut generators.
@@ -447,7 +457,7 @@ namespace Bonmin
     // to get node parent info in Cbc, pass parameter 3.
     //model_.branchAndBound(3);
     model_.branchAndBound();
-
+    
     numNodes_ = model_.getNodeCount();
     bestObj_ = model_.getObjValue();
     bestBound_ = model_.getBestPossibleObjValue();
@@ -477,18 +487,17 @@ namespace Bonmin
        if (true&&!generator->numberCutsInTotal())
 	continue;
       CoinMessageHandler * cbc_handler = model_.messageHandler();
-      const CoinMessages & cbc_messages = model_.messages();
       int cbc_log_level = model_.logLevel();
       FILE * fp = cbc_handler->filePointer();
       if(cbc_log_level >= 1) {
-        fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
-                generator->cutGeneratorName(),
-                generator->numberTimesEntered(),
-                generator->numberCutsInTotal()+
-                generator->numberColumnCuts(),
-                generator->numberCutsActive());
+	fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
+               generator->cutGeneratorName(),
+               generator->numberTimesEntered(),
+               generator->numberCutsInTotal()+
+               generator->numberColumnCuts(),
+               generator->numberCutsActive());
         if (generator->timing()) {
-          fprintf(fp, " (%.3f seconds)\n",generator->timeInCutGenerator());
+          fprintf(fp, " (%.3fs)\n",generator->timeInCutGenerator());
         }
         else {
           fprintf(fp, "\n");
@@ -498,8 +507,6 @@ namespace Bonmin
 
     if (hasFailed) {
       CoinMessageHandler * cbc_handler = model_.messageHandler();
-      const CoinMessages & cbc_messages = model_.messages();
-      int cbc_log_level = model_.logLevel();
       FILE * fp = cbc_handler->filePointer();
       fprintf(fp,
      "************************************************************\n"
