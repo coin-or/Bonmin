@@ -271,8 +271,8 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	else if (Lb (i) > Ub (i))     // non-sense bounds, fix them
 	  xInt [i] = X (i) = lb [i] = ub [i] = 
 	    (fixed [i] == CONTINUOUS) ?
-	                  (0.5 * (Lb (i) + Ub (i)) + 0.5) :
-	    COUENNE_round (0.5 * (Lb (i) + Ub (i)) + 0.5);
+	                  (0.5 * (Lb (i) + Ub (i))) :
+	    COUENNE_round (0.5 * (Lb (i) + Ub (i)));
 
 	else {                        // normal case
 	  lb [i] = Lb (i);
