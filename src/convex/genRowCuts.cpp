@@ -40,6 +40,9 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
   if (firstcall_)
     for (int i=0, j = problem_ -> nVars (); j--; i++) {
 
+      if (CoinCpuTime () > problem_ -> getMaxCpuTime ())
+	break;
+
       exprVar *var = problem_ -> Var (i);
 
       if ((var -> Multiplicity () > 0) && 
@@ -83,6 +86,9 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 	|| have_NLP
 	|| info.pass > 0)) {
       */
+
+      if (CoinCpuTime () > problem_ -> getMaxCpuTime ())
+	break;
 
       exprVar *var = problem_ -> Var (problem_ -> evalOrder (i));
 

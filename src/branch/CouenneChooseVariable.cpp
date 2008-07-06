@@ -105,6 +105,13 @@ bool CouenneChooseVariable::feasibleSolution (const OsiBranchingInformation * in
 /// Add list of options to be read from file
 void CouenneChooseVariable::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {
 
+  roptions -> AddStringOption2 
+    ("enable_sos",
+     "Use Special Ordered Sets (SOS) as indicated in the MINLP model",
+     "no",
+     "no","",
+     "yes","");
+
   roptions -> AddStringOption2
     ("branch_fbbt",
      "Apply bound tightening before branching",

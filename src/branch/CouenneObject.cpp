@@ -430,10 +430,17 @@ void CouenneObject::setEstimates (const OsiBranchingInformation *info,
   ///////////////////////////////////////////////////////////
   if (info &&
       ((pseudoMultType_ == INTERVAL_LP) ||
-       (pseudoMultType_ == INTERVAL_LP_REV)))
+       (pseudoMultType_ == INTERVAL_LP_REV))) {
 
     point = info -> solution_ [index];
 
+    CouNumber delta = closeToBounds * (info -> upper_ [index] - info -> lower_ [index]);
+
+    if      (point < info -> lower_ [index] + delta)
+      point        = info -> lower_ [index] + delta;
+    else if (point > info -> upper_ [index] - delta)
+      point        = info -> upper_ [index] - delta;
+  }
   else if (brpoint &&
 	   ((pseudoMultType_ == INTERVAL_BR) ||
 	    (pseudoMultType_ == INTERVAL_BR_REV)))

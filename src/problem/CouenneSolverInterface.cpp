@@ -1,9 +1,10 @@
 /*
  * Name:    CouenneSolverInterface.cpp
  * Authors: Pietro Belotti, Carnegie Mellon University
+ *          Andreas Waechter, IBM Corp.
  * Purpose: Implementation of the OsiSolverInterface::resolve () method 
  *
- * (C) Carnegie-Mellon University, 2006, 2007. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -12,23 +13,23 @@
 #include "CouenneSolverInterface.hpp"
 #include "CglTreeInfo.hpp"
 
-//#define DEBUG
+/// constructor
+CouenneSolverInterface::CouenneSolverInterface (CouenneCutGenerator *cg /*= NULL*/):
 
-CouenneSolverInterface::CouenneSolverInterface (CouenneCutGenerator *cg /*= NULL*/)
-  :
   OsiClpSolverInterface(),
   cutgen_ (cg),
   knowInfeasible_(false),
   knowOptimal_(false)
 {}
 
-CouenneSolverInterface::CouenneSolverInterface (const CouenneSolverInterface &src)
-  :
+/// copy constructor
+CouenneSolverInterface::CouenneSolverInterface (const CouenneSolverInterface &src):
+
   OsiSolverInterface (src),
   OsiClpSolverInterface (src),
   cutgen_ (src.cutgen_),
   knowInfeasible_ (src.knowInfeasible_),
-  knowOptimal_ (src.knowOptimal_) 
+  knowOptimal_ (src.knowOptimal_)
 {}
 
 /// Destructor
@@ -72,6 +73,7 @@ bool CouenneSolverInterface::isProvenOptimal() const
   return OsiClpSolverInterface::isProvenOptimal();
 }
 
+
 /// Defined in Couenne/src/convex/generateCuts.cpp
 void sparse2dense (int, t_chg_bounds *, int *&, int &);
 
@@ -105,30 +107,77 @@ void CouenneSolverInterface::resolve () {
     }*/
   ////////////////////////////////////// Cut }
 
-  // TODO: if NLP point available, add new cuts BEFORE resolving --
-  // and decrease number of cutting plane iterations by one, to
-  // balance it
-  //printf("NumRows in resolve = %d\n", getNumRows());
+  static int count = -1;
+  char filename [30];
 
-  //static int count = 0;
-  //char filename [30];
-  //sprintf (filename, "presol_%d", count);
-  //writeLp (filename);
-
-  //printf ("----------------------------- count = %d [%s]\n", count, filename);
+  // save problem to be loaded later
+  if (cutgen_ -> check_lp ()) {
+    count++;
+    sprintf (filename, "resolve_%d", count);
+    writeMps (filename);
+  }
 
   knowInfeasible_ = false;
   knowOptimal_    = false;
 
+  const CoinWarmStart *ws = getWarmStart ();
+
+  //deleteScaleFactors ();
+
+  // re-solve problem
   OsiClpSolverInterface::resolve ();
 
-  //sprintf (filename, "postsol_%d", count++);
-  //writeLp (filename);
+  // check LP independently
+  if (cutgen_ -> check_lp ()) {
 
-  /*printf("obj value in resolve = %e\n",getObjValue());
-  printf ("after resolve, %p --> [%g,%g]\n", this,
-	  getColLower () [getNumCols () - 1],
-	  getColUpper () [getNumCols () - 1]);*/
+    OsiSolverInterface
+      *nsi = new OsiClpSolverInterface,
+      *csi = clone ();
+
+    sprintf (filename, "resolve_%d.mps", count);
+    nsi -> readMps (filename);
+
+    nsi -> messageHandler () -> setLogLevel (0);
+    nsi -> setWarmStart (ws);
+
+    nsi -> initialSolve ();
+
+    if ((nsi -> isProvenOptimal () && isProvenOptimal ()) ||
+	!(nsi -> isProvenOptimal ()) && !isProvenOptimal ()) {
+
+      if (nsi -> isProvenOptimal () &&
+	  (fabs (nsi -> getObjValue () - getObjValue ()) / 
+	   (1. + fabs (nsi -> getObjValue ()) + fabs (getObjValue ())) > 1e-2))
+
+	printf ("Warning: discrepancy between saved %g and current %g [%g], file %s\n", 
+		nsi -> getObjValue (),  getObjValue (),
+		nsi -> getObjValue () - getObjValue (),
+		filename);
+    }
+
+    csi -> messageHandler () -> setLogLevel (0);
+    csi -> setWarmStart (ws);
+
+    csi -> initialSolve ();
+
+    if ((csi -> isProvenOptimal () && isProvenOptimal ()) ||
+	!(csi -> isProvenOptimal ()) && !isProvenOptimal ()) {
+
+      if (csi -> isProvenOptimal () &&
+	  (fabs (csi -> getObjValue () - getObjValue ()) / 
+	   (1. + fabs (csi -> getObjValue ()) + fabs (getObjValue ())) > 1e-2))
+
+	printf ("Warning: discrepancy between cloned %g and current %g [%g]\n", 
+		csi -> getObjValue (),  getObjValue (),
+		csi -> getObjValue () - getObjValue ());
+    }
+
+    delete nsi;
+    delete csi;
+
+    //else printf ("Warning: discrepancy between statuses %s -- %s feasible\n", 
+    //filename, isProvenOptimal () ? "current" : "saved");
+  }
 }
 
 

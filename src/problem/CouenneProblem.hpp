@@ -162,6 +162,9 @@ class CouenneProblem {
   /// numberInRank_ [i] is the number of integer variables in rank i
   mutable std::vector <int> numberInRank_;
 
+  /// maximum cpu time
+  double maxCpuTime_;
+
  public:
 
   CouenneProblem  (const ASL * = NULL,
@@ -423,6 +426,17 @@ class CouenneProblem {
   /// return object vector
   const std::vector <CouenneObject> &Objects () const
   {return objects_;}
+
+  /// find SOS constraints in problem
+  int findSOS (OsiSolverInterface *solver, OsiObject ** objects);
+
+  /// set maximum CPU time
+  inline void setMaxCpuTime (double time)
+  {maxCpuTime_ = time;}
+
+  /// return maximum CPU time
+  inline double getMaxCpuTime () const
+  {return maxCpuTime_;}
 
 protected:
 

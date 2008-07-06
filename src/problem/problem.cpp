@@ -48,10 +48,27 @@ void CouenneProblem::initAuxs () const {
       Lb (index) = - (Ub (index) = COUENNE_INFINITY);
   }
 
-  // only one loop is sufficient here, since auxiliary variable are
-  // defined in such a way that w_i does NOT depend on w_j if i<j.
+  // first initialize with values from constraints
 
   //Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM, "Initial bounds for aux (initAuxs):\n");
+
+  for (std::vector <CouenneConstraint *>::const_iterator con = constraints_.begin ();
+       con != constraints_.end (); ++con) {
+
+    CouNumber
+      lb = (*((*con) -> Lb ())) (),
+      ub = (*((*con) -> Ub ())) ();
+
+    int index = (*con) -> Body () -> Index ();
+
+    assert (index >= 0);
+
+    if ((Lb (index) = CoinMax (Lb (index), lb)) <= -COUENNE_INFINITY) Lb (index) = -COIN_DBL_MAX;
+    if ((Ub (index) = CoinMin (Ub (index), ub)) >=  COUENNE_INFINITY) Ub (index) =  COIN_DBL_MAX;
+  }
+
+  // only one loop is sufficient here, since auxiliary variable are
+  // defined in such a way that w_i does NOT depend on w_j if i<j.
 
   for (int j=0, i=nVars (); i--; j++) {
 

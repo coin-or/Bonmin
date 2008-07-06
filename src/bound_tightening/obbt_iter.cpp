@@ -24,6 +24,7 @@ static bool obbt_updateBound (CouenneSolverInterface *csi, /// interface to use 
 			      CouNumber &bound,            /// bound to be updated
 			      bool isint) {                /// is this variable integer
 
+  //csi -> deleteScaleFactors ();
   csi -> setDblParam (OsiDualObjectiveLimit, COIN_DBL_MAX); 
   csi -> setDblParam (OsiPrimalObjectiveLimit, (sense==1) ? bound : -bound);
   csi -> setObjSense (1); // always minimize, just change the sign of the variable
@@ -183,12 +184,27 @@ obbt_iter (CouenneSolverInterface *csi,
     }
     */
 
-    // create scaled solution (ideally should be feasible but
-    // shouldn't be extreme of bounding box)
-
-    //csi -> createInteriorWS (warmstart);
-
     csi -> setWarmStart (warmstart);
+    //csi -> continuousModel () -> setPerturbation (50);
+
+    /* From ClpSimplex.cpp:
+       
+       If you are re-using the same matrix again and again then the
+       setup time to do scaling may be significant.  Also you may not
+       want to initialize all values or return all values (especially
+       if infeasible).  While an auxiliary model exists it will be
+       faster.  If options -1 then model is switched off.  Otherwise
+       switched on with following options.
+
+       1 - rhs is constant
+       2 - bounds are constant
+       4 - objective is constant
+       8 - solution in by basis and no djs etc in
+       16 - no duals out (but reduced costs)
+       32 - no output if infeasible
+    */
+
+    //csi -> continuousModel () -> auxiliaryModel (1|8|16|32);
 
     //Jnlst () -> Printf (J_MATRIX, J_BOUNDTIGHTENING,
     //"obbt___ index = %d [sen=%d,bd=%g,int=%d]\n", 

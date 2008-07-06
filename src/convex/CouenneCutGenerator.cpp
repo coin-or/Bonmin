@@ -49,6 +49,9 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
   base -> options () -> GetStringValue ("violated_cuts_only", s, "couenne."); 
   addviolated_ = (s == "yes");
 
+  base -> options () -> GetStringValue ("check_lp", s, "couenne."); 
+  check_lp_ = (s == "yes");
+
   problem_ = new CouenneProblem (asl, base, jnlst_);
 }
 
@@ -76,7 +79,9 @@ CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
   BabPtr_      (src. BabPtr_),
   infeasNode_  (src. infeasNode_),
   jnlst_       (src. jnlst_),
-  rootTime_    (src. rootTime_) {}
+  rootTime_    (src. rootTime_),
+  check_lp_    (src. check_lp_)
+{}
 
 
 #define MAX_SLOPE 1e3
@@ -122,6 +127,13 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "Specify the frequency (in terms of nodes) at which couenne ecp cuts are generated.",
      0,1,
      "A frequency of 0 amounts to never solve the NLP relaxation.");
+
+  roptions -> AddStringOption2
+    ("check_lp",
+     "Check all LPs through an independent call to OsiClpSolverInterface::initialSolve()",
+     "no",
+     "no","",
+     "yes","");
 
   roptions -> AddStringOption2
     ("local_optimization_heuristic",

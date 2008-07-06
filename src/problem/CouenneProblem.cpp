@@ -54,7 +54,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   opt_window_ (1e50),
   useQuadratic_ (false),
   feas_tolerance_ (feas_tolerance_default),
-  integerRank_ (NULL) {
+  integerRank_ (NULL),
+  maxCpuTime_  (1.e20) {
 
   if (!asl) return;
 
@@ -196,7 +197,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   dependence_   (p.dependence_),
   objects_      (p.objects_),
   integerRank_  (NULL),
-  numberInRank_ (p.numberInRank_) {
+  numberInRank_ (p.numberInRank_),
+  maxCpuTime_   (p.maxCpuTime_) {
 
   for (int i=0; i < p.nVars (); i++)
     variables_ . push_back (NULL);

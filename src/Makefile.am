@@ -116,6 +116,7 @@ libCouenne_la_SOURCES = \
 	problem/checkNLP.cpp \
 	problem/getIntegerCandidate.cpp \
 	problem/testIntFix.cpp \
+	problem/CouenneSOS.cpp \
 	problem/depGraph/depGraph.cpp \
 	problem/depGraph/checkCycles.cpp \
 	bound_tightening/boundTightening.cpp \

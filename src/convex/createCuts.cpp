@@ -15,6 +15,14 @@
 #include "CouenneProblem.hpp"
 
 
+/// checks if very large or very small nonzero
+bool badCoeff (CouNumber coe) {
+
+  coe = fabs (coe);
+  return ((coe > COU_MAX_COEFF) || ((coe < COU_MIN_COEFF) && (coe > 0.)));
+}
+
+
 /// general procedure for inserting a linear cut with up to three
 /// variables. Return 1 if cut inserted, 0 if none, <0 if error
 
@@ -31,20 +39,29 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
   int nterms = 0;
 
-  if (fabs (c3) <= 1.0e-21) {                                    i3 = -1;} // shift coeff/index to
-  if (fabs (c2) <= 1.0e-21) {                  c2 = c3; i2 = i3; i3 = -1;} // keep consistency
-  if (fabs (c1) <= 1.0e-21) {c1 = c2; i1 = i2; c2 = c3; i2 = i3; i3 = -1;}
+  // CAUTION: this can make the problem infeasible...
+  if (fabs (c3) <= 1.e-21) {                                    i3 = -1;} // shift coeff/index to
+  if (fabs (c2) <= 1.e-21) {                  c2 = c3; i2 = i3; i3 = -1;} // keep consistency
+  if (fabs (c1) <= 1.e-21) {c1 = c2; i1 = i2; c2 = c3; i2 = i3; i3 = -1;}
   // why 1.0e-21? Look at CoinPackedMatrix.cpp:2188
 
+#if 1
   if (i1 >= 0) {if (fabs (c1) > COU_MAX_COEFF) numerics = true; nterms++;} else c1 = 0;
   if (i2 >= 0) {if (fabs (c2) > COU_MAX_COEFF) numerics = true; nterms++;} else c2 = 0;
   if (i3 >= 0) {if (fabs (c3) > COU_MAX_COEFF) numerics = true; nterms++;} else c3 = 0;
+#else
+  if (i1 >= 0){if (badCoeff (c1)) numerics = true; nterms++;} else c1 = 0;
+  if (i2 >= 0){if (badCoeff (c2)) numerics = true; nterms++;} else c2 = 0;
+  if (i3 >= 0){if (badCoeff (c3)) numerics = true; nterms++;} else c3 = 0;
+#endif
 
   if (!nterms) // nonsense cut
     return 0;
 
   // cut has large coefficients/rhs, bail out
   if (numerics
+      //|| ((fabs (lb) < COU_MIN_COEFF) || 
+      //(fabs (ub) < COU_MIN_COEFF))
       || ((fabs (lb) > COU_MAX_COEFF) &&
 	  (fabs (ub) > COU_MAX_COEFF))) {
 
@@ -77,31 +94,32 @@ int CouenneCutGenerator::createCut (OsiCuts &cs,
 
   CouNumber *best = problem_ -> bestSol ();
 
-  bool print = false;
+  if (best &&
+      ((i1 < 0) || ((best [i1] >= problem_ -> Lb (i1)) && (best [i1] <= problem_ -> Ub (i1)))) &&
+      ((i2 < 0) || ((best [i2] >= problem_ -> Lb (i2)) && (best [i2] <= problem_ -> Ub (i2)))) &&
+      ((i3 < 0) || ((best [i3] >= problem_ -> Lb (i3)) && (best [i3] <= problem_ -> Ub (i3))))) {
 
-  if (best) {
-
-    CouNumber lhs = 0;
+    CouNumber lhs = 0.;
 
     if (i1 >= 0) lhs += c1 * best [i1];
     if (i2 >= 0) lhs += c2 * best [i2];
     if (i3 >= 0) lhs += c3 * best [i3];
 
     if (lhs > ub + COUENNE_EPS)
-      {jnlst_->Printf(J_WARNING, J_CONVEXIFYING,
-		      "### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g >= %g [%g]\n", 
-		      i1,i2,i3, c1,c2,c3, lhs, ub, lhs - ub); print = true;}
+      jnlst_->Printf(J_WARNING, J_CONVEXIFYING,
+		     "### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g >= %g [%g]\n", 
+		     i1,i2,i3, c1,c2,c3, lhs, ub, lhs - ub); 
 
     if (lhs < lb - COUENNE_EPS)
-      {jnlst_->Printf(J_WARNING, J_CONVEXIFYING,
-		      "### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g <= %g [%g]\n", 
-		      i1,i2,i3, c1,c2,c3, lhs, lb, lb - lhs); print = true;}
+      jnlst_->Printf(J_WARNING, J_CONVEXIFYING,
+		     "### cut (%d,%d,%d) (%g,%g,%g) violates optimum: %g <= %g [%g]\n", 
+		     i1,i2,i3, c1,c2,c3, lhs, lb, lb - lhs);
   }
 
   // You are here if:
   //
-  // 1) this is the first call to CouenneCutGenerator::generateCuts()
-  // 2) you also want unviolated cuts
+  // 1) this is the first call to CouenneCutGenerator::generateCuts(), or
+  // 2) you also want unviolated cuts, or
   // 3) the cut is violated
 
   // two cases: cut is of the form w1 [<|>]= alpha, hence a column

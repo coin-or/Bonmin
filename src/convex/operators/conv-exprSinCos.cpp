@@ -27,10 +27,10 @@
 #ifndef NEW_TRIG
 /// add four cuts with slope 1 and -1
 int addHexagon (const CouenneCutGenerator *, // cut generator that has called us
-		 OsiCuts &,      // cut set to be enriched
-		 enum cou_trig,  // sine or cosine
-		 expression *,      // auxiliary variable
-		 expression *);  // argument of cos/sin (should be a variable)
+		OsiCuts &,                   // cut set to be enriched
+		enum cou_trig,               // sine or cosine
+		expression *,                // auxiliary variable
+		expression *);               // argument of cos/sin (should be a variable)
 #endif
 
 /// convex cuts for sine or cosine
@@ -229,10 +229,10 @@ int bayEnvelope (const CouenneCutGenerator *cg, // cut generator that has called
 /// add lateral edges of the hexagon providing 
 
 int addHexagon (const CouenneCutGenerator *cg, // cut generator that has called us
-		 OsiCuts &cs,       // cut set to be enriched
-		 enum cou_trig tt,  // sine or cosine
-		 expression *aux,      // auxiliary variable
-		 expression *arg) { // argument of cos/sin (should be a variable)
+		OsiCuts &cs,                   // cut set to be enriched
+		enum cou_trig tt,              // sine or cosine
+		expression *aux,               // auxiliary variable
+		expression *arg) {             // argument of cos/sin (should be a variable)
 
   // retrieve argument bounds
   CouNumber lb, ub;
