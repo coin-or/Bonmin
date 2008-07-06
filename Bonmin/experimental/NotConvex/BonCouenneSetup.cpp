@@ -137,6 +137,8 @@ namespace Bonmin{
 
     //////////////////////////////////////////////////////////////
 
+    couenneCg -> Problem () -> setMaxCpuTime (getDoubleParameter (BabSetupBase::MaxTime));
+
     ci -> extractLinearRelaxation (*continuousSolver_, *couenneCg);
 
     // In case there are no discrete variables, we have already a
@@ -147,8 +149,10 @@ namespace Bonmin{
       /// setup initial heuristic (in principle it should only run once...)
       InitHeuristic* initHeuristic = new InitHeuristic 
 	(ci -> getObjValue (), ci -> getColSolution (), *couenneProb);
-
-      heuristics_.push_back(initHeuristic);
+      HeuristicMethod h;
+      h.id = "Init Rounding NLP";
+      h.heuristic = initHeuristic;
+      heuristics_.push_back(h);
     }
 
     if(extraStuff->infeasibleNode()){
@@ -157,13 +161,33 @@ namespace Bonmin{
     }
 
     continuousSolver_ -> findIntegersAndSOS (false);
+    addSos (); // only adds embedded SOS objects
+
+    // Add Couenne SOS ///////////////////////////////////////////////////////////////
+
+    std::string s;
+    int nSOS = 0;
+
+    // allocate sufficient space for both nonlinear variables and SOS's
+    OsiObject ** objects = new OsiObject* [couenneProb -> nVars ()];
+
+    options () -> GetStringValue ("enable_sos", s, "couenne.");
+    if (s == "yes") {
+
+      nSOS = couenneProb -> findSOS (nonlinearSolver (), objects);
+      //printf ("==================== found %d SOS\n", nSOS);
+      //nonlinearSolver () -> addObjects (nSOS, objects);
+      continuousSolver () -> addObjects (nSOS, objects);
+
+      for (int i=0; i<nSOS; i++)
+	delete objects [i];
+      delete [] objects;
+    }
 
     //model -> assignSolver (continuousSolver_, true);
     //continuousSolver_ = model -> solver();
 
-    // add Couenne objects for branching /////////////////////////////////////////////
-
-    std::string s;
+    // Add Couenne objects for branching /////////////////////////////////////////////
 
     options () -> GetStringValue ("display_stats", s, "couenne.");
     displayStats_ = (s == "yes");
@@ -180,12 +204,11 @@ namespace Bonmin{
       exit (-1);
     }
 
-    int nAuxs = 0, nobj = 0,
+    int 
+      nobj  = 0, // if no SOS then objects is empty
       nVars = couenneProb -> nVars ();
 
-    nAuxs = couenneProb -> nVars ();
-
-    OsiObject ** objects = new OsiObject* [nAuxs];
+    objects = new OsiObject* [couenneProb -> nVars ()];
 
     for (int i = 0; i < nVars; i++) { // for each variable
 
@@ -283,7 +306,10 @@ namespace Bonmin{
       //nlpHeuristic->setMaxNlpInf(1e-4);
       nlpHeuristic->setMaxNlpInf(maxNlpInf_0);
       nlpHeuristic->setNumberSolvePerLevel(numSolve);
-      heuristics_.push_back(nlpHeuristic);
+      HeuristicMethod h;
+      h.id = "Couenne Rounding NLP";
+      h.heuristic = nlpHeuristic;
+      heuristics_.push_back(h);
     }
 
     int varSelection;
