@@ -200,7 +200,7 @@ namespace Bonmin {
 	  if (pseudoUpdateLP_ && CouObj && solver -> isProvenOptimal ()) {
 	    CouNumber dist = distance (lpSol, solver -> getColSolution (), numberColumns);
 	    if (dist > COUENNE_EPS)
-	      CouObj -> setEstimate (dist, 0);
+	      CouObj -> setEstimate (dist, 1);
 	    //CouObj -> setEstimate (distance (lpSol, solver -> getColSolution (), numberColumns), 1);
 	  }
 	}
@@ -221,7 +221,7 @@ namespace Bonmin {
 	  if (pseudoUpdateLP_ && CouObj && thisSolver -> isProvenOptimal ()) {
 	    CouNumber dist = distance (lpSol, thisSolver -> getColSolution (), numberColumns);
 	    if (dist > COUENNE_EPS)
-	      CouObj -> setEstimate (dist, 0);
+	      CouObj -> setEstimate (dist, 1);
 	    //CouObj -> setEstimate (distance (lpSol, thisSolver->getColSolution (),numberColumns), 1);
 	  }
 	}
