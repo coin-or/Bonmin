@@ -130,6 +130,16 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
    void writeLatexHtmlDoc(std::ostream &of, ExtraCategoriesInfo which);
   /** Ouptut a bonmin.opt file with options default values and short descritpions.*/
   void writeBonminOpt(std::ostream &os, ExtraCategoriesInfo which);
+
+   /** Get info about what a category is taking care of (e.g., Ipopt, Bonmin, FilterSQP,...) .*/
+   ExtraCategoriesInfo categoriesInfo(const std::string &s)
+   {
+      std::map<std::string, ExtraCategoriesInfo>::iterator i = categoriesInfos_.find(s);
+      if(i == categoriesInfos_.end())
+        return IpoptCategory;
+      return i->second;
+   }
+
    private:
    /** Output Latex table of options.*/
    void chooseOptions(ExtraCategoriesInfo which, std::list<Ipopt::RegisteredOption *> &options);
@@ -140,14 +150,6 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
    /** Store extra Informations on Registering categories
        (is bonmin, filterSqp...).*/
    std::map<std::string, ExtraCategoriesInfo> categoriesInfos_;
-   /** Get categoriesInfo taking care of Ipopt.*/
-   ExtraCategoriesInfo categoriesInfo(const std::string &s)
-   {
-      std::map<std::string, ExtraCategoriesInfo>::iterator i = categoriesInfos_.find(s);
-      if(i == categoriesInfos_.end())
-        return IpoptCategory;
-      return i->second;
-   }
 };
 
 }/*Ends namespace Bonmin.*/
