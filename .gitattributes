@@ -81,6 +81,8 @@ Bonmin/src/CbcBonmin/BonDiver.cpp -text
 Bonmin/src/CbcBonmin/BonDiver.hpp -text
 Bonmin/src/CbcBonmin/BonGuessHeuristic.cpp -text
 Bonmin/src/CbcBonmin/BonGuessHeuristic.hpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonDummyPump.cpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonDummyPump.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonFixAndSolveHeuristic.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonFixAndSolveHeuristic.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonLocalSolverBasedHeuristic.cpp -text
