@@ -12,4 +12,4 @@ Cgl -r 649 https://projects.coin-or.org/svn/Cgl/trunk/Cgl
 Clp -r 1218 https://projects.coin-or.org/svn/Clp/trunk/Clp
 Ipopt -r 1252 https://projects.coin-or.org/svn/Ipopt/trunk/Ipopt
 Osi -r 1247 https://projects.coin-or.org/svn/Osi/trunk/Osi
-Couenne -r 1218 https://projects.coin-or.org/svn/Bonmin/branches/Couenne-0.9-candidate-sub
+Couenne -r 1222 https://projects.coin-or.org/svn/Bonmin/branches/Couenne-0.9-candidate-sub
