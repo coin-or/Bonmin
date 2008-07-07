@@ -18,7 +18,8 @@ noinst_LTLIBRARIES = libbonheuristics.la
 # List all source files, including headers
 libbonheuristics_la_SOURCES = \
        BonLocalSolverBasedHeuristic.cpp  BonLocalSolverBasedHeuristic.hpp \
-       BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp
+       BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
+       BonDummyPump.cpp BonDummyPump.hpp
 
 # This is for libtool (on Windows)
 libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
@@ -83,7 +84,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
                      BonLocalSolverBasedHeuristic.hpp \
-                     BonFixAndSolveHeuristic.hpp
+                     BonFixAndSolveHeuristic.hpp \
+                     BonDummyPump.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -92,7 +94,8 @@ includecoin_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
    BonLocalSolverBasedHeuristic.cppbak  BonLocalSolverBasedHeuristic.hppbak \
-   BonFixAndSolveHeuristic.cppbak  BonFixAndSolveHeuristic.hppbak
+   BonFixAndSolveHeuristic.cppbak  BonFixAndSolveHeuristic.hppbak \
+   BonDummyPump.cppbak BonDummyPump.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

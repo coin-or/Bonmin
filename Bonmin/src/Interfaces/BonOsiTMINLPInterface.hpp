@@ -890,6 +890,13 @@ class Messages : public CoinMessages
    * \param L L-norm to use (can be either 1 or 2).
    */
   double solveFeasibilityProblem(int n, const double * x_bar, const int* ind, double a, double s, int L);
+
+  /** Given a point x_bar setup feasibility problem and switch so that every call to initialSolve or resolve will
+      solve it.*/
+  void switchToFeasibilityProblem(int n, const double * x_bar, const int* ind, double a, double s, int L);
+
+  /** switch back to solving original problem.*/
+  void switchToOriginalProblem();
   //@}
 
   /** \name output for OA cut generation
@@ -1055,6 +1062,10 @@ protected:
   Ipopt::SmartPtr<TMINLP> tminlp_;
   /** Adapter for a MINLP to a NLP */
   Ipopt::SmartPtr<TMINLP2TNLP> problem_;
+  /** Problem currently optimized (may be problem_ or feasibilityProblem_)*/
+  Ipopt::SmartPtr<Ipopt::TNLP> problem_to_optimize_;
+  /** Is true if and only if in feasibility mode.*/
+  bool feasibility_mode_;
   /** Solver for a TMINLP. */
   Ipopt::SmartPtr<TNLPSolver> app_;
 

@@ -24,7 +24,11 @@ namespace Bonmin
   public:
     /**@name Constructors/Destructors */
     //@{
+    /** Build using tnlp as source problem.*/
     TNLP2FPNLP(const SmartPtr<TNLP> tnlp, double objectiveScalingFactor = 100);
+
+    /** Build using tnlp as source problem and using other for all other parameters..*/
+    TNLP2FPNLP(const SmartPtr<TNLP> tnlp, const SmartPtr<TNLP2FPNLP> other);
 
     /** Default destructor */
     virtual ~TNLP2FPNLP();
@@ -40,7 +44,7 @@ namespace Bonmin
      */
     void set_dist2point_obj(int n, const Number * vals, const Index * inds);
 
-     /** Set the value for simgma */
+     /** Set the value for sigma */
      void setSigma(double sigma){
        assert(sigma >= 0.);
        sigma_ = sigma;}

@@ -44,6 +44,7 @@
 #include "CglRedSplit.hpp"
 
 #include "BonFixAndSolveHeuristic.hpp"
+#include "BonDummyPump.hpp"
 namespace Bonmin
 {
   BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy)
@@ -88,7 +89,11 @@ namespace Bonmin
 
     registerMilpCutGenerators(roptions);
 
+
+    /** Heursitics.*/
+    LocalSolverBasedHeuristic::registerOptions(roptions);
     FixAndSolveHeuristic::registerOptions(roptions);
+    DummyPump::registerOptions(roptions);
 
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
@@ -418,11 +423,20 @@ namespace Bonmin
     Index doFixAndSolve = false;
     options()->GetEnumValue("fix_and_solve_heuristic",doFixAndSolve,"bonmin.");
     if(doFixAndSolve){
-     printf("Adding heuristic\n");
       FixAndSolveHeuristic* fix_and_solve = new FixAndSolveHeuristic(this);
       HeuristicMethod h;
       h.heuristic = fix_and_solve;
       h.id = "Fix and Solve";
+      heuristics_.push_back(h);
+    }
+
+    Index doDummyPump = false;
+    options()->GetEnumValue("dummy_pump_heuristic",doDummyPump,"bonmin.");
+    if(doDummyPump){
+      DummyPump* fix_and_solve = new DummyPump(this);
+      HeuristicMethod h;
+      h.heuristic = fix_and_solve;
+      h.id = "Dummy pump";
       heuristics_.push_back(h);
     }
   }

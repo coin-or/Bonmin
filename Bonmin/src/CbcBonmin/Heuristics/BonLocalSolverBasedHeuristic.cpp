@@ -13,14 +13,16 @@ namespace Bonmin {
   LocalSolverBasedHeuristic::LocalSolverBasedHeuristic():
      CbcHeuristic(),
      setup_(NULL),
-     time_limit_(180),
-     max_number_nodes_(500){
+     time_limit_(60),
+     max_number_nodes_(1000),
+     max_number_solutions_(10){
   }
   LocalSolverBasedHeuristic::LocalSolverBasedHeuristic(BabSetupBase * setup):
      CbcHeuristic(),
      setup_(setup),
-     time_limit_(180),
-     max_number_nodes_(500){
+     time_limit_(60),
+     max_number_nodes_(1000),
+     max_number_solutions_(10){
      Initialize(setup->options());
   }
 
@@ -28,7 +30,8 @@ namespace Bonmin {
     CbcHeuristic(other),
     setup_(other.setup_),
     time_limit_(other.time_limit_),
-    max_number_nodes_(other.max_number_nodes_) {
+    max_number_nodes_(other.max_number_nodes_),
+    max_number_solutions_(other.max_number_solutions_) {
   }
 
    LocalSolverBasedHeuristic::~LocalSolverBasedHeuristic(){
@@ -54,6 +57,7 @@ namespace Bonmin {
       mysetup->setDoubleParameter(BabSetupBase::Cutoff, cutoff);
       mysetup->setDoubleParameter(BabSetupBase::MaxTime, time_limit_);
       mysetup->setIntParameter(BabSetupBase::MaxNodes, max_number_nodes_);
+      mysetup->setIntParameter(BabSetupBase::MaxSolutions, max_number_solutions_);
       bb(mysetup); 
       if(bb.bestSolution()){
         CoinCopyN(bb.bestSolution(), solver->getNumCols(), solution);
@@ -67,13 +71,20 @@ namespace Bonmin {
    void
    LocalSolverBasedHeuristic::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     roptions->SetRegisteringCategory("Local search based heuristics", RegisteredOptions::BonminCategory);
+    roptions->AddLowerBoundedNumberOption("local_search_time_limit","Time  limit for local searches in heuristics",
+                                          0, false, 60, "");
+    roptions->AddLowerBoundedIntegerOption("local_search_node_limit","Node limit for local searches in heuristics",
+                                           0, 1000,"");
+    roptions->AddLowerBoundedIntegerOption("local_search_solution_limit", "Solution limit for local searches in heuristics",
+                               0, 5,"");
    }
 
    /** Initiaize using passed options.*/
    void 
    LocalSolverBasedHeuristic::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
-    options->GetNumericValue("time_limit", time_limit_, "local_search.");
-    options->GetIntegerValue("node_limit", max_number_nodes_, "local_search.");
+    options->GetNumericValue("local_search_time_limit", time_limit_, "bonmin..");
+    options->GetIntegerValue("local_search_node_limit", max_number_nodes_, "bonmin.");
+    options->GetIntegerValue("local_search_solution_limit", max_number_solutions_, "bonmin.");
    }
 } /* Ends Bonmin namespace.*/
 

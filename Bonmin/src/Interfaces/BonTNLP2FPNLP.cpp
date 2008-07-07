@@ -22,6 +22,16 @@ namespace Bonmin
       objectiveScalingFactor_(objectiveScalingFactor)
   {}
 
+  TNLP2FPNLP::TNLP2FPNLP(const SmartPtr<TNLP> tnlp, const SmartPtr<TNLP2FPNLP> other):
+      tnlp_(tnlp),
+      inds_(other->inds_),
+      vals_(other->vals_),
+      lambda_(other->lambda_),
+      sigma_(other->sigma_),
+      norm_(other->norm_),
+      objectiveScalingFactor_(other->objectiveScalingFactor_)
+  {}
+
   TNLP2FPNLP::~TNLP2FPNLP()
   {
   }

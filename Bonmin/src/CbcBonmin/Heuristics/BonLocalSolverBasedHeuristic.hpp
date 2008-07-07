@@ -76,6 +76,8 @@ namespace Bonmin {
     double time_limit_;
     /** maximal number of nodes in local search.*/
     int max_number_nodes_;
+    /** Maximal number of solutions in local search.*/
+    int max_number_solutions_;
   };
 } /** ends namespace Bonmin.*/
 

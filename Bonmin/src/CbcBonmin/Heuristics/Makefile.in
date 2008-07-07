@@ -61,7 +61,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonheuristics_la_LIBADD =
 am_libbonheuristics_la_OBJECTS = BonLocalSolverBasedHeuristic.lo \
-	BonFixAndSolveHeuristic.lo
+	BonFixAndSolveHeuristic.lo BonDummyPump.lo
 libbonheuristics_la_OBJECTS = $(am_libbonheuristics_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -338,7 +338,8 @@ noinst_LTLIBRARIES = libbonheuristics.la
 # List all source files, including headers
 libbonheuristics_la_SOURCES = \
        BonLocalSolverBasedHeuristic.cpp  BonLocalSolverBasedHeuristic.hpp \
-       BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp
+       BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
+       BonDummyPump.cpp BonDummyPump.hpp
 
 
 # This is for libtool (on Windows)
@@ -392,7 +393,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
                      BonLocalSolverBasedHeuristic.hpp \
-                     BonFixAndSolveHeuristic.hpp
+                     BonFixAndSolveHeuristic.hpp \
+                     BonDummyPump.hpp
 
 
 ########################################################################
@@ -402,7 +404,8 @@ includecoin_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
    BonLocalSolverBasedHeuristic.cppbak  BonLocalSolverBasedHeuristic.hppbak \
-   BonFixAndSolveHeuristic.cppbak  BonFixAndSolveHeuristic.hppbak
+   BonFixAndSolveHeuristic.cppbak  BonFixAndSolveHeuristic.hppbak \
+   BonDummyPump.cppbak BonDummyPump.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -457,6 +460,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDummyPump.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFixAndSolveHeuristic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLocalSolverBasedHeuristic.Plo@am__quote@
 
