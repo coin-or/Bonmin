@@ -185,6 +185,9 @@ static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
         (problem may be solvable).*/
   bool isRecoverable(ReturnStatus &r);
 
+  /** Say if return status is an error.*/
+  bool isError(ReturnStatus &r){
+    return r < 0;}
   /** Error code (solver specific).*/
 virtual int errorCode() const = 0;
 protected:

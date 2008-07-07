@@ -34,9 +34,7 @@ namespace Bonmin {
   int
   FixAndSolveHeuristic::solution(double & objectiveValue,
                                  double * newSolution){
-    printf("I am here\n");
     if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
-    printf("I went there\n");
     int numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
@@ -56,17 +54,18 @@ namespace Bonmin {
     delete nlp;
     return r_val;
   }
-   void
-   FixAndSolveHeuristic::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("Local search based heuristics", RegisteredOptions::BonminCategory);
-    roptions->AddStringOption2(
-      "fix_and_solve_heuristic",
-      "if yes runs a heuristic at root where fixes all variables integer in the continuous solution",
-      "no",
-      "no", "don't run it",
-      "yes", "runs the heuristic",
-      "");
-   }
+
+  void
+  FixAndSolveHeuristic::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+   roptions->SetRegisteringCategory("Local search based heuristics", RegisteredOptions::BonminCategory);
+   roptions->AddStringOption2(
+     "fix_and_solve_heuristic",
+     "if yes runs a heuristic at root where fixes all variables integer in the continuous solution",
+     "no",
+     "no", "don't run it",
+     "yes", "runs the heuristic",
+     "");
+  }
 
    /** Initiaize using passed options.*/
    void 

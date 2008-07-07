@@ -44,12 +44,13 @@ register_general_options
 (SmartPtr<RegisteredOptions> roptions)
 {
   roptions->SetRegisteringCategory("nlp interface option", RegisteredOptions::BonminCategory);
-  roptions->AddStringOption2("nlp_solver",
+  roptions->AddStringOption3("nlp_solver",
                              "Choice of the solver for local optima of continuous nlp's",
                              "Ipopt",
                              "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
                              "filterSQP", "Sequential quadratic programming trust region "
                                           "algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
+                             "all", "run all available solvers at each node",
                              "");
   roptions->setOptionExtraInfo("nlp_solver",15);
   roptions->AddBoundedIntegerOption("nlp_log_level",
@@ -276,6 +277,8 @@ OsiTMINLPInterface::Messages::Messages
   ADD_MSG(ERROR_NO_TNLPSOLVER, warn_m, 1,"Can not parse options when no IpApplication has been created");
   ADD_MSG(WARNING_NON_CONVEX_OA, warn_m, 1,
           "OA on non-convex constraint is very experimental.");                          
+  ADD_MSG(SOLVER_DISAGREE_STATUS, warn_m, 1, "Ipopt says problem %s, Filter says %s.");
+  ADD_MSG(SOLVER_DISAGREE_VALUE, warn_m, 1, "Ipopt gives objective %.16g, Filter gives %.16g.");
 
 }
 
@@ -389,6 +392,9 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with FilterSQP.");
 #endif    
+#ifdef COIN_HAS_IPOPT
+   debug_apps_.push_back(new IpoptSolver(roptions, options, journalist)); 
+#endif
   }
   else if(s == EIpopt){
 #ifdef COIN_HAS_IPOPT
@@ -397,9 +403,28 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with Ipopt.");
 #endif
+#ifdef COIN_HAS_FILTERSQP
+   debug_apps_.push_back(new Bonmin::FilterSolver(roptions, options, journalist)); 
+#endif
+  }
+  else if(s == EAll){
+#ifdef COIN_HAS_FILTERSQP
+    app_ = new Bonmin::FilterSolver(roptions, options, journalist);
+#else
+   throw SimpleError("createApplication",
+                     "Bonmin not configured to run with Ipopt.");
+#endif
+#ifdef COIN_HAS_IPOPT
+   debug_apps_.push_back(new IpoptSolver(roptions, options, journalist)); 
+#endif
+    testOthers_ = true;
   }
   if (!app_->Initialize("")) {
     throw CoinError("Error during initialization of app_","createApplication", "OsiTMINLPInterface");
+  }
+  for(std::list<Ipopt::SmartPtr<TNLPSolver> >::iterator i = debug_apps_.begin() ; 
+      i != debug_apps_.end() ; i++){
+    (*i)->Initialize("");
   }
   extractInterfaceParams();
   
@@ -496,6 +521,11 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     setAuxiliaryInfo(source.getAuxiliaryInfo());
     // Copy options from old application
     app_ = source.app_->clone();
+    for(std::list<Ipopt::SmartPtr<TNLPSolver> >::const_iterator i = source.debug_apps_.begin();
+        i != source.debug_apps_.end() ; i++){
+      debug_apps_.push_back((*i)->clone());
+    }
+    testOthers_ = source.testOthers_;
   }
   else {
     throw SimpleError("Don't know how to copy an empty IpoptInterface.",
@@ -707,10 +737,11 @@ OsiTMINLPInterface::freeCachedData()
   freeCachedColRim();
   freeCachedRowRim();
 }
-static const char * OPT_SYMB="OPT";
-static const char * FAILED_SYMB="FAILED";
-static const char * INFEAS_SYMB="INFEAS";
 
+const char * OsiTMINLPInterface::OPT_SYMB="OPT";
+const char * OsiTMINLPInterface::FAILED_SYMB="FAILED";
+const char * OsiTMINLPInterface::UNBOUND_SYMB="UNBOUNDED";
+const char * OsiTMINLPInterface::INFEAS_SYMB="INFEAS";
 ///////////////////////////////////////////////////////////////////
 // WarmStart Information                                                                           //
 ///////////////////////////////////////////////////////////////////
@@ -758,15 +789,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
     solveAndCheckErrors(0,0,"resolveForCost");
 
 
-    const char * status=OPT_SYMB;
-    ;
     char c=' ';
-    if(isAbandoned()) {
-      status=FAILED_SYMB;
-    }
-    else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
-
-
     //Is solution better than previous
     if(isProvenOptimal() &&
         getObjValue()<bestBound) {
@@ -781,7 +804,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
     }
 
     messageHandler()->message(LOG_LINE, messages_)
-    <<c<<f+1<<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<c<<f+1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
 
     if(isProvenOptimal())
@@ -838,16 +861,12 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   solveAndCheckErrors(0,0,"resolveForRobustness");
 
 
-  const char * status=OPT_SYMB;
-  ;
   char c='*';
   if(isAbandoned()) {
-    status=FAILED_SYMB;
     c=' ';
   }
-  else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
   messageHandler()->message(LOG_LINE, messages_)
-  <<c<<1<<status<<getObjValue()<<app_->IterationCount()<<
+  <<c<<1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<
     app_->CPUTime()<<CoinMessageEol;
 
 
@@ -876,16 +895,13 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     <<"resolveForRobustness"<<optimizationStatus_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
 
-    const char * status=OPT_SYMB;
-    ;
     char c='*';
     if(isAbandoned()) {
-      status=FAILED_SYMB;
       c=' ';
     }
-    else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
     messageHandler()->message(LOG_LINE, messages_)
-    <<c<<f+2<<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<c<<f+2<<statusAsString()<<getObjValue()
+    <<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
 
     if(!isAbandoned()) {
@@ -2264,7 +2280,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     app_->options()->SetStringValue("print_user_options","no", false, true);
   }
   
-  
+  bool otherDisagree = false ;
 #if 1
   if(optimizationStatus_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
   {
@@ -2332,6 +2348,32 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
       getStrParam(OsiProbName, probName);
       throw newUnsolvedError(app_->errorCode(), problem_, probName);
     }
+    else if(testOthers_ && !app_->isError(optimizationStatus_)){
+      Ipopt::SmartPtr<TMINLP2TNLP> problem_copy = problem_->clone();
+      //Try other solvers and see if they agree
+      int f =1;
+      for(std::list<Ipopt::SmartPtr<TNLPSolver> >::iterator i = debug_apps_.begin();
+          i != debug_apps_.end() ; i++){
+        TNLPSolver::ReturnStatus otherStatus = (*i)->OptimizeTNLP(GetRawPtr(problem_copy));
+       messageHandler()->message(LOG_LINE, messages_)
+         <<'d'<<f++<<statusAsString()<<problem_copy->obj_value()
+         <<(*i)->IterationCount()<<(*i)->CPUTime()<<CoinMessageEol;
+        if(!(*i)->isError(otherStatus)){
+           CoinRelFltEq eq(1e-05);
+           if(otherStatus != optimizationStatus_){
+             otherDisagree = true;
+             messageHandler()->message(SOLVER_DISAGREE_STATUS, messages_)
+             <<statusAsString()<<statusAsString(otherStatus)<<CoinMessageEol; 
+           }
+           else if(isProvenOptimal() && !eq(problem_->obj_value(),problem_copy->obj_value()))
+           {
+             otherDisagree = true;
+             messageHandler()->message(SOLVER_DISAGREE_VALUE, messages_)
+             <<problem_->obj_value()<<problem_copy->obj_value()<<CoinMessageEol; 
+           }
+        }
+     }
+  }
   try{
     totalIterations_ += app_->IterationCount();
   }
@@ -2402,7 +2444,8 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     messageHandler()->message(LOG_HEAD, messages_)<<CoinMessageEol;
   
   
-  if (numIterationSuspect_ >= 0 && (getIterationCount()>numIterationSuspect_ || isAbandoned())) {
+  if ( (numIterationSuspect_ >= 0 && (getIterationCount()>numIterationSuspect_ || isAbandoned())) ||
+       ( otherDisagree )){
     messageHandler()->message(SUSPECT_PROBLEM,
                               messages_)<<nCallOptimizeTNLP_<<CoinMessageEol;
     std::string subProbName;
@@ -2445,12 +2488,12 @@ void OsiTMINLPInterface::initialSolve()
     app_->options()->SetIntegerValue("print_level",0);
   }
   
-  const char * status=OPT_SYMB;
-  ;
-  if(isAbandoned()) status=FAILED_SYMB;
-  else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
   messageHandler()->message(LOG_FIRST_LINE, messages_)<<nCallOptimizeTNLP_
-						      <<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+						      <<statusAsString()
+                                                      <<getObjValue()
+                                                      <<app_->IterationCount()
+                                                      <<app_->CPUTime()
+                                                      <<CoinMessageEol;
   
   int numRetry = firstSolve_ ? numRetryInitial_ : numRetryResolve_;
   if(isAbandoned()) {
@@ -2506,12 +2549,11 @@ OsiTMINLPInterface::resolve()
   else app_->disableWarmStart();
   solveAndCheckErrors(1,1,"resolve");
   
-  const char * status=OPT_SYMB;
-  ;
-  if(isAbandoned()) status=FAILED_SYMB;
-  else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
   messageHandler()->message(LOG_FIRST_LINE, messages_)<<nCallOptimizeTNLP_
-						      <<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+						      <<statusAsString()
+                                                      <<getObjValue()
+                                                      <<app_->IterationCount()
+                                                      <<app_->CPUTime()<<CoinMessageEol;
   
   if(isAbandoned()) {
     resolveForRobustness(numRetryUnsolved_);

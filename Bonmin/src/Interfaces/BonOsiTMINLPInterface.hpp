@@ -35,7 +35,8 @@ namespace Bonmin {
   /** Solvers for solving nonlinear programs.*/
   enum Solver{
     EIpopt=0 /** <a href="http://projects.coin-or.org/Ipopt"> Ipopt </a> interior point algorithm.*/,
-    EFilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/
+    EFilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/,
+    EAll/** Use all solvers.*/
   };
 /**
    This is class provides an Osi interface for a Mixed Integer Linear Program
@@ -105,6 +106,8 @@ class SimpleError : public CoinError
                                          */,
     ERROR_NO_TNLPSOLVER /** Trying to access non-existent TNLPSolver*/,
     WARNING_NON_CONVEX_OA /** Warn that there are equality or ranged constraints and OA may works bad.*/,
+    SOLVER_DISAGREE_STATUS /** Different solver gives different status for problem.*/,
+    SOLVER_DISAGREE_VALUE /** Different solver gives different optimal value for problem.*/,
     OSITMINLPINTERFACE_DUMMY_END
   };
 
@@ -1054,6 +1057,11 @@ protected:
   Ipopt::SmartPtr<TMINLP2TNLP> problem_;
   /** Solver for a TMINLP. */
   Ipopt::SmartPtr<TNLPSolver> app_;
+
+  /** Alternate solvers for TMINLP.*/
+  std::list<Ipopt::SmartPtr<TNLPSolver> > debug_apps_;
+  /** Do we use the other solvers?*/
+  bool testOthers_;
   //@}
 
   /** Warmstart information for reoptimization */
@@ -1192,6 +1200,22 @@ private:
   SmartPtr<StrongBranchingSolver> strong_branching_solver_;
   /** status of last optimization before hot start was marked. */
   TNLPSolver::ReturnStatus optimizationStatusBeforeHotStart_;
+static const char * OPT_SYMB;
+static const char * FAILED_SYMB;
+static const char * INFEAS_SYMB;
+static const char * UNBOUND_SYMB;
+  /** Get status as a char * for log.*/
+  const char * statusAsString(TNLPSolver::ReturnStatus r){
+    if(r == TNLPSolver::solvedOptimal || r == TNLPSolver::solvedOptimalTol){
+      return OPT_SYMB;} 
+    else if(r == TNLPSolver::provenInfeasible){
+      return INFEAS_SYMB;}
+    else if(r == TNLPSolver::unbounded){
+      return UNBOUND_SYMB;}
+    else return FAILED_SYMB;
+  }
+  const char * statusAsString(){
+    return statusAsString(optimizationStatus_);}
 };
 }
 #endif
