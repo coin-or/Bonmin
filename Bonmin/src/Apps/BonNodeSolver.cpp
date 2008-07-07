@@ -60,7 +60,7 @@ int main (int argc, char *argv[])
 
 
     BonminAmplSetup bonmin;
-    bonmin.initialize(argv);
+    bonmin.initialize(myArgv);
     Bonmin::OsiTMINLPInterface& nlpSolver = *bonmin.nonlinearSolver();
   
     Ipopt::SmartPtr<Ipopt::OptionsList> Options =
