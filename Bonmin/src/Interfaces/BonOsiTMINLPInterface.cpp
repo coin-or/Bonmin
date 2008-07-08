@@ -2311,7 +2311,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   }
   
   bool otherDisagree = false ;
-#if 1
+#if 0
   if(optimizationStatus_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
   {
     (*messageHandler())<<"Too few degrees of freedom...."<<CoinMessageEol;
