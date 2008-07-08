@@ -216,6 +216,8 @@ namespace Bonmin
       //Change Cbc messages prefixes
       strcpy(cbc_->messagesPointer()->source_,"OaCbc");
 
+      cbc_->setLogLevel(loglevel);
+      cbc_->solver()->messageHandler()->setLogLevel(0);
       clp_->resolve();
       cbc_->setStrategy(*strategy_);
       cbc_->setLogLevel(loglevel);
@@ -321,6 +323,7 @@ OaDecompositionBase::solverManip::solverManip
   }
   if (saveCutoff)
     si->getDblParam(OsiDualObjectiveLimit, cutoff_);
+  si->messageHandler()->setLogLevel(0);
   if (resolve) si->resolve();
 }
 
@@ -560,6 +563,7 @@ OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si)
   double cutoff;
   si.getDblParam(OsiDualObjectiveLimit, cutoff);
   si_->setDblParam(OsiDualObjectiveLimit, cutoff);
+  si_->messageHandler()->setLogLevel(0);
   si_->resolve();
 
   numrows_ = si.getNumRows();

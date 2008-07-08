@@ -277,8 +277,8 @@ OsiTMINLPInterface::Messages::Messages
   ADD_MSG(ERROR_NO_TNLPSOLVER, warn_m, 1,"Can not parse options when no IpApplication has been created");
   ADD_MSG(WARNING_NON_CONVEX_OA, warn_m, 1,
           "OA on non-convex constraint is very experimental.");                          
-  ADD_MSG(SOLVER_DISAGREE_STATUS, warn_m, 1, "Ipopt says problem %s, Filter says %s.");
-  ADD_MSG(SOLVER_DISAGREE_VALUE, warn_m, 1, "Ipopt gives objective %.16g, Filter gives %.16g.");
+  ADD_MSG(SOLVER_DISAGREE_STATUS, warn_m, 1, "%s says problem %s, %s says %s.");
+  ADD_MSG(SOLVER_DISAGREE_VALUE, warn_m, 1, "%s gives objective %.16g, %s gives %.16g.");
 
 }
 
@@ -394,9 +394,6 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with FilterSQP.");
 #endif    
-#ifdef COIN_HAS_IPOPT
-   debug_apps_.push_back(new IpoptSolver(roptions, options, journalist)); 
-#endif
   }
   else if(s == EIpopt){
 #ifdef COIN_HAS_IPOPT
@@ -404,9 +401,6 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
 #else
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with Ipopt.");
-#endif
-#ifdef COIN_HAS_FILTERSQP
-   debug_apps_.push_back(new Bonmin::FilterSolver(roptions, options, journalist)); 
 #endif
   }
   else if(s == EAll){
@@ -2393,13 +2387,15 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
            if(otherStatus != optimizationStatus_){
              otherDisagree = true;
              messageHandler()->message(SOLVER_DISAGREE_STATUS, messages_)
-             <<statusAsString()<<statusAsString(otherStatus)<<CoinMessageEol; 
+             <<app_->solverName()<<statusAsString()
+             <<(*i)->solverName()<<statusAsString(otherStatus)<<CoinMessageEol; 
            }
            else if(isProvenOptimal() && !eq(problem_->obj_value(),problem_copy->obj_value()))
            {
              otherDisagree = true;
              messageHandler()->message(SOLVER_DISAGREE_VALUE, messages_)
-             <<problem_->obj_value()<<problem_copy->obj_value()<<CoinMessageEol; 
+             <<app_->solverName()<<problem_->obj_value()
+             <<(*i)->solverName()<<problem_copy->obj_value()<<CoinMessageEol; 
            }
         }
      }
@@ -2613,7 +2609,7 @@ bool OsiTMINLPInterface::isAbandoned() const
         (optimizationStatus_==TNLPSolver::computationError)||
         (optimizationStatus_==TNLPSolver::illDefinedProblem)||
         (optimizationStatus_==TNLPSolver::illegalOption)||
-        (optimizationStatus_==TNLPSolver::externalException)||
+        (optimizationStatus_==TNLPSolver::externalException)|
         (optimizationStatus_==TNLPSolver::exception)
       );
 }
@@ -2621,8 +2617,8 @@ bool OsiTMINLPInterface::isAbandoned() const
 /// Is optimality proven?
 bool OsiTMINLPInterface::isProvenOptimal() const
 {
-  return (optimizationStatus_==TNLPSolver::solvedOptimal ||
-	  optimizationStatus_==TNLPSolver::solvedOptimalTol);
+  return (optimizationStatus_==TNLPSolver::solvedOptimal) ||
+	  (optimizationStatus_==TNLPSolver::solvedOptimalTol);
 }
 /// Is primal infeasiblity proven?
 bool OsiTMINLPInterface::isProvenPrimalInfeasible() const
