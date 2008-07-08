@@ -80,7 +80,14 @@ namespace Bonmin
       }
     }
     problem_ = new TMINLP2TNLP(tminlp_);
-
+    feasibilityProblem_ = new TNLP2FPNLP
+        (Ipopt::SmartPtr<TNLP>(Ipopt::GetRawPtr(problem_)));
+  if(feasibility_mode_){
+    problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
+  }
+  else {
+    problem_to_optimize_ = GetRawPtr(problem_);
+  }
 
     int numcols = getNumCols();
     if (obj_)
@@ -90,8 +97,6 @@ namespace Bonmin
     setStrParam(OsiProbName, std::string(argv[1]));
     extractInterfaceParams();
     hasBeenOptimized_ = false;
-    feasibilityProblem_ = new TNLP2FPNLP
-        (Ipopt::SmartPtr<TNLP>(Ipopt::GetRawPtr(problem_)));
 
     //Read columns and row names if they exists
     readNames();
