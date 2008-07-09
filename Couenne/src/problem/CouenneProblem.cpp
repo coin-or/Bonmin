@@ -42,7 +42,8 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   numbering_ (NULL),
   ndefined_  (0),
   graph_     (NULL),
-  nOrig_     (0),
+  nOrigVars_ (0),
+  nOrigIntVars_ (0),
   pcutoff_   (new GlobalCutOff (COIN_DBL_MAX)),
   created_pcutoff_ (true),
   doFBBT_    (true),
@@ -81,11 +82,12 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   // save -- for statistic purposes -- number of original
   // constraints. Some of them will be deleted as definition of
   // auxiliary variables.
-  nOrigCons_ = constraints_. size ();
+  nOrigCons_    = constraints_. size ();
+  nOrigIntVars_ = nIntVars ();
 
   jnlst_->Printf (Ipopt::J_SUMMARY, J_PROBLEM,
 		  "Problem size before standarization: %d variables (%d integer), %d constraints.\n",
-		  nOrig_, nIntVars (), nOrigCons_);
+		  nOrigVars_, nOrigIntVars_, nOrigCons_);
 
   if (base) {
     std::string s;
@@ -181,8 +183,9 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   numbering_    (NULL),
   ndefined_     (p.ndefined_),
   graph_        (NULL),
-  nOrig_        (p.nOrig_),
+  nOrigVars_    (p.nOrigVars_),
   nOrigCons_    (p.nOrigCons_),
+  nOrigIntVars_ (p.nOrigIntVars_),
   pcutoff_      (p.pcutoff_),
   created_pcutoff_ (false),
   doFBBT_       (p. doFBBT_),
@@ -436,11 +439,11 @@ void CouenneProblem::fillIntegerRank () const {
   }
 
   jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "Free (original) integers\n");
-  for (int i=0; i<nOrig_; i++)
+  for (int i=0; i<nOrigVars_; i++)
     jnlst_->Printf (Ipopt::J_VECTOR, J_PROBLEM, "%d: %d\n", i, integerRank_ [i]);
 
   // fill in numberInRank_
-  for (int i=0; i<nOrig_; i++)
+  for (int i=0; i<nOrigVars_; i++)
     if ((variables_ [i] -> isDefinedInteger ()) &&
 	(variables_ [i] -> Multiplicity () > 0)) {
 

@@ -114,11 +114,14 @@ class CouenneProblem {
   DepGraph *graph_;
 
   /// Number of original variables
-  int nOrig_;
+  int nOrigVars_;
 
   /// Number of original constraints (disregarding those that turned
   /// into auxiliary variable definition)
   int nOrigCons_;
+
+  /// Number of original integer variables
+  int nOrigIntVars_;
 
   /// Pointer to a global cutoff object
   mutable GlobalCutOff* pcutoff_;
@@ -181,9 +184,10 @@ class CouenneProblem {
   int nCons     () const {return constraints_.  size ();} ///< Get number of constraints
   int nOrigCons () const {return nOrigCons_;}             ///< Get number of original constraints
 
-  inline int nOrig    () const {return nOrig_;}              ///< Number of original variables
-  inline int nIntVars () const {return nIntVars_;}           ///< Number of original integer variables
-  inline int nVars    () const {return variables_. size ();} ///< Total number of variables
+  inline int nOrigVars    () const {return nOrigVars_;}          ///< Number of original variables
+  inline int nOrigIntVars () const {return nOrigIntVars_;}       ///< Number of original integers
+  inline int nIntVars     () const {return nIntVars_;}           ///< Number of integer variables
+  inline int nVars        () const {return variables_. size ();} ///< Total number of variables
 
   /// get evaluation order index 
   inline int evalOrder (int i) const

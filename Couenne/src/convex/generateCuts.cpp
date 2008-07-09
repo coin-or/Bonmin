@@ -355,7 +355,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	 problem_ -> domain () -> ub (), false);
 
       // fill originals with nlp values
-      CoinCopyN (nlpSol, problem_ -> nOrig (), problem_ -> domain () -> x ());
+      CoinCopyN (nlpSol, problem_ -> nOrigVars (), problem_ -> domain () -> x ());
       problem_ -> initAuxs ();
 
       if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {

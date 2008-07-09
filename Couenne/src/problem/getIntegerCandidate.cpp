@@ -34,24 +34,24 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     retval   = 0;
 
   double
-    *olb   = new double [ncols],   *oub   = new double [ncols],  // outer bounds
-    *dualL = new double [nOrig_],  *dualR = new double [nOrig_]; // lb[objind] per fix index/direction
+    *olb   = new double [ncols],       *oub   = new double [ncols],      // outer bounds
+    *dualL = new double [nOrigVars_],  *dualR = new double [nOrigVars_]; // lb[objind] per fix index/direction
 
   // copy in current bounds
   CoinCopyN (Lb (), ncols, olb);
   CoinCopyN (Ub (), ncols, oub);
 
   // for now save fractional point into integer point
-  CoinCopyN (xFrac, nOrig_, xInt);
+  CoinCopyN (xFrac, nOrigVars_, xInt);
 
   domain_.push (nVars (), xInt, lb, ub);
 
   CoinCopyN (lb, nVars (), Lb ());
   CoinCopyN (ub, nVars (), Ub ());
 
-  enum fixType *fixed = new enum fixType [nOrig_]; // integer variables that were fixed
+  enum fixType *fixed = new enum fixType [nOrigVars_]; // integer variables that were fixed
 
-  for (int i=0; i<nOrig_; i++) 
+  for (int i=0; i<nOrigVars_; i++) 
     fixed [i] = (Var (i) -> isInteger () &&        // work on integer variables only
 		 Var (i) -> Multiplicity () > 0) ? // don't care if unused variable
       UNFIXED : CONTINUOUS;
@@ -104,7 +104,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
       printf ("=       ===========================================\n");
       printf ("= BEGIN ===========================================\n");
       printf ("=       ===========================================\n");
-      for (int i=0; i<nOrig_; i++)
+      for (int i=0; i<nOrigVars_; i++)
 	if (variables_ [i] -> Multiplicity () > 0)
 	  printf ("#### %4d: %d %c %2d frac %20g  [%20g,%20g]\n", 
 		  i, fixed [i], 
@@ -112,7 +112,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 		  integerRank_ ? integerRank_ [i] : -1,
 		  xFrac [i], Lb (i), Ub (i));
       printf ("---\n");
-      for (int i=nOrig_; i<nVars (); i++)
+      for (int i=nOrigVars_; i<nVars (); i++)
 	if (variables_ [i] -> Multiplicity () > 0)
 	  printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
 		  i, variables_ [i] -> isInteger () ? 'I' : ' ',
@@ -134,7 +134,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	// *rNum is the number of variable with integer rank equal to rank
 
 	// start restricting around current integer box
-	for (int i=0; i<nOrig_; i++) 
+	for (int i=0; i<nOrigVars_; i++) 
 	  if ((Var (i) -> Multiplicity () > 0) && // alive variable
 	      (Var (i) -> isInteger    ())     && // integer, may fix if independent of other integers
 	      (integerRank_ [i] == rank)) {
@@ -148,7 +148,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
 	  printf ("= RANK LEVEL = %d [%d] ==================================\n", rank, *rNum);
-	  for (int i=0; i<nOrig_; i++)
+	  for (int i=0; i<nOrigVars_; i++)
 	    if (Var (i) -> Multiplicity () > 0) // alive variable
 	      printf ("#### %4d: %d %c %2d frac %20g -> int %20g [%20g,%20g]\n", 
 		      i, fixed [i], 
@@ -156,7 +156,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 		      integerRank_ ? integerRank_ [i] : -1,
 		      xFrac [i], xInt [i], Lb (i), Ub (i));
 	  printf ("--------------------\n");
-	  for (int i=nOrig_; i<nVars (); i++)
+	  for (int i=nOrigVars_; i<nVars (); i++)
 	    if (Var (i) -> Multiplicity () > 0) // alive variable
 	      printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
 		      i, variables_ [i] -> isInteger () ? 'I' : ' ',
@@ -165,7 +165,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	  printf ("=================================================\n");
 	}
 
-	//CoinCopyN (xFrac, nOrig_, xInt);// TODO: re-copy first nOrig_ variables into xInt?
+	//CoinCopyN (xFrac, nOrigVars_, xInt);// TODO: re-copy first nOrigVars_ variables into xInt?
 
 	int 
 	  remaining = *rNum,
@@ -176,7 +176,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	  bool one_fixed = false;
 
-	  for (int i=0; i<nOrig_; i++) 
+	  for (int i=0; i<nOrigVars_; i++) 
 
 	    if ((Var (i) -> Multiplicity () > 0) && // alive 
 		(integerRank_ [i] == rank)       && // at this rank
@@ -218,13 +218,13 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	    int index = 0;
 
 	    // find first unfixed integer at this rank
-	    while ((index < nOrig_) && 
+	    while ((index < nOrigVars_) && 
 		   (!(Var (index) -> isInteger ()) ||
 		    (integerRank_ [index] != rank) ||
 		    (fixed [index] != UNFIXED)))
 	      index++;
 
-	    assert (index < nOrig_);
+	    assert (index < nOrigVars_);
 
 	    jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
 			      "none fixed, fix %d from %g [%g,%g] [L=%g, R=%g]", 
@@ -248,7 +248,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	  if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
 	    printf ("--- remaining = %d --------------------------- \n", remaining);
-	    for (int i=0; i<nOrig_; i++)
+	    for (int i=0; i<nOrigVars_; i++)
 	      if (variables_ [i] -> Multiplicity () > 0)
 		printf ("#### %4d: %d %c %2d frac %20g -> int %20g  [%20g,%20g]\n", 
 			i, fixed [i], 
@@ -262,7 +262,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
       } // for
 
     // save tightened bounds in NLP space. Sanity check
-    for (int i = nOrig_; i--;) 
+    for (int i = nOrigVars_; i--;) 
       if (Var (i) -> Multiplicity () > 0) {
 
 	if (fixed [i] == FIXED)       // integer point, fixed
@@ -308,7 +308,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
     if (retval >= 0) {
       printf ("- retval %d ----------------------------------------------------------------\n", 
 	      retval);
-      for (int i=0; i<nOrig_; i++)
+      for (int i=0; i<nOrigVars_; i++)
 	if (variables_ [i] -> Multiplicity () > 0)
 	  printf ("#### %4d: %d %c frac %20g -> int %20g [%20g,%20g]\n", 
 		  i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',

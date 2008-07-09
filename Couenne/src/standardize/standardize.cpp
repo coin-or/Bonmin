@@ -216,7 +216,7 @@ void CouenneProblem::standardize () {
       // initial auxiliary bounds are infinite (they are later changed
       // through branching)
 
-      if (variables_ [ord] -> Index () >= nOrig_) { // and one that was not an original, originally...
+      if (variables_ [ord] -> Index () >= nOrigVars_) { // and one that was not an original, originally...
 
 	domain_.lb (ord) = -COIN_DBL_MAX;
 	domain_.ub (ord) =  COIN_DBL_MAX;
@@ -320,7 +320,7 @@ void CouenneProblem::standardize () {
 
 	auxiliarize (varLeaves, varStays); // now replace occurrences of w_k with x_h
 
-	//if (varLeaves -> Index () >= nOrig_) // why check? It's not there anymore.
+	//if (varLeaves -> Index () >= nOrigVars_) // why check? It's not there anymore.
 	varLeaves -> zeroMult (); // disable this variable
       }
     }

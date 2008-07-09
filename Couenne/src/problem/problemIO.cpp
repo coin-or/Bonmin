@@ -113,7 +113,7 @@ bool CouenneProblem::readOptimum (std::string *fname) {
   }
 
   // read optimal values of variables
-  for (int i = 0; i < nOrig_; i++)
+  for (int i = 0; i < nOrigVars_; i++)
     if (fscanf (f, "%lf", optimum_ + i) < 1) {
       fclose (f);
       printf ("could not read optimal value of x_%d from file \"%s\"\n", i, fname -> c_str ());
@@ -121,7 +121,7 @@ bool CouenneProblem::readOptimum (std::string *fname) {
     }
 
   if (opt_window_ < 1e50) // restrict solution space around known optimum
-    for (int i = 0; i < nOrig_; i++) {
+    for (int i = 0; i < nOrigVars_; i++) {
       Lb (i) = CoinMax (Lb (i), optimum_ [i] - opt_window_ * (1 + fabs (optimum_ [i])));
       Ub (i) = CoinMin (Ub (i), optimum_ [i] + opt_window_ * (1 + fabs (optimum_ [i])));
     }

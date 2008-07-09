@@ -16,7 +16,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
   const int infeasible = 1;
 
   /*printf ("checking solution: [%g] ", obj);
-  for (int i=0; i<nOrig_; i++)
+  for (int i=0; i<nOrigVars_; i++)
     printf ("%.5f ", solution [i]);
     printf ("\n");*/
 
@@ -24,9 +24,9 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
 
   // copy solution, evaluate the corresponding aux, and then replace
   // the original variables again for checking
-  CoinCopyN (solution, nOrig_, sol);
+  CoinCopyN (solution, nOrigVars_, sol);
   getAuxs (sol);
-  CoinCopyN (solution, nOrig_, sol);
+  CoinCopyN (solution, nOrigVars_, sol);
 
   // install NL solution candidate in evaluation structure
   domain_.push (nVars (), sol, domain_.lb (), domain_.ub (), false);
@@ -53,7 +53,7 @@ bool CouenneProblem::checkNLP (const double *solution, const double obj) const {
       throw infeasible;
     }
 
-    for (int i=0; i < nOrig_; i++) {
+    for (int i=0; i < nOrigVars_; i++) {
 
       CouNumber val = domain_.x (i);
 

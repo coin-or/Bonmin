@@ -42,8 +42,8 @@ void CouenneProblem::initAuxs () const {
 
     int index;
 
-    if ((variables_ [i] -> Type  () == AUX) &&            // this is an auxiliary
-	((index = variables_ [i] -> Index ()) >= nOrig_)) // and not an original, originally...
+    if ((variables_ [i] -> Type  () == AUX) &&                // this is an auxiliary
+	((index = variables_ [i] -> Index ()) >= nOrigVars_)) // and not an original, originally...
       //int index = variables_ [i] -> Index ();
       Lb (index) = - (Ub (index) = COUENNE_INFINITY);
   }

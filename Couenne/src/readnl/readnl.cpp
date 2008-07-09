@@ -73,7 +73,7 @@ int CouenneProblem::readnl (const ASL *asl) {
   // add space for common expressions
   for (int i = ndefined_; i--;)                                  addVariable(false, &domain_);
 
-  nOrig_ = n_var;
+  nOrigVars_ = n_var;
 
   // create expression set for binary search
   auxSet_ = new std::set <exprAux *, compExpr>;

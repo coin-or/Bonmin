@@ -84,7 +84,9 @@ Couenne/src/convex/operators/quadCuts.cpp -text
 Couenne/src/convex/operators/trigNewton.cpp -text
 Couenne/src/convex/operators/unifiedProdCuts.cpp -text
 Couenne/src/convex/updateBranchInfo.cpp -text
+Couenne/src/disjunctive/CouenneDisjCuts.cpp -text
 Couenne/src/disjunctive/CouenneDisjCuts.hpp -text
+Couenne/src/disjunctive/generateDisjCuts.cpp -text
 Couenne/src/expression/.deps/expression.Po -text
 Couenne/src/expression/CouennePrecisions.hpp -text
 Couenne/src/expression/CouenneTypes.hpp -text

@@ -118,11 +118,11 @@ expression *CouenneProblem::nl2e (expr *e, const ASL *asl) {
 
     int j = ((expr_v *) e) -> a;
 
-    if (j >= nOrig_) // common expression
+    if (j >= nOrigVars_) // common expression
       // use base pointer otherwise the .a field returns an awkward, out-of-bound index
       j = ((expr_v *) e) - ((const ASL_fg *) asl) -> I.var_e_; 
 
-    if (j >= nOrig_ + ndefined_) {
+    if (j >= nOrigVars_ + ndefined_) {
       printf ("error: unknown variable x_%d\n", j);
       //return new exprClone (variables_ [0]);
       exit (-1);

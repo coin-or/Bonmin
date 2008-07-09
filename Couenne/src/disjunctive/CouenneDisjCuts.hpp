@@ -12,8 +12,10 @@
 
 #include "BonRegisteredOptions.hpp"
 
-#include "OsiRowCut.hpp"
 #include "OsiSolverInterface.hpp"
+#include "CglCutGenerator.hpp"
+#include "BonOsiTMINLPInterface.hpp"
+#include "BonBabInfos.hpp"
 
 #include "CouenneTypes.hpp"
 #include "CouenneJournalist.hpp"
@@ -43,8 +45,14 @@ class CouenneDisjCuts: public CglCutGenerator {
   mutable double objValue_;
 
   /// nonlinear solver interface as used within Bonmin (used at first
-  /// Couenne pass of each b&b node
-  Bonmin::OsiTMINLPInterface *nlp_;
+  /// Couenne pass of each b&b node)
+  Bonmin::OsiTMINLPInterface *minlp_;
+
+  /// Branching scheme (if strong, we can use SB candidates)
+  OsiChooseVariable *branchingMethod_;
+
+  /// Is branchMethod_ referred to a strong branching scheme?
+  bool isBranchingStrong_;
 
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
@@ -52,13 +60,15 @@ class CouenneDisjCuts: public CglCutGenerator {
  public:
 
   /// constructor
-  CouenneDisjCuts (Bonmin::OsiTMINLPInterface * = NULL,
+  CouenneDisjCuts (Bonmin::OsiTMINLPInterface *minlp = NULL,
 		   Bonmin::BabSetupBase *base = NULL,
-		   const struct ASL * = NULL, 
+		   CouenneProblem *problem = NULL,
+		   OsiChooseVariable *bcv = NULL,
+		   bool is_strong = false,
 		   JnlstPtr journalist = NULL);
 
   /// copy constructor
-  CouenneDisjCuts (const CouenneCutGenerator &);
+  CouenneDisjCuts (const CouenneDisjCuts &);
 
   /// destructor
   ~CouenneDisjCuts ();

@@ -70,8 +70,8 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   for (std::list<SmartPtr<const Bonmin::CouenneInfo::NlpSolution> >::const_iterator 
 	 i = solList.begin();
        i != solList.end(); i++) {
-    assert(nOrig_ == (*i)->nVars());
-    const double thisDist = distanceToBound(nOrig_, (*i)->solution(), olb, oub);
+    assert(nOrigVars_ == (*i)->nVars());
+    const double thisDist = distanceToBound(nOrigVars_, (*i)->solution(), olb, oub);
     if (thisDist < dist) {
       closestSol = *i;
       dist = thisDist;
@@ -93,12 +93,12 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
     CoinFillN (lower, nvars, -COUENNE_INFINITY);
     CoinFillN (upper, nvars,  COUENNE_INFINITY);
 
-    CoinCopyN (nlp -> getColLower (), nOrig_, lower);
-    CoinCopyN (nlp -> getColUpper (), nOrig_, upper);
+    CoinCopyN (nlp -> getColLower (), nOrigVars_, lower);
+    CoinCopyN (nlp -> getColUpper (), nOrigVars_, upper);
 
     double *Y = new double [nvars];
     CoinFillN (Y, nvars, 0.);
-    CoinCopyN (X (), nOrig_, Y);
+    CoinCopyN (X (), nOrigVars_, Y);
 
     if (getIntegerCandidate (nlp -> getColSolution (), Y, lower, upper) < 0) {
       jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "TODO: find NLP point in ABT failed\n");
@@ -122,7 +122,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
     if (nlp->isProvenOptimal()) {
       closestSol = new Bonmin::CouenneInfo::NlpSolution 
-	(nOrig_, nlp->getColSolution(), nlp->getObjValue());
+	(nOrigVars_, nlp->getColSolution(), nlp->getObjValue());
       couInfo->addSolution(closestSol);
       dist = 0.;
     }
@@ -142,7 +142,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   // through getAuxs()
 
   double *X = new double [ncols];
-  CoinCopyN (closestSol->solution(), nOrig_, X);
+  CoinCopyN (closestSol->solution(), nOrigVars_, X);
   getAuxs (X);
 
   // create a new, fictitious, bound bookkeeping structure
@@ -151,7 +151,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
     //    CouNumber cutoff = getCutOff ();
     int       objind = Obj (0) -> Body  () -> Index ();
-    for (int i=0; i<nOrig_; i++)
+    for (int i=0; i<nOrigVars_; i++)
       Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 		      "   %2d %+20g [%+20g %+20g]\n",
 		      i, X [i], Lb (i), Ub (i));
@@ -195,7 +195,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
       // PBe: That makes a lot of sense when problems are really
       // big. Instances arki000[24].nl spend a lot of time here
 
-      if ((nOrig_ < THRES_ABT_ORIG) || (index < nOrig_)) {
+      if ((nOrigVars_ < THRES_ABT_ORIG) || (index < nOrigVars_)) {
 
 	// if (index == objind) continue; // don't do it on objective function
 
@@ -244,7 +244,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
     Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 		    "-------------\ndone Aggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
 		    Lb (objind), getCutOff (), ncols);
-    for (int i=0; i<nOrig_; i++)
+    for (int i=0; i<nOrigVars_; i++)
       Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
 		      "   %2d %+20g %+20g  | %+20g\n",
 		      i, Lb (i), Ub (i), X [i]);

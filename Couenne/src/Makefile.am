@@ -93,6 +93,8 @@ libCouenne_la_SOURCES = \
 	convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp \
 	convex/updateBranchInfo.cpp \
+	disjunctive/CouenneDisjCuts.cpp \
+	disjunctive/generateDisjCuts.cpp \
 	standardize/decomposeTerm.cpp \
 	standardize/linStandardize.cpp \
 	standardize/sumStandardize.cpp \
