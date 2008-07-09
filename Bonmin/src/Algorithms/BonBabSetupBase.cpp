@@ -304,6 +304,7 @@ namespace Bonmin
     // Set branching strategy
     if (varSelection == MOST_FRACTIONAL) {
       intParam_[NumberStrong] = 0;
+      intParam_[NumberBeforeTrust] = 0;
       options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
     }
     else if (varSelection == RELIABILITY_BRANCHING) {
