@@ -345,7 +345,7 @@ namespace Bonmin
     }
     int varSelection;
     bool val = options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
-    if (!val) {
+    if (!val || varSelection == STRONG_BRANCHING || varSelection == RELIABILITY_BRANCHING ) {
       options_->SetStringValue("variable_selection", "nlp-strong-branching","bonmin.");
       varSelection = NLP_STRONG_BRANCHING;
     }
