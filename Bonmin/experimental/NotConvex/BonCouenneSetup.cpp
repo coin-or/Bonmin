@@ -19,6 +19,7 @@
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
 #include "CouenneCutGenerator.hpp"
+#include "CouenneDisjCuts.hpp"
 #include "BonCouenneInfo.hpp"
 #include "BonCbcNode.hpp"
 
@@ -264,6 +265,7 @@ namespace Bonmin{
     }
 
     // Add objects /////////////////////////////////
+
     continuousSolver_ -> addObjects (nobj, objects);
 
     for (int i = 0 ; i < nobj ; i++)
@@ -274,8 +276,11 @@ namespace Bonmin{
     // Setup Convexifier generators ////////////////////////////////////////////////
 
     int freq;
+
     options()->GetIntegerValue("convexification_cuts",freq,"couenne.");
+
     if (freq != 0) {
+
       CuttingMethod cg;
       cg.frequency = freq;
       cg.cgl = couenneCg;
@@ -287,13 +292,16 @@ namespace Bonmin{
 	(continuousSolver_) -> setCutGenPtr (couenneCg);
     }
 
+    // disjunctive cuts generator added AFTER 
+
     // add other cut generators -- test for integer variables first
     if (couenneCg -> Problem () -> nIntVars () > 0)
       addMilpCutGenerators ();
 
     CouennePtr_ = couenneCg;
 
-    /*Setup heuristic to solve nlp problems.*/
+    // Setup heuristic to solve nlp problems. /////////////////////////////////
+
     int doNlpHeurisitic = 0;
     options()->GetEnumValue("local_optimization_heuristic", doNlpHeurisitic, "couenne.");
     if(doNlpHeurisitic)
@@ -312,20 +320,13 @@ namespace Bonmin{
       heuristics_.push_back(h);
     }
 
+    // Add Branching rules ///////////////////////////////////////////////////////
+
     int varSelection;
     if (!options_->GetEnumValue("variable_selection",varSelection,"bonmin.")) {
       // change the default for Couenne
       varSelection = OSI_SIMPLE;
     }
-
-    /*
-    if ((varSelection == OSI_STRONG) && 
-	(objType == CouenneObject::VT_OBJ)) {
-      printf ("Couenne: warning, strong branching is incompatible with Violation Transfer\n"
-	      "Resetting variable selection to simple branching");
-      varSelection = OSI_SIMPLE;
-    }
-    */
 
     switch (varSelection) {
 
@@ -348,6 +349,26 @@ namespace Bonmin{
       std::cerr << "Unknown variable_selection for Couenne\n" << std::endl;
       throw;
       break;
+    }
+
+    // Add disjunctive cuts ///////////////////////////////////////////////////////
+
+    options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
+
+    if (freq != 0) {
+
+      CouenneDisjCuts * couenneDisj = 
+	new CouenneDisjCuts (ci, this, 
+			     couenneCg -> Problem (), 
+			     branchingMethod_, 
+			     varSelection == OSI_STRONG, // if true, use strong branching candidates
+			     journalist ());
+
+      CuttingMethod cg;
+      cg.frequency = freq;
+      cg.cgl = couenneDisj;
+      cg.id = "Couenne disjunctive cuts";
+      cutGenerators (). push_back(cg);
     }
 
     int ival;
@@ -377,6 +398,7 @@ namespace Bonmin{
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
     CouenneCutGenerator::registerOptions (roptions);
+    CouenneDisjCuts::registerOptions (roptions);
 
     roptions -> AddStringOption2 (
       "display_stats",

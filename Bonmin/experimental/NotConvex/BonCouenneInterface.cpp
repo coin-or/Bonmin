@@ -108,7 +108,7 @@ CouenneInterface::extractLinearRelaxation
 	*nlb = getColLower (),
 	*nub = getColUpper ();
 
-      for (int i=0; i < p -> nOrig (); i++) 
+      for (int i=0; i < p -> nOrigVars (); i++) 
 	if (p -> Var (i) -> Multiplicity () > 0) {
 	  if (nlb [i] < p -> Lb (i) - COUENNE_EPS) setColLower (i, p -> Lb (i));
 	  if (nub [i] > p -> Ub (i) + COUENNE_EPS) setColUpper (i, p -> Ub (i));
@@ -129,7 +129,7 @@ CouenneInterface::extractLinearRelaxation
       if (getNumIntegers () > 0) {
 
 	int
-	  norig = p -> nOrig (),
+	  norig = p -> nOrigVars (),
 	  nvars = p -> nVars ();
 
 	bool fractional = false;

@@ -29,7 +29,7 @@ namespace Bonmin{
 
       sol_ = new double[nVars_];
 
-      CoinCopyN(sol, cp.nOrig(), sol_);
+      CoinCopyN(sol, cp.nOrigVars(), sol_);
       cp.getAuxs(sol_);
     }
   }
