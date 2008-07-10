@@ -2019,10 +2019,32 @@ OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const 
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
+  feasibilityProblem_->set_use_feasibility_pump_objective(true);
   feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
   feasibilityProblem_->setLambda(a);
   feasibilityProblem_->setSigma(s);
   feasibilityProblem_->setNorm(L);
+  feasibilityProblem_->set_use_cutoff_constraint(false);
+  feasibilityProblem_->set_use_local_branching_constraint(false);  
+  problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
+  feasibility_mode_ = true;
+}
+
+void
+OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
+					       int L, double cutoff, double rhs_local_branching_constraint){
+  if(! IsValid(feasibilityProblem_)) {
+    throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
+  }
+  feasibilityProblem_->set_use_feasibility_pump_objective(true);
+  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->setLambda(1.0);
+  feasibilityProblem_->setSigma(0.0);
+  feasibilityProblem_->setNorm(L);
+  feasibilityProblem_->set_use_cutoff_constraint(false);
+  feasibilityProblem_->set_cutoff(cutoff);
+  feasibilityProblem_->set_use_local_branching_constraint(true);  
+  feasibilityProblem_->set_rhs_local_branching_constraint(rhs_local_branching_constraint);  
   problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
   feasibility_mode_ = true;
 }
@@ -2040,10 +2062,38 @@ OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
+  feasibilityProblem_->set_use_feasibility_pump_objective(true);
   feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
   feasibilityProblem_->setLambda(a);
   feasibilityProblem_->setSigma(s);
   feasibilityProblem_->setNorm(L);
+  feasibilityProblem_->set_use_cutoff_constraint(false);
+  feasibilityProblem_->set_use_local_branching_constraint(false);  
+  nCallOptimizeTNLP_++;
+  totalNlpSolveTime_-=CoinCpuTime();
+  SmartPtr<TNLPSolver> app2 = app_->clone();
+  app2->options()->SetIntegerValue("print_level", (Index) 0);
+  optimizationStatus_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
+  totalNlpSolveTime_+=CoinCpuTime();
+  hasBeenOptimized_=true;
+  return getObjValue();
+}
+
+double
+OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+                                            int L, double cutoff)
+{
+  if(! IsValid(feasibilityProblem_)) {
+    throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
+  }
+  feasibilityProblem_->set_use_feasibility_pump_objective(true);
+  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->setLambda(1.0);
+  feasibilityProblem_->setSigma(0.0);
+  feasibilityProblem_->setNorm(L);
+  feasibilityProblem_->set_use_cutoff_constraint(true);
+  feasibilityProblem_->set_cutoff(cutoff);
+  feasibilityProblem_->set_use_local_branching_constraint(false);  
   nCallOptimizeTNLP_++;
   totalNlpSolveTime_-=CoinCpuTime();
   SmartPtr<TNLPSolver> app2 = app_->clone();
