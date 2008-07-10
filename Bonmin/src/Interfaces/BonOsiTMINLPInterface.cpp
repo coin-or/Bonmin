@@ -388,6 +388,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
   options->GetEnumValue("nlp_solver", ival, "bonmin.");
   Solver s = (Solver) ival;
   if(s == EFilterSQP){
+    testOthers_ = false;;
 #ifdef COIN_HAS_FILTERSQP
     app_ = new Bonmin::FilterSolver(roptions, options, journalist);
 #else
@@ -396,6 +397,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
 #endif    
   }
   else if(s == EIpopt){
+    testOthers_ = false;
 #ifdef COIN_HAS_IPOPT
     app_ = new IpoptSolver(roptions, options, journalist);
 #else
@@ -2430,7 +2432,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
           i != debug_apps_.end() ; i++){
         TNLPSolver::ReturnStatus otherStatus = (*i)->OptimizeTNLP(GetRawPtr(problem_copy));
        messageHandler()->message(LOG_LINE, messages_)
-         <<'d'<<f++<<statusAsString()<<problem_copy->obj_value()
+         <<'d'<<f++<<statusAsString(otherStatus)<<problem_copy->obj_value()
          <<(*i)->IterationCount()<<(*i)->CPUTime()<<CoinMessageEol;
         if(!(*i)->isError(otherStatus)){
            CoinRelFltEq eq(1e-05);
