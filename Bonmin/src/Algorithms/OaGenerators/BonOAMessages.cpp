@@ -21,7 +21,7 @@ namespace Bonmin
     strcpy(source_,"OA");
     ADD_MSG(FEASIBLE_NLP, std_m, 2,"Solved NLP in %d iterations, found a feasible solution of value %f.");
     ADD_MSG(INFEASIBLE_NLP, std_m,2,"Solved NLP in %d iterations, problem is infeasible in subspace.");
-    ADD_MSG(UPDATE_UB, ,1,"New best feasible of %g found after %g sec.");
+    ADD_MSG(UPDATE_UB, std_m,1,"New best feasible of %g found after %g sec.");
     ADD_MSG(SOLVED_LOCAL_SEARCH, std_m,2,"Local search solved to optimality in %d nodes and %d lp iterations.");
     ADD_MSG(LOCAL_SEARCH_ABORT, std_m,2,"Local search aborted : %d nodes and %d lp iterations.");
     ADD_MSG(UPDATE_LB, std_m ,2,"Updating lower bound to %g elapsed time %g sec");
