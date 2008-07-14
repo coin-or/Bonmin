@@ -45,6 +45,8 @@
 
 #include "BonFixAndSolveHeuristic.hpp"
 #include "BonDummyPump.hpp"
+#include "BonHeuristicRINS.hpp"
+#include "BonHeuristicLocalBranching.hpp"
 namespace Bonmin
 {
   BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy)
@@ -94,6 +96,8 @@ namespace Bonmin
     LocalSolverBasedHeuristic::registerOptions(roptions);
     FixAndSolveHeuristic::registerOptions(roptions);
     DummyPump::registerOptions(roptions);
+    HeuristicRINS::registerOptions(roptions);
+    HeuristicLocalBranching::registerOptions(roptions);
 
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
@@ -437,6 +441,26 @@ namespace Bonmin
       HeuristicMethod h;
       h.heuristic = fix_and_solve;
       h.id = "Dummy pump";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicRINS = false;
+    options()->GetEnumValue("heuristic_RINS",doHeuristicRINS,"bonmin.");
+    if(doHeuristicRINS){
+      HeuristicRINS* rins = new HeuristicRINS(this);
+      HeuristicMethod h;
+      h.heuristic = rins;
+      h.id = "RINS";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicLocalBranching = false;
+    options()->GetEnumValue("heuristic_local_branching",doHeuristicLocalBranching,"bonmin.");
+    if(doHeuristicLocalBranching){
+      HeuristicLocalBranching* local_branching = new HeuristicLocalBranching(this);
+      HeuristicMethod h;
+      h.heuristic = local_branching;
+      h.id = "LocalBranching";
       heuristics_.push_back(h);
     }
   }
