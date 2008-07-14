@@ -19,7 +19,9 @@ noinst_LTLIBRARIES = libbonheuristics.la
 libbonheuristics_la_SOURCES = \
        BonLocalSolverBasedHeuristic.cpp  BonLocalSolverBasedHeuristic.hpp \
        BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
-       BonDummyPump.cpp BonDummyPump.hpp
+       BonDummyPump.cpp BonDummyPump.hpp \
+       BonHeuristicRINS.cpp BonHeuristicRINS.hpp \
+       BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp
 
 # This is for libtool (on Windows)
 libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
@@ -85,7 +87,9 @@ includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
                      BonLocalSolverBasedHeuristic.hpp \
                      BonFixAndSolveHeuristic.hpp \
-                     BonDummyPump.hpp
+                     BonDummyPump.hpp \
+                     BonHeuristicRINS.hpp \
+                     BonHeuristicLocalBranching.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -95,7 +99,9 @@ includecoin_HEADERS = \
 ASTYLE_FILES = \
    BonLocalSolverBasedHeuristic.cppbak  BonLocalSolverBasedHeuristic.hppbak \
    BonFixAndSolveHeuristic.cppbak  BonFixAndSolveHeuristic.hppbak \
-   BonDummyPump.cppbak BonDummyPump.hppbak
+   BonDummyPump.cppbak BonDummyPump.hppbak \
+   BonHeuristicRINS.cppbak BonHeuristicRINS.hppbak \
+   BonHeuristicLocalBranching.cppbak BonHeuristicLocalBranching.hppbak 
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
