@@ -2036,17 +2036,13 @@ OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const 
 
 void
 OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
-					       int L, double cutoff, double rhs_local_branching_constraint){
+					       double rhs_local_branching_constraint){
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
-  feasibilityProblem_->set_use_feasibility_pump_objective(true);
+  feasibilityProblem_->set_use_feasibility_pump_objective(false);
   feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
-  feasibilityProblem_->setLambda(1.0);
-  feasibilityProblem_->setSigma(0.0);
-  feasibilityProblem_->setNorm(L);
   feasibilityProblem_->set_use_cutoff_constraint(false);
-  feasibilityProblem_->set_cutoff(cutoff);
   feasibilityProblem_->set_use_local_branching_constraint(true);  
   feasibilityProblem_->set_rhs_local_branching_constraint(rhs_local_branching_constraint);  
   problem_to_optimize_ = GetRawPtr(feasibilityProblem_);

@@ -907,7 +907,7 @@ class Messages : public CoinMessages
 
   /** Given a point x_bar setup feasibility problem and switch so that every call to initialSolve or resolve will
       solve it. This is to be used in the local branching heuristic */
-  void switchToFeasibilityProblem(int n, const double * x_bar, const int* ind, int L, double cutoff,
+  void switchToFeasibilityProblem(int n, const double * x_bar, const int* ind,
 				  double rhs_local_branching_constraint);
 
   /** switch back to solving original problem.*/
