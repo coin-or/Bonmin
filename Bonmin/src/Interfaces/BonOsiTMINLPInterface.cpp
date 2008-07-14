@@ -318,6 +318,8 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     problem_to_optimize_(NULL),
     feasibility_mode_(false),
     app_(NULL),
+    debug_apps_(),
+    testOthers_(false),
     warmstart_(NULL),
     rowsense_(NULL),
     rhs_(NULL),
