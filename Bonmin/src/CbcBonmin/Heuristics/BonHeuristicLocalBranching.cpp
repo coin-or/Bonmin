@@ -59,7 +59,7 @@ namespace Bonmin {
       inds[i] = iColumn;
     }
 
-    double rhs_local_branching_constraint = floor(numberIntegers / 2);
+    double rhs_local_branching_constraint = numberIntegers / 2; //stefan: this should be the same as floor(numInt/2) since numInt and 2 are int's
     nlp->switchToFeasibilityProblem(numberIntegers, vals, inds, rhs_local_branching_constraint);
 
     int r_val = 0;
