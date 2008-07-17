@@ -47,6 +47,7 @@
 #include "BonDummyPump.hpp"
 #include "BonHeuristicRINS.hpp"
 #include "BonHeuristicLocalBranching.hpp"
+#include "BonHeuristicFPump.hpp"
 namespace Bonmin
 {
   BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy)
@@ -98,6 +99,7 @@ namespace Bonmin
     DummyPump::registerOptions(roptions);
     HeuristicRINS::registerOptions(roptions);
     HeuristicLocalBranching::registerOptions(roptions);
+    HeuristicFPump::registerOptions(roptions);
 
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
@@ -461,6 +463,16 @@ namespace Bonmin
       HeuristicMethod h;
       h.heuristic = local_branching;
       h.id = "LocalBranching";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicFPump = false;
+    options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,"bonmin.");
+    if(doHeuristicFPump){
+      HeuristicFPump* feasibility_pump = new HeuristicFPump(this);
+      HeuristicMethod h;
+      h.heuristic = feasibility_pump;
+      h.id = "FPump";
       heuristics_.push_back(h);
     }
   }
