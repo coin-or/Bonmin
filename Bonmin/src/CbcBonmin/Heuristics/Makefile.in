@@ -62,7 +62,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonheuristics_la_LIBADD =
 am_libbonheuristics_la_OBJECTS = BonLocalSolverBasedHeuristic.lo \
 	BonFixAndSolveHeuristic.lo BonDummyPump.lo BonHeuristicRINS.lo \
-	BonHeuristicLocalBranching.lo
+	BonHeuristicLocalBranching.lo BonHeuristicFPump.lo
 libbonheuristics_la_OBJECTS = $(am_libbonheuristics_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -342,7 +342,8 @@ libbonheuristics_la_SOURCES = \
        BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
        BonDummyPump.cpp BonDummyPump.hpp \
        BonHeuristicRINS.cpp BonHeuristicRINS.hpp \
-       BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp
+       BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp \
+       BonHeuristicFPump.cpp BonHeuristicFPump.hpp
 
 
 # This is for libtool (on Windows)
@@ -399,7 +400,8 @@ includecoin_HEADERS = \
                      BonFixAndSolveHeuristic.hpp \
                      BonDummyPump.hpp \
                      BonHeuristicRINS.hpp \
-                     BonHeuristicLocalBranching.hpp
+                     BonHeuristicLocalBranching.hpp \
+                     BonHeuristicFPump.hpp
 
 
 ########################################################################
@@ -412,7 +414,8 @@ ASTYLE_FILES = \
    BonFixAndSolveHeuristic.cppbak  BonFixAndSolveHeuristic.hppbak \
    BonDummyPump.cppbak BonDummyPump.hppbak \
    BonHeuristicRINS.cppbak BonHeuristicRINS.hppbak \
-   BonHeuristicLocalBranching.cppbak BonHeuristicLocalBranching.hppbak 
+   BonHeuristicLocalBranching.cppbak BonHeuristicLocalBranching.hppbak \
+   BonHeuristicFPump.cppbak BonHeuristicFPump.hppbak 
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -469,6 +472,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDummyPump.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFixAndSolveHeuristic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicFPump.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicLocalBranching.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicRINS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLocalSolverBasedHeuristic.Plo@am__quote@
