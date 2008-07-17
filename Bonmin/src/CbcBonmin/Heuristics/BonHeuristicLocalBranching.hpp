@@ -29,6 +29,12 @@ namespace Bonmin {
 
      /** Destructor*/
      virtual ~HeuristicLocalBranching();
+    
+    /// Update model
+    virtual void setModel(CbcModel * model);
+
+    /// Validate model i.e. sets when_ to 0 if necessary
+    virtual void validate();
 
      /** Runs heuristic*/
      int solution(double & objectiveValue,

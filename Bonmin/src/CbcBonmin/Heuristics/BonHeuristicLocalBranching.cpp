@@ -32,12 +32,47 @@ namespace Bonmin {
   HeuristicLocalBranching::~HeuristicLocalBranching(){
   }
 
+  void 
+  HeuristicLocalBranching::setModel(CbcModel * model)
+  {
+    model_=model;
+    //  assert(model_->solver());
+    validate();
+  }
+
+  void
+  HeuristicLocalBranching::validate()
+  {
+    assert(setup_ != NULL);
+    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
+      (setup_->nonlinearSolver());
+    TMINLP2TNLP* minlp = nlp->problem();
+    int numberColumns;
+    int numberRows;
+    int nnz_jac_g;
+    int nnz_h_lag;
+    TNLP::IndexStyleEnum index_style;
+    minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
+			nnz_h_lag, index_style);
+    const Bonmin::TMINLP::VariableType* variableType = minlp->var_types();
+    const double* x_l = minlp->x_l();
+    const double* x_u = minlp->x_u();
+
+    for(int i=0; i<numberColumns; i++) {
+      if ((variableType[i] != Bonmin::TMINLP::CONTINUOUS) &&
+	  (x_l[i] != 0.0 || x_u[i] != 1.0)) {
+	setWhen(0);
+	return;
+      }
+    }
+  }
+
   /** Runs heuristic*/
   int
   HeuristicLocalBranching::solution(double & objectiveValue,
 			  double * newSolution)
   {
-    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if(!when() || model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
 
     const double * bestSolution = model_->bestSolution();
     if (!bestSolution)
