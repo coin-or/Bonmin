@@ -169,7 +169,11 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
     vt_delta += 
       fabs (info -> pi_ [info -> row_ [indRow]] * 
-	    info -> elementByColumn_  [indRow]);
+    	    info -> elementByColumn_  [indRow]);
+
+    //     vt_delta += 
+    //       info -> pi_ [info -> row_ [indRow]] * 
+    //       fabs (info -> elementByColumn_  [indRow]);
 
     jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "+ (pi[%d]=%g) * (el[%d]=%g) [=%g] --> vtd = %g\n",
 		      info -> row_ [indRow],

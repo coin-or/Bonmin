@@ -120,7 +120,10 @@ void CouenneSolverInterface::resolve () {
   knowInfeasible_ = false;
   knowOptimal_    = false;
 
-  const CoinWarmStart *ws = getWarmStart ();
+  const CoinWarmStart *ws;
+
+  if (cutgen_ -> check_lp ())
+    ws = getWarmStart ();
 
   //deleteScaleFactors ();
 
@@ -174,10 +177,13 @@ void CouenneSolverInterface::resolve () {
 
     delete nsi;
     delete csi;
+    
+    delete ws;
 
     //else printf ("Warning: discrepancy between statuses %s -- %s feasible\n", 
     //filename, isProvenOptimal () ? "current" : "saved");
   }
+
 }
 
 
