@@ -386,6 +386,8 @@ namespace Bonmin
     roptions->SetRegisteringCategory("Feasibility pump heuristic", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption("feasibility_pump_objective_norm","Norm of feasibility pump objective function",
                                            1, 2,"");
+    roptions->AddStringOption2("heuristic_feasibility_pump", "whether the heuristic feasibility pump should be used",
+      "no", "no", "don't use it", "yes", "use it", "Someone should fix this entry...");
   }
 
   void 
