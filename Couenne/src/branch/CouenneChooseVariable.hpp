@@ -14,6 +14,7 @@
 #include "OsiChooseVariable.hpp"
 #include "BonBabInfos.hpp"
 #include "CouenneJournalist.hpp"
+#include "BonRegisteredOptions.hpp"
 
 class CouenneProblem;
 

@@ -10,6 +10,7 @@
 #include "CouenneCutGenerator.hpp"
 #include "CouenneProblem.hpp"
 #include "BonBabInfos.hpp"
+#include "BonCbc.hpp"
 
 // max # bound tightening iterations
 #define MAX_BT_ITER 3

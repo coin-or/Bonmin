@@ -15,8 +15,9 @@
 #include "OsiSolverInterface.hpp"
 #include "CglCutGenerator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
+#include "BonBabSetupBase.hpp"
 #include "BonBabInfos.hpp"
-
+#include "OsiChooseVariable.hpp"
 #include "CouenneTypes.hpp"
 #include "CouenneJournalist.hpp"
 
