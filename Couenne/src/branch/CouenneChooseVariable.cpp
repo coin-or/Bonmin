@@ -190,4 +190,9 @@ void CouenneChooseVariable::registerOptions (Ipopt::SmartPtr <Bonmin::Registered
      1.,false,
      0.2,
      "Default value is 0.2.");
+
+  roptions -> AddLowerBoundedIntegerOption
+    ("cont_var_priority",
+     "Priority of continuous variable branching",
+     1, 2000, "Default value is 2000 (it is 1000 for integers and 10 for SOS).");
 }

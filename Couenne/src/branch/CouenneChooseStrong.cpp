@@ -110,7 +110,7 @@ namespace Bonmin {
     roptions -> AddStringOption6
       ("pseudocost_mult",
        "Multipliers of pseudocosts for estimating and update estimation of bound",
-       "infeasibility",
+       "interval_br_rev",
 
        "infeasibility", "infeasibility returned by object",
 

@@ -147,7 +147,7 @@ void CouenneCutGenerator::registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOp
      "Specify the logarithm of the number of local optimizations to perform" 
      " on average for each level of given depth of the tree.",
      -1,
-     3, "Solve as many nlp's at the nodes for each level of the tree. "
+     2, "Solve as many nlp's at the nodes for each level of the tree. "
      "Nodes are randomly selected. If for a "
      "given level there are less nodes than this number nlp are solved for every nodes. "
      "For example if parameter is 8, nlp's are solved for all node until level 8, " 
