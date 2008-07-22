@@ -326,7 +326,8 @@ namespace Bonmin
     assert (numberObjects);
     if (numberObjects>pseudoCosts_.numberObjects()) {
       //std::cout<<"Number objects "<<numberObjects<<std::endl;
-      //AW : How could that ever happen?  Right now, all old content is deleted!
+      //AW : How could that ever happen?
+      //PB : It happens for instance when SOS constraints are added. They are added after the creation of this.
       //   assert(false && "Right now, all old content is deleted!");
       // redo useful arrays
       int saveNumberBeforeTrusted = pseudoCosts_.numberBeforeTrusted();

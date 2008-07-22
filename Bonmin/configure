@@ -2833,7 +2833,7 @@ rm -f conftest.err conftest.$ac_objext \
       *-ibm-*)
         case "$CC" in
           xlc* | */xlc* | mpxlc* | */mpxlc*)
-            coin_opt_cflags="-O3 -qarch=auto -qcache=auto -qtune=auto -qmaxmem=-1"
+            coin_opt_cflags="-O -qarch=auto -qcache=auto -qtune=auto -qmaxmem=-1"
             coin_add_cflags="-bmaxdata:0x80000000 -qsuppress=1500-036 -qsuppress=1500-029"
             coin_dbg_cflags="-g"
           ;;
@@ -3680,7 +3680,7 @@ rm -f conftest.err conftest.$ac_objext \
       *-ibm-*)
         case "$CXX" in
           xlC* | */xlC* | mpxlC* | */mpxlC*)
-            coin_opt_cxxflags="-O3 -qarch=auto -qcache=auto -qtune=auto -qmaxmem=-1"
+            coin_opt_cxxflags="-O -qarch=auto -qcache=auto -qtune=auto -qmaxmem=-1"
             coin_add_cxxflags="-bmaxdata:0x80000000 -qrtti=dyna -qsuppress=1500-036 -qsuppress=1500-029"
             coin_dbg_cxxflags="-g"
             ;;
@@ -4416,7 +4416,7 @@ rm -f conftest.err conftest.$ac_objext \
       *-ibm-*)
         case "$F77" in
           xlf* | */xlf* | mpxlf* | */mpxlf* )
-            coin_opt_fflags="-O3 -qarch=auto -qcache=auto -qtune=auto -qmaxmem=-1"
+            coin_opt_fflags="-O -qarch=auto -qcache=auto -qtune=auto -qmaxmem=-1"
             coin_add_fflags="-bmaxdata:0x80000000 -qsuppress=1500-036 -qsuppress=1500-029"
             coin_dbg_fflags="-g -C"
             ;;
@@ -23938,7 +23938,7 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile experimental/FP/Makefile experimental/NotConvex/Makefile examples/OptionDocGen/Makefile test/Makefile examples/CppExample/Makefile"
+                                                                                                                                                      ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile examples/OptionDocGen/Makefile test/Makefile examples/CppExample/Makefile"
 
 
           ac_config_headers="$ac_config_headers inc/config_bonmin.h"
@@ -24740,8 +24740,6 @@ do
   "src/Algorithms/Ampl/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Algorithms/Ampl/Makefile" ;;
   "src/Algorithms/Branching/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Algorithms/Branching/Makefile" ;;
   "src/Algorithms/OaGenerators/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Algorithms/OaGenerators/Makefile" ;;
-  "experimental/FP/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/FP/Makefile" ;;
-  "experimental/NotConvex/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/NotConvex/Makefile" ;;
   "examples/OptionDocGen/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/OptionDocGen/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
   "examples/CppExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/CppExample/Makefile" ;;

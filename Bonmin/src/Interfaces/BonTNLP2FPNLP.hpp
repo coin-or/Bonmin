@@ -24,10 +24,41 @@ namespace Bonmin
   public:
     /**@name Constructors/Destructors */
     //@{
+    /** Build using tnlp as source problem.*/
     TNLP2FPNLP(const SmartPtr<TNLP> tnlp, double objectiveScalingFactor = 100);
+
+    /** Build using tnlp as source problem and using other for all other parameters..*/
+    TNLP2FPNLP(const SmartPtr<TNLP> tnlp, const SmartPtr<TNLP2FPNLP> other);
 
     /** Default destructor */
     virtual ~TNLP2FPNLP();
+    //@}
+
+    /**@name Methods to select the objective function and extra constraints*/
+    //@{
+    /// Flag to indicate that we want to use the feasibility pump objective
+    void set_use_feasibility_pump_objective(bool use_feasibility_pump_objective) 
+    { use_feasibility_pump_objective_ = use_feasibility_pump_objective; }
+
+    /** Flag to indicate that we want to use a cutoff constraint
+     *	This constraint has the form f(x) <= (1-epsilon) f(x') */ 
+    void set_use_cutoff_constraint(bool use_cutoff_constraint)
+    { use_cutoff_constraint_ = use_cutoff_constraint; }
+
+    /// Flag to indicate that we want to use a local branching constraint
+    void set_use_local_branching_constraint(bool use_local_branching_constraint)
+    { use_local_branching_constraint_ = use_local_branching_constraint; }
+    //@}
+
+    /**@name Methods to provide the rhs of the extra constraints*/
+    //@{
+    /// Set the cutoff value to use in the cutoff constraint
+    void set_cutoff(Number cutoff);
+
+    /// Set the rhs of the local branching constraint
+    void set_rhs_local_branching_constraint(double rhs_local_branching_constraint)
+    { assert(rhs_local_branching_constraint >= 0);
+      rhs_local_branching_constraint_ = rhs_local_branching_constraint; }
     //@}
 
     /**@name Methods to change the objective function*/
@@ -40,7 +71,7 @@ namespace Bonmin
      */
     void set_dist2point_obj(int n, const Number * vals, const Index * inds);
 
-     /** Set the value for simgma */
+     /** Set the value for sigma */
      void setSigma(double sigma){
        assert(sigma >= 0.);
        sigma_ = sigma;}
@@ -63,10 +94,7 @@ namespace Bonmin
     /** This call is just passed onto tnlp_
      */
     virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
-        Index m, Number* g_l, Number* g_u)
-    {
-      return tnlp_->get_bounds_info(n, x_l , x_u, m, g_l, g_u);
-    }
+				 Index m, Number* g_l, Number* g_u);
 
     /** Passed onto tnlp_
      */
@@ -88,20 +116,15 @@ namespace Bonmin
     virtual bool eval_grad_f(Index n, const Number* x, bool new_x,
         Number* grad_f);
 
-    /** passed onto tnlp_ */
+    /** overload to return the values of the left-hand side of the
+        constraints */
     virtual bool eval_g(Index n, const Number* x, bool new_x,
-        Index m, Number* g)
-    {
-      return tnlp_->eval_g(n, x, new_x, m, g);
-    }
+			Index m, Number* g);
 
-    /** Passed onto tnlp_ */
+    /** overload to return the jacobian of g */
     virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
-        Index m, Index nele_jac, Index* iRow,
-        Index *jCol, Number* values)
-    {
-      return tnlp_->eval_jac_g(n, x, new_x, m, nele_jac, iRow, jCol, values);
-    }
+			    Index m, Index nele_jac, Index* iRow,
+			    Index *jCol, Number* values);
 
     /** Evaluate the modified Hessian of the Lagrangian*/
     virtual bool eval_h(Index n, const Number* x, bool new_x,
@@ -176,6 +199,31 @@ namespace Bonmin
 
     /// Scaling factor for the objective
     double objectiveScalingFactor_;
+
+    /**@name Flags to  select the objective function and extra constraints*/
+    //@{
+    /// Flag to indicate that we want to use the feasibility pump objective
+    bool use_feasibility_pump_objective_;
+
+    /** Flag to indicate that we want to use a cutoff constraint
+     *	This constraint has the form f(x) <= (1-epsilon) f(x') */ 
+    bool use_cutoff_constraint_;    
+
+    /// Flag to indicate that we want to use a local branching constraint
+    bool use_local_branching_constraint_;
+    //@}
+
+    /**@name Data for storing the rhs of the extra constraints*/
+    //@{
+    /// Value of best solution known
+    double cutoff_;
+
+    /// RHS of local branching constraint
+    double rhs_local_branching_constraint_;
+    //@}
+
+    /// Index style (C++ or Fortran)
+    TNLP::IndexStyleEnum index_style_;
 
   };
 

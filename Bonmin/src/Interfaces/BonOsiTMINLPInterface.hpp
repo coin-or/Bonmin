@@ -26,16 +26,17 @@
 #include "BonTNLP2FPNLP.hpp"
 #include "BonTNLPSolver.hpp"
 #include "BonCutStrengthener.hpp"
-#include "BonRegisteredOptions.hpp"
+//#include "BonRegisteredOptions.hpp"
 
 namespace Bonmin {
-
+  class RegisteredOptions;
   class StrongBranchingSolver;
 
   /** Solvers for solving nonlinear programs.*/
   enum Solver{
     EIpopt=0 /** <a href="http://projects.coin-or.org/Ipopt"> Ipopt </a> interior point algorithm.*/,
-    EFilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/
+    EFilterSQP /** <a href="http://www-unix.mcs.anl.gov/~leyffer/solvers.html"> filterSQP </a> Sequential Quadratic Programming algorithm.*/,
+    EAll/** Use all solvers.*/
   };
 /**
    This is class provides an Osi interface for a Mixed Integer Linear Program
@@ -105,6 +106,8 @@ class SimpleError : public CoinError
                                          */,
     ERROR_NO_TNLPSOLVER /** Trying to access non-existent TNLPSolver*/,
     WARNING_NON_CONVEX_OA /** Warn that there are equality or ranged constraints and OA may works bad.*/,
+    SOLVER_DISAGREE_STATUS /** Different solver gives different status for problem.*/,
+    SOLVER_DISAGREE_VALUE /** Different solver gives different optimal value for problem.*/,
     OSITMINLPINTERFACE_DUMMY_END
   };
 
@@ -887,6 +890,28 @@ class Messages : public CoinMessages
    * \param L L-norm to use (can be either 1 or 2).
    */
   double solveFeasibilityProblem(int n, const double * x_bar, const int* ind, double a, double s, int L);
+
+  /** Given a point x_bar this solves the problem of finding the point which minimize
+    * the distance to x_bar while satisfying the additional cutoff constraint:
+   * \f$ min \sum\limits_{i=1}^n  ||x_{ind[i]} -\overline{x}_i)||_L$
+   * \return Distance between feasibility set a x_bar on components in ind
+   * \param n number of elements in array x_bar and ind
+   * \param L L-norm to use (can be either 1 or 2).
+   * \param cutoff objective function value of a known integer feasible solution
+   */
+  double solveFeasibilityProblem(int n, const double * x_bar, const int* ind, int L, double cutoff);
+
+  /** Given a point x_bar setup feasibility problem and switch so that every call to initialSolve or resolve will
+      solve it.*/
+  void switchToFeasibilityProblem(int n, const double * x_bar, const int* ind, double a, double s, int L);
+
+  /** Given a point x_bar setup feasibility problem and switch so that every call to initialSolve or resolve will
+      solve it. This is to be used in the local branching heuristic */
+  void switchToFeasibilityProblem(int n, const double * x_bar, const int* ind,
+				  double rhs_local_branching_constraint);
+
+  /** switch back to solving original problem.*/
+  void switchToOriginalProblem();
   //@}
 
   /** \name output for OA cut generation
@@ -1052,8 +1077,17 @@ protected:
   Ipopt::SmartPtr<TMINLP> tminlp_;
   /** Adapter for a MINLP to a NLP */
   Ipopt::SmartPtr<TMINLP2TNLP> problem_;
+  /** Problem currently optimized (may be problem_ or feasibilityProblem_)*/
+  Ipopt::SmartPtr<Ipopt::TNLP> problem_to_optimize_;
+  /** Is true if and only if in feasibility mode.*/
+  bool feasibility_mode_;
   /** Solver for a TMINLP. */
   Ipopt::SmartPtr<TNLPSolver> app_;
+
+  /** Alternate solvers for TMINLP.*/
+  std::list<Ipopt::SmartPtr<TNLPSolver> > debug_apps_;
+  /** Do we use the other solvers?*/
+  bool testOthers_;
   //@}
 
   /** Warmstart information for reoptimization */
@@ -1192,6 +1226,22 @@ private:
   SmartPtr<StrongBranchingSolver> strong_branching_solver_;
   /** status of last optimization before hot start was marked. */
   TNLPSolver::ReturnStatus optimizationStatusBeforeHotStart_;
+static const char * OPT_SYMB;
+static const char * FAILED_SYMB;
+static const char * INFEAS_SYMB;
+static const char * UNBOUND_SYMB;
+  /** Get status as a char * for log.*/
+  const char * statusAsString(TNLPSolver::ReturnStatus r){
+    if(r == TNLPSolver::solvedOptimal || r == TNLPSolver::solvedOptimalTol){
+      return OPT_SYMB;} 
+    else if(r == TNLPSolver::provenInfeasible){
+      return INFEAS_SYMB;}
+    else if(r == TNLPSolver::unbounded){
+      return UNBOUND_SYMB;}
+    else return FAILED_SYMB;
+  }
+  const char * statusAsString(){
+    return statusAsString(optimizationStatus_);}
 };
 }
 #endif

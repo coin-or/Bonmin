@@ -44,12 +44,13 @@ register_general_options
 (SmartPtr<RegisteredOptions> roptions)
 {
   roptions->SetRegisteringCategory("nlp interface option", RegisteredOptions::BonminCategory);
-  roptions->AddStringOption2("nlp_solver",
+  roptions->AddStringOption3("nlp_solver",
                              "Choice of the solver for local optima of continuous nlp's",
                              "Ipopt",
                              "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
                              "filterSQP", "Sequential quadratic programming trust region "
                                           "algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
+                             "all", "run all available solvers at each node",
                              "");
   roptions->setOptionExtraInfo("nlp_solver",15);
   roptions->AddBoundedIntegerOption("nlp_log_level",
@@ -276,6 +277,8 @@ OsiTMINLPInterface::Messages::Messages
   ADD_MSG(ERROR_NO_TNLPSOLVER, warn_m, 1,"Can not parse options when no IpApplication has been created");
   ADD_MSG(WARNING_NON_CONVEX_OA, warn_m, 1,
           "OA on non-convex constraint is very experimental.");                          
+  ADD_MSG(SOLVER_DISAGREE_STATUS, warn_m, 1, "%s says problem %s, %s says %s.");
+  ADD_MSG(SOLVER_DISAGREE_VALUE, warn_m, 1, "%s gives objective %.16g, %s gives %.16g.");
 
 }
 
@@ -312,7 +315,11 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     OsiSolverInterface(),
     tminlp_(NULL),
     problem_(NULL),
+    problem_to_optimize_(NULL),
+    feasibility_mode_(false),
     app_(NULL),
+    debug_apps_(),
+    testOthers_(false),
     warmstart_(NULL),
     rowsense_(NULL),
     rhs_(NULL),
@@ -383,6 +390,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
   options->GetEnumValue("nlp_solver", ival, "bonmin.");
   Solver s = (Solver) ival;
   if(s == EFilterSQP){
+    testOthers_ = false;;
 #ifdef COIN_HAS_FILTERSQP
     app_ = new Bonmin::FilterSolver(roptions, options, journalist);
 #else
@@ -391,6 +399,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
 #endif    
   }
   else if(s == EIpopt){
+    testOthers_ = false;
 #ifdef COIN_HAS_IPOPT
     app_ = new IpoptSolver(roptions, options, journalist);
 #else
@@ -398,8 +407,24 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
                      "Bonmin not configured to run with Ipopt.");
 #endif
   }
+  else if(s == EAll){
+#ifdef COIN_HAS_FILTERSQP
+    app_ = new Bonmin::FilterSolver(roptions, options, journalist);
+#else
+   throw SimpleError("createApplication",
+                     "Bonmin not configured to run with Ipopt.");
+#endif
+#ifdef COIN_HAS_IPOPT
+   debug_apps_.push_back(new IpoptSolver(roptions, options, journalist)); 
+#endif
+    testOthers_ = true;
+  }
   if (!app_->Initialize("")) {
     throw CoinError("Error during initialization of app_","createApplication", "OsiTMINLPInterface");
+  }
+  for(std::list<Ipopt::SmartPtr<TNLPSolver> >::iterator i = debug_apps_.begin() ; 
+      i != debug_apps_.end() ; i++){
+    (*i)->Initialize("");
   }
   extractInterfaceParams();
   
@@ -414,6 +439,12 @@ OsiTMINLPInterface::setModel(SmartPtr<TMINLP> tminlp)
   problem_ = new TMINLP2TNLP(tminlp_);
   feasibilityProblem_ = new TNLP2FPNLP
         (SmartPtr<TNLP>(GetRawPtr(problem_)));
+  if(feasibility_mode_){
+    problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
+  }
+  else {
+    problem_to_optimize_ = GetRawPtr(problem_);
+  }
 }
 
 
@@ -441,6 +472,8 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     OsiSolverInterface(source),
     tminlp_(source.tminlp_),
     problem_(NULL),
+    problem_to_optimize_(NULL),
+    feasibility_mode_(source.feasibility_mode_),
     rowsense_(NULL),
     rhs_(NULL),
     rowrange_(NULL),
@@ -482,18 +515,31 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     oaHandler_(NULL),
     strong_branching_solver_(source.strong_branching_solver_)
 {
-      messageHandler()->setLogLevel(source.messageHandler()->logLevel());
+   if(defaultHandler()){
+     messageHandler()->setLogLevel(source.messageHandler()->logLevel());
+   }
   //Pass in message handler
   if(source.messageHandler())
     passInMessageHandler(source.messageHandler());
   // Copy options from old application
   if(IsValid(source.tminlp_)) {
     problem_ = source.problem_->clone();
+    feasibilityProblem_ = new TNLP2FPNLP
+        (SmartPtr<TNLP>(GetRawPtr(problem_)), source.feasibilityProblem_);
+    if(feasibility_mode_)
+      problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
+    else
+      problem_to_optimize_ = GetRawPtr(problem_);
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
 
     setAuxiliaryInfo(source.getAuxiliaryInfo());
     // Copy options from old application
     app_ = source.app_->clone();
+    for(std::list<Ipopt::SmartPtr<TNLPSolver> >::const_iterator i = source.debug_apps_.begin();
+        i != source.debug_apps_.end() ; i++){
+      debug_apps_.push_back((*i)->clone());
+    }
+    testOthers_ = source.testOthers_;
   }
   else {
     throw SimpleError("Don't know how to copy an empty IpoptInterface.",
@@ -506,13 +552,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     obj_ = new double[source.getNumCols()];
     CoinCopyN(source.obj_, source.getNumCols(), obj_);
   }
-  if(IsValid(source.tminlp_))
-    feasibilityProblem_ = new TNLP2FPNLP
-        (SmartPtr<TNLP>(GetRawPtr(problem_)));
-  else
-    throw SimpleError("Don't know how to copy an empty IpoptOAInterface.",
-        "copy constructor");
-
 
 
    oaHandler_ = new OaMessageHandler(*source.oaHandler_);;
@@ -547,6 +586,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
 
       tminlp_ = rhs.tminlp_;
       problem_ = new TMINLP2TNLP(tminlp_);
+      problem_to_optimize_ = GetRawPtr(problem_);
       app_ = rhs.app_->clone();
 
       warmstart_ = rhs.warmstart_ ? rhs.warmstart_->clone() : NULL;
@@ -705,10 +745,11 @@ OsiTMINLPInterface::freeCachedData()
   freeCachedColRim();
   freeCachedRowRim();
 }
-static const char * OPT_SYMB="OPT";
-static const char * FAILED_SYMB="FAILED";
-static const char * INFEAS_SYMB="INFEAS";
 
+const char * OsiTMINLPInterface::OPT_SYMB="OPT";
+const char * OsiTMINLPInterface::FAILED_SYMB="FAILED";
+const char * OsiTMINLPInterface::UNBOUND_SYMB="UNBOUNDED";
+const char * OsiTMINLPInterface::INFEAS_SYMB="INFEAS";
 ///////////////////////////////////////////////////////////////////
 // WarmStart Information                                                                           //
 ///////////////////////////////////////////////////////////////////
@@ -756,15 +797,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
     solveAndCheckErrors(0,0,"resolveForCost");
 
 
-    const char * status=OPT_SYMB;
-    ;
     char c=' ';
-    if(isAbandoned()) {
-      status=FAILED_SYMB;
-    }
-    else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
-
-
     //Is solution better than previous
     if(isProvenOptimal() &&
         getObjValue()<bestBound) {
@@ -779,7 +812,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
     }
 
     messageHandler()->message(LOG_LINE, messages_)
-    <<c<<f+1<<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<c<<f+1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
 
     if(isProvenOptimal())
@@ -802,7 +835,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
   setRowPrice(point() + getNumCols());
   app_->enableWarmStart();
 
-  optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
+  optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_to_optimize_));
   hasBeenOptimized_ = true;
 
   if(!exposeWarmStart_ && keepWarmStart) {
@@ -836,16 +869,12 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   solveAndCheckErrors(0,0,"resolveForRobustness");
 
 
-  const char * status=OPT_SYMB;
-  ;
   char c='*';
   if(isAbandoned()) {
-    status=FAILED_SYMB;
     c=' ';
   }
-  else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
   messageHandler()->message(LOG_LINE, messages_)
-  <<c<<1<<status<<getObjValue()<<app_->IterationCount()<<
+  <<c<<1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<
     app_->CPUTime()<<CoinMessageEol;
 
 
@@ -874,16 +903,13 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     <<"resolveForRobustness"<<optimizationStatus_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
 
-    const char * status=OPT_SYMB;
-    ;
     char c='*';
     if(isAbandoned()) {
-      status=FAILED_SYMB;
       c=' ';
     }
-    else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
     messageHandler()->message(LOG_LINE, messages_)
-    <<c<<f+2<<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<c<<f+2<<statusAsString()<<getObjValue()
+    <<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
 
     if(!isAbandoned()) {
@@ -1711,14 +1737,14 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
 {
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
-  tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
+  problem_to_optimize_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
   assert(jRow_ != NULL);
   assert(jCol_ != NULL);
   double * g = new double[m];
-  tminlp_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
-  tminlp_->eval_g(n,x,1,m,g);
+  problem_to_optimize_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
+  problem_to_optimize_->eval_g(n,x,1,m,g);
   //As jacobian is stored by cols fill OsiCuts with cuts
   CoinPackedVector * cuts = new CoinPackedVector[nNonLinear_ + 1];
   double * lb = new double[nNonLinear_ + 1];
@@ -1852,11 +1878,11 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
   delete [] row2cutIdx;
   delete [] cut2rowIdx;
 
-  if(getObj && ! tminlp_->hasLinearObjective()) { // Get the objective cuts
+  if(getObj && ! problem_->hasLinearObjective()) { // Get the objective cuts
     double * obj = new double [n];
-    tminlp_->eval_grad_f(n, x, 1,obj);
+    problem_to_optimize_->eval_grad_f(n, x, 1,obj);
     double f;
-    tminlp_->eval_f(n, x, 1, f);
+    problem_to_optimize_->eval_f(n, x, 1, f);
 
     CoinPackedVector v;
     v.reserve(n);
@@ -1928,8 +1954,8 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   int * indices = new int[getNumCols()];
   double * values = new double[getNumCols()];
   int nnz;
-  tminlp_->eval_grad_gi(getNumCols(), x, 1, rowIdx, nnz, indices, values);
-  tminlp_->eval_gi(getNumCols(),x,1, rowIdx, g);
+  problem_->eval_grad_gi(getNumCols(), x, 1, rowIdx, nnz, indices, values);
+  problem_->eval_gi(getNumCols(),x,1, rowIdx, g);
 
   CoinPackedVector cut;
   double lb;
@@ -1991,6 +2017,44 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   delete [] values;
 }
 
+void
+OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
+                                            double a, double s, int L){
+  if(! IsValid(feasibilityProblem_)) {
+    throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
+  }
+  feasibilityProblem_->set_use_feasibility_pump_objective(true);
+  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->setLambda(a);
+  feasibilityProblem_->setSigma(s);
+  feasibilityProblem_->setNorm(L);
+  feasibilityProblem_->set_use_cutoff_constraint(false);
+  feasibilityProblem_->set_use_local_branching_constraint(false);  
+  problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
+  feasibility_mode_ = true;
+}
+
+void
+OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
+					       double rhs_local_branching_constraint){
+  if(! IsValid(feasibilityProblem_)) {
+    throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
+  }
+  feasibilityProblem_->set_use_feasibility_pump_objective(false);
+  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->set_use_cutoff_constraint(false);
+  feasibilityProblem_->set_use_local_branching_constraint(true);  
+  feasibilityProblem_->set_rhs_local_branching_constraint(rhs_local_branching_constraint);  
+  problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
+  feasibility_mode_ = true;
+}
+
+void
+OsiTMINLPInterface::switchToOriginalProblem(){
+  problem_to_optimize_ = GetRawPtr(problem_);
+  feasibility_mode_ = false;
+}
+
 double
 OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
                                             double a, double s, int L)
@@ -1998,10 +2062,38 @@ OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
+  feasibilityProblem_->set_use_feasibility_pump_objective(true);
   feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
   feasibilityProblem_->setLambda(a);
   feasibilityProblem_->setSigma(s);
   feasibilityProblem_->setNorm(L);
+  feasibilityProblem_->set_use_cutoff_constraint(false);
+  feasibilityProblem_->set_use_local_branching_constraint(false);  
+  nCallOptimizeTNLP_++;
+  totalNlpSolveTime_-=CoinCpuTime();
+  SmartPtr<TNLPSolver> app2 = app_->clone();
+  app2->options()->SetIntegerValue("print_level", (Index) 0);
+  optimizationStatus_ = app2->OptimizeTNLP(GetRawPtr(feasibilityProblem_));
+  totalNlpSolveTime_+=CoinCpuTime();
+  hasBeenOptimized_=true;
+  return getObjValue();
+}
+
+double
+OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+                                            int L, double cutoff)
+{
+  if(! IsValid(feasibilityProblem_)) {
+    throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
+  }
+  feasibilityProblem_->set_use_feasibility_pump_objective(true);
+  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->setLambda(1.0);
+  feasibilityProblem_->setSigma(0.0);
+  feasibilityProblem_->setNorm(L);
+  feasibilityProblem_->set_use_cutoff_constraint(true);
+  feasibilityProblem_->set_cutoff(cutoff);
+  feasibilityProblem_->set_use_local_branching_constraint(false);  
   nCallOptimizeTNLP_++;
   totalNlpSolveTime_-=CoinCpuTime();
   SmartPtr<TNLPSolver> app2 = app_->clone();
@@ -2037,18 +2129,18 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   int nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
   //Get problem information
-  tminlp_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
+  problem_to_optimize_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
 
   //if not allocated allocate spaced for stroring jacobian
   if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
 
   //get Jacobian
-  tminlp_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
+  problem_to_optimize_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
 
 
   double *g = new double[m];
-  tminlp_->eval_g(n, x, 1, m, g);
+  problem_to_optimize_->eval_g(n, x, 1, m, g);
 
   rowLow = new double[m];
   rowUp = new double[m];
@@ -2156,19 +2248,19 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   }
   if(getObj) {
      bool addObjVar = false;
-     if(tminlp_->hasLinearObjective()){
+     if(problem_->hasLinearObjective()){
        //Might be in trouble if objective has a constant part
        // for now just check that f(0) = 0. 
        // If it is not adding a constant term does not seem supported by Osi
        // for now
        double zero;
-       tminlp_->eval_f(n, obj, 1, zero);
+       problem_to_optimize_->eval_f(n, obj, 1, zero);
        si.setDblParam(OsiObjOffset, -zero);
        //if(fabs(zero - 0) > 1e-10)
          //addObjVar = true;
        //else { 
          //Copy the linear objective and don't create a dummy variable.
-         tminlp_->eval_grad_f(n, x, 1,obj);
+         problem_to_optimize_->eval_grad_f(n, x, 1,obj);
          si.setObjective(obj);
        //}
     }
@@ -2184,9 +2276,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   
       // Now get the objective cuts
       // get the gradient, pack it and add the cut
-      tminlp_->eval_grad_f(n, x, 1,obj);
+      problem_to_optimize_->eval_grad_f(n, x, 1,obj);
       double ub;
-      tminlp_->eval_f(n, x, 1, ub);
+      problem_to_optimize_->eval_f(n, x, 1, ub);
       ub*=-1;
       double lb = -1e300;
       CoinPackedVector objCut;
@@ -2247,13 +2339,14 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 {
   totalNlpSolveTime_-=CoinCpuTime();
   if(warmStarted)
-    optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_));
+    optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_to_optimize_));
   else
-    optimizationStatus_ = app_->OptimizeTNLP(GetRawPtr(problem_));
+    optimizationStatus_ = app_->OptimizeTNLP(GetRawPtr(problem_to_optimize_));
   totalNlpSolveTime_+=CoinCpuTime();
   nCallOptimizeTNLP_++;
   hasBeenOptimized_ = true;
-  
+ 
+ 
   //Options should have been printed if not done already turn off Ipopt output
   if(!hasPrintedOptions) {
     hasPrintedOptions = 1;
@@ -2261,8 +2354,8 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     app_->options()->SetStringValue("print_user_options","no", false, true);
   }
   
-  
-#if 1
+  bool otherDisagree = false ;
+#if 0
   if(optimizationStatus_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
   {
     (*messageHandler())<<"Too few degrees of freedom...."<<CoinMessageEol;
@@ -2329,6 +2422,34 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
       getStrParam(OsiProbName, probName);
       throw newUnsolvedError(app_->errorCode(), problem_, probName);
     }
+    else if(testOthers_ && !app_->isError(optimizationStatus_)){
+      Ipopt::SmartPtr<TMINLP2TNLP> problem_copy = problem_->clone();
+      //Try other solvers and see if they agree
+      int f =1;
+      for(std::list<Ipopt::SmartPtr<TNLPSolver> >::iterator i = debug_apps_.begin();
+          i != debug_apps_.end() ; i++){
+        TNLPSolver::ReturnStatus otherStatus = (*i)->OptimizeTNLP(GetRawPtr(problem_copy));
+       messageHandler()->message(LOG_LINE, messages_)
+         <<'d'<<f++<<statusAsString(otherStatus)<<problem_copy->obj_value()
+         <<(*i)->IterationCount()<<(*i)->CPUTime()<<CoinMessageEol;
+        if(!(*i)->isError(otherStatus)){
+           CoinRelFltEq eq(1e-05);
+           if(otherStatus != optimizationStatus_){
+             otherDisagree = true;
+             messageHandler()->message(SOLVER_DISAGREE_STATUS, messages_)
+             <<app_->solverName()<<statusAsString()
+             <<(*i)->solverName()<<statusAsString(otherStatus)<<CoinMessageEol; 
+           }
+           else if(isProvenOptimal() && !eq(problem_->obj_value(),problem_copy->obj_value()))
+           {
+             otherDisagree = true;
+             messageHandler()->message(SOLVER_DISAGREE_VALUE, messages_)
+             <<app_->solverName()<<problem_->obj_value()
+             <<(*i)->solverName()<<problem_copy->obj_value()<<CoinMessageEol; 
+           }
+        }
+     }
+  }
   try{
     totalIterations_ += app_->IterationCount();
   }
@@ -2399,7 +2520,8 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     messageHandler()->message(LOG_HEAD, messages_)<<CoinMessageEol;
   
   
-  if (numIterationSuspect_ >= 0 && (getIterationCount()>numIterationSuspect_ || isAbandoned())) {
+  if ( (numIterationSuspect_ >= 0 && (getIterationCount()>numIterationSuspect_ || isAbandoned())) ||
+       ( otherDisagree )){
     messageHandler()->message(SUSPECT_PROBLEM,
                               messages_)<<nCallOptimizeTNLP_<<CoinMessageEol;
     std::string subProbName;
@@ -2442,12 +2564,12 @@ void OsiTMINLPInterface::initialSolve()
     app_->options()->SetIntegerValue("print_level",0);
   }
   
-  const char * status=OPT_SYMB;
-  ;
-  if(isAbandoned()) status=FAILED_SYMB;
-  else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
   messageHandler()->message(LOG_FIRST_LINE, messages_)<<nCallOptimizeTNLP_
-						      <<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+						      <<statusAsString()
+                                                      <<getObjValue()
+                                                      <<app_->IterationCount()
+                                                      <<app_->CPUTime()
+                                                      <<CoinMessageEol;
   
   int numRetry = firstSolve_ ? numRetryInitial_ : numRetryResolve_;
   if(isAbandoned()) {
@@ -2503,12 +2625,11 @@ OsiTMINLPInterface::resolve()
   else app_->disableWarmStart();
   solveAndCheckErrors(1,1,"resolve");
   
-  const char * status=OPT_SYMB;
-  ;
-  if(isAbandoned()) status=FAILED_SYMB;
-  else if(isProvenPrimalInfeasible()) status=INFEAS_SYMB;
   messageHandler()->message(LOG_FIRST_LINE, messages_)<<nCallOptimizeTNLP_
-						      <<status<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+						      <<statusAsString()
+                                                      <<getObjValue()
+                                                      <<app_->IterationCount()
+                                                      <<app_->CPUTime()<<CoinMessageEol;
   
   if(isAbandoned()) {
     resolveForRobustness(numRetryUnsolved_);
@@ -2538,7 +2659,7 @@ bool OsiTMINLPInterface::isAbandoned() const
         (optimizationStatus_==TNLPSolver::computationError)||
         (optimizationStatus_==TNLPSolver::illDefinedProblem)||
         (optimizationStatus_==TNLPSolver::illegalOption)||
-        (optimizationStatus_==TNLPSolver::externalException)||
+        (optimizationStatus_==TNLPSolver::externalException)|
         (optimizationStatus_==TNLPSolver::exception)
       );
 }
@@ -2546,8 +2667,8 @@ bool OsiTMINLPInterface::isAbandoned() const
 /// Is optimality proven?
 bool OsiTMINLPInterface::isProvenOptimal() const
 {
-  return (optimizationStatus_==TNLPSolver::solvedOptimal ||
-	  optimizationStatus_==TNLPSolver::solvedOptimalTol);
+  return (optimizationStatus_==TNLPSolver::solvedOptimal) ||
+	  (optimizationStatus_==TNLPSolver::solvedOptimalTol);
 }
 /// Is primal infeasiblity proven?
 bool OsiTMINLPInterface::isProvenPrimalInfeasible() const
@@ -2712,7 +2833,7 @@ const double * OsiTMINLPInterface::getObjCoefficients() const
   
   if (!retval) {
     // Let's see if that happens - it will cause a crash
-    printf("ERROR WHILE EVALUATING GRAD_F in OsiTMINLPInterface::getObjCoefficients()\n");
+    fprintf(stderr, "ERROR WHILE EVALUATING GRAD_F in OsiTMINLPInterface::getObjCoefficients()\n");
     delete [] obj_;
     obj_ = NULL;
   }

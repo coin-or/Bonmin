@@ -52,6 +52,26 @@ namespace Bonmin
       algo_(other.algo_)
   {}
 
+  BonminSetup::BonminSetup(const BonminSetup &other,
+                           OsiTMINLPInterface &nlp):
+      BabSetupBase(other, nlp),
+      algo_(other.algo_)
+  {
+    if(algo_ != B_BB){
+      assert(continuousSolver_ == NULL);
+      continuousSolver_ = new OsiClpSolverInterface;
+      int lpLogLevel;
+      options_->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
+      lpMessageHandler_ = nonlinearSolver_->messageHandler()->clone();
+      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+      continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+      nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
+      // say bound dubious, does cuts at solution
+      OsiBabSolver * extraStuff = new OsiBabSolver(3);
+      continuousSolver_->setAuxiliaryInfo(extraStuff);
+      delete extraStuff;
+    }
+  }
   void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
     BabSetupBase::registerAllOptions(roptions);
@@ -66,6 +86,7 @@ namespace Bonmin
 
 
     registerMilpCutGenerators(roptions);
+
 
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
@@ -95,8 +116,8 @@ namespace Bonmin
 
     use(tminlp);
     BabSetupBase::gatherParametersValues(options_);
-    Algorithm algo = getAlgorithm();
-    if (algo == B_BB)
+    algo_ = getAlgorithm();
+    if (algo_ == B_BB)
       initializeBBB();
     else
       initializeBHyb(createContinuousSolver);
@@ -317,7 +338,7 @@ namespace Bonmin
     }
     int varSelection;
     bool val = options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
-    if (!val) {
+    if (!val || varSelection == STRONG_BRANCHING || varSelection == RELIABILITY_BRANCHING ) {
       options_->SetStringValue("variable_selection", "nlp-strong-branching","bonmin.");
       varSelection = NLP_STRONG_BRANCHING;
     }
@@ -494,7 +515,10 @@ namespace Bonmin
 
     DummyHeuristic * oaHeu = new DummyHeuristic;
     oaHeu->setNlp(nonlinearSolver_);
-    heuristics_.push_back(oaHeu);
+    HeuristicMethod h;
+    h.heuristic = oaHeu;
+    h.id = "noonlinear programm";
+    heuristics_.push_back(h);
   }
 
   Algorithm BonminSetup::getAlgorithm()

@@ -174,7 +174,7 @@ namespace Bonmin
       const double * toCut = (parameter().addOnlyViolated_)?
           colsol:NULL;
       nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
-          parameter().global_);
+                                  parameter().global_);
 
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)

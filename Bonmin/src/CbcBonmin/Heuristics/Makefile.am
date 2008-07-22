@@ -9,43 +9,32 @@
 AUTOMAKE_OPTIONS = foreign
 
 # Name of the library in this directory
-
-SUBDIRS = \
-       OaGenerators \
-       Branching
-if COIN_HAS_ASL
-SUBDIRS += Ampl
-endif
-
-noinst_LTLIBRARIES = libbonalgorithms.la
+noinst_LTLIBRARIES = libbonheuristics.la
 
 ########################################################################
 #                          bonmin library                              #
 ########################################################################
 
 # List all source files, including headers
-libbonalgorithms_la_SOURCES = \
-         BonBabSetupBase.cpp BonBabSetupBase.hpp \
-         BonBonminSetup.cpp BonBonminSetup.hpp
-
-libbonalgorithms_la_LIBADD = Branching/libbonbranching.la
-libbonalgorithms_la_LIBADD += OaGenerators/libbonoagenerators.la 
-
-libbonalgorithms_la_DEPENDENCIES = $(libbonalgorithms_la_LIBADD)
+libbonheuristics_la_SOURCES = \
+       BonLocalSolverBasedHeuristic.cpp  BonLocalSolverBasedHeuristic.hpp \
+       BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
+       BonDummyPump.cpp BonDummyPump.hpp \
+       BonHeuristicRINS.cpp BonHeuristicRINS.hpp \
+       BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp \
+       BonHeuristicFPump.cpp BonHeuristicFPump.hpp
 
 # This is for libtool (on Windows)
-libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
+libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin/Heuristics` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
+	-I`$(CYGPATH_W) $(srcdir)/..` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Algorithms` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
 	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/contrib/CGPenalty` \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
@@ -66,16 +55,17 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
+
+# Currently, the following has to be included for BonChooseVariable.hpp, but
+# we should try to unmangle the connection to Cbc
+
+AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin`
 
 if COIN_HAS_CPX
   AM_CPPFLAGS += \
@@ -96,9 +86,12 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # and that therefore should be installed in 'install/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
-          BonBabSetupBase.hpp \
-          BonBonminSetup.hpp 
- 
+                     BonLocalSolverBasedHeuristic.hpp \
+                     BonFixAndSolveHeuristic.hpp \
+                     BonDummyPump.hpp \
+                     BonHeuristicRINS.hpp \
+                     BonHeuristicLocalBranching.hpp \
+                     BonHeuristicFPump.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -106,10 +99,12 @@ includecoin_HEADERS = \
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-               BonBabSetupBase.cppbak \
-               BonBabSetupBase.hppbak \
-               BonBonminSetup.cppbak \
-               BonBonminSetup.hppbak
+   BonLocalSolverBasedHeuristic.cppbak  BonLocalSolverBasedHeuristic.hppbak \
+   BonFixAndSolveHeuristic.cppbak  BonFixAndSolveHeuristic.hppbak \
+   BonDummyPump.cppbak BonDummyPump.hppbak \
+   BonHeuristicRINS.cppbak BonHeuristicRINS.hppbak \
+   BonHeuristicLocalBranching.cppbak BonHeuristicLocalBranching.hppbak \
+   BonHeuristicFPump.cppbak BonHeuristicFPump.hppbak 
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

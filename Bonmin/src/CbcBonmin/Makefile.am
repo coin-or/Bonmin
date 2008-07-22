@@ -8,6 +8,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+
 # Name of the library in this directory
 lib_LTLIBRARIES = libbonmin.la
 if COIN_HAS_ASL

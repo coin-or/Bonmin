@@ -19,6 +19,7 @@
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
 #include "CouenneCutGenerator.hpp"
+#include "CouenneDisjCuts.hpp"
 #include "BonCouenneInfo.hpp"
 #include "BonCbcNode.hpp"
 
@@ -137,6 +138,8 @@ namespace Bonmin{
 
     //////////////////////////////////////////////////////////////
 
+    couenneCg -> Problem () -> setMaxCpuTime (getDoubleParameter (BabSetupBase::MaxTime));
+
     ci -> extractLinearRelaxation (*continuousSolver_, *couenneCg);
 
     // In case there are no discrete variables, we have already a
@@ -147,8 +150,10 @@ namespace Bonmin{
       /// setup initial heuristic (in principle it should only run once...)
       InitHeuristic* initHeuristic = new InitHeuristic 
 	(ci -> getObjValue (), ci -> getColSolution (), *couenneProb);
-
-      heuristics_.push_back(initHeuristic);
+      HeuristicMethod h;
+      h.id = "Init Rounding NLP";
+      h.heuristic = initHeuristic;
+      heuristics_.push_back(h);
     }
 
     if(extraStuff->infeasibleNode()){
@@ -157,13 +162,33 @@ namespace Bonmin{
     }
 
     continuousSolver_ -> findIntegersAndSOS (false);
+    addSos (); // only adds embedded SOS objects
+
+    // Add Couenne SOS ///////////////////////////////////////////////////////////////
+
+    std::string s;
+    int nSOS = 0;
+
+    // allocate sufficient space for both nonlinear variables and SOS's
+    OsiObject ** objects = new OsiObject* [couenneProb -> nVars ()];
+
+    options () -> GetStringValue ("enable_sos", s, "couenne.");
+    if (s == "yes") {
+
+      nSOS = couenneProb -> findSOS (nonlinearSolver (), objects);
+      //printf ("==================== found %d SOS\n", nSOS);
+      //nonlinearSolver () -> addObjects (nSOS, objects);
+      continuousSolver () -> addObjects (nSOS, objects);
+
+      for (int i=0; i<nSOS; i++)
+	delete objects [i];
+      delete [] objects;
+    }
 
     //model -> assignSolver (continuousSolver_, true);
     //continuousSolver_ = model -> solver();
 
-    // add Couenne objects for branching /////////////////////////////////////////////
-
-    std::string s;
+    // Add Couenne objects for branching /////////////////////////////////////////////
 
     options () -> GetStringValue ("display_stats", s, "couenne.");
     displayStats_ = (s == "yes");
@@ -180,12 +205,15 @@ namespace Bonmin{
       exit (-1);
     }
 
-    int nAuxs = 0, nobj = 0,
+    int 
+      nobj  = 0, // if no SOS then objects is empty
       nVars = couenneProb -> nVars ();
 
-    nAuxs = couenneProb -> nVars ();
+    objects = new OsiObject* [couenneProb -> nVars ()];
 
-    OsiObject ** objects = new OsiObject* [nAuxs];
+    int contObjPriority = 2000; // default object priority -- it is 1000 for integers and 10 for SOS
+
+    options () -> GetIntegerValue ("cont_var_priority", contObjPriority, "bonmin.");
 
     for (int i = 0; i < nVars; i++) { // for each variable
 
@@ -204,7 +232,7 @@ namespace Bonmin{
 	    (var -> Image () -> Linearity () > LINEAR)) {
 
 	  objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (1);
+	  objects [nobj++] -> setPriority (contObjPriority);
 	}
 
 	break;
@@ -218,7 +246,7 @@ namespace Bonmin{
 	   //    (var -> Image () -> Linearity () > LINEAR))) {              // of nonlinear
 
 	  objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (1);
+	  objects [nobj++] -> setPriority (contObjPriority);
 	}
 
 	break;
@@ -233,7 +261,7 @@ namespace Bonmin{
 	  //(var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
 
 	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (1);
+	  objects [nobj++] -> setPriority (contObjPriority);
 	}
 
 	break;
@@ -241,6 +269,7 @@ namespace Bonmin{
     }
 
     // Add objects /////////////////////////////////
+
     continuousSolver_ -> addObjects (nobj, objects);
 
     for (int i = 0 ; i < nobj ; i++)
@@ -251,8 +280,11 @@ namespace Bonmin{
     // Setup Convexifier generators ////////////////////////////////////////////////
 
     int freq;
+
     options()->GetIntegerValue("convexification_cuts",freq,"couenne.");
+
     if (freq != 0) {
+
       CuttingMethod cg;
       cg.frequency = freq;
       cg.cgl = couenneCg;
@@ -264,13 +296,16 @@ namespace Bonmin{
 	(continuousSolver_) -> setCutGenPtr (couenneCg);
     }
 
+    // disjunctive cuts generator added AFTER 
+
     // add other cut generators -- test for integer variables first
     if (couenneCg -> Problem () -> nIntVars () > 0)
       addMilpCutGenerators ();
 
     CouennePtr_ = couenneCg;
 
-    /*Setup heuristic to solve nlp problems.*/
+    // Setup heuristic to solve nlp problems. /////////////////////////////////
+
     int doNlpHeurisitic = 0;
     options()->GetEnumValue("local_optimization_heuristic", doNlpHeurisitic, "couenne.");
     if(doNlpHeurisitic)
@@ -283,23 +318,19 @@ namespace Bonmin{
       //nlpHeuristic->setMaxNlpInf(1e-4);
       nlpHeuristic->setMaxNlpInf(maxNlpInf_0);
       nlpHeuristic->setNumberSolvePerLevel(numSolve);
-      heuristics_.push_back(nlpHeuristic);
+      HeuristicMethod h;
+      h.id = "Couenne Rounding NLP";
+      h.heuristic = nlpHeuristic;
+      heuristics_.push_back(h);
     }
+
+    // Add Branching rules ///////////////////////////////////////////////////////
 
     int varSelection;
     if (!options_->GetEnumValue("variable_selection",varSelection,"bonmin.")) {
       // change the default for Couenne
       varSelection = OSI_SIMPLE;
     }
-
-    /*
-    if ((varSelection == OSI_STRONG) && 
-	(objType == CouenneObject::VT_OBJ)) {
-      printf ("Couenne: warning, strong branching is incompatible with Violation Transfer\n"
-	      "Resetting variable selection to simple branching");
-      varSelection = OSI_SIMPLE;
-    }
-    */
 
     switch (varSelection) {
 
@@ -322,6 +353,26 @@ namespace Bonmin{
       std::cerr << "Unknown variable_selection for Couenne\n" << std::endl;
       throw;
       break;
+    }
+
+    // Add disjunctive cuts ///////////////////////////////////////////////////////
+
+    options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
+
+    if (freq != 0) {
+
+      CouenneDisjCuts * couenneDisj = 
+	new CouenneDisjCuts (ci, this, 
+			     couenneCg -> Problem (), 
+			     branchingMethod_, 
+			     varSelection == OSI_STRONG, // if true, use strong branching candidates
+			     journalist ());
+
+      CuttingMethod cg;
+      cg.frequency = freq;
+      cg.cgl = couenneDisj;
+      cg.id = "Couenne disjunctive cuts";
+      cutGenerators (). push_back(cg);
     }
 
     int ival;
@@ -351,6 +402,7 @@ namespace Bonmin{
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
     CouenneCutGenerator::registerOptions (roptions);
+    CouenneDisjCuts::registerOptions (roptions);
 
     roptions -> AddStringOption2 (
       "display_stats",
@@ -362,17 +414,17 @@ namespace Bonmin{
     roptions->AddBoundedIntegerOption(
       "branching_print_level",
       "Output level for braching code in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
+      -2, J_LAST_LEVEL-1, J_NONE,
       "");
     roptions->AddBoundedIntegerOption(
       "boundtightening_print_level",
       "Output level for bound tightening code in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
+      -2, J_LAST_LEVEL-1, J_NONE,
       "");
     roptions->AddBoundedIntegerOption(
       "convexifying_print_level",
       "Output level for convexifying code in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
+      -2, J_LAST_LEVEL-1, J_NONE,
       "");
     roptions->AddBoundedIntegerOption(
       "problem_print_level",
@@ -437,9 +489,9 @@ namespace Bonmin{
 
     } cutList [] = {
       {(const char*)"Gomory_cuts",new CglGomory,      (const char*)"Mixed Integer Gomory",CUTINFO_MIG},
-      {(const char*)"probing_cuts",new CglProbing,        (const char*) "Probing",  CUTINFO_PROBING},
+      {(const char*)"probing_cuts",new CglProbing,        (const char*) "Probing", CUTINFO_PROBING},
       {(const char*)"mir_cuts",new CglMixedIntegerRounding2, (const char*) "Mixed Integer Rounding", 
-       CUTINFO_NONE},
+                                                                                        CUTINFO_NONE},
       {(const char*)"2mir_cuts",    new CglTwomir,         (const char*) "2-MIR",    CUTINFO_NONE},
       {(const char*)"cover_cuts",   new CglKnapsackCover,  (const char*) "Cover",    CUTINFO_NONE},
       {(const char*)"clique_cuts",  new CglClique,         (const char*) "Clique",   CUTINFO_CLIQUE},

@@ -114,11 +114,11 @@ int main (int argc, char *argv[])
 		"%6d [root] %8d [tot] %6g [sep] %8g [time] %8g [bb] "
 		"%20e [lower] %20e [upper] %7d [nodes]\n",// %s %s\n",
 		cp ? cp -> problemName ().c_str () : "unknown",
-		(cp) ? cp -> nOrig     () : -1, 
-		(cp) ? cp -> nIntVars  () : -1, 
-		(cp) ? cp -> nOrigCons () : -1,
-		(cp) ? (cp -> nVars   () - 
-			cp -> nOrig   ()): -1,
+		(cp) ? cp -> nOrigVars     () : -1, 
+		(cp) ? cp -> nOrigIntVars  () : -1, 
+		(cp) ? cp -> nOrigCons     () : -1,
+		(cp) ? (cp -> nVars     () - 
+			cp -> nOrigVars ()): -1,
 		nr, nt, st, 
 		CoinCpuTime () - time_start,
 		cg ? (CoinCpuTime () - cg -> rootTime ()) : CoinCpuTime (),

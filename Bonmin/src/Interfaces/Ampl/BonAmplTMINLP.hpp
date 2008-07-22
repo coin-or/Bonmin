@@ -18,6 +18,7 @@
 #include "IpSmartPtr.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "OsiCuts.hpp"
+#include "BonRegisteredOptions.hpp"
 
 /* non Ipopt forward declaration */
 struct ASL_pfgh;
@@ -48,6 +49,7 @@ namespace Bonmin
     //@{
     /** Constructor */
     AmplTMINLP(const SmartPtr<const Journalist>& jnlst,
+        const SmartPtr<Bonmin::RegisteredOptions> roptions,
         const SmartPtr<OptionsList> options,
         char**& argv,
         AmplSuffixHandler* suffix_handler = NULL,
@@ -55,6 +57,7 @@ namespace Bonmin
         std::string* nl_file_content = NULL);
 
     virtual void Initialize(const SmartPtr<const Journalist>& jnlst,
+        const SmartPtr<Bonmin::RegisteredOptions> roptions,
         const SmartPtr<OptionsList> options,
         char**& argv,
         AmplSuffixHandler* suffix_handler =NULL,

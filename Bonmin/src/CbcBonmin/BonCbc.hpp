@@ -10,12 +10,12 @@
 #ifndef BonCbc_H
 #define BonCbc_H
 
-#include "BonBabSetupBase.hpp"
+//#include "BonBabSetupBase.hpp"
 #include "CbcModel.hpp"
 
 namespace Bonmin
 {
-
+  class BabSetupBase;
   class Bab
   {
   public:
@@ -28,11 +28,15 @@ namespace Bonmin
     Bab();
     /** destructor.*/
     virtual ~Bab();
-    /** Perform a branch-and-bound on given IpoptInterface using passed parameters.*/
+    /** Perform a branch-and-bound using given setup.*/
     virtual void branchAndBound(BabSetupBase & s);
 
     /**operator() performs the branchAndBound*/
     virtual void operator()(BabSetupBase & s);
+
+    /**operator() performs the branchAndBound*/
+    virtual void operator()(BabSetupBase * s){
+       operator()(*s);}
 
     /** get the best solution known to the problem (is optimal if MipStatus is FeasibleOptimal).
       if no solution is known returns NULL.*/

@@ -228,7 +228,7 @@ namespace Bonmin{
     if (haveRoundedIntVars && skipOnInfeasibility) 
       // no integer initial point could be found, make up some random rounding
 
-      for (int i = couenne_ -> nOrig (); i--;) 
+      for (int i = couenne_ -> nOrigVars (); i--;) 
 
 	if (couenne_ -> Var (i) -> isDefinedInteger ())
 	  lower [i] = upper [i] = Y [i] = 
