@@ -211,6 +211,10 @@ namespace Bonmin{
 
     objects = new OsiObject* [couenneProb -> nVars ()];
 
+    int contObjPriority = 2000; // default object priority -- it is 1000 for integers and 10 for SOS
+
+    options () -> GetIntegerValue ("cont_var_priority", contObjPriority, "bonmin.");
+
     for (int i = 0; i < nVars; i++) { // for each variable
 
       exprVar *var = couenneProb -> Var (i);
@@ -228,7 +232,7 @@ namespace Bonmin{
 	    (var -> Image () -> Linearity () > LINEAR)) {
 
 	  objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (1);
+	  objects [nobj++] -> setPriority (contObjPriority);
 	}
 
 	break;
@@ -242,7 +246,7 @@ namespace Bonmin{
 	   //    (var -> Image () -> Linearity () > LINEAR))) {              // of nonlinear
 
 	  objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (1);
+	  objects [nobj++] -> setPriority (contObjPriority);
 	}
 
 	break;
@@ -257,7 +261,7 @@ namespace Bonmin{
 	  //(var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
 
 	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (1);
+	  objects [nobj++] -> setPriority (contObjPriority);
 	}
 
 	break;
@@ -485,9 +489,9 @@ namespace Bonmin{
 
     } cutList [] = {
       {(const char*)"Gomory_cuts",new CglGomory,      (const char*)"Mixed Integer Gomory",CUTINFO_MIG},
-      {(const char*)"probing_cuts",new CglProbing,        (const char*) "Probing",  CUTINFO_PROBING},
+      {(const char*)"probing_cuts",new CglProbing,        (const char*) "Probing", CUTINFO_PROBING},
       {(const char*)"mir_cuts",new CglMixedIntegerRounding2, (const char*) "Mixed Integer Rounding", 
-       CUTINFO_NONE},
+                                                                                        CUTINFO_NONE},
       {(const char*)"2mir_cuts",    new CglTwomir,         (const char*) "2-MIR",    CUTINFO_NONE},
       {(const char*)"cover_cuts",   new CglKnapsackCover,  (const char*) "Cover",    CUTINFO_NONE},
       {(const char*)"clique_cuts",  new CglClique,         (const char*) "Clique",   CUTINFO_CLIQUE},
