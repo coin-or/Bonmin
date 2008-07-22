@@ -11,12 +11,10 @@
 #define BonBabInfos_H
 #include <stdlib.h>
 #include "BonAuxInfos.hpp"
-#include "BonCbc.hpp"
-
 
 namespace Bonmin
 {
-
+  class Bab;
   /** Bonmin class for passing info between components of branch-and-cuts.*/
   class BabInfo : public Bonmin::AuxInfo
   {

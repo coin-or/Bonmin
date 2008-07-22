@@ -26,10 +26,10 @@
 #include "BonTNLP2FPNLP.hpp"
 #include "BonTNLPSolver.hpp"
 #include "BonCutStrengthener.hpp"
-#include "BonRegisteredOptions.hpp"
+//#include "BonRegisteredOptions.hpp"
 
 namespace Bonmin {
-
+  class RegisteredOptions;
   class StrongBranchingSolver;
 
   /** Solvers for solving nonlinear programs.*/

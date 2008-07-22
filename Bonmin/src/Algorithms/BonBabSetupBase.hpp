@@ -145,9 +145,7 @@ namespace Bonmin
     virtual BabSetupBase * clone() const = 0;
 
     /** Make a copy with solver replace by one passed .*/
-    virtual BabSetupBase *clone(OsiTMINLPInterface&nlp)const {
-       throw(CoinError("BabSetupBase", "CloneWithOtherNlp","Not implemented"));
-    }
+    virtual BabSetupBase *clone(OsiTMINLPInterface&nlp)const;
     /** Virtual destructor. */
     virtual ~BabSetupBase();
 

@@ -12,18 +12,47 @@
 // Date : 12/01/2004
 #include "IpBlas.hpp"
 
+#include <list>
+
 #include "AmplTNLP.hpp"
 #include "BonAmplTMINLP.hpp"
 #include <iostream>
-
-#include "asl.h"
-#include "asl_pfgh.h"
-#include "getstub.h"
-
 #include <fstream>
 
 #include "CoinHelperFunctions.hpp"
 #include "BonExitCodes.hpp"
+namespace Bonmin{
+  void 
+  RegisteredOptions::fillAmplOptionList(ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList){
+      std::list<int> test;
+      std::list< Ipopt::RegisteredOption * > options;
+      chooseOptions(which, options);
+      for(std::list< Ipopt::RegisteredOption * >::iterator i = options.begin();
+           i != options.end() ; i++)
+       {
+           std::string name = "bonmin.";
+           name += (*i)->Name();
+           Ipopt::RegisteredOptionType T = (*i)->Type();
+           Ipopt::AmplOptionsList::AmplOptionType  type;
+           switch(T){
+             case Ipopt::OT_Number: type = Ipopt::AmplOptionsList::Number_Option;
+                  break;
+             case Ipopt::OT_Integer: type = Ipopt::AmplOptionsList::Integer_Option;
+                  break;
+             case Ipopt::OT_String: type = Ipopt::AmplOptionsList::String_Option;
+                  break;
+             case Ipopt::OT_Unknown:
+             default:
+                throw CoinError("RegisteredOptions","fillAmplOptionList","Unknown option type");
+           }
+           amplOptList->AddAmplOption(name, name, type, (*i)->ShortDescription());
+       }
+}
+}
+#include "asl.h"
+#include "asl_pfgh.h"
+#include "getstub.h"
+
 namespace ampl_utils
 {
   void sos_kludge(int nsos, int *sosbeg, double *sosref);
@@ -49,6 +78,7 @@ namespace Bonmin
 
 
   AmplTMINLP::AmplTMINLP(const SmartPtr<const Journalist>& jnlst,
+      const SmartPtr<Bonmin::RegisteredOptions> roptions,
       const SmartPtr<OptionsList> options,
       char**& argv,
       AmplSuffixHandler* suffix_handler /*=NULL*/,
@@ -69,11 +99,12 @@ namespace Bonmin
       simpleConcaves_(NULL),
       hasLinearObjective_(false)
   {
-    Initialize(jnlst, options, argv, suffix_handler, appName, nl_file_content);
+    Initialize(jnlst, roptions, options, argv, suffix_handler, appName, nl_file_content);
   }
 
   void
   AmplTMINLP::Initialize(const SmartPtr<const Journalist>& jnlst,
+      const SmartPtr<Bonmin::RegisteredOptions> roptions,
       const SmartPtr<OptionsList> options,
       char**& argv,
       AmplSuffixHandler* suffix_handler /*=NULL*/,
@@ -128,7 +159,9 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("perturb_radius",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
 
     SmartPtr<AmplOptionsList> ampl_options_list = new AmplOptionsList();
-    fillAmplOptionList(GetRawPtr(ampl_options_list));
+    roptions->fillAmplOptionList(RegisteredOptions::BonminCategory, GetRawPtr(ampl_options_list));
+    roptions->fillAmplOptionList(RegisteredOptions::FilterCategory, GetRawPtr(ampl_options_list));
+    roptions->fillAmplOptionList(RegisteredOptions::BqpdCategory, GetRawPtr(ampl_options_list));
     fillApplicationOptions(GetRawPtr(ampl_options_list) );
     std::string options_id = appName + "_options";
     ampl_tnlp_ = new AmplTNLP(jnlst, options, argv, suffix_handler, true,
@@ -940,6 +973,5 @@ namespace Bonmin
   {
     return ampl_tnlp_->AmplSolverObject();
   }
-
 
 } // namespace Bonmin

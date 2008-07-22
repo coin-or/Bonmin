@@ -183,6 +183,11 @@ namespace Bonmin
   }
 
 
+  /** Make a copy with solver replace by one passed .*/
+  BabSetupBase *
+  BabSetupBase::clone(OsiTMINLPInterface&nlp)const {
+     throw(CoinError("BabSetupBase", "CloneWithOtherNlp","Not implemented"));
+  }
 
 
   void

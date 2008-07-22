@@ -11,6 +11,8 @@
 #define BonCouenneInfos_H
 
 #include "BonBabInfos.hpp"
+#include "BonCbc.hpp"
+#include "IpSmartPtr.hpp"
 #include <list>
 
 namespace Bonmin
@@ -75,18 +77,18 @@ namespace Bonmin
     virtual OsiAuxInfo * clone() const;
 
     /** List of all stored NLP solutions */
-    const std::list<SmartPtr<const NlpSolution> >& NlpSolutions() const {
+    const std::list<Ipopt::SmartPtr<const NlpSolution> >& NlpSolutions() const {
       return nlpSols_;
     }
 
     /** Add a new NLP solution */
-    void addSolution(SmartPtr<const NlpSolution> newSol)
+    void addSolution(Ipopt::SmartPtr<const NlpSolution> newSol)
     {
       nlpSols_.push_back(newSol);
     }
 
     protected:
-    std::list<SmartPtr<const NlpSolution> > nlpSols_;
+    std::list<Ipopt::SmartPtr<const NlpSolution> > nlpSols_;
   };
 }/* End namespace.*/
 

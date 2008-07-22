@@ -16,6 +16,12 @@
 #include "CoinError.hpp"
 #include "IpTypes.hpp"
 #include <iostream>
+#ifdef COIN_HAS_ASL
+   /* Forwar declaration, the function will be defined in BonAmplTMINLP.cpp*/
+   namespace Ipopt{
+   class AmplOptionsList;
+   }
+#endif
 namespace Bonmin {
 /** Class to add a few more information to Ipopt::RegisteredOptions.
     In particular, it allows to store code to indicate in which algorithm
@@ -139,7 +145,11 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
         return IpoptCategory;
       return i->second;
    }
-
+  
+#ifdef COIN_HAS_ASL
+   /* Forward declaration, the function will be defined in BonAmplTMINLP.cpp*/
+   void fillAmplOptionList(ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList);
+#endif
    private:
    /** Output Latex table of options.*/
    void chooseOptions(ExtraCategoriesInfo which, std::list<Ipopt::RegisteredOption *> &options);

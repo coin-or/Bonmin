@@ -60,7 +60,7 @@ namespace Bonmin
     }
     // set the default options... expect_infeasible, etc...
     if (!IsValid(tminlp_)) {
-      amplTminlp_ = new AmplTMINLP(Ipopt::ConstPtr(app_->journalist()), app_->options(), argv,
+      amplTminlp_ = new AmplTMINLP(Ipopt::ConstPtr(app_->journalist()), app_->roptions(), app_->options(), argv,
           NULL, appName() , nl_file_content);
       tminlp_ = GetRawPtr(amplTminlp_);
     }
@@ -68,13 +68,13 @@ namespace Bonmin
       AmplTMINLP * amplTMINLP = dynamic_cast<AmplTMINLP *> (GetRawPtr(tminlp_));
       if (amplTMINLP) {
         AmplTMINLP * newAmpl = amplTMINLP->createEmpty();
-        newAmpl->Initialize(ConstPtr(app_->journalist()), app_->options(), argv,
+        newAmpl->Initialize(ConstPtr(app_->journalist()), app_->roptions(), app_->options(), argv,
             NULL, appName() , nl_file_content);
         amplTminlp_ = newAmpl;
         tminlp_ = GetRawPtr(amplTminlp_);
       }
       else {
-        amplTminlp_ = new AmplTMINLP(ConstPtr(app_->journalist()), app_->options(), argv,
+        amplTminlp_ = new AmplTMINLP(ConstPtr(app_->journalist()), app_->roptions(), app_->options(), argv,
             NULL, appName() , nl_file_content);
         tminlp_ = GetRawPtr(amplTminlp_);
       }
@@ -97,7 +97,6 @@ namespace Bonmin
     setStrParam(OsiProbName, std::string(argv[1]));
     extractInterfaceParams();
     hasBeenOptimized_ = false;
-
     //Read columns and row names if they exists
     readNames();
   }

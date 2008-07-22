@@ -351,5 +351,4 @@ namespace Bonmin{
        }
     }
 
-
 }/*Ends bonmin namespace.*/

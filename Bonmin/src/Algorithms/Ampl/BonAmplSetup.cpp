@@ -14,7 +14,8 @@ namespace Bonmin
   {
     readOptionsFile();
     /* Read the model.*/
-    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", NULL);
+    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(), options(),
+                                                argv, NULL, "bonmin", NULL);
     mayPrintDoc();
     BonminSetup::initialize(GetRawPtr(model), true);
   }
@@ -29,7 +30,8 @@ namespace Bonmin
     /* Get the basic options. */
     readOptionsFile();
     /* Read the model.*/
-    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", NULL);
+    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(),
+                                                options(), argv, NULL, "bonmin", NULL);
     mayPrintDoc();
     toFill.initialize(roptions_, options_, journalist_, GetRawPtr(model));
     BonminSetup::initialize(toFill, true);
@@ -42,7 +44,8 @@ namespace Bonmin
     /* Get the basic options. */
     readOptionsString(opt_file_content);
     /* read nl file by creating AmplTMINLP.*/
-    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", &nl_file_content);
+    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(),
+                                                options(), argv, NULL, "bonmin", &nl_file_content);
     mayPrintDoc();
     BonminSetup::initialize(GetRawPtr(model), createContinuousSolver);
   }
@@ -57,7 +60,8 @@ namespace Bonmin
     /* Get the basic options. */
     readOptionsString(opt_file_content);
     /* read nl file by creating AmplTMINLP.*/
-    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), options(), argv, NULL, "bonmin", &nl_file_content);
+    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(),
+                                                options(), argv, NULL, "bonmin", &nl_file_content);
     mayPrintDoc();
     toFill.initialize(roptions_, options_, journalist_, GetRawPtr(model));
     BonminSetup::initialize(toFill, createContinuousSolver);
@@ -73,6 +77,7 @@ namespace Bonmin
     /* Read the model.*/
     SmartPtr<AmplTMINLP> model =
       new AmplTMINLP(ConstPtr(journalist_),
+          roptions_,
           options_,
           argv, NULL, "bonmin", &nl);
     toFill.initialize(roptions(), options_, journalist(), GetRawPtr(model));

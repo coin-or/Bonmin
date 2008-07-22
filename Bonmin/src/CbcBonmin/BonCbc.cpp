@@ -171,7 +171,7 @@ namespace Bonmin
     bool ChangedObject = false;
     //Pass over user set branching priorities to Cbc
     if (s.continuousSolver()->objects()==NULL) {
-      assert (s.branchingMethod() == NULL);
+      //assert (s.branchingMethod() == NULL);
       const OsiTMINLPInterface * nlpSolver = s.nonlinearSolver();
       //set priorities, prefered directions...
       const int * priorities = nlpSolver->getPriorities();

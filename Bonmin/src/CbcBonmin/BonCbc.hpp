@@ -10,12 +10,12 @@
 #ifndef BonCbc_H
 #define BonCbc_H
 
-#include "BonBabSetupBase.hpp"
+//#include "BonBabSetupBase.hpp"
 #include "CbcModel.hpp"
 
 namespace Bonmin
 {
-
+  class BabSetupBase;
   class Bab
   {
   public:
