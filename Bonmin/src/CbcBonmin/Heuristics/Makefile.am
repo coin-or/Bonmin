@@ -22,7 +22,10 @@ libbonheuristics_la_SOURCES = \
        BonDummyPump.cpp BonDummyPump.hpp \
        BonHeuristicRINS.cpp BonHeuristicRINS.hpp \
        BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp \
-       BonHeuristicFPump.cpp BonHeuristicFPump.hpp
+       BonHeuristicFPump.cpp BonHeuristicFPump.hpp \
+       BonHeuristicDive.cpp BonHeuristicDive.hpp \
+       BonHeuristicDiveFractional.cpp BonHeuristicDiveFractional.hpp \
+       BonHeuristicDiveVectorLength.cpp BonHeuristicDiveVectorLength.hpp
 
 # This is for libtool (on Windows)
 libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
@@ -91,7 +94,10 @@ includecoin_HEADERS = \
                      BonDummyPump.hpp \
                      BonHeuristicRINS.hpp \
                      BonHeuristicLocalBranching.hpp \
-                     BonHeuristicFPump.hpp
+                     BonHeuristicFPump.hpp \
+                     BonHeuristicDive.hpp \
+                     BonHeuristicDiveFractional.hpp \
+                     BonHeuristicDiveVectorLength.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -104,7 +110,10 @@ ASTYLE_FILES = \
    BonDummyPump.cppbak BonDummyPump.hppbak \
    BonHeuristicRINS.cppbak BonHeuristicRINS.hppbak \
    BonHeuristicLocalBranching.cppbak BonHeuristicLocalBranching.hppbak \
-   BonHeuristicFPump.cppbak BonHeuristicFPump.hppbak 
+   BonHeuristicFPump.cppbak BonHeuristicFPump.hppbak \
+   BonHeuristicDive.cppbak BonHeuristicDive.hppbak \
+   BonHeuristicDiveFractional.cppbak BonHeuristicDiveFractional.hppbak \
+   BonHeuristicDiveVectorLength.cppbak BonHeuristicDiveVectorLength.hppbak 
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
