@@ -48,6 +48,8 @@
 #include "BonHeuristicRINS.hpp"
 #include "BonHeuristicLocalBranching.hpp"
 #include "BonHeuristicFPump.hpp"
+#include "BonHeuristicDiveFractional.hpp"
+#include "BonHeuristicDiveVectorLength.hpp"
 namespace Bonmin
 {
   BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy)
@@ -100,6 +102,8 @@ namespace Bonmin
     HeuristicRINS::registerOptions(roptions);
     HeuristicLocalBranching::registerOptions(roptions);
     HeuristicFPump::registerOptions(roptions);
+    HeuristicDiveFractional::registerOptions(roptions);
+    HeuristicDiveVectorLength::registerOptions(roptions);
 
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
@@ -473,6 +477,26 @@ namespace Bonmin
       HeuristicMethod h;
       h.heuristic = feasibility_pump;
       h.id = "FPump";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveFractional = false;
+    options()->GetEnumValue("heuristic_dive_fractional",doHeuristicDiveFractional,"bonmin.");
+    if(doHeuristicDiveFractional){
+      HeuristicDiveFractional* dive_fractional = new HeuristicDiveFractional(this);
+      HeuristicMethod h;
+      h.heuristic = dive_fractional;
+      h.id = "Fractional";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveVectorLength = false;
+    options()->GetEnumValue("heuristic_dive_vectorLength",doHeuristicDiveVectorLength,"bonmin.");
+    if(doHeuristicDiveVectorLength){
+      HeuristicDiveVectorLength* dive_vectorLength = new HeuristicDiveVectorLength(this);
+      HeuristicMethod h;
+      h.heuristic = dive_vectorLength;
+      h.id = "VectorLength";
       heuristics_.push_back(h);
     }
   }
