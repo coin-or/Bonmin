@@ -8,9 +8,12 @@
 // Date : 04/18/2007
 
 #include "BonCouenneSetup.hpp"
-#include "BonNlpHeuristic.hpp"
 #include "BonInitHeuristic.hpp"
+#include "BonNlpHeuristic.hpp"
 #include "BonCouenneInterface.hpp"
+
+#include "BonGuessHeuristic.hpp"
+#include "CbcCompareActual.hpp"
 
 #include "CouenneObject.hpp"
 #include "CouenneVarObject.hpp"
@@ -232,7 +235,7 @@ namespace Bonmin{
 	    (var -> Image () -> Linearity () > LINEAR)) {
 
 	  objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (contObjPriority);
+	  objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
 	}
 
 	break;
@@ -246,7 +249,7 @@ namespace Bonmin{
 	   //    (var -> Image () -> Linearity () > LINEAR))) {              // of nonlinear
 
 	  objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (contObjPriority);
+	  objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
 	}
 
 	break;
@@ -261,7 +264,7 @@ namespace Bonmin{
 	  //(var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
 
 	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (contObjPriority);
+	  objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
 	}
 
 	break;
@@ -323,6 +326,20 @@ namespace Bonmin{
       h.heuristic = nlpHeuristic;
       heuristics_.push_back(h);
     }
+
+#if 0
+    {
+      CbcCompareEstimate compare;
+      model -> setNodeComparison(compare);
+      GuessHeuristic * guessHeu = new GuessHeuristic (*model);
+      HeuristicMethod h;
+      h.id = "Bonmin Guessing";
+      h.heuristic = guessHeu;
+      heuristics_.push_back (h);
+      //model_.addHeuristic(guessHeu);
+      //delete guessHeu;
+    }
+#endif
 
     // Add Branching rules ///////////////////////////////////////////////////////
 

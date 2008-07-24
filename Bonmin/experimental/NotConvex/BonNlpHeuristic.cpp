@@ -176,7 +176,7 @@ namespace Bonmin{
           double value = solution [i];
           if (value < lower[i])
 	    value = lower[i];
-          else if(value > upper[i])
+          else if (value > upper[i])
             value = upper[i];
 
 	  double rounded = floor (value + 0.5);
@@ -261,6 +261,19 @@ namespace Bonmin{
       double * saveColLower = CoinCopyOfArray (nlp_ -> getColLower (), nlp_ -> getNumCols ());
       double * saveColUpper = CoinCopyOfArray (nlp_ -> getColUpper (), nlp_ -> getNumCols ());
 
+      for (int i = nlp_ -> getNumCols (); i--;) {
+
+	if (lower [i] > upper [i]) {
+	  double swap = lower [i];
+	  lower [i] = upper [i];
+	  upper [i] = swap;
+	}
+
+	if      (Y [i] < lower [i]) Y [i] = lower [i];
+	else if (Y [i] > upper [i]) Y [i] = upper [i];
+      }
+
+
       nlp_ -> setColLower    (lower);
       nlp_ -> setColUpper    (upper);
       nlp_ -> setColSolution (Y);
@@ -314,8 +327,8 @@ namespace Bonmin{
 	delete [] tmpSolution;
       }
 
-      nlp_->setColLower(saveColLower);
-      nlp_->setColUpper(saveColUpper);
+      nlp_->setColLower (saveColLower);
+      nlp_->setColUpper (saveColUpper);
 
       delete [] saveColLower;
       delete [] saveColUpper;
