@@ -2551,7 +2551,7 @@ void OsiTMINLPInterface::initialSolve()
     int printOptions;
     app_->options()->GetEnumValue("print_user_options",printOptions,"bonmin.");
     if(printOptions)
-      app_->options()->SetStringValue("print_user_options","yes");
+      app_->options()->SetStringValue("print_user_options","yes",true,true);
   }
   if(exposeWarmStart_)
     app_->disableWarmStart(); 

@@ -347,16 +347,16 @@ namespace Bonmin
     intParam_[BabSetupBase::SpecialOption] = 16;
     if (!options_->GetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.")) {
       intParam_[BabSetupBase::MinReliability] = 1;
-      options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
+      options_->SetIntegerValue("bonmin.number_before_trust",intParam_[BabSetupBase::MinReliability],true,true);
     }
     if (!options_->GetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.")) {
       intParam_[BabSetupBase::NumberStrong] = 1000;
-      options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
+      options_->SetIntegerValue("bonmin.number_strong_branch",intParam_[BabSetupBase::NumberStrong],true,true);
     }
     int varSelection;
     bool val = options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
     if (!val || varSelection == STRONG_BRANCHING || varSelection == RELIABILITY_BRANCHING ) {
-      options_->SetStringValue("variable_selection", "nlp-strong-branching","bonmin.");
+      options_->SetStringValue("variable_selection", "bonmin.nlp-strong-branching",true,true);
       varSelection = NLP_STRONG_BRANCHING;
     }
 
