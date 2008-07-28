@@ -666,7 +666,7 @@ namespace Bonmin
     }
     else if (status == TMINLP::LIMIT_EXCEEDED) {
       status_str = "\t\"Not finished\"";
-      message = "\n Optimization interupted on limit.";
+      message = "\n Optimization interrupted on limit.";
     }
     else if (status == TMINLP::MINLP_ERROR) {
       status_str = "\t\"Aborted\"";
