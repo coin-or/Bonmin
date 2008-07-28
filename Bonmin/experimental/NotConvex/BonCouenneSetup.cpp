@@ -204,6 +204,10 @@ namespace Bonmin{
       exit (-1);
     }
 
+    options () -> GetStringValue ("red_cost_branching", s, "couenne.");
+
+    bool redCostBranch = (s == "yes");
+
     int 
       nobj  = 0, // if no SOS then objects is empty
       nVars = couenneProb -> nVars ();
@@ -249,13 +253,13 @@ namespace Bonmin{
       default:
       case CouenneObject::VT_OBJ:
 
-	// branching objects on variables
+	// Violation Transfer branching objects 
 	if // comment three lines below for linear variables too
 	  (couenneProb -> Dependence () [var -> Index ()] . size () > 0) { // has indep
 	  //|| ((var -> Type () == AUX) &&                      // or, aux 
 	  //(var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
 
-	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
+	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist (), redCostBranch);
 	  objects [nobj++] -> setPriority (1);
 	}
 
