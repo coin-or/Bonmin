@@ -154,6 +154,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
     if      (leanLeft <     threshold) way = 0;
     else if (leanLeft > 1 - threshold) way = 1;
+    else way = (CoinDrand48 () < 0.5) ? 0 : 1;
   }
 
   // done computing delta. Now transfer violation on LP relaxation ///////////////
@@ -167,7 +168,9 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
     int indRow = info -> columnStart_ [indexVar] + i;
 
-    vt_delta += 
+    vt_delta += redCostBranch_ ? 
+           (info -> pi_ [info -> row_ [indRow]] * 
+            info -> elementByColumn_  [indRow]) :
       fabs (info -> pi_ [info -> row_ [indRow]] * 
 	    info -> elementByColumn_  [indRow]);
 
@@ -180,6 +183,9 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 		      info -> elementByColumn_  [indRow],
 		      vt_delta);
   }
+
+  if (redCostBranch_ && (vt_delta < 0))
+    vt_delta = -vt_delta;
 
   // weights for VT itself and width of interval
   const CouNumber 

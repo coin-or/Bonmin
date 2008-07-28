@@ -21,13 +21,16 @@ public:
   CouenneVTObject (CouenneProblem *p,
 		   exprVar *ref, 
 		   Bonmin::BabSetupBase *base, 
-		   JnlstPtr jnlst):
+		   JnlstPtr jnlst,
+		   bool redCostBranch):
 
-    CouenneVarObject (p, ref, base, jnlst) {}
+    CouenneVarObject (p, ref, base, jnlst),
+    redCostBranch_ (redCostBranch) {}
 
   /// Copy constructor
   CouenneVTObject (const CouenneVTObject &src):
-    CouenneVarObject (src) {}
+    CouenneVarObject (src),
+    redCostBranch_ (src.redCostBranch_) {}
 
   /// Destructor
   ~CouenneVTObject () {}
@@ -40,6 +43,11 @@ public:
   /// all infeasibilities of auxiliaries w whose defining function
   /// depends on x |w - f(x)|
   virtual double infeasibility (const OsiBranchingInformation *info, int &way) const;
+
+protected:
+
+  /// should we use original reduced cost branching?
+  bool redCostBranch_;
 };
 
 #endif
