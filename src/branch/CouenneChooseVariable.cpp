@@ -190,4 +190,11 @@ void CouenneChooseVariable::registerOptions (Ipopt::SmartPtr <Bonmin::Registered
      1.,false,
      0.2,
      "Default value is 0.2.");
+
+  roptions -> AddStringOption2
+    ("red_cost_branching",
+     "Apply Reduced Cost Branching (instead of the Violation Transfer) -- MUST have vt_obj enabled",
+     "no",
+     "no", "Use Violation Transfer with $\\sum |\\pi_i a_{ij}|$",
+     "yes","Use Reduced cost branching with $|\\sum \\pi_i a_{ij}|$");
 }
