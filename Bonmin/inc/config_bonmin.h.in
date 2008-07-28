@@ -33,7 +33,7 @@
 /* Define to 1 if the FortMP package is available */
 #undef COIN_HAS_FMP
 
-/* Define to 1 if the Glpk package is available */
+/* Define to 1 if Glpk package is available */
 #undef COIN_HAS_GLPK
 
 /* Define to 1 if the Ipopt package is used */
