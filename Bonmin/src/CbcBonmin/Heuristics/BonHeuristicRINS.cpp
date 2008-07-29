@@ -50,7 +50,7 @@ namespace Bonmin {
     int numberIntegers = model_->numberIntegers();
     const int * integerVariable = model_->integerVariable();
 
-    const double * currentSolution = nlp->getColSolution();
+    const double * currentSolution = model_->getColSolution();
 
     double primalTolerance;
     nlp->getDblParam(OsiPrimalTolerance,primalTolerance);

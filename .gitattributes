@@ -89,6 +89,12 @@ Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDive.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDive.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveFractional.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveFractional.hpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveMIP.cpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveMIP.hpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveMIPFractional.cpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveMIPFractional.hpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveMIPVectorLength.cpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveMIPVectorLength.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveVectorLength.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonHeuristicDiveVectorLength.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonHeuristicFPump.cpp -text

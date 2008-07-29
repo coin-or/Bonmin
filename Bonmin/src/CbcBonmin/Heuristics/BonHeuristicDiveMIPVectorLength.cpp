@@ -12,38 +12,38 @@
 #  pragma warning(disable:4786)
 #endif
 
-#include "BonHeuristicDiveVectorLength.hpp"
+#include "BonHeuristicDiveMIPVectorLength.hpp"
 #include "CbcModel.hpp"
 
 namespace Bonmin
 {
-  HeuristicDiveVectorLength::HeuristicDiveVectorLength() 
+  HeuristicDiveMIPVectorLength::HeuristicDiveMIPVectorLength() 
     :
-    HeuristicDive(),
+    HeuristicDiveMIP(),
     columnLength_(NULL)
   {}
 
-  HeuristicDiveVectorLength::HeuristicDiveVectorLength(BabSetupBase * setup)
+  HeuristicDiveMIPVectorLength::HeuristicDiveMIPVectorLength(BabSetupBase * setup)
     :
-    HeuristicDive(setup),
+    HeuristicDiveMIP(setup),
     columnLength_(NULL)
   {
     Initialize(setup->options());    
   }
 
-  HeuristicDiveVectorLength::HeuristicDiveVectorLength(const HeuristicDiveVectorLength &copy)
+  HeuristicDiveMIPVectorLength::HeuristicDiveMIPVectorLength(const HeuristicDiveMIPVectorLength &copy)
     :
-    HeuristicDive(copy)
+    HeuristicDiveMIP(copy)
   {
     delete [] columnLength_;
     columnLength_ = NULL;
   }
 
-  HeuristicDiveVectorLength & 
-  HeuristicDiveVectorLength::operator=( const HeuristicDiveVectorLength& rhs)
+  HeuristicDiveMIPVectorLength & 
+  HeuristicDiveMIPVectorLength::operator=( const HeuristicDiveMIPVectorLength& rhs)
   {
     if (this!=&rhs) {
-      HeuristicDive::operator=(rhs);
+      HeuristicDiveMIP::operator=(rhs);
       delete [] columnLength_;
       columnLength_ = NULL;
     }
@@ -51,13 +51,13 @@ namespace Bonmin
   }
 
   CbcHeuristic *
-  HeuristicDiveVectorLength::clone() const
+  HeuristicDiveMIPVectorLength::clone() const
   {
-    return new HeuristicDiveVectorLength(*this);
+    return new HeuristicDiveMIPVectorLength(*this);
   }
 
   void
-  HeuristicDiveVectorLength::setInternalVariables(TMINLP2TNLP* minlp)
+  HeuristicDiveMIPVectorLength::setInternalVariables(TMINLP2TNLP* minlp)
   {
     delete [] columnLength_;
     
@@ -96,7 +96,7 @@ namespace Bonmin
   }
 
   void
-  HeuristicDiveVectorLength::selectVariableToBranch(TMINLP2TNLP* minlp,
+  HeuristicDiveMIPVectorLength::selectVariableToBranch(TMINLP2TNLP* minlp,
 						    const vector<int> & integerColumns,
 						    const double* newSolution,
 						    int& bestColumn,
@@ -164,11 +164,11 @@ namespace Bonmin
   }
 
   void
-  HeuristicDiveVectorLength::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("VectorLength diving heuristic", RegisteredOptions::BonminCategory);
+  HeuristicDiveMIPVectorLength::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
+    roptions->SetRegisteringCategory("VectorLength diving MIP heuristic", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
-     "heuristic_dive_vectorLength",
-     "if yes runs the Dive VectorLength heuristic",
+     "heuristic_dive_MIP_vectorLength",
+     "if yes runs the Dive MIP VectorLength heuristic",
      "no",
      "no", "don't run it",
      "yes", "runs the heuristic",
@@ -176,7 +176,7 @@ namespace Bonmin
   }
 
   void 
-  HeuristicDiveVectorLength::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+  HeuristicDiveMIPVectorLength::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
   }
 
 }

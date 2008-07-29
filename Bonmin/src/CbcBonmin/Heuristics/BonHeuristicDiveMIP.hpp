@@ -7,31 +7,31 @@
 //
 // Date : November 12, 2007
 
-#ifndef BonHeuristicDive_HPP
-#define BonHeuristicDive_HPP
+#ifndef BonHeuristicDiveMIP_HPP
+#define BonHeuristicDiveMIP_HPP
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonBabSetupBase.hpp"
 #include "CbcHeuristic.hpp"
 
 namespace Bonmin
 {
-  class HeuristicDive : public CbcHeuristic
+  class HeuristicDiveMIP : public CbcHeuristic
   {
   public:
     /// Default constructor
-    HeuristicDive();
+    HeuristicDiveMIP();
 
     /// Constructor with setup
-    HeuristicDive(BabSetupBase * setup);
+    HeuristicDiveMIP(BabSetupBase * setup);
 
     /// Copy constructor
-    HeuristicDive(const HeuristicDive &copy);
+    HeuristicDiveMIP(const HeuristicDiveMIP &copy);
 
     /// Destructor
-    ~HeuristicDive() {}
+    ~HeuristicDiveMIP() {}
 
     /// Assignment operator
-    HeuristicDive & operator=(const HeuristicDive & rhs);
+    HeuristicDiveMIP & operator=(const HeuristicDiveMIP & rhs);
 
     /// Clone
     virtual CbcHeuristic * clone() const = 0;
@@ -67,11 +67,5 @@ namespace Bonmin
     BabSetupBase * setup_; 
 
   };
-
-  /// checks if the NLP relaxation of the problem is feasible
-  bool isNlpFeasible(TMINLP2TNLP* minlp, const double primalTolerance);
-  
-  /// Adjusts the primalTolerance in case some of the constraints are violated
-  void adjustPrimalTolerance(TMINLP2TNLP* minlp, double & primalTolerance);
 }
 #endif

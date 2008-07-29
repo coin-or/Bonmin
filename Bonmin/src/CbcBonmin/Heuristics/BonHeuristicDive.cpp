@@ -60,8 +60,8 @@ namespace Bonmin
 
     int returnCode = 0; // 0 means it didn't find a feasible solution
 
-    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
-                               (setup_->nonlinearSolver()->clone());
+    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>(model_->solver()->clone());
+      //                               (setup_->nonlinearSolver()->clone());
     TMINLP2TNLP* minlp = nlp->problem();
 
     // set tolerances
@@ -114,7 +114,6 @@ namespace Bonmin
       iteration++;
 
       // select a fractional variable to bound
-      double smallestFraction = DBL_MAX;
       int bestColumn = -1;
       int bestRound = -1; // -1 rounds down, +1 rounds up
       selectVariableToBranch(minlp, integerColumns, newSolution,
@@ -192,13 +191,14 @@ namespace Bonmin
 
     delete [] newSolution;
     delete [] new_g_sol;
+    delete nlp;
 
     return returnCode;
   }
 
 
   bool
-  HeuristicDive::isNlpFeasible(TMINLP2TNLP* minlp, const double primalTolerance)
+  isNlpFeasible(TMINLP2TNLP* minlp, const double primalTolerance)
   {
     int numberColumns;
     int numberRows;
@@ -233,7 +233,7 @@ namespace Bonmin
   }
 
   void
-  HeuristicDive::adjustPrimalTolerance(TMINLP2TNLP* minlp, double & primalTolerance)
+  adjustPrimalTolerance(TMINLP2TNLP* minlp, double & primalTolerance)
   {
     int numberColumns;
     int numberRows;

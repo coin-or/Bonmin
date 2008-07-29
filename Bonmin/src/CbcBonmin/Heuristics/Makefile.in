@@ -64,7 +64,9 @@ am_libbonheuristics_la_OBJECTS = BonLocalSolverBasedHeuristic.lo \
 	BonFixAndSolveHeuristic.lo BonDummyPump.lo BonHeuristicRINS.lo \
 	BonHeuristicLocalBranching.lo BonHeuristicFPump.lo \
 	BonHeuristicDive.lo BonHeuristicDiveFractional.lo \
-	BonHeuristicDiveVectorLength.lo
+	BonHeuristicDiveVectorLength.lo BonHeuristicDiveMIP.lo \
+	BonHeuristicDiveMIPFractional.lo \
+	BonHeuristicDiveMIPVectorLength.lo
 libbonheuristics_la_OBJECTS = $(am_libbonheuristics_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -348,7 +350,10 @@ libbonheuristics_la_SOURCES = \
        BonHeuristicFPump.cpp BonHeuristicFPump.hpp \
        BonHeuristicDive.cpp BonHeuristicDive.hpp \
        BonHeuristicDiveFractional.cpp BonHeuristicDiveFractional.hpp \
-       BonHeuristicDiveVectorLength.cpp BonHeuristicDiveVectorLength.hpp
+       BonHeuristicDiveVectorLength.cpp BonHeuristicDiveVectorLength.hpp \
+       BonHeuristicDiveMIP.cpp BonHeuristicDiveMIP.hpp \
+       BonHeuristicDiveMIPFractional.cpp BonHeuristicDiveMIPFractional.hpp \
+       BonHeuristicDiveMIPVectorLength.cpp BonHeuristicDiveMIPVectorLength.hpp
 
 
 # This is for libtool (on Windows)
@@ -409,7 +414,10 @@ includecoin_HEADERS = \
                      BonHeuristicFPump.hpp \
                      BonHeuristicDive.hpp \
                      BonHeuristicDiveFractional.hpp \
-                     BonHeuristicDiveVectorLength.hpp
+                     BonHeuristicDiveVectorLength.hpp \
+                     BonHeuristicDiveMIP.hpp \
+                     BonHeuristicDiveMIPFractional.hpp \
+                     BonHeuristicDiveMIPVectorLength.hpp
 
 
 ########################################################################
@@ -426,7 +434,10 @@ ASTYLE_FILES = \
    BonHeuristicFPump.cppbak BonHeuristicFPump.hppbak \
    BonHeuristicDive.cppbak BonHeuristicDive.hppbak \
    BonHeuristicDiveFractional.cppbak BonHeuristicDiveFractional.hppbak \
-   BonHeuristicDiveVectorLength.cppbak BonHeuristicDiveVectorLength.hppbak 
+   BonHeuristicDiveVectorLength.cppbak BonHeuristicDiveVectorLength.hppbak \
+   BonHeuristicDiveMIP.cppbak BonHeuristicDiveMIP.hppbak \
+   BonHeuristicDiveMIPFractional.cppbak BonHeuristicDiveMIPFractional.hppbak \
+   BonHeuristicDiveMIPVectorLength.cppbak BonHeuristicDiveMIPVectorLength.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
@@ -485,6 +496,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFixAndSolveHeuristic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicDive.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicDiveFractional.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicDiveMIP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicDiveMIPFractional.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicDiveMIPVectorLength.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicDiveVectorLength.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicFPump.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicLocalBranching.Plo@am__quote@
