@@ -1,4 +1,4 @@
-# Copyright (C) 2006 International Business Machines.
+# Copyright (C) 2006, 2008 International Business Machines.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
@@ -76,6 +76,18 @@ AC_COIN_HAS_PROJECT(Sym)
 AC_COIN_HAS_PROJECT(Vol)
 AC_COIN_HAS_PROJECT(Bcp)
 AC_COIN_HAS_PROJECT(Couenne)
+
+AC_ARG_WITH([bonminbcp],
+            AC_HELP_STRING([--with-bonminbcp],
+                           [Compile Bonmin with Bcp-based parallel version]),
+            [use_bcp="$withval"], [use_bcp=no])
+if test "$use_bcp" = yes; then
+  if test $m4_tolower(coin_has_$1) = unavailable ||
+     test $m4_tolower(coin_has_$1) = skipping; then
+     AC_MSG_ERROR([You specified --with-bonminbcp, but Bcp is not available])
+  fi
+fi
+AM_CONDITIONAL(COMPILE_BONMINBCP, test "$use_bcp" = yes)
 
 #############################################################################
 #                            Third party solvers                            #
