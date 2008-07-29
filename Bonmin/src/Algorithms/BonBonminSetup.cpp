@@ -50,6 +50,8 @@
 #include "BonHeuristicFPump.hpp"
 #include "BonHeuristicDiveFractional.hpp"
 #include "BonHeuristicDiveVectorLength.hpp"
+#include "BonHeuristicDiveMIPFractional.hpp"
+#include "BonHeuristicDiveMIPVectorLength.hpp"
 namespace Bonmin
 {
   BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy)
@@ -104,6 +106,8 @@ namespace Bonmin
     HeuristicFPump::registerOptions(roptions);
     HeuristicDiveFractional::registerOptions(roptions);
     HeuristicDiveVectorLength::registerOptions(roptions);
+    HeuristicDiveMIPFractional::registerOptions(roptions);
+    HeuristicDiveMIPVectorLength::registerOptions(roptions);
 
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
     roptions->AddStringOption5("algorithm",
@@ -486,7 +490,7 @@ namespace Bonmin
       HeuristicDiveFractional* dive_fractional = new HeuristicDiveFractional(this);
       HeuristicMethod h;
       h.heuristic = dive_fractional;
-      h.id = "Fractional";
+      h.id = "DiveFractional";
       heuristics_.push_back(h);
     }
 
@@ -496,7 +500,27 @@ namespace Bonmin
       HeuristicDiveVectorLength* dive_vectorLength = new HeuristicDiveVectorLength(this);
       HeuristicMethod h;
       h.heuristic = dive_vectorLength;
-      h.id = "VectorLength";
+      h.id = "DiveVectorLength";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveMIPFractional = false;
+    options()->GetEnumValue("heuristic_dive_MIP_fractional",doHeuristicDiveMIPFractional,"bonmin.");
+    if(doHeuristicDiveMIPFractional){
+      HeuristicDiveMIPFractional* dive_MIP_fractional = new HeuristicDiveMIPFractional(this);
+      HeuristicMethod h;
+      h.heuristic = dive_MIP_fractional;
+      h.id = "DiveMIPFractional";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveMIPVectorLength = false;
+    options()->GetEnumValue("heuristic_dive_MIP_vectorLength",doHeuristicDiveMIPVectorLength,"bonmin.");
+    if(doHeuristicDiveMIPVectorLength){
+      HeuristicDiveMIPVectorLength* dive_MIP_vectorLength = new HeuristicDiveMIPVectorLength(this);
+      HeuristicMethod h;
+      h.heuristic = dive_MIP_vectorLength;
+      h.id = "DiveMIPVectorLength";
       heuristics_.push_back(h);
     }
   }
