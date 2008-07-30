@@ -173,10 +173,12 @@ namespace Bonmin{
     int nSOS = 0;
 
     // allocate sufficient space for both nonlinear variables and SOS's
-    OsiObject ** objects = new OsiObject* [couenneProb -> nVars ()];
+    OsiObject ** objects;
 
     options () -> GetStringValue ("enable_sos", s, "couenne.");
     if (s == "yes") {
+
+      objects = new OsiObject* [couenneProb -> nVars ()];
 
       nSOS = couenneProb -> findSOS (nonlinearSolver (), objects);
       //printf ("==================== found %d SOS\n", nSOS);
@@ -383,7 +385,8 @@ namespace Bonmin{
 			     couenneCg -> Problem (), 
 			     branchingMethod_, 
 			     varSelection == OSI_STRONG, // if true, use strong branching candidates
-			     journalist ());
+			     journalist (),
+			     options ());
 
       CuttingMethod cg;
       cg.frequency = freq;

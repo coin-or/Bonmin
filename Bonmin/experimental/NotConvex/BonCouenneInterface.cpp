@@ -168,6 +168,19 @@ CouenneInterface::extractLinearRelaxation
 
 	  if (p -> getIntegerCandidate (solution, Y, lbCur, ubCur) >= 0) {
 
+	    for (int i = getNumCols (); i--;) {
+
+	      if (lbCur [i] > ubCur [i]) {
+		double swap = lbCur [i];
+		lbCur [i] = ubCur [i];
+		ubCur [i] = swap;
+	      }
+
+	      if      (Y [i] < lbCur [i]) Y [i] = lbCur [i];
+	      else if (Y [i] > ubCur [i]) Y [i] = ubCur [i];
+	    }
+
+
 	    for (int i=0; i<norig; i++)
 	      if ((p -> Var (i) -> Multiplicity () > 0) &&
 		  p  -> Var (i) -> isInteger ()) {

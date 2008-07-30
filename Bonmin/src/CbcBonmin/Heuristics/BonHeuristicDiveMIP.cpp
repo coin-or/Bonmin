@@ -16,6 +16,10 @@
 #include "OsiCpxSolverInterface.hpp"
 #endif
 
+#ifdef COIN_HAS_CPX
+#include "OsiClpSolverInterface.hpp"
+#endif
+
 #include "OsiAuxInfo.hpp"
 
 #include "CoinTime.hpp"
@@ -76,7 +80,7 @@ namespace Bonmin
     double primalTolerance = 1.0e-6;
     adjustPrimalTolerance(minlp, primalTolerance);
 
-    assert(isNlpFeasible(minlp, primalTolerace));
+    assert(isNlpFeasible(minlp, primalTolerance));
 
     int numberColumns;
     int numberRows;

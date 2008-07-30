@@ -286,6 +286,7 @@ namespace Bonmin
       for (int i=0; i<nco; i++) 
 	objs [i] = s.continuousSolver () -> objects () [i];
       model_.addObjects (nco, objs);
+      delete [] objs;
     }
 
     CbcBranchDefaultDecision branch;
@@ -489,7 +490,7 @@ namespace Bonmin
       int cbc_log_level = model_.logLevel();
       FILE * fp = cbc_handler->filePointer();
       if(cbc_log_level >= 1) {
-	fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
+       fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
                generator->cutGeneratorName(),
                generator->numberTimesEntered(),
                generator->numberCutsInTotal()+
