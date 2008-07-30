@@ -24,6 +24,8 @@
 class CouenneProblem;
 class CouenneSolverInterface;
 
+enum {COUENNE_INFEASIBLE, COUENNE_TIGHTENED, COUENNE_FEASIBLE};
+
 /// Cut Generator for linear convexifications
 
 class CouenneDisjCuts: public CglCutGenerator {
@@ -58,6 +60,18 @@ class CouenneDisjCuts: public CglCutGenerator {
   /// SmartPointer to the Journalist
   JnlstPtr jnlst_;
 
+  /// Number of disjunction to consider at each separation 
+  mutable int numDisjunctions_;
+
+  /// Initial percentage of objects to use for generating cuts, in [0,1]
+  double initDisjPercentage_;
+
+  /// Depth of the BB tree where start decreasing number of objects
+  int depthLevelling_;
+
+  /// Depth of the BB tree where stop separation
+  int depthStopSeparate_;
+
  public:
 
   /// constructor
@@ -66,7 +80,8 @@ class CouenneDisjCuts: public CglCutGenerator {
 		   CouenneProblem *problem = NULL,
 		   OsiChooseVariable *bcv = NULL,
 		   bool is_strong = false,
-		   JnlstPtr journalist = NULL);
+		   JnlstPtr journalist = NULL,
+		   const Ipopt::SmartPtr<Ipopt::OptionsList> options = NULL);
 
   /// copy constructor
   CouenneDisjCuts (const CouenneDisjCuts &);
@@ -93,6 +108,37 @@ class CouenneDisjCuts: public CglCutGenerator {
   /// Provide Journalist
   inline ConstJnlstPtr Jnlst() const 
   {return ConstPtr (jnlst_);}
+
+  /// get all disjunctions
+  int getDisjunctions (std::vector <std::pair <OsiCuts *, OsiCuts *> > &disjunctions, 
+		       OsiSolverInterface &si, 
+		       OsiCuts &cs, 
+		       const CglTreeInfo &info) const;
+
+  /// separate couenne cuts on both sides of single disjunction
+  int separateWithDisjunction (std::pair <OsiCuts *, OsiCuts *> &disj, 
+			      OsiSolverInterface &si, 
+			      OsiCuts &cs, 
+			      const CglTreeInfo &info) const;
+
+  /// generate one disjunctive cut from one CGLP
+  int generateDisjCut (std::pair <OsiCuts *, OsiCuts *> &disj, 
+		       OsiSolverInterface &si, 
+		       OsiCuts &cs, 
+		       const CglTreeInfo &info) const;
+
+  /// check if (column!) cuts compatible with solver interface
+  int checkDisjSide (OsiSolverInterface &si, OsiCuts *cuts) const;
+
+  /// compute smallest box containing both left and right boxes.
+  int getBoxUnion (OsiSolverInterface &si, 
+		   OsiCuts *left, OsiCuts *right, 
+		   CoinPackedVector &lower, CoinPackedVector &upper) const;
+
+protected:
+
+  /// create single osicolcut disjunction
+  OsiCuts *getSingleDisjunction (OsiSolverInterface &si) const;
 };
 
 #endif
