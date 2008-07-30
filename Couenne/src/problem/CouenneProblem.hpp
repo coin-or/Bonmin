@@ -180,14 +180,14 @@ class CouenneProblem {
   CouenneProblem *clone () const
   {return new CouenneProblem (*this);}
 
-  int nObjs     () const {return objectives_.   size ();} ///< Get number of objectives
-  int nCons     () const {return constraints_.  size ();} ///< Get number of constraints
-  int nOrigCons () const {return nOrigCons_;}             ///< Get number of original constraints
+  int nObjs     () const {return (int) objectives_.   size ();} ///< Get number of objectives
+  int nCons     () const {return (int) constraints_.  size ();} ///< Get number of constraints
+  int nOrigCons () const {return nOrigCons_;}                   ///< Get number of original constraints
 
-  inline int nOrigVars    () const {return nOrigVars_;}          ///< Number of original variables
-  inline int nOrigIntVars () const {return nOrigIntVars_;}       ///< Number of original integers
-  inline int nIntVars     () const {return nIntVars_;}           ///< Number of integer variables
-  inline int nVars        () const {return variables_. size ();} ///< Total number of variables
+  inline int nOrigVars    () const {return nOrigVars_;}                ///< Number of orig. variables
+  inline int nOrigIntVars () const {return nOrigIntVars_;}             ///< Number of original integers
+  inline int nIntVars     () const {return nIntVars_;}                 ///< Number of integer variables
+  inline int nVars        () const {return (int) variables_. size ();} ///< Total number of variables
 
   /// get evaluation order index 
   inline int evalOrder (int i) const
