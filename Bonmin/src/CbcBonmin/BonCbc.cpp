@@ -429,6 +429,11 @@ namespace Bonmin
     //Get the time and start.
     model_.initialSolve();
     model_.solver()->resolve();
+
+    // for Couenne
+    if (usingCouenne_)
+      model_.passInSolverCharacteristics (bonBabInfoPtr);
+
     model_.resolve(NULL, 1);
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
