@@ -22,7 +22,7 @@
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
 #include "CouenneCutGenerator.hpp"
-#include "CouenneDisjCuts.hpp"
+//#include "CouenneDisjCuts.hpp"
 #include "BonCouenneInfo.hpp"
 #include "BonCbcNode.hpp"
 
@@ -376,6 +376,7 @@ namespace Bonmin{
 
     // Add disjunctive cuts ///////////////////////////////////////////////////////
 
+#if 0
     options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
 
     if (freq != 0) {
@@ -394,6 +395,7 @@ namespace Bonmin{
       cg.id = "Couenne disjunctive cuts";
       cutGenerators (). push_back(cg);
     }
+#endif
 
     int ival;
     if (!options_->GetEnumValue("node_comparison",ival,"bonmin.")) {
@@ -422,7 +424,7 @@ namespace Bonmin{
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
     CouenneCutGenerator::registerOptions (roptions);
-    CouenneDisjCuts::registerOptions (roptions);
+    //CouenneDisjCuts::registerOptions (roptions);
 
     roptions -> AddStringOption2 (
       "display_stats",
