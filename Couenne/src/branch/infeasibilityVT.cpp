@@ -154,6 +154,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
     if      (leanLeft <     threshold) way = 0;
     else if (leanLeft > 1 - threshold) way = 1;
+    else way = (CoinDrand48 () < 0.5) ? 0 : 1;
   }
 
   // done computing delta. Now transfer violation on LP relaxation ///////////////

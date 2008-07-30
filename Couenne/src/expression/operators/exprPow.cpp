@@ -19,6 +19,7 @@
 #include "exprDiv.hpp"
 #include "exprLog.hpp"
 #include "exprConst.hpp"
+#include "CouenneProblem.hpp"
 
 
 /// simplify power f(x) ^ g(x)
@@ -291,6 +292,58 @@ CouNumber exprPow::gradientNorm (const double *x) {
 
   int ind0 = arglist_ [0] -> Index ();
   CouNumber exponent = arglist_ [1] -> Value ();
-  return (ind0 < 0) ? 0. : fabs (exponent * pow (x [ind0], exponent - 1));
+  return (ind0 < 0) ? 0. : fabs (exponent * safe_pow (x [ind0], exponent - 1));
 }
 
+
+/// can this expression be further linearized or are we on its
+/// concave ("bad") side
+bool exprPow::isCuttable (CouenneProblem *problem, int index) const {
+
+  CouNumber exponent = arglist_ [1] -> Value ();
+
+  bool
+    isInt    = ::isInteger (exponent),
+    isInvInt = (exponent != 0.) && ::isInteger (1. / exponent);
+
+  int intExp = (isInt ? COUENNE_round (exponent) : (isInvInt ? COUENNE_round (1. / exponent) : 0));
+
+  if (exponent > 0.) {
+
+    if (isInt || isInvInt) {
+
+      if (intExp % 2) return false; // exponent odd or 1/odd
+
+      CouNumber 
+	x = problem -> X (arglist_ [0] -> Index ()),
+	y = problem -> X (index);
+
+      if (isInt) return (y <= safe_pow (x, exponent)); // below convex curve ==> cuttable
+
+      return (y >= safe_pow (x, exponent)); // above concave k-th root curve ==> cuttable
+    } else {
+
+      // non-integer exponent
+      CouNumber 
+	x = problem -> X (arglist_ [0] -> Index ()),
+	y = problem -> X (index);
+
+      return ((exponent <= 1.) && (y >= safe_pow (x, exponent)) ||
+	      (exponent >= 1.) && (y <= safe_pow (x, exponent)));
+    }      
+  } else {
+
+    // non-integer exponent
+    CouNumber 
+      x  = problem -> X (arglist_ [0] -> Index ()),
+      y  = problem -> X (index),
+      lb = problem -> Lb (index),
+      ub = problem -> Ub (index);
+
+    if (isInt || isInvInt)
+
+      if (!(intExp % 2)) return (((lb > 0) || (ub < 0)) && (y * safe_pow (fabs (x), -exponent) <= 1.));
+      else               return (((lb > 0) || (ub < 0)) && (y * safe_pow (x,        -exponent) <= 1.));
+    else                 return                            (y * safe_pow (x,        -exponent) <= 1.);
+  }
+}

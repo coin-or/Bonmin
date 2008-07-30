@@ -94,6 +94,10 @@ class exprInv: public exprUnary {
   {
     return 1./((*vardep)());
   }
+
+  /// can this expression be further linearized or are we on its
+  /// concave ("bad") side
+  virtual bool isCuttable (CouenneProblem *problem, int index) const;
 };
 
 #endif

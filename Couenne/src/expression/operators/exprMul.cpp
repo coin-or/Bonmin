@@ -208,3 +208,4 @@ CouNumber exprMul::gradientNorm (const double *x) {
     if (ind1 < 0) return fabs (x1);            // x*d
     else          return sqrt (x0*x0 + x1*x1); // x*y
 }
+

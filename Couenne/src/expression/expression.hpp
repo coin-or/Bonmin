@@ -251,6 +251,11 @@ class expression {
   /// closest feasible points in function in both directions
   virtual void closestFeasible (expression *varind, expression *vardep,
 				CouNumber& left, CouNumber& right) const;
+
+  /// can this expression be further linearized or are we on its
+  /// concave ("bad") side
+  virtual bool isCuttable (CouenneProblem *problem, int index) const
+  {return true;}
 };
 
 

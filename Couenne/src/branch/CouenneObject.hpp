@@ -145,6 +145,10 @@ public:
 		     CouNumber *infeasibility,
 		     CouNumber *brpt) const;
 
+  /// are we on the bad or good side of the expression?
+  virtual bool isCuttable () const
+  {return reference_ -> Image () -> isCuttable (problem_, reference_ -> Index ());}
+
 protected:
 
   /// pointer to Couenne problem

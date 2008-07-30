@@ -73,6 +73,10 @@ public:
   void setSimulate (bool s)
   {simulate_ = s;}
 
+  /// return branching variable
+  expression *variable ()
+  {return variable_;}
+
 protected:
 
   /// The index of the variable this branching object refers to. If

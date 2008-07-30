@@ -241,4 +241,3 @@ CouNumber exprDiv::gradientNorm (const double *x) {
     if (ind1 < 0) return 1. / x1;                                // x/d
     else          return sqrt (1. / x1sq + x0*x0 / (x1sq * x1sq)); // x/y
 }
-

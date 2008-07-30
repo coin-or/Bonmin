@@ -13,6 +13,7 @@
 #include "exprMax.hpp"
 #include "exprOpp.hpp"
 
+#include "CouenneProblem.hpp"
 
 /// find lower and upper bound of a given expression
 
@@ -126,4 +127,16 @@ void exprAbs::closestFeasible (expression *varind, expression *vardep,
     right = valdep;
   }
 
+}
+
+
+/// can this expression be further linearized or are we on its
+/// concave ("bad") side
+bool exprAbs::isCuttable (CouenneProblem *problem, int index) const {
+
+  double 
+    x = problem -> X (argument_ -> Index ()),
+    y = problem -> X (index);
+
+  return ((y <= x) || (y <= -x));
 }

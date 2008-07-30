@@ -56,6 +56,9 @@ public:
   /// fix nonlinear coordinates of current integer-nonlinear feasible solution
   virtual double feasibleRegion (OsiSolverInterface *, const OsiBranchingInformation *) const;
 
+  /// are we on the bad or good side of the expression?
+  virtual bool isCuttable () const;
+
 protected:
 
   /// Method computing the branching point

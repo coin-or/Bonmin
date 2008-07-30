@@ -360,7 +360,7 @@ class CouenneProblem {
   {return pcutoff_ -> getCutOff ();}
 
   /// Make cutoff known to the problem
-  void installCutOff ();
+  void installCutOff () const;
 
   /// Provide Journalist
   ConstJnlstPtr Jnlst() const 

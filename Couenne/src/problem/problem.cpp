@@ -246,7 +246,7 @@ void CouenneProblem::setCutOff (CouNumber cutoff) const {
 
 /// Tell problem that auxiliary related to obj has a cutoff, to be
 /// used in bound tightening
-void CouenneProblem::installCutOff () {
+void CouenneProblem::installCutOff () const {
 
   int indobj = objectives_ [0] -> Body () -> Index ();
 

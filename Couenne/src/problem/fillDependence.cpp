@@ -52,6 +52,6 @@ void CouenneProblem::fillDependence (Bonmin::BabSetupBase *base) {
 	  obj.insert (ind);
       }
 
-    } else objects_.push_back (nullObject);
+    } else objects_.push_back (nullObject); // null object for original and linear auxiliaries
   }
 }

@@ -98,6 +98,11 @@ protected:
 
   /// balanced strategy for branching point selection in products
   CouNumber balancedMul (const OsiBranchingInformation *info, int index, int wind);
+
+  /// can this expression be further linearized or are we on its
+  /// concave ("bad") side
+  virtual bool isCuttable (CouenneProblem *problem, int index) const
+  {return false;} // concave on both sides, as for products
 };
 
 

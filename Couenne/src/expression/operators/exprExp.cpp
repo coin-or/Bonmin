@@ -10,7 +10,7 @@
 #include "exprExp.hpp"
 #include "exprClone.hpp"
 #include "exprMul.hpp"
-
+#include "CouenneProblem.hpp"
 
 // differentiation
 expression *exprExp::differentiate (int index) {
@@ -55,4 +55,16 @@ bool exprExp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   if (resU) chg [ind].setUpper(t_chg_bounds::CHANGED);
 
   return (resL || resU);
+}
+
+
+/// can this expression be further linearized or are we on its
+/// concave ("bad") side
+bool exprExp::isCuttable (CouenneProblem *problem, int index) const {
+
+  double 
+    x = problem -> X (argument_ -> Index ()),
+    y = problem -> X (index);
+
+  return (y <= exp (x));
 }

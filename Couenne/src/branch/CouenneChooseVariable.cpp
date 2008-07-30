@@ -78,7 +78,6 @@ int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initia
 int CouenneChooseVariable::chooseVariable (OsiSolverInterface * solver, 
 					   OsiBranchingInformation *info, 
 					   bool fixVariables) {
-
   problem_ -> domain () -> push 
     (problem_ -> nVars (),
      info -> solution_, 
@@ -195,4 +194,11 @@ void CouenneChooseVariable::registerOptions (Ipopt::SmartPtr <Bonmin::Registered
     ("cont_var_priority",
      "Priority of continuous variable branching",
      1, 2000, "Default value is 2000 (it is 1000 for integers and 10 for SOS).");
+
+  roptions -> AddStringOption2
+    ("red_cost_branching",
+     "Apply Reduced Cost Branching (instead of the Violation Transfer) -- MUST have vt_obj enabled",
+     "no",
+     "no", "Use Violation Transfer with $\\sum |\\pi_i a_{ij}|$",
+     "yes","Use Reduced cost branching with $|\\sum \\pi_i a_{ij}|$");
 }

@@ -237,3 +237,19 @@ double CouenneVarObject::feasibleRegion (OsiSolverInterface *solver,
 
   return 0.;
 }
+
+
+/// are we on the bad or good side of the expression?
+bool CouenneVarObject::isCuttable () const {
+
+  const std::set <int>              &deplist = problem_ -> Dependence () [reference_ -> Index ()];
+  const std::vector <CouenneObject> &objects = problem_ -> Objects ();
+
+  for (std::set <int>::const_iterator depvar = deplist. begin ();
+       depvar != deplist. end (); ++depvar)
+    if (!(objects [*depvar]. isCuttable ()))
+      return false;
+
+  return true;
+}
+

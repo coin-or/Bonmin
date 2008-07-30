@@ -272,6 +272,11 @@ protected:
   void computeQuadFiniteBound (CouNumber &qMin, CouNumber &qMax, 
 			       CouNumber *l, CouNumber *u,
 			       int &indInfLo, int &indInfUp);
+
+  /// can this expression be further linearized or are we on its
+  /// concave ("bad") side
+  virtual bool isCuttable (CouenneProblem *problem, int index) const
+  {return false;} // !!! TODO: specialize
 };
 
 

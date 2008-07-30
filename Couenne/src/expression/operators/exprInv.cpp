@@ -10,6 +10,7 @@
 #include "exprInv.hpp"
 #include "exprClone.hpp"
 #include "exprMul.hpp"
+#include "CouenneProblem.hpp"
 
 
 // differentiation
@@ -110,3 +111,17 @@ CouNumber exprInv::gradientNorm (const double *x) {
   }
 }
 
+
+/// can this expression be further linearized or are we on its
+/// concave ("bad") side
+bool exprInv::isCuttable (CouenneProblem *problem, int index) const {
+
+  int xind = argument_ -> Index ();
+
+  double 
+    x = problem -> X (xind),
+    y = problem -> X (index);
+
+  return ((problem -> Lb (xind) >= 0) && (x > 0) && (y*x <= 1) ||
+	  (problem -> Ub (xind) <= 0) && (x < 0) && (y*x <= 1));
+}

@@ -93,6 +93,12 @@ libCouenne_la_SOURCES = \
 	convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp \
 	convex/updateBranchInfo.cpp \
+	disjunctive/CouenneDisjCuts.cpp \
+	disjunctive/generateDisjCuts.cpp \
+	disjunctive/disjCut.cpp \
+	disjunctive/getDisjunctions.cpp \
+	disjunctive/separateWithDisjunction.cpp \
+	disjunctive/singleDisjunctions.cpp \
 	standardize/decomposeTerm.cpp \
 	standardize/linStandardize.cpp \
 	standardize/sumStandardize.cpp \
@@ -136,13 +142,6 @@ libCouenne_la_SOURCES = \
 	util/drawCuts.cpp \
 	util/rootQ.cpp
 
-
-#	disjunctive/CouenneDisjCuts.cpp \
-#	disjunctive/generateDisjCuts.cpp \
-#	disjunctive/disjCut.cpp \
-#	disjunctive/getDisjunctions.cpp \
-#	disjunctive/separateWithDisjunction.cpp \
-#	disjunctive/singleDisjunctions.cpp \
 
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \

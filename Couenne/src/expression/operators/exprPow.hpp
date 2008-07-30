@@ -101,6 +101,10 @@ class exprPow: public exprOp {
 				expression *vardep, 
 				CouNumber &left,
 				CouNumber &right) const;
+
+  /// can this expression be further linearized or are we on its
+  /// concave ("bad") side
+  virtual bool isCuttable (CouenneProblem *problem, int index) const;
 };
 
 

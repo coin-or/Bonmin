@@ -206,6 +206,11 @@ class exprCopy: public expression {
   virtual void closestFeasible (expression *varind, expression *vardep,
 				CouNumber& left, CouNumber& right) const
   {copy_ -> closestFeasible (varind, vardep, left, right);}
+
+  /// can this expression be further linearized or are we on its
+  /// concave ("bad") side
+  virtual bool isCuttable (CouenneProblem *problem, int index) const
+  {return copy_ -> isCuttable (problem, index);}
 };
 
 #endif

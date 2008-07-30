@@ -17,6 +17,7 @@
 #include "exprMax.hpp"
 #include "exprMin.hpp"
 #include "exprDiv.hpp"
+#include "CouenneProblem.hpp"
 
 
 /// get bounds of log (x) based on bounds of x
@@ -87,3 +88,14 @@ CouNumber exprLog::gradientNorm (const double *x) {
     1. / (CoinMin (1 / COUENNE_INFINITY, x [argument_ -> Index ()]));
 }
 
+
+/// can this expression be further linearized or are we on its
+/// concave ("bad") side
+bool exprLog::isCuttable (CouenneProblem *problem, int index) const {
+
+  double
+    x = problem -> X (argument_ -> Index ()),
+    y = problem -> X (index);
+
+  return ((x == 0.) || (y > log (x)));
+}

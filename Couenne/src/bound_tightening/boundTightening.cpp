@@ -29,6 +29,8 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
 
   bool first = true;
 
+  installCutOff ();
+
   do {
 
     if (CoinCpuTime () > maxCpuTime_)
