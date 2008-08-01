@@ -39,11 +39,12 @@ namespace Bonmin {
      /** Runs heuristic*/
      int solution(double & objectiveValue,
                   double * newSolution);
-   /** Register the options common to all local search based heuristics.*/
-   static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
-   /** Initiaize using passed options.*/
-   void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
+    /** Register the options common to all local search based heuristics.*/
+    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
+
+    /** Initiaize using passed options.*/
+    void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
   };
 
 }/* Ends Bonmin namepace.*/

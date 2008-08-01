@@ -26,13 +26,15 @@ namespace Bonmin
   HeuristicDive::HeuristicDive()
     :
     CbcHeuristic(),
-    setup_(NULL)
+    setup_(NULL),
+    percentageToFix_(0.2)
   {}
 
   HeuristicDive::HeuristicDive(BabSetupBase * setup)
     :
     CbcHeuristic(),
-    setup_(setup)
+    setup_(setup),
+    percentageToFix_(0.2)
   {
     //    Initialize(setup->options());
   }
@@ -40,7 +42,8 @@ namespace Bonmin
   HeuristicDive::HeuristicDive(const HeuristicDive &copy)
     :
     CbcHeuristic(copy),
-    setup_(copy.setup_)
+    setup_(copy.setup_),
+    percentageToFix_(copy.percentageToFix_)    
   {}
 
   HeuristicDive &
@@ -49,6 +52,7 @@ namespace Bonmin
     if(this != &rhs) {
       CbcHeuristic::operator=(rhs);
       setup_ = rhs.setup_;
+      percentageToFix_ = rhs.percentageToFix_;
     }
     return *this;
   }
@@ -109,6 +113,14 @@ namespace Bonmin
 
     setInternalVariables(minlp);
 
+    // vectors to store the latest variables fixed at their bounds
+    int numberIntegers = (int) integerColumns.size();
+    int* columnFixed = new int [numberIntegers];
+    double* originalBound = new double [numberIntegers];
+    bool * fixedAtLowerBound = new bool [numberIntegers];
+
+    const int maxNumberAtBoundToFix = (int) floor(percentageToFix_ * numberIntegers);
+
     int iteration = -1;
     while(numberFractionalVariables) {
       iteration++;
@@ -119,22 +131,93 @@ namespace Bonmin
       selectVariableToBranch(minlp, integerColumns, newSolution,
 			     bestColumn, bestRound);
 
+      // fix integer variables that are at their bounds
+      int numberAtBoundFixed = 0;
+      for (int i=0; i<numberIntegers; i++) {
+	int iColumn = integerColumns[i];
+	double value=newSolution[iColumn];
+	if(fabs(floor(value+0.5)-value)<=integerTolerance && 
+	   numberAtBoundFixed < maxNumberAtBoundToFix) {
+	  // fix the variable at one of its bounds
+	  if (fabs(x_l[iColumn]-value)<=integerTolerance &&
+	      x_l[iColumn] != x_u[iColumn]) {
+	    columnFixed[numberAtBoundFixed] = iColumn;
+	    originalBound[numberAtBoundFixed] = x_u[iColumn];
+	    fixedAtLowerBound[numberAtBoundFixed] = true;
+	    minlp->SetVariableUpperBound(iColumn, x_l[iColumn]);
+	    numberAtBoundFixed++;
+	  }
+	  else if(fabs(x_u[iColumn]-value)<=integerTolerance &&
+		  x_l[iColumn] != x_u[iColumn]) {
+	    columnFixed[numberAtBoundFixed] = iColumn;
+	    originalBound[numberAtBoundFixed] = x_l[iColumn];
+	    fixedAtLowerBound[numberAtBoundFixed] = false;
+	    minlp->SetVariableLowerBound(iColumn, x_u[iColumn]);
+	    numberAtBoundFixed++;
+	  }
+	  if(numberAtBoundFixed == maxNumberAtBoundToFix)
+	    break;
+	}
+      }
+
+      double originalBoundBestColumn;
       if(bestColumn >= 0) {
-	if(bestRound < 0)
+	if(bestRound < 0) {
+	  originalBoundBestColumn = x_u[bestColumn];
 	  minlp->SetVariableUpperBound(bestColumn, floor(newSolution[bestColumn]));
-	else
+	}
+	else {
+	  originalBoundBestColumn = x_l[bestColumn];
 	  minlp->SetVariableLowerBound(bestColumn, ceil(newSolution[bestColumn]));
+	}
       } else {
 	break;
       }
+      int originalBestRound = bestRound;
+      while (1) {
 
-      nlp->initialSolve();
+	nlp->initialSolve();
+
+	if(minlp->optimization_status() != SUCCESS) {
+	  if(numberAtBoundFixed > 0) {
+	    // Remove the bound fix for variables that were at bounds
+	    for(int i=0; i<numberAtBoundFixed; i++) {
+	      int iColFixed = columnFixed[i];
+	      if(fixedAtLowerBound[i])
+		minlp->SetVariableUpperBound(iColFixed, originalBound[i]);
+	      else
+		minlp->SetVariableLowerBound(iColFixed, originalBound[i]);
+	    }
+	    numberAtBoundFixed = 0;
+	  }
+	  else if(bestRound == originalBestRound) {
+	    bestRound *= (-1);
+	    if(bestRound < 0) {
+	      minlp->SetVariableLowerBound(bestColumn, originalBoundBestColumn);
+	      minlp->SetVariableUpperBound(bestColumn, floor(newSolution[bestColumn]));
+	    }
+	    else {
+	      minlp->SetVariableLowerBound(bestColumn, ceil(newSolution[bestColumn]));
+	      minlp->SetVariableUpperBound(bestColumn, originalBoundBestColumn);
+	    }
+	  }
+	  else
+	    break;
+	}
+	else
+	  break;
+      }
 
       if(minlp->optimization_status() != SUCCESS) {
 	break;
       }
 
       memcpy(newSolution,x_sol,numberColumns*sizeof(double));
+
+      double newSolutionValue;
+      minlp->eval_f(numberColumns, newSolution, true, newSolutionValue); 
+      if(newSolutionValue >= solutionValue)
+	break;
 
       numberFractionalVariables = 0;
       for(int iIntCol=0; iIntCol<(int)integerColumns.size(); iIntCol++) {
@@ -144,8 +227,6 @@ namespace Bonmin
 	  numberFractionalVariables++;
       }
 
-      double newSolutionValue;
-      minlp->eval_f(numberColumns, newSolution, true, newSolutionValue); 
     }
 
     bool feasible = true;
@@ -192,6 +273,9 @@ namespace Bonmin
     delete [] newSolution;
     delete [] new_g_sol;
     delete nlp;
+    delete [] columnFixed;
+    delete [] originalBound;
+    delete [] fixedAtLowerBound;
 
     return returnCode;
   }

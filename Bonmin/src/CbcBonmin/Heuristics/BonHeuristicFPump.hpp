@@ -72,5 +72,47 @@ namespace Bonmin
     int objective_norm_;
 
   };
+
+  class RoundingFPump
+  {
+  public:
+    /// Default constructor
+    RoundingFPump(TMINLP2TNLP* minlp);
+
+    /// Destructor
+    ~RoundingFPump();
+
+    /// Rounds the solution
+    void round(const double integerTolerance, 
+	       const double primalTolerance,
+	       double* solution);
+
+  private:
+    /// gutsOfConstructor
+    void gutsOfConstructor();
+
+    /// Pointer to problem
+    TMINLP2TNLP* minlp_;
+
+    /// Number of rows
+    int numberRows_;
+
+    /// Number of columns
+    int numberColumns_;
+
+    /// Indices of columns
+    int* column_;
+
+    /// Indices of start of rows
+    int* rowStart_;
+
+    /// Indices of row lengths
+    int* rowLength_;
+
+    /// Jacobian of g
+    double* jac_g_;
+
+  };
+
 }
 #endif

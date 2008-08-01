@@ -91,8 +91,8 @@ namespace Bonmin
 
     int returnCode = 0; // 0 means it didn't find a feasible solution
 
-    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
-                               (setup_->nonlinearSolver()->clone());
+    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>(model_->solver()->clone());
+    //                               (setup_->nonlinearSolver()->clone());
     TMINLP2TNLP* minlp = nlp->problem();
 
     // set tolerances
@@ -170,18 +170,25 @@ namespace Bonmin
 	oldSolution[j][i]=-COIN_DBL_MAX;
     }
 
+    RoundingFPump roundObj(minlp);
+
     bool stopDueToAlmostZeroObjective = false;
     double* x_bar = new double[numberIntegerColumns];
     int* indexes_x_bar = new int[numberIntegerColumns];
+    double* copy_newSolution = new double[numberColumns];
     int iteration = 0;
     while(numberFractionalVariables) {
       iteration++;
       if(iteration > maxNumberIterations) {
 	break;
       }
+      memcpy(copy_newSolution, newSolution, numberColumns*sizeof(double));
+      roundObj.round(integerTolerance, primalTolerance, copy_newSolution);
       bool flip = true;
       for(int iIntCol=0; iIntCol<numberIntegerColumns; iIntCol++) {
 	int iColumn = integerColumns[iIntCol];
+	double value=copy_newSolution[iColumn];
+#if 0
 	double value=newSolution[iColumn];
 	if (fabs(floor(value+0.5)-value)>integerTolerance) {
 	  value = floor(value+0.5);
@@ -191,6 +198,7 @@ namespace Bonmin
 	  else if(value > x_u[iColumn]+primalTolerance)
 	    value--;
 	}
+#endif
 	x_bar[iIntCol]=value;
 	indexes_x_bar[iIntCol]=iColumn;
 	if(flip && 
@@ -377,6 +385,7 @@ namespace Bonmin
 #endif
     delete [] newSolution;
     delete [] new_g_sol;
+    delete [] copy_newSolution;
 
     return returnCode;
   }
@@ -393,6 +402,134 @@ namespace Bonmin
   void 
   HeuristicFPump::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
     options->GetIntegerValue("feasibility_pump_objective_norm", objective_norm_, "bonmin.");
+  }
+
+  RoundingFPump::RoundingFPump(TMINLP2TNLP* minlp)
+    :
+    minlp_(minlp)
+  {
+    gutsOfConstructor();
+  }
+
+  RoundingFPump::~RoundingFPump()
+  {
+    delete [] column_;
+    delete [] rowStart_;
+    delete [] rowLength_;
+    delete [] jac_g_;
+  }
+
+  void
+  RoundingFPump::gutsOfConstructor()
+  {
+
+    int numberColumns;
+    int nnz_jac_g;
+    int nnz_h_lag;
+    TNLP::IndexStyleEnum index_style;
+    minlp_->get_nlp_info(numberColumns, numberRows_, nnz_jac_g,
+			nnz_h_lag, index_style);
+    
+    const double* x_sol = minlp_->x_sol();
+
+    // Get the indicies of the jacobian
+    // This is also a way of knowing which variables are
+    // used in each row
+    int* indexRow = new int[nnz_jac_g];
+    int* indexCol = new int[nnz_jac_g];
+    minlp_->eval_jac_g(numberColumns, x_sol, false,
+		       numberRows_, nnz_jac_g,
+		       indexRow, indexCol, 0);
+    column_ = new int[nnz_jac_g];
+    rowStart_ = new int[numberRows_];
+    rowLength_ = new int[numberRows_];
+    int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
+    int iniRow = -1;
+    for(int i=0; i<nnz_jac_g; i++) {
+      int thisIndexRow = indexRow[i]-indexCorrection;
+      if(indexRow[i] != iniRow) {
+	iniRow = indexRow[i];
+	rowStart_[thisIndexRow] = i;
+	rowLength_[thisIndexRow] = 1;
+      }
+      else {
+	rowLength_[thisIndexRow]++;
+      }
+      column_[i] = indexCol[i]-indexCorrection;
+    }
+
+    // get the jacobian for the solution with zeros
+    jac_g_ = new double [nnz_jac_g];
+    double* zero_sol = new double [numberColumns];
+    memset(zero_sol, 0, numberColumns * sizeof(double));
+    minlp_->eval_jac_g(numberColumns, zero_sol, true,
+		       numberRows_, nnz_jac_g,
+		       0, 0, jac_g_);
+
+    delete [] indexRow;
+    delete [] indexCol;
+    delete [] zero_sol;
+  }
+
+  void
+  RoundingFPump::round(const double integerTolerance, 
+		       const double primalTolerance,
+		       double* solution)
+  {
+    const Bonmin::TMINLP::VariableType* variableType = minlp_->var_types();
+    const double* x_l = minlp_->x_l();
+    const double* x_u = minlp_->x_u();
+    const double* g_l = minlp_->g_l();
+    const double* g_u = minlp_->g_u();
+
+
+    for(int iRow=0; iRow<numberRows_; iRow++) {
+      if(g_l[iRow] == 1.0 && g_u[iRow] == 1.0) {
+	bool sosConstraint = true;
+	double weightedSum = 0.0;
+	int counter = 1;
+	for (int j=rowStart_[iRow];
+	     j<rowStart_[iRow]+rowLength_[iRow];j++) {
+	  int iColumn = column_[j];
+	  if (jac_g_[j] != 1.0 ||
+	      variableType[iColumn] == Bonmin::TMINLP::CONTINUOUS) {
+	    sosConstraint = false;
+	    break;
+	  }
+	  else {
+	    weightedSum += counter * solution[iColumn];
+	    counter++;
+	  }
+	}
+	if(sosConstraint) {
+	  int columnSelected = (int) floor(weightedSum + 0.5);
+	  assert(0 <= ColumnSelected && columnSelected < numberColumns);
+	  for (int j=rowStart_[iRow];
+	       j<rowStart_[iRow]+rowLength_[iRow];j++) {
+	    int iColumn = column_[j];
+	    if(iColumn == columnSelected)
+	      solution[iColumn] = 1.0;
+	    else
+	      solution[iColumn] = 0.0;
+	  }
+	}
+      }
+    }
+
+    for(int iColumn=0; iColumn<numberColumns_; iColumn++) {
+      if(variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
+	double value=solution[iColumn];
+	if (fabs(floor(value+0.5)-value)>integerTolerance) {
+	  value = floor(value+0.5);
+	  // make sure that the new value is within bounds
+	  if(value < x_l[iColumn]-primalTolerance)
+	    value++;
+	  else if(value > x_u[iColumn]+primalTolerance)
+	    value--;
+	}
+      }
+    }
+
   }
   
 }

@@ -47,6 +47,10 @@ namespace Bonmin
       //      Initialize(setup_->options());
     }
 
+    /// Set percentage of integer variables to fix at bounds
+    void setPercentageToFix(double value)
+    { percentageToFix_ = value; }
+
     /// Performs heuristic
     virtual int solution(double &solutionValue, double *betterSolution);
 
@@ -65,6 +69,9 @@ namespace Bonmin
   protected:
     /** Setup to use for local searches (will make copies).*/
     BabSetupBase * setup_; 
+
+    /// Percentage of integer variables to fix at bounds
+    double percentageToFix_;
 
   };
 
