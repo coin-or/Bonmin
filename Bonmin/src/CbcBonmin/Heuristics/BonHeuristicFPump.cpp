@@ -503,7 +503,7 @@ namespace Bonmin
 	}
 	if(sosConstraint) {
 	  int columnSelected = (int) floor(weightedSum + 0.5);
-	  assert(0 <= ColumnSelected && columnSelected < numberColumns);
+	  assert(0 <= columnSelected && columnSelected < numberColumns_);
 	  for (int j=rowStart_[iRow];
 	       j<rowStart_[iRow]+rowLength_[iRow];j++) {
 	    int iColumn = column_[j];
