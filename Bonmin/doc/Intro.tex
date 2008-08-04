@@ -132,9 +132,9 @@ libraries (and pay attention to their licenses!):
 PACKage)
 \item \link{\BlasAddr}{Blas} (Basic Linear Algebra
 Subroutines)
-\item the sparse linear solver MA27 from the
+\item a sparse linear solver that is supported by Ipopt, e.g., MA27 from the
 \link{\AslAddr}{HSL}
-(Harwell Subroutine Library)
+(Harwell Subroutine Library), MUMPS, or Pardiso
 \end{itemize}
 
 Note that Lapack and the Blas are free for commercial use from the
@@ -156,9 +156,10 @@ the commercial solver \footlink{http://www.ilog.com/products/cplex/product/mip.c
 \subsectionHs{Tested platforms}{Support}
 \Bonmin\ has been installed on the following systems:
 \begin{itemize}
-\item Linux using g++ version 3.* and 4.*
+\item Linux using g++ version 3.* and 4.* and Intel 9.* and 10.*
 \item Windows using version Cygwin 1.5.18
-\item Mac OS X using gcc 3.* and 4.*
+\item Mac OS X using gcc 3.* and 4.* and Intel 9.* and 10.*
+\item SunOS 5 using gcc 4.3
 \end{itemize}
 
 \latexhtml{}{
