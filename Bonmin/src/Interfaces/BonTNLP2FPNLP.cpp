@@ -130,20 +130,24 @@ namespace Bonmin
     bool ret_code;
 
     if(use_cutoff_constraint_ && use_local_branching_constraint_) {
-      tnlp_->get_bounds_info(n, x_l , x_u, m-2, g_l, g_u);
+      ret_code = tnlp_->get_bounds_info(n, x_l , x_u, m-2, g_l, g_u);
       g_l[m-2] = - COIN_DBL_MAX;
       g_u[m-2] = cutoff_;
       g_l[m-1] = - COIN_DBL_MAX;
       g_u[m-1] = rhs_local_branching_constraint_;
     }
     else if(use_cutoff_constraint_) {
+      ret_code = tnlp_->get_bounds_info(n, x_l , x_u, m-1, g_l, g_u);
       g_l[m-1] = - COIN_DBL_MAX;
       g_u[m-1] = cutoff_;
     }
     else if(use_local_branching_constraint_) {
+      ret_code = tnlp_->get_bounds_info(n, x_l , x_u, m-1, g_l, g_u);
       g_l[m-1] = - COIN_DBL_MAX;
       g_u[m-1] = rhs_local_branching_constraint_;
     }
+    else
+      ret_code = tnlp_->get_bounds_info(n, x_l , x_u, m, g_l, g_u);
 
     return ret_code;
   }
