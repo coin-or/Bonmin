@@ -192,7 +192,7 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
         CoinRelFltEq eq(1e-07);// to test equality of doubles    
     OsiClpSolverInterface lp;
     si.extractLinearRelaxation(lp);
-    lp.writeMps("toy");
+//    lp.writeMps("toy");
      MyAssert(lp.getNumCols()==4);
       MyAssert(lp.getNumRows()==3);
       //Check bounds on columns
