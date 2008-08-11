@@ -20,7 +20,10 @@ CouenneSolverInterface::CouenneSolverInterface (CouenneCutGenerator *cg /*= NULL
   cutgen_ (cg),
   knowInfeasible_(false),
   knowOptimal_(false)
-{}
+{
+  // prevents from running OsiClpSolverInterface::tightenBounds()
+  specialOptions_ = specialOptions_ | 262144; 
+}
 
 /// copy constructor
 CouenneSolverInterface::CouenneSolverInterface (const CouenneSolverInterface &src):
