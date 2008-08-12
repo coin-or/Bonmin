@@ -427,8 +427,6 @@ namespace Bonmin
 
     //Get the time and start.
     model_.initialSolve();
-    model_.solver()->resolve();
-    model_.resolve(NULL, 1);
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
     {
@@ -485,9 +483,8 @@ namespace Bonmin
       //CglStored * stored = dynamic_cast<CglStored*>(generator->generator());
        if (true&&!generator->numberCutsInTotal())
 	continue;
-      CoinMessageHandler * cbc_handler = model_.messageHandler();
-      int cbc_log_level = model_.logLevel();
-      FILE * fp = cbc_handler->filePointer();
+      int cbc_log_level = modelHandler_->logLevel();
+      FILE * fp = modelHandler_->filePointer();
       if(cbc_log_level >= 1) {
 	fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
                generator->cutGeneratorName(),
