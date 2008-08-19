@@ -26,6 +26,7 @@ Bonmin/experimental/NotConvex/BonInitHeuristic.cpp -text
 Bonmin/experimental/NotConvex/BonInitHeuristic.hpp -text
 Bonmin/experimental/NotConvex/BonNlpHeuristic.cpp -text
 Bonmin/experimental/NotConvex/BonNlpHeuristic.hpp -text
+Bonmin/experimental/NotConvex/CouTight.cpp -text
 Bonmin/experimental/NotConvex/Makefile.am -text
 Bonmin/experimental/NotConvex/Makefile.in -text
 Bonmin/inc/config_bonmin.h.in -text

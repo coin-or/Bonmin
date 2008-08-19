@@ -9,7 +9,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 if COIN_HAS_ASL
-  bin_PROGRAMS = boncouenne
+  bin_PROGRAMS = boncouenne coutight
 endif
 
 COINLIBS = 
@@ -116,6 +116,23 @@ boncouenne_SOURCES = BonCouenne.cpp \
 	BonCouenneInfo.cpp BonCouenneInfo.hpp
 
 boncouenne_LDADD = \
+        ../../src/CbcBonmin/libbonminampl.la \
+        ../../src/CbcBonmin/libbonmin.la \
+        $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
+	$(IPOPTLIBS) \
+	$(LIBCBCCOPY) \
+	$(COINLIBS) \
+	$(ASLLIB) \
+	$(ADDLIBS)
+
+coutight_SOURCES = CouTight.cpp \
+	BonCouenneSetup.cpp BonCouenneSetup.hpp \
+	BonCouenneInterface.cpp BonCouenneInterface.hpp \
+	BonNlpHeuristic.cpp BonNlpHeuristic.hpp \
+	BonInitHeuristic.cpp BonInitHeuristic.hpp \
+	BonCouenneInfo.cpp BonCouenneInfo.hpp
+
+coutight_LDADD = \
         ../../src/CbcBonmin/libbonminampl.la \
         ../../src/CbcBonmin/libbonmin.la \
         $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
