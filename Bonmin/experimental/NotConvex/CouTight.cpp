@@ -27,20 +27,16 @@
 #include "r_opn.hd" // for N_OPS 
 #include "opcode.hd"
 
-int pint;
+static int empty_int = 0;
 
 static keyword keywds[] = { /* must be sorted */
-  { const_cast<char*>("barrier"), 
-    I_val,  
-    &pint,
-    (char *) "non faccio nulla"}
+  KW(const_cast<char*>("empty"), 
+     I_val, 
+     empty_int, 
+     const_cast<char*>("nothing")), 
 };
 
 extern Option_Info Oinfo;
-
-//extern 
-//Option_Info* TheOInfo;
-//extern ASL* asl;
 
 using namespace Bonmin;
 
@@ -67,12 +63,18 @@ int main (int argc, char *argv[]) {
   typedef struct {char *msg; int code, wantsol;} Sol_info;
 
   static Sol_info solinfo [] = {
-    {"Optimal", 0, 1}
+    {
+      const_cast<char*>("Optimal"), 
+      0, 
+      1
+    }
   };
 
   static SufDecl suftab [] = {
-    {(char *) "newlb", 0, ASL_Sufkind_var | ASL_Sufkind_real, 0},
-    {(char *) "newub", 0, ASL_Sufkind_var | ASL_Sufkind_real, 0}};
+    {const_cast<char*>("newlb"), 0, 
+     ASL_Sufkind_var | ASL_Sufkind_real | ASL_Sufkind_output, 0},
+    {const_cast<char*>("newub"), 0, 
+     ASL_Sufkind_var | ASL_Sufkind_real | ASL_Sufkind_output, 0}};
 
   char oinf = 0;
 
@@ -80,19 +82,11 @@ int main (int argc, char *argv[]) {
 
   Sol_info *Si;
 
-  suf_declare_ASL (aslfg -> asl, suftab, 2); //sizeof (suftab) / sizeof (Sufdecl));
+  suf_declare_ASL (aslfg -> asl, suftab, sizeof (suftab) / sizeof (SufDecl));
 
   // add an AMPL suffix
   SufDesc* vnewLb = suf_get_ASL(aslfg -> asl, "newlb", ASL_Sufkind_var);
   SufDesc* vnewUb = suf_get_ASL(aslfg -> asl, "newub", ASL_Sufkind_var);
-
-  double *x = new double [NumberOfVariables];
-
-  CoinFillN (x, NumberOfVariables, 0.);
-
-  write_sol_ASL (aslfg -> asl, (char *) "solved!", 0, 0, &Oinfo);
-
-  delete [] x;
 
   vnewLb -> u.r = (real*)M1zapalloc_ASL(&aslfg -> asl->i, NumberOfVariables * sizeof(real));
   vnewUb -> u.r = (real*)M1zapalloc_ASL(&aslfg -> asl->i, NumberOfVariables * sizeof(real));
@@ -107,5 +101,6 @@ int main (int argc, char *argv[]) {
     vnewUb->u.r[i] = newU [i];
   }
 
+  write_sol_ASL (aslfg -> asl, const_cast<char*>("solved!"), 0, 0, &Oinfo);
   return 0;
 }
