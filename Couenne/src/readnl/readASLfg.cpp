@@ -16,12 +16,12 @@
 
 fint timing = 0;
 
-static keyword keywds[] = { // must be alphabetical
+keyword keywds[] = { // must be alphabetical
    KW(CHR"timing", L_val, &timing, CHR"display timings for the run"),
 };
 
-static Option_Info Oinfo = { CHR"testampl", CHR"ANALYSIS TEST",
-   CHR"concert_options", keywds, nkeywds, 0, CHR"ANALYSIS TEST" };
+Option_Info Oinfo = { CHR"testampl", CHR"ANALYSIS TEST",
+		      CHR"concert_options", keywds, nkeywds, 0, CHR"ANALYSIS TEST" };
 
 
 ASL *readASLfg (char **argv) {
