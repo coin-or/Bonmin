@@ -33,7 +33,7 @@ static keyword keywds[] = { /* must be sorted */
   { const_cast<char*>("barrier"), 
     I_val,  
     &pint,
-    (const char *) "non faccio nulla"}
+    (char *) "non faccio nulla"}
 };
 
 extern Option_Info Oinfo;
@@ -71,8 +71,8 @@ int main (int argc, char *argv[]) {
   };
 
   static SufDecl suftab [] = {
-    {(const char *) "newlb", 0, ASL_Sufkind_var | ASL_Sufkind_real, 0},
-    {(const char *) "newub", 0, ASL_Sufkind_var | ASL_Sufkind_real, 0}};
+    {(char *) "newlb", 0, ASL_Sufkind_var | ASL_Sufkind_real, 0},
+    {(char *) "newub", 0, ASL_Sufkind_var | ASL_Sufkind_real, 0}};
 
   char oinf = 0;
 
@@ -90,7 +90,7 @@ int main (int argc, char *argv[]) {
 
   CoinFillN (x, NumberOfVariables, 0.);
 
-  write_sol_ASL (aslfg -> asl, (const char *) "solved!", 0, 0, &Oinfo);
+  write_sol_ASL (aslfg -> asl, (char *) "solved!", 0, 0, &Oinfo);
 
   delete [] x;
 
