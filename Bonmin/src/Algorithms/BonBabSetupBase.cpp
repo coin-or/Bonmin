@@ -310,11 +310,11 @@ namespace Bonmin
     if (varSelection == MOST_FRACTIONAL) {
       intParam_[NumberStrong] = 0;
       intParam_[MinReliability] = 0;
-      options_->SetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.");
+      options_->SetIntegerValue("bonmin.number_strong_branch",intParam_[BabSetupBase::NumberStrong],true, true);
     }
     else if (varSelection == RELIABILITY_BRANCHING) {
       intParam_[MinReliability] = 10;
-      options_->SetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.");
+      options_->SetIntegerValue("bonmin.number_before_trust",intParam_[BabSetupBase::MinReliability],true, true);
     }
   }
 
