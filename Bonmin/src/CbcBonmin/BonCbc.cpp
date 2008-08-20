@@ -483,35 +483,32 @@ namespace Bonmin
       //CglStored * stored = dynamic_cast<CglStored*>(generator->generator());
        if (true&&!generator->numberCutsInTotal())
 	continue;
-      int cbc_log_level = modelHandler_->logLevel();
-      FILE * fp = modelHandler_->filePointer();
-      if(cbc_log_level >= 1) {
-	fprintf(fp, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
-               generator->cutGeneratorName(),
-               generator->numberTimesEntered(),
-               generator->numberCutsInTotal()+
-               generator->numberColumnCuts(),
-               generator->numberCutsActive());
-        if (generator->timing()) {
-          fprintf(fp, " (%.3fs)\n",generator->timeInCutGenerator());
-        }
-        else {
-          fprintf(fp, "\n");
-        }
+       if(modelHandler_->logLevel() >= 1) {
+        *modelHandler_ << generator->cutGeneratorName()
+                << "was tried" << generator->numberTimesEntered()
+                << "times and created" << generator->numberCutsInTotal()+generator->numberColumnCuts()
+                << "cuts of which" << generator->numberCutsActive()
+                << "were active after adding rounds of cuts";
+         if (generator->timing()) {
+                char timebuf[20];
+                sprintf(timebuf, "(%.3fs)", generator->timeInCutGenerator());
+                *modelHandler_ << timebuf << CoinMessageEol;
+         }
+         else {
+                *modelHandler_ << CoinMessageEol;
+         }
       }
     }
 
     if (hasFailed) {
-      CoinMessageHandler * cbc_handler = model_.messageHandler();
-      FILE * fp = cbc_handler->filePointer();
-      fprintf(fp,
-     "************************************************************\n"
-     "WARNING : Optimization failed on an NLP during optimization\n"
-     "\n (no optimal value found within tolerances).\n"
-     "Optimization was not stopped because option \n"
-     "\"nlp_failure_behavior\" has been set to fathom but\n"
-     " beware that reported solution may not be optimal\n"
-     "************************************************************\n");
+        *model_.messageHandler()
+      << "************************************************************" << CoinMessageEol
+      << "WARNING : Optimization failed on an NLP during optimization"  << CoinMessageEol
+      << "  (no optimal value found within tolerances)."  << CoinMessageEol
+      << "  Optimization was not stopped because option"  << CoinMessageEol
+      << "\"nlp_failure_behavior\" has been set to fathom but"  << CoinMessageEol
+      << " beware that reported solution may not be optimal"  << CoinMessageEol
+      << "************************************************************" << CoinMessageEol;
     }
     TMINLP::SolverReturn status = TMINLP::MINLP_ERROR;
 
