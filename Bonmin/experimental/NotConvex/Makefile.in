@@ -42,7 +42,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COIN_HAS_ASL_TRUE@bin_PROGRAMS = boncouenne$(EXEEXT)
+@COIN_HAS_ASL_TRUE@bin_PROGRAMS = boncouenne$(EXEEXT) \
+@COIN_HAS_ASL_TRUE@	coutight$(EXEEXT)
 @COIN_HAS_COUENNE_TRUE@am__append_1 = $(COUENNEOBJDIR)/src/libCouenne.la
 @COIN_HAS_CPX_TRUE@am__append_2 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 @COIN_HAS_CPX_TRUE@am__append_3 = \
@@ -96,6 +97,15 @@ boncouenne_DEPENDENCIES = ../../src/CbcBonmin/libbonminampl.la \
 	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_6) \
 	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_4)
+am_coutight_OBJECTS = CouTight.$(OBJEXT) BonCouenneSetup.$(OBJEXT) \
+	BonCouenneInterface.$(OBJEXT) BonNlpHeuristic.$(OBJEXT) \
+	BonInitHeuristic.$(OBJEXT) BonCouenneInfo.$(OBJEXT)
+coutight_OBJECTS = $(am_coutight_OBJECTS)
+coutight_DEPENDENCIES = ../../src/CbcBonmin/libbonminampl.la \
+	../../src/CbcBonmin/libbonmin.la \
+	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_6) \
+	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_4)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/inc
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -115,8 +125,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(boncouenne_SOURCES)
-DIST_SOURCES = $(boncouenne_SOURCES)
+SOURCES = $(boncouenne_SOURCES) $(coutight_SOURCES)
+DIST_SOURCES = $(boncouenne_SOURCES) $(coutight_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -415,6 +425,23 @@ boncouenne_LDADD = \
 	$(ASLLIB) \
 	$(ADDLIBS)
 
+coutight_SOURCES = CouTight.cpp \
+	BonCouenneSetup.cpp BonCouenneSetup.hpp \
+	BonCouenneInterface.cpp BonCouenneInterface.hpp \
+	BonNlpHeuristic.cpp BonNlpHeuristic.hpp \
+	BonInitHeuristic.cpp BonInitHeuristic.hpp \
+	BonCouenneInfo.cpp BonCouenneInfo.hpp
+
+coutight_LDADD = \
+        ../../src/CbcBonmin/libbonminampl.la \
+        ../../src/CbcBonmin/libbonmin.la \
+        $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
+	$(IPOPTLIBS) \
+	$(LIBCBCCOPY) \
+	$(COINLIBS) \
+	$(ASLLIB) \
+	$(ADDLIBS)
+
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
@@ -484,6 +511,9 @@ clean-binPROGRAMS:
 boncouenne$(EXEEXT): $(boncouenne_OBJECTS) $(boncouenne_DEPENDENCIES) 
 	@rm -f boncouenne$(EXEEXT)
 	$(CXXLINK) $(boncouenne_LDFLAGS) $(boncouenne_OBJECTS) $(boncouenne_LDADD) $(LIBS)
+coutight$(EXEEXT): $(coutight_OBJECTS) $(coutight_DEPENDENCIES) 
+	@rm -f coutight$(EXEEXT)
+	$(CXXLINK) $(coutight_LDFLAGS) $(coutight_OBJECTS) $(coutight_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -497,6 +527,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCouenneSetup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonInitHeuristic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonNlpHeuristic.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouTight.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
