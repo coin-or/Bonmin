@@ -426,6 +426,8 @@ namespace Bonmin
       }
     }
 
+
+    try {
     //Get the time and start.
     model_.initialSolve();
     model_.solver()->resolve();
@@ -462,7 +464,15 @@ namespace Bonmin
     // to get node parent info in Cbc, pass parameter 3.
     //model_.branchAndBound(3);
     model_.branchAndBound();
-    
+    }
+    catch(TNLPSolver::UnsolvedError *E){
+      s.nonlinearSolver()->model()->finalize_solution(TMINLP::MINLP_ERROR,
+           0,
+           NULL,
+           DBL_MAX);
+      throw E;
+   
+    }
     numNodes_ = model_.getNodeCount();
     bestObj_ = model_.getObjValue();
     bestBound_ = model_.getBestPossibleObjValue();
