@@ -69,7 +69,8 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
     brpts = (CouNumber *) realloc (brpts, sizeof (CouNumber));
     *brpts = 0.5*(l+u);
     way = TWO_RAND;
-    return (y0 - pow (x0, k));
+    brDist = (double *) realloc (brDist, 2 * sizeof (double));
+    return (brDist [0] = brDist [1] = fabs (y0 - pow (x0, k)));
   }
 
   // case 1: k negative, resort to method similar to exprInv:: ///////////////////////////////
@@ -105,10 +106,9 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
       // on the bad side /////////////////////
 
-#if 0
       // TODO: restore when we can do three-way branching
 
-      double xp = pow (y0, 1./k);
+      /*double xp = pow (y0, 1./k);
 
       brpts = (double *) realloc (brpts, 2 * sizeof (double));
       brpts [0] = 0.5 * (x0 - xp);
@@ -120,8 +120,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 		      CoinMin (brpts [1] - x0, 
 			       projectSeg (x0, y0, 
 					   brpts [0], pow (brpts [0], k),
-					   brpts [1], pow (brpts [1], k), -1)));
-#endif
+					   brpts [1], pow (brpts [1], k), -1)));*/
 
       // in the meantime, branch on current point (next branch won't
       // have unbounded x)
@@ -156,7 +155,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
     if (l < -COUENNE_INFINITY) {
 
       // if y0 is huge, try to make it close to 0
-      *brpts = -safe_pow (y0, 1. / k);
+      *brpts = obj -> midInterval (-safe_pow (y0, 1. / k), l, u);
       way = TWO_RIGHT;
 
       //printf ("  ----> brptPow %g\n", *brpts);
@@ -172,7 +171,7 @@ CouNumber exprPow::selectBranch (const CouenneObject *obj,
 
       // if y0 is huge, try to make it close to 0
       //*brpts = CoinMin (safe_pow (y0, 1. / k), COU_MAX_COEFF / k);
-      *brpts = safe_pow (y0, 1. / k);
+      *brpts = obj -> midInterval (safe_pow (y0, 1. / k), l, u);
       way = TWO_LEFT;
 
       //printf ("  ----> brptPow %g\n", *brpts);

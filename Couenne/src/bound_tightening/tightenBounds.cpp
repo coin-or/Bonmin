@@ -58,7 +58,7 @@ int CouenneProblem::tightenBounds (t_chg_bounds *chg_bds) const {
       if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
 
 	Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
-			"pre-check: w_%d has infeasible bounds [%g,%g]. ", i, Lb (i), Ub (i));
+			"pre-check: w_%d has infeasible bounds [%.10e,%.10e]. ", i, Lb (i), Ub (i));
 
 	if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
 	  Var (i) -> Lb () -> print (std::cout);

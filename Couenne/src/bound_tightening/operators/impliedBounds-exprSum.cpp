@@ -120,6 +120,9 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
       if      (coe >  0.) {I1 [ipos] = ind; C1 [ipos++] = coe;}
       else if (coe < -0.) {I2 [ineg] = ind; C2 [ineg++] = coe;}
+
+      if (el -> first -> isInteger ())
+	intSet.insert (ind);
     }
   }
 
@@ -292,7 +295,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       int ind = I1 [i];
       if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [i] + uc [ind]) || tighter) {
 	chg [ind].setLower(t_chg_bounds::CHANGED); 
-	if (intSet.find (ind)!= intSet.end ()) 
+	if (intSet.find (ind) != intSet.end ()) 
 	  l [ind] = ceil (l [ind] - COUENNE_EPS);
       }
     }
@@ -301,7 +304,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       int ind = I2 [i];
       if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [i] + lc [ind]) || tighter) {
 	chg [ind].setUpper(t_chg_bounds::CHANGED);
-	if (intSet.find (ind)!= intSet.end ()) 
+	if (intSet.find (ind) != intSet.end ()) 
 	  u [ind] = floor (u [ind] + COUENNE_EPS);
       }
     }
@@ -311,7 +314,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       int ind = I1 [infUp1];
       if (tighter = updateBound (-1, l + ind, (wl - upper) / C1 [infUp1]) || tighter) {
 	chg [ind].setLower(t_chg_bounds::CHANGED);
-	if (intSet.find (ind)!= intSet.end ()) 
+	if (intSet.find (ind) != intSet.end ()) 
 	  l [ind] = ceil (l [ind] - COUENNE_EPS);
       }
     }
@@ -320,7 +323,7 @@ bool exprSum::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 	int ind = I2 [infLo2];
 	if (tighter = updateBound (+1, u + ind, (wl - upper) / C2 [infLo2]) || tighter) {
 	  chg [ind].setUpper(t_chg_bounds::CHANGED);
-	  if (intSet.find (ind)!= intSet.end ()) 
+	  if (intSet.find (ind) != intSet.end ()) 
 	    u [ind] = floor (u [ind] + COUENNE_EPS);
 	}
       }

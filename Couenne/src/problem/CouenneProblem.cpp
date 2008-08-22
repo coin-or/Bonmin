@@ -86,7 +86,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   nOrigIntVars_ = nIntVars ();
 
   jnlst_->Printf (Ipopt::J_SUMMARY, J_PROBLEM,
-		  "Problem size before standarization: %d variables (%d integer), %d constraints.\n",
+		  "Problem size before reformulation: %d variables (%d integer), %d constraints.\n",
 		  nOrigVars_, nOrigIntVars_, nOrigCons_);
 
   if (base) {
@@ -109,7 +109,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
   if ((now = (CoinCpuTime () - now)) > 10.)
     jnlst_->Printf(Ipopt::J_WARNING, J_PROBLEM,
-		   "Couenne: standardization time %.3fs\n", now);
+		   "Couenne: reformulation time %.3fs\n", now);
 
   // give a value to all auxiliary variables
   initAuxs ();
@@ -126,7 +126,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
     }
 
   jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
-		  "Problem size after  standarization: %d variables (%d integer), %d constraints.\n",
+		  "Problem size after  reformulation: %d variables (%d integer), %d constraints.\n",
 		  nActualVars, nIntVars_, nCons());
 
   if (base) {

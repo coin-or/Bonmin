@@ -1,0 +1,59 @@
+# Configuration file for Couenne
+# Pietro Belotti
+# (C) Carnegie Mellon University 2008
+
+# This is a base configuration file for Couenne. The value of the parameters
+# are the default in Couenne and it is recommended that they stay like that.
+# However, you may customize each parameter to a specific problem you have.
+
+# General parameters
+# Log levels
+# Disjunctive cuts
+# Convexification cuts
+# Bound tightening
+# Branching
+# MILP cuts
+# Misc
+
+minlp_disj_cuts
+disj_init_perc
+disj_depth_level
+disj_depth_stop
+disj_active_rows
+disj_active_cols
+disj_cumulative
+
+enable_sos
+use_quadratic
+art_lower
+
+branch_fbbt
+branch_conv_cuts
+branch_pt_select
+branch_midpoint_alpha
+branch_lp_clamp
+cont_var_priority
+red_cost_branching
+branching_object
+pseudocost_mult
+pseudocost_mult_lp
+
+local_optimization_heuristic
+log_num_local_optimization_per_level
+
+convexification_type
+convexification_points
+violated_cuts_only
+convexification_cuts 
+check_lp
+
+art_cutoff
+opt_window
+feas_tolerance
+
+feasibility_bt
+optimality_bt
+log_num_obbt_per_level
+aggressive_fbbt
+log_num_abt_per_level
+

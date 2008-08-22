@@ -75,7 +75,6 @@ void updateBranchInfo (const OsiSolverInterface &si, CouenneProblem *p,
 void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 					OsiCuts &cs, 
 					const CglTreeInfo info) const {
-
   const int infeasible = 1;
 
   int nInitCuts = cs.sizeRowCuts ();

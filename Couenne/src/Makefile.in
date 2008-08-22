@@ -134,11 +134,6 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp convex/updateBranchInfo.cpp \
-	disjunctive/CouenneDisjCuts.cpp \
-	disjunctive/generateDisjCuts.cpp disjunctive/disjCut.cpp \
-	disjunctive/getDisjunctions.cpp \
-	disjunctive/separateWithDisjunction.cpp \
-	disjunctive/singleDisjunctions.cpp \
 	standardize/decomposeTerm.cpp standardize/linStandardize.cpp \
 	standardize/sumStandardize.cpp standardize/analyzeSparsity.cpp \
 	standardize/constrStandardize.cpp standardize/elementBreak.cpp \
@@ -192,20 +187,17 @@ am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
 	conv-exprExp.lo conv-exprLog.lo conv-exprGroup.lo \
 	conv-exprQuad.lo trigNewton.lo CouenneCutGenerator.lo \
 	generateCuts.lo genColCuts.lo genRowCuts.lo alphaConvexify.lo \
-	quadCuts.lo updateBranchInfo.lo CouenneDisjCuts.lo \
-	generateDisjCuts.lo disjCut.lo getDisjunctions.lo \
-	separateWithDisjunction.lo singleDisjunctions.lo \
-	decomposeTerm.lo linStandardize.lo sumStandardize.lo \
-	analyzeSparsity.lo constrStandardize.lo elementBreak.lo \
-	splitAux.lo auxiliarize.lo standardize.lo flattenMul.lo \
-	problem.lo CouenneProblem.lo problemIO.lo writeAMPL.lo \
-	writeGAMS.lo constraint.lo fillQuadIndices.lo \
-	fillDependence.lo CouenneSolverInterface.lo \
-	CouenneLPtightenBounds.lo checkNLP.lo getIntegerCandidate.lo \
-	testIntFix.lo CouenneSOS.lo depGraph.lo checkCycles.lo \
-	boundTightening.lo aggressiveBT.lo fake_tightening.lo obbt.lo \
-	obbt_iter.lo tightenBounds.lo impliedBounds.lo \
-	impliedBounds-mul.lo impliedBounds-sum.lo \
+	quadCuts.lo updateBranchInfo.lo decomposeTerm.lo \
+	linStandardize.lo sumStandardize.lo analyzeSparsity.lo \
+	constrStandardize.lo elementBreak.lo splitAux.lo \
+	auxiliarize.lo standardize.lo flattenMul.lo problem.lo \
+	CouenneProblem.lo problemIO.lo writeAMPL.lo writeGAMS.lo \
+	constraint.lo fillQuadIndices.lo fillDependence.lo \
+	CouenneSolverInterface.lo CouenneLPtightenBounds.lo \
+	checkNLP.lo getIntegerCandidate.lo testIntFix.lo CouenneSOS.lo \
+	depGraph.lo checkCycles.lo boundTightening.lo aggressiveBT.lo \
+	fake_tightening.lo obbt.lo obbt_iter.lo tightenBounds.lo \
+	impliedBounds.lo impliedBounds-mul.lo impliedBounds-sum.lo \
 	impliedBounds-exprSum.lo impliedBounds-exprDiv.lo \
 	impliedBounds-exprMul.lo impliedBounds-exprQuad.lo \
 	impliedBounds-exprPow.lo drawCuts.lo rootQ.lo $(am__objects_1)
@@ -479,11 +471,6 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	convex/generateCuts.cpp convex/genColCuts.cpp \
 	convex/genRowCuts.cpp convex/operators/alphaConvexify.cpp \
 	convex/operators/quadCuts.cpp convex/updateBranchInfo.cpp \
-	disjunctive/CouenneDisjCuts.cpp \
-	disjunctive/generateDisjCuts.cpp disjunctive/disjCut.cpp \
-	disjunctive/getDisjunctions.cpp \
-	disjunctive/separateWithDisjunction.cpp \
-	disjunctive/singleDisjunctions.cpp \
 	standardize/decomposeTerm.cpp standardize/linStandardize.cpp \
 	standardize/sumStandardize.cpp standardize/analyzeSparsity.cpp \
 	standardize/constrStandardize.cpp standardize/elementBreak.cpp \
@@ -512,6 +499,16 @@ libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
 	bound_tightening/operators/impliedBounds-exprQuad.cpp \
 	bound_tightening/operators/impliedBounds-exprPow.cpp \
 	util/drawCuts.cpp util/rootQ.cpp $(am__append_1)
+
+#disjunctive/CouenneDisjCuts.cpp \
+#disjunctive/generateDisjCuts.cpp \
+#disjunctive/disjCut.cpp \
+#disjunctive/getDisjunctions.cpp \
+#disjunctive/separateWithDisjunction.cpp \
+#disjunctive/singleDisjunctions.cpp \
+#disjunctive/dummyVecMatr.cpp \
+#disjunctive/OsiLinear2MatrVec.cpp \
+#disjunctive/OsiCuts2MatrVec.cpp
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
@@ -704,7 +701,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseStrong.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneDisjCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneLPtightenBounds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneProblem.Plo@am__quote@
@@ -752,7 +748,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/decomposeTerm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depGraph.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/disjCut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/doStrongBranching.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/domain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawCuts.Plo@am__quote@
@@ -786,8 +781,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genColCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genRowCuts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateCuts.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generateDisjCuts.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getDisjunctions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getIntegerCandidate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprDiv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/impliedBounds-exprMul.Plo@am__quote@
@@ -813,10 +806,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readASLfg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readnl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rootQ.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separateWithDisjunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplifiers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simplify.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/singleDisjunctions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splitAux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/standardize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sumStandardize.Plo@am__quote@
@@ -1373,48 +1364,6 @@ updateBranchInfo.lo: convex/updateBranchInfo.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='convex/updateBranchInfo.cpp' object='updateBranchInfo.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o updateBranchInfo.lo `test -f 'convex/updateBranchInfo.cpp' || echo '$(srcdir)/'`convex/updateBranchInfo.cpp
-
-CouenneDisjCuts.lo: disjunctive/CouenneDisjCuts.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneDisjCuts.lo -MD -MP -MF "$(DEPDIR)/CouenneDisjCuts.Tpo" -c -o CouenneDisjCuts.lo `test -f 'disjunctive/CouenneDisjCuts.cpp' || echo '$(srcdir)/'`disjunctive/CouenneDisjCuts.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CouenneDisjCuts.Tpo" "$(DEPDIR)/CouenneDisjCuts.Plo"; else rm -f "$(DEPDIR)/CouenneDisjCuts.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='disjunctive/CouenneDisjCuts.cpp' object='CouenneDisjCuts.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneDisjCuts.lo `test -f 'disjunctive/CouenneDisjCuts.cpp' || echo '$(srcdir)/'`disjunctive/CouenneDisjCuts.cpp
-
-generateDisjCuts.lo: disjunctive/generateDisjCuts.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT generateDisjCuts.lo -MD -MP -MF "$(DEPDIR)/generateDisjCuts.Tpo" -c -o generateDisjCuts.lo `test -f 'disjunctive/generateDisjCuts.cpp' || echo '$(srcdir)/'`disjunctive/generateDisjCuts.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/generateDisjCuts.Tpo" "$(DEPDIR)/generateDisjCuts.Plo"; else rm -f "$(DEPDIR)/generateDisjCuts.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='disjunctive/generateDisjCuts.cpp' object='generateDisjCuts.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o generateDisjCuts.lo `test -f 'disjunctive/generateDisjCuts.cpp' || echo '$(srcdir)/'`disjunctive/generateDisjCuts.cpp
-
-disjCut.lo: disjunctive/disjCut.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT disjCut.lo -MD -MP -MF "$(DEPDIR)/disjCut.Tpo" -c -o disjCut.lo `test -f 'disjunctive/disjCut.cpp' || echo '$(srcdir)/'`disjunctive/disjCut.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/disjCut.Tpo" "$(DEPDIR)/disjCut.Plo"; else rm -f "$(DEPDIR)/disjCut.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='disjunctive/disjCut.cpp' object='disjCut.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o disjCut.lo `test -f 'disjunctive/disjCut.cpp' || echo '$(srcdir)/'`disjunctive/disjCut.cpp
-
-getDisjunctions.lo: disjunctive/getDisjunctions.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT getDisjunctions.lo -MD -MP -MF "$(DEPDIR)/getDisjunctions.Tpo" -c -o getDisjunctions.lo `test -f 'disjunctive/getDisjunctions.cpp' || echo '$(srcdir)/'`disjunctive/getDisjunctions.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/getDisjunctions.Tpo" "$(DEPDIR)/getDisjunctions.Plo"; else rm -f "$(DEPDIR)/getDisjunctions.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='disjunctive/getDisjunctions.cpp' object='getDisjunctions.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o getDisjunctions.lo `test -f 'disjunctive/getDisjunctions.cpp' || echo '$(srcdir)/'`disjunctive/getDisjunctions.cpp
-
-separateWithDisjunction.lo: disjunctive/separateWithDisjunction.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT separateWithDisjunction.lo -MD -MP -MF "$(DEPDIR)/separateWithDisjunction.Tpo" -c -o separateWithDisjunction.lo `test -f 'disjunctive/separateWithDisjunction.cpp' || echo '$(srcdir)/'`disjunctive/separateWithDisjunction.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/separateWithDisjunction.Tpo" "$(DEPDIR)/separateWithDisjunction.Plo"; else rm -f "$(DEPDIR)/separateWithDisjunction.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='disjunctive/separateWithDisjunction.cpp' object='separateWithDisjunction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o separateWithDisjunction.lo `test -f 'disjunctive/separateWithDisjunction.cpp' || echo '$(srcdir)/'`disjunctive/separateWithDisjunction.cpp
-
-singleDisjunctions.lo: disjunctive/singleDisjunctions.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT singleDisjunctions.lo -MD -MP -MF "$(DEPDIR)/singleDisjunctions.Tpo" -c -o singleDisjunctions.lo `test -f 'disjunctive/singleDisjunctions.cpp' || echo '$(srcdir)/'`disjunctive/singleDisjunctions.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/singleDisjunctions.Tpo" "$(DEPDIR)/singleDisjunctions.Plo"; else rm -f "$(DEPDIR)/singleDisjunctions.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='disjunctive/singleDisjunctions.cpp' object='singleDisjunctions.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o singleDisjunctions.lo `test -f 'disjunctive/singleDisjunctions.cpp' || echo '$(srcdir)/'`disjunctive/singleDisjunctions.cpp
 
 decomposeTerm.lo: standardize/decomposeTerm.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT decomposeTerm.lo -MD -MP -MF "$(DEPDIR)/decomposeTerm.Tpo" -c -o decomposeTerm.lo `test -f 'standardize/decomposeTerm.cpp' || echo '$(srcdir)/'`standardize/decomposeTerm.cpp; \

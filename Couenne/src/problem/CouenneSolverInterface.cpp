@@ -114,7 +114,7 @@ void CouenneSolverInterface::resolve () {
   char filename [30];
 
   // save problem to be loaded later
-  if (cutgen_ -> check_lp ()) {
+  if (cutgen_ && (cutgen_ -> check_lp ())) {
     count++;
     sprintf (filename, "resolve_%d", count);
     writeMps (filename);
@@ -125,7 +125,7 @@ void CouenneSolverInterface::resolve () {
 
   const CoinWarmStart *ws;
 
-  if (cutgen_ -> check_lp ())
+  if (cutgen_ && (cutgen_ -> check_lp ()))
     ws = getWarmStart ();
 
   //deleteScaleFactors ();
@@ -134,7 +134,7 @@ void CouenneSolverInterface::resolve () {
   OsiClpSolverInterface::resolve ();
 
   // check LP independently
-  if (cutgen_ -> check_lp ()) {
+  if (cutgen_ && (cutgen_ -> check_lp ())) {
 
     OsiSolverInterface
       *nsi = new OsiClpSolverInterface,

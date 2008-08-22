@@ -6,6 +6,7 @@ Couenne/Makefile.in -text
 Couenne/README -text
 Couenne/configure -text
 Couenne/configure.ac -text
+Couenne/couenne.opt.base -text
 Couenne/couenne_addlibs.txt.in -text
 Couenne/inc/config_couenne.h.in -text
 Couenne/src/CouenneConfig.h -text
@@ -86,7 +87,10 @@ Couenne/src/convex/operators/unifiedProdCuts.cpp -text
 Couenne/src/convex/updateBranchInfo.cpp -text
 Couenne/src/disjunctive/CouenneDisjCuts.cpp -text
 Couenne/src/disjunctive/CouenneDisjCuts.hpp -text
+Couenne/src/disjunctive/OsiCuts2MatrVec.cpp -text
+Couenne/src/disjunctive/OsiLinear2MatrVec.cpp -text
 Couenne/src/disjunctive/disjCut.cpp -text
+Couenne/src/disjunctive/dummyVecMatr.cpp -text
 Couenne/src/disjunctive/generateDisjCuts.cpp -text
 Couenne/src/disjunctive/getDisjunctions.cpp -text
 Couenne/src/disjunctive/separateWithDisjunction.cpp -text

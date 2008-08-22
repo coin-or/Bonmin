@@ -19,6 +19,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 				      int *changed,
 				      t_chg_bounds *chg) const {
 
+  // TODO: make nchanged and changed useful
   // TODO: pass have_NLP to all
 
   // For each auxiliary variable, create convexification cut (or set
@@ -52,7 +53,7 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
       }
     }
   else { // chg_bds contains the indices of the variables whose bounds
-	 // have changes (a -1 follows the last element)
+	 // have changed (a -1 follows the last element)
 
     /*
     printf ("# # # # pass = %d, have_NLP = %d. nchanged = %d: {", info.pass, have_NLP, nchanged);
