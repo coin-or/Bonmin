@@ -1,4 +1,4 @@
-# Copyright (C) 2006 International Business Machines.
+# Copyright (C) 2006, 2008 International Business Machines.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
@@ -15,7 +15,7 @@ AC_PREREQ(2.59)
 AC_INIT([Bonmin],[0.9],[coin-bonmin@list.coin-or.org])
 
 AC_COPYRIGHT([
-Copyright 2006, 2007 International Business Machines and others.
+Copyright 2006, 2008 International Business Machines and others.
 All Rights Reserved.
 This file is part of the open source package BONMIN which is distributed
 under the Common Public License.])
@@ -77,13 +77,37 @@ AC_COIN_HAS_PROJECT(Vol)
 AC_COIN_HAS_PROJECT(Bcp)
 AC_COIN_HAS_PROJECT(Couenne)
 
+AC_ARG_WITH([bonminbcp],
+            AC_HELP_STRING([--with-bonminbcp],
+                           [Compile Bonmin with Bcp-based parallel version]),
+            [use_bcp="$withval"], [use_bcp=no])
+if test "$use_bcp" = yes; then
+  if test $m4_tolower(coin_has_$1) = unavailable ||
+     test $m4_tolower(coin_has_$1) = skipping; then
+     AC_MSG_ERROR([You specified --with-bonminbcp, but Bcp is not available])
+  fi
+fi
+AM_CONDITIONAL(COMPILE_BONMINBCP, test "$use_bcp" = yes)
+
+AC_ARG_WITH([boncouenne],
+            AC_HELP_STRING([--with-boncouenne],
+                           [Compile Bonmin with Couenne parallel version]),
+            [use_couenne="$withval"], [use_couenne=no])
+if test "$use_couenne" = yes; then
+  if test $m4_tolower(coin_has_$1) = unavailable ||
+     test $m4_tolower(coin_has_$1) = skipping; then
+     AC_MSG_ERROR([You specified --with-boncouenne, but Couenne is not available])
+  fi
+fi
+AM_CONDITIONAL(COMPILE_BONCOUENNE, test "$use_couenne" = yes)
+
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################
 
 # Check which third party solvers are available ToDo!
 AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex _glp_lpx_simplex])
+AC_COIN_HAS_GLPK(Glpk)
 AC_COIN_HAS_USER_LIBRARY([FortMP],[FMP])  #ToDo! is Fortran?
 AC_COIN_HAS_USER_LIBRARY([Mosek],[MSK],[mosekdl.h],[MSK_openmosek])
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])

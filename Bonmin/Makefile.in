@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright (C) 2006 International Business Machines and others.
+# Copyright (C) 2006, 2008 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
@@ -52,8 +52,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @BUILD_FP_TRUE@am__append_1 = experimental/FP
-@COIN_HAS_BCP_TRUE@am__append_2 = experimental/Bcp
-@COIN_HAS_COUENNE_TRUE@am__append_3 = experimental/NotConvex
+@COMPILE_BONMINBCP_TRUE@am__append_2 = experimental/Bcp
+@COMPILE_BONCOUENNE_TRUE@am__append_3 = experimental/NotConvex
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
@@ -150,6 +150,8 @@ CLPSRCDIR = @CLPSRCDIR@
 COINUTILSDOCDIR = @COINUTILSDOCDIR@
 COINUTILSOBJDIR = @COINUTILSOBJDIR@
 COINUTILSSRCDIR = @COINUTILSSRCDIR@
+COIN_BUILD_GLPK_FALSE = @COIN_BUILD_GLPK_FALSE@
+COIN_BUILD_GLPK_TRUE = @COIN_BUILD_GLPK_TRUE@
 COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
 COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
 COIN_HAS_BCP_FALSE = @COIN_HAS_BCP_FALSE@
@@ -190,6 +192,10 @@ COIN_HAS_VOL_FALSE = @COIN_HAS_VOL_FALSE@
 COIN_HAS_VOL_TRUE = @COIN_HAS_VOL_TRUE@
 COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
 COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
+COMPILE_BONCOUENNE_FALSE = @COMPILE_BONCOUENNE_FALSE@
+COMPILE_BONCOUENNE_TRUE = @COMPILE_BONCOUENNE_TRUE@
+COMPILE_BONMINBCP_FALSE = @COMPILE_BONMINBCP_FALSE@
+COMPILE_BONMINBCP_TRUE = @COMPILE_BONMINBCP_TRUE@
 COUENNEDOCDIR = @COUENNEDOCDIR@
 COUENNEOBJDIR = @COUENNEOBJDIR@
 COUENNESRCDIR = @COUENNESRCDIR@

@@ -1,4 +1,4 @@
-# Copyright (C) 2006 International Business Machines and others.
+# Copyright (C) 2006, 2008 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
@@ -22,11 +22,11 @@ if BUILD_FP
 SUBDIRS += experimental/FP
 endif
 
-if COIN_HAS_BCP
+if COMPILE_BONMINBCP
 SUBDIRS += experimental/Bcp
 endif
 
-if COIN_HAS_COUENNE
+if COMPILE_BONCOUENNE
 SUBDIRS += experimental/NotConvex
 endif
 

@@ -502,8 +502,6 @@ namespace Bonmin
     delete [] trash;
     const Number max_trash_tol = 1e-6;
     if (max_trash > max_trash_tol) {
-//DELETEME
-printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\n", max_trash);
       jnlst_->Printf(J_WARNING, J_NLP,
 		     "Curvature Estimator: Bad solution from linear solver with max_red = %e:\n", max_trash);
       return false;
@@ -748,7 +746,7 @@ printf("Curvature Estimator: Bad solution from linear solver with max_red = %e:\
 
     if (solver_retval != SYMSOLVER_SUCCESS) {
       // DELETEME
-      printf("Return code from Solver is %d\n", solver_retval);
+      //printf("Return code from Solver is %d\n", solver_retval);
       return false;
     }
 
