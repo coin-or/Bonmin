@@ -44,9 +44,6 @@ int main (int argc, char *argv[]) {
 
   using namespace Ipopt;
 
-  //  char * pbName = NULL;
-  //  double time_start = CoinCpuTime();
-
   Bonmin::Bab bb;
   bb.setUsingCouenne (true);
 
@@ -77,8 +74,6 @@ int main (int argc, char *argv[]) {
      ASL_Sufkind_var | ASL_Sufkind_real | ASL_Sufkind_output, 0}};
 
   char oinf = 0;
-
-  //Option_Info *TheOInfo = (Option_Info*) &oinf;
 
   Sol_info *Si;
 
