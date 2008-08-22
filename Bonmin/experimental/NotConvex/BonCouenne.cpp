@@ -43,13 +43,16 @@ int main (int argc, char *argv[])
   char * pbName = NULL;
   double time_start = CoinCpuTime();
 
+  const int infeasible = 1;
+
   try {
 
     Bab bb;
     bb.setUsingCouenne (true);
 
     CouenneSetup bonmin;
-    bonmin.InitializeCouenne (argv);
+    if (!bonmin.InitializeCouenne (argv))
+      throw infeasible;
 
 #if 0
     CouenneFeasibility feasibility;
@@ -196,6 +199,11 @@ int main (int argc, char *argv[])
   {
    std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
   }
+  catch (int generic_error) {
+    if (generic_error = infeasible)
+      printf ("problem infeasible\n");
+  }
+
 //  catch(...) {
 //    std::cerr<<pbName<<" unrecognized excpetion"<<std::endl;
 //    std::cerr<<pbName<<"\t Finished \t exception"<<std::endl;

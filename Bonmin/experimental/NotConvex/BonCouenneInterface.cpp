@@ -61,6 +61,7 @@ CouenneInterface::extractLinearRelaxation
 (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 
   CouenneProblem *p = couenneCg.Problem ();
+  bool is_feasible = true;
 
   if (solveNlp) {
 
@@ -99,8 +100,10 @@ CouenneInterface::extractLinearRelaxation
 	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
       }
 
-      if (!(p -> boundTightening (chg_bds, NULL)))
+      if (!(p -> boundTightening (chg_bds, NULL))) {
+	is_feasible = false;
 	printf ("warning, tightened NLP is infeasible\n");
+      }
 
       delete [] chg_bds;
 
@@ -119,9 +122,17 @@ CouenneInterface::extractLinearRelaxation
 	}
     }
 
-    initialSolve ();
+    if (is_feasible) 
+      initialSolve ();
+    else {
+      OsiAuxInfo * auxInfo = si.getAuxiliaryInfo ();
+      BabInfo * babInfo = dynamic_cast <BabInfo *> (auxInfo);
 
-    if (isProvenOptimal ()) {
+      if (babInfo) 
+	babInfo -> setInfeasibleNode ();
+    }
+
+    if (is_feasible && isProvenOptimal ()) {
 
       CouNumber obj             = getObjValue    ();
       const CouNumber *solution = getColSolution ();
@@ -180,7 +191,6 @@ CouenneInterface::extractLinearRelaxation
 	      else if (Y [i] > ubCur [i]) Y [i] = ubCur [i];
 	    }
 
-
 	    for (int i=0; i<norig; i++)
 	      if ((p -> Var (i) -> Multiplicity () > 0) &&
 		  p  -> Var (i) -> isInteger ()) {
@@ -232,6 +242,9 @@ CouenneInterface::extractLinearRelaxation
       }
     }
   }
+
+  if (!is_feasible) // nothing else to do, problem infeasible
+    return;
 
   int 
     numcols     = getNumCols (), // # original               variables

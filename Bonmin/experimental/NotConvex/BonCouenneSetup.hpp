@@ -52,7 +52,7 @@ public:
     virtual ~CouenneSetup();
 
     /** Initialize from command line arguments. */
-    void InitializeCouenne(char **& argv);
+    bool InitializeCouenne(char **& argv);
 
     /** register the options */
     virtual void registerOptions();

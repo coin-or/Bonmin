@@ -77,7 +77,7 @@ namespace Bonmin{
     //delete CouennePtr_;
   }
 
-  void CouenneSetup::InitializeCouenne (char **& argv) {
+  bool CouenneSetup::InitializeCouenne (char **& argv) {
     /* Get the basic options. */
     readOptionsFile();
  
@@ -102,17 +102,22 @@ namespace Bonmin{
     int i;
 
     options()->GetIntegerValue("boundtightening_print_level", i, "bonmin.");
-    journalist()->GetJournal("console")->
-      SetPrintLevel(J_BOUNDTIGHTENING, (EJournalLevel)i);
+    journalist()->GetJournal("console")-> SetPrintLevel(J_BOUNDTIGHTENING, (EJournalLevel) i);
+
     options()->GetIntegerValue("branching_print_level", i, "bonmin.");
-    journalist()->GetJournal("console")->
-      SetPrintLevel(J_BRANCHING, (EJournalLevel)i);
+    journalist()->GetJournal("console")-> SetPrintLevel(J_BRANCHING, (EJournalLevel) i);
+
     options()->GetIntegerValue("convexifying_print_level", i, "bonmin.");
-    journalist()->GetJournal("console")->
-      SetPrintLevel(J_CONVEXIFYING, (EJournalLevel)i);
+    journalist()->GetJournal("console")-> SetPrintLevel(J_CONVEXIFYING, (EJournalLevel) i);
+
     options()->GetIntegerValue("problem_print_level", i, "bonmin.");
-    journalist()->GetJournal("console")->
-      SetPrintLevel(J_PROBLEM, (EJournalLevel)i);
+    journalist()->GetJournal("console")-> SetPrintLevel(J_PROBLEM, (EJournalLevel) i);
+
+    options()->GetIntegerValue("nlpheur_print_level", i, "bonmin.");
+    journalist()->GetJournal("console")-> SetPrintLevel(J_NLPHEURISTIC, (EJournalLevel) i);
+
+    options()->GetIntegerValue("disjcuts_print_level", i, "bonmin.");
+    journalist()->GetJournal("console")-> SetPrintLevel(J_DISJCUTS, (EJournalLevel) i);
 
     /* Initialize Couenne cut generator.*/
     //int ivalue, num_points;
@@ -147,7 +152,8 @@ namespace Bonmin{
 
     // In case there are no discrete variables, we have already a
     // heuristic solution for which create a initialization heuristic
-    if (ci -> isProvenOptimal () && 
+    if (!(extraStuff -> infeasibleNode ()) &&
+	ci -> isProvenOptimal () && 
 	ci -> haveNlpSolution ()) {
 
       /// setup initial heuristic (in principle it should only run once...)
@@ -159,9 +165,10 @@ namespace Bonmin{
       heuristics_.push_back(h);
     }
 
-    if(extraStuff->infeasibleNode()){
-      std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, quit"<<std::endl;
-      return;
+    if (extraStuff -> infeasibleNode ()){
+      std::cout<<"Initial linear relaxation constructed by Couenne is infeasible, exiting..."
+	       <<std::endl;
+      return false;
     }
 
     continuousSolver_ -> findIntegersAndSOS (false);
@@ -382,7 +389,7 @@ namespace Bonmin{
 
       CouenneDisjCuts * couenneDisj = 
 	new CouenneDisjCuts (ci, this, 
-			     couenneCg -> Problem (), 
+			     couenneCg, 
 			     branchingMethod_, 
 			     varSelection == OSI_STRONG, // if true, use strong branching candidates
 			     journalist (),
@@ -410,6 +417,8 @@ namespace Bonmin{
     // Tell Cbc not to check again if a solution returned from
     // heuristic is indeed feasible
     intParam_[BabSetupBase::SpecialOption] = 16 | 4;
+
+    return true;
   }
  
   void CouenneSetup::registerOptions(){
@@ -449,6 +458,16 @@ namespace Bonmin{
     roptions->AddBoundedIntegerOption(
       "problem_print_level",
       "Output level for problem manipulation code in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING,
+      "");
+    roptions->AddBoundedIntegerOption(
+      "nlpheur_print_level",
+      "Output level for NLP heuristic in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING,
+      "");
+    roptions->AddBoundedIntegerOption(
+      "disjcuts_print_level",
+      "Output level for disjunctive cuts in Couenne",
       -2, J_LAST_LEVEL-1, J_WARNING,
       "");
 
@@ -527,7 +546,6 @@ namespace Bonmin{
       options_ -> GetIntegerValue (std::string (cutList [i]. optname), freq, "bonmin.");
 
       if (!freq) {
-
 	delete cutList [i].cglptr;
 	continue;
       }
@@ -538,6 +556,7 @@ namespace Bonmin{
       cg.id        = std::string (cutList [i]. cglId);
       cutGenerators_.push_back (cg);
 
+      // options for particular cases
       switch (cutList [i].extraInfo) {
 
       case CUTINFO_MIG: {
