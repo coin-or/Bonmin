@@ -22,7 +22,7 @@
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
 #include "CouenneCutGenerator.hpp"
-#include "CouenneDisjCuts.hpp"
+//#include "CouenneDisjCuts.hpp"
 #include "BonCouenneInfo.hpp"
 #include "BonCbcNode.hpp"
 
@@ -116,8 +116,8 @@ namespace Bonmin{
     options()->GetIntegerValue("nlpheur_print_level", i, "bonmin.");
     journalist()->GetJournal("console")-> SetPrintLevel(J_NLPHEURISTIC, (EJournalLevel) i);
 
-    options()->GetIntegerValue("disjcuts_print_level", i, "bonmin.");
-    journalist()->GetJournal("console")-> SetPrintLevel(J_DISJCUTS, (EJournalLevel) i);
+    //options()->GetIntegerValue("disjcuts_print_level", i, "bonmin.");
+    //journalist()->GetJournal("console")-> SetPrintLevel(J_DISJCUTS, (EJournalLevel) i);
 
     /* Initialize Couenne cut generator.*/
     //int ivalue, num_points;
@@ -382,7 +382,7 @@ namespace Bonmin{
     }
 
     // Add disjunctive cuts ///////////////////////////////////////////////////////
-
+    /*
     options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
 
     if (freq != 0) {
@@ -401,7 +401,7 @@ namespace Bonmin{
       cg.id = "Couenne disjunctive cuts";
       cutGenerators (). push_back(cg);
     }
-
+    */
     int ival;
     if (!options_->GetEnumValue("node_comparison",ival,"bonmin.")) {
       // change default for Couenne
@@ -431,7 +431,7 @@ namespace Bonmin{
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
     CouenneCutGenerator::registerOptions (roptions);
-    CouenneDisjCuts::registerOptions (roptions);
+    //CouenneDisjCuts::registerOptions (roptions);
 
     roptions -> AddStringOption2 (
       "display_stats",
@@ -465,11 +465,11 @@ namespace Bonmin{
       "Output level for NLP heuristic in Couenne",
       -2, J_LAST_LEVEL-1, J_WARNING,
       "");
-    roptions->AddBoundedIntegerOption(
-      "disjcuts_print_level",
-      "Output level for disjunctive cuts in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
-      "");
+    //roptions->AddBoundedIntegerOption(
+    //"disjcuts_print_level",
+    //"Output level for disjunctive cuts in Couenne",
+    //-2, J_LAST_LEVEL-1, J_WARNING,
+    //"");
 
 
     // copied from BonminSetup::registerMilpCutGenerators(), in

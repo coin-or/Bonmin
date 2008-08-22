@@ -200,7 +200,7 @@ int main (int argc, char *argv[])
    std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
   }
   catch (int generic_error) {
-    if (generic_error = infeasible)
+    if (generic_error == infeasible)
       printf ("problem infeasible\n");
   }
 
