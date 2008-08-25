@@ -359,10 +359,10 @@ namespace Bonmin
     }
     int varSelection;
     bool val = options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
-    //if (!val || varSelection == STRONG_BRANCHING || varSelection == RELIABILITY_BRANCHING ) {
-    //  options_->SetStringValue("variable_selection", "bonmin.nlp-strong-branching",true,true);
-    //  varSelection = NLP_STRONG_BRANCHING;
-    //}
+    if (!val){// || varSelection == STRONG_BRANCHING || varSelection == RELIABILITY_BRANCHING ) {
+      options_->SetStringValue("variable_selection", "bonmin.nlp-strong-branching",true,true);
+      varSelection = NLP_STRONG_BRANCHING;
+    }
 
     switch (varSelection) {
     case CURVATURE_ESTIMATOR:
