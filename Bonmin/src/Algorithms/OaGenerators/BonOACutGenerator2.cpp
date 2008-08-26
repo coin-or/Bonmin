@@ -6,7 +6,6 @@
 // P. Bonami, Carnegie Mellon University
 //
 // Date : 05/26/2005
-//#define OA_DEBUG
 
 #include "BonOACutGenerator2.hpp"
 #include "BonminConfig.h"
@@ -78,11 +77,12 @@ namespace Bonmin
 
   /// virutal method to decide if local search is performed
   bool
-  OACutGenerator2::doLocalSearch() const
+  OACutGenerator2::doLocalSearch(BabInfo * babInfo) const
   {
     return (nLocalSearch_<parameters_.maxLocalSearch_ &&
         parameters_.localSearchNodeLimit_ > 0 &&
-        CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_);
+        CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_ &&
+        numSols_ < parameters_.maxSols_);
   }
   /// virtual method which performs the OA algorithm by modifying lp and nlp.
   double
@@ -90,9 +90,11 @@ namespace Bonmin
       solverManip &nlpManip,
       solverManip &lpManip,
       SubMipSolver * &subMip,
-      OsiBabSolver * babInfo,
+      BabInfo * babInfo,
       double & cutoff) const
   {
+
+    bool interuptOnLimit = false;
     double lastPeriodicLog= CoinCpuTime();
 
     //const int numcols = nlp_->getNumCols();
@@ -166,6 +168,7 @@ namespace Bonmin
         cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
         // Update the lp solver cutoff
         lp->setDblParam(OsiDualObjectiveLimit, cutoff);
+        numSols_++;
       }
 
       nlpSol = const_cast<double *>(nlp_->getColSolution());
@@ -210,7 +213,7 @@ namespace Bonmin
       if (milpOptimal && feasible && !isInteger &&
           nLocalSearch_ < parameters_.maxLocalSearch_ &&
           numberPasses < parameters_.maxLocalSearchPerNode_ &&
-          parameters_.localSearchNodeLimit_ > 0) {
+          parameters_.localSearchNodeLimit_ > 0 && numSols_ < parameters_.maxSols_) {
 
         /** do we have a subMip? if not create a new one. */
         if (subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy());
@@ -265,7 +268,7 @@ namespace Bonmin
     }
 
 #ifdef OA_DEBUG
-    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
+    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, cutoff, milpBound, isInteger, feasible, std::cout);
 #endif
     return milpBound;
   }

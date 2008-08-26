@@ -361,10 +361,10 @@ libbonoagenerators_la_LDFLAGS = $(LT_LDFLAGS)
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/..` -I`$(CYGPATH_W) \
-	$(IPOPTOBJDIR)/inc` -I`$(CYGPATH_W) \
-	$(IPOPTSRCDIR)/src/contrib/CGPenalty` -I`$(CYGPATH_W) \
-	$(IPOPTSRCDIR)/src/Common` -I`$(CYGPATH_W) \
+	-I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin` -I`$(CYGPATH_W) \
+	$(srcdir)/..` -I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/contrib/CGPenalty` \
+	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` -I`$(CYGPATH_W) \
 	$(IPOPTSRCDIR)/src/Interfaces` -I`$(CYGPATH_W) \
 	$(IPOPTSRCDIR)/src/LinAlg` -I`$(CYGPATH_W) \
 	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \

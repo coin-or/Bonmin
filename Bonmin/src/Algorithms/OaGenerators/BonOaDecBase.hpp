@@ -6,7 +6,7 @@
 // P. Bonami, International Business Machines
 //
 // Date :  12/07/2006
-
+//#define OA_DEBUG
 #ifndef BonOaDecBase_HPP
 #define BonOaDecBase_HPP
 #include "CglCutGenerator.hpp"
@@ -19,8 +19,8 @@
 #include "CoinTime.hpp"
 #include "OsiAuxInfo.hpp"
 #include "OsiBranchingObject.hpp"
-
-
+#include <iostream>
+#include "BonBabInfos.hpp"
 /* forward declarations.*/
 class OsiClpSolverInterface;
 class OsiCpxSolverInterface;
@@ -212,12 +212,15 @@ namespace Bonmin
       double integerTolerance_;
     };
     /// Old usefull constructor
-    OaDecompositionBase(OsiTMINLPInterface * nlp = NULL,
+    OaDecompositionBase(OsiTMINLPInterface * nlp = NULL
+#if 0
+  ,
         OsiSolverInterface * si = NULL,
         CbcStrategy * strategy = NULL,
         double cbcCutoffIncrement_=1e-07,
         double cbcIntegerTolerance = 1e-05,
         bool leaveSiUnchanged = 0
+#endif
                        );
     /// New usefull constructor
     OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
@@ -283,6 +286,8 @@ namespace Bonmin
       double maxLocalSearchTime_;
       /** sub milp log level.*/
       int subMilpLogLevel_;
+      /** maximum number of solutions*/
+      int maxSols_;
       /** Frequency of log. */
       double logFrequency_;
 
@@ -337,14 +342,14 @@ private:
 
     /** Solve the nlp and do output.
         \return true if feasible*/
-    bool solveNlp(OsiBabSolver * babInfo, double cutoff) const;
+    bool solveNlp(BabInfo * babInfo, double cutoff) const;
     /** @} */
 
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts &cs, solverManip &nlpManip, solverManip &lpManip,
-        SubMipSolver * &subMip, OsiBabSolver * babInfo, double &) const = 0;
+        SubMipSolver * &subMip, BabInfo * babInfo, double &) const = 0;
     /// virutal method to decide if local search is performed
-    virtual bool doLocalSearch() const = 0;
+    virtual bool doLocalSearch(BabInfo * babInfo) const = 0;
 
     /// \name Protected members
     /** @{ */
@@ -370,6 +375,8 @@ private:
     bool reassignLpsolver_;
     /** time of construction*/
     double timeBegin_;
+    /** number of solutions found by OA_decomposition.*/
+    mutable int numSols_;
 
     /** Parameters.*/
     Parameters parameters_;
@@ -379,14 +386,16 @@ private:
 #ifdef OA_DEBUG
     class OaDebug
     {
-      bool checkInteger(const double * colsol, int numcols, ostream & os) const;
+      public:
+      bool checkInteger(const OsiSolverInterface&nlp, std::ostream & os) const;
 
       void printEndOfProcedureDebugMessage(const OsiCuts &cs,
           bool foundSolution,
+          double solValue,
           double milpBound,
           bool isInteger,
           bool feasible,
-          std::ostream & os);
+          std::ostream & os) const;
     };
 
     /** debug object. */

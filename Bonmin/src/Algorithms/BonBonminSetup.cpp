@@ -544,19 +544,19 @@ namespace Bonmin
     }
     Algorithm algo = getAlgorithm();
     if (algo == B_OA) {
-      options_->SetNumericValue("oa_dec_time_limit",COIN_DBL_MAX, true, true);
-      options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
-      //intParam_[BabLogLevel] = 0;
+      options_->SetNumericValue("bonmin.oa_dec_time_limit",COIN_DBL_MAX, true, true);
+      options_->SetIntegerValue("bonmin.nlp_solve_frequency", 0, true, true);
+      intParam_[BabLogLevel] = 0;
     }
     else if (algo==B_QG) {
-      options_->SetNumericValue("oa_dec_time_limit",0, true, true);
-      options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
+      options_->SetNumericValue("bonmin.oa_dec_time_limit",0, true, true);
+      options_->SetIntegerValue("bonmin.nlp_solve_frequency", 0, true, true);
     }
     else if (algo==B_Ecp) {
-      options_->SetNumericValue("oa_dec_time_limit",0, true, true);
-      options_->SetIntegerValue("nlp_solve_frequency", 0, true, true);
-      options_->SetIntegerValue("filmint_ecp_cuts", 1, true, true);
-      options_->SetIntegerValue("number_cut_passes", 1, true, true);
+      options_->SetNumericValue("bonmin.oa_dec_time_limit",0, true, true);
+      options_->SetIntegerValue("bonmin.nlp_solve_frequency", 0, true, true);
+      options_->SetIntegerValue("bonmin.filmint_ecp_cuts", 1, true, true);
+      options_->SetIntegerValue("bonmin.number_cut_passes", 1, true, true);
     }
 //#define GREAT_STUFF_FOR_ANDREAS
 #ifdef GREAT_STUFF_FOR_ANDREAS
@@ -596,14 +596,14 @@ namespace Bonmin
       cutGenerators_.push_back(cg);
     }
 
-    if (algo!=B_QG)
+    if (algo == B_Hyb || algo == B_Ecp)
       addMilpCutGenerators();
 
     double oaTime;
     options_->GetNumericValue("oa_dec_time_limit",oaTime,"bonmin.");
     if (oaTime > 0.) {
       CuttingMethod cg;
-      cg.frequency = ival;
+      cg.frequency = -99;
       OACutGenerator2 * oa = new OACutGenerator2(*this);
       oa->passInMessageHandler(nonlinearSolver_->messageHandler());
       cg.cgl = oa;
@@ -628,7 +628,7 @@ namespace Bonmin
     oaHeu->setNlp(nonlinearSolver_);
     HeuristicMethod h;
     h.heuristic = oaHeu;
-    h.id = "noonlinear programm";
+    h.id = "nonlinear programm";
     heuristics_.push_back(h);
   }
 

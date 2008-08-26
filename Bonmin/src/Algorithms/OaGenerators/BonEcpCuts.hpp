@@ -23,13 +23,14 @@ namespace Bonmin
         double rel_violation_tol = 1000.,
         double beta = -1.
            ):
-        OaDecompositionBase(nlp,NULL, NULL,0,0,0),
+        OaDecompositionBase(nlp),
         objValue_(-COIN_DBL_MAX),
         numRounds_(numRounds),
         abs_violation_tol_(abs_violation_tol),
         rel_violation_tol_(rel_violation_tol),
         beta_(beta)
     {}
+
     EcpCuts(BabSetupBase & b);
 
     /// Copy constructor
@@ -83,12 +84,12 @@ namespace Bonmin
   protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip,
-        SubMipSolver *& subMip, OsiBabSolver * babInfo, double &cutoff) const
+        SubMipSolver *& subMip, BabInfo * babInfo, double &cutoff) const
     {
       throw -1;
     }
     /// virutal method to decide if local search is performed
-    virtual bool doLocalSearch() const
+    virtual bool doLocalSearch(BabInfo * babInfo) const
     {
       return 0;
     }

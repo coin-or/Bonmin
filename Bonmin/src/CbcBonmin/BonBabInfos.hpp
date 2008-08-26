@@ -46,6 +46,8 @@ namespace Bonmin
       return babPtr_;
     }
 
+    bool hasSolution() const{
+      return bestSolution_ != NULL;}
   protected:
     /** Pointer to branch-and-bound algorithm.*/
     Bab * babPtr_;

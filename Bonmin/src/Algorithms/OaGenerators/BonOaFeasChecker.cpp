@@ -18,6 +18,7 @@
 namespace Bonmin
 {
 
+#if 0
 // Default constructor
   OaFeasibilityChecker ::OaFeasibilityChecker
   (OsiTMINLPInterface * nlp,
@@ -31,7 +32,7 @@ namespace Bonmin
           NULL, cbcCutoffIncrement,
           cbcIntegerTolerance, leaveSiUnchanged)
   {}
-
+#endif
   /// New usefull constructor
   OaFeasibilityChecker::OaFeasibilityChecker(BabSetupBase &b):
       OaDecompositionBase(b, false, true)
@@ -42,7 +43,7 @@ namespace Bonmin
   /// OaDecomposition method
   double
   OaFeasibilityChecker::performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip,
-      SubMipSolver * &subMip, OsiBabSolver * babInfo, double &cutoff) const
+      SubMipSolver * &subMip, BabInfo * babInfo, double &cutoff) const
   {
     bool isInteger = true;
     bool feasible = 1;
@@ -53,6 +54,7 @@ namespace Bonmin
     double milpBound = -COIN_DBL_MAX;
     int numberPasses = 0;
     double * nlpSol =  NULL;
+   
     while (isInteger && feasible ) {
       numberPasses++;
 
@@ -114,7 +116,7 @@ namespace Bonmin
 #endif
     }
 #ifdef OA_DEBUG
-    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
+    debug_.printEndOfProcedureDebugMessage(cs, true, cutoff, milpBound, isInteger, feasible, std::cout);
     std::cout<<"milpBound found: "<<milpBound<<std::endl;
 #endif
     return milpBound;

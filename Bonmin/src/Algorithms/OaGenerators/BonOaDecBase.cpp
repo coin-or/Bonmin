@@ -8,6 +8,7 @@
 // Date :  12/07/2006
 
 #include <sstream>
+#include <climits>
 
 #include "BonOaDecBase.hpp"
 
@@ -21,14 +22,35 @@
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
 #endif
-#include "OsiAuxInfo.hpp"
-
+#include "BonCbc.hpp"
 //The following two are to interupt the solution of sub-mip through CTRL-C
 extern CbcModel * OAModel;
 
 namespace Bonmin
 {
 
+  OaDecompositionBase::OaDecompositionBase
+  (OsiTMINLPInterface * nlp)
+      :
+      CglCutGenerator(),
+      nlp_(nlp),
+      nSolve_(0),
+      lp_(NULL),
+      objects_(NULL),
+      nObjects_(0),
+      nLocalSearch_(0),
+      handler_(NULL),
+      leaveSiUnchanged_(true),
+      reassignLpsolver_(false),
+      timeBegin_(0),
+      parameters_()
+  {
+    handler_ = new CoinMessageHandler();
+    handler_ -> setLogLevel(2);
+    messages_ = OaMessages();
+    timeBegin_ = CoinCpuTime();
+  }
+#if 0
   OaDecompositionBase::OaDecompositionBase
   (OsiTMINLPInterface * nlp,
    OsiSolverInterface * si,
@@ -60,6 +82,7 @@ namespace Bonmin
     parameters_.cbcCutoffIncrement_  = cbcCutoffIncrement;
     parameters_.cbcIntegerTolerance_ = cbcIntegerTolerance;
   }
+#endif
   OaDecompositionBase::OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
       bool reassignLpsolver):
       CglCutGenerator(),
@@ -72,6 +95,7 @@ namespace Bonmin
       leaveSiUnchanged_(leaveSiUnchanged),
       reassignLpsolver_(reassignLpsolver),
       timeBegin_(0),
+      numSols_(0),
       parameters_()
   {
     handler_ = new CoinMessageHandler();
@@ -80,6 +104,7 @@ namespace Bonmin
     b.options()->GetNumericValue("oa_log_frequency",parameters_.logFrequency_,"bonmin.");
 
     handler_ -> setLogLevel(logLevel);
+    b.options()->GetIntegerValue("solution_limit", parameters_.maxSols_,"bonmin.");
 
     messages_ = OaMessages();
     timeBegin_ = CoinCpuTime();
@@ -106,6 +131,7 @@ namespace Bonmin
       leaveSiUnchanged_(other.leaveSiUnchanged_),
       reassignLpsolver_(other.reassignLpsolver_),
       timeBegin_(0),
+      numSols_(other.numSols_),
       parameters_(other.parameters_)
   {
     timeBegin_ = CoinCpuTime();
@@ -122,6 +148,7 @@ namespace Bonmin
       maxLocalSearch_(0),
       maxLocalSearchTime_(3600),
       subMilpLogLevel_(0),
+      maxSols_(INT_MAX),
       logFrequency_(1000.),
       strategy_(NULL)
   {}
@@ -144,6 +171,7 @@ namespace Bonmin
       maxLocalSearch_(other.maxLocalSearch_),
       maxLocalSearchTime_(other.maxLocalSearchTime_),
       subMilpLogLevel_(other.subMilpLogLevel_),
+      maxSols_(other.maxSols_),
       logFrequency_(other.logFrequency_),
       strategy_(NULL)
   {
@@ -570,12 +598,12 @@ OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si)
 #ifdef OA_DEBUG
 
   std::cout<<"Resolve with hotstart :"<<std::endl
-  <<"number of iterations(should be 0) : "<<lp_->getIterationCount()<<std::endl
-  <<"Objective value and diff to original : "<<lp_->getObjValue()<<", "
+  <<"number of iterations(should be 0) : "<<si_->getIterationCount()<<std::endl
+  <<"Objective value and diff to original : "<<si_->getObjValue()<<", "
   <<fabs(si_->getObjValue() - si.getObjValue())<<std::endl;
-  for (int i = 0 ; i <= numcols ; i++) {
+  for (int i = 0 ; i <= numcols_ ; i++) {
     if (fabs(si.getColSolution()[i]-si_->getColSolution()[i])>1e-08) {
-      std::cout<<"Diff between solution at node and solution with local solver : "<<fabs(si.getColSolution()[i]-lp_->getColSolution()[i])<<std::endl;
+      std::cout<<"Diff between solution at node and solution with local solver : "<<fabs(si.getColSolution()[i]-si_->getColSolution()[i])<<std::endl;
     }
   }
 #endif
@@ -623,7 +651,11 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   }
 
   // babInfo is used to communicate with the b-and-b solver (Cbc or Bcp).
-  OsiBabSolver * babInfo = dynamic_cast<OsiBabSolver *> (si.getAuxiliaryInfo());
+  BabInfo * babInfo = dynamic_cast<BabInfo *> (si.getAuxiliaryInfo());
+  assert(babInfo);
+  assert(babInfo->babPtr());
+  numSols_ = babInfo->babPtr()->model().getSolutionCount ();
+  if(babInfo->hasSolution()) numSols_ ++;
   if (babInfo)
     if (!babInfo->mipFeasible())
       return;
@@ -643,7 +675,7 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   SubMipSolver * subMip = NULL;
 
   if (!isInteger) {
-    if (doLocalSearch())//create sub mip solver.
+    if (doLocalSearch(babInfo))//create sub mip solver.
     {
       subMip = new SubMipSolver(lp_, parameters_.strategy());
     }
@@ -684,6 +716,10 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   lpManip->setIntegerTolerance(parameters_.cbcIntegerTolerance_);
   double milpBound = performOa(cs, nlpManip, *lpManip, subMip, babInfo, cutoff);
 
+  if(babInfo->hasSolution()){
+     babInfo->babPtr()->model().setSolutionCount (numSols_ - 1);
+  }
+
   //Transmit the bound found by the milp
   {
     if (milpBound>-1e100)
@@ -720,7 +756,7 @@ OaDecompositionBase::solverManip::getCached()
 
 /** Solve the nlp and do output return true if feasible*/
 bool
-OaDecompositionBase::solveNlp(OsiBabSolver * babInfo, double cutoff) const
+OaDecompositionBase::solveNlp(BabInfo * babInfo, double cutoff) const
 {
   nSolve_++;
   nlp_->resolve();
@@ -732,7 +768,7 @@ OaDecompositionBase::solveNlp(OsiBabSolver * babInfo, double cutoff) const
 
 #ifdef OA_DEBUG
     const double * colsol2 = nlp_->getColSolution();
-    debug_.checkInteger(colsol2,numcols,std::cerr);
+    debug_.checkInteger(*nlp_,std::cerr);
 #endif
 
     if ((nlp_->getObjValue() < cutoff) ) {
@@ -773,14 +809,16 @@ OaDecompositionBase::solveNlp(OsiBabSolver * babInfo, double cutoff) const
 
 #ifdef OA_DEBUG
 bool
-OaDecompositionBase::OaDebug::checkInteger(const double * colsol, int numcols, ostream & os) const
+OaDecompositionBase::OaDebug::checkInteger(const OsiSolverInterface &nlp, std::ostream & os) const
 {
+   const double * colsol = nlp.getColSolution();
+   int numcols = nlp.getNumCols();
   for (int i = 0 ; i < numcols ; i++) {
-    if (nlp_->isInteger(i)) {
-      if (fabs(sol[i]) - floor(sol[i] + 0.5) >
-          parameters_.cbcIntegerTolerance_) {
+    if (nlp.isInteger(i)) {
+      if (fabs(colsol[i]) - floor(colsol[i] + 0.5) >
+          1e-07) {
         std::cerr<<"Integer infeasible point (should not be), integer infeasibility for variable "<<i
-        <<" is, "<<fabs(colsol2[i] - floor(colsol2[i] + 0.5))<<std::endl;
+        <<" is, "<<fabs(colsol[i] - floor(colsol[i] + 0.5))<<std::endl;
       }
     }
     return true;
@@ -791,17 +829,18 @@ OaDecompositionBase::OaDebug::checkInteger(const double * colsol, int numcols, o
 void
 OaDecompositionBase::OaDebug::printEndOfProcedureDebugMessage(const OsiCuts &cs,
     bool foundSolution,
+    double solValue,
     double milpBound,
     bool isInteger,
     bool feasible,
-    std::ostream & os)
+    std::ostream & os) const
 {
   std::cout<<"------------------------------------------------------------------"
   <<std::endl;
   std::cout<<"OA procedure finished"<<std::endl;
   std::cout<<"Generated "<<cs.sizeRowCuts()<<std::endl;
   if (foundSolution)
-    std::cout <<"Found NLP-integer feasible solution of  value : "<<cutoff<<std::endl;
+    std::cout <<"Found NLP-integer feasible solution of  value : "<<solValue<<std::endl;
   std::cout<<"Current MILP lower bound is : "<<milpBound<<std::endl;
   std::cout<<"-------------------------------------------------------------------"<<std::endl;
   std::cout<<"Stopped because : isInteger "<<isInteger<<", feasible "<<feasible<<std::endl<<std::endl;
