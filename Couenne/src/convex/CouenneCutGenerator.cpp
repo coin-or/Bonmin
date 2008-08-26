@@ -23,7 +23,7 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 					  const struct ASL *asl, 
 					  JnlstPtr jnlst):
 
-  OaDecompositionBase (nlp, NULL, NULL, 0,0,0),
+  OaDecompositionBase (nlp),
 
   firstcall_      (true),
   problem_        (NULL),

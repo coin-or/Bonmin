@@ -186,12 +186,12 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   /// virtual method which performs the OA algorithm by modifying lp and nlp.
   virtual double performOa (OsiCuts & cs,           solverManip &nlpManip, 
 			    solverManip &lpManip,   SubMipSolver *& subMip, 
-			    OsiBabSolver * babInfo, double &cutoff) const
+			    Bonmin::BabInfo * babInfo, double &cutoff) const
     {throw -1;}
 
   /// (for compatibility with base class)
   /// virtual method to decide if local search is performed
-  virtual bool doLocalSearch () const 
+  virtual bool doLocalSearch (Bonmin::BabInfo * babInfo) const 
   {return 0;}
 
   /// Method to set the Bab pointer
