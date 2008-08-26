@@ -436,7 +436,6 @@ namespace Bonmin
     if (usingCouenne_)
       model_.passInSolverCharacteristics (bonBabInfoPtr);
 
-    model_.resolve(NULL, 1);
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
     {
