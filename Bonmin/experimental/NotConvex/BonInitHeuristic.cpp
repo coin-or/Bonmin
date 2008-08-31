@@ -23,7 +23,7 @@ namespace Bonmin{
     setHeuristicName("InitHeuristic");
     nVars_ = cp.nVars();
 
-    if (cp.checkNLP (sol, objValue)) {
+    if (cp.checkNLP (sol, objValue, true)) { // true for recomputing objValue
 
       objValue_ = objValue;
 

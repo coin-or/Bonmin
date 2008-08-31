@@ -156,7 +156,7 @@ CouenneInterface::extractLinearRelaxation
 	    break;
 	  }
 
-	if (fractional) {
+	if (fractional) { // try again if solution found by Ipopt is fractional
 
 	  double 
 	    *lbSave = new double [norig],
@@ -205,6 +205,7 @@ CouenneInterface::extractLinearRelaxation
 	    obj      = getObjValue ();
 	    solution = getColSolution ();
 
+	    // restore previous bounds on integer variables
 	    for (int i=0; i<norig; i++)
 	      if ((p -> Var (i) -> Multiplicity () > 0) &&
 		  p  -> Var (i) -> isInteger ()) {
@@ -223,8 +224,8 @@ CouenneInterface::extractLinearRelaxation
 
       // re-check optimality in case resolve () was called
       if (isProvenOptimal () && 
-	  (obj < p -> getCutOff ()) &&
-	  p -> checkNLP (solution, obj)) {
+	  p -> checkNLP (solution, obj, true) && // true for recomputing obj
+	  (obj < p -> getCutOff ())) {
 
 	// tell caller there is an initial solution to be fed to the initHeuristic
 	have_nlp_solution_ = true;

@@ -22,7 +22,7 @@
 #include "CouenneChooseStrong.hpp"
 #include "CouenneSolverInterface.hpp"
 #include "CouenneCutGenerator.hpp"
-//#include "CouenneDisjCuts.hpp"
+#include "CouenneDisjCuts.hpp"
 #include "BonCouenneInfo.hpp"
 #include "BonCbcNode.hpp"
 
@@ -116,8 +116,8 @@ namespace Bonmin{
     options()->GetIntegerValue("nlpheur_print_level", i, "bonmin.");
     journalist()->GetJournal("console")-> SetPrintLevel(J_NLPHEURISTIC, (EJournalLevel) i);
 
-    //options()->GetIntegerValue("disjcuts_print_level", i, "bonmin.");
-    //journalist()->GetJournal("console")-> SetPrintLevel(J_DISJCUTS, (EJournalLevel) i);
+    options()->GetIntegerValue("disjcuts_print_level", i, "bonmin.");
+    journalist()->GetJournal("console")-> SetPrintLevel(J_DISJCUTS, (EJournalLevel) i);
 
     /* Initialize Couenne cut generator.*/
     //int ivalue, num_points;
@@ -171,8 +171,8 @@ namespace Bonmin{
       return false;
     }
 
-    continuousSolver_ -> findIntegersAndSOS (false);
-    addSos (); // only adds embedded SOS objects
+    //continuousSolver_ -> findIntegersAndSOS (false);
+    //addSos (); // only adds embedded SOS objects
 
     // Add Couenne SOS ///////////////////////////////////////////////////////////////
 
@@ -232,7 +232,7 @@ namespace Bonmin{
       exprVar *var = couenneProb -> Var (i);
 
       // we only want enabled variables
-      if (var -> Multiplicity () == 0) 
+      if (var -> Multiplicity () <= 0) 
 	continue;
 
       switch (objType) {
@@ -240,11 +240,13 @@ namespace Bonmin{
       case CouenneObject::EXPR_OBJ:
 
 	// if this variable is associated with a nonlinear function
-	if ((var -> Type  () == AUX) && 
+	if (var -> isInteger () || 
+	    (var -> Type  () == AUX) && 
 	    (var -> Image () -> Linearity () > LINEAR)) {
 
 	  objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
+	  objects [nobj++] -> setPriority (contObjPriority);
+	  //objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
 	}
 
 	break;
@@ -253,12 +255,14 @@ namespace Bonmin{
 
 	// branching objects on variables
 	if // comment three lines below for linear variables too
-	  (couenneProb -> Dependence () [var -> Index ()] . size () > 0) {  // has indep
+	  (var -> isInteger () || 
+	   (couenneProb -> Dependence () [var -> Index ()] . size () > 0)) {  // has indep
 	   //|| ((var -> Type () == AUX) &&                                  // or, aux 
 	   //    (var -> Image () -> Linearity () > LINEAR))) {              // of nonlinear
 
 	  objects [nobj] = new CouenneVarObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
+	  objects [nobj++] -> setPriority (contObjPriority);
+	  //objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
 	}
 
 	break;
@@ -268,12 +272,14 @@ namespace Bonmin{
 
 	// branching objects on variables
 	if // comment three lines below for linear variables too
-	  (couenneProb -> Dependence () [var -> Index ()] . size () > 0) { // has indep
+	  (var -> isInteger () || 
+	   (couenneProb -> Dependence () [var -> Index ()] . size () > 0)) { // has indep
 	  //|| ((var -> Type () == AUX) &&                      // or, aux 
 	  //(var -> Image () -> Linearity () > LINEAR))) { // of nonlinear
 
 	  objects [nobj] = new CouenneVTObject (couenneProb, var, this, journalist ());
-	  objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
+	  objects [nobj++] -> setPriority (contObjPriority);
+	  //objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
 	}
 
 	break;
@@ -382,8 +388,9 @@ namespace Bonmin{
     }
 
     // Add disjunctive cuts ///////////////////////////////////////////////////////
-    /*
-    options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
+
+    //options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
+    freq = 0;
 
     if (freq != 0) {
 
@@ -401,7 +408,7 @@ namespace Bonmin{
       cg.id = "Couenne disjunctive cuts";
       cutGenerators (). push_back(cg);
     }
-    */
+
     int ival;
     if (!options_->GetEnumValue("node_comparison",ival,"bonmin.")) {
       // change default for Couenne
@@ -431,7 +438,7 @@ namespace Bonmin{
     BabSetupBase::registerAllOptions(roptions);
     BonCbcFullNodeInfo::registerOptions(roptions);
     CouenneCutGenerator::registerOptions (roptions);
-    //CouenneDisjCuts::registerOptions (roptions);
+    CouenneDisjCuts::registerOptions (roptions);
 
     roptions -> AddStringOption2 (
       "display_stats",
@@ -465,11 +472,11 @@ namespace Bonmin{
       "Output level for NLP heuristic in Couenne",
       -2, J_LAST_LEVEL-1, J_WARNING,
       "");
-    //roptions->AddBoundedIntegerOption(
-    //"disjcuts_print_level",
-    //"Output level for disjunctive cuts in Couenne",
-    //-2, J_LAST_LEVEL-1, J_WARNING,
-    //"");
+    roptions->AddBoundedIntegerOption(
+    "disjcuts_print_level",
+    "Output level for disjunctive cuts in Couenne",
+    -2, J_LAST_LEVEL-1, J_WARNING,
+    "");
 
 
     // copied from BonminSetup::registerMilpCutGenerators(), in

@@ -1,3 +1,14 @@
+/*
+ * Name:    CouTight.cpp
+ * Authors: Leo Liberti, LIX, Ecole Polytechnique.
+ *          Pietro Belotti, Carnegie Mellon University
+ * Purpose: Just applies bound tightening to a problem and saves new bounds as AMPL suffixed fields
+ *
+ * (C) Carnegie-Mellon University, 2008.
+ * This file is licensed under the Common Public License (CPL)
+ */
+
+
 #if defined(_MSC_VER)
 // Turn off compiler warning about long names
 #  pragma warning(disable:4786)
@@ -40,6 +51,8 @@ extern Option_Info Oinfo;
 
 using namespace Bonmin;
 
+
+///////////////////////////////////////////////////
 int main (int argc, char *argv[]) {
 
   using namespace Ipopt;
@@ -50,8 +63,6 @@ int main (int argc, char *argv[]) {
   CouenneSetup bonmin;
   bonmin.InitializeCouenne (argv);
 
-  //
-
   SmartAsl *aslfg = new SmartAsl;
   aslfg -> asl = readASLfg (argv);
 
@@ -59,23 +70,11 @@ int main (int argc, char *argv[]) {
 
   typedef struct {char *msg; int code, wantsol;} Sol_info;
 
-  static Sol_info solinfo [] = {
-    {
-      const_cast<char*>("Optimal"), 
-      0, 
-      1
-    }
-  };
-
   static SufDecl suftab [] = {
     {const_cast<char*>("newlb"), 0, 
      ASL_Sufkind_var | ASL_Sufkind_real | ASL_Sufkind_output, 0},
     {const_cast<char*>("newub"), 0, 
      ASL_Sufkind_var | ASL_Sufkind_real | ASL_Sufkind_output, 0}};
-
-  char oinf = 0;
-
-  Sol_info *Si;
 
   suf_declare_ASL (aslfg -> asl, suftab, sizeof (suftab) / sizeof (SufDecl));
 

@@ -284,8 +284,8 @@ namespace Bonmin{
       double obj = (nlp_ -> isProvenOptimal()) ? nlp_ -> getObjValue (): COIN_DBL_MAX;
 
       if (nlp_ -> isProvenOptimal () &&
-	  (obj < couenne_ -> getCutOff ()) &&
-	  couenne_ -> checkNLP (nlp_ -> getColSolution (), obj)) {
+	  couenne_ -> checkNLP (nlp_ -> getColSolution (), obj, true) && // true for recomputing obj
+	  (obj < couenne_ -> getCutOff ())) {
 
 	// store solution in Aux info
 
