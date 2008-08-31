@@ -93,10 +93,10 @@ class CouenneDisjCuts: public CglCutGenerator {
 		   OsiChooseVariable *bcv = NULL,
 		   bool is_strong = false,
 		   JnlstPtr journalist = NULL,
-		   const Ipopt::SmartPtr<Ipopt::OptionsList> options = NULL);
+		   const Ipopt::SmartPtr<Ipopt::OptionsList> options = NULL) {}
 
   /// copy constructor
-  CouenneDisjCuts (const CouenneDisjCuts &);
+  CouenneDisjCuts (const CouenneDisjCuts &){}
 
   /// destructor
   ~CouenneDisjCuts () {}
@@ -112,7 +112,7 @@ class CouenneDisjCuts: public CglCutGenerator {
   /// the main CglCutGenerator
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, 
-		     const CglTreeInfo = CglTreeInfo ()) const;
+		     const CglTreeInfo = CglTreeInfo ()) const {}
 
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {}
@@ -125,58 +125,58 @@ class CouenneDisjCuts: public CglCutGenerator {
   int getDisjunctions (std::vector <std::pair <OsiCuts *, OsiCuts *> > &disjunctions, 
 		       OsiSolverInterface &si, 
 		       OsiCuts &cs, 
-		       const CglTreeInfo &info) const;
+		       const CglTreeInfo &info) const {return 0;}
 
   /// separate couenne cuts on both sides of single disjunction
   int separateWithDisjunction (OsiCuts *cuts,
 			       OsiSolverInterface &si, 
 			       OsiCuts &cs, 
-			       const CglTreeInfo &info) const;
+			       const CglTreeInfo &info) const {return 0;}
 
   /// generate one disjunctive cut from one CGLP
   int generateDisjCuts (std::vector <std::pair <OsiCuts *, OsiCuts *> > &disjs, 
-		       OsiSolverInterface &si, 
-		       OsiCuts &cs, 
-			const CglTreeInfo &info) const;
+			OsiSolverInterface &si, 
+			OsiCuts &cs, 
+			const CglTreeInfo &info) const {return 0;}
 
   /// check if (column!) cuts compatible with solver interface
-  int checkDisjSide (OsiSolverInterface &si, OsiCuts *cuts) const;
+  int checkDisjSide (OsiSolverInterface &si, OsiCuts *cuts) const {return 0;}
 
   /// compute smallest box containing both left and right boxes.
   int getBoxUnion (OsiSolverInterface &si, 
 		   OsiCuts *left, OsiCuts *right, 
-		   CoinPackedVector &lower, CoinPackedVector &upper) const;
+		   CoinPackedVector &lower, CoinPackedVector &upper) const {return 0;}
 
 protected:
 
   /// create single osicolcut disjunction
-  OsiCuts *getSingleDisjunction (OsiSolverInterface &si) const;
+  OsiCuts *getSingleDisjunction (OsiSolverInterface &si) const {return NULL;}
 
   /// utility to merge vectors into one
   void mergeBoxes (int dir,                        // direction (negative for "<", positive for ">")
 		   CoinPackedVector &left,         // input
 		   CoinPackedVector &right,        // input
-		   CoinPackedVector merged) const; // output  
+		   CoinPackedVector merged) const {} // output  
 
   /// our own applyColCuts
   void applyColCuts (OsiSolverInterface &si,
-		     OsiCuts *cuts) const;
+		     OsiCuts *cuts) const {}
 
   /// our own applyColCut, single cut
   void applyColCuts (OsiSolverInterface &si, 
-		     OsiColCut *cut) const;
+		     OsiColCut *cut) const {}
 
   // construct reduced, standard form matrix M from coefficient matrix of si
   void OsiSI2MatrVec (CoinPackedMatrix &M,
 		      CoinPackedVector &r,
-		      OsiSolverInterface &si) const;
+		      OsiSolverInterface &si) const {}
 
   /// add CGLP columns to solver interface; return number of columns
   /// added (for later removal)
   int OsiCuts2MatrVec (OsiSolverInterface *cglp,
 		       OsiCuts *cuts,
 		       int displRow,
-		       int displRhs) const;
+		       int displRhs) const {return 0;}
 };
 
 
