@@ -163,6 +163,13 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
       *U  = psi -> getColUpper    (),
       *RC = psi -> getReducedCost ();
 
+    if (jnlst_ -> ProduceOutput (J_MATRIX, J_BOUNDTIGHTENING)) {
+      printf ("REDUCED COST BT:\n");
+      for (int i=0; i < nVars (); i++) 
+	printf ("%3d %10e [%10e %10e] rc %10e\n", i, X [i], L [i], U [i], RC [i]);
+      printf ("-----------\n");
+    }
+
     int ncols = psi -> getNumCols ();
 
     for (int i=0; i<ncols; i++)
@@ -182,29 +189,26 @@ int CouenneProblem::redCostBT (const OsiSolverInterface *psi,
 
 	if (x == l) {
 	  if (LB + (u-l)*rc > UB) {
+	    //printf ("ub [%d]: %g ", i, Ub (i));
 	    Ub (i) = l + (UB-LB) / rc;
 	    if (isInt) 
-	      Ub (i) = floor (Ub (i));
+	      Ub (i) = floor (Ub (i) + COUENNE_EPS);
+	    //printf ("--> %g\n", Ub (i));
 	    nchanges++;
 	    chg_bds [i].setLower(t_chg_bounds::CHANGED);
 	  }
 	} else if (x == u) {
 	  if (LB + (u-l) * rc > UB) {
+	    //printf ("lb [%d]: %g ", i, Lb (i));
 	    Lb (i) = u - (UB-LB) / rc;
 	    if (isInt) 
-	      Lb (i) = ceil (Lb (i));
+	      Lb (i) = ceil (Lb (i) - COUENNE_EPS);
+	    //printf ("--> %g\n", Lb (i));
 	    nchanges++;
 	    chg_bds [i].setUpper(t_chg_bounds::CHANGED);
 	  }
 	}
       }
-
-      /*      if ((rc > COUENNE_EPS) && (dx*rc > (UB-LB))) {
-	// can improve bound on variable w_i
-	Ub (i) = x + (UB-LB) / rc;
-	nchanges++;
-	chg_bds [i].setUpper(t_chg_bounds::CHANGED);
-	}*/
   }
 
   return nchanges;

@@ -104,7 +104,6 @@ void CouenneProblem::initAuxs () const {
 
 /// get auxiliary variables from original variables in the nonlinear
 /// problem
-
 void CouenneProblem::getAuxs (CouNumber * x) const {
 
   // set point at x, don't copy
@@ -239,7 +238,7 @@ void CouenneProblem::setCutOff (CouNumber cutoff) const {
 
     if (Var (indobj) -> isInteger ())
       pcutoff_    -> setCutOff (floor (cutoff + COUENNE_EPS));
-    else pcutoff_ -> setCutOff (cutoff + SafeCutoff * fabs (1 + cutoff));
+    else pcutoff_ -> setCutOff (cutoff + SafeCutoff * fabs (1. + cutoff));
   }
 } // tolerance needed to retain feasibility
 

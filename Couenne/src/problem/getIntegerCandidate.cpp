@@ -289,10 +289,11 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
     if (X (objind) < getCutOff ()) {
 
-      const CouNumber *x = X (), xp = x [objind];
+      const CouNumber *x = X ();
+      CouNumber xp = x [objind];
 
-      if (checkNLP (x, xp))
-	setCutOff (X (objind));
+      if (checkNLP (x, xp, true)) // true for recomputing xp
+	setCutOff (xp);
     }
   } // try
 

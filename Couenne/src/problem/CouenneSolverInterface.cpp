@@ -123,7 +123,7 @@ void CouenneSolverInterface::resolve () {
   knowInfeasible_ = false;
   knowOptimal_    = false;
 
-  const CoinWarmStart *ws;
+  const CoinWarmStart *ws = NULL;
 
   if (cutgen_ && (cutgen_ -> check_lp ()))
     ws = getWarmStart ();
