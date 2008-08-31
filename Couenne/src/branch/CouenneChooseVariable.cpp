@@ -75,30 +75,33 @@ int CouenneChooseVariable::setupList (OsiBranchingInformation *info, bool initia
 
 
 /// choose object to branch based on earlier setup
-int CouenneChooseVariable::chooseVariable (OsiSolverInterface * solver, 
-					   OsiBranchingInformation *info, 
-					   bool fixVariables) {
-  problem_ -> domain () -> push 
-    (problem_ -> nVars (),
-     info -> solution_, 
-     info -> lower_, 
-     info -> upper_);
+// int CouenneChooseVariable::chooseVariable (OsiSolverInterface * solver, 
+// 					   OsiBranchingInformation *info, 
+// 					   bool fixVariables) {
 
-  int retval = OsiChooseVariable::chooseVariable (solver, info, fixVariables);
+//   // !!!should go -- just choose the first element
+//   problem_ -> domain () -> push 
+//     (problem_ -> nVars (),
+//      info -> solution_, 
+//      info -> lower_, 
+//      info -> upper_);
 
-  problem_ -> domain () -> pop ();
+//   int retval = OsiChooseVariable::chooseVariable (solver, info, fixVariables);
 
-  return retval;
-}
+//   problem_ -> domain () -> pop ();
+
+//   return retval;
+// }
 
 
 // Returns true if solution looks feasible against given objects
 bool CouenneChooseVariable::feasibleSolution (const OsiBranchingInformation * info,
 					      const double * solution,
 					      int numberObjects,
-					      const OsiObject ** objects)
-
-{return problem_ -> checkNLP (solution, solution [problem_ -> Obj (0) -> Body () -> Index ()]);}
+					      const OsiObject ** objects) {
+  double obj = solution [problem_ -> Obj (0) -> Body () -> Index ()];
+  return problem_ -> checkNLP (solution, obj);
+}
 
 
 /// Add list of options to be read from file

@@ -13,6 +13,7 @@
 #include "BonRegisteredOptions.hpp"
 
 #include "BonOaDecBase.hpp"
+#include "CglCutGenerator.hpp"
 #include "OsiRowCut.hpp"
 #include "BonAuxInfos.hpp"
 #include "BonBabInfos.hpp"
@@ -29,7 +30,7 @@ struct ASL;
 
 /// Cut Generator for linear convexifications
 
-class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
+class CouenneCutGenerator: public CglCutGenerator {
 
  protected:
 
@@ -181,18 +182,6 @@ class CouenneCutGenerator: public Bonmin::OaDecompositionBase {
   int addTangent (OsiCuts &, int, int, 
 		  CouNumber, CouNumber, 
 		  CouNumber, int) const; 
-
-  /// (for compatibility with base class)
-  /// virtual method which performs the OA algorithm by modifying lp and nlp.
-  virtual double performOa (OsiCuts & cs,           solverManip &nlpManip, 
-			    solverManip &lpManip,   SubMipSolver *& subMip, 
-			    Bonmin::BabInfo * babInfo, double &cutoff) const
-    {throw -1;}
-
-  /// (for compatibility with base class)
-  /// virtual method to decide if local search is performed
-  virtual bool doLocalSearch (Bonmin::BabInfo * babInfo) const 
-  {return 0;}
 
   /// Method to set the Bab pointer
   void setBabPtr (Bonmin::Bab *p)

@@ -4,7 +4,7 @@
  *          Pietro Belotti, Carnegie Mellon University
  * Purpose: Object for auxiliary variables
  *
- * (C) Carnegie-Mellon University, 2006-07.
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -146,8 +146,16 @@ public:
 		     CouNumber *brpt) const;
 
   /// are we on the bad or good side of the expression?
-  virtual bool isCuttable () const
-  {return reference_ -> Image () -> isCuttable (problem_, reference_ -> Index ());}
+  virtual bool isCuttable () const {
+    return (reference_ -> Image ()) ? 
+      ((!(reference_ -> isInteger ())) &&
+       reference_ -> Image () -> isCuttable (problem_, reference_ -> Index ())) :
+      (!(reference_ -> isInteger ()));
+  }
+
+  /// integer infeasibility: min {value - floor(value), ceil(value) - value}
+  virtual double intInfeasibility (double value) const
+  {return CoinMin (value - floor (value + COUENNE_EPS), ceil (value - COUENNE_EPS) - value);}
 
 protected:
 

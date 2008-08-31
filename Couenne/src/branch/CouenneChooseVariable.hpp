@@ -56,9 +56,9 @@ public:
 				 const OsiObject ** objects);
 
   /// choose object to branch based on earlier setup
-  virtual int chooseVariable (OsiSolverInterface * solver, 
-			      OsiBranchingInformation *info, 
-			      bool fixVariables);
+  //   virtual int chooseVariable (OsiSolverInterface * solver, 
+  // 			      OsiBranchingInformation *info, 
+  // 			      bool fixVariables);
 
   /// Add list of options to be read from file
   static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);

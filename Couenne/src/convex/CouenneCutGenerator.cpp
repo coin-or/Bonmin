@@ -8,7 +8,6 @@
  */
 
 
-#include "BonOaDecBase.hpp"
 #include "CglCutGenerator.hpp"
 
 #include "CouenneProblem.hpp"
@@ -23,8 +22,8 @@ CouenneCutGenerator::CouenneCutGenerator (Bonmin::OsiTMINLPInterface *nlp,
 					  const struct ASL *asl, 
 					  JnlstPtr jnlst):
 
-  OaDecompositionBase (nlp),
-
+  CglCutGenerator (),
+  
   firstcall_      (true),
   problem_        (NULL),
   nrootcuts_      (0),
@@ -64,7 +63,7 @@ CouenneCutGenerator::~CouenneCutGenerator ()
 /// copy constructor
 CouenneCutGenerator::CouenneCutGenerator (const CouenneCutGenerator &src):
 
-  OaDecompositionBase (src),
+  CglCutGenerator (src),
 
   firstcall_   (src. firstcall_),
   addviolated_ (src. addviolated_), 

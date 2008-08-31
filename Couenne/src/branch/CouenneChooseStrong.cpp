@@ -136,7 +136,9 @@ namespace Bonmin {
   bool CouenneChooseStrong::feasibleSolution (const OsiBranchingInformation * info,
 					      const double * solution,
 					      int numberObjects,
-					      const OsiObject ** objects)
+					      const OsiObject ** objects) {
 
-  {return problem_ -> checkNLP (solution, solution [problem_ -> Obj (0) -> Body () -> Index ()]);}
+    double obj = solution [problem_ -> Obj (0) -> Body () -> Index ()];
+    return problem_ -> checkNLP (solution, obj);
+  }
 }

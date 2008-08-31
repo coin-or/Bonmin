@@ -24,8 +24,14 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
   // feasible variable
   if (info -> upper_ [indexVar] - 
-      info -> lower_ [indexVar] < tol)
-    return (upEstimate_ = downEstimate_ = 0.);
+      info -> lower_ [indexVar] < tol) {
+    if (reference_ -> isInteger ()) {
+      double point = info -> solution_ [reference_ -> Index ()];
+      if (downEstimate_ <       point  - floor (point)) downEstimate_ =       point  - floor (point);
+      if (upEstimate_   < ceil (point) -        point)  upEstimate_   = ceil (point) -        point;
+      return intInfeasibility (point);
+    } else return (upEstimate_ = downEstimate_ = 0.);
+  }
 
   // let Couenne know of current status (variables, bounds)
   problem_ -> domain () -> push 
@@ -104,11 +110,12 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 	maxInf = infeas;
 
       // check feasibility of nonlinear object
-      if (infeas > 0.0) {
+      if (infeas > 0.) {
 
 	// measure how far have to go, left and right, to restore
 	// feasibility (see page 582, Tawarmalani and Sahinidis,
 	// MathProg A: 99, pp. 563-591)
+	//if (obj. Reference () -> Image ()) // not needed! obj only has nonlinear objects
 	obj. Reference () -> Image () -> closestFeasible 
 	  (reference_, obj. Reference (), left, right);
 
@@ -119,10 +126,14 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
       if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) { // debug output
 	jnlst_ -> Printf (J_MATRIX, J_BRANCHING, "[%g,%g] --> %g - %g = %g (diff = %g - %g = %g): ", 
 			  left, right, rFeas, lFeas, rFeas - lFeas,
-			  (*(obj. Reference () -> Image ())) (),  (*(obj. Reference ())) (),
-			  (*(obj. Reference () -> Image ())) () - (*(obj. Reference ())) ());
-	obj.Reference () -> print (); printf (" := ");
-	obj.Reference () -> Image () -> print (); printf ("\n");
+			  (obj. Reference () -> Image ()) ? 
+			  (*(obj. Reference () -> Image ())) () : 0.,  
+			  (*(obj. Reference ())) (),
+			  (obj. Reference () -> Image ()) ? 
+			  (*(obj. Reference () -> Image ())) () - (*(obj. Reference ())) () : 0.);
+	obj.Reference () -> print (); 
+	if (obj. Reference () -> Image ()) {printf (" := "); obj.Reference () -> Image () -> print ();}
+	printf ("\n");
       }
     }
 
@@ -239,5 +250,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
   assert ((retval < ALMOST_ZERO && upEstimate_ < ALMOST_ZERO && downEstimate_ < ALMOST_ZERO) ||
 	  (retval > ALMOST_ZERO && upEstimate_ > ALMOST_ZERO && downEstimate_ > ALMOST_ZERO));
 
-  return retval;
+  return (reference_ -> isInteger ()) ? 
+    CoinMax (retval, intInfeasibility (info -> solution_ [reference_ -> Index ()])) :
+    retval;
 }

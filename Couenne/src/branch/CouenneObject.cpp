@@ -65,8 +65,10 @@ CouenneObject::CouenneObject (CouenneProblem *p,
       jnlst_ -> ProduceOutput (J_SUMMARY, J_BRANCHING)) {
 
     printf ("created Expression Object: "); reference_ -> print (); 
-    printf (" := "); 
-    reference_ -> Image () -> print ();
+    if (reference_ -> Image ()) {
+      printf (" := "); 
+      reference_ -> Image () -> print ();
+    }
 
     printf (" with %s strategy [clamp=%g, alpha=%g]\n", 
 	    (strategy_ == LP_CLAMPED)   ? "lp-clamped" : 
@@ -154,10 +156,28 @@ OsiBranchingObject *CouenneObject::createBranch (OsiSolverInterface *si,
   expression *brVar = NULL; // branching variable
   int whichWay = 0;
 
-  CouNumber improv =  // not used out of debug
-    reference_ -> Image () -> 
-    selectBranch (this, info,                      // input parameters
-		  brVar, brPts, brDist, whichWay); // result: who, where, distance, and direction
+  CouNumber improv;
+
+  if (reference_ -> Image ())  // not used out of debug
+    improv = reference_ -> Image () -> 
+      selectBranch (this, info,                      // input parameters
+		    brVar, brPts, brDist, whichWay); // result: who, where, distance, and direction
+  else {
+    brVar = reference_;
+    brPts  = (double *) realloc (brPts, sizeof (double)); 
+    brDist = (double *) realloc (brDist, 2 * sizeof (double)); 
+
+    double point = info -> solution_ [reference_ -> Index ()];
+
+    *brPts = point;
+    improv = 0.;
+
+    if (point > floor (point)) {improv =                  brDist [0] = point - floor (point);}
+    if (point < ceil  (point)) {improv = CoinMin (improv, brDist [1] = ceil (point) - point);}
+
+    point -= floor (point);
+    whichWay = (point < 0.45) ? TWO_LEFT : (point > 0.55) ? TWO_RIGHT : TWO_RAND;
+  }
 
   assert (brVar); // MUST have a branching variable
 
@@ -179,8 +199,9 @@ OsiBranchingObject *CouenneObject::createBranch (OsiSolverInterface *si,
 
   /// Debug output 
   if (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING)) {
-    printf ("brpts for "); reference_ -> print (); printf (" := ");
-    reference_ -> Image () -> print (); printf (" is on "); brVar -> print ();
+    printf ("brpts for "); reference_ -> print (); 
+    if (reference_ -> Image ()) {printf (" := "); reference_ -> Image () -> print ();}
+    printf (" is on "); brVar -> print ();
     printf (" @ %.12g [%.12g,%.12g]\n", *brPts, 
 	    problem_ -> Lb (brVar -> Index ()), 
 	    problem_ -> Ub (brVar -> Index ()));
@@ -189,8 +210,9 @@ OsiBranchingObject *CouenneObject::createBranch (OsiSolverInterface *si,
 
       if (improv <= COUENNE_EPS) {
 	printf ("### warning, infeas = %g for ", improv);
-	reference_ -> print (); printf (":=");
-	reference_ -> Image () -> print (); printf ("\n");
+	reference_ -> print (); 
+	if (reference_ -> Image ()) {printf (":="); reference_ -> Image () -> print ();}
+	printf ("\n");
       }
 
       int index = brVar -> Index ();
@@ -282,11 +304,24 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
 
   problem_ -> domain () -> pop ();
 
-  if (pseudoMultType_ == INFEASIBILITY)
-    upEstimate_ = downEstimate_ = retval;
+  if (pseudoMultType_ == INFEASIBILITY) {
+
+    double point = info -> solution_ [reference_ -> Index ()];
+
+    if (reference_ -> isInteger ()) {
+      if (retval < intInfeasibility (point)) {
+	if (downEstimate_ <       point  - floor (point)) downEstimate_ =       point  - floor (point);
+	if (upEstimate_   < ceil (point) -        point)  upEstimate_   = ceil (point) -        point;
+	retval = intInfeasibility (point);
+      }
+    }
+    else upEstimate_ = downEstimate_ = retval;
+  }
   else setEstimates (info, &retval, NULL);
 
-  return retval;
+  return (reference_ -> isInteger ()) ? 
+    CoinMax (retval, intInfeasibility (info -> solution_ [reference_ -> Index ()])) :
+    retval;
 }
 
 
@@ -296,24 +331,36 @@ double CouenneObject::infeasibility (const OsiBranchingInformation *info, int &w
 double CouenneObject::checkInfeasibility (const OsiBranchingInformation *info) const {
 
   if (reference_ -> Type () == VAR)
-    return 0.;
+    return (reference_ -> isInteger ()) ? 
+      intInfeasibility (info -> solution_ [reference_ -> Index ()]) : 0.;
 
-  double retval = 
-    fabs (info -> solution_ [reference_ -> Index ()] - (*(reference_ -> Image ())) ()) / 
-    CoinMax (1., reference_ -> Image () -> gradientNorm (info -> solution_));
+  double 
+    vval = info -> solution_ [reference_ -> Index ()],
+    fval = (*(reference_ -> Image ())) (),
+    denom  = CoinMax (1., reference_ -> Image () -> gradientNorm (info -> solution_)),
+    retval = fabs (vval - fval),
+    ratio = (CoinMax (1., fabs (vval)) / 
+	     CoinMax (1., fabs (fval)));
 
-  if (retval < CoinMin (COUENNE_EPS, feas_tolerance_)) 
+  //printf ("checkinf --> v=%e f=%e den=%e ret=%e ratio=%e\n", vval, fval, denom, retval, ratio);
+
+  if ((ratio < 2)  && 
+      (ratio > .5) &&
+      ((retval /= denom) < CoinMin (COUENNE_EPS, feas_tolerance_)))
     retval = 0.;
 
   if (//(retval > 0.) &&
       (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING))) {
 
     printf ("  infeas %g: ", retval); 
-    reference_             -> print (); printf (" := ");
-    reference_ -> Image () -> print (); printf ("\n");
+    reference_             -> print (); 
+    if (reference_ -> Image ()) {printf (" := "); reference_ -> Image () -> print ();}
+    printf ("\n");
   }
 
-  return retval;
+  return (reference_ -> isInteger ()) ? 
+    CoinMax (retval, intInfeasibility (info -> solution_ [reference_ -> Index ()])) :
+    retval;
 }
 
 
@@ -470,5 +517,10 @@ void CouenneObject::setEstimates (const OsiBranchingInformation *info,
   default: 
     printf ("Couenne: invalid estimate setting procedure\n");
     exit (-1);
+  }
+
+  if (reference_ -> isInteger ()) {
+    if (downEstimate_ <       point  - floor (point)) downEstimate_ =       point  - floor (point);
+    if (upEstimate_   < ceil (point) -        point)  upEstimate_   = ceil (point) -        point;
   }
 }
