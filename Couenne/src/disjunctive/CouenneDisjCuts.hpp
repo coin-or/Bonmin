@@ -115,7 +115,7 @@ class CouenneDisjCuts: public CglCutGenerator {
 		     const CglTreeInfo = CglTreeInfo ()) const;
 
   /// Add list of options to be read from file
-  static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
+  static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {}
 
   /// Provide Journalist
   inline ConstJnlstPtr Jnlst() const 
