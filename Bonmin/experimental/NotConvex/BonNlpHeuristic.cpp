@@ -159,7 +159,7 @@ namespace Bonmin{
 	if (too_deep) { // only test infeasibility if BB level is high
 	  int dummy;
 	  double infeas;
-	  maxInfeasibility = max ( maxInfeasibility, infeas = couObj->infeasibility(&info, dummy));
+	  maxInfeasibility = std::max ( maxInfeasibility, infeas = couObj->infeasibility(&info, dummy));
 	  if(maxInfeasibility > maxNlpInf_){
 	    delete [] lower;
 	    delete [] upper;
