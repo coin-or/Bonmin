@@ -489,7 +489,7 @@ namespace Bonmin
     }
     else {
       kmax = kmax_ipt;
-      kmax = min(kmax,n);
+      kmax = std::min(kmax,n);
     }
     Ipopt::Index mlp_ipt;
     options->GetIntegerValue("mlp", mlp_ipt,"filter.");

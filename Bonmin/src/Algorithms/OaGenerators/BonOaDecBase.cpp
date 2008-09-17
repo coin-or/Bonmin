@@ -472,8 +472,8 @@ OaDecompositionBase::solverManip::fixIntegers(const OsiBranchingInformation& inf
           throw CoinError(stream.str(),"fixIntegers","OaDecompositionBase::solverManip");
         }
         value = floor(value+0.5);
-        value = max(colLower_[i],value);
-        value = min(value, colUpper_[i]);
+        value = std::max(colLower_[i],value);
+        value = std::min(value, colUpper_[i]);
 
         if (fabs(value) > 1e10) {
           std::stringstream stream;

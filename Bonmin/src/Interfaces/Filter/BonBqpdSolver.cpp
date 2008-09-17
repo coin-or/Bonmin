@@ -14,6 +14,7 @@
 #include "BonBqpdWarmStart.hpp"
 
 #include "CoinTime.hpp"
+#include <algorithm>
 
 #define InitializeAll
 
@@ -251,7 +252,7 @@ namespace Bonmin
     }
     else {
       kmax = kmax_ipt;
-      kmax = min(kmax,n);
+      kmax = std::min(kmax,n);
     }
     mlp = mlp_ipt;
 
