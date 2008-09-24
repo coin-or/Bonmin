@@ -12,7 +12,7 @@
 #include "BonminConfig.h"
 
 #include "OsiAuxInfo.hpp"
-
+//#define OA_DEBUG
 
 
 namespace Bonmin
@@ -114,7 +114,7 @@ namespace Bonmin
 #endif
     }
 #ifdef OA_DEBUG
-    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
+    //debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
     std::cout<<"milpBound found: "<<milpBound<<std::endl;
 #endif
     return milpBound;
