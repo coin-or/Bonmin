@@ -1517,8 +1517,8 @@ OsiTMINLPInterface::getDblParam(OsiDblParam key, double& value) const
     break;
   case OsiPrimalTolerance:
     options()->GetNumericValue("tol", value,"");
-    value = 1e-07;
-    retval = false;
+    //value = 1e-07;
+    retval = true;
     break;
   case OsiObjOffset:
     retval = OsiSolverInterface::getDblParam(key, value);
