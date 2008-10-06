@@ -50,7 +50,7 @@ host_triplet = @host@
 
 subdir = src/CbcBonmin
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+	$(srcdir)/Makefile.in $(srcdir)/bonmin_addlibs_cpp.txt.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -58,7 +58,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = bonmin_addlibs_cpp.txt
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -461,6 +461,14 @@ DISTCLEANFILES = \
 	CbcCompareUser.cpp CbcBranchUser.cpp
 
 SUFFIXES = .cppbak .hppbak
+
+########################################################################
+#                            addlibs stuff                             #
+########################################################################
+addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)/
+ADDLIBS_FILES = \
+	bonmin_addlibs_cpp.txt 
+
 all: all-am
 
 .SUFFIXES:
@@ -494,6 +502,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+bonmin_addlibs_cpp.txt: $(top_builddir)/config.status $(srcdir)/bonmin_addlibs_cpp.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
@@ -718,7 +728,7 @@ info-am:
 
 install-data-am: install-includecoinHEADERS
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-exec-local install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -745,21 +755,21 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-includecoinHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	uninstall-libLTLIBRARIES uninstall-local
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libLTLIBRARIES clean-libtool ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
-	install-exec-am install-includecoinHEADERS install-info \
-	install-info-am install-libLTLIBRARIES install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-includecoinHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	install-exec-am install-exec-local install-includecoinHEADERS \
+	install-info install-info-am install-libLTLIBRARIES \
+	install-man install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-includecoinHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES uninstall-local
 
 
 astyle: $(ASTYLE_FILES)
@@ -773,6 +783,17 @@ astyle: $(ASTYLE_FILES)
 	mv $< $@
 	$(ASTYLE) $(ASTYLEFLAGS) < $@ > $<
 	touch $@
+
+# Make sure the addlibs files are installed in lib
+install-exec-local:
+	for i in $(ADDLIBS_FILES); do \
+	  $(install_sh_DATA) $$i $(DESTDIR)$(addlibsdir)/$$i; \
+	done
+
+uninstall-local:
+	for i in $(ADDLIBS_FILES); do \
+	  rm -f $(DESTDIR)$(addlibsdir)/$$i; \
+	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

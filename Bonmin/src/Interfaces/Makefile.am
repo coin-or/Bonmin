@@ -114,6 +114,7 @@ includecoin_HEADERS = \
      BonTypes.hpp \
      BonRegisteredOptions.hpp
 
+
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
 #############################################################################

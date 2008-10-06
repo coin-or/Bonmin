@@ -201,6 +201,7 @@ AC_CONFIG_FILES([Makefile
                  experimental/NotConvex/Makefile
                  experimental/FP/Makefile
                  src/CbcBonmin/Makefile
+                 src/CbcBonmin/bonmin_addlibs_cpp.txt
                  src/Interfaces/Makefile
                  src/Interfaces/Ipopt/Makefile
                  src/Interfaces/Filter/Makefile

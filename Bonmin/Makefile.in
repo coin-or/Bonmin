@@ -579,7 +579,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/inc $(distdir)/src/CbcBonmin $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
