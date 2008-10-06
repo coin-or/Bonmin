@@ -56,7 +56,7 @@ CouenneInterface::readAmplNlFile(char **& argv, Ipopt::SmartPtr<Bonmin::Register
    * the initial linear relaxation.
    */
 
-void 
+void
 CouenneInterface::extractLinearRelaxation 
 (OsiSolverInterface &si, CouenneCutGenerator & couenneCg, bool getObj, bool solveNlp) {
 

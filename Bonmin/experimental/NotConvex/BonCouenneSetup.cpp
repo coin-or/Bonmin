@@ -119,6 +119,9 @@ namespace Bonmin{
     options()->GetIntegerValue("disjcuts_print_level", i, "bonmin.");
     journalist()->GetJournal("console")-> SetPrintLevel(J_DISJCUTS, (EJournalLevel) i);
 
+    options()->GetIntegerValue("reformulate_print_level", i, "bonmin.");
+    journalist()->GetJournal("console")-> SetPrintLevel(J_REFORMULATE, (EJournalLevel) i);
+
     /* Initialize Couenne cut generator.*/
     //int ivalue, num_points;
     //options()->GetEnumValue("convexification_type", ivalue,"bonmin.");
@@ -389,8 +392,7 @@ namespace Bonmin{
 
     // Add disjunctive cuts ///////////////////////////////////////////////////////
 
-    //options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
-    freq = 0;
+    options () -> GetIntegerValue ("minlp_disj_cuts", freq, "couenne.");
 
     if (freq != 0) {
 
@@ -448,35 +450,32 @@ namespace Bonmin{
       "no", "");
 
     roptions->AddBoundedIntegerOption(
-      "branching_print_level",
-      "Output level for braching code in Couenne",
-      -2, J_LAST_LEVEL-1, J_NONE,
-      "");
+      "branching_print_level", "Output level for braching code in Couenne",
+      -2, J_LAST_LEVEL-1, J_NONE, "");
+
     roptions->AddBoundedIntegerOption(
-      "boundtightening_print_level",
-      "Output level for bound tightening code in Couenne",
-      -2, J_LAST_LEVEL-1, J_NONE,
-      "");
+      "boundtightening_print_level", "Output level for bound tightening code in Couenne",
+      -2, J_LAST_LEVEL-1, J_NONE, "");
+
     roptions->AddBoundedIntegerOption(
-      "convexifying_print_level",
-      "Output level for convexifying code in Couenne",
-      -2, J_LAST_LEVEL-1, J_NONE,
-      "");
+      "convexifying_print_level", "Output level for convexifying code in Couenne",
+      -2, J_LAST_LEVEL-1, J_NONE, "");
+
     roptions->AddBoundedIntegerOption(
-      "problem_print_level",
-      "Output level for problem manipulation code in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
-      "");
+      "problem_print_level", "Output level for problem manipulation code in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING, "");
+
     roptions->AddBoundedIntegerOption(
-      "nlpheur_print_level",
-      "Output level for NLP heuristic in Couenne",
-      -2, J_LAST_LEVEL-1, J_WARNING,
-      "");
+      "nlpheur_print_level", "Output level for NLP heuristic in Couenne",
+      -2, J_LAST_LEVEL-1, J_WARNING, "");
+
     roptions->AddBoundedIntegerOption(
-    "disjcuts_print_level",
-    "Output level for disjunctive cuts in Couenne",
-    -2, J_LAST_LEVEL-1, J_WARNING,
-    "");
+    "disjcuts_print_level", "Output level for disjunctive cuts in Couenne",
+    -2, J_LAST_LEVEL-1, J_WARNING, "");
+
+    roptions->AddBoundedIntegerOption(
+    "reformulate_print_level", "Output level for reformulating problems in Couenne",
+    -2, J_LAST_LEVEL-1, J_WARNING, "");
 
 
     // copied from BonminSetup::registerMilpCutGenerators(), in

@@ -89,12 +89,16 @@ int main (int argc, char *argv[]) {
     *newL = bonmin.couennePtr () -> Problem () -> Lb (),
     *newU = bonmin.couennePtr () -> Problem () -> Ub ();
 
+  //printf ("New bounds:");
+  //for (int i=0; i<bonmin.couennePtr () -> Problem () -> nVars(); i++)
+  //  printf ("x_%05d %e %e\n", i, newL [i], newU [i]);
+
   // return variable integrality
   for(int i = 0; i < NumberOfVariables; i++) {
     vnewLb->u.r[i] = newL [i];
     vnewUb->u.r[i] = newU [i];
   }
 
-  write_sol_ASL (aslfg -> asl, const_cast<char*>("solved!"), 0, 0, &Oinfo);
+  write_sol_ASL (aslfg -> asl, const_cast<char*>("tightened bounds"), 0, 0, &Oinfo);
   return 0;
 }

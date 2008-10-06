@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
 {
   using namespace Ipopt;
 
-  char * pbName = NULL;
+  //char * pbName = NULL;
   double time_start = CoinCpuTime();
 
   const int infeasible = 1;
@@ -210,6 +210,6 @@ int main (int argc, char *argv[])
 //    throw;
 //  }
 
-  delete [] pbName;
+  //delete [] pbName;
   return 0;
 }
