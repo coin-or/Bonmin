@@ -60,7 +60,7 @@ OsiBranchingObject *CouenneVarObject::createBranch (OsiSolverInterface *si,
 
   ///////////////////////////////////////////
 
-  jnlst_ -> Printf (J_MATRIX, J_BRANCHING, ":::: creating branching on x_%d @%g [%g,%g]\n", 
+  jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, ":::: creating branching on x_%d @%g [%g,%g]\n", 
 	  reference_ -> Index (), 
 	  info -> solution_ [reference_ -> Index ()],
 	  info -> lower_    [reference_ -> Index ()],
@@ -80,7 +80,7 @@ CouNumber CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation 
 						  int& bestWay) const
 {
 
-  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+  if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
     printf ( "---------- computeBRPT for "); 
     reference_ -> print (); 
     printf (" [%g,%g]\n", 

@@ -76,7 +76,7 @@ void CouenneProblem::initAuxs () const {
 
     if (variables_ [ord] -> Type () == AUX) {
 
-      Jnlst () -> Printf (Ipopt::J_ALL, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, Lb (ord), Ub (ord));
+      Jnlst () -> Printf (Ipopt::J_VECTOR, J_PROBLEM, "w_%04d [%10g,%10g] ", ord, Lb (ord), Ub (ord));
 
       CouNumber l, u;
       variables_ [ord] -> Image () -> getBounds (l, u);
@@ -87,7 +87,7 @@ void CouenneProblem::initAuxs () const {
       //if ((lb_ [ord] = (*(aux -> Lb ())) ()) <= -COUENNE_INFINITY) lb_ [ord] = -DBL_MAX;
       //if ((ub_ [ord] = (*(aux -> Ub ())) ()) >=  COUENNE_INFINITY) ub_ [ord] =  DBL_MAX;
 
-      Jnlst () -> Printf (Ipopt::J_ALL, J_PROBLEM, " --> [%10g,%10g]\n", Lb (ord), Ub (ord));
+      Jnlst () -> Printf (Ipopt::J_VECTOR, J_PROBLEM, " --> [%10g,%10g]\n", Lb (ord), Ub (ord));
 
       bool integer = variables_ [ord] -> isInteger ();
 
@@ -215,7 +215,7 @@ void CouenneProblem::fillObjCoeff (double *&obj) {
   case COU_EXPRCONST: break; // a constant objective
 
   default:
-    Jnlst()->Printf(Ipopt::J_WARNING, J_PROBLEM,
+    Jnlst()->Printf(Ipopt::J_STRONGWARNING, J_PROBLEM,
 		    "Couenne: warning, objective function not recognized\n");
     break;
   }
@@ -231,7 +231,7 @@ void CouenneProblem::setCutOff (CouNumber cutoff) const {
   //     Couenne here?
   if ((indobj >= 0) && (cutoff < pcutoff_ -> getCutOff () - COUENNE_EPS)) {
 
-    Jnlst () -> Printf (Ipopt::J_DETAILED, J_PROBLEM,
+    Jnlst () -> Printf (Ipopt::J_ITERSUMMARY, J_PROBLEM,
 			"Setting new cutoff %.10e for optimization variable index %d val = %.10e\n",
 			cutoff, indobj,
 			pcutoff_ -> getCutOff ());
@@ -257,7 +257,7 @@ void CouenneProblem::installCutOff () const {
     if (cutoff < Ub (indobj))
       Ub (indobj) = cutoff;
 
-  } else jnlst_ -> Printf (J_SUMMARY, J_PROBLEM, 
+  } else jnlst_ -> Printf (J_ERROR, J_PROBLEM, 
 			   "Warning, could not install cutoff - negative objective index\n");
 }
 

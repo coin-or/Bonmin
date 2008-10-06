@@ -90,7 +90,7 @@ class exprOp: public expression {
   /// simplification
   virtual expression *simplify ();
 
-  /// clone argument list (for use with clone method
+  /// clone argument list (for use with clone method)
   expression **clonearglist (Domain *d = NULL) const {
     if (nargs_) {
       expression **al = new expression * [nargs_];

@@ -108,8 +108,8 @@ class expression {
     {return this;}
 
   /// print expression to iostream
-  virtual void print (std::ostream &s  = std::cout,   /// output stream
-		      bool             = false) const /// descend into auxiliaries' image?
+  virtual void print (std::ostream &s       = std::cout,   //< output stream
+		      bool          descend = false) const //< descend into auxiliary's image?
     {s << '?';}
 
   /// null function for evaluating the expression
@@ -256,6 +256,10 @@ class expression {
   /// concave ("bad") side
   virtual bool isCuttable (CouenneProblem *problem, int index) const
   {return true;}
+
+  /// is this just a pointer [true] or a true expression? 
+  virtual bool isaCopy () 
+  {return false;}
 };
 
 

@@ -21,11 +21,14 @@ class Domain;
 // General N-ary function destructor
 exprOp::~exprOp () {
 
+  //printf ("deleting "); print (); printf ("\n");
+
   if (arglist_) {
     for (expression **alist = arglist_; nargs_--; alist++)
       if (*alist) delete (*alist);
     delete [] arglist_;
-  }
+    arglist_ = NULL;
+  } else nargs_ = 0;
 }
 
 

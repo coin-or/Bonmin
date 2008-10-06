@@ -243,9 +243,9 @@ fake_tighten (char direction,  // 0: left, 1: right
   }
 
 
-  Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING, "\n");
+  Jnlst()->Printf(Ipopt::J_MOREVECTOR, J_BOUNDTIGHTENING, "\n");
   if (tightened) 
-    Jnlst()->Printf(Ipopt::J_VECTOR, J_BOUNDTIGHTENING, 
+    Jnlst()->Printf(Ipopt::J_MOREVECTOR, J_BOUNDTIGHTENING, 
 		    "  [x%2d] pruned %s [%g, %g] -- lb = %g cutoff = %g\n", 
 		    index,direction?"right":"left",
 		    olb[index],oub[index], Lb (objind), getCutOff ());

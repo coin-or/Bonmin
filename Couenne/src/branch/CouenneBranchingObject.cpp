@@ -74,7 +74,7 @@ CouenneBranchingObject::CouenneBranchingObject (OsiSolverInterface *solver,
     else if ((ub - value_) / (ub-lb) < closeToBounds) value_ = ub + (lb-ub) * closeToBounds;
   }
 
-  jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 
+  jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, 
 		    "Branch: x%-3d will branch on %g (cur. %g) [%g,%g]; firstBranch_ = %d\n", 
 		    variable_ -> Index (), value_, (*variable_) (), lb, ub, firstBranch_);
 }
@@ -107,20 +107,20 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
 
   if (way) {
     if      (value_ < l)             
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n",l,u,value_);
+      jnlst_->Printf(J_STRONGWARNING, J_BRANCHING, "Nonsense up-br: [ %.8f ,(%.8f)] -> %.8f\n",l,u,value_);
     else if (value_ < l+COUENNE_EPS) 
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n",l,u,value_);
+      jnlst_->Printf(J_STRONGWARNING, J_BRANCHING, "## WEAK  up-br: [ %.8f ,(%.8f)] -> %.8f\n",l,u,value_);
   } else {
     if      (value_ > u)             
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n",l,u,value_);
+      jnlst_->Printf(J_STRONGWARNING, J_BRANCHING, "Nonsense dn-br: [(%.8f), %.8f ] -> %.8f\n",l,u,value_);
     else if (value_ > u+COUENNE_EPS) 
-      jnlst_->Printf(J_DETAILED, J_BRANCHING, "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n",l,u,value_);
+      jnlst_->Printf(J_STRONGWARNING, J_BRANCHING, "## WEAK  dn-br: [(%.8f), %.8f ] -> %.8f\n",l,u,value_);
   }
 
   if ((brpt < l) || (brpt > u))
     brpt = 0.5 * (l+u);
 
-  jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
+  jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
 		    index, way ? '>' : '<', integer ? (way ? ceil (brpt) : floor (brpt)) : brpt);
 
   /*

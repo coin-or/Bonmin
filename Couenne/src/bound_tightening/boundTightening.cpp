@@ -104,7 +104,7 @@ bool CouenneProblem::btCore (t_chg_bounds *chg_bds) const {
 bool CouenneProblem::boundTightening (t_chg_bounds *chg_bds, 
 				      Bonmin::BabInfo * babInfo) const {
 
-  Jnlst()->Printf (J_DETAILED, J_BOUNDTIGHTENING,
+  Jnlst()->Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING,
 		   "Feasibility-based Bound Tightening\n");
 
   int objInd = Obj (0) -> Body () -> Index ();

@@ -103,11 +103,11 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   t_chg_bounds *chg_bds = new t_chg_bounds [ncols];
 
-  for (int i=0; i < ncols; i++) 
+  /*for (int i=0; i < ncols; i++) 
     if (problem_ -> Var (i) -> Multiplicity () <= 0) {
       chg_bds [i].setLower (t_chg_bounds::UNCHANGED);
       chg_bds [i].setUpper (t_chg_bounds::UNCHANGED);
-    }
+      }*/
 
   problem_ -> installCutOff (); // install upper bound
 
@@ -197,14 +197,16 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       }
     }
 
-    if (jnlst_ -> ProduceOutput (J_DETAILED, J_CONVEXIFYING)) {
+    if (jnlst_ -> ProduceOutput (J_ITERSUMMARY, J_CONVEXIFYING)) {
       if (cs.sizeRowCuts ()) {
-	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,"Couenne: constraint row cuts\n");
+	jnlst_ -> Printf (J_ITERSUMMARY, J_CONVEXIFYING,"Couenne: %d constraint row cuts\n",
+			  cs.sizeRowCuts ());
 	for (int i=0; i<cs.sizeRowCuts (); i++) 
 	  cs.rowCutPtr (i) -> print ();
       }
       if (cs.sizeColCuts ()) {
-	jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,"Couenne: constraint col cuts\n");
+	jnlst_ -> Printf (J_ITERSUMMARY, J_CONVEXIFYING,"Couenne: %d constraint col cuts\n",
+			  cs.sizeColCuts ());
 	for (int i=0; i<cs.sizeColCuts (); i++) 
 	  cs.colCutPtr (i) -> print ();
       }
@@ -295,7 +297,9 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     // Bound tightening done /////////////////////////////
 
-    if ((problem_ -> doFBBT () || problem_ -> doOBBT () || problem_ -> doABT  ()) &&
+    if ((problem_ -> doFBBT () ||
+	 problem_ -> doOBBT () ||
+	 problem_ -> doABT  ()) &&
 	(jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING))) {
 
       jnlst_ -> Printf(J_VECTOR, J_CONVEXIFYING,"== after bt =============\n");
@@ -329,7 +333,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 	   (CoinDrand48 () <                  //  probability inversely proportional to the level)
 	    pow (2., (double) logAbtLev - (info.level + 1))))) {
 
-	jnlst_ -> Printf(J_DETAILED, J_CONVEXIFYING,"  performing ABT\n");
+	jnlst_ -> Printf(J_ITERSUMMARY, J_CONVEXIFYING,"  performing ABT\n");
 	if (! (problem_ -> aggressiveBT (nlp_, chg_bds, babInfo)))
 	  throw infeasible;
 
@@ -398,7 +402,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
       genColCuts (si, cs, nchanged, changed);
 
     if (firstcall_ && (cs.sizeRowCuts () >= 1))
-      jnlst_->Printf(J_SUMMARY, J_CONVEXIFYING,
+      jnlst_->Printf(J_ITERSUMMARY, J_CONVEXIFYING,
 		     "Couenne: %d initial row cuts\n", cs.sizeRowCuts ());
   }
 
@@ -408,7 +412,7 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
     if ((exception == infeasible) && (!firstcall_)) {
 
-      jnlst_ -> Printf (J_DETAILED, J_CONVEXIFYING,
+      jnlst_ -> Printf (J_ITERSUMMARY, J_CONVEXIFYING,
 			"Couenne: Infeasible node\n");
 
       OsiColCut *infeascut = new OsiColCut;
@@ -435,6 +439,12 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
   if (!firstcall_)
     problem_ -> domain () -> pop ();
 
+  if (firstcall_)
+    jnlst_ -> Printf (J_SUMMARY, J_CONVEXIFYING, 
+		      "Couenne: %d cuts (%d row, %d col) for linearization\n", 
+		      cs.sizeRowCuts () + cs.sizeColCuts (),
+		      cs.sizeRowCuts (),  cs.sizeColCuts ());
+
   if (firstcall_) {
 
     fictitiousBound (cs, problem_, true);
@@ -445,10 +455,10 @@ void CouenneCutGenerator::generateCuts (const OsiSolverInterface &si,
 
   septime_ += CoinCpuTime () - now;
 
-  if (jnlst_ -> ProduceOutput (J_VECTOR, J_CONVEXIFYING)) {
+  if (jnlst_ -> ProduceOutput (J_ITERSUMMARY, J_CONVEXIFYING)) {
 
     if (cs.sizeColCuts ()) {
-      jnlst_ -> Printf (J_VECTOR, J_CONVEXIFYING,"Couenne col cuts:\n");
+      jnlst_ -> Printf (J_ITERSUMMARY, J_CONVEXIFYING,"Couenne col cuts:\n");
       for (int i=0; i<cs.sizeColCuts (); i++) 
 	cs.colCutPtr (i) -> print ();
     }

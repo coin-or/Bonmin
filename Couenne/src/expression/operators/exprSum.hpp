@@ -68,7 +68,27 @@ class exprSum: public exprOp {
   virtual enum expr_type code () 
     {return COU_EXPRSUM;}
 
-  /// Implied bound processing
+  /** Implied bound.
+   *  An expression 
+   *
+   *  \f$w = a0 + \sum_{i\in I1} a_i x_i + \sum_{i\in I2} a_i x_i\f$ 
+   *
+   *  is given such that all \f$a_i\f$ are positive for \f$i \in I1\f$ and
+   *  negative for \f$i \in I2\f$. If the bounds on \f$w \in [l,b]\f$, implied
+   *  bounds on all \f$x_i, i\in I1 \cup I2\f$ are as follows:
+   *
+   *  \f$\forall i\in I1\f$
+   *    \f$x_i \ge (l - a0 - \sum_{j\in I1 | j\neq i} a_j u_j - \sum_{j\in I2}        a_j l_j) / a_i\f$
+   *    \f$x_i \le (u - a0 - \sum_{j\in I1 | j\neq i} a_j l_j - \sum_{j\in I2}        a_j u_j) / a_i\f$
+   *
+   *  \f$\forall i\in I2\f$
+   *    \f$x_i \ge (u - a0 - \sum_{j\in I1} a_j u_j       - \sum_{j\in I2 | j\neq i} a_j l_j) / a_i\f$
+   *    \f$x_i \le (l - a0 - \sum_{j\in I1} a_j l_j       - \sum_{j\in I2 | j\neq i} a_j u_j) / a_i\f$,
+   *
+   *  where \f$l_i\f$ and \f$u_i\f$ are lower and upper bound,
+   *  respectively, of \f$x_i\f$. We also have to check if some of
+   *  these bounds are infinite.
+   */
   virtual bool impliedBound (int, CouNumber *, CouNumber *, t_chg_bounds *);
 
   /// Checks for quadratic terms in the expression and returns an

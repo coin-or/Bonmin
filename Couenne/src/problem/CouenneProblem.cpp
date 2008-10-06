@@ -66,7 +66,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   readnl (asl);
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-    jnlst_ -> Printf (Ipopt::J_WARNING, J_PROBLEM,
+    jnlst_ -> Printf (Ipopt::J_SUMMARY, J_PROBLEM,
 		      "Couenne: reading time %.3fs\n", now);
 
   now = CoinCpuTime ();
@@ -108,7 +108,7 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   fillQuadIndices ();
 
   if ((now = (CoinCpuTime () - now)) > 10.)
-    jnlst_->Printf(Ipopt::J_WARNING, J_PROBLEM,
+    jnlst_->Printf(Ipopt::J_SUMMARY, J_PROBLEM,
 		   "Couenne: reformulation time %.3fs\n", now);
 
   // give a value to all auxiliary variables
@@ -167,6 +167,11 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
 
   //writeAMPL ("extended-aw.mod", true);
   //writeAMPL ("original.mod", false);
+
+  /*printf ("INITIAL BOUNDS:\n");
+  for (int i=0; i < nVars (); i++) 
+    printf ("%3d [%10e %10e]\n", i, Lb (i), Ub (i));
+    printf ("-----------\n");*/
 }
 
 
@@ -217,10 +222,8 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
   }
 
   if (p.numbering_) {
-    int i;
-    numbering_ = new int [i = nVars ()];
-    while (i--)
-      numbering_ [i] = p.numbering_ [i];
+    numbering_ = new int [nVars ()];
+    CoinCopyN (p.numbering_, nVars (), numbering_);
   }
 
   for (int i=0; i < p.nObjs (); i++) objectives_  . push_back (p.Obj (i) -> clone (&domain_));
@@ -228,19 +231,21 @@ CouenneProblem::CouenneProblem (const CouenneProblem &p):
 
   if (p.optimum_) {
     optimum_ = (CouNumber *) malloc (nVars () * sizeof (CouNumber));
-
-    for (int i = nVars (); i--;)
-      optimum_ [i] = p.optimum_ [i];
+    CoinCopyN (p.optimum_, nVars (), optimum_);
   }
 
   // clear all spurious variables pointers not referring to the variables_ vector
   realign ();
 
   if (p.integerRank_) {
-
     integerRank_ = new int [nVars ()];
     CoinCopyN (p.integerRank_, nVars (), integerRank_);
   }
+
+  /*printf ("INITIAL BOUNDS (copy):\n");
+  for (int i=0; i < nVars (); i++) 
+    printf ("%3d [%10e %10e]\n", i, Lb (i), Ub (i));
+    printf ("-----------\n");*/
 }
 
 

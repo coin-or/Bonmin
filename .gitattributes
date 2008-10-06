@@ -32,6 +32,7 @@ Couenne/src/branch/CouenneChooseStrong.cpp -text
 Couenne/src/branch/CouenneChooseStrong.hpp -text
 Couenne/src/branch/CouenneChooseVariable.cpp -text
 Couenne/src/branch/CouenneChooseVariable.hpp -text
+Couenne/src/branch/CouenneComplObject.hpp -text
 Couenne/src/branch/CouenneObject.cpp -text
 Couenne/src/branch/CouenneObject.hpp -text
 Couenne/src/branch/CouenneThreeWayBranchObj.cpp -text

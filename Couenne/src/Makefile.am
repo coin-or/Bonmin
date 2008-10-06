@@ -21,6 +21,7 @@ libCouenne_la_SOURCES = \
 	branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp \
 	branch/CouenneObject.cpp \
+	branch/CouenneComplObject.cpp \
 	branch/CouenneVarObject.cpp \
 	branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp \
@@ -133,18 +134,17 @@ libCouenne_la_SOURCES = \
 	bound_tightening/operators/impliedBounds-exprMul.cpp \
 	bound_tightening/operators/impliedBounds-exprQuad.cpp \
 	bound_tightening/operators/impliedBounds-exprPow.cpp \
+	disjunctive/CouenneDisjCuts.cpp \
+	disjunctive/generateDisjCuts.cpp \
+	disjunctive/disjCut.cpp \
+	disjunctive/getDisjunctions.cpp \
+	disjunctive/separateWithDisjunction.cpp \
+	disjunctive/singleDisjunctions.cpp \
+	disjunctive/dummyVecMatr.cpp \
+	disjunctive/OsiLinear2MatrVec.cpp \
+	disjunctive/OsiCuts2MatrVec.cpp \
 	util/drawCuts.cpp \
 	util/rootQ.cpp
-
-#disjunctive/CouenneDisjCuts.cpp \
-#disjunctive/generateDisjCuts.cpp \
-#disjunctive/disjCut.cpp \
-#disjunctive/getDisjunctions.cpp \
-#disjunctive/separateWithDisjunction.cpp \
-#disjunctive/singleDisjunctions.cpp \
-#disjunctive/dummyVecMatr.cpp \
-#disjunctive/OsiLinear2MatrVec.cpp \
-#disjunctive/OsiCuts2MatrVec.cpp
 
 COINLIBS = \
 	$(OSIOBJDIR)/src/libOsi.la \
@@ -222,6 +222,7 @@ include_HEADERS = \
 	branch/CouenneObject.hpp \
 	branch/CouenneVarObject.hpp \
 	branch/CouenneVTObject.hpp \
+	branch/CouenneComplObject.hpp \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \

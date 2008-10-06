@@ -60,7 +60,7 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
   case 0: way = firstBranch_;                break;
   case 1: way = (firstBranch_ == 0) ? 1 : 0; break;
   case 2: way = (firstBranch_ == 2) ? 1 : 2; break;
-  default: jnlst_->Printf(J_WARNING, J_BRANCHING, 
+  default: jnlst_->Printf(J_STRONGWARNING, J_BRANCHING, 
 			  "Warning, branchIndex_ has a strange value (%d)\n", branchIndex_);
   }
 
@@ -82,7 +82,7 @@ double CouenneThreeWayBranchObj::branch (OsiSolverInterface * solver) {
   case  0: solver -> setColLower (index, integer ? ceil  (lcrop_) : lcrop_);
            solver -> setColUpper (index, integer ? floor (rcrop_) : rcrop_); break; // central
   case  1: solver -> setColLower (index, integer ? ceil  (rcrop_) : rcrop_); break; // right
-  default: jnlst_->Printf(J_WARNING, J_BRANCHING, "Couenne: branching on nonsense way %d\n", way);
+  default: jnlst_->Printf(J_STRONGWARNING, J_BRANCHING, "Couenne: branching on nonsense way %d\n", way);
   }
 
   // TODO: apply bound tightening 

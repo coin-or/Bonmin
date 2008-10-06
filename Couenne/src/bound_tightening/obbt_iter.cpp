@@ -216,13 +216,13 @@ obbt_iter (CouenneSolverInterface *csi,
 	if (sense == 1) {
 	  if ((Lb (index) < bestSol () [index]) && 
 	      (bound       > COUENNE_EPS + bestSol () [index]))
-	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
+	    Jnlst()->Printf(J_STRONGWARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: lb = %g, opt = %g, new lb = %g\n", 
 			    index, Lb (index), bestSol () [index], bound);
 	} else {
 	  if ((Ub (index) > bestSol () [index]) && 
 	      (bound       < -COUENNE_EPS + bestSol () [index]))
-	    Jnlst()->Printf(J_WARNING, J_BOUNDTIGHTENING,
+	    Jnlst()->Printf(J_STRONGWARNING, J_BOUNDTIGHTENING,
 			    "#### OBBT error on x%d: ub = %g, opt = %g, new ub = %g\n", 
 			    index, Ub (index), bestSol () [index], bound);
 	}
@@ -232,14 +232,14 @@ obbt_iter (CouenneSolverInterface *csi,
 
       if (sense==1)
 	if (csi -> getColLower () [index] < bound - COUENNE_EPS) {
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"l_%d: %g --> %g\n", 
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"l_%d: %g --> %g\n", 
 			  index, csi -> getColLower () [index], bound);
 	  csi -> setColLower (index, bound); 
 	  chg_bds      [index].setLowerBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
 	} else chg_bds [index].setLowerBits(t_chg_bounds::EXACT);
       else
 	if (csi -> getColUpper () [index] > bound + COUENNE_EPS) {
-	  Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,"u_%d: %g --> %g\n", 
+	  Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,"u_%d: %g --> %g\n", 
 			  index, csi -> getColUpper () [index], bound);
 	  csi -> setColUpper (index, bound); 
 	  chg_bds      [index].setUpperBits(t_chg_bounds::CHANGED | t_chg_bounds::EXACT);
@@ -291,13 +291,13 @@ obbt_iter (CouenneSolverInterface *csi,
       // (first argument =NULL is pointer to solverInterface) as csi
       // is not our problem
 
-      Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+      Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 		      "  OBBT: x_%d: [%g, %g]\n", index, 
 		      csi -> getColLower () [index], 
 		      csi -> getColUpper () [index]);
 
       if (doFBBT_ && !(boundTightening (chg_bds, babInfo))) {
-	Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+	Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			"node is infeasible after post-OBBT tightening\n");
 	return -1; // tell caller this is infeasible
       }

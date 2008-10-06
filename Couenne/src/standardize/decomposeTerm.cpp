@@ -183,7 +183,6 @@ void CouenneProblem::decomposeTerm (expression *term,
       exprMul *mul = new exprMul (al, indices.size ());
       exprAux *aux = mul -> standardize (this);
       lmap.insert (aux -> Index (), coe);
-
     } break;
     }
 

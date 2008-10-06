@@ -194,6 +194,10 @@ class CouenneCutGenerator: public CglCutGenerator {
     st  = septime_;
   }
 
+  /// Get number of cuts so far
+  int getNumTotCuts () 
+  {return ntotalcuts_;}
+
   /// Allow to get and set the infeasNode_ flag (used only in generateCuts())
   bool &infeasNode () const
   {return infeasNode_;}
@@ -220,5 +224,7 @@ class CouenneCutGenerator: public CglCutGenerator {
   bool check_lp ()
   {return check_lp_;}
 };
+
+void sparse2dense (int ncols, t_chg_bounds *chg_bds, int *&changed, int &nchanged);
 
 #endif

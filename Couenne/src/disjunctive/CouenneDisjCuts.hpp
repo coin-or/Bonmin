@@ -66,6 +66,9 @@ class CouenneDisjCuts: public CglCutGenerator {
   /// Initial percentage of objects to use for generating cuts, in [0,1]
   double initDisjPercentage_;
 
+  /// Initial number of objects to use for generating cuts
+  int initDisjNumber_;
+
   /// Depth of the BB tree where start decreasing number of objects
   int depthLevelling_;
 
@@ -93,10 +96,10 @@ class CouenneDisjCuts: public CglCutGenerator {
 		   OsiChooseVariable *bcv = NULL,
 		   bool is_strong = false,
 		   JnlstPtr journalist = NULL,
-		   const Ipopt::SmartPtr<Ipopt::OptionsList> options = NULL) {}
+		   const Ipopt::SmartPtr<Ipopt::OptionsList> options = NULL);
 
   /// copy constructor
-  CouenneDisjCuts (const CouenneDisjCuts &){}
+  CouenneDisjCuts (const CouenneDisjCuts &);
 
   /// destructor
   ~CouenneDisjCuts () {}
@@ -112,10 +115,10 @@ class CouenneDisjCuts: public CglCutGenerator {
   /// the main CglCutGenerator
   void generateCuts (const OsiSolverInterface &, 
 		     OsiCuts &, 
-		     const CglTreeInfo = CglTreeInfo ()) const {}
+		     const CglTreeInfo = CglTreeInfo ()) const;
 
   /// Add list of options to be read from file
-  static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions) {}
+  static void registerOptions (Ipopt::SmartPtr <Bonmin::RegisteredOptions> roptions);
 
   /// Provide Journalist
   inline ConstJnlstPtr Jnlst() const 
@@ -125,58 +128,58 @@ class CouenneDisjCuts: public CglCutGenerator {
   int getDisjunctions (std::vector <std::pair <OsiCuts *, OsiCuts *> > &disjunctions, 
 		       OsiSolverInterface &si, 
 		       OsiCuts &cs, 
-		       const CglTreeInfo &info) const {return 0;}
+		       const CglTreeInfo &info) const;
 
   /// separate couenne cuts on both sides of single disjunction
   int separateWithDisjunction (OsiCuts *cuts,
 			       OsiSolverInterface &si, 
 			       OsiCuts &cs, 
-			       const CglTreeInfo &info) const {return 0;}
+			       const CglTreeInfo &info) const;
 
   /// generate one disjunctive cut from one CGLP
   int generateDisjCuts (std::vector <std::pair <OsiCuts *, OsiCuts *> > &disjs, 
-			OsiSolverInterface &si, 
-			OsiCuts &cs, 
-			const CglTreeInfo &info) const {return 0;}
+		       OsiSolverInterface &si, 
+		       OsiCuts &cs, 
+			const CglTreeInfo &info) const;
 
   /// check if (column!) cuts compatible with solver interface
-  int checkDisjSide (OsiSolverInterface &si, OsiCuts *cuts) const {return 0;}
+  int checkDisjSide (OsiSolverInterface &si, OsiCuts *cuts) const;
 
   /// compute smallest box containing both left and right boxes.
   int getBoxUnion (OsiSolverInterface &si, 
 		   OsiCuts *left, OsiCuts *right, 
-		   CoinPackedVector &lower, CoinPackedVector &upper) const {return 0;}
+		   CoinPackedVector &lower, CoinPackedVector &upper) const;
 
 protected:
 
   /// create single osicolcut disjunction
-  OsiCuts *getSingleDisjunction (OsiSolverInterface &si) const {return NULL;}
+  OsiCuts *getSingleDisjunction (OsiSolverInterface &si) const;
 
   /// utility to merge vectors into one
   void mergeBoxes (int dir,                        // direction (negative for "<", positive for ">")
 		   CoinPackedVector &left,         // input
 		   CoinPackedVector &right,        // input
-		   CoinPackedVector merged) const {} // output  
+		   CoinPackedVector merged) const; // output  
 
   /// our own applyColCuts
   void applyColCuts (OsiSolverInterface &si,
-		     OsiCuts *cuts) const {}
+		     OsiCuts *cuts) const;
 
   /// our own applyColCut, single cut
   void applyColCuts (OsiSolverInterface &si, 
-		     OsiColCut *cut) const {}
+		     OsiColCut *cut) const;
 
   // construct reduced, standard form matrix M from coefficient matrix of si
   void OsiSI2MatrVec (CoinPackedMatrix &M,
 		      CoinPackedVector &r,
-		      OsiSolverInterface &si) const {}
+		      OsiSolverInterface &si) const;
 
   /// add CGLP columns to solver interface; return number of columns
   /// added (for later removal)
   int OsiCuts2MatrVec (OsiSolverInterface *cglp,
 		       OsiCuts *cuts,
 		       int displRow,
-		       int displRhs) const {return 0;}
+		       int displRhs) const;
 };
 
 

@@ -154,7 +154,7 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
                                           //  probability inversely proportional to the level)
        (CoinDrand48 () < pow (2., (double) logObbtLev_ - (info.level + 1))))) {
 
-    jnlst_ -> Printf (J_VECTOR, J_BOUNDTIGHTENING, "----- OBBT\n");
+    jnlst_ -> Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING, "----- OBBT\n");
 
     // TODO: why check info.pass==0? Why not more than one pass? It
     // should be anyway checked that info.level be >= 0 as <0 means
@@ -201,7 +201,7 @@ int CouenneProblem::obbt (const CouenneCutGenerator *cg,
     delete csi;
 
     if (nImprov < 0) {
-      jnlst_->Printf(J_DETAILED, J_BOUNDTIGHTENING, "  Couenne: infeasible node after OBBT\n");
+      jnlst_->Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING, "  Couenne: infeasible node after OBBT\n");
       return -1;
     }
   }

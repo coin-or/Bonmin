@@ -189,8 +189,10 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 
   //#ifdef DEBUG
 
-  if (cg -> Jnlst () -> ProduceOutput (Ipopt::J_MATRIX, J_CONVEXIFYING)) {
-    if (warned_large_coeff)
+  if (cg -> Jnlst () -> ProduceOutput (Ipopt::J_DETAILED, J_CONVEXIFYING)) {
+
+    if (cg -> Jnlst () -> ProduceOutput (Ipopt::J_STRONGWARNING, J_CONVEXIFYING) &&
+	(warned_large_coeff))
       for (int jj=nrc; jj < cs.sizeRowCuts (); jj++) {
 
 	OsiRowCut        *cut = cs.rowCutPtr (jj);
@@ -219,8 +221,7 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
       }
 
     //  if (!(cg -> isFirst ())) 
-    if (1 ||
-	(nrc < cs.sizeRowCuts ()) || 
+    if ((nrc < cs.sizeRowCuts ()) || 
 	(ncc < cs.sizeColCuts ()))
       {
 	printf ("---------------- ConvCut:  "); 

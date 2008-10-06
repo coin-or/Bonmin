@@ -42,7 +42,7 @@ double CouenneVTObject::infeasibility (const OsiBranchingInformation *info, int 
 
   // debug output ////////////////////////////////////////////////////////////////
 
-  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+  if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
     printf ("VT infeas on ");
     reference_ -> print ();
     if (reference_ -> Image ()) { // if no list, print image

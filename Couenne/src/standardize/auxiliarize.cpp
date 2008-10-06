@@ -64,7 +64,7 @@ void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
 
 	if (body -> Index () == (*orig) -> Index ()) {
       
-	  delete body;//(*i) -> Body ();
+	  delete body;
 	  (*i) -> Body (new exprClone (subst));
 	}
       } else body -> replace (*orig, subst);
@@ -84,7 +84,7 @@ void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
 
 	if (body -> Index () == (*orig) -> Index ()) {
       
-	  delete body;//(*i) -> Body ();
+	  delete body;
 	  (*i) -> Body (new exprClone (subst));
 	}
       } else body -> replace (*orig, subst);
@@ -121,8 +121,9 @@ void CouenneProblem::auxiliarize (exprVar *aux, exprVar *subst) {
       //printf ("\n");
     }
 
-  // replace it with new auxiliary
+  //  delete *orig;
 
+  // replace it with new auxiliary
   if (same_var)
     *orig = aux;
 }

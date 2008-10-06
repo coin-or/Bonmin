@@ -43,7 +43,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 				   t_chg_bounds *chg_bds, 
 				   Bonmin::BabInfo * babInfo) const {
 
-  Jnlst()->Printf (J_DETAILED, J_BOUNDTIGHTENING, "Aggressive FBBT\n");
+  Jnlst()->Printf (J_ITERSUMMARY, J_BOUNDTIGHTENING, "Aggressive FBBT\n");
 
   Bonmin::CouenneInfo* couInfo =
     dynamic_cast<Bonmin::CouenneInfo*>(babInfo);
@@ -101,7 +101,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
     CoinCopyN (X (), nOrigVars_, Y);
 
     if (getIntegerCandidate (nlp -> getColSolution (), Y, lower, upper) < 0) {
-      jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "TODO: find NLP point in ABT failed\n");
+      jnlst_ -> Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING, "TODO: find NLP point in ABT failed\n");
       delete [] Y;
       delete [] lower;
       delete [] upper;
@@ -127,13 +127,13 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
       dist = 0.;
     }
     else {
-      jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "TODO: NLP solve in ABT failed\n");
+      jnlst_ -> Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING, "TODO: NLP solve in ABT failed\n");
       return true;
     }
   }
 
   if (dist>1e10) {
-    jnlst_ -> Printf(J_VECTOR, J_BOUNDTIGHTENING, "TODO: Don't have point for ABT\n");
+    jnlst_ -> Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING, "TODO: Don't have point for ABT\n");
     return true;
   }
 
@@ -148,14 +148,14 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   // create a new, fictitious, bound bookkeeping structure
   t_chg_bounds *f_chg = new t_chg_bounds [ncols];
 
-  if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
+  if (Jnlst()->ProduceOutput(J_ITERSUMMARY, J_BOUNDTIGHTENING)) {
     //    CouNumber cutoff = getCutOff ();
     int       objind = Obj (0) -> Body  () -> Index ();
     for (int i=0; i<nOrigVars_; i++)
-      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
+      Jnlst()->Printf(J_MOREVECTOR, J_BOUNDTIGHTENING,
 		      "   %2d %+20g [%+20g %+20g]\n",
 		      i, X [i], Lb (i), Ub (i));
-    Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
+    Jnlst()->Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING,
 		    "-------------\nAggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
 		    Lb (objind), getCutOff (), ncols);
   }
@@ -199,7 +199,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
 	// if (index == objind) continue; // don't do it on objective function
 
-	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
+	Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			"------------- tighten left x%d\n", index);
 
 	// tighten on left
@@ -211,7 +211,7 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
 
 	second = 0;
 
-	Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
+	Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
 			"------------- tighten right x%d\n", index);
 
 	// tighten on right
@@ -230,24 +230,26 @@ bool CouenneProblem::aggressiveBT (Bonmin::OsiTMINLPInterface *nlp,
   CoinCopyN (olb, ncols, Lb ());
   CoinCopyN (oub, ncols, Ub ());
 
-  if (Jnlst()->ProduceOutput(J_VECTOR, J_BOUNDTIGHTENING)) {
-    Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,"------------------\n");
-    for (int i=0; i<ncols; i++)
-      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
-		      "   %2d %+20g %+20g  | %+20g\n", i, Lb (i), Ub (i), X [i]);
-    if (!retval) Jnlst()->Printf(J_VECTOR, J_BOUNDTIGHTENING,
-				 "Couenne infeasible node from aggressive BT\n");
-  }
+  if (Jnlst()->ProduceOutput(J_ITERSUMMARY, J_BOUNDTIGHTENING)) {
+    Jnlst()->Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING,"------------------\n");
 
-  if (Jnlst()->ProduceOutput(J_DETAILED, J_BOUNDTIGHTENING)) {
+    if (!retval) Jnlst()->Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING,
+				 "Couenne infeasible node from aggressive BT\n");
+
     int       objind = Obj (0) -> Body  () -> Index ();
-    Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+
+    Jnlst()->Printf(J_ITERSUMMARY, J_BOUNDTIGHTENING,
 		    "-------------\ndone Aggressive BT. Current bound = %g, cutoff = %g, %d vars\n", 
 		    Lb (objind), getCutOff (), ncols);
+
     for (int i=0; i<nOrigVars_; i++)
-      Jnlst()->Printf(J_MATRIX, J_BOUNDTIGHTENING,
-		      "   %2d %+20g %+20g  | %+20g\n",
+      Jnlst()->Printf(J_DETAILED, J_BOUNDTIGHTENING,
+		      "   x%02d [%+20g %+20g]  | %+20g\n",
 		      i, Lb (i), Ub (i), X [i]);
+
+    for (int i=nOrigVars_; i<ncols; i++)
+      Jnlst()->Printf(J_MOREDETAILED, J_BOUNDTIGHTENING,
+		      "   w%02d [%+20g %+20g]  | %+20g\n", i, Lb (i), Ub (i), X [i]);
   }
 
   delete [] X;

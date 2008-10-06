@@ -100,24 +100,29 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
     int rank = 1;
 
-    if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+    if (jnlst_ -> ProduceOutput (Ipopt::J_VECTOR, J_NLPHEURISTIC)) {
       printf ("=       ===========================================\n");
       printf ("= BEGIN ===========================================\n");
       printf ("=       ===========================================\n");
       for (int i=0; i<nOrigVars_; i++)
+
 	if (variables_ [i] -> Multiplicity () > 0)
-	  printf ("#### %4d: %d %c %2d frac %20g  [%20g,%20g]\n", 
-		  i, fixed [i], 
-		  variables_ [i] -> isInteger () ? 'I' : ' ',
-		  integerRank_ ? integerRank_ [i] : -1,
-		  xFrac [i], Lb (i), Ub (i));
-      printf ("---\n");
+	  jnlst_ -> Printf (Ipopt::J_VECTOR, J_NLPHEURISTIC,
+			    "#### %4d: %d %c %2d frac %20g  [%20g,%20g]\n", 
+			    i, fixed [i], 
+			    variables_ [i] -> isInteger () ? 'I' : ' ',
+			    integerRank_ ? integerRank_ [i] : -1,
+			    xFrac [i], Lb (i), Ub (i));
+
+      jnlst_ -> Printf (Ipopt::J_VECTOR, J_NLPHEURISTIC, "---\n");
+
       for (int i=nOrigVars_; i<nVars (); i++)
 	if (variables_ [i] -> Multiplicity () > 0)
-	  printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
-		  i, variables_ [i] -> isInteger () ? 'I' : ' ',
-		  //(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
-		  X (i), Lb (i), Ub (i));
+	  jnlst_ -> Printf (Ipopt::J_MOREVECTOR, J_NLPHEURISTIC,
+			    "#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
+			    i, variables_ [i] -> isInteger () ? 'I' : ' ',
+			    //(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
+			    X (i), Lb (i), Ub (i));
       printf ("===================================================\n");
       printf ("===================================================\n");
       printf ("===================================================\n");
@@ -146,23 +151,29 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	// translate current NLP point+bounds into higher-dimensional space
 	initAuxs ();
 
-	if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+	if (jnlst_ -> ProduceOutput (Ipopt::J_VECTOR, J_NLPHEURISTIC)) {
 	  printf ("= RANK LEVEL = %d [%d] ==================================\n", rank, *rNum);
 	  for (int i=0; i<nOrigVars_; i++)
 	    if (Var (i) -> Multiplicity () > 0) // alive variable
-	      printf ("#### %4d: %d %c %2d frac %20g -> int %20g [%20g,%20g]\n", 
-		      i, fixed [i], 
-		      variables_ [i] -> isInteger () ? 'I' : ' ',
-		      integerRank_ ? integerRank_ [i] : -1,
-		      xFrac [i], xInt [i], Lb (i), Ub (i));
-	  printf ("--------------------\n");
+	      jnlst_ -> Printf (Ipopt::J_VECTOR, J_NLPHEURISTIC,
+				"#### %4d: %d %c %2d frac %20g -> int %20g [%20g,%20g]\n", 
+				i, fixed [i], 
+				variables_ [i] -> isInteger () ? 'I' : ' ',
+				integerRank_ ? integerRank_ [i] : -1,
+				xFrac [i], xInt [i], Lb (i), Ub (i));
+
+	  jnlst_ -> Printf (Ipopt::J_MOREVECTOR, J_NLPHEURISTIC, "--------------------\n");
+
 	  for (int i=nOrigVars_; i<nVars (); i++)
 	    if (Var (i) -> Multiplicity () > 0) // alive variable
-	      printf ("#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
-		      i, variables_ [i] -> isInteger () ? 'I' : ' ',
-		      //(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
-		      X (i), Lb (i), Ub (i));
-	  printf ("=================================================\n");
+	      jnlst_ -> Printf (Ipopt::J_MOREVECTOR, J_NLPHEURISTIC,
+				"#### %4d:   %c    frac %20g   [%20g,%20g]\n", 
+				i, variables_ [i] -> isInteger () ? 'I' : ' ',
+				//(integerRank_ && integerRank_ [i]) ? 'F' : ' ',
+				X (i), Lb (i), Ub (i));
+
+	  jnlst_ -> Printf (Ipopt::J_VECTOR, J_NLPHEURISTIC,
+			    "=================================================\n");
 	}
 
 	//CoinCopyN (xFrac, nOrigVars_, xInt);// TODO: re-copy first nOrigVars_ variables into xInt?
@@ -201,7 +212,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	      int result = testIntFix (i, xFrac [i], fixed, xInt,
 				       dualL, dualR, olb, oub, ntrials < maxtrials);
 
-	      jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
+	      jnlst_ -> Printf (J_DETAILED, J_NLPHEURISTIC, 
 				"testing %d [%g -> %g], res = %d\n", i, xFrac [i], xInt [i], result);
 
 	      if (result > 0) {
@@ -226,7 +237,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	    assert (index < nOrigVars_);
 
-	    jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
+	    jnlst_ -> Printf (J_DETAILED, J_NLPHEURISTIC, 
 			      "none fixed, fix %d from %g [%g,%g] [L=%g, R=%g]", 
 			      index, xFrac [index], Lb (index), Ub (index), 
 			      dualL [index], dualR [index]);
@@ -237,7 +248,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 	       ((CoinDrand48 () > xFrac [index] - floor (xFrac [index])) ? 
 		floor (xFrac [index]) : ceil (xFrac [index])));
 
-	    jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, " to %g\n", xInt [index]);
+	    jnlst_ -> Printf (J_DETAILED, J_NLPHEURISTIC, " to %g\n", xInt [index]);
 
 	    fixed [index] = FIXED;
 
@@ -246,7 +257,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
 	  ntrials++;
 
-	  if (jnlst_ -> ProduceOutput (Ipopt::J_MOREVECTOR, J_PROBLEM)) {
+	  if (jnlst_ -> ProduceOutput (Ipopt::J_VECTOR, J_NLPHEURISTIC)) {
 	    printf ("--- remaining = %d --------------------------- \n", remaining);
 	    for (int i=0; i<nOrigVars_; i++)
 	      if (variables_ [i] -> Multiplicity () > 0)
@@ -305,17 +316,16 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  if (jnlst_->ProduceOutput(Ipopt::J_MOREVECTOR, J_PROBLEM)) {
-    if (retval >= 0) {
-      printf ("- retval %d ----------------------------------------------------------------\n", 
-	      retval);
-      for (int i=0; i<nOrigVars_; i++)
-	if (variables_ [i] -> Multiplicity () > 0)
-	  printf ("#### %4d: %d %c frac %20g -> int %20g [%20g,%20g]\n", 
-		  i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
-		  xFrac [i], xInt [i], lb [i], ub [i]);
-    } else printf ("no good point was found\n");
-  }
+  if ((retval >= 0) && 
+      (jnlst_->ProduceOutput (Ipopt::J_VECTOR, J_NLPHEURISTIC))) {
+    printf ("- retval %d ----------------------------------------------------------------\n", 
+	    retval);
+    for (int i=0; i<nOrigVars_; i++)
+      if (variables_ [i] -> Multiplicity () > 0)
+	printf ("#### %4d: %d %c frac %20g -> int %20g [%20g,%20g]\n", 
+		i, fixed [i], variables_ [i] -> isInteger () ? 'I' : ' ',
+		xFrac [i], xInt [i], lb [i], ub [i]);
+  } //else printf ("no good point was found\n");
 
   delete [] fixed;
 
@@ -324,7 +334,7 @@ int CouenneProblem::getIntegerCandidate (const double *xFrac, double *xInt,
 
   domain_.pop ();
 
-  jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, "Done with GetIntegerCandidate\n");
+  jnlst_ -> Printf (J_DETAILED, J_NLPHEURISTIC, "Done with GetIntegerCandidate\n");
 
   return retval;
 }

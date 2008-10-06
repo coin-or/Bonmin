@@ -51,7 +51,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   //////////////////////////////////////////////
 
   if (//(retval > CoinMin (COUENNE_EPS, feas_tolerance_)) &&
-      (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING))) {
+      (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING))) {
     printf ("infeasVar x%d %-10g [", reference_ -> Index (), retval);
     reference_             -> print (); 
     if ((dependence.size () == 0) && (reference_ -> Image ())) { // if no list, print image
@@ -72,7 +72,7 @@ double CouenneVarObject::infeasibility (const OsiBranchingInformation *info, int
   if (pseudoMultType_ != PROJECTDIST)
     setEstimates (info, &retval, &brkPt);
 
-  if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
+  if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
     printf("index = %d up = %e down = %e bounds [%e,%e] brpt = %e\n", 
 	   index, upEstimate_, downEstimate_, 
 	   info -> lower_ [index],

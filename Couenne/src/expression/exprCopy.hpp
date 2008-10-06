@@ -46,8 +46,10 @@ class exprCopy: public expression {
   /// Destructor -- CAUTION: this is the only destructive destructor,
   /// exprClone and exprStore do not destroy anything
   virtual ~exprCopy () {
-    if (copy_)
+    if (copy_) {
       delete copy_;
+      copy_ = NULL;
+    }
   }
 
   /// Cloning method
@@ -61,7 +63,7 @@ class exprCopy: public expression {
   {return copy_ -> Original ();}
 
   /// return pointer to corresponding expression (for auxiliary variables only)
-  virtual inline expression *Image () const
+  inline expression *Image () const
   {return copy_ -> Image ();}
 
   /// Get variable index in problem
@@ -91,8 +93,8 @@ class exprCopy: public expression {
   /// I/O
   virtual void print (std::ostream &out = std::cout, 
 		      bool descend      = false) const
-  {copy_ -> Original () -> print (out, descend);}
-  //{out << "["; copy_ -> print (out, descend); out << "]"; } // Must go
+  //{copy_ -> Original () -> print (out, descend);}
+  {out << "["; copy_ -> print (out, descend); out << "]"; } // Must go
 
   /// value
   virtual inline CouNumber Value () const 
@@ -211,6 +213,10 @@ class exprCopy: public expression {
   /// concave ("bad") side
   virtual bool isCuttable (CouenneProblem *problem, int index) const
   {return copy_ -> isCuttable (problem, index);}
+
+  /// is this just a pointer [true] or a true expression? 
+  virtual bool isaCopy () 
+  {return true;}
 };
 
 #endif

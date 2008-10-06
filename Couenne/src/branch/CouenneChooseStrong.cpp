@@ -86,8 +86,10 @@ namespace Bonmin {
        info -> lower_, 
        info -> upper_); // have to alloc+copy
 
+    jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, 
+		      "----------------- (strong) setup list\n");
+
     if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
-      printf ("----------------- (strong) setup list\n");
       for (int i=0; i<problem_ -> domain () -> current () -> Dimension (); i++)
 	printf ("%4d %20.4g [%20.4g %20.4g]\n", i,
 		info -> solution_ [i], info -> lower_ [i], info -> upper_ [i]);
@@ -96,7 +98,7 @@ namespace Bonmin {
     // call Bonmin's setuplist
     int retval = BonChooseVariable::setupList (info, initialize);
 
-    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, 
+    jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, 
 		      "----------------- (strong) setup list done - %d infeasibilities\n", retval);
 
     problem_ -> domain () -> pop ();

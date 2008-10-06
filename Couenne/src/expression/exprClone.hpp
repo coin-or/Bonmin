@@ -37,16 +37,19 @@ class exprClone: public exprCopy {
 
   /// Destructor
   virtual ~exprClone () {
-    //if (copy_ != Original ())
+    //if (copy_ && copy_ -> isaCopy())
+    //delete copy_;
+
+    //if (copy_ && (copy_ != Original ()))
     //delete copy_;
     copy_ = NULL;
   }
 
   /// I/O
-  //void print (std::ostream &out = std::cout, 
-  //bool descend      = false) const
-    //{copy_ -> Original () -> print (out, descend);}
-  //{out << "{"; copy_ -> print (out, descend); out << "}"; } // Must go
+  void print (std::ostream &out = std::cout, 
+	      bool descend      = false) const
+  //{copy_ -> Original () -> print (out, descend);}
+  {out << "{"; copy_ -> print (out, descend); out << "}"; } // Must go
 
   /// value
   inline CouNumber Value () const 

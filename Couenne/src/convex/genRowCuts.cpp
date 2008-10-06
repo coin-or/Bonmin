@@ -69,9 +69,9 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
 
       // TODO: check if list contains all and only aux's to cut
 
-      /*expression * image = problem_ -> Aux (i) -> Image ();
-      
-      if ((image -> dependsOn (changed, nchanged)) && 
+      exprVar *var = problem_ -> Var (problem_ -> evalOrder (i));
+
+      /*if ((image -> dependsOn (changed, nchanged)) && 
 	  (image -> Linearity () > LINEAR)) {
 	printf ("         ");
 	problem_ -> Aux (i) -> print ();
@@ -82,21 +82,21 @@ void CouenneCutGenerator::genRowCuts (const OsiSolverInterface &si,
       */
       // cut only if:
 
-      /*if (   (image -> Linearity () > LINEAR)    // 1) expression is non linear
-	&& (image -> dependsOn (changed, nchanged) // 2) it depends on changed variables
-	|| have_NLP
-	|| info.pass > 0)) {
-      */
+      if ((var -> Type () != AUX) ||
+	  (var -> Multiplicity () <= 0) &&
+	  (var -> Image () -> Linearity () <= LINEAR))
+	continue;
 
       if (CoinCpuTime () > problem_ -> getMaxCpuTime ())
 	break;
 
-      exprVar *var = problem_ -> Var (problem_ -> evalOrder (i));
+      if ((var -> Image () -> Linearity () > LINEAR) &&       // 1) expression is non linear
+	  (var -> Image () -> dependsOn (changed, nchanged))) // 2) it depends on changed variables
+	    //|| have_NLP
+	    //|| (info.pass > 0)
 
-      if ((var -> Type () == AUX) &&
-	  (var -> Multiplicity () > 0) &&
-	  (var -> Image () -> Linearity () > LINEAR))
 	var -> generateCuts (si, cs, this, chg);
     }
   }
 }
+

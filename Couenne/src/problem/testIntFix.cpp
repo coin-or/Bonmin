@@ -97,14 +97,14 @@ int CouenneProblem::testIntFix (int index,
 
     if (!feasRight) {
 
-      jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
+      jnlst_ -> Printf (J_MOREDETAILED, J_PROBLEM, 
 			"test on %d -> Infeasible. ", index);
       retval = -1; // case 2
 
     } else {
 
       // ceil is feasible, floor is not.
-      jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
+      jnlst_ -> Printf (J_MOREDETAILED, J_PROBLEM, 
 			"test on %d -> Right feasible, fix to %g. ", index, ceil (xFrac));
 
       fixed [index] = FIXED;
@@ -126,7 +126,7 @@ int CouenneProblem::testIntFix (int index,
   else if (!feasRight) {
 
     // floor is feasible, ceil is not.
-    jnlst_ -> Printf (J_MOREVECTOR, J_PROBLEM, 
+    jnlst_ -> Printf (J_MOREDETAILED, J_PROBLEM, 
 		      "test on %d -> Left feasible, fix to %g. ", index, floor (xFrac));
 
     fixed [index] = FIXED;

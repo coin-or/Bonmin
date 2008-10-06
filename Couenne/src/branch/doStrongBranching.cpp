@@ -58,7 +58,8 @@ namespace Bonmin {
 					      int numberToDo, int returnCriterion)
   {
 
-    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "\n-\n------- CCS: trying %d objects:\n", numberToDo);
+    jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, 
+		      "\n-\n------- CCS: trying %d objects:\n", numberToDo);
 
     int numberColumns = solver -> getNumCols ();
 
@@ -244,7 +245,7 @@ namespace Bonmin {
 	status1 = 0;
       }
 
-      jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "-------\n");
+      jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, "-------\n");
 
       if (cb) cb -> setSimulate (false);
 
@@ -350,7 +351,7 @@ namespace Bonmin {
 
     delete [] lpSol;
 
-    jnlst_ -> Printf (J_DETAILED, J_BRANCHING, "----------------------done\n\n\n");
+    jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, "----------------------done\n\n\n");
 
     if (iDo < numberToDo) iDo++; // exited due to infeasibility
     assert (iDo <= (int) results_.size());

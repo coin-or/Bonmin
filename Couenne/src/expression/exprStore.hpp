@@ -42,9 +42,9 @@ class exprStore: public exprCopy {
   {copy_ = NULL;}
 
   /// I/O -- Must go
-  //virtual void print (std::ostream &out = std::cout, 
-  //bool descend      = false) const
-  //{out << "<"; copy_ -> print (out, descend); out << ">"; }
+  virtual void print (std::ostream &out = std::cout, 
+		      bool descend      = false) const
+  {out << "<"; copy_ -> print (out, descend); out << ">"; }
 
   /// Cloning method
   virtual inline expression *clone (Domain *d = NULL) const

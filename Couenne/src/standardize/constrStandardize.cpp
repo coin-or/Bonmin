@@ -84,7 +84,7 @@ exprAux *CouenneConstraint::standardize (CouenneProblem *p) {
 	// replace ALL occurrences of original variable (with index
 	// wind) with newly created auxiliary
 	p -> auxiliarize (w);
-      } 
+      } else delete w; // check!
 
 #ifdef DEBUG
       else {

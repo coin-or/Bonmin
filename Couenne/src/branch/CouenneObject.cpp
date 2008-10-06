@@ -137,7 +137,7 @@ OsiBranchingObject *CouenneObject::createBranch (OsiSolverInterface *si,
   // the purpose, and save the output parameter into the branching
   // point that should be used later in createBranch.
 
-  if (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING)) {
+  if (jnlst_ -> ProduceOutput (J_ITERSUMMARY, J_BRANCHING)) {
     printf ("CouObj::createBranch on ");
     reference_ -> print (); printf ("\n");
   }
@@ -350,7 +350,7 @@ double CouenneObject::checkInfeasibility (const OsiBranchingInformation *info) c
     retval = 0.;
 
   if (//(retval > 0.) &&
-      (jnlst_ -> ProduceOutput (J_MOREMATRIX, J_BRANCHING))) {
+      (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING))) {
 
     printf ("  infeas %g: ", retval); 
     reference_             -> print (); 

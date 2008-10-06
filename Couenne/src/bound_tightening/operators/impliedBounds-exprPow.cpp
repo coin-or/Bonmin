@@ -78,16 +78,22 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
       // |x| <= b^(1/k), where b is wl or wu depending on k negative
       // or positive, respectively
 
-      if (bound > COUENNE_EPS) {
+      //printf ("should be here... index=%d, vI=%d: ", index, wind);
+
+      if ((k>0) || (bound > COUENNE_EPS)) {
 
 	if (fabs (bound) < COUENNE_INFINITY) {
 	  resL = updateBound (-1, l + index, - pow (bound, 1./k));
+	  //printf ("a: %e --> %e\t", u [index], pow (bound, 1./k));
 	  resU = updateBound (+1, u + index,   pow (bound, 1./k));
+	  //printf ("b: %e --> %e\t", u [index], pow (bound, 1./k));
 	} /*else {
 	  resL = updateBound (-1, l + index, - COUENNE_INFINITY);
 	  resU = updateBound (+1, u + index,   COUENNE_INFINITY);
 	  }*/
       }
+
+      //printf ("%e --> %e\t", u [index], pow (bound, 1./k));
 
       // invert check, if bounds on x do not contain 0 we may improve them
 
@@ -99,6 +105,8 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
 
       if      (xl > - xb + COUENNE_EPS) resL = updateBound (-1, l + index,   xb) || resL;
       else if (xu <   xb - COUENNE_EPS) resU = updateBound ( 1, u + index, - xb) || resU;
+
+      //printf ("%e --> %e [%d]\n", u [index], pow (bound, 1./k), resU);
 
     } else { // x^k, k=(1/h), h integer and even, or x^k, neither k nor 1/k integer
 
@@ -119,13 +127,10 @@ bool exprPow::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *
   if (resL) chg [index].setLower(t_chg_bounds::CHANGED);
   if (resU) chg [index].setUpper(t_chg_bounds::CHANGED);
 
-  bool xInt = arglist_ [0] -> isInteger ();
+  if (arglist_ [0] -> isInteger ()) {
 
-  if ((resL || resU) && xInt) {
-    int xi = arglist_ [0] -> Index ();
-    assert (xi >= 0);
-    l [xi] = ceil  (l [xi] - COUENNE_EPS);
-    u [xi] = floor (u [xi] + COUENNE_EPS);
+    if (resL) l [index] = ceil  (l [index] - COUENNE_EPS);
+    if (resU) u [index] = floor (u [index] + COUENNE_EPS);
   }
 
   return (resL || resU);

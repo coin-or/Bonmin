@@ -36,7 +36,9 @@ bool CouenneProblem::checkNLP (const double *solution, double &obj, bool recompu
     printf ("%4d %20g [%20g %20g]\n", 
     i, domain_.x (i), domain_.lb (i), domain_.ub (i));*/
 
-  CouNumber realobj = (*(Obj (0) -> Body ())) ();
+  expression *objBody = Obj (0) -> Body ();
+
+  CouNumber realobj = (*(objBody -> Image () ? objBody -> Image () : objBody)) ();
 
   bool retval = true;
 
@@ -44,9 +46,9 @@ bool CouenneProblem::checkNLP (const double *solution, double &obj, bool recompu
 
     // check if objective corresponds
 
-    if (fabs (realobj - obj) / (1 + fabs (realobj)) > feas_tolerance_) {
+    if (fabs (realobj - obj) / (1. + fabs (realobj)) > feas_tolerance_) {
 
-      Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
+      Jnlst()->Printf(Ipopt::J_ITERSUMMARY, J_PROBLEM,
 		      "checkNLP: false objective. %g != %g (diff. %g)\n", 
 		      realobj, obj, realobj - obj);
 
@@ -65,7 +67,7 @@ bool CouenneProblem::checkNLP (const double *solution, double &obj, bool recompu
       if ((val > domain_.ub (i) + feas_tolerance_) ||
 	  (val < domain_.lb (i) - feas_tolerance_)) {
 
-	Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
+	Jnlst()->Printf(Ipopt::J_ITERSUMMARY, J_PROBLEM,
 			"checkNLP: variable %d out of bounds: %.6f [%g,%g] (diff %g)\n", 
 			i, val, domain_.lb (i), domain_.ub (i),
 			CoinMax (fabs (val - domain_.lb (i)), 
@@ -78,7 +80,7 @@ bool CouenneProblem::checkNLP (const double *solution, double &obj, bool recompu
       if (variables_ [i] -> isInteger () &&
 	  (fabs (val - COUENNE_round (val)) > feas_tolerance_)) {
 
-	Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
+	Jnlst()->Printf(Ipopt::J_ITERSUMMARY, J_PROBLEM,
 			"checkNLP: integrality %d violated: %.6f [%g,%g]\n", 
 			i, val, domain_.lb (i), domain_.ub (i));
 
@@ -107,7 +109,7 @@ bool CouenneProblem::checkNLP (const double *solution, double &obj, bool recompu
 	  (fabs (delta = (*(variables_ [i])) () - 
 		 (*(variables_ [i] -> Image ())) ()) > feas_tolerance_)) {
 
-	Jnlst()->Printf(Ipopt::J_VECTOR, J_PROBLEM,
+	Jnlst()->Printf(Ipopt::J_ITERSUMMARY, J_PROBLEM,
 			"checkNLP: auxiliarized %d violated (%g)\n", i, delta);
 
 	throw infeasible;
@@ -125,13 +127,15 @@ bool CouenneProblem::checkNLP (const double *solution, double &obj, bool recompu
 	lhs  = (*(c -> Lb   ())) (),
 	rhs  = (*(c -> Ub   ())) ();
 
-      if ((body > rhs + feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs)))) || 
-	  (body < lhs - feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs))))) {
+      if ((rhs < COUENNE_INFINITY) &&
+	   (body > rhs + feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (rhs)))) || 
+	  (lhs > -COUENNE_INFINITY) &&
+	  (body < lhs - feas_tolerance_ * (1 + CoinMax (fabs (body), fabs (lhs))))) {
 
-	if (Jnlst()->ProduceOutput(Ipopt::J_VECTOR, J_PROBLEM)) {
+	if (Jnlst()->ProduceOutput(Ipopt::J_ITERSUMMARY, J_PROBLEM)) {
 
 	  Jnlst()->Printf
-	    (Ipopt::J_WARNING, J_PROBLEM,
+	    (Ipopt::J_ITERSUMMARY, J_PROBLEM,
 	     "checkNLP: constraint %d violated (lhs=%+e body=%+e rhs=%+e, violation %g): ",
 	     i, lhs, body, rhs, CoinMax (lhs-body, body-rhs));
 
