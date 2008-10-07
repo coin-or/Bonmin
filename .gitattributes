@@ -96,6 +96,7 @@ Bonmin/src/CbcBonmin/BonDiver.cpp -text
 Bonmin/src/CbcBonmin/BonDiver.hpp -text
 Bonmin/src/CbcBonmin/BonGuessHeuristic.cpp -text
 Bonmin/src/CbcBonmin/BonGuessHeuristic.hpp -text
+Bonmin/src/CbcBonmin/bonmin_addlibs_cpp.txt.in -text
 Bonmin/src/Interfaces/Ampl/Makefile.in -text
 Bonmin/src/Interfaces/BonAuxInfos.cpp -text
 Bonmin/src/Interfaces/BonAuxInfos.hpp -text
