@@ -430,7 +430,6 @@ namespace Bonmin
     try {
     //Get the time and start.
     model_.initialSolve();
-    model_.solver()->resolve();
 
     // for Couenne
     if (usingCouenne_)
