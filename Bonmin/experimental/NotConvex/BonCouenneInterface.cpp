@@ -359,10 +359,11 @@ CouenneInterface::extractLinearRelaxation
    //si.writeLp ("toto");
    app_ -> enableWarmStart();
 
-   //   if (problem () -> x_sol ()) {
-   setColSolution (problem () -> x_sol     ());
-   setRowPrice    (problem () -> duals_sol ());
-     //   }
+   // restored check. With "TOO FEW DEGREES OF FREEDOM" exception, x_sol() is null
+   if (problem () -> x_sol ()) {
+     setColSolution (problem () -> x_sol     ());
+     setRowPrice    (problem () -> duals_sol ());
+   }
 }
 
 
