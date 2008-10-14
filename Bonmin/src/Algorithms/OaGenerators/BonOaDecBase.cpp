@@ -592,7 +592,7 @@ OaDecompositionBase::solverManip::installCuts(const OsiCuts& cs, int numberCuts)
   CoinWarmStartBasis * basis
   = dynamic_cast<CoinWarmStartBasis*>(si_->getWarmStart()) ;
   assert(basis != NULL); // make sure not volume
-  basis->resize(numrows_ + numberCuts,numcols_ + 1) ;
+  basis->resize(numrows_ + numberCuts,numcols_) ;
   for (int i = 0 ; i < numberCuts ; i++) {
     basis->setArtifStatus(numrows_ + i,
         CoinWarmStartBasis::basic) ;
