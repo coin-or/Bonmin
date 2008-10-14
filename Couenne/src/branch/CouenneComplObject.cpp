@@ -8,41 +8,45 @@
  */
 
 #include "CouenneComplObject.hpp"
-
-
-/// empty constructor (for unused objects)
-CouenneComplObject::CouenneComplObject () {
-
-}
+#include "CouenneComplBranchingObject.hpp"
 
 
 /// Constructor with information for branching point selection strategy
 CouenneComplObject::CouenneComplObject (CouenneProblem *p, 
 					exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst):
-  CouenneObject (p,  ref, base, jnlst) {
-
+  CouenneObject (p, ref, base, jnlst) {
+  jnlst -> Printf (J_DETAILED, J_PROBLEM, "[created Complementarity constraint object]\n");
 }
 
 
 /// Constructor with lesser information, used for infeasibility only
 CouenneComplObject::CouenneComplObject (exprVar *ref, Bonmin::BabSetupBase *base, JnlstPtr jnlst):
-  CouenneObject (ref, base, jnlst) {
-
-}
+  CouenneObject (ref, base, jnlst) {}
 
 
 /// Copy constructor
 CouenneComplObject::CouenneComplObject (const CouenneObject &src): 
-  CouenneObject (src) {
-
-}
+  CouenneObject (src) {}
     
 
 /// compute infeasibility of this variable, |w - f(x)| (where w is
 /// the auxiliary variable defined as w = f(x)
 double CouenneComplObject::infeasibility (const OsiBranchingInformation *info, int &way) const {
 
-  return 0.;
+  expression **arglist = reference_ -> Image () -> ArgList ();
+
+  int index0 = arglist [0] -> Index (),
+      index1 = arglist [1] -> Index ();
+
+  CouNumber 
+    x0 = info -> solution_ [index0],
+    x1 = info -> solution_ [index1];
+
+  // if x1 < x0, it is preferrable to branch with x1=0 instead of x0=0
+  // as this is closer to the point
+  way = (x1 < x0) ? 1 : 0;
+
+  return x0 * x1;
 }
 
 
@@ -50,19 +54,24 @@ double CouenneComplObject::infeasibility (const OsiBranchingInformation *info, i
 /// the auxiliary variable defined as w = f(x)
 double CouenneComplObject::checkInfeasibility (const OsiBranchingInformation * info) const {
 
-  return 0.;
-}
+  expression **arglist = reference_ -> Image () -> ArgList ();
 
+  int index0 = arglist [0] -> Index (),
+      index1 = arglist [1] -> Index ();
 
-/// fix (one of the) arguments of reference auxiliary variable 
-double CouenneComplObject::feasibleRegion (OsiSolverInterface*, const OsiBranchingInformation*) const {
-  return 0;
+  return info -> solution_ [index0] * 
+         info -> solution_ [index1];
 }
 
 
 /// create CouenneBranchingObject or CouenneThreeWayBranchObj based
 /// on this object
-OsiBranchingObject *CouenneComplObject::createBranch (OsiSolverInterface*, 
-						      const OsiBranchingInformation*, int) const {
-  return NULL;
+OsiBranchingObject *CouenneComplObject::createBranch (OsiSolverInterface *solver, 
+						      const OsiBranchingInformation *info, 
+						      int way) const {
+
+  return new CouenneComplBranchingObject (solver, this, jnlst_,
+					  reference_ -> ArgList () [0],
+					  reference_ -> ArgList () [1], 
+					  way, 0, doFBBT_, doConvCuts_);
 }

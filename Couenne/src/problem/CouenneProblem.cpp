@@ -101,6 +101,10 @@ CouenneProblem::CouenneProblem (const struct ASL *asl,
   // clear all spurious variables pointers not referring to the variables_ vector
   realign ();
 
+  // give a value to all auxiliary variables. Do it now to be able to
+  // recognize complementarity constraints in fillDependence()
+  initAuxs ();
+
   // fill dependence_ structure
   fillDependence (base);
 

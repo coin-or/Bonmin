@@ -60,6 +60,7 @@ CouenneDisjCuts::CouenneDisjCuts (const CouenneDisjCuts &src):
   isBranchingStrong_  (src.isBranchingStrong_),
   jnlst_              (src.jnlst_),
   initDisjPercentage_ (src.initDisjPercentage_),
+  initDisjNumber_     (src.initDisjNumber_),
   depthLevelling_     (src.depthLevelling_),
   depthStopSeparate_  (src.depthStopSeparate_),
   activeRows_         (src.activeRows_),

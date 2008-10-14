@@ -86,8 +86,9 @@ void CouenneDisjCuts::generateCuts (const OsiSolverInterface &si,
   //   11) add corresponding cut, possibly to CGLP as well?
   // }
 
-  int maxDisj = CoinMin ((int) (csi -> numberObjects () * initDisjPercentage_),
-			 (int) (initDisjNumber_ >= 0 ? initDisjNumber_ : 1e10));
+  int maxDisj = (initDisjNumber_ >= 0) ? 
+    CoinMin ((int) (csi -> numberObjects () * initDisjPercentage_), initDisjNumber_) :
+    (int) (csi -> numberObjects () * initDisjPercentage_);
 
   // number of disjunctions to consider (branching objects)
   numDisjunctions_ = (depthLevelling_ < 0 || info.level < depthLevelling_) ? 

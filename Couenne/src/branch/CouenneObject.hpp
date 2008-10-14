@@ -20,7 +20,6 @@
 
 #define AGGR_MUL 2
 #define THRES_ZERO_SYMM 0.8
-#define TOL 0.
 
 const CouNumber closeToBounds = .05;
 

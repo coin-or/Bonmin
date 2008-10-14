@@ -63,7 +63,14 @@ exprAux *exprPow::standardize (CouenneProblem *p, bool addAux) {
     // better (lower) convexification -- replace exprOp::standardize 
     exprOp::standardize (p);
 
-    return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this, p -> domain ()));
+    // if binary
+    if (arglist_ [0] -> isInteger () &&  // integer
+	(fabs (p -> Lb (arglist_ [0] -> Index ()))      < COUENNE_EPS) && // >= 0
+	(fabs (p -> Ub (arglist_ [0] -> Index ()) - 1.) < COUENNE_EPS))   // <= 1
+      return (addAux ? (p -> addAuxiliary (arglist_ [0])) :  // return same variable
+	      new exprAux (arglist_ [0], p -> domain ()));
+    else  // otherwise return normal power
+      return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this, p -> domain ()));
   }
 
   return (addAux ? (p -> addAuxiliary (ret)) : new exprAux (ret, p -> domain ()));

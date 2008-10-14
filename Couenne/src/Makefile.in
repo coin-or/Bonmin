@@ -75,9 +75,10 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libCouenne_la_LIBADD =
 am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
-	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
-	branch/CouenneComplObject.cpp branch/CouenneVarObject.cpp \
-	branch/CouenneChooseVariable.cpp \
+	branch/CouenneBranchingObject.cpp \
+	branch/CouenneComplBranchingObject.cpp \
+	branch/CouenneObject.cpp branch/CouenneComplObject.cpp \
+	branch/CouenneVarObject.cpp branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp branch/doStrongBranching.cpp \
 	branch/projections.cpp branch/infeasibility.cpp \
 	branch/infeasibilityVT.cpp branch/feasibleRegion.cpp \
@@ -174,8 +175,8 @@ am__libCouenne_la_SOURCES_DIST = branch/CouenneThreeWayBranchObj.cpp \
 @COIN_HAS_ASL_TRUE@am__objects_1 = readnl.lo nl2e.lo invmap.lo \
 @COIN_HAS_ASL_TRUE@	readASLfg.lo
 am_libCouenne_la_OBJECTS = CouenneThreeWayBranchObj.lo \
-	CouenneBranchingObject.lo CouenneObject.lo \
-	CouenneComplObject.lo CouenneVarObject.lo \
+	CouenneBranchingObject.lo CouenneComplBranchingObject.lo \
+	CouenneObject.lo CouenneComplObject.lo CouenneVarObject.lo \
 	CouenneChooseVariable.lo CouenneChooseStrong.lo \
 	doStrongBranching.lo projections.lo infeasibility.lo \
 	infeasibilityVT.lo feasibleRegion.lo branchExprAbs.lo \
@@ -425,9 +426,10 @@ lib_LTLIBRARIES = libCouenne.la
 
 # List all source files for this library, including headers
 libCouenne_la_SOURCES = branch/CouenneThreeWayBranchObj.cpp \
-	branch/CouenneBranchingObject.cpp branch/CouenneObject.cpp \
-	branch/CouenneComplObject.cpp branch/CouenneVarObject.cpp \
-	branch/CouenneChooseVariable.cpp \
+	branch/CouenneBranchingObject.cpp \
+	branch/CouenneComplBranchingObject.cpp \
+	branch/CouenneObject.cpp branch/CouenneComplObject.cpp \
+	branch/CouenneVarObject.cpp branch/CouenneChooseVariable.cpp \
 	branch/CouenneChooseStrong.cpp branch/doStrongBranching.cpp \
 	branch/projections.cpp branch/infeasibility.cpp \
 	branch/infeasibilityVT.cpp branch/feasibleRegion.cpp \
@@ -583,6 +585,7 @@ include_HEADERS = \
 	branch/CouenneComplObject.hpp \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
+	branch/CouenneComplBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
 	branch/CouenneChooseStrong.hpp \
 	branch/projections.hpp \
@@ -712,6 +715,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneBranchingObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseStrong.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneChooseVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneComplBranchingObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneComplObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneCutGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CouenneDisjCuts.Plo@am__quote@
@@ -875,6 +879,13 @@ CouenneBranchingObject.lo: branch/CouenneBranchingObject.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/CouenneBranchingObject.cpp' object='CouenneBranchingObject.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneBranchingObject.lo `test -f 'branch/CouenneBranchingObject.cpp' || echo '$(srcdir)/'`branch/CouenneBranchingObject.cpp
+
+CouenneComplBranchingObject.lo: branch/CouenneComplBranchingObject.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneComplBranchingObject.lo -MD -MP -MF "$(DEPDIR)/CouenneComplBranchingObject.Tpo" -c -o CouenneComplBranchingObject.lo `test -f 'branch/CouenneComplBranchingObject.cpp' || echo '$(srcdir)/'`branch/CouenneComplBranchingObject.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CouenneComplBranchingObject.Tpo" "$(DEPDIR)/CouenneComplBranchingObject.Plo"; else rm -f "$(DEPDIR)/CouenneComplBranchingObject.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='branch/CouenneComplBranchingObject.cpp' object='CouenneComplBranchingObject.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CouenneComplBranchingObject.lo `test -f 'branch/CouenneComplBranchingObject.cpp' || echo '$(srcdir)/'`branch/CouenneComplBranchingObject.cpp
 
 CouenneObject.lo: branch/CouenneObject.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CouenneObject.lo -MD -MP -MF "$(DEPDIR)/CouenneObject.Tpo" -c -o CouenneObject.lo `test -f 'branch/CouenneObject.cpp' || echo '$(srcdir)/'`branch/CouenneObject.cpp; \

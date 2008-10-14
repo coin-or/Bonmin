@@ -20,6 +20,7 @@
 #include "exprQuad.hpp"
 #include "lqelems.hpp"
 
+#define TOL 0.
 
 /// fix integer coordinates of current integer feasible solution
 double CouenneObject::feasibleRegion (OsiSolverInterface *solver, 

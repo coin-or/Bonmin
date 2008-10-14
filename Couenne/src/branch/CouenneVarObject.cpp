@@ -240,6 +240,8 @@ CouNumber CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation 
 }
 
 
+#define TOL 0.
+
 /// fix nonlinear coordinates of current integer-nonlinear feasible solution
 double CouenneVarObject::feasibleRegion (OsiSolverInterface *solver, 
 					 const OsiBranchingInformation *info) const {

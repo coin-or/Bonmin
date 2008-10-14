@@ -33,8 +33,17 @@ void CouenneProblem::fillDependence (Bonmin::BabSetupBase *base) {
     if (((*i) -> Type () == AUX)                           // consider aux's only
 	&& ((*i) -> Image () -> Linearity () > LINEAR)) {  // and nonlinear
 
+      CouenneObject *infeasObj = (*i) -> properObject (this, base, jnlst_);
+
+      if (!infeasObj) // found something that will never be infeasibl
+	continue;
+
+      CouenneObject infObj (*infeasObj);
+
+      delete infeasObj;
+
       // add object for this variable
-      objects_.push_back (CouenneObject (this, *i, base, jnlst_));
+      objects_.push_back (infObj);
 
       std::set <int> deplist;
 

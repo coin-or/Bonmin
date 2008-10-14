@@ -11,6 +11,8 @@
 #include "exprBound.hpp"
 #include "exprMax.hpp"
 #include "exprMin.hpp"
+#include "CouenneObject.hpp"
+#include "CouenneComplObject.hpp"
 #include "CouenneCutGenerator.hpp"
 #include "CouenneJournalist.hpp"
 
@@ -257,4 +259,31 @@ void exprAux::generateCuts (const OsiSolverInterface &si,
 #if 0
   draw_cuts (cs, cg, nrc, this, image_);
 #endif
+}
+
+
+/// return proper object to handle expression associated with this
+/// variable (NULL if this is not an auxiliary)
+CouenneObject *exprAux::properObject (CouenneProblem *p, 
+				     Bonmin::BabSetupBase *base, 
+				     JnlstPtr jnlst) {
+
+  /*if (image_ -> code () == COU_EXPRMUL) printf ("OK1\n");
+  if (image_ -> ArgList () [0] -> Index () >= 0) printf ("OK2\n"); 
+  if (image_ -> ArgList () [1] -> Index () >= 0) printf ("OK3\n");
+  if (fabs (lb ()) < COUENNE_EPS) printf ("OK4\n");
+  if (fabs (ub ()) < COUENNE_EPS) printf ("OK5\n");*/
+
+  // todo: this is an expression method
+
+  if ((image_ -> code () == COU_EXPRMUL) &&
+      (image_ -> ArgList () [0] -> Index () >= 0) &&
+      (image_ -> ArgList () [1] -> Index () >= 0) &&
+      (fabs (lb ()) < COUENNE_EPS) &&
+      (fabs (ub ()) < COUENNE_EPS))
+
+    // it's a complementarity constraint object!
+
+    return new CouenneComplObject (p, this, base, jnlst);
+  else return new CouenneObject (p, this, base, jnlst);
 }

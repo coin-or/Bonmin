@@ -20,6 +20,7 @@ lib_LTLIBRARIES = libCouenne.la
 libCouenne_la_SOURCES = \
 	branch/CouenneThreeWayBranchObj.cpp \
 	branch/CouenneBranchingObject.cpp \
+	branch/CouenneComplBranchingObject.cpp \
 	branch/CouenneObject.cpp \
 	branch/CouenneComplObject.cpp \
 	branch/CouenneVarObject.cpp \
@@ -225,6 +226,7 @@ include_HEADERS = \
 	branch/CouenneComplObject.hpp \
 	branch/CouenneThreeWayBranchObj.hpp \
 	branch/CouenneBranchingObject.hpp \
+	branch/CouenneComplBranchingObject.hpp \
 	branch/CouenneChooseVariable.hpp \
 	branch/CouenneChooseStrong.hpp \
 	branch/projections.hpp \
