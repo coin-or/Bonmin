@@ -28,6 +28,8 @@
 
 #include <iomanip>
 
+//#define DEBUG_BON_HEURISTIC_DIVE_MIP
+
 using namespace std;
 
 namespace Bonmin
@@ -71,16 +73,13 @@ namespace Bonmin
  
     int returnCode = 0; // 0 means it didn't find a feasible solution
 
-    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
-                               (setup_->nonlinearSolver()->clone());
+    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>(model_->solver()->clone());
+      //                               (setup_->nonlinearSolver()->clone());
     TMINLP2TNLP* minlp = nlp->problem();
  
     // set tolerances
     double integerTolerance = model_->getDblParam(CbcModel::CbcIntegerTolerance);
     double primalTolerance = 1.0e-6;
-    adjustPrimalTolerance(minlp, primalTolerance);
-
-    assert(isNlpFeasible(minlp, primalTolerance));
 
     int numberColumns;
     int numberRows;
@@ -97,6 +96,10 @@ namespace Bonmin
     const double* g_sol = minlp->g_sol();
     const double* g_l = minlp->g_l();
     const double* g_u = minlp->g_u();
+
+    adjustPrimalTolerance(minlp, primalTolerance);
+
+    assert(isNlpFeasible(minlp, primalTolerance));
 
     // Get information about the linear and nonlinear part of the instance
     TMINLP* tminlp = nlp->model();
@@ -164,12 +167,12 @@ namespace Bonmin
     minlp->eval_grad_f(numberColumns,newSolution,true,gradient_f);
 
     // create a set with the indices of the fractional variables
-    vector<int> integerColumns; // stores the integer variables
+    vector<int> integerNonlinearColumns; // stores the integer variables
     int numberFractionalNonlinearVariables = 0;
     for (int iNLCol=0;iNLCol<numberNonlinearColumns;iNLCol++) {
       int iColumn = nonlinearVariable[iNLCol];
       if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
-	integerColumns.push_back(iColumn);
+	integerNonlinearColumns.push_back(iColumn);
 	double value=newSolution[iColumn];
 	if (fabs(floor(value+0.5)-value)>integerTolerance) {
 	  numberFractionalNonlinearVariables++;
@@ -186,7 +189,7 @@ namespace Bonmin
       // select a fractional variable to bound
       int bestColumn = -1;
       int bestRound = -1; // -1 rounds down, +1 rounds up
-      selectVariableToBranch(minlp, integerColumns, newSolution,
+      selectVariableToBranch(minlp, integerNonlinearColumns, newSolution,
 			     bestColumn, bestRound);
 
       if(bestColumn >= 0) {
@@ -207,8 +210,8 @@ namespace Bonmin
       memcpy(newSolution,x_sol,numberColumns*sizeof(double));
 
       numberFractionalNonlinearVariables = 0;
-      for(int iIntCol=0; iIntCol<(int)integerColumns.size(); iIntCol++) {
-	int iColumn = integerColumns[iIntCol];
+      for(int iIntCol=0; iIntCol<(int)integerNonlinearColumns.size(); iIntCol++) {
+	int iColumn = integerNonlinearColumns[iIntCol];
 	double value=newSolution[iColumn];
 	if (fabs(floor(value+0.5)-value)>integerTolerance)
 	  numberFractionalNonlinearVariables++;
@@ -231,6 +234,7 @@ namespace Bonmin
       }
     }
 
+    bool feasible = true;
     if(numberFractionalLinearVariables) {
       int numberMIPRows = 0;
       int* mapRows = new int[numberRows];
@@ -324,6 +328,8 @@ namespace Bonmin
 	  newSolution[iColumn] = solution[iLCol];
 	}
       }
+      else
+	feasible = false;
 
       delete [] mapRows;
       delete [] row_lb;
@@ -337,6 +343,7 @@ namespace Bonmin
       delete si;
     }
 
+#if 0
     bool feasible = true;
     for (int iColumn=0;iColumn<numberColumns;iColumn++) {
       double value=newSolution[iColumn];
@@ -360,13 +367,48 @@ namespace Bonmin
 	  feasible = false;
 	  break;
 	} else {
+#ifdef DEBUG_BON_HEURISTIC_DIVE_MIP
 	  cout<<"It should be infeasible because: "<<endl;
 	  cout<<"g_l["<<iRow<<"]= "<<g_l[iRow]<<" "
 	      <<"g_sol["<<iRow<<"]= "<<new_g_sol[iRow]<<" "
 	      <<"g_u["<<iRow<<"]= "<<g_u[iRow]<<endl;
+	  cout<<"primalTolerance= "<<primalTolerance<<endl;
+#endif
+	  feasible = false;
+	  break;
 	}
       }
     }
+#else
+    if(feasible) {
+      // fix the integer variables and solve the NLP
+      for (int iColumn=0;iColumn<numberColumns;iColumn++) {
+	if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
+	  double value=newSolution[iColumn];
+	  if (fabs(floor(value+0.5)-value)>integerTolerance) {
+#ifdef DEBUG_BON_HEURISTIC_DIVE_MIP
+	    cout<<"It should be infeasible because: "<<endl;
+	    cout<<"variable "<<iColumn<<" is not integer"<<endl;
+#endif
+	    feasible = false;
+	    break;
+	  }
+	  else {
+	    value=floor(newSolution[iColumn]+0.5);
+	    minlp->SetVariableUpperBound(iColumn, value);
+	    minlp->SetVariableLowerBound(iColumn, value);
+	  }
+	}
+      }
+      if(feasible) {
+	nlp->initialSolve();
+	if(minlp->optimization_status() != SUCCESS) {
+	  feasible = false;
+	}
+	memcpy(newSolution,x_sol,numberColumns*sizeof(double));
+      }
+    }
+#endif
 
     if(feasible) {
       double newSolutionValue;
@@ -387,6 +429,10 @@ namespace Bonmin
     delete [] newSolution;
     delete [] new_g_sol;
     delete nlp;
+
+#ifdef DEBUG_BON_HEURISTIC_DIVE_MIP
+    std::cout<<"DiveMIP returnCode = "<<returnCode<<std::endl;
+#endif
 
     return returnCode;
   }

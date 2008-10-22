@@ -21,7 +21,7 @@
 
 using namespace std;
 
-//#define DEBUG_FPump
+//#define DEBUG_BON_HEURISTIC_FPUMP
 
 namespace Bonmin
 {
@@ -87,7 +87,7 @@ namespace Bonmin
     }
 
     const int maxNumberIterations = 200;
-    const double toleranceObjectiveFP = 1.0e-9;
+    const double toleranceObjectiveFP = 1.0e-5;
 
     int returnCode = 0; // 0 means it didn't find a feasible solution
 
@@ -117,7 +117,7 @@ namespace Bonmin
     const double* x_l = minlp->x_l();
     const double* x_u = minlp->x_u();
 
-#ifdef DEBUG_FPump
+#ifdef DEBUG_BON_HEURISTIC_FPUMP
     const double* g_sol = minlp->g_sol();
     const double* g_l = minlp->g_l();
     const double* g_u = minlp->g_u();
@@ -206,7 +206,7 @@ namespace Bonmin
 	  flip = false;
       }
 
-#ifdef DEBUG_FPump
+#ifdef DEBUG_BON_HEURISTIC_FPUMP
       cout<<"iteration= "<<iteration<<", flip= "<<flip<<endl;
 #endif
 
@@ -265,7 +265,7 @@ namespace Bonmin
 	  if (matched) break;
 	}
 
-#ifdef DEBUG_FPump
+#ifdef DEBUG_BON_HEURISTIC_FPUMP
 	cout<<"matched= "<<matched<<endl;
 #endif
 
@@ -317,7 +317,7 @@ namespace Bonmin
 					       1,0,objective_norm_);
 
 
-#ifdef DEBUG_FPump
+#ifdef DEBUG_BON_HEURISTIC_FPUMP
       cout<<"obj_nlp= "<<obj_nlp<<endl;
 #endif
 
@@ -372,7 +372,7 @@ namespace Bonmin
       }
     }
 
-#ifdef DEBUG_FPump
+#ifdef DEBUG_BON_HEURISTIC_FPUMP
     cout<<"returnCode= "<<returnCode<<endl;
 #endif
 
@@ -393,8 +393,8 @@ namespace Bonmin
   void
   HeuristicFPump::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
     roptions->SetRegisteringCategory("Feasibility pump heuristic", RegisteredOptions::BonminCategory);
-    roptions->AddLowerBoundedIntegerOption("feasibility_pump_objective_norm","Norm of feasibility pump objective function",
-                                           1, 2,"");
+    roptions->AddBoundedIntegerOption("feasibility_pump_objective_norm","Norm of feasibility pump objective function",
+				      1, 2, 2,"");
     roptions->AddStringOption2("heuristic_feasibility_pump", "whether the heuristic feasibility pump should be used",
       "no", "no", "don't use it", "yes", "use it", "Someone should fix this entry...");
   }
@@ -413,21 +413,17 @@ namespace Bonmin
 
   RoundingFPump::~RoundingFPump()
   {
-    delete [] column_;
-    delete [] rowStart_;
-    delete [] rowLength_;
-    delete [] jac_g_;
+    delete [] col_and_jac_g_;
   }
 
   void
   RoundingFPump::gutsOfConstructor()
   {
 
-    int numberColumns;
     int nnz_jac_g;
     int nnz_h_lag;
     TNLP::IndexStyleEnum index_style;
-    minlp_->get_nlp_info(numberColumns, numberRows_, nnz_jac_g,
+    minlp_->get_nlp_info(numberColumns_, numberRows_, nnz_jac_g,
 			nnz_h_lag, index_style);
     
     const double* x_sol = minlp_->x_sol();
@@ -437,37 +433,31 @@ namespace Bonmin
     // used in each row
     int* indexRow = new int[nnz_jac_g];
     int* indexCol = new int[nnz_jac_g];
-    minlp_->eval_jac_g(numberColumns, x_sol, false,
+    minlp_->eval_jac_g(numberColumns_, x_sol, false,
 		       numberRows_, nnz_jac_g,
 		       indexRow, indexCol, 0);
-    column_ = new int[nnz_jac_g];
-    rowStart_ = new int[numberRows_];
-    rowLength_ = new int[numberRows_];
-    int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
-    int iniRow = -1;
-    for(int i=0; i<nnz_jac_g; i++) {
-      int thisIndexRow = indexRow[i]-indexCorrection;
-      if(indexRow[i] != iniRow) {
-	iniRow = indexRow[i];
-	rowStart_[thisIndexRow] = i;
-	rowLength_[thisIndexRow] = 1;
-      }
-      else {
-	rowLength_[thisIndexRow]++;
-      }
-      column_[i] = indexCol[i]-indexCorrection;
-    }
 
     // get the jacobian for the solution with zeros
-    jac_g_ = new double [nnz_jac_g];
-    double* zero_sol = new double [numberColumns];
-    memset(zero_sol, 0, numberColumns * sizeof(double));
-    minlp_->eval_jac_g(numberColumns, zero_sol, true,
+    double* jac_g = new double [nnz_jac_g];
+    double* zero_sol = new double [numberColumns_];
+    memset(zero_sol, 0, numberColumns_ * sizeof(double));
+    minlp_->eval_jac_g(numberColumns_, zero_sol, true,
 		       numberRows_, nnz_jac_g,
-		       0, 0, jac_g_);
+		       0, 0, jac_g);
+
+    col_and_jac_g_ = new vector<pair<int, int> >[numberRows_];
+
+    int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
+    for(int i=0; i<nnz_jac_g; i++) {
+      int thisIndexRow = indexRow[i]-indexCorrection;      
+      int thisIndexCol = indexCol[i]-indexCorrection;
+      pair<int, int> value(thisIndexCol, jac_g[i]);
+      col_and_jac_g_[thisIndexRow].push_back(value);
+    }    
 
     delete [] indexRow;
     delete [] indexCol;
+    delete [] jac_g;
     delete [] zero_sol;
   }
 
@@ -488,10 +478,11 @@ namespace Bonmin
 	bool sosConstraint = true;
 	double weightedSum = 0.0;
 	int counter = 1;
-	for (int j=rowStart_[iRow];
-	     j<rowStart_[iRow]+rowLength_[iRow];j++) {
-	  int iColumn = column_[j];
-	  if (jac_g_[j] != 1.0 ||
+	vector<pair<int, int> > jac_g = col_and_jac_g_[iRow];
+	for (int j=0; j<jac_g.size(); j++) {
+	  int iColumn = jac_g[j].first;
+	  if (solution[iColumn]>=1.0-integerTolerance ||
+	      jac_g[j].second != 1.0 ||
 	      variableType[iColumn] == Bonmin::TMINLP::CONTINUOUS) {
 	    sosConstraint = false;
 	    break;
@@ -501,13 +492,19 @@ namespace Bonmin
 	    counter++;
 	  }
 	}
+#ifdef DEBUG_BON_HEURISTIC_FPUMP
 	if(sosConstraint) {
-	  int columnSelected = (int) floor(weightedSum + 0.5);
-	  assert(0 <= columnSelected && columnSelected < numberColumns_);
-	  for (int j=rowStart_[iRow];
-	       j<rowStart_[iRow]+rowLength_[iRow];j++) {
-	    int iColumn = column_[j];
-	    if(iColumn == columnSelected)
+	  cout<<"weightedSum= "<<weightedSum
+	      <<", numberColumns_= "<<numberColumns_<<endl;
+	}
+#endif
+	if(sosConstraint) {
+	  double fl = floor(weightedSum + 0.5); 
+	  int indexColumnSelected = fl - 1;
+	  assert(0 <= indexColumnSelected && indexColumnSelected < jac_g.size());
+	  for (int j=0; j<jac_g.size(); j++) {
+	    int iColumn = jac_g[j].first;
+	    if(j == indexColumnSelected)
 	      solution[iColumn] = 1.0;
 	    else
 	      solution[iColumn] = 0.0;
@@ -526,6 +523,7 @@ namespace Bonmin
 	    value++;
 	  else if(value > x_u[iColumn]+primalTolerance)
 	    value--;
+	  solution[iColumn] = value;
 	}
       }
     }

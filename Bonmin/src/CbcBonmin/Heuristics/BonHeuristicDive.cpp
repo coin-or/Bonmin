@@ -19,6 +19,8 @@
 
 #include <iomanip>
 
+//#define DEBUG_BON_HEURISTIC_DIVE
+
 using namespace std;
 
 namespace Bonmin
@@ -252,10 +254,15 @@ namespace Bonmin
 	  feasible = false;
 	  break;
 	} else {
+#ifdef DEBUG_BON_HEURISTIC_DIVE
 	  cout<<"It should be infeasible because: "<<endl;
 	  cout<<"g_l["<<iRow<<"]= "<<g_l[iRow]<<" "
 	      <<"g_sol["<<iRow<<"]= "<<new_g_sol[iRow]<<" "
 	      <<"g_u["<<iRow<<"]= "<<g_u[iRow]<<endl;
+	  cout<<"primalTolerance= "<<primalTolerance<<endl;
+#endif
+	  feasible = false;
+	  break;
 	}
       }
     }
@@ -276,6 +283,10 @@ namespace Bonmin
     delete [] columnFixed;
     delete [] originalBound;
     delete [] fixedAtLowerBound;
+
+#ifdef DEBUG_BON_HEURISTIC_DIVE
+    std::cout<<"Dive returnCode = "<<returnCode<<std::endl;
+#endif
 
     return returnCode;
   }

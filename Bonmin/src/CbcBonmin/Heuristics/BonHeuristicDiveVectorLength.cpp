@@ -79,17 +79,17 @@ namespace Bonmin
     minlp->eval_jac_g(numberColumns, x_sol, false,
 		      numberRows, nnz_jac_g,
 		      indexRow, indexCol, 0);
-    int* columnLength = new int[numberColumns];
+    columnLength_ = new int[numberColumns];
     int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
     int iniCol = -1;
     for(int i=0; i<nnz_jac_g; i++) {
       int thisIndexCol = indexCol[i]-indexCorrection;
       if(indexCol[i] != iniCol) {
 	iniCol = indexCol[i];
-	columnLength[thisIndexCol] = 1;
+	columnLength_[thisIndexCol] = 1;
       }
       else {
-	columnLength[thisIndexCol]++;
+	columnLength_[thisIndexCol]++;
       }
     }
     

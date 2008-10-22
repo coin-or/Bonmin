@@ -13,6 +13,7 @@
 #include "BonBabSetupBase.hpp"
 #include "CbcHeuristic.hpp"
 
+using namespace std;
 namespace Bonmin
 {
   class  HeuristicFPump : public CbcHeuristic
@@ -100,17 +101,8 @@ namespace Bonmin
     /// Number of columns
     int numberColumns_;
 
-    /// Indices of columns
-    int* column_;
-
-    /// Indices of start of rows
-    int* rowStart_;
-
-    /// Indices of row lengths
-    int* rowLength_;
-
     /// Jacobian of g
-    double* jac_g_;
+    vector<pair<int, int> >* col_and_jac_g_;
 
   };
 
