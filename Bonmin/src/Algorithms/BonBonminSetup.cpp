@@ -630,6 +630,77 @@ namespace Bonmin
     h.heuristic = oaHeu;
     h.id = "nonlinear programm";
     heuristics_.push_back(h);
+
+    Index doHeuristicRINS = false;
+    options()->GetEnumValue("heuristic_RINS",doHeuristicRINS,"bonmin.");
+    if(doHeuristicRINS){
+      HeuristicRINS* rins = new HeuristicRINS(this);
+      HeuristicMethod h;
+      h.heuristic = rins;
+      h.id = "RINS";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicLocalBranching = false;
+    options()->GetEnumValue("heuristic_local_branching",doHeuristicLocalBranching,"bonmin.");
+    if(doHeuristicLocalBranching){
+      HeuristicLocalBranching* local_branching = new HeuristicLocalBranching(this);
+      HeuristicMethod h;
+      h.heuristic = local_branching;
+      h.id = "LocalBranching";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicFPump = false;
+    options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,"bonmin.");
+    if(doHeuristicFPump){
+      HeuristicFPump* feasibility_pump = new HeuristicFPump(this);
+      HeuristicMethod h;
+      h.heuristic = feasibility_pump;
+      h.id = "FPump";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveFractional = false;
+    options()->GetEnumValue("heuristic_dive_fractional",doHeuristicDiveFractional,"bonmin.");
+    if(doHeuristicDiveFractional){
+      HeuristicDiveFractional* dive_fractional = new HeuristicDiveFractional(this);
+      HeuristicMethod h;
+      h.heuristic = dive_fractional;
+      h.id = "DiveFractional";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveVectorLength = false;
+    options()->GetEnumValue("heuristic_dive_vectorLength",doHeuristicDiveVectorLength,"bonmin.");
+    if(doHeuristicDiveVectorLength){
+      HeuristicDiveVectorLength* dive_vectorLength = new HeuristicDiveVectorLength(this);
+      HeuristicMethod h;
+      h.heuristic = dive_vectorLength;
+      h.id = "DiveVectorLength";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveMIPFractional = false;
+    options()->GetEnumValue("heuristic_dive_MIP_fractional",doHeuristicDiveMIPFractional,"bonmin.");
+    if(doHeuristicDiveMIPFractional){
+      HeuristicDiveMIPFractional* dive_MIP_fractional = new HeuristicDiveMIPFractional(this);
+      HeuristicMethod h;
+      h.heuristic = dive_MIP_fractional;
+      h.id = "DiveMIPFractional";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveMIPVectorLength = false;
+    options()->GetEnumValue("heuristic_dive_MIP_vectorLength",doHeuristicDiveMIPVectorLength,"bonmin.");
+    if(doHeuristicDiveMIPVectorLength){
+      HeuristicDiveMIPVectorLength* dive_MIP_vectorLength = new HeuristicDiveMIPVectorLength(this);
+      HeuristicMethod h;
+      h.heuristic = dive_MIP_vectorLength;
+      h.id = "DiveMIPVectorLength";
+      heuristics_.push_back(h);
+    }
+
   }
 
   Algorithm BonminSetup::getAlgorithm()
