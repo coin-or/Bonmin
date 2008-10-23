@@ -10,7 +10,7 @@
 #ifndef BonHeuristicDiveFractional_H
 #define BonHeuristicDiveFractional_H
 
-#include "BonBabSetupBase.hpp"
+#include "BonBonminSetup.hpp"
 #include "BonHeuristicDive.hpp"
 
 /** DiveFractional class
@@ -24,7 +24,7 @@ namespace Bonmin
     HeuristicDiveFractional ();
 
     /// Constructor with setup
-    HeuristicDiveFractional(BabSetupBase * setup);
+    HeuristicDiveFractional(BonminSetup * setup);
 
     /// Copy constructor
     HeuristicDiveFractional(const HeuristicDiveFractional &copy);
@@ -39,7 +39,7 @@ namespace Bonmin
     virtual CbcHeuristic * clone() const;
 
     /** Change setup used for heuristic.*/
-    virtual void setSetup(BabSetupBase * setup){
+    virtual void setSetup(BonminSetup * setup){
       HeuristicDive::setSetup(setup);
       Initialize(setup->options());
     }

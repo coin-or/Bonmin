@@ -22,7 +22,7 @@ namespace Bonmin
     HeuristicDiveMIP()
   {}
 
-  HeuristicDiveMIPFractional::HeuristicDiveMIPFractional(BabSetupBase * setup)
+  HeuristicDiveMIPFractional::HeuristicDiveMIPFractional(BonminSetup * setup)
     :
     HeuristicDiveMIP(setup)
   {

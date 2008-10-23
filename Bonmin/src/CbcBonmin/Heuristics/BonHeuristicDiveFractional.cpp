@@ -22,7 +22,7 @@ namespace Bonmin
     HeuristicDive()
   {}
 
-  HeuristicDiveFractional::HeuristicDiveFractional(BabSetupBase * setup)
+  HeuristicDiveFractional::HeuristicDiveFractional(BonminSetup * setup)
     :
     HeuristicDive(setup)
   {

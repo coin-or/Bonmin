@@ -23,7 +23,7 @@ namespace Bonmin
     columnLength_(NULL)
   {}
 
-  HeuristicDiveVectorLength::HeuristicDiveVectorLength(BabSetupBase * setup)
+  HeuristicDiveVectorLength::HeuristicDiveVectorLength(BonminSetup * setup)
     :
     HeuristicDive(setup),
     columnLength_(NULL)

@@ -10,7 +10,7 @@
 #ifndef BonHeuristicFPump_HPP
 #define BonHeuristicFPump_HPP
 #include "BonOsiTMINLPInterface.hpp"
-#include "BonBabSetupBase.hpp"
+#include "BonBonminSetup.hpp"
 #include "CbcHeuristic.hpp"
 
 using namespace std;
@@ -23,7 +23,7 @@ namespace Bonmin
     HeuristicFPump();
 
     /// Constructor with setup
-    HeuristicFPump(BabSetupBase * setup);
+    HeuristicFPump(BonminSetup * setup);
 
     /// Copy constructor
     HeuristicFPump(const HeuristicFPump &copy);
@@ -45,7 +45,7 @@ namespace Bonmin
     }
 
     /** Change setup used for heuristic.*/
-    void setSetup(BabSetupBase * setup){
+    void setSetup(BonminSetup * setup){
       setup_ = setup;
       Initialize(setup_->options());
     }
@@ -67,7 +67,7 @@ namespace Bonmin
 
   private:
     /** Setup to use for local searches (will make copies).*/
-    BabSetupBase * setup_; 
+    BonminSetup * setup_; 
 
     /** Norm of the objective function - either 1 or 2 */
     int objective_norm_;

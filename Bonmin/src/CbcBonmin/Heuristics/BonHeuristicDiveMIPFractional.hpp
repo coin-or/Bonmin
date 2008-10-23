@@ -10,7 +10,7 @@
 #ifndef BonHeuristicDiveMIPFractional_H
 #define BonHeuristicDiveMIPFractional_H
 
-#include "BonBabSetupBase.hpp"
+#include "BonBonminSetup.hpp"
 #include "BonHeuristicDiveMIP.hpp"
 
 /** DiveMIPFractional class
@@ -24,7 +24,7 @@ namespace Bonmin
     HeuristicDiveMIPFractional ();
 
     /// Constructor with setup
-    HeuristicDiveMIPFractional(BabSetupBase * setup);
+    HeuristicDiveMIPFractional(BonminSetup * setup);
 
     /// Copy constructor
     HeuristicDiveMIPFractional(const HeuristicDiveMIPFractional &copy);
@@ -39,7 +39,7 @@ namespace Bonmin
     virtual CbcHeuristic * clone() const;
 
     /** Change setup used for heuristic.*/
-    virtual void setSetup(BabSetupBase * setup){
+    virtual void setSetup(BonminSetup * setup){
       HeuristicDiveMIP::setSetup(setup);
       Initialize(setup->options());
     }

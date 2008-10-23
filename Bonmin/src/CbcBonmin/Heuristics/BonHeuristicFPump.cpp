@@ -47,7 +47,7 @@ namespace Bonmin
     objective_norm_(1)
   {}
 
-  HeuristicFPump::HeuristicFPump(BabSetupBase * setup)
+  HeuristicFPump::HeuristicFPump(BonminSetup * setup)
     :
     CbcHeuristic(),
     setup_(setup),
@@ -91,8 +91,12 @@ namespace Bonmin
 
     int returnCode = 0; // 0 means it didn't find a feasible solution
 
-    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>(model_->solver()->clone());
-    //                               (setup_->nonlinearSolver()->clone());
+    OsiTMINLPInterface * nlp = NULL;
+    if(setup_->getAlgorithm() == B_BB)
+      nlp = dynamic_cast<OsiTMINLPInterface *>(model_->solver()->clone());
+    else
+      nlp = dynamic_cast<OsiTMINLPInterface *>(setup_->nonlinearSolver()->clone());
+
     TMINLP2TNLP* minlp = nlp->problem();
 
     // set tolerances

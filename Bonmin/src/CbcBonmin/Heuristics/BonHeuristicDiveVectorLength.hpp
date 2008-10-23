@@ -10,7 +10,7 @@
 #ifndef BonHeuristicDiveVectorLength_H
 #define BonHeuristicDiveVectorLength_H
 
-#include "BonBabSetupBase.hpp"
+#include "BonBonminSetup.hpp"
 #include "BonHeuristicDive.hpp"
 
 /** DiveVectorLength class
@@ -24,7 +24,7 @@ namespace Bonmin
     HeuristicDiveVectorLength ();
 
     /// Constructor with setup
-    HeuristicDiveVectorLength(BabSetupBase * setup);
+    HeuristicDiveVectorLength(BonminSetup * setup);
 
     /// Copy constructor
     HeuristicDiveVectorLength(const HeuristicDiveVectorLength &copy);
@@ -42,7 +42,7 @@ namespace Bonmin
     virtual CbcHeuristic * clone() const;
 
     /** Change setup used for heuristic.*/
-    virtual void setSetup(BabSetupBase * setup){
+    virtual void setSetup(BonminSetup * setup){
       HeuristicDive::setSetup(setup);
       Initialize(setup->options());
     }

@@ -10,7 +10,7 @@
 #ifndef BonHeuristicDive_HPP
 #define BonHeuristicDive_HPP
 #include "BonOsiTMINLPInterface.hpp"
-#include "BonBabSetupBase.hpp"
+#include "BonBonminSetup.hpp"
 #include "CbcHeuristic.hpp"
 
 namespace Bonmin
@@ -22,7 +22,7 @@ namespace Bonmin
     HeuristicDive();
 
     /// Constructor with setup
-    HeuristicDive(BabSetupBase * setup);
+    HeuristicDive(BonminSetup * setup);
 
     /// Copy constructor
     HeuristicDive(const HeuristicDive &copy);
@@ -42,7 +42,7 @@ namespace Bonmin
     }
 
     /** Change setup used for heuristic.*/
-    virtual void setSetup(BabSetupBase * setup){
+    virtual void setSetup(BonminSetup * setup){
       setup_ = setup;
       //      Initialize(setup_->options());
     }
@@ -68,7 +68,7 @@ namespace Bonmin
 
   protected:
     /** Setup to use for local searches (will make copies).*/
-    BabSetupBase * setup_; 
+    BonminSetup * setup_; 
 
     /// Percentage of integer variables to fix at bounds
     double percentageToFix_;
