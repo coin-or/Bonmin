@@ -294,6 +294,7 @@ namespace Bonmin
 
     lp_->branchAndBound();
 
+   optimal_ = lp_->isProvenOptimal();
 #ifdef COIN_HAS_CPX
     if (cpx_) {
       //CpxModel = NULL;
@@ -301,7 +302,10 @@ namespace Bonmin
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
       int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
-      nodeCount_ = CPXgetnodecnt(env , cpxlp);
+     
+      int stat = CPXgetstat( env, cpxlp);
+      optimal_ |= (stat == CPXMIP_INFEASIBLE); 
+       nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
       if (status)
         throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
@@ -620,7 +624,7 @@ OaDecompositionBase::solverManip::installCuts(const OsiCuts& cs, int numberCuts)
   CoinWarmStartBasis * basis
   = dynamic_cast<CoinWarmStartBasis*>(si_->getWarmStart()) ;
   assert(basis != NULL); // make sure not volume
-  basis->resize(numrows_ + numberCuts,numcols_ + 1) ;
+  basis->resize(numrows_ + numberCuts,numcols_) ;
   for (int i = 0 ; i < numberCuts ; i++) {
     basis->setArtifStatus(numrows_ + i,
         CoinWarmStartBasis::basic) ;
