@@ -420,7 +420,7 @@ namespace Bonmin
 
     roptions->AddStringOption5("node_comparison",
         "Choose the node selection strategy.",
-        "dynamic",
+        "best-bound",
         "best-bound", "choose node with the smallest bound,",
         "depth-first", "Perform depth first search,",
         "breadth-first", "Perform breadth first search,",
@@ -432,7 +432,7 @@ namespace Bonmin
 
     roptions->AddStringOption5("tree_search_strategy",
         "Pick a strategy for traversing the tree",
-        "top-node",
+        "probed-dive",
         "top-node"," Always pick the top node as sorted by the node comparison function",
         "dive","Dive in the tree if possible, otherwise pick top node as sorted by the tree comparison function.",
         "probed-dive","Dive in the tree exploring two childs before continuing the dive at each level.",

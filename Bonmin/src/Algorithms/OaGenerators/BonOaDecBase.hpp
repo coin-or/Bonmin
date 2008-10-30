@@ -379,14 +379,16 @@ private:
 #ifdef OA_DEBUG
     class OaDebug
     {
-      bool checkInteger(const double * colsol, int numcols, ostream & os) const;
+      public:
+      bool checkInteger(const OsiSolverInterface&nlp, std::ostream & os) const;
 
       void printEndOfProcedureDebugMessage(const OsiCuts &cs,
           bool foundSolution,
+          double solValue,
           double milpBound,
           bool isInteger,
           bool feasible,
-          std::ostream & os);
+          std::ostream & os) const;
     };
 
     /** debug object. */

@@ -8,6 +8,7 @@
 // Date :  12/07/2006
 
 #include <sstream>
+#include <climits>
 
 #include "BonOaDecBase.hpp"
 
@@ -449,8 +450,8 @@ OaDecompositionBase::solverManip::fixIntegers(const OsiBranchingInformation& inf
           throw CoinError(stream.str(),"fixIntegers","OaDecompositionBase::solverManip");
         }
         value = floor(value+0.5);
-        value = max(colLower_[i],value);
-        value = min(value, colUpper_[i]);
+        value = std::max(colLower_[i],value);
+        value = std::min(value, colUpper_[i]);
 
         if (fabs(value) > 1e10) {
           std::stringstream stream;
@@ -580,7 +581,7 @@ OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si)
   <<fabs(si_->getObjValue() - si.getObjValue())<<std::endl;
   for (int i = 0 ; i <= numcols ; i++) {
     if (fabs(si.getColSolution()[i]-si_->getColSolution()[i])>1e-08) {
-      std::cout<<"Diff between solution at node and solution with local solver : "<<fabs(si.getColSolution()[i]-lp_->getColSolution()[i])<<std::endl;
+      std::cout<<"Diff between solution at node and solution with local solver : "<<fabs(si.getColSolution()[i]-si_->getColSolution()[i])<<std::endl;
     }
   }
 #endif
@@ -737,7 +738,7 @@ OaDecompositionBase::solveNlp(OsiBabSolver * babInfo, double cutoff) const
 
 #ifdef OA_DEBUG
     const double * colsol2 = nlp_->getColSolution();
-    debug_.checkInteger(colsol2,numcols,std::cerr);
+    debug_.checkInteger(*nlp_,std::cerr);
 #endif
 
     if ((nlp_->getObjValue() < cutoff) ) {
@@ -778,14 +779,16 @@ OaDecompositionBase::solveNlp(OsiBabSolver * babInfo, double cutoff) const
 
 #ifdef OA_DEBUG
 bool
-OaDecompositionBase::OaDebug::checkInteger(const double * colsol, int numcols, ostream & os) const
+OaDecompositionBase::OaDebug::checkInteger(const OsiSolverInterface &nlp, std::ostream & os) const
 {
+   const double * colsol = nlp.getColSolution();
+   int numcols = nlp.getNumCols();
   for (int i = 0 ; i < numcols ; i++) {
-    if (nlp_->isInteger(i)) {
-      if (fabs(sol[i]) - floor(sol[i] + 0.5) >
-          parameters_.cbcIntegerTolerance_) {
+    if (nlp.isInteger(i)) {
+      if (fabs(colsol[i]) - floor(colsol[i] + 0.5) >
+          1e-07) {
         std::cerr<<"Integer infeasible point (should not be), integer infeasibility for variable "<<i
-        <<" is, "<<fabs(colsol2[i] - floor(colsol2[i] + 0.5))<<std::endl;
+        <<" is, "<<fabs(colsol[i] - floor(colsol[i] + 0.5))<<std::endl;
       }
     }
     return true;
@@ -796,17 +799,18 @@ OaDecompositionBase::OaDebug::checkInteger(const double * colsol, int numcols, o
 void
 OaDecompositionBase::OaDebug::printEndOfProcedureDebugMessage(const OsiCuts &cs,
     bool foundSolution,
+    double solValue,
     double milpBound,
     bool isInteger,
     bool feasible,
-    std::ostream & os)
+    std::ostream & os) const
 {
   std::cout<<"------------------------------------------------------------------"
   <<std::endl;
   std::cout<<"OA procedure finished"<<std::endl;
   std::cout<<"Generated "<<cs.sizeRowCuts()<<std::endl;
   if (foundSolution)
-    std::cout <<"Found NLP-integer feasible solution of  value : "<<cutoff<<std::endl;
+    std::cout <<"Found NLP-integer feasible solution of  value : "<<solValue<<std::endl;
   std::cout<<"Current MILP lower bound is : "<<milpBound<<std::endl;
   std::cout<<"-------------------------------------------------------------------"<<std::endl;
   std::cout<<"Stopped because : isInteger "<<isInteger<<", feasible "<<feasible<<std::endl<<std::endl;

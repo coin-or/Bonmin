@@ -265,7 +265,7 @@ namespace Bonmin
     }
 
 #ifdef OA_DEBUG
-    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
+    debug_.printEndOfProcedureDebugMessage(cs, foundSolution, cutoff, milpBound, isInteger, feasible, std::cout);
 #endif
     return milpBound;
   }

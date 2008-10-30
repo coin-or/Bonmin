@@ -286,6 +286,7 @@ namespace Bonmin
       for (int i=0; i<nco; i++) 
 	objs [i] = s.continuousSolver () -> objects () [i];
       model_.addObjects (nco, objs);
+      delete [] objs;
     }
 
     CbcBranchDefaultDecision branch;
@@ -425,8 +426,14 @@ namespace Bonmin
       }
     }
 
+   try {
     //Get the time and start.
     model_.initialSolve();
+
+    // for Couenne
+    if (usingCouenne_)
+      model_.passInSolverCharacteristics (bonBabInfoPtr);
+
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
     {
@@ -454,7 +461,15 @@ namespace Bonmin
     // to get node parent info in Cbc, pass parameter 3.
     //model_.branchAndBound(3);
     model_.branchAndBound();
-    
+    }
+    catch(TNLPSolver::UnsolvedError *E){
+      s.nonlinearSolver()->model()->finalize_solution(TMINLP::MINLP_ERROR,
+           0,
+           NULL,
+           DBL_MAX);
+      throw E;
+   
+    }
     numNodes_ = model_.getNodeCount();
     bestObj_ = model_.getObjValue();
     bestBound_ = model_.getBestPossibleObjValue();
