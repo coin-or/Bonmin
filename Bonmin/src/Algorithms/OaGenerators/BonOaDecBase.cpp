@@ -105,10 +105,10 @@ namespace Bonmin
       messages_(other.messages_),
       leaveSiUnchanged_(other.leaveSiUnchanged_),
       reassignLpsolver_(other.reassignLpsolver_),
-      timeBegin_(0),
+      timeBegin_(other.timeBegin_),
       parameters_(other.parameters_)
   {
-    timeBegin_ = CoinCpuTime();
+    //timeBegin_ = CoinCpuTime();
     handler_ = other.handler_->clone();
   }
 /// Constructor with default values for parameters
@@ -266,14 +266,19 @@ namespace Bonmin
 
     lp_->branchAndBound();
 
+   optimal_ = lp_->isProvenOptimal();
 #ifdef COIN_HAS_CPX
     if (cpx_) {
       //CpxModel = NULL;
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
+       
       int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
-      nodeCount_ = CPXgetnodecnt(env , cpxlp);
+     
+      int stat = CPXgetstat( env, cpxlp);
+      optimal_ |= (stat == CPXMIP_INFEASIBLE); 
+       nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
       if (status)
         throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
