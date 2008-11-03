@@ -59,6 +59,9 @@ class exprOpp: public exprUnary {
   /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
+  /// Get value of lower and upper bound of an expression (if any)
+  void getBounds (CouNumber &, CouNumber&);
+
   /// special version for linear constraints
   virtual void generateCuts (expression *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,

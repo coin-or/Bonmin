@@ -11,7 +11,6 @@
 
 
 // find bounds of -x given bounds on x
-
 void exprOpp::getBounds (expression *&lb, expression *&ub) {
 
   expression *lba, *uba;
@@ -22,15 +21,24 @@ void exprOpp::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-// differentiation
+// find bounds of -x given bounds on x
+void exprOpp::getBounds (CouNumber &lb, CouNumber &ub) {
 
+  CouNumber lba, uba;
+  argument_ -> getBounds (lba, uba);
+
+  lb = -uba;
+  ub = -lba;
+}
+
+
+// differentiation
 inline expression *exprOpp::differentiate (int index) 
 {return new exprOpp (argument_ -> differentiate (index));}
 
 
 /// implied bound processing for expression w = -x, upon change in
 /// lower- and/or upper bound of w, whose index is wind
-
 bool exprOpp::impliedBound (int wind, CouNumber *l, CouNumber *u, t_chg_bounds *chg) {
 
   int ind = argument_ -> Index ();

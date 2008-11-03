@@ -84,8 +84,10 @@ exprAux::~exprAux () {
 }
 
 
+/* eliminated: same as exprVar's */
+
 /// Get lower and upper bound of an expression (if any)
-void exprAux::getBounds (expression *&lb, expression *&ub) {
+//void exprAux::getBounds (expression *&lb, expression *&ub) {
 
   // this replaces the previous 
   //
@@ -96,9 +98,9 @@ void exprAux::getBounds (expression *&lb, expression *&ub) {
 
   //  lb = lb_ -> clone ();//new exprLowerBound (varIndex_);
   //  ub = ub_ -> clone ();//new exprUpperBound (varIndex_);
-  lb = new exprLowerBound (varIndex_, domain_);
-  ub = new exprUpperBound (varIndex_, domain_);
-}
+//  lb = new exprLowerBound (varIndex_, domain_);
+//  ub = new exprUpperBound (varIndex_, domain_);
+//}
 
 
 /// set bounds depending on both branching rules and propagated

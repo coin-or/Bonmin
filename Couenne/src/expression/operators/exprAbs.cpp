@@ -15,7 +15,8 @@
 
 #include "CouenneProblem.hpp"
 
-/// find lower and upper bound of a given expression
+
+/// find expression of lower and upper bound of a given expression
 
 void exprAbs::getBounds (expression *&lb, expression *&ub) {
 
@@ -37,6 +38,28 @@ void exprAbs::getBounds (expression *&lb, expression *&ub) {
 
   ub = new exprMax (new exprAbs (new exprClone (lba)), 
 		    new exprAbs (new exprClone (uba)));
+}
+
+
+/// find value of lower and upper bound of a given expression
+
+void exprAbs::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  // get bounds of the argument
+  CouNumber lba, uba;
+
+  argument_ -> getBounds (lba, uba);
+
+  if (lba > 0) {
+    lb = lba;
+    ub = uba;
+  } else if (uba < 0) {
+    lb = -uba;
+    ub = -lba;
+  } else {
+    lb = 0;
+    ub = CoinMax (-lb, ub);
+  }
 }
 
 

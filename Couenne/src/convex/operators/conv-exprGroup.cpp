@@ -20,64 +20,165 @@
 /// Get lower and upper bound of an expression (if any)
 void exprGroup::getBounds (expression *&lb, expression *&ub) {
 
-  expression *lbnl, *ubnl;
+  expression 
+    **lbnl = new expression * [1], 
+    **ubnl = new expression * [1];
 
   // TODO: do not aggregate members of exprSum
 
   // compute lower/upper bound of nonlinear part
-  exprSum::getBounds (lbnl, ubnl);
+  exprSum::getBounds (*lbnl, *ubnl);
 
-  // count linear and constant terms
-  int nlin = lcoeff_.size();
-  if (fabs (c0_) > COUENNE_EPS) nlin++;
-  //  for (register int *ind = index_; *ind++>=0; nlin++);
-
-  expression 
-    **linall = new expression * [nlin + 1], // linear arglist for lower bound
-    **linalu = new expression * [nlin + 1]; //                    upper
-
-  // add constant to bounds
-  if (fabs (c0_) > COUENNE_EPS) {
-    *linall++ = new exprConst (c0_);
-    *linalu++ = new exprConst (c0_);
-  }
-
-  // TODO: make it another exprGroup!
+  lincoeff 
+    *coeL = new lincoeff,
+    *coeU = new lincoeff;
 
   // derive linear part (obtain constant)
   for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
 
-    //    c0 += el -> second;
+    std::pair <exprVar *, CouNumber> pairL, pairU;
 
     CouNumber coeff = el -> second;
     int         ind = el -> first -> Index ();
 
-    expression *l = new exprLowerBound (ind, el -> first -> domain ()),
-               *u = new exprUpperBound (ind, el -> first -> domain ());
+    pairL .second = pairU .second = coeff;
 
-    if (fabs (coeff - 1.) < COUENNE_EPS) {
-      *linall++ = l;
-      *linalu++ = u;
+    if (coeff < 0.) {
+      pairL.first = new exprUpperBound (ind, el -> first -> domain ());
+      pairU.first = new exprLowerBound (ind, el -> first -> domain ());
     } else {
-
-      expression *c1 = new exprConst (coeff),
-                 *c2 = new exprConst (coeff);
-
-      if (coeff < 0) {
-	*linall++ = new exprMul (c1, u);
-	*linalu++ = new exprMul (c2, l);
-      } else {
-	*linall++ = new exprMul (c1, l);
-	*linalu++ = new exprMul (c2, u);
-      }
+      pairL.first = new exprLowerBound (ind, el -> first -> domain ());
+      pairU.first = new exprUpperBound (ind, el -> first -> domain ());
     }
+
+    coeL -> push_back (pairL);
+    coeU -> push_back (pairU);
   }
 
-  *linall = lbnl;
-  *linalu = ubnl;
+  lb = new exprGroup (c0_, *coeL, lbnl, 1);
+  ub = new exprGroup (c0_, *coeU, ubnl, 1);
 
-  lb = new exprSum (linall - nlin, nlin + 1);
-  ub = new exprSum (linalu - nlin, nlin + 1);
+  delete coeL;
+  delete coeU;
+}
+
+
+// /// Get expressions of lower and upper bound of an expression (if any)
+// void exprGroup::getBounds (expression *&lb, expression *&ub) {
+
+//   expression *lbnl, *ubnl;
+
+//   // TODO: do not aggregate members of exprSum
+
+//   // compute lower/upper bound of nonlinear part
+//   exprSum::getBounds (lbnl, ubnl);
+
+//   // count linear and constant terms
+//   int nlin = lcoeff_.size();
+//   if (fabs (c0_) > COUENNE_EPS) nlin++;
+//   //  for (register int *ind = index_; *ind++>=0; nlin++);
+
+//   expression 
+//     **linall = new expression * [nlin + 1], // linear arglist for lower bound
+//     **linalu = new expression * [nlin + 1]; //                    upper
+
+//   // add constant to bounds
+//   if (fabs (c0_) > COUENNE_EPS) {
+//     *linall++ = new exprConst (c0_);
+//     *linalu++ = new exprConst (c0_);
+//   }
+
+//   // TODO: make it another exprGroup!
+
+//   // derive linear part (obtain constant)
+//   for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
+
+//     //    c0 += el -> second;
+
+//     CouNumber coeff = el -> second;
+//     int         ind = el -> first -> Index ();
+
+//     expression *l = new exprLowerBound (ind, el -> first -> domain ()),
+//                *u = new exprUpperBound (ind, el -> first -> domain ());
+
+//     if (fabs (coeff - 1.) < COUENNE_EPS) {
+//       *linall++ = l;
+//       *linalu++ = u;
+//     } else {
+
+//       expression *c1 = new exprConst (coeff),
+//                  *c2 = new exprConst (coeff);
+
+//       if (coeff < 0) {
+// 	*linall++ = new exprMul (c1, u);
+// 	*linalu++ = new exprMul (c2, l);
+//       } else {
+// 	*linall++ = new exprMul (c1, l);
+// 	*linalu++ = new exprMul (c2, u);
+//       }
+//     }
+//   }
+
+//   *linall = lbnl;
+//   *linalu = ubnl;
+
+//   lb = new exprSum (linall - nlin, nlin + 1);
+//   ub = new exprSum (linalu - nlin, nlin + 1);
+// }
+
+
+
+/// Get values of  lower and upper bound of an expression (if any)
+void exprGroup::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  // compute lower/upper bound of nonlinear part
+
+  exprSum::getBounds (lb, ub);
+  /*{
+    expression *le, *ue;
+    getBounds (le, ue);
+
+    lb = (*le) ();
+    ub = (*ue) ();
+
+    delete le;
+    delete ue;
+    }*/
+
+  lb += c0_;
+  ub += c0_;
+
+  // derive linear part (obtain constant)
+  for (lincoeff::iterator el = lcoeff_.begin (); el != lcoeff_.end (); ++el) {
+
+    exprVar    *var = el -> first;
+    CouNumber coeff = el -> second, vlb, vub;
+
+    bool 
+      inf_lb = false,
+      inf_ub = false;
+
+    if ((vlb = var -> lb ()) < -COUENNE_INFINITY) {
+      if (coeff > 0) inf_lb = true;
+      else           inf_ub = true;
+    } else {
+      if (coeff > 0) lb += vlb * coeff;
+      else           ub += vlb * coeff;
+    }
+
+    if ((vub = var -> ub ()) >  COUENNE_INFINITY) {
+      if (coeff > 0) inf_ub = true;
+      else           inf_lb = true;
+    } else {
+      if (coeff > 0) ub += vub * coeff;
+      else           lb += vub * coeff;
+    }
+
+    if (inf_lb) lb = -COUENNE_INFINITY;
+    if (inf_ub) ub =  COUENNE_INFINITY;
+
+    if (inf_lb && inf_ub) break; // no need to keep computing...
+  }
 }
 
 

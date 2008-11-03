@@ -128,11 +128,16 @@ class exprCopy: public expression {
   inline int Linearity ()
   {return copy_ -> Linearity ();}
 
+  /// return true if expression is integer
   virtual inline bool isInteger ()
   {return copy_ -> isInteger ();}
 
   /// Get lower and upper bound of an expression (if any)
   inline void getBounds (expression *&lower, expression *&upper) 
+  {copy_ -> getBounds (lower, upper);}
+
+  /// Get lower and upper bound of an expression (if any)
+  inline void getBounds (CouNumber &lower, CouNumber &upper) 
   {copy_ -> getBounds (lower, upper);}
 
   /// Create standard formulation of this expression

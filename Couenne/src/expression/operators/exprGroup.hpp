@@ -77,6 +77,9 @@ public:
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
+  /// Get lower and upper bound of an expression (if any)
+  virtual void getBounds (CouNumber &, CouNumber &);
+
   /// special version for linear constraints
   virtual void generateCuts (expression *, const OsiSolverInterface &, 
 			     OsiCuts &, const CouenneCutGenerator *,

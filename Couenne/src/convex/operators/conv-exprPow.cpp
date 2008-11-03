@@ -63,14 +63,32 @@ exprAux *exprPow::standardize (CouenneProblem *p, bool addAux) {
     // better (lower) convexification -- replace exprOp::standardize 
     exprOp::standardize (p);
 
-    // if binary
-    if (arglist_ [0] -> isInteger () &&  // integer
+    // if binary -- NO! Bounds not known yet
+    /*if (arglist_ [0] -> isInteger () &&  // integer
 	(fabs (p -> Lb (arglist_ [0] -> Index ()))      < COUENNE_EPS) && // >= 0
 	(fabs (p -> Ub (arglist_ [0] -> Index ()) - 1.) < COUENNE_EPS))   // <= 1
+      {
+
+	printf ("------------------ returning binary! [%g,%g] ",
+		p -> Lb (arglist_ [0] -> Index ()),
+		p -> Ub (arglist_ [0] -> Index ()));
+	print ();
+	printf ("\n");
+
       return (addAux ? (p -> addAuxiliary (arglist_ [0])) :  // return same variable
 	      new exprAux (arglist_ [0], p -> domain ()));
-    else  // otherwise return normal power
+      }
+      else*/  // otherwise return normal power
+    {
+
+      /*printf ("------------------ returning normal [%g,%g] ",
+	      arglist_ [0] -> ),
+	      p -> Ub (arglist_ [0] -> Index ()));
+      print ();
+      printf ("\n");*/
+
       return (addAux ? (p -> addAuxiliary (this)) : new exprAux (this, p -> domain ()));
+    }
   }
 
   return (addAux ? (p -> addAuxiliary (ret)) : new exprAux (ret, p -> domain ()));

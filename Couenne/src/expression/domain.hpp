@@ -65,9 +65,9 @@ public:
   /// return dimension_
   inline int Dimension () {return dimension_;}
 
-  inline CouNumber &x  (int index) {return x_  [index];} ///< return current variable
-  inline CouNumber &lb (int index) {return lb_ [index];} ///< return current lower bound
-  inline CouNumber &ub (int index) {return ub_ [index];} ///< return current upper bound
+  inline CouNumber &x  (register int index) {return x_  [index];} ///< return current variable
+  inline CouNumber &lb (register int index) {return lb_ [index];} ///< return current lower bound
+  inline CouNumber &ub (register int index) {return ub_ [index];} ///< return current upper bound
 
   inline CouNumber *x  () {return x_ ;} ///< return current variable vector
   inline CouNumber *lb () {return lb_;} ///< return current lower bound vector
@@ -128,11 +128,11 @@ public:
   /// restore previous point
   void pop ();
 
-  inline DomainPoint *current ()   {return point_;}                 ///< return current point
+  inline DomainPoint *current ()   {return point_;}                          ///< return current point
 
-  inline CouNumber &x  (int index) {return point_ -> x  (index);}   ///< return current variable
-  inline CouNumber &lb (int index) {return point_ -> lb (index);}   ///< return current lower bound
-  inline CouNumber &ub (int index) {return point_ -> ub (index);}   ///< return current upper bound
+  inline CouNumber &x  (register int index) {return point_ -> x  (index);}   ///< current variable
+  inline CouNumber &lb (register int index) {return point_ -> lb (index);}   ///< current lower bound
+  inline CouNumber &ub (register int index) {return point_ -> ub (index);}   ///< current upper bound
 
   inline CouNumber *x  () {return point_ -> x  ();}   ///< return current variable vector
   inline CouNumber *lb () {return point_ -> lb ();}   ///< return current lower bound vector

@@ -26,6 +26,7 @@ exprMul::exprMul  (expression **al, int n):
   qsort (arglist_, nargs_, sizeof (expression*), compareExpr);
 }
 
+
 /// constructor with only two factors
 exprMul::exprMul (expression *arg0, expression *arg1):
   exprOp (arg0, arg1) {
@@ -41,7 +42,6 @@ exprMul::exprMul (expression *arg0, expression *arg1):
 
 
 /// simplify multiplications
-
 expression *exprMul::simplify () {
 
   exprOp:: simplify ();
@@ -99,7 +99,6 @@ expression *exprMul::simplify () {
 
 
 // differentiate product of expressions
-
 expression *exprMul::differentiate (int index) {
 
   expression **als = new expression * [nargs_];

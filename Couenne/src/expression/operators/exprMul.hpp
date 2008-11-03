@@ -51,7 +51,10 @@ class exprMul: public exprOp {
   virtual int Linearity ();
 
   /// Get lower and upper bound of an expression (if any)
-  void getBounds (expression *&, expression *&);
+  virtual void getBounds (expression *&, expression *&);
+
+  /// Get value of lower and upper bound of an expression (if any)
+  virtual void getBounds (CouNumber &lb, CouNumber &ub);
 
   /// reduce expression in standard form, creating additional aux
   /// variables (and constraints)

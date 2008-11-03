@@ -46,6 +46,23 @@ void exprInv::getBounds (expression *&lb, expression *&ub) {
 }
 
 
+// compute VALUE of lower and upper bound of expression
+void exprInv::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  register CouNumber lba, uba;
+
+  argument_ -> getBounds (lba, uba);
+
+  if ((uba < 0) || (lba > 0)) {
+    lb = 1./uba;
+    ub = 1./lba;
+  } else {
+    lb = -COUENNE_INFINITY;
+    ub =  COUENNE_INFINITY;
+  }
+}
+
+
 #define MIN_DENOMINATOR 1e-6
 
 // generate convexification cut for constraint w = 1/x

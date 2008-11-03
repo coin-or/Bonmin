@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: definition of the exponential
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08.
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -20,7 +20,7 @@ expression *exprExp::differentiate (int index) {
 }
 
 
-// Get lower and upper bound of an expression (if any)
+// Get expressions of lower and upper bound of an expression (if any)
 void exprExp::getBounds (expression *&lb, expression *&ub) {
 
   expression *lba, *uba;
@@ -28,6 +28,17 @@ void exprExp::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprExp (lba);
   ub = new exprExp (uba);
+}
+
+
+// Get value of lower and upper bound of an expression (if any)
+void exprExp::getBounds (CouNumber &lb, CouNumber&ub) {
+
+  CouNumber lba, uba;
+  argument_ -> getBounds (lba, uba);
+
+  lb = exp (lba);
+  ub = exp (uba);
 }
 
 

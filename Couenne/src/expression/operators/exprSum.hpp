@@ -53,6 +53,9 @@ class exprSum: public exprOp {
   /// Get lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
+  /// Get lower and upper bound of an expression (if any)
+  virtual void getBounds (CouNumber &, CouNumber &);
+
   /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)
   virtual exprAux *standardize (CouenneProblem *p, bool addAux = true);

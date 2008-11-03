@@ -44,6 +44,9 @@ class exprLog: public exprUnary {
   /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&, expression *&);
 
+  /// Get value of lower and upper bound of an expression (if any)
+  void getBounds (CouNumber &lb, CouNumber &ub);
+
   /// generate equality between *this and *w
   void generateCuts (expression *w, const OsiSolverInterface &si, 
 		     OsiCuts &cs, const CouenneCutGenerator *cg, 

@@ -30,7 +30,6 @@ expression *exprSin::differentiate (int index) {
 
 
 // compute bounds of sin x given bounds of x 
-
 void exprSin::getBounds (expression *&lb, expression *&ub) {
 
   expression *xl, *xu;
@@ -41,6 +40,28 @@ void exprSin::getBounds (expression *&lb, expression *&ub) {
   ub = new exprUBSin (new exprClone (xl), new exprClone (xu));
 }
 
+
+// compute value of bounds of cos x given bounds of x 
+void exprSin::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  CouNumber l, u;
+
+  argument_ -> getBounds (l, u);
+
+  CouNumber pi2 = 2 * M_PI;
+
+  if ((u - l > pi2) ||        // 1) interval spans whole cycle
+      (floor (l/pi2 - 0.75) < // 2) there is a pi + 2k pi between l and u
+       floor (u/pi2 - 0.75))) 
+    lb = -1.;
+  else lb = CoinMin (cos (l), cos (u));
+
+  if ((u - l > pi2) ||        // 1) interval spans whole cycle
+      (floor (l/pi2 - 0.25) < // 2) there is a 3/2 pi + 2k pi between l and u
+       floor (u/pi2 - 0.25))) 
+    ub = 1.;
+  else ub = CoinMax (cos (l), cos (u));
+}
 
 /// generalized implied bound procedure for sine/cosine
 bool trigImpliedBound (enum cou_trig type, int wind, int xind,

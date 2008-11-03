@@ -62,6 +62,9 @@ class exprDiv: public exprOp {
   /// Get lower and upper bound of an expression (if any)
   void getBounds (expression *&lb, expression *&ub);
 
+  /// Get value of lower and upper bound of an expression (if any)
+  void getBounds (CouNumber &lb, CouNumber &ub);
+
   /// Reduce expression in standard form, creating additional aux
   /// variables (and constraints)
   exprAux *standardize (CouenneProblem *p, bool addAux = true);

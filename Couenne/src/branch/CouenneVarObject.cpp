@@ -12,7 +12,7 @@
 #include "CouenneProblem.hpp"
 #include "CouenneVarObject.hpp"
 #include "CouenneBranchingObject.hpp"
-
+#include "CouenneComplObject.hpp"
 
 /// Constructor with information for branching point selection strategy
 CouenneVarObject::CouenneVarObject (CouenneProblem *p,
@@ -56,7 +56,9 @@ OsiBranchingObject *CouenneVarObject::createBranch (OsiSolverInterface *si,
      info -> upper_); // have to alloc+copy
 
   int bestWay;
-  CouNumber bestPt = computeBranchingPoint (info, bestWay);
+  const CouenneObject *criticalObject = NULL; // should create the branchingObject
+
+  CouNumber bestPt = computeBranchingPoint (info, bestWay, criticalObject);
 
   ///////////////////////////////////////////
 
@@ -66,8 +68,9 @@ OsiBranchingObject *CouenneVarObject::createBranch (OsiSolverInterface *si,
 	  info -> lower_    [reference_ -> Index ()],
 	  info -> upper_    [reference_ -> Index ()]);
 
-  CouenneBranchingObject *brObj = new CouenneBranchingObject 
-    (si, this, jnlst_, reference_, way, bestPt, doFBBT_, doConvCuts_);
+  OsiBranchingObject *brObj = criticalObject ? 
+    criticalObject -> createBranch (si, info, way) :
+    new CouenneBranchingObject (si, this, jnlst_, reference_, way, bestPt, doFBBT_, doConvCuts_);
 
   problem_ -> domain () -> pop ();
 
@@ -77,8 +80,9 @@ OsiBranchingObject *CouenneVarObject::createBranch (OsiSolverInterface *si,
 
 /// compute branching point (used in createBranch ())
 CouNumber CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation *info,
-						  int& bestWay) const
-{
+						  int& bestWay,
+						  const CouenneObject *&criticalObject) const {
+  criticalObject = NULL;
 
   if (jnlst_ -> ProduceOutput (J_DETAILED, J_BRANCHING)) {
     printf ( "---------- computeBRPT for "); 
@@ -108,30 +112,30 @@ CouNumber CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation 
 
   for (std::set <int>::iterator i = deplist.begin (); i != deplist.end (); ++i) {
 
-    CouenneObject obj = problem_ -> Objects () [*i];
+    CouenneObject *obj = problem_ -> Objects () [*i];
 
     CouNumber improv = 0.;
 
-    assert (obj. Reference ());
+    assert (obj -> Reference ());
 
     if (jnlst_ -> ProduceOutput (J_MATRIX, J_BRANCHING)) {
       printf ("  ** "); 
-      obj. Reference ()             -> print (); 
-      if (reference_ -> Image ()) {printf (" := "); obj. Reference () -> Image () -> print ();}
+      obj -> Reference ()             -> print (); 
+      if (reference_ -> Image ()) {printf (" := "); obj -> Reference () -> Image () -> print ();}
       printf ("\n");
     }
 
-    if (obj. Reference ()) {
-      if (obj. Reference () -> Image ())
-	improv = obj. Reference () -> Image ()
-	  -> selectBranch (&obj, info,                      // input parameters
+    if (obj -> Reference ()) {
+      if (obj -> Reference () -> Image ())
+	improv = obj -> Reference () -> Image ()
+	  -> selectBranch (obj, info,                      // input parameters
 			   brVar, brPts, brDist, whichWay); // result: who, where, distances, direction
       else {
-	brVar = obj. Reference ();
+	brVar = obj -> Reference ();
 	brPts  = (double *) realloc (brPts, sizeof (double)); 
 	brDist = (double *) realloc (brDist, 2 * sizeof (double)); 
 
-	double point = info -> solution_ [obj. Reference () -> Index ()];
+	double point = info -> solution_ [obj -> Reference () -> Index ()];
 
 	*brPts = point;
 	improv = 0.;
@@ -155,6 +159,8 @@ CouNumber CouenneVarObject::computeBranchingPoint(const OsiBranchingInformation 
 	(brVar -> Index () == index) &&    // it's us!
 	(fabs (improv) > maxdist) &&       // this branching seems to induce a higher improvement
 	(fabs (*brPts) < COU_MAX_COEFF)) { // and branching pt is limited
+
+      criticalObject = problem_ -> Objects () [*i]; // set this object as the branch creator
 
       brdistDn = brDist [0];
       brdistUp = brDist [1];
@@ -262,12 +268,12 @@ double CouenneVarObject::feasibleRegion (OsiSolverInterface *solver,
 /// are we on the bad or good side of the expression?
 bool CouenneVarObject::isCuttable () const {
 
-  const std::set <int>              &deplist = problem_ -> Dependence () [reference_ -> Index ()];
-  const std::vector <CouenneObject> &objects = problem_ -> Objects ();
+  const std::set <int>                &deplist = problem_ -> Dependence () [reference_ -> Index ()];
+  const std::vector <CouenneObject *> &objects = problem_ -> Objects ();
 
   for (std::set <int>::const_iterator depvar = deplist. begin ();
        depvar != deplist. end (); ++depvar)
-    if (!(objects [*depvar]. isCuttable ()))
+    if (!(objects [*depvar] -> isCuttable ()))
       return false;
 
   return (!(reference_ -> isInteger ()));

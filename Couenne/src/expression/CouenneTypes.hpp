@@ -10,6 +10,9 @@
 #ifndef COUENNE_TYPES_H
 #define COUENNE_TYPES_H
 
+/** general include file for different compilers */
+#include "CoinPragma.hpp"
+
 /** type of a node in an expression tree */
 enum nodeType       {CONST=0, VAR, UNARY, N_ARY, COPY, AUX, EMPTY};
 

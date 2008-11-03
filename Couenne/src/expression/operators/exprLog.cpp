@@ -51,6 +51,18 @@ void exprLog::getBounds (expression *&lb, expression *&ub) {
 }
 
 
+/// get bounds of log (x) based on bounds of x
+
+void exprLog::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  CouNumber lba, uba;
+  argument_ -> getBounds (lba, uba);
+
+  lb = log (CoinMax (1e-50, lba));
+  ub = log (CoinMax (1e-50, uba));
+}
+
+
 /// differentiation
 expression *exprLog::differentiate (int index) {
   return new exprDiv (argument_ -> differentiate (index),

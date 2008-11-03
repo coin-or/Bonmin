@@ -121,8 +121,11 @@ class exprVar: public expression {
     return ((fabs (lb - domain_ -> ub (varIndex_)) < COUENNE_EPS) && (::isInteger (lb)));
   }
 
-  /// Get lower and upper bound of an expression (if any)
+  /// Get expression of lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
+
+  /// Get value of lower and upper bound of an expression (if any)
+  virtual void getBounds (CouNumber &lb, CouNumber &ub);
 
   /// generate cuts for expression associated with this auxiliary
   virtual void generateCuts (const OsiSolverInterface &, 

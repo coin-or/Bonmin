@@ -84,6 +84,24 @@ void exprSub::getBounds (expression *&lb, expression *&ub) {
 }
 
 
+// Get value of lower and upper bound of an expression (if any)
+void exprSub::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  CouNumber lba0, uba0, lba1, uba1;
+
+  arglist_ [0] -> getBounds (lba0, uba0);
+  arglist_ [1] -> getBounds (lba1, uba1);
+
+  lb = ((lba0 < -COUENNE_INFINITY) || (uba1 >  COUENNE_INFINITY)) ?
+    -COUENNE_INFINITY :
+    (lba0 - uba1);
+
+  ub = ((uba0 >  COUENNE_INFINITY) || (lba1 < -COUENNE_INFINITY)) ?
+    COUENNE_INFINITY :
+    (uba0 - lba1);
+}
+
+
 /// implied bound processing for expression w = x-y, upon change in
 /// lower- and/or upper bound of w, whose index is wind
 

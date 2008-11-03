@@ -156,7 +156,7 @@ class CouenneProblem {
   /// vector of pointer to CouenneObjects. Used by CouenneVarObjects
   /// when finding all objects related to (having as argument) a
   /// single variable
-  std::vector <CouenneObject> objects_;
+  std::vector <CouenneObject *> objects_;
 
   /// each element is true if variable is integer and, if auxiliary,
   /// depends on no integer
@@ -428,7 +428,7 @@ class CouenneProblem {
   {return dependence_;}
 
   /// return object vector
-  const std::vector <CouenneObject> &Objects () const
+  const std::vector <CouenneObject *> &Objects () const
   {return objects_;}
 
   /// find SOS constraints in problem

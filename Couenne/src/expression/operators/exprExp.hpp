@@ -43,7 +43,10 @@ class exprExp: public exprUnary {
   expression *differentiate (int index); 
 
   /// Get lower and upper bound of an expression (if any)
-  void getBounds (expression *&, expression *&);
+  virtual void getBounds (expression *&, expression *&);
+
+  /// Get expression of lower and upper bound of an expression (if any)
+  virtual void getBounds (CouNumber &lb, CouNumber&ub);
 
   /// Generate convexification cuts for this expression
   void generateCuts (expression *w, const OsiSolverInterface &si, 

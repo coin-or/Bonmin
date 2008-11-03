@@ -113,13 +113,12 @@ expression *exprSum:: differentiate (int index) {
 
 
 /// Get lower and upper bound of an expression (if any)
-
 void exprSum::getBounds (expression *&lb, expression *&ub) {
 
   expression **all = new expression * [nargs_];
   expression **alu = new expression * [nargs_];
 
-  for (register int i=0; i<nargs_; i++)
+  for (int i=0; i<nargs_; i++)
     arglist_ [i] -> getBounds (all [i], alu [i]);
 
   lb = new exprSum (all, nargs_);
@@ -127,8 +126,22 @@ void exprSum::getBounds (expression *&lb, expression *&ub) {
 }
 
 
-/// get a measure of "how linear" the expression is (see CouenneTypes.h)
+/// Get lower and upper bound of an expression (if any)
+void exprSum::getBounds (CouNumber &lb, CouNumber &ub) {
 
+  CouNumber tlb, tub;
+
+  lb = ub = 0;
+
+  for (int i=0; i<nargs_; i++) {
+    arglist_ [i] -> getBounds (tlb, tub);
+    lb += tlb;
+    ub += tub;
+  }
+}
+
+
+/// get a measure of "how linear" the expression is (see CouenneTypes.h)
 int exprSum::Linearity () {
 
   int linmax = arglist_ [0] -> Linearity ();

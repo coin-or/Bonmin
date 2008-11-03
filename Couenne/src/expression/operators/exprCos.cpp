@@ -31,7 +31,7 @@ expression *exprCos::differentiate (int index) {
 }
 
 
-// compute bounds of sin x given bounds of x 
+// compute expression of bounds of cos x given bounds of x 
 void exprCos::getBounds (expression *&lb, expression *&ub) {
 
   expression *xl, *xu;
@@ -39,6 +39,26 @@ void exprCos::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprLBCos (xl, xu);
   ub = new exprUBCos (new exprClone (xl), new exprClone (xu));
+}
+
+
+// compute value of bounds of cos x given bounds of x 
+void exprCos::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  CouNumber l, u,  pi2 = 2 * M_PI;
+  argument_ -> getBounds (l, u);
+
+  if ((u - l > pi2) ||       // 1) interval spans whole cycle
+      (floor (l/pi2 - 0.5) < // 2) there is a pi + 2k pi between l and u
+       floor (u/pi2 - 0.5))) 
+    lb = -1.;
+  else lb = CoinMin (cos (l), cos (u));
+
+  if ((u - l > pi2) || // 1) interval spans whole cycle
+      (floor (l/pi2) < // 2) there is a 3/2 pi + 2k pi between l and u
+       floor (u/pi2))) 
+    ub = 1.;
+  else ub = CoinMax (cos (l), cos (u));
 }
 
 

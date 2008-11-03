@@ -38,12 +38,12 @@ void CouenneProblem::fillDependence (Bonmin::BabSetupBase *base) {
       if (!infeasObj) // found something that will never be infeasibl
 	continue;
 
-      CouenneObject infObj (*infeasObj);
+      //CouenneObject infObj (*infeasObj);
 
-      delete infeasObj;
+      //delete infeasObj;
 
       // add object for this variable
-      objects_.push_back (infObj);
+      objects_.push_back (infeasObj);
 
       std::set <int> deplist;
 
@@ -61,6 +61,6 @@ void CouenneProblem::fillDependence (Bonmin::BabSetupBase *base) {
 	  obj.insert (ind);
       }
 
-    } else objects_.push_back (nullObject); // null object for original and linear auxiliaries
+    } else objects_.push_back (new CouenneObject (nullObject)); // null for original and linear auxs
   }
 }

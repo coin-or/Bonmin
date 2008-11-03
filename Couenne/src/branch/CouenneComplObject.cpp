@@ -39,8 +39,8 @@ double CouenneComplObject::infeasibility (const OsiBranchingInformation *info, i
       index1 = arglist [1] -> Index ();
 
   CouNumber 
-    x0 = info -> solution_ [index0],
-    x1 = info -> solution_ [index1];
+    x0 = fabs (info -> solution_ [index0]),
+    x1 = fabs (info -> solution_ [index1]);
 
   // if x1 < x0, it is preferrable to branch with x1=0 instead of x0=0
   // as this is closer to the point
@@ -59,8 +59,9 @@ double CouenneComplObject::checkInfeasibility (const OsiBranchingInformation * i
   int index0 = arglist [0] -> Index (),
       index1 = arglist [1] -> Index ();
 
-  return info -> solution_ [index0] * 
-         info -> solution_ [index1];
+  return 
+    fabs (info -> solution_ [index0]) * 
+    fabs (info -> solution_ [index1]);
 }
 
 
@@ -70,8 +71,14 @@ OsiBranchingObject *CouenneComplObject::createBranch (OsiSolverInterface *solver
 						      const OsiBranchingInformation *info, 
 						      int way) const {
 
+  expression **args = reference_ -> Image () -> ArgList ();
+
+  /*  printf ("creating CCobj: %d %d.%d\n", reference_ -> Index (), 
+	  args [0] -> Index (),
+	  args [1] -> Index ());*/
+
   return new CouenneComplBranchingObject (solver, this, jnlst_,
-					  reference_ -> ArgList () [0],
-					  reference_ -> ArgList () [1], 
+					  args [0],
+					  args [1], 
 					  way, 0, doFBBT_, doConvCuts_);
 }

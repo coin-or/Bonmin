@@ -3,7 +3,7 @@
  * Author:  Pietro Belotti
  * Purpose: methods of the class for defining variables
  *
- * (C) Carnegie-Mellon University, 2006. 
+ * (C) Carnegie-Mellon University, 2006-08. 
  * This file is licensed under the Common Public License (CPL)
  */
 
@@ -14,11 +14,19 @@
 #include "depGraph.hpp"
 
 
-// Get lower and upper bound of a variable expression (if any)
+// Get expression of lower and upper bound of a variable expression (if any)
 void exprVar::getBounds (expression *&lb, expression *&ub) {
 
   lb = new exprLowerBound (varIndex_, domain_); 
   ub = new exprUpperBound (varIndex_, domain_);
+}
+
+
+// Get value of lower and upper bound of a variable expression (if any)
+void exprVar::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  lb = domain_ -> lb (varIndex_);
+  ub = domain_ -> ub (varIndex_);
 }
 
 

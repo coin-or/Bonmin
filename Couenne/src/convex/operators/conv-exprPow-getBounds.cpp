@@ -169,3 +169,59 @@ void exprPow::getBounds (expression *&lb, expression *&ub) {
   lb -> print (); printf ("=%g, ", (*lb) ());
   ub -> print (); printf ("=%g [%g,%g]\n", (*ub) (), l, u);*/
 }
+
+
+// get value of lower and upper bound for the expression
+void exprPow::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  CouNumber lba, uba, k = (*(arglist_ [1])) ();
+  arglist_ [0] -> getBounds (lba, uba);
+  int intk;
+
+  bool isInt = fabs (k - (double) (intk = COUENNE_round (k))) < COUENNE_EPS;
+
+  if (isInt && !(intk % 2) && (k > 0)) { // x^{2h}
+
+    if (uba < 0) {
+      lb = pow (-uba, k);
+      ub = pow (-lba, k);
+    } else if (lba > 0) {
+      lb = pow (lba, k);
+      ub = pow (uba, k);
+    } else {
+      lb = 0;
+      ub = pow (CoinMax (-lba, uba), k);
+    }
+
+  } else if (k > 0) { // monotone increasing: x^{2h+1} with h integer, x^h with h real
+
+    lb = pow (lba, k);
+    ub = pow (uba, k);
+
+  } else if (isInt && !(intk % 2)) { // x^{-2h} or x^{-1/2h} with h integer
+
+    if (uba < 0) {
+      lb = pow (-lba, k);
+      ub = pow (-uba, k);
+    } else if (lba > 0) {
+      lb = pow (uba, k);
+      ub = pow (lba, k);
+    } else {
+      lb = pow (CoinMax (-lba, uba), k);
+      ub = COUENNE_INFINITY;
+    }
+
+  } else { // x^k, k<0
+
+    if (uba < 0) {
+      lb = pow (uba, k);
+      ub = pow (lba, k);
+    } else if (lba > 0) {
+      lb = pow (uba, k);
+      ub = pow (lba, k);
+    } else {
+      lb = -COUENNE_INFINITY; // !!! may not be reached
+      ub =  COUENNE_INFINITY;
+    }
+  }
+}

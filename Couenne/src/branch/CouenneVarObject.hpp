@@ -62,7 +62,9 @@ public:
 protected:
 
   /// Method computing the branching point
-  CouNumber computeBranchingPoint (const OsiBranchingInformation *info, int& bestWay) const;
+  CouNumber computeBranchingPoint (const OsiBranchingInformation *info, 
+				   int& bestWay, 
+				   const CouenneObject *&criticalObject) const;
 };
 
 #endif

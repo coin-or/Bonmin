@@ -55,7 +55,7 @@ class expression {
   expression (const expression &e, Domain *d = NULL) {}
 
   /// Destructor
-  virtual ~expression () {}
+  virtual inline ~expression () {}
 
   /// Cloning method
   virtual expression *clone (Domain *d = NULL) const 
@@ -74,8 +74,7 @@ class expression {
   {return NULL;}
 
   /// set arglist (used in deleting nodes without deleting children)
-  virtual inline void ArgList (expression **al)
-  {}
+  virtual inline void ArgList (expression **al) {}
 
   /// return argument (when applicable, i.e., with univariate functions)
   virtual inline expression *Argument () const
@@ -105,12 +104,12 @@ class expression {
   /// the original expr??? instead of an exprClone -- improve computing
   /// efficiency. Only overloaded for exprClones/exprCopy, of course.
   virtual inline const expression *Original () const 
-    {return this;}
+  {return this;}
 
   /// print expression to iostream
   virtual void print (std::ostream &s       = std::cout,   //< output stream
 		      bool          descend = false) const //< descend into auxiliary's image?
-    {s << '?';}
+  {s << '?';}
 
   /// null function for evaluating the expression
   virtual CouNumber operator () () = 0;
@@ -153,10 +152,10 @@ class expression {
   virtual inline bool isInteger ()
   {return false;}
 
-  /// Get lower and upper bound of an expression (if any)
+  /// Get expression of lower and upper bound of an expression (if any)
   virtual void getBounds (expression *&, expression *&);
 
-  /// Get lower and upper bound of an expression (if any) -- real values
+  /// Get value of lower and upper bound of an expression (if any)
   virtual void getBounds (CouNumber &, CouNumber &);
 
   /// Create standard form of this expression, by:

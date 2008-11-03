@@ -74,6 +74,10 @@ public:
     upper = new exprConst (value_);
   }
 
+  /// Get lower and upper bound of an expression (if any)
+  inline void getBounds (CouNumber &lower, CouNumber &upper)
+  {lower = upper = value_;}
+
   /// generate convexification cut for constraint w = this
   void generateCuts (expression *, const OsiSolverInterface &, 
 		     OsiCuts &, const CouenneCutGenerator *, 

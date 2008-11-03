@@ -123,6 +123,41 @@ void exprDiv::getBounds (expression *&lb, expression *&ub) {
 }
 
 
+
+// get lower/upper bounds as a function of the arguments' lower/upper
+// bounds
+
+void exprDiv::getBounds (CouNumber &lb, CouNumber &ub) {
+
+  // lower
+
+  CouNumber ln, un, ld, ud;
+
+  arglist_ [0] -> getBounds (ln, un);
+  arglist_ [1] -> getBounds (ld, ud);
+
+  if (ld > 0)                                      // (?,?,+,+)
+    if   (ln > 0)    lb = safeDiv (ln,ud,-1);      // (+,+,+,+) --> ln/ud
+    else             lb = safeDiv (ln,ld,-1);      // (-,?,+,+) --> ln/ld
+  else { // ld <= 0
+    if      (ud > 0) lb = - COUENNE_INFINITY;      // (?,?,-,+) --> unbounded
+    else if (un > 0) lb = safeDiv (un,ud,-1);      // (?,+,-,-) --> un/ud
+    else             lb = safeDiv (un,ld,-1);      // (-,-,-,-) --> un/ld
+  }
+
+  // upper
+
+  if (ld > 0)                                     // (ln,un,ld,ud)     lb 
+    if   (un < 0) ub = safeDiv (un,ud,1);         // (-,-,+,+) --> un/ud
+    else          ub = safeDiv (un,ld,1);         // (?,+,+,+) --> un/ld
+  else { // ld <= 0
+    if      (ud > 0) ub = + COUENNE_INFINITY;     // (?,?,-,+) --> unbounded
+    else if (ln < 0) ub = safeDiv (ln,ud,1);      // (-,?,-,-) --> ln/ud
+    else             ub = safeDiv (ln,ld,1);      // (+,+,-,-) --> ln/ld
+  }
+}
+
+
 /// is this expression integer?
 bool exprDiv::isInteger () {
 
@@ -132,30 +167,26 @@ bool exprDiv::isInteger () {
   // expression is integer. Otherwise, check if denominator is +1 or
   // -1.
 
-  expression *dl, *du, *nl, *nu;
+  CouNumber dl, du, nl, nu;
 
   arglist_ [1] -> getBounds (dl, du);
   arglist_ [0] -> getBounds (nl, nu);
 
-  register CouNumber 
-    num = (*nl) (), 
-    den = (*dl) ();
-
   bool
-    denzero  = (fabs (den) < COUENNE_EPS),
-    numconst = (fabs (num - (*nu) ()) < COUENNE_EPS);
+    denzero  = (fabs (dl) < COUENNE_EPS),
+    numconst = (fabs (nl - nu) < COUENNE_EPS);
 
-  if ((fabs (num) < COUENNE_EPS)  && // numerator is zero
-      numconst                    && // constant
-      !denzero)                      // and denominator is nonzero
+  if ((fabs (nl) < COUENNE_EPS)  && // numerator is zero
+      numconst                   && // constant
+      !denzero)                     // and denominator is nonzero
 
     return true;
 
   // otherwise...
 
-  if (fabs (den - (*du) ()) < COUENNE_EPS) { // denominator is constant
+  if (fabs (dl - du) < COUENNE_EPS) { // denominator is constant
 
-    if (fabs (fabs (den) - 1) < COUENNE_EPS) // it is +1 or -1, check numerator
+    if (fabs (fabs (dl) - 1) < COUENNE_EPS) // it is +1 or -1, check numerator
       return arglist_ [0] -> isInteger ();
 
     if (denzero) // it is zero, better leave...
@@ -163,7 +194,7 @@ bool exprDiv::isInteger () {
 
     if (numconst) { // numerator is constant, too
 
-      CouNumber quot = num / den;
+      CouNumber quot = nl / dl;
 
       if (fabs (COUENNE_round (quot) - quot) < COUENNE_EPS)
 	return true;
