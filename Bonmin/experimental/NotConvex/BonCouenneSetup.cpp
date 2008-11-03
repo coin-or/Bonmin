@@ -16,6 +16,7 @@
 #include "CbcCompareActual.hpp"
 
 #include "CouenneObject.hpp"
+#include "CouenneComplObject.hpp"
 #include "CouenneVarObject.hpp"
 #include "CouenneVTObject.hpp"
 #include "CouenneChooseVariable.hpp"
@@ -247,7 +248,16 @@ namespace Bonmin{
 	    (var -> Type  () == AUX) && 
 	    (var -> Image () -> Linearity () > LINEAR)) {
 
-	  objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
+	  if ((var -> Image () -> code () == COU_EXPRMUL) &&
+	      (var -> Image () -> ArgList () [0] -> Index () >= 0) &&
+	      (var -> Image () -> ArgList () [1] -> Index () >= 0) &&
+	      (fabs (var -> lb ()) < COUENNE_EPS) &&
+	      (fabs (var -> ub ()) < COUENNE_EPS))
+
+	    // it's a complementarity constraint object!
+	    objects    [nobj] = new CouenneComplObject (couenneProb, var, this, journalist ());
+	  else objects [nobj] = new CouenneObject (couenneProb, var, this, journalist ());
+
 	  objects [nobj++] -> setPriority (contObjPriority);
 	  //objects [nobj++] -> setPriority (contObjPriority + var -> rank ());
 	}
