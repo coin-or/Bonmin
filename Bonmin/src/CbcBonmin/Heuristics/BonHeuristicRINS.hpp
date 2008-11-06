@@ -18,7 +18,7 @@ namespace Bonmin {
      /** Default constructor*/
      HeuristicRINS();
     /** Constructor with setup.*/
-    HeuristicRINS(BabSetupBase * setup);
+    HeuristicRINS(BonminSetup * setup);
 
      /** Copy constructor.*/
      HeuristicRINS(const HeuristicRINS &other);
@@ -38,6 +38,17 @@ namespace Bonmin {
 
    /** Initiaize using passed options.*/
    void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
+
+    /// Sets how often to do it
+    inline void setHowOften(int value)
+    { howOften_=value;}
+
+  private:
+    /// How often to do (code can change)
+    int howOften_;
+    /// Number of solutions so we can do something at solution
+    int numberSolutions_;
+
   };
 
 }/* Ends Bonmin namepace.*/

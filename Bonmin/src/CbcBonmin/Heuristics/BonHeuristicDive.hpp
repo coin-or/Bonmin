@@ -73,6 +73,10 @@ namespace Bonmin
     /// Percentage of integer variables to fix at bounds
     double percentageToFix_;
 
+  private:
+    /// How often to do (code can change)
+    int howOften_;
+
   };
 
   /// checks if the NLP relaxation of the problem is feasible

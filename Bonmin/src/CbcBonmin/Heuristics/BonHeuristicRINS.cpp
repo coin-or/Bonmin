@@ -12,22 +12,28 @@
 #include "CbcModel.hpp"
 #include "OsiBranchingObject.hpp"
 
+//#define DEBUG_BON_HEURISTIC_RINS
+
 namespace Bonmin {
 
   /** Default constructor*/
   HeuristicRINS::HeuristicRINS():
-    LocalSolverBasedHeuristic(){
-  }
+    LocalSolverBasedHeuristic(),
+    howOften_(100),
+    numberSolutions_(0)
+  {}
   /** Constructor with setup.*/
-  HeuristicRINS::HeuristicRINS(BabSetupBase * setup):
+  HeuristicRINS::HeuristicRINS(BonminSetup * setup):
     LocalSolverBasedHeuristic(setup){
   }
 
   /** Copy constructor.*/
   HeuristicRINS::HeuristicRINS
-             (const HeuristicRINS &other):
-    LocalSolverBasedHeuristic(other){
-  }
+  (const HeuristicRINS &other):
+    LocalSolverBasedHeuristic(other),
+    howOften_(other.howOften_),
+    numberSolutions_(other.numberSolutions_)
+  {}
 
   HeuristicRINS::~HeuristicRINS(){
   }
@@ -37,7 +43,15 @@ namespace Bonmin {
   HeuristicRINS::solution(double & objectiveValue,
 			  double * newSolution)
   {
-    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+#ifdef DEBUG_BON_HEURISTIC_RINS
+    std::cout<<"entered RINS"<<std::endl;
+#endif
+
+    //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if (numberSolutions_>=model_->getSolutionCount())
+      return 0;
+    else
+      numberSolutions_=model_->getSolutionCount();
 
     const double * bestSolution = model_->bestSolution();
     if (!bestSolution)
@@ -79,10 +93,18 @@ namespace Bonmin {
 
     int r_val = 0;
     if(nFix > numberIntegers/5) {
+#ifdef DEBUG_BON_HEURISTIC_RINS
+      std::cout<<"cutoff = "<<model_->getCutoff()<<std::endl;
+#endif
       r_val = doLocalSearch(nlp, newSolution, objectiveValue, model_->getCutoff());
+#ifdef DEBUG_BON_HEURISTIC_RINS
+      std::cout<<"executed RINS "<<r_val<<std::endl;
+#endif
     }
 
     delete nlp;
+
+    if(r_val > 0) numberSolutions_ = model_->getSolutionCount() + 1;
 
     return r_val;
   }

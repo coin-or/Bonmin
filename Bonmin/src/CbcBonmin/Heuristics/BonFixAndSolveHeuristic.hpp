@@ -16,7 +16,7 @@ namespace Bonmin {
      /** Default constructor*/
      FixAndSolveHeuristic();
     /** Constructor with setup.*/
-    FixAndSolveHeuristic(BabSetupBase * setup);
+    FixAndSolveHeuristic(BonminSetup * setup);
 
      /** Copy constructor.*/
      FixAndSolveHeuristic(const FixAndSolveHeuristic &other);

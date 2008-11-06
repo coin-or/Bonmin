@@ -17,7 +17,7 @@ namespace Bonmin {
      max_number_nodes_(1000),
      max_number_solutions_(10){
   }
-  LocalSolverBasedHeuristic::LocalSolverBasedHeuristic(BabSetupBase * setup):
+  LocalSolverBasedHeuristic::LocalSolverBasedHeuristic(BonminSetup * setup):
      CbcHeuristic(),
      setup_(setup),
      time_limit_(60),
@@ -52,7 +52,8 @@ namespace Bonmin {
                                             double *solution,
                                             double & solValue,
                                             double cutoff) const{
-      BabSetupBase * mysetup = setup_->clone(*solver);
+     Algorithm algo = B_OA;
+     BonminSetup * mysetup = setup_->clone(*solver, algo);
       Bab bb;
       mysetup->setDoubleParameter(BabSetupBase::Cutoff, cutoff);
       mysetup->setDoubleParameter(BabSetupBase::MaxTime, time_limit_);

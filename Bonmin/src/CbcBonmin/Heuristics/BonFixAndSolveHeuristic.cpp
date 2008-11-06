@@ -17,7 +17,7 @@ namespace Bonmin {
     LocalSolverBasedHeuristic(){
   }
   /** Constructor with setup.*/
-  FixAndSolveHeuristic::FixAndSolveHeuristic(BabSetupBase * setup):
+  FixAndSolveHeuristic::FixAndSolveHeuristic(BonminSetup * setup):
     LocalSolverBasedHeuristic(setup){
   }
 

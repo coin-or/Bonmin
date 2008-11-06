@@ -17,7 +17,7 @@ namespace Bonmin {
     LocalSolverBasedHeuristic(){
   }
   /** Constructor with setup.*/
-  DummyPump::DummyPump(BabSetupBase * setup):
+  DummyPump::DummyPump(BonminSetup * setup):
     LocalSolverBasedHeuristic(setup){
   }
 

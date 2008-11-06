@@ -37,13 +37,15 @@ namespace Bonmin
   HeuristicDiveMIP::HeuristicDiveMIP()
     :
     CbcHeuristic(),
-    setup_(NULL)
+    setup_(NULL),
+    howOften_(100)
   {}
 
   HeuristicDiveMIP::HeuristicDiveMIP(BonminSetup * setup)
     :
     CbcHeuristic(),
-    setup_(setup)
+    setup_(setup),
+    howOften_(100)
   {
     //    Initialize(setup->options());
   }
@@ -51,7 +53,8 @@ namespace Bonmin
   HeuristicDiveMIP::HeuristicDiveMIP(const HeuristicDiveMIP &copy)
     :
     CbcHeuristic(copy),
-    setup_(copy.setup_)
+    setup_(copy.setup_),
+    howOften_(copy.howOften_)
   {}
 
   HeuristicDiveMIP &
@@ -60,6 +63,7 @@ namespace Bonmin
     if(this != &rhs) {
       CbcHeuristic::operator=(rhs);
       setup_ = rhs.setup_;
+      howOften_ = rhs.howOften_;
     }
     return *this;
   }
@@ -69,7 +73,9 @@ namespace Bonmin
   int
   HeuristicDiveMIP::solution(double &solutionValue, double *betterSolution)
   {
-    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if ((model_->getNodeCount()%howOften_)!=0||model_->getCurrentPassNumber()>1)
+      return 0;
  
     int returnCode = 0; // 0 means it didn't find a feasible solution
 

@@ -18,7 +18,7 @@ namespace Bonmin {
      /** Default constructor*/
      HeuristicLocalBranching();
     /** Constructor with setup.*/
-    HeuristicLocalBranching(BabSetupBase * setup);
+    HeuristicLocalBranching(BonminSetup * setup);
 
      /** Copy constructor.*/
      HeuristicLocalBranching(const HeuristicLocalBranching &other);
@@ -45,6 +45,13 @@ namespace Bonmin {
 
     /** Initiaize using passed options.*/
     void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
+
+  private:
+    /// How often to do (code can change)
+    int howOften_;
+    /// Number of solutions so we can do something at solution
+    int numberSolutions_;
+
   };
 
 }/* Ends Bonmin namepace.*/

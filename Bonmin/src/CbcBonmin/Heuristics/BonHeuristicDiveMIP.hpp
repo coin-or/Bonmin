@@ -66,6 +66,10 @@ namespace Bonmin
     /** Setup to use for local searches (will make copies).*/
     BonminSetup * setup_; 
 
+  private:
+    /// How often to do (code can change)
+    int howOften_;
+
   };
 }
 #endif

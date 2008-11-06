@@ -16,7 +16,7 @@ namespace Bonmin {
      /** Default constructor*/
      DummyPump();
     /** Constructor with setup.*/
-    DummyPump(BabSetupBase * setup);
+    DummyPump(BonminSetup * setup);
 
      /** Copy constructor.*/
      DummyPump(const DummyPump &other);

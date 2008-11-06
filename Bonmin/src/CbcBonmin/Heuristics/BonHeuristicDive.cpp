@@ -29,14 +29,16 @@ namespace Bonmin
     :
     CbcHeuristic(),
     setup_(NULL),
-    percentageToFix_(0.2)
+    percentageToFix_(0.2),
+    howOften_(100)
   {}
 
   HeuristicDive::HeuristicDive(BonminSetup * setup)
     :
     CbcHeuristic(),
     setup_(setup),
-    percentageToFix_(0.2)
+    percentageToFix_(0.2),
+    howOften_(100)
   {
     //    Initialize(setup->options());
   }
@@ -45,7 +47,8 @@ namespace Bonmin
     :
     CbcHeuristic(copy),
     setup_(copy.setup_),
-    percentageToFix_(copy.percentageToFix_)    
+    percentageToFix_(copy.percentageToFix_),
+    howOften_(copy.howOften_)
   {}
 
   HeuristicDive &
@@ -55,6 +58,7 @@ namespace Bonmin
       CbcHeuristic::operator=(rhs);
       setup_ = rhs.setup_;
       percentageToFix_ = rhs.percentageToFix_;
+      howOften_ = rhs.howOften_;
     }
     return *this;
   }
@@ -62,7 +66,9 @@ namespace Bonmin
   int
   HeuristicDive::solution(double &solutionValue, double *betterSolution)
   {
-    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if ((model_->getNodeCount()%howOften_)!=0||model_->getCurrentPassNumber()>1)
+      return 0;
 
     int returnCode = 0; // 0 means it didn't find a feasible solution
 

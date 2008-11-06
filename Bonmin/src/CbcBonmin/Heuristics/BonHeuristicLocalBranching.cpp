@@ -16,18 +16,24 @@ namespace Bonmin {
 
   /** Default constructor*/
   HeuristicLocalBranching::HeuristicLocalBranching():
-    LocalSolverBasedHeuristic(){
-  }
+    LocalSolverBasedHeuristic(),
+    howOften_(100),
+    numberSolutions_(0)
+  {}
   /** Constructor with setup.*/
-  HeuristicLocalBranching::HeuristicLocalBranching(BabSetupBase * setup):
-    LocalSolverBasedHeuristic(setup){
-  }
+  HeuristicLocalBranching::HeuristicLocalBranching(BonminSetup * setup):
+    LocalSolverBasedHeuristic(setup),
+    howOften_(100),
+    numberSolutions_(0)
+  {}
 
   /** Copy constructor.*/
   HeuristicLocalBranching::HeuristicLocalBranching
-             (const HeuristicLocalBranching &other):
-    LocalSolverBasedHeuristic(other){
-  }
+  (const HeuristicLocalBranching &other):
+    LocalSolverBasedHeuristic(other),
+    howOften_(other.howOften_),
+    numberSolutions_(other.numberSolutions_)
+  {}
 
   HeuristicLocalBranching::~HeuristicLocalBranching(){
   }
@@ -72,7 +78,11 @@ namespace Bonmin {
   HeuristicLocalBranching::solution(double & objectiveValue,
 			  double * newSolution)
   {
-    if(!when() || model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    //    if(!when() || model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if (numberSolutions_>=model_->getSolutionCount())
+      return 0;
+    else
+      numberSolutions_=model_->getSolutionCount();
 
     const double * bestSolution = model_->bestSolution();
     if (!bestSolution)
@@ -103,6 +113,8 @@ namespace Bonmin {
     delete [] vals;
     delete [] inds;
     delete nlp;
+
+    if(r_val > 0) numberSolutions_ = model_->getSolutionCount() + 1;
 
     return r_val;
   }

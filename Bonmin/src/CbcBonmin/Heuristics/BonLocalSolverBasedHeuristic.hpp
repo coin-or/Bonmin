@@ -8,7 +8,7 @@
 
 #ifndef BonLocalSolverBasedHeuristic_H
 #define BonLocalSolverBasedHeuristic_H
-#include "BonBabSetupBase.hpp"
+#include "BonBonminSetup.hpp"
 #include "CbcHeuristic.hpp"
 
 namespace Bonmin {
@@ -18,7 +18,7 @@ namespace Bonmin {
     LocalSolverBasedHeuristic();
 
     /** Constructor with setup.*/
-    LocalSolverBasedHeuristic(BabSetupBase * setup);
+    LocalSolverBasedHeuristic(BonminSetup * setup);
 
     /** Copy constructor.*/
     LocalSolverBasedHeuristic(const LocalSolverBasedHeuristic & other);
@@ -42,7 +42,7 @@ namespace Bonmin {
   }
 
   /** Change setup used for heuristic.*/
-  void setSetup(BabSetupBase * setup){
+  void setSetup(BonminSetup * setup){
     setup_ = setup;
     Initialize(setup_->options());
   }
@@ -69,7 +69,7 @@ namespace Bonmin {
    void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
    protected:
    /** Setup to use for local searches (will make copies).*/
-   BabSetupBase * setup_; 
+   BonminSetup * setup_; 
 
    private:
     /** Time limit in local search.*/
