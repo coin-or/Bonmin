@@ -81,6 +81,17 @@ namespace Bonmin
       delete extraStuff;
     }
   }
+  BonminSetup::BonminSetup(const BonminSetup &other,
+                           OsiTMINLPInterface &nlp,
+			   Algorithm algo):
+    BabSetupBase(other, nlp, false),
+    algo_(algo)
+  {
+    if (algo_ == B_BB)
+      initializeBBB_noHeuristics();
+    else
+      initializeBHyb_noHeuristics(true);
+  }
   void BonminSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
     BabSetupBase::registerAllOptions(roptions);
@@ -343,6 +354,9 @@ namespace Bonmin
   void
   BonminSetup::initializeBBB()
   {
+#if 1
+    initializeBBB_noHeuristics();
+#else
     continuousSolver_ = nonlinearSolver_;
     nonlinearSolver_->ignoreFailures();
     OsiBabSolver extraStuff(2);
@@ -433,6 +447,7 @@ namespace Bonmin
     if (branchingMethod_ != NULL) {
       branchingMethod_->setNumberStrong(intParam_[NumberStrong]);
     }
+#endif
 
     Index doFixAndSolve = false;
     options()->GetEnumValue("fix_and_solve_heuristic",doFixAndSolve,"bonmin.");
@@ -526,7 +541,284 @@ namespace Bonmin
   }
 
   void
+  BonminSetup::initializeBBB_noHeuristics()
+  {
+    continuousSolver_ = nonlinearSolver_;
+    nonlinearSolver_->ignoreFailures();
+    OsiBabSolver extraStuff(2);
+    continuousSolver_->setAuxiliaryInfo(&extraStuff);
+
+    intParam_[BabSetupBase::SpecialOption] = 16;
+    if (!options_->GetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.")) {
+      intParam_[BabSetupBase::MinReliability] = 1;
+      options_->SetIntegerValue("bonmin.number_before_trust",intParam_[BabSetupBase::MinReliability],true,true);
+    }
+    if (!options_->GetIntegerValue("number_strong_branch",intParam_[BabSetupBase::NumberStrong],"bonmin.")) {
+      intParam_[BabSetupBase::NumberStrong] = 1000;
+      options_->SetIntegerValue("bonmin.number_strong_branch",intParam_[BabSetupBase::NumberStrong],true,true);
+    }
+    int varSelection;
+    bool val = options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
+    if (!val){// || varSelection == STRONG_BRANCHING || varSelection == RELIABILITY_BRANCHING ) {
+      options_->SetStringValue("bonmin.variable_selection", "nlp-strong-branching",true,true);
+      varSelection = NLP_STRONG_BRANCHING;
+    }
+
+    switch (varSelection) {
+    case CURVATURE_ESTIMATOR:
+    case QP_STRONG_BRANCHING:
+    case LP_STRONG_BRANCHING:
+    case NLP_STRONG_BRANCHING: {
+        continuousSolver_->findIntegersAndSOS(false);
+        setPriorities();
+        addSos();
+        SmartPtr<StrongBranchingSolver> strong_solver = NULL;
+        BonChooseVariable * chooseVariable = new BonChooseVariable(*this, nonlinearSolver_);
+        chooseVariable->passInMessageHandler(nonlinearSolver_->messageHandler());
+        switch (varSelection) {
+        case CURVATURE_ESTIMATOR:
+          strong_solver = new CurvBranchingSolver(nonlinearSolver_);
+          chooseVariable->setTrustStrongForSolution(false);
+          chooseVariable->setTrustStrongForBound(false);
+          //chooseVariable->setOnlyPseudoWhenTrusted(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
+          break;
+        case QP_STRONG_BRANCHING:
+          chooseVariable->setTrustStrongForSolution(false);
+          strong_solver = new QpBranchingSolver(nonlinearSolver_);
+          // The bound returned from the QP can be wrong, since the
+          // objective is not guaranteed to be an underestimator:
+          chooseVariable->setTrustStrongForBound(false);
+          //chooseVariable->setOnlyPseudoWhenTrusted(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
+          break;
+        case LP_STRONG_BRANCHING:
+          chooseVariable->setTrustStrongForSolution(false);
+          strong_solver = new LpBranchingSolver(nonlinearSolver_);
+          //chooseVariable->setOnlyPseudoWhenTrusted(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
+          break;
+         case NLP_STRONG_BRANCHING:
+          chooseVariable->setTrustStrongForSolution(false);
+          chooseVariable->setTrustStrongForBound(true);
+          chooseVariable->setOnlyPseudoWhenTrusted(false);
+          break;
+        }
+        nonlinearSolver_->SetStrongBrachingSolver(strong_solver);
+        branchingMethod_ = chooseVariable;
+      }
+      break;
+    case OSI_SIMPLE:
+      continuousSolver_->findIntegersAndSOS(false);
+      setPriorities();
+      addSos();
+      branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
+
+      break;
+    case OSI_STRONG:
+      continuousSolver_->findIntegersAndSOS(false);
+      setPriorities();
+      addSos();
+      branchingMethod_ = new OsiChooseStrong(nonlinearSolver_);
+      break;
+    case RANDOM:
+      continuousSolver_->findIntegersAndSOS(false);
+      setPriorities();
+      addSos();
+      branchingMethod_ = new BonRandomChoice(nonlinearSolver_);
+      break;
+      //default:
+      //abort();
+    }
+    if (branchingMethod_ != NULL) {
+      branchingMethod_->setNumberStrong(intParam_[NumberStrong]);
+    }
+  }
+
+  void
   BonminSetup::initializeBHyb(bool createContinuousSolver /*= false*/)
+  {
+#if 1
+    initializeBHyb_noHeuristics(createContinuousSolver);
+#else
+    if (createContinuousSolver) {
+      /* Create linear solver */
+      continuousSolver_ = new OsiClpSolverInterface;
+      int lpLogLevel;
+      options_->GetIntegerValue("lp_log_level",lpLogLevel,"bonmin.");
+      lpMessageHandler_ = nonlinearSolver_->messageHandler()->clone();
+      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+      continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+      nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
+      // say bound dubious, does cuts at solution
+      OsiBabSolver * extraStuff = new OsiBabSolver(3);
+      continuousSolver_->setAuxiliaryInfo(extraStuff);
+      delete extraStuff;
+    }
+    Algorithm algo = getAlgorithm();
+    if (algo == B_OA) {
+      options_->SetNumericValue("bonmin.oa_dec_time_limit",COIN_DBL_MAX, true, true);
+      options_->SetIntegerValue("bonmin.nlp_solve_frequency", 0, true, true);
+      intParam_[BabLogLevel] = 0;
+    }
+    else if (algo==B_QG) {
+      options_->SetNumericValue("bonmin.oa_dec_time_limit",0, true, true);
+      options_->SetIntegerValue("bonmin.nlp_solve_frequency", 0, true, true);
+    }
+    else if (algo==B_Ecp) {
+      options_->SetNumericValue("bonmin.oa_dec_time_limit",0, true, true);
+      options_->SetIntegerValue("bonmin.nlp_solve_frequency", 0, true, true);
+      options_->SetIntegerValue("bonmin.filmint_ecp_cuts", 1, true, true);
+      options_->SetIntegerValue("bonmin.number_cut_passes", 1, true, true);
+    }
+//#define GREAT_STUFF_FOR_ANDREAS
+#ifdef GREAT_STUFF_FOR_ANDREAS
+    printf("ToDo: Clean me up in Bab::branchAndBound\n");
+    OsiCuts cuts;
+    nonlinearSolver_->getOuterApproximation(cuts, true, NULL, true);
+    continuousSolver_->applyCuts(cuts);
+#endif
+
+
+    int varSelection;
+    options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
+    if (varSelection > RELIABILITY_BRANCHING) {
+      std::cout<<"Variable selection stragey not available with oa branch-and-cut."<<std::endl;
+    }
+    /* Populate cut generation and heuristic procedures.*/
+    int ival;
+    options_->GetIntegerValue("nlp_solve_frequency",ival,"bonmin.");
+    if (ival != 0) {
+      CuttingMethod cg;
+      cg.frequency = ival;
+      OaNlpOptim * nlpsol = new OaNlpOptim(*this);
+      nlpsol->passInMessageHandler(nonlinearSolver_->messageHandler());
+      cg.cgl = nlpsol;
+      cg.id="NLP solution based oa cuts";
+      cutGenerators_.push_back(cg);
+    }
+
+    options_->GetIntegerValue("filmint_ecp_cuts",ival, "bonmin.");
+    if (ival != 0) {
+      CuttingMethod cg;
+      cg.frequency = ival;
+      EcpCuts * ecp = new EcpCuts(*this);
+      ecp->passInMessageHandler(nonlinearSolver_->messageHandler());
+      cg.cgl = ecp;
+      cg.id = "Ecp cuts";
+      cutGenerators_.push_back(cg);
+    }
+
+    if (algo == B_Hyb || algo == B_Ecp)
+      addMilpCutGenerators();
+
+    double oaTime;
+    options_->GetNumericValue("oa_dec_time_limit",oaTime,"bonmin.");
+    if (oaTime > 0.) {
+      CuttingMethod cg;
+      cg.frequency = -99;
+      OACutGenerator2 * oa = new OACutGenerator2(*this);
+      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
+      cg.cgl = oa;
+      cg.id = "Outer Approximation decomposition.";
+      cutGenerators_.push_back(cg);
+
+    }
+
+    {
+      CuttingMethod cg;
+      cg.frequency = 1;
+      OaFeasibilityChecker * oa = new OaFeasibilityChecker(*this);
+      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
+      cg.cgl = oa;
+      cg.id = "Outer Approximation feasibility check.";
+      cg.atSolution = true;
+      cg.normal = false;
+      cutGenerators_.push_back(cg);
+    }
+#endif
+
+    DummyHeuristic * oaHeu = new DummyHeuristic;
+    oaHeu->setNlp(nonlinearSolver_);
+    HeuristicMethod h;
+    h.heuristic = oaHeu;
+    h.id = "nonlinear programm";
+    heuristics_.push_back(h);
+
+    Index doHeuristicRINS = false;
+    options()->GetEnumValue("heuristic_RINS",doHeuristicRINS,"bonmin.");
+    if(doHeuristicRINS){
+      HeuristicRINS* rins = new HeuristicRINS(this);
+      HeuristicMethod h;
+      h.heuristic = rins;
+      h.id = "RINS";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicLocalBranching = false;
+    options()->GetEnumValue("heuristic_local_branching",doHeuristicLocalBranching,"bonmin.");
+    if(doHeuristicLocalBranching){
+      HeuristicLocalBranching* local_branching = new HeuristicLocalBranching(this);
+      HeuristicMethod h;
+      h.heuristic = local_branching;
+      h.id = "LocalBranching";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicFPump = false;
+    options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,"bonmin.");
+    if(doHeuristicFPump){
+      HeuristicFPump* feasibility_pump = new HeuristicFPump(this);
+      HeuristicMethod h;
+      h.heuristic = feasibility_pump;
+      h.id = "FPump";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveFractional = false;
+    options()->GetEnumValue("heuristic_dive_fractional",doHeuristicDiveFractional,"bonmin.");
+    if(doHeuristicDiveFractional){
+      HeuristicDiveFractional* dive_fractional = new HeuristicDiveFractional(this);
+      HeuristicMethod h;
+      h.heuristic = dive_fractional;
+      h.id = "DiveFractional";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveVectorLength = false;
+    options()->GetEnumValue("heuristic_dive_vectorLength",doHeuristicDiveVectorLength,"bonmin.");
+    if(doHeuristicDiveVectorLength){
+      HeuristicDiveVectorLength* dive_vectorLength = new HeuristicDiveVectorLength(this);
+      HeuristicMethod h;
+      h.heuristic = dive_vectorLength;
+      h.id = "DiveVectorLength";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveMIPFractional = false;
+    options()->GetEnumValue("heuristic_dive_MIP_fractional",doHeuristicDiveMIPFractional,"bonmin.");
+    if(doHeuristicDiveMIPFractional){
+      HeuristicDiveMIPFractional* dive_MIP_fractional = new HeuristicDiveMIPFractional(this);
+      HeuristicMethod h;
+      h.heuristic = dive_MIP_fractional;
+      h.id = "DiveMIPFractional";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicDiveMIPVectorLength = false;
+    options()->GetEnumValue("heuristic_dive_MIP_vectorLength",doHeuristicDiveMIPVectorLength,"bonmin.");
+    if(doHeuristicDiveMIPVectorLength){
+      HeuristicDiveMIPVectorLength* dive_MIP_vectorLength = new HeuristicDiveMIPVectorLength(this);
+      HeuristicMethod h;
+      h.heuristic = dive_MIP_vectorLength;
+      h.id = "DiveMIPVectorLength";
+      heuristics_.push_back(h);
+    }
+
+  }
+
+  void
+  BonminSetup::initializeBHyb_noHeuristics(bool createContinuousSolver /*= false*/)
   {
     if (createContinuousSolver) {
       /* Create linear solver */
@@ -623,84 +915,6 @@ namespace Bonmin
       cg.normal = false;
       cutGenerators_.push_back(cg);
     }
-
-    DummyHeuristic * oaHeu = new DummyHeuristic;
-    oaHeu->setNlp(nonlinearSolver_);
-    HeuristicMethod h;
-    h.heuristic = oaHeu;
-    h.id = "nonlinear programm";
-    heuristics_.push_back(h);
-
-    Index doHeuristicRINS = false;
-    options()->GetEnumValue("heuristic_RINS",doHeuristicRINS,"bonmin.");
-    if(doHeuristicRINS){
-      HeuristicRINS* rins = new HeuristicRINS(this);
-      HeuristicMethod h;
-      h.heuristic = rins;
-      h.id = "RINS";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicLocalBranching = false;
-    options()->GetEnumValue("heuristic_local_branching",doHeuristicLocalBranching,"bonmin.");
-    if(doHeuristicLocalBranching){
-      HeuristicLocalBranching* local_branching = new HeuristicLocalBranching(this);
-      HeuristicMethod h;
-      h.heuristic = local_branching;
-      h.id = "LocalBranching";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicFPump = false;
-    options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,"bonmin.");
-    if(doHeuristicFPump){
-      HeuristicFPump* feasibility_pump = new HeuristicFPump(this);
-      HeuristicMethod h;
-      h.heuristic = feasibility_pump;
-      h.id = "FPump";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicDiveFractional = false;
-    options()->GetEnumValue("heuristic_dive_fractional",doHeuristicDiveFractional,"bonmin.");
-    if(doHeuristicDiveFractional){
-      HeuristicDiveFractional* dive_fractional = new HeuristicDiveFractional(this);
-      HeuristicMethod h;
-      h.heuristic = dive_fractional;
-      h.id = "DiveFractional";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicDiveVectorLength = false;
-    options()->GetEnumValue("heuristic_dive_vectorLength",doHeuristicDiveVectorLength,"bonmin.");
-    if(doHeuristicDiveVectorLength){
-      HeuristicDiveVectorLength* dive_vectorLength = new HeuristicDiveVectorLength(this);
-      HeuristicMethod h;
-      h.heuristic = dive_vectorLength;
-      h.id = "DiveVectorLength";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicDiveMIPFractional = false;
-    options()->GetEnumValue("heuristic_dive_MIP_fractional",doHeuristicDiveMIPFractional,"bonmin.");
-    if(doHeuristicDiveMIPFractional){
-      HeuristicDiveMIPFractional* dive_MIP_fractional = new HeuristicDiveMIPFractional(this);
-      HeuristicMethod h;
-      h.heuristic = dive_MIP_fractional;
-      h.id = "DiveMIPFractional";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicDiveMIPVectorLength = false;
-    options()->GetEnumValue("heuristic_dive_MIP_vectorLength",doHeuristicDiveMIPVectorLength,"bonmin.");
-    if(doHeuristicDiveMIPVectorLength){
-      HeuristicDiveMIPVectorLength* dive_MIP_vectorLength = new HeuristicDiveMIPVectorLength(this);
-      HeuristicMethod h;
-      h.heuristic = dive_MIP_vectorLength;
-      h.id = "DiveMIPVectorLength";
-      heuristics_.push_back(h);
-    }
-
   }
 
   Algorithm BonminSetup::getAlgorithm()

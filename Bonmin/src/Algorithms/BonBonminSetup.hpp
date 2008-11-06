@@ -33,14 +33,27 @@ namespace Bonmin
     BonminSetup(const BonminSetup &setup,
                 OsiTMINLPInterface &nlp);
 
+    /** Copy but uses another nlp and algorithm.*/
+    BonminSetup(const BonminSetup &setup,
+                OsiTMINLPInterface &nlp,
+		Algorithm algo);
+
     /** virtual copy constructor. */
     virtual BabSetupBase * clone() const
     {
       return new BonminSetup(*this);
     }
     /** Make a copy with solver replace by one passed .*/
-    virtual BabSetupBase *clone(OsiTMINLPInterface&nlp)const{
+    //    virtual BabSetupBase *clone(OsiTMINLPInterface&nlp)const{
+    //      return new BonminSetup(*this, nlp);
+    //    }
+    /** Make a copy with solver replace by one passed .*/
+    BonminSetup *clone(OsiTMINLPInterface&nlp)const{
       return new BonminSetup(*this, nlp);
+    }
+    /** Make a copy with solver replace by one passed .*/
+    BonminSetup *clone(OsiTMINLPInterface&nlp, Algorithm algo)const{
+      return new BonminSetup(*this, nlp, algo);
     }
     virtual ~BonminSetup()
     {}
@@ -67,8 +80,12 @@ namespace Bonmin
     void addMilpCutGenerators();
     /** Initialize a plain branch-and-bound.*/
     void initializeBBB();
+    /** Initialize a plain branch-and-bound with no heuristics*/
+    void initializeBBB_noHeuristics();
     /** Initialize a branch-and-cut with some OA.*/
     void initializeBHyb(bool createContinuousSolver = false);
+    /** Initialize a branch-and-cut with some OA and with no heuristics*/
+    void initializeBHyb_noHeuristics(bool createContinuousSolver = false);
   private:
     Algorithm algo_;
   };

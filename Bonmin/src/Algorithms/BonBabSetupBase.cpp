@@ -118,7 +118,8 @@ namespace Bonmin
   }
   /** Copy constructor with change of nlp. */
   BabSetupBase::BabSetupBase(const BabSetupBase & other,
-                             OsiTMINLPInterface &nlp):
+                             OsiTMINLPInterface &nlp,
+			     bool copy_all /*= true */):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
       cutGenerators_(),
@@ -132,28 +133,30 @@ namespace Bonmin
       roptions_(other.roptions_),
       readOptions_(other.readOptions_)
   {
-      nonlinearSolver_ = &nlp;
-    if (other.continuousSolver_ != other.nonlinearSolver_) {
-      continuousSolver_ = NULL;
-    }
-    else
-      continuousSolver_ = nonlinearSolver_;
-    if (other.lpMessageHandler_) {
-      lpMessageHandler_ = other.lpMessageHandler_->clone();
-      continuousSolver_->passInMessageHandler(lpMessageHandler_);
-    }
-    for (CuttingMethods::const_iterator i = other.cutGenerators_.begin() ; i != other.cutGenerators_.end() ; i++) {
-      cutGenerators_.push_back(*i);
-      cutGenerators_.back().cgl = cutGenerators_.back().cgl->clone();
-    }
+    nonlinearSolver_ = &nlp;
+    if(copy_all) {
+      if (other.continuousSolver_ != other.nonlinearSolver_) {
+	continuousSolver_ = NULL;
+      }
+      else
+	continuousSolver_ = nonlinearSolver_;
+      if (other.lpMessageHandler_) {
+	lpMessageHandler_ = other.lpMessageHandler_->clone();
+	continuousSolver_->passInMessageHandler(lpMessageHandler_);
+      }
+      for (CuttingMethods::const_iterator i = other.cutGenerators_.begin() ; i != other.cutGenerators_.end() ; i++) {
+	cutGenerators_.push_back(*i);
+	cutGenerators_.back().cgl = cutGenerators_.back().cgl->clone();
+      }
 
-    for (HeuristicMethods::iterator i = heuristics_.begin() ; i != heuristics_.end() ; i++) {
-      heuristics_.push_back(*i);
-      heuristics_.back().heuristic = i->heuristic->clone();
-    }
+      for (HeuristicMethods::iterator i = heuristics_.begin() ; i != heuristics_.end() ; i++) {
+	heuristics_.push_back(*i);
+	heuristics_.back().heuristic = i->heuristic->clone();
+      }
   
-    if(other.branchingMethod_ != NULL)
-      branchingMethod_ = other.branchingMethod_->clone();
+      if(other.branchingMethod_ != NULL)
+	branchingMethod_ = other.branchingMethod_->clone();
+    }
     if (IsValid(other.options_)) {
       options_ = new OptionsList;
       *options_ = *other.options_;
