@@ -136,9 +136,12 @@ namespace Bonmin
     BabSetupBase(const OsiTMINLPInterface& nlp);
     /** Copy but uses an other nlp.*/
     BabSetupBase(const BabSetupBase &setup,
+                 OsiTMINLPInterface &nlp);
+
+    /** Copy but uses an other nlp.*/
+    BabSetupBase(const BabSetupBase &setup,
                  OsiTMINLPInterface &nlp,
-		 bool copy_all = true,
-                 const std::string &prefix= "bonmin.");
+                 const std::string &prefix);
 
     /** Copy constructor. */
     BabSetupBase(const BabSetupBase & other);

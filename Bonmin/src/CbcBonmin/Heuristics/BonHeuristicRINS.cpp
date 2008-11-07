@@ -24,7 +24,9 @@ namespace Bonmin {
   {}
   /** Constructor with setup.*/
   HeuristicRINS::HeuristicRINS(BonminSetup * setup):
-    LocalSolverBasedHeuristic(setup){
+    LocalSolverBasedHeuristic(setup),
+    howOften_(100),
+    numberSolutions_(0){
   }
 
   /** Copy constructor.*/
@@ -48,14 +50,23 @@ namespace Bonmin {
 #endif
 
     //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
-    if (numberSolutions_>=model_->getSolutionCount())
+    if (numberSolutions_>=model_->getSolutionCount()){
+#ifdef DEBUG_BON_HEURISTIC_RINS
+    std::cout<<"exited RINS a"<<std::endl;
+    printf("numberSolutions_ %i model_->getSolutionCount() %i\n", numberSolutions_, model_->getSolutionCount());
+#endif
       return 0;
+    }
     else
       numberSolutions_=model_->getSolutionCount();
 
     const double * bestSolution = model_->bestSolution();
-    if (!bestSolution)
+    if (!bestSolution){
+#ifdef DEBUG_BON_HEURISTIC_RINS
+    std::cout<<"exited RINS b"<<std::endl;
+#endif
       return 0; // No solution found yet
+    }
 
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
                                (setup_->nonlinearSolver()->clone());

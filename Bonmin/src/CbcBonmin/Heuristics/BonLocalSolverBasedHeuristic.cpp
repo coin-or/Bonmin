@@ -52,8 +52,15 @@ namespace Bonmin {
                                             double *solution,
                                             double & solValue,
                                             double cutoff) const{
-     Algorithm algo = B_OA;
-     BonminSetup * mysetup = setup_->clone(*solver, algo);
+     int algo;
+     if (!setup_->options()->GetEnumValue("algorithm",algo,"local_solver.")) {   
+      printf("Setting option\n");
+      setup_->options()->SetStringValue("local_solver.algorithm","B-QG",true,true);
+      setup_->options()->GetEnumValue("algorithm",algo,"local_solver.");
+      printf("Option set to %i\n", algo);
+    }
+ 
+      BonminSetup * mysetup = setup_->clone(*solver, "local_solver.");
       Bab bb;
       mysetup->setDoubleParameter(BabSetupBase::Cutoff, cutoff);
       mysetup->setDoubleParameter(BabSetupBase::MaxTime, time_limit_);
