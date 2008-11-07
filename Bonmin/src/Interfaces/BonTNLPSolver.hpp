@@ -102,7 +102,8 @@ class TNLPSolver: public Ipopt::ReferencedObject{
   ///Constructor with options initialization
 TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
            Ipopt::SmartPtr<Ipopt::OptionsList> options,
-           Ipopt::SmartPtr<Ipopt::Journalist> journalist);
+           Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+           const std::string & prefix);
 
   ///virtual copy constructor
   virtual Ipopt::SmartPtr<TNLPSolver> clone() = 0;
@@ -164,6 +165,10 @@ TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
    Ipopt::SmartPtr<Ipopt::OptionsList> options() {
      return options_;}
 
+  /// Get the prefix
+  const char * prefix(){
+    return prefix_.c_str();
+  }
    /// Register this solver options into passed roptions
 static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){}
 
@@ -184,6 +189,8 @@ static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
     /** Say if an optimization status for a problem which failed is recoverable
         (problem may be solvable).*/
   bool isRecoverable(ReturnStatus &r);
+
+
 
   /** Say if return status is an error.*/
   bool isError(ReturnStatus &r){
@@ -208,6 +215,8 @@ protected:
     /** Registered Options */
     Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions_;
    
+    /** Prefix to use for reading bonmin's options.*/
+   std::string prefix_;
    private:
    /// There is no copy constructor for this class
    TNLPSolver(TNLPSolver &other); 

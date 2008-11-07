@@ -56,7 +56,7 @@ namespace Bonmin
                                     )
   {
     if (!IsValid(app_)) {
-      createApplication(roptions, options, journalist);
+      createApplication(roptions, options, journalist, "bonmin.");
     }
     // set the default options... expect_infeasible, etc...
     if (!IsValid(tminlp_)) {

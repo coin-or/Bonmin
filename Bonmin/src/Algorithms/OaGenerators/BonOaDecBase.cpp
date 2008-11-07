@@ -100,21 +100,21 @@ namespace Bonmin
   {
     handler_ = new CoinMessageHandler();
     int logLevel;
-    b.options()->GetIntegerValue("oa_log_level",logLevel,"bonmin.");
-    b.options()->GetNumericValue("oa_log_frequency",parameters_.logFrequency_,"bonmin.");
+    b.options()->GetIntegerValue("oa_log_level",logLevel,b.prefix());
+    b.options()->GetNumericValue("oa_log_frequency",parameters_.logFrequency_,b.prefix());
 
     handler_ -> setLogLevel(logLevel);
-    b.options()->GetIntegerValue("solution_limit", parameters_.maxSols_,"bonmin.");
+    b.options()->GetIntegerValue("solution_limit", parameters_.maxSols_,b.prefix());
 
     messages_ = OaMessages();
     timeBegin_ = CoinCpuTime();
-    b.options()->GetIntegerValue("milp_log_level",parameters_.subMilpLogLevel_,"bonmin.");
-    b.options()->GetNumericValue("cutoff_decr",parameters_.cbcCutoffIncrement_,"bonmin.");
-    b.options()->GetNumericValue("integer_tolerance",parameters_.cbcIntegerTolerance_,"bonmin.");
+    b.options()->GetIntegerValue("milp_log_level",parameters_.subMilpLogLevel_,b.prefix());
+    b.options()->GetNumericValue("cutoff_decr",parameters_.cbcCutoffIncrement_,b.prefix());
+    b.options()->GetNumericValue("integer_tolerance",parameters_.cbcIntegerTolerance_,b.prefix());
     int ivalue;
-    b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
+    b.options()->GetEnumValue("add_only_violated_oa", ivalue,b.prefix());
     parameters_.addOnlyViolated_ = ivalue;
-    b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
+    b.options()->GetEnumValue("oa_cuts_scope", ivalue,b.prefix());
     parameters_.global_ = ivalue;
   }
 

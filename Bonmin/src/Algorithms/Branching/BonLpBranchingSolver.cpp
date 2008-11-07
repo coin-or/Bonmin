@@ -23,11 +23,11 @@ namespace Bonmin
     SmartPtr<OptionsList> options = tnlp_solver->options();
 
     options->GetIntegerValue("ecp_max_rounds_strong",
-        maxCuttingPlaneIterations_, "bonmin.");
-    options->GetNumericValue("ecp_abs_tol_strong", abs_ecp_tol_,"bonmin.");
-    options->GetNumericValue("ecp_rel_tol_strong", rel_ecp_tol_,"bonmin.");
+        maxCuttingPlaneIterations_, solver->prefix());
+    options->GetNumericValue("ecp_abs_tol_strong", abs_ecp_tol_,solver->prefix());
+    options->GetNumericValue("ecp_rel_tol_strong", rel_ecp_tol_,solver->prefix());
     int dummy;
-    options->GetEnumValue("lp_strong_warmstart_method", dummy,"bonmin.");
+    options->GetEnumValue("lp_strong_warmstart_method", dummy,solver->prefix());
     warm_start_mode_ = (WarmStartMethod) dummy;
   }
 

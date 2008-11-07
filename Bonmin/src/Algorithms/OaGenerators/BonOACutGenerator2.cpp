@@ -29,7 +29,7 @@ namespace Bonmin
       OaDecompositionBase(b, true, false)
   {
     int ivalue;
-    b.options()->GetEnumValue("milp_subsolver",ivalue,"bonmin.");
+    b.options()->GetEnumValue("milp_subsolver",ivalue,b.prefix());
     if (ivalue <= 0) {//uses cbc
       //nothing to do?
     }
@@ -65,7 +65,7 @@ namespace Bonmin
     }
 
     double oaTime;
-    b.options()->GetNumericValue("oa_dec_time_limit",oaTime,"bonmin.");
+    b.options()->GetNumericValue("oa_dec_time_limit",oaTime,b.prefix());
     parameter().localSearchNodeLimit_ = 1000000;
     parameter().maxLocalSearch_ = 100000;
     parameter().maxLocalSearchPerNode_ = 10000;

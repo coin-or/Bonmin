@@ -51,7 +51,8 @@ namespace Bonmin
 /// Constructor with Passed in journalist, registered options, options
     IpoptSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
         Ipopt::SmartPtr<Ipopt::OptionsList> options,
-        Ipopt::SmartPtr<Ipopt::Journalist> journalist);
+        Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+        const std::string & prefix);
 
 
     ///virtual copy constructor

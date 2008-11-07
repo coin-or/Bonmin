@@ -35,13 +35,13 @@ namespace Bonmin
       nSolve_(0)
   {
     int ivalue;
-    b.options()->GetEnumValue("add_only_violated_oa", ivalue,"bonmin.");
+    b.options()->GetEnumValue("add_only_violated_oa", ivalue,b.prefix());
     addOnlyViolated_ = ivalue;
-    b.options()->GetEnumValue("oa_cuts_scope", ivalue,"bonmin.");
+    b.options()->GetEnumValue("oa_cuts_scope", ivalue,b.prefix());
     global_ = ivalue;
 
-    b.options()->GetIntegerValue("nlp_solve_max_depth", maxDepth_,"bonmin.");
-    b.options()->GetNumericValue("nlp_solves_per_depth", solves_per_level_,"bonmin.");
+    b.options()->GetIntegerValue("nlp_solve_max_depth", maxDepth_,b.prefix());
+    b.options()->GetNumericValue("nlp_solves_per_depth", solves_per_level_,b.prefix());
     handler_ = new CoinMessageHandler();
     handler_ -> setLogLevel(1);
     messages_ = OaMessages();

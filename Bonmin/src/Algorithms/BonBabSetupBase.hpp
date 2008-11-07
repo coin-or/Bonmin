@@ -137,7 +137,8 @@ namespace Bonmin
     /** Copy but uses an other nlp.*/
     BabSetupBase(const BabSetupBase &setup,
                  OsiTMINLPInterface &nlp,
-		 bool copy_all = true);
+		 bool copy_all = true,
+                 const std::string &prefix= "bonmin.");
 
     /** Copy constructor. */
     BabSetupBase(const BabSetupBase & other);
@@ -194,6 +195,11 @@ namespace Bonmin
     /** May print documentation of options if options print_options_documentation is set to yes.*/
     void mayPrintDoc();
 
+
+    /** Get prefix to use for options.*/
+    const char * prefix() const {
+      return prefix_.c_str();
+    }
 
     /** Set the value for options, output...*/
     void setOptionsAndJournalist(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
@@ -350,6 +356,8 @@ namespace Bonmin
     bool readOptions_;
     /** separate message handler if continuousSolver_!= nonlinearSolver.*/
     CoinMessageHandler * lpMessageHandler_;
+    /** Prefix to use when reading options.*/
+    std::string prefix_;
   };
 }/* End namespace Bonmin. */
 #endif

@@ -63,7 +63,8 @@ namespace Bonmin
       options_(NULL),
       roptions_(NULL),
       readOptions_(false),
-      lpMessageHandler_(NULL)
+      lpMessageHandler_(NULL),
+      prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -82,7 +83,8 @@ namespace Bonmin
       journalist_(other.journalist_),
       options_(NULL),
       roptions_(other.roptions_),
-      readOptions_(other.readOptions_)
+      readOptions_(other.readOptions_),
+      prefix_(other.prefix_)
   {
     if (other.nonlinearSolver_) {
       nonlinearSolver_ = static_cast<OsiTMINLPInterface *>(other.nonlinearSolver_->clone());
@@ -119,7 +121,8 @@ namespace Bonmin
   /** Copy constructor with change of nlp. */
   BabSetupBase::BabSetupBase(const BabSetupBase & other,
                              OsiTMINLPInterface &nlp,
-			     bool copy_all /*= true */):
+			     bool copy_all /*= true */,
+                             const std::string & prefix /* = "bonmin"*/):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
       cutGenerators_(),
@@ -178,7 +181,8 @@ namespace Bonmin
       treeTraversalMethod_(),
       objects_(0),
       readOptions_(false),
-      lpMessageHandler_(NULL)
+      lpMessageHandler_(NULL),
+      prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -199,7 +203,7 @@ namespace Bonmin
     readOptionsFile();
     assert(IsValid(tminlp));
     nonlinearSolver_ = new OsiTMINLPInterface;
-    nonlinearSolver_->initialize(roptions_, options_, journalist_, tminlp);
+    nonlinearSolver_->initialize(roptions_, options_, journalist_, prefix(), tminlp);
   }
 
   BabSetupBase::BabSetupBase(const OsiTMINLPInterface& nlp):
@@ -215,7 +219,8 @@ namespace Bonmin
       options_(NULL),
       roptions_(NULL),
       readOptions_(false),
-      lpMessageHandler_(NULL)
+      lpMessageHandler_(NULL),
+      prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -244,7 +249,8 @@ namespace Bonmin
       journalist_(app->journalist()),
       options_(app->options()),
       roptions_(app->roptions()),
-      readOptions_(true)
+      readOptions_(true),
+      prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -279,36 +285,36 @@ namespace Bonmin
   BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options)
   {
 
-    options->GetIntegerValue("bb_log_level",intParam_[BabLogLevel],"bonmin.");
-    options->GetIntegerValue("bb_log_interval",intParam_[BabLogInterval],"bonmin.");
-    options->GetIntegerValue("max_consecutive_failures",intParam_[MaxFailures],"bonmin.");
-    options->GetEnumValue("nlp_failure_behavior",intParam_[FailureBehavior],"bonmin.");
-    options->GetIntegerValue("max_consecutive_infeasible",intParam_[MaxInfeasible],"bonmin.");
-    options->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],"bonmin.");
-    options->GetIntegerValue("number_before_trust",intParam_[MinReliability],"bonmin.");
-    options->GetIntegerValue("node_limit",intParam_[MaxNodes],"bonmin.");
-    options->GetIntegerValue("solution_limit",intParam_[MaxSolutions],"bonmin.");
-    options->GetIntegerValue("iteration_limit",intParam_[MaxIterations],"bonmin.");
-    options->GetEnumValue("sos_constraints",intParam_[DisableSos],"bonmin.");
-    options->GetIntegerValue("num_cut_passes",intParam_[NumCutPasses],"bonmin.");
-    options->GetIntegerValue("num_cut_passes_at_root",intParam_[NumCutPassesAtRoot],"bonmin.");
+    options->GetIntegerValue("bb_log_level",intParam_[BabLogLevel],prefix_.c_str());
+    options->GetIntegerValue("bb_log_interval",intParam_[BabLogInterval],prefix_.c_str());
+    options->GetIntegerValue("max_consecutive_failures",intParam_[MaxFailures],prefix_.c_str());
+    options->GetEnumValue("nlp_failure_behavior",intParam_[FailureBehavior],prefix_.c_str());
+    options->GetIntegerValue("max_consecutive_infeasible",intParam_[MaxInfeasible],prefix_.c_str());
+    options->GetIntegerValue("number_strong_branch",intParam_[NumberStrong],prefix_.c_str());
+    options->GetIntegerValue("number_before_trust",intParam_[MinReliability],prefix_.c_str());
+    options->GetIntegerValue("node_limit",intParam_[MaxNodes],prefix_.c_str());
+    options->GetIntegerValue("solution_limit",intParam_[MaxSolutions],prefix_.c_str());
+    options->GetIntegerValue("iteration_limit",intParam_[MaxIterations],prefix_.c_str());
+    options->GetEnumValue("sos_constraints",intParam_[DisableSos],prefix_.c_str());
+    options->GetIntegerValue("num_cut_passes",intParam_[NumCutPasses],prefix_.c_str());
+    options->GetIntegerValue("num_cut_passes_at_root",intParam_[NumCutPassesAtRoot],prefix_.c_str());
 
-    options->GetNumericValue("cutoff_decr",doubleParam_[CutoffDecr],"bonmin.");
-    options->GetNumericValue("cutoff",doubleParam_[Cutoff],"bonmin.");
-    options->GetNumericValue("allowable_gap",doubleParam_[AllowableGap],"bonmin.");
-    options->GetNumericValue("allowable_fraction_gap",doubleParam_[AllowableFractionGap],"bonmin.");
-    options->GetNumericValue("integer_tolerance",doubleParam_[IntTol],"bonmin.");
-    options->GetNumericValue("time_limit", doubleParam_[MaxTime],"bonmin.");
+    options->GetNumericValue("cutoff_decr",doubleParam_[CutoffDecr],prefix_.c_str());
+    options->GetNumericValue("cutoff",doubleParam_[Cutoff],prefix_.c_str());
+    options->GetNumericValue("allowable_gap",doubleParam_[AllowableGap],prefix_.c_str());
+    options->GetNumericValue("allowable_fraction_gap",doubleParam_[AllowableFractionGap],prefix_.c_str());
+    options->GetNumericValue("integer_tolerance",doubleParam_[IntTol],prefix_.c_str());
+    options->GetNumericValue("time_limit", doubleParam_[MaxTime],prefix_.c_str());
 
     int ival;
-    options->GetEnumValue("node_comparison",ival,"bonmin.");
+    options->GetEnumValue("node_comparison",ival,prefix_.c_str());
     nodeComparisonMethod_ = NodeComparison(ival);
 
-    options->GetEnumValue("tree_search_strategy", ival, "bonmin.");
+    options->GetEnumValue("tree_search_strategy", ival, prefix_.c_str());
     treeTraversalMethod_ = TreeTraversal(ival);
 
     int varSelection;
-    options->GetEnumValue("variable_selection",varSelection,"bonmin.");
+    options->GetEnumValue("variable_selection",varSelection,prefix_.c_str());
     // Set branching strategy
     if (varSelection == MOST_FRACTIONAL) {
       intParam_[NumberStrong] = 0;

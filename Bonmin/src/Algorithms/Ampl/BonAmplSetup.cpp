@@ -33,7 +33,7 @@ namespace Bonmin
     SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(),
                                                 options(), argv, NULL, "bonmin", NULL);
     mayPrintDoc();
-    toFill.initialize(roptions_, options_, journalist_, GetRawPtr(model));
+    toFill.initialize(roptions_, options_, journalist_, prefix(), GetRawPtr(model));
     BonminSetup::initialize(toFill, true);
   }
 
@@ -63,7 +63,7 @@ namespace Bonmin
     SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(),
                                                 options(), argv, NULL, "bonmin", &nl_file_content);
     mayPrintDoc();
-    toFill.initialize(roptions_, options_, journalist_, GetRawPtr(model));
+    toFill.initialize(roptions_, options_, journalist_, prefix(), GetRawPtr(model));
     BonminSetup::initialize(toFill, createContinuousSolver);
   }
 
@@ -80,7 +80,7 @@ namespace Bonmin
           roptions_,
           options_,
           argv, NULL, "bonmin", &nl);
-    toFill.initialize(roptions(), options_, journalist(), GetRawPtr(model));
+    toFill.initialize(roptions(), options_, journalist(), prefix(), GetRawPtr(model));
   }
 
 }

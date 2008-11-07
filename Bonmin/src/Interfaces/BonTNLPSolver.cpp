@@ -44,10 +44,12 @@ namespace Bonmin{
 
   TNLPSolver::TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
     Ipopt::SmartPtr<Ipopt::OptionsList> options,
-    Ipopt::SmartPtr<Ipopt::Journalist> journalist):
+    Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+    const std::string & prefix):
     journalist_(journalist),
     options_(options),
-    roptions_(roptions)
+    roptions_(roptions),
+    prefix_(prefix)
   {
   }
   
@@ -235,6 +237,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
 /** Initialize the options and the journalist.*/
 void 
 TNLPSolver::initializeOptionsAndJournalist(){
+  prefix_ = "bonmin.";
   options_ = new Ipopt::OptionsList();
   
   journalist_= new Ipopt::Journalist();

@@ -38,8 +38,9 @@ namespace Bonmin
   /// Constructor with Passed in journalist, registered options, options
   IpoptSolver::IpoptSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
       Ipopt::SmartPtr<Ipopt::OptionsList> options,
-      Ipopt::SmartPtr<Ipopt::Journalist> journalist):
-      TNLPSolver(roptions, options, journalist),
+      Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+      const std::string & prefix):
+      TNLPSolver(roptions, options, journalist, prefix),
       problemHadZeroDimension_(false),
       warmStartStrategy_(1),
       enable_warm_start_(false),
@@ -56,7 +57,7 @@ namespace Bonmin
   Ipopt::SmartPtr<TNLPSolver>
   IpoptSolver::clone()
   {
-    SmartPtr<IpoptSolver> retval = new IpoptSolver(GetRawPtr(roptions_), new Ipopt::OptionsList(), journalist_);
+    SmartPtr<IpoptSolver> retval = new IpoptSolver(GetRawPtr(roptions_), new Ipopt::OptionsList(), journalist_, prefix_);
     *retval->options_ = *options_;
     retval->warmStartStrategy_ = warmStartStrategy_;
     retval->problemHadZeroDimension_ = problemHadZeroDimension_;
@@ -76,7 +77,7 @@ namespace Bonmin
     if (status != Ipopt::Solve_Succeeded) {
       return false;
     }
-    options_->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
+    options_->GetEnumValue("warm_start",warmStartStrategy_,prefix());
     setMinlpDefaults(options_);
     optimized_before_ = false;
     return true;
@@ -90,7 +91,7 @@ namespace Bonmin
     if (status != Ipopt::Solve_Succeeded) {
       return false;
     }
-    options_->GetEnumValue("warm_start",warmStartStrategy_,"bonmin.");
+    options_->GetEnumValue("warm_start",warmStartStrategy_,prefix());
     setMinlpDefaults(app_->Options());
     optimized_before_ = false;
     return true;

@@ -368,9 +368,10 @@ void
 OsiTMINLPInterface::initialize(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                               const std::string & prefix,
                                Ipopt::SmartPtr<TMINLP> tminlp){
   if(!IsValid(app_))
-     createApplication(roptions, options, journalist);
+     createApplication(roptions, options, journalist, prefix);
   setModel(tminlp); 
 }
 
@@ -382,17 +383,18 @@ void OsiTMINLPInterface::setSolver(Ipopt::SmartPtr<TNLPSolver> app){
 void
 OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                                       Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                                      Ipopt::SmartPtr<Ipopt::Journalist> journalist
+                                      Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                                      const std::string & prefix
                                       )
 {
   assert(!IsValid(app_));
   int ival;
-  options->GetEnumValue("nlp_solver", ival, "bonmin.");
+  options->GetEnumValue("nlp_solver", ival, prefix.c_str());
   Solver s = (Solver) ival;
   if(s == EFilterSQP){
     testOthers_ = false;;
 #ifdef COIN_HAS_FILTERSQP
-    app_ = new Bonmin::FilterSolver(roptions, options, journalist);
+    app_ = new Bonmin::FilterSolver(roptions, options, journalist, prefix);
 #else
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with FilterSQP.");
@@ -401,7 +403,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
   else if(s == EIpopt){
     testOthers_ = false;
 #ifdef COIN_HAS_IPOPT
-    app_ = new IpoptSolver(roptions, options, journalist);
+    app_ = new IpoptSolver(roptions, options, journalist, prefix);
 #else
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with Ipopt.");
@@ -409,13 +411,13 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
   }
   else if(s == EAll){
 #ifdef COIN_HAS_FILTERSQP
-    app_ = new Bonmin::FilterSolver(roptions, options, journalist);
+    app_ = new Bonmin::FilterSolver(roptions, options, journalist, prefix);
 #else
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with Ipopt.");
 #endif
 #ifdef COIN_HAS_IPOPT
-   debug_apps_.push_back(new IpoptSolver(roptions, options, journalist)); 
+   debug_apps_.push_back(new IpoptSolver(roptions, options, journalist, prefix)); 
 #endif
     testOthers_ = true;
   }
@@ -2549,7 +2551,7 @@ void OsiTMINLPInterface::initialSolve()
   
   if(!hasPrintedOptions) {
     int printOptions;
-    app_->options()->GetEnumValue("print_user_options",printOptions,"bonmin.");
+    app_->options()->GetEnumValue("print_user_options",printOptions,app_->prefix());
     if(printOptions)
       app_->options()->SetStringValue("print_user_options","yes",true,true);
   }
@@ -2704,7 +2706,7 @@ OsiTMINLPInterface::extractInterfaceParams()
 {
   if (IsValid(app_)) {
     int logLevel;
-    app_->options()->GetIntegerValue("nlp_log_level", logLevel,"bonmin.");
+    app_->options()->GetIntegerValue("nlp_log_level", logLevel,app_->prefix());
     messageHandler()->setLogLevel(logLevel);
 
 #ifdef COIN_HAS_FILTERSQP
@@ -2712,7 +2714,7 @@ OsiTMINLPInterface::extractInterfaceParams()
 
     bool is_given =
 #endif
-      app_->options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,"bonmin.");
+      app_->options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,app_->prefix());
 
 #ifdef COIN_HAS_FILTERSQP
     if(filter && !is_given){
@@ -2722,27 +2724,27 @@ OsiTMINLPInterface::extractInterfaceParams()
 #endif
    
    int oaCgLogLevel = 0;
-   app_->options()->GetIntegerValue("oa_cuts_log_level", oaCgLogLevel,"bonmin.");
+   app_->options()->GetIntegerValue("oa_cuts_log_level", oaCgLogLevel,app_->prefix());
    oaHandler_->setLogLevel(oaCgLogLevel); 
     
     int exposeWs = false;
-    app_->options()->GetEnumValue("warm_start", exposeWs, "bonmin.");
+    app_->options()->GetEnumValue("warm_start", exposeWs, app_->prefix());
     setExposeWarmStart(exposeWs > 0);
     
-    app_->options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,"bonmin.");
-    app_->options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,"bonmin.");
-    app_->options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,"bonmin.");
-    app_->options()->GetIntegerValue("num_resolve_at_infeasibles", numRetryInfeasibles_,"bonmin.");
-    app_->options()->GetIntegerValue("num_iterations_suspect", numIterationSuspect_,"bonmin.");
-    app_->options()->GetEnumValue("nlp_failure_behavior",pretendFailIsInfeasible_,"bonmin.");
+    app_->options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,app_->prefix());
+    app_->options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,app_->prefix());
+    app_->options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,app_->prefix());
+    app_->options()->GetIntegerValue("num_resolve_at_infeasibles", numRetryInfeasibles_,app_->prefix());
+    app_->options()->GetIntegerValue("num_iterations_suspect", numIterationSuspect_,app_->prefix());
+    app_->options()->GetEnumValue("nlp_failure_behavior",pretendFailIsInfeasible_,app_->prefix());
     app_->options()->GetNumericValue
-    ("warm_start_bound_frac" ,pushValue_,"bonmin.");
-    app_->options()->GetNumericValue("tiny_element",tiny_,"bonmin.");
-    app_->options()->GetNumericValue("very_tiny_element",veryTiny_,"bonmin.");
-    app_->options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,"bonmin.");
-    app_->options()->GetEnumValue("random_point_type",randomGenerationType_,"bonmin.");
+    ("warm_start_bound_frac" ,pushValue_,app_->prefix());
+    app_->options()->GetNumericValue("tiny_element",tiny_,app_->prefix());
+    app_->options()->GetNumericValue("very_tiny_element",veryTiny_,app_->prefix());
+    app_->options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,app_->prefix());
+    app_->options()->GetEnumValue("random_point_type",randomGenerationType_,app_->prefix());
     int cut_strengthening_type;
-    app_->options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type,"bonmin.");
+    app_->options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type,app_->prefix());
 
     if (cut_strengthening_type != CS_None) {
       // TNLP solver to be used in the cut strengthener

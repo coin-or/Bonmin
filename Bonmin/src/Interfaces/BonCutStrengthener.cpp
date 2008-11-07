@@ -18,11 +18,11 @@ namespace Bonmin
     :
     tnlp_solver_(tnlp_solver)
   {
-    options->GetIntegerValue("oa_log_level", oa_log_level_, "bonmin.");
+    options->GetIntegerValue("oa_log_level", oa_log_level_, tnlp_solver->prefix());
     options->GetEnumValue("cut_strengthening_type", cut_strengthening_type_,
-			  "bonmin.");
+			  tnlp_solver->prefix());
     options->GetEnumValue("disjunctive_cut_type", disjunctive_cut_type_,
-			  "bonmin.");
+			  tnlp_solver->prefix());
 
     tnlp_solver_->options()->clear();
     if (!tnlp_solver_->Initialize("strength.opt")) {

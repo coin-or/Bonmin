@@ -52,14 +52,14 @@ namespace Bonmin
 
     handler_ = new CoinMessageHandler;
 
-    options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
+    options->GetIntegerValue("bb_log_level", bb_log_level_, b.prefix());
     handler_->setLogLevel(bb_log_level_);
-    options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
-    options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
-    options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
-    options->GetEnumValue("trust_strong_branching_for_pseudo_cost",trustStrongForPseudoCosts_ , "bonmin.");
+    options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, b.prefix());
+    options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, b.prefix());
+    options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, b.prefix());
+    options->GetEnumValue("trust_strong_branching_for_pseudo_cost",trustStrongForPseudoCosts_ , b.prefix());
     int sortCrit;
-    options->GetEnumValue("candidate_sort_criterion", sortCrit, "bonmin.");
+    options->GetEnumValue("candidate_sort_criterion", sortCrit, b.prefix());
 #ifndef OLD_USEFULLNESS
     sortCrit_ = (CandidateSortCriterion) sortCrit;
 #endif
@@ -73,13 +73,13 @@ namespace Bonmin
     setNumberStrong(b.getIntParameter(BabSetupBase::NumberStrong));
 
     /** Get values of options specific to BonChooseVariable.*/
-    if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, "bonmin.")) {
+    if (!options->GetIntegerValue("number_before_trust_list", numberBeforeTrustedList_, b.prefix())) {
       // default is to use the same value as for numberBeforeTrusted
       numberBeforeTrustedList_ = numberBeforeTrusted;
     }
-    options->GetIntegerValue("number_strong_branch_root", numberStrongRoot_, "bonmin.");
-    options->GetIntegerValue("min_number_strong_branch", minNumberStrongBranch_, "bonmin.");
-    options->GetIntegerValue("number_look_ahead", numberLookAhead_, "bonmin.");
+    options->GetIntegerValue("number_strong_branch_root", numberStrongRoot_, b.prefix());
+    options->GetIntegerValue("min_number_strong_branch", minNumberStrongBranch_, b.prefix());
+    options->GetIntegerValue("number_look_ahead", numberLookAhead_, b.prefix());
 
   }
 

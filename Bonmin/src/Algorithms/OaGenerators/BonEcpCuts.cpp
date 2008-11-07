@@ -16,10 +16,10 @@ namespace Bonmin
       OaDecompositionBase(b,false, false)
   {
     assignLpInterface(NULL);
-    b.options()->GetIntegerValue("ecp_max_rounds", numRounds_,"bonmin.");
-    b.options()->GetNumericValue("ecp_abs_tol", abs_violation_tol_,"bonmin.");
-    b.options()->GetNumericValue("ecp_rel_tol", rel_violation_tol_,"bonmin.");
-    b.options()->GetNumericValue("ecp_propability_factor", beta_,"bonmin.");
+    b.options()->GetIntegerValue("ecp_max_rounds", numRounds_,b.prefix());
+    b.options()->GetNumericValue("ecp_abs_tol", abs_violation_tol_,b.prefix());
+    b.options()->GetNumericValue("ecp_rel_tol", rel_violation_tol_,b.prefix());
+    b.options()->GetNumericValue("ecp_propability_factor", beta_,b.prefix());
   }
 
   double

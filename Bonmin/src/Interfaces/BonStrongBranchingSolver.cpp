@@ -17,7 +17,7 @@ StrongBranchingSolver::StrongBranchingSolver(OsiTMINLPInterface * tminlp_interfa
   reg_options_ = tminlp_interface->solver()->roptions();
   DBG_ASSERT(IsValid(reg_options_));
 
-  options_->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
+  options_->GetIntegerValue("bb_log_level", bb_log_level_, tminlp_interface->prefix());
 }
 
 StrongBranchingSolver::StrongBranchingSolver(const StrongBranchingSolver & rhs)

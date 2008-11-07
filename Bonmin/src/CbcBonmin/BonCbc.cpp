@@ -342,22 +342,22 @@ namespace Bonmin
     }
     else if (s.treeTraversalMethod() == BabSetupBase::DiveFromBest) {
       CbcDiver treeTraversal;
-      treeTraversal.initialize(s.options());
+      treeTraversal.initialize(s);
       model_.passInTreeHandler(treeTraversal);
     }
     else if (s.treeTraversalMethod() == BabSetupBase::ProbedDive) {
       CbcProbedDiver treeTraversal;
-      treeTraversal.initialize(s.options());
+      treeTraversal.initialize(s);
       model_.passInTreeHandler(treeTraversal);
     }
     else if (s.treeTraversalMethod() == BabSetupBase::DfsDiveFromBest) {
       CbcDfsDiver treeTraversal;
-      treeTraversal.initialize(s.options());
+      treeTraversal.initialize(s);
       model_.passInTreeHandler(treeTraversal);
     }
     else if (s.treeTraversalMethod() == BabSetupBase::DfsDiveDynamic) {
       CbcDfsDiver treeTraversal;
-      treeTraversal.initialize(s.options());
+      treeTraversal.initialize(s);
       model_.passInTreeHandler(treeTraversal);
 
       DiverCompare compare;

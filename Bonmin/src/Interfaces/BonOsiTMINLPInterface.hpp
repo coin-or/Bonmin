@@ -135,6 +135,7 @@ class Messages : public CoinMessages
   void initialize(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                   Ipopt::SmartPtr<Ipopt::OptionsList> options,
                   Ipopt::SmartPtr<Ipopt::Journalist> journalist_,
+                  const std::string & prefix,
                   Ipopt::SmartPtr<TMINLP> tminlp);
 
   /** Set the model to be solved by interface.*/
@@ -166,6 +167,14 @@ class Messages : public CoinMessages
   /// Retrieve OsiTMINLPApplication option list
   Ipopt::SmartPtr<Ipopt::OptionsList> options();
 
+  const char * prefix() const{
+  if(!IsValid(app_)) {
+    messageHandler()->message(ERROR_NO_TNLPSOLVER, messages_)<<CoinMessageEol;
+    return NULL;
+  }
+  else
+    return app_->prefix();
+  }
   //---------------------------------------------------------------------------
   /**@name Solve methods */
   //@{
@@ -1212,7 +1221,8 @@ protected:
   /** Facilitator to create an application. */
   void createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                          Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                         Ipopt::SmartPtr<Ipopt::Journalist> journalist);
+                         Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                         const std::string & prefix);
   ///Constructor without model only for derived classes
   OsiTMINLPInterface(Ipopt::SmartPtr<TNLPSolver> app);
 

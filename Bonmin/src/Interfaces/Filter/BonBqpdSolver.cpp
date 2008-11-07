@@ -121,9 +121,10 @@ namespace Bonmin
 
   BqpdSolver::BqpdSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
       Ipopt::SmartPtr<Ipopt::OptionsList> options,
-      Ipopt::SmartPtr<Ipopt::Journalist> journalist)
+      Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+      const std::string & prefix)
       :
-      TNLPSolver(roptions, options, journalist),
+      TNLPSolver(roptions, options, journalist, prefix),
       cached_(NULL)
   {
     options->GetNumericValue("qp_fillin_factor", fillin_factor_, "bqpd.");
@@ -138,6 +139,7 @@ namespace Bonmin
     *retval->options_ = *options_; // Copy the options
     retval->roptions_ = roptions_; // only copy pointers of registered options
     retval->journalist_ = journalist_; // and journalist
+    retval->prefix_ = prefix_;
     retval->fillin_factor_ = fillin_factor_;
     retval->kmax_ipt_ = kmax_ipt_;
     retval->mlp_ipt_ = mlp_ipt_;

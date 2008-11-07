@@ -20,6 +20,7 @@
 #include <list>
 namespace Bonmin
 {
+  class BabSetupBase;
   /** Class to do diving in the tree. Principle is that branch-and-bound follows current branch of the tree untill it
       hits the bottom at which point it goes to the best candidate (according to CbcCompare) on the heap.*/
   class CbcDiver : public CbcTree
@@ -87,7 +88,7 @@ namespace Bonmin
     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
     /// Initialize the method (get options)
-    void initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
+    void initialize(BabSetupBase &b);
 
   private:
     /** Say if we are cleaning the tree (then only call CbcTree functions).*/
@@ -166,7 +167,7 @@ namespace Bonmin
     }
 
     /// Initialize the method (get options)
-    void initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
+    void initialize(BabSetupBase &b);
 
   private:
     /** Say if we are cleaning the tree (then only call CbcTree functions).*/
@@ -260,7 +261,7 @@ namespace Bonmin
     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
     /// Initialize the method (get options)
-    void initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
+    void initialize(BabSetupBase &b);
 //#endif
     ///Don't know what this is yet?
     virtual void endSearch()

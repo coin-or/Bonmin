@@ -11,6 +11,7 @@
 #include "CoinFinite.hpp"
 #include "CbcModel.hpp"
 #include "CbcConfig.h"
+#include "BonBabSetupBase.hpp"
 //#define DIVE_DEBUG
 namespace Bonmin
 {
@@ -179,10 +180,10 @@ namespace Bonmin
 
   /// Initialize the method (get options)
   void
-  CbcDiver::initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options)
+  CbcDiver::initialize(BabSetupBase &b)
   {
-    options->GetBoolValue("stop_diving_on_cutoff", stop_diving_on_cutoff_,
-        "bonmin.");
+    b.options()->GetBoolValue("stop_diving_on_cutoff", stop_diving_on_cutoff_,
+        b.prefix());
   }
 
 
@@ -435,10 +436,10 @@ namespace Bonmin
 
   /// Initialize the method (get options)
   void
-  CbcProbedDiver::initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options)
+  CbcProbedDiver::initialize(BabSetupBase &b)
   {
-    options->GetBoolValue("stop_diving_on_cutoff", stop_diving_on_cutoff_,
-        "bonmin.");
+    b.options()->GetBoolValue("stop_diving_on_cutoff", stop_diving_on_cutoff_,
+        b.prefix());
   }
 
   /************************************************************************/
@@ -536,6 +537,10 @@ namespace Bonmin
     //Always push on dive;
     dive_.push_front(x);
     diveListSize_++;
+#ifdef DIVE_DEBUG
+    printf("diveListSize_ = %i == %u = dive_.size()\n",diveListSize_, dive_.size());
+    assert(diveListSize_ == dive_.size());
+#endif
   }
 
   /// Remove the top node of the heap.
@@ -546,7 +551,7 @@ namespace Bonmin
 #ifdef DIVE_DEBUG
     std::cout<<"CbcDfsDiver::pop"<<std::endl;
 #endif
-    if (mode_ != CbcDfsDiver::FindSolutions) {
+    if (mode_ > CbcDfsDiver::FindSolutions) {
       assert(dive_.empty());
     }
     if (!dive_.empty()) {
@@ -561,6 +566,9 @@ namespace Bonmin
   CbcNode *
   CbcDfsDiver::bestNode(double cutoff)
   {
+#ifdef DIVE_DEBUG
+    std::cout<<"CbcDfsDiver::bestNode"<<std::endl;
+#endif
     if (treeCleaning_) return CbcTree::bestNode(cutoff);
 #ifdef DIVE_DEBUG
     for (unsigned int i = 0 ; i < nodes_.size() ; i++) {
@@ -583,6 +591,7 @@ namespace Bonmin
         else {
           //pop and return node;
           dive_.pop_back();
+          diveListSize_ --;
           return node;
         }
       }
@@ -591,16 +600,14 @@ namespace Bonmin
       assert(dive_.empty());
       CbcTree::bestNode(cutoff);
     }
-#ifdef DIVE_DEBUG
-    std::cout<<"CbcDfsDiver::bestNode"<<std::endl;
-#endif
     assert(nBacktracks_ < maxDiveBacktracks_);
     CbcNode * node = NULL;
     while (diveListSize_ > 0) {
 #ifdef DIVE_DEBUG
       std::cerr<<"CbcDfsDiver::bestNode"
-      <<", exmining node"<<std::endl;
+      <<", examining node"<<std::endl;
 #endif
+      assert(!dive_.empty());
       node = dive_.front();
       dive_.pop_front();
       diveListSize_ --;
@@ -616,10 +623,11 @@ namespace Bonmin
         node = NULL;
         nBacktracks_++;
       }
-      else if (node->guessedObjectiveValue() > cutoff) {//Put it on the real heap
+      else if (0 && node->guessedObjectiveValue() > cutoff) {//Put it on the real heap
 #ifdef DIVE_DEBUG
         std::cout<<"CbcDfsDiver::bestNode"
-        <<", node estimates above cutoff"<<std::endl;
+        <<", node estimates "<<node->guessedObjectiveValue()<<"above cutoff"
+        <<cutoff<<std::endl;
 #endif
         CbcTree::push(node);
         nBacktracks_++;
@@ -665,7 +673,7 @@ namespace Bonmin
 
   void CbcDfsDiver::pushDiveOntoHeap(double cutoff)
   {
-    while (!dive_.empty() && dive_.front()->objectiveValue() >= cutoff) {
+    while (!dive_.empty() ){//&& dive_.front()->objectiveValue() >= cutoff) {
       CbcTree::push(dive_.front());
       dive_.pop_front();
       diveListSize_--;
@@ -736,10 +744,10 @@ namespace Bonmin
 
   /// Initialize the method (get options)
   void
-  CbcDfsDiver::initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options)
+  CbcDfsDiver::initialize(BabSetupBase &b)
   {
-    options->GetIntegerValue("max_dive_depth", maxDiveDepth_,"bonmin.");
-    options->GetIntegerValue("max_backtracks_in_dive", maxDiveBacktracks_,"bonmin.");
+    b.options()->GetIntegerValue("max_dive_depth", maxDiveDepth_,b.prefix());
+    b.options()->GetIntegerValue("max_backtracks_in_dive", maxDiveBacktracks_,b.prefix());
   }
 //#endif
 
@@ -771,6 +779,7 @@ namespace Bonmin
         break;
       }
 #endif
+      CbcTree::setComparison(*comparison_.test_); 
     }
   }
 
