@@ -4,6 +4,7 @@ ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/
 ThirdParty/HSL https://projects.coin-or.org/svn/BuildTools/ThirdParty/HSL/stable/1.1
 ThirdParty/ASL https://projects.coin-or.org/svn/BuildTools/ThirdParty/ASL/stable/1.0
 ThirdParty/Mumps https://projects.coin-or.org/svn/BuildTools/ThirdParty/Mumps/stable/1.1
+ThirdParty/FilterSQP https://projects.coin-or.org/svn/BuildTools/ThirdParty/FilterSQP/stable/1.0
 Data/Sample https://projects.coin-or.org/svn/Data/stable/1.0/Sample
 CoinUtils https://projects.coin-or.org/svn/CoinUtils/stable/2.3/CoinUtils
 Cbc https://projects.coin-or.org/svn/Cbc/stable/2.2/Cbc
