@@ -457,7 +457,7 @@ namespace Bonmin
 
     roptions->AddStringOption5("node_comparison",
         "Choose the node selection strategy.",
-        "dynamic",
+        "best-bound",
         "best-bound", "choose node with the smallest bound,",
         "depth-first", "Perform depth first search,",
         "breadth-first", "Perform breadth first search,",
