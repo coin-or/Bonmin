@@ -323,10 +323,11 @@ namespace Bonmin
       si = new OsiCpxSolverInterface;
 #else
       si = new OsiClpSolverInterface;
+      si->messageHandler()->setLogLevel(0);
 #endif
       si->loadProblem(*matrix, col_lb, col_ub, objective, row_lb, row_ub);
       si->setInteger(indexIntegerColumn, numberIndexIntegerColumn);
-
+      
       // solve with cplex
       si->branchAndBound();
 

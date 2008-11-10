@@ -48,9 +48,9 @@ namespace Bonmin {
 #ifdef DEBUG_BON_HEURISTIC_RINS
     std::cout<<"entered RINS"<<std::endl;
 #endif
-
+    if(model_->getNodeCount() % howOften_ != 0) return 0;
     //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
-    if (numberSolutions_>=model_->getSolutionCount()){
+    if (0 && numberSolutions_>=model_->getSolutionCount()){
 #ifdef DEBUG_BON_HEURISTIC_RINS
     std::cout<<"exited RINS a"<<std::endl;
     printf("numberSolutions_ %i model_->getSolutionCount() %i\n", numberSolutions_, model_->getSolutionCount());
@@ -103,7 +103,7 @@ namespace Bonmin {
     }
 
     int r_val = 0;
-    if(nFix > numberIntegers/5) {
+    if(nFix > numberIntegers/10) {
 #ifdef DEBUG_BON_HEURISTIC_RINS
       std::cout<<"cutoff = "<<model_->getCutoff()<<std::endl;
 #endif
@@ -112,11 +112,16 @@ namespace Bonmin {
       std::cout<<"executed RINS "<<r_val<<std::endl;
 #endif
     }
+    else {numberSolutions_ --;}
 
     delete nlp;
 
-    if(r_val > 0) numberSolutions_ = model_->getSolutionCount() + 1;
-
+    if(r_val > 0) {
+      numberSolutions_ = model_->getSolutionCount() + 1;
+      howOften_ = std::min(10, howOften_ / 2);
+    }
+    else
+      howOften_ = std::max(10000,2*howOften_);
     return r_val;
   }
 

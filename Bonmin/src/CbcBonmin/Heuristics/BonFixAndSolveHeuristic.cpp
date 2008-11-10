@@ -14,11 +14,13 @@ namespace Bonmin {
 
   /** Default constructor*/
   FixAndSolveHeuristic::FixAndSolveHeuristic():
-    LocalSolverBasedHeuristic(){
+    LocalSolverBasedHeuristic()
+    {
   }
   /** Constructor with setup.*/
   FixAndSolveHeuristic::FixAndSolveHeuristic(BonminSetup * setup):
-    LocalSolverBasedHeuristic(setup){
+    LocalSolverBasedHeuristic(setup)
+    {
   }
 
   /** Copy constructor.*/
@@ -34,7 +36,10 @@ namespace Bonmin {
   int
   FixAndSolveHeuristic::solution(double & objectiveValue,
                                  double * newSolution){
-    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    //if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if(model_->getSolutionCount() > 0) return 0;
+    if(model_->getNodeCount() > 1000) return 0;
+    if(model_->getNodeCount() % 100 != 0) return 0;
     int numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
@@ -44,11 +49,14 @@ namespace Bonmin {
     info.solution_ = model_->getColSolution();
 
     int dummy;
+    int nFixed = 0;
     for(int i = 0 ; i < numberObjects; i++){
       if(objects[i]->infeasibility(&info, dummy) == 0.){
          objects[i]->feasibleRegion(nlp, &info);
+         nFixed ++;
       }
     }
+    if(nFixed < numberObjects / 3) return 0;
     double cutoff = info.cutoff_; 
     int r_val = doLocalSearch(nlp, newSolution, objectiveValue, cutoff);
     delete nlp;
