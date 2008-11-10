@@ -294,7 +294,7 @@ namespace Bonmin
 
     lp_->branchAndBound();
 
-   optimal_ = lp_->isProvenOptimal();
+    optimal_ = lp_->isProvenOptimal();
 #ifdef COIN_HAS_CPX
     if (cpx_) {
       //CpxModel = NULL;

@@ -394,6 +394,7 @@ libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../Algorithms` -I`$(CYGPATH_W) \
 	$(srcdir)/../Algorithms/OaGenerators` -I`$(CYGPATH_W) \
 	$(srcdir)/../Algorithms/Branching` -I`$(CYGPATH_W) \
+	$(srcdir)/../Algorithms/QuadCuts` -I`$(CYGPATH_W) \
 	$(srcdir)/../Interfaces` -I`$(CYGPATH_W) \
 	$(srcdir)/../Interfaces/Ipopt` -I`$(CYGPATH_W) \
 	$(srcdir)/../Interfaces/Ampl` -I`$(CYGPATH_W) \

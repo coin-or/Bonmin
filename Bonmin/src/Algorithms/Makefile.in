@@ -99,7 +99,7 @@ includecoinHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(includecoin_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = OaGenerators Branching Ampl
+DIST_SUBDIRS = OaGenerators Branching QuadCuts Ampl
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ADDLIBS = @ADDLIBS@
@@ -341,7 +341,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 
 # Name of the library in this directory
-SUBDIRS = OaGenerators Branching $(am__append_1)
+SUBDIRS = OaGenerators Branching QuadCuts $(am__append_1)
 noinst_LTLIBRARIES = libbonalgorithms.la
 
 ########################################################################
@@ -354,7 +354,7 @@ libbonalgorithms_la_SOURCES = \
          BonBonminSetup.cpp BonBonminSetup.hpp
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la \
-	OaGenerators/libbonoagenerators.la
+	OaGenerators/libbonoagenerators.la QuadCuts/libbonquadcuts.la
 libbonalgorithms_la_DEPENDENCIES = $(libbonalgorithms_la_LIBADD)
 
 # This is for libtool (on Windows)
@@ -363,8 +363,8 @@ libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/Branching` -I`$(CYGPATH_W) \
-	$(srcdir)/OaGenerators` -I`$(CYGPATH_W) \
-	$(srcdir)/../CbcBonmin` -I`$(CYGPATH_W) \
+	$(srcdir)/QuadCuts` -I`$(CYGPATH_W) $(srcdir)/OaGenerators` \
+	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` -I`$(CYGPATH_W) \
 	$(srcdir)/../CbcBonmin/Heuristics` -I`$(CYGPATH_W) \
 	$(srcdir)/../Interfaces` -I`$(CYGPATH_W) \
 	$(srcdir)/../Interfaces/Ipopt` -I`$(CYGPATH_W) \

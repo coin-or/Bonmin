@@ -42,6 +42,7 @@
 #include "CglPreProcess.hpp"
 #include "CglLandP.hpp"
 #include "CglRedSplit.hpp"
+#include "BonLinearCutsGenerator.hpp"
 
 #include "BonFixAndSolveHeuristic.hpp"
 #include "BonDummyPump.hpp"
@@ -182,6 +183,7 @@ namespace Bonmin
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
         "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("Gomory_cuts",5);
+#if 0
     roptions->AddBoundedIntegerOption("probing_cuts",
         "Frequency (in terms of nodes) for generating probing cuts in branch-and-cut",
         0,0,0,
@@ -189,7 +191,7 @@ namespace Bonmin
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
         "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("probing_cuts",5);
-
+#endif
     roptions->AddLowerBoundedIntegerOption("cover_cuts",
         "Frequency (in terms of nodes) for generating cover cuts in branch-and-cut",
         -100,-5,
@@ -257,6 +259,7 @@ namespace Bonmin
       cg.id = "Mixed Integer Gomory";
       cutGenerators_.push_back(cg);
     }
+#if 0
     options_->GetIntegerValue("probing_cuts",freq,prefix_.c_str());
     if (freq) {
       CuttingMethod cg;
@@ -279,6 +282,7 @@ namespace Bonmin
       cg.id = "Probing";
       cutGenerators_.push_back(cg);
     }
+#endif
     options_->GetIntegerValue("mir_cuts",freq,prefix_.c_str());
     if (freq) {
       CuttingMethod cg;
@@ -448,6 +452,9 @@ namespace Bonmin
     if (branchingMethod_ != NULL) {
       branchingMethod_->setNumberStrong(intParam_[NumberStrong]);
     }
+
+
+
     Index doFixAndSolve = false;
     options()->GetEnumValue("fix_and_solve_heuristic",doFixAndSolve,prefix_.c_str());
     if(doFixAndSolve){

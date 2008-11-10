@@ -23,7 +23,7 @@ namespace Bonmin
   {
   public:
     /** Type for cut generation method with its frequency and string identification. */
-    struct CuttingMethod
+    struct CuttingMethod 
     {
       int frequency;
       std::string id;

@@ -23,7 +23,7 @@
 #include "BonGuessHeuristic.hpp"
 
 #include "BonDiver.hpp"
-
+#include "BonLinearCutsGenerator.hpp"
 // sets cutoff a bit above real one, to avoid single-point feasible sets
 #define CUTOFF_TOL 1e-6
 
@@ -430,6 +430,24 @@ namespace Bonmin
     try {
     //Get the time and start.
     model_.initialSolve();
+
+
+    int ival;
+    s.options()->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
+    if(ival)
+    {
+      LinearCutsGenerator cgl;
+      cgl.initialize(s); 
+      OsiCuts cuts;
+      cgl.generateCuts(*model_.solver(), cuts);
+      std::vector<OsiRowCut *> mycuts(cuts.sizeRowCuts());
+      for(int i = 0 ; i < cuts.sizeRowCuts() ; i++){
+        mycuts[i] = cuts.rowCutPtr(i);
+      }
+      model_.solver()->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
+    }
+
+    model_.solver()->resolve();
 
     // for Couenne
     if (usingCouenne_)

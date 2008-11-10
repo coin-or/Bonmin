@@ -12,7 +12,8 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = \
        OaGenerators \
-       Branching
+       Branching \
+       QuadCuts
 if COIN_HAS_ASL
 SUBDIRS += Ampl
 endif
@@ -30,6 +31,7 @@ libbonalgorithms_la_SOURCES = \
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la
 libbonalgorithms_la_LIBADD += OaGenerators/libbonoagenerators.la 
+libbonalgorithms_la_LIBADD += QuadCuts/libbonquadcuts.la 
 
 libbonalgorithms_la_DEPENDENCIES = $(libbonalgorithms_la_LIBADD)
 
@@ -40,6 +42,7 @@ libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/Branching` \
+	-I`$(CYGPATH_W) $(srcdir)/QuadCuts` \
 	-I`$(CYGPATH_W) $(srcdir)/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
 	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin/Heuristics` \

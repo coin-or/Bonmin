@@ -20,7 +20,7 @@
 #include "BonQpBranchingSolver.hpp"
 #include "BonLpBranchingSolver.hpp"
 #include "BonChooseVariable.hpp"
-
+#include "BonTMINLP2Quad.hpp"
 namespace Bonmin
 {
   int BabSetupBase::defaultIntParam_[BabSetupBase::NumberIntParam] = {
@@ -232,6 +232,11 @@ namespace Bonmin
     assert(IsValid(tminlp));
     nonlinearSolver_ = new OsiTMINLPInterface;
     nonlinearSolver_->initialize(roptions_, options_, journalist_, prefix(), tminlp);
+    int ival;
+    options_->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
+    if (ival){
+      nonlinearSolver_->use(new Bonmin::TMINLP2TNLPQuadCuts(tminlp));
+    }
   }
 
   BabSetupBase::BabSetupBase(const OsiTMINLPInterface& nlp):
@@ -548,6 +553,12 @@ namespace Bonmin
         "");
     roptions->setOptionExtraInfo("num_cut_passes_at_root", 7);
 
+    roptions->AddStringOption2("enable_dynamic_nlp",
+               "Enable dynamic linear and quadratic rows addition in nlp",
+               "no",
+               "no", "",
+               "yes", "",
+               "");
 
     /* Branching options.*/
     LpBranchingSolver::registerOptions(roptions);
