@@ -85,6 +85,8 @@ Bonmin/src/Algorithms/QuadCuts/BonQuadRow.cpp -text
 Bonmin/src/Algorithms/QuadCuts/BonQuadRow.hpp -text
 Bonmin/src/Algorithms/QuadCuts/BonTMINLP2Quad.cpp -text
 Bonmin/src/Algorithms/QuadCuts/BonTMINLP2Quad.hpp -text
+Bonmin/src/Algorithms/QuadCuts/BonTMINLPLinObj.cpp -text
+Bonmin/src/Algorithms/QuadCuts/BonTMINLPLinObj.hpp -text
 Bonmin/src/Algorithms/QuadCuts/BonTMatrix.cpp -text
 Bonmin/src/Algorithms/QuadCuts/BonTMatrix.hpp -text
 Bonmin/src/Algorithms/QuadCuts/Makefile.am -text

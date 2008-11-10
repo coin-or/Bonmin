@@ -29,6 +29,8 @@ libbonquadcuts_la_SOURCES = \
                   BonTMatrix.hpp \
                   BonLinearCutsGenerator.hpp \
                   BonLinearCutsGenerator.cpp \
+                  BonTMINLPLinObj.hpp \
+                  BonTMINLPLinObj.cpp \
                   BonTMINLP2Quad.cpp \
                   BonTMINLP2Quad.hpp
 
@@ -104,6 +106,7 @@ includecoin_HEADERS = \
             BonQuadCut.hpp \
             BonQuadRow.hpp \
             BonTMatrix.hpp \
+            BonTMINLPLinObj.hpp \
             BonTMINLP2Quad.hpp
 
  
@@ -123,6 +126,8 @@ ASTYLE_FILES = \
               BonQuadRow.hppbak \
               BonTMatrix.cppbak \
               BonTMatrix.hppbak \
+              BonTMINLPLinObj.hppbak \
+              BonTMINLPLinObj.cppbak \
               BonTMINLP2Quad.cppbak \
               BonTMINLP2Quad.hpp
 

@@ -33,10 +33,9 @@ namespace Bonmin
 
   HeuristicDiveVectorLength::HeuristicDiveVectorLength(const HeuristicDiveVectorLength &copy)
     :
-    HeuristicDive(copy)
+    HeuristicDive(copy),
+    columnLength_(NULL)
   {
-    delete [] columnLength_;
-    columnLength_ = NULL;
   }
 
   HeuristicDiveVectorLength & 

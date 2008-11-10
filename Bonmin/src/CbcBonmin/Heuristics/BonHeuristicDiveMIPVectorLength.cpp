@@ -33,10 +33,9 @@ namespace Bonmin
 
   HeuristicDiveMIPVectorLength::HeuristicDiveMIPVectorLength(const HeuristicDiveMIPVectorLength &copy)
     :
-    HeuristicDiveMIP(copy)
+    HeuristicDiveMIP(copy),
+    columnLength_(NULL)
   {
-    delete [] columnLength_;
-    columnLength_ = NULL;
   }
 
   HeuristicDiveMIPVectorLength & 

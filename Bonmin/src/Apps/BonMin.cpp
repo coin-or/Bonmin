@@ -30,8 +30,8 @@ int main (int argc, char *argv[])
     pbName = new char[strlen(argv[1])+1];
     strcpy(pbName, argv[1]);
   }
-  
-#if 1
+//#define CATCH_ERRORS 
+#ifdef CATCH_ERRORS
   try
 #endif 
   {
@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
     bb(bonmin);//do branch and bound
 
   }
-#if 1
+#ifdef CATCH_ERRORS
   catch(TNLPSolver::UnsolvedError *E) {
     E->writeDiffFiles();
     E->printError(std::cerr);

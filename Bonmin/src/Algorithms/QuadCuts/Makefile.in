@@ -62,7 +62,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonquadcuts_la_LIBADD =
 am_libbonquadcuts_la_OBJECTS = BonOuterApprox.lo BonQuadCut.lo \
 	BonQuadRow.lo BonTMatrix.lo BonLinearCutsGenerator.lo \
-	BonTMINLP2Quad.lo
+	BonTMINLPLinObj.lo BonTMINLP2Quad.lo
 libbonquadcuts_la_OBJECTS = $(am_libbonquadcuts_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -355,6 +355,8 @@ libbonquadcuts_la_SOURCES = \
                   BonTMatrix.hpp \
                   BonLinearCutsGenerator.hpp \
                   BonLinearCutsGenerator.cpp \
+                  BonTMINLPLinObj.hpp \
+                  BonTMINLPLinObj.cpp \
                   BonTMINLP2Quad.cpp \
                   BonTMINLP2Quad.hpp
 
@@ -417,6 +419,7 @@ includecoin_HEADERS = \
             BonQuadCut.hpp \
             BonQuadRow.hpp \
             BonTMatrix.hpp \
+            BonTMINLPLinObj.hpp \
             BonTMINLP2Quad.hpp
 
 
@@ -435,6 +438,8 @@ ASTYLE_FILES = \
               BonQuadRow.hppbak \
               BonTMatrix.cppbak \
               BonTMatrix.hppbak \
+              BonTMINLPLinObj.hppbak \
+              BonTMINLPLinObj.cppbak \
               BonTMINLP2Quad.cppbak \
               BonTMINLP2Quad.hpp
 
@@ -496,6 +501,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQuadCut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQuadRow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP2Quad.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLPLinObj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMatrix.Plo@am__quote@
 
 .cpp.o:

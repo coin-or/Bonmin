@@ -21,6 +21,7 @@
 #include "BonLpBranchingSolver.hpp"
 #include "BonChooseVariable.hpp"
 #include "BonTMINLP2Quad.hpp"
+#include "BonTMINLPLinObj.hpp"
 namespace Bonmin
 {
   int BabSetupBase::defaultIntParam_[BabSetupBase::NumberIntParam] = {
@@ -231,9 +232,15 @@ namespace Bonmin
     readOptionsFile();
     assert(IsValid(tminlp));
     nonlinearSolver_ = new OsiTMINLPInterface;
-    nonlinearSolver_->initialize(roptions_, options_, journalist_, prefix(), tminlp);
     int ival;
     options_->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
+    if(ival && ! tminlp->hasLinearObjective()){
+      Ipopt::SmartPtr<Bonmin::TMINLPLinObj> linObj =
+                        new Bonmin::TMINLPLinObj;
+      linObj->setTminlp(GetRawPtr(tminlp));
+      tminlp = GetRawPtr(linObj);
+    }
+    nonlinearSolver_->initialize(roptions_, options_, journalist_, prefix(), tminlp);
     if (ival){
       nonlinearSolver_->use(new Bonmin::TMINLP2TNLPQuadCuts(tminlp));
     }
