@@ -42,8 +42,16 @@ namespace Bonmin {
     if(model_->getNodeCount() % 100 != 0) return 0;
     int numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
+
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
-                               (setup_->nonlinearSolver()->clone());
+                               (model_->solver());
+    if(nlp == NULL){
+       nlp = dynamic_cast<OsiTMINLPInterface *>
+                         (setup_->nonlinearSolver()->clone());
+     }
+     else {
+       nlp = dynamic_cast<OsiTMINLPInterface *>(nlp->clone());
+     }
 
     OsiBranchingInformation info = model_->usefulInformation();
     info.solution_ = model_->getColSolution();

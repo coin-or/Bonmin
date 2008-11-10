@@ -455,45 +455,6 @@ namespace Bonmin
 
 
 
-    Index doFixAndSolve = false;
-    options()->GetEnumValue("fix_and_solve_heuristic",doFixAndSolve,prefix_.c_str());
-    if(doFixAndSolve){
-      FixAndSolveHeuristic* fix_and_solve = new FixAndSolveHeuristic(this);
-      HeuristicMethod h;
-      h.heuristic = fix_and_solve;
-      h.id = "Fix and Solve";
-      heuristics_.push_back(h);
-    }
-
-    Index doDummyPump = false;
-    options()->GetEnumValue("dummy_pump_heuristic",doDummyPump,prefix_.c_str());
-    if(doDummyPump){
-      DummyPump* fix_and_solve = new DummyPump(this);
-      HeuristicMethod h;
-      h.heuristic = fix_and_solve;
-      h.id = "Dummy pump";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicRINS = false;
-    options()->GetEnumValue("heuristic_RINS",doHeuristicRINS,prefix_.c_str());
-    if(doHeuristicRINS){
-      HeuristicRINS* rins = new HeuristicRINS(this);
-      HeuristicMethod h;
-      h.heuristic = rins;
-      h.id = "RINS";
-      heuristics_.push_back(h);
-    }
-
-    Index doHeuristicLocalBranching = false;
-    options()->GetEnumValue("heuristic_local_branching",doHeuristicLocalBranching,prefix_.c_str());
-    if(doHeuristicLocalBranching){
-      HeuristicLocalBranching* local_branching = new HeuristicLocalBranching(this);
-      HeuristicMethod h;
-      h.heuristic = local_branching;
-      h.id = "LocalBranching";
-      heuristics_.push_back(h);
-    }
 
     Index doHeuristicFPump = false;
     options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,prefix_.c_str());
@@ -542,6 +503,45 @@ namespace Bonmin
       HeuristicMethod h;
       h.heuristic = dive_MIP_vectorLength;
       h.id = "DiveMIPVectorLength";
+      heuristics_.push_back(h);
+    }
+    Index doFixAndSolve = false;
+    options()->GetEnumValue("fix_and_solve_heuristic",doFixAndSolve,prefix_.c_str());
+    if(doFixAndSolve){
+      FixAndSolveHeuristic* fix_and_solve = new FixAndSolveHeuristic(this);
+      HeuristicMethod h;
+      h.heuristic = fix_and_solve;
+      h.id = "Fix and Solve";
+      heuristics_.push_back(h);
+    }
+
+    Index doDummyPump = false;
+    options()->GetEnumValue("dummy_pump_heuristic",doDummyPump,prefix_.c_str());
+    if(doDummyPump){
+      DummyPump* fix_and_solve = new DummyPump(this);
+      HeuristicMethod h;
+      h.heuristic = fix_and_solve;
+      h.id = "Dummy pump";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicRINS = false;
+    options()->GetEnumValue("heuristic_RINS",doHeuristicRINS,prefix_.c_str());
+    if(doHeuristicRINS){
+      HeuristicRINS* rins = new HeuristicRINS(this);
+      HeuristicMethod h;
+      h.heuristic = rins;
+      h.id = "RINS";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicLocalBranching = false;
+    options()->GetEnumValue("heuristic_local_branching",doHeuristicLocalBranching,prefix_.c_str());
+    if(doHeuristicLocalBranching){
+      HeuristicLocalBranching* local_branching = new HeuristicLocalBranching(this);
+      HeuristicMethod h;
+      h.heuristic = local_branching;
+      h.id = "LocalBranching";
       heuristics_.push_back(h);
     }
   }

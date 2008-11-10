@@ -105,6 +105,7 @@ OuterApprox::extractLinearRelaxation(Bonmin::OsiTMINLPInterface &minlp,
     }
     if(getObj) {
        if(model->hasLinearObjective()){
+         std::cout<<"Linear stuff"<<std::endl;
          double zero;
          model->eval_f(n, &obj[0], 1, zero);
          si->setDblParam(OsiObjOffset, -zero);

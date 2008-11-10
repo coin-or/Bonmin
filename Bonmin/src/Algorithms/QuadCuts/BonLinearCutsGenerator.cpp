@@ -109,15 +109,16 @@ namespace Bonmin {
   LinearCutsGenerator::generateCuts(const OsiSolverInterface &solver, OsiCuts &cs,
                      const CglTreeInfo info) const {
 
-    OsiClpSolverInterface si;
-    const OsiTMINLPInterface * tmp = dynamic_cast<const OsiTMINLPInterface *>(&solver);
-    OsiTMINLPInterface * nlp = const_cast<OsiTMINLPInterface *>(tmp);
+    //const OsiTMINLPInterface * tmp = dynamic_cast<const OsiTMINLPInterface *>(&solver);
+    OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>(solver.clone());//const_cast<OsiTMINLPInterface *>(tmp);
     assert(nlp);
     OuterApprox oa;
-    oa(*nlp, &si, solver.getColSolution(), true); 
     //si.writeMps("toto");
-    int numberRows = si.getNumRows();
-    for(int i = 0 ; i < 3 ; i++){
+    int numberRows = nlp->getNumRows();
+    for(int i = 0 ; i < 5 ; i++){
+      nlp->resolve();
+      OsiClpSolverInterface si;
+      oa(*nlp, &si, solver.getColSolution(), true); 
       si.resolve();
       OsiCuts cuts;
       for(std::list<Coin::SmartPtr<CuttingMethod> >::const_iterator i = methods_.begin() ;
@@ -129,21 +130,25 @@ namespace Bonmin {
         mycuts[i] = cuts.rowCutPtr(i);
         cs.insert(*mycuts[i]);
       }
-      si.applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
+      nlp->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
     }
 
     // Take off slack cuts
     std::vector<int> kept;
-    int numberRowsNow = si.getNumRows();
+    int numberRowsNow = nlp->getNumRows();
     int * del = new int [numberRowsNow-numberRows];
-    const CoinWarmStartBasis* basis = dynamic_cast<const CoinWarmStartBasis*>(si.getWarmStart()) ;
-    assert (basis);
+    nlp->resolve();
+    
+    const double * activity = nlp->getRowActivity();
+    const double * lb = nlp->getRowLower();
+    const double * ub = nlp->getRowUpper();
+    CoinRelFltEq eq;
     int nDelete=0;
-    for (int i=numberRows;i<numberRowsNow;i++) {
-      CoinWarmStartBasis::Status status = basis->getArtifStatus(i);
-      if (! status == CoinWarmStartBasis::basic)
+    for (int i=numberRowsNow -1;i>=numberRows;i--) {
+      if ( !(eq(activity[i], lb[i]) || eq(activity[i], ub[i])) )
         cs.eraseRowCut(i - numberRows);
     }
-
+    delete [] del;
+    delete nlp;
   }
 }/* Ends Bonmin namespace.*/

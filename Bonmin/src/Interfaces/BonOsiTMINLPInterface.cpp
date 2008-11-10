@@ -517,13 +517,13 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     oaHandler_(NULL),
     strong_branching_solver_(source.strong_branching_solver_)
 {
-   if(defaultHandler()){
+   if(0 && defaultHandler()){
      messageHandler()->setLogLevel(source.messageHandler()->logLevel());
    }
   //Pass in message handler
-  if(source.messageHandler())
+  if(0 && source.messageHandler())
     passInMessageHandler(source.messageHandler());
-  // Copy options from old application
+   //Copy options from old application
   if(IsValid(source.tminlp_)) {
     problem_ = source.problem_->clone();
     feasibilityProblem_ = new TNLP2FPNLP
@@ -1612,16 +1612,16 @@ int OsiTMINLPInterface::initializeJacobianArrays()
 {
   Index n, m, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
-  tminlp_->get_nlp_info( n, m, nnz_jac, nnz_h_lag, index_style);
+  problem_to_optimize_->get_nlp_info( n, m, nnz_jac, nnz_h_lag, index_style);
 
-  if(jRow_ != NULL) delete jRow_;
-  if(jCol_ != NULL) delete jCol_;
-  if(jValues_ != NULL) delete jValues_;
+  if(jRow_ != NULL) delete [] jRow_;
+  if(jCol_ != NULL) delete [] jCol_;
+  if(jValues_ != NULL) delete [] jValues_;
 
   jRow_ = new Index[nnz_jac];
   jCol_ = new Index[nnz_jac];
   jValues_ = new Number[nnz_jac];
-  tminlp_->eval_jac_g(n, NULL, 0, m, nnz_jac, jRow_, jCol_, NULL);
+  problem_to_optimize_->eval_jac_g(n, NULL, 0, m, nnz_jac, jRow_, jCol_, NULL);
   if(index_style == Ipopt::TNLP::FORTRAN_STYLE)//put C-style
   {
     for(int i = 0 ; i < nnz_jac ; i++){
@@ -1634,7 +1634,7 @@ int OsiTMINLPInterface::initializeJacobianArrays()
 //  if(constTypesNum_ != NULL) delete [] constTypesNum_;
 
   constTypes_ = new TNLP::LinearityType[getNumRows()];
-  tminlp_->get_constraints_linearity(getNumRows(), constTypes_);
+  problem_to_optimize_->get_constraints_linearity(getNumRows(), constTypes_);
 //  constTypesNum_ = new int[getNumRows()];
   for(int i = 0; i < getNumRows() ; i++) {
     if(constTypes_[i]==TNLP::NON_LINEAR) {
@@ -2134,7 +2134,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   problem_to_optimize_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
 
   //if not allocated allocate spaced for stroring jacobian
-  if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
+  //if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
     initializeJacobianArrays();
 
   //get Jacobian

@@ -434,7 +434,7 @@ namespace Bonmin
 
     int ival;
     s.options()->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
-    if(ival)
+    if(s.nonlinearSolver() == s.continuousSolver() && ival)
     {
       LinearCutsGenerator cgl;
       cgl.initialize(s); 

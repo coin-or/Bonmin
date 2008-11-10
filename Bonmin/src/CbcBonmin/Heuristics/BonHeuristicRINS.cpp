@@ -19,13 +19,13 @@ namespace Bonmin {
   /** Default constructor*/
   HeuristicRINS::HeuristicRINS():
     LocalSolverBasedHeuristic(),
-    howOften_(100),
+    howOften_(10),
     numberSolutions_(0)
   {}
   /** Constructor with setup.*/
   HeuristicRINS::HeuristicRINS(BonminSetup * setup):
     LocalSolverBasedHeuristic(setup),
-    howOften_(100),
+    howOften_(10),
     numberSolutions_(0){
   }
 
@@ -67,10 +67,15 @@ namespace Bonmin {
 #endif
       return 0; // No solution found yet
     }
-
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
-                               (setup_->nonlinearSolver()->clone());
-
+                               (model_->solver());
+    if(nlp == NULL){
+       nlp = dynamic_cast<OsiTMINLPInterface *>
+                         (setup_->nonlinearSolver()->clone());
+     }
+     else {
+       nlp = dynamic_cast<OsiTMINLPInterface *>(nlp->clone());
+    }
 
     int numberIntegers = model_->numberIntegers();
     const int * integerVariable = model_->integerVariable();
