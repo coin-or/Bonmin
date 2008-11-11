@@ -399,6 +399,10 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with FilterSQP.");
 #endif    
+
+#ifdef COIN_HAS_IPOPT
+   debug_apps_.push_back(new IpoptSolver(roptions, options, journalist, prefix)); 
+#endif
   }
   else if(s == EIpopt){
     testOthers_ = false;
@@ -407,6 +411,9 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
 #else
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with Ipopt.");
+#endif
+#ifdef COIN_HAS_FILTERSQP
+    debug_apps_.push_back(new Bonmin::FilterSolver(roptions, options, journalist, prefix));
 #endif
   }
   else if(s == EAll){
@@ -2451,6 +2458,16 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
            }
         }
      }
+  }
+  else if(app_->isError(optimizationStatus_) && ! debug_apps_.empty()){
+      int f =1;
+      for(std::list<Ipopt::SmartPtr<TNLPSolver> >::iterator i = debug_apps_.begin();
+          i != debug_apps_.end() && app_->isError(optimizationStatus_) ; i++){
+        optimizationStatus_ = (*i)->OptimizeTNLP(GetRawPtr(problem_));
+        messageHandler()->message(LOG_LINE, messages_)
+          <<'d'<<f++<<statusAsString(optimizationStatus_)<<problem_->obj_value()
+          <<(*i)->IterationCount()<<(*i)->CPUTime()<<CoinMessageEol;
+      }
   }
   try{
     totalIterations_ += app_->IterationCount();
