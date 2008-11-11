@@ -169,7 +169,7 @@ namespace Bonmin
 
   private:
   /** Some storage for quadratic cuts.*/
-  std::vector<QuadRow *> quadRows_;
+  vector<QuadRow *> quadRows_;
 
   /** Storage for the original hessian of the problem.*/
   AdjustableMat H_;
@@ -180,7 +180,7 @@ namespace Bonmin
   int curr_nnz_jac_;
 
   /** Store user passed linear objective.*/
-  std::vector<double> obj_;
+  vector<double> obj_;
   /** constant term in objective function.*/
   double c_;
   };

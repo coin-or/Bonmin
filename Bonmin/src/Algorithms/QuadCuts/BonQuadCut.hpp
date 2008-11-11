@@ -13,6 +13,7 @@
 #include "CoinPackedMatrix.hpp"
 #include "OsiRowCut.hpp"
 #include "OsiCuts.hpp"
+#include "BonTypes.hpp"
 #include <list>
 
 
@@ -99,7 +100,7 @@ class QuadCut : public OsiRowCut {
 /** Generalizes OsiCuts to handle quadratic cuts.*/
 class Cuts : public OsiCuts {
  public:
-  typedef std::vector<QuadCut *> QuadCutPtrStorage;
+  typedef vector<QuadCut *> QuadCutPtrStorage;
   /** Default constructor.*/
   Cuts();
 

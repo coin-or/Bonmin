@@ -38,9 +38,9 @@ OuterApprox::extractLinearRelaxation(Bonmin::OsiTMINLPInterface &minlp,
     //Get problem information
     model->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
   
-    std::vector<int> iRow(nnz_jac_g);
-    std::vector<int> jCol(nnz_jac_g);
-    std::vector<double> vals(nnz_jac_g);
+    vector<int> iRow(nnz_jac_g);
+    vector<int> jCol(nnz_jac_g);
+    vector<double> vals(nnz_jac_g);
   
     //get Jacobian
     model->eval_jac_g(n, x, 1, m, nnz_jac_g, &iRow[0], &jCol[0], NULL);
@@ -53,20 +53,20 @@ OuterApprox::extractLinearRelaxation(Bonmin::OsiTMINLPInterface &minlp,
        jCol[k]--;
       }
     }
-    std::vector<double> g(m);
+    vector<double> g(m);
     model->eval_g(n, x, 1, m, &g[0]);
   
-    std::vector<double> rowLow(m);
-    std::vector<double> rowUp(m);
-    std::vector<double> colUp(n);
-    std::vector<double> colLow(n);
+    vector<double> rowLow(m);
+    vector<double> rowUp(m);
+    vector<double> colUp(n);
+    vector<double> colLow(n);
 
     model->get_bounds_info(n, &colLow[0], &colUp[0], m, &rowLow[0], &rowUp[0]);
 
     double infty = si->getInfinity();
     double nlp_infty = infty;
     
-   std::vector<Ipopt::TNLP::LinearityType> const_types(m); 
+   vector<Ipopt::TNLP::LinearityType> const_types(m); 
    model->get_constraints_linearity(m, &const_types[0]);
     for(int i = 0 ; i < m ; i++) {
        if(rowLow[i] > - nlp_infty){
@@ -95,7 +95,7 @@ OuterApprox::extractLinearRelaxation(Bonmin::OsiTMINLPInterface &minlp,
     CoinPackedMatrix mat(true, &iRow[0], &jCol[0], &vals[0], nnz_jac_g);
     mat.setDimensions(m,n); // In case matrix was empty, this should be enough
     
-    std::vector<double> obj(n,0.);
+    vector<double> obj(n,0.);
     
     si->loadProblem(mat, &colLow[0], &colUp[0], &obj[0], &rowLow[0], &rowUp[0]);
 

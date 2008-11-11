@@ -10,6 +10,8 @@ class vector : public std::vector<T>{
 public:
   /** Default constructor.*/
   vector(): std::vector<T>(){}
+  /** Constructor with initialization.*/
+  vector(unsigned int n, const T& v): std::vector<T>(n,v){}
   /** Copy constructor.*/
   vector(const vector<T>& other): std::vector<T>(other){}
   /** Copy constructor.*/

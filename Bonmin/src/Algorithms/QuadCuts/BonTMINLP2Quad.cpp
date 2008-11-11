@@ -360,7 +360,7 @@ namespace Bonmin {
      addRowCuts((OsiCuts) cuts, safe); 
      duals_sol_.resize(g_l_.size() + 2*x_l_.size(), 0.);
      x_init_.resize(g_l_.size() + 3*x_l_.size(), 0.);
-     duals_init_ = x_init_.data() + x_l_.size();
+     duals_init_ = x_init_() + x_l_.size();
   }
 
   /** Method to add array of OsiRowCut figuring out which is quadratic (slow!)..*/
@@ -388,7 +388,7 @@ namespace Bonmin {
      }
      duals_sol_.resize(g_l_.size() + 2*x_l_.size(), 0.);
      x_init_.resize(g_l_.size() + 3*x_l_.size(), 0.);
-     duals_init_ = x_init_.data() + x_l_.size();
+     duals_init_ = x_init_() + x_l_.size();
   } 
   /** Method to add OsiCuts figuring out which is quadratic (slow!)..*/
   void TMINLP2TNLPQuadCuts::addCuts(const OsiCuts& cuts){
@@ -434,13 +434,13 @@ namespace Bonmin {
   }
      duals_sol_.resize(g_l_.size() + 2*x_l_.size(), 0.);
      x_init_.resize(g_l_.size() + 3*x_l_.size(), 0.);
-     duals_init_ = x_init_.data() + x_l_.size();
+     duals_init_ = x_init_() + x_l_.size();
  }
 
   /** Method which removes a set of cuts.*/
   void TMINLP2TNLPQuadCuts::removeCuts(unsigned int n,const int * idxs){
      if(n == 0) return;
-     std::vector< int > order(quadRows_.size());
+     vector< int > order(quadRows_.size());
      int m_tminlp = num_constraints() - quadRows_.size();
       //delete the pointers
        for(unsigned int k = 0; k < n ; k++){//Erase
@@ -490,7 +490,7 @@ void
 TMINLP2TNLPQuadCuts::set_linear_objective(int n_var, const double * obj, double c_0){
   assert(n_var == TMINLP2TNLP::num_variables());
   obj_.resize(n_var);
-  CoinCopyN(obj, n_var, obj_.data());
+  CoinCopyN(obj, n_var, obj_());
   c_ = c_0;
 }
 }//Ends Bonmin namespace

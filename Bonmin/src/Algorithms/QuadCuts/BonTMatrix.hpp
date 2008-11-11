@@ -29,7 +29,7 @@ struct TMat{
 
  /** Storage for non empty rows.
      first is row number and second is first element in row.*/
- typedef std::vector< std::pair< int, int> > RowS;
+ typedef vector< std::pair< int, int> > RowS;
 
   /** Default constructor.*/
   TMat(): iRow_(NULL), jCol_(NULL), value_(NULL), nnz_(0),
@@ -115,13 +115,13 @@ struct TMat{
  };
  public:
  /** Orders current matrix by columns. */
- const std::vector<int>& orderByColumns(){
+ const vector<int>& orderByColumns(){
     resizeOrdering(columnOrdering_, nnz_);
     std::sort(columnOrdering_.begin(), columnOrdering_.end(),ColumnOrder(this));
     return columnOrdering_;
  }
  /** Orders current matrix by rows.*/
- const std::vector<int>& orderByRows(){
+ const vector<int>& orderByRows(){
     resizeOrdering(rowOrdering_, nnz_);
     std::sort(rowOrdering_.begin(), rowOrdering_.end(), RowOrder(this));
     return rowOrdering_;
@@ -134,7 +134,7 @@ struct TMat{
      quadratic form with only upper triange stored.*/
  void makeQuadUpperDiag();
 
- void resizeOrdering(std::vector<int> &ordering, unsigned int newSize){
+ void resizeOrdering(vector<int> &ordering, unsigned int newSize){
         int oldSize = ordering.size();
         ordering.resize(newSize);
         for(unsigned int i = oldSize ; i < newSize ; i++)
@@ -144,9 +144,9 @@ struct TMat{
    /** Create the TMat from M.*/
    void create(const CoinPackedMatrix &M);
  
-   std::vector<int> columnOrdering_;
+   vector<int> columnOrdering_;
  
-   std::vector<int> rowOrdering_;
+   vector<int> rowOrdering_;
 
    void make_upper_triangular(const MatrixStorageType &T);
 
