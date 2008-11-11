@@ -60,10 +60,12 @@ namespace Bonmin {
       printf("Option set to %i\n", algo);
     }
  
+      setup_->options()->SetStringValue("local_solver.variable_selection","most-fractional",true,true);
       BonminSetup * mysetup = setup_->clone(*solver, "local_solver.");
       Bab bb;
       mysetup->setDoubleParameter(BabSetupBase::Cutoff, cutoff);
       mysetup->setDoubleParameter(BabSetupBase::MaxTime, time_limit_);
+      mysetup->setIntParameter(BabSetupBase::NumberStrong, 0);
       mysetup->setIntParameter(BabSetupBase::MaxNodes, max_number_nodes_);
       mysetup->setIntParameter(BabSetupBase::MaxSolutions, max_number_solutions_);
       bb(mysetup); 
