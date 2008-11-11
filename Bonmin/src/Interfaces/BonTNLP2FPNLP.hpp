@@ -33,7 +33,8 @@ namespace Bonmin
     /** Default destructor */
     virtual ~TNLP2FPNLP();
     //@}
-
+    void use(Ipopt::SmartPtr<TNLP> tnlp){
+      tnlp_ = GetRawPtr(tnlp);}
     /**@name Methods to select the objective function and extra constraints*/
     //@{
     /// Flag to indicate that we want to use the feasibility pump objective

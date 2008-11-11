@@ -144,7 +144,8 @@ class Messages : public CoinMessages
   void setSolver(Ipopt::SmartPtr<TNLPSolver> app);
   /** Sets the TMINLP2TNLP to be used by the interface.*/
   void use(Ipopt::SmartPtr<TMINLP2TNLP> tminlp2tnlp){
-     problem_ = tminlp2tnlp;}
+     problem_ = tminlp2tnlp;
+     feasibilityProblem_->use(GetRawPtr(tminlp2tnlp));}
   /** Copy constructor
   */
   OsiTMINLPInterface (const OsiTMINLPInterface &);

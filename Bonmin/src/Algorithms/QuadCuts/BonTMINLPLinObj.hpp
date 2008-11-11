@@ -190,6 +190,8 @@ class TMINLPLinObj: public Bonmin::TMINLP {
 
   /** Say if problem has a linear objective (for OA) */
   virtual bool hasLinearObjective(){return true;}
+  /** return pointer to tminlp_.*/
+  SmartPtr<TMINLP> tminlp(){return tminlp_;}
   private:
   /** Reset all data.*/
    void gutsOfDestructor();

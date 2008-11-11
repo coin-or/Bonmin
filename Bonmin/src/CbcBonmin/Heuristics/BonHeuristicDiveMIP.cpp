@@ -345,7 +345,7 @@ namespace Bonmin
       delete [] mapRows;
       delete [] row_lb;
       delete [] row_ub;
-      delete jac_g;
+      delete [] jac_g;
       delete matrix;
       delete [] objective;
       delete [] col_lb;

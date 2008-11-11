@@ -48,7 +48,7 @@ namespace Bonmin {
 #ifdef DEBUG_BON_HEURISTIC_RINS
     std::cout<<"entered RINS"<<std::endl;
 #endif
-    if(model_->getNodeCount() % howOften_ != 0) return 0;
+    if(!howOften_ || model_->getNodeCount() % howOften_ != 0) return 0;
     //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
     if (0 && numberSolutions_>=model_->getSolutionCount()){
 #ifdef DEBUG_BON_HEURISTIC_RINS
@@ -123,10 +123,10 @@ namespace Bonmin {
 
     if(r_val > 0) {
       numberSolutions_ = model_->getSolutionCount() + 1;
-      howOften_ = std::min(10, howOften_ / 2);
+      howOften_ = std::max(10, howOften_ / 2);
     }
     else
-      howOften_ = std::max(10000,2*howOften_);
+      howOften_ = std::min(10000,2*howOften_);
     return r_val;
   }
 

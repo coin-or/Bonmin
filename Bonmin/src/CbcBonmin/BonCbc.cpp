@@ -24,6 +24,7 @@
 
 #include "BonDiver.hpp"
 #include "BonLinearCutsGenerator.hpp"
+#include "BonTMINLPLinObj.hpp"
 // sets cutoff a bit above real one, to avoid single-point feasible sets
 #define CUTOFF_TOL 1e-6
 
@@ -436,15 +437,24 @@ namespace Bonmin
     s.options()->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
     if(s.nonlinearSolver() == s.continuousSolver() && ival)
     {
-      LinearCutsGenerator cgl;
-      cgl.initialize(s); 
-      OsiCuts cuts;
-      cgl.generateCuts(*model_.solver(), cuts);
-      std::vector<OsiRowCut *> mycuts(cuts.sizeRowCuts());
-      for(int i = 0 ; i < cuts.sizeRowCuts() ; i++){
-        mycuts[i] = cuts.rowCutPtr(i);
+      if(!model_.solver()->isProvenOptimal() ){//Something went wrong check if objective is linear and alternate model
+                                            // can be solved
+        OsiTMINLPInterface * tmpOsi = dynamic_cast<OsiTMINLPInterface *> (model_.solver());
+        TMINLPLinObj * tmp_tminlp = dynamic_cast<TMINLPLinObj *> (tmpOsi->model());
+        tmpOsi->setModel(tmp_tminlp->tminlp());
+        model_.initialSolve();
+      } 
+      else {
+        LinearCutsGenerator cgl;
+        cgl.initialize(s); 
+        OsiCuts cuts;
+        cgl.generateCuts(*model_.solver(), cuts);
+        std::vector<OsiRowCut *> mycuts(cuts.sizeRowCuts());
+        for(int i = 0 ; i < cuts.sizeRowCuts() ; i++){
+          mycuts[i] = cuts.rowCutPtr(i);
+        }
+        model_.solver()->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
       }
-      model_.solver()->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
     }
 
     model_.solver()->resolve();
