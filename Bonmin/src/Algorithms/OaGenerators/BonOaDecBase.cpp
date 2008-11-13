@@ -9,6 +9,7 @@
 
 #include <sstream>
 #include <climits>
+#include <algorithm>
 
 #include "BonOaDecBase.hpp"
 
