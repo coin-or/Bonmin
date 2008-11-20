@@ -61,6 +61,7 @@ double CouenneComplBranchingObject::branch (OsiSolverInterface * solver) {
     index = way ? variable2_ -> Index () : variable_ -> Index ();
 
   jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, "Branching: x%-3d = 0\n", 
+		    //printf ("complementarity Branching: x%-3d = 0\n", 
 		    way ? variable2_ -> Index () : variable_ -> Index ());
 
   /*

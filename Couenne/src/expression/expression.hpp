@@ -61,6 +61,10 @@ class expression {
   virtual expression *clone (Domain *d = NULL) const 
   {return NULL;}
 
+  /// return pointer to copied expression
+  virtual inline expression *Copy () const
+  {return NULL;}
+
   /// Return index of variable (only valid for exprVar and exprAux)
   virtual inline int Index () const
   {return -1;}

@@ -271,6 +271,7 @@ include_HEADERS = \
 	problem/CouenneProblemElem.hpp \
 	problem/CouenneProblem.hpp \
 	problem/CouenneSolverInterface.hpp \
+	problem/CouenneJournalist.hpp \
 	expression/CouenneTypes.hpp \
 	util/rootQ.hpp \
 	util/funtriplets.hpp \

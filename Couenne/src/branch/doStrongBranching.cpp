@@ -276,6 +276,7 @@ namespace Bonmin {
       }
 
       if (tightened &&                     // have tighter bounds
+	  (problem_ -> doFBBT ()) &&       // selected FBBT
 	  !(problem_ -> btCore (chg_bds))) // tighten again on root
 
 	status0 = status1 = 1;	           // if returns false, problem is infeasible

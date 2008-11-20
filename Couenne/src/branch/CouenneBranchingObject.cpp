@@ -121,6 +121,7 @@ double CouenneBranchingObject::branch (OsiSolverInterface * solver) {
     brpt = 0.5 * (l+u);
 
   jnlst_ -> Printf (J_ITERSUMMARY, J_BRANCHING, "Branching: x%-3d %c= %g\n", 
+		    //printf ("Branching: x%-3d %c= %g\n", 
 		    index, way ? '>' : '<', integer ? (way ? ceil (brpt) : floor (brpt)) : brpt);
 
   /*

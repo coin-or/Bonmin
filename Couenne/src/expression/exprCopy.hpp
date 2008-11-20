@@ -36,9 +36,11 @@ class exprCopy: public expression {
     {return copy_ -> Type ();}
 
   /// Constructor
-  exprCopy  (expression *copy):
+  exprCopy (expression *copy):
     copy_  (copy),
-    value_ (0.) {}
+    value_ (0.) {
+    //copy_ = (copy -> isaCopy ()) ? copy -> Copy () : copy;
+  }
 
   /// Copy constructor
   exprCopy (const exprCopy &e, Domain *d = NULL);
@@ -50,6 +52,11 @@ class exprCopy: public expression {
       delete copy_;
       copy_ = NULL;
     }
+  }
+
+  /// return pointer to copied expression
+  virtual inline expression *Copy () const {
+    return (copy_ -> isaCopy ()) ? copy_ -> Copy () : copy_;
   }
 
   /// Cloning method

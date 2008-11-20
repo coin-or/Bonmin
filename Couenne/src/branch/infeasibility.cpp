@@ -111,9 +111,12 @@ double CouenneVarObject::checkInfeasibility (const OsiBranchingInformation * inf
     double retval = (obj -> Reference ()) ? 
       (1. - 1. / (1. + info -> upper_ [index] - info -> lower_ [index])) *
       weiSum * obj ->checkInfeasibility (info) : 0.;
-    return (reference_ -> isInteger ()) ? 
+
+    return retval;
+
+    /*return (reference_ -> isInteger ()) ? 
       CoinMax (retval, intInfeasibility (info -> solution_ [reference_ -> Index ()])) :
-      retval;
+      retval;*/
 
   } else {
 
@@ -145,8 +148,10 @@ double CouenneVarObject::checkInfeasibility (const OsiBranchingInformation * inf
        weiMin * infmin + 
        weiMax * infmax);
 
-    return (reference_ -> isInteger ()) ? 
+    return retval;
+
+    /*return (reference_ -> isInteger ()) ? 
       CoinMax (retval, intInfeasibility (info -> solution_ [reference_ -> Index ()])) :
-      retval;
+      retval;*/
   }
 }
