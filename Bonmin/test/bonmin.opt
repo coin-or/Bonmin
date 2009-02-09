@@ -46,7 +46,6 @@ bonmin.cover_cuts                           -5        	#Frequency (in terms of n
 bonmin.flow_covers_cuts                     -5        	#Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut
 bonmin.lift_and_project_cuts                0         	#Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut
 bonmin.mir_cuts                             -5        	#Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut
-bonmin.probing_cuts                         0         	#Frequency (in terms of nodes) for generating probing cuts in branch-and-cut
 bonmin.reduce_and_split_cuts                0         	#Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut
 
 # registering category: Nlp solution robustness
