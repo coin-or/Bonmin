@@ -328,6 +328,7 @@ namespace Bonmin
     continuousSolver_->setAuxiliaryInfo(&extraStuff);
 
     intParam_[BabSetupBase::SpecialOption] = 16;
+#if 1
     if (!options_->GetIntegerValue("number_before_trust",intParam_[BabSetupBase::MinReliability],"bonmin.")) {
       intParam_[BabSetupBase::MinReliability] = 1;
       options_->SetIntegerValue("bonmin.number_before_trust",intParam_[BabSetupBase::MinReliability], true, true);
@@ -338,10 +339,17 @@ namespace Bonmin
     }
     int varSelection;
     bool val = options_->GetEnumValue("variable_selection",varSelection,"bonmin.");
+    // Set branching strategy
+    if (varSelection == MOST_FRACTIONAL) {
+      intParam_[NumberStrong] = 0;
+      intParam_[MinReliability] = 0;
+      options_->SetIntegerValue("bonmin.number_strong_branch",intParam_[BabSetupBase::NumberStrong],true, true);
+    }
     if (!val || varSelection == STRONG_BRANCHING || varSelection == RELIABILITY_BRANCHING ) {
       options_->SetStringValue("bonmin.variable_selection", "nlp-strong-branching", true, true);
       varSelection = NLP_STRONG_BRANCHING;
     }
+#endif
 
     switch (varSelection) {
     case CURVATURE_ESTIMATOR:
