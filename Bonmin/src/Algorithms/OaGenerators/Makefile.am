@@ -24,6 +24,7 @@ libbonoagenerators_la_SOURCES = \
 	BonOaDecBase.cpp BonOaDecBase.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
         BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
+        BonFpForMinlp.cpp BonFpForMinlp.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 
 # This is for libtool (on Windows)

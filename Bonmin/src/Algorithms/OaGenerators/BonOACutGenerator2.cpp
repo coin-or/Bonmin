@@ -18,7 +18,7 @@
 #include "OsiCpxSolverInterface.hpp"
 #endif
 #include "OsiAuxInfo.hpp"
-
+#include "BonSolverHelp.hpp"
 
 
 namespace Bonmin
@@ -87,7 +87,6 @@ namespace Bonmin
   /// virtual method which performs the OA algorithm by modifying lp and nlp.
   double
   OACutGenerator2::performOa(OsiCuts &cs,
-      solverManip &nlpManip,
       solverManip &lpManip,
       SubMipSolver * &subMip,
       BabInfo * babInfo,
@@ -112,7 +111,7 @@ namespace Bonmin
     bool feasible = 1;
     if (subMip)//Perform a local search
     {
-      subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_,
+      subMip->optimize(cutoff, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
           parameters_.localSearchNodeLimit_);
       milpBound = subMip->lowBound();
@@ -159,10 +158,11 @@ namespace Bonmin
       const double * colsol = subMip == NULL ? lp->getColSolution():
           subMip->getLastSolution();
       info.solution_ = colsol;
-      nlpManip.fixIntegers(info);
 
+      fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_,objects_, nObjects_);
 
-      if (solveNlp(babInfo, cutoff)) {
+      nlp_->resolve();
+      if (post_nlp_solve(babInfo, cutoff)) {
         //nlp solved and feasible
         // Update the cutoff
         cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
@@ -181,7 +181,7 @@ namespace Bonmin
 
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)
-        lpManip.installCuts(cs, numberCuts);
+      installCuts(*lp, cs, numberCuts);
 
       lp->resolve();
       double objvalue = lp->getObjValue();
@@ -192,10 +192,13 @@ namespace Bonmin
       bool changed = !feasible;//if lp is infeasible we don't have to check anything
       info.solution_ = lp->getColSolution();
       if (!changed)
-        changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+        changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
+                                        parameters_.cbcIntegerTolerance_,
+                                        nlp_->getColSolution(), lp->getColSolution());
       if (changed) {
 
-        isInteger = lpManip.integerFeasible(info);
+        isInteger = integerFeasible(*lp, info, parameters_.cbcIntegerTolerance_,
+                                     objects_, nObjects_);
       }
       else {
         isInteger = 0;
@@ -220,7 +223,7 @@ namespace Bonmin
 
         nLocalSearch_++;
 
-        subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_,
+        subMip->optimize(cutoff, parameters_.subMilpLogLevel_,
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
             parameters_.localSearchNodeLimit_);
 
@@ -239,7 +242,9 @@ namespace Bonmin
 
         if (feasible && isInteger) {
           bool changed = false;
-          changed = nlpManip.isDifferentOnIntegers(colsol);//If integer solution is the same as nlp
+          changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
+                                          parameters_.cbcIntegerTolerance_,
+                                          nlp_->getColSolution(), colsol);
           //solution problem is solved
           if (!changed) {
             feasible = 0;

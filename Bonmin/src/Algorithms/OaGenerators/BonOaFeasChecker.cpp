@@ -12,7 +12,7 @@
 #include "BonminConfig.h"
 
 #include "OsiAuxInfo.hpp"
-
+#include "BonSolverHelp.hpp"
 
 
 namespace Bonmin
@@ -42,7 +42,7 @@ namespace Bonmin
 
   /// OaDecomposition method
   double
-  OaFeasibilityChecker::performOa(OsiCuts & cs, solverManip &nlpManip, solverManip &lpManip,
+  OaFeasibilityChecker::performOa(OsiCuts & cs, solverManip &lpManip,
       SubMipSolver * &subMip, BabInfo * babInfo, double &cutoff) const
   {
     bool isInteger = true;
@@ -64,12 +64,13 @@ namespace Bonmin
       //Fix the variable which have to be fixed, after having saved the bounds
       double * colsol = const_cast<double *>(lp->getColSolution());
       info.solution_ = colsol;
-      nlpManip.fixIntegers(info);
+      fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_,objects_, nObjects_);
 
 
       //Now solve the NLP get the cuts, and intall them in the local LP
 
-      if (solveNlp(babInfo, cutoff)) {
+      nlp_->resolve();
+      if (post_nlp_solve(babInfo, cutoff)) {
         //nlp solved and feasible
         // Update the cutoff
         cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
@@ -86,7 +87,7 @@ namespace Bonmin
           parameter().global_);
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)
-        lpManip.installCuts(cs, numberCuts);
+        installCuts(*lp, cs, numberCuts);
 
       lp->resolve();
       double objvalue = lp->getObjValue();
@@ -99,11 +100,14 @@ namespace Bonmin
       //	  if(!fixed)//fathom on bounds
       //           milpBound = 1e200;
       if (feasible) {
-        changed = nlpManip.isDifferentOnIntegers(lp->getColSolution());
+        changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
+                                        parameters_.cbcIntegerTolerance_,
+                                        nlp_->getColSolution(), lp->getColSolution());
       }
       if (changed) {
         info.solution_ = lp->getColSolution();
-        isInteger = lpManip.integerFeasible(info);
+        isInteger = integerFeasible(*lp, info, parameters_.cbcIntegerTolerance_,
+                                     objects_, nObjects_);
       }
       else {
         isInteger = 0;

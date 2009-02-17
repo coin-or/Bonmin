@@ -60,7 +60,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am_libbonalgorithms_la_OBJECTS = BonBabSetupBase.lo BonBonminSetup.lo
+am_libbonalgorithms_la_OBJECTS = BonBabSetupBase.lo BonBonminSetup.lo \
+	BonSubMipSolver.lo BonSolverHelp.lo BonCutStorage.lo
 libbonalgorithms_la_OBJECTS = $(am_libbonalgorithms_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -351,7 +352,10 @@ noinst_LTLIBRARIES = libbonalgorithms.la
 # List all source files, including headers
 libbonalgorithms_la_SOURCES = \
          BonBabSetupBase.cpp BonBabSetupBase.hpp \
-         BonBonminSetup.cpp BonBonminSetup.hpp
+         BonBonminSetup.cpp BonBonminSetup.hpp \
+         BonSubMipSolver.cpp BonSubMipSolver.hpp \
+         BonSolverHelp.cpp BonSolverHelp.hpp \
+         BonCutStorage.cpp BonCutStorage.hpp
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la \
 	OaGenerators/libbonoagenerators.la QuadCuts/libbonquadcuts.la
@@ -479,6 +483,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBabSetupBase.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBonminSetup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCutStorage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonSolverHelp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonSubMipSolver.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

@@ -21,6 +21,7 @@
 //OA machinery
 #include "BonDummyHeuristic.hpp"
 #include "BonOACutGenerator2.hpp"
+#include "BonFpForMinlp.hpp"
 #include "BonOaFeasChecker.hpp"
 #include "BonOaNlpOptim.hpp"
 #include "BonEcpCuts.hpp"
@@ -100,6 +101,7 @@ namespace Bonmin
 
     /* Outer Approximation options.*/
     OACutGenerator2::registerOptions(roptions);
+    MinlpFeasPump::registerOptions(roptions);
     EcpCuts::registerOptions(roptions);
     OaNlpOptim::registerOptions(roptions);
 
@@ -642,6 +644,18 @@ namespace Bonmin
 
     }
 
+    double fp_for_minlp_time;
+    options_->GetNumericValue("minlp_pump_time_limit",fp_for_minlp_time,prefix_.c_str());
+    if (fp_for_minlp_time > 0.) {
+      CuttingMethod cg;
+      cg.frequency = -99;
+      MinlpFeasPump * oa = new MinlpFeasPump(*this);
+      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
+      cg.cgl = oa;
+      cg.id = "Feasibility Pump for MINLP.";
+      cutGenerators_.push_back(cg);
+
+    }
     {
       CuttingMethod cg;
       cg.frequency = 1;

@@ -27,7 +27,10 @@ noinst_LTLIBRARIES = libbonalgorithms.la
 # List all source files, including headers
 libbonalgorithms_la_SOURCES = \
          BonBabSetupBase.cpp BonBabSetupBase.hpp \
-         BonBonminSetup.cpp BonBonminSetup.hpp
+         BonBonminSetup.cpp BonBonminSetup.hpp \
+         BonSubMipSolver.cpp BonSubMipSolver.hpp \
+         BonSolverHelp.cpp BonSolverHelp.hpp \
+         BonCutStorage.cpp BonCutStorage.hpp
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la
 libbonalgorithms_la_LIBADD += OaGenerators/libbonoagenerators.la 

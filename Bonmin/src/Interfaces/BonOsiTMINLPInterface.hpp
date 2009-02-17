@@ -21,14 +21,14 @@
 #include "OsiSolverInterface.hpp"
 #include "CoinWarmStartBasis.hpp"
 
-#include "BonTMINLP.hpp"
-#include "BonTMINLP2TNLP.hpp"
-#include "BonTNLP2FPNLP.hpp"
-#include "BonTNLPSolver.hpp"
 #include "BonCutStrengthener.hpp"
 //#include "BonRegisteredOptions.hpp"
 
 namespace Bonmin {
+  class TMINLP;
+  class TMINLP2TNLP;
+  class TNLP2FPNLP;
+  class TNLPSolver;
   class RegisteredOptions;
   class StrongBranchingSolver;
 
@@ -143,9 +143,7 @@ class Messages : public CoinMessages
   /** Set the solver to be used by interface.*/
   void setSolver(Ipopt::SmartPtr<TNLPSolver> app);
   /** Sets the TMINLP2TNLP to be used by the interface.*/
-  void use(Ipopt::SmartPtr<TMINLP2TNLP> tminlp2tnlp){
-     problem_ = tminlp2tnlp;
-     feasibilityProblem_->use(GetRawPtr(tminlp2tnlp));}
+  void use(Ipopt::SmartPtr<TMINLP2TNLP> tminlp2tnlp);
   /** Copy constructor
   */
   OsiTMINLPInterface (const OsiTMINLPInterface &);

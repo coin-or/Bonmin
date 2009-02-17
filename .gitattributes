@@ -38,6 +38,11 @@ Bonmin/src/Algorithms/BonBabSetupBase.cpp -text
 Bonmin/src/Algorithms/BonBabSetupBase.hpp -text
 Bonmin/src/Algorithms/BonBonminSetup.cpp -text
 Bonmin/src/Algorithms/BonBonminSetup.hpp -text
+Bonmin/src/Algorithms/BonCutStorage.cpp -text
+Bonmin/src/Algorithms/BonSolverHelp.cpp -text
+Bonmin/src/Algorithms/BonSolverHelp.hpp -text
+Bonmin/src/Algorithms/BonSubMipSolver.cpp -text
+Bonmin/src/Algorithms/BonSubMipSolver.hpp -text
 Bonmin/src/Algorithms/Branching/BonChooseVariable.cpp -text
 Bonmin/src/Algorithms/Branching/BonChooseVariable.hpp -text
 Bonmin/src/Algorithms/Branching/BonCurvBranchingSolver.cpp -text

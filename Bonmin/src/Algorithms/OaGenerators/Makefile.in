@@ -63,7 +63,7 @@ libbonoagenerators_la_LIBADD =
 am_libbonoagenerators_la_OBJECTS = BonDummyHeuristic.lo \
 	BonOaNlpOptim.lo BonOACutGenerator2.lo BonOaFeasChecker.lo \
 	BonOaDecBase.lo BonEcpCuts.lo BonCbcLpStrategy.lo \
-	BonOAMessages.lo
+	BonFpForMinlp.lo BonOAMessages.lo
 libbonoagenerators_la_OBJECTS = $(am_libbonoagenerators_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -352,6 +352,7 @@ libbonoagenerators_la_SOURCES = \
 	BonOaDecBase.cpp BonOaDecBase.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
         BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
+        BonFpForMinlp.cpp BonFpForMinlp.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 
 
@@ -477,6 +478,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcLpStrategy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDummyHeuristic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonEcpCuts.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonFpForMinlp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOACutGenerator2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOAMessages.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOaDecBase.Plo@am__quote@

@@ -21,6 +21,7 @@
 #include <string>
 #include <sstream>
 
+#include "BonTNLP2FPNLP.hpp"
 
 namespace Bonmin
 {

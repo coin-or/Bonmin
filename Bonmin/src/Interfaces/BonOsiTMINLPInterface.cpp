@@ -14,6 +14,10 @@
 #include "BonminConfig.h"
 
 #include "BonOsiTMINLPInterface.hpp"
+#include "BonTMINLP.hpp"
+#include "BonTMINLP2TNLP.hpp"
+#include "BonTNLP2FPNLP.hpp"
+#include "BonTNLPSolver.hpp"
 #include "CoinTime.hpp"
 #include <climits>
 #include <string>
@@ -2860,6 +2864,11 @@ const double * OsiTMINLPInterface::getObjCoefficients() const
   return obj_;
 }
 
+  /** Sets the TMINLP2TNLP to be used by the interface.*/
+  void 
+  OsiTMINLPInterface::use(Ipopt::SmartPtr<TMINLP2TNLP> tminlp2tnlp){
+     problem_ = tminlp2tnlp;
+     feasibilityProblem_->use(GetRawPtr(tminlp2tnlp));}
 
 }/** end namespace Bonmin*/
 

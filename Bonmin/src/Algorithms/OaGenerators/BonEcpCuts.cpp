@@ -8,6 +8,7 @@
 // Date :  12/20/2006
 //#define ECP_DEBUG
 #include "BonEcpCuts.hpp"
+#include "BonSolverHelp.hpp"
 namespace Bonmin
 {
 
@@ -86,7 +87,7 @@ namespace Bonmin
               lpManip = new solverManip(lp_, true,true,
                   false,false);
           }
-          lpManip->installCuts(cs,numberCuts);
+          installCuts(*lpManip->si(), cs,numberCuts);
 #ifdef ECP_DEBUG
           std::cerr<<"Installed "<<numberCuts<<"cuts in lp"<<std::endl;
 #endif

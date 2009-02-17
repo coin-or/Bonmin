@@ -9,6 +9,7 @@
 //#define OA_DEBUG
 #ifndef BonOaDecBase_HPP
 #define BonOaDecBase_HPP
+#include "BonSubMipSolver.hpp"
 #include "CglCutGenerator.hpp"
 #include "BonBabSetupBase.hpp"
 #include "BonOAMessages.hpp"
@@ -21,9 +22,6 @@
 #include "OsiBranchingObject.hpp"
 #include <iostream>
 #include "BonBabInfos.hpp"
-/* forward declarations.*/
-class OsiClpSolverInterface;
-class OsiCpxSolverInterface;
 
 namespace Bonmin
 {
@@ -31,91 +29,7 @@ namespace Bonmin
   class OaDecompositionBase : public CglCutGenerator
   {
   public:
-    /** Small class to perform the solution of sub-mips.*/
-    class SubMipSolver
-    {
-    public:
-      /** Constructor */
-      SubMipSolver(OsiSolverInterface * lp = NULL,
-          const CbcStrategy * strategy = NULL);
 
-      ~SubMipSolver();
-
-      /** Assign lp solver. */
-      void setLpSolver(OsiSolverInterface * lp);
-
-      /** Assign a strategy. */
-      void setStrategy(CbcStrategy * strategy)
-      {
-        if (strategy_) delete strategy_;
-        strategy_ = strategy->clone();
-      }
-      /** get the solution found in last local search (return NULL if no solution). */
-      const double * getLastSolution()
-      {
-        return integerSolution_;
-      }
-
-      double getLowerBound()
-      {
-        return lowBound_;
-      }
-      /** update cutoff and perform a new local search. */
-      void performLocalSearch(double cutoff,
-          int loglevel,
-          double maxTime,
-          int maxNodes);
-
-      /** Returns lower bound. */
-      inline double lowBound()
-      {
-        return lowBound_;
-      }
-
-      /** returns optimality status. */
-      inline bool optimal()
-      {
-        return optimal_;
-      }
-
-      /** Returns number of nodes in last solve.*/
-      inline int nodeCount()
-      {
-        return nodeCount_;
-      }
-
-      /** Returns number of simplex iterations in last solve.*/
-      inline int iterationCount()
-      {
-        return iterationCount_;
-      }
-
-
-      /** Register options for that Oa based cut generation method. */
-      void registerOptions(Ipopt::SmartPtr<Ipopt::RegisteredOptions> roptions)
-      {}
-    private:
-      /** lp (potentially mip solver). */
-      OsiSolverInterface * lp_;
-      /** If lp solver is clp (then have to use Cbc).*/
-      OsiClpSolverInterface *clp_;
-      /** If lp solver is cpx this points to it. */
-      OsiCpxSolverInterface * cpx_;
-      /** If cbc is used pointer to CbcModel. */
-      CbcModel * cbc_;
-      /** lower bound obtained */
-      double lowBound_;
-      /** Is optimality proven? */
-      bool optimal_;
-      /** Has an integer solution? then it is here*/
-      double * integerSolution_;
-      /** Strategy for solving sub mips with cbc. */
-      CbcStrategy * strategy_;
-      /** number of nodes in last mip solved.*/
-      int nodeCount_;
-      /** number of simplex iteration in last mip solved.*/
-      int iterationCount_;
-    };
 
     /** Small class to manipulatee various things in an OsiSolverInterface and restore them.
         The OsiSolverInterface manipulated may already exist or may be cloned from another one.*/
@@ -134,26 +48,12 @@ namespace Bonmin
       /** Restore solver. */
       void restore();
 
+#if 0
       /** Clone the state of another solver (bounds, cutoff, basis).*/
       void cloneOther(const OsiSolverInterface &si);
-      /** Check for integer feasibility of a solution return true if it is feasible.
-      \todo Handle SOS Type 2 constraints. */
-      bool integerFeasible(const OsiBranchingInformation & info) const;
+#endif
 
-      /** Fix integer variables in si to their values in colsol.
-          \remark colsol is assumed to be integer on the integer constrained variables.
-          \todo Handle SOS type 2.*/
-      void fixIntegers(const OsiBranchingInformation & info);
-
-      /** Check if solution in solver is the same as colsol on integer variables. */
-      bool isDifferentOnIntegers(const double * colsol);
-
-      /** Check if two solutions are the same on integer variables. */
-      bool isDifferentOnIntegers(const double * colsol, const double * other);
-
-      /** Install cuts in solver. */
-      void installCuts(const OsiCuts& cs, int numberCuts);
-
+      
       /** Get pointer to solver interface. */
       OsiSolverInterface * si()
       {
@@ -167,10 +67,6 @@ namespace Bonmin
         nObjects_ = nObjects;
       }
 
-      void setIntegerTolerance(double v)
-      {
-        integerTolerance_ = v;
-      }
     private:
       /** Interface saved. */
       OsiSolverInterface * si_;
@@ -209,7 +105,6 @@ namespace Bonmin
 
       void getCached();
       /** @} */
-      double integerTolerance_;
     };
     /// Old usefull constructor
     OaDecompositionBase(OsiTMINLPInterface * nlp = NULL
@@ -342,11 +237,11 @@ private:
 
     /** Solve the nlp and do output.
         \return true if feasible*/
-    bool solveNlp(BabInfo * babInfo, double cutoff) const;
+    bool post_nlp_solve(BabInfo * babInfo, double cutoff) const;
     /** @} */
 
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
-    virtual double performOa(OsiCuts &cs, solverManip &nlpManip, solverManip &lpManip,
+    virtual double performOa(OsiCuts &cs, solverManip &lpManip,
         SubMipSolver * &subMip, BabInfo * babInfo, double &) const = 0;
     /// virutal method to decide if local search is performed
     virtual bool doLocalSearch(BabInfo * babInfo) const = 0;
