@@ -130,6 +130,8 @@ Bonmin/src/CbcBonmin/Heuristics/BonHeuristicRINS.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonHeuristicRINS.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonLocalSolverBasedHeuristic.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonLocalSolverBasedHeuristic.hpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonPumpForMinlp.cpp -text
+Bonmin/src/CbcBonmin/Heuristics/BonPumpForMinlp.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/Makefile.am -text
 Bonmin/src/CbcBonmin/Heuristics/Makefile.in -text
 Bonmin/src/Interfaces/Ampl/Makefile.in -text
