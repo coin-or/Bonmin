@@ -122,13 +122,13 @@ namespace Bonmin {
 #else
         CPXENVptr env = cpx_->getEnvironmentPtr();
         CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
-        CPXsetintparam(env, CPX_PARAM_NODELIM, maxNodes);
-        CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
+        CPXsetintparam(env, CPX_PARAM_NODELIM, max_node);
+        CPXsetdblparam(env, CPX_PARAM_TILIM, max_time);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
 
         CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10000);
         CPXsetintparam(env,CPX_PARAM_NODELIM, 100000);
-        CPXsetdblparam(env,CPX_PARAM_TILIM, maxTime);
+        CPXsetdblparam(env,CPX_PARAM_TILIM, max_time);
 
         cpx_->branchAndBound();
 
