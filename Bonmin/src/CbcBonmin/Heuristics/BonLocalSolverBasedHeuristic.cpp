@@ -46,28 +46,58 @@ namespace Bonmin {
      return *this;
    }
 
+   void
+   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+                                             std::string prefix,
+                                             const std::string &option,
+                                             const std::string &value){
+     int dummy;
+     if(!options->GetEnumValue(option,dummy,prefix))
+       options->SetStringValue(prefix + option, value, true, true);
+   
+   }
+   void
+   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+                                             std::string prefix,
+                                             const std::string &option,
+                                             const double &value){
+     double dummy;
+     if(!options->GetNumericValue(option,dummy,prefix))
+       options->SetNumericValue(prefix + option, value, true, true);
+   
+   }
+   void
+   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options,
+                                             std::string prefix,
+                                             const std::string &option,
+                                             const int &value){
+     int dummy;
+     if(!options->GetIntegerValue(option,dummy,prefix))
+       options->SetIntegerValue(prefix + option, value, true, true);
+   
+   }
+
+   void
+   LocalSolverBasedHeuristic::setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+     int dummy;
+     printf("Changing defaults LocalSolverBasedHeuristic\n");
+     std::string prefix = "local_solver.";
+     changeIfNotSet(options, prefix, "algorithm", "B-QG");
+     changeIfNotSet(options, prefix, "variable_selection", "most-fractional");
+     changeIfNotSet(options, prefix, "time_limit", 60.);
+     changeIfNotSet(options, prefix, "node_limit", 1000);
+     changeIfNotSet(options, prefix, "solution_limit", 5);
+   }
 
    int
    LocalSolverBasedHeuristic::doLocalSearch(OsiTMINLPInterface * solver,
                                             double *solution,
                                             double & solValue,
-                                            double cutoff) const{
-     int algo;
-     if (!setup_->options()->GetEnumValue("algorithm",algo,"local_solver.")) {   
-      printf("Setting option\n");
-      setup_->options()->SetStringValue("local_solver.algorithm","B-QG",true,true);
-      setup_->options()->GetEnumValue("algorithm",algo,"local_solver.");
-      printf("Option set to %i\n", algo);
-    }
- 
-      setup_->options()->SetStringValue("local_solver.variable_selection","most-fractional",true,true);
-      BonminSetup * mysetup = setup_->clone(*solver, "local_solver.");
+                                            double cutoff,std::string prefix) const{
+      BonminSetup * mysetup = setup_->clone(*solver, prefix);
       Bab bb;
       mysetup->setDoubleParameter(BabSetupBase::Cutoff, cutoff);
-      mysetup->setDoubleParameter(BabSetupBase::MaxTime, time_limit_);
       mysetup->setIntParameter(BabSetupBase::NumberStrong, 0);
-      mysetup->setIntParameter(BabSetupBase::MaxNodes, max_number_nodes_);
-      mysetup->setIntParameter(BabSetupBase::MaxSolutions, max_number_solutions_);
       bb(mysetup); 
       if(bb.bestSolution()){
         CoinCopyN(bb.bestSolution(), solver->getNumCols(), solution);
@@ -80,21 +110,13 @@ namespace Bonmin {
    /** Register the options common to all local search based heuristics.*/
    void
    LocalSolverBasedHeuristic::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("Local search based heuristics", RegisteredOptions::BonminCategory);
-    roptions->AddLowerBoundedNumberOption("local_search_time_limit","Time  limit for local searches in heuristics",
-                                          0, false, 60, "");
-    roptions->AddLowerBoundedIntegerOption("local_search_node_limit","Node limit for local searches in heuristics",
-                                           0, 1000,"");
-    roptions->AddLowerBoundedIntegerOption("local_search_solution_limit", "Solution limit for local searches in heuristics",
-                               0, 5,"");
    }
 
    /** Initiaize using passed options.*/
    void 
    LocalSolverBasedHeuristic::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
-    options->GetNumericValue("local_search_time_limit", time_limit_, "bonmin..");
-    options->GetIntegerValue("local_search_node_limit", max_number_nodes_, "bonmin.");
-    options->GetIntegerValue("local_search_solution_limit", max_number_solutions_, "bonmin.");
+     /** Some fancy defaults.*/
+     setupDefaults(options);
    }
 } /* Ends Bonmin namespace.*/
 

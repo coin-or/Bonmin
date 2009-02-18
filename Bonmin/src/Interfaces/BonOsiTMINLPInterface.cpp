@@ -1746,7 +1746,9 @@ bool cleanNnz(double &value, double colLower, double colUpper,
 /** Get the outer approximation constraints at the point x.
 */
 void
-OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool getObj, const double * x2, double theta, bool global)
+OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, 
+                                          bool getObj, const double * x2,
+                                          double theta, bool global)
 {
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
@@ -1886,12 +1888,12 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     cs.insert(newCut);
   }
 
-  delete[] g;
+  delete [] g;
   delete [] cuts;
   delete [] row2cutIdx;
   delete [] cut2rowIdx;
 
-  if(getObj && ! problem_->hasLinearObjective()) { // Get the objective cuts
+  if(getObj && !problem_->hasLinearObjective()) { // Get the objective cuts
     double * obj = new double [n];
     problem_to_optimize_->eval_grad_f(n, x, 1,obj);
     double f;
@@ -2117,6 +2119,7 @@ OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int
   return getObjValue();
 }
 
+#if 0
 double
 OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,const int *inds, OsiCuts &cs, bool addOnlyViolated, bool global)
 {
@@ -2125,17 +2128,15 @@ OsiTMINLPInterface::getFeasibilityOuterApproximation(int n,const double * x_bar,
 			, global);
   return ret_val;
 }
-
+#endif
 
 static bool WarnedForNonConvexOa=false;
 
 void
 OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si, 
-                                            const double * x, bool getObj)
+                                            const double * x, bool getObj
+                                            )
 {
-  double * rowLow = NULL;
-  double * rowUp = NULL;
-
   int n;
   int m;
   int nnz_jac_g;
@@ -2152,12 +2153,12 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   problem_to_optimize_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
 
 
-  double *g = new double[m];
-  problem_to_optimize_->eval_g(n, x, 1, m, g);
+  vector<double> g(m);
+  problem_to_optimize_->eval_g(n, x, 1, m, g());
 
-  rowLow = new double[m];
-  rowUp = new double[m];
-  int * nonBindings = new int[m];//store non binding constraints (which are to be removed from OA)
+  vector<double> rowLow(m);
+  vector<double> rowUp(m);
+  vector<int> nonBindings(m);;//store non binding constraints (which are to be removed from OA)
   int numNonBindings = 0;
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
@@ -2242,19 +2243,15 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   mat.setDimensions(m,n); // In case matrix was empty, this should be enough
   
   //remove non-bindings equality constraints
-  mat.deleteRows(numNonBindings, nonBindings);
+  mat.deleteRows(numNonBindings, nonBindings());
 
   int numcols=getNumCols();
-  double *obj = new double[numcols];
+  vector<double> obj(numcols);
   for(int i = 0 ; i < numcols ; i++)
     obj[i] = 0.;
   
   
-  si.loadProblem(mat, getColLower(), getColUpper(), obj, rowLow, rowUp);
-  delete [] rowLow;
-  delete [] rowUp;
-  delete [] nonBindings;
-  delete [] g;
+  si.loadProblem(mat, getColLower(), getColUpper(), obj(), rowLow(), rowUp());
   for(int i = 0 ; i < getNumCols() ; i++) {
     if(isInteger(i))
       si.setInteger(i);
@@ -2262,26 +2259,32 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   if(getObj) {
      bool addObjVar = false;
      if(problem_->hasLinearObjective()){
-       //Might be in trouble if objective has a constant part
-       // for now just check that f(0) = 0. 
-       // If it is not adding a constant term does not seem supported by Osi
-       // for now
        double zero;
-       problem_to_optimize_->eval_f(n, obj, 1, zero);
+       problem_to_optimize_->eval_f(n, x, 1, zero);
        si.setDblParam(OsiObjOffset, -zero);
-       //if(fabs(zero - 0) > 1e-10)
-         //addObjVar = true;
-       //else { 
-         //Copy the linear objective and don't create a dummy variable.
-         problem_to_optimize_->eval_grad_f(n, x, 1,obj);
-         si.setObjective(obj);
-       //}
+       //Copy the linear objective and don't create a dummy variable.
+       si.setObjective(obj());
     }
     else {
       addObjVar = true;
    }
-
+   
    if(addObjVar){
+      addObjectiveFunction(si, x);
+    }
+  }
+//  si.writeMpsNative("OA.mps",NULL, NULL, 1);
+}
+
+void 
+OsiTMINLPInterface::addObjectiveFunction(OsiSolverInterface &si, 
+                                         const double *x){
+  const double * colLower = getColLower();
+  const double * colUpper = getColUpper();
+  int numcols = getNumCols();
+  assert(numcols == si.getNumCols() );
+  vector<double> obj(numcols);
+      problem_to_optimize_->eval_grad_f(numcols, x, 1,obj());
       //add variable alpha
       //(alpha should be empty in the matrix with a coefficient of -1 and unbounded)
       CoinPackedVector a;
@@ -2289,16 +2292,15 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   
       // Now get the objective cuts
       // get the gradient, pack it and add the cut
-      problem_to_optimize_->eval_grad_f(n, x, 1,obj);
       double ub;
-      problem_to_optimize_->eval_f(n, x, 1, ub);
+      problem_to_optimize_->eval_f(numcols, x, 1, ub);
       ub*=-1;
       double lb = -1e300;
       CoinPackedVector objCut;
       CoinPackedVector * v = &objCut;
-      v->reserve(n);
-      for(int i = 0; i<n ; i++) {
-       if(nnz_jac_g)
+      v->reserve(numcols+1);
+      for(int i = 0; i<numcols ; i++) {
+       if(si.getNumRows())
        {
         if(cleanNnz(obj[i],colLower[i], colUpper[i],
             -getInfinity(), 0,
@@ -2323,13 +2325,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
            }
        }
       }
-    v->insert(n,-1);
+    v->insert(numcols,-1);
     si.addRow(objCut, lb, ub);
     }
-  }
-//  si.writeMpsNative("OA.mps",NULL, NULL, 1);
-  delete [] obj;
-}
 
 /** Add a collection of linear cuts to problem formulation.*/
 void 

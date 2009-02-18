@@ -20,6 +20,7 @@ libbonheuristics_la_SOURCES = \
        BonLocalSolverBasedHeuristic.cpp  BonLocalSolverBasedHeuristic.hpp \
        BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
        BonDummyPump.cpp BonDummyPump.hpp \
+       BonPumpForMinlp.cpp BonPumpForMinlp.hpp \
        BonHeuristicRINS.cpp BonHeuristicRINS.hpp \
        BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp \
        BonHeuristicFPump.cpp BonHeuristicFPump.hpp \

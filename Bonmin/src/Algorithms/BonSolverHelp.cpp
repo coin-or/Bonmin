@@ -25,7 +25,8 @@ bool integerFeasible(OsiSolverInterface & si, const OsiBranchingInformation & in
   if (objects) {
     int dummy;
     for (int i = 0 ; i < nObjects ; i++) {
-      if (objects[i]->infeasibility(&info, dummy) > 0.0) return false;
+      double infeasibility = objects[i]->infeasibility(&info, dummy);
+      if (infeasibility > 1000*integer_tolerance) return false;
     }
   }
   else {
@@ -52,7 +53,8 @@ void fixIntegers(OsiSolverInterface & si,
 {
   if (objects) {
     for (int i = 0 ; i < nObjects ; i++) {
-      if (objects[i]->feasibleRegion(&si, &info));
+      if (fabs(objects[i]->feasibleRegion(&si, &info)) > integer_tolerance) 
+       throw;
     }
   }
   else {

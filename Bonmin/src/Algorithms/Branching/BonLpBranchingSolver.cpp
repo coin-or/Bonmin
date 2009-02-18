@@ -73,7 +73,8 @@ namespace Bonmin
   markHotStart(OsiTMINLPInterface* tminlp_interface)
   {
     lin_ = new OsiClpSolverInterface();
-    tminlp_interface->extractLinearRelaxation(*lin_, true, false);
+    tminlp_interface->extractLinearRelaxation(*lin_, tminlp_interface->getColSolution(),
+                                              true);
     double cutoff = -DBL_MAX;
     tminlp_interface->getDblParam(OsiDualObjectiveLimit, cutoff);
     lin_->setDblParam(OsiDualObjectiveLimit, cutoff);

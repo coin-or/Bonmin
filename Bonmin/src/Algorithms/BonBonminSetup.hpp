@@ -18,7 +18,8 @@ namespace Bonmin
     B_OA=1/** Bonmin's Outer Approximation Decomposition.*/,
     B_QG=2/** Bonmin's Quesada & Grossmann branch-and-cut.*/,
     B_Hyb=3/** Bonmin's hybrid outer approximation.*/,
-    B_Ecp=4/** Bonmin's implemantation of ecp cuts based branch-and-cut a la FilMINT.*/
+    B_Ecp=4/** Bonmin's implemantation of ecp cuts based branch-and-cut a la FilMINT.*/,
+    B_IFP=5/** Bonmin's implemantation of iterated feasibility pump for MINLP.*/
   };
   /* Bonmin algorithm setup. */
   class BonminSetup : public BabSetupBase

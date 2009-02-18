@@ -55,7 +55,7 @@ namespace Bonmin {
       bool reassignLpsolver):
       CglCutGenerator(),
       nlp_(b.nonlinearSolver()),
-      lp_(b.continuousSolver()),
+      lp_(NULL),
       objects_(NULL),
       nObjects_(0),
       nLocalSearch_(0),
@@ -365,15 +365,9 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   SubMipSolver * subMip = NULL;
 
   if (!isInteger) {
-    if (doLocalSearch(babInfo))//create sub mip solver.
-    {
-      subMip = new SubMipSolver(lp_, parameters_.strategy());
-    }
-    else {
+    if (!doLocalSearch(babInfo))//create sub mip solver.
       return;
-    }
   }
-
 
   //get the current cutoff
   double cutoff;
@@ -403,6 +397,10 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
     lpManip = new solverManip(si);
   }
   lpManip->setObjects(objects_, nObjects_);
+  if (!isInteger) {
+      subMip = new SubMipSolver(lpManip->si(), parameters_.strategy());
+  }
+
   double milpBound = performOa(cs, *lpManip, subMip, babInfo, cutoff);
 
   if(babInfo->hasSolution()){
@@ -451,6 +449,7 @@ OaDecompositionBase::post_nlp_solve(BabInfo * babInfo, double cutoff) const{
   nSolve_++;
   bool return_value = false;
   if (nlp_->isProvenOptimal()) {
+    printf("I found a solution but I don't print anything!\n");
     handler_->message(FEASIBLE_NLP, messages_)
     <<nlp_->getIterationCount()
     <<nlp_->getObjValue()<<CoinMessageEol;

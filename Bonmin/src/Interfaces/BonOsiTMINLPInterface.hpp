@@ -829,6 +829,9 @@ class Messages : public CoinMessages
   virtual void extractLinearRelaxation(OsiSolverInterface &si, const double *x, 
                                        bool getObj = 1);
 
+  /** Add constraint corresponding to objective function.*/
+  virtual void addObjectiveFunction(OsiSolverInterface &si, const double * x);
+#if 1
   /** \brief Extract a linear relaxation of the MINLP.
    * Solve the continuous relaxation and takes first-order outer-approximation constraints at the optimum.
    * The put everything in an OsiSolverInterface.
@@ -844,7 +847,7 @@ class Messages : public CoinMessages
         setRowPrice(problem()->duals_sol());
      }
    }
-
+#endif
   /** Get the outer approximation constraints at the current optimal point.
       If x2 is different from NULL only add cuts violated by x2.
    (Only get outer-approximations of nonlinear constraints of the problem.)*/
@@ -878,15 +881,6 @@ class Messages : public CoinMessages
 
   /** Get the Benders cut at provided point with provided multipliers.*/
   void getBendersCut(OsiCuts &cs, const double * x, const double *lambda, bool getObj = 1);
-
-  /** solve the problem of finding the closest point to x_bar in the subspace of coordinates given by ind
-   * (i.e., \f$ min \sum\limits_{i=1}^n (x_{ind[i]} -\overline{x}_i)^2 \f$ ,
-   * and get the corresponding outer-approximation constraints.
-      (Only get outer-approximations of nonlinear constraints of the problem.)
-   * \return Distance between feasibility set and x
-   * \param n number of element in arrays x and ind
-   * \param ind indices of the coordinate*/
-  double getFeasibilityOuterApproximation(int n, const double * x_bar,const int *ind, OsiCuts &cs, bool addOnlyViolated, bool global);
 
   /** Given a point x_bar this solves the problem of finding the point which minimize a convex 
     *combination between the distance to  x_bar and the original objective function f(x):

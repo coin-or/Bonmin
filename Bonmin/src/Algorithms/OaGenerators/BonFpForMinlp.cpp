@@ -97,37 +97,42 @@ namespace Bonmin
     double lastPeriodicLog= CoinCpuTime();
 
     const int numcols = nlp_->getNumCols();
+    vector<double> savedColLower(nlp_->getNumCols());
+    CoinCopyN(nlp_->getColLower(), nlp_->getNumCols(), savedColLower());
+    vector<double> savedColUpper(nlp_->getNumCols());
+    CoinCopyN(nlp_->getColUpper(), nlp_->getNumCols(), savedColUpper());
 
-
-    bool isInteger = false;
 
     OsiSolverInterface * lp = lpManip.si();
-    OsiBranchingInformation info(lp, false);
-    bool milpOptimal = 1;
-
-
-    double milpBound = -COIN_DBL_MAX;
-    bool milpFeasible = 1;
-    bool feasible = 1;
 
     vector<int> indices;
     for(int i = 0; i < numcols ; i++) {
+      lp->setObjCoeff(i,0);
       if(!lp->isInteger(i)) {
-         lp->setObjCoeff(i,0);
       }
       else { indices.push_back(i);}
     }
 
+    // If objective is linear need to add to lp constraint for objective
+    if(lp->getNumCols() == nlp_->getNumCols())
+      nlp_->addObjectiveFunction(*lp, nlp_->getColSolution());
+    lp->setObjCoeff(numcols,0);
+    const double * colsol = NULL;
+    OsiBranchingInformation info(lp, false);
+
+    nlp_->resolve();
     if (subMip)//Perform a local search
     {
+      assert(subMip->solver() == lp);
       set_fp_objective(*lp, nlp_->getColSolution());
-      subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
+      lp->initialSolve();
+      printf("Objective value %g\n", lp->getObjValue());
+      lp->setColUpper(numcols, cutoff);
+      subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
           parameters_.localSearchNodeLimit_);
 
-      feasible = milpBound < cutoff;
-      milpFeasible = feasible;
-      isInteger = subMip->getLastSolution() != NULL;
+      colsol = subMip->getLastSolution();
       nLocalSearch_++;
 
     }
@@ -138,7 +143,7 @@ namespace Bonmin
 #endif
     double * nlpSol = NULL;
 
-    while (isInteger && feasible ) {
+    while (colsol) {
       numberPasses++;
 
       //after a prescribed elapsed time give some information to user
@@ -149,47 +154,49 @@ namespace Bonmin
       int numberCutsBefore = cs.sizeRowCuts();
 
       //Fix the variable which have to be fixed, after having saved the bounds
-      const double * colsol = subMip == NULL ? lp->getColSolution():
-          subMip->getLastSolution();
       info.solution_ = colsol;
 
       vector<double> x_bar(indices.size());
       for(unsigned int i = 0 ; i < indices.size() ; i++){
          x_bar[i] = colsol[indices[i]];
       }
-      nlp_->solveFeasibilityProblem(indices.size(), x_bar(), indices(), 1, 0, 2);
 
-      info.solution_ = nlp_->getColSolution();
+      double dist = nlp_->solveFeasibilityProblem(indices.size(), x_bar(), indices(), 1, 0, 2);
 
-      if(integerFeasible(*lp, info, parameters_.cbcIntegerTolerance_,
-                         objects_, nObjects_)){
-         fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_,objects_, nObjects_);
+      printf("NLP solution is %g from MILP sol\n",dist);
+
+      if(dist < 1e-06){
+         fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
 
          nlp_->resolve();
          if (post_nlp_solve(babInfo, cutoff)) {
-           //nlp solved and feasible
+           //nlp is solved and feasible
            // Update the cutoff
-           cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
+           cutoff = nlp_->getObjValue() * (1 - parameters_.cbcCutoffIncrement_);
            // Update the lp solver cutoff
            lp->setDblParam(OsiDualObjectiveLimit, cutoff);
            numSols_++;
          }
-       break;
+         nlpSol = const_cast<double *>(nlp_->getColSolution());
+         nlp_->getOuterApproximation(cs, nlpSol, 1, NULL,
+                                  parameter().global_);
+         nlp_->setColLower(savedColLower());
+         nlp_->setColUpper(savedColUpper());
+         nlp_->resolve();
+      }
+      else {
+         nlpSol = const_cast<double *>(nlp_->getColSolution());
+         nlp_->getOuterApproximation(cs, nlpSol, 1, NULL,
+                                  parameter().global_);
       }
 
 
-      nlpSol = const_cast<double *>(nlp_->getColSolution());
-
-      // Get the cuts outer approximation at the current point
-      const double * toCut = (parameter().addOnlyViolated_)?
-          colsol:NULL;
-      nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
-                                  parameter().global_);
 
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
-      if (numberCuts > 0)
-        installCuts(*lp, cs, numberCuts);
-
+      assert(numberCuts);
+      installCuts(*lp, cs, numberCuts);
+      numberCutsBefore = cs.sizeRowCuts();
+     
       //check time
       if (CoinCpuTime() - timeBegin_ > parameters_.maxLocalSearchTime_)
         break;
@@ -202,24 +209,27 @@ namespace Bonmin
         if (subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy());
 
         nLocalSearch_++;
-        set_fp_objective(*lp_, nlp_->getColSolution());
+        set_fp_objective(*lp, nlp_->getColSolution());
+
+        lp->setColUpper(numcols, cutoff);
 
      
-        subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
+        subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
             parameters_.localSearchNodeLimit_);
 
-        milpBound = subMip->lowBound();
-
-        colsol = const_cast<double *> (subMip->getLastSolution());
-
+        colsol = subMip->getLastSolution();
       }/** endif localSearch*/
       else if (subMip!=NULL) {
         delete subMip;
         subMip = NULL;
+        colsol = NULL;
       }
     }
-    return -DBL_MAX;
+    if(colsol)
+      return -DBL_MAX;
+    else
+      return DBL_MAX;
   }
 
   /** Register OA options.*/
@@ -274,6 +284,7 @@ MinlpFeasPump::set_fp_objective(OsiSolverInterface &si, const double * colsol) c
       }
     }
   }
+  si.initialSolve();
 }
 
 }/* End namespace Bonmin. */

@@ -285,7 +285,7 @@ namespace Bonmin
     roptions->SetRegisteringCategory("Options for OA decomposition", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
         "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
-        0.,0,30.,
+        0.,0,0.,
         "");
 
     roptions->AddBoundedIntegerOption("oa_log_level",

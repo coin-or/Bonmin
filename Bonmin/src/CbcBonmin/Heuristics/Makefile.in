@@ -61,11 +61,11 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonheuristics_la_LIBADD =
 am_libbonheuristics_la_OBJECTS = BonLocalSolverBasedHeuristic.lo \
-	BonFixAndSolveHeuristic.lo BonDummyPump.lo BonHeuristicRINS.lo \
-	BonHeuristicLocalBranching.lo BonHeuristicFPump.lo \
-	BonHeuristicDive.lo BonHeuristicDiveFractional.lo \
-	BonHeuristicDiveVectorLength.lo BonHeuristicDiveMIP.lo \
-	BonHeuristicDiveMIPFractional.lo \
+	BonFixAndSolveHeuristic.lo BonDummyPump.lo BonPumpForMinlp.lo \
+	BonHeuristicRINS.lo BonHeuristicLocalBranching.lo \
+	BonHeuristicFPump.lo BonHeuristicDive.lo \
+	BonHeuristicDiveFractional.lo BonHeuristicDiveVectorLength.lo \
+	BonHeuristicDiveMIP.lo BonHeuristicDiveMIPFractional.lo \
 	BonHeuristicDiveMIPVectorLength.lo
 libbonheuristics_la_OBJECTS = $(am_libbonheuristics_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -351,6 +351,7 @@ libbonheuristics_la_SOURCES = \
        BonLocalSolverBasedHeuristic.cpp  BonLocalSolverBasedHeuristic.hpp \
        BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
        BonDummyPump.cpp BonDummyPump.hpp \
+       BonPumpForMinlp.cpp BonPumpForMinlp.hpp \
        BonHeuristicRINS.cpp BonHeuristicRINS.hpp \
        BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp \
        BonHeuristicFPump.cpp BonHeuristicFPump.hpp \
@@ -510,6 +511,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicLocalBranching.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicRINS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLocalSolverBasedHeuristic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonPumpForMinlp.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

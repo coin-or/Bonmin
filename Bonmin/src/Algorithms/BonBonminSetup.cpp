@@ -47,6 +47,7 @@
 
 #include "BonFixAndSolveHeuristic.hpp"
 #include "BonDummyPump.hpp"
+#include "BonPumpForMinlp.hpp"
 #include "BonHeuristicRINS.hpp"
 #include "BonHeuristicLocalBranching.hpp"
 #include "BonHeuristicFPump.hpp"
@@ -116,6 +117,7 @@ namespace Bonmin
     LocalSolverBasedHeuristic::registerOptions(roptions);
     FixAndSolveHeuristic::registerOptions(roptions);
     DummyPump::registerOptions(roptions);
+    PumpForMinlp::registerOptions(roptions);
     HeuristicRINS::registerOptions(roptions);
     HeuristicLocalBranching::registerOptions(roptions);
     HeuristicFPump::registerOptions(roptions);
@@ -125,7 +127,7 @@ namespace Bonmin
     HeuristicDiveMIPVectorLength::registerOptions(roptions);
 
     roptions->SetRegisteringCategory("Algorithm choice", RegisteredOptions::BonminCategory);
-    roptions->AddStringOption5("algorithm",
+    roptions->AddStringOption6("algorithm",
         "Choice of the algorithm.",
         "B-BB",
         "B-BB","simple branch-and-bound algorithm,",
@@ -133,9 +135,12 @@ namespace Bonmin
         "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
         "B-Hyb","hybrid outer approximation based branch-and-cut,",
         "B-Ecp","ecp cuts based branch-and-cut a la FilMINT.",
+        "B-iFP","Iterated Feasibility Pump for MINLP.",
         "This will preset some of the options of bonmin depending on the algorithm choice."
                               );
     roptions->setOptionExtraInfo("algorithm",31);
+
+
   }
 
   /** Register all the Bonmin options.*/
@@ -546,6 +551,16 @@ namespace Bonmin
       h.id = "LocalBranching";
       heuristics_.push_back(h);
     }
+
+    Index doHeuristicPumpForMinlp = false;
+    options()->GetEnumValue("pump_for_minlp",doHeuristicPumpForMinlp,prefix_.c_str());
+    if(doHeuristicPumpForMinlp){
+      PumpForMinlp * pump = new PumpForMinlp(this);
+      HeuristicMethod h;
+      h.heuristic = pump;
+      h.id = "Pump for MINLP";
+      heuristics_.push_back(h);
+    }
   }
 
 
@@ -569,6 +584,13 @@ namespace Bonmin
     Algorithm algo = getAlgorithm();
     if (algo == B_OA) {
       std::string o_name = prefix_ + "oa_dec_time_limit";
+      options_->SetNumericValue(o_name.c_str(),COIN_DBL_MAX, true, true);
+      o_name = prefix_ + "nlp_solve_frequency";
+      options_->SetIntegerValue(o_name.c_str(), 0, true, true);
+      intParam_[BabLogLevel] = 0;
+    }
+    if (algo == B_IFP) {
+      std::string o_name = prefix_ + "minlp_pump_time_limit";
       options_->SetNumericValue(o_name.c_str(),COIN_DBL_MAX, true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);

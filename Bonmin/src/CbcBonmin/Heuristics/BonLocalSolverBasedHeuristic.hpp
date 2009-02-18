@@ -60,10 +60,13 @@ namespace Bonmin {
    int doLocalSearch(OsiTMINLPInterface * solver, 
                       double *solution, 
                       double & solValue,
-                      double cutoff) const;
+                      double cutoff, std::string prefix = "local_solver.") const;
 
    /** Register the options common to all local search based heuristics.*/
    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
+
+   /** Setup the defaults.*/
+   virtual void setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options);
 
    /** Initiaize using passed options.*/
    void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
@@ -71,6 +74,20 @@ namespace Bonmin {
    /** Setup to use for local searches (will make copies).*/
    BonminSetup * setup_; 
 
+   static void changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+                       std::string prefix,
+                       const std::string &option,
+                       const std::string &value);
+   
+   static void changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+                       std::string prefix,
+                       const std::string &option,
+                       const double &value);
+   
+   static void changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options,
+                       std::string prefix,
+                       const std::string &option,
+                       const int &value);
    private:
     /** Time limit in local search.*/
     double time_limit_;
