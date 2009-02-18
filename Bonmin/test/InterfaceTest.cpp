@@ -260,10 +260,9 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
 void testFp(Bonmin::AmplInterface &si)
 {
         CoinRelFltEq eq(1e-07);// to test equality of doubles
-        OsiCuts cuts;
         double x[1] = {0.};
         int ind[1]={1};
-        si.getFeasibilityOuterApproximation(1,x,ind,cuts, 0, 1);
+        si.solveFeasibilityProblem(1,x,ind, 0, 1);
         std::cout<<si.getColSolution()[0]<<std::endl;
          std::cout<<si.getColSolution()[1]<<std::endl;
        DblEqAssert(si.getColSolution()[1],(1./2.));
