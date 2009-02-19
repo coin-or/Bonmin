@@ -109,9 +109,10 @@ namespace Bonmin
     double milpBound = -COIN_DBL_MAX;
     bool milpFeasible = 1;
     bool feasible = 1;
+
     if (subMip)//Perform a local search
     {
-      subMip->optimize(cutoff, parameters_.subMilpLogLevel_,
+      subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
           parameters_.localSearchNodeLimit_);
       milpBound = subMip->lowBound();
@@ -119,7 +120,7 @@ namespace Bonmin
 
       feasible = milpBound < cutoff;
       milpFeasible = feasible;
-      isInteger = subMip->getLastSolution() != NULL;
+      isInteger = (subMip->getLastSolution() != NULL);
       nLocalSearch_++;
 
       if (milpOptimal)
@@ -138,7 +139,6 @@ namespace Bonmin
 
     while (isInteger && feasible ) {
       numberPasses++;
-
       //after a prescribed elapsed time give some information to user
       double time = CoinCpuTime();
       if (time - lastPeriodicLog > parameters_.logFrequency_) {
@@ -180,10 +180,11 @@ namespace Bonmin
                                   parameter().global_);
 
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
-      if (numberCuts > 0)
+      assert(numberCuts);
       installCuts(*lp, cs, numberCuts);
 
       lp->resolve();
+
       double objvalue = lp->getObjValue();
       //milpBound = max(milpBound, lp->getObjValue());
       feasible = (lp->isProvenOptimal() &&
@@ -213,7 +214,7 @@ namespace Bonmin
       if (CoinCpuTime() - timeBegin_ > parameters_.maxLocalSearchTime_)
         break;
       //do we perform a new local search ?
-      if (milpOptimal && feasible && !isInteger &&
+      if (feasible && !isInteger &&
           nLocalSearch_ < parameters_.maxLocalSearch_ &&
           numberPasses < parameters_.maxLocalSearchPerNode_ &&
           parameters_.localSearchNodeLimit_ > 0 && numSols_ < parameters_.maxSols_) {
@@ -223,7 +224,7 @@ namespace Bonmin
 
         nLocalSearch_++;
 
-        subMip->optimize(cutoff, parameters_.subMilpLogLevel_,
+        subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
             parameters_.localSearchNodeLimit_);
 
@@ -236,7 +237,7 @@ namespace Bonmin
 
 
         colsol = const_cast<double *> (subMip->getLastSolution());
-        isInteger = colsol != 0;
+        isInteger = (colsol != 0);
 
         feasible =  (milpBound < cutoff);
 

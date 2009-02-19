@@ -585,6 +585,8 @@ namespace Bonmin
     if (algo == B_OA) {
       std::string o_name = prefix_ + "oa_dec_time_limit";
       options_->SetNumericValue(o_name.c_str(),COIN_DBL_MAX, true, true);
+      o_name = prefix_ + "minlp_pump_time_limit";
+      options_->SetNumericValue(o_name.c_str(),0, true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
       intParam_[BabLogLevel] = 0;
@@ -599,11 +601,15 @@ namespace Bonmin
     else if (algo==B_QG) {
       std::string o_name = prefix_ + "oa_dec_time_limit";
       options_->SetNumericValue(o_name.c_str(),0, true, true);
+      o_name = prefix_ + "minlp_pump_time_limit";
+      options_->SetNumericValue(o_name.c_str(),0, true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
     }
     else if (algo==B_Ecp) {
       std::string o_name = prefix_ + "oa_dec_time_limit";
+      options_->SetNumericValue(o_name.c_str(),0, true, true);
+      o_name = prefix_ + "minlp_pump_time_limit";
       options_->SetNumericValue(o_name.c_str(),0, true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);

@@ -449,7 +449,6 @@ OaDecompositionBase::post_nlp_solve(BabInfo * babInfo, double cutoff) const{
   nSolve_++;
   bool return_value = false;
   if (nlp_->isProvenOptimal()) {
-    printf("I found a solution but I don't print anything!\n");
     handler_->message(FEASIBLE_NLP, messages_)
     <<nlp_->getIterationCount()
     <<nlp_->getObjValue()<<CoinMessageEol;
@@ -467,6 +466,7 @@ OaDecompositionBase::post_nlp_solve(BabInfo * babInfo, double cutoff) const{
 
       return_value = true;
       // Also pass it to solver
+      assert(babInfo);
       if (babInfo) {
         int numcols = nlp_->getNumCols();
         double * lpSolution = new double[numcols + 1];
@@ -475,10 +475,6 @@ OaDecompositionBase::post_nlp_solve(BabInfo * babInfo, double cutoff) const{
         babInfo->setSolution(lpSolution,
             numcols + 1, lpSolution[numcols]);
         delete [] lpSolution;
-      }
-      else {
-        printf("No auxiliary info in nlp solve!\n");
-        throw -1;
       }
     }
   }

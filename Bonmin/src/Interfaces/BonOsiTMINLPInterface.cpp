@@ -1894,6 +1894,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
   delete [] cut2rowIdx;
 
   if(getObj && !problem_->hasLinearObjective()) { // Get the objective cuts
+    printf("Generating obj cut\n");
     double * obj = new double [n];
     problem_to_optimize_->eval_grad_f(n, x, 1,obj);
     double f;
@@ -2263,6 +2264,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
        problem_to_optimize_->eval_f(n, x, 1, zero);
        si.setDblParam(OsiObjOffset, -zero);
        //Copy the linear objective and don't create a dummy variable.
+       problem_to_optimize_->eval_grad_f(n, x, 1,obj());
        si.setObjective(obj());
     }
     else {
