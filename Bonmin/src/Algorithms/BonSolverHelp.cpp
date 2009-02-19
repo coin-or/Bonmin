@@ -53,8 +53,9 @@ void fixIntegers(OsiSolverInterface & si,
 {
   if (objects) {
     for (int i = 0 ; i < nObjects ; i++) {
-      if (fabs(objects[i]->feasibleRegion(&si, &info)) > integer_tolerance) 
-       throw;
+      fabs(objects[i]->feasibleRegion(&si, &info));
+      //if (fabs(objects[i]->feasibleRegion(&si, &info)) > integer_tolerance) 
+      // throw;
     }
   }
   else {
