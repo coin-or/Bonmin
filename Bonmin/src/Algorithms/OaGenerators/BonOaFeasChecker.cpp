@@ -101,7 +101,7 @@ namespace Bonmin
       //           milpBound = 1e200;
       if (feasible) {
         changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
-                                        parameters_.cbcIntegerTolerance_,
+                                        0.1,
                                         nlp_->getColSolution(), lp->getColSolution());
       }
       if (changed) {

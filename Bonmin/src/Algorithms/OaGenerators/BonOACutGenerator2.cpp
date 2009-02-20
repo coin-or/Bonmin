@@ -194,7 +194,7 @@ namespace Bonmin
       info.solution_ = lp->getColSolution();
       if (!changed)
         changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
-                                        parameters_.cbcIntegerTolerance_,
+                                        0.1,
                                         nlp_->getColSolution(), lp->getColSolution());
       if (changed) {
 
@@ -244,7 +244,7 @@ namespace Bonmin
         if (feasible && isInteger) {
           bool changed = false;
           changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
-                                          parameters_.cbcIntegerTolerance_,
+                                          0.1,
                                           nlp_->getColSolution(), colsol);
           //solution problem is solved
           if (!changed) {
