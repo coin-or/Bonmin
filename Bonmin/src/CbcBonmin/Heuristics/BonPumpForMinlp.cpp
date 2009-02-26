@@ -45,14 +45,12 @@ namespace Bonmin {
 
     double cutoff = info.cutoff_; 
     int r_val = doLocalSearch(nlp, newSolution, objectiveValue, cutoff, "pump_for_minlp.");
-    delete nlp;
     return r_val;
   }
 
    void
    PumpForMinlp::setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options){
      int dummy;
-     printf("Changing defaults PumpForMinlp\n");
      std::string prefix = "pump_for_minlp.";
      changeIfNotSet(options, prefix, "algorithm", "B-iFP");
      changeIfNotSet(options, prefix, "time_limit", 60.);

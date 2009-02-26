@@ -80,7 +80,6 @@ namespace Bonmin {
    void
    LocalSolverBasedHeuristic::setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options){
      int dummy;
-     printf("Changing defaults LocalSolverBasedHeuristic\n");
      std::string prefix = "local_solver.";
      changeIfNotSet(options, prefix, "algorithm", "B-QG");
      changeIfNotSet(options, prefix, "variable_selection", "most-fractional");
@@ -99,12 +98,14 @@ namespace Bonmin {
       mysetup->setDoubleParameter(BabSetupBase::Cutoff, cutoff);
       mysetup->setIntParameter(BabSetupBase::NumberStrong, 0);
       bb(mysetup); 
+      int r_val = 0;
       if(bb.bestSolution()){
         CoinCopyN(bb.bestSolution(), solver->getNumCols(), solution);
-        bb.bestObj();
-        return 1;
+        solValue = bb.bestObj();
+        r_val = 1;
       }
-      else return 0;
+      delete mysetup;
+      return r_val;
     }
 
    /** Register the options common to all local search based heuristics.*/

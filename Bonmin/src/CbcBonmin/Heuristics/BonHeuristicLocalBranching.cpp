@@ -112,7 +112,6 @@ namespace Bonmin {
 
     delete [] vals;
     delete [] inds;
-    delete nlp;
 
     if(r_val > 0) numberSolutions_ = model_->getSolutionCount() + 1;
 

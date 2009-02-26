@@ -119,8 +119,6 @@ namespace Bonmin {
     }
     else {numberSolutions_ --;}
 
-    delete nlp;
-
     if(r_val > 0) {
       numberSolutions_ = model_->getSolutionCount() + 1;
       howOften_ = std::max(10, howOften_ / 2);
