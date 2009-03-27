@@ -66,8 +66,9 @@ namespace Bonmin{
     tnlp->get_nlp_info(n,m,dum1, dum2, dum3);
     double * x_l = new double[n];
     double * x_u = new double[n];
-    double * g_l = new double[m];
-    double * g_u = new double[m];
+   
+    double * g_l = (m>0) ? new double[m] : NULL;
+    double * g_u = (m >0) ? new double[m] : NULL;
     
     tnlp->get_bounds_info(n, x_l, x_u, m, g_l , g_u);
     
@@ -77,8 +78,10 @@ namespace Bonmin{
 	{
 	  delete [] x_l;
 	  delete [] x_u;
-	  delete [] g_l;
-	  delete [] g_u;
+          if(m > 0){
+	    delete [] g_l;
+	    delete [] g_u;
+          }
 	  return 0;
 	}
     }
@@ -97,7 +100,7 @@ namespace Bonmin{
     delete [] x_l;
     delete [] x_u;
 
-    double * g_sol = new double [m];
+    double * g_sol = (m > 0) ? new double [m] : NULL;
 
     tnlp->eval_g(n, x_sol, true, m, g_sol);
     
@@ -108,34 +111,34 @@ namespace Bonmin{
 	
 	delete [] g_l;
 	delete [] g_u;
-	double * lam = new double[m];
+	double * lam = (m > 0) ? new double[m]: NULL;
 	CoinFillN(lam,m,0.);
 	double * z = new double[n];
 	CoinFillN(z,n,0.);
 	tnlp->finalize_solution(Ipopt::LOCAL_INFEASIBILITY,
 			       n, x_sol, NULL, NULL, 
 			       m, g_sol, NULL, obj_value, NULL, NULL);
-	delete [] lam;
+	if (m > 0) delete [] lam;
 	delete [] z;
-	delete [] g_sol;
+	if (m > 0) delete [] g_sol;
 	delete [] x_sol;
 
         return 1;
       }
     }
-    delete [] g_l;
-    delete [] g_u;
+    if (m > 0) delete [] g_l;
+    if (m > 0) delete [] g_u;
 
-    double * lam = new double[m];
+    double * lam = (m > 0) ? new double[m] : NULL;
     CoinFillN(lam,m,0.);
     double * z = new double[n];
     CoinFillN(z,n,0.);
     tnlp->finalize_solution(Ipopt::SUCCESS,
 			   n, x_sol, z, z,
 			   m, g_sol, lam, obj_value, NULL, NULL);
-    delete [] lam;
+    if (m > 0) delete [] lam;
     delete [] z;
-    delete [] g_sol;
+    if (m > 0) delete [] g_sol;
     delete [] x_sol;
     return 1;
   }

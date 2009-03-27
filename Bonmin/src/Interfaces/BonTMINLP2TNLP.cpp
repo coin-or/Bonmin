@@ -82,7 +82,12 @@ namespace Bonmin
     g_u_.resize(m);
 
     // retrieve the variable bounds
-    tminlp_->get_bounds_info(n, x_l_(), x_u_(), m, g_l_(), g_u_());
+    if(m){
+      tminlp_->get_bounds_info(n, x_l_(), x_u_(), m, g_l_(), g_u_());
+    }
+    else {
+      tminlp_->get_bounds_info(n, x_l_(), x_u_(), m, NULL, NULL);
+    }
     IpBlasDcopy(n, x_l_(), 1, orig_x_l_(), 1);
     IpBlasDcopy(n, x_u_(), 1, orig_x_u_(), 1);
 

@@ -142,7 +142,7 @@ namespace Bonmin {
     const double * activity = nlp->getRowActivity();
     const double * lb = nlp->getRowLower();
     const double * ub = nlp->getRowUpper();
-    CoinRelFltEq eq(1e-04);
+    CoinRelFltEq eq(1e-06);
     int nDelete=0;
     for (int i=numberRowsNow -1;i>=numberRows;i--) {
       if ( !(eq(activity[i], lb[i]) || eq(activity[i], ub[i])) )
