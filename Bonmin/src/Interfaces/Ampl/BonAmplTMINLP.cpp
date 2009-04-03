@@ -452,7 +452,7 @@ namespace Bonmin
     //next variables non-linear in some constraints
     // The first ones are continuous
     start = end;
-    end = max(start,end + n_non_linear_c - n_non_linear_ci - n_non_linear_b);
+    end = std::max(start,end + n_non_linear_c - n_non_linear_ci - n_non_linear_b);
     for (int i=start; i<end; i++) {
       var_types[i] = CONTINUOUS;
     }
@@ -468,7 +468,8 @@ namespace Bonmin
     //next variables non-linear in the objective function
     // The first ones are continuous
     start = end;
-    end = max(start,end + n_non_linear_o - max(n_non_linear_b, n_non_linear_c) - n_non_linear_oi);
+    end = std::max(start,end + n_non_linear_o - std::max(n_non_linear_b, n_non_linear_c)
+                         - n_non_linear_oi);
     for (int i=start; i<end; i++) {
       var_types[i] = CONTINUOUS;
     }
