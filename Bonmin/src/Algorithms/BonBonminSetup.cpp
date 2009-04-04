@@ -105,6 +105,7 @@ namespace Bonmin
     MinlpFeasPump::registerOptions(roptions);
     EcpCuts::registerOptions(roptions);
     OaNlpOptim::registerOptions(roptions);
+    SubMipSolver::registerOptions(roptions);
 
 
     BonCbcFullNodeInfo::registerOptions(roptions);
@@ -420,7 +421,7 @@ namespace Bonmin
           break;
         case LP_STRONG_BRANCHING:
           chooseVariable->setTrustStrongForSolution(false);
-          strong_solver = new LpBranchingSolver(nonlinearSolver_);
+          strong_solver = new LpBranchingSolver(this);
           //chooseVariable->setOnlyPseudoWhenTrusted(true);
           chooseVariable->setOnlyPseudoWhenTrusted(false);
           break;
@@ -583,34 +584,40 @@ namespace Bonmin
     }
     Algorithm algo = getAlgorithm();
     if (algo == B_OA) {
-      std::string o_name = prefix_ + "oa_dec_time_limit";
-      options_->SetNumericValue(o_name.c_str(),COIN_DBL_MAX, true, true);
-      o_name = prefix_ + "minlp_pump_time_limit";
-      options_->SetNumericValue(o_name.c_str(),0, true, true);
+      std::string o_name = prefix_ + "oa_decomposition";
+      options_->SetStringValue(o_name.c_str(),"yes", true, true);
+      o_name = prefix_ + "oa_decomposition.time_limit";
+      options_->SetNumericValue(o_name.c_str(),DBL_MAX, true, true);
+      o_name = prefix_ + "pump_for_minlp";
+      options_->SetStringValue(o_name.c_str(),"no", true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
       intParam_[BabLogLevel] = 0;
     }
     if (algo == B_IFP) {
-      std::string o_name = prefix_ + "minlp_pump_time_limit";
-      options_->SetNumericValue(o_name.c_str(),COIN_DBL_MAX, true, true);
+      std::string o_name = prefix_ + "oa_decomposition";
+      options_->SetStringValue(o_name.c_str(),"no", true, true);
+      o_name = prefix_ + "pump_for_minlp";
+      options_->SetStringValue(o_name.c_str(),"yes", true, true);
+      o_name = prefix_ + "pump_for_minlp.time_limit";
+      options_->SetNumericValue(o_name.c_str(),DBL_MAX, true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
       intParam_[BabLogLevel] = 0;
     }
     else if (algo==B_QG) {
-      std::string o_name = prefix_ + "oa_dec_time_limit";
-      options_->SetNumericValue(o_name.c_str(),0, true, true);
-      o_name = prefix_ + "minlp_pump_time_limit";
-      options_->SetNumericValue(o_name.c_str(),0, true, true);
+      std::string o_name = prefix_ + "oa_decomposition";
+      options_->SetStringValue(o_name.c_str(),"no", true, true);
+      o_name = prefix_ + "pump_for_minlp";
+      options_->SetStringValue(o_name.c_str(),"no", true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
     }
     else if (algo==B_Ecp) {
-      std::string o_name = prefix_ + "oa_dec_time_limit";
-      options_->SetNumericValue(o_name.c_str(),0, true, true);
-      o_name = prefix_ + "minlp_pump_time_limit";
-      options_->SetNumericValue(o_name.c_str(),0, true, true);
+      std::string o_name = prefix_ + "oa_decomposition";
+      options_->SetStringValue(o_name.c_str(),"no", true, true);
+      o_name = prefix_ + "pump_for_minlp";
+      options_->SetStringValue(o_name.c_str(),"no", true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
       o_name = prefix_ + "filmint_ecp_cuts";
@@ -659,9 +666,21 @@ namespace Bonmin
     if (algo == B_Hyb || algo == B_Ecp)
       addMilpCutGenerators();
 
-    double oaTime;
-    options_->GetNumericValue("oa_dec_time_limit",oaTime,prefix_.c_str());
-    if (oaTime > 0.) {
+    int doFp;
+    options_->GetEnumValue("pump_for_minlp",doFp,prefix_.c_str());
+    if (doFp) {
+      CuttingMethod cg;
+      cg.frequency = -99;
+      MinlpFeasPump * oa = new MinlpFeasPump(*this);
+      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
+      cg.cgl = oa;
+      cg.id = "Feasibility Pump for MINLP.";
+      cutGenerators_.push_back(cg);
+
+    }
+    int doOa;
+    options_->GetEnumValue("oa_decomposition",doOa,prefix_.c_str());
+    if (doOa) {
       CuttingMethod cg;
       cg.frequency = -99;
       OACutGenerator2 * oa = new OACutGenerator2(*this);
@@ -672,18 +691,6 @@ namespace Bonmin
 
     }
 
-    double fp_for_minlp_time;
-    options_->GetNumericValue("minlp_pump_time_limit",fp_for_minlp_time,prefix_.c_str());
-    if (fp_for_minlp_time > 0.) {
-      CuttingMethod cg;
-      cg.frequency = -99;
-      MinlpFeasPump * oa = new MinlpFeasPump(*this);
-      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
-      cg.cgl = oa;
-      cg.id = "Feasibility Pump for MINLP.";
-      cutGenerators_.push_back(cg);
-
-    }
     {
       CuttingMethod cg;
       cg.frequency = 1;

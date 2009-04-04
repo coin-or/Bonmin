@@ -29,19 +29,22 @@ namespace Bonmin
       OaDecompositionBase(b, true, false)
   {
     int ivalue;
-    b.options()->GetEnumValue("milp_subsolver",ivalue,b.prefix());
+    std::string bonmin="bonmin.";
+    std::string prefix = (b.prefix() == bonmin) ? "" : b.prefix();
+    prefix += "oa_decomposition.";
+    b.options()->GetEnumValue("milp_subsolver",ivalue,prefix);
     if (ivalue <= 0) {//uses cbc
       //nothing to do?
     }
     else if (ivalue == 1) {
       int nodeS, nStrong, nTrust, mig, mir, probe, cover;
-      b.options()->GetEnumValue("node_comparison",nodeS,"milp_sub.");
-      b.options()->GetIntegerValue("number_strong_branch",nStrong,"milp_sub.");
-      b.options()->GetIntegerValue("number_before_trust", nTrust,"milp_sub.");
-      b.options()->GetIntegerValue("Gomory_cuts", mig,"milp_sub.");
-      b.options()->GetIntegerValue("probing_cuts",probe,"milp_sub.");
-      b.options()->GetIntegerValue("mir_cuts",mir,"milp_sub.");
-      b.options()->GetIntegerValue("cover_cuts",cover,"milp_sub.");
+      b.options()->GetEnumValue("node_comparison",nodeS,prefix);
+      b.options()->GetIntegerValue("number_strong_branch",nStrong,prefix);
+      b.options()->GetIntegerValue("number_before_trust", nTrust,prefix);
+      b.options()->GetIntegerValue("Gomory_cuts", mig,prefix);
+      b.options()->GetIntegerValue("probing_cuts",probe,prefix);
+      b.options()->GetIntegerValue("mir_cuts",mir,prefix);
+      b.options()->GetIntegerValue("cover_cuts",cover,prefix);
       
       CbcStrategy * strategy =
         new CbcOaStrategy(mig, probe, mir, cover, nTrust,
@@ -65,12 +68,12 @@ namespace Bonmin
     }
 
     double oaTime;
-    b.options()->GetNumericValue("oa_dec_time_limit",oaTime,b.prefix());
+    b.options()->GetNumericValue("time_limit",oaTime,prefix);
+    parameter().maxLocalSearchTime_ =
+    std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
     parameter().localSearchNodeLimit_ = 1000000;
     parameter().maxLocalSearch_ = 100000;
     parameter().maxLocalSearchPerNode_ = 10000;
-    parameter().maxLocalSearchTime_ =
-      Ipopt::Min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
   }
   OACutGenerator2::~OACutGenerator2()
   {}
@@ -284,11 +287,11 @@ namespace Bonmin
   OACutGenerator2::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
     roptions->SetRegisteringCategory("Options for OA decomposition", RegisteredOptions::BonminCategory);
-    roptions->AddLowerBoundedNumberOption("oa_dec_time_limit",
-        "Specify the maximum number of seconds spent overall in OA decomposition iterations.",
-        0.,0,0.,
-        "");
-
+    roptions->AddStringOption2("oa_decomposition", "If yes do initial OA decomposition",
+                               "no",
+                               "no","",
+                               "yes","",
+                               "");
     roptions->AddBoundedIntegerOption("oa_log_level",
         "specify OA iterations log level.",
         0,2,1,
@@ -300,27 +303,6 @@ namespace Bonmin
         "display an update on lower and upper bounds in OA every n seconds",
         0.,1.,100.,
         "");
-
-    roptions->SetRegisteringCategory("Options for MILP subsolver in OA decomposition", RegisteredOptions::BonminCategory);
-    roptions->AddStringOption3("milp_subsolver",
-        "Choose the subsolver to solve MILP sub-problems in OA decompositions.",
-        "Cbc_D",
-        "Cbc_D","Coin Branch and Cut with its default",
-        "Cbc_Par", "Coin Branch and Cut with passed parameters",
-        "Cplex","Ilog Cplex",
-        " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
-    roptions->setOptionExtraInfo("milp_subsolver",5);
-
-    roptions->AddBoundedIntegerOption("milp_log_level",
-        "specify MILP subsolver log level.",
-        0,3,0,
-        "Set the level of output of the MILP subsolver in OA : "
-        "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
-                                     );
-    roptions->setOptionExtraInfo("milp_log_level",5);
-
-
   }
-
-
 }/* End namespace Bonmin. */
+

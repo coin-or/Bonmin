@@ -35,6 +35,7 @@ namespace Bonmin {
       :
       CglCutGenerator(),
       nlp_(nlp),
+      s_(NULL),
       nSolve_(0),
       lp_(NULL),
       objects_(NULL),

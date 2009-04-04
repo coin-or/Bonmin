@@ -29,48 +29,51 @@ namespace Bonmin
       OaDecompositionBase(b, true, false)
   {
     int ivalue;
-    b.options()->GetEnumValue("milp_subsolver",ivalue,b.prefix());
+    std::string bonmin="bonmin.";
+    std::string prefix = (b.prefix() == bonmin) ? "" : b.prefix();
+    prefix += "pump_for_minlp.";
+    b.options()->GetEnumValue("milp_solver",ivalue,prefix);
     if (ivalue <= 0) {//uses cbc
       //nothing to do?
     }
     else if (ivalue == 1) {
       int nodeS, nStrong, nTrust, mig, mir, probe, cover;
-      b.options()->GetEnumValue("node_comparison",nodeS,"fp_sub.");
-      b.options()->GetIntegerValue("number_strong_branch",nStrong,"fp_sub.");
-      b.options()->GetIntegerValue("number_before_trust", nTrust,"fp_sub.");
-      b.options()->GetIntegerValue("Gomory_cuts", mig,"fp_sub.");
-      b.options()->GetIntegerValue("probing_cuts",probe,"fp_sub.");
-      b.options()->GetIntegerValue("mir_cuts",mir,"fp_sub.");
-      b.options()->GetIntegerValue("cover_cuts",cover,"fp_sub.");
-      
-      CbcStrategy * strategy =
-        new CbcOaStrategy(mig, probe, mir, cover, nTrust,
-            nStrong, nodeS, parameters_.cbcIntegerTolerance_, parameters_.subMilpLogLevel_);
-      setStrategy(*strategy);
-      delete strategy;
+	      b.options()->GetEnumValue("node_comparison",nodeS,prefix);
+	      b.options()->GetIntegerValue("number_strong_branch",nStrong, prefix);
+	      b.options()->GetIntegerValue("number_before_trust", nTrust, prefix);
+	      b.options()->GetIntegerValue("Gomory_cuts", mig, prefix);
+	      b.options()->GetIntegerValue("probing_cuts",probe, prefix);
+	      b.options()->GetIntegerValue("mir_cuts",mir, prefix);
+	      b.options()->GetIntegerValue("cover_cuts",cover,prefix);
+	      
+	      CbcStrategy * strategy =
+		new CbcOaStrategy(mig, probe, mir, cover, nTrust,
+		    nStrong, nodeS, parameters_.cbcIntegerTolerance_, parameters_.subMilpLogLevel_);
+	      setStrategy(*strategy);
+	      delete strategy;
 
-    }
-    else if (ivalue == 2) {
-#ifdef COIN_HAS_CPX
-      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
-      b.nonlinearSolver()->extractLinearRelaxation(*cpxSolver);
-      assignLpInterface(cpxSolver);
-#else
-      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
-      << "subsolver in oa decomposition. However, apparently\n"
-      << "CPLEX is not configured to be used in bonmin.\n"
-      << "See the manual for configuring CPLEX\n";
-      throw -1;
-#endif
-    }
+	    }
+	    else if (ivalue == 2) {
+	#ifdef COIN_HAS_CPX
+	      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
+	      b.nonlinearSolver()->extractLinearRelaxation(*cpxSolver);
+	      assignLpInterface(cpxSolver);
+	#else
+	      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
+	      << "subsolver in oa decomposition. However, apparently\n"
+	      << "CPLEX is not configured to be used in bonmin.\n"
+	      << "See the manual for configuring CPLEX\n";
+	      throw -1;
+	#endif
+	    }
 
-    double oaTime;
-    b.options()->GetNumericValue("minlp_pump_time_limit",oaTime,b.prefix());
-    parameter().localSearchNodeLimit_ = 1000000;
-    parameter().maxLocalSearch_ = 100000;
-    parameter().maxLocalSearchPerNode_ = 10000;
-    parameter().maxLocalSearchTime_ =
-      Ipopt::Min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
+	    double oaTime;
+            b.options()->GetNumericValue("time_limit",oaTime,prefix);
+            parameter().localSearchNodeLimit_ = 1000000;
+            parameter().maxLocalSearch_ = 100000;
+            parameter().maxLocalSearchPerNode_ = 10000;
+            parameter().maxLocalSearchTime_ =
+            std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
   }
   MinlpFeasPump::~MinlpFeasPump()
   {}
@@ -120,19 +123,20 @@ namespace Bonmin
     const double * colsol = NULL;
     OsiBranchingInformation info(lp, false);
 
+    bool milpOptimal = false;
     nlp_->resolve();
-    printf("Time limit is %g", parameters_.maxLocalSearchTime_);
+    //printf("Time limit is %g", parameters_.maxLocalSearchTime_);
     if (subMip)//Perform a local search
     {
       assert(subMip->solver() == lp);
       set_fp_objective(*lp, nlp_->getColSolution());
       lp->initialSolve();
-      printf("Objective value %g\n", lp->getObjValue());
       lp->setColUpper(numcols, cutoff);
       subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
           parameters_.localSearchNodeLimit_);
 
+      milpOptimal = subMip -> optimal(); 
       colsol = subMip->getLastSolution();
       nLocalSearch_++;
 
@@ -164,7 +168,8 @@ namespace Bonmin
 
       double dist = nlp_->solveFeasibilityProblem(indices.size(), x_bar(), indices(), 1, 0, 2);
 
-      printf("NLP solution is %g from MILP sol\n",dist);
+      handler_->message(FP_DISTANCE, messages_) 
+      <<dist<<CoinMessageEol;
 
       if(dist < 1e-06){
          fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
@@ -173,9 +178,9 @@ namespace Bonmin
          if (post_nlp_solve(babInfo, cutoff)) {
            //nlp is solved and feasible
            // Update the cutoff
-           cutoff = nlp_->getObjValue() * (1 - parameters_.cbcCutoffIncrement_);
-           // Update the lp solver cutoff
-           lp->setDblParam(OsiDualObjectiveLimit, cutoff);
+           //cutoff = nlp_->getObjValue() * (1 - 10*parameters_.cbcCutoffIncrement_);
+           cutoff = nlp_->getObjValue() - parameters_.cbcCutoffIncrement_;
+           cutoff = nlp_->getObjValue() - 0.1;
            numSols_++;
          }
          nlpSol = const_cast<double *>(nlp_->getColSolution());
@@ -218,8 +223,12 @@ namespace Bonmin
         subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
             parameters_.localSearchNodeLimit_);
-
+        milpOptimal = subMip -> optimal(); 
         colsol = subMip->getLastSolution();
+      if(colsol)
+        handler_->message(FP_MILP_VAL, messages_) 
+        <<colsol[nlp_->getNumCols()]<<CoinMessageEol;
+         
       }/** endif localSearch*/
       else if (subMip!=NULL) {
         delete subMip;
@@ -227,7 +236,7 @@ namespace Bonmin
         colsol = NULL;
       }
     }
-    if(colsol)
+    if(colsol || ! milpOptimal)
       return -DBL_MAX;
     else
       return DBL_MAX;
@@ -238,20 +247,16 @@ namespace Bonmin
   MinlpFeasPump::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
     roptions->SetRegisteringCategory("Options for feasibility pump", RegisteredOptions::BonminCategory);
-    roptions->AddLowerBoundedNumberOption("minlp_pump_time_limit",
-        "Specify the maximum number of seconds spent overall in MINLP Feasibility Pump.",
-        0.,0,60.,
-        "");
 
     roptions->AddBoundedIntegerOption("fp_log_level",
-        "specify OA iterations log level.",
+        "specify FP iterations log level.",
         0,2,1,
         "Set the level of output of OA decomposition solver : "
         "0 - none, 1 - normal, 2 - verbose"
                                      );
 
     roptions->AddLowerBoundedNumberOption("fp_log_frequency",
-        "display an update on lower and upper bounds in OA every n seconds",
+        "display an update on lower and upper bounds in FP every n seconds",
         0.,1.,100.,
         "");
   }

@@ -17,9 +17,13 @@ namespace Bonmin
 
   public:
 
+#if 0
     /// Constructor from solver (so we can set up arrays etc)
     LpBranchingSolver (OsiTMINLPInterface * solver);
+#endif
 
+    /// Constructor from setup 
+    LpBranchingSolver (BabSetupBase *b);
     /// Copy constructor
     LpBranchingSolver (const LpBranchingSolver &);
 

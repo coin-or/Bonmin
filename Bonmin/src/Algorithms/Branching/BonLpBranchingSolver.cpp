@@ -12,24 +12,31 @@
 namespace Bonmin
 {
 
-  LpBranchingSolver::LpBranchingSolver(OsiTMINLPInterface * solver) :
-      StrongBranchingSolver(solver),
+  LpBranchingSolver::LpBranchingSolver(BabSetupBase * b) :
+      StrongBranchingSolver(b->nonlinearSolver()),
       lin_(NULL),
       warm_(NULL),
       ecp_(NULL)
   {
     SmartPtr<TNLPSolver> tnlp_solver =
-      static_cast<TNLPSolver *> (solver->solver());
+       static_cast<TNLPSolver *> (b->nonlinearSolver()->solver());
     SmartPtr<OptionsList> options = tnlp_solver->options();
 
-    options->GetIntegerValue("ecp_max_rounds_strong",
-        maxCuttingPlaneIterations_, solver->prefix());
-    options->GetNumericValue("ecp_abs_tol_strong", abs_ecp_tol_,solver->prefix());
-    options->GetNumericValue("ecp_rel_tol_strong", rel_ecp_tol_,solver->prefix());
-    int dummy;
-    options->GetEnumValue("lp_strong_warmstart_method", dummy,solver->prefix());
-    warm_start_mode_ = (WarmStartMethod) dummy;
-  }
+	    options->GetIntegerValue("ecp_max_rounds_strong",
+	                             maxCuttingPlaneIterations_,
+                                     b->nonlinearSolver()->prefix());
+	    options->GetNumericValue("ecp_abs_tol_strong",
+                                     abs_ecp_tol_,
+                                     b->nonlinearSolver()->prefix());
+	    options->GetNumericValue("ecp_rel_tol_strong",
+                                     rel_ecp_tol_,
+                                     b->nonlinearSolver()->prefix());
+	    int dummy;
+	    options->GetEnumValue("lp_strong_warmstart_method", 
+                                  dummy,
+                                  b->nonlinearSolver()->prefix());
+	    warm_start_mode_ = (WarmStartMethod) dummy;
+	  }
 
   LpBranchingSolver::LpBranchingSolver(const LpBranchingSolver & rhs) :
       StrongBranchingSolver(rhs),
@@ -82,9 +89,9 @@ namespace Bonmin
     lin_->messageHandler()->setLogLevel(0);
     lin_->resolve();
     warm_ = lin_->getWarmStart();
-    if (maxCuttingPlaneIterations_)
-      ecp_ = new EcpCuts(tminlp_interface, maxCuttingPlaneIterations_,
-          abs_ecp_tol_, rel_ecp_tol_, -1.);
+    //if (maxCuttingPlaneIterations_)
+    //  ecp_ = new EcpCuts(tminlp_interface, maxCuttingPlaneIterations_,
+    //      abs_ecp_tol_, rel_ecp_tol_, -1.);
   }
 
   void LpBranchingSolver::

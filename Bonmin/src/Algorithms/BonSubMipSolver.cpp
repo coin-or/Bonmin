@@ -19,6 +19,8 @@
 #include "OsiCpxSolverInterface.hpp"
 #endif
 
+#include "BonRegisteredOptions.hpp"
+
 namespace Bonmin {
   /** Constructor */
   SubMipSolver::SubMipSolver(OsiSolverInterface * lp,
@@ -260,4 +262,28 @@ namespace Bonmin {
      strategy_ = strategy->clone();
    }
 
+  /** Register options.*/
+  void
+  SubMipSolver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
+  {
+    roptions->SetRegisteringCategory("Options for MILP solver", RegisteredOptions::BonminCategory);
+    roptions->AddStringOption3("milp_solver",
+        "Choose the subsolver to solve MILP sub-problems in OA decompositions.",
+        "Cbc_D",
+        "Cbc_D","Coin Branch and Cut with its default",
+        "Cbc_Par", "Coin Branch and Cut with passed parameters",
+        "Cplex","Ilog Cplex",
+        " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
+    roptions->setOptionExtraInfo("milp_solver",5);
+
+    roptions->AddBoundedIntegerOption("milp_log_level",
+        "specify MILP solver log level.",
+        0,3,0,
+        "Set the level of output of the MILP subsolver in OA : "
+        "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
+                                     );
+    roptions->setOptionExtraInfo("milp_log_level",5);
+
+
+  }
 }/* Ends Bonmin namespace.*/

@@ -250,6 +250,8 @@ private:
     /** @{ */
     /// Pointer to nlp interface
     mutable OsiTMINLPInterface * nlp_;
+    /// Pointer to setup
+    BabSetupBase * s_;
     ///Number of nlp solved done
     mutable int nSolve_;
     /// A linear solver

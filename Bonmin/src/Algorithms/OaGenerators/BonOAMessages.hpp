@@ -24,6 +24,8 @@ namespace Bonmin
     OASUCCESS,
     LP_ERROR,
     PERIODIC_MSG,
+    FP_DISTANCE,
+    FP_MILP_VAL,
     DUMMY_END
   };
 

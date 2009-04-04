@@ -30,7 +30,6 @@ namespace Bonmin
         rel_violation_tol_(rel_violation_tol),
         beta_(beta)
     {}
-
     EcpCuts(BabSetupBase & b);
 
     /// Copy constructor

@@ -11,7 +11,7 @@
 // Code separated from BonOaDecBase to try to clarify OAs
 #ifndef BonSubMipSolver_HPP
 #define BonSubMipSolver_HPP
-
+#include "IpSmartPtr.hpp"
 /* forward declarations.*/
 class OsiSolverInterface;
 class OsiClpSolverInterface;
@@ -20,6 +20,7 @@ class CbcStrategy;
 class CbcModel;
 
 namespace Bonmin {
+    class RegisteredOptions;
     /** A very simple class to provide a common interface for solving MIPs with Cplex and Cbc.*/
     class SubMipSolver
     {
@@ -87,6 +88,7 @@ namespace Bonmin {
       OsiSolverInterface * solver(){
          return lp_;
       }
+     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
     private:
       /** lp (potentially mip solver). */
       OsiSolverInterface * lp_;
