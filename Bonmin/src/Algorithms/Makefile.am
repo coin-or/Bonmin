@@ -102,6 +102,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
           BonBabSetupBase.hpp \
+          BonSubMipSolver.hpp \
           BonBonminSetup.hpp 
  
 

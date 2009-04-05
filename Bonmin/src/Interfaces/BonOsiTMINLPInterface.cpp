@@ -1747,7 +1747,7 @@ bool cleanNnz(double &value, double colLower, double colUpper,
 */
 void
 OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, 
-                                          bool getObj, const double * x2,
+                                          int getObj, const double * x2,
                                           double theta, bool global)
 {
   int n,m, nnz_jac_g, nnz_h_lag;
@@ -1893,8 +1893,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
   delete [] row2cutIdx;
   delete [] cut2rowIdx;
 
-  if(getObj && !problem_->hasLinearObjective()) { // Get the objective cuts
-    printf("Generating obj cut\n");
+  if(getObj == 2 || (getObj && !problem_->hasLinearObjective())) { // Get the objective cuts
     double * obj = new double [n];
     problem_to_optimize_->eval_grad_f(n, x, 1,obj);
     double f;
@@ -1951,6 +1950,9 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
       cs.insert(newCut);
     }
     delete [] obj;
+    }
+    else{
+      printf("Objective is linear\n");
     }
 
   delete []lb;

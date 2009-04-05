@@ -35,7 +35,8 @@ namespace Bonmin {
   int
   PumpForMinlp::solution(double & objectiveValue,
                                  double * newSolution){
-    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    //if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if(model_->getSolutionCount()) return 0;
     int numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
@@ -62,8 +63,8 @@ namespace Bonmin {
    roptions->SetRegisteringCategory("Local search based heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "pump_for_minlp",
-     "if yes runs a heuristic which looks like a dummy FP",
-     "no",
+     "if yes runs FP for MINLP",
+     "yes",
      "no", "don't run it",
      "yes", "runs the heuristic",
      "");

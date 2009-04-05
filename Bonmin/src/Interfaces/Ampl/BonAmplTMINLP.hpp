@@ -202,10 +202,6 @@ namespace Bonmin
     /** This methods gives the linear part of the objective function */
     virtual void getLinearPartOfObjective(double * obj);
 
-
-    /** Method to add the extra option for ampl */
-    void fillAmplOptionList(AmplOptionsList* amplOptList);
-
     /** Do we have an alternate objective for upper bounding?*/
     virtual bool hasUpperBoundingObjective()
     {
