@@ -85,6 +85,7 @@ namespace Bonmin
       options_(NULL),
       roptions_(other.roptions_),
       readOptions_(other.readOptions_),
+      lpMessageHandler_(NULL),
       prefix_(other.prefix_)
   {
     if (other.nonlinearSolver_) {
@@ -95,8 +96,8 @@ namespace Bonmin
     }
     if (other.lpMessageHandler_) {
       lpMessageHandler_ = other.lpMessageHandler_->clone();
+      continuousSolver_->passInMessageHandler(lpMessageHandler_);
     }
-    continuousSolver_->passInMessageHandler(lpMessageHandler_);
     for (CuttingMethods::const_iterator i = other.cutGenerators_.begin() ; i != other.cutGenerators_.end() ; i++) {
       cutGenerators_.push_back(*i);
       cutGenerators_.back().cgl = cutGenerators_.back().cgl->clone();
@@ -135,6 +136,7 @@ namespace Bonmin
       options_(NULL),
       roptions_(other.roptions_),
       readOptions_(other.readOptions_),
+      lpMessageHandler_(NULL),
       prefix_(other.prefix_)
   {
     nonlinearSolver_ = &nlp;
@@ -185,12 +187,17 @@ namespace Bonmin
       options_(NULL),
       roptions_(other.roptions_),
       readOptions_(other.readOptions_),
+      lpMessageHandler_(NULL),
       prefix_(prefix)
   {
     nonlinearSolver_ = &nlp;
     if (IsValid(other.options_)) {
       options_ = new OptionsList;
       *options_ = *other.options_;
+    }
+    if (other.lpMessageHandler_) {
+      lpMessageHandler_ = other.lpMessageHandler_->clone();
+      continuousSolver_->passInMessageHandler(lpMessageHandler_);
     }
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);

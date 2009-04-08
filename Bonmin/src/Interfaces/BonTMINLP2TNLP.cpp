@@ -470,11 +470,14 @@ namespace Bonmin
     x_sol_.resize(n);
     
     IpBlasDcopy(n, x, 1, x_sol_(), 1);
-
+    
+    if(m > 0){
     g_sol_.resize(m);
     IpBlasDcopy(m, g, 1, g_sol_(), 1);
+    }
     duals_sol_.resize(m + 2*n);
     if(lambda){
+      if(m > 0)
       IpBlasDcopy(m, lambda, 1, duals_sol_() + 2*n, 1);
       
       IpBlasDcopy(n, z_L, 1 , duals_sol_() , 1);

@@ -64,7 +64,7 @@ namespace Bonmin {
    roptions->AddStringOption2(
      "pump_for_minlp",
      "if yes runs FP for MINLP",
-     "yes",
+     "no",
      "no", "don't run it",
      "yes", "runs the heuristic",
      "");
