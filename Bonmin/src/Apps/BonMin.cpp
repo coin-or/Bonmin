@@ -20,6 +20,7 @@
 #include "BonAmplSetup.hpp"
 #include "BonCbc.hpp"
 
+#define CATCH_ERRORS
 using namespace Bonmin;
 int main (int argc, char *argv[])
 {

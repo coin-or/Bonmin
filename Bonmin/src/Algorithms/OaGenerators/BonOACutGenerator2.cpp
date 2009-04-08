@@ -32,7 +32,7 @@ namespace Bonmin
     std::string bonmin="bonmin.";
     std::string prefix = (b.prefix() == bonmin) ? "" : b.prefix();
     prefix += "oa_decomposition.";
-    b.options()->GetEnumValue("milp_subsolver",ivalue,prefix);
+    b.options()->GetEnumValue("milp_solver",ivalue,prefix);
     if (ivalue <= 0) {//uses cbc
       //nothing to do?
     }

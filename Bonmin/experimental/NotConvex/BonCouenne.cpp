@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
 
     /// update time limit (read/preprocessing might have taken some)
     double timeLimit = 0;
-    bonmin.options () -> GetNumericValue ("time_limit", timeLimit, "bonmin.");
+    bonmin.options () -> GetNumericValue ("time_limit", timeLimit, bonmin.prefix());
     bonmin.setDoubleParameter (BabSetupBase::MaxTime, 
 			       timeLimit - (time_start = (CoinCpuTime () - time_start)));
 
@@ -137,7 +137,7 @@ int main (int argc, char *argv[])
       /////////////////////////////////
 
       double timeLimit = 0, obj = bb.model (). getObjValue ();
-      bonmin.options() -> GetNumericValue ("time_limit", timeLimit, "bonmin.");
+      bonmin.options() -> GetNumericValue ("time_limit", timeLimit, bonmin.prefix());
 
       if (CoinCpuTime () - time_start > timeLimit) {
 

@@ -74,9 +74,11 @@ namespace Bonmin {
                                     int max_node){
 
      if(clp_){
-      if (!strategy_)
-        strategy_ = new CbcStrategyDefault(1,0,0, loglevel);
-
+      if (!strategy_){
+        CbcStrategyDefault * strat = new CbcStrategyDefault(1,0,0, loglevel);
+        strat->setupPreProcessing();
+        strategy_ = strat;
+      }
       OsiBabSolver empty;
       if (cbc_) delete cbc_;
       cbc_ = new CbcModel(*clp_);
@@ -96,6 +98,8 @@ namespace Bonmin {
       cbc_->setMaximumSolutions(1);
       cbc_->setCutoff(cutoff);
 
+      cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
+      
       cbc_->branchAndBound();
       lowBound_ = cbc_->getBestPossibleObjValue();
 
@@ -164,8 +168,11 @@ namespace Bonmin {
       int maxNodes)
   {
     if (clp_) {
-      if (!strategy_)
-        strategy_ = new CbcStrategyDefault(1,0,0, loglevel);
+      if (!strategy_){
+        CbcStrategyDefault * strat = new CbcStrategyDefault(1,0,0, loglevel);
+        strat->setupPreProcessing();
+        strategy_ = strat;
+      }
 
       OsiBabSolver empty;
       if (cbc_) delete cbc_;
@@ -185,6 +192,7 @@ namespace Bonmin {
       cbc_->setMaximumSeconds(maxTime);
       cbc_->setCutoff(cutoff);
 
+      cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
       cbc_->branchAndBound();
       lowBound_ = cbc_->getBestPossibleObjValue();
 

@@ -132,14 +132,20 @@ namespace Bonmin
       set_fp_objective(*lp, nlp_->getColSolution());
       lp->initialSolve();
       lp->setColUpper(numcols, cutoff);
-      subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
+      //subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
+      subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
           parameters_.localSearchNodeLimit_);
 
       milpOptimal = subMip -> optimal(); 
       colsol = subMip->getLastSolution();
       nLocalSearch_++;
-
+      if(milpOptimal)
+        handler_->message(SOLVED_LOCAL_SEARCH, messages_)
+        <<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
+      else
+        handler_->message(LOCAL_SEARCH_ABORT, messages_)
+        <<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
     }
     int numberPasses = 0;
 
@@ -171,24 +177,36 @@ namespace Bonmin
       handler_->message(FP_DISTANCE, messages_) 
       <<dist<<CoinMessageEol;
 
-      if(dist < 1e-06){
+      if(dist < 1e-05){
          fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
 
          nlp_->resolve();
+         bool restart = false;
          if (post_nlp_solve(babInfo, cutoff)) {
+           restart = true;
            //nlp is solved and feasible
            // Update the cutoff
-           //cutoff = nlp_->getObjValue() * (1 - 10*parameters_.cbcCutoffIncrement_);
-           cutoff = nlp_->getObjValue() - parameters_.cbcCutoffIncrement_;
+           printf("Cutoff increment %g\n", parameters_.cbcCutoffIncrement_);
+           cutoff = nlp_->getObjValue() - 
+                    parameters_.cbcCutoffIncrement_;
            cutoff = nlp_->getObjValue() - 0.1;
+           printf("New cutoff value %g\n", cutoff);
            numSols_++;
+         }
+         else{
+           //nlp_->setColLower(savedColLower());
+           //nlp_->setColUpper(savedColUpper());
+           //dist = nlp_->solveFeasibilityProblem(indices.size(), x_bar(), indices(), 1, 0, 2);
          }
          nlpSol = const_cast<double *>(nlp_->getColSolution());
          nlp_->getOuterApproximation(cs, nlpSol, 1, NULL,
                                   parameter().global_);
-         nlp_->setColLower(savedColLower());
-         nlp_->setColUpper(savedColUpper());
-         nlp_->resolve();
+         //if(restart){
+           nlp_->setColLower(savedColLower());
+           nlp_->setColUpper(savedColUpper());
+         if(restart)
+           nlp_->resolve();
+         //}
       }
       else {
          nlpSol = const_cast<double *>(nlp_->getColSolution());
@@ -220,11 +238,16 @@ namespace Bonmin
         lp->setColUpper(numcols, cutoff);
 
      
-        subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
-            parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
-            parameters_.localSearchNodeLimit_);
+        //subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
+        subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
+                         parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
+                         parameters_.localSearchNodeLimit_);
         milpOptimal = subMip -> optimal(); 
         colsol = subMip->getLastSolution();
+      if(milpOptimal)
+        handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
+      else
+        handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
       if(colsol)
         handler_->message(FP_MILP_VAL, messages_) 
         <<colsol[nlp_->getNumCols()]<<CoinMessageEol;

@@ -118,7 +118,7 @@ void installCuts(OsiSolverInterface &si,
   if (si.setWarmStart(basis) == false) {
     delete basis;
     throw CoinError("Fail setWarmStart() after cut installation.",
-        "generateCuts","OACutGenerator2") ;
+                    "generateCuts","OACutGenerator2") ;
   }
   delete basis;
 }
