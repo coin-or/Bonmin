@@ -2,6 +2,7 @@
 Bonmin/AUTHORS -text
 Bonmin/INSTALL -text
 Bonmin/LICENSE -text
+Bonmin/MSVisualStudio/v8/libBonmin/libBonmin.vcproj -text
 Bonmin/README -text
 Bonmin/configure -text
 Bonmin/examples/CppExample/Mybonmin.opt -text
