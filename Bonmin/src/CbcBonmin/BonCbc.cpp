@@ -559,10 +559,13 @@ namespace Bonmin
     if (model_.numberObjects()==0) {
       if (bestSolution_)
         delete [] bestSolution_;
-      bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
-      CoinCopyN(s.nonlinearSolver()->getColSolution(), s.nonlinearSolver()->getNumCols(),
+      OsiSolverInterface * solver = 
+             (s.nonlinearSolver() == s.continuousSolver())? 
+             model_.solver() : s.nonlinearSolver();
+      bestSolution_ = new double[solver->getNumCols()];
+      CoinCopyN(solver->getColSolution(), solver->getNumCols(),
           bestSolution_);
-      bestObj_ = bestBound_ = s.nonlinearSolver()->getObjValue();
+      bestObj_ = bestBound_ = solver->getObjValue();
     }
 
     if (bonBabInfoPtr->bestSolution2().size() > 0) {
