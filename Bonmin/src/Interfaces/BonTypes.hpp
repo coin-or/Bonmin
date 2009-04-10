@@ -28,9 +28,20 @@ public:
      return (*this);}
 
 /** Access pointer to first element of storage.*/
-inline T* operator()(){return &std::vector<T>::front();}
+inline T* operator()(){
+#if defined(_MSC_VER)
+  if (size() == 0)
+    return NULL;
+#endif
+return &std::vector<T>::front();}
 /** Access pointer to first element of storage.*/
-inline const T* operator()() const {return &std::vector<T>::front();}
+inline const T* operator()() const {
+#if defined(_MSC_VER)
+  if (size() == 0)
+    return NULL;
+#endif
+return &std::vector<T>::front();
+}
 };
 
 //structure to store an object of class X in a Coin::ReferencedObject
