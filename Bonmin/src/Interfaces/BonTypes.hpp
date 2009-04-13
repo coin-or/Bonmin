@@ -30,7 +30,7 @@ public:
 /** Access pointer to first element of storage.*/
 inline T* operator()(){
 #if defined(_MSC_VER)
-  if (size() == 0)
+  if (std::vector<T>::size() == 0)
     return NULL;
 #endif
 return &std::vector<T>::front();}
