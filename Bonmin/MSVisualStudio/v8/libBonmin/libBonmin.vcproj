@@ -41,8 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\Cbc\examples;..\..\..\..\Cbc\src;..\..\..\..\Cgl\src;..\..\..\..\Cgl\src\CglAllDifferent;..\..\..\..\Cgl\src\CglClique;..\..\..\..\Cgl\src\CglDuplicateRow;..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\Cgl\src\CglGomory;..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\Cgl\src\CglLandP;..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\Cgl\src\CglProbing;..\..\..\..\Cgl\src\CglRedSplit;..\..\..\..\Cgl\src\CglResidualCapacity;..\..\..\..\Cgl\src\CglSimpleRounding;..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\Clp\src;..\..\..\..\Ipopt\src\Algorithm;..\..\..\..\Ipopt\src\Algorithm\LinearSolvers;..\..\..\..\Ipopt\src\Apps\Amplsolver;..\..\..\..\Ipopt\src\Common;..\..\..\..\Ipopt\src\Interfaces;..\..\..\..\Ipopt\src\LinAlg;..\..\..\..\Ipopt\src\LinAlg\TMatrices;..\..\..\..!
- \Ipopt\src\contrib\LinearSolverLoader;..\..\..\..\Ipopt\src\contrib\CGPenalty;..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiCbc;..\..\..\..\Osi\src\OsiClp;..\..\..\..\ThirdParty\ASL\solvers;..\..\..\..\Bonmin\src\Algorithms;..\..\..\..\Bonmin\src\Algorithms\Ampl;..\..\..\..\Bonmin\src\Algorithms\Branching;..\..\..\..\Bonmin\src\Algorithms\OaGenerators;..\..\..\..\Bonmin\src\Algorithms\QuadCuts;..\..\..\..\Bonmin\src\CbcBonmin;..\..\..\..\Bonmin\src\CbcBonmin\Heuristics;..\..\..\..\Bonmin\src\Interfaces;..\..\..\..\Bonmin\src\Interfaces\Filter;..\..\..\..\Bonmin\src\Interfaces\Ampl;..\..\..\..\Bonmin\src\Interfaces\Ipopt"
+				AdditionalIncludeDirectories="..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\Cbc\examples;..\..\..\..\Cbc\src;..\..\..\..\Cgl\src;..\..\..\..\Cgl\src\CglAllDifferent;..\..\..\..\Cgl\src\CglClique;..\..\..\..\Cgl\src\CglDuplicateRow;..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\Cgl\src\CglGomory;..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\Cgl\src\CglLandP;..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\Cgl\src\CglProbing;..\..\..\..\Cgl\src\CglRedSplit;..\..\..\..\Cgl\src\CglResidualCapacity;..\..\..\..\Cgl\src\CglSimpleRounding;..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\Clp\src;..\..\..\..\Ipopt\src\Algorithm;..\..\..\..\Ipopt\src\Algorithm\LinearSolvers;..\..\..\..\Ipopt\src\Apps\Amplsolver;..\..\..\..\Ipopt\src\Common;..\..\..\..\Ipopt\src\Interfaces;..\..\..\..\Ipopt\src\LinAlg;..\..\..\..\Ipopt\src\LinAlg\TMatrices;..\..\..\..\Ipopt\src\contrib\LinearSolverLoader;..\..\..\..\Ipopt\src\contrib\CGPenalty;..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiCbc;..\..\..\..\Osi\src\OsiClp;..\..\..\..\ThirdParty\ASL\solvers;..\..\..\..\Bonmin\src\Algorithms;..\..\..\..\Bonmin\src\Algorithms\Ampl;..\..\..\..\Bonmin\src\Algorithms\Branching;..\..\..\..\Bonmin\src\Algorithms\OaGenerators;..\..\..\..\Bonmin\src\Algorithms\QuadCuts;..\..\..\..\Bonmin\src\CbcBonmin;..\..\..\..\Bonmin\src\CbcBonmin\Heuristics;..\..\..\..\Bonmin\src\Interfaces;..\..\..\..\Bonmin\src\Interfaces\Filter;..\..\..\..\Bonmin\src\Interfaces\Ampl;..\..\..\..\Bonmin\src\Interfaces\Ipopt"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;COIN_USE_F2C;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -108,8 +107,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\Cbc\examples;..\..\..\..\Cbc\src;..\..\..\..\Cgl\src;..\..\..\..\Cgl\src\CglAllDifferent;..\..\..\..\Cgl\src\CglClique;..\..\..\..\Cgl\src\CglDuplicateRow;..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\Cgl\src\CglGomory;..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\Cgl\src\CglLandP;..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\Cgl\src\CglProbing;..\..\..\..\Cgl\src\CglRedSplit;..\..\..\..\Cgl\src\CglResidualCapacity;..\..\..\..\Cgl\src\CglSimpleRounding;..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\Clp\src;..\..\..\..\Ipopt\src\Algorithm;..\..\..\..\Ipopt\src\Algorithm\LinearSolvers;..\..\..\..\Ipopt\src\Apps\Amplsolver;..\..\..\..\Ipopt\src\Common;..\..\..\..\Ipopt\src\Interfaces;..\..\..\..\Ipopt\src\LinAlg;..\..\..\..\Ipopt\src\LinAlg\TMatrices;..\..\..\..!
- \Ipopt\src\contrib\LinearSolverLoader;..\..\..\..\Ipopt\src\contrib\CGPenalty;..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiCbc;..\..\..\..\Osi\src\OsiClp;..\..\..\..\ThirdParty\ASL\solvers;..\..\..\..\Bonmin\src\Algorithms;..\..\..\..\Bonmin\src\Algorithms\Ampl;..\..\..\..\Bonmin\src\Algorithms\Branching;..\..\..\..\Bonmin\src\Algorithms\OaGenerators;..\..\..\..\Bonmin\src\Algorithms\QuadCuts;..\..\..\..\Bonmin\src\CbcBonmin;..\..\..\..\Bonmin\src\CbcBonmin\Heuristics;..\..\..\..\Bonmin\src\Interfaces;..\..\..\..\Bonmin\src\Interfaces\Filter;..\..\..\..\Bonmin\src\Interfaces\Ampl;..\..\..\..\Bonmin\src\Interfaces\Ipopt"
+				AdditionalIncludeDirectories="..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\Cbc\examples;..\..\..\..\Cbc\src;..\..\..\..\Cgl\src;..\..\..\..\Cgl\src\CglAllDifferent;..\..\..\..\Cgl\src\CglClique;..\..\..\..\Cgl\src\CglDuplicateRow;..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\Cgl\src\CglGomory;..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\Cgl\src\CglLandP;..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\Cgl\src\CglProbing;..\..\..\..\Cgl\src\CglRedSplit;..\..\..\..\Cgl\src\CglResidualCapacity;..\..\..\..\Cgl\src\CglSimpleRounding;..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\Clp\src;..\..\..\..\Ipopt\src\Algorithm;..\..\..\..\Ipopt\src\Algorithm\LinearSolvers;..\..\..\..\Ipopt\src\Apps\Amplsolver;..\..\..\..\Ipopt\src\Common;..\..\..\..\Ipopt\src\Interfaces;..\..\..\..\Ipopt\src\LinAlg;..\..\..\..\Ipopt\src\LinAlg\TMatrices;..\..\..\..\Ipopt\src\contrib\LinearSolverLoader;..\..\..\..\Ipopt\src\contrib\CGPenalty;..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiCbc;..\..\..\..\Osi\src\OsiClp;..\..\..\..\ThirdParty\ASL\solvers;..\..\..\..\Bonmin\src\Algorithms;..\..\..\..\Bonmin\src\Algorithms\Ampl;..\..\..\..\Bonmin\src\Algorithms\Branching;..\..\..\..\Bonmin\src\Algorithms\OaGenerators;..\..\..\..\Bonmin\src\Algorithms\QuadCuts;..\..\..\..\Bonmin\src\CbcBonmin;..\..\..\..\Bonmin\src\CbcBonmin\Heuristics;..\..\..\..\Bonmin\src\Interfaces;..\..\..\..\Bonmin\src\Interfaces\Filter;..\..\..\..\Bonmin\src\Interfaces\Ampl;..\..\..\..\Bonmin\src\Interfaces\Ipopt"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;COIN_USE_F2C;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
 				DisableLanguageExtensions="true"
@@ -167,10 +165,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\Algorithms\BonBonminSetup.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\src\Algorithms\BonCutStorage.cpp"
 					>
 				</File>
 				<File
@@ -481,10 +475,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\src\Algorithms\BonBonminSetup.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\src\Algorithms\BonCutStorage.hpp"
 					>
 				</File>
 				<File
