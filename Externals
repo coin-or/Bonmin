@@ -6,7 +6,7 @@ ThirdParty/ASL https://projects.coin-or.org/svn/BuildTools/ThirdParty/ASL/stable
 ThirdParty/Mumps https://projects.coin-or.org/svn/BuildTools/ThirdParty/Mumps/stable/1.1
 ThirdParty/FilterSQP https://projects.coin-or.org/svn/BuildTools/ThirdParty/FilterSQP/stable/1.0
 Data/Sample https://projects.coin-or.org/svn/Data/stable/1.0/Sample
-CoinUtils https://projects.coin-or.org/svn/CoinUtils/stable/2.6/CoinUtils
+CoinUtils https://projects.coin-or.org/svn/CoinUtils/stable/2.5/CoinUtils
 Cbc https://projects.coin-or.org/svn/Cbc/stable/2.3/Cbc
 Cgl https://projects.coin-or.org/svn/Cgl/stable/0.54/Cgl
 Clp https://projects.coin-or.org/svn/Clp/stable/1.10/Clp
