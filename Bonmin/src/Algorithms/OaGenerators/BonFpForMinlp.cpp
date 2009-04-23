@@ -131,9 +131,9 @@ namespace Bonmin
       assert(subMip->solver() == lp);
       set_fp_objective(*lp, nlp_->getColSolution());
       lp->initialSolve();
-      lp->setColUpper(numcols, cutoff);
-      //subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
-      subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
+      //lp->setColUpper(numcols, cutoff);
+      subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
+      //subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
           parameters_.localSearchNodeLimit_);
 
@@ -235,11 +235,11 @@ namespace Bonmin
         nLocalSearch_++;
         set_fp_objective(*lp, nlp_->getColSolution());
 
-        lp->setColUpper(numcols, cutoff);
+        //lp->setColUpper(numcols, cutoff);
 
      
-        //subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
-        subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
+        subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
+        //subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
                          parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
                          parameters_.localSearchNodeLimit_);
         milpOptimal = subMip -> optimal(); 

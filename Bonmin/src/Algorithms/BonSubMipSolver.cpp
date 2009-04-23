@@ -74,10 +74,11 @@ namespace Bonmin {
                                     int max_node){
 
      if(clp_){
+      CbcStrategyDefault * strat_default = NULL;
       if (!strategy_){
-        CbcStrategyDefault * strat = new CbcStrategyDefault(1,0,0, loglevel);
-        strat->setupPreProcessing();
-        strategy_ = strat;
+        strat_default = new CbcStrategyDefault(1,5,5, loglevel);
+        strat_default->setupPreProcessing();
+        strategy_ = strat_default;
       }
       OsiBabSolver empty;
       if (cbc_) delete cbc_;
@@ -119,6 +120,10 @@ namespace Bonmin {
       nodeCount_ = cbc_->getNodeCount();
       iterationCount_ = cbc_->getIterationCount();
 
+      if(strat_default != NULL){
+        delete strat_default;
+        strategy_ = NULL;
+      }
      }
      else if (cpx_){
 #ifndef COIN_HAS_CPX
@@ -168,10 +173,11 @@ namespace Bonmin {
       int maxNodes)
   {
     if (clp_) {
+      CbcStrategyDefault * strat_default = NULL;
       if (!strategy_){
-        CbcStrategyDefault * strat = new CbcStrategyDefault(1,0,0, loglevel);
-        strat->setupPreProcessing();
-        strategy_ = strat;
+        strat_default = new CbcStrategyDefault(1,5,5, loglevel);
+        strat_default->setupPreProcessing();
+        strategy_ = strat_default;
       }
 
       OsiBabSolver empty;
@@ -211,6 +217,10 @@ namespace Bonmin {
       }
       nodeCount_ = cbc_->getNodeCount();
       iterationCount_ = cbc_->getIterationCount();
+      if(strat_default != NULL){
+        delete strat_default;
+        strategy_ = NULL;
+      }
     }
     else {
       lp_->messageHandler()->setLogLevel(loglevel);
