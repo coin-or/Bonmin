@@ -131,7 +131,7 @@ namespace Bonmin
       assert(subMip->solver() == lp);
       set_fp_objective(*lp, nlp_->getColSolution());
       lp->initialSolve();
-      //lp->setColUpper(numcols, cutoff);
+      lp->setColUpper(numcols, cutoff);
       subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
       //subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
@@ -215,6 +215,8 @@ namespace Bonmin
       }
 
 
+      handler_->message(FP_ITERATION, messages_) 
+      <<nLocalSearch_<<cutoff<<CoinMessageEol;
 
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       assert(numberCuts);
@@ -235,9 +237,11 @@ namespace Bonmin
         nLocalSearch_++;
         set_fp_objective(*lp, nlp_->getColSolution());
 
-        //lp->setColUpper(numcols, cutoff);
-
+        lp->setColUpper(numcols, cutoff); 
      
+        if(nLocalSearch_ == 13){
+          printf("Here\n");
+        } 
         subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
         //subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
                          parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
