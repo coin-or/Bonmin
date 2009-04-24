@@ -99,7 +99,7 @@ namespace Bonmin {
       cbc_->setMaximumSolutions(1);
       cbc_->setCutoff(cutoff);
 
-      cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
+      //cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
       
       cbc_->branchAndBound();
       lowBound_ = cbc_->getBestPossibleObjValue();
@@ -198,7 +198,7 @@ namespace Bonmin {
       cbc_->setMaximumSeconds(maxTime);
       cbc_->setCutoff(cutoff);
 
-      cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
+      //cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
       cbc_->branchAndBound();
       lowBound_ = cbc_->getBestPossibleObjValue();
 

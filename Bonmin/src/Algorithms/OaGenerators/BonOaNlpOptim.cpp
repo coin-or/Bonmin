@@ -152,7 +152,7 @@ namespace Bonmin
           delete [] lpSolution;
         }
         else
-          printf("No auxiliary info in nlp solve!\n");
+          fprintf(stderr,"No auxiliary info in nlp solve!\n");
 #endif
 
       }

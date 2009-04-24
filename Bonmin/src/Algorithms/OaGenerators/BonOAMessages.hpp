@@ -26,7 +26,8 @@ namespace Bonmin
     PERIODIC_MSG,
     FP_DISTANCE,
     FP_MILP_VAL,
-    FP_ITERATION,
+    FP_MAJOR_ITERATION,
+    FP_MINOR_ITERATION,
     DUMMY_END
   };
 

@@ -31,7 +31,8 @@ namespace Bonmin
     ADD_MSG(PERIODIC_MSG, std_m,1,"After %7.1f seconds, upper bound %10g, lower bound %10g");
     ADD_MSG(FP_DISTANCE, std_m,2,"NLP solution is %g from MILP sol");
     ADD_MSG(FP_MILP_VAL, std_m,2,"MILP solution has value w.r.t original objective: %10g");
-    ADD_MSG(FP_ITERATION, std_m,1,"Major iteration %i ub: %g");
+    ADD_MSG(FP_MAJOR_ITERATION, std_m,1,"Major iteration %i ub: %g");
+    ADD_MSG(FP_MINOR_ITERATION, std_m,1,"Minor iteration %i ub: %g");
   }
 
 }//end namespace Bonmin

@@ -1953,7 +1953,6 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     delete [] obj;
     }
     else{
-      printf("Objective is linear\n");
     }
 
   delete []lb;

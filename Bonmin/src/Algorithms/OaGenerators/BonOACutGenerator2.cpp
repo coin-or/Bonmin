@@ -42,7 +42,7 @@ namespace Bonmin
       b.options()->GetIntegerValue("number_strong_branch",nStrong,prefix);
       b.options()->GetIntegerValue("number_before_trust", nTrust,prefix);
       b.options()->GetIntegerValue("Gomory_cuts", mig,prefix);
-      b.options()->GetIntegerValue("probing_cuts",probe,prefix);
+      //b.options()->GetIntegerValue("probing_cuts",probe,prefix);
       b.options()->GetIntegerValue("mir_cuts",mir,prefix);
       b.options()->GetIntegerValue("cover_cuts",cover,prefix);
       
@@ -97,7 +97,7 @@ namespace Bonmin
   {
 
     bool interuptOnLimit = false;
-    double lastPeriodicLog= CoinCpuTime();
+    double lastPeriodicLog = CoinCpuTime();
 
     //const int numcols = nlp_->getNumCols();
 

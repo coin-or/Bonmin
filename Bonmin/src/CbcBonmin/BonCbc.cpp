@@ -379,6 +379,8 @@ namespace Bonmin
 
     model_.setMaximumNodes(s.getIntParameter(BabSetupBase::MaxNodes));
 
+    model_.setMaximumNumberIterations(s.getIntParameter(BabSetupBase::MaxIterations));
+
     model_.setMaximumSolutions(s.getIntParameter(BabSetupBase::MaxSolutions));
 
     model_.setIntegerTolerance(s.getDoubleParameter(BabSetupBase::IntTol));

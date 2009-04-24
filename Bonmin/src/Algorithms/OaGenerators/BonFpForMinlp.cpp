@@ -42,10 +42,11 @@ namespace Bonmin
 	      b.options()->GetIntegerValue("number_strong_branch",nStrong, prefix);
 	      b.options()->GetIntegerValue("number_before_trust", nTrust, prefix);
 	      b.options()->GetIntegerValue("Gomory_cuts", mig, prefix);
-	      b.options()->GetIntegerValue("probing_cuts",probe, prefix);
+//	      b.options()->GetIntegerValue("probing_cuts",probe, prefix);
 	      b.options()->GetIntegerValue("mir_cuts",mir, prefix);
 	      b.options()->GetIntegerValue("cover_cuts",cover,prefix);
-	      
+              probe = 0;	      
+              //printf("Probing to 0\n");
 	      CbcStrategy * strategy =
 		new CbcOaStrategy(mig, probe, mir, cover, nTrust,
 		    nStrong, nodeS, parameters_.cbcIntegerTolerance_, parameters_.subMilpLogLevel_);
@@ -97,7 +98,7 @@ namespace Bonmin
   {
 
     bool interuptOnLimit = false;
-    double lastPeriodicLog= CoinCpuTime();
+    double lastPeriodicLog = CoinCpuTime();
 
     const int numcols = nlp_->getNumCols();
     vector<double> savedColLower(nlp_->getNumCols());
@@ -153,7 +154,7 @@ namespace Bonmin
     bool foundSolution = 0;
 #endif
     double * nlpSol = NULL;
-
+    int major_iteration = 0;
     while (colsol) {
       numberPasses++;
 
@@ -186,11 +187,9 @@ namespace Bonmin
            restart = true;
            //nlp is solved and feasible
            // Update the cutoff
-           printf("Cutoff increment %g\n", parameters_.cbcCutoffIncrement_);
            cutoff = nlp_->getObjValue() - 
                     parameters_.cbcCutoffIncrement_;
            cutoff = nlp_->getObjValue() - 0.1;
-           printf("New cutoff value %g\n", cutoff);
            numSols_++;
          }
          else{
@@ -204,8 +203,13 @@ namespace Bonmin
          //if(restart){
            nlp_->setColLower(savedColLower());
            nlp_->setColUpper(savedColUpper());
-         if(restart)
-           nlp_->resolve();
+        if(restart){
+          major_iteration++;
+          handler_->message(FP_MAJOR_ITERATION, messages_) 
+          <<major_iteration<<cutoff<<CoinMessageEol;
+          nlp_->resolve();
+        }
+
          //}
       }
       else {
@@ -215,9 +219,11 @@ namespace Bonmin
       }
 
 
-      handler_->message(FP_ITERATION, messages_) 
+#if 0
+      handler_->message(FP_MINOR_ITERATION, messages_) 
       <<nLocalSearch_<<cutoff<<CoinMessageEol;
-
+#endif
+      
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       assert(numberCuts);
       installCuts(*lp, cs, numberCuts);
@@ -239,9 +245,6 @@ namespace Bonmin
 
         lp->setColUpper(numcols, cutoff); 
      
-        if(nLocalSearch_ == 13){
-          printf("Here\n");
-        } 
         subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
         //subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
                          parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
