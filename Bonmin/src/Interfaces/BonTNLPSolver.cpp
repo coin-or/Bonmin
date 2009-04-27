@@ -37,7 +37,9 @@ namespace Bonmin{
 #endif
     
     
-  TNLPSolver::TNLPSolver()
+  TNLPSolver::TNLPSolver():
+    start_time_(0),
+    time_limit_(DBL_MAX)
   {
     initializeOptionsAndJournalist();
   }
@@ -49,8 +51,21 @@ namespace Bonmin{
     journalist_(journalist),
     options_(options),
     roptions_(roptions),
-    prefix_(prefix)
+    prefix_(prefix),
+    start_time_(0),
+    time_limit_(DBL_MAX)
   {
+  }
+
+  TNLPSolver::TNLPSolver(const TNLPSolver &other):
+    journalist_(other.journalist_),
+    options_(NULL),
+    roptions_(other.roptions_),
+    prefix_(other.prefix_),
+    start_time_(other.start_time_),
+    time_limit_(other.time_limit_){
+      options_ = new Ipopt::OptionsList();
+      *options_ = *other.options_;
   }
   
   TNLPSolver::~TNLPSolver()
@@ -234,7 +249,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
       (problem may be solvable).*/
   bool 
   TNLPSolver::isRecoverable(ReturnStatus &r){
-    return (r >=0 || (r != illDefinedProblem && r != illegalOption && r != computationError) );
+    return (r >=0 || (r != illDefinedProblem && r != illegalOption && r != computationError && r != timeLimit) );
   }
 
 /** Initialize the options and the journalist.*/

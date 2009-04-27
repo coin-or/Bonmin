@@ -54,6 +54,8 @@ namespace Bonmin
         Ipopt::SmartPtr<Ipopt::Journalist> journalist,
         const std::string & prefix);
 
+    /// Copy constructor
+    IpoptSolver(const IpoptSolver &other);
 
     ///virtual copy constructor
     virtual Ipopt::SmartPtr<TNLPSolver> clone();

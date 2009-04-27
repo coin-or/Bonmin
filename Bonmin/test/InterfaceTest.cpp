@@ -388,7 +388,7 @@ int main()
   Ipopt::SmartPtr<IpoptSolver> ipopt_solver = new IpoptSolver;
   interfaceTest(GetRawPtr(ipopt_solver));
 
-#ifdef COIN_HAS_FSQP
+#ifdef COIN_HAS_FILTERSQP
   Ipopt::SmartPtr<FilterSolver> filter_solver = new FilterSolver;
   interfaceTest(GetRawPtr(filter_solver));
 #endif

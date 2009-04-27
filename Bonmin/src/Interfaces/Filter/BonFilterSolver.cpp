@@ -363,15 +363,18 @@ namespace Bonmin
   {}
 
 
+  FilterSolver::FilterSolver(const FilterSolver & other):
+      TNLPSolver(other),
+      warmF_(NULL),
+      cached_(NULL)
+  {
+    warmF_ = (other.warmF_.IsValid()) ? dynamic_cast<FilterWarmStart *>(other.warmF_->clone()):NULL;
+  }
+
   Ipopt::SmartPtr <TNLPSolver>
   FilterSolver::clone()
   {
-    Ipopt::SmartPtr<FilterSolver> retval = new FilterSolver(true);
-    *retval->options_ = *options_; // Copy the options
-    retval->roptions_ = roptions_; // only copy pointers of registered options
-    retval->journalist_ = journalist_; // and journalist
-    retval->prefix_ = prefix_;
-    retval->warmF_ = (warmF_.IsValid()) ? dynamic_cast<FilterWarmStart *>(warmF_->clone()):NULL;
+    Ipopt::SmartPtr<FilterSolver> retval = new FilterSolver(*this);
     return GetRawPtr(retval);
   }
 

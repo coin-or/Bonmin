@@ -114,11 +114,13 @@ namespace Bonmin
     }
     bonBabInfoPtr->setBabPtr(this);
 
+    s.nonlinearSolver()->solver()->setup_global_time_limit(s.getDoubleParameter(BabSetupBase::MaxTime));
     OsiSolverInterface * solver = s.continuousSolver()->clone();
     delete modelHandler_;
     modelHandler_ = s.continuousSolver()->messageHandler()->clone();
     model_.passInMessageHandler(modelHandler_);
     model_.assignSolver(solver, true);
+
 
     //  s.continuousSolver() = model_.solver();
     //   if(s.continuousSolver()->objects()!=NULL){

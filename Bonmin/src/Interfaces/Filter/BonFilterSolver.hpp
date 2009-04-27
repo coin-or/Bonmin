@@ -67,6 +67,8 @@ namespace Bonmin
         const std::string & prefix
                 );
 
+    /// Copy constructor
+    FilterSolver(const FilterSolver & other);
     ///destructor
     virtual ~FilterSolver();
 

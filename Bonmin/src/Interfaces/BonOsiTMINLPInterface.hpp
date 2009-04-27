@@ -174,6 +174,7 @@ class Messages : public CoinMessages
   else
     return app_->prefix();
   }
+  //@}
   //---------------------------------------------------------------------------
   /**@name Solve methods */
   //@{
@@ -302,8 +303,6 @@ class Messages : public CoinMessages
      Const pointers returned from any data-query method are valid as
      long as the data is unchanged and the solver is not called.
   */
-  //@{
-  /**@name Methods related to querying the input data */
   //@{
   /// Get number of columns
   virtual int getNumCols() const;
@@ -1232,6 +1231,7 @@ private:
 static const char * OPT_SYMB;
 static const char * FAILED_SYMB;
 static const char * INFEAS_SYMB;
+static const char * TIME_SYMB;
 static const char * UNBOUND_SYMB;
   /** Get status as a char * for log.*/
   const char * statusAsString(TNLPSolver::ReturnStatus r){
@@ -1241,6 +1241,8 @@ static const char * UNBOUND_SYMB;
       return INFEAS_SYMB;}
     else if(r == TNLPSolver::unbounded){
       return UNBOUND_SYMB;}
+    else if(r == TNLPSolver::timeLimit){
+      return TIME_SYMB;}
     else return FAILED_SYMB;
   }
   const char * statusAsString(){

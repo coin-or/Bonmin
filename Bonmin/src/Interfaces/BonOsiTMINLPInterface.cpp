@@ -763,6 +763,7 @@ const char * OsiTMINLPInterface::OPT_SYMB="OPT";
 const char * OsiTMINLPInterface::FAILED_SYMB="FAILED";
 const char * OsiTMINLPInterface::UNBOUND_SYMB="UNBOUNDED";
 const char * OsiTMINLPInterface::INFEAS_SYMB="INFEAS";
+const char * OsiTMINLPInterface::TIME_SYMB="TIME";
 ///////////////////////////////////////////////////////////////////
 // WarmStart Information                                                                           //
 ///////////////////////////////////////////////////////////////////

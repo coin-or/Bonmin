@@ -54,6 +54,7 @@ namespace Bonmin
 
     options->GetIntegerValue("bb_log_level", bb_log_level_, b.prefix());
     handler_->setLogLevel(bb_log_level_);
+    options->GetNumericValue("time_limit", time_limit_, b.prefix());
     options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, b.prefix());
     options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, b.prefix());
     options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, b.prefix());
@@ -81,11 +82,14 @@ namespace Bonmin
     options->GetIntegerValue("min_number_strong_branch", minNumberStrongBranch_, b.prefix());
     options->GetIntegerValue("number_look_ahead", numberLookAhead_, b.prefix());
 
+    start_time_ = CoinCpuTime();
   }
 
   BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
       OsiChooseVariable(rhs),
       results_(rhs.results_),
+      time_limit_(rhs.time_limit_),
+      start_time_(CoinCpuTime()),
       cbc_model_(rhs.cbc_model_),
       only_pseudo_when_trusted_(rhs.only_pseudo_when_trusted_),
       maxmin_crit_no_sol_(rhs.maxmin_crit_no_sol_),
@@ -625,9 +629,9 @@ namespace Bonmin
             i < minNumberStrongBranch_ ||
             (
               only_pseudo_when_trusted_ && number_not_trusted_>0 ) ||
-              !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
-                          downNumber[iObject]<numberBeforeTrusted )||
-              isRoot && (!upNumber[iObject] && !downNumber[iObject]) ) {
+              ( !isRoot && (upNumber[iObject]<numberBeforeTrusted ||
+                          downNumber[iObject]<numberBeforeTrusted ))||
+              ( isRoot && (!upNumber[iObject] && !downNumber[iObject])) ) {
          
              results_.push_back(HotInfo(solver, info,
                                 solver->objects(), iObject));
@@ -742,7 +746,7 @@ namespace Bonmin
       }
       if ( bestObjectIndex_ >=0 ) {
         OsiObject * obj = solver->objects()[bestObjectIndex_];
-        obj->setWhichWay(	bestWhichWay_);
+        obj->setWhichWay(bestWhichWay_);
         message(BRANCH_VAR)<<obj->columnNumber()<< bestWhichWay_
         <<CoinMessageEol;
       }
@@ -897,7 +901,8 @@ namespace Bonmin
   	break;
         }
       }
-      bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_);
+      bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_)
+                        || ( CoinCpuTime() - start_time_ > time_limit_);
       if (hitMaxTime) {
         returnCode=3;
         break;

@@ -17,6 +17,7 @@
 #include "IpOptionsList.hpp"
 #include "CoinWarmStart.hpp"
 #include "BonRegisteredOptions.hpp"
+#include "CoinTime.hpp"
 namespace Bonmin  {
 /** This is a generic class for calling an NLP solver to solve a TNLP.
     A TNLPSolver is able to solve and resolve a problem, it has some options (stored
@@ -27,6 +28,7 @@ class TNLPSolver: public Ipopt::ReferencedObject{
 
   enum ReturnStatus /** Standard return statuses for a solver*/{
     iterationLimit = -3/** Solver reached iteration limit. */,
+    timeLimit = 5/** Solver reached iteration limit. */,
     doesNotConverge = -8/** Algorithm does not converge.*/,
     computationError = -2/** Some error was made in the computations. */,
     notEnoughFreedom = -1/** not enough degrees of freedom.*/,
@@ -190,7 +192,11 @@ static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
         (problem may be solvable).*/
   bool isRecoverable(ReturnStatus &r);
 
-
+  /** Setup for a global time limit for solver.*/
+  void setup_global_time_limit(double time_limit){
+    time_limit_ = time_limit + 5;
+    start_time_ = CoinCpuTime();
+  }
 
   /** Say if return status is an error.*/
   bool isError(ReturnStatus &r){
@@ -217,9 +223,15 @@ protected:
    
     /** Prefix to use for reading bonmin's options.*/
    std::string prefix_;
-   private:
-   /// There is no copy constructor for this class
-   TNLPSolver(TNLPSolver &other); 
+   /** Global start time.*/
+   double start_time_;
+
+   /** Global time limit.*/
+   double time_limit_;
+
+  /// Copy Constructor
+  TNLPSolver(const TNLPSolver & other);
+
 };
 }
 #endif

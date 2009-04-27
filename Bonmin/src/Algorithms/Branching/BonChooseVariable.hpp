@@ -275,6 +275,11 @@ namespace Bonmin
     /** Default Constructor, forbiden for some reason.*/
     BonChooseVariable ();
 
+    /** Global time limit for algorithm. */
+    double time_limit_;
+
+    /** Starting time of algorithm.*/
+    double start_time_;
   protected:
     /// CbcModel, used to get status of search
     CbcModel* cbc_model_;

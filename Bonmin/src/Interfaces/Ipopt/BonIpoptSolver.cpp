@@ -53,18 +53,21 @@ namespace Bonmin
   IpoptSolver::~IpoptSolver()
   {}
 
+  IpoptSolver::IpoptSolver(const IpoptSolver &other):
+    TNLPSolver(other),
+    optimizationStatus_(other.optimizationStatus_),
+    problemHadZeroDimension_(other.problemHadZeroDimension_),
+    warmStartStrategy_(other.warmStartStrategy_),
+    enable_warm_start_(false),
+    optimized_before_(false){
+      app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions_), options_, journalist_);
+  }
+
   ///virtual constructor
   Ipopt::SmartPtr<TNLPSolver>
   IpoptSolver::clone()
   {
-    SmartPtr<IpoptSolver> retval = new IpoptSolver(GetRawPtr(roptions_), new Ipopt::OptionsList(), journalist_, prefix_);
-    *retval->options_ = *options_;
-    retval->warmStartStrategy_ = warmStartStrategy_;
-    retval->problemHadZeroDimension_ = problemHadZeroDimension_;
-    retval->optimizationStatus_ = optimizationStatus_;
-
-    enable_warm_start_ = false;
-    optimized_before_ = false;
+    SmartPtr<IpoptSolver> retval = new IpoptSolver(*this);
     return GetRawPtr(retval);
   }
 
@@ -100,8 +103,24 @@ namespace Bonmin
   TNLPSolver::ReturnStatus
   IpoptSolver::OptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp)
   {
+#if 0
+    printf("Global Time limit set to %g\n", time_limit_);
+    double local_time_limit = time_limit_ - 
+                              CoinCpuTime() + start_time_;
+    printf("Time limit set to %g\n", local_time_limit);
+    if(local_time_limit <= 0.){
+       optimizationStatus_ = Ipopt::Maximum_CpuTime_Exceeded;
+       return solverReturnStatus(optimizationStatus_);
+    }
+#endif
     TNLPSolver::ReturnStatus ret_status;
     if (!zeroDimension(tnlp, ret_status)) {
+#if 0
+      if(time_limit_ < DBL_MAX){
+           options_->SetNumericValue("max_cpu_time", local_time_limit,
+                                  true, true);
+      }
+#endif
       if (enable_warm_start_ && optimized_before_) {
         optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
       }
@@ -129,8 +148,25 @@ namespace Bonmin
   TNLPSolver::ReturnStatus
   IpoptSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> &tnlp)
   {
+#if 0
+    printf("Global Time limit set to %g\n", time_limit_);
+    double local_time_limit = time_limit_ - 
+                              CoinCpuTime() + start_time_;
+    printf("Time limit set to %g\n", local_time_limit);
+    if(local_time_limit <= 0.){
+       optimizationStatus_ = Ipopt::Maximum_CpuTime_Exceeded;
+       return solverReturnStatus(optimizationStatus_);
+    }
+#endif
     TNLPSolver::ReturnStatus ret_status;
     if (!zeroDimension(tnlp, ret_status)) {
+#if 0
+      if(time_limit_ < DBL_MAX){
+        options_->SetNumericValue("max_cpu_time", 
+                                  std::max(0., local_time_limit),
+                                  true, true);
+      }
+#endif
       if (optimized_before_) {
         optimizationStatus_ = app_->ReOptimizeTNLP(tnlp);
       }
@@ -245,6 +281,8 @@ namespace Bonmin
       return provenInfeasible;
     case Ipopt::Diverging_Iterates:
       return unbounded;
+    case Ipopt::Maximum_CpuTime_Exceeded:
+      return timeLimit;
     default:
       return exception;
     }
