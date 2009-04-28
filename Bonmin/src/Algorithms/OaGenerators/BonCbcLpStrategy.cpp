@@ -64,23 +64,23 @@ namespace Bonmin
     if(set==0) gen_freqs_[k] = -99;
     k++;
 
-    s.options()->GetIntegerValue("Gomory_cuts", gen_freqs_[k], prefix);
+    set = s.options()->GetIntegerValue("Gomory_cuts", gen_freqs_[k], prefix);
     if(set==0) gen_freqs_[k] = -99;
     k++;
     
-    s.options()->GetIntegerValue("cover_cuts", gen_freqs_[k], prefix);
+    set = s.options()->GetIntegerValue("cover_cuts", gen_freqs_[k], prefix);
     if(set==0) gen_freqs_[k] = -99;
     k++;
     
-    s.options()->GetIntegerValue("clique_cuts", gen_freqs_[k], prefix);
+    set = s.options()->GetIntegerValue("clique_cuts", gen_freqs_[k], prefix);
     if(set==0) gen_freqs_[k] = -99;
     k++;
     
-    s.options()->GetIntegerValue("flow_cover_cuts", gen_freqs_[k], prefix);
+    set = s.options()->GetIntegerValue("flow_cover_cuts", gen_freqs_[k], prefix);
     if(set==0) gen_freqs_[k] = -99;
     k++;
     
-    s.options()->GetIntegerValue("mir_cuts", gen_freqs_[k], prefix);
+    set = s.options()->GetIntegerValue("mir_cuts", gen_freqs_[k], prefix);
     if(set==0) gen_freqs_[k] = -99;
     k++;
     
