@@ -65,7 +65,7 @@ bonmin.2mir_cuts                            0         	#Frequency (in terms of n
 bonmin.Gomory_cuts                          -5        	#Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.
 bonmin.clique_cuts                          -5        	#Frequency (in terms of nodes) for generating clique cuts in branch-and-cut
 bonmin.cover_cuts                           -5        	#Frequency (in terms of nodes) for generating cover cuts in branch-and-cut
-bonmin.flow_covers_cuts                     -5        	#Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut
+bonmin.flow_cover_cuts                     -5        	#Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut
 bonmin.lift_and_project_cuts                0         	#Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut
 bonmin.mir_cuts                             -5        	#Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut
 bonmin.reduce_and_split_cuts                0         	#Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut

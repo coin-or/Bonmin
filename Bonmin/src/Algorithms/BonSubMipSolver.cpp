@@ -40,7 +40,10 @@ namespace Bonmin {
     cpx_ = (lp_ == NULL)? NULL :
         dynamic_cast<OsiCpxSolverInterface *>(lp_);
 #endif
-    if (strategy) strategy_ = strategy->clone();
+    if (strategy) {
+      strategy_ = dynamic_cast<CbcStrategyDefault *>(strategy->clone());
+      assert(strategy_);
+    }
   }
   SubMipSolver::~SubMipSolver()
   {
@@ -173,12 +176,10 @@ namespace Bonmin {
       int maxNodes)
   {
     if (clp_) {
-      CbcStrategyDefault * strat_default = NULL;
-      if (!strategy_){
-        strat_default = new CbcStrategyDefault(1,5,5, loglevel);
-        strat_default->setupPreProcessing();
-        strategy_ = strat_default;
-      }
+      assert(strategy_);
+      CbcStrategyDefault * strat_default = dynamic_cast<CbcStrategyDefault *>(strategy_->clone());
+      assert(strat_default);
+      strat_default->setupPreProcessing();
 
       OsiBabSolver empty;
       if (cbc_) delete cbc_;
@@ -217,10 +218,7 @@ namespace Bonmin {
       }
       nodeCount_ = cbc_->getNodeCount();
       iterationCount_ = cbc_->getIterationCount();
-      if(strat_default != NULL){
-        delete strat_default;
-        strategy_ = NULL;
-      }
+      delete strat_default;
     }
     else {
       lp_->messageHandler()->setLogLevel(loglevel);
@@ -274,10 +272,11 @@ namespace Bonmin {
 
    /** Assign a strategy. */
    void 
-   SubMipSolver::setStrategy(CbcStrategy * strategy)
+   SubMipSolver::setStrategy(CbcStrategyDefault * strategy)
    {
      if (strategy_) delete strategy_;
-     strategy_ = strategy->clone();
+     strategy_ = dynamic_cast<CbcStrategyDefault *>(strategy->clone());
+     assert(strategy_);
    }
 
   /** Register options.*/

@@ -17,10 +17,10 @@
 #include "CglOddHole.hpp"
 #include "CglClique.hpp"
 #include "CglFlowCover.hpp"
-#include "CglMixedIntegerRounding.hpp"
+#include "CglMixedIntegerRounding2.hpp"
 #include "CglTwomir.hpp"
 #include "CglPreProcess.hpp"
-
+#include "CbcCutGenerator.hpp"
 
 // Node selection
 #include "CbcCompareActual.hpp"
@@ -30,105 +30,134 @@
 
 namespace Bonmin
 {
-  CbcOaStrategy::CbcOaStrategy(int migFreq,
-      int probFreq,
-      int mirFreq,
-      int coverFreq,
-      int minReliability,
-      int numberStrong,
-      int nodeSelection,
-      double intTol,
-      int logLevel
-                              ):
-      CbcStrategy(),
-      migFreq_(migFreq),
-      probFreq_(probFreq),
-      mirFreq_(mirFreq),
-      coverFreq_(coverFreq),
-      minReliability_(minReliability),
-      numberStrong_(numberStrong),
-      nodeSelection_(nodeSelection),
-      intTol_(intTol),
-      logLevel_(logLevel)
+
+  CbcStrategyChooseCuts::CbcStrategyChooseCuts():
+    CbcStrategyDefault(),
+    genFlag_(63)
   {
-    setPreProcessState(0);
+    CoinFillN(gen_freqs_,6,-99);
   }
 
-  CbcStrategy *
-  CbcOaStrategy::clone () const
+  CbcStrategyChooseCuts::CbcStrategyChooseCuts(const CbcStrategyChooseCuts &other):
+    CbcStrategyDefault(other),
+    genFlag_(other.genFlag_)
   {
-    return new CbcOaStrategy(migFreq_, probFreq_,  mirFreq_, coverFreq_, minReliability_,
-        numberStrong_, nodeSelection_, intTol_,
-        logLevel_);
+    CoinCopyN(other.gen_freqs_,6,gen_freqs_);
   }
 
-  void
-  CbcOaStrategy::setupCutGenerators(CbcModel & model)
+  CbcStrategyChooseCuts::CbcStrategyChooseCuts(BabSetupBase &s,
+                                               const std::string &prefix):
+    CbcStrategyDefault(),
+    genFlag_(0)
   {
-
-    CglGomory miGGen;
-
-    CglProbing probGen;
-    probGen.setUsingObjective(true);
-    probGen.setMaxPass(3);
-    probGen.setMaxProbe(100);
-    probGen.setMaxLook(50);
-
-    CglKnapsackCover knapsackGen;
-    CglMixedIntegerRounding mixedGen;
-
-    if (migFreq_ != 0)
-      model.addCutGenerator(&miGGen,migFreq_,"GMI");
-    if (probFreq_ != 0)
-      model.addCutGenerator(&probGen,probFreq_,"Probing");
-    if (coverFreq_ != 0)
-      model.addCutGenerator(&knapsackGen,coverFreq_,"covers");
-    if (mirFreq_ != 0)
-      model.addCutGenerator(&mixedGen,mirFreq_,"MIR");
-
+    setup(s, prefix);
   }
 
-/// Setup heuristics
-  void
-  CbcOaStrategy::setupHeuristics(CbcModel & model)
-{}
+  void CbcStrategyChooseCuts::setup(BabSetupBase &s,
+                               const std::string &prefix){ 
+    s.options()->GetIntegerValue("number_strong_branch", numberStrong_, prefix);
+    s.options()->GetIntegerValue("number_before_trust", numberBeforeTrust_, prefix);
 
-/// Do printing stuff
-  void
-  CbcOaStrategy::setupPrinting(CbcModel & model,int modelLogLevel)
-  {
-    model.messageHandler()->setLogLevel(logLevel_);
-    model.solver()->messageHandler()->setLogLevel(0);
-    model.setPrintFrequency(100);
+    int k = 0;
+    
+    bool set = s.options()->GetIntegerValue("probing_cuts", gen_freqs_[k], prefix);
+    if(set==0) gen_freqs_[k] = -99;
+    k++;
+
+    s.options()->GetIntegerValue("Gomory_cuts", gen_freqs_[k], prefix);
+    if(set==0) gen_freqs_[k] = -99;
+    k++;
+    
+    s.options()->GetIntegerValue("cover_cuts", gen_freqs_[k], prefix);
+    if(set==0) gen_freqs_[k] = -99;
+    k++;
+    
+    s.options()->GetIntegerValue("clique_cuts", gen_freqs_[k], prefix);
+    if(set==0) gen_freqs_[k] = -99;
+    k++;
+    
+    s.options()->GetIntegerValue("flow_cover_cuts", gen_freqs_[k], prefix);
+    if(set==0) gen_freqs_[k] = -99;
+    k++;
+    
+    s.options()->GetIntegerValue("mir_cuts", gen_freqs_[k], prefix);
+    if(set==0) gen_freqs_[k] = -99;
+    k++;
+    
   }
 
-// Other stuff e.g. strong branching
-  void
-  CbcOaStrategy::setupOther(CbcModel & model)
-  {
-    model.setNumberStrong(numberStrong_);
-    model.setNumberBeforeTrust(minReliability_);
+template<class X>
+bool has_cg(CbcModel &model, const X& gen){
+  int numberGenerators = model.numberCutGenerators();
+  for (int iGenerator=0;iGenerator<numberGenerators;iGenerator++) {
+    CglCutGenerator * generator = model.cutGenerator(iGenerator)->generator();
+    X * cgl = dynamic_cast<X *>(generator);
+    if (cgl) {
+      return true;
+    }
+  }
+  return false;
+}
 
-    model.setIntegerTolerance(intTol_);
+#define ADD_CG(model, gen, setting, name) model.addCutGenerator(&gen,setting, name)
 
-    // Definition of node selection strategy
-    CbcCompareObjective compare0;
-    CbcCompareDepth compare1;
-    CbcCompareDefault compare2;
-    if (nodeSelection_==0) {
-      model.setNodeComparison(compare0);
-    }
-    else if (nodeSelection_==1) {
-      model.setNodeComparison(compare1);
-    }
-    else if (nodeSelection_==2) {
-      compare2.setWeight(0.0);
-      model.setNodeComparison(compare2);
-    }
-    else if (nodeSelection_==3) {
-      model.setNodeComparison(compare2);
-    }
+  void 
+  CbcStrategyChooseCuts::setupCutGenerators(CbcModel &model){
+    CglProbing probing;
+    probing.setUsingObjective(true);
+    probing.setMaxPass(1);
+    probing.setMaxPassRoot(1);
+    // Number of unsatisfied variables to look at
+    probing.setMaxProbe(10);
+    // How far to follow the consequences
+    probing.setMaxLook(10);
+    // Only look at rows with fewer than this number of elements
+    probing.setMaxElements(200);
+    probing.setMaxElementsRoot(300);
+    //generator1.setRowCuts(3);
 
+    CglGomory miG;
+    // try larger limit
+    miG.setLimit(300);
+
+    CglKnapsackCover cover;
+
+    CglClique clique;
+    clique.setStarCliqueReport(false);
+    clique.setRowCliqueReport(false);
+
+    CglMixedIntegerRounding2 mixedGen;
+    CglFlowCover flowGen;
+    int k = 0;
+
+    if(gen_freqs_[k]!= 0 && !has_cg(model, probing)){
+      ADD_CG(model, probing, gen_freqs_[k], "Probing"); 
+    }
+    k++;
+
+    if(gen_freqs_[k]!= 0 && !has_cg(model, miG)){
+      ADD_CG(model, miG, gen_freqs_[k], "Gomory"); 
+    }
+    k++;
+    
+    if(gen_freqs_[k] != 0 && !has_cg(model, cover)){
+      ADD_CG(model, cover, gen_freqs_[k], "Knapsack"); 
+    }
+    k++;
+
+    if(gen_freqs_[k] != 0 && !has_cg(model, clique)){
+      ADD_CG(model, clique, gen_freqs_[k], "Clique"); 
+    }
+    k++;
+
+    if(gen_freqs_[k] != 0 && !has_cg(model, flowGen)){
+      ADD_CG(model, flowGen, gen_freqs_[k], "FlowCover"); 
+    }
+    k++;
+
+    if(gen_freqs_[k] != 0 && !has_cg(model, mixedGen)){
+      ADD_CG(model, mixedGen, gen_freqs_[k], "MixedIntegerRounding2"); 
+    }
   }
 
 }

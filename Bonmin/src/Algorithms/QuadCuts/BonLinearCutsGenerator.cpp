@@ -76,7 +76,7 @@ namespace Bonmin {
       cg->id = "Clique";
       methods_.push_back(cg);
     }
-    s.options()->GetIntegerValue("flow_covers_cuts",freq,"bonmin.");
+    s.options()->GetIntegerValue("flow_cover_cuts",freq,"bonmin.");
     if (freq) {
       Coin::SmartPtr<CuttingMethod> cg = new CuttingMethod;
       cg->frequency = freq;

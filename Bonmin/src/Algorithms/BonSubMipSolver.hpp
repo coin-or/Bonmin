@@ -17,6 +17,7 @@ class OsiSolverInterface;
 class OsiClpSolverInterface;
 class OsiCpxSolverInterface;
 class CbcStrategy;
+class CbcStrategyDefault;
 class CbcModel;
 
 namespace Bonmin {
@@ -35,7 +36,7 @@ namespace Bonmin {
       void setLpSolver(OsiSolverInterface * lp);
 
       /** Assign a strategy. */
-      void setStrategy(CbcStrategy * strategy);
+      void setStrategy(CbcStrategyDefault * strategy);
 
       /** get the solution found in last local search (return NULL if no solution). */
       const double * getLastSolution()
@@ -105,7 +106,7 @@ namespace Bonmin {
       /** Has an integer solution? then it is here*/
       double * integerSolution_;
       /** Strategy for solving sub mips with cbc. */
-      CbcStrategy * strategy_;
+      CbcStrategyDefault * strategy_;
       /** number of nodes in last mip solved.*/
       int nodeCount_;
       /** number of simplex iteration in last mip solved.*/

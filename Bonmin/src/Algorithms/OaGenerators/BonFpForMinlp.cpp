@@ -34,48 +34,36 @@ namespace Bonmin
     prefix += "pump_for_minlp.";
     b.options()->GetEnumValue("milp_solver",ivalue,prefix);
     if (ivalue <= 0) {//uses cbc
-      //nothing to do?
+      CbcStrategyDefault strategy;
+      setStrategy(strategy);
     }
     else if (ivalue == 1) {
-      int nodeS, nStrong, nTrust, mig, mir, probe, cover;
-	      b.options()->GetEnumValue("node_comparison",nodeS,prefix);
-	      b.options()->GetIntegerValue("number_strong_branch",nStrong, prefix);
-	      b.options()->GetIntegerValue("number_before_trust", nTrust, prefix);
-	      b.options()->GetIntegerValue("Gomory_cuts", mig, prefix);
-//	      b.options()->GetIntegerValue("probing_cuts",probe, prefix);
-	      b.options()->GetIntegerValue("mir_cuts",mir, prefix);
-	      b.options()->GetIntegerValue("cover_cuts",cover,prefix);
-              probe = 0;	      
-              //printf("Probing to 0\n");
-	      CbcStrategy * strategy =
-		new CbcOaStrategy(mig, probe, mir, cover, nTrust,
-		    nStrong, nodeS, parameters_.cbcIntegerTolerance_, parameters_.subMilpLogLevel_);
-	      setStrategy(*strategy);
-	      delete strategy;
+      CbcStrategyChooseCuts strategy(b, prefix);
+      setStrategy(strategy);
+    }
+    else if (ivalue == 2) {
+#ifdef COIN_HAS_CPX
+      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
+      b.nonlinearSolver()->extractLinearRelaxation(*cpxSolver);
+      assignLpInterface(cpxSolver);
+#else
+      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
+      << "subsolver in oa decomposition. However, apparently\n"
+      << "CPLEX is not configured to be used in bonmin.\n"
+      << "See the manual for configuring CPLEX\n";
+      throw -1;
+#endif
+    }
 
-	    }
-	    else if (ivalue == 2) {
-	#ifdef COIN_HAS_CPX
-	      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
-	      b.nonlinearSolver()->extractLinearRelaxation(*cpxSolver);
-	      assignLpInterface(cpxSolver);
-	#else
-	      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
-	      << "subsolver in oa decomposition. However, apparently\n"
-	      << "CPLEX is not configured to be used in bonmin.\n"
-	      << "See the manual for configuring CPLEX\n";
-	      throw -1;
-	#endif
-	    }
-
-	    double oaTime;
-            b.options()->GetNumericValue("time_limit",oaTime,prefix);
-            parameter().localSearchNodeLimit_ = 1000000;
-            parameter().maxLocalSearch_ = 100000;
-            parameter().maxLocalSearchPerNode_ = 10000;
-            parameter().maxLocalSearchTime_ =
-            std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
+    double oaTime;
+    b.options()->GetNumericValue("time_limit",oaTime,prefix);
+    parameter().localSearchNodeLimit_ = 1000000;
+    parameter().maxLocalSearch_ = 100000;
+    parameter().maxLocalSearchPerNode_ = 10000;
+    parameter().maxLocalSearchTime_ =
+    std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
   }
+
   MinlpFeasPump::~MinlpFeasPump()
   {}
 
