@@ -6,9 +6,9 @@ ThirdParty/ASL https://projects.coin-or.org/svn/BuildTools/ThirdParty/ASL/stable
 ThirdParty/Mumps https://projects.coin-or.org/svn/BuildTools/ThirdParty/Mumps/stable/1.1
 ThirdParty/FilterSQP https://projects.coin-or.org/svn/BuildTools/ThirdParty/FilterSQP/stable/1.0
 Data/Sample https://projects.coin-or.org/svn/Data/stable/1.0/Sample
-CoinUtils https://projects.coin-or.org/svn/CoinUtils/stable/2.5/CoinUtils
-Cbc https://projects.coin-or.org/svn/Cbc/stable/2.3/Cbc
-Cgl https://projects.coin-or.org/svn/Cgl/stable/0.54/Cgl
-Clp https://projects.coin-or.org/svn/Clp/stable/1.10/Clp
+CoinUtils https://projects.coin-or.org/svn/CoinUtils/stable/2.3/CoinUtils
+Cbc https://projects.coin-or.org/svn/Cbc/stable/2.2/Cbc
+Cgl https://projects.coin-or.org/svn/Cgl/stable/0.53/Cgl
+Clp https://projects.coin-or.org/svn/Clp/stable/1.8/Clp
 Ipopt https://projects.coin-or.org/svn/Ipopt/stable/3.6/Ipopt
-Osi https://projects.coin-or.org/svn/Osi/stable/0.100/Osi
+Osi https://projects.coin-or.org/svn/Osi/stable/0.99/Osi
