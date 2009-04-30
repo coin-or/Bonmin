@@ -300,7 +300,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
        BonminAmplSetup bonmin;
        bonmin.initialize(amplSi,const_cast<char **&>(argv));
        OsiTMINLPInterface& si = *bonmin.nonlinearSolver();
-      si.setExposeWarmStart(true);
+       si.setExposeWarmStart(true);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
     <<std::endl<<"Testing useful constructor"<<std::endl
     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;

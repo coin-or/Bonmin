@@ -57,7 +57,7 @@
 #include "BonHeuristicDiveMIPVectorLength.hpp"
 namespace Bonmin
 {
-  BonminSetup::BonminSetup():BabSetupBase(),algo_(Dummy)
+  BonminSetup::BonminSetup(const CoinMessageHandler * handler):BabSetupBase(handler),algo_(Dummy)
   {}
 
   BonminSetup::BonminSetup(const BonminSetup &other):BabSetupBase(other),
@@ -74,8 +74,8 @@ namespace Bonmin
       continuousSolver_ = new OsiClpSolverInterface;
       int lpLogLevel;
       options_->GetIntegerValue("lp_log_level",lpLogLevel,prefix_.c_str());
-      lpMessageHandler_ = nonlinearSolver_->messageHandler()->clone();
-      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+      if(messageHandler_)
+        continuousSolver_->passInMessageHandler(messageHandler_);
       continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
       nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
       // say bound dubious, does cuts at solution
@@ -573,8 +573,8 @@ namespace Bonmin
       continuousSolver_ = new OsiClpSolverInterface;
       int lpLogLevel;
       options_->GetIntegerValue("lp_log_level",lpLogLevel,prefix_.c_str());
-      lpMessageHandler_ = nonlinearSolver_->messageHandler()->clone();
-      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+      if(messageHandler_)
+        continuousSolver_->passInMessageHandler(messageHandler_);
       continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
       nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
       // say bound dubious, does cuts at solution
@@ -648,7 +648,7 @@ namespace Bonmin
       CuttingMethod cg;
       cg.frequency = ival;
       OaNlpOptim * nlpsol = new OaNlpOptim(*this);
-      nlpsol->passInMessageHandler(nonlinearSolver_->messageHandler());
+      nlpsol->passInMessageHandler(messageHandler_);
       cg.cgl = nlpsol;
       cg.id="NLP solution based oa cuts";
       cutGenerators_.push_back(cg);
@@ -659,7 +659,7 @@ namespace Bonmin
       CuttingMethod cg;
       cg.frequency = ival;
       EcpCuts * ecp = new EcpCuts(*this);
-      ecp->passInMessageHandler(nonlinearSolver_->messageHandler());
+      ecp->passInMessageHandler(messageHandler_);
       cg.cgl = ecp;
       cg.id = "Ecp cuts";
       cutGenerators_.push_back(cg);
@@ -674,7 +674,7 @@ namespace Bonmin
       CuttingMethod cg;
       cg.frequency = -99;
       MinlpFeasPump * oa = new MinlpFeasPump(*this);
-      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
+      oa->passInMessageHandler(messageHandler_);
       cg.cgl = oa;
       cg.id = "Feasibility Pump for MINLP.";
       cutGenerators_.push_back(cg);
@@ -686,7 +686,7 @@ namespace Bonmin
       CuttingMethod cg;
       cg.frequency = -99;
       OACutGenerator2 * oa = new OACutGenerator2(*this);
-      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
+      oa->passInMessageHandler(messageHandler_);
       cg.cgl = oa;
       cg.id = "Outer Approximation decomposition.";
       cutGenerators_.push_back(cg);
@@ -697,7 +697,7 @@ namespace Bonmin
       CuttingMethod cg;
       cg.frequency = 1;
       OaFeasibilityChecker * oa = new OaFeasibilityChecker(*this);
-      oa->passInMessageHandler(nonlinearSolver_->messageHandler());
+      oa->passInMessageHandler(messageHandler_);
       cg.cgl = oa;
       cg.id = "Outer Approximation feasibility check.";
       cg.atSolution = true;

@@ -54,7 +54,7 @@ namespace Bonmin {
      int dummy;
      std::string prefix = "pump_for_minlp.";
      changeIfNotSet(options, prefix, "algorithm", "B-iFP");
-     changeIfNotSet(options, prefix, "time_limit", 60.);
+     changeIfNotSet(options, prefix, "time_limit", 30.);
    }
 
 

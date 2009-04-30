@@ -126,10 +126,10 @@ namespace Bonmin
     };
 
     /** Default constructor. */
-    BabSetupBase();
+    BabSetupBase(const CoinMessageHandler * handler = NULL);
 
     /** Construct from existing tminlp. */
-    BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp);
+    BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp, const CoinMessageHandler * handler = NULL);
     /** Construct from existing application.*/
     BabSetupBase(Ipopt::SmartPtr<TNLPSolver> app);
     /** Construct from existing TMINLP interface.*/
@@ -357,8 +357,8 @@ namespace Bonmin
 
     /** flag to say if option file was read.*/
     bool readOptions_;
-    /** separate message handler if continuousSolver_!= nonlinearSolver.*/
-    CoinMessageHandler * lpMessageHandler_;
+    /** separate message handler.*/
+    CoinMessageHandler * messageHandler_;
     /** Prefix to use when reading options.*/
     std::string prefix_;
   };

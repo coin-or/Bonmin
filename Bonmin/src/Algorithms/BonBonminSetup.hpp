@@ -26,7 +26,7 @@ namespace Bonmin
   {
   public:
     /** Default constructor. */
-    BonminSetup();
+    BonminSetup(const CoinMessageHandler * handler = NULL);
     /** Copy constructor. */
     BonminSetup(const BonminSetup & other);
 

@@ -51,7 +51,7 @@ namespace Bonmin
         COIN_DBL_MAX /* MaxTime*/,
       };
 
-  BabSetupBase::BabSetupBase():
+  BabSetupBase::BabSetupBase(const CoinMessageHandler * handler):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
       cutGenerators_(),
@@ -64,11 +64,12 @@ namespace Bonmin
       options_(NULL),
       roptions_(NULL),
       readOptions_(false),
-      lpMessageHandler_(NULL),
+      messageHandler_(NULL),
       prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
+    if(handler) messageHandler_ = handler->clone();
   }
 
   /** Copy constructor. */
@@ -85,7 +86,7 @@ namespace Bonmin
       options_(NULL),
       roptions_(other.roptions_),
       readOptions_(other.readOptions_),
-      lpMessageHandler_(NULL),
+      messageHandler_(NULL),
       prefix_(other.prefix_)
   {
     if (other.nonlinearSolver_) {
@@ -94,9 +95,9 @@ namespace Bonmin
     if (other.continuousSolver_) {
       continuousSolver_ = other.continuousSolver_->clone();
     }
-    if (other.lpMessageHandler_) {
-      lpMessageHandler_ = other.lpMessageHandler_->clone();
-      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+    if (other.messageHandler_) {
+      messageHandler_ = other.messageHandler_->clone();
+      continuousSolver_->passInMessageHandler(messageHandler_);
     }
     for (CuttingMethods::const_iterator i = other.cutGenerators_.begin() ; i != other.cutGenerators_.end() ; i++) {
       cutGenerators_.push_back(*i);
@@ -136,7 +137,7 @@ namespace Bonmin
       options_(NULL),
       roptions_(other.roptions_),
       readOptions_(other.readOptions_),
-      lpMessageHandler_(NULL),
+      messageHandler_(NULL),
       prefix_(other.prefix_)
   {
     nonlinearSolver_ = &nlp;
@@ -145,9 +146,9 @@ namespace Bonmin
     }
     else
       continuousSolver_ = nonlinearSolver_;
-    if (other.lpMessageHandler_) {
-      lpMessageHandler_ = other.lpMessageHandler_->clone();
-      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+    if (other.messageHandler_) {
+      messageHandler_ = other.messageHandler_->clone();
+      continuousSolver_->passInMessageHandler(messageHandler_);
     }
     for (CuttingMethods::const_iterator i = other.cutGenerators_.begin() ; i != other.cutGenerators_.end() ; i++) {
       cutGenerators_.push_back(*i);
@@ -187,7 +188,7 @@ namespace Bonmin
       options_(NULL),
       roptions_(other.roptions_),
       readOptions_(other.readOptions_),
-      lpMessageHandler_(NULL),
+      messageHandler_(NULL),
       prefix_(prefix)
   {
     nonlinearSolver_ = &nlp;
@@ -195,9 +196,9 @@ namespace Bonmin
       options_ = new OptionsList;
       *options_ = *other.options_;
     }
-    if (other.lpMessageHandler_) {
-      lpMessageHandler_ = other.lpMessageHandler_->clone();
-      continuousSolver_->passInMessageHandler(lpMessageHandler_);
+    if (other.messageHandler_) {
+      messageHandler_ = other.messageHandler_->clone();
+      continuousSolver_->passInMessageHandler(messageHandler_);
     }
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
@@ -207,7 +208,7 @@ namespace Bonmin
     }
   }
 
-  BabSetupBase::BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp):
+  BabSetupBase::BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp, const CoinMessageHandler * handler):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
       cutGenerators_(),
@@ -217,11 +218,12 @@ namespace Bonmin
       treeTraversalMethod_(),
       objects_(0),
       readOptions_(false),
-      lpMessageHandler_(NULL),
+      messageHandler_(NULL),
       prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
+    if(handler) messageHandler_ = handler->clone();
     use(tminlp);
   }
 
@@ -248,6 +250,10 @@ namespace Bonmin
       tminlp = GetRawPtr(linObj);
     }
     nonlinearSolver_->initialize(roptions_, options_, journalist_, prefix(), tminlp);
+    if(messageHandler_ != NULL)
+      nonlinearSolver_->passInMessageHandler(messageHandler_);
+    else
+      messageHandler_ = nonlinearSolver_->messageHandler()->clone();
     if (ival){
       nonlinearSolver_->use(new Bonmin::TMINLP2TNLPQuadCuts(tminlp));
     }
@@ -266,7 +272,7 @@ namespace Bonmin
       options_(NULL),
       roptions_(NULL),
       readOptions_(false),
-      lpMessageHandler_(NULL),
+      messageHandler_(NULL),
       prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
@@ -281,6 +287,8 @@ namespace Bonmin
     options_ = nonlinearSolver_->solver()->options();
     roptions_ = nonlinearSolver_->solver()->roptions();
     journalist_ = nonlinearSolver_->solver()->journalist();
+    if(messageHandler_ != NULL ) delete messageHandler_;		
+    messageHandler_ = nlp.messageHandler()->clone();
     readOptions_ = true;
   }
 
@@ -297,6 +305,7 @@ namespace Bonmin
       options_(app->options()),
       roptions_(app->roptions()),
       readOptions_(true),
+      messageHandler_(NULL),
       prefix_("bonmin.")
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
@@ -324,7 +333,8 @@ namespace Bonmin
       delete objects_[i];
     }
 
-    delete lpMessageHandler_;
+    if(messageHandler_)
+      delete messageHandler_;
   }
 
 

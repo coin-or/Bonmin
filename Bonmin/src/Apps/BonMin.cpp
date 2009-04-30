@@ -37,6 +37,7 @@ int main (int argc, char *argv[])
 #endif 
   {
 
+    FILE * fp = fopen("log","w");
     BonminAmplSetup bonmin;
     bonmin.initialize(argv);
     Bab bb;

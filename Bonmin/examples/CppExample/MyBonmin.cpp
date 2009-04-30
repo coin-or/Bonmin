@@ -27,7 +27,7 @@
 #include "BonOACutGenerator2.hpp"
 #include "BonEcpCuts.hpp"
 #include "BonOaNlpOptim.hpp"
-
+//#define REDIRECT
 
 int main (int argc, char *argv[])
 {
@@ -37,8 +37,13 @@ int main (int argc, char *argv[])
   using namespace Bonmin;
   SmartPtr<MyTMINLP> tminlp = new MyTMINLP;
   
-
+#ifdef REDIRECT
+  FILE * fp = fopen("log.out","w");
+  CoinMessageHandler handler(fp);
+  BonminSetup bonmin(&handler);
+#else
   BonminSetup bonmin;
+#endif
   bonmin.initializeOptionsAndJournalist();
   //Register an additional option
   bonmin.roptions()->AddStringOption2("print_solution","Do we print the solution or not?",
