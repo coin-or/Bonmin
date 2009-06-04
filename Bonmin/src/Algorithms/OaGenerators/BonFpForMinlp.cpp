@@ -114,7 +114,6 @@ namespace Bonmin
 
     bool milpOptimal = false;
     nlp_->resolve();
-    //printf("Time limit is %g", parameters_.maxLocalSearchTime_);
     if (subMip)//Perform a local search
     {
       assert(subMip->solver() == lp);
