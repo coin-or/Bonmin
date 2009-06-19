@@ -309,8 +309,8 @@ namespace Bonmin
     x_init_.resize(num_variables() * 3 + num_constraints(), 0.);
     if(!duals_init_)
       duals_init_ = x_init_() + num_variables();
-
-    IpBlasDcopy(m, duals_init, 1, duals_init_, 1);
+    if(m > 0)
+      IpBlasDcopy(m, duals_init, 1, duals_init_, 1);
 
   }
 
@@ -350,8 +350,10 @@ namespace Bonmin
     assert(m==num_constraints());
     IpBlasDcopy(n, x_l_(), 1, x_l, 1);
     IpBlasDcopy(n, x_u_(), 1, x_u, 1);
-    IpBlasDcopy(m, g_l_(), 1, g_l, 1);
-    IpBlasDcopy(m, g_u_(), 1, g_u, 1);
+    if(m > 0){
+      IpBlasDcopy(m, g_l_(), 1, g_l, 1);
+      IpBlasDcopy(m, g_u_(), 1, g_u, 1);
+    }
     return true;
   }
 
@@ -379,7 +381,9 @@ namespace Bonmin
     if(init_lambda == true) {
       if(duals_init_ == NULL)
         return false;
-      IpBlasDcopy(m, duals_init_ + 2*n , 1, lambda, 1);
+      if(m > 0){
+        IpBlasDcopy(m, duals_init_ + 2*n , 1, lambda, 1);
+      }
     }
 
     need_new_warm_starter_ = true;
@@ -466,11 +470,14 @@ namespace Bonmin
     
     IpBlasDcopy(n, x, 1, x_sol_(), 1);
 
-    g_sol_.resize(m);
-    IpBlasDcopy(m, g, 1, g_sol_(), 1);
+    if(m > 0){
+      g_sol_.resize(m);
+      IpBlasDcopy(m, g, 1, g_sol_(), 1);
+    }
     duals_sol_.resize(m + 2*n);
     if(lambda){
-      IpBlasDcopy(m, lambda, 1, duals_sol_() + 2*n, 1);
+      if(m > 0)
+        IpBlasDcopy(m, lambda, 1, duals_sol_() + 2*n, 1);
       
       IpBlasDcopy(n, z_L, 1 , duals_sol_() , 1);
       IpBlasDcopy(n, z_U, 1 , duals_sol_() + n, 1);

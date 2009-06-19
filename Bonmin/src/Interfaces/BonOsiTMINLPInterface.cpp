@@ -994,6 +994,7 @@ void OsiTMINLPInterface::extractSenseRhsAndRange() const
 {
   assert(rowsense_==NULL&&rhs_==NULL&&rowrange_==NULL);
   int numrows = problem_->num_constraints();
+  if(numrows == 0) return;
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
   rowsense_ = new char [numrows];

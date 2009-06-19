@@ -82,7 +82,8 @@ namespace Bonmin
       journalist_(other.journalist_),
       options_(NULL),
       roptions_(other.roptions_),
-      readOptions_(other.readOptions_)
+      readOptions_(other.readOptions_),
+      lpMessageHandler_(NULL)
   {
     if (other.nonlinearSolver_) {
       nonlinearSolver_ = static_cast<OsiTMINLPInterface *>(other.nonlinearSolver_->clone());
@@ -130,7 +131,8 @@ namespace Bonmin
       journalist_(other.journalist_),
       options_(NULL),
       roptions_(other.roptions_),
-      readOptions_(other.readOptions_)
+      readOptions_(other.readOptions_),
+      lpMessageHandler_(NULL)
   {
       nonlinearSolver_ = &nlp;
     if (other.continuousSolver_ != other.nonlinearSolver_) {
@@ -241,7 +243,8 @@ namespace Bonmin
       journalist_(app->journalist()),
       options_(app->options()),
       roptions_(app->roptions()),
-      readOptions_(true)
+      readOptions_(true),
+      lpMessageHandler_(NULL)
   {
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
