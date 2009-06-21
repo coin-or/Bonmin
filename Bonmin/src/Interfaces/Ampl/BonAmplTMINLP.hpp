@@ -271,6 +271,8 @@ namespace Bonmin
     /** Overloaded Equals Operator */
     void operator=(const AmplTMINLP&);
     //@}
+     /** Name of application.*/
+    std::string appName_;
 
     /** Index of the objective to use for upper bounding*/
     int upperBoundingObj_;
