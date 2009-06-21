@@ -23,7 +23,6 @@ namespace Bonmin
     enum MipStatuses {FeasibleOptimal /** Optimum solution has been found and its optimality proved.*/,
         ProvenInfeasible /** Problem has been proven to be infeasible.*/,
         Feasible /** An integer solution to the problem has been found.*/,
-        UnboundedOrInfeasible /*Coninuous relaxation is unbounded.*/,
         NoSolutionKnown/** No feasible solution to the problem is known*/};
     /** Constructor.*/
     Bab();

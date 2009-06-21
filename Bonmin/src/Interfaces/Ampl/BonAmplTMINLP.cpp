@@ -63,7 +63,6 @@ namespace Bonmin
   AmplTMINLP::AmplTMINLP()
       :
       TMINLP(),
-      appName_(),
       upperBoundingObj_(-1),
       ampl_tnlp_(NULL),
       branch_(),
@@ -88,7 +87,6 @@ namespace Bonmin
                         )
       :
       TMINLP(),
-      appName_(),
       upperBoundingObj_(-1),
       ampl_tnlp_(NULL),
       branch_(),
@@ -114,7 +112,6 @@ namespace Bonmin
       std::string* nl_file_content /* = NULL */
                         )
   {
-    appName_ = appName;
     options->GetEnumValue("file_solution",writeAmplSolFile_,"bonmin.");
     jnlst_ = jnlst;
 
@@ -662,23 +659,19 @@ namespace Bonmin
     std::string status_str;
     if (status == TMINLP::SUCCESS) {
       status_str = "\t\"Finished\"";
-      message = "\n"+ appName_ +" Optimal";
+      message = "\nbonmin: Optimal";
     }
     else if (status == TMINLP::INFEASIBLE) {
       status_str = "\t\"Finished\"";
-      message = "\n" + appName_ +" Infeasible problem";
-    }
-    else if (status == TMINLP::CONTINUOUS_UNBOUNDED) {
-      status_str = "\t\"Finished\"";
-      message = "\n" + appName_ +" Continuous relaxation is unbounded.";
+      message = "\nbonmin: Infeasible problem";
     }
     else if (status == TMINLP::LIMIT_EXCEEDED) {
       status_str = "\t\"Not finished\"";
-      message = "\n" + appName_ +" Optimization interrupted on limit.";
+      message = "\n Optimization interrupted on limit.";
     }
     else if (status == TMINLP::MINLP_ERROR) {
       status_str = "\t\"Aborted\"";
-      message = "\n" + appName_ + " Error encountered in optimization.";
+      message = "\n Error encountered in optimization.";
     }
     if (writeAmplSolFile_) {
       write_solution(message, x);
@@ -686,8 +679,7 @@ namespace Bonmin
     }
     else {
       std::cout<<status_str<<message<<std::endl;
-      std::string fName = appName_ + ".sol";
-      std::ofstream of(fName.c_str());
+      std::ofstream of("bonmin.sol");
       for (int i = 0 ; i < n ; i++) {
         of<<i<<"\t"<<x[i]<<std::endl;
       }
