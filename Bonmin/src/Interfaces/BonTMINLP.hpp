@@ -65,6 +65,7 @@ namespace Bonmin
     enum SolverReturn{
       SUCCESS,
       INFEASIBLE,
+      CONTINUOUS_UNBOUNDED,
       LIMIT_EXCEEDED,
       MINLP_ERROR};
     /** Class to store sos constraints for model */

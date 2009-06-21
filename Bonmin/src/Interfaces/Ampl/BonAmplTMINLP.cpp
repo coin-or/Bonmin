@@ -112,6 +112,7 @@ namespace Bonmin
       std::string* nl_file_content /* = NULL */
                         )
   {
+    appName_ = appName;
     options->GetEnumValue("file_solution",writeAmplSolFile_,"bonmin.");
     jnlst_ = jnlst;
 
@@ -658,19 +659,19 @@ namespace Bonmin
     std::string status_str;
     if (status == TMINLP::SUCCESS) {
       status_str = "\t\"Finished\"";
-      message = "\nbonmin: Optimal";
+      message = "\n" + appName_ +": Optimal";
     }
     else if (status == TMINLP::INFEASIBLE) {
       status_str = "\t\"Finished\"";
-      message = "\nbonmin: Infeasible problem";
+      message = "\n" + appName_ + ": Infeasible problem";
     }
     else if (status == TMINLP::LIMIT_EXCEEDED) {
       status_str = "\t\"Not finished\"";
-      message = "\n Optimization interupted on limit.";
+      message = "\n" + appName_ + ": Optimization interupted on limit.";
     }
     else if (status == TMINLP::MINLP_ERROR) {
       status_str = "\t\"Aborted\"";
-      message = "\n Error encountered in optimization.";
+      message = "\n" + appName_ + ": Error encountered in optimization.";
     }
     if (writeAmplSolFile_) {
       write_solution(message, x);

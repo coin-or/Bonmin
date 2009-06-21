@@ -590,6 +590,11 @@ namespace Bonmin
       CoinCopyN(model_.bestSolution(), s.nonlinearSolver()->getNumCols(), bestSolution_);
     }
     if (model_.status() == 0) {
+      if(model_.isContinuousUnbounded()){
+        status = TMINLP::CONTINUOUS_UNBOUNDED;
+        mipStatus_ = UnboundedOrInfeasible;
+      }
+      else
       if (bestSolution_) {
         status = TMINLP::SUCCESS;
         mipStatus_ = FeasibleOptimal;
