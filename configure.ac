@@ -48,6 +48,7 @@ AC_COIN_THIRDPARTY_SUBDIRS([HSL],[ThirdParty/HSL],[configure.ac])
 AC_COIN_THIRDPARTY_SUBDIRS([ASL],[ThirdParty/ASL],[solvers/asl.h])
 AC_COIN_THIRDPARTY_SUBDIRS([FilterSQP],[ThirdParty/FilterSQP],[source/src/filter.f])
 AC_COIN_THIRDPARTY_SUBDIRS([Mumps],[ThirdParty/Mumps],[MUMPS/src/dmumps_part1.F])
+AC_COIN_THIRDPARTY_SUBDIRS([Metis],[ThirdParty/Metis],[metis-4.0/Lib/balance.c])
 
 #############################################################################
 #                  Check which subprojects are there                        #
