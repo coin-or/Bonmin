@@ -198,7 +198,6 @@ AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
 AC_CONFIG_FILES([Makefile
                  src/Apps/Makefile
                  experimental/Bcp/Makefile
-                 experimental/NotConvex/Makefile
                  experimental/FP/Makefile
                  src/CbcBonmin/Makefile
                  src/CbcBonmin/bonmin_addlibs_cpp.txt

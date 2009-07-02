@@ -24131,7 +24131,7 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile experimental/NotConvex/Makefile experimental/FP/Makefile src/CbcBonmin/Makefile src/CbcBonmin/bonmin_addlibs_cpp.txt src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile examples/OptionDocGen/Makefile test/Makefile examples/CppExample/Makefile"
+                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Apps/Makefile experimental/Bcp/Makefile experimental/FP/Makefile src/CbcBonmin/Makefile src/CbcBonmin/bonmin_addlibs_cpp.txt src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/OaGenerators/Makefile examples/OptionDocGen/Makefile test/Makefile examples/CppExample/Makefile"
 
 
           ac_config_headers="$ac_config_headers inc/config_bonmin.h"
@@ -24945,7 +24945,6 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "src/Apps/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Apps/Makefile" ;;
   "experimental/Bcp/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/Bcp/Makefile" ;;
-  "experimental/NotConvex/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/NotConvex/Makefile" ;;
   "experimental/FP/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/FP/Makefile" ;;
   "src/CbcBonmin/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/CbcBonmin/Makefile" ;;
   "src/CbcBonmin/bonmin_addlibs_cpp.txt" ) CONFIG_FILES="$CONFIG_FILES src/CbcBonmin/bonmin_addlibs_cpp.txt" ;;
