@@ -222,7 +222,6 @@ AC_CONFIG_FILES([Makefile
                  src/Algorithms/OaGenerators/Makefile
                  src/CbcBonmin/Heuristics/Makefile
                  experimental/FP/Makefile
-                 experimental/NotConvex/Makefile
                  examples/OptionDocGen/Makefile
                  test/Makefile
                  examples/CppExample/Makefile])
