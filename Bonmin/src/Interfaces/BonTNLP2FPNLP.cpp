@@ -127,7 +127,7 @@ namespace Bonmin
   TNLP2FPNLP::get_bounds_info(Index n, Number* x_l, Number* x_u,
 			      Index m, Number* g_l, Number* g_u)
   {
-    bool ret_code;
+    bool ret_code = true;
 
     if(use_cutoff_constraint_ && use_local_branching_constraint_) {
       tnlp_->get_bounds_info(n, x_l , x_u, m-2, g_l, g_u);
