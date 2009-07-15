@@ -54,6 +54,7 @@ namespace Bonmin
 
     options->GetIntegerValue("bb_log_level", bb_log_level_, "bonmin.");
     handler_->setLogLevel(bb_log_level_);
+    options->GetNumericValue("time_limit", time_limit_, "bonmin.");
     options->GetNumericValue("setup_pseudo_frac", setup_pseudo_frac_, "bonmin.");
     options->GetNumericValue("maxmin_crit_no_sol", maxmin_crit_no_sol_, "bonmin.");
     options->GetNumericValue("maxmin_crit_have_sol", maxmin_crit_have_sol_, "bonmin.");
@@ -81,11 +82,14 @@ namespace Bonmin
     options->GetIntegerValue("min_number_strong_branch", minNumberStrongBranch_, "bonmin.");
     options->GetIntegerValue("number_look_ahead", numberLookAhead_, "bonmin.");
 
+    start_time_ = CoinCpuTime();
   }
 
   BonChooseVariable::BonChooseVariable(const BonChooseVariable & rhs) :
       OsiChooseVariable(rhs),
       results_(rhs.results_),
+      time_limit_(rhs.time_limit_),
+      start_time_(CoinCpuTime()),
       cbc_model_(rhs.cbc_model_),
       only_pseudo_when_trusted_(rhs.only_pseudo_when_trusted_),
       maxmin_crit_no_sol_(rhs.maxmin_crit_no_sol_),
@@ -897,7 +901,8 @@ namespace Bonmin
   	break;
         }
       }
-      bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_);
+      bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_)
+                        || ( CoinCpuTime() - start_time_ > time_limit_);
       if (hitMaxTime) {
         returnCode=3;
         break;
