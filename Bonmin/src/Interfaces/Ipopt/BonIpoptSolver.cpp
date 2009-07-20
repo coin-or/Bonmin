@@ -68,6 +68,7 @@ namespace Bonmin
   IpoptSolver::clone()
   {
     SmartPtr<IpoptSolver> retval = new IpoptSolver(*this);
+    retval->app_->Initialize("");
     return GetRawPtr(retval);
   }
 
