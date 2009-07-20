@@ -61,6 +61,7 @@ namespace Bonmin
     retval->warmStartStrategy_ = warmStartStrategy_;
     retval->problemHadZeroDimension_ = problemHadZeroDimension_;
     retval->optimizationStatus_ = optimizationStatus_;
+    retval->app_->Initialize("");
 
     enable_warm_start_ = false;
     optimized_before_ = false;
