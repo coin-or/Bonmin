@@ -198,7 +198,7 @@ namespace Bonmin
     }
     if (other.messageHandler_) {
       messageHandler_ = other.messageHandler_->clone();
-      continuousSolver_->passInMessageHandler(messageHandler_);
+      nonlinearSolver_->passInMessageHandler(messageHandler_);
     }
     CoinCopyN(defaultIntParam_, NumberIntParam, intParam_);
     CoinCopyN(defaultDoubleParam_, NumberDoubleParam, doubleParam_);
