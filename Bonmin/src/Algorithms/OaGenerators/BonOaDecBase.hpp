@@ -195,7 +195,7 @@ namespace Bonmin
       /** Destructor */
       ~Parameters()
       {
-        if (!strategy_) delete strategy_;
+        if (strategy_) delete strategy_;
       }
 
       /** Strategy to apply when using Cbc as MILP sub-solver.*/
