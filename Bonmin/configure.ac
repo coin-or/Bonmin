@@ -89,18 +89,6 @@ if test "$use_bcp" = yes; then
 fi
 AM_CONDITIONAL(COMPILE_BONMINBCP, test "$use_bcp" = yes)
 
-AC_ARG_WITH([boncouenne],
-            AC_HELP_STRING([--with-boncouenne],
-                           [Compile Bonmin with Couenne parallel version]),
-            [use_couenne="$withval"], [use_couenne=no])
-if test "$use_couenne" = yes; then
-  if test $m4_tolower(coin_has_$1) = unavailable ||
-     test $m4_tolower(coin_has_$1) = skipping; then
-     AC_MSG_ERROR([You specified --with-boncouenne, but Couenne is not available])
-  fi
-fi
-AM_CONDITIONAL(COMPILE_BONCOUENNE, test "$use_couenne" = yes)
-
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################
@@ -109,7 +97,7 @@ AM_CONDITIONAL(COMPILE_BONCOUENNE, test "$use_couenne" = yes)
 AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
 AC_COIN_HAS_GLPK(Glpk)
 AC_COIN_HAS_USER_LIBRARY([FortMP],[FMP])  #ToDo! is Fortran?
-AC_COIN_HAS_USER_LIBRARY([Mosek],[MSK],[mosekdl.h],[MSK_openmosek])
+AC_COIN_HAS_USER_LIBRARY([Mosek],[MSK],[mosek.h],[MSK_openmosek])
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])

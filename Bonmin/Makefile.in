@@ -53,12 +53,11 @@ build_triplet = @build@
 host_triplet = @host@
 @BUILD_FP_TRUE@am__append_1 = experimental/FP
 @COMPILE_BONMINBCP_TRUE@am__append_2 = experimental/Bcp
-@COMPILE_BONCOUENNE_TRUE@am__append_3 = experimental/NotConvex
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball
-@ALWAYS_FALSE@am__append_4 = test
+@ALWAYS_FALSE@am__append_3 = test
 DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/../BuildTools/Makemain.inc $(srcdir)/../config.guess \
 	$(srcdir)/../config.sub $(srcdir)/../install-sh \
@@ -71,8 +70,8 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.hpp \
 	$(top_srcdir)/examples/OptionDocGen/Makefile.in \
 	$(top_srcdir)/inc/config_bonmin.h.in AUTHORS INSTALL
-@HAVE_EXTERNALS_TRUE@am__append_5 = Externals
-@HAVE_EXTERNALS_TRUE@am__append_6 = .Externals-stamp
+@HAVE_EXTERNALS_TRUE@am__append_4 = Externals
+@HAVE_EXTERNALS_TRUE@am__append_5 = .Externals-stamp
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -96,7 +95,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
-	experimental/FP experimental/Bcp experimental/NotConvex test
+	experimental/FP experimental/Bcp test
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -192,8 +191,6 @@ COIN_HAS_VOL_FALSE = @COIN_HAS_VOL_FALSE@
 COIN_HAS_VOL_TRUE = @COIN_HAS_VOL_TRUE@
 COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
 COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
-COMPILE_BONCOUENNE_FALSE = @COMPILE_BONCOUENNE_FALSE@
-COMPILE_BONCOUENNE_TRUE = @COMPILE_BONCOUENNE_TRUE@
 COMPILE_BONMINBCP_FALSE = @COMPILE_BONMINBCP_FALSE@
 COMPILE_BONMINBCP_TRUE = @COMPILE_BONMINBCP_TRUE@
 COUENNEDOCDIR = @COUENNEDOCDIR@
@@ -232,6 +229,7 @@ FMPINCDIR = @FMPINCDIR@
 FMPLIB = @FMPLIB@
 GLPKINCDIR = @GLPKINCDIR@
 GLPKLIB = @GLPKLIB@
+GLPKOBJDIR = @GLPKOBJDIR@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
@@ -353,8 +351,7 @@ AUTOMAKE_OPTIONS = foreign
 
 # Here list all subdirectories into which to recurse
 SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
-	$(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4)
+	$(am__append_1) $(am__append_2) $(am__append_3)
 
 ########################################################################
 #             Additional files to be included in tarball               #
@@ -365,7 +362,7 @@ EXTRA_DIST = doc/Bonmin_ReferenceManual.hpp \
 	doc/Bonm-Min_UsersManual.pdf doc/Bonm-Min_UsersManual.tex \
 	doc/BOUM_Intro.tex doc/options.tex test/InterfaceTest.cpp \
 	test/CppExample/MyTMINLP.hpp test/CppExample/MyTMINLP.cpp \
-	test/CppExample/MyBonmin.cpp test/mytoy.nl $(am__append_5)
+	test/CppExample/MyBonmin.cpp test/mytoy.nl $(am__append_4)
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -375,7 +372,7 @@ EXTRA_DIST = doc/Bonmin_ReferenceManual.hpp \
 DISTCLEANFILES = Test/*.$(OBJEXT) Test/unitTest$(EXEEXT) \
 	Test/CppExample/*.$(OBJEXT) \
 	Test/CppExample/CppExample$(EXEEXT) Test/testtoy.nl \
-	$(am__append_6) $(VPATH_DISTCLEANFILES)
+	$(am__append_5) $(VPATH_DISTCLEANFILES)
 DocFiles = README AUTHORS LICENSE
 DocInstallDir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
 all: all-recursive
