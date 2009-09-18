@@ -19,7 +19,7 @@
 #include "CoinTime.hpp"
 #include "BonAmplSetup.hpp"
 #include "BonCbc.hpp"
-
+#include "BonVersions.hpp"
 #define CATCH_ERRORS
 using namespace Bonmin;
 int main (int argc, char *argv[])
@@ -27,11 +27,17 @@ int main (int argc, char *argv[])
   using namespace Ipopt;
   char * pbName = NULL;
   
+  std::cout<<"Bonmin "
+           <<BONMIN_VERSION; 
+  std::cout<<" using Cbc "
+         <<CBCVERSION; 
+  std::cout<<" and Ipopt "
+         <<IPOPT_VERSION<<std::endl; 
   if(argc > 1) {
     pbName = new char[strlen(argv[1])+1];
     strcpy(pbName, argv[1]);
   }
-//#define CATCH_ERRORS 
+#define CATCH_ERRORS 
 #ifdef CATCH_ERRORS
   try
 #endif 
