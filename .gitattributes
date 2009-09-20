@@ -83,6 +83,7 @@ Bonmin/src/Algorithms/QuadCuts/BonTMatrix.hpp -text
 Bonmin/src/Algorithms/QuadCuts/Makefile.am -text
 Bonmin/src/Algorithms/QuadCuts/Makefile.in -text
 Bonmin/src/Algorithms/QuadCuts/next -text
+Bonmin/src/Apps/BonVersions.hpp -text
 Bonmin/src/CbcBonmin/BonBabInfos.cpp -text
 Bonmin/src/CbcBonmin/BonBabInfos.hpp -text
 Bonmin/src/CbcBonmin/BonCbc.cpp -text
