@@ -127,7 +127,7 @@
 <tr>
 <td> <a href="#sec:node_comparison">node_comparison</a> </td>
 <td>S</td>
-<td>dynamic</td>
+<td>best-bound</td>
 <td> +</td>
 <td>+</td>
 <td>+</td>
@@ -208,7 +208,7 @@
 <tr>
 <td> <a href="#sec:tree_search_strategy">tree_search_strategy</a> </td>
 <td>S</td>
-<td>top-node</td>
+<td>probed-dive</td>
 <td> +</td>
 <td>+</td>
 <td>+</td>
@@ -310,15 +310,6 @@
 </tr>
 <tr>
 <td> <a href="#sec:mir_cuts">mir_cuts</a> </td>
-<td>I</td>
-<td>-5</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:probing_cuts">probing_cuts</a> </td>
 <td>I</td>
 <td>-5</td>
 <td> -</td>
@@ -619,7 +610,7 @@
 <td>+</td>
 <td>+</td>
 </tr>
-<tr>   <th colspan=7> <a href="#sec:Output_ond_log-levels_ptions">Output ond log-levels ptions</a> </th>
+<tr>   <th colspan=7> <a href="#sec:Output_ond_log-levels_options">Output ond log-levels options</a> </th>
 </tr>
 <tr>
 <td> <a href="#sec:bb_log_interval">bb_log_interval</a> </td>
@@ -888,7 +879,7 @@ Possible values:
 \paragraph{node\_comparison:}\label{sec:node_comparison} Choose the node selection strategy. $\;$ \\
  Choose the strategy for selecting the next node
 to be processed.
-The default value for this string option is "dynamic".
+The default value for this string option is "best-bound".
 \\ 
 Possible values:
 \begin{itemize}
@@ -962,7 +953,7 @@ which affect dfs-dive are max-backtracks-in-dive
 and max-dive-depth. The dfs-dive won't work in a
 non-convex problem where objective does not
 decrease down branches.
-The default value for this string option is "top-node".
+The default value for this string option is "probed-dive".
 \\ 
 Possible values:
 \begin{itemize}
@@ -1104,17 +1095,6 @@ enough are generated at the root node, if k=-99
 generate cuts only at the root node, if k=0 or
 100 do not generate cuts. The valid range for this integer option is
 $-100 \le {\tt mir\_cuts } <  {\tt +inf}$
-and its default value is $-5$.
-
-
-\paragraph{probing\_cuts:}\label{sec:probing_cuts} Frequency (in terms of nodes) for generating probing cuts in branch-and-cut $\;$ \\
- If k > 0, cuts are generated every k nodes, if
--99 < k < 0 cuts are generated every -k nodes but
-Cbc may decide to stop generating cuts, if not
-enough are generated at the root node, if k=-99
-generate cuts only at the root node, if k=0 or
-100 do not generate cuts. The valid range for this integer option is
-$-100 \le {\tt probing\_cuts } <  {\tt +inf}$
 and its default value is $-5$.
 
 
@@ -1393,8 +1373,8 @@ $-0 \le {\tt very\_tiny\_element } <  {\tt +inf}$
 and its default value is $1 \cdot 10^{-17}$.
 
 
-\subsection{Output ond log-levels ptions}
-\label{sec:Output_ond_log-levels_ptions}
+\subsection{Output ond log-levels options}
+\label{sec:Output_ond_log-levels_options}
 \paragraph{bb\_log\_interval:}\label{sec:bb_log_interval} Interval at which node level output is printed. $\;$ \\
  Set the interval (in terms of number of nodes) at
 which a log on node resolutions (consisting of
@@ -1518,6 +1498,7 @@ Possible values:
 algorithm
 (http://www-unix.mcs.anl.gov/~leyffer/solvers.h-
 tml)
+   \item all: run all available solvers at each node
 \end{itemize}
 
 \paragraph{warm\_start:}\label{sec:warm_start} Select the warm start method $\;$ \\
