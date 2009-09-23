@@ -1487,7 +1487,14 @@ and its default value is $1$.
 
 
 \paragraph{nlp\_solver:}\label{sec:nlp_solver} Choice of the solver for local optima of continuous nlp's $\;$ \\
-
+ Note that option will work only if the specified
+solver has been installed. Ipopt will usualy be
+installed with Bonmin by default. For FilterSQP
+please see
+http://www-unix.mcs.anl.gov/~leyffer/solvers.html
+on how to obtain it and
+https://projects.coin-or.org/Bonmin/wiki/HintTric-
+ks on how to configure Bonmin to use it.
 The default value for this string option is "Ipopt".
 \\ 
 Possible values:
