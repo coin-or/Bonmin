@@ -55,7 +55,7 @@ register_general_options
                              "filterSQP", "Sequential quadratic programming trust region "
                                           "algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
                              "all", "run all available solvers at each node",
-                             "");
+                             "Note that option will work only if the specified solver has been installed. Ipopt will usualy be installed with Bonmin by default. For FilterSQP please see http://www-unix.mcs.anl.gov/~leyffer/solvers.html on how to obtain it and https://projects.coin-or.org/Bonmin/wiki/HintTricks on how to configure Bonmin to use it.");
   roptions->setOptionExtraInfo("nlp_solver",15);
   roptions->AddBoundedIntegerOption("nlp_log_level",
                                     "specify NLP solver interface log level (independent from ipopt print_level).",
