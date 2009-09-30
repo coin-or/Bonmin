@@ -655,23 +655,31 @@ namespace Bonmin
   void AmplTMINLP::finalize_solution(TMINLP::SolverReturn status,
       Index n, const Number* x, Number obj_value)
   {
+    ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
     std::string message;
     std::string status_str;
     if (status == TMINLP::SUCCESS) {
       status_str = "\t\"Finished\"";
       message = "\n" + appName_ +": Optimal";
+      solve_result_num = 3;
     }
     else if (status == TMINLP::INFEASIBLE) {
       status_str = "\t\"Finished\"";
       message = "\n" + appName_ + ": Infeasible problem";
+      solve_result_num = 220;
     }
     else if (status == TMINLP::LIMIT_EXCEEDED) {
       status_str = "\t\"Not finished\"";
       message = "\n" + appName_ + ": Optimization interupted on limit.";
+      if(x)
+        solve_result_num = 421; /* Limit reached with integer feasible solution.*/
+      else
+        solve_result_num = 410; /* Limit reached without solution.*/
     }
     else if (status == TMINLP::MINLP_ERROR) {
       status_str = "\t\"Aborted\"";
       message = "\n" + appName_ + ": Error encountered in optimization.";
+      solve_result_num = 500;
     }
     if (writeAmplSolFile_) {
       write_solution(message, x);
