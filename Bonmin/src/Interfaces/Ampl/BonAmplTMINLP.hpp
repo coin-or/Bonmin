@@ -163,16 +163,25 @@ namespace Bonmin
 
     /** @name Solution Methods */
     //@{
+    /** Called after optimizing to return results to ampl.
+      * Status code is put into solve_result_num according to the table below.
+      * <table>
+      * <tr> <td> <b> <center> Code </center> </b> </td> <td> <b> <center> Status </center> </b> </td> </tr>
+      * <tr> <td> 3 </td> <td> Integer optimal </td> </tr>
+      * <tr> <td> 220 </td> <td> problem is proven infeasible. </td> </tr>
+      * <tr> <td> 421 </td> <td> limit reached with integer feasible solution found. </td> </tr>
+      * <tr> <td> 410 </td> <td> limit reached without any integer feasible solution. </td> </tr>
+      * <tr> <td> 500 </td> <td> error. </td> </tr>
+      * <caption> Status codes for optimization. </caption>
+      * </table>
+      *    */
     virtual void finalize_solution(TMINLP::SolverReturn status,
         Index n, const Number* x, Number obj_value);
 
+    /** Write the solution using ampl's write_sol (called by finalize_solution).*/
     void write_solution(const std::string & message, const Number *x_sol);
     //@}
 
-    /** Write the solution file.  This is a wrapper for AMPL's
-     *  write_sol.  TODO Maybe this should be at a different place, or
-     *  collect the numbers itself? */
-    void write_solution_file(const std::string& message) const;
     //@}
 
 
