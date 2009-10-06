@@ -7,9 +7,9 @@ ThirdParty/Mumps  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Mumps/r
 ThirdParty/Metis  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Metis/releases/1.0.3
 ThirdParty/FilterSQP  https://projects.coin-or.org/svn/BuildTools/ThirdParty/FilterSQP/releases/1.0.0
 Data/Sample  https://projects.coin-or.org/svn/Data/releases/1.0.7/Sample
-CoinUtils  https://projects.coin-or.org/svn/CoinUtils/releases/2.5.0/CoinUtils
-Cbc  https://projects.coin-or.org/svn/Cbc/releases/2.3.1/Cbc
-Cgl  https://projects.coin-or.org/svn/Cgl/releases/0.54.1/Cgl
-Clp  https://projects.coin-or.org/svn/Clp/releases/1.10.1/Clp
+CoinUtils  https://projects.coin-or.org/svn/CoinUtils/releases/2.5.1/CoinUtils
+Cbc  https://projects.coin-or.org/svn/Cbc/releases/2.3.2/Cbc
+Cgl  https://projects.coin-or.org/svn/Cgl/releases/0.54.2/Cgl
+Clp  https://projects.coin-or.org/svn/Clp/releases/1.10.2/Clp
 Ipopt  https://projects.coin-or.org/svn/Ipopt/releases/3.6.1/Ipopt
-Osi  https://projects.coin-or.org/svn/Osi/releases/0.100.1/Osi
+Osi  https://projects.coin-or.org/svn/Osi/releases/0.100.2/Osi

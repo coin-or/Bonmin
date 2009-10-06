@@ -227,7 +227,7 @@ namespace Bonmin
       cbc_->setMaximumNodes(maxNodes);
       cbc_->setMaximumSeconds(maxTime);
       cbc_->setCutoff(cutoff);
-
+      printf("Solving local search");
       cbc_->branchAndBound();
       OAModel = NULL;
       lowBound_ = cbc_->getBestPossibleObjValue();

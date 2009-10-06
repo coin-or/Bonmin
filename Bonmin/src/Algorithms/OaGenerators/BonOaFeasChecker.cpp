@@ -47,6 +47,7 @@ namespace Bonmin
     bool isInteger = true;
     bool feasible = 1;
 
+    OsiCuts cs2;
     OsiSolverInterface * lp = lpManip.si();
     OsiBranchingInformation info(lp,false);
     //int numcols = lp->getNumCols();
@@ -57,7 +58,7 @@ namespace Bonmin
       numberPasses++;
 
       //setup the nlp
-      int numberCutsBefore = cs.sizeRowCuts();
+      int numberCutsBefore = cs2.sizeRowCuts();
 
       //Fix the variable which have to be fixed, after having saved the bounds
       double * colsol = const_cast<double *>(lp->getColSolution());
@@ -80,11 +81,11 @@ namespace Bonmin
 
       const double * toCut = (parameter().addOnlyViolated_)?
           colsol:NULL;
-      nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
+      nlp_->getOuterApproximation(cs2, nlpSol, 1, toCut,
           parameter().global_);
-      int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
+      int numberCuts = cs2.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)
-        lpManip.installCuts(cs, numberCuts);
+        lpManip.installCuts(cs2, numberCuts);
 
       lp->resolve();
       double objvalue = lp->getObjValue();
@@ -113,6 +114,29 @@ namespace Bonmin
           numberCuts) ;
 #endif
     }
+    int numberCuts = cs2.sizeRowCuts();
+    //Remove non tight cuts
+    if(numberCuts)
+    {
+       int num_rows_before = lp->getNumRows() - numberCuts;
+       vector<int> toDelete;
+       toDelete.reserve(numberCuts);
+       CoinWarmStartBasis * basis = dynamic_cast<CoinWarmStartBasis *> (lp->getWarmStart());
+       assert(basis);
+       for(int i = 0 ; i < numberCuts ; i++){
+          int idx = i + num_rows_before;
+          if(basis->getArtifStatus(idx) == CoinWarmStartBasis::basic){
+             toDelete.push_back(idx);
+          }
+          else {
+            cs.insert(cs2.rowCut(i));
+          }
+       }
+       lp->deleteRows(toDelete.size(), toDelete());
+       //printf("Remove %i cuts\n", toDelete.size());
+       lp->resolve();
+       delete basis;
+    } 
 #ifdef OA_DEBUG
     //debug_.printEndOfProcedureDebugMessage(cs, foundSolution, milpBound, isInteger, feasible, std::cout);
     std::cout<<"milpBound found: "<<milpBound<<std::endl;
