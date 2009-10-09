@@ -40,7 +40,8 @@ namespace Bonmin
       b.options()->GetIntegerValue("number_strong_branch",nStrong,"milp_sub.");
       b.options()->GetIntegerValue("number_before_trust", nTrust,"milp_sub.");
       b.options()->GetIntegerValue("Gomory_cuts", mig,"milp_sub.");
-      b.options()->GetIntegerValue("probing_cuts",probe,"milp_sub.");
+      //b.options()->GetIntegerValue("probing_cuts",probe,"milp_sub.");
+      probe = 0;
       b.options()->GetIntegerValue("mir_cuts",mir,"milp_sub.");
       b.options()->GetIntegerValue("cover_cuts",cover,"milp_sub.");
       
