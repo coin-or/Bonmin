@@ -502,14 +502,14 @@ namespace Bonmin
         "top-node"," Always pick the top node as sorted by the node comparison function",
         "dive","Dive in the tree if possible, otherwise pick top node as sorted by the tree comparison function.",
         "probed-dive","Dive in the tree exploring two childs before continuing the dive at each level.",
-        "dfs-dive","Dive in the tree if possible doing a depth first search."
+        "dfs-dive","Dive in the tree if possible doing a depth first search. "
         "Backtrack on leaves or when a prescribed depth is attained or "
         "when estimate of best possible integer feasible solution in subtree "
         "is worst than cutoff. "
         "Once a prescribed limit of backtracks is attained pick top node "
         "as sorted by the tree comparison function",
         "dfs-dive-dynamic","Same as dfs-dive but once enough solution are found switch to best-bound and if too many nodes switch to depth-first.",
-        "All strategies can be used in conjunction with any of the node comparison functions."
+        "All strategies can be used in conjunction with any of the node comparison functions. "
         "Options which affect dfs-dive are max-backtracks-in-dive and max-dive-depth. "
         "The dfs-dive won't work in a non-convex problem where objective does not decrease down branches."
                               );

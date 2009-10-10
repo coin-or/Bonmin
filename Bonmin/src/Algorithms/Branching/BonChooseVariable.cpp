@@ -187,7 +187,7 @@ namespace Bonmin
         0, 0,"");
     roptions->setOptionExtraInfo("min_number_strong_branch",31);
     roptions->AddStringOption2("trust_strong_branching_for_pseudo_cost",
-                               "Wether or not to trust strong branching results for updating pseudo costs.",
+                               "Whether or not to trust strong branching results for updating pseudo costs.",
                                "yes",
                                "no","",
                                "yes","",
