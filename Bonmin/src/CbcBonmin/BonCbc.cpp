@@ -436,7 +436,6 @@ namespace Bonmin
     //Get the time and start.
     model_.initialSolve();
 
-
     int ival;
     s.options()->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
     if(s.nonlinearSolver() == s.continuousSolver() && ival)

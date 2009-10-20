@@ -2331,7 +2331,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
      bool addObjVar = false;
      if(problem_->hasLinearObjective()){
        double zero;
-       problem_to_optimize_->eval_f(n, x, 1, zero);
+       vector<double> x0(n,0.);
+       problem_to_optimize_->eval_f(n, x0(), 1, zero);
        si.setDblParam(OsiObjOffset, -zero);
        //Copy the linear objective and don't create a dummy variable.
        problem_to_optimize_->eval_grad_f(n, x, 1,obj());
