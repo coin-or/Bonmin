@@ -14,25 +14,10 @@
 #include "OsiAuxInfo.hpp"
 #include "BonSolverHelp.hpp"
 
-//#define SAVE_MEM
+#define SAVE_MEM
 namespace Bonmin
 {
 
-#if 0
-// Default constructor
-  OaFeasibilityChecker ::OaFeasibilityChecker
-  (OsiTMINLPInterface * nlp,
-   OsiSolverInterface * si,
-   double cbcCutoffIncrement,
-   double cbcIntegerTolerance,
-   bool leaveSiUnchanged
-  )
-      :
-      OaDecompositionBase(nlp,si,
-          NULL, cbcCutoffIncrement,
-          cbcIntegerTolerance, leaveSiUnchanged)
-  {}
-#endif
   /// New usefull constructor
   OaFeasibilityChecker::OaFeasibilityChecker(BabSetupBase &b):
       OaDecompositionBase(b, false, true)

@@ -1951,8 +1951,8 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
   //As jacobian is stored by cols fill OsiCuts with cuts
   vector<double> cut(n+1,0.);
   vector<bool> keep(m+1,false);
-  double lb;
-  double ub;
+  double lb = 0;
+  double ub = 0;
 
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
@@ -2012,8 +2012,8 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
         ub += obj[i] * x[i];
       }
     }
-  }
   v.insert(n,-1);
+  }
   for(int i = 0 ; i < n ; i++){
     if(fabs(cut[i])>1e-020){
       v.insert(i, cut[i]);
