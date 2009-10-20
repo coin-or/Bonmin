@@ -424,7 +424,7 @@ namespace Bonmin
 
     roptions->AddLowerBoundedNumberOption("time_limit",
         "Set the global maximum computation time (in secs) for the algorithm.",
-        0.,1,1e10,
+        0.,0,1e10,
         "");
     roptions->setOptionExtraInfo("time_limit", 31);
 

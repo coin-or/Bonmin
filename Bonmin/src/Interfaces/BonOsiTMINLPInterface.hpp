@@ -878,8 +878,9 @@ class Messages : public CoinMessages
      getConstraintOuterApproximation(cs, constraintNumber, getColSolution(),x2,global);
   }
 
-  /** Get the Benders cut at provided point with provided multipliers.*/
-  void getBendersCut(OsiCuts &cs, const double * x, const double *lambda, bool getObj = 1);
+
+/** Get a benders cut from solution.*/
+void getBendersCut(OsiCuts &cs, bool global);
 
   /** Given a point x_bar this solves the problem of finding the point which minimize a convex 
     *combination between the distance to  x_bar and the original objective function f(x):

@@ -1759,15 +1759,15 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     initializeJacobianArrays();
   assert(jRow_ != NULL);
   assert(jCol_ != NULL);
-  double * g = new double[m];
+  vector<double> g(m);
   problem_to_optimize_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
-  problem_to_optimize_->eval_g(n,x,1,m,g);
+  problem_to_optimize_->eval_g(n,x,1,m,g());
   //As jacobian is stored by cols fill OsiCuts with cuts
-  CoinPackedVector * cuts = new CoinPackedVector[nNonLinear_ + 1];
-  double * lb = new double[nNonLinear_ + 1];
-  double * ub = new double[nNonLinear_ + 1];
+  vector<CoinPackedVector>  cuts(nNonLinear_ + 1);
+  vector<double> lb(nNonLinear_ + 1);
+  vector<double> ub(nNonLinear_ + 1);
 
-  int * row2cutIdx = new int[m];//store correspondance between index of row and index of cut (some cuts are not generated for rows because linear, or not binding). -1 if constraint does not generate a cut, otherwise index in cuts.
+  vector<int> row2cutIdx(m,-1);//store correspondance between index of row and index of cut (some cuts are not generated for rows because linear, or not binding). -1 if constraint does not generate a cut, otherwise index in cuts.
   int numCuts = 0;
 
   const double * rowLower = getRowLower();
@@ -1780,16 +1780,6 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
   
   for(int rowIdx = 0; rowIdx < m ; rowIdx++) {
     if(constTypes_[rowIdx] == TNLP::NON_LINEAR) {
-#if 0
-      if(fabs(duals[rowIdx]) == 0.)
-      {
-        row2cutIdx[rowIdx] = -1;
-#ifdef NDEBUG
-        (*handler_)<<"non binding constraint"<<CoinMessageEol;
-#endif
-        continue;
-      }
-#endif
       row2cutIdx[rowIdx] = numCuts;
       if(rowLower[rowIdx] > - nlp_infty)
         lb[numCuts] = rowLower[rowIdx] - g[rowIdx];
@@ -1809,8 +1799,6 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
       
       numCuts++;
     }
-    else
-      row2cutIdx[rowIdx] = -1;
   }
 
 
@@ -1834,9 +1822,9 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     }
   }
 
-  int * cut2rowIdx = NULL;
+  vector<int> cut2rowIdx(0);
   if (IsValid(cutStrengthener_) || oaHandler_->logLevel() > 0) {
-    cut2rowIdx = new int [numCuts];// Store correspondance between indices of cut and indices of rows. For each cut
+    cut2rowIdx.resize(numCuts);// Store correspondance between indices of cut and indices of rows. For each cut
     for(int rowIdx = 0 ; rowIdx < m ; rowIdx++){
        if(row2cutIdx[rowIdx] >= 0){
           cut2rowIdx[row2cutIdx[rowIdx]] = rowIdx;
@@ -1879,25 +1867,18 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     if(global) {
       newCut.setGloballyValidAsInteger(1);
     }
-    newCut.setEffectiveness(99.99e99);
+    //newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
-    //    CftValidator validator;
-    //    validator(newCut);
     if(oaHandler_->logLevel()>2){
       oaHandler_->print(newCut);}
     cs.insert(newCut);
   }
 
-  delete [] g;
-  delete [] cuts;
-  delete [] row2cutIdx;
-  delete [] cut2rowIdx;
-
   if(getObj == 2 || (getObj && !problem_->hasLinearObjective())) { // Get the objective cuts
-    double * obj = new double [n];
-    problem_to_optimize_->eval_grad_f(n, x, 1,obj);
+    vector<double> obj(n);
+    problem_to_optimize_->eval_grad_f(n, x, 1,obj());
     double f;
     problem_to_optimize_->eval_f(n, x, 1, f);
 
@@ -1943,24 +1924,110 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
       OsiRowCut newCut;
       if(global)
 	newCut.setGloballyValidAsInteger(1);
-      newCut.setEffectiveness(99.99e99);
+      //newCut.setEffectiveness(99.99e99);
       newCut.setRow(v);
       newCut.setLb(-COIN_DBL_MAX/*Infinity*/);
       newCut.setUb(ub[nNonLinear_]);
-      //     CftValidator validator;
-      //     validator(newCut);
       cs.insert(newCut);
     }
-    delete [] obj;
     }
-    else{
-    }
-
-  delete []lb;
-  delete[]ub;
 }
 
+/** Get a benders cut from solution.*/
+void
+OsiTMINLPInterface::getBendersCut(OsiCuts &cs, 
+                                  bool global){
+  int n,m, nnz_jac_g, nnz_h_lag;
+  TNLP::IndexStyleEnum index_style;
+  problem_to_optimize_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
+  if(jRow_ == NULL || jCol_ == NULL || jValues_ == NULL)
+    initializeJacobianArrays();
+  assert(jRow_ != NULL);
+  assert(jCol_ != NULL);
+  vector<double> g(m);
+  const double * x = getColSolution();
+  problem_to_optimize_->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL, jValues_);
+  problem_to_optimize_->eval_g(n,x,1,m,g());
+  //As jacobian is stored by cols fill OsiCuts with cuts
+  vector<double> cut(n+1,0.);
+  vector<bool> keep(m+1,false);
+  double lb;
+  double ub;
 
+  const double * rowLower = getRowLower();
+  const double * rowUpper = getRowUpper();
+  const double * colLower = getColLower();
+  const double * colUpper = getColUpper();
+  const double * duals = getRowPrice() + 2 * n;
+  double infty = getInfinity();
+  double nlp_infty = infty_;
+  
+  for(int rowIdx = 0; rowIdx < m ; rowIdx++) {
+    if(constTypes_[rowIdx] == TNLP::NON_LINEAR && fabs(duals[rowIdx]) > 1e-06)
+    {
+      const double & lam = duals[rowIdx];
+      keep[rowIdx] = true;
+      assert(lam < 0 || rowUpper[rowIdx] < 1e10);
+      assert(lam > 0 || rowLower[rowIdx] > -1e10);
+      if(lam < 0){
+        assert(rowLower[rowIdx] > -1e10);
+        ub += lam*(rowLower[rowIdx] -g[rowIdx]);
+      }
+      else {
+        assert(rowUpper[rowIdx] < 1e10);
+        ub += lam*(rowUpper[rowIdx] -g[rowIdx]);
+      }
+    }
+  }
+
+
+  for(int i = 0 ; i < nnz_jac_g ; i++) {
+    const int &rowIdx = jRow_[i];
+    if (!keep[rowIdx]) continue;
+    const int &colIdx = jCol_[i];
+    //"clean" coefficient
+    if(cleanNnz(jValues_[i],colLower[colIdx], colUpper[colIdx],
+      	  rowLower[rowIdx], rowUpper[rowIdx], x[colIdx], lb,
+      	  ub, tiny_, veryTiny_)) {
+      const double & lam = duals[rowIdx];
+      cut[colIdx] += lam * jValues_[i];
+      ub += lam * jValues_[i] * x[colIdx];
+    }
+  }
+
+  CoinPackedVector v;
+  if(!problem_->hasLinearObjective() && 
+     isProvenOptimal()) { // Get the objective cuts
+    vector<double> obj(n);
+    problem_to_optimize_->eval_grad_f(n, x, 1,obj());
+    double f;
+    problem_to_optimize_->eval_f(n, x, 1, f);
+
+    ub = -f;
+    //double minCoeff = 1e50;
+    for(int i = 0; i<n ; i++) {
+      if(cleanNnz(obj[i],colLower[i], colUpper[i], -getInfinity(), 0,
+          x[i], lb, ub,tiny_, 1e-15)) {
+        cut[i] += obj[i];
+        ub += obj[i] * x[i];
+      }
+    }
+  }
+  v.insert(n,-1);
+  for(int i = 0 ; i < n ; i++){
+    if(fabs(cut[i])>1e-020){
+      v.insert(i, cut[i]);
+    }
+  }
+  OsiRowCut newCut;
+  if(global)
+    newCut.setGloballyValidAsInteger(1);
+  //newCut.setEffectiveness(99.99e99);
+  newCut.setRow(v);
+  newCut.setLb(-COIN_DBL_MAX/*Infinity*/);
+  newCut.setUb(ub);
+  cs.insert(newCut);
+}
 
 /** Get the outer approximation of a single constraint at the point x.
 */
@@ -2026,7 +2093,7 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   if(global) {
     newCut.setGloballyValidAsInteger(1);
   }
-  newCut.setEffectiveness(99.99e99);
+  //newCut.setEffectiveness(99.99e99);
   newCut.setLb(lb);
   newCut.setUb(ub);
   newCut.setRow(cut);

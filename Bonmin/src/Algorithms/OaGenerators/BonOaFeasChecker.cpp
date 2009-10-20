@@ -14,7 +14,7 @@
 #include "OsiAuxInfo.hpp"
 #include "BonSolverHelp.hpp"
 
-
+//#define SAVE_MEM
 namespace Bonmin
 {
 
@@ -54,12 +54,12 @@ namespace Bonmin
     double milpBound = -COIN_DBL_MAX;
     int numberPasses = 0;
     double * nlpSol =  NULL;
+    int numberCutsBefore = cs.sizeRowCuts();
    
     while (isInteger && feasible ) {
       numberPasses++;
 
       //setup the nlp
-      int numberCutsBefore = cs.sizeRowCuts();
 
       //Fix the variable which have to be fixed, after having saved the bounds
       double * colsol = const_cast<double *>(lp->getColSolution());
@@ -83,8 +83,12 @@ namespace Bonmin
 
       const double * toCut = (parameter().addOnlyViolated_)?
           colsol:NULL;
+#ifndef SAVE_MEM
       nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
-          parameter().global_);
+                                  parameter().global_);
+#else
+      nlp_->getBendersCut(cs, parameter().global_);
+#endif
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       if (numberCuts > 0)
         installCuts(*lp, cs, numberCuts);
@@ -118,6 +122,10 @@ namespace Bonmin
       printf("Obj value after cuts %g %d rows\n",lp->getObjValue(),
           numberCuts) ;
 #endif
+    }
+    int num_cuts_now = cs.sizeRowCuts();
+    for(int i = numberCutsBefore ; i < num_cuts_now ; i++){
+      cs.rowCut(i).setEffectiveness(99.9e99);
     }
 #ifdef OA_DEBUG
     debug_.printEndOfProcedureDebugMessage(cs, true, cutoff, milpBound, isInteger, feasible, std::cout);
