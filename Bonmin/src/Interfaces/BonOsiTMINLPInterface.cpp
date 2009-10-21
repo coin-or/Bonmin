@@ -1986,12 +1986,13 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
     if (!keep[rowIdx]) continue;
     const int &colIdx = jCol_[i];
     //"clean" coefficient
-    if(cleanNnz(jValues_[i],colLower[colIdx], colUpper[colIdx],
+    const double & lam = duals[rowIdx];
+    double coeff = lam*jValues_[i];
+    if(cleanNnz(coeff,colLower[colIdx], colUpper[colIdx],
       	  rowLower[rowIdx], rowUpper[rowIdx], x[colIdx], lb,
       	  ub, tiny_, veryTiny_)) {
-      const double & lam = duals[rowIdx];
-      cut[colIdx] += lam * jValues_[i];
-      ub += lam * jValues_[i] * x[colIdx];
+      cut[colIdx] += coeff;
+      ub += coeff * x[colIdx];
     }
   }
 
@@ -2022,10 +2023,9 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
   OsiRowCut newCut;
   if(global)
     newCut.setGloballyValidAsInteger(1);
-  //newCut.setEffectiveness(99.99e99);
-  newCut.setRow(v);
   newCut.setLb(-COIN_DBL_MAX/*Infinity*/);
   newCut.setUb(ub);
+  newCut.setRow(v);
   cs.insert(newCut);
 }
 

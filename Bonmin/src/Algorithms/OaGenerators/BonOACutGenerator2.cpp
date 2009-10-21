@@ -286,11 +286,13 @@ namespace Bonmin
         "Set the level of output of OA decomposition solver : "
         "0 - none, 1 - normal, 2 - verbose"
                                      );
+    roptions->setOptionExtraInfo("oa_decomposition", 7);
 
     roptions->AddLowerBoundedNumberOption("oa_log_frequency",
         "display an update on lower and upper bounds in OA every n seconds",
         0.,1.,100.,
         "");
+    roptions->setOptionExtraInfo("oa_log_frequency", 15);
   }
 }/* End namespace Bonmin. */
 

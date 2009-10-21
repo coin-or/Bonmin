@@ -45,7 +45,8 @@ namespace Bonmin {
       leaveSiUnchanged_(true),
       reassignLpsolver_(false),
       timeBegin_(0),
-      parameters_()
+      parameters_(),
+      currentNodeNumber_(-1)
   {
     handler_ = new CoinMessageHandler();
     handler_ -> setLogLevel(2);
@@ -66,7 +67,8 @@ namespace Bonmin {
       reassignLpsolver_(reassignLpsolver),
       timeBegin_(0),
       numSols_(0),
-      parameters_()
+      parameters_(),
+      currentNodeNumber_(-1)
   {
     handler_ = new CoinMessageHandler();
     int logLevel;
@@ -102,7 +104,8 @@ namespace Bonmin {
       reassignLpsolver_(other.reassignLpsolver_),
       timeBegin_(0),
       numSols_(other.numSols_),
-      parameters_(other.parameters_)
+      parameters_(other.parameters_),
+      currentNodeNumber_(other.currentNodeNumber_)
   {
     timeBegin_ = CoinCpuTime();
     handler_ = other.handler_->clone();
@@ -366,6 +369,32 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
 
   SubMipSolver * subMip = NULL;
 
+  //Check nodeNumber if it did not change scan savedCuts_ if one is violated force it and exit
+  int nodeNumber = babInfo->babPtr()->model().getNodeCount();
+  if(nodeNumber == currentNodeNumber_){
+#ifdef OA_DEBUG
+    printf("OA decomposition recalled from the same node!\n");
+#endif
+    int numCuts = savedCuts_.sizeRowCuts();
+    for(int i = 0 ; i < numCuts ; i++){
+       //Check if cuts off solution
+       if(savedCuts_.rowCut(i).violated(colsol) > 0.){
+#ifdef OA_DEBUG
+         printf("A violated cut has been found\n");
+#endif
+         savedCuts_.rowCut(i).setEffectiveness(9.99e99);
+         cs.insert(savedCuts_.rowCut(i));
+         savedCuts_.eraseRowCut(i);
+         return;
+         i--; numCuts--;
+       }
+    }
+  }
+  else {
+    currentNodeNumber_ = nodeNumber;
+    savedCuts_.dumpCuts();
+  } 
+         
   if (!isInteger) {
     if (!doLocalSearch(babInfo))//create sub mip solver.
       return;

@@ -102,6 +102,7 @@ namespace Bonmin
 
     /* Outer Approximation options.*/
     OACutGenerator2::registerOptions(roptions);
+    OaFeasibilityChecker::registerOptions(roptions);
     MinlpFeasPump::registerOptions(roptions);
     EcpCuts::registerOptions(roptions);
     OaNlpOptim::registerOptions(roptions);

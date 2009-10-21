@@ -278,6 +278,12 @@ private:
     /** Parameters.*/
     Parameters parameters_;
 
+      /** Saved cuts: in some cases when using OA to check feasible solution algorithm may loop because Cbc removes inactive cuts.
+          To overcome this we can impose that no OA cut can be discarded by Cbc but this consumes too much memory in some cases.
+          Here we do it another way: cuts generated at current node are saved if algorithm seems to enter a loop we impose the needed cuts to be kept.*/
+    mutable OsiCuts savedCuts_;
+      /** Store the current node number.*/
+    mutable int currentNodeNumber_;
     /** @} */
 
 #ifdef OA_DEBUG

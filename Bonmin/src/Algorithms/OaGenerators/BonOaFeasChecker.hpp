@@ -18,28 +18,20 @@ namespace Bonmin
   class OaFeasibilityChecker : public OaDecompositionBase
   {
   public:
-    /// Usefull constructor
-    OaFeasibilityChecker(OsiTMINLPInterface * nlp = NULL,
-        OsiSolverInterface * si = NULL,
-        double cbcCutoffIncrement_=1e-07,
-        double cbcIntegerTolerance = 1e-05,
-        bool leaveSiUnchanged = 0
-                        );
-
     /// New usefull constructor
     OaFeasibilityChecker(BabSetupBase &b);
     /// Copy constructor
     OaFeasibilityChecker(const OaFeasibilityChecker &copy)
         :
-        OaDecompositionBase(copy)
+        OaDecompositionBase(copy),
+        pol_(copy.pol_),
+        type_(copy.type_)
     {}
     /// Destructor
     ~OaFeasibilityChecker();
 
-    void setStrategy(const CbcStrategy & strategy)
-    {
-      parameters_.setStrategy(strategy);
-    }
+    /** Register OA options.*/
+    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
     virtual CglCutGenerator * clone() const
     {
@@ -54,6 +46,21 @@ namespace Bonmin
     {
       return 0;
     }
+
+    /** See documentation for feas_check_discard_policy option.*/
+    enum CutsPolicies {
+      DetectCycles = 0,
+      KeepAll,
+      TreatAsNormal};
+    /** Policy for keeping cuts.*/
+    CutsPolicies pol_;
+ 
+    /** See documentation for feas_check_cut_types option.*/
+    enum CutsTypes {
+      OA = 0,
+      Benders};
+    /** Type of cuts.*/
+    CutsTypes type_;
   };
 }
 #endif
