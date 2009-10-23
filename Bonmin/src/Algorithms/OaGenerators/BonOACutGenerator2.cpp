@@ -23,6 +23,8 @@
 
 namespace Bonmin
 {
+   static const char * txt_id = "OA decomposition";
+
 
 /// Constructor with basic setup
   OACutGenerator2::OACutGenerator2(BabSetupBase & b):
@@ -102,7 +104,6 @@ namespace Bonmin
     bool milpFeasible = 1;
     bool feasible = 1;
 
-    printf("maximum time: %g\n", parameter().maxLocalSearchTime_);
     if (subMip)//Perform a local search
     {
       subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
@@ -154,7 +155,7 @@ namespace Bonmin
 
       fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_,objects_, nObjects_);
 
-      nlp_->resolve();
+      nlp_->resolve(txt_id);
       if (post_nlp_solve(babInfo, cutoff)) {
         //nlp solved and feasible
         // Update the cutoff

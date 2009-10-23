@@ -15,6 +15,8 @@
 
 namespace Bonmin
 {
+   static const char * txt_id = "NLP relax. for OA";
+
 /// Default constructor
   OaNlpOptim::OaNlpOptim(OsiTMINLPInterface * si,
       int maxDepth, bool addOnlyViolated, bool global)
@@ -85,7 +87,6 @@ namespace Bonmin
     if (score <= rand)
       return;
 #endif
-    printf("NLP REL ");
     //Fix the variable which have to be fixed, after having saved the bounds
     double * saveColLb = new double[numcols];
     double * saveColUb = new double[numcols];
@@ -101,7 +102,7 @@ namespace Bonmin
 
     //  nlp_->turnOnIpoptOutput();
     nSolve_++;
-    nlp_->resolve();
+    nlp_->resolve(txt_id);
     const double * violatedPoint = (addOnlyViolated_)? si.getColSolution():
         NULL;
     nlp_->getOuterApproximation(cs, 1, violatedPoint,global_);

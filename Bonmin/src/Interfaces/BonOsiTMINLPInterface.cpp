@@ -269,10 +269,9 @@ OsiTMINLPInterface::Messages::Messages
 
   ADD_MSG(LOG_HEAD, std_m, 1,
           "\n          "
-          "    Num      Status      Obj             It       time");
-  ADD_MSG(LOG_FIRST_LINE, std_m, 1, 
-          "    %-8d %-11s %-23.16g %-8d %-3g");
-  ADD_MSG(LOG_LINE, std_m, 1, " %c  r%-7d %-11s %-23.16g %-8d %-3g");
+          "    Num      Status      Obj             It       time                 Location");
+  ADD_MSG(LOG_LINE, std_m, 1, 
+          "%c    %-8d %-11s %-15.5g %-8d %-8g %20s");
 
   ADD_MSG(ALTERNATE_OBJECTIVE, std_m, 1, "Objective value recomputed with alternate objective: %g.");
   
@@ -808,7 +807,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
         messages_)
     <<f+1<< CoinMessageEol ;
     randomStartingPoint();
-    solveAndCheckErrors(0,0,"resolveForCost");
+    solveAndCheckErrors(0,0,"resolve cost");
 
 
     char c=' ';
@@ -826,7 +825,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
     }
 
     messageHandler()->message(LOG_LINE, messages_)
-    <<c<<f+1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<c<<f+1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<"resolve cost"<<CoinMessageEol;
 
 
     if(isProvenOptimal())
@@ -880,7 +879,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   messageHandler()->message(WARNING_RESOLVING,
       messages_)
   <<1<< CoinMessageEol ;
-  solveAndCheckErrors(0,0,"resolveForRobustness");
+  solveAndCheckErrors(0,0,"resolve robustness");
 
 
   char c='*';
@@ -889,7 +888,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   }
   messageHandler()->message(LOG_LINE, messages_)
   <<c<<1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<
-    app_->CPUTime()<<CoinMessageEol;
+    app_->CPUTime()<<"resolve robustness"<<CoinMessageEol;
 
 
   if(!isAbandoned()) {
@@ -910,7 +909,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     <<f+2<< CoinMessageEol ;
 
     randomStartingPoint();
-    solveAndCheckErrors(0,0,"resolveForRobustness");
+    solveAndCheckErrors(0,0,"resolve robustness");
 
 
     messageHandler()->message(IPOPT_SUMMARY, messages_)
@@ -923,7 +922,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     }
     messageHandler()->message(LOG_LINE, messages_)
     <<c<<f+2<<statusAsString()<<getObjValue()
-    <<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
+    <<app_->IterationCount()<<app_->CPUTime()<<"resolve robustness"<<CoinMessageEol;
 
 
     if(!isAbandoned()) {
@@ -2515,7 +2514,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
         TNLPSolver::ReturnStatus otherStatus = (*i)->OptimizeTNLP(GetRawPtr(problem_copy));
        messageHandler()->message(LOG_LINE, messages_)
          <<'d'<<f++<<statusAsString(otherStatus)<<problem_copy->obj_value()
-         <<(*i)->IterationCount()<<(*i)->CPUTime()<<CoinMessageEol;
+         <<(*i)->IterationCount()<<(*i)->CPUTime()<<"retry with "+(*i)->solverName()<<CoinMessageEol;
         if(!(*i)->isError(otherStatus)){
            CoinRelFltEq eq(1e-05);
            if(otherStatus != optimizationStatus_){
@@ -2541,7 +2540,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
         optimizationStatus_ = (*i)->OptimizeTNLP(GetRawPtr(problem_));
         messageHandler()->message(LOG_LINE, messages_)
           <<'d'<<f++<<statusAsString(optimizationStatus_)<<problem_->obj_value()
-          <<(*i)->IterationCount()<<(*i)->CPUTime()<<CoinMessageEol;
+          <<(*i)->IterationCount()<<(*i)->CPUTime()<<"retry with "+(*i)->solverName()<<CoinMessageEol;
       }
   }
   try{
@@ -2631,8 +2630,15 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
 ////////////////////////////////////////////////////////////////////
 // Solve Methods                                                  //
 ////////////////////////////////////////////////////////////////////
-/// Solve initial continuous relaxation
 void OsiTMINLPInterface::initialSolve()
+{
+   initialSolve("");
+}
+
+////////////////////////////////////////////////////////////////////
+// Solve Methods                                                  //
+////////////////////////////////////////////////////////////////////
+void OsiTMINLPInterface::initialSolve(const char * whereFrom)
 {
   assert(IsValid(app_));
   assert(IsValid(problem_));
@@ -2658,12 +2664,12 @@ void OsiTMINLPInterface::initialSolve()
     app_->options()->SetIntegerValue("print_level",0);
   }
   
-  messageHandler()->message(LOG_FIRST_LINE, messages_)<<nCallOptimizeTNLP_
+  messageHandler()->message(LOG_LINE, messages_)<<' '<<nCallOptimizeTNLP_
 						      <<statusAsString()
                                                       <<getObjValue()
                                                       <<app_->IterationCount()
                                                       <<app_->CPUTime()
-                                                      <<CoinMessageEol;
+                                                      <<whereFrom<<CoinMessageEol;
   
   int numRetry = firstSolve_ ? numRetryInitial_ : numRetryResolve_;
   if(isAbandoned()) {
@@ -2686,21 +2692,25 @@ void OsiTMINLPInterface::initialSolve()
   }
 }
 
+/** Resolve the continuous relaxation after problem modification. */
+void
+OsiTMINLPInterface::resolve(){
+   resolve("");
+}
 /** Resolve the continuous relaxation after problem modification.
  * \note for Ipopt, same as resolve */
 void
-OsiTMINLPInterface::resolve()
+OsiTMINLPInterface::resolve(const char * whereFrom)
 {
   assert(IsValid(app_));
   assert(IsValid(problem_));
-  
   int has_warmstart = warmstart_ == NULL ? 0 : 1;
   if(warmstart_ == NULL) has_warmstart = 0;
   else if(!app_->warmStartIsValid(warmstart_)) has_warmstart = 1;
   else has_warmstart = 2;
   if (has_warmstart < 2) {
     // empty (or unrecognized) warmstart
-    initialSolve();
+    initialSolve(whereFrom);
     return;
   }
   app_->setWarmStart(warmstart_, problem_);
@@ -2719,11 +2729,14 @@ OsiTMINLPInterface::resolve()
   else app_->disableWarmStart();
   solveAndCheckErrors(1,1,"resolve");
   
-  messageHandler()->message(LOG_FIRST_LINE, messages_)<<nCallOptimizeTNLP_
-						      <<statusAsString()
-                                                      <<getObjValue()
-                                                      <<app_->IterationCount()
-                                                      <<app_->CPUTime()<<CoinMessageEol;
+  messageHandler()->message(LOG_LINE, messages_)<<' '<<nCallOptimizeTNLP_
+						<<statusAsString()
+                                                <<getObjValue()
+                                                <<app_->IterationCount()
+                                                <<app_->CPUTime()
+                                                <<whereFrom
+                                                <<"totot"
+                                                <<CoinMessageEol;
   
   if(isAbandoned()) {
     resolveForRobustness(numRetryUnsolved_);

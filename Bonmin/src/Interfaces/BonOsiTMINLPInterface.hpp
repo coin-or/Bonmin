@@ -181,12 +181,22 @@ class Messages : public CoinMessages
   /// Solve initial continuous relaxation
   virtual void initialSolve();
 
+  /// Solve initial continuous relaxation (precising from where)
+  virtual void initialSolve(const char * whereFrom);
+
   /** Resolve the continuous relaxation after problem modification.
       initialSolve may or may not have been called before this is called. In
       any case, this must solve the problem, and speed the process up if it
       can reuse any remnants of data that might exist from a previous solve.
    */
   virtual void resolve();
+
+  /** Resolve the continuous relaxation after problem modification.
+      initialSolve may or may not have been called before this is called. In
+      any case, this must solve the problem, and speed the process up if it
+      can reuse any remnants of data that might exist from a previous solve.
+   */
+  virtual void resolve(const char * whereFrom);
 
   /** Resolve the problem with different random starting points to try to find
       a better solution (only makes sense for a non-convex problem.*/
@@ -838,7 +848,7 @@ class Messages : public CoinMessages
   virtual void extractLinearRelaxation(OsiSolverInterface &si, bool getObj = 1,
                                        bool solveNlp = 1){
      if(solveNlp)
-       initialSolve();
+       initialSolve("build initial OA");
      extractLinearRelaxation(si, getColSolution(), getObj); 
      if(solveNlp){
         app_->enableWarmStart();

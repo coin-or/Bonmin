@@ -23,7 +23,7 @@
 
 namespace Bonmin
 {
-
+   static const char * txt_id = "FP for MINLP";
 /// Constructor with basic setup
   MinlpFeasPump::MinlpFeasPump(BabSetupBase & b):
       OaDecompositionBase(b, true, false)
@@ -114,7 +114,7 @@ namespace Bonmin
     OsiBranchingInformation branch_info(lp, false);
 
     bool milpOptimal = false;
-    nlp_->resolve();
+    nlp_->resolve(txt_id);
     if (subMip)//Perform a local search
     {
       assert(subMip->solver() == lp);
@@ -169,7 +169,7 @@ namespace Bonmin
       if(dist < 1e-05){
          fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
 
-         nlp_->resolve();
+         nlp_->resolve(txt_id);
          bool restart = false;
          if (post_nlp_solve(babInfo, cutoff)) {
            restart = true;
@@ -195,7 +195,7 @@ namespace Bonmin
           major_iteration++;
           handler_->message(FP_MAJOR_ITERATION, messages_) 
           <<major_iteration<<cutoff<<CoinMessageEol;
-          nlp_->resolve();
+          nlp_->resolve(txt_id);
         }
 
          //}

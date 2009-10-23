@@ -458,9 +458,10 @@ namespace Bonmin
         }
         model_.solver()->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
       }
-    }
 
     model_.solver()->resolve();
+
+    }
 
     // for Couenne
     if (usingCouenne_)

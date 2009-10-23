@@ -16,6 +16,7 @@
 
 namespace Bonmin
 {
+   static const char * txt_id = "check integer sol.";
 
   /// New usefull constructor
   OaFeasibilityChecker::OaFeasibilityChecker(BabSetupBase &b):
@@ -61,8 +62,7 @@ namespace Bonmin
 
 
       //Now solve the NLP get the cuts, and intall them in the local LP
-      printf("NLP CHECK ");
-      nlp_->resolve();
+      nlp_->resolve(txt_id);
       if (post_nlp_solve(babInfo, cutoff)) {
         //nlp solved and feasible
         // Update the cutoff
