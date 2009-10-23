@@ -242,7 +242,7 @@ private:
 
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts &cs, solverManip &lpManip,
-        SubMipSolver * &subMip, BabInfo * babInfo, double &) const = 0;
+        SubMipSolver * &subMip, BabInfo * babInfo, double &, const CglTreeInfo & info) const = 0;
     /// virutal method to decide if local search is performed
     virtual bool doLocalSearch(BabInfo * babInfo) const = 0;
 

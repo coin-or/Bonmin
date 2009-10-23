@@ -25,7 +25,9 @@ namespace Bonmin
         :
         OaDecompositionBase(copy),
         pol_(copy.pol_),
-        type_(copy.type_)
+        type_(copy.type_),
+        cut_count_(copy.cut_count_),
+        maximum_oa_cuts_(copy.maximum_oa_cuts_)
     {}
     /// Destructor
     ~OaFeasibilityChecker();
@@ -40,7 +42,7 @@ namespace Bonmin
   protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts & cs, solverManip &lpManip,
-        SubMipSolver * &subMip, BabInfo * babInfo, double &cutoff) const;
+        SubMipSolver * &subMip, BabInfo * babInfo, double &cutoff, const CglTreeInfo & info) const;
     /// virutal method to decide if local search is performed
     virtual bool doLocalSearch(BabInfo * babInfo) const
     {
@@ -61,6 +63,11 @@ namespace Bonmin
       Benders};
     /** Type of cuts.*/
     CutsTypes type_;
+
+    /** Count the total number of cuts generated.*/
+    mutable unsigned int cut_count_;
+    /** maximum number of OA cuts.*/
+    unsigned int maximum_oa_cuts_;
   };
 }
 #endif

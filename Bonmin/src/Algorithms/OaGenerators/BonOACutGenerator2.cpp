@@ -59,6 +59,7 @@ namespace Bonmin
     b.options()->GetNumericValue("time_limit",oaTime,prefix);
     parameter().maxLocalSearchTime_ =
     std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
+    b.options()->GetIntegerValue("solution_limit", parameter().maxSols_,prefix);
     parameter().localSearchNodeLimit_ = 1000000;
     parameter().maxLocalSearch_ = 100000;
     parameter().maxLocalSearchPerNode_ = 10000;
@@ -81,7 +82,7 @@ namespace Bonmin
       solverManip &lpManip,
       SubMipSolver * &subMip,
       BabInfo * babInfo,
-      double & cutoff) const
+      double & cutoff, const CglTreeInfo & info) const
   {
 
     bool interuptOnLimit = false;
@@ -93,7 +94,7 @@ namespace Bonmin
     bool isInteger = false;
 
     OsiSolverInterface * lp = lpManip.si();
-    OsiBranchingInformation info(lp, false);
+    OsiBranchingInformation branch_info(lp, false);
     bool milpOptimal = 1;
 
 
@@ -101,6 +102,7 @@ namespace Bonmin
     bool milpFeasible = 1;
     bool feasible = 1;
 
+    printf("maximum time: %g\n", parameter().maxLocalSearchTime_);
     if (subMip)//Perform a local search
     {
       subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
@@ -148,9 +150,9 @@ namespace Bonmin
       //Fix the variable which have to be fixed, after having saved the bounds
       const double * colsol = subMip == NULL ? lp->getColSolution():
           subMip->getLastSolution();
-      info.solution_ = colsol;
+      branch_info.solution_ = colsol;
 
-      fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_,objects_, nObjects_);
+      fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_,objects_, nObjects_);
 
       nlp_->resolve();
       if (post_nlp_solve(babInfo, cutoff)) {
@@ -182,14 +184,14 @@ namespace Bonmin
           !lp->isDualObjectiveLimitReached() && (objvalue<cutoff)) ;
       //if value of integers are unchanged then we have to get out
       bool changed = !feasible;//if lp is infeasible we don't have to check anything
-      info.solution_ = lp->getColSolution();
+      branch_info.solution_ = lp->getColSolution();
       if (!changed)
         changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
                                         0.1,
                                         nlp_->getColSolution(), lp->getColSolution());
       if (changed) {
 
-        isInteger = integerFeasible(*lp, info, parameters_.cbcIntegerTolerance_,
+        isInteger = integerFeasible(*lp, branch_info, parameters_.cbcIntegerTolerance_,
                                      objects_, nObjects_);
       }
       else {

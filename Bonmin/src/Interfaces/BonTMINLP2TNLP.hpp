@@ -61,14 +61,14 @@ namespace Bonmin
     inline Index num_variables() const
     {
       assert(x_l_.size() == x_u_.size());
-      return x_l_.size();
+      return static_cast<int>(x_l_.size());
     }
 
     /** Get the number of constraints */
     inline Index num_constraints() const
     {
       assert(g_l_.size() == g_u_.size());
-      return g_l_.size();
+      return static_cast<int>(g_l_.size());
     }
     /** Get the nomber of nz in hessian */
     Index nnz_h_lag()

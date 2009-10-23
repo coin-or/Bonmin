@@ -57,6 +57,7 @@ namespace Bonmin
 
     double oaTime;
     b.options()->GetNumericValue("time_limit",oaTime,prefix);
+    b.options()->GetIntegerValue("solution_limit", parameter().maxSols_,prefix);
     parameter().localSearchNodeLimit_ = 1000000;
     parameter().maxLocalSearch_ = 100000;
     parameter().maxLocalSearchPerNode_ = 10000;
@@ -82,7 +83,7 @@ namespace Bonmin
       solverManip &lpManip,
       SubMipSolver * &subMip,
       BabInfo * babInfo,
-      double & cutoff) const
+      double & cutoff,const CglTreeInfo &info) const
   {
 
     bool interuptOnLimit = false;
@@ -110,7 +111,7 @@ namespace Bonmin
       nlp_->addObjectiveFunction(*lp, nlp_->getColSolution());
     lp->setObjCoeff(numcols,0);
     const double * colsol = NULL;
-    OsiBranchingInformation info(lp, false);
+    OsiBranchingInformation branch_info(lp, false);
 
     bool milpOptimal = false;
     nlp_->resolve();
@@ -145,7 +146,7 @@ namespace Bonmin
     while (colsol) {
       numberPasses++;
 
-      //after a prescribed elapsed time give some information to user
+      //after a prescribed elapsed time give some branch_information to user
       double time = CoinCpuTime();
 
 
@@ -153,7 +154,7 @@ namespace Bonmin
       int numberCutsBefore = cs.sizeRowCuts();
 
       //Fix the variable which have to be fixed, after having saved the bounds
-      info.solution_ = colsol;
+      branch_info.solution_ = colsol;
 
       vector<double> x_bar(indices.size());
       for(unsigned int i = 0 ; i < indices.size() ; i++){
@@ -166,7 +167,7 @@ namespace Bonmin
       <<dist<<CoinMessageEol;
 
       if(dist < 1e-05){
-         fixIntegers(*nlp_,info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
+         fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
 
          nlp_->resolve();
          bool restart = false;

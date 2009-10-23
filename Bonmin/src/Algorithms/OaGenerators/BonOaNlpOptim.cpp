@@ -9,6 +9,9 @@
 
 #include "BonOaNlpOptim.hpp"
 #include "OsiAuxInfo.hpp"
+#include "CbcModel.hpp"
+#include "BonBabInfos.hpp"
+#include "BonCbc.hpp"
 
 namespace Bonmin
 {
@@ -53,7 +56,6 @@ namespace Bonmin
   {
     nlp_ = si;
   }
-  static int nCalls = 0;
 /// cut generation method
   void
   OaNlpOptim::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
@@ -68,11 +70,22 @@ namespace Bonmin
     //Get the continuous solution
     //const double *colsol = si.getColSolution();
     //Check for integer feasibility
-    nCalls++;
+   if(!info.inTree || info.pass > 0) return;
+#if 1
+    BabInfo * babInfo = dynamic_cast<BabInfo *> (si.getAuxiliaryInfo());
+    assert(babInfo);
+    assert(babInfo->babPtr());
+    const CbcNode * node = babInfo->babPtr()->model().currentNode();
+    int level = (node == NULL) ? 0 : babInfo->babPtr()->model().currentNode()->depth();
     double rand = CoinDrand48();
-    if (info.level > maxDepth_ || info.pass > 0 || !info.inTree  ||
-        pow(2.,-info.level)*solves_per_level_ <= rand)
+    if (info.level > maxDepth_)
       return;
+    double score = pow(2.,-level)*solves_per_level_;
+    //printf("depth %i, score %g , rand %g\n", level, score, rand);
+    if (score <= rand)
+      return;
+#endif
+    printf("NLP REL ");
     //Fix the variable which have to be fixed, after having saved the bounds
     double * saveColLb = new double[numcols];
     double * saveColUb = new double[numcols];
@@ -84,42 +97,6 @@ namespace Bonmin
       }
     }
 
-#if 0
-//Add tight cuts at LP optimum
-    int numberCuts = si.getNumRows() - nlp_->getNumRows();
-    const OsiRowCut ** cuts = new const OsiRowCut*[numberCuts];
-    int begin = nlp_->getNumRows();
-    numberCuts = 0;
-    int end = si.getNumRows();
-    const double * rowLower = si.getRowLower();
-    const double * rowUpper = si.getRowUpper();
-    const CoinPackedMatrix * mat = si.getMatrixByRow();
-    const CoinBigIndex * starts = mat->getVectorStarts();
-    const int * lengths = mat->getVectorLengths();
-    const double * elements = mat->getElements();
-    const int * indices = mat->getIndices();
-
-    for (int i = begin ; i < end ; i++, numberCuts++) {
-      bool nnzExists=false;
-      for (int k = starts[i] ; k < starts[i]+lengths[i] ; k++) {
-        if (indices[k] == nlp_->getNumCols()) {
-          nnzExists = true;
-          char sign = (elements[k]>0.)?'+':'-';
-          char type='<';
-          if (rowLower[i]>-1e20) type='>';
-        }
-      }
-      if (nnzExists) {
-        numberCuts--;
-        continue;
-      }
-      int * indsCopy = CoinCopyOfArray(&indices[starts[i]], lengths[i]);
-      double * elemsCopy = CoinCopyOfArray(&elements[starts[i]], lengths[i]);
-      cuts[numberCuts] = new OsiRowCut(rowLower[i], rowUpper[i], lengths[i], lengths[i],
-          indsCopy, elemsCopy);
-    }
-    nlp_->applyRowCuts(numberCuts,cuts);
-#endif
     //Now solve the NLP get the cuts, reset bounds and get out
 
     //  nlp_->turnOnIpoptOutput();
@@ -199,17 +176,17 @@ namespace Bonmin
     roptions->SetRegisteringCategory("Nlp solve options in B-Hyb", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
         "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
-        0,10,
+        0,1,
         "A frequency of 0 amounts to to never solve the NLP relaxation.");
     roptions->setOptionExtraInfo("nlp_solve_frequency",1);
     roptions->AddLowerBoundedIntegerOption("nlp_solve_max_depth",
         "Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.",
-        0,10,
+        0,30,
         "A depth of 0 amounts to to never solve the NLP relaxation.");
     roptions->setOptionExtraInfo("nlp_solve_max_depth",1);
     roptions->AddLowerBoundedNumberOption("nlp_solves_per_depth",
         "Set average number of nodes in the tree at which NLP relaxations are solved in B-Hyb for each depth.",
-        0.,false,1e30);
+        0.,false,16);
     roptions->setOptionExtraInfo("nlp_solves_per_depth",1);
   }
 

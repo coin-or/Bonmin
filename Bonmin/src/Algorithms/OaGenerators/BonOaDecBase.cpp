@@ -346,6 +346,9 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   assert(babInfo);
   assert(babInfo->babPtr());
   numSols_ = babInfo->babPtr()->model().getSolutionCount ();
+  CglTreeInfo info_copy = info;
+  const CbcNode * node = babInfo->babPtr()->model().currentNode();
+  info_copy.level = (node == NULL) ? 0 : babInfo->babPtr()->model().currentNode()->depth();
   if(babInfo->hasSolution()) numSols_ ++;
   if (babInfo)
     if (!babInfo->mipFeasible())
@@ -432,7 +435,7 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
       subMip = new SubMipSolver(lpManip->si(), parameters_.strategy());
   }
 
-  double milpBound = performOa(cs, *lpManip, subMip, babInfo, cutoff);
+  double milpBound = performOa(cs, *lpManip, subMip, babInfo, cutoff, info_copy);
 
   if(babInfo->hasSolution()){
      babInfo->babPtr()->model().setSolutionCount (numSols_ - 1);
