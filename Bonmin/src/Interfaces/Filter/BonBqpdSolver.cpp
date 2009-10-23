@@ -130,6 +130,9 @@ namespace Bonmin
     options->GetNumericValue("qp_fillin_factor", fillin_factor_, "bqpd.");
     options->GetIntegerValue("kmax", kmax_ipt_, "bqpd.");
     options->GetIntegerValue("mlp", mlp_ipt_,"bqpd.");
+     if(!options_->GetIntegerValue("print_level",default_log_level_,""))
+      default_log_level_ = 1;
+
   }
 
   Ipopt::SmartPtr <TNLPSolver>
@@ -143,6 +146,7 @@ namespace Bonmin
     retval->fillin_factor_ = fillin_factor_;
     retval->kmax_ipt_ = kmax_ipt_;
     retval->mlp_ipt_ = mlp_ipt_;
+    retval->default_log_level_ = default_log_level_;
     return GetRawPtr(retval);
   }
 
@@ -171,6 +175,8 @@ namespace Bonmin
     if (is) {
       is.close();
     }
+    if(!options_->GetIntegerValue("print_level",default_log_level_,""))
+      default_log_level_ = 1;
     return retval;
   }
 

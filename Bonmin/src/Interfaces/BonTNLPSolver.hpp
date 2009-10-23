@@ -182,9 +182,9 @@ static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
 
 
   /// turn off all output from the solver 
-  virtual void turnOffOutput() = 0 ;
+  virtual void setOutputToDefault() = 0 ;
   /// turn on all output from the solver
-  virtual void turnOnOutput() = 0;
+  virtual void forceSolverOutput(int log_level) = 0;
   /// Get the solver name
   virtual std::string & solverName() = 0;
 
@@ -229,6 +229,8 @@ protected:
    /** Global time limit.*/
    double time_limit_;
 
+   /** To record default log level.*/
+   int default_log_level_;
   /// Copy Constructor
   TNLPSolver(const TNLPSolver & other);
 

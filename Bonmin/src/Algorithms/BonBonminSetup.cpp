@@ -77,6 +77,7 @@ namespace Bonmin
       if(messageHandler_)
         continuousSolver_->passInMessageHandler(messageHandler_);
       continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+
       nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
       // say bound dubious, does cuts at solution
       OsiBabSolver * extraStuff = new OsiBabSolver(3);
@@ -577,7 +578,9 @@ namespace Bonmin
       if(messageHandler_)
         continuousSolver_->passInMessageHandler(messageHandler_);
       continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
+      nonlinearSolver_->forceSolverOutput(intParam_[RootLogLevel]); 
       nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
+      nonlinearSolver_->setSolverOutputToDefault(); 
       // say bound dubious, does cuts at solution
       OsiBabSolver * extraStuff = new OsiBabSolver(3);
       continuousSolver_->setAuxiliaryInfo(extraStuff);

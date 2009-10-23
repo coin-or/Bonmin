@@ -110,6 +110,7 @@ namespace Bonmin
       DisableSos /** Consider or not SOS constraints.*/,
       NumCutPasses/** Number of cut passes at nodes.*/,
       NumCutPassesAtRoot/** Number of cut passes at nodes.*/,
+      RootLogLevel/** Log level for root relaxation.*/,
       NumberIntParam /** Dummy end to size table*/
     };
 
@@ -313,7 +314,7 @@ namespace Bonmin
     {
       return objects_;
     }
-
+   
   protected:
     /** Set the priorities into OsiTMINLPInterface when needed.*/
     void setPriorities();
@@ -344,7 +345,7 @@ namespace Bonmin
     TreeTraversal treeTraversalMethod_;
     /** Extra object to add to Cbc (not OsiObjects).*/
     vector<OsiObject *> objects_;
-
+    
 
     /** Storage of Journalist for output */
     Ipopt::SmartPtr<Ipopt::Journalist> journalist_;

@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
 	init.readAndApply(&nlpSolver);
       }
       
-      nlpSolver.solver()->turnOnOutput();
+      nlpSolver.solver()->forceSolverOutput(4);
       nlpSolver.initialSolve();
       
       //Print out integer variable values

@@ -110,9 +110,9 @@ namespace Bonmin
     virtual int IterationCount();
 
     /// turn off all output from the solver
-    virtual void turnOffOutput();
+    virtual void setOutputToDefault();
     /// turn on all output from the solver
-    virtual void turnOnOutput();
+    virtual void forceSolverOutput(int log_level);
 
     /// Get the solver name
     virtual std::string & solverName()

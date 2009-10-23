@@ -127,17 +127,18 @@ namespace Bonmin
       return 0;
     }
 
-    /// turn off all output from the solver
-    virtual void turnOffOutput()
+
+    // turn off all output from the solver
+    virtual void setOutputToDefault()
     {
-      if (Ipopt::IsValid(cached_)) cached_->iprint = 0;
+      if (Ipopt::IsValid(cached_)) cached_->iprint = default_log_level_;
     }
     /// turn on all output from the solver
-    virtual void turnOnOutput()
+    virtual void forceSolverOutput(int log_level)
     {
-      if (Ipopt::IsValid(cached_)) cached_->iprint = 3;
+      if (Ipopt::IsValid(cached_)) cached_->iprint = log_level;
     }
-
+    
     /// Get the solver name
     virtual std::string & solverName()
     {
@@ -362,6 +363,11 @@ namespace Bonmin
 
     //name of solver (Bqpd)
     static std::string  solverName_;
+
+    /** To record default log level.*/
+     int default_log_level_;
+
+
   };
 
 }// end namespace Bonmin

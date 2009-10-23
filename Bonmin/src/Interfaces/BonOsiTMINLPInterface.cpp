@@ -1958,8 +1958,8 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
   const double * colLower = getColLower();
   const double * colUpper = getColUpper();
   const double * duals = getRowPrice() + 2 * n;
-  double infty = getInfinity();
-  double nlp_infty = infty_;
+  //double infty = getInfinity();
+  //double nlp_infty = infty_;
   
   for(int rowIdx = 0; rowIdx < m ; rowIdx++) {
     if(constTypes_[rowIdx] == TNLP::NON_LINEAR && fabs(duals[rowIdx]) > 1e-06)

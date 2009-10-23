@@ -434,7 +434,17 @@ namespace Bonmin
 
     try {
     //Get the time and start.
-    model_.initialSolve();
+    {
+      OsiTMINLPInterface * tmpOsi = NULL;
+      if(s.nonlinearSolver() == s.continuousSolver()){
+        tmpOsi = dynamic_cast<OsiTMINLPInterface *> (model_.solver());
+        tmpOsi->forceSolverOutput(s.getIntParameter(BabSetupBase::RootLogLevel)); 
+      }
+      model_.initialSolve();
+      if(tmpOsi != NULL){
+        tmpOsi->setSolverOutputToDefault(); 
+      }
+    }
 
     int ival;
     s.options()->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");

@@ -38,7 +38,8 @@ namespace Bonmin
         0 /* SpecialOption*/,
         0 /* DisableSos.*/,
         1 /* numCutPasses.*/,
-        20 /* numCutPassesAtRoot.*/
+        20 /* numCutPassesAtRoot.*/,
+        0 /* log level at root.*/
       };
 
 
@@ -355,6 +356,7 @@ namespace Bonmin
     options->GetEnumValue("sos_constraints",intParam_[DisableSos],prefix_.c_str());
     options->GetIntegerValue("num_cut_passes",intParam_[NumCutPasses],prefix_.c_str());
     options->GetIntegerValue("num_cut_passes_at_root",intParam_[NumCutPassesAtRoot],prefix_.c_str());
+    options->GetIntegerValue("nlp_log_at_root",intParam_[RootLogLevel],prefix_.c_str());
 
     options->GetNumericValue("cutoff_decr",doubleParam_[CutoffDecr],prefix_.c_str());
     options->GetNumericValue("cutoff",doubleParam_[Cutoff],prefix_.c_str());
@@ -362,6 +364,7 @@ namespace Bonmin
     options->GetNumericValue("allowable_fraction_gap",doubleParam_[AllowableFractionGap],prefix_.c_str());
     options->GetNumericValue("integer_tolerance",doubleParam_[IntTol],prefix_.c_str());
     options->GetNumericValue("time_limit", doubleParam_[MaxTime],prefix_.c_str());
+
 
     int ival;
     options->GetEnumValue("node_comparison",ival,prefix_.c_str());
@@ -419,6 +422,12 @@ namespace Bonmin
         "0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose"
                                      );
     roptions->setOptionExtraInfo("lp_log_level", 3);
+
+    roptions->AddBoundedIntegerOption("nlp_log_at_root"," Specify a different log level "
+                                           "for root relaxtion.",
+                                            0,12,0,
+                                            "");
+    roptions->setOptionExtraInfo("nlp_log_at_root",11);
 
     roptions->SetRegisteringCategory("Branch-and-bound options", RegisteredOptions::BonminCategory);
 

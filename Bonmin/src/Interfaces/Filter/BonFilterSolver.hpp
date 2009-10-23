@@ -135,14 +135,14 @@ namespace Bonmin
     }
 
     /// turn off all output from the solver
-    virtual void turnOffOutput()
+    virtual void setOutputToDefault()
     {
-      if (cached_.IsValid()) cached_->iprint = 0;
+      if (cached_.IsValid()) cached_->iprint = default_log_level_;
     }
     /// turn on all output from the solver
-    virtual void turnOnOutput()
+    virtual void forceSolverOutput(int log_level)
     {
-      if (cached_.IsValid()) cached_->iprint = 3;
+      if (cached_.IsValid()) cached_->iprint = log_level;
     }
 
     /// Get the solver name
@@ -329,6 +329,8 @@ namespace Bonmin
     //name of solver (Filter)
     static std::string  solverName_;
 
+     /** To record default log level.*/
+     int default_log_level_;
     /** Converting TMatrices into row-ordered matrices */
     static void TMat2RowPMat(bool symmetric, fint n, fint m, int nnz, const Index* iRow,
         const Index* iCol, int * permutation2,

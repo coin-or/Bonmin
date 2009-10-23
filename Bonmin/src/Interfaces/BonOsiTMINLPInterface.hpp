@@ -784,10 +784,10 @@ class Messages : public CoinMessages
   /**@name Control of Ipopt output
    */
   //@{
-  void turnOffSolverOutput(){
-  app_->turnOffOutput();}
-  void turnOnSolverOutput(){
-  app_->turnOnOutput();}
+  void setSolverOutputToDefault(){
+  app_->setOutputToDefault();}
+  void forceSolverOutput(int log_level){
+  app_->forceSolverOutput(log_level);}
   //@}
 
   /**@name Sets and Getss */

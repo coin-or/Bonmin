@@ -403,6 +403,8 @@ namespace Bonmin
     if (is) {
       is.close();
     }
+    if(!options_->GetIntegerValue("print_level",default_log_level_,""))
+      default_log_level_ = 1;
     return retval;
   }
 

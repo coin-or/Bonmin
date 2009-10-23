@@ -69,6 +69,7 @@ namespace Bonmin
   {
     SmartPtr<IpoptSolver> retval = new IpoptSolver(*this);
     retval->app_->Initialize("");
+    retval->default_log_level_ = default_log_level_;
     return GetRawPtr(retval);
   }
 
@@ -240,6 +241,8 @@ namespace Bonmin
     Options->SetStringValue("expect_infeasible_problem","yes", true, true);
     Options->SetStringValue("mu_strategy", "adaptive", true, true);
     Options->SetStringValue("mu_oracle","probing", true, true);
+    if(!Options->GetIntegerValue("print_level",default_log_level_,""))
+      default_log_level_ = 1;
     Options->SetIntegerValue("print_level",1, true, true);
   }
 
@@ -375,13 +378,17 @@ IpoptSolver::getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
 
 
   void
-  IpoptSolver::turnOffOutput()
-  {}
+  IpoptSolver::setOutputToDefault()
+  {
+     options_->SetIntegerValue("print_level", default_log_level_, true, true);
+  }
 
 
   void
-  IpoptSolver::turnOnOutput()
-  {}
+  IpoptSolver::forceSolverOutput(int log_level)
+  {
+     options_->SetIntegerValue("print_level", log_level, true, true);
+  }
 
 
   /*******************************************************************************/
