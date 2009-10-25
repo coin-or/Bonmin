@@ -9,6 +9,8 @@
 //#define ECP_DEBUG
 #include "BonEcpCuts.hpp"
 #include "BonSolverHelp.hpp"
+#include "BonBabInfos.hpp"
+#include "BonCbc.hpp"
 namespace Bonmin
 {
 
@@ -46,11 +48,15 @@ namespace Bonmin
       const CglTreeInfo info) const
   {
     if (beta_ >=0) {
-      //Get a random number
-      double num=CoinDrand48();
-      const int & depth = info.level;
-      if (depth == 0) return;
-      if (num> beta_*pow(2.,-depth))
+      BabInfo * babInfo = dynamic_cast<BabInfo *> (si.getAuxiliaryInfo());
+      assert(babInfo);
+      assert(babInfo->babPtr());
+      const CbcNode * node = babInfo->babPtr()->model().currentNode();
+      int level = (node == NULL) ? 0 : babInfo->babPtr()->model().currentNode()->depth();
+      double rand = CoinDrand48();
+      double score = pow(2.,-level)*beta_;
+      //printf("depth %i, score %g , rand %g\n", level, score, rand);
+      if (score <= rand)
         return;
     }
     double orig_violation = nlp_->getNonLinearitiesViolation(
@@ -166,7 +172,7 @@ namespace Bonmin
     roptions->AddNumberOption
     ("ecp_propability_factor",
      "Factor appearing in formula for skipping ECP cuts.",
-     1000.,
+     10.,
      "Choosing -1 disables the skipping.");
     roptions->setOptionExtraInfo("ecp_propability_factor",1);
   }
