@@ -79,13 +79,15 @@ namespace Bonmin
     assert(babInfo->babPtr());
     const CbcNode * node = babInfo->babPtr()->model().currentNode();
     int level = (node == NULL) ? 0 : babInfo->babPtr()->model().currentNode()->depth();
-    double rand = CoinDrand48();
     if (info.level > maxDepth_)
       return;
-    double score = pow(2.,-level)*solves_per_level_;
-    //printf("depth %i, score %g , rand %g\n", level, score, rand);
-    if (score <= rand)
-      return;
+    if(solves_per_level_ < 1e10){
+      double rand = CoinDrand48();
+      double score = pow(2.,-level)*solves_per_level_;
+      //printf("depth %i, score %g , rand %g\n", level, score, rand);
+      if (score <= rand)
+        return;
+    }
 #endif
     //Fix the variable which have to be fixed, after having saved the bounds
     double * saveColLb = new double[numcols];
@@ -177,17 +179,17 @@ namespace Bonmin
     roptions->SetRegisteringCategory("Nlp solve options in B-Hyb", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
         "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
-        0,1,
+        0,10,
         "A frequency of 0 amounts to to never solve the NLP relaxation.");
     roptions->setOptionExtraInfo("nlp_solve_frequency",1);
     roptions->AddLowerBoundedIntegerOption("nlp_solve_max_depth",
         "Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.",
-        0,30,
+        0,10,
         "A depth of 0 amounts to to never solve the NLP relaxation.");
     roptions->setOptionExtraInfo("nlp_solve_max_depth",1);
     roptions->AddLowerBoundedNumberOption("nlp_solves_per_depth",
         "Set average number of nodes in the tree at which NLP relaxations are solved in B-Hyb for each depth.",
-        0.,false,16);
+        0.,false,1e100);
     roptions->setOptionExtraInfo("nlp_solves_per_depth",1);
   }
 

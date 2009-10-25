@@ -63,6 +63,9 @@ namespace Bonmin
     parameter().maxLocalSearchPerNode_ = 10000;
     parameter().maxLocalSearchTime_ =
     std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
+    if(parameter().maxSols_ > b.getIntParameter(BabSetupBase::MaxSolutions))
+      parameter().maxSols_ = b.getIntParameter(BabSetupBase::MaxSolutions);
+       
   }
 
   MinlpFeasPump::~MinlpFeasPump()

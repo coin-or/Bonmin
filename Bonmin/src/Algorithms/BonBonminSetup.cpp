@@ -587,23 +587,34 @@ namespace Bonmin
       delete extraStuff;
     }
     Algorithm algo = getAlgorithm();
-    if (algo == B_OA) {
+    std::string prefix = (prefix_ == "bonmin.") ? "" : prefix_;
+    if (algo == B_Hyb) {
+      std::string o_name = prefix_ + "oa_decomposition";
+      options_->SetStringValue(o_name.c_str(),"no", true, true);
+      o_name = prefix_ + "pump_for_minlp";
+      options_->SetStringValue(o_name.c_str(),"yes", true, true);
+      o_name = prefix + "pump_for_minlp.time_limit";
+      options_->SetNumericValue(o_name.c_str(),30, true, true);
+      o_name = prefix + "pump_for_minlp.solution_limit";
+      options_->SetIntegerValue(o_name.c_str(),3, true, true);
+    }
+    else if (algo == B_OA) {
       std::string o_name = prefix_ + "oa_decomposition";
       options_->SetStringValue(o_name.c_str(),"yes", true, true);
-      o_name = prefix_ + "oa_decomposition.time_limit";
+      o_name = prefix + "oa_decomposition.time_limit";
       options_->SetNumericValue(o_name.c_str(),DBL_MAX, true, true);
       o_name = prefix_ + "pump_for_minlp";
       options_->SetStringValue(o_name.c_str(),"no", true, true);
-      o_name = prefix_ + "nlp_solve_frequency";
+      o_name = prefix + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
       intParam_[BabLogLevel] = 0;
     }
-    if (algo == B_IFP) {
+    else if (algo == B_IFP) {
       std::string o_name = prefix_ + "oa_decomposition";
       options_->SetStringValue(o_name.c_str(),"no", true, true);
       o_name = prefix_ + "pump_for_minlp";
       options_->SetStringValue(o_name.c_str(),"yes", true, true);
-      o_name = prefix_ + "pump_for_minlp.time_limit";
+      o_name = prefix + "pump_for_minlp.time_limit";
       options_->SetNumericValue(o_name.c_str(),DBL_MAX, true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
