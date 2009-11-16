@@ -1863,7 +1863,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
     if(global) {
       newCut.setGloballyValidAsInteger(1);
     }
-    newCut.setEffectiveness(99.99e99);
+    //newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
@@ -1927,7 +1927,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x, bool ge
       OsiRowCut newCut;
       if(global)
 	newCut.setGloballyValidAsInteger(1);
-      newCut.setEffectiveness(99.99e99);
+      //newCut.setEffectiveness(99.99e99);
       newCut.setRow(v);
       newCut.setLb(-COIN_DBL_MAX/*Infinity*/);
       newCut.setUb(ub[nNonLinear_]);
@@ -2008,7 +2008,7 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   if(global) {
     newCut.setGloballyValidAsInteger(1);
   }
-  newCut.setEffectiveness(99.99e99);
+  //newCut.setEffectiveness(99.99e99);
   newCut.setLb(lb);
   newCut.setUb(ub);
   newCut.setRow(cut);

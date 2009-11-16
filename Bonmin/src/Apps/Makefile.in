@@ -412,8 +412,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-             BonMin.cpp \
-             BonNodeSolver.cpp
+             BonMin.cppbak \
+             BonNodeSolver.cppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 DISTCLEANFILES = 
