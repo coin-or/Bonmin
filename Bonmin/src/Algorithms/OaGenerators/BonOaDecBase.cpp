@@ -274,16 +274,29 @@ namespace Bonmin
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
-       
-      int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
-     
       int stat = CPXgetstat( env, cpxlp);
+      bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS);
       optimal_ |= (stat == CPXMIP_INFEASIBLE); 
-       nodeCount_ = CPXgetnodecnt(env , cpxlp);
+      nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
-      if (status)
-        throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
+      int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+       
+      if(!infeasible){
+         if(!integerSolution_){
+           integerSolution_ = new double[lp_->getNumCols()];
+         }
+         CPXgetmipx(env, cpxlp, integerSolution_, 0, lp_->getNumCols() -1);
+        if (status)
+          throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
+      }
+      else {
+        if (integerSolution_) {
+          delete [] integerSolution_;
+          integerSolution_ = NULL;
+        }
+      }
     }
+    else {
 #endif
 
     if (lp_->getFractionalIndices().size() == 0) {
@@ -296,6 +309,9 @@ namespace Bonmin
       integerSolution_ = NULL;
     }
   }
+#ifdef COIN_HAS_CPX
+  }
+#endif
 }
 
 OaDecompositionBase::solverManip::solverManip
