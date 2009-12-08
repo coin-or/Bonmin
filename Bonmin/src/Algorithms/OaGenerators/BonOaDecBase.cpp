@@ -276,7 +276,7 @@ namespace Bonmin
 
       int stat = CPXgetstat( env, cpxlp);
       bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS) || (stat == CPXMIP_TIME_LIM_INFEAS) || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)
-                        || (stat == CPXMIP_MEM_LIM_INFEAS);
+                        || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
       optimal_ |= (stat == CPXMIP_INFEASIBLE); 
       nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
