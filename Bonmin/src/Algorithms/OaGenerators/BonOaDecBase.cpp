@@ -22,6 +22,9 @@
 #include "CbcStrategy.hpp"
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
+
+#define CHECK_CPX_STAT(a,b) if(b) throw CoinError("Error in CPLEX call",__FILE__,a);
+
 #endif
 #include "OsiAuxInfo.hpp"
 
@@ -265,30 +268,39 @@ namespace Bonmin
             "OaDecompositionBase::SubMipSolver");
     }
 
-    lp_->branchAndBound();
-
-   optimal_ = lp_->isProvenOptimal();
 #ifdef COIN_HAS_CPX
     if (cpx_) {
+      cpx_->switchToMIP();
       //CpxModel = NULL;
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
+      int status = CPXmipopt(env,cpxlp);
+      CHECK_CPX_STAT("mipopt",status)
+
       int stat = CPXgetstat( env, cpxlp);
+//#define FOR_HASSAN
+#ifdef FOR_HASSAN
+      std::cout << "STATUS = "<<stat<<"\n";
+      if(stat==119){
+          cpx_->writeMpsNative("OA.mps", NULL, NULL, 1);
+          throw CoinError("Ok program stoped by me !","OaDecompositionBase::SubMipSolver","performLocalSearch");
+      }
+#endif
       bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS) || (stat == CPXMIP_TIME_LIM_INFEAS) || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)
                         || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
-      optimal_ |= (stat == CPXMIP_INFEASIBLE); 
+      optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
       nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
-      int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+      status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+      CHECK_CPX_STAT("getbestobjval",status)
        
       if(!infeasible){
          if(!integerSolution_){
            integerSolution_ = new double[lp_->getNumCols()];
          }
          CPXgetmipx(env, cpxlp, integerSolution_, 0, lp_->getNumCols() -1);
-        if (status)
-          throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
+         CHECK_CPX_STAT("getmipx",status)
       }
       else {
         if (integerSolution_) {
@@ -299,6 +311,9 @@ namespace Bonmin
     }
     else {
 #endif
+    lp_->branchAndBound();
+
+   optimal_ = lp_->isProvenOptimal();
 
     if (lp_->getFractionalIndices().size() == 0) {
       if (!integerSolution_)
