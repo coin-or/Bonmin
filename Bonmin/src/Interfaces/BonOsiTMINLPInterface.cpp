@@ -2153,7 +2153,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   const double * colUpper = getColUpper();
   const double * duals = getRowPrice() + 2*n;
   assert(m==getNumRows());
-  double infty = si.getInfinity();
+  double infty = DBL_MAX;//si.getInfinity();
   double nlp_infty = infty_;
   
   for(int i = 0 ; i < m ; i++) {
@@ -2222,8 +2222,10 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     }
     else {
       double value = jValues_[i] * getColSolution()[jCol_[i]];
-      rowLow[jRow_[i]] += value;
-      rowUp[jRow_[i]] += value;
+      if(rowLow[jRow_[i]] > - infty_)
+        rowLow[jRow_[i]] += value;
+      if(rowUp[jRow_[i]] < infty_)
+        rowUp[jRow_[i]] += value;
     } 
   }
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
