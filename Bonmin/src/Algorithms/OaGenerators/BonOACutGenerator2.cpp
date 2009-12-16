@@ -20,7 +20,7 @@
 #endif
 #include "OsiAuxInfo.hpp"
 
-
+#include <climits>
 
 namespace Bonmin
 {
@@ -68,9 +68,9 @@ namespace Bonmin
 
     double oaTime;
     b.options()->GetNumericValue("oa_dec_time_limit",oaTime,"bonmin.");
-    parameter().localSearchNodeLimit_ = 1000000;
-    parameter().maxLocalSearch_ = 100000;
-    parameter().maxLocalSearchPerNode_ = 10000;
+    parameter().localSearchNodeLimit_ = INT_MAX;
+    parameter().maxLocalSearch_ = INT_MAX;
+    parameter().maxLocalSearchPerNode_ = INT_MAX;
     parameter().maxLocalSearchTime_ =
       Ipopt::Min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
   }
