@@ -68,9 +68,7 @@ namespace Bonmin
 
     double oaTime;
     b.options()->GetNumericValue("oa_dec_time_limit",oaTime,"bonmin.");
-    parameter().localSearchNodeLimit_ = INT_MAX;
     parameter().maxLocalSearch_ = INT_MAX;
-    parameter().maxLocalSearchPerNode_ = INT_MAX;
     parameter().maxLocalSearchTime_ =
       Ipopt::Min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
   }
@@ -82,7 +80,6 @@ namespace Bonmin
   OACutGenerator2::doLocalSearch() const
   {
     return (nLocalSearch_<parameters_.maxLocalSearch_ &&
-        parameters_.localSearchNodeLimit_ > 0 &&
         CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_);
   }
   /// virtual method which performs the OA algorithm by modifying lp and nlp.
@@ -112,8 +109,7 @@ namespace Bonmin
     if (subMip)//Perform a local search
     {
       subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_,
-          (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
-          parameters_.localSearchNodeLimit_);
+          (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */);
       milpBound = subMip->lowBound();
       milpOptimal = subMip->optimal();
 
@@ -209,9 +205,7 @@ namespace Bonmin
         break;
       //do we perform a new local search ?
       if (milpOptimal && feasible && !isInteger &&
-          nLocalSearch_ < parameters_.maxLocalSearch_ &&
-          numberPasses < parameters_.maxLocalSearchPerNode_ &&
-          parameters_.localSearchNodeLimit_ > 0) {
+          nLocalSearch_ < parameters_.maxLocalSearch_) {
 
         /** do we have a subMip? if not create a new one. */
         if (subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy());
@@ -219,8 +213,7 @@ namespace Bonmin
         nLocalSearch_++;
 
         subMip->performLocalSearch(cutoff, parameters_.subMilpLogLevel_,
-            parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
-            parameters_.localSearchNodeLimit_);
+            parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime());
 
         milpBound = subMip->lowBound();
 

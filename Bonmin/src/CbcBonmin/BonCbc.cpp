@@ -432,6 +432,11 @@ namespace Bonmin
     //Get the time and start.
     model_.initialSolve();
 
+    //Added by Claudia
+    OsiTMINLPInterface * nlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
+    if(nlpSolver->getNewCutoffDecr()!=COIN_DBL_MAX)
+      model_.setDblParam(CbcModel::CbcCutoffIncrement, nlpSolver->getNewCutoffDecr());
+
     // for Couenne
     if (usingCouenne_)
       model_.passInSolverCharacteristics (bonBabInfoPtr);
