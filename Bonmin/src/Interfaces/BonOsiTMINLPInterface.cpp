@@ -807,7 +807,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
   delete warmstart_;
   warmstart_ = NULL;
  
-  double * of_current = new double[numsolve];
+  double * of_current = (numsolve > 0) ? new double[numsolve]: NULL;
   int num_failed, num_infeas;
   double mean, std_dev, var_coeff;
   double min = DBL_MAX;
@@ -891,40 +891,41 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
       <<f+2
       <<CoinMessageEol;
 
-
-  if(isProvenOptimal())
-  {
-    of_current[f] = getObjValue();
-    mean=mean+of_current[f];
-    if (of_current[f] < min)
-       min = of_current[f];
-    else if (of_current[f] > max)
-       max = of_current[f];
+  if(of_current != NULL){
+    if(isProvenOptimal())
+    {
+      of_current[f] = getObjValue();
+      mean=mean+of_current[f];
+      if (of_current[f] < min)
+         min = of_current[f];
+      else if (of_current[f] > max)
+         max = of_current[f];
+    }
+    else
+    {
+      of_current[f] = 0;
+    }
   }
-  else
-  {
-    of_current[f] = 0;
-  }
-
 }
 
 
-//calculate the mean
-mean=mean/(numsolve-num_failed-num_infeas);
-
-std_dev = 0;
-
-//calculate the std deviation
-for(int i=0; i<numsolve; i++)
-{
-  if(of_current[i]!=0)
-    std_dev=std_dev+pow(of_current[i]-mean,2);
-}
-std_dev=pow((std_dev/(numsolve-num_failed-num_infeas)),0.5);
-
-//calculate coeff of variation
-var_coeff=std_dev/mean;
-
+  if(of_current != NULL){
+     //calculate the mean
+     mean=mean/(numsolve-num_failed-num_infeas);
+     
+     std_dev = 0;
+     
+     //calculate the std deviation
+     for(int i=0; i<numsolve; i++)
+     {
+       if(of_current[i]!=0)
+         std_dev=std_dev+pow(of_current[i]-mean,2);
+     }
+     std_dev=pow((std_dev/(numsolve-num_failed-num_infeas)),0.5);
+     
+     //calculate coeff of variation
+     var_coeff=std_dev/mean;
+  }
 
 
 
