@@ -122,6 +122,8 @@ namespace Bonmin
       addOnlyViolated_(false),
       cbcCutoffIncrement_(1e-06),
       cbcIntegerTolerance_(1e-05),
+      localSearchNodeLimit_(0),
+      maxLocalSearchPerNode_(0),
       maxLocalSearch_(0),
       maxLocalSearchTime_(3600),
       subMilpLogLevel_(0),
@@ -142,6 +144,8 @@ namespace Bonmin
       addOnlyViolated_(other.addOnlyViolated_),
       cbcCutoffIncrement_(other.cbcCutoffIncrement_),
       cbcIntegerTolerance_(other.cbcIntegerTolerance_),
+      localSearchNodeLimit_(other.localSearchNodeLimit_),
+      maxLocalSearchPerNode_(other.maxLocalSearchPerNode_),
       maxLocalSearch_(other.maxLocalSearch_),
       maxLocalSearchTime_(other.maxLocalSearchTime_),
       subMilpLogLevel_(other.subMilpLogLevel_),
@@ -202,7 +206,8 @@ namespace Bonmin
 
 
   void
-  OaDecompositionBase::SubMipSolver::performLocalSearch(double cutoff, int loglevel, double maxTime)
+  OaDecompositionBase::SubMipSolver::performLocalSearch(double cutoff, int loglevel, double maxTime,
+      int maxNodes)
   {
     if (clp_) {
       if (!strategy_)
@@ -222,6 +227,7 @@ namespace Bonmin
       cbc_->setStrategy(*strategy_);
       cbc_->setLogLevel(loglevel);
       cbc_->solver()->messageHandler()->setLogLevel(0);
+      cbc_->setMaximumNodes(maxNodes);
       cbc_->setMaximumSeconds(maxTime);
       cbc_->setCutoff(cutoff);
       cbc_->branchAndBound();
@@ -249,6 +255,7 @@ namespace Bonmin
 #ifdef COIN_HAS_CPX
       if (cpx_) {
         CPXENVptr env = cpx_->getEnvironmentPtr();
+        CPXsetintparam(env, CPX_PARAM_NODELIM, maxNodes);
         CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
         //CpxModel = cpx_;

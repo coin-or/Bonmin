@@ -146,32 +146,6 @@ register_general_options
   roptions->setOptionExtraInfo("num_resolve_at_infeasibles",8);
 
 
-  roptions->AddStringOption2("dynamic_def_cutoff_decr",
-      "Do you want to define the parameter cutoff_decr dynamically?",
-      "no",
-      "no", "No, define it statically",
-      "yes","Yes, define it dynamically");
-  roptions->setOptionExtraInfo("dynamic_def_cutoff_decr",8);
-
-  roptions->AddLowerBoundedNumberOption("coeff_var_threshold",
-      "Coefficient of variation threshold (for dynamic definition of cutoff_decr).",
-      0.0,
-      false,
-      0.1,
-      "Coefficient of variation threshold (for dynamic definition of cutoff_decr).");
-  roptions->setOptionExtraInfo("coeff_var_threshold",8);
-  
-  roptions->AddNumberOption("first_perc_for_cutoff_decr",
-      "The percentage used when, the coeff of variance is smaller than the threshold, to compute the cutoff_decr dynamically.",
-      -0.02,
-      "The percentage used when, the coeff of variance is smaller than the threshold, to compute the cutoff_decr dynamically.");
-  roptions->setOptionExtraInfo("first_perc_for_cutoff_decr",8);
-
-  roptions->AddNumberOption("second_perc_for_cutoff_decr",
-      "The percentage used when, the coeff of variance is greater than the threshold, to compute the cutoff_decr dynamically.",
-      -0.05,
-      "The percentage used when, the coeff of variance is greater than the threshold, to compute the cutoff_decr dynamically.");
-  roptions->setOptionExtraInfo("second_perc_for_cutoff_decr",8);
 
   }
 
@@ -384,13 +358,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     firstSolve_(true),
     cutStrengthener_(NULL),
     oaMessages_(),
-    oaHandler_(NULL),
-    dynamicCutOff_(0),
-    coeff_var_threshold_(0.1),
-    first_perc_for_cutoff_decr_(-0.02),
-    second_perc_for_cutoff_decr_(-0.05),
-    newCutoffDecr(COIN_DBL_MAX)
-
+    oaHandler_(NULL)
 {
    oaHandler_ = new OaMessageHandler;
    oaHandler_->setLogLevel(0);
@@ -545,12 +513,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     cutStrengthener_(source.cutStrengthener_),
     oaMessages_(),
     oaHandler_(NULL),
-    strong_branching_solver_(source.strong_branching_solver_),
-    dynamicCutOff_(source.dynamicCutOff_),
-    coeff_var_threshold_(source.coeff_var_threshold_),
-    first_perc_for_cutoff_decr_(source.first_perc_for_cutoff_decr_),
-    second_perc_for_cutoff_decr_(source.second_perc_for_cutoff_decr_),
-    newCutoffDecr(source.newCutoffDecr)
+    strong_branching_solver_(source.strong_branching_solver_)
 {
    if(defaultHandler()){
      messageHandler()->setLogLevel(source.messageHandler()->logLevel());
@@ -667,7 +630,6 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
       veryTiny_ = rhs.veryTiny_;
       infty_ = rhs.infty_;
       exposeWarmStart_ = rhs.exposeWarmStart_;
-      newCutoffDecr = rhs.newCutoffDecr;
 
     }
     else {
@@ -707,11 +669,6 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
     delete oaHandler_;
     oaHandler_ = new OaMessageHandler(*rhs.oaHandler_);
     strong_branching_solver_ = rhs.strong_branching_solver_;
-
-    dynamicCutOff_ = rhs.dynamicCutOff_;
-    coeff_var_threshold_ = rhs.coeff_var_threshold_;
-    first_perc_for_cutoff_decr_ = rhs.first_perc_for_cutoff_decr_;
-    second_perc_for_cutoff_decr_ = rhs.second_perc_for_cutoff_decr_;
 
     freeCachedData();
   }
@@ -807,12 +764,6 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
   delete warmstart_;
   warmstart_ = NULL;
  
-  double * of_current = (numsolve > 0) ? new double[numsolve]: NULL;
-  int num_failed, num_infeas;
-  double mean, std_dev, var_coeff;
-  double min = DBL_MAX;
-  double max = -DBL_MAX;
-
   Coin::SmartPtr<SimpleReferencedPtr<CoinWarmStart> > ws_backup = NULL;
   if(!exposeWarmStart_ && keepWarmStart){
     //if warm start is not exposed, we need to store the current starting point to
@@ -838,11 +789,6 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
         messages_)
     <<1
     <<CoinMessageEol;
-
-  num_failed = 0;
-  num_infeas = 0;
-  mean = 0;
-
   for(int f = 0; f < numsolve ; f++) {
     messageHandler()->message(WARNING_RESOLVING,
         messages_)
@@ -868,14 +814,8 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
     messageHandler()->message(LOG_LINE, messages_)
     <<c<<f+1<<statusAsString()<<getObjValue()<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
 
-    if(isAbandoned()) {
-      num_failed++;
-    }
-    else if(isProvenPrimalInfeasible()) {
-       num_infeas++;
-    }
 
-    else if(isProvenOptimal())
+    if(isProvenOptimal())
       messageHandler()->message(SOLUTION_FOUND,
           messages_)
       <<f+2<<getObjValue()<<bestBound
@@ -890,62 +830,10 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
           messages_)
       <<f+2
       <<CoinMessageEol;
-
-  if(of_current != NULL){
-    if(isProvenOptimal())
-    {
-      of_current[f] = getObjValue();
-      mean=mean+of_current[f];
-      if (of_current[f] < min)
-         min = of_current[f];
-      else if (of_current[f] > max)
-         max = of_current[f];
-    }
-    else
-    {
-      of_current[f] = 0;
-    }
   }
-}
-
-
-  if(of_current != NULL){
-     //calculate the mean
-     mean=mean/(numsolve-num_failed-num_infeas);
-     
-     std_dev = 0;
-     
-     //calculate the std deviation
-     for(int i=0; i<numsolve; i++)
-     {
-       if(of_current[i]!=0)
-         std_dev=std_dev+pow(of_current[i]-mean,2);
-     }
-     std_dev=pow((std_dev/(numsolve-num_failed-num_infeas)),0.5);
-     
-     //calculate coeff of variation
-     var_coeff=std_dev/mean;
-  }
-
-
-
   setColSolution(point());
   setRowPrice(point() + getNumCols());
   app_->enableWarmStart();
-
-
-  if(dynamicCutOff_)
-  {
-     if(var_coeff<0.1)
-     {
-        setNewCutoffDecr(mean*first_perc_for_cutoff_decr_);
-     }
-     else
-     {
-        setNewCutoffDecr(mean*second_perc_for_cutoff_decr_);
-     }
-  }
-     
 
   optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_to_optimize_));
   hasBeenOptimized_ = true;
@@ -2847,10 +2735,6 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,"bonmin.");
     app_->options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,"bonmin.");
     app_->options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,"bonmin.");
-    app_->options()->GetEnumValue("dynamic_def_cutoff_decr", dynamicCutOff_,"bonmin.");
-    app_->options()->GetNumericValue("coeff_var_threshold", coeff_var_threshold_, "bonmin.");
-    app_->options()->GetNumericValue("first_perc_for_cutoff_decr", first_perc_for_cutoff_decr_, "bonmin.");
-    app_->options()->GetNumericValue("second_perc_for_cutoff_decr", second_perc_for_cutoff_decr_, "bonmin.");
     app_->options()->GetIntegerValue("num_resolve_at_infeasibles", numRetryInfeasibles_,"bonmin.");
     app_->options()->GetIntegerValue("num_iterations_suspect", numIterationSuspect_,"bonmin.");
     app_->options()->GetEnumValue("nlp_failure_behavior",pretendFailIsInfeasible_,"bonmin.");

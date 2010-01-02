@@ -63,7 +63,8 @@ namespace Bonmin
       /** update cutoff and perform a new local search. */
       void performLocalSearch(double cutoff,
           int loglevel,
-          double maxTime);
+          double maxTime,
+          int maxNodes);
 
       /** Returns lower bound. */
       inline double lowBound()
@@ -272,6 +273,10 @@ namespace Bonmin
       double cbcCutoffIncrement_;
       /// integer tolerance (has to be the same as Cbc's)
       double cbcIntegerTolerance_;
+      ///Max number of nodes for local search
+      int localSearchNodeLimit_;
+      ///Max number of local searches per node
+      int maxLocalSearchPerNode_;
       ///Total max number of local searches
       int maxLocalSearch_;
       /// maximum time for local searches
