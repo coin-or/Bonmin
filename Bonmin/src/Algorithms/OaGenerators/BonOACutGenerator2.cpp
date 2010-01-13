@@ -20,6 +20,7 @@
 #include "OsiAuxInfo.hpp"
 #include "BonSolverHelp.hpp"
 
+#include <climits>
 
 namespace Bonmin
 {
@@ -61,10 +62,8 @@ namespace Bonmin
     b.options()->GetNumericValue("time_limit",oaTime,prefix);
     parameter().maxLocalSearchTime_ =
     std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
+    parameter().maxLocalSearch_ = INT_MAX;
     b.options()->GetIntegerValue("solution_limit", parameter().maxSols_,prefix);
-    parameter().localSearchNodeLimit_ = 1000000;
-    parameter().maxLocalSearch_ = 100000;
-    parameter().maxLocalSearchPerNode_ = 10000;
   }
   OACutGenerator2::~OACutGenerator2()
   {}
@@ -74,9 +73,7 @@ namespace Bonmin
   OACutGenerator2::doLocalSearch(BabInfo * babInfo) const
   {
     return (nLocalSearch_<parameters_.maxLocalSearch_ &&
-        parameters_.localSearchNodeLimit_ > 0 &&
-        CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_ &&
-        numSols_ < parameters_.maxSols_);
+	    CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_);
   }
   /// virtual method which performs the OA algorithm by modifying lp and nlp.
   double
@@ -87,7 +84,6 @@ namespace Bonmin
       double & cutoff, const CglTreeInfo & info) const
   {
 
-    bool interuptOnLimit = false;
     double lastPeriodicLog = CoinCpuTime();
 
     //const int numcols = nlp_->getNumCols();
@@ -107,8 +103,7 @@ namespace Bonmin
     if (subMip)//Perform a local search
     {
       subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
-          (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */,
-          parameters_.localSearchNodeLimit_);
+          (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
       milpBound = subMip->lowBound();
       milpOptimal = subMip->optimal();
 
@@ -210,8 +205,7 @@ namespace Bonmin
       //do we perform a new local search ?
       if (feasible && !isInteger &&
           nLocalSearch_ < parameters_.maxLocalSearch_ &&
-          numberPasses < parameters_.maxLocalSearchPerNode_ &&
-          parameters_.localSearchNodeLimit_ > 0 && numSols_ < parameters_.maxSols_) {
+	  numSols_ < parameters_.maxSols_) {
 
         /** do we have a subMip? if not create a new one. */
         if (subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy());
@@ -219,8 +213,8 @@ namespace Bonmin
         nLocalSearch_++;
 
         subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
-            parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime(),
-            parameters_.localSearchNodeLimit_);
+            parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()
+            );
 
         milpBound = subMip->lowBound();
 

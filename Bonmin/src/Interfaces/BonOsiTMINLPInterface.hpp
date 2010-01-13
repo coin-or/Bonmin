@@ -239,6 +239,21 @@ class Messages : public CoinMessages
   {
     hasContinuedAfterNlpFailure_ = true;
   }
+
+
+  //Added by Claudia
+  
+  double getNewCutoffDecr()
+  {
+    return newCutoffDecr;
+  }
+
+  void setNewCutoffDecr(double d)
+  {
+    newCutoffDecr = d;
+  }
+
+
   /// Did we continue on a failure
   bool hasContinuedOnAFailure()
   {
@@ -1154,6 +1169,19 @@ protected:
   int numRetryInfeasibles_;
   /// Number of times problem will be resolved in case of a failure
   int numRetryUnsolved_;
+
+
+  //Added by Claudia
+  /// Dynamic cutOff_
+  int dynamicCutOff_;
+  /// coeff_var_threshold_
+  double coeff_var_threshold_;
+  /// first_perc_for_cutoff_decr_
+  double first_perc_for_cutoff_decr_;
+  /// second_perc_for_cutoff_decr_
+  double second_perc_for_cutoff_decr_;
+ 
+
   /** Messages specific to an OsiTMINLPInterface. */
   Messages messages_;
   /** If not 0 when a problem is not solved (failed to be solved)
@@ -1220,6 +1248,8 @@ protected:
   /** OA Message handler. */
   OaMessageHandler * oaHandler_;
   //@}
+
+  double newCutoffDecr;
 protected:
   /** Facilitator to create an application. */
   void createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,

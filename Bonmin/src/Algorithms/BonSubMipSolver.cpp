@@ -17,6 +17,9 @@
 
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
+
+#define CHECK_CPX_STAT(a,b) if(b) throw CoinError("Error in CPLEX call",__FILE__,a);
+
 #endif
 
 #include "BonRegisteredOptions.hpp"
@@ -73,8 +76,7 @@ namespace Bonmin {
 
 
  void 
- SubMipSolver::find_good_sol(double cutoff, int loglevel, double max_time,
-                                    int max_node){
+ SubMipSolver::find_good_sol(double cutoff, int loglevel, double max_time){
 
      if(clp_){
       CbcStrategyDefault * strat_default = NULL;
@@ -97,7 +99,6 @@ namespace Bonmin {
       cbc_->setStrategy(*strategy_);
       cbc_->setLogLevel(loglevel);
       cbc_->solver()->messageHandler()->setLogLevel(0);
-      cbc_->setMaximumNodes(max_node);
       cbc_->setMaximumSeconds(max_time);
       cbc_->setMaximumSolutions(1);
       cbc_->setCutoff(cutoff);
@@ -136,7 +137,6 @@ namespace Bonmin {
 #else
         CPXENVptr env = cpx_->getEnvironmentPtr();
         CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
-        CPXsetintparam(env, CPX_PARAM_NODELIM, max_node);
         CPXsetdblparam(env, CPX_PARAM_TILIM, max_time);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
 
@@ -172,8 +172,7 @@ namespace Bonmin {
   }
 
   void
-  SubMipSolver::optimize(double cutoff, int loglevel, double maxTime,
-      int maxNodes)
+  SubMipSolver::optimize(double cutoff, int loglevel, double maxTime)
   {
     if (clp_) {
       assert(strategy_);
@@ -195,7 +194,6 @@ namespace Bonmin {
       cbc_->setStrategy(*strategy_);
       cbc_->setLogLevel(loglevel);
       cbc_->solver()->messageHandler()->setLogLevel(0);
-      cbc_->setMaximumNodes(maxNodes);
       cbc_->setMaximumSeconds(maxTime);
       cbc_->setCutoff(cutoff);
 
@@ -225,7 +223,6 @@ namespace Bonmin {
 #ifdef COIN_HAS_CPX
       if (cpx_) {
         CPXENVptr env = cpx_->getEnvironmentPtr();
-        CPXsetintparam(env, CPX_PARAM_NODELIM, maxNodes);
         CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
         //CpxModel = cpx_;

@@ -75,7 +75,7 @@ namespace Bonmin
       nlpSol = const_cast<double *>(nlp_->getColSolution());
 
       const double * toCut = (parameter().addOnlyViolated_)?
-          colsol:NULL;
+                             colsol:NULL;
       if(cut_count_ <= maximum_oa_cuts_ && type_ == OA)
         nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
                                     parameter().global_);

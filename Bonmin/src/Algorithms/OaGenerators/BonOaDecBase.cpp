@@ -22,6 +22,9 @@
 #include "CbcStrategy.hpp"
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
+
+#define CHECK_CPX_STAT(a,b) if(b) throw CoinError("Error in CPLEX call",__FILE__,a);
+
 #endif
 #include "BonCbc.hpp"
 #include "BonSolverHelp.hpp"
@@ -116,8 +119,6 @@ namespace Bonmin {
       addOnlyViolated_(false),
       cbcCutoffIncrement_(1e-06),
       cbcIntegerTolerance_(1e-05),
-      localSearchNodeLimit_(0),
-      maxLocalSearchPerNode_(0),
       maxLocalSearch_(0),
       maxLocalSearchTime_(3600),
       subMilpLogLevel_(0),
@@ -139,8 +140,6 @@ namespace Bonmin {
       addOnlyViolated_(other.addOnlyViolated_),
       cbcCutoffIncrement_(other.cbcCutoffIncrement_),
       cbcIntegerTolerance_(other.cbcIntegerTolerance_),
-      localSearchNodeLimit_(other.localSearchNodeLimit_),
-      maxLocalSearchPerNode_(other.maxLocalSearchPerNode_),
       maxLocalSearch_(other.maxLocalSearch_),
       maxLocalSearchTime_(other.maxLocalSearchTime_),
       subMilpLogLevel_(other.subMilpLogLevel_),

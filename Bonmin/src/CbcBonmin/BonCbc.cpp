@@ -469,6 +469,11 @@ namespace Bonmin
         model_.solver()->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
       }
 
+       //Added by Claudia
+       OsiTMINLPInterface * nlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
+       if(nlpSolver && nlpSolver->getNewCutoffDecr()!=COIN_DBL_MAX)
+          model_.setDblParam(CbcModel::CbcCutoffIncrement, nlpSolver->getNewCutoffDecr());
+
     model_.solver()->resolve();
 
     }

@@ -211,6 +211,7 @@ namespace Bonmin
     /** This methods gives the linear part of the objective function */
     virtual void getLinearPartOfObjective(double * obj);
 
+
     /** Do we have an alternate objective for upper bounding?*/
     virtual bool hasUpperBoundingObjective()
     {
@@ -276,7 +277,6 @@ namespace Bonmin
     /** Overloaded Equals Operator */
     void operator=(const AmplTMINLP&);
     //@}
-
      /** Name of application.*/
     std::string appName_;
 

@@ -63,6 +63,7 @@ namespace Bonmin
   AmplTMINLP::AmplTMINLP()
       :
       TMINLP(),
+      appName_(),
       upperBoundingObj_(-1),
       ampl_tnlp_(NULL),
       branch_(),
@@ -87,6 +88,7 @@ namespace Bonmin
                         )
       :
       TMINLP(),
+      appName_(),
       upperBoundingObj_(-1),
       ampl_tnlp_(NULL),
       branch_(),
@@ -668,6 +670,11 @@ namespace Bonmin
       message = "\n" + appName_ + ": Infeasible problem";
       solve_result_num = 220;
     }
+    else if (status == TMINLP::CONTINUOUS_UNBOUNDED) {
+      status_str = "\t\"Finished\"";
+      message = "\n" + appName_ +" Continuous relaxation is unbounded.";
+      solve_result_num = 300;
+    }
     else if (status == TMINLP::LIMIT_EXCEEDED) {
       status_str = "\t\"Not finished\"";
       message = "\n" + appName_ + ": Optimization interupted on limit.";
@@ -687,7 +694,8 @@ namespace Bonmin
     }
     else {
       std::cout<<status_str<<message<<std::endl;
-      std::ofstream of("bonmin.sol");
+      std::string fName = appName_ + ".sol";
+      std::ofstream of(fName.c_str());
       for (int i = 0 ; i < n ; i++) {
         of<<i<<"\t"<<x[i]<<std::endl;
       }
@@ -762,6 +770,7 @@ namespace Bonmin
     }
     //The rest is linear keep the values of the gradient
   }
+
 
 
   /** This method to returns the value of an alternative objective function for

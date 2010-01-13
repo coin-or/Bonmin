@@ -51,14 +51,12 @@ namespace Bonmin {
       /** update cutoff and perform a local search to a good solution. */
       void find_good_sol(double cutoff,
           int loglevel,
-          double maxTime,
-          int maxNodes);
+          double maxTime);
 
       /** update cutoff and optimize MIP. */
       void optimize(double cutoff,
           int loglevel,
-          double maxTime,
-          int maxNodes);
+          double maxTime);
 
       /** Returns lower bound. */
       inline double lowBound()
