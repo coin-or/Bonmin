@@ -466,16 +466,6 @@ namespace Bonmin
 
 
 
-    Index doHeuristicFPump = false;
-    options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,prefix_.c_str());
-    if(doHeuristicFPump){
-      HeuristicFPump* feasibility_pump = new HeuristicFPump(this);
-      HeuristicMethod h;
-      h.heuristic = feasibility_pump;
-      h.id = "FPump";
-      heuristics_.push_back(h);
-    }
-
     Index doHeuristicDiveFractional = false;
     options()->GetEnumValue("heuristic_dive_fractional",doHeuristicDiveFractional,prefix_.c_str());
     if(doHeuristicDiveFractional){
@@ -497,7 +487,11 @@ namespace Bonmin
     }
 
     Index doHeuristicDiveMIPFractional = false;
-    options()->GetEnumValue("heuristic_dive_MIP_fractional",doHeuristicDiveMIPFractional,prefix_.c_str());
+    if(!options()->GetEnumValue("heuristic_dive_MIP_fractional",doHeuristicDiveMIPFractional,prefix_.c_str())){
+      doHeuristicDiveMIPFractional = true;
+      std::string o_name = prefix_ + "heuristic_dive_MIP_fractional";
+      options_->SetStringValue(o_name.c_str(), "yes",true,true);
+    }
     if(doHeuristicDiveMIPFractional){
       HeuristicDiveMIPFractional* dive_MIP_fractional = new HeuristicDiveMIPFractional(this);
       HeuristicMethod h;
@@ -515,6 +509,20 @@ namespace Bonmin
       h.id = "DiveMIPVectorLength";
       heuristics_.push_back(h);
     }
+    Index doHeuristicFPump = false;
+    if(!options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,prefix_.c_str())){
+      doHeuristicFPump = true;
+      std::string o_name = prefix_ + "heuristic_feasibility_pump";
+      options_->SetStringValue(o_name.c_str(), "yes",true,true);
+    }
+    if(doHeuristicFPump){
+      HeuristicFPump* feasibility_pump = new HeuristicFPump(this);
+      HeuristicMethod h;
+      h.heuristic = feasibility_pump;
+      h.id = "FPump";
+      heuristics_.push_back(h);
+    }
+
     Index doFixAndSolve = false;
     options()->GetEnumValue("fix_and_solve_heuristic",doFixAndSolve,prefix_.c_str());
     if(doFixAndSolve){

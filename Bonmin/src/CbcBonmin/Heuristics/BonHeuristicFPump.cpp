@@ -400,7 +400,7 @@ namespace Bonmin
     roptions->AddBoundedIntegerOption("feasibility_pump_objective_norm","Norm of feasibility pump objective function",
 				      1, 2, 1,"");
     roptions->AddStringOption2("heuristic_feasibility_pump", "whether the heuristic feasibility pump should be used",
-      "no", "no", "don't use it", "yes", "use it", "Someone should fix this entry...");
+      "no", "no", "don't use it", "yes", "use it", "");
   }
 
   void 
