@@ -123,12 +123,13 @@ TMINLP::hasGeneralInteger(){
    get_bounds_info(n, x_lb(), x_ub(), m, g_lb(), g_ub());
    for(unsigned int i = 0 ; i < n ; i++){
       if(v_t[i] == INTEGER && 
-         (x_lb[i] < - 0.99 || x_lb[i] > 0.99) && 
-         (x_lb[i] <0.01 || x_ub[i] > 1.99) ){
-         return false;
+         (x_lb[i] < - 0.99 || x_lb[i] > 0.99 || 
+         x_ub[i] <0.01 || x_ub[i] > 1.99) ){
+          printf("Has general integer %i lb %g ub %g\n",i, x_lb[i], x_ub[i]);
+         return true;
       }
    }
-   return true;
+   return false;
 }
 
 }
