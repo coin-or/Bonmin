@@ -9,6 +9,7 @@
 
 #include "BonTMINLP.hpp"
 #include "IpBlas.hpp"
+#include "BonTypes.hpp"
 
 namespace Bonmin{
 
@@ -107,5 +108,27 @@ TMINLP::~TMINLP()
 {
 }
 
+/** Say if has general integer variables.*/
+bool
+TMINLP::hasGeneralInteger(){
+   int n, m, nnz_j, nnz_h;
+   Ipopt::TNLP::IndexStyleEnum dummy;
+   get_nlp_info(n, m, nnz_j, nnz_h, dummy);
+   vector<double> x_lb(n);
+   vector<double> x_ub(n);
+   vector<double> g_lb(m);
+   vector<double> g_ub(m);
+   vector<VariableType> v_t(n);
+   get_variables_types(n, v_t());
+   get_bounds_info(n, x_lb(), x_ub(), m, g_lb(), g_ub());
+   for(unsigned int i = 0 ; i < n ; i++){
+      if(v_t[i] == INTEGER && 
+         (x_lb[i] < - 0.99 || x_lb[i] > 0.99) && 
+         (x_lb[i] <0.01 || x_ub[i] > 1.99) ){
+         return false;
+      }
+   }
+   return true;
+}
 
 }

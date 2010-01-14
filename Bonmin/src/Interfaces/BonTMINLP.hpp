@@ -394,6 +394,8 @@ namespace Bonmin
   /** Say if problem has a linear objective (for OA) */
   virtual bool hasLinearObjective(){return false;}
 
+  /** Say if problem has general integer variables.*/
+  bool hasGeneralInteger();
   protected:
     /** Copy constructor */
     //@{

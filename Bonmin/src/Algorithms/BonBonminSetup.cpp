@@ -510,7 +510,7 @@ namespace Bonmin
       heuristics_.push_back(h);
     }
     Index doHeuristicFPump = false;
-    if(!options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,prefix_.c_str())){
+    if(!nonlinearSolver_->model()->hasGeneralInteger() && !options()->GetEnumValue("heuristic_feasibility_pump",doHeuristicFPump,prefix_.c_str())){
       doHeuristicFPump = true;
       std::string o_name = prefix_ + "heuristic_feasibility_pump";
       options_->SetStringValue(o_name.c_str(), "yes",true,true);
