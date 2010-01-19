@@ -129,7 +129,7 @@ ASTYLE_FILES = \
               BonTMINLPLinObj.hppbak \
               BonTMINLPLinObj.cppbak \
               BonTMINLP2Quad.cppbak \
-              BonTMINLP2Quad.hpp
+              BonTMINLP2Quad.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
