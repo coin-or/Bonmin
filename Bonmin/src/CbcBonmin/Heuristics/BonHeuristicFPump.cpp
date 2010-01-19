@@ -83,7 +83,7 @@ namespace Bonmin
     if(model_->getSolutionCount()) {
       //      bestSolutionValue = model_->getObjValue();
       integerSolutionAlreadyExists = true;
-      assert(solutionValue < 1.0e-40);
+      assert(solutionValue < 1.0e50);
     }
 
     const int maxNumberIterations = 200;
@@ -183,6 +183,7 @@ namespace Bonmin
     int iteration = 0;
     while(numberFractionalVariables) {
       iteration++;
+      std::cerr<<"In iteration "<<iteration<<std::endl;
       if(iteration > maxNumberIterations) {
 	break;
       }
@@ -444,7 +445,8 @@ namespace Bonmin
     // get the jacobian for the solution with zeros
     double* jac_g = new double [nnz_jac_g];
     double* zero_sol = new double [numberColumns_];
-    memset(zero_sol, 0, numberColumns_ * sizeof(double));
+    minlp_->get_starting_point(numberColumns_, 1, zero_sol, 0, NULL, NULL, numberRows_, 0, NULL);
+    //memset(zero_sol, 0, numberColumns_ * sizeof(double));
     minlp_->eval_jac_g(numberColumns_, zero_sol, true,
 		       numberRows_, nnz_jac_g,
 		       0, 0, jac_g);
