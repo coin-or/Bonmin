@@ -270,11 +270,13 @@ namespace Bonmin
         "Set the level of output of OA decomposition solver : "
         "0 - none, 1 - normal, 2 - verbose"
                                      );
+    roptions->setOptionExtraInfo("fp_log_level",3);
 
     roptions->AddLowerBoundedNumberOption("fp_log_frequency",
         "display an update on lower and upper bounds in FP every n seconds",
         0.,1.,100.,
         "");
+    roptions->setOptionExtraInfo("fp_log_frequency",3);
   }
 
 /** Put objective of MIP according to FP scheme. */

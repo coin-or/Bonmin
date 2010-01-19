@@ -73,6 +73,7 @@ namespace Bonmin
   OACutGenerator2::doLocalSearch(BabInfo * babInfo) const
   {
     return (nLocalSearch_<parameters_.maxLocalSearch_ &&
+            numSols_ < parameters_.maxSols_ &&
 	    CoinCpuTime() - timeBegin_ < parameters_.maxLocalSearchTime_);
   }
   /// virtual method which performs the OA algorithm by modifying lp and nlp.
@@ -277,19 +278,21 @@ namespace Bonmin
                                "no","",
                                "yes","",
                                "");
+    roptions->setOptionExtraInfo("oa_decomposition",19);
+
     roptions->AddBoundedIntegerOption("oa_log_level",
         "specify OA iterations log level.",
         0,2,1,
         "Set the level of output of OA decomposition solver : "
         "0 - none, 1 - normal, 2 - verbose"
                                      );
-    roptions->setOptionExtraInfo("oa_decomposition", 7);
+    roptions->setOptionExtraInfo("oa_log_level", 25);
 
     roptions->AddLowerBoundedNumberOption("oa_log_frequency",
         "display an update on lower and upper bounds in OA every n seconds",
         0.,1.,100.,
         "");
-    roptions->setOptionExtraInfo("oa_log_frequency", 15);
+    roptions->setOptionExtraInfo("oa_log_frequency", 25);
   }
 }/* End namespace Bonmin. */
 

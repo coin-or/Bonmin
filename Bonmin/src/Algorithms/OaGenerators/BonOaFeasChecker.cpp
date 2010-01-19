@@ -145,7 +145,7 @@ namespace Bonmin
                                "outer-approximations", "Generate a set of Outer Approximations cuts.",
                                "Benders", "Generate a single Benders cut.",
                                "If it seems too much memory is used should try Benders to use less");
-    roptions->setOptionExtraInfo("feas_check_cut_types", 11);
+    roptions->setOptionExtraInfo("feas_check_cut_types", 19);
     
 
     roptions->AddStringOption3("feas_check_discard_policy", "How cuts from feasibility checker are discarded",
@@ -158,13 +158,13 @@ namespace Bonmin
                                "To avoid this one can instruct Cbc to never discard a cut but if we do that for all cuts it can lead to memory problems. "
                                "The default policy here is to detect cycles and only then impose to Cbc to keep the cut. "
                                "The two other alternative are to instruct Cbc to keep all cuts or to just ignore the problem and hope for the best");
-    roptions->setOptionExtraInfo("feas_check_discard_policy", 11);
+    roptions->setOptionExtraInfo("feas_check_discard_policy", 19);
 
     roptions->AddLowerBoundedIntegerOption("generate_benders_after_so_many_oa", "Specify that after so many oa cuts have been generated Benders cuts should be generated instead.",
                                            0, 5000,
                                            "It seems that sometimes generating too many oa cuts slows down the optimization compared to Benders due to the size of the LP. "
                                            "With this option we specify that after so many OA cuts have been generated we should switch to Benders cuts.");
-    roptions->setOptionExtraInfo("generate_benders_after_so_many_oa", 11);
+    roptions->setOptionExtraInfo("generate_benders_after_so_many_oa", 19);
   }
 
 }/* End namespace Bonmin. */

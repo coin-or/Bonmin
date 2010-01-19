@@ -150,30 +150,30 @@ namespace Bonmin
         "Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.",
         0,0,
         "A frequency of 0 amounts to to never solve the NLP relaxation.");
-    roptions->setOptionExtraInfo("filmint_ecp_cuts",1);
+    roptions->setOptionExtraInfo("filmint_ecp_cuts",3);
     roptions->AddLowerBoundedIntegerOption
     ("ecp_max_rounds",
      "Set the maximal number of rounds of ECP cuts.",
      0,5,
      "");
-    roptions->setOptionExtraInfo("ecp_max_rounds",1);
+    roptions->setOptionExtraInfo("ecp_max_rounds",3);
     roptions->AddLowerBoundedNumberOption
     ("ecp_abs_tol",
      "Set the absolute termination tolerance for ECP rounds.",
      0,false,1e-6,
      "");
-    roptions->setOptionExtraInfo("ecp_abs_tol",1);
+    roptions->setOptionExtraInfo("ecp_abs_tol",3);
     roptions->AddLowerBoundedNumberOption
     ("ecp_rel_tol",
      "Set the relative termination tolerance for ECP rounds.",
      0,false,0.,
      "");
-    roptions->setOptionExtraInfo("ecp_rel_tol",1);
+    roptions->setOptionExtraInfo("ecp_rel_tol",3);
     roptions->AddNumberOption
     ("ecp_propability_factor",
      "Factor appearing in formula for skipping ECP cuts.",
      10.,
      "Choosing -1 disables the skipping.");
-    roptions->setOptionExtraInfo("ecp_propability_factor",1);
+    roptions->setOptionExtraInfo("ecp_propability_factor",3);
   }
 } // end namespace bonmin.
