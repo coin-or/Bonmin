@@ -397,11 +397,13 @@ namespace Bonmin
 
   void
   HeuristicFPump::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("Feasibility pump heuristic", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("feasibility_pump_objective_norm","Norm of feasibility pump objective function",
 				      1, 2, 1,"");
+    roptions->setOptionExtraInfo("feasibility_pump_objective_norm", 63);
     roptions->AddStringOption2("heuristic_feasibility_pump", "whether the heuristic feasibility pump should be used",
       "no", "no", "don't use it", "yes", "use it", "");
+    roptions->setOptionExtraInfo("heuristic_feasibility_pump", 63);
   }
 
   void 

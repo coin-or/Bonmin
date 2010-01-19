@@ -130,7 +130,7 @@ namespace Bonmin {
 
   void
   HeuristicRINS::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-   roptions->SetRegisteringCategory("Local search based heuristics", RegisteredOptions::BonminCategory);
+   roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "heuristic_RINS",
      "if yes runs the RINS heuristic",
@@ -138,6 +138,7 @@ namespace Bonmin {
      "no", "don't run it",
      "yes", "runs the heuristic",
      "");
+    roptions->setOptionExtraInfo("heuristic_RINS", 63);
   }
 
    /** Initiaize using passed options.*/

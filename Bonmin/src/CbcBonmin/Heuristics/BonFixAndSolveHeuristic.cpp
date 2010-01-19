@@ -73,7 +73,7 @@ namespace Bonmin {
 
   void
   FixAndSolveHeuristic::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-   roptions->SetRegisteringCategory("Local search based heuristics", RegisteredOptions::BonminCategory);
+   roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "fix_and_solve_heuristic",
      "if yes runs a heuristic at root where fixes all variables integer in the continuous solution",
@@ -81,6 +81,7 @@ namespace Bonmin {
      "no", "don't run it",
      "yes", "runs the heuristic",
      "");
+   roptions->setOptionExtraInfo("fix_and_solve_heuristic", 63);
   }
 
    /** Initiaize using passed options.*/
