@@ -9,7 +9,7 @@
 // Date : 27/08/2007
 
 #include "BonRegisteredOptions.hpp"
-#include "IpSmartPtr.hpp"
+#include <IpSmartPtr.hpp>
 #include <sstream>
 #include <climits>
 #include <cfloat>
@@ -166,14 +166,19 @@ namespace Bonmin{
            registered_options = RegisteredOptionsList();
 
   //Print table header
-  of<<"\\begin{threeparttable}"<<std::endl
-    <<"\\caption{\\label{tab:options} "<<std::endl
+  //of<<"\\begin{threeparttable}"<<std::endl
+  of<<"\\topcaption{\\label{tab:options} "<<std::endl
     <<"List of options and compatibility with the different algorithms."<<std::endl
-    <<"}"<<std::endl
-    <<"\\begin{tabular}{|l|r|r|r|r|r|r|}"
+    <<"}"<<std::endl;
+  of<<"\\tablehead{\\hline "<<std::endl
+    <<"Option & type &  default & {\\tt B-BB} & {\\tt B-OA} & {\\tt B-QG} & {\\tt B-Hyb} & {\\tt B-Ecp} & {\\tt B-iFP} & {\\tt Cbc\\_Par} \\\\"<<std::endl
     <<"\\hline"<<std::endl
-    <<"Option & type &  default & {\\tt B-BB} & {\\tt B-OA} & {\\tt B-QG} & {\\tt B-Hyb} \\\\"<<std::endl
-    <<"\\hline"<<std::endl;
+    <<"\\hline}"<<std::endl;
+  of<<"\\tabletail{\\hline \\multicolumn{10}{|c|}{continued on next page}\\\\"
+    <<"\\hline}"<<std::endl; 
+  of<<"\\tablelasttail{\\hline}"<<std::endl;
+  of<<"{\\tiny"<<std::endl;
+  of<<"\\begin{xtabular}{|l|r|r|r|r|r|r|r|r|r|}"<<std::endl;
 
   //sort options by categories and alphabetical order
   std::list< Ipopt::RegisteredOption * > sortedOptions;
@@ -192,29 +197,35 @@ namespace Bonmin{
      if((*i)->RegisteringCategory() != registeringCategory){
      registeringCategory = (*i)->RegisteringCategory();
      of<<"\\hline"<<std::endl
-       <<"\\multicolumn{1}{|c}{} & \\multicolumn{6}{l|}{"
+       <<"\\multicolumn{1}{|c}{} & \\multicolumn{9}{l|}{"
        <<registeringCategory<<"}\\\\"<<std::endl
        <<"\\hline"<<std::endl;
      }
      
      of<<makeLatex((*i)->Name())<<"& "<<OptionType2Char((*i)->Type())<<"& "
        <<makeLatex(defaultAsString(*i))
-       <<"& "<<( (isValidForBBB((*i)->Name()))? '+' : '-' )
-       <<"& "<<( (isValidForBOA((*i)->Name()))? '+' : '-' )
-       <<"& "<<( (isValidForBQG((*i)->Name()))? '+' : '-' )
-       <<"& "<<( (isValidForHybrid((*i)->Name()))? '+' : '-' )
+       <<"& "<<( (isValidForBBB((*i)->Name()))? "$\\surd$" : "-" )
+       <<"& "<<( (isValidForBOA((*i)->Name()))? "$\\surd$" : "-" )
+       <<"& "<<( (isValidForBQG((*i)->Name()))? "$\\surd$" : "-" )
+       <<"& "<<( (isValidForHybrid((*i)->Name()))? "$\\surd$" : "-" )
+       <<"& "<<( (isValidForBEcp((*i)->Name()))? "$\\surd$" : "-" )
+       <<"& "<<( (isValidForBiFP((*i)->Name()))? "$\\surd$" : "-" )
+       <<"& "<<( (isValidForCbc((*i)->Name()))? "$\\surd$" : "-" )
        <<"\\\\"<<std::endl;
    }
    //Print table end
   of<<"\\hline"<<std::endl
-    <<"\\end{tabular}"<<std::endl
-    <<"\\begin{tablenotes}"<<std::endl
+    <<"\\end{xtabular}"<<std::endl;
+  of<<"}"<<std::endl;
+#if 0
+  of<<"\\begin{tablenotes}"<<std::endl
     <<"\\item $\\strut^*$ option is available"<<std::endl
     <<"        for MILP subsolver (it is only passed if the {\\tt milp\\_subsolver} optio"<<std::endl
     <<"        see Subsection \\ref{sec:milp_opt})."<<std::endl
     <<"       \\item $\\strut^1$ disabled for stability reasons."<<std::endl
     <<"\\end{tablenotes}"<<std::endl
     <<"\\end{threeparttable} "<<std::endl;
+#endif
   }
 
   /** choose options.*/
@@ -343,7 +354,7 @@ namespace Bonmin{
            os<<"bonmin.";
            os.setf(std::ios::left);
            os.width(37);
-           os<<(*i)->Name();
+           os<<(*i)->Name()<<" ";
            os.width(10);
            os<<makeNumber(defaultAsString(*i))<<"\t#";
            os<<(*i)->ShortDescription();

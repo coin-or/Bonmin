@@ -30,17 +30,32 @@ namespace Bonmin {
 class RegisteredOptions: public Ipopt::RegisteredOptions{
   public:
     enum ExtraOptInfosBits{
-    validInHybrid=0/** Say that option is valid in Hybrid method.*/,
-    validInQG/** Say that option is valid in Quesada Grossmann method.*/,
-    validInOA/**Say that option is valid in outer approximation dec.*/,
-    validInBBB/** Say that option is valid in the pure branch-and-bound.*/
+    validInHybrid=0/** Say that option is valid in Hybrid method (1).*/,
+    validInQG/** Say that option is valid in Quesada Grossmann method (2).*/,
+    validInOA/**Say that option is valid in outer approximation dec (4).*/,
+    validInBBB/** Say that option is valid in the pure branch-and-bound (8).*/,
+    validInEcp/** Say that option is valid in the Ecp (16).*/,
+    validIniFP/** Say that option is valid in the iFP (32).*/,
+    validInCbc/** Say that option is valid when using Cbc_Par (64).*/
    };
+
+
+/* Table of values
+ * only B-Hyb 1
+ * B-Hyb & B-QG 3
+ * B-Hyb & B-OA 5
+ * B-Hyb & B-QG & B-OA & B-ECP 23
+ */
+
+
+
    enum ExtraCategoriesInfo{
     BonminCategory = 0/** Option category is for Bonmin.*/,
     IpoptCategory /** Option category for Ipopt.*/,
     FilterCategory /** Option category for FilterSqp.*/,
     BqpdCategory /** Option category for Bqpd.*/,
-    CouenneCategory /** Option category for Couenne.*/
+    CouenneCategory /** Option category for Couenne.*/,
+    UndocumentedCategory /** Options not yet documented*/
    };
     /** Standard constructor.*/
     RegisteredOptions():
@@ -92,6 +107,21 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
    inline void optionValidForBBB(const std::string &option){
      optionExists(option);
      bonOptInfos_[option] |= 1 << validInBBB;}
+   
+   /** Set that option is valid for B-Ecp.*/
+   inline void optionValidForBEcp(const std::string &option){
+     optionExists(option);
+     bonOptInfos_[option] |= 1 << validInEcp;}
+   
+   /** Set that option is valid for B-iFP.*/
+   inline void optionValidForBiFP(const std::string &option){
+     optionExists(option);
+     bonOptInfos_[option] |= 1 << validIniFP;}
+   
+   /** Set that option is valid for Cbc.*/
+   inline void optionValidForCbc(const std::string &option){
+     optionExists(option);
+     bonOptInfos_[option] |= 1 << validInCbc;}
 
 
     /** Say if option is valid for hybrid.*/
@@ -125,6 +155,35 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
      if(i != bonOptInfos_.end()) 
      return (i->second) & (1 << validInBBB);
      return true;}
+
+   
+   /** Say if option is valid for B-Ecp.*/
+   inline bool isValidForBEcp(const std::string &option){
+     optionExists(option);
+     std::map<std::string, int>::iterator i = bonOptInfos_.find(option);
+     if(i != bonOptInfos_.end()) 
+     return (i->second) & (1 << validInEcp);
+     return true;}
+
+   
+   /** Say if option is valid for B-iFP.*/
+   inline bool isValidForBiFP(const std::string &option){
+     optionExists(option);
+     std::map<std::string, int>::iterator i = bonOptInfos_.find(option);
+     if(i != bonOptInfos_.end()) 
+     return (i->second) & (1 << validIniFP);
+     return true;}
+
+   
+   /** Say if option is valid for Cbc.*/
+   inline bool isValidForCbc(const std::string &option){
+     optionExists(option);
+     std::map<std::string, int>::iterator i = bonOptInfos_.find(option);
+     if(i != bonOptInfos_.end()) 
+     return (i->second) & (1 << validInCbc);
+     return true;}
+
+
    /** Output Latex table of options.*/
    void writeLatexOptionsTable(std::ostream &of, ExtraCategoriesInfo which);
 

@@ -56,20 +56,21 @@ register_general_options
                                           "algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
                              "all", "run all available solvers at each node",
                              "Note that option will work only if the specified solver has been installed. Ipopt will usualy be installed with Bonmin by default. For FilterSQP please see http://www-unix.mcs.anl.gov/~leyffer/solvers.html on how to obtain it and https://projects.coin-or.org/Bonmin/wiki/HintTricks on how to configure Bonmin to use it.");
-  roptions->setOptionExtraInfo("nlp_solver",15);
+  roptions->setOptionExtraInfo("nlp_solver",127);
   roptions->AddBoundedIntegerOption("nlp_log_level",
                                     "specify NLP solver interface log level (independent from ipopt print_level).",
                                      0,2,1,
                                     "Set the level of output of the OsiTMINLPInterface : "
                                     "0 - none, 1 - normal, 2 - verbose"
                                    );
-  roptions->setOptionExtraInfo("nlp_log_level",15);
+  roptions->setOptionExtraInfo("nlp_log_level",127);
 
   roptions->AddStringOption2("file_solution",
        "Write a file bonmin.sol with the solution",
        "no",
        "yes","",
        "no","","");
+  roptions->setOptionExtraInfo("file_solution",127);
 
   roptions->AddStringOption3("warm_start",
       "Select the warm start method",
@@ -110,7 +111,7 @@ register_general_options
    -1,-1,
    "When the number of iterations to solve a node is above this number, the subproblem at this"
    " node is considered to be suspect and it will be outputed in a file (set to -1 to deactivate this).");
-  roptions->setOptionExtraInfo("num_iterations_suspect",15);
+  roptions->setOptionExtraInfo("num_iterations_suspect",127);
 
   
 
@@ -122,7 +123,7 @@ register_general_options
       "When Ipopt fails to solve a continuous NLP sub-problem, if $k > 0$, the algorithm will "
       "try again to solve the failed NLP with $k$ new randomly chosen starting points "
       " or until the problem is solved with success.");
-  roptions->setOptionExtraInfo("num_retry_unsolved_random_point",15);
+  roptions->setOptionExtraInfo("num_retry_unsolved_random_point",127);
 
 
   roptions->SetRegisteringCategory("Options for non-convex problems", RegisteredOptions::BonminCategory);
@@ -182,27 +183,14 @@ register_general_options
 static void register_OA_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("Outer Approximation cuts generation", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("Outer Approximation cuts generation discarded options", RegisteredOptions::UndocumentedCategory);
   
   roptions->AddStringOption2("disjunctive_cut_type",
       "Determine if and what kind of disjunctive cuts should be computed.",
       "none",
       "none", "No disjunctive cuts.",
       "most-fractional", "If discrete variables present, compute disjunction for most-fractional variable");
-  roptions->setOptionExtraInfo("disjunctive_cut_type",7);
-
-  roptions->AddStringOption2("oa_cuts_scope","Specify if OA cuts added are to be set globally or locally valid",
-                             "global",
-			     "local","Cuts are treated as globally valid",
-			     "global", "Cuts are treated as locally valid",
-			     "");
-  roptions->setOptionExtraInfo("oa_cuts_scope",7);
-
-  roptions->AddStringOption2("add_only_violated_oa","Do we add all OA cuts or only the ones violated by current point?",
-			     "no",
-			     "no","Add all cuts",
-			     "yes","Add only violated Cuts","");
-  roptions->setOptionExtraInfo("add_only_violated_oa",7);
+  roptions->setOptionExtraInfo("disjunctive_cut_type",119);
 
   roptions->AddStringOption4("cut_strengthening_type",
                              "Determines if and what kind of cut strengthening should be performed.",
@@ -212,19 +200,35 @@ static void register_OA_options
                              "uglobal-slocal", "Unstrengthened global and strengthened local cuts",
                              "sglobal-slocal", "Strengthened global and strengthened local cuts",
                              "");
-  roptions->setOptionExtraInfo("cut_strengthening_type",7);
+  roptions->setOptionExtraInfo("cut_strengthening_type",119);
+
+  roptions->SetRegisteringCategory("Outer Approximation cuts generation", RegisteredOptions::BonminCategory);
+
+  roptions->AddStringOption2("oa_cuts_scope","Specify if OA cuts added are to be set globally or locally valid",
+                             "global",
+			     "local","Cuts are treated as globally valid",
+			     "global", "Cuts are treated as locally valid",
+			     "");
+  roptions->setOptionExtraInfo("oa_cuts_scope",119);
+
+  roptions->AddStringOption2("add_only_violated_oa","Do we add all OA cuts or only the ones violated by current point?",
+			     "no",
+			     "no","Add all cuts",
+			     "yes","Add only violated Cuts","");
+  roptions->setOptionExtraInfo("add_only_violated_oa",119);
+
   
   roptions->AddLowerBoundedNumberOption("tiny_element","Value for tiny element in OA cut",
       -0.,0,1e-08,
       "We will remove \"cleanly\" (by relaxing cut) an element lower"
       " than this.");
-  roptions->setOptionExtraInfo("tiny_element",7);
+  roptions->setOptionExtraInfo("tiny_element",119);
 
   roptions->AddLowerBoundedNumberOption("very_tiny_element","Value for very tiny element in OA cut",
       -0.,0,1e-17,
       "Algorithm will take the risk of neglecting an element lower"
       " than this.");
-  roptions->setOptionExtraInfo("very_tiny_element",7);
+  roptions->setOptionExtraInfo("very_tiny_element",119);
 
   roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
                                          "level of log when generating OA cuts.",
@@ -233,7 +237,7 @@ static void register_OA_options
                                          "1: when a cut is generated, its violation and index of row from which it originates,\n"
                                          "2: always output violation of the cut.\n"
                                          "3: output generated cuts incidence vectors.");
-  roptions->setOptionExtraInfo("oa_cuts_log_level",7);
+  roptions->setOptionExtraInfo("oa_cuts_log_level",119);
 
 }
 
