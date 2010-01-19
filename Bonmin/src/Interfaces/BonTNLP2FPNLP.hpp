@@ -104,8 +104,17 @@ namespace Bonmin
         Index m, bool init_lambda,
         Number* lambda)
     {
-      return tnlp_->get_starting_point(n, init_x, x,
-          init_z, z_L, z_U, m, init_lambda, lambda);
+      int m2 = m;
+      if(use_cutoff_constraint_) {
+        m2--;
+        if(lambda!=NULL)lambda[m2] = 0;
+      }
+      if(use_local_branching_constraint_) {
+        m2--;
+        if(lambda!= NULL)lambda[m2] = 0;
+      }
+      int ret_code = tnlp_->get_starting_point(n, init_x, x,
+          init_z, z_L, z_U, m2, init_lambda, lambda);
     }
 
     /** overloaded to return the value of the objective function */

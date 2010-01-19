@@ -379,13 +379,16 @@ namespace Bonmin
     bool ret_code;
 
     int  nnz_obj_h = (norm_ == 2) ? inds_.size() : 0;
+
     if(use_cutoff_constraint_ && use_local_branching_constraint_) {
-      ret_code = tnlp_->eval_h(n, x, new_x, obj_factor*(1-lambda_)*sigma_ + lambda[m-2], 
+      double coef_obj = (iRow != NULL)?0 : lambda[m - 2];
+      ret_code = tnlp_->eval_h(n, x, new_x, obj_factor*(1-lambda_)*sigma_ + coef_obj, 
 			       m - 2, lambda, new_lambda, nele_hess - nnz_obj_h, 
 			       iRow, jCol, values);
     }
     else if(use_cutoff_constraint_) {
-      ret_code = tnlp_->eval_h(n, x, new_x, obj_factor*(1-lambda_)*sigma_ + lambda[m-1], 
+      double coef_obj = (iRow != NULL)?0 : lambda[m - 1];
+      ret_code = tnlp_->eval_h(n, x, new_x, obj_factor*(1-lambda_)*sigma_ + coef_obj, 
 			       m - 1, lambda, new_lambda, nele_hess - nnz_obj_h, 
 			       iRow, jCol, values);
     }
@@ -441,7 +444,14 @@ namespace Bonmin
       const IpoptData* ip_data,
       IpoptCalculatedQuantities* ip_cq)
   {
-    tnlp_->finalize_solution(status,n, x, z_L, z_U,m, g, lambda, obj_value,
+      int m2 = m;
+      if(use_cutoff_constraint_) {
+        m2--;
+      }
+      if(use_local_branching_constraint_) {
+        m2--;
+      }
+    tnlp_->finalize_solution(status,n, x, z_L, z_U,m2, g, lambda, obj_value,
 			     ip_data, ip_cq);
   }
 }
