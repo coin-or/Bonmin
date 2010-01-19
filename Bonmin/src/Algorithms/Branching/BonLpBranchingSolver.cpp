@@ -220,19 +220,19 @@ namespace Bonmin
      "Set the maximal number of rounds of ECP cuts in strong branching.",
      0,0,
      "");
-    roptions->setOptionExtraInfo("ecp_max_rounds_strong",15);
+    roptions->setOptionExtraInfo("ecp_max_rounds_strong",63);
     roptions->AddLowerBoundedNumberOption
     ("ecp_abs_tol_strong",
      "Set the absolute termination tolerance for ECP rounds in strong branching.",
      0,false,1e-6,
      "");
-    roptions->setOptionExtraInfo("ecp_abs_tol_strong",15);
+    roptions->setOptionExtraInfo("ecp_abs_tol_strong",63);
     roptions->AddLowerBoundedNumberOption
     ("ecp_rel_tol_strong",
      "Set the relative termination tolerance for ECP rounds in strong branching.",
      0,false,1e-1,
      "");
-    roptions->setOptionExtraInfo("ecp_rel_tol_strong",15);
+    roptions->setOptionExtraInfo("ecp_rel_tol_strong",63);
     roptions->AddStringOption2
     ("lp_strong_warmstart_method",
      "Choose method to use for warm starting lp in strong branching",
@@ -240,7 +240,7 @@ namespace Bonmin
      "Basis", "Use optimal basis of node",
      "Clone", "Clone optimal problem of node",
      "(Advanced stuff)");
-    roptions->setOptionExtraInfo("lp_strong_warmstart_method",15);
+    roptions->setOptionExtraInfo("lp_strong_warmstart_method",63);
   }
 
 }

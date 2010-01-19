@@ -163,29 +163,29 @@ namespace Bonmin
         "most-fractional", "Sort by decreasing integer infeasibility",
         "least-fractional", "Sort by increasing integer infeasibility","");
 
-    roptions->setOptionExtraInfo("candidate_sort_criterion",31);
+    roptions->setOptionExtraInfo("candidate_sort_criterion",63);
 
     roptions->AddBoundedNumberOption("setup_pseudo_frac", "Proportion of strong branching list that has to be taken from most-integer-infeasible list.",
         0., false, 1., false, 0.5);
-    roptions->setOptionExtraInfo("setup_pseudo_frac",31);
+    roptions->setOptionExtraInfo("setup_pseudo_frac",63);
     roptions->AddBoundedNumberOption("maxmin_crit_no_sol", "Weight towards minimum in of lower and upper branching estimates when no solution has been found yet.",
         0., false, 1., false, 0.7);
-    roptions->setOptionExtraInfo("maxmin_crit_no_sol",31);
+    roptions->setOptionExtraInfo("maxmin_crit_no_sol",63);
     roptions->AddBoundedNumberOption("maxmin_crit_have_sol", "Weight towards minimum in of lower and upper branching estimates when a solution has been found.",
         0., false, 1., false, 0.1);
-    roptions->setOptionExtraInfo("maxmin_crit_have_sol",31);
+    roptions->setOptionExtraInfo("maxmin_crit_have_sol",63);
     roptions->AddLowerBoundedIntegerOption("number_before_trust_list",
         "Set the number of branches on a variable before its pseudo costs are to be believed during setup of strong branching candidate list.",
         -1, 0, "The default value is that of \"number_before_trust\"");
-    roptions->setOptionExtraInfo("number_before_trust_list",31);
+    roptions->setOptionExtraInfo("number_before_trust_list",63);
     roptions->AddLowerBoundedIntegerOption("number_strong_branch_root",
         "Maximum number of variables considered for strong branching in root node.",
         0, COIN_INT_MAX, "");
-    roptions->setOptionExtraInfo("number_strong_branch_root",31);
+    roptions->setOptionExtraInfo("number_strong_branch_root",63);
 
     roptions->AddLowerBoundedIntegerOption("min_number_strong_branch", "Sets minimum number of variables for strong branching (overriding trust)",
         0, 0,"");
-    roptions->setOptionExtraInfo("min_number_strong_branch",31);
+    roptions->setOptionExtraInfo("min_number_strong_branch",63);
     roptions->AddStringOption2("trust_strong_branching_for_pseudo_cost",
                                "Whether or not to trust strong branching results for updating pseudo costs.",
                                "yes",
@@ -193,7 +193,7 @@ namespace Bonmin
                                "yes","",
                                ""
                                );
-    roptions->setOptionExtraInfo("trust_strong_branching_for_pseudo_cost", 31);
+    roptions->setOptionExtraInfo("trust_strong_branching_for_pseudo_cost", 63);
 
     roptions->AddLowerBoundedIntegerOption("number_look_ahead", "Sets limit of look-ahead strong-branching trials",
         0, 0,"");
