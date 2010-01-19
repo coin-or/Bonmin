@@ -415,8 +415,8 @@ BonNodeSolver_LDFLAGS = -rpath $(libdir)
 
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
-             BonMin.cpp \
-             BonNodeSolver.cpp
+             BonMin.cppbak \
+             BonNodeSolver.cppbak
 
 CLEANFILES = $(ASTYLE_FILES)
 DISTCLEANFILES = 
