@@ -175,6 +175,7 @@ namespace Bonmin
       "no",
       "no", "",
       "yes", "");
+    roptions->setOptionExtraInfo("stop_diving_on_cutoff",63);
 
   }
 
@@ -727,18 +728,20 @@ namespace Bonmin
   void
   CbcDfsDiver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Diving options", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Diving options", RegisteredOptions::UndocumentedCategory);
     roptions->AddLowerBoundedIntegerOption("max_backtracks_in_dive",
         "Set the number of backtracks in a dive when using dfs-dive tree search"
         "strategy.",
         0,5,
         "");
+    roptions->setOptionExtraInfo("ma_backtracks_in_dive",63);
 
     roptions->AddLowerBoundedIntegerOption("max_dive_depth",
         "When using dfs-dive search. Maximum depth to go to from the diving "
         "board (node where the diving started.",
         0,COIN_INT_MAX,
         "");
+    roptions->setOptionExtraInfo("max_dive_depth",63);
 
   }
 

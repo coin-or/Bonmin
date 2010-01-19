@@ -82,6 +82,7 @@ namespace Bonmin
         0,0,
         "Will continue exploring a branch of the tree until \"max_consecutive_infeasible\""
         "consecutive problems are infeasibles by the NLP sub-solver.");
+    roptions->setOptionExtraInfo("max_consecutive_infeasible",8);
 
     roptions->SetRegisteringCategory("Nlp solution robustness", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption
@@ -91,6 +92,7 @@ namespace Bonmin
      "When $n > 0$, continue exploring a branch of the tree until $n$ "
      "consecutive problems in the branch are unsolved (we call unsolved a problem for which Ipopt can not "
      "guarantee optimality within the specified tolerances).");
+    roptions->setOptionExtraInfo("max_consecutive_failures",8);
 
   }
 
