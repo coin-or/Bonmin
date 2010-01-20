@@ -55,7 +55,7 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
     FilterCategory /** Option category for FilterSqp.*/,
     BqpdCategory /** Option category for Bqpd.*/,
     CouenneCategory /** Option category for Couenne.*/,
-    UndocumentedCategory /** Options not yet documented*/
+    UndocumentedCategory /**For undocumented options.*/
    };
     /** Standard constructor.*/
     RegisteredOptions():

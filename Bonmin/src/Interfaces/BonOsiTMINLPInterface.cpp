@@ -183,15 +183,15 @@ register_general_options
 static void register_OA_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("Outer Approximation cuts generation discarded options", RegisteredOptions::UndocumentedCategory);
-  
+  roptions->SetRegisteringCategory("Outer Approximations strengthening", RegisteredOptions::UndocumentedCategory);
   roptions->AddStringOption2("disjunctive_cut_type",
       "Determine if and what kind of disjunctive cuts should be computed.",
       "none",
       "none", "No disjunctive cuts.",
       "most-fractional", "If discrete variables present, compute disjunction for most-fractional variable");
   roptions->setOptionExtraInfo("disjunctive_cut_type",119);
-
+  
+  
   roptions->AddStringOption4("cut_strengthening_type",
                              "Determines if and what kind of cut strengthening should be performed.",
                              "none",
