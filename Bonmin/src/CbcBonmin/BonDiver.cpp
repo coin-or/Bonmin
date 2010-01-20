@@ -734,7 +734,7 @@ namespace Bonmin
         "strategy.",
         0,5,
         "");
-    roptions->setOptionExtraInfo("ma_backtracks_in_dive",63);
+    roptions->setOptionExtraInfo("max_backtracks_in_dive",63);
 
     roptions->AddLowerBoundedIntegerOption("max_dive_depth",
         "When using dfs-dive search. Maximum depth to go to from the diving "

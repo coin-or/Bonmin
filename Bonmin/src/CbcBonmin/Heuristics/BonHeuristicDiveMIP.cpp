@@ -73,7 +73,7 @@ namespace Bonmin
   int
   HeuristicDiveMIP::solution(double &solutionValue, double *betterSolution)
   {
-    //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
     if ((model_->getNodeCount()%howOften_)!=0||model_->getCurrentPassNumber()>1)
       return 0;
  

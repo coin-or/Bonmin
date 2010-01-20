@@ -83,6 +83,7 @@ namespace Bonmin
     if(model_->getSolutionCount()) {
       //      bestSolutionValue = model_->getObjValue();
       integerSolutionAlreadyExists = true;
+      return 0;
       assert(solutionValue < 1.0e50);
     }
 
