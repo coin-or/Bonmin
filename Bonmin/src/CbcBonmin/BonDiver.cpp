@@ -168,14 +168,14 @@ namespace Bonmin
   void
   CbcDiver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Diving options", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Diving options", RegisteredOptions::UndocumentedCategory);
     roptions->AddStringOption2(
       "stop_diving_on_cutoff",
       "Flag indicating whether we stop diving based on guessed feasible objective and the current cutoff",
       "no",
       "no", "",
       "yes", "");
-    roptions->setOptionExtraInfo("stop_diving_on_cutoff",63);
+    roptions->setOptionExtraInfo("stop_diving_on_cutoff", 63);
 
   }
 

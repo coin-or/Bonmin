@@ -197,6 +197,7 @@ namespace Bonmin
 
     roptions->AddLowerBoundedIntegerOption("number_look_ahead", "Sets limit of look-ahead strong-branching trials",
         0, 0,"");
+    roptions->setOptionExtraInfo("number_look_ahead", 31);
   }
 
 
