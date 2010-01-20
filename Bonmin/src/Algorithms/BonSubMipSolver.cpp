@@ -296,7 +296,7 @@ namespace Bonmin {
         "Set the level of output of the MILP subsolver in OA : "
         "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                      );
-    roptions->setOptionExtraInfo("milp_log_level",5);
+    roptions->setOptionExtraInfo("milp_log_level",64);
 
 
   }

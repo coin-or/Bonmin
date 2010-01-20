@@ -214,7 +214,7 @@ namespace Bonmin
   void
   LpBranchingSolver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Bonmin ecp based strong branching",RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Bonmin ecp based strong branching",RegisteredOptions::UndocumentedCategory);
     roptions->AddLowerBoundedIntegerOption
     ("ecp_max_rounds_strong",
      "Set the maximal number of rounds of ECP cuts in strong branching.",

@@ -120,7 +120,7 @@ namespace Bonmin {
 
   void
   HeuristicLocalBranching::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-   roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
+   roptions->SetRegisteringCategory("Undocumented MINLP Heuristics", RegisteredOptions::UndocumentedCategory);
    roptions->AddStringOption2(
      "heuristic_local_branching",
      "if yes runs the LocalBranching heuristic",
