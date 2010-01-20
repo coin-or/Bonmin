@@ -21,44 +21,6 @@
 <td>+</td>
 <td>+</td>
 </tr>
-<tr>   <th colspan=7> <a href="#sec:Bonmin_ecp_based_strong_branching">Bonmin ecp based strong branching</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:ecp_abs_tol_strong">ecp_abs_tol_strong</a> </td>
-<td>F</td>
-<td>1e-06</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:ecp_max_rounds_strong">ecp_max_rounds_strong</a> </td>
-<td>I</td>
-<td>0</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:ecp_rel_tol_strong">ecp_rel_tol_strong</a> </td>
-<td>F</td>
-<td>0.1</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:lp_strong_warmstart_method">lp_strong_warmstart_method</a> </td>
-<td>S</td>
-<td>Basis</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
 <tr>   <th colspan=7> <a href="#sec:Branch-and-bound_options">Branch-and-bound options</a> </th>
 </tr>
 <tr>
@@ -101,8 +63,8 @@
 <td> <a href="#sec:enable_dynamic_nlp">enable_dynamic_nlp</a> </td>
 <td>S</td>
 <td>no</td>
-<td> +</td>
-<td>+</td>
+<td> -</td>
+<td>-</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -129,9 +91,9 @@
 <td>S</td>
 <td>stop</td>
 <td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
 </tr>
 <tr>
 <td> <a href="#sec:node_comparison">node_comparison</a> </td>
@@ -156,7 +118,7 @@
 <td>I</td>
 <td>1</td>
 <td> -</td>
-<td>+</td>
+<td>-</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -165,7 +127,7 @@
 <td>I</td>
 <td>20</td>
 <td> -</td>
-<td>+</td>
+<td>-</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -201,7 +163,7 @@
 <td>S</td>
 <td>enable</td>
 <td> +</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -228,96 +190,90 @@
 <td>S</td>
 <td>strong-branching</td>
 <td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
 </tr>
-<tr>   <th colspan=7> <a href="#sec:Diving_options">Diving options</a> </th>
+<tr>   <th colspan=7> <a href="#sec:MILP_cutting_planes_in_hybrid">MILP cutting planes in hybrid</a> </th>
 </tr>
 <tr>
-<td> <a href="#sec:max_backtracks_in_dive">max_backtracks_in_dive</a> </td>
+<td> <a href="#sec:2mir_cuts">2mir_cuts</a> </td>
 <td>I</td>
-<td>5</td>
-<td> +</td>
+<td>0</td>
+<td> -</td>
 <td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
 <tr>
-<td> <a href="#sec:max_dive_depth">max_dive_depth</a> </td>
+<td> <a href="#sec:Gomory_cuts">Gomory_cuts</a> </td>
 <td>I</td>
-<td>INT_MAX</td>
-<td> +</td>
+<td>-5</td>
+<td> -</td>
 <td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
 <tr>
-<td> <a href="#sec:stop_diving_on_cutoff">stop_diving_on_cutoff</a> </td>
-<td>S</td>
-<td>no</td>
-<td> +</td>
+<td> <a href="#sec:clique_cuts">clique_cuts</a> </td>
+<td>I</td>
+<td>-5</td>
+<td> -</td>
 <td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
-<tr>   <th colspan=7> <a href="#sec:Feasibility_pump_heuristic">Feasibility pump heuristic</a> </th>
+<tr>
+<td> <a href="#sec:cover_cuts">cover_cuts</a> </td>
+<td>I</td>
+<td>-5</td>
+<td> -</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:flow_cover_cuts">flow_cover_cuts</a> </td>
+<td>I</td>
+<td>-5</td>
+<td> -</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:lift_and_project_cuts">lift_and_project_cuts</a> </td>
+<td>I</td>
+<td>0</td>
+<td> -</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:mir_cuts">mir_cuts</a> </td>
+<td>I</td>
+<td>-5</td>
+<td> -</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:reduce_and_split_cuts">reduce_and_split_cuts</a> </td>
+<td>I</td>
+<td>0</td>
+<td> -</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>   <th colspan=7> <a href="#sec:MINLP_Heuristics">MINLP Heuristics</a> </th>
 </tr>
 <tr>
 <td> <a href="#sec:feasibility_pump_objective_norm">feasibility_pump_objective_norm</a> </td>
 <td>I</td>
 <td>1</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:heuristic_feasibility_pump">heuristic_feasibility_pump</a> </td>
-<td>S</td>
-<td>no</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>   <th colspan=7> <a href="#sec:Fractional_diving_MIP_heuristic">Fractional diving MIP heuristic</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:heuristic_dive_MIP_fractional">heuristic_dive_MIP_fractional</a> </td>
-<td>S</td>
-<td>no</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>   <th colspan=7> <a href="#sec:Fractional_diving_heuristic">Fractional diving heuristic</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:heuristic_dive_fractional">heuristic_dive_fractional</a> </td>
-<td>S</td>
-<td>no</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>   <th colspan=7> <a href="#sec:Local_search_based_heuristics">Local search based heuristics</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:dummy_pump_heuristic">dummy_pump_heuristic</a> </td>
-<td>S</td>
-<td>no</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:fix_and_solve_heuristic">fix_and_solve_heuristic</a> </td>
-<td>S</td>
-<td>no</td>
 <td> +</td>
 <td>+</td>
 <td>+</td>
@@ -333,7 +289,34 @@
 <td>+</td>
 </tr>
 <tr>
-<td> <a href="#sec:heuristic_local_branching">heuristic_local_branching</a> </td>
+<td> <a href="#sec:heuristic_dive_MIP_vectorLength">heuristic_dive_MIP_vectorLength</a> </td>
+<td>S</td>
+<td>no</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:heuristic_dive_fractional">heuristic_dive_fractional</a> </td>
+<td>S</td>
+<td>no</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:heuristic_dive_vectorLength">heuristic_dive_vectorLength</a> </td>
+<td>S</td>
+<td>no</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:heuristic_feasibility_pump">heuristic_feasibility_pump</a> </td>
 <td>S</td>
 <td>no</td>
 <td> +</td>
@@ -350,87 +333,15 @@
 <td>+</td>
 <td>+</td>
 </tr>
-<tr>   <th colspan=7> <a href="#sec:MILP_cutting_planes_in_hybrid">MILP cutting planes in hybrid</a> </th>
+<tr>   <th colspan=7> <a href="#sec:MINLP_heuristics">MINLP heuristics</a> </th>
 </tr>
 <tr>
-<td> <a href="#sec:2mir_cuts">2mir_cuts</a> </td>
-<td>I</td>
-<td>0</td>
-<td> -</td>
+<td> <a href="#sec:heuristic_dive_MIP_fractional">heuristic_dive_MIP_fractional</a> </td>
+<td>S</td>
+<td>no</td>
+<td> +</td>
 <td>+</td>
-<td>-</td>
 <td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:Gomory_cuts">Gomory_cuts</a> </td>
-<td>I</td>
-<td>-5</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:clique_cuts">clique_cuts</a> </td>
-<td>I</td>
-<td>-5</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:cover_cuts">cover_cuts</a> </td>
-<td>I</td>
-<td>-5</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:flow_cover_cuts">flow_cover_cuts</a> </td>
-<td>I</td>
-<td>-5</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:lift_and_project_cuts">lift_and_project_cuts</a> </td>
-<td>I</td>
-<td>0</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:mir_cuts">mir_cuts</a> </td>
-<td>I</td>
-<td>-5</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:probing_cuts">probing_cuts</a> </td>
-<td>I</td>
-<td>0</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:reduce_and_split_cuts">reduce_and_split_cuts</a> </td>
-<td>I</td>
-<td>0</td>
-<td> -</td>
-<td>+</td>
-<td>-</td>
 <td>+</td>
 </tr>
 <tr>   <th colspan=7> <a href="#sec:Nlp_solution_robustness">Nlp solution robustness</a> </th>
@@ -440,9 +351,9 @@
 <td>I</td>
 <td>10</td>
 <td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
 </tr>
 <tr>
 <td> <a href="#sec:max_random_point_radius">max_random_point_radius</a> </td>
@@ -525,18 +436,18 @@
 <td>I</td>
 <td>0</td>
 <td> -</td>
-<td>+</td>
 <td>-</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
 </tr>
 <tr>
 <td> <a href="#sec:milp_solver">milp_solver</a> </td>
 <td>S</td>
 <td>Cbc_D</td>
 <td> -</td>
-<td>+</td>
 <td>-</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
 </tr>
 <tr>   <th colspan=7> <a href="#sec:Options_for_OA_decomposition">Options for OA decomposition</a> </th>
 </tr>
@@ -545,7 +456,7 @@
 <td>S</td>
 <td>no</td>
 <td> -</td>
-<td>+</td>
+<td>-</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -554,8 +465,8 @@
 <td>F</td>
 <td>100</td>
 <td> +</td>
-<td>+</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
 <td>+</td>
 </tr>
 <tr>
@@ -563,8 +474,8 @@
 <td>I</td>
 <td>1</td>
 <td> +</td>
-<td>+</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
 <td>+</td>
 </tr>
 <tr>   <th colspan=7> <a href="#sec:Options_for_ecp_cuts_generation">Options for ecp cuts generation</a> </th>
@@ -575,7 +486,7 @@
 <td>1e-06</td>
 <td> -</td>
 <td>-</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 </tr>
 <tr>
@@ -584,7 +495,7 @@
 <td>5</td>
 <td> -</td>
 <td>-</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 </tr>
 <tr>
@@ -593,7 +504,7 @@
 <td>10</td>
 <td> -</td>
 <td>-</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 </tr>
 <tr>
@@ -602,7 +513,7 @@
 <td>0</td>
 <td> -</td>
 <td>-</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 </tr>
 <tr>
@@ -611,7 +522,7 @@
 <td>0</td>
 <td> -</td>
 <td>-</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 </tr>
 <tr>   <th colspan=7> <a href="#sec:Options_for_feasibility_checker_using_OA_cuts">Options for feasibility checker using OA cuts</a> </th>
@@ -619,8 +530,8 @@
 <tr>
 <td> <a href="#sec:feas_check_cut_types">feas_check_cut_types</a> </td>
 <td>S</td>
-<td>outer-approximations</td>
-<td> +</td>
+<td>outer-approx</td>
+<td> -</td>
 <td>-</td>
 <td>+</td>
 <td>+</td>
@@ -629,7 +540,7 @@
 <td> <a href="#sec:feas_check_discard_policy">feas_check_discard_policy</a> </td>
 <td>S</td>
 <td>detect-cycles</td>
-<td> +</td>
+<td> -</td>
 <td>-</td>
 <td>+</td>
 <td>+</td>
@@ -638,7 +549,7 @@
 <td> <a href="#sec:generate_benders_after_so_many_oa">generate_benders_after_so_many_oa</a> </td>
 <td>I</td>
 <td>5000</td>
-<td> +</td>
+<td> -</td>
 <td>-</td>
 <td>+</td>
 <td>+</td>
@@ -649,8 +560,8 @@
 <td> <a href="#sec:fp_log_frequency">fp_log_frequency</a> </td>
 <td>F</td>
 <td>100</td>
-<td> +</td>
-<td>+</td>
+<td> -</td>
+<td>-</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -658,21 +569,48 @@
 <td> <a href="#sec:fp_log_level">fp_log_level</a> </td>
 <td>I</td>
 <td>1</td>
-<td> +</td>
-<td>+</td>
+<td> -</td>
+<td>-</td>
 <td>+</td>
 <td>+</td>
 </tr>
 <tr>   <th colspan=7> <a href="#sec:Options_for_non-convex_problems">Options for non-convex problems</a> </th>
 </tr>
 <tr>
+<td> <a href="#sec:coeff_var_threshold">coeff_var_threshold</a> </td>
+<td>F</td>
+<td>0.1</td>
+<td> +</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td> <a href="#sec:dynamic_def_cutoff_decr">dynamic_def_cutoff_decr</a> </td>
+<td>S</td>
+<td>no</td>
+<td> +</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td> <a href="#sec:first_perc_for_cutoff_decr">first_perc_for_cutoff_decr</a> </td>
+<td>F</td>
+<td>-0.02</td>
+<td> +</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
 <td> <a href="#sec:max_consecutive_infeasible">max_consecutive_infeasible</a> </td>
 <td>I</td>
 <td>0</td>
 <td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
 </tr>
 <tr>
 <td> <a href="#sec:num_resolve_at_infeasibles">num_resolve_at_infeasibles</a> </td>
@@ -701,30 +639,21 @@
 <td>-</td>
 <td>-</td>
 </tr>
+<tr>
+<td> <a href="#sec:second_perc_for_cutoff_decr">second_perc_for_cutoff_decr</a> </td>
+<td>F</td>
+<td>-0.05</td>
+<td> +</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
 <tr>   <th colspan=7> <a href="#sec:Outer_Approximation_cuts_generation">Outer Approximation cuts generation</a> </th>
 </tr>
 <tr>
 <td> <a href="#sec:add_only_violated_oa">add_only_violated_oa</a> </td>
 <td>S</td>
 <td>no</td>
-<td> -</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:cut_strengthening_type">cut_strengthening_type</a> </td>
-<td>S</td>
-<td>none</td>
-<td> -</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td> <a href="#sec:disjunctive_cut_type">disjunctive_cut_type</a> </td>
-<td>S</td>
-<td>none</td>
 <td> -</td>
 <td>+</td>
 <td>+</td>
@@ -773,7 +702,7 @@
 <td>I</td>
 <td>100</td>
 <td> +</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -782,7 +711,7 @@
 <td>I</td>
 <td>1</td>
 <td> +</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -791,7 +720,7 @@
 <td>I</td>
 <td>0</td>
 <td> -</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -800,7 +729,7 @@
 <td>I</td>
 <td>0</td>
 <td> +</td>
-<td>-</td>
+<td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -887,28 +816,6 @@
 <td>+</td>
 <td>+</td>
 </tr>
-<tr>   <th colspan=7> <a href="#sec:VectorLength_diving_MIP_heuristic">VectorLength diving MIP heuristic</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:heuristic_dive_MIP_vectorLength">heuristic_dive_MIP_vectorLength</a> </td>
-<td>S</td>
-<td>no</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>   <th colspan=7> <a href="#sec:VectorLength_diving_heuristic">VectorLength diving heuristic</a> </th>
-</tr>
-<tr>
-<td> <a href="#sec:heuristic_dive_vectorLength">heuristic_dive_vectorLength</a> </td>
-<td>S</td>
-<td>no</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
 <tr>   <th colspan=7> <a href="#sec:nlp_interface_option">nlp interface option</a> </th>
 </tr>
 <tr>
@@ -966,36 +873,6 @@ Possible values:
    \item B-Hyb: hybrid outer approximation based branch-and-cut,
    \item B-Ecp: ecp cuts based branch-and-cut a la FilMINT.
    \item B-iFP: Iterated Feasibility Pump for MINLP.
-\end{itemize}
-
-\subsection{Bonmin ecp based strong branching}
-\label{sec:Bonmin_ecp_based_strong_branching}
-\paragraph{ecp\_abs\_tol\_strong:}\label{sec:ecp_abs_tol_strong} Set the absolute termination tolerance for ECP rounds in strong branching. $\;$ \\
- The valid range for this real option is 
-$0 \le {\tt ecp\_abs\_tol\_strong } <  {\tt +inf}$
-and its default value is $1 \cdot 10^{-06}$.
-
-
-\paragraph{ecp\_max\_rounds\_strong:}\label{sec:ecp_max_rounds_strong} Set the maximal number of rounds of ECP cuts in strong branching. $\;$ \\
- The valid range for this integer option is
-$0 \le {\tt ecp\_max\_rounds\_strong } <  {\tt +inf}$
-and its default value is $0$.
-
-
-\paragraph{ecp\_rel\_tol\_strong:}\label{sec:ecp_rel_tol_strong} Set the relative termination tolerance for ECP rounds in strong branching. $\;$ \\
- The valid range for this real option is 
-$0 \le {\tt ecp\_rel\_tol\_strong } <  {\tt +inf}$
-and its default value is $0.1$.
-
-
-\paragraph{lp\_strong\_warmstart\_method:}\label{sec:lp_strong_warmstart_method} Choose method to use for warm starting lp in strong branching $\;$ \\
- (Advanced stuff)
-The default value for this string option is "Basis".
-\\ 
-Possible values:
-\begin{itemize}
-   \item Basis: Use optimal basis of node
-   \item Clone: Clone optimal problem of node
 \end{itemize}
 
 \subsection{Branch-and-bound options}
@@ -1193,124 +1070,6 @@ variable
    \item random: Method to choose branching variable randomly
 \end{itemize}
 
-\subsection{Diving options}
-\label{sec:Diving_options}
-\paragraph{max\_backtracks\_in\_dive:}\label{sec:max_backtracks_in_dive} Set the number of backtracks in a dive when using dfs-dive tree searchstrategy. $\;$ \\
- The valid range for this integer option is
-$0 \le {\tt max\_backtracks\_in\_dive } <  {\tt +inf}$
-and its default value is $5$.
-
-
-\paragraph{max\_dive\_depth:}\label{sec:max_dive_depth} When using dfs-dive search. Maximum depth to go to from the diving board (node where the diving started. $\;$ \\
- The valid range for this integer option is
-$0 \le {\tt max\_dive\_depth } <  {\tt +inf}$
-and its default value is $2147483647$.
-
-
-\paragraph{stop\_diving\_on\_cutoff:}\label{sec:stop_diving_on_cutoff} Flag indicating whether we stop diving based on guessed feasible objective and the current cutoff $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: 
-   \item yes: 
-\end{itemize}
-
-\subsection{Feasibility pump heuristic}
-\label{sec:Feasibility_pump_heuristic}
-\paragraph{feasibility\_pump\_objective\_norm:}\label{sec:feasibility_pump_objective_norm} Norm of feasibility pump objective function $\;$ \\
- The valid range for this integer option is
-$1 \le {\tt feasibility\_pump\_objective\_norm } \le 2$
-and its default value is $1$.
-
-
-\paragraph{heuristic\_feasibility\_pump:}\label{sec:heuristic_feasibility_pump} whether the heuristic feasibility pump should be used $\;$ \\
- Someone should fix this entry...
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't use it
-   \item yes: use it
-\end{itemize}
-
-\subsection{Fractional diving MIP heuristic}
-\label{sec:Fractional_diving_MIP_heuristic}
-\paragraph{heuristic\_dive\_MIP\_fractional:}\label{sec:heuristic_dive_MIP_fractional} if yes runs the Dive MIP Fractional heuristic $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
-\subsection{Fractional diving heuristic}
-\label{sec:Fractional_diving_heuristic}
-\paragraph{heuristic\_dive\_fractional:}\label{sec:heuristic_dive_fractional} if yes runs the Dive Fractional heuristic $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
-\subsection{Local search based heuristics}
-\label{sec:Local_search_based_heuristics}
-\paragraph{dummy\_pump\_heuristic:}\label{sec:dummy_pump_heuristic} if yes runs a heuristic which looks like a dummy FP $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
-\paragraph{fix\_and\_solve\_heuristic:}\label{sec:fix_and_solve_heuristic} if yes runs a heuristic at root where fixes all variables integer in the continuous solution $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
-\paragraph{heuristic\_RINS:}\label{sec:heuristic_RINS} if yes runs the RINS heuristic $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
-\paragraph{heuristic\_local\_branching:}\label{sec:heuristic_local_branching} if yes runs the LocalBranching heuristic $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
-\paragraph{pump\_for\_minlp:}\label{sec:pump_for_minlp} if yes runs FP for MINLP $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
 \subsection{MILP cutting planes in hybrid}
 \label{sec:MILP_cutting_planes_in_hybrid}
 \paragraph{2mir\_cuts:}\label{sec:2mir_cuts} Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut $\;$ \\
@@ -1390,17 +1149,6 @@ $-100 \le {\tt mir\_cuts } <  {\tt +inf}$
 and its default value is $-5$.
 
 
-\paragraph{probing\_cuts:}\label{sec:probing_cuts} Frequency (in terms of nodes) for generating probing cuts in branch-and-cut $\;$ \\
- If k > 0, cuts are generated every k nodes, if
--99 < k < 0 cuts are generated every -k nodes but
-Cbc may decide to stop generating cuts, if not
-enough are generated at the root node, if k=-99
-generate cuts only at the root node, if k=0 or
-100 do not generate cuts. The valid range for this integer option is
-$0 \le {\tt probing\_cuts } \le 0$
-and its default value is $0$.
-
-
 \paragraph{reduce\_and\_split\_cuts:}\label{sec:reduce_and_split_cuts} Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut $\;$ \\
  If k > 0, cuts are generated every k nodes, if
 -99 < k < 0 cuts are generated every -k nodes but
@@ -1411,6 +1159,86 @@ generate cuts only at the root node, if k=0 or
 $-100 \le {\tt reduce\_and\_split\_cuts } <  {\tt +inf}$
 and its default value is $0$.
 
+
+\subsection{MINLP Heuristics}
+\label{sec:MINLP_Heuristics}
+\paragraph{feasibility\_pump\_objective\_norm:}\label{sec:feasibility_pump_objective_norm} Norm of feasibility pump objective function $\;$ \\
+ The valid range for this integer option is
+$1 \le {\tt feasibility\_pump\_objective\_norm } \le 2$
+and its default value is $1$.
+
+
+\paragraph{heuristic\_RINS:}\label{sec:heuristic_RINS} if yes runs the RINS heuristic $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: don't run it
+   \item yes: runs the heuristic
+\end{itemize}
+
+\paragraph{heuristic\_dive\_MIP\_vectorLength:}\label{sec:heuristic_dive_MIP_vectorLength} if yes runs the Dive MIP VectorLength heuristic $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: don't run it
+   \item yes: runs the heuristic
+\end{itemize}
+
+\paragraph{heuristic\_dive\_fractional:}\label{sec:heuristic_dive_fractional} if yes runs the Dive Fractional heuristic $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: don't run it
+   \item yes: runs the heuristic
+\end{itemize}
+
+\paragraph{heuristic\_dive\_vectorLength:}\label{sec:heuristic_dive_vectorLength} if yes runs the Dive VectorLength heuristic $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: don't run it
+   \item yes: runs the heuristic
+\end{itemize}
+
+\paragraph{heuristic\_feasibility\_pump:}\label{sec:heuristic_feasibility_pump} whether the heuristic feasibility pump should be used $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: don't use it
+   \item yes: use it
+\end{itemize}
+
+\paragraph{pump\_for\_minlp:}\label{sec:pump_for_minlp} if yes runs FP for MINLP $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: don't run it
+   \item yes: runs the heuristic
+\end{itemize}
+
+\subsection{MINLP heuristics}
+\label{sec:MINLP_heuristics}
+\paragraph{heuristic\_dive\_MIP\_fractional:}\label{sec:heuristic_dive_MIP_fractional} if yes runs the Dive MIP Fractional heuristic $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: don't run it
+   \item yes: runs the heuristic
+\end{itemize}
 
 \subsection{Nlp solution robustness}
 \label{sec:Nlp_solution_robustness}
@@ -1579,11 +1407,11 @@ and its default value is $0$.
 \paragraph{feas\_check\_cut\_types:}\label{sec:feas_check_cut_types} Choose the type of cuts generated when an integer feasible solution is found $\;$ \\
  If it seems too much memory is used should try
 Benders to use less
-The default value for this string option is "outer-approximations".
+The default value for this string option is "outer-approx".
 \\ 
 Possible values:
 \begin{itemize}
-   \item outer-approximations: Generate a set of Outer Approximations cuts.
+   \item outer-approx: Generate a set of Outer Approximations cuts.
    \item Benders: Generate a single Benders cut.
 \end{itemize}
 
@@ -1639,6 +1467,31 @@ and its default value is $1$.
 
 \subsection{Options for non-convex problems}
 \label{sec:Options_for_non-convex_problems}
+\paragraph{coeff\_var\_threshold:}\label{sec:coeff_var_threshold} Coefficient of variation threshold (for dynamic definition of cutoff\_decr). $\;$ \\
+ Coefficient of variation threshold (for dynamic
+definition of cutoff\_decr). The valid range for this real option is 
+$0 \le {\tt coeff\_var\_threshold } <  {\tt +inf}$
+and its default value is $0.1$.
+
+
+\paragraph{dynamic\_def\_cutoff\_decr:}\label{sec:dynamic_def_cutoff_decr} Do you want to define the parameter cutoff\_decr dynamically? $\;$ \\
+
+The default value for this string option is "no".
+\\ 
+Possible values:
+\begin{itemize}
+   \item no: No, define it statically
+   \item yes: Yes, define it dynamically
+\end{itemize}
+
+\paragraph{first\_perc\_for\_cutoff\_decr:}\label{sec:first_perc_for_cutoff_decr} The percentage used when, the coeff of variance is smaller than the threshold, to compute the cutoff\_decr dynamically. $\;$ \\
+ The percentage used when, the coeff of variance
+is smaller than the threshold, to compute the
+cutoff\_decr dynamically. The valid range for this real option is 
+${\tt -inf} <  {\tt first\_perc\_for\_cutoff\_decr } <  {\tt +inf}$
+and its default value is $-0.02$.
+
+
 \paragraph{max\_consecutive\_infeasible:}\label{sec:max_consecutive_infeasible} Number of consecutive infeasible subproblems before aborting a branch. $\;$ \\
  Will continue exploring a branch of the tree
 until "max\_consecutive\_infeasible"consecutive
@@ -1671,6 +1524,14 @@ $0 \le {\tt num\_resolve\_at\_root } <  {\tt +inf}$
 and its default value is $0$.
 
 
+\paragraph{second\_perc\_for\_cutoff\_decr:}\label{sec:second_perc_for_cutoff_decr} The percentage used when, the coeff of variance is greater than the threshold, to compute the cutoff\_decr dynamically. $\;$ \\
+ The percentage used when, the coeff of variance
+is greater than the threshold, to compute the
+cutoff\_decr dynamically. The valid range for this real option is 
+${\tt -inf} <  {\tt second\_perc\_for\_cutoff\_decr } <  {\tt +inf}$
+and its default value is $-0.05$.
+
+
 \subsection{Outer Approximation cuts generation}
 \label{sec:Outer_Approximation_cuts_generation}
 \paragraph{add\_only\_violated\_oa:}\label{sec:add_only_violated_oa} Do we add all OA cuts or only the ones violated by current point? $\;$ \\
@@ -1681,30 +1542,6 @@ Possible values:
 \begin{itemize}
    \item no: Add all cuts
    \item yes: Add only violated Cuts
-\end{itemize}
-
-\paragraph{cut\_strengthening\_type:}\label{sec:cut_strengthening_type} Determines if and what kind of cut strengthening should be performed. $\;$ \\
-
-The default value for this string option is "none".
-\\ 
-Possible values:
-\begin{itemize}
-   \item none: No strengthening of cuts.
-   \item sglobal: Strengthen global cuts.
-   \item uglobal-slocal: Unstrengthened global and strengthened local
-cuts
-   \item sglobal-slocal: Strengthened global and strengthened local cuts
-\end{itemize}
-
-\paragraph{disjunctive\_cut\_type:}\label{sec:disjunctive_cut_type} Determine if and what kind of disjunctive cuts should be computed. $\;$ \\
-
-The default value for this string option is "none".
-\\ 
-Possible values:
-\begin{itemize}
-   \item none: No disjunctive cuts.
-   \item most-fractional: If discrete variables present, compute
-disjunction for most-fractional variable
 \end{itemize}
 
 \paragraph{oa\_cuts\_log\_level:}\label{sec:oa_cuts_log_level} level of log when generating OA cuts. $\;$ \\
@@ -1841,30 +1678,6 @@ Possible values:
 \begin{itemize}
    \item no: 
    \item yes: 
-\end{itemize}
-
-\subsection{VectorLength diving MIP heuristic}
-\label{sec:VectorLength_diving_MIP_heuristic}
-\paragraph{heuristic\_dive\_MIP\_vectorLength:}\label{sec:heuristic_dive_MIP_vectorLength} if yes runs the Dive MIP VectorLength heuristic $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
-\end{itemize}
-
-\subsection{VectorLength diving heuristic}
-\label{sec:VectorLength_diving_heuristic}
-\paragraph{heuristic\_dive\_vectorLength:}\label{sec:heuristic_dive_vectorLength} if yes runs the Dive VectorLength heuristic $\;$ \\
-
-The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't run it
-   \item yes: runs the heuristic
 \end{itemize}
 
 \subsection{nlp interface option}
