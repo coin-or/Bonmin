@@ -1,160 +1,141 @@
 
 # registering category: Algorithm choice
 
-bonmin.algorithm                            B-BB      	#Choice of the algorithm.
-
-# registering category: Bonmin ecp based strong branching
-
-bonmin.ecp_abs_tol_strong                   1e-06     	#Set the absolute termination tolerance for ECP rounds in strong branching.
-bonmin.ecp_max_rounds_strong                0         	#Set the maximal number of rounds of ECP cuts in strong branching.
-bonmin.ecp_rel_tol_strong                   0.1       	#Set the relative termination tolerance for ECP rounds in strong branching.
-bonmin.lp_strong_warmstart_method           Basis     	#Choose method to use for warm starting lp in strong branching
+bonmin.algorithm                             B-BB      	#Choice of the algorithm.
 
 # registering category: Branch-and-bound options
 
-bonmin.allowable_fraction_gap               0         	#Specify the value of relative gap under which the algorithm stops.
-bonmin.allowable_gap                        0         	#Specify the value of absolute gap under which the algorithm stops.
-bonmin.cutoff                               1e+100    	#Specify cutoff value.
-bonmin.cutoff_decr                          1e-05     	#Specify cutoff decrement.
-bonmin.enable_dynamic_nlp                   no        	#Enable dynamic linear and quadratic rows addition in nlp
-bonmin.integer_tolerance                    1e-06     	#Set integer tolerance.
-bonmin.iteration_limit                      2147483647	#Set the cumulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.
-bonmin.nlp_failure_behavior                 stop      	#Set the behavior when an NLP or a series of NLP are unsolved by Ipopt (we call unsolved an NLP for which Ipopt is not able to guarantee optimality within the specified tolerances).
-bonmin.node_comparison                      best-bound	#Choose the node selection strategy.
-bonmin.node_limit                           2147483647	#Set the maximum number of nodes explored in the branch-and-bound search.
-bonmin.num_cut_passes                       1         	#Set the maximum number of cut passes at regular nodes of the branch-and-cut.
-bonmin.num_cut_passes_at_root               20        	#Set the maximum number of cut passes at regular nodes of the branch-and-cut.
-bonmin.number_before_trust                  8         	#Set the number of branches on a variable before its pseudo costs are to be believed in dynamic strong branching.
-bonmin.number_strong_branch                 20        	#Choose the maximum number of variables considered for strong branching.
-bonmin.solution_limit                       2147483647	#Abort after that much integer feasible solution have been found by algorithm
-bonmin.sos_constraints                      enable    	#Wether or not to activate SOS constraints.
-bonmin.time_limit                           1e+10     	#Set the global maximum computation time (in secs) for the algorithm.
-bonmin.tree_search_strategy                 probed-dive	#Pick a strategy for traversing the tree
-bonmin.variable_selection                   strong-branching	#Chooses variable selection strategy
-
-# registering category: Diving options
-
-bonmin.max_backtracks_in_dive               5         	#Set the number of backtracks in a dive when using dfs-dive tree searchstrategy.
-bonmin.max_dive_depth                       2147483647	#When using dfs-dive search. Maximum depth to go to from the diving board (node where the diving started.
-bonmin.stop_diving_on_cutoff                no        	#Flag indicating whether we stop diving based on guessed feasible objective and the current cutoff
-
-# registering category: Feasibility pump heuristic
-
-bonmin.feasibility_pump_objective_norm      1         	#Norm of feasibility pump objective function
-bonmin.heuristic_feasibility_pump           no        	#whether the heuristic feasibility pump should be used
-
-# registering category: Fractional diving MIP heuristic
-
-bonmin.heuristic_dive_MIP_fractional        no        	#if yes runs the Dive MIP Fractional heuristic
-
-# registering category: Fractional diving heuristic
-
-bonmin.heuristic_dive_fractional            no        	#if yes runs the Dive Fractional heuristic
-
-# registering category: Local search based heuristics
-
-bonmin.dummy_pump_heuristic                 no        	#if yes runs a heuristic which looks like a dummy FP
-bonmin.fix_and_solve_heuristic              no        	#if yes runs a heuristic at root where fixes all variables integer in the continuous solution
-bonmin.heuristic_RINS                       no        	#if yes runs the RINS heuristic
-bonmin.heuristic_local_branching            no        	#if yes runs the LocalBranching heuristic
-bonmin.pump_for_minlp                       yes       	#if yes runs FP for MINLP
+bonmin.allowable_fraction_gap                0         	#Specify the value of relative gap under which the algorithm stops.
+bonmin.allowable_gap                         0         	#Specify the value of absolute gap under which the algorithm stops.
+bonmin.cutoff                                1e+100    	#Specify cutoff value.
+bonmin.cutoff_decr                           1e-05     	#Specify cutoff decrement.
+bonmin.enable_dynamic_nlp                    no        	#Enable dynamic linear and quadratic rows addition in nlp
+bonmin.integer_tolerance                     1e-06     	#Set integer tolerance.
+bonmin.iteration_limit                       2147483647	#Set the cumulated maximum number of iteration in the algorithm used to process nodes continuous relaxations in the branch-and-bound.
+bonmin.nlp_failure_behavior                  stop      	#Set the behavior when an NLP or a series of NLP are unsolved by Ipopt (we call unsolved an NLP for which Ipopt is not able to guarantee optimality within the specified tolerances).
+bonmin.node_comparison                       best-bound	#Choose the node selection strategy.
+bonmin.node_limit                            2147483647	#Set the maximum number of nodes explored in the branch-and-bound search.
+bonmin.num_cut_passes                        1         	#Set the maximum number of cut passes at regular nodes of the branch-and-cut.
+bonmin.num_cut_passes_at_root                20        	#Set the maximum number of cut passes at regular nodes of the branch-and-cut.
+bonmin.number_before_trust                   8         	#Set the number of branches on a variable before its pseudo costs are to be believed in dynamic strong branching.
+bonmin.number_strong_branch                  20        	#Choose the maximum number of variables considered for strong branching.
+bonmin.solution_limit                        2147483647	#Abort after that much integer feasible solution have been found by algorithm
+bonmin.sos_constraints                       enable    	#Wether or not to activate SOS constraints.
+bonmin.time_limit                            1e+10     	#Set the global maximum computation time (in secs) for the algorithm.
+bonmin.tree_search_strategy                  probed-dive	#Pick a strategy for traversing the tree
+bonmin.variable_selection                    strong-branching	#Chooses variable selection strategy
 
 # registering category: MILP cutting planes in hybrid
 
-bonmin.2mir_cuts                            0         	#Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut
-bonmin.Gomory_cuts                          -5        	#Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.
-bonmin.clique_cuts                          -5        	#Frequency (in terms of nodes) for generating clique cuts in branch-and-cut
-bonmin.cover_cuts                           -5        	#Frequency (in terms of nodes) for generating cover cuts in branch-and-cut
-bonmin.flow_cover_cuts                     -5        	#Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut
-bonmin.lift_and_project_cuts                0         	#Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut
-bonmin.mir_cuts                             -5        	#Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut
-bonmin.reduce_and_split_cuts                0         	#Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut
+bonmin.2mir_cuts                             0         	#Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut
+bonmin.Gomory_cuts                           -5        	#Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.
+bonmin.clique_cuts                           -5        	#Frequency (in terms of nodes) for generating clique cuts in branch-and-cut
+bonmin.cover_cuts                            -5        	#Frequency (in terms of nodes) for generating cover cuts in branch-and-cut
+bonmin.flow_cover_cuts                       -5        	#Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut
+bonmin.lift_and_project_cuts                 0         	#Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut
+bonmin.mir_cuts                              -5        	#Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut
+bonmin.reduce_and_split_cuts                 0         	#Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut
+
+# registering category: MINLP Heuristics
+
+bonmin.feasibility_pump_objective_norm       1         	#Norm of feasibility pump objective function
+bonmin.heuristic_RINS                        no        	#if yes runs the RINS heuristic
+bonmin.heuristic_dive_MIP_vectorLength       no        	#if yes runs the Dive MIP VectorLength heuristic
+bonmin.heuristic_dive_fractional             no        	#if yes runs the Dive Fractional heuristic
+bonmin.heuristic_dive_vectorLength           no        	#if yes runs the Dive VectorLength heuristic
+bonmin.heuristic_feasibility_pump            no        	#whether the heuristic feasibility pump should be used
+bonmin.pump_for_minlp                        no        	#if yes runs FP for MINLP
+
+# registering category: MINLP heuristics
+
+bonmin.heuristic_dive_MIP_fractional         no        	#if yes runs the Dive MIP Fractional heuristic
 
 # registering category: Nlp solution robustness
 
-bonmin.max_consecutive_failures             10        	#(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.
-bonmin.max_random_point_radius              100000    	#Set max value r for coordinate of a random point.
-bonmin.num_iterations_suspect               -1        	#Number of iterations over which a node is considered "suspect" (for debugging purposes only, see detailed documentation).
-bonmin.num_retry_unsolved_random_point      0         	#Number $k$ of times that the algorithm will try to resolve an unsolved NLP with a random starting point (we call unsolved an NLP for which Ipopt is not able to guarantee optimality within the specified tolerances).
-bonmin.random_point_perturbation_interval   1         	#Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point
-bonmin.random_point_type                    Jon       	#method to choose a random starting point
+bonmin.max_consecutive_failures              10        	#(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.
+bonmin.max_random_point_radius               100000    	#Set max value r for coordinate of a random point.
+bonmin.num_iterations_suspect                -1        	#Number of iterations over which a node is considered "suspect" (for debugging purposes only, see detailed documentation).
+bonmin.num_retry_unsolved_random_point       0         	#Number $k$ of times that the algorithm will try to resolve an unsolved NLP with a random starting point (we call unsolved an NLP for which Ipopt is not able to guarantee optimality within the specified tolerances).
+bonmin.random_point_perturbation_interval    1         	#Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point
+bonmin.random_point_type                     Jon       	#method to choose a random starting point
 
 # registering category: Nlp solve options in B-Hyb
 
-bonmin.nlp_solve_frequency                  10        	#Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.
-bonmin.nlp_solve_max_depth                  10        	#Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.
-bonmin.nlp_solves_per_depth                 1e+30     	#Set average number of nodes in the tree at which NLP relaxations are solved in B-Hyb for each depth.
+bonmin.nlp_solve_frequency                   10        	#Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.
+bonmin.nlp_solve_max_depth                   10        	#Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.
+bonmin.nlp_solves_per_depth                  1e+100    	#Set average number of nodes in the tree at which NLP relaxations are solved in B-Hyb for each depth.
 
 # registering category: Options for MILP solver
 
-bonmin.milp_log_level                       0         	#specify MILP solver log level.
-bonmin.milp_solver                          Cbc_D     	#Choose the subsolver to solve MILP sub-problems in OA decompositions.
+bonmin.milp_log_level                        0         	#specify MILP solver log level.
+bonmin.milp_solver                           Cbc_D     	#Choose the subsolver to solve MILP sub-problems in OA decompositions.
 
 # registering category: Options for OA decomposition
 
-bonmin.oa_decomposition                     no        	#If yes do initial OA decomposition
-bonmin.oa_log_frequency                     100       	#display an update on lower and upper bounds in OA every n seconds
-bonmin.oa_log_level                         1         	#specify OA iterations log level.
+bonmin.oa_decomposition                      no        	#If yes do initial OA decomposition
+bonmin.oa_log_frequency                      100       	#display an update on lower and upper bounds in OA every n seconds
+bonmin.oa_log_level                          1         	#specify OA iterations log level.
 
 # registering category: Options for ecp cuts generation
 
-bonmin.ecp_abs_tol                          1e-06     	#Set the absolute termination tolerance for ECP rounds.
-bonmin.ecp_max_rounds                       5         	#Set the maximal number of rounds of ECP cuts.
-bonmin.ecp_propability_factor               1000      	#Factor appearing in formula for skipping ECP cuts.
-bonmin.ecp_rel_tol                          0         	#Set the relative termination tolerance for ECP rounds.
-bonmin.filmint_ecp_cuts                     0         	#Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.
+bonmin.ecp_abs_tol                           1e-06     	#Set the absolute termination tolerance for ECP rounds.
+bonmin.ecp_max_rounds                        5         	#Set the maximal number of rounds of ECP cuts.
+bonmin.ecp_propability_factor                10        	#Factor appearing in formula for skipping ECP cuts.
+bonmin.ecp_rel_tol                           0         	#Set the relative termination tolerance for ECP rounds.
+bonmin.filmint_ecp_cuts                      0         	#Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.
+
+# registering category: Options for feasibility checker using OA cuts
+
+bonmin.feas_check_cut_types                  outer-approximations	#Choose the type of cuts generated when an integer feasible solution is found
+bonmin.feas_check_discard_policy             detect-cycles	#How cuts from feasibility checker are discarded
+bonmin.generate_benders_after_so_many_oa     5000      	#Specify that after so many oa cuts have been generated Benders cuts should be generated instead.
 
 # registering category: Options for feasibility pump
 
-bonmin.fp_log_frequency                     100       	#display an update on lower and upper bounds in FP every n seconds
-bonmin.fp_log_level                         1         	#specify FP iterations log level.
+bonmin.fp_log_frequency                      100       	#display an update on lower and upper bounds in FP every n seconds
+bonmin.fp_log_level                          1         	#specify FP iterations log level.
 
 # registering category: Options for non-convex problems
 
-bonmin.max_consecutive_infeasible           0         	#Number of consecutive infeasible subproblems before aborting a branch.
-bonmin.num_resolve_at_infeasibles           0         	#Number $k$ of tries to resolve an infeasible node (other than the root) of the tree with different starting point.
-bonmin.num_resolve_at_node                  0         	#Number $k$ of tries to resolve a node (other than the root) of the tree with different starting point.
-bonmin.num_resolve_at_root                  0         	#Number $k$ of tries to resolve the root node with different starting points.
+bonmin.coeff_var_threshold                   0.1       	#Coefficient of variation threshold (for dynamic definition of cutoff_decr).
+bonmin.dynamic_def_cutoff_decr               no        	#Do you want to define the parameter cutoff_decr dynamically?
+bonmin.first_perc_for_cutoff_decr            -0.02     	#The percentage used when, the coeff of variance is smaller than the threshold, to compute the cutoff_decr dynamically.
+bonmin.max_consecutive_infeasible            0         	#Number of consecutive infeasible subproblems before aborting a branch.
+bonmin.num_resolve_at_infeasibles            0         	#Number $k$ of tries to resolve an infeasible node (other than the root) of the tree with different starting point.
+bonmin.num_resolve_at_node                   0         	#Number $k$ of tries to resolve a node (other than the root) of the tree with different starting point.
+bonmin.num_resolve_at_root                   0         	#Number $k$ of tries to resolve the root node with different starting points.
+bonmin.second_perc_for_cutoff_decr           -0.05     	#The percentage used when, the coeff of variance is greater than the threshold, to compute the cutoff_decr dynamically.
 
 # registering category: Outer Approximation cuts generation
 
-bonmin.add_only_violated_oa                 no        	#Do we add all OA cuts or only the ones violated by current point?
-bonmin.cut_strengthening_type               none      	#Determines if and what kind of cut strengthening should be performed.
-bonmin.disjunctive_cut_type                 none      	#Determine if and what kind of disjunctive cuts should be computed.
-bonmin.oa_cuts_log_level                    0         	#level of log when generating OA cuts.
-bonmin.oa_cuts_scope                        global    	#Specify if OA cuts added are to be set globally or locally valid
-bonmin.tiny_element                         1e-08     	#Value for tiny element in OA cut
-bonmin.very_tiny_element                    1e-17     	#Value for very tiny element in OA cut
+bonmin.add_only_violated_oa                  no        	#Do we add all OA cuts or only the ones violated by current point?
+bonmin.oa_cuts_log_level                     0         	#level of log when generating OA cuts.
+bonmin.oa_cuts_scope                         global    	#Specify if OA cuts added are to be set globally or locally valid
+bonmin.tiny_element                          1e-08     	#Value for tiny element in OA cut
+bonmin.very_tiny_element                     1e-17     	#Value for very tiny element in OA cut
 
 # registering category: Output ond log-levels options
 
-bonmin.bb_log_interval                      100       	#Interval at which node level output is printed.
-bonmin.bb_log_level                         1         	#specify main branch-and-bound log level.
-bonmin.lp_log_level                         0         	#specify LP log level.
+bonmin.bb_log_interval                       100       	#Interval at which node level output is printed.
+bonmin.bb_log_level                          1         	#specify main branch-and-bound log level.
+bonmin.lp_log_level                          0         	#specify LP log level.
+bonmin.nlp_log_at_root                       0         	# Specify a different log level for root relaxtion.
 
 # registering category: Strong branching setup
 
-bonmin.candidate_sort_criterion             best-ps-cost	#Choice of the criterion to choose candidates in strong-branching
-bonmin.maxmin_crit_have_sol                 0.1       	#Weight towards minimum in of lower and upper branching estimates when a solution has been found.
-bonmin.maxmin_crit_no_sol                   0.7       	#Weight towards minimum in of lower and upper branching estimates when no solution has been found yet.
-bonmin.min_number_strong_branch             0         	#Sets minimum number of variables for strong branching (overriding trust)
-bonmin.number_before_trust_list             0         	#Set the number of branches on a variable before its pseudo costs are to be believed during setup of strong branching candidate list.
-bonmin.number_look_ahead                    0         	#Sets limit of look-ahead strong-branching trials
-bonmin.number_strong_branch_root            2147483647	#Maximum number of variables considered for strong branching in root node.
-bonmin.setup_pseudo_frac                    0.5       	#Proportion of strong branching list that has to be taken from most-integer-infeasible list.
-bonmin.trust_strong_branching_for_pseudo_cost yes       	#Wether or not to trust strong branching results for updating pseudo costs.
-
-# registering category: VectorLength diving MIP heuristic
-
-bonmin.heuristic_dive_MIP_vectorLength      no        	#if yes runs the Dive MIP VectorLength heuristic
-
-# registering category: VectorLength diving heuristic
-
-bonmin.heuristic_dive_vectorLength          no        	#if yes runs the Dive VectorLength heuristic
+bonmin.candidate_sort_criterion              best-ps-cost	#Choice of the criterion to choose candidates in strong-branching
+bonmin.maxmin_crit_have_sol                  0.1       	#Weight towards minimum in of lower and upper branching estimates when a solution has been found.
+bonmin.maxmin_crit_no_sol                    0.7       	#Weight towards minimum in of lower and upper branching estimates when no solution has been found yet.
+bonmin.min_number_strong_branch              0         	#Sets minimum number of variables for strong branching (overriding trust)
+bonmin.number_before_trust_list              0         	#Set the number of branches on a variable before its pseudo costs are to be believed during setup of strong branching candidate list.
+bonmin.number_look_ahead                     0         	#Sets limit of look-ahead strong-branching trials
+bonmin.number_strong_branch_root             2147483647	#Maximum number of variables considered for strong branching in root node.
+bonmin.setup_pseudo_frac                     0.5       	#Proportion of strong branching list that has to be taken from most-integer-infeasible list.
+bonmin.trust_strong_branching_for_pseudo_cost yes       	#Whether or not to trust strong branching results for updating pseudo costs.
 
 # registering category: nlp interface option
 
-bonmin.file_solution                        no        	#Write a file bonmin.sol with the solution
-bonmin.nlp_log_level                        1         	#specify NLP solver interface log level (independent from ipopt print_level).
-bonmin.nlp_solver                           Ipopt     	#Choice of the solver for local optima of continuous nlp's
-bonmin.warm_start                           none      	#Select the warm start method
+bonmin.file_solution                         no        	#Write a file bonmin.sol with the solution
+bonmin.nlp_log_level                         1         	#specify NLP solver interface log level (independent from ipopt print_level).
+bonmin.nlp_solver                            Ipopt     	#Choice of the solver for local optima of continuous nlp's
+bonmin.warm_start                            none      	#Select the warm start method
