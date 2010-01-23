@@ -35,7 +35,7 @@ namespace Bonmin {
   int
   PumpForMinlp::solution(double & objectiveValue,
                                  double * newSolution){
-    //if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
+    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
     if(model_->getSolutionCount()) return 0;
     int numberObjects = model_->numberObjects();
     OsiObject ** objects = model_->objects();
