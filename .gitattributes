@@ -175,6 +175,7 @@ Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
 /Dependencies -text
+/Externals -text
 /INSTALL -text
 /LICENSE -text
 /README -text
