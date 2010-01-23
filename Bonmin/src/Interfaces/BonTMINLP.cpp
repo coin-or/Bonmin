@@ -125,7 +125,6 @@ TMINLP::hasGeneralInteger(){
       if(v_t[i] == INTEGER && 
          (x_lb[i] < - 0.99 || x_lb[i] > 0.99 || 
          x_ub[i] <0.01 || x_ub[i] > 1.99) ){
-          printf("Has general integer %i lb %g ub %g\n",i, x_lb[i], x_ub[i]);
          return true;
       }
    }
