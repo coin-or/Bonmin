@@ -184,7 +184,6 @@ namespace Bonmin
     int iteration = 0;
     while(numberFractionalVariables) {
       iteration++;
-      std::cerr<<"In iteration "<<iteration<<std::endl;
       if(iteration > maxNumberIterations) {
 	break;
       }
