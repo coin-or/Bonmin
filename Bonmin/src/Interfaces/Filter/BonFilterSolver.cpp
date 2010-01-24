@@ -362,6 +362,14 @@ namespace Bonmin
       cached_(NULL)
   {}
 
+  FilterSolver::FilterSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
+      Ipopt::SmartPtr<Ipopt::OptionsList> options,
+      Ipopt::SmartPtr<Ipopt::Journalist> journalist):
+      TNLPSolver(roptions, options, journalist, "bonmin."),
+      warmF_(NULL),
+      cached_(NULL)
+  {}
+
 
   FilterSolver::FilterSolver(const FilterSolver & other):
       TNLPSolver(other),
