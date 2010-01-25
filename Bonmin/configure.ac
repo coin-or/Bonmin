@@ -197,7 +197,6 @@ AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
 
 AC_CONFIG_FILES([Makefile
                  src/Apps/Makefile
-                 experimental/Bcp/Makefile
                  src/CbcBonmin/Makefile
                  src/Interfaces/Makefile
                  src/Interfaces/Ipopt/Makefile
@@ -209,7 +208,6 @@ AC_CONFIG_FILES([Makefile
                  src/Algorithms/QuadCuts/Makefile
                  src/Algorithms/OaGenerators/Makefile
                  src/CbcBonmin/Heuristics/Makefile
-                 experimental/FP/Makefile
                  examples/OptionDocGen/Makefile
                  test/Makefile
                  examples/CppExample/Makefile])
