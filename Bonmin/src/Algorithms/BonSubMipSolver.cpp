@@ -135,6 +135,7 @@ namespace Bonmin {
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
 #else
+        cpx_->switchToMIP();
         CPXENVptr env = cpx_->getEnvironmentPtr();
         CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
         CPXsetdblparam(env, CPX_PARAM_TILIM, max_time);
@@ -144,31 +145,65 @@ namespace Bonmin {
         CPXsetintparam(env,CPX_PARAM_NODELIM, 100000);
         CPXsetdblparam(env,CPX_PARAM_TILIM, max_time);
 
-        cpx_->branchAndBound();
+        int status = CPXmipopt(env,cpxlp);
+        CHECK_CPX_STAT("mipopt",status)
 
-        int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+        status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+        CHECK_CPX_STAT("bestobjvalue",status)
      
         int stat = CPXgetstat( env, cpxlp);
-        optimal_ |= (stat == CPXMIP_INFEASIBLE); 
+        CHECK_CPX_STAT("getstat",status)
+        optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
         nodeCount_ = CPXgetnodecnt(env , cpxlp);
         iterationCount_ = CPXgetmipitcnt(env , cpxlp);
 
         CPXsetintparam(env, CPX_PARAM_INTSOLLIM, 1);
         CPXsetintparam(env,CPX_PARAM_NODELIM, 1000);
         while(stat == CPXMIP_NODE_LIM_INFEAS){
-           cpx_->branchAndBound();
-           int stat = CPXgetstat( env, cpxlp);
-           optimal_ |= (stat == CPXMIP_INFEASIBLE);
+           status = CPXmipopt(env,cpxlp);
+           CHECK_CPX_STAT("mipopt",status)
+
+           status = CPXgetstat( env, cpxlp);
+           CHECK_CPX_STAT("getstat",status)
+           optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
            nodeCount_ = CPXgetnodecnt(env , cpxlp);
            iterationCount_ = CPXgetmipitcnt(env , cpxlp);
-        }
-      
-        if (status)
-          throw CoinError("Error in getting some CPLEX information",
-                          "OaDecompositionBase::SubMipSolver",
-                          "performLocalSearch");
+       }
+       bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS) || (stat == CPXMIP_TIME_LIM_INFEAS) 
+                          || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)  
+                          || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
+       
+       if(!infeasible){
+          if(!integerSolution_){
+            integerSolution_ = new double[lp_->getNumCols()];
+          }
+          CPXgetmipx(env, cpxlp, integerSolution_, 0, lp_->getNumCols() -1);
+          CHECK_CPX_STAT("getmipx",status)
+       }
+       else {
+         if (integerSolution_) {
+           delete [] integerSolution_;
+           integerSolution_ = NULL;
+         }
+       }
+      cpx_->switchToLP();
 #endif
-    }
+    } 
+    else {
+       
+      lp_->branchAndBound();
+
+      optimal_ = lp_->isProvenOptimal();
+      if (lp_->getFractionalIndices().size() == 0) {
+        if (!integerSolution_)
+          integerSolution_ = new double[lp_->getNumCols()];
+         CoinCopyN(lp_->getColSolution(), lp_->getNumCols() , integerSolution_);
+       }
+       else if (integerSolution_) {
+         delete [] integerSolution_;
+         integerSolution_ = NULL;
+       }
+   }
   }
 
   void
@@ -235,25 +270,46 @@ namespace Bonmin {
             "OaDecompositionBase::SubMipSolver");
     }
 
-    lp_->branchAndBound();
-
-    optimal_ = lp_->isProvenOptimal();
 #ifdef COIN_HAS_CPX
     if (cpx_) {
+      cpx_->switchToMIP();
       //CpxModel = NULL;
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
-      int status = CPXgetbestobjval(env, cpxlp, &lowBound_);
-     
+      int status = CPXmipopt(env,cpxlp);
+      CHECK_CPX_STAT("mipopt",status)
+
       int stat = CPXgetstat( env, cpxlp);
-      optimal_ |= (stat == CPXMIP_INFEASIBLE); 
-       nodeCount_ = CPXgetnodecnt(env , cpxlp);
+      bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS) || (stat == CPXMIP_TIME_LIM_INFEAS) || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)
+                        || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
+      optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
+      nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
-      if (status)
-        throw CoinError("Error in getting some CPLEX information","OaDecompositionBase::SubMipSolver","performLocalSearch");
+      status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+      CHECK_CPX_STAT("getbestobjval",status)
+       
+      if(!infeasible){
+         if(!integerSolution_){
+           integerSolution_ = new double[lp_->getNumCols()];
+         }
+         CPXgetmipx(env, cpxlp, integerSolution_, 0, lp_->getNumCols() -1);
+         CHECK_CPX_STAT("getmipx",status)
+      }
+      else {
+        if (integerSolution_) {
+          delete [] integerSolution_;
+          integerSolution_ = NULL;
+        }
+      }
+      cpx_->switchToLP();
     }
+    else {
 #endif
+    lp_->branchAndBound();
+
+   optimal_ = lp_->isProvenOptimal();
+
 
       if (lp_->getFractionalIndices().size() == 0) {
         if (!integerSolution_)
@@ -264,8 +320,11 @@ namespace Bonmin {
         delete [] integerSolution_;
         integerSolution_ = NULL;
       }
+#ifdef COIN_HAS_CPX
     }
+#endif
   }
+}
 
    /** Assign a strategy. */
    void 

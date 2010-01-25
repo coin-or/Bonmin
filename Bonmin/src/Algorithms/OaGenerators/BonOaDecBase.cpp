@@ -258,7 +258,7 @@ OaDecompositionBase::passInMessageHandler(CoinMessageHandler * handler)
 
 
 
-#if 0
+#if 1
 /** Clone the state of another solver (bounds, cutoff, basis).*/
 void
 OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si){
@@ -411,8 +411,7 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   solverManip * lpManip = NULL;
   if (lp_ != NULL) {
     if (lp_!=&si) {
-      throw;
-#if 0
+#if 1
       lpManip = new solverManip(lp_, true, false, false, true, true);
       lpManip->cloneOther(si);
 #endif
