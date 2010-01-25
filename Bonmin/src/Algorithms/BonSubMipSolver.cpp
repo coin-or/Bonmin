@@ -17,7 +17,7 @@
 
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
-
+#include "cplex.h"
 #define CHECK_CPX_STAT(a,b) if(b) throw CoinError("Error in CPLEX call",__FILE__,a);
 
 #endif
