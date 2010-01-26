@@ -70,7 +70,7 @@ namespace Bonmin
     /// Constructor with passed journalist, roptions, options.
     FilterSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
         Ipopt::SmartPtr<Ipopt::OptionsList> options,
-        Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+        Ipopt::SmartPtr<Ipopt::Journalist> journalist
                 );
 
     /// Copy constructor
