@@ -113,7 +113,7 @@ namespace Bonmin
         m2--;
         if(lambda!= NULL)lambda[m2] = 0;
       }
-      int ret_code = tnlp_->get_starting_point(n, init_x, x,
+      return tnlp_->get_starting_point(n, init_x, x,
           init_z, z_L, z_U, m2, init_lambda, lambda);
     }
 
