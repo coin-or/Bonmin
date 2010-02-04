@@ -103,7 +103,7 @@ namespace Bonmin
     const double* x_sol = minlp->x_sol();
     const double* x_l = minlp->x_l();
     const double* x_u = minlp->x_u();
-    const double* g_sol = minlp->g_sol();
+    //const double* g_sol = minlp->g_sol();
     const double* g_l = minlp->g_l();
     const double* g_u = minlp->g_u();
 

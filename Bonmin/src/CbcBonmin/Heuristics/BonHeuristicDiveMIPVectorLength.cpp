@@ -126,7 +126,7 @@ namespace Bonmin
       if (fabs(floor(value+0.5)-value)>integerTolerance) {
 	double below = floor(value);
 	double downFraction = COIN_DBL_MAX;
-	double downCost = COIN_DBL_MAX;
+	//double downCost = COIN_DBL_MAX;
 	double gradient = gradient_f[iColumn];
 	if(below >= x_l[iColumn])
 	  downFraction = value-below;

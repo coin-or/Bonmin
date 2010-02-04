@@ -371,6 +371,10 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     numRetryResolve_(-1),
     numRetryInfeasibles_(-1),
     numRetryUnsolved_(1),
+    dynamicCutOff_(0),
+    coeff_var_threshold_(0.1),
+    first_perc_for_cutoff_decr_(-0.02),
+    second_perc_for_cutoff_decr_(-0.05),
     messages_(),
     pretendFailIsInfeasible_(0),
     hasContinuedAfterNlpFailure_(false),
@@ -392,11 +396,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     cutStrengthener_(NULL),
     oaMessages_(),
     oaHandler_(NULL),
-    newCutoffDecr(COIN_DBL_MAX),
-    dynamicCutOff_(0),
-    coeff_var_threshold_(0.1),
-    first_perc_for_cutoff_decr_(-0.02),
-    second_perc_for_cutoff_decr_(-0.05)
+    newCutoffDecr(COIN_DBL_MAX)
 
 {
    oaHandler_ = new OaMessageHandler;
@@ -539,6 +539,10 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     numRetryResolve_(source.numRetryResolve_),
     numRetryInfeasibles_(source.numRetryInfeasibles_),
     numRetryUnsolved_(source.numRetryUnsolved_),
+    dynamicCutOff_(source.dynamicCutOff_),
+    coeff_var_threshold_(source.coeff_var_threshold_),
+    first_perc_for_cutoff_decr_(source.first_perc_for_cutoff_decr_),
+    second_perc_for_cutoff_decr_(source.second_perc_for_cutoff_decr_),
     messages_(),
     pretendFailIsInfeasible_(source.pretendFailIsInfeasible_),
     hasContinuedAfterNlpFailure_(source.hasContinuedAfterNlpFailure_),
@@ -562,11 +566,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     oaMessages_(),
     oaHandler_(NULL),
     newCutoffDecr(source.newCutoffDecr),
-    strong_branching_solver_(source.strong_branching_solver_),
-    dynamicCutOff_(source.dynamicCutOff_),
-    coeff_var_threshold_(source.coeff_var_threshold_),
-    first_perc_for_cutoff_decr_(source.first_perc_for_cutoff_decr_),
-    second_perc_for_cutoff_decr_(source.second_perc_for_cutoff_decr_)
+    strong_branching_solver_(source.strong_branching_solver_)
 {
    if(0 && defaultHandler()){
      messageHandler()->setLogLevel(source.messageHandler()->logLevel());

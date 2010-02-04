@@ -459,7 +459,7 @@ namespace Bonmin
     for(int i=0; i<nnz_jac_g; i++) {
       int thisIndexRow = indexRow[i]-indexCorrection;      
       int thisIndexCol = indexCol[i]-indexCorrection;
-      pair<int, int> value(thisIndexCol, jac_g[i]);
+      pair<int, int> value(thisIndexCol, static_cast<int>(jac_g[i]));
       col_and_jac_g_[thisIndexRow].push_back(value);
     }    
 
@@ -487,7 +487,7 @@ namespace Bonmin
 	double weightedSum = 0.0;
 	int counter = 1;
 	vector<pair<int, int> > jac_g = col_and_jac_g_[iRow];
-	for (int j=0; j<jac_g.size(); j++) {
+	for (unsigned int j=0; j<jac_g.size(); j++) {
 	  int iColumn = jac_g[j].first;
 	  if (solution[iColumn]>=1.0-integerTolerance ||
 	      jac_g[j].second != 1.0 ||
@@ -508,9 +508,9 @@ namespace Bonmin
 #endif
 	if(sosConstraint) {
 	  double fl = floor(weightedSum + 0.5); 
-	  int indexColumnSelected = fl - 1;
+	  int indexColumnSelected = static_cast<int>(fl) - 1;
 	  assert(0 <= indexColumnSelected && indexColumnSelected < jac_g.size());
-	  for (int j=0; j<jac_g.size(); j++) {
+	  for (unsigned int j=0; j<jac_g.size(); j++) {
 	    int iColumn = jac_g[j].first;
 	    if(j == indexColumnSelected)
 	      solution[iColumn] = 1.0;

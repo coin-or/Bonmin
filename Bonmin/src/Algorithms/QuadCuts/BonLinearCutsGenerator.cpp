@@ -130,7 +130,7 @@ namespace Bonmin {
         mycuts[i] = cuts.rowCutPtr(i);
         cs.insert(*mycuts[i]);
       }
-      nlp->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
+      nlp->applyRowCuts(mycuts.size(), const_cast<const OsiRowCut **> (&mycuts[0]));
     }
 
     // Take off slack cuts
@@ -143,7 +143,7 @@ namespace Bonmin {
     const double * lb = nlp->getRowLower();
     const double * ub = nlp->getRowUpper();
     CoinRelFltEq eq(1e-06);
-    int nDelete=0;
+    //int nDelete=0;
     for (int i=numberRowsNow -1;i>=numberRows;i--) {
       if ( !(eq(activity[i], lb[i]) || eq(activity[i], ub[i])) )
         cs.eraseRowCut(i - numberRows);
