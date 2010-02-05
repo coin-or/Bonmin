@@ -23,7 +23,6 @@ libbonoagenerators_la_SOURCES = \
         BonOaFeasChecker.cpp BonOaFeasChecker.hpp \
 	BonOaDecBase.cpp BonOaDecBase.hpp \
         BonEcpCuts.cpp BonEcpCuts.hpp \
-        BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
         BonFpForMinlp.cpp BonFpForMinlp.hpp \
 	BonOAMessages.cpp BonOAMessages.hpp
 
@@ -85,7 +84,6 @@ includecoin_HEADERS = \
         BonOaFeasChecker.hpp \
 	BonOaDecBase.hpp \
         BonEcpCuts.hpp \
-        BonCbcLpStrategy.hpp \
 	BonOAMessages.hpp
  
 
@@ -101,7 +99,6 @@ ASTYLE_FILES = \
         BonOaFeasChecker.cppbak BonOaFeasChecker.hppbak \
 	BonOaDecBase.cppbak BonOaDecBase.hppbak \
         BonEcpCuts.cppbak BonEcpCuts.hppbak \
-        BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
 	BonOAMessages.cppbak BonOAMessages.hppbak
 
 ASTYLE = @ASTYLE@

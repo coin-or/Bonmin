@@ -11,6 +11,8 @@
 #include "CoinHelperFunctions.hpp"
 #include "CbcModel.hpp"
 #include "BonHeuristicDive.hpp"
+#include "BonSubMipSolver.hpp"
+#include "BonCbcLpStrategy.hpp"
 
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
@@ -34,27 +36,61 @@ using namespace std;
 
 namespace Bonmin
 {
+#if 0
   HeuristicDiveMIP::HeuristicDiveMIP()
     :
     CbcHeuristic(),
     setup_(NULL),
-    howOften_(100)
+    howOften_(100),
+    emptyInterface_(NULL),
+    strategy_(NULL)
   {}
+#endif
 
   HeuristicDiveMIP::HeuristicDiveMIP(BonminSetup * setup)
     :
     CbcHeuristic(),
     setup_(setup),
-    howOften_(100)
+    howOften_(100),
+    emptyInterface_(NULL),
+    strategy_(NULL)
   {
-    //    Initialize(setup->options());
+    Initialize(setup);
+  }
+
+  void
+  HeuristicDiveMIP::Initialize(BonminSetup * b){
+    int ivalue;
+    b->options()->GetEnumValue("milp_solver",ivalue,b->prefix());
+    if (ivalue <= 0) {//uses cbc
+      emptyInterface_ = new OsiClpSolverInterface;
+      strategy_ = new CbcStrategyDefault;
+    }
+    else if (ivalue == 1) {
+      emptyInterface_ = new OsiClpSolverInterface;
+      std::string prefix = "milp_solver.";
+      strategy_ = new CbcStrategyChooseCuts(*b, prefix);
+    }
+    else if (ivalue == 2) {
+#ifdef COIN_HAS_CPX
+      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
+      emptyInterface_ = cpxSolver;
+#else
+      std::cerr	<< "You have set an option to use CPLEX as the milp subsolver. However, \n"
+                << "apparently CPLEX is not configured to be used in bonmin.\n"
+                << "See the manual for configuring CPLEX\n";
+      throw -1;
+#endif
+    }
   }
 
   HeuristicDiveMIP::HeuristicDiveMIP(const HeuristicDiveMIP &copy)
     :
     CbcHeuristic(copy),
     setup_(copy.setup_),
-    howOften_(copy.howOften_)
+    howOften_(copy.howOften_),
+    emptyInterface_(copy.emptyInterface_->clone()),
+    strategy_(copy.strategy_->clone())
   {}
 
   HeuristicDiveMIP &
@@ -64,8 +100,20 @@ namespace Bonmin
       CbcHeuristic::operator=(rhs);
       setup_ = rhs.setup_;
       howOften_ = rhs.howOften_;
+      delete emptyInterface_;
+      delete strategy_;
+      if(rhs.emptyInterface_)
+        emptyInterface_ = rhs.emptyInterface_->clone();
+      if(rhs.strategy_)
+        strategy_ = rhs.strategy_->clone();
     }
     return *this;
+  }
+
+  /// Destructor
+  HeuristicDiveMIP::~HeuristicDiveMIP(){
+    delete emptyInterface_;
+    delete strategy_;
   }
 
 
@@ -319,20 +367,18 @@ namespace Bonmin
 
       // load the problem to OSI
       OsiSolverInterface *si;
-#ifdef COIN_HAS_CPX
-      si = new OsiCpxSolverInterface;
-#else
-      si = new OsiClpSolverInterface;
+      si = emptyInterface_->clone();
       si->messageHandler()->setLogLevel(0);
-#endif
+      si->passInMessageHandler(model_->messageHandler());
+
       si->loadProblem(*matrix, col_lb, col_ub, objective, row_lb, row_ub);
       si->setInteger(indexIntegerColumn, numberIndexIntegerColumn);
       
-      // solve with cplex
-      si->branchAndBound();
+      SubMipSolver mip(si, strategy_);
+      mip.optimize(DBL_MAX, 0, 60);
 
-      if(si->isProvenOptimal()) {
-	const double* solution = si->getColSolution();
+      if(mip.getLastSolution()) {
+	const double* solution = mip.getLastSolution();
 	assert(si->getNumCols() == numberLinearColumns);
 	for (int iLCol=0;iLCol<numberLinearColumns;iLCol++) {
 	  int iColumn = linearVariable[iLCol];

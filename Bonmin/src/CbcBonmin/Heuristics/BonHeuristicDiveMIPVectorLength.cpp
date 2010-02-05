@@ -17,11 +17,13 @@
 
 namespace Bonmin
 {
+#if 0
   HeuristicDiveMIPVectorLength::HeuristicDiveMIPVectorLength() 
     :
     HeuristicDiveMIP(),
     columnLength_(NULL)
   {}
+#endif
 
   HeuristicDiveMIPVectorLength::HeuristicDiveMIPVectorLength(BonminSetup * setup)
     :
