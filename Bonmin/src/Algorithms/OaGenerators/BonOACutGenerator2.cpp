@@ -105,7 +105,7 @@ namespace Bonmin
     {
       subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
-      milpBound = subMip->lowBound();
+      milpBound = std::max(milpBound, subMip->lowBound());
       milpOptimal = subMip->optimal();
 
       feasible = milpBound < cutoff;
@@ -132,10 +132,9 @@ namespace Bonmin
       //after a prescribed elapsed time give some information to user
       double time = CoinCpuTime();
       if (time - lastPeriodicLog > parameters_.logFrequency_) {
-        double lb = (subMip == NULL) ?lp->getObjValue() : subMip->getLowerBound();
         handler_->message(PERIODIC_MSG,messages_)
         <<time - timeBegin_<<cutoff
-        <<lb
+        <<milpBound
         <<CoinMessageEol;
         lastPeriodicLog = CoinCpuTime();
       }
@@ -217,7 +216,7 @@ namespace Bonmin
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()
             );
 
-        milpBound = subMip->lowBound();
+        milpBound = std::max(milpBound, subMip->lowBound());
 
         if (subMip->optimal())
           handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;

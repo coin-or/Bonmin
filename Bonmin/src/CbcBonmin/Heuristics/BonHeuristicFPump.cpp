@@ -411,7 +411,7 @@ namespace Bonmin
     roptions->setOptionExtraInfo("heuristic_feasibility_pump", 63);
 
     roptions->SetRegisteringCategory("Test Heuristics", RegisteredOptions::UndocumentedCategory);
-    roptions->AddStringOption2("improving_fp","use at your own risks",
+    roptions->AddStringOption2("unstable_fp","use at your own risks",
                                "no",
                                "no", "",
                                "yes", "","");

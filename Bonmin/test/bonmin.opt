@@ -86,7 +86,7 @@ bonmin.filmint_ecp_cuts                      0         	#Specify the frequency (
 
 # registering category: Options for feasibility checker using OA cuts
 
-bonmin.feas_check_cut_types                  outer-approximations	#Choose the type of cuts generated when an integer feasible solution is found
+bonmin.feas_check_cut_types                  outer-approx	#Choose the type of cuts generated when an integer feasible solution is found
 bonmin.feas_check_discard_policy             detect-cycles	#How cuts from feasibility checker are discarded
 bonmin.generate_benders_after_so_many_oa     5000      	#Specify that after so many oa cuts have been generated Benders cuts should be generated instead.
 
