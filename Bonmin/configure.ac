@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Bonmin],[1.2trunk],[coin-bonmin@list.coin-or.org])
+AC_INIT([Bonmin],[1.3stable],[coin-bonmin@list.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006, 2008 International Business Machines and others.
@@ -197,7 +197,6 @@ AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
 
 AC_CONFIG_FILES([Makefile
                  src/Apps/Makefile
-                 experimental/Bcp/Makefile
                  src/CbcBonmin/Makefile
                  src/Interfaces/Makefile
                  src/Interfaces/Ipopt/Makefile
@@ -209,7 +208,6 @@ AC_CONFIG_FILES([Makefile
                  src/Algorithms/QuadCuts/Makefile
                  src/Algorithms/OaGenerators/Makefile
                  src/CbcBonmin/Heuristics/Makefile
-                 experimental/FP/Makefile
                  examples/OptionDocGen/Makefile
                  test/Makefile
                  examples/CppExample/Makefile])

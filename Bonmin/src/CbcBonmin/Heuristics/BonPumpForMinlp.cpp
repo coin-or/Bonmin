@@ -37,8 +37,8 @@ namespace Bonmin {
                                  double * newSolution){
     if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
     if(model_->getSolutionCount()) return 0;
-    int numberObjects = model_->numberObjects();
-    OsiObject ** objects = model_->objects();
+    //int numberObjects = model_->numberObjects();
+    //OsiObject ** objects = model_->objects();
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
                                (setup_->nonlinearSolver()->clone());
 
@@ -51,7 +51,7 @@ namespace Bonmin {
 
    void
    PumpForMinlp::setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options){
-     int dummy;
+     //int dummy;
      std::string prefix = "pump_for_minlp.";
      changeIfNotSet(options, prefix, "algorithm", "B-iFP");
      changeIfNotSet(options, prefix, "time_limit", 30.);

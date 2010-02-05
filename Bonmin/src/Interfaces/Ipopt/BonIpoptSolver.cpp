@@ -50,6 +50,20 @@ namespace Bonmin
     app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions), options, journalist);
   }
 
+  /// Constructor with Passed in journalist, registered options, options
+  IpoptSolver::IpoptSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
+      Ipopt::SmartPtr<Ipopt::OptionsList> options,
+      Ipopt::SmartPtr<Ipopt::Journalist> journalist):
+      TNLPSolver(roptions, options, journalist, "bonmin."),
+      problemHadZeroDimension_(false),
+      warmStartStrategy_(1),
+      enable_warm_start_(false),
+      optimized_before_(false)
+  {
+    roptions_ = roptions;
+    app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions), options, journalist);
+  }
+
   IpoptSolver::~IpoptSolver()
   {}
 

@@ -67,6 +67,12 @@ namespace Bonmin
         const std::string & prefix
                 );
 
+    /// Constructor with passed journalist, roptions, options.
+    FilterSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
+        Ipopt::SmartPtr<Ipopt::OptionsList> options,
+        Ipopt::SmartPtr<Ipopt::Journalist> journalist
+                );
+
     /// Copy constructor
     FilterSolver(const FilterSolver & other);
     ///destructor

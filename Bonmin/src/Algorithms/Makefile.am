@@ -29,6 +29,7 @@ libbonalgorithms_la_SOURCES = \
          BonBabSetupBase.cpp BonBabSetupBase.hpp \
          BonBonminSetup.cpp BonBonminSetup.hpp \
          BonSubMipSolver.cpp BonSubMipSolver.hpp \
+         BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
          BonSolverHelp.cpp BonSolverHelp.hpp
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la
@@ -103,6 +104,7 @@ includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
           BonBabSetupBase.hpp \
           BonSubMipSolver.hpp \
+          BonCbcLpStrategy.hpp \
           BonBonminSetup.hpp 
  
 
@@ -115,6 +117,7 @@ ASTYLE_FILES = \
                BonBabSetupBase.cppbak \
                BonBabSetupBase.hppbak \
                BonBonminSetup.cppbak \
+               BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
                BonBonminSetup.hppbak
 
 ASTYLE = @ASTYLE@

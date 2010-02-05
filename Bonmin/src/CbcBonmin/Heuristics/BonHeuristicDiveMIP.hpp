@@ -12,14 +12,16 @@
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonBonminSetup.hpp"
 #include "CbcHeuristic.hpp"
-
+#include "CbcStrategy.hpp"
 namespace Bonmin
 {
   class HeuristicDiveMIP : public CbcHeuristic
   {
   public:
+#if 0
     /// Default constructor
     HeuristicDiveMIP();
+#endif
 
     /// Constructor with setup
     HeuristicDiveMIP(BonminSetup * setup);
@@ -28,13 +30,16 @@ namespace Bonmin
     HeuristicDiveMIP(const HeuristicDiveMIP &copy);
 
     /// Destructor
-    ~HeuristicDiveMIP() {}
+    ~HeuristicDiveMIP();
 
     /// Assignment operator
     HeuristicDiveMIP & operator=(const HeuristicDiveMIP & rhs);
 
     /// Clone
     virtual CbcHeuristic * clone() const = 0;
+
+    /// Initialize method 
+    void Initialize(BonminSetup * setup);
 
     /// Resets stuff if model changes
     virtual void resetModel(CbcModel * model){
@@ -69,6 +74,10 @@ namespace Bonmin
   private:
     /// How often to do (code can change)
     int howOften_;
+    /// empty LP solver to use for creating sub-MIP
+    OsiSolverInterface * emptyInterface_;
+    /// A strategy for Cbc
+    CbcStrategy * strategy_;
 
   };
 }

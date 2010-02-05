@@ -141,8 +141,8 @@ namespace Bonmin
   {
     roptions->SetRegisteringCategory("Options for feasibility checker using OA cuts", RegisteredOptions::BonminCategory);
     roptions->AddStringOption2("feas_check_cut_types", "Choose the type of cuts generated when an integer feasible solution is found",
-                               "outer-approximations",
-                               "outer-approximations", "Generate a set of Outer Approximations cuts.",
+                               "outer-approx",
+                               "outer-approx", "Generate a set of Outer Approximations cuts.",
                                "Benders", "Generate a single Benders cut.",
                                "If it seems too much memory is used should try Benders to use less");
     roptions->setOptionExtraInfo("feas_check_cut_types", 19);

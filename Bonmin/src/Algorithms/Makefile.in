@@ -61,7 +61,7 @@ CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 am_libbonalgorithms_la_OBJECTS = BonBabSetupBase.lo BonBonminSetup.lo \
-	BonSubMipSolver.lo BonSolverHelp.lo
+	BonSubMipSolver.lo BonCbcLpStrategy.lo BonSolverHelp.lo
 libbonalgorithms_la_OBJECTS = $(am_libbonalgorithms_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -353,6 +353,7 @@ libbonalgorithms_la_SOURCES = \
          BonBabSetupBase.cpp BonBabSetupBase.hpp \
          BonBonminSetup.cpp BonBonminSetup.hpp \
          BonSubMipSolver.cpp BonSubMipSolver.hpp \
+         BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
          BonSolverHelp.cpp BonSolverHelp.hpp
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la \
@@ -413,6 +414,7 @@ includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
           BonBabSetupBase.hpp \
           BonSubMipSolver.hpp \
+          BonCbcLpStrategy.hpp \
           BonBonminSetup.hpp 
 
 
@@ -425,6 +427,7 @@ ASTYLE_FILES = \
                BonBabSetupBase.cppbak \
                BonBabSetupBase.hppbak \
                BonBonminSetup.cppbak \
+               BonCbcLpStrategy.cppbak BonCbcLpStrategy.hppbak \
                BonBonminSetup.hppbak
 
 CLEANFILES = $(ASTYLE_FILES)
@@ -482,6 +485,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBabSetupBase.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBonminSetup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcLpStrategy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonSolverHelp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonSubMipSolver.Plo@am__quote@
 

@@ -171,14 +171,16 @@ namespace Bonmin{
     <<"List of options and compatibility with the different algorithms."<<std::endl
     <<"}"<<std::endl;
   of<<"\\tablehead{\\hline "<<std::endl
-    <<"Option & type &  default & {\\tt B-BB} & {\\tt B-OA} & {\\tt B-QG} & {\\tt B-Hyb} & {\\tt B-Ecp} & {\\tt B-iFP} & {\\tt Cbc\\_Par} \\\\"<<std::endl
+    <<"Option & type & ";
+  //of<<" default & ";
+  of<<"{\\tt B-BB} & {\\tt B-OA} & {\\tt B-QG} & {\\tt B-Hyb} & {\\tt B-Ecp} & {\\tt B-iFP} & {\\tt Cbc\\_Par} \\\\"<<std::endl
     <<"\\hline"<<std::endl
     <<"\\hline}"<<std::endl;
-  of<<"\\tabletail{\\hline \\multicolumn{10}{|c|}{continued on next page}\\\\"
+  of<<"\\tabletail{\\hline \\multicolumn{9}{|c|}{continued on next page}\\\\"
     <<"\\hline}"<<std::endl; 
   of<<"\\tablelasttail{\\hline}"<<std::endl;
   of<<"{\\tiny"<<std::endl;
-  of<<"\\begin{xtabular}{|l|r|r|r|r|r|r|r|r|r|}"<<std::endl;
+  of<<"\\begin{xtabular}{|l|r|r|r|r|r|r|r|r|}"<<std::endl;
 
   //sort options by categories and alphabetical order
   std::list< Ipopt::RegisteredOption * > sortedOptions;
@@ -197,13 +199,13 @@ namespace Bonmin{
      if((*i)->RegisteringCategory() != registeringCategory){
      registeringCategory = (*i)->RegisteringCategory();
      of<<"\\hline"<<std::endl
-       <<"\\multicolumn{1}{|c}{} & \\multicolumn{9}{l|}{"
+       <<"\\multicolumn{1}{|c}{} & \\multicolumn{8}{l|}{"
        <<registeringCategory<<"}\\\\"<<std::endl
        <<"\\hline"<<std::endl;
      }
      
-     of<<makeLatex((*i)->Name())<<"& "<<OptionType2Char((*i)->Type())<<"& "
-       <<makeLatex(defaultAsString(*i))
+     of<<makeLatex((*i)->Name())<<"& "<<OptionType2Char((*i)->Type())//<<"& "
+       //<<makeLatex(defaultAsString(*i))
        <<"& "<<( (isValidForBBB((*i)->Name()))? "$\\surd$" : "-" )
        <<"& "<<( (isValidForBOA((*i)->Name()))? "$\\surd$" : "-" )
        <<"& "<<( (isValidForBQG((*i)->Name()))? "$\\surd$" : "-" )
@@ -264,7 +266,7 @@ namespace Bonmin{
    os<<"<tr>"<<std::endl;
    os<<"<td>Option </td>"<<std::endl;
    os<<"<td> type </td>"<<std::endl;
-   os<<"<td> default </td>"<<std::endl;
+   //os<<"<td> default </td>"<<std::endl;
    os<<"<td> B-BB</td>"<<std::endl;
    os<<"<td> B-OA</td>"<<std::endl;
    os<<"<td> B-QG</td>"<<std::endl;
@@ -277,7 +279,7 @@ namespace Bonmin{
      if((*i)->RegisteringCategory() != registeringCategory){
      registeringCategory = (*i)->RegisteringCategory();
      os<<"<tr>"
-       <<"   <th colspan=7>"
+       <<"   <th colspan=9>"
        <<" <a href=\"#sec:"<<makeSpaceLess(registeringCategory)<<"\">"
        <<registeringCategory<<"</a> </th>"<<std::endl
        <<"</tr>"<<std::endl;
@@ -287,7 +289,7 @@ namespace Bonmin{
        <<"<td> <a href=\"#sec:"<<makeSpaceLess((*i)->Name())<<"\">"
        <<((*i)->Name())<<"</a> </td>"<<std::endl
        <<"<td>"<<OptionType2Char((*i)->Type())<<"</td>"<<std::endl
-       <<"<td>"<<defaultAsString(*i)<<"</td>"<<std::endl
+       //<<"<td>"<<defaultAsString(*i)<<"</td>"<<std::endl
        <<"<td> "<<( (isValidForBBB((*i)->Name()))? '+' : '-' )<<"</td>"<<std::endl
        <<"<td>"<<( (isValidForBOA((*i)->Name()))? '+' : '-' )<<"</td>"<<std::endl
        <<"<td>"<<( (isValidForBQG((*i)->Name()))? '+' : '-' )<<"</td>"<<std::endl

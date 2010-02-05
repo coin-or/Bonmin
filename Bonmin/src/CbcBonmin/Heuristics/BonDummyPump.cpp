@@ -35,8 +35,8 @@ namespace Bonmin {
   DummyPump::solution(double & objectiveValue,
                                  double * newSolution){
     if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
-    int numberObjects = model_->numberObjects();
-    OsiObject ** objects = model_->objects();
+    //int numberObjects = model_->numberObjects();
+    //OsiObject ** objects = model_->objects();
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>
                                (setup_->nonlinearSolver()->clone());
 

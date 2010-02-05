@@ -79,7 +79,6 @@ namespace Bonmin {
 
    void
    LocalSolverBasedHeuristic::setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options){
-     int dummy;
      std::string prefix = "local_solver.";
      changeIfNotSet(options, prefix, "algorithm", "B-QG");
      changeIfNotSet(options, prefix, "variable_selection", "most-fractional");

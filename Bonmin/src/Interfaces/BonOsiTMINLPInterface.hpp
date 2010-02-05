@@ -134,9 +134,17 @@ class Messages : public CoinMessages
   /** Facilitator to initialize interface. */
   void initialize(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
                   Ipopt::SmartPtr<Ipopt::OptionsList> options,
-                  Ipopt::SmartPtr<Ipopt::Journalist> journalist_,
+                  Ipopt::SmartPtr<Ipopt::Journalist> journalist,
                   const std::string & prefix,
                   Ipopt::SmartPtr<TMINLP> tminlp);
+
+  /** Facilitator to initialize interface. */
+  void initialize(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
+                  Ipopt::SmartPtr<Ipopt::OptionsList> options,
+                  Ipopt::SmartPtr<Ipopt::Journalist> journalist,
+                  Ipopt::SmartPtr<TMINLP> tminlp){
+     initialize(roptions, options, journalist, "bonmin.", tminlp);
+  }
 
   /** Set the model to be solved by interface.*/
   void setModel(Ipopt::SmartPtr<TMINLP> tminlp);

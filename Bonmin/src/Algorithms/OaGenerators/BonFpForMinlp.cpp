@@ -233,7 +233,7 @@ namespace Bonmin
         lp->setColUpper(numcols, cutoff); 
      
         subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
-        //subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
+        // subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
                          parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime());
         milpOptimal = subMip -> optimal(); 
         colsol = subMip->getLastSolution();
@@ -250,12 +250,14 @@ namespace Bonmin
         delete subMip;
         subMip = NULL;
         colsol = NULL;
+        milpOptimal = false;
       }
     }
     if(colsol || ! milpOptimal)
       return -DBL_MAX;
-    else
+    else{
       return DBL_MAX;
+    }
   }
 
   /** Register OA options.*/

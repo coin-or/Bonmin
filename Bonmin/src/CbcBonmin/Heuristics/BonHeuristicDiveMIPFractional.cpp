@@ -17,10 +17,12 @@
 
 namespace Bonmin
 {
+#if 0
   HeuristicDiveMIPFractional::HeuristicDiveMIPFractional() 
     :
     HeuristicDiveMIP()
   {}
+#endif
 
   HeuristicDiveMIPFractional::HeuristicDiveMIPFractional(BonminSetup * setup)
     :
