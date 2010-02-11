@@ -200,7 +200,6 @@ namespace Bonmin
     c.iRow = indexRow;
     c.jCol = indexCol;
     std::sort(sortedIndex.begin(), sortedIndex.end(), c);
-    std::copy(sortedIndex.begin(), sortedIndex.end(), ostream_iterator<int>(cout, " "));
 
     int* row = new int[nnz_jac_g];
     int* columnStart = new int[numberColumns];
