@@ -30,6 +30,8 @@
 
 #include <iomanip>
 
+#include "CoinHelperFunctions.hpp"
+
 //#define DEBUG_BON_HEURISTIC_DIVE_MIP
 
 using namespace std;
@@ -110,12 +112,19 @@ namespace Bonmin
     return *this;
   }
 
-  /// Destructor
   HeuristicDiveMIP::~HeuristicDiveMIP(){
     delete emptyInterface_;
     delete strategy_;
   }
 
+  struct MatComp{
+    const int * iRow;
+    const int * jCol;
+  /// Destructor
+    bool operator()(int i,int j){
+      return (jCol[i] < jCol[j]) || (jCol[i] == jCol[j] && iRow[i] < iRow[j]);
+    }
+  };
 
 
   int
@@ -184,6 +193,15 @@ namespace Bonmin
     minlp->eval_jac_g(numberColumns, x_sol, false,
 		      numberRows, nnz_jac_g,
 		      indexRow, indexCol, 0);
+
+    std::vector<int> sortedIndex(nnz_jac_g);
+    CoinIotaN(&sortedIndex[0], nnz_jac_g, 0);
+    MatComp c;
+    c.iRow = indexRow;
+    c.jCol = indexCol;
+    std::sort(sortedIndex.begin(), sortedIndex.end(), c);
+    std::copy(sortedIndex.begin(), sortedIndex.end(), ostream_iterator<int>(cout, " "));
+
     int* row = new int[nnz_jac_g];
     int* columnStart = new int[numberColumns];
     int* columnLength = new int[numberColumns];
@@ -199,16 +217,16 @@ namespace Bonmin
     int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
     int iniCol = -1;
     for(int i=0; i<nnz_jac_g; i++) {
-      int thisIndexCol = indexCol[i]-indexCorrection;
-      if(indexCol[i] != iniCol) {
-	iniCol = indexCol[i];
+      int thisIndexCol = indexCol[sortedIndex[i]]-indexCorrection;
+      if(indexCol[sortedIndex[i]] != iniCol) {
+	iniCol = indexCol[sortedIndex[i]];
 	columnStart[thisIndexCol] = i;
 	columnLength[thisIndexCol] = 1;
       }
       else {
 	columnLength[thisIndexCol]++;
       }
-      row[i] = indexRow[i]-indexCorrection;
+      row[i] = indexRow[sortedIndex[i]]-indexCorrection;
       column[row[i]].push_back(thisIndexCol);
       if (variableType[thisIndexCol] != Bonmin::TMINLP::CONTINUOUS)
 	columnInt[row[i]].push_back(thisIndexCol);
@@ -358,7 +376,7 @@ namespace Bonmin
 	for (int j=columnStart[iColumn];
 	     j<columnStart[iColumn]+columnLength[iColumn];j++) {
 	  int iRow = row[j];
-	  newRow.insert(mapRows[iRow], jac_g[j]);
+	  newRow.insert(mapRows[iRow], jac_g[sortedIndex[j]]);
 	}
 	matrix->appendCol(newRow);
 	if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS)
