@@ -108,11 +108,12 @@ namespace Bonmin
     }
 
     // If objective is linear need to add to lp constraint for objective
+    const double * colsol = NULL;
+    lp->resolve();
+    OsiBranchingInformation branch_info(lp, false);
     if(lp->getNumCols() == nlp_->getNumCols())
       nlp_->addObjectiveFunction(*lp, nlp_->getColSolution());
     lp->setObjCoeff(numcols,0);
-    const double * colsol = NULL;
-    OsiBranchingInformation branch_info(lp, false);
 
     bool milpOptimal = false;
     nlp_->resolve(txt_id);
@@ -158,6 +159,7 @@ namespace Bonmin
 
       vector<double> x_bar(indices.size());
       for(unsigned int i = 0 ; i < indices.size() ; i++){
+         assert(fabs(colsol[indices[i]] - floor(colsol[indices[i]] + 0.5)) < 1e-5);
          x_bar[i] = colsol[indices[i]];
       }
 
@@ -170,6 +172,10 @@ namespace Bonmin
          fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
 
          nlp_->resolve(txt_id);
+         if(!nlp_->isProvenOptimal()){
+           relaxIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
+           nlp_->resolve(txt_id);
+         }
          bool restart = false;
          if (post_nlp_solve(babInfo, cutoff)) {
            restart = true;

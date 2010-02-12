@@ -103,7 +103,6 @@ namespace Bonmin {
       cbc_->setMaximumSolutions(1);
       cbc_->setCutoff(cutoff);
 
-      //cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
       
       cbc_->branchAndBound();
       lowBound_ = cbc_->getBestPossibleObjValue();
@@ -141,10 +140,13 @@ namespace Bonmin {
         CPXsetdblparam(env, CPX_PARAM_TILIM, max_time);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
 
+
         CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10000);
         CPXsetintparam(env,CPX_PARAM_NODELIM, 100000);
         CPXsetdblparam(env,CPX_PARAM_TILIM, max_time);
 
+        nodeCount_ = 0;
+        iterationCount_ = 0;
         int status = CPXmipopt(env,cpxlp);
         CHECK_CPX_STAT("mipopt",status)
 
@@ -173,7 +175,10 @@ namespace Bonmin {
                           || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)  
                           || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
        
+
        if(!infeasible){
+          nodeCount_ += CPXgetnodecnt(env, cpxlp);
+          //iterationCount_ += CPXgetitcnt(env, cpxlp);
           if(!integerSolution_){
             integerSolution_ = new double[lp_->getNumCols()];
           }

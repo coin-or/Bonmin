@@ -30,6 +30,11 @@ namespace Bonmin {
    void fixIntegers(OsiSolverInterface & si, const OsiBranchingInformation & info,
                     double integer_tolerance,
                     OsiObject ** objects = 0, int nObjects = -1);
+   /** Relax integer variables in si.
+    */
+   void relaxIntegers(OsiSolverInterface & si, const OsiBranchingInformation & info,
+                    double integer_tolerance,
+                    OsiObject ** objects = 0, int nObjects = -1);
    /** Check if two solutions are the same on integer variables. */
    bool isDifferentOnIntegers(OsiSolverInterface &si,
                               OsiObject ** objects, int nObjects,
