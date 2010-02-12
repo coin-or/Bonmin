@@ -182,8 +182,8 @@ namespace Bonmin
            //nlp is solved and feasible
            // Update the cutoff
            cutoff = nlp_->getObjValue() - 
-                    parameters_.cbcCutoffIncrement_;
-           cutoff = nlp_->getObjValue() - 0.1;
+                    (1 + fabs(nlp_->getObjValue()))*parameters_.cbcCutoffIncrement_;
+           
            numSols_++;
          }
          else{

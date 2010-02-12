@@ -18,9 +18,10 @@
 #include <fstream>
 #include <sstream>
 #include "Ipopt/BonIpoptInteriorWarmStarter.hpp"
+#include "OsiBranchingObject.hpp"
 
 extern bool BonminAbortAll;
-
+class OsiObject;
 namespace Bonmin
 {
 
@@ -633,7 +634,6 @@ namespace Bonmin
         unfixed vars, checks wether the solution given by the bounds is feasible.*/
 
     /** @name Methods for setting and getting the warm starter */
-    //@{
   void 
   TMINLP2TNLP::SetWarmStarter(SmartPtr<IpoptInteriorWarmStarter> warm_starter)
     {
@@ -654,6 +654,35 @@ namespace Bonmin
     return help;
   }
 
+  double
+  TMINLP2TNLP::check_solution(OsiObject ** objects, int nObjects){
+    assert(x_sol_.size() == num_variables());
+    assert(g_sol_.size() == num_constraints());
+    if (objects) {
+      for (int i = 0 ; i < nObjects ; i++) {
+        OsiSimpleInteger * obj = dynamic_cast<OsiSimpleInteger *>(objects[i]);
+        if(obj){
+          int colNumber = obj->columnNumber();
+          x_sol_[colNumber] = floor(x_sol_[colNumber]+0.5);
+        }
+      }
+    }
+    else {
+      for (unsigned int i = 0; i < x_sol_.size() ; i++) {
+        if (var_types_[i] == TMINLP::INTEGER || var_types_[i] == TMINLP::BINARY) {
+          x_sol_[i] = floor(x_sol_[i]+0.5);
+        }
+      }
+    }
+    eval_g(x_sol_.size(), x_sol_(), true, g_sol_.size(), g_sol_());
+    eval_f(x_sol_.size(), x_sol_(), false, obj_value_);
+    double error = 0;
+    for(unsigned int i = 0 ; i < g_sol_.size() ; i++){
+      error = std::max(error, std::max(0., g_l_[i] - g_sol_[i]));
+      error = std::max(error, std::max(0., - g_u_[i] + g_sol_[i]));
+    }
+    return error;
+  }
 
 }// namespace Bonmin
 

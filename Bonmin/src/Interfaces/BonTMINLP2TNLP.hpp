@@ -380,6 +380,8 @@ namespace Bonmin
 
     //@}
 
+    /** Round and check the current solution, return norm inf of constraint violation.*/
+    double check_solution(OsiObject ** objects = 0, int nObjects = -1);
    protected:
    /** \name These should be modified in derived class to always maintain there corecteness.
              They are directly queried by OsiTMINLPInterface without virtual function for 
