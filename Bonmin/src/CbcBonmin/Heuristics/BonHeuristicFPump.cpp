@@ -519,10 +519,14 @@ namespace Bonmin
 	      <<", numberColumns_= "<<numberColumns_<<endl;
 	}
 #endif
+        
 	if(sosConstraint) {
 	  double fl = floor(weightedSum + 0.5); 
 	  int indexColumnSelected = static_cast<int>(fl) - 1;
-	  assert(0 <= indexColumnSelected && indexColumnSelected < jac_g.size());
+          if(indexColumnSelected < 0){//Looks like all variables have been fixed to 0
+            continue;
+          }
+	  assert(indexColumnSelected < jac_g.size());
 	  for (unsigned int j=0; j<jac_g.size(); j++) {
 	    int iColumn = jac_g[j].first;
 	    if(j == indexColumnSelected)
@@ -548,7 +552,5 @@ namespace Bonmin
 	}
       }
     }
-
   }
-  
 }
