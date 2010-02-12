@@ -204,6 +204,8 @@ namespace Bonmin
     int* row = new int[nnz_jac_g];
     int* columnStart = new int[numberColumns];
     int* columnLength = new int[numberColumns];
+    CoinZeroN(columnStart, numberColumns);
+    CoinZeroN(columnLength, numberColumns);
     vector<vector<int> > column(numberRows); // stores the index of
     // the variables in
     // each row
