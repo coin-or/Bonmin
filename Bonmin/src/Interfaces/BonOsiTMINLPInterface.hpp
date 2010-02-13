@@ -947,6 +947,14 @@ void getBendersCut(OsiCuts &cs, bool global);
 
   /** switch back to solving original problem.*/
   void switchToOriginalProblem();
+  
+  /** round solution and check its feasibility.*/
+  void round_and_check(double tolerance,
+                       OsiObject ** objects = 0, int nObjects = -1){
+    if(!problem_->check_solution(objects, nObjects)){
+      optimizationStatus_ = TNLPSolver::provenInfeasible;
+    }
+  }
   //@}
 
   /** \name output for OA cut generation

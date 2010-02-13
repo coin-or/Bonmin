@@ -108,11 +108,14 @@ namespace Bonmin
     }
 
     // If objective is linear need to add to lp constraint for objective
+    const double * colsol = NULL;
+    lp->resolve();
+    OsiBranchingInformation branch_info(lp, false);
+    branch_info.lower_ = savedColLower();
+    branch_info.upper_ = savedColUpper();
     if(lp->getNumCols() == nlp_->getNumCols())
       nlp_->addObjectiveFunction(*lp, nlp_->getColSolution());
     lp->setObjCoeff(numcols,0);
-    const double * colsol = NULL;
-    OsiBranchingInformation branch_info(lp, false);
 
     bool milpOptimal = false;
     nlp_->resolve(txt_id);
@@ -143,6 +146,7 @@ namespace Bonmin
 #endif
     double * nlpSol = NULL;
     int major_iteration = 0;
+    double ub = cutoff;
     while (colsol) {
       numberPasses++;
 
@@ -158,6 +162,7 @@ namespace Bonmin
 
       vector<double> x_bar(indices.size());
       for(unsigned int i = 0 ; i < indices.size() ; i++){
+         assert(fabs(colsol[indices[i]] - floor(colsol[indices[i]] + 0.5)) < 1e-5);
          x_bar[i] = colsol[indices[i]];
       }
 
@@ -170,14 +175,18 @@ namespace Bonmin
          fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
 
          nlp_->resolve(txt_id);
+         if(!nlp_->isProvenOptimal()){
+           relaxIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
+           nlp_->resolve(txt_id);
+         }
          bool restart = false;
          if (post_nlp_solve(babInfo, cutoff)) {
            restart = true;
            //nlp is solved and feasible
            // Update the cutoff
-           cutoff = nlp_->getObjValue() - 
-                    parameters_.cbcCutoffIncrement_;
-           cutoff = nlp_->getObjValue() - 0.1;
+           ub = std::min(ub, nlp_->getObjValue());
+           cutoff = ub * (1 - parameters_.cbcCutoffIncrement_);
+           
            numSols_++;
          }
          else{
@@ -256,6 +265,8 @@ namespace Bonmin
     if(colsol || ! milpOptimal)
       return -DBL_MAX;
     else{
+      handler_->message(OASUCCESS, messages_)<<"FP"<<CoinCpuTime() - timeBegin_ 
+      <<ub<<CoinMessageEol;
       return DBL_MAX;
     }
   }

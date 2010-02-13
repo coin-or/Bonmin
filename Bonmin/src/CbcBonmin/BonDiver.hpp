@@ -61,7 +61,7 @@ namespace Bonmin
     /** Give size of the tree.*/
     virtual int size()
     {
-      return (nodes_.size() + (nextOnBranch_ != NULL) );
+      return ((int) nodes_.size() + (nextOnBranch_ != NULL) );
     }
     /** @} */
 
@@ -143,7 +143,7 @@ namespace Bonmin
     /** Give size of the tree.*/
     virtual int size()
     {
-      return (nodes_.size() + (nextOnBranch_ != NULL) + (candidateChild_ != NULL) );
+      return ((int) nodes_.size() + (nextOnBranch_ != NULL) + (candidateChild_ != NULL) );
     }
     /** @} */
 
@@ -239,7 +239,7 @@ namespace Bonmin
     /** Give size of the tree.*/
     virtual int size()
     {
-      return nodes_.size() + diveListSize_;
+      return (int) nodes_.size() + diveListSize_;
     }
     /** @} */
 

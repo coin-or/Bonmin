@@ -72,6 +72,7 @@ namespace Bonmin
     /** Norm of the objective function - either 1 or 2 */
     int objective_norm_;
 
+    int enableAdvanced_;
   };
 
   class RoundingFPump

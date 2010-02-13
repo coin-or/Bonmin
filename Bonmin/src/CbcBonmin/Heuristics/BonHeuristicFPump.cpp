@@ -44,14 +44,16 @@ namespace Bonmin
     :
     CbcHeuristic(),
     setup_(NULL),
-    objective_norm_(1)
+    objective_norm_(1),
+    enableAdvanced_(false)
   {}
 
   HeuristicFPump::HeuristicFPump(BonminSetup * setup)
     :
     CbcHeuristic(),
     setup_(setup),
-    objective_norm_(1)
+    objective_norm_(1),
+    enableAdvanced_(false)
   {
     Initialize(setup->options());
   }
@@ -60,7 +62,8 @@ namespace Bonmin
     :
     CbcHeuristic(copy),
     setup_(copy.setup_),
-    objective_norm_(copy.objective_norm_)
+    objective_norm_(copy.objective_norm_),
+    enableAdvanced_(copy.enableAdvanced_)
   {}
 
   HeuristicFPump &
@@ -70,6 +73,7 @@ namespace Bonmin
       CbcHeuristic::operator=(rhs);
       setup_ = rhs.setup_;
       objective_norm_ = rhs.objective_norm_;
+      enableAdvanced_ = rhs.enableAdvanced_;
     }
     return *this;
   }
@@ -83,7 +87,8 @@ namespace Bonmin
     if(model_->getSolutionCount()) {
       //      bestSolutionValue = model_->getObjValue();
       integerSolutionAlreadyExists = true;
-      return 0;
+      if(!enableAdvanced_)
+        return 0;
       assert(solutionValue < 1.0e50);
     }
 
@@ -404,11 +409,19 @@ namespace Bonmin
     roptions->AddStringOption2("heuristic_feasibility_pump", "whether the heuristic feasibility pump should be used",
       "no", "no", "don't use it", "yes", "use it", "");
     roptions->setOptionExtraInfo("heuristic_feasibility_pump", 63);
+
+    roptions->SetRegisteringCategory("Test Heuristics", RegisteredOptions::UndocumentedCategory);
+    roptions->AddStringOption2("unstable_fp","use at your own risks",
+                               "no",
+                               "no", "",
+                               "yes", "","");
+    roptions->setOptionExtraInfo("unstable_fp", 63);
   }
 
   void 
   HeuristicFPump::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
     options->GetIntegerValue("feasibility_pump_objective_norm", objective_norm_, "bonmin.");
+    options->GetEnumValue("unstable_fp", enableAdvanced_, "bonmin.");
   }
 
   RoundingFPump::RoundingFPump(TMINLP2TNLP* minlp)
@@ -506,10 +519,14 @@ namespace Bonmin
 	      <<", numberColumns_= "<<numberColumns_<<endl;
 	}
 #endif
+        
 	if(sosConstraint) {
 	  double fl = floor(weightedSum + 0.5); 
 	  int indexColumnSelected = static_cast<int>(fl) - 1;
-	  assert(0 <= indexColumnSelected && indexColumnSelected < jac_g.size());
+          if(indexColumnSelected < 0){//Looks like all variables have been fixed to 0
+            continue;
+          }
+	  assert(indexColumnSelected < jac_g.size());
 	  for (unsigned int j=0; j<jac_g.size(); j++) {
 	    int iColumn = jac_g[j].first;
 	    if(j == indexColumnSelected)
@@ -535,7 +552,5 @@ namespace Bonmin
 	}
       }
     }
-
   }
-  
 }

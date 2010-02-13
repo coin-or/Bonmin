@@ -53,9 +53,7 @@ void fixIntegers(OsiSolverInterface & si,
 {
   if (objects) {
     for (int i = 0 ; i < nObjects ; i++) {
-      fabs(objects[i]->feasibleRegion(&si, &info));
-      //if (fabs(objects[i]->feasibleRegion(&si, &info)) > integer_tolerance) 
-      // throw;
+      objects[i]->feasibleRegion(&si, &info);
     }
   }
   else {
@@ -91,6 +89,57 @@ void fixIntegers(OsiSolverInterface & si,
 #ifdef OA_DEBUG
     std::cout<<std::endl;
 #endif
+  }
+}
+
+/** Slightly relax integer variables in si.
+*/
+void relaxIntegers(OsiSolverInterface & si, 
+                 const OsiBranchingInformation & info,
+                 double integer_tolerance,
+                 OsiObject ** objects, int nObjects)
+{
+  if (objects) {
+    for (int i = 0 ; i < nObjects ; i++) {
+      OsiSimpleInteger * obj = dynamic_cast<OsiSimpleInteger *>(objects[i]);
+      int colNumber = obj->columnNumber();
+      si.setColLower(colNumber, si.getColLower()[colNumber] - integer_tolerance); 
+      si.setColUpper(colNumber, si.getColUpper()[colNumber] + integer_tolerance); 
+    }
+  }
+  else {
+    for (int i = 0; i < info.numberColumns_; i++) {
+      if (si.isInteger(i)) {
+        const int &colNumber = i;
+        si.setColLower(colNumber, si.getColLower()[colNumber] - integer_tolerance); 
+        si.setColUpper(colNumber, si.getColUpper()[colNumber] + integer_tolerance); 
+      }
+    }
+  }
+}
+
+bool refixIntegers(OsiSolverInterface & si, 
+                 const OsiBranchingInformation & info,
+                 double integer_tolerance,
+                 OsiObject ** objects, int nObjects)
+{
+  if(!si.isProvenOptimal()) return false;
+  if (objects) {
+    for (int i = 0 ; i < nObjects ; i++) {
+      OsiSimpleInteger * obj = dynamic_cast<OsiSimpleInteger *>(objects[i]);
+      int colNumber = obj->columnNumber();
+      si.setColLower(colNumber, si.getColLower()[colNumber] - integer_tolerance); 
+      si.setColUpper(colNumber, si.getColUpper()[colNumber] + integer_tolerance); 
+    }
+  }
+  else {
+    for (int i = 0; i < info.numberColumns_; i++) {
+      if (si.isInteger(i)) {
+        const int &colNumber = i;
+        si.setColLower(colNumber, si.getColLower()[colNumber] - integer_tolerance); 
+        si.setColUpper(colNumber, si.getColUpper()[colNumber] + integer_tolerance); 
+      }
+    }
   }
 }
 

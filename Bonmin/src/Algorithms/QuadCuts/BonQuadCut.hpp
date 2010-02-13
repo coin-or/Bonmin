@@ -174,7 +174,7 @@ Cuts::insert(const Cuts & cs){
   }
 }
 
-int 
+int
 Cuts::sizeQuadCuts() const {
   return quadCuts_.size();
 }

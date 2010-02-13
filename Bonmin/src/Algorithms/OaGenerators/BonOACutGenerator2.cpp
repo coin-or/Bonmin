@@ -105,7 +105,7 @@ namespace Bonmin
     {
       subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
           (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
-      milpBound = subMip->lowBound();
+      milpBound = std::max(milpBound, subMip->lowBound());
       milpOptimal = subMip->optimal();
 
       feasible = milpBound < cutoff;
@@ -126,16 +126,15 @@ namespace Bonmin
     bool foundSolution = 0;
 #endif
     double * nlpSol = NULL;
-
+    double ub = cutoff;
     while (isInteger && feasible ) {
       numberPasses++;
       //after a prescribed elapsed time give some information to user
       double time = CoinCpuTime();
       if (time - lastPeriodicLog > parameters_.logFrequency_) {
-        double lb = (subMip == NULL) ?lp->getObjValue() : subMip->getLowerBound();
         handler_->message(PERIODIC_MSG,messages_)
         <<time - timeBegin_<<cutoff
-        <<lb
+        <<milpBound
         <<CoinMessageEol;
         lastPeriodicLog = CoinCpuTime();
       }
@@ -155,7 +154,8 @@ namespace Bonmin
       if (post_nlp_solve(babInfo, cutoff)) {
         //nlp solved and feasible
         // Update the cutoff
-        cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
+        ub = std::min(nlp_->getObjValue(), ub);
+        cutoff = ub *(1 - parameters_.cbcCutoffIncrement_);
         // Update the lp solver cutoff
         lp->setDblParam(OsiDualObjectiveLimit, cutoff);
         numSols_++;
@@ -217,7 +217,7 @@ namespace Bonmin
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()
             );
 
-        milpBound = subMip->lowBound();
+        milpBound = std::max(milpBound, subMip->lowBound());
 
         if (subMip->optimal())
           handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
@@ -253,7 +253,8 @@ namespace Bonmin
         else {
           milpBound = 1e50;
           feasible = 0;
-          handler_->message(OASUCCESS, messages_)<<CoinCpuTime() - timeBegin_ <<CoinMessageEol;
+          handler_->message(OASUCCESS, messages_)<<"OA"<<CoinCpuTime() - timeBegin_ 
+          <<ub<<CoinMessageEol;
         }
       }/** endif localSearch*/
       else if (subMip!=NULL) {
