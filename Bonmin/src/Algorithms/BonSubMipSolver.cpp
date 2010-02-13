@@ -138,6 +138,7 @@ namespace Bonmin {
         CPXENVptr env = cpx_->getEnvironmentPtr();
         CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
         CPXsetdblparam(env, CPX_PARAM_TILIM, max_time);
+        CPXsetdblparam(env, CPX_PARAM_EPINT, 1e-08);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
 
 

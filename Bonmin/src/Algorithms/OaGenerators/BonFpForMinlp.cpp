@@ -111,6 +111,8 @@ namespace Bonmin
     const double * colsol = NULL;
     lp->resolve();
     OsiBranchingInformation branch_info(lp, false);
+    branch_info.lower_ = savedColLower();
+    branch_info.upper_ = savedColUpper();
     if(lp->getNumCols() == nlp_->getNumCols())
       nlp_->addObjectiveFunction(*lp, nlp_->getColSolution());
     lp->setObjCoeff(numcols,0);
