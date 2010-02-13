@@ -144,6 +144,7 @@ namespace Bonmin
 #endif
     double * nlpSol = NULL;
     int major_iteration = 0;
+    double ub = cutoff;
     while (colsol) {
       numberPasses++;
 
@@ -181,8 +182,8 @@ namespace Bonmin
            restart = true;
            //nlp is solved and feasible
            // Update the cutoff
-           cutoff = nlp_->getObjValue() - 
-                    (1 + fabs(nlp_->getObjValue()))*parameters_.cbcCutoffIncrement_;
+           ub = std::min(ub, nlp_->getObjValue());
+           cutoff = ub * (1 - parameters_.cbcCutoffIncrement_);
            
            numSols_++;
          }
@@ -263,7 +264,7 @@ namespace Bonmin
       return -DBL_MAX;
     else{
       handler_->message(OASUCCESS, messages_)<<"FP"<<CoinCpuTime() - timeBegin_ 
-      <<cutoff<<CoinMessageEol;
+      <<ub<<CoinMessageEol;
       return DBL_MAX;
     }
   }
