@@ -252,7 +252,8 @@ namespace Bonmin
         else {
           milpBound = 1e50;
           feasible = 0;
-          handler_->message(OASUCCESS, messages_)<<CoinCpuTime() - timeBegin_ <<CoinMessageEol;
+          handler_->message(OASUCCESS, messages_)<<"OA"<<CoinCpuTime() - timeBegin_ 
+          <<cutoff<<CoinMessageEol;
         }
       }/** endif localSearch*/
       else if (subMip!=NULL) {

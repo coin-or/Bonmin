@@ -26,7 +26,7 @@ namespace Bonmin
     ADD_MSG(LOCAL_SEARCH_ABORT, std_m,2,"Local search aborted : %d nodes and %d lp iterations.");
     ADD_MSG(UPDATE_LB, std_m ,2,"Updating lower bound to %g elapsed time %g sec");
     ADD_MSG(ABORT,std_m,1,"Oa aborted on %s limit, time spent %g");
-    ADD_MSG(OASUCCESS, std_m,1,"Oa converged in %g seconds");
+    ADD_MSG(OASUCCESS, std_m,1,"%s converged in %g seconds found solution of value %g");
     ADD_MSG(LP_ERROR,std_m,2,"Error of LP approximation %g");
     ADD_MSG(PERIODIC_MSG, std_m,1,"After %7.1f seconds, upper bound %10g, lower bound %10g");
     ADD_MSG(FP_DISTANCE, std_m,2,"NLP solution is %g from MILP sol");
