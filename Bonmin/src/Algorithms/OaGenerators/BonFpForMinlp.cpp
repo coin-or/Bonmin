@@ -262,6 +262,8 @@ namespace Bonmin
     if(colsol || ! milpOptimal)
       return -DBL_MAX;
     else{
+      handler_->message(OASUCCESS, messages_)<<"FP"<<CoinCpuTime() - timeBegin_ 
+      <<cutoff<<CoinMessageEol;
       return DBL_MAX;
     }
   }
