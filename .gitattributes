@@ -18,6 +18,14 @@ Bonmin/doc/bonmin.css -text
 Bonmin/doc/bonmin.sty -text
 Bonmin/doc/genHtml.sh -text
 Bonmin/doc/html.sty -text
+Bonmin/doc/html/Install.html -text
+Bonmin/doc/html/Intro.html -text
+Bonmin/doc/html/Obtain.html -text
+Bonmin/doc/html/bib.html -text
+Bonmin/doc/html/bonmin.css -text
+Bonmin/doc/html/options_list.html -text
+Bonmin/doc/html/options_set.html -text
+Bonmin/doc/html/use.html -text
 Bonmin/doc/htrick.sty -text
 Bonmin/doc/ltrick.sty -text
 Bonmin/doc/options.tex -text
