@@ -1,16 +1,15 @@
-OUTPUTS = Install.done
-OUTPUTS += Intro.done
-OUTPUTS += Obtain.done
-OUTPUTS += bib.done
-OUTPUTS += options_list.done
-OUTPUTS += options_set.done
-OUTPUTS += use.done
+OUTPUTS = html/Install.html
+OUTPUTS += html/Intro.html
+OUTPUTS += html/Obtain.html
+OUTPUTS += html/bib.html
+OUTPUTS += html/options_list.html
+OUTPUTS += html/options_set.html
+OUTPUTS += html/use.html
 
 all: $(OUTPUTS) Head.tex
 
-%.done : %.tex Head.tex
+html/%.html : %.tex Head.tex bonmin.sty
 	./genHtml.sh $<
-	touch $@
 
 install_www:
-	cp -rv bib Install Intro Obtain options_list options_set use ../../../../html/
+	cp -rv html/*.html ../../../../html/

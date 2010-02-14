@@ -5,9 +5,10 @@ NAME=`basename $f .tex`;
 rm -rf $NAME;
 awk -v NAME=$NAME '{sub(/FILENAME/,NAME);print}' Head.tex > tmp.tex;
 latex tmp.tex;
-latex2html -split 1 -no_navigation -info 0  tmp.tex;
-awk '{sub(/tmp.css/,"../bonmin.css") ; sub(/>tmp</,">BONMIN Users Manual<") ; print}' tmp/index.html > toto.html;
-mv toto.html tmp/index.html;
-mv tmp $NAME;
-#rm tmp.*;
+latex tmp.tex;
+latex tmp.tex;
+tex4ht tmp.tex;
+awk '{sub(/tmp.css/,"bonmin.css") ; sub(/>tmp</,">BONMIN Users Manual<") ; print}' tmp.html | sed -e's/##/#/g' > toto.html;
+mv toto.html html/$NAME.html
+#rm tmp.*
 done
