@@ -18,6 +18,8 @@ Bonmin/doc/bonmin.css -text
 Bonmin/doc/bonmin.sty -text
 Bonmin/doc/genHtml.sh -text
 Bonmin/doc/html.sty -text
+Bonmin/doc/htrick.sty -text
+Bonmin/doc/ltrick.sty -text
 Bonmin/doc/options.tex -text
 Bonmin/doc/options_list.tex -text
 Bonmin/doc/options_list_bonmin_content.tex -text
