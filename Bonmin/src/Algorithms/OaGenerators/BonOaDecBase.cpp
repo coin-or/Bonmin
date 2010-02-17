@@ -216,14 +216,14 @@ void
 OaDecompositionBase::solverManip::restore()
 {
   if (initialNumberRows_ >= 0) {
-    int nRowsToDelete = numrows_ - initialNumberRows_;
+    int nRowsToDelete = si_->getNumRows() - initialNumberRows_;
     int * rowsToDelete = new int[nRowsToDelete];
     for (int i = 0 ; i < nRowsToDelete ; i++) {
       rowsToDelete[i] = i + initialNumberRows_;
     }
     si_->deleteRows(nRowsToDelete, rowsToDelete);
     delete [] rowsToDelete;
-    numrows_ -= nRowsToDelete;
+    numrows_ = si_->getNumRows() ;
   }
 
   if (colLower_) {
