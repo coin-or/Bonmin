@@ -363,6 +363,13 @@ namespace Bonmin {
                                      );
     roptions->setOptionExtraInfo("milp_log_level",64);
 
+    roptions->AddLowerBoundedIntegerOption("cplex_number_threads",
+                           "Set number of threads to use with cplex.",
+                           0, 0,
+                           "number of threads used with cplex (refer to CPLEX documentation)"
+                           );
+    roptions->setOptionExtraInfo("cplex_number_threads",64);
+
 
   }
 }/* Ends Bonmin namespace.*/
