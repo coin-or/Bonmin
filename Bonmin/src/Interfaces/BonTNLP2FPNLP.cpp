@@ -407,13 +407,14 @@ namespace Bonmin
     if(use_feasibility_pump_objective_ && norm_ == 2){
       if (iRow && jCol && !values) //Initialization phase
 	{
+    int index_correction = (index_style_ == TNLP::C_STYLE) ? 0 : 1;
 	  int k = nele_hess - nnz_obj_h;
 	  iRow += k;
 	  jCol += k;
 	  for(unsigned int i = 0; i < inds_.size() ; i++)
 	    {
-	      iRow[i] = inds_[i] + 1;
-	      jCol[i] = inds_[i] + 1;
+	      iRow[i] = inds_[i] + index_correction;
+	      jCol[i] = inds_[i] + index_correction;
 	    }
 	  DBG_ASSERT(k==nele_hess);
 	}
