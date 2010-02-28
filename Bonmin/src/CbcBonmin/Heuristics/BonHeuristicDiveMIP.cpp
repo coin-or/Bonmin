@@ -195,7 +195,9 @@ namespace Bonmin
 		      indexRow, indexCol, 0);
 
     std::vector<int> sortedIndex(nnz_jac_g);
-    CoinIotaN(&sortedIndex[0], nnz_jac_g, 0);
+    if(!nnz_jac_g){
+      CoinIotaN(&sortedIndex[0], nnz_jac_g, 0);
+    }
     MatComp c;
     c.iRow = indexRow;
     c.jCol = indexCol;
