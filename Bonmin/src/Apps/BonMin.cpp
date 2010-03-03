@@ -67,7 +67,6 @@ int main (int argc, char *argv[])
   }
   catch(CoinError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
-    <<std::endl
     <<E.message()<<std::endl;
   }
   catch (Ipopt::OPTION_INVALID &E)

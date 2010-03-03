@@ -10,5 +10,5 @@ latex tmp.tex;
 tex4ht tmp.tex;
 awk '{sub(/tmp.css/,"bonmin.css") ; sub(/>tmp</,">BONMIN Users Manual<") ; print}' tmp.html | sed -e's/##/#/g' > toto.html;
 mv toto.html html/$NAME.html
-#rm tmp.*
+rm tmp.*
 done
