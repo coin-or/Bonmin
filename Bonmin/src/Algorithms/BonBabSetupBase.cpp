@@ -398,7 +398,7 @@ namespace Bonmin
   {
     OsiTMINLPInterface::registerOptions(roptions);
     /* BabSetup options.*/
-    roptions->SetRegisteringCategory("Output ond log-levels options", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Output and log-level options", RegisteredOptions::BonminCategory);
 
     roptions->AddBoundedIntegerOption("bb_log_level",
         "specify main branch-and-bound log level.",

@@ -162,20 +162,17 @@ register_general_options
       "Coefficient of variation threshold (for dynamic definition of cutoff_decr).",
       0.0,
       false,
-      0.1,
-      "Coefficient of variation threshold (for dynamic definition of cutoff_decr).");
+      0.1);
   roptions->setOptionExtraInfo("coeff_var_threshold",8);
   
   roptions->AddNumberOption("first_perc_for_cutoff_decr",
       "The percentage used when, the coeff of variance is smaller than the threshold, to compute the cutoff_decr dynamically.",
-      -0.02,
-      "The percentage used when, the coeff of variance is smaller than the threshold, to compute the cutoff_decr dynamically.");
+      -0.02);
   roptions->setOptionExtraInfo("first_perc_for_cutoff_decr",8);
 
   roptions->AddNumberOption("second_perc_for_cutoff_decr",
       "The percentage used when, the coeff of variance is greater than the threshold, to compute the cutoff_decr dynamically.",
-      -0.05,
-      "The percentage used when, the coeff of variance is greater than the threshold, to compute the cutoff_decr dynamically.");
+      -0.05);
   roptions->setOptionExtraInfo("second_perc_for_cutoff_decr",8);
 
   }
