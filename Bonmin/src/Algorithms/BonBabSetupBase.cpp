@@ -480,7 +480,7 @@ namespace Bonmin
         "Specify cutoff value.",
         -1e100,0,1e100,0,1e100,
         "cutoff should be the value of a feasible solution known by the user "
-        "(if any). The algorithm will only look for solutions better than cutoof.");
+        "(if any). The algorithm will only look for solutions better than cutoff.");
     roptions->setOptionExtraInfo("cutoff", 127);
 
 
