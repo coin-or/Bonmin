@@ -48,9 +48,9 @@ or not. \latexhtml{Table \ref{tab:options} gives t}{T}he list of options togethe
 with their types, default values and availability in each of the
 four algorithms\latexhtml{}{ can be found \link{\OptListPage \#sec:options_list}{here}}. The column labeled `type' indicates the type of the
 parameter (`F' stands for float, `I' for integer, and `S' for
-string). The column labeled default indicates the global default
-value. Then for each of the four algorithm {\tt B-BB}, {\tt B-OA},
-{\tt B-QG}, and {\tt B-Hyb}, `$+$' indicates that the option is
+string). The column labeled `default' indicates the global default
+value. Then for each of the algorithms {\tt B-BB}, {\tt B-OA},
+{\tt B-QG}, {\tt B-Hyb}, {\tt B-Ecp}, and {\tt B-iFP} `$\surd$' indicates that the option is
 available for that particular algorithm
 while `$-$' indicates that it is not.\\
 
@@ -99,13 +99,13 @@ Outer Approximation Decomposition (called in {\tt B-Hyb} at the root node)
 and Feasibility Pump for MINLP (called in B-Hyb or B-BB at the root node), RINS, RENS, Local Branching.
 
 In all these cases, one can pass options to the sub-algorithm used through the bonmin.opt file. The basic principle is
-that the ``bonmin.'' prefix  is replaced with a prefix that identify the sub-algorithm used:
+that the ``bonmin.'' prefix  is replaced with a prefix that identifies the sub-algorithm used:
 \begin{itemize}
 \item to pass options to Outer Approximation Decomposition: {\tt oa\_decomposition.},
 \item to pass options to Feasibility Pump for MINLP: {\tt pump\_for\_minlp.},
 \item to pass options to RINS: {\tt rins.},
-\item to RENS: {\tt rens.},
-\item to Local Branching: {\tt local\_branch}.
+\item to pass options to RENS: {\tt rens.},
+\item to pass options to Local Branching: {\tt local\_branch}.
 \end{itemize}
 
 
@@ -123,7 +123,7 @@ pump_for_minlp.solution_limit 6 # set a solution limit
 Note that the actual solution and time limit will be the minimum of the global limits set for \Bonmin.
 
 A slightly more complicated set of options may be used when using RINS. Say for example that we want to run RINS inside B-BB. Each time RINS is called we want
-to solve the small-size MINLP generated using B-QG (we may run any algorithm available in bonmin for solving an MINLP) and want to stop as soon as B-QG found 1 solution.
+to solve the small-size MINLP generated using B-QG (we may run any algorithm available in \Bonmin for solving an MINLP) and want to stop as soon as B-QG found 1 solution.
 We set the following options in bonmin.opt
 
 \begin{verbatim}
@@ -134,7 +134,7 @@ rins.algorithm B-QG
 rins.solution_limit 1
 
 \end{verbatim}
-This example shows that it is possible to set any option used in the sub=algorithm to be different than the one used for the main algorithm.
+This example shows that it is possible to set any option used in the sub-algorithm to be different than the one used for the main algorithm.
 
 
 In the context of OA and FP for MINLP, a standard MILP solver is used.
@@ -202,20 +202,20 @@ settings.
 for updating the barrier parameter \mycite{NocedalAdaptive}{Nocedal2004} which we have found to be
 more efficient in the context of MINLP).
 \paragraph{{\tt gamma\_phi} and {\tt gamma\_theta}} are set to $10^{-8}$ and $10^{-4}$
-respectively. This has the effect of reducing the size of the filter in the line search performed by Ipopt.
+respectively. This has the effect of reducing the size of the filter in the line search performed by \Ipopt.
 
 \paragraph{\tt required\_infeasibility\_reduction} is set to $0.1$.
 This increases the required infeasibility reduction when \Ipopt\ enters the
-restoration phase and should thus help
+restoration phase and should thus help to
 detect infeasible problems faster.
 
-\paragraph{\tt expect\_infeasible\_problem} is set to {\tt yes} which enables some heuristics
+\paragraph{\tt expect\_infeasible\_problem} is set to {\tt yes}, which enables some heuristics
 to detect infeasible problems faster.
 
 \paragraph{\tt warm\_start\_init\_point} is set to {\tt yes} when a full primal/dual starting
 point is available (generally all the optimizations after the continuous relaxation has been solved).
 
-\paragraph{\tt print\_level} is set to $0$ by default to turn off Ipopt output.
+\paragraph{\tt print\_level} is set to $0$ by default to turn off \Ipopt\ output.
 \subsubsection{Some useful \Ipopt\ options}
 \paragraph{bound\_relax\_factor} is by default set to $10^{-8}$ in \Ipopt. All of the bounds
 of the problem are relaxed by this factor. This may cause some trouble

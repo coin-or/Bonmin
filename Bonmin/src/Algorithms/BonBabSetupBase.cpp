@@ -398,7 +398,7 @@ namespace Bonmin
   {
     OsiTMINLPInterface::registerOptions(roptions);
     /* BabSetup options.*/
-    roptions->SetRegisteringCategory("Output ond log-levels options", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Output and log-level options", RegisteredOptions::BonminCategory);
 
     roptions->AddBoundedIntegerOption("bb_log_level",
         "specify main branch-and-bound log level.",
@@ -480,7 +480,7 @@ namespace Bonmin
         "Specify cutoff value.",
         -1e100,0,1e100,0,1e100,
         "cutoff should be the value of a feasible solution known by the user "
-        "(if any). The algorithm will only look for solutions better than cutoof.");
+        "(if any). The algorithm will only look for solutions better than cutoff.");
     roptions->setOptionExtraInfo("cutoff", 127);
 
 

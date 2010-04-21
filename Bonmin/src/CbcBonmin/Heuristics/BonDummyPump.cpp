@@ -62,7 +62,7 @@ namespace Bonmin {
 
   void
   DummyPump::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-   roptions->SetRegisteringCategory("Test heuristics", RegisteredOptions::UndocumentedCategory);
+   roptions->SetRegisteringCategory("Test Heuristics", RegisteredOptions::UndocumentedCategory);
    roptions->AddStringOption2(
      "dummy_pump_heuristic",
      "if yes runs a heuristic which looks like a dummy FP",
