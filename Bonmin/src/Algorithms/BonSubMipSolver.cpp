@@ -134,6 +134,7 @@ namespace Bonmin {
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
 #else
+        cpx_->messageHandler()->setLogLevel(loglevel);
         cpx_->switchToMIP();
         CPXENVptr env = cpx_->getEnvironmentPtr();
         CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
