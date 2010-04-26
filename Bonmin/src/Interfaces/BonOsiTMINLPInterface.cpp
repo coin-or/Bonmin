@@ -203,8 +203,8 @@ static void register_OA_options
 
   roptions->AddStringOption2("oa_cuts_scope","Specify if OA cuts added are to be set globally or locally valid",
                              "global",
-			     "local","Cuts are treated as globally valid",
-			     "global", "Cuts are treated as locally valid",
+			     "local","Cuts are treated as locally valid",
+			     "global", "Cuts are treated as globally valid",
 			     "");
   roptions->setOptionExtraInfo("oa_cuts_scope",119);
 
