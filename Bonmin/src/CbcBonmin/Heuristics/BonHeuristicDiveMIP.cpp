@@ -92,8 +92,11 @@ namespace Bonmin
     setup_(copy.setup_),
     howOften_(copy.howOften_),
     emptyInterface_(copy.emptyInterface_->clone()),
-    strategy_(copy.strategy_->clone())
-  {}
+    strategy_(NULL)
+  { 
+    if(copy.strategy_)
+      strategy_ = copy.strategy_->clone();
+  }
 
   HeuristicDiveMIP &
   HeuristicDiveMIP::operator=(const HeuristicDiveMIP & rhs)
