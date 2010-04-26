@@ -3,7 +3,7 @@
 %%% TeX-master: "Bonmin_UsersManual"
 %%% End:
 
-\begin{htmlonly}
+\html{
 
 \begin{PageSummary}
 \PageName{Introduction}
@@ -23,14 +23,15 @@
   R. Fletcher and S. Leyffer. Mathematical Programming.}{\FLLink}
 \quickcitation{An LP/NLP based branched and bound algorithm for convex MINLP optimization problems. I. Quesada and I.E. Grossmann.
    Computers and Chemical Engineering.}{\QGLink}\end{quickref}
-\end{htmlonly}
+}
+
 \PageTitle{\latexhtml{Introduction}{\Bonmin}}{sec:Intro}
 \Bonmin\ (Basic Open-source Nonlinear Mixed INteger programming)
 is an open-source code for solving general MINLP (Mixed
 Integer NonLinear Programming) problems.
  It is distributed on
 \COINOR
-\latexhtml{\begin{latexonly} (\tt www.coin-or.org) \end{latexonly}}{}
+\latexhtml{{(\tt www.coin-or.org)}}{}
 under the CPL (Common Public
 License). The CPL is a license approved by the
 \footlink{http://www.opensource.org}{OSI},
@@ -60,17 +61,20 @@ step outside the open-source realm and use
 \Cplex\ as the MILP solver and FilterSQP as the NLP solver. 
 
 Additional documentation can be found on the {\tt Bonmin}
-\begin{latexonly} homepage at 
-\begin{verbatim}
-         http://www.coin-or.org/Bonmin
-\end{verbatim}
+\latex{ homepage at 
+$$
+         \hbox{\tt http://www.coin-or.org/Bonmin}
+$$
  and wiki at 
-\begin{verbatim}
-         https://projects.coin-or.org/Bonmin
-\end{verbatim}
-\end{latexonly}
-\begin{htmlonly} \link{http://www.coin-or.org/Bonmin}{homepage} 
-and \link{https://projects.coin-or.org/Bonmin}{wiki}. \end{htmlonly}
+$$
+         \hbox{\tt https://projects.coin-or.org/Bonmin}
+$$
+}
+
+\html{
+\href{http://www.coin-or.org/Bonmin}{homepage} 
+and \href{https://projects.coin-or.org/Bonmin}{wiki}.}
+
 \subsectionHs{Types of problems solved}{MathBack}
 \Bonmin\ solves MINLPs of the form
 
@@ -105,8 +109,8 @@ a continuous nonlinear program at each node of the search tree and
 branching on variables \mycite{Gupta80Nonlinear}{Gupta 1980};
 we also allow the possibility of SOS (Type 1) branching
 \item {\tt B-OA}: an outer-approximation based decomposition algorithm
-\latexhtml{\begin{latexonly} \cite{DG,FL} \end{latexonly}}
-{[\link{\DGLink}{Duran Grossmann 1986},\link{\FLLink}{Fletcher Leyffer 1994}]}
+\latexhtml{\cite{DG,FL}}
+{[\href{\DGLink}{Duran Grossmann 1986},\href{\FLLink}{Fletcher Leyffer 1994}]}
 \item {\tt B-QG}: an outer-approximation based branch-and-cut
 algorithm
 \citeH{QG}{\QGLink}{Quesada Grossmann 1994}
@@ -115,7 +119,7 @@ based branch-and-cut algorithm \citeH{Betal}
 {\BetalLink}{Bonami et al. 2008}
 \item {\tt B-Ecp}: another outer-approximation based branch-and-cut inspired
 by the settings described in \citeH{abhishek.leyffer.linderoth:06}{\AbhishekLink}{Abhishek Leyffer Linderoth 2006}
-\item {\tt B-iFP}: an iterated feasibility pump algorithm \citeH{bonami.etal:06}{\FPLink}{Bonami Cornu\'ejols Lodi Margot 2009}.
+\item {\tt B-iFP}: an iterated feasibility pump algorithm \citeH{bonami.etal:06}{\FPLink}{Bonami Cornu\eacute jols Lodi Margot 2009}.
 \end{itemize}
 
 In this manual,  we will not go into a further description of these algorithms.
@@ -132,19 +136,19 @@ Nevertheless, there are cases where {\tt B-OA} is much faster than {\tt B-Hyb} a
 For nonconvex MINLPs, we strongly recommend using {\tt B-BB} (the outer-approximation algorithms
 have not been tailored to treat nonconvex problems at this point). Although even {\tt B-BB} is only a
 heuristic for such problems, we have added several
-options to try and improve the quality of the solutions it provides (see \latexhtml{Section \ref{sec:non_convex}}{\link{\OptSetPage #sec:non_convex}{non convex options}}).
+options to try and improve the quality of the solutions it provides (see \latexhtml{Section \ref{sec:non_convex}}{\href{\OptSetPage \#sec:non_convex}{non convex options}}).
 Because it is appliable to more classes problem {\tt B-BB} is the default algorithm in \Bonmin.
 
 \subsectionHs{Required third party code}{ThirdP}
 In order to run {\Bonmin}, you have to download other external
 libraries (and pay attention to their licenses!):
 \begin{itemize}
-\item \link{\LapackAddr}{Lapack} (Linear Algebra
+\item \href{\LapackAddr}{Lapack} (Linear Algebra
 PACKage)
-\item \link{\BlasAddr}{Blas} (Basic Linear Algebra
+\item \href{\BlasAddr}{Blas} (Basic Linear Algebra
 Subroutines)
 \item a sparse linear solver that is supported by Ipopt, e.g., MA27 from the
-\link{\AslAddr}{HSL}
+\href{\AslAddr}{HSL}
 (Harwell Subroutine Library), MUMPS, or Pardiso.
 \end{itemize}
 
@@ -175,14 +179,3 @@ the commercial solver \footlink{http://www.ilog.com/products/cplex/product/mip.c
 \item SunOS 5 using gcc 4.3
 \end{itemize}
 
-\latexhtml{}{
-\begin{rawhtml}
-</div>
-</div>
-<!--end content -->
-<div id="siteInfo">
-  <img src="" width="44" height="22"> <a href="#">About Us</a> | <a href="#">Contact Us</a> | &copy;2006
-  Carnegie Mellon University, IBM</div>
-<br>
-\end{rawhtml}
-}
