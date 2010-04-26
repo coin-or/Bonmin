@@ -195,7 +195,7 @@ namespace Bonmin
 		      indexRow, indexCol, 0);
 
     std::vector<int> sortedIndex(nnz_jac_g);
-    if(!nnz_jac_g){
+    if(nnz_jac_g){
       CoinIotaN(&sortedIndex[0], nnz_jac_g, 0);
     }
     MatComp c;
@@ -376,8 +376,9 @@ namespace Bonmin
 	col_lb[iLCol] = x_l[iColumn];
 	col_ub[iLCol] = x_u[iColumn];
 	CoinPackedVector newRow;
+        int end = columnStart[iColumn]+columnLength[iColumn];
 	for (int j=columnStart[iColumn];
-	     j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	     j< end;j++) {
 	  int iRow = row[j];
 	  newRow.insert(mapRows[iRow], jac_g[sortedIndex[j]]);
 	}
