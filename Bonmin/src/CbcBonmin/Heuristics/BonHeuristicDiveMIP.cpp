@@ -393,8 +393,8 @@ namespace Bonmin
       // load the problem to OSI
       OsiSolverInterface *si;
       si = emptyInterface_->clone();
+      si->passInMessageHandler(model_->messageHandler()->clone());
       si->messageHandler()->setLogLevel(0);
-      si->passInMessageHandler(model_->messageHandler());
 
       si->loadProblem(*matrix, col_lb, col_ub, objective, row_lb, row_ub);
       si->setInteger(indexIntegerColumn, numberIndexIntegerColumn);
