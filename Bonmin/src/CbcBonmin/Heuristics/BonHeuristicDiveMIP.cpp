@@ -390,7 +390,8 @@ namespace Bonmin
       // load the problem to OSI
       OsiSolverInterface *si;
       si = emptyInterface_->clone();
-      si->passInMessageHandler(model_->messageHandler()->clone());
+      CoinMessageHandler * handler = model_->messageHandler()->clone();
+      si->passInMessageHandler(handler);
       si->messageHandler()->setLogLevel(0);
 
       si->loadProblem(*matrix, col_lb, col_ub, objective, row_lb, row_ub);
@@ -419,7 +420,9 @@ namespace Bonmin
       delete [] col_lb;
       delete [] col_ub;
       delete [] indexIntegerColumn;
+      delete [] gradient_f;
       delete si;
+      delete handler;
     }
 
 #if 0
