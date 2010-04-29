@@ -54,9 +54,9 @@ namespace Bonmin {
 #ifdef COIN_HAS_CPX
       OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
 #if 1
-      b.options()->GetIntegerValue("number_cpx_threads",ivalue,b.prefix());
+      b.options()->GetIntegerValue("number_cpx_threads",ivalue,prefix);
       CPXsetintparam(cpxSolver->getEnvironmentPtr(), CPX_PARAM_THREADS, ivalue);
-      b.options()->GetIntegerValue("cpx_parallel_strategy",ivalue,b.prefix());
+      b.options()->GetIntegerValue("cpx_parallel_strategy",ivalue,prefix);
       CPXsetintparam(cpxSolver->getEnvironmentPtr(), CPX_PARAM_PARALLELMODE, ivalue);
 #endif
       cpx_ = cpxSolver;
@@ -75,6 +75,7 @@ namespace Bonmin {
         milp_strat_ = GetOptimum;
       }
 
+      b.options()->GetNumericValue("allowable_fraction_gap", gap_tol_, prefix);
     }
 
 
@@ -88,7 +89,8 @@ namespace Bonmin {
       optimal_(false),
       integerSolution_(NULL),
       strategy_(NULL),
-      milp_strat_(copy.milp_strat_)
+      milp_strat_(copy.milp_strat_),
+      gap_tol_(copy.gap_tol_)
   {
 #ifdef COIN_HAS_CPX
      if(copy.cpx_ != NULL){
@@ -302,6 +304,7 @@ namespace Bonmin {
       cbc.solver()->messageHandler()->setLogLevel(0);
       cbc.setMaximumSeconds(maxTime);
       cbc.setCutoff(cutoff);
+      cbc.setDblParam( CbcModel::CbcAllowableFractionGap, gap_tol_);
 
       //cbc.solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
       cbc.branchAndBound();
@@ -335,6 +338,7 @@ namespace Bonmin {
 
       CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
       CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
+      CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
       int status = CPXmipopt(env,cpxlp);
       CHECK_CPX_STAT("mipopt",status)
 

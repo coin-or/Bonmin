@@ -124,6 +124,8 @@ namespace Bonmin {
       int iterationCount_;
       /** MILP search strategy.*/
       MILP_solve_strategy milp_strat_;
+      /** setting for gap tolerance.*/
+      double gap_tol_;
     };
 
 }
