@@ -354,9 +354,11 @@ namespace Bonmin
 
       // load the problem to OSI
       OsiSolverInterface *si = mip_->solver();
+      bool delete_si = false;
       if(si == NULL){
         si = new OsiClpSolverInterface;
         mip_->setLpSolver(si);
+        delete_si = true;
       }
       CoinMessageHandler * handler = model_->messageHandler()->clone();
       si->passInMessageHandler(handler);
@@ -388,7 +390,7 @@ namespace Bonmin
       delete [] col_lb;
       delete [] col_ub;
       delete [] indexIntegerColumn;
-      if(mip_->solver() == NULL){
+      if(delete_si){
         delete si;
       }
       delete handler;

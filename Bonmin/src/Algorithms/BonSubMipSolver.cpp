@@ -36,7 +36,7 @@ namespace Bonmin {
   SubMipSolver::SubMipSolver(BabSetupBase &b, const std::string &prefix):
       clp_(NULL),
       cpx_(NULL),
-      lowBound_(-COIN_DBL_MAX),
+      lowBound_(-DBL_MAX),
       optimal_(false),
       integerSolution_(NULL),
       strategy_(NULL)
@@ -90,9 +90,11 @@ namespace Bonmin {
       strategy_(NULL),
       milp_strat_(copy.milp_strat_)
   {
+#ifdef COIN_HAS_CPX
      if(copy.cpx_ != NULL){
        cpx_ = new OsiCpxSolverInterface(*copy.cpx_);
      }
+#endif
      if(copy.strategy_){
         strategy_ = dynamic_cast<CbcStrategyDefault *>(copy.strategy_->clone());
         assert(strategy_);
@@ -102,7 +104,9 @@ namespace Bonmin {
   {
     if (strategy_) delete strategy_;
     if (integerSolution_) delete [] integerSolution_;
+    #ifdef COIN_HAS_CPX
     if(cpx_) delete cpx_;
+    #endif
   }
 
   /** Assign lp solver. */
@@ -126,7 +130,9 @@ namespace Bonmin {
       clp_ = (lp == NULL) ? NULL :
               dynamic_cast<OsiClpSolverInterface *>(lp);
       assert(clp_);
+#ifdef COIN_HAS_CPX
     }
+#endif
     lowBound_ = -COIN_DBL_MAX;
     optimal_ = false;
     if (integerSolution_) {
@@ -140,7 +146,11 @@ namespace Bonmin {
          if(clp_ != NULL)
            return clp_;
          else
+#ifdef COIN_HAS_CPX
            return cpx_;
+#else
+         return NULL;
+#endif
       }
 
  void 
@@ -354,6 +364,7 @@ namespace Bonmin {
     }
     else {
 #endif
+     {
         throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");

@@ -45,20 +45,8 @@ namespace Bonmin {
   HeuristicRINS::solution(double & objectiveValue,
 			  double * newSolution)
   {
-#ifdef DEBUG_BON_HEURISTIC_RINS
-    std::cout<<"entered RINS"<<std::endl;
-#endif
     if(!howOften_ || model_->getNodeCount() % howOften_ != 0) return 0;
-    //    if(model_->getNodeCount() || model_->getCurrentPassNumber() > 1) return 0;
-    if (0 && numberSolutions_>=model_->getSolutionCount()){
-#ifdef DEBUG_BON_HEURISTIC_RINS
-    std::cout<<"exited RINS a"<<std::endl;
-    printf("numberSolutions_ %i model_->getSolutionCount() %i\n", numberSolutions_, model_->getSolutionCount());
-#endif
-      return 0;
-    }
-    else
-      numberSolutions_=model_->getSolutionCount();
+    numberSolutions_=model_->getSolutionCount();
 
     const double * bestSolution = model_->bestSolution();
     if (!bestSolution){

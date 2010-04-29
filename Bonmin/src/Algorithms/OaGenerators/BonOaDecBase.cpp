@@ -34,31 +34,6 @@ extern CbcModel * OAModel;
 
 namespace Bonmin {
 
-#if 0
-  OaDecompositionBase::OaDecompositionBase
-  (OsiTMINLPInterface * nlp)
-      :
-      CglCutGenerator(),
-      nlp_(nlp),
-      s_(NULL),
-      nSolve_(0),
-      lp_(NULL),
-      objects_(NULL),
-      nObjects_(0),
-      nLocalSearch_(0),
-      handler_(NULL),
-      leaveSiUnchanged_(true),
-      reassignLpsolver_(false),
-      timeBegin_(0),
-      parameters_(),
-      currentNodeNumber_(-1)
-  {
-    handler_ = new CoinMessageHandler();
-    handler_ -> setLogLevel(2);
-    messages_ = OaMessages();
-    timeBegin_ = CoinCpuTime();
-  }
-#endif
 
   OaDecompositionBase::OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
       bool reassignLpsolver):
@@ -168,7 +143,7 @@ OaDecompositionBase::solverManip::solverManip
     colLower_(NULL),
     colUpper_(NULL),
     warm_(NULL),
-    cutoff_(COIN_DBL_MAX),
+    cutoff_(DBL_MAX),
     deleteSolver_(false),
     objects_(NULL),
     nObjects_(0)
@@ -198,7 +173,7 @@ OaDecompositionBase::solverManip::solverManip
     colLower_(NULL),
     colUpper_(NULL),
     warm_(NULL),
-    cutoff_(COIN_DBL_MAX),
+    cutoff_(DBL_MAX),
     deleteSolver_(true),
     objects_(NULL),
     nObjects_(0)
@@ -261,7 +236,7 @@ OaDecompositionBase::passInMessageHandler(CoinMessageHandler * handler)
 
 
 
-#if 1
+#if 0
 /** Clone the state of another solver (bounds, cutoff, basis).*/
 void
 OaDecompositionBase::solverManip::cloneOther(const OsiSolverInterface &si){
@@ -412,19 +387,8 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
 
   solverManip * lpManip = NULL;
   if (lp_ != NULL) {
-#if 0
-    if (lp_!=&si) {
-      assert(0);
-#if 1
-      lpManip = new solverManip(lp_, true, false, false, true, true);
-      lpManip->cloneOther(si);
-#endif
-    }
-    else {
-#else
       assert(lp_ == &si);
       lpManip = new solverManip(lp_, true, leaveSiUnchanged_, true, true);
-#endif
   }
   else {
     lpManip = new solverManip(si);

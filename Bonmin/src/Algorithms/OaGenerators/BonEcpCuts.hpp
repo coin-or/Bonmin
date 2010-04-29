@@ -17,19 +17,6 @@ namespace Bonmin
   class EcpCuts: public OaDecompositionBase
   {
   public:
-    EcpCuts(OsiTMINLPInterface *nlp = NULL,
-        int numRounds = 1,
-        double abs_violation_tol = 1e-6,
-        double rel_violation_tol = 1000.,
-        double beta = -1.
-           ):
-        OaDecompositionBase(nlp),
-        objValue_(-COIN_DBL_MAX),
-        numRounds_(numRounds),
-        abs_violation_tol_(abs_violation_tol),
-        rel_violation_tol_(rel_violation_tol),
-        beta_(beta)
-    {}
     EcpCuts(BabSetupBase & b);
 
     /// Copy constructor

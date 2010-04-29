@@ -106,9 +106,6 @@ namespace Bonmin
       void getCached();
       /** @} */
     };
-    /// Old usefull constructor
-    OaDecompositionBase(OsiTMINLPInterface * nlp = NULL
-                       );
 
     /// New usefull constructor
     OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
