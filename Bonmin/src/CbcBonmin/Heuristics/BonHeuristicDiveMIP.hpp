@@ -15,6 +15,7 @@
 #include "CbcStrategy.hpp"
 namespace Bonmin
 {
+  class SubMipSolver;
   class HeuristicDiveMIP : public CbcHeuristic
   {
   public:
@@ -74,10 +75,8 @@ namespace Bonmin
   private:
     /// How often to do (code can change)
     int howOften_;
-    /// empty LP solver to use for creating sub-MIP
-    OsiSolverInterface * emptyInterface_;
-    /// A strategy for Cbc
-    CbcStrategy * strategy_;
+    /// A subsolver for MIP
+    SubMipSolver * mip_;
 
   };
 }

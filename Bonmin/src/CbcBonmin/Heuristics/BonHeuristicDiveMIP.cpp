@@ -38,52 +38,21 @@ using namespace std;
 
 namespace Bonmin
 {
-#if 0
-  HeuristicDiveMIP::HeuristicDiveMIP()
-    :
-    CbcHeuristic(),
-    setup_(NULL),
-    howOften_(100),
-    emptyInterface_(NULL),
-    strategy_(NULL)
-  {}
-#endif
-
   HeuristicDiveMIP::HeuristicDiveMIP(BonminSetup * setup)
     :
     CbcHeuristic(),
     setup_(setup),
     howOften_(100),
-    emptyInterface_(NULL),
-    strategy_(NULL)
+    mip_(NULL)
   {
     Initialize(setup);
   }
 
   void
   HeuristicDiveMIP::Initialize(BonminSetup * b){
-    int ivalue;
-    b->options()->GetEnumValue("milp_solver",ivalue,b->prefix());
-    if (ivalue <= 0) {//uses cbc
-      emptyInterface_ = new OsiClpSolverInterface;
-      strategy_ = new CbcStrategyDefault;
-    }
-    else if (ivalue == 1) {
-      emptyInterface_ = new OsiClpSolverInterface;
-      std::string prefix = "milp_solver.";
-      strategy_ = new CbcStrategyChooseCuts(*b, prefix);
-    }
-    else if (ivalue == 2) {
-#ifdef COIN_HAS_CPX
-      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
-      emptyInterface_ = cpxSolver;
-#else
-      std::cerr	<< "You have set an option to use CPLEX as the milp subsolver. However, \n"
-                << "apparently CPLEX is not configured to be used in bonmin.\n"
-                << "See the manual for configuring CPLEX\n";
-      throw -1;
-#endif
-    }
+    delete mip_;
+    mip_ = new SubMipSolver (*b, b->prefix());
+   
   }
 
   HeuristicDiveMIP::HeuristicDiveMIP(const HeuristicDiveMIP &copy)
@@ -91,11 +60,8 @@ namespace Bonmin
     CbcHeuristic(copy),
     setup_(copy.setup_),
     howOften_(copy.howOften_),
-    emptyInterface_(copy.emptyInterface_->clone()),
-    strategy_(NULL)
+    mip_(new SubMipSolver(*copy.mip_))
   {
-    if(copy.strategy_)
-      strategy_ = copy.strategy_->clone();
   }
 
   HeuristicDiveMIP &
@@ -105,19 +71,15 @@ namespace Bonmin
       CbcHeuristic::operator=(rhs);
       setup_ = rhs.setup_;
       howOften_ = rhs.howOften_;
-      delete emptyInterface_;
-      delete strategy_;
-      if(rhs.emptyInterface_)
-        emptyInterface_ = rhs.emptyInterface_->clone();
-      if(rhs.strategy_)
-        strategy_ = rhs.strategy_->clone();
+      delete mip_;
+      if(rhs.mip_)
+        mip_ = new SubMipSolver(*rhs.mip_);
     }
     return *this;
   }
 
   HeuristicDiveMIP::~HeuristicDiveMIP(){
-    delete emptyInterface_;
-    delete strategy_;
+    delete mip_;
   }
 
   struct MatComp{
@@ -184,8 +146,8 @@ namespace Bonmin
       else
 	nonlinearVariable.push_back(iColumn);
     }
-    int numberLinearColumns = linearVariable.size();
-    int numberNonlinearColumns = nonlinearVariable.size();
+    size_t numberLinearColumns = linearVariable.size();
+    size_t numberNonlinearColumns = nonlinearVariable.size();
 
 
     // Get the indicies of the jacobian
@@ -251,7 +213,7 @@ namespace Bonmin
     // create a set with the indices of the fractional variables
     vector<int> integerNonlinearColumns; // stores the integer variables
     int numberFractionalNonlinearVariables = 0;
-    for (int iNLCol=0;iNLCol<numberNonlinearColumns;iNLCol++) {
+    for (size_t iNLCol=0;iNLCol<numberNonlinearColumns;iNLCol++) {
       int iColumn = nonlinearVariable[iNLCol];
       if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
 	integerNonlinearColumns.push_back(iColumn);
@@ -306,7 +268,7 @@ namespace Bonmin
 
     // now we are going to solve a MIP with the linear part of the problem
     int numberFractionalLinearVariables = 0;
-    for (int iLCol=0;iLCol<numberLinearColumns;iLCol++) {
+    for (size_t iLCol=0;iLCol<numberLinearColumns;iLCol++) {
       int iColumn = linearVariable[iLCol];
       if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
 	double value=newSolution[iColumn];
@@ -330,7 +292,7 @@ namespace Bonmin
       // set all linear variables to zero in order to compute the
       // impact of the nonlinear variables in each row
       int numberIntegerLinearColumns = 0;
-      for (int iLCol=0;iLCol<numberLinearColumns;iLCol++) {
+      for (size_t iLCol=0;iLCol<numberLinearColumns;iLCol++) {
 	int iColumn = linearVariable[iLCol];
 	newSolution[iColumn] = 0.0;
 	if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS)
@@ -373,7 +335,7 @@ namespace Bonmin
       double* col_ub = new double[numberLinearColumns];
       int* indexIntegerColumn = new int[numberIntegerLinearColumns];
       int numberIndexIntegerColumn = 0;
-      for (int iLCol=0;iLCol<numberLinearColumns;iLCol++) {
+      for (size_t iLCol=0;iLCol<numberLinearColumns;iLCol++) {
 	int iColumn = linearVariable[iLCol];
 	objective[iLCol] = gradient_f[iColumn];
 	col_lb[iLCol] = x_l[iColumn];
@@ -387,12 +349,15 @@ namespace Bonmin
 	}
 	matrix->appendCol(newRow);
 	if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS)
-	  indexIntegerColumn[numberIndexIntegerColumn++] = iLCol;
+	  indexIntegerColumn[numberIndexIntegerColumn++] = static_cast<int>(iLCol);
       }
 
       // load the problem to OSI
-      OsiSolverInterface *si;
-      si = emptyInterface_->clone();
+      OsiSolverInterface *si = mip_->solver();
+      if(si == NULL){
+        si = new OsiClpSolverInterface;
+        mip_->setLpSolver(si);
+      }
       CoinMessageHandler * handler = model_->messageHandler()->clone();
       si->passInMessageHandler(handler);
       si->messageHandler()->setLogLevel(0);
@@ -400,13 +365,12 @@ namespace Bonmin
       si->loadProblem(*matrix, col_lb, col_ub, objective, row_lb, row_ub);
       si->setInteger(indexIntegerColumn, numberIndexIntegerColumn);
       
-      SubMipSolver mip(si, strategy_);
-      mip.optimize(DBL_MAX, 0, 60);
+      mip_->optimize(DBL_MAX, 0, 60);
 
-      if(mip.getLastSolution()) {
-	const double* solution = mip.getLastSolution();
-	assert(si->getNumCols() == numberLinearColumns);
-	for (int iLCol=0;iLCol<numberLinearColumns;iLCol++) {
+      if(mip_->getLastSolution()) {
+	const double* solution = mip_->getLastSolution();
+	assert(si->getNumCols() == static_cast<int>(numberLinearColumns));
+	for (size_t iLCol=0;iLCol<numberLinearColumns;iLCol++) {
 	  int iColumn = linearVariable[iLCol];
 	  newSolution[iColumn] = solution[iLCol];
 	}
@@ -424,7 +388,9 @@ namespace Bonmin
       delete [] col_lb;
       delete [] col_ub;
       delete [] indexIntegerColumn;
-      delete si;
+      if(mip_->solver() == NULL){
+        delete si;
+      }
       delete handler;
     }
 

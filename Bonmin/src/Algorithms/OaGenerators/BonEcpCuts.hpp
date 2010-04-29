@@ -83,7 +83,7 @@ namespace Bonmin
   protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts & cs, solverManip &lpManip,
-        SubMipSolver *& subMip, BabInfo * babInfo, double &cutoff, const CglTreeInfo &info) const
+                   BabInfo * babInfo, double &cutoff, const CglTreeInfo &info) const
     {
       throw -1;
     }

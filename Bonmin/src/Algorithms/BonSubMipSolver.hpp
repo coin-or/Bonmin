@@ -12,23 +12,29 @@
 #ifndef BonSubMipSolver_HPP
 #define BonSubMipSolver_HPP
 #include "IpSmartPtr.hpp"
+#include <string>
 /* forward declarations.*/
 class OsiSolverInterface;
 class OsiClpSolverInterface;
 class OsiCpxSolverInterface;
 class CbcStrategy;
 class CbcStrategyDefault;
-class CbcModel;
 
 namespace Bonmin {
     class RegisteredOptions;
+    class BabSetupBase; 
     /** A very simple class to provide a common interface for solving MIPs with Cplex and Cbc.*/
     class SubMipSolver
     {
     public:
+      enum MILP_solve_strategy{
+         FindGoodSolution,
+         GetOptimum};
       /** Constructor */
-      SubMipSolver(OsiSolverInterface * lp = 0,
-          const CbcStrategy * strategy = 0);
+      SubMipSolver(BabSetupBase &b, const std::string &prefix);
+
+      /** Copy Constructor */
+      SubMipSolver(const SubMipSolver &copy);
 
       ~SubMipSolver();
 
@@ -48,6 +54,18 @@ namespace Bonmin {
       {
         return lowBound_;
       }
+
+      void solve(double cutoff,
+          int loglevel,
+          double maxTime){
+         if(milp_strat_ == FindGoodSolution){
+            find_good_sol(cutoff, loglevel, maxTime);
+         }
+         else
+            optimize(cutoff, loglevel, maxTime);
+      }
+ 
+
       /** update cutoff and perform a local search to a good solution. */
       void find_good_sol(double cutoff,
           int loglevel,
@@ -83,20 +101,15 @@ namespace Bonmin {
       }
 
 
-      /** Register options for that Oa based cut generation method. */
-      OsiSolverInterface * solver(){
-         return lp_;
-      }
+      OsiSolverInterface * solver();
+
+     /** Register options for that Oa based cut generation method. */
      static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
     private:
-      /** lp (potentially mip solver). */
-      OsiSolverInterface * lp_;
-      /** If lp solver is clp (then have to use Cbc).*/
+      /** If lp solver is clp (then have to use Cbc) (not owned).*/
       OsiClpSolverInterface *clp_;
-      /** If lp solver is cpx this points to it. */
+      /** If mip solver is cpx this is it (owned). */
       OsiCpxSolverInterface * cpx_;
-      /** If cbc is used pointer to CbcModel. */
-      CbcModel * cbc_;
       /** lower bound obtained */
       double lowBound_;
       /** Is optimality proven? */
@@ -109,6 +122,8 @@ namespace Bonmin {
       int nodeCount_;
       /** number of simplex iteration in last mip solved.*/
       int iterationCount_;
+      /** MILP search strategy.*/
+      MILP_solve_strategy milp_strat_;
     };
 
 }

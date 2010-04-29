@@ -108,15 +108,8 @@ namespace Bonmin
     };
     /// Old usefull constructor
     OaDecompositionBase(OsiTMINLPInterface * nlp = NULL
-#if 0
-  ,
-        OsiSolverInterface * si = NULL,
-        CbcStrategy * strategy = NULL,
-        double cbcCutoffIncrement_=1e-07,
-        double cbcIntegerTolerance = 1e-05,
-        bool leaveSiUnchanged = 0
-#endif
                        );
+
     /// New usefull constructor
     OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
         bool reassignLpsolver);
@@ -205,6 +198,7 @@ namespace Bonmin
       {
         return strategy_;
       }
+
 private:
       /** Strategy to apply when using Cbc as MILP sub-solver.*/
       CbcStrategy * strategy_;
@@ -228,6 +222,7 @@ private:
 
     void passInMessageHandler(CoinMessageHandler * handler);
   protected:
+      void setupMipSolver(BabSetupBase &b, const std::string &prefix);
     /// \name Protected helper functions
     /**@{ */
 
@@ -238,7 +233,7 @@ private:
 
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts &cs, solverManip &lpManip,
-        SubMipSolver * &subMip, BabInfo * babInfo, double &, const CglTreeInfo & info) const = 0;
+                             BabInfo * babInfo, double &, const CglTreeInfo & info) const = 0;
     /// virutal method to decide if local search is performed
     virtual bool doLocalSearch(BabInfo * babInfo) const = 0;
 

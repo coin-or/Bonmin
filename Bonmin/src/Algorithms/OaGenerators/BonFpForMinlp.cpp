@@ -27,35 +27,13 @@ namespace Bonmin
    static const char * txt_id = "FP for MINLP";
 /// Constructor with basic setup
   MinlpFeasPump::MinlpFeasPump(BabSetupBase & b):
-      OaDecompositionBase(b, true, false)
+      OaDecompositionBase(b, true, false),
+      subMip_(NULL)
   {
-    int ivalue;
     std::string bonmin="bonmin.";
     std::string prefix = (b.prefix() == bonmin) ? "" : b.prefix();
     prefix += "pump_for_minlp.";
-    b.options()->GetEnumValue("milp_solver",ivalue,prefix);
-    if (ivalue <= 0) {//uses cbc
-      CbcStrategyDefault strategy;
-      setStrategy(strategy);
-    }
-    else if (ivalue == 1) {
-      CbcStrategyChooseCuts strategy(b, prefix);
-      setStrategy(strategy);
-    }
-    else if (ivalue == 2) {
-#ifdef COIN_HAS_CPX
-      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
-      b.nonlinearSolver()->extractLinearRelaxation(*cpxSolver);
-      assignLpInterface(cpxSolver);
-#else
-      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
-      << "subsolver in oa decomposition. However, apparently\n"
-      << "CPLEX is not configured to be used in bonmin.\n"
-      << "See the manual for configuring CPLEX\n";
-      throw -1;
-#endif
-    }
-
+    subMip_ = new SubMipSolver(b, prefix);
     double oaTime;
     b.options()->GetNumericValue("time_limit",oaTime,prefix);
     parameter().maxLocalSearch_ = INT_MAX;
@@ -64,8 +42,7 @@ namespace Bonmin
     std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
     if(parameter().maxSols_ > b.getIntParameter(BabSetupBase::MaxSolutions))
       parameter().maxSols_ = b.getIntParameter(BabSetupBase::MaxSolutions);
-       
-  }
+ }
 
   MinlpFeasPump::~MinlpFeasPump()
   {}
@@ -82,7 +59,6 @@ namespace Bonmin
   double
   MinlpFeasPump::performOa(OsiCuts &cs,
       solverManip &lpManip,
-      SubMipSolver * &subMip,
       BabInfo * babInfo,
       double & cutoff,const CglTreeInfo &info) const
   {
@@ -97,7 +73,8 @@ namespace Bonmin
     CoinCopyN(nlp_->getColUpper(), nlp_->getNumCols(), savedColUpper());
 
 
-    OsiSolverInterface * lp = lpManip.si();
+    subMip_->setLpSolver(lpManip.si());
+    OsiSolverInterface * lp = subMip_->solver();
 
     vector<int> indices;
     for(int i = 0; i < numcols ; i++) {
@@ -119,26 +96,22 @@ namespace Bonmin
 
     bool milpOptimal = false;
     nlp_->resolve(txt_id);
-    if (subMip)//Perform a local search
-    {
-      assert(subMip->solver() == lp);
-      set_fp_objective(*lp, nlp_->getColSolution());
-      lp->initialSolve();
-      lp->setColUpper(numcols, cutoff);
-      subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
-      //subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
-          (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */);
+    set_fp_objective(*lp, nlp_->getColSolution());
+    lp->initialSolve();
+    lp->setColUpper(numcols, cutoff);
+    subMip_->solve(DBL_MAX, parameters_.subMilpLogLevel_,
+    //subMip_->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
+        (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */);
 
-      milpOptimal = subMip -> optimal(); 
-      colsol = subMip->getLastSolution();
-      nLocalSearch_++;
-      if(milpOptimal)
-        handler_->message(SOLVED_LOCAL_SEARCH, messages_)
-        <<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
-      else
-        handler_->message(LOCAL_SEARCH_ABORT, messages_)
-        <<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
-    }
+    milpOptimal = subMip_ -> optimal(); 
+    colsol = subMip_->getLastSolution();
+    nLocalSearch_++;
+    if(milpOptimal)
+      handler_->message(SOLVED_LOCAL_SEARCH, messages_)
+      <<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
+    else
+      handler_->message(LOCAL_SEARCH_ABORT, messages_)
+      <<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
     int numberPasses = 0;
 
 #ifdef OA_DEBUG
@@ -149,10 +122,6 @@ namespace Bonmin
     double ub = cutoff;
     while (colsol) {
       numberPasses++;
-
-      //after a prescribed elapsed time give some branch_information to user
-      //double time = CoinCpuTime();
-
 
       //setup the nlp
       int numberCutsBefore = cs.sizeRowCuts();
@@ -233,34 +202,25 @@ namespace Bonmin
       if (nLocalSearch_ < parameters_.maxLocalSearch_ &&
           numSols_ < parameters_.maxSols_) {
 
-        /** do we have a subMip? if not create a new one. */
-        if (subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy());
-
         nLocalSearch_++;
         set_fp_objective(*lp, nlp_->getColSolution());
 
         lp->setColUpper(numcols, cutoff); 
      
-        subMip->find_good_sol(DBL_MAX, parameters_.subMilpLogLevel_,
-        // subMip->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
+        subMip_->solve(DBL_MAX, parameters_.subMilpLogLevel_,
+        // subMip_->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
                          parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime());
-        milpOptimal = subMip -> optimal(); 
-        colsol = subMip->getLastSolution();
+        milpOptimal = subMip_ -> optimal(); 
+        colsol = subMip_->getLastSolution();
       if(milpOptimal)
-        handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
+        handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
       else
-        handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
+        handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
       if(colsol)
         handler_->message(FP_MILP_VAL, messages_) 
         <<colsol[nlp_->getNumCols()]<<CoinMessageEol;
          
       }/** endif localSearch*/
-      else if (subMip!=NULL) {
-        delete subMip;
-        subMip = NULL;
-        colsol = NULL;
-        milpOptimal = false;
-      }
     }
     if(colsol || ! milpOptimal)
       return -DBL_MAX;

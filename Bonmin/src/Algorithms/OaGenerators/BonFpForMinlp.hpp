@@ -20,7 +20,8 @@ namespace Bonmin{
     /// Copy constructor
     MinlpFeasPump(const MinlpFeasPump &copy)
         :
-        OaDecompositionBase(copy)
+        OaDecompositionBase(copy),
+        subMip_(new SubMipSolver(*copy.subMip_))
     {}
     /// Destructor
     ~MinlpFeasPump();
@@ -40,12 +41,14 @@ namespace Bonmin{
   protected:
     /// virtual method which performs the OA algorithm by modifying lp and nlp.
     virtual double performOa(OsiCuts & cs, solverManip &lpManip,
-        SubMipSolver * &subMip, BabInfo * babInfo, double &cutoff, const CglTreeInfo & info) const;
+                   BabInfo * babInfo, double &cutoff, const CglTreeInfo & info) const;
     /// virutal method to decide if local search is performed
     virtual bool doLocalSearch(BabInfo * babInfo) const;
     /** Put objective of MIP according to FP scheme. */
     void set_fp_objective(OsiSolverInterface &si, const double * colsol) const;
     
+  private:
+    SubMipSolver * subMip_;
   };
 
 }/* End Namespace.*/

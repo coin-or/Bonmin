@@ -31,42 +31,23 @@ namespace Bonmin
   OACutGenerator2::OACutGenerator2(BabSetupBase & b):
       OaDecompositionBase(b, true, false)
   {
-    int ivalue;
     std::string bonmin="bonmin.";
     std::string prefix = (b.prefix() == bonmin) ? "" : b.prefix();
     prefix += "oa_decomposition.";
-    b.options()->GetEnumValue("milp_solver",ivalue,prefix);
-    if (ivalue <= 0) {//uses cbc
-      CbcStrategyDefault strategy;
-      setStrategy(strategy);
-    }
-    else if (ivalue == 1) {
-      CbcStrategyChooseCuts strategy(b, prefix);
-      setStrategy(strategy);
-    }
-    else if (ivalue == 2) {
-#ifdef COIN_HAS_CPX
-      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
-      b.nonlinearSolver()->extractLinearRelaxation(*cpxSolver);
-      assignLpInterface(cpxSolver);
-#else
-      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
-      << "subsolver in oa decomposition. However, apparently\n"
-      << "CPLEX is not configured to be used in bonmin.\n"
-      << "See the manual for configuring CPLEX\n";
-      throw -1;
-#endif
-    }
-
+    subMip_ = new SubMipSolver(b, prefix);
     double oaTime;
     b.options()->GetNumericValue("time_limit",oaTime,prefix);
-    parameter().maxLocalSearchTime_ =
-    std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
     parameter().maxLocalSearch_ = INT_MAX;
     b.options()->GetIntegerValue("solution_limit", parameter().maxSols_,prefix);
+    parameter().maxLocalSearchTime_ =
+    std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
+    if(parameter().maxSols_ > b.getIntParameter(BabSetupBase::MaxSolutions))
+      parameter().maxSols_ = b.getIntParameter(BabSetupBase::MaxSolutions);
   }
   OACutGenerator2::~OACutGenerator2()
-  {}
+  {
+     delete subMip_;
+  }
 
   /// virutal method to decide if local search is performed
   bool
@@ -80,7 +61,6 @@ namespace Bonmin
   double
   OACutGenerator2::performOa(OsiCuts &cs,
       solverManip &lpManip,
-      SubMipSolver * &subMip,
       BabInfo * babInfo,
       double & cutoff, const CglTreeInfo & info) const
   {
@@ -92,7 +72,9 @@ namespace Bonmin
 
     bool isInteger = false;
 
-    OsiSolverInterface * lp = lpManip.si();
+    subMip_->setLpSolver(lpManip.si());
+    OsiSolverInterface * lp = subMip_->solver();
+    lp->resolve();
     OsiBranchingInformation branch_info(lp, false);
     bool milpOptimal = 1;
 
@@ -101,24 +83,21 @@ namespace Bonmin
     bool milpFeasible = 1;
     bool feasible = 1;
 
-    if (subMip)//Perform a local search
+    subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
+        (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
+    milpBound = std::max(milpBound, subMip_->lowBound());
+    milpOptimal = subMip_->optimal();
+
+    feasible = milpBound < cutoff;
+    milpFeasible = feasible;
+    isInteger = (subMip_->getLastSolution() != NULL);
+    nLocalSearch_++;
+
+    if (milpOptimal)
+      handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
+    else
     {
-      subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
-          (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
-      milpBound = std::max(milpBound, subMip->lowBound());
-      milpOptimal = subMip->optimal();
-
-      feasible = milpBound < cutoff;
-      milpFeasible = feasible;
-      isInteger = (subMip->getLastSolution() != NULL);
-      nLocalSearch_++;
-
-      if (milpOptimal)
-        handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
-      else
-      {
-        handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
-      }
+      handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
     }
     int numberPasses = 0;
 
@@ -144,8 +123,8 @@ namespace Bonmin
       int numberCutsBefore = cs.sizeRowCuts();
 
       //Fix the variable which have to be fixed, after having saved the bounds
-      const double * colsol = subMip == NULL ? lp->getColSolution():
-          subMip->getLastSolution();
+      const double * colsol = subMip_ == NULL ? lp->getColSolution():
+          subMip_->getLastSolution();
       branch_info.solution_ = colsol;
 
       fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_,objects_, nObjects_);
@@ -208,24 +187,22 @@ namespace Bonmin
           nLocalSearch_ < parameters_.maxLocalSearch_ &&
 	  numSols_ < parameters_.maxSols_) {
 
-        /** do we have a subMip? if not create a new one. */
-        if (subMip == NULL) subMip = new SubMipSolver(lp, parameters_.strategy());
 
         nLocalSearch_++;
 
-        subMip->find_good_sol(cutoff, parameters_.subMilpLogLevel_,
+        subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()
             );
 
-        milpBound = std::max(milpBound, subMip->lowBound());
+        milpBound = std::max(milpBound, subMip_->lowBound());
 
-        if (subMip->optimal())
-          handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
+        if (subMip_->optimal())
+          handler_->message(SOLVED_LOCAL_SEARCH, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
         else
-          handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
+          handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
 
 
-        colsol = const_cast<double *> (subMip->getLastSolution());
+        colsol = const_cast<double *> (subMip_->getLastSolution());
         isInteger = (colsol != 0);
 
         feasible =  (milpBound < cutoff);
@@ -242,7 +219,7 @@ namespace Bonmin
           }
           milpFeasible = feasible;
         }
-        if (subMip->optimal())
+        if (subMip_->optimal())
           milpOptimal = 1;
         else {
           milpOptimal = 0;
@@ -256,10 +233,6 @@ namespace Bonmin
           handler_->message(OASUCCESS, messages_)<<"OA"<<CoinCpuTime() - timeBegin_ 
           <<ub<<CoinMessageEol;
         }
-      }/** endif localSearch*/
-      else if (subMip!=NULL) {
-        delete subMip;
-        subMip = NULL;
       }
     }
 

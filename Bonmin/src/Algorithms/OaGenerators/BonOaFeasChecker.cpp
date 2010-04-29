@@ -37,7 +37,7 @@ namespace Bonmin
   /// OaDecomposition method
   double
   OaFeasibilityChecker::performOa(OsiCuts & cs, solverManip &lpManip,
-      SubMipSolver * &subMip, BabInfo * babInfo, double &cutoff,const CglTreeInfo & info) const
+      BabInfo * babInfo, double &cutoff,const CglTreeInfo & info) const
   {
     bool isInteger = true;
     bool feasible = 1;

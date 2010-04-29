@@ -2458,6 +2458,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
       addObjectiveFunction(si, x);
     }
   }
+
+
+
 //  si.writeMpsNative("OA.mps",NULL, NULL, 1);
 }
 

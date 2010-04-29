@@ -20,9 +20,10 @@
 
 #include "CbcModel.hpp"
 #include "CbcStrategy.hpp"
+#include "BonCbcLpStrategy.hpp"
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
-
+#include "cplex.h"
 #define CHECK_CPX_STAT(a,b) if(b) throw CoinError("Error in CPLEX call",__FILE__,a);
 
 #endif
@@ -33,6 +34,7 @@ extern CbcModel * OAModel;
 
 namespace Bonmin {
 
+#if 0
   OaDecompositionBase::OaDecompositionBase
   (OsiTMINLPInterface * nlp)
       :
@@ -56,6 +58,7 @@ namespace Bonmin {
     messages_ = OaMessages();
     timeBegin_ = CoinCpuTime();
   }
+#endif
 
   OaDecompositionBase::OaDecompositionBase(BabSetupBase &b, bool leaveSiUnchanged,
       bool reassignLpsolver):
@@ -91,7 +94,7 @@ namespace Bonmin {
     parameters_.addOnlyViolated_ = ivalue;
     b.options()->GetEnumValue("oa_cuts_scope", ivalue,b.prefix());
     parameters_.global_ = ivalue;
-  }
+}
 
   OaDecompositionBase::OaDecompositionBase
   (const OaDecompositionBase & other)
@@ -216,14 +219,14 @@ void
 OaDecompositionBase::solverManip::restore()
 {
   if (initialNumberRows_ >= 0) {
-    int nRowsToDelete = numrows_ - initialNumberRows_;
+    int nRowsToDelete = si_->getNumRows() - initialNumberRows_;
     int * rowsToDelete = new int[nRowsToDelete];
     for (int i = 0 ; i < nRowsToDelete ; i++) {
       rowsToDelete[i] = i + initialNumberRows_;
     }
     si_->deleteRows(nRowsToDelete, rowsToDelete);
     delete [] rowsToDelete;
-    numrows_ -= nRowsToDelete;
+    numrows_ = si_->getNumRows() ;
   }
 
   if (colLower_) {
@@ -369,7 +372,6 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   bool isInteger = integerFeasible(*nlp_, brInfo, parameters_.cbcIntegerTolerance_,
                               objects_, nObjects_);
 
-  SubMipSolver * subMip = NULL;
 
   //Check nodeNumber if it did not change scan savedCuts_ if one is violated force it and exit
   int nodeNumber = babInfo->babPtr()->model().getNodeCount();
@@ -410,30 +412,26 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
 
   solverManip * lpManip = NULL;
   if (lp_ != NULL) {
+#if 0
     if (lp_!=&si) {
+      assert(0);
 #if 1
       lpManip = new solverManip(lp_, true, false, false, true, true);
       lpManip->cloneOther(si);
 #endif
     }
     else {
-#if 0
-      throw CoinError("Not allowed to modify si in a cutGenerator",
-          "OACutGenerator2","generateCuts");
 #else
+      assert(lp_ == &si);
       lpManip = new solverManip(lp_, true, leaveSiUnchanged_, true, true);
 #endif
-    }
   }
   else {
     lpManip = new solverManip(si);
   }
   lpManip->setObjects(objects_, nObjects_);
-  if (!isInteger) {
-      subMip = new SubMipSolver(lpManip->si(), parameters_.strategy());
-  }
 
-  double milpBound = performOa(cs, *lpManip, subMip, babInfo, cutoff, info_copy);
+  double milpBound = performOa(cs, *lpManip, babInfo, cutoff, info_copy);
 
   if(babInfo->hasSolution()){
      babInfo->babPtr()->model().setSolutionCount (numSols_ - 1);
@@ -448,12 +446,6 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
         babInfo->setMipBound(milpBound);
     }
   }  //Clean everything :
-
-  //free subMip
-  if (subMip!= NULL) {
-    delete subMip;
-    subMip = NULL;
-  }
 
   //  Reset the two solvers
   if (leaveSiUnchanged_)
@@ -521,7 +513,11 @@ OaDecompositionBase::post_nlp_solve(BabInfo * babInfo, double cutoff) const{
   return return_value;
 }
 
+void 
+OaDecompositionBase::setupMipSolver(BabSetupBase &b, const std::string & prefix){
 
+
+}
 
 #ifdef OA_DEBUG
 bool

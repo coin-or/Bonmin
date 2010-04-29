@@ -15,57 +15,118 @@
 #include "OsiAuxInfo.hpp"
 #include "OsiClpSolverInterface.hpp"
 
+#include <climits>
 #ifdef COIN_HAS_CPX
 #include "OsiCpxSolverInterface.hpp"
 #include "cplex.h"
-#define CHECK_CPX_STAT(a,b) if(b) throw CoinError("Error in CPLEX call",__FILE__,a);
+void throw_error(const std::string &s, const std::string &f, const std::string &func){
+throw CoinError(s,f,func);
+}
+#define CHECK_CPX_STAT(a,b) if(b) throw_error("Error in CPLEX call",__FILE__,a);
 
 #endif
 
 #include "BonRegisteredOptions.hpp"
+#include "BonBabSetupBase.hpp"
+#include "BonCbcLpStrategy.hpp"
+
 
 namespace Bonmin {
   /** Constructor */
-  SubMipSolver::SubMipSolver(OsiSolverInterface * lp,
-      const CbcStrategy * strategy):
-      lp_(lp),
+  SubMipSolver::SubMipSolver(BabSetupBase &b, const std::string &prefix):
       clp_(NULL),
       cpx_(NULL),
-      cbc_(NULL),
       lowBound_(-COIN_DBL_MAX),
       optimal_(false),
       integerSolution_(NULL),
       strategy_(NULL)
   {
-    clp_ = (lp_ == NULL)? NULL :
-        dynamic_cast<OsiClpSolverInterface *>(lp_);
+   int ivalue;
+   b.options()->GetEnumValue("milp_solver",ivalue,prefix);
+   if (ivalue <= 0) {//uses cbc
+     strategy_ = new CbcStrategyDefault;
+   }
+   else if (ivalue == 1) {
+     CbcStrategyChooseCuts strategy(b, prefix);
+     strategy_  = new CbcStrategyChooseCuts(b, prefix);
+   }
+   else if (ivalue == 2) {
 #ifdef COIN_HAS_CPX
-    cpx_ = (lp_ == NULL)? NULL :
-        dynamic_cast<OsiCpxSolverInterface *>(lp_);
+      OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
+#if 1
+      b.options()->GetIntegerValue("number_cpx_threads",ivalue,b.prefix());
+      CPXsetintparam(cpxSolver->getEnvironmentPtr(), CPX_PARAM_THREADS, ivalue);
+      b.options()->GetIntegerValue("cpx_parallel_strategy",ivalue,b.prefix());
+      CPXsetintparam(cpxSolver->getEnvironmentPtr(), CPX_PARAM_PARALLELMODE, ivalue);
 #endif
-    if (strategy) {
-      strategy_ = dynamic_cast<CbcStrategyDefault *>(strategy->clone());
-      assert(strategy_);
+      cpx_ = cpxSolver;
+#else
+      std::cerr	<< "You have set an option to use CPLEX as the milp\n"
+      << "subsolver in oa decomposition. However, apparently\n"
+      << "CPLEX is not configured to be used in bonmin.\n"
+      << "See the manual for configuring CPLEX\n";
+      throw -1;
+#endif
+      b.options()->GetEnumValue("milp_strategy",ivalue,prefix);
+      if(ivalue == 0){
+        milp_strat_ = FindGoodSolution;
+      }
+      else {
+        milp_strat_ = GetOptimum;
+      }
+
     }
+
+
+   b.options()->GetEnumValue("milp_solver",ivalue,prefix);
+
+  }
+  SubMipSolver::SubMipSolver(const SubMipSolver &copy):
+      clp_(NULL),
+      cpx_(NULL),
+      lowBound_(-DBL_MAX),
+      optimal_(false),
+      integerSolution_(NULL),
+      strategy_(NULL),
+      milp_strat_(copy.milp_strat_)
+  {
+     if(copy.cpx_ != NULL){
+       cpx_ = new OsiCpxSolverInterface(*copy.cpx_);
+     }
+     if(copy.strategy_){
+        strategy_ = dynamic_cast<CbcStrategyDefault *>(copy.strategy_->clone());
+        assert(strategy_);
+     }
   }
   SubMipSolver::~SubMipSolver()
   {
     if (strategy_) delete strategy_;
     if (integerSolution_) delete [] integerSolution_;
-    if (cbc_) delete cbc_;
+    if(cpx_) delete cpx_;
   }
 
   /** Assign lp solver. */
   void
   SubMipSolver::setLpSolver(OsiSolverInterface * lp)
   {
-    lp_ = lp;
-    clp_ = (lp_ == NULL) ? NULL :
-        dynamic_cast<OsiClpSolverInterface *>(lp_);
 #ifdef COIN_HAS_CPX
-    cpx_ = (lp_ == NULL) ? NULL :
-        dynamic_cast<OsiCpxSolverInterface *>(lp_);
+    if(cpx_){
+      clp_ = NULL;
+      cpx_->loadProblem(*lp->getMatrixByCol(), lp->getColLower(), lp->getColUpper(), lp->getObjCoefficients(), lp->getRowLower(), lp->getRowUpper());
+      int ncols = lp->getNumCols();
+      for(int i = 0 ; i < ncols ; i++){
+        if(lp->isInteger(i) || lp->isBinary(i))
+           cpx_->setInteger(i);
+        else
+           cpx_->setContinuous(i);
+      }
+    }
+    else {
 #endif
+      clp_ = (lp == NULL) ? NULL :
+              dynamic_cast<OsiClpSolverInterface *>(lp);
+      assert(clp_);
+    }
     lowBound_ = -COIN_DBL_MAX;
     optimal_ = false;
     if (integerSolution_) {
@@ -74,6 +135,13 @@ namespace Bonmin {
     }
   }
 
+  OsiSolverInterface * 
+  SubMipSolver::solver(){
+         if(clp_ != NULL)
+           return clp_;
+         else
+           return cpx_;
+      }
 
  void 
  SubMipSolver::find_good_sol(double cutoff, int loglevel, double max_time){
@@ -86,42 +154,41 @@ namespace Bonmin {
         strategy_ = strat_default;
       }
       OsiBabSolver empty;
-      if (cbc_) delete cbc_;
-      cbc_ = new CbcModel(*clp_);
-      cbc_->solver()->setAuxiliaryInfo(&empty);
+      CbcModel cbc(*clp_);
+      cbc.solver()->setAuxiliaryInfo(&empty);
 
       //Change Cbc messages prefixes
-      strcpy(cbc_->messagesPointer()->source_,"OaCbc");
+      strcpy(cbc.messagesPointer()->source_,"OaCbc");
 
-      cbc_->setLogLevel(loglevel);
-      cbc_->solver()->messageHandler()->setLogLevel(0);
+      cbc.setLogLevel(loglevel);
+      cbc.solver()->messageHandler()->setLogLevel(0);
       clp_->resolve();
-      cbc_->setStrategy(*strategy_);
-      cbc_->setLogLevel(loglevel);
-      cbc_->solver()->messageHandler()->setLogLevel(0);
-      cbc_->setMaximumSeconds(max_time);
-      cbc_->setMaximumSolutions(1);
-      cbc_->setCutoff(cutoff);
+      cbc.setStrategy(*strategy_);
+      cbc.setLogLevel(loglevel);
+      cbc.solver()->messageHandler()->setLogLevel(0);
+      cbc.setMaximumSeconds(max_time);
+      cbc.setMaximumSolutions(1);
+      cbc.setCutoff(cutoff);
 
       
-      cbc_->branchAndBound();
-      lowBound_ = cbc_->getBestPossibleObjValue();
+      cbc.branchAndBound();
+      lowBound_ = cbc.getBestPossibleObjValue();
 
-      if (cbc_->isProvenOptimal() || cbc_->isProvenInfeasible())
+      if (cbc.isProvenOptimal() || cbc.isProvenInfeasible())
         optimal_ = true;
       else optimal_ = false;
 
-      if (cbc_->getSolutionCount()) {
+      if (cbc.getSolutionCount()) {
         if (!integerSolution_)
-          integerSolution_ = new double[lp_->getNumCols()];
-        CoinCopyN(cbc_->bestSolution(), lp_->getNumCols(), integerSolution_);
+          integerSolution_ = new double[clp_->getNumCols()];
+        CoinCopyN(cbc.bestSolution(), clp_->getNumCols(), integerSolution_);
       }
       else if (integerSolution_) {
         delete [] integerSolution_;
         integerSolution_ = NULL;
       }
-      nodeCount_ = cbc_->getNodeCount();
-      iterationCount_ = cbc_->getIterationCount();
+      nodeCount_ = cbc.getNodeCount();
+      iterationCount_ = cbc.getIterationCount();
 
       if(strat_default != NULL){
         delete strat_default;
@@ -134,6 +201,7 @@ namespace Bonmin {
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
 #else
+        cpx_->messageHandler()->setLogLevel(loglevel);
         cpx_->switchToMIP();
         CPXENVptr env = cpx_->getEnvironmentPtr();
         CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
@@ -143,31 +211,29 @@ namespace Bonmin {
 
 
         CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10000);
-        CPXsetintparam(env,CPX_PARAM_NODELIM, 100000);
-        CPXsetdblparam(env,CPX_PARAM_TILIM, max_time);
+        CPXsetintparam(env,CPX_PARAM_NODELIM, 1000000);
 
         nodeCount_ = 0;
         iterationCount_ = 0;
         int status = CPXmipopt(env,cpxlp);
         CHECK_CPX_STAT("mipopt",status)
-
+       
+    
         status = CPXgetbestobjval(env, cpxlp, &lowBound_);
         CHECK_CPX_STAT("bestobjvalue",status)
      
         int stat = CPXgetstat( env, cpxlp);
-        CHECK_CPX_STAT("getstat",status)
         optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
         nodeCount_ = CPXgetnodecnt(env , cpxlp);
         iterationCount_ = CPXgetmipitcnt(env , cpxlp);
 
-        CPXsetintparam(env, CPX_PARAM_INTSOLLIM, 1);
-        CPXsetintparam(env,CPX_PARAM_NODELIM, 1000);
-        while(stat == CPXMIP_NODE_LIM_INFEAS){
+        if(stat == CPXMIP_NODE_LIM_INFEAS){
+          CPXsetintparam(env, CPX_PARAM_INTSOLLIM, 1);
+          CPXsetintparam(env,CPX_PARAM_NODELIM, 2100000000);
            status = CPXmipopt(env,cpxlp);
            CHECK_CPX_STAT("mipopt",status)
 
            status = CPXgetstat( env, cpxlp);
-           CHECK_CPX_STAT("getstat",status)
            optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
            nodeCount_ = CPXgetnodecnt(env , cpxlp);
            iterationCount_ = CPXgetmipitcnt(env , cpxlp);
@@ -181,9 +247,9 @@ namespace Bonmin {
           nodeCount_ += CPXgetnodecnt(env, cpxlp);
           //iterationCount_ += CPXgetitcnt(env, cpxlp);
           if(!integerSolution_){
-            integerSolution_ = new double[lp_->getNumCols()];
+            integerSolution_ = new double[cpx_->getNumCols()];
           }
-          CPXgetmipx(env, cpxlp, integerSolution_, 0, lp_->getNumCols() -1);
+          CPXgetmipx(env, cpxlp, integerSolution_, 0, cpx_->getNumCols() -1);
           CHECK_CPX_STAT("getmipx",status)
        }
        else {
@@ -196,19 +262,9 @@ namespace Bonmin {
 #endif
     } 
     else {
-       
-      lp_->branchAndBound();
-
-      optimal_ = lp_->isProvenOptimal();
-      if (lp_->getFractionalIndices().size() == 0) {
-        if (!integerSolution_)
-          integerSolution_ = new double[lp_->getNumCols()];
-         CoinCopyN(lp_->getColSolution(), lp_->getNumCols() , integerSolution_);
-       }
-       else if (integerSolution_) {
-         delete [] integerSolution_;
-         integerSolution_ = NULL;
-       }
+        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
+            "performLocalSearch",
+            "OaDecompositionBase::SubMipSolver");
    }
   }
 
@@ -222,67 +278,53 @@ namespace Bonmin {
       strat_default->setupPreProcessing();
 
       OsiBabSolver empty;
-      if (cbc_) delete cbc_;
-      cbc_ = new CbcModel(*clp_);
-      cbc_->solver()->setAuxiliaryInfo(&empty);
+      CbcModel cbc(*clp_);
+      cbc.solver()->setAuxiliaryInfo(&empty);
 
       //Change Cbc messages prefixes
-      strcpy(cbc_->messagesPointer()->source_,"OaCbc");
+      strcpy(cbc.messagesPointer()->source_,"OaCbc");
 
-      cbc_->setLogLevel(loglevel);
-      cbc_->solver()->messageHandler()->setLogLevel(0);
+      cbc.setLogLevel(loglevel);
+      cbc.solver()->messageHandler()->setLogLevel(0);
       clp_->resolve();
-      cbc_->setStrategy(*strategy_);
-      cbc_->setLogLevel(loglevel);
-      cbc_->solver()->messageHandler()->setLogLevel(0);
-      cbc_->setMaximumSeconds(maxTime);
-      cbc_->setCutoff(cutoff);
+      cbc.setStrategy(*strategy_);
+      cbc.setLogLevel(loglevel);
+      cbc.solver()->messageHandler()->setLogLevel(0);
+      cbc.setMaximumSeconds(maxTime);
+      cbc.setCutoff(cutoff);
 
-      //cbc_->solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
-      cbc_->branchAndBound();
-      lowBound_ = cbc_->getBestPossibleObjValue();
+      //cbc.solver()->writeMpsNative("FP.mps", NULL, NULL, 1);
+      cbc.branchAndBound();
+      lowBound_ = cbc.getBestPossibleObjValue();
 
-      if (cbc_->isProvenOptimal() || cbc_->isProvenInfeasible())
+      if (cbc.isProvenOptimal() || cbc.isProvenInfeasible())
         optimal_ = true;
       else optimal_ = false;
 
-      if (cbc_->getSolutionCount()) {
+      if (cbc.getSolutionCount()) {
         if (!integerSolution_)
-          integerSolution_ = new double[lp_->getNumCols()];
-        CoinCopyN(cbc_->bestSolution(), lp_->getNumCols(), integerSolution_);
+          integerSolution_ = new double[clp_->getNumCols()];
+        CoinCopyN(cbc.bestSolution(), clp_->getNumCols(), integerSolution_);
       }
       else if (integerSolution_) {
         delete [] integerSolution_;
         integerSolution_ = NULL;
       }
-      nodeCount_ = cbc_->getNodeCount();
-      iterationCount_ = cbc_->getIterationCount();
+      nodeCount_ = cbc.getNodeCount();
+      iterationCount_ = cbc.getIterationCount();
       delete strat_default;
     }
-    else {
-      lp_->messageHandler()->setLogLevel(loglevel);
-#ifdef COIN_HAS_CPX
-      if (cpx_) {
-        CPXENVptr env = cpx_->getEnvironmentPtr();
-        CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
-        CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
-        //CpxModel = cpx_;
-      }
-      else
-#endif 
-     {
-        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
-            "performLocalSearch",
-            "OaDecompositionBase::SubMipSolver");
-    }
-
+    else 
 #ifdef COIN_HAS_CPX
     if (cpx_) {
+      cpx_->messageHandler()->setLogLevel(loglevel);
       cpx_->switchToMIP();
       //CpxModel = NULL;
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
+      CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
+      CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
       int status = CPXmipopt(env,cpxlp);
       CHECK_CPX_STAT("mipopt",status)
 
@@ -297,9 +339,9 @@ namespace Bonmin {
        
       if(!infeasible){
          if(!integerSolution_){
-           integerSolution_ = new double[lp_->getNumCols()];
+           integerSolution_ = new double[cpx_->getNumCols()];
          }
-         CPXgetmipx(env, cpxlp, integerSolution_, 0, lp_->getNumCols() -1);
+         CPXgetmipx(env, cpxlp, integerSolution_, 0, cpx_->getNumCols() -1);
          CHECK_CPX_STAT("getmipx",status)
       }
       else {
@@ -312,24 +354,10 @@ namespace Bonmin {
     }
     else {
 #endif
-    lp_->branchAndBound();
-
-   optimal_ = lp_->isProvenOptimal();
-
-
-      if (lp_->getFractionalIndices().size() == 0) {
-        if (!integerSolution_)
-          integerSolution_ = new double[lp_->getNumCols()];
-        CoinCopyN(lp_->getColSolution(), lp_->getNumCols() , integerSolution_);
+        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
+            "performLocalSearch",
+            "OaDecompositionBase::SubMipSolver");
       }
-      else if (integerSolution_) {
-        delete [] integerSolution_;
-        integerSolution_ = NULL;
-      }
-#ifdef COIN_HAS_CPX
-    }
-#endif
-  }
 }
 
    /** Assign a strategy. */
@@ -357,12 +385,34 @@ namespace Bonmin {
 
     roptions->AddBoundedIntegerOption("milp_log_level",
         "specify MILP solver log level.",
-        0,3,0,
+        0,4,0,
         "Set the level of output of the MILP subsolver in OA : "
         "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
                                      );
     roptions->setOptionExtraInfo("milp_log_level",64);
 
+    roptions->AddBoundedIntegerOption("cpx_parallel_strategy",
+                           "Set parallel to use with cplex.",
+                           -1, 1, 0,
+                           "(refer to CPLEX documentation)"
+                           );
+    roptions->setOptionExtraInfo("cpx_parallel_strategy",64);
+
+    roptions->AddLowerBoundedIntegerOption("number_cpx_threads",
+                           "Set number of threads to use with cplex.",
+                           0, 0,
+                           "number of threads used with cplex (refer to CPLEX documentation)"
+                           );
+    roptions->setOptionExtraInfo("number_cpx_threads",64);
+
+    
+    roptions->AddStringOption2("milp_strategy",
+        "Choose a strategy for MILPs.",
+        "find_good_sol",
+        "find_good_sol","Stop sub milps when a solution improving the incumbent is found",
+        "solve_to_optimality", "Solve MILPs to optimality",
+        ".");
+    roptions->setOptionExtraInfo("milp_strategy",64);
 
   }
 }/* Ends Bonmin namespace.*/
