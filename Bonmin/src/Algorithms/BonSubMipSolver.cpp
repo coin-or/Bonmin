@@ -95,6 +95,11 @@ namespace Bonmin {
 #ifdef COIN_HAS_CPX
      if(copy.cpx_ != NULL){
        cpx_ = new OsiCpxSolverInterface(*copy.cpx_);
+      int ival;
+      CPXgetintparam(copy.cpx_->getEnvironmentPtr(), CPX_PARAM_THREADS, &ival);
+      CPXsetintparam(cpx_->getEnvironmentPtr(), CPX_PARAM_THREADS, ival);
+      CPXgetintparam(copy.cpx_->getEnvironmentPtr(), CPX_PARAM_PARALLELMODE, &ival);
+      CPXsetintparam(cpx_->getEnvironmentPtr(), CPX_PARAM_PARALLELMODE, ival);
      }
 #endif
      if(copy.strategy_){
@@ -221,8 +226,10 @@ namespace Bonmin {
         CPXsetdblparam(env, CPX_PARAM_EPINT, 1e-08);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
 
+#if 0
       CPXsetintparam(env, CPX_PARAM_THREADS, 16);
       CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);
+#endif
 
         CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10000);
         CPXsetintparam(env,CPX_PARAM_NODELIM, 1000000);
@@ -341,8 +348,10 @@ namespace Bonmin {
       CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
       CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
       CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
+#if 0
       CPXsetintparam(env, CPX_PARAM_THREADS, 16);
       CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);
+#endif
       int status = CPXmipopt(env,cpxlp);
       CHECK_CPX_STAT("mipopt",status)
 
