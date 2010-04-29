@@ -11,13 +11,13 @@ public:
   /** Default constructor.*/
   vector(): std::vector<T>(){}
   /** Constructor with initialization.*/
-  vector(unsigned int n, const T& v): std::vector<T>(n,v){}
+  vector(size_t n, const T& v): std::vector<T>(n,v){}
   /** Copy constructor.*/
   vector(const vector<T>& other): std::vector<T>(other){}
   /** Copy constructor.*/
   vector(const std::vector<T>& other): std::vector<T>(other){}
   /** constructor with size.*/
-  vector(unsigned int n): std::vector<T>(n){}
+  vector(size_t n): std::vector<T>(n){}
   /** Assignment.*/
   vector<T>& operator=(const vector<T>& other){
      std::vector<T>::operator=(other);

@@ -363,8 +363,9 @@ namespace Bonmin {
       cpx_->switchToLP();
     }
     else {
-#endif
+#else
      {
+#endif
         throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
