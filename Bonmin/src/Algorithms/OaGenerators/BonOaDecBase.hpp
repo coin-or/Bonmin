@@ -47,12 +47,6 @@ namespace Bonmin
       ~solverManip();
       /** Restore solver. */
       void restore();
-
-#if 1
-      /** Clone the state of another solver (bounds, cutoff, basis).*/
-      void cloneOther(const OsiSolverInterface &si);
-#endif
-
       
       /** Get pointer to solver interface. */
       OsiSolverInterface * si()
