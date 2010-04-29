@@ -221,6 +221,8 @@ namespace Bonmin {
         CPXsetdblparam(env, CPX_PARAM_EPINT, 1e-08);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
 
+      CPXsetintparam(env, CPX_PARAM_THREADS, 16);
+      CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);
 
         CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10000);
         CPXsetintparam(env,CPX_PARAM_NODELIM, 1000000);
@@ -339,6 +341,8 @@ namespace Bonmin {
       CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
       CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
       CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
+      CPXsetintparam(env, CPX_PARAM_THREADS, 16);
+      CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);
       int status = CPXmipopt(env,cpxlp);
       CHECK_CPX_STAT("mipopt",status)
 
