@@ -280,6 +280,7 @@ namespace Bonmin {
 #ifdef COIN_HAS_CPX
     if (cpx_) {
       cpx_->switchToMIP();
+      cpx_->messageHandler()->setLogLevel(loglevel);
       //CpxModel = NULL;
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
