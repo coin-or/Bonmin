@@ -139,6 +139,8 @@ namespace Bonmin
         handler_->message(LOCAL_SEARCH_ABORT, messages_)
         <<subMip->nodeCount()<<subMip->iterationCount()<<CoinMessageEol;
     }
+    else
+      colsol = lp->getColSolution();
     int numberPasses = 0;
 
 #ifdef OA_DEBUG
