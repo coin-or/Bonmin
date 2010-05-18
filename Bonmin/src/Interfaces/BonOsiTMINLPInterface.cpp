@@ -374,6 +374,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     second_perc_for_cutoff_decr_(-0.05),
     messages_(),
     pretendFailIsInfeasible_(0),
+    pretendSucceededNext_(0),
     hasContinuedAfterNlpFailure_(false),
     numIterationSuspect_(-1),
     hasBeenOptimized_(false),
@@ -542,6 +543,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     second_perc_for_cutoff_decr_(source.second_perc_for_cutoff_decr_),
     messages_(),
     pretendFailIsInfeasible_(source.pretendFailIsInfeasible_),
+    pretendSucceededNext_(source.pretendSucceededNext_),
     hasContinuedAfterNlpFailure_(source.hasContinuedAfterNlpFailure_),
     numIterationSuspect_(source.numIterationSuspect_),
     hasBeenOptimized_(source.hasBeenOptimized_),
@@ -581,6 +583,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     else
       problem_to_optimize_ = GetRawPtr(problem_);
     pretendFailIsInfeasible_ = source.pretendFailIsInfeasible_;
+    pretendSucceededNext_ = source.pretendSucceededNext_;
 
     setAuxiliaryInfo(source.getAuxiliaryInfo());
     // Copy options from old application
@@ -712,6 +715,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
     numRetryInfeasibles_ = rhs.numRetryInfeasibles_;
     numRetryUnsolved_ = rhs.numRetryUnsolved_;
     pretendFailIsInfeasible_ = rhs.pretendFailIsInfeasible_;
+    pretendSucceededNext_ = rhs.pretendSucceededNext_;
     numIterationSuspect_ = rhs.numIterationSuspect_;
 
     hasBeenOptimized_ = rhs.hasBeenOptimized_;
@@ -835,13 +839,13 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
   }
   /** Save current optimum. */
   vector<double> point(getNumCols()*3+ getNumRows());
-  double bestBound = getObjValue();
+  double bestBound = (isProvenOptimal()) ? getObjValue() : DBL_MAX;
   CoinCopyN(getColSolution(),
       getNumCols(), point());
   CoinCopyN(getRowPrice(),
       2*getNumCols()+ getNumRows(),
       point() + getNumCols());
-
+  TNLPSolver::ReturnStatus savedStatus = optimizationStatus_;
   if(isProvenOptimal())
     messageHandler()->message(SOLUTION_FOUND,
         messages_)
@@ -877,6 +881,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
           2*getNumCols()+ getNumRows(),
           point() + getNumCols());
       bestBound = getObjValue();
+      savedStatus = optimizationStatus_;
     }
 
     messageHandler()->message(LOG_LINE, messages_)
@@ -943,10 +948,6 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
 
 
 
-  setColSolution(point());
-  setRowPrice(point() + getNumCols());
-  app_->enableWarmStart();
-
 
   if(dynamicCutOff_)
   {
@@ -961,7 +962,10 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
   }
      
 
-  optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_to_optimize_));
+  problem_->Set_x_sol(getNumCols(),point());
+  problem_->Set_dual_sol(point.size()-getNumCols(), point() + getNumCols());
+  problem_->set_obj_value(bestBound);
+  optimizationStatus_ = savedStatus;
   hasBeenOptimized_ = true;
 
   if(!exposeWarmStart_ && keepWarmStart) {
@@ -1058,6 +1062,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     delete ws_backup;
   }
   if(pretendFailIsInfeasible_) {
+    pretendSucceededNext_ = true;
     if(pretendFailIsInfeasible_ == 1) {
       messageHandler()->message(WARN_CONTINUING_ON_FAILURE,
           messages_)
@@ -2874,7 +2879,10 @@ OsiTMINLPInterface::resolve(const char * whereFrom)
 /// Are there a numerical difficulties?
 bool OsiTMINLPInterface::isAbandoned() const
 {
-  return (
+  if (pretendSucceededNext_)
+    return false;
+  pretendSucceededNext_ = false;
+  return ( 
         (optimizationStatus_==TNLPSolver::iterationLimit)||
         (optimizationStatus_==TNLPSolver::computationError)||
         (optimizationStatus_==TNLPSolver::illDefinedProblem)||

@@ -1204,6 +1204,9 @@ protected:
       will pretend that it is infeasible. If == 1 will care
       (i.e. record the fact issue messages to user), if ==2 don't care (somebody else will) */
   int pretendFailIsInfeasible_;
+
+  mutable int pretendSucceededNext_;
+
   /** did we ever continue optimization ignoring a failure. */
   bool hasContinuedAfterNlpFailure_;
   /** number iterations above which a problem is considered suspect (-1 is considered \f$+ \infty \f$).
