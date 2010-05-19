@@ -725,8 +725,23 @@ namespace Bonmin
       cg.frequency = 1;
       OaFeasibilityChecker * oa = new OaFeasibilityChecker(*this);
       oa->passInMessageHandler(messageHandler_);
+      oa->setReassignLpSolver(false);
       cg.cgl = oa;
       cg.id = "Outer Approximation feasibility check.";
+      cg.atSolution = false;
+      cg.normal = true;
+      cg.always = true;
+      cutGenerators_.push_back(cg);
+    }
+
+    {
+      CuttingMethod cg;
+      cg.frequency = 1;
+      OaFeasibilityChecker * oa = new OaFeasibilityChecker(*this);
+      oa->passInMessageHandler(messageHandler_);
+      oa->setReassignLpSolver(true);
+      cg.cgl = oa;
+      cg.id = "Outer Approximation strong branching solution check.";
       cg.atSolution = true;
       cg.normal = false;
       cutGenerators_.push_back(cg);

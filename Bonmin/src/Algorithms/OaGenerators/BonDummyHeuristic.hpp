@@ -41,6 +41,8 @@ namespace Bonmin
     }
     virtual void resetModel(CbcModel*)
     {}
+  virtual bool shouldHeurRun(int whereFrom){
+     return true;}
   private:
     /// Pointer to the Ipopt interface
     OsiTMINLPInterface * nlp_;

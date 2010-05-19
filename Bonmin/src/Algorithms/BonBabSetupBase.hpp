@@ -30,9 +30,11 @@ namespace Bonmin
       CglCutGenerator * cgl;
       bool atSolution;
       bool normal;
+      bool always;
       CuttingMethod():
           atSolution(false),
-          normal(true)
+          normal(true),
+          always(false)
       {}
 
       CuttingMethod(const CuttingMethod & other):
@@ -40,7 +42,8 @@ namespace Bonmin
           id(other.id),
           cgl(other.cgl),
           atSolution(other.atSolution),
-          normal(other.normal)
+          normal(other.normal),
+          always(other.always)
       {}
     };
     /** Type for heuristic method with its string identification. */

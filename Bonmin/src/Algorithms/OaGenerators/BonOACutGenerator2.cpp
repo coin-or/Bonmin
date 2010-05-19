@@ -83,7 +83,6 @@ namespace Bonmin
     bool milpFeasible = 1;
     bool feasible = 1;
 
-    if(subMip_){
     subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
         (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
     milpBound = std::max(milpBound, subMip_->lowBound());
@@ -100,9 +99,6 @@ namespace Bonmin
     {
       handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
     }
-    }
-    else
-      isInteger = true;
     int numberPasses = 0;
 
 #ifdef OA_DEBUG
@@ -127,7 +123,7 @@ namespace Bonmin
       int numberCutsBefore = cs.sizeRowCuts();
 
       //Fix the variable which have to be fixed, after having saved the bounds
-      const double * colsol = subMip_ == NULL ? lp->getColSolution():
+      const double * colsol = 
           subMip_->getLastSolution();
       branch_info.solution_ = colsol;
 
@@ -187,7 +183,7 @@ namespace Bonmin
       if (CoinCpuTime() - timeBegin_ > parameters_.maxLocalSearchTime_)
         break;
       //do we perform a new local search ?
-      if (feasible && !isInteger &&
+      if (feasible && 
           nLocalSearch_ < parameters_.maxLocalSearch_ &&
 	  numSols_ < parameters_.maxSols_) {
 

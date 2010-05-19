@@ -98,7 +98,6 @@ namespace Bonmin
     set_fp_objective(*lp, nlp_->getColSolution());
     lp->initialSolve();
     lp->setColUpper(numcols, cutoff);
-    if(subMip_){
     subMip_->setLpSolver(lpManip.si());
     subMip_->solve(DBL_MAX, parameters_.subMilpLogLevel_,
     //subMip_->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
@@ -113,9 +112,6 @@ namespace Bonmin
     else
       handler_->message(LOCAL_SEARCH_ABORT, messages_)
       <<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
-    }
-    else
-      colsol = lp->getColSolution();
     int numberPasses = 0;
 
 #ifdef OA_DEBUG

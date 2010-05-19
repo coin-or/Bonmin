@@ -211,6 +211,9 @@ private:
       handler_->setLogLevel(level);
     }
 
+    void setReassignLpSolver(bool v){
+      reassignLpsolver_ = v;
+    }
     void passInMessageHandler(CoinMessageHandler * handler);
   protected:
       void setupMipSolver(BabSetupBase &b, const std::string &prefix);
