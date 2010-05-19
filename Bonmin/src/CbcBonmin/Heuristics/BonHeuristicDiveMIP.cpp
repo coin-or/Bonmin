@@ -159,10 +159,8 @@ namespace Bonmin
 		      numberRows, nnz_jac_g,
 		      indexRow, indexCol, 0);
 
-    std::vector<int> sortedIndex(nnz_jac_g);
-    if(nnz_jac_g){
-      CoinIotaN(&sortedIndex[0], nnz_jac_g, 0);
-    }
+    vector<int> sortedIndex(nnz_jac_g);
+    CoinIotaN(sortedIndex(), nnz_jac_g, 0);
     MatComp c;
     c.iRow = indexRow;
     c.jCol = indexCol;
@@ -394,6 +392,7 @@ namespace Bonmin
         delete si;
       }
       delete handler;
+      delete [] gradient_f;
     }
 
 #if 0
