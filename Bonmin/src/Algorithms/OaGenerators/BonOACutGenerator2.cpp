@@ -83,6 +83,7 @@ namespace Bonmin
     bool milpFeasible = 1;
     bool feasible = 1;
 
+    if(subMip_){
     subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
         (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
     milpBound = std::max(milpBound, subMip_->lowBound());
@@ -99,6 +100,9 @@ namespace Bonmin
     {
       handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
     }
+    }
+    else
+      isInteger = true;
     int numberPasses = 0;
 
 #ifdef OA_DEBUG

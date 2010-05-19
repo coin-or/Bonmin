@@ -618,7 +618,8 @@ namespace Bonmin
       options_->SetStringValue(o_name.c_str(),"no", true, true);
       o_name = prefix + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
-      intParam_[BabLogLevel] = 0;
+      o_name = prefix + "bb_log_level";
+      options_->SetIntegerValue(o_name.c_str(), 0, true, true);
     }
     else if (algo == B_IFP) {
       std::string o_name = prefix_ + "oa_decomposition";

@@ -392,7 +392,6 @@ namespace Bonmin
         delete si;
       }
       delete handler;
-      delete [] gradient_f;
     }
 
 #if 0

@@ -332,6 +332,17 @@ namespace Bonmin
     IpBlasDcopy(n, x_sol, 1, x_sol_(), 1);
   }
 
+  /** Set the contiuous dual solution */
+  void TMINLP2TNLP::Set_dual_sol(Index n, const Number* dual_sol)
+  {
+    assert(n == num_variables() *2 + num_constraints());
+    if (duals_sol_.empty()) {
+      duals_sol_.resize(n);
+    }
+    assert(n == (int) duals_sol_.size());
+    IpBlasDcopy(n, dual_sol, 1, duals_sol_(), 1);
+  }
+
   /** Change the type of the variable */
   void TMINLP2TNLP::SetVariableType(Index n, TMINLP::VariableType type)
   {

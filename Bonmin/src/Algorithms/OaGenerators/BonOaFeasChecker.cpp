@@ -78,7 +78,7 @@ namespace Bonmin
                              colsol:NULL;
       if(cut_count_ <= maximum_oa_cuts_ && type_ == OA)
         nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
-                                    parameter().global_);
+                                    true);
       else {//if (type_ == Benders)
         nlp_->getBendersCut(cs, parameter().global_);
       }

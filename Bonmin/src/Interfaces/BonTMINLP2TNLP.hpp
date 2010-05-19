@@ -215,6 +215,9 @@ namespace Bonmin
     /** Set the contiuous solution */
     void Set_x_sol(Index n, const Number* x_sol);
 
+    /** Set the contiuous dual solution */
+    void Set_dual_sol(Index n, const Number* dual_sol);
+
     /** Change the type of the variable */
     void SetVariableType(Index n, TMINLP::VariableType type);
     //@}
