@@ -532,9 +532,9 @@ namespace Bonmin
     use_warm_start_in_cache_ = false;
     //for(int i = 0 ; i < n ; i++) x[i] = 0;
     lam = new real [n+m];
-#ifdef InitializeAll
+    //#ifdef InitializeAll // This should be initialized
     for (int i = 0 ; i < n+m ; i++) lam[i] = 0.;
-#endif
+    //#endif
     //bounds
     bounds = new real [2*n + 2*m];
 
@@ -592,7 +592,7 @@ namespace Bonmin
 
     ws = new real[maxWk];
     lws = new fint[maxiWk];
-#ifdef InitializeAll
+#ifdef InitializeAll // ToDo: This shouldn't have to be initialized
     for (int i = 0 ; i < maxWk ; i++) ws[i] = 0;
     for (int i = 0 ; i < maxiWk ; i++) lws[i] = 0;
 #endif
@@ -617,14 +617,14 @@ namespace Bonmin
 
     istat = new fint[14];
     rstat = new real[7];
-#ifdef InitializeAll
+    //#ifdef InitializeAll ToDo: He will do that later
     for (int i=0; i<14; i++) {
       istat[0] = 43;
     }
     for (int i=0; i<7; i++) {
       rstat[0] = 42.;
     }
-#endif
+    //#endif
 
     fmin = -1e100;
     Ipopt::Index bufy;
