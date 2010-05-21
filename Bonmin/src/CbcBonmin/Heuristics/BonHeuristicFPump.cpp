@@ -149,8 +149,10 @@ namespace Bonmin
 
     // exit if the current NLP solution is infeasible
     // infeasibility is determined by the NLP solver
-    if(minlp->optimization_status() != SUCCESS)
+    if(minlp->optimization_status() != SUCCESS){
+      delete nlp;
       return returnCode;
+    }
 
     // Get solution array for heuristic solution
     double* newSolution = new double [numberColumns];
@@ -396,6 +398,7 @@ namespace Bonmin
     delete [] newSolution;
     delete [] new_g_sol;
     delete [] copy_newSolution;
+    delete nlp;
 
     return returnCode;
   }
