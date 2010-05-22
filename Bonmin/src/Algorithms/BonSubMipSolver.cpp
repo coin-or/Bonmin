@@ -67,6 +67,8 @@ namespace Bonmin {
       << "See the manual for configuring CPLEX\n";
       throw -1;
 #endif
+    }
+
       b.options()->GetEnumValue("milp_strategy",ivalue,prefix);
       if(ivalue == 0){
         milp_strat_ = FindGoodSolution;
@@ -76,10 +78,7 @@ namespace Bonmin {
       }
 
       b.options()->GetNumericValue("allowable_fraction_gap", gap_tol_, prefix);
-    }
 
-
-   b.options()->GetEnumValue("milp_solver",ivalue,prefix);
 
   }
   SubMipSolver::SubMipSolver(const SubMipSolver &copy):
@@ -339,15 +338,14 @@ namespace Bonmin {
     else 
 #ifdef COIN_HAS_CPX
     if (cpx_) {
-      cpx_->messageHandler()->setLogLevel(loglevel);
       cpx_->switchToMIP();
-      //CpxModel = NULL;
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
       CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
       CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
       CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
+      cpx_->messageHandler()->setLogLevel(loglevel);
 #if 0
       CPXsetintparam(env, CPX_PARAM_THREADS, 16);
       CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);

@@ -155,6 +155,27 @@ namespace Bonmin
         IpoptCalculatedQuantities* ip_cq);
     //@}
 
+    virtual bool get_variables_linearity(Index n, LinearityType* var_types)
+    {
+      return tnlp_->get_variables_linearity(n, var_types);;
+    }
+
+    /** overload this method to return the constraint linearity.
+     * array should be alocated with length at least n. (default implementation
+     *  just return false and does not fill the array).*/
+    virtual bool get_constraints_linearity(Index m, LinearityType* const_types)
+    {
+      int m2 = m;
+      if(use_cutoff_constraint_) {
+        m2--;
+        const_types[m2] = Ipopt::TNLP::NON_LINEAR;
+      } 
+      if(use_local_branching_constraint_) {
+        m2--;
+        const_types[m2] = Ipopt::TNLP::LINEAR;
+      }
+      return tnlp_->get_constraints_linearity(m2, const_types);
+    }
     /** @name Scaling of the objective function */
     //@{
     void setObjectiveScaling(double value)

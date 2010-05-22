@@ -55,6 +55,7 @@
 #include "BonHeuristicDiveVectorLength.hpp"
 #include "BonHeuristicDiveMIPFractional.hpp"
 #include "BonHeuristicDiveMIPVectorLength.hpp"
+//#include "BonInnerApproximation.hpp"
 namespace Bonmin
 {
   BonminSetup::BonminSetup(const CoinMessageHandler * handler):BabSetupBase(handler),algo_(Dummy)
@@ -204,7 +205,7 @@ namespace Bonmin
 #endif
     roptions->AddLowerBoundedIntegerOption("cover_cuts",
         "Frequency (in terms of nodes) for generating cover cuts in branch-and-cut",
-        -100,-5,
+        -100,0,
         "If k > 0, cuts are generated every k nodes, if -99 < k < 0 cuts are generated every -k nodes but "
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
         "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
@@ -823,6 +824,17 @@ namespace Bonmin
       h.id = "DiveMIPVectorLength";
       heuristics_.push_back(h);
     }
+
+#if 0
+    if(true){
+      InnerApproximation * inner = new InnerApproximation(this);
+      HeuristicMethod h;
+      h.heuristic = inner;
+      h.id = "InnerApproximation";
+      heuristics_.push_back(h);
+    }
+#endif
+      
 
   }
 

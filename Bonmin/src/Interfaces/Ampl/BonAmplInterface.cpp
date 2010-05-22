@@ -116,14 +116,14 @@ namespace Bonmin
     if (colRead.readFile()) {
       OsiNameVec colNames;
       colRead.copyNames(colNames);
-      setColNames(colNames, 0, colNames.size(), 0);
+      setColNames(colNames, 0, static_cast<int>(colNames.size()), 0);
     }
 
     NamesReader rowRead(probName, ".row");
     if (rowRead.readFile()) {
       OsiNameVec rowNames;
       rowRead.copyNames(rowNames);
-      setRowNames(rowNames, 0, rowNames.size(), 0);
+      setRowNames(rowNames, 0, static_cast<int>(rowNames.size()), 0);
     }
 
 

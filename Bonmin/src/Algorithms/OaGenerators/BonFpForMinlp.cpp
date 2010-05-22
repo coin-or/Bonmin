@@ -45,7 +45,9 @@ namespace Bonmin
  }
 
   MinlpFeasPump::~MinlpFeasPump()
-  {}
+  {
+    delete subMip_;
+  }
 
   /// virutal method to decide if local search is performed
   bool
@@ -73,8 +75,10 @@ namespace Bonmin
     CoinCopyN(nlp_->getColUpper(), nlp_->getNumCols(), savedColUpper());
 
 
+    subMip_->setLpSolver(lpManip.si());
     OsiSolverInterface * lp = subMip_->solver();
 
+    assert(lp);
     vector<int> indices;
     for(int i = 0; i < numcols ; i++) {
       lp->setObjCoeff(i,0);
@@ -98,7 +102,6 @@ namespace Bonmin
     set_fp_objective(*lp, nlp_->getColSolution());
     lp->initialSolve();
     lp->setColUpper(numcols, cutoff);
-    subMip_->setLpSolver(lpManip.si());
     subMip_->solve(DBL_MAX, parameters_.subMilpLogLevel_,
     //subMip_->optimize(DBL_MAX, parameters_.subMilpLogLevel_,
         (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()) /* time limit */);
@@ -196,8 +199,10 @@ namespace Bonmin
       numberCutsBefore = cs.sizeRowCuts();
      
       //check time
-      if (CoinCpuTime() - timeBegin_ > parameters_.maxLocalSearchTime_)
+      if (CoinCpuTime() - timeBegin_ > parameters_.maxLocalSearchTime_){
+        colsol = NULL;
         break;
+      }
       //do we perform a new local search ?
       if (nLocalSearch_ < parameters_.maxLocalSearch_ &&
           numSols_ < parameters_.maxSols_) {
@@ -221,6 +226,9 @@ namespace Bonmin
         <<colsol[nlp_->getNumCols()]<<CoinMessageEol;
          
       }/** endif localSearch*/
+      else {
+        colsol = NULL;
+      }
     }
     if(colsol || ! milpOptimal)
       return -DBL_MAX;
