@@ -180,19 +180,6 @@ register_general_options
 static void register_OA_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-	//Hassan options
-        roptions->SetRegisteringCategory("Initial Approximations descriptions", RegisteredOptions::UndocumentedCategory);
-	roptions->AddStringOption2("initial_outer_description",
-		"Do we add all Outer Approximation constraints defining the initial Outer Approximation description of the MINLP. See the number_approximations_initial_outer option for fixing the number of approximation points",
-		"no",
-		"yes","Generate the description",
-		"no","Do not generate the description",
-		"");
-	roptions->AddUpperBoundedIntegerOption("number_approximations_initial_outer",
-		"Number of Outer Approximation points needed for generating the initial Outer Approximation description, maximum value = 500, default value = 50",
-		500,
-		50,
-		"");
 	//
 
   roptions->SetRegisteringCategory("Outer Approximations strengthening", RegisteredOptions::UndocumentedCategory);
@@ -2479,66 +2466,6 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
       addObjectiveFunction(si, x);
     }
   }
-  
-
-
-// Hassan OA initial description
-  int OuterDesc = 0;
-  app_->options()->GetEnumValue("initial_outer_description", OuterDesc, app_->prefix());
-  if(OuterDesc==0) {
-	  OsiCuts cs;
-
-	  double * p = CoinCopyOfArray(colLower, getNumCols());
-	  double * pp = CoinCopyOfArray(colUpper, getNumCols());
-          for(int i = 0 ; i < n ; i++){
-            p[i] = std::max(p[i], x[i] -1e1);
-            pp[i] = std::min(pp[i], x[i] + 1e1);
-          }
-	  //double * xprod = NULL;
-	  //CoinZeroN(xprod, getNumCols());
-	  //double * x_prod = NULL;
-	  //CoinZeroN(x_prod, getNumCols());
-
-	  int nbAp = 50;
-	  app_->options()->GetIntegerValue("number_approximations_initial_outer", nbAp, app_->prefix());
-
-	  int nbG = 1;// Number of generated points
-
-          std::vector<double> step(n);
-          for(unsigned int i = 0 ; i < step.size() ; i++){
-            step[i] = (pp[i] - p[i])/nbAp;
-          }
-
-	  getOuterApproximation(cs, p, getObj, NULL, true);// Generate Tangents at lower bounds of all variables
-	  for(int j = 1; j<= nbAp; j++) {
-		  for(int i = 0; i< n ; i++) {
-			  p[i]+= step[i];
-		  }
-#if 0
-                  printf("Point to linearize:\n");
-		  for(int i = 0; i< n; i++) {
-                    printf("x[%i] = %g, ",i,p[i]);
-                  }
-                  printf("\n");
-#endif
-		  getOuterApproximation(cs, p, getObj, NULL, true);// Generate Tangents at current point
-
-		  //for(int i = 0; i<getNumCols(); i++) {
-		  // xprod[i] = x[i]*x[i];
-		  //}
-		  //for(int i = 0; i<getNumCols(); i++) {
-		  // x_prod[i] = x_[i]*x_[i];
-		  //}
-		  //if((x_*x_ - x*x)>=0.005) {
-		  // file<<nbG<<" "<<x_<<"\n"; //
-		   nbG++;
-		  // x = x_;
-		  //}
-	  }
-	  si.applyCuts(cs);
-  }
-  // END
-  //si.writeMpsNative("OA.mps",NULL, NULL, 1);
 
 }
 
@@ -3028,12 +2955,6 @@ OsiTMINLPInterface::extractInterfaceParams()
    int oaCgLogLevel = 0;
    app_->options()->GetIntegerValue("oa_cuts_log_level", oaCgLogLevel,app_->prefix());
    oaHandler_->setLogLevel(oaCgLogLevel); 
-    //Hassan options
-	//int OuterDesc = 0;
-	//app_->options()->GetEnumValue("OuterDescription", OuterDesc, app_->prefix());
-	//int nbAppPts = 50;
- //   app_->options()->GetIntegerValue("nbAppPts", nbAppPts, app_->prefix());
-	//
 	
     int exposeWs = false;
     app_->options()->GetEnumValue("warm_start", exposeWs, app_->prefix());
