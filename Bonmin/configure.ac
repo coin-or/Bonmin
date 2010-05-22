@@ -209,6 +209,7 @@ AC_CONFIG_FILES([Makefile
                  src/Algorithms/OaGenerators/Makefile
                  src/CbcBonmin/Heuristics/Makefile
                  examples/OptionDocGen/Makefile
+                 experimental/Separable/Makefile
                  test/Makefile
                  examples/CppExample/Makefile])
 
