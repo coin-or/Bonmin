@@ -47,6 +47,15 @@ Bonmin/experimental/Bcp/BM_lp.cpp -text
 Bonmin/experimental/Bcp/BM_lp_branch.cpp -text
 Bonmin/experimental/Bcp/BM_tm.cpp -text
 Bonmin/experimental/Bcp/ampl_bcp.patch -text
+Bonmin/experimental/Separable/BonHeuristicInnerApproximation.cpp -text
+Bonmin/experimental/Separable/BonHeuristicInnerApproximation.hpp -text
+Bonmin/experimental/Separable/BonOuterDescription.cpp -text
+Bonmin/experimental/Separable/BonOuterDescription.hpp -text
+Bonmin/experimental/Separable/Makefile.am -text
+Bonmin/experimental/Separable/Makefile.in -text
+Bonmin/experimental/Separable/Sepa.cpp -text
+Bonmin/experimental/Separable/SepaSetup.cpp -text
+Bonmin/experimental/Separable/SepaSetup.hpp -text
 Bonmin/inc/config_bonmin.h.in -text
 Bonmin/src/Algorithms/Ampl/BonAmplSetup.cpp -text
 Bonmin/src/Algorithms/Ampl/BonAmplSetup.hpp -text

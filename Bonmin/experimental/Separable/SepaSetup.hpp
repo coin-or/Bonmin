@@ -1,0 +1,70 @@
+// (C) Copyright CNRS and others 2010
+// All Rights Reserved.
+// This code is published under the Common Public License.
+//
+// Authors :
+// Pierre Bonami, Université de la Méditérannée
+// Hassan Hijazi, Orange Labs
+//
+// Date : 05/22/2010
+
+#ifndef SepaSetup_H
+#define SepaSetup_H
+#include "BonminSetup.hpp"
+namespace Bonmin
+{
+  /* Bonmin algorithm setup. */
+  class SepaSetup : public BonminSetup
+  {
+  public:
+    /** Default constructor. */
+    SepaSetup(const CoinMessageHandler * handler = NULL);
+    /** Copy constructor. */
+    SepaSetup(const BonminSetup & other);
+
+    /** Copy but uses an other nlp.*/
+    SepaSetup(const BonminSetup &setup,
+                OsiTMINLPInterface &nlp);
+
+    /** Copy but uses another nlp and algorithm.*/
+    SepaSetup(const BonminSetup &setup,
+                OsiTMINLPInterface &nlp,
+                const std::string & prefix);
+    /** virtual copy constructor. */
+    virtual BabSetupBase * clone() const
+    {
+      return new SepaSetup(*this);
+    }
+    /** Make a copy with solver replace by one passed .*/
+    //    virtual BabSetupBase *clone(OsiTMINLPInterface&nlp)const{
+    //      return new BonminSetup(*this, nlp);
+    //    }
+    /** Make a copy with solver replace by one passed .*/
+    SepaSetup *clone(OsiTMINLPInterface&nlp)const{
+      return new SepaSetup(*this, nlp);
+    }
+    /** Make a copy but take options with different prefix.*/
+    SepaSetup *clone(OsiTMINLPInterface &nlp, const std::string & prefix)const{
+      return new SepaSetup(*this, nlp, prefix);
+    }
+    virtual ~BonminSetup()
+    {}
+    /** @name Methods to instantiate: Registering and retrieving options and initializing everything. */
+    /** @{ */
+    /** Register all the options for this algorithm instance.*/
+    virtual void registerOptions();
+    /** @} */
+    /** Register all bonmin type executable options.*/
+    static void registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
+    /** Initialize, read options and create appropriate bonmin setup.*/
+    void initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver = true);
+    /** Initialize, read options and create appropriate bonmin setup.*/
+    void initialize(const OsiTMINLPInterface& nlpSi, bool createContinuousSolver = true);
+  protected:
+    /** Initialize a branch-and-cut with some OA.*/
+    void initializeSepa(bool createContinuousSolver = false);
+  };
+}/** end namespace Bonmin*/
+
+#endif
+
