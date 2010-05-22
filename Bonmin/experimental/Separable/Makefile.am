@@ -40,6 +40,7 @@ LIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Apps` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
@@ -56,6 +57,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Apps/AmplSolver` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
@@ -88,7 +90,9 @@ endif
 sepa_SOURCES = Sepa.cpp \
                 SepaSetup.cpp SepaSetup.hpp \
                 BonHeuristicInnerApproximation.hpp \
-                BonHeuristicInnerApproximation.cpp
+                BonHeuristicInnerApproximation.cpp \
+                BonOuterDescription.cpp \
+                BonOuterDescription.hpp
 
 sepa_LDADD = \
         ../../src/CbcBonmin/libbonminampl.la \

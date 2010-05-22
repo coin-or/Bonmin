@@ -40,14 +40,18 @@ using namespace std;
 namespace Bonmin {
 
 HeuristicInnerApproximation::HeuristicInnerApproximation(BonminSetup * setup) :
-	CbcHeuristic(), setup_(setup), howOften_(100), mip_(NULL) {
-	Initialize(setup->options());
+	CbcHeuristic(), setup_(setup), howOften_(100), mip_(NULL),
+        nbAp_(50) {
+	Initialize(setup);
 }
 
 HeuristicInnerApproximation::HeuristicInnerApproximation(
 		const HeuristicInnerApproximation &copy) :
-	CbcHeuristic(copy), setup_(copy.setup_), howOften_(copy.howOften_), mip_(
-			new SubMipSolver(*copy.mip_)) {
+	CbcHeuristic(copy), 
+        setup_(copy.setup_), 
+        howOften_(copy.howOften_), 
+        mip_(new SubMipSolver(*copy.mip_)),
+        nbAp_(copy.nbAp_) {
 }
 
 HeuristicInnerApproximation &
@@ -56,6 +60,7 @@ HeuristicInnerApproximation::operator=(const HeuristicInnerApproximation& rhs) {
 		CbcHeuristic::operator=(rhs);
 		setup_ = rhs.setup_;
 		howOften_ = rhs.howOften_;
+                nbAp_ = rhs.nbAp_;
 		delete mip_;
 		if (rhs.mip_)
 			mip_ = new SubMipSolver(*rhs.mip_);
@@ -74,7 +79,12 @@ void HeuristicInnerApproximation::registerOptions(Ipopt::SmartPtr<
 }
 
 void
-HeuristicInnerApproximation::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options) {
+HeuristicInnerApproximation::Initialize(BonminSetup * b) {
+
+   delete mip_;
+   mip_ = new SubMipSolver (*b, b->prefix());
+   b->options()->GetIntegerValue("number_approximations_initial_outer",
+   		nbAp_, b->prefix());
 }
 
 HeuristicInnerApproximation::~HeuristicInnerApproximation() {
@@ -102,7 +112,6 @@ nlp = dynamic_cast<OsiTMINLPInterface *>(setup_->nonlinearSolver()->clone());
 TMINLP2TNLP* minlp = nlp->problem();
 // set tolerances
 double integerTolerance = model_->getDblParam(CbcModel::CbcIntegerTolerance);
-double primalTolerance = 1.0e-6;
 
 int numberColumns;
 int numberRows;
@@ -113,10 +122,6 @@ minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 		nnz_h_lag, index_style);
 
 const Bonmin::TMINLP::VariableType* variableType = minlp->var_types();
-
-adjustPrimalTolerance(minlp, primalTolerance);
-
-assert(isNlpFeasible(minlp, primalTolerance));
 
 const double* x_sol = minlp->x_sol();
 
@@ -143,7 +148,7 @@ si->messageHandler()->setLogLevel(2);
 #ifdef DEBUG_BON_HEURISTIC
 cout << "Loading problem into si\n";
 #endif
-nlp->extractInnerApproximation(*si, newSolution, true); // Call the function construncting the inner approximation description 
+extractInnerApproximation(*nlp, *si, newSolution, true); // Call the function construncting the inner approximation description 
 #ifdef DEBUG_BON_HEURISTIC
 cout << "problem loaded\n";
 cout << "**** Running optimization ****\n";
@@ -272,7 +277,7 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
 
 	int n, m, nnz_jac_g, nnz_h_lag;
 	TNLP::IndexStyleEnum index_style;
-        TNLP * problem = si.problem(); 
+        TMINLP2TNLP * problem = si.problem(); 
 	problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
 
 
@@ -280,7 +285,7 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
 	double lb = 0;
 	double ub = 0;
 
-	double infty = getInfinity();
+	double infty = si.getInfinity();
 
 	lb = -infty; // we only compute <= constraints
 
@@ -288,13 +293,13 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
 	double g2 = 0;
 	double diff = 0;
 	double a = 0;
-	problem_->eval_gi(getNumCols(), x, 1, ind, g);
-	problem_->eval_gi(getNumCols(), x2, 1, ind, g2);
+	problem->eval_gi(n, x, 1, ind, g);
+	problem->eval_gi(n, x2, 1, ind, g2);
         vector<int> jCol(n);
         int nnz;
-        problem_->eval_grad_gi(n, x2, 0, ind, nnz, jCol, NULL);
+        problem->eval_grad_gi(n, x2, 0, ind, nnz, jCol(), NULL);
         vector<double> jValues(nnz);
-        problem_->eval_grad_gi(n, x2, 0, ind, nnz, NULL, jValues);
+        problem->eval_grad_gi(n, x2, 0, ind, nnz, NULL, jValues());
 
 	bool add = false;
 	for (int i = 0; i < nnz; i++) {
@@ -329,14 +334,14 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    int nnz_jac_g;
    int nnz_h_lag;
    TNLP::IndexStyleEnum index_style;
-     TNLP * problem = si.problem(); 
+   TMINLP2TNLP * problem = nlp.problem(); 
    //Get problem information
    problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
    
-   vector<int> jRow(nnz_jac_h);
-   vector<int> jCol(nnz_jac_h);
-   vector<double> values(nnz_jac_h);
-   problem->eval_jac_g(n, NULL, 0, m, nnz_jac, jRow(), jCol(), NULL);
+   vector<int> jRow(nnz_jac_g);
+   vector<int> jCol(nnz_jac_g);
+   vector<double> jValues(nnz_jac_g);
+   problem->eval_jac_g(n, NULL, 0, m, nnz_jac_g, jRow(), jCol(), NULL);
    if(index_style == Ipopt::TNLP::FORTRAN_STYLE)//put C-style
    {
      for(int i = 0 ; i < nnz_jac_g ; i++){
@@ -347,7 +352,7 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    
    //get Jacobian
    problem->eval_jac_g(n, x, 1, m, nnz_jac_g, NULL, NULL,
-   		jValues_);
+   		jValues());
    
    vector<double> g(m);
    problem->eval_g(n, x, 1, m, g());
@@ -361,9 +366,11 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    const double * colUpper = nlp.getColUpper();
    assert(m == nlp.getNumRows());
    double infty = si.getInfinity();
-   double nlp_infty = nlp.getIninity();
+   double nlp_infty = nlp.getInfinity();
+   vector<Ipopt::TNLP::LinearityType>  constTypes(m);
+   problem->get_constraints_linearity(m, constTypes());
    for (int i = 0; i < m; i++) {
-   	if (constTypes_[i] == TNLP::NON_LINEAR) {
+   	if (constTypes[i] == TNLP::NON_LINEAR) {
    		nonLinear[numNonLinear++] = i;
    	}
    }
@@ -371,7 +378,7 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    vector<double> rowUp(m - numNonLinear);
    int ind = 0;
    for (int i = 0; i < m; i++) {
-   	if (constTypes_[i] != TNLP::NON_LINEAR) {
+   	if (constTypes[i] != TNLP::NON_LINEAR) {
    		if (rowLower[i] > -nlp_infty) {
    			//   printf("Lower %g ", rowLower[i]);
    			rowLow[ind] = (rowLower[i]);
@@ -387,27 +394,28 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    
    }
    
-   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
+   CoinPackedMatrix mat(true, jRow(), jCol(), jValues(), nnz_jac_g);
    mat.setDimensions(m, n); // In case matrix was empty, this should be enough
    
    //remove non-linear constraints
    mat.deleteRows(numNonLinear, nonLinear());
    
-   int numcols = getNumCols();
+   int numcols = nlp.getNumCols();
    vector<double> obj(numcols);
    for (int i = 0; i < numcols; i++)
    	obj[i] = 0.;
    
-   si.loadProblem(mat, getColLower(), getColUpper(), obj(), rowLow(), rowUp());
-   const Bonmin::TMINLP::VariableType* variableType = problem_->var_types();
-   for (int i = 0; i < getNumCols(); i++) {
+   si.loadProblem(mat, nlp.getColLower(), nlp.getColUpper(), 
+                  obj(), rowLow(), rowUp());
+   const Bonmin::TMINLP::VariableType* variableType = problem->var_types();
+   for (int i = 0; i < n; i++) {
    	if ((variableType[i] == TMINLP::BINARY) || (variableType[i]
    			== TMINLP::INTEGER))
    		si.setInteger(i);
    }
    if (getObj) {
    	bool addObjVar = false;
-   	if (problem_->hasLinearObjective()) {
+   	if (problem->hasLinearObjective()) {
    		double zero;
    		vector<double> x0(n, 0.);
    		problem->eval_f(n, x0(), 1, zero);
@@ -420,24 +428,20 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    	}
    
    	if (addObjVar) {
-   		addObjectiveFunction(si, x);
+   		nlp.addObjectiveFunction(si, x);
    	}
    }
    
    // Hassan IA initial description
    int InnerDesc = 1;
-   app_->options()->GetEnumValue("initial_outer_description", InnerDesc,
-   		app_->prefix());
-   if (InnerDesc == 0) {
+   if (InnerDesc == 1) {
    	OsiCuts cs;
    
    	double * p = CoinCopyOfArray(colLower, n);
    	double * pp = CoinCopyOfArray(colLower, n);
    	double * up = CoinCopyOfArray(colUpper, n);
    
-   	int nbAp = 50;
-   	app_->options()->GetIntegerValue("number_approximations_initial_outer",
-   			nbAp, app_->prefix());
+   	const int& nbAp = nbAp_;
    	std::vector<int> nbG(m, 0);// Number of generated points for each nonlinear constraint
    
    	std::vector<double> step(n);
@@ -473,12 +477,12 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    		problem->eval_g(n, pp, 1, m, g_pp());
    		double diff = 0;
    		int varInd = 0;
-   		for (int i = 0; (i < m && constTypes_[i] == TNLP::NON_LINEAR); i++) {
+   		for (int i = 0; (i < m && constTypes[i] == TNLP::NON_LINEAR); i++) {
    			if (varInd == n - 1)
    				varInd = 0;
    			diff = std::abs(g_p[i] - g_pp[i]);
    			if (nbG[i] < nbAp - 1 && std::abs(g_p[i] - g_pp[i]) >= 0.005) {
-   				getMyInnerApproximation(cs, i, p, pp);// Generate a chord connecting the two points
+   				getMyInnerApproximation(nlp, cs, i, p, pp);// Generate a chord connecting the two points
    				p[varInd] = pp[varInd];
    				nbG[i]++;
    			}

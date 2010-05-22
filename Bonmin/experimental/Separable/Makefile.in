@@ -65,7 +65,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_sepa_OBJECTS = Sepa.$(OBJEXT) SepaSetup.$(OBJEXT) \
-	BonHeuristicInnerApproximation.$(OBJEXT)
+	BonHeuristicInnerApproximation.$(OBJEXT) \
+	BonOuterDescription.$(OBJEXT)
 sepa_OBJECTS = $(am_sepa_OBJECTS)
 am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
 am__DEPENDENCIES_2 =
@@ -355,7 +356,8 @@ IPOPTLIBS = \
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Apps` \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Ampl` \
@@ -369,11 +371,11 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	$(IPOPTSRCDIR)/src/LinAlg` -I`$(CYGPATH_W) \
 	$(IPOPTSRCDIR)/src/Apps/AmplSolver` -I`$(CYGPATH_W) \
 	$(OSISRCDIR)/src` -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` -I`$(CYGPATH_W) \
-	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) \
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(CBCSRCDIR)/examples` -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(CLPOBJDIR)/inc` -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) \
 	$(OSISRCDIR)/src/OsiCbc` -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglProbing` -I`$(CYGPATH_W) \
@@ -392,7 +394,9 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 sepa_SOURCES = Sepa.cpp \
                 SepaSetup.cpp SepaSetup.hpp \
                 BonHeuristicInnerApproximation.hpp \
-                BonHeuristicInnerApproximation.cpp
+                BonHeuristicInnerApproximation.cpp \
+                BonOuterDescription.cpp \
+                BonOuterDescription.hpp
 
 sepa_LDADD = \
         ../../src/CbcBonmin/libbonminampl.la \
@@ -486,6 +490,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicInnerApproximation.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOuterDescription.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sepa.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SepaSetup.Po@am__quote@
 

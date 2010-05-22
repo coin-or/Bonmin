@@ -11,8 +11,9 @@
 #include "BonminConfig.h"
 #include "OsiClpSolverInterface.hpp"
 
-#include "BonBonminSetup.hpp"
+#include "SepaSetup.hpp"
 #include "BonHeuristicInnerApproximation.hpp"
+#include "BonOuterDescription.hpp"
 namespace Bonmin
 {
   SepaSetup::SepaSetup(const CoinMessageHandler * handler):BonminSetup(handler)
@@ -32,8 +33,8 @@ namespace Bonmin
                            const std::string &prefix):
     BonminSetup(other, nlp, prefix)
   {
-   Alorithm algo = getAlgorithm();
-    if (algo_ == B_OA)
+   Algorithm algo = getAlgorithm();
+    if (algo == B_OA)
       initializeSepa();
   }
 
@@ -45,7 +46,7 @@ namespace Bonmin
         roptions->SetRegisteringCategory("Initial Approximations descriptions", RegisteredOptions::UndocumentedCategory);
 	roptions->AddStringOption2("initial_outer_description",
 		"Do we add all Outer Approximation constraints defining the initial Outer Approximation description of the MINLP. See the number_approximations_initial_outer option for fixing the number of approximation points",
-		"no",
+		"yes",
 		"yes","Generate the description",
 		"no","Do not generate the description",
 		"");
@@ -68,24 +69,31 @@ namespace Bonmin
   SepaSetup::initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/)
   {
     BonminSetup::initialize(tminlp, createContinuousSolver);
-    if (algo_ == B_OA)
+    if (getAlgorithm() == B_OA)
       initializeSepa();
   }
 
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
   void
-  BonminSetup::initialize(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/)
+  SepaSetup::initialize(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/)
   {
     BonminSetup::initialize(nlpSi, createContinuousSolver);
-    if (algo_ == B_OA)
+    if (getAlgorithm() == B_OA)
       initializeSepa();
   }
 
-  BonminSetup::initializeSepa(bool createContinuousSolver /*= false*/)
+  void SepaSetup::initializeSepa()
   {
 
-    if(true){
-      HeuristicInnerApproximation * inner = new InnerApproximation(this);
+    int doOuter;
+    options()->GetEnumValue("initial_outer_description", doOuter, prefix_.c_str());
+    if(doOuter)
+      addOuterDescription(*nonlinearSolver(), *continuousSolver(), nonlinearSolver()->getColSolution(), false);
+    int doInner;
+    
+    options()->GetEnumValue("heuristic_inner_approximation", doInner, prefix_.c_str());
+    if(doInner){
+      HeuristicInnerApproximation * inner = new HeuristicInnerApproximation(this);
       HeuristicMethod h;
       h.heuristic = inner;
       h.id = "InnerApproximation";

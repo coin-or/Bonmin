@@ -46,21 +46,12 @@ public:
 		setModel(model);
 	}
 
-	/** Change setup used for heuristic.*/
-	virtual void setSetup(BonminSetup * setup) {
-		setup_ = setup;
-		Initialize(setup_->options());
-	}
-
 	/// Performs heuristic
 	virtual int solution(double &solutionValue, double *betterSolution);
 
 	/** Register the options common to all local search based heuristics.*/
 	static void registerOptions(
 			Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
-
-	/** Initiaize using passed options.*/
-	void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
 
 protected:
 	/** Setup to use for local searches (will make copies).*/
@@ -72,6 +63,9 @@ private:
 
 	/// A subsolver for MIP
 	SubMipSolver * mip_;
+
+        /// Number of Approximation points
+        int nbAp_;
 
         void extractInnerApproximation(OsiTMINLPInterface & nlp, OsiSolverInterface &si,
                                        const double * x, bool getObj);
