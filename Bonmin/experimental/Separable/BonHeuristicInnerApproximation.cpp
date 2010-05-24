@@ -75,6 +75,7 @@ void HeuristicInnerApproximation::registerOptions(Ipopt::SmartPtr<
 	roptions->AddStringOption2("heuristic_inner_approximation",
 			"if yes runs the InnerApproximation heuristic", "yes", "no",
 			"don't run it", "yes", "runs the heuristic", "");
+
         roptions->setOptionExtraInfo("heuristic_inner_approximation", 63);
 }
 
