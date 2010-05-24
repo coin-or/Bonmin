@@ -1,3 +1,4 @@
+
 // (C) Copyright CNRS and others 2010
 // All Rights Reserved.
 // This code is published under the Common Public License.
@@ -8,7 +9,7 @@
 //
 // Date : 05/22/2010
 
-
+//Test MySVN
 #include "BonHeuristicInnerApproximation.hpp"
 #include "CoinHelperFunctions.hpp"
 #include "CbcModel.hpp"
