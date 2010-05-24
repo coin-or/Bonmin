@@ -48,8 +48,8 @@ namespace Bonmin
 	roptions->AddStringOption2("initial_outer_description",
 		"Do we add all Outer Approximation constraints defining the initial Outer Approximation description of the MINLP. See the number_approximations_initial_outer option for fixing the number of approximation points",
 		"yes",
-		"yes","Generate the description",
 		"no","Do not generate the description",
+		"yes","Generate the description",
 		"");
 	roptions->AddUpperBoundedIntegerOption("number_approximations_initial_outer",
 		"Number of Outer Approximation points needed for generating the initial Outer Approximation description, maximum value = 500, default value = 50",

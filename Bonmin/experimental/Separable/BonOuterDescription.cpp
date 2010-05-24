@@ -74,13 +74,12 @@ void getMyOuterApproximation(
 	problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
 
         double g_i = 0;
-	problem->eval_gi(n, x, 1, m, g_i);
+	problem->eval_gi(n, x, 1, ind, g_i);
         vector<int> jCol(n);
         int nnz;
-        problem->eval_grad_gi(n, x2, 0, ind, nnz, jCol(), NULL);
+        problem->eval_grad_gi(n, x, 0, ind, nnz, jCol(), NULL);
         vector<double> jValues(nnz);
-        problem->eval_grad_gi(n, x2, 0, ind, nnz, NULL, jValues());
-
+        problem->eval_grad_gi(n, x, 0, ind, nnz, NULL, jValues());
 	//As jacobian is stored by cols fill OsiCuts with cuts
 	CoinPackedVector cut;
 	double lb;
@@ -115,6 +114,7 @@ void getMyOuterApproximation(
         double veryTiny = 1e-20;
 
 	for (int i = 0; i < nnz; i++) {
+	  if(index_style == Ipopt::TNLP::FORTRAN_STYLE) jCol[i]--;
 	  const int &colIdx = jCol[i];
 	//"clean" coefficient
 	if (cleanNnz(jValues[i], colLower[colIdx], colUpper[colIdx],
@@ -153,6 +153,7 @@ void getMyOuterApproximation(
 		newCut.setLb(lb);
 		newCut.setUb(ub);
 		newCut.setRow(cut);
+		//newCut.print();
 		cs.insert(newCut);
 	}
 }
@@ -181,7 +182,8 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 		double * p = CoinCopyOfArray(nlp.getColLower(), n);
 		double * pp = CoinCopyOfArray(nlp.getColLower(), n);
 		double * up = CoinCopyOfArray(nlp.getColUpper(), n);
-		int nbAp = 50;
+		int nbAp = 10;
+		//b->options()->GetIntegerValue("number_approximations_initial_outer",nbAp, b->prefix());
 		std::vector<int> nbG(m, 0);// Number of generated points for each nonlinear constraint
 
 		std::vector<double> step(n);
@@ -215,7 +217,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 				pp[i] += step[i];
 			}
 
-		}
+		
 		problem->eval_g(n, p, 1, m, g_p());
 		problem->eval_g(n, pp, 1, m, g_pp());
 		double diff = 0;
@@ -233,10 +235,12 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 			}
 			varInd++;
 		}
+		}
 		for (int i = 0; i < m ; i++) {
                         if(constTypes[i] != TNLP::NON_LINEAR) continue;
 			getMyOuterApproximation(nlp, cs, i, up, 0, NULL, 10000, true);// Generate Tangents at current point
 		}
+		
 		si.applyCuts(cs);
 		delete [] p;
 		delete [] pp;
