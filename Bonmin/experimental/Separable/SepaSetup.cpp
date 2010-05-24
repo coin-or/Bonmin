@@ -41,6 +41,7 @@ namespace Bonmin
   void SepaSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
      BonminSetup::registerAllOptions(roptions);
+
      HeuristicInnerApproximation::registerOptions(roptions);
 
         roptions->SetRegisteringCategory("Initial Approximations descriptions", RegisteredOptions::UndocumentedCategory);
