@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
   bonmin.roptions()->writeLatexHtmlDoc(of, Bonmin::RegisteredOptions::FilterCategory);
   of.close();
 
-  of.open("latex_table.tex");
+  of.open("options_table.tex");
   bonmin.roptions()->writeLatexOptionsTable(of, Bonmin::RegisteredOptions::BonminCategory);
   of.close();
 

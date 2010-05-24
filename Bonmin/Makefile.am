@@ -16,7 +16,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = src/Interfaces \
 	  src/Algorithms \
 	  src/CbcBonmin \
-	  src/Apps 
+	  src/Apps
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is

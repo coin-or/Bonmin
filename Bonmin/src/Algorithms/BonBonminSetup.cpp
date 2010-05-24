@@ -631,6 +631,8 @@ namespace Bonmin
       options_->SetNumericValue(o_name.c_str(),DBL_MAX, true, true);
       o_name = prefix_ + "nlp_solve_frequency";
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
+      o_name = prefix_ + "fp_pass_infeasible";
+      options_->SetStringValue(o_name.c_str(), "yes", true, true);
       //o_name = prefix_ + "cutoff_decr";
       //options_->SetNumericValue(o_name.c_str(), 1e-02, true, true);
       intParam_[BabLogLevel] = 0;
