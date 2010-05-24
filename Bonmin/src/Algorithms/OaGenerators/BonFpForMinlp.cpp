@@ -42,6 +42,7 @@ namespace Bonmin
     std::min(b.getDoubleParameter(BabSetupBase::MaxTime), oaTime);
     if(parameter().maxSols_ > b.getIntParameter(BabSetupBase::MaxSolutions))
       parameter().maxSols_ = b.getIntParameter(BabSetupBase::MaxSolutions);
+    b.options()->GetEnumValue("fp_pass_infeasible", passBound_, prefix);
  }
 
   MinlpFeasPump::~MinlpFeasPump()
@@ -230,7 +231,8 @@ namespace Bonmin
         colsol = NULL;
       }
     }
-    if(colsol || ! milpOptimal)
+     //return -DBL_MAX;
+    if(!passBound_ || colsol || ! milpOptimal)
       return -DBL_MAX;
     else{
       handler_->message(OASUCCESS, messages_)<<"FP"<<CoinCpuTime() - timeBegin_ 
@@ -245,6 +247,10 @@ namespace Bonmin
   {
     roptions->SetRegisteringCategory("Options for feasibility pump", RegisteredOptions::BonminCategory);
 
+    roptions->AddStringOption2("fp_pass_infeasible", "Say wether fp should claim to converge or not",
+                               "no",
+                               "no", "When master MILP is infeasible just bail out (don't stop all algorithm. This is the option for using in B-Hyb.",
+                               "yes", "Claim convergence, numericaly dangerous","");
     roptions->AddBoundedIntegerOption("fp_log_level",
         "specify FP iterations log level.",
         0,2,1,

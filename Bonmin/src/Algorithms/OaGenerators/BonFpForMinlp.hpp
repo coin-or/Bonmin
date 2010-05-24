@@ -21,7 +21,8 @@ namespace Bonmin{
     MinlpFeasPump(const MinlpFeasPump &copy)
         :
         OaDecompositionBase(copy),
-        subMip_(new SubMipSolver(*copy.subMip_))
+        subMip_(new SubMipSolver(*copy.subMip_)),
+        passBound_(copy.passBound_)
     {}
     /// Destructor
     ~MinlpFeasPump();
@@ -49,6 +50,8 @@ namespace Bonmin{
     
   private:
     SubMipSolver * subMip_;
+    /** Wether or not to pass bound to master algorithm.*/
+    int passBound_;
   };
 
 }/* End Namespace.*/
