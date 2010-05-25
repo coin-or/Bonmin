@@ -32,7 +32,7 @@ namespace Bonmin {
 
 /** Adds an outer description of problem to linear formulation.*/
 void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
-		const double * x, bool getObj);
+		const double * x, int nbAp, bool getObj);
 
 }
 #endif

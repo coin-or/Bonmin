@@ -87,9 +87,12 @@ namespace Bonmin
   {
 
     int doOuter;
+    int nbAp = 10;
     options()->GetEnumValue("initial_outer_description", doOuter, prefix_.c_str());
+    options()->GetIntegerValue("number_approximations_initial_outer",
+       		nbAp, prefix_.c_str());
     if(doOuter)
-      addOuterDescription(*nonlinearSolver(), *continuousSolver(), nonlinearSolver()->getColSolution(), false);
+      addOuterDescription(*nonlinearSolver(), *continuousSolver(), nonlinearSolver()->getColSolution(), nbAp, false);
     int doInner;
     
     options()->GetEnumValue("heuristic_inner_approximation", doInner, prefix_.c_str());

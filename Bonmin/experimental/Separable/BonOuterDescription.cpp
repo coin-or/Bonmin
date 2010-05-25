@@ -159,7 +159,7 @@ void getMyOuterApproximation(
 }
 
 void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
-		const double * x, bool getObj) {
+		const double * x, int nbAp, bool getObj) {
 	int n;
 	int m;
 	int nnz_jac_g;
@@ -182,7 +182,6 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 		double * p = CoinCopyOfArray(nlp.getColLower(), n);
 		double * pp = CoinCopyOfArray(nlp.getColLower(), n);
 		double * up = CoinCopyOfArray(nlp.getColUpper(), n);
-		int nbAp = 10;
 		//b->options()->GetIntegerValue("number_approximations_initial_outer",nbAp, b->prefix());
 		std::vector<int> nbG(m, 0);// Number of generated points for each nonlinear constraint
 
