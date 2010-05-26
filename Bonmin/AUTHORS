@@ -1,7 +1,5 @@
  
 
-Initial authors of the code and documentation:
-
  Pierre Bonami, project manager (IBM),
  John J. Forrest (IBM Copr.),
  Carl Laird, (Carnegie Mellon University),
@@ -9,15 +7,10 @@ Initial authors of the code and documentation:
  Jon Lee (IBM Copr.)
  Francois Margot (Carnegie Mellon University)
  Andreas Waechter (IBM Copr.)
-are the authors and contributors to this code. 
-
-Contributors:
- Claudia D'amborsio (Universita di Bologna):
-    Code to handle two objective functions.
- Pietro Belotti (Carnegie Mellon University)
-    Author of the Couenne code and the interface for Couenne and Bonmin.
- Stefan Vigerske (Humboldt-University)
-    Found and fixed many bugs when developping the GAMSlink for Bonmin.
+ Claudia D'amborsio (Universita di Bologna, various improvement for non-convex problems).
+ Pietro Belotti (Lehigh).
+ Stefan Vigerske (Humboldt-University, found and fixed many bugs when developping the GAMSlink for Bonmin)
+ Hassan Hijazi (Orange Labs, experimental code for separable problems + various improvements)
   
 
 We would also like to acknoweldge  <br>
