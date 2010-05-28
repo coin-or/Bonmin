@@ -68,7 +68,7 @@ namespace Bonmin
     double lastPeriodicLog = CoinCpuTime();
 
     //const int numcols = nlp_->getNumCols();
-
+    double gap_tol = this->parameter().gap_tol_;
 
     bool isInteger = false;
 
@@ -106,7 +106,8 @@ namespace Bonmin
 #endif
     double * nlpSol = NULL;
     double ub = cutoff;
-    while (isInteger && feasible ) {
+    double gap = 1;
+    while (isInteger && feasible) {
       numberPasses++;
       //after a prescribed elapsed time give some information to user
       double time = CoinCpuTime();
@@ -182,12 +183,32 @@ namespace Bonmin
       //check time
       if (CoinCpuTime() - timeBegin_ > parameters_.maxLocalSearchTime_)
         break;
+      
+      if(ub!=0)
+    	  gap = (ub - milpBound)/ub;
+      else
+		  gap = -milpBound/(1e-10);
+      if (gap < gap_tol){
+		 milpBound = 1e50;
+		 feasible = 0;
+		 handler_->message(OASUCCESS, messages_)<<"OA finished due to gap tolerance"<<CoinCpuTime() - timeBegin_ 
+		 <<ub<<CoinMessageEol;
+	   }
       //do we perform a new local search ?
       if (feasible && 
           nLocalSearch_ < parameters_.maxLocalSearch_ &&
 	  numSols_ < parameters_.maxSols_) {
 
-
+	  if(ub!=0)
+		  gap = (ub - milpBound)/ub;
+	  else
+		  gap = -milpBound/(1e-10);
+	  if (gap < gap_tol){
+		 milpBound = 1e50;
+		 feasible = 0;
+		 handler_->message(OASUCCESS, messages_)<<"OA finished due to gap tolerance"<<CoinCpuTime() - timeBegin_ 
+		 <<ub<<CoinMessageEol;
+	   }
         nLocalSearch_++;
 
         subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
@@ -224,16 +245,16 @@ namespace Bonmin
         else {
           milpOptimal = 0;
         }
-
         if (milpBound < cutoff)
-          handler_->message(UPDATE_LB, messages_)<<milpBound<<CoinCpuTime() - timeBegin_<<CoinMessageEol;
-        else {
-          milpBound = 1e50;
-          feasible = 0;
-          handler_->message(OASUCCESS, messages_)<<"OA"<<CoinCpuTime() - timeBegin_ 
-          <<ub<<CoinMessageEol;
-        }
+		  handler_->message(UPDATE_LB, messages_)<<milpBound<<CoinCpuTime() - timeBegin_<<CoinMessageEol;
+		else {
+		  milpBound = 1e50;
+		  feasible = 0;
+		  handler_->message(OASUCCESS, messages_)<<"OA"<<CoinCpuTime() - timeBegin_ 
+		  <<ub<<CoinMessageEol;
+		}
       }
+      
     }
 
 #ifdef OA_DEBUG

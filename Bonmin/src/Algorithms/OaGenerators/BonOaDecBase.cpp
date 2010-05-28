@@ -55,7 +55,7 @@ namespace Bonmin {
     int logLevel;
     b.options()->GetIntegerValue("oa_log_level",logLevel,b.prefix());
     b.options()->GetNumericValue("oa_log_frequency",parameters_.logFrequency_,b.prefix());
-
+    b.options()->GetNumericValue("allowable_fraction_gap", parameters_.gap_tol_, b.prefix());
     handler_ -> setLogLevel(logLevel);
     b.options()->GetIntegerValue("solution_limit", parameters_.maxSols_,b.prefix());
 
@@ -102,6 +102,7 @@ namespace Bonmin {
       subMilpLogLevel_(0),
       maxSols_(INT_MAX),
       logFrequency_(1000.),
+      gap_tol_(1e-05),
       strategy_(NULL)
   {}
 
@@ -118,6 +119,7 @@ namespace Bonmin {
       addOnlyViolated_(other.addOnlyViolated_),
       cbcCutoffIncrement_(other.cbcCutoffIncrement_),
       cbcIntegerTolerance_(other.cbcIntegerTolerance_),
+      gap_tol_(other.gap_tol_),
       maxLocalSearch_(other.maxLocalSearch_),
       maxLocalSearchTime_(other.maxLocalSearchTime_),
       subMilpLogLevel_(other.subMilpLogLevel_),

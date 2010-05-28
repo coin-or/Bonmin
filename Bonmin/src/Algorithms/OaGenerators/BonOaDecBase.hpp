@@ -154,7 +154,9 @@ namespace Bonmin
       /// cutoff min increase (has to be intialized trhough Cbc)
       double cbcCutoffIncrement_;
       /// integer tolerance (has to be the same as Cbc's)
-      double cbcIntegerTolerance_;
+      double cbcIntegerTolerance_; 
+      /** setting for gap tolerance.*/
+      double gap_tol_;
       ///Total max number of local searches
       int maxLocalSearch_;
       /// maximum time for local searches
@@ -165,7 +167,8 @@ namespace Bonmin
       int maxSols_;
       /** Frequency of log. */
       double logFrequency_;
-
+     
+      
       /** Constructor with default values */
       Parameters();
 
@@ -259,7 +262,7 @@ private:
     double timeBegin_;
     /** number of solutions found by OA_decomposition.*/
     mutable int numSols_;
-
+    
     /** Parameters.*/
     Parameters parameters_;
 

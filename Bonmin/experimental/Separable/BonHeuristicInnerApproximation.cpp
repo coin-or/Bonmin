@@ -84,7 +84,7 @@ void
 HeuristicInnerApproximation::Initialize(BonminSetup * b) {
 
    delete mip_;
-   mip_ = new SubMipSolver (*b, b->prefix());
+   mip_ = new SubMipSolver (*b, "oa_decomposition");
    b->options()->GetIntegerValue("number_approximations_initial_outer",
    		nbAp_, b->prefix());
 }
