@@ -39,16 +39,21 @@ namespace Bonmin {
       lowBound_(-DBL_MAX),
       optimal_(false),
       integerSolution_(NULL),
-      strategy_(NULL)
+      strategy_(NULL),
+      ownClp_(false)
   {
    int ivalue;
    b.options()->GetEnumValue("milp_solver",ivalue,prefix);
    if (ivalue <= 0) {//uses cbc
      strategy_ = new CbcStrategyDefault;
+     clp_ = new OsiClpSolverInterface;
+     ownClp_ = true;
    }
    else if (ivalue == 1) {
      CbcStrategyChooseCuts strategy(b, prefix);
      strategy_  = new CbcStrategyChooseCuts(b, prefix);
+     clp_ = new OsiClpSolverInterface;
+     ownClp_ = true;
    }
    else if (ivalue == 2) {
 #ifdef COIN_HAS_CPX
@@ -89,7 +94,8 @@ namespace Bonmin {
       integerSolution_(NULL),
       strategy_(NULL),
       milp_strat_(copy.milp_strat_),
-      gap_tol_(copy.gap_tol_)
+      gap_tol_(copy.gap_tol_),
+      ownClp_(copy.ownClp_)
   {
 #ifdef COIN_HAS_CPX
      if(copy.cpx_ != NULL){
@@ -101,6 +107,10 @@ namespace Bonmin {
       CPXsetintparam(cpx_->getEnvironmentPtr(), CPX_PARAM_PARALLELMODE, ival);
      }
 #endif
+     if(copy.clp_ != NULL){
+       if(ownClp_) clp_ = new OsiClpSolverInterface(*copy.clp_);
+       else clp_ = copy.clp_;
+     }
      if(copy.strategy_){
         strategy_ = dynamic_cast<CbcStrategyDefault *>(copy.strategy_->clone());
         assert(strategy_);
@@ -112,6 +122,7 @@ namespace Bonmin {
     if (integerSolution_) delete [] integerSolution_;
     #ifdef COIN_HAS_CPX
     if(cpx_) delete cpx_;
+    if(ownClp_) delete clp_;
     #endif
   }
 
@@ -133,6 +144,8 @@ namespace Bonmin {
     }
     else {
 #endif
+      if(ownClp_) delete clp_;
+      ownClp_ = false;
       clp_ = (lp == NULL) ? NULL :
               dynamic_cast<OsiClpSolverInterface *>(lp);
       assert(clp_);

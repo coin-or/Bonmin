@@ -55,6 +55,7 @@
 #include "BonHeuristicDiveVectorLength.hpp"
 #include "BonHeuristicDiveMIPFractional.hpp"
 #include "BonHeuristicDiveMIPVectorLength.hpp"
+#include "BonMilpRounding.hpp"
 //#include "BonInnerApproximation.hpp"
 namespace Bonmin
 {
@@ -121,6 +122,7 @@ namespace Bonmin
     LocalSolverBasedHeuristic::registerOptions(roptions);
     FixAndSolveHeuristic::registerOptions(roptions);
     DummyPump::registerOptions(roptions);
+    MilpRounding::registerOptions(roptions);
     PumpForMinlp::registerOptions(roptions);
     HeuristicRINS::registerOptions(roptions);
     HeuristicLocalBranching::registerOptions(roptions);
@@ -574,6 +576,16 @@ namespace Bonmin
       HeuristicMethod h;
       h.heuristic = pump;
       h.id = "Pump for MINLP";
+      heuristics_.push_back(h);
+    }
+
+    Index doHeuristicMilpRounding = false;
+    options()->GetEnumValue("MILP_rounding_heuristic",doHeuristicMilpRounding,prefix_.c_str());
+    if(doHeuristicMilpRounding){
+      MilpRounding * round = new MilpRounding(this);
+      HeuristicMethod h;
+      h.heuristic = round;
+      h.id = "MILP Rounding";
       heuristics_.push_back(h);
     }
   }
