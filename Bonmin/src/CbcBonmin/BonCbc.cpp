@@ -253,10 +253,15 @@ namespace Bonmin
         {
           int start = starts[i];
           int length = starts[i + 1] - start;
+#ifdef DO_IT_NWAY
+          printf("setting nway object\n"),
+          objects[i] = new CbcNWay(&model_, length, &indices[start],
+              i);
+#else
           objects[i] = new CbcSOS(&model_, length, &indices[start],
               &weights[start], i, types[i]);
-
-          objects[i]->setPriority(10);
+#endif
+          objects[i]->setPriority(1);
           if (hasPriorities && sosPriorities && sosPriorities[i]) {
             objects[i]->setPriority(sosPriorities[i]);
           }
