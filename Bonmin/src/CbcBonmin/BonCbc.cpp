@@ -257,11 +257,12 @@ namespace Bonmin
           printf("setting nway object\n"),
           objects[i] = new CbcNWay(&model_, length, &indices[start],
               i);
+          objects[i]->setPriority(1);
 #else
           objects[i] = new CbcSOS(&model_, length, &indices[start],
               &weights[start], i, types[i]);
+          objects[i]->setPriority(10);
 #endif
-          objects[i]->setPriority(1);
           if (hasPriorities && sosPriorities && sosPriorities[i]) {
             objects[i]->setPriority(sosPriorities[i]);
           }
