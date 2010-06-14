@@ -206,6 +206,7 @@ namespace Bonmin
          }
       }
 
+#if 0
       // Get dual multipliers and build gradient of the lagrangean
       const double * duals = nlp->getRowPrice() + 2 *n;
       vector<double> grad(n, 0); 
@@ -226,9 +227,10 @@ namespace Bonmin
          //if(fabs(objective[i]) < 1e-4) objective[i] = 0;
          else objective[i] = 0;
       }
-
       std::copy(objective.begin(), objective.end(), std::ostream_iterator<double>(std::cout, " "));
       std::cout<<std::endl;
+#endif
+
       // load the problem to OSI
       OsiSolverInterface *si = mip_->solver();
       assert(si != NULL);
