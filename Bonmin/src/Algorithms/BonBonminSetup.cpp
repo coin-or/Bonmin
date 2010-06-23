@@ -728,7 +728,7 @@ namespace Bonmin
       cg.cgl = oa;
       cg.id = "Outer Approximation feasibility check.";
       cg.atSolution = true;
-      cg.normal = false;
+      cg.normal = true;
       cutGenerators_.push_back(cg);
     }
 

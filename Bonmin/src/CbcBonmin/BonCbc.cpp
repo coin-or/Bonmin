@@ -150,6 +150,8 @@ namespace Bonmin
         oa->assignLpInterface(model_.solver());
         model_.addCutGenerator(i->cgl,i->frequency,i->id.c_str(), i->normal,
                                i->atSolution);
+      if (oa && oa->reassignLpsolver())
+        model_.cutGenerators()[model_.numberCutGenerators() - 1]->setMustCallAgain(true);
     }
 
     for (BabSetupBase::HeuristicMethods::iterator i = s.heuristics().begin() ;

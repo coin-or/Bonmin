@@ -456,7 +456,7 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
   }
 
   //  Reset the two solvers
-  if (leaveSiUnchanged_)
+  if (1 || leaveSiUnchanged_)
     lpManip->restore();
   delete lpManip;
 
