@@ -214,7 +214,7 @@ namespace Bonmin
     else {
       const Ipopt::SmartPtr<Ipopt::SolveStatistics>  stats = app_->Statistics();
       if (IsValid(stats)) {
-        return stats->TotalCPUTime();
+        return stats->TotalCpuTime();
       }
       else {
         printf("TODO: No statistics available from Ipopt in Bonmin::IpoptSolver::CPUTime\n");
