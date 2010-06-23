@@ -100,7 +100,7 @@ namespace Bonmin {
 #ifdef DEBUG_BON_HEURISTIC_RINS
       std::cout<<"cutoff = "<<model_->getCutoff()<<std::endl;
 #endif
-      r_val = doLocalSearch(nlp, newSolution, objectiveValue, model_->getCutoff());
+      r_val = doLocalSearch(nlp, newSolution, objectiveValue, model_->getCutoff(), "rins.");
 #ifdef DEBUG_BON_HEURISTIC_RINS
       std::cout<<"executed RINS "<<r_val<<std::endl;
 #endif
