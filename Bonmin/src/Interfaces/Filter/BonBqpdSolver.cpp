@@ -138,6 +138,9 @@ namespace Bonmin
   Ipopt::SmartPtr <TNLPSolver>
   BqpdSolver::clone()
   {
+#ifdef TIME_BQPD
+    times().create -= CoinCpuTime();
+#endif
     Ipopt::SmartPtr<BqpdSolver> retval = new BqpdSolver(true);
     *retval->options_ = *options_; // Copy the options
     retval->roptions_ = roptions_; // only copy pointers of registered options
@@ -147,6 +150,9 @@ namespace Bonmin
     retval->kmax_ipt_ = kmax_ipt_;
     retval->mlp_ipt_ = mlp_ipt_;
     retval->default_log_level_ = default_log_level_;
+#ifdef TIME_BQPD
+    times().create += CoinCpuTime();
+#endif
     return GetRawPtr(retval);
   }
 
@@ -203,7 +209,14 @@ namespace Bonmin
       cached_ = new cachedInfo(tqp, options_, kmax_ipt_, mlp_ipt_,
 			       &fillin_factor_);
     }
-    return callOptimizer();
+#ifdef TIME_BQPD
+    times().solve -= CoinCpuTime();
+#endif
+    TNLPSolver::ReturnStatus r_val = callOptimizer();
+#ifdef TIME_BQPD
+    times().solve += CoinCpuTime();
+#endif
+    return r_val;
   }
 
 /// Solves a problem expresses as a TNLP
@@ -225,7 +238,14 @@ namespace Bonmin
     }
 
     cached_->use_warm_start_in_cache_ = true;  // Trying...
-    return callOptimizer();
+#ifdef TIME_BQPD
+    times().resolve -= CoinCpuTime();
+#endif
+    TNLPSolver::ReturnStatus r_val = callOptimizer();
+#ifdef TIME_BQPD
+    times().resolve += CoinCpuTime();
+#endif
+    return r_val;
   }
 
   void
@@ -380,6 +400,9 @@ namespace Bonmin
   TNLPSolver::ReturnStatus
   BqpdSolver::callOptimizer()
   {
+#ifdef TIME_BQPD
+    times().numsolve++;
+#endif
     cached_->optimize();
 
     TNLPSolver::ReturnStatus optimizationStatus = TNLPSolver::exception;
@@ -438,6 +461,9 @@ namespace Bonmin
   bool
   BqpdSolver::cachedInfo::markHotStart()
   {
+#ifdef TIME_BQPD
+    times_.warm_start -= CoinCpuTime();
+#endif
     haveHotStart_ = true;
     irh1 = F77_FUNC(bqpdc,BQPDC).irh1;
     na = F77_FUNC(bqpdc,BQPDC).na;
@@ -518,6 +544,9 @@ namespace Bonmin
     wsHot = CoinCopyOfArray(ws,mxws);
     lwsHot = CoinCopyOfArray(lws,mxlws);
     infoHot[0] = info[0];
+#ifdef TIME_BQPD
+    times_.warm_start += CoinCpuTime();
+#endif
 
     return true;
   }

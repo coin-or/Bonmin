@@ -38,7 +38,15 @@ namespace Bonmin
   }
 
   QpBranchingSolver::~QpBranchingSolver ()
-  {}
+  {
+#ifdef TIME_BQPD
+     printf("QPBRANCH Timings for %i sbs\n", times_.numsolve);
+     printf("QPBRANCH Creating  : %g\n", times_.create);
+     printf("QPBRANCH Solving : %g\n", times_.solve);
+     printf("QPBRANCH Warming  : %g\n", times_.warm_start);
+     printf("QPBRANCH Resolving : %g\n", times_.resolve);
+#endif
+  }
 
   void QpBranchingSolver::
   markHotStart(OsiTMINLPInterface* tminlp_interface)
@@ -51,20 +59,20 @@ namespace Bonmin
     FilterSolver* filter_solver =
       dynamic_cast<FilterSolver*> (tminlp_interface->solver());
     if (filter_solver) {
-      SmartPtr<BqpdSolver> qp_solver_ =
+      SmartPtr<BqpdSolver> qp_solver =
 	new BqpdSolver(RegOptions(), Options(), Jnlst(), tminlp_interface->prefix());
 #if 1
       // Solve the QP with the original bounds and set the hot start
       // information
       TNLPSolver::ReturnStatus retstatus;
-      retstatus = qp_solver_->OptimizeTNLP(GetRawPtr(branching_tqp_));
+      retstatus = qp_solver->OptimizeTNLP(GetRawPtr(branching_tqp_));
       if (retstatus == TNLPSolver::solvedOptimal ||
 	  retstatus == TNLPSolver::solvedOptimalTol) {
 	first_solve_ = false;
-	qp_solver_->markHotStart();
+	qp_solver->markHotStart();
       }
 #endif
-      tqp_solver_ = GetRawPtr(qp_solver_);
+      tqp_solver_ = GetRawPtr(qp_solver);
       //tqp_solver_ = new FilterSolver(RegOptions(), Options(), Jnlst());
     }
 #endif
@@ -78,6 +86,10 @@ namespace Bonmin
   unmarkHotStart(OsiTMINLPInterface* tminlp_interface)
   {
     // Free memory
+#ifdef TIME_BQPD
+    BqpdSolver * qp_solver = dynamic_cast<BqpdSolver *>(GetRawPtr(tqp_solver_));
+    if(qp_solver) times_ += qp_solver->times();
+#endif
     branching_tqp_ = NULL;
     tqp_solver_ = NULL;
   }
