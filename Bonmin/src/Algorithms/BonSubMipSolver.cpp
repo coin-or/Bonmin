@@ -187,7 +187,7 @@ namespace Bonmin {
       cbc.solver()->setAuxiliaryInfo(&empty);
 
       //Change Cbc messages prefixes
-      strcpy(cbc.messagesPointer()->source_,"OaCbc");
+      strcpy(cbc.messagesPointer()->source_,"OCbc");
 
       cbc.setLogLevel(loglevel);
       cbc.solver()->messageHandler()->setLogLevel(0);
@@ -315,7 +315,7 @@ namespace Bonmin {
       cbc.solver()->setAuxiliaryInfo(&empty);
 
       //Change Cbc messages prefixes
-      strcpy(cbc.messagesPointer()->source_,"OaCbc");
+      strcpy(cbc.messagesPointer()->source_,"OCbc");
 
       cbc.setLogLevel(loglevel);
       cbc.solver()->messageHandler()->setLogLevel(0);
