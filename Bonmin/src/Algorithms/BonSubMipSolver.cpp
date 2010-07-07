@@ -122,8 +122,8 @@ namespace Bonmin {
     if (integerSolution_) delete [] integerSolution_;
     #ifdef COIN_HAS_CPX
     if(cpx_) delete cpx_;
-    if(ownClp_) delete clp_;
     #endif
+    if(ownClp_) delete clp_;
   }
 
   /** Assign lp solver. */
