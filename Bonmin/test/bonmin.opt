@@ -80,7 +80,7 @@ bonmin.oa_log_level                          1         	#specify OA iterations l
 
 bonmin.ecp_abs_tol                           1e-06     	#Set the absolute termination tolerance for ECP rounds.
 bonmin.ecp_max_rounds                        5         	#Set the maximal number of rounds of ECP cuts.
-bonmin.ecp_propability_factor                10        	#Factor appearing in formula for skipping ECP cuts.
+bonmin.ecp_probability_factor                10        	#Factor appearing in formula for skipping ECP cuts.
 bonmin.ecp_rel_tol                           0         	#Set the relative termination tolerance for ECP rounds.
 bonmin.filmint_ecp_cuts                      0         	#Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.
 
