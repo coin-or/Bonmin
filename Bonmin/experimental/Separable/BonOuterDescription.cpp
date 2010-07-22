@@ -197,7 +197,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 					== TMINLP::BINARY) || (variableType[i] == TMINLP::INTEGER)) {
 				step[i] = 0;
 			} else
-				step[i] = (up[i] - colLower[i]) / (nbAp * 20.);
+				step[i] = (up[i] - colLower[i]) / (nbAp);
 
 			if (colLower[i] < -1e08) {
 				p[i] = 0;
@@ -210,7 +210,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
                         if(constTypes[i] != TNLP::NON_LINEAR) continue;
 			getMyOuterApproximation(nlp, cs, i, p, 0, NULL, 10000, true);// Generate Tangents at current point    	 
 		}
-		for (int j = 1; j <= nbAp * 20; j++) {
+		for (int j = 1; j <= nbAp; j++) {
 
 			for (int i = 0; i < n; i++) {
 				pp[i] += step[i];
@@ -227,7 +227,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 				varInd = 0;
 			diff = std::abs(g_p[i] - g_pp[i]);
 
-			if (nbG[i] < nbAp && std::abs(g_p[i] - g_pp[i]) >= 0.005) {
+			if (nbG[i] < nbAp && diff ) {
 				getMyOuterApproximation(nlp, cs, i, pp, 0, NULL, 10000, true);// Generate Tangents at current point
 				p[varInd] = pp[varInd];
 				nbG[i]++;

@@ -70,7 +70,7 @@ private:
         void extractInnerApproximation(OsiTMINLPInterface & nlp, OsiSolverInterface &si,
                                        const double * x, bool getObj);
 
-        void getMyInnerApproximation(OsiTMINLPInterface &si, OsiCuts &cs, int ind,
+        bool getMyInnerApproximation(OsiTMINLPInterface &si, OsiCuts &cs, int ind,
                 const double * x, const double * x2);
 
 
