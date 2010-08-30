@@ -250,7 +250,7 @@ namespace Bonmin
       return branchingMethod_;
     }
     /** Method used to compare nodes. */
-    NodeComparison nodeComparisonMethod()
+    NodeComparison& nodeComparisonMethod()
     {
       return nodeComparisonMethod_;
     }
