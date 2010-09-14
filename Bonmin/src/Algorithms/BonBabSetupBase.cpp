@@ -380,6 +380,7 @@ namespace Bonmin
       intParam_[NumberStrong] = 0;
       intParam_[MinReliability] = 0;
       options_->SetIntegerValue("bonmin.number_strong_branch",intParam_[BabSetupBase::NumberStrong],true,true);
+      options_->SetIntegerValue("bonmin.number_before_trust",intParam_[BabSetupBase::MinReliability],true,true);
     }
     else if (varSelection == RELIABILITY_BRANCHING) {
       intParam_[MinReliability] = 10;

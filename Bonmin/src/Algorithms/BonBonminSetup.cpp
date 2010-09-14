@@ -470,8 +470,6 @@ namespace Bonmin
     }
 
 
-
-
     Index doHeuristicDiveFractional = false;
     options()->GetEnumValue("heuristic_dive_fractional",doHeuristicDiveFractional,prefix_.c_str());
     if(doHeuristicDiveFractional){
