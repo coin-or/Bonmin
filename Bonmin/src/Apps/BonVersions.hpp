@@ -20,7 +20,7 @@ static std::string IPOPT_VERSION=PACKAGE_VERSION;
 #include "config_bonmin.h"
 
 //static std::string BONMIN_VERSION=PACKAGE_VERSION;
-#define BONMIN_VERSION "1.3"
+#define BONMIN_VERSION "1.4"
 /* undefine macros that could conflict with those in other config.h
    files */
 #undef PACKAGE
@@ -33,7 +33,7 @@ static std::string IPOPT_VERSION=PACKAGE_VERSION;
 #else
 
 #include "IpoptConfig.h"
-#define BONMIN_VERSION="1.3"
+#define BONMIN_VERSION="1.4"
 #endif
 
 #endif
