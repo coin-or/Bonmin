@@ -14,7 +14,7 @@
 #include "BonTNLPSolver.hpp"
 #include "BonBranchingTQP.hpp"
 
-#define TIME_BQPD
+//#define TIME_BQPD
 namespace Bonmin
 {
   class BqpdSolver : public TNLPSolver
