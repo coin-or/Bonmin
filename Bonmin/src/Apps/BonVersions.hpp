@@ -19,8 +19,8 @@ static std::string IPOPT_VERSION=PACKAGE_VERSION;
 
 #include "config_bonmin.h"
 
-static std::string BONMIN_VERSION=PACKAGE_VERSION;
-//#define BONMIN_VERSION "1.4trunk"
+//static std::string BONMIN_VERSION=PACKAGE_VERSION;
+#define BONMIN_VERSION "1.4trunk"
 /* undefine macros that could conflict with those in other config.h
    files */
 #undef PACKAGE
