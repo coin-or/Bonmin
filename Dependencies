@@ -1,4 +1,4 @@
-BuildTools https://projects.coin-or.org/svn/BuildTools/stable/0.5
+BuildTools https://projects.coin-or.org/svn/BuildTools/stable/0.6
 ThirdParty/Blas https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/stable/1.0
 ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/stable/1.0
 ThirdParty/HSL https://projects.coin-or.org/svn/BuildTools/ThirdParty/HSL/stable/1.1
@@ -8,8 +8,8 @@ ThirdParty/Mumps https://projects.coin-or.org/svn/BuildTools/ThirdParty/Mumps/st
 ThirdParty/Metis https://projects.coin-or.org/svn/BuildTools/ThirdParty/Metis/stable/1.0
 Data/Sample https://projects.coin-or.org/svn/Data/stable/1.0/Sample
 CoinUtils https://projects.coin-or.org/svn/CoinUtils/stable/2.6/CoinUtils
-Cbc https://projects.coin-or.org/svn/Cbc/stable/2.4/Cbc
+Cbc https://projects.coin-or.org/svn/Cbc/stable/2.5/Cbc
 Cgl https://projects.coin-or.org/svn/Cgl/stable/0.55/Cgl
-Clp https://projects.coin-or.org/svn/Clp/stable/1.11/Clp
+Clp https://projects.coin-or.org/svn/Clp/stable/1.12/Clp
 Ipopt https://projects.coin-or.org/svn/Ipopt/stable/3.8/Ipopt
-Osi https://projects.coin-or.org/svn/Osi/stable/0.102/Osi
+Osi https://projects.coin-or.org/svn/Osi/stable/0.103/Osi
