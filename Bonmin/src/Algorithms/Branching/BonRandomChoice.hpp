@@ -70,7 +70,6 @@ class BonRandomChoice : public OsiChooseVariable {
     int way;
     double value = object[i]->infeasibility(info,way);
     if (value>0.0) {
-      numberUnsatisfied_++;
       if (value==COIN_DBL_MAX) {
 	// infeasible
 	feasible=false;
