@@ -3076,6 +3076,7 @@ const double * OsiTMINLPInterface::getObjCoefficients() const
   void 
   OsiTMINLPInterface::use(Ipopt::SmartPtr<TMINLP2TNLP> tminlp2tnlp){
      problem_ = tminlp2tnlp;
+     problem_to_optimize_ = GetRawPtr(problem_);
      feasibilityProblem_->use(GetRawPtr(tminlp2tnlp));}
 
 }/** end namespace Bonmin*/
