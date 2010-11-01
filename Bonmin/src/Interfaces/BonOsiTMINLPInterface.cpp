@@ -2395,13 +2395,14 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     else {
       if(rowLower[i] > -nlp_infty){
       //   printf("Lower %g ", rowLower[i]);
-         rowLow[i] = (rowLower[i] - g[i]);
+         //rowLow[i] = (rowLower[i] - g[i]);
+         rowLow[i] = (rowLower[i]);
       }
       else
         rowLow[i] = - infty;
       if(rowUpper[i] < nlp_infty){
       //   printf("Upper %g ", rowUpper[i]);
-         rowUp[i] =  (rowUpper[i] - g[i]);
+         rowUp[i] =  (rowUpper[i]);
       }
       else
         rowUp[i] = infty;
@@ -2425,9 +2426,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
        }
     }
     else {
-      double value = jValues_[i] * getColSolution()[jCol_[i]];
-      rowLow[jRow_[i]] += value;
-      rowUp[jRow_[i]] += value;
+      //double value = jValues_[i] * x[jCol_[i]];
+      //rowLow[jRow_[i]] += value;
+      //rowUp[jRow_[i]] += value;
     } 
   }
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);

@@ -24,7 +24,10 @@ namespace Bonmin
         ProvenInfeasible /** Problem has been proven to be infeasible.*/,
         Feasible /** An integer solution to the problem has been found.*/,
         UnboundedOrInfeasible /*Coninuous relaxation is unbounded.*/,
-        NoSolutionKnown/** No feasible solution to the problem is known*/};
+        NoSolutionKnown/** No feasible solution to the problem is known*/,
+        NumMipStats};
+
+
     /** Constructor.*/
     Bab();
     /** destructor.*/
@@ -56,6 +59,7 @@ namespace Bonmin
     {
       return mipStatus_;
     }
+
     /** return the best known lower bound on the objective value*/
     double bestBound();
     /** return the total number of nodes explored.*/

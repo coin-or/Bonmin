@@ -552,7 +552,6 @@ namespace Bonmin
       if (ubounds[i] > infty) ubounds[i] = infty;
     }
 #endif
-
     maxa = n + nnz_jac_g;
     fint maxia = n + nnz_jac_g + m + 3;
     a = new real[maxa];

@@ -101,6 +101,7 @@ namespace Bonmin {
         bool ret_val = TMINLP2TNLP::get_nlp_info(n,m,nnz_jac_g, nnz_h_lag, index_style);
         nnz_h_lag = H_.size();
         nnz_jac_g = curr_nnz_jac_;
+        //printf("Dinmension in TMINLP2Quad are %i\n", curr_nnz_jac_);
         return ret_val;
       }
 

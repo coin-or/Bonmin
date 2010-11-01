@@ -358,6 +358,7 @@ namespace Bonmin
     nnz_jac_g = nnz_jac_g_;
     nnz_h_lag = nnz_h_lag_;
     index_style = index_style_;
+     //printf("Been there and said %i\n", nnz_jac_g_);
     return true;
   }
 
