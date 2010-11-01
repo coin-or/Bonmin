@@ -1070,6 +1070,13 @@ void getBendersCut(OsiCuts &cs, bool global);
   virtual void unmarkHotStart();
   //@}
 
+  /// Get values of tiny_ and very_tiny_
+  void get_tolerances(double &tiny, double&very_tiny, double &infty){
+    tiny = tiny_;
+    very_tiny = veryTiny_;
+    infty = infty_;
+  }
+
 protected:
   
   //@}
