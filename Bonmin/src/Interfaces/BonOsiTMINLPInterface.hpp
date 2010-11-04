@@ -846,6 +846,10 @@ class Messages : public CoinMessages
     return GetRawPtr(app_);
   } 
  
+  const std::list<Ipopt::SmartPtr<TNLPSolver> >& debug_apps() const{
+    return debug_apps_;
+  }
+
   TNLPSolver * solver()
   {
     return GetRawPtr(app_);

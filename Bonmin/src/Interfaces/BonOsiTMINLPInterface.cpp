@@ -2421,7 +2421,9 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
                 x[jCol_[i]],
                 rowLow[jRow_[i]],
                 rowUp[jRow_[i]], tiny_, veryTiny_)) {      
+          if(rowLow[jRow_[i]] > - infty)
           rowLow[jRow_[i]] += jValues_[i] * x[jCol_ [i]];
+          if(rowUp[jRow_[i]] < infty)
           rowUp[jRow_[i]] += jValues_[i] *x[jCol_[i]];
        }
     }

@@ -205,8 +205,6 @@ namespace Bonmin
     memcpy(newSolution,x_sol,numberColumns*sizeof(double));
     double* new_g_sol = new double [numberRows];
 
-    double* gradient_f = new double[numberColumns];
-    minlp->eval_grad_f(numberColumns,newSolution,true,gradient_f);
 
     // create a set with the indices of the fractional variables
     vector<int> integerNonlinearColumns; // stores the integer variables
@@ -296,6 +294,9 @@ namespace Bonmin
 	if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS)
 	  numberIntegerLinearColumns++;
       }
+
+      double* gradient_f = new double[numberColumns];
+      minlp->eval_grad_f(numberColumns,newSolution,true,gradient_f);
       // create row lower and upper bounds for MILP
       minlp->eval_g(numberColumns, newSolution, true,
 		    numberRows, new_g_sol);
