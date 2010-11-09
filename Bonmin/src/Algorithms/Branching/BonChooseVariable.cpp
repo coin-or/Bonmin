@@ -1108,7 +1108,12 @@ BonChooseVariable::updateInformation( int index, int branch,
     for(int i = 0 ; i < numObject ; i++){
        infeasibility += objects[i]->checkInfeasibility(info);
     }
-    return OsiHotInfo::updateInformation(solver, info, choose);
+    int status = OsiHotInfo::updateInformation(solver, info, choose);
+    if(status == 1 && !solver->isProvenPrimalInfeasible()){
+      printf("There was a problem solving this guy\n");
+      status = 2;
+    }
+    return status;
   }
   
 }/* Ends Bonmin's namespace.*/
