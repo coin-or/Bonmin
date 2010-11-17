@@ -86,7 +86,7 @@ register_general_options
   roptions->AddLowerBoundedNumberOption("max_random_point_radius",
       "Set max value r for coordinate of a random point.",
       0.,1,1e5,
-      "When picking a random point coordinate i will be in the interval [min(max(l,-r),u-r), max(min(u,r),l+r)] "
+      "When picking a random point, coordinate i will be in the interval [min(max(l,-r),u-r), max(min(u,r),l+r)] "
       "(where l is the lower bound for the variable and u is its upper bound)");
   roptions->setOptionExtraInfo("max_random_point_radius",8);
 

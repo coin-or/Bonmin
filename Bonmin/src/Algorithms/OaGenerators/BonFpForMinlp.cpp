@@ -247,10 +247,10 @@ namespace Bonmin
   {
     roptions->SetRegisteringCategory("Options for feasibility pump", RegisteredOptions::BonminCategory);
 
-    roptions->AddStringOption2("fp_pass_infeasible", "Say wether fp should claim to converge or not",
+    roptions->AddStringOption2("fp_pass_infeasible", "Say whether feasibility pump should claim to converge or not",
                                "no",
-                               "no", "When master MILP is infeasible just bail out (don't stop all algorithm. This is the option for using in B-Hyb.",
-                               "yes", "Claim convergence, numericaly dangerous","");
+                               "no", "When master MILP is infeasible just bail out (don't stop all algorithm). This is the option for using in B-Hyb.",
+                               "yes", "Claim convergence, numerically dangerous.","");
     roptions->AddBoundedIntegerOption("fp_log_level",
         "specify FP iterations log level.",
         0,2,1,
