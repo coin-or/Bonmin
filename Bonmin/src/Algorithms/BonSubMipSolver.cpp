@@ -432,16 +432,16 @@ namespace Bonmin {
     roptions->setOptionExtraInfo("milp_log_level",64);
 
     roptions->AddBoundedIntegerOption("cpx_parallel_strategy",
-                           "Set parallel to use with cplex.",
+                           "Strategy of parallel search mode in CPLEX.",
                            -1, 1, 0,
-                           "(refer to CPLEX documentation)"
+                           "-1 = opportunistic, 0 = automatic, 1 = deterministic (refer to CPLEX documentation)"
                            );
     roptions->setOptionExtraInfo("cpx_parallel_strategy",64);
 
     roptions->AddLowerBoundedIntegerOption("number_cpx_threads",
                            "Set number of threads to use with cplex.",
                            0, 0,
-                           "number of threads used with cplex (refer to CPLEX documentation)"
+                           "(refer to CPLEX documentation)"
                            );
     roptions->setOptionExtraInfo("number_cpx_threads",64);
 
@@ -451,7 +451,7 @@ namespace Bonmin {
         "find_good_sol",
         "find_good_sol","Stop sub milps when a solution improving the incumbent is found",
         "solve_to_optimality", "Solve MILPs to optimality",
-        ".");
+        "");
     roptions->setOptionExtraInfo("milp_strategy",64);
 
   }
