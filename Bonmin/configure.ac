@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Bonmin],[1.3stable],[coin-bonmin@list.coin-or.org])
+AC_INIT([Bonmin],[trunk],[bonmin@list.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006, 2008 International Business Machines and others.
@@ -41,7 +41,7 @@ AC_CANONICAL_BUILD
 # the source root directory contains definition of where to find those
 # externals.  The following macro ensures that those externals are
 # retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT
+AC_COIN_PROJECTDIR_INIT(Bonmin)
 
 # Check if user wants to produce debugging code
 AC_COIN_DEBUG_COMPILE(Bonmin)
@@ -62,96 +62,57 @@ AC_COIN_F77_WRAPPERS
 AC_COIN_INIT_AUTO_TOOLS
 
 #############################################################################
-#                              COIN components                              #
+#                           COIN-OR components                              #
 #############################################################################
 
-AC_COIN_HAS_PROJECT(Cbc)
-AC_COIN_HAS_PROJECT(Cgl)
-AC_COIN_HAS_PROJECT(Clp)
-AC_COIN_HAS_PROJECT(CoinUtils)
-AC_COIN_HAS_PROJECT(DyLP)
-AC_COIN_HAS_PROJECT(Ipopt)
-AC_COIN_HAS_PROJECT(Osi)
-AC_COIN_HAS_PROJECT(Sym)
-AC_COIN_HAS_PROJECT(Vol)
-AC_COIN_HAS_PROJECT(Bcp)
-AC_COIN_HAS_PROJECT(Couenne)
+AC_COIN_CHECK_PACKAGE(CoinDepend, [cbc osi-clp ipopt], [BonminLib])
+if test $coin_has_coindepend != yes ; then
+  AC_MSG_ERROR([Required package Cbc or Ipopt not available.])
+fi
+
+AC_COIN_CHECK_PACKAGE(ASL, [coinasl])
+
+AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
 
 AC_ARG_WITH([bonminbcp],
             AC_HELP_STRING([--with-bonminbcp],
                            [Compile Bonmin with Bcp-based parallel version]),
             [use_bcp="$withval"], [use_bcp=no])
 if test "$use_bcp" = yes; then
-  if test $m4_tolower(coin_has_$1) = unavailable ||
-     test $m4_tolower(coin_has_$1) = skipping; then
+  if test $coin_has_bcp != yes ; then
      AC_MSG_ERROR([You specified --with-bonminbcp, but Bcp is not available])
   fi
 fi
 AM_CONDITIONAL(COMPILE_BONMINBCP, test "$use_bcp" = yes)
 
 #############################################################################
-#                            Third party solvers                            #
+#                                     CPLEX                                 #
 #############################################################################
 
-# Check which third party solvers are available ToDo!
-AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_GLPK(Glpk)
-AC_COIN_HAS_USER_LIBRARY([FortMP],[FMP])  #ToDo! is Fortran?
-AC_COIN_HAS_USER_LIBRARY([Mosek],[MSK],[mosek.h],[MSK_openmosek])
-AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
-AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
-AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
+# Check whether OsiCplex is available
+AC_COIN_CHECK_PACKAGE(OsiCpx, [osi-cpx], [BonminLib])
+
+# To get also the directory where cplex.h can be found, we also check for cplex directly.
+AC_COIN_CHECK_USER_LIBRARY([Cplex], [CPX],[cplex.h],[CPXgetstat])
 
 #############################################################################
-#                       Other third party software                          #
+#                                FilterSQP                                  #
 #############################################################################
 
-# Ampl Solver library
-AC_COIN_HAS_ASL
-
-
-# Some internal variables
-if test x"$BUILD_FP" != x; then
-  build_fp=yes
-fi
-AM_CONDITIONAL(BUILD_FP, test x$build_fp = xyes)
-
-#####################
-# FILTER SQP SOLVER #
-#####################
-
-filtersqpobjdir=../ThirdParty/FilterSQP
-filtersqpsrcdir=$srcdir/$filtersqpobjdir
-
-AC_MSG_NOTICE([Checking for Filter SQP library])
-
+# for backward compatibility, map --with-filtersqp to --with-filtersqp-libs
 AC_ARG_WITH([filtersqp],
             AC_HELP_STRING([--with-filtersqp],
                            [specify library for FilterSQP (or BUILD for compilation)]),
-            [use_filtersqp=$withval], [use_filtersqp=detect])
+            [filtersqp_libs="$withval"])
 
-if test "$use_filtersqp" = BUILD || test "$use_filtersqp" = detect; then
-# Check which files are available
-  AC_COIN_CHECK_FILE([$filtersqpsrcdir/source/src/filter.f],
-	             [AC_DEFINE(COIN_HAS_FILTERSQP,1,
-                                [Define to 1 if FilterSQP is available])
-                      use_filtersqp=BUILD],
-                     [if test "$use_filtersqp" = BUILD; then
-                       AC_MSG_ERROR([Filter SQP files are not available])
-                      fi])
-fi
-if test "$use_filtersqp" = detect; then
-  use_filtersqp=no
-fi
+AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
 
-if test "$use_filtersqp" = BUILD; then
-  FILTERSQPLIBADD=`cd $filtersqpobjdir; pwd`/libfiltersqp.la
-  coin_need_flibs=yes
-elif test "$use_filtersqp" != no; then
-  AC_MSG_CHECKING([whether user supplied FILTERSQPLIB=\"$use_filtersqp\" works])
+# we want to keep the linking check for FilterSQP, but cannot do this if FilterSQP will be build later (in ThirdParty)
+# the latter is indicated by having a .pc dependency, so we skip the link check if $FILTERSQP_PCREQUIRED is not empty
+if test $coin_has_filtersqp = yes && test "x$FILTERSQP_PCREQUIRED" = x; then
+  AC_MSG_CHECKING([whether FilterSQP library $FILTERSQP_LIBS works])
   SAVE_LIBS="$LIBS"
-  LIBS="$use_filtersqp $LIBS $FLIBS"
-  ADDLIBS="$use_filtersqp $ADDLIBS"
+  LIBS="$FILTERSQP_LIBS $FLIBS $LIBS"
   AC_LANG_PUSH([Fortran 77])
   AC_TRY_LINK([],
 [      call filterSQP
@@ -163,23 +124,32 @@ elif test "$use_filtersqp" != no; then
       subroutine gradient
       end
       subroutine hessian],
-              [AC_MSG_RESULT([yes])],
+              [AC_MSG_RESULT([yes])
+               FILTERSQP_LIBS="$FILTERSQP_LIBS $FLIBS"],
               [AC_MSG_RESULT([no])
-               AC_MSG_ERROR([user supplied FilterSQP library \"$use_filtersqp\" does not work])])
+               AC_MSG_ERROR([user supplied FilterSQP library $FILTERSQP_LIBS does not work])])
   AC_LANG_POP([Fortran 77])
   LIBS="$SAVE_LIBS"
 fi
 
-AM_CONDITIONAL([COIN_HAS_FILTERSQP], [test "$use_filtersqp" != no])
-AC_SUBST(FILTERSQPLIBADD)
+#############################################################################
+#                           Feasibility Pump                                #
+#############################################################################
 
-##########
-# ASTYLE #
-##########
+if test x"$BUILD_FP" != x; then
+  build_fp=yes
+fi
+AM_CONDITIONAL(BUILD_FP, test x$build_fp = xyes)
+
+#############################################################################
+#                                 ASTYLE                                    #
+#############################################################################
+
 ASTYLE=astyle
 AC_SUBST(ASTYLE)
+
 ASTYLEFLAGS="--mode=c --indent=spaces=2 --indent-cases --indent-namespaces --min-conditional-indent=1 --brackets=linux --brackets=break-closing-headers --max-instatement-indent=2"
-AC_SUBST(ASTYLEFLAGS)    
+AC_SUBST(ASTYLEFLAGS)
 
 #############################################################################
 #                            Stuff for Examples                             #

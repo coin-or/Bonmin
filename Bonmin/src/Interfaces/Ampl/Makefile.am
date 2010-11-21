@@ -13,9 +13,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library in this directory
-if COIN_HAS_ASL
-  noinst_LTLIBRARIES = libbonamplinterface.la
-endif
+noinst_LTLIBRARIES = libbonamplinterface.la
 
 # List all source files, including headers
 libbonamplinterface_la_SOURCES = \
@@ -23,24 +21,12 @@ libbonamplinterface_la_SOURCES = \
 	BonAmplTMINLP.cpp BonAmplTMINLP.hpp \
         sos_kludge.cpp
 
-# This is for libtool (on Windows)
+# This is for libtool
 libbonamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Algorithm` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Apps/AmplSolver` \
-	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
         -I`$(CYGPATH_W) $(srcdir)/..` \
         -I`$(CYGPATH_W) $(srcdir)/../Ipopt`
 
@@ -48,8 +34,7 @@ if COIN_HAS_FILTERSQP
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Filter` 
 endif
 
-AM_CPPFLAGS += $(ASL_CPPFLAGS)
-
+AM_CPPFLAGS += $(ASL_CFLAGS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
@@ -60,7 +45,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'install/coin'
+# and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
 	BonAmplInterface.hpp BonAmplTMINLP.hpp

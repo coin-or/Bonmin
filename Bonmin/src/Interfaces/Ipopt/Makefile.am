@@ -22,29 +22,13 @@ libipoptinterface_la_SOURCES = \
         BonIpoptInteriorWarmStarter.hpp  BonIpoptSolver.hpp \
         BonIpoptWarmStart.hpp
 
-# This is for libtool (on Windows)
+# This is for libtool
 libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/contrib/CGPenalty` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Algorithm` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Apps/AmplSolver` \
-	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
         -I`$(CYGPATH_W) $(srcdir)/..`
-
-AM_CPPFLAGS += $(ASL_CPPFLAGS)
-
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
@@ -55,7 +39,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'install/coin'
+# and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
 	BonIpoptInteriorWarmStarter.hpp \
