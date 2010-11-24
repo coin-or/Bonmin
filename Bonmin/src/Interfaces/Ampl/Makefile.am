@@ -26,15 +26,13 @@ libbonamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
+AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
         -I`$(CYGPATH_W) $(srcdir)/..` \
         -I`$(CYGPATH_W) $(srcdir)/../Ipopt`
 
 if COIN_HAS_FILTERSQP
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Filter` 
 endif
-
-AM_CPPFLAGS += $(ASL_CFLAGS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin

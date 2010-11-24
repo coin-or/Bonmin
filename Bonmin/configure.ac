@@ -70,7 +70,7 @@ if test $coin_has_coindepend != yes ; then
   AC_MSG_ERROR([Required package Cbc or Ipopt not available.])
 fi
 
-AC_COIN_CHECK_PACKAGE(ASL, [coinasl])
+AC_COIN_CHECK_PACKAGE(ASL, [coinasl ipoptamplinterface])
 
 AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
 
