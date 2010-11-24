@@ -799,12 +799,15 @@ namespace Bonmin
     <<std::endl;
     std::cout<<"Found "<<model->getSolutionCount()<<" solutions"<<std::endl;
 #endif
-    if (diver_->getComparisonMode() == CbcDfsDiver::Enlarge)
+    bool r_value = false;
+    if (diver_->getComparisonMode() == CbcDfsDiver::Enlarge){
       diver_->setComparisonMode(CbcDfsDiver::FindSolutions);
+      r_value = true;}
     if (model->getSolutionCount() >= numberSolToStopDive_ && diver_->getComparisonMode() == CbcDfsDiver::FindSolutions) {
       diver_->setComparisonMode(CbcDfsDiver::CloseBound);
+      r_value = true;
     }
-    return true;
+    return r_value;
   }
 
   /// This is test function
