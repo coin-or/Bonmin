@@ -66,7 +66,8 @@ BonNodeSolver_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
 am_bonmin_OBJECTS = BonMin.$(OBJEXT)
 bonmin_OBJECTS = $(am_bonmin_OBJECTS)
 bonmin_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la $(am__DEPENDENCIES_1)
+	../CbcBonmin/libbonmin.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -277,7 +278,8 @@ bonmin_SOURCES = BonMin.cpp
 bonmin_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
-	$(BONMINLIB_LIBS)
+	$(BONMINLIB_LIBS) \
+	$(ASL_LIBS)
 
 
 #TODO where to get thisone from?
@@ -613,7 +615,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-info-am
 
-	$(ASL_LIBS)
 
 astyle: $(ASTYLE_FILES)
 

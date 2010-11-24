@@ -24,7 +24,7 @@ bonmin_SOURCES = BonMin.cpp
 bonmin_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
-	$(BONMINLIB_LIBS)
+	$(BONMINLIB_LIBS) \
 	$(ASL_LIBS)
 
 #TODO where to get thisone from?

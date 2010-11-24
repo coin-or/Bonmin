@@ -32,7 +32,7 @@
 #ifdef HAVE_WSMP
 # include "IpWsmpSolverInterface.hpp"
 #endif
-#ifdef HAVE_MUMPS
+#ifdef COIN_HAS_MUMPS
 # include "IpMumpsSolverInterface.hpp"
 #endif
 
