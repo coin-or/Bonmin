@@ -364,10 +364,10 @@ namespace Bonmin
     virtual bool test (CbcNode * x, CbcNode * y);
 
     ///  Called after each new solution
-    virtual void newSolution(CbcModel * model);
+    virtual bool newSolution(CbcModel * model);
 
     ///  Called after each new solution
-    virtual void newSolution(CbcModel * model,
+    virtual bool newSolution(CbcModel * model,
         double objectiveAtContinuous,
         int numberInfeasibilitiesAtContinuous);
 
