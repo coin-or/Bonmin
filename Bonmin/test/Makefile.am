@@ -28,14 +28,11 @@ unitTest_LDADD =
 if COIN_HAS_ASL
 unitTest_LDADD += \
         ../src/CbcBonmin/libbonminampl.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la
+	$(ASL_LIBS)
 endif
 unitTest_LDADD += \
         ../src/CbcBonmin/libbonmin.la \
-	$(IPOPTLIBS) \
-	$(COINLIBS) \
-	$(ASLLIB) \
-	$(ADDLIBS)
+	$(BONMINLIB_LIBS)
 
 
 #########################################################################
@@ -47,35 +44,11 @@ CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 # List libraries of COIN projects
 CppExample_LDADD = \
         ../src/CbcBonmin/libbonmin.la \
-        $(IPOPTLIBS) \
-        $(COINLIBS)
-
-CppExample_LDADD += $(ADDLIBS)
-
-COINLIBS = \
-	$(CBCOBJDIR)/src/libCbc.la \
-	$(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/libOsi.la \
-	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-
-if COIN_HAS_CPX
-  COINLIBS += \
-	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(CPXLIB)
-endif
-
-IPOPTLIBS = \
-	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
-
-# List additional libraries
-LIBS += `cat $(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
+        $(BONMINLIB_LIBS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
-AM_CPPFLAGS = \
+AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
         -I`$(CYGPATH_W) $(srcdir)/../src/Apps` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ipopt` \
@@ -85,23 +58,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl` \
-	-I`$(CYGPATH_W) $(IPOPTOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/contrib/CGPenalty` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/LinAlg` \
-	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-          $(ASL_CPPFLAGS)
-
+	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl`
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
