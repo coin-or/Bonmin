@@ -49,27 +49,9 @@ COININCDIR = @abs_include_dir@/coin
 # Directory with COIN libraries
 COINLIBDIR = @abs_lib_dir@
 
-# Libraries necessary to link with Bonmin
-IPOPTLIBDIR = @IPOPTLIBDIR@
+LIBS = -L$(COINLIBDIR) -L$(COINLIBDIR)/ThirdParty -lbonmin @BONMINLIB_LIBS@
 
-#Librairies for ASL (needed by Cbc)
-ASLLIB = @ASLLIB@
-
-
-LIBS = -L$(COINLIBDIR) \
-	-lbonmin -lipopt \
-       -lCbc -lCgl -lOsiClp -lOsi -lClp -lCoinUtils \
-         @ADDLIBS@ \
-	`cat @IPOPTDOCDIR@/ipopt_addlibs_cpp.txt` \
-	`cat @CGLDOCDIR@/cgl_addlibs.txt` \
-	`cat @OSIDOCDIR@/osi_addlibs.txt` \
-	`cat @CLPDOCDIR@/clp_addlibs.txt` \
-	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` 
-
-# Necessary Include dirs
-INCL = -I`$(CYGPATH_W) $(COININCDIR)` \
-	-I`$(CYGPATH_W) $(COININCDIR)/ipopt` \
-        $(ADDINCFLAGS)
+INCL = -I`$(CYGPATH_W) $(COININCDIR)` -I`$(CYGPATH_W) $(COININCDIR)/ThirdParty` @BONMINLIB_CFLAGS@ $(ADDINCFLAGS)
 
 # The following is necessary under cygwin, if native compilers are used
 CYGPATH_W = @CYGPATH_W@
