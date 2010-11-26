@@ -12,7 +12,7 @@ AUTOMAKE_OPTIONS = foreign
 
 if COIN_HAS_ASL
   bin_PROGRAMS = bonmin
-  bin_PROGRAMS += BonNodeSolver
+  noinst_PROGRAMS = BonNodeSolver
 endif
 
 ########################################################################
@@ -26,9 +26,6 @@ bonmin_LDADD = \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS) \
 	$(ASL_LIBS)
-
-#TODO where to get thisone from?
-#	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
@@ -62,8 +59,6 @@ BonNodeSolver_LDADD = \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS) \
 	$(ASL_LIBS)
-
-#	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
