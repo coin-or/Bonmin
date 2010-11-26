@@ -43,15 +43,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = oa_fp$(EXEEXT)
-@COIN_HAS_CPX_TRUE@am__append_1 = \
-@COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-@COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-@COIN_HAS_CPX_TRUE@	$(CPXLIB)
-
-@COIN_HAS_CPX_TRUE@am__append_2 = \
-@COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
-@COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(CPXINCDIR)`
-
 subdir = experimental/FP
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -67,22 +58,10 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_oa_fp_OBJECTS = OAFeasibilityPump.$(OBJEXT) FP.$(OBJEXT)
 oa_fp_OBJECTS = $(am_oa_fp_OBJECTS)
-am__DEPENDENCIES_1 = $(IPOPTOBJDIR)/src/Interfaces/libipopt.la
-am__DEPENDENCIES_2 =
-@COIN_HAS_CPX_TRUE@am__DEPENDENCIES_3 =  \
-@COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
-@COIN_HAS_CPX_TRUE@	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-@COIN_HAS_CPX_TRUE@	$(am__DEPENDENCIES_2)
-am__DEPENDENCIES_4 = $(CBCOBJDIR)/src/libCbc.la \
-	$(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_3)
-oa_fp_DEPENDENCIES = ../../src/CbcBonmin/libbonmin.la \
-	../../src/Interfaces/Ampl/libamplinterface.la \
-	$(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_4) \
-	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
+am__DEPENDENCIES_1 =
+oa_fp_DEPENDENCIES = ../../src/Interfaces/Ampl/libamplinterface.la \
+	../../src/CbcBonmin/libbonmin.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/inc
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -107,6 +86,7 @@ DIST_SOURCES = $(oa_fp_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ABSBUILDDIR = @ABSBUILDDIR@
 ACLOCAL = @ACLOCAL@
 ADDLIBS = @ADDLIBS@
 ADD_CFLAGS = @ADD_CFLAGS@
@@ -118,8 +98,9 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
-ASLLIB = @ASLLIB@
-ASL_CPPFLAGS = @ASL_CPPFLAGS@
+ASL_CFLAGS = @ASL_CFLAGS@
+ASL_DATA = @ASL_DATA@
+ASL_LIBS = @ASL_LIBS@
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
 AUTOCONF = @AUTOCONF@
@@ -127,75 +108,42 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AUX_DIR = @AUX_DIR@
 AWK = @AWK@
-BCPDOCDIR = @BCPDOCDIR@
-BCPOBJDIR = @BCPOBJDIR@
-BCPSRCDIR = @BCPSRCDIR@
+BCP_CFLAGS = @BCP_CFLAGS@
+BCP_DATA = @BCP_DATA@
+BCP_LIBS = @BCP_LIBS@
+BONMINLIB_CFLAGS = @BONMINLIB_CFLAGS@
+BONMINLIB_LIBS = @BONMINLIB_LIBS@
+BONMINLIB_PCLIBS = @BONMINLIB_PCLIBS@
+BONMINLIB_PCREQUIRES = @BONMINLIB_PCREQUIRES@
+BONMIN_SVN_REV = @BONMIN_SVN_REV@
 BUILDTOOLSDIR = @BUILDTOOLSDIR@
 BUILD_FP_FALSE = @BUILD_FP_FALSE@
 BUILD_FP_TRUE = @BUILD_FP_TRUE@
-CBCDOCDIR = @CBCDOCDIR@
-CBCOBJDIR = @CBCOBJDIR@
-CBCSRCDIR = @CBCSRCDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
-CGLDOCDIR = @CGLDOCDIR@
-CGLOBJDIR = @CGLOBJDIR@
-CGLSRCDIR = @CGLSRCDIR@
-CLPDOCDIR = @CLPDOCDIR@
-CLPOBJDIR = @CLPOBJDIR@
-CLPSRCDIR = @CLPSRCDIR@
-COINUTILSDOCDIR = @COINUTILSDOCDIR@
-COINUTILSOBJDIR = @COINUTILSOBJDIR@
-COINUTILSSRCDIR = @COINUTILSSRCDIR@
-COIN_BUILD_GLPK_FALSE = @COIN_BUILD_GLPK_FALSE@
-COIN_BUILD_GLPK_TRUE = @COIN_BUILD_GLPK_TRUE@
+COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
+COINDEPEND_DATA = @COINDEPEND_DATA@
+COINDEPEND_LIBS = @COINDEPEND_LIBS@
 COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
 COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
 COIN_HAS_BCP_FALSE = @COIN_HAS_BCP_FALSE@
 COIN_HAS_BCP_TRUE = @COIN_HAS_BCP_TRUE@
-COIN_HAS_CBC_FALSE = @COIN_HAS_CBC_FALSE@
-COIN_HAS_CBC_TRUE = @COIN_HAS_CBC_TRUE@
-COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
-COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
-COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
-COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@
-COIN_HAS_COINUTILS_FALSE = @COIN_HAS_COINUTILS_FALSE@
-COIN_HAS_COINUTILS_TRUE = @COIN_HAS_COINUTILS_TRUE@
-COIN_HAS_COUENNE_FALSE = @COIN_HAS_COUENNE_FALSE@
-COIN_HAS_COUENNE_TRUE = @COIN_HAS_COUENNE_TRUE@
+COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
+COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
-COIN_HAS_DYLP_FALSE = @COIN_HAS_DYLP_FALSE@
-COIN_HAS_DYLP_TRUE = @COIN_HAS_DYLP_TRUE@
 COIN_HAS_FILTERSQP_FALSE = @COIN_HAS_FILTERSQP_FALSE@
 COIN_HAS_FILTERSQP_TRUE = @COIN_HAS_FILTERSQP_TRUE@
-COIN_HAS_FMP_FALSE = @COIN_HAS_FMP_FALSE@
-COIN_HAS_FMP_TRUE = @COIN_HAS_FMP_TRUE@
-COIN_HAS_GLPK_FALSE = @COIN_HAS_GLPK_FALSE@
-COIN_HAS_GLPK_TRUE = @COIN_HAS_GLPK_TRUE@
-COIN_HAS_IPOPT_FALSE = @COIN_HAS_IPOPT_FALSE@
-COIN_HAS_IPOPT_TRUE = @COIN_HAS_IPOPT_TRUE@
-COIN_HAS_MSK_FALSE = @COIN_HAS_MSK_FALSE@
-COIN_HAS_MSK_TRUE = @COIN_HAS_MSK_TRUE@
-COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
-COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
-COIN_HAS_OSL_FALSE = @COIN_HAS_OSL_FALSE@
-COIN_HAS_OSL_TRUE = @COIN_HAS_OSL_TRUE@
-COIN_HAS_SPX_FALSE = @COIN_HAS_SPX_FALSE@
-COIN_HAS_SPX_TRUE = @COIN_HAS_SPX_TRUE@
-COIN_HAS_SYM_FALSE = @COIN_HAS_SYM_FALSE@
-COIN_HAS_SYM_TRUE = @COIN_HAS_SYM_TRUE@
-COIN_HAS_VOL_FALSE = @COIN_HAS_VOL_FALSE@
-COIN_HAS_VOL_TRUE = @COIN_HAS_VOL_TRUE@
-COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
-COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
+COIN_HAS_OSICPX_FALSE = @COIN_HAS_OSICPX_FALSE@
+COIN_HAS_OSICPX_TRUE = @COIN_HAS_OSICPX_TRUE@
+COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
+COIN_HAS_PKGCONFIG_TRUE = @COIN_HAS_PKGCONFIG_TRUE@
+COIN_PKG_CONFIG_PATH = @COIN_PKG_CONFIG_PATH@
+COIN_PKG_CONFIG_PATH_UNINSTALLED = @COIN_PKG_CONFIG_PATH_UNINSTALLED@
 COMPILE_BONMINBCP_FALSE = @COMPILE_BONMINBCP_FALSE@
 COMPILE_BONMINBCP_TRUE = @COMPILE_BONMINBCP_TRUE@
-COUENNEDOCDIR = @COUENNEDOCDIR@
-COUENNEOBJDIR = @COUENNEOBJDIR@
-COUENNESRCDIR = @COUENNESRCDIR@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPXINCDIR = @CPXINCDIR@
@@ -211,9 +159,6 @@ DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DBG_FFLAGS = @DBG_FFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DYLPDOCDIR = @DYLPDOCDIR@
-DYLPOBJDIR = @DYLPOBJDIR@
-DYLPSRCDIR = @DYLPSRCDIR@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -223,27 +168,20 @@ EXEEXT = @EXEEXT@
 F77 = @F77@
 FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
-FILTERSQPLIBADD = @FILTERSQPLIBADD@
+FILTERSQP_CFLAGS = @FILTERSQP_CFLAGS@
+FILTERSQP_DATA = @FILTERSQP_DATA@
+FILTERSQP_LIBS = @FILTERSQP_LIBS@
 FLIBS = @FLIBS@
-FMPINCDIR = @FMPINCDIR@
-FMPLIB = @FMPLIB@
-GLPKINCDIR = @GLPKINCDIR@
-GLPKLIB = @GLPKLIB@
-GLPKOBJDIR = @GLPKOBJDIR@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-IPOPTDOCDIR = @IPOPTDOCDIR@
-IPOPTOBJDIR = @IPOPTOBJDIR@
-IPOPTSRCDIR = @IPOPTSRCDIR@
 LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
-LIBS = @LIBS@ `cat \
-	$(IPOPTOBJDIR)/src/Interfaces/ipopt_addlibs_cpp.txt`
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIBTOOLM4 = @LIBTOOLM4@
 LN_S = @LN_S@
@@ -256,17 +194,13 @@ MAKEINFO = @MAKEINFO@
 MPICC = @MPICC@
 MPICXX = @MPICXX@
 MPIF77 = @MPIF77@
-MSKINCDIR = @MSKINCDIR@
-MSKLIB = @MSKLIB@
 OBJEXT = @OBJEXT@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
 OPT_FFLAGS = @OPT_FFLAGS@
-OSIDOCDIR = @OSIDOCDIR@
-OSIOBJDIR = @OSIOBJDIR@
-OSISRCDIR = @OSISRCDIR@
-OSLINCDIR = @OSLINCDIR@
-OSLLIB = @OSLLIB@
+OSICPX_CFLAGS = @OSICPX_CFLAGS@
+OSICPX_DATA = @OSICPX_DATA@
+OSICPX_LIBS = @OSICPX_LIBS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -274,23 +208,15 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PCADDLIBS = @PCADDLIBS@
+PKG_CONFIG = @PKG_CONFIG@
 RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
-SPXINCDIR = @SPXINCDIR@
-SPXLIB = @SPXLIB@
 STRIP = @STRIP@
-SYMDOCDIR = @SYMDOCDIR@
-SYMOBJDIR = @SYMOBJDIR@
-SYMSRCDIR = @SYMSRCDIR@
 VERSION = @VERSION@
-VOLDOCDIR = @VOLDOCDIR@
-VOLOBJDIR = @VOLOBJDIR@
-VOLSRCDIR = @VOLSRCDIR@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
-XPRINCDIR = @XPRINCDIR@
-XPRLIB = @XPRLIB@
 abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
@@ -303,6 +229,7 @@ ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
+ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -323,6 +250,7 @@ exec_prefix = @exec_prefix@
 have_autoconf = @have_autoconf@
 have_automake = @have_automake@
 have_svn = @have_svn@
+have_svnversion = @have_svnversion@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -345,70 +273,43 @@ sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-COINLIBS = $(CBCOBJDIR)/src/libCbc.la $(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/libOsi.la $(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__append_1)
-IPOPTLIBS = \
-	$(IPOPTOBJDIR)/src/Interfaces/libipopt.la
-
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../../src/OaAlgorithms` \
+AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
+	-I`$(CYGPATH_W) $(srcdir)/../../src/OaAlgorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` -I`$(CYGPATH_W) \
-	$(IPOPTOBJDIR)/inc` -I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Common` \
-	-I`$(CYGPATH_W) $(IPOPTSRCDIR)/src/Interfaces` -I`$(CYGPATH_W) \
-	$(IPOPTSRCDIR)/src/LinAlg` -I`$(CYGPATH_W) \
-	$(IPOPTSRCDIR)/src/Apps/AmplSolver` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src` -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCSRCDIR)/examples` -I`$(CYGPATH_W) \
-	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiCbc` -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglProbing` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglOddHole` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglClique` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglMixedIntegerRounding` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglTwomir` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src` $(am__append_2)
+	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin`
+
+
+# The following is a trick to get the source code of Cbc/Samples correctly in
+# here, and also to get a link to libCbc into this directory (so that it
+# is made)
+#CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
+#	rm -f $@
+#	$(LN_S) $< $@
+
+#CbcBranchUser.cpp: $(CBCSRCDIR)/examples/CbcBranchUser.cpp
+#	rm -f $@
+#	$(LN_S) $< $@
 
 ########################################################################
 #                                 oa_fp                                #
 ########################################################################
 oa_fp_SOURCES = OAFeasibilityPump.cpp FP.cpp FP.hpp
 oa_fp_LDADD = \
-        ../../src/CbcBonmin/libbonmin.la \
 	../../src/Interfaces/Ampl/libamplinterface.la \
-        $(IPOPTOBJDIR)/src/Apps/AmplSolver/libamplinterface.la \
-	$(IPOPTLIBS) \
-	$(LIBCBCCOPY) \
-	$(COINLIBS) \
-	$(ASLLIB) \
-	$(ADDLIBS)
+	../../src/CbcBonmin/libbonmin.la \
+	$(ASL_LIBS) \
+	$(BONMINLIB_LIBS)
 
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
 # libraries.
 oa_fp_LDFLAGS = -rpath $(libdir)
-
-########################################################################
-#                         make distclean stuff                         #
-########################################################################
-CLEANFILES = $(LIBCBCCOPY)
-DISTCLEANFILES = \
-	CbcCompareUser.cpp CbcBranchUser.cpp
-
 all: all-am
 
 .SUFFIXES:
@@ -613,11 +514,9 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
-	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -685,16 +584,14 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	uninstall-binPROGRAMS uninstall-info-am
 
 
-# The following is a trick to get the source code of Cbc/Samples correctly in
-# here, and also to get a link to libCbc into this directory (so that it
-# is made)
-CbcCompareUser.cpp: $(CBCSRCDIR)/examples/CbcCompareUser.cpp
-	rm -f $@
-	$(LN_S) $< $@
+########################################################################
+#                         make distclean stuff                         #
+########################################################################
 
-CbcBranchUser.cpp: $(CBCSRCDIR)/examples//CbcBranchUser.cpp
-	rm -f $@
-	$(LN_S) $< $@
+#CLEANFILES = $(LIBCBCCOPY)
+
+#DISTCLEANFILES = \
+#	CbcCompareUser.cpp CbcBranchUser.cpp
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
