@@ -39,21 +39,17 @@ AC_PREFIX_DEFAULT([`pwd`])
 AC_COIN_CREATE_LIBTOOL
 
 #############################################################################
-#             Check which ThirdParty sources are available                  #
-#############################################################################
-
-AC_COIN_MAIN_PACKAGEDIR([Blas],     [ThirdParty],[daxpy.f],                 coinblas)
-AC_COIN_MAIN_PACKAGEDIR([Lapack],   [ThirdParty],[LAPACK/SRC/dlarf.f],      coinlapack)
-AC_COIN_MAIN_PACKAGEDIR([HSL],      [ThirdParty],[configure.ac],            coinhsl)
-AC_COIN_MAIN_PACKAGEDIR([ASL],      [ThirdParty],[solvers/asl.h],           coinasl)
-AC_COIN_MAIN_PACKAGEDIR([FilterSQP],[ThirdParty],[source/src/filter.f],     coinfiltersqp)
-AC_COIN_MAIN_PACKAGEDIR([Metis],    [ThirdParty],[metis-4.0/Lib/balance.c], coinmetis)
-AC_COIN_MAIN_PACKAGEDIR([Mumps],    [ThirdParty],[MUMPS/src/dmumps_part1.F],coinmumps)
-
-#############################################################################
 #                  Check which subprojects are there                        #
 #############################################################################
 
+AC_COIN_MAIN_PACKAGEDIR(Blas,     ThirdParty,[daxpy.f],                 coinblas)
+AC_COIN_MAIN_PACKAGEDIR(Lapack,   ThirdParty,[LAPACK/SRC/dlarf.f],      coinlapack)
+AC_COIN_MAIN_PACKAGEDIR(ASL,      ThirdParty,[solvers/asl.h],           coinasl)
+AC_COIN_MAIN_PACKAGEDIR(FilterSQP,ThirdParty,[source/src/filter.f],     coinfiltersqp)
+AC_COIN_MAIN_PACKAGEDIR(Metis,    ThirdParty,[metis-4.0/Lib/balance.c], coinmetis)
+AC_COIN_MAIN_PACKAGEDIR(Mumps,    ThirdParty,[MUMPS/src/dmumps_part1.F],coinmumps)
+AC_COIN_MAIN_PACKAGEDIR(HSL,      ThirdParty,[configure.ac],            coinhsl)
+AC_COIN_MAIN_PACKAGEDIR(Sample,   Data,,                                coindatasample)
 AC_COIN_MAIN_PACKAGEDIR(CoinUtils)
 AC_COIN_MAIN_PACKAGEDIR(Osi)
 AC_COIN_MAIN_PACKAGEDIR(Clp)
@@ -62,7 +58,6 @@ AC_COIN_MAIN_PACKAGEDIR(Cbc)
 AC_COIN_MAIN_PACKAGEDIR(Bcp)
 AC_COIN_MAIN_PACKAGEDIR(Ipopt)
 AC_COIN_MAIN_PACKAGEDIR(Bonmin)
-AC_COIN_MAIN_PACKAGEDIR(Sample,Data,,coindatasample)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #

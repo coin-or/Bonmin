@@ -475,11 +475,12 @@ ac_includes_default="\
 
 ac_subdirs_all="$ac_subdirs_all ThirdParty/Blas"
 ac_subdirs_all="$ac_subdirs_all ThirdParty/Lapack"
-ac_subdirs_all="$ac_subdirs_all ThirdParty/HSL"
 ac_subdirs_all="$ac_subdirs_all ThirdParty/ASL"
 ac_subdirs_all="$ac_subdirs_all ThirdParty/FilterSQP"
 ac_subdirs_all="$ac_subdirs_all ThirdParty/Metis"
 ac_subdirs_all="$ac_subdirs_all ThirdParty/Mumps"
+ac_subdirs_all="$ac_subdirs_all ThirdParty/HSL"
+ac_subdirs_all="$ac_subdirs_all Data/Sample"
 ac_subdirs_all="$ac_subdirs_all CoinUtils"
 ac_subdirs_all="$ac_subdirs_all Osi"
 ac_subdirs_all="$ac_subdirs_all Clp"
@@ -488,7 +489,6 @@ ac_subdirs_all="$ac_subdirs_all Cbc"
 ac_subdirs_all="$ac_subdirs_all Bcp"
 ac_subdirs_all="$ac_subdirs_all Ipopt"
 ac_subdirs_all="$ac_subdirs_all Bonmin"
-ac_subdirs_all="$ac_subdirs_all Data/Sample"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX ADD_FFLAGS DBG_FFLAGS OPT_FFLAGS F77 FFLAGS ac_ct_F77 MPIF77 EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS PKG_CONFIG ac_pt_PKG_CONFIG COIN_HAS_PKGCONFIG_TRUE COIN_HAS_PKGCONFIG_FALSE COIN_PKG_CONFIG_PATH COIN_PKG_CONFIG_PATH_UNINSTALLED COIN_SKIP_PROJECTS subdirs LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
@@ -1152,9 +1152,6 @@ Optional Packages:
   --with-lapack-incdir directory with header files for using project Lapack
   --with-lapack-datadir directory with data files for using project Lapack
   --with-lapack           specify LAPACK library (or BUILD for compilation)
-  --with-hsl-lib linker flags for using project HSL
-  --with-hsl-incdir directory with header files for using project HSL
-  --with-hsl-datadir directory with data files for using project HSL
   --with-asl-lib linker flags for using project ASL
   --with-asl-incdir directory with header files for using project ASL
   --with-asl-datadir directory with data files for using project ASL
@@ -1170,6 +1167,12 @@ Optional Packages:
   --with-mumps-lib linker flags for using project Mumps
   --with-mumps-incdir directory with header files for using project Mumps
   --with-mumps-datadir directory with data files for using project Mumps
+  --with-hsl-lib linker flags for using project HSL
+  --with-hsl-incdir directory with header files for using project HSL
+  --with-hsl-datadir directory with data files for using project HSL
+  --with-sample-lib linker flags for using project Sample
+  --with-sample-incdir directory with header files for using project Sample
+  --with-sample-datadir directory with data files for using project Sample
   --with-coinutils-lib linker flags for using project CoinUtils
   --with-coinutils-incdir directory with header files for using project
                           CoinUtils
@@ -1197,9 +1200,6 @@ Optional Packages:
   --with-bonmin-lib linker flags for using project Bonmin
   --with-bonmin-incdir directory with header files for using project Bonmin
   --with-bonmin-datadir directory with data files for using project Bonmin
-  --with-sample-lib linker flags for using project Sample
-  --with-sample-incdir directory with header files for using project Sample
-  --with-sample-datadir directory with data files for using project Sample
 
 Some influential environment variables:
   CDEFS       Additional -D flags to be used when compiling C code.
@@ -20882,7 +20882,7 @@ fi
 
 
 #############################################################################
-#             Check which ThirdParty sources are available                  #
+#                  Check which subprojects are there                        #
 #############################################################################
 
 
@@ -21328,127 +21328,6 @@ echo "${ECHO_T}yes" >&6
 
 
 subdirs="$subdirs ThirdParty/Lapack"
-
-  else
-    echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-  fi
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-
-echo "$as_me:$LINENO: checking whether project HSL is available" >&5
-echo $ECHO_N "checking whether project HSL is available... $ECHO_C" >&6
-
-coin_has_hsl=notGiven
-coin_have_project_dir=no
-
-# check if user wants to skip project in any case
-
-if test x"$COIN_SKIP_PROJECTS" != x; then
-  for dir in $COIN_SKIP_PROJECTS; do
-    if test $dir = "HSL"; then
-      coin_has_hsl=skipping
-    fi
-    if test $dir = "ThirdParty/HSL"; then
-      coin_has_hsl=skipping
-    fi
-  done
-fi
-
-if test $coin_has_hsl != skipping; then
-  if test $PACKAGE_TARNAME = hsl; then
-    coin_has_hsl=.
-    coin_have_project_dir=yes
-  fi
-
-
-# Check whether --with-m4_tolower(HSL)-lib or --without-m4_tolower(HSL)-lib was given.
-if test "${with_hsl_lib+set}" = set; then
-  withval="$with_hsl_lib"
-  coin_has_hsl=installed
-fi;
-
-
-# Check whether --with-m4_tolower(HSL)-incdir or --without-m4_tolower(HSL)-incdir was given.
-if test "${with_hsl_incdir+set}" = set; then
-  withval="$with_hsl_incdir"
-  coin_has_hsl=installed
-fi;
-
-
-# Check whether --with-m4_tolower(HSL)-datadir or --without-m4_tolower(HSL)-datadir was given.
-if test "${with_hsl_datadir+set}" = set; then
-  withval="$with_hsl_datadir"
-  coin_has_hsl=installed
-fi;
-
-
-
-
-
-fi
-
-# check if project is available in present directory
-if test "$coin_has_hsl" = notGiven; then
-  if test -d $srcdir/ThirdParty/HSL; then
-    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
-    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
-    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
-    for i in $srcdir/ThirdParty/HSL/configure.ac; do
-         if test -r $i; then
-           coin_have_project_dir=yes
-         fi
-       done
-
-    if test $coin_have_project_dir = yes; then
-      coin_has_hsl=ThirdParty/HSL
-    fi
-  fi
-fi
-
-# check for project by using pkg-config, if pkg-config is available
-if test $coin_has_hsl = notGiven; then
-  #we are only interested in installed packages here, so we do not search in $COIN_PKG_CONFIG_PATH_UNINSTALLED
-  if test -n "$PKG_CONFIG" ; then
-    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
-    PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" ; export PKG_CONFIG_PATH
-
-if test -n "$PKG_CONFIG" ; then
-  if $PKG_CONFIG --exists "coinhsl"; then
-    COINHSL_VERSION=`$PKG_CONFIG --modversion "coinhsl" 2>/dev/null`
-    coin_has_hsl="$COINHSL_VERSION"
-  else
-    COINHSL_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "coinhsl"`
-
-  fi
-else
-  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module coinhsl without pkg-config\"" >&5
-echo "$as_me: error: \"Cannot check for existance of module coinhsl without pkg-config\"" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
-  fi
-fi
-
-echo "$as_me:$LINENO: result: $coin_has_hsl" >&5
-echo "${ECHO_T}$coin_has_hsl" >&6
-
-echo "$as_me:$LINENO: checking whether project HSL needs to be configured" >&5
-echo $ECHO_N "checking whether project HSL needs to be configured... $ECHO_C" >&6
-if test "$coin_have_project_dir" = yes ; then
-
-  if test -r $srcdir/ThirdParty/HSL/configure; then
-    coin_subdirs="$coin_subdirs ThirdParty/HSL"
-    echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-
-subdirs="$subdirs ThirdParty/HSL"
 
   else
     echo "$as_me:$LINENO: result: no" >&5
@@ -21944,9 +21823,242 @@ echo "${ECHO_T}no" >&6
 fi
 
 
-#############################################################################
-#                  Check which subprojects are there                        #
-#############################################################################
+echo "$as_me:$LINENO: checking whether project HSL is available" >&5
+echo $ECHO_N "checking whether project HSL is available... $ECHO_C" >&6
+
+coin_has_hsl=notGiven
+coin_have_project_dir=no
+
+# check if user wants to skip project in any case
+
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = "HSL"; then
+      coin_has_hsl=skipping
+    fi
+    if test $dir = "ThirdParty/HSL"; then
+      coin_has_hsl=skipping
+    fi
+  done
+fi
+
+if test $coin_has_hsl != skipping; then
+  if test $PACKAGE_TARNAME = hsl; then
+    coin_has_hsl=.
+    coin_have_project_dir=yes
+  fi
+
+
+# Check whether --with-m4_tolower(HSL)-lib or --without-m4_tolower(HSL)-lib was given.
+if test "${with_hsl_lib+set}" = set; then
+  withval="$with_hsl_lib"
+  coin_has_hsl=installed
+fi;
+
+
+# Check whether --with-m4_tolower(HSL)-incdir or --without-m4_tolower(HSL)-incdir was given.
+if test "${with_hsl_incdir+set}" = set; then
+  withval="$with_hsl_incdir"
+  coin_has_hsl=installed
+fi;
+
+
+# Check whether --with-m4_tolower(HSL)-datadir or --without-m4_tolower(HSL)-datadir was given.
+if test "${with_hsl_datadir+set}" = set; then
+  withval="$with_hsl_datadir"
+  coin_has_hsl=installed
+fi;
+
+
+
+
+
+fi
+
+# check if project is available in present directory
+if test "$coin_has_hsl" = notGiven; then
+  if test -d $srcdir/ThirdParty/HSL; then
+    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
+    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
+    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
+    for i in $srcdir/ThirdParty/HSL/configure.ac; do
+         if test -r $i; then
+           coin_have_project_dir=yes
+         fi
+       done
+
+    if test $coin_have_project_dir = yes; then
+      coin_has_hsl=ThirdParty/HSL
+    fi
+  fi
+fi
+
+# check for project by using pkg-config, if pkg-config is available
+if test $coin_has_hsl = notGiven; then
+  #we are only interested in installed packages here, so we do not search in $COIN_PKG_CONFIG_PATH_UNINSTALLED
+  if test -n "$PKG_CONFIG" ; then
+    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" ; export PKG_CONFIG_PATH
+
+if test -n "$PKG_CONFIG" ; then
+  if $PKG_CONFIG --exists "coinhsl"; then
+    COINHSL_VERSION=`$PKG_CONFIG --modversion "coinhsl" 2>/dev/null`
+    coin_has_hsl="$COINHSL_VERSION"
+  else
+    COINHSL_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "coinhsl"`
+
+  fi
+else
+  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module coinhsl without pkg-config\"" >&5
+echo "$as_me: error: \"Cannot check for existance of module coinhsl without pkg-config\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+  fi
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_hsl" >&5
+echo "${ECHO_T}$coin_has_hsl" >&6
+
+echo "$as_me:$LINENO: checking whether project HSL needs to be configured" >&5
+echo $ECHO_N "checking whether project HSL needs to be configured... $ECHO_C" >&6
+if test "$coin_have_project_dir" = yes ; then
+
+  if test -r $srcdir/ThirdParty/HSL/configure; then
+    coin_subdirs="$coin_subdirs ThirdParty/HSL"
+    echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+
+subdirs="$subdirs ThirdParty/HSL"
+
+  else
+    echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+  fi
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+
+echo "$as_me:$LINENO: checking whether project Sample is available" >&5
+echo $ECHO_N "checking whether project Sample is available... $ECHO_C" >&6
+
+coin_has_sample=notGiven
+coin_have_project_dir=no
+
+# check if user wants to skip project in any case
+
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = "Sample"; then
+      coin_has_sample=skipping
+    fi
+    if test $dir = "Data/Sample"; then
+      coin_has_sample=skipping
+    fi
+  done
+fi
+
+if test $coin_has_sample != skipping; then
+  if test $PACKAGE_TARNAME = sample; then
+    coin_has_sample=.
+    coin_have_project_dir=yes
+  fi
+
+
+# Check whether --with-m4_tolower(Sample)-lib or --without-m4_tolower(Sample)-lib was given.
+if test "${with_sample_lib+set}" = set; then
+  withval="$with_sample_lib"
+  coin_has_sample=installed
+fi;
+
+
+# Check whether --with-m4_tolower(Sample)-incdir or --without-m4_tolower(Sample)-incdir was given.
+if test "${with_sample_incdir+set}" = set; then
+  withval="$with_sample_incdir"
+  coin_has_sample=installed
+fi;
+
+
+# Check whether --with-m4_tolower(Sample)-datadir or --without-m4_tolower(Sample)-datadir was given.
+if test "${with_sample_datadir+set}" = set; then
+  withval="$with_sample_datadir"
+  coin_has_sample=installed
+fi;
+
+
+
+
+
+fi
+
+# check if project is available in present directory
+if test "$coin_has_sample" = notGiven; then
+  if test -d $srcdir/Data/Sample; then
+    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
+    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
+    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
+     coin_have_project_dir=yes
+
+    if test $coin_have_project_dir = yes; then
+      coin_has_sample=Data/Sample
+    fi
+  fi
+fi
+
+# check for project by using pkg-config, if pkg-config is available
+if test $coin_has_sample = notGiven; then
+  #we are only interested in installed packages here, so we do not search in $COIN_PKG_CONFIG_PATH_UNINSTALLED
+  if test -n "$PKG_CONFIG" ; then
+    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" ; export PKG_CONFIG_PATH
+
+if test -n "$PKG_CONFIG" ; then
+  if $PKG_CONFIG --exists "coindatasample"; then
+    COINDATASAMPLE_VERSION=`$PKG_CONFIG --modversion "coindatasample" 2>/dev/null`
+    coin_has_sample="$COINDATASAMPLE_VERSION"
+  else
+    COINDATASAMPLE_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "coindatasample"`
+
+  fi
+else
+  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module coindatasample without pkg-config\"" >&5
+echo "$as_me: error: \"Cannot check for existance of module coindatasample without pkg-config\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+  fi
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_sample" >&5
+echo "${ECHO_T}$coin_has_sample" >&6
+
+echo "$as_me:$LINENO: checking whether project Sample needs to be configured" >&5
+echo $ECHO_N "checking whether project Sample needs to be configured... $ECHO_C" >&6
+if test "$coin_have_project_dir" = yes ; then
+
+  if test -r $srcdir/Data/Sample/configure; then
+    coin_subdirs="$coin_subdirs Data/Sample"
+    echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+
+subdirs="$subdirs Data/Sample"
+
+  else
+    echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+  fi
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
 
 
 echo "$as_me:$LINENO: checking whether project CoinUtils is available" >&5
@@ -22874,123 +22986,6 @@ echo "${ECHO_T}yes" >&6
 
 
 subdirs="$subdirs Bonmin"
-
-  else
-    echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-  fi
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-
-echo "$as_me:$LINENO: checking whether project Sample is available" >&5
-echo $ECHO_N "checking whether project Sample is available... $ECHO_C" >&6
-
-coin_has_sample=notGiven
-coin_have_project_dir=no
-
-# check if user wants to skip project in any case
-
-if test x"$COIN_SKIP_PROJECTS" != x; then
-  for dir in $COIN_SKIP_PROJECTS; do
-    if test $dir = "Sample"; then
-      coin_has_sample=skipping
-    fi
-    if test $dir = "Data/Sample"; then
-      coin_has_sample=skipping
-    fi
-  done
-fi
-
-if test $coin_has_sample != skipping; then
-  if test $PACKAGE_TARNAME = sample; then
-    coin_has_sample=.
-    coin_have_project_dir=yes
-  fi
-
-
-# Check whether --with-m4_tolower(Sample)-lib or --without-m4_tolower(Sample)-lib was given.
-if test "${with_sample_lib+set}" = set; then
-  withval="$with_sample_lib"
-  coin_has_sample=installed
-fi;
-
-
-# Check whether --with-m4_tolower(Sample)-incdir or --without-m4_tolower(Sample)-incdir was given.
-if test "${with_sample_incdir+set}" = set; then
-  withval="$with_sample_incdir"
-  coin_has_sample=installed
-fi;
-
-
-# Check whether --with-m4_tolower(Sample)-datadir or --without-m4_tolower(Sample)-datadir was given.
-if test "${with_sample_datadir+set}" = set; then
-  withval="$with_sample_datadir"
-  coin_has_sample=installed
-fi;
-
-
-
-
-
-fi
-
-# check if project is available in present directory
-if test "$coin_has_sample" = notGiven; then
-  if test -d $srcdir/Data/Sample; then
-    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
-    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
-    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
-     coin_have_project_dir=yes
-
-    if test $coin_have_project_dir = yes; then
-      coin_has_sample=Data/Sample
-    fi
-  fi
-fi
-
-# check for project by using pkg-config, if pkg-config is available
-if test $coin_has_sample = notGiven; then
-  #we are only interested in installed packages here, so we do not search in $COIN_PKG_CONFIG_PATH_UNINSTALLED
-  if test -n "$PKG_CONFIG" ; then
-    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
-    PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" ; export PKG_CONFIG_PATH
-
-if test -n "$PKG_CONFIG" ; then
-  if $PKG_CONFIG --exists "coindatasample"; then
-    COINDATASAMPLE_VERSION=`$PKG_CONFIG --modversion "coindatasample" 2>/dev/null`
-    coin_has_sample="$COINDATASAMPLE_VERSION"
-  else
-    COINDATASAMPLE_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "coindatasample"`
-
-  fi
-else
-  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module coindatasample without pkg-config\"" >&5
-echo "$as_me: error: \"Cannot check for existance of module coindatasample without pkg-config\"" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
-  fi
-fi
-
-echo "$as_me:$LINENO: result: $coin_has_sample" >&5
-echo "${ECHO_T}$coin_has_sample" >&6
-
-echo "$as_me:$LINENO: checking whether project Sample needs to be configured" >&5
-echo $ECHO_N "checking whether project Sample needs to be configured... $ECHO_C" >&6
-if test "$coin_have_project_dir" = yes ; then
-
-  if test -r $srcdir/Data/Sample/configure; then
-    coin_subdirs="$coin_subdirs Data/Sample"
-    echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-
-subdirs="$subdirs Data/Sample"
 
   else
     echo "$as_me:$LINENO: result: no" >&5
