@@ -15,9 +15,6 @@
 /* Define to 1 if the ASL package is available */
 #undef COIN_HAS_ASL
 
-/* Define to 1 if the Bcp package is available */
-#undef COIN_HAS_BCP
-
 /* Define to 1 if the CoinDepend package is available */
 #undef COIN_HAS_COINDEPEND
 

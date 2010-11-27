@@ -72,18 +72,18 @@ fi
 
 AC_COIN_CHECK_PACKAGE(ASL, [coinasl ipoptamplinterface])
 
-AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
-
-AC_ARG_WITH([bonminbcp],
-            AC_HELP_STRING([--with-bonminbcp],
-                           [Compile Bonmin with Bcp-based parallel version]),
-            [use_bcp="$withval"], [use_bcp=no])
-if test "$use_bcp" = yes; then
-  if test $coin_has_bcp != yes ; then
-     AC_MSG_ERROR([You specified --with-bonminbcp, but Bcp is not available])
-  fi
-fi
-AM_CONDITIONAL(COMPILE_BONMINBCP, test "$use_bcp" = yes)
+#AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
+#
+#AC_ARG_WITH([bonminbcp],
+#            AC_HELP_STRING([--with-bonminbcp],
+#                           [Compile Bonmin with Bcp-based parallel version]),
+#            [use_bcp="$withval"], [use_bcp=no])
+#if test "$use_bcp" = yes; then
+#  if test $coin_has_bcp != yes ; then
+#     AC_MSG_ERROR([You specified --with-bonminbcp, but Bcp is not available])
+#  fi
+#fi
+#AM_CONDITIONAL(COMPILE_BONMINBCP, test "$use_bcp" = yes)
 
 #############################################################################
 #                                     CPLEX                                 #
@@ -108,38 +108,37 @@ AC_ARG_WITH([filtersqp],
 AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
 
 # we want to keep the linking check for FilterSQP, but cannot do this if FilterSQP will be build later (in ThirdParty)
-# the latter is indicated by having a .pc dependency, so we skip the link check if $FILTERSQP_PCREQUIRED is not empty
-if test $coin_has_filtersqp = yes && test "x$FILTERSQP_PCREQUIRED" = x; then
-  AC_MSG_CHECKING([whether FilterSQP library $FILTERSQP_LIBS works])
-  SAVE_LIBS="$LIBS"
-  LIBS="$FILTERSQP_LIBS $FLIBS $LIBS"
-  AC_LANG_PUSH([Fortran 77])
-  AC_TRY_LINK([],
-[      call filterSQP
-      end
-      subroutine confun
-      end
-      subroutine objfun
-      end
-      subroutine gradient
-      end
-      subroutine hessian],
-              [AC_MSG_RESULT([yes])
-               FILTERSQP_LIBS="$FILTERSQP_LIBS $FLIBS"],
-              [AC_MSG_RESULT([no])
-               AC_MSG_ERROR([user supplied FilterSQP library $FILTERSQP_LIBS does not work])])
-  AC_LANG_POP([Fortran 77])
-  LIBS="$SAVE_LIBS"
-fi
+#if test $coin_has_filtersqp = yes ; then
+#  AC_MSG_CHECKING([whether FilterSQP library $FILTERSQP_LIBS works])
+#  SAVE_LIBS="$LIBS"
+#  LIBS="$FILTERSQP_LIBS $FLIBS $LIBS"
+#  AC_LANG_PUSH([Fortran 77])
+#  AC_TRY_LINK([],
+#[      call filterSQP
+#      end
+#      subroutine confun
+#      end
+#      subroutine objfun
+#      end
+#      subroutine gradient
+#      end
+#      subroutine hessian],
+#              [AC_MSG_RESULT([yes])
+#               FILTERSQP_LIBS="$FILTERSQP_LIBS $FLIBS"],
+#              [AC_MSG_RESULT([no])
+#               AC_MSG_ERROR([user supplied FilterSQP library $FILTERSQP_LIBS does not work])])
+#  AC_LANG_POP([Fortran 77])
+#  LIBS="$SAVE_LIBS"
+#fi
 
 #############################################################################
 #                           Feasibility Pump                                #
 #############################################################################
 
-if test x"$BUILD_FP" != x; then
-  build_fp=yes
-fi
-AM_CONDITIONAL(BUILD_FP, test x$build_fp = xyes)
+#if test x"$BUILD_FP" != x; then
+#  build_fp=yes
+#fi
+#AM_CONDITIONAL(BUILD_FP, test x$build_fp = xyes)
 
 #############################################################################
 #                                 ASTYLE                                    #
