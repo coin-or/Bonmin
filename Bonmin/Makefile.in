@@ -29,6 +29,7 @@
 ########################################################################
 #                    Documentation installation                        #
 ########################################################################
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -61,6 +62,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/../config.sub $(srcdir)/../install-sh \
 	$(srcdir)/../ltmain.sh $(srcdir)/../missing \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/bonmin-uninstalled.pc.in $(srcdir)/bonmin.pc.in \
 	$(top_srcdir)/configure \
 	$(top_srcdir)/examples/CppExample/Makefile.in \
 	$(top_srcdir)/examples/CppExample/MyBonmin.cpp \
@@ -81,7 +83,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
 CONFIG_CLEAN_FILES = examples/OptionDocGen/Makefile \
-	examples/CppExample/Makefile
+	examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -90,6 +92,15 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-recursive installcheck-recursive installdirs-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(pkgconfiglibdir)"
+pkgconfiglibDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(pkgconfiglib_DATA)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
@@ -119,6 +130,7 @@ AMTAR = @AMTAR@
 AR = @AR@
 ASL_CFLAGS = @ASL_CFLAGS@
 ASL_DATA = @ASL_DATA@
+ASL_DATA_INSTALLED = @ASL_DATA_INSTALLED@
 ASL_LIBS = @ASL_LIBS@
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
@@ -128,7 +140,9 @@ AUTOMAKE = @AUTOMAKE@
 AUX_DIR = @AUX_DIR@
 AWK = @AWK@
 BONMINLIB_CFLAGS = @BONMINLIB_CFLAGS@
+BONMINLIB_CFLAGS_INSTALLED = @BONMINLIB_CFLAGS_INSTALLED@
 BONMINLIB_LIBS = @BONMINLIB_LIBS@
+BONMINLIB_LIBS_INSTALLED = @BONMINLIB_LIBS_INSTALLED@
 BONMINLIB_PCLIBS = @BONMINLIB_PCLIBS@
 BONMINLIB_PCREQUIRES = @BONMINLIB_PCREQUIRES@
 BONMIN_SVN_REV = @BONMIN_SVN_REV@
@@ -139,7 +153,12 @@ CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
 COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
 COINDEPEND_DATA = @COINDEPEND_DATA@
+COINDEPEND_DATA_INSTALLED = @COINDEPEND_DATA_INSTALLED@
 COINDEPEND_LIBS = @COINDEPEND_LIBS@
+COIN_CC_IS_CL_FALSE = @COIN_CC_IS_CL_FALSE@
+COIN_CC_IS_CL_TRUE = @COIN_CC_IS_CL_TRUE@
+COIN_CXX_IS_CL_FALSE = @COIN_CXX_IS_CL_FALSE@
+COIN_CXX_IS_CL_TRUE = @COIN_CXX_IS_CL_TRUE@
 COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
 COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
 COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
@@ -180,6 +199,7 @@ FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
 FILTERSQP_CFLAGS = @FILTERSQP_CFLAGS@
 FILTERSQP_DATA = @FILTERSQP_DATA@
+FILTERSQP_DATA_INSTALLED = @FILTERSQP_DATA_INSTALLED@
 FILTERSQP_LIBS = @FILTERSQP_LIBS@
 FLIBS = @FLIBS@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
@@ -210,6 +230,7 @@ OPT_CXXFLAGS = @OPT_CXXFLAGS@
 OPT_FFLAGS = @OPT_FFLAGS@
 OSICPX_CFLAGS = @OSICPX_CFLAGS@
 OSICPX_DATA = @OSICPX_DATA@
+OSICPX_DATA_INSTALLED = @OSICPX_DATA_INSTALLED@
 OSICPX_LIBS = @OSICPX_LIBS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -304,6 +325,12 @@ EXTRA_DIST = doc/Bonmin_ReferenceManual.hpp \
 	test/CppExample/MyBonmin.cpp test/mytoy.nl $(am__append_2)
 
 ########################################################################
+#                  Installation of the .pc file                        #
+########################################################################
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = bonmin.pc
+
+########################################################################
 #                         Maintainer Stuff                             #
 ########################################################################
 
@@ -371,6 +398,10 @@ examples/OptionDocGen/Makefile: $(top_builddir)/config.status $(top_srcdir)/exam
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/CppExample/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/CppExample/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+bonmin.pc: $(top_builddir)/config.status $(srcdir)/bonmin.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+bonmin-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/bonmin-uninstalled.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -381,6 +412,23 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-pkgconfiglibDATA: $(pkgconfiglib_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(pkgconfiglibdir)" || $(mkdir_p) "$(DESTDIR)$(pkgconfiglibdir)"
+	@list='$(pkgconfiglib_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(pkgconfiglibDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(pkgconfiglibdir)/$$f'"; \
+	  $(pkgconfiglibDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(pkgconfiglibdir)/$$f"; \
+	done
+
+uninstall-pkgconfiglibDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkgconfiglib_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(pkgconfiglibdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(pkgconfiglibdir)/$$f"; \
+	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -517,7 +565,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -658,9 +706,12 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
+	for dir in "$(DESTDIR)$(pkgconfiglibdir)"; do \
+	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -706,7 +757,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-pkgconfiglibDATA
 
 install-exec-am: install-exec-local
 
@@ -734,7 +785,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-local
+uninstall-am: uninstall-info-am uninstall-local \
+	uninstall-pkgconfiglibDATA
 
 uninstall-info: uninstall-info-recursive
 
@@ -747,12 +799,13 @@ uninstall-info: uninstall-info-recursive
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
 	install-exec-am install-exec-local install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am uninstall-local
+	install-info-am install-man install-pkgconfiglibDATA \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am uninstall-info-am \
+	uninstall-local uninstall-pkgconfiglibDATA
 
 
 ########################################################################

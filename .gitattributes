@@ -4,6 +4,8 @@ Bonmin/INSTALL -text
 Bonmin/LICENSE -text
 Bonmin/MSVisualStudio/v8/libBonmin/libBonmin.vcproj -text
 Bonmin/README -text
+Bonmin/bonmin-uninstalled.pc.in -text
+Bonmin/bonmin.pc.in -text
 Bonmin/configure -text
 Bonmin/doc/BONMIN_ReferenceManual.hpp -text
 Bonmin/doc/BONMIN_UsersManual.pdf -text svneol=unset#unset

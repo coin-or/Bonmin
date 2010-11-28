@@ -180,7 +180,8 @@ AC_CONFIG_FILES([Makefile
                  examples/OptionDocGen/Makefile
                  experimental/Separable/Makefile
                  test/Makefile
-                 examples/CppExample/Makefile])
+                 examples/CppExample/Makefile
+                 bonmin.pc bonmin-uninstalled.pc])
 
 AC_CONFIG_HEADER([inc/config_bonmin.h])
 

@@ -43,15 +43,14 @@ CXXFLAGS = @CXXFLAGS@
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-# Directory with COIN header files
-COININCDIR = @abs_include_dir@/coin
+# Compiler flags (we use the CYGPATH_W variables to allow compilation with Windows compilers)
+@COIN_HAS_PKGCONFIG_TRUE@INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags bonmin` $(ADDINCFLAGS)
+@COIN_HAS_PKGCONFIG_FALSE@INCL = @BONMINLIB_CFLAGS_INSTALLED@ $(ADDINCFLAGS)
 
-# Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
-
-LIBS = -L$(COINLIBDIR) -L$(COINLIBDIR)/ThirdParty -lbonmin @BONMINLIB_LIBS@
-
-INCL = -I`$(CYGPATH_W) $(COININCDIR)` -I`$(CYGPATH_W) $(COININCDIR)/ThirdParty` @BONMINLIB_CFLAGS@ $(ADDINCFLAGS)
+# Linker flags
+@COIN_HAS_PKGCONFIG_TRUE@@COIN_CXX_IS_CL_FALSE@LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs bonmin`
+@COIN_HAS_PKGCONFIG_TRUE@@COIN_CXX_IS_CL_TRUE@LIBS = /link: `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --msvc-syntax --libs bonmin`
+@COIN_HAS_PKGCONFIG_FALSE@LIBS = -L@abs_lib_dir@ -lbonmin @BONMINLIB_LIBS_INSTALLED@
 
 # The following is necessary under cygwin, if native compilers are used
 CYGPATH_W = @CYGPATH_W@
@@ -63,7 +62,7 @@ all: $(EXE)
 $(EXE): $(OBJS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS) $(ADDLIBS)
 
 clean:
 	rm -rf $(EXE) $(OBJS)
