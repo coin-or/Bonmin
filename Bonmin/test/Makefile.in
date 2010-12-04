@@ -44,10 +44,8 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = $(am__EXEEXT_1) CppExample$(EXEEXT)
 @COIN_HAS_ASL_TRUE@am__append_1 = unitTest
-@COIN_HAS_ASL_TRUE@am__append_2 = \
-@COIN_HAS_ASL_TRUE@        ../src/CbcBonmin/libbonminampl.la \
-@COIN_HAS_ASL_TRUE@	$(ASL_LIBS)
-
+@COIN_HAS_ASL_TRUE@am__append_2 = ../src/CbcBonmin/libbonminampl.la $(ASL_LIBS)
+@COIN_HAS_ASL_TRUE@am__append_3 = ../src/CbcBonmin/libbonminampl.la $(ASL_DEPENDENCIES)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -63,15 +61,11 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_CppExample_OBJECTS = MyBonmin.$(OBJEXT) MyTMINLP.$(OBJEXT)
 CppExample_OBJECTS = $(am_CppExample_OBJECTS)
 am__DEPENDENCIES_1 =
-CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la \
-	$(am__DEPENDENCIES_1)
 am_unitTest_OBJECTS = InterfaceTest.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 @COIN_HAS_ASL_TRUE@am__DEPENDENCIES_2 =  \
 @COIN_HAS_ASL_TRUE@	../src/CbcBonmin/libbonminampl.la \
 @COIN_HAS_ASL_TRUE@	$(am__DEPENDENCIES_1)
-unitTest_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	../src/CbcBonmin/libbonmin.la $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -108,9 +102,12 @@ AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
 ASL_CFLAGS = @ASL_CFLAGS@
+ASL_CFLAGS_INSTALLED = @ASL_CFLAGS_INSTALLED@
 ASL_DATA = @ASL_DATA@
 ASL_DATA_INSTALLED = @ASL_DATA_INSTALLED@
+ASL_DEPENDENCIES = @ASL_DEPENDENCIES@
 ASL_LIBS = @ASL_LIBS@
+ASL_LIBS_INSTALLED = @ASL_LIBS_INSTALLED@
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
 AUTOCONF = @AUTOCONF@
@@ -120,6 +117,7 @@ AUX_DIR = @AUX_DIR@
 AWK = @AWK@
 BONMINLIB_CFLAGS = @BONMINLIB_CFLAGS@
 BONMINLIB_CFLAGS_INSTALLED = @BONMINLIB_CFLAGS_INSTALLED@
+BONMINLIB_DEPENDENCIES = @BONMINLIB_DEPENDENCIES@
 BONMINLIB_LIBS = @BONMINLIB_LIBS@
 BONMINLIB_LIBS_INSTALLED = @BONMINLIB_LIBS_INSTALLED@
 BONMINLIB_PCLIBS = @BONMINLIB_PCLIBS@
@@ -131,9 +129,12 @@ CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
 COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
+COINDEPEND_CFLAGS_INSTALLED = @COINDEPEND_CFLAGS_INSTALLED@
 COINDEPEND_DATA = @COINDEPEND_DATA@
 COINDEPEND_DATA_INSTALLED = @COINDEPEND_DATA_INSTALLED@
+COINDEPEND_DEPENDENCIES = @COINDEPEND_DEPENDENCIES@
 COINDEPEND_LIBS = @COINDEPEND_LIBS@
+COINDEPEND_LIBS_INSTALLED = @COINDEPEND_LIBS_INSTALLED@
 COIN_CC_IS_CL_FALSE = @COIN_CC_IS_CL_FALSE@
 COIN_CC_IS_CL_TRUE = @COIN_CC_IS_CL_TRUE@
 COIN_CXX_IS_CL_FALSE = @COIN_CXX_IS_CL_FALSE@
@@ -177,9 +178,12 @@ F77 = @F77@
 FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
 FILTERSQP_CFLAGS = @FILTERSQP_CFLAGS@
+FILTERSQP_CFLAGS_INSTALLED = @FILTERSQP_CFLAGS_INSTALLED@
 FILTERSQP_DATA = @FILTERSQP_DATA@
 FILTERSQP_DATA_INSTALLED = @FILTERSQP_DATA_INSTALLED@
+FILTERSQP_DEPENDENCIES = @FILTERSQP_DEPENDENCIES@
 FILTERSQP_LIBS = @FILTERSQP_LIBS@
+FILTERSQP_LIBS_INSTALLED = @FILTERSQP_LIBS_INSTALLED@
 FLIBS = @FLIBS@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
@@ -208,9 +212,12 @@ OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
 OPT_FFLAGS = @OPT_FFLAGS@
 OSICPX_CFLAGS = @OSICPX_CFLAGS@
+OSICPX_CFLAGS_INSTALLED = @OSICPX_CFLAGS_INSTALLED@
 OSICPX_DATA = @OSICPX_DATA@
 OSICPX_DATA_INSTALLED = @OSICPX_DATA_INSTALLED@
+OSICPX_DEPENDENCIES = @OSICPX_DEPENDENCIES@
 OSICPX_LIBS = @OSICPX_LIBS@
+OSICPX_LIBS_INSTALLED = @OSICPX_LIBS_INSTALLED@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -287,19 +294,20 @@ unitTest_SOURCES = \
 	InterfaceTest.cpp 
 
 
-# List libraries of COIN projects; libs with AMPL interface have to come before ASLLIB
+# List libraries that need to be linked in
+# libs with AMPL interface have to come before ASLLIB
 unitTest_LDADD = $(am__append_2) ../src/CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS)
+unitTest_DEPENDENCIES = $(am__append_3) ../src/CbcBonmin/libbonmin.la \
+	$(BONMINLIB_DEPENDENCIES)
 
 #########################################################################
 #########################################################################
 CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
-# List libraries of COIN projects
-CppExample_LDADD = \
-        ../src/CbcBonmin/libbonmin.la \
-        $(BONMINLIB_LIBS)
-
+# List libraries that need to be linked in
+CppExample_LDADD = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
+CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin

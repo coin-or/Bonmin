@@ -23,16 +23,18 @@ noinst_PROGRAMS += CppExample
 unitTest_SOURCES = \
 	InterfaceTest.cpp 
 
-# List libraries of COIN projects; libs with AMPL interface have to come before ASLLIB
+# List libraries that need to be linked in
+# libs with AMPL interface have to come before ASLLIB
 unitTest_LDADD =
+unitTest_DEPENDENCIES =
+
 if COIN_HAS_ASL
-unitTest_LDADD += \
-        ../src/CbcBonmin/libbonminampl.la \
-	$(ASL_LIBS)
+unitTest_LDADD        += ../src/CbcBonmin/libbonminampl.la $(ASL_LIBS)
+unitTest_DEPENDENCIES += ../src/CbcBonmin/libbonminampl.la $(ASL_DEPENDENCIES)
 endif
-unitTest_LDADD += \
-        ../src/CbcBonmin/libbonmin.la \
-	$(BONMINLIB_LIBS)
+
+unitTest_LDADD        += ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
+unitTest_DEPENDENCIES += ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
 
 
 #########################################################################
@@ -41,10 +43,9 @@ unitTest_LDADD += \
 
 CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
-# List libraries of COIN projects
-CppExample_LDADD = \
-        ../src/CbcBonmin/libbonmin.la \
-        $(BONMINLIB_LIBS)
+# List libraries that need to be linked in
+CppExample_LDADD        = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
+CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin

@@ -27,6 +27,12 @@ bonmin_LDADD = \
 	$(BONMINLIB_LIBS) \
 	$(ASL_LIBS)
 
+bonmin_DEPENDENCIES = \
+	../CbcBonmin/libbonminampl.la \
+	../CbcBonmin/libbonmin.la \
+	$(BONMINLIB_DEPENDENCIES) \
+	$(ASL_DEPENDENCIES)
+
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
 # libraries.
@@ -59,6 +65,12 @@ BonNodeSolver_LDADD = \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS) \
 	$(ASL_LIBS)
+
+BonNodeSolver_DEPENDENCIES = \
+	../CbcBonmin/libbonminampl.la \
+	../CbcBonmin/libbonmin.la \
+	$(BONMINLIB_DEPENDENCIES) \
+	$(ASL_DEPENDENCIES)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
