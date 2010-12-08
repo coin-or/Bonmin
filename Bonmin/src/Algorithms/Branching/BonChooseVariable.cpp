@@ -1109,8 +1109,7 @@ BonChooseVariable::updateInformation( int index, int branch,
        infeasibility += objects[i]->checkInfeasibility(info);
     }
     int status = OsiHotInfo::updateInformation(solver, info, choose);
-    if(status == 1 && !solver->isProvenPrimalInfeasible()){
-      printf("There was a problem solving this guy\n");
+    if(status == 1 && !solver->isProvenPrimalInfeasible() && !solver->isProvenOptimal()){
       status = 2;
     }
     return status;
