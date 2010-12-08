@@ -1,5 +1,8 @@
 // Copyright (C) 2006, 2007 International Business Machines
 // Corporation and others.  All Rights Reserved.
+//
+//
+#error "BonCurvBranchingSolver not supported anymore"
 #ifndef BonCurvBranchingSolver_H
 #define BonCurvBranchingSolver_H
 

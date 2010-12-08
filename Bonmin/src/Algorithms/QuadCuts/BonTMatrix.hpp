@@ -135,10 +135,10 @@ struct TMat{
  void makeQuadUpperDiag();
 
  void resizeOrdering(vector<int> &ordering, unsigned int newSize){
-        int oldSize = ordering.size();
+        size_t oldSize = ordering.size();
         ordering.resize(newSize);
-        for(unsigned int i = oldSize ; i < newSize ; i++)
-           ordering[i] = i;
+        for(size_t i = oldSize ; i < newSize ; i++)
+           ordering[i] = static_cast<int>(i);
    }
 
    /** Create the TMat from M.*/

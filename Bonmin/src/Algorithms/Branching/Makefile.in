@@ -57,8 +57,8 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libbonbranching_la_LIBADD =
 am_libbonbranching_la_OBJECTS = BonChooseVariable.lo \
-	BonRandomChoice.lo BonCurvBranchingSolver.lo BonPseudoCosts.lo \
-	BonLpBranchingSolver.lo BonQpBranchingSolver.lo
+	BonRandomChoice.lo BonPseudoCosts.lo BonLpBranchingSolver.lo \
+	BonQpBranchingSolver.lo
 libbonbranching_la_OBJECTS = $(am_libbonbranching_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -305,7 +305,6 @@ noinst_LTLIBRARIES = libbonbranching.la
 libbonbranching_la_SOURCES = \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
         BonRandomChoice.cpp BonRandomChoice.hpp \
-	BonCurvBranchingSolver.cpp BonCurvBranchingSolver.hpp \
         BonPseudoCosts.cpp BonPseudoCosts.hpp \
         BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
 	BonQpBranchingSolver.cpp BonQpBranchingSolver.hpp
@@ -415,7 +414,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonChooseVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvBranchingSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLpBranchingSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonPseudoCosts.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonQpBranchingSolver.Plo@am__quote@

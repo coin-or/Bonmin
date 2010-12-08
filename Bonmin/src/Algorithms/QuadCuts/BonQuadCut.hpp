@@ -176,12 +176,12 @@ Cuts::insert(const Cuts & cs){
 
 int 
 Cuts::sizeQuadCuts() const {
-  return quadCuts_.size();
+  return static_cast<int>(quadCuts_.size());
 }
 
 int
 Cuts::sizeCuts() const {
-  return quadCuts_.size() + OsiCuts::sizeCuts();
+  return static_cast<int>(quadCuts_.size()) + OsiCuts::sizeCuts();
 }
 
 QuadCut *

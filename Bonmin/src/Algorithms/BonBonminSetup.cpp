@@ -11,7 +11,9 @@
 #include "OsiClpSolverInterface.hpp"
 
 #include "BonBonminSetup.hpp"
+#ifdef BONMIN_CURVATURE_BRANCHING
 #include "BonCurvBranchingSolver.hpp"
+#endif
 #include "BonChooseVariable.hpp"
 #include "BonRandomChoice.hpp"
 #include "BonDiver.hpp"
@@ -400,7 +402,9 @@ namespace Bonmin
     }
 
     switch (varSelection) {
+#ifdef BONMIN_CURVATURE_BRANCHING
     case CURVATURE_ESTIMATOR:
+#endif
     case QP_STRONG_BRANCHING:
     case LP_STRONG_BRANCHING:
     case NLP_STRONG_BRANCHING: {
@@ -411,6 +415,7 @@ namespace Bonmin
         BonChooseVariable * chooseVariable = new BonChooseVariable(*this, nonlinearSolver_);
         chooseVariable->passInMessageHandler(nonlinearSolver_->messageHandler());
         switch (varSelection) {
+#ifdef BONMIN_CURVATURE_BRANCHING
         case CURVATURE_ESTIMATOR:
           strong_solver = new CurvBranchingSolver(nonlinearSolver_);
           chooseVariable->setTrustStrongForSolution(false);
@@ -418,6 +423,7 @@ namespace Bonmin
           //chooseVariable->setOnlyPseudoWhenTrusted(true);
           chooseVariable->setOnlyPseudoWhenTrusted(false);
           break;
+#endif
         case QP_STRONG_BRANCHING:
           chooseVariable->setTrustStrongForSolution(false);
           strong_solver = new QpBranchingSolver(nonlinearSolver_);

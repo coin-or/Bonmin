@@ -559,13 +559,19 @@ namespace Bonmin
         "(only type 1 SOS are supported at the moment)");
     roptions->setOptionExtraInfo("sos_constraints", 63);
 
+#ifdef BONMIN_CURVATURE_BRANCHING
     roptions->AddStringOption10("variable_selection",
+#else
+    roptions->AddStringOption9("variable_selection",
+#endif
         "Chooses variable selection strategy",
         "strong-branching",
         "most-fractional", "Choose most fractional variable",
         "strong-branching", "Perform strong branching",
         "reliability-branching", "Use reliability branching",
+#ifdef BONMIN_CURVATURE_BRANCHING
         "curvature-estimator", "Use curvature estimation to select branching variable",
+#endif
         "qp-strong-branching", "Perform strong branching with QP approximation",
         "lp-strong-branching", "Perform strong branching with LP approximation",
         "nlp-strong-branching", "Perform strong branching with NLP approximation",

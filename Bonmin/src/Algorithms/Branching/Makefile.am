@@ -19,7 +19,6 @@ noinst_LTLIBRARIES = libbonbranching.la
 libbonbranching_la_SOURCES = \
 	BonChooseVariable.cpp BonChooseVariable.hpp \
         BonRandomChoice.cpp BonRandomChoice.hpp \
-	BonCurvBranchingSolver.cpp BonCurvBranchingSolver.hpp \
         BonPseudoCosts.cpp BonPseudoCosts.hpp \
         BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
 	BonQpBranchingSolver.cpp BonQpBranchingSolver.hpp
