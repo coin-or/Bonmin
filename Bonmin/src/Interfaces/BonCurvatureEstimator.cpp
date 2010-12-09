@@ -32,7 +32,7 @@
 #ifdef HAVE_WSMP
 # include "IpWsmpSolverInterface.hpp"
 #endif
-#ifdef HAVE_MUMPS
+#ifdef COIN_HAS_MUMPS
 # include "IpMumpsSolverInterface.hpp"
 #endif
 
@@ -136,7 +136,7 @@ namespace Bonmin
 
     }
     else if (linear_solver=="mumps") {
-#ifdef HAVE_MUMPS
+#ifdef COIN_HAS_MUMPS
       SolverInterface1 = new MumpsSolverInterface();
       SolverInterface2 = new MumpsSolverInterface();
 #else

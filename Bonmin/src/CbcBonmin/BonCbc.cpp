@@ -16,8 +16,8 @@
 #include "CbcBranchActual.hpp"
 #include "CbcCutGenerator.hpp"
 #include "CbcCompareActual.hpp"
-//#include "CbcCompareObjective.hpp"
-//#include "CbcCompareEstimate.hpp"
+#include "CbcCompareObjective.hpp"
+#include "CbcCompareEstimate.hpp"
 
 #include "BonExitCodes.hpp"
 

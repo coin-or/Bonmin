@@ -61,7 +61,7 @@ namespace Bonmin
     /** Give size of the tree.*/
     virtual int size()
     {
-      return (nodes_.size() + (nextOnBranch_ != NULL) );
+      return (static_cast<int>(nodes_.size()) + (nextOnBranch_ != NULL) );
     }
     /** @} */
 
@@ -143,7 +143,7 @@ namespace Bonmin
     /** Give size of the tree.*/
     virtual int size()
     {
-      return (nodes_.size() + (nextOnBranch_ != NULL) + (candidateChild_ != NULL) );
+      return (static_cast<int>(nodes_.size()) + (nextOnBranch_ != NULL) + (candidateChild_ != NULL) );
     }
     /** @} */
 
@@ -239,7 +239,7 @@ namespace Bonmin
     /** Give size of the tree.*/
     virtual int size()
     {
-      return nodes_.size() + diveListSize_;
+      return static_cast<int>(nodes_.size()) + diveListSize_;
     }
     /** @} */
 
@@ -364,10 +364,10 @@ namespace Bonmin
     virtual bool test (CbcNode * x, CbcNode * y);
 
     ///  Called after each new solution
-    virtual void newSolution(CbcModel * model);
+    virtual bool newSolution(CbcModel * model);
 
     ///  Called after each new solution
-    virtual void newSolution(CbcModel * model,
+    virtual bool newSolution(CbcModel * model,
         double objectiveAtContinuous,
         int numberInfeasibilitiesAtContinuous);
 

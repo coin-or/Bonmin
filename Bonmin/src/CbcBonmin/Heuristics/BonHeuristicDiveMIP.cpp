@@ -18,9 +18,7 @@
 #include "OsiCpxSolverInterface.hpp"
 #endif
 
-#ifdef COIN_HAS_CLP
 #include "OsiClpSolverInterface.hpp"
-#endif
 
 #include "OsiAuxInfo.hpp"
 

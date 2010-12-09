@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Bonmin],[1.3stable],[coin-bonmin@lists.coin-or.org])
+AC_INIT([Bonmin],[trunk],[bonmin@lists.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
@@ -39,32 +39,25 @@ AC_PREFIX_DEFAULT([`pwd`])
 AC_COIN_CREATE_LIBTOOL
 
 #############################################################################
-#             Check which ThirdParty sources are available                  #
-#############################################################################
-
-AC_COIN_THIRDPARTY_SUBDIRS([Blas],[ThirdParty/Blas],[daxpy.f])
-AC_COIN_THIRDPARTY_SUBDIRS([Lapack],[ThirdParty/Lapack],[LAPACK/SRC/dlarf.f])
-AC_COIN_THIRDPARTY_SUBDIRS([HSL],[ThirdParty/HSL],[configure.ac])
-AC_COIN_THIRDPARTY_SUBDIRS([ASL],[ThirdParty/ASL],[solvers/asl.h])
-AC_COIN_THIRDPARTY_SUBDIRS([FilterSQP],[ThirdParty/FilterSQP],[source/src/filter.f])
-AC_COIN_THIRDPARTY_SUBDIRS([Mumps],[ThirdParty/Mumps],[MUMPS/src/dmumps_part1.F])
-AC_COIN_THIRDPARTY_SUBDIRS([Metis],[ThirdParty/Metis],[metis-4.0/Lib/balance.c])
-#############################################################################
 #                  Check which subprojects are there                        #
 #############################################################################
 
-AC_COIN_MAIN_SUBDIRS(CoinUtils)
-AC_COIN_MAIN_SUBDIRS(Data/Netlib)
-AC_COIN_MAIN_SUBDIRS(Data/Sample)
-AC_COIN_MAIN_SUBDIRS(Data/miplib3)
-AC_COIN_MAIN_SUBDIRS(Clp)
-AC_COIN_MAIN_SUBDIRS(Osi)
-AC_COIN_MAIN_SUBDIRS(Cgl)
-AC_COIN_MAIN_SUBDIRS(Cbc)
-AC_COIN_MAIN_SUBDIRS(Bcp)
-AC_COIN_MAIN_SUBDIRS(Ipopt)
-AC_COIN_MAIN_SUBDIRS(Couenne)
-AC_COIN_MAIN_SUBDIRS(Bonmin)
+AC_COIN_MAIN_PACKAGEDIR(Blas,     ThirdParty,[daxpy.f],                 coinblas)
+AC_COIN_MAIN_PACKAGEDIR(Lapack,   ThirdParty,[LAPACK/SRC/dlarf.f],      coinlapack)
+AC_COIN_MAIN_PACKAGEDIR(ASL,      ThirdParty,[solvers/asl.h],           coinasl)
+AC_COIN_MAIN_PACKAGEDIR(FilterSQP,ThirdParty,[source/src/filter.f],     coinfiltersqp)
+AC_COIN_MAIN_PACKAGEDIR(Metis,    ThirdParty,[metis-4.0/Lib/balance.c], coinmetis)
+AC_COIN_MAIN_PACKAGEDIR(Mumps,    ThirdParty,[MUMPS/src/dmumps_part1.F],coinmumps)
+AC_COIN_MAIN_PACKAGEDIR(HSL,      ThirdParty,[configure.ac],            coinhsl)
+AC_COIN_MAIN_PACKAGEDIR(Sample,   Data,,                                coindatasample)
+AC_COIN_MAIN_PACKAGEDIR(CoinUtils)
+AC_COIN_MAIN_PACKAGEDIR(Osi)
+AC_COIN_MAIN_PACKAGEDIR(Clp)
+AC_COIN_MAIN_PACKAGEDIR(Cgl)
+AC_COIN_MAIN_PACKAGEDIR(Cbc)
+AC_COIN_MAIN_PACKAGEDIR(Bcp)
+AC_COIN_MAIN_PACKAGEDIR(Ipopt)
+AC_COIN_MAIN_PACKAGEDIR(Bonmin)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #

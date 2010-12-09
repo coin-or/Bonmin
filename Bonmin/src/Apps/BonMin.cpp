@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
   std::cout<<"Bonmin "
            <<BONMIN_VERSION; 
   std::cout<<" using Cbc "
-         <<CBCVERSION; 
+         <<CBC_VERSION; 
   std::cout<<" and Ipopt "
          <<IPOPT_VERSION<<std::endl; 
   if(argc > 1) {

@@ -4,6 +4,8 @@ Bonmin/INSTALL -text
 Bonmin/LICENSE -text
 Bonmin/MSVisualStudio/v8/libBonmin/libBonmin.vcproj -text
 Bonmin/README -text
+Bonmin/bonmin-uninstalled.pc.in -text
+Bonmin/bonmin.pc.in -text
 Bonmin/configure -text
 Bonmin/doc/BONMIN_ReferenceManual.hpp -text
 Bonmin/doc/BONMIN_UsersManual.pdf -text svneol=unset#unset
@@ -46,6 +48,7 @@ Bonmin/experimental/Bcp/BM.par -text
 Bonmin/experimental/Bcp/BM_lp.cpp -text
 Bonmin/experimental/Bcp/BM_lp_branch.cpp -text
 Bonmin/experimental/Bcp/BM_tm.cpp -text
+Bonmin/experimental/Bcp/README -text
 Bonmin/experimental/Bcp/ampl_bcp.patch -text
 Bonmin/experimental/Separable/BonHeuristicInnerApproximation.cpp -text
 Bonmin/experimental/Separable/BonHeuristicInnerApproximation.hpp -text

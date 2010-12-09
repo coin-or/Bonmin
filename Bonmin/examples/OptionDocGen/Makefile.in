@@ -34,6 +34,9 @@ VPATH = @srcdir@
 #  change certain compiler options, you might have to recompile Bonmin.   #
 ##########################################################################
 
+COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
+COIN_CXX_IS_CL = @COIN_CXX_IS_CL_TRUE@TRUE
+
 # C++ Compiler command
 CXX = @CXX@
 
@@ -43,33 +46,24 @@ CXXFLAGS = @CXXFLAGS@
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-# Directory with COIN header files
-COININCDIR = @abs_include_dir@/coin
+# Include directories (we use the CYGPATH_W variables to allow compilation with Windows compilers)
+ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+  INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags bonmin`
+else
+  INCL = @BONMINLIB_CFLAGS_INSTALLED@
+endif
+INCL += $(ADDINCFLAGS)
 
-# Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
-
-# Libraries necessary to link with Bonmin
-IPOPTLIBDIR = @IPOPTLIBDIR@
-
-#Librairies for ASL (needed by Cbc)
-ASLLIB = @ASLLIB@
-
-
-LIBS = -L$(COINLIBDIR) \
-	-lbonmin -lipopt \
-       -lCbc -lCgl -lOsiClp -lOsi -lClp -lCoinUtils \
-         @ADDLIBS@ \
-	`cat @IPOPTDOCDIR@/ipopt_addlibs_cpp.txt` \
-	`cat @CGLDOCDIR@/cgl_addlibs.txt` \
-	`cat @OSIDOCDIR@/osi_addlibs.txt` \
-	`cat @CLPDOCDIR@/clp_addlibs.txt` \
-	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` 
-
-# Necessary Include dirs
-INCL = -I`$(CYGPATH_W) $(COININCDIR)` \
-	-I`$(CYGPATH_W) $(COININCDIR)/ipopt` \
-        $(ADDINCFLAGS)
+# Linker flags
+ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+  LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs bonmin`
+else
+  ifeq ($(COIN_CXX_IS_CL), TRUE)
+    LIBS = /link /libpath:`$(CYGPATH_W) @abs_lib_dir@` libbonmin.lib @BONMINLIB_LIBS_INSTALLED@
+  else
+    LIBS = -L@abs_lib_dir@ -lbonmin @BONMINLIB_LIBS_INSTALLED@
+  endif
+endif
 
 # The following is necessary under cygwin, if native compilers are used
 CYGPATH_W = @CYGPATH_W@
@@ -81,7 +75,7 @@ all: $(EXE)
 $(EXE): $(OBJS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS) $(ADDLIBS)
 
 clean:
 	rm -rf $(EXE) $(OBJS)

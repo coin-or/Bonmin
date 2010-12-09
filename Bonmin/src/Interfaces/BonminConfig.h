@@ -48,14 +48,8 @@
 /* If defined, the Ampl Solver Library is available. */
 #define COIN_HAS_ASL 1
 
-/* If defined, the BLAS Library is available. */
-#define COIN_HAS_BLAS 1
-
 /* Define to 1 if the Ipopt package is used */
 #define COIN_HAS_BONMIN 1
-
-/* If defined, the LAPACK Library is available. */
-#define COIN_HAS_LAPACK 1
 
 /* Define to 1 if MA27 is available */
 #define HAVE_MA27 1
@@ -67,7 +61,7 @@
 #define HAVE_MC19 1
 
 /* Define to 1 if MUMPS is available */
-/* #undef HAVE_MUMPS */
+/* #undef COIN_HAS_MUMPS */
 
 /* Define to 1 if Pardiso is available */
 /* #undef HAVE_PARDISO */

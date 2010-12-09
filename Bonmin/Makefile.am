@@ -78,6 +78,13 @@ astyle:
 	cd src/Interfaces/Ampl; $(MAKE) astyle
 	cd src/Interfaces/Filter; $(MAKE) astyle
 	cd src/Interfaces/Ipopt; $(MAKE) astyle
+	
+########################################################################
+#                  Installation of the .pc file                        #
+########################################################################
+
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = bonmin.pc
 
 ########################################################################
 #                         Maintainer Stuff                             #

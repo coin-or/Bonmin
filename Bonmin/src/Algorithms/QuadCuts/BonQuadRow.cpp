@@ -182,7 +182,7 @@ QuadRow::eval_f(const double *x, bool new_x){
 /** Get number of non-zeroes in the gradiant.*/
 int 
 QuadRow::nnz_grad(){
-  return g_.size();}
+  return static_cast<int>(g_.size());}
 /** Get structure of gradiant */
 void 
 QuadRow::gradiant_struct(const int nnz, int * indices, bool offset){

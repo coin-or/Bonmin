@@ -790,7 +790,7 @@ namespace Bonmin
 
   // This allows any method to change behavior as it is called
   // after each solution
-  void
+  bool
   DiverCompare::newSolution(CbcModel * model)
   {
     assert(diver_);
@@ -799,11 +799,15 @@ namespace Bonmin
     <<std::endl;
     std::cout<<"Found "<<model->getSolutionCount()<<" solutions"<<std::endl;
 #endif
-    if (diver_->getComparisonMode() == CbcDfsDiver::Enlarge)
+    bool r_value = false;
+    if (diver_->getComparisonMode() == CbcDfsDiver::Enlarge){
       diver_->setComparisonMode(CbcDfsDiver::FindSolutions);
+      r_value = true;}
     if (model->getSolutionCount() >= numberSolToStopDive_ && diver_->getComparisonMode() == CbcDfsDiver::FindSolutions) {
       diver_->setComparisonMode(CbcDfsDiver::CloseBound);
+      r_value = true;
     }
+    return r_value;
   }
 
   /// This is test function
@@ -831,11 +835,11 @@ namespace Bonmin
 
   // This Also allows any method to change behavior as it is called
   // after each solution
-  void
+  bool
   DiverCompare::newSolution(CbcModel * model,
       double objectiveAtContinuous,
       int numberInfeasibilitiesAtContinuous)
-  {}
+  { return false; }
 
   // This allows any method to change behavior as it is called
   // after every 1000 nodes.

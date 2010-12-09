@@ -256,9 +256,7 @@ OsiTMINLPInterface::registerOptions
 #ifdef COIN_HAS_FILTERSQP
     FilterSolver::RegisterOptions(roptions);
 #endif
-#ifdef COIN_HAS_IPOPT
     IpoptSolver::RegisterOptions(roptions);
-#endif
   }   
   catch(RegisteredOptions::OPTION_ALREADY_REGISTERED) {
     // skipping
@@ -441,18 +439,12 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
                      "Bonmin not configured to run with FilterSQP.");
 #endif    
 
-#ifdef COIN_HAS_IPOPT
    debug_apps_.push_back(new IpoptSolver(roptions, options, journalist, prefix)); 
-#endif
   }
   else if(s == EIpopt){
     testOthers_ = false;
-#ifdef COIN_HAS_IPOPT
     app_ = new IpoptSolver(roptions, options, journalist, prefix);
-#else
-   throw SimpleError("createApplication",
-                     "Bonmin not configured to run with Ipopt.");
-#endif
+
 #ifdef COIN_HAS_FILTERSQP
     debug_apps_.push_back(new Bonmin::FilterSolver(roptions, options, journalist, prefix));
 #endif
@@ -464,9 +456,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
    throw SimpleError("createApplication",
                      "Bonmin not configured to run with Ipopt.");
 #endif
-#ifdef COIN_HAS_IPOPT
    debug_apps_.push_back(new IpoptSolver(roptions, options, journalist, prefix)); 
-#endif
     testOthers_ = true;
   }
   if (!app_->Initialize("")) {

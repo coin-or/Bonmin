@@ -783,7 +783,7 @@ class Messages : public CoinMessages
   }
 
   /** Throws an error */
-  virtual std::vector<double*> getDualRays(int maxNumRays) const
+  virtual std::vector<double*> getDualRays(int maxNumRays, bool fullRay = false) const
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "getDualRays");
