@@ -8,7 +8,7 @@
 
 #ifndef __BONCURVATUREESTIMATOR_HPP__
 #define __BONCURVATUREESTIMATOR_HPP__
-
+#error "Not supported currently"
 #include "IpTNLP.hpp"
 #include "IpOptionsList.hpp"
 #include "IpCompoundSymMatrix.hpp"

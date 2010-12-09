@@ -561,13 +561,6 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     newCutoffDecr(source.newCutoffDecr),
     strong_branching_solver_(source.strong_branching_solver_)
 {
-   if(0 && defaultHandler()){
-     messageHandler()->setLogLevel(source.messageHandler()->logLevel());
-   }
-  //Pass in message handler
-  if(0 && source.messageHandler())
-    passInMessageHandler(source.messageHandler());
-   //Copy options from old application
   if(IsValid(source.tminlp_)) {
     problem_ = source.problem_->clone();
     feasibilityProblem_ = new TNLP2FPNLP
@@ -1950,15 +1943,12 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
       double violation = 0.;
       violation = std::max(violation, rhs - ub[cutIdx]);
       violation = std::max(violation, lb[cutIdx] - rhs);
-      if(violation < theta) {
-        if(oaHandler_->logLevel() > 0)
+      if(violation < theta && oaHandler_) {
           oaHandler_->message(CUT_NOT_VIOLATED_ENOUGH, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEol;
         continue;}
-        if(oaHandler_->logLevel() > 0)
+      if(oaHandler_)
           oaHandler_->message(VIOLATED_OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEol;
     }
-    else if (oaHandler_->logLevel() > 0)
-      oaHandler_->message(OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<CoinMessageEol;
   OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
@@ -2543,7 +2533,6 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   nCallOptimizeTNLP_++;
   hasBeenOptimized_ = true;
  
- 
   //Options should have been printed if not done already turn off Ipopt output
   if(!hasPrintedOptions) {
     hasPrintedOptions = 1;
@@ -2552,67 +2541,6 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   }
   
   bool otherDisagree = false ;
-#if 0
-  if(optimizationStatus_ == TNLPSolver::notEnoughFreedom)//Too few degrees of freedom
-  {
-    (*messageHandler())<<"Too few degrees of freedom...."<<CoinMessageEol;
-    int numrows = getNumRows();
-    int numcols = getNumCols();
-    
-    const double * colLower = getColLower();
-    const double * colUpper = getColUpper();
-    
-    
-    const double * rowLower = getRowLower();
-    const double * rowUpper = getRowUpper();
-    
-    int numberFixed = 0;
-    for(int i = 0 ; i < numcols ; i++)
-    {
-      if(colUpper[i] - colLower[i] <= INT_BIAS)
-	    {
-	      numberFixed++;
-	    }
-    }
-    int numberEqualities = 0;
-    for(int i = 0 ; i < numrows ; i++)
-    {
-      if(rowUpper[i] - rowLower[i] <= INT_BIAS)
-	    {
-	      numberEqualities++;
-	    }	  
-    }
-    if(numcols - numberFixed > numberEqualities || numcols < numberEqualities)
-    {
-      std::string probName;
-      getStrParam(OsiProbName, probName);
-      throw newUnsolvedError(app_->errorCode(), problem_, probName);
-    }
-    double * saveColLow = CoinCopyOfArray(getColLower(), getNumCols());
-    double * saveColUp = CoinCopyOfArray(getColUpper(), getNumCols());
-    
-    for(int i = 0; i < numcols && numcols - numberFixed <= numberEqualities ; i++)
-    {
-      if(colUpper[i] - colLower[i] <= INT_BIAS)
-	    {
-	      setColLower(i, saveColLow[i]-1e-06);
-	      setColUpper(i, saveColLow[i]+1e-06);
-	      numberFixed--;
-	    }
-    }
-    solveAndCheckErrors(warmStarted, throwOnFailure, whereFrom);
-    //restore
-    for(int i = 0; i < numcols && numcols - numberFixed < numrows ; i++)
-    {
-      problem_->SetVariableLowerBound(i,saveColLow[i]);
-      problem_->SetVariableUpperBound(i,saveColUp[i]);
-    }
-    delete [] saveColLow;
-    delete [] saveColUp;
-    return;
-  }
-  else 
-#endif
     if(!app_->isRecoverable(optimizationStatus_))//Solver failed and the error can not be recovered, throw it
     {
       std::string probName;
@@ -2720,6 +2648,7 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
       }
     }
   }
+
   messageHandler()->message(IPOPT_SUMMARY, messages_)
     <<whereFrom<<optimizationStatus_<<app_->IterationCount()<<app_->CPUTime()<<CoinMessageEol;
   

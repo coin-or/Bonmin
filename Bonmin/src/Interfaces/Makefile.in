@@ -61,10 +61,9 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @COIN_HAS_FILTERSQP_TRUE@am__DEPENDENCIES_1 =  \
 @COIN_HAS_FILTERSQP_TRUE@	Filter/libfilterinterface.la
 am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonAuxInfos.lo \
-	BonColReader.lo BonCurvatureEstimator.lo BonCutStrengthener.lo \
-	BonStartPointReader.lo BonOsiTMINLPInterface.lo \
-	BonTMINLP2TNLP.lo BonTMINLP.lo BonTNLPSolver.lo \
-	BonTNLP2FPNLP.lo BonBranchingTQP.lo \
+	BonColReader.lo BonCutStrengthener.lo BonStartPointReader.lo \
+	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo BonTMINLP.lo \
+	BonTNLPSolver.lo BonTNLP2FPNLP.lo BonBranchingTQP.lo \
 	BonStrongBranchingSolver.lo BonRegisteredOptions.lo
 libbonmininterfaces_la_OBJECTS = $(am_libbonmininterfaces_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -322,7 +321,6 @@ libbonmininterfaces_la_SOURCES = \
 	BonBoundsReader.cpp BonBoundsReader.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
 	BonColReader.cpp BonColReader.hpp \
-	BonCurvatureEstimator.cpp BonCurvatureEstimator.hpp \
 	BonCutStrengthener.cpp BonCutStrengthener.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
@@ -478,7 +476,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBoundsReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonBranchingTQP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonColReader.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCurvatureEstimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCutStrengthener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOsiTMINLPInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonRegisteredOptions.Plo@am__quote@
