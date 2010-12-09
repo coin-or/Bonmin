@@ -4,7 +4,9 @@
 #define BonChooseVariable_H
 
 #include "OsiChooseVariable.hpp"
+#ifdef BONMIN_CURVATURE_BRANCHING
 #include "BonCurvatureEstimator.hpp"
+#endif
 #include "BonOsiTMINLPInterface.hpp"
 #include "CoinMessageHandler.hpp"
 #include "BonBabSetupBase.hpp"
