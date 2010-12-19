@@ -60,7 +60,7 @@ am_libbonbranching_la_OBJECTS = BonChooseVariable.lo \
 	BonRandomChoice.lo BonPseudoCosts.lo BonLpBranchingSolver.lo \
 	BonQpBranchingSolver.lo
 libbonbranching_la_OBJECTS = $(am_libbonbranching_la_OBJECTS)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

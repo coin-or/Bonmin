@@ -60,7 +60,7 @@ am_libbonquadcuts_la_OBJECTS = BonOuterApprox.lo BonQuadCut.lo \
 	BonQuadRow.lo BonTMatrix.lo BonLinearCutsGenerator.lo \
 	BonTMINLPLinObj.lo BonTMINLP2Quad.lo
 libbonquadcuts_la_OBJECTS = $(am_libbonquadcuts_la_OBJECTS)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

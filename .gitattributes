@@ -6,7 +6,10 @@ Bonmin/MSVisualStudio/v8/libBonmin/libBonmin.vcproj -text
 Bonmin/README -text
 Bonmin/bonmin-uninstalled.pc.in -text
 Bonmin/bonmin.pc.in -text
+Bonmin/config.guess -text
+Bonmin/config.sub -text
 Bonmin/configure -text
+Bonmin/depcomp -text
 Bonmin/doc/BONMIN_ReferenceManual.hpp -text
 Bonmin/doc/BONMIN_UsersManual.pdf -text svneol=unset#unset
 Bonmin/doc/BONMIN_UsersManual.tex -text
@@ -60,6 +63,9 @@ Bonmin/experimental/Separable/Sepa.cpp -text
 Bonmin/experimental/Separable/SepaSetup.cpp -text
 Bonmin/experimental/Separable/SepaSetup.hpp -text
 Bonmin/inc/config_bonmin.h.in -text
+Bonmin/install-sh -text
+Bonmin/ltmain.sh -text
+Bonmin/missing -text
 Bonmin/src/Algorithms/Ampl/BonAmplSetup.cpp -text
 Bonmin/src/Algorithms/Ampl/BonAmplSetup.hpp -text
 Bonmin/src/Algorithms/Ampl/Makefile.am -text

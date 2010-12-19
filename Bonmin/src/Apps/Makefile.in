@@ -62,7 +62,7 @@ BonNodeSolver_OBJECTS = $(am_BonNodeSolver_OBJECTS)
 am__DEPENDENCIES_1 =
 am_bonmin_OBJECTS = BonMin.$(OBJEXT)
 bonmin_OBJECTS = $(am_bonmin_OBJECTS)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

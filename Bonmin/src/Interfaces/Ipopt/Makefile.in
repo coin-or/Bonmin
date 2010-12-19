@@ -59,7 +59,7 @@ libipoptinterface_la_LIBADD =
 am_libipoptinterface_la_OBJECTS = BonIpoptInteriorWarmStarter.lo \
 	BonIpoptSolver.lo BonIpoptWarmStart.lo
 libipoptinterface_la_OBJECTS = $(am_libipoptinterface_la_OBJECTS)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

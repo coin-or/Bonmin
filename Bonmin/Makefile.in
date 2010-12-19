@@ -58,18 +58,16 @@ host_triplet = @host@
 # included in the tarball
 @ALWAYS_FALSE@am__append_1 = test
 DIST_COMMON = README $(am__configure_deps) \
-	$(srcdir)/../BuildTools/Makemain.inc $(srcdir)/../config.guess \
-	$(srcdir)/../config.sub $(srcdir)/../install-sh \
-	$(srcdir)/../ltmain.sh $(srcdir)/../missing \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/bonmin-uninstalled.pc.in $(srcdir)/bonmin.pc.in \
-	$(top_srcdir)/configure \
+	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/bonmin-uninstalled.pc.in \
+	$(srcdir)/bonmin.pc.in $(top_srcdir)/configure \
 	$(top_srcdir)/examples/CppExample/Makefile.in \
 	$(top_srcdir)/examples/CppExample/MyBonmin.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.hpp \
 	$(top_srcdir)/examples/OptionDocGen/Makefile.in \
-	$(top_srcdir)/inc/config_bonmin.h.in AUTHORS INSTALL
+	$(top_srcdir)/inc/config_bonmin.h.in AUTHORS INSTALL \
+	config.guess config.sub depcomp install-sh ltmain.sh missing
 @HAVE_EXTERNALS_TRUE@am__append_2 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
 subdir = .
@@ -359,7 +357,7 @@ all: all-recursive
 .SUFFIXES:
 am--refresh:
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../BuildTools/Makemain.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/BuildTools/Makemain.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -578,7 +576,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/inc $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -66,7 +66,7 @@ am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonAuxInfos.lo \
 	BonTNLPSolver.lo BonTNLP2FPNLP.lo BonBranchingTQP.lo \
 	BonStrongBranchingSolver.lo BonRegisteredOptions.lo
 libbonmininterfaces_la_OBJECTS = $(am_libbonmininterfaces_la_OBJECTS)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

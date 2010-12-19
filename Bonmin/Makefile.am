@@ -98,4 +98,4 @@ DISTCLEANFILES = \
 	Test/CppExample/CppExample$(EXEEXT) \
 	Test/testtoy.nl
 
-include ../BuildTools/Makemain.inc
+include BuildTools/Makemain.inc
