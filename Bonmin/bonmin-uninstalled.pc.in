@@ -3,6 +3,7 @@ libdir=@ABSBUILDDIR@/src/CbcBonmin
 
 Name: Bonmin
 Description: Basic Open-source Nonlinear Mixed Integer programming
+URL: https://projects.coin-or.org/Bonmin
 Version: @PACKAGE_VERSION@
 Libs: ${libdir}/libbonmin.la @BONMINLIB_PCLIBS@
 Cflags: -I@abs_source_dir@/src -I@abs_source_dir@/src/Algorithms -I@abs_source_dir@/src/CbcBonmin -I@abs_source_dir@/src/Interfaces -I@ABSBUILDDIR@/inc

@@ -22,7 +22,7 @@
 
 # Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
-# This file is distributed under the Common Public License.
+# This file is distributed under the Eclipse Public License.
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
@@ -116,7 +116,6 @@ distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 ABSBUILDDIR = @ABSBUILDDIR@
 ACLOCAL = @ACLOCAL@
-ADDLIBS = @ADDLIBS@
 ADD_CFLAGS = @ADD_CFLAGS@
 ADD_CXXFLAGS = @ADD_CXXFLAGS@
 ADD_FFLAGS = @ADD_FFLAGS@
@@ -200,7 +199,6 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
-FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
 FILTERSQP_CFLAGS = @FILTERSQP_CFLAGS@
 FILTERSQP_CFLAGS_INSTALLED = @FILTERSQP_CFLAGS_INSTALLED@
@@ -250,7 +248,6 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PCADDLIBS = @PCADDLIBS@
 PKG_CONFIG = @PKG_CONFIG@
 RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
