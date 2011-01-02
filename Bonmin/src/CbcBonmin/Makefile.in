@@ -61,16 +61,15 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libcoindir)" \
-	"$(DESTDIR)$(includecoindir)"
-libcoinLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(libcoin_LTLIBRARIES)
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includecoindir)"
+libLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(lib_LTLIBRARIES)
 am_libbonmin_la_OBJECTS = BonCbc.lo BonCbcNlpStrategy.lo BonCbcNode.lo \
 	BonBabInfos.lo BonGuessHeuristic.lo BonDiver.lo
 libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS)
 am_libbonminampl_la_OBJECTS =
 libbonminampl_la_OBJECTS = $(am_libbonminampl_la_OBJECTS)
-@COIN_HAS_ASL_TRUE@am_libbonminampl_la_rpath = -rpath $(libcoindir)
+@COIN_HAS_ASL_TRUE@am_libbonminampl_la_rpath = -rpath $(libdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -302,10 +301,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = Heuristics
-libcoindir = $(libdir)/coin
 
 # Name of the library in this directory
-libcoin_LTLIBRARIES = libbonmin.la $(am__append_1)
+lib_LTLIBRARIES = libbonmin.la $(am__append_1)
 
 ########################################################################
 #                          bonmin library                              #
@@ -429,35 +427,35 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-install-libcoinLTLIBRARIES: $(libcoin_LTLIBRARIES)
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(libcoindir)" || $(mkdir_p) "$(DESTDIR)$(libcoindir)"
-	@list='$(libcoin_LTLIBRARIES)'; for p in $$list; do \
+	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(libcoinLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libcoindir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libcoinLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libcoindir)/$$f"; \
+	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-libcoinLTLIBRARIES:
+uninstall-libLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(libcoin_LTLIBRARIES)'; for p in $$list; do \
+	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
 	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libcoindir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libcoindir)/$$p"; \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
 	done
 
-clean-libcoinLTLIBRARIES:
-	-test -z "$(libcoin_LTLIBRARIES)" || rm -f $(libcoin_LTLIBRARIES)
-	@list='$(libcoin_LTLIBRARIES)'; for p in $$list; do \
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
 libbonmin.la: $(libbonmin_la_OBJECTS) $(libbonmin_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libcoindir) $(libbonmin_la_LDFLAGS) $(libbonmin_la_OBJECTS) $(libbonmin_la_LIBADD) $(LIBS)
+	$(CXXLINK) -rpath $(libdir) $(libbonmin_la_LDFLAGS) $(libbonmin_la_OBJECTS) $(libbonmin_la_LIBADD) $(LIBS)
 libbonminampl.la: $(libbonminampl_la_OBJECTS) $(libbonminampl_la_DEPENDENCIES) 
 	$(LINK) $(am_libbonminampl_la_rpath) $(libbonminampl_la_LDFLAGS) $(libbonminampl_la_OBJECTS) $(libbonminampl_la_LIBADD) $(LIBS)
 
@@ -701,7 +699,7 @@ check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libcoindir)" "$(DESTDIR)$(includecoindir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includecoindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -732,7 +730,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libcoinLTLIBRARIES clean-libtool \
+clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-recursive
@@ -751,9 +749,9 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-includecoinHEADERS install-libcoinLTLIBRARIES
+install-data-am: install-includecoinHEADERS
 
-install-exec-am:
+install-exec-am: install-libLTLIBRARIES
 
 install-info: install-info-recursive
 
@@ -780,26 +778,26 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-includecoinHEADERS uninstall-info-am \
-	uninstall-libcoinLTLIBRARIES
+	uninstall-libLTLIBRARIES
 
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am \
-	clean clean-generic clean-libcoinLTLIBRARIES clean-libtool \
+	clean clean-generic clean-libLTLIBRARIES clean-libtool \
 	clean-recursive ctags ctags-recursive distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-recursive distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-exec install-exec-am \
 	install-includecoinHEADERS install-info install-info-am \
-	install-libcoinLTLIBRARIES install-man install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
-	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
+	install-libLTLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am \
 	uninstall-includecoinHEADERS uninstall-info-am \
-	uninstall-libcoinLTLIBRARIES
+	uninstall-libLTLIBRARIES
 
 
 astyle: $(ASTYLE_FILES)

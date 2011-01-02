@@ -10,12 +10,10 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = Heuristics
 
-libcoindir = $(libdir)/coin
-
 # Name of the library in this directory
-libcoin_LTLIBRARIES = libbonmin.la
+lib_LTLIBRARIES = libbonmin.la
 if COIN_HAS_ASL
-libcoin_LTLIBRARIES += libbonminampl.la
+lib_LTLIBRARIES += libbonminampl.la
 endif
 
 ########################################################################
