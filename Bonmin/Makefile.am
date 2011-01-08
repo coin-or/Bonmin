@@ -85,6 +85,9 @@ astyle:
 
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = bonmin.pc
+if COIN_HAS_ASL
+pkgconfiglib_DATA += bonminamplinterface.pc
+endif
 
 ########################################################################
 #                         Maintainer Stuff                             #

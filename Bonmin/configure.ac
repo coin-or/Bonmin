@@ -70,7 +70,7 @@ if test $coin_has_coindepend != yes ; then
   AC_MSG_ERROR([Required package Cbc or Ipopt not available.])
 fi
 
-AC_COIN_CHECK_PACKAGE(ASL, [coinasl ipoptamplinterface])
+AC_COIN_CHECK_PACKAGE(ASL, [ipoptamplinterface], [BonminAmplInterfaceLib])
 
 #AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
 #
@@ -182,6 +182,12 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  examples/CppExample/Makefile
                  bonmin.pc bonmin-uninstalled.pc])
+
+if test $coin_has_asl = yes ; then
+  AC_CONFIG_FILES([bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in
+                   bonminamplinterface-uninstalled.pc:src/CbcBonmin/bonminamplinterface-uninstalled.pc.in
+                  ])
+fi
 
 AC_CONFIG_HEADER([inc/config_bonmin.h])
 

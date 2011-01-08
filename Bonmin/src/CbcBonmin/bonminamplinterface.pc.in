@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@/coin
+
+Name: BonminTMINLP
+Description: Ampl Interface to Bonmin
+URL: https://projects.coin-or.org/Bonmin
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lbonminampl @BONMINAMPLINTERFACELIB_PCLIBS@
+Cflags: -I${includedir}
+Requires: bonmin @BONMINAMPLINTERFACELIB_PCREQUIRES@

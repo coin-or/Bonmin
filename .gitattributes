@@ -171,6 +171,8 @@ Bonmin/src/CbcBonmin/Heuristics/BonPumpForMinlp.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonPumpForMinlp.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/Makefile.am -text
 Bonmin/src/CbcBonmin/Heuristics/Makefile.in -text
+Bonmin/src/CbcBonmin/bonminamplinterface-uninstalled.pc.in -text
+Bonmin/src/CbcBonmin/bonminamplinterface.pc.in -text
 Bonmin/src/Interfaces/Ampl/Makefile.in -text
 Bonmin/src/Interfaces/BonAuxInfos.cpp -text
 Bonmin/src/Interfaces/BonAuxInfos.hpp -text
