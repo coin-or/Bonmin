@@ -23273,9 +23273,9 @@ if test $coin_has_osicpx = notGiven; then
 
 
 if test -n "$PKG_CONFIG" ; then
-  if $PKG_CONFIG --exists "osi-cpx"; then
-    OSICPX_VERSIONS="`$PKG_CONFIG --modversion "osi-cpx" 2>/dev/null | tr '\n' ' '`"
-     cflags=`$PKG_CONFIG --cflags "osi-cpx" 2>/dev/null`
+  if $PKG_CONFIG --exists "osi-cplex"; then
+    OSICPX_VERSIONS="`$PKG_CONFIG --modversion "osi-cplex" 2>/dev/null | tr '\n' ' '`"
+     cflags=`$PKG_CONFIG --cflags "osi-cplex" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
 	# but only do this if is not trivial
@@ -23284,8 +23284,8 @@ if test -n "$PKG_CONFIG" ; then
       cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
     fi
     OSICPX_CFLAGS="$cflags"
-    OSICPX_LIBS=`$PKG_CONFIG --libs "osi-cpx" 2>/dev/null`
-    OSICPX_DATA=`$PKG_CONFIG --variable=datadir "osi-cpx" 2>/dev/null`
+    OSICPX_LIBS=`$PKG_CONFIG --libs "osi-cplex" 2>/dev/null`
+    OSICPX_DATA=`$PKG_CONFIG --variable=datadir "osi-cplex" 2>/dev/null`
      coin_has_osicpx=yes
         echo "$as_me:$LINENO: result: yes: $OSICPX_VERSIONS" >&5
 echo "${ECHO_T}yes: $OSICPX_VERSIONS" >&6
@@ -23299,14 +23299,14 @@ echo "${ECHO_T}yes: $OSICPX_VERSIONS" >&6
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in BonminLib
 
-          BONMINLIB_PCREQUIRES="osi-cpx $BONMINLIB_PCREQUIRES"
+          BONMINLIB_PCREQUIRES="osi-cplex $BONMINLIB_PCREQUIRES"
           BONMINLIB_CFLAGS="$OSICPX_CFLAGS $BONMINLIB_CFLAGS"
           BONMINLIB_LIBS="$OSICPX_LIBS $BONMINLIB_LIBS"
 
 
 
   else
-    OSICPX_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "osi-cpx"`
+    OSICPX_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "osi-cplex"`
       coin_has_osicpx=notGiven
         echo "$as_me:$LINENO: result: not given: $OSICPX_PKG_ERRORS" >&5
 echo "${ECHO_T}not given: $OSICPX_PKG_ERRORS" >&6
@@ -23340,8 +23340,8 @@ OSICPX_CFLAGS_INSTALLED=
 OSICPX_DATA=
 OSICPX_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-cpx", but we need to filter out version number specifications (= x, <= x, >= x)
-projtoprocess="osi-cpx"
+# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x)
+projtoprocess="osi-cplex"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
 # further, we collect the list of corresponding .pc files, but do this in reverse order, because we need this order afterwards
@@ -23537,7 +23537,7 @@ _ACEOF
   fi
 
 
-    BONMINLIB_PCREQUIRES="osi-cpx $BONMINLIB_PCREQUIRES"
+    BONMINLIB_PCREQUIRES="osi-cplex $BONMINLIB_PCREQUIRES"
     BONMINLIB_CFLAGS="$OSICPX_CFLAGS $BONMINLIB_CFLAGS"
     BONMINLIB_LIBS="$OSICPX_LIBS $BONMINLIB_LIBS"
     BONMINLIB_CFLAGS_INSTALLED="$OSICPX_CFLAGS_INSTALLED $BONMINLIB_CFLAGS_INSTALLED"

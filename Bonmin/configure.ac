@@ -90,7 +90,7 @@ AC_COIN_CHECK_PACKAGE(ASL, [ipoptamplinterface], [BonminAmplInterfaceLib])
 #############################################################################
 
 # Check whether OsiCplex is available
-AC_COIN_CHECK_PACKAGE(OsiCpx, [osi-cpx], [BonminLib])
+AC_COIN_CHECK_PACKAGE(OsiCpx, [osi-cplex], [BonminLib])
 
 # To get also the directory where cplex.h can be found, we also check for cplex directly.
 AC_COIN_CHECK_USER_LIBRARY([Cplex], [CPX],[cplex.h],[CPXgetstat])
