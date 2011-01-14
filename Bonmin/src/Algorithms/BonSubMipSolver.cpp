@@ -237,6 +237,7 @@ namespace Bonmin {
         CPXsetdblparam(env, CPX_PARAM_TILIM, max_time);
         CPXsetdblparam(env, CPX_PARAM_EPINT, 1e-08);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
+      CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
 
 #if 0
       CPXsetintparam(env, CPX_PARAM_THREADS, 16);

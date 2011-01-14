@@ -46,10 +46,11 @@ int main (int argc, char *argv[])
     //FILE * fp = fopen("log","w");
     BonminAmplSetup bonmin;
     bonmin.initialize(argv);
+    {
     Bab bb;
 
     bb(bonmin);//do branch and bound
-
+    }
   }
 #ifdef CATCH_ERRORS
   catch(TNLPSolver::UnsolvedError *E) {
