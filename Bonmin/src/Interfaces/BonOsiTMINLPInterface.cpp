@@ -2360,6 +2360,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   assert(m==getNumRows());
   double infty = si.getInfinity();
   double nlp_infty = infty_;
+  //printf("Infinity is %g\n", infty_);
   for(int i = 0 ; i < m ; i++) {
     if(constTypes_[i] == TNLP::NON_LINEAR) {
       //If constraint is range not binding prepare to remove it
@@ -2974,7 +2975,10 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->options()->GetEnumValue("random_point_type",randomGenerationType_,app_->prefix());
     int cut_strengthening_type;
     app_->options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type,app_->prefix());
-
+    double lo_inf, up_inf;  
+    app_->options()->GetNumericValue("nlp_lower_bound_inf",lo_inf, app_->prefix());
+    app_->options()->GetNumericValue("nlp_upper_bound_inf",up_inf, app_->prefix());
+    infty_ = std::min(fabs(lo_inf), fabs(up_inf));
     if (cut_strengthening_type != CS_None) {
       // TNLP solver to be used in the cut strengthener
       cutStrengthener_ = new CutStrengthener(app_->clone(), app_->options());
