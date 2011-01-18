@@ -1826,14 +1826,13 @@ OsiTMINLPInterface::getNonLinearitiesViolation(const double *x, const double obj
 static inline
 bool cleanNnz(double &value, double colLower, double colUpper,
     double rowLower, double rowUpper, double colsol,
-    double & lb, double &ub, double tiny, double veryTiny)
+    double & lb, double &ub, double tiny, double veryTiny, double infty)
 {
   if(fabs(value)>= tiny) return 1;
 
   if(fabs(value)<veryTiny) return 0;//Take the risk?
 
   //try and remove
-  double infty = 1e20;
   bool colUpBounded = colUpper < 10000;
   bool colLoBounded = colLower > -10000;
   bool rowNotLoBounded =  rowLower <= - infty;
@@ -1897,16 +1896,15 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
   const double * colUpper = getColUpper();
   const double * duals = getRowPrice() + 2 * n;
   double infty = getInfinity();
-  double nlp_infty = infty_;
   
   for(int rowIdx = 0; rowIdx < m ; rowIdx++) {
     if(constTypes_[rowIdx] == TNLP::NON_LINEAR) {
       row2cutIdx[rowIdx] = numCuts;
-      if(rowLower[rowIdx] > - nlp_infty)
+      if(rowLower[rowIdx] > - infty_)
         lb[numCuts] = rowLower[rowIdx] - g[rowIdx];
       else
         lb[numCuts] = - infty;
-      if(rowUpper[rowIdx] < nlp_infty)
+      if(rowUpper[rowIdx] < infty_)
         ub[numCuts] = rowUpper[rowIdx] - g[rowIdx];
       else
         ub[numCuts] = infty;
@@ -1933,7 +1931,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
 		  rowLower[rowIdx], rowUpper[rowIdx],
 		  x[colIdx],
 		  lb[cutIdx],
-		  ub[cutIdx], tiny_, veryTiny_)) {
+		  ub[cutIdx], tiny_, veryTiny_, infty_)) {
         cuts[cutIdx].insert(colIdx,jValues_[i]);
         if(lb[cutIdx] > - infty)
           lb[cutIdx] += jValues_[i] * x[colIdx];
@@ -2013,7 +2011,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
           -getInfinity(), 0,
           x[i],
           lb[nNonLinear_],
-          ub[nNonLinear_],tiny_, 1e-15)) {
+          ub[nNonLinear_],tiny_, 1e-15, infty_)) {
         //	      minCoeff = min(fabs(obj[i]), minCoeff);
         v.insert(i,obj[i]);
         lb[nNonLinear_] += obj[i] * x[i];
@@ -2081,7 +2079,6 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
   const double * colUpper = getColUpper();
   const double * duals = getRowPrice() + 2 * n;
   //double infty = getInfinity();
-  //double nlp_infty = infty_;
   
   for(int rowIdx = 0; rowIdx < m ; rowIdx++) {
     if(constTypes_[rowIdx] == TNLP::NON_LINEAR && fabs(duals[rowIdx]) > 1e-06)
@@ -2111,7 +2108,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
     double coeff = lam*jValues_[i];
     if(cleanNnz(coeff,colLower[colIdx], colUpper[colIdx],
       	  rowLower[rowIdx], rowUpper[rowIdx], x[colIdx], lb,
-      	  ub, tiny_, veryTiny_)) {
+      	  ub, tiny_, veryTiny_, infty_)) {
       cut[colIdx] += coeff;
       ub += coeff * x[colIdx];
     }
@@ -2129,7 +2126,7 @@ OsiTMINLPInterface::getBendersCut(OsiCuts &cs,
     //double minCoeff = 1e50;
     for(int i = 0; i<n ; i++) {
       if(cleanNnz(obj[i],colLower[i], colUpper[i], -getInfinity(), 0,
-          x[i], lb, ub,tiny_, 1e-15)) {
+          x[i], lb, ub,tiny_, 1e-15, infty_)) {
         cut[i] += obj[i];
         ub += obj[i] * x[i];
       }
@@ -2175,13 +2172,12 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
   const double * colUpper = getColUpper();
   const double dual = (getRowPrice() + 2 * getNumCols())[rowIdx];
   double infty = getInfinity();
-  double nlp_infty = infty_;
   
-  if(rowLower > - nlp_infty)
+  if(rowLower > - infty_)
     lb = rowLower - g;
   else
     lb = - infty;
-  if(rowUpper < nlp_infty)
+  if(rowUpper < infty_)
     ub = rowUpper - g;
   else
     ub = infty;
@@ -2200,7 +2196,7 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
 		  rowLower, rowUpper,
 		  x[colIdx],
 		  lb,
-		  ub, tiny_, veryTiny_)) {
+		  ub, tiny_, veryTiny_, infty_)) {
         cut.insert(colIdx,values[i]);
         if(lb > - infty)
           lb += values[i] * x[colIdx];
@@ -2359,33 +2355,32 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   const double * duals = getRowPrice() + 2*n;
   assert(m==getNumRows());
   double infty = si.getInfinity();
-  double nlp_infty = infty_;
   //printf("Infinity is %g\n", infty_);
   for(int i = 0 ; i < m ; i++) {
     if(constTypes_[i] == TNLP::NON_LINEAR) {
       //If constraint is range not binding prepare to remove it
-      if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty && fabs(duals[i]) == 0.)
+      if(rowLower[i] > -infty_ && rowUpper[i] < infty_ && fabs(duals[i]) == 0.)
       {
         nonBindings[numNonBindings++] = i;
         continue;
       }
       else
-        if(rowLower[i] > - nlp_infty){
+        if(rowLower[i] > - infty_){
           rowLow[i] = (rowLower[i] - g[i]) - 1e-07;
-          if(! WarnedForNonConvexOa && rowUpper[i] < nlp_infty){
+          if(! WarnedForNonConvexOa && rowUpper[i] < infty_){
              messageHandler()->message(WARNING_NON_CONVEX_OA, messages_)<<CoinMessageEol;
              WarnedForNonConvexOa = true;
           }
         }
       else
         rowLow[i] = - infty;
-      if(rowUpper[i] < nlp_infty)
+      if(rowUpper[i] < infty_)
         rowUp[i] =  (rowUpper[i] - g[i]) + 1e-07;
       else
         rowUp[i] = infty;
       
       //If equality or ranged constraint only add one side by looking at sign of dual multiplier
-      if(rowLower[i] > -nlp_infty && rowUpper[i] < nlp_infty)
+      if(rowLower[i] > -infty_ && rowUpper[i] < infty_)
       {
         if(duals[i] >= 0.)// <= inequality
           rowLow[i] = - infty;
@@ -2394,13 +2389,13 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
       }
     }
     else {
-      if(rowLower[i] > -nlp_infty){
+      if(rowLower[i] > -infty_){
       //   printf("Lower %g ", rowLower[i]);
          rowLow[i] = (rowLower[i] - g[i]);
       }
       else
         rowLow[i] = - infty;
-      if(rowUpper[i] < nlp_infty){
+      if(rowUpper[i] < infty_){
       //   printf("Upper %g ", rowUpper[i]);
          rowUp[i] =  (rowUpper[i] - g[i]);
       }
@@ -2420,7 +2415,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
                 rowLower[jRow_[i]], rowUpper[jRow_[i]],
                 x[jCol_[i]],
                 rowLow[jRow_[i]],
-                rowUp[jRow_[i]], tiny_, veryTiny_)) {      
+                rowUp[jRow_[i]], tiny_, veryTiny_, infty_)) {      
           rowLow[jRow_[i]] += jValues_[i] * x[jCol_ [i]];
           rowUp[jRow_[i]] += jValues_[i] *x[jCol_[i]];
        }
@@ -2500,7 +2495,7 @@ OsiTMINLPInterface::addObjectiveFunction(OsiSolverInterface &si,
             -getInfinity(), 0,
             x[i],
             lb,
-            ub, tiny_, veryTiny_)) {
+            ub, tiny_, veryTiny_, infty_)) {
           v->insert(i,obj[i]);
           lb += obj[i] * x[i];
           ub += obj[i] * x[i];
@@ -2512,7 +2507,7 @@ OsiTMINLPInterface::addObjectiveFunction(OsiSolverInterface &si,
             -getInfinity(), 0,
             x[i],
             lb,
-            ub, 1e-03, 1e-08)) {
+            ub, 1e-03, 1e-08, infty_)) {
           v->insert(i,obj[i]);
           lb += obj[i] * x[i];
           ub += obj[i] * x[i];
