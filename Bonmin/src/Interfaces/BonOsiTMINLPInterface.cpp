@@ -1833,8 +1833,8 @@ bool cleanNnz(double &value, double colLower, double colUpper,
   if(fabs(value)<veryTiny) return 0;//Take the risk?
 
   //try and remove
-  bool colUpBounded = colUpper < 10000;
-  bool colLoBounded = colLower > -10000;
+  bool colUpBounded = colUpper < infty;
+  bool colLoBounded = colLower > -infty;
   bool rowNotLoBounded =  rowLower <= - infty;
   bool rowNotUpBounded = rowUpper >= infty;
   bool pos =  value > 0;
@@ -2350,12 +2350,13 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   int numNonBindings = 0;
   const double * rowLower = getRowLower();
   const double * rowUpper = getRowUpper();
-  const double * colLower = getColLower();
-  const double * colUpper = getColUpper();
+  vector<double> colLower(n);
+  vector<double> colUpper(n);
+  std::copy(getColLower(), getColLower() + n, colLower.begin());
+  std::copy(getColUpper(), getColUpper() + n, colUpper.begin());
   const double * duals = getRowPrice() + 2*n;
   assert(m==getNumRows());
   double infty = si.getInfinity();
-  //printf("Infinity is %g\n", infty_);
   for(int i = 0 ; i < m ; i++) {
     if(constTypes_[i] == TNLP::NON_LINEAR) {
       //If constraint is range not binding prepare to remove it
@@ -2434,11 +2435,13 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
 
   int numcols=getNumCols();
   vector<double> obj(numcols);
-  for(int i = 0 ; i < numcols ; i++)
+  for(int i = 0 ; i < numcols ; i++){
     obj[i] = 0.;
+    if(colLower[i] <= - infty_) colLower[i] = - infty;
+    if(colUpper[i] >= infty_) colUpper[i] = infty;
+  }
   
-  
-  si.loadProblem(mat, getColLower(), getColUpper(), obj(), rowLow(), rowUp());
+  si.loadProblem(mat, colLower(), colUpper(), obj(), rowLow(), rowUp());
   for(int i = 0 ; i < getNumCols() ; i++) {
     if(isInteger(i))
       si.setInteger(i);
