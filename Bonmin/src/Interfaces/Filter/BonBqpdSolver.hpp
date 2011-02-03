@@ -165,7 +165,8 @@ namespace Bonmin
     double solve;
     double resolve;
     double warm_start;
-    Times(): numsolve(0), create(0), solve(0), resolve(0), warm_start(0){
+    int pivots;
+    Times(): numsolve(0), create(0), solve(0), resolve(0), warm_start(0), pivots(0){
     }
 
     Times & operator +=(Times &rhs){
@@ -174,6 +175,7 @@ namespace Bonmin
       solve += rhs.solve;
       resolve += rhs.resolve;
       warm_start += rhs.warm_start;
+      pivots += rhs.pivots;
       return *this;
     }
   };
@@ -194,6 +196,8 @@ namespace Bonmin
     double fillin_factor_;
     int kmax_ipt_;
     int mlp_ipt_;
+    /** Hot start m0de.*/
+    int m0de_;
     //@}
 
     /** Cached information for reoptimizing. */
@@ -393,6 +397,7 @@ namespace Bonmin
 
     /** To record default log level.*/
      int default_log_level_;
+
     public:
 
 #ifdef TIME_BQPD

@@ -109,6 +109,7 @@ namespace Bonmin
   {
     roptions->SetRegisteringCategory("Bqpd options",RegisteredOptions::BqpdCategory);
     roptions->AddLowerBoundedNumberOption("qp_fillin_factor", "Factor for estimating fill-in for factorization method in Bqpd", 0., true, 4.);
+    roptions->AddBoundedIntegerOption("hot_start_m0de", "Choice of the hot start option", 0, 6, 6);
   }
 
   BqpdSolver::BqpdSolver(bool createEmpty /* = false */)
@@ -130,6 +131,7 @@ namespace Bonmin
     options->GetNumericValue("qp_fillin_factor", fillin_factor_, "bqpd.");
     options->GetIntegerValue("kmax", kmax_ipt_, "bqpd.");
     options->GetIntegerValue("mlp", mlp_ipt_,"bqpd.");
+    options->GetIntegerValue("hot_start_m0de", m0de_,"bqpd.");
      if(!options_->GetIntegerValue("print_level",default_log_level_,""))
       default_log_level_ = 1;
 
@@ -238,6 +240,7 @@ namespace Bonmin
     }
 
     cached_->use_warm_start_in_cache_ = true;  // Trying...
+    cached_->m0de = m0de_;
 #ifdef TIME_BQPD
     times().resolve -= CoinCpuTime();
 #endif
@@ -666,7 +669,6 @@ namespace Bonmin
     F77_FUNC(wsc,WSC).mxlws = mxlws;
 
     if (use_warm_start_in_cache_ && !bad_warm_start_info_) {
-      m0de = 6;
       ifail = 0;
       use_warm_start_in_cache_ = false;
       if (haveHotStart_) copyFromHotStart();
@@ -698,8 +700,9 @@ namespace Bonmin
     F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
         g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
         &m0de, &ifail, info, &iprint, &nout);
+    times_.pivots += info[0];
     if (ifail == 8 && m0de == 6) {
-      printf("Restarting Bqpd...");
+      fprintf(stderr, "Restarting Bqpd...");
       m0de = 0;
       tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;
