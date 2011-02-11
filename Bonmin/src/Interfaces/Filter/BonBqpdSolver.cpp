@@ -20,7 +20,8 @@
 
 typedef Bonmin::BqpdSolver::fint fint;
 typedef Bonmin::BqpdSolver::real real;
-
+int Bonmin::BqpdSolver::reinit_freq_ = 0;
+int Bonmin::BqpdSolver::m0de_ = 6;
 extern "C"
 {
   void F77_FUNC(bqpd,BQPD)(fint* n, fint* m, fint* k, fint* kmax,
@@ -110,6 +111,7 @@ namespace Bonmin
     roptions->SetRegisteringCategory("Bqpd options",RegisteredOptions::BqpdCategory);
     roptions->AddLowerBoundedNumberOption("qp_fillin_factor", "Factor for estimating fill-in for factorization method in Bqpd", 0., true, 4.);
     roptions->AddBoundedIntegerOption("hot_start_m0de", "Choice of the hot start option", 0, 6, 6);
+    roptions->AddLowerBoundedIntegerOption("reinit_freq", "Number of pivots before recopy hot start", 0, 0);
   }
 
   BqpdSolver::BqpdSolver(bool createEmpty /* = false */)
@@ -132,6 +134,7 @@ namespace Bonmin
     options->GetIntegerValue("kmax", kmax_ipt_, "bqpd.");
     options->GetIntegerValue("mlp", mlp_ipt_,"bqpd.");
     options->GetIntegerValue("hot_start_m0de", m0de_,"bqpd.");
+    options->GetIntegerValue("reinit_freq", reinit_freq_,"bqpd.");
      if(!options_->GetIntegerValue("print_level",default_log_level_,""))
       default_log_level_ = 1;
 
@@ -152,6 +155,8 @@ namespace Bonmin
     retval->kmax_ipt_ = kmax_ipt_;
     retval->mlp_ipt_ = mlp_ipt_;
     retval->default_log_level_ = default_log_level_;
+    retval->reinit_freq_ = reinit_freq_;
+    retval->m0de_ = m0de_;
 #ifdef TIME_BQPD
     times().create += CoinCpuTime();
 #endif
@@ -239,8 +244,14 @@ namespace Bonmin
       cached_->bu[i] = Min(cached_->bu[i], 1e50);
     }
 
+#if 1
     cached_->use_warm_start_in_cache_ = true;  // Trying...
     cached_->m0de = m0de_;
+#else
+    cached_->re_initialize();
+    cached_->use_warm_start_in_cache_ = true;  // Trying...
+#endif
+
 #ifdef TIME_BQPD
     times().resolve -= CoinCpuTime();
 #endif
@@ -399,6 +410,20 @@ namespace Bonmin
     tqp_ = tqp;
   }
 
+  void
+  BqpdSolver::cachedInfo::re_initialize()
+  {
+    use_warm_start_in_cache_ = false;
+
+    // Setup workspaces
+    for (int i=0; i<mxws; i++) {
+      ws[i] = 42.;
+    }
+    for (int i=0; i<mxlws; i++) {
+      lws[i] = 55;
+    }
+  }
+
 /// Solves a problem expresses as a TNLP
   TNLPSolver::ReturnStatus
   BqpdSolver::callOptimizer()
@@ -464,6 +489,10 @@ namespace Bonmin
   bool
   BqpdSolver::cachedInfo::markHotStart()
   {
+     next_reinit_ = BqpdSolver::reinit_freq_; 
+#ifdef DISABLE_COPYING
+     return 1;
+#endif
 #ifdef TIME_BQPD
     times_.warm_start -= CoinCpuTime();
 #endif
@@ -530,7 +559,10 @@ namespace Bonmin
 
     mxm1 = F77_FUNC(mxm1c,MXM1c).mxm1;
     c = F77_FUNC(minorc,MINORC).c;
+
+    kkHot = F77_FUNC(wsc,WSC).kk;
     kkkHot = F77_FUNC(wsc,WSC).kkk;
+    llHot = F77_FUNC(wsc,WSC).ll;
     lllHot = F77_FUNC(wsc,WSC).lll;
 
     kHot = k;
@@ -557,6 +589,12 @@ namespace Bonmin
   void
   BqpdSolver::cachedInfo::copyFromHotStart()
   {
+#ifdef DISABLE_COPYING
+    return;
+#endif
+#ifdef TIME_BQPD
+    times_.warm_start -= CoinCpuTime();
+#endif
     F77_FUNC(bqpdc,BQPDC).irh1 = irh1;
     F77_FUNC(bqpdc,BQPDC).na = na;
     F77_FUNC(bqpdc,BQPDC).na1 = na1;
@@ -620,7 +658,9 @@ namespace Bonmin
     F77_FUNC(mxm1c,MXM1c).mxm1 = mxm1;
     F77_FUNC(minorc,MINORC).c = c;
 
+    F77_FUNC(wsc,WSC).kk = kkHot;
     F77_FUNC(wsc,WSC).kkk = kkkHot;
+    F77_FUNC(wsc,WSC).ll = llHot;
     F77_FUNC(wsc,WSC).lll = lllHot;
 
     k = kHot;
@@ -633,10 +673,14 @@ namespace Bonmin
     CoinCopyN(lsHot,n+m,ls);
     CoinCopyN(alpHot,mlp,alp);
     CoinCopyN(lpHot,mlp,lp);
-    peq = peqHot;
     CoinCopyN(wsHot,mxws,ws);
     CoinCopyN(lwsHot,mxlws,lws);
     info[0] = infoHot[0];
+    peq = peqHot;
+#ifdef TIME_BQPD
+    times_.warm_start += CoinCpuTime();
+#endif
+
   }
 
   void
@@ -671,7 +715,12 @@ namespace Bonmin
     if (use_warm_start_in_cache_ && !bad_warm_start_info_) {
       ifail = 0;
       use_warm_start_in_cache_ = false;
-      if (haveHotStart_) copyFromHotStart();
+      if (haveHotStart_ && times_.pivots > next_reinit_) {
+        //printf("Reinitialize hot start\n");
+        copyFromHotStart();
+        while (BqpdSolver::reinit_freq_ > 0&& next_reinit_ < times_.pivots)
+          next_reinit_ += BqpdSolver::reinit_freq_;
+      }
     }
     else {
       m0de = 0;
@@ -701,8 +750,17 @@ namespace Bonmin
         g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
         &m0de, &ifail, info, &iprint, &nout);
     times_.pivots += info[0];
-    if (ifail == 8 && m0de == 6) {
-      fprintf(stderr, "Restarting Bqpd...");
+    if(BqpdSolver::reinit_freq_ > 0 && haveHotStart_ && (ifail == 7 || ifail == 8) && m0de == 6){
+      fprintf(stdout, "Reinitialize hot start...\n");
+      copyFromHotStart();
+      ifail = 0;
+      F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+			  g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
+			  &m0de, &ifail, info, &iprint, &nout);
+      printf("new ifail = %d\n", ifail);
+    }
+    if (ifail == 8 && BqpdSolver::m0de_ == 6) {
+      fprintf(stdout, "Restarting Bqpd...");
       m0de = 0;
       tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;

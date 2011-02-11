@@ -197,7 +197,9 @@ namespace Bonmin
     int kmax_ipt_;
     int mlp_ipt_;
     /** Hot start m0de.*/
-    int m0de_;
+    static int m0de_;
+    /** Hot start reinitialization fequency.*/
+    static int reinit_freq_;
     //@}
 
     /** Cached information for reoptimizing. */
@@ -281,6 +283,8 @@ namespace Bonmin
       fint infoHot[1];
       fint kkkHot;
       fint lllHot;
+      fint kkHot;
+      fint llHot;
 
       Ipopt::SmartPtr<BranchingTQP> tqp_;
       /** Elapsed CPU time in last optimization. */
@@ -298,6 +302,9 @@ namespace Bonmin
 	  increase is not forgotten. */
       double* fillin_factor_;
       //@}
+
+      /** next reinitialization of hot start.*/
+      int next_reinit_;
 
       /** Constructor.*/
       cachedInfo()
@@ -329,7 +336,8 @@ namespace Bonmin
 	  lwsHot(NULL),
           cpuTime_(0),
           use_warm_start_in_cache_(false),
-	  bad_warm_start_info_(false)
+	  bad_warm_start_info_(false),
+          next_reinit_(0)
       {}
 
       cachedInfo(const Ipopt::SmartPtr<BranchingTQP> &tqp,
@@ -363,7 +371,8 @@ namespace Bonmin
           tqp_(tqp),
           cpuTime_(0),
           use_warm_start_in_cache_(false),
-          bad_warm_start_info_(false)
+          bad_warm_start_info_(false),
+          next_reinit_(0)
       {
         initialize(tqp, options, kmax_ipt, mlp_ipt, fillin_factor);
       }
@@ -373,6 +382,7 @@ namespace Bonmin
 		      Ipopt::SmartPtr<Ipopt::OptionsList>& options,
 		      int kmax_ipt, int mlp_ipt, double* fillin_factor);
 
+      void re_initialize();
       /** Optimize problem described by cache with filter.*/
       void optimize();
 
@@ -392,7 +402,7 @@ namespace Bonmin
     /** Cached information on last problem optimized for reoptimization. */
     Ipopt::SmartPtr<cachedInfo> cached_;
 
-    //name of solver (Bqpd)
+    ///\name of solver (Bqpd)
     static std::string  solverName_;
 
     /** To record default log level.*/
