@@ -1991,7 +1991,6 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     v.reserve(n);
     lb[nNonLinear_] = -infty_;
     ub[nNonLinear_] = -f;
-    printf ("I have been here\n");
     //double minCoeff = 1e50;
     for(int i = 0; i<n ; i++) {
       if(cleanNnz(obj[i],colLower[i], colUpper[i],
