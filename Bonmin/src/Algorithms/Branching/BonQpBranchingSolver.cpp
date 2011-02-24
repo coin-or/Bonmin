@@ -41,6 +41,7 @@ namespace Bonmin
   {
 #ifdef TIME_BQPD
      printf("QPBRANCH Timings for %i sbs\n", times_.numsolve);
+     printf("QPBRANCH %i pivots\n", times_.pivots);
      printf("QPBRANCH Creating  : %g\n", times_.create);
      printf("QPBRANCH Solving : %g\n", times_.solve);
      printf("QPBRANCH Warming  : %g\n", times_.warm_start);

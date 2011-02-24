@@ -674,6 +674,10 @@ namespace Bonmin
           for (unsigned int i=0;i < results_.size();i++) {
             int iObject = results_[i].whichObject();
             double upEstimate;
+            if (results_[i].downStatus()== 2 || results_[i].upStatus()==2) {
+              //printf("A variable went wrong\n");
+              //continue;
+            }
             if (results_[i].upStatus()!=1) {
               assert (results_[i].upStatus()>=0);
               upEstimate = results_[i].upChange();
@@ -1110,8 +1114,9 @@ BonChooseVariable::updateInformation( int index, int branch,
     }
     int status = OsiHotInfo::updateInformation(solver, info, choose);
 #if 1
-    if(status == 1 && !solver->isProvenPrimalInfeasible() && !solver->isProvenOptimal()){
+    if(!solver->isProvenPrimalInfeasible() && !solver->isProvenOptimal()){
       status = 2;
+      statuses_[iBranch] = status;
     }
 #endif
     return status;

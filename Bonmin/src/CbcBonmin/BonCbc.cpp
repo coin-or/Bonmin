@@ -500,8 +500,11 @@ namespace Bonmin
 #if 1
       const double * colsol = model_.solver()->getColSolution();
       const double * duals = model_.solver()->getRowPrice();
+
+#if 1
       model_.solver()->setColSolution(colsol);
       model_.solver()->setRowPrice(duals);
+#endif
 #else
       OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
       CoinWarmStart * warm = tnlpSolver->solver()->getWarmStart(tnlpSolver->problem());

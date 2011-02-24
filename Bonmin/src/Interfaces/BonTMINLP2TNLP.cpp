@@ -448,6 +448,14 @@ namespace Bonmin
     bool return_code =
       tminlp_->eval_jac_g(n, x, new_x, m, nele_jac,
 			  iRow, jCol, values);
+    if(iRow != NULL){
+      Index buf;
+      for(Index k = 0; k < nele_jac ; k++){
+        buf = iRow[k];
+        iRow[k] = -1;
+        iRow[k] = buf;
+      }
+    }
     return return_code;
   }
 
