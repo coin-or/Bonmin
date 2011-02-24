@@ -1,3 +1,6 @@
+Detailed installation instructions for Bonmin can be found in the Users Manual at
+http://www.coin-or.org/Bonmin/Intro.html
+
 Standard installation instructions for COIN-OR projects can be found at
 
 https://projects.coin-or.org/BuildTools
@@ -6,11 +9,15 @@ I - Installing Bonmin
 The build process of Bonmin uses the standard GNU Autotools
 
 It has been successfully compiled and run on the following platforms:
- - Linux using g++ version 3.4 and 4.0
+ - Linux using g++ version 4.4
  - Windows using version Cygwin 1.5.18
  - Mac OS X using gcc 3.4 and 4.0
 
-Bonmin is compiled and installed using the commands:
+Note that Bonmin reauires a certain number of third parties dependencies. Please visit:
+https://projects.coin-or.org/Bonmin/wiki/ThirdParty
+to find out how to obtain and install them.
+
+Bonmin is then compiled and installed using the commands:
 
 % ./configure
 % make
