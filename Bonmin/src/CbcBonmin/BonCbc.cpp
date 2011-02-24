@@ -253,10 +253,16 @@ namespace Bonmin
         {
           int start = starts[i];
           int length = starts[i + 1] - start;
+#ifdef DO_IT_NWAY
+          printf("setting nway object\n"),
+          objects[i] = new CbcNWay(&model_, length, &indices[start],
+              i);
+          objects[i]->setPriority(1);
+#else
           objects[i] = new CbcSOS(&model_, length, &indices[start],
               &weights[start], i, types[i]);
-
           objects[i]->setPriority(10);
+#endif
           if (hasPriorities && sosPriorities && sosPriorities[i]) {
             objects[i]->setPriority(sosPriorities[i]);
           }
@@ -550,7 +556,7 @@ namespace Bonmin
     for (int iGenerator=0;iGenerator<numberGenerators;iGenerator++) {
       CbcCutGenerator * generator = model_.cutGenerator(iGenerator);
       //CglStored * stored = dynamic_cast<CglStored*>(generator->generator());
-       if (true&&!generator->numberCutsInTotal())
+      if (true&&!(generator->numberCutsInTotal() || generator->numberColumnCuts()))
 	continue;
        if(modelHandler_->logLevel() >= 1) {
        	*modelHandler_ << generator->cutGeneratorName()

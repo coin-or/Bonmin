@@ -6,6 +6,11 @@
 #include "BonStrongBranchingSolver.hpp"
 #include "BonBranchingTQP.hpp"
 
+#ifdef COIN_HAS_FILTERSQP
+#include "BonFilterSolver.hpp"
+#include "BonBqpdSolver.hpp"
+#endif
+
 namespace Bonmin
 {
 
@@ -49,6 +54,10 @@ namespace Bonmin
     SmartPtr<BranchingTQP> branching_tqp_;
 
     SmartPtr<TNLPSolver> tqp_solver_;
+
+#ifdef TIME_BQPD
+    BqpdSolver::Times times_;
+#endif
 
     bool first_solve_;
   };

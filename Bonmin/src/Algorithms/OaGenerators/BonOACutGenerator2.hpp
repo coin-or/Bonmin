@@ -51,7 +51,6 @@ namespace Bonmin
 
   private:
     SubMipSolver * subMip_;
-
   };
 }
 #endif

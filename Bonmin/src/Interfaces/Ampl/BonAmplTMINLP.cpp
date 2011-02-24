@@ -189,9 +189,11 @@ namespace Bonmin
     ampl_tnlp_->get_discrete_info(n_non_linear_b, n_non_linear_bi, n_non_linear_c,
         n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
         n_binaries, n_integers);
+#if 0
     if (n_non_linear_b == 0 && n_non_linear_o == 0) {
       hasLinearObjective_ = true;
     }
+#endif
   }
 
   AmplTMINLP::~AmplTMINLP()
@@ -529,7 +531,9 @@ namespace Bonmin
         n_binaries, n_integers);
 
     //Compute the number of non linear variables:
-    int n_non_linear = n_non_linear_c + n_non_linear_o - n_non_linear_b;
+    int n_non_linear = std::max(n_non_linear_c, n_non_linear_o);//n_non_linear_c + n_non_linear_o - n_non_linear_b;
+
+    //printf("n_non_linear_c %i n_non_linear_o %i n_non_linear_b %i\n", n_non_linear_c, n_non_linear_o, n_non_linear_b);
 
     int start = 0;
     int end = n_non_linear;

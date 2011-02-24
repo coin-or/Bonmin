@@ -22,7 +22,7 @@ namespace Bonmin
     b.options()->GetIntegerValue("ecp_max_rounds", numRounds_,b.prefix());
     b.options()->GetNumericValue("ecp_abs_tol", abs_violation_tol_,b.prefix());
     b.options()->GetNumericValue("ecp_rel_tol", rel_violation_tol_,b.prefix());
-    b.options()->GetNumericValue("ecp_propability_factor", beta_,b.prefix());
+    b.options()->GetNumericValue("ecp_probability_factor", beta_,b.prefix());
   }
 
   double
@@ -170,10 +170,10 @@ namespace Bonmin
      "");
     roptions->setOptionExtraInfo("ecp_rel_tol",3);
     roptions->AddNumberOption
-    ("ecp_propability_factor",
+    ("ecp_probability_factor",
      "Factor appearing in formula for skipping ECP cuts.",
      10.,
      "Choosing -1 disables the skipping.");
-    roptions->setOptionExtraInfo("ecp_propability_factor",3);
+    roptions->setOptionExtraInfo("ecp_probability_factor",3);
   }
 } // end namespace bonmin.

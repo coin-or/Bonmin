@@ -14,12 +14,14 @@
 #include "BonTNLPSolver.hpp"
 #include "BonBranchingTQP.hpp"
 
+//#define TIME_BQPD
 namespace Bonmin
 {
   class BqpdSolver : public TNLPSolver
   {
   public:
     friend class FilterSolver;
+
 
   class UnsolvedBqpdError: public TNLPSolver::UnsolvedError
     {
@@ -156,6 +158,27 @@ namespace Bonmin
     {
       return -1;
     }
+#ifdef TIME_BQPD
+  struct Times {
+    int numsolve;
+    double create;
+    double solve;
+    double resolve;
+    double warm_start;
+    Times(): numsolve(0), create(0), solve(0), resolve(0), warm_start(0){
+    }
+
+    Times & operator +=(Times &rhs){
+      numsolve += rhs.numsolve;
+      create += rhs.create;
+      solve += rhs.solve;
+      resolve += rhs.resolve;
+      warm_start += rhs.warm_start;
+      return *this;
+    }
+  };
+#endif
+
     /// Register this solver options into passed roptions
     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
   private:
@@ -176,6 +199,10 @@ namespace Bonmin
     /** Cached information for reoptimizing. */
   struct cachedInfo : public Ipopt::ReferencedObject
     {
+#ifdef TIME_BQPD
+  Times times_;
+#endif
+
       fint n;
       fint m;
       fint k;
@@ -366,7 +393,11 @@ namespace Bonmin
 
     /** To record default log level.*/
      int default_log_level_;
+    public:
 
+#ifdef TIME_BQPD
+    Times &times(){ return cached_->times_;}
+#endif
 
   };
 

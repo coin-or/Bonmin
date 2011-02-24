@@ -29,6 +29,7 @@ libbonheuristics_la_SOURCES = \
        BonHeuristicDiveVectorLength.cpp BonHeuristicDiveVectorLength.hpp \
        BonHeuristicDiveMIP.cpp BonHeuristicDiveMIP.hpp \
        BonHeuristicDiveMIPFractional.cpp BonHeuristicDiveMIPFractional.hpp \
+       BonMilpRounding.cpp BonMilpRounding.hpp \
        BonHeuristicDiveMIPVectorLength.cpp BonHeuristicDiveMIPVectorLength.hpp
 
 # This is for libtool (on Windows)

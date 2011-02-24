@@ -126,6 +126,8 @@ namespace Bonmin {
       MILP_solve_strategy milp_strat_;
       /** setting for gap tolerance.*/
       double gap_tol_;
+      /** say if owns copy of clp_.*/
+      bool ownClp_;
     };
 
 }

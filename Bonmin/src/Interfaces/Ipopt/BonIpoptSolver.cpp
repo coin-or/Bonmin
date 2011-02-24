@@ -249,11 +249,26 @@ namespace Bonmin
   void
   IpoptSolver::setMinlpDefaults(Ipopt::SmartPtr<Ipopt::OptionsList> Options)
   {
+    bool set = false;
+    double dummy_dbl;
+    int dummy_int;
+    set = Options->GetNumericValue("gamma_phi", dummy_dbl, "");
+    if(!set)
     Options->SetNumericValue("gamma_phi", 1e-8, true, true);
+    set = Options->GetNumericValue("gamma_theta", dummy_dbl, "");
+    if(!set)
     Options->SetNumericValue("gamma_theta", 1e-4, true, true);
+    set = Options->GetNumericValue("required_infeasibility_reduction", dummy_dbl, "");
+    if(!set)
     Options->SetNumericValue("required_infeasibility_reduction", 0.1, true, true);
+    set = Options->GetEnumValue("expect_infeasible_problem",dummy_int, "");
+    if(!set)
     Options->SetStringValue("expect_infeasible_problem","yes", true, true);
+    set = Options->GetEnumValue("mu_strategy", dummy_int, "");
+    if(!set)
     Options->SetStringValue("mu_strategy", "adaptive", true, true);
+    set = Options->GetEnumValue("mu_oracle",dummy_int, "");
+    if(!set)
     Options->SetStringValue("mu_oracle","probing", true, true);
     if(!Options->GetIntegerValue("print_level",default_log_level_,""))
       default_log_level_ = 1;

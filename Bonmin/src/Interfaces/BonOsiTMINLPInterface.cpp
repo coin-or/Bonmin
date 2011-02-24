@@ -1970,23 +1970,9 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
   OsiRowCut newCut;
     //    if(lb[i]>-1e20) assert (ub[i]>1e20);
 
-    if (IsValid(cutStrengthener_)) {
-      const int& rowIdx = cut2rowIdx[cutIdx];
-      bool retval =
-	cutStrengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
-				       GetRawPtr(problem_), rowIdx,
-				       cuts[cutIdx], lb[cutIdx], ub[cutIdx], g[rowIdx],
-				       rowLower[rowIdx], rowUpper[rowIdx],
-				       n, x, infty);
-      if (!retval) {
-	(*messageHandler()) << "error in cutStrengthener_->ComputeCuts\n";
-	//exit(-2);
-      }
-    }
     if(global) {
       newCut.setGloballyValidAsInteger(1);
     }
-    //newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
@@ -2003,15 +1989,16 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
 
     CoinPackedVector v;
     v.reserve(n);
-    lb[nNonLinear_] = -f;
+    lb[nNonLinear_] = -infty_;
     ub[nNonLinear_] = -f;
+    printf ("I have been here\n");
     //double minCoeff = 1e50;
     for(int i = 0; i<n ; i++) {
       if(cleanNnz(obj[i],colLower[i], colUpper[i],
           -getInfinity(), 0,
           x[i],
           lb[nNonLinear_],
-          ub[nNonLinear_],tiny_, 1e-15, infty_)) {
+          ub[nNonLinear_],tiny_, veryTiny_, infty_)) {
         //	      minCoeff = min(fabs(obj[i]), minCoeff);
         v.insert(i,obj[i]);
         lb[nNonLinear_] += obj[i] * x[i];
@@ -2027,25 +2014,12 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
       if(violation < theta) genCut = false;
     }
     if(genCut) {
-      if (IsValid(cutStrengthener_)) {
-	lb[nNonLinear_] = -infty;
-	bool retval =
-	  cutStrengthener_->ComputeCuts(cs, GetRawPtr(tminlp_),
-					 GetRawPtr(problem_), -1,
-					 v, lb[nNonLinear_], ub[nNonLinear_],
-					 ub[nNonLinear_], -infty, 0.,
-					 n, x, infty);
-	if (!retval) {
-    (*handler_)<< "error in cutStrengthener_->ComputeCuts"<<CoinMessageEol;
-	  //exit(-2);
-	}
-      }
       OsiRowCut newCut;
       if(global)
 	newCut.setGloballyValidAsInteger(1);
       //newCut.setEffectiveness(99.99e99);
       newCut.setRow(v);
-      newCut.setLb(-COIN_DBL_MAX/*Infinity*/);
+      newCut.setLb(-infty_/*Infinity*/);
       newCut.setUb(ub[nNonLinear_]);
       cs.insert(newCut);
     }
@@ -2487,27 +2461,29 @@ OsiTMINLPInterface::addObjectiveFunction(OsiSolverInterface &si,
       double ub;
       problem_to_optimize_->eval_f(numcols, x, 1, ub);
       ub*=-1;
-      double lb = -1e300;
+      //ub += 1e-3;
+      double lb = -infty_;
       CoinPackedVector objCut;
       CoinPackedVector * v = &objCut;
       v->reserve(numcols+1);
       for(int i = 0; i<numcols ; i++) {
        if(si.getNumRows())
        {
+        if(obj[i] && fabs(obj[i]) < tiny_) {printf ("Strange : %g\n", obj[i]); obj[i] = 0.;}
         if(cleanNnz(obj[i],colLower[i], colUpper[i],
-            -getInfinity(), 0,
+            -infty_, 0,
             x[i],
             lb,
             ub, tiny_, veryTiny_, infty_)) {
           v->insert(i,obj[i]);
-          lb += obj[i] * x[i];
+          //lb += obj[i] * x[i];
           ub += obj[i] * x[i];
         }
        }
        else //Unconstrained problem can not put clean coefficient
        {
            if(cleanNnz(obj[i],colLower[i], colUpper[i],
-            -getInfinity(), 0,
+            -infty_, 0,
             x[i],
             lb,
             ub, 1e-03, 1e-08, infty_)) {

@@ -66,7 +66,7 @@ am_libbonheuristics_la_OBJECTS = BonLocalSolverBasedHeuristic.lo \
 	BonHeuristicFPump.lo BonHeuristicDive.lo \
 	BonHeuristicDiveFractional.lo BonHeuristicDiveVectorLength.lo \
 	BonHeuristicDiveMIP.lo BonHeuristicDiveMIPFractional.lo \
-	BonHeuristicDiveMIPVectorLength.lo
+	BonMilpRounding.lo BonHeuristicDiveMIPVectorLength.lo
 libbonheuristics_la_OBJECTS = $(am_libbonheuristics_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
@@ -359,6 +359,7 @@ libbonheuristics_la_SOURCES = \
        BonHeuristicDiveVectorLength.cpp BonHeuristicDiveVectorLength.hpp \
        BonHeuristicDiveMIP.cpp BonHeuristicDiveMIP.hpp \
        BonHeuristicDiveMIPFractional.cpp BonHeuristicDiveMIPFractional.hpp \
+       BonMilpRounding.cpp BonMilpRounding.hpp \
        BonHeuristicDiveMIPVectorLength.cpp BonHeuristicDiveMIPVectorLength.hpp
 
 
@@ -510,6 +511,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicLocalBranching.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicRINS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonLocalSolverBasedHeuristic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonMilpRounding.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonPumpForMinlp.Plo@am__quote@
 
 .cpp.o:
