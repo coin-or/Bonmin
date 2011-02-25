@@ -715,10 +715,10 @@ namespace Bonmin
     if (use_warm_start_in_cache_ && !bad_warm_start_info_) {
       ifail = 0;
       use_warm_start_in_cache_ = false;
-      if (haveHotStart_ && times_.pivots > next_reinit_) {
+      if (haveHotStart_ && pivots_ > next_reinit_) {
         //printf("Reinitialize hot start\n");
         copyFromHotStart();
-        while (BqpdSolver::reinit_freq_ > 0&& next_reinit_ < times_.pivots)
+        while (BqpdSolver::reinit_freq_ > 0&& next_reinit_ < pivots_)
           next_reinit_ += BqpdSolver::reinit_freq_;
       }
     }
@@ -749,7 +749,10 @@ namespace Bonmin
     F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
         g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
         &m0de, &ifail, info, &iprint, &nout);
+#ifdef TIME_BQPD
     times_.pivots += info[0];
+#endif
+    pivots_ += info[0];
     if(BqpdSolver::reinit_freq_ > 0 && haveHotStart_ && (ifail == 7 || ifail == 8) && m0de == 6){
       fprintf(stdout, "Reinitialize hot start...\n");
       copyFromHotStart();

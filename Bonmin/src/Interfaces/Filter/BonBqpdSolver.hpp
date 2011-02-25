@@ -305,7 +305,8 @@ namespace Bonmin
 
       /** next reinitialization of hot start.*/
       int next_reinit_;
-
+      /** Number of pivots.*/
+      int pivots_;
       /** Constructor.*/
       cachedInfo()
           :
@@ -337,7 +338,8 @@ namespace Bonmin
           cpuTime_(0),
           use_warm_start_in_cache_(false),
 	  bad_warm_start_info_(false),
-          next_reinit_(0)
+          next_reinit_(0),
+          pivots_(0)
       {}
 
       cachedInfo(const Ipopt::SmartPtr<BranchingTQP> &tqp,
@@ -372,7 +374,8 @@ namespace Bonmin
           cpuTime_(0),
           use_warm_start_in_cache_(false),
           bad_warm_start_info_(false),
-          next_reinit_(0)
+          next_reinit_(0),
+          pivots_(0)
       {
         initialize(tqp, options, kmax_ipt, mlp_ipt, fillin_factor);
       }
