@@ -60,7 +60,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 @COIN_HAS_FILTERSQP_TRUE@am__DEPENDENCIES_1 =  \
 @COIN_HAS_FILTERSQP_TRUE@	Filter/libfilterinterface.la
-am_libbonmininterfaces_la_OBJECTS = BonBoundsReader.lo BonAuxInfos.lo \
+am_libbonmininterfaces_la_OBJECTS = BonAuxInfos.lo BonBoundsReader.lo \
 	BonColReader.lo BonCutStrengthener.lo BonStartPointReader.lo \
 	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo BonTMINLP.lo \
 	BonTNLPSolver.lo BonTNLP2FPNLP.lo BonBranchingTQP.lo \
@@ -322,8 +322,8 @@ SUBDIRS = Ipopt $(am__append_1) $(am__append_2)
 noinst_LTLIBRARIES = libbonmininterfaces.la 
 # List all source files, including headers
 libbonmininterfaces_la_SOURCES = \
-	BonBoundsReader.cpp BonBoundsReader.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
+	BonBoundsReader.cpp BonBoundsReader.hpp \
 	BonColReader.cpp BonColReader.hpp \
 	BonCutStrengthener.cpp BonCutStrengthener.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \

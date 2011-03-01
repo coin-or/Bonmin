@@ -19,6 +19,7 @@ noinst_LTLIBRARIES = libbonamplinterface.la
 libbonamplinterface_la_SOURCES = \
 	BonAmplInterface.cpp BonAmplInterface.hpp \
 	BonAmplTMINLP.cpp BonAmplTMINLP.hpp \
+	BonSolReader.cpp BonSolReader.hpp \
         sos_kludge.cpp
 
 # This is for libtool

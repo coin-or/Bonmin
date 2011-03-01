@@ -9,13 +9,15 @@
 
 //Bonmin includes
 #include "BonTNLPSolver.hpp"
-#include "BonColReader.hpp"
 
 //Ipopt includes
 #include "IpBlas.hpp"
 
 //Standard includes
 #include <fstream>
+
+#include "BonColReader.hpp"
+
 
 namespace Bonmin{
   using namespace Ipopt;

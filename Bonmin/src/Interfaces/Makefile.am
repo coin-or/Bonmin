@@ -25,8 +25,8 @@ endif
 noinst_LTLIBRARIES = libbonmininterfaces.la 
 # List all source files, including headers
 libbonmininterfaces_la_SOURCES = \
-	BonBoundsReader.cpp BonBoundsReader.hpp \
         BonAuxInfos.cpp BonAuxInfos.hpp \
+	BonBoundsReader.cpp BonBoundsReader.hpp \
 	BonColReader.cpp BonColReader.hpp \
 	BonCutStrengthener.cpp BonCutStrengthener.hpp \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
