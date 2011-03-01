@@ -20,6 +20,8 @@
 #include "BonAmplSetup.hpp"
 #include "BonCbc.hpp"
 #include "BonVersions.hpp"
+
+
 #define CATCH_ERRORS
 using namespace Bonmin;
 int main (int argc, char *argv[])
@@ -46,6 +48,7 @@ int main (int argc, char *argv[])
     //FILE * fp = fopen("log","w");
     BonminAmplSetup bonmin;
     bonmin.initialize(argv);
+
     {
     Bab bb;
 

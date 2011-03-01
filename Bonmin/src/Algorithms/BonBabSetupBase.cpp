@@ -601,6 +601,16 @@ namespace Bonmin
                "");
     roptions->setOptionExtraInfo("enable_dynamic_nlp", 19);
 
+
+    //roptions->SetRegisteringCategory("Debugging",RegisteredOptions::UndocumentedCategory);
+    roptions->AddStringOption2("read_solution_file",
+               "Read a file with the optimal solution to test if algorithms cuts it.",
+               "no",
+               "no","",
+               "yes","",
+               "For Debugging purposes only.");
+    roptions->setOptionExtraInfo("enable_dynamic_nlp", 8);
+
     /* Branching options.*/
     LpBranchingSolver::registerOptions(roptions);
 

@@ -8,6 +8,7 @@
 // Date : 04/15/2007
 
 #include "BonAmplSetup.hpp"
+#include "BonSolReader.hpp"
 namespace Bonmin
 {
   void BonminAmplSetup::initialize(char **& argv)
@@ -18,6 +19,17 @@ namespace Bonmin
                                                 argv, NULL, "bonmin", NULL);
     mayPrintDoc();
     BonminSetup::initialize(GetRawPtr(model), true);
+#if 1
+    int ival;
+    options()->GetEnumValue("read_solution_file", ival, "bonmin.");
+    if(ival){
+      printf("Reading solution file");
+      SolReader read(argv[1], ".dbg_sol");
+      read.set_n_cols(nonlinearSolver()->getNumCols());
+      read.readFile();
+      nonlinearSolver()->activateRowCutDebugger(read.x());
+    }
+#endif
   }
 
   void

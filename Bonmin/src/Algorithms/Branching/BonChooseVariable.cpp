@@ -813,6 +813,8 @@ namespace Bonmin
         branch->branch(solver);
         // maybe we should check bounds for stupidities here?
         solver->solveFromHotStart() ;
+
+
       } else {
         // adding cuts or something 
         thisSolver = solver->clone();
@@ -832,6 +834,10 @@ namespace Bonmin
         info->cutoff_ = goodObjectiveValue_;
         status0=0;
         }
+      }
+      if(solver->getRowCutDebugger() && status0 != 0){
+           printf("Has failed.\n");
+           exit(1);
       }
       numberStrongIterations_ += thisSolver->getIterationCount();
       if (solver!=thisSolver)
@@ -872,6 +878,10 @@ namespace Bonmin
         info->cutoff_ = goodObjectiveValue_;
         status1=0;
         }
+      }
+      if(solver->getRowCutDebugger() && status0 != 0){
+           printf("Has failed.\n");
+           exit(1);
       }
       numberStrongIterations_ += thisSolver->getIterationCount();
       if (solver!=thisSolver)
