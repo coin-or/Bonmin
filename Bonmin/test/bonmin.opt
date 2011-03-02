@@ -139,3 +139,5 @@ bonmin.file_solution                         no        	#Write a file bonmin.sol
 bonmin.nlp_log_level                         1         	#specify NLP solver interface log level (independent from ipopt print_level).
 bonmin.nlp_solver                            Ipopt     	#Choice of the solver for local optima of continuous nlp's
 bonmin.warm_start                            none      	#Select the warm start method
+
+linear_solver Mumps
