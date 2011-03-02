@@ -2537,6 +2537,8 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
    if(getRowCutDebugger()){
       printf("On the optimal path %g < %g?\n", getObjValue(),  getRowCutDebugger()->optimalValue());
       if(! (isProvenOptimal() && getObjValue() < getRowCutDebugger()->optimalValue())){
+         std::string probName;
+         getStrParam(OsiProbName, probName);
          throw newUnsolvedError(app_->errorCode(), problem_, probName);
       }
    }
