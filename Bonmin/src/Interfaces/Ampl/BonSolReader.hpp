@@ -1,11 +1,11 @@
-// (C) Copyright Carnegie Mellon University 2005
+// (C) Copyright CNRS 2011
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
 // Authors :
-// Pierre Bonami, Carnegie Mellon University,
+// Pierre Bonami, LIF, CNRS,
 //
-// Date : 26/05/2005
+// Date : 03/01/2011
 
 #ifndef SolReader_HPP
 #define SolReader_HPP

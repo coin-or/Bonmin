@@ -33,6 +33,7 @@
 #endif
 
 #include "OsiBranchingObject.hpp"
+#include "OsiRowCutDebugger.hpp"
 #include "BonStrongBranchingSolver.hpp"
 
 //Macros to try and make messages definition less heavy
@@ -2533,6 +2534,13 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   nCallOptimizeTNLP_++;
   hasBeenOptimized_ = true;
  
+   if(getRowCutDebugger()){
+      printf("On the optimal path %g < %g?\n", getObjValue(),  getRowCutDebugger()->optimalValue());
+      if(! (isProvenOptimal() && getObjValue() < getRowCutDebugger()->optimalValue())){
+         throw newUnsolvedError(app_->errorCode(), problem_, probName);
+      }
+   }
+
   //Options should have been printed if not done already turn off Ipopt output
   if(!hasPrintedOptions) {
     hasPrintedOptions = 1;

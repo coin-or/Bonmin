@@ -746,6 +746,48 @@ namespace Bonmin
       printf("qxstart[%2d] = %23.16e\n", i, x[i]);
     }
 #endif
+#ifdef WRITE_QPS
+    if (m0de==0) {
+      FILE* fp = fopen("QPinit.dat", "w");
+      fprintf(fp, "n = %d\n", n);
+      fprintf(fp, "m = %d\n", m);
+      fprintf(fp, "kmax = %d\n", kmax);
+      fprintf(fp, "amax = %d\n" ,amax_);
+      for (int i=1; i<=amax_; i++) {
+        fprintf(fp, "a = %23.16e\n", a[i-1]);
+      }
+      int lamax = amax_ + m + 2;
+      fprintf(fp, "lamax = %d\n" ,lamax);
+      for (int i=1; i<=lamax+1; i++) {
+        fprintf(fp, "la = %6d\n", la[i-1]);
+      }
+      for (int i=1; i<=n; i++) {
+        fprintf(fp, "x = %23.16e\n", x[i-1]);
+      }
+      for (int i=1; i<=n+m; i++) {
+        fprintf(fp, "bl = %23.16e\n", bl[i-1]);
+      }
+      for (int i=1; i<=n+m; i++) {
+        fprintf(fp, "bu = %23.16e\n", bu[i-1]);
+      }
+      fprintf(fp, "fmin = %23.16e\n", fmin);
+      fprintf(fp, "mlp = %6d\n", mlp);
+      fprintf(fp, "mxws = %d\n", mxws);
+      fprintf(fp, "mxlws = %d\n", mxlws);
+      fclose(fp);
+    }
+    else {
+      FILE* fp = fopen("QPbounds.dat", "w");
+       fprintf(fp, "m0de = %d\n", m0de);
+      for (int i=1; i<=n+m; i++) {
+        fprintf(fp, "bl = %23.16e\n", bl[i-1]);
+      }
+      for (int i=1; i<=n+m; i++) {
+        fprintf(fp, "bu = %23.16e\n", bu[i-1]);
+      }
+      fclose(fp);
+    }
+#endif
     F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
         g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
         &m0de, &ifail, info, &iprint, &nout);

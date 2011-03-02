@@ -5,7 +5,7 @@
 // Authors :
 // Pierre Bonami, LIF, CNRS,
 //
-// Date : 26/05/2005
+// Date : 03/01/2011
 #include "BonSolReader.hpp"
 #include <fstream>
 #include <iostream>
