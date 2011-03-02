@@ -21,10 +21,10 @@ namespace Bonmin
       CoinMessages((int) BON_CHOOSE_MESSAGES_DUMMY_END)
   {
     strcpy(source_,"BON");
-    ADD_MSG(PS_COST_HISTORY,std_m,5,"%3d up %3d  %15.8e  down %3d  %15.8e");
-    ADD_MSG(PS_COST_MULT,std_m, 5, "upMultiplier = %e downMultiplier = %e");
-    ADD_MSG(PS_COST_ESTIMATES, std_m, 5, "%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e");
-    ADD_MSG(CANDIDATE_LIST,std_m,4,
+    ADD_MSG(PS_COST_HISTORY,std_m,6,"%3d up %3d  %15.8e  down %3d  %15.8e");
+    ADD_MSG(PS_COST_MULT,std_m, 6, "upMultiplier = %e downMultiplier = %e");
+    ADD_MSG(PS_COST_ESTIMATES, std_m, 6, "%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e");
+    ADD_MSG(CANDIDATE_LIST,std_m,5,
         "list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e");
     ADD_MSG(CANDIDATE_LIST2, std_m, 5,
         "list_[%3d] = %3d useful_[%3d] = %e");
@@ -675,7 +675,6 @@ namespace Bonmin
             int iObject = results_[i].whichObject();
             double upEstimate;
             if (results_[i].downStatus()== 2 || results_[i].upStatus()==2) {
-              //printf("A variable went wrong\n");
               //continue;
             }
             if (results_[i].upStatus()!=1) {
@@ -835,9 +834,9 @@ namespace Bonmin
         status0=0;
         }
       }
-      if(solver->getRowCutDebugger() && status0 != 0){
-           printf("Has failed.\n");
-           exit(1);
+      if(solver->getRowCutDebugger() && status0 != 0 ){
+           OsiTMINLPInterface * tminlp_solver = dynamic_cast<OsiTMINLPInterface *> (solver);
+           throw tminlp_solver->newUnsolvedError(1, tminlp_solver->problem(), "SB");
       }
       numberStrongIterations_ += thisSolver->getIterationCount();
       if (solver!=thisSolver)
@@ -857,6 +856,7 @@ namespace Bonmin
         // ordinary
         branch->branch(solver);
         // maybe we should check bounds for stupidities here?
+        fflush(stdout);
         solver->solveFromHotStart() ;
       } else {
         // adding cuts or something 
@@ -866,6 +866,8 @@ namespace Bonmin
         int limit;
         thisSolver->getIntParam(OsiMaxNumIterationHotStart,limit);
         thisSolver->setIntParam(OsiMaxNumIteration,limit); 
+
+
         thisSolver->resolve();
       }
       // can check if we got solution
@@ -879,9 +881,9 @@ namespace Bonmin
         status1=0;
         }
       }
-      if(solver->getRowCutDebugger() && status0 != 0){
-           printf("Has failed.\n");
-           exit(1);
+      if(solver->getRowCutDebugger() && status1 != 0){
+           OsiTMINLPInterface * tminlp_solver = dynamic_cast<OsiTMINLPInterface *> (solver);
+           throw tminlp_solver->newUnsolvedError(1, tminlp_solver->problem(), "SB");
       }
       numberStrongIterations_ += thisSolver->getIterationCount();
       if (solver!=thisSolver)
