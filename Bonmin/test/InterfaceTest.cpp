@@ -300,7 +300,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
        BonminAmplSetup bonmin;
        bonmin.initialize(amplSi,const_cast<char **&>(argv));
        OsiTMINLPInterface& si = *bonmin.nonlinearSolver();
-       si.setExposeWarmStart(true);
+       si.setWarmStartMode(2);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
     <<std::endl<<"Testing useful constructor"<<std::endl
     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
@@ -334,7 +334,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
       BonminAmplSetup bonmin;
       bonmin.initialize(amplSi,const_cast<char **&>(argv));     
       OsiTMINLPInterface& si1 = *bonmin.nonlinearSolver();
-      si1.setExposeWarmStart(true);
+      si1.setWarmStartMode(2);
       
       OsiTMINLPInterface si(si1);
     std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
@@ -356,7 +356,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
         BonminAmplSetup bonmin;
         bonmin.initialize(amplSi,const_cast<char **&>(argv));     
         OsiTMINLPInterface& si = *bonmin.nonlinearSolver();
-        si.setExposeWarmStart(true);
+        si.setWarmStartMode(2);
         std::cout<<"---------------------------------------------------------------------------------------------------------------------------------------------------------"
           <<std::endl<<"Testing outer approximations related methods"<<std::endl
           <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
