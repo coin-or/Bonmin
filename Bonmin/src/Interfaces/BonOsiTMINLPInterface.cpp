@@ -73,10 +73,11 @@ register_general_options
        "no","","");
   roptions->setOptionExtraInfo("file_solution",127);
 
-  roptions->AddStringOption3("warm_start",
+  roptions->AddStringOption4("warm_start",
       "Select the warm start method",
       "none",
-      "none","No warm start",
+      "none","No warm start just start NLPs from optimal solution of the root relaxation",
+      "fake_basis", "builds fake bases usefull for cut management in Cbc (warm start is the same as in none)",
       "optimum","Warm start with direct parent optimum",
       "interior_point","Warm start with an interior point of direct parent",
       "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
@@ -392,7 +393,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     tiny_(1e-8),
     veryTiny_(1e-20),
     infty_(1e100),
-    exposeWarmStart_(false),
+    warmStartMode_(None),
     firstSolve_(true),
     cutStrengthener_(NULL),
     oaMessages_(),
@@ -554,7 +555,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_),
     infty_(source.infty_),
-    exposeWarmStart_(source.exposeWarmStart_),
+    warmStartMode_(source.warmStartMode_),
     firstSolve_(true),
     cutStrengthener_(source.cutStrengthener_),
     oaMessages_(),
@@ -670,7 +671,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
       tiny_ = rhs.tiny_;
       veryTiny_ = rhs.veryTiny_;
       infty_ = rhs.infty_;
-      exposeWarmStart_ = rhs.exposeWarmStart_;
+      warmStartMode_ = rhs.warmStartMode_;
       newCutoffDecr = rhs.newCutoffDecr;
 
     }
@@ -820,7 +821,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
   double max = -DBL_MAX;
 
   Coin::SmartPtr<SimpleReferencedPtr<CoinWarmStart> > ws_backup = NULL;
-  if(!exposeWarmStart_ && keepWarmStart){
+  if(warmStartMode_ <= Optimum && keepWarmStart){
     //if warm start is not exposed, we need to store the current starting point to
     //restore it at the end of the method
     ws_backup = make_referenced(app_->getUsedWarmStart(problem_));
@@ -956,7 +957,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
   optimizationStatus_ = savedStatus;
   hasBeenOptimized_ = true;
 
-  if(!exposeWarmStart_ && keepWarmStart) {
+  if(warmStartMode_ < Optimum && keepWarmStart) {
     app_->setWarmStart(ws_backup->ptr(), problem_);
   }
 }
@@ -972,7 +973,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   
 
   CoinWarmStart * ws_backup = NULL;
-  if(!exposeWarmStart_){
+  if(warmStartMode_ < Optimum){
     //if warm start is not exposed, we need to store the current starting point to
     //restore it at the end of the method
     ws_backup = app_->getUsedWarmStart(problem_);
@@ -1000,7 +1001,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
     messageHandler()->message(WARN_SUCCESS_WS, messages_) << CoinMessageEol ;
     // re-enable warmstart and get it
     app_->enableWarmStart();
-    if (!exposeWarmStart_) {
+    if (warmStartMode_ < Optimum) {
       app_->setWarmStart(ws_backup, problem_);
       delete ws_backup;
     }
@@ -1035,7 +1036,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
 	<< f+2 << CoinMessageEol ;
       // re-enable warmstart and get it
       app_->enableWarmStart();
-      if (!exposeWarmStart_) {
+      if (warmStartMode_ < Optimum) {
         app_->setWarmStart(ws_backup, problem_);
         delete ws_backup;
       }
@@ -1045,7 +1046,7 @@ OsiTMINLPInterface::resolveForRobustness(int numsolve)
   }
 
 
-  if(!exposeWarmStart_){
+  if(warmStartMode_ < Optimum){
     app_->setWarmStart(ws_backup, problem_);
     delete ws_backup;
   }
@@ -1413,8 +1414,11 @@ OsiTMINLPInterface::getEmptyWarmStart () const
 CoinWarmStart* 
 OsiTMINLPInterface::getWarmStart() const
 {
-  if (exposeWarmStart_) {
+  if (warmStartMode_ >= Optimum) {
     return internal_getWarmStart();;
+  }
+  else if(warmStartMode_ == FakeBasis){
+    return build_fake_basis();
   }
   else {
     return getEmptyWarmStart();
@@ -1425,18 +1429,47 @@ OsiTMINLPInterface::getWarmStart() const
 bool 
 OsiTMINLPInterface::setWarmStart(const CoinWarmStart* ws)
 {
-  if (exposeWarmStart_) {
+  if (warmStartMode_ >= Optimum) {
     return internal_setWarmStart(ws);
   }
   else {
     return true;
   }
 }
+
+
+#define EPSILON 1e-4
+
+CoinWarmStart*
+OsiTMINLPInterface::build_fake_basis() const{
+   CoinWarmStartBasis * r_val = new CoinWarmStartBasis();
+   int n_con = problem_->num_constraints();
+   r_val->setSize(problem_->num_variables(), n_con);
+   const double * act = problem_->g_sol();
+   const double * lb = problem_->g_l();
+   const double * ub = problem_->g_u();
+   for(int i = 0 ; i < n_con ; i++){
+     if(lb[i] > ub[i] - EPSILON){
+        r_val->setArtifStatus(i, CoinWarmStartBasis::isFree); 
+     }
+     if(act[i] > ub[i] - EPSILON){
+        r_val->setArtifStatus(i, CoinWarmStartBasis::atLowerBound); 
+     }
+     else if(act[i] < lb[i] + EPSILON){
+        r_val->setArtifStatus(i, CoinWarmStartBasis::atLowerBound); 
+     }
+     else {
+        r_val->setArtifStatus(i, CoinWarmStartBasis::basic); 
+     }
+   }
+   return r_val;
+}
+
   /** Get warmstarting information */
 CoinWarmStart* 
 OsiTMINLPInterface::internal_getWarmStart() const
 {
-  if (exposeWarmStart_ && warmstart_) {
+  if (warmStartMode_ >= Optimum && warmstart_) {
     return warmstart_->clone();
   }
   else {
@@ -1451,7 +1484,7 @@ OsiTMINLPInterface::internal_setWarmStart(const CoinWarmStart* ws)
   delete warmstart_;
   warmstart_ = NULL;
   hasBeenOptimized_ = false;
-  if (exposeWarmStart_) {
+  if (warmStartMode_ >= Optimum) {
     if (ws == NULL) {
       return true;
     }
@@ -2706,7 +2739,7 @@ void OsiTMINLPInterface::initialSolve(const char * whereFrom)
     if(printOptions)
       app_->options()->SetStringValue("print_user_options","yes",true,true);
   }
-  if(exposeWarmStart_)
+  if(warmStartMode_ >= Optimum)
     app_->disableWarmStart(); 
   solveAndCheckErrors(0,1,"initialSolve");
   
@@ -2739,7 +2772,7 @@ void OsiTMINLPInterface::initialSolve(const char * whereFrom)
   // if warmstart_ is not empty then had to use resolveFor... and that created
   // the warmstart at the end, and we have nothing to do here. Otherwise...
   if (! warmstart_ && ! isAbandoned()) {
-    if (exposeWarmStart_) {
+    if (warmStartMode_ >= Optimum) {
       warmstart_ = app_->getWarmStart(problem_);
     }
   }
@@ -2801,7 +2834,7 @@ OsiTMINLPInterface::resolve(const char * whereFrom)
   // if warmstart_ is not empty then had to use resolveFor... and that created
   // the warmstart at the end, and we have nothing to do here. Otherwise...
   if (! warmstart_ && ! isAbandoned()) {
-    if (exposeWarmStart_) {
+    if (warmStartMode_ >= Optimum) {
       warmstart_ = app_->getWarmStart(problem_);
     }
   }
@@ -2888,10 +2921,10 @@ OsiTMINLPInterface::extractInterfaceParams()
    app_->options()->GetIntegerValue("oa_cuts_log_level", oaCgLogLevel,app_->prefix());
    oaHandler_->setLogLevel(oaCgLogLevel); 
 	
-    int exposeWs = false;
-    app_->options()->GetEnumValue("warm_start", exposeWs, app_->prefix());
-    setExposeWarmStart(exposeWs > 0);
-    
+    int buffy;
+    app_->options()->GetEnumValue("warm_start", buffy, app_->prefix());
+    warmStartMode_ = (WarmStartModes) buffy;   
+ 
     app_->options()->GetIntegerValue("num_retry_unsolved_random_point", numRetryUnsolved_,app_->prefix());
     app_->options()->GetIntegerValue("num_resolve_at_root", numRetryInitial_,app_->prefix());
     app_->options()->GetIntegerValue("num_resolve_at_node", numRetryResolve_,app_->prefix());

@@ -321,8 +321,11 @@ namespace Bonmin
       xx[i] = x_sol_copy_[i] + x[i];
     }
 
+    double obj = obj_value + obj_val_;
+    if(status == Ipopt::LOCAL_INFEASIBILITY) 
+    obj = obj_value;
     tminlp2tnlp_->finalize_solution(status, n, xx, z_L, z_U, m, g, lambda,
-				    obj_value+obj_val_, ip_data, ip_cq);
+				    obj, ip_data, ip_cq);
     delete [] xx;
   }
 

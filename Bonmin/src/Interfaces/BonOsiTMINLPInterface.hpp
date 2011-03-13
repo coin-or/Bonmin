@@ -83,6 +83,11 @@ class SimpleError : public CoinError
   }
   //#############################################################################
 
+  enum WarmStartModes{
+   None,
+   FakeBasis,
+   Optimum,
+   InteriorPoint};
 
   /** Type of the messages specifically outputed by OsiTMINLPInterface.*/
   enum MessagesTypes{
@@ -567,12 +572,11 @@ class Messages : public CoinMessages
       the warmstart information was accepted or not. */
   virtual bool setWarmStart(const CoinWarmStart* warmstart);
 
-  void setExposeWarmStart(bool value) {
-    exposeWarmStart_ = value;
+  void setWarmStartMode(int mode) {
+    warmStartMode_ = (WarmStartModes) mode;
   }
-
-  bool getExposeWarmStart() {
-    return exposeWarmStart_;
+  WarmStartModes getWarmStartMode() {
+    return warmStartMode_;
   }
 
   void randomStartingPoint();
@@ -1264,7 +1268,7 @@ protected:
   /** status of last optimization. */
   TNLPSolver::ReturnStatus optimizationStatus_;
   /** Flag indicating if the warm start methods actually do something.*/
-  bool exposeWarmStart_;
+  WarmStartModes warmStartMode_;
   /** Is it the first solve (for random starting point at root options).*/
   bool firstSolve_;
   /** Object for strengthening cuts */
@@ -1294,7 +1298,11 @@ protected:
 
   /** internal get warm start.*/
   CoinWarmStart* internal_getWarmStart() const; 
+
+  /** Procedure that builds a fake basis. Only tries to make basis consistent with constraints activity.*/
+  CoinWarmStart* build_fake_basis() const; 
 private:
+
   /** solver to be used for all strong branching solves */
   SmartPtr<StrongBranchingSolver> strong_branching_solver_;
   /** status of last optimization before hot start was marked. */

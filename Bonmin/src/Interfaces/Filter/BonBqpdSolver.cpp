@@ -425,9 +425,7 @@ namespace Bonmin
   }
 
 /// Solves a problem expresses as a TNLP
-  TNLPSolver::ReturnStatus
-  BqpdSolver::callOptimizer()
-  {
+  TNLPSolver::ReturnStatus BqpdSolver::callOptimizer() {
 #ifdef TIME_BQPD
     times().numsolve++;
 #endif
@@ -746,6 +744,7 @@ namespace Bonmin
       printf("qxstart[%2d] = %23.16e\n", i, x[i]);
     }
 #endif
+//#define WRITE_QPS
 #ifdef WRITE_QPS
     if (m0de==0) {
       FILE* fp = fopen("QPinit.dat", "w");
