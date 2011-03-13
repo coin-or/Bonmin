@@ -834,7 +834,7 @@ namespace Bonmin
         status0=0;
         }
       }
-      if(solver->getRowCutDebugger() && status0 != 0 ){
+      if(solver->getRowCutDebugger() && status0 == 1 ){
            OsiTMINLPInterface * tminlp_solver = dynamic_cast<OsiTMINLPInterface *> (solver);
            throw tminlp_solver->newUnsolvedError(1, tminlp_solver->problem(), "SB");
       }
@@ -881,7 +881,7 @@ namespace Bonmin
         status1=0;
         }
       }
-      if(solver->getRowCutDebugger() && status1 != 0){
+      if(solver->getRowCutDebugger() && status1 == 1){
            OsiTMINLPInterface * tminlp_solver = dynamic_cast<OsiTMINLPInterface *> (solver);
            throw tminlp_solver->newUnsolvedError(1, tminlp_solver->problem(), "SB");
       }
@@ -1127,6 +1127,11 @@ BonChooseVariable::updateInformation( int index, int branch,
     int status = OsiHotInfo::updateInformation(solver, info, choose);
 #if 1
     if(!solver->isProvenPrimalInfeasible() && !solver->isProvenOptimal()){
+      status = 2;
+      statuses_[iBranch] = status;
+    }
+    else if(solver->isProvenPrimalInfeasible() && fabs(solver->getObjValue()) < 1e-06) {
+      fprintf(stderr, "Very small infeasibility: %g\n", solver->getObjValue());
       status = 2;
       statuses_[iBranch] = status;
     }

@@ -319,7 +319,10 @@ namespace Bonmin
     {
       return objects_;
     }
-   
+  
+    void addCutGenerator(CuttingMethod & cg){
+      cutGenerators_.push_back(cg);
+    }
   protected:
     /** Set the priorities into OsiTMINLPInterface when needed.*/
     void setPriorities();

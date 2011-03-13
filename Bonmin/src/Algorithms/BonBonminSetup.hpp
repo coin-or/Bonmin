@@ -73,6 +73,10 @@ namespace Bonmin
     void initialize(const OsiTMINLPInterface& nlpSi, bool createContinuousSolver = true);
     /** Get the algorithm used.*/
     Bonmin::Algorithm getAlgorithm();
+
+    void addCutGenerator(CuttingMethod & cg){
+      BabSetupBase::addCutGenerator(cg);
+    }
   protected:
     /** Register standard MILP cut generators. */
     static void registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
