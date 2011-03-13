@@ -170,6 +170,8 @@ namespace Bonmin
     ampl_tnlp_ = new AmplTNLP(jnlst, options, argv, suffix_handler, true,
         ampl_options_list, options_id.c_str(),
         appName.c_str(), appName.c_str(), nl_file_content);
+
+
     /* Read suffixes */
     read_obj_suffixes();
     read_priorities();
@@ -247,7 +249,6 @@ namespace Bonmin
   AmplTMINLP::read_sos()
   {
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
-
     int i = 0;//ASL_suf_sos_explict_free;
     int copri[2], **p_sospri;
     copri[0] = 0;
@@ -260,9 +261,13 @@ namespace Bonmin
     p_sospri = &priorities;
 
     sos_.gutsOfDestructor();
-
+    int m = n_con;
     sos_.num = suf_sos(i, &sos_.numNz, &types, p_sospri, copri,
         &starts, &indices, &weights);
+    if(m != n_con){
+      throw CoinError("number of constraints changed by suf_sos. Not supported.",
+                       "read_sos","Bonmin::AmplTMINLP");
+   }
     if (sos_.num) {
       //Copy sos information
       sos_.priorities = CoinCopyOfArray(priorities,sos_.num);
@@ -273,12 +278,12 @@ namespace Bonmin
 
       ampl_utils::sos_kludge(sos_.num, sos_.starts, sos_.weights);
       for (int ii=0;ii<sos_.num;ii++) {
-        int ichar = sos_.types[ii];
-        if (ichar != '1' && ichar != '2') {
+        int ichar = sos_.types[ii] - '0';
+        if (ichar != 1 && ichar != 2) {
           std::cerr<<"Unsuported type of sos constraint: "<<sos_.types[ii]<<std::endl;
           throw;
         }
-        sos_.types[ii]= 1;
+        sos_.types[ii]= ichar;
       }
     }
   }
