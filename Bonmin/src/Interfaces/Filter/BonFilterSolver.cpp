@@ -203,7 +203,7 @@ namespace Bonmin
       lt.colIndices = iCol;
     }
 
-    std::sort(permutation2, &permutation2[nnz], lt);
+    std::sort(permutation2, permutation2 + nnz, lt);
 
     const int idx_offset = (index_style == Ipopt::TNLP::C_STYLE);
     fint row = 1-idx_offset;
@@ -239,85 +239,6 @@ namespace Bonmin
 
   }
 
-#if 0
-  // Convert a sparse matrix from triplet format to row ordered packed matrix
-  void TMat2RowPMat_(fint n, fint m, int nnz, const Index* iRow,
-      const Index* iCol, int * permutation2,
-      fint * lws, int offset)
-  {
-    for (int i = 0 ; i < nnz ; i++)
-      permutation2[i] = i;
-
-    Transposer lt;
-    lt.rowIndices = iRow;
-    lt.colIndices = iCol;
-
-    std::sort(permutation2, &permutation2[nnz], lt);
-
-    fint row = 1;
-    lws[0] = nnz + offset + 1;
-    fint * inds = lws + offset + 1;
-    fint * start = inds + nnz + 1;
-
-    for (fint i = 0 ; i < nnz ; i++) {
-      inds[i] = iCol[permutation2[i]];
-      //DBG_ASSERT(RowJac[permutation2[i]] >= row);
-      if (iRow[permutation2[i]] >= row) {
-        for (;row <= iRow[permutation2[i]] ; row++)
-          *start++ = i + offset + 1;
-      }
-    }
-    for (;row <= m+1 ; row++)
-      *start++ = nnz + offset +1;
-
-    //deleteme
-    for (int i = 0; i<offset+1; i++)
-      printf("alws[%3d] = %3d\n", i, lws[i]);
-    for (int i = offset+1; i<offset+nnz+1; i++)
-      printf("alws[%3d] = %3d  [%3d,%3d]\n", i, lws[i], lt.rowIndices[permutation2[i-offset-1]], lt.colIndices[permutation2[i-offset-1]]);
-    for (int i = offset+nnz+1; i<lws[0]+m+2; i++)
-      printf("alws[%3d] = %3d\n", i, lws[i]);
-  }
-
-
-  // Convert a sparse matrix from triplet format to row ordered packed matrix
-  void TMat2ColPMat_(fint n, fint m, int nnz, const Index* iRow,
-      const Index* iCol,
-      int* permutationHess2, fint * lws, int offset)
-  {
-    for (int i = 0 ; i < nnz ; i++)
-      permutationHess2[i] = i;
-
-    fint col = 1;
-    lws[0] = nnz + offset + 1;
-    fint * inds = lws + 1;
-    fint * start = inds + nnz + offset;
-
-    Transposer lt;
-    lt.rowIndices = iCol;
-    lt.colIndices = iRow;
-
-    std::sort(permutationHess2, permutationHess2 + nnz, lt);
-
-    for (fint i = 0 ; i < nnz ; i++) {
-      inds[offset + i] = iRow[permutationHess2[i]];
-      if (iCol[permutationHess2[i]] >= col) {
-        for (;col <= iCol[permutationHess2[i]] ; col++)
-          *start++ = i + offset + 1;
-      }
-    }
-    for (;col <= n+1 ; col++)
-      *start++ = nnz + offset +1;
-
-    //deleteme
-    for (int i = 0; i<offset+1; i++)
-      printf("blws[%3d] = %3d\n", i, lws[i]);
-    for (int i = offset+1; i<offset+nnz+1; i++)
-      printf("blws[%3d] = %3d  [%3d,%3d]\n", i, lws[i], lt.rowIndices[permutationHess2[i-offset-1]], lt.colIndices[permutationHess2[i-offset-1]]);
-    for (int i = offset+nnz+1; i<lws[0]+m+2; i++)
-      printf("blws[%3d] = %3d\n", i, lws[i]);
-  }
-#endif
 
 
   std::string FilterSolver::solverName_ = "filter SQP";
@@ -447,7 +368,7 @@ namespace Bonmin
     return callOptimizer();
   }
 
-/// Solves a problem expresses as a TNLP
+/// Solves a problem expressed as a TNLP
   TNLPSolver::ReturnStatus
   FilterSolver::ReOptimizeTNLP(const Ipopt::SmartPtr<Ipopt::TNLP> & tnlp)
   {
