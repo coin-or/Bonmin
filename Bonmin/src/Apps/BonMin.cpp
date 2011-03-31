@@ -21,8 +21,10 @@
 #include "BonCbc.hpp"
 #include "BonVersions.hpp"
 
-
+#ifndef NDEBUG
 #define CATCH_ERRORS
+#endif
+
 using namespace Bonmin;
 int main (int argc, char *argv[])
 {
