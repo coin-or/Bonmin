@@ -10,9 +10,9 @@
 #ifndef BonDiver_H
 #define BonDiver_H
 
+#include "BonminConfig.h"
 #include "CbcCompareBase.hpp"
 #include "CbcTree.hpp"
-#include "BonminConfig.h"
 #include "IpRegOptions.hpp"
 #include "IpOptionsList.hpp"
 #include "CbcCompareActual.hpp"

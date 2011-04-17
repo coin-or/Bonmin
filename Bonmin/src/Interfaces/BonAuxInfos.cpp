@@ -7,8 +7,10 @@
 //
 // Date : 04/23/2007
 
+#include "BonminConfig.h"
 #include "BonAuxInfos.hpp"
 #include "CoinHelperFunctions.hpp"
+#include "CoinFinite.hpp"
 
 namespace Bonmin
 {
@@ -67,6 +69,9 @@ namespace Bonmin
   {
     return new AuxInfo(*this);
   }
+
+  double AuxInfo::nlpObjValue ()
+  {return hasNlpSolution_ ? objValue_ : COIN_DBL_MAX;}
 
   /** Pass a solution found by an nlp solver.*/
   void

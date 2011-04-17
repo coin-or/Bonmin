@@ -151,6 +151,14 @@ ASTYLEFLAGS="--mode=c --indent=spaces=2 --indent-cases --indent-namespaces --min
 AC_SUBST(ASTYLEFLAGS)
 
 #############################################################################
+#                                System header                              #
+#############################################################################
+
+AC_COIN_CHECK_CXX_CHEADER(math)
+AC_COIN_CHECK_CXX_CHEADER(float)
+AC_COIN_CHECK_CXX_CHEADER(ieeefp)
+
+#############################################################################
 #                            Stuff for Examples                             #
 #############################################################################
 
