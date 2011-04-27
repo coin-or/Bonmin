@@ -486,7 +486,7 @@ namespace Bonmin
        if(nlpSolver && nlpSolver->getNewCutoffDecr()!=COIN_DBL_MAX)
           model_.setDblParam(CbcModel::CbcCutoffIncrement, nlpSolver->getNewCutoffDecr());
 
-    model_.solver()->resolve();
+       model_.solver()->resolve();
 
     }
 
@@ -501,17 +501,25 @@ namespace Bonmin
       const double * colsol = model_.solver()->getColSolution();
       const double * duals = model_.solver()->getRowPrice();
 
-#if 1
-      model_.solver()->setColSolution(colsol);
-      model_.solver()->setRowPrice(duals);
-#endif
+      OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
+      // Primal dual point is not copied if one (supposedely a better one) has already been put into the solver.
+      if(tnlpSolver->problem()->has_x_init() != 2){
+        model_.solver()->setColSolution(colsol);
+        model_.solver()->setRowPrice(duals);
+      }
 #else
       OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
       CoinWarmStart * warm = tnlpSolver->solver()->getWarmStart(tnlpSolver->problem());
       tnlpSolver->solver()->setWarmStart(warm, tnlpSolver->problem());
       delete warm;
 #endif
+
+#if 0 // Sometimes primal dual point is problematic in the context of Cut-and-branch
+    model_.solver()->resolve();
+    if(!model_.solver()->isProvenOptimal())
+       model_.solver()->setColSolution(NULL);
     }
+#endif 
 
 #ifdef SIGNAL
     CoinSighandler_t saveSignal=SIG_DFL;
