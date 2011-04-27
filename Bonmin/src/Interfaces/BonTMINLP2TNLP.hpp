@@ -193,25 +193,22 @@ namespace Bonmin
     /** Change the upper bound on the variable */
     void SetVariableUpperBound(Index var_no, Number x_u);
 
-    /** Change the starting point */
-    void SetStartingPoint(Index n, const Number* x_init);
-
     /** reset the starting point to original one. */
     void resetStartingPoint();
-
-    /** Set component ind of the starting point. */
-    void setxInit(Index ind,const Number val);
 
     /** set the starting point to x_init */
     void setxInit(Index n,const Number* x_init);
 
-    /** Set component ind of the dual starting point. */
-    void setDualInit(Index ind, const Number val);
-
     /** set the dual starting point to duals_init */
     void setDualsInit(Index n, const Number* duals_init);
 
-
+    /** xInit has been set?
+      * \return 0 if not, 1 if only primal 2 if primal dual.*/
+    int has_x_init(){
+      if(x_init_.empty()) return 0;
+      if(duals_init_) return 2;
+      return 1;
+    }
     /** Set the contiuous solution */
     void Set_x_sol(Index n, const Number* x_sol);
 
