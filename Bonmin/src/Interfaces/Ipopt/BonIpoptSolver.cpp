@@ -270,9 +270,10 @@ namespace Bonmin
     set = Options->GetEnumValue("mu_oracle",dummy_int, "");
     if(!set)
     Options->SetStringValue("mu_oracle","probing", true, true);
-    if(!Options->GetIntegerValue("print_level",default_log_level_,""))
+    if(!Options->GetIntegerValue("print_level",default_log_level_,"")) {
       default_log_level_ = 1;
-    Options->SetIntegerValue("print_level",1, true, true);
+      Options->SetIntegerValue("print_level",1, true, true);
+    }
   }
 
 
