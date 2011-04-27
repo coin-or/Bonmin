@@ -518,8 +518,8 @@ namespace Bonmin
     model_.solver()->resolve();
     if(!model_.solver()->isProvenOptimal())
        model_.solver()->setColSolution(NULL);
-    }
 #endif 
+    }
 
 #ifdef SIGNAL
     CoinSighandler_t saveSignal=SIG_DFL;
