@@ -13,6 +13,7 @@
 #include "BonTMINLP2TNLP.hpp"
 #include "IpBlas.hpp"
 #include "IpAlgTypes.hpp"
+#include "IpIpoptCalculatedQuantities.hpp"
 #include <climits>
 #include <string>
 #include <fstream>
@@ -94,14 +95,9 @@ namespace Bonmin
 
 
     // Allocate space for the initial point
-    x_init_.reserve(3*n+2*m);
-    x_init_.resize(3*n + m);
-    tminlp_->get_starting_point(n, true, x_init_(), false, NULL, NULL,
-        m, false, NULL);
-    CoinZeroN(x_init_() + n , 2*n + m);
     x_init_user_.resize(n);
-    IpBlasDcopy(n, x_init_(), 1, x_init_user_(), 1);
-    duals_init_ = NULL;
+    tminlp_->get_starting_point(n, true, x_init_user_(), false, NULL, NULL,
+        m, false, NULL);
 
 #ifdef WARM_STARTER
     // Get values for parameters
@@ -205,7 +201,7 @@ namespace Bonmin
    }
 
   if(!other.g_l_.empty()){
-      const int& size = other.g_l_.size();
+      const size_t& size = other.g_l_.size();
       g_l_.resize(size);
       g_u_.resize(size);
    }
@@ -231,7 +227,7 @@ namespace Bonmin
 
     if(!other.duals_sol_.empty()) {
       duals_sol_.resize(m + 2*n);
-      IpBlasDcopy(duals_sol_.size(), other.duals_sol_(), 1, duals_sol_(), 1);
+      IpBlasDcopy((int) duals_sol_.size(), other.duals_sol_(), 1, duals_sol_(), 1);
     }
 
 }
@@ -278,43 +274,25 @@ namespace Bonmin
     x_u_[var_no] = x_u;
   }
 
-  void TMINLP2TNLP::SetStartingPoint(Index n,const Number* x_init)
-  {
-    assert(n == num_variables());
-    IpBlasDcopy(n, x_init, 1, x_init_(), 1);
-  }
-
   void TMINLP2TNLP::resetStartingPoint()
   {
     curr_warm_starter_ = NULL;
-    IpBlasDcopy(x_init_user_.size(), x_init_user_(), 1, x_init_(), 1);
-  }
-
-  void TMINLP2TNLP::setxInit(Index ind, const Number val)
-  {
-    x_init_[ind] = val;
+    x_init_.clear();
   }
 
   void TMINLP2TNLP::setxInit(Index n,const Number* x_init)
   {
     assert(n == num_variables());
+    if(x_init_.size() < n)
+      x_init_.resize(n);
     IpBlasDcopy(n, x_init, 1, x_init_(), 1);
-  }
-
-  void TMINLP2TNLP::setDualInit(Index ind, const Number val)
-  {
-    x_init_.resize(num_variables() * 3 + num_constraints(), 0.);
-    if(!duals_init_)
-      duals_init_ = &x_init_[num_variables()];
-    duals_init_[ind] = val;
   }
 
   void TMINLP2TNLP::setDualsInit(Index m, const Number* duals_init)
   {
     assert(m == num_variables() * 2 + num_constraints() );
     x_init_.resize(num_variables() * 3 + num_constraints(), 0.);
-    if(!duals_init_)
-      duals_init_ = x_init_() + num_variables();
+    duals_init_ = x_init_() + num_variables();
 
     if(m >0)
       IpBlasDcopy(m, duals_init, 1, duals_init_, 1);
@@ -383,16 +361,22 @@ namespace Bonmin
   {
     assert(m==num_constraints());
     assert(n==num_variables());
+#if 0
     x_init_.resize(3*n + m, 0.);
     duals_init_ = x_init_() + n;
+#endif
     if (init_x == true) {
-      if(x_init_.empty())
-        return false;
-      IpBlasDcopy(n, x_init_(), 1, x, 1);
+      if(x_init_.empty()){
+        assert(x_init_user_.size() >= n);
+        IpBlasDcopy(n, x_init_user_(), 1, x, 1);
+      }
+      else
+        IpBlasDcopy(n, x_init_(), 1, x, 1);
     }
     if (init_z == true) {
       if(duals_init_ == NULL)
         return false;
+      assert(x_init_.size() == 3*n + m && duals_init_ == x_init_() + n); 
       IpBlasDcopy(n, duals_init_, 1, z_L, 1);
       IpBlasDcopy(n, duals_init_ + n, 1, z_U, 1);
 
@@ -400,6 +384,7 @@ namespace Bonmin
     if(init_lambda == true) {
       if(duals_init_ == NULL)
         return false;
+      assert(x_init_.size() == 3*n + m && duals_init_ == x_init_() + n); 
       if(m > 0)
         IpBlasDcopy(m, duals_init_ + 2*n , 1, lambda, 1);
     }
@@ -512,6 +497,9 @@ namespace Bonmin
     return_status_ = status;
     obj_value_ = obj_value;
 
+    if(status == Ipopt::LOCAL_INFEASIBILITY  && ip_cq != NULL){
+      obj_value = ip_cq->curr_nlp_constraint_violation(NORM_MAX);
+    }
     if (IsValid(curr_warm_starter_)) {
       curr_warm_starter_->Finalize();
     }

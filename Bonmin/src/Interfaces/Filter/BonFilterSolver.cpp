@@ -632,9 +632,9 @@ namespace Bonmin
       }
     }
     cached_->tnlp_->finalize_solution(status, cached_->n,
-        cached_->x, z_L, z_U,
-        cached_->m, cached_->c, mlam,
-        cached_->f, NULL, NULL);
+                                      cached_->x, z_L, z_U,
+                                      cached_->m, cached_->c, mlam,
+                                      cached_->f, NULL, NULL);
     delete [] mlam;
     delete [] z_L;
     delete [] z_U;
@@ -705,6 +705,10 @@ namespace Bonmin
     printf("final f = %e\n", f);
     printf("ifail = %d\n", ifail);
 #endif
+    if(ifail == 3){
+      f = rstat[4];
+    }
+
     cpuTime_ += CoinCpuTime();
   }
 

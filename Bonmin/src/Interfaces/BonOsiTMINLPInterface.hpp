@@ -1200,6 +1200,8 @@ protected:
   int numRetryInfeasibles_;
   /// Number of times problem will be resolved in case of a failure
   int numRetryUnsolved_;
+  /// If infeasibility for a problem is less than this, let's be carrefull. It might be feasible
+  double infeasibility_epsilon_;
 
 
   //Added by Claudia

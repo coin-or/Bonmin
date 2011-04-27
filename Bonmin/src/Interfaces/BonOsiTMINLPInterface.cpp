@@ -127,6 +127,14 @@ register_general_options
       " or until the problem is solved with success.");
   roptions->setOptionExtraInfo("num_retry_unsolved_random_point",127);
 
+ roptions->AddLowerBoundedNumberOption("resolve_on_small_infeasibility",
+					   "If a locally infeasible problem is infeasible by less than this resolve it" 
+                                           "with initial starting point.",
+					   0.,true, 0.,
+					   "It is set to 0 by default with Ipopt. "
+                                           "For filter Bonmin sets it to a small value.");
+  roptions->setOptionExtraInfo("random_point_perturbation_interval",8);
+
 
   roptions->SetRegisteringCategory("Options for non-convex problems", RegisteredOptions::BonminCategory);
 
@@ -372,6 +380,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     numRetryResolve_(-1),
     numRetryInfeasibles_(-1),
     numRetryUnsolved_(1),
+    infeasibility_epsilon_(0),
     dynamicCutOff_(0),
     coeff_var_threshold_(0.1),
     first_perc_for_cutoff_decr_(-0.02),
@@ -533,6 +542,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     numRetryResolve_(source.numRetryResolve_),
     numRetryInfeasibles_(source.numRetryInfeasibles_),
     numRetryUnsolved_(source.numRetryUnsolved_),
+    infeasibility_epsilon_(source.infeasibility_epsilon_),
     dynamicCutOff_(source.dynamicCutOff_),
     coeff_var_threshold_(source.coeff_var_threshold_),
     first_perc_for_cutoff_decr_(source.first_perc_for_cutoff_decr_),
@@ -703,6 +713,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
     numRetryResolve_ = rhs.numRetryResolve_;
     numRetryInfeasibles_ = rhs.numRetryInfeasibles_;
     numRetryUnsolved_ = rhs.numRetryUnsolved_;
+    infeasibility_epsilon_ = rhs.infeasibility_epsilon_;
     pretendFailIsInfeasible_ = rhs.pretendFailIsInfeasible_;
     pretendSucceededNext_ = rhs.pretendSucceededNext_;
     numIterationSuspect_ = rhs.numIterationSuspect_;
@@ -952,7 +963,7 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
      
 
   problem_->Set_x_sol(getNumCols(),point());
-  problem_->Set_dual_sol(point.size()-getNumCols(), point() + getNumCols());
+  problem_->Set_dual_sol((int) point.size()-getNumCols(), point() + getNumCols());
   problem_->set_obj_value(bestBound);
   optimizationStatus_ = savedStatus;
   hasBeenOptimized_ = true;
@@ -1379,7 +1390,10 @@ way is solver-dependent.
 void
 OsiTMINLPInterface::setColSolution(const double *colsol)
 {
-  problem_->setxInit(getNumCols(), colsol);
+  if(colsol != NULL)
+    problem_->setxInit(getNumCols(), colsol);
+  else
+    problem_->resetStartingPoint();
   hasBeenOptimized_ = false;
 }
 
@@ -2568,10 +2582,11 @@ OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
   hasBeenOptimized_ = true;
  
    if(getRowCutDebugger()){
-      printf("On the optimal path %g < %g?\n", getObjValue(),  getRowCutDebugger()->optimalValue());
+      //printf("On the optimal path %g < %g?\n", getObjValue(),  getRowCutDebugger()->optimalValue());
       if(! (isProvenOptimal() && getObjValue() < getRowCutDebugger()->optimalValue())){
          std::string probName;
          getStrParam(OsiProbName, probName);
+         fprintf(stderr, "Problem on optimal path is infeasible!\n");
          throw newUnsolvedError(app_->errorCode(), problem_, probName);
       }
    }
@@ -2758,7 +2773,8 @@ void OsiTMINLPInterface::initialSolve(const char * whereFrom)
                                                       <<whereFrom<<CoinMessageEol;
   
   int numRetry = firstSolve_ ? numRetryInitial_ : numRetryResolve_;
-  if(isAbandoned()) {
+  if(isAbandoned() ||
+    ( isProvenPrimalInfeasible() && getObjValue() < infeasibility_epsilon_)) {
     resolveForRobustness(numRetryUnsolved_);
   }
   else if(numRetry)
@@ -2824,7 +2840,8 @@ OsiTMINLPInterface::resolve(const char * whereFrom)
                                                 <<"totot"
                                                 <<CoinMessageEol;
   
-  if(isAbandoned()) {
+  if(isAbandoned() ||
+    ( (getObjValue() < 1e-06) && isProvenPrimalInfeasible())) {
     resolveForRobustness(numRetryUnsolved_);
   }
   else if(numRetryResolve_ ||
@@ -2940,6 +2957,20 @@ OsiTMINLPInterface::extractInterfaceParams()
     int cut_strengthening_type;
     app_->options()->GetEnumValue("cut_strengthening_type", cut_strengthening_type,app_->prefix());
 
+#ifdef COIN_HAS_FILTERSQP
+    is_given =
+#endif
+    app_->options()->GetNumericValue("resolve_on_small_infeasibility", infeasibility_epsilon_, app_->prefix());
+
+#ifdef COIN_HAS_FILTERSQP
+    if(filter && !is_given){
+      // overwriting default for filter
+      infeasibility_epsilon_ = 1e-06;
+      std::string o_name = app_->prefix();
+      o_name += "resolve_on_small_infeasibility";
+      app_->options()->SetNumericValue(o_name.c_str(), infeasibility_epsilon_, true, true);
+    }
+#endif
     if (cut_strengthening_type != CS_None) {
       // TNLP solver to be used in the cut strengthener
       cutStrengthener_ = new CutStrengthener(app_->clone(), app_->options());
