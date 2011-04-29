@@ -586,7 +586,7 @@ namespace Bonmin
        }
     }
 
-    if (hasFailed) {
+    if (hasFailed && !usingCouenne_) {
     	*model_.messageHandler()
       << "************************************************************" << CoinMessageEol
       << "WARNING : Optimization failed on an NLP during optimization"  << CoinMessageEol
