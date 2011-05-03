@@ -22,7 +22,6 @@
 #include "OsiBranchingObject.hpp"
 #include <iostream>
 #include "BonBabInfos.hpp"
-//#define OA_DEBUG
 namespace Bonmin
 {
   /** Base class for OA algorithms.*/

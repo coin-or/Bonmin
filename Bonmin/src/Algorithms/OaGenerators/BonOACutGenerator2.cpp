@@ -185,7 +185,7 @@ namespace Bonmin
         break;
       
       if(ub!=0)
-    	  gap = (ub - milpBound)/ub;
+    	  gap = (ub - milpBound)/fabs(ub);
       else
 		  gap = -milpBound/(1e-10);
       if (gap < gap_tol){
@@ -200,7 +200,7 @@ namespace Bonmin
 	  numSols_ < parameters_.maxSols_) {
 
 	  if(ub!=0)
-		  gap = (ub - milpBound)/ub;
+		  gap = (ub - milpBound)/fabs(ub);
 	  else
 		  gap = -milpBound/(1e-10);
 	  if (gap < gap_tol){
