@@ -192,27 +192,27 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
         CoinRelFltEq eq(1e-07);// to test equality of doubles    
     OsiClpSolverInterface lp;
     si.extractLinearRelaxation(lp);
-//    lp.writeMps("toy");
-     MyAssert(lp.getNumCols()==4);
-      MyAssert(lp.getNumRows()==3);
-      //Check bounds on columns
-      const double * colLow = lp.getColLower();
-      DblEqAssert(colLow[0],0.);
-      DblEqAssert(colLow[1],0.);
-      DblEqAssert(colLow[2],0.);
-      DblEqAssert(colLow[3],0.);
-      
-      const double * colUp = lp.getColUpper();
-      MyAssert(colUp[0]>=lp.getInfinity());
-      MyAssert(colUp[1]>=lp.getInfinity());
-      DblEqAssert(colUp[2],1.);
-      DblEqAssert(colUp[3],5.);
-      //Check bounds on rows
-      const double * rowLow = lp.getRowLower();
-      std::cout<<rowLow[0]<<"\t"<<lp.getInfinity()<<std::endl;
-      MyAssert(rowLow[0]<= -lp.getInfinity());
-      MyAssert(rowLow[1]<= -lp.getInfinity());
-      MyAssert(rowLow[2]<= -lp.getInfinity());
+    lp.writeMps("toy");
+    MyAssert(lp.getNumCols()==4);
+    MyAssert(lp.getNumRows()==3);
+    //Check bounds on columns
+    const double * colLow = lp.getColLower();
+    DblEqAssert(colLow[0],0.);
+    DblEqAssert(colLow[1],0.);
+    DblEqAssert(colLow[2],0.);
+    DblEqAssert(colLow[3],0.);
+    
+    const double * colUp = lp.getColUpper();
+    MyAssert(colUp[0]>=lp.getInfinity());
+    MyAssert(colUp[1]>=lp.getInfinity());
+    DblEqAssert(colUp[2],1.);
+    DblEqAssert(colUp[3],5.);
+    //Check bounds on rows
+    const double * rowLow = lp.getRowLower();
+    std::cout<<rowLow[0]<<"\t"<<lp.getInfinity()<<std::endl;
+    MyAssert(rowLow[0]<= -lp.getInfinity());
+    MyAssert(rowLow[1]<= -lp.getInfinity());
+    MyAssert(rowLow[2]<= -lp.getInfinity());
                   
       const double * rowUp = lp.getRowUpper();
       double sqrt5 = sqrt(5.);

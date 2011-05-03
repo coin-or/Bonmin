@@ -189,7 +189,7 @@ namespace Bonmin
     ampl_tnlp_->get_discrete_info(n_non_linear_b, n_non_linear_bi, n_non_linear_c,
         n_non_linear_ci, n_non_linear_o, n_non_linear_oi,
         n_binaries, n_integers);
-#if 0
+#if 1
     if (n_non_linear_b == 0 && n_non_linear_o == 0) {
       hasLinearObjective_ = true;
     }
