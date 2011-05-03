@@ -135,7 +135,8 @@ namespace Bonmin
         //nlp solved and feasible
         // Update the cutoff
         ub = std::min(nlp_->getObjValue(), ub);
-        cutoff = ub *(1 - parameters_.cbcCutoffIncrement_);
+        cutoff = ub > 0 ? ub *(1 - parameters_.cbcCutoffIncrement_) : ub*(1 + parameters_.cbcCutoffIncrement_);
+        assert(cutoff < ub);
         // Update the lp solver cutoff
         lp->setDblParam(OsiDualObjectiveLimit, cutoff);
         numSols_++;
@@ -211,6 +212,7 @@ namespace Bonmin
 	   }
         nLocalSearch_++;
 
+        assert(cutoff < ub);
         subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()
             );
