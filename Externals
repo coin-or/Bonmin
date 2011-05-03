@@ -1,4 +1,4 @@
-BuildTools  https://projects.coin-or.org/svn/BuildTools/releases/0.5.30
+BuildTools  https://projects.coin-or.org/svn/BuildTools/releases/0.5.29
 ThirdParty/Blas  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/releases/1.0.14
 ThirdParty/Lapack  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/releases/1.0.21
 ThirdParty/HSL  https://projects.coin-or.org/svn/BuildTools/ThirdParty/HSL/releases/1.1.4
