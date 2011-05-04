@@ -12,15 +12,15 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Bonmin],[trunk],[bonmin@lists.coin-or.org])
+AC_INIT([Bonmin],[1.5],[bonmin@lists.coin-or.org])
 
 AC_COPYRIGHT([
-Copyright 2006 International Business Machines and others.
+Copyright 2006,2011 International Business Machines and others.
 All Rights Reserved.
 This file is part of the open source package Coin which is distributed
 under the Common Public License.])
 
-AC_REVISION(1.3)
+AC_REVISION(1.5)
 
 # List one file in the package so that the configure script can test
 # whether the package is actually there
