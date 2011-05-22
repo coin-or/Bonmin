@@ -1016,6 +1016,8 @@ BonChooseVariable::updateInformation( int index, int branch,
   if(cbc_model_ == NULL) return;
   assert (index<solver_->numberObjects()); 
   assert (branch<2); 
+  
+  if(fabs(changeInValue) < 1e-6) return;
 
   double* upTotalChange = pseudoCosts_.upTotalChange(); 
   double* downTotalChange = pseudoCosts_.downTotalChange(); 
