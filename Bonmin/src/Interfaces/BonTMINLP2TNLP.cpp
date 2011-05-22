@@ -498,7 +498,7 @@ namespace Bonmin
     obj_value_ = obj_value;
 
     if(status == Ipopt::LOCAL_INFEASIBILITY  && ip_cq != NULL){
-      obj_value = ip_cq->curr_nlp_constraint_violation(NORM_MAX);
+      obj_value_ = ip_cq->curr_nlp_constraint_violation(NORM_MAX);
     }
     if (IsValid(curr_warm_starter_)) {
       curr_warm_starter_->Finalize();
