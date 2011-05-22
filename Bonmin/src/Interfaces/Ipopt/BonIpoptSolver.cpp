@@ -326,6 +326,8 @@ namespace Bonmin
 CoinWarmStart *
 IpoptSolver::getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
 {
+  if(tnlp->x_init() == NULL || tnlp->duals_init() == NULL)
+    return NULL;
   return  new IpoptWarmStart(tnlp->num_variables(),
                              2*tnlp->num_variables() + 
                              tnlp->num_constraints(),
@@ -351,6 +353,7 @@ IpoptSolver::getUsedWarmStart(Ipopt::SmartPtr<TMINLP2TNLP> tnlp) const
     if (!warmstart && warmStartStrategy_)
       return 0;
     const IpoptWarmStart * ws = dynamic_cast<const IpoptWarmStart*> (warmstart);
+    if(ws == NULL) return 0;
     if (ws->empty())//reset initial point and leave
     {
       disableWarmStart();
