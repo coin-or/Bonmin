@@ -592,6 +592,7 @@ namespace Bonmin
   void
   BonminSetup::initializeBHyb(bool createContinuousSolver /*= false*/)
   {
+    double setup_time = -CoinCpuTime();
     if (createContinuousSolver) {
       /* Create linear solver */
       continuousSolver_ = new OsiClpSolverInterface;
@@ -847,7 +848,8 @@ namespace Bonmin
     }
 #endif
       
-
+    setup_time += CoinCpuTime();
+    doubleParam_[MaxTime] -= setup_time;
   }
 
 
