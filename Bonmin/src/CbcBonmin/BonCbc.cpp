@@ -523,8 +523,8 @@ namespace Bonmin
     remaining_time -= CoinCpuTime();
     model_.setDblParam(CbcModel::CbcMaximumSeconds, remaining_time);
 
-
-    model_.branchAndBound();
+    if(remaining_time > 0.)
+      model_.branchAndBound();
     }
     catch(TNLPSolver::UnsolvedError *E){
       s.nonlinearSolver()->model()->finalize_solution(TMINLP::MINLP_ERROR,
@@ -620,7 +620,13 @@ namespace Bonmin
       bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
       CoinCopyN(model_.bestSolution(), s.nonlinearSolver()->getNumCols(), bestSolution_);
     }
-    if (model_.status() == 0) {
+    if(remaining_time <= 0.){
+      status = TMINLP::LIMIT_EXCEEDED;
+      if (bestSolution_) {
+        mipStatus_ = Feasible;
+      }
+    }
+    else if (model_.status() == 0) {
       if(model_.isContinuousUnbounded()){
         status = TMINLP::CONTINUOUS_UNBOUNDED;
         mipStatus_ = UnboundedOrInfeasible;
