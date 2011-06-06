@@ -260,23 +260,31 @@ namespace Bonmin
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
         "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
     roptions->setOptionExtraInfo("clique_cuts", 119);
+
   }
+
+
   /** Add milp cut generators according to options.*/
   void
   BonminSetup::addMilpCutGenerators()
   {
+
     int freq;
+
     options_->GetIntegerValue("Gomory_cuts", freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglGomory * gom = new CglGomory;
       cg.cgl = gom;
-      gom->setLimitAtRoot(512);
-      gom->setLimit(50);
+      gom->setLimitAtRoot(5000);
+      gom->setLimit(500);
+      gom->setLargestFactorMultiplier(1e-08);
       cg.id = "Mixed Integer Gomory";
       cutGenerators_.push_back(cg);
     }
+
 #if 0
     options_->GetIntegerValue("probing_cuts",freq,prefix_.c_str());
     if (freq) {
@@ -301,18 +309,21 @@ namespace Bonmin
       cutGenerators_.push_back(cg);
     }
 #endif
+
     options_->GetIntegerValue("mir_cuts",freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
       CglMixedIntegerRounding2 * mir = new CglMixedIntegerRounding2;
+      //CglMixedIntegerRounding2 * mir = new CglMixedIntegerRounding2(1, true, 1);
       cg.cgl = mir;
       cg.id = "Mixed Integer Rounding";
       cutGenerators_.push_back(cg);
-
-
     }
+
     options_->GetIntegerValue("2mir_cuts",freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
@@ -321,7 +332,9 @@ namespace Bonmin
       cg.id = "2-MIR";
       cutGenerators_.push_back(cg);
     }
+
     options_->GetIntegerValue("cover_cuts",freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
@@ -332,6 +345,7 @@ namespace Bonmin
     }
 
     options_->GetIntegerValue("clique_cuts",freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
@@ -344,7 +358,9 @@ namespace Bonmin
       cg.id = "Clique";
       cutGenerators_.push_back(cg);
     }
+
     options_->GetIntegerValue("flow_cover_cuts",freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
@@ -353,7 +369,9 @@ namespace Bonmin
       cg.id = "Flow Covers";
       cutGenerators_.push_back(cg);
     }
+
     options_->GetIntegerValue("lift_and_project_cuts",freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
@@ -362,7 +380,9 @@ namespace Bonmin
       cg.id = "Lift-and-Project";
       cutGenerators_.push_back(cg);
     }
+
     options_->GetIntegerValue("reduce_and_split_cuts",freq,prefix_.c_str());
+
     if (freq) {
       CuttingMethod cg;
       cg.frequency = freq;
@@ -598,6 +618,7 @@ namespace Bonmin
   void
   BonminSetup::initializeBHyb(bool createContinuousSolver /*= false*/)
   {
+    double setup_time = -CoinCpuTime();
     if (createContinuousSolver) {
       /* Create linear solver */
       continuousSolver_ = new OsiClpSolverInterface;
@@ -852,8 +873,8 @@ namespace Bonmin
       heuristics_.push_back(h);
     }
 #endif
-      
-
+    setup_time += CoinCpuTime();
+    doubleParam_[MaxTime] -= setup_time;
   }
 
 

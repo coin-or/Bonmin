@@ -99,6 +99,9 @@ namespace Bonmin
     {
       handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
     }
+
+    int nodeCount = subMip_->nodeCount();
+
     int numberPasses = 0;
 
 #ifdef OA_DEBUG
@@ -224,6 +227,7 @@ namespace Bonmin
         else
           handler_->message(LOCAL_SEARCH_ABORT, messages_)<<subMip_->nodeCount()<<subMip_->iterationCount()<<CoinMessageEol;
 
+        nodeCount += subMip_->nodeCount();
 
         colsol = const_cast<double *> (subMip_->getLastSolution());
         isInteger = (colsol != 0);
@@ -259,6 +263,9 @@ namespace Bonmin
       
     }
 
+
+   handler_->message(OA_STATS, messages_)<<numberPasses<<nodeCount
+                                         <<CoinMessageEol;
 #ifdef OA_DEBUG
     debug_.printEndOfProcedureDebugMessage(cs, foundSolution, cutoff, milpBound, isInteger, feasible, std::cout);
 #endif
