@@ -104,6 +104,8 @@ namespace Bonmin
   void
   Bab::branchAndBound(BabSetupBase & s)
   {
+
+    double remaining_time = s.getDoubleParameter(BabSetupBase::MaxTime) + CoinCpuTime();
     /* Put a link to this into solver.*/
     OsiBabSolver *  babInfo = dynamic_cast<OsiBabSolver *>(s.continuousSolver()->getAuxiliaryInfo());
     assert(babInfo);
@@ -531,6 +533,9 @@ namespace Bonmin
 
     // to get node parent info in Cbc, pass parameter 3.
     //model_.branchAndBound(3);
+    remaining_time -= CoinCpuTime();
+    model_.setDblParam(CbcModel::CbcMaximumSeconds, remaining_time);
+    //fprintf(stderr, "Remaining time %g\n", remaining_time);
     model_.branchAndBound();
     }
     catch(TNLPSolver::UnsolvedError *E){
