@@ -7,6 +7,7 @@
 //
 // Date :  07/01/2005
 
+#include "BonminConfig.h"
 #include "BonAmplInterface.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "BonTMINLP.hpp"

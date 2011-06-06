@@ -8,9 +8,11 @@
 
 #include "BonIpoptInteriorWarmStarter.hpp"
 #include "IpDenseVector.hpp"
-
 #include "IpIpoptData.hpp"
 #include "IpIpoptCalculatedQuantities.hpp"
+
+#include <cassert>
+
 namespace Bonmin
 {
   IpoptInteriorWarmStarter::
