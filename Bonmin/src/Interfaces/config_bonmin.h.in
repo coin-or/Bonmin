@@ -1,5 +1,8 @@
 /* src/Interfaces/config_bonmin.h.in. */
 
+#ifndef __CONFIG_BONMIN_H__
+#define __CONFIG_BONMIN_H__
+
 /* Version number of project */
 #undef BONMIN_VERSION
 
@@ -11,3 +14,5 @@
 
 /* Release Version number of project */
 #undef BONMIN_VERSION_RELEASE
+
+#endif
