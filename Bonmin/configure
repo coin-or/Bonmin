@@ -22299,6 +22299,10 @@ fi
 COINDEPEND_LIBS=
 COINDEPEND_CFLAGS=
 COINDEPEND_DATA=
+COINDEPEND_DEPENDENCIES=
+COINDEPEND_PCLIBS=
+COINDEPEND_PCREQUIRES=
+COINDEPEND_DATA=
 
 
 
@@ -22327,6 +22331,7 @@ if test "${with_coindepend_lib+set}" = set; then
      else
        coin_has_coindepend=yes
        COINDEPEND_LIBS="$withval"
+       COINDEPEND_PCLIBS="$withval"
 
          BONMINLIB_PCLIBS="$withval $BONMINLIB_PCLIBS"
          BONMINLIB_LIBS="$withval $BONMINLIB_LIBS"
@@ -22417,6 +22422,7 @@ echo "${ECHO_T}yes: $COINDEPEND_VERSIONS" >&6
         then
           COINDEPEND_LIBS=`echo " $COINDEPEND_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        COINDEPEND_PCREQUIRES="cbc osi-clp ipopt"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in BonminLib
 
@@ -22460,6 +22466,8 @@ COINDEPEND_CFLAGS=
 COINDEPEND_CFLAGS_INSTALLED=
 COINDEPEND_DATA=
 COINDEPEND_DATA_INSTALLED=
+COINDEPEND_PCLIBS=
+COINDEPEND_PCREQUIRES=
 
 # initial list of dependencies is "cbc osi-clp ipopt", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="cbc osi-clp ipopt"
@@ -22657,6 +22665,7 @@ _ACEOF
     COINDEPEND_LIBS_INSTALLED=`echo " $COINDEPEND_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  COINDEPEND_PCREQUIRES="cbc osi-clp ipopt"
 
     BONMINLIB_PCREQUIRES="cbc osi-clp ipopt $BONMINLIB_PCREQUIRES"
     BONMINLIB_CFLAGS="$COINDEPEND_CFLAGS $BONMINLIB_CFLAGS"
@@ -22732,9 +22741,13 @@ echo "$as_me: CoinDepend DEPENDENCIES are $COINDEPEND_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: CoinDepend DATA   is  $COINDEPEND_DATA" >&5
 echo "$as_me: CoinDepend DATA   is  $COINDEPEND_DATA" >&6;}
     fi
-    if test -n "$COINDEPEND_CFLAGS" ; then
-      { echo "$as_me:$LINENO: CoinDepend CFLAGS are $COINDEPEND_CFLAGS" >&5
-echo "$as_me: CoinDepend CFLAGS are $COINDEPEND_CFLAGS" >&6;}
+    if test -n "$COINDEPEND_PCLIBS" ; then
+      { echo "$as_me:$LINENO: CoinDepend PCLIBS are $COINDEPEND_PCLIBS" >&5
+echo "$as_me: CoinDepend PCLIBS are $COINDEPEND_PCLIBS" >&6;}
+    fi
+    if test -n "$COINDEPEND_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: CoinDepend PCREQUIRES are $COINDEPEND_PCREQUIRES" >&5
+echo "$as_me: CoinDepend PCREQUIRES are $COINDEPEND_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: BonminLib CFLAGS are $BONMINLIB_CFLAGS" >&5
@@ -22797,6 +22810,10 @@ fi
 ASL_LIBS=
 ASL_CFLAGS=
 ASL_DATA=
+ASL_DEPENDENCIES=
+ASL_PCLIBS=
+ASL_PCREQUIRES=
+ASL_DATA=
 
 
 
@@ -22825,6 +22842,7 @@ if test "${with_asl_lib+set}" = set; then
      else
        coin_has_asl=yes
        ASL_LIBS="$withval"
+       ASL_PCLIBS="$withval"
 
          BONMINAMPLINTERFACELIB_PCLIBS="$withval $BONMINAMPLINTERFACELIB_PCLIBS"
          BONMINAMPLINTERFACELIB_LIBS="$withval $BONMINAMPLINTERFACELIB_LIBS"
@@ -22915,6 +22933,7 @@ echo "${ECHO_T}yes: $ASL_VERSIONS" >&6
         then
           ASL_LIBS=`echo " $ASL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        ASL_PCREQUIRES="ipoptamplinterface"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in BonminAmplInterfaceLib
 
@@ -22958,6 +22977,8 @@ ASL_CFLAGS=
 ASL_CFLAGS_INSTALLED=
 ASL_DATA=
 ASL_DATA_INSTALLED=
+ASL_PCLIBS=
+ASL_PCREQUIRES=
 
 # initial list of dependencies is "ipoptamplinterface", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="ipoptamplinterface"
@@ -23155,6 +23176,7 @@ _ACEOF
     ASL_LIBS_INSTALLED=`echo " $ASL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  ASL_PCREQUIRES="ipoptamplinterface"
 
     BONMINAMPLINTERFACELIB_PCREQUIRES="ipoptamplinterface $BONMINAMPLINTERFACELIB_PCREQUIRES"
     BONMINAMPLINTERFACELIB_CFLAGS="$ASL_CFLAGS $BONMINAMPLINTERFACELIB_CFLAGS"
@@ -23230,9 +23252,13 @@ echo "$as_me: ASL DEPENDENCIES are $ASL_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: ASL DATA   is  $ASL_DATA" >&5
 echo "$as_me: ASL DATA   is  $ASL_DATA" >&6;}
     fi
-    if test -n "$ASL_CFLAGS" ; then
-      { echo "$as_me:$LINENO: ASL CFLAGS are $ASL_CFLAGS" >&5
-echo "$as_me: ASL CFLAGS are $ASL_CFLAGS" >&6;}
+    if test -n "$ASL_PCLIBS" ; then
+      { echo "$as_me:$LINENO: ASL PCLIBS are $ASL_PCLIBS" >&5
+echo "$as_me: ASL PCLIBS are $ASL_PCLIBS" >&6;}
+    fi
+    if test -n "$ASL_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: ASL PCREQUIRES are $ASL_PCREQUIRES" >&5
+echo "$as_me: ASL PCREQUIRES are $ASL_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: BonminAmplInterfaceLib CFLAGS are $BONMINAMPLINTERFACELIB_CFLAGS" >&5
@@ -23308,6 +23334,10 @@ fi
 OSICPX_LIBS=
 OSICPX_CFLAGS=
 OSICPX_DATA=
+OSICPX_DEPENDENCIES=
+OSICPX_PCLIBS=
+OSICPX_PCREQUIRES=
+OSICPX_DATA=
 
 
 
@@ -23336,6 +23366,7 @@ if test "${with_osicpx_lib+set}" = set; then
      else
        coin_has_osicpx=yes
        OSICPX_LIBS="$withval"
+       OSICPX_PCLIBS="$withval"
 
          BONMINLIB_PCLIBS="$withval $BONMINLIB_PCLIBS"
          BONMINLIB_LIBS="$withval $BONMINLIB_LIBS"
@@ -23426,6 +23457,7 @@ echo "${ECHO_T}yes: $OSICPX_VERSIONS" >&6
         then
           OSICPX_LIBS=`echo " $OSICPX_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        OSICPX_PCREQUIRES="osi-cplex"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in BonminLib
 
@@ -23469,6 +23501,8 @@ OSICPX_CFLAGS=
 OSICPX_CFLAGS_INSTALLED=
 OSICPX_DATA=
 OSICPX_DATA_INSTALLED=
+OSICPX_PCLIBS=
+OSICPX_PCREQUIRES=
 
 # initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cplex"
@@ -23666,6 +23700,7 @@ _ACEOF
     OSICPX_LIBS_INSTALLED=`echo " $OSICPX_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  OSICPX_PCREQUIRES="osi-cplex"
 
     BONMINLIB_PCREQUIRES="osi-cplex $BONMINLIB_PCREQUIRES"
     BONMINLIB_CFLAGS="$OSICPX_CFLAGS $BONMINLIB_CFLAGS"
@@ -23741,9 +23776,13 @@ echo "$as_me: OsiCpx DEPENDENCIES are $OSICPX_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: OsiCpx DATA   is  $OSICPX_DATA" >&5
 echo "$as_me: OsiCpx DATA   is  $OSICPX_DATA" >&6;}
     fi
-    if test -n "$OSICPX_CFLAGS" ; then
-      { echo "$as_me:$LINENO: OsiCpx CFLAGS are $OSICPX_CFLAGS" >&5
-echo "$as_me: OsiCpx CFLAGS are $OSICPX_CFLAGS" >&6;}
+    if test -n "$OSICPX_PCLIBS" ; then
+      { echo "$as_me:$LINENO: OsiCpx PCLIBS are $OSICPX_PCLIBS" >&5
+echo "$as_me: OsiCpx PCLIBS are $OSICPX_PCLIBS" >&6;}
+    fi
+    if test -n "$OSICPX_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: OsiCpx PCREQUIRES are $OSICPX_PCREQUIRES" >&5
+echo "$as_me: OsiCpx PCREQUIRES are $OSICPX_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: BonminLib CFLAGS are $BONMINLIB_CFLAGS" >&5
@@ -24006,6 +24045,10 @@ fi
 FILTERSQP_LIBS=
 FILTERSQP_CFLAGS=
 FILTERSQP_DATA=
+FILTERSQP_DEPENDENCIES=
+FILTERSQP_PCLIBS=
+FILTERSQP_PCREQUIRES=
+FILTERSQP_DATA=
 
 
 
@@ -24034,6 +24077,7 @@ if test "${with_filtersqp_lib+set}" = set; then
      else
        coin_has_filtersqp=yes
        FILTERSQP_LIBS="$withval"
+       FILTERSQP_PCLIBS="$withval"
 
          BONMINLIB_PCLIBS="$withval $BONMINLIB_PCLIBS"
          BONMINLIB_LIBS="$withval $BONMINLIB_LIBS"
@@ -24124,6 +24168,7 @@ echo "${ECHO_T}yes: $FILTERSQP_VERSIONS" >&6
         then
           FILTERSQP_LIBS=`echo " $FILTERSQP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        FILTERSQP_PCREQUIRES="coinfiltersqp"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in BonminLib
 
@@ -24167,6 +24212,8 @@ FILTERSQP_CFLAGS=
 FILTERSQP_CFLAGS_INSTALLED=
 FILTERSQP_DATA=
 FILTERSQP_DATA_INSTALLED=
+FILTERSQP_PCLIBS=
+FILTERSQP_PCREQUIRES=
 
 # initial list of dependencies is "coinfiltersqp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinfiltersqp"
@@ -24364,6 +24411,7 @@ _ACEOF
     FILTERSQP_LIBS_INSTALLED=`echo " $FILTERSQP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  FILTERSQP_PCREQUIRES="coinfiltersqp"
 
     BONMINLIB_PCREQUIRES="coinfiltersqp $BONMINLIB_PCREQUIRES"
     BONMINLIB_CFLAGS="$FILTERSQP_CFLAGS $BONMINLIB_CFLAGS"
@@ -24439,9 +24487,13 @@ echo "$as_me: FilterSQP DEPENDENCIES are $FILTERSQP_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: FilterSQP DATA   is  $FILTERSQP_DATA" >&5
 echo "$as_me: FilterSQP DATA   is  $FILTERSQP_DATA" >&6;}
     fi
-    if test -n "$FILTERSQP_CFLAGS" ; then
-      { echo "$as_me:$LINENO: FilterSQP CFLAGS are $FILTERSQP_CFLAGS" >&5
-echo "$as_me: FilterSQP CFLAGS are $FILTERSQP_CFLAGS" >&6;}
+    if test -n "$FILTERSQP_PCLIBS" ; then
+      { echo "$as_me:$LINENO: FilterSQP PCLIBS are $FILTERSQP_PCLIBS" >&5
+echo "$as_me: FilterSQP PCLIBS are $FILTERSQP_PCLIBS" >&6;}
+    fi
+    if test -n "$FILTERSQP_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: FilterSQP PCREQUIRES are $FILTERSQP_PCREQUIRES" >&5
+echo "$as_me: FilterSQP PCREQUIRES are $FILTERSQP_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: BonminLib CFLAGS are $BONMINLIB_CFLAGS" >&5
