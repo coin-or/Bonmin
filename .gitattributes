@@ -62,7 +62,6 @@ Bonmin/experimental/Separable/Makefile.in -text
 Bonmin/experimental/Separable/Sepa.cpp -text
 Bonmin/experimental/Separable/SepaSetup.cpp -text
 Bonmin/experimental/Separable/SepaSetup.hpp -text
-Bonmin/inc/config_bonmin.h.in -text
 Bonmin/install-sh -text
 Bonmin/ltmain.sh -text
 Bonmin/missing -text
@@ -205,6 +204,10 @@ Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.cpp -text
 Bonmin/src/Interfaces/Ipopt/BonIpoptSolver.hpp -text
 Bonmin/src/Interfaces/Ipopt/Makefile.am -text
 Bonmin/src/Interfaces/Ipopt/Makefile.in -text
+Bonmin/src/Interfaces/config.h.in -text
+Bonmin/src/Interfaces/config_bonmin.h.in -text
+Bonmin/src/Interfaces/config_bonmin_default.h -text
+Bonmin/src/Interfaces/config_default.h -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip

@@ -50,9 +50,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin`
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 ########################################################################
 #                              nodeSolver                              #

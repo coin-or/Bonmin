@@ -61,9 +61,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl`
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 test: unitTest$(EXEEXT) CppExample$(EXEEXT)
 	./unitTest$(EXEEXT)

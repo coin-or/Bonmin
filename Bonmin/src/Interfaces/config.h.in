@@ -1,4 +1,4 @@
-/* inc/config_bonmin.h.in.  Generated from configure.ac by autoheader.  */
+/* src/Interfaces/config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* SVN revision number of project */
 #undef BONMIN_SVN_REV

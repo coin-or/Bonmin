@@ -41,9 +41,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
 
 #AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin`
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 
 ########################################################################
@@ -57,8 +56,7 @@ includecoin_HEADERS = \
 	BonChooseVariable.hpp \
 	BonPseudoCosts.hpp \
 	BonCurvBranchingSolver.hpp \
-        BonLpBranchingSolver.hpp \
-        BonQpBranchingSolver.hpp
+        BonLpBranchingSolver.hpp
 
 ########################################################################
 #                            Astyle stuff                              #

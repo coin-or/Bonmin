@@ -53,7 +53,8 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
+CONFIG_HEADER = $(top_builddir)/src/Interfaces/config.h \
+	$(top_builddir)/src/Interfaces/config_bonmin.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -363,9 +364,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter`
 
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 ########################################################################
 #                Headers that need to be installed                     #

@@ -1,0 +1,13 @@
+/* src/Interfaces/config_bonmin.h.in. */
+
+/* Version number of project */
+#undef BONMIN_VERSION
+
+/* Major Version number of project */
+#undef BONMIN_VERSION_MAJOR
+
+/* Minor Version number of project */
+#undef BONMIN_VERSION_MINOR
+
+/* Release Version number of project */
+#undef BONMIN_VERSION_RELEASE

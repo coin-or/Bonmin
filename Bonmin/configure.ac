@@ -189,6 +189,6 @@ if test $coin_has_asl = yes ; then
                   ])
 fi
 
-AC_CONFIG_HEADER([inc/config_bonmin.h])
+AC_CONFIG_HEADER([src/Interfaces/config.h src/Interfaces/config_bonmin.h])
 
 AC_COIN_FINALIZE

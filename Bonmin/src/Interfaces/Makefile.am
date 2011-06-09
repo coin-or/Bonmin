@@ -59,9 +59,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin`
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -71,7 +70,6 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
-     ../../inc/config_bonmin.h \
      BonOsiTMINLPInterface.hpp \
      BonTMINLP2TNLP.hpp \
      BonAuxInfos.hpp \
@@ -83,23 +81,11 @@ includecoin_HEADERS = \
      BonTypes.hpp \
      BonRegisteredOptions.hpp
 
-#############################################################################
-# Create the Config.h file that always defines HAVE_CONFIG_H and install it #
-#############################################################################
-
-# You only need to adapt the following line
-ConfigHeader = BonminConfig.h
-
 install-exec-local:
-	echo "#ifndef HAVE_CONFIG_H" >bla
-	echo "#define HAVE_CONFIG_H" >>bla
-	echo "#endif" >> bla
-	cat $(srcdir)/$(ConfigHeader) >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
-	rm -f bla
+	$(install_sh_DATA) config_bonmin.h $(DESTDIR)$(includecoindir)/BonminConfig.h
 
 uninstall-local:
-	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
+	rm -f $(DESTDIR)$(includecoindir)/BonminConfig.h
 
 ########################################################################
 #                            Astyle stuff                              #

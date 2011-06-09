@@ -48,14 +48,15 @@ host_triplet = @host@
 @COIN_HAS_FILTERSQP_TRUE@am__append_3 = Filter/libfilterinterface.la
 subdir = src/Interfaces
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
+	$(srcdir)/config_bonmin.h.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/inc/config_bonmin.h
+CONFIG_HEADER = config.h config_bonmin.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 @COIN_HAS_FILTERSQP_TRUE@am__DEPENDENCIES_1 =  \
@@ -354,9 +355,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin`
 
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -366,7 +366,6 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 # and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
-     ../../inc/config_bonmin.h \
      BonOsiTMINLPInterface.hpp \
      BonTMINLP2TNLP.hpp \
      BonAuxInfos.hpp \
@@ -378,13 +377,6 @@ includecoin_HEADERS = \
      BonTypes.hpp \
      BonRegisteredOptions.hpp
 
-
-#############################################################################
-# Create the Config.h file that always defines HAVE_CONFIG_H and install it #
-#############################################################################
-
-# You only need to adapt the following line
-ConfigHeader = BonminConfig.h
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -425,7 +417,8 @@ ASTYLE_FILES = \
 
 CLEANFILES = $(ASTYLE_FILES)
 SUFFIXES = .cppbak .hppbak
-all: all-recursive
+all: config.h config_bonmin.h
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .cppbak .hppbak .cpp .hpp .lo .o .obj
@@ -458,6 +451,33 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+
+config.h: stamp-h1
+	@if test ! -f $@; then \
+	  rm -f stamp-h1; \
+	  $(MAKE) stamp-h1; \
+	else :; fi
+
+stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
+	@rm -f stamp-h1
+	cd $(top_builddir) && $(SHELL) ./config.status src/Interfaces/config.h
+$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_srcdir) && $(AUTOHEADER)
+	rm -f stamp-h1
+	touch $@
+
+config_bonmin.h: stamp-h2
+	@if test ! -f $@; then \
+	  rm -f stamp-h2; \
+	  $(MAKE) stamp-h2; \
+	else :; fi
+
+stamp-h2: $(srcdir)/config_bonmin.h.in $(top_builddir)/config.status
+	@rm -f stamp-h2
+	cd $(top_builddir) && $(SHELL) ./config.status src/Interfaces/config_bonmin.h
+
+distclean-hdr:
+	-rm -f config.h stamp-h1 config_bonmin.h stamp-h2
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -619,7 +639,7 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES) config.h.in config_bonmin.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
@@ -636,7 +656,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
 	  fi; \
 	done; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in config_bonmin.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -648,11 +668,11 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS: ctags-recursive $(HEADERS) $(SOURCES) config.h.in config_bonmin.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in config_bonmin.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -671,7 +691,6 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../../inc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -715,7 +734,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS) config.h config_bonmin.h
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(includecoindir)"; do \
@@ -755,7 +774,7 @@ distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-libtool distclean-tags
+	distclean-hdr distclean-libtool distclean-tags
 
 dvi: dvi-recursive
 
@@ -803,10 +822,10 @@ uninstall-info: uninstall-info-recursive
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am \
 	clean clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	clean-recursive ctags ctags-recursive distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-recursive distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-exec install-exec-am \
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-libtool distclean-recursive distclean-tags distdir \
+	dvi dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-exec install-exec-am \
 	install-exec-local install-includecoinHEADERS install-info \
 	install-info-am install-man install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
@@ -818,15 +837,10 @@ uninstall-info: uninstall-info-recursive
 
 
 install-exec-local:
-	echo "#ifndef HAVE_CONFIG_H" >bla
-	echo "#define HAVE_CONFIG_H" >>bla
-	echo "#endif" >> bla
-	cat $(srcdir)/$(ConfigHeader) >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
-	rm -f bla
+	$(install_sh_DATA) config_bonmin.h $(DESTDIR)$(includecoindir)/BonminConfig.h
 
 uninstall-local:
-	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
+	rm -f $(DESTDIR)$(includecoindir)/BonminConfig.h
 
 astyle: $(ASTYLE_FILES)
 

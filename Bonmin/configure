@@ -2863,7 +2863,7 @@ if test x"$CFLAGS" = x; then
       *)
         coin_opt_cflags="-O3"
         coin_add_cflags="-pipe"
-        coin_dbg_cflags="-g"
+        coin_dbg_cflags="-g -O0"
         coin_warn_cflags="-Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -3795,7 +3795,7 @@ if test x"$CXXFLAGS" = x; then
 # ToDo decide about unroll-loops
         coin_opt_cxxflags="-O3"
         coin_add_cxxflags="-pipe"
-        coin_dbg_cxxflags="-g"
+        coin_dbg_cxxflags="-g -O0"
         coin_warn_cxxflags="-Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -4575,7 +4575,7 @@ if test "$F77" != "unavailable" && test x"$FFLAGS" = x ; then
   if test "$G77" = "yes"; then
     coin_opt_fflags="-O3"
     coin_add_fflags="-pipe"
-    coin_dbg_fflags="-g"
+    coin_dbg_fflags="-g -O0"
     case $enable_doscompile in
       mingw)
 	FFLAGS="-mno-cygwin"
@@ -22461,7 +22461,7 @@ COINDEPEND_CFLAGS_INSTALLED=
 COINDEPEND_DATA=
 COINDEPEND_DATA_INSTALLED=
 
-# initial list of dependencies is "cbc osi-clp ipopt", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "cbc osi-clp ipopt", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="cbc osi-clp ipopt"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22959,7 +22959,7 @@ ASL_CFLAGS_INSTALLED=
 ASL_DATA=
 ASL_DATA_INSTALLED=
 
-# initial list of dependencies is "ipoptamplinterface", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "ipoptamplinterface", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="ipoptamplinterface"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23470,7 +23470,7 @@ OSICPX_CFLAGS_INSTALLED=
 OSICPX_DATA=
 OSICPX_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cplex"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24168,7 +24168,7 @@ FILTERSQP_CFLAGS_INSTALLED=
 FILTERSQP_DATA=
 FILTERSQP_DATA_INSTALLED=
 
-# initial list of dependencies is "coinfiltersqp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coinfiltersqp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinfiltersqp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24562,7 +24562,7 @@ if test $coin_has_asl = yes ; then
 
 fi
 
-          ac_config_headers="$ac_config_headers inc/config_bonmin.h"
+                    ac_config_headers="$ac_config_headers src/Interfaces/config.h src/Interfaces/config_bonmin.h"
 
 
 
@@ -25316,7 +25316,8 @@ do
   "test/MyTMINLP.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp" ;;
   "test/MyTMINLP.hpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
-  "inc/config_bonmin.h" ) CONFIG_HEADERS="$CONFIG_HEADERS inc/config_bonmin.h" ;;
+  "src/Interfaces/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/Interfaces/config.h" ;;
+  "src/Interfaces/config_bonmin.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/Interfaces/config_bonmin.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
