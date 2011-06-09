@@ -348,8 +348,7 @@ includecoin_HEADERS = \
 	BonChooseVariable.hpp \
 	BonPseudoCosts.hpp \
 	BonCurvBranchingSolver.hpp \
-        BonLpBranchingSolver.hpp \
-        BonQpBranchingSolver.hpp
+        BonLpBranchingSolver.hpp
 
 
 ########################################################################
