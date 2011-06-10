@@ -101,11 +101,6 @@ amplsolver.a:
 bonminbcp_LDADD = $(bonminbcp_DEPENDENCIES) \
 	$(ADDLIBS)
 
-# Finally, the -rpath flag is used by libtool to make sure that the shared
-# library is found (in the lib install directory) when we are using dynamic
-# libraries.
-bonminbcp_LDFLAGS = -rpath $(libdir)
-
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = \

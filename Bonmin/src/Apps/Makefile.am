@@ -33,11 +33,6 @@ bonmin_DEPENDENCIES = \
 	$(BONMINLIB_DEPENDENCIES) \
 	$(ASL_DEPENDENCIES)
 
-# Finally, the -rpath flag is used by libtool to make sure that the shared
-# library is found (in the lib install directory) when we are using dynamic
-# libraries.
-bonmin_LDFLAGS = -rpath $(libdir)
-
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
 AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
@@ -70,11 +65,6 @@ BonNodeSolver_DEPENDENCIES = \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_DEPENDENCIES) \
 	$(ASL_DEPENDENCIES)
-
-# Finally, the -rpath flag is used by libtool to make sure that the shared
-# library is found (in the lib install directory) when we are using dynamic
-# libraries.
-BonNodeSolver_LDFLAGS = -rpath $(libdir)
 
 ########################################################################
 #                            Astyle stuff                              #

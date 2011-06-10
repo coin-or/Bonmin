@@ -43,11 +43,6 @@ sepa_LDADD = \
 	$(ASL_LIBS) \
 	$(BONMINLIB_LIBS)
 
-# Finally, the -rpath flag is used by libtool to make sure that the shared
-# library is found (in the lib install directory) when we are using dynamic
-# libraries.
-sepa_LDFLAGS = -rpath $(libdir)
-
 ########################################################################
 #                         make distclean stuff                         #
 ########################################################################
