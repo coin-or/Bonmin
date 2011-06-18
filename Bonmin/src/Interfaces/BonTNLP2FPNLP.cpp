@@ -10,6 +10,9 @@
 
 #include "BonTNLP2FPNLP.hpp"
 #include "IpBlas.hpp"
+
+using namespace Ipopt;
+
 namespace Bonmin
 {
   TNLP2FPNLP::TNLP2FPNLP(const SmartPtr<TNLP> tnlp, double objectiveScalingFactor):

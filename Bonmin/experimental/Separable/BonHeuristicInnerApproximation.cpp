@@ -117,7 +117,7 @@ int numberColumns;
 int numberRows;
 int nnz_jac_g;
 int nnz_h_lag;
-TNLP::IndexStyleEnum index_style;
+Ipopt::TNLP::IndexStyleEnum index_style;
 minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
     nnz_h_lag, index_style);
 
@@ -291,7 +291,7 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
     const double * x, const double * x2) {
 
   int n, m, nnz_jac_g, nnz_h_lag;
-  TNLP::IndexStyleEnum index_style;
+  Ipopt::TNLP::IndexStyleEnum index_style;
         TMINLP2TNLP * problem = si.problem(); 
   problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
 
@@ -350,7 +350,7 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    int m;
    int nnz_jac_g;
    int nnz_h_lag;
-   TNLP::IndexStyleEnum index_style;
+   Ipopt::TNLP::IndexStyleEnum index_style;
    TMINLP2TNLP * problem = nlp.problem(); 
    //Get problem information
    problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
@@ -387,7 +387,7 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    vector<Ipopt::TNLP::LinearityType>  constTypes(m);
    problem->get_constraints_linearity(m, constTypes());
    for (int i = 0; i < m; i++) {
-     if (constTypes[i] == TNLP::NON_LINEAR) {
+     if (constTypes[i] == Ipopt::TNLP::NON_LINEAR) {
        nonLinear[numNonLinear++] = i;
      }
    }
@@ -395,7 +395,7 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    vector<double> rowUp(m - numNonLinear);
    int ind = 0;
    for (int i = 0; i < m; i++) {
-     if (constTypes[i] != TNLP::NON_LINEAR) {
+     if (constTypes[i] != Ipopt::TNLP::NON_LINEAR) {
        if (rowLower[i] > -nlp_infty) {
          //   printf("Lower %g ", rowLower[i]);
          rowLow[ind] = (rowLower[i]);
@@ -494,7 +494,7 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
        problem->eval_g(n, pp, 1, m, g_pp());
        double diff = 0;
        int varInd = 0;
-       for (int i = 0; (i < m && constTypes[i] == TNLP::NON_LINEAR); i++) {
+       for (int i = 0; (i < m && constTypes[i] == Ipopt::TNLP::NON_LINEAR); i++) {
          if (varInd == n - 1)
            varInd = 0;
          diff = std::abs(g_p[i] - g_pp[i]);
@@ -507,7 +507,7 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
        }
      }
    
-     for(int i = 0; (i< m && constTypes[i] == TNLP::NON_LINEAR); i++) {
+     for(int i = 0; (i< m && constTypes[i] == Ipopt::TNLP::NON_LINEAR); i++) {
       //  getConstraintOuterApproximation(cs, i, colUpper, NULL, true);// Generate Tangents at current point
          getMyInnerApproximation(nlp, cs, i, p, up);// Generate a chord connecting the two points
      }

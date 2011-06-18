@@ -86,6 +86,6 @@ namespace Bonmin {
 
    /** Initiaize using passed options.*/
    void 
-   FixAndSolveHeuristic::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   FixAndSolveHeuristic::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
    }
 }/* ends bonmin namespace*/

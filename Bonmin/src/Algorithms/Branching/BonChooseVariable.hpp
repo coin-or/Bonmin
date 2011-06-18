@@ -254,7 +254,7 @@ namespace Bonmin
   protected:
 
     /// Holding on the a pointer to the journalist
-    SmartPtr<Journalist> jnlst_;
+    Ipopt::SmartPtr<Ipopt::Journalist> jnlst_;
 
     /// verbosity level
     int bb_log_level_;

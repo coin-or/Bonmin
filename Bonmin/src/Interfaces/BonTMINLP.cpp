@@ -86,7 +86,7 @@ TMINLP::SosInfo::gutsOfDestructor()
 }
 
 
-void TMINLP::PerturbInfo::SetPerturbationArray(Index numvars, const double* perturb_radius) {
+void TMINLP::PerturbInfo::SetPerturbationArray(Ipopt::Index numvars, const double* perturb_radius) {
   delete [] perturb_radius_;
   if (perturb_radius) {
     perturb_radius_ = new double[numvars];

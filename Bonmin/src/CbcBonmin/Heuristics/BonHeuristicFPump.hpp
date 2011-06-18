@@ -13,7 +13,6 @@
 #include "BonBonminSetup.hpp"
 #include "CbcHeuristic.hpp"
 
-using namespace std;
 namespace Bonmin
 {
   class  HeuristicFPump : public CbcHeuristic
@@ -63,7 +62,7 @@ namespace Bonmin
     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
     /** Initiaize using passed options.*/
-    void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
+    void Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
 
   private:
     /** Setup to use for local searches (will make copies).*/
@@ -104,7 +103,7 @@ namespace Bonmin
     int numberColumns_;
 
     /// Jacobian of g
-    vector<pair<int, int> >* col_and_jac_g_;
+    std::vector<std::pair<int, int> >* col_and_jac_g_;
 
   };
 

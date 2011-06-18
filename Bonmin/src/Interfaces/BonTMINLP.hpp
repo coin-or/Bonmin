@@ -22,9 +22,8 @@
 #include "OsiCuts.hpp"
 #include "IpTNLP.hpp"
 #include "CoinError.hpp"
-
 #include "CoinHelperFunctions.hpp"
-using namespace Ipopt;
+
 namespace Bonmin
 {
   DECLARE_STD_EXCEPTION(TMINLP_INVALID);
@@ -169,7 +168,7 @@ namespace Bonmin
       }
 
       /** Method for setting the perturbation radii. */
-      void SetPerturbationArray(Index numvars, const double* perturb_radius);
+      void SetPerturbationArray(Ipopt::Index numvars, const double* perturb_radius);
 
       /** Method for getting the array for the perturbation radii in
        *  order to use the values. */
@@ -209,8 +208,8 @@ namespace Bonmin
     /** overload this method to return the number of variables
      *  and constraints, and the number of non-zeros in the jacobian and
      *  the hessian. */
-    virtual bool get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
-        Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)=0;
+    virtual bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
+        Ipopt::Index& nnz_h_lag, Ipopt::TNLP::IndexStyleEnum& index_style)=0;
 
     /** overload this method to return scaling parameters. This is
      *  only called if the options are set to retrieve user scaling.
@@ -219,11 +218,11 @@ namespace Bonmin
      *  method should return true only if the scaling parameters could
      *  be provided.
      */
-    virtual bool get_scaling_parameters(Number& obj_scaling,
-                                        bool& use_x_scaling, Index n,
-                                        Number* x_scaling,
-                                        bool& use_g_scaling, Index m,
-                                        Number* g_scaling)
+    virtual bool get_scaling_parameters(Ipopt::Number& obj_scaling,
+                                        bool& use_x_scaling, Ipopt::Index n,
+                                        Ipopt::Number* x_scaling,
+                                        bool& use_g_scaling, Ipopt::Index m,
+                                        Ipopt::Number* g_scaling)
     {
       return false;
     }
@@ -231,16 +230,16 @@ namespace Bonmin
 
     /** overload this method to provide the variables types. The var_types
      *  array will be allocated with length n. */
-    virtual bool get_variables_types(Index n, VariableType* var_types)=0;
+    virtual bool get_variables_types(Ipopt::Index n, VariableType* var_types)=0;
 
     /** overload this method to provide the variables linearity.
      * array should be allocated with length at least n.*/
-    virtual bool get_variables_linearity(Index n, 
+    virtual bool get_variables_linearity(Ipopt::Index n, 
 					   Ipopt::TNLP::LinearityType* var_types) = 0;
 
     /** overload this method to provide the constraint linearity.
      * array should be allocated with length at least m.*/
-    virtual bool get_constraints_linearity(Index m, 
+    virtual bool get_constraints_linearity(Ipopt::Index m, 
 					   Ipopt::TNLP::LinearityType* const_types) = 0;
 
     /** overload this method to return the information about the bound
@@ -251,8 +250,8 @@ namespace Bonmin
      *  1e19.
      *  An exception will be thrown if x_l and x_u are not 0,1 for binary variables
      */
-    virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
-        Index m, Number* g_l, Number* g_u)=0;
+    virtual bool get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
+        Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u)=0;
 
     /** overload this method to return the starting point. The bools
      *  init_x and init_lambda are both inputs and outputs. As inputs,
@@ -261,32 +260,32 @@ namespace Bonmin
      *  algorithm wants you to initialize these and you cannot, set
      *  the respective bool to false.
      */
-    virtual bool get_starting_point(Index n, bool init_x, Number* x,
-                                    bool init_z, Number* z_L, Number* z_U,
-        Index m, bool init_lambda,
-        Number* lambda)=0;
+    virtual bool get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
+                                    bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
+        Ipopt::Index m, bool init_lambda,
+        Ipopt::Number* lambda)=0;
 
     /** overload this method to return the value of the objective function */
-    virtual bool eval_f(Index n, const Number* x, bool new_x,
-        Number& obj_value)=0;
+    virtual bool eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number& obj_value)=0;
 
     /** overload this method to return the vector of the gradient of
      *  the objective w.r.t. x */
-    virtual bool eval_grad_f(Index n, const Number* x, bool new_x,
-        Number* grad_f)=0;
+    virtual bool eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number* grad_f)=0;
 
     /** overload this method to return the vector of constraint values */
-    virtual bool eval_g(Index n, const Number* x, bool new_x,
-        Index m, Number* g)=0;
+    virtual bool eval_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Number* g)=0;
 
     /** overload this method to return the jacobian of the
      *  constraints. The vectors iRow and jCol only need to be set
      *  once. The first call is used to set the structure only (iRow
      *  and jCol will be non-NULL, and values will be NULL) For
      *  subsequent calls, iRow and jCol will be NULL. */
-    virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
-        Index m, Index nele_jac, Index* iRow,
-        Index *jCol, Number* values)=0;
+    virtual bool eval_jac_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index* iRow,
+        Ipopt::Index *jCol, Ipopt::Number* values)=0;
 
     /** overload this method to return the hessian of the
      *  lagrangian. The vectors iRow and jCol only need to be set once
@@ -295,14 +294,14 @@ namespace Bonmin
      *  will be NULL) For subsequent calls, iRow and jCol will be
      *  NULL. This matrix is symmetric - specify the lower diagonal
      *  only */
-    virtual bool eval_h(Index n, const Number* x, bool new_x,
-        Number obj_factor, Index m, const Number* lambda,
-        bool new_lambda, Index nele_hess,
-        Index* iRow, Index* jCol, Number* values)=0;
+    virtual bool eval_h(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number obj_factor, Ipopt::Index m, const Ipopt::Number* lambda,
+        bool new_lambda, Ipopt::Index nele_hess,
+        Ipopt::Index* iRow, Ipopt::Index* jCol, Ipopt::Number* values)=0;
     /** Compute the value of a single constraint. The constraint
      *  number is i (starting counting from 0. */
-    virtual bool eval_gi(Index n, const Number* x, bool new_x,
-			 Index i, Number& gi)
+    virtual bool eval_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+			 Ipopt::Index i, Ipopt::Number& gi)
     {
       std::cerr << "Method eval_gi not overloaded from TMINLP\n";
       throw -1;
@@ -310,9 +309,9 @@ namespace Bonmin
     /** Compute the structure or values of the gradient for one
      *  constraint. The constraint * number is i (starting counting
      *  from 0.  Other things are like with eval_jac_g. */
-    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
-			      Index i, Index& nele_grad_gi, Index* jCol,
-			      Number* values)
+    virtual bool eval_grad_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+			      Ipopt::Index i, Ipopt::Index& nele_grad_gi, Ipopt::Index* jCol,
+			      Ipopt::Number* values)
     {
       std::cerr << "Method eval_grad_gi not overloaded from TMINLP\n";
       throw -1;
@@ -323,7 +322,7 @@ namespace Bonmin
     //@{
     /** This method is called when the algorithm is complete so the TNLP can store/write the solution */
     virtual void finalize_solution(TMINLP::SolverReturn status,
-                                   Index n, const Number* x, Number obj_value) =0;
+                                   Ipopt::Index n, const Ipopt::Number* x, Ipopt::Number obj_value) =0;
     //@}
     
     virtual const BranchingInfo * branchingInfo() const = 0;
@@ -341,8 +340,8 @@ namespace Bonmin
     
     /** overload this method to return the value of an alternative objective function for
       upper bounding (to use it hasUpperBoundingObjective should return true).*/
-    virtual bool eval_upper_bound_f(Index n, const Number* x,
-                                    Number& obj_value){ return false; }
+    virtual bool eval_upper_bound_f(Ipopt::Index n, const Ipopt::Number* x,
+                                    Ipopt::Number& obj_value){ return false; }
 
    /** Used to mark constraints of the problem.*/
    enum Convexity {

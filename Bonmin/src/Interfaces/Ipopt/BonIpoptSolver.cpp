@@ -81,7 +81,7 @@ namespace Bonmin
   Ipopt::SmartPtr<TNLPSolver>
   IpoptSolver::clone()
   {
-    SmartPtr<IpoptSolver> retval = new IpoptSolver(*this);
+    Ipopt::SmartPtr<IpoptSolver> retval = new IpoptSolver(*this);
     retval->app_->Initialize("");
     retval->default_log_level_ = default_log_level_;
     return GetRawPtr(retval);

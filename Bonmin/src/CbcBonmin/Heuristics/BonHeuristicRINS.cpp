@@ -131,6 +131,6 @@ namespace Bonmin {
 
    /** Initiaize using passed options.*/
    void 
-   HeuristicRINS::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   HeuristicRINS::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
    }
 }/* ends bonmin namespace*/

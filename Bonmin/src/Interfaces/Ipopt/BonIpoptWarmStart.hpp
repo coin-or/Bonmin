@@ -52,7 +52,7 @@ namespace Bonmin
     IpoptWarmStart(bool empty = 1, int numvars = 0, int numcont = 0);
     /// Usefull constructor, stores the current optimum of ipopt
     IpoptWarmStart(const Ipopt::SmartPtr<TMINLP2TNLP> tnlp,
-        SmartPtr<IpoptInteriorWarmStarter> warm_starter);
+        Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter);
     /// Another usefull constructor, stores the passed point
     IpoptWarmStart(int primal_size, int dual_size,
                    const double * primal, const double * dual);
@@ -79,7 +79,7 @@ namespace Bonmin
     applyDiff (const CoinWarmStartDiff *const cwsdDiff);
 
     /** Accessor to warm start information obecjt */
-    SmartPtr<IpoptInteriorWarmStarter> warm_starter() const
+    Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter() const
     {
       return warm_starter_;
     }
@@ -94,7 +94,7 @@ namespace Bonmin
     }
   private:
     /** warm start information object */
-    mutable SmartPtr<IpoptInteriorWarmStarter> warm_starter_;
+    mutable Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter_;
     ///Say if warm start is empty
     bool empty_;
   };
@@ -112,7 +112,7 @@ namespace Bonmin
     friend class IpoptWarmStart;
     /** Useful constructor; takes over the data in \c diff */
     IpoptWarmStartDiff(CoinWarmStartPrimalDualDiff * diff,
-		       SmartPtr<IpoptInteriorWarmStarter> warm_starter):
+		       Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter):
       CoinWarmStartPrimalDualDiff(),
       warm_starter_(NULL)//(warm_starter)
     {
@@ -133,7 +133,7 @@ namespace Bonmin
     }
 
     /** Accessor to warm start information obecjt */
-    SmartPtr<IpoptInteriorWarmStarter> warm_starter() const
+    Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter() const
     {
       return warm_starter_;
     }
@@ -141,7 +141,7 @@ namespace Bonmin
   private:
 
     /** warm start information object */
-    SmartPtr<IpoptInteriorWarmStarter> warm_starter_;
+    Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter_;
   };
 
 }

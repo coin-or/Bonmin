@@ -25,10 +25,10 @@ namespace Bonmin
     /**@name Constructors/Destructors */
     //@{
     /** Build using tnlp as source problem.*/
-    TNLP2FPNLP(const SmartPtr<TNLP> tnlp, double objectiveScalingFactor = 100);
+    TNLP2FPNLP(const Ipopt::SmartPtr<Ipopt::TNLP> tnlp, double objectiveScalingFactor = 100);
 
     /** Build using tnlp as source problem and using other for all other parameters..*/
-    TNLP2FPNLP(const SmartPtr<TNLP> tnlp, const SmartPtr<TNLP2FPNLP> other);
+    TNLP2FPNLP(const Ipopt::SmartPtr<TNLP> tnlp, const Ipopt::SmartPtr<TNLP2FPNLP> other);
 
     /** Default destructor */
     virtual ~TNLP2FPNLP();
@@ -54,7 +54,7 @@ namespace Bonmin
     /**@name Methods to provide the rhs of the extra constraints*/
     //@{
     /// Set the cutoff value to use in the cutoff constraint
-    void set_cutoff(Number cutoff);
+    void set_cutoff(Ipopt::Number cutoff);
 
     /// Set the rhs of the local branching constraint
     void set_rhs_local_branching_constraint(double rhs_local_branching_constraint)
@@ -70,7 +70,7 @@ namespace Bonmin
      * \param inds indices of the coordinates on which distance is minimized
      * \param vals values of the point for coordinates in ind
      */
-    void set_dist2point_obj(int n, const Number * vals, const Index * inds);
+    void set_dist2point_obj(int n, const Ipopt::Number * vals, const Ipopt::Index * inds);
 
      /** Set the value for sigma */
      void setSigma(double sigma){
@@ -89,20 +89,20 @@ namespace Bonmin
     /**@name methods to gather information about the NLP */
     //@{
     /** get info from nlp_ and add hessian information */
-    virtual bool get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
-        Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style);
+    virtual bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
+        Ipopt::Index& nnz_h_lag, Ipopt::TNLP::IndexStyleEnum& index_style);
 
     /** This call is just passed onto tnlp_
      */
-    virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
-				 Index m, Number* g_l, Number* g_u);
+    virtual bool get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
+				 Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u);
 
     /** Passed onto tnlp_
      */
-    virtual bool get_starting_point(Index n, bool init_x, Number* x,
-        bool init_z, Number* z_L, Number* z_U,
-        Index m, bool init_lambda,
-        Number* lambda)
+    virtual bool get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
+        bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
+        Ipopt::Index m, bool init_lambda,
+        Ipopt::Number* lambda)
     {
       int m2 = m;
       if(use_cutoff_constraint_) {
@@ -119,43 +119,43 @@ namespace Bonmin
     }
 
     /** overloaded to return the value of the objective function */
-    virtual bool eval_f(Index n, const Number* x, bool new_x,
-        Number& obj_value);
+    virtual bool eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number& obj_value);
 
     /** overload this method to return the vector of the gradient of
      *  the objective w.r.t. x */
-    virtual bool eval_grad_f(Index n, const Number* x, bool new_x,
-        Number* grad_f);
+    virtual bool eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number* grad_f);
 
     /** overload to return the values of the left-hand side of the
         constraints */
-    virtual bool eval_g(Index n, const Number* x, bool new_x,
-			Index m, Number* g);
+    virtual bool eval_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+			Ipopt::Index m, Ipopt::Number* g);
 
     /** overload to return the jacobian of g */
-    virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
-			    Index m, Index nele_jac, Index* iRow,
-			    Index *jCol, Number* values);
+    virtual bool eval_jac_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+			    Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index* iRow,
+			    Ipopt::Index *jCol, Ipopt::Number* values);
 
     /** Evaluate the modified Hessian of the Lagrangian*/
-    virtual bool eval_h(Index n, const Number* x, bool new_x,
-        Number obj_factor, Index m, const Number* lambda,
-        bool new_lambda, Index nele_hess,
-        Index* iRow, Index* jCol, Number* values);
+    virtual bool eval_h(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number obj_factor, Ipopt::Index m, const Ipopt::Number* lambda,
+        bool new_lambda, Ipopt::Index nele_hess,
+        Ipopt::Index* iRow, Ipopt::Index* jCol, Ipopt::Number* values);
     //@}
 
     /** @name Solution Methods */
     //@{
     /** This method is called when the algorithm is complete so the TNLP can store/write the solution */
-    virtual void finalize_solution(SolverReturn status,
-        Index n, const Number* x, const Number* z_L, const Number* z_U,
-        Index m, const Number* g, const Number* lambda,
-        Number obj_value,
-        const IpoptData* ip_data,
-        IpoptCalculatedQuantities* ip_cq);
+    virtual void finalize_solution(Ipopt::SolverReturn status,
+        Ipopt::Index n, const Ipopt::Number* x, const Ipopt::Number* z_L, const Ipopt::Number* z_U,
+        Ipopt::Index m, const Ipopt::Number* g, const Ipopt::Number* lambda,
+        Ipopt::Number obj_value,
+        const Ipopt::IpoptData* ip_data,
+        Ipopt::IpoptCalculatedQuantities* ip_cq);
     //@}
 
-    virtual bool get_variables_linearity(Index n, LinearityType* var_types)
+    virtual bool get_variables_linearity(Ipopt::Index n, LinearityType* var_types)
     {
       return tnlp_->get_variables_linearity(n, var_types);;
     }
@@ -163,7 +163,7 @@ namespace Bonmin
     /** overload this method to return the constraint linearity.
      * array should be alocated with length at least n. (default implementation
      *  just return false and does not fill the array).*/
-    virtual bool get_constraints_linearity(Index m, LinearityType* const_types)
+    virtual bool get_constraints_linearity(Ipopt::Index m, LinearityType* const_types)
     {
       int m2 = m;
       if(use_cutoff_constraint_) {
@@ -191,7 +191,7 @@ namespace Bonmin
     /** @name Internal methods to help compute the distance, its gradient and hessian */
     //@{
     /** Compute the norm-2 distance to the current point to which distance is minimized. */
-    double dist2point(const Number *x);
+    double dist2point(const Ipopt::Number *x);
     //@}
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -212,14 +212,14 @@ namespace Bonmin
     //@}
 
     /** pointer to the tminlp that is being adapted */
-    SmartPtr<TNLP> tnlp_;
+    Ipopt::SmartPtr<TNLP> tnlp_;
 
     /** @name Data for storing the point the distance to which is minimized */
     //@{
     /// Indices of the variables for which distance is minimized (i.e. indices of integer variables in a feasibility pump setting)
-    vector<Index> inds_;
+    vector<Ipopt::Index> inds_;
     /// Values of the point to which we separate (if x is the point vals_[i] should be x[inds_[i]] )
-    vector<Number> vals_;
+    vector<Ipopt::Number> vals_;
     /** value for the convex combination to take between original objective and distance function.
       * ( take lambda_ * distance + (1-lambda) sigma f(x).*/
     double lambda_;
@@ -254,8 +254,8 @@ namespace Bonmin
     double rhs_local_branching_constraint_;
     //@}
 
-    /// Index style (C++ or Fortran)
-    TNLP::IndexStyleEnum index_style_;
+    /// Ipopt::Index style (C++ or Fortran)
+    Ipopt::TNLP::IndexStyleEnum index_style_;
 
   };
 

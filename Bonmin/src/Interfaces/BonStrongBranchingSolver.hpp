@@ -14,7 +14,7 @@ namespace Bonmin {
  *  BonOsiSolverInterface to perform the strong branching solves.
 */
 
-class StrongBranchingSolver : public ReferencedObject  {
+class StrongBranchingSolver : public Ipopt::ReferencedObject  {
  
 public:
 
@@ -41,15 +41,15 @@ public:
 
 protected:
 
-  inline SmartPtr<Journalist>& Jnlst()
+  inline Ipopt::SmartPtr<Ipopt::Journalist>& Jnlst()
   {
     return jnlst_;
   }
-  inline SmartPtr<OptionsList>& Options()
+  inline Ipopt::SmartPtr<Ipopt::OptionsList>& Options()
   {
     return options_;
   }
-  inline SmartPtr<RegisteredOptions>& RegOptions()
+  inline Ipopt::SmartPtr<RegisteredOptions>& RegOptions()
   {
     return reg_options_;
   }
@@ -57,9 +57,9 @@ private:
   /** Default Constructor, forbiden for some reason.*/
   StrongBranchingSolver ();
 
-  SmartPtr<Journalist> jnlst_;
-  SmartPtr<OptionsList> options_;
-  SmartPtr<Bonmin::RegisteredOptions> reg_options_;
+  Ipopt::SmartPtr<Ipopt::Journalist> jnlst_;
+  Ipopt::SmartPtr<Ipopt::OptionsList> options_;
+  Ipopt::SmartPtr<Bonmin::RegisteredOptions> reg_options_;
 
   int bb_log_level_;
 

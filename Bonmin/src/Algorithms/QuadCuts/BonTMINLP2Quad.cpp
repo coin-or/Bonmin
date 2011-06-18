@@ -10,6 +10,8 @@
 #include "BonTMINLP2Quad.hpp"
 #include <climits>
 
+using namespace Ipopt;
+
 //#define DEBUG
 namespace Bonmin {
 

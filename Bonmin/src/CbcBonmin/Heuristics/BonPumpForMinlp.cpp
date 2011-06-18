@@ -50,7 +50,7 @@ namespace Bonmin {
   }
 
    void
-   PumpForMinlp::setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   PumpForMinlp::setupDefaults(Ipopt::SmartPtr<Ipopt::OptionsList> options){
      //int dummy;
      std::string prefix = "pump_for_minlp.";
      changeIfNotSet(options, prefix, "algorithm", "B-iFP");
@@ -73,7 +73,7 @@ namespace Bonmin {
 
    /** Initiaize using passed options.*/
    void 
-   PumpForMinlp::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   PumpForMinlp::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
    }
 }/* ends bonmin namespace*/
 

@@ -60,7 +60,7 @@ namespace Bonmin
     FilterSolver* filter_solver =
       dynamic_cast<FilterSolver*> (tminlp_interface->solver());
     if (filter_solver) {
-      SmartPtr<BqpdSolver> qp_solver =
+      Ipopt::SmartPtr<BqpdSolver> qp_solver =
 	new BqpdSolver(RegOptions(), Options(), Jnlst(), tminlp_interface->prefix());
 #if 1
       // Solve the QP with the original bounds and set the hot start

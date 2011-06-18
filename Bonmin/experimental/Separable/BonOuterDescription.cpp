@@ -69,7 +69,7 @@ void getMyOuterApproximation(
 		const double * x, int getObj, const double * x2, double theta,
 		bool global) {
 	int n, m, nnz_jac_g, nnz_h_lag;
-	TNLP::IndexStyleEnum index_style;
+	Ipopt::TNLP::IndexStyleEnum index_style;
         TMINLP2TNLP* problem = si.problem();
 	problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
 
@@ -164,7 +164,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 	int m;
 	int nnz_jac_g;
 	int nnz_h_lag;
-	TNLP::IndexStyleEnum index_style;
+	Ipopt::TNLP::IndexStyleEnum index_style;
 	//Get problem information
         TMINLP2TNLP* problem = nlp.problem();
 	problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
@@ -207,7 +207,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 		vector<double> g_p(m);
 		vector<double> g_pp(m);
 		for (int i = 0; (i < m); i++) {
-                        if(constTypes[i] != TNLP::NON_LINEAR) continue;
+                        if(constTypes[i] != Ipopt::TNLP::NON_LINEAR) continue;
 			getMyOuterApproximation(nlp, cs, i, p, 0, NULL, 10000, true);// Generate Tangents at current point    	 
 		}
 		for (int j = 1; j <= nbAp; j++) {
@@ -222,7 +222,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 		double diff = 0;
 		int varInd = 0;
 		for (int i = 0; (i < m); i++) {
-                        if(constTypes[i] != TNLP::NON_LINEAR) continue;
+                        if(constTypes[i] != Ipopt::TNLP::NON_LINEAR) continue;
 			if (varInd == n - 1)
 				varInd = 0;
 			diff = std::abs(g_p[i] - g_pp[i]);
@@ -236,7 +236,7 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 		}
 		}
 		for (int i = 0; i < m ; i++) {
-                        if(constTypes[i] != TNLP::NON_LINEAR) continue;
+                        if(constTypes[i] != Ipopt::TNLP::NON_LINEAR) continue;
 			getMyOuterApproximation(nlp, cs, i, up, 0, NULL, 10000, true);// Generate Tangents at current point
 		}
 		

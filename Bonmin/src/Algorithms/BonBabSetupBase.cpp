@@ -113,7 +113,7 @@ namespace Bonmin
     if(other.branchingMethod_ != NULL)
       branchingMethod_ = other.branchingMethod_->clone();
     if (IsValid(other.options_)) {
-      options_ = new OptionsList;
+      options_ = new Ipopt::OptionsList;
       *options_ = *other.options_;
     }
     CoinCopyN(other.intParam_, NumberIntParam, intParam_);
@@ -164,7 +164,7 @@ namespace Bonmin
     if(other.branchingMethod_ != NULL)
       branchingMethod_ = other.branchingMethod_->clone();
     if (IsValid(other.options_)) {
-      options_ = new OptionsList;
+      options_ = new Ipopt::OptionsList;
       *options_ = *other.options_;
     }
     CoinCopyN(other.intParam_, NumberIntParam, intParam_);
@@ -194,7 +194,7 @@ namespace Bonmin
   {
     nonlinearSolver_ = &nlp;
     if (IsValid(other.options_)) {
-      options_ = new OptionsList;
+      options_ = new Ipopt::OptionsList;
       *options_ = *other.options_;
     }
     if (other.messageHandler_) {
@@ -340,7 +340,7 @@ namespace Bonmin
 
 
   void
-  BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<OptionsList> options)
+  BabSetupBase::gatherParametersValues(Ipopt::SmartPtr<Ipopt::OptionsList> options)
   {
 
     options->GetIntegerValue("bb_log_level",intParam_[BabLogLevel],prefix_.c_str());

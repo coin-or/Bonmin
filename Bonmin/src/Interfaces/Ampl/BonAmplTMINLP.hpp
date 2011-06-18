@@ -48,19 +48,19 @@ namespace Bonmin
     /**@name Constructors/Destructors */
     //@{
     /** Constructor */
-    AmplTMINLP(const SmartPtr<const Journalist>& jnlst,
-        const SmartPtr<Bonmin::RegisteredOptions> roptions,
-        const SmartPtr<OptionsList> options,
+    AmplTMINLP(const Ipopt::SmartPtr<const Ipopt::Journalist>& jnlst,
+        const Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
+        const Ipopt::SmartPtr<Ipopt::OptionsList> options,
         char**& argv,
-        AmplSuffixHandler* suffix_handler = NULL,
+        Ipopt::AmplSuffixHandler* suffix_handler = NULL,
         const std::string& appName = "bonmin",
         std::string* nl_file_content = NULL);
 
-    virtual void Initialize(const SmartPtr<const Journalist>& jnlst,
-        const SmartPtr<Bonmin::RegisteredOptions> roptions,
-        const SmartPtr<OptionsList> options,
+    virtual void Initialize(const Ipopt::SmartPtr<const Ipopt::Journalist>& jnlst,
+        const Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
+        const Ipopt::SmartPtr<Ipopt::OptionsList> options,
         char**& argv,
-        AmplSuffixHandler* suffix_handler =NULL,
+        Ipopt::AmplSuffixHandler* suffix_handler =NULL,
         const std::string& appName = "bonmin",
         std::string* nl_file_content = NULL);
 
@@ -98,67 +98,67 @@ namespace Bonmin
     * detailed documentation. */
     //@{
     /** returns dimensions of the nlp. Overloaded from TMINLP */
-    virtual bool get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
-        Index& nnz_h_lag,
-        TNLP::IndexStyleEnum& index_style);
+    virtual bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
+        Ipopt::Index& nnz_h_lag,
+        Ipopt::TNLP::IndexStyleEnum& index_style);
 
     /** returns the vector of variable types */
-    virtual bool get_variables_types(Index n, VariableType* var_types);
+    virtual bool get_variables_types(Ipopt::Index n, VariableType* var_types);
 
     /** return the variables linearity (linear or not)*/
-    virtual bool get_variables_linearity(Index n, Ipopt::TNLP::LinearityType * var_types);
+    virtual bool get_variables_linearity(Ipopt::Index n, Ipopt::TNLP::LinearityType * var_types);
 
     /** Returns the constraint linearity.
      * array should be alocated with length at least n.*/
-    virtual bool get_constraints_linearity(Index m,
+    virtual bool get_constraints_linearity(Ipopt::Index m,
         Ipopt::TNLP::LinearityType* const_types);
 
     /** returns bounds of the nlp. Overloaded from TMINLP */
-    virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
-        Index m, Number* g_l, Number* g_u);
+    virtual bool get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
+        Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u);
 
     /** provides a starting point for the nlp variables. Overloaded
     from TMINLP */
-    virtual bool get_starting_point(Index n, bool init_x, Number* x,
-        bool init_z, Number* z_L, Number* z_U,
-        Index m, bool init_lambda, Number* lambda);
+    virtual bool get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
+        bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
+        Ipopt::Index m, bool init_lambda, Ipopt::Number* lambda);
 
     /** evaluates the objective value for the nlp. Overloaded from TMINLP */
-    virtual bool eval_f(Index n, const Number* x, bool new_x,
-        Number& obj_value);
+    virtual bool eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number& obj_value);
 
     /** evaluates the gradient of the objective for the
     nlp. Overloaded from TMINLP */
-    virtual bool eval_grad_f(Index n, const Number* x, bool new_x,
-        Number* grad_f);
+    virtual bool eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number* grad_f);
 
     /** evaluates the constraint residuals for the nlp. Overloaded from TMINLP */
-    virtual bool eval_g(Index n, const Number* x, bool new_x,
-        Index m, Number* g);
+    virtual bool eval_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Number* g);
 
     /** specifies the jacobian structure (if values is NULL) and
      *  evaluates the jacobian values (if values is not NULL) for the
      *  nlp. Overloaded from TMINLP */
-    virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
-        Index m, Index nele_jac, Index* iRow,
-        Index *jCol, Number* values);
+    virtual bool eval_jac_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index* iRow,
+        Ipopt::Index *jCol, Ipopt::Number* values);
 
     /** specifies the structure of the hessian of the lagrangian (if
      *  values is NULL) and evaluates the values (if values is not
      *  NULL). Overloaded from TMINLP */
-    virtual bool eval_h(Index n, const Number* x, bool new_x,
-        Number obj_factor, Index m, const Number* lambda,
-        bool new_lambda, Index nele_hess, Index* iRow,
-        Index* jCol, Number* values);
+    virtual bool eval_h(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number obj_factor, Ipopt::Index m, const Ipopt::Number* lambda,
+        bool new_lambda, Ipopt::Index nele_hess, Ipopt::Index* iRow,
+        Ipopt::Index* jCol, Ipopt::Number* values);
 
     /** compute the value of a single constraint */
-    virtual bool eval_gi(Index n, const Number* x, bool new_x,
-        Index i, Number& gi);
+    virtual bool eval_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index i, Ipopt::Number& gi);
     /** compute the structure or values of the gradient for one
     constraint */
-    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
-        Index i, Index& nele_grad_gi, Index* jCol,
-        Number* values);
+    virtual bool eval_grad_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index i, Ipopt::Index& nele_grad_gi, Ipopt::Index* jCol,
+        Ipopt::Number* values);
     //@}
 
     /** @name Solution Methods */
@@ -176,10 +176,10 @@ namespace Bonmin
       * </table>
       *    */
     virtual void finalize_solution(TMINLP::SolverReturn status,
-        Index n, const Number* x, Number obj_value);
+        Ipopt::Index n, const Ipopt::Number* x, Ipopt::Number obj_value);
 
     /** Write the solution using ampl's write_sol (called by finalize_solution).*/
-    void write_solution(const std::string & message, const Number *x_sol);
+    void write_solution(const std::string & message, const Ipopt::Number *x_sol);
     //@}
 
     //@}
@@ -203,7 +203,7 @@ namespace Bonmin
     /** @name User callbacks */
     //@{
     /** Additional application specific options.*/
-    virtual void fillApplicationOptions(AmplOptionsList* amplOptList)
+    virtual void fillApplicationOptions(Ipopt::AmplOptionsList* amplOptList)
     {}
     //@}
 
@@ -220,8 +220,8 @@ namespace Bonmin
 
     /** This method to returns the value of an alternative objective function for
       upper bounding (if one has been declared by using the prefix UBObj).*/
-    virtual bool eval_upper_bound_f(Index n, const Number* x,
-        Number& obj_value);
+    virtual bool eval_upper_bound_f(Ipopt::Index n, const Ipopt::Number* x,
+        Ipopt::Number& obj_value);
 
     /** Get accest to constraint convexities.*/
     virtual bool get_constraint_convexities(int m, TMINLP::Convexity * constraints_convexities)const
@@ -283,9 +283,9 @@ namespace Bonmin
     /** Index of the objective to use for upper bounding*/
     int upperBoundingObj_;
     /** pointer to the internal AmplTNLP */
-    AmplTNLP* ampl_tnlp_;
+    Ipopt::AmplTNLP* ampl_tnlp_;
     /** Journalist */
-    SmartPtr<const Journalist> jnlst_;
+    Ipopt::SmartPtr<const Ipopt::Journalist> jnlst_;
 
     /** Storage of branching priorities information.*/
     BranchingInfo branch_;
@@ -294,16 +294,16 @@ namespace Bonmin
     /** Storage for perturbation radii */
     PerturbInfo perturb_info_;
     /** Store a suffix handler.*/
-    SmartPtr<AmplSuffixHandler> suffix_handler_;
+    Ipopt::SmartPtr<Ipopt::AmplSuffixHandler> suffix_handler_;
 
     /** Store constraints types.*/
     TMINLP::Convexity * constraintsConvexities_;
 
-    /** Number of nonConvex constraints.*/
+    /** Ipopt::Number of nonConvex constraints.*/
     int numberNonConvex_;
     /** Store marked non-convex constraints and their relaxations.*/
     MarkedNonConvex * nonConvexConstraintsAndRelaxations_;
-    /** Number of simpleConcave constraints.*/
+    /** Ipopt::Number of simpleConcave constraints.*/
     int numberSimpleConcave_;
     /** Store simple concave constraints descriptions.*/
     SimpleConcaveConstraint * simpleConcaves_;

@@ -64,7 +64,7 @@ namespace Bonmin
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
     
@@ -79,7 +79,7 @@ namespace Bonmin
 		      numberRows, nnz_jac_g,
 		      indexRow, indexCol, 0);
     columnLength_ = new int[numberColumns];
-    int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
+    int indexCorrection = (index_style == Ipopt::TNLP::C_STYLE) ? 0 : 1;
     int iniCol = -1;
     for(int i=0; i<nnz_jac_g; i++) {
       int thisIndexCol = indexCol[i]-indexCorrection;
@@ -110,7 +110,7 @@ namespace Bonmin
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
 
@@ -176,7 +176,7 @@ namespace Bonmin
   }
 
   void 
-  HeuristicDiveVectorLength::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+  HeuristicDiveVectorLength::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
   }
 
 }

@@ -51,9 +51,9 @@ namespace Bonmin
     /// Default Constructor
     QpBranchingSolver ();
 
-    SmartPtr<BranchingTQP> branching_tqp_;
+    Ipopt::SmartPtr<BranchingTQP> branching_tqp_;
 
-    SmartPtr<TNLPSolver> tqp_solver_;
+    Ipopt::SmartPtr<TNLPSolver> tqp_solver_;
 
 #ifdef TIME_BQPD
     BqpdSolver::Times times_;

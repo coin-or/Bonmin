@@ -47,7 +47,7 @@ namespace Bonmin {
    }
 
    void
-   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Ipopt::OptionsList> options, 
                                              std::string prefix,
                                              const std::string &option,
                                              const std::string &value){
@@ -57,7 +57,7 @@ namespace Bonmin {
    
    }
    void
-   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Ipopt::OptionsList> options, 
                                              std::string prefix,
                                              const std::string &option,
                                              const double &value){
@@ -67,7 +67,7 @@ namespace Bonmin {
    
    }
    void
-   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options,
+   LocalSolverBasedHeuristic::changeIfNotSet(Ipopt::SmartPtr<Ipopt::OptionsList> options,
                                              std::string prefix,
                                              const std::string &option,
                                              const int &value){
@@ -78,7 +78,7 @@ namespace Bonmin {
    }
 
    void
-   LocalSolverBasedHeuristic::setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   LocalSolverBasedHeuristic::setupDefaults(Ipopt::SmartPtr<Ipopt::OptionsList> options){
      std::string prefix = "local_solver.";
      changeIfNotSet(options, prefix, "algorithm", "B-QG");
      changeIfNotSet(options, prefix, "variable_selection", "most-fractional");
@@ -114,7 +114,7 @@ namespace Bonmin {
 
    /** Initiaize using passed options.*/
    void 
-   LocalSolverBasedHeuristic::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   LocalSolverBasedHeuristic::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
      /** Some fancy defaults.*/
      setupDefaults(options);
    }

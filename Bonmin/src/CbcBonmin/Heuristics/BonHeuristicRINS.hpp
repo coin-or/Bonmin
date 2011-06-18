@@ -37,7 +37,7 @@ namespace Bonmin {
    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
    /** Initiaize using passed options.*/
-   void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
+   void Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
 
     /// Sets how often to do it
     inline void setHowOften(int value)

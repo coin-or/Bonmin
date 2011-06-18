@@ -88,7 +88,7 @@ namespace Bonmin
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
 
@@ -190,7 +190,7 @@ namespace Bonmin
 
 	nlp->initialSolve();
 
-	if(minlp->optimization_status() != SUCCESS) {
+	if(minlp->optimization_status() != Ipopt::SUCCESS) {
 	  if(numberAtBoundFixed > 0) {
 	    // Remove the bound fix for variables that were at bounds
 	    for(int i=0; i<numberAtBoundFixed; i++) {
@@ -220,7 +220,7 @@ namespace Bonmin
 	  break;
       }
 
-      if(minlp->optimization_status() != SUCCESS) {
+      if(minlp->optimization_status() != Ipopt::SUCCESS) {
 	break;
       }
 
@@ -260,7 +260,7 @@ namespace Bonmin
     for(int iRow=0; iRow<numberRows; iRow++) {
       if(new_g_sol[iRow]<g_l[iRow]-primalTolerance ||
 	 new_g_sol[iRow]>g_u[iRow]+primalTolerance) {
-	if(minlp->optimization_status() != SUCCESS) {
+	if(minlp->optimization_status() != Ipopt::SUCCESS) {
 	  feasible = false;
 	  break;
 	} else {
@@ -309,7 +309,7 @@ namespace Bonmin
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
 
@@ -344,7 +344,7 @@ namespace Bonmin
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
 

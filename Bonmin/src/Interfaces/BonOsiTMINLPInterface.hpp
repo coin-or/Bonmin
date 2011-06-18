@@ -1274,7 +1274,7 @@ protected:
   /** Is it the first solve (for random starting point at root options).*/
   bool firstSolve_;
   /** Object for strengthening cuts */
-  SmartPtr<CutStrengthener> cutStrengthener_;
+  Ipopt::SmartPtr<CutStrengthener> cutStrengthener_;
 
   /** \name output for OA cut generation
        \todo All OA code here should be moved to a separate class sometime.*/
@@ -1306,7 +1306,7 @@ protected:
 private:
 
   /** solver to be used for all strong branching solves */
-  SmartPtr<StrongBranchingSolver> strong_branching_solver_;
+  Ipopt::SmartPtr<StrongBranchingSolver> strong_branching_solver_;
   /** status of last optimization before hot start was marked. */
   TNLPSolver::ReturnStatus optimizationStatusBeforeHotStart_;
 static const char * OPT_SYMB;

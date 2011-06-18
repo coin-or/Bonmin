@@ -34,7 +34,7 @@ namespace Bonmin
   public:
     /**@name Constructors/Destructors */
     //@{
-    TMINLP2TNLP(const SmartPtr<TMINLP> tminlp
+    TMINLP2TNLP(const Ipopt::SmartPtr<TMINLP> tminlp
 #ifdef WARM_STARTER
         ,
         const OptionsList& options
@@ -58,20 +58,20 @@ namespace Bonmin
     //@{
 
     /** Get the number of variables */
-    inline Index num_variables() const
+    inline Ipopt::Index num_variables() const
     {
       assert(x_l_.size() == x_u_.size());
       return static_cast<int>(x_l_.size());
     }
 
     /** Get the number of constraints */
-    inline Index num_constraints() const
+    inline Ipopt::Index num_constraints() const
     {
       assert(g_l_.size() == g_u_.size());
       return static_cast<int>(g_l_.size());
     }
     /** Get the nomber of nz in hessian */
-    Index nnz_h_lag()
+    Ipopt::Index nnz_h_lag()
     {
       return nnz_h_lag_;
     }
@@ -82,88 +82,88 @@ namespace Bonmin
     }
 
     /** Get the current values for the lower bounds */
-    const Number* x_l()
+    const Ipopt::Number* x_l()
     {
       return &x_l_[0];
     }
     /** Get the current values for the upper bounds */
-    const Number* x_u()
+    const Ipopt::Number* x_u()
     {
       return &x_u_[0];
     }
 
     /** Get the original values for the lower bounds */
-    const Number* orig_x_l() const
+    const Ipopt::Number* orig_x_l() const
     {
       return &orig_x_l_[0];
     }
     /** Get the original values for the upper bounds */
-    const Number* orig_x_u() const
+    const Ipopt::Number* orig_x_u() const
     {
       return orig_x_u_();
     }
 
     /** Get the current values for constraints lower bounds */
-    const Number* g_l()
+    const Ipopt::Number* g_l()
     {
       return g_l_();
     }
     /** Get the current values for constraints upper bounds */
-    const Number* g_u()
+    const Ipopt::Number* g_u()
     {
       return g_u_();
     }
 
     /** get the starting primal point */
-    const Number * x_init() const
+    const Ipopt::Number * x_init() const
     {
       return x_init_();
     }
 
     /** get the user provided starting primal point */
-    const Number * x_init_user() const
+    const Ipopt::Number * x_init_user() const
     {
       return x_init_user_();
     }
 
     /** get the starting dual point */
-    const Number * duals_init() const
+    const Ipopt::Number * duals_init() const
     {
       return duals_init_;
     }
 
     /** get the solution values */
-    const Number* x_sol() const
+    const Ipopt::Number* x_sol() const
     {
       return x_sol_();
     }
 
     /** get the g solution (activities) */
-    const Number* g_sol() const
+    const Ipopt::Number* g_sol() const
     {
       return g_sol_();
     }
 
     /** get the dual values */
-    const Number* duals_sol() const
+    const Ipopt::Number* duals_sol() const
     {
       return duals_sol_();
     }
 
     /** Get Optimization status */
-    SolverReturn optimization_status() const
+    Ipopt::SolverReturn optimization_status() const
     {
       return return_status_;
     }
 
     /** Get the objective value */
-    Number obj_value() const
+    Ipopt::Number obj_value() const
     {
       return obj_value_;
     }
 
     /** Manually set objective value. */
-    void set_obj_value(Number value)
+    void set_obj_value(Ipopt::Number value)
     {
       obj_value_ = value;
     }
@@ -172,35 +172,35 @@ namespace Bonmin
     void force_fractionnal_sol();
 
     /** Change the bounds on the variables */
-    void SetVariablesBounds(Index n,
-                            const Number * x_l,
-                            const Number * x_u);
+    void SetVariablesBounds(Ipopt::Index n,
+                            const Ipopt::Number * x_l,
+                            const Ipopt::Number * x_u);
 
     /** Change the lower bound on the variables */
-    void SetVariablesLowerBounds(Index n,
-                               const Number * x_l);
+    void SetVariablesLowerBounds(Ipopt::Index n,
+                               const Ipopt::Number * x_l);
 
     /** Change the upper bound on the variable */
-    void SetVariablesUpperBounds(Index n,
-                                const Number * x_u);
+    void SetVariablesUpperBounds(Ipopt::Index n,
+                                const Ipopt::Number * x_u);
 
     /** Change the bounds on the variable */
-    void SetVariableBounds(Index var_no, Number x_l, Number x_u);
+    void SetVariableBounds(Ipopt::Index var_no, Ipopt::Number x_l, Ipopt::Number x_u);
 
     /** Change the lower bound on the variable */
-    void SetVariableLowerBound(Index var_no, Number x_l);
+    void SetVariableLowerBound(Ipopt::Index var_no, Ipopt::Number x_l);
 
     /** Change the upper bound on the variable */
-    void SetVariableUpperBound(Index var_no, Number x_u);
+    void SetVariableUpperBound(Ipopt::Index var_no, Ipopt::Number x_u);
 
     /** reset the starting point to original one. */
     void resetStartingPoint();
 
     /** set the starting point to x_init */
-    void setxInit(Index n,const Number* x_init);
+    void setxInit(Ipopt::Index n,const Ipopt::Number* x_init);
 
     /** set the dual starting point to duals_init */
-    void setDualsInit(Index n, const Number* duals_init);
+    void setDualsInit(Ipopt::Index n, const Ipopt::Number* duals_init);
 
     /** xInit has been set?
       * \return 0 if not, 1 if only primal 2 if primal dual.*/
@@ -210,13 +210,13 @@ namespace Bonmin
       return 1;
     }
     /** Set the contiuous solution */
-    void Set_x_sol(Index n, const Number* x_sol);
+    void Set_x_sol(Ipopt::Index n, const Ipopt::Number* x_sol);
 
     /** Set the contiuous dual solution */
-    void Set_dual_sol(Index n, const Number* dual_sol);
+    void Set_dual_sol(Ipopt::Index n, const Ipopt::Number* dual_sol);
 
     /** Change the type of the variable */
-    void SetVariableType(Index n, TMINLP::VariableType type);
+    void SetVariableType(Ipopt::Index n, TMINLP::VariableType type);
     //@}
     /** Procedure to ouptut relevant informations to reproduce a sub-problem.
       Compare the current problem to the problem to solve
@@ -227,20 +227,20 @@ namespace Bonmin
     /**@name methods to gather information about the NLP */
     //@{
     /** This call is just passed onto the TMINLP object */
-    virtual bool get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
-        Index& nnz_h_lag,
+    virtual bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
+        Ipopt::Index& nnz_h_lag,
         TNLP::IndexStyleEnum& index_style);
 
     /** The caller is allowed to modify the bounds, so this
      *  method returns the internal bounds information
      */
-    virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
-        Index m, Number* g_l, Number* g_u);
+    virtual bool get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
+        Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u);
 
     /** Returns the constraint linearity.
      * array should be alocated with length at least n. (default implementation
      *  just return false and does not fill the array).*/
-    virtual bool get_constraints_linearity(Index m, LinearityType* const_types)
+    virtual bool get_constraints_linearity(Ipopt::Index m, LinearityType* const_types)
     {
       return tminlp_->get_constraints_linearity(m, const_types);
     }
@@ -254,54 +254,54 @@ namespace Bonmin
      *  algorithm wants you to initialize these and you cannot, set
      *  the respective bool to false.
      */
-    virtual bool get_starting_point(Index n, bool init_x, Number* x,
-        bool init_z, Number* z_L, Number* z_U,
-        Index m, bool init_lambda,
-        Number* lambda);
+    virtual bool get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
+        bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
+        Ipopt::Index m, bool init_lambda,
+        Ipopt::Number* lambda);
 
     /** Method that returns scaling parameters. 
      */
-    virtual bool get_scaling_parameters(Number& obj_scaling,
-                                        bool& use_x_scaling, Index n,
-                                        Number* x_scaling,
-                                        bool& use_g_scaling, Index m,
-                                        Number* g_scaling);
+    virtual bool get_scaling_parameters(Ipopt::Number& obj_scaling,
+                                        bool& use_x_scaling, Ipopt::Index n,
+                                        Ipopt::Number* x_scaling,
+                                        bool& use_g_scaling, Ipopt::Index m,
+                                        Ipopt::Number* g_scaling);
 
 
     /** Methat that returns an Ipopt IteratesVector that has the
      *  starting point for all internal varibles. */
-    virtual bool get_warm_start_iterate(IteratesVector& warm_start_iterate);
+    virtual bool get_warm_start_iterate(Ipopt::IteratesVector& warm_start_iterate);
 
     /** Returns the value of the objective function in x*/
-    virtual bool eval_f(Index n, const Number* x, bool new_x,
-        Number& obj_value);
+    virtual bool eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number& obj_value);
 
     /** Returns the vector of the gradient of
      *  the objective w.r.t. x */
-    virtual bool eval_grad_f(Index n, const Number* x, bool new_x,
-        Number* grad_f);
+    virtual bool eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number* grad_f);
 
     /** Returns the vector of constraint values in x*/
-    virtual bool eval_g(Index n, const Number* x, bool new_x,
-        Index m, Number* g);
+    virtual bool eval_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Number* g);
 
     /** Returns the jacobian of the
      *  constraints. The vectors iRow and jCol only need to be set
      *  once. The first call is used to set the structure only (iRow
      *  and jCol will be non-NULL, and values will be NULL) For
      *  subsequent calls, iRow and jCol will be NULL. */
-    virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
-        Index m, Index nele_jac, Index* iRow,
-        Index *jCol, Number* values);
+    virtual bool eval_jac_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index* iRow,
+        Ipopt::Index *jCol, Ipopt::Number* values);
 
     /** compute the value of a single constraint */
-    virtual bool eval_gi(Index n, const Number* x, bool new_x,
-			 Index i, Number& gi);
+    virtual bool eval_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+			 Ipopt::Index i, Ipopt::Number& gi);
     /** compute the structure or values of the gradient for one
 	constraint */
-    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
-			      Index i, Index& nele_grad_gi, Index* jCol,
-			      Number* values);
+    virtual bool eval_grad_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+			      Ipopt::Index i, Ipopt::Index& nele_grad_gi, Ipopt::Index* jCol,
+			      Ipopt::Number* values);
 
     /** Return the hessian of the
      *  lagrangian. The vectors iRow and jCol only need to be set once
@@ -310,33 +310,33 @@ namespace Bonmin
      *  will be NULL) For subsequent calls, iRow and jCol will be
      *  NULL. This matrix is symmetric - specify the lower diagonal
      *  only */
-    virtual bool eval_h(Index n, const Number* x, bool new_x,
-        Number obj_factor, Index m, const Number* lambda,
-        bool new_lambda, Index nele_hess,
-        Index* iRow, Index* jCol, Number* values);
+    virtual bool eval_h(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number obj_factor, Ipopt::Index m, const Ipopt::Number* lambda,
+        bool new_lambda, Ipopt::Index nele_hess,
+        Ipopt::Index* iRow, Ipopt::Index* jCol, Ipopt::Number* values);
     //@}
 
     /** @name Solution Methods */
     //@{
     /** This method is called when the algorithm is complete so the TNLP can store/write the solution */
-    virtual void finalize_solution(SolverReturn status,
-        Index n, const Number* x, const Number* z_L, const Number* z_U,
-        Index m, const Number* g, const Number* lambda,
-        Number obj_value,
-        const IpoptData* ip_data,
-        IpoptCalculatedQuantities* ip_cq);
+    virtual void finalize_solution(Ipopt::SolverReturn status,
+        Ipopt::Index n, const Ipopt::Number* x, const Ipopt::Number* z_L, const Ipopt::Number* z_U,
+        Ipopt::Index m, const Ipopt::Number* g, const Ipopt::Number* lambda,
+        Ipopt::Number obj_value,
+        const Ipopt::IpoptData* ip_data,
+        Ipopt::IpoptCalculatedQuantities* ip_cq);
     /** Intermediate Callback method for the user.  Providing dummy
      *  default implementation.  For details see IntermediateCallBack
      *  in IpNLP.hpp. */
-    virtual bool intermediate_callback(AlgorithmMode mode,
-        Index iter, Number obj_value,
-        Number inf_pr, Number inf_du,
-        Number mu, Number d_norm,
-        Number regularization_size,
-        Number alpha_du, Number alpha_pr,
-        Index ls_trials,
-        const IpoptData* ip_data,
-        IpoptCalculatedQuantities* ip_cq);
+    virtual bool intermediate_callback(Ipopt::AlgorithmMode mode,
+        Ipopt::Index iter, Ipopt::Number obj_value,
+        Ipopt::Number inf_pr, Ipopt::Number inf_du,
+        Ipopt::Number mu, Ipopt::Number d_norm,
+        Ipopt::Number regularization_size,
+        Ipopt::Number alpha_du, Ipopt::Number alpha_pr,
+        Ipopt::Index ls_trials,
+        const Ipopt::IpoptData* ip_data,
+        Ipopt::IpoptCalculatedQuantities* ip_cq);
     //@}
 
     /** Method called to check wether a problem has still some variable not fixed. If there are no more
@@ -344,9 +344,9 @@ namespace Bonmin
 
     /** @name Methods for setting and getting the warm starter */
     //@{
-    void SetWarmStarter(SmartPtr<IpoptInteriorWarmStarter> warm_starter);
+    void SetWarmStarter(Ipopt::SmartPtr<IpoptInteriorWarmStarter> warm_starter);
 
-      SmartPtr<IpoptInteriorWarmStarter> GetWarmStarter();
+      Ipopt::SmartPtr<IpoptInteriorWarmStarter> GetWarmStarter();
 
     //@}
       
@@ -390,36 +390,36 @@ namespace Bonmin
     /// Types of the variable (TMINLP::CONTINUOUS, TMINLP::INTEGER, TMINLP::BINARY).
     vector<TMINLP::VariableType> var_types_;
     /// Current lower bounds on variables
-    vector<Number> x_l_;
+    vector<Ipopt::Number> x_l_;
     /// Current upper bounds on variables
-    vector<Number> x_u_;
+    vector<Ipopt::Number> x_u_;
     /// Original lower bounds on variables
-    vector<Number> orig_x_l_;
+    vector<Ipopt::Number> orig_x_l_;
     /// Original upper bounds on variables
-    vector<Number> orig_x_u_;
+    vector<Ipopt::Number> orig_x_u_;
     /// Lower bounds on constraints values
-    vector<Number> g_l_; 
+    vector<Ipopt::Number> g_l_; 
     /// Upper bounds on constraints values
-    vector<Number> g_u_;
+    vector<Ipopt::Number> g_u_;
     /// Initial primal point
-    vector<Number> x_init_;
+    vector<Ipopt::Number> x_init_;
     /** Initial values for all dual multipliers (constraints then lower bounds then upper bounds) */
-    Number * duals_init_;
+    Ipopt::Number * duals_init_;
     /// User-provideed initial prmal point
-    vector<Number> x_init_user_;
+    vector<Ipopt::Number> x_init_user_;
     /// Optimal solution
-    vector<Number> x_sol_;
+    vector<Ipopt::Number> x_sol_;
     /// Activities of constraint g( x_sol_)
-    vector<Number> g_sol_;
+    vector<Ipopt::Number> g_sol_;
     /** Dual multipliers of constraints and bounds*/
-    vector<Number> duals_sol_;
+    vector<Ipopt::Number> duals_sol_;
     /** @} */
 
     /** Access number of entries in tminlp_ hessian*/
-    Index nnz_h_lag() const{
+    Ipopt::Index nnz_h_lag() const{
      return nnz_h_lag_;}
     /** Access number of entries in tminlp_ hessian*/
-    Index nnz_jac_g() const{
+    Ipopt::Index nnz_jac_g() const{
      return nnz_jac_g_;}
 
     /** Acces index_style.*/
@@ -442,31 +442,31 @@ namespace Bonmin
     //@}
 
     /** pointer to the tminlp that is being adapted */
-    SmartPtr<TMINLP> tminlp_;
+    Ipopt::SmartPtr<TMINLP> tminlp_;
 
     /** @name Internal copies of data allowing caller to modify the MINLP */
     //@{
     /// Number of non-zeroes in the constraints jacobian.
-    Index nnz_jac_g_;
+    Ipopt::Index nnz_jac_g_;
     /// Number of non-zeroes in the lagrangian hessian
-    Index nnz_h_lag_;
+    Ipopt::Index nnz_h_lag_;
     /**index style (fortran or C)*/
     TNLP::IndexStyleEnum index_style_;
 
     /** Return status of the optimization process*/
-    SolverReturn return_status_;
+    Ipopt::SolverReturn return_status_;
     /** Value of the optimal solution found by Ipopt */
-    Number obj_value_;
+    Ipopt::Number obj_value_;
     //@}
 
     /** @name Warmstart object and related data */
     //@{
     /** Pointer to object that holds warmstart information */
-    SmartPtr<IpoptInteriorWarmStarter> curr_warm_starter_;
+    Ipopt::SmartPtr<IpoptInteriorWarmStarter> curr_warm_starter_;
     /** Value for a lower bound that denotes -infinity */
-    Number nlp_lower_bound_inf_;
+    Ipopt::Number nlp_lower_bound_inf_;
     /** Value for a upper bound that denotes infinity */
-    Number nlp_upper_bound_inf_;
+    Ipopt::Number nlp_upper_bound_inf_;
     /** Option from Ipopt - we currently use it to see if we want to
      *  use some clever warm start or just the last iterate from the
      *  previous run */
@@ -478,7 +478,7 @@ namespace Bonmin
 
     /** Private method that throws an exception if the variable bounds
      * are not consistent with the variable type */
-    void throw_exception_on_bad_variable_bound(Index i);
+    void throw_exception_on_bad_variable_bound(Ipopt::Index i);
     
     private:
     // Delete all arrays

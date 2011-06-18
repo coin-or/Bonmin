@@ -18,9 +18,9 @@ namespace Bonmin
       warm_(NULL),
       ecp_(NULL)
   {
-    SmartPtr<TNLPSolver> tnlp_solver =
+    Ipopt::SmartPtr<TNLPSolver> tnlp_solver =
        static_cast<TNLPSolver *> (b->nonlinearSolver()->solver());
-    SmartPtr<OptionsList> options = tnlp_solver->options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> options = tnlp_solver->options();
 
 	    options->GetIntegerValue("ecp_max_rounds_strong",
 	                             maxCuttingPlaneIterations_,

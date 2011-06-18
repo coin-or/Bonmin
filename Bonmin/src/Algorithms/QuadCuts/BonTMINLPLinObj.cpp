@@ -8,6 +8,7 @@
 
 #include "BonTMINLPLinObj.hpp"
 
+using namespace Ipopt;
 
 namespace Bonmin{
    /** Default constructor*/

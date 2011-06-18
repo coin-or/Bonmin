@@ -14,6 +14,9 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+
+using namespace Ipopt;
+
 namespace Bonmin
 {
   BranchingTQP::BranchingTQP(SmartPtr<TMINLP2TNLP> tminlp2tnlp)

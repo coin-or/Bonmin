@@ -67,10 +67,10 @@ void initialize(char **& argv)
   {
     readOptionsFile();
     /* Read the model.*/
-    SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(), options(),
+    Ipopt::SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(), options(),
                                                 argv, NULL, "bonmin", NULL);
     mayPrintDoc();
-    initialize(GetRawPtr(model), true);
+    initialize(Ipopt::GetRawPtr(model), true);
   }
 
 

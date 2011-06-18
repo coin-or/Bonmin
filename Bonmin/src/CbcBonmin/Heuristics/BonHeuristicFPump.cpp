@@ -118,7 +118,7 @@ namespace Bonmin
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
 
@@ -149,7 +149,7 @@ namespace Bonmin
 
     // exit if the current NLP solution is infeasible
     // infeasibility is determined by the NLP solver
-    if(minlp->optimization_status() != SUCCESS){
+    if(minlp->optimization_status() != Ipopt::SUCCESS){
       delete nlp;
       return returnCode;
     }
@@ -367,7 +367,7 @@ namespace Bonmin
     }
     nlp->initialSolve();
     bool feasible = true;
-    if(minlp->optimization_status() != SUCCESS) {
+    if(minlp->optimization_status() != Ipopt::SUCCESS) {
       feasible = false;
       //      if(stopDueToAlmostZeroObjective)
 	//	returnCode = 8;
@@ -422,7 +422,7 @@ namespace Bonmin
   }
 
   void 
-  HeuristicFPump::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+  HeuristicFPump::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
     options->GetIntegerValue("feasibility_pump_objective_norm", objective_norm_, "bonmin.");
     options->GetEnumValue("unstable_fp", enableAdvanced_, "bonmin.");
   }
@@ -445,7 +445,7 @@ namespace Bonmin
 
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp_->get_nlp_info(numberColumns_, numberRows_, nnz_jac_g,
 			nnz_h_lag, index_style);
     
@@ -471,7 +471,7 @@ namespace Bonmin
 
     col_and_jac_g_ = new vector<pair<int, int> >[numberRows_];
 
-    int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
+    int indexCorrection = (index_style == Ipopt::TNLP::C_STYLE) ? 0 : 1;
     for(int i=0; i<nnz_jac_g; i++) {
       int thisIndexRow = indexRow[i]-indexCorrection;      
       int thisIndexCol = indexCol[i]-indexCorrection;

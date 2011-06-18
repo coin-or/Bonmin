@@ -82,7 +82,7 @@ namespace Bonmin
     }
     problem_ = new TMINLP2TNLP(tminlp_);
     feasibilityProblem_ = new TNLP2FPNLP
-        (Ipopt::SmartPtr<TNLP>(Ipopt::GetRawPtr(problem_)));
+        (Ipopt::SmartPtr<Ipopt::TNLP>(Ipopt::GetRawPtr(problem_)));
   if(feasibility_mode_){
     problem_to_optimize_ = GetRawPtr(feasibilityProblem_);
   }

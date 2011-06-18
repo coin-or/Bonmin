@@ -127,7 +127,7 @@ namespace Bonmin
   }
 
   void 
-  HeuristicDiveMIPFractional::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+  HeuristicDiveMIPFractional::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
   }
 
 }

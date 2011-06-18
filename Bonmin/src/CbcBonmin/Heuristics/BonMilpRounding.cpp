@@ -107,7 +107,7 @@ namespace Bonmin
     int m;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(n, m, nnz_jac_g,
 			nnz_h_lag, index_style);
 
@@ -158,7 +158,7 @@ namespace Bonmin
     vector<double> value (nnz_jac_g);
     vector<int> columnStart(n,0.); 
     vector<int> columnLength(n,0.);
-    int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
+    int indexCorrection = (index_style == Ipopt::TNLP::C_STYLE) ? 0 : 1;
     int iniCol = -1;
     int nnz = 0;
     for(int i=0; i<nnz_jac_g; i++) {
@@ -333,7 +333,7 @@ namespace Bonmin
       noGoods.insert(c);
       if(feasible) {
 	nlp->initialSolve();
-	if(minlp->optimization_status() != SUCCESS) {
+	if(minlp->optimization_status() != Ipopt::SUCCESS) {
           printf("Infeasible for NLP");
 	  feasible = false;
 	}

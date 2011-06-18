@@ -48,7 +48,7 @@ namespace Bonmin
       pseudoCosts_()
   {
     jnlst_ = b.journalist();
-    SmartPtr<OptionsList> options = b.options();
+    Ipopt::SmartPtr<Ipopt::OptionsList> options = b.options();
 
     handler_ = new CoinMessageHandler;
 

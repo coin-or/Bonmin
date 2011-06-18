@@ -289,7 +289,7 @@ namespace Bonmin
       gatherParametersValues(options_);
     }
     /** Get the values of the base parameters from the passed options.*/
-    void gatherParametersValues(Ipopt::SmartPtr<OptionsList> options);
+    void gatherParametersValues(Ipopt::SmartPtr<Ipopt::OptionsList> options);
     /** Acces storage of Journalist for output */
     Ipopt::SmartPtr<Ipopt::Journalist> journalist()
     {

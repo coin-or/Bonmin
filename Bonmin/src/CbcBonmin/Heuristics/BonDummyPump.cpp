@@ -75,6 +75,6 @@ namespace Bonmin {
 
    /** Initiaize using passed options.*/
    void 
-   DummyPump::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   DummyPump::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
    }
 }/* ends bonmin namespace*/

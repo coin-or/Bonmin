@@ -115,7 +115,7 @@ namespace Bonmin
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
 
@@ -178,7 +178,7 @@ namespace Bonmin
     std::vector<int> numberColumnsLinear(numberRows, 0); // stores the number
     // of the linear variables in
     // each row
-    int indexCorrection = (index_style == TNLP::C_STYLE) ? 0 : 1;
+    int indexCorrection = (index_style == Ipopt::TNLP::C_STYLE) ? 0 : 1;
     int iniCol = -1;
     for(int i=0; i<nnz_jac_g; i++) {
       int thisIndexCol = indexCol[sortedIndex[i]]-indexCorrection;
@@ -241,7 +241,7 @@ namespace Bonmin
 
       nlp->initialSolve();
 
-      if(minlp->optimization_status() != SUCCESS) {
+      if(minlp->optimization_status() != Ipopt::SUCCESS) {
 	break;
       }
 
@@ -452,7 +452,7 @@ namespace Bonmin
       }
       if(feasible) {
 	nlp->initialSolve();
-	if(minlp->optimization_status() != SUCCESS) {
+	if(minlp->optimization_status() != Ipopt::SUCCESS) {
 	  feasible = false;
 	}
 	memcpy(newSolution,x_sol,numberColumns*sizeof(double));

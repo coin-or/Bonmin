@@ -14,6 +14,7 @@
 #include "BonTMINLP2TNLP.hpp"
 #include "BonIpoptInteriorWarmStarter.hpp"
 
+using namespace Ipopt;
 
 namespace Bonmin
 {

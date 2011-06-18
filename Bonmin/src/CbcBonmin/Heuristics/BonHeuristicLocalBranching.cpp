@@ -57,7 +57,7 @@ namespace Bonmin {
     int numberRows;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
     minlp->get_nlp_info(numberColumns, numberRows, nnz_jac_g,
 			nnz_h_lag, index_style);
     const Bonmin::TMINLP::VariableType* variableType = minlp->var_types();
@@ -133,6 +133,6 @@ namespace Bonmin {
 
    /** Initiaize using passed options.*/
    void 
-   HeuristicLocalBranching::Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options){
+   HeuristicLocalBranching::Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options){
    }
 }/* ends bonmin namespace*/

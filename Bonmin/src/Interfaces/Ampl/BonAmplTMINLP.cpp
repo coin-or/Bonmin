@@ -21,6 +21,9 @@
 
 #include "CoinHelperFunctions.hpp"
 #include "BonExitCodes.hpp"
+
+using namespace Ipopt;
+
 namespace Bonmin{
   void 
   RegisteredOptions::fillAmplOptionList(ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList){

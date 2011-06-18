@@ -13,6 +13,8 @@
 
 #include <cassert>
 
+using namespace Ipopt;
+
 namespace Bonmin
 {
   IpoptInteriorWarmStarter::

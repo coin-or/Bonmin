@@ -66,25 +66,25 @@ namespace Bonmin {
    static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
    /** Setup the defaults.*/
-   virtual void setupDefaults(Ipopt::SmartPtr<Bonmin::OptionsList> options);
+   virtual void setupDefaults(Ipopt::SmartPtr<Ipopt::OptionsList> options);
 
    /** Initiaize using passed options.*/
-   void Initialize(Ipopt::SmartPtr<Bonmin::OptionsList> options);
+   void Initialize(Ipopt::SmartPtr<Ipopt::OptionsList> options);
    protected:
    /** Setup to use for local searches (will make copies).*/
    BonminSetup * setup_; 
 
-   static void changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+   static void changeIfNotSet(Ipopt::SmartPtr<Ipopt::OptionsList> options, 
                        std::string prefix,
                        const std::string &option,
                        const std::string &value);
    
-   static void changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options, 
+   static void changeIfNotSet(Ipopt::SmartPtr<Ipopt::OptionsList> options, 
                        std::string prefix,
                        const std::string &option,
                        const double &value);
    
-   static void changeIfNotSet(Ipopt::SmartPtr<Bonmin::OptionsList> options,
+   static void changeIfNotSet(Ipopt::SmartPtr<Ipopt::OptionsList> options,
                        std::string prefix,
                        const std::string &option,
                        const int &value);

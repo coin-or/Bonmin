@@ -21,6 +21,8 @@
 #include "Ipopt/BonIpoptInteriorWarmStarter.hpp"
 #include "OsiBranchingObject.hpp"
 
+using namespace Ipopt;
+
 extern bool BonminAbortAll;
 class OsiObject;
 namespace Bonmin

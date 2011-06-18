@@ -24,7 +24,7 @@ namespace Bonmin
   public:
     /**@name Constructors/Destructors */
     //@{
-    TMINLP2TNLPQuadCuts(const SmartPtr<Bonmin::TMINLP> tminlp
+    TMINLP2TNLPQuadCuts(const Ipopt::SmartPtr<Bonmin::TMINLP> tminlp
 #ifdef WARM_STARTER
         ,
         const OptionsList& options
@@ -49,63 +49,63 @@ namespace Bonmin
     //@{
     /** This call is just passed onto parent class and add number of quadratic
         cuts*/
-    virtual bool get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
-        Index& nnz_h_lag,
-        TNLP::IndexStyleEnum& index_style);
+    virtual bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
+        Ipopt::Index& nnz_h_lag,
+        Ipopt::TNLP::IndexStyleEnum& index_style);
 
     /** This call is just passed onto parent class and add bounds of quadratic
         cuts*/
-    virtual bool get_bounds_info(Index n, Number* x_l, Number* x_u,
-        Index m, Number* g_l, Number* g_u);
+    virtual bool get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
+        Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u);
 
-    virtual bool get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types);
+    virtual bool get_constraints_linearity(Ipopt::Index m, Ipopt::TNLP::LinearityType* const_types);
 
     /** This call is just passed onto parent class and add 
         lambda for quadratic cuts*/
-    virtual bool get_starting_point(Index n, bool init_x, Number* x,
-        bool init_z, Number* z_L, Number* z_U,
-        Index m, bool init_lambda,
-        Number* lambda);
+    virtual bool get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
+        bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
+        Ipopt::Index m, bool init_lambda,
+        Ipopt::Number* lambda);
 
     /** Method that returns scaling parameters (passed to parent all quadratic
         not scaled). 
      */
-    virtual bool get_scaling_parameters(Number& obj_scaling,
-                                        bool& use_x_scaling, Index n,
-                                        Number* x_scaling,
-                                        bool& use_g_scaling, Index m,
-                                        Number* g_scaling);
+    virtual bool get_scaling_parameters(Ipopt::Number& obj_scaling,
+                                        bool& use_x_scaling, Ipopt::Index n,
+                                        Ipopt::Number* x_scaling,
+                                        bool& use_g_scaling, Ipopt::Index m,
+                                        Ipopt::Number* g_scaling);
 
 
     /** Returns the value of the objective function in x*/
-    virtual bool eval_f(Index n, const Number* x, bool new_x,
-        Number& obj_value);
+    virtual bool eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number& obj_value);
 
     /** Returns the vector of the gradient of
      *  the objective w.r.t. x */
-    virtual bool eval_grad_f(Index n, const Number* x, bool new_x,
-        Number* grad_f);
+    virtual bool eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number* grad_f);
 
     /** Returns the vector of constraint values in x (appends constraint values for quadratics).*/
-    virtual bool eval_g(Index n, const Number* x, bool new_x,
-        Index m, Number* g);
+    virtual bool eval_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Number* g);
 
     /** Returns the jacobian of the
      *  constraints. The vectors iRow and jCol only need to be set
      *  once. The first call is used to set the structure only (iRow
      *  and jCol will be non-NULL, and values will be NULL) For
      *  subsequent calls, iRow and jCol will be NULL. */
-    virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
-        Index m, Index nele_jac, Index* iRow,
-        Index *jCol, Number* values);
+    virtual bool eval_jac_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index* iRow,
+        Ipopt::Index *jCol, Ipopt::Number* values);
     /** compute the value of a single constraint */
-    virtual bool eval_gi(Index n, const Number* x, bool new_x,
-                         Index i, Number& gi);
+    virtual bool eval_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+                         Ipopt::Index i, Ipopt::Number& gi);
     /** compute the structure or values of the gradient for one
         constraint */
-    virtual bool eval_grad_gi(Index n, const Number* x, bool new_x,
-                              Index i, Index& nele_grad_gi, Index* jCol,
-                              Number* values);
+    virtual bool eval_grad_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+                              Ipopt::Index i, Ipopt::Index& nele_grad_gi, Ipopt::Index* jCol,
+                              Ipopt::Number* values);
     /** Return the hessian of the
      *  lagrangian. The vectors iRow and jCol only need to be set once
      *  (during the first call). The first call is used to set the
@@ -113,10 +113,10 @@ namespace Bonmin
      *  will be NULL) For subsequent calls, iRow and jCol will be
      *  NULL. This matrix is symmetric - specify the lower diagonal
      *  only */
-    virtual bool eval_h(Index n, const Number* x, bool new_x,
-        Number obj_factor, Index m, const Number* lambda,
-        bool new_lambda, Index nele_hess,
-        Index* iRow, Index* jCol, Number* values);
+    virtual bool eval_h(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
+        Ipopt::Number obj_factor, Ipopt::Index m, const Ipopt::Number* lambda,
+        bool new_lambda, Ipopt::Index nele_hess,
+        Ipopt::Index* iRow, Ipopt::Index* jCol, Ipopt::Number* values);
     //@}
 
 

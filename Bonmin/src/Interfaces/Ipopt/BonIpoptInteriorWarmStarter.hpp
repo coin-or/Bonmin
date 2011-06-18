@@ -13,19 +13,18 @@
 #include "IpNLP.hpp"
 #include <vector>
 
-using namespace Ipopt;
 namespace Bonmin
 {
-  class IpoptInteriorWarmStarter : public ReferencedObject
+  class IpoptInteriorWarmStarter : public Ipopt::ReferencedObject
   {
   public:
     /**@name Constructors/Destructors */
     //@{
     /** Constructor. We give it the values of the current bounds so that
      *  it can figure out which variables are fixed for this NLP. */
-    IpoptInteriorWarmStarter(Index n, const Number* x_L, const Number* x_u,
-        Number nlp_lower_bound_inf,
-        Number nlp_upper_bound_inf,
+    IpoptInteriorWarmStarter(Ipopt::Index n, const Ipopt::Number* x_L, const Ipopt::Number* x_u,
+        Ipopt::Number nlp_lower_bound_inf,
+        Ipopt::Number nlp_upper_bound_inf,
         bool store_several_iterates);
 
     /** Default destructor */
@@ -35,9 +34,9 @@ namespace Bonmin
     /** Method for possibly storing another iterate during the current
      *  optimizatin for possible use for a warm start for a new
      *  problem */
-    bool UpdateStoredIterates(AlgorithmMode mode,
-        const IpoptData& ip_data,
-        IpoptCalculatedQuantities& ip_cq);
+    bool UpdateStoredIterates(Ipopt::AlgorithmMode mode,
+        const Ipopt::IpoptData& ip_data,
+        Ipopt::IpoptCalculatedQuantities& ip_cq);
 
     /** Method for doing whatever needs to be done after the parent NLP
      *  has been solved */
@@ -45,8 +44,8 @@ namespace Bonmin
 
     /** Method for computing the initial point based on the stored
      *  information */
-    bool WarmStartIterate(Index n, const Number* x_l_new, const Number* x_u_new,
-        IteratesVector& warm_start_iterate);
+    bool WarmStartIterate(Ipopt::Index n, const Ipopt::Number* x_l_new, const Ipopt::Number* x_u_new,
+        Ipopt::IteratesVector& warm_start_iterate);
 
   private:
     /**@name Default Compiler Generated Methods
@@ -69,9 +68,9 @@ namespace Bonmin
 
     //@{
     /** Value for a lower bound that denotes -infinity */
-    Number nlp_lower_bound_inf_;
+    Ipopt::Number nlp_lower_bound_inf_;
     /** Value for a upper bound that denotes infinity */
-    Number nlp_upper_bound_inf_;
+    Ipopt::Number nlp_upper_bound_inf_;
     /** Flag indicating whether more than one iterate is to be
      *  stored. */
     bool store_several_iterates_;
@@ -82,22 +81,22 @@ namespace Bonmin
      *  might also help to see how large the perturbation of the new
      *  problem is. */
     //@{
-    Index n_;
-    Number* x_l_prev_;
-    Number* x_u_prev_;
+    Ipopt::Index n_;
+    Ipopt::Number* x_l_prev_;
+    Ipopt::Number* x_u_prev_;
     //@}
 
     /** @name Selected Iterates and quantities from the previous
      *  optimization */
     //@{
-    Index n_stored_iterates_;
-    std::vector<Index> stored_iter_;
-    std::vector<SmartPtr<const IteratesVector> > stored_iterates_;
-    std::vector<Number> stored_mu_;
-    std::vector<Number> stored_nlp_error_;
-    std::vector<Number> stored_primal_inf_;
-    std::vector<Number> stored_dual_inf_;
-    std::vector<Number> stored_compl_;
+    Ipopt::Index n_stored_iterates_;
+    std::vector<Ipopt::Index> stored_iter_;
+    std::vector<Ipopt::SmartPtr<const Ipopt::IteratesVector> > stored_iterates_;
+    std::vector<Ipopt::Number> stored_mu_;
+    std::vector<Ipopt::Number> stored_nlp_error_;
+    std::vector<Ipopt::Number> stored_primal_inf_;
+    std::vector<Ipopt::Number> stored_dual_inf_;
+    std::vector<Ipopt::Number> stored_compl_;
     //@}
   };
 }

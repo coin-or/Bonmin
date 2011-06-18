@@ -31,7 +31,7 @@ OuterApprox::extractLinearRelaxation(Bonmin::OsiTMINLPInterface &minlp,
     int m;
     int nnz_jac_g;
     int nnz_h_lag;
-    TNLP::IndexStyleEnum index_style;
+    Ipopt::TNLP::IndexStyleEnum index_style;
 
     Bonmin::TMINLP2TNLP * model = minlp.problem();
     
@@ -71,18 +71,18 @@ OuterApprox::extractLinearRelaxation(Bonmin::OsiTMINLPInterface &minlp,
     for(int i = 0 ; i < m ; i++) {
        if(rowLow[i] > - nlp_infty){
          rowLow[i] = (rowLow[i] - g[i]);
-         if(1 || const_types[i] != TNLP::LINEAR) rowLow[i] -= 1e-07;
+         if(1 || const_types[i] != Ipopt::TNLP::LINEAR) rowLow[i] -= 1e-07;
        }
         if(rowUp[i] < nlp_infty){
           rowUp[i] =  (rowUp[i] - g[i]);
-         if(1 || const_types[i] != TNLP::LINEAR) rowUp[i] += 1e-07;
+         if(1 || const_types[i] != Ipopt::TNLP::LINEAR) rowUp[i] += 1e-07;
         }
     }
     
     //Then convert everything to a CoinPackedMatrix
     //Go through values, clean coefficients and fix bounds
     for(int i = 0 ; i < nnz_jac_g ; i++) {
-      if(const_types[iRow[i]] != TNLP::LINEAR || //For linear just copy is fine.
+      if(const_types[iRow[i]] != Ipopt::TNLP::LINEAR || //For linear just copy is fine.
          cleanNnz(vals[i],colLow[jCol[i]], colUp[jCol[i]],
                   rowLow[iRow[i]], rowUp[iRow[i]],
                   x[jCol[i]],
