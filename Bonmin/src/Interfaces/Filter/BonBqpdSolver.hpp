@@ -115,7 +115,7 @@ namespace Bonmin
     //@}
 
     /// Virtual copy constructor
-    virtual SmartPtr<TNLPSolver> clone();
+    virtual Ipopt::SmartPtr<TNLPSolver> clone();
 
     /// Get the CpuTime of the last optimization.
     virtual double CPUTime()

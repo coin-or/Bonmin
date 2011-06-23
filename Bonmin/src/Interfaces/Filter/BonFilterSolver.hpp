@@ -126,7 +126,7 @@ namespace Bonmin
     //@}
 
     /// Virtual copy constructor
-    virtual SmartPtr<TNLPSolver> clone();
+    virtual Ipopt::SmartPtr<TNLPSolver> clone();
 
     /// Get the CpuTime of the last optimization.
     virtual double CPUTime()
@@ -338,8 +338,8 @@ namespace Bonmin
      /** To record default log level.*/
      int default_log_level_;
     /** Converting TMatrices into row-ordered matrices */
-    static void TMat2RowPMat(bool symmetric, fint n, fint m, int nnz, const Index* iRow,
-        const Index* iCol, int * permutation2,
+    static void TMat2RowPMat(bool symmetric, fint n, fint m, int nnz, const Ipopt::Index* iRow,
+        const Ipopt::Index* iCol, int * permutation2,
         fint * lws, int nnz_offset, int n_offset,
         Ipopt::TNLP::IndexStyleEnum index_style);
   };

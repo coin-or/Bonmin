@@ -240,8 +240,8 @@ namespace Bonmin
         m, cached_->bl+n, cached_->bu+n);
     // Make sure bounds are not infinity
     for (int i=0; i<n+m; i++) {
-      cached_->bl[i] = Max(cached_->bl[i], -1e50);
-      cached_->bu[i] = Min(cached_->bu[i], 1e50);
+      cached_->bl[i] = std::max(cached_->bl[i], -1e50);
+      cached_->bu[i] = std::min(cached_->bu[i], 1e50);
     }
 
 #if 1
@@ -284,7 +284,7 @@ namespace Bonmin
     F77_FUNC(refactorc,REFACTORC).nfreq = 500;
 
     Ipopt::TNLP::IndexStyleEnum index_style;
-    Index nv, nc, nnz_jac_g, nnz_hess;
+    Ipopt::Index nv, nc, nnz_jac_g, nnz_hess;
     tqp->get_nlp_info(nv, nc, nnz_jac_g, nnz_hess, index_style);
     n = nv;
     m = nc;
@@ -317,13 +317,13 @@ namespace Bonmin
 
     // Make sure bounds are not infinity
     for (int i=0; i<n+m; i++) {
-      bl[i] = Max(bl[i], -1e50);
-      bu[i] = Min(bu[i], 1e50);
+      bl[i] = std::max(bl[i], -1e50);
+      bu[i] = std::min(bu[i], 1e50);
     }
 
     // Set up sparse matrix with objective gradient and constraint Jacobian
 
-    const Number* obj_grad = tqp->ObjGrad();
+    const Ipopt::Number* obj_grad = tqp->ObjGrad();
     amax_ = nnz_jac_g;
     for (int i = 0; i<n; i++) {
       if (obj_grad[i]!=0.) {
@@ -345,13 +345,13 @@ namespace Bonmin
     la[amax_+1] = 1;
 
     // Constraint Jacobian
-    const Number* JacVals = tqp->ConstrJacVals();
-    const Index* RowJac = tqp->ConstrJacIRow();
-    const Index* ColJac = tqp->ConstrJacJCol();
+    const Ipopt::Number* JacVals = tqp->ConstrJacVals();
+    const Ipopt::Index* RowJac = tqp->ConstrJacIRow();
+    const Ipopt::Index* ColJac = tqp->ConstrJacJCol();
 
     int* permutationJac = new int [nnz_jac_g];
     FilterSolver::TMat2RowPMat(false, n, m, nnz_jac_g,  RowJac, ColJac, permutationJac,
-        la, nnz_grad, 1, TNLP::C_STYLE);
+        la, nnz_grad, 1, Ipopt::TNLP::C_STYLE);
     for (int i=0; i<nnz_jac_g; i++) {
       const int& indice = permutationJac[i];
       a[nnz_grad+i] = JacVals[indice];
@@ -381,16 +381,16 @@ namespace Bonmin
 #endif
 
     // Now setup Hessian
-    const Number* HessVals = tqp->ObjHessVals();
-    const Index* RowHess = tqp->ObjHessIRow();
-    const Index* ColHess = tqp->ObjHessJCol();
+    const Ipopt::Number* HessVals = tqp->ObjHessVals();
+    const Ipopt::Index* RowHess = tqp->ObjHessIRow();
+    const Ipopt::Index* ColHess = tqp->ObjHessJCol();
 
     kk = nnz_hess;
     ll = nnz_hess + n + 2;
     int* permutationHess = new int[nnz_hess];
 
     FilterSolver::TMat2RowPMat(true, n, n, nnz_hess, RowHess, ColHess,
-        permutationHess, lws, 0, 0, TNLP::C_STYLE);
+        permutationHess, lws, 0, 0, Ipopt::TNLP::C_STYLE);
     for (int i=0; i<nnz_hess; i++) {
       ws[i] = HessVals[permutationHess[i]];
     }
@@ -402,7 +402,7 @@ namespace Bonmin
     for (int i=0; i<kk; i++) printf("hess ws[%3d] = %e\n",i,ws[i]);
 #endif
 
-    Index bufy;
+    Ipopt::Index bufy;
     options->GetIntegerValue("iprint",bufy, "bqpd.");
     iprint = bufy;
     nout = 6;
@@ -449,8 +449,8 @@ namespace Bonmin
       break;
     }
 
-    Index dummy_len = Ipopt::Max(cached_->n,cached_->m);
-    Number* dummy = new Number[dummy_len];
+    Ipopt::Index dummy_len = std::max(cached_->n,cached_->m);
+    Ipopt::Number* dummy = new Ipopt::Number[dummy_len];
     for (int i=0; i<dummy_len; i++) {
       dummy[i] = 0.;
     }

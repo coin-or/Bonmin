@@ -131,7 +131,7 @@ extern "C"
   F77_FUNC(hessian,HESSIAN)(real *x, fint *n, fint *m, fint *phase, real *lam,
       real *ws, fint *lws, real *user, fint *iuser,
       fint *l_hess, fint *li_hess, fint *errflag) {
-    Number obj_factor = (*phase == 1)? 0. : 1.;
+    Ipopt::Number obj_factor = (*phase == 1)? 0. : 1.;
     fint  end = nnz_h + (*n)  + 2;
 
     for (int i = 0 ; i < end ; i++) {
@@ -139,14 +139,14 @@ extern "C"
     }
     *l_hess = nnz_h;
     *li_hess = nnz_h + *n + 3;
-    Number * mlam = NULL;
+    Ipopt::Number * mlam = NULL;
     if (*m > 0) {
-      mlam = new Number[*m];
+      mlam = new Ipopt::Number[*m];
     }
     for (int i = 0; i<*m; i++) {
       mlam[i] = -lam[*n+i];
     }
-    Number * values = new Number [nnz_h];
+    Ipopt::Number * values = new Ipopt::Number [nnz_h];
     (*errflag) = !tnlpSolved->eval_h(*n, x, 1, obj_factor, *m, mlam ,1, hStruct[0] - 1, NULL, NULL, values);
     delete [] mlam;
     for (int i = 0 ; i < nnz_h ; i++) ws[i] = values[permutationHess[i]];
@@ -160,8 +160,8 @@ namespace Bonmin
 
   struct Transposer
   {
-    const Index* rowIndices;
-    const Index* colIndices;
+    const Ipopt::Index* rowIndices;
+    const Ipopt::Index* colIndices;
     bool operator()(int i, int j)
     {
       return rowIndices[i]<rowIndices[j] ||
@@ -171,8 +171,8 @@ namespace Bonmin
 
   // Convert a sparse matrix from triplet format to row ordered packed matrix
   void FilterSolver::TMat2RowPMat(bool symmetric, fint n, fint m, int nnz,
-      const Index* iRow,
-      const Index* iCol, int * permutation2,
+      const Ipopt::Index* iRow,
+      const Ipopt::Index* iCol, int * permutation2,
       fint * lws, int nnz_offset, int n_offset,
       Ipopt::TNLP::IndexStyleEnum index_style)
   {
@@ -181,11 +181,11 @@ namespace Bonmin
 
     Transposer lt;
     if (symmetric) {
-      Index* tmpRow = new Index[nnz];
-      Index* tmpCol = new Index[nnz];
+      Ipopt::Index* tmpRow = new Ipopt::Index[nnz];
+      Ipopt::Index* tmpCol = new Ipopt::Index[nnz];
       for (int i=0; i<nnz; i++) {
-        const Index& irow = iRow[i];
-        const Index& jcol = iCol[i];
+        const Ipopt::Index& irow = iRow[i];
+        const Ipopt::Index& jcol = iCol[i];
         if (irow > jcol) {
           tmpRow[i] = irow;
           tmpCol[i] = jcol;
@@ -341,14 +341,14 @@ namespace Bonmin
   FilterSolver::Initialize(std::istream &is)
   {
 
-    Index ivalue;
+    Ipopt::Index ivalue;
     options_->GetIntegerValue("print_level", ivalue, "");
-    EJournalLevel print_level = (EJournalLevel)ivalue;
-    SmartPtr<Journal> stdout_jrnl = journalist_->GetJournal("console");
+    Ipopt::EJournalLevel print_level = (Ipopt::EJournalLevel)ivalue;
+    Ipopt::SmartPtr<Ipopt::Journal> stdout_jrnl = journalist_->GetJournal("console");
     if (IsValid(stdout_jrnl)) {
       // Set printlevel for stdout
       stdout_jrnl->SetAllPrintLevels(print_level);
-      stdout_jrnl->SetPrintLevel(J_DBG, J_NONE);
+      stdout_jrnl->SetPrintLevel(Ipopt::J_DBG, Ipopt::J_NONE);
     }
 
     if (is.good()) {
@@ -607,25 +607,25 @@ namespace Bonmin
       break;
     }
 
-    Number* mlam = NULL;
+    Ipopt::Number* mlam = NULL;
     if (cached_->m>0) {
-      mlam = new Number[cached_->m];
+      mlam = new Ipopt::Number[cached_->m];
     }
     for (int i = 0; i<cached_->m; i++) {
       mlam[i] = -cached_->lam[cached_->n+i];
     }
-    Number* z_L = new Number[cached_->n];
-    Number* z_U = new Number[cached_->n];
+    Ipopt::Number* z_L = new Ipopt::Number[cached_->n];
+    Ipopt::Number* z_U = new Ipopt::Number[cached_->n];
     const int os = cached_->n+cached_->m;
     for (int i=0; i<cached_->n; i++) {
       if (cached_->x[i] == cached_->bounds[i]) {
-        z_L[i] = Max(0.,cached_->lam[i]);
+        z_L[i] = std::max(0.,cached_->lam[i]);
       }
       else {
         z_L[i] = 0.;
       }
       if (cached_->x[i] == cached_->bounds[os+i]) {
-        z_U[i] = Max(0.,-cached_->lam[i]);
+        z_U[i] = std::max(0.,-cached_->lam[i]);
       }
       else {
         z_U[i] = 0.;
