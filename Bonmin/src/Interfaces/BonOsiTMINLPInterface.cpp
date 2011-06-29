@@ -2224,7 +2224,7 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
 		  rowLower, rowUpper,
 		  x[colIdx],
 		  lb,
-		  ub, tiny_, veryTiny_)) {
+		  ub, tiny_, veryTiny_, infty_)) {
         cut.insert(colIdx,values[i]);
         if(lb > - infty)
           lb += values[i] * x[colIdx];
