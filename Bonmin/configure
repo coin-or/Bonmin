@@ -22445,7 +22445,7 @@ if test $coin_has_coindepend = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "cbc osi-clp ipopt"; then
-    COINDEPEND_VERSIONS="`$PKG_CONFIG --modversion "cbc osi-clp ipopt" 2>/dev/null | sed -n -e "1h;2,\\$H;\\${g;s/\n/ /g;p}"`"
+    COINDEPEND_VERSIONS=`$PKG_CONFIG --modversion "cbc osi-clp ipopt" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "cbc osi-clp ipopt" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -22962,7 +22962,7 @@ if test $coin_has_asl = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "ipoptamplinterface"; then
-    ASL_VERSIONS="`$PKG_CONFIG --modversion "ipoptamplinterface" 2>/dev/null | sed -n -e "1h;2,\\$H;\\${g;s/\n/ /g;p}"`"
+    ASL_VERSIONS=`$PKG_CONFIG --modversion "ipoptamplinterface" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "ipoptamplinterface" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -23492,7 +23492,7 @@ if test $coin_has_osicpx = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-cplex"; then
-    OSICPX_VERSIONS="`$PKG_CONFIG --modversion "osi-cplex" 2>/dev/null | sed -n -e "1h;2,\\$H;\\${g;s/\n/ /g;p}"`"
+    OSICPX_VERSIONS=`$PKG_CONFIG --modversion "osi-cplex" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-cplex" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -24209,7 +24209,7 @@ if test $coin_has_filtersqp = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "coinfiltersqp"; then
-    FILTERSQP_VERSIONS="`$PKG_CONFIG --modversion "coinfiltersqp" 2>/dev/null | sed -n -e "1h;2,\\$H;\\${g;s/\n/ /g;p}"`"
+    FILTERSQP_VERSIONS=`$PKG_CONFIG --modversion "coinfiltersqp" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "coinfiltersqp" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -24747,10 +24747,6 @@ if test x$coin_skip_ac_output != xyes; then
     ABSBUILDDIR="`pwd`"
 
   fi
-
-  # On AIX, the default sed cannot deal with somewhat long sed commands executed by config.status.
-  # So we reduce the hardcoded number of commands given to sed from 48 to 5 in config.status, hoping this will suffice.
-
 
   cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -26534,16 +26530,6 @@ cat >>$CONFIG_STATUS <<\_ACEOF
 _ACEOF
 chmod +x $CONFIG_STATUS
 ac_clean_files=$ac_clean_files_save
-
-
-    case $build in
-      *-aix*)
-        { echo "$as_me:$LINENO: patching config.status to reduce ac_max_sed_lines to 5" >&5
-echo "$as_me: patching config.status to reduce ac_max_sed_lines to 5" >&6;}
-        sed -e 's/ac_max_sed_lines=48/ac_max_sed_lines=5/g' config.status > config.status.tmp
-        mv config.status.tmp config.status
-      ;;
-    esac
 
 
 # configure is writing to config.log, and then calls config.status.
