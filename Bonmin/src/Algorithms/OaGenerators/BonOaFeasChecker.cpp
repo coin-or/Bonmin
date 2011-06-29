@@ -1,4 +1,4 @@
-// (C) Copyright International Business Machines 2006
+// (C) Copyright International Business Machines 2006-2011
 // All Rights Reserved.
 // This code is published under the Common Public License.
 //
@@ -6,7 +6,6 @@
 // P. Bonami, Carnegie Mellon University
 //
 // Date : 12/26/2006
-//#define OA_DEBUG
 
 #include "BonOaFeasChecker.hpp"
 #include "BonminConfig.h"

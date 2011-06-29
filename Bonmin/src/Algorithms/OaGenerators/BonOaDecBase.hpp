@@ -6,7 +6,6 @@
 // P. Bonami, International Business Machines
 //
 // Date :  12/07/2006
-//#define OA_DEBUG
 #ifndef BonOaDecBase_HPP
 #define BonOaDecBase_HPP
 #include "BonSubMipSolver.hpp"

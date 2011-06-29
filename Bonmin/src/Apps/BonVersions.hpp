@@ -30,7 +30,7 @@
 #else
 
 #include "IpoptConfig.h"
-#define BONMIN_VERSION="1.4trunk"
+#define BONMIN_VERSION="1.5trunk"
 #endif
 
 #endif
