@@ -8,17 +8,17 @@
 //
 // Date : 05/22/2010
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 #include <iomanip>
 #include <fstream>
 
+#include "CoinPragma.hpp"
+#include "BonminConfig.h"
+#include "IpoptConfig.h"
+#include "CbcConfig.h"
 #include "CoinTime.hpp"
 #include "SepaSetup.hpp"
 #include "BonCbc.hpp"
-#include "BonVersions.hpp"
+
 #define CATCH_ERRORS
 using namespace Bonmin;
 int main (int argc, char *argv[])

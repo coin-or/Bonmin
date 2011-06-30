@@ -9,17 +9,16 @@
 // Date : 02/15/2006
 
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 #include <iomanip>
 #include <fstream>
 
+#include "CoinPragma.hpp"
+#include "BonminConfig.h"
+#include "IpoptConfig.h"
+#include "CbcConfig.h"
 #include "CoinTime.hpp"
 #include "BonAmplSetup.hpp"
 #include "BonCbc.hpp"
-#include "BonVersions.hpp"
 
 #ifndef NDEBUG
 #define CATCH_ERRORS
