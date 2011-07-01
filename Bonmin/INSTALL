@@ -9,9 +9,9 @@ I - Installing Bonmin
 The build process of Bonmin uses the standard GNU Autotools
 
 It has been successfully compiled and run on the following platforms:
- - Linux using g++ version 4.4
+ - Linux using g++ version 4.5
  - Windows using version Cygwin 1.5.18
- - Mac OS X using gcc 3.4 and 4.0
+ - Mac OS X using gcc 4.5
 
 Note that Bonmin reauires a certain number of third parties dependencies. Please visit:
 https://projects.coin-or.org/Bonmin/wiki/ThirdParty
