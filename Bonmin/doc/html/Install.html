@@ -1,0 +1,205 @@
+<a 
+ id="page.1"></a>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title></title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- html --> 
+<meta name="src" content="tmp.tex"> 
+<meta name="date" content="2011-07-25 14:22:00"> 
+<link rel="stylesheet" type="text/css" href="bonmin.css"> 
+</head><body 
+>
+<!--l. 1--><p class="noindent" ><div id="header">   <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1>   <div id="globalNav">   <a href="Intro.html">Introduction</a> |   <a href="Obtain.html">Download</a> |  <a href="Install.html">Install</a> |   <a href="use.html">Use</a> |   <a href="options_set.html">Setting Options</a> |   <a href="options_list.html">Options List</a> |   <a href="bib.html">Bibliography</a> |  </div>   </div>  <div id="leftPanel"> <div id="side-bar">  <ul> <li class="main"><a href="/Bonmin/index.html">Bonmin</a></li>  <li><a href="https://projects.coin-or.org/Bonmin">Wiki</a></li>   <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS </a> </li>  <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU OCR </a></li>  <li><a href="http://domino.research.ibm.com/comm/research_projects.nsf/pages/minlp.index.html">  IBM MINLP </a></li>  <br>  <br>  <li class="main"><a href="/index.html">COIN-OR Home</a></li>  <li><a href="/projects.html">Projects</a></li>  <li><a href="/faqs.html">FAQs</a></li>   <li><a href="/download.html">Download</a></li>  <li><a href="/mail.html">Mailing Lists</a></li>  <li><a href="/how-to-help.html">Get Involved</a></li>  <li><a href="/resources.html">Related Resources</a></li>  <li class="main"><a href="/foundation.html">  <br>  <br>  COIN-OR Foundation  </a></li>   <li><a href="/events.html">Events</a></li>  <li><a href="/members.html">Members</a></li>  </ul>  </div> </div> <!--end navBar div -->  <br>   <h2 id="pageName"> Installation  </h2>  <a href="#sec:install " > Installing <span 
+class="cmtt-10">BONMIN </span> </a> /
+<a href="#sec:cplex&#x02D9;install " > Configuring <span 
+class="cmtt-10">Cplex </span> </a> / <a href="#sec:vpath " > Compiling <span 
+class="cmtt-10">BONMIN</span>&#x00A0;in a external
+directory  </a> / <a href="#sec:ref&#x02D9;man " > Building documentation  </a> / <a href="#sec:test " > Running test program  </a> /   </div> 
+<!--l. 10--><p class="noindent" > <div id="rightPanel"> <div id="headlines"> <h4>References </h4>    <div id="refer"> <p>  1 <a 
+href="https://projects.coin-or.org/BuildTools" >Generic Coin Installation on Coin BuildTools web page</a>  </p> </div>       <div id="refer"> <p>  2 <a 
+href="https://projects.coin-or.org/BuildTools" >Known issues for
+building Coin packages</a>  </p> </div>       <div id="refer"> <p>  3 <a 
+href="https://projects.coin-or.org/Bonmin/wiki/GettingStarted" ><span 
+class="cmtt-10">BONMIN</span>&#x00A0;build Wiki page.</a>  </p> </div>       <div id="refer"> <p>  4 <a 
+href="https://projects.coin-or.org/Bonmin/Wiki/CygwinInstall" >Specific Instructions for
+building <span 
+class="cmtt-10">BONMIN</span>&#x00A0;on Cygwin</a>  </p> </div>       <div id="refer"> <p>  5 <a 
+href="https://projects.coin-or.org/Bonmin/Wiki/OsXInstall" >Specific instructions for building <span 
+class="cmtt-10">BONMIN</span>&#x00A0;on Mac
+OSX</a>  </p> </div>     </div> </div> 
+ </div> <div id="content"> <div class="feature"> <h3> <a id="sec:install">Installing <span 
+class="cmtt-10">BONMIN</span></a> </h3>  The build process for <span 
+class="cmtt-10">BONMIN</span>&#x00A0;should be fairly automatic
+as it uses <a 
+href="http://sources.redhat.com/autobook/autobook/" >GNU autotools</a>. It has been successfully compiled and run on the following
+platforms:
+     <ul class="itemize1">
+     <li class="itemize">Linux using g++ version 4.5
+     </li>
+     <li class="itemize">Windows using version Cygwin 1.5.18
+     </li>
+     <li class="itemize">Mac OS X using gcc 4.5</li></ul>
+<!--l. 27--><p class="noindent" >For Cygwin and OS X some specific setup has to be done prior to instalation.
+These step are described on the wiki pages of <span 
+class="cmtt-10">Bonmin </span><a 
+href="https://projects.coin-or.org/Bonmin/wiki/CygwinInstall" >CygwinInstall</a> and
+<a 
+href="https://projects.coin-or.org/Bonmin/wiki/OsxInstall" >OsxInstall</a>.
+<!--l. 30--><p class="indent" >   <span 
+class="cmtt-10">BONMIN</span>&#x00A0;is compiled and installed using the commands: <div id="verbatim">
+
+<a 
+ id="page.2"></a>
+   <div class="verbatim" id="verbatim-1">
+&#x00A0;<br />./configure&#x00A0;-C
+&#x00A0;<br />make
+&#x00A0;<br />make&#x00A0;install
+&#x00A0;<br />
+</div>
+<!--l. 38--><p class="nopar" > </div> 
+<!--l. 41--><p class="indent" >   This installs the executable <span 
+class="cmtt-10">bonmin </span>in <span 
+class="cmtt-10">Bonmin-1.5/bin</span>. In what follows, we
+assume that you have put the executable <span 
+class="cmtt-10">bonmin </span>on your path.
+<!--l. 44--><p class="indent" >   The <span 
+class="cmtt-10">configure </span>script attempts to find all of the machine specific settings
+(compiler, libraries,...) necessary to compile and run the code. Although <span 
+class="cmtt-10">configure</span>
+should find most of the standard ones, you may have to manually specify a few of the
+settings. The options for the configure script can be found by issuing the
+command
+<!--l. 49--><p class="indent" >   <div id="verbatim">
+
+<a 
+ id="page.3"></a>
+   <div class="verbatim" id="verbatim-2">
+&#x00A0;<br />./configure&#x00A0;--help
+&#x00A0;<br />
+</div>
+<!--l. 54--><p class="nopar" > </div> 
+<!--l. 57--><p class="indent" >   For a more in depth description of these options, the reader is invited to refer to
+the COIN-OR <span 
+class="cmtt-10">BuildTools </span><a 
+href="https://projects.coin-or.org/BuildTools" >trac page</a>.
+<!--l. 60--><p class="indent" >    </div> <div class="story"><h3><a id="sec:cplex&#x02D9;install">Specifying the location of <span 
+class="cmtt-10">Cplex </span>libraries</a></h3>   If you have <span 
+class="cmtt-10">Cplex</span>
+installed on your machine, you may want to use it as the Mixed Integer Linear
+Programming subsolver in <span 
+class="cmtt-10">B-OA</span>, <span 
+class="cmtt-10">B-Hyb </span>and <span 
+class="cmtt-10">B-iFP</span>. To do so you have to specify the
+location of the header files and libraries. You can either specify the location of the
+header files directory by passing it as an argument to the configure script or by
+writing it into a <span 
+class="cmtt-10">config.site</span>.<br 
+class="newline" />
+<!--l. 68--><p class="indent" >   In the former case, specify the location of the <span 
+class="cmtt-10">Cplex </span>header files by using the
+argument <span 
+class="cmtt-10">--with-cplexincdir </span>and the location of the <span 
+class="cmtt-10">Cplex  </span>library with
+<span 
+class="cmtt-10">--with-cplexlib </span>(note that on the Linux platform you will also need to add
+<span 
+class="cmtt-10">-lpthread </span>as an argument to <span 
+class="cmtt-10">--with-cplexlib</span>).<br 
+class="newline" />
+<!--l. 73--><p class="indent" >   For example, on a Linux machine if <span 
+class="cmtt-10">Cplex </span>is installed in <span 
+class="cmtt-10">/usr/ilog</span>&#x00A0;, you would
+invoke configure with the arguments as follows:
+<!--l. 76--><p class="indent" >   <div id="verbatim">
+
+<a 
+ id="page.4"></a>
+   <div class="verbatim" id="verbatim-3">
+&#x00A0;<br />./configure&#x00A0;--with-cplex-incdir=/usr/ilog/cplex/include/ilcplex&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;--with-cplex-lib="/usr/ilog/cplex/lib/libcplex.a&#x00A0;-lpthread"
+&#x00A0;<br />&#x00A0;
+</div>
+<!--l. 81--><p class="nopar" > </div> 
+<!--l. 84--><p class="indent" >   In the latter case, put a file called <span 
+class="cmtt-10">config.site </span>in a subdirectory named <span 
+class="cmtt-10">share </span>of
+the installation directory (if you do not specify an alternate installation directory to
+the <span 
+class="cmtt-10">configure </span>script with the <span 
+class="cmtt-10">--prefix </span>argument, the installation directory is the
+directory where you execute the <span 
+class="cmtt-10">configure </span>script). To specify the location of
+<span 
+class="cmtt-10">Cplex</span>&#x00A0;, insert the following lines in the <span 
+class="cmtt-10">config.site </span>file:
+<!--l. 91--><p class="indent" >   <div id="verbatim">
+
+<a 
+ id="page.5"></a>
+   <div class="verbatim" id="verbatim-4">
+&#x00A0;<br />&#x00A0;with_cplex_lib="/usr/ilog/cplex/lib/libcplex.a&#x00A0;-lpthread"
+&#x00A0;<br />&#x00A0;with_cplex_incdir="/usr/ilog/cplex/include/ilcplex"
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;
+</div>
+<!--l. 97--><p class="nopar" > </div> 
+<!--l. 100--><p class="indent" >   (You will find a <span 
+class="cmtt-10">config.site </span>example in the subdirectory <span 
+class="cmtt-10">BuildTools </span>of
+<span 
+class="cmtt-10">coin-Bonmin</span>.)
+<!--l. 102--><p class="indent" >    </div> <div class="story"><h3><a id="sec:vpath">Compiling <span 
+class="cmtt-10">BONMIN</span>&#x00A0;in a external directory</a></h3>   It is recommended to
+compile <span 
+class="cmtt-10">BONMIN</span>&#x00A0;in a directory different from the source directory (<span 
+class="cmtt-10">Bonmin-1.5 </span>in our
+case). This is convenient if you want to have several executables compiled for
+different architectures or have several executables compiled with different options
+(debugging and production, shared and static libraries) but also because you don&#8217;t
+modify the directory where the sources are.<br 
+class="newline" />
+<!--l. 108--><p class="indent" >   To do this just create a new directory, for example <span 
+class="cmtt-10">Bonmin-build </span>in
+the parent directory of <span 
+class="cmtt-10">coin-Bonmin </span>and run the configure command from
+<span 
+class="cmtt-10">Bonmin-build</span>:
+<!--l. 112--><p class="indent" >   <div id="verbatim">
+
+<a 
+ id="page.6"></a>
+   <div class="verbatim" id="verbatim-5">
+&#x00A0;<br />../Bonmin-\stableVersion/configure&#x00A0;-C
+&#x00A0;<br />
+</div>
+<!--l. 117--><p class="nopar" > </div> 
+<!--l. 120--><p class="indent" >   This will create the makefiles in <span 
+class="cmtt-10">Bonmin-build</span>, and you can then compile with
+the usual <span 
+class="cmtt-10">make </span>and <span 
+class="cmtt-10">make install </span>(in <span 
+class="cmtt-10">Bonmin-build</span>).
+<!--l. 124--><p class="indent" >    </div> <div class="story"><h3><a id="sec:ref&#x02D9;man">Building the documentation</a></h3>   The documentation for <span 
+class="cmtt-10">BONMIN</span>&#x00A0;consists
+of a users&#8217; manual (this document) and a reference manual. You can build a local
+copy of the reference manual provided that you have Latex and Doxygen installed on
+your machine. Issue the command <span 
+class="cmtt-10">make doxydoc </span>in <span 
+class="cmtt-10">coin-Bonmin</span>. It calls Doxygen
+to build a copy of the reference manual. An html version of the reference manual can
+then be accessed in <span 
+class="cmtt-10">doc/html/index.html</span>.
+<!--l. 136--><p class="indent" >    </div> <div class="story"><h3><a id="sec:test">Running the test programs</a></h3>   By issuing the command <span 
+class="cmtt-10">make test</span>&#x00A0;, you
+build and run the automatic test program for <span 
+class="cmtt-10">BONMIN</span>.
+    
+</body></html> 
+
+
+
