@@ -10,7 +10,7 @@
 <meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
 <!-- html --> 
 <meta name="src" content="tmp.tex"> 
-<meta name="date" content="2011-07-25 14:22:00"> 
+<meta name="date" content="2011-07-25 14:32:00"> 
 <link rel="stylesheet" type="text/css" href="bonmin.css"> 
 </head><body 
 >
@@ -484,17 +484,25 @@ class="cmbx-10">2mir</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut <span style="margin-left:2.77695pt" class="tmspace"></span>
 <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every -k
-nodes but Cbc may decide to stop generating cuts, if not enough are generated at the
-root node, if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate
-cuts. The valid range for this integer option is <span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> 2<span 
 class="cmmi-10">mir</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and its
-default value is 0.
+class="cmmi-10">inf</span>
+and its default value is 0.
 <!--l. 1074--><p class="indent" >   <a id="sec:Gomory_cuts"></a>
 
 <a 
@@ -507,17 +515,25 @@ class="cmbx-10">Gomory</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut. <span style="margin-left:2.77695pt" class="tmspace"></span>
 <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every -k
-nodes but Cbc may decide to stop generating cuts, if not enough are generated at the
-root node, if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate
-cuts. The valid range for this integer option is <span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are
+generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if
+<span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer option is
+<span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> <span 
 class="cmmi-10">Gomory</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and its
-default value is <span 
+class="cmmi-10">inf</span> and its default value is <span 
 class="cmsy-10">-</span>5.
 <!--l. 1086--><p class="indent" >   <a id="sec:clique_cuts"></a>
 <a 
@@ -528,17 +544,25 @@ class="cmbx-10">clique</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency (in terms of nodes) for generating clique cuts in branch-and-cut <span style="margin-left:2.77695pt" class="tmspace"></span>
 <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every -k
-nodes but Cbc may decide to stop generating cuts, if not enough are generated at the
-root node, if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate
-cuts. The valid range for this integer option is <span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> <span 
 class="cmmi-10">clique</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and its
-default value is <span 
+class="cmmi-10">inf</span>
+and its default value is <span 
 class="cmsy-10">-</span>5.
 <!--l. 1098--><p class="indent" >   <a id="sec:cover_cuts"></a>
 <a 
@@ -549,17 +573,25 @@ class="cmbx-10">cover</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency (in terms of nodes) for generating cover cuts in branch-and-cut <span style="margin-left:2.77695pt" class="tmspace"></span>
 <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every -k
-nodes but Cbc may decide to stop generating cuts, if not enough are generated at the
-root node, if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate
-cuts. The valid range for this integer option is <span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> <span 
 class="cmmi-10">cover</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and its
-default value is 0.
+class="cmmi-10">inf</span>
+and its default value is 0.
 <!--l. 1110--><p class="indent" >   <a id="sec:flow_cover_cuts"></a>
 <a 
  id="section*.26"></a>
@@ -570,18 +602,26 @@ class="cmbx-10">_cover</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut <span style="margin-left:2.77695pt" class="tmspace"></span>
 <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every -k
-nodes but Cbc may decide to stop generating cuts, if not enough are generated at the
-root node, if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate
-cuts. The valid range for this integer option is <span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are
+generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if
+<span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer option is
+<span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> <span 
 class="cmmi-10">flow</span>_<span 
 class="cmmi-10">cover</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and
-its default value is <span 
+class="cmmi-10">inf</span> and its default value is <span 
 class="cmsy-10">-</span>5.
 <!--l. 1122--><p class="indent" >   <a id="sec:lift_and_project_cuts"></a>
 
@@ -597,11 +637,19 @@ class="cmbx-10">_project</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency (in terms of nodes) for generating lift-and-project cuts in
 branch-and-cut <span style="margin-left:2.77695pt" class="tmspace"></span> <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every
--k nodes but Cbc may decide to stop generating cuts, if not enough are
-generated at the root node, if k=-99 generate cuts only at the root node, if
-k=0 or 100 do not generate cuts. The valid range for this integer option is
-<span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated
+every <span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough
+are generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root
+node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer
+option is <span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> <span 
 class="cmmi-10">lift</span>_<span 
@@ -609,7 +657,8 @@ class="cmmi-10">and</span>_<span
 class="cmmi-10">project</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and its default value is 0.
+class="cmmi-10">inf</span> and its default value is
+0.
 <!--l. 1134--><p class="indent" >   <a id="sec:mir_cuts"></a>
 <a 
  id="section*.28"></a>
@@ -619,17 +668,25 @@ class="cmbx-10">mir</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut <span style="margin-left:2.77695pt" class="tmspace"></span>
 <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every -k
-nodes but Cbc may decide to stop generating cuts, if not enough are generated at the
-root node, if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate
-cuts. The valid range for this integer option is <span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> <span 
 class="cmmi-10">mir</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and its
-default value is <span 
+class="cmmi-10">inf</span>
+and its default value is <span 
 class="cmsy-10">-</span>5.
 <!--l. 1146--><p class="indent" >   <a id="sec:reduce_and_split_cuts"></a>
 <a 
@@ -642,11 +699,19 @@ class="cmbx-10">_split</span><span
 class="cmbx-10">_cuts:</span></span>
    Frequency (in terms of nodes) for generating reduce-and-split cuts in
 branch-and-cut <span style="margin-left:2.77695pt" class="tmspace"></span> <br 
-class="newline" />If k ¿ 0, cuts are generated every k nodes, if -99 ¡ k ¡ 0 cuts are generated every
--k nodes but Cbc may decide to stop generating cuts, if not enough are
-generated at the root node, if k=-99 generate cuts only at the root node, if
-k=0 or 100 do not generate cuts. The valid range for this integer option is
-<span 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every k nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated
+every <span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough
+are generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root
+node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer
+option is <span 
 class="cmsy-10">-</span>100 <span 
 class="cmsy-10">&#x2264;</span> <span 
 class="cmmi-10">reduce</span>_<span 
@@ -654,7 +719,8 @@ class="cmmi-10">and</span>_<span
 class="cmmi-10">split</span>_<span 
 class="cmmi-10">cuts</span> <span 
 class="cmmi-10">&#x003C;</span> +<span 
-class="cmmi-10">inf</span> and its default value is 0.
+class="cmmi-10">inf</span> and its default value is
+0.
    <a 
  id="subsection.A.4"></a>
    <h4 class="subsectionHead"><span class="titlemark">A.4   </span> <a 

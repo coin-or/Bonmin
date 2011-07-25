@@ -307,9 +307,9 @@ namespace Bonmin{
       std::list< Ipopt::RegisteredOption * > options;
       chooseOptions(which, options);
       os<<"\\latexhtml{}{"<<std::endl;
-      os<<"\\begin{rawhtml}"<<std::endl;
+      os<<"\\HCode{"<<std::endl;
       writeHtmlOptionsTable(os, options);
-      os<<"\\end{rawhtml}\n}"<<std::endl;
+      os<<"}\n}"<<std::endl;
 
       //Create journalist to write to os
       Ipopt::Journalist jnlst;
@@ -326,6 +326,7 @@ namespace Bonmin{
            registeringCategory = (*i)->RegisteringCategory();
              os<<"\\subsection{"<<registeringCategory<<"}"<<std::endl;      
              os<<"\\label{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
+             os<<"\\htmlanchor{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
            }
        
            (*i)->OutputLatexDescription(jnlst);
