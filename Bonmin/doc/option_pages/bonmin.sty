@@ -1,0 +1,199 @@
+\newcommand{\stableVersion}{1.5}
+\newcommand{\releaseVersion}{1.5.0}
+%Some frequently used html addresses
+
+%Documentation Pages
+\newcommand{\BonPrefix}{}
+\newcommand{\BibPage}{\BonPrefix bib.html}
+\newcommand{\OptSetPage}{\BonPrefix options_set.html}
+\newcommand{\OptListPage}{\BonPrefix options_list.html}
+% references
+\newcommand{\BetalLink}{http://domino.research.ibm.com/library/cyberdig.nsf/1e4115aea78b6e7c85256b360066f0d4/fdb4630e33bd2876852570b20062af37?OpenDocument}
+\newcommand{\FilterLink}{http://www.mcs.anl.gov/~leyffer/solvers.html}
+\newcommand{\DGLink}{\BibPage \#DG}
+\newcommand{\GuptaLink}{\BibPage \#Gupta80Nonlinear}
+\newcommand{\FLLink}{http://dx.doi.org/10.1007/BF01581153}
+\newcommand{\QGLink}{http://dx.doi.org/10.1016/0098-1354(92)80028-8}
+\newcommand{\AMPL}{\BibPage \#Fourrer2003}
+\newcommand{\FPLink}{http://dx.doi.org/10.1007/s10107-008-0212-2}
+\newcommand{\AbhishekLink}{http://wiki.mcs.anl.gov/leyffer/index.php/Sven\_Leyffer's\_Publications}
+\newcommand{\HotMINLPLink}{http://hal.archives-ouvertes.fr/hal-00423416/en/}
+
+
+
+%Some third party softwares
+\newcommand{\Cplex}{\href{http://www.ilog.com/products/cplex/product/mip.cfm}{\tt Cplex}}
+\newcommand{\LapackAddr}{http://www.netlib.org/lapack/}
+\newcommand{\BlasAddr}{http://www.netlib.org/blas/}
+\newcommand{\AslAddr}{http://www.cse.clrc.ac.uk/nag/hsl/contents.shtml}
+
+%for coin projects
+\newcommand{\linkCoin}{https://projects.coin-or.org/}
+
+%Some frequently used name with strange typesetting
+\newcommand{\Bonmin}{{\tt BONMIN}}
+\newcommand{\Ipopt}{\href{\linkCoin Ipopt}{\tt Ipopt}}
+\newcommand{\CoinUtils}{\href{\linkCoin CoinUtils}{\tt CoinUtils}}
+\newcommand{\BuildTools}{\href{\linkCoin BuildTools}{\tt BuildTools}}
+\newcommand{\Cbc}{\href{\linkCoin Cbc}{\tt Cbc}} 
+\newcommand{\Cgl}{\href{\linkCoin Cgl}{\tt Cgl}}
+\newcommand{\Clp}{\href{\linkCoin Clp}{\tt Clp}}
+\newcommand{\Osi}{\href{\linkCoin Osi}{\tt Osi}}
+\newcommand{\COINOR}{\href{http://www.coin-or.org}{COIN-OR}}
+
+\newcommand{\IpoptDoc}[1]{http://www.coin-or.org/Ipopt/documentation/node#1.html}
+
+
+\newcommand{\eacute}{\latexhtml{\'e}{\HCode{&eacute;}}}
+\newcommand{\auml}{\latexhtml{\"a}{\HCode{&auml;}}}
+
+\newcommand{\mycite}[2]{\latexhtml{
+\cite{#1}}
+{
+\href{bib.html\##1}{[#2]}
+}
+}
+\newcommand{\footlink}[2]{\href{#1}{#2}\latex{\footnote{#1}}}
+\def\htmlanchor#1{\HCode{<a id="#1"></a>}}
+
+
+%Put into a colored background for verbatim
+\newenvironment{colorverb}{\HCode{<div id="verbatim">}}{\HCode{</div> }}
+
+\newcommand{\PageTitle}[2]{
+\latexhtml{
+		\section{#1}
+		\label{#2}
+	}
+	{
+		\HCode{
+		</div>
+		<div id="content">
+			<div class="feature">
+			<h3> <a id="}#2\HCode{">}#1\HCode{</a>
+		</h3>}
+	}
+}
+
+\newcommand{\myHTMLsections}[3]{
+\latexhtml{
+#3{#1}
+\label{#2}
+}
+{
+\HCode{
+ </div> <div class="story"><h3><a id="}#2\HCode{">}#1\HCode{</a></h3>}
+}
+}
+
+\newcommand{\subsectionH}[2]{
+\myHTMLsections{#1}{#2}{\subsection}}
+
+\newcommand{\subsubsectionH}[2]{
+\myHTMLsections{#1}{#2}{\subsubsection}}
+
+\newcommand{\subsectionHs}[2]{
+\myHTMLsections{#1}{#2}{\subsection*}}
+
+\newcommand{\citeH}[3]{\latexhtml{ \cite{#1} }{
+\href{#2}{[#3]}
+}
+}
+
+%Header of the page
+  
+  \newcommand{\PageName}[1]{\latexhtml{}{
+ \HCode{<h2 id="pageName">} #1 \HCode{ </h2>}
+}}
+
+  \newcommand{\PageSection}[2]{\latexhtml{}{\HCode{<a href="}\##2 \HCode{" >} #1 \HCode{ </a>  /}}}
+ 
+ \newcommand{\EndPageSummary}{
+ \latexhtml{}{\HCode{
+</div>
+}
+}
+}
+
+%Panels of links
+\newcommand{\NavigationPanels}{
+\HCode{<div id="header"> }
+\HCode{  <h1 id="siteName"><TT> <big> BONMIN Options </big> </tt> reference manual</h1> }
+\HCode{  <div id="globalNav"> }
+\HCode{	<a href="options_list_bonmin.html">Bonmin</a> | }
+\HCode{	<a href="options_list_ipopt.html">Ipopt</a> |}
+\HCode{	<a href="options_list_filter.html">Filter-SQP</a> | }
+\HCode{  </div> }
+\HCode{  </div> }
+\HCode{<div id="leftPanel">}
+\HCode{<div id="side-bar"> }
+\HCode{<ul>}
+\HCode{<li class="main"><a href="/Bonmin/index.html">Bonmin</a></li>}
+\HCode{	  <li><a href="https://projects.coin-or.org/Bonmin">Wiki</a></li> }
+\HCode{	  <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS </a> </li>}
+\HCode{		<li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU OCR </a></li>}
+\HCode{		<li><a href="http://domino.research.ibm.com/comm/research_projects.nsf/pages/minlp.index.html">}
+\HCode{		IBM MINLP </a></li>}
+\HCode{		<br>}
+\HCode{		<br>}
+\HCode{             <li class="main"><a href="/index.html">COIN-OR Home</a></li>}
+\HCode{              <li><a href="/projects.html">Projects</a></li>}
+\HCode{              <li><a href="/faqs.html">FAQs</a></li>}
+\HCode{}
+\HCode{              <li><a href="/download.html">Download</a></li>}
+\HCode{              <li><a href="/mail.html">Mailing Lists</a></li>}
+\HCode{              <li><a href="/how-to-help.html">Get Involved</a></li>}
+\HCode{              <li><a href="/resources.html">Related Resources</a></li>}
+\HCode{              <li class="main"><a href="/foundation.html">}
+\HCode{     <br>}
+\HCode{     <br>}
+\HCode{                COIN-OR Foundation}
+\HCode{              </a></li>}
+\HCode{}
+\HCode{              <li><a href="/events.html">Events</a></li>}
+\HCode{              <li><a href="/members.html">Members</a></li>}
+\HCode{	</ul> }
+\HCode{</div>}
+\HCode{</div>}
+\HCode{<!--end navBar div --> }
+\HCode{<br>}
+}
+
+
+\newenvironment{PageSummary}{\NavigationPanels}{\EndPageSummary }
+%\newenvironment{PageSummary}{}{}
+
+\newcounter{refnum}
+
+\newenvironment{quickref}
+{
+\html{ 
+\setcounter{refnum}{0}
+\HCode{
+<div id="rightPanel">
+<div id="headlines">
+  <h4>References </h4>
+}}}
+{
+\html{\HCode{
+</div>
+</div>
+}}}
+
+\newcommand{\quickcitation}[2]{
+\html{
+\addtocounter{refnum}{1}
+\HCode{
+  <div id="refer">
+  <p> 
+}
+\arabic{refnum} \href{#2}{#1}
+\HCode{
+</p>
+</div>
+}}
+}
+
+
+
+
