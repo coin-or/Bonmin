@@ -130,7 +130,7 @@ register_general_options
  roptions->AddLowerBoundedNumberOption("resolve_on_small_infeasibility",
 					   "If a locally infeasible problem is infeasible by less than this resolve it" 
                                            "with initial starting point.",
-					   0.,true, 0.,
+					   0.,false, 0.,
 					   "It is set to 0 by default with Ipopt. "
                                            "For filter Bonmin sets it to a small value.");
   roptions->setOptionExtraInfo("random_point_perturbation_interval",8);
