@@ -1,0 +1,200 @@
+\latexhtml{}{
+\HCode{
+<table border="1">
+<tr>
+<td>Option </td>
+<td> type </td>
+<td> B-BB</td>
+<td> B-OA</td>
+<td> B-QG</td>
+<td> B-Hyb</td>
+</tr>
+<tr>   <th colspan=9> <a href="#sec:FilterSQP_options">FilterSQP options</a> </th>
+</tr>
+<tr>
+<td> <a href="#sec:eps">eps</a> </td>
+<td>F</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:infty">infty</a> </td>
+<td>F</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:iprint">iprint</a> </td>
+<td>I</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:kmax">kmax</a> </td>
+<td>I</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:maxf">maxf</a> </td>
+<td>I</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:maxiter">maxiter</a> </td>
+<td>I</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:mlp">mlp</a> </td>
+<td>I</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:mxlws">mxlws</a> </td>
+<td>I</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:mxws">mxws</a> </td>
+<td>I</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:rho_init">rho_init</a> </td>
+<td>F</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:tt">tt</a> </td>
+<td>F</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+<tr>
+<td> <a href="#sec:ubd">ubd</a> </td>
+<td>F</td>
+<td> +</td>
+<td>+</td>
+<td>+</td>
+<td>+</td>
+</tr>
+</tr>
+</table>
+}
+}
+\subsection{FilterSQP options}
+\label{sec:FilterSQP_options}
+\htmlanchor{sec:FilterSQP_options}
+\htmlanchor{sec:eps}
+\paragraph{eps:}\label{sec:eps} Tolerance for SQP solver $\;$ \\
+ The valid range for this real option is 
+$0 <  {\tt eps } <  {\tt +inf}$
+and its default value is $1 \cdot 10^{-08}$.
+
+
+\htmlanchor{sec:infty}
+\paragraph{infty:}\label{sec:infty} A large number (1E20) $\;$ \\
+ The valid range for this real option is 
+$0 <  {\tt infty } <  {\tt +inf}$
+and its default value is $1 \cdot 10^{+20}$.
+
+
+\htmlanchor{sec:iprint}
+\paragraph{iprint:}\label{sec:iprint} Print level (0=silent, 3=verbose) $\;$ \\
+ The valid range for this integer option is
+$0 \le {\tt iprint } \le 6$
+and its default value is $0$.
+
+
+\htmlanchor{sec:kmax}
+\paragraph{kmax:}\label{sec:kmax} Dimension of null-space $\;$ \\
+ The valid range for this integer option is
+$-1 \le {\tt kmax } <  {\tt +inf}$
+and its default value is $-1$.
+
+
+\htmlanchor{sec:maxf}
+\paragraph{maxf:}\label{sec:maxf} Maximum filter length $\;$ \\
+ The valid range for this integer option is
+$0 \le {\tt maxf } <  {\tt +inf}$
+and its default value is $100$.
+
+
+\htmlanchor{sec:maxiter}
+\paragraph{maxiter:}\label{sec:maxiter} Maximum number of iterations $\;$ \\
+ The valid range for this integer option is
+$0 \le {\tt maxiter } <  {\tt +inf}$
+and its default value is $1000$.
+
+
+\htmlanchor{sec:mlp}
+\paragraph{mlp:}\label{sec:mlp} Maximum level for degeneracy (bqpd) $\;$ \\
+ The valid range for this integer option is
+$0 \le {\tt mlp } <  {\tt +inf}$
+and its default value is $1000$.
+
+
+\htmlanchor{sec:mxlws}
+\paragraph{mxlws:}\label{sec:mxlws} FINTEGER workspace increment $\;$ \\
+ The valid range for this integer option is
+$0 \le {\tt mxlws } <  {\tt +inf}$
+and its default value is $500000$.
+
+
+\htmlanchor{sec:mxws}
+\paragraph{mxws:}\label{sec:mxws} REAL workspace increment $\;$ \\
+ The valid range for this integer option is
+$0 \le {\tt mxws } <  {\tt +inf}$
+and its default value is $2000000$.
+
+
+\htmlanchor{sec:rho_init}
+\paragraph{rho\_init:}\label{sec:rho_init} Initial trust region size $\;$ \\
+ The valid range for this real option is 
+$0 <  {\tt rho\_init } <  {\tt +inf}$
+and its default value is $10$.
+
+
+\htmlanchor{sec:tt}
+\paragraph{tt:}\label{sec:tt} Parameter for upper bound on filter $\;$ \\
+ The valid range for this real option is 
+$0 <  {\tt tt } <  {\tt +inf}$
+and its default value is $1.25$.
+
+
+\htmlanchor{sec:ubd}
+\paragraph{ubd:}\label{sec:ubd} Parameter for upper bound on filter $\;$ \\
+ The valid range for this real option is 
+$0 <  {\tt ubd } <  {\tt +inf}$
+and its default value is $100$.
+
+
