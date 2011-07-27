@@ -2249,13 +2249,13 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
 }
 
 void
-OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
+OsiTMINLPInterface::switchToFeasibilityProblem(size_t n,const double * x_bar,const int *inds,
                                             double a, double s, int L){
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
   feasibilityProblem_->set_use_feasibility_pump_objective(true);
-  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->set_dist_to_point_obj(n,(const Number *) x_bar,(const Index *) inds);
   feasibilityProblem_->setLambda(a);
   feasibilityProblem_->setSigma(s);
   feasibilityProblem_->setNorm(L);
@@ -2266,13 +2266,13 @@ OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const 
 }
 
 void
-OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
+OsiTMINLPInterface::switchToFeasibilityProblem(size_t n,const double * x_bar,const int *inds,
 					       double rhs_local_branching_constraint){
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
   feasibilityProblem_->set_use_feasibility_pump_objective(false);
-  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->set_dist_to_point_obj(n,(const Number *) x_bar,(const Index *) inds);
   feasibilityProblem_->set_use_cutoff_constraint(false);
   feasibilityProblem_->set_use_local_branching_constraint(true);  
   feasibilityProblem_->set_rhs_local_branching_constraint(rhs_local_branching_constraint);  
@@ -2287,14 +2287,14 @@ OsiTMINLPInterface::switchToOriginalProblem(){
 }
 
 double
-OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+OsiTMINLPInterface::solveFeasibilityProblem(size_t n,const double * x_bar,const int *inds, 
                                             double a, double s, int L)
 {
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
   feasibilityProblem_->set_use_feasibility_pump_objective(true);
-  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->set_dist_to_point_obj(n,(const Number *) x_bar,(const Index *) inds);
   feasibilityProblem_->setLambda(a);
   feasibilityProblem_->setSigma(s);
   feasibilityProblem_->setNorm(L);
@@ -2311,14 +2311,14 @@ OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int
 }
 
 double
-OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+OsiTMINLPInterface::solveFeasibilityProblem(size_t n,const double * x_bar,const int *inds, 
                                             int L, double cutoff)
 {
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
   }
   feasibilityProblem_->set_use_feasibility_pump_objective(true);
-  feasibilityProblem_->set_dist2point_obj(n,(const Number *) x_bar,(const Index *) inds);
+  feasibilityProblem_->set_dist_to_point_obj(n,(const Number *) x_bar,(const Index *) inds);
   feasibilityProblem_->setLambda(1.0);
   feasibilityProblem_->setSigma(0.0);
   feasibilityProblem_->setNorm(L);

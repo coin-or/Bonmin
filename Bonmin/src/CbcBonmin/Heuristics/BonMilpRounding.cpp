@@ -101,7 +101,7 @@ namespace Bonmin
  
     // set tolerances
     double integerTolerance = model_->getDblParam(CbcModel::CbcIntegerTolerance);
-    double primalTolerance = 1.0e-6;
+    //double primalTolerance = 1.0e-6;
 
     int n;
     int m;
@@ -156,8 +156,8 @@ namespace Bonmin
 
     vector<int> row (nnz_jac_g);
     vector<double> value (nnz_jac_g);
-    vector<int> columnStart(n,0.); 
-    vector<int> columnLength(n,0.);
+    vector<int> columnStart(n,0); 
+    vector<int> columnLength(n,0);
     int indexCorrection = (index_style == Ipopt::TNLP::C_STYLE) ? 0 : 1;
     int iniCol = -1;
     int nnz = 0;
@@ -194,7 +194,7 @@ namespace Bonmin
 
       // create objective function and columns lower and upper bounds for MILP
       // and create columns for matrix in MILP
-      double alpha = 0;
+      //double alpha = 0;
       double beta = 1;
       vector<double> objective(n);
       vector<int> idxIntegers;

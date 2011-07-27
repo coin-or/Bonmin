@@ -97,12 +97,12 @@ namespace Bonmin {
       addOnlyViolated_(false),
       cbcCutoffIncrement_(1e-06),
       cbcIntegerTolerance_(1e-05),
+      gap_tol_(1e-05),
       maxLocalSearch_(0),
       maxLocalSearchTime_(3600),
       subMilpLogLevel_(0),
       maxSols_(INT_MAX),
       logFrequency_(1000.),
-      gap_tol_(1e-05),
       strategy_(NULL)
   {}
 

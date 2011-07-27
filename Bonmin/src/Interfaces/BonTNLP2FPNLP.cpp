@@ -9,7 +9,6 @@
 
 
 #include "BonTNLP2FPNLP.hpp"
-#include "IpBlas.hpp"
 
 using namespace Ipopt;
 
@@ -64,17 +63,17 @@ namespace Bonmin
   }
 
   void
-  TNLP2FPNLP::set_dist2point_obj(int n, const Number * vals, const Index * inds)
+  TNLP2FPNLP::set_dist_to_point_obj(size_t n, const Number * vals, const Index * inds)
   {
     inds_.resize(n);
     vals_.resize(n);
-    IpBlasDcopy(n, vals, 1, vals_(), 1);
-    CoinCopyN(inds, n, inds_());
+    std::copy(vals, vals + n, vals_.begin());
+    std::copy(inds, inds + n, inds_.begin());
   }
 
   /** Compute the distance to the current point to which distance is minimized. */
   double
-  TNLP2FPNLP::dist2point(const Number *x)
+  TNLP2FPNLP::dist_to_point(const Number *x)
   {
     double ret_val = 0;
     assert(vals_.size() == inds_.size());
@@ -163,7 +162,7 @@ namespace Bonmin
 
     if(use_feasibility_pump_objective_) {
       obj_value *= (1 - lambda_) * sigma_;
-      obj_value += objectiveScalingFactor_*lambda_*dist2point(x);
+      obj_value += objectiveScalingFactor_*lambda_*dist_to_point(x);
     }
 
     return ret_code;

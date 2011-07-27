@@ -530,7 +530,7 @@ namespace Bonmin
             continue;
           }
 	  assert(indexColumnSelected < jac_g.size());
-	  for (unsigned int j=0; j<jac_g.size(); j++) {
+	  for (size_t j=0; j<jac_g.size(); j++) {
 	    int iColumn = jac_g[j].first;
 	    if(j == indexColumnSelected)
 	      solution[iColumn] = 1.0;

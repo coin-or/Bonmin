@@ -17,7 +17,7 @@ namespace Bonmin
 {
   /** This is an adapter class to convert an NLP to a Feasibility Pump NLP
    *  by changing the objective function to the (2-norm) distance to a point.
-   * The extra function is set_dist2point_obj(int n, const double *, const int *)
+   * The extra function is set_dist_to_point_obj(size_t n, const double *, const int *)
    */
   class TNLP2FPNLP : public Ipopt::TNLP
   {
@@ -70,7 +70,7 @@ namespace Bonmin
      * \param inds indices of the coordinates on which distance is minimized
      * \param vals values of the point for coordinates in ind
      */
-    void set_dist2point_obj(int n, const Ipopt::Number * vals, const Ipopt::Index * inds);
+    void set_dist_to_point_obj(size_t n, const Ipopt::Number * vals, const Ipopt::Index * inds);
 
      /** Set the value for sigma */
      void setSigma(double sigma){
@@ -191,7 +191,7 @@ namespace Bonmin
     /** @name Internal methods to help compute the distance, its gradient and hessian */
     //@{
     /** Compute the norm-2 distance to the current point to which distance is minimized. */
-    double dist2point(const Ipopt::Number *x);
+    double dist_to_point(const Ipopt::Number *x);
     //@}
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
