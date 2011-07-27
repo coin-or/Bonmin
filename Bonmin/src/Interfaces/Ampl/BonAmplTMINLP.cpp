@@ -286,7 +286,7 @@ namespace Bonmin
           std::cerr<<"Unsuported type of sos constraint: "<<sos_.types[ii]<<std::endl;
           throw;
         }
-        sos_.types[ii]= ichar;
+        sos_.types[ii]= static_cast<char>(ichar);
       }
     }
   }

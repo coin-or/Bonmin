@@ -932,7 +932,7 @@ void getBendersCut(OsiCuts &cs, bool global);
    * \param a Combination to take between feasibility and original objective (must be between 0 and 1).
    * \param L L-norm to use (can be either 1 or 2).
    */
-  double solveFeasibilityProblem(int n, const double * x_bar, const int* ind, double a, double s, int L);
+  double solveFeasibilityProblem(size_t n, const double * x_bar, const int* ind, double a, double s, int L);
 
   /** Given a point x_bar this solves the problem of finding the point which minimize
     * the distance to x_bar while satisfying the additional cutoff constraint:
@@ -942,15 +942,15 @@ void getBendersCut(OsiCuts &cs, bool global);
    * \param L L-norm to use (can be either 1 or 2).
    * \param cutoff objective function value of a known integer feasible solution
    */
-  double solveFeasibilityProblem(int n, const double * x_bar, const int* ind, int L, double cutoff);
+  double solveFeasibilityProblem(size_t n, const double * x_bar, const int* ind, int L, double cutoff);
 
   /** Given a point x_bar setup feasibility problem and switch so that every call to initialSolve or resolve will
       solve it.*/
-  void switchToFeasibilityProblem(int n, const double * x_bar, const int* ind, double a, double s, int L);
+  void switchToFeasibilityProblem(size_t n, const double * x_bar, const int* ind, double a, double s, int L);
 
   /** Given a point x_bar setup feasibility problem and switch so that every call to initialSolve or resolve will
       solve it. This is to be used in the local branching heuristic */
-  void switchToFeasibilityProblem(int n, const double * x_bar, const int* ind,
+  void switchToFeasibilityProblem(size_t n, const double * x_bar, const int* ind,
 				  double rhs_local_branching_constraint);
 
   /** switch back to solving original problem.*/

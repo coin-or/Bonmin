@@ -102,7 +102,7 @@ namespace Bonmin
     assert(diffF);
     CoinWarmStartPrimalDual::applyDiff(diffF);
 
-    fint end = diffF->differences.size();
+    fint end = static_cast<fint>(diffF->differences.size());
     for (fint i = 0 ; i < end ; i++) {
       lwsArray_[diffF->differences[i].first] += diffF->differences[i].second;
     }

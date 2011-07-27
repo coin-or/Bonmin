@@ -29,7 +29,7 @@ NamesReader::NamesReader(const std::string & file, const std::string & suffix)
 bool NamesReader::readFile()
 {
   std::string colFileName = file_;
-  int size = colFileName.size();
+  size_t size = colFileName.size();
   bool hasNlExtension =  (colFileName.size()>4) && (colFileName[size - 1] =='l') && (colFileName[size - 2] =='n') && (colFileName[size - 3] =='.');
   if(hasNlExtension)
     colFileName.erase(size-3,3);

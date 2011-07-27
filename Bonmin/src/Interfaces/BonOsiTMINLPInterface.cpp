@@ -2249,7 +2249,7 @@ OsiTMINLPInterface::getConstraintOuterApproximation(OsiCuts &cs, int rowIdx,
 }
 
 void
-OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
+OsiTMINLPInterface::switchToFeasibilityProblem(size_t n,const double * x_bar,const int *inds,
                                             double a, double s, int L){
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
@@ -2266,7 +2266,7 @@ OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const 
 }
 
 void
-OsiTMINLPInterface::switchToFeasibilityProblem(int n,const double * x_bar,const int *inds,
+OsiTMINLPInterface::switchToFeasibilityProblem(size_t n,const double * x_bar,const int *inds,
 					       double rhs_local_branching_constraint){
   if(! IsValid(feasibilityProblem_)) {
     throw SimpleError("No feasibility problem","getFeasibilityOuterApproximation");
@@ -2287,7 +2287,7 @@ OsiTMINLPInterface::switchToOriginalProblem(){
 }
 
 double
-OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+OsiTMINLPInterface::solveFeasibilityProblem(size_t n,const double * x_bar,const int *inds, 
                                             double a, double s, int L)
 {
   if(! IsValid(feasibilityProblem_)) {
@@ -2311,7 +2311,7 @@ OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int
 }
 
 double
-OsiTMINLPInterface::solveFeasibilityProblem(int n,const double * x_bar,const int *inds, 
+OsiTMINLPInterface::solveFeasibilityProblem(size_t n,const double * x_bar,const int *inds, 
                                             int L, double cutoff)
 {
   if(! IsValid(feasibilityProblem_)) {

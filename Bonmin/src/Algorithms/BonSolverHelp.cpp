@@ -141,6 +141,7 @@ bool refixIntegers(OsiSolverInterface & si,
       }
     }
   }
+  return true;
 }
 
 /** Install cuts in solver. */

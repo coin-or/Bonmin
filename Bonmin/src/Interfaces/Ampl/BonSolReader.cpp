@@ -51,12 +51,12 @@ bool SolReader::readFile()
     }
     int n_cols, n_cols_2;
     inFile>>n_cols_2>>n_cols;
-    if(n_cols != x_.size()){
+    if(n_cols != static_cast<int>(x_.size())){
        fprintf(stderr, "Number of columns different %d\n", n_cols);
        x_.resize(n_cols);
     }
   }
-for(int i = 0 ; i < x_.size() ; i++){
+for(size_t i = 0 ; i < x_.size() ; i++){
      inFile>>x_[i];
   }
   return true;
