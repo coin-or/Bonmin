@@ -360,6 +360,8 @@ includecoin_HEADERS = \
                      BonLocalSolverBasedHeuristic.hpp \
                      BonFixAndSolveHeuristic.hpp \
                      BonDummyPump.hpp \
+                     BonPumpForMinlp.hpp \
+                     BonMilpRounding.hpp \
                      BonHeuristicRINS.hpp \
                      BonHeuristicLocalBranching.hpp \
                      BonHeuristicFPump.hpp \
