@@ -57,7 +57,7 @@ libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
+AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
@@ -65,7 +65,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter`
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
+	$(BONMINLIB_CFLAGS)
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces

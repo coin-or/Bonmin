@@ -49,7 +49,7 @@ CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
-AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
+AM_CPPFLAGS = \
         -I`$(CYGPATH_W) $(srcdir)/../src/Apps` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ipopt` \
@@ -59,7 +59,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl`
+	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl` \
+	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS) 
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces

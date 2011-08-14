@@ -44,7 +44,7 @@ libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
+AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/QuadCuts` \
 	-I`$(CYGPATH_W) $(srcdir)/OaGenerators` \
@@ -52,7 +52,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin/Heuristics` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter`
+	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Filter` \
+	$(BONMINLIB_CFLAGS)
 
 # BonSubMipSolver.cpp needs to include cplex.h
 if COIN_HAS_CPX

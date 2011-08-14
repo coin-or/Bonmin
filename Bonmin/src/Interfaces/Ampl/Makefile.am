@@ -27,9 +27,10 @@ libbonamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
+AM_CPPFLAGS = \
         -I`$(CYGPATH_W) $(srcdir)/..` \
-        -I`$(CYGPATH_W) $(srcdir)/../Ipopt`
+        -I`$(CYGPATH_W) $(srcdir)/../Ipopt` \
+        $(BONMINLIB_CFLAGS) $(ASL_CFLAGS)
 
 if COIN_HAS_FILTERSQP
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Filter` 
@@ -45,8 +46,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I..
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
-includecoin_HEADERS = \
-	BonAmplInterface.hpp BonAmplTMINLP.hpp
+includecoin_HEADERS = BonAmplInterface.hpp BonAmplTMINLP.hpp
 
 ########################################################################
 #                            Astyle stuff                              #

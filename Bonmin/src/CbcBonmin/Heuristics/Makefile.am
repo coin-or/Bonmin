@@ -37,12 +37,13 @@ libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = $(BONMINLIB_CFLAGS) \
+AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/..` \
 	-I`$(CYGPATH_W) $(srcdir)/../../Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
 	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter`
+	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
+	$(BONMINLIB_CFLAGS)
 
 # Currently, the following has to be included for BonChooseVariable.hpp, but
 # we should try to unmangle the connection to Cbc
