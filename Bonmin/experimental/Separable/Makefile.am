@@ -14,7 +14,7 @@ bin_PROGRAMS = sepa
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
+AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Apps` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
@@ -24,7 +24,8 @@ AM_CPPFLAGS = $(BONMINLIB_CFLAGS) $(ASL_CFLAGS) \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin/Heuristics`
+	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin/Heuristics` \
+	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS)
 
 ########################################################################
 #                                sepa                                  #
