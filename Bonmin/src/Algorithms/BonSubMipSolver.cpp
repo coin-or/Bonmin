@@ -10,6 +10,7 @@
 
 // Code separated from BonOaDecBase to try to clarify OAs
 #include "BonSubMipSolver.hpp"
+#include "BonminConfig.h"
 #include "CbcModel.hpp"
 #include "CbcStrategy.hpp"
 #include "OsiAuxInfo.hpp"

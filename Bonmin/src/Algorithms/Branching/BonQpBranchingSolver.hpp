@@ -3,6 +3,7 @@
 #ifndef BonQpBranchingSolver_H
 #define BonQpBranchingSolver_H
 
+#include "BonminConfig.h"
 #include "BonStrongBranchingSolver.hpp"
 #include "BonBranchingTQP.hpp"
 
