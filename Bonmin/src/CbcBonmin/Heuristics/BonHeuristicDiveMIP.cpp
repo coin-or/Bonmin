@@ -7,6 +7,7 @@
 //
 // Date : November 12, 2007
 
+#include "BonminConfig.h"
 #include "BonHeuristicDiveMIP.hpp"
 #include "CoinHelperFunctions.hpp"
 #include "CbcModel.hpp"
