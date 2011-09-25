@@ -49,14 +49,6 @@ AC_COIN_DEBUG_COMPILE(Bonmin)
 # Get the name of the C++ compiler and appropriate compiler options
 AC_COIN_PROG_CXX
 
-# AW: I'm adding the Fortran compiler now for FilterSQP - we should
-# make this optional
-
-# Get the name of the Fortran compiler and appropriate compiler options
-AC_COIN_PROG_F77
-
-# Find out how to call Fortran from C and determine Fortran runtime libraries
-AC_COIN_F77_WRAPPERS
 
 # Initialize automake and libtool
 AC_COIN_INIT_AUTO_TOOLS
@@ -106,6 +98,15 @@ AC_ARG_WITH([filtersqp],
             [filtersqp_libs="$withval"])
 
 AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
+
+if test $coin_has_filtersqp = yes
+then
+  # Get the name of the Fortran compiler and appropriate compiler options
+  AC_COIN_PROG_F77
+
+  # Find out how to call Fortran from C and determine Fortran runtime libraries
+  AC_COIN_F77_WRAPPERS
+fi
 
 # we want to keep the linking check for FilterSQP, but cannot do this if FilterSQP will be build later (in ThirdParty)
 #if test $coin_has_filtersqp = yes ; then
