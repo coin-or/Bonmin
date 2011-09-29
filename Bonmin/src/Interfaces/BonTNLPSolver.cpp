@@ -278,11 +278,13 @@ TNLPSolver::initializeOptionsAndJournalist(){
     journalist_->Printf(Ipopt::J_ERROR, Ipopt::J_MAIN, "\n Not enough memory .... EXIT\n");
     throw -1;
   }
+#ifndef NO_CATCH_ALL
   catch(...){
     Ipopt::IpoptException E("Uncaught exception in FilterSolver::FilterSolver()",
                             "BonFilterSolver.cpp",-1);
     throw E;
   }
+#endif
   
 }
 

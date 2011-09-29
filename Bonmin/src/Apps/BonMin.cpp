@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
     pbName = new char[strlen(argv[1])+1];
     strcpy(pbName, argv[1]);
   }
-#define CATCH_ERRORS 
+#define CATCH_ERRORS
 #ifdef CATCH_ERRORS
   try
 #endif 
@@ -83,11 +83,13 @@ int main (int argc, char *argv[])
   {
     std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
   }
+#ifndef NO_CATCH_ALL
   catch(...) {
     std::cerr<<pbName<<" unrecognized exception"<<std::endl;
     std::cerr<<pbName<<"\t Finished \t exception"<<std::endl;
     throw;
   }
+#endif
 #endif
   
   delete [] pbName;
