@@ -83,11 +83,13 @@ int main (int argc, char *argv[])
   {
     std::cerr<<"Ipopt exception : "<<E.Message()<<std::endl;
   }
+#ifndef NO_CATCH_ALL
   catch(...) {
     std::cerr<<pbName<<" unrecognized exception"<<std::endl;
     std::cerr<<pbName<<"\t Finished \t exception"<<std::endl;
     throw;
   }
+#endif
 #endif
   
   delete [] pbName;
