@@ -245,8 +245,8 @@ namespace Bonmin {
       CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);
 #endif
 
-        CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10000);
-        CPXsetintparam(env,CPX_PARAM_NODELIM, 1000000);
+        CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10);
+        CPXsetintparam(env,CPX_PARAM_NODELIM, 1000);
 
         nodeCount_ = 0;
         iterationCount_ = 0;
@@ -261,14 +261,18 @@ namespace Bonmin {
         optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
         nodeCount_ = CPXgetnodecnt(env , cpxlp);
         iterationCount_ = CPXgetmipitcnt(env , cpxlp);
+        
+        int type;
+        status = CPXsolninfo(env, cpxlp, NULL, &type, NULL, NULL);
+        CHECK_CPX_STAT("solninfo", status);
 
-        if(stat == CPXMIP_NODE_LIM_INFEAS){
+        while(!optimal_ && type == CPX_NO_SOLN && stat != CPXMIP_SOL_LIM){
           CPXsetintparam(env, CPX_PARAM_INTSOLLIM, 1);
           CPXsetintparam(env,CPX_PARAM_NODELIM, 2100000000);
            status = CPXmipopt(env,cpxlp);
            CHECK_CPX_STAT("mipopt",status)
 
-           status = CPXgetstat( env, cpxlp);
+           stat = CPXgetstat( env, cpxlp);
            optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
            nodeCount_ = CPXgetnodecnt(env , cpxlp);
            iterationCount_ = CPXgetmipitcnt(env , cpxlp);
@@ -278,6 +282,8 @@ namespace Bonmin {
                           || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
        
 
+      status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+      CHECK_CPX_STAT("getbestobjval",status)
        if(!infeasible){
           nodeCount_ += CPXgetnodecnt(env, cpxlp);
           //iterationCount_ += CPXgetitcnt(env, cpxlp);

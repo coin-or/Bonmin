@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
     pbName = new char[strlen(argv[1])+1];
     strcpy(pbName, argv[1]);
   }
-#define CATCH_ERRORS 
+#define CATCH_ERRORS
 #ifdef CATCH_ERRORS
   try
 #endif 
