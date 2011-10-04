@@ -116,7 +116,7 @@ namespace Bonmin
       double time = CoinCpuTime();
       if (time - lastPeriodicLog > parameters_.logFrequency_) {
         handler_->message(PERIODIC_MSG,messages_)
-        <<time - timeBegin_<<cutoff
+        <<time - timeBegin_<<numberPasses<<cutoff
         <<milpBound
         <<CoinMessageEol;
         lastPeriodicLog = CoinCpuTime();
