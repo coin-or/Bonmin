@@ -24784,7 +24784,7 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile src/Apps/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/QuadCuts/Makefile src/Algorithms/OaGenerators/Makefile src/CbcBonmin/Heuristics/Makefile examples/OptionDocGen/Makefile experimental/Separable/Makefile test/Makefile examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile src/Apps/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/QuadCuts/Makefile src/Algorithms/OaGenerators/Makefile src/CbcBonmin/Heuristics/Makefile examples/OptionDocGen/Makefile experimental/Separable/Makefile experimental/RobotBonmin/Makefile test/Makefile examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc"
 
 
 if test $coin_has_asl = yes ; then
@@ -25536,6 +25536,7 @@ do
   "src/CbcBonmin/Heuristics/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/CbcBonmin/Heuristics/Makefile" ;;
   "examples/OptionDocGen/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/OptionDocGen/Makefile" ;;
   "experimental/Separable/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/Separable/Makefile" ;;
+  "experimental/RobotBonmin/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/RobotBonmin/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
   "examples/CppExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/CppExample/Makefile" ;;
   "bonmin.pc" ) CONFIG_FILES="$CONFIG_FILES bonmin.pc" ;;

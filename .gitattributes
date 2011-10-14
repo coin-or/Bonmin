@@ -71,6 +71,15 @@ Bonmin/experimental/Bcp/BM_lp_branch.cpp -text
 Bonmin/experimental/Bcp/BM_tm.cpp -text
 Bonmin/experimental/Bcp/README -text
 Bonmin/experimental/Bcp/ampl_bcp.patch -text
+Bonmin/experimental/RobotBonmin/BonNWayChoose.cpp -text
+Bonmin/experimental/RobotBonmin/BonNWayChoose.hpp -text
+Bonmin/experimental/RobotBonmin/BonNWayObject.cpp -text
+Bonmin/experimental/RobotBonmin/BonNWayObject.hpp -text
+Bonmin/experimental/RobotBonmin/Makefile.am -text
+Bonmin/experimental/RobotBonmin/Makefile.in -text
+Bonmin/experimental/RobotBonmin/Robot-bonmin.cpp -text
+Bonmin/experimental/RobotBonmin/RobotSetup.cpp -text
+Bonmin/experimental/RobotBonmin/RobotSetup.hpp -text
 Bonmin/experimental/Separable/BonHeuristicInnerApproximation.cpp -text
 Bonmin/experimental/Separable/BonHeuristicInnerApproximation.hpp -text
 Bonmin/experimental/Separable/BonOuterDescription.cpp -text

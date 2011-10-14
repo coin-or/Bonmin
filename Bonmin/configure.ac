@@ -180,6 +180,7 @@ AC_CONFIG_FILES([Makefile
                  src/CbcBonmin/Heuristics/Makefile
                  examples/OptionDocGen/Makefile
                  experimental/Separable/Makefile
+                 experimental/RobotBonmin/Makefile
                  test/Makefile
                  examples/CppExample/Makefile
                  bonmin.pc bonmin-uninstalled.pc])
