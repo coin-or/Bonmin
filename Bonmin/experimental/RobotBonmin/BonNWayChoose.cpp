@@ -21,12 +21,14 @@ namespace Bonmin
 
   BonNWayChoose::BonNWayChoose(BabSetupBase &b, const OsiSolverInterface* solver):
       OsiChooseVariable(solver),
+      br_depth_(0),
       bounds_(),
       unit_changes_()
   {
 
     Ipopt::SmartPtr<Ipopt::OptionsList> options = b.options();
     options->GetNumericValue("time_limit", time_limit_, b.prefix());
+    options->GetIntegerValue("strong_branch_depth", br_depth_, b.prefix());
 
     /** Set values of standard branching options.*/
     int numberObjects = solver_->numberObjects();
@@ -46,6 +48,7 @@ namespace Bonmin
 
   BonNWayChoose::BonNWayChoose(const BonNWayChoose & rhs) :
       OsiChooseVariable(rhs),
+      br_depth_(rhs.br_depth_),
       time_limit_(rhs.time_limit_),
       start_time_(rhs.start_time_),
       start_nway_(rhs.start_nway_),
@@ -58,6 +61,7 @@ namespace Bonmin
   BonNWayChoose::operator=(const BonNWayChoose & rhs)
   {
     if (this != &rhs) {
+      br_depth_ = rhs.br_depth_;
       time_limit_ = rhs.time_limit_;
       start_time_ = rhs.start_time_;
       start_nway_ = rhs.start_nway_;
@@ -78,14 +82,16 @@ namespace Bonmin
   {
   }
 
-#if 0
   void
-  BonNWayChoose::registerOptions(
-    Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
+  BonNWayChoose::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
     roptions->SetRegisteringCategory("NWay Strong branching setup", RegisteredOptions::BonminCategory);
+    roptions->AddLowerBoundedIntegerOption("strong_branch_depth",
+                                           "To which level do we perform strong-branching",
+                                           0,0,
+                                           "");
+
   }
-#endif
 
   double
   BonNWayChoose::compute_usefulness(int objectIndex, const OsiBranchingInformation * info) const
@@ -105,6 +111,7 @@ namespace Bonmin
     const int * vars = nway->members();
     int n_pt = 0;
 
+    return compute_usefulness(info, n, vars, bounds_[nwayIndex], unit_changes_[nwayIndex]);
     for(size_t  i = 0 ; i < n ; i++){
       int iCol = vars[i];
       if(fabs(lower[iCol] - upper[iCol]) < integerTolerance) continue; //Variable is fixed
@@ -113,9 +120,36 @@ namespace Bonmin
       r_val*=std::max(residual*unit_changes_[nwayIndex][i],bounds_[nwayIndex][i] - obj_val);
       n_pt++;
     } 
+    //printf("r_val %g n_pt %i\n", r_val, n_pt);
     return r_val;
+    return pow(r_val, 1./(double) n_pt);
   }
 
+  double
+  BonNWayChoose::compute_usefulness(const OsiBranchingInformation * info,
+                size_t n, const int * vars,const std::vector<double> &bounds, const std::vector<double> &unit_changes) const
+  {
+    const double * solution = info->solution_;
+    double obj_val = info->objectiveValue_;
+    const double * lower = info->lower_;
+    const double * upper = info->upper_;
+    double integerTolerance = info->integerTolerance_;
+    double r_val = 1;
+
+    int n_pt = 0;
+
+    for(size_t  i = 0 ; i < n ; i++){
+      int iCol = vars[i];
+      if(fabs(lower[iCol] - upper[iCol]) < integerTolerance) continue; //Variable is fixed
+      assert(lower[iCol] < upper[iCol]);
+      double residual = upper[iCol] - solution[iCol];
+      r_val*=std::max(residual*unit_changes[i],bounds[i] - obj_val);
+      n_pt++;
+    } 
+    //printf("r_val %g n_pt %i\n", r_val, n_pt);
+    return r_val;
+    return pow(r_val, 1./(double) n_pt)/n_pt;
+  }
   int
   BonNWayChoose::setupList ( OsiBranchingInformation *info, bool initialize)
   {
@@ -127,9 +161,13 @@ namespace Bonmin
       goodSolution_ = NULL;
       goodObjectiveValue_ = COIN_DBL_MAX;
     }
+#if 0
     else {
+      std::cerr<<"BonNWayChoose::setupList , Should not be called"
+                <<" with initialize==false"<<std::endl;
       throw CoinError("BonNWayChoose","setupList","Should not be called with initialize==false");
     }
+#endif
 
 
     numberOnList_=0;
@@ -137,15 +175,19 @@ namespace Bonmin
     int numberObjects = info->solver_->numberObjects() - start_nway_;
     int maximumStrong = 0;
     if(info->depth_ == 0){
+      bounds_.resize(0);
+      unit_changes_.resize(0);
       bounds_.resize(numberObjects, std::vector<double>(numberObjects,0.));
       unit_changes_.resize(numberObjects, std::vector<double>(numberObjects,0.));
-      maximumStrong = numberObjects;
     }
     else {
       assert(unit_changes_.size() == numberObjects);
       assert(bounds_.size() == unit_changes_.size());
-      maximumStrong = 1;
     }
+    if(info->depth_ > br_depth_)
+      maximumStrong = 1;
+    else
+      maximumStrong = numberObjects;
 
 
 
@@ -294,9 +336,39 @@ namespace Bonmin
     bool fixVariables)
   {
     if(!numberUnsatisfied_) return 1;//Node is feasible
-    bool isRoot = info->depth_ == 0;
 
-    if(!isRoot){
+
+
+    if(info->depth_ > br_depth_){
+      const double * solution = info->solution_;
+      double obj_val = info->objectiveValue_;
+      double cutoff = info->cutoff_;
+      const double * lower = info->lower_;
+      const double * upper = info->upper_;
+      double integerTolerance = info->integerTolerance_;
+
+
+      // See if quick variable fixing can be done
+      int n_fixed = 0;
+      for(int i = 0 ; i < numberUnsatisfied_ ; i++){
+         int iObject = list_[i];
+         int nwayIndex = iObject - start_nway_;
+         const BonNWayObject * nway = ASSERTED_CAST<const BonNWayObject *>(solver->object(iObject));
+
+         size_t n = nway->numberMembers();
+         const int * vars = nway->members();
+         for(size_t  j = 0 ; j < n ; j++){
+           int iCol = vars[j];
+           if(upper[iCol] < lower[iCol] + 0.5) continue;//variable already fixed to lower buund
+           if(bounds_[nwayIndex][j] > cutoff){//It can be fixed
+              solver->setColUpper(iCol, lower[iCol]);
+              n_fixed ++;
+           }
+         }
+      }
+      if(n_fixed)
+        printf("Fixed %i variables\n", n_fixed);
+
       assert(bounds_.size() == unit_changes_.size());
       assert(unit_changes_.size() == info->solver_->numberObjects() - start_nway_);
       //Just take the most usefull
@@ -308,12 +380,6 @@ namespace Bonmin
 #define OUT_BRANCH
 #ifdef OUT_BRANCH
       int nwayIndex = bestObjectIndex_ - start_nway_;
-      const double * solution = info->solution_;
-      double obj_val = info->objectiveValue_;
-      double cutoff = info->cutoff_;
-      const double * lower = info->lower_;
-      const double * upper = info->upper_;
-      double integerTolerance = info->integerTolerance_;
       BonNWayObject * nway = ASSERTED_CAST<BonNWayObject *>
                         (info->solver_->objects()[bestObjectIndex_]);
       assert(nway);
@@ -333,8 +399,12 @@ namespace Bonmin
              info->depth_, bestObjectIndex_, n_pt, obj_val, r_val);
 #endif 
 
+      if(n_fixed) return 2;
       return 0;
      }
+
+
+    printf("Restarting strong branching loop....\n\n");
 
     int numberLeft = numberUnsatisfied_;//Always do full strong at root
     int returnCode=0;
@@ -360,28 +430,32 @@ namespace Bonmin
              bestPriority = objectPriority;
       }
       else break;
-      int numberFixed=0;
-      returnCode = doStrongBranching(solver, info, iObject, saveLower.data(),
-                                     saveUpper.data());
-      if(returnCode == -1) break;
+      double score;
+      int r_val = doStrongBranching(solver, info, iObject, saveLower.data(),
+                                     saveUpper.data(), score);
+      if(r_val == -1) {
+         std::cerr<< "This is Infeasible"<<std::endl;
+         returnCode = -1;
+         break;
+      }
 
-
-       if (returnCode == 1 && fixVariables && 0) {//for now don't as this is very unlikely
+       if (r_val == 1 && fixVariables && 0) {//for now don't as this is very unlikely
              //and would require nontrivial coding.
              const OsiObject * obj = solver->object(iObject);
              OsiBranchingObject * branch = obj->createBranch(solver,info,0);
              branch->branch(solver);
              delete branch;
       }
+      if(r_val == 1 && info->depth_ == 0) returnCode=2;
       //Compute Score
-      double score = compute_usefulness(iObject, info);
       printf("Usefullness from strong branching on %i : %g\n", iObject - start_nway_, score);
       if(score > best_score){//We have a winner
         best_score = score;
         bestObjectIndex_ = iObject;
         bestWhichWay_ = 0;
       }
-      if (returnCode==3) {
+      if (r_val==3) {
+          returnCode = 3;
           // max time - just choose one
           if(bestObjectIndex_ < 0){
             bestObjectIndex_ = list_[0];
@@ -408,8 +482,8 @@ namespace Bonmin
   BonNWayChoose::doStrongBranching( OsiSolverInterface * solver, 
   				    OsiBranchingInformation *info,
   				    int objectIndex,
-                                    const double * saveLower,
-                                    const double * saveUpper)
+                                    double * saveLower,
+                                    double * saveUpper, double & score)
   {
     int nwayIndex = objectIndex - start_nway_;
     const double * lower = info->lower_;
@@ -427,9 +501,10 @@ namespace Bonmin
     int number_branches = branch->numberBranchesLeft();
     int n_can_be_fixed = 0;
 
-    double big_val = info->cutoff_;// For infeasibles
+    double big_val = 3*info->cutoff_;// For infeasibles
     if(big_val > 1e10){ big_val = 10*info->objectiveValue_;}
     big_val += fabs(big_val)*1e-5;
+    std::vector<double> unit_changes(numberObjects - start_nway_, 0.);
     while(branches_left){ 
 
       branch->branch(solver);
@@ -445,15 +520,22 @@ namespace Bonmin
       if(solver->isProvenPrimalInfeasible() ||
          (solver->isProvenOptimal() && obj_val > info->cutoff_)){//infeasible
          n_can_be_fixed++;
+         if(info->depth_ == 0){
          bounds_[nwayIndex][s_br] = big_val;
-         if(obj_val > 1e10){//failure be less violent
+         if(0 && obj_val > 1e10){//failure be less violent
            bounds_[nwayIndex][s_br] = - 1e50;
          }
-         unit_changes_[nwayIndex][s_br] = (big_val -  info->objectiveValue_)/residual;
+         //Fix variable
+         }
+         unit_changes[s_br] = (big_val - info->objectiveValue_)/residual;
+         printf("Fixing variable %i to 0\n", v_br);
+         saveUpper[v_br] = saveLower[v_br];
       }
       else{
+         if(info->depth_ == 0){
           bounds_[nwayIndex][s_br] = obj_val;
-          unit_changes_[nwayIndex][s_br] = (obj_val - info->objectiveValue_)/residual;
+         }
+         unit_changes[s_br] = (obj_val - info->objectiveValue_)/residual;
       }
 
       // Restore bounds
@@ -466,15 +548,18 @@ namespace Bonmin
       branches_left = branch->numberBranchesLeft();
     }
 
-
+    score = compute_usefulness(info, nway->numberMembers(), nway->members(), bounds_[nwayIndex], unit_changes);
+    if(info->depth_ > 0) score = pow(score, 1./(number_branches-n_can_be_fixed));
     if(info->depth_ == 0){//At root bounds contains valid bound on obj after branching, remember
         nway->set_bounds(bounds_[nwayIndex]);
+        unit_changes_[nwayIndex] = unit_changes;
     }
 
     if(n_can_be_fixed == number_branches){
        return -1;
     }
-    if(n_can_be_fixed == number_branches - 1){
+    //if(n_can_be_fixed == number_branches - 1){
+    if(n_can_be_fixed){
        return 1;
     }
     bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_)

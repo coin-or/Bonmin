@@ -43,6 +43,8 @@ namespace Bonmin
     /** Helper function for setupList and chooseVariable, compute usefullness of an nway object */
     double compute_usefulness(int objectIndex, const OsiBranchingInformation * info) const;
 
+    double compute_usefulness(const OsiBranchingInformation * info,
+                size_t n, const int * vars, const std::vector<double> &bounds, const std::vector<double> &unit_changes) const;
     /** Sets up strong list and clears all if initialize is true.
         Returns number of infeasibilities. */
     virtual int setupList ( OsiBranchingInformation *info, bool initialize);
@@ -76,11 +78,18 @@ namespace Bonmin
   */
   virtual int doStrongBranching( OsiSolverInterface * solver, 
 				 OsiBranchingInformation *info,
-				 int iObject, const double * saveLow, const double * saveUp);
+				 int iObject, double * saveLow, double * saveUp, double &score);
+
+ 
+  /** Register class options.*/
+  static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
+
   private:
     /** Default Constructor, forbiden for some reason.*/
     BonNWayChoose ();
 
+    /** depth of strong-branching.*/
+    int br_depth_;
     /** Global time limit for algorithm. */
     double time_limit_;
 

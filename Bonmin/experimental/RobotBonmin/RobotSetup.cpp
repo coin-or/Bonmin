@@ -42,6 +42,7 @@ namespace Bonmin
   void RobotSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
      BonminSetup::registerAllOptions(roptions);
+     BonNWayChoose::registerOptions(roptions);
   }
 
   /** Register all the Bonmin options.*/

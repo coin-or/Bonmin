@@ -214,26 +214,12 @@ BonNWayObject::createBranch(OsiSolverInterface * solver, const OsiBranchingInfor
             sort[numberFree++] = distance;
         }
     }
-    if(numberFree ==0){//Could be fathomed but impossible here.... create one branch
-      for (j = 0; j < members_.size(); j++) {
-        int iColumn = members_[j];
-        double value = solution[iColumn];
-        value = CoinMax(value, lower[iColumn]);
-        value = CoinMin(value, upper[iColumn]);
-        if (upper[iColumn] > lower[iColumn]) {
-            double distance = upper[iColumn] - value;
-            list[numberFree] = static_cast<int>(j);
-            sort[numberFree++] = distance;
-            break;
-        }
-    }
-    }
     assert (numberFree);
     // sort
     CoinSort_2(sort, sort + numberFree, list);
     // create object
     OsiBranchingObject * branch;
-    branch = numberFree ? new BonNWayBranchingObject(solver, this, numberFree, list) : NULL;
+    branch = new BonNWayBranchingObject(solver, this, numberFree, list);
     delete [] list;
     delete [] sort;
     return branch;
