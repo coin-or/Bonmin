@@ -9,7 +9,7 @@
 // Date : 05/22/2010
 
 #include "BonminConfig.h"
-#include "BonQpBranchingSolver.hpp"
+#include "BonStrongBranchingSolver.hpp"
 
 #include "RobotSetup.hpp"
 #include "BonNWayObject.hpp"
