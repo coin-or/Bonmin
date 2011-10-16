@@ -84,9 +84,8 @@ namespace Bonmin
   int
   MilpRounding::solution(double &solutionValue, double *betterSolution)
   {
-    printf("Entering heuristic\n");
     if(model_->getCurrentPassNumber() > 1) return 0;
-    if ((model_->getNodeCount()%howOften_)!=0||model_->getCurrentPassNumber()>1)
+    if (model_->currentDepth() > 2 && (model_->getNodeCount()%howOften_)!=0)
       return 0;
  
     int returnCode = 0; // 0 means it didn't find a feasible solution
@@ -242,12 +241,10 @@ namespace Bonmin
                       newRowLower(), newRowUpper());
       si->setInteger(idxIntegers(), static_cast<int>(idxIntegers.size()));
       si->applyCuts(noGoods);
-      printf("Done creating mip, start solving\n"); 
 
       bool hasFractionnal = true;
       while(hasFractionnal){
         mip_->optimize(DBL_MAX, 0, 60);
-        printf("Done solving\n"); 
         hasFractionnal = false;
 #if 0
         bool feasible = false;
@@ -301,17 +298,12 @@ namespace Bonmin
     if(feasible) {
       // fix the integer variables and solve the NLP
       // also add no good cut
-      printf("We found a solution");
       CoinPackedVector v;
       double lb = 1;
       for (int iColumn=0;iColumn<n;iColumn++) {
 	if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
 	  double value=newSolution[iColumn];
 	  if (fabs(floor(value+0.5)-value)>integerTolerance) {
-#ifdef DEBUG_BON_HEURISTIC_DIVE_MIP
-	    cout<<"It should be infeasible because: "<<endl;
-	    cout<<"variable "<<iColumn<<" is not integer"<<endl;
-#endif
 	    feasible = false;
 	    break;
 	  }
