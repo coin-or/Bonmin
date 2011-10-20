@@ -25,7 +25,8 @@ namespace Bonmin {
 BonNWayObject::BonNWayObject ()
         : OsiObject(),
         members_(),
-        consequence_(NULL)
+        consequence_(NULL),
+        quicky_(false)
 {
 }
 
@@ -33,7 +34,8 @@ BonNWayObject::BonNWayObject ()
 BonNWayObject::BonNWayObject (int numberMembers,
                   const int * which, int identifier):
        OsiObject(),
-       members_(numberMembers)
+       members_(numberMembers),
+       quicky_(false)
 {
     if (numberMembers) {
         memcpy(members_.data(), which, numberMembers*sizeof(int));
@@ -44,7 +46,7 @@ BonNWayObject::BonNWayObject (int numberMembers,
 
 // Copy constructor
 BonNWayObject::BonNWayObject ( const BonNWayObject & rhs)
-        : OsiObject(rhs), members_(rhs.members_)
+        : OsiObject(rhs), members_(rhs.members_), quicky_(rhs.quicky_)
 {
     consequence_ = NULL;
     if (members_.size()) {
@@ -75,6 +77,7 @@ BonNWayObject::operator=( const BonNWayObject & rhs)
     if (this != &rhs) {
         OsiObject::operator=(rhs);
         members_ = rhs.members_;
+        quicky_ = rhs.quicky_;
         if (consequence_) {
             for (size_t i = 0; i < members_.size(); i++)
                 delete consequence_[i];
@@ -195,6 +198,7 @@ BonNWayObject::createBranch(OsiSolverInterface * solver, const OsiBranchingInfor
     const double * solution = info->solution_;
     const double * lower = info->lower_;
     const double * upper = info->upper_;
+    double integerTolerance = info->integerTolerance_;
     double cutoff = info->cutoff_;
     int * list = new int[members_.size()];
     double * sort = new double[members_.size()];
@@ -209,6 +213,8 @@ BonNWayObject::createBranch(OsiSolverInterface * solver, const OsiBranchingInfor
           printf("Fathom branch on bound %i : %g > %g\n", j, bounds_[j], cutoff);
           continue;
         }
+        if(quicky_ && fabs(solution[iColumn] - lower[iColumn]) < integerTolerance)
+          continue;
             double distance = upper[iColumn] - value;
             list[numberFree] = static_cast<int>(j);
             sort[numberFree++] = distance;

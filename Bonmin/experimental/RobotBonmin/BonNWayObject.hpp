@@ -104,6 +104,8 @@ public:
     void set_bounds(std::vector<double> & bounds) const{
       bounds_ = bounds;
     }
+
+    void make_quick(){quicky_ = true;}
 private:
     /// data
 
@@ -114,6 +116,9 @@ private:
 
     /// Bounds on the members
     mutable std::vector<double> bounds_;
+
+    /// Quicky only branch up on variables with non zero value
+    bool quicky_;
 };
 /** N way branching Object class.
     Variable is number of set.
@@ -177,7 +182,7 @@ public:
       return branchIndex_ - 1;
     }
 private:
-    /// order of branching - points back to BonNWay
+    /// order of branching 
     int * order_;
     /// Points back to object
     const BonNWayObject * object_;

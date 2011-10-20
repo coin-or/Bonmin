@@ -23,13 +23,19 @@ namespace Bonmin
       OsiChooseVariable(solver),
       br_depth_(0),
       bounds_(),
-      unit_changes_()
+      unit_changes_(),
+      num_ps_costs_(),
+      num_eval_(),
+      geo_means_(0)
   {
-
     Ipopt::SmartPtr<Ipopt::OptionsList> options = b.options();
     options->GetNumericValue("time_limit", time_limit_, b.prefix());
+    options->GetNumericValue("cutoff_multiplier", cutoff_multiplier_, b.prefix());
+    options->GetNumericValue("pseudocost_trust_value", pseudocost_trust_value_, b.prefix());
     options->GetIntegerValue("strong_branch_depth", br_depth_, b.prefix());
-
+    options->GetIntegerValue("nway_branch_log_level", log_, b.prefix());
+    options->GetEnumValue("do_fixings", do_fixings_, b.prefix());
+    options->GetEnumValue("use_geo_means", geo_means_, b.prefix());
     /** Set values of standard branching options.*/
     int numberObjects = solver_->numberObjects();
     std::cout<<"Number objects "<<numberObjects<<std::endl;
@@ -42,18 +48,23 @@ namespace Bonmin
       break;
     }
     numberObjects -= start_nway_;
-    std::cout<<"Number nway "<<numberObjects<<std::endl;
-
   }
 
   BonNWayChoose::BonNWayChoose(const BonNWayChoose & rhs) :
       OsiChooseVariable(rhs),
       br_depth_(rhs.br_depth_),
+      do_fixings_(rhs.do_fixings_),
+      cutoff_multiplier_(rhs.cutoff_multiplier_),
+      pseudocost_trust_value_(rhs.pseudocost_trust_value_),
       time_limit_(rhs.time_limit_),
       start_time_(rhs.start_time_),
       start_nway_(rhs.start_nway_),
+      log_(rhs.log_),
       bounds_(rhs.bounds_),
-      unit_changes_(rhs.unit_changes_)
+      unit_changes_(rhs.unit_changes_),
+      num_ps_costs_(rhs.num_ps_costs_),
+      num_eval_(rhs.num_eval_),
+      geo_means_(rhs.geo_means_)
   {
   }
 
@@ -62,12 +73,19 @@ namespace Bonmin
   {
     if (this != &rhs) {
       br_depth_ = rhs.br_depth_;
+      do_fixings_ = rhs.do_fixings_;
+      cutoff_multiplier_ = rhs.cutoff_multiplier_;
+      pseudocost_trust_value_ = rhs.pseudocost_trust_value_;
       time_limit_ = rhs.time_limit_;
       start_time_ = rhs.start_time_;
+      log_ = rhs.log_;
       start_nway_ = rhs.start_nway_;
       OsiChooseVariable::operator=(rhs);
       bounds_ = rhs.bounds_;
       unit_changes_ = rhs.unit_changes_;
+      num_ps_costs_ = rhs.num_ps_costs_;
+      num_eval_ = rhs.num_eval_;
+      geo_means_ = rhs.geo_means_;
     }
     return *this;
   }
@@ -86,10 +104,40 @@ namespace Bonmin
   BonNWayChoose::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
     roptions->SetRegisteringCategory("NWay Strong branching setup", RegisteredOptions::BonminCategory);
+    roptions->AddLowerBoundedIntegerOption("nway_branch_log_level",
+                                           "Log level for the branching on nways",
+                                           0,1,
+                                           "");
+
     roptions->AddLowerBoundedIntegerOption("strong_branch_depth",
                                            "To which level do we perform strong-branching",
                                            0,0,
                                            "");
+
+    roptions->AddLowerBoundedNumberOption("cutoff_multiplier",
+                                           "multiplier applied to cutoff_ for computing pseudo-cost of infeasible sub-problems",
+                                           1.,0,3.,
+                                           "");
+
+    roptions->AddLowerBoundedNumberOption("pseudocost_trust_value",
+                                           "Trust pseudo cost of best nway object if it is above this value",
+                                           0.,0,0,
+                                           "");
+
+    roptions->AddStringOption2("use_geo_means", "Use geometrical means to average pseudo-costs",
+                               "yes", 
+                               "no", "Use artihmetical means",
+                               "yes", "Use geometrical means","");
+
+    roptions->AddStringOption4("do_fixings",
+        "Do we fix variables in strong branching?",
+        "all",
+        "none", "Don't do any.",
+        "in-tree", "Fix only variables in the tree",
+        "strong-branching", "Fix variable in strong branching only",
+        "all", "Fix whenever possible",
+        "");
+
 
   }
 
@@ -97,32 +145,23 @@ namespace Bonmin
   BonNWayChoose::compute_usefulness(int objectIndex, const OsiBranchingInformation * info) const
   {
     int nwayIndex = objectIndex - start_nway_;
-    const double * solution = info->solution_;
-    double obj_val = info->objectiveValue_;
-    const double * lower = info->lower_;
-    const double * upper = info->upper_;
-    double integerTolerance = info->integerTolerance_;
-    double r_val = 1;
 
     BonNWayObject * nway = ASSERTED_CAST<BonNWayObject *>(info->solver_->objects()[objectIndex]);
     assert(nway);
-    //BonNWayObject * nway = dynamic_cast<BonNWayObject *>(info->solver_->objects()[objectIndex]);
     size_t n = nway->numberMembers();
     const int * vars = nway->members();
-    int n_pt = 0;
 
-    return compute_usefulness(info, n, vars, bounds_[nwayIndex], unit_changes_[nwayIndex]);
-    for(size_t  i = 0 ; i < n ; i++){
-      int iCol = vars[i];
-      if(fabs(lower[iCol] - upper[iCol]) < integerTolerance) continue; //Variable is fixed
-      assert(lower[iCol] < upper[iCol]);
-      double residual = upper[iCol] - solution[iCol];
-      r_val*=std::max(residual*unit_changes_[nwayIndex][i],bounds_[nwayIndex][i] - obj_val);
-      n_pt++;
-    } 
-    //printf("r_val %g n_pt %i\n", r_val, n_pt);
+    std::vector<double> unit_changes(unit_changes_[nwayIndex]);
+    if(geo_means_){
+      for(size_t k = 0 ; k < unit_changes.size() ; k++) unit_changes[k] = (num_ps_costs_[nwayIndex][k]) ? pow(unit_changes[k], 1./(double) num_ps_costs_[nwayIndex][k]): unit_changes[k];
+    }
+    else {
+    for(size_t k = 0 ; k < unit_changes.size() ; k++) unit_changes[k] = (num_ps_costs_[nwayIndex][k]) ? unit_changes[k]/(double) num_ps_costs_[nwayIndex][k]: unit_changes[k];
+    }
+
+
+    double r_val = compute_usefulness(info, n, vars, bounds_[nwayIndex], unit_changes);
     return r_val;
-    return pow(r_val, 1./(double) n_pt);
   }
 
   double
@@ -134,22 +173,26 @@ namespace Bonmin
     const double * lower = info->lower_;
     const double * upper = info->upper_;
     double integerTolerance = info->integerTolerance_;
-    double r_val = 1;
-
-    int n_pt = 0;
+    double cutoff = info->cutoff_*cutoff_multiplier_;
+    double r_val = (geo_means_) ? 1 : 0;
 
     for(size_t  i = 0 ; i < n ; i++){
       int iCol = vars[i];
-      if(fabs(lower[iCol] - upper[iCol]) < integerTolerance) continue; //Variable is fixed
+      if(fabs(lower[iCol] - upper[iCol]) < integerTolerance) {
+        //r_val *= (cutoff - obj_val);
+        continue; //Variable is fixed
+      }
       assert(lower[iCol] < upper[iCol]);
       double residual = upper[iCol] - solution[iCol];
-      r_val*=std::max(residual*unit_changes[i],bounds[i] - obj_val);
-      n_pt++;
+      double score = std::min(cutoff - obj_val, std::max(residual*unit_changes[i],bounds[i] - obj_val));
+      if(geo_means_)
+        r_val*=score;
+      else
+        r_val += score;
     } 
-    //printf("r_val %g n_pt %i\n", r_val, n_pt);
     return r_val;
-    return pow(r_val, 1./(double) n_pt)/n_pt;
   }
+
   int
   BonNWayChoose::setupList ( OsiBranchingInformation *info, bool initialize)
   {
@@ -161,35 +204,26 @@ namespace Bonmin
       goodSolution_ = NULL;
       goodObjectiveValue_ = COIN_DBL_MAX;
     }
-#if 0
-    else {
-      std::cerr<<"BonNWayChoose::setupList , Should not be called"
-                <<" with initialize==false"<<std::endl;
-      throw CoinError("BonNWayChoose","setupList","Should not be called with initialize==false");
-    }
-#endif
 
 
     numberOnList_=0;
     numberUnsatisfied_=0;
     int numberObjects = info->solver_->numberObjects() - start_nway_;
-    int maximumStrong = 0;
+    double cutoff = info->cutoff_;
     if(info->depth_ == 0){
       bounds_.resize(0);
       unit_changes_.resize(0);
-      bounds_.resize(numberObjects, std::vector<double>(numberObjects,0.));
-      unit_changes_.resize(numberObjects, std::vector<double>(numberObjects,0.));
+      bounds_.resize(numberObjects, std::vector<double>(numberObjects,cutoff));
+      unit_changes_.resize(numberObjects, std::vector<double>(numberObjects,0));
+      num_eval_.resize(numberObjects, 0);
+      num_ps_costs_.resize(numberObjects, std::vector<int>(numberObjects,0));
     }
     else {
       assert(unit_changes_.size() == numberObjects);
       assert(bounds_.size() == unit_changes_.size());
     }
-    if(info->depth_ > br_depth_)
-      maximumStrong = 1;
-    else
-      maximumStrong = numberObjects;
-
-
+    //Always allow all objects on the list  
+    int maximumStrong = numberObjects;
 
     double check = -COIN_DBL_MAX;
     int checkIndex=0;
@@ -211,11 +245,6 @@ namespace Bonmin
       double value = object[i]->infeasibility(info,way);
       if (value>0.0) {
         numberUnsatisfied_++;
-        if (value>=1e50) {
-          // infeasible
-          feasible=false;
-          break;
-        }
         int priorityLevel = object[i]->priority();
         // Better priority? Flush choices.
         if (priorityLevel<bestPriority) {
@@ -236,7 +265,6 @@ namespace Bonmin
           //Compute usefullness
           if(info->depth_ != 0){
             value = compute_usefulness(i + start_nway_, info); 
-            //printf("Usefullness on pseudo cost %i : %g\n", i, value);
           }
 
           if (value>check) {
@@ -338,36 +366,35 @@ namespace Bonmin
     if(!numberUnsatisfied_) return 1;//Node is feasible
 
 
-
-    if(info->depth_ > br_depth_){
-      const double * solution = info->solution_;
-      double obj_val = info->objectiveValue_;
-      double cutoff = info->cutoff_;
+    double cutoff = info->cutoff_;
+    double obj_val = info->objectiveValue_;
+    if(info->depth_ > br_depth_ &&  ( (- useful_[0]   > pseudocost_trust_value_ )|| num_eval_[list_[0] - start_nway_] >= 18) ){
       const double * lower = info->lower_;
       const double * upper = info->upper_;
-      double integerTolerance = info->integerTolerance_;
 
 
       // See if quick variable fixing can be done
       int n_fixed = 0;
-      for(int i = 0 ; i < numberUnsatisfied_ ; i++){
-         int iObject = list_[i];
-         int nwayIndex = iObject - start_nway_;
-         const BonNWayObject * nway = ASSERTED_CAST<const BonNWayObject *>(solver->object(iObject));
+      if(do_fixings_ > 1){
+         for(int i = 0 ; i < numberUnsatisfied_ ; i++){
+            int iObject = list_[i];
+            int nwayIndex = iObject - start_nway_;
+            const BonNWayObject * nway = ASSERTED_CAST<const BonNWayObject *>(solver->object(iObject));
 
-         size_t n = nway->numberMembers();
-         const int * vars = nway->members();
-         for(size_t  j = 0 ; j < n ; j++){
-           int iCol = vars[j];
-           if(upper[iCol] < lower[iCol] + 0.5) continue;//variable already fixed to lower buund
-           if(bounds_[nwayIndex][j] > cutoff){//It can be fixed
-              solver->setColUpper(iCol, lower[iCol]);
-              n_fixed ++;
-           }
+            size_t n = nway->numberMembers();
+            const int * vars = nway->members();
+            for(size_t  j = 0 ; j < n ; j++){
+              int iCol = vars[j];
+              if(upper[iCol] < lower[iCol] + 0.5) continue;//variable already fixed to lower buund
+              if(bounds_[nwayIndex][j] > cutoff){//It can be fixed
+                 solver->setColUpper(iCol, lower[iCol]);
+                 n_fixed ++;
+              }
+            }
          }
+        if(n_fixed && log_ > 1)
+          printf("NWAY: Fixed %i variables\n", n_fixed);
       }
-      if(n_fixed)
-        printf("Fixed %i variables\n", n_fixed);
 
       assert(bounds_.size() == unit_changes_.size());
       assert(unit_changes_.size() == info->solver_->numberObjects() - start_nway_);
@@ -377,36 +404,21 @@ namespace Bonmin
       OsiObject * obj = solver->objects()[bestObjectIndex_];
       obj->setWhichWay(bestWhichWay_);
 
-#define OUT_BRANCH
-#ifdef OUT_BRANCH
-      int nwayIndex = bestObjectIndex_ - start_nway_;
-      BonNWayObject * nway = ASSERTED_CAST<BonNWayObject *>
-                        (info->solver_->objects()[bestObjectIndex_]);
-      assert(nway);
-      size_t n = nway->numberMembers();
-      const int * vars = nway->members();
-      int n_pt = 0;
-      double r_val = 1; 
-      for(size_t  i = 0 ; i < n ; i++){
-        int iCol = vars[i];
-        if(fabs(lower[iCol] - upper[iCol]) < integerTolerance) continue; //Variable is fixed
-        assert(lower[iCol] < upper[iCol]);
-        double residual = upper[iCol] - solution[iCol];
-        r_val*=std::max(residual*unit_changes_[nwayIndex][i],bounds_[nwayIndex][i] - obj_val);
-        if(bounds_[nwayIndex][i] < cutoff) n_pt++;
+      if(log_ > 1){
+        printf("level %i branch on %i bound %g usefullness %g.\n",
+               info->depth_, bestObjectIndex_ - start_nway_, obj_val, - useful_[0]);
       }
-      printf("level %i branch on %i: %i branches, bound %g usefullness %g.\n",
-             info->depth_, bestObjectIndex_, n_pt, obj_val, r_val);
-#endif 
-
       if(n_fixed) return 2;
       return 0;
      }
 
 
-    printf("Restarting strong branching loop....\n\n");
+    if(log_ > 0)
+      printf("Restarting strong branching loop....\n\n");
 
-    int numberLeft = numberUnsatisfied_;//Always do full strong at root
+    numberStrongIterations_ = 0;
+    numberStrongDone_ = 0;
+    int numberLeft = numberOnList_;//Always do full strong at root
     int returnCode=0;
     bestObjectIndex_ = -1;
     bestWhichWay_ = -1;
@@ -434,21 +446,16 @@ namespace Bonmin
       int r_val = doStrongBranching(solver, info, iObject, saveLower.data(),
                                      saveUpper.data(), score);
       if(r_val == -1) {
-         std::cerr<< "This is Infeasible"<<std::endl;
+         if(log_ > 0)
+           std::cout<<"This is Infeasible"<<std::endl;
          returnCode = -1;
          break;
       }
 
-       if (r_val == 1 && fixVariables && 0) {//for now don't as this is very unlikely
-             //and would require nontrivial coding.
-             const OsiObject * obj = solver->object(iObject);
-             OsiBranchingObject * branch = obj->createBranch(solver,info,0);
-             branch->branch(solver);
-             delete branch;
-      }
-      if(r_val == 1 && info->depth_ == 0) returnCode=2;
+      if(do_fixings_ > 1 && r_val == 1 && info->depth_ == 0) returnCode=2;
       //Compute Score
-      printf("Usefullness from strong branching on %i : %g\n", iObject - start_nway_, score);
+      if(log_ > 0)
+        printf("Usefullness from strong branching on %i : %g\n", iObject - start_nway_, score);
       if(score > best_score){//We have a winner
         best_score = score;
         bestObjectIndex_ = iObject;
@@ -465,7 +472,6 @@ namespace Bonmin
         }
     }
     solver->unmarkHotStart();
-    assert(returnCode == 0);
     return returnCode;
   }
 
@@ -501,10 +507,11 @@ namespace Bonmin
     int number_branches = branch->numberBranchesLeft();
     int n_can_be_fixed = 0;
 
-    double big_val = 3*info->cutoff_;// For infeasibles
+    double big_val = cutoff_multiplier_*info->cutoff_;// For infeasibles
     if(big_val > 1e10){ big_val = 10*info->objectiveValue_;}
     big_val += fabs(big_val)*1e-5;
-    std::vector<double> unit_changes(numberObjects - start_nway_, 0.);
+    std::vector<double> unit_changes(numberObjects - start_nway_, -DBL_MAX);
+    //std::vector<double> unit_changes(numberObjects - start_nway_, 0);
     while(branches_left){ 
 
       branch->branch(solver);
@@ -519,17 +526,16 @@ namespace Bonmin
 
       if(solver->isProvenPrimalInfeasible() ||
          (solver->isProvenOptimal() && obj_val > info->cutoff_)){//infeasible
-         n_can_be_fixed++;
          if(info->depth_ == 0){
          bounds_[nwayIndex][s_br] = big_val;
-         if(0 && obj_val > 1e10){//failure be less violent
-           bounds_[nwayIndex][s_br] = - 1e50;
-         }
-         //Fix variable
          }
          unit_changes[s_br] = (big_val - info->objectiveValue_)/residual;
-         printf("Fixing variable %i to 0\n", v_br);
-         saveUpper[v_br] = saveLower[v_br];
+         if(do_fixings_ > 1){
+           n_can_be_fixed++;
+           if(log_ > 0)
+           printf("Fixing variable %i to 0 the cutoff is %g\n", v_br, big_val);
+           saveUpper[v_br] = saveLower[v_br];
+         }
       }
       else{
          if(info->depth_ == 0){
@@ -549,26 +555,40 @@ namespace Bonmin
     }
 
     score = compute_usefulness(info, nway->numberMembers(), nway->members(), bounds_[nwayIndex], unit_changes);
-    if(info->depth_ > 0) score = pow(score, 1./(number_branches-n_can_be_fixed));
     if(info->depth_ == 0){//At root bounds contains valid bound on obj after branching, remember
+        if(do_fixings_ == 1 || do_fixings_ == 3)
         nway->set_bounds(bounds_[nwayIndex]);
+        for(size_t k = 0 ; k < unit_changes.size() ; k++){
+           num_ps_costs_[nwayIndex][k]=1;
+        }
         unit_changes_[nwayIndex] = unit_changes;
+        num_eval_[nwayIndex] = 1;
     }
-
+    else if (n_can_be_fixed < number_branches -1){
+       num_eval_[nwayIndex]++;
+       for(size_t k = 0 ; k < unit_changes.size() ; k++){
+         if(unit_changes[k] > 0.){
+           if(geo_means_)
+              unit_changes_[nwayIndex][k] *= unit_changes[k];
+           else
+              unit_changes_[nwayIndex][k] += unit_changes[k];
+           num_ps_costs_[nwayIndex][k]++;
+         }
+       }
+    }
     if(n_can_be_fixed == number_branches){
        return -1;
     }
-    //if(n_can_be_fixed == number_branches - 1){
-    if(n_can_be_fixed){
-       return 1;
+   if(n_can_be_fixed){
+     return 1;
     }
     bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_)
-                        || ( CoinCpuTime() - start_time_ > time_limit_);
-   if (hitMaxTime) {
-        return 3;
+    		|| ( CoinCpuTime() - start_time_ > time_limit_);
+    if (hitMaxTime) {
+    return 3;
     }
-   return 0;
-  }
+    return 0;
+}
 
 }/* Ends Bonmin's namespace.*/
 

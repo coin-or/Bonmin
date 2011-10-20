@@ -90,6 +90,12 @@ namespace Bonmin
 
     /** depth of strong-branching.*/
     int br_depth_;
+    /** Do we fix?*.*/
+    Ipopt::Index do_fixings_;
+    /** Cutoff multiplier for infeasibles*/
+    double cutoff_multiplier_;
+    /** Trust value for the pseudo costs.*/
+    double pseudocost_trust_value_;
     /** Global time limit for algorithm. */
     double time_limit_;
 
@@ -99,13 +105,19 @@ namespace Bonmin
     /// Start of nway objects in array
     int start_nway_;
 
+    /// log level
+    int log_;
     typedef std::vector< std::vector<double> > full_mat;
 
     full_mat bounds_;
 
     full_mat unit_changes_;
 
+    std::vector < std::vector<int> > num_ps_costs_;
 
+    std::vector<int> num_eval_;
+
+    int geo_means_;
   };
 
 }

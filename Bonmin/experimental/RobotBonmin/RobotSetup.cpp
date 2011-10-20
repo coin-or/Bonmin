@@ -43,6 +43,15 @@ namespace Bonmin
   {
      BonminSetup::registerAllOptions(roptions);
      BonNWayChoose::registerOptions(roptions);
+
+
+    roptions->AddStringOption2("do_a_quick_one",
+        "Do we try our luck?",
+        "no",
+        "no", "Don't (of course).",
+        "yes", "Be crazy",
+        "");
+
   }
 
   /** Register all the Bonmin options.*/
@@ -91,6 +100,8 @@ namespace Bonmin
   RobotSetup::addNWays()
   {
 
+    int do_quick;
+    options()->GetEnumValue("do_a_quick_one", do_quick, prefix());
     // pass user set Sos constraints (code inspired from CoinSolve.cpp)
     const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
     if (!getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
@@ -154,6 +165,8 @@ namespace Bonmin
           }
           objects[i] = nway;
 
+        if(do_quick)
+          nway->make_quick();
         if (hasPriorities && sosPriorities && sosPriorities[i]) {
           objects[i]->setPriority(sosPriorities[i]);
         }
