@@ -76,8 +76,8 @@ register_general_options
   roptions->AddStringOption4("warm_start",
       "Select the warm start method",
       "none",
-      "none","No warm start just start NLPs from optimal solution of the root relaxation",
-      "fake_basis", "builds fake bases usefull for cut management in Cbc (warm start is the same as in none)",
+      "none","No warm start, just start NLPs from optimal solution of the root relaxation",
+      "fake_basis", "builds fake basis, useful for cut management in Cbc (warm start is the same as in none)",
       "optimum","Warm start with direct parent optimum",
       "interior_point","Warm start with an interior point of direct parent",
       "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
@@ -128,7 +128,7 @@ register_general_options
   roptions->setOptionExtraInfo("num_retry_unsolved_random_point",127);
 
  roptions->AddLowerBoundedNumberOption("resolve_on_small_infeasibility",
-					   "If a locally infeasible problem is infeasible by less than this resolve it" 
+					   "If a locally infeasible problem is infeasible by less than this, resolve it "
                                            "with initial starting point.",
 					   0.,false, 0.,
 					   "It is set to 0 by default with Ipopt. "
