@@ -15,6 +15,7 @@
 #define BonNWayObject_H
 #include "OsiBranchingObject.hpp"
 #include "CbcConsequence.hpp"
+#include <list>
 
 namespace Bonmin {
 class n_way_consequences {
@@ -50,6 +51,7 @@ public:
   }
 
 };
+
 class BonNWayObject : public OsiObject {
 
 public:
@@ -106,6 +108,10 @@ public:
     }
 
     void make_quick(){quicky_ = true;}
+
+    void set_only_frac_branches(int depth){
+      only_frac_branch_ = depth;
+    }
 private:
     /// data
 
@@ -119,6 +125,8 @@ private:
 
     /// Quicky only branch up on variables with non zero value
     bool quicky_;
+    /// Only branch on fractional variables (last branch puts all of them to 0)
+    int only_frac_branch_;
 };
 /** N way branching Object class.
     Variable is number of set.
@@ -135,7 +143,7 @@ public:
         this is so -1 and +1 have similarity to normal
     */
     BonNWayBranchingObject (OsiSolverInterface * solver,  const BonNWayObject * nway,
-                            int numberBranches, const int * order);
+                            const std::vector<int>& order, const std::list<int>& skipped);
 
     // Copy constructor
     BonNWayBranchingObject ( const BonNWayBranchingObject &);
@@ -159,7 +167,7 @@ public:
     /** The number of branch arms created for this branching object
     */
     virtual int numberBranches() const {
-        return numberInSet_;
+        return static_cast<int>(order_.size()) + (!skipped_.empty());
     }
     /// Is this a two way object (-1 down, +1 up)
     virtual bool twoWay() const {
@@ -182,14 +190,12 @@ public:
       return branchIndex_ - 1;
     }
 private:
-    /// order of branching 
-    int * order_;
     /// Points back to object
     const BonNWayObject * object_;
-    /// Number in set
-    int numberInSet_;
-    /// 
-    int way_;
+    /// order of branching 
+    std::vector<int> order_;
+    /// Is only branching on a subset of variables (has to do a last branch with all variables in order set to 0)
+    std::list<int> skipped_;
 };
 
 }

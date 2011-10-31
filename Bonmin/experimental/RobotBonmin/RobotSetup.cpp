@@ -4,9 +4,10 @@
 //
 // Authors :
 // Pierre Bonami, Université de la Méditérannée
-// Hassan Hijazi, Orange Labs
 //
 // Date : 05/22/2010
+
+#include <climits>
 
 #include "BonminConfig.h"
 #include "BonStrongBranchingSolver.hpp"
@@ -44,6 +45,10 @@ namespace Bonmin
      BonminSetup::registerAllOptions(roptions);
      BonNWayChoose::registerOptions(roptions);
 
+
+    roptions->AddLowerBoundedIntegerOption("branch_on_frac_only",
+        "Starting at given depth branch on the subset of fractional variables (and set the last branch that one of them is 1)",
+        0,INT_MAX,"");
 
     roptions->AddStringOption2("do_a_quick_one",
         "Do we try our luck?",
@@ -102,6 +107,9 @@ namespace Bonmin
 
     int do_quick;
     options()->GetEnumValue("do_a_quick_one", do_quick, prefix());
+    int depth_frac;
+    options()->GetIntegerValue("branch_on_frac_only", depth_frac, prefix());
+
     // pass user set Sos constraints (code inspired from CoinSolve.cpp)
     const TMINLP::SosInfo * sos = nonlinearSolver()->model()->sosConstraints();
     if (!getIntParameter(BabSetupBase::DisableSos) && sos && sos->num > 0) //we have some sos constraints
@@ -167,6 +175,7 @@ namespace Bonmin
 
         if(do_quick)
           nway->make_quick();
+        nway->set_only_frac_branches(depth_frac);
         if (hasPriorities && sosPriorities && sosPriorities[i]) {
           objects[i]->setPriority(sosPriorities[i]);
         }

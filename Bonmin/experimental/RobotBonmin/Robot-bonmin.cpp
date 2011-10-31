@@ -4,7 +4,6 @@
 //
 // Authors :
 // Pierre Bonami, Université de la Méditérannée
-// Hassan Hijazi, Orange Labs
 //
 // Date : 05/22/2010
 
