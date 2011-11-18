@@ -32,6 +32,7 @@ libbonmininterfaces_la_SOURCES = \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
+	BonTMINLP2OsiLP.cpp BonTMINLP2OsiLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
 	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \

@@ -17,6 +17,7 @@
 #include "BonTMINLP.hpp"
 #include "BonTMINLP2TNLP.hpp"
 #include "BonTNLP2FPNLP.hpp"
+#include "BonTMINLP2OsiLP.hpp"
 #include "BonTNLPSolver.hpp"
 #include "CoinTime.hpp"
 #include <climits>
@@ -1718,6 +1719,16 @@ OsiTMINLPInterface::getStrParam(OsiStrParam key, std::string & value) const
 
   return true;
 }
+
+void 
+OsiTMINLPInterface::set_linearizer(Ipopt::SmartPtr<TMINLP2OsiLP> linearizer)
+{
+  linearizer_ = new TMINLP2OsiLP(*linearizer);
+  linearizer_->set_tols(tiny_, veryTiny_, infty_);
+  linearizer_->set_model(GetRawPtr(problem_));
+}
+
+
 
 void
 OsiTMINLPInterface::randomStartingPoint()

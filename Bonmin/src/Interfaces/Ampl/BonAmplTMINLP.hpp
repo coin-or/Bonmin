@@ -19,6 +19,7 @@
 #include "CoinPackedMatrix.hpp"
 #include "OsiCuts.hpp"
 #include "BonRegisteredOptions.hpp"
+#include "BonTypes.hpp"
 
 /* non Ipopt forward declaration */
 struct ASL_pfgh;
@@ -72,6 +73,9 @@ namespace Bonmin
 
     /** Read suffixes which indicate which constraints are convex.*/
     void read_convexities();
+
+    /** Read suffixes used to apply perspective in OA to some of the constraints.*/
+    void read_persp();
 
     /** Read suffixes on objective functions for upper bounding*/
     void read_obj_suffixes();
@@ -261,6 +265,11 @@ namespace Bonmin
     {
       return hasLinearObjective_;
     }
+
+  /** Access array describing constraint to which perspectives should be applied.*/
+  virtual const int * get_const_xtra_id() const{
+    return c_extra_id_();
+  }
   private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
@@ -298,6 +307,9 @@ namespace Bonmin
 
     /** Store constraints types.*/
     TMINLP::Convexity * constraintsConvexities_;
+
+    /** Store perspective information.*/
+    vector<int> c_extra_id_; 
 
     /** Ipopt::Number of nonConvex constraints.*/
     int numberNonConvex_;

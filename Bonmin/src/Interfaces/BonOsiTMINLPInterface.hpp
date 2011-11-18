@@ -27,6 +27,7 @@
 namespace Bonmin {
   class TMINLP;
   class TMINLP2TNLP;
+  class TMINLP2OsiLP;
   class TNLP2FPNLP;
   class TNLPSolver;
   class RegisteredOptions;
@@ -1085,6 +1086,7 @@ void getBendersCut(OsiCuts &cs, bool global);
     infty = infty_;
   }
 
+  void set_linearizer(Ipopt::SmartPtr<TMINLP2OsiLP> linearizer);
 protected:
   
   //@}
@@ -1243,6 +1245,8 @@ protected:
   /** Adapter for TNLP to a feasibility problem */
   Ipopt::SmartPtr<TNLP2FPNLP> feasibilityProblem_;
 
+  /** Adapter for TMINLP to an Osi LP  */
+  Ipopt::SmartPtr<TMINLP2OsiLP> linearizer_;
 
   /** \name Arrays to store Jacobian matrix */
   //@{

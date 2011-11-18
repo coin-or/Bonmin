@@ -380,6 +380,12 @@ namespace Bonmin
 
     //@}
 
+
+  /** Access array describing constraint to which perspectives should be applied.*/
+  virtual const int * get_const_xtra_id() const{
+     return tminlp_->get_const_xtra_id();
+  }
+
     /** Round and check the current solution, return norm inf of constraint violation.*/
     double check_solution(OsiObject ** objects = 0, int nObjects = -1);
    protected:
