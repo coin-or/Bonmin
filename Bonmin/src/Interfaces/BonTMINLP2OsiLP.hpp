@@ -75,7 +75,7 @@ namespace Bonmin {
 
    /** Get OAs of nonlinear constraints in x.*/
    virtual void get_oas(OsiCuts & cs, 
-                const double * x, bool getObj);
+                const double * x, bool getObj, bool global);
 
 
    private:

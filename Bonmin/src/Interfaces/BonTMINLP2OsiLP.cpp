@@ -144,7 +144,7 @@ TMINLP2OsiLP::extract(OsiSolverInterface *si,
 
 }
  
-void TMINLP2OsiLP::get_oas(OsiCuts &cs, const double *x, bool getObj) {
+void TMINLP2OsiLP::get_oas(OsiCuts &cs, const double *x, bool getObj, bool global) {
 
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
@@ -210,12 +210,10 @@ void TMINLP2OsiLP::get_oas(OsiCuts &cs, const double *x, bool getObj) {
     }
   }
 
-  vector<int> cut2rowIdx(0);
-
   for(int cutIdx = 0; cutIdx < numCuts; cutIdx++) {
-    //Compute cut violation
     OsiRowCut newCut;
-    newCut.setGloballyValidAsInteger(1);
+    if(global)
+      newCut.setGloballyValidAsInteger(1);
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);

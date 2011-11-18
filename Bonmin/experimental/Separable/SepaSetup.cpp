@@ -86,6 +86,21 @@ namespace Bonmin
   void SepaSetup::initializeSepa()
   {
 
+    //Test that suffixes have been read
+    OsiTMINLPInterface * nlp = nonlinearSolver();
+    const int * xtra_id = nlp->problem()->get_const_xtra_id();
+    int m = nlp->getNumRows();
+    if(xtra_id != NULL){
+      for(int i = 0 ; i < m ; i++){
+        if(xtra_id[i] > 0)
+        printf("Id of %i is %i\n", i, xtra_id[i]);
+      }
+    }
+    else{
+      printf("no ids for perspectives\n");
+    }
+
+
     int doOuter;
     int nbAp = 10;
     options()->GetEnumValue("initial_outer_description", doOuter, prefix_.c_str());

@@ -158,8 +158,8 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("primary_var",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
 
     // For marking constraints to which applying perspective
-    suffix_handler->AddAvailableSuffix("per_c",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
-    suffix_handler->AddAvailableSuffix("per_v",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
+    suffix_handler->AddAvailableSuffix("per_c",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
+    suffix_handler->AddAvailableSuffix("per_v",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
 
     // For objectives
     suffix_handler->AddAvailableSuffix("UBObj", AmplSuffixHandler::Objective_Source, AmplSuffixHandler::Index_Type);
@@ -183,6 +183,7 @@ namespace Bonmin
     read_obj_suffixes();
     read_priorities();
     read_convexities();
+    read_persp();
     read_sos();
 
 
@@ -431,8 +432,8 @@ namespace Bonmin
     DBG_ASSERT(asl);
 
     const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
-    const Index * c_per = suffix_handler->GetIntegerSuffixValues("per_c", AmplSuffixHandler::Variable_Source);
-    const Index * v_per = suffix_handler->GetIntegerSuffixValues("per_v", AmplSuffixHandler::Constraint_Source);
+    const Index * c_per = suffix_handler->GetIntegerSuffixValues("per_c", AmplSuffixHandler::Constraint_Source);
+    const Index * v_per = suffix_handler->GetIntegerSuffixValues("per_v", AmplSuffixHandler::Variable_Source);
 
     if(c_per == NULL && v_per == NULL){//No suffixes
       return;
@@ -444,29 +445,26 @@ namespace Bonmin
 
     c_extra_id_.clear();
     c_extra_id_.resize(n_con, -1);
-    std::map<int, std::pair<int, int> > id_map;
+    std::map<int, int> id_map;
 
       for (int i = 0 ; i < n_var ; i++) {
         if(v_per[i] > 0)
-          id_map[v_per[i]] = std::make_pair(i,-1);
+          id_map[v_per[i]] = i;
       }
 
       for (int i = 0 ; i < n_con ; i++) {
         if(c_per[i] > 0){
-          std::map<int, std::pair<int, int> >::iterator k = id_map.find(c_per[i]);
-          if(k != id_map.end())
-            (*k).second.second = i;
+          std::map<int, int >::iterator k = id_map.find(c_per[i]);
+          if(k != id_map.end()){
+            c_extra_id_[i] = (*k).second;
+          }
           else{
-            std::cerr<<"Incorrect suffixes description in ampl model. non_conv's are not declared "<<std::endl;
+            std::cerr<<"Incorrect suffixes description in ampl model. c_per has value attributed to no variable "<<std::endl;
             exit(ERROR_IN_AMPL_SUFFIXES);
           }
+        }
       }
-
-      for(std::map<int, std::pair<int, int> >::iterator k = id_map.begin() ; k != id_map.end() ; k++){
-         c_extra_id_[(*k).second.second] = c_extra_id_[(*k).second.first];
-      }
-  }
- }
+   }
 
   bool AmplTMINLP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g, Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
   {

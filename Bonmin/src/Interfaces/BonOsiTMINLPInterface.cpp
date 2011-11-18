@@ -1915,6 +1915,9 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
                                           int getObj, const double * x2,
                                           double theta, bool global)
 {
+  if(IsValid(linearizer_) && x2 == NULL){
+    linearizer_->get_oas(cs, x, getObj, global);
+  }
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
   problem_to_optimize_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
@@ -2364,6 +2367,10 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
                                             const double * x, bool getObj
                                             )
 {
+  if(IsValid(linearizer_)){
+    linearizer_->extract(&si, x, getObj);
+    return;
+  }
   int n;
   int m;
   int nnz_jac_g;

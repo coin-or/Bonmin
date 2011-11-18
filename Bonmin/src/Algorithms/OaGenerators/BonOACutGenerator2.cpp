@@ -148,10 +148,14 @@ namespace Bonmin
       nlpSol = const_cast<double *>(nlp_->getColSolution());
 
       // Get the cuts outer approximation at the current point
-      const double * toCut = (parameter().addOnlyViolated_)?
-          colsol:NULL;
-      nlp_->getOuterApproximation(cs, nlpSol, 1, toCut,
-                                  parameter().global_);
+      if(parameter().addOnlyViolated_){
+        nlp_->getOuterApproximation(cs, nlpSol, 1, colsol,
+                                     parameter().global_);
+      }
+      else {
+        nlp_->getOuterApproximation(cs, nlpSol, 1, NULL,
+                                     parameter().global_);
+      }
 
       int numberCuts = cs.sizeRowCuts() - numberCutsBefore;
       assert(numberCuts);
