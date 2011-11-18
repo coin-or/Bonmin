@@ -326,6 +326,8 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
                    a = (g - g2) / diff;
                    cut.insert(colIdx, a);
                    ub = a * x[colIdx] - g;
+                   // Get id of binary variable z
+                   // cut.insert(id, -ub);
                    add = true;
     } else
                   cut.insert(colIdx, jValues[i]);
@@ -336,7 +338,7 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
     OsiRowCut newCut;
     newCut.setGloballyValidAsInteger(1);
     newCut.setLb(lb);
-    newCut.setUb(ub);
+    newCut.setUb(ub);// newCut.setUb(0);
     newCut.setRow(cut);
     cs.insert(newCut);
     return true;
