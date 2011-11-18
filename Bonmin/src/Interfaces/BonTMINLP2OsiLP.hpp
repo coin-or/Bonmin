@@ -40,6 +40,8 @@ namespace Bonmin {
     model_(other.model_){
     }
 
+    /** virtual copy constructor*/
+    virtual TMINLP2OsiLP * clone() const = 0;
 
    void set_tols(double tiny, double very_tiny, double infty){
      tiny_ = tiny;
@@ -67,18 +69,14 @@ namespace Bonmin {
 
    /** Build the Outer approximation of model_ in x and put it in si.*/
    virtual void extract(OsiSolverInterface *si, 
-                const double * x, bool getObj);
-
-   virtual 
-   void addObjectiveFunction(OsiSolverInterface &si, 
-                        const double *x);
+                const double * x, bool getObj) = 0;
 
    /** Get OAs of nonlinear constraints in x.*/
    virtual void get_oas(OsiCuts & cs, 
-                const double * x, bool getObj, bool global);
+                const double * x, bool getObj, bool global) = 0;
 
 
-   private:
+   protected:
    /** Facilitator to clean up coefficient.*/
   inline bool cleanNnz(double &value, double colLower, double colUpper,
     double rowLower, double rowUpper, double colsol,

@@ -1723,7 +1723,7 @@ OsiTMINLPInterface::getStrParam(OsiStrParam key, std::string & value) const
 void 
 OsiTMINLPInterface::set_linearizer(Ipopt::SmartPtr<TMINLP2OsiLP> linearizer)
 {
-  linearizer_ = new TMINLP2OsiLP(*linearizer);
+  linearizer_ = linearizer->clone();
   linearizer_->set_tols(tiny_, veryTiny_, infty_);
   linearizer_->set_model(GetRawPtr(problem_));
 }
@@ -1917,6 +1917,7 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
 {
   if(IsValid(linearizer_) && x2 == NULL){
     linearizer_->get_oas(cs, x, getObj, global);
+    return;
   }
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
@@ -2029,7 +2030,6 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     if(global) {
       newCut.setGloballyValidAsInteger(1);
     }
-    //newCut.setEffectiveness(99.99e99);
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
@@ -2473,6 +2473,8 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
       //rowUp[jRow_[i]] += value;
     } 
   }
+
+
   CoinPackedMatrix mat(true, jRow_, jCol_, jValues_, nnz_jac_g);
   mat.setDimensions(m,n); // In case matrix was empty, this should be enough
   
