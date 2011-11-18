@@ -75,7 +75,7 @@ namespace Bonmin
     void read_convexities();
 
     /** Read suffixes used to apply perspective in OA to some of the constraints.*/
-    void read_persp();
+    void read_onoff();
 
     /** Read suffixes on objective functions for upper bounding*/
     void read_obj_suffixes();
@@ -266,7 +266,7 @@ namespace Bonmin
       return hasLinearObjective_;
     }
 
-  /** Access array describing constraint to which perspectives should be applied.*/
+  /** Access array describing onoff constraint.*/
   virtual const int * get_const_xtra_id() const{
     return c_extra_id_();
   }
@@ -308,7 +308,7 @@ namespace Bonmin
     /** Store constraints types.*/
     TMINLP::Convexity * constraintsConvexities_;
 
-    /** Store perspective information.*/
+    /** Store onoff information.*/
     vector<int> c_extra_id_; 
 
     /** Ipopt::Number of nonConvex constraints.*/

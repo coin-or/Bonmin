@@ -157,9 +157,9 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("non_conv",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
     suffix_handler->AddAvailableSuffix("primary_var",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
 
-    // For marking constraints to which applying perspective
-    suffix_handler->AddAvailableSuffix("per_c",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
-    suffix_handler->AddAvailableSuffix("per_v",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
+    // For marking onoff constraints and indicator variables
+    suffix_handler->AddAvailableSuffix("onoff_c",AmplSuffixHandler::Constraint_Source, AmplSuffixHandler::Index_Type);
+    suffix_handler->AddAvailableSuffix("onoff_v",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Index_Type);
 
     // For objectives
     suffix_handler->AddAvailableSuffix("UBObj", AmplSuffixHandler::Objective_Source, AmplSuffixHandler::Index_Type);
@@ -183,7 +183,7 @@ namespace Bonmin
     read_obj_suffixes();
     read_priorities();
     read_convexities();
-    read_persp();
+    read_onoff();
     read_sos();
 
 
@@ -426,19 +426,19 @@ namespace Bonmin
   }
 
 
-  void AmplTMINLP::read_persp()
+  void AmplTMINLP::read_onoff()
   {
     ASL_pfgh* asl = ampl_tnlp_->AmplSolverObject();
     DBG_ASSERT(asl);
 
     const AmplSuffixHandler * suffix_handler = GetRawPtr(suffix_handler_);
-    const Index * c_per = suffix_handler->GetIntegerSuffixValues("per_c", AmplSuffixHandler::Constraint_Source);
-    const Index * v_per = suffix_handler->GetIntegerSuffixValues("per_v", AmplSuffixHandler::Variable_Source);
+    const Index * onoff_c = suffix_handler->GetIntegerSuffixValues("onoff_c", AmplSuffixHandler::Constraint_Source);
+    const Index * onoff_v = suffix_handler->GetIntegerSuffixValues("onoff_v", AmplSuffixHandler::Variable_Source);
 
-    if(c_per == NULL && v_per == NULL){//No suffixes
+    if(onoff_c == NULL && onoff_v == NULL){//No suffixes
       return;
     } 
-    if(c_per == NULL || v_per == NULL){// If one in non-null both should be
+    if(onoff_c == NULL || onoff_v == NULL){// If one in non-null both should be
         std::cerr<<"Incorrect suffixes description in ampl model.  One of per_v or per_c is declared but not the other."<<std::endl;
         exit(ERROR_IN_AMPL_SUFFIXES);
     } 
@@ -448,18 +448,18 @@ namespace Bonmin
     std::map<int, int> id_map;
 
       for (int i = 0 ; i < n_var ; i++) {
-        if(v_per[i] > 0)
-          id_map[v_per[i]] = i;
+        if(onoff_v[i] > 0)
+          id_map[onoff_v[i]] = i;
       }
 
       for (int i = 0 ; i < n_con ; i++) {
-        if(c_per[i] > 0){
-          std::map<int, int >::iterator k = id_map.find(c_per[i]);
+        if(onoff_c[i] > 0){
+          std::map<int, int >::iterator k = id_map.find(onoff_c[i]);
           if(k != id_map.end()){
             c_extra_id_[i] = (*k).second;
           }
           else{
-            std::cerr<<"Incorrect suffixes description in ampl model. c_per has value attributed to no variable "<<std::endl;
+            std::cerr<<"Incorrect suffixes description in ampl model. onoff_c has value attributed to no variable "<<std::endl;
             exit(ERROR_IN_AMPL_SUFFIXES);
           }
         }
