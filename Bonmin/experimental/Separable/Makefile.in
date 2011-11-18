@@ -58,7 +58,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_sepa_OBJECTS = Sepa.$(OBJEXT) SepaSetup.$(OBJEXT) \
-	BonHeuristicInnerApproximation.$(OBJEXT) \
+	SepaTMINLP2OsiLP.$(OBJEXT) \
+	SepaHeuristicInnerApproximation.$(OBJEXT) \
 	BonOuterDescription.$(OBJEXT)
 sepa_OBJECTS = $(am_sepa_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -316,8 +317,9 @@ AM_CPPFLAGS = \
 ########################################################################
 sepa_SOURCES = Sepa.cpp \
                SepaSetup.cpp SepaSetup.hpp \
-               BonHeuristicInnerApproximation.hpp \
-               BonHeuristicInnerApproximation.cpp \
+               SepaTMINLP2OsiLP.cpp  SepaTMINLP2OsiLP.hpp \
+               SepaHeuristicInnerApproximation.hpp \
+               SepaHeuristicInnerApproximation.cpp \
                BonOuterDescription.cpp \
                BonOuterDescription.hpp
 
@@ -404,10 +406,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonHeuristicInnerApproximation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOuterDescription.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sepa.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SepaHeuristicInnerApproximation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SepaSetup.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SepaTMINLP2OsiLP.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

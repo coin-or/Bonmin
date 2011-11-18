@@ -12,10 +12,10 @@
 #define SepaSetup_H
 #include "BonBonminSetup.hpp"
 #include "BonAmplSetup.hpp"
-namespace Bonmin
+namespace Sepa
 {
   /** algorithm setup. */
-  class SepaSetup : public BonminSetup
+  class SepaSetup : public Bonmin::BonminSetup
   {
   public:
     /** Default constructor. */
@@ -25,11 +25,11 @@ namespace Bonmin
 
     /** Copy but uses an other nlp.*/
     SepaSetup(const SepaSetup &setup,
-                OsiTMINLPInterface &nlp);
+                Bonmin::OsiTMINLPInterface &nlp);
 
     /** Copy but uses another nlp and algorithm.*/
     SepaSetup(const SepaSetup &setup,
-                OsiTMINLPInterface &nlp,
+                Bonmin::OsiTMINLPInterface &nlp,
                 const std::string & prefix);
     /** virtual copy constructor. */
     virtual BabSetupBase * clone() const
@@ -41,11 +41,11 @@ namespace Bonmin
     //      return new SepaSetup(*this, nlp);
     //    }
     /** Make a copy with solver replace by one passed .*/
-    SepaSetup *clone(OsiTMINLPInterface&nlp)const{
+    SepaSetup *clone(Bonmin::OsiTMINLPInterface&nlp)const{
       return new SepaSetup(*this, nlp);
     }
     /** Make a copy but take options with different prefix.*/
-    SepaSetup *clone(OsiTMINLPInterface &nlp, const std::string & prefix)const{
+    SepaSetup *clone(Bonmin::OsiTMINLPInterface &nlp, const std::string & prefix)const{
       return new SepaSetup(*this, nlp, prefix);
     }
     virtual ~SepaSetup()
@@ -58,16 +58,16 @@ namespace Bonmin
     /** Register all bonmin type executable options.*/
     static void registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
     /** Initialize, read options and create appropriate bonmin setup.*/
-    void initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver = true);
+    void initialize(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp, bool createContinuousSolver = true);
     /** Initialize, read options and create appropriate bonmin setup.*/
-    void initialize(const OsiTMINLPInterface& nlpSi, bool createContinuousSolver = true);
+    void initialize(const Bonmin::OsiTMINLPInterface& nlpSi, bool createContinuousSolver = true);
 
     /** Ampl initialization*/
 void initialize(char **& argv)
   {
     readOptionsFile();
     /* Read the model.*/
-    Ipopt::SmartPtr<AmplTMINLP> model = new AmplTMINLP(ConstPtr(journalist()), roptions(), options(),
+    Ipopt::SmartPtr<Bonmin::AmplTMINLP> model = new Bonmin::AmplTMINLP(ConstPtr(journalist()), roptions(), options(),
                                                 argv, NULL, "bonmin", NULL);
     mayPrintDoc();
     initialize(Ipopt::GetRawPtr(model), true);

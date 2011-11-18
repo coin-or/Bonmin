@@ -33,8 +33,9 @@ AM_CPPFLAGS = \
 
 sepa_SOURCES = Sepa.cpp \
                SepaSetup.cpp SepaSetup.hpp \
-               BonHeuristicInnerApproximation.hpp \
-               BonHeuristicInnerApproximation.cpp \
+               SepaTMINLP2OsiLP.cpp  SepaTMINLP2OsiLP.hpp \
+               SepaHeuristicInnerApproximation.hpp \
+               SepaHeuristicInnerApproximation.cpp \
                BonOuterDescription.cpp \
                BonOuterDescription.hpp
 

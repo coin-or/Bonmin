@@ -12,39 +12,42 @@
 #include "OsiClpSolverInterface.hpp"
 
 #include "SepaSetup.hpp"
-#include "BonHeuristicInnerApproximation.hpp"
+#include "SepaTMINLP2OsiLP.hpp"
+#include "SepaHeuristicInnerApproximation.hpp"
 #include "BonOuterDescription.hpp"
-namespace Bonmin
+
+namespace Sepa
 {
   SepaSetup::SepaSetup(const CoinMessageHandler * handler):BonminSetup(handler)
-  {}
+  {
+  }
 
   SepaSetup::SepaSetup(const SepaSetup &other):BonminSetup(other)
   {}
 
   SepaSetup::SepaSetup(const SepaSetup &other,
-                           OsiTMINLPInterface &nlp):
+                           Bonmin::OsiTMINLPInterface &nlp):
       BonminSetup(other, nlp)
   {
   }
 
   SepaSetup::SepaSetup(const SepaSetup &other,
-                           OsiTMINLPInterface &nlp,
+                           Bonmin::OsiTMINLPInterface &nlp,
                            const std::string &prefix):
     BonminSetup(other, nlp, prefix)
   {
-   Algorithm algo = getAlgorithm();
-    if (algo == B_OA)
+   Bonmin::Algorithm algo = getAlgorithm();
+    if (algo == Bonmin::B_OA)
       initializeSepa();
   }
 
   void SepaSetup::registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-     BonminSetup::registerAllOptions(roptions);
+     Bonmin::BonminSetup::registerAllOptions(roptions);
 
-     HeuristicInnerApproximation::registerOptions(roptions);
+     Sepa::HeuristicInnerApproximation::registerOptions(roptions);
 
-        roptions->SetRegisteringCategory("Initial Approximations descriptions", RegisteredOptions::UndocumentedCategory);
+        roptions->SetRegisteringCategory("Initial Approximations descriptions", Bonmin::RegisteredOptions::UndocumentedCategory);
 	roptions->AddStringOption2("initial_outer_description",
 		"Do we add all Outer Approximation constraints defining the initial Outer Approximation description of the MINLP. See the number_approximations_initial_outer option for fixing the number of approximation points",
 		"yes",
@@ -67,38 +70,46 @@ namespace Bonmin
 
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
   void
-  SepaSetup::initialize(Ipopt::SmartPtr<TMINLP> tminlp, bool createContinuousSolver /*= false*/)
+  SepaSetup::initialize(Ipopt::SmartPtr<Bonmin::TMINLP> tminlp, bool createContinuousSolver /*= false*/)
   {
-    BonminSetup::initialize(tminlp, createContinuousSolver);
-    if (getAlgorithm() == B_OA)
+
+    int do_outer;
+    int n_approx;
+    options()->GetEnumValue("initial_outer_description", do_outer, prefix_.c_str());
+    options()->GetIntegerValue("number_approximations_initial_outer",
+       		n_approx, prefix_.c_str());
+    SepaTMINLP2OsiLP* linearizer = new SepaTMINLP2OsiLP;
+    linearizer_ = linearizer;
+    if(do_outer)
+      linearizer->set_num_approx(n_approx);
+
+    Bonmin::BonminSetup::initialize(tminlp, createContinuousSolver);
+
+    if (getAlgorithm() == Bonmin::B_OA)
       initializeSepa();
   }
 
   /** Initialize, read options and create appropriate bonmin setup using initialized tminlp.*/
   void
-  SepaSetup::initialize(const OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/)
+  SepaSetup::initialize(const Bonmin::OsiTMINLPInterface &nlpSi, bool createContinuousSolver /*= false*/)
   {
+    int do_outer;
+    int n_approx;
+    options()->GetEnumValue("initial_outer_description", do_outer, prefix_.c_str());
+    options()->GetIntegerValue("number_approximations_initial_outer",
+       		n_approx, prefix_.c_str());
+    SepaTMINLP2OsiLP* linearizer = new SepaTMINLP2OsiLP;
+    linearizer_ = linearizer;
+    if(do_outer)
+      linearizer->set_num_approx(n_approx);
+    
     BonminSetup::initialize(nlpSi, createContinuousSolver);
-    if (getAlgorithm() == B_OA)
+    if (getAlgorithm() == Bonmin::B_OA)
       initializeSepa();
   }
 
   void SepaSetup::initializeSepa()
   {
-
-    //Test that suffixes have been read
-    OsiTMINLPInterface * nlp = nonlinearSolver();
-    const int * xtra_id = nlp->problem()->get_const_xtra_id();
-    int m = nlp->getNumRows();
-    if(xtra_id != NULL){
-      for(int i = 0 ; i < m ; i++){
-        if(xtra_id[i] > 0)
-        printf("Id of %i is %i\n", i, xtra_id[i]);
-      }
-    }
-    else{
-      printf("no ids for perspectives\n");
-    }
 
 
     int doOuter;
@@ -106,13 +117,17 @@ namespace Bonmin
     options()->GetEnumValue("initial_outer_description", doOuter, prefix_.c_str());
     options()->GetIntegerValue("number_approximations_initial_outer",
        		nbAp, prefix_.c_str());
+
+#ifdef USE_OLD_FUNC
     if(doOuter)
       addOuterDescription(*nonlinearSolver(), *continuousSolver(), nonlinearSolver()->getColSolution(), nbAp, false);
+#endif
+  
     int doInner;
     
     options()->GetEnumValue("heuristic_inner_approximation", doInner, prefix_.c_str());
     if(doInner){
-      HeuristicInnerApproximation * inner = new HeuristicInnerApproximation(this);
+      Sepa::HeuristicInnerApproximation * inner = new Sepa::HeuristicInnerApproximation(this);
       HeuristicMethod h;
       h.heuristic = inner;
       h.id = "InnerApproximation";

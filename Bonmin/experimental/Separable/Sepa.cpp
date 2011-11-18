@@ -20,7 +20,6 @@
 #include "BonCbc.hpp"
 
 #define CATCH_ERRORS
-using namespace Bonmin;
 int main (int argc, char *argv[])
 {
   using namespace Ipopt;
@@ -43,15 +42,15 @@ int main (int argc, char *argv[])
   {
 
     //FILE * fp = fopen("log","w");
-    SepaSetup bonmin;
+    Sepa::SepaSetup bonmin;
     bonmin.initialize(argv);
-    Bab bb;
+    Bonmin::Bab bb;
 
     bb(bonmin);//do branch and bound
 
   }
 #ifdef CATCH_ERRORS
-  catch(TNLPSolver::UnsolvedError *E) {
+  catch(Bonmin::TNLPSolver::UnsolvedError *E) {
     E->writeDiffFiles();
     E->printError(std::cerr);
     //There has been a failure to solve a problem with Ipopt.
@@ -59,7 +58,7 @@ int main (int argc, char *argv[])
     //Now depending on what algorithm has been called (B-BB or other) the failed problem may be at different place.
     //    const OsiSolverInterface &si1 = (algo > 0) ? nlpSolver : *model.solver();
   }
-  catch(OsiTMINLPInterface::SimpleError &E) {
+  catch(Bonmin::OsiTMINLPInterface::SimpleError &E) {
     std::cerr<<E.className()<<"::"<<E.methodName()
     <<std::endl
     <<E.message()<<std::endl;

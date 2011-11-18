@@ -152,9 +152,9 @@ void getMyOuterApproximation(
 		//newCut.setEffectiveness(99.99e99);
 
         //********* Perspective Extension ********//
-        int* ids = problem->get_const_xtra_id(); // vector of indices corresponding to the binary variable activating the corresponding constraint
+        const int* ids = problem->get_const_xtra_id(); // vector of indices corresponding to the binary variable activating the corresponding constraint
         // Get the index of the corresponding indicator binary variable
-        int binary_id = ids[ind]; // index corresponding to the binary variable activating the corresponding constraint
+        int binary_id = (ids == NULL) ? -1 : ids[ind];// index corresponding to the binary variable activating the corresponding constraint
         if(binary_id>0) {// If this hyperplane is a linearization of a disjunctive constraint, we link its righthand (or lefthand) side to the corresponding indicator binary variable
             if (lb > -infty) { // ∂x ≥ lb => ∂x - lb*z ≥ 0
                 cut.insert(binary_id, -lb);
