@@ -92,7 +92,6 @@ void getMyOuterApproximation(
 	const double * duals = si.getRowPrice() + 2 * n;
 	double infty = si.getInfinity();
 	double nlp_infty = infty;
-
 	int rowIdx = ind;
 
 	if (rowLower[rowIdx] > -nlp_infty)
@@ -121,6 +120,7 @@ void getMyOuterApproximation(
 			rowLower[rowIdx], rowUpper[rowIdx], x[colIdx], lb, ub,
 			tiny, veryTiny)) {
 		cut.insert(colIdx, jValues[i]);
+        
 		if (lb > -infty)
 		lb += jValues[i] * x[colIdx];
 		if (ub < infty)
@@ -150,8 +150,31 @@ void getMyOuterApproximation(
 		newCut.setGloballyValidAsInteger(1);
 		}
 		//newCut.setEffectiveness(99.99e99);
-		newCut.setLb(lb);
-		newCut.setUb(ub);
+
+        //********* Perspective Extension ********//
+        int* ids = problem->get_const_xtra_id(); // vector of indices corresponding to the binary variable activating the corresponding constraint
+        // Get the index of the corresponding indicator binary variable
+        int binary_id = ids[ind]; // index corresponding to the binary variable activating the corresponding constraint
+        if(binary_id>0) {// If this hyperplane is a linearization of a disjunctive constraint, we link its righthand (or lefthand) side to the corresponding indicator binary variable
+            if (lb > -infty) { // ∂x ≥ lb => ∂x - lb*z ≥ 0
+                cut.insert(binary_id, -lb);
+                newCut.setLb(0);
+                newCut.setUb(ub);
+                
+            }
+            if (ub < infty) { // ∂x ≤ ub => ∂x - ub*z ≤ 0
+                cut.insert(binary_id, -ub);
+                newCut.setLb(lb);
+                newCut.setUb(0);
+                
+            }
+        }
+        else {
+            newCut.setLb(lb);
+            newCut.setUb(ub);
+        }
+        //********* Perspective Extension ********//
+
 		newCut.setRow(cut);
 		//newCut.print();
 		cs.insert(newCut);

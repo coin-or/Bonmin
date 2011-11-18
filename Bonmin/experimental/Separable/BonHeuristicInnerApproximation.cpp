@@ -315,7 +315,6 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
   problem->eval_grad_gi(n, x2, 0, ind, nnz, jCol(), NULL);
   vector<double> jValues(nnz);
   problem->eval_grad_gi(n, x2, 0, ind, nnz, NULL, jValues());
-
   bool add = false;
   for (int i = 0; i < nnz; i++) {
     const int &colIdx = jCol[i];
@@ -326,8 +325,6 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
                    a = (g - g2) / diff;
                    cut.insert(colIdx, a);
                    ub = a * x[colIdx] - g;
-                   // Get id of binary variable z
-                   // cut.insert(id, -ub);
                    add = true;
     } else
                   cut.insert(colIdx, jValues[i]);
@@ -338,7 +335,20 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
     OsiRowCut newCut;
     newCut.setGloballyValidAsInteger(1);
     newCut.setLb(lb);
-    newCut.setUb(ub);// newCut.setUb(0);
+    
+      //********* Perspective Extension ********//
+    int binary_id = 0; // index corresponding to the binary variable activating the corresponding constraint
+    int* ids = problem->get_const_xtra_id(); // vector of indices corresponding to the binary variable activating the corresponding constraint
+    // Get the index of the corresponding indicator binary variable
+    binary_id = ids[ind];
+    if(binary_id>0) {// If this hyperplane is a linearization of a disjunctive constraint, we link its righthand side to the corresponding indicator binary variable
+        cut.insert(binary_id, -ub); // ∂x ≤ ub => ∂x - ub*z ≤ 0
+        newCut.setUb(0);
+    }
+    else
+        newCut.setUb(ub);
+    //********* Perspective Extension ********//
+
     newCut.setRow(cut);
     cs.insert(newCut);
     return true;
