@@ -628,8 +628,13 @@ namespace Bonmin
         continuousSolver_->passInMessageHandler(messageHandler_);
       continuousSolver_->messageHandler()->setLogLevel(lpLogLevel);
       nonlinearSolver_->forceSolverOutput(intParam_[RootLogLevel]); 
+
+      if(IsValid(linearizer_))//Use user provided linearizer
+        nonlinearSolver_->set_linearizer(linearizer_);
+
       nonlinearSolver_->extractLinearRelaxation(*continuousSolver_);
       nonlinearSolver_->setSolverOutputToDefault(); 
+
       // say bound dubious, does cuts at solution
       OsiBabSolver * extraStuff = new OsiBabSolver(3);
       continuousSolver_->setAuxiliaryInfo(extraStuff);

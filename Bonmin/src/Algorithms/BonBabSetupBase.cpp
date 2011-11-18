@@ -55,6 +55,7 @@ namespace Bonmin
   BabSetupBase::BabSetupBase(const CoinMessageHandler * handler):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
+      linearizer_(NULL),
       cutGenerators_(),
       heuristics_(),
       branchingMethod_(NULL),
@@ -77,6 +78,7 @@ namespace Bonmin
   BabSetupBase::BabSetupBase(const BabSetupBase & other):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
+      linearizer_(other.linearizer_),
       cutGenerators_(),
       heuristics_(),
       branchingMethod_(NULL),
@@ -128,6 +130,7 @@ namespace Bonmin
                              OsiTMINLPInterface &nlp):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
+      linearizer_(other.linearizer_),
       cutGenerators_(),
       heuristics_(),
       branchingMethod_(NULL),
@@ -179,6 +182,7 @@ namespace Bonmin
                              const std::string & prefix):
       nonlinearSolver_(other.nonlinearSolver_),
       continuousSolver_(NULL),
+      linearizer_(other.linearizer_),
       cutGenerators_(),
       heuristics_(),
       branchingMethod_(NULL),
@@ -212,6 +216,7 @@ namespace Bonmin
   BabSetupBase::BabSetupBase(Ipopt::SmartPtr<TMINLP> tminlp, const CoinMessageHandler * handler):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
+      linearizer_(NULL),
       cutGenerators_(),
       heuristics_(),
       branchingMethod_(NULL),
@@ -263,6 +268,7 @@ namespace Bonmin
   BabSetupBase::BabSetupBase(const OsiTMINLPInterface& nlp):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
+      linearizer_(NULL),
       cutGenerators_(),
       heuristics_(),
       branchingMethod_(NULL),
@@ -296,6 +302,7 @@ namespace Bonmin
   BabSetupBase::BabSetupBase( Ipopt::SmartPtr<TNLPSolver> app):
       nonlinearSolver_(NULL),
       continuousSolver_(NULL),
+      linearizer_(NULL),
       cutGenerators_(),
       heuristics_(),
       branchingMethod_(NULL),

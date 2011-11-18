@@ -16,6 +16,9 @@
 #include "CbcHeuristic.hpp"
 #include "OsiChooseVariable.hpp"
 #include "BonOsiTMINLPInterface.hpp"
+#include "IpSmartPtr.hpp"
+#include "BonTMINLP2OsiLP.hpp"
+
 namespace Bonmin
 {
   /** A class to have all elements necessary to setup a branch-and-bound.*/
@@ -323,6 +326,11 @@ namespace Bonmin
     void addCutGenerator(CuttingMethod & cg){
       cutGenerators_.push_back(cg);
     }
+
+    void set_linearizer(TMINLP2OsiLP * linearizer){
+      linearizer_ = linearizer;
+    }
+
   protected:
     /** Set the priorities into OsiTMINLPInterface when needed.*/
     void setPriorities();
@@ -341,6 +349,8 @@ namespace Bonmin
     OsiTMINLPInterface * nonlinearSolver_;
     /** Storage of continuous solver.*/
     OsiSolverInterface * continuousSolver_;
+    /** Method to linearize MINLPs */
+    Ipopt::SmartPtr<TMINLP2OsiLP> linearizer_;
     /** Cut generation methods. */
     CuttingMethods cutGenerators_;
     /** Heuristic methods. */
