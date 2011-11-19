@@ -337,10 +337,8 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
     newCut.setLb(lb);
     
       //********* Perspective Extension ********//
-    int binary_id = 0; // index corresponding to the binary variable activating the corresponding constraint
     int* ids = problem->get_const_xtra_id(); // vector of indices corresponding to the binary variable activating the corresponding constraint
-    // Get the index of the corresponding indicator binary variable
-    binary_id = ids[ind];
+    int binary_id = (ids == NULL) ? -1 : ids[ind]; // Get the index of the corresponding indicator binary variable
     if(binary_id>0) {// If this hyperplane is a linearization of a disjunctive constraint, we link its righthand side to the corresponding indicator binary variable
         cut.insert(binary_id, -ub); // ∂x ≤ ub => ∂x - ub*z ≤ 0
         newCut.setUb(0);
