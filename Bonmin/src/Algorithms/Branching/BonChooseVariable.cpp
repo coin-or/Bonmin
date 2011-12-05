@@ -1132,7 +1132,8 @@ BonChooseVariable::updateInformation( int index, int branch,
       statuses_[iBranch] = status;
     }
     else if(solver->isProvenPrimalInfeasible() && fabs(solver->getObjValue()) < 1e-06) {
-      fprintf(stderr, "Very small infeasibility: %g\n", solver->getObjValue());
+      assert(solver->messageHandler() != NULL);
+      *solver->messageHandler() << "Very small infeasibility: " << solver->getObjValue() << CoinMessageEol;
       status = 2;
       statuses_[iBranch] = status;
     }
