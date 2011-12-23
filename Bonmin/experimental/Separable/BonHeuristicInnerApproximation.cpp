@@ -176,62 +176,7 @@ const double* x_u = minlp->x_u();
 const double* g_l = minlp->g_l();
 const double* g_u = minlp->g_u();
 double primalTolerance = 1.0e-6;
-#if 0 // Set to 1 if you need to test the feasibility of the returned solution
-vector<Ipopt::TNLP::LinearityType>  constTypes(numberRows);
-minlp->get_constraints_linearity(numberRows, constTypes());
-feasible = true;
-for (int iColumn=0;iColumn<numberColumns;iColumn++) {
-  double value=newSolution[iColumn];
-  if(value - x_l[iColumn] < -1e-8|| value - x_u[iColumn] > 1e-8) {
-#ifdef DEBUG_BON_HEURISTIC
-    cout<<"It should be infeasible because: "<<endl;
-    cout<<"x_l["<<iColumn<<"]= "<<x_l[iColumn]<<" "
-    <<"x_sol["<<iColumn<<"]= "<<value<<" "
-    <<"x_u["<<iColumn<<"]= "<<x_u[iColumn]<<endl;
-#endif
-    feasible = false;
-    break;
-  }
-  if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
-    if (fabs(floor(value+0.5)-value)>integerTolerance) {
-#ifdef DEBUG_BON_HEURISTIC
-      cout<<"It should be infeasible because: "<<endl;
-      cout<<"x["<<iColumn<<"]= "<<value<<" Should be integer!"<<"\\Integer tolerance = "<<integerTolerance<<"\n";
-#endif
-      feasible = false;
-      break;
-    }
-  }
-}
-minlp->eval_g(numberColumns, newSolution, true,
-    numberRows, new_g_sol);
-for(int iRow=0; iRow<numberRows; iRow++) {
-  if(new_g_sol[iRow]<g_l[iRow]-primalTolerance ||
-      new_g_sol[iRow]>g_u[iRow]+primalTolerance) {
-    if(minlp->optimization_status() != SUCCESS) {
-      feasible = false;
-      break;
-    } else {
-#ifdef DEBUG_BON_HEURISTIC
-      cout<<"It should be infeasible because: "<<endl;
-      cout<<"g_l["<<iRow<<"]= "<<g_l[iRow]<<" "
-      <<"g_sol["<<iRow<<"]= "<<new_g_sol[iRow]<<" "
-      <<"g_u["<<iRow<<"]= "<<g_u[iRow]<<endl;
-      cout<<"primalTolerance= "<<primalTolerance<<endl;
-      if(constTypes[iRow] == TNLP::NON_LINEAR)
-      cout<<"nonLinear constraint number "<<iRow<<endl;
-#endif
-      feasible = false;
-    }
-  }
-}
-#ifdef DEBUG_BON_HEURISTIC
-cout<<"Every thing is feasible"<<endl;
-#endif
-
-
-//#else // fix integer variables and solve the NLP
-#if 0
+#if 1
 if(feasible ) {
 
   std::vector<double> memLow(numberColumns);
@@ -240,13 +185,15 @@ if(feasible ) {
   std::copy(minlp->x_u(), minlp->x_u() + numberColumns, memUpp.begin());
   // fix the integer variables and solve the NLP
   for (int iColumn=0;iColumn<numberColumns;iColumn++) {
-        double value=floor(newSolution[iColumn]+0.5);
-        minlp->SetVariableUpperBound(iColumn, value);
-        minlp->SetVariableLowerBound(iColumn, value);
+        if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
+          double value=floor(newSolution[iColumn]+0.5);
+          minlp->SetVariableUpperBound(iColumn, value);
+          minlp->SetVariableLowerBound(iColumn, value);
+        }
   }
   if(feasible) {
     nlp->initialSolve();
-    if(minlp->optimization_status() != SUCCESS) {
+    if(minlp->optimization_status() != Ipopt::SUCCESS) {
       feasible = false;
     }
     memcpy(newSolution,minlp->x_sol(),numberColumns*sizeof(double));
