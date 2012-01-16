@@ -215,7 +215,7 @@ namespace Bonmin
 	   }
         nLocalSearch_++;
 
-        assert(cutoff < ub);
+        assert(cutoff <= ub);
         subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
             parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()
             );

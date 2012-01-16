@@ -2016,6 +2016,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
       newCut.setGloballyValidAsInteger(1);
     }
     //newCut.setEffectiveness(99.99e99);
+    if(fabs(lb[cutIdx]) < tiny_) lb[cutIdx] = 0;
+    if(fabs(ub[cutIdx]) < tiny_) ub[cutIdx] = 0;
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
@@ -2469,8 +2471,12 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     if(colUpper[i] >= infty_) colUpper[i] = infty;
   }
   
+  for(int i = 0 ; i < rowLow.size() ; i++){
+     if(fabs(rowLow[i]) < tiny_) rowLow[i] = 0.;
+     if(fabs(rowUp[i]) < tiny_) rowUp[i] = 0.;
+  }
   si.loadProblem(mat, colLower(), colUpper(), obj(), rowLow(), rowUp());
-  for(int i = 0 ; i < getNumCols() ; i++) {
+  for(int i = 0 ; i < numcols ; i++) {
     if(isInteger(i))
       si.setInteger(i);
   }
