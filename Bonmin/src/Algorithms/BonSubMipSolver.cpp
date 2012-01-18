@@ -236,9 +236,10 @@ namespace Bonmin {
         CPXENVptr env = cpx_->getEnvironmentPtr();
         CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
         CPXsetdblparam(env, CPX_PARAM_TILIM, max_time);
+        CPXsetintparam(env, CPX_PARAM_CLOCKTYPE, 1);
         CPXsetdblparam(env, CPX_PARAM_EPINT, 1e-08);
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
-      CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
+        CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
 
 #if 0
       CPXsetintparam(env, CPX_PARAM_THREADS, 16);
@@ -364,6 +365,7 @@ namespace Bonmin {
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
       CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
+      CPXsetintparam(env, CPX_PARAM_CLOCKTYPE, 1);
       CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
       CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
       cpx_->messageHandler()->setLogLevel(loglevel);

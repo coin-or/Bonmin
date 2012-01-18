@@ -199,8 +199,6 @@ namespace Bonmin
       if (gap < gap_tol){
 		 milpBound = 1e50;
 		 feasible = 0;
-		 handler_->message(OASUCCESS, messages_)<<"OA finished due to gap tolerance"<<CoinCpuTime() - timeBegin_ 
-		 <<ub<<CoinMessageEol;
 	   }
       //do we perform a new local search ?
       if (feasible && 
@@ -214,8 +212,6 @@ namespace Bonmin
 	  if (gap < gap_tol){
 		 milpBound = 1e50;
 		 feasible = 0;
-		 handler_->message(OASUCCESS, messages_)<<"OA finished due to gap tolerance"<<CoinCpuTime() - timeBegin_ 
-		 <<ub<<CoinMessageEol;
 	   }
         nLocalSearch_++;
 
@@ -260,14 +256,19 @@ namespace Bonmin
 		else {
 		  milpBound = 1e50;
 		  feasible = 0;
-		  handler_->message(OASUCCESS, messages_)<<"OA"<<CoinCpuTime() - timeBegin_ 
-		  <<ub<<CoinMessageEol;
 		}
       }
       
     }
 
-
+   if(milpBound >= cutoff){
+      handler_->message(OASUCCESS, messages_)<<"OA "<<CoinCpuTime() - timeBegin_ 
+                                             <<ub<<milpBound<<CoinMessageEol;
+   }
+   else {
+      handler_->message(OAABORT, messages_)<<"OA "<<CoinCpuTime() - timeBegin_           
+                                             <<ub<<milpBound<<CoinMessageEol;
+   }
    handler_->message(OA_STATS, messages_)<<numberPasses<<nodeCount
                                          <<CoinMessageEol;
 #ifdef OA_DEBUG

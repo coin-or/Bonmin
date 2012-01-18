@@ -238,11 +238,17 @@ namespace Bonmin
         Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u);
 
     /** Returns the constraint linearity.
-     * array should be alocated with length at least n. (default implementation
-     *  just return false and does not fill the array).*/
+     * array should be alocated with length at least m..*/
     virtual bool get_constraints_linearity(Ipopt::Index m, LinearityType* const_types)
     {
       return tminlp_->get_constraints_linearity(m, const_types);
+    }
+
+    /** Returns the variables linearity.
+     * array should be alocated with length at least n..*/
+    virtual bool get_variables_linearity(Ipopt::Index n, LinearityType* var_types)
+    {
+      return tminlp_->get_variables_linearity(n, var_types);
     }
 
     /** returns true if objective is linear.*/

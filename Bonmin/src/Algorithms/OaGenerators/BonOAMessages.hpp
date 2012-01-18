@@ -22,6 +22,7 @@ namespace Bonmin
     UPDATE_LB,
     ABORT,
     OASUCCESS,
+    OAABORT,
     OA_STATS,
     LP_ERROR,
     PERIODIC_MSG,

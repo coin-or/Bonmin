@@ -407,7 +407,6 @@ HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp,
    }
    
    // Hassan IA initial description
-    // Testing Xcode AGAIN
    int InnerDesc = 1;
    if (InnerDesc == 1) {
      OsiCuts cs;
