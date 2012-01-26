@@ -62,6 +62,7 @@ namespace Bonmin
 
     /** return the best known lower bound on the objective value*/
     double bestBound();
+
     /** return the total number of nodes explored.*/
     int numNodes() const
     {
@@ -94,17 +95,7 @@ namespace Bonmin
     {
       return model_;
     }
-    /** Say that algorithm is using Couenne.*/
-    void setUsingCouenne(bool v)
-    {
-      usingCouenne_ = v;
-    }
 
-    /** Get value of usingCouenne variable.*/
-    bool getUsingCouenne()
-    {
-      return usingCouenne_;
-    }
   protected:
     /** Stores the solution of MIP. */
     double * bestSolution_;
@@ -131,9 +122,6 @@ namespace Bonmin
     OsiObject** objects_;
     /** number of objects.*/
     int nObjects_;
-
-    /** Say if current algorithm is Couenne.*/
-    bool usingCouenne_;
   };
 }
 #endif

@@ -77,8 +77,7 @@ namespace Bonmin
       model_(),
       modelHandler_(NULL),
       objects_(0),
-      nObjects_(0),
-      usingCouenne_(false)
+      nObjects_(0)
   {}
 
   /** Destructor.*/
@@ -293,18 +292,8 @@ namespace Bonmin
     // Redundant definition of default branching (as Default == User)
     assert (s.branchingMethod() != NULL);
 
-    if (!usingCouenne_)
-      model_.addObjects (s.continuousSolver()->numberObjects(),
-			 s.continuousSolver()->objects());
-    else {
-      // add nonlinear and integer objects (need to add OsiSOS)
-      int nco = s.continuousSolver () -> numberObjects ();
-      OsiObject **objs = new OsiObject * [nco];
-      for (int i=0; i<nco; i++) 
-	objs [i] = s.continuousSolver () -> objects () [i];
-      model_.addObjects (nco, objs);
-      delete [] objs;
-    }
+    model_.addObjects (s.continuousSolver()->numberObjects(),
+		       s.continuousSolver()->objects());
 
     CbcBranchDefaultDecision branch;
     s.branchingMethod()->setSolver(model_.solver());
@@ -491,10 +480,6 @@ namespace Bonmin
 
     }
 
-    // for Couenne
-    if (usingCouenne_)
-      model_.passInSolverCharacteristics (bonBabInfoPtr);
-
     continuousRelaxation_ =model_.solver()->getObjValue();
     if (specOpt==16)//Set warm start point for Ipopt
     {
@@ -590,7 +575,7 @@ namespace Bonmin
        }
     }
 
-    if (hasFailed && !usingCouenne_) {
+    if (hasFailed) {
     	*model_.messageHandler()
       << "************************************************************" << CoinMessageEol
       << "WARNING : Optimization failed on an NLP during optimization"  << CoinMessageEol
