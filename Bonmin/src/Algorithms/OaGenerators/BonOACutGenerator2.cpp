@@ -172,7 +172,7 @@ namespace Bonmin
       branch_info.solution_ = lp->getColSolution();
       if (!changed)
         changed = isDifferentOnIntegers(*nlp_, objects_, nObjects_,
-                                        0.1,
+                                        parameters_.cbcIntegerTolerance_,
                                         nlp_->getColSolution(), lp->getColSolution());
       if (changed) {
 
