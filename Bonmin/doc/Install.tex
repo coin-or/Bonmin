@@ -77,7 +77,7 @@ invoke configure with the arguments as follows:
 \begin{verbatim}
 
 ./configure --with-cplex-incdir=/usr/ilog/cplex/include/ilcplex \
-  --with-cplex-lib="/usr/ilog/cplex/lib/libcplex.a -lpthread"
+  --with-cplex-lib="-L/usr/ilog/cplex/lib  -lcplex -lpthread"
  \end{verbatim}
  \end{colorverb}
  
@@ -91,7 +91,7 @@ following lines in the {\tt config.site} file:
 \begin{colorverb}
  \begin{verbatim}
 
- with_cplex_lib="/usr/ilog/cplex/lib/libcplex.a -lpthread"
+ with_cplex_lib="-L/usr/ilog/cplex/lib -lcplex -lpthread"
  with_cplex_incdir="/usr/ilog/cplex/include/ilcplex"
  
  \end{verbatim}
