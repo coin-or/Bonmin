@@ -326,6 +326,7 @@ namespace Bonmin{
            registeringCategory = (*i)->RegisteringCategory();
              os<<"\\subsection{"<<registeringCategory<<"}"<<std::endl;      
              os<<"\\label{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
+             os<<"\\htmlanchor{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
            }
        
            (*i)->OutputLatexDescription(jnlst);

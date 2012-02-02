@@ -242,14 +242,14 @@ namespace Bonmin
         -100,0,
         "If $k > 0$, cuts are generated every $k$ nodes, if $-99 < k < 0$ cuts are generated every $-k$ nodes but "
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "if $k=-99$ generate cuts only at the root node, if $k=0$ or $100$ do not generate cuts.");
     roptions->setOptionExtraInfo("lift_and_project_cuts", 119);
     roptions->AddLowerBoundedIntegerOption("reduce_and_split_cuts",
         "Frequency (in terms of nodes) for generating reduce-and-split cuts in branch-and-cut",
         -100,0,
         "If $k > 0$, cuts are generated every $k$ nodes, if $-99 < k < 0$ cuts are generated every $-k$ nodes but "
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "if $k=-99$ generate cuts only at the root node, if $k=0$ or $100$ do not generate cuts.");
     roptions->setOptionExtraInfo("reduce_and_split_cuts", 119);
 
 
@@ -258,7 +258,7 @@ namespace Bonmin
         -100,-5,
         "If $k > 0$, cuts are generated every $k$ nodes, if $-99 < k < 0$ cuts are generated every $-k$ nodes but "
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
-        "if k=-99 generate cuts only at the root node, if k=0 or 100 do not generate cuts.");
+        "if $k=-99$ generate cuts only at the root node, if $k=0$ or $100$ do not generate cuts.");
     roptions->setOptionExtraInfo("clique_cuts", 119);
 
   }
