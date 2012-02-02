@@ -541,8 +541,10 @@ namespace Bonmin
       CbcNlpStrategy * nlpStrategy = dynamic_cast<CbcNlpStrategy *>(model_.strategy());
       if (nlpStrategy)
         hasFailed = nlpStrategy->hasFailed();
-      else
-        throw -1;
+      else {
+        throw CoinError("BonCbc", "Bab", "Inconsistent construction of model_ strategy is"
+                        " not the right type.");
+      }
     }
     else
       hasFailed = s.nonlinearSolver()->hasContinuedOnAFailure();

@@ -828,7 +828,7 @@ namespace Bonmin
       return comparisonDepth_.test(x,y);
     }
     else {
-      throw -1;
+      throw CoinError("DiverCompare","test"," Unknown mode for comparison.");
     }
   }
 

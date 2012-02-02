@@ -276,7 +276,7 @@ TNLPSolver::initializeOptionsAndJournalist(){
   }
   catch(std::bad_alloc){
     journalist_->Printf(Ipopt::J_ERROR, Ipopt::J_MAIN, "\n Not enough memory .... EXIT\n");
-    throw -1;
+    throw CoinError("TNLPSolver", "initializeOptionsAndJournalist", "Not enough memory");
   }
 #ifndef NO_CATCH_ALL
   catch(...){

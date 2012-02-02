@@ -326,13 +326,11 @@ namespace Bonmin
       if(feasible) {
 	nlp->initialSolve();
 	if(minlp->optimization_status() != Ipopt::SUCCESS) {
-          printf("Infeasible for NLP");
 	  feasible = false;
 	}
 	std::copy(x_sol,x_sol+n, newSolution.begin());
       }
     }
-    else {printf("No solution found\n");}
     if(feasible) {
       double newSolutionValue;
       minlp->eval_f(n, newSolution(), true, newSolutionValue); 

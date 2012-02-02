@@ -131,7 +131,7 @@ register_general_options
  roptions->AddLowerBoundedNumberOption("resolve_on_small_infeasibility",
 					   "If a locally infeasible problem is infeasible by less than this, resolve it "
                                            "with initial starting point.",
-					   0.,true, 0.,
+					   0.,false, 0.,
 					   "It is set to 0 by default with Ipopt. "
                                            "For filter Bonmin sets it to a small value.");
   roptions->setOptionExtraInfo("random_point_perturbation_interval",8);
@@ -2030,6 +2030,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     if(global) {
       newCut.setGloballyValidAsInteger(1);
     }
+    if(fabs(lb[cutIdx]) < tiny_) lb[cutIdx] = 0; 
+    if(fabs(ub[cutIdx]) < tiny_) ub[cutIdx] = 0;
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
@@ -2489,8 +2491,13 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     if(colUpper[i] >= infty_) colUpper[i] = infty;
   }
   
+  for(int i = 0 ; i < rowLow.size() ; i++){
+     if(fabs(rowLow[i]) < tiny_) rowLow[i] = 0.;
+     if(fabs(rowUp[i]) < tiny_) rowUp[i] = 0.;
+  }
+
   si.loadProblem(mat, colLower(), colUpper(), obj(), rowLow(), rowUp());
-  for(int i = 0 ; i < getNumCols() ; i++) {
+  for(int i = 0 ; i < numcols ; i++) {
     if(isInteger(i))
       si.setInteger(i);
   }
