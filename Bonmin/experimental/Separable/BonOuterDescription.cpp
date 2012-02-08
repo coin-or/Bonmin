@@ -180,7 +180,8 @@ void getMyOuterApproximation(
 		cs.insert(newCut);
 	}
 }
-
+    
+/* Old Uniform sampling method
 void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 		const double * x, int nbAp, bool getObj) {
 	int n;
@@ -269,7 +270,109 @@ void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
 		delete [] up;
 	}
 
-}
+} */
+    // New curvature based sampling method
+    void addOuterDescription(OsiTMINLPInterface &nlp, OsiSolverInterface &si,
+                             const double * x, int nbAp, bool getObj) {
+        int n;
+        int m;
+        int nnz_jac_g;
+        int nnz_h_lag;
+        Ipopt::TNLP::IndexStyleEnum index_style;
+        //Get problem information
+        TMINLP2TNLP* problem = nlp.problem();
+        problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+        
+        const double * colLower = nlp.getColLower();
+        const double * colUpper = nlp.getColUpper();
+        const Bonmin::TMINLP::VariableType* variableType = problem->var_types();
+        vector<Ipopt::TNLP::LinearityType>  constTypes(m);
+        problem->get_constraints_linearity(m, constTypes());
+        // Hassan OA initial description
+        int OuterDesc = 0;
+        if (OuterDesc == 0) {
+            OsiCuts cs;
+            
+            double * p = CoinCopyOfArray(nlp.getColLower(), n);
+            double * pp = CoinCopyOfArray(nlp.getColLower(), n);
+            double * up = CoinCopyOfArray(nlp.getColUpper(), n);
+            //b->options()->GetIntegerValue("number_approximations_initial_outer",nbAp, b->prefix());
+            std::vector<int> nbG(m, 2);// Number of generated points for each nonlinear constraint, we always generate two cuts at lower and upper bounds.
+            
+            std::vector<double> step(n);
+            
+            for (int i = 0; i < n; i++) {
+                
+                if (colUpper[i] > 1e08) {
+                    up[i] = 0;
+                }
+                
+                if (colUpper[i] > 1e08 || colLower[i] < -1e08 || (variableType[i]
+                                                                  == TMINLP::BINARY) || (variableType[i] == TMINLP::INTEGER)) {
+                    step[i] = 0;
+                } else
+                    step[i] = (up[i] - colLower[i]) / 2e02; // if step[i]!=0 then variable i appears in one univariate nonlinear function, a small step is computed in order to perform curavture based sampling
+                
+                if (colLower[i] < -1e08) {
+                    p[i] = 0;
+                    pp[i] = 0;
+                }
+            }
+            vector<double> g_p(m);
+            double g_p_i, g_pp_i;
+            problem->eval_g(n, p, 1, m, g_p()); // Evaluate function g at lowerbounds
+            vector<double> g_pp(m);
+            vector<double> g_up(m);
+            problem->eval_g(n, up, 1, m, g_up()); // Evaluate function g at upperbounds
+            
+            for (int i = 0; (i < m); i++) {
+                if(constTypes[i] != Ipopt::TNLP::NON_LINEAR) continue;
+                getMyOuterApproximation(nlp, cs, i, p, 0, NULL, 10000, true);// Generate Tangents at lowerbounds    	 
+            }
+            vector<double> thr(m); // minimum threshold value for the variation of function g (curvature) for generating a cut at point pp
+            for (int i = 0; i < m; i++) {
+                thr[i] = std::abs(g_up[i]-g_p[i])/nbAp;
+            }
+            double diff = 0;
+            for (int i = 0; (i < m); i++) { // Generate Outer-Approximation initial cuts for all nonlinear constraints
+                if(constTypes[i] != Ipopt::TNLP::NON_LINEAR) continue;
+                p = CoinCopyOfArray(nlp.getColLower(), n); // For each nonlinear constraint reset all points to lowerbounds
+                pp = CoinCopyOfArray(nlp.getColLower(), n);
+                while (nbG[i] < nbAp) { // Iterate untill the number of initial approximations is reached for each nonlinear constraint
+                
+                    // Curvature sampling
+                    for (int j = 0; j < n; j++) {
+                        pp[j] += step[j];
+                    }
+                    problem->eval_gi(n, p, 1, i, g_p_i);
+                    problem->eval_gi(n, pp, 1, i, g_pp_i);
+                    diff = std::abs(g_p_i - g_pp_i);  
+                        
+                    if (diff>=thr[i] ) {
+                        getMyOuterApproximation(nlp, cs, i, pp, 0, NULL, 10000, true);// Generate Tangents at current point
+                        for (int j = 0; j < n; j++) {
+                            p[j] = pp[j]; // Move all previous points to the current one
+                        }
+                        
+                        nbG[i]++;
+                    }
+                }
+                
+            }
+            
+            for (int i = 0; i < m ; i++) {
+                if(constTypes[i] != Ipopt::TNLP::NON_LINEAR) continue;
+                getMyOuterApproximation(nlp, cs, i, up, 0, NULL, 10000, true);// Generate Tangents at upperbounds
+            }
+            
+            si.applyCuts(cs);
+            delete [] p;
+            delete [] pp;
+            delete [] up;
+        
+        }
 
+
+    }
 }
 
