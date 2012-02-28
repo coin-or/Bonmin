@@ -71,16 +71,22 @@ namespace Bonmin {
    virtual void extract(OsiSolverInterface *si, 
                 const double * x, bool getObj) = 0;
 
-   /** Get OAs of nonlinear constraints in x.*/
+   
+/** Get OAs of nonlinear constraints in x.*/
+   virtual void get_refined_oa(OsiCuts & cs
+                ) const = 0;
+
+/** Get OAs of nonlinear constraints in x.*/
    virtual void get_oas(OsiCuts & cs, 
-                const double * x, bool getObj, bool global) = 0;
+                const double * x, bool getObj, bool global) const = 0;
 
 
+   
    protected:
    /** Facilitator to clean up coefficient.*/
   inline bool cleanNnz(double &value, double colLower, double colUpper,
     double rowLower, double rowUpper, double colsol,
-    double & lb, double &ub, double tiny, double veryTiny);
+    double & lb, double &ub, double tiny, double veryTiny) const;
    /** If constraint coefficient is below this, we try to remove it.*/
    double tiny_;
    /** If constraint coefficient is below this, we neglect it.*/
@@ -92,11 +98,11 @@ namespace Bonmin {
 
    /** Cache Jacobian matrix*/
    /** Columns of jacobian.*/
-   vector<int> jCol_;
+   mutable vector<int> jCol_;
    /** Rows of jacobian.*/
-   vector<int> iRow_;
+   mutable vector<int> iRow_;
    /** Values of jacobian.*/
-   vector<double> value_;
+   mutable vector<double> value_;
 
    vector<Ipopt::TNLP::LinearityType> const_types_;
  
@@ -110,7 +116,7 @@ inline
 bool 
 TMINLP2OsiLP::cleanNnz(double &value, double colLower, double colUpper,
     double rowLower, double rowUpper, double colsol,
-    double & lb, double &ub, double tiny, double veryTiny)
+    double & lb, double &ub, double tiny, double veryTiny) const
 {
   if(fabs(value)>= tiny) return 1;
   //fprintf(stderr, "Warning: small coefficient %g\n", tiny);

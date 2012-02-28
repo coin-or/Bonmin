@@ -1728,6 +1728,10 @@ OsiTMINLPInterface::set_linearizer(Ipopt::SmartPtr<TMINLP2OsiLP> linearizer)
   linearizer_->set_model(GetRawPtr(problem_));
 }
 
+Ipopt::SmartPtr<TMINLP2OsiLP> 
+OsiTMINLPInterface::linearizer(){
+   return linearizer_;
+}
 
 
 void
