@@ -62,9 +62,15 @@ namespace Sepa {
 
    /** Get OAs of nonlinear constraints in x.*/
    virtual void get_oas(OsiCuts & cs, 
-                const double * x, bool getObj, bool global) ;
+                const double * x, bool getObj, bool global) const;
+
+   virtual void get_refined_oa(OsiCuts & cs) const;
+   /** Get OA of one constraints in x.*/
+   virtual void get_oa(int iRow, OsiCuts & cs, 
+                const double * x, bool getObj, bool global) const;
 
    void add_outer_description(OsiSolverInterface &si) ;
+   void add_outer_description_function_values(OsiSolverInterface &si) ;
    private:
    int num_approx_;
   };

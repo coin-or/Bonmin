@@ -32,13 +32,13 @@
 
 #include "CoinHelperFunctions.hpp"
 
-#define DEBUG_BON_HEURISTIC
+//#define DEBUG_BON_HEURISTIC
 
 namespace Sepa{
 
 HeuristicInnerApproximation::HeuristicInnerApproximation(Bonmin::BonminSetup * setup) :
   CbcHeuristic(), setup_(setup), howOften_(100), mip_(NULL),
-        nbAp_(50) {
+        nbAp_(50), time_limit_(10.) {
   Initialize(setup);
 }
 
@@ -48,7 +48,9 @@ HeuristicInnerApproximation::HeuristicInnerApproximation(
         setup_(copy.setup_), 
         howOften_(copy.howOften_), 
         mip_(new Bonmin::SubMipSolver(*copy.mip_)),
-        nbAp_(copy.nbAp_) {
+        nbAp_(copy.nbAp_),
+        time_limit_(copy.time_limit_)
+ {
 }
 
 HeuristicInnerApproximation &
@@ -73,7 +75,17 @@ void HeuristicInnerApproximation::registerOptions(Ipopt::SmartPtr<
       "if yes runs the InnerApproximation heuristic", "yes", "no",
       "don't run it", "yes", "runs the heuristic", "");
 
-        roptions->setOptionExtraInfo("heuristic_inner_approximation", 63);
+ roptions->setOptionExtraInfo("heuristic_inner_approximation", 63);
+
+ roptions->AddLowerBoundedIntegerOption("number_inner_approximation_points",
+       "Set the number of points to use for linear inner approximation of nonlinear functions in heuristic",
+       1, 20);
+ roptions->setOptionExtraInfo("number_inner_approximation_points", 63);
+
+ roptions->AddLowerBoundedNumberOption("inner_time_limit",
+       "Time limit for inner approximation",
+       0, true, 10, "");
+ roptions->setOptionExtraInfo("number_inner_approximation_points", 63);
 }
 
 void
@@ -81,8 +93,10 @@ HeuristicInnerApproximation::Initialize(Bonmin::BonminSetup * b) {
 
    delete mip_;
    mip_ = new Bonmin::SubMipSolver (*b, "inner_approximation");
-   b->options()->GetIntegerValue("number_approximations_initial_outer",
+   b->options()->GetIntegerValue("number_inner_approximation_points",
        nbAp_, b->prefix());
+   b->options()->GetNumericValue("inner_time_limit",
+       time_limit_, b->prefix());
 }
 
 HeuristicInnerApproximation::~HeuristicInnerApproximation() {
@@ -152,55 +166,42 @@ extractInnerApproximation(*nlp, *si, newSolution, true); // Call the function co
 std::cout << "problem loaded\n";
 std::cout << "**** Running optimization ****\n";
 #endif
-mip_->optimize(DBL_MAX, 2, 180); // Optimize the MIP
+mip_->optimize(DBL_MAX, 2, time_limit_); // Optimize the MIP
 #ifdef DEBUG_BON_HEURISTIC
 std::cout << "Optimization finished\n";
 #endif
 if(mip_->getLastSolution()) { // if the MIP solver returns a feasible solution
   const double* solution = mip_->getLastSolution();
-  for (size_t iLCol=0;iLCol<numberColumns;iLCol++) {
-    newSolution[iLCol] = solution[iLCol];
+  std::copy(solution, solution + numberColumns, newSolution);
   }
-}
-else
-feasible = false;
+  else
+  feasible = false;
 
 if(delete_si) {
   delete si;
 }
 delete handler;
 
-// const double* x_l = minlp->x_l();
-// const double* x_u = minlp->x_u();
-// const double* g_l = minlp->g_l();
-// const double* g_u = minlp->g_u();
-// double primalTolerance = 1.0e-6;
 
 #if 0 // Set to 1 if you need to test the feasibility of the returned solution
-vector<Ipopt::TNLP::LinearityType>  constTypes(numberRows);
+const double* x_l = minlp->x_l();
+const double* x_u = minlp->x_u();
+const double* g_l = minlp->g_l();
+const double* g_u = minlp->g_u();
+double primalTolerance = 1.0e-6;
+
+Bonmin::vector<Ipopt::TNLP::LinearityType>  constTypes(numberRows);
 minlp->get_constraints_linearity(numberRows, constTypes());
 feasible = true;
 for (int iColumn=0;iColumn<numberColumns;iColumn++) {
   double value=newSolution[iColumn];
   if(value - x_l[iColumn] < -1e-8|| value - x_u[iColumn] > 1e-8) {
-#ifdef DEBUG_BON_HEURISTIC
-    cout<<"It should be infeasible because: "<<endl;
-    cout<<"x_l["<<iColumn<<"]= "<<x_l[iColumn]<<" "
+    std::cout<<"Solution found infeasible because: "<<std::endl;
+    std::cout<<"x_l["<<iColumn<<"]= "<<x_l[iColumn]<<" "
     <<"x_sol["<<iColumn<<"]= "<<value<<" "
-    <<"x_u["<<iColumn<<"]= "<<x_u[iColumn]<<endl;
-#endif
+    <<"x_u["<<iColumn<<"]= "<<x_u[iColumn]<<std::endl;
     feasible = false;
     break;
-  }
-  if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
-    if (fabs(floor(value+0.5)-value)>integerTolerance) {
-#ifdef DEBUG_BON_HEURISTIC
-      cout<<"It should be infeasible because: "<<endl;
-      cout<<"x["<<iColumn<<"]= "<<value<<" Should be integer!"<<"\\Integer tolerance = "<<integerTolerance<<"\n";
-#endif
-      feasible = false;
-      break;
-    }
   }
 }
 minlp->eval_g(numberColumns, newSolution, true,
@@ -208,59 +209,17 @@ minlp->eval_g(numberColumns, newSolution, true,
 for(int iRow=0; iRow<numberRows; iRow++) {
   if(new_g_sol[iRow]<g_l[iRow]-primalTolerance ||
       new_g_sol[iRow]>g_u[iRow]+primalTolerance) {
-    if(minlp->optimization_status() != SUCCESS) {
-      feasible = false;
-      break;
-    } else {
-#ifdef DEBUG_BON_HEURISTIC
-      cout<<"It should be infeasible because: "<<endl;
-      cout<<"g_l["<<iRow<<"]= "<<g_l[iRow]<<" "
+      std::cout<<"It should be infeasible because: "<<std::endl;
+      std::cout<<"g_l["<<iRow<<"]= "<<g_l[iRow]<<" "
       <<"g_sol["<<iRow<<"]= "<<new_g_sol[iRow]<<" "
-      <<"g_u["<<iRow<<"]= "<<g_u[iRow]<<endl;
-      cout<<"primalTolerance= "<<primalTolerance<<endl;
-      if(constTypes[iRow] == TNLP::NON_LINEAR)
-      cout<<"nonLinear constraint number "<<iRow<<endl;
-#endif
+      <<"g_u["<<iRow<<"]= "<<g_u[iRow]<<std::endl;
+      std::cout<<"primalTolerance= "<<primalTolerance<<std::endl;
+      if(constTypes[iRow] == Ipopt::TNLP::NON_LINEAR)
+      std::cout<<"nonLinear constraint number "<<iRow<<std::endl;
       feasible = false;
-    }
   }
 }
-#ifdef DEBUG_BON_HEURISTIC
-cout<<"Every thing is feasible"<<endl;
-#endif
-
-
-//#else // fix integer variables and solve the NLP
-#if 0
-if(feasible ) {
-
-  std::vector<double> memLow(numberColumns);
-  std::vector<double> memUpp(numberColumns);
-  std::copy(minlp->x_l(), minlp->x_l() + numberColumns, memLow.begin());
-  std::copy(minlp->x_u(), minlp->x_u() + numberColumns, memUpp.begin());
-  // fix the integer variables and solve the NLP
-  for (int iColumn=0;iColumn<numberColumns;iColumn++) {
-        double value=floor(newSolution[iColumn]+0.5);
-        minlp->SetVariableUpperBound(iColumn, value);
-        minlp->SetVariableLowerBound(iColumn, value);
-  }
-  if(feasible) {
-    nlp->initialSolve();
-    if(minlp->optimization_status() != SUCCESS) {
-      feasible = false;
-    }
-    memcpy(newSolution,minlp->x_sol(),numberColumns*sizeof(double));
-  }
-
- 
-  for (int iColumn=0;iColumn<numberColumns;iColumn++) {
-    if (variableType[iColumn] != Bonmin::TMINLP::CONTINUOUS) {
-        minlp->SetVariableUpperBound(iColumn, memUpp[iColumn]);
-        minlp->SetVariableLowerBound(iColumn, memLow[iColumn]);
-    }
-  }
-}
-#endif
+std::cout<<"Every thing is feasible"<<std::endl;
 #endif
 
 if(feasible) {
@@ -294,15 +253,13 @@ HeuristicInnerApproximation::getMyInnerApproximation(Bonmin::OsiTMINLPInterface 
   Ipopt::TNLP::IndexStyleEnum index_style;
   Bonmin::TMINLP2TNLP * problem = si.problem(); 
   problem->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+  double infty = si.getInfinity();
 
 
   CoinPackedVector cut;
-  double lb = 0;
+  double lb = -infty;
   double ub = 0;
 
-  double infty = si.getInfinity();
-
-  lb = -infty; // we only compute <= constraints
 
   double g = 0;
   double g2 = 0;
@@ -323,15 +280,14 @@ HeuristicInnerApproximation::getMyInnerApproximation(Bonmin::OsiTMINLPInterface 
     diff = x[colIdx] - x2[colIdx];
 
     if (fabs(diff) >= 1e-8) {
-                   a = (g - g2) / diff;
-                   cut.insert(colIdx, a);
-                   ub = a * x[colIdx] - g;
-                   //printf("const %i col %i p[col] %g pp[col] %g g %g g2 %g diff %g\n",ind, colIdx, x[colIdx], x2[colIdx], g, g2, diff);
-                   if(a < 1e8)
-                     add = true;
+       a = (g - g2) / diff;
+       cut.insert(colIdx, a);
+       ub = (a * x[colIdx] - g) - fabs(a * x[colIdx] - g)*1e-6;
+       //printf("const %i col %i p[col] %g pp[col] %g g %g g2 %g diff %g\n",ind, colIdx, x[colIdx], x2[colIdx], g, g2, diff);
+       add = true;
     } else {
-                  cut.insert(colIdx, jValues[i]);
-                  //printf("const %i col %i val %g\n",ind, colIdx, jValues[i]);
+       cut.insert(colIdx, jValues[i]);
+       //printf("const %i col %i val %g\n",ind, colIdx, jValues[i]);
     }
   }
 
@@ -490,7 +446,6 @@ HeuristicInnerApproximation::extractInnerApproximation(Bonmin::OsiTMINLPInterfac
 
      const int& nbAp = nbAp_;
      printf("Generating approximation with %i points.\n", nbAp);
-     std::vector<int> nbG(m, 0);// Number of generated points for each nonlinear constraint
    
      std::vector<double> step(n);
      int n_lin = 0;
@@ -507,8 +462,6 @@ HeuristicInnerApproximation::extractInnerApproximation(Bonmin::OsiTMINLPInterfac
        }
      }
      printf("Number of linears %i\n", n_lin);
-     Bonmin::vector<double> g_p(m);
-     Bonmin::vector<double> g_pp(m);
    
      for (int j = 1; j < nbAp; j++) {
    
@@ -516,17 +469,12 @@ HeuristicInnerApproximation::extractInnerApproximation(Bonmin::OsiTMINLPInterfac
          pp[i] += step[i];
        }
    
-       problem->eval_g(n, p, 1, m, g_p());
-       problem->eval_g(n, pp, 1, m, g_pp());
-       double diff = 0;
        for (int i = 0; (i < m ); i++) {
          if (constTypes[i] == Ipopt::TNLP::LINEAR) continue;
-         diff = std::abs(g_p[i] - g_pp[i]);
-         if (nbG[i] < nbAp - 1) {
-           bool status = getMyInnerApproximation(nlp, cs, i, p, pp);// Generate a chord connecting the two points
-           if(status == false)
-             constTypes[i] = Ipopt::TNLP::LINEAR;
-           nbG[i]++;
+         bool status = getMyInnerApproximation(nlp, cs, i, p, pp);// Generate a chord connecting the two points
+         if(status == false){
+           printf("Error in generating inner approximation\n");
+           exit(1);
          }
        }
        std::copy(pp, pp+n, p);
@@ -543,7 +491,6 @@ HeuristicInnerApproximation::extractInnerApproximation(Bonmin::OsiTMINLPInterfac
         delete [] up; 
      si.applyCuts(cs);
    }
-   //si.writeLp("IA");
    printf("************  Done extracting inner approx ********");
   }
 

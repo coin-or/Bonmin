@@ -70,6 +70,9 @@ private:
         /// Number of Approximation points
         int nbAp_;
 
+        /// Time limit for mip
+        double time_limit_;
+
         void extractInnerApproximation(Bonmin::OsiTMINLPInterface & nlp, OsiSolverInterface &si,
                                        const double * x, bool getObj);
 

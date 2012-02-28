@@ -140,13 +140,11 @@ SepaTMINLP2OsiLP::extract(OsiSolverInterface *si,
   get_oas(cs, x, 0, 1);
   si->applyCuts(cs);
 
-  if(num_approx_ > 0)
-   add_outer_description(*si); 
   
 }
  
 void 
-SepaTMINLP2OsiLP::get_oas(OsiCuts &cs, const double *x, bool getObj, bool global)  {
+SepaTMINLP2OsiLP::get_oas(OsiCuts &cs, const double *x, bool getObj, bool global) const {
 
   int n,m, nnz_jac_g, nnz_h_lag;
   TNLP::IndexStyleEnum index_style;
@@ -207,7 +205,7 @@ SepaTMINLP2OsiLP::get_oas(OsiCuts &cs, const double *x, bool getObj, bool global
         lb[cutIdx],
         ub[cutIdx], tiny_, very_tiny_)) {
         if(fabs(value_[i]) > 1e15) {
-           printf("Not generating cut because of big coefficient %g col %i x[%i] = %g\n", value_[i], colIdx, x[colIdx]);
+           printf("Not generating cut because of big coefficient %g col %i x[%i] = %g\n", value_[i], colIdx, colIdx, x[colIdx]);
            return;
         }
         cuts[cutIdx].insert(colIdx,value_[i]);
@@ -258,7 +256,99 @@ SepaTMINLP2OsiLP::get_oas(OsiCuts &cs, const double *x, bool getObj, bool global
 }
 
 void 
-SepaTMINLP2OsiLP::add_outer_description(OsiSolverInterface &si) {
+SepaTMINLP2OsiLP::get_oa(int rowIdx, OsiCuts &cs, const double *x, bool getObj, bool global) const {
+
+  int n,m, nnz_jac_g, nnz_h_lag;
+  TNLP::IndexStyleEnum index_style;
+  model_->get_nlp_info( n, m, nnz_jac_g, nnz_h_lag, index_style);
+
+  double gi;
+  model_->eval_gi(n,x,1, rowIdx,gi);
+  Bonmin::vector<int> jCol(n);
+  int nnz;
+  model_->eval_grad_gi(n, x, 0, rowIdx, nnz, jCol(), NULL);
+  model_->eval_grad_gi(n, x, 0, rowIdx, nnz, NULL, value_());
+
+
+  //As jacobian is stored by cols fill OsiCuts with cuts
+  double lb;
+  double ub;
+
+  const double * rowLower = model_->g_l();
+  const double * rowUpper = model_->g_u();
+  const double * colLower = model_->x_l();
+  const double * colUpper = model_->x_u();
+  double nlp_infty = infty_;
+  double infty = DBL_MAX;
+  
+  if (rowLower[rowIdx] > -nlp_infty)
+    lb = rowLower[rowIdx] - gi;
+  else
+    lb = -infty;
+  if (rowUpper[rowIdx] < nlp_infty)
+    ub = rowUpper[rowIdx] - gi;
+  else
+    ub = infty;
+
+  CoinPackedVector  cut;
+
+
+  for(int i = 0 ; i < nnz ; i++) {
+    if(index_style == Ipopt::TNLP::FORTRAN_STYLE) jCol[i]--;
+    const int &colIdx = jCol[i];
+    //"clean" coefficient
+    if(cleanNnz(value_[i],colLower[colIdx], colUpper[colIdx],
+      rowLower[rowIdx], rowUpper[rowIdx],
+      x[colIdx],
+      lb,
+      ub, tiny_, very_tiny_)) {
+      if(fabs(value_[i]) > 1e15) {
+         printf("Not generating cut because of big coefficient %g col %i x[%i] = %g\n", value_[i], colIdx, colIdx, x[colIdx]);
+         return;
+      }
+      cut.insert(colIdx,value_[i]);
+        if(lb > - infty)
+          lb += value_[i] * x[colIdx];
+        if(ub < infty)
+           ub += value_[i] * x[colIdx];
+      }
+  }
+
+  OsiRowCut newCut;
+  if(global)
+    newCut.setGloballyValidAsInteger(1);
+  //********* Perspective Extension ********//
+  const int* ids = model_->get_const_xtra_id(); // vector of indices corresponding to the binary variable activating the corresponding constraint
+  // Get the index of the corresponding indicator binary variable
+  int binary_id = (ids == NULL) ? -1 : ids[rowIdx];// index corresponding to the binary variable activating the corresponding constraint
+    if(binary_id>0) {// If this hyperplane is a linearization of a disjunctive constraint, we link its righthand (or lefthand) side to the corresponding indicator binary variable
+        //printf("Using perspectives\n");
+        if (lb > -infty) { // ∂x ≥ lb => ∂x - lb*z ≥ 0
+            cut.insert(binary_id, -lb);
+            newCut.setLb(0);
+            newCut.setUb(ub);
+            
+        }
+        if (ub < infty) { // ∂x ≤ ub => ∂x - ub*z ≤ 0
+            cut.insert(binary_id, -ub);
+            newCut.setLb(lb);
+            newCut.setUb(0);
+        }
+    }
+    else {
+        newCut.setLb(lb);
+        newCut.setUb(ub);
+    }
+    //********* Perspective Extension ********//
+    newCut.setRow(cut);
+    cs.insert(newCut);
+  return;
+}
+
+void 
+SepaTMINLP2OsiLP::get_refined_oa(OsiCuts & cs) const{
+   if(num_approx_ <= 0)
+     return;
    int n;
    int m;
    int nnz_jac_g;
@@ -271,12 +361,11 @@ SepaTMINLP2OsiLP::add_outer_description(OsiSolverInterface &si) {
   //const double * rowUpper = model_->g_u();
   const double * colLower = model_->x_l();
   const double * colUpper = model_->x_u();
-   Bonmin::vector<Ipopt::TNLP::LinearityType>  varTypes(n);
+  Bonmin::vector<Ipopt::TNLP::LinearityType>  varTypes(n);
 
    model_->get_variables_linearity(n, varTypes());
-   const Bonmin::TMINLP::VariableType* variableType = model_->var_types();
+   //const Bonmin::TMINLP::VariableType* variableType = model_->var_types();
    // Hassan OA initial description
-   OsiCuts cs;
 
    double * p = CoinCopyOfArray(colLower, n);
    double * pp = CoinCopyOfArray(colLower, n);
@@ -318,6 +407,102 @@ SepaTMINLP2OsiLP::add_outer_description(OsiSolverInterface &si) {
    }
 
    get_oas(cs, up, 0, true);// Generate Tangents at current point
+      
+   delete [] p;
+   delete [] pp;
+   delete [] up;
+  }
+
+void 
+SepaTMINLP2OsiLP::add_outer_description_function_values(OsiSolverInterface &si) {
+   int n;
+   int m;
+   int nnz_jac_g;
+   int nnz_h_lag;
+   Ipopt::TNLP::IndexStyleEnum index_style;
+   //Get problem information
+   model_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+
+  //const double * rowLower = model_->g_l();
+  //const double * rowUpper = model_->g_u();
+  const double * colLower = model_->x_l();
+  const double * colUpper = model_->x_u();
+   Bonmin::vector<Ipopt::TNLP::LinearityType>  varTypes(n);
+
+   model_->get_variables_linearity(n, varTypes());
+   const Bonmin::TMINLP::VariableType* variableType = model_->var_types();
+   // Hassan OA initial description
+   OsiCuts cs;
+
+   double * p = CoinCopyOfArray(colLower, n);
+   double * pp = CoinCopyOfArray(colLower, n);
+   double * up = CoinCopyOfArray(colUpper, n);
+   double * low = CoinCopyOfArray(colLower, n);
+
+   Bonmin::vector<double> step(n);
+   Bonmin::vector<int> nbG(m,2);
+
+
+     for (int i = 0; i < n; i++) {
+       if (low[i] < -1e4){
+          low[i] = -1e4;
+       }
+       if (up[i] > 1e4){
+          up[i] = 1e4;
+       }
+     } 
+
+
+   for (int i = 0; i < n; i++) {
+
+      if (varTypes[i] == Ipopt::TNLP::LINEAR) {
+         step[i] = 0;
+         low[i] = p[i] = pp[i] = up[i] = 0;
+      }
+      else
+        step[i] = (up[i] - low[i]) / (num_approx_*20);
+
+    }
+    get_oas(cs, low, 0, true);// Generate Tangents at start point        
+    get_oas(cs, up, 0, true);// Generate Tangents at end point        
+    Bonmin::vector<double> g_p(m);
+    Bonmin::vector<double> g_pp(m);
+    model_->eval_g(n, low, 1, m, g_p()); // Evaluate function g at lowerbounds
+    model_->eval_g(n, up, 1, m, g_pp()); // Evaluate function g at upperbounds
+
+    for (int i = 0; (i < m); i++) { // Generate Outer-Approximation initial cuts for all nonlinear constraints
+      if(const_types_[i] != Ipopt::TNLP::NON_LINEAR) continue;
+      double thresh = std::abs(g_pp[i] - g_p[i])/(num_approx_-1);
+      
+      printf("Constraint %i threshold is %g lower val %g upper %g\n",i, thresh,
+             g_p[i], g_pp[i]);
+      std::copy(low, low + n, p);
+      std::copy(low, low + n, pp);
+      double g_p_i, g_pp_i;
+      g_p_i = g_p[i];
+      int n_steps = 0;
+      while (nbG[i] < num_approx_) { // Iterate untill increase is sufficient 
+        n_steps++;
+        // Curvature sampling
+        for (int j = 0; j < n; j++) {
+          pp[j] += step[j];
+        }
+        model_->eval_gi(n, pp, 1, i, g_pp_i);
+    //    printf("Difference in function value: %g\n", std::abs(g_p_i - g_pp_i)); 
+        if (std::abs(g_p_i - g_pp_i)>=thresh ) {
+          printf("Function value after %i steps %g\n", n_steps, g_pp_i);
+          get_oa(i, cs, pp, 0, true);// Generate Tangents at current point
+          for (int j = 0; j < n; j++) {
+            p[j] = pp[j]; // Move all previous points to the current one
+          }
+          g_p_i = g_pp_i; 
+          nbG[i]++;
+        }
+      }
+      
+    }
+
+
       
    si.applyCuts(cs);
    delete [] p;

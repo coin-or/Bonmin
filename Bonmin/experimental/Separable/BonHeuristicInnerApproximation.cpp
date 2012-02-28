@@ -302,7 +302,7 @@ HeuristicInnerApproximation::getMyInnerApproximation(OsiTMINLPInterface &si, Osi
 }
 void 
 HeuristicInnerApproximation::extractInnerApproximation(OsiTMINLPInterface & nlp, OsiSolverInterface &si,
-  const double * x, bool getObj) {
+                                                       const double * x, bool getObj) {
    int n;
    int m;
    int nnz_jac_g;
