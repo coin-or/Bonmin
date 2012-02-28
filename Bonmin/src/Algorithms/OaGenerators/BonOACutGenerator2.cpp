@@ -75,6 +75,13 @@ namespace Bonmin
     subMip_->setLpSolver(lpManip.si());
     OsiSolverInterface * lp = subMip_->solver();
     lp->resolve();
+
+    if(IsValid(nlp_->linearizer())){
+      nlp_->linearizer()->get_refined_oa(cs);
+      installCuts(*lp, cs, cs.sizeRowCuts());
+    }
+    lp->resolve();
+
     OsiBranchingInformation branch_info(lp, false);
     bool milpOptimal = 1;
 
@@ -84,7 +91,8 @@ namespace Bonmin
     bool feasible = 1;
 
     subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
-        (parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()));
+                   parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime());
+
     milpBound = std::max(milpBound, subMip_->lowBound());
     milpOptimal = subMip_->optimal();
 
@@ -215,10 +223,8 @@ namespace Bonmin
 	   }
         nLocalSearch_++;
 
-        //assert(cutoff < ub);
         subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
-            parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime()
-            );
+            parameters_.maxLocalSearchTime_ + timeBegin_ - CoinCpuTime());
 
         milpBound = std::max(milpBound, subMip_->lowBound());
 
