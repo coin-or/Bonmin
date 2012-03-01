@@ -140,4 +140,3 @@ bonmin.nlp_log_level                         1         	#specify NLP solver inte
 bonmin.nlp_solver                            Ipopt     	#Choice of the solver for local optima of continuous nlp's
 bonmin.warm_start                            none      	#Select the warm start method
 
-linear_solver Mumps
