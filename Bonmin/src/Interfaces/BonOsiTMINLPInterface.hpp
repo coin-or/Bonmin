@@ -1087,6 +1087,8 @@ void getBendersCut(OsiCuts &cs, bool global);
   }
 
   void set_linearizer(Ipopt::SmartPtr<TMINLP2OsiLP> linearizer);
+
+  Ipopt::SmartPtr<TMINLP2OsiLP> linearizer();
 protected:
   
   //@}

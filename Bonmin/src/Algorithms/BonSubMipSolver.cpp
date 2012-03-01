@@ -241,10 +241,6 @@ namespace Bonmin {
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
         CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
 
-#if 0
-      CPXsetintparam(env, CPX_PARAM_THREADS, 16);
-      CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);
-#endif
 
         CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10);
         CPXsetintparam(env,CPX_PARAM_NODELIM, 1000);
@@ -362,17 +358,137 @@ namespace Bonmin {
     if (cpx_) {
       cpx_->switchToMIP();
       CPXENVptr env = cpx_->getEnvironmentPtr();
+      CPXLPptr orig_lp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+
+      int s;
+      CPXLPptr cpxlp = CPXcloneprob(env, orig_lp, &s);
+      printf("S is %i\n", s);
+      double gap_tol = std::max(0.,gap_tol_- gap_tol_*(1e-01));
+
+#ifdef SHIFT_CUTOFF
+      if(cutoff < 1e20){
+        cutoff = cutoff-fabs(cutoff)*gap_tol_*0.2;
+        gap_tol = gap_tol_*0.8;
+      }
+#endif
+
+      CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
+      CPXsetintparam(env, CPX_PARAM_CLOCKTYPE, 1);
+      CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
+      CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol);
+      CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
+
+      //CPXwriteprob(env, cpxlp, "OA_trunk","MPS");
+      //CPXwriteparam(env, "params.txt");
+      
+
+      cpx_->messageHandler()->setLogLevel(loglevel);
+
+      int status = CPXmipopt(env,cpxlp);
+      CHECK_CPX_STAT("mipopt",status)
+
+      int stat = CPXgetstat( env, cpxlp);
+      bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS) || (stat == CPXMIP_TIME_LIM_INFEAS) || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)
+                        || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
+      optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
+      nodeCount_ = CPXgetnodecnt(env , cpxlp);
+      iterationCount_ = CPXgetmipitcnt(env , cpxlp);
+      status = CPXgetbestobjval(env, cpxlp, &lowBound_);
+      CHECK_CPX_STAT("getbestobjval",status)
+       
+      if(!infeasible){
+         if(!integerSolution_){
+           integerSolution_ = new double[cpx_->getNumCols()];
+         }
+         CPXgetmipx(env, cpxlp, integerSolution_, 0, cpx_->getNumCols() -1);
+         CHECK_CPX_STAT("getmipx",status)
+      }
+      else {
+        if (integerSolution_) {
+          delete [] integerSolution_;
+          integerSolution_ = NULL;
+        }
+      }
+      CPXfreeprob(env, &cpxlp);
+      cpx_->switchToLP();
+    }
+    else {
+#else
+     {
+#endif
+        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
+            "performLocalSearch",
+            "OaDecompositionBase::SubMipSolver");
+      }
+}
+
+  void
+  SubMipSolver::optimize_with_lazy_constraints(double cutoff, int loglevel, double maxTime, const OsiCuts &cs)
+  {
+    if (clp_) {
+      fprintf(stderr, "Function optimize_with_lazy_constraints can only be used with CPLEX\n");
+      optimize(cutoff,loglevel, maxTime);
+    }
+    else 
+#ifdef COIN_HAS_CPX
+    if (cpx_) {
+      cpx_->switchToMIP();
+      CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr cpxlp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+
+// Remove all the cuts and declare them as lazy constraints
+
+      int orig_nrows = CPXgetnumrows(env, cpxlp) - cs.sizeRowCuts();
+      printf("Number of rows %i\n", cs.sizeRowCuts());
+      CPXdelrows(env, cpxlp, orig_nrows, CPXgetnumrows(env, cpxlp) - 1);
+      
+      int rcnt = cs.sizeRowCuts(), nzcnt = 0;
+      vector<double> rhs(rcnt);
+      vector<char> sense(rcnt);
+      vector<int> beg(rcnt);
+      vector<int> ind;
+      vector<double> val; 
+      double infty = cpx_->getInfinity();
+ 
+      for(int i =0 ; i < rcnt ; i++){
+        const OsiRowCut &r = cs.rowCut(i);
+        const double lb = r.lb(), ub=r.ub();
+        if(ub >= infty) {
+          sense[i] = 'G';
+          rhs[i] = lb;
+        }
+        else if (lb <= infty) {
+           sense[i] = 'L';
+           rhs[i] = ub;
+        }
+        else {
+          assert(lb == ub);
+          sense[i] = 'E';
+          rhs[i] = ub;
+        }
+        beg[i] = nzcnt;
+        nzcnt += r.row().getNumElements();
+      }
+
+      ind.resize(nzcnt);
+      val.resize(nzcnt);      
+      for(int i =0 ; i < rcnt ; i++){
+        const OsiRowCut &r = cs.rowCut(i);
+        const double * el = r.row().getElements();
+        const int * id = r.row().getIndices();
+        int nz = r.row().getNumElements();
+        std::copy(el, el + nz, val() + beg[i]);
+        std::copy(id, id + nz, ind() + beg[i]);
+      }
+
+      CPXaddlazyconstraints(env, cpxlp, rcnt, nzcnt, rhs(), sense(), beg(), ind(), val(), NULL);
+      CPXsetintparam(env, CPX_PARAM_REDUCE, CPX_PREREDUCE_PRIMALONLY);
 
       CPXsetdblparam(env, CPX_PARAM_TILIM, maxTime);
       CPXsetintparam(env, CPX_PARAM_CLOCKTYPE, 1);
       CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
       CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
       cpx_->messageHandler()->setLogLevel(loglevel);
-#if 0
-      CPXsetintparam(env, CPX_PARAM_THREADS, 16);
-      CPXsetintparam(env, CPX_PARAM_PARALLELMODE, -1);
-#endif
       int status = CPXmipopt(env,cpxlp);
       CHECK_CPX_STAT("mipopt",status)
 
@@ -399,6 +515,8 @@ namespace Bonmin {
         }
       }
       cpx_->switchToLP();
+      CPXfreelazyconstraints(env, cpxlp);
+      CPXaddrows(env, cpxlp, 0, rcnt, nzcnt, rhs(), sense(), beg(), ind(), val(), NULL, NULL);
     }
     else {
 #else

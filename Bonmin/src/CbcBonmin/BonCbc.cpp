@@ -662,8 +662,7 @@ namespace Bonmin
   double
   Bab::bestBound()
   {
-    if (mipStatus_ == FeasibleOptimal) return bestObj_;
-    else if (mipStatus_ == ProvenInfeasible) return 1e200;
+    if (mipStatus_ == ProvenInfeasible) return 1e200;
     else return bestBound_;
   }
 

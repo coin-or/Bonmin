@@ -47,18 +47,17 @@ namespace Sepa
 
      Sepa::HeuristicInnerApproximation::registerOptions(roptions);
 
-        roptions->SetRegisteringCategory("Initial Approximations descriptions", Bonmin::RegisteredOptions::UndocumentedCategory);
-	roptions->AddStringOption2("initial_outer_description",
-		"Do we add all Outer Approximation constraints defining the initial Outer Approximation description of the MINLP. See the number_approximations_initial_outer option for fixing the number of approximation points",
-		"yes",
-		"no","Do not generate the description",
-		"yes","Generate the description",
-		"");
-	roptions->AddUpperBoundedIntegerOption("number_approximations_initial_outer",
-		"Number of Outer Approximation points needed for generating the initial Outer Approximation description, maximum value = 500, default value = 50",
-		500,
-		50,
-		"");
+     roptions->SetRegisteringCategory("Initial Approximations descriptions", Bonmin::RegisteredOptions::UndocumentedCategory);
+     roptions->AddStringOption2("initial_outer_description",
+                                "Do we add all Outer Approximation constraints defining the initial Outer Approximation "
+                                "description of the MINLP. See the number_approximations_initial_outer option for fixing the "
+                                "number of approximation points",
+                                "yes", "no","Do not generate the description", "yes","Generate the description",
+                                "");
+
+     roptions->AddUpperBoundedIntegerOption("number_approximations_initial_outer",
+                                            "Number of Outer Approximation points needed for generating the initial Outer Approximation description, maximum value = 500, default value = 50",
+                                            500, 50, "");
   }
 
   /** Register all the Bonmin options.*/
@@ -77,7 +76,7 @@ namespace Sepa
     int n_approx;
     options()->GetEnumValue("initial_outer_description", do_outer, prefix_.c_str());
     options()->GetIntegerValue("number_approximations_initial_outer",
-       		n_approx, prefix_.c_str());
+                               n_approx, prefix_.c_str());
     SepaTMINLP2OsiLP* linearizer = new SepaTMINLP2OsiLP;
     linearizer_ = linearizer;
     if(do_outer)
@@ -97,7 +96,7 @@ namespace Sepa
     int n_approx;
     options()->GetEnumValue("initial_outer_description", do_outer, prefix_.c_str());
     options()->GetIntegerValue("number_approximations_initial_outer",
-       		n_approx, prefix_.c_str());
+                               n_approx, prefix_.c_str());
     SepaTMINLP2OsiLP* linearizer = new SepaTMINLP2OsiLP;
     linearizer_ = linearizer;
     if(do_outer)
@@ -116,7 +115,7 @@ namespace Sepa
     int nbAp = 10;
     options()->GetEnumValue("initial_outer_description", doOuter, prefix_.c_str());
     options()->GetIntegerValue("number_approximations_initial_outer",
-       		nbAp, prefix_.c_str());
+                               nbAp, prefix_.c_str());
 
 #ifdef USE_OLD_FUNC
     if(doOuter)

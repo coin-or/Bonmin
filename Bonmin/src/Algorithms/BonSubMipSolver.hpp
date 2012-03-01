@@ -20,6 +20,8 @@ class OsiCpxSolverInterface;
 class CbcStrategy;
 class CbcStrategyDefault;
 
+#include "OsiCuts.hpp"
+
 namespace Bonmin {
     class RegisteredOptions;
     class BabSetupBase; 
@@ -75,6 +77,11 @@ namespace Bonmin {
       void optimize(double cutoff,
           int loglevel,
           double maxTime);
+
+      /** update cutoff, put OA constraints in cs as lazy constraints and optimize MIP. */
+      void optimize_with_lazy_constraints(double cutoff,
+          int loglevel,
+          double maxTime, const OsiCuts & cs);
 
       /** Returns lower bound. */
       inline double lowBound()

@@ -77,8 +77,12 @@ Bonmin/experimental/Separable/BonOuterDescription.hpp -text
 Bonmin/experimental/Separable/Makefile.am -text
 Bonmin/experimental/Separable/Makefile.in -text
 Bonmin/experimental/Separable/Sepa.cpp -text
+Bonmin/experimental/Separable/SepaHeuristicInnerApproximation.cpp -text
+Bonmin/experimental/Separable/SepaHeuristicInnerApproximation.hpp -text
 Bonmin/experimental/Separable/SepaSetup.cpp -text
 Bonmin/experimental/Separable/SepaSetup.hpp -text
+Bonmin/experimental/Separable/SepaTMINLP2OsiLP.cpp -text
+Bonmin/experimental/Separable/SepaTMINLP2OsiLP.hpp -text
 Bonmin/install-sh -text
 Bonmin/ltmain.sh -text
 Bonmin/missing -text
