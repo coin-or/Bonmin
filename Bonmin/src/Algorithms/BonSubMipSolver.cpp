@@ -360,8 +360,11 @@ namespace Bonmin {
       CPXENVptr env = cpx_->getEnvironmentPtr();
       CPXLPptr orig_lp = cpx_->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
 
-      int s;
-      CPXLPptr cpxlp = CPXcloneprob(env, orig_lp, &s);
+      int copied_prob;
+      CPXLPptr cpxlp = CPXcloneprob(env, orig_lp, &copied_prob);
+      if (copied_prob != 0){
+        cpxlp = orig_lp;
+      }
       double gap_tol = std::max(0.,gap_tol_- gap_tol_*(1e-01));
 
 #ifdef SHIFT_CUTOFF
@@ -408,7 +411,9 @@ namespace Bonmin {
           integerSolution_ = NULL;
         }
       }
+      if (copied_prob == 0){
       CPXfreeprob(env, &cpxlp);
+      }
       cpx_->switchToLP();
     }
     else {
