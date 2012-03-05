@@ -362,7 +362,6 @@ namespace Bonmin {
 
       int s;
       CPXLPptr cpxlp = CPXcloneprob(env, orig_lp, &s);
-      printf("S is %i\n", s);
       double gap_tol = std::max(0.,gap_tol_- gap_tol_*(1e-01));
 
 #ifdef SHIFT_CUTOFF
