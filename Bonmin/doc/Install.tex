@@ -68,7 +68,7 @@ argument to the configure script or by writing it into a {\tt config.site}.\\
 In the former case, specify the location of the {\tt Cplex} header files by using the
 argument {\tt --with-cplexincdir} and the location of the
 {\tt Cplex } library with {\tt --with-cplexlib} (note that on the Linux platform you will also
-need to add {\tt -lpthread} as an argument to {\tt --with-cplexlib}).\\
+need to add {\tt -lpthread -lm} as an argument to {\tt --with-cplexlib}).\\
 
 For example, on a Linux machine if {\tt Cplex} is installed in {\tt /usr/ilog}~, you would
 invoke configure with the arguments as follows:
@@ -77,7 +77,7 @@ invoke configure with the arguments as follows:
 \begin{verbatim}
 
 ./configure --with-cplex-incdir=/usr/ilog/cplex/include/ilcplex \
-  --with-cplex-lib="-L/usr/ilog/cplex/lib -lcplex -lpthread"
+  --with-cplex-lib="-L/usr/ilog/cplex/lib -lcplex -lpthread -lm"
  \end{verbatim}
  \end{colorverb}
  
@@ -92,7 +92,7 @@ following lines in the {\tt config.site} file:
  \begin{verbatim}
 
  with_cplex_lib="-L/usr/ilog/cplex/lib/ -lcplex -lpthread"
- with_cplex_incdir="/usr/ilog/cplex/include/ilcplex"
+ with_cplex_incdir="/usr/ilog/cplex/include/ilcplex -lm"
  
  \end{verbatim}
 \end{colorverb}
