@@ -78,6 +78,7 @@ includecoin_HEADERS = \
      BonTMINLP.hpp \
      BonTNLP2FPNLP.hpp \
      BonCutStrengthener.hpp \
+     BonStrongBranchingSolver.hpp \
      BonTNLPSolver.hpp \
      BonBranchingTQP.hpp \
      BonTypes.hpp \
