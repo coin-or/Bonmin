@@ -80,6 +80,8 @@ includecoin_HEADERS = \
      BonCutStrengthener.hpp \
      BonTNLPSolver.hpp \
      BonBranchingTQP.hpp \
+     BonStrongBranchingSolver.hpp \
+     BonTMINLP2OsiLP.hpp \
      BonTypes.hpp \
      BonRegisteredOptions.hpp
 
