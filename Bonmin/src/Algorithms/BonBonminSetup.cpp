@@ -711,7 +711,30 @@ namespace Bonmin
     int varSelection;
     options_->GetEnumValue("variable_selection",varSelection,prefix_.c_str());
     if (varSelection > RELIABILITY_BRANCHING) {
-      std::cout<<"Variable selection stragey not available with oa branch-and-cut."<<std::endl;
+      switch (varSelection){
+        case OSI_SIMPLE:
+          continuousSolver_->findIntegersAndSOS(false);
+          setPriorities();
+          addSos();
+          branchingMethod_ = new OsiChooseVariable(nonlinearSolver_);
+    
+          break;
+        case OSI_STRONG:
+          {
+          continuousSolver_->findIntegersAndSOS(false);
+          setPriorities();
+          addSos();
+          OsiChooseStrong * chooser = new OsiChooseStrong(nonlinearSolver_);
+          branchingMethod_ = chooser;
+          chooser->setNumberStrong(intParam_[NumberStrong]);
+          chooser->setTrustStrongForSolution(false);
+          chooser->setNumberBeforeTrusted(intParam_[MinReliability]);
+          }
+          break;
+        default:
+          std::cout<<"Variable selection stragey not available with oa branch-and-cut."<<std::endl;
+          break;
+     }
     }
     /* Populate cut generation and heuristic procedures.*/
     int ival;
