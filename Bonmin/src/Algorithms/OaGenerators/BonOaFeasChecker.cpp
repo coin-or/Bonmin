@@ -65,7 +65,8 @@ namespace Bonmin
       if (post_nlp_solve(babInfo, cutoff)) {
         //nlp solved and feasible
         // Update the cutoff
-        cutoff = nlp_->getObjValue() *(1 - parameters_.cbcCutoffIncrement_);
+        double ub = nlp_->getObjValue();
+        cutoff = ub > 0 ? ub *(1 - parameters_.cbcCutoffIncrement_) : ub*(1 + parameters_.cbcCutoffIncrement_);
         // Update the lp solver cutoff
         lp->setDblParam(OsiDualObjectiveLimit, cutoff);
       }
@@ -106,7 +107,7 @@ namespace Bonmin
       }
       if (changed) {
        branch_info.solution_ = lp->getColSolution();
-        isInteger = integerFeasible(*lp,branch_info, parameters_.cbcIntegerTolerance_,
+       isInteger = integerFeasible(*lp,branch_info, parameters_.cbcIntegerTolerance_,
                                      objects_, nObjects_);
       }
       else {

@@ -287,7 +287,7 @@ OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
        //Check if cuts off solution
        if(savedCuts_.rowCut(i).violated(colsol) > 0.){
 #ifdef OA_DEBUG
-         printf("A violated cut has been found\n");
+         printf("A violated saved cut has been found\n");
 #endif
          savedCuts_.rowCut(i).setEffectiveness(9.99e99);
          cs.insert(savedCuts_.rowCut(i));
