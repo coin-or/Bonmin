@@ -1875,6 +1875,7 @@ bool cleanNnz(double &value, double colLower, double colUpper,
     double & lb, double &ub, double tiny, double veryTiny,
     double infty)
 {
+  //return 1;
   if(fabs(value)>= tiny) return 1;
 
   if(fabs(value)<veryTiny) return 0;//Take the risk?
@@ -1885,30 +1886,26 @@ bool cleanNnz(double &value, double colLower, double colUpper,
   bool rowNotLoBounded =  rowLower <= - infty;
   bool rowNotUpBounded = rowUpper >= infty;
   bool pos =  value > 0;
-
-  if(colLoBounded && pos && rowNotUpBounded) {
-    lb += value * (colsol - colLower);
+  if(colUpBounded && pos && rowNotUpBounded) {
+    lb += value * (colsol - colUpper);
     return 0;
   }
   else
-    if(colLoBounded && !pos && rowNotLoBounded) {
-      ub += value * (colsol - colLower);
+    if(colUpBounded && !pos && rowNotLoBounded) {
+      ub += value * (colsol - colUpper);
       return 0;
     }
     else
-      if(colUpBounded && !pos && rowNotUpBounded) {
-        lb += value * (colsol - colUpper);
+      if(colLoBounded && !pos && rowNotUpBounded) {
+        lb += value * (colsol - colLower);
         return 0;
       }
       else
-        if(colUpBounded && pos && rowNotLoBounded) {
-          ub += value * (colsol - colUpper);
+        if(colLoBounded && pos && rowNotLoBounded) {
+          ub += value * (colsol - colLower);
           return 0;
         }
-  //can not remove coefficient increase it to smallest non zero
-  if(pos) value = tiny;
-  else
-    value = - tiny;
+  //can not remove coefficient 
   return 1;
 }
 
@@ -2034,8 +2031,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     if(global) {
       newCut.setGloballyValidAsInteger(1);
     }
-    if(fabs(lb[cutIdx]) < tiny_) lb[cutIdx] = 0; 
-    if(fabs(ub[cutIdx]) < tiny_) ub[cutIdx] = 0;
+    //if(fabs(lb[cutIdx]) < tiny_) lb[cutIdx] = 0; 
+    //if(fabs(ub[cutIdx]) < tiny_) ub[cutIdx] = 0;
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
