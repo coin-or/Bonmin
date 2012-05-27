@@ -372,8 +372,13 @@ namespace Bonmin
     options->GetNumericValue("integer_tolerance",doubleParam_[IntTol],prefix_.c_str());
     options->GetNumericValue("time_limit", doubleParam_[MaxTime],prefix_.c_str());
 
-
     int ival;
+    int seed = 0;
+    ival = options->GetIntegerValue("random_generator_seed",seed,prefix_.c_str());
+    if(seed == -1)
+      CoinSeedRandom(CoinGetTimeOfDay());
+    else if (ival != 0) CoinSeedRandom(seed);
+
     options->GetEnumValue("node_comparison",ival,prefix_.c_str());
     nodeComparisonMethod_ = NodeComparison(ival);
 
@@ -438,6 +443,13 @@ namespace Bonmin
     roptions->setOptionExtraInfo("nlp_log_at_root",63);
 
     roptions->SetRegisteringCategory("Branch-and-bound options", RegisteredOptions::BonminCategory);
+
+  roptions->AddLowerBoundedIntegerOption
+  ("random_generator_seed",
+   "Set seed for random number generator (a value of -1 sets seeds to time since Epoch).",
+   -1,0,
+   "");
+  roptions->setOptionExtraInfo("random_generator_seed",127);
 
     roptions->AddLowerBoundedNumberOption("time_limit",
         "Set the global maximum computation time (in secs) for the algorithm.",

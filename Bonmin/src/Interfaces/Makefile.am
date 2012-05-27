@@ -78,11 +78,11 @@ includecoin_HEADERS = \
      BonTMINLP.hpp \
      BonTNLP2FPNLP.hpp \
      BonCutStrengthener.hpp \
-     BonStrongBranchingSolver.hpp \
      BonTNLPSolver.hpp \
      BonBranchingTQP.hpp \
-     BonTypes.hpp \
+     BonStrongBranchingSolver.hpp \
      BonTMINLP2OsiLP.hpp \
+     BonTypes.hpp \
      BonRegisteredOptions.hpp
 
 install-exec-local:

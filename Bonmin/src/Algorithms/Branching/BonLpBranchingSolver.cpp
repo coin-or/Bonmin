@@ -117,12 +117,6 @@ namespace Bonmin
     std::vector<int> diff_up_bnd_index;
     std::vector<double> diff_up_bnd_value;
 
-#if 0
-    // deleteme
-    for (int i=0; i<tminlp_interface->getNumCols(); i++) {
-      printf("%3d ol = %e nl = %e   ou = %e nu = %e\n",i,tminlp_interface->getColLower()[i],lin_->getColLower()[i],tminlp_interface->getColUpper()[i],lin_->getColUpper()[i]);
-    }
-#endif
     // Get the bounds.  We assume that the bounds in the linear solver
     // are always the original ones
     const int numCols = tminlp_interface->getNumCols();
@@ -158,12 +152,6 @@ namespace Bonmin
       }
     }
 
-#if 0
-    // deleteme
-    for (int i=0; i<numCols; i++) {
-      printf("%3d ol = %e nl = %e   ou = %e nu = %e\n",i,tminlp_interface->getColLower()[i],lin_->getColLower()[i],tminlp_interface->getColUpper()[i],lin_->getColUpper()[i]);
-    }
-#endif
     if(warm_start_mode_ == Basis){
       lin->setWarmStart(warm_);
     }
