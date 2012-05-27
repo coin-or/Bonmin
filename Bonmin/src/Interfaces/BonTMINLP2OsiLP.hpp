@@ -131,29 +131,26 @@ TMINLP2OsiLP::cleanNnz(double &value, double colLower, double colUpper,
   bool rowNotUpBounded = rowUpper >= infty;
   bool pos =  value > 0;
 
-  if(colLoBounded && pos && rowNotUpBounded) {
+  if(colLoBounded && !pos && rowNotUpBounded) {
     lb += value * (colsol - colLower);
     return 0;
   }
   else
-    if(colLoBounded && !pos && rowNotLoBounded) {
+    if(colLoBounded && pos && rowNotLoBounded) {
       ub += value * (colsol - colLower);
       return 0;
     }
     else
-      if(colUpBounded && !pos && rowNotUpBounded) {
+      if(colUpBounded && pos && rowNotUpBounded) {
         lb += value * (colsol - colUpper);
         return 0;
       }
       else
-        if(colUpBounded && pos && rowNotLoBounded) {
+        if(colUpBounded && !pos && rowNotLoBounded) {
           ub += value * (colsol - colUpper);
           return 0;
         }
-  //can not remove coefficient increase it to smallest non zero
-  if(pos) value = tiny;
-  else
-    value = - tiny;
+  //can not remove coefficient 
   return 1;
 }
 
