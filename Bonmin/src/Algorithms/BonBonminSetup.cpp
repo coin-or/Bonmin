@@ -648,7 +648,7 @@ namespace Bonmin
       o_name = prefix_ + "pump_for_minlp";
       options_->SetStringValue(o_name.c_str(),"yes", true, true);
       o_name = prefix + "pump_for_minlp.time_limit";
-      options_->SetNumericValue(o_name.c_str(),30, true, true);
+      options_->SetNumericValue(o_name.c_str(),10, true, true);
       o_name = prefix + "pump_for_minlp.solution_limit";
       options_->SetIntegerValue(o_name.c_str(),3, true, true);
     }
