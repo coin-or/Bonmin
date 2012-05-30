@@ -43,29 +43,37 @@ namespace Bonmin {
       strategy_(NULL),
       ownClp_(false)
   {
+
+   int logLevel;
+   b.options()->GetIntegerValue("milp_log_level", logLevel, prefix);
+
    int ivalue;
    b.options()->GetEnumValue("milp_solver",ivalue,prefix);
    if (ivalue <= 0) {//uses cbc
      strategy_ = new CbcStrategyDefault;
      clp_ = new OsiClpSolverInterface;
      ownClp_ = true;
+     clp_->messageHandler()->setLogLevel(logLevel);
    }
    else if (ivalue == 1) {
      CbcStrategyChooseCuts strategy(b, prefix);
      strategy_  = new CbcStrategyChooseCuts(b, prefix);
      clp_ = new OsiClpSolverInterface;
      ownClp_ = true;
+     clp_->messageHandler()->setLogLevel(logLevel);
    }
    else if (ivalue == 2) {
 #ifdef COIN_HAS_CPX
       OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
 #if 1
+      
       b.options()->GetIntegerValue("number_cpx_threads",ivalue,prefix);
       CPXsetintparam(cpxSolver->getEnvironmentPtr(), CPX_PARAM_THREADS, ivalue);
       b.options()->GetIntegerValue("cpx_parallel_strategy",ivalue,prefix);
       CPXsetintparam(cpxSolver->getEnvironmentPtr(), CPX_PARAM_PARALLELMODE, ivalue);
 #endif
       cpx_ = cpxSolver;
+      cpx_->messageHandler()->setLogLevel(logLevel);
 #else
       std::cerr	<< "You have set an option to use CPLEX as the milp\n"
       << "subsolver in oa decomposition. However, apparently\n"
@@ -241,6 +249,7 @@ namespace Bonmin {
         CPXsetdblparam(env, CPX_PARAM_CUTUP, cutoff);
         CPXsetdblparam(env, CPX_PARAM_EPGAP, gap_tol_);
 
+        double start_time = CoinCpuTime();
 
         CPXsetintparam(env,CPX_PARAM_INTSOLLIM, 10);
         CPXsetintparam(env,CPX_PARAM_NODELIM, 1000);
@@ -262,9 +271,10 @@ namespace Bonmin {
         int type;
         status = CPXsolninfo(env, cpxlp, NULL, &type, NULL, NULL);
         CHECK_CPX_STAT("solninfo", status);
-
-        while(!optimal_ && type == CPX_NO_SOLN && stat != CPXMIP_SOL_LIM){
+        while(!optimal_ && type == CPX_NO_SOLN && stat != CPXMIP_SOL_LIM && stat != CPXMIP_TIME_LIM_INFEAS 
+              && stat != CPXMIP_TIME_LIM_FEAS && (CoinCpuTime() - start_time) <= max_time){
           CPXsetintparam(env, CPX_PARAM_INTSOLLIM, 1);
+          CPXsetdblparam(env, CPX_PARAM_TILIM, max_time - CoinCpuTime() + start_time);
           CPXsetintparam(env,CPX_PARAM_NODELIM, 2100000000);
            status = CPXmipopt(env,cpxlp);
            CHECK_CPX_STAT("mipopt",status)
