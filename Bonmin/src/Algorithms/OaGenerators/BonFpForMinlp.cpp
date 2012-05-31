@@ -144,7 +144,7 @@ namespace Bonmin
       handler_->message(FP_DISTANCE, messages_) 
       <<dist<<CoinMessageEol;
 
-      if(dist < 1e-05){
+      if(dist < 1e-06){
          fixIntegers(*nlp_,branch_info, parameters_.cbcIntegerTolerance_, objects_, nObjects_);
 
          nlp_->resolve(txt_id);

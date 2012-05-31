@@ -1080,9 +1080,10 @@ void getBendersCut(OsiCuts &cs, bool global);
   //@}
 
   /// Get values of tiny_ and very_tiny_
-  void get_tolerances(double &tiny, double&very_tiny, double &infty){
+  void get_tolerances(double &tiny, double&very_tiny, double &rhsRelax, double &infty){
     tiny = tiny_;
     very_tiny = veryTiny_;
+    rhsRelax = rhsRelax_;
     infty = infty_;
   }
 
@@ -1271,6 +1272,8 @@ protected:
   double tiny_;
   /** Value for small non-zero element which we will take the risk to ignore in OA cuts.*/
   double veryTiny_;
+  /** Amount by which to relax OA constraints RHSes*/
+  double rhsRelax_;
   /** Value for infinity. */
   double infty_;
   /** status of last optimization. */

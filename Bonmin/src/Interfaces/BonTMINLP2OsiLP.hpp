@@ -43,9 +43,10 @@ namespace Bonmin {
     /** virtual copy constructor*/
     virtual TMINLP2OsiLP * clone() const = 0;
 
-   void set_tols(double tiny, double very_tiny, double infty){
+   void set_tols(double tiny, double very_tiny, double rhs_relax, double infty){
      tiny_ = tiny;
      very_tiny_ = very_tiny;
+     rhs_relax_ = rhs_relax;
      infty_ = infty;
    }
 
@@ -91,6 +92,8 @@ namespace Bonmin {
    double tiny_;
    /** If constraint coefficient is below this, we neglect it.*/
    double very_tiny_;
+   /** Amount by which to relax OA constraints RHSes*/
+   double rhs_relax_;
    /** infinity.*/
    double infty_;
    /** Count the number of linear outer approximations taken.*/
