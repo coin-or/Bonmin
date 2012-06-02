@@ -242,6 +242,12 @@ static void register_OA_options
       " than this.");
   roptions->setOptionExtraInfo("very_tiny_element",119);
 
+  roptions->AddLowerBoundedNumberOption("oa_rhs_relax","Value by which to relax OA cut",
+      -0.,0,1e-8,
+      "RHS of OA constraints will be relaxed by this amount times the absolute value of the initial rhs if it is >= 1 (otherwise by this amount)."
+      );
+  roptions->setOptionExtraInfo("oa_rhs_relax",119);
+
   roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
                                          "level of log when generating OA cuts.",
                                          0, 0,
@@ -402,6 +408,7 @@ OsiTMINLPInterface::OsiTMINLPInterface():
     nNonLinear_(0),
     tiny_(1e-8),
     veryTiny_(1e-20),
+    rhsRelax_(tiny_),
     infty_(1e100),
     warmStartMode_(None),
     firstSolve_(true),
@@ -565,6 +572,7 @@ OsiTMINLPInterface::OsiTMINLPInterface (const OsiTMINLPInterface &source):
     nNonLinear_(0),
     tiny_(source.tiny_),
     veryTiny_(source.veryTiny_),
+    rhsRelax_(source.rhsRelax_),
     infty_(source.infty_),
     warmStartMode_(source.warmStartMode_),
     firstSolve_(true),
@@ -681,6 +689,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
       }
       tiny_ = rhs.tiny_;
       veryTiny_ = rhs.veryTiny_;
+      rhsRelax_ = rhs.rhsRelax_;
       infty_ = rhs.infty_;
       warmStartMode_ = rhs.warmStartMode_;
       newCutoffDecr = rhs.newCutoffDecr;
@@ -1724,7 +1733,7 @@ void
 OsiTMINLPInterface::set_linearizer(Ipopt::SmartPtr<TMINLP2OsiLP> linearizer)
 {
   linearizer_ = linearizer->clone();
-  linearizer_->set_tols(tiny_, veryTiny_, infty_);
+  linearizer_->set_tols(tiny_, veryTiny_, rhsRelax_, infty_);
   linearizer_->set_model(GetRawPtr(problem_));
 }
 
@@ -2031,8 +2040,8 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
     if(global) {
       newCut.setGloballyValidAsInteger(1);
     }
-    //if(fabs(lb[cutIdx]) < tiny_) lb[cutIdx] = 0; 
-    //if(fabs(ub[cutIdx]) < tiny_) ub[cutIdx] = 0;
+    if(lb[cutIdx] > infty) lb[cutIdx] -= rhsRelax_*std::max(fabs(lb[cutIdx]), 1.);
+    if(ub[cutIdx] < infty) ub[cutIdx] += rhsRelax_*std::max(fabs(ub[cutIdx]), 1.);
     newCut.setLb(lb[cutIdx]);
     newCut.setUb(ub[cutIdx]);
     newCut.setRow(cuts[cutIdx]);
@@ -2492,9 +2501,11 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     if(colUpper[i] >= infty_) colUpper[i] = infty;
   }
   
+
+  //Relax rhs's by tiny_
   for(int i = 0 ; i < rowLow.size() ; i++){
-     if(fabs(rowLow[i]) < tiny_) rowLow[i] = 0.;
-     if(fabs(rowUp[i]) < tiny_) rowUp[i] = 0.;
+     if(rowLow[i] > infty) rowLow[i] -= rhsRelax_*std::max(fabs(rowLow[i]), 1.);
+     if(rowUp[i] < infty) rowUp[i] += rhsRelax_*std::max(fabs(rowUp[i]), 1.);
   }
 
   si.loadProblem(mat, colLower(), colUpper(), obj(), rowLow(), rowUp());
@@ -2522,6 +2533,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
     }
   }
 
+  //si.writeMpsNative("Toto.mps", NULL, NULL, 1);
 }
 
 void 
@@ -2532,50 +2544,50 @@ OsiTMINLPInterface::addObjectiveFunction(OsiSolverInterface &si,
   int numcols = getNumCols();
   assert(numcols == si.getNumCols() );
   vector<double> obj(numcols);
-      problem_to_optimize_->eval_grad_f(numcols, x, 1,obj());
-      //add variable alpha
-      //(alpha should be empty in the matrix with a coefficient of -1 and unbounded)
-      CoinPackedVector a;
-      si.addCol(a,-si.getInfinity(), si.getInfinity(), 1.);
+  problem_to_optimize_->eval_grad_f(numcols, x, 1,obj());
+  //add variable alpha
+  //(alpha should be empty in the matrix with a coefficient of -1 and unbounded)
+  CoinPackedVector a;
+  si.addCol(a,-si.getInfinity(), si.getInfinity(), 1.);
   
-      // Now get the objective cuts
-      // get the gradient, pack it and add the cut
-      double ub;
-      problem_to_optimize_->eval_f(numcols, x, 1, ub);
-      ub*=-1;
-      double lb = -1e300;
-      CoinPackedVector objCut;
-      CoinPackedVector * v = &objCut;
-      v->reserve(numcols+1);
-      for(int i = 0; i<numcols ; i++) {
-       if(si.getNumRows())
-       {
-        if(cleanNnz(obj[i],colLower[i], colUpper[i],
-            -getInfinity(), 0,
-            x[i],
-            lb,
-            ub, tiny_, veryTiny_, infty_)) {
-          v->insert(i,obj[i]);
-          lb += obj[i] * x[i];
-          ub += obj[i] * x[i];
-        }
-       }
-       else //Unconstrained problem can not put clean coefficient
-       {
-           if(cleanNnz(obj[i],colLower[i], colUpper[i],
-            -getInfinity(), 0,
-            x[i],
-            lb,
-            ub, 1e-03, 1e-08, infty_)) {
-          v->insert(i,obj[i]);
-          lb += obj[i] * x[i];
-          ub += obj[i] * x[i];
-           }
-       }
-      }
-    v->insert(numcols,-1);
-    si.addRow(objCut, lb, ub);
+  // Now get the objective cuts
+  // get the gradient, pack it and add the cut
+  double ub;
+  problem_to_optimize_->eval_f(numcols, x, 1, ub);
+  ub*=-1;
+  double lb = -1e300;
+  CoinPackedVector objCut;
+  CoinPackedVector * v = &objCut;
+  v->reserve(numcols+1);
+  for(int i = 0; i<numcols ; i++) {
+    if(si.getNumRows())
+    {
+     if(cleanNnz(obj[i],colLower[i], colUpper[i],
+         -getInfinity(), 0,
+         x[i],
+         lb,
+         ub, tiny_, veryTiny_, infty_)) {
+       v->insert(i,obj[i]);
+       lb += obj[i] * x[i];
+       ub += obj[i] * x[i];
+     }
     }
+    else //Unconstrained problem can not put clean coefficient
+    {
+       if(cleanNnz(obj[i],colLower[i], colUpper[i],
+        -getInfinity(), 0,
+        x[i],
+        lb,
+        ub, 1e-03, 1e-08, infty_)) {
+      v->insert(i,obj[i]);
+      lb += obj[i] * x[i];
+      ub += obj[i] * x[i];
+       }
+    }
+  }
+  v->insert(numcols,-1);
+  si.addRow(objCut, lb, ub);
+}
 
 /** Add a collection of linear cuts to problem formulation.*/
 void 
@@ -2976,6 +2988,7 @@ OsiTMINLPInterface::extractInterfaceParams()
     ("warm_start_bound_frac" ,pushValue_,app_->prefix());
     app_->options()->GetNumericValue("tiny_element",tiny_,app_->prefix());
     app_->options()->GetNumericValue("very_tiny_element",veryTiny_,app_->prefix());
+    app_->options()->GetNumericValue("oa_rhs_relax",rhsRelax_,app_->prefix());
     app_->options()->GetNumericValue("random_point_perturbation_interval",max_perturbation_,app_->prefix());
     app_->options()->GetEnumValue("random_point_type",randomGenerationType_,app_->prefix());
     int cut_strengthening_type;
