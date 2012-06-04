@@ -380,8 +380,6 @@ includecoin_HEADERS = \
      BonStrongBranchingSolver.hpp \
      BonTMINLP2OsiLP.hpp \
      BonTypes.hpp \
-     BonTMINLP2OsiLP.hpp \
-     BonStrongBranchingSolver.hpp \
      BonRegisteredOptions.hpp
 
 
