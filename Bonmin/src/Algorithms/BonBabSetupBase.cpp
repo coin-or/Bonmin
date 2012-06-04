@@ -598,7 +598,7 @@ namespace Bonmin
         "osi-strong", "Osi method to do strong branching",
         "random", "Method to choose branching variable randomly");
 
-    roptions->setOptionExtraInfo("variable_selection", 8);
+    roptions->setOptionExtraInfo("variable_selection", 27);
 
     roptions->AddLowerBoundedIntegerOption("num_cut_passes",
         "Set the maximum number of cut passes at regular nodes of the branch-and-cut.",

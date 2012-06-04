@@ -19,6 +19,8 @@ bonmin.num_cut_passes                        1         	#Set the maximum number 
 bonmin.num_cut_passes_at_root                20        	#Set the maximum number of cut passes at regular nodes of the branch-and-cut.
 bonmin.number_before_trust                   8         	#Set the number of branches on a variable before its pseudo costs are to be believed in dynamic strong branching.
 bonmin.number_strong_branch                  20        	#Choose the maximum number of variables considered for strong branching.
+bonmin.random_generator_seed                 0         	#Set seed for random number generator (a value of -1 sets seeds to time since Epoch).
+bonmin.read_solution_file                    no        	#Read a file with the optimal solution to test if algorithms cuts it.
 bonmin.solution_limit                        2147483647	#Abort after that much integer feasible solution have been found by algorithm
 bonmin.sos_constraints                       enable    	#Wether or not to activate SOS constraints.
 bonmin.time_limit                            1e+10     	#Set the global maximum computation time (in secs) for the algorithm.
@@ -30,7 +32,7 @@ bonmin.variable_selection                    strong-branching	#Chooses variable 
 bonmin.2mir_cuts                             0         	#Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut
 bonmin.Gomory_cuts                           -5        	#Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.
 bonmin.clique_cuts                           -5        	#Frequency (in terms of nodes) for generating clique cuts in branch-and-cut
-bonmin.cover_cuts                            -5        	#Frequency (in terms of nodes) for generating cover cuts in branch-and-cut
+bonmin.cover_cuts                            0         	#Frequency (in terms of nodes) for generating cover cuts in branch-and-cut
 bonmin.flow_cover_cuts                       -5        	#Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut
 bonmin.lift_and_project_cuts                 0         	#Frequency (in terms of nodes) for generating lift-and-project cuts in branch-and-cut
 bonmin.mir_cuts                              -5        	#Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut
@@ -40,15 +42,12 @@ bonmin.reduce_and_split_cuts                 0         	#Frequency (in terms of 
 
 bonmin.feasibility_pump_objective_norm       1         	#Norm of feasibility pump objective function
 bonmin.heuristic_RINS                        no        	#if yes runs the RINS heuristic
+bonmin.heuristic_dive_MIP_fractional         no        	#if yes runs the Dive MIP Fractional heuristic
 bonmin.heuristic_dive_MIP_vectorLength       no        	#if yes runs the Dive MIP VectorLength heuristic
 bonmin.heuristic_dive_fractional             no        	#if yes runs the Dive Fractional heuristic
 bonmin.heuristic_dive_vectorLength           no        	#if yes runs the Dive VectorLength heuristic
 bonmin.heuristic_feasibility_pump            no        	#whether the heuristic feasibility pump should be used
 bonmin.pump_for_minlp                        no        	#if yes runs FP for MINLP
-
-# registering category: MINLP heuristics
-
-bonmin.heuristic_dive_MIP_fractional         no        	#if yes runs the Dive MIP Fractional heuristic
 
 # registering category: Nlp solution robustness
 
@@ -58,6 +57,7 @@ bonmin.num_iterations_suspect                -1        	#Number of iterations ov
 bonmin.num_retry_unsolved_random_point       0         	#Number $k$ of times that the algorithm will try to resolve an unsolved NLP with a random starting point (we call unsolved an NLP for which Ipopt is not able to guarantee optimality within the specified tolerances).
 bonmin.random_point_perturbation_interval    1         	#Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point
 bonmin.random_point_type                     Jon       	#method to choose a random starting point
+bonmin.resolve_on_small_infeasibility        0         	#If a locally infeasible problem is infeasible by less than this, resolve it with initial starting point.
 
 # registering category: Nlp solve options in B-Hyb
 
@@ -67,8 +67,11 @@ bonmin.nlp_solves_per_depth                  1e+100    	#Set average number of n
 
 # registering category: Options for MILP solver
 
+bonmin.cpx_parallel_strategy                 0         	#Strategy of parallel search mode in CPLEX.
 bonmin.milp_log_level                        0         	#specify MILP solver log level.
 bonmin.milp_solver                           Cbc_D     	#Choose the subsolver to solve MILP sub-problems in OA decompositions.
+bonmin.milp_strategy                         find_good_sol	#Choose a strategy for MILPs.
+bonmin.number_cpx_threads                    0         	#Set number of threads to use with cplex.
 
 # registering category: Options for OA decomposition
 
@@ -94,6 +97,7 @@ bonmin.generate_benders_after_so_many_oa     5000      	#Specify that after so m
 
 bonmin.fp_log_frequency                      100       	#display an update on lower and upper bounds in FP every n seconds
 bonmin.fp_log_level                          1         	#specify FP iterations log level.
+bonmin.fp_pass_infeasible                    no        	#Say whether feasibility pump should claim to converge or not
 
 # registering category: Options for non-convex problems
 
@@ -111,10 +115,11 @@ bonmin.second_perc_for_cutoff_decr           -0.05     	#The percentage used whe
 bonmin.add_only_violated_oa                  no        	#Do we add all OA cuts or only the ones violated by current point?
 bonmin.oa_cuts_log_level                     0         	#level of log when generating OA cuts.
 bonmin.oa_cuts_scope                         global    	#Specify if OA cuts added are to be set globally or locally valid
+bonmin.oa_rhs_relax                          1e-08     	#Value by which to relax OA cut
 bonmin.tiny_element                          1e-08     	#Value for tiny element in OA cut
 bonmin.very_tiny_element                     1e-17     	#Value for very tiny element in OA cut
 
-# registering category: Output ond log-levels options
+# registering category: Output and log-level options
 
 bonmin.bb_log_interval                       100       	#Interval at which node level output is printed.
 bonmin.bb_log_level                          1         	#specify main branch-and-bound log level.
@@ -139,4 +144,3 @@ bonmin.file_solution                         no        	#Write a file bonmin.sol
 bonmin.nlp_log_level                         1         	#specify NLP solver interface log level (independent from ipopt print_level).
 bonmin.nlp_solver                            Ipopt     	#Choice of the solver for local optima of continuous nlp's
 bonmin.warm_start                            none      	#Select the warm start method
-
