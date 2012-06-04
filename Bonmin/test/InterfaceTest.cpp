@@ -190,11 +190,16 @@ void testSetMethods(OsiTMINLPInterface &si)
 
 void testOa(Bonmin::OsiTMINLPInterface &si)
 {
-        CoinRelFltEq eq(1e-07);// to test equality of doubles    
-    OsiClpSolverInterface lp;
-    si.extractLinearRelaxation(lp);
+      CoinRelFltEq eq(1e-07);// to test equality of doubles    
+      OsiClpSolverInterface lp;
+      si.extractLinearRelaxation(lp);
+
+      //get tolerances
+      double tiny, very_tiny, rhs_relax, infty;
+      si.get_tolerances(tiny, very_tiny, rhs_relax, infty);
+
 //    lp.writeMps("toy");
-     MyAssert(lp.getNumCols()==4);
+      MyAssert(lp.getNumCols()==4);
       MyAssert(lp.getNumRows()==3);
       //Check bounds on columns
       const double * colLow = lp.getColLower();
@@ -222,8 +227,8 @@ void testOa(Bonmin::OsiTMINLPInterface &si)
 	std::cout<<"Error in OA for rowUp[0]: "
 		 <<error<<std::endl;
       }
-      DblEqAssert(rowUp[1], 0.);
-      DblEqAssert(rowUp[2], 2.);
+      DblEqAssert(rowUp[1], 0. + rhs_relax);
+      DblEqAssert(rowUp[2], 2. * (1 + rhs_relax));
       //DblEqAssert(rowUp[3], 0.);
       
 
