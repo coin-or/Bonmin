@@ -50,9 +50,9 @@ extern "C"
       exit(0);
     }
     if (currentBranchModel!=NULL)
-      currentBranchModel->setMaximumNodes(0); // stop at next node
+      currentBranchModel->sayEventHappened(); // stop at next node
     if (OAModel!=NULL)
-      OAModel->setMaximumNodes(0); // stop at next node
+      OAModel->sayEventHappened(); // stop at next node
     if (currentOA!=NULL)
       currentOA->parameter().maxLocalSearchTime_ = 0.; // stop OA
     BonminAbortAll = true;
@@ -639,7 +639,7 @@ namespace Bonmin
         mipStatus_ = ProvenInfeasible;
       }
     }
-    else if (model_.status() == 1) {
+    else if (model_.status() == 1 || model_.status() == 5) {
       status = TMINLP::LIMIT_EXCEEDED;
       if (bestSolution_) {
         mipStatus_ = Feasible;
