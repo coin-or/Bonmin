@@ -623,6 +623,9 @@ namespace Bonmin
       if (bestSolution_) {
         mipStatus_ = Feasible;
       }
+      else {
+        mipStatus_ = NoSolutionKnown;
+      }
     }
     else if (model_.status() == 0) {
       if(model_.isContinuousUnbounded()){
@@ -640,7 +643,7 @@ namespace Bonmin
       }
     }
     else if (model_.status() == 1 || model_.status() == 5) {
-      status = TMINLP::LIMIT_EXCEEDED;
+      status = model_.status() == 1 ? TMINLP::LIMIT_EXCEEDED : TMINLP::USER_INTERRUPT;
       if (bestSolution_) {
         mipStatus_ = Feasible;
       }

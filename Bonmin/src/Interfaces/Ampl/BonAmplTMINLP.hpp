@@ -173,8 +173,8 @@ namespace Bonmin
       * <tr> <td> <b> <center> Code </center> </b> </td> <td> <b> <center> Status </center> </b> </td> </tr>
       * <tr> <td> 3 </td> <td> Integer optimal </td> </tr>
       * <tr> <td> 220 </td> <td> problem is proven infeasible. </td> </tr>
-      * <tr> <td> 421 </td> <td> limit reached with integer feasible solution found. </td> </tr>
-      * <tr> <td> 410 </td> <td> limit reached without any integer feasible solution. </td> </tr>
+      * <tr> <td> 421 </td> <td> limit reached or user interrupt with integer feasible solution found. </td> </tr>
+      * <tr> <td> 410 </td> <td> limit reached or user interrupt without any integer feasible solution. </td> </tr>
       * <tr> <td> 500 </td> <td> error. </td> </tr>
       * <caption> Status codes for optimization. </caption>
       * </table>

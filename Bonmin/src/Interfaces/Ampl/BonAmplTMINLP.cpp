@@ -731,13 +731,13 @@ namespace Bonmin
       message = "\n" + appName_ +" Continuous relaxation is unbounded.";
       solve_result_num = 300;
     }
-    else if (status == TMINLP::LIMIT_EXCEEDED) {
+    else if (status == TMINLP::LIMIT_EXCEEDED || status == TMINLP::USER_INTERRUPT) {
       status_str = "\t\"Not finished\"";
-      message = "\n" + appName_ + ": Optimization interupted on limit.";
+      message = "\n" + appName_ + ": Optimization interrupted " + (status == TMINLP::LIMIT_EXCEEDED ? "on limit." : "by user.");
       if(x)
-        solve_result_num = 421; /* Limit reached with integer feasible solution.*/
+        solve_result_num = 421; /* Limit reached or user interrupt with integer feasible solution.*/
       else
-        solve_result_num = 410; /* Limit reached without solution.*/
+        solve_result_num = 410; /* Limit reached or user interrupt without solution.*/
     }
     else if (status == TMINLP::MINLP_ERROR) {
       status_str = "\t\"Aborted\"";

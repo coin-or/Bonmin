@@ -66,6 +66,7 @@ namespace Bonmin
       INFEASIBLE,
       CONTINUOUS_UNBOUNDED,
       LIMIT_EXCEEDED,
+      USER_INTERRUPT,
       MINLP_ERROR};
     /** Class to store sos constraints for model */
     struct SosInfo
