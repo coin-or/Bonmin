@@ -2015,10 +2015,10 @@ OsiTMINLPInterface::getOuterApproximation(OsiCuts &cs, const double * x,
       double violation = 0.;
       violation = std::max(violation, rhs - ub[cutIdx]);
       violation = std::max(violation, lb[cutIdx] - rhs);
-      if(violation < theta && oaHandler_) {
+      if(violation < theta && oaHandler_->logLevel() > 0) {
           oaHandler_->message(CUT_NOT_VIOLATED_ENOUGH, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEol;
         continue;}
-      if(oaHandler_)
+      if(oaHandler_->logLevel() > 0)
           oaHandler_->message(VIOLATED_OA_CUT_GENERATED, oaMessages_)<<cut2rowIdx[cutIdx]<<violation<<CoinMessageEol;
     }
   OsiRowCut newCut;
