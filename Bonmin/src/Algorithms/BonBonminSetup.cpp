@@ -696,8 +696,10 @@ namespace Bonmin
       options_->SetIntegerValue(o_name.c_str(), 0, true, true);
       o_name = prefix_ + "filmint_ecp_cuts";
       options_->SetIntegerValue(o_name.c_str(), 1, true, true);
+      /* SV: there is no option number_cut_passes; should it be num_cut_passes ?????
       o_name = prefix_ + "number_cut_passes";
       options_->SetIntegerValue(o_name.c_str(), 1, true, true);
+      */
     }
 //#define GREAT_STUFF_FOR_ANDREAS
 #ifdef GREAT_STUFF_FOR_ANDREAS
