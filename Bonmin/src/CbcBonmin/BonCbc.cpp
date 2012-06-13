@@ -32,7 +32,7 @@
 
 // Code to enable user interuption
 static CbcModel * currentBranchModel = NULL; //pointer to the main b&b
-static Bonmin::OACutGenerator2 * currentOA = NULL; //pointer to the OA generator
+Bonmin::OACutGenerator2 * currentOA = NULL; //pointer to the OA generator
 CbcModel * OAModel; // pointer to the submip if using Cbc
 bool BonminAbortAll;
 
