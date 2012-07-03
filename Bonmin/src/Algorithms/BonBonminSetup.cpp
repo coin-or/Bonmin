@@ -192,7 +192,7 @@ namespace Bonmin
     roptions->SetRegisteringCategory("MILP cutting planes in hybrid", RegisteredOptions::BonminCategory);
 
     roptions->AddLowerBoundedIntegerOption("Gomory_cuts",
-        "Frequency k (in terms of nodes) for generating Gomory cuts in branch-and-cut.",
+        "Frequency (in terms of nodes) for generating Gomory cuts in branch-and-cut.",
         -100,-5,
         "If $k > 0$, cuts are generated every $k$ nodes, if $-99 < k < 0$ cuts are generated every $-k$ nodes but "
         "Cbc may decide to stop generating cuts, if not enough are generated at the root node, "
