@@ -561,7 +561,7 @@ namespace Bonmin {
         "Cbc_D",
         "Cbc_D","Coin Branch and Cut with its default",
         "Cbc_Par", "Coin Branch and Cut with passed parameters",
-        "Cplex","Ilog Cplex",
+        "Cplex","IBM Cplex",
         " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
     roptions->setOptionExtraInfo("milp_solver",64);
 
