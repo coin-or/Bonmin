@@ -595,10 +595,15 @@ namespace Bonmin
       OsiSolverInterface * solver = 
              (s.nonlinearSolver() == s.continuousSolver())? 
              model_.solver() : s.nonlinearSolver();
-      bestSolution_ = new double[solver->getNumCols()];
-      CoinCopyN(solver->getColSolution(), solver->getNumCols(),
-          bestSolution_);
-      bestObj_ = bestBound_ = solver->getObjValue();
+      if(solver->isProvenPrimalInfeasible()){
+         bestSolution_ = NULL;
+      }
+      else {
+         bestSolution_ = new double[solver->getNumCols()];
+         CoinCopyN(solver->getColSolution(), solver->getNumCols(),
+            bestSolution_);
+         bestObj_ = bestBound_ = solver->getObjValue();
+      }
     }
 
     if (bonBabInfoPtr->bestSolution2().size() > 0) {
