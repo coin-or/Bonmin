@@ -264,7 +264,7 @@ namespace Bonmin {
         CHECK_CPX_STAT("bestobjvalue",status)
      
         int stat = CPXgetstat( env, cpxlp);
-        optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
+        optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL) || (stat == CPXMIP_INForUNBD) ; 
         nodeCount_ = CPXgetnodecnt(env , cpxlp);
         iterationCount_ = CPXgetmipitcnt(env , cpxlp);
         
@@ -280,7 +280,7 @@ namespace Bonmin {
            CHECK_CPX_STAT("mipopt",status)
 
            stat = CPXgetstat( env, cpxlp);
-           optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
+           optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL) || (stat == CPXMIP_INForUNBD) ; 
            nodeCount_ = CPXgetnodecnt(env , cpxlp);
            iterationCount_ = CPXgetmipitcnt(env , cpxlp);
        }
@@ -400,7 +400,7 @@ namespace Bonmin {
       int stat = CPXgetstat( env, cpxlp);
       bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS) || (stat == CPXMIP_TIME_LIM_INFEAS) || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)
                         || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
-      optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
+      optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL) || (stat == CPXMIP_INForUNBD); 
       nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
       status = CPXgetbestobjval(env, cpxlp, &lowBound_);
@@ -505,7 +505,7 @@ namespace Bonmin {
       int stat = CPXgetstat( env, cpxlp);
       bool infeasible = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_ABORT_INFEAS) || (stat == CPXMIP_TIME_LIM_INFEAS) || (stat == CPXMIP_NODE_LIM_INFEAS) || (stat == CPXMIP_FAIL_INFEAS)
                         || (stat == CPXMIP_MEM_LIM_INFEAS) || (stat == CPXMIP_INForUNBD);
-      optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL); 
+      optimal_ = (stat == CPXMIP_INFEASIBLE) || (stat == CPXMIP_OPTIMAL) || (stat == CPXMIP_OPTIMAL_TOL) || (stat == CPXMIP_INForUNBD);
       nodeCount_ = CPXgetnodecnt(env , cpxlp);
       iterationCount_ = CPXgetmipitcnt(env , cpxlp);
       status = CPXgetbestobjval(env, cpxlp, &lowBound_);
@@ -586,7 +586,7 @@ namespace Bonmin {
     
     roptions->AddStringOption2("milp_strategy",
         "Choose a strategy for MILPs.",
-        "find_good_sol",
+        "solve_to_optimality",
         "find_good_sol","Stop sub milps when a solution improving the incumbent is found",
         "solve_to_optimality", "Solve MILPs to optimality",
         "");
