@@ -121,6 +121,7 @@ namespace Bonmin
       CANDIDATE_LIST,
       CANDIDATE_LIST2,
       CANDIDATE_LIST3,
+      SB_START,
       SB_HEADER,
       SB_RES,
       BRANCH_VAR,

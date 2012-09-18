@@ -21,19 +21,21 @@ namespace Bonmin
       CoinMessages((int) BON_CHOOSE_MESSAGES_DUMMY_END)
   {
     strcpy(source_,"BON");
-    ADD_MSG(PS_COST_HISTORY,std_m,6,"%3d up %3d  %15.8e  down %3d  %15.8e");
+    ADD_MSG(PS_COST_HISTORY,std_m,6,"%3d up %3d  %.8e  down %3d  %.8e");
     ADD_MSG(PS_COST_MULT,std_m, 6, "upMultiplier = %e downMultiplier = %e");
     ADD_MSG(PS_COST_ESTIMATES, std_m, 6, "%3d value = %e upEstimate = %e downEstimate = %e infeas = %e value2 = %e");
-    ADD_MSG(CANDIDATE_LIST,std_m,5,
-        "list_[%5d] = %5d, usefull_[%5d] = %23.16e %23.16e");
-    ADD_MSG(CANDIDATE_LIST2, std_m, 5,
+    ADD_MSG(CANDIDATE_LIST,std_m,6,
+        "list_[%5d] = %5d, usefull_[%5d] = %.16e %.16e");
+    ADD_MSG(CANDIDATE_LIST2, std_m, 6,
         "list_[%3d] = %3d useful_[%3d] = %e");
-    ADD_MSG(CANDIDATE_LIST3, std_m, 5,
+    ADD_MSG(CANDIDATE_LIST3, std_m, 6,
         "list2[%3d] = %3d useful2[%3d] = %e");
+    ADD_MSG(SB_START, std_m,5,
+        " Starting strong branching. Obj. val = %g\n");
     ADD_MSG(SB_HEADER, std_m,5,
-        "           DownStat    DownChange     UpStat      UpChange");
+        "           Var    Value            DownStat    DownChange     UpStat      UpChange");
     ADD_MSG(SB_RES, std_m, 5,
-        "    %3d    %6s    %13.6e   %6s    %13.6e");
+        "    %3d    %3d    %.6e      %6s    %.6e   %6s    %.6e");
     ADD_MSG(BRANCH_VAR, std_m, 4, "Branched on variable %i, bestWhichWay: %i");
     ADD_MSG(CHOSEN_VAR, std_m, 4,"           Choosing %d");
     ADD_MSG(UPDATE_PS_COST, std_m, 4,"update %3d %3d %e %e %3d");
@@ -610,6 +612,11 @@ namespace Bonmin
     if (isRoot) {
       numberStrong = CoinMax(numberStrong_, numberStrongRoot_);
     }
+    std::vector<double> save_sol;
+    if (bb_log_level_>=3) {
+       save_sol.resize(info->numberColumns_);
+       std::copy(info->solution_, info->solution_ + info->numberColumns_ , save_sol.begin());
+    }
     if (numberUnsatisfied_) {
       const double* upTotalChange = pseudoCosts_.upTotalChange();
       const double* downTotalChange = pseudoCosts_.downTotalChange();
@@ -654,14 +661,18 @@ namespace Bonmin
       if (results_.size() > 0) {
         returnCode = doStrongBranching(solver, info, results_.size(), 1);
         if (bb_log_level_>=3) {
+          OsiObject ** obj = solver->objects();
           const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"};
+          message(SB_START)<<info->objectiveValue_<<CoinMessageEol;
           message(SB_HEADER)<<CoinMessageEol;
           for (unsigned int i = 0; i< results_.size(); i++) {
             double up_change = results_[i].upChange();
             double down_change = results_[i].downChange();
             int up_status = results_[i].upStatus();
             int down_status = results_[i].downStatus();
-            message(SB_RES)<<(int) i<<stat_msg[down_status+1]<<down_change
+            int icol = obj[results_[i].whichObject()]->columnNumber();
+            double val = save_sol[icol];
+            message(SB_RES)<<(int) i<<icol<<val<<stat_msg[down_status+1]<<down_change
             <<stat_msg[up_status+1]<< up_change<< CoinMessageEol;
           }
         }
@@ -908,15 +919,10 @@ namespace Bonmin
       if (status0==1&&status1==1) {
         // infeasible
         returnCode=-1;
-        break; // exit loop
+        //break; // exit loop
       } else if (status0==1||status1==1) {
         numberStrongFixed_++;
-        if (!returnCriterion) {
   	returnCode=1;
-        } else {
-  	returnCode=2;
-  	break;
-        }
       }
       bool hitMaxTime = ( CoinCpuTime()-timeStart > info->timeRemaining_)
                         || ( CoinCpuTime() - start_time_ > time_limit_);
