@@ -372,7 +372,6 @@ namespace Bonmin {
 
       int s;
       CPXLPptr cpxlp = CPXcloneprob(env, orig_lp, &s);
-      printf("S is %i\n", s);
       double gap_tol = std::max(0.,gap_tol_- gap_tol_*(1e-01));
 
 #ifdef SHIFT_CUTOFF
@@ -449,7 +448,7 @@ namespace Bonmin {
 // Remove all the cuts and declare them as lazy constraints
 
       int orig_nrows = CPXgetnumrows(env, cpxlp) - cs.sizeRowCuts();
-      printf("Number of rows %i\n", cs.sizeRowCuts());
+      /* printf("Number of rows %i\n", cs.sizeRowCuts()); */
       CPXdelrows(env, cpxlp, orig_nrows, CPXgetnumrows(env, cpxlp) - 1);
       
       int rcnt = cs.sizeRowCuts(), nzcnt = 0;
