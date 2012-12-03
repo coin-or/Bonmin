@@ -217,7 +217,7 @@ namespace Bonmin
         return stats->TotalCpuTime();
       }
       else {
-        app_->Jnlst()->Printf(Ipopt::J_WARNING, Ipopt::J_STATISTICS, "TODO: No statistics available from Ipopt in Bonmin::IpoptSolver::CPUTime\n");
+        app_->Jnlst()->Printf(Ipopt::J_WARNING, Ipopt::J_STATISTICS, "No statistics available from Ipopt in Bonmin::IpoptSolver::CPUTime\n");
         return 0.;
         //throw CoinError("No statistics available from Ipopt","CPUTime","Bonmin::IpoptSolver");
       }
@@ -237,7 +237,7 @@ namespace Bonmin
         return stats->IterationCount();
       }
       else {
-        app_->Jnlst()->Printf(Ipopt::J_WARNING, Ipopt::J_STATISTICS, "TODO: No statistics available from Ipopt in Bonmin::IpoptSolver::IterationCount\n");
+        app_->Jnlst()->Printf(Ipopt::J_WARNING, Ipopt::J_STATISTICS, "No statistics available from Ipopt in Bonmin::IpoptSolver::IterationCount\n");
         return 0;
         //throw CoinError("No statistics available from Ipopt","IterationCount","Bonmin::IpoptSolver");
       }

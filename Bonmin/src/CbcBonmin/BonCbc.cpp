@@ -433,6 +433,14 @@ namespace Bonmin
       }
     }
 
+#ifdef SIGNAL
+    CoinSighandler_t saveSignal=SIG_DFL;
+    // register signal handler
+    saveSignal = signal(SIGINT,signal_handler);
+#endif
+
+    currentBranchModel = &model_;
+
 
     try {
     //Get the time and start.
@@ -506,14 +514,6 @@ namespace Bonmin
        model_.solver()->setColSolution(NULL);
 #endif 
     }
-
-#ifdef SIGNAL
-    CoinSighandler_t saveSignal=SIG_DFL;
-    // register signal handler
-    saveSignal = signal(SIGINT,signal_handler);
-#endif
-
-    currentBranchModel = &model_;
 
     // to get node parent info in Cbc, pass parameter 3.
     //model_.branchAndBound(3);
