@@ -457,9 +457,7 @@ namespace Bonmin
       }
     }
 
-    if(BonminInteruptedOnce){
-      return;
-    }
+    if(!BonminInteruptedOnce){
     int ival;
     s.options()->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
     if(s.nonlinearSolver() == s.continuousSolver() && ival)
@@ -525,6 +523,7 @@ namespace Bonmin
     model_.setDblParam(CbcModel::CbcMaximumSeconds, remaining_time);
     if(remaining_time > 0.)
       model_.branchAndBound();
+    }
     }
     catch(TNLPSolver::UnsolvedError *E){
       s.nonlinearSolver()->model()->finalize_solution(TMINLP::MINLP_ERROR,
@@ -593,6 +592,7 @@ namespace Bonmin
     }
     TMINLP::SolverReturn status = TMINLP::MINLP_ERROR;
 
+    if(BonminAbortAll) status = TMINLP::USER_INTERRUPT;
     if (model_.numberObjects()==0) {
       if (bestSolution_)
         delete [] bestSolution_;
