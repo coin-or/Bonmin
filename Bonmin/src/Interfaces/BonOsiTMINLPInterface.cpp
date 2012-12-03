@@ -43,6 +43,7 @@
 using namespace Ipopt;
 
 
+extern bool BonminAbortAll;
 namespace Bonmin {
 ///Register options
 static void
@@ -2503,7 +2504,7 @@ OsiTMINLPInterface::extractLinearRelaxation(OsiSolverInterface &si,
   
 
   //Relax rhs's by tiny_
-  for(int i = 0 ; i < rowLow.size() ; i++){
+  for(size_t i = 0 ; i < rowLow.size() ; i++){
      if(rowLow[i] > infty) rowLow[i] -= rhsRelax_*std::max(fabs(rowLow[i]), 1.);
      if(rowUp[i] < infty) rowUp[i] += rhsRelax_*std::max(fabs(rowUp[i]), 1.);
   }
@@ -2608,6 +2609,7 @@ void
 OsiTMINLPInterface::solveAndCheckErrors(bool warmStarted, bool throwOnFailure,
     const char * whereFrom)
 {
+  if (BonminAbortAll == true) return;
   totalNlpSolveTime_-=CoinCpuTime();
   if(warmStarted)
     optimizationStatus_ = app_->ReOptimizeTNLP(GetRawPtr(problem_to_optimize_));
@@ -2780,6 +2782,7 @@ void OsiTMINLPInterface::initialSolve(const char * whereFrom)
   assert(IsValid(app_));
   assert(IsValid(problem_));
 
+  if (BonminAbortAll == true) return;
   // Discard warmstart_ if we had one
   delete warmstart_;
   warmstart_ = NULL;
@@ -2808,6 +2811,9 @@ void OsiTMINLPInterface::initialSolve(const char * whereFrom)
                                                       <<app_->CPUTime()
                                                       <<whereFrom<<CoinMessageEol;
   
+  if(BonminAbortAll){
+    return;
+  }
   int numRetry = firstSolve_ ? numRetryInitial_ : numRetryResolve_;
   if(isAbandoned() ||
     ( isProvenPrimalInfeasible() && getObjValue() < infeasibility_epsilon_)) {
@@ -2842,6 +2848,7 @@ OsiTMINLPInterface::resolve(const char * whereFrom)
 {
   assert(IsValid(app_));
   assert(IsValid(problem_));
+  if (BonminAbortAll == true) return;
   int has_warmstart = warmstart_ == NULL ? 0 : 1;
   if(warmstart_ == NULL) has_warmstart = 0;
   else if(!app_->warmStartIsValid(warmstart_)) has_warmstart = 1;

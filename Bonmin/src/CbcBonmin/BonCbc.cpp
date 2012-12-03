@@ -55,6 +55,7 @@ extern "C"
       OAModel->sayEventHappened(); // stop at next node
     if (currentOA!=NULL)
       currentOA->parameter().maxLocalSearchTime_ = 0.; // stop OA
+     
     BonminAbortAll = true;
     BonminInteruptedOnce = true;
     return;
@@ -456,6 +457,9 @@ namespace Bonmin
       }
     }
 
+    if(BonminInteruptedOnce){
+      return;
+    }
     int ival;
     s.options()->GetEnumValue("enable_dynamic_nlp", ival, "bonmin.");
     if(s.nonlinearSolver() == s.continuousSolver() && ival)
