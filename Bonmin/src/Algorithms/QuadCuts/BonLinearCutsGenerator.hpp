@@ -10,6 +10,7 @@
 #ifndef BonLinearCutsGenerator_H
 #define BonLinearCutsGenerator_H
 
+#include "CglConfig.h"
 #include "CglCutGenerator.hpp"
 #include "CoinSmartPtr.hpp"
 #include "BonOuterApprox.hpp"
@@ -63,8 +64,11 @@ class LinearCutsGenerator : public CglCutGenerator {
    void initialize(BabSetupBase& s);
 
    void generateCuts(const OsiSolverInterface &solver, OsiCuts &cs,
-		     const CglTreeInfo info = CglTreeInfo()) const; 
-     
+		     const CglTreeInfo info = CglTreeInfo())
+#if CGL_VERSION_MAJOR == 0 && CGL_VERSION_MINOR <= 57
+    const
+#endif
+   ;
 
    private:
      std::list<Coin::SmartPtr<CuttingMethod> > methods_; 

@@ -61,7 +61,10 @@ namespace Bonmin
 /// cut generation method
   void
   OaNlpOptim::generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
-      const CglTreeInfo info) const
+      const CglTreeInfo info)
+#if CGL_VERSION_MAJOR == 0 && CGL_VERSION_MINOR <= 57
+    const
+#endif
   {
     if (nlp_ == NULL) {
       CoinError("Error in cut generator for outer approximation no ipopt NLP assigned", "generateCuts", "OaNlpOptim");

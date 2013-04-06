@@ -9,6 +9,7 @@
 #ifndef BonOaDecBase_HPP
 #define BonOaDecBase_HPP
 #include "BonSubMipSolver.hpp"
+#include "CglConfig.h"
 #include "CglCutGenerator.hpp"
 #include "BonBabSetupBase.hpp"
 #include "BonOAMessages.hpp"
@@ -112,7 +113,11 @@ namespace Bonmin
 
     /** Standard cut generation methods. */
     virtual void generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
-        const CglTreeInfo info = CglTreeInfo()) const;
+        const CglTreeInfo info = CglTreeInfo())
+#if CGL_VERSION_MAJOR == 0 && CGL_VERSION_MINOR <= 57
+    const
+#endif
+    ;
 
     /// Assign an OsiTMINLPInterface
     void assignNlpInterface(OsiTMINLPInterface * nlp)

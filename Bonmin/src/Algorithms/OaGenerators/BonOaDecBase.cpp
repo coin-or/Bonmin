@@ -241,7 +241,11 @@ OaDecompositionBase::passInMessageHandler(CoinMessageHandler * handler)
 /** Standard cut generation methods. */
 void
 OaDecompositionBase::generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
-    const CglTreeInfo info) const{
+    const CglTreeInfo info)
+#if CGL_VERSION_MAJOR == 0 && CGL_VERSION_MINOR <= 57
+    const
+#endif
+{
   if (nlp_ == NULL) {
     throw CoinError("Error in cut generator for outer approximation no NLP ipopt assigned", "generateCuts", "OaDecompositionBase");
   }

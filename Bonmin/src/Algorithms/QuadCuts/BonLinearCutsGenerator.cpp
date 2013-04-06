@@ -107,7 +107,11 @@ namespace Bonmin {
 
   void 
   LinearCutsGenerator::generateCuts(const OsiSolverInterface &solver, OsiCuts &cs,
-                     const CglTreeInfo info) const {
+                     const CglTreeInfo info)
+#if CGL_VERSION_MAJOR == 0 && CGL_VERSION_MINOR <= 57
+    const
+#endif
+  {
 
     //const OsiTMINLPInterface * tmp = dynamic_cast<const OsiTMINLPInterface *>(&solver);
     OsiTMINLPInterface * nlp = dynamic_cast<OsiTMINLPInterface *>(solver.clone());//const_cast<OsiTMINLPInterface *>(tmp);
