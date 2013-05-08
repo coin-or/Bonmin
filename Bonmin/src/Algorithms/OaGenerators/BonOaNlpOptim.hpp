@@ -9,7 +9,6 @@
 
 #ifndef BonOaNlpOptim_HPP
 #define BonOaNlpOptim_HPP
-#include "CglConfig.h"
 #include "CglCutGenerator.hpp"
 #include "BonOsiTMINLPInterface.hpp"
 #include "BonOAMessages.hpp"
@@ -64,11 +63,7 @@ namespace Bonmin
     void assignInterface(OsiTMINLPInterface * si);
     /// cut generation method
     virtual void generateCuts( const OsiSolverInterface & si, OsiCuts & cs,
-        const CglTreeInfo info)
-#if CGL_VERSION_MAJOR == 0 && CGL_VERSION_MINOR <= 57
-    const
-#endif
-    ;
+        const CglTreeInfo info);
 
 
 
