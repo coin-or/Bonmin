@@ -1,7 +1,7 @@
 
 PROJECT_NAME           = Bonmin
 
-PROJECT_NUMBER         = 1.4trunk
+PROJECT_NUMBER         = @PACKAGE_VERSION@
 
 OUTPUT_DIRECTORY       = Doc
 
