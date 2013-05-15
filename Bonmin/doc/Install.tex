@@ -106,15 +106,10 @@ This is convenient if you want to have several executables compiled for differen
 you don't modify the directory where the sources are.\\
 
 To do this just create a new directory, for example {\tt Bonmin-build} in the parent directory of
-{\tt coin-Bonmin} and run the configure command from {\tt Bonmin-build}:
-
+{\tt Bonmin-\stableVersion} and run the configure command from {\tt Bonmin-build}:
 
 \begin{colorverb}
-\begin{verbatim}
-
-../Bonmin-\stableVersion/configure -C
-
-\end{verbatim}
+ \noindent {\tt  ../Bonmin-\stableVersion/configure -C }
 \end{colorverb}
 
 This will create the makefiles in {\tt Bonmin-build}, and
@@ -125,7 +120,7 @@ you can then compile with the usual {\tt make} and {\tt make install}
 The documentation for \Bonmin\ consists of a users' manual (this document) and a reference manual.
 You can build a local copy of the reference manual provided that you have Latex
 and Doxygen installed on your machine. Issue the command {\tt make
-doxydoc} in {\tt coin-Bonmin}. It calls Doxygen to build a copy of the
+doxydoc} in {\tt Bonmin-\stableVersion}. It calls Doxygen to build a copy of the
 reference manual. An html version of the reference manual can then
 be accessed in {\tt doc/html/index.html}.
 
