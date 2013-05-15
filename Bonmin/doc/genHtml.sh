@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir -p html
 for f in $@ ; 
 do
 NAME=`basename $f .tex`;
