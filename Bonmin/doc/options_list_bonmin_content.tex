@@ -831,7 +831,7 @@
 }
 \subsection{Algorithm choice}
 \label{sec:Algorithm_choice}
-\htmlanchor{sec:Algorithm_choice}
+%\htmlanchor{sec:Algorithm_choice}
 \paragraph{algorithm:}\label{sec:algorithm} Choice of the algorithm. $\;$ \\
  This will preset some of the options of bonmin
 depending on the algorithm choice.
@@ -849,7 +849,7 @@ Possible values:
 
 \subsection{Branch-and-bound options}
 \label{sec:Branch-and-bound_options}
-\htmlanchor{sec:Branch-and-bound_options}
+%\htmlanchor{sec:Branch-and-bound_options}
 \paragraph{allowable\_fraction\_gap:}\label{sec:allowable_fraction_gap} Specify the value of relative gap under which the algorithm stops. $\;$ \\
  Stop the tree search when the gap between the
 objective value of the best known solution and
@@ -1059,7 +1059,7 @@ Possible values:
 
 \subsection{MILP cutting planes in hybrid}
 \label{sec:MILP_cutting_planes_in_hybrid}
-\htmlanchor{sec:MILP_cutting_planes_in_hybrid}
+%\htmlanchor{sec:MILP_cutting_planes_in_hybrid}
 \paragraph{2mir\_cuts:}\label{sec:2mir_cuts} Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut $\;$ \\
  If $k > 0$, cuts are generated every $k$ nodes,
 if $-99 < k < 0$ cuts are generated every $-k$
@@ -1150,7 +1150,7 @@ and its default value is $0$.
 
 \subsection{MINLP Heuristics}
 \label{sec:MINLP_Heuristics}
-\htmlanchor{sec:MINLP_Heuristics}
+%\htmlanchor{sec:MINLP_Heuristics}
 \paragraph{feasibility\_pump\_objective\_norm:}\label{sec:feasibility_pump_objective_norm} Norm of feasibility pump objective function $\;$ \\
  The valid range for this integer option is
 $1 \le {\tt feasibility\_pump\_objective\_norm } \le 2$
@@ -1229,7 +1229,7 @@ Possible values:
 
 \subsection{Nlp solution robustness}
 \label{sec:Nlp_solution_robustness}
-\htmlanchor{sec:Nlp_solution_robustness}
+%\htmlanchor{sec:Nlp_solution_robustness}
 \paragraph{max\_consecutive\_failures:}\label{sec:max_consecutive_failures} (temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree. $\;$ \\
  When $n > 0$, continue exploring a branch of the
 tree until $n$ consecutive problems in the branch
@@ -1296,7 +1296,7 @@ and its default value is $0$.
 
 \subsection{Nlp solve options in B-Hyb}
 \label{sec:Nlp_solve_options_in_B-Hyb}
-\htmlanchor{sec:Nlp_solve_options_in_B-Hyb}
+%\htmlanchor{sec:Nlp_solve_options_in_B-Hyb}
 \paragraph{nlp\_solve\_frequency:}\label{sec:nlp_solve_frequency} Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb. $\;$ \\
  A frequency of 0 amounts to to never solve the
 NLP relaxation. The valid range for this integer option is
@@ -1319,7 +1319,7 @@ and its default value is $1 \cdot 10^{+100}$.
 
 \subsection{Options for MILP solver}
 \label{sec:Options_for_MILP_solver}
-\htmlanchor{sec:Options_for_MILP_solver}
+%\htmlanchor{sec:Options_for_MILP_solver}
 \paragraph{cpx\_parallel\_strategy:}\label{sec:cpx_parallel_strategy} Strategy of parallel search mode in CPLEX. $\;$ \\
  -1 = opportunistic, 0 = automatic, 1 =
 deterministic (refer to CPLEX documentation) The valid range for this integer option is
@@ -1367,7 +1367,7 @@ and its default value is $0$.
 
 \subsection{Options for OA decomposition}
 \label{sec:Options_for_OA_decomposition}
-\htmlanchor{sec:Options_for_OA_decomposition}
+%\htmlanchor{sec:Options_for_OA_decomposition}
 \paragraph{oa\_decomposition:}\label{sec:oa_decomposition} If yes do initial OA decomposition $\;$ \\
 
 The default value for this string option is "no".
@@ -1393,7 +1393,7 @@ and its default value is $1$.
 
 \subsection{Options for ecp cuts generation}
 \label{sec:Options_for_ecp_cuts_generation}
-\htmlanchor{sec:Options_for_ecp_cuts_generation}
+%\htmlanchor{sec:Options_for_ecp_cuts_generation}
 \paragraph{ecp\_abs\_tol:}\label{sec:ecp_abs_tol} Set the absolute termination tolerance for ECP rounds. $\;$ \\
  The valid range for this real option is 
 $0 \le {\tt ecp\_abs\_tol } <  {\tt +inf}$
@@ -1427,7 +1427,7 @@ and its default value is $0$.
 
 \subsection{Options for feasibility checker using OA cuts}
 \label{sec:Options_for_feasibility_checker_using_OA_cuts}
-\htmlanchor{sec:Options_for_feasibility_checker_using_OA_cuts}
+%\htmlanchor{sec:Options_for_feasibility_checker_using_OA_cuts}
 \paragraph{feas\_check\_cut\_types:}\label{sec:feas_check_cut_types} Choose the type of cuts generated when an integer feasible solution is found $\;$ \\
  If it seems too much memory is used should try
 Benders to use less
@@ -1476,7 +1476,7 @@ and its default value is $5000$.
 
 \subsection{Options for feasibility pump}
 \label{sec:Options_for_feasibility_pump}
-\htmlanchor{sec:Options_for_feasibility_pump}
+%\htmlanchor{sec:Options_for_feasibility_pump}
 \paragraph{fp\_log\_frequency:}\label{sec:fp_log_frequency} display an update on lower and upper bounds in FP every n seconds $\;$ \\
  The valid range for this real option is 
 $0 <  {\tt fp\_log\_frequency } <  {\tt +inf}$
@@ -1504,7 +1504,7 @@ for using in B-Hyb.
 
 \subsection{Options for non-convex problems}
 \label{sec:Options_for_non-convex_problems}
-\htmlanchor{sec:Options_for_non-convex_problems}
+%\htmlanchor{sec:Options_for_non-convex_problems}
 \paragraph{coeff\_var\_threshold:}\label{sec:coeff_var_threshold} Coefficient of variation threshold (for dynamic definition of cutoff\_decr). $\;$ \\
  The valid range for this real option is 
 $0 \le {\tt coeff\_var\_threshold } <  {\tt +inf}$
@@ -1567,7 +1567,7 @@ and its default value is $-0.05$.
 
 \subsection{Outer Approximation cuts generation}
 \label{sec:Outer_Approximation_cuts_generation}
-\htmlanchor{sec:Outer_Approximation_cuts_generation}
+%\htmlanchor{sec:Outer_Approximation_cuts_generation}
 \paragraph{add\_only\_violated\_oa:}\label{sec:add_only_violated_oa} Do we add all OA cuts or only the ones violated by current point? $\;$ \\
 
 The default value for this string option is "no".
@@ -1624,7 +1624,7 @@ and its default value is $1 \cdot 10^{-17}$.
 
 \subsection{Output and log-level options}
 \label{sec:Output_and_log-level_options}
-\htmlanchor{sec:Output_and_log-level_options}
+%\htmlanchor{sec:Output_and_log-level_options}
 \paragraph{bb\_log\_interval:}\label{sec:bb_log_interval} Interval at which node level output is printed. $\;$ \\
  Set the interval (in terms of number of nodes) at
 which a log on node resolutions (consisting of
@@ -1658,7 +1658,7 @@ and its default value is $0$.
 
 \subsection{Strong branching setup}
 \label{sec:Strong_branching_setup}
-\htmlanchor{sec:Strong_branching_setup}
+%\htmlanchor{sec:Strong_branching_setup}
 \paragraph{candidate\_sort\_criterion:}\label{sec:candidate_sort_criterion} Choice of the criterion to choose candidates in strong-branching $\;$ \\
 
 The default value for this string option is "best-ps-cost".
@@ -1726,7 +1726,7 @@ Possible values:
 
 \subsection{nlp interface option}
 \label{sec:nlp_interface_option}
-\htmlanchor{sec:nlp_interface_option}
+%\htmlanchor{sec:nlp_interface_option}
 \paragraph{file\_solution:}\label{sec:file_solution} Write a file bonmin.sol with the solution $\;$ \\
 
 The default value for this string option is "no".

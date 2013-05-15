@@ -37,7 +37,7 @@ Since {\tt bonmin.opt} contains both {\tt Ipopt} and \Bonmin\ options, for clari
 all \Bonmin\ options should be preceded with the prefix ``{\tt bonmin.}'' in {\tt bonmin.opt}~.
 Note that some options can also be passed to the MILP subsolver used by \Bonmin\
 in the outer approximation decomposition
-and the hybrid (see Subsection \ref{sec:milp_opt}).\\
+and the hybrid (see Subsection \ref{sec:sub_solvers}).\\
 
 The most important option in \Bonmin\ is the choice of the solution
 algorithm. This can be set by using the option named {\tt
@@ -93,7 +93,7 @@ for nonconvex problems.\\
 }
 
 \subsectionH{Passing options to local search based heuristics and oa generators}{sec:sub_solvers}
-\label{sec:sub_solvers}
+%\label{sec:sub_solvers}
 Several parts of the algorithms in \Bonmin\ are based on solving a simplified version of the problem with another instance of \Bonmin:
 Outer Approximation Decomposition (called in {\tt B-Hyb} at the root node)
 and Feasibility Pump for MINLP (called in B-Hyb or B-BB at the root node), RINS, RENS, Local Branching.
@@ -182,7 +182,7 @@ solution. This is achieved by setting {\tt allowable\_gap}
 and {\tt allowable\_fraction\_gap} and {\tt cutoff\_decr} to negative values.
 
 \subsectionH{Notes on {\tt Ipopt} options}{sec:opt_ipopt}
-\label{sec:opt_ipopt}
+%\label{sec:opt_ipopt}
 \Ipopt\ has a very large number of options, to get a complete description of them, you
 should refer to the \Ipopt\ manual.
 Here we only mention and explain some of the options that have been more important to us, so far,
