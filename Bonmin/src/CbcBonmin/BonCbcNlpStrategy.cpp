@@ -104,8 +104,8 @@ namespace Bonmin
       seqOfInfeasiblesSize++;
     }
 
-    if ((seqOfUnsolvedSize==0) || (maxFailure_ == 0) &&
-        (maxInfeasible_== 0) || (seqOfInfeasiblesSize==0))
+    if (((seqOfUnsolvedSize==0) || (maxFailure_ == 0)) &&
+        ((maxInfeasible_== 0) || (seqOfInfeasiblesSize==0)))
 
       if (feasible && seqOfInfeasiblesSize > 1) {
         (*model->messageHandler())<<"Feasible node while father was infeasible."

@@ -32,10 +32,12 @@ namespace Bonmin {
                              nnz_h, jCol, iRow, NULL);
   
          for(int i = 0 ; i < nnz_h ; i++){
-           std::pair< AdjustableMat::iterator , bool> res = 
+#ifndef NDEBUG
+           bool inserted = 
+#endif
                     H_.insert(std::make_pair( std::make_pair(jCol[i], iRow[i]), 
-                              std::make_pair(i, -1)));
-           assert(res.second == true);
+                              std::make_pair(i, -1))).second;
+           assert(inserted == true);
          }
          delete [] jCol;
          delete [] iRow;
@@ -56,29 +58,31 @@ namespace Bonmin {
       obj_(other.obj_)
       {
        // Get the number of nonzoeroes in the matrix
-       const int nnz_h = TMINLP2TNLP::nnz_h_lag();
+       const size_t nnz_h = TMINLP2TNLP::nnz_h_lag();
 
        if(nnz_h > 0){
          int * jCol = new int [nnz_h];
          int * iRow = new int [nnz_h];
-         int m = TMINLP2TNLP::num_constraints() - quadRows_.size(); 
+         int m = TMINLP2TNLP::num_constraints() - (int)quadRows_.size(); 
          TMINLP2TNLP::eval_h(num_variables(), NULL, false, 
                              0., m, NULL, false, 
-                             nnz_h, jCol, iRow, NULL);
+                             (int)nnz_h, jCol, iRow, NULL);
 
-         for(int i = 0 ; i < nnz_h ; i++){
-           std::pair< AdjustableMat::iterator , bool> res = 
+         for(size_t i = 0 ; i < nnz_h ; i++){
+#ifndef NDEBUG
+           bool inserted = 
+#endif
                     H_.insert(std::make_pair( std::make_pair(jCol[i], iRow[i]), 
-                              std::make_pair(i, -1)));
-           assert(res.second == true);
+                              std::make_pair(i, -1))).second;
+           assert(inserted == true);
          }
          delete [] jCol;
          delete [] iRow;
         }
-         assert(nnz_h == (int) H_.size());
+         assert(nnz_h == H_.size());
 
         //Properly create quadRows_
-       for(unsigned int i = 0 ; i < quadRows_.size() ; i++){
+       for(size_t i = 0 ; i < quadRows_.size() ; i++){
          quadRows_[i] = new QuadRow(*quadRows_[i]);
         }
 
@@ -101,7 +105,7 @@ namespace Bonmin {
         Index& nnz_h_lag,
         TNLP::IndexStyleEnum& index_style){
         bool ret_val = TMINLP2TNLP::get_nlp_info(n,m,nnz_jac_g, nnz_h_lag, index_style);
-        nnz_h_lag = H_.size();
+        nnz_h_lag = (int)H_.size();
         nnz_jac_g = curr_nnz_jac_;
         //printf("Dinmension in TMINLP2Quad are %i\n", curr_nnz_jac_);
         return ret_val;
@@ -119,8 +123,8 @@ namespace Bonmin {
     bool 
     TMINLP2TNLPQuadCuts::get_constraints_linearity(Index m, LinearityType* const_types)
     {
-      bool ret_val = TMINLP2TNLP::get_constraints_linearity(m - quadRows_.size(), const_types);
-      const_types += m - quadRows_.size();
+      bool ret_val = TMINLP2TNLP::get_constraints_linearity(m - (int)quadRows_.size(), const_types);
+      const_types += m - (int)quadRows_.size();
       for(unsigned int i = 0 ; i < quadRows_.size() ; i++){
         if(quadRows_[i]->isLinear())
           const_types[i] = TNLP::LINEAR;
@@ -148,10 +152,10 @@ namespace Bonmin {
                                         bool& use_g_scaling, Index m,
                                         Number* g_scaling){
            assert(num_constraints() == m);
-           bool retval = get_scaling_parameters(obj_scaling, use_x_scaling, n, x_scaling, use_g_scaling, m - quadRows_.size(), g_scaling);
+           bool retval = get_scaling_parameters(obj_scaling, use_x_scaling, n, x_scaling, use_g_scaling, m - (int)quadRows_.size(), g_scaling);
            if(use_g_scaling){
-             g_scaling += m - quadRows_.size();
-             CoinFillN(g_scaling, quadRows_.size(), 1.);}
+             g_scaling += m - (int)quadRows_.size();
+             CoinFillN(g_scaling, (int)quadRows_.size(), 1.);}
            return retval;
       }
 
@@ -192,7 +196,7 @@ namespace Bonmin {
   bool TMINLP2TNLPQuadCuts::eval_gi(Index n, const Number* x, bool new_x,
                            Index i, Number& gi)
   {
-    int m_orig = num_constraints() - quadRows_.size();
+    int m_orig = num_constraints() - (int)quadRows_.size();
     if(i < m_orig){
        return TMINLP2TNLP::eval_gi(n, x, new_x, i, gi);
     }
@@ -205,7 +209,7 @@ namespace Bonmin {
     /** Returns the vector of constraint values in x (appends constraint values for quadratics).*/
      bool TMINLP2TNLPQuadCuts::eval_g(Index n, const Number* x, bool new_x,
         Index m, Number* g){
-       int m_tminlp = m - quadRows_.size();
+       int m_tminlp = m - (int)quadRows_.size();
        bool retval = TMINLP2TNLP::eval_g(n, x, new_x, m_tminlp, g);
        g+= (m_tminlp);
        for(unsigned int i = 0 ; i < quadRows_.size() ; i++){
@@ -223,7 +227,7 @@ namespace Bonmin {
         Index m, Index nele_jac, Index* iRow,
         Index *jCol, Number* values){
         int n_ele_orig =  TMINLP2TNLP::nnz_jac_g();
-        int m_orig = m - quadRows_.size();
+        int m_orig = m - (int)quadRows_.size();
 	int offset = TMINLP2TNLP::index_style() == Ipopt::TNLP::FORTRAN_STYLE;
 
         bool retval = TMINLP2TNLP::eval_jac_g(n, x, new_x, m_orig ,
@@ -259,7 +263,7 @@ namespace Bonmin {
                                 Index i, Index& nele_grad_gi, Index* jCol,
                                 Number* values)
   {
-    int m_orig = num_constraints() - quadRows_.size();
+    int m_orig = num_constraints() - (int)quadRows_.size();
     if(i < m_orig){
        return TMINLP2TNLP::eval_grad_gi(n, x, new_x, i, nele_grad_gi, jCol, values);
     }
@@ -327,10 +331,10 @@ namespace Bonmin {
            assert(iRow == NULL);
            assert(jCol == NULL);
            int nnz_h_lag_orig = TMINLP2TNLP::nnz_h_lag();
-           int m_orig = m - quadRows_.size();
+           int m_orig = m - (int)quadRows_.size();
            bool ret_val = TMINLP2TNLP::eval_h(n, x, new_x, obj_factor, m_orig, lambda, new_lambda,
                             nnz_h_lag_orig, iRow, jCol, values);
-	   CoinZeroN(values + nnz_h_lag_orig, H_.size() - nnz_h_lag_orig);
+	   CoinZeroN(values + nnz_h_lag_orig, (int)H_.size() - nnz_h_lag_orig);
            for(unsigned int i = 0 ; i < quadRows_.size() ; i++){
              quadRows_[i]->eval_hessian(lambda[i + m_orig], values);
             }
@@ -444,7 +448,7 @@ namespace Bonmin {
   void TMINLP2TNLPQuadCuts::removeCuts(unsigned int n,const int * idxs){
      if(n == 0) return;
      vector< int > order(quadRows_.size());
-     int m_tminlp = num_constraints() - quadRows_.size();
+     int m_tminlp = num_constraints() - (int)quadRows_.size();
       //delete the pointers
        for(unsigned int k = 0; k < n ; k++){//Erase
        int idx = idxs[k] - m_tminlp ;

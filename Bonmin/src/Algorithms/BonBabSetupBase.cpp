@@ -376,7 +376,7 @@ namespace Bonmin
     int seed = 0;
     ival = options->GetIntegerValue("random_generator_seed",seed,prefix_.c_str());
     if(seed == -1)
-      CoinSeedRandom(CoinGetTimeOfDay());
+      CoinSeedRandom((int)CoinGetTimeOfDay());
     else if (ival != 0) CoinSeedRandom(seed);
 
     options->GetEnumValue("node_comparison",ival,prefix_.c_str());

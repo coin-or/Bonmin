@@ -29,14 +29,14 @@ int BonRandomChoice::setupList(OsiBranchingInformation * info, bool initialize){
     std::fill(list_, list_+numberObjects, -1);
     OsiObject ** object = info->solver_->objects();
     // Say feasible
-    bool feasible = true;
+    //bool feasible = true;
     for (int i=0;i<numberObjects;i++) {
     int way;
     double value = object[i]->infeasibility(info,way);
     if (value>0.0) {
       if (value==COIN_DBL_MAX) {
   // infeasible
-  feasible=false;
+  //feasible=false;
   break;
       }
       int priorityLevel = object[i]->priority();

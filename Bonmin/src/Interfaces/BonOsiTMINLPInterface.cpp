@@ -945,38 +945,34 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
 
 
   if(of_current != NULL){
-     //calculate the mean
-     mean=mean/(numsolve-num_failed-num_infeas);
+    //calculate the mean
+    mean=mean/(numsolve-num_failed-num_infeas);
      
-     std_dev = 0;
+    std_dev = 0;
      
-     //calculate the std deviation
-     for(int i=0; i<numsolve; i++)
-     {
-       if(of_current[i]!=0)
-         std_dev=std_dev+pow(of_current[i]-mean,2);
-     }
-     std_dev=pow((std_dev/(numsolve-num_failed-num_infeas)),0.5);
+    //calculate the std deviation
+    for(int i=0; i<numsolve; i++)
+    {
+      if(of_current[i]!=0)
+        std_dev=std_dev+pow(of_current[i]-mean,2);
+    }
+    std_dev=pow((std_dev/(numsolve-num_failed-num_infeas)),0.5);
      
-     //calculate coeff of variation
-     var_coeff=std_dev/mean;
-  }
+    //calculate coeff of variation
+    var_coeff=std_dev/mean;
 
-
-
-
-  if(dynamicCutOff_)
-  {
-     if(var_coeff<0.1)
-     {
+    if(dynamicCutOff_)
+    {
+      if(var_coeff<0.1)
+      {
         setNewCutoffDecr(mean*first_perc_for_cutoff_decr_);
-     }
-     else
-     {
+      }
+      else
+      {
         setNewCutoffDecr(mean*second_perc_for_cutoff_decr_);
-     }
+      }
+    }
   }
-     
 
   problem_->Set_x_sol(getNumCols(),point());
   problem_->Set_dual_sol((int) point.size()-getNumCols(), point() + getNumCols());
@@ -1769,10 +1765,7 @@ OsiTMINLPInterface::randomStartingPoint()
     }
   }
   for(int i = 0 ; i < numcols ; i++) {
-    int randomGenerationType = randomGenerationType_;
-    if(x_init[i] < colLower[i] || x_init[i] > colUpper[i])
-      randomGenerationType = uniform;
-    if(randomGenerationType_ == uniform){
+    if(randomGenerationType_ == uniform || x_init[i] < colLower[i] || x_init[i] > colUpper[i]) {
       double lower = std::min(-maxRandomRadius_,colUpper[i] - maxRandomRadius_);
       lower = std::max(colLower[i], lower);
       double upper = std::max(maxRandomRadius_,colLower[i] + maxRandomRadius_);
@@ -1780,14 +1773,15 @@ OsiTMINLPInterface::randomStartingPoint()
       lower = std::min(upper,lower);
       upper = std::max(upper, lower);
       double interval = upper - lower;
-      sol[i] = CoinDrand48()*(interval) + lower;}
-    else if (randomGenerationType_ == perturb){
+      sol[i] = CoinDrand48()*(interval) + lower;
+    }
+    else if (randomGenerationType_ == perturb) {
       const double lower = std::max(x_init[i] - max_perturbation_, colLower[i]);
       const double upper = std::min(x_init[i] + max_perturbation_, colUpper[i]);
       const double interval = upper - lower;
       sol[i]  = lower + CoinDrand48()*(interval);
     }
-    else if (randomGenerationType_ == perturb_suffix){
+    else if (randomGenerationType_ == perturb_suffix) {
       const double radius = perturb_radius[i];
       const double lower = std::max(x_init[i] - radius*max_perturbation_, colLower[i]);
       const double upper = std::min(x_init[i] + radius*max_perturbation_, colUpper[i]);

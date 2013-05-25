@@ -184,7 +184,7 @@ namespace Bonmin
 
     RoundingFPump roundObj(minlp);
 
-    bool stopDueToAlmostZeroObjective = false;
+    //bool stopDueToAlmostZeroObjective = false;
     double* x_bar = new double[numberIntegerColumns];
     int* indexes_x_bar = new int[numberIntegerColumns];
     double* copy_newSolution = new double[numberColumns];
@@ -336,7 +336,7 @@ namespace Bonmin
       memcpy(newSolution,x_sol,numberColumns*sizeof(double));
 
       if(obj_nlp < toleranceObjectiveFP) {
-	stopDueToAlmostZeroObjective = true;
+	//stopDueToAlmostZeroObjective = true;
 	break;
       }
 
@@ -532,7 +532,7 @@ namespace Bonmin
 	  assert(indexColumnSelected < jac_g.size());
 	  for (size_t j=0; j<jac_g.size(); j++) {
 	    int iColumn = jac_g[j].first;
-	    if(j == indexColumnSelected)
+	    if((int)j == indexColumnSelected)
 	      solution[iColumn] = 1.0;
 	    else
 	      solution[iColumn] = 0.0;

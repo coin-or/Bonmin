@@ -87,7 +87,7 @@ namespace Bonmin
 
 
     double milpBound = -COIN_DBL_MAX;
-    bool milpFeasible = 1;
+    //bool milpFeasible = 1;
     bool feasible = 1;
 
     subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
@@ -97,7 +97,7 @@ namespace Bonmin
     milpOptimal = subMip_->optimal();
 
     feasible = milpBound < cutoff;
-    milpFeasible = feasible;
+    //milpFeasible = feasible;
     isInteger = (subMip_->getLastSolution() != NULL);
     nLocalSearch_++;
 
@@ -250,7 +250,7 @@ namespace Bonmin
             feasible = 0;
             milpBound = 1e50;
           }
-          milpFeasible = feasible;
+          //milpFeasible = feasible;
         }
         if (subMip_->optimal())
           milpOptimal = 1;

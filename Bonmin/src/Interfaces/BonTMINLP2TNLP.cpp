@@ -285,7 +285,7 @@ namespace Bonmin
   void TMINLP2TNLP::setxInit(Index n,const Number* x_init)
   {
     assert(n == num_variables());
-    if(x_init_.size() < n)
+    if((int)x_init_.size() < n)
       x_init_.resize(n);
     IpBlasDcopy(n, x_init, 1, x_init_(), 1);
   }
@@ -684,8 +684,8 @@ namespace Bonmin
         }
       }
     }
-    eval_g(x_sol_.size(), x_sol_(), true, g_sol_.size(), g_sol_());
-    eval_f(x_sol_.size(), x_sol_(), false, obj_value_);
+    eval_g((int)x_sol_.size(), x_sol_(), true, (int)g_sol_.size(), g_sol_());
+    eval_f((int)x_sol_.size(), x_sol_(), false, obj_value_);
     double error = 0;
     for(unsigned int i = 0 ; i < g_sol_.size() ; i++){
       error = std::max(error, std::max(0., g_l_[i] - g_sol_[i]));
