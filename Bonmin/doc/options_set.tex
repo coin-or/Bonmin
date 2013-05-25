@@ -15,7 +15,7 @@ Options in \Bonmin\ can be set in several different ways.
 First, you can set options by putting them in a file called {\tt
 bonmin.opt} in the directory where {\tt bonmin} is executing. If you
 are familiar with the file
-\href{\IpoptDoc{50}}{\tt
+\href{\IpoptDoc{34}}{\tt
 ipopt.opt} (formerly named {\tt PARAMS.DAT}) in {\tt Ipopt}, the
 syntax of the {\tt bonmin.opt} is similar. For those not familiar
 with {\tt ipopt.opt}, the syntax is simply to put the name of the
@@ -29,7 +29,7 @@ in the file {\tt bonmin.opt} (the standard {\tt Ipopt} option file {\tt ipopt.op
 is not read by \Bonmin.)
 For a list and a description of all the {\tt Ipopt} options, the
 reader may refer to the
-\footlink{\IpoptDoc{54}}{documentation
+\footlink{\IpoptDoc{39}}{documentation
 of {\tt
 Ipopt}}.
 
@@ -67,9 +67,9 @@ A small example is as follows:
 This sets the level of output of the branch-and-bound in \Bonmin\ to $4$, the algorithm to branch-and-bound
 and the output level for {\tt Ipopt} to $6$.\\
 
-When \Bonmin\ is run from within {\tt Ampl}, another way to set
+When \Bonmin\ is run from within {\tt AMPL}, another way to set
 an option is through the
-internal {\tt Ampl} command {\tt options}.
+internal {\tt AMPL} command {\tt options}.
 For example
 \begin{verbatim}
 options bonmin_options "bonmin.bb_log-level 4 \
@@ -77,7 +77,7 @@ options bonmin_options "bonmin.bb_log-level 4 \
 \end{verbatim}
 has the same affect as the {\tt bonmin.opt} example above.
 Note that any \Bonmin\ option specified in the file {\tt bonmin.opt}
-overrides any setting of that option from within {\t Ampl}.\\
+overrides any setting of that option from within {\tt AMPL}.\\
 
 A third way is to set options directly in the C/C++ code when
 running \Bonmin\ from inside a C/C++ program as is explained in the reference manual.
