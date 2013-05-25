@@ -550,7 +550,7 @@ namespace Bonmin {
   void
   SubMipSolver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Options for MILP solver", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("MILP Solver", RegisteredOptions::BonminCategory);
     roptions->AddStringOption3("milp_solver",
         "Choose the subsolver to solve MILP sub-problems in OA decompositions.",
         "Cbc_D",
@@ -559,14 +559,6 @@ namespace Bonmin {
         "Cplex","IBM Cplex",
         " To use Cplex, a valid license is required and you should have compiled OsiCpx in COIN-OR  (see Osi documentation).");
     roptions->setOptionExtraInfo("milp_solver",64);
-
-    roptions->AddBoundedIntegerOption("milp_log_level",
-        "specify MILP solver log level.",
-        0,4,0,
-        "Set the level of output of the MILP subsolver in OA : "
-        "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
-                                     );
-    roptions->setOptionExtraInfo("milp_log_level",64);
 
     roptions->AddBoundedIntegerOption("cpx_parallel_strategy",
                            "Strategy of parallel search mode in CPLEX.",
@@ -590,6 +582,15 @@ namespace Bonmin {
         "solve_to_optimality", "Solve MILPs to optimality",
         "");
     roptions->setOptionExtraInfo("milp_strategy",64);
+
+    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+    roptions->AddBoundedIntegerOption("milp_log_level",
+        "specify MILP solver log level.",
+        0,4,0,
+        "Set the level of output of the MILP subsolver in OA : "
+        "0 - none, 1 - minimal, 2 - normal low, 3 - normal high"
+                                     );
+    roptions->setOptionExtraInfo("milp_log_level",64);
 
   }
 }/* Ends Bonmin namespace.*/

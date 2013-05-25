@@ -287,7 +287,7 @@ namespace Bonmin
   void
   OACutGenerator2::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Options for OA decomposition", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Outer Approximation Decomposition (B-OA)", RegisteredOptions::BonminCategory);
     roptions->AddStringOption2("oa_decomposition", "If yes do initial OA decomposition",
                                "no",
                                "no","",
@@ -295,6 +295,7 @@ namespace Bonmin
                                "");
     roptions->setOptionExtraInfo("oa_decomposition",19);
 
+    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("oa_log_level",
         "specify OA iterations log level.",
         0,2,1,

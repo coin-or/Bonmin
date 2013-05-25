@@ -7,7 +7,7 @@ Option & type & {\tt B-BB} & {\tt B-OA} & {\tt B-QG} & {\tt B-Hyb} & {\tt B-Ecp}
 \hline}
 \tabletail{\hline \multicolumn{9}{|c|}{continued on next page}\\\hline}
 \tablelasttail{\hline}
-{\tiny
+{\small
 \begin{xtabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Algorithm choice}\\
@@ -38,7 +38,28 @@ time\_limit& F& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 tree\_search\_strategy& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
 variable\_selection& S& $\surd$& -& $\surd$& $\surd$& $\surd$& -& -\\
 \hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{MILP cutting planes in hybrid}\\
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{ECP cuts generation}\\
+\hline
+ecp\_abs\_tol& F& -& -& $\surd$& $\surd$& -& -& -\\
+ecp\_max\_rounds& I& -& -& $\surd$& $\surd$& -& -& -\\
+ecp\_probability\_factor& F& -& -& $\surd$& $\surd$& -& -& -\\
+ecp\_rel\_tol& F& -& -& $\surd$& $\surd$& -& -& -\\
+filmint\_ecp\_cuts& I& -& -& $\surd$& $\surd$& -& -& -\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Feasibility checker using OA cuts}\\
+\hline
+feas\_check\_cut\_types& S& -& -& $\surd$& $\surd$& $\surd$& -& -\\
+feas\_check\_discard\_policy& S& -& -& $\surd$& $\surd$& $\surd$& -& -\\
+generate\_benders\_after\_so\_many\_oa& I& -& -& $\surd$& $\surd$& $\surd$& -& -\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{MILP Solver}\\
+\hline
+cpx\_parallel\_strategy& I& -& -& -& -& -& -& $\surd$\\
+milp\_solver& S& -& -& -& -& -& -& $\surd$\\
+milp\_strategy& S& -& -& -& -& -& -& $\surd$\\
+number\_cpx\_threads& I& -& -& -& -& -& -& $\surd$\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{MILP cutting planes in hybrid algorithm}\\
 \hline
 2mir\_cuts& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 Gomory\_cuts& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
@@ -49,18 +70,12 @@ lift\_and\_project\_cuts& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\s
 mir\_cuts& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 reduce\_and\_split\_cuts& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 \hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{MINLP Heuristics}\\
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{NLP interface}\\
 \hline
-feasibility\_pump\_objective\_norm& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-heuristic\_RINS& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-heuristic\_dive\_MIP\_fractional& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-heuristic\_dive\_MIP\_vectorLength& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-heuristic\_dive\_fractional& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-heuristic\_dive\_vectorLength& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-heuristic\_feasibility\_pump& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-pump\_for\_minlp& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+nlp\_solver& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+warm\_start& S& $\surd$& -& -& -& -& -& -\\
 \hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Nlp solution robustness}\\
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{NLP solution robustness}\\
 \hline
 max\_consecutive\_failures& I& $\surd$& -& -& -& -& -& -\\
 max\_random\_point\_radius& F& $\surd$& -& -& -& -& -& -\\
@@ -68,49 +83,15 @@ num\_iterations\_suspect& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd
 num\_retry\_unsolved\_random\_point& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 random\_point\_perturbation\_interval& F& $\surd$& -& -& -& -& -& -\\
 random\_point\_type& S& $\surd$& -& -& -& -& -& -\\
-resolve\_on\_small\_infeasibility& F& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+resolve\_on\_small\_infeasibility& F& $\surd$& -& -& -& -& -& -\\
 \hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Nlp solve options in B-Hyb}\\
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{NLP solves in hybrid algorithm (B-Hyb)}\\
 \hline
 nlp\_solve\_frequency& I& -& -& -& $\surd$& -& -& -\\
 nlp\_solve\_max\_depth& I& -& -& -& $\surd$& -& -& -\\
 nlp\_solves\_per\_depth& F& -& -& -& $\surd$& -& -& -\\
 \hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Options for MILP solver}\\
-\hline
-cpx\_parallel\_strategy& I& -& -& -& -& -& -& $\surd$\\
-milp\_log\_level& I& -& -& -& -& -& -& $\surd$\\
-milp\_solver& S& -& -& -& -& -& -& $\surd$\\
-milp\_strategy& S& -& -& -& -& -& -& $\surd$\\
-number\_cpx\_threads& I& -& -& -& -& -& -& $\surd$\\
-\hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Options for OA decomposition}\\
-\hline
-oa\_decomposition& S& -& -& $\surd$& $\surd$& $\surd$& -& -\\
-oa\_log\_frequency& F& $\surd$& -& -& $\surd$& $\surd$& -& -\\
-oa\_log\_level& I& $\surd$& -& -& $\surd$& $\surd$& -& -\\
-\hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Options for ecp cuts generation}\\
-\hline
-ecp\_abs\_tol& F& -& -& $\surd$& $\surd$& -& -& -\\
-ecp\_max\_rounds& I& -& -& $\surd$& $\surd$& -& -& -\\
-ecp\_probability\_factor& F& -& -& $\surd$& $\surd$& -& -& -\\
-ecp\_rel\_tol& F& -& -& $\surd$& $\surd$& -& -& -\\
-filmint\_ecp\_cuts& I& -& -& $\surd$& $\surd$& -& -& -\\
-\hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Options for feasibility checker using OA cuts}\\
-\hline
-feas\_check\_cut\_types& S& -& -& $\surd$& $\surd$& $\surd$& -& -\\
-feas\_check\_discard\_policy& S& -& -& $\surd$& $\surd$& $\surd$& -& -\\
-generate\_benders\_after\_so\_many\_oa& I& -& -& $\surd$& $\surd$& $\surd$& -& -\\
-\hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Options for feasibility pump}\\
-\hline
-fp\_log\_frequency& F& -& -& $\surd$& $\surd$& -& -& -\\
-fp\_log\_level& I& -& -& $\surd$& $\surd$& -& -& -\\
-fp\_pass\_infeasible& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
-\hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Options for non-convex problems}\\
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Nonconvex problems}\\
 \hline
 coeff\_var\_threshold& F& $\surd$& -& -& -& -& -& -\\
 dynamic\_def\_cutoff\_decr& S& $\surd$& -& -& -& -& -& -\\
@@ -121,21 +102,57 @@ num\_resolve\_at\_node& I& $\surd$& -& -& -& -& -& -\\
 num\_resolve\_at\_root& I& $\surd$& -& -& -& -& -& -\\
 second\_perc\_for\_cutoff\_decr& F& $\surd$& -& -& -& -& -& -\\
 \hline
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Outer Approximation Decomposition (B-OA)}\\
+\hline
+oa\_decomposition& S& -& -& $\surd$& $\surd$& $\surd$& -& -\\
+\hline
 \multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Outer Approximation cuts generation}\\
 \hline
 add\_only\_violated\_oa& S& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
-oa\_cuts\_log\_level& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 oa\_cuts\_scope& S& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 oa\_rhs\_relax& F& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 tiny\_element& F& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 very\_tiny\_element& F& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 \hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Output and log-level options}\\
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Output}\\
 \hline
 bb\_log\_interval& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 bb\_log\_level& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+file\_print\_level& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+file\_solution& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+fp\_log\_frequency& F& -& -& $\surd$& $\surd$& -& -& -\\
+fp\_log\_level& I& -& -& $\surd$& $\surd$& -& -& -\\
+inf\_pr\_output& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
 lp\_log\_level& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+milp\_log\_level& I& -& -& -& -& -& -& $\surd$\\
 nlp\_log\_at\_root& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+nlp\_log\_level& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+oa\_cuts\_log\_level& I& -& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+oa\_log\_frequency& F& $\surd$& -& -& $\surd$& $\surd$& -& -\\
+oa\_log\_level& I& $\surd$& -& -& $\surd$& $\surd$& -& -\\
+option\_file\_name& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+output\_file& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+print\_frequency\_iter& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+print\_frequency\_time& F& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+print\_info\_string& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+print\_level& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+print\_options\_documentation& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+print\_timing\_statistics& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+print\_user\_options& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+replace\_bounds& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+skip\_finalize\_solution\_call& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+\hline
+\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Primal Heuristics}\\
+\hline
+feasibility\_pump\_objective\_norm& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+fp\_pass\_infeasible& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
+heuristic\_RINS& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+heuristic\_dive\_MIP\_fractional& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+heuristic\_dive\_MIP\_vectorLength& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+heuristic\_dive\_fractional& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+heuristic\_dive\_vectorLength& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+heuristic\_feasibility\_pump& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
+pump\_for\_minlp& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
 \hline
 \multicolumn{1}{|c}{} & \multicolumn{8}{l|}{Strong branching setup}\\
 \hline
@@ -148,13 +165,6 @@ number\_look\_ahead& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -& -\\
 number\_strong\_branch\_root& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
 setup\_pseudo\_frac& F& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
 trust\_strong\_branching\_for\_pseudo\_cost& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& -\\
-\hline
-\multicolumn{1}{|c}{} & \multicolumn{8}{l|}{nlp interface option}\\
-\hline
-file\_solution& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
-nlp\_log\_level& I& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
-nlp\_solver& S& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$\\
-warm\_start& S& $\surd$& -& -& -& -& -& -\\
 \hline
 \end{xtabular}
 }

@@ -249,7 +249,7 @@ namespace Bonmin
     roptions->SetRegisteringCategory("FilterSQP options", RegisteredOptions::FilterCategory);
     roptions->AddLowerBoundedNumberOption("eps", "Tolerance for SQP solver",
         0., 1, 1e-08, "");
-    roptions->AddLowerBoundedNumberOption("infty","A large number (1E20)",0.,1, 1e20, "");
+    roptions->AddLowerBoundedNumberOption("infty", "A large number",0.,1, 1e20, "");
     roptions->AddBoundedIntegerOption("iprint", "Print level (0=silent, 3=verbose)", 0,6,0);
     roptions->AddLowerBoundedIntegerOption("kmax", "Dimension of null-space",
         -1, -1, "");

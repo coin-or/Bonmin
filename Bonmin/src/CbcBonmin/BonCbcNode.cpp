@@ -75,16 +75,16 @@ namespace Bonmin
   {
 
 
-    roptions->SetRegisteringCategory("Options for non-convex problems", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Nonconvex problems", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption("max_consecutive_infeasible",
         "Number of consecutive infeasible subproblems before aborting a"
         " branch.",
         0,0,
         "Will continue exploring a branch of the tree until \"max_consecutive_infeasible\""
-        "consecutive problems are infeasibles by the NLP sub-solver.");
+        "consecutive problems are locally infeasible by the NLP sub-solver.");
     roptions->setOptionExtraInfo("max_consecutive_infeasible",8);
 
-    roptions->SetRegisteringCategory("Nlp solution robustness", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("NLP solution robustness", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption
     ("max_consecutive_failures",
      "(temporarily removed) Number $n$ of consecutive unsolved problems before aborting a branch of the tree.",

@@ -119,7 +119,7 @@ namespace Bonmin
 
     if (seqOfInfeasiblesSize < maxInfeasible_ &&
         solved && !feasible) {
-      (*model->messageHandler())<<"Branching on infeasible node, sequence of infeasibles size "
+      (*model->messageHandler())<<"Branching on infeasible node, sequence of infeasible size "
       <<seqOfInfeasiblesSize<<CoinMessageEol;
       // Have to make sure that we will branch
       OsiTMINLPInterface * ipopt = dynamic_cast<OsiTMINLPInterface *>(solver);

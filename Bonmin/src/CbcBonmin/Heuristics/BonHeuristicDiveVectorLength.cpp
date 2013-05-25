@@ -164,13 +164,13 @@ namespace Bonmin
 
   void
   HeuristicDiveVectorLength::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "heuristic_dive_vectorLength",
      "if yes runs the Dive VectorLength heuristic",
      "no",
-     "no", "don't run it",
-     "yes", "runs the heuristic",
+     "no", "",
+     "yes", "",
      "");
    roptions->setOptionExtraInfo("heuristic_dive_vectorLength", 63);
   }

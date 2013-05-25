@@ -142,7 +142,7 @@ namespace Bonmin
         "B-OA","OA Decomposition algorithm,",
         "B-QG","Quesada and Grossmann branch-and-cut algorithm,",
         "B-Hyb","hybrid outer approximation based branch-and-cut,",
-        "B-Ecp","ecp cuts based branch-and-cut a la FilMINT.",
+        "B-Ecp","ECP cuts based branch-and-cut a la FilMINT.",
         "B-iFP","Iterated Feasibility Pump for MINLP.",
         "This will preset some of the options of bonmin depending on the algorithm choice."
                               );
@@ -189,7 +189,7 @@ namespace Bonmin
   void
   BonminSetup::registerMilpCutGenerators(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("MILP cutting planes in hybrid", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("MILP cutting planes in hybrid algorithm", RegisteredOptions::BonminCategory);
 
     roptions->AddLowerBoundedIntegerOption("Gomory_cuts",
         "Frequency (in terms of nodes) for generating Gomory cuts in branch-and-cut.",

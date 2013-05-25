@@ -113,13 +113,13 @@ namespace Bonmin
 
   void
   HeuristicDiveFractional::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "heuristic_dive_fractional",
      "if yes runs the Dive Fractional heuristic",
      "no",
-     "no", "don't run it",
-     "yes", "runs the heuristic",
+     "no", "",
+     "yes", "",
      "");
    roptions->setOptionExtraInfo("heuristic_dive_fractional", 63);
   }

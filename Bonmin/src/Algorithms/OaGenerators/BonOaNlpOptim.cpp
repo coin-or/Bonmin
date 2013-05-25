@@ -175,7 +175,7 @@ namespace Bonmin
   void
   OaNlpOptim::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Nlp solve options in B-Hyb", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("NLP solves in hybrid algorithm (B-Hyb)", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption("nlp_solve_frequency",
         "Specify the frequency (in terms of nodes) at which NLP relaxations are solved in B-Hyb.",
         0,10,

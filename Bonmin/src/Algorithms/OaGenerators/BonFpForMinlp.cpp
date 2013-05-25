@@ -245,12 +245,14 @@ namespace Bonmin
   void
   MinlpFeasPump::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Options for feasibility pump", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics", RegisteredOptions::BonminCategory);
 
     roptions->AddStringOption2("fp_pass_infeasible", "Say whether feasibility pump should claim to converge or not",
                                "no",
                                "no", "When master MILP is infeasible just bail out (don't stop all algorithm). This is the option for using in B-Hyb.",
                                "yes", "Claim convergence, numerically dangerous.","");
+                               
+    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("fp_log_level",
         "specify FP iterations log level.",
         0,2,1,

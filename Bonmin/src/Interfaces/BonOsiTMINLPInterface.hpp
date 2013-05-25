@@ -90,7 +90,7 @@ class SimpleError : public CoinError
    Optimum,
    InteriorPoint};
 
-  /** Type of the messages specifically outputed by OsiTMINLPInterface.*/
+  /** Type of the messages specifically written by OsiTMINLPInterface.*/
   enum MessagesTypes{
     SOLUTION_FOUND/**found a feasible solution*/,
     INFEASIBLE_SOLUTION_FOUND/**found an infeasible problem*/,
@@ -120,7 +120,7 @@ class SimpleError : public CoinError
   //#############################################################################
 
 
-  /** Messages outputed by an OsiTMINLPInterface. */
+  /** Messages written by an OsiTMINLPInterface. */
 class Messages : public CoinMessages
   {
   public:
@@ -1232,7 +1232,7 @@ protected:
   /** did we ever continue optimization ignoring a failure. */
   bool hasContinuedAfterNlpFailure_;
   /** number iterations above which a problem is considered suspect (-1 is considered \f$+ \infty \f$).
-  	If in a call to solve a problem takes more than that number of iterations it will be outputed to files.*/
+  	If in a call to solve a problem takes more than that number of iterations it will be output to files.*/
   int numIterationSuspect_ ;
   /** Has problem been optimized since last change (include setColSolution).
      If yes getColSolution will return Ipopt point, otherwise will return

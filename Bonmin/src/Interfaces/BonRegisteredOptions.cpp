@@ -179,7 +179,7 @@ namespace Bonmin{
   of<<"\\tabletail{\\hline \\multicolumn{9}{|c|}{continued on next page}\\\\"
     <<"\\hline}"<<std::endl; 
   of<<"\\tablelasttail{\\hline}"<<std::endl;
-  of<<"{\\tiny"<<std::endl;
+  of<<"{\\small"<<std::endl;
   of<<"\\begin{xtabular}{|l|r|r|r|r|r|r|r|r|}"<<std::endl;
 
   //sort options by categories and alphabetical order
@@ -301,7 +301,7 @@ namespace Bonmin{
     <<"</table>"<<std::endl;
   }
 
-   /** Output Latex/Html ooptions documentation.*/
+   /** Output Latex/Html options documentation.*/
    void 
    RegisteredOptions::writeLatexHtmlDoc(std::ostream &os, ExtraCategoriesInfo which){
       std::list< Ipopt::RegisteredOption * > options;
@@ -326,7 +326,7 @@ namespace Bonmin{
            registeringCategory = (*i)->RegisteringCategory();
              os<<"\\subsection{"<<registeringCategory<<"}"<<std::endl;      
              os<<"\\label{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
-             os<<"\\htmlanchor{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
+             //os<<"\\htmlanchor{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
            }
        
            (*i)->OutputLatexDescription(jnlst);
