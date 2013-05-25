@@ -8,13 +8,10 @@
 // Date :  03/17/2006
 
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 #include <iomanip>
 #include <fstream>
 
+#include "CoinPragma.hpp"
 #include "CoinTime.hpp"
 #include "CoinError.hpp"
 
@@ -78,7 +75,6 @@ int main (int argc, char *argv[])
 
 
   //Set up done, now let's branch and bound
-  double time1 = CoinCpuTime();
   try {
     Bab bb;
     bb(bonmin);//process parameter file using Ipopt and do branch and bound using Cbc

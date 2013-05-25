@@ -8,13 +8,10 @@
 // Date :  03/17/2006
 
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 #include <iomanip>
 #include <fstream>
 
+#include "CoinPragma.hpp"
 #include "CoinTime.hpp"
 
 #include "BonOsiTMINLPInterface.hpp"

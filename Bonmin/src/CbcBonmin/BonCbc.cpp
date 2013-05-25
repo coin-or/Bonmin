@@ -179,7 +179,6 @@ namespace Bonmin
 
     model_.setPrintFrequency(s.getIntParameter(BabSetupBase::BabLogInterval));
 
-    bool ChangedObject = false;
     //Pass over user set branching priorities to Cbc
     if (s.continuousSolver()->objects()==NULL) {
       //assert (s.branchingMethod() == NULL);
@@ -194,7 +193,6 @@ namespace Bonmin
       OsiObject ** simpleIntegerObjects = model_.objects();
       int numberObjects = model_.numberObjects();
       if (priorities != NULL || directions != NULL || hasPseudo) {
-        ChangedObject = true;
         for (int i = 0 ; i < numberObjects ; i++) {
           CbcObject * object = dynamic_cast<CbcObject *>
               (simpleIntegerObjects[i]);
@@ -283,7 +281,7 @@ namespace Bonmin
           assert(objects[i]);
           objects[i]->setModel(&model_);
         }
-	model_.addObjects(s.objects().size(), objects);
+	model_.addObjects((int)s.objects().size(), objects);
         delete [] objects;
       }
 
@@ -435,9 +433,9 @@ namespace Bonmin
     }
 
 #ifdef SIGNAL
-    CoinSighandler_t saveSignal=SIG_DFL;
-    // register signal handler
-    saveSignal = signal(SIGINT,signal_handler);
+    //CoinSighandler_t saveSignal=SIG_DFL;
+    // register signal handler  FIXME restore original signal handler when finished
+    /*saveSignal =*/ signal(SIGINT,signal_handler);
 #endif
 
     currentBranchModel = &model_;
@@ -478,7 +476,7 @@ namespace Bonmin
         for(int i = 0 ; i < cuts.sizeRowCuts() ; i++){
           mycuts[i] = cuts.rowCutPtr(i);
         }
-        model_.solver()->applyRowCuts(mycuts.size(), (const OsiRowCut **) &mycuts[0]);
+        model_.solver()->applyRowCuts((int)mycuts.size(), const_cast<const OsiRowCut **>(&mycuts[0]));
       }
 
        //Added by Claudia

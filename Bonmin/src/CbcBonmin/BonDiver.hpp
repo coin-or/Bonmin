@@ -102,7 +102,7 @@ namespace Bonmin
 
 
   /** Class to do probed diving in the tree.
-    * Principle is that branch-and-bound follows current branch of the tree by exploring the two childs at each level
+    * Principle is that branch-and-bound follows current branch of the tree by exploring the two children at each level
     * and continuing the dive on the best one of the two. Untill it 
     *  hits the bottom at which point it goes to the best candidate (according to CbcCompare) on the heap.*/
   class CbcProbedDiver : public CbcTree

@@ -184,7 +184,7 @@ namespace Bonmin
 
     RoundingFPump roundObj(minlp);
 
-    bool stopDueToAlmostZeroObjective = false;
+    //bool stopDueToAlmostZeroObjective = false;
     double* x_bar = new double[numberIntegerColumns];
     int* indexes_x_bar = new int[numberIntegerColumns];
     double* copy_newSolution = new double[numberColumns];
@@ -336,7 +336,7 @@ namespace Bonmin
       memcpy(newSolution,x_sol,numberColumns*sizeof(double));
 
       if(obj_nlp < toleranceObjectiveFP) {
-	stopDueToAlmostZeroObjective = true;
+	//stopDueToAlmostZeroObjective = true;
 	break;
       }
 
@@ -405,15 +405,15 @@ namespace Bonmin
 
   void
   HeuristicFPump::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("feasibility_pump_objective_norm","Norm of feasibility pump objective function",
 				      1, 2, 1,"");
     roptions->setOptionExtraInfo("feasibility_pump_objective_norm", 63);
     roptions->AddStringOption2("heuristic_feasibility_pump", "whether the heuristic feasibility pump should be used",
-      "no", "no", "don't use it", "yes", "use it", "");
+      "no", "no", "", "yes", "", "");
     roptions->setOptionExtraInfo("heuristic_feasibility_pump", 63);
 
-    roptions->SetRegisteringCategory("Test Heuristics", RegisteredOptions::UndocumentedCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics (undocumented)", RegisteredOptions::UndocumentedCategory);
     roptions->AddStringOption2("unstable_fp","use at your own risks",
                                "no",
                                "no", "",
@@ -532,7 +532,7 @@ namespace Bonmin
 	  assert(indexColumnSelected < jac_g.size());
 	  for (size_t j=0; j<jac_g.size(); j++) {
 	    int iColumn = jac_g[j].first;
-	    if(j == indexColumnSelected)
+	    if((int)j == indexColumnSelected)
 	      solution[iColumn] = 1.0;
 	    else
 	      solution[iColumn] = 0.0;

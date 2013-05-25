@@ -15,7 +15,7 @@ Options in \Bonmin\ can be set in several different ways.
 First, you can set options by putting them in a file called {\tt
 bonmin.opt} in the directory where {\tt bonmin} is executing. If you
 are familiar with the file
-\href{\IpoptDoc{50}}{\tt
+\href{\IpoptDoc{34}}{\tt
 ipopt.opt} (formerly named {\tt PARAMS.DAT}) in {\tt Ipopt}, the
 syntax of the {\tt bonmin.opt} is similar. For those not familiar
 with {\tt ipopt.opt}, the syntax is simply to put the name of the
@@ -29,7 +29,7 @@ in the file {\tt bonmin.opt} (the standard {\tt Ipopt} option file {\tt ipopt.op
 is not read by \Bonmin.)
 For a list and a description of all the {\tt Ipopt} options, the
 reader may refer to the
-\footlink{\IpoptDoc{54}}{documentation
+\footlink{\IpoptDoc{39}}{documentation
 of {\tt
 Ipopt}}.
 
@@ -37,7 +37,7 @@ Since {\tt bonmin.opt} contains both {\tt Ipopt} and \Bonmin\ options, for clari
 all \Bonmin\ options should be preceded with the prefix ``{\tt bonmin.}'' in {\tt bonmin.opt}~.
 Note that some options can also be passed to the MILP subsolver used by \Bonmin\
 in the outer approximation decomposition
-and the hybrid (see Subsection \ref{sec:sub_solvers}).\\
+and the hybrid (see Subsection \ref{sec:sub_solvers}).
 
 The most important option in \Bonmin\ is the choice of the solution
 algorithm. This can be set by using the option named {\tt
@@ -52,7 +52,7 @@ string). The column labeled `default' indicates the global default
 value. Then for each of the algorithms {\tt B-BB}, {\tt B-OA},
 {\tt B-QG}, {\tt B-Hyb}, {\tt B-Ecp}, and {\tt B-iFP} `$\surd$' indicates that the option is
 available for that particular algorithm
-while `$-$' indicates that it is not.\\
+while `$-$' indicates that it is not.
 
 An example of a {\tt bonmin.opt} file including all the options
 with their default values is located in the {\tt Test}
@@ -65,11 +65,11 @@ A small example is as follows:
    print_level 6
 \end{verbatim}
 This sets the level of output of the branch-and-bound in \Bonmin\ to $4$, the algorithm to branch-and-bound
-and the output level for {\tt Ipopt} to $6$.\\
+and the output level for {\tt Ipopt} to $6$.
 
-When \Bonmin\ is run from within {\tt Ampl}, another way to set
-an option is through the
-internal {\tt Ampl} command {\tt options}.
+When \Bonmin\ is run from within {\tt AMPL}, another way to set
+an option is via the
+internal {\tt AMPL} command {\tt options}.
 For example
 \begin{verbatim}
 options bonmin_options "bonmin.bb_log-level 4 \
@@ -77,7 +77,7 @@ options bonmin_options "bonmin.bb_log-level 4 \
 \end{verbatim}
 has the same affect as the {\tt bonmin.opt} example above.
 Note that any \Bonmin\ option specified in the file {\tt bonmin.opt}
-overrides any setting of that option from within {\t Ampl}.\\
+overrides any setting of that option from within {\tt AMPL}.
 
 A third way is to set options directly in the C/C++ code when
 running \Bonmin\ from inside a C/C++ program as is explained in the reference manual.
@@ -85,7 +85,7 @@ running \Bonmin\ from inside a C/C++ program as is explained in the reference ma
 A detailed description of all of the \Bonmin\ options is given \latexhtml{in Appendix \ref{sec:optList}}{\href{\OptListPage \#sec:options_list}{here}}.
 In the following, we give some more details on options for the MILP subsolver and
 on the options specifically designed
-for nonconvex problems.\\
+for nonconvex problems.
 
 \latexhtml{
 \include{options_table}
@@ -99,25 +99,24 @@ Outer Approximation Decomposition (called in {\tt B-Hyb} at the root node)
 and Feasibility Pump for MINLP (called in B-Hyb or B-BB at the root node), RINS, RENS, Local Branching.
 
 In all these cases, one can pass options to the sub-algorithm used through the bonmin.opt file. The basic principle is
-that the ``bonmin.'' prefix  is replaced with a prefix that identifies the sub-algorithm used:
+that the {\tt bonmin.} prefix  is replaced with a prefix that identifies the sub-algorithm used:
 \begin{itemize}
-\item to pass options to Outer Approximation Decomposition: {\tt oa\_decomposition.},
-\item to pass options to Feasibility Pump for MINLP: {\tt pump\_for\_minlp.},
-\item to pass options to RINS: {\tt rins.},
-\item to pass options to RENS: {\tt rens.},
-\item to pass options to Local Branching: {\tt local\_branch}.
+\item {\tt oa\_decomposition.} to pass options to Outer Approximation Decomposition,
+\item {\tt pump\_for\_minlp.} to pass options to Feasibility Pump for MINLP
+\item {\tt rins.} to pass options to RINS,
+\item {\tt rens.} to pass options to RENS,
+\item {\tt local\_branch.} to pass options to Local Branching.
 \end{itemize}
 
 
-For example, we may want to run a maximum of 60 seconds of FP for MINLP until 6 solutions are found at the beginning of the hybrid algorithm. To do so 
+For example, we may want to run a maximum of 60 seconds of the feasibility pump for MINLP until 6 solutions are found at the beginning of the hybrid algorithm. To do so 
 we set the following option in {\tt bonmin.opt}
 \begin{verbatim}
 bonmin.algorithm B-Hyb
 
-bonmin.pump_for_minlp yes      #Tells to run fp for MINLP
-pump_for_minlp.time_limit 60 #set a time limit for the pump
+bonmin.pump_for_minlp yes       # tells to run fp for MINLP
+pump_for_minlp.time_limit 60    # set a time limit for the pump
 pump_for_minlp.solution_limit 6 # set a solution limit
-
 \end{verbatim}
 
 Note that the actual solution and time limit will be the minimum of the global limits set for \Bonmin.
@@ -142,7 +141,7 @@ Several option are available for configuring this MILP solver.
 \Bonmin\ allows a choice of different MILP solvers through the option
 {\tt bonmin.milp\_subsolver}. Values for this option are: {\tt Cbc\_D} which uses {\tt Cbc} with its
 default settings, {\tt Cplex} which uses {\tt Cplex} with its default settings, and
-{\tt Cbc\_Par} which uses a version of {\tt Cbc} that can be parameterized by the user.
+{\tt Cbc\_Par} which uses a version of {\tt Cbc} that can be parametrized by the user.
 The options that can be set in {\tt Cbc\_Par} are the number of strong-branching candidates,
 the number of branches before pseudo costs are to be trusted, and the frequency of the various cut generators
 (these options are signaled in Table \ref{tab:options}).

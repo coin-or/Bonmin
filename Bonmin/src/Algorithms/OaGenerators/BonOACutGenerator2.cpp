@@ -87,7 +87,7 @@ namespace Bonmin
 
 
     double milpBound = -COIN_DBL_MAX;
-    bool milpFeasible = 1;
+    //bool milpFeasible = 1;
     bool feasible = 1;
 
     subMip_->solve(cutoff, parameters_.subMilpLogLevel_,
@@ -97,7 +97,7 @@ namespace Bonmin
     milpOptimal = subMip_->optimal();
 
     feasible = milpBound < cutoff;
-    milpFeasible = feasible;
+    //milpFeasible = feasible;
     isInteger = (subMip_->getLastSolution() != NULL);
     nLocalSearch_++;
 
@@ -250,7 +250,7 @@ namespace Bonmin
             feasible = 0;
             milpBound = 1e50;
           }
-          milpFeasible = feasible;
+          //milpFeasible = feasible;
         }
         if (subMip_->optimal())
           milpOptimal = 1;
@@ -287,7 +287,7 @@ namespace Bonmin
   void
   OACutGenerator2::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Options for OA decomposition", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Outer Approximation Decomposition (B-OA)", RegisteredOptions::BonminCategory);
     roptions->AddStringOption2("oa_decomposition", "If yes do initial OA decomposition",
                                "no",
                                "no","",
@@ -295,6 +295,7 @@ namespace Bonmin
                                "");
     roptions->setOptionExtraInfo("oa_decomposition",19);
 
+    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("oa_log_level",
         "specify OA iterations log level.",
         0,2,1,

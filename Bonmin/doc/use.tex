@@ -5,7 +5,7 @@
 \PageSection{From AMPL}{sec:run_ampl}
 \PageSection{priorities and SOS in AMPL}{sub_sec:prio}
 \PageSection{From GAMS}{sec:run_gams}
-\PageSection{From a C++ Programm}{sec:run_cpp}
+\PageSection{From a C++ Program}{sec:run_cpp}
 \end{PageSummary}
 
 \begin{quickref}
@@ -21,7 +21,7 @@ Programming, Second Edition, Duxbury Press Brooks Cole Publishing Co., 2003. R.~
 \item [(i)] from a command line on a {\tt .nl} file
 (see \mycite{Gay}{Gay2005}),
 \item [(ii)] from the modeling language \footlink{http://www.ampl.com}{\tt AMPL} (see
-\mycite{AMPL}{Fourrer2003}),
+\mycite{AMPL}{Fourer2003}),
 \item[(iii)] from the \footlink{http://www.gams.com/}{GAMS} modeling language,
 \item [(iv)] by invoking it from a C/C++ program,
 \item[(v)] remotely through the \footlink{http://neos.mcs.anl.gov/neos}{NEOS} web interface,
@@ -67,9 +67,9 @@ in the {\tt AMPL} environment. Then the next {\tt solve} will
 use \Bonmin\ to solve the model loaded in {\tt AMPL}.
 After the optimization is finished, the values of the variables in the best-known
 or optimal solution can be accessed in {\tt AMPL}. If the optimization is interrupted
-with {\tt <CTRL-C>} the best known solution is accessible (this feature is not available in Cygwin).\\
+with {\tt <CTRL-C>} the best known solution is accessible (this feature is not available in Cygwin).
 
-\subsubsectionH{Example {\tt AMPL} model}
+\subsubsectionH{Example {\tt AMPL} model}{}
 A simple {\tt AMPL} example model follows:
 
 \begin{colorverb}
@@ -90,8 +90,8 @@ A simple {\tt AMPL} example model follows:
        c2: x - y[1] <= 0 ;
        c3: x + y[2] + z <= 2;
 
-   option solver bonmin; # Choose BONMIN as the solver (assuming that
-                         # bonmin is in your PATH
+   option solver bonmin; # Choose BONMIN as the solver (assuming
+                         # that bonmin is in your PATH)
 
    solve;                # Solve the model
    display x;
@@ -99,9 +99,7 @@ A simple {\tt AMPL} example model follows:
 
 \end{verbatim}
 \end{colorverb}
-
-(This example can be found in the subdirectory {\tt Bonmin/examples/amplExamples/} of
-the \Bonmin\ package.)
+(This example model can be found in the \Bonmin\ package in the subdirectory {\tt Bonmin/examples/amplExamples/}.)
 
 \subsubsectionH{Setting up branching priorities, directions and declaring SOS1 constraints in AMPL}{sub_sec:prio}
 Branching priorities, branching directions and pseudo-costs can be passed using {\tt AMPL} suffixes.
@@ -111,7 +109,7 @@ for branching direction is {\tt "direction"} (if direction is $1$ the $\geq$ bra
 is explored first, if direction is $-1$ the $\leq$ branch is explored first), for up
 and down pseudo costs {\tt "upPseudoCost"} and {\tt "downPseudoCost"} respectively
 (note that if only one of the up and down pseudo-costs is set in the {\tt AMPL} model it will
-be used for both up and down).\\
+be used for both up and down).
 
 For example, to give branching priorities of $10$ to variables {\tt y} and 1 to variable {\tt x}
 and to set the branching directions to explore the upper branch first for all variables
@@ -138,8 +136,9 @@ Two type of suffixes should be declared:
 
 \begin{colorverb}
 \begin{verbatim}
-suffix sosno IN, integer, >=1;  # Note that the solver assumes that these
-                                #   values are positive for SOS Type 1
+suffix sosno IN, integer, >=1;  # Note that the solver assumes
+                                # that these values are positive
+                                # for SOS Type 1
 suffix ref IN;
 \end{verbatim}
 \end{colorverb}

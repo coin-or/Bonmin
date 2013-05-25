@@ -7,11 +7,7 @@
 //
 // Date : November 12, 2007
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
+#include "CoinPragma.hpp"
 #include "BonHeuristicDiveMIPVectorLength.hpp"
 #include "CbcModel.hpp"
 
@@ -166,13 +162,13 @@ namespace Bonmin
 
   void
   HeuristicDiveMIPVectorLength::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "heuristic_dive_MIP_vectorLength",
      "if yes runs the Dive MIP VectorLength heuristic",
      "no",
-     "no", "don't run it",
-     "yes", "runs the heuristic",
+     "no", "",
+     "yes", "",
      "");
    roptions->setOptionExtraInfo("heuristic_dive_MIP_vectorLength", 63);
   }

@@ -7,11 +7,7 @@
 //
 // Date : November 12, 2007
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
-
+#include "CoinPragma.hpp"
 #include "BonHeuristicDiveFractional.hpp"
 #include "CbcModel.hpp"
 
@@ -113,13 +109,13 @@ namespace Bonmin
 
   void
   HeuristicDiveFractional::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "heuristic_dive_fractional",
      "if yes runs the Dive Fractional heuristic",
      "no",
-     "no", "don't run it",
-     "yes", "runs the heuristic",
+     "no", "",
+     "yes", "",
      "");
    roptions->setOptionExtraInfo("heuristic_dive_fractional", 63);
   }

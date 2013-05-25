@@ -13,8 +13,8 @@
        c2: x - y[1] <= 0 ;
        c3: x + y[2] + z <= 2;
 
-   option solver bonmin; # Choose BONMIN as the solver (assuming that
-                         # bonmin is in your PATH
+   option solver bonmin; # Choose BONMIN as the solver (assuming
+                         # that bonmin is in your PATH)
 
    solve;                # Solve the model
    display x;

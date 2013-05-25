@@ -1,10 +1,7 @@
 // Copyright (C) 2006, 2007 International Business Machines
 // Corporation and others.  All Rights Reserved.
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 
+#include "CoinPragma.hpp"
 #include "BonLpBranchingSolver.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include <vector>
@@ -202,7 +199,7 @@ namespace Bonmin
   void
   LpBranchingSolver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Bonmin ecp based strong branching",RegisteredOptions::UndocumentedCategory);
+    roptions->SetRegisteringCategory("ECP based strong branching",RegisteredOptions::UndocumentedCategory);
     roptions->AddLowerBoundedIntegerOption
     ("ecp_max_rounds_strong",
      "Set the maximal number of rounds of ECP cuts in strong branching.",

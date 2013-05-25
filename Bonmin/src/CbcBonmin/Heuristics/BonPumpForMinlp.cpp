@@ -60,13 +60,13 @@ namespace Bonmin {
 
   void
   PumpForMinlp::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-   roptions->SetRegisteringCategory("MINLP Heuristics", RegisteredOptions::BonminCategory);
+   roptions->SetRegisteringCategory("Primal Heuristics", RegisteredOptions::BonminCategory);
    roptions->AddStringOption2(
      "pump_for_minlp",
-     "if yes runs FP for MINLP",
+     "whether to run the feasibility pump heuristic for MINLP",
      "no",
-     "no", "don't run it",
-     "yes", "runs the heuristic",
+     "no", "",
+     "yes", "",
      "");
     roptions->setOptionExtraInfo("pump_for_minlp", 63);
   }

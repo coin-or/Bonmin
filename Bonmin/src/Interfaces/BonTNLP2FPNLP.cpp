@@ -107,11 +107,11 @@ namespace Bonmin
                                 // other that uses index_style_
 
     if(use_feasibility_pump_objective_ && norm_ == 2)
-      nnz_h_lag += vals_.size();
+      nnz_h_lag += (int)vals_.size();
 
     if(use_cutoff_constraint_ && use_local_branching_constraint_) {
       m += 2;
-      nnz_jac_g += (n + vals_.size());
+      nnz_jac_g += (n + (int)vals_.size());
     }
     else if(use_cutoff_constraint_) {
       m++;
@@ -119,7 +119,7 @@ namespace Bonmin
     }
     else if(use_local_branching_constraint_) {
       m++;
-      nnz_jac_g += vals_.size();
+      nnz_jac_g += (int)vals_.size();
     }
 
     return ret_code;
@@ -253,7 +253,7 @@ namespace Bonmin
     bool ret_code;
 
     if(use_cutoff_constraint_ && use_local_branching_constraint_) {
-      int n_integers = vals_.size();
+      int n_integers = (int)vals_.size();
       ret_code = tnlp_->eval_jac_g(n, x, new_x, m, nele_jac - n - n_integers, 
 				   iRow, jCol, values);
 
@@ -337,7 +337,7 @@ namespace Bonmin
       }
     }
     else if(use_local_branching_constraint_) {
-      int n_integers = vals_.size();
+      int n_integers = (int)vals_.size();
       ret_code = tnlp_->eval_jac_g(n, x, new_x, m, nele_jac - n_integers, 
 				   iRow, jCol, values);
       
@@ -380,7 +380,7 @@ namespace Bonmin
   {
     bool ret_code;
 
-    int  nnz_obj_h = (norm_ == 2) ? inds_.size() : 0;
+    int  nnz_obj_h = (norm_ == 2) ? (int)inds_.size() : 0;
 
     if(use_cutoff_constraint_ && use_local_branching_constraint_) {
       double coef_obj = (iRow != NULL)?0 : lambda[m - 2];

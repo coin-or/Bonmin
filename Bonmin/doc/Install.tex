@@ -24,17 +24,15 @@ The build process for \Bonmin\ should be fairly automatic as it uses
 \item Mac OS X using gcc 4.5
 \end{itemize}
 
-For Cygwin and OS X some specific setup has to be done prior to instalation. These step are described on the wiki pages of {\tt Bonmin}  \footlink{https://projects.coin-or.org/Bonmin/wiki/CygwinInstall}{CygwinInstall} and \footlink{https://projects.coin-or.org/Bonmin/wiki/OsxInstall}{OsxInstall}.
+For Cygwin and OS X some specific setup has to be done prior to installation. These step are described on the wiki pages of {\tt Bonmin}  \footlink{https://projects.coin-or.org/Bonmin/wiki/CygwinInstall}{CygwinInstall} and \footlink{https://projects.coin-or.org/Bonmin/wiki/OsxInstall}{OsxInstall}.
 
 
 \Bonmin\ is compiled and installed using the commands:
 \begin{colorverb}
 \begin{verbatim}
-
 ./configure -C
 make
 make install
-
 \end{verbatim}
 \end{colorverb}
 
@@ -48,9 +46,7 @@ The options for the configure script can be found by issuing the command
 
 \begin{colorverb}
 \begin{verbatim}
-
 ./configure --help
-
 \end{verbatim}
 \end{colorverb}
 
@@ -63,19 +59,18 @@ as the Mixed Integer Linear Programming subsolver in {\tt B-OA}, {\tt B-Hyb}
 and {\tt B-iFP}.
 To do so you have to specify the location of the header files and libraries.
 You can either specify the location of the header files directory by passing it as an
-argument to the configure script or by writing it into a {\tt config.site}.\\
+argument to the configure script or by writing it into a {\tt config.site}.
 
 In the former case, specify the location of the {\tt Cplex} header files by using the
 argument {\tt --with-cplexincdir} and the location of the
 {\tt Cplex } library with {\tt --with-cplexlib} (note that on the Linux platform you will also
-need to add {\tt -lpthread -lm} as an argument to {\tt --with-cplexlib}).\\
+need to add {\tt -lpthread -lm} as an argument to {\tt --with-cplexlib}).
 
 For example, on a Linux machine if {\tt Cplex} is installed in {\tt /usr/ilog}~, you would
 invoke configure with the arguments as follows:
 
 \begin{colorverb}
 \begin{verbatim}
-
 ./configure --with-cplex-incdir=/usr/ilog/cplex/include/ilcplex \
   --with-cplex-lib="/usr/ilog/cplex/lib/libcplex.a -lpthread -lm"
  \end{verbatim}
@@ -90,10 +85,8 @@ following lines in the {\tt config.site} file:
 
 \begin{colorverb}
  \begin{verbatim}
-
  with_cplex_lib="/usr/ilog/cplex/lib/libcplex.a -lpthread"
- with_cplex_incdir="/usr/ilog/cplex/include/ilcplex -lm"
- 
+ with_cplex_incdir="/usr/ilog/cplex/include/ilcplex -lm" 
  \end{verbatim}
 \end{colorverb}
 
@@ -103,14 +96,14 @@ following lines in the {\tt config.site} file:
 It is recommended to compile \Bonmin\ in a directory different from the source directory ({\tt Bonmin-\stableVersion} in our case).
 This is convenient if you want to have several executables compiled for different architectures or have several executables compiled with different options
 (debugging and production, shared and static libraries) but also because
-you don't modify the directory where the sources are.\\
+you don't modify the directory where the sources are.
 
 To do this just create a new directory, for example {\tt Bonmin-build} in the parent directory of
-{\tt Bonmin-\stableVersion} and run the configure command from {\tt Bonmin-build}:
+{\tt Bonmin-\stableVersion} and run configure from {\tt Bonmin-build}:
+\medskip
 
-\begin{colorverb}
- \noindent {\tt  ../Bonmin-\stableVersion/configure -C }
-\end{colorverb}
+{\tt  ../Bonmin-\stableVersion/configure -C }
+\medskip
 
 This will create the makefiles in {\tt Bonmin-build}, and
 you can then compile with the usual {\tt make} and {\tt make install}

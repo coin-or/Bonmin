@@ -50,16 +50,29 @@ static void
 register_general_options
 (SmartPtr<RegisteredOptions> roptions)
 {
-  roptions->SetRegisteringCategory("nlp interface option", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("NLP interface", RegisteredOptions::BonminCategory);
   roptions->AddStringOption3("nlp_solver",
-                             "Choice of the solver for local optima of continuous nlp's",
+                             "Choice of the solver for local optima of continuous NLP's",
                              "Ipopt",
                              "Ipopt", "Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)",
                              "filterSQP", "Sequential quadratic programming trust region "
                                           "algorithm (http://www-unix.mcs.anl.gov/~leyffer/solvers.html)",
                              "all", "run all available solvers at each node",
-                             "Note that option will work only if the specified solver has been installed. Ipopt will usualy be installed with Bonmin by default. For FilterSQP please see http://www-unix.mcs.anl.gov/~leyffer/solvers.html on how to obtain it and https://projects.coin-or.org/Bonmin/wiki/HintTricks on how to configure Bonmin to use it.");
+                             "Note that option will work only if the specified solver has been installed. Ipopt will usually be installed with Bonmin by default. For FilterSQP please see http://www-unix.mcs.anl.gov/~leyffer/solvers.html on how to obtain it and https://projects.coin-or.org/Bonmin/wiki/HintTricks on how to configure Bonmin to use it.");
   roptions->setOptionExtraInfo("nlp_solver",127);
+  
+  roptions->AddStringOption4("warm_start",
+      "Select the warm start method",
+      "none",
+      "none","No warm start, just start NLPs from optimal solution of the root relaxation",
+      "fake_basis", "builds fake basis, useful for cut management in Cbc (warm start is the same as in none)",
+      "optimum","Warm start with direct parent optimum",
+      "interior_point","Warm start with an interior point of direct parent",
+      "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
+  roptions->setOptionExtraInfo("warm_start",8);
+
+  roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+  
   roptions->AddBoundedIntegerOption("nlp_log_level",
                                     "specify NLP solver interface log level (independent from ipopt print_level).",
                                      0,2,1,
@@ -75,17 +88,7 @@ register_general_options
        "no","","");
   roptions->setOptionExtraInfo("file_solution",127);
 
-  roptions->AddStringOption4("warm_start",
-      "Select the warm start method",
-      "none",
-      "none","No warm start, just start NLPs from optimal solution of the root relaxation",
-      "fake_basis", "builds fake basis, useful for cut management in Cbc (warm start is the same as in none)",
-      "optimum","Warm start with direct parent optimum",
-      "interior_point","Warm start with an interior point of direct parent",
-      "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
-  roptions->setOptionExtraInfo("warm_start",8);
-
-  roptions->SetRegisteringCategory("Nlp solution robustness", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("NLP solution robustness", RegisteredOptions::BonminCategory);
 
   roptions->AddLowerBoundedNumberOption("max_random_point_radius",
       "Set max value r for coordinate of a random point.",
@@ -103,7 +106,7 @@ register_general_options
   roptions->setOptionExtraInfo("random_point_type",8);
 
     roptions->AddLowerBoundedNumberOption("random_point_perturbation_interval",
-					   "Amount by which starting point is perturbed when choosing to pick random point by perturbating starting point",
+					   "Amount by which starting point is perturbed when choosing to pick random point by perturbing starting point",
 					   0.,true, 1.,
 					   "");
   roptions->setOptionExtraInfo("random_point_perturbation_interval",8);
@@ -114,7 +117,7 @@ register_general_options
    "Number of iterations over which a node is considered \"suspect\" (for debugging purposes only, see detailed documentation).",
    -1,-1,
    "When the number of iterations to solve a node is above this number, the subproblem at this"
-   " node is considered to be suspect and it will be outputed in a file (set to -1 to deactivate this).");
+   " node is considered to be suspect and it will be written into a file (set to -1 to deactivate this).");
   roptions->setOptionExtraInfo("num_iterations_suspect",127);
 
   
@@ -129,16 +132,16 @@ register_general_options
       " or until the problem is solved with success.");
   roptions->setOptionExtraInfo("num_retry_unsolved_random_point",127);
 
- roptions->AddLowerBoundedNumberOption("resolve_on_small_infeasibility",
-					   "If a locally infeasible problem is infeasible by less than this, resolve it "
-                                           "with initial starting point.",
-					   0.,false, 0.,
-					   "It is set to 0 by default with Ipopt. "
-                                           "For filter Bonmin sets it to a small value.");
-  roptions->setOptionExtraInfo("random_point_perturbation_interval",8);
+  roptions->AddLowerBoundedNumberOption("resolve_on_small_infeasibility",
+      "If a locally infeasible problem is infeasible by less than this, resolve it "
+      "with initial starting point.",
+      0.,false, 0.,
+     "It is set to 0 by default with Ipopt. "
+     "When using FilterSQP, Bonmin sets it to a small value.");
+  roptions->setOptionExtraInfo("resolve_on_small_infeasibility",8);
 
 
-  roptions->SetRegisteringCategory("Options for non-convex problems", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("Nonconvex problems", RegisteredOptions::BonminCategory);
 
 
   roptions->AddLowerBoundedIntegerOption("num_resolve_at_root",
@@ -166,8 +169,8 @@ register_general_options
   roptions->AddStringOption2("dynamic_def_cutoff_decr",
       "Do you want to define the parameter cutoff_decr dynamically?",
       "no",
-      "no", "No, define it statically",
-      "yes","Yes, define it dynamically");
+      "no", "",
+      "yes", "");
   roptions->setOptionExtraInfo("dynamic_def_cutoff_decr",8);
 
   roptions->AddLowerBoundedNumberOption("coeff_var_threshold",
@@ -194,7 +197,7 @@ static void register_OA_options
 {
 	//
 
-  roptions->SetRegisteringCategory("Outer Approximations strengthening", RegisteredOptions::UndocumentedCategory);
+  roptions->SetRegisteringCategory("Outer Approximation strengthening", RegisteredOptions::UndocumentedCategory);
   roptions->AddStringOption2("disjunctive_cut_type",
       "Determine if and what kind of disjunctive cuts should be computed.",
       "none",
@@ -227,7 +230,7 @@ static void register_OA_options
   roptions->AddStringOption2("add_only_violated_oa","Do we add all OA cuts or only the ones violated by current point?",
 			     "no",
 			     "no","Add all cuts",
-			     "yes","Add only violated Cuts","");
+			     "yes","Add only violated cuts","");
   roptions->setOptionExtraInfo("add_only_violated_oa",119);
 
   
@@ -248,6 +251,8 @@ static void register_OA_options
       "RHS of OA constraints will be relaxed by this amount times the absolute value of the initial rhs if it is >= 1 (otherwise by this amount)."
       );
   roptions->setOptionExtraInfo("oa_rhs_relax",119);
+
+  roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
 
   roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
                                          "level of log when generating OA cuts.",
@@ -940,38 +945,34 @@ OsiTMINLPInterface::resolveForCost(int numsolve, bool keepWarmStart)
 
 
   if(of_current != NULL){
-     //calculate the mean
-     mean=mean/(numsolve-num_failed-num_infeas);
+    //calculate the mean
+    mean=mean/(numsolve-num_failed-num_infeas);
      
-     std_dev = 0;
+    std_dev = 0;
      
-     //calculate the std deviation
-     for(int i=0; i<numsolve; i++)
-     {
-       if(of_current[i]!=0)
-         std_dev=std_dev+pow(of_current[i]-mean,2);
-     }
-     std_dev=pow((std_dev/(numsolve-num_failed-num_infeas)),0.5);
+    //calculate the std deviation
+    for(int i=0; i<numsolve; i++)
+    {
+      if(of_current[i]!=0)
+        std_dev=std_dev+pow(of_current[i]-mean,2);
+    }
+    std_dev=pow((std_dev/(numsolve-num_failed-num_infeas)),0.5);
      
-     //calculate coeff of variation
-     var_coeff=std_dev/mean;
-  }
+    //calculate coeff of variation
+    var_coeff=std_dev/mean;
 
-
-
-
-  if(dynamicCutOff_)
-  {
-     if(var_coeff<0.1)
-     {
+    if(dynamicCutOff_)
+    {
+      if(var_coeff<0.1)
+      {
         setNewCutoffDecr(mean*first_perc_for_cutoff_decr_);
-     }
-     else
-     {
+      }
+      else
+      {
         setNewCutoffDecr(mean*second_perc_for_cutoff_decr_);
-     }
+      }
+    }
   }
-     
 
   problem_->Set_x_sol(getNumCols(),point());
   problem_->Set_dual_sol((int) point.size()-getNumCols(), point() + getNumCols());
@@ -1764,10 +1765,7 @@ OsiTMINLPInterface::randomStartingPoint()
     }
   }
   for(int i = 0 ; i < numcols ; i++) {
-    int randomGenerationType = randomGenerationType_;
-    if(x_init[i] < colLower[i] || x_init[i] > colUpper[i])
-      randomGenerationType = uniform;
-    if(randomGenerationType_ == uniform){
+    if(randomGenerationType_ == uniform || x_init[i] < colLower[i] || x_init[i] > colUpper[i]) {
       double lower = std::min(-maxRandomRadius_,colUpper[i] - maxRandomRadius_);
       lower = std::max(colLower[i], lower);
       double upper = std::max(maxRandomRadius_,colLower[i] + maxRandomRadius_);
@@ -1775,14 +1773,15 @@ OsiTMINLPInterface::randomStartingPoint()
       lower = std::min(upper,lower);
       upper = std::max(upper, lower);
       double interval = upper - lower;
-      sol[i] = CoinDrand48()*(interval) + lower;}
-    else if (randomGenerationType_ == perturb){
+      sol[i] = CoinDrand48()*(interval) + lower;
+    }
+    else if (randomGenerationType_ == perturb) {
       const double lower = std::max(x_init[i] - max_perturbation_, colLower[i]);
       const double upper = std::min(x_init[i] + max_perturbation_, colUpper[i]);
       const double interval = upper - lower;
       sol[i]  = lower + CoinDrand48()*(interval);
     }
-    else if (randomGenerationType_ == perturb_suffix){
+    else if (randomGenerationType_ == perturb_suffix) {
       const double radius = perturb_radius[i];
       const double lower = std::max(x_init[i] - radius*max_perturbation_, colLower[i]);
       const double upper = std::min(x_init[i] + radius*max_perturbation_, colUpper[i]);

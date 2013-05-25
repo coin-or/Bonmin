@@ -130,7 +130,7 @@ namespace Bonmin {
         mycuts[i] = cuts.rowCutPtr(i);
         cs.insert(*mycuts[i]);
       }
-      nlp->applyRowCuts(mycuts.size(), const_cast<const OsiRowCut **> (&mycuts[0]));
+      nlp->applyRowCuts((int)mycuts.size(), const_cast<const OsiRowCut **> (&mycuts[0]));
     }
 
     // Take off slack cuts

@@ -145,7 +145,7 @@ namespace Bonmin
   void
   EcpCuts::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
   {
-    roptions->SetRegisteringCategory("Options for ecp cuts generation", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("ECP cuts generation", RegisteredOptions::BonminCategory);
     roptions->AddLowerBoundedIntegerOption("filmint_ecp_cuts",
         "Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are generated.",
         0,0,

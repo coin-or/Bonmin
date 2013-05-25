@@ -1,11 +1,8 @@
 // Copyright (C) 2006, 2008 International Business Machines
 // Corporation and others.  All Rights Reserved.
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 
 #include <climits>
+#include "CoinPragma.hpp"
 #include "BonChooseVariable.hpp"
 #include "CoinTime.hpp"
 #include "IpBlas.hpp"
@@ -659,7 +656,7 @@ namespace Bonmin
       }
       int numberFixed=0;
       if (results_.size() > 0) {
-        returnCode = doStrongBranching(solver, info, results_.size(), 1);
+        returnCode = doStrongBranching(solver, info, (int)results_.size(), 1);
         if (bb_log_level_>=3) {
           OsiObject ** obj = solver->objects();
           const char* stat_msg[] = {"NOTDON", "FEAS", "INFEAS", "NOFINI"};

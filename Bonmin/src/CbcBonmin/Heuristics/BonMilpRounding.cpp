@@ -351,7 +351,7 @@ namespace Bonmin
   }
   void
   MilpRounding::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){
-    roptions->SetRegisteringCategory("Undocumented Heuristics", RegisteredOptions::UndocumentedCategory);
+    roptions->SetRegisteringCategory("Primal Heuristics (undocumented)", RegisteredOptions::UndocumentedCategory);
    roptions->AddStringOption2(
      "MILP_rounding_heuristic",
      "if yes runs the heuristic",

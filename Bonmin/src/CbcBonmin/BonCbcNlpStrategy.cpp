@@ -8,14 +8,11 @@
 //
 // Date : 03/15/2006
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 #include <cassert>
 #include <cmath>
 #include <cfloat>
 
+#include "CoinPragma.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CbcModel.hpp"
 #include "BonCbcNlpStrategy.hpp"
@@ -104,8 +101,8 @@ namespace Bonmin
       seqOfInfeasiblesSize++;
     }
 
-    if ((seqOfUnsolvedSize==0) || (maxFailure_ == 0) &&
-        (maxInfeasible_== 0) || (seqOfInfeasiblesSize==0))
+    if (((seqOfUnsolvedSize==0) || (maxFailure_ == 0)) &&
+        ((maxInfeasible_== 0) || (seqOfInfeasiblesSize==0)))
 
       if (feasible && seqOfInfeasiblesSize > 1) {
         (*model->messageHandler())<<"Feasible node while father was infeasible."
@@ -119,7 +116,7 @@ namespace Bonmin
 
     if (seqOfInfeasiblesSize < maxInfeasible_ &&
         solved && !feasible) {
-      (*model->messageHandler())<<"Branching on infeasible node, sequence of infeasibles size "
+      (*model->messageHandler())<<"Branching on infeasible node, sequence of infeasible size "
       <<seqOfInfeasiblesSize<<CoinMessageEol;
       // Have to make sure that we will branch
       OsiTMINLPInterface * ipopt = dynamic_cast<OsiTMINLPInterface *>(solver);
