@@ -193,7 +193,7 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
 
    /** Output Latex/Html ooptions documentation.*/
    void writeLatexHtmlDoc(std::ostream &of, ExtraCategoriesInfo which);
-  /** Ouptut a bonmin.opt file with options default values and short descritpions.*/
+  /** Ouptut a bonmin.opt file with options default values and short descriptions.*/
   void writeBonminOpt(std::ostream &os, ExtraCategoriesInfo which);
 
    /** Get info about what a category is taking care of (e.g., Ipopt, Bonmin, FilterSQP,...) .*/
