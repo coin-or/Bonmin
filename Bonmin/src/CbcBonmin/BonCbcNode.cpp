@@ -9,13 +9,10 @@
 // Date : 03/15/2006
 
 
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 #include <string>
 #include <cassert>
 #include <cfloat>
+#include "CoinPragma.hpp"
 #include "OsiSolverInterface.hpp"
 #include "CoinWarmStartBasis.hpp"
 #include "CbcModel.hpp"

@@ -1,11 +1,8 @@
 // Copyright (C) 2006, 2008 International Business Machines
 // Corporation and others.  All Rights Reserved.
-#if defined(_MSC_VER)
-// Turn off compiler warning about long names
-#  pragma warning(disable:4786)
-#endif
 
 #include <climits>
+#include "CoinPragma.hpp"
 #include "BonNWayChoose.hpp"
 #include "BonNWayObject.hpp"
 #include "CoinTime.hpp"
