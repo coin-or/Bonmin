@@ -1,5 +1,4 @@
-\newcommand{\stableVersion}{1.5}
-\newcommand{\releaseVersion}{1.5.0}
+\newcommand{\stableVersion}{1.7}
 %Some frequently used html addresses
 
 %Documentation Pages
@@ -53,8 +52,9 @@
 \href{bib.html\##1}{[#2]}
 }
 }
-\newcommand{\footlink}[2]{\href{#1}{#2}\latex{\footnote{#1}}}
-\def\htmlanchor#1{\HCode{<a id="#1"></a>}}
+\newcommand{\footlink}[2]{\href{#1}{#2}\latex{\footnote{\url{#1}}}}
+\def\htmlanchor#1{\HCode{<a id="}#1\HCode{"></a>}}
+\newcommand{\doilink}[1]{\href{http://dx.doi.org/#1}{doi:\detokenize{#1}}}
 
 
 %Put into a colored background for verbatim
