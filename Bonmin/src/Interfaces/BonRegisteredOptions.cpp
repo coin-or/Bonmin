@@ -179,8 +179,8 @@ namespace Bonmin{
   of<<"\\tabletail{\\hline \\multicolumn{9}{|c|}{continued on next page}\\\\"
     <<"\\hline}"<<std::endl; 
   of<<"\\tablelasttail{\\hline}"<<std::endl;
-  of<<"{\\small"<<std::endl;
-  of<<"\\begin{xtabular}{|l|r|r|r|r|r|r|r|r|}"<<std::endl;
+  of<<"{\\footnotesize"<<std::endl;
+  of<<"\\begin{xtabular}{@{}|@{\\;}l@{\\;}|@{\\;}r@{\\;}|@{\\;}c@{\\;}|@{\\;}c@{\\;}|@{\\;}c@{\\;}|@{\\;}c@{\\;}|@{\\;}c@{\\;}|@{\\;}c@{\\;}|@{\\;}c@{\\;}|@{}}"<<std::endl;
 
   //sort options by categories and alphabetical order
   std::list< Ipopt::RegisteredOption * > sortedOptions;

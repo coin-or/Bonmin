@@ -32,7 +32,7 @@ project but also source code from other \COINOR\ projects:
 \end{itemize}
 
 When downloading the \Bonmin\ package you will download the source code for all these and
-libraries of problems to test the codes.\\
+libraries of problems to test the codes.
 
 Before downloading \Bonmin\ you need to know which branch of Bonmin you want to download. 
 In particular you need to know if you want to download the latest version from:
@@ -51,13 +51,10 @@ The only way to obtain one of the stable versions is through \href{http://subver
 In Unix\footnote{UNIX is a registered trademark of The Open
 Group.}-like environments, to download the latest stable version of Bonmin (\stableVersion) in a sub-directory, say {\tt Bonmin-\stableVersion} 
 issue the following command
-%\begin{verbatim}
-\break
-
-\begin{colorverb}
- \noindent {\tt  svn co
-https://projects.coin-or.org/svn/Bonmin/stable/\stableVersion\ Bonmin-\stableVersion }
-\end{colorverb}
+\begin{center}
+\tt \small svn co
+https://projects.coin-or.org/svn/Bonmin/stable/\stableVersion\ Bonmin-\stableVersion
+\end{center}
 
 \noindent This copies all the necessary COIN-OR files to compile \Bonmin\ to
 {\tt Bonmin-\stableVersion}. To download \Bonmin\ using svn on Windows,
@@ -83,7 +80,7 @@ CYGWIN, Lapack and Blas are available as prebuild binary packages in
 the distribution (and are probably already installed on your
 machine). 
 
-Linear solvers are used by Ipopt. The most up-to-date information regarding the supported linear solvers and how to install them is found in \href{http://www.coin-or.org/Ipopt/documentation/node13.html}{Section 2.2} of the Ipopt manual.\\
+Linear solvers are used by Ipopt. The most up-to-date information regarding the supported linear solvers and how to install them is found in \href{http://www.coin-or.org/Ipopt/documentation/node13.html}{Section 2.2} of the Ipopt manual.
 
 Several options are available for linear solvers: MA27 from the Harwell Subroutine Library (and optionally, but strongly recommended, MC19 to enable automatic scaling in \Ipopt), MA57 or Mumps.
 In our experiment MA27 and MA57 usually perform significantly better but they are freely 
