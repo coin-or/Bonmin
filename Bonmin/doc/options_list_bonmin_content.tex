@@ -577,7 +577,7 @@
 <td>+</td>
 <td>+</td>
 </tr>
-<tr>   <th colspan=9> <a href="#sec:Output">Output</a> </th>
+<tr>   <th colspan=9> <a href="#sec:OutputandLoglevel">Output and Loglevel</a> </th>
 </tr>
 <tr>
 <td>bb_log_interval</td>
@@ -589,14 +589,6 @@
 </tr>
 <tr>
 <td>bb_log_level</td>
-<td>I</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>file_print_level</td>
 <td>I</td>
 <td> +</td>
 <td>+</td>
@@ -624,14 +616,6 @@
 <td>I</td>
 <td> -</td>
 <td>-</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>inf_pr_output</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
 <td>+</td>
 <td>+</td>
 </tr>
@@ -689,94 +673,6 @@
 <td> +</td>
 <td>-</td>
 <td>-</td>
-<td>+</td>
-</tr>
-<tr>
-<td>option_file_name</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>output_file</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>print_frequency_iter</td>
-<td>I</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>print_frequency_time</td>
-<td>F</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>print_info_string</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>print_level</td>
-<td>I</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>print_options_documentation</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>print_timing_statistics</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>print_user_options</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>replace_bounds</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
-<td>+</td>
-</tr>
-<tr>
-<td>skip_finalize_solution_call</td>
-<td>S</td>
-<td> +</td>
-<td>+</td>
-<td>+</td>
 <td>+</td>
 </tr>
 <tr>   <th colspan=9> <a href="#sec:PrimalHeuristics">Primal Heuristics</a> </th>
@@ -1455,9 +1351,9 @@ $-0 \le {\tt very\_tiny\_element } <  {\tt +inf}$
 and its default value is $1 \cdot 10^{-17}$.
 
 
-\subsection{Output}
-\label{sec:Output}
-\htmlanchor{sec:Output}
+\subsection{Output and Loglevel}
+\label{sec:OutputandLoglevel}
+\htmlanchor{sec:OutputandLoglevel}
 \paragraph{bb\_log\_interval:}\label{opt:bb_log_interval} Interval at which node level output is printed. \\
  Set the interval (in terms of number of nodes) at which a log on node resolutions (consisting of lower and upper bounds) is given. The valid range for this integer option is
 $0 \le {\tt bb\_log\_interval } <  {\tt +inf}$
@@ -1468,12 +1364,6 @@ and its default value is $100$.
  Set the level of output of the branch-and-bound : 0 - none, 1 - minimal, 2 - normal low, 3 - normal high The valid range for this integer option is
 $0 \le {\tt bb\_log\_level } \le 5$
 and its default value is $1$.
-
-
-\paragraph{file\_print\_level:}\label{opt:file_print_level} Verbosity level for output file. \\
- NOTE: This option only works when read from the ipopt.opt options file! Determines the verbosity level for the file specified by "output\_file".  By default it is the same as "print\_level". The valid range for this integer option is
-$0 \le {\tt file\_print\_level } \le 12$
-and its default value is $5$.
 
 
 \paragraph{file\_solution:}\label{opt:file_solution} Write a file bonmin.sol with the solution \\
@@ -1496,15 +1386,6 @@ and its default value is $100$.
 $0 \le {\tt fp\_log\_level } \le 2$
 and its default value is $1$.
 
-
-\paragraph{inf\_pr\_output:}\label{opt:inf_pr_output} Determines what value is printed in the "inf\_pr" output column. \\
- Ipopt works with a reformulation of the original problem, where slacks are introduced and the problem might have been scaled.  The choice "internal" prints out the constraint violation of this formulation. With "original" the true constraint violation in the original NLP is printed. The default value for this string option is "original".
-\\ 
-Possible values:
-\begin{itemize}
-   \item internal: max-norm of violation of internal equality constraints
-   \item original: maximal constraint violation in original NLP
-\end{itemize}
 
 \paragraph{lp\_log\_level:}\label{opt:lp_log_level} specify LP log level. \\
  Set the level of output of the linear programming sub-solver in B-Hyb or B-QG : 0 - none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose The valid range for this integer option is
@@ -1550,94 +1431,6 @@ and its default value is $100$.
 $0 \le {\tt oa\_log\_level } \le 2$
 and its default value is $1$.
 
-
-\paragraph{option\_file\_name:}\label{opt:option_file_name} File name of options file (to overwrite default). \\
- By default, the name of the Ipopt options file is "ipopt.opt" - or something else if specified in the IpoptApplication::Initialize call. If this option is set by SetStringValue BEFORE the options file is read, it specifies the name of the options file.  It does not make any sense to specify this option within the options file. The default value for this string option is "".
-\\ 
-Possible values:
-\begin{itemize}
-   \item *: Any acceptable standard file name
-\end{itemize}
-
-\paragraph{output\_file:}\label{opt:output_file} File name of desired output file (leave unset for no file output). \\
- NOTE: This option only works when read from the ipopt.opt options file! An output file with this name will be written (leave unset for no file output).  The verbosity level is by default set to "print\_level", but can be overridden with "file\_print\_level".  The file name is changed to use only small letters. The default value for this string option is "".
-\\ 
-Possible values:
-\begin{itemize}
-   \item *: Any acceptable standard file name
-\end{itemize}
-
-\paragraph{print\_frequency\_iter:}\label{opt:print_frequency_iter} Determines at which iteration frequency the summarizing iteration output line should be printed. \\
- Summarizing iteration output is printed every print\_frequency\_iter iterations, if at least print\_frequency\_time seconds have passed since last output. The valid range for this integer option is
-$1 \le {\tt print\_frequency\_iter } <  {\tt +inf}$
-and its default value is $1$.
-
-
-\paragraph{print\_frequency\_time:}\label{opt:print_frequency_time} Determines at which time frequency the summarizing iteration output line should be printed. \\
- Summarizing iteration output is printed if at least print\_frequency\_time seconds have passed since last output and the iteration number is a multiple of print\_frequency\_iter. The valid range for this real option is 
-$0 \le {\tt print\_frequency\_time } <  {\tt +inf}$
-and its default value is $0$.
-
-
-\paragraph{print\_info\_string:}\label{opt:print_info_string} Enables printing of additional info string at end of iteration output. \\
- This string contains some insider information about the current iteration.  For details, look for "Diagnostic Tags" in the Ipopt documentation. The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't print string
-   \item yes: print string at end of each iteration output
-\end{itemize}
-
-\paragraph{print\_level:}\label{opt:print_level} Output verbosity level. \\
- Sets the default verbosity level for console output. The larger this value the more detailed is the output. The valid range for this integer option is
-$0 \le {\tt print\_level } \le 12$
-and its default value is $5$.
-
-
-\paragraph{print\_options\_documentation:}\label{opt:print_options_documentation} Switch to print all algorithmic options. \\
- If selected, the algorithm will print the list of all available algorithmic options with some documentation before solving the optimization problem. The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't print list
-   \item yes: print list
-\end{itemize}
-
-\paragraph{print\_timing\_statistics:}\label{opt:print_timing_statistics} Switch to print timing statistics. \\
- If selected, the program will print the CPU usage (user time) for selected tasks. The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't print statistics
-   \item yes: print all timing statistics
-\end{itemize}
-
-\paragraph{print\_user\_options:}\label{opt:print_user_options} Print all options set by the user. \\
- If selected, the algorithm will print the list of all options set by the user including their values and whether they have been used.  In some cases this information might be incorrect, due to the internal program flow. The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: don't print options
-   \item yes: print options
-\end{itemize}
-
-\paragraph{replace\_bounds:}\label{opt:replace_bounds} Indicates if all variable bounds should be replaced by inequality constraints \\
- This option must be set for the inexact algorithm The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: leave bounds on variables
-   \item yes: replace variable bounds by inequality constraints
-\end{itemize}
-
-\paragraph{skip\_finalize\_solution\_call:}\label{opt:skip_finalize_solution_call} Indicates if call to NLP::FinalizeSolution after optimization should be suppressed \\
- In some Ipopt applications, the user might want to call the FinalizeSolution method separately.  Setting this option to "yes" will cause the IpoptApplication object to suppress the default call to that method. The default value for this string option is "no".
-\\ 
-Possible values:
-\begin{itemize}
-   \item no: call FinalizeSolution
-   \item yes: do not call FinalizeSolution
-\end{itemize}
 
 \subsection{Primal Heuristics}
 \label{sec:PrimalHeuristics}

@@ -252,7 +252,7 @@ namespace Bonmin
                                "no", "When master MILP is infeasible just bail out (don't stop all algorithm). This is the option for using in B-Hyb.",
                                "yes", "Claim convergence, numerically dangerous.","");
                                
-    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Output and Loglevel", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("fp_log_level",
         "specify FP iterations log level.",
         0,2,1,

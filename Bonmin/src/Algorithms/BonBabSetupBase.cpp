@@ -411,7 +411,7 @@ namespace Bonmin
   {
     OsiTMINLPInterface::registerOptions(roptions);
     /* BabSetup options.*/
-    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Output and Loglevel", RegisteredOptions::BonminCategory);
 
     roptions->AddBoundedIntegerOption("bb_log_level",
         "specify main branch-and-bound log level.",
@@ -754,7 +754,7 @@ namespace Bonmin
       categories.push_back("Nonconvex problems");
       categories.push_back("Outer Approximation Decomposition (B-OA)");
       categories.push_back("Outer Approximation cuts generation");
-      categories.push_back("Output");
+      categories.push_back("Output and Loglevel");
       categories.push_back("Strong branching setup");
       // Undocumented categories
       categories.push_back("Diving options");
